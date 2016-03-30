@@ -1,0 +1,5 @@
+# IntelliJ project files
+.idea
+
+vendor/
+config.inc.local.php
