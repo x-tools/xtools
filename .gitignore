@@ -1,5 +1,5 @@
 # IntelliJ project files
-.idea
+.idea/
 
 vendor/
 config.inc.local.php
