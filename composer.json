@@ -1,0 +1,16 @@
+{
+  "name": "vendor_name/package_name",
+  "description": "description_text",
+  "minimum-stability": "stable",
+  "license": "GPL",
+  "authors": [
+    {
+      "name": "X!",
+      "email": "xtools@lists.wikimedia.org"
+    }
+  ],
+  "require": {
+    "twbs/bootstrap": "v3.3.6",
+    "smarty/smarty": "v3.1.29"
+  }
+}

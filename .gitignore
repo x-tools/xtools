@@ -1,5 +1,6 @@
 # IntelliJ project files
 .idea/
 
+/composer.lock
 vendor/
 config.inc.local.php
