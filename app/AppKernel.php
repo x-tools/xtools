@@ -3,6 +3,9 @@
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 
+// MRB - Local System Workaround
+date_default_timezone_set("America/Denver");
+
 class AppKernel extends Kernel
 {
     public function registerBundles()
