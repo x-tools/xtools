@@ -12,3 +12,8 @@ services:
         public: false
         tags:
             - { name: twig.extension }
+    app.twig_extension:
+        class: AppBundle\Twig\TranslateExtension
+        public: false
+        tags:
+            - { name: twig.extension }
