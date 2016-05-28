@@ -25,10 +25,25 @@ class EditCounterController extends Controller
      */
 
     public function getAction() {
+        $request = Request::createFromGlobals();
+
+        $project = $request->query->get('project');
+        $username = $request->query->get('user');
+
+        if ($project == "") {
+            // Redirect back to the index
+            return $this->redirectToRoute("EditCounter", array());
+        }
+        if ($username == "") {
+            // Redirect to the project selection
+            return $this->redirectToRoute("EditCounterProject", array(
+                'project' => $project
+            ));
+        }
 
         return $this->redirectToRoute('EditCounterResult', array(
-            'project' => "enwiki",
-            'username' => "matthewrbowker"));
+            'project' => $project,
+            'username' => $username));
     }
 
     /**
@@ -36,6 +51,7 @@ class EditCounterController extends Controller
      */
     public function projectAction($project) {
         return $this->render('editCounter/index.html.twig', [
+            'title' => "$project edit counter",
             'project' => $project,
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
         ]);

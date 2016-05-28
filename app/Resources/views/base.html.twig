@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>X!'s tools</title>
+    <title>{% if title is defined%}{{ title }} - {% endif %}xTools</title>
 
     <link rel="stylesheet" type="text/css" href="{{ asset("bootstrap/css/bootstrap.min.css") }}">
     <link rel="stylesheet" type="text/css" href="{{ asset("res/stylenew.css") }}" />
@@ -44,7 +44,7 @@
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-left">
                 <li class="active" >			<a href="/ec" title="Edit Counter">Edit Counter</a></li>
-                <li class="" >	<a href="//tools.wmflabs.org/xtools-articleinfo/" title="Page history" >Page history</a></li>
+                <li class="" >	<a href="/articleinfo" title="Page history" >Page history</a></li>
                 <li class="" >			<a href="//tools.wmflabs.org/xtools/pages/" title="Pages created" >Pages created</a></li>
                 <li class="" >		<a href="//tools.wmflabs.org/xtools/topedits/" title="Top edits" >Top edits</a></li>
                 <li class="" >	<a href="//tools.wmflabs.org/xtools/rangecontribs/" title="Range contribs">Range Contributions</a></li>
@@ -76,7 +76,7 @@
         {% block body %}
         {% endblock %}
     <div class="container-fluid">
-        <span><small><span>Executed in 0.11 second(s).</span> &middot; <span>Taken 1.75 megabytes of memory to execute. (Peak: 2.25)</span></small></span>
+        <span><small><span>Executed in {{ request_time() }} second(s).</span> &middot; <span>Taken {{ memory_usage() }} megabytes of memory to execute. (Peak: {{ peak_memory() }})</span></small></span>
         <hr style="margin:5px 10px;" />
         <div class="row">
             <div class="col">
