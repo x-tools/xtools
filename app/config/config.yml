@@ -38,6 +38,7 @@ twig:
     strict_variables: "%kernel.debug%"
     globals:
         version: '%app.version%'
+        path:    '%web.path%'
 
 
 # Doctrine Configuration
