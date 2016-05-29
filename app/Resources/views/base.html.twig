@@ -43,21 +43,19 @@
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-left">
-                <li class="active" >			<a href="/ec" title="Edit Counter">Edit Counter</a></li>
-                <li class="" >	<a href="/articleinfo" title="Page history" >Page history</a></li>
-                <li class="" >			<a href="//tools.wmflabs.org/xtools/pages/" title="Pages created" >Pages created</a></li>
-                <li class="" >		<a href="//tools.wmflabs.org/xtools/topedits/" title="Top edits" >Top edits</a></li>
-                <li class="" >	<a href="//tools.wmflabs.org/xtools/rangecontribs/" title="Range contribs">Range Contributions</a></li>
-                <li class="" >			<a href="//tools.wmflabs.org/xtools/blame/" title="Article blamer" >Article blamer</a></li>
-
-                <!-- <li class="" >		<a href="//tools.wmflabs.org/xtools/autoedits/" title="Automated edits" >Automated edits</a></li>  -->
-                <li class="" >		<a href="//tools.wmflabs.org/xtools/autoblock/" title="Autoblock" >Autoblock</a></li>
-                <li class="" >	<a href="//tools.wmflabs.org/xtools/adminstats/" title="AdminStats" >AdminStats</a></li>
-                <li class="" >			<a href="//tools.wmflabs.org/xtools/rfa/" title="RfX" >RfX Analysis</a></li>
-                <li class="" >			<a href="//tools.wmflabs.org/xtools/rfap/" title="RfX Vote">RfX Vote Calculator</a></li>
-                <!-- <li class="" >			<a href="//tools.wmflabs.org/xtools/bash/">RQ</a></li>  -->
-                <li class="" >			<a href="//tools.wmflabs.org/xtools/sc" title="SC" >Quick, Dirty, Simple Edit Counter</a></li>
-
+                <li class="active" >{{ link("ec", "Edit Counter") }}</li>
+                <li class="" >{{ link("articleinfo", "Page History") }}</li>
+                <li class="" >{{ link("pages", "Pages created") }}</li>
+                <li class="" >{{ link("topedits", "Top edits") }}</li>
+                <li class="" >{{ link("rangecontribs", "Range contribs") }}</li>
+                <li class="" >{{ link("blame", "Article blamer") }}</li>
+                <li class="" >{{ link("autoedits", "Automated edits (BETA)") }}</li>
+                <li class="" >{{ link("autoblock", "Autoblock") }}</li>
+                <li class="" >{{ link("adminstats", "AdminStats") }}</li>
+                <li class="" >{{ link("rfa", "RfX Analysis") }}</li>
+                <li class="" >{{ link("rfap", "RfX Vote Calculator") }}</li>
+                <li class="" >{{ link("bash", "RQ (BETA)") }}</li>
+                <li class="" >{{ link("sc", "Quick, Dirty, Simple Edit Counter") }}</li>
             </ul>
         </div>
     </div>
@@ -76,7 +74,7 @@
         {% block body %}
         {% endblock %}
     <div class="container-fluid">
-        <span><small><span>Executed in {{ request_time() }} second(s).</span> &middot; <span>Taken {{ memory_usage() }} megabytes of memory to execute. (Peak: {{ peak_memory() }})</span></small></span>
+        <span><small><span>Executed in {{ request_time() }} second(s).</span> &middot; <span>Taken {{ memory_usage() }} megabytes of memory to execute. (Peak: {{ peak_memory() }}) - Version {{ version }}</span></small></span>
         <hr style="margin:5px 10px;" />
         <div class="row">
             <div class="col">
