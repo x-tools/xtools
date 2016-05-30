@@ -7,19 +7,19 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
 
-class EditCounterController extends Controller
+class SimpleEditCounterController extends Controller
 {
     /**
-     * @Route("/ec", name="EditCounter")
+     * @Route("/sc", name="SimpleEditCounter")
      */
     public function indexAction(Request $request)
     {
         // replace this example code with whatever you need
-        return $this->render('editCounter/index.html.twig', []);
+        return $this->render('simpleEditCounter/index.html.twig', []);
     }
 
     /**
-     * @Route("/ec/get", name="EditCounterRedirect")
+     * @Route("/sc/get", name="SimpleEditCounterRedirect")
      */
 
     public function getAction() {
@@ -30,33 +30,33 @@ class EditCounterController extends Controller
 
         if ($project == "") {
             // Redirect back to the index
-            return $this->redirectToRoute("EditCounter", array());
+            return $this->redirectToRoute("SimpleEditCounter", array());
         }
         if ($username == "") {
             // Redirect to the project selection
-            return $this->redirectToRoute("EditCounterProject", array(
+            return $this->redirectToRoute("SimpleEditCounterProject", array(
                 'project' => $project
             ));
         }
 
-        return $this->redirectToRoute('EditCounterResult', array(
+        return $this->redirectToRoute('SimpleEditCounterResult', array(
             'project' => $project,
             'username' => $username));
     }
 
     /**
-     * @Route("/ec/{project}", name="EditCounterProject")
+     * @Route("/sc/{project}", name="SimpleEditCounterProject")
      */
     public function projectAction($project) {
-        return $this->render('editCounter/index.html.twig', [
+        return $this->render('simpleEditCounter/index.html.twig', [
             'title' => "$project edit counter",
             'project' => $project,
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
         ]);
     }
-    
+
     /**
-     * @Route("/ec/{project}/{username}", name="EditCounterResult")
+     * @Route("/sc/{project}/{username}", name="SimpleEditCounterResult")
      */
     public function resultAction($project, $username) {
         $conn = $this->get('doctrine')->getManager("meta")->getConnection();
@@ -67,7 +67,6 @@ class EditCounterController extends Controller
             ->where($wikiQuery->expr()->eq('dbname', ':project'))
             ->orwhere($wikiQuery->expr()->like('url', ":project"))
             ->setParameter("project", $project);
-        //echo $wikiQuery;
         $wikiStatement = $wikiQuery->execute();
 
         $wikis = $wikiStatement->fetchAll();
@@ -84,7 +83,7 @@ class EditCounterController extends Controller
         $family = $wikis[0]['family'];
         $url = $wikis[0]['url'];
 
-        return $this->render('editCounter/result.html.twig', [
+        return $this->render('simpleEditCounter/result.html.twig', [
             'title' => "$username@$dbName Edit Counter",
             'project' => $project,
             'username' => $username,
