@@ -1,21 +1,13 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div id="wrapper">
-        <div id="container">
-            <div id="welcome">
-                Edit Counter!
-            </div>
-
-        </div>
-    </div>
-    {% if project is defined %}{{ project }}{% endif %}
-    {% if username is defined %}{{ username }}{% endif %}
-    {% if wiki is defined %}{{ wiki }}{% endif %}
-    {% if dbName is defined %}{{ dbName }}{% endif %}
-    {% if lang is defined %}{{ lang }}{% endif %}
-    {% if name is defined %}{{ name }}{% endif %}
-    {% if family is defined %}{{ family }}{% endif %}
-    {% if url is defined %}{{ url }}{% endif %}
-    {% if users is defined %}{{ dump(users) }}{% endif %}
+    <table class="leantable table-condensed xt-table" >
+        <tr><td>Username: </td><td><a href="{{ url|raw }}/wiki/User:{{ username }}" >{{ username }}</a></td></tr>
+        <tr><td>User ID: </td><td>12975570</td></tr>
+        <tr><td>User groups: </td><td>accountcreator eponline extendedconfirmed reviewer rollbacker </td></tr>
+        <tr><td>Deleted edits: </td><td>1,530</td></tr>
+        <tr><td>Live edits: </td><td>7,811</td></tr>
+        <tr><td>Total edits: </td><td><b>9,341</b></td></tr>
+    </table>
+    {{ url }}
 {% endblock %}
