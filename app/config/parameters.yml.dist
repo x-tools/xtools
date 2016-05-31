@@ -23,3 +23,9 @@ parameters:
 
     # Path to the web interface. blank string means that it exists at the root.
     web.path:          ""
+
+    # Code for the display of the notice.  noticeDisplay is bool, display or not. noticeStyle is one of "error,"
+    # "warning," "succeess," "info."  noticeText contains the message shown to the user.
+    app.noticeDisplay: false
+    app.noticeStyle:   ""
+    app.noticeText:    ""

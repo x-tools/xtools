@@ -15,7 +15,10 @@ class SimpleEditCounterController extends Controller
     public function indexAction(Request $request)
     {
         // replace this example code with whatever you need
-        return $this->render('simpleEditCounter/index.html.twig', []);
+        return $this->render('simpleEditCounter/index.html.twig', [
+            "pageTitle" => "Quick, Dirty, Simple Edit Counter",
+            "subtitle" => "Quick user contribution analysis"
+        ]);
     }
 
     /**
@@ -50,6 +53,8 @@ class SimpleEditCounterController extends Controller
     public function projectAction($project) {
         return $this->render('simpleEditCounter/index.html.twig', [
             'title' => "$project edit counter",
+            "pageTitle" => "Quick, Dirty, Simple Edit Counter",
+            "subtitle" => "Quick user contribution analysis",
             'project' => $project,
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
         ]);

@@ -19,6 +19,7 @@ class AppExtension extends \Twig_Extension
             new \Twig_SimpleFunction('memory_usage', [$this, 'requestMemory'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('peak_memory', [$this, 'requestPeakMemory'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('link', [$this, 'generateLink'], ['is_safe' => ['html']]),
+            new \Twig_SimpleFunction('year', [$this, 'generateYear'], ['is_save' => ['html']]),
         ];
     }
 
@@ -38,6 +39,10 @@ class AppExtension extends \Twig_Extension
     public function generateLink($page, $text, $class = "") {
         $path = $this->container->getParameter('web.path');
         return "<a href='$path/$page' class='$class'>$text</a>";
+    }
+
+    public function generateYear() {
+        return date('Y');
     }
 
     public function getName()
