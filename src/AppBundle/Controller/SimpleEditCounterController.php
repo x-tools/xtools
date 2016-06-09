@@ -98,7 +98,7 @@ class SimpleEditCounterController extends Controller
 			UNION
 			SELECT 'rev' as source, COUNT(*) AS value FROM $dbName.revision WHERE rev_user_text = :username
 			UNION
-			SELECT 'groups' as source, ug_group as value FROM $dbName.user_groups JOIN mw_user on user_id = ug_user WHERE user_name = :username
+			SELECT 'groups' as source, ug_group as value FROM $dbName.user_groups JOIN user on user_id = ug_user WHERE user_name = :username
             ");
 
         $resultQuery->bindParam("username", $username);
