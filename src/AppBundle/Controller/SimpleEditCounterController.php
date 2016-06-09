@@ -92,13 +92,13 @@ class SimpleEditCounterController extends Controller
 
         // Prepare the query and execute
         $resultQuery = $conn->prepare( "
-			SELECT 'id' as source, user_id as value FROM $dbName.mw_user WHERE user_name = :username
+			SELECT 'id' as source, user_id as value FROM $dbName.user WHERE user_name = :username
 			UNION
-			SELECT 'arch' as source, COUNT(*) AS value FROM $dbName.mw_archive WHERE ar_user_text = :username
+			SELECT 'arch' as source, COUNT(*) AS value FROM $dbName.archive WHERE ar_user_text = :username
 			UNION
-			SELECT 'rev' as source, COUNT(*) AS value FROM $dbName.mw_revision WHERE rev_user_text = :username
+			SELECT 'rev' as source, COUNT(*) AS value FROM $dbName.revision WHERE rev_user_text = :username
 			UNION
-			SELECT 'groups' as source, ug_group as value FROM $dbName.mw_user_groups JOIN mw_user on user_id = ug_user WHERE user_name = :username
+			SELECT 'groups' as source, ug_group as value FROM $dbName.user_groups JOIN mw_user on user_id = ug_user WHERE user_name = :username
             ");
 
         $resultQuery->bindParam("username", $username);
