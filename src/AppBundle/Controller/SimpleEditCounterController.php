@@ -64,9 +64,10 @@ class SimpleEditCounterController extends Controller
         // Create the query we're going to run against the meta database
         $wikiQuery = $conn->createQueryBuilder();
         $wikiQuery
-            ->select(['name','url'])
+            ->select(['dbName','name','url'])
             ->from("wiki")
             ->where($wikiQuery->expr()->eq('dbname', ':project'))
+            ->orwhere($wikiQuery->expr()->like('name', ':project'))
             ->orwhere($wikiQuery->expr()->like('url', ":project"))
             ->setParameter("project", $project);
         $wikiStatement = $wikiQuery->execute();
@@ -80,6 +81,7 @@ class SimpleEditCounterController extends Controller
         }
 
         // Grab the data we need out of it.
+        $dbName = $wikis[0]['dbName'];
         $wikiName = $wikis[0]['name'];
         $url = $wikis[0]['url'];
 
@@ -88,13 +90,13 @@ class SimpleEditCounterController extends Controller
 
         // Prepare the query and execute
         $resultQuery = $conn->prepare( "
-			SELECT 'id' as source, user_id as value FROM mw_user WHERE user_name = :username
+			SELECT 'id' as source, user_id as value FROM $dbName.mw_user WHERE user_name = :username
 			UNION
-			SELECT 'arch' as source, COUNT(*) AS value FROM mw_archive WHERE ar_user_text = :username
+			SELECT 'arch' as source, COUNT(*) AS value FROM $dbName.mw_archive WHERE ar_user_text = :username
 			UNION
-			SELECT 'rev' as source, COUNT(*) AS value FROM mw_revision WHERE rev_user_text = :username
+			SELECT 'rev' as source, COUNT(*) AS value FROM $dbName.mw_revision WHERE rev_user_text = :username
 			UNION
-			SELECT 'groups' as source, ug_group as value FROM mw_user_groups JOIN mw_user on user_id = ug_user WHERE user_name = :username
+			SELECT 'groups' as source, ug_group as value FROM $dbName.mw_user_groups JOIN mw_user on user_id = ug_user WHERE user_name = :username
             ");
 
         $resultQuery->bindParam("username", $username);
