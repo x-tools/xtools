@@ -153,8 +153,8 @@ class SimpleEditCounterController extends Controller
 
             'id' => $id,
             'arch' => $arch,
-            'rev' => $rev,
-            'live' => $rev - $arch,
+            'rev' => $rev + $arch,
+            'live' => $rev,
             'groups' => $groups,
         ]);
     }
