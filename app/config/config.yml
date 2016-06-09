@@ -59,11 +59,11 @@ doctrine:
                 charset:  UTF8
             meta:
                 driver:   pdo_mysql
-                host:     "%database_host%"
-                port:     "%database_port%"
+                host:     "%database_replica_host%"
+                port:     "%database_replica_port%"
                 dbname:   "%database_meta_name%"
-                user:     "%database_user%"
-                password: "%database_password%"
+                user:     "%database_replica_user%"
+                password: "%database_replica_password%"
                 charset:  UTF8
             replicas:
                 driver:   pdo_mysql
