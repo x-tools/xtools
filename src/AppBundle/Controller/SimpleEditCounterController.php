@@ -17,7 +17,8 @@ class SimpleEditCounterController extends Controller
         // replace this example code with whatever you need
         return $this->render('simpleEditCounter/index.html.twig', [
             "pageTitle" => "Quick, Dirty, Simple Edit Counter",
-            "subtitle" => "Quick user contribution analysis"
+            "subtitle" => "Quick user contribution analysis",
+            'page' => "sc",
         ]);
     }
 
@@ -53,6 +54,7 @@ class SimpleEditCounterController extends Controller
     public function projectAction($project) {
         return $this->render('simpleEditCounter/index.html.twig', [
             'title' => "$project edit counter",
+            'page' => "sc",
             "pageTitle" => "Quick, Dirty, Simple Edit Counter",
             "subtitle" => "Quick user contribution analysis",
             'project' => $project,
@@ -67,7 +69,7 @@ class SimpleEditCounterController extends Controller
         $conn = $this->get('doctrine')->getManager("meta")->getConnection();
         $wikiQuery = $conn->createQueryBuilder();
         $wikiQuery
-            ->select(['dbName','lang','`name`','family','url'])
+            ->select(['name','url'])
             ->from("wiki")
             ->where($wikiQuery->expr()->eq('dbname', ':project'))
             ->orwhere($wikiQuery->expr()->like('url', ":project"))
@@ -82,22 +84,70 @@ class SimpleEditCounterController extends Controller
 
         dump($wikis);
 
-        $dbName = $wikis[0]['dbName'];
-        $lang = $wikis[0]['lang'];
-        $name = $wikis[0]['name'];
-        $family = $wikis[0]['family'];
+        $wikiName = $wikis[0]['name'];
         $url = $wikis[0]['url'];
 
+        $conn = $this->get('doctrine')->getManager("replicas")->getConnection();
+        $resultQuery = $conn->prepare( "
+			SELECT 'id' as source, user_id as value FROM mw_user WHERE user_name = :username
+			UNION
+			SELECT 'arch' as source, COUNT(*) AS value FROM mw_archive WHERE ar_user_text = :username
+			UNION
+			SELECT 'rev' as source, COUNT(*) AS value FROM mw_revision WHERE rev_user_text = :username
+			UNION
+			SELECT 'groups' as source, ug_group as value FROM mw_user_groups JOIN mw_user on user_id = ug_user WHERE user_name = :username
+            ");
+
+        $resultQuery->bindParam("username", $username);
+        $resultQuery->execute();
+
+        $results = $resultQuery->fetchAll();
+
+        dump($results);
+
+        if (sizeof($results) <1) {
+            throw new Exception("Unknown user \"$username\"");
+        }
+
+        $id = "";
+        $arch = "";
+        $rev = "";
+        $groups = "";
+
+        foreach($results as $row) {
+            if($row["source"] == "id") {
+                $id = $row["value"];
+            }
+            if($row["source"] == "arch") {
+                $arch = $row["value"];
+            }
+            if($row["source"] == "rev") {
+                $rev = $row["value"];
+            }
+            if($row["source"] == "groups") {
+                $groups .= $row["value"]. ", ";
+            }
+        }
+
+        if (strlen($groups) > 2) {
+            $groups = substr($groups, 0, -2);
+        }
+
+        if (strlen($groups) == 0) {
+            $groups = "No groups";
+        }
+
         return $this->render('simpleEditCounter/result.html.twig', [
-            'title' => "$username@$dbName Edit Counter",
-            'project' => $project,
-            'username' => $username,
-            'wiki' => $dbName,
-            'lang' => $lang,
-            'name' => $name,
-            'family' => $family,
+            'title' => "Plain and simple edit counter | $username@$wikiName",
+            'page' => "sc",
             'url' => $url,
-            'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
+            'username' => $username,
+
+            'id' => $id,
+            'arch' => $arch,
+            'rev' => $rev,
+            'live' => $rev - $arch,
+            'groups' => $groups,
         ]);
     }
 }

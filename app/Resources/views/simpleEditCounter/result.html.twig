@@ -3,11 +3,10 @@
 {% block body %}
     <table class="leantable table-condensed xt-table" >
         <tr><td>Username: </td><td><a href="{{ url|raw }}/wiki/User:{{ username }}" >{{ username }}</a></td></tr>
-        <tr><td>User ID: </td><td>12975570</td></tr>
-        <tr><td>User groups: </td><td>accountcreator eponline extendedconfirmed reviewer rollbacker </td></tr>
-        <tr><td>Deleted edits: </td><td>1,530</td></tr>
-        <tr><td>Live edits: </td><td>7,811</td></tr>
-        <tr><td>Total edits: </td><td><b>9,341</b></td></tr>
+        <tr><td>User ID: </td><td>{{ id }}</td></tr>
+        <tr><td>User groups: </td><td>{{ groups }}</td></tr>
+        <tr><td>Deleted edits: </td><td>{{ arch }}</td></tr>
+        <tr><td>Live edits: </td><td>{{ live }}</td></tr>
+        <tr><td>Total edits: </td><td><b>{{ rev }}</b></td></tr>
     </table>
-    {{ url }}
 {% endblock %}

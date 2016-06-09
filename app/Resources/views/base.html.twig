@@ -43,19 +43,19 @@
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-left">
-                <li class="active" >{{ link("ec", "Edit Counter") }}</li>
-                <li class="" >{{ link("articleinfo", "Page History") }}</li>
-                <li class="" >{{ link("pages", "Pages created") }}</li>
-                <li class="" >{{ link("topedits", "Top edits") }}</li>
-                <li class="" >{{ link("rangecontribs", "Range contribs") }}</li>
-                <li class="" >{{ link("blame", "Article blamer") }}</li>
-                <li class="" >{{ link("autoedits", "Automated edits (BETA)") }}</li>
-                <li class="" >{{ link("autoblock", "Autoblock") }}</li>
-                <li class="" >{{ link("adminstats", "AdminStats") }}</li>
-                <li class="" >{{ link("rfa", "RfX Analysis") }}</li>
-                <li class="" >{{ link("rfap", "RfX Vote Calculator") }}</li>
-                <li class="" >{{ link("bash", "RQ (BETA)") }}</li>
-                <li class="" >{{ link("sc", "Quick, Dirty, Simple Edit Counter") }}</li>
+                <li{% if page is defined and page=="ec" %} class="active"{% endif %} >{{ link("ec", "Edit Counter") }}</li>
+                <li{% if page is defined and page=="articleinfo" %} class="active"{% endif %}>{{ link("articleinfo", "Page History") }}</li>
+                <li{% if page is defined and page=="pages" %} class="active"{% endif %}>{{ link("pages", "Pages created") }}</li>
+                <li{% if page is defined and page=="topedits" %} class="active"{% endif %}>{{ link("topedits", "Top edits") }}</li>
+                <li{% if page is defined and page=="rangecontribs" %} class="active"{% endif %}>{{ link("rangecontribs", "Range contribs") }}</li>
+                <li{% if page is defined and page=="blame" %} class="active"{% endif %}>{{ link("blame", "Article blamer") }}</li>
+                <li{% if page is defined and page=="autoedits" %} class="active"{% endif %}>{{ link("autoedits", "Automated edits (BETA)") }}</li>
+                <li{% if page is defined and page=="autoblock" %} class="active"{% endif %}>{{ link("autoblock", "Autoblock") }}</li>
+                <li{% if page is defined and page=="adminstats" %} class="active"{% endif %}>{{ link("adminstats", "AdminStats") }}</li>
+                <li{% if page is defined and page=="rfa" %} class="active"{% endif %}>{{ link("rfa", "RfX Analysis") }}</li>
+                <li{% if page is defined and page=="rfab" %} class="active"{% endif %}>{{ link("rfap", "RfX Vote Calculator") }}</li>
+                <li{% if page is defined and page=="bash" %} class="active"{% endif %}>{{ link("bash", "RQ (BETA)") }}</li>
+                <li{% if page is defined and page=="sc" %} class="active"{% endif %}>{{ link("sc", "Quick, Dirty, Simple Edit Counter") }}</li>
             </ul>
         </div>
     </div>

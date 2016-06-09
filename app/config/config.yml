@@ -61,9 +61,17 @@ doctrine:
                 driver:   pdo_mysql
                 host:     "%database_host%"
                 port:     "%database_port%"
-                dbname:   "labs_meta_p"
+                dbname:   "%database_meta_name%"
                 user:     "%database_user%"
                 password: "%database_password%"
+                charset:  UTF8
+            replicas:
+                driver:   pdo_mysql
+                host:     "%database_replica_host%"
+                port:     "%database_replica_port%"
+                dbname:   "%database_replica_name%"
+                user:     "%database_replica_user%"
+                password: "%database_replica_password%"
                 charset:  UTF8
 
     orm:
@@ -75,6 +83,8 @@ doctrine:
                 connection: default
             meta:
                 connection: meta
+            replicas:
+                connection: replicas
 
 # Swiftmailer Configuration
 swiftmailer:
