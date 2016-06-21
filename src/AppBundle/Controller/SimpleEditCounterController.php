@@ -85,7 +85,9 @@ class SimpleEditCounterController extends Controller
         $wikiName = $wikis[0]['name'];
         $url = $wikis[0]['url'];
 
-        $dbName .= "_p";
+        if (substr($dbName, -2) != "_p") {
+            $dbName .= "_p";
+        }
 
         // Grab the connection to the replica database (which is separate from the above)
         $conn = $this->get('doctrine')->getManager("replicas")->getConnection();

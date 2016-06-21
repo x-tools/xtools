@@ -17,3 +17,5 @@
 ~
 
 .idea/
+
+composer.lock
