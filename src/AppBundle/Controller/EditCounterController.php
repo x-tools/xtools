@@ -15,7 +15,8 @@ class EditCounterController extends Controller
     public function indexAction(Request $request)
     {
         // replace this example code with whatever you need
-        return $this->render('editCounter/index.html.twig', []);
+        return $this->render('editCounter/index.html.twig', [
+            'page' => "ec",]);
     }
 
     /**
@@ -50,6 +51,7 @@ class EditCounterController extends Controller
     public function projectAction($project) {
         return $this->render('editCounter/index.html.twig', [
             'title' => "$project edit counter",
+            'page' => "ec",
             'project' => $project,
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
         ]);
@@ -59,39 +61,52 @@ class EditCounterController extends Controller
      * @Route("/ec/{project}/{username}", name="EditCounterResult")
      */
     public function resultAction($project, $username) {
+
+        $username = ucfirst($username);
+
+        // Grab the connection to the meta database
         $conn = $this->get('doctrine')->getManager("meta")->getConnection();
+
+        // Create the query we're going to run against the meta database
         $wikiQuery = $conn->createQueryBuilder();
         $wikiQuery
-            ->select(['dbName','lang','`name`','family','url'])
+            ->select(['dbName','name','url'])
             ->from("wiki")
             ->where($wikiQuery->expr()->eq('dbname', ':project'))
+            ->orwhere($wikiQuery->expr()->like('name', ':project'))
             ->orwhere($wikiQuery->expr()->like('url', ":project"))
             ->setParameter("project", $project);
-        //echo $wikiQuery;
         $wikiStatement = $wikiQuery->execute();
 
+        // Fetch the wiki data
         $wikis = $wikiStatement->fetchAll();
 
+        // Throw an exception if we can't find the wiki
         if (sizeof($wikis) <1) {
             throw new Exception("Unknown wiki \"$project\"");
         }
 
-        dump($wikis);
-
+        // Grab the data we need out of it.
         $dbName = $wikis[0]['dbName'];
-        $lang = $wikis[0]['lang'];
-        $name = $wikis[0]['name'];
-        $family = $wikis[0]['family'];
+        $wikiName = $wikis[0]['name'];
         $url = $wikis[0]['url'];
+
+        if (substr($dbName, -2) != "_p") {
+            $dbName .= "_p";
+        }
+
+        // Grab the connection to the replica database (which is separate from the above)
+        $conn = $this->get('doctrine')->getManager("replicas")->getConnection();
+
+
 
         return $this->render('editCounter/result.html.twig', [
             'title' => "$username@$dbName Edit Counter",
+            'page' => "ec",
             'project' => $project,
             'username' => $username,
             'wiki' => $dbName,
-            'lang' => $lang,
-            'name' => $name,
-            'family' => $family,
+            'name' => $wikiName,
             'url' => $url,
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
         ]);

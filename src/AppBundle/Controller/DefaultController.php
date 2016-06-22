@@ -16,7 +16,7 @@ class DefaultController extends Controller
         // replace this example code with whatever you need
         return $this->render('default/index.html.twig', [
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
-            "pageTitle" => "Welcome to xTools!"
+            "pageTitle" => "welcome"
         ]);
     }
 
@@ -28,7 +28,7 @@ class DefaultController extends Controller
         // replace this example code with whatever you need
         return $this->render('default/about.html.twig', array(
             "title" => "About",
-            "pageTitle" => "About us",
+            "pageTitle" => "about",
         ));
     }
 }

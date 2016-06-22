@@ -32,9 +32,10 @@ class SimpleEditCounterController extends Controller
 
         // Otherwise fall through.
         return $this->render('simpleEditCounter/index.html.twig', [
-            "pageTitle" => "Quick, Dirty, Simple Edit Counter",
-            "subtitle" => "Quick user contribution analysis",
+            "pageTitle" => "tool_sc",
+            "subtitle" => "tool_sc_desc",
             'page' => "sc",
+            'title' => "tool_sc",
         ]);
     }
 
@@ -43,10 +44,10 @@ class SimpleEditCounterController extends Controller
      */
     public function projectAction($project) {
         return $this->render('simpleEditCounter/index.html.twig', [
-            'title' => "$project edit counter",
+            'title' => "tool_sc",
             'page' => "sc",
-            "pageTitle" => "Quick, Dirty, Simple Edit Counter",
-            "subtitle" => "Quick user contribution analysis",
+            "pageTitle" => "tool_sc",
+            "subtitle" => "tool_sc_desc",
             'project' => $project,
         ]);
     }
@@ -148,10 +149,13 @@ class SimpleEditCounterController extends Controller
 
         // Assign the values and display the template
         return $this->render('simpleEditCounter/result.html.twig', [
-            'title' => "Plain and simple edit counter | $username@$wikiName",
+            'title' => "tool_sc",
             'page' => "sc",
+            "pageTitle" => "tool_sc",
+            "subtitle" => "tool_sc_desc",
             'url' => $url,
             'username' => $username,
+            'project' => $wikiName,
 
             'id' => $id,
             'arch' => $arch,

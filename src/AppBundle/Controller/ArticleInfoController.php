@@ -19,7 +19,8 @@ class ArticleInfoController extends Controller
         // replace this example code with whatever you need
         return $this->render('articleInfo/index.html.twig', [
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
-            "pageTitle" => "Welcome to xTools!"
+            'title' => "tool_articleinfo",
+            "pageTitle" => "tool_articleinfo",
         ]);
     }
 
