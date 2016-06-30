@@ -13,3 +13,8 @@ services:
         public: false
         tags:
             - { name: twig.extension }
+    app.api_helper:
+        class: AppBundle\Helper\Apihelper
+        public: true
+        tags:
+          - {name: api.helper}
