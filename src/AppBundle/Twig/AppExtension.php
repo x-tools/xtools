@@ -4,6 +4,7 @@ namespace AppBundle\Twig;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use \Intuition;
 
 class AppExtension extends \Twig_Extension
 {
@@ -14,7 +15,10 @@ class AppExtension extends \Twig_Extension
 
     public function __construct(ContainerInterface $container) {
         $this->container = $container;
-        $this->intuition = new \Intuition();
+        $this->intuition = new Intuition();
+
+        //$this->intuition->refreshLang();
+
         $this->intuition->loadTextdomainFromFile( $this->container->getParameter("kernel.root_dir") . '/i18n', "xtools" );
 
         /*dump(
@@ -25,13 +29,13 @@ class AppExtension extends \Twig_Extension
 
         $this->request = Request::createFromGlobals();
 
-        $useLang = $this->request->query->get('uselang');
+        /*$useLang = $this->request->query->get('uselang');
 
         if ($useLang == "") $useLang = "en";
 
         $this->lang = $useLang;
 
-        $this->intuition->setLang($useLang);
+        $this->intuition->setLang($useLang);*/
     }
 
     public function getFunctions()

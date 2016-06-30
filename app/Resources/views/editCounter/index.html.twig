@@ -7,7 +7,7 @@
             <legend></legend>
 
             <div class="input-group">
-                <span class="input-group-addon form-label">Username</span>
+                <span class="input-group-addon form-label">{{ msg("username") }}</span>
                 <input type="text" class="form-control" value="" name="user">
 			<span class="input-group-addon glyphicon glyphicon-info-sign tooltipcss"  >
 				<span>
@@ -18,7 +18,7 @@
             </div>
 
             <div class="input-group">
-                <span class="input-group-addon form-label">Wiki</span>
+                <span class="input-group-addon form-label">{{ msg("wiki") }}</span>
                 <input type="text" class="form-control" {% if project is defined %}value="{{ project }}" {% endif %}name="project">
 			<span class="input-group-addon glyphicon glyphicon-info-sign tooltipcss"  >
 				<span>

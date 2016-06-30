@@ -16,7 +16,10 @@ class EditCounterController extends Controller
     {
         // replace this example code with whatever you need
         return $this->render('editCounter/index.html.twig', [
-            'page' => "ec",]);
+            'page' => "ec",
+            'pageTitle' => "tool_ec",
+            'subtitle' => "tool_ec_desc"
+        ]);
     }
 
     /**

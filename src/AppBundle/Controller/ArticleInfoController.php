@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use AppBundle\Helper\Apihelper;
 
 class ArticleInfoController extends Controller
 {
@@ -16,23 +17,42 @@ class ArticleInfoController extends Controller
      */
     public function indexAction()
     {
+        $api = $this->get("app.api_helper");
+        $api->test();
+
+        // Grab the request object, grab the values out of it.
+        $request = Request::createFromGlobals();
+
+        $project = $request->query->get('project');
+        $article = $request->query->get('article');
+
+        if ($project != "" && $article != "") {
+            return $this->redirectToRoute("ArticleInfoResult", array('project'=>$project, 'article' => $article));
+        }
+        else if ($article != "") {
+            return $this->redirectToRoute("SimpleEditCounterProject", array('project'=>$project));
+        }
+
         // replace this example code with whatever you need
         return $this->render('articleInfo/index.html.twig', [
-            'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
+            'page' => "articleinfo",
             'title' => "tool_articleinfo",
             "pageTitle" => "tool_articleinfo",
         ]);
     }
 
     /**
-     * @Route("/articleinfo/{project}", name="aboutPage")
+     * @Route("/articleinfo/{project}/{article}", name="ArticleInfoResult")
      */
-    public function articleInfoProjectAction()
+    public function articleInfoProjectAction($project, $article)
     {
         // replace this example code with whatever you need
         return $this->render('articleInfo/result.html.twig', array(
-            "title" => "About",
-            "pageTitle" => "About us",
+            'page' => "articleinfo",
+            "title" => "tool_articleinfo",
+            "pageTitle" => "tool_articleinfo",
+            "project" => $project,
+            "article_title" => $article,
         ));
     }
 }
