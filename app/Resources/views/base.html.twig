@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{ lang() }}">
 <head>
     <title>{% if title is defined%}{{ msg(title) }} - {% endif %}{{ msg("title_xtools") }}</title>
 
@@ -41,6 +41,32 @@
                 <li></li>
                 <li><a title="Your echo notifications from 800+ wikis" href="//tools.wmflabs.org/xtools/echo/"><img style="vertical-align:bottom;padding-right:4px;" src="//tools.wmflabs.org/xtools/static/images/Echo_Icon_18.png" />XEcho</a>&nbsp;&nbsp;</li>
             </ul>
+            <div class="pull-right">
+                <!-- Single button -->
+                <!-- div class="btn-group">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Action <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Action</a></li>
+                        <li><a href="#">Another action</a></li>
+                        <li><a href="#">Something else here</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Separated link</a></li>
+                        {% for key, value in allLangs() %}
+                            <li><a href="?uselang={{ key }}">{{ value|e }}{% if key==lang() %} - ACTIVE{% endif %}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div -->
+                <form action="?" method="get">
+                    <select name="uselang" class="form-control">
+                        {% for key, value in allLangs() %}
+                            <option value="{{ key }}" {% if key==lang() %}selected{% endif %}>{{ value|e }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="submit" value="{{ msg("select_language") }}">
+                </form>
+            </div>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-left">

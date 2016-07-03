@@ -29,13 +29,13 @@ class AppExtension extends \Twig_Extension
 
         $this->request = Request::createFromGlobals();
 
-        /*$useLang = $this->request->query->get('uselang');
+        $useLang = $this->request->query->get('uselang');
 
         if ($useLang == "") $useLang = "en";
 
         $this->lang = $useLang;
 
-        $this->intuition->setLang($useLang);*/
+        $this->intuition->setLang($useLang);
     }
 
     public function getFunctions()
@@ -47,6 +47,8 @@ class AppExtension extends \Twig_Extension
             new \Twig_SimpleFunction('year', [$this, 'generateYear'], ['is_save' => ['html']]),
             new \Twig_SimpleFunction('msg', [$this, 'intuitionMessage'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('msg_footer', [$this, 'intuitionMessageFooter'], ['is_safe' => ['html']]),
+            new \Twig_SimpleFunction('lang', [$this, 'getLang'], ['is_safe' => ['html']]),
+            new \Twig_SimpleFunction('allLangs', [$this, 'getAllLangs']),
         ];
     }
 
@@ -77,6 +79,14 @@ class AppExtension extends \Twig_Extension
 
     public function intuitionMessageFooter() {
         return $this->intuition->getFooterLine( TSINT_HELP_NONE );
+    }
+
+    public function getLang()  {
+        return $this->lang;
+    }
+
+    public function getAllLangs() {
+        return $this->intuition->generateLanguageList();
     }
 
     public function getName()
