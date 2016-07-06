@@ -3,29 +3,12 @@
 {% block body %}
     <div id="wrapper">
         <div id="container">
-            <div id="welcome">
-                Edit Counter!
-            </div>
-
-        </div>
-    </div>
-    {% if project is defined %}{{ project }}{% endif %}
-    {% if username is defined %}{{ username }}{% endif %}
-    {% if wiki is defined %}{{ wiki }}{% endif %}
-    {% if dbName is defined %}{{ dbName }}{% endif %}
-    {% if lang is defined %}{{ lang }}{% endif %}
-    {% if name is defined %}{{ name }}{% endif %}
-    {% if family is defined %}{{ family }}{% endif %}
-    {% if url is defined %}{{ url }}{% endif %}
-    {% if users is defined %}{{ dump(users) }}{% endif %}
-    {% if name is defined %}{{ name }}{% endif %}
-
 
     <div class="panel panel-primary" style="text-align:center">
         <div class="panel-heading">
             <p class="xt-heading-top" >
                 <a href="{{ url }}/wiki/User:{{ username }}">{{ username }}</a>
-                <small><span style="padding-left:10px;" > &bull;&nbsp; {{ url }} </span></small>
+                <small><span style="padding-left:10px;" > &bull;&nbsp; {{ project }} </span></small>
             </p>
         </div>
         <div class="panel-body xt-panel-body-top" >
@@ -36,8 +19,6 @@
                 <a href="//tools.wmflabs.org/quentinv57-tools/tools/sulinfo.php?username={{ username }}" >SUL Info</a> &middot;
                 <a href="//tools.wmflabs.org/wikiviewstats/?lang=en&wiki=wikipedia&page=User:{{ username }}*" >Pageviews in userspace</a>
             </p>
-
-            <hr />
 
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -61,12 +42,12 @@
                         </div>
                         <div class="col">
                             <table class="table-condensed  xt-table">
-                                <tr><td>{{ msg("lastday") }}:</td><td><span class="tdgeneral" >(TODO: 24h)</span></td></tr>
-                                <tr><td>{{ msg("lastweek") }}:</td><td><span class="tdgeneral" >(TODO: Week)</span></td></tr>
-                                <tr><td>{{ msg("lastmonth") }}:</td><td><span class="tdgeneral" >(TODO: Month)</span></td></tr>
-                                <tr><td>{{ msg("lastyear") }}:</td><td><span class="tdgeneral" >(TODO: YEAR)</span></td></tr>
+                                <tr><td>{{ msg("lastday") }}:</td><td><span class="tdgeneral" >{{ rev_24h }}</span></td></tr>
+                                <tr><td>{{ msg("lastweek") }}:</td><td><span class="tdgeneral" >{{ rev_7d }}</span></td></tr>
+                                <tr><td>{{ msg("lastmonth") }}:</td><td><span class="tdgeneral" >{{ rev_30d }}</span></td></tr>
+                                <tr><td>{{ msg("lastyear") }}:</td><td><span class="tdgeneral" >{{ rev_365d }}</span></td></tr>
                                 <tr><td colspan=20 ></td></tr>
-                                <tr><td title="DAYS days" >{{ msg("avg_edits_per_time_sign", [msg("days", [1])]) }}:</td><td><span class="tdgeneral" >(TODO: DELTA)</span></td></tr>
+                                <tr><td title="{{ days }} {{ msg('days', [days]) }}" >{{ msg("avg_edits_per_time_sign", [msg("days", [1])]) }}:</td><td><span class="tdgeneral" >{{ delta }}</span></td></tr>
                             </table>
                         </div>
                     </div>
@@ -2755,6 +2736,10 @@ Draft: 1 edits (5.56%)
                     <br />
                 </div>
             </div>
+
+        </div>
+    </div>
+
 
         </div>
     </div>

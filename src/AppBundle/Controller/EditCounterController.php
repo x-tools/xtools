@@ -108,6 +108,14 @@ class EditCounterController extends Controller
 			UNION
 			(SELECT 'latest_rev' as source, rev_timestamp FROM $dbName.`revision_userindex` WHERE rev_user_text = :username ORDER BY rev_timestamp DESC LIMIT 1)
 			UNION
+			SELECT 'rev_24h' as source, COUNT(*) FROM $dbName.revision_userindex WHERE rev_timestamp >= DATE_SUB(NOW(),INTERVAL 24 HOUR)
+			UNION
+			SELECT 'rev_7d' as source, COUNT(*) FROM $dbName.revision_userindex WHERE rev_timestamp >= DATE_SUB(NOW(),INTERVAL 7 DAY)
+			UNION
+			SELECT 'rev_30d' as source, COUNT(*) FROM $dbName.revision_userindex WHERE rev_timestamp >= DATE_SUB(NOW(),INTERVAL 30 DAY)
+			UNION
+			SELECT 'rev_365d' as source, COUNT(*) FROM $dbName.revision_userindex WHERE rev_timestamp >= DATE_SUB(NOW(),INTERVAL 365 DAY)
+			UNION
 			SELECT 'groups' as source, ug_group as value FROM $dbName.user_groups JOIN user on user_id = ug_user WHERE user_name = :username
             ");
 
@@ -128,6 +136,10 @@ class EditCounterController extends Controller
         $rev = "";
         $first_rev = "";
         $latest_rev = "";
+        $rev_24h = "";
+        $rev_7d = "";
+        $rev_30d = "";
+        $rev_365d = "";
         $groups = "";
 
         // Iterate over the results, putting them in the right variables
@@ -142,15 +154,31 @@ class EditCounterController extends Controller
                 $rev = $row["value"];
             }
             if($row["source"] == "first_rev") {
-                $first_rev = $row["value"];
+                $first_rev = strtotime($row["value"]);
             }
             if($row["source"] == "latest_rev") {
-                $latest_rev = $row["value"];
+                $latest_rev = strtotime($row["value"]);
+            }
+            if($row["source"] == "rev_24h") {
+                $rev_24h = $row["value"];
+            }
+            if($row["source"] == "rev_7d") {
+                $rev_7d = $row["value"];
+            }
+            if($row["source"] == "rev_30d") {
+                $rev_30d = $row["value"];
+            }
+            if($row["source"] == "rev_365d") {
+                $rev_365d = $row["value"];
             }
             if($row["source"] == "groups") {
                 $groups .= $row["value"]. ", ";
             }
         }
+
+        $days = ceil(($latest_rev - $first_rev)/(60*60*24));
+
+        $delta = round(($rev/$days), 3);
 
         // Remove the last comma and space
         if (strlen($groups) > 2) {
@@ -176,8 +204,14 @@ class EditCounterController extends Controller
             'deleted_edits' => $arch,
             'total_edits' => $rev + $arch,
             'live_edits' => $rev,
-            'first_rev' => $first_rev,
-            'latest_rev' => $latest_rev,
+            'first_rev' => date('Y-m-d h:i:s', $first_rev),
+            'latest_rev' => date('Y-m-d h:i:s', $latest_rev),
+            'days' => $days,
+            'delta' => $delta,
+            'rev_24h' => $rev_24h,
+            'rev_7d' => $rev_7d,
+            'rev_30d' => $rev_30d,
+            'rev_365d' => $rev_365d,
         ]);
     }
 }
