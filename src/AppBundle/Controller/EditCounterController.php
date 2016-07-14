@@ -107,16 +107,18 @@ class EditCounterController extends Controller
 			(SELECT 'first_rev' as source, rev_timestamp FROM $dbName.`revision_userindex` WHERE rev_user_text = :username ORDER BY rev_timestamp ASC LIMIT 1)
 			UNION
 			(SELECT 'latest_rev' as source, rev_timestamp FROM $dbName.`revision_userindex` WHERE rev_user_text = :username ORDER BY rev_timestamp DESC LIMIT 1)
+			UNION 
+			SELECT 'rev_24h' as source, COUNT(*) as value FROM $dbName.revision_userindex WHERE rev_user_text = :username AND rev_timestamp >= DATE_SUB(NOW(),INTERVAL 24 HOUR)
 			UNION
-			SELECT 'rev_24h' as source, COUNT(*) FROM $dbName.revision_userindex WHERE rev_timestamp >= DATE_SUB(NOW(),INTERVAL 24 HOUR)
+			SELECT 'rev_7d' as source, COUNT(*) as value FROM $dbName.revision_userindex WHERE rev_user_text = :username AND rev_timestamp >= DATE_SUB(NOW(),INTERVAL 7 DAY)
 			UNION
-			SELECT 'rev_7d' as source, COUNT(*) FROM $dbName.revision_userindex WHERE rev_timestamp >= DATE_SUB(NOW(),INTERVAL 7 DAY)
+			SELECT 'rev_30d' as source, COUNT(*) as value FROM $dbName.revision_userindex WHERE rev_user_text = :username AND rev_timestamp >= DATE_SUB(NOW(),INTERVAL 30 DAY)
 			UNION
-			SELECT 'rev_30d' as source, COUNT(*) FROM $dbName.revision_userindex WHERE rev_timestamp >= DATE_SUB(NOW(),INTERVAL 30 DAY)
-			UNION
-			SELECT 'rev_365d' as source, COUNT(*) FROM $dbName.revision_userindex WHERE rev_timestamp >= DATE_SUB(NOW(),INTERVAL 365 DAY)
+			SELECT 'rev_365d' as source, COUNT(*) as value FROM $dbName.revision_userindex WHERE rev_user_text = :username AND rev_timestamp >= DATE_SUB(NOW(),INTERVAL 365 DAY)
 			UNION
 			SELECT 'groups' as source, ug_group as value FROM $dbName.user_groups JOIN user on user_id = ug_user WHERE user_name = :username
+			UNION
+			SELECT 'unique-pages' as source, COUNT(*) as value FROM $dbName.revision_userindex WHERE rev_user_text = :username GROUP BY rev_page;
             ");
 
         $resultQuery->bindParam("username", $username);
@@ -141,6 +143,7 @@ class EditCounterController extends Controller
         $rev_30d = "";
         $rev_365d = "";
         $groups = "";
+        $uniquePages = "";
 
         // Iterate over the results, putting them in the right variables
         foreach($results as $row) {
@@ -173,6 +176,9 @@ class EditCounterController extends Controller
             }
             if($row["source"] == "groups") {
                 $groups .= $row["value"]. ", ";
+            }
+            if($row["source"] == "unique-pages") {
+                $uniquePages = $row["value"];
             }
         }
 
@@ -212,6 +218,7 @@ class EditCounterController extends Controller
             'rev_7d' => $rev_7d,
             'rev_30d' => $rev_30d,
             'rev_365d' => $rev_365d,
+            'uniquePages' => $uniquePages,
         ]);
     }
 }
