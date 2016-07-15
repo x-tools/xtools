@@ -117,9 +117,7 @@ class EditCounterController extends Controller
 			SELECT 'rev_365d' as source, COUNT(*) as value FROM $dbName.revision_userindex WHERE rev_user_text = :username AND rev_timestamp >= DATE_SUB(NOW(),INTERVAL 365 DAY)
 			UNION
 			SELECT 'groups' as source, ug_group as value FROM $dbName.user_groups JOIN user on user_id = ug_user WHERE user_name = :username
-			UNION
-			SELECT 'unique-pages' as source, COUNT(*) as value FROM $dbName.revision_userindex WHERE rev_user_text = :username GROUP BY rev_page;
-            ");
+			");
 
         $resultQuery->bindParam("username", $username);
         $resultQuery->execute();
@@ -143,7 +141,6 @@ class EditCounterController extends Controller
         $rev_30d = "";
         $rev_365d = "";
         $groups = "";
-        $uniquePages = "";
 
         // Iterate over the results, putting them in the right variables
         foreach($results as $row) {
@@ -177,9 +174,6 @@ class EditCounterController extends Controller
             if($row["source"] == "groups") {
                 $groups .= $row["value"]. ", ";
             }
-            if($row["source"] == "unique-pages") {
-                $uniquePages = $row["value"];
-            }
         }
 
         $days = ceil(($latest_rev - $first_rev)/(60*60*24));
@@ -193,8 +187,86 @@ class EditCounterController extends Controller
 
         // If the user isn't in any groups, show a message.
         if (strlen($groups) == 0) {
-            $groups = "No groups";
+            $groups = "--";
         }
+
+        // -------------------------
+        // General statistics part 2
+        // -------------------------
+
+        $resultQuery = $conn->prepare("
+        
+			/*SELECT 'unique-pages' as source, COUNT(*) as value FROM $dbName.archive_userindex WHERE ar_user_text = :username GROUP BY ar_title;
+			UNION*/
+			SELECT 'unique-pages' as source, COUNT(*) as value FROM `revision_userindex` where rev_user_text=:username GROUP by rev_user
+			/*UNION
+			SELECT rev_page, 'edits-per-age' as source, COUNT(*) as value FROM `revision_userindex` where rev_user_text=:username group by rev_page*/
+            
+            ");
+
+        $resultQuery->bindParam("username", $username);
+        $resultQuery->execute();
+
+        // Fetch the result data
+        $results = $resultQuery->fetchAll();
+
+        $uniquePages = "";
+
+        foreach($results as $row) {
+            if($row["source"] == "unique-pages") {
+                $uniquePages = $row["value"];
+            }
+        }
+
+        // -------------------------
+        // General statistics part 3
+        // -------------------------
+
+
+
+        // -------------------------
+        // General statistics part 4
+        // -------------------------
+
+
+
+        // -------------------------
+        // General statistics graphs
+        // -------------------------
+
+
+
+        // -------------------------
+        // Namespace Totals
+        // -------------------------
+
+
+        // -------------------------
+        // Month and Year Counts
+        // -------------------------
+
+
+        // -------------------------
+        // Timecard
+        // -------------------------
+
+
+
+        // -------------------------
+        // Latest Global Edits
+        // -------------------------
+
+
+
+        // -------------------------
+        // Top Edited Pages
+        // -------------------------
+
+
+        // -------------------------
+        // Semi-automated edits
+        // -------------------------
+
 
         return $this->render('editCounter/result.html.twig', [
             'title' => "tool_ec",
@@ -218,6 +290,8 @@ class EditCounterController extends Controller
             'rev_7d' => $rev_7d,
             'rev_30d' => $rev_30d,
             'rev_365d' => $rev_365d,
+
+            // General part 2
             'uniquePages' => $uniquePages,
         ]);
     }
