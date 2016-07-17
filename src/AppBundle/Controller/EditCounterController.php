@@ -198,10 +198,12 @@ class EditCounterController extends Controller
         
 			/*SELECT 'unique-pages' as source, COUNT(*) as value FROM $dbName.archive_userindex WHERE ar_user_text = :username GROUP BY ar_title;
 			UNION*/
-			SELECT 'unique-pages-live' as source, COUNT(distinct rev_page) as value FROM `revision_userindex` where rev_user_text=:username 
+			SELECT 'unique-pages-live' as source, COUNT(distinct rev_page) as value FROM `revision_userindex` where rev_user_text=:username
 			UNION
-			SELECT 'unique-pages-archive' as source, COUNT(distinct ar_title) as value FROM `archive_userindex` where ar_user_text=:username 
+			SELECT 'pages-created' as source, COUNT(*) as value from `revision_userindex` where rev_user_text=:username and rev_parent_id=0
 			/*UNION
+			SELECT 'unique-pages-archive' as source, COUNT(distinct ar_title) as value FROM `archive_userindex` where ar_user_text=:username 
+			UNION
 			SELECT rev_page, 'edits-per-age' as source, COUNT(*) as value FROM `revision_userindex` where rev_user_text=:username group by rev_page*/
             
             ");
@@ -213,6 +215,7 @@ class EditCounterController extends Controller
         $results = $resultQuery->fetchAll();
 
         $uniquePages = 0;
+        $pagesCreated = 0;
 
         foreach($results as $row) {
             if($row["source"] == "unique-pages-live") {
@@ -220,6 +223,9 @@ class EditCounterController extends Controller
             }
             if($row["source"] == "unique-pages-archive") {
                 $uniquePages += $row["value"];
+            }
+            if($row["source"] == "pages-created") {
+                $pagesCreated += $row["value"];
             }
         }
 
@@ -298,6 +304,7 @@ class EditCounterController extends Controller
 
             // General part 2
             'uniquePages' => $uniquePages,
+            'pagesCreated' => $pagesCreated,
         ]);
     }
 }
