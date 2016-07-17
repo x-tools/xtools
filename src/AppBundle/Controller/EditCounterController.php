@@ -125,8 +125,8 @@ class EditCounterController extends Controller
         // Fetch the result data
         $results = $resultQuery->fetchAll();
 
-        // Unknown user
-        if (sizeof($results) < 3) {
+        // Unknown user - This is a dirty hack that should be fixed.
+        if (sizeof($results) < 7) {
             throw new Exception("Unknown user \"$username\"");
         }
 
@@ -198,7 +198,9 @@ class EditCounterController extends Controller
         
 			/*SELECT 'unique-pages' as source, COUNT(*) as value FROM $dbName.archive_userindex WHERE ar_user_text = :username GROUP BY ar_title;
 			UNION*/
-			SELECT 'unique-pages' as source, COUNT(*) as value FROM `revision_userindex` where rev_user_text=:username GROUP by rev_user
+			SELECT 'unique-pages-live' as source, COUNT(distinct rev_page) as value FROM `revision_userindex` where rev_user_text=:username 
+			UNION
+			SELECT 'unique-pages-archive' as source, COUNT(distinct ar_title) as value FROM `archive_userindex` where ar_user_text=:username 
 			/*UNION
 			SELECT rev_page, 'edits-per-age' as source, COUNT(*) as value FROM `revision_userindex` where rev_user_text=:username group by rev_page*/
             
@@ -210,11 +212,14 @@ class EditCounterController extends Controller
         // Fetch the result data
         $results = $resultQuery->fetchAll();
 
-        $uniquePages = "";
+        $uniquePages = 0;
 
         foreach($results as $row) {
-            if($row["source"] == "unique-pages") {
-                $uniquePages = $row["value"];
+            if($row["source"] == "unique-pages-live") {
+                $uniquePages += $row["value"];
+            }
+            if($row["source"] == "unique-pages-archive") {
+                $uniquePages += $row["value"];
             }
         }
 
