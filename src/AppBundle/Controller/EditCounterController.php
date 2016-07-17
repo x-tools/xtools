@@ -195,15 +195,12 @@ class EditCounterController extends Controller
         // -------------------------
 
         $resultQuery = $conn->prepare("
-        
-			/*SELECT 'unique-pages' as source, COUNT(*) as value FROM $dbName.archive_userindex WHERE ar_user_text = :username GROUP BY ar_title;
-			UNION*/
-			SELECT 'unique-pages-live' as source, COUNT(distinct rev_page) as value FROM `revision_userindex` where rev_user_text=:username
+			SELECT 'unique-pages' as source, COUNT(distinct rev_page) as value FROM `revision_userindex` where rev_user_text=:username
 			UNION
-			SELECT 'pages-created' as source, COUNT(*) as value from `revision_userindex` where rev_user_text=:username and rev_parent_id=0
+			SELECT 'pages-created-live' as source, COUNT(*) as value from `revision_userindex` where rev_user_text=:username and rev_parent_id=0
+			UNION
+			SELECT 'pages-created-archive' as source, COUNT(*) as value from `archive_userindex` where ar_user_text=:username and ar_parent_id=0
 			/*UNION
-			SELECT 'unique-pages-archive' as source, COUNT(distinct ar_title) as value FROM `archive_userindex` where ar_user_text=:username 
-			UNION
 			SELECT rev_page, 'edits-per-age' as source, COUNT(*) as value FROM `revision_userindex` where rev_user_text=:username group by rev_page*/
             
             ");
@@ -218,13 +215,13 @@ class EditCounterController extends Controller
         $pagesCreated = 0;
 
         foreach($results as $row) {
-            if($row["source"] == "unique-pages-live") {
+            if($row["source"] == "unique-pages") {
                 $uniquePages += $row["value"];
             }
-            if($row["source"] == "unique-pages-archive") {
-                $uniquePages += $row["value"];
+            if($row["source"] == "pages-created-live") {
+                $pagesCreated += $row["value"];
             }
-            if($row["source"] == "pages-created") {
+            if($row["source"] == "pages-created-archive") {
                 $pagesCreated += $row["value"];
             }
         }
