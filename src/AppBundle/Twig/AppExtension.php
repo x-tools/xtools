@@ -31,6 +31,8 @@ class AppExtension extends \Twig_Extension
 
         $useLang = $this->request->query->get('uselang');
 
+        $useLang = strtolower($useLang);
+
         if ($useLang == "") $useLang = "en";
 
         $this->lang = $useLang;
@@ -63,6 +65,8 @@ class AppExtension extends \Twig_Extension
 
     public function generateLink($page, $text, $class = "") {
         $path = $this->container->getParameter('web.path');
+
+        $this->lang = strtolower($this->lang);
 
         if($this->lang != "en") $page .= "?uselang=" . $this->lang;
 
