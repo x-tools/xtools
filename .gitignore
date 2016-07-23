@@ -18,4 +18,5 @@
 
 .idea/
 
+/docs/_build
 composer.lock
