@@ -78,7 +78,8 @@ class SimpleEditCounterController extends Controller
 
         // Throw an exception if we can't find the wiki
         if (sizeof($wikis) <1) {
-            throw new Exception("Unknown wiki \"$project\"");
+            $this->addFlash('notice', "Unknown wiki $project");
+            return $this->redirectToRoute("SimpleEditCounter");
         }
 
         // Grab the data we need out of it.
@@ -110,10 +111,7 @@ class SimpleEditCounterController extends Controller
         // Fetch the result data
         $results = $resultQuery->fetchAll();
 
-        // Unknown user
-        if (sizeof($results) < 3) {
-            throw new Exception("Unknown user \"$username\"");
-        }
+        //dump($results);
 
         // Initialize the variables - just so we don't get variable undefined errors if there is a problem
         $id = "";
@@ -137,6 +135,14 @@ class SimpleEditCounterController extends Controller
             }
         }
 
+        // Unknown user - If the user is created the $results variable will have 3 entries.  This is a workaround to detect
+        // non-existant IPs.
+        if (sizeof($results) < 3 && $arch == 0 && $rev == 0) {
+            //throw new Exception("User \"$username\" does not exist or has not made edits");
+            $this->addFlash('notice', "User $username does not exist or has not made edits");
+            return $this->redirectToRoute("SimpleEditCounterProject", ["project"=>$project]);
+        }
+
         // Remove the last comma and space
         if (strlen($groups) > 2) {
             $groups = substr($groups, 0, -2);
@@ -144,7 +150,7 @@ class SimpleEditCounterController extends Controller
 
         // If the user isn't in any groups, show a message.
         if (strlen($groups) == 0) {
-            $groups = "No groups";
+            $groups = "---";
         }
 
         // Assign the values and display the template

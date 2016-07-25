@@ -178,6 +178,12 @@ class EditCounterController extends Controller
 
         $days = ceil(($latest_rev - $first_rev)/(60*60*24));
 
+        // Workaround if there is only one edit.
+
+        if ($first_rev == $latest_rev) {
+            $days = 1;
+        }
+
         $delta = round(($rev/$days), 3);
 
         // Remove the last comma and space

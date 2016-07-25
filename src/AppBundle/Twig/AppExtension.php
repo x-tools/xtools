@@ -47,6 +47,8 @@ class AppExtension extends \Twig_Extension
             new \Twig_SimpleFunction('memory_usage', [$this, 'requestMemory'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('link', [$this, 'generateLink'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('year', [$this, 'generateYear'], ['is_save' => ['html']]),
+            new \Twig_SimpleFunction('msgPrintExists', [$this, 'intuitionMessagePrintExists'], ['is_safe' => ['html']]),
+            new \Twig_SimpleFunction('msgExists', [$this, 'intuitionMessageExists'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('msg', [$this, 'intuitionMessage'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('msg_footer', [$this, 'intuitionMessageFooter'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('lang', [$this, 'getLang'], ['is_safe' => ['html']]),
@@ -75,6 +77,19 @@ class AppExtension extends \Twig_Extension
 
     public function generateYear() {
         return date('Y');
+    }
+
+    public function intuitionMessageExists($message = "") {
+        return $this->intuition->msgExists( $message , array("domain"=>"xtools"));
+    }
+
+    public function intuitionMessagePrintExists($message = "", $vars=[]) {
+        if ($this->intuitionMessageExists($message)) {
+            return $this->intuitionMessage($message, $vars);
+        }
+        else {
+            return $message;
+        }
     }
 
     public function intuitionMessage($message = "", $vars=[]) {

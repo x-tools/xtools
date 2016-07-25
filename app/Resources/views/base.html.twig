@@ -17,11 +17,11 @@
             var ff = document.getElementById(id);
             if( ff.style.display == "none" || ff.style.display == undefined ) {
                 ff.style.display = "block";
-                if(elmnt && id != 'xt-notifications') elmnt.innerHTML = '[hide]';
+                if(elmnt && id != 'xt-notifications') elmnt.innerHTML = '[{{ msg("hide") }}]';
             }
             else{
                 ff.style.display = "none";
-                if(elmnt && id != 'xt-notifications') elmnt.innerHTML = '[show]';
+                if(elmnt && id != 'xt-notifications') elmnt.innerHTML = '[{{ msg("show") }}]';
             }
         }
     </script>
@@ -37,9 +37,9 @@
             <ul class="list-inline">
                 <li>{{ link("", msg("title_xtools")) }}</li>
                 <li><span class="login" ><a href="https://tools.wmflabs.org/xtools/oauthredirector.php?action=login&callto=https://www.mediawiki.org/w/api.php&returnto=https://tools.wmflabs.org/xtools-ec/" >{{ msg("login") }}</a></span></li>
-                <li><a title="XAgent configuration" href="//tools.wmflabs.org/xtools/agent/config.php"><img style="vertical-align:baseline" src="//tools.wmflabs.org/xtools/static/images/Blue_Fedora_hat_12.png" />XAgent</a>&nbsp;&nbsp;</li>
+                <li><a title="XAgent configuration" href="//tools.wmflabs.org/xtools/agent/config.php"><img style="vertical-align:baseline" src="{{ asset("static/images/Blue_Fedora_hat_12.png") }}" />XAgent</a>&nbsp;&nbsp;</li>
                 <li></li>
-                <li><a title="Your echo notifications from 800+ wikis" href="//tools.wmflabs.org/xtools/echo/"><img style="vertical-align:bottom;padding-right:4px;" src="//tools.wmflabs.org/xtools/static/images/Echo_Icon_18.png" />XEcho</a>&nbsp;&nbsp;</li>
+                <li><a title="Your echo notifications from 800+ wikis" href="//tools.wmflabs.org/xtools/echo/"><img style="vertical-align:bottom;padding-right:4px;" src="{{ asset("static/images/Echo_Icon_18.png") }}" />XEcho</a>&nbsp;&nbsp;</li>
             </ul>
             <div class="pull-right">
                 <!-- Single button -->
@@ -81,6 +81,16 @@
         {% endif %}
     </p>
 </div>
+{% endif %}
+
+{% if app.session.flashBag.peek('notice') %}
+    <div class="container-fluid" style="margin-top: -10px;margin-bottom:10px;">
+        {% for flash_message in app.session.flashBag.get('notice') %}
+        <p class="alert alert-danger xt-alert">
+            {{ msgPrintExists(flash_message) }}
+        </p>
+        {% endfor %}
+    </div>
 {% endif %}
 
 <div class="container-fluid" id="content">
