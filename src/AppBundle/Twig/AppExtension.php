@@ -52,6 +52,7 @@ class AppExtension extends \Twig_Extension
             new \Twig_SimpleFunction('msg', [$this, 'intuitionMessage'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('msg_footer', [$this, 'intuitionMessageFooter'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('lang', [$this, 'getLang'], ['is_safe' => ['html']]),
+            new \Twig_SimpleFunction('langName', [$this, 'getLangName'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('allLangs', [$this, 'getAllLangs']),
         ];
     }
@@ -102,6 +103,10 @@ class AppExtension extends \Twig_Extension
 
     public function getLang()  {
         return $this->lang;
+    }
+
+    public function getLangName()  {
+        return in_array( $this->intuition->getLangName(), $this->getAllLangs() ) ? $this->intuition->getLangName() : 'English';
     }
 
     public function getAllLangs() {

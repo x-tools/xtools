@@ -7,6 +7,8 @@
     <link rel="stylesheet" type="text/css" href="{{ asset("res/stylenew.css") }}" />
     <link rel="shortcut icon" href="//tools.wmflabs.org/favicon.ico?v=2" />
     <script type="text/javascript" src="{{ asset("res/sortable.js") }}"></script>
+    <script type="text/javascript" src="{{ asset("res/jquery.min.js") }}"></script>
+    <script type="text/javascript" src="{{ asset("bootstrap/js/bootstrap.min.js") }}"></script>
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -30,30 +32,30 @@
 
 <body>
 
-<div class="navbar navbar-default navbar-top" role="navigation" style="min-height:40px;">
+<header class="navbar navbar-default navbar-top" role="navigation" style="min-height:40px;">
     <div class="container-fluid">
         <div class="navbar-collapse collapse" style="padding-top:5px;">
-
             <ul class="list-inline">
                 <li>{{ link("", msg("title_xtools")) }}</li>
-                <li><span class="login" ><a href="https://tools.wmflabs.org/xtools/oauthredirector.php?action=login&callto=https://www.mediawiki.org/w/api.php&returnto=https://tools.wmflabs.org/xtools-ec/" >{{ msg("login") }}</a></span></li>
+                <li><span class="login" ><a href="https://tools.wmflabs.org/xtools/oauthredirector.php?action=login&amp;callto=https://www.mediawiki.org/w/api.php&amp;returnto=https://tools.wmflabs.org/xtools-ec/" >{{ msg("login") }}</a></span></li>
                 <li><a title="XAgent configuration" href="//tools.wmflabs.org/xtools/agent/config.php"><img style="vertical-align:baseline" src="{{ asset("static/images/Blue_Fedora_hat_12.png") }}" />XAgent</a>&nbsp;&nbsp;</li>
-                <li></li>
-                <li><a title="Your echo notifications from 800+ wikis" href="//tools.wmflabs.org/xtools/echo/"><img style="vertical-align:bottom;padding-right:4px;" src="{{ asset("static/images/Echo_Icon_18.png") }}" />XEcho</a>&nbsp;&nbsp;</li>
             </ul>
-            <div class="pull-right">
-                <!-- Single button -->
-                <form action="?" method="get">
-                    <select name="uselang" class="form-control">
-                        {% for key, value in allLangs() %}
-                            <option value="{{ key }}" {% if key==lang() %}selected{% endif %}>{{ value|e }}</option>
-                        {% endfor %}
-                    </select>
-                    <input type="submit" class="btn btn-info" value="{{ msg("select_language") }}">
-                </form>
-            </div>
+            <span class="pull-right dropdown lang-dropdown">
+                <button id="lang-selector" class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {# FIXME #}
+                    {{ langName() }}
+                    <span class="caret"></span>
+                </button>
+                <ul class="form-control dropdown-menu" aria-labelledby="lang-selector">
+                    {% for key, value in allLangs() %}
+                        <li>
+                            <a class="lang-link" href="#" data-lang="{{ key }}">{{ value|e }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </span>
         </div>
-        <div class="navbar-collapse collapse">
+        <nav class="top-nav navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-left">
                 <li{% if page is defined and page=="ec" %} class="active"{% endif %} >{{ link("ec", msg("tool_ec")) }}</li>
                 <li{% if page is defined and page=="articleinfo" %} class="active"{% endif %}>{{ link("articleinfo", msg("tool_articleinfo")) }}</li>
@@ -69,9 +71,9 @@
                 <li{% if page is defined and page=="bash" %} class="active"{% endif %}>{{ link("bash", msg("tool_bash")) }}</li>
                 <li{% if page is defined and page=="sc" %} class="active"{% endif %}>{{ link("sc", msg("tool_sc")) }}</li>
             </ul>
-        </div>
+        </nav>
     </div>
-</div>
+</header>
 
 {% if noticeDisplay is defined and noticeDisplay == true %}
 <div class="container-fluid" style="margin-top: -10px;margin-bottom:10px;">
@@ -93,29 +95,28 @@
     </div>
 {% endif %}
 
-<div class="container-fluid" id="content">
-    <div class="container" >
-        {# if pageTitle is defined %}<h3 style="width:100%; margin-bottom: 0.4em; margin-left:auto; margin-right:auto">{{ pageTitle }}{% if subtitle is defined %}<small style="color:inherit"> &nbsp;&bull;&nbsp; {{ subtitle }}</small>{% endif %}</h3>{% endif #}
-        {% if pageTitle is defined %}<h2 style="width: 80%; margin-bottom: .5em; margin-left:auto; margin-right:auto">{{ msg(pageTitle) }}{% if subtitle is defined %}<small> &nbsp;&bull;&nbsp; {{ msg(subtitle) }}</small>{% endif %}</h2>{% endif %}
-        <!--hr / -->
-        {% block body %}
-        {% endblock %}
-    <div class="container-fluid">
-        <span><small><span>{{ msg("executed", [request_time()]) }}</span> &middot; <span>{{ msg("memory", [memory_usage()]) }} - v. {{ version }}</span></small></span>
+<main class="container-fluid" id="content">
+    {# if pageTitle is defined %}<h3 style="width:100%; margin-bottom: 0.4em; margin-left:auto; margin-right:auto">{{ pageTitle }}{% if subtitle is defined %}<small style="color:inherit"> &nbsp;&bull;&nbsp; {{ subtitle }}</small>{% endif %}</h3>{% endif #}
+    {% if pageTitle is defined %}<h2 style="width: 80%; margin-bottom: .5em; margin-left:auto; margin-right:auto">{{ msg(pageTitle) }}{% if subtitle is defined %}<small> &nbsp;&bull;&nbsp; {{ msg(subtitle) }}</small>{% endif %}</h2>{% endif %}
+    <!--hr / -->
+    {% block body %}
+    {% endblock %}
+</main>
+<footer class="app-footer container-fluid">
+    <span><small><span>{{ msg("executed", [request_time()]) }}</span> &middot; <span>{{ msg("memory", [memory_usage()]) }} - v. {{ version }}</span></small></span>
+    </div>
+    <hr style="margin:5px 10px;" />
+    <div class="row">
+        <div class="col">
+            <span>&copy; 2008-{{ year() }} &middot; {{ link("about", "About these tools") }}</span><br />
+            <span>{{ msg_footer() }}</span>
         </div>
-        <hr style="margin:5px 10px;" />
-        <div class="row">
-            <div class="col">
-                <span>&copy; 2008-{{ year() }} &middot; {{ link("about", "About these tools") }}</span><br />
-                <span>{{ msg_footer() }}</span>
-            </div>
-            <div class="col pull-right">
-                <a style="margin-right:5px;" href="//translatewiki.net/?setlang=en "><img height="36px" src="//upload.wikimedia.org/wikipedia/commons/5/51/Translatewiki.net_logo.svg" alt="translatewiki.net logo"/></a>
-                <a href="//tools.wmflabs.org"><img height="40px" src="//tools.wmflabs.org/xtools/static/images/labs.png" alt="Powered by WMF Labs" /></a>
-            </div>
+        <div class="col pull-right">
+            <a style="margin-right:5px;" href="//translatewiki.net/?setlang=en "><img height="36px" src="//upload.wikimedia.org/wikipedia/commons/5/51/Translatewiki.net_logo.svg" alt="translatewiki.net logo"/></a>
+            <a href="//tools.wmflabs.org"><img height="40px" src="//tools.wmflabs.org/xtools/static/images/labs.png" alt="Powered by WMF Labs" /></a>
         </div>
     </div>
-</div>
+</footer>
 <br />
 <br />
 
