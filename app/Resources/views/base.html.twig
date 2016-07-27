@@ -103,12 +103,12 @@
     {% endblock %}
 </main>
 <footer class="app-footer container-fluid">
-    <span><small><span>{{ msg("executed", [request_time()]) }}</span> &middot; <span>{{ msg("memory", [memory_usage()]) }} - v. {{ version }}</span></small></span>
+    <span><small><span>{{ msg("executed", [request_time()]) }}</span> &middot; <span>{{ msg("memory", [memory_usage()]) }}</span></small></span>
     </div>
     <hr style="margin:5px 10px;" />
     <div class="row">
         <div class="col">
-            <span>&copy; 2008-{{ year() }} &middot; {{ link("about", "About these tools") }}</span><br />
+            <span>&copy; 2008-{{ year() }} &middot; {{ link("about", "About these tools") }}  &middot; v.{{ version }} &middot; <a href="http://github.com/x-tools/xtools-rebirth/tree/{{ hash() }}" target="_blank">r.{{ shortHash() }}</a> </span><br />
             <span>{{ msg_footer() }}</span>
         </div>
         <div class="col pull-right">

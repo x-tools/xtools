@@ -54,6 +54,8 @@ class AppExtension extends \Twig_Extension
             new \Twig_SimpleFunction('lang', [$this, 'getLang'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('langName', [$this, 'getLangName'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('allLangs', [$this, 'getAllLangs']),
+            new \Twig_SimpleFunction('shortHash', [$this, 'gitShortHash']),
+            new \Twig_SimpleFunction('hash', [$this, 'gitHash']),
         ];
     }
 
@@ -111,6 +113,14 @@ class AppExtension extends \Twig_Extension
 
     public function getAllLangs() {
         return $this->intuition->generateLanguageList();
+    }
+
+    public function gitShortHash() {
+        return exec("git rev-parse --short HEAD");
+    }
+
+    public function gitHash() {
+        return exec("git rev-parse HEAD");
     }
 
     public function getName()
