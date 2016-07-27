@@ -1,17 +1,47 @@
-/.tooltip {outline:none; }
-//a.tooltip strong {line-height:30px;}
-//.tooltip:hover {text-decoration:none;}
+html {
+    height: 100%;
+}
+
+body {
+    background: url('gradient.png');
+    min-height: 100%;
+    position: relative;
+}
+
+#content {
+    background: white;
+    border-radius: 5px;
+    padding: 12px 12px 112px;
+    width: calc(100% - 30px);
+}
+
+.tooltip {
+    outline:none;
+}
 
 .tooltipcss span {
-    z-index:10;display:none; padding:14px 20px;
-    margin-top:-30px; margin-left:28px;
-    width:240px; line-height:16px;
+    z-index:10;
+    display:none;
+    padding:14px 20px;
+    margin-top:-30px;
+    margin-left:28px;
+    width:240px;
+    line-height:16px;
 }
 .tooltipcss:hover span{
-    display:inline; position:absolute; color:#111;
-    border:1px solid #DCA; background:#fffAF0;
+    display:inline;
+    position:absolute;
+    color:#111;
+    border:1px solid #DCA;
+    background:#fffAF0;
 }
-.callout {z-index:20;position:absolute;top:30px;border:0;left:-12px;}
+.callout {
+    z-index:20;
+    position:absolute;
+    top:30px;
+    border:0;
+    left:-12px;
+}
 
 /*CSS3 extras*/
 .tooltipcss span{
@@ -168,7 +198,6 @@ div.outer_bar {
     background-position: left center;
     background-repeat: no-repeat;
     line-height: 1.125em;
-    margin-left: 0.75em;
     margin-top: 0.5em;
     white-space: nowrap;
 }
@@ -242,4 +271,26 @@ div.outer_bar {
     background-image: url("../static/images/squiggle.png");
     background-repeat: repeat-x;
     background-position: left bottom;
+}
+
+.list-inline {
+    display: inline-block;
+}
+
+.top-nav {
+    padding: 0;
+}
+
+.app-footer {
+    bottom: 0;
+    left: 0;
+    margin-top: 30px;
+    padding: 15px;
+    position: absolute;
+    width: 100%;
+}
+
+.lang-dropdown .dropdown-menu {
+    height: 194px;
+    overflow-y: scroll;
 }
