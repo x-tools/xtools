@@ -294,3 +294,7 @@ div.outer_bar {
     height: 194px;
     overflow-y: scroll;
 }
+
+.navbar-default {
+    background: transparent;
+}
