@@ -30,7 +30,7 @@ class ArticleInfoController extends Controller
             return $this->redirectToRoute("ArticleInfoResult", array('project'=>$project, 'article' => $article));
         }
         else if ($article != "") {
-            return $this->redirectToRoute("SimpleEditCounterProject", array('project'=>$project));
+            return $this->redirectToRoute("ArticleInfoProject", array('project'=>$project));
         }
 
         // replace this example code with whatever you need

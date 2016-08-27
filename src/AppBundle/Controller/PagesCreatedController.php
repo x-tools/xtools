@@ -7,12 +7,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
 
-class SimpleEditCounterController extends Controller
+class PagesCreatedController extends Controller
 {
     /**
-     * @Route("/sc", name="SimpleEditCounter")
-     * @Route("/sc/", name="SimpleEditCounterSlash")
-     * @Route("/sc/index.php", name="SimpleEditCounterIndexPhp")
+     * @Route("/pages", name="PagesCreated")
+     * @Route("/pages/", name="PagesCreatedSlash")
+     * @Route("/pages/index.php", name="PagesCreatedIndexPhp")
      */
     public function indexAction()
     {
@@ -24,14 +24,14 @@ class SimpleEditCounterController extends Controller
         $username = $request->query->get('user');
 
         if ($project != "" && $username != "") {
-            return $this->redirectToRoute("SimpleEditCounterResult", array('project'=>$project, 'username' => $username));
+            return $this->redirectToRoute("PagesCreatedResult", array('project'=>$project, 'username' => $username));
         }
         else if ($project != "") {
-            return $this->redirectToRoute("SimpleEditCounterProject", array('project'=>$project));
+            return $this->redirectToRoute("PagesCreatedProject", array('project'=>$project));
         }
 
         // Otherwise fall through.
-        return $this->render('simpleEditCounter/index.html.twig', [
+        return $this->render('pagesCreated/index.html.twig', [
             "pageTitle" => "tool_sc",
             "subtitle" => "tool_sc_desc",
             'page' => "sc",
@@ -40,10 +40,10 @@ class SimpleEditCounterController extends Controller
     }
 
     /**
-     * @Route("/sc/{project}", name="SimpleEditCounterProject")
+     * @Route("/pages/{project}", name="PagesCreatedProject")
      */
     public function projectAction($project) {
-        return $this->render('simpleEditCounter/index.html.twig', [
+        return $this->render('pagesCreated/index.html.twig', [
             'title' => "tool_sc",
             'page' => "sc",
             "pageTitle" => "tool_sc",
@@ -53,7 +53,7 @@ class SimpleEditCounterController extends Controller
     }
 
     /**
-     * @Route("/sc/{project}/{username}", name="SimpleEditCounterResult")
+     * @Route("/pages/{project}/{username}", name="PagesCreatedResult")
      */
     public function resultAction($project, $username) {
 
@@ -78,7 +78,7 @@ class SimpleEditCounterController extends Controller
 
         // Throw an exception if we can't find the wiki
         if (sizeof($wikis) <1) {
-            $this->addFlash('notice', ["nowiki", $project]);
+            $this->addFlash('notice', "Unknown wiki $project");
             return $this->redirectToRoute("SimpleEditCounter");
         }
 
@@ -108,22 +108,10 @@ class SimpleEditCounterController extends Controller
         $resultQuery->bindParam("username", $username);
         $resultQuery->execute();
 
-        if ($resultQuery->errorCode() > 0) {
-            $this->addFlash("notice", ["noresults", $username]);
-        }
-
         // Fetch the result data
         $results = $resultQuery->fetchAll();
 
         dump($results);
-
-        $resultTestQuery = $conn->prepare("SELECT 'groups' as source, ug_group as value FROM $dbName.user_groups JOIN user on user_id = ug_user WHERE user_name = :username");
-
-        $resultTestQuery->bindParam("username", $username);
-        $resultTestQuery->execute();
-
-        dump($resultTestQuery->fetchAll());
-        dump($resultTestQuery->errorCode());
 
         // Initialize the variables - just so we don't get variable undefined errors if there is a problem
         $id = "";
@@ -143,7 +131,6 @@ class SimpleEditCounterController extends Controller
                 $rev = $row["value"];
             }
             if($row["source"] == "groups") {
-                dump($row["value"]);
                 $groups .= $row["value"]. ", ";
             }
         }
@@ -151,22 +138,18 @@ class SimpleEditCounterController extends Controller
         // Unknown user - If the user is created the $results variable will have 3 entries.  This is a workaround to detect
         // non-existant IPs.
         if (sizeof($results) < 3 && $arch == 0 && $rev == 0) {
-            $this->addFlash('notice', ["noresult", $username]);
-
+            //throw new Exception("User \"$username\" does not exist or has not made edits");
+            $this->addFlash('notice', "User $username does not exist or has not made edits");
             return $this->redirectToRoute("SimpleEditCounterProject", ["project"=>$project]);
         }
 
-        dump($groups);
         // Remove the last comma and space
         if (strlen($groups) > 2) {
-            dump($groups);
             $groups = substr($groups, 0, -2);
         }
 
-        dump($groups);
         // If the user isn't in any groups, show a message.
         if (strlen($groups) == 0) {
-            dump($groups);
             $groups = "---";
         }
 

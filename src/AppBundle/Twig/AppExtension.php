@@ -29,13 +29,28 @@ class AppExtension extends \Twig_Extension
 
         $this->request = Request::createFromGlobals();
 
-        $useLang = $this->request->query->get('uselang');
+        $useLang = "en";
+
+        $query = $this->request->query->get('uselang');
+        $cookie = $this->request->cookies->get("lang");
+
+        if ($query != "") {
+            $useLang = $query;
+        }
+        else if ($cookie != "") {
+            $useLang = $cookie;
+        }
+        else {
+            // Do nothing... it'll default to en.
+        }
 
         $useLang = strtolower($useLang);
 
-        if ($useLang == "") $useLang = "en";
-
         $this->lang = $useLang;
+
+        if ($cookie != $useLang) {
+            $this->request->cookies->set("lang", $useLang);
+        }
 
         $this->intuition->setLang($useLang);
     }
@@ -71,9 +86,9 @@ class AppExtension extends \Twig_Extension
     public function generateLink($page, $text, $class = "") {
         $path = $this->container->getParameter('web.path');
 
-        $this->lang = strtolower($this->lang);
+        //$this->lang = strtolower($this->lang);
 
-        if($this->lang != "en") $page .= "?uselang=" . $this->lang;
+        //if($this->lang != "en") $page .= "?uselang=" . $this->lang;
 
         return "<a href='$path/$page' class='$class'>$text</a>";
     }
@@ -87,6 +102,11 @@ class AppExtension extends \Twig_Extension
     }
 
     public function intuitionMessagePrintExists($message = "", $vars=[]) {
+        if (is_array($message)) {
+            $vars = $message;
+            $message = $message[0];
+        }
+        if ($message == $vars[0]) {$vars = array_slice($vars, 1);}
         if ($this->intuitionMessageExists($message)) {
             return $this->intuitionMessage($message, $vars);
         }
@@ -100,7 +120,9 @@ class AppExtension extends \Twig_Extension
     }
 
     public function intuitionMessageFooter() {
-        return $this->intuition->getFooterLine( TSINT_HELP_NONE );
+        $message = $this->intuition->getFooterLine( TSINT_HELP_NONE );
+        $message = str_replace("<a class=\"int-dashboardbacklink\" href=\"//tools.wmflabs.org/intuition/?returnto=%2Fapp_dev.php&amp;returntoquery=#tab-settingsform\" title=\"Change the interface language of this tool.\">Change language!</a>", "", $message);
+        return $message;
     }
 
     public function getLang()  {
