@@ -4,6 +4,7 @@ namespace AppBundle\Twig;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use \Intuition;
 
 class AppExtension extends \Twig_Extension
@@ -11,6 +12,7 @@ class AppExtension extends \Twig_Extension
     private $intuition;
     private $container;
     private $request;
+    private $response;
     private $lang;
 
     public function __construct(ContainerInterface $container) {
@@ -28,6 +30,7 @@ class AppExtension extends \Twig_Extension
         dump($this->intuition->listMsgs('xtools'));*/
 
         $this->request = Request::createFromGlobals();
+        $this->response = Response::create();
 
         $useLang = "en";
 
@@ -105,8 +108,8 @@ class AppExtension extends \Twig_Extension
         if (is_array($message)) {
             $vars = $message;
             $message = $message[0];
+            $vars = array_slice($vars, 1);
         }
-        if ($message == $vars[0]) {$vars = array_slice($vars, 1);}
         if ($this->intuitionMessageExists($message)) {
             return $this->intuitionMessage($message, $vars);
         }

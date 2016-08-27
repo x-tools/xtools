@@ -110,6 +110,7 @@ class SimpleEditCounterController extends Controller
 
         if ($resultQuery->errorCode() > 0) {
             $this->addFlash("notice", ["noresults", $username]);
+            return $this->redirectToRoute("SimpleEditCounterProject", ["project"=>$project]);
         }
 
         // Fetch the result data
@@ -122,6 +123,7 @@ class SimpleEditCounterController extends Controller
         $resultTestQuery->bindParam("username", $username);
         $resultTestQuery->execute();
 
+        dump($dbName);
         dump($resultTestQuery->fetchAll());
         dump($resultTestQuery->errorCode());
 
