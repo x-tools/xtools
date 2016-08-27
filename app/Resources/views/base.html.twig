@@ -49,7 +49,7 @@
                 <ul class="form-control dropdown-menu" aria-labelledby="lang-selector">
                     {% for key, value in allLangs() %}
                         <li>
-                            <a class="lang-link" href="?uselang={{ key }}">{{ key }} - {{ value|e }}</a>
+                            <a class="lang-link" href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'uselang': key})) }}" data-lang="{{ key }}">{{ value|e }}</a>
                         </li>
                     {% endfor %}
                 </ul>
@@ -122,8 +122,6 @@
 
 <script>
     if (window.sortables_init) sortables_init();
-</script>
-<script>
 </script>
 
 </body>
