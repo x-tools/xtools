@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\Session\Session;
 use \Intuition;
 
 class AppExtension extends \Twig_Extension
@@ -14,6 +15,7 @@ class AppExtension extends \Twig_Extension
     private $container;
     private $request;
     private $response;
+    private $session;
     private $lang;
 
     public function __construct(ContainerInterface $container) {
@@ -23,12 +25,12 @@ class AppExtension extends \Twig_Extension
         $this->intuition->loadTextdomainFromFile( $this->container->getParameter("kernel.root_dir") . '/i18n', "xtools" );
 
         $this->request = Request::createFromGlobals();
-        $this->response = Response::create();
+        $this->session = new Session();
 
         $useLang = "en";
 
         $query = $this->request->query->get('uselang');
-        $cookie = $this->request->cookies->get("lang");
+        $cookie = $this->session->get("lang");
 
         if ($query != "") {
             $useLang = $query;
@@ -45,8 +47,7 @@ class AppExtension extends \Twig_Extension
         $this->lang = $useLang;
 
         if ($cookie != $useLang) {
-            $cookie = new Cookie("lang", $useLang);
-            $this->response->headers->setCookie($cookie);
+            $this->session->set("lang", $useLang);
         }
 
         $this->intuition->setLang($useLang);

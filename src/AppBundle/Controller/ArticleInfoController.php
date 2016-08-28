@@ -38,6 +38,7 @@ class ArticleInfoController extends Controller
             'page' => "articleinfo",
             'title' => "tool_articleinfo",
             "pageTitle" => "tool_articleinfo",
+            "subtitle" => "tool_articleinfo_desc",
         ]);
     }
 
@@ -53,6 +54,7 @@ class ArticleInfoController extends Controller
             "pageTitle" => "tool_articleinfo",
             "project" => $project,
             "article_title" => $article,
+            "subtitle" => "tool_articleinfo_desc",
         ));
     }
 }
