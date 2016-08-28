@@ -10,6 +10,7 @@ class DefaultController extends Controller
 {
     /**
      * @Route("/", name="homepage")
+     * @Route("/index.php", name="homepageIndexPhp")
      */
     public function indexAction()
     {

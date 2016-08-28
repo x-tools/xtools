@@ -131,11 +131,11 @@ class EditCounterController extends Controller
         }
 
         // Initialize the variables - just so we don't get variable undefined errors if there is a problem
-        $id = "";
+        $id = 0;
         $arch = "";
         $rev = "";
-        $first_rev = "";
-        $latest_rev = "";
+        $first_rev = 0;
+        $latest_rev = 0;
         $rev_24h = "";
         $rev_7d = "";
         $rev_30d = "";
@@ -196,6 +196,20 @@ class EditCounterController extends Controller
             $groups = "--";
         }
 
+        if ($first_rev > 0) {
+            $first_rev = date('Y-m-d h:i:s', $first_rev);
+        }
+        else {
+            $first_rev = "----";
+        }
+
+        if ($latest_rev > 0) {
+            $latest_rev = date('Y-m-d h:i:s', $latest_rev);
+        }
+        else {
+            $latest_rev = "----";
+        }
+
         // -------------------------
         // General statistics part 2
         // -------------------------
@@ -206,9 +220,7 @@ class EditCounterController extends Controller
 			SELECT 'pages-created-live' as source, COUNT(*) as value from `revision_userindex` where rev_user_text=:username and rev_parent_id=0
 			UNION
 			SELECT 'pages-created-archive' as source, COUNT(*) as value from `archive_userindex` where ar_user_text=:username and ar_parent_id=0
-			/*UNION
-			SELECT rev_page, 'edits-per-age' as source, COUNT(*) as value FROM `revision_userindex` where rev_user_text=:username group by rev_page*/
-            
+			
             ");
 
         $resultQuery->bindParam("username", $username);
@@ -219,6 +231,7 @@ class EditCounterController extends Controller
 
         $uniquePages = 0;
         $pagesCreated = 0;
+        $editsPerPage = 0;
 
         foreach($results as $row) {
             if($row["source"] == "unique-pages") {
@@ -230,6 +243,11 @@ class EditCounterController extends Controller
             if($row["source"] == "pages-created-archive") {
                 $pagesCreated += $row["value"];
             }
+        }
+
+        if ($uniquePages > 0) {
+            $editsPerPage = ($rev + $arch) / $uniquePages;
+            $editsPerPage = number_format($editsPerPage, 2);
         }
 
         // -------------------------
@@ -253,7 +271,145 @@ class EditCounterController extends Controller
         // -------------------------
         // Namespace Totals
         // -------------------------
+        // TODO: Convert to named namespaces
+        $colors = array(
+            0 => '#Cc0000',#'#FF005A', #red '#FF5555',
+            1 => '#F7b7b7',
 
+            2 => '#5c8d20',#'#008800', #green'#55FF55',
+            3 => '#85eD82',
+
+            4 => '#2E97E0', #blue
+            5 => '#B9E3F9',
+
+            6 => '#e1711d',  #orange
+            7 => '#ffc04c',
+
+            8 => '#FDFF98', #yellow
+
+            9 => '#5555FF',
+            10 => '#55FFFF',
+
+            11 => '#0000C0',  #
+            12 => '#008800',  # green
+            13 => '#00C0C0',
+            14 => '#FFAFAF',	# rosé
+            15 => '#808080',	# gray
+            16 => '#00C000',
+            17 => '#404040',
+            18 => '#C0C000',	# green
+            19 => '#C000C0',
+
+            100 => '#75A3D1',	# blue
+            101 => '#A679D2',	# purple
+            102 => '#660000',
+            103 => '#000066',
+            104 => '#FAFFAF',	# caramel
+            105 => '#408345',
+            106 => '#5c8d20',
+            107 => '#e1711d',	# red
+            108 => '#94ef2b',	# light green
+            109 => '#756a4a',	# brown
+            110 => '#6f1dab',
+            111 => '#301e30',
+            112 => '#5c9d96',
+            113 => '#a8cd8c',	# earth green
+            114 => '#f2b3f1',	# light purple
+            115 => '#9b5828',
+            118 => '#99FFFF',
+            119 => '#99BBFF',
+            120 => '#FF99FF',
+            121 => '#CCFFFF',
+            122 => '#CCFF00',
+            123 => '#CCFFCC',
+            200 => '#33FF00',
+            201 => '#669900',
+            202 => '#666666',
+            203 => '#999999',
+            204 => '#FFFFCC',
+            205 => '#FF00CC',
+            206 => '#FFFF00',
+            207 => '#FFCC00',
+            208 => '#FF0000',
+            209 => '#FF6600',
+            446 => '#06DCFB',
+            447 => '#892EE4',
+            460 => '#99FF66',
+            461 => '#99CC66',	# green
+            470 => '#CCCC33',	# ocker
+            471 => '#CCFF33',
+            480 => '#6699FF',
+            481 => '#66FFFF',
+            490 => '#995500',
+            491 => '#998800',
+            710 => '#FFCECE',
+            711 => '#FFC8F2',
+            828 => '#F7DE00',
+            829 => '#BABA21',
+            866 => '#FFFFFF',
+            867 => '#FFCCFF',
+            1198 => '#FF34B3',
+            1199 => '#8B1C62',);
+
+            $colors2 = array('#61a9f3',#blue
+            '#f381b9',#pink
+            '#61E3A9',
+
+            '#D56DE2',
+            '#85eD82',
+            '#F7b7b7',
+            '#CFDF49',
+            '#88d8f2',
+            '#07AF7B',#green
+            '#B9E3F9',
+            '#FFF3AD',
+            '#EF606A',#red
+            '#EC8833',
+            '#FFF100',
+            '#87C9A5',
+            '#FFFB11',
+            '#005EBC',
+            '#9AEB67',
+            '#FF4A26',
+            '#FDFF98',
+            '#6B7EFF',
+            '#BCE02E',
+            '#E0642E',
+            '#E0D62E',
+
+            '#02927F',
+            '#FF005A',
+            '#61a9f3', #blue' #FFFF55',
+        );
+        $colorCounter2 = 0;
+        $resultQuery = $conn->prepare("SELECT page_namespace, count(*) as 'count' FROM $dbName.`revision_userindex` r
+RIGHT JOIN $dbName.page p on r.rev_page = p.page_id
+WHERE r.rev_user = :id GROUP BY page_namespace");
+        $resultQuery->bindParam(":id", $id);
+        $resultQuery->execute();
+
+        $namespaceTotal = 0;
+        $namespaceArray = [];
+
+        foreach ($resultQuery->fetchAll() as $row) {
+            if ($colors[$row["page_namespace"]]) {
+                $color = $colors[$row["page_namespace"]];
+            }
+            else {
+                if ($colors2[$colorCounter2]) {
+                    $color = $colors2[$colorCounter2];
+                    $colorCounter2++;
+                }
+                else {
+                    $color = $colors2[0];
+                    $colorCounter2 = 1;
+                }
+            }
+            $namespaceArray[$row["page_namespace"]] = ['num'=>$row["count"], "color" => $color];
+            $namespaceTotal += $row["count"];
+        }
+
+        dump($namespaceArray);
 
         // -------------------------
         // Month and Year Counts
@@ -296,8 +452,8 @@ class EditCounterController extends Controller
             'deleted_edits' => $arch,
             'total_edits' => $rev + $arch,
             'live_edits' => $rev,
-            'first_rev' => date('Y-m-d h:i:s', $first_rev),
-            'latest_rev' => date('Y-m-d h:i:s', $latest_rev),
+            'first_rev' => $first_rev,
+            'latest_rev' => $latest_rev,
             'days' => $days,
             'delta' => $delta,
             'rev_24h' => $rev_24h,
@@ -308,6 +464,11 @@ class EditCounterController extends Controller
             // General part 2
             'uniquePages' => $uniquePages,
             'pagesCreated' => $pagesCreated,
+            'editsPerPage' => $editsPerPage,
+
+            // Namespace Totals
+            'namespaceArray' => $namespaceArray,
+            'namespaceTotal' => $namespaceTotal,
         ]);
     }
 }

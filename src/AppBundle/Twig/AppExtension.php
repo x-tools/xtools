@@ -19,15 +19,7 @@ class AppExtension extends \Twig_Extension
         $this->container = $container;
         $this->intuition = new Intuition();
 
-        //$this->intuition->refreshLang();
-
         $this->intuition->loadTextdomainFromFile( $this->container->getParameter("kernel.root_dir") . '/i18n', "xtools" );
-
-        /*dump(
-            $this->intuition->getDomainInfo( 'xtools' )
-        );
-
-        dump($this->intuition->listMsgs('xtools'));*/
 
         $this->request = Request::createFromGlobals();
         $this->response = Response::create();

@@ -49,7 +49,7 @@
                 <ul class="form-control dropdown-menu" aria-labelledby="lang-selector">
                     {% for key, value in allLangs() %}
                         <li>
-                            <a class="lang-link" href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'uselang': key})) }}" data-lang="{{ key }}">{{ value|e }}</a>
+                            {#<a class="lang-link" href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'uselang': key})) }}" data-lang="{{ key }}">{{ value|e }}</a>#}
                         </li>
                     {% endfor %}
                 </ul>
@@ -78,7 +78,7 @@
 {% if noticeDisplay is defined and noticeDisplay == true %}
 <div class="container-fluid" style="margin-top: -10px;margin-bottom:10px;">
     <p class='alert {% if noticeStyle is defined %}alert-{{ noticeStyle }}{% else %}alert-danger{% endif %} xt-alert'>
-        {% if noticeText is defined %}{{ noticeText }}
+        {% if noticeText is defined %}{{ msgPrintExists(noticeText) }}
         {% else %}No notice has been defined but the notice has been turned on.  Poke a maintainer to fix this.
         {% endif %}
     </p>
