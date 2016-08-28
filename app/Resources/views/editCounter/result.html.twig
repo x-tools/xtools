@@ -59,7 +59,7 @@
                                 <tr><td style="color:gray">{{ msg("live") }}:</td></tr>
                                 <tr><td>{{ msg("unique") }}:</td><td><span class="tdgeneral" >{{ uniquePages }}</span></td>    </tr>
                                 <tr><td>{{ msg("pages_created") }}:</td><td><span class="tdgeneral" ><!--a href="//tools.wmflabs.org/xtools/pages/?user=Matthewrbowker&lang=en&wiki=wikipedia&namespace=all&redirects=none" -->{{ pagesCreated }}</a></span></td></tr>
-                                <tr><td>Pages moved:</td><td><span class="tdgeneral" >153</span></td></tr>
+                                <tr><td>{{ msg("pages_moved") }}:</td><td><span class="tdgeneral" >{{ pagesMoved }}</span></td></tr>
                                 <tr><td title="{{ msg("average_per_page") }}" >{{ msg("average_per_page_sign") }}</td><td><span class="tdgeneral" >{{ editsPerPage }}</span></td></tr>
                                 <tr><td title="Average change per page" >Ø change per page (bytes):</td><td><span class="tdgeneral" >extended</span></td></tr>
                                 <tr><td colspan=20 ></td></tr>
@@ -77,21 +77,21 @@
                         </div>
                         <div class="col">
                             <table class="table-condensed  xt-table">
-                                <tr><td style="color:gray">Actions:</td></td></tr>
-                                <tr><td>Thank:</td><td><span class="tdgeneral"><a href="//en.wikipedia.org/w/index.php?title=Special%3ALog&type=thanks&user=Matthewrbowker&page=&year=&month=-1&tagfilter=" >2 <small>x</small></a></span></td></tr>
-                                <tr><td>Approve:</td><td><span class="tdgeneral"><a href="//en.wikipedia.org/w/index.php?title=Special%3ALog&type=review&user=Matthewrbowker&page=&year=&month=-1&tagfilter=&hide_patrol_log=1&hide_review_log=1&hide_thanks_log=1" >9 <small>x</small></a></span></td></tr>
+                                <tr><td style="color:gray">{{ msg("actions") }}:</td></td></tr>
+                                <tr><td>{{ msg("thank") }}:</td><td><span class="tdgeneral"><a href="{{ url|raw }}/index.php?title=Special%3ALog&type=thanks&user={{ username }}&page=&year=&month=-1&tagfilter=" >{{ pagesThanked }} <small>x</small></a></span></td></tr>
+                                <tr><td>{{ msg("approve") }}:</td><td><span class="tdgeneral"><a href="{{ url|raw }}/index.php?title=Special%3ALog&type=review&user={{ username }}&page=&year=&month=-1&tagfilter=&hide_patrol_log=1&hide_review_log=1&hide_thanks_log=1" >{{ pagesApproved }} <small>x</small></a></span></td></tr>
                                 <!--    <tr><td>Unapprove:</td><td><span class="tdgeneral">0 <small>x</small></span></td></tr>   -->
-                                <tr><td>Patrol:</td><td><span class="tdgeneral"><a href="//en.wikipedia.org/w/index.php?title=Special%3ALog&type=patrol&user=Matthewrbowker&page=&year=&month=-1&tagfilter=" >36 <small>x</small></a></span></td></tr>
+                                <tr><td>{{ msg("patrol") }}:</td><td><span class="tdgeneral"><a href="{{ url|raw }}/index.php?title=Special%3ALog&type=patrol&user={{ username }}&page=&year=&month=-1&tagfilter=" >{{ pagesPatrolled }} <small>x</small></a></span></td></tr>
                                 <tr><td colspan=2></td></tr>
-                                <tr><td style="color:gray">Admin actions</td></td></tr>
-                                <tr><td>Block:</td><td><span class="tdgeneral">0 <small>x</small></span></td></tr>
-                                <!--    <tr><td>Unblock:</td><td><span class="tdgeneral">0 <small>x</small></span></td></tr>   -->
-                                <tr><td>Protect:</td><td><span class="tdgeneral">0 <small>x</small></span></td></tr>
-                                <!--    <tr><td>Unprotect:</td><td><span class="tdgeneral">0 <small>x</small></span></td></tr>   -->
-                                <tr><td>Delete:</td><td><span class="tdgeneral">0 <small>x</small></span></td></tr>
-                                <!--    <tr><td>Delete (revision):</td><td><span class="tdgeneral">0 <small>x</small></span></td></tr>  -->
-                                <!--    <tr><td>Restore:</td><td><span class="tdgeneral">0 <small>x</small></span></td></tr>  -->
-                                <tr><td>Import:</td><td><span class="tdgeneral">0 <small>x</small></span></td></tr>
+                                <tr><td style="color:gray">{{ msg("actions_admin") }}</td></td></tr>
+                                <tr><td>{{ msg("block") }}:</td><td><span class="tdgeneral">{{ usersBlocked }} <small>x</small></span></td></tr>
+                                <tr><td>{{ msg("unblock") }}:</td><td><span class="tdgeneral">{{ usersUnblocked }} <small>x</small></span></td></tr>
+                                <tr><td>{{ msg("protect") }}:</td><td><span class="tdgeneral">{{ pagesProtected }} <small>x</small></span></td></tr>
+                                <tr><td>{{ msg("unprotect") }}:</td><td><span class="tdgeneral">{{ pagesUnprotected }} <small>x</small></span></td></tr>
+                                <tr><td>{{ msg("delete") }}:</td><td><span class="tdgeneral">{{ pagesDeleted }} <small>x</small></span></td></tr>
+                                <tr><td>{{ msg("delete") }} ({{ msg("revisions", [1]) }}):</td><td><span class="tdgeneral">{{ pagesDeletedRevision }} <small>x</small></span></td></tr>
+                                <tr><td>{{ msg("restore") }}:</td><td><span class="tdgeneral">{{ pagesRestored }} <small>x</small></span></td></tr>
+                                <tr><td>{{ msg("import") }}:</td><td><span class="tdgeneral">{{ pagesImported }} <small>x</small></span></td></tr>
                                 <tr><td colspan=2></td></tr>
                                 <tr><td colspan=2></td></tr>
                                 <!--    <tr><td style="color:gray">Article:</td></td></tr> -->

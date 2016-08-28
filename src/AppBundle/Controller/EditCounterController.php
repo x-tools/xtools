@@ -217,7 +217,8 @@ class EditCounterController extends Controller
 			SELECT 'pages-created-live' as source, COUNT(*) as value from `revision_userindex` where rev_user_text=:username and rev_parent_id=0
 			UNION
 			SELECT 'pages-created-archive' as source, COUNT(*) as value from `archive_userindex` where ar_user_text=:username and ar_parent_id=0
-			
+			UNION
+			SELECT 'pages-moved' as source, count(*) as value from `logging` where log_type='move' and log_action='move' and log_user_text=:username 
             ");
 
         $resultQuery->bindParam("username", $username);
@@ -228,6 +229,7 @@ class EditCounterController extends Controller
 
         $uniquePages = 0;
         $pagesCreated = 0;
+        $pagesMoved = 0;
         $editsPerPage = 0;
 
         foreach($results as $row) {
@@ -240,6 +242,9 @@ class EditCounterController extends Controller
             if($row["source"] == "pages-created-archive") {
                 $pagesCreated += $row["value"];
             }
+            if($row["source"] == "pages-moved") {
+                $pagesMoved += $row["value"];
+            }
         }
 
         if ($uniquePages > 0) {
@@ -250,7 +255,84 @@ class EditCounterController extends Controller
         // -------------------------
         // General statistics part 3
         // -------------------------
+        // TODO: Turn into single query - not using UNION
+        $resultQuery = $conn->prepare("
+        SELECT 'pages-thanked' as source, count(*) as value from `logging` where log_type='thank' and log_action='thank' and log_user_text=:username 
+        UNION
+        SELECT 'pages-approved' as source, count(*) as value from `logging` where log_type='review' and log_action='approve' and log_user_text=:username 
+        UNION
+        SELECT 'pages-patrolled' as source, count(*) as value from `logging` where log_type='patrol' and log_action='patrol' and log_user_text=:username 
+        UNION
+        SELECT 'users-blocked' as source, count(*) as value from `logging` where log_type='block' and log_action='block' and log_user_text=:username 
+        UNION
+        SELECT 'users-unblocked' as source, count(*) as value from `logging` where log_type='block' and log_action='unblock' and log_user_text=:username 
+        UNION
+        SELECT 'pages-protected' as source, count(*) as value from `logging` where log_type='protect' and log_action='protect' and log_user_text=:username 
+        UNION
+        SELECT 'pages-unprotected' as source, count(*) as value from `logging` where log_type='protect' and log_action='unprotect' and log_user_text=:username 
+        UNION
+        SELECT 'pages-deleted' as source, count(*) as value from `logging` where log_type='delete' and log_action='delete' and log_user_text=:username 
+        UNION
+        SELECT 'pages-deleted-revision' as source, count(*) as value from `logging` where log_type='delete' and log_action='revision' and log_user_text=:username 
+        UNION
+        SELECT 'pages-restored' as source, count(*) as value from `logging` where log_type='delete' and log_action='restore' and log_user_text=:username 
+        UNION
+        SELECT 'pages-imported' as source, count(*) as value from `logging` where log_type='import' and log_action='import' and log_user_text=:username 
+        ");
 
+        $resultQuery->bindParam("username", $username);
+        $resultQuery->execute();
+
+        // Fetch the result data
+        $results = $resultQuery->fetchAll();
+
+        $pagesThanked = 0;
+        $pagesApproved = 0;
+        $pagesPatrolled = 0;
+        $usersBlocked = 0;
+        $usersUnblocked = 0;
+        $pagesProtected = 0;
+        $pagesUnrotected = 0;
+        $pagesDeleted = 0;
+        $pagesDeletedRevision = 0;
+        $pagesRestored = 0;
+        $pagesImported = 0;
+
+        foreach($results as $row) {
+            if ($row["source"] == "pages-thanked") {
+                $pagesThanked += $row["value"];
+            }
+            if ($row["source"] == "pages-approved") {
+                $pagesApproved += $row["value"];
+            }
+            if ($row["source"] == "pages-patrolled") {
+                $pagesPatrolled += $row["value"];
+            }
+            if ($row["source"] == "users-blocked") {
+                $usersBlocked += $row["value"];
+            }
+            if ($row["source"] == "users-unblocked") {
+                $usersUnblocked += $row["value"];
+            }
+            if ($row["source"] == "pages-protected") {
+                $pagesProtected += $row["value"];
+            }
+            if ($row["source"] == "pages-unprotected") {
+                $pagesUnrotected += $row["value"];
+            }
+            if ($row["source"] == "pages-deleted") {
+                $pagesDeleted += $row["value"];
+            }
+            if ($row["source"] == "pages-deleted-revision") {
+                $pagesDeletedRevision += $row["value"];
+            }
+            if ($row["source"] == "pages-restored") {
+                $pagesRestored += $row["value"];
+            }
+            if ($row["source"] == "pages-imported") {
+                $pagesImported += $row["value"];
+            }
+        }
 
 
         // -------------------------
@@ -412,8 +494,7 @@ WHERE r.rev_user = :id GROUP BY page_namespace");
             /*for($i = 0; $i < (sizeof($namespaceArray) + 1); $i++) {
                 $namespaceArray[$i]['pct'] = ($namespaceArray[$i]['num'] / 100);
             }*/
-
-            dump($namespaceArray);
+            
         }
 
 
@@ -470,7 +551,21 @@ WHERE r.rev_user = :id GROUP BY page_namespace");
             // General part 2
             'uniquePages' => $uniquePages,
             'pagesCreated' => $pagesCreated,
+            'pagesMoved' => $pagesMoved,
             'editsPerPage' => $editsPerPage,
+
+            // General part 3
+            'pagesThanked' => $pagesThanked,
+            'pagesApproved' => $pagesApproved,
+            'pagesPatrolled' => $pagesPatrolled,
+            'usersBlocked' => $usersBlocked,
+            'usersUnblocked' => $usersUnblocked,
+            'pagesProtected' => $pagesProtected,
+            'pagesUnprotected' => $pagesUnrotected,
+            'pagesDeleted' => $pagesDeleted,
+            'pagesDeletedRevision' => $pagesDeletedRevision,
+            'pagesRestored' => $pagesRestored,
+            'pagesImported' => $pagesImported,
 
             // Namespace Totals
             'namespaceArray' => $namespaceArray,
