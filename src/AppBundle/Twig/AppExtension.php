@@ -5,6 +5,7 @@ namespace AppBundle\Twig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Cookie;
 use \Intuition;
 
 class AppExtension extends \Twig_Extension
@@ -44,7 +45,8 @@ class AppExtension extends \Twig_Extension
         $this->lang = $useLang;
 
         if ($cookie != $useLang) {
-            $this->request->cookies->set("lang", $useLang);
+            $cookie = new Cookie("lang", $useLang);
+            $this->response->headers->setCookie($cookie);
         }
 
         $this->intuition->setLang($useLang);
