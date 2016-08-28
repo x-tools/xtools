@@ -12,6 +12,7 @@ class EditCounterController extends Controller
     /**
      * @Route("/ec", name="EditCounter")
      * @Route("/ec/", name="EditCounterSlash")
+     * @Route("/ec/get", name="EditCounterGet")
      * @Route("/ec/index.php", name="EditCounterIndexPhp")
      */
     public function indexAction()
@@ -84,10 +85,6 @@ class EditCounterController extends Controller
         $dbName = $wikis[0]['dbName'];
         $wikiName = $wikis[0]['name'];
         $url = $wikis[0]['url'];
-
-        if (substr($dbName, -2) != "_p") {
-            $dbName .= "_p";
-        }
 
         if (substr($dbName, -2) != "_p") {
             $dbName .= "_p";
@@ -193,7 +190,7 @@ class EditCounterController extends Controller
 
         // If the user isn't in any groups, show a message.
         if (strlen($groups) == 0) {
-            $groups = "--";
+            $groups = "----";
         }
 
         if ($first_rev > 0) {

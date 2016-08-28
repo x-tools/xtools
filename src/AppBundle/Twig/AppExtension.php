@@ -4,8 +4,6 @@ namespace AppBundle\Twig;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Session\Session;
 use \Intuition;
 
@@ -14,7 +12,6 @@ class AppExtension extends \Twig_Extension
     private $intuition;
     private $container;
     private $request;
-    private $response;
     private $session;
     private $lang;
 
@@ -44,13 +41,13 @@ class AppExtension extends \Twig_Extension
 
         $useLang = strtolower($useLang);
 
+        $this->intuition->setLang($useLang);
+
         $this->lang = $useLang;
 
         if ($cookie != $useLang) {
             $this->session->set("lang", $useLang);
         }
-
-        $this->intuition->setLang($useLang);
     }
 
     public function getFunctions()
