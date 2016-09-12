@@ -77,13 +77,13 @@
                         </div>
                         <div class="col">
                             <table class="table-condensed  xt-table">
-                                <tr><td style="color:gray">{{ msg("actions") }}:</td></td></tr>
+                                <tr><td style="color:gray">{{ msg("actions") }}:</td></tr>
                                 <tr><td>{{ msg("thank") }}:</td><td><span class="tdgeneral"><a href="{{ url|raw }}/index.php?title=Special%3ALog&type=thanks&user={{ username }}&page=&year=&month=-1&tagfilter=" >{{ pagesThanked }} <small>x</small></a></span></td></tr>
                                 <tr><td>{{ msg("approve") }}:</td><td><span class="tdgeneral"><a href="{{ url|raw }}/index.php?title=Special%3ALog&type=review&user={{ username }}&page=&year=&month=-1&tagfilter=&hide_patrol_log=1&hide_review_log=1&hide_thanks_log=1" >{{ pagesApproved }} <small>x</small></a></span></td></tr>
                                 <!--    <tr><td>Unapprove:</td><td><span class="tdgeneral">0 <small>x</small></span></td></tr>   -->
                                 <tr><td>{{ msg("patrol") }}:</td><td><span class="tdgeneral"><a href="{{ url|raw }}/index.php?title=Special%3ALog&type=patrol&user={{ username }}&page=&year=&month=-1&tagfilter=" >{{ pagesPatrolled }} <small>x</small></a></span></td></tr>
                                 <tr><td colspan=2></td></tr>
-                                <tr><td style="color:gray">{{ msg("actions_admin") }}</td></td></tr>
+                                <tr><td style="color:gray">{{ msg("actions_admin") }}:</td></tr>
                                 <tr><td>{{ msg("block") }}:</td><td><span class="tdgeneral">{{ usersBlocked }} <small>x</small></span></td></tr>
                                 <tr><td>{{ msg("unblock") }}:</td><td><span class="tdgeneral">{{ usersUnblocked }} <small>x</small></span></td></tr>
                                 <tr><td>{{ msg("protect") }}:</td><td><span class="tdgeneral">{{ pagesProtected }} <small>x</small></span></td></tr>
@@ -94,8 +94,7 @@
                                 <tr><td>{{ msg("import") }}:</td><td><span class="tdgeneral">{{ pagesImported }} <small>x</small></span></td></tr>
                                 <tr><td colspan=2></td></tr>
                                 <tr><td colspan=2></td></tr>
-                                <!--    <tr><td style="color:gray">Article:</td></td></tr> -->
-                                <tr><td style="color:gray">Article:</td></td></tr>
+                                <tr><td style="color:gray">{{ msg("users", [1]) }}:</td></tr>
                                 <tr><td>(Re)blocked:</td><td><span class="tdgeneral"><a href="//en.wikipedia.org/w/index.php?title=Special%3ALog&type=block&user=&page=User%3AMatthewrbowker&year=&month=-1&tagfilter=" >0 <small>x</small></a></span></td></tr>
                                 <tr><td colspan=2 >Longest block:&nbsp;<span style="float:right" >–</span></td></tr>
                                 <tr><td colspan=2 ><span>Current block:&nbsp;</span><span style="float:right" >–</span></td></tr>

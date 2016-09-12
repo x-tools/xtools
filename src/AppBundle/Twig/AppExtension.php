@@ -64,6 +64,7 @@ class AppExtension extends \Twig_Extension
             new \Twig_SimpleFunction('lang', [$this, 'getLang'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('langName', [$this, 'getLangName'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('allLangs', [$this, 'getAllLangs']),
+            new \Twig_SimpleFunction('isRTL', [$this, 'intuitionIsRTL']),
             new \Twig_SimpleFunction('shortHash', [$this, 'gitShortHash']),
             new \Twig_SimpleFunction('hash', [$this, 'gitHash']),
         ];
@@ -130,6 +131,10 @@ class AppExtension extends \Twig_Extension
 
     public function getAllLangs() {
         return $this->intuition->generateLanguageList();
+    }
+
+    public function intuitionIsRTL() {
+        return $this->intuition->isRTL($this->lang);
     }
 
     public function gitShortHash() {

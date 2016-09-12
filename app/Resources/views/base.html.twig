@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ lang() }}">
+<html lang="{{ lang() }}"{% if isRTL() %} dir="rtl"{% endif %}>
 <head>
     <title>{% if title is defined%}{{ msg(title) }} - {% endif %}{{ msg("title_xtools") }}</title>
 
