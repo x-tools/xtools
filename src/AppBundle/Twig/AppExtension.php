@@ -67,6 +67,7 @@ class AppExtension extends \Twig_Extension
             new \Twig_SimpleFunction('isRTL', [$this, 'intuitionIsRTL']),
             new \Twig_SimpleFunction('shortHash', [$this, 'gitShortHash']),
             new \Twig_SimpleFunction('hash', [$this, 'gitHash']),
+            new \Twig_SimpleFunction('enabled', [$this, 'tabEnabled']),
         ];
     }
 
@@ -148,5 +149,11 @@ class AppExtension extends \Twig_Extension
     public function getName()
     {
         return 'app_extension';
+    }
+
+    public function tabEnabled($tool = "index") {
+        $param = boolval($this->container->getParameter("enable.$tool"));
+        if (!defined($param) || $param === "") {$param = true; }
+        return $param;
     }
 }

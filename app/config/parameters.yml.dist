@@ -33,3 +33,19 @@ parameters:
     app.noticeDisplay: false
     app.noticeStyle:   ""
     app.noticeText:    ""
+
+    # Enabling or disabling of individual tools
+    enable.ec: true
+    enable.articleinfo: true
+    enable.pages: true
+    enable.topedits: true
+    enable.rangecontribs: true
+    enable.blame: true
+    enable.autoedits: true
+    enable.autoblock: true
+    enable.adminstats: true
+    enable.adminscore: true
+    enable.rfa: true
+    enable.rfab: true
+    enable.bash: true
+    enable.sc: true
