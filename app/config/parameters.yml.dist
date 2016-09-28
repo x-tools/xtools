@@ -35,17 +35,17 @@ parameters:
     app.noticeText:    ""
 
     # Enabling or disabling of individual tools
-    enable.ec: true
-    enable.articleinfo: true
-    enable.pages: true
-    enable.topedits: true
-    enable.rangecontribs: true
-    enable.blame: true
-    enable.autoedits: true
-    enable.autoblock: true
-    enable.adminstats: true
-    enable.adminscore: true
-    enable.rfa: true
-    enable.rfab: true
-    enable.bash: true
-    enable.sc: true
+    enable.ec: 0
+    enable.articleinfo: 0
+    enable.pages: 0
+    enable.topedits: 0
+    enable.rangecontribs: 0
+    enable.blame: 0
+    enable.autoedits: 0
+    enable.autoblock: 0
+    enable.adminstats: 0
+    enable.adminscore: 0
+    enable.rfa: 0
+    enable.rfab: 0
+    enable.bash: 0
+    enable.sc: 0

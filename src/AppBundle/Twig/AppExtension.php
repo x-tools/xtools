@@ -152,8 +152,8 @@ class AppExtension extends \Twig_Extension
     }
 
     public function tabEnabled($tool = "index") {
-        $param = boolval($this->container->getParameter("enable.$tool"));
-        if (!defined($param) || $param === "") {$param = true; }
+        $param = false;
+        if ($this->container->hasParameter("enable.$tool")) {$param = boolval($this->container->getParameter("enable.$tool")); };
         return $param;
     }
 }
