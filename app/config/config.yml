@@ -31,6 +31,8 @@ framework:
     fragments:       ~
     http_method_override: true
     assets: ~
+    session:
+        handler_id:  ~
 
 # Twig Configuration
 twig:
@@ -93,3 +95,4 @@ swiftmailer:
     username:  "%mailer_user%"
     password:  "%mailer_password%"
     spool:     { type: memory }
+
