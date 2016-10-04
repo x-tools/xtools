@@ -77,7 +77,11 @@ class AppExtension extends \Twig_Extension
     }
 
     public function requestMemory() {
-        return 0;
+        $mem = memory_get_usage(false);
+        $div = pow(1024, 3);
+        $mem = $mem/$div;
+
+        return round($mem, 2);
     }
 
     public function generateLink($page, $text, $class = "") {
