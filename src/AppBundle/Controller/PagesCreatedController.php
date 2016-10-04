@@ -16,6 +16,9 @@ class PagesCreatedController extends Controller
      */
     public function indexAction()
     {
+        if (!$this->getParameter("enable.pages")) {
+            throw new NotFoundHttpException("This tool is disabled");
+        }
 
         // Grab the request object, grab the values out of it.
         $request = Request::createFromGlobals();
@@ -43,6 +46,10 @@ class PagesCreatedController extends Controller
      * @Route("/pages/{project}", name="PagesCreatedProject")
      */
     public function projectAction($project) {
+
+        if (!$this->getParameter("enable.pages")) {
+            throw new NotFoundHttpException("This tool is disabled");
+        }
         return $this->render('pagesCreated/index.html.twig', [
             'title' => "tool_sc",
             'page' => "sc",
@@ -56,6 +63,9 @@ class PagesCreatedController extends Controller
      * @Route("/pages/{project}/{username}", name="PagesCreatedResult")
      */
     public function resultAction($project, $username) {
+        if (!$this->getParameter("enable.pages")) {
+            throw new NotFoundHttpException("This tool is disabled");
+        }
 
         $username = ucfirst($username);
 

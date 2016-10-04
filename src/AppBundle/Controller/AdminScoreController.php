@@ -17,6 +17,9 @@ class AdminScoreController extends Controller
      */
     public function indexAction()
     {
+        if (!$this->getParameter("enable.adminscore")) {
+            throw new NotFoundHttpException("This tool is disabled");
+        }
 
         // Grab the request object, grab the values out of it.
         $request = Request::createFromGlobals();
@@ -45,6 +48,9 @@ class AdminScoreController extends Controller
      */
     public function resultAction($project, $username)
     {
+        if (!$this->getParameter("enable.adminscore")) {
+            throw new NotFoundHttpException("This tool is disabled");
+        }
         $username = ucfirst($username);
 
         // Grab the connection to the meta database

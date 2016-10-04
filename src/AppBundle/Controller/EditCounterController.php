@@ -17,6 +17,9 @@ class EditCounterController extends Controller
      */
     public function indexAction()
     {
+        if (!$this->getParameter("enable.ec")) {
+            throw new NotFoundHttpException("This tool is disabled");
+        }
 
         // Grab the request object, grab the values out of it.
         $request = Request::createFromGlobals();
@@ -44,6 +47,9 @@ class EditCounterController extends Controller
      * @Route("/ec/{project}", name="EditCounterProject")
      */
     public function projectAction($project) {
+        if (!$this->getParameter("enable.ec")) {
+            throw new NotFoundHttpException("This tool is disabled");
+        }
         return $this->render('editCounter/index.html.twig', [
             'title' => "$project edit counter",
             'page' => "ec",
@@ -56,6 +62,9 @@ class EditCounterController extends Controller
      * @Route("/ec/{project}/{username}", name="EditCounterResult")
      */
     public function resultAction($project, $username) {
+        if (!$this->getParameter("enable.ec")) {
+            throw new NotFoundHttpException("This tool is disabled");
+        }
 
         $username = ucfirst($username);
 

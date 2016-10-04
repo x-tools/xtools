@@ -17,6 +17,10 @@ class ArticleInfoController extends Controller
      */
     public function indexAction()
     {
+        if (!$this->getParameter("enable.articleinfo")) {
+            throw new NotFoundHttpException("This tool is disabled");
+        }
+
         $api = $this->get("app.api_helper");
         $api->test();
 
@@ -47,6 +51,9 @@ class ArticleInfoController extends Controller
      */
     public function articleInfoProjectAction($project, $article)
     {
+        if (!$this->getParameter("enable.articleinfo")) {
+            throw new NotFoundHttpException("This tool is disabled");
+        }
         // replace this example code with whatever you need
         return $this->render('articleInfo/result.html.twig', array(
             'page' => "articleinfo",

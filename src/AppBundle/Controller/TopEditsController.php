@@ -16,6 +16,9 @@ class TopEditsController extends Controller
      */
     public function indexAction()
     {
+        if (!$this->getParameter("enable.topedits")) {
+            throw new NotFoundHttpException("This tool is disabled");
+        }
         // replace this example code with whatever you need
         return $this->render('topedits/index.html.twig', [
             "pageTitle" => "tool_topedits",
@@ -29,7 +32,10 @@ class TopEditsController extends Controller
      */
     public function resultAction($project, $namespace = 0, $article="Main_page", $user = "Example")
     {
-        // replace this example code with whatever you need
+        if (!$this->getParameter("enable.topedits")) {
+            throw new NotFoundHttpException("This tool is disabled");
+        }
+
         return $this->render('topedits/result.html.twig', array(
             "pageTitle" => "tool_topedits",
             "subtitle" => "tool_topedits_desc",

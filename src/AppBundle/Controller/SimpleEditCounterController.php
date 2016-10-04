@@ -6,6 +6,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class SimpleEditCounterController extends Controller
 {
@@ -16,6 +17,9 @@ class SimpleEditCounterController extends Controller
      */
     public function indexAction()
     {
+        if (!$this->getParameter("enable.sc")) {
+            throw new NotFoundHttpException("This tool is disabled");
+        }
 
         // Grab the request object, grab the values out of it.
         $request = Request::createFromGlobals();
@@ -43,6 +47,9 @@ class SimpleEditCounterController extends Controller
      * @Route("/sc/{project}", name="SimpleEditCounterProject")
      */
     public function projectAction($project) {
+        if (!$this->getParameter("enable.sc")) {
+            throw new NotFoundHttpException("This tool is disabled");
+        }
         return $this->render('simpleEditCounter/index.html.twig', [
             'title' => "tool_sc",
             'page' => "sc",
@@ -56,6 +63,9 @@ class SimpleEditCounterController extends Controller
      * @Route("/sc/{project}/{username}", name="SimpleEditCounterResult")
      */
     public function resultAction($project, $username) {
+        if (!$this->getParameter("enable.sc")) {
+            throw new NotFoundHttpException("This tool is disabled");
+        }
 
         $username = ucfirst($username);
 
