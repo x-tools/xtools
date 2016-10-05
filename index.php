@@ -2,3 +2,4 @@
 
 header("LOCATION: web/");
 
+exit();

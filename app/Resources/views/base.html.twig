@@ -40,20 +40,17 @@
                 <li><span class="login" ><a href="https://tools.wmflabs.org/xtools/oauthredirector.php?action=login&amp;callto=https://www.mediawiki.org/w/api.php&amp;returnto=https://tools.wmflabs.org/xtools-ec/" >{{ msg("login") }}</a></span></li>
                 <li><a title="XAgent configuration" href="//tools.wmflabs.org/xtools/agent/config.php"><img style="vertical-align:baseline" src="{{ asset("static/images/Blue_Fedora_hat_12.png") }}" />XAgent</a>&nbsp;&nbsp;</li>
             </ul>
-            <span class="pull-right dropdown lang-dropdown">
-                <button id="lang-selector" class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {# FIXME #}
-                    {{ langName() }}
-                    <span class="caret"></span>
-                </button>
-                <ul class="form-control dropdown-menu" aria-labelledby="lang-selector">
+            <div class="pull-right dropdown">
+                <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">{{ langName() }}
+                    <span class="caret"></span></button>
+                <ul class="dropdown-menu">
                     {% for key, value in allLangs() %}
                         <li>
-                            {#<a class="lang-link" href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'uselang': key})) }}" data-lang="{{ key }}">{{ value|e }}</a>#}
+                            <a class="lang-link" href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'uselang': key})) }}" data-lang="{{ key }}">{{ value|e }}</a>
                         </li>
                     {% endfor %}
                 </ul>
-            </span>
+            </div>
         </div>
         <nav class="top-nav navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-left">
