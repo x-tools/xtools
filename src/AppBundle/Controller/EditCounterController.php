@@ -67,6 +67,7 @@ class EditCounterController extends Controller
         }
 
         $username = ucfirst($username);
+        $username = str_replace("_", " ", $username);
 
         // Grab the connection to the meta database
         $conn = $this->get('doctrine')->getManager("meta")->getConnection();
@@ -122,7 +123,7 @@ class EditCounterController extends Controller
 			UNION
 			SELECT 'rev_365d' as source, COUNT(*) as value FROM $dbName.revision_userindex WHERE rev_user_text = :username AND rev_timestamp >= DATE_SUB(NOW(),INTERVAL 365 DAY)
 			UNION
-			SELECT 'groups' as source, ug_group as value FROM $dbName.user_groups JOIN user on user_id = ug_user WHERE user_name = :username
+			SELECT 'groups' as source, ug_group as value FROM $dbName.user_groups JOIN $dbName.user on user_id = ug_user WHERE user_name = :username
 			");
 
         $resultQuery->bindParam("username", $username);
@@ -221,13 +222,13 @@ class EditCounterController extends Controller
         // -------------------------
 
         $resultQuery = $conn->prepare("
-			SELECT 'unique-pages' as source, COUNT(distinct rev_page) as value FROM `revision_userindex` where rev_user_text=:username
+			SELECT 'unique-pages' as source, COUNT(distinct rev_page) as value FROM $dbName.`revision_userindex` where rev_user_text=:username
 			UNION
-			SELECT 'pages-created-live' as source, COUNT(*) as value from `revision_userindex` where rev_user_text=:username and rev_parent_id=0
+			SELECT 'pages-created-live' as source, COUNT(*) as value from $dbName.`revision_userindex` where rev_user_text=:username and rev_parent_id=0
 			UNION
-			SELECT 'pages-created-archive' as source, COUNT(*) as value from `archive_userindex` where ar_user_text=:username and ar_parent_id=0
+			SELECT 'pages-created-archive' as source, COUNT(*) as value from $dbName.`archive_userindex` where ar_user_text=:username and ar_parent_id=0
 			UNION
-			SELECT 'pages-moved' as source, count(*) as value from `logging` where log_type='move' and log_action='move' and log_user_text=:username 
+			SELECT 'pages-moved' as source, count(*) as value from $dbName.`logging` where log_type='move' and log_action='move' and log_user_text=:username 
             ");
 
         $resultQuery->bindParam("username", $username);
@@ -266,27 +267,27 @@ class EditCounterController extends Controller
         // -------------------------
         // TODO: Turn into single query - not using UNION
         $resultQuery = $conn->prepare("
-        SELECT 'pages-thanked' as source, count(*) as value from `logging` where log_type='thank' and log_action='thank' and log_user_text=:username 
+        SELECT 'pages-thanked' as source, count(*) as value from $dbName.`logging` where log_type='thank' and log_action='thank' and log_user_text=:username 
         UNION
-        SELECT 'pages-approved' as source, count(*) as value from `logging` where log_type='review' and log_action='approve' and log_user_text=:username 
+        SELECT 'pages-approved' as source, count(*) as value from $dbName.`logging` where log_type='review' and log_action='approve' and log_user_text=:username 
         UNION
-        SELECT 'pages-patrolled' as source, count(*) as value from `logging` where log_type='patrol' and log_action='patrol' and log_user_text=:username 
+        SELECT 'pages-patrolled' as source, count(*) as value from $dbName.`logging` where log_type='patrol' and log_action='patrol' and log_user_text=:username 
         UNION
-        SELECT 'users-blocked' as source, count(*) as value from `logging` where log_type='block' and log_action='block' and log_user_text=:username 
+        SELECT 'users-blocked' as source, count(*) as value from $dbName.`logging` where log_type='block' and log_action='block' and log_user_text=:username 
         UNION
-        SELECT 'users-unblocked' as source, count(*) as value from `logging` where log_type='block' and log_action='unblock' and log_user_text=:username 
+        SELECT 'users-unblocked' as source, count(*) as value from $dbName.`logging` where log_type='block' and log_action='unblock' and log_user_text=:username 
         UNION
-        SELECT 'pages-protected' as source, count(*) as value from `logging` where log_type='protect' and log_action='protect' and log_user_text=:username 
+        SELECT 'pages-protected' as source, count(*) as value from $dbName.`logging` where log_type='protect' and log_action='protect' and log_user_text=:username 
         UNION
-        SELECT 'pages-unprotected' as source, count(*) as value from `logging` where log_type='protect' and log_action='unprotect' and log_user_text=:username 
+        SELECT 'pages-unprotected' as source, count(*) as value from $dbName.`logging` where log_type='protect' and log_action='unprotect' and log_user_text=:username 
         UNION
-        SELECT 'pages-deleted' as source, count(*) as value from `logging` where log_type='delete' and log_action='delete' and log_user_text=:username 
+        SELECT 'pages-deleted' as source, count(*) as value from $dbName.`logging` where log_type='delete' and log_action='delete' and log_user_text=:username 
         UNION
-        SELECT 'pages-deleted-revision' as source, count(*) as value from `logging` where log_type='delete' and log_action='revision' and log_user_text=:username 
+        SELECT 'pages-deleted-revision' as source, count(*) as value from $dbName.`logging` where log_type='delete' and log_action='revision' and log_user_text=:username 
         UNION
-        SELECT 'pages-restored' as source, count(*) as value from `logging` where log_type='delete' and log_action='restore' and log_user_text=:username 
+        SELECT 'pages-restored' as source, count(*) as value from $dbName.`logging` where log_type='delete' and log_action='restore' and log_user_text=:username 
         UNION
-        SELECT 'pages-imported' as source, count(*) as value from `logging` where log_type='import' and log_action='import' and log_user_text=:username 
+        SELECT 'pages-imported' as source, count(*) as value from $dbName.`logging` where log_type='import' and log_action='import' and log_user_text=:username 
         ");
 
         $resultQuery->bindParam("username", $username);
