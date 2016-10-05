@@ -102,7 +102,7 @@ class SimpleEditCounterController extends Controller
 			UNION
 			SELECT 'rev' as source, COUNT(*) AS value FROM $dbName.revision_userindex WHERE rev_user_text = :username
 			UNION
-			SELECT 'groups' as source, ug_group as value FROM $dbName.user_groups JOIN user on user_id = ug_user WHERE user_name = :username
+			SELECT 'groups' as source, ug_group as value FROM $dbName.user_groups JOIN $dbName.user on user_id = ug_user WHERE user_name = :username
             ");
 
         $resultQuery->bindParam("username", $username);
@@ -118,7 +118,9 @@ class SimpleEditCounterController extends Controller
 
         dump($results);
 
-        $resultTestQuery = $conn->prepare("SELECT 'groups' as source, ug_group as value FROM $dbName.user_groups JOIN user on user_id = ug_user WHERE user_name = :username");
+        //globalGroups($url, $username);
+
+        $resultTestQuery = $conn->prepare("SELECT 'groups' as source, ug_group as value FROM $dbName.user_groups JOIN $dbName.user on user_id = ug_user WHERE user_name = :username");
 
         $resultTestQuery->bindParam("username", $username);
         $resultTestQuery->execute();
