@@ -46,7 +46,7 @@
                 <ul class="dropdown-menu">
                     {% for key, value in allLangs() %}
                         <li>
-                            <a class="lang-link" href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'uselang': key})) }}" data-lang="{{ key }}">{{ value|e }}</a>
+                            <a class="lang-link" href="{{ path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'uselang': key})) }}" data-lang="{{ key }}">{{ value|e }}</a>
                         </li>
                     {% endfor %}
                 </ul>
