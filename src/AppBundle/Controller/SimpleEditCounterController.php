@@ -126,18 +126,12 @@ class SimpleEditCounterController extends Controller
         // Fetch the result data
         $results = $resultQuery->fetchAll();
 
-        dump($results);
-
         //globalGroups($url, $username);
 
         $resultTestQuery = $conn->prepare("SELECT 'groups' as source, ug_group as value FROM $dbName.user_groups JOIN $dbName.user on user_id = ug_user WHERE user_name = :username");
 
         $resultTestQuery->bindParam("username", $username);
         $resultTestQuery->execute();
-
-        dump($dbName);
-        dump($resultTestQuery->fetchAll());
-        dump($resultTestQuery->errorCode());
 
         // Initialize the variables - just so we don't get variable undefined errors if there is a problem
         $id = "";
@@ -157,27 +151,23 @@ class SimpleEditCounterController extends Controller
                 $rev = $row["value"];
             }
             if($row["source"] == "groups") {
-                dump($row["value"]);
                 $groups .= $row["value"]. ", ";
             }
         }
 
         // Unknown user - If the user is created the $results variable will have 3 entries.  This is a workaround to detect
-        // non-existant IPs.
+        // non-existent IPs.
         if (sizeof($results) < 3 && $arch == 0 && $rev == 0) {
             $this->addFlash('notice', ["noresult", $username]);
 
             return $this->redirectToRoute("SimpleEditCounterProject", ["project"=>$project]);
         }
 
-        dump($groups);
         // Remove the last comma and space
         if (strlen($groups) > 2) {
-            dump($groups);
             $groups = substr($groups, 0, -2);
         }
 
-        dump($groups);
         // If the user isn't in any groups, show a message.
         if (strlen($groups) == 0) {
             dump($groups);

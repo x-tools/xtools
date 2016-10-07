@@ -78,7 +78,7 @@ class AppExtension extends \Twig_Extension
 
     public function requestMemory() {
         $mem = memory_get_usage(false);
-        $div = pow(1024, 3);
+        $div = pow(1024, 2);
         $mem = $mem/$div;
 
         return round($mem, 2);
@@ -122,7 +122,7 @@ class AppExtension extends \Twig_Extension
 
     public function intuitionMessageFooter() {
         $message = $this->intuition->getFooterLine( TSINT_HELP_NONE );
-        $message = str_replace("<a class=\"int-dashboardbacklink\" href=\"//tools.wmflabs.org/intuition/?returnto=%2Fapp_dev.php&amp;returntoquery=#tab-settingsform\" title=\"Change the interface language of this tool.\">Change language!</a>", "", $message);
+        $message = preg_replace('/<a class.*?>Change language!<\/a>/i', "", $message);
         return $message;
     }
 
