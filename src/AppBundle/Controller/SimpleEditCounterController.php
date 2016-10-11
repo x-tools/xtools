@@ -170,7 +170,6 @@ class SimpleEditCounterController extends Controller
 
         // If the user isn't in any groups, show a message.
         if (strlen($groups) == 0) {
-            dump($groups);
             $groups = "---";
         }
 
