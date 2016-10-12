@@ -126,8 +126,6 @@ class SimpleEditCounterController extends Controller
         // Fetch the result data
         $results = $resultQuery->fetchAll();
 
-        //globalGroups($url, $username);
-
         $resultTestQuery = $conn->prepare("SELECT 'groups' as source, ug_group as value FROM $dbName.user_groups JOIN $dbName.user on user_id = ug_user WHERE user_name = :username");
 
         $resultTestQuery->bindParam("username", $username);
@@ -173,6 +171,10 @@ class SimpleEditCounterController extends Controller
             $groups = "---";
         }
 
+        // Retrieving the global groups, using the Apihelper class
+        $api = $this->get("app.api_helper");
+        $globalGroups = $api->globalGroups($url, $username);
+
         // Assign the values and display the template
         return $this->render('simpleEditCounter/result.html.twig', [
             'title' => "tool_sc",
@@ -188,6 +190,7 @@ class SimpleEditCounterController extends Controller
             'rev' => $rev + $arch,
             'live' => $rev,
             'groups' => $groups,
+            'globalGroups' => $globalGroups,
         ]);
     }
 }
