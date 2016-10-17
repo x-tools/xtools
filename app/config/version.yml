@@ -1,0 +1,5 @@
+# DEVELOPERS: When a new version is tagged in git, update the following to make sure we are displaying the right version
+# If you are confused, contact Matthewrbowker or MusikAnimal
+
+parameters:
+  app.version: 0.1devel1

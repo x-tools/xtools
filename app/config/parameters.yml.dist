@@ -22,9 +22,6 @@ parameters:
     # A secret key that's used to generate certain security-related tokens
     secret:            ThisTokenIsNotSoSecretChangeIt
 
-    # The current xTools version
-    app.version:       0.1devel1
-
     # Path to the web interface. blank string means that it exists at the root.
     web.path:          ""
 
