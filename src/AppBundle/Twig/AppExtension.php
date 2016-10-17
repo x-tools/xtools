@@ -2,6 +2,7 @@
 
 namespace AppBundle\Twig;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -17,9 +18,15 @@ class AppExtension extends \Twig_Extension
 
     public function __construct(ContainerInterface $container) {
         $this->container = $container;
-        $this->intuition = new Intuition();
+        
+        $path = $this->container->getParameter("kernel.root_dir") . '/../i18n';
 
-        $this->intuition->loadTextdomainFromFile( $this->container->getParameter("kernel.root_dir") . '/i18n', "xtools" );
+        if (!file_exists("$path/en.json")) {
+            throw new Exception("Language directory doesn't exist: $path");
+        }
+
+        $this->intuition = new Intuition( 'xtools' );
+        $this->intuition->registerDomain( 'xtools', $path );
 
         $this->request = Request::createFromGlobals();
         $this->session = new Session();
