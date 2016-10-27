@@ -55,20 +55,10 @@
         <nav class="top-nav navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-left">
                 <li{% if page is defined and page=="index" %} class="active"{% endif %} >{{ link("", msg("title_xtools")) }}</li>
-                {% if enabled("ec") %}<li{% if page is defined and page=="ec" %} class="active"{% endif %} >{{ link("ec", msg("tool_ec")) }}</li>{% endif %}
-                {% if enabled("articleinfo") %}<li{% if page is defined and page=="articleinfo" %} class="active"{% endif %}>{{ link("articleinfo", msg("tool_articleinfo")) }}</li>{% endif %}
-                {% if enabled("pages") %}<li{% if page is defined and page=="pages" %} class="active"{% endif %}>{{ link("pages", msg("tool_pages")) }}</li>{% endif %}
-                {% if enabled("topedits") %}<li{% if page is defined and page=="topedits" %} class="active"{% endif %}>{{ link("topedits", msg("tool_topedits")) }}</li>{% endif %}
-                {% if enabled("rangecontribs") %}<li{% if page is defined and page=="rangecontribs" %} class="active"{% endif %}>{{ link("rangecontribs", msg("tool_rangecontribs")) }}</li>{% endif %}
-                {% if enabled("blame") %}<li{% if page is defined and page=="blame" %} class="active"{% endif %}>{{ link("blame", msg("tool_blame")) }}</li>{% endif %}
-                {% if enabled("autoedits") %}<li{% if page is defined and page=="autoedits" %} class="active"{% endif %}>{{ link("autoedits", msg("tool_autoedits")) }}</li>{% endif %}
-                {% if enabled("autoblock") %}<li{% if page is defined and page=="autoblock" %} class="active"{% endif %}>{{ link("autoblock", msg("tool_autoblock")) }}</li>{% endif %}
-                {% if enabled("adminstats") %}<li{% if page is defined and page=="adminstats" %} class="active"{% endif %}>{{ link("adminstats", msg("tool_adminstats")) }}</li>{% endif %}
-                {% if enabled("adminscore") %}<li{% if page is defined and page=="adminscore" %} class="active"{% endif %}>{{ link("adminscore", msg("tool_adminscore")) }}</li>{% endif %}
-                {% if enabled("rfa") %}<li{% if page is defined and page=="rfa" %} class="active"{% endif %}>{{ link("rfa", msg("tool_rfa")) }}</li>{% endif %}
-                {% if enabled("rfab") %}<li{% if page is defined and page=="rfab" %} class="active"{% endif %}>{{ link("rfap", msg("tool_rfap")) }}</li>{% endif %}
-                {% if enabled("bash") %}<li{% if page is defined and page=="bash" %} class="active"{% endif %}>{{ link("bash", msg("tool_bash")) }}</li>{% endif %}
-                {% if enabled("sc") %}<li{% if page is defined and page=="sc" %} class="active"{% endif %}>{{ link("sc", msg("tool_sc")) }}</li>{% endif %}
+
+                {% for tool in tools() %}
+                    {% if enabled(tool) %}<li{% if page is defined and page==tool %} class="active"{% endif %} >{{ link(tool, msg("tool_" ~ tool)) }}</li>{% endif %}
+                {% endfor %}
             </ul>
         </nav>
     </div>

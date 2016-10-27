@@ -75,6 +75,7 @@ class AppExtension extends \Twig_Extension
             new \Twig_SimpleFunction('shortHash', [$this, 'gitShortHash']),
             new \Twig_SimpleFunction('hash', [$this, 'gitHash']),
             new \Twig_SimpleFunction('enabled', [$this, 'tabEnabled']),
+            new \Twig_SimpleFunction('tools', [$this, 'allTools']),
         ];
     }
 
@@ -166,5 +167,11 @@ class AppExtension extends \Twig_Extension
         $param = false;
         if ($this->container->hasParameter("enable.$tool")) {$param = boolval($this->container->getParameter("enable.$tool")); };
         return $param;
+    }
+
+    public function allTools() {
+        $retVal = [];
+        if ($this->container->hasParameter("tools")) {$retVal = $this->container->getParameter("tools"); };
+        return $retVal;
     }
 }
