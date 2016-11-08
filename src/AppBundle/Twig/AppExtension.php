@@ -143,7 +143,7 @@ class AppExtension extends \Twig_Extension
     }
 
     public function getAllLangs() {
-        return $this->intuition->generateLanguageList();
+        return $this->intuition->getAvailableLangs();
     }
 
     public function intuitionIsRTL() {

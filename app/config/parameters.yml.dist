@@ -43,6 +43,6 @@ parameters:
     enable.adminstats: 1
     enable.adminscore: 1
     enable.rfa: 1
-    enable.rfab: 1
+    enable.rfap: 1
     enable.bash: 1
     enable.sc: 1

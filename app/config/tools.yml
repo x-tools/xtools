@@ -11,6 +11,6 @@ parameters:
     adminstats: adminstats
     adminscore: adminscore
     rfa: rfa
-    rfab: rfab
+    rfap: rfap
     bash: bash
     sc: sc
