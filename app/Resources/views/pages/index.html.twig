@@ -18,7 +18,7 @@
 
         <div class="input-group">
             <span class="input-group-addon form-label">Wiki</span>
-            <input type="text" class="form-control" value="en.wikipedia.org" name="project">
+            <input type="text" class="form-control" value="{% if project is defined %}{{ project }}{% endif %}" name="project">
 			<span class="input-group-addon glyphicon glyphicon-info-sign tooltipcss"  >
 				<span>
         			<img class="callout" src="../static/images/callout.png" />

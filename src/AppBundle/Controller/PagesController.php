@@ -4,7 +4,6 @@ namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -63,12 +62,19 @@ class PagesController extends Controller
         if (!$this->getParameter("enable.pages")) {
             throw new NotFoundHttpException("This tool is disabled");
         }
+
+        // Retrieving the global groups, using the Apihelper class
+        $api = $this->get("app.api_helper");
+        $namespaces = $api->namespaces("http://localhost/~wiki");
+
         return $this->render('Pages/index.html.twig', [
-            'title' => "tool_sc",
-            'page' => "sc",
-            "pageTitle" => "tool_sc",
-            "subtitle" => "tool_sc_desc",
+            "pageTitle" => "tool_pages",
+            "subtitle" => "tool_pages_desc",
+            'page' => "pages",
+            'title' => "tool_pages",
             'project' => $project,
+
+            'namespaces' => $namespaces,
         ]);
     }
 
