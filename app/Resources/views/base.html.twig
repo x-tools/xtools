@@ -35,18 +35,17 @@
 <header class="navbar navbar-default navbar-top" role="navigation" style="min-height:40px;">
     <div class="container-fluid">
         <div class="navbar-collapse collapse" style="padding-top:5px;">
-            <ul class="list-inline">
-                <li>{{ link("", msg("title_xtools")) }}</li>
+            <ul class="list-inline pull-right">
                 <li><span class="login" ><a href="https://tools.wmflabs.org/xtools/oauthredirector.php?action=login&amp;callto=https://www.mediawiki.org/w/api.php&amp;returnto=https://tools.wmflabs.org/xtools-ec/" >{{ msg("login") }}</a></span></li>
             </ul>
-            <div class="pull-right dropdown">
+            <div class="dropdown">
                 <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">{{ langName() }}
                     <span class="caret"></span></button>
                 <ul class="dropdown-menu">
                     {% for key, value in allLangs() %}
                         <li>
                             <a class="lang-link" href="{{ path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'uselang': key})) }}" data-lang="{{ key }}">{{ value|e }}</a>
-                        </li></li>
+                        </li>
                     {% endfor %}
                 </ul>
             </div>
