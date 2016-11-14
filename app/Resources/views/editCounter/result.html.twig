@@ -31,7 +31,14 @@
                         <div class="col">
                             <table class="table-condensed  xt-table">
                                 <tr><td>{{ msg("userid") }}:</td><td>{{ user_id }}</td></tr>
-                                <tr><td style="vertical-align:top;">{{ msg("groups") }}:</td><td style="max-width:300px;" >{{ user_groups }}</td></tr>
+                                <tr><td style="vertical-align:top;">{{ msg("groups") }}:</td><td style="max-width:300px;" >{{ user_groups }}
+                                        {% if globalGroups is defined and globalGroups|length > 0 %}<br />
+                                            &bull; {{ msg("global") }}:
+                                            {% for group in globalGroups %}
+                                                {{ group }}
+                                            {% endfor %}
+                                        {% endif %}
+                                </td></tr>
                                 <tr><td>{{ msg("firstedit") }}:</td><td>{{ first_rev }}</td></tr>
                                 <tr><td>{{ msg("latestedit") }}:</td><td>{{ latest_rev }}</td></tr>
                                 <tr><td colspan=20 ></td></tr>

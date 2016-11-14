@@ -218,6 +218,10 @@ class EditCounterController extends Controller
             $latest_rev = "----";
         }
 
+        // Retrieving the global groups, using the Apihelper class
+        $api = $this->get("app.api_helper");
+        $globalGroups = $api->globalGroups($url, $username);
+
         // -------------------------
         // General statistics part 2
         // -------------------------
@@ -558,6 +562,7 @@ WHERE r.rev_user = :id GROUP BY page_namespace");
             'rev_7d' => $rev_7d,
             'rev_30d' => $rev_30d,
             'rev_365d' => $rev_365d,
+            'globalGroups' => $globalGroups,
 
             // General part 2
             'uniquePages' => $uniquePages,
