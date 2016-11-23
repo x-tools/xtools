@@ -5,20 +5,53 @@ namespace AppBundle\Helper;
 
 class Apihelper
 {
-    public function test() {
+    private $curlChannel;
+
+    private function curl($url, $timeout = 90)
+    {
+        if ( !$this->curlChannel )
+        {
+            $ch = $this->curlChannel = curl_init();
+            curl_setopt($ch, CURLOPT_USERAGENT, "Xtools" ); //TODO: Turn into config option
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        }
+
+        $ch = $this->curlChannel;
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT , $timeout);
+
+        if (curl_error($ch) !== "")
+        {
+            return false;
+        }
+
+        return curl_exec($ch);
+    }
+
+    public function __construct()
+    {
+        $ch = $this->curlChannel = curl_init();
+        curl_setopt($ch, CURLOPT_USERAGENT, "Xtools" ); // TODO: Turn into config option
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    }
+
+    public function test()
+    {
         dump("Testing");
     }
 
-    public function groups($host, $username) {
-        $array = @file_get_contents("$host/w/api.php?action=query&list=users&ususers=$username&usprop=groups&format=json");
+    public function groups($host, $username)
+    {
+        $array = $this->curl("$host/w/api.php?action=query&list=users&ususers=$username&usprop=groups&format=json");
 
         dump($array);
     }
 
-    public function globalGroups($host, $username) {
+    public function globalGroups($host, $username)
+    {
         $retVal = [];
 
-        $array = @file_get_contents("$host/api.php?action=query&meta=globaluserinfo&guiuser=$username&guiprop=groups&format=json");
+        $array = $this->curl("$host/api.php?action=query&meta=globaluserinfo&guiuser=$username&guiprop=groups&format=json");
 
         if ($array === false) return $retVal;
 
@@ -32,10 +65,11 @@ class Apihelper
 
     }
 
-    public function namespaces($host) {
+    public function namespaces($host)
+    {
         $retVal = [];
 
-        $array = @file_get_contents("$host/api.php?action=query&meta=siteinfo&siprop=namespaces&format=json");
+        $array = $this->curl("$host/api.php?action=query&meta=siteinfo&siprop=namespaces&format=json");
 
         if ($array === false || $array === null) return $retVal;
 
