@@ -52,10 +52,11 @@ class EditCounterController extends Controller
             throw new NotFoundHttpException("This tool is disabled");
         }
         return $this->render('editCounter/index.html.twig', [
-            'title' => "$project edit counter",
+            "pageTitle" => "tool_ec",
+            "subtitle" => "tool_ec_desc",
             'page' => "ec",
+            'title' => "tool_ec",
             'project' => $project,
-            'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
         ]);
     }
     

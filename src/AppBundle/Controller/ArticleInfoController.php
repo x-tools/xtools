@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use AppBundle\Helper\Apihelper;
 
 class ArticleInfoController extends Controller
@@ -37,13 +38,31 @@ class ArticleInfoController extends Controller
             return $this->redirectToRoute("ArticleInfoProject", array('project'=>$project));
         }
 
-        // replace this example code with whatever you need
         return $this->render('articleInfo/index.html.twig', [
             'page' => "articleinfo",
             'title' => "tool_articleinfo",
             "pageTitle" => "tool_articleinfo",
             "subtitle" => "tool_articleinfo_desc",
         ]);
+    }
+
+    /**
+     * @Route("/articleinfo/{project}", name="ArticleInfoProject")
+     */
+    public function articleInfoProject($project)
+    {
+        if (!$this->getParameter("enable.articleinfo")) {
+            throw new NotFoundHttpException("This tool is disabled");
+        }
+
+        return $this->render('articleInfo/index.html.twig', [
+            'page' => "articleinfo",
+            'title' => "tool_articleinfo",
+            "pageTitle" => "tool_articleinfo",
+            "subtitle" => "tool_articleinfo_desc",
+            "project" => $project,
+        ]);
+
     }
 
     /**
