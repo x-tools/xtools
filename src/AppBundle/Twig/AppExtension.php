@@ -62,7 +62,6 @@ class AppExtension extends \Twig_Extension
         return [
             new \Twig_SimpleFunction('request_time', [$this, 'requestTime'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('memory_usage', [$this, 'requestMemory'], ['is_safe' => ['html']]),
-            new \Twig_SimpleFunction('link', [$this, 'generateLink'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('year', [$this, 'generateYear'], ['is_save' => ['html']]),
             new \Twig_SimpleFunction('msgPrintExists', [$this, 'intuitionMessagePrintExists'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('msgExists', [$this, 'intuitionMessageExists'], ['is_safe' => ['html']]),
@@ -90,16 +89,6 @@ class AppExtension extends \Twig_Extension
         $mem = $mem/$div;
 
         return round($mem, 2);
-    }
-
-    public function generateLink($page, $text, $class = "") {
-        $path = $this->container->getParameter('web.path');
-
-        //$this->lang = strtolower($this->lang);
-
-        //if($this->lang != "en") $page .= "?uselang=" . $this->lang;
-
-        return "<a href='$path/$page' class='$class'>$text</a>";
     }
 
     public function generateYear() {

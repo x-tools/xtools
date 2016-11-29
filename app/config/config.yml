@@ -42,7 +42,6 @@ twig:
     strict_variables: "%kernel.debug%"
     globals:
         version:       '%app.version%'
-        path:          '%web.path%'
         noticeDisplay: '%app.noticeDisplay%'
         noticeStyle:   '%app.noticeStyle%'
         noticeText:    '%app.noticeText%'

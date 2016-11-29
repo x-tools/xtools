@@ -53,10 +53,10 @@
         </div>
         <nav class="top-nav navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-left">
-                <li{% if page is defined and page=="index" %} class="active"{% endif %} >{{ link("", msg("title_xtools")) }}</li>
+                <li{% if page is defined and page=="index" %} class="active"{% endif %} ><a href="/">{{ msg("title_xtools") }}</a></li>
 
                 {% for tool in tools() %}
-                    {% if enabled(tool) %}<li{% if page is defined and page==tool %} class="active"{% endif %} >{{ link(tool, msg("tool_" ~ tool)) }}</li>{% endif %}
+                    {% if enabled(tool) %}<li{% if page is defined and page==tool %} class="active"{% endif %} ><a href="/{{ tool }}">{{ msg("tool_" ~ tool) }}</a></li>{% endif %}
                 {% endfor %}
             </ul>
         </nav>
@@ -96,7 +96,7 @@
     <hr style="margin:5px 10px;" />
     <div class="row">
         <div class="col">
-            <span>&copy; 2008-{{ year() }} &middot; {{ link("about", "About these tools") }}  &middot; v.{{ version }} &middot; <a href="http://github.com/x-tools/xtools-rebirth/tree/{{ hash() }}" target="_blank">r.{{ shortHash() }}</a> </span><br />
+            <span>&copy; 2008-{{ year() }} &middot; <a href="/about">About these tools</a>  &middot; v.{{ version }} &middot; <a href="http://github.com/x-tools/xtools-rebirth/tree/{{ hash() }}" target="_blank">r.{{ shortHash() }}</a> </span><br />
             <span>{{ msg_footer() }}</span>
         </div>
         <div class="col pull-right">
