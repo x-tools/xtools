@@ -18,4 +18,6 @@ To install xtools, follow these steps:
 4. ???
 5. Profit!
 
-Currently, xtools actually requires two databases.  One for itself (normally called "symfony") and a meta database describing all of the wikis xTools should be aware of.  For the structure, see [Wikitech](https://wikitech.wikimedia.org/wiki/Help:Tool_Labs/Database#Metadata_database).  an example, see [this Quarry](https://quarry.wmflabs.org/query/4031).
+Currently, xtools requires two databases.  One for itself (normally called "symfony") and a meta database describing all of the wikis xTools should be aware of.  For the structure, see [Wikitech](https://wikitech.wikimedia.org/wiki/Help:Tool_Labs/Database#Metadata_database).  an example, see [this Quarry](https://quarry.wmflabs.org/query/4031).
+
+For full documentation, please see [ReadTheDocs](https://xtools.readthedocs.io).
