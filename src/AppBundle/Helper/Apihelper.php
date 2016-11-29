@@ -57,7 +57,7 @@ class Apihelper
 
         $data = json_decode($array, true);
 
-        if (!isset($data["warnings"]) && !isset($data["error"])) {
+        if (!isset($data["warnings"]) && !isset($data["error"]) && isset($data["query"]["globaluserinfo"]["groups"])) {
             $retVal = $data["query"]["globaluserinfo"]["groups"];
         }
 
@@ -75,7 +75,7 @@ class Apihelper
 
         $data = json_decode($array, true);
 
-        if (!isset($data["warnings"]) && !isset($data["error"])) {
+        if (!isset($data["warnings"]) && !isset($data["error"]) && isset($data["query"]["namespaces"])) {
             foreach ($data["query"]["namespaces"] as $row) {
                 if($row["id"] < 0) {continue;}
 
