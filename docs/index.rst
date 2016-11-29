@@ -1,6 +1,6 @@
-********************************
-Welcome to the Rewrite of Xtools
-********************************
+******************
+Welcome to xTools!
+******************
 
 
 Xtools is a system of tools written by `User:X! on Wikipedia <http://en.wikipedia.org/wiki/User:Soxred93>`_.  The original version lives at

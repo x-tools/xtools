@@ -1,6 +1,6 @@
-**********************
-Installation of xTools
-**********************
+************
+Installation
+************
 
 To install xTools, please follow these steps:
 

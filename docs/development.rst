@@ -1,6 +1,6 @@
-*********************
-Development of xTools
-*********************
+***********
+Development
+***********
 
 To contribute to the development of xTools, you may fork us on GitHub.  A few things to be aware of first:
 

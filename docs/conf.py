@@ -5,8 +5,8 @@
 source_suffix = '.rst'
 master_doc = 'index'
 
-project = u'sphinx theme for dotted style'
-copyright = u'2011, Sphinx-users.jp'
+project = u'xTools'
+copyright = u'2011, xTools maintainers'
 
 version = '0.1.2'
 
