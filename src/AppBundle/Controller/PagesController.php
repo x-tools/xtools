@@ -176,7 +176,7 @@ class PagesController extends Controller
         $stmt = "
 			(SELECT DISTINCT page_namespace as namespace, 'rev' as type, page_title as page_title, page_is_redirect as page_is_redirect, rev_timestamp as timestamp, rev_user, rev_user_text
 			FROM $dbName.page
-			JOIN revision_userindex on page_id = rev_page
+			JOIN $dbName.revision_userindex on page_id = rev_page
 			WHERE  $whereRev  AND rev_parent_id = '0'  $namespaceConditionRev  $redirectCondition
 			)
 			
@@ -188,7 +188,7 @@ class PagesController extends Controller
 			 (
 			  Select b.ar_namespace, b.ar_title
 			  FROM $dbName.archive_userindex as b
-			  LEFT JOIN logging_logindex on log_namespace = b.ar_namespace and log_title = b.ar_title  and log_user = b.ar_user and (log_action = 'move' or log_action = 'move_redir')
+			  LEFT JOIN $dbName.logging_logindex on log_namespace = b.ar_namespace and log_title = b.ar_title  and log_user = b.ar_user and (log_action = 'move' or log_action = 'move_redir')
 			  WHERE  $whereArc AND b.ar_parent_id = '0' $namespaceConditionArc and log_action is null
 			 ) AS c on c.ar_namespace= a.ar_namespace and c.ar_title = a.ar_title 
 			GROUP BY a.ar_namespace, a.ar_title
