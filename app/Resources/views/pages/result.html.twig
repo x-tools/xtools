@@ -120,15 +120,6 @@
                     borderColor: [{% for key,value in count %}{% if not first %},{% endif %}'{{ color(key) }}'{% set first = 0 %}{% endfor %}],
                     borderWidth: 1
                 }]
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero:true
-                        }
-                    }]
-                }
             }
         });
     </script>
