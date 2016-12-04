@@ -75,6 +75,7 @@ class AppExtension extends \Twig_Extension
             new \Twig_SimpleFunction('hash', [$this, 'gitHash']),
             new \Twig_SimpleFunction('enabled', [$this, 'tabEnabled']),
             new \Twig_SimpleFunction('tools', [$this, 'allTools']),
+            new \Twig_SimpleFunction('color', [$this, 'getColorList']),
         ];
     }
 
@@ -162,5 +163,126 @@ class AppExtension extends \Twig_Extension
         $retVal = [];
         if ($this->container->hasParameter("tools")) {$retVal = $this->container->getParameter("tools"); };
         return $retVal;
+    }
+
+    function GetColorList( $num = false ) {
+        $colors = array(
+            0 => '#Cc0000',#'#FF005A', #red '#FF5555',
+            1 => '#F7b7b7',
+
+            2 => '#5c8d20',#'#008800', #green'#55FF55',
+            3 => '#85eD82',
+
+            4 => '#2E97E0', #blue
+            5 => '#B9E3F9',
+
+            6 => '#e1711d',  #orange
+            7 => '#ffc04c',
+
+            8 => '#FDFF98', #yellow
+
+            9 => '#5555FF',
+            10 => '#55FFFF',
+
+            11 => '#0000C0',  #
+            12 => '#008800',  # green
+            13 => '#00C0C0',
+            14 => '#FFAFAF',  # rosé
+            15 => '#808080',  # gray
+            16 => '#00C000',
+            17 => '#404040',
+            18 => '#C0C000',  # green
+            19 => '#C000C0',
+
+            100 => '#75A3D1',  # blue
+            101 => '#A679D2',  # purple
+            102 => '#660000',
+            103 => '#000066',
+            104 => '#FAFFAF',  # caramel
+            105 => '#408345',
+            106 => '#5c8d20',
+            107 => '#e1711d',  # red
+            108 => '#94ef2b',  # light green
+            109 => '#756a4a',  # brown
+            110 => '#6f1dab',
+            111 => '#301e30',
+            112 => '#5c9d96',
+            113 => '#a8cd8c',  # earth green
+            114 => '#f2b3f1',  # light purple
+            115 => '#9b5828',
+            118 => '#99FFFF',
+            119 => '#99BBFF',
+            120 => '#FF99FF',
+            121 => '#CCFFFF',
+            122 => '#CCFF00',
+            123 => '#CCFFCC',
+            200 => '#33FF00',
+            201 => '#669900',
+            202 => '#666666',
+            203 => '#999999',
+            204 => '#FFFFCC',
+            205 => '#FF00CC',
+            206 => '#FFFF00',
+            207 => '#FFCC00',
+            208 => '#FF0000',
+            209 => '#FF6600',
+            446 => '#06DCFB',
+            447 => '#892EE4',
+            460 => '#99FF66',
+            461 => '#99CC66',  # green
+            470 => '#CCCC33',  # ocker
+            471 => '#CCFF33',
+            480 => '#6699FF',
+            481 => '#66FFFF',
+            490 => '#995500',
+            491 => '#998800',
+            710 => '#FFCECE',
+            711 => '#FFC8F2',
+            828 => '#F7DE00',
+            829 => '#BABA21',
+            866 => '#FFFFFF',
+            867 => '#FFCCFF',
+            1198 => '#FF34B3',
+            1199 => '#8B1C62',
+
+            '#61a9f3',#blue
+            '#f381b9',#pink
+            '#61E3A9',
+
+            '#D56DE2',
+            '#85eD82',
+            '#F7b7b7',
+            '#CFDF49',
+            '#88d8f2',
+            '#07AF7B',#green
+            '#B9E3F9',
+            '#FFF3AD',
+            '#EF606A',#red
+            '#EC8833',
+            '#FFF100',
+            '#87C9A5',
+            '#FFFB11',
+            '#005EBC',
+            '#9AEB67',
+            '#FF4A26',
+            '#FDFF98',
+            '#6B7EFF',
+            '#BCE02E',
+            '#E0642E',
+            '#E0D62E',
+
+            '#02927F',
+            '#FF005A',
+            '#61a9f3', #blue' #FFFF55',
+        );
+
+        if( $num === false ) {
+            return $colors;
+        }
+        else{
+            return $colors[$num];
+        }
+
+
     }
 }

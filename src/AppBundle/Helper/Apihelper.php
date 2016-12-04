@@ -83,7 +83,8 @@ class Apihelper
                 elseif (isset($row["*"])) {$name = $row["*"];}
                 else {continue;}
 
-                if($name === "") {$name = "Main"; }
+                // TODO: Figure out a way to i18n-ize this
+                if($name === "") {$name = "Article"; }
 
                 $retVal[$row["id"]] = $name;
             }

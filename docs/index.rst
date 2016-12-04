@@ -26,6 +26,7 @@ Xtools requires the following to run:
   - ctype needs to be enabled
   - You must have ``date.timezone`` set in ``php.ini``.
   - PDO including the driver for the database you want to use
+  - Curl must be enabled.
 
 - Composer 1.0.0 
 

@@ -201,27 +201,54 @@ class PagesController extends Controller
         $result = $resultQuery->fetchAll();
 
         $pagesArray = [];
+        $countArray = [];
 
         foreach ($result as $row) {
             $datetime = date(DATE_W3C, strtotime($row["timestamp"]));
             $human_time = date("Y-m-d", strtotime($row["timestamp"]));
             $pagesArray[$row["namespace"]][$datetime] = $row;
             $pagesArray[$row["namespace"]][$datetime]["human_time"] = $human_time;
+
+            // Totals
+            if (isset($countArray[$row["namespace"]]["total"])) {
+                $countArray[$row["namespace"]]["total"]++;
+            }
+            else {
+                $countArray[$row["namespace"]]["total"] = 1;
+                $countArray[$row["namespace"]]["redirect"] = 0;
+                $countArray[$row["namespace"]]["deleted"] = 0;
+            }
+
+            if ($row["page_is_redirect"]) {
+                // Redirects
+                if (isset($countArray[$row["namespace"]]["redirect"])) {
+                    $countArray[$row["namespace"]]["redirect"]++;
+                } else {
+                    $countArray[$row["namespace"]]["redirect"] = 1;
+                }
+            }
+
+            if ($row["type"] === "arc") {
+                // Deleted
+                if (isset($countArray[$row["namespace"]]["deleted"])) {
+                    $countArray[$row["namespace"]]["deleted"]++;
+                } else {
+                    $countArray[$row["namespace"]]["deleted"] = 1;
+                }
+            }
+
         }
 
         ksort($pagesArray);
+        ksort($countArray);
 
         foreach (array_keys($pagesArray) as $key) {
             krsort($pagesArray[$key]);
         }
 
-        dump($pagesArray);
-
         // Retrieving the namespaces, using the Apihelper class
         $api = $this->get("app.api_helper");
         $namespaces = $api->namespaces($url);
-
-        dump($namespaces);
 
         // Assign the values and display the template
         return $this->render('pages/result.html.twig', [
@@ -239,6 +266,7 @@ class PagesController extends Controller
             'namespaces' => $namespaces,
 
             'pages' => $pagesArray,
+            'count' => $countArray,
         ]);
     }
 }
