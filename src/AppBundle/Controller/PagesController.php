@@ -202,6 +202,9 @@ class PagesController extends Controller
 
         $pagesArray = [];
         $countArray = [];
+        $total = 0;
+        $redirectTotal = 0;
+        $deletedTotal = 0;
 
         foreach ($result as $row) {
             $datetime = date(DATE_W3C, strtotime($row["timestamp"]));
@@ -218,8 +221,10 @@ class PagesController extends Controller
                 $countArray[$row["namespace"]]["redirect"] = 0;
                 $countArray[$row["namespace"]]["deleted"] = 0;
             }
+            $total++;
 
             if ($row["page_is_redirect"]) {
+                $redirectTotal++;
                 // Redirects
                 if (isset($countArray[$row["namespace"]]["redirect"])) {
                     $countArray[$row["namespace"]]["redirect"]++;
@@ -229,6 +234,7 @@ class PagesController extends Controller
             }
 
             if ($row["type"] === "arc") {
+                $deletedTotal++;
                 // Deleted
                 if (isset($countArray[$row["namespace"]]["deleted"])) {
                     $countArray[$row["namespace"]]["deleted"]++;
@@ -267,6 +273,10 @@ class PagesController extends Controller
 
             'pages' => $pagesArray,
             'count' => $countArray,
+
+            'total' => $total,
+            'redirectTotal' => $redirectTotal,
+            'deletedTotal' => $deletedTotal,
         ]);
     }
 }
