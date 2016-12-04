@@ -245,6 +245,11 @@ class PagesController extends Controller
 
         }
 
+        if ($total < 1) {
+            $this->addFlash("notice", ["noresult", $username]);
+            return $this->redirectToRoute("PagesProject", ["project"=>$project]);
+        }
+
         ksort($pagesArray);
         ksort($countArray);
 

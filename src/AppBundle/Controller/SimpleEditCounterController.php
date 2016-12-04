@@ -119,7 +119,7 @@ class SimpleEditCounterController extends Controller
         $resultQuery->execute();
 
         if ($resultQuery->errorCode() > 0) {
-            $this->addFlash("notice", ["noresults", $username]);
+            $this->addFlash("notice", ["noresult", $username]);
             return $this->redirectToRoute("SimpleEditCounterProject", ["project"=>$project]);
         }
 
