@@ -51,7 +51,7 @@ class Apihelper
     {
         $retVal = [];
 
-        $array = $this->curl("$host/api.php?action=query&meta=globaluserinfo&guiuser=$username&guiprop=groups&format=json");
+        $array = $this->curl("$host/w/api.php?action=query&meta=globaluserinfo&guiuser=$username&guiprop=groups&format=json");
 
         if ($array === false) return $retVal;
 
@@ -69,7 +69,7 @@ class Apihelper
     {
         $retVal = [];
 
-        $array = $this->curl("$host/api.php?action=query&meta=siteinfo&siprop=namespaces&format=json");
+        $array = $this->curl("$host/w/api.php?action=query&meta=siteinfo&siprop=namespaces&format=json");
 
         if ($array === false || $array === null) return $retVal;
 

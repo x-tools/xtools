@@ -50,7 +50,7 @@ class PagesController extends Controller
         $namespaces = $api->namespaces("http://localhost/~wiki");
 
         // Otherwise fall through.
-        return $this->render('Pages/index.html.twig', [
+        return $this->render('pages/index.html.twig', [
             "pageTitle" => "tool_pages",
             "subtitle" => "tool_pages_desc",
             'page' => "pages",
@@ -73,7 +73,7 @@ class PagesController extends Controller
         $api = $this->get("app.api_helper");
         $namespaces = $api->namespaces("http://localhost/~wiki");
 
-        return $this->render('Pages/index.html.twig', [
+        return $this->render('pages/index.html.twig', [
             "pageTitle" => "tool_pages",
             "subtitle" => "tool_pages_desc",
             'page' => "pages",
