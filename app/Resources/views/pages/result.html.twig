@@ -100,11 +100,11 @@
 
                                 <tr>
                                     <td>{{ loop.index }}.</td>
-                                    <td style='max-width:50%; white-space:wrap; word-wrap:break-word' ><a href="{{ url }}/index.php?title={{ value['page_title']|e }}&redirect=no" >{{ value['page_title'] }}</a>{% if value["page_is_redirect"] %}<small class="text-warning"> &middot; ({{ msg("redirect") }})</small>{% endif %}{% if value["type"] == "arc" %}<small class="text-danger"> &middot; ({{ msg("deleted") }})</small> {% endif %} </td>
+                                    <td style='max-width:50%; white-space:wrap; word-wrap:break-word' ><a href="{{ url }}/index.php?title={% if key != 0 %}{{ namespaces[key] }}:{% endif %}{{ value['page_title']|e }}&redirect=no" >{{ value['page_title'] }}</a>{% if value["page_is_redirect"] %}<small class="text-warning"> &middot; ({{ msg("redirect") }})</small>{% endif %}{% if value["type"] == "arc" %}<small class="text-danger"> &middot; ({{ msg("deleted") }})</small> {% endif %} </td>
                                     <td style='white-space: nowrap; font-size:95%; padding-right:10px;' >{{ value["human_time"] }}</td>
-                                    <td style='white-space: nowrap' ><a href="{{ url }}/index.php?title=Special:Log&type=&page={{ value['page_title']|e }}" ><small>{{ msg("log") }}</small></a> &middot; </td>
-                                    <td style='white-space: nowrap' ><a href="/articleinfo/?project={{ project }}&article={{ value['page_title']|e }}" ><small>{{ msg("page_history") }}</small></a> &middot; </td>
-                                    <td style='white-space: nowrap' ><a href="/topedits/?project={{ project }}&user=Matthewrbowker&article={{ value['page_title']|e }}" ><small>{{ msg("top_edits") }}</small></a></td>
+                                    <td style='white-space: nowrap' ><a href="{{ url }}/index.php?title=Special:Log&type=&page={% if key!= 0 %}{{ namespaces[key] }}:{% endif %}{{ value['page_title']|e }}" ><small>{{ msg("log") }}</small></a> &middot; </td>
+                                    <td style='white-space: nowrap' ><a href="/articleinfo/?project={{ project }}&article={% if key != 0 %}{{ namespaces[key] }}:{% endif %}{{ value['page_title']|e }}" ><small>{{ msg("page_history") }}</small></a> &middot; </td>
+                                    <td style='white-space: nowrap' ><a href="/topedits/?project={{ project }}&user=Matthewrbowker&article={% if key != 0 %}{{ namespaces[key] }}:{% endif %}{{ value['page_title']|e }}" ><small>{{ msg("top_edits") }}</small></a></td>
 
                                 </tr>
                             {% endfor %}

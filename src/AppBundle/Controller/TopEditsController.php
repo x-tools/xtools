@@ -28,9 +28,9 @@ class TopEditsController extends Controller
     }
 
     /**
-     * @Route("/topedits/{project}/{namespace}/{article}/{user}", name="topEditsResults")
+     * @Route("/topedits/{project}/{username}/{namespace}/{article}", name="topEditsResults")
      */
-    public function resultAction($project, $namespace = 0, $article="Main_page", $user = "Example")
+    public function resultAction($project, $username = "Example", $namespace = 0, $article="Main_page")
     {
         if (!$this->getParameter("enable.topedits")) {
             throw new NotFoundHttpException("This tool is disabled");
@@ -40,6 +40,9 @@ class TopEditsController extends Controller
             "pageTitle" => "tool_topedits",
             "subtitle" => "tool_topedits_desc",
             'page' => "topedits",
+
+            'project' => $project,
+            'username' => $username,
         ));
     }
 }
