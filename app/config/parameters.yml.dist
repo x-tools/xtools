@@ -28,6 +28,12 @@ parameters:
     app.noticeStyle:   ""
     app.noticeText:    ""
 
+    app.is_labs: 0
+
+    app.load_stylesheets_from_cdn: 0
+
+    app.single_wiki: 1
+
     # Enabling or disabling of individual tools
     enable.ec: 1
     enable.articleinfo: 1

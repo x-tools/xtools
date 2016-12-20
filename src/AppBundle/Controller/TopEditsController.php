@@ -12,7 +12,6 @@ class TopEditsController extends Controller
      * @Route("/topedits", name="topEdits")
      * @Route("/topedits/", name="topEditsSlash")
      * @Route("/topedits/index.php", name="topEditsIndex")
-     * @Route("/topedits/get", name="topEditsGet")
      */
     public function indexAction()
     {
@@ -30,7 +29,7 @@ class TopEditsController extends Controller
     /**
      * @Route("/topedits/{project}/{username}/{namespace}/{article}", name="topEditsResults")
      */
-    public function resultAction($project, $username = "Example", $namespace = 0, $article="Main_page")
+    public function resultAction($project, $username, $namespace = 0, $article="Main_page")
     {
         if (!$this->getParameter("enable.topedits")) {
             throw new NotFoundHttpException("This tool is disabled");

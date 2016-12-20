@@ -76,6 +76,10 @@ class AppExtension extends \Twig_Extension
             new \Twig_SimpleFunction('enabled', [$this, 'tabEnabled']),
             new \Twig_SimpleFunction('tools', [$this, 'allTools']),
             new \Twig_SimpleFunction('color', [$this, 'getColorList']),
+            new \Twig_SimpleFunction('isWMFLabs', [$this, 'isWMFLabs']),
+            new \Twig_SimpleFunction('isSingleWiki', [$this, 'isSingleWiki']),
+            new \Twig_SimpleFunction('loadStylesheetsFromCDN', [$this, 'loadStylesheetsFromCDN']),
+            new \Twig_SimpleFunction('isWMFLabs', [$this, 'isWMFLabs']),
         ];
     }
 
@@ -284,5 +288,26 @@ class AppExtension extends \Twig_Extension
         }
 
 
+    }
+
+
+    public function isSingleWiki() {
+        $param = false;
+        if ($this->container->hasParameter("app.single_wiki")) {$param = boolval($this->container->getParameter("app.single_wiki")); };
+        return $param;
+    }
+
+
+    public function loadStylesheetsFromCDN() {
+        $param = false;
+        if ($this->container->hasParameter("app.load_stylesheets_from_cdn")) {$param = boolval($this->container->getParameter("app.load_stylesheets_from_cdn")); };
+        return $param;
+    }
+
+
+    public function isWMFLabs() {
+        $param = false;
+        if ($this->container->hasParameter("app.is_labs")) {$param = boolval($this->container->getParameter("app.is_labs")); };
+        return $param;
     }
 }
