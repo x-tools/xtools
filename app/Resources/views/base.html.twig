@@ -22,7 +22,7 @@
     {% endif %}
 
     {% if loadStylesheetsFromCDN() %}
-        <script type="text/javascript" src="{{ asset("https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.0/Chart.min.js") }}"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.0/Chart.min.js"></script>
     {% else %}
         <script type="text/javascript" src="{{ asset("chartjs/Chart.min.js") }}"></script>
     {% endif %}
@@ -57,9 +57,11 @@
 <header class="navbar navbar-default navbar-top" role="navigation" style="min-height:40px;">
     <div class="container-fluid">
         <div class="navbar-collapse collapse" style="padding-top:5px;">
+            {% if isWMFLabs() %}
             <ul class="list-inline pull-right">
                 <li><span class="login" ><a href="https://tools.wmflabs.org/xtools/oauthredirector.php?action=login&amp;callto=https://www.mediawiki.org/w/api.php&amp;returnto=https://tools.wmflabs.org/xtools-ec/" >{{ msg("login") }}</a></span></li>
             </ul>
+            {% endif %}
             <div class="dropdown">
                 <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">{{ langName() }}
                     <span class="caret"></span></button>

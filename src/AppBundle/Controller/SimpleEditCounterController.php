@@ -126,11 +126,6 @@ class SimpleEditCounterController extends Controller
         // Fetch the result data
         $results = $resultQuery->fetchAll();
 
-        $resultTestQuery = $conn->prepare("SELECT 'groups' as source, ug_group as value FROM $dbName.user_groups JOIN $dbName.user on user_id = ug_user WHERE user_name = :username");
-
-        $resultTestQuery->bindParam("username", $username);
-        $resultTestQuery->execute();
-
         // Initialize the variables - just so we don't get variable undefined errors if there is a problem
         $id = "";
         $arch = "";
@@ -171,9 +166,13 @@ class SimpleEditCounterController extends Controller
             $groups = "---";
         }
 
-        // Retrieving the global groups, using the Apihelper class
-        $api = $this->get("app.api_helper");
-        $globalGroups = $api->globalGroups($url, $username);
+        $globalGroups = "";
+
+        if (boolval($this->getParameter("app.single_wiki"))) {
+            // Retrieving the global groups, using the Apihelper class
+            $api = $this->get("app.api_helper");
+            $globalGroups = $api->globalGroups($url, $username);
+        }
 
         // Assign the values and display the template
         return $this->render('simpleEditCounter/result.html.twig', [

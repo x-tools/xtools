@@ -18,6 +18,28 @@ class TopEditsController extends Controller
         if (!$this->getParameter("enable.topedits")) {
             throw new NotFoundHttpException("This tool is disabled");
         }
+
+        // Grab the request object, grab the values out of it.
+        $request = Request::createFromGlobals();
+
+        $project = $request->query->get('project');
+        $username = $request->query->get('user');
+        $namespace = $request->query->get('namespace');
+        $article = $request->query->get('article');
+
+        if ($project != "" && $username != "" && $namespace != "" && $article != "") {
+            return $this->redirectToRoute("TopEditsResults", array('project'=>$project, 'username' => $username, 'namespace'=>$namespace, 'article'=>$article));
+        }
+        elseif ($project != "" && $username != "" && $namespace != "") {
+            return $this->redirectToRoute("TopEditsResults", array('project'=>$project, 'username' => $username, 'namespace'=>$namespace));
+        }
+        elseif ($project != "" && $username != "") {
+            return $this->redirectToRoute("TopEditsResults", array('project'=>$project, 'username' => $username));
+        }
+        else if ($project != "") {
+            return $this->redirectToRoute("TopEditsResults", array('project'=>$project));
+        }
+
         // replace this example code with whatever you need
         return $this->render('topedits/index.html.twig', [
             "pageTitle" => "tool_topedits",
@@ -27,21 +49,33 @@ class TopEditsController extends Controller
     }
 
     /**
-     * @Route("/topedits/{project}/{username}/{namespace}/{article}", name="topEditsResults")
+     * @Route("/topedits/{project}/{username}/{namespace}/{article}", name="TopEditsResults")
      */
-    public function resultAction($project, $username, $namespace = 0, $article="Main_page")
+    public function resultAction($project, $username, $namespace = 0, $article="")
     {
         if (!$this->getParameter("enable.topedits")) {
             throw new NotFoundHttpException("This tool is disabled");
         }
 
-        return $this->render('topedits/result.html.twig', array(
-            "pageTitle" => "tool_topedits",
-            "subtitle" => "tool_topedits_desc",
-            'page' => "topedits",
+        if ($article === "") {
+            return $this->render('topedits/result_namespace.html.twig', array(
+                "pageTitle" => "tool_topedits",
+                "subtitle" => "tool_topedits_desc",
+                'page' => "topedits",
 
-            'project' => $project,
-            'username' => $username,
-        ));
+                'project' => $project,
+                'username' => $username,
+            ));
+        }
+        else {
+            return $this->render('topedits/result_article.html.twig', array(
+                "pageTitle" => "tool_topedits",
+                "subtitle" => "tool_topedits_desc",
+                'page' => "topedits",
+
+                'project' => $project,
+                'username' => $username,
+            ));
+        }
     }
 }

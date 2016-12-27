@@ -63,6 +63,7 @@ class AppExtension extends \Twig_Extension
             new \Twig_SimpleFunction('request_time', [$this, 'requestTime'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('memory_usage', [$this, 'requestMemory'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('year', [$this, 'generateYear'], ['is_save' => ['html']]),
+            new \Twig_SimpleFunction('linkWiki', [$this, 'linkToWiki'], ['is_save' => ['html']]),
             new \Twig_SimpleFunction('msgPrintExists', [$this, 'intuitionMessagePrintExists'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('msgExists', [$this, 'intuitionMessageExists'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('msg', [$this, 'intuitionMessage'], ['is_safe' => ['html']]),
@@ -98,6 +99,24 @@ class AppExtension extends \Twig_Extension
 
     public function generateYear() {
         return date('Y');
+    }
+    
+    public function linkToWiki($url, $page, $secondary = "") {
+        // This function mainly acts as a workaround, as only wmf wikis use /w/ or /wiki/ in their path
+        
+        $link = $url . "/";
+        
+        if ($this->isWMFLabs()) {
+            $link .= "wiki/";
+        }
+        
+        $link .= $page;
+        
+        if ($secondary != "") {
+            $link .= "/$secondary";
+        }
+        
+        return $link;
     }
 
     public function intuitionMessageExists($message = "") {
@@ -292,7 +311,7 @@ class AppExtension extends \Twig_Extension
 
 
     public function isSingleWiki() {
-        $param = false;
+        $param = true;
         if ($this->container->hasParameter("app.single_wiki")) {$param = boolval($this->container->getParameter("app.single_wiki")); };
         return $param;
     }

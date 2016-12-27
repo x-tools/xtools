@@ -2,7 +2,7 @@
 
 {% block body %}
     <table class="leantable table-condensed xt-table" >
-        <tr><td>{{ msg("username") }}: </td><td><a href="{{ url|raw }}/wiki/User:{{ username }}" >{{ username }} @ {{ project }}</a></td></tr>
+        <tr><td>{{ msg("username") }}: </td><td><a href="{{ linkWiki(url|raw, "User:"~username) }}" >{{ username }} @ {{ project }}</a></td></tr>
         <tr><td>{{ msg("userid") }}: </td><td>{{ id }}</td></tr>
         <tr><td>{{ msg("groups") }}: </td><td>{{ groups }}
         {% if globalGroups is defined and globalGroups|length > 0 %}<br />
