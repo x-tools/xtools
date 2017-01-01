@@ -1,0 +1,3 @@
+parameters:
+    database_meta_name: meta_p
+    app.single_wiki: 0

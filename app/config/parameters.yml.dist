@@ -12,7 +12,6 @@ parameters:
     database_replica_name:      enwiki
     database_replica_user:      root
     database_replica_password:  ~
-    database_meta_name:         meta_p
 
     mailer_transport:  smtp
     mailer_host:       127.0.0.1
@@ -31,8 +30,6 @@ parameters:
     app.is_labs: 0
 
     app.load_stylesheets_from_cdn: 0
-
-    app.single_wiki: 1
 
     # Enabling or disabling of individual tools
     enable.ec: 1
