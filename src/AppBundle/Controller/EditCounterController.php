@@ -71,34 +71,42 @@ class EditCounterController extends Controller
         $username = ucfirst($username);
         $username = str_replace("_", " ", $username);
 
-        // Grab the connection to the meta database
-        $conn = $this->get('doctrine')->getManager("meta")->getConnection();
 
-        // Create the query we're going to run against the meta database
-        $wikiQuery = $conn->createQueryBuilder();
-        $wikiQuery
-            ->select(['dbName','name','url'])
-            ->from("wiki")
-            ->where($wikiQuery->expr()->eq('dbname', ':project'))
-            ->orwhere($wikiQuery->expr()->like('name', ':project'))
-            ->orwhere($wikiQuery->expr()->like('url', ":project"))
-            ->setParameter("project", $project);
-        $wikiStatement = $wikiQuery->execute();
+        if ($this->getParameter("app.single_wiki")) {
+            $dbName = $this->getParameter("database_replica_name");
+            $wikiName = "wiki";
+            $url = $this->getParameter("wiki_url");
+        }
+        else {
+            // Grab the connection to the meta database
+            $conn = $this->get('doctrine')->getManager("meta")->getConnection();
 
-        // Fetch the wiki data
-        $wikis = $wikiStatement->fetchAll();
+            // Create the query we're going to run against the meta database
+            $wikiQuery = $conn->createQueryBuilder();
+            $wikiQuery
+                ->select(['dbName', 'name', 'url'])
+                ->from("wiki")
+                ->where($wikiQuery->expr()->eq('dbname', ':project'))
+                ->orwhere($wikiQuery->expr()->like('name', ':project'))
+                ->orwhere($wikiQuery->expr()->like('url', ":project"))
+                ->setParameter("project", $project);
+            $wikiStatement = $wikiQuery->execute();
 
-        // Throw an exception if we can't find the wiki
-        if (sizeof($wikis) <1) {
-            throw new Exception("Unknown wiki \"$project\"");
+            // Fetch the wiki data
+            $wikis = $wikiStatement->fetchAll();
+
+            // Throw an exception if we can't find the wiki
+            if (sizeof($wikis) < 1) {
+                throw new Exception("Unknown wiki \"$project\"");
+            }
+
+            // Grab the data we need out of it.
+            $dbName = $wikis[0]['dbName'];
+            $wikiName = $wikis[0]['name'];
+            $url = $wikis[0]['url'];
         }
 
-        // Grab the data we need out of it.
-        $dbName = $wikis[0]['dbName'];
-        $wikiName = $wikis[0]['name'];
-        $url = $wikis[0]['url'];
-
-        if (substr($dbName, -2) != "_p") {
+        if ($this->getParameter("app.is_labs") && substr($dbName, -2) != "_p") {
             $dbName .= "_p";
         }
 
