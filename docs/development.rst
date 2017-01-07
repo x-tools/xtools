@@ -4,7 +4,7 @@ Development
 
 To contribute to the development of xTools, you may fork us on GitHub.  A few things to be aware of first:
 
-1. xTools is based on Symfony 3.0. We use Twig as our templating engine.  Symfony is a full MVC system.
+1. xTools is based on Symfony 3.0. We use Twig as our template engine.  Symfony is a full MVC system.
   a. The controllers are located at ``src/AppBundle/controller``.  They are sorted by tool
   b. The twig templates are located at ``app/resources/views``.  They are sorted by tool.
 2. We use the ``@Route`` syntax to configure routes. 
@@ -12,9 +12,10 @@ To contribute to the development of xTools, you may fork us on GitHub.  A few th
 
 Style Guideline
 ---------------
-- We use spaces to indent code.  4 spaces per "tab"
+- We use 4 spaces to indent code.
 - Opening and closing curly braces must be on their own lines.
-- Variable names are camelCase.  Constants are ALL CAPS.  Function names are camelCase.
+- Variable names are camelCase.  Constants are ALL_CAPS_AND_UNDERSCORES.  Function names are camelCase.
+- Functions and routes must begin with the tool name.
 
 Running Development server
 --------------------------

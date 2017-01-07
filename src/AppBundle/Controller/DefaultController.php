@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class DefaultController extends Controller
 {
@@ -32,6 +33,34 @@ class DefaultController extends Controller
             "title" => "About",
             "pageTitle" => "about",
             'page' => "index",
+        ));
+    }
+
+    /**
+     * @Route("/config", name="configPage")
+     */
+    public function configAction()
+    {
+        if ($this->container->getParameter('kernel.environment') != "dev") {
+            throw new NotFoundHttpException();
+        }
+
+        $params = $this->container->getParameterBag()->all();
+
+        foreach($params as $key=>$value) {
+            if (strpos($key, "password") !== false) {
+                $params[$key] = "<REDACTED>";
+            }
+        }
+
+        dump($params);
+
+        // replace this example code with whatever you need
+        return $this->render('default/config.html.twig', array(
+            "title" => "Config",
+            "pageTitle" => "Config",
+            'page' => "index",
+            'dump' => print_r($params, true),
         ));
     }
 }

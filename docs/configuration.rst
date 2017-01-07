@@ -16,7 +16,7 @@ of those options.
 - **database_replica_name** - Database Name for the server with the MediaWiki database
 - **database_replica_user** - Username for the server with the MediaWiki database
 - **database_replica_password** - Password for the server with the MediaWiki database
-- **database_meta_name** - Database Name for the server with the meta_p table
+- **database_meta_name** - Database Name for the server with the meta_p table (This is optional if app.single_wiki is set)
 
 - **mailer_transport** - Software for the mailer
 - **mailer_host** - Hostname for the mailer
@@ -43,3 +43,8 @@ of those options.
 - **enable.rfap** - Enable "RfX Vote Calculator" tool
 - **enable.bash** - Enable "Quote Database" tool
 - **enable.sc** - Enable "Plain, Dirty, Simple Edit Counter" tool
+
+- **app.load_stylesheets_from_cdn** - Whether to load our stylesheets and scripts from a CDN.  This is required if xTools is installed on a Windows server
+- **app.single_wiki** - Point xTools to a single wiki, instead of using a meta database.  This ignores database_meta_name above.
+- **app.is_labs** - Whether xTools lives on the Wikimedia Foundation Labs environment.  This should be set to false.
+- **wiki_url** - URL to use if app.single_wiki is enabled.  The title of pages is attached to the end.
