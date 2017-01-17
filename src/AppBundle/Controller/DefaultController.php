@@ -53,8 +53,6 @@ class DefaultController extends Controller
             }
         }
 
-        dump($params);
-
         // replace this example code with whatever you need
         return $this->render('default/config.html.twig', array(
             "title" => "Config",

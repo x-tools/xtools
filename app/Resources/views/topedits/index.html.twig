@@ -20,7 +20,7 @@
             <div class="input-group{% if isSingleWiki() %} hidden{% endif %}">
                 <span class="input-group-addon form-label">{{ msg("wiki") }}</span>
                 <input type="text" class="form-control"
-                       {% if project is defined %}value="{{ project }}"
+                       {% if (project is defined) and (project != "") %}value="{{ project }}"
                        {% elseif isSingleWiki() %}value="wiki"
                         {% endif %}
                        name="project">

@@ -13,8 +13,9 @@ class PagesController extends Controller
      * @Route("/pages", name="Pages")
      * @Route("/pages/", name="PagesSlash")
      * @Route("/pages/index.php", name="PagesIndexPhp")
+     * @Route("/pages/{project}", name="PagesProject")
      */
-    public function indexAction()
+    public function indexAction($project = null)
     {
         if (!$this->getParameter("enable.pages")) {
             throw new NotFoundHttpException("This tool is disabled");
@@ -23,25 +24,25 @@ class PagesController extends Controller
         // Grab the request object, grab the values out of it.
         $request = Request::createFromGlobals();
 
-        $project = $request->query->get('project');
+        $projectQuery = $request->query->get('project');
         $username = $request->query->get('user');
         $namespace = $request->query->get('namespace');
         $redirects = $request->query->get('redirects');
 
-        if ($project != "" && $username != "" && $namespace != "" && $redirects != "") {
-            return $this->redirectToRoute("PagesResult", array('project'=>$project, 'username' => $username, 'namespace'=>$namespace, 'redirects'=>$redirects));
+        if ($projectQuery != "" && $username != "" && $namespace != "" && $redirects != "") {
+            return $this->redirectToRoute("PagesResult", array('project'=>$projectQuery, 'username' => $username, 'namespace'=>$namespace, 'redirects'=>$redirects));
         }
-        elseif ($project != "" && $username != "" && $namespace != "") {
-            return $this->redirectToRoute("PagesResult", array('project'=>$project, 'username' => $username, 'namespace'=>$namespace));
+        elseif ($projectQuery != "" && $username != "" && $namespace != "") {
+            return $this->redirectToRoute("PagesResult", array('project'=>$projectQuery, 'username' => $username, 'namespace'=>$namespace));
         }
-        elseif ($project != "" && $username != "" && $redirects != "") {
-            return $this->redirectToRoute("PagesResult", array('project'=>$project, 'username' => $username, 'redirects'=>$redirects));
+        elseif ($projectQuery != "" && $username != "" && $redirects != "") {
+            return $this->redirectToRoute("PagesResult", array('project'=>$projectQuery, 'username' => $username, 'redirects'=>$redirects));
         }
-        elseif ($project != "" && $username != "") {
-            return $this->redirectToRoute("PagesResult", array('project'=>$project, 'username' => $username));
+        elseif ($projectQuery != "" && $username != "") {
+            return $this->redirectToRoute("PagesResult", array('project'=>$projectQuery, 'username' => $username));
         }
-        else if ($project != "") {
-            return $this->redirectToRoute("PagesProject", array('project'=>$project));
+        else if ($projectQuery != "") {
+            return $this->redirectToRoute("PagesProject", array('project'=>$projectQuery));
         }
 
 
@@ -57,30 +58,7 @@ class PagesController extends Controller
             'title' => "tool_pages",
 
             'namespaces' => $namespaces,
-        ]);
-    }
-
-    /**
-     * @Route("/pages/{project}", name="PagesProject")
-     */
-    public function projectAction($project) {
-
-        if (!$this->getParameter("enable.pages")) {
-            throw new NotFoundHttpException("This tool is disabled");
-        }
-
-        // Retrieving the global groups, using the Apihelper class
-        $api = $this->get("app.api_helper");
-        $namespaces = $api->namespaces("http://localhost/~wiki");
-
-        return $this->render('pages/index.html.twig', [
-            "pageTitle" => "tool_pages",
-            "subtitle" => "tool_pages_desc",
-            'page' => "pages",
-            'title' => "tool_pages",
             'project' => $project,
-
-            'namespaces' => $namespaces,
         ]);
     }
 

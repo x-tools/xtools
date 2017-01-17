@@ -14,8 +14,9 @@ class SimpleEditCounterController extends Controller
      * @Route("/sc", name="SimpleEditCounter")
      * @Route("/sc/", name="SimpleEditCounterSlash")
      * @Route("/sc/index.php", name="SimpleEditCounterIndexPhp")
+     * @Route("/sc/{project}", name="SimpleEditCounterProject")
      */
-    public function indexAction()
+    public function indexAction($project = null)
     {
         if (!$this->getParameter("enable.sc")) {
             throw new NotFoundHttpException("This tool is disabled");
@@ -24,14 +25,14 @@ class SimpleEditCounterController extends Controller
         // Grab the request object, grab the values out of it.
         $request = Request::createFromGlobals();
 
-        $project = $request->query->get('project');
+        $projectQuery = $request->query->get('project');
         $username = $request->query->get('user');
 
-        if ($project != "" && $username != "") {
-            return $this->redirectToRoute("SimpleEditCounterResult", array('project'=>$project, 'username' => $username));
+        if ($projectQuery != "" && $username != "") {
+            return $this->redirectToRoute("SimpleEditCounterResult", array('project'=>$projectQuery, 'username' => $username));
         }
-        else if ($project != "") {
-            return $this->redirectToRoute("SimpleEditCounterProject", array('project'=>$project));
+        else if ($projectQuery != "") {
+            return $this->redirectToRoute("SimpleEditCounterProject", array('project'=>$projectQuery));
         }
 
         // Otherwise fall through.
@@ -40,22 +41,6 @@ class SimpleEditCounterController extends Controller
             "subtitle" => "tool_sc_desc",
             'page' => "sc",
             'title' => "tool_sc",
-        ]);
-    }
-
-    /**
-     * @Route("/sc/{project}", name="SimpleEditCounterProject")
-     */
-    public function projectAction($project) {
-        if (!$this->getParameter("enable.sc")) {
-            throw new NotFoundHttpException("This tool is disabled");
-        }
-        return $this->render('simpleEditCounter/index.html.twig', [
-            'title' => "tool_sc",
-            'page' => "sc",
-            "pageTitle" => "tool_sc",
-            "subtitle" => "tool_sc_desc",
-            'project' => $project,
         ]);
     }
 

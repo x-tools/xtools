@@ -14,9 +14,9 @@ class ArticleInfoController extends Controller
      * @Route("/articleinfo", name="articleInfo")
      * @Route("/articleinfo/", name="articleInfoSlash")
      * @Route("/articleinfo/index.php", name="articleInfoIndexPhp")
-     * @Route("/articleinfo/get", name="articleInfoGet")
+     * @Route("/articleinfo/{project}", name="ArticleInfoProject")
      */
-    public function indexAction()
+    public function indexAction($project = null)
     {
         if (!$this->getParameter("enable.articleinfo")) {
             throw new NotFoundHttpException("This tool is disabled");
@@ -28,31 +28,14 @@ class ArticleInfoController extends Controller
         // Grab the request object, grab the values out of it.
         $request = Request::createFromGlobals();
 
-        $project = $request->query->get('project');
+        $projectQuery = $request->query->get('project');
         $article = $request->query->get('article');
 
-        if ($project != "" && $article != "") {
-            return $this->redirectToRoute("ArticleInfoResult", array('project'=>$project, 'article' => $article));
+        if ($projectQuery != "" && $article != "") {
+            return $this->redirectToRoute("ArticleInfoResult", array('project'=>$projectQuery, 'article' => $article));
         }
         else if ($article != "") {
-            return $this->redirectToRoute("ArticleInfoProject", array('project'=>$project));
-        }
-
-        return $this->render('articleInfo/index.html.twig', [
-            'page' => "articleinfo",
-            'title' => "tool_articleinfo",
-            "pageTitle" => "tool_articleinfo",
-            "subtitle" => "tool_articleinfo_desc",
-        ]);
-    }
-
-    /**
-     * @Route("/articleinfo/{project}", name="ArticleInfoProject")
-     */
-    public function articleInfoProject($project)
-    {
-        if (!$this->getParameter("enable.articleinfo")) {
-            throw new NotFoundHttpException("This tool is disabled");
+            return $this->redirectToRoute("ArticleInfoProject", array('project'=>$projectQuery));
         }
 
         return $this->render('articleInfo/index.html.twig', [
@@ -62,7 +45,6 @@ class ArticleInfoController extends Controller
             "subtitle" => "tool_articleinfo_desc",
             "project" => $project,
         ]);
-
     }
 
     /**

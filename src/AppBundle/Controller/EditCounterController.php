@@ -549,6 +549,12 @@ WHERE r.rev_user = :id GROUP BY page_namespace");
         // -------------------------
 
 
+
+        // Retrieving the namespaces, using the Apihelper class
+        $api = $this->get("app.api_helper");
+        $namespaces = $api->namespaces($url);
+
+
         return $this->render('editCounter/result.html.twig', [
             'title' => "tool_ec",
             'page' => "ec",
@@ -595,6 +601,8 @@ WHERE r.rev_user = :id GROUP BY page_namespace");
             // Namespace Totals
             'namespaceArray' => $namespaceArray,
             'namespaceTotal' => $namespaceTotal,
+
+            'namespaces' => $namespaces,
         ]);
     }
 }
