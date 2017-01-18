@@ -15,9 +15,9 @@ class TopEditsController extends Controller
      */
     public function indexAction()
     {
-        if (!$this->getParameter("enable.topedits")) {
-            throw new NotFoundHttpException("This tool is disabled");
-        }
+        $lh = $this->get("app.labs_helper");
+
+        $lh->checkEnabled("topedits");
 
         // Grab the request object, grab the values out of it.
         $request = Request::createFromGlobals();
@@ -53,9 +53,17 @@ class TopEditsController extends Controller
      */
     public function resultAction($project, $username, $namespace = 0, $article="")
     {
-        if (!$this->getParameter("enable.topedits")) {
-            throw new NotFoundHttpException("This tool is disabled");
-        }
+        $lh = $this->get("app.labs_helper");
+
+        $lh->checkEnabled("topedits");
+
+        $username = ucfirst($username);
+
+        $dbValues = $lh->databasePrepare($project, "topEdits");
+
+        $dbName = $dbValues["dbName"];
+        $wikiName = $dbValues["wikiName"];
+        $url = $dbValues["url"];
 
         if ($article === "") {
             return $this->render('topedits/result_namespace.html.twig', array(

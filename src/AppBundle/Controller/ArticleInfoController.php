@@ -18,9 +18,9 @@ class ArticleInfoController extends Controller
      */
     public function indexAction($project = null)
     {
-        if (!$this->getParameter("enable.articleinfo")) {
-            throw new NotFoundHttpException("This tool is disabled");
-        }
+        $lh = $this->get("app.labs_helper");
+
+        $lh->checkEnabled("articleinfo");
 
         $api = $this->get("app.api_helper");
         $api->test();
@@ -52,9 +52,16 @@ class ArticleInfoController extends Controller
      */
     public function articleInfoProjectAction($project, $article)
     {
-        if (!$this->getParameter("enable.articleinfo")) {
-            throw new NotFoundHttpException("This tool is disabled");
-        }
+        $lh = $this->get("app.labs_helper");
+
+        $lh->checkEnabled("articleinfo");
+
+        $dbValues = $lh->databasePrepare($project, "ArticleInfo");
+
+        $dbName = $dbValues["dbName"];
+        $wikiName = $dbValues["wikiName"];
+        $url = $dbValues["url"];
+        
         // replace this example code with whatever you need
         return $this->render('articleInfo/result.html.twig', array(
             'page' => "articleinfo",

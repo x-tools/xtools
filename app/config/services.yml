@@ -18,3 +18,9 @@ services:
         public: true
         tags:
           - {name: api.helper}
+    app.labs_helper:
+        class: AppBundle\Helper\labsHelper
+        arguments: ["@service_container"]
+        public: true
+        tags:
+          - {name: labs.helper}

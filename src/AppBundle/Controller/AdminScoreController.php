@@ -19,9 +19,9 @@ class AdminScoreController extends Controller
      */
     public function indexAction($project = null)
     {
-        if (!$this->getParameter("enable.adminscore")) {
-            throw new NotFoundHttpException("This tool is disabled");
-        }
+        $lh = $this->get("app.labs_helper");
+
+        $lh->checkEnabled("adminscore");
 
         // Grab the request object, grab the values out of it.
         $request = Request::createFromGlobals();
@@ -52,49 +52,18 @@ class AdminScoreController extends Controller
      */
     public function resultAction($project, $username)
     {
-        if (!$this->getParameter("enable.adminscore")) {
-            throw new NotFoundHttpException("This tool is disabled");
-        }
+
+        $lh = $this->get("app.labs_helper");
+
+        $lh->checkEnabled("adminscore");
+
         $username = ucfirst($username);
 
-        if ($this->getParameter("app.single_wiki")) {
-            $dbName = $this->getParameter("database_replica_name");
-            $wikiName = "wiki";
-            $url = $this->getParameter("wiki_url");
-        }
-        else {
-            // Grab the connection to the meta database
-            $conn = $this->get('doctrine')->getManager("meta")->getConnection();
+        $dbValues = $lh->databasePrepare($project, "AdminScore");
 
-            // Create the query we're going to run against the meta database
-            $wikiQuery = $conn->createQueryBuilder();
-            $wikiQuery
-                ->select(['dbName', 'name', 'url'])
-                ->from("wiki")
-                ->where($wikiQuery->expr()->eq('dbname', ':project'))
-                ->orwhere($wikiQuery->expr()->like('name', ':project'))
-                ->orwhere($wikiQuery->expr()->like('url', ":project"))
-                ->setParameter("project", $project);
-            $wikiStatement = $wikiQuery->execute();
-
-            // Fetch the wiki data
-            $wikis = $wikiStatement->fetchAll();
-
-            // Throw an exception if we can't find the wiki
-            if (sizeof($wikis) < 1) {
-                $this->addFlash('notice', ["nowiki", $project]);
-                return $this->redirectToRoute("Pages");
-            }
-
-            // Grab the data we need out of it.
-            $dbName = $wikis[0]['dbName'];
-            $wikiName = $wikis[0]['name'];
-            $url = $wikis[0]['url'];
-        }
-
-        if ($this->getParameter("app.is_labs") && substr($dbName, -2) != "_p") {
-            $dbName .= "_p";
-        }
+        $dbName = $dbValues["dbName"];
+        $wikiName = $dbValues["wikiName"];
+        $url = $dbValues["url"];
 
         // MULTIPLIERS (to review)
         $ACCT_AGE_MULT = 1.25;   # 0 if = 365 jours

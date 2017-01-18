@@ -13,14 +13,14 @@ class EditCounterController extends Controller
     /**
      * @Route("/ec", name="EditCounter")
      * @Route("/ec/", name="EditCounterSlash")
-     * @Route("/ec/get", name="EditCounterGet")
      * @Route("/ec/index.php", name="EditCounterIndexPhp")
+     * @Route("/ec/{project}", name="EditCounterProject")
      */
-    public function indexAction()
+    public function indexAction($project = null)
     {
-        if (!$this->getParameter("enable.ec")) {
-            throw new NotFoundHttpException("This tool is disabled");
-        }
+        $lh = $this->get("app.labs_helper");
+
+        $lh->checkEnabled("ec");
 
         // Grab the request object, grab the values out of it.
         $request = Request::createFromGlobals();
@@ -41,21 +41,7 @@ class EditCounterController extends Controller
             "subtitle" => "tool_ec_desc",
             'page' => "ec",
             'title' => "tool_ec",
-        ]);
-    }
 
-    /**
-     * @Route("/ec/{project}", name="EditCounterProject")
-     */
-    public function projectAction($project) {
-        if (!$this->getParameter("enable.ec")) {
-            throw new NotFoundHttpException("This tool is disabled");
-        }
-        return $this->render('editCounter/index.html.twig', [
-            "pageTitle" => "tool_ec",
-            "subtitle" => "tool_ec_desc",
-            'page' => "ec",
-            'title' => "tool_ec",
             'project' => $project,
         ]);
     }
@@ -63,52 +49,19 @@ class EditCounterController extends Controller
     /**
      * @Route("/ec/{project}/{username}", name="EditCounterResult")
      */
-    public function resultAction($project, $username) {
-        if (!$this->getParameter("enable.ec")) {
-            throw new NotFoundHttpException("This tool is disabled");
-        }
+    public function resultAction($project, $username)
+    {
+        $lh = $this->get("app.labs_helper");
+
+        $lh->checkEnabled("ec");
 
         $username = ucfirst($username);
-        $username = str_replace("_", " ", $username);
 
+        $dbValues = $lh->databasePrepare($project, "SimpleEditCounter");
 
-        if ($this->getParameter("app.single_wiki")) {
-            $dbName = $this->getParameter("database_replica_name");
-            $wikiName = "wiki";
-            $url = $this->getParameter("wiki_url");
-        }
-        else {
-            // Grab the connection to the meta database
-            $conn = $this->get('doctrine')->getManager("meta")->getConnection();
-
-            // Create the query we're going to run against the meta database
-            $wikiQuery = $conn->createQueryBuilder();
-            $wikiQuery
-                ->select(['dbName', 'name', 'url'])
-                ->from("wiki")
-                ->where($wikiQuery->expr()->eq('dbname', ':project'))
-                ->orwhere($wikiQuery->expr()->like('name', ':project'))
-                ->orwhere($wikiQuery->expr()->like('url', ":project"))
-                ->setParameter("project", $project);
-            $wikiStatement = $wikiQuery->execute();
-
-            // Fetch the wiki data
-            $wikis = $wikiStatement->fetchAll();
-
-            // Throw an exception if we can't find the wiki
-            if (sizeof($wikis) < 1) {
-                throw new Exception("Unknown wiki \"$project\"");
-            }
-
-            // Grab the data we need out of it.
-            $dbName = $wikis[0]['dbName'];
-            $wikiName = $wikis[0]['name'];
-            $url = $wikis[0]['url'];
-        }
-
-        if ($this->getParameter("app.is_labs") && substr($dbName, -2) != "_p") {
-            $dbName .= "_p";
-        }
+        $dbName = $dbValues["dbName"];
+        $wikiName = $dbValues["wikiName"];
+        $url = $dbValues["url"];
 
         // Grab the connection to the replica database (which is separate from the above)
         $conn = $this->get('doctrine')->getManager("replicas")->getConnection();
