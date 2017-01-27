@@ -41,6 +41,8 @@ class SimpleEditCounterController extends Controller
             "subtitle" => "tool_sc_desc",
             'page' => "sc",
             'title' => "tool_sc",
+
+            'project' => $project,
         ]);
     }
 
@@ -59,19 +61,24 @@ class SimpleEditCounterController extends Controller
         $dbName = $dbValues["dbName"];
         $wikiName = $dbValues["wikiName"];
         $url = $dbValues["url"];
+        
+        $userTable = $lh->getTable("user", $dbName);
+        $archiveTable = $lh->getTable("archive", $dbName);
+        $revisionTable = $lh->getTable("revision", $dbName);
+        $userGroupsTable = $lh->getTable("user_groups", $dbName);
 
         // Grab the connection to the replica database (which is separate from the above)
         $conn = $this->get('doctrine')->getManager("replicas")->getConnection();
 
         // Prepare the query and execute
         $resultQuery = $conn->prepare( "
-			SELECT 'id' as source, user_id as value FROM $dbName.user WHERE user_name = :username
+			SELECT 'id' as source, user_id as value FROM $userTable WHERE user_name = :username
 			UNION
-			SELECT 'arch' as source, COUNT(*) AS value FROM $dbName.archive_userindex WHERE ar_user_text = :username
+			SELECT 'arch' as source, COUNT(*) AS value FROM $archiveTable WHERE ar_user_text = :username
 			UNION
-			SELECT 'rev' as source, COUNT(*) AS value FROM $dbName.revision_userindex WHERE rev_user_text = :username
+			SELECT 'rev' as source, COUNT(*) AS value FROM $revisionTable WHERE rev_user_text = :username
 			UNION
-			SELECT 'groups' as source, ug_group as value FROM $dbName.user_groups JOIN $dbName.user on user_id = ug_user WHERE user_name = :username
+			SELECT 'groups' as source, ug_group as value FROM $userGroupsTable JOIN $userTable on user_id = ug_user WHERE user_name = :username
             ");
 
         $resultQuery->bindParam("username", $username);

@@ -68,4 +68,15 @@ class labsHelper
 
         return ["dbName" => $dbName, "wikiName" => $wikiName, "url" => $url];
     }
+
+    public function getTable($table, $dbName = null) {
+        $retVal = $table;
+        if($this->container->hasParameter("app.table.$table")) {
+                $retVal = $this->container->getParameter("app.table.$table");
+            }
+        if (isset($dbName)) {
+            $retVal = "$dbName.$retVal";
+        }
+        return $retVal;
+        }
 }

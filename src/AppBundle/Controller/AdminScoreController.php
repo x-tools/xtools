@@ -65,6 +65,12 @@ class AdminScoreController extends Controller
         $wikiName = $dbValues["wikiName"];
         $url = $dbValues["url"];
 
+        $userTable = $lh->getTable("user", $dbName);
+        $pageTable = $lh->getTable("page", $dbName);
+        $loggingTable = $lh->getTable("logging", $dbName);
+        $revisionTable = $lh->getTable("revision", $dbName);
+        $archiveTable = $lh->getTable("archive", $dbName);
+
         // MULTIPLIERS (to review)
         $ACCT_AGE_MULT = 1.25;   # 0 if = 365 jours
         $EDIT_COUNT_MULT = 1.25;     # 0 if = 10 000
@@ -86,33 +92,33 @@ class AdminScoreController extends Controller
 
         // Prepare the query and execute
         $resultQuery = $conn->prepare( "
-		SELECT 'id' as source, user_id as value FROM $dbName.user WHERE user_name = :username
+		SELECT 'id' as source, user_id as value FROM $userTable WHERE user_name = :username
 		UNION
-        SELECT 'acct_age' as source, user_registration as value FROM $dbName.user WHERE user_name=:username
+        SELECT 'acct_age' as source, user_registration as value FROM $userTable WHERE user_name=:username
         UNION
-        SELECT 'edit_count' as source, user_editcount as value FROM $dbName.user WHERE user_name=:username
+        SELECT 'edit_count' as source, user_editcount as value FROM $userTable WHERE user_name=:username
         UNION
-        SELECT 'user_page' as source, page_len as value FROM $dbName.page WHERE page_namespace=2 AND page_title=:username
+        SELECT 'user_page' as source, page_len as value FROM $pageTable WHERE page_namespace=2 AND page_title=:username
         UNION
-        SELECT 'patrols' as source, COUNT(*) as value FROM $dbName.logging WHERE log_type='patrol' and log_action='patrol' and log_namespace=0 and log_deleted=0 and log_user_text=:username
+        SELECT 'patrols' as source, COUNT(*) as value FROM $loggingTable WHERE log_type='patrol' and log_action='patrol' and log_namespace=0 and log_deleted=0 and log_user_text=:username
         UNION
-        SELECT 'blocks' as source, COUNT(*) as value FROM $dbName.logging WHERE log_type='block' AND log_action='block' AND log_namespace=2 AND log_deleted=0 AND log_title=:username
+        SELECT 'blocks' as source, COUNT(*) as value FROM $loggingTable WHERE log_type='block' AND log_action='block' AND log_namespace=2 AND log_deleted=0 AND log_title=:username
         UNION
-        SELECT 'afd' as source, COUNT(*) as value FROM $dbName.revision WHERE rev_page like 'Articles for deletion/%' and rev_page not like 'Articles_for_deletion/Log/%' and rev_user_text=:username
+        SELECT 'afd' as source, COUNT(*) as value FROM $revisionTable WHERE rev_page like 'Articles for deletion/%' and rev_page not like 'Articles_for_deletion/Log/%' and rev_user_text=:username
         UNION
-        SELECT 'recent_activity' as source, COUNT(*) as value FROM $dbName.revision WHERE rev_user_text=:username AND rev_timestamp > (now()-INTERVAL 730 day) and rev_timestamp < now()
+        SELECT 'recent_activity' as source, COUNT(*) as value FROM $revisionTable WHERE rev_user_text=:username AND rev_timestamp > (now()-INTERVAL 730 day) and rev_timestamp < now()
         UNION
-        SELECT 'aiv' as source, COUNT(*) as value FROM $dbName.revision WHERE rev_page like 'Administrator intervention against vandalism%' and rev_user_text=:username
+        SELECT 'aiv' as source, COUNT(*) as value FROM $revisionTable WHERE rev_page like 'Administrator intervention against vandalism%' and rev_user_text=:username
         UNION
-        SELECT 'edit_summaries' as source, COUNT(*) as value FROM $dbName.revision JOIN page ON rev_page=page_id WHERE page_namespace=0 AND rev_user_text=:username
+        SELECT 'edit_summaries' as source, COUNT(*) as value FROM $revisionTable JOIN page ON rev_page=page_id WHERE page_namespace=0 AND rev_user_text=:username
         UNION
-        SELECT 'namespaces' as source, count(*) as value FROM $dbName.revision JOIN page ON rev_page=page_id WHERE rev_user_text=:username AND page_namespace=0
+        SELECT 'namespaces' as source, count(*) as value FROM $revisionTable JOIN page ON rev_page=page_id WHERE rev_user_text=:username AND page_namespace=0
         UNION
-	    SELECT 'pages_created_live' as source, COUNT(*) as value from $dbName.`revision_userindex` where rev_user_text=:username and rev_parent_id=0
+	    SELECT 'pages_created_live' as source, COUNT(*) as value from $revisionTable where rev_user_text=:username and rev_parent_id=0
 		UNION
-		SELECT 'pages_created_archive' as source, COUNT(*) as value from $dbName.`archive_userindex` where ar_user_text=:username and ar_parent_id=0
+		SELECT 'pages_created_archive' as source, COUNT(*) as value from $archiveTable where ar_user_text=:username and ar_parent_id=0
         UNION
-        SELECT 'rpp' as source, COUNT(*) as value FROM $dbName.revision WHERE rev_page like 'Requests_for_page_protection%' and rev_user_text=:username
+        SELECT 'rpp' as source, COUNT(*) as value FROM $revisionTable WHERE rev_page like 'Requests_for_page_protection%' and rev_user_text=:username
         ");
 
         $resultQuery->bindParam("username", $username);

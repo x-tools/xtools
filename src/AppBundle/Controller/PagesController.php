@@ -80,12 +80,18 @@ class PagesController extends Controller
 
         $user_id = 0;
 
+        $userTable = $lh->getTable("user", $dbName);
+        $pageTable = $lh->getTable("page", $dbName);
+        $revisionTable = $lh->getTable("revision", $dbName);
+        $archiveTable = $lh->getTable("archive", $dbName);
+        $logTable = $lh->getTable("logging", $dbName);
+
         // Grab the connection to the replica database (which is separate from the above)
         $conn = $this->get('doctrine')->getManager("replicas")->getConnection();
 
         // Prepare the query and execute
         $resultQuery = $conn->prepare( "
-			SELECT 'id' as source, user_id as value FROM $dbName.user WHERE user_name = :username
+			SELECT 'id' as source, user_id as value FROM $userTable WHERE user_name = :username
             ");
 
         $resultQuery->bindParam("username", $username);
@@ -98,13 +104,11 @@ class PagesController extends Controller
         }
 
         $namespaceConditionArc = "";
-        // $namespaceConditionArc2 = "";
         $namespaceConditionRev = "";
 
         if ($namespace != "all") {
             $namespaceConditionRev = " and page_namespace = '".intval($namespace)."' ";
             $namespaceConditionArc = " and ar_namespace = '".intval($namespace)."' ";
-            //$namespaceConditionArc2 = " and b.ar_namespace = '".intval($namespace)."' ";
         }
 
         $redirectCondition = "";
@@ -114,32 +118,30 @@ class PagesController extends Controller
         if ( $user_id == 0) { // IP Editor or undefined username.
             $whereRev = " rev_user_text = '$username' AND rev_user = '0' ";
             $whereArc = " ar_user_text = '$username' AND ar_user = '0' ";
-            //$whereArc2 = " b.ar_user_text = '$username' AND b.ar_user = '0' ";
             $having = " rev_user_text = '$username' ";
         }
         else {
             $whereRev = " rev_user = '$user_id' AND rev_timestamp > 1 ";
             $whereArc = " ar_user = '$user_id' AND ar_timestamp > 1 ";
-            //$whereArc2 = " b.ar_user = '$user_id' AND b.ar_timestamp > 1 ";
             $having = " rev_user = '$user_id' ";
         }
 
         $stmt = "
 			(SELECT DISTINCT page_namespace as namespace, 'rev' as type, page_title as page_title, page_is_redirect as page_is_redirect, rev_timestamp as timestamp, rev_user, rev_user_text
-			FROM $dbName.page
-			JOIN $dbName.revision_userindex on page_id = rev_page
+			FROM $pageTable
+			JOIN $revisionTable on page_id = rev_page
 			WHERE  $whereRev  AND rev_parent_id = '0'  $namespaceConditionRev  $redirectCondition
 			)
 			
 			UNION
 			
 			(SELECT  a.ar_namespace as namespace, 'arc' as type, a.ar_title as page_title, '0' as page_is_redirect, min(a.ar_timestamp) as timestamp , a.ar_user as rev_user, a.ar_user_text as rev_user_text
-			FROM $dbName.archive_userindex a
+			FROM $archiveTable a
 			JOIN 
 			 (
 			  Select b.ar_namespace, b.ar_title
-			  FROM $dbName.archive_userindex as b
-			  LEFT JOIN $dbName.logging_logindex on log_namespace = b.ar_namespace and log_title = b.ar_title  and log_user = b.ar_user and (log_action = 'move' or log_action = 'move_redir')
+			  FROM $archiveTable as b
+			  LEFT JOIN $logTable on log_namespace = b.ar_namespace and log_title = b.ar_title  and log_user = b.ar_user and (log_action = 'move' or log_action = 'move_redir')
 			  WHERE  $whereArc AND b.ar_parent_id = '0' $namespaceConditionArc and log_action is null
 			 ) AS c on c.ar_namespace= a.ar_namespace and c.ar_title = a.ar_title 
 			GROUP BY a.ar_namespace, a.ar_title

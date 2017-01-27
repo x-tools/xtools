@@ -3,7 +3,7 @@
 namespace AppBundle\Helper;
 
 
-class Apihelper
+class apiHelper
 {
     private $curlChannel;
 
@@ -33,11 +33,6 @@ class Apihelper
         $ch = $this->curlChannel = curl_init();
         curl_setopt($ch, CURLOPT_USERAGENT, "Xtools" ); // TODO: Turn into config option
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    }
-
-    public function test()
-    {
-        dump("Testing");
     }
 
     public function groups($host, $username)

@@ -14,7 +14,7 @@ services:
         tags:
             - { name: twig.extension }
     app.api_helper:
-        class: AppBundle\Helper\Apihelper
+        class: AppBundle\Helper\apiHelper
         public: true
         tags:
           - {name: api.helper}
