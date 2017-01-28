@@ -2,6 +2,7 @@
 
 namespace AppBundle\Twig;
 
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -79,8 +80,10 @@ class AppExtension extends \Twig_Extension
             new \Twig_SimpleFunction('color', [$this, 'getColorList']),
             new \Twig_SimpleFunction('isWMFLabs', [$this, 'isWMFLabs']),
             new \Twig_SimpleFunction('isSingleWiki', [$this, 'isSingleWiki']),
+            new \Twig_SimpleFunction('getReplagThreshold', [$this, 'getReplagThreshold']),
             new \Twig_SimpleFunction('loadStylesheetsFromCDN', [$this, 'loadStylesheetsFromCDN']),
             new \Twig_SimpleFunction('isWMFLabs', [$this, 'isWMFLabs']),
+            new \Twig_SimpleFunction('replag', [$this, 'replag']),
         ];
     }
 
@@ -316,6 +319,14 @@ class AppExtension extends \Twig_Extension
         return $param;
     }
 
+    public function getReplagThreshold() {
+        $param = 30;
+        if ($this->container->hasParameter("app.replag_threshold")) {
+            $param = $this->container->getParameter("app.replag_threshold");
+        };
+        return $param;
+    }
+
 
     public function loadStylesheetsFromCDN() {
         $param = false;
@@ -328,5 +339,43 @@ class AppExtension extends \Twig_Extension
         $param = false;
         if ($this->container->hasParameter("app.is_labs")) {$param = boolval($this->container->getParameter("app.is_labs")); };
         return $param;
+    }
+
+    public function replag() {
+        $retVal = 0;
+
+        if ($this->container->hasParameter("app.is_labs") &&
+            (boolval($this->container->getParameter("app.is_labs")) == true))
+        {
+
+            $project = $this->container->get("request_stack")->getCurrentRequest()->get('project');
+
+            if (!isset($project)) {
+                $project = "enwiki";
+            }
+
+            $stmt = "SELECT lag FROM `heartbeat_p`.`heartbeat` h
+            RIGHT JOIN `meta_p`.`wiki` w on concat(h.shard, \".labsdb\")=w.slice 
+            where dbname like :project or name like :project or url like :project limit 1";
+
+            $conn = $this->container->get('doctrine')->getManager("replicas")->getConnection();
+
+            // Prepare the query and execute
+            $resultQuery = $conn->prepare($stmt);
+            $resultQuery->bindParam("project", $project);
+            $resultQuery->execute();
+
+            if ($resultQuery->errorCode() == 0) {
+
+                $results = $resultQuery->fetchAll();
+
+                if (isset($results[0]["lag"])) {
+                    $retVal = $results[0]["lag"];
+                }
+            }
+
+        }
+
+        return $retVal;
     }
 }

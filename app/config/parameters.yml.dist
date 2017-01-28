@@ -36,6 +36,8 @@ parameters:
 
     app.single_wiki: 1
 
+    app.replag_threshold: 30
+
     # Enabling or disabling of individual tools
     enable.ec: 1
     enable.articleinfo: 1
