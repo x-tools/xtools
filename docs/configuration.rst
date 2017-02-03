@@ -28,6 +28,7 @@ of those options.
 - **app.noticeDisplay** - Display the notice or not
 - **app.noticeStyle** - Style of the notice banner.  Available options: "error," "warning," "succeess," "info."
 - **app.noticeText** - Message shown to the user.  If you provide a valid intuition key, it will display that message instead
+- **app.replag_threshold** - Number of seconds to consider the replicas as "lagged", and show a warning to the user that the data may be out of date
 
 - **enable.ec** - Enable "Edit Counter" tool
 - **enable.articleinfo** - Enable "Article Information" tool
