@@ -4,16 +4,17 @@
     <div class="panel panel-primary" style="text-align:center">
         <div class="panel-heading">
             <p class="xt-heading-top" >
-                <a href="{{ url }}/index.php?title=User:{{ username }}">{{ username }}</a>
+                <a href="{{ linkWiki(url, "User:"~username) }}">{{ username }}</a>
                 <small><span style="padding-left:10px;" > &bull;&nbsp; {{ project }} </span></small>
             </p>
         </div>
         <div class="panel-body xt-panel-body-top" >
             <p>
-                <a href="{{ url }}/index.php?title=Special%3ALog&type=block&user=&page=User%3A{{ username }}&year=&month=-1&tagfilter=" >{{ msg("block_log") }}</a> &middot;
-                <a href="/ec/?user={{ username }}&project={{ project }}" >Edit Counter</a>{# &middot;
-                <a href="//tools.wmflabs.org/guc/?user=Matthewrbowker" >Global user contributions</a> &middot;
-                <a href="//tools.wmflabs.org/wikiviewstats/?project=en.wikipedia.org&pages=User:Matthewrbowker" >Userpage pageviews</a>#}
+                <a href="{{ linkWikiScript(url, "title=Special:Log&type=block&user=&page=User%3A"~username~"&year=&month=-1&tagfilter=") }}" >{{ msg("block_log") }}</a> &middot;
+                <a href="{{ link("/ec/"~project~"/"~username) }}" >Edit Counter</a>
+                {% if isWMFLabs() %} &middot;
+                <a href="//tools.wmflabs.org/guc/?user={{ username }}" >Global user contributions</a>
+                {% endif %}
             </p>
 
             <div class="panel panel-default">
@@ -100,11 +101,16 @@
 
                                 <tr>
                                     <td>{{ loop.index }}.</td>
-                                    <td style='max-width:50%; white-space:wrap; word-wrap:break-word' ><a href="{{ url }}/index.php?title={% if key != 0 %}{{ namespaces[key] }}:{% endif %}{{ value['page_title']|e }}&redirect=no" >{{ value['page_title'] }}</a>{% if value["page_is_redirect"] %}<small class="text-warning"> &middot; ({{ msg("redirect") }})</small>{% endif %}{% if value["type"] == "arc" %}<small class="text-danger"> &middot; ({{ msg("deleted") }})</small> {% endif %} </td>
+                                    {% if key == 0 %}
+                                        {% set pagename = value['page_title']|e %}
+                                    {% else %}
+                                        {% set pagename = namespaces[key]~":"~value["page_title"] %}
+                                    {% endif %}
+                                    <td style='max-width:50%; white-space:wrap; word-wrap:break-word' ><a href="{{ linkWiki(url, pagename, "redirect=no")}}" >{{ value['page_title'] }}</a>{% if value["page_is_redirect"] %}<small class="text-warning"> &middot; ({{ msg("redirect") }})</small>{% endif %}{% if value["type"] == "arc" %}<small class="text-danger"> &middot; ({{ msg("deleted") }})</small> {% endif %} </td>
                                     <td style='white-space: nowrap; font-size:95%; padding-right:10px;' >{{ value["human_time"] }}</td>
-                                    <td style='white-space: nowrap' ><a href="{{ url }}/index.php?title=Special:Log&type=&page={% if key!= 0 %}{{ namespaces[key] }}:{% endif %}{{ value['page_title']|e }}" ><small>{{ msg("log") }}</small></a> &middot; </td>
-                                    <td style='white-space: nowrap' ><a href="/articleinfo/?project={{ project }}&article={% if key != 0 %}{{ namespaces[key] }}:{% endif %}{{ value['page_title']|e }}" ><small>{{ msg("page_history") }}</small></a> &middot; </td>
-                                    <td style='white-space: nowrap' ><a href="/topedits/?project={{ project }}&user=Matthewrbowker&article={% if key != 0 %}{{ namespaces[key] }}:{% endif %}{{ value['page_title']|e }}" ><small>{{ msg("top_edits") }}</small></a></td>
+                                    <td style='white-space: nowrap' ><a href="{{ linkWikiScript(url, "title=Special:Log&type=&page="~pagename)}}" ><small>{{ msg("log") }}</small></a> &middot; </td>
+                                    <td style='white-space: nowrap' ><a href="{{ link("/aricleinfo/"~project~"/"~pagename) }}" ><small>{{ msg("page_history") }}</small></a> &middot; </td>
+                                    <td style='white-space: nowrap' ><a href="{{ link("/topedits/"~project~"/"~username~"/"~namespaces[key]~"/"~pagename) }}" ><small>{{ msg("top_edits") }}</small></a></td>
 
                                 </tr>
                             {% endfor %}

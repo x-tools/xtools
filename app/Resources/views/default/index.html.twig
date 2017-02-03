@@ -5,7 +5,7 @@
     We have the following tools available:
     <ul>
         {% for tool in tools() %}
-            {% if enabled(tool) %}<li><a href="/{{ tool }}">{{ msg("tool_" ~ tool) }}</a></li>{% endif %}
+            {% if enabled(tool) %}<li><a href="{{ link("/" ~ tool) }}">{{ msg("tool_" ~ tool) }}</a></li>{% endif %}
         {% endfor %}
     </ul>
 {% endblock %}

@@ -53,3 +53,6 @@ parameters:
     enable.rfap: 1
     enable.bash: 1
     enable.sc: 1
+
+    # Leave blank if xTools is installed in the root directory
+    app.base_path:

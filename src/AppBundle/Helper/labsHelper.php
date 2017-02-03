@@ -8,6 +8,7 @@
 
 namespace AppBundle\Helper;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -52,8 +53,10 @@ class labsHelper
 
             // Throw an exception if we can't find the wiki
             if (sizeof($wikis) < 1) {
-                $this->addFlash('notice', ["nowiki", $project]);
-                return $this->redirectToRoute($route);
+                // TODO: Fix so that we're rendering a flash rather than dying...
+                throw new Exception("Unable to find project");
+                //$this->container->get('controller')->addFlash('notice', ["nowiki", $project]);
+                //return $this->container->redirectToRoute($route);
             }
 
             // Grab the data we need out of it.

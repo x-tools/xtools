@@ -65,6 +65,7 @@ class AppExtension extends \Twig_Extension
             new \Twig_SimpleFunction('memory_usage', [$this, 'requestMemory'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('year', [$this, 'generateYear'], ['is_save' => ['html']]),
             new \Twig_SimpleFunction('linkWiki', [$this, 'linkToWiki'], ['is_save' => ['html']]),
+            new \Twig_SimpleFunction('linkWikiScript', [$this, 'linkToWikiScript'], ['is_save' => ['html']]),
             new \Twig_SimpleFunction('msgPrintExists', [$this, 'intuitionMessagePrintExists'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('msgExists', [$this, 'intuitionMessageExists'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('msg', [$this, 'intuitionMessage'], ['is_safe' => ['html']]),
@@ -84,6 +85,7 @@ class AppExtension extends \Twig_Extension
             new \Twig_SimpleFunction('loadStylesheetsFromCDN', [$this, 'loadStylesheetsFromCDN']),
             new \Twig_SimpleFunction('isWMFLabs', [$this, 'isWMFLabs']),
             new \Twig_SimpleFunction('replag', [$this, 'replag']),
+            new \Twig_SimpleFunction('link', [$this, 'link']),
         ];
     }
 
@@ -116,9 +118,24 @@ class AppExtension extends \Twig_Extension
         $link .= $page;
         
         if ($secondary != "") {
-            $link .= "/$secondary";
+            $link .= "?$secondary";
         }
         
+        return $link;
+    }
+
+    public function linkToWikiScript($url, $secondary) {
+        $link = $url . "/";
+
+        if ($this->isWMFLabs()) {
+            $link .= "w/";
+        }
+
+        $link .= "index.php?$secondary";
+
+
+        //$link = str_replace("//", "/", $link);
+
         return $link;
     }
 
@@ -375,6 +392,19 @@ class AppExtension extends \Twig_Extension
             }
 
         }
+
+        return $retVal;
+    }
+
+    public function link($path = "/") {
+        $base_path = $this->container->getParameter("app.base_path");
+        $retVal = $path;
+
+        if(isset($base_path)) {
+            $retVal = "$base_path/$path";
+        }
+
+        $retVal = str_replace("//", "/", $retVal);
 
         return $retVal;
     }
