@@ -55,6 +55,7 @@
                 <li><span class="login" ><a href="https://tools.wmflabs.org/xtools/oauthredirector.php?action=login&amp;callto=https://www.mediawiki.org/w/api.php&amp;returnto=https://tools.wmflabs.org/xtools-ec/" >{{ msg("login") }}</a></span></li>
             </ul>
             {% endif %}
+            {% if exception is not defined %}
             <div class="dropdown">
                 <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">{{ langName() }}
                     <span class="caret"></span></button>
@@ -66,6 +67,7 @@
                     {% endfor %}
                 </ul>
             </div>
+            {% endif %}
         </div>
         <nav class="top-nav navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-left">

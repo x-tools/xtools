@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    {% if attribute(exception, "message") is defined %}
+    {% if exception is defined and attribute(exception, "message") is defined %}
         {%  set message = attribute(exception, "message") %}
     {% else %}
         {% set message = "unknown" %}
