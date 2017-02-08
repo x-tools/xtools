@@ -46,7 +46,7 @@ class PagesController extends Controller
         }
 
 
-        // Retrieving the global groups, using the Apihelper class
+        // Retrieving the global groups, using the ApiHelper class
         $api = $this->get("app.api_helper");
         $namespaces = $api->namespaces("http://localhost/~wiki");
 
@@ -132,18 +132,18 @@ class PagesController extends Controller
 			JOIN $revisionTable on page_id = rev_page
 			WHERE  $whereRev  AND rev_parent_id = '0'  $namespaceConditionRev  $redirectCondition
 			)
-			
+
 			UNION
-			
+
 			(SELECT  a.ar_namespace as namespace, 'arc' as type, a.ar_title as page_title, '0' as page_is_redirect, min(a.ar_timestamp) as timestamp , a.ar_user as rev_user, a.ar_user_text as rev_user_text
 			FROM $archiveTable a
-			JOIN 
+			JOIN
 			 (
 			  Select b.ar_namespace, b.ar_title
 			  FROM $archiveTable as b
 			  LEFT JOIN $logTable on log_namespace = b.ar_namespace and log_title = b.ar_title  and log_user = b.ar_user and (log_action = 'move' or log_action = 'move_redir')
 			  WHERE  $whereArc AND b.ar_parent_id = '0' $namespaceConditionArc and log_action is null
-			 ) AS c on c.ar_namespace= a.ar_namespace and c.ar_title = a.ar_title 
+			 ) AS c on c.ar_namespace= a.ar_namespace and c.ar_title = a.ar_title
 			GROUP BY a.ar_namespace, a.ar_title
 			HAVING  $having
 			)
@@ -210,7 +210,7 @@ class PagesController extends Controller
             krsort($pagesArray[$key]);
         }
 
-        // Retrieving the namespaces, using the Apihelper class
+        // Retrieving the namespaces, using the ApiHelper class
         $api = $this->get("app.api_helper");
         $namespaces = $api->namespaces($url);
 

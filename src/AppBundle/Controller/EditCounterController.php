@@ -45,7 +45,7 @@ class EditCounterController extends Controller
             'project' => $project,
         ]);
     }
-    
+
     /**
      * @Route("/ec/{project}/{username}", name="EditCounterResult")
      */
@@ -77,7 +77,7 @@ class EditCounterController extends Controller
 			(SELECT 'first_rev' as source, rev_timestamp FROM $dbName.`revision_userindex` WHERE rev_user_text = :username ORDER BY rev_timestamp ASC LIMIT 1)
 			UNION
 			(SELECT 'latest_rev' as source, rev_timestamp FROM $dbName.`revision_userindex` WHERE rev_user_text = :username ORDER BY rev_timestamp DESC LIMIT 1)
-			UNION 
+			UNION
 			SELECT 'rev_24h' as source, COUNT(*) as value FROM $dbName.revision_userindex WHERE rev_user_text = :username AND rev_timestamp >= DATE_SUB(NOW(),INTERVAL 24 HOUR)
 			UNION
 			SELECT 'rev_7d' as source, COUNT(*) as value FROM $dbName.revision_userindex WHERE rev_user_text = :username AND rev_timestamp >= DATE_SUB(NOW(),INTERVAL 7 DAY)
@@ -180,7 +180,7 @@ class EditCounterController extends Controller
             $latest_rev = "----";
         }
 
-        // Retrieving the global groups, using the Apihelper class
+        // Retrieving the global groups, using the ApiHelper class
         $api = $this->get("app.api_helper");
         $globalGroups = $api->globalGroups($url, $username);
 
@@ -195,7 +195,7 @@ class EditCounterController extends Controller
 			UNION
 			SELECT 'pages-created-archive' as source, COUNT(*) as value from $dbName.`archive_userindex` where ar_user_text=:username and ar_parent_id=0
 			UNION
-			SELECT 'pages-moved' as source, count(*) as value from $dbName.`logging` where log_type='move' and log_action='move' and log_user_text=:username 
+			SELECT 'pages-moved' as source, count(*) as value from $dbName.`logging` where log_type='move' and log_action='move' and log_user_text=:username
             ");
 
         $resultQuery->bindParam("username", $username);
@@ -234,27 +234,27 @@ class EditCounterController extends Controller
         // -------------------------
         // TODO: Turn into single query - not using UNION
         $resultQuery = $conn->prepare("
-        SELECT 'pages-thanked' as source, count(*) as value from $dbName.`logging` where log_type='thank' and log_action='thank' and log_user_text=:username 
+        SELECT 'pages-thanked' as source, count(*) as value from $dbName.`logging` where log_type='thank' and log_action='thank' and log_user_text=:username
         UNION
-        SELECT 'pages-approved' as source, count(*) as value from $dbName.`logging` where log_type='review' and log_action='approve' and log_user_text=:username 
+        SELECT 'pages-approved' as source, count(*) as value from $dbName.`logging` where log_type='review' and log_action='approve' and log_user_text=:username
         UNION
-        SELECT 'pages-patrolled' as source, count(*) as value from $dbName.`logging` where log_type='patrol' and log_action='patrol' and log_user_text=:username 
+        SELECT 'pages-patrolled' as source, count(*) as value from $dbName.`logging` where log_type='patrol' and log_action='patrol' and log_user_text=:username
         UNION
-        SELECT 'users-blocked' as source, count(*) as value from $dbName.`logging` where log_type='block' and log_action='block' and log_user_text=:username 
+        SELECT 'users-blocked' as source, count(*) as value from $dbName.`logging` where log_type='block' and log_action='block' and log_user_text=:username
         UNION
-        SELECT 'users-unblocked' as source, count(*) as value from $dbName.`logging` where log_type='block' and log_action='unblock' and log_user_text=:username 
+        SELECT 'users-unblocked' as source, count(*) as value from $dbName.`logging` where log_type='block' and log_action='unblock' and log_user_text=:username
         UNION
-        SELECT 'pages-protected' as source, count(*) as value from $dbName.`logging` where log_type='protect' and log_action='protect' and log_user_text=:username 
+        SELECT 'pages-protected' as source, count(*) as value from $dbName.`logging` where log_type='protect' and log_action='protect' and log_user_text=:username
         UNION
-        SELECT 'pages-unprotected' as source, count(*) as value from $dbName.`logging` where log_type='protect' and log_action='unprotect' and log_user_text=:username 
+        SELECT 'pages-unprotected' as source, count(*) as value from $dbName.`logging` where log_type='protect' and log_action='unprotect' and log_user_text=:username
         UNION
-        SELECT 'pages-deleted' as source, count(*) as value from $dbName.`logging` where log_type='delete' and log_action='delete' and log_user_text=:username 
+        SELECT 'pages-deleted' as source, count(*) as value from $dbName.`logging` where log_type='delete' and log_action='delete' and log_user_text=:username
         UNION
-        SELECT 'pages-deleted-revision' as source, count(*) as value from $dbName.`logging` where log_type='delete' and log_action='revision' and log_user_text=:username 
+        SELECT 'pages-deleted-revision' as source, count(*) as value from $dbName.`logging` where log_type='delete' and log_action='revision' and log_user_text=:username
         UNION
-        SELECT 'pages-restored' as source, count(*) as value from $dbName.`logging` where log_type='delete' and log_action='restore' and log_user_text=:username 
+        SELECT 'pages-restored' as source, count(*) as value from $dbName.`logging` where log_type='delete' and log_action='restore' and log_user_text=:username
         UNION
-        SELECT 'pages-imported' as source, count(*) as value from $dbName.`logging` where log_type='import' and log_action='import' and log_user_text=:username 
+        SELECT 'pages-imported' as source, count(*) as value from $dbName.`logging` where log_type='import' and log_action='import' and log_user_text=:username
         ");
 
         $resultQuery->bindParam("username", $username);
@@ -471,7 +471,7 @@ WHERE r.rev_user = :id GROUP BY page_namespace");
             /*for($i = 0; $i < (sizeof($namespaceArray) + 1); $i++) {
                 $namespaceArray[$i]['pct'] = ($namespaceArray[$i]['num'] / 100);
             }*/
-            
+
         }
 
 
@@ -503,7 +503,7 @@ WHERE r.rev_user = :id GROUP BY page_namespace");
 
 
 
-        // Retrieving the namespaces, using the Apihelper class
+        // Retrieving the namespaces, using the ApiHelper class
         $api = $this->get("app.api_helper");
         $namespaces = $api->namespaces($url);
 
