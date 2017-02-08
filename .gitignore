@@ -15,6 +15,7 @@
 !var/SymfonyRequirements.php
 /vendor/
 /web/bundles/
+/web/config.php
 ~
 
 .idea/
@@ -22,3 +23,5 @@
 /docs/_build
 /app/config/multisite.yml
 composer.lock
+*.swp
+.DS_Store
