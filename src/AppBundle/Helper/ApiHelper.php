@@ -3,7 +3,7 @@
 namespace AppBundle\Helper;
 
 
-class apiHelper
+class ApiHelper
 {
     private $curlChannel;
 

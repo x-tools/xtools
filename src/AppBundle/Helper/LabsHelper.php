@@ -12,7 +12,7 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class labsHelper
+class LabsHelper
 {
     private $container;
 

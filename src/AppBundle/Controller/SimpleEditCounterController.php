@@ -61,7 +61,7 @@ class SimpleEditCounterController extends Controller
         $dbName = $dbValues["dbName"];
         $wikiName = $dbValues["wikiName"];
         $url = $dbValues["url"];
-        
+
         $userTable = $lh->getTable("user", $dbName);
         $archiveTable = $lh->getTable("archive", $dbName);
         $revisionTable = $lh->getTable("revision", $dbName);
@@ -135,7 +135,7 @@ class SimpleEditCounterController extends Controller
         $globalGroups = "";
 
         if (boolval($this->getParameter("app.single_wiki"))) {
-            // Retrieving the global groups, using the Apihelper class
+            // Retrieving the global groups, using the ApiHelper class
             $api = $this->get("app.api_helper");
             $globalGroups = $api->globalGroups($url, $username);
         }

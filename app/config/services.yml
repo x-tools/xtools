@@ -14,12 +14,12 @@ services:
         tags:
             - { name: twig.extension }
     app.api_helper:
-        class: AppBundle\Helper\apiHelper
+        class: AppBundle\Helper\ApiHelper
         public: true
         tags:
           - {name: api.helper}
     app.labs_helper:
-        class: AppBundle\Helper\labsHelper
+        class: AppBundle\Helper\LabsHelper
         arguments: ["@service_container"]
         public: true
         tags:
