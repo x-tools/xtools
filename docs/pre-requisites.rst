@@ -3,7 +3,7 @@ Pre-requisites
 
 Xtools requires the following to run:
 
-- A recent version of Linux (Windows servers are not supported).
+- A recent version of Linux (Windows servers are supported, however; you must enable the ``app.load_stylesheets_from_cdn`` if you want it to look nice).
 - PHP 5.5.9+ (not tested on PHP7)
 
   - JSON must be enabled.
@@ -13,8 +13,6 @@ Xtools requires the following to run:
   - Curl must be enabled.
 
 - Composer 1.0.0+
-
-Xtools must be run in the server root, running in a sub-directory is not supported.
 
 Databases
 ---------
