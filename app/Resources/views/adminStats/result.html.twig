@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    <div class="panel-body xt-panel-body-top"  >
+        <p>
+        <table class="table-condensed xt-table" style="text-align:left">
+            <tr><td>Starting date:</td><td>Nov 1, 2016, 12:00 AM &middot; (100 days)</td></tr>
+            <tr><td>Log types:</td><td>delete, block, protect, import, rights</td></tr>
+            <tr><td>Current Admins (grp):</td><td><a href="//en.wikipedia.org/w/index.php?title=Special:ListUsers&group=sysop&creationSort=1&limit=50" >455</a></td></tr>
+            <tr><td>Admins without action:</td><td>240 (8.9%)</td></tr>
+        </table>
+        </p>
+        <br />
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4  class="topcaption" >Summary <span class="showhide" onclick="javascript:switchShow( 'generalstats', this )">[{{ msg("hide") }}]</span></h4>
+            </div>
+            <div class="panel-body" id="generalstats">
+                <table class="table-striped table-condensed table-hover sortable xt-table">
+
+                    <tr>
+                        <th>#</th>
+                        <th>{{ msg("username") }}</th>
+                        <th>{{ msg("group") }}</th>
+                        <th>{{ msg("link") }}</th>
+                        <th>{{ msg("total") }}</th>
+                        <th>{{ msg("delete") }}</th>
+                        <th>{{ msg("restore") }}</th>
+                        <th>{{ msg("block") }}</th>
+                        <th>{{ msg("unblock") }}</th>
+                        <th>{{ msg("protect") }}</th>
+                        <th>{{ msg("unprotect") }}</th>
+                        <th>{{ msg("import") }}</th>
+                        <th>{{ msg("rights") }}</th>
+                    </tr>
+
+
+                {% for username,value in users %}
+                    <tr>
+                        <td>{{ loop.index }}.</td>
+                        <td style="max-width:150px;"><a style="max-width:120px;" href="{{ linkWiki(url, "User:"~username) }}">{{ username }}</a></td>
+                        <td>{{ value.group }}</td>
+                        <td style="white-space:nowrap;">
+                            <a title="Edit Counter" href="{{ link("/ec/"~project~"/"~username) }}" >ec</a> &middot;
+                            {% if isWMFLabs() %}<a title="Global User Contributions" href="//tools.wmflabs.org/guc/?user={{ username|e }}" >guc</a> &middot;{% endif %}
+                            <a title="Log" href="//en.wikipedia.org/w/index.php?title=Special:Log&user=ProcseeBot " >log</a>
+                        </td>
+                        <td class="tdnum" >{{ value.total }}</td>
+                        <td class="tdnum" >{{ value.delete }}</td>
+                        <td class="tdnum" >{{ value.restore }}</td>
+                        <td class="tdnum" >{{ value.block }}</td>
+                        <td class="tdnum" >{{ value.unblock }}</td>
+                        <td class="tdnum" >{{ value.protect }}</td>
+                        <td class="tdnum" >{{ value.unprotect }}</td>
+                        <td class="tdnum" >{{ value.import }}</td>
+                        <td class="tdnum" >{{ value.rights }}</td>
+                    </tr>
+                    {% endfor %}
+
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
