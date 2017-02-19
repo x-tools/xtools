@@ -1,0 +1,58 @@
+# This file is a "template" of what your parameters.yml file should look like
+# Set parameters here that may be different on each deployment target of the app, e.g. development, staging, production.
+# http://symfony.com/doc/current/best_practices/configuration.html#infrastructure-related-configuration
+parameters:
+    database_host:              127.0.0.1
+    database_port:              ~
+    database_name:              symfony
+    database_user:              root
+    database_password:          ~
+    database_replica_host:      127.0.0.1
+    database_replica_port:      ~
+    database_replica_name:      enwiki
+    database_replica_user:      root
+    database_replica_password:  ~
+    database_meta_name:         meta_p
+
+    wiki_url:                   http://en.wikipedia.org
+
+    mailer_transport:  smtp
+    mailer_host:       127.0.0.1
+    mailer_user:       ~
+    mailer_password:   ~
+
+    # A secret key that's used to generate certain security-related tokens
+    secret:            ThisTokenIsNotSoSecretChangeIt
+
+    # Code for the display of the notice.  noticeDisplay is bool, display or not. noticeStyle is one of "error,"
+    # "warning," "succeess," "info."  noticeText contains the message shown to the user.
+    app.noticeDisplay: false
+    app.noticeStyle:   ""
+    app.noticeText:    ""
+
+    app.is_labs: 0
+
+    app.load_stylesheets_from_cdn: 0
+
+    app.single_wiki: 1
+
+    app.replag_threshold: 30
+
+    # Enabling or disabling of individual tools
+    enable.ec: 1
+    enable.articleinfo: 1
+    enable.pages: 1
+    enable.topedits: 1
+    enable.rangecontribs: 1
+    enable.blame: 1
+    enable.autoedits: 1
+    enable.autoblock: 1
+    enable.adminstats: 1
+    enable.adminscore: 1
+    enable.rfa: 1
+    enable.rfap: 1
+    enable.bash: 1
+    enable.sc: 1
+
+    # Leave blank if xTools is installed in the root directory
+    app.base_path:

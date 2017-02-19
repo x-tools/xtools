@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="{{ lang() }}"{% if isRTL() %} dir="rtl"{% endif %}>
+<head>
+    <title>{% if title is defined%}{{ msg(title) }} - {% endif %}{{ msg("title_xtools") }}</title>
+
+    {% if loadStylesheetsFromCDN() %}
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"
+              integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.1.0.min.js"
+                integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+                crossorigin="anonymous"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.0/Chart.min.js"></script>
+    {% else %}
+        <link rel="stylesheet" type="text/css" href="{{ asset("bootstrap/css/bootstrap.min.css") }}">
+        <script type="text/javascript" src="{{ asset("res/jquery.min.js") }}"></script>
+        <script type="text/javascript" src="{{ asset("bootstrap/js/bootstrap.min.js") }}"></script>
+        <script type="text/javascript" src="{{ asset("chartjs/Chart.min.js") }}"></script>
+    {% endif %}
+
+    <script type="text/javascript" src="{{ asset("res/sortable.js") }}"></script>
+
+    <link rel="stylesheet" type="text/css" href="{{ asset("res/stylenew.css") }}" />
+
+    <link rel="shortcut icon" href="/favicon.ico?v=3" />
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script type="text/javascript">
+        function switchShow( id, elmnt ) {
+            var ff = document.getElementById(id);
+            if( ff.style.display == "none" || ff.style.display == undefined ) {
+                ff.style.display = "block";
+                if(elmnt && id != 'xt-notifications') elmnt.innerHTML = '[{{ msg("hide") }}]';
+            }
+            else{
+                ff.style.display = "none";
+                if(elmnt && id != 'xt-notifications') elmnt.innerHTML = '[{{ msg("show") }}]';
+            }
+        }
+    </script>
+
+</head>
+
+<body>
+
+<header class="navbar navbar-default navbar-top" role="navigation" style="min-height:40px;">
+    <div class="container-fluid">
+        <div class="navbar-collapse collapse" style="padding-top:5px;">
+            {% if isWMFLabs() %}
+            <ul class="list-inline pull-right">
+                <li><span class="login" ><a href="https://tools.wmflabs.org/xtools/oauthredirector.php?action=login&amp;callto=https://www.mediawiki.org/w/api.php&amp;returnto=https://tools.wmflabs.org/xtools-ec/" >{{ msg("login") }}</a></span></li>
+            </ul>
+            {% endif %}
+            {% if exception is not defined %}
+            <div class="dropdown">
+                <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">{{ langName() }}
+                    <span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                    {% for key, value in allLangs() %}
+                        <li>
+                            <a class="lang-link" href="{{ link(path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'uselang': key}))) }}" data-lang="{{ key }}">{{ value|e }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+        <nav class="top-nav navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-left">
+                <li{% if page is defined and page=="index" %} class="active"{% endif %} ><a href="{{ link("/") }}">{{ msg("title_xtools") }}</a></li>
+
+                {% for tool in tools() %}
+                    {% if enabled(tool) %}<li{% if page is defined and page==tool %} class="active"{% endif %} ><a href="{{ link("/"~tool) }}">{{ msg("tool_" ~ tool) }}</a></li>{% endif %}
+                {% endfor %}
+            </ul>
+        </nav>
+    </div>
+</header>
+
+{% if noticeDisplay is defined and noticeDisplay == true %}
+<div class="container-fluid" style="margin-top: -10px;margin-bottom:10px;">
+    <p class='alert {% if noticeStyle is defined %}alert-{{ noticeStyle }}{% else %}alert-danger{% endif %} xt-alert'>
+        {% if noticeText is defined %}{{ msgPrintExists(noticeText) }}
+        {% else %}No notice has been defined but the notice has been turned on.  Poke a maintainer to fix this.
+        {% endif %}
+    </p>
+</div>
+{% endif %}
+
+{% if app.session.flashBag.peek('notice') %}
+    <div class="container-fluid" style="margin-top: -10px;margin-bottom:10px;">
+        {% for flash_message in app.session.flashBag.get('notice') %}
+        <p class="alert alert-danger xt-alert">
+            {{ msgPrintExists(flash_message) }}
+        </p>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% set replagValue = replag() %}
+{% if replagValue > getReplagThreshold() %}
+    <p class="alert alert-danger xt-alert">
+    {{ msgPrintExists("highreplag", [replagValue ~ " " ~ msg("seconds", [replagValue])]) }}
+        </p>
+{% endif %}
+
+<main class="container-fluid" id="content">
+    {# if pageTitle is defined %}<h3 style="width:100%; margin-bottom: 0.4em; margin-left:auto; margin-right:auto">{{ pageTitle }}{% if subtitle is defined %}<small style="color:inherit"> &nbsp;&bull;&nbsp; {{ subtitle }}</small>{% endif %}</h3>{% endif #}
+    {% if pageTitle is defined %}<h2 style="width: 80%; margin-bottom: .5em; margin-left:auto; margin-right:auto">{{ msg(pageTitle) }}{% if subtitle is defined %}<small> &nbsp;&bull;&nbsp; {{ msg(subtitle) }}</small>{% endif %}</h2>{% endif %}
+    <!--hr / -->
+    {% block body %}
+    {% endblock %}
+</main>
+<footer class="app-footer container-fluid">
+    <span><small><span>{{ msg("executed", [request_time()]) }}</span> &middot; <span>{{ msg("memory", [memory_usage()]) }}</span></small></span>
+    </div>
+    <hr style="margin:5px 10px;" />
+    <div class="row">
+        <div class="col">
+            <span>&copy; 2008-{{ year() }} &middot; <a href="{{ link("/about") }}">About these tools</a>  &middot; v.{{ version }} &middot; <a href="http://github.com/x-tools/xtools-rebirth/tree/{{ hash() }}" target="_blank">r.{{ shortHash() }}</a> </span><br />
+            <span>{{ msg_footer() }}</span>
+        </div>
+        <div class="col pull-right">
+            <a style="margin-right:5px;" href="//translatewiki.net/?setlang=en "><img height="36px" src="//upload.wikimedia.org/wikipedia/commons/5/51/Translatewiki.net_logo.svg" alt="translatewiki.net logo"/></a>
+            <a href="//tools.wmflabs.org"><img height="40px" src="//tools.wmflabs.org/xtools/static/images/labs.png" alt="Powered by WMF Labs" /></a>
+        </div>
+    </div>
+</footer>
+<br />
+<br />
+
+<script>
+    if (window.sortables_init) sortables_init();
+</script>
+
+</body>
+</html>

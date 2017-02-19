@@ -1,0 +1,140 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="panel panel-primary" style="text-align:center">
+        <div class="panel-heading">
+            <p class="xt-heading-top" >
+                <a href="{{ linkWiki(url, "User:"~username) }}">{{ username }}</a>
+                <small><span style="padding-left:10px;" > &bull;&nbsp; {{ project }} </span></small>
+            </p>
+        </div>
+        <div class="panel-body xt-panel-body-top" >
+            <p>
+                <a href="{{ linkWikiScript(url, "title=Special:Log&type=block&user=&page=User%3A"~username~"&year=&month=-1&tagfilter=") }}" >{{ msg("block_log") }}</a> &middot;
+                <a href="{{ link("/ec/"~project~"/"~username) }}" >Edit Counter</a>
+                {% if isWMFLabs() %} &middot;
+                <a href="//tools.wmflabs.org/guc/?user={{ username }}" >Global user contributions</a>
+                {% endif %}
+            </p>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4>Namespace Totals <span class="showhide" onclick="javascript:switchShow( 'nstotals', this )">[hide]</span></h4>
+                </div>
+                <div class="panel-body" id="nstotals">
+                    <p style="margin-top: 0px;" >
+                    <table class="table-condensed xt-table">
+                        <tr><td>Namespace:</td><td>all</td></tr>
+                        <tr><td>Redirects:</td><td>Include redirects and non-redirects</td></tr>
+                    </table>
+                    </p>
+                    <table>
+                        <tr>
+                            <td>
+                                <table class="leantable table-condensed xt-table"  >
+                                    <tr>
+                                        <th>Namespace</th>
+                                        <th>Pages</th>
+                                        <th style="padding_left:5px">Redirects</th>
+                                        <th style="padding_left:5px">Deleted</th>
+                                    </tr>
+
+                                    {% for key,value in count %}
+                                    <tr>
+                                        <td style="padding-right:10px">
+                                            <span class=legendicon style="background-color:{{ color(key) }}"> </span>
+                                            <a href="#{{ key }}" >{{ namespaces[key] }}</a>
+                                        </td>
+                                        <td class=tdnum >
+                                            {% if value.total is defined %}
+                                                {{ value.total }}
+                                            {% else %}
+                                                0
+                                            {% endif %}
+                                        </td>
+                                        <td class=tdnum >
+                                            {% if value.redirect is defined %}
+                                                {{ value.redirect }}
+                                            {% else %}
+                                                0
+                                            {% endif %}
+                                        </td>
+                                        <td class=tdnum >
+                                            {% if value.deleted is defined %}
+                                                {{ value.deleted }}
+                                            {% else %}
+                                                0
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+
+
+                                    <tr>
+                                        <td style="border-top:3px double silver;" ></td>
+                                        <td class=tdnum style="border-top:3px double silver" ><strong>{{ total }}</strong></td>
+                                        <td class=tdnum style="border-top:3px double silver" >{{ redirectTotal }}</td>
+                                        <td class=tdnum style="border-top:3px double silver" >{{ deletedTotal }}</td>
+                                    </tr>
+
+                                </table>
+                            </td>
+                            <td style="padding-left:50px;">
+                                <canvas id="pie_chart" width="400" height="400"></canvas>
+                            </td>
+                        </tr>
+                    </table>
+                    <br />
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4>Pages created <span class="showhide" onclick="javascript:switchShow( 'pagescreated', this )">[hide]</span></h4>
+                </div>
+                <div class="panel-body" id="pagescreated">
+                    <table class="table-condensed xt-table" >
+
+                        {% for key in pages|keys %}
+                            <tr ><td colspan=22 ><h3 id={{ key }} >{#{ key }}: #}{{ namespaces[key] }}</h3></td></tr>
+                            {% for date,value in pages[key] %}
+
+                                <tr>
+                                    <td>{{ loop.index }}.</td>
+                                    {% if key == 0 %}
+                                        {% set pagename = value['page_title']|e %}
+                                    {% else %}
+                                        {% set pagename = namespaces[key]~":"~value["page_title"] %}
+                                    {% endif %}
+                                    <td style='max-width:50%; white-space:wrap; word-wrap:break-word' ><a href="{{ linkWiki(url, pagename, "redirect=no")}}" >{{ value['page_title'] }}</a>{% if value["page_is_redirect"] %}<small class="text-warning"> &middot; ({{ msg("redirect") }})</small>{% endif %}{% if value["type"] == "arc" %}<small class="text-danger"> &middot; ({{ msg("deleted") }})</small> {% endif %} </td>
+                                    <td style='white-space: nowrap; font-size:95%; padding-right:10px;' >{{ value["human_time"] }}</td>
+                                    <td style='white-space: nowrap' ><a href="{{ linkWikiScript(url, "title=Special:Log&type=&page="~pagename)}}" ><small>{{ msg("log") }}</small></a> &middot; </td>
+                                    <td style='white-space: nowrap' ><a href="{{ link("/aricleinfo/"~project~"/"~pagename) }}" ><small>{{ msg("page_history") }}</small></a> &middot; </td>
+                                    <td style='white-space: nowrap' ><a href="{{ link("/topedits/"~project~"/"~username~"/"~namespaces[key]~"/"~pagename) }}" ><small>{{ msg("top_edits") }}</small></a></td>
+
+                                </tr>
+                            {% endfor %}
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+    <script>
+        var ctx = document.getElementById("pie_chart");
+        var myChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+        {% set first = 1 %}
+                labels: [{% for key,value in count %}{% if not first %},{% endif %}"{{ namespaces[key] }}"{% set first = 0 %}{% endfor %}],
+                datasets: [{
+                    {% set first = 1 %}
+                    data: [{% for value in count %}{% if not first %},{% endif %}{% if value.total is defined %}{{ value.total }}{% else %}0{% endif %}{% set first = 0 %}{% endfor %}],
+                    {% set first = 1 %}
+                    backgroundColor: [{% for key,value in count %}{% if not first %},{% endif %}'{{ color(key) }}'{% set first = 0 %}{% endfor %}],
+                    {% set first = 1 %}
+                    borderColor: [{% for key,value in count %}{% if not first %},{% endif %}'{{ color(key) }}'{% set first = 0 %}{% endfor %}],
+                    borderWidth: 1
+                }]
+            }
+        });
+    </script>
+{% endblock %}

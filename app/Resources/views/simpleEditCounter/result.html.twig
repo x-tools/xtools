@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <table class="leantable table-condensed xt-table" >
+        <tr><td>{{ msg("username") }}: </td><td><a href="{{ linkWiki(url, "User:"~username) }}" >{{ username }} @ {{ project }}</a></td></tr>
+        <tr><td>{{ msg("userid") }}: </td><td>{{ id }}</td></tr>
+        <tr><td>{{ msg("groups") }}: </td><td>{{ groups }}
+        {% if globalGroups is defined and globalGroups|length > 0 %}<br />
+                &bull; {{ msg("global") }}:
+                {% for group in globalGroups %}
+                    {{ group }}
+                {% endfor %}
+                {% endif %}
+        </td></tr>
+        <tr><td>{{ msg("deleted_edits") }}: </td><td>{{ arch }}</td></tr>
+        <tr><td>{{ msg("live") }}: </td><td>{{ live }}</td></tr>
+        <tr><td>{{ msg("total") }}: </td><td><b>{{ rev }}</b></td></tr>
+    </table>
+{% endblock %}

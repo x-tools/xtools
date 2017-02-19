@@ -1,0 +1,16 @@
+parameters:
+  tools:
+    ec: ec
+    articleinfo: articleinfo
+    pages: pages
+    topedits: topedits
+    rangecontribs: rangecontribs
+    blame: blame
+    autoedits: autoedits
+    autoblock: autoblock
+    adminstats: adminstats
+    adminscore: adminscore
+    rfa: rfa
+    rfap: rfap
+    bash: bash
+    sc: sc
