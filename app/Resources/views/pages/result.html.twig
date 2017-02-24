@@ -4,16 +4,16 @@
     <div class="panel panel-primary" style="text-align:center">
         <div class="panel-heading">
             <p class="xt-heading-top" >
-                <a href="{{ linkWiki(url, "User:"~username) }}">{{ username }}</a>
+                <a href="{{ linkWiki(url, "User:"~username) }}" target="_blank">{{ username }}</a>
                 <small><span style="padding-left:10px;" > &bull;&nbsp; {{ project }} </span></small>
             </p>
         </div>
         <div class="panel-body xt-panel-body-top" >
             <p>
-                <a href="{{ linkWikiScript(url, "title=Special:Log&type=block&user=&page=User%3A"~username~"&year=&month=-1&tagfilter=") }}" >{{ msg("block_log") }}</a> &middot;
+                <a href="{{ linkWikiScript(url, "title=Special:Log&type=block&user=&page=User%3A"~username~"&year=&month=-1&tagfilter=") }}" target="_blank">{{ msg("block_log") }}</a> &middot;
                 <a href="{{ link("/ec/"~project~"/"~username) }}" >Edit Counter</a>
                 {% if isWMFLabs() %} &middot;
-                <a href="//tools.wmflabs.org/guc/?user={{ username }}" >Global user contributions</a>
+                <a href="//tools.wmflabs.org/guc/?user={{ username }}" target="_blank">Global user contributions</a>
                 {% endif %}
             </p>
 
@@ -106,10 +106,10 @@
                                     {% else %}
                                         {% set pagename = namespaces[key]~":"~value["page_title"] %}
                                     {% endif %}
-                                    <td style='max-width:50%; white-space:wrap; word-wrap:break-word' ><a href="{{ linkWiki(url, pagename, "redirect=no")}}" >{{ value['page_title'] }}</a>{% if value["page_is_redirect"] %}<small class="text-warning"> &middot; ({{ msg("redirect") }})</small>{% endif %}{% if value["type"] == "arc" %}<small class="text-danger"> &middot; ({{ msg("deleted") }})</small> {% endif %} </td>
+                                    <td style='max-width:50%; white-space:wrap; word-wrap:break-word' ><a href="{{ linkWiki(url, pagename, "redirect=no")}}" target="_blank">{{ value['page_title'] }}</a>{% if value["page_is_redirect"] %}<small class="text-warning"> &middot; ({{ msg("redirect") }})</small>{% endif %}{% if value["type"] == "arc" %}<small class="text-danger"> &middot; ({{ msg("deleted") }})</small> {% endif %} </td>
                                     <td style='white-space: nowrap; font-size:95%; padding-right:10px;' >{{ value["human_time"] }}</td>
-                                    <td style='white-space: nowrap' ><a href="{{ linkWikiScript(url, "title=Special:Log&type=&page="~pagename)}}" ><small>{{ msg("log") }}</small></a> &middot; </td>
-                                    <td style='white-space: nowrap' ><a href="{{ link("/aricleinfo/"~project~"/"~pagename) }}" ><small>{{ msg("page_history") }}</small></a> &middot; </td>
+                                    <td style='white-space: nowrap' ><a href="{{ linkWikiScript(url, "title=Special:Log&type=&page="~pagename)}}" target="_blank"><small>{{ msg("log") }}</small></a> &middot; </td>
+                                    <td style='white-space: nowrap' ><a href="{{ link("/aricleinfo/"~project~"/"~pagename) }}"><small>{{ msg("page_history") }}</small></a> &middot; </td>
                                     <td style='white-space: nowrap' ><a href="{{ link("/topedits/"~project~"/"~username~"/"~namespaces[key]~"/"~pagename) }}" ><small>{{ msg("top_edits") }}</small></a></td>
 
                                 </tr>
