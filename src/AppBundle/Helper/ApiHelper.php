@@ -3,89 +3,89 @@
 namespace AppBundle\Helper;
 
 
+use \Mediawiki\Api\MediawikiApi;
+use Mediawiki\Api\SimpleRequest;
+use GuzzleHttp;
+use Symfony\Component\Config\Definition\Exception\Exception;
+
 class ApiHelper
 {
-    private $curlChannel;
+    private $api;
 
-    private function curl($url, $timeout = 90)
-    {
-        if ( !$this->curlChannel )
-        {
-            $ch = $this->curlChannel = curl_init();
-            curl_setopt($ch, CURLOPT_USERAGENT, "Xtools" ); //TODO: Turn into config option
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    private function setUp($host) {
+        if (!isset($this->api)) {
+            $this->api = MediawikiApi::newFromApiEndpoint( "$host/api.php" );
         }
 
-        $ch = $this->curlChannel;
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT , $timeout);
-
-        if (curl_error($ch) !== "")
-        {
-            return false;
-        }
-
-        return curl_exec($ch);
-    }
-
-    public function __construct()
-    {
-        $ch = $this->curlChannel = curl_init();
-        curl_setopt($ch, CURLOPT_USERAGENT, "Xtools" ); // TODO: Turn into config option
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     }
 
     public function groups($host, $username)
     {
-        $array = $this->curl("$host/w/api.php?action=query&list=users&ususers=$username&usprop=groups&format=json");
+        $this->setUp($host);
+        $query = new SimpleRequest('query', ["list"=>"users", "ususers"=>$username, "usprop"=>"groups"]);
+        $result = [];
 
-        dump($array);
+        try{
+            $res = $this->api->getRequest( $query );
+            if (isset($res["batchcomplete"]) && isset($res["query"]["users"][0]["groups"])) {
+                $result = $res["query"]["users"][0]["groups"];
+            }
+        }
+        catch ( Exception $e ) {
+            // The api returned an error!  Ignore
+        }
+
+        return $result;
     }
 
     public function globalGroups($host, $username)
     {
-        $retVal = [];
+        $this->setUp($host);
+        $query = new SimpleRequest('query', ["meta"=>"globaluserinfo", "guiuser"=>$username, "guiprop"=>"groups"]);
+        $result = [];
 
-        $array = $this->curl("$host/w/api.php?action=query&meta=globaluserinfo&guiuser=$username&guiprop=groups&format=json");
-
-        if ($array === false) return $retVal;
-
-        $data = json_decode($array, true);
-
-        if (!isset($data["warnings"]) && !isset($data["error"]) && isset($data["query"]["globaluserinfo"]["groups"])) {
-            $retVal = $data["query"]["globaluserinfo"]["groups"];
+        try{
+            $res = $this->api->getRequest( $query );
+            if (isset($res["batchcomplete"]) && isset($res["query"]["globaluserinfo"]["groups"])) {
+                $result = $res["query"]["globaluserinfo"]["groups"];
+            }
+        }
+        catch ( Exception $e ) {
+            // The api returned an error!  Ignore
         }
 
-        return $retVal;
+        return $result;
 
     }
 
     public function namespaces($host)
     {
-        $retVal = [];
+        $this->setUp($host);
+        $query = new SimpleRequest('query', ["meta"=>"siteinfo", "siprop"=>"namespaces"]);
+        $result = [];
 
-        $array = $this->curl("$host/w/api.php?action=query&meta=siteinfo&siprop=namespaces&format=json");
+        try{
+            $res = $this->api->getRequest( $query );
+            if (isset($res["batchcomplete"]) && isset($res["query"]["namespaces"])) {
+                foreach ($res["query"]["namespaces"] as $row) {
+                    if($row["id"] < 0) {continue;}
 
-        if ($array === false || $array === null) return $retVal;
+                    if (isset($row["name"])) {$name = $row["name"];}
+                    elseif (isset($row["*"])) {$name = $row["*"];}
+                    else {continue;}
 
-        $data = json_decode($array, true);
+                    // TODO: Figure out a way to i18n-ize this
+                    if($name === "") {$name = "Article"; }
 
-        if (!isset($data["warnings"]) && !isset($data["error"]) && isset($data["query"]["namespaces"])) {
-            foreach ($data["query"]["namespaces"] as $row) {
-                if($row["id"] < 0) {continue;}
-
-                if (isset($row["name"])) {$name = $row["name"];}
-                elseif (isset($row["*"])) {$name = $row["*"];}
-                else {continue;}
-
-                // TODO: Figure out a way to i18n-ize this
-                if($name === "") {$name = "Article"; }
-
-                $retVal[$row["id"]] = $name;
+                    $result[$row["id"]] = $name;
+                }
             }
         }
+        catch ( Exception $e ) {
+            // The api returned an error!  Ignore
+        }
 
-        return $retVal;
+        return $result;
 
     }
 }
