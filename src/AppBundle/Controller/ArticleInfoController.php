@@ -22,9 +22,6 @@ class ArticleInfoController extends Controller
 
         $lh->checkEnabled("articleinfo");
 
-        $api = $this->get("app.api_helper");
-        $api->test();
-
         // Grab the request object, grab the values out of it.
         $request = Request::createFromGlobals();
 
@@ -61,7 +58,7 @@ class ArticleInfoController extends Controller
         $dbName = $dbValues["dbName"];
         $wikiName = $dbValues["wikiName"];
         $url = $dbValues["url"];
-        
+
         // replace this example code with whatever you need
         return $this->render('articleInfo/result.html.twig', array(
             'page' => "articleinfo",

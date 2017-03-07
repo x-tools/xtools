@@ -1,0 +1,101 @@
+{% macro wiki_input() %}
+<div class="input-group{% if isSingleWiki() %} hidden{% endif %} form-row">
+    <label class="input-group-addon form-label" for="project_input">
+        {{ msg("wiki") }}
+        <div class="glyphicon glyphicon-info-sign tooltipcss pull-right">
+            <div class="tooltip-body">
+                <strong>Accepted formats:</strong>
+                <code>enwiki</code> or <code>en.wikipedia</code> or
+                <span class="text-nowrap"><code>https://en.wikipedia.org</code> &hellip;</span>
+            </div>
+        </div>
+    </label>
+    <input type="text" class="form-control"
+        {% if (project is defined) and (project != "") %}value="{{ project }}"
+        {% elseif isSingleWiki() %}value="wiki"
+        {% endif %}
+        name="project"
+        id="project_input"
+        required>
+</div>
+{% endmacro %}
+
+{% macro page_input(required = true) %}
+<div class="input-group form-row">
+    <label class="input-group-addon form-label" for="article_input">
+        {{ msg("page") }}
+    </label>
+    <input type="text" class="form-control" name="article" id="article_input"{% if required %} required{% endif %}>
+    <span class="input-group-addon">
+        <label>
+            <input type="checkbox" name="nofollowredir" />
+            {{ msg("nofollowredir") }}
+        </label>
+    </span>
+</div>
+{% endmacro %}
+
+{% macro user_input(required = true, multiple = false) %}
+<div class="input-group form-row">
+    <label class="input-group-addon form-label" for="user_input">
+        {{ msg("username") }}
+        <div class="glyphicon glyphicon-info-sign tooltipcss pull-right">
+            <div class="tooltip-body">
+                {% if multiple %}
+                    <strong>Multiple users allowed (separated by pipes):</strong>
+                    <br>eg: <code>UserX|UserY|UserZ</code>
+                {% else %}
+                    Username or IPv4 or IPv6
+                {% endif %}
+            </div>
+        </div>
+    </label>
+    <input type="text" class="form-control" name="user" id="user_input"{% if required %} required{% endif %}>
+</div>
+{% endmacro %}
+
+{% macro namespace_select() %}
+<div class="input-group form-row">
+    <label class="input-group-addon form-label" for="namespace_select">
+        {{ msg("namespace") }}
+    </label>
+    <select class="form-control namespace-selector" name="namespace" id="namespace_select">
+        <option value="0">Main</option>
+        <option value="1">Talk</option>
+        <option value="2">User</option>
+        <option value="3">User talk</option>
+        <option value="4">Wikipedia</option>
+        <option value="5">Wikipedia talk</option>
+        <option value="6">File</option>
+        <option value="7">File talk</option>
+        <option value="8">MediaWiki</option>
+        <option value="9">MediaWiki talk</option>
+        <option value="10">Template</option>
+        <option value="11">Template talk</option>
+        <option value="12">Help</option>
+        <option value="13">Help talk</option>
+        <option value="14">Category</option>
+        <option value="15">Category talk</option>
+        <option value="100">Portal</option>
+        <option value="101">Portal talk</option>
+        <option value="108">Book</option>
+        <option value="109">Book talk</option>
+    </select>
+</div>
+{% endmacro %}
+
+{% macro date_input(type = 'start', required = false) %}
+<div class="input-group form-row">
+    <label class="input-group-addon form-label" for="date_{{ type }}_input">
+        {{ msg(type) }}
+        {% if type == 'end' %}
+            <span class="text-muted">({{ msg("optional") }})</span>
+        {% endif %}
+    </label>
+    <input type="date" class="form-control" name="{{ type }}" placeholder="2016-11-01"{% if required %} required{% endif %} />
+</div>
+{% endmacro %}
+
+{% macro submit_btn() %}
+<button class="btn btn-large btn-primary form-submit">{{ msg("submit") }}</button>
+{% endmacro %}

@@ -1,37 +1,12 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/forms.html.twig' as forms %}
 
 {% block body %}
-    {# Nothing here right now, soon to be a list of tools. #}
-    <form class="form-horizontal" style="width:80%; margin:0 auto" action="{{ link("/articleinfo") }}" method="get" accept-charset="utf-8" >
-        <fieldset>
-            <legend></legend>
-
-            <div class="input-group">
-                <span class="input-group-addon form-label">Page title:</span>
-                <input type="text" class="form-control" value="" name="article">
-			<span class="input-group-addon">
-        		<input type="checkbox" name="nofollowredir" /> Don't follow redirects
-      		</span>
-            </div>
-
-            <div class="input-group{% if isSingleWiki() %} hidden{% endif %}">
-                <span class="input-group-addon form-label">{{ msg("wiki") }}</span>
-                <input type="text" class="form-control"
-                       {% if (project is defined) and (project != "") %}value="{{ project }}"
-                       {% elseif isSingleWiki() %}value="wiki"
-                        {% endif %}
-                       name="project">
-			<span class="input-group-addon glyphicon glyphicon-info-sign tooltipcss"  >
-				<span>
-        			<img class="callout" src="/static/images/callout.png" />
-        			<strong>Accepted formats :</strong><br />
-        			enwiki or en.wikipedia or <br />https://de.wikipedia.org ...
-    			</span>
-			</span>
-            </div>
-
-            <br />
-            <input class="btn btn-large btn-primary" type="submit" value="Submit" />
+    <form class="col-lg-8 col-lg-offset-2" action="{{ link("/articleinfo") }}" method="get" accept-charset="utf-8" >
+        <fieldset class="form-fieldset">
+            {{ forms.page_input() }}
+            {{ forms.wiki_input() }}
         </fieldset>
+        {{ forms.submit_btn }}
     </form>
 {% endblock %}

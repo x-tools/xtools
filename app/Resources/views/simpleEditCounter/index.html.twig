@@ -1,40 +1,12 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/forms.html.twig' as forms %}
 
 {% block body %}
-    <form class="form-horizontal" style="width:80%; margin:0 auto" action="{{ link("/sc") }}" method="get" accept-charset="utf-8" >
-        <fieldset>
-            <legend></legend>
-
-            <div class="input-group">
-                <span class="input-group-addon form-label">{{ msg("username") }}</span>
-                <input type="text" class="form-control" value="" name="user">
-			<span class="input-group-addon glyphicon glyphicon-info-sign tooltipcss"  >
-				<span>
-        			<img class="callout" src="/static/images/callout.png" />
-        			Username or IPv4 or IPv6
-    			</span>
-			</span>
-            </div>
-
-            <div class="input-group{% if isSingleWiki() %} hidden{% endif %}">
-                <span class="input-group-addon form-label">{{ msg("wiki") }}</span>
-                <input type="text" class="form-control"
-                       {% if (project is defined) and (project != "") %}value="{{ project }}"
-                       {% elseif isSingleWiki() %}value="wiki"
-                        {% endif %}
-                       name="project">
-			<span class="input-group-addon glyphicon glyphicon-info-sign tooltipcss"  >
-				<span>
-        			<img class="callout" src="/static/images/callout.png" />
-        			<strong>Accepted formats :</strong><br />
-        			enwiki or en.wikipedia or <br />https://de.wikipedia.org ...
-    			</span>
-			</span>
-            </div>
-
-            <br />
-            <input class="btn btn-large btn-primary" type="submit" value="{{ msg("submit") }}" />
+    <form class="col-lg-8 col-lg-offset-2" action="{{ link("/sc") }}" method="get" accept-charset="utf-8" >
+        <fieldset class="form-fieldset">
+            {{ forms.user_input() }}
+            {{ forms.wiki_input() }}
         </fieldset>
+        {{ forms.submit_btn() }}
     </form>
-    </div><br />
 {% endblock %}
