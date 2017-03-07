@@ -81,44 +81,70 @@
     </div>
 </header>
 
-{% if noticeDisplay is defined and noticeDisplay == true %}
-<div class="container-fluid" style="margin-top: -10px;margin-bottom:10px;">
-    <p class='alert {% if noticeStyle is defined %}alert-{{ noticeStyle }}{% else %}alert-danger{% endif %} xt-alert'>
-        {% if noticeText is defined %}{{ msgPrintExists(noticeText) }}
-        {% else %}No notice has been defined but the notice has been turned on.  Poke a maintainer to fix this.
-        {% endif %}
-    </p>
-</div>
-{% endif %}
-
-{% if app.session.flashBag.peek('notice') %}
-    <div class="container-fluid" style="margin-top: -10px;margin-bottom:10px;">
-        {% for flash_message in app.session.flashBag.get('notice') %}
-        <p class="alert alert-danger xt-alert">
-            {{ msgPrintExists(flash_message) }}
+<div class="site-notice">
+    {% if noticeDisplay is defined and noticeDisplay == true %}
+    <div class="container-fluid">
+        <p class='alert {% if noticeStyle is defined %}alert-{{ noticeStyle }}{% else %}alert-danger{% endif %} xt-alert'>
+            {% if noticeText is defined %}{{ msgPrintExists(noticeText) }}
+            {% else %}No notice has been defined but the notice has been turned on. Poke a maintainer to fix this.
+            {% endif %}
         </p>
-        {% endfor %}
     </div>
-{% endif %}
+    {% endif %}
 
-{% set replagValue = replag() %}
-{% if replagValue > getReplagThreshold() %}
-    <p class="alert alert-danger xt-alert">
-    {{ msgPrintExists("highreplag", [replagValue ~ " " ~ msg("seconds", [replagValue])]) }}
+    {% if app.session.flashBag.peek('notice') %}
+        <div class="container-fluid">
+            {% for flash_message in app.session.flashBag.get('notice') %}
+            <p class="alert alert-danger xt-alert">
+                {{ msgPrintExists(flash_message) }}
+            </p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% set replagValue = replag() %}
+    {% if replagValue > getReplagThreshold() %}
+        <p class="alert alert-warning xt-alert">
+            {{ msgPrintExists("highreplag", [replagValue ~ " " ~ msg("seconds", [replagValue])]) }}
         </p>
-{% endif %}
+    {% endif %}
+</div>
 
-<main class="container-fluid" id="content">
-    {# if pageTitle is defined %}<h3 style="width:100%; margin-bottom: 0.4em; margin-left:auto; margin-right:auto">{{ pageTitle }}{% if subtitle is defined %}<small style="color:inherit"> &nbsp;&bull;&nbsp; {{ subtitle }}</small>{% endif %}</h3>{% endif #}
-    {% if pageTitle is defined %}<h2 style="width: 80%; margin-bottom: .5em; margin-left:auto; margin-right:auto">{{ msg(pageTitle) }}{% if subtitle is defined %}<small> &nbsp;&bull;&nbsp; {{ msg(subtitle) }}</small>{% endif %}</h2>{% endif %}
-    <!--hr / -->
+<div class="container-fluid" id="wrapper">
+<main id="content">
+    {% block title %}
+    <div class="col-lg-8 col-lg-offset-2">
+        {# if pageTitle is defined %}
+            <h3>
+                {{ pageTitle }}
+                {% if subtitle is defined %}
+                    <small style="color:inherit"> &nbsp;&bull;&nbsp; {{ subtitle }}</small>
+                {% endif %}
+            </h3>
+        {% endif #}
+        {% if pageTitle is defined %}
+            <h2>
+                {{ msg(pageTitle) }}
+                {% if subtitle is defined %}
+                    <small> &nbsp;&bull;&nbsp; {{ msg(subtitle) }}</small>
+                {% endif %}
+            </h2>
+        {% endif %}
+    </div>
+    {% endblock %}
+
     {% block body %}
     {% endblock %}
 </main>
+</div>
+
 <footer class="app-footer container-fluid">
-    <span><small><span>{{ msg("executed", [request_time()]) }}</span> &middot; <span>{{ msg("memory", [memory_usage()]) }}</span></small></span>
-    </div>
-    <hr style="margin:5px 10px;" />
+    <span>
+        <small>
+            <span>{{ msg("executed", [request_time()]) }}</span> &middot; <span>{{ msg("memory", [memory_usage()]) }}</span>
+        </small>
+    </span>
+    <hr>
     <div class="row">
         <div class="col">
             <span>&copy; 2008-{{ year() }} &middot; <a href="{{ link("/about") }}">About these tools</a>  &middot; v.{{ version }} &middot; <a href="http://github.com/x-tools/xtools-rebirth/tree/{{ hash() }}" target="_blank">r.{{ shortHash() }}</a> </span><br />
@@ -130,12 +156,5 @@
         </div>
     </div>
 </footer>
-<br />
-<br />
-
-<script>
-    if (window.sortables_init) sortables_init();
-</script>
-
 </body>
 </html>
