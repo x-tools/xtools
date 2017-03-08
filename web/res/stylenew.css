@@ -350,3 +350,19 @@ body::after {
     font-weight: normal;
     margin: 0;
 }
+
+.form-row > * {
+    border-radius: 0;
+}
+.form-row:first-child > *:first-child {
+    border-top-left-radius: 4px;
+}
+.form-row:first-child > *:last-child {
+    border-top-right-radius: 4px;
+}
+.form-row:last-child > *:first-child {
+    border-bottom-left-radius: 4px;
+}
+.form-row:last-child > *:last-child {
+    border-bottom-right-radius: 4px;
+}
