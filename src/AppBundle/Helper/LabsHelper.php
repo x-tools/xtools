@@ -14,7 +14,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LabsHelper
 {
+    public $dbName;
+    public $client;
     private $container;
+    private $url;
 
     public function __construct(ContainerInterface $container) {
         $this->container = $container;
@@ -35,10 +38,10 @@ class LabsHelper
         }
         else {
             // Grab the connection to the meta database
-            $conn = $this->container->get('doctrine')->getManager('meta')->getConnection();
+            $this->client = $this->container->get('doctrine')->getManager('meta')->getConnection();
 
             // Create the query we're going to run against the meta database
-            $wikiQuery = $conn->createQueryBuilder();
+            $wikiQuery = $this->client->createQueryBuilder();
             $wikiQuery
                 ->select(['dbName', 'name', 'url'])
                 ->from('wiki')
@@ -73,17 +76,32 @@ class LabsHelper
             $dbName .= '_p';
         }
 
+        $this->dbName = $dbName;
+        $this->url = $url;
+
         return ['dbName' => $dbName, 'wikiName' => $wikiName, 'url' => $url];
     }
 
-    public function getTable($table, $dbName = null) {
+    /**
+     * All mapping tables to environment-specific names, as specified in config/table_map.yml
+     * Used for example to convert revision -> revision_replica
+     * @param  string   $table  Table name
+     * @param  [string] $dbName Database name
+     * @return $string  Converted table name
+     */
+    public function getTable( $table, $dbName = null ) {
         $retVal = $table;
-        if($this->container->hasParameter("app.table.$table")) {
-            $retVal = $this->container->getParameter("app.table.$table");
+        if( $this->container->hasParameter( "app.table.$table" ) ) {
+            $retVal = $this->container->getParameter( "app.table.$table" );
         }
-        if (isset($dbName)) {
-            $retVal = "$dbName.$retVal";
+
+        // use class variable if not set via function parameter
+        $dbName = $dbName || $this->dbName;
+
+        if ( isset($dbName) ) {
+            $retVal = "$this->dbName.$retVal";
         }
+
         return $retVal;
     }
 }

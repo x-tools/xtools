@@ -13,6 +13,12 @@ services:
         public: false
         tags:
             - { name: twig.extension }
+    app.wiki_extension:
+        class: AppBundle\Twig\WikiExtension
+        arguments: ["@service_container"]
+        public: false
+        tags:
+            - { name: twig.extension }
     app.api_helper:
         class: AppBundle\Helper\ApiHelper
         public: true
@@ -24,3 +30,9 @@ services:
         public: true
         tags:
           - {name: labs.helper}
+    app.pageviews_helper:
+        class: AppBundle\Helper\PageviewsHelper
+        arguments: ["@service_container"]
+        public: true
+        tags:
+          - {name: pageviews.helper}

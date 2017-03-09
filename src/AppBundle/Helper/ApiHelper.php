@@ -2,7 +2,6 @@
 
 namespace AppBundle\Helper;
 
-
 use \Mediawiki\Api\MediawikiApi;
 use Mediawiki\Api\SimpleRequest;
 use GuzzleHttp;
@@ -12,16 +11,15 @@ class ApiHelper
 {
     private $api;
 
-    private function setUp($host) {
+    private function setUp($project) {
         if (!isset($this->api)) {
-            $this->api = MediawikiApi::newFromApiEndpoint( "$host/api.php" );
+            $this->api = MediawikiApi::newFromApiEndpoint( "$project/w/api.php" );
         }
-
     }
 
-    public function groups($host, $username)
+    public function groups($project, $username)
     {
-        $this->setUp($host);
+        $this->setUp($project);
         $query = new SimpleRequest('query', ["list"=>"users", "ususers"=>$username, "usprop"=>"groups"]);
         $result = [];
 
@@ -38,13 +36,13 @@ class ApiHelper
         return $result;
     }
 
-    public function globalGroups($host, $username)
+    public function globalGroups($project, $username)
     {
-        $this->setUp($host);
+        $this->setUp($project);
         $query = new SimpleRequest('query', ["meta"=>"globaluserinfo", "guiuser"=>$username, "guiprop"=>"groups"]);
         $result = [];
 
-        try{
+        try {
             $res = $this->api->getRequest( $query );
             if (isset($res["batchcomplete"]) && isset($res["query"]["globaluserinfo"]["groups"])) {
                 $result = $res["query"]["globaluserinfo"]["groups"];
@@ -58,13 +56,13 @@ class ApiHelper
 
     }
 
-    public function namespaces($host)
+    public function namespaces($project)
     {
-        $this->setUp($host);
+        $this->setUp($project);
         $query = new SimpleRequest('query', ["meta"=>"siteinfo", "siprop"=>"namespaces"]);
         $result = [];
 
-        try{
+        try {
             $res = $this->api->getRequest( $query );
             if (isset($res["batchcomplete"]) && isset($res["query"]["namespaces"])) {
                 foreach ($res["query"]["namespaces"] as $row) {
@@ -87,5 +85,46 @@ class ApiHelper
 
         return $result;
 
+    }
+
+    /**
+     * Get basic info about a page via the API
+     * @param  string  $project      Full domain of project (en.wikipedia.org)
+     * @param  string  $page         Page title
+     * @param  boolean $followRedir  Whether or not to resolve redirects
+     * @return array   Associative array of data
+     */
+    public function getBasicPageInfo($project, $page, $followRedir) {
+        $this->setUp( $project );
+
+        $params = [
+            'prop' => 'info|pageprops', // |extlinks', TODO: for when we start checking for dead external links
+            'inprop' => 'protection|talkid|watched|watchers|notificationtimestamp|subjectid|url|readable',
+            'converttitles' => '',
+            // 'ellimit' => 20,
+            // 'elexpandurl' => '',
+            'titles' => $page,
+            'formatversion' => 2
+            // 'pageids' => $pageIds // FIXME: allow page IDs
+        ];
+
+        if ( $followRedir ) {
+            $params['redirects'] = '';
+        }
+
+        $query = new SimpleRequest( 'query', $params );
+        $result = [];
+
+        try {
+            $res = $this->api->getRequest( $query );
+            if ( isset( $res['query']['pages'] ) ) {
+                $result = $res['query']['pages'][0];
+            }
+        }
+        catch ( Exception $e ) {
+            // The api returned an error!  Ignore
+        }
+
+        return $result;
     }
 }

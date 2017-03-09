@@ -110,7 +110,7 @@ body {
     margin: 5px;
     text-align: center;
 }
-.panel-primary > .panel-heading > p > a {
+.panel-primary > .panel-heading a {
     color: white;
 }
 .xt-panel-body-top {
@@ -365,4 +365,26 @@ body::after {
 }
 .form-row:last-child > *:last-child {
     border-bottom-right-radius: 4px;
+}
+
+.stat-list dt {
+    margin-right: 10px;
+    width: 300px;
+}
+.stat-list dt::after {
+    content: ':';
+}
+
+.diff-pos {
+    color: #006400;
+}
+.diff-pos::before {
+    color: #006400;
+    content: '+';
+}
+.diff-neg {
+    color: #8B0000;
+}
+.diff-zero {
+    color: #A2A9B1;
 }

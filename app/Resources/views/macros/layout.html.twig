@@ -1,0 +1,8 @@
+{% macro content_block(title, content, id) %}
+<section class="panel panel-default clearfix" {% if id is defined %} id={{ id }}{% endif %}>
+    <header class="panel-heading col-lg-12">
+        <h4>{{ title }}</h4>
+    </header>
+    <div class="panel-body col-lg-12">{{ content }}</div>
+</section>
+{% endmacro %}
