@@ -10,6 +10,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class PagesController extends Controller
 {
     /**
+     * @Route("/pages", name="pages")
      * @Route("/pages", name="Pages")
      * @Route("/pages/", name="PagesSlash")
      * @Route("/pages/index.php", name="PagesIndexPhp")

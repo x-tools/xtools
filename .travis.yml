@@ -22,8 +22,9 @@ before_install:
 #  - codecov
 
 script:
+    - composer validate
     - composer install
-    - phpunit --coverage-clover=coverage.xml
+    - ./vendor/bin/phpunit --coverage-clover=coverage.xml
     - codecov
 
 sudo: false

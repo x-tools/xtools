@@ -1,6 +1,7 @@
 {
-    "name": "matthew/xtools.symfony",
-    "license": "proprietary",
+    "name": "xtools/xtools-rebirth",
+    "description": "A set of article and user statistics tools for MediaWiki sites",
+    "license": "GPL-3.0",
     "type": "project",
     "autoload": {
         "psr-4": {
@@ -18,7 +19,7 @@
     },
     "require": {
         "php": ">=5.5.9",
-        "symfony/symfony": "3.0.*",
+        "symfony/symfony": "^3.0",
         "doctrine/orm": "^2.5",
         "doctrine/doctrine-bundle": "^1.6",
         "doctrine/doctrine-cache-bundle": "^1.2",
@@ -37,6 +38,7 @@
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",
+        "phpunit/phpunit": "^4.8",
         "symfony/phpunit-bridge": "^3.0"
     },
     "scripts": {

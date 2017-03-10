@@ -11,6 +11,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class EditCounterController extends Controller
 {
     /**
+     * @Route("/ec", name="ec")
      * @Route("/ec", name="EditCounter")
      * @Route("/ec/", name="EditCounterSlash")
      * @Route("/ec/index.php", name="EditCounterIndexPhp")

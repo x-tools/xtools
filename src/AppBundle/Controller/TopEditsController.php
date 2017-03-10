@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 class TopEditsController extends Controller
 {
     /**
+     * @Route("/topedits", name="topedits")
      * @Route("/topedits", name="topEdits")
      * @Route("/topedits/", name="topEditsSlash")
      * @Route("/topedits/index.php", name="topEditsIndex")
