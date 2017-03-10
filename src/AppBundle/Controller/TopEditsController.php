@@ -16,6 +16,7 @@ class TopEditsController extends Controller
      */
     public function indexAction()
     {
+
         $lh = $this->get("app.labs_helper");
 
         $lh->checkEnabled("topedits");
@@ -29,16 +30,25 @@ class TopEditsController extends Controller
         $article = $request->query->get('article');
 
         if ($project != "" && $username != "" && $namespace != "" && $article != "") {
-            return $this->redirectToRoute("TopEditsResults", array('project'=>$project, 'username' => $username, 'namespace'=>$namespace, 'article'=>$article));
-        }
-        elseif ($project != "" && $username != "" && $namespace != "") {
-            return $this->redirectToRoute("TopEditsResults", array('project'=>$project, 'username' => $username, 'namespace'=>$namespace));
-        }
-        elseif ($project != "" && $username != "") {
-            return $this->redirectToRoute("TopEditsResults", array('project'=>$project, 'username' => $username));
-        }
-        else if ($project != "") {
-            return $this->redirectToRoute("TopEditsResults", array('project'=>$project));
+            return $this->redirectToRoute("TopEditsResults", [
+                'project'=>$project,
+                'username' => $username,
+                'namespace'=>$namespace,
+                'article'=>$article,
+            ]);
+        } elseif ($project != "" && $username != "" && $namespace != "") {
+            return $this->redirectToRoute("TopEditsResults", [
+                'project'=>$project,
+                'username' => $username,
+                'namespace'=>$namespace,
+            ]);
+        } elseif ($project != "" && $username != "") {
+            return $this->redirectToRoute("TopEditsResults", [
+                'project' => $project,
+                'username' => $username,
+            ]);
+        } elseif ($project != "") {
+            return $this->redirectToRoute("TopEditsResults", [ 'project'=>$project ]);
         }
 
         // replace this example code with whatever you need
@@ -52,8 +62,9 @@ class TopEditsController extends Controller
     /**
      * @Route("/topedits/{project}/{username}/{namespace}/{article}", name="TopEditsResults")
      */
-    public function resultAction($project, $username, $namespace = 0, $article="")
+    public function resultAction($project, $username, $namespace = 0, $article = "")
     {
+
         $lh = $this->get("app.labs_helper");
 
         $lh->checkEnabled("topedits");
@@ -75,16 +86,15 @@ class TopEditsController extends Controller
                 'project' => $project,
                 'username' => $username,
             ));
-        }
-        else {
-            return $this->render('topedits/result_article.html.twig', array(
+        } else {
+            return $this->render('topedits/result_article.html.twig', [
                 "xtPageTitle" => "tool_topedits",
                 "xtSubtitle" => "tool_topedits_desc",
                 'xtPage' => "topedits",
 
                 'project' => $project,
                 'username' => $username,
-            ));
+            ]);
         }
     }
 }

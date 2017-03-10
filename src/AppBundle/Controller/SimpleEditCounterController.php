@@ -19,6 +19,7 @@ class SimpleEditCounterController extends Controller
      */
     public function indexAction($project = null)
     {
+
         $lh = $this->get("app.labs_helper");
 
         $lh->checkEnabled("sc");
@@ -30,10 +31,10 @@ class SimpleEditCounterController extends Controller
         $username = $request->query->get('user');
 
         if ($projectQuery != "" && $username != "") {
-            return $this->redirectToRoute("SimpleEditCounterResult", array('project'=>$projectQuery, 'username' => $username));
-        }
-        else if ($projectQuery != "") {
-            return $this->redirectToRoute("SimpleEditCounterProject", array('project'=>$projectQuery));
+            $routeParams = [ 'project'=>$projectQuery, 'username' => $username ];
+            return $this->redirectToRoute("SimpleEditCounterResult", $routeParams);
+        } elseif ($projectQuery != "") {
+            return $this->redirectToRoute("SimpleEditCounterProject", [ 'project'=>$projectQuery ]);
         }
 
         // Otherwise fall through.
@@ -50,7 +51,8 @@ class SimpleEditCounterController extends Controller
     /**
      * @Route("/sc/{project}/{username}", name="SimpleEditCounterResult")
      */
-    public function resultAction($project, $username) {
+    public function resultAction($project, $username)
+    {
         $lh = $this->get("app.labs_helper");
 
         $lh->checkEnabled("sc");
@@ -72,22 +74,23 @@ class SimpleEditCounterController extends Controller
         $conn = $this->get('doctrine')->getManager("replicas")->getConnection();
 
         // Prepare the query and execute
-        $resultQuery = $conn->prepare( "
+        $resultQuery = $conn->prepare("
 			SELECT 'id' as source, user_id as value FROM $userTable WHERE user_name = :username
 			UNION
 			SELECT 'arch' as source, COUNT(*) AS value FROM $archiveTable WHERE ar_user_text = :username
 			UNION
 			SELECT 'rev' as source, COUNT(*) AS value FROM $revisionTable WHERE rev_user_text = :username
 			UNION
-			SELECT 'groups' as source, ug_group as value FROM $userGroupsTable JOIN $userTable on user_id = ug_user WHERE user_name = :username
-            ");
+			SELECT 'groups' as source, ug_group as value
+				FROM $userGroupsTable JOIN $userTable on user_id = ug_user WHERE user_name = :username
+			");
 
         $resultQuery->bindParam("username", $username);
         $resultQuery->execute();
 
         if ($resultQuery->errorCode() > 0) {
-            $this->addFlash("notice", ["noresult", $username]);
-            return $this->redirectToRoute("SimpleEditCounterProject", ["project"=>$project]);
+            $this->addFlash("notice", [ "noresult", $username ]);
+            return $this->redirectToRoute("SimpleEditCounterProject", [ "project"=>$project ]);
         }
 
         // Fetch the result data
@@ -100,27 +103,27 @@ class SimpleEditCounterController extends Controller
         $groups = "";
 
         // Iterate over the results, putting them in the right variables
-        foreach($results as $row) {
-            if($row["source"] == "id") {
+        foreach ($results as $row) {
+            if ($row["source"] == "id") {
                 $id = $row["value"];
             }
-            if($row["source"] == "arch") {
+            if ($row["source"] == "arch") {
                 $arch = $row["value"];
             }
-            if($row["source"] == "rev") {
+            if ($row["source"] == "rev") {
                 $rev = $row["value"];
             }
-            if($row["source"] == "groups") {
+            if ($row["source"] == "groups") {
                 $groups .= $row["value"]. ", ";
             }
         }
 
-        // Unknown user - If the user is created the $results variable will have 3 entries.  This is a workaround to detect
-        // non-existent IPs.
-        if (sizeof($results) < 3 && $arch == 0 && $rev == 0) {
-            $this->addFlash('notice', ["noresult", $username]);
+        // Unknown user - If the user is created the $results variable will have 3 entries.
+        // This is a workaround to detect non-existent IPs.
+        if (count($results) < 3 && $arch == 0 && $rev == 0) {
+            $this->addFlash('notice', [ "noresult", $username ]);
 
-            return $this->redirectToRoute("SimpleEditCounterProject", ["project"=>$project]);
+            return $this->redirectToRoute("SimpleEditCounterProject", [ "project"=>$project ]);
         }
 
         // Remove the last comma and space

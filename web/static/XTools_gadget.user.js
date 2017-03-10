@@ -21,6 +21,5 @@ var src = '//meta.wikimedia.org/w/index.php?title=User:Hedonil/XTools/XTools.js&
 var script = document.createElement('script');
 script.type = 'text/javascript';
 script.src = src;
-(document.head||document.documentElement).appendChild(script);
+(document.head || document.documentElement).appendChild(script);
 script.parentNode.removeChild(script);
-

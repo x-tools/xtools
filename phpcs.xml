@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<ruleset>
+    <rule ref="PSR2"/>
+    <file>.</file>
+    <exclude-pattern>vendor/</exclude-pattern>
+    <exclude-pattern>var/</exclude-pattern>
+    <exclude-pattern>docs/</exclude-pattern>
+    <exclude-pattern>web/static/js/unserialize.jquery.1.0.2.js</exclude-pattern>
+    <exclude-pattern>web/static/js/xagent.js</exclude-pattern>
+    <exclude-pattern>*.min.js</exclude-pattern>
+
+    <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
+        <exclude-pattern>app/AppKernel.php</exclude-pattern>
+    </rule>
+    <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
+        <exclude-pattern>app/AppKernel.php</exclude-pattern>
+        <exclude-pattern>app/AppCache.php</exclude-pattern>
+    </rule>
+
+</ruleset>

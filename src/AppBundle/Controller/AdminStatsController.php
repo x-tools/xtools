@@ -17,6 +17,7 @@ class AdminStatsController extends Controller
      */
     public function indexAction()
     {
+
         $lh = $this->get("app.labs_helper");
 
         $lh->checkEnabled("adminstats");
@@ -28,18 +29,25 @@ class AdminStatsController extends Controller
         $startDate = $request->query->get('begin');
         $endDate = $request->query->get("end");
 
-
         if ($projectQuery != "" && $startDate != "" && $endDate != "") {
-            return $this->redirectToRoute("AdminStatsResult", array('project'=>$projectQuery, 'start' => $startDate, 'end' => $endDate));
-        }
-        elseif ($projectQuery != "" && $endDate != "") {
-            return $this->redirectToRoute("AdminStatsResult", array('project'=>$projectQuery, 'start' => "1970-01-01", 'end' => $endDate));
-        }
-        elseif ($projectQuery != "" && $startDate != "") {
-            return $this->redirectToRoute("AdminStatsResult", array('project'=>$projectQuery, 'start' => $startDate));
-        }
-        else if ($projectQuery != "") {
-            return $this->redirectToRoute("AdminStatsResult", array('project'=>$projectQuery));
+            return $this->redirectToRoute("AdminStatsResult", [
+                'project'=>$projectQuery,
+                'start' => $startDate,
+                'end' => $endDate,
+            ]);
+        } elseif ($projectQuery != "" && $endDate != "") {
+            return $this->redirectToRoute("AdminStatsResult", [
+                'project'=>$projectQuery,
+                'start' => "1970-01-01",
+                'end' => $endDate,
+            ]);
+        } elseif ($projectQuery != "" && $startDate != "") {
+            return $this->redirectToRoute("AdminStatsResult", [
+                'project' => $projectQuery,
+                'start' => $startDate,
+            ]);
+        } elseif ($projectQuery != "") {
+            return $this->redirectToRoute("AdminStatsResult", [ 'project'=>$projectQuery ]);
         }
 
         // Otherwise fall through.
@@ -55,7 +63,8 @@ class AdminStatsController extends Controller
     /**
      * @Route("/adminstats/{project}/{start}/{end}", name="AdminStatsResult")
      */
-    public function resultAction($project, $start = null, $end = null) {
+    public function resultAction($project, $start = null, $end = null)
+    {
 
         $lh = $this->get("app.labs_helper");
 
@@ -67,8 +76,17 @@ class AdminStatsController extends Controller
         $wikiName = $dbValues["wikiName"];
         $url = $dbValues["url"];
 
-        $users = ["Matthew" => ["group" => "A", "delete" => "0", "restore" => "0", "block" => "0", "unblock" => "0", "protect" => "0", "unprotect" => "0", "import" => "0", "rights"=>"0", "total"=>"0"],
-        "Aexandra" => ["group" => "ABC", "delete" => "0", "restore" => "0", "block" => "0", "unblock" => "0", "protect" => "0", "unprotect" => "0", "import" => "0", "rights"=>"0", "total"=>"0"]];
+        $users = [
+            "Matthew" => [
+                "group" => "A", "delete" => "0", "restore" => "0", "block" => "0", "unblock" => "0",
+                "protect" => "0", "unprotect" => "0", "import" => "0", "rights"=>"0", "total"=>"0"
+            ],
+            "Aexandra" => [
+                "group" => "ABC", "delete" => "0", "restore" => "0", "block" => "0",
+                "unblock" => "0", "protect" => "0", "unprotect" => "0", "import" => "0",
+                "rights"=>"0", "total"=>"0"
+            ]
+        ];
 
         dump($users);
 

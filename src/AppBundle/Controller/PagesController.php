@@ -18,6 +18,7 @@ class PagesController extends Controller
      */
     public function indexAction($project = null)
     {
+
         $lh = $this->get("app.labs_helper");
 
         $lh->checkEnabled("pages");
@@ -31,21 +32,32 @@ class PagesController extends Controller
         $redirects = $request->query->get('redirects');
 
         if ($projectQuery != "" && $username != "" && $namespace != "" && $redirects != "") {
-            return $this->redirectToRoute("PagesResult", array('project'=>$projectQuery, 'username' => $username, 'namespace'=>$namespace, 'redirects'=>$redirects));
+            return $this->redirectToRoute("PagesResult", [
+                'project'=>$projectQuery,
+                'username' => $username,
+                'namespace'=>$namespace,
+                'redirects'=>$redirects,
+            ]);
+        } elseif ($projectQuery != "" && $username != "" && $namespace != "") {
+            return $this->redirectToRoute("PagesResult", [
+                'project'=>$projectQuery,
+                'username' => $username,
+                'namespace'=>$namespace,
+            ]);
+        } elseif ($projectQuery != "" && $username != "" && $redirects != "") {
+            return $this->redirectToRoute("PagesResult", [
+                'project'=>$projectQuery,
+                'username' => $username,
+                'redirects'=>$redirects,
+            ]);
+        } elseif ($projectQuery != "" && $username != "") {
+            return $this->redirectToRoute("PagesResult", [
+                'project'=>$projectQuery,
+                'username' => $username,
+            ]);
+        } elseif ($projectQuery != "") {
+            return $this->redirectToRoute("PagesProject", [ 'project'=>$projectQuery ]);
         }
-        elseif ($projectQuery != "" && $username != "" && $namespace != "") {
-            return $this->redirectToRoute("PagesResult", array('project'=>$projectQuery, 'username' => $username, 'namespace'=>$namespace));
-        }
-        elseif ($projectQuery != "" && $username != "" && $redirects != "") {
-            return $this->redirectToRoute("PagesResult", array('project'=>$projectQuery, 'username' => $username, 'redirects'=>$redirects));
-        }
-        elseif ($projectQuery != "" && $username != "") {
-            return $this->redirectToRoute("PagesResult", array('project'=>$projectQuery, 'username' => $username));
-        }
-        else if ($projectQuery != "") {
-            return $this->redirectToRoute("PagesProject", array('project'=>$projectQuery));
-        }
-
 
         // Retrieving the global groups, using the ApiHelper class
         $api = $this->get("app.api_helper");
@@ -66,7 +78,8 @@ class PagesController extends Controller
     /**
      * @Route("/pages/{project}/{username}/{namespace}/{redirects}", name="PagesResult")
      */
-    public function resultAction($project, $username, $namespace = "all", $redirects = "none") {
+    public function resultAction($project, $username, $namespace = "all", $redirects = "none")
+    {
         $lh = $this->get("app.labs_helper");
 
         $lh->checkEnabled("pages");
@@ -91,7 +104,7 @@ class PagesController extends Controller
         $conn = $this->get('doctrine')->getManager("replicas")->getConnection();
 
         // Prepare the query and execute
-        $resultQuery = $conn->prepare( "
+        $resultQuery = $conn->prepare("
 			SELECT 'id' as source, user_id as value FROM $userTable WHERE user_name = :username
             ");
 
@@ -113,42 +126,49 @@ class PagesController extends Controller
         }
 
         $redirectCondition = "";
-        if ( $redirects == "onlyredirects" ){ $redirectCondition = " and page_is_redirect = '1' "; }
-        if ( $redirects == "noredirects" ){ $redirectCondition = " and page_is_redirect = '0' "; }
+        if ($redirects == "onlyredirects") {
+            $redirectCondition = " and page_is_redirect = '1' ";
+        }
+        if ($redirects == "noredirects") {
+            $redirectCondition = " and page_is_redirect = '0' ";
+        }
 
-        if ( $user_id == 0) { // IP Editor or undefined username.
+        if ($user_id == 0) { // IP Editor or undefined username.
             $whereRev = " rev_user_text = '$username' AND rev_user = '0' ";
             $whereArc = " ar_user_text = '$username' AND ar_user = '0' ";
             $having = " rev_user_text = '$username' ";
-        }
-        else {
+        } else {
             $whereRev = " rev_user = '$user_id' AND rev_timestamp > 1 ";
             $whereArc = " ar_user = '$user_id' AND ar_timestamp > 1 ";
             $having = " rev_user = '$user_id' ";
         }
 
         $stmt = "
-			(SELECT DISTINCT page_namespace as namespace, 'rev' as type, page_title as page_title, page_is_redirect as page_is_redirect, rev_timestamp as timestamp, rev_user, rev_user_text
-			FROM $pageTable
-			JOIN $revisionTable on page_id = rev_page
-			WHERE  $whereRev  AND rev_parent_id = '0'  $namespaceConditionRev  $redirectCondition
-			)
-
-			UNION
-
-			(SELECT  a.ar_namespace as namespace, 'arc' as type, a.ar_title as page_title, '0' as page_is_redirect, min(a.ar_timestamp) as timestamp , a.ar_user as rev_user, a.ar_user_text as rev_user_text
-			FROM $archiveTable a
-			JOIN
-			 (
-			  Select b.ar_namespace, b.ar_title
-			  FROM $archiveTable as b
-			  LEFT JOIN $logTable on log_namespace = b.ar_namespace and log_title = b.ar_title  and log_user = b.ar_user and (log_action = 'move' or log_action = 'move_redir')
-			  WHERE  $whereArc AND b.ar_parent_id = '0' $namespaceConditionArc and log_action is null
-			 ) AS c on c.ar_namespace= a.ar_namespace and c.ar_title = a.ar_title
-			GROUP BY a.ar_namespace, a.ar_title
-			HAVING  $having
-			)
-			";
+            (SELECT DISTINCT page_namespace as namespace, 'rev' as type, page_title as page_title,
+            page_is_redirect as page_is_redirect, rev_timestamp as timestamp, rev_user, rev_user_text
+            FROM $pageTable
+            JOIN $revisionTable on page_id = rev_page
+            WHERE  $whereRev  AND rev_parent_id = '0'  $namespaceConditionRev  $redirectCondition
+            )
+    
+            UNION
+    
+            (SELECT  a.ar_namespace as namespace, 'arc' as type, a.ar_title as page_title,
+            '0' as page_is_redirect, min(a.ar_timestamp) as timestamp , a.ar_user as rev_user,
+            a.ar_user_text as rev_user_text
+            FROM $archiveTable a
+            JOIN
+             (
+              Select b.ar_namespace, b.ar_title
+              FROM $archiveTable as b
+              LEFT JOIN $logTable on log_namespace = b.ar_namespace and log_title = b.ar_title
+                AND log_user = b.ar_user and (log_action = 'move' or log_action = 'move_redir')
+              WHERE  $whereArc AND b.ar_parent_id = '0' $namespaceConditionArc and log_action is null
+             ) AS c on c.ar_namespace= a.ar_namespace and c.ar_title = a.ar_title
+            GROUP BY a.ar_namespace, a.ar_title
+            HAVING  $having
+            )
+            ";
         $resultQuery = $conn->prepare($stmt);
         $resultQuery->execute();
 
@@ -169,8 +189,7 @@ class PagesController extends Controller
             // Totals
             if (isset($countArray[$row["namespace"]]["total"])) {
                 $countArray[$row["namespace"]]["total"]++;
-            }
-            else {
+            } else {
                 $countArray[$row["namespace"]]["total"] = 1;
                 $countArray[$row["namespace"]]["redirect"] = 0;
                 $countArray[$row["namespace"]]["deleted"] = 0;
@@ -196,12 +215,11 @@ class PagesController extends Controller
                     $countArray[$row["namespace"]]["deleted"] = 1;
                 }
             }
-
         }
 
         if ($total < 1) {
-            $this->addFlash("notice", ["noresult", $username]);
-            return $this->redirectToRoute("PagesProject", ["project"=>$project]);
+            $this->addFlash("notice", [ "noresult", $username ]);
+            return $this->redirectToRoute("PagesProject", [ "project"=>$project ]);
         }
 
         ksort($pagesArray);

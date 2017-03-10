@@ -19,6 +19,7 @@ class EditCounterController extends Controller
      */
     public function indexAction($project = null)
     {
+
         $lh = $this->get("app.labs_helper");
 
         $lh->checkEnabled("ec");
@@ -30,10 +31,10 @@ class EditCounterController extends Controller
         $username = $request->query->get('user');
 
         if ($project != "" && $username != "") {
-            return $this->redirectToRoute("EditCounterResult", array('project'=>$project, 'username' => $username));
-        }
-        else if ($project != "") {
-            return $this->redirectToRoute("EditCounterProject", array('project'=>$project));
+            $routeParams = [ 'project'=>$project, 'username' => $username ];
+            return $this->redirectToRoute("EditCounterResult", $routeParams);
+        } elseif ($project != "") {
+            return $this->redirectToRoute("EditCounterProject", [ 'project'=>$project ]);
         }
 
         // Otherwise fall through.
@@ -51,6 +52,7 @@ class EditCounterController extends Controller
      */
     public function resultAction($project, $username)
     {
+
         $lh = $this->get("app.labs_helper");
 
         $lh->checkEnabled("ec");
@@ -67,27 +69,37 @@ class EditCounterController extends Controller
         $conn = $this->get('doctrine')->getManager("replicas")->getConnection();
 
         // Prepare the query and execute
-        $resultQuery = $conn->prepare( "
-			SELECT 'id' as source, user_id as value FROM $dbName.user WHERE user_name = :username
-			UNION
-			SELECT 'arch' as source, COUNT(*) AS value FROM $dbName.archive_userindex WHERE ar_user_text = :username
-			UNION
-			SELECT 'rev' as source, COUNT(*) AS value FROM $dbName.revision_userindex WHERE rev_user_text = :username
-			UNION
-			(SELECT 'first_rev' as source, rev_timestamp FROM $dbName.`revision_userindex` WHERE rev_user_text = :username ORDER BY rev_timestamp ASC LIMIT 1)
-			UNION
-			(SELECT 'latest_rev' as source, rev_timestamp FROM $dbName.`revision_userindex` WHERE rev_user_text = :username ORDER BY rev_timestamp DESC LIMIT 1)
-			UNION
-			SELECT 'rev_24h' as source, COUNT(*) as value FROM $dbName.revision_userindex WHERE rev_user_text = :username AND rev_timestamp >= DATE_SUB(NOW(),INTERVAL 24 HOUR)
-			UNION
-			SELECT 'rev_7d' as source, COUNT(*) as value FROM $dbName.revision_userindex WHERE rev_user_text = :username AND rev_timestamp >= DATE_SUB(NOW(),INTERVAL 7 DAY)
-			UNION
-			SELECT 'rev_30d' as source, COUNT(*) as value FROM $dbName.revision_userindex WHERE rev_user_text = :username AND rev_timestamp >= DATE_SUB(NOW(),INTERVAL 30 DAY)
-			UNION
-			SELECT 'rev_365d' as source, COUNT(*) as value FROM $dbName.revision_userindex WHERE rev_user_text = :username AND rev_timestamp >= DATE_SUB(NOW(),INTERVAL 365 DAY)
-			UNION
-			SELECT 'groups' as source, ug_group as value FROM $dbName.user_groups JOIN $dbName.user on user_id = ug_user WHERE user_name = :username
-			");
+        $resultQuery = $conn->prepare("
+            SELECT 'id' as source, user_id as value FROM $dbName.user
+                WHERE user_name = :username
+            UNION
+            SELECT 'arch' as source, COUNT(*) AS value FROM $dbName.archive_userindex
+                WHERE ar_user_text = :username
+            UNION
+            SELECT 'rev' as source, COUNT(*) AS value FROM $dbName.revision_userindex
+                WHERE rev_user_text = :username
+            UNION
+            (SELECT 'first_rev' as source, rev_timestamp FROM $dbName.`revision_userindex`
+                WHERE rev_user_text = :username ORDER BY rev_timestamp ASC LIMIT 1)
+            UNION
+            (SELECT 'latest_rev' as source, rev_timestamp FROM $dbName.`revision_userindex`
+                WHERE rev_user_text = :username ORDER BY rev_timestamp DESC LIMIT 1)
+            UNION
+            SELECT 'rev_24h' as source, COUNT(*) as value FROM $dbName.revision_userindex
+                WHERE rev_user_text = :username AND rev_timestamp >= DATE_SUB(NOW(),INTERVAL 24 HOUR)
+            UNION
+            SELECT 'rev_7d' as source, COUNT(*) as value FROM $dbName.revision_userindex
+                WHERE rev_user_text = :username AND rev_timestamp >= DATE_SUB(NOW(),INTERVAL 7 DAY)
+            UNION
+            SELECT 'rev_30d' as source, COUNT(*) as value FROM $dbName.revision_userindex
+                WHERE rev_user_text = :username AND rev_timestamp >= DATE_SUB(NOW(),INTERVAL 30 DAY)
+            UNION
+            SELECT 'rev_365d' as source, COUNT(*) as value FROM $dbName.revision_userindex
+                WHERE rev_user_text = :username AND rev_timestamp >= DATE_SUB(NOW(),INTERVAL 365 DAY)
+            UNION
+            SELECT 'groups' as source, ug_group as value FROM $dbName.user_groups
+                JOIN $dbName.user on user_id = ug_user WHERE user_name = :username
+            ");
 
         $resultQuery->bindParam("username", $username);
         $resultQuery->execute();
@@ -113,40 +125,40 @@ class EditCounterController extends Controller
         $groups = "";
 
         // Iterate over the results, putting them in the right variables
-        foreach($results as $row) {
-            if($row["source"] == "id") {
+        foreach ($results as $row) {
+            if ($row["source"] == "id") {
                 $id = $row["value"];
             }
-            if($row["source"] == "arch") {
+            if ($row["source"] == "arch") {
                 $arch = $row["value"];
             }
-            if($row["source"] == "rev") {
+            if ($row["source"] == "rev") {
                 $rev = $row["value"];
             }
-            if($row["source"] == "first_rev") {
+            if ($row["source"] == "first_rev") {
                 $first_rev = strtotime($row["value"]);
             }
-            if($row["source"] == "latest_rev") {
+            if ($row["source"] == "latest_rev") {
                 $latest_rev = strtotime($row["value"]);
             }
-            if($row["source"] == "rev_24h") {
+            if ($row["source"] == "rev_24h") {
                 $rev_24h = $row["value"];
             }
-            if($row["source"] == "rev_7d") {
+            if ($row["source"] == "rev_7d") {
                 $rev_7d = $row["value"];
             }
-            if($row["source"] == "rev_30d") {
+            if ($row["source"] == "rev_30d") {
                 $rev_30d = $row["value"];
             }
-            if($row["source"] == "rev_365d") {
+            if ($row["source"] == "rev_365d") {
                 $rev_365d = $row["value"];
             }
-            if($row["source"] == "groups") {
+            if ($row["source"] == "groups") {
                 $groups .= $row["value"]. ", ";
             }
         }
 
-        $days = ceil(($latest_rev - $first_rev)/(60*60*24));
+        $days = ceil(( $latest_rev - $first_rev )/( 60*60*24 ));
 
         // Workaround if there is only one edit.
 
@@ -154,7 +166,7 @@ class EditCounterController extends Controller
             $days = 1;
         }
 
-        $delta = round(($rev/$days), 3);
+        $delta = round(( $rev/$days ), 3);
 
         // Remove the last comma and space
         if (strlen($groups) > 2) {
@@ -168,15 +180,13 @@ class EditCounterController extends Controller
 
         if ($first_rev > 0) {
             $first_rev = date('Y-m-d h:i:s', $first_rev);
-        }
-        else {
+        } else {
             $first_rev = "----";
         }
 
         if ($latest_rev > 0) {
             $latest_rev = date('Y-m-d h:i:s', $latest_rev);
-        }
-        else {
+        } else {
             $latest_rev = "----";
         }
 
@@ -189,13 +199,17 @@ class EditCounterController extends Controller
         // -------------------------
 
         $resultQuery = $conn->prepare("
-			SELECT 'unique-pages' as source, COUNT(distinct rev_page) as value FROM $dbName.`revision_userindex` where rev_user_text=:username
-			UNION
-			SELECT 'pages-created-live' as source, COUNT(*) as value from $dbName.`revision_userindex` where rev_user_text=:username and rev_parent_id=0
-			UNION
-			SELECT 'pages-created-archive' as source, COUNT(*) as value from $dbName.`archive_userindex` where ar_user_text=:username and ar_parent_id=0
-			UNION
-			SELECT 'pages-moved' as source, count(*) as value from $dbName.`logging` where log_type='move' and log_action='move' and log_user_text=:username
+            SELECT 'unique-pages' as source, COUNT(distinct rev_page) as value
+                FROM $dbName.`revision_userindex` where rev_user_text=:username
+            UNION
+            SELECT 'pages-created-live' as source, COUNT(*) as value from $dbName.`revision_userindex`
+                WHERE rev_user_text=:username and rev_parent_id=0
+            UNION
+            SELECT 'pages-created-archive' as source, COUNT(*) as value from $dbName.`archive_userindex`
+                WHERE ar_user_text=:username and ar_parent_id=0
+            UNION
+            SELECT 'pages-moved' as source, count(*) as value from $dbName.`logging`
+                WHERElog_type='move' and log_action='move' and log_user_text=:username
             ");
 
         $resultQuery->bindParam("username", $username);
@@ -209,23 +223,23 @@ class EditCounterController extends Controller
         $pagesMoved = 0;
         $editsPerPage = 0;
 
-        foreach($results as $row) {
-            if($row["source"] == "unique-pages") {
+        foreach ($results as $row) {
+            if ($row["source"] == "unique-pages") {
                 $uniquePages += $row["value"];
             }
-            if($row["source"] == "pages-created-live") {
+            if ($row["source"] == "pages-created-live") {
                 $pagesCreated += $row["value"];
             }
-            if($row["source"] == "pages-created-archive") {
+            if ($row["source"] == "pages-created-archive") {
                 $pagesCreated += $row["value"];
             }
-            if($row["source"] == "pages-moved") {
+            if ($row["source"] == "pages-moved") {
                 $pagesMoved += $row["value"];
             }
         }
 
         if ($uniquePages > 0) {
-            $editsPerPage = ($rev + $arch) / $uniquePages;
+            $editsPerPage = ( $rev + $arch ) / $uniquePages;
             $editsPerPage = number_format($editsPerPage, 2);
         }
 
@@ -234,27 +248,38 @@ class EditCounterController extends Controller
         // -------------------------
         // TODO: Turn into single query - not using UNION
         $resultQuery = $conn->prepare("
-        SELECT 'pages-thanked' as source, count(*) as value from $dbName.`logging` where log_type='thank' and log_action='thank' and log_user_text=:username
+        SELECT 'pages-thanked' as source, count(*) as value from $dbName.`logging`
+            WHERE log_type='thank' and log_action='thank' and log_user_text=:username
         UNION
-        SELECT 'pages-approved' as source, count(*) as value from $dbName.`logging` where log_type='review' and log_action='approve' and log_user_text=:username
+        SELECT 'pages-approved' as source, count(*) as value from $dbName.`logging`
+            WHERE log_type='review' and log_action='approve' and log_user_text=:username
         UNION
-        SELECT 'pages-patrolled' as source, count(*) as value from $dbName.`logging` where log_type='patrol' and log_action='patrol' and log_user_text=:username
+        SELECT 'pages-patrolled' as source, count(*) as value from $dbName.`logging`
+            WHERE log_type='patrol' and log_action='patrol' and log_user_text=:username
         UNION
-        SELECT 'users-blocked' as source, count(*) as value from $dbName.`logging` where log_type='block' and log_action='block' and log_user_text=:username
+        SELECT 'users-blocked' as source, count(*) as value from $dbName.`logging`
+            WHERE log_type='block' and log_action='block' and log_user_text=:username
         UNION
-        SELECT 'users-unblocked' as source, count(*) as value from $dbName.`logging` where log_type='block' and log_action='unblock' and log_user_text=:username
+        SELECT 'users-unblocked' as source, count(*) as value from $dbName.`logging`
+            WHERE log_type='block' and log_action='unblock' and log_user_text=:username
         UNION
-        SELECT 'pages-protected' as source, count(*) as value from $dbName.`logging` where log_type='protect' and log_action='protect' and log_user_text=:username
+        SELECT 'pages-protected' as source, count(*) as value from $dbName.`logging`
+            WHERE log_type='protect' and log_action='protect' and log_user_text=:username
         UNION
-        SELECT 'pages-unprotected' as source, count(*) as value from $dbName.`logging` where log_type='protect' and log_action='unprotect' and log_user_text=:username
+        SELECT 'pages-unprotected' as source, count(*) as value from $dbName.`logging`
+            WHERE log_type='protect' and log_action='unprotect' and log_user_text=:username
         UNION
-        SELECT 'pages-deleted' as source, count(*) as value from $dbName.`logging` where log_type='delete' and log_action='delete' and log_user_text=:username
+        SELECT 'pages-deleted' as source, count(*) as value from $dbName.`logging`
+            WHERE log_type='delete' and log_action='delete' and log_user_text=:username
         UNION
-        SELECT 'pages-deleted-revision' as source, count(*) as value from $dbName.`logging` where log_type='delete' and log_action='revision' and log_user_text=:username
+        SELECT 'pages-deleted-revision' as source, count(*) as value from $dbName.`logging`
+            WHERE log_type='delete' and log_action='revision' and log_user_text=:username
         UNION
-        SELECT 'pages-restored' as source, count(*) as value from $dbName.`logging` where log_type='delete' and log_action='restore' and log_user_text=:username
+        SELECT 'pages-restored' as source, count(*) as value from $dbName.`logging`
+            WHERE log_type='delete' and log_action='restore' and log_user_text=:username
         UNION
-        SELECT 'pages-imported' as source, count(*) as value from $dbName.`logging` where log_type='import' and log_action='import' and log_user_text=:username
+        SELECT 'pages-imported' as source, count(*) as value from $dbName.`logging`
+            WHERE log_type='import' and log_action='import' and log_user_text=:username
         ");
 
         $resultQuery->bindParam("username", $username);
@@ -275,7 +300,7 @@ class EditCounterController extends Controller
         $pagesRestored = 0;
         $pagesImported = 0;
 
-        foreach($results as $row) {
+        foreach ($results as $row) {
             if ($row["source"] == "pages-thanked") {
                 $pagesThanked += $row["value"];
             }
@@ -311,40 +336,35 @@ class EditCounterController extends Controller
             }
         }
 
-
         // -------------------------
         // General statistics part 4
         // -------------------------
-
-
 
         // -------------------------
         // General statistics graphs
         // -------------------------
 
-
-
         // -------------------------
         // Namespace Totals
         // -------------------------
         // TODO: Convert to named namespaces
-        $namespaceArray = array();
+        $namespaceArray = [];
         $namespaceTotal = 0;
-        if (($rev + $arch) > 0) {
-            $colors = array(
-                0 => '#Cc0000',#'#FF005A', #red '#FF5555',
+        if (( $rev + $arch ) > 0) {
+            $colors = [
+                0 => '#Cc0000',# '#FF005A', #red '#FF5555',
                 1 => '#F7b7b7',
 
-                2 => '#5c8d20',#'#008800', #green'#55FF55',
+                2 => '#5c8d20',# '#008800', #green'#55FF55',
                 3 => '#85eD82',
 
-                4 => '#2E97E0', #blue
+                4 => '#2E97E0', # blue
                 5 => '#B9E3F9',
 
-                6 => '#e1711d',  #orange
+                6 => '#e1711d',  # orange
                 7 => '#ffc04c',
 
-                8 => '#FDFF98', #yellow
+                8 => '#FDFF98', # yellow
 
                 9 => '#5555FF',
                 10 => '#55FFFF',
@@ -352,28 +372,28 @@ class EditCounterController extends Controller
                 11 => '#0000C0',  #
                 12 => '#008800',  # green
                 13 => '#00C0C0',
-                14 => '#FFAFAF',	# rosé
-                15 => '#808080',	# gray
+                14 => '#FFAFAF',    # rosé
+                15 => '#808080',    # gray
                 16 => '#00C000',
                 17 => '#404040',
-                18 => '#C0C000',	# green
+                18 => '#C0C000',    # green
                 19 => '#C000C0',
 
-                100 => '#75A3D1',	# blue
-                101 => '#A679D2',	# purple
+                100 => '#75A3D1',   # blue
+                101 => '#A679D2',   # purple
                 102 => '#660000',
                 103 => '#000066',
-                104 => '#FAFFAF',	# caramel
+                104 => '#FAFFAF',   # caramel
                 105 => '#408345',
                 106 => '#5c8d20',
-                107 => '#e1711d',	# red
-                108 => '#94ef2b',	# light green
-                109 => '#756a4a',	# brown
+                107 => '#e1711d',   # red
+                108 => '#94ef2b',   # light green
+                109 => '#756a4a',   # brown
                 110 => '#6f1dab',
                 111 => '#301e30',
                 112 => '#5c9d96',
-                113 => '#a8cd8c',	# earth green
-                114 => '#f2b3f1',	# light purple
+                113 => '#a8cd8c',   # earth green
+                114 => '#f2b3f1',   # light purple
                 115 => '#9b5828',
                 118 => '#99FFFF',
                 119 => '#99BBFF',
@@ -394,8 +414,8 @@ class EditCounterController extends Controller
                 446 => '#06DCFB',
                 447 => '#892EE4',
                 460 => '#99FF66',
-                461 => '#99CC66',	# green
-                470 => '#CCCC33',	# ocker
+                461 => '#99CC66',   # green
+                470 => '#CCCC33',   # ocker
                 471 => '#CCFF33',
                 480 => '#6699FF',
                 481 => '#66FFFF',
@@ -408,10 +428,10 @@ class EditCounterController extends Controller
                 866 => '#FFFFFF',
                 867 => '#FFCCFF',
                 1198 => '#FF34B3',
-                1199 => '#8B1C62',);
+                1199 => '#8B1C62', ];
 
-            $colors2 = array('#61a9f3',#blue
-                '#f381b9',#pink
+            $colors2 = [ '#61a9f3',# blue
+                '#f381b9',# pink
                 '#61E3A9',
 
                 '#D56DE2',
@@ -419,10 +439,10 @@ class EditCounterController extends Controller
                 '#F7b7b7',
                 '#CFDF49',
                 '#88d8f2',
-                '#07AF7B',#green
+                '#07AF7B',# green
                 '#B9E3F9',
                 '#FFF3AD',
-                '#EF606A',#red
+                '#EF606A',# red
                 '#EC8833',
                 '#FFF100',
                 '#87C9A5',
@@ -438,12 +458,13 @@ class EditCounterController extends Controller
 
                 '#02927F',
                 '#FF005A',
-                '#61a9f3', #blue' #FFFF55',
-            );
+                '#61a9f3', # blue' #FFFF55',
+            ];
             $colorCounter2 = 0;
-            $resultQuery = $conn->prepare("SELECT page_namespace, count(*) as 'count' FROM $dbName.`revision_userindex` r
-RIGHT JOIN $dbName.page p on r.rev_page = p.page_id
-WHERE r.rev_user = :id GROUP BY page_namespace");
+            $sql = "SELECT page_namespace, count(*) as 'count' FROM $dbName.`revision_userindex` r
+                RIGHT JOIN $dbName.page p on r.rev_page = p.page_id
+                WHERE r.rev_user = :id GROUP BY page_namespace";
+            $resultQuery = $conn->prepare($sql);
             $resultQuery->bindParam(":id", $id);
             $resultQuery->execute();
 
@@ -453,60 +474,47 @@ WHERE r.rev_user = :id GROUP BY page_namespace");
             foreach ($resultQuery->fetchAll() as $row) {
                 if ($colors[$row["page_namespace"]]) {
                     $color = $colors[$row["page_namespace"]];
-                }
-                else {
+                } else {
                     if ($colors2[$colorCounter2]) {
                         $color = $colors2[$colorCounter2];
                         $colorCounter2++;
-                    }
-                    else {
+                    } else {
                         $color = $colors2[0];
                         $colorCounter2 = 1;
                     }
                 }
-                $namespaceArray[$row["page_namespace"]] = ['num'=>$row["count"], "color" => $color];
+                $namespaceArray[$row["page_namespace"]] = [ 'num'=>$row["count"], "color" => $color ];
                 $namespaceTotal += $row["count"];
             }
 
             /*for($i = 0; $i < (sizeof($namespaceArray) + 1); $i++) {
                 $namespaceArray[$i]['pct'] = ($namespaceArray[$i]['num'] / 100);
             }*/
-
         }
-
 
         // -------------------------
         // Month and Year Counts
         // -------------------------
 
-
         // -------------------------
         // Timecard
         // -------------------------
-
-
 
         // -------------------------
         // Latest Global Edits
         // -------------------------
 
-
-
         // -------------------------
         // Top Edited Pages
         // -------------------------
-
 
         // -------------------------
         // Semi-automated edits
         // -------------------------
 
-
-
         // Retrieving the namespaces, using the ApiHelper class
         $api = $this->get("app.api_helper");
         $namespaces = $api->namespaces($url);
-
 
         return $this->render('editCounter/result.html.twig', [
             'xtTitle' => "tool_ec",

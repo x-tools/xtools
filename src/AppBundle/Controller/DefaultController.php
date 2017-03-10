@@ -15,6 +15,7 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {
+
         // replace this example code with whatever you need
         return $this->render('default/index.html.twig', [
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
@@ -28,6 +29,7 @@ class DefaultController extends Controller
      */
     public function aboutAction()
     {
+
         // replace this example code with whatever you need
         return $this->render('default/about.html.twig', array(
             "xtTitle" => "About",
@@ -41,24 +43,25 @@ class DefaultController extends Controller
      */
     public function configAction()
     {
+
         if ($this->container->getParameter('kernel.environment') != "dev") {
             throw new NotFoundHttpException();
         }
 
         $params = $this->container->getParameterBag()->all();
 
-        foreach($params as $key=>$value) {
+        foreach ($params as $key => $value) {
             if (strpos($key, "password") !== false) {
                 $params[$key] = "<REDACTED>";
             }
         }
 
         // replace this example code with whatever you need
-        return $this->render('default/config.html.twig', array(
+        return $this->render('default/config.html.twig', [
             "xtTitle" => "Config",
             "xtPageTitle" => "Config",
             'xtPage' => "index",
             'dump' => print_r($params, true),
-        ));
+        ]);
     }
 }
