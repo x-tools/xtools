@@ -11,6 +11,7 @@ use DateTime;
 class AdminScoreController extends Controller
 {
     /**
+     * @Route("/adminscore", name="adminscore")
      * @Route("/adminscore", name="AdminScore")
      * @Route("/adminscore/", name="AdminScoreSlash")
      * @Route("/adminscore/index.php", name="AdminScoreIndexPhp")

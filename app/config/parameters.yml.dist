@@ -39,20 +39,20 @@ parameters:
     app.replag_threshold: 30
 
     # Enabling or disabling of individual tools
-    enable.ec: 1
-    enable.articleinfo: 1
-    enable.pages: 1
-    enable.topedits: 1
-    enable.rangecontribs: 1
-    enable.blame: 1
-    enable.autoedits: 1
-    enable.autoblock: 1
-    enable.adminstats: 1
     enable.adminscore: 1
-    enable.rfa: 1
-    enable.rfap: 1
-    enable.bash: 1
+    enable.adminstats: 1
+    enable.articleinfo: 1
+    enable.autoblock: 0
+    enable.autoedits: 0
+    enable.bash: 0
+    enable.blame: 0
+    enable.ec: 1
+    enable.pages: 1
+    enable.rangecontribs: 0
+    enable.rfa: 0
+    enable.rfap: 0
     enable.sc: 1
+    enable.topedits: 1
 
     # Leave blank if xTools is installed in the root directory
     app.base_path:

@@ -62,7 +62,7 @@
                 <ul class="dropdown-menu">
                     {% for key, value in allLangs() %}
                         <li>
-                            <a class="lang-link" href="{{ link(path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'uselang': key}))) }}" data-lang="{{ key }}">{{ value|e }}</a>
+                            <a class="lang-link" href="{{ path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'uselang': key})) }}" data-lang="{{ key }}">{{ value|e }}</a>
                         </li>
                     {% endfor %}
                 </ul>
@@ -71,10 +71,14 @@
         </div>
         <nav class="top-nav navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-left">
-                <li{% if page is defined and page=="index" %} class="active"{% endif %} ><a href="{{ link("/") }}">{{ msg("title_xtools") }}</a></li>
+                <li{% if page is defined and page=="index" %} class="active"{% endif %} ><a href="{{ path("homepage") }}">{{ msg("title_xtools") }}</a></li>
 
                 {% for tool in tools() %}
-                    {% if enabled(tool) %}<li{% if page is defined and page==tool %} class="active"{% endif %} ><a href="{{ link("/"~tool) }}">{{ msg("tool_" ~ tool) }}</a></li>{% endif %}
+                    {% if enabled(tool) %}
+                        <li{% if page is defined and page==tool %} class="active"{% endif %} >
+                            <a href="{{ path(tool) }}">{{ msg("tool_" ~ tool) }}</a>
+                        </li>
+                    {% endif %}
                 {% endfor %}
             </ul>
         </nav>
@@ -147,7 +151,7 @@
     <hr>
     <div class="row">
         <div class="col">
-            <span>&copy; 2008-{{ year() }} &middot; <a href="{{ link("/about") }}">About these tools</a>  &middot; v.{{ version }} &middot; <a href="http://github.com/x-tools/xtools-rebirth/tree/{{ hash() }}" target="_blank">r.{{ shortHash() }}</a> </span><br />
+            <span>&copy; 2008-{{ year() }} &middot; <a href="{{ path("aboutPage") }}">About these tools</a>  &middot; v.{{ version }} &middot; <a href="http://github.com/x-tools/xtools-rebirth/tree/{{ hash() }}" target="_blank">r.{{ shortHash() }}</a> </span><br />
             <span>{{ msg_footer() }}</span>
         </div>
         <div class="col pull-right">

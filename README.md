@@ -13,7 +13,7 @@ Installation
 To install xtools, follow these steps:
 
 1. Clone or download this repository.
-2. Run "composer install".  This will prompt for a series of questions, including database credientials.  
+2. Run "composer install".  This will prompt for a series of questions, including database credentials.
 3. Run in web server.
 4. ???
 5. Profit!

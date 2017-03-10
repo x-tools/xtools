@@ -11,6 +11,7 @@ use AppBundle\Helper\Apihelper;
 class ArticleInfoController extends Controller
 {
     /**
+     * @Route("/articleinfo", name="articleinfo")
      * @Route("/articleinfo", name="articleInfo")
      * @Route("/articleinfo/", name="articleInfoSlash")
      * @Route("/articleinfo/index.php", name="articleInfoIndexPhp")
