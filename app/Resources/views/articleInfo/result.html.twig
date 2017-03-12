@@ -23,7 +23,7 @@
             {{ pageviews_links(title, project) }}
             {% if wikidataId is defined %}
                 &middot;
-                <a href="http://tools.wmflabs.org/reasonator/?q={{ wikidataId }}">Resonator (Wikidata)</a>
+                <a target="_blank" href="http://tools.wmflabs.org/reasonator/?q={{ wikidataId }}">Resonator (Wikidata)</a>
             {% endif %}
         </p>
 
@@ -31,12 +31,12 @@
             <dl class="col-lg-6 dl-horizontal stat-list clearfix">
                 <dt>ID</dt>
                 <dd>
-                    <a href="{{ project_url }}/w/index.php?action=info&title={{ title }}">{{ id }}</a>
+                    <a target="_blank" href="{{ project_url }}/w/index.php?action=info&title={{ title }}">{{ id }}</a>
                 </dd>
                 {% if wikidataId is defined %}
                     <dt>Wikidata ID</dt>
                     <dd>
-                        <a href="https://www.wikidata.org/wiki/{{ wikidataId }}">{{ wikidataId }}</a>
+                        <a target="_blank" href="https://www.wikidata.org/wiki/{{ wikidataId }}">{{ wikidataId }}</a>
                         &middot;
                         {{ msg('num-items', [numWikidataItems]) }}
                     </dd>
@@ -113,11 +113,11 @@
             <dl class="col-lg-6 dl-horizontal stat-list clearfix">
                 <dt>{{ msg('links_in') }}</dt>
                 <dd>
-                    <a href="{{ project_url }}/w/index.php?title=Special:WhatLinksHere/{{ title }}&hidetrans=1">{{ links_in_count | number_format }}</a>
+                    <a target="_blank" href="{{ project_url }}/w/index.php?title=Special:WhatLinksHere/{{ title }}&hidetrans=1">{{ links_in_count | number_format }}</a>
                 </dd>
                 <dt>{{ msg('redirects') }}</dt>
                 <dd>
-                    <a href="{{ project_url }}/w/index.php?title=Special:WhatLinksHere/{{ title }}&hidetrans=1&hidelinks=1">{{ redirects_count | number_format }}</a>
+                    <a target="_blank" href="{{ project_url }}/w/index.php?title=Special:WhatLinksHere/{{ title }}&hidetrans=1&hidelinks=1">{{ redirects_count | number_format }}</a>
                 </dd>
                 <dt>{{ msg('links_out') }}</dt>
                 <dd>{{ links_out_count | number_format }}</dd>
@@ -127,7 +127,7 @@
                 <dd>{{ watchers | number_format }}</dd>
                 <dt>{{ msg('pageviews') }} (60 {{ msg('days', [60]) }})</dt>
                 <dd>
-                    <a href="https://tools.wmflabs.org/pageviews?project={{ project }}&pages={{ title }}&range=latest={{ pageviews_offset }}">
+                    <a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project }}&pages={{ title }}&range=latest-{{ pageviews_offset }}">
                         {{ pageviews | number_format }}
                     </a>
                 </dd>
@@ -165,10 +165,10 @@
                         <td>{{ stats.minor | number_format }}</td>
                         <td></td>
                         <td>
-                            <a href="{{ project_url }}/wiki/Special:Diff/{{ stats.first_id }}">{{ stats.first }}</a>
+                            <a target="_blank" href="{{ project_url }}/wiki/Special:Diff/{{ stats.first_id }}">{{ stats.first }}</a>
                         </td>
                         <td>
-                            <a href="{{ project_url }}/wiki/Special:Diff/{{ stats.last_id }}">{{ stats.last }}</a>
+                            <a target="_blank" href="{{ project_url }}/wiki/Special:Diff/{{ stats.last_id }}">{{ stats.last }}</a>
                         </td>
                         <td>
                             {{ stats.added | diff_format }}
@@ -192,7 +192,7 @@
                             {{ user_link(bot.username, project_url) }}
                             {% if not bot.current %}
                                 <i>
-                                    (<a href="{{ project_url }}/w/index.php?title=Special:Log&action=view&page=User:{{ bot.username }}&type=rights">{{ msg('former_bot') }}</a>)
+                                    (<a target="_blank" href="{{ project_url }}/w/index.php?title=Special:Log&action=view&page=User:{{ bot.username }}&type=rights">{{ msg('former_bot') }}</a>)
                                 </i>
                             {% endif %}
                         </td>

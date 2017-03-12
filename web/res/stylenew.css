@@ -113,6 +113,9 @@ body {
 .panel-primary > .panel-heading a {
     color: white;
 }
+.panel-body {
+    overflow-x: scroll;
+}
 .xt-panel-body-top {
     padding: 8px;
     margin-bottom: 5px;
