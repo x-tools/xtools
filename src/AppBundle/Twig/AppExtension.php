@@ -180,8 +180,28 @@ class AppExtension extends \Twig_Extension
         return in_array( $this->intuition->getLangName(), $this->getAllLangs() ) ? $this->intuition->getLangName() : 'English';
     }
 
+    /**
+     * Get all available languages in the i18n directory
+     * @return array Associative array of langKey => langName
+     */
     public function getAllLangs() {
-        return $this->intuition->getAvailableLangs();
+        $messageFiles = glob( $this->container->getParameter("kernel.root_dir") . '/../i18n/*.json' );
+
+        $languages = array_values( array_unique( array_map(
+          function ( $filename ) {
+            return basename( $filename, '.json' );
+          },
+          $messageFiles
+        ) ) );
+
+        $availableLanguages = [];
+
+        foreach ( $languages as $lang ) {
+          $availableLanguages[$lang] = ucfirst( $this->intuition->getLangName( $lang ) );
+        }
+        asort( $availableLanguages );
+
+        return $availableLanguages;
     }
 
     public function intuitionIsRTL() {

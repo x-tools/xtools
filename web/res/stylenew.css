@@ -18,6 +18,49 @@ body {
     margin: 0 10px;
 }
 
+.navbar-top {
+    padding: 10px 15px 0;
+}
+.navbar-top li:last-child {
+    padding-right: 0;
+}
+.tool-links {
+    float: left;
+    padding: 0;
+}
+.tool-links .nav {
+    margin: 0;
+}
+@media (max-width: 768px) {
+    .tool-links {
+        clear: both;
+        width: 100%;
+    }
+}
+.navbar-toggle {
+    margin: 0;
+}
+
+.lang-group .dropdown-menu {
+    max-height: 194px;
+    overflow-y: scroll;
+}
+.lang-group .btn {
+    padding-left: 30px;
+}
+.lang-group svg {
+    height: 17px;
+    left: 8px;
+    position: absolute;
+    top: 7px;
+    width: 17px;
+}
+
+.login-btn .glyphicon-user {
+    padding-right: 2px;
+    top: 2px;
+}
+
 .tooltipcss {
     position: inherit;
 }
@@ -305,10 +348,6 @@ div.outer_bar {
 
 .list-inline {
     display: inline-block;
-}
-
-.top-nav {
-    padding: 0;
 }
 
 .app-footer {
