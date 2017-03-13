@@ -3,7 +3,7 @@ html {
 }
 
 body {
-    background: url('gradient.png');
+    background: url('../../res/gradient.png');
     min-height: 100%;
     position: relative;
 }

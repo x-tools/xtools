@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="{{ lang() }}"{% if isRTL() %} dir="rtl"{% endif %}>
 <head>
-    <title>{% if title is defined%}{{ msg(title) }} - {% endif %}{{ msg("title_xtools") }}</title>
+    <title>{% if title is defined %}{{ msg(title) }} - {% endif %}{{ msg("title_xtools") }}</title>
 
     {% if loadStylesheetsFromCDN() %}
         <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"
               integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="{{ asset("static/css/application.css") }}" />
         <script src="https://code.jquery.com/jquery-3.1.0.min.js"
                 integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
@@ -13,36 +14,26 @@
                 crossorigin="anonymous"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.0/Chart.min.js"></script>
     {% else %}
-        <link rel="stylesheet" type="text/css" href="{{ asset("bootstrap/css/bootstrap.min.css") }}">
-        <script type="text/javascript" src="{{ asset("res/jquery.min.js") }}"></script>
-        <script type="text/javascript" src="{{ asset("bootstrap/js/bootstrap.min.js") }}"></script>
-        <script type="text/javascript" src="{{ asset("chartjs/Chart.min.js") }}"></script>
+        {% stylesheets
+            'bootstrap/css/bootstrap.min.css'
+            'static/css/application.css'
+            output='static/css/production.css' %}
+        <link rel="stylesheet" href="{{ asset_url }}" />
+        {% endstylesheets %}
+        {% javascripts
+            'res/jquery.min.js'
+            'bootstrap/js/bootstrap.min.js'
+            'chartjs/Chart.min.js'
+            output='static/js/production.js' %}
+        <script src="{{ asset_url }}"></script>
+        {% endjavascripts %}
     {% endif %}
-
-    <script type="text/javascript" src="{{ asset("res/sortable.js") }}"></script>
-
-    <link rel="stylesheet" type="text/css" href="{{ asset("res/stylenew.css") }}" />
 
     <link rel="shortcut icon" href="/favicon.ico?v=3" />
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <script type="text/javascript">
-        function switchShow( id, elmnt ) {
-            var ff = document.getElementById(id);
-            if( ff.style.display == "none" || ff.style.display == undefined ) {
-                ff.style.display = "block";
-                if(elmnt && id != 'xt-notifications') elmnt.innerHTML = '[{{ msg("hide") }}]';
-            }
-            else{
-                ff.style.display = "none";
-                if(elmnt && id != 'xt-notifications') elmnt.innerHTML = '[{{ msg("show") }}]';
-            }
-        }
-    </script>
-
 </head>
 
 <body>
@@ -161,14 +152,20 @@
 <footer class="app-footer container-fluid">
     <span>
         <small>
-            <span>{{ msg("executed", [request_time()]) }}</span> &middot; <span>{{ msg("memory", [memory_usage()]) }}</span>
+            <span>{{ msg("executed", [request_time()]) }}</span> &middot;
+            <span>{{ msg("memory", [memory_usage()]) }}</span>
         </small>
     </span>
     <hr>
     <div class="row">
         <div class="col">
-            <span>&copy; 2008-{{ year() }} &middot; <a href="{{ path("aboutPage") }}">About these tools</a>  &middot; v.{{ version }} &middot; <a href="http://github.com/x-tools/xtools-rebirth/tree/{{ hash() }}" target="_blank">r.{{ shortHash() }}</a> </span><br />
-            <span>{{ msg_footer() }}</span>
+            <span>
+                &copy; 2008-{{ year() }} &middot;
+                <a href="{{ path("aboutPage") }}">About these tools</a>  &middot;
+                v.{{ version }} &middot;
+                <a href="http://github.com/x-tools/xtools-rebirth/tree/{{ hash() }}" target="_blank">r.{{ shortHash() }}</a>
+            </span>
+            <div>{{ msg_footer() }}</div>
         </div>
         <div class="col pull-right">
             <a style="margin-right:5px;" href="//translatewiki.net/?setlang=en "><img height="36px" src="//upload.wikimedia.org/wikipedia/commons/5/51/Translatewiki.net_logo.svg" alt="translatewiki.net logo"/></a>

@@ -19,11 +19,12 @@
             &middot;
             {{ wiki_log_link(title, project_url) }}
             &middot;
-            {# FIXME: only show if is_labs is set #}
+            {% if isWMFLabs() %}
             {{ pageviews_links(title, project) }}
             {% if wikidataId is defined %}
                 &middot;
                 <a target="_blank" href="http://tools.wmflabs.org/reasonator/?q={{ wikidataId }}">Resonator (Wikidata)</a>
+            {% endif %}
             {% endif %}
         </p>
 
