@@ -341,13 +341,6 @@ div.outer_bar {
     padding-left: 2px;
     padding-right: 2px;
     padding-bottom: 0px;
-    background-image: url("../static/images/squiggle.png");
-    background-repeat: repeat-x;
-    background-position: left bottom;
-}
-
-.list-inline {
-    display: inline-block;
 }
 
 .app-footer {
