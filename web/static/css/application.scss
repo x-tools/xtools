@@ -179,6 +179,19 @@ body {
     padding: 5px 2px;
     white-space: nowrap;
 }
+.xt-show {
+    display: none;
+}
+.xt-show,
+.xt-hide {
+    bottom: 2px;
+    cursor: pointer;
+    position: relative;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
 
 .tdnum {
     text-align: right;

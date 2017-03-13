@@ -134,7 +134,7 @@
                 </dd>
             </dl>
         {% endset %}
-        {{ layout.content_block(msg('generalstats'), content) }}
+        {{ layout.content_block('generalstats', content) }}
 
         <div style="clear:both"></div>
 
@@ -209,7 +209,7 @@
                 </tbody>
             </table>
         {% endset %}
-        {{ layout.content_block(msg('usertable'), content) }}
+        {{ layout.content_block('usertable', content) }}
 
         {% set content %}
             <table class="table table-bordered table-hover table-striped">
@@ -238,7 +238,7 @@
                 </tbody>
             </table>
         {% endset %}
-        {{ layout.content_block(msg('yearcounts'), content) }}
+        {{ layout.content_block('yearcounts', content) }}
 
         {% set content %}
             <table class="table table-bordered table-hover table-striped">
@@ -274,7 +274,7 @@
                 </tbody>
             </table>
         {% endset %}
-        {{ layout.content_block(msg('monthcounts'), content) }}
+        {{ layout.content_block('monthcounts', content) }}
     </div>
 </div>
 {% endblock %}
