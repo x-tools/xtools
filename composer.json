@@ -41,7 +41,8 @@
     "require-dev": {
         "sensio/generator-bundle": "^3.0",
         "phpunit/phpunit": "^4.8",
-        "symfony/phpunit-bridge": "^3.0"
+        "symfony/phpunit-bridge": "^3.0",
+        "mediawiki/mediawiki-codesniffer": "^0.7"
     },
     "scripts": {
         "post-install-cmd": [

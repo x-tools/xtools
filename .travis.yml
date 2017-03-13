@@ -26,6 +26,7 @@ script:
     - composer install
     - ./vendor/bin/phpunit --coverage-clover=coverage.xml
     - codecov
+    - ./vendor/bin/phpcs -s .
 
 sudo: false
 

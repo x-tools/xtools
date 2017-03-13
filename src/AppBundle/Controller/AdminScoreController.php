@@ -20,6 +20,7 @@ class AdminScoreController extends Controller
      */
     public function indexAction($project = null)
     {
+
         $lh = $this->get("app.labs_helper");
 
         $lh->checkEnabled("adminscore");
@@ -31,10 +32,9 @@ class AdminScoreController extends Controller
         $username = $request->query->get('user');
 
         if ($projectQuery != "" && $username != "") {
-            return $this->redirectToRoute("AdminScoreResult", array('project'=>$projectQuery, 'username' => $username));
-        }
-        else if ($projectQuery != "") {
-            return $this->redirectToRoute("AdminScoreProject", array('project'=>$projectQuery));
+            return $this->redirectToRoute("AdminScoreResult", [ 'project'=>$projectQuery, 'username' => $username ]);
+        } elseif ($projectQuery != "") {
+            return $this->redirectToRoute("AdminScoreProject", [ 'project'=>$projectQuery ]);
         }
 
         // Otherwise fall through.
@@ -91,34 +91,53 @@ class AdminScoreController extends Controller
         $conn = $this->get('doctrine')->getManager("replicas")->getConnection();
 
         // Prepare the query and execute
-        $resultQuery = $conn->prepare( "
-		SELECT 'id' as source, user_id as value FROM $userTable WHERE user_name = :username
-		UNION
-        SELECT 'acct_age' as source, user_registration as value FROM $userTable WHERE user_name=:username
+        $resultQuery = $conn->prepare("
+        SELECT 'id' as source, user_id as value FROM $userTable
+            WHERE user_name = :username
         UNION
-        SELECT 'edit_count' as source, user_editcount as value FROM $userTable WHERE user_name=:username
+        SELECT 'acct_age' as source, user_registration as value FROM $userTable
+            WHERE user_name=:username
         UNION
-        SELECT 'user_page' as source, page_len as value FROM $pageTable WHERE page_namespace=2 AND page_title=:username
+        SELECT 'edit_count' as source, user_editcount as value FROM $userTable
+            WHERE user_name=:username
         UNION
-        SELECT 'patrols' as source, COUNT(*) as value FROM $loggingTable WHERE log_type='patrol' and log_action='patrol' and log_namespace=0 and log_deleted=0 and log_user_text=:username
+        SELECT 'user_page' as source, page_len as value FROM $pageTable
+            WHERE page_namespace=2 AND page_title=:username
         UNION
-        SELECT 'blocks' as source, COUNT(*) as value FROM $loggingTable WHERE log_type='block' AND log_action='block' AND log_namespace=2 AND log_deleted=0 AND log_title=:username
+        SELECT 'patrols' as source, COUNT(*) as value FROM $loggingTable
+            WHERE log_type='patrol'
+                AND log_action='patrol'
+                AND log_namespace=0
+                AND log_deleted=0 and log_user_text=:username
         UNION
-        SELECT 'afd' as source, COUNT(*) as value FROM $revisionTable WHERE rev_page like 'Articles for deletion/%' and rev_page not like 'Articles_for_deletion/Log/%' and rev_user_text=:username
+        SELECT 'blocks' as source, COUNT(*) as value FROM $loggingTable
+            WHERE log_type='block' AND log_action='block' AND log_namespace=2 AND log_deleted=0 AND log_title=:username
         UNION
-        SELECT 'recent_activity' as source, COUNT(*) as value FROM $revisionTable WHERE rev_user_text=:username AND rev_timestamp > (now()-INTERVAL 730 day) and rev_timestamp < now()
+        SELECT 'afd' as source, COUNT(*) as value FROM $revisionTable
+            WHERE rev_page LIKE 'Articles for deletion/%'
+                AND rev_page NOT LIKE 'Articles_for_deletion/Log/%'
+                AND rev_user_text=:username
         UNION
-        SELECT 'aiv' as source, COUNT(*) as value FROM $revisionTable WHERE rev_page like 'Administrator intervention against vandalism%' and rev_user_text=:username
+        SELECT 'recent_activity' as source, COUNT(*) as value FROM $revisionTable
+            WHERE rev_user_text=:username AND rev_timestamp > (now()-INTERVAL 730 day) and rev_timestamp < now()
         UNION
-        SELECT 'edit_summaries' as source, COUNT(*) as value FROM $revisionTable JOIN page ON rev_page=page_id WHERE page_namespace=0 AND rev_user_text=:username
+        SELECT 'aiv' as source, COUNT(*) as value FROM $revisionTable
+            WHERE rev_page like 'Administrator intervention against vandalism%' and rev_user_text=:username
         UNION
-        SELECT 'namespaces' as source, count(*) as value FROM $revisionTable JOIN page ON rev_page=page_id WHERE rev_user_text=:username AND page_namespace=0
+        SELECT 'edit_summaries' as source, COUNT(*) as value FROM $revisionTable JOIN page ON rev_page=page_id
+            WHERE page_namespace=0 AND rev_user_text=:username
         UNION
-	    SELECT 'pages_created_live' as source, COUNT(*) as value from $revisionTable where rev_user_text=:username and rev_parent_id=0
-		UNION
-		SELECT 'pages_created_archive' as source, COUNT(*) as value from $archiveTable where ar_user_text=:username and ar_parent_id=0
+        SELECT 'namespaces' as source, count(*) as value FROM $revisionTable JOIN page ON rev_page=page_id
+            WHERE rev_user_text=:username AND page_namespace=0
         UNION
-        SELECT 'rpp' as source, COUNT(*) as value FROM $revisionTable WHERE rev_page like 'Requests_for_page_protection%' and rev_user_text=:username
+        SELECT 'pages_created_live' as source, COUNT(*) as value from $revisionTable
+            WHERE rev_user_text=:username and rev_parent_id=0
+        UNION
+        SELECT 'pages_created_archive' as source, COUNT(*) as value from $archiveTable
+            WHERE ar_user_text=:username and ar_parent_id=0
+        UNION
+        SELECT 'rpp' as source, COUNT(*) as value FROM $revisionTable
+            WHERE rev_page like 'Requests_for_page_protection%' and rev_user_text=:username
         ");
 
         $resultQuery->bindParam("username", $username);
@@ -132,7 +151,7 @@ class AdminScoreController extends Controller
 
         $id = 0;
 
-        foreach($results as $row) {
+        foreach ($results as $row) {
             $key = $row["source"];
             $value = $row["value"];
 
@@ -142,32 +161,28 @@ class AdminScoreController extends Controller
                 $diff = $date->diff($now);
                 $formula = 365*$diff->format("%y")+30*$diff->format("%m")+$diff->format("%d");
                 $value = $formula-365;
-
             }
 
             if ($key == "id") {
                 $id = $value;
-            }
-            else {
+            } else {
                 $multiplierKey = strtoupper($row["source"] . "_MULT");
-                $multiplier = (isset($$multiplierKey) ? $$multiplierKey : 1);
+                $multiplier = ( isset($$multiplierKey) ? $$multiplierKey : 1 );
                 $score = max(min($value * $multiplier, 100), -100);
                 $master[$key]["mult"] = $multiplier;
                 $master[$key]["value"] = $value;
                 $master[$key]["score"] = $score;
                 $total += $score;
-
             }
         }
 
         if ($id == 0) {
-            $this->addFlash("notice", ["noresult", $username]);
-            return $this->redirectToRoute("AdminScore", ["project"=>$project]);
+            $this->addFlash("notice", [ "noresult", $username ]);
+            return $this->redirectToRoute("AdminScore", [ "project"=>$project ]);
         }
 
-
         // replace this example code with whatever you need
-        return $this->render('adminscore/result.html.twig', array(
+        return $this->render('adminscore/result.html.twig', [
             "xtPage" => "adminscore",
             "xtTitle" => "tool_adminscore",
             "xtPageTitle" => "tool_adminscore",
@@ -177,6 +192,6 @@ class AdminScoreController extends Controller
             'project' => $wikiName,
             'master' => $master,
             'total' => $total,
-        ));
+        ]);
     }
 }

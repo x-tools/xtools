@@ -1,16 +1,16 @@
-$(document).ready(function() {
-  var sortDirection, sortColumn;
+$(document).ready(function () {
+    var sortDirection, sortColumn;
 
-  $('.xt-hide').on('click', function() {
-    $(this).hide();
-    $(this).siblings('.xt-show').show();
-    $(this).parents('.panel-heading').siblings('.panel-body').hide();
-  });
-  $('.xt-show').on('click', function() {
-    $(this).hide();
-    $(this).siblings('.xt-hide').show();
-    $(this).parents('.panel-heading').siblings('.panel-body').show();
-  });
+    $('.xt-hide').on('click', function () {
+        $(this).hide();
+        $(this).siblings('.xt-show').show();
+        $(this).parents('.panel-heading').siblings('.panel-body').hide();
+    });
+    $('.xt-show').on('click', function () {
+        $(this).hide();
+        $(this).siblings('.xt-hide').show();
+        $(this).parents('.panel-heading').siblings('.panel-body').show();
+    });
 
   // Sorting of columns
   //
@@ -30,38 +30,39 @@ $(document).ready(function() {
   //
   // Data type is automatically determined, with support for integer,
   //   floats, and strings, including date strings (e.g. "2016-01-01 12:59")
-  $('.sort-link').on('click', function() {
-    sortDirection = sortColumn === $(this).data('column') ? -sortDirection : 1;
+    $('.sort-link').on('click', function () {
+        sortDirection = sortColumn === $(this).data('column') ? -sortDirection : 1;
 
-    $('.sort-link .glyphicon').removeClass('glyphicon-sort-by-alphabet-alt glyphicon-sort-by-alphabet').addClass('glyphicon-sort');
-    var newSortClassName = sortDirection === 1 ? 'glyphicon-sort-by-alphabet-alt' : 'glyphicon-sort-by-alphabet';
-    $(this).find('.glyphicon').addClass(newSortClassName).removeClass('glyphicon-sort');
+        $('.sort-link .glyphicon').removeClass('glyphicon-sort-by-alphabet-alt glyphicon-sort-by-alphabet').addClass('glyphicon-sort');
+        var newSortClassName = sortDirection === 1 ? 'glyphicon-sort-by-alphabet-alt' : 'glyphicon-sort-by-alphabet';
+        $(this).find('.glyphicon').addClass(newSortClassName).removeClass('glyphicon-sort');
 
-    sortColumn = $(this).data('column');
-    var $table = $(this).parents('table');
-    var entries = $table.find('.sort-entry--' + sortColumn).parent();
+        sortColumn = $(this).data('column');
+        var $table = $(this).parents('table');
+        var entries = $table.find('.sort-entry--' + sortColumn).parent();
 
-    if (!entries.length) return;
+        if (!entries.length) {
+            return; }
 
-    entries.sort(function(a, b) {
-      var before = $(a).find('.sort-entry--' + sortColumn).data('value'),
-        after = $(b).find('.sort-entry--' + sortColumn).data('value');
+        entries.sort(function (a, b) {
+            var before = $(a).find('.sort-entry--' + sortColumn).data('value'),
+            after = $(b).find('.sort-entry--' + sortColumn).data('value');
 
-      // test data type, assumed to be string if can't be parsed as float
-      if (!isNaN(parseFloat(before, 10))) {
-        before = parseFloat(before, 10);
-        after = parseFloat(after, 10);
-      }
+            // test data type, assumed to be string if can't be parsed as float
+            if (!isNaN(parseFloat(before, 10))) {
+                before = parseFloat(before, 10);
+                after = parseFloat(after, 10);
+            }
 
-      if (before < after) {
-        return sortDirection;
-      } else if (before > after) {
-        return -sortDirection;
-      } else {
-        return 0;
-      }
+            if (before < after) {
+                return sortDirection;
+            } else if (before > after) {
+                return -sortDirection;
+            } else {
+                return 0;
+            }
+        });
+
+        $table.find('tbody').html($(entries));
     });
-
-    $table.find('tbody').html($(entries));
-  });
 });
