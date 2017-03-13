@@ -35,7 +35,8 @@
         "addwiki/mediawiki-datamodel": "0.7.x-dev",
         "addwiki/mediawiki-api": "0.7.x-dev",
         "addwiki/guzzle-mediawiki-client": "0.1",
-        "symfony/assetic-bundle": "^2.8"
+        "symfony/assetic-bundle": "^2.8",
+        "leafo/scssphp": "^0.6.7"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",

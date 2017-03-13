@@ -1,0 +1,37 @@
+$bootstrap-darker-gray: #888;
+$bootstrap-dark-gray: #ddd;
+$bootstrap-gray: #777;
+$bootstrap-link-gray: #555;
+$bootstrap-text: #333;
+$bootstrap-primary: #337ab7;
+$bootstrap-success: #dff0d8;
+$bootstrap-info: #d9edf7;
+$bootstrap-warning-bg: #fcf8e3;
+$bootstrap-warning-text: #8a6d3b;
+$bootstrap-danger-bg: #f2dede;
+$bootstrap-danger-text: #a94442;
+
+$diff-pos: #006400;
+$diff-neg: #8B0000;
+$diff-zero: #A2A9B1;
+
+@mixin prefix($prop, $val) {
+  @each $pre in -webkit-, -moz-, -ms-, -o- {
+    #{$pre}#{$prop}: #{$val};
+  }
+  #{$prop}: #{$val};
+}
+
+@mixin center($direction: '', $position: 'absolute') {
+  position: unquote($position);
+
+  @if($direction == 'vertical') {
+    top: 50%;
+    @include prefix(transform, translateY(-50%));
+  } @else if($direction == 'horizontal') {
+    left: 50%;
+    @include prefix(transform, translateX(-50%));
+  } @else {
+    @include prefix(transform, translate(-50%, -50%));
+  }
+}

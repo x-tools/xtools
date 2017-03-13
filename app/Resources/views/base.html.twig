@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ lang() }}"{% if isRTL() %} dir="rtl"{% endif %}>
 <head>
-    <title>{% if title is defined %}{{ msg(title) }} - {% endif %}{{ msg("title_xtools") }}</title>
+    <title>{% if title is defined %}{{ msg(title) }} - {% endif %}{{ msg('title_xtools') }}</title>
 
     {% if loadStylesheetsFromCDN() %}
         <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"
@@ -14,9 +14,9 @@
                 crossorigin="anonymous"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.0/Chart.min.js"></script>
     {% else %}
-        {% stylesheets
+        {% stylesheets filter="scssphp"
             'bootstrap/css/bootstrap.min.css'
-            'static/css/application.css'
+            'static/css/*.scss'
             output='static/css/production.css' %}
         <link rel="stylesheet" href="{{ asset_url }}" />
         {% endstylesheets %}
@@ -36,7 +36,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
-<body>
+<body class="{{ app.request.attributes.get('_route') }}">
 
 <header class="navbar navbar-default navbar-top" role="navigation">
     <button class="navbar-toggle collapsed pull-left" data-toggle="collapse" data-target=".tool-links" aria-expanded="false">
@@ -122,7 +122,7 @@
 </div>
 
 <div id="wrapper">
-<main id="content">
+<main id="content" class="clearfix">
     {% block title %}
     <div class="col-lg-8 col-lg-offset-2">
         {# if pageTitle is defined %}
