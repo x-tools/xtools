@@ -43,13 +43,6 @@ body {
     }
 }
 
-@media (max-width: 768px) {
-    .tool-links {
-        clear: both;
-        width: 100%;
-    }
-}
-
 .navbar-toggle {
     margin: 0;
 }
@@ -154,6 +147,9 @@ body {
     padding-bottom: 0px;
     margin-bottom: 0px;
 }
+.xt-heading-subtitle {
+    margin-top: 3px;
+}
 .xt-alert {
     padding: 5px;
     margin: 5px;
@@ -162,8 +158,11 @@ body {
 .panel-primary > .panel-heading a {
     color: white;
 }
-.panel-body {
+section > .panel-body {
     overflow-x: scroll;
+}
+.xt-panel-body table {
+    white-space: nowrap;
 }
 .xt-panel-body-top {
     padding: 8px;
@@ -221,11 +220,17 @@ body {
     min-width: 55px;
     text-align: right;
 }
-.panel-default {
-    text-align: left;
+.panel-primary {
+    margin-bottom: 0;
 }
-.panel-default > .panel-heading {
-    padding: 5px 10px;
+.panel-default {
+    margin-bottom: 0;
+    margin-top: 20px;
+    text-align: left;
+
+    > .panel-heading {
+        padding: 5px 10px;
+    }
 }
 
 div.bar {
@@ -346,4 +351,44 @@ div.outer_bar {
 }
 .diff-zero {
     color: $diff-zero;
+}
+
+.sort-link {
+  @include prefix(user-select, none);
+  cursor: pointer;
+
+  .glyphicon {
+    top: 2px;
+    visibility: hidden;
+  }
+
+  .glyphicon-sort-by-alphabet,
+  .glyphicon-sort-by-alphabet-alt {
+    visibility: visible;
+  }
+
+  &:hover {
+    .glyphicon-sort {
+      visibility: visible;
+    }
+  }
+}
+
+@media (max-width: $bootstrap-sm) {
+    .tool-links {
+        clear: both;
+        width: 100%;
+    }
+
+    .xt-panel-body {
+        padding: 15px 0;
+    }
+
+    .panel-default {
+        border-radius: 0;
+    }
+
+    #wrapper {
+        margin: 15px 5px;
+    }
 }

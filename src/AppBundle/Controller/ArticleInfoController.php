@@ -221,7 +221,7 @@ class ArticleInfoController extends Controller
                 $counter++;
             }
 
-            $this->pageInfo['editors'][$editor]['minorpct'] = ( $info['all'] ) ?  ( $info['minor'] / $info['all'] ) * 100 : 0 ;
+            $this->pageInfo['editors'][$editor]['minor_percentage'] = ( $info['all'] ) ?  ( $info['minor'] / $info['all'] ) * 100 : 0 ;
 
             if ( $info['all'] > 1 ) {
                 $secs = intval( ( strtotime( $info['last'] ) - strtotime( $info['first'] ) ) / $info['all'] );
@@ -303,6 +303,10 @@ class ArticleInfoController extends Controller
         }
 
         $firstEdit = $this->pageHistory[0];
+
+        // The month of the first edit. Used as a comparison when building the per-month data
+        $firstEditMonth = strtotime( date( 'Y-m-01, 00:00', strtotime( $firstEdit['rev_timestamp'] ) ) );
+
         $lastEdit = $this->pageHistory[ $this->historyCount - 1 ];
         $secondLastEdit = $this->historyCount === 1 ? $lastEdit : $this->pageHistory[ $this->historyCount - 2 ];
 
@@ -362,8 +366,7 @@ class ArticleInfoController extends Controller
                     'user' => htmlspecialchars( $rev['rev_user_text'] ),
                     'size' => $rev['rev_len']
                 ];
-
-                $first_edit_parse = date_parse( $data['first_edit']['timestamp'] );
+                // $first_edit_parse = date_parse( $data['first_edit']['timestamp'] );
             }
 
             // Fill in the blank arrays for the year and 12 months
@@ -371,6 +374,13 @@ class ArticleInfoController extends Controller
                 $data['year_count'][$timestamp['year']] = [ 'all' => 0, 'minor' => 0, 'anon' => 0, 'months' => [] ];
 
                 for( $i = 1; $i <= 12; $i++ ) {
+                    $timeObj = mktime( 0, 0, 0, $i, 1, $timestamp['year'] );
+
+                    // don't show zeros for months before the first edit or after the current month
+                    if ( $timeObj < $firstEditMonth || $timeObj > strtotime('last day of this month') ) {
+                        continue;
+                    }
+
                     $data['year_count'][$timestamp['year']]['months'][$i] = [ 'all' => 0, 'minor' => 0, 'anon' => 0, 'size' => [] ];
                 }
             }
@@ -386,11 +396,11 @@ class ArticleInfoController extends Controller
                 $data['editors'][$username] = [
                     'all' => 0,
                     'minor' => 0,
+                    'minor_percentage' => 0,
                     'first' => date( 'Y-m-d, H:i', strtotime( $rev['rev_timestamp'] ) ),
                     'first_id' => $rev['rev_id'],
                     'last' => null,
                     'atbe' => null,
-                    'minorpct' => 0,
                     'added' => 0,
                     'sizes' => [],
                     'urlencoded' => rawurlencode( $rev['rev_user_text'] ), //str_replace( array( '+' ), array( '_' ), urlencode( $rev['rev_user_text'] ) )
