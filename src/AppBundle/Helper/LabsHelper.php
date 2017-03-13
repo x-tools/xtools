@@ -14,8 +14,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LabsHelper
 {
+    /** @var string */
     public $dbName;
+
+    /** @var \Doctrine\DBAL\Connection */
     public $client;
+
     private $container;
     private $url;
 
@@ -31,8 +35,14 @@ class LabsHelper
         }
     }
 
-    // Todo: Handle failure better
-    public function databasePrepare($project = 'wiki', $route = 'homepage')
+    /**
+     * Set up LabsHelper::$client and return get the database name, wiki name, and URL of a given
+     * project.
+     * @todo: Handle failure better
+     * @param string $project The project name (e.g. 'enwiki').
+     * @return string[] With keys 'dbName', 'wikiName', and 'url'.
+     */
+    public function databasePrepare($project = 'wiki')
     {
         if ($this->container->getParameter('app.single_wiki')) {
             $dbName = $this->container->getParameter('database_replica_name');
