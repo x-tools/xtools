@@ -43,9 +43,9 @@ class TopEditsController extends Controller
 
         // replace this example code with whatever you need
         return $this->render('topedits/index.html.twig', [
-            "pageTitle" => "tool_topedits",
-            "subtitle" => "tool_topedits_desc",
-            'page' => "topedits",
+            "xtPageTitle" => "tool_topedits",
+            "xtSubtitle" => "tool_topedits_desc",
+            'xtPage' => "topedits",
         ]);
     }
 
@@ -68,9 +68,9 @@ class TopEditsController extends Controller
 
         if ($article === "") {
             return $this->render('topedits/result_namespace.html.twig', array(
-                "pageTitle" => "tool_topedits",
-                "subtitle" => "tool_topedits_desc",
-                'page' => "topedits",
+                "xtPageTitle" => "tool_topedits",
+                "xtSubtitle" => "tool_topedits_desc",
+                'xtPage' => "topedits",
 
                 'project' => $project,
                 'username' => $username,
@@ -78,9 +78,9 @@ class TopEditsController extends Controller
         }
         else {
             return $this->render('topedits/result_article.html.twig', array(
-                "pageTitle" => "tool_topedits",
-                "subtitle" => "tool_topedits_desc",
-                'page' => "topedits",
+                "xtPageTitle" => "tool_topedits",
+                "xtSubtitle" => "tool_topedits_desc",
+                'xtPage' => "topedits",
 
                 'project' => $project,
                 'username' => $username,

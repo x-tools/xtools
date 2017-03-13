@@ -38,10 +38,10 @@ class SimpleEditCounterController extends Controller
 
         // Otherwise fall through.
         return $this->render('simpleEditCounter/index.html.twig', [
-            "pageTitle" => "tool_sc",
-            "subtitle" => "tool_sc_desc",
-            'page' => "sc",
-            'title' => "tool_sc",
+            "xtPageTitle" => "tool_sc",
+            "xtSubtitle" => "tool_sc_desc",
+            'xtPage' => "sc",
+            'xtTitle' => "tool_sc",
 
             'project' => $project,
         ]);
@@ -143,10 +143,10 @@ class SimpleEditCounterController extends Controller
 
         // Assign the values and display the template
         return $this->render('simpleEditCounter/result.html.twig', [
-            'title' => "tool_sc",
-            'page' => "sc",
-            "pageTitle" => "tool_sc",
-            "subtitle" => "tool_sc_desc",
+            'xtTitle' => "tool_sc",
+            'xtPage' => "sc",
+            "xtPageTitle" => "tool_sc",
+            "xtSubtitle" => "tool_sc_desc",
             'url' => $url,
             'username' => $username,
             'project' => $wikiName,

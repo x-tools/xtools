@@ -40,10 +40,9 @@ class AdminScoreController extends Controller
         // Otherwise fall through.
         return $this->render('adminscore/index.html.twig', [
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
-            "page" => "adminscore",
-            "pageTitle" => "tool_adminscore",
-            "subtitle" => "tool_adminscore_desc",
-
+            "xtPage" => "adminscore",
+            "xtPageTitle" => "tool_adminscore",
+            "xtSubtitle" => "tool_adminscore_desc",
             "project" => $project,
         ]);
     }
@@ -169,9 +168,9 @@ class AdminScoreController extends Controller
 
         // replace this example code with whatever you need
         return $this->render('adminscore/result.html.twig', array(
-            "page" => "adminscore",
-            "title" => "tool_adminscore",
-            "pageTitle" => "tool_adminscore",
+            "xtPage" => "adminscore",
+            "xtTitle" => "tool_adminscore",
+            "xtPageTitle" => "tool_adminscore",
             "subtitle" => "tool_adminscore_desc",
             'url' => $url,
             'username' => $username,

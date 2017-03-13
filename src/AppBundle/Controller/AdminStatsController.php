@@ -45,9 +45,9 @@ class AdminStatsController extends Controller
         // Otherwise fall through.
         return $this->render('adminStats/index.html.twig', [
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
-            "page" => "adminstats",
-            "pageTitle" => "tool_adminstats",
-            "subtitle" => "tool_adminstats_desc",
+            "xtPage" => "adminstats",
+            "xtPageTitle" => "tool_adminstats",
+            "xtSubtitle" => "tool_adminstats_desc",
         ]);
     }
 
@@ -74,9 +74,9 @@ class AdminStatsController extends Controller
 
         return $this->render("adminStats/result.html.twig", [
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
-            "page" => "adminstats",
-            "pageTitle" => "tool_adminstats",
-            "subtitle" => "tool_adminstats_desc",
+            "xtPage" => "adminstats",
+            "xtPageTitle" => "tool_adminstats",
+            "xtSubtitle" => "tool_adminstats_desc",
 
             'url' => $url,
             'project' => $project,

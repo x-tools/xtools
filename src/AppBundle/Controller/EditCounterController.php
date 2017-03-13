@@ -38,11 +38,10 @@ class EditCounterController extends Controller
 
         // Otherwise fall through.
         return $this->render('editCounter/index.html.twig', [
-            "pageTitle" => "tool_ec",
-            "subtitle" => "tool_ec_desc",
-            'page' => "ec",
-            'title' => "tool_ec",
-
+            "xtPageTitle" => "tool_ec",
+            "xtSubtitle" => "tool_ec_desc",
+            'xtPage' => "ec",
+            'xtTitle' => "tool_ec",
             'project' => $project,
         ]);
     }
@@ -510,8 +509,8 @@ WHERE r.rev_user = :id GROUP BY page_namespace");
 
 
         return $this->render('editCounter/result.html.twig', [
-            'title' => "tool_ec",
-            'page' => "ec",
+            'xtTitle' => "tool_ec",
+            'xtPage' => "ec",
             'project' => $project,
             'username' => $username,
             'wiki' => $dbName,

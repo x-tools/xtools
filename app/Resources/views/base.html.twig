@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ lang() }}"{% if isRTL() %} dir="rtl"{% endif %}>
 <head>
-    <title>{% if title is defined %}{{ msg(title) }} - {% endif %}{{ msg('title_xtools') }}</title>
+    <title>{% if xtTitle is defined %}{{ msg(xtTitle) }} - {% endif %}{{ msg('title_xtools') }}</title>
 
     {% if loadStylesheetsFromCDN() %}
         <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"
@@ -36,7 +36,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
-<body class="{{ app.request.attributes.get('_route') }}">
+<body class="{{ xtPage }}">
 
 <header class="navbar navbar-default navbar-top" role="navigation">
     <button class="navbar-toggle collapsed pull-left" data-toggle="collapse" data-target=".tool-links" aria-expanded="false">
@@ -77,13 +77,13 @@
     </ol>
     <nav class="tool-links navbar-collapse collapse">
         <ol class="nav navbar-nav navbar-left">
-            <li{% if page is defined and page=="index" %} class="active"{% endif %} >
-                <a href="{{ path("homepage") }}">{{ msg("title_xtools") }}</a>
+            <li{% if current_tool is defined and current_tool == "index" %} class="active"{% endif %} >
+                <a href="{{ path('homepage') }}">{{ msg("title_xtools") }}</a>
             </li>
 
             {% for tool in tools() %}
                 {% if enabled(tool) %}
-                    <li{% if page is defined and page==tool %} class="active"{% endif %} >
+                    <li{% if xtPage is defined and xtPage==tool %} class="active"{% endif %} >
                         <a href="{{ path(tool) }}">{{ msg("tool_" ~ tool) }}</a>
                     </li>
                 {% endif %}
@@ -125,19 +125,19 @@
 <main id="content" class="clearfix">
     {% block title %}
     <div class="col-lg-8 col-lg-offset-2">
-        {# if pageTitle is defined %}
+        {# if xtPageTitle is defined %}
             <h3>
-                {{ pageTitle }}
-                {% if subtitle is defined %}
-                    <small style="color:inherit"> &nbsp;&bull;&nbsp; {{ subtitle }}</small>
+                {{ xtPageTitle }}
+                {% if xtSubtitle is defined %}
+                    <small style="color:inherit"> &nbsp;&bull;&nbsp; {{ xtSubtitle }}</small>
                 {% endif %}
             </h3>
         {% endif #}
-        {% if pageTitle is defined %}
+        {% if xtPageTitle is defined %}
             <h2>
-                {{ msg(pageTitle) }}
-                {% if subtitle is defined %}
-                    <small> &nbsp;&bull;&nbsp; {{ msg(subtitle) }}</small>
+                {{ msg(xtPageTitle) }}
+                {% if xtSubtitle is defined %}
+                    <small> &nbsp;&bull;&nbsp; {{ msg(xtSubtitle) }}</small>
                 {% endif %}
             </h2>
         {% endif %}
@@ -161,7 +161,7 @@
         <div class="col">
             <span>
                 &copy; 2008-{{ year() }} &middot;
-                <a href="{{ path("aboutPage") }}">About these tools</a>  &middot;
+                <a href="{{ path('aboutPage') }}">About these tools</a>  &middot;
                 v.{{ version }} &middot;
                 <a href="http://github.com/x-tools/xtools-rebirth/tree/{{ hash() }}" target="_blank">r.{{ shortHash() }}</a>
             </span>

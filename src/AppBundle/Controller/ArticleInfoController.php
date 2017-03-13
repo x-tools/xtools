@@ -60,10 +60,10 @@ class ArticleInfoController extends Controller
         }
 
         return $this->render('articleInfo/index.html.twig', [
-            'page' => 'articleinfo',
-            'title' => 'tool_articleinfo',
-            'pageTitle' => 'tool_articleinfo',
-            'subtitle' => 'tool_articleinfo_desc',
+            'xtPage' => 'articleinfo',
+            'xtTitle' => 'tool_articleinfo',
+            'xtPageTitle' => 'tool_articleinfo',
+            'xtSubtitle' => 'tool_articleinfo_desc',
             'project' => $project,
         ]);
     }
@@ -137,6 +137,8 @@ class ArticleInfoController extends Controller
             $this->pageInfo['title'],
             $this->pageInfo['pageviews_offset']
         );
+
+        $this->pageInfo['xtPage'] = 'articleinfo';
 
         return $this->render("articleInfo/result.html.twig", $this->pageInfo);
     }
