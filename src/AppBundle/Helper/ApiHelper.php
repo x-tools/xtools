@@ -147,6 +147,7 @@ class ApiHelper
      */
     public function displayTitles($project, $pageTitles)
     {
+        $this->setUp($project);
         $displayTitles = [];
         for ($n = 0; $n < count($pageTitles); $n += 50) {
             $titleSlice = array_slice($pageTitles, $n, 50);
@@ -156,7 +157,7 @@ class ApiHelper
                 'titles' => join('|', $titleSlice),
             ];
             $query = new SimpleRequest('query', $params);
-            $result = $this->getApi($project)->getRequest($query);
+            $result = $this->api->getRequest($query);
 
             // Extract normalization info.
             $normalized = [];
