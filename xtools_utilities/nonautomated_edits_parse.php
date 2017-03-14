@@ -16,7 +16,7 @@ $data = json_decode($file, true);
 
 // Output the contents to the piped file
 print ( "parameters:
-  semi-automated edits:\r\n" );
+  automated_tools:\r\n" );
 foreach ($data as $row) {
     print "  - " . $row["name"] . ": '" . $row["regex"] . "'\r\n";
 }

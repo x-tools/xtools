@@ -28,6 +28,14 @@
             {% endif %}
         </p>
 
+        <div class="text-center xt-toc">
+            {% for section in ['generalstats', 'usertable', 'yearcounts', 'monthcounts', 'autoedits'] %}
+                <span>
+                    <a href="#{{ section }}" data-section="{{ section }}">{{ msg(section) }}</a>
+                </span>
+            {% endfor %}
+        </div>
+
         {% set content %}
             <dl class="col-lg-6 dl-horizontal stat-list clearfix">
                 <dt>ID</dt>
@@ -90,6 +98,10 @@
                 <dd>{{ anon_count | number_format }} &middot; ({{ anon_percentage }}%)</dd>
                 <dt>{{ msg('botedits') }}</dt>
                 <dd>{{ bot_revision_count | number_format }} &middot; ({{ bot_percentage }}%)</dd>
+                <dt>{{ msg('autoedits') }}</dt>
+                <dd>{{ automated_count }}</dd>
+                <dt>{{ msg('reverted') }}</dt>
+                <dd>{{ revert_count }}</dd>
                 <dt>{{ msg('avg_timebwedits_sign') }}</dt>
                 <dd>{{ average_days_per_edit }} {{ msg('days', [average_days_per_edit]) }}</dd>
                 <dt>{{ msg('editsperuser') }}</dt>
@@ -97,9 +109,9 @@
                 <dt>{{ msg('editsperday') }}</dt>
                 <dd>{{ edits_per_day }}</dd>
                 <dt>{{ msg('editspermonth') }}</dt>
-                <dd>{{ edits_per_month | number_format }}</dd>
+                <dd>{{ edits_per_month | number_format(1) }}</dd>
                 <dt>{{ msg('editsperyear') }}</dt>
-                <dd>{{ edits_per_year | number_format }}</dd>
+                <dd>{{ edits_per_year | number_format(1) }}</dd>
                 <dt>{{ msg('lastday') }}</dt>
                 <dd>{{ count_history.day | number_format }}</dd>
                 <dt>{{ msg('lastweek') }}</dt>
@@ -125,7 +137,7 @@
                 <dt>{{ msg('links_ext') }}</dt>
                 <dd>{{ links_ext_count | number_format }}</dd>
                 <dt>{{ msg('pagewatchers') }}</dt>
-                <dd>{{ watchers | number_format }}</dd>
+                <dd>{{ watchers }}</dd>
                 <dt>{{ msg('pageviews') }} (60 {{ msg('days', [60]) }})</dt>
                 <dd>
                     <a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project }}&pages={{ title }}&range=latest-{{ pageviews_offset }}">
@@ -310,6 +322,30 @@
             </table>
         {% endset %}
         {{ layout.content_block('monthcounts', content) }}
+
+        {% set content %}
+            <table class="table table-bordered table-hover table-striped">
+                <thead><tr>
+                    {% for key in ['tool', 'count'] %}
+                        <th>
+                            <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
+                                {{ msg(key) | capitalize }}
+                                <span class="glyphicon glyphicon-sort"></span>
+                            </span>
+                        </th>
+                    {% endfor %}
+                </tr></thead>
+                <tbody>
+                {% for tool, tool_count in tools %}
+                    <tr>
+                        <td class="sort-entry--tool" data-value="{{ tool }}">{{ tool }}</td>
+                        <td class="sort-entry--count" data-value="{{ tool_count }}">{{ tool_count }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endset %}
+        {{ layout.content_block('autoedits', content) }}
     </div>
 </div>
 {% endblock %}

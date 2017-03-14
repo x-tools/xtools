@@ -24,7 +24,7 @@
             'res/jquery.min.js'
             'bootstrap/js/bootstrap.min.js'
             'chartjs/Chart.min.js'
-            'static/js/*.js'
+            'static/js/application.js'
             output='static/js/production.js' %}
         <script src="{{ asset_url }}"></script>
         {% endjavascripts %}
@@ -171,7 +171,7 @@
         <div class="col pull-right">
             <a style="margin-right:5px;" href="//translatewiki.net/?setlang=en "><img height="36px" src="//upload.wikimedia.org/wikipedia/commons/5/51/Translatewiki.net_logo.svg" alt="translatewiki.net logo"/></a>
             {% if isWMFLabs() %}
-            <a href="//tools.wmflabs.org" target="_blank"><img height="40px" src="//tools.wmflabs.org/xtools/static/images/labs.png" alt="Powered by WMF Labs" /></a>
+            <a href="//tools.wmflabs.org" target="_blank"><img height="40px" src="{{ asset('static/images/labs.png') }}" alt="Powered by WMF Labs" /></a>
             {% endif %}
         </div>
     </div>

@@ -150,6 +150,33 @@ body {
 .xt-heading-subtitle {
     margin-top: 3px;
 }
+.xt-toc {
+    background: white;
+    font-size: 110%;
+    margin-top: 20px;
+    padding: 10px;
+    width: 100%;
+    z-index: 100;
+
+    span::after {
+        content: '\A0\2022\A0';
+    }
+    span:last-child::after {
+        content: '';
+    }
+
+    .bold {
+        font-weight: 500;
+    }
+
+    &.fixed {
+        @include center('horizontal', 'fixed');
+        box-shadow: 5px 5px 8px #CCC;
+        margin: 0;
+        top: 0;
+        width: auto;
+    }
+}
 .xt-alert {
     padding: 5px;
     margin: 5px;

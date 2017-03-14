@@ -101,7 +101,7 @@ class LabsHelper
      * Used for example to convert revision -> revision_replica
      * @param  string   $table  Table name
      * @param  [string] $dbName Database name
-     * @return $string  Converted table name
+     * @return string   Converted table name
      */
     public function getTable($table, $dbName = null)
     {

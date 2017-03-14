@@ -10,6 +10,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use AppBundle\Helper\Apihelper;
 use AppBundle\Helper\PageviewsHelper;
+use AppBundle\Helper\AutomatedEditsHelper;
 
 class ArticleInfoController extends Controller
 {
@@ -38,6 +39,7 @@ class ArticleInfoController extends Controller
         $this->lh = $this->get('app.labs_helper');
         $this->lh->checkEnabled('articleinfo');
         $this->ph = $this->get('app.pageviews_helper');
+        $this->nah = $this->get('app.automated_edits_helper');
     }
 
     /**
@@ -122,8 +124,6 @@ class ArticleInfoController extends Controller
         //         $this->extLinks[] = array("link" => $link->{'*'}, "status" => "unchecked" );
         //     }
         // }
-
-        // var_dump($this->pageInfo);
 
         $this->pageHistory = $this->getHistory();
         $this->historyCount = count($this->getHistory());
@@ -297,13 +297,31 @@ class ArticleInfoController extends Controller
         $userTable = $this->lh->getTable('user');
 
         $query = "SELECT rev_id, rev_parent_id, rev_user_text, rev_user, rev_timestamp,
-                rev_minor_edit, rev_len
+                rev_minor_edit, rev_len, rev_comment
             FROM $this->revisionTable
             WHERE rev_page = '" . $this->pageInfo['id'] . "' AND rev_timestamp > 1
             ORDER BY rev_timestamp";
 
         $res = $this->lh->client->query($query)->fetchAll();
         return $res;
+    }
+
+    /**
+     * Get the size of the diff
+     * @param  int $rev The index of the revision within $this->pageHistory
+     * @return int Size of the diff
+     */
+    private function getDiffSize($revIndex)
+    {
+        $rev = $this->pageHistory[$revIndex];
+
+        if ($revIndex === 0) {
+            return $rev['rev_len'];
+        }
+
+        $lastRev = $this->pageHistory[$revIndex - 1];
+
+        return $rev['rev_len'] - $lastRev['rev_len'];
     }
 
     /**
@@ -367,13 +385,14 @@ class ArticleInfoController extends Controller
             'textshares' => [],
             'textshare_total' => 0,
             'tools' => [],
-            'automated_count' => 0
+            'automated_count' => 0,
+            'revert_count' => 0
         ];
 
         // And now comes the logic for filling said master array
         foreach ($this->pageHistory as $i => $rev) {
             $newSize = $rev['rev_len'];
-            $diffSize = $i > 0 ? $newSize - $this->pageHistory[$i - 1]['rev_len'] : $newSize;
+            $diffSize = $this->getDiffSize($i);
             $timestamp = date_parse($rev['rev_timestamp']);
             $username = htmlspecialchars($rev['rev_user_text']);
 
@@ -388,7 +407,13 @@ class ArticleInfoController extends Controller
 
             // Fill in the blank arrays for the year and 12 months
             if (!isset($data['year_count'][$timestamp['year']])) {
-                $data['year_count'][$timestamp['year']] = [ 'all' => 0, 'minor' => 0, 'anon' => 0, 'months' => [] ];
+                $data['year_count'][$timestamp['year']] = [
+                    'all' => 0,
+                    'minor' => 0,
+                    'anon' => 0,
+                    'automated' => 0,
+                    'months' => [],
+                ];
 
                 for ($i = 1; $i <= 12; $i++) {
                     $timeObj = mktime(0, 0, 0, $i, 1, $timestamp['year']);
@@ -403,6 +428,7 @@ class ArticleInfoController extends Controller
                         'minor' => 0,
                         'anon' => 0,
                         'size' => [],
+                        'automated' => 0,
                     ];
                 }
             }
@@ -437,27 +463,41 @@ class ArticleInfoController extends Controller
             $data['editors'][$username]['last_id'] = $rev['rev_id'];
             $data['editors'][$username]['sizes'][] = number_format(( $rev['rev_len'] / 1024 ), 2);
 
-            // if ( !$revert ){
-            if ($newSize > 0) {
-                $data['textshare_total'] += $newSize;
-                if (!isset($data['textshares'][$username]['all'])) {
-                    $data['textshares'][$username]['all'] = 0;
+            // check if it was a revert
+            if ($this->nah->isRevert($rev['rev_comment'])) {
+                $data['revert_count']++;
+            } else {
+                // edit was NOT a revert
+
+                if ($newSize > 0) {
+                    // FIXME: what are textshares?
+                    $data['textshare_total'] += $newSize;
+                    if (!isset($data['textshares'][$username]['all'])) {
+                        $data['textshares'][$username]['all'] = 0;
+                    }
+                    $data['textshares'][$username]['all'] += $newSize;
                 }
-                $data['textshares'][$username]['all'] += $newSize;
+                if ($diffSize > $data['max_add']['size']) {
+                    $data['max_add']['timestamp'] = DateTime::createFromFormat('YmdHis', $rev['rev_timestamp']);
+                    $data['max_add']['revid'] = $rev['rev_id'];
+                    $data['max_add']['user'] = $rev['rev_user_text'];
+                    $data['max_add']['size'] = $diffSize;
+                }
+
+                // determine if the next revision was a revert
+                $nextRevision = isset($this->pageHistory[$i + 1]) ? $this->pageHistory[$i + 1] : null;
+                $nextRevisionIsRevert = $nextRevision &&
+                    $this->getDiffSize($i + 1) === -$diffSize &&
+                    $this->nah->isRevert($nextRevision['rev_comment']);
+
+                // don't count this edit as content removal if the next edit reverted it
+                if (!$nextRevisionIsRevert && $diffSize < $data['max_del']['size']) {
+                    $data['max_del']['timestamp'] = DateTime::createFromFormat('YmdHis', $rev['rev_timestamp']);
+                    $data['max_del']['revid'] = $rev['rev_id'];
+                    $data['max_del']['user'] = $rev['rev_user_text'];
+                    $data['max_del']['size'] = $diffSize;
+                }
             }
-            if ($diffSize > $data['max_add']['size']) {
-                $data['max_add']['timestamp'] = DateTime::createFromFormat('YmdHis', $rev['rev_timestamp']);
-                $data['max_add']['revid'] = $rev['rev_id'];
-                $data['max_add']['user'] = $rev['rev_user_text'];
-                $data['max_add']['size'] = $diffSize;
-            }
-            if ($diffSize < $data['max_del']['size']) {
-                $data['max_del']['timestamp'] = DateTime::createFromFormat('YmdHis', $rev['rev_timestamp']);
-                $data['max_del']['revid'] = $rev['rev_id'];
-                $data['max_del']['user'] = $rev['rev_user_text'];
-                $data['max_del']['size'] = $diffSize;
-            }
-            // }
 
             if (!$rev['rev_user']) {
                 if (!isset($rev['rev_user']['anons'][$username])) {
@@ -477,17 +517,18 @@ class ArticleInfoController extends Controller
                 $data['editors'][$username]['minor']++;
             }
 
-//          if ( $this->checkAEB ){
-//              foreach ( $this->AEBTypes as $tool => $signature ){
-//                  if ( preg_match( $signature["regex"], $rev["rev_comment"]) ){
-//                      $data['automated_count']++;
-//                      $data['year_count'][$timestamp['year']]['automated']++;
-//                      $data['year_count'][$timestamp['year']]['months'][$timestamp['month']]['automated']++;
-//                      $data['tools'][$tool]++;
-//                      break;
-//                  }
-//              }
-//          }
+            $automatedTool = $this->nah->getTool($rev['rev_comment']);
+            if ($automatedTool) {
+                $data['automated_count']++;
+                $data['year_count'][$timestamp['year']]['automated']++;
+                $data['year_count'][$timestamp['year']]['months'][$timestamp['month']]['automated']++;
+
+                if (!isset($data['tools'][$automatedTool])) {
+                    $data['tools'][$automatedTool] = 1;
+                } else {
+                    $data['tools'][$automatedTool]++;
+                }
+            }
 
             // Increment "edits per <time>" counts
             if (strtotime($rev['rev_timestamp']) > strtotime('-1 day')) {
@@ -534,6 +575,7 @@ class ArticleInfoController extends Controller
         // Various sorts
         arsort($data['editors']);
         arsort($data['textshares']);
+        arsort($data['tools']);
         ksort($data['year_count']);
 
         return $data;

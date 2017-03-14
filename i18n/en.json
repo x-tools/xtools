@@ -171,6 +171,7 @@
   "timebwedits": "Average time between edits",
   "timecard": "Time card",
   "title_xtools": "XTools",
+  "tool": "Tool",
   "tool_adminstats": "AdminStats",
   "tool_adminstats_desc": "Show statistics of admin actions",
   "tool_articleinfo": "Page history",

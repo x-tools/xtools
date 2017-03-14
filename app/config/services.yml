@@ -36,3 +36,9 @@ services:
         public: true
         tags:
           - {name: pageviews.helper}
+    app.automated_edits_helper:
+        class: AppBundle\Helper\AutomatedEditsHelper
+        arguments: ["@service_container"]
+        public: true
+        tags:
+          - {name: automatededits.helper}
