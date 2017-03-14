@@ -82,11 +82,15 @@ class TopEditsController extends Controller
 
     /**
      * List top edits by this user for all pages in a particular namespace.
+     * @param LabsHelper $lh
+     * @param string $username
+     * @param string $project
+     * @param integer $namespace
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function namespaceTopEdits($lh, $username, $project, $namespace)
     {
-        // List top 100 edits by this user in this namespace.
+        // Get the basic data about the pages edited by this user.
         $query = "SELECT page_namespace, page_title, page_is_redirect, COUNT(page_title) AS count
                 FROM ".$lh->getTable('page')." JOIN ".$lh->getTable('revision_userindex')." ON page_id = rev_page
                 WHERE rev_user_text = :username AND page_namespace = :namespace
@@ -94,7 +98,23 @@ class TopEditsController extends Controller
                 ORDER BY count DESC
                 LIMIT 100";
         $params = ['username'=>$username, 'namespace'=> $namespace];
-        $edits = $lh->client->executeQuery($query, $params)->fetchAll();
+        $editData = $lh->client->executeQuery($query, $params)->fetchAll();
+
+        // Get page info about these 100 pages, so we can use their display title.
+        $titles = array_map(function ($e) {
+            return $e['page_title'];
+        }, $editData);
+        /** @var ApiHelper $apiHelper */
+        $apiHelper = $this->get("app.api_helper");
+        $displayTitles = $apiHelper->displayTitles($project, $titles);
+
+        // Put all together, and return the view.
+        $edits = [];
+        foreach ($editData as $editDatum) {
+            $pageTitle = $editDatum['page_title'];
+            $editDatum['displaytitle'] = $displayTitles[$pageTitle];
+            $edits[] = $editDatum;
+        }
         return $this->render('topedits/result_namespace.html.twig', array(
             "xtPageTitle" => "tool_topedits",
             "xtSubtitle" => "tool_topedits_desc",

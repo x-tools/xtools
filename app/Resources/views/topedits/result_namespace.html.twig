@@ -25,7 +25,7 @@
                     {% for edit in edits %}
                     <tr>
                         <td class=tdnum >{{ edit.count }}</td>
-                        <td><a href="//{{ project }}/wiki/{{ edit.page_title }}" >{{ edit.page_title }}</a></td>
+                        <td><a href="//{{ project }}/wiki/{{ edit.page_title }}" >{{ edit.displaytitle|raw }}</a></td>
                         <td><a href="//{{ project }}/w/index.php?title=Special:Log&type=&page={{ edit.page_title }}" ><small>log</small></a> &middot; </td>
                         <td><a href="{{ path('ArticleInfoResult', {project:project, article:edit.page_title|url_encode}) }}"><small>page history</small></a> &middot; </td>
                         <td><a href="{{ path('TopEditsResults', {project:project, username:username, namespace:namespace, article:edit.page_title|url_encode}) }}" ><small>topedits</small></a></td>

@@ -34,8 +34,7 @@
                             <td>User:</td>
                             <td colspan="4" >
                                 {{ user_link(username, '//'~project ) }}
-                                <a href="//{{ project }}/wiki/User:{{ username }}" >{{ username }}</a>
-                                &middot;<a title="Edit Counter" href="{{ path('EditCounterResult', {project:project, username:username}) }}" >(ec)</a>
+                                &middot; <a href="{{ path('EditCounterResult', {project:project, username:username}) }}" >{{ msg('tool_ec') }}</a>
                             </td>
                         </tr>
                         <tr><td>Number of edits:</td><td><span class="tdnum" colspan=1 >{{ revision_count }}</span></td></tr>

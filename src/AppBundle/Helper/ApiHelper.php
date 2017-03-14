@@ -136,4 +136,49 @@ class ApiHelper
 
         return $result;
     }
+
+    /**
+     * Get HTML display titles of a set of pages (or the normal title if there's no display title).
+     * This will send t/50 API requests where t is the number of titles supplied.
+     * @param string $project The project.
+     * @param string[] $pageTitles The titles to fetch.
+     * @return string[] Keys are the original supplied title, and values are the display titles.
+     */
+    public function displayTitles($project, $pageTitles)
+    {
+        $displayTitles = [];
+        for ($n = 0; $n < count($pageTitles); $n += 50) {
+            $titleSlice = array_slice($pageTitles, $n, 50);
+            $params = [
+                'prop' => 'info|pageprops',
+                'inprop' => 'displaytitle',
+                'titles' => join('|', $titleSlice),
+            ];
+            $query = new SimpleRequest('query', $params);
+            $result = $this->getApi($project)->getRequest($query);
+
+            // Extract normalization info.
+            $normalized = [];
+            if (isset($result['query']['normalized'])) {
+                array_map(
+                    function ($e) use (&$normalized) {
+                        $normalized[$e['to']] = $e['from'];
+                    },
+                    $result['query']['normalized']
+                );
+            }
+
+            // Match up the normalized titles with the display titles and the original titles.
+            foreach ($result['query']['pages'] as $pageInfo) {
+                $displayTitle = isset($pageInfo['pageprops']['displaytitle'])
+                    ? $pageInfo['pageprops']['displaytitle']
+                    : $pageInfo['title'];
+                $origTitle = isset($normalized[$pageInfo['title']])
+                    ? $normalized[$pageInfo['title']] : $pageInfo['title'];
+                $displayTitles[$origTitle] = $displayTitle;
+            }
+        }
+
+        return $displayTitles;
+    }
 }
