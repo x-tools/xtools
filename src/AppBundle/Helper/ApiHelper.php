@@ -55,7 +55,6 @@ class ApiHelper
         }
 
         return $result;
-
     }
 
     public function namespaces($project)
@@ -94,7 +93,6 @@ class ApiHelper
         }
 
         return $result;
-
     }
 
     /**
