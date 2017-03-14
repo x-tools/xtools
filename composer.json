@@ -29,15 +29,12 @@
         "sensio/distribution-bundle": "^5.0",
         "sensio/framework-extra-bundle": "^3.0",
         "incenteev/composer-parameter-handler": "^2.0",
-        "twbs/bootstrap": "3.1.1",
-        "Krinkle/intuition": "^0.2.3",
-        "nnnick/chartjs": "2.1.0",
-        "addwiki/mediawiki-api-base": "2.3.x-dev",
-        "addwiki/mediawiki-datamodel": "0.7.x-dev",
-        "addwiki/mediawiki-api": "0.7.x-dev",
-        "addwiki/guzzle-mediawiki-client": "0.1",
+        "twbs/bootstrap": "^3.1",
+        "Krinkle/intuition": "^0.2",
+        "nnnick/chartjs": "^2.1",
+        "addwiki/mediawiki-api": "^0.7",
         "symfony/assetic-bundle": "^2.8",
-        "leafo/scssphp": "^0.6.7"
+        "leafo/scssphp": "^0.6"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",

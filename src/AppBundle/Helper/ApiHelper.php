@@ -2,9 +2,8 @@
 
 namespace AppBundle\Helper;
 
-use \Mediawiki\Api\MediawikiApi;
+use Mediawiki\Api\MediawikiApi;
 use Mediawiki\Api\SimpleRequest;
-use GuzzleHttp;
 use Symfony\Component\Config\Definition\Exception\Exception;
 
 class ApiHelper
