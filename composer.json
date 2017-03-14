@@ -27,7 +27,7 @@
         "symfony/swiftmailer-bundle": "^2.3",
         "symfony/monolog-bundle": "^2.8",
         "sensio/distribution-bundle": "^5.0",
-        "sensio/framework-extra-bundle": "^3.0.2",
+        "sensio/framework-extra-bundle": "^3.0",
         "incenteev/composer-parameter-handler": "^2.0",
         "twbs/bootstrap": "3.1.1",
         "Krinkle/intuition": "^0.2.3",
@@ -43,7 +43,7 @@
         "sensio/generator-bundle": "^3.0",
         "phpunit/phpunit": "^4.8",
         "symfony/phpunit-bridge": "^3.0",
-        "mediawiki/mediawiki-codesniffer": "^0.7"
+        "jakub-onderka/php-parallel-lint": "0.9.2"
     },
     "scripts": {
         "post-install-cmd": [

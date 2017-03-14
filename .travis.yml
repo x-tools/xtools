@@ -22,6 +22,7 @@ before_install:
 #  - codecov
 
 script:
+    - ./vendor/bin/parallel-lint --exclude vendor .
     - composer validate
     - composer install
     - ./vendor/bin/phpunit --coverage-clover=coverage.xml
