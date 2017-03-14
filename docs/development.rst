@@ -28,6 +28,26 @@ Follow these steps
 
 The development server does not cache data.  Any changes you make are visible after refreshing the page.
 
+Developing against WMF databases
+--------------------------------
+If you want to use the WMF database replicas, open a tunnel with:
+::
+
+    ssh -L 4711:enwiki.labsdb:3306 tools-login.wmflabs.org -N -l your-username-here
+
+And set the following in ``app/config/parameters.yml``:
+::
+
+    app.is_labs: 1
+    database_replica_host: 127.0.0.1
+    database_replica_port: 4711
+    database_replica_name: meta_p
+    database_meta_name: meta_p
+    database_replica_user: your-uxxxx-username-here
+    database_replica_password: your-password-here
+
+(Change the 'your-*-here' bits to your own values.)
+
 Additional Help
 ---------------
 Please contact `User:Matthewrbowker <https://en.wikipedia.org/wiki/User:Matthewrbowker>`_ or `User:MusikAnimal <https://en.wikipedia.org/wiki/User:MusikAnimal>`_ if you need help.  Or, you are welcome to visit us on `IRC <https://webchat.freenode.net/?channels=#wikimedia-xtools>`_ (`Direct link <irc://irc.freenode.net/#wikimedia-xtools>`_ - Requires an IRC client).
