@@ -7,6 +7,7 @@ Refactored 2014 by Hedonil
 
 Refactored 2016 by Matthewrbowker
 
+[![Docs](https://readthedocs.org/projects/xtools/badge/?version=latest)](https://xtools.readthedocs.io/en/latest/?badge=latest)
 [![Dependency Status](https://www.versioneye.com/user/projects/58c7654c2e726a000f720682/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/58c7654c2e726a000f720682)
 [![Build Status](https://travis-ci.org/x-tools/xtools-rebirth.svg?branch=master)](https://travis-ci.org/x-tools/xtools-rebirth)
 
