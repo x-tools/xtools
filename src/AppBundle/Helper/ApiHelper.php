@@ -4,6 +4,7 @@ namespace AppBundle\Helper;
 
 use Mediawiki\Api\MediawikiApi;
 use Mediawiki\Api\SimpleRequest;
+use Mediawiki\Api\FluentRequest;
 use Symfony\Component\Config\Definition\Exception\Exception;
 
 class ApiHelper
@@ -180,5 +181,105 @@ class ApiHelper
         }
 
         return $displayTitles;
+    }
+
+    /**
+     * Make mass API requests to MediaWiki API
+     * The API normally limits to 500 pages, but gives you a 'continue' value
+     *   to finish iterating through the resource.
+     * Adapted from https://github.com/MusikAnimal/pageviews
+     * @param  array   $params        Associative array of params to pass to API
+     * @param  string  $project       Project to query, e.g. en.wikipedia.org
+     * @param  string  [$continueKey] the key to look in the continue hash, if present
+     *                                (e.g. 'cmcontinue' for API:Categorymembers)
+     * @param  string  $dataKey       The key for the main chunk of data, in the query hash
+     *                                (e.g. 'categorymembers' for API:Categorymembers)
+     * @param  integer $limit         max number of pages to fetch
+     * @return array                  Associative array with data
+     */
+    public function massApi($params, $project, $dataKey, $continueKey = 'continue', $limit = 5000)
+    {
+        $this->setUp($project);
+
+        // Passed by reference to massApiInternal so we can keep track of
+        //   everything we need during the recursive calls
+        // The magically essential part here is $data['promise'] which we'll
+        //   wait to be resolved
+        $data = [
+            'params' => $params,
+            'project' => $project,
+            'continueKey' => $continueKey,
+            'dataKey' => $dataKey,
+            'limit' => $limit,
+            'resolveData' => [
+                'pages' => []
+            ],
+            'continueValue' => null,
+            'promise' => new \GuzzleHttp\Promise\Promise(),
+        ];
+
+        // wait for all promises to complete, even if some of them fail
+        \GuzzleHttp\Promise\settle($this->massApiInternal($data))->wait();
+
+        return $data['resolveData'];
+    }
+
+    /**
+     * Internal function used by massApi() to make recursive calls
+     * @param  array &$data Everything we need to keep track of, as defined in massApi()
+     * @return null         Nothing. $data['promise']->then is used to continue flow of
+     *                      execution after all recursive calls are complete
+     */
+    private function massApiInternal(&$data)
+    {
+        $requestData = array_merge([
+            'action' => 'query',
+            'format' => 'json',
+            'formatversion' => '2',
+        ], $data['params']);
+
+        if ($data['continueValue']) {
+            $requestData[$data['continueKey']] = $data['continueValue'];
+        }
+
+        $query = FluentRequest::factory()->setAction('query')->setParams($requestData);
+        $innerPromise = $this->api->getRequestAsync($query);
+
+        $innerPromise->then(function ($result) use (&$data) {
+            // some failures come back as 200s, so we still resolve and let the outer function handle it
+            if (isset($result['error']) || !isset($result['query'])) {
+                return $data['promise']->resolve($data);
+            }
+
+            $dataKey = $data['dataKey'];
+            $isFinished = false;
+
+            // append new data to data from last request. We might want both 'pages' and dataKey
+            if ($result['query']['pages']) {
+                $data['resolveData']['pages'] = array_merge($data['resolveData']['pages'], $result['query']['pages']);
+            }
+            if ($result['query'][$dataKey]) {
+                $newValues = isset($data['resolveData'][$dataKey]) ? $data['resolveData'][$dataKey] : [];
+                $data['resolveData'][$dataKey] = array_merge($newValues, $result['query'][$dataKey]);
+            }
+
+            // If pages is not the collection we want, it will be either an empty array or one entry with
+            //   basic page info depending on what API we're hitting. So resolveData[dataKey] will hit the limit
+            $isFinished = count($data['resolveData']['pages']) >= $data['limit'] ||
+                count($data['resolveData'][$dataKey]) >= $data['limit'];
+
+            // make recursive call if needed, waiting 100ms
+            if (!$isFinished && isset($result['continue']) && isset($result['continue'][$data['continueKey']])) {
+                usleep(100000);
+                $data['continueValue'] = $result['continue'][$data['continueKey']];
+                return $this->massApiInternal($data);
+            } else {
+                // indicate there were more entries than the limit
+                if ($result['continue']) {
+                    $data['resolveData']['continue'] = true;
+                }
+                $data['promise']->resolve($data);
+            }
+        });
     }
 }
