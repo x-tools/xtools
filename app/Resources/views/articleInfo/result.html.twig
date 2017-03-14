@@ -99,9 +99,9 @@
                 <dt>{{ msg('botedits') }}</dt>
                 <dd>{{ bot_revision_count | number_format }} &middot; ({{ bot_percentage }}%)</dd>
                 <dt>{{ msg('autoedits') }}</dt>
-                <dd>{{ automated_count }}</dd>
+                <dd>{{ automated_count | number_format }}</dd>
                 <dt>{{ msg('reverted') }}</dt>
-                <dd>{{ revert_count }}</dd>
+                <dd>{{ revert_count | number_format }}</dd>
                 <dt>{{ msg('avg_timebwedits_sign') }}</dt>
                 <dd>{{ average_days_per_edit }} {{ msg('days', [average_days_per_edit]) }}</dd>
                 <dt>{{ msg('editsperuser') }}</dt>
