@@ -39,7 +39,7 @@ class ArticleInfoController extends Controller
         $this->lh = $this->get('app.labs_helper');
         $this->lh->checkEnabled('articleinfo');
         $this->ph = $this->get('app.pageviews_helper');
-        $this->nah = $this->get('app.automated_edits_helper');
+        $this->aeh = $this->get('app.automated_edits_helper');
     }
 
     /**
@@ -142,6 +142,7 @@ class ArticleInfoController extends Controller
             $this->pageInfo['title'],
             $this->pageInfo['pageviews_offset']
         );
+        $this->pageInfo['assessments'] = $api->getPageAssessments($project, $page);
 
         $this->pageInfo['xtPage'] = 'articleinfo';
 
@@ -464,7 +465,7 @@ class ArticleInfoController extends Controller
             $data['editors'][$username]['sizes'][] = number_format(( $rev['rev_len'] / 1024 ), 2);
 
             // check if it was a revert
-            if ($this->nah->isRevert($rev['rev_comment'])) {
+            if ($this->aeh->isRevert($rev['rev_comment'])) {
                 $data['revert_count']++;
             } else {
                 // edit was NOT a revert
@@ -488,7 +489,7 @@ class ArticleInfoController extends Controller
                 $nextRevision = isset($this->pageHistory[$i + 1]) ? $this->pageHistory[$i + 1] : null;
                 $nextRevisionIsRevert = $nextRevision &&
                     $this->getDiffSize($i + 1) === -$diffSize &&
-                    $this->nah->isRevert($nextRevision['rev_comment']);
+                    $this->aeh->isRevert($nextRevision['rev_comment']);
 
                 // don't count this edit as content removal if the next edit reverted it
                 if (!$nextRevisionIsRevert && $diffSize < $data['max_del']['size']) {
@@ -517,7 +518,7 @@ class ArticleInfoController extends Controller
                 $data['editors'][$username]['minor']++;
             }
 
-            $automatedTool = $this->nah->getTool($rev['rev_comment']);
+            $automatedTool = $this->aeh->getTool($rev['rev_comment']);
             if ($automatedTool) {
                 $data['automated_count']++;
                 $data['year_count'][$timestamp['year']]['automated']++;

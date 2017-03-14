@@ -10,6 +10,8 @@ class AppExtension extends Extension
         return 'app_extension';
     }
 
+    /*********************************** FUNCTIONS ***********************************/
+
     public function getFunctions()
     {
         $options = ['is_safe' => ['html']];
@@ -395,5 +397,25 @@ class AppExtension extends Extension
         $retVal = str_replace("//", "/", $retVal);
 
         return $retVal;
+    }
+
+    /*********************************** FILTERS ***********************************/
+
+    public function getFilters()
+    {
+        return [
+            new \Twig_SimpleFilter('capitalize_first', [ $this, 'capitalizeFirst' ]),
+        ];
+    }
+
+    /**
+     * Mysteriously missing Twig helper to capitalize only the first character.
+     * E.g. used for table headings for translated messages
+     * @param  string $str The string
+     * @return string      The string, capitalized
+     */
+    public function capitalizeFirst($str)
+    {
+        return ucfirst($str);
     }
 }

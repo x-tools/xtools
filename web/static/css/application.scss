@@ -146,9 +146,19 @@ body {
     font-size: 1.8em;
     padding-bottom: 0px;
     margin-bottom: 0px;
+    position: relative;
 }
 .xt-heading-subtitle {
     margin-top: 3px;
+}
+.back-to-search {
+    @include center('vertical');
+    font-size: 16px;
+    left: 0;
+
+    &:hover {
+        text-decoration: none;
+    }
 }
 .xt-toc {
     background: white;
@@ -175,6 +185,7 @@ body {
         margin: 0;
         top: 0;
         width: auto;
+        white-space: nowrap;
     }
 }
 .xt-alert {
@@ -399,6 +410,31 @@ div.outer_bar {
       visibility: visible;
     }
   }
+}
+
+.assessment-badge {
+    height: 20px;
+    width: 20px;
+}
+
+.sort-entry--assessment,
+.sort-entry--importance {
+    font-weight: bold;
+    text-align: center;
+
+    a {
+        color: #4365cc;
+    }
+}
+
+.rm-inline-margin {
+    margin-right: -4px;
+}
+
+@media (min-width: $bootstrap-lg) {
+    .xt-panel-body table {
+        width: auto;
+    }
 }
 
 @media (max-width: $bootstrap-sm) {

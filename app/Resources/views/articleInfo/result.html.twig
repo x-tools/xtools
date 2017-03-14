@@ -5,6 +5,10 @@
 <div class="panel panel-primary">
     <header class="panel-heading">
         <div class="text-center xt-heading-top">
+            <a class="back-to-search" href="{{ path('articleinfo') }}">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                Back
+            </a>
             {{ wiki_link(title, project_url) }}
             <small>
                 &bull;
@@ -29,7 +33,7 @@
         </p>
 
         <div class="text-center xt-toc">
-            {% for section in ['generalstats', 'usertable', 'yearcounts', 'monthcounts', 'autoedits'] %}
+            {% for section in ['generalstats', 'usertable', 'yearcounts', 'monthcounts', 'autoedits', 'assessments'] %}
                 <span>
                     <a href="#{{ section }}" data-section="{{ section }}">{{ msg(section) }}</a>
                 </span>
@@ -47,15 +51,32 @@
                     <dd>
                         <a target="_blank" href="https://www.wikidata.org/wiki/{{ wikidataId }}">{{ wikidataId }}</a>
                         &middot;
-                        {{ msg('num-items', [numWikidataItems]) }}
+                        {{ msg('num_sitelinks', [numWikidataItems | number_format, numWikidataItems]) }}
                     </dd>
                 {% endif %}
                 <dt>{{ msg('pagesize') }}</dt>
-                <dd>{{ msg('num-bytes', [length | number_format, length]) }}</dd>
+                <dd>{{ msg('num_bytes', [length | number_format, length]) }}</dd>
                 <dt>{{ msg('totaledits') }}</dt>
                 <dd>{{ revision_count | number_format }}</dd>
-                <dt>{{ msg('editorcount') }}</dt>
+                <dt>
+                    <a class="rm-inline-margin" href="#usertable">{{ msg('editorcount') }}</a>
+                </dt>
                 <dd>{{ editor_count | number_format }}</dd>
+                {% if assessments is defined %}
+                    <dt>
+                        <a class="rm-inline-margin" href="#assessments">{{ msg('assessment') }}</a>
+                    </dt>
+                    <dd>
+                        {% set assessment_value %}
+                            {% if assessments.assessment.badge is defined %}
+                                <img alt="{{ assessments.assessment.value }}" src="{{ assessments.assessment.badge }}" class="assessment-badge" />
+                            {% else %}
+                                {{ assessments.assessment.value }}
+                            {% endif %}
+                        {% endset %}
+                        {{ wiki_link(assessments.assessment.category, project_url, assessment_value) }}
+                    </dd>
+                {% endif %}
             </dl>
             <dl class="col-lg-6 dl-horizontal stat-list clearfix">
                 <dt>{{ msg('firstedit') }}</dt>
@@ -98,7 +119,9 @@
                 <dd>{{ anon_count | number_format }} &middot; ({{ anon_percentage }}%)</dd>
                 <dt>{{ msg('botedits') }}</dt>
                 <dd>{{ bot_revision_count | number_format }} &middot; ({{ bot_percentage }}%)</dd>
-                <dt>{{ msg('autoedits') }}</dt>
+                <dt>
+                    <a class="rm-inline-margin" href="#autoedits">{{ msg('autoedits') }}</a>
+                </dt>
                 <dd>{{ automated_count | number_format }}</dd>
                 <dt>{{ msg('reverted') }}</dt>
                 <dd>{{ revert_count | number_format }}</dd>
@@ -156,7 +179,7 @@
                     {% for key in ['username', 'links', 'edits', 'minor', 'minor_percentage', 'firstedit', 'latestedit', 'net_change'] %}
                         <th>
                             <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
-                                {{ msg(key) | capitalize }}
+                                {{ msg(key) | capitalize_first }}
                                 {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
                             </span>
                         </th>
@@ -248,11 +271,7 @@
                     {% for key in ['year', 'numedits', 'ips', 'ips_percentage', 'minor', 'minor_percentage', 'events'] %}
                         <th>
                             <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                                {% if key == "ips" %}
-                                    {{ msg(key) }}
-                                {% else %}
-                                    {{ msg(key) | capitalize }}
-                                {% endif %}
+                                {{ msg(key) | capitalize_first }}
                                 <span class="glyphicon glyphicon-sort"></span>
                             </span>
                         </th>
@@ -283,11 +302,7 @@
                     {% for key in ['month', 'numedits', 'ips', 'ips_percentage', 'minor', 'minor_percentage'] %}
                         <th>
                             <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                                {% if key == "ips" %}
-                                    {{ msg(key) }}
-                                {% else %}
-                                    {{ msg(key) | capitalize }}
-                                {% endif %}
+                                {{ msg(key) | capitalize_first }}
                                 <span class="glyphicon glyphicon-sort"></span>
                             </span>
                         </th>
@@ -329,7 +344,7 @@
                     {% for key in ['tool', 'count'] %}
                         <th>
                             <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                                {{ msg(key) | capitalize }}
+                                {{ msg(key) | capitalize_first }}
                                 <span class="glyphicon glyphicon-sort"></span>
                             </span>
                         </th>
@@ -346,6 +361,45 @@
             </table>
         {% endset %}
         {{ layout.content_block('autoedits', content) }}
+
+        {% set content %}
+            <table class="table table-bordered table-hover table-striped assessments-table">
+                <thead><tr>
+                    {% for key in ['wikiproject', 'assessment', 'importance'] %}
+                        <th>
+                            <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
+                                {{ msg(key) | capitalize_first }}
+                                <span class="glyphicon glyphicon-sort"></span>
+                            </span>
+                        </th>
+                    {% endfor %}
+                </tr></thead>
+                <tbody>
+                {% for wikiproject, assessment in assessments.wikiprojects %}
+                    <tr>
+                        <td class="sort-entry--wikiproject" data-value="{{ wikiproject }}">
+                            {{ wiki_link(assessments.wikiproject_prefix ~ wikiproject, project_url, wikiproject) }}
+                        </td>
+                        <td style="background:{{ assessment.class.color }}" class="sort-entry--assessment" data-value="{{ assessment.class.value }}">
+                            {% set assessment_value %}
+                                {% if assessment.class.badge is defined %}
+                                    <img alt="{{ assessment.class.value }}" src="{{ assessment.class.badge }}" class="assessment-badge" />
+                                {% else %}
+                                    {{ assessment.class.value }}
+                                {% endif %}
+                            {% endset %}
+                            {{ wiki_link(assessment.class.category, project_url, assessment_value) }}
+                        </td>
+                        <td style="background:{{ assessment.importance.color }}" class="sort-entry--importance" data-value="{{ assessment.importance.weight }}">
+                            {% set importance_label = assessment.importance ? assessment.importance.value : '???' %}
+                            {{ wiki_link(assessment.importance.category, project_url, importance_label) }}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endset %}
+        {{ layout.content_block('assessments', content) }}
     </div>
 </div>
 {% endblock %}

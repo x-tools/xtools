@@ -6,10 +6,16 @@ use Mediawiki\Api\MediawikiApi;
 use Mediawiki\Api\SimpleRequest;
 use Mediawiki\Api\FluentRequest;
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ApiHelper
 {
     private $api;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     private function setUp($project)
     {
@@ -185,18 +191,135 @@ class ApiHelper
     }
 
     /**
+     * Get assessments of the given pages, if a supported project
+     * @param  string       $project    Project such as en.wikipedia.org
+     * @param  string|array $pageTitles Single page title or array of titles
+     * @return array                    Page assessments info
+     */
+    public function getPageAssessments($project, $pageTitles)
+    {
+        $supportedProjects = ['en.wikipedia.org', 'en.wikivoyage.org'];
+
+        // return null if unsupported project
+        if (!in_array($project, $supportedProjects)) {
+            return null;
+        }
+
+        $params = [
+            'prop' => 'pageassessments',
+            'titles' => is_string($pageTitles) ? $pageTitles : implode('|', $pageTitles),
+            'palimit' => 500,
+        ];
+
+        // get assessments for this page from the API
+        $assessments = $this->massApi($params, $project, function ($data) {
+            return isset($data['pages'][0]['pageassessments']) ? $data['pages'][0]['pageassessments'] : [];
+        }, 'pacontinue')['pages'];
+
+        // From config/assessments.yml
+        $config = $this->getAssessmentsConfig()[$project];
+
+        $decoratedAssessments = [];
+
+        // Set the default decorations for the overall quality assessment
+        // This will be replaced with the first valid class defined for any WikiProject
+        $overallQuality = $config['class']['Unknown'];
+        $overallQuality['value'] = '???';
+
+        // loop through each assessment and decorate with colors, category URLs and images, if applicable
+        foreach ($assessments as $wikiproject => $assessment) {
+            $classValue = $assessment['class'];
+
+            // Use ??? as the presented value when the class is unknown or is not defined in the config
+            if ($classValue === 'Unknown' || $classValue === '' || !isset($config['class'][$classValue])) {
+                $assessment['class'] = $config['class']['Unknown'];
+                $assessment['class']['value'] = '???';
+            } else {
+                $classAttrs = $config['class'][$classValue];
+                $assessment['class'] = [
+                    'value' => $classValue,
+                    'color' => $classAttrs['color'],
+                    // $1 is used to substitute the WikiProject name, e.g. Category:FA-Class Wikipedia 1.0 articles
+                    'category' => str_replace('$1', $wikiproject, $classAttrs['category'])
+                ];
+
+                // add full URL to badge icon
+                if ($classAttrs['badge'] !== '') {
+                    $assessment['class']['badge'] = "https://upload.wikimedia.org/wikipedia/commons/" .
+                        $classAttrs['badge'];
+                }
+
+                if ($overallQuality['value'] === '???') {
+                    $overallQuality = $assessment['class'];
+                    // Replace category with the root one for this class.
+                    // E.g. use 'Category:FA-Class articles' instead of 'Category:FA-Class Wikipedia 1.0 articles'
+                    $overallQuality['category'] = preg_replace('/\s?\$1\s?/', ' ', $classAttrs['category']);
+                }
+            }
+
+            $importanceValue = $assessment['importance'];
+            $importanceUnknown = $importanceValue === 'Unknown' || $importanceValue === '';
+
+            if ($importanceUnknown || !isset($config['importance'][$importanceValue])) {
+                $assessment['importance'] = $config['importance']['Unknown'];
+                $assessment['importance']['value'] = '???';
+            } else {
+                $importanceAttrs = $config['importance'][$importanceValue];
+                $assessment['importance'] = [
+                    'value' => $importanceValue,
+                    'color' => $importanceAttrs['color'],
+                    'weight' => $importanceAttrs['weight'], // numerical weight for sorting purposes
+                    'category' => str_replace('$1', $wikiproject, $importanceAttrs['category'])
+                ];
+            }
+
+            $decoratedAssessments[$wikiproject] = $assessment;
+        }
+
+        return [
+            'assessment' => $overallQuality,
+            'wikiprojects' => $decoratedAssessments,
+            'wikiproject_prefix' => $config['wikiproject_prefix']
+        ];
+    }
+
+    /**
+     * Get the base path to WikiProjects for the given wiki
+     * @return string Path, such as 'Wikipedia:WikiProject_'
+     */
+    public function getWikiProjectPrefix($project)
+    {
+        return $this->getAssessmentsConfig()[$project]['wikiproject_prefix'];
+    }
+
+    /**
+     * Fetch assessments data from config/assessments.yml and cache in static variable
+     * @return array Mappings of project/quality/class with badges, colors and category links
+     */
+    private function getAssessmentsConfig()
+    {
+        static $assessmentsConfig = null;
+        if ($assessmentsConfig === null) {
+            $assessmentsConfig = $this->container->getParameter('assessments');
+        }
+        return $assessmentsConfig;
+    }
+
+    /**
      * Make mass API requests to MediaWiki API
      * The API normally limits to 500 pages, but gives you a 'continue' value
      *   to finish iterating through the resource.
      * Adapted from https://github.com/MusikAnimal/pageviews
-     * @param  array   $params        Associative array of params to pass to API
-     * @param  string  $project       Project to query, e.g. en.wikipedia.org
-     * @param  string  [$continueKey] the key to look in the continue hash, if present
-     *                                (e.g. 'cmcontinue' for API:Categorymembers)
-     * @param  string  $dataKey       The key for the main chunk of data, in the query hash
-     *                                (e.g. 'categorymembers' for API:Categorymembers)
-     * @param  integer $limit         max number of pages to fetch
-     * @return array                  Associative array with data
+     * @param  array       $params        Associative array of params to pass to API
+     * @param  string      $project       Project to query, e.g. en.wikipedia.org
+     * @param  string|func $dataKey       The key for the main chunk of data, in the query hash
+     *                                    (e.g. 'categorymembers' for API:Categorymembers).
+     *                                    If this is a function it is given the response data,
+     *                                    and expected to return the data we want to concatentate.
+     * @param  string      [$continueKey] the key to look in the continue hash, if present
+     *                                    (e.g. 'cmcontinue' for API:Categorymembers)
+     * @param  integer     $limit         max number of pages to fetch
+     * @return array                      Associative array with data
      */
     public function massApi($params, $project, $dataKey, $continueKey = 'continue', $limit = 5000)
     {
@@ -255,19 +378,36 @@ class ApiHelper
             $dataKey = $data['dataKey'];
             $isFinished = false;
 
-            // append new data to data from last request. We might want both 'pages' and dataKey
-            if ($result['query']['pages']) {
-                $data['resolveData']['pages'] = array_merge($data['resolveData']['pages'], $result['query']['pages']);
-            }
-            if ($result['query'][$dataKey]) {
-                $newValues = isset($data['resolveData'][$dataKey]) ? $data['resolveData'][$dataKey] : [];
-                $data['resolveData'][$dataKey] = array_merge($newValues, $result['query'][$dataKey]);
-            }
+            // allow custom function to parse the data we want, if provided
+            if (is_callable($dataKey)) {
+                $data['resolveData']['pages'] = array_merge(
+                    $data['resolveData']['pages'],
+                    $data['dataKey']($result['query'])
+                );
+                $isFinished = count($data['resolveData']['pages']) >= $data['limit'];
+            } else {
+                var_dump('BEFORE');
+                var_dump($data['resolveData']);
+                // append new data to data from last request. We might want both 'pages' and dataKey
+                if ($result['query']['pages']) {
+                    $data['resolveData']['pages'] = array_merge(
+                        $data['resolveData']['pages'],
+                        $result['query']['pages']
+                    );
+                }
+                var_dump('AFTER');
+                var_dump($data['resolveData']);
+                var_dump('====');
+                if ($result['query'][$dataKey]) {
+                    $newValues = isset($data['resolveData'][$dataKey]) ? $data['resolveData'][$dataKey] : [];
+                    $data['resolveData'][$dataKey] = array_merge($newValues, $result['query'][$dataKey]);
+                }
 
-            // If pages is not the collection we want, it will be either an empty array or one entry with
-            //   basic page info depending on what API we're hitting. So resolveData[dataKey] will hit the limit
-            $isFinished = count($data['resolveData']['pages']) >= $data['limit'] ||
-                count($data['resolveData'][$dataKey]) >= $data['limit'];
+                // If pages is not the collection we want, it will be either an empty array or one entry with
+                //   basic page info depending on what API we're hitting. So resolveData[dataKey] will hit the limit
+                $isFinished = count($data['resolveData']['pages']) >= $data['limit'] ||
+                    count($data['resolveData'][$dataKey]) >= $data['limit'];
+            }
 
             // make recursive call if needed, waiting 100ms
             if (!$isFinished && isset($result['continue']) && isset($result['continue'][$data['continueKey']])) {

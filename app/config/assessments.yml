@@ -1,0 +1,90 @@
+parameters:
+  assessments:
+    en.wikipedia.org:
+      wikiproject_prefix: 'Wikipedia:WikiProject '
+      class:
+        FA:
+          badge: 'b/bc/Featured_article_star.svg'
+          color: '#6699ff'
+          category: 'Category:FA-Class $1 articles'
+        A:
+          badge: '2/25/Symbol_a_class.svg'
+          color: '#66ffff'
+          category: 'Category:FA-Class $1 articles'
+        GA:
+          badge: '9/94/Symbol_support_vote.svg'
+          color: '#66ff66'
+          category: 'Category:FA-Class $1 articles'
+        B:
+          badge: '5/5f/Symbol_b_class.svg'
+          color: '#b2ff66'
+          category: 'Category:B-Class $1 articles'
+        C:
+          badge: 'e/e6/Symbol_c_class.svg'
+          color: '#ffff66'
+          category: 'Category:C-Class $1 articles'
+        Start:
+          badge: 'a/a4/Symbol_start_class.svg'
+          color: '#ffaa66'
+          category: 'Category:Start-Class $1 articles'
+        Stub:
+          badge: 'f/f5/Symbol_stub_class.svg'
+          color: '#ff6666'
+          category: 'Category:Stub-Class $1 articles'
+        FL:
+          badge: 'e/e7/Cscr-featured.svg'
+          color: '#6699ff'
+          category: 'Category:FL-Class $1 articles'
+        List:
+          badge: 'd/db/Symbol_list_class.svg'
+          color: '#aa88ff'
+          category: 'Category:List-Class $1 articles'
+        Disambig:
+          badge: '2/2a/Symbol_dab_class.svg'
+          color: '#00fa9a'
+          category: 'Category:Disambig-Class $1 articles'
+        Redirect:
+          badge: 'a/a2/Symbol_redirect_class.svg'
+          color: '#c0c0c0'
+          category: 'Category:Redirect-Class $1 articles'
+        Book:
+          badge: '4/4d/Symbol_book_class.svg'
+          color: '#98FF98'
+          category: 'Category:Book-Class $1 articles'
+        Template:
+          badge: '5/5c/Symbol_template_class.svg'
+          color: '#fbceb1'
+          category: 'Category:Template-Class $1 articles'
+        Category:
+          badge: '9/96/Symbol_category_class.svg'
+          color: '#ffdb58'
+          category: 'Category:Category-Class $1 articles'
+        Unknown:
+          badge: ''
+          color: ''
+          category: 'Category:Unassessed $1 articles'
+      importance:
+        Top:
+          color: '#ff00ff'
+          category: 'Category:Top-importance $1 articles'
+          weight: 5
+        High:
+          color: '#ff88ff'
+          category: 'Category:Top-importance $1 articles'
+          weight: 4
+        Mid:
+          color: '#ffbbff'
+          category: 'Category:Top-importance $1 articles'
+          weight: 3
+        Low:
+          color: '#ffddff'
+          category: 'Category:Top-importance $1 articles'
+          weight: 2
+        Bottom:
+          color: '#ffeeff'
+          category: 'Category:Top-importance $1 articles'
+          weight: 1
+        Unknown:
+          color: ''
+          category: 'Category:Unknown-importance $1 articles'
+          weight: 0
