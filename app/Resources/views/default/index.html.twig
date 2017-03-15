@@ -3,7 +3,7 @@
 {% block body %}
     <div class="col-lg-8 col-lg-offset-2">
         <p>We have the following tools available:</p>
-        <ul>
+        <ul id="tool-list">
             {% for tool in tools() %}
                 {% if enabled(tool) %}<li><a href="{{ path(tool) }}">{{ msg("tool_" ~ tool) }}</a></li>{% endif %}
             {% endfor %}

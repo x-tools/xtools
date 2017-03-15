@@ -2,60 +2,8 @@
 
 namespace AppBundle\Twig;
 
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\Config\Definition\Exception\Exception;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
-use \Intuition;
-
-class AppExtension extends \Twig_Extension
+class AppExtension extends Extension
 {
-    private $intuition;
-    private $container;
-    private $request;
-    private $session;
-    private $lang;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-
-        $path = $this->container->getParameter("kernel.root_dir") . '/../i18n';
-
-        if (!file_exists("$path/en.json")) {
-            throw new Exception("Language directory doesn't exist: $path");
-        }
-
-        $this->intuition = new Intuition('xtools');
-        $this->intuition->registerDomain('xtools', $path);
-
-        $this->request = Request::createFromGlobals();
-        $this->session = new Session();
-
-        $useLang = "en";
-
-        $query = $this->request->query->get('uselang');
-        $cookie = $this->session->get("lang");
-
-        if ($query !== "") {
-            $useLang = $query;
-        } elseif ($cookie !== "") {
-            $useLang = $cookie;
-        } else {
-            // Do nothing... it'll default to en.
-        }
-
-        $useLang = strtolower($useLang);
-
-        $this->intuition->setLang($useLang);
-
-        $this->lang = $useLang;
-
-        if ($cookie !== $useLang) {
-            $this->session->set("lang", $useLang);
-        }
-    }
 
     public function getName()
     {
@@ -156,7 +104,7 @@ class AppExtension extends \Twig_Extension
     // TODO: refactor all intuition stuff so it can be used anywhere
     public function intuitionMessageExists($message = "")
     {
-        return $this->intuition->msgExists($message, [ "domain" => "xtools" ]);
+        return $this->getIntuition()->msgExists($message, [ "domain" => "xtools" ]);
     }
 
     public function intuitionMessagePrintExists($message = "", $vars = [])
@@ -175,25 +123,25 @@ class AppExtension extends \Twig_Extension
 
     public function intuitionMessage($message = "", $vars = [])
     {
-        return $this->intuition->msg($message, [ "domain" => "xtools", "variables" => $vars ]);
+        return $this->getIntuition()->msg($message, [ "domain" => "xtools", "variables" => $vars ]);
     }
 
     public function intuitionMessageFooter()
     {
-        $message = $this->intuition->getFooterLine(TSINT_HELP_NONE);
+        $message = $this->getIntuition()->getFooterLine(TSINT_HELP_NONE);
         $message = preg_replace('/<a class.*?>Change language!<\/a>/i', "", $message);
         return $message;
     }
 
     public function getLang()
     {
-        return $this->lang;
+        return $this->getIntuition()->getLang();
     }
 
     public function getLangName()
     {
-        return in_array($this->intuition->getLangName(), $this->getAllLangs())
-            ? $this->intuition->getLangName()
+        return in_array($this->getIntuition()->getLangName(), $this->getAllLangs())
+            ? $this->getIntuition()->getLangName()
             : 'English';
     }
 
@@ -215,7 +163,7 @@ class AppExtension extends \Twig_Extension
         $availableLanguages = [];
 
         foreach ($languages as $lang) {
-            $availableLanguages[$lang] = ucfirst($this->intuition->getLangName($lang));
+            $availableLanguages[$lang] = ucfirst($this->getIntuition()->getLangName($lang));
         }
         asort($availableLanguages);
 
@@ -224,7 +172,7 @@ class AppExtension extends \Twig_Extension
 
     public function intuitionIsRTL()
     {
-        return $this->intuition->isRTL($this->lang);
+        return $this->getIntuition()->isRTL($this->getIntuition()->getLang());
     }
 
     public function gitShortHash()

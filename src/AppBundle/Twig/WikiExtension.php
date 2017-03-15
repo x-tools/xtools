@@ -2,61 +2,10 @@
 
 namespace AppBundle\Twig;
 
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\Config\Definition\Exception\Exception;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
-use \Intuition;
 use Twig_SimpleFunction;
 
-class WikiExtension extends \Twig_Extension
+class WikiExtension extends Extension
 {
-    private $intuition;
-    private $container;
-    private $request;
-    private $session;
-    private $lang;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-
-        $path = $this->container->getParameter("kernel.root_dir") . '/../i18n';
-
-        if (!file_exists("$path/en.json")) {
-            throw new Exception("Language directory doesn't exist: $path");
-        }
-
-        $this->intuition = new Intuition('xtools');
-        $this->intuition->registerDomain('xtools', $path);
-
-        $this->request = Request::createFromGlobals();
-        $this->session = new Session();
-
-        $useLang = "en";
-
-        $query = $this->request->query->get('uselang');
-        $cookie = $this->session->get("lang");
-
-        if ($query !== "") {
-            $useLang = $query;
-        } elseif ($cookie !== "") {
-            $useLang = $cookie;
-        } else {
-            // Do nothing... it'll default to en.
-        }
-
-        $useLang = strtolower($useLang);
-
-        $this->intuition->setLang($useLang);
-
-        $this->lang = $useLang;
-
-        if ($cookie !== $useLang) {
-            $this->session->set("lang", $useLang);
-        }
-    }
 
     public function getName()
     {

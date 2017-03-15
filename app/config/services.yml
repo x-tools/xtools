@@ -9,13 +9,13 @@ services:
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
     app.twig_extension:
         class: AppBundle\Twig\AppExtension
-        arguments: ["@service_container"]
+        arguments: ["@service_container", "@request_stack", "@session"]
         public: false
         tags:
             - { name: twig.extension }
     app.wiki_extension:
         class: AppBundle\Twig\WikiExtension
-        arguments: ["@service_container"]
+        arguments: ["@service_container", "@request_stack", "@session"]
         public: false
         tags:
             - { name: twig.extension }
