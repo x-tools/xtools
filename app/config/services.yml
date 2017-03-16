@@ -21,7 +21,7 @@ services:
             - { name: twig.extension }
     app.api_helper:
         class: AppBundle\Helper\ApiHelper
-        arguments: ["@service_container"]
+        arguments: ["@service_container", "@app.labs_helper"]
         public: true
         tags:
           - {name: api.helper}

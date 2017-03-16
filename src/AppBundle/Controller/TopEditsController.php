@@ -92,13 +92,14 @@ class TopEditsController extends Controller
     {
         // Get the basic data about the pages edited by this user.
         $query = "SELECT page_namespace, page_title, page_is_redirect, COUNT(page_title) AS count
-                FROM ".$lh->getTable('page')." JOIN ".$lh->getTable('revision_userindex')." ON page_id = rev_page
+                FROM ".$lh->getTable('page')." JOIN ".$lh->getTable('revision')." ON page_id = rev_page
                 WHERE rev_user_text = :username AND page_namespace = :namespace
                 GROUP BY page_namespace, page_title
                 ORDER BY count DESC
                 LIMIT 100";
         $params = ['username'=>$username, 'namespace'=> $namespace];
-        $editData = $lh->client->executeQuery($query, $params)->fetchAll();
+        $conn = $this->getDoctrine()->getManager('replicas')->getConnection();
+        $editData = $conn->executeQuery($query, $params)->fetchAll();
 
         // Get page info about these 100 pages, so we can use their display title.
         $titles = array_map(function ($e) {
@@ -151,14 +152,15 @@ class TopEditsController extends Controller
                     revs.rev_timestamp AS timestamp,
                     (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
                     revs.rev_comment AS comment
-                FROM ".$lh->getTable('revision_userindex')." AS revs
-                    LEFT JOIN ".$lh->getTable('revision_userindex')."
+                FROM ".$lh->getTable('revision')." AS revs
+                    LEFT JOIN ".$lh->getTable('revision')."
                     AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                 WHERE revs.rev_user_text in (:username) AND revs.rev_page = :pageid
                 ORDER BY revs.rev_timestamp DESC
             ";
         $params = ['username' => $username, 'pageid' => $pageInfo['pageid']];
-        $revisionsData = $lh->client->executeQuery($query, $params)->fetchAll();
+        $conn = $this->getDoctrine()->getManager('replicas')->getConnection();
+        $revisionsData = $conn->executeQuery($query, $params)->fetchAll();
 
         // Loop through all revisions and format dates, find totals, etc.
         $totalAdded = 0;
