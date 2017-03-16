@@ -14,7 +14,7 @@ class WikiExtension extends Extension
 
     public function intuitionMessage($message = "", $vars = [])
     {
-        return $this->intuition->msg($message, [ "domain" => "xtools", "variables" => $vars ]);
+        return $this->getIntuition()->msg($message, [ "domain" => "xtools", "variables" => $vars ]);
     }
 
     /*********************************** FUNCTIONS ***********************************/
