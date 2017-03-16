@@ -10,11 +10,11 @@ parameters:
         A:
           badge: '2/25/Symbol_a_class.svg'
           color: '#66ffff'
-          category: 'Category:FA-Class $1 articles'
+          category: 'Category:A-Class $1 articles'
         GA:
           badge: '9/94/Symbol_support_vote.svg'
           color: '#66ff66'
-          category: 'Category:FA-Class $1 articles'
+          category: 'Category:GA-Class $1 articles'
         B:
           badge: '5/5f/Symbol_b_class.svg'
           color: '#b2ff66'

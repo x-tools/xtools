@@ -1,0 +1,54 @@
+@import 'mixins.scss';
+
+.articleinfo {
+    .basic-info-charts {
+        clear: both;
+        display: block;
+        position: relative;
+
+        canvas {
+            max-width: 150px;
+        }
+    }
+
+    .top-editors-charts {
+        display: block;
+        margin-bottom: 25px;
+        position: relative;
+
+        canvas {
+            max-width: 250px;
+        }
+    }
+
+    .year-count-charts {
+        display: block;
+        margin-bottom: 25px;
+        position: relative;
+
+        canvas {
+            max-width: 800px;
+        }
+    }
+
+    .chart-wrapper {
+        display: flex;
+        float: left;
+        margin-right: 50px;
+    }
+
+    .chart-title {
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .chart-legend {
+        align-self: center;
+        margin-left: 15px;
+
+        .color-icon {
+            margin-right: 5px;
+            vertical-align: -2px;
+        }
+    }
+}

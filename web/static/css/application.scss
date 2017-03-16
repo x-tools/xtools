@@ -427,8 +427,26 @@ div.outer_bar {
     }
 }
 
+.comma-separated {
+    &::after {
+        content: ',';
+    }
+    &:last-child::after {
+        content: '';
+    }
+}
+
 .rm-inline-margin {
     margin-right: -4px;
+}
+
+.chart-legend {
+    .color-icon {
+        border-radius: 100%;
+        display: inline-block;
+        height: 15px;
+        width: 15px;
+    }
 }
 
 @media (min-width: $bootstrap-lg) {

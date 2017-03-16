@@ -57,11 +57,11 @@
                 <dt>{{ msg('pagesize') }}</dt>
                 <dd>{{ msg('num_bytes', [length | number_format, length]) }}</dd>
                 <dt>{{ msg('totaledits') }}</dt>
-                <dd>{{ revision_count | number_format }}</dd>
+                <dd>{{ general.revision_count | number_format }}</dd>
                 <dt>
                     <a class="rm-inline-margin" href="#usertable">{{ msg('editorcount') }}</a>
                 </dt>
-                <dd>{{ editor_count | number_format }}</dd>
+                <dd>{{ general.editor_count | number_format }}</dd>
                 {% if assessments is defined %}
                     <dt>
                         <a class="rm-inline-margin" href="#assessments">{{ msg('assessment') }}</a>
@@ -81,70 +81,70 @@
             <dl class="col-lg-6 dl-horizontal stat-list clearfix">
                 <dt>{{ msg('firstedit') }}</dt>
                 <dd>
-                    {{ diff_link(first_edit.revid, project_url, datetime_first_edit) }}
+                    {{ diff_link(general.first_edit.revid, project_url, general.datetime_first_edit) }}
                     &bull;
-                    {{ user_link(first_edit.user, project_url) }}
+                    {{ user_link(general.first_edit.user, project_url) }}
                     &bull;
-                    {{ first_edit.size | diff_format }}
+                    {{ general.first_edit.size | diff_format }}
                 </dd>
                 <dt>{{ msg('latestedit') }}</dt>
                 <dd>
-                    {{ diff_link(last_edit.revid, project_url, datetime_last_edit.timestamp) }}
+                    {{ diff_link(general.last_edit.revid, project_url, general.datetime_last_edit.timestamp) }}
                     &bull;
-                    {{ user_link(last_edit.user, project_url) }}
+                    {{ user_link(general.last_edit.user, project_url) }}
                     &bull;
-                    {{ last_edit.size | diff_format }}
+                    {{ general.last_edit.size | diff_format }}
                 </dd>
                 <dt>{{ msg('maxadd') }}</dt>
                 <dd>
-                    {{ diff_link(max_add.revid, project_url, max_add.timestamp) }}
+                    {{ diff_link(general.max_add.revid, project_url, general.max_add.timestamp) }}
                     &bull;
-                    {{ user_link(max_add.user, project_url) }}
+                    {{ user_link(general.max_add.user, project_url) }}
                     &bull;
-                    {{ max_add.size | diff_format }}
+                    {{ general.max_add.size | diff_format }}
                 </dd>
                 <dt>{{ msg('maxdel') }}</dt>
                 <dd>
-                    {{ diff_link(max_del.revid, project_url, max_del.timestamp) }}
+                    {{ diff_link(general.max_del.revid, project_url, general.max_del.timestamp) }}
                     &bull;
-                    {{ user_link(max_del.user, project_url) }}
+                    {{ user_link(general.max_del.user, project_url) }}
                     &bull;
-                    {{ max_del.size | diff_format }}
+                    {{ general.max_del.size | diff_format }}
                 </dd>
             </dl>
             <dl class="col-lg-6 dl-horizontal stat-list clearfix" style="clear:both">
                 <dt>{{ msg('minoredits') }}</dt>
-                <dd>{{ minor_count | number_format }} &middot; ({{ minor_percentage }}%)</dd>
+                <dd>{{ general.minor_count | number_format }} &middot; ({{ general.minor_percentage }}%)</dd>
                 <dt>{{ msg('anonedits') }}</dt>
-                <dd>{{ anon_count | number_format }} &middot; ({{ anon_percentage }}%)</dd>
+                <dd>{{ general.anon_count | number_format }} &middot; ({{ general.anon_percentage }}%)</dd>
                 <dt>{{ msg('botedits') }}</dt>
-                <dd>{{ bot_revision_count | number_format }} &middot; ({{ bot_percentage }}%)</dd>
+                <dd>{{ general.bot_revision_count | number_format }} &middot; ({{ general.bot_percentage }}%)</dd>
                 <dt>
                     <a class="rm-inline-margin" href="#autoedits">{{ msg('autoedits') }}</a>
                 </dt>
-                <dd>{{ automated_count | number_format }}</dd>
+                <dd>{{ general.automated_count | number_format }}</dd>
                 <dt>{{ msg('reverted') }}</dt>
-                <dd>{{ revert_count | number_format }}</dd>
+                <dd>{{ general.revert_count | number_format }}</dd>
                 <dt>{{ msg('avg_timebwedits_sign') }}</dt>
-                <dd>{{ average_days_per_edit }} {{ msg('days', [average_days_per_edit]) }}</dd>
+                <dd>{{ general.average_days_per_edit }} {{ msg('days', [general.average_days_per_edit]) }}</dd>
                 <dt>{{ msg('editsperuser') }}</dt>
-                <dd>{{ edits_per_editor | number_format(1) }}</dd>
+                <dd>{{ general.edits_per_editor | number_format(1) }}</dd>
                 <dt>{{ msg('editsperday') }}</dt>
-                <dd>{{ edits_per_day }}</dd>
+                <dd>{{ general.edits_per_day }}</dd>
                 <dt>{{ msg('editspermonth') }}</dt>
-                <dd>{{ edits_per_month | number_format(1) }}</dd>
+                <dd>{{ general.edits_per_month | number_format(1) }}</dd>
                 <dt>{{ msg('editsperyear') }}</dt>
-                <dd>{{ edits_per_year | number_format(1) }}</dd>
+                <dd>{{ general.edits_per_year | number_format(1) }}</dd>
                 <dt>{{ msg('lastday') }}</dt>
-                <dd>{{ count_history.day | number_format }}</dd>
+                <dd>{{ general.count_history.day | number_format }}</dd>
                 <dt>{{ msg('lastweek') }}</dt>
-                <dd>{{ count_history.week | number_format }}</dd>
+                <dd>{{ general.count_history.week | number_format }}</dd>
                 <dt>{{ msg('lastmonth') }}</dt>
-                <dd>{{ count_history.month | number_format }}</dd>
+                <dd>{{ general.count_history.month | number_format }}</dd>
                 <dt>{{ msg('lastyear') }}</dt>
-                <dd>{{ count_history.year | number_format }}</dd>
+                <dd>{{ general.count_history.year | number_format }}</dd>
                 <dt>{{ msg('toptencount') }}</dt>
-                <dd>{{ top_ten_count | number_format }} &middot; ({{ top_ten_percentage }}%)</dd>
+                <dd>{{ general.top_ten_count | number_format }} &middot; ({{ general.top_ten_percentage }}%)</dd>
             </dl>
             <dl class="col-lg-6 dl-horizontal stat-list clearfix">
                 <dt>{{ msg('links_in') }}</dt>
@@ -163,23 +163,81 @@
                 <dd>{{ watchers }}</dd>
                 <dt>{{ msg('pageviews') }} (60 {{ msg('days', [60]) }})</dt>
                 <dd>
-                    <a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project }}&pages={{ title }}&range=latest-{{ pageviews_offset }}">
-                        {{ pageviews | number_format }}
+                    <a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project }}&pages={{ title }}&range=latest-{{ general.pageviews_offset }}">
+                        {{ general.pageviews | number_format }}
                     </a>
                 </dd>
             </dl>
+            <script>
+                var general = {{ general | json_encode() | raw }};
+                general.labels = {
+                    users_ips: [
+                        "{{ msg('users', [general.revision_count]) }}",
+                        "{{ msg('ips') }}",
+                    ],
+                    minor_major: [
+                        "{{ msg('major') }}",
+                        "{{ msg('minor') }}",
+                    ],
+                    top_bottom: [
+                        "{{ msg('topten') }}",
+                        "{{ msg('bottomninety') }}",
+                    ],
+                };
+            </script>
+            <div class="basic-info-charts clearfix">
+                <div class="chart-wrapper">
+                    <canvas id="users_ips"></canvas>
+                    <span class="chart-legend" id="users_ips_legend"></span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="minor_major"></canvas>
+                    <span class="chart-legend" id="minor_major_legend"></span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="top_bottom"></canvas>
+                    <span class="chart-legend" id="top_bottom_legend"></span>
+                </div>
+            </div>
         {% endset %}
         {{ layout.content_block('generalstats', content) }}
 
         <div style="clear:both"></div>
 
         {% set content %}
+            <script>
+                var editors = {{ editors | json_encode() | raw }};
+                var i18n = {
+                    others: "{{ msg('others') | capitalize_first }}",
+                };
+            </script>
+            <div class="top-editors-charts clearfix">
+                <div class="pull-left">
+                    <div class="chart-title">{{ msg('toptenbyedits') | capitalize_first }}</div>
+                    <div class="chart-wrapper">
+                        <canvas id="top_by_edits"></canvas>
+                        <span class="chart-legend" id="top_by_edits_legend"></span>
+                    </div>
+                </div>
+                <div class="pull-left">
+                    <div class="chart-title">{{ msg('toptenbytext') | capitalize_first }}</div>
+                    <div class="chart-wrapper">
+                        <canvas id="top_by_added"></canvas>
+                        <span class="chart-legend" id="top_by_added_legend"></span>
+                    </div>
+                </div>
+            </div>
+            <div><sup>1</sup> {{ msg('atbe') }}</div>
             <table class="table table-bordered table-hover table-striped">
                 <thead><tr>
-                    {% for key in ['username', 'links', 'edits', 'minor', 'minor_percentage', 'firstedit', 'latestedit', 'net_change'] %}
+                    {% for key in ['username', 'links', 'edits', 'minor', 'minor_percentage', 'firstedit', 'latestedit', 'atbe', 'net_change'] %}
                         <th>
                             <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
-                                {{ msg(key) | capitalize_first }}
+                                {% if key == 'atbe' %}
+                                    atbe<sup>1</sup>
+                                {% else %}
+                                    {{ msg(key) | capitalize_first }}
+                                {% endif %}
                                 {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
                             </span>
                         </th>
@@ -211,6 +269,9 @@
                         </td>
                         <td class="sort-entry--latestedit" data-value="{{ stats.last_id }}">
                             <a target="_blank" href="{{ project_url }}/wiki/Special:Diff/{{ stats.last_id }}">{{ stats.last }}</a>
+                        </td>
+                        <td class="sort-entry--atbe" data-value="{{ stats.atbe }}">
+                            {{ stats.atbe | number_format(1) }}
                         </td>
                         <td class="sort-entry--net_change" data-value="{{ stats.added }}">
                             {{ stats.added | diff_format }}
@@ -266,9 +327,25 @@
         {{ layout.content_block('usertable', content) }}
 
         {% set content %}
+            <script>
+                var year_count = {{ year_count | json_encode() | raw }};
+                Object.assign(i18n, {
+                    all: "{{ msg('all') | capitalize_first }}",
+                    minor: "{{ msg('minor') | capitalize_first }}",
+                    anon: "{{ msg('ip_edits') | capitalize_first }}",
+                    size: "{{ msg('size') | capitalize_first }}",
+                    edits: "{{ msg('edits') | capitalize_first }}",
+                });
+            </script>
+            <div class="year-count-charts clearfix">
+                <div class="chart-wrapper">
+                    <canvas id="year_count"></canvas>
+                    <span class="chart-legend" id="year_count_legend"></span>
+                </div>
+            </div>
             <table class="table table-bordered table-hover table-striped">
                 <thead><tr>
-                    {% for key in ['year', 'numedits', 'ips', 'ips_percentage', 'minor', 'minor_percentage', 'events'] %}
+                    {% for key in ['year', 'numedits', 'ips', 'ips_percentage', 'minor', 'minor_percentage', 'log_events'] %}
                         <th>
                             <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
                                 {{ msg(key) | capitalize_first }}
@@ -288,7 +365,11 @@
                         <td class="sort-entry--minor" data-value="{{ stats.minor }}">{{ stats.minor | number_format }}</td>
                         {% set year_minor_percent = stats.minor | percent_format(stats.all) %}
                         <td class="sort-entry--minor_percentage" data-value="{{ year_minor_percent }}">{{ year_minor_percent }}</td>
-                        <td></td>
+                        <td>
+                            {% for event, count in stats.events %}
+                                <span class="comma-separated">{{ msg('num_'~event, [count | number_format, count]) }}</span>
+                            {% endfor %}
+                        </td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -318,11 +399,20 @@
                 <tbody>
                 {% for year, year_stats in year_count %}
                     {% for month, stats in year_stats.months %}
+                        {% set month_str = '%02d' | format(month) %}
                         <tr>
-                            <td class="sort-entry--month" data-value="{{ year }}{{ '%02d' | format(month) }}">
+                            <td class="sort-entry--month" data-value="{{ year }}{{ month_str }}">
                                 {{ year }}-{{ "%02d" | format(month) }}
                             </td>
-                            <td class="sort-entry--numedits" data-value="{{ stats.all }}">{{ stats.all | number_format }}</td>
+                            <td class="sort-entry--numedits" data-value="{{ stats.all }}">
+                                {% if stats.all > 0 %}
+                                    {# Generate link to revision history showing all edits for the given month #}
+                                    {% set offset = date(year~"-"~month_str~"-01") | date("Ymt")~"235959" %}
+                                    {{ wiki_history_link(title, project_url, stats.all | number_format, offset, stats.all) }}
+                                {% else %}
+                                    0
+                                {% endif %}
+                            </td>
                             <td class="sort-entry--ips" data-value="{{ stats.anon }}">{{ stats.anon | number_format }}</td>
                             {% set month_ips_percent = stats.anon | percent_format(stats.all) %}
                             <td class="sort-entry--ips_percentage" data-value="{{ month_ips_percent }}">{{ month_ips_percent }}</td>

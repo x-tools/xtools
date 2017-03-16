@@ -73,14 +73,25 @@ class WikiExtension extends Extension
      * @param  string $title      Title of page
      * @param  string $projectUrl Project domain and protocol such as https://en.wikipedia.org
      * @param  string [$label]    The link text, defaults to msg('history')
+     * @param  string [$offset]   Will to edits on or before this timestamp
+     * @param  int    [$limit]    Show this number of results
      * @return string Markup
      */
-    public function wikiHistoryLink($title, $projectUrl, $label = null)
+    public function wikiHistoryLink($title, $projectUrl, $label = null, $offset = null, $limit = null)
     {
         if (!isset($label)) {
             $label = $this->intuitionMessage('history');
         }
-        return "<a href='$projectUrl/w/index.php?title=$title&action=history' target='_blank'>$label</a>";
+        $url = "$projectUrl/w/index.php?title=$title&action=history";
+
+        if ($offset) {
+            $url .= "&offset=$offset";
+        }
+        if ($limit) {
+            $url .= "&limit=$limit";
+        }
+
+        return "<a href='$url' target='_blank'>$label</a>";
     }
 
     /**
