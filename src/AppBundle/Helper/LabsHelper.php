@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Matthew
- * Date: 1/16/17
- * Time: 16:38
- */
 
 namespace AppBundle\Helper;
 
@@ -15,13 +9,16 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class LabsHelper
 {
     /** @var string */
-    public $dbName;
+    protected $dbName;
 
     /** @var \Doctrine\DBAL\Connection */
-    public $client;
+    protected $client;
 
-    private $container;
-    private $url;
+    /** @var ContainerInterface */
+    protected $container;
+
+    /** @var string */
+    protected $url;
 
     public function __construct(ContainerInterface $container)
     {
@@ -99,24 +96,34 @@ class LabsHelper
     /**
      * All mapping tables to environment-specific names, as specified in config/table_map.yml
      * Used for example to convert revision -> revision_replica
-     * @param  string   $table  Table name
-     * @param  [string] $dbName Database name
-     * @return string   Converted table name
+     * https://wikitech.wikimedia.org/wiki/Help:Tool_Labs/Database#Tables_for_revision_or_logging_queries_involving_user_names_and_IDs
+     * @param string $table Table name
+     * @param string $dbName Database name
+     * @return string Converted table name
      */
     public function getTable($table, $dbName = null)
     {
-        $retVal = $table;
+        // Use the table specified in the table mapping configuration, if present.
+        $mapped = false;
         if ($this->container->hasParameter("app.table.$table")) {
-            $retVal = $this->container->getParameter("app.table.$table");
+            $mapped = true;
+            $table = $this->container->getParameter("app.table.$table");
         }
 
-        // use class variable if not set via function parameter
+        // For 'revision' and 'logging' tables (actually views) on Labs, use the indexed versions
+        // (that have some rows hidden, e.g. for revdeleted users).
+        $isLoggingOrRevision = in_array($table, ['revision', 'logging']);
+        if (!$mapped && $isLoggingOrRevision && $this->container->getParameter('app.is_labs')) {
+            $table = $table."_userindex";
+        }
+
+        // Prepend database name.
+        // Use class variable for the database name if not set via function parameter.
         $dbName = $dbName || $this->dbName;
-
-        if (isset($dbName)) {
-            $retVal = "$this->dbName.$retVal";
+        if (!empty($dbName)) {
+            $table = "$this->dbName.$table";
         }
 
-        return $retVal;
+        return $table;
     }
 }

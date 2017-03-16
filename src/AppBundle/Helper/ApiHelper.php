@@ -10,17 +10,24 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ApiHelper
 {
+
+    /** @var MediawikiApi */
     private $api;
 
-    public function __construct(ContainerInterface $container)
+    /** @var LabsHelper */
+    private $labsHelper;
+
+    public function __construct(ContainerInterface $container, LabsHelper $labsHelper)
     {
         $this->container = $container;
+        $this->labsHelper = $labsHelper;
     }
 
     private function setUp($project)
     {
         if (!isset($this->api)) {
-            $this->api = MediawikiApi::newFromApiEndpoint("$project/w/api.php");
+            $projectInfo = $this->labsHelper->databasePrepare($project);
+            $this->api = MediawikiApi::newFromPage($projectInfo['url']);
         }
     }
 

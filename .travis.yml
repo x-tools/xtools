@@ -14,23 +14,29 @@ php:
 
 # optionally specify a list of environments, for example to test different RDBMS
 env:
-  - DB=mysql
+  - IS_LABS=1
+  - IS_LABS=0
 
 before_install:
   - pip install --user codecov
-#after_success:
-#  - codecov
+
+install:
+  - composer install
+  - 'sed -i "s/apps.is_labs: .*/apps.is_labs: $IS_LABS/" app/config/parameters.yml'
 
 script:
-    - composer validate
-    - composer install
-    - ./vendor/bin/parallel-lint --exclude vendor .
-    - ./vendor/bin/phpunit --coverage-clover=coverage.xml
-    - codecov
-    - ./vendor/bin/phpcs -s .
+  - composer validate
+  - ./vendor/bin/parallel-lint --exclude vendor .
+  - ./vendor/bin/phpunit --coverage-clover=coverage.xml
+  - codecov
+  - ./vendor/bin/phpcs -s .
 
 sudo: false
 
 matrix:
-  allow_failures:
+  # Only test both IS_LABS values on 5.5, because that's what Labs uses.
+  exclude:
+    - php: 5.6
+      env: IS_LABS=1
     - php: 7.0
+      env: IS_LABS=1
