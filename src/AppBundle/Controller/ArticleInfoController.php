@@ -49,12 +49,8 @@ class ArticleInfoController extends Controller
      * @Route("/articleinfo/index.php", name="articleInfoIndexPhp")
      * @Route("/articleinfo/{project}", name="ArticleInfoProject")
      */
-    public function indexAction($project = null)
+    public function indexAction(Request $request, $project = null)
     {
-
-        // Grab the request object, grab the values out of it.
-        $request = Request::createFromGlobals();
-
         $projectQuery = $request->query->get('project');
         $article = $request->query->get('article');
 

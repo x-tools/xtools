@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Helper\LabsHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Config\Definition\Exception\Exception;
@@ -17,24 +18,19 @@ class EditCounterController extends Controller
      * @Route("/ec/index.php", name="EditCounterIndexPhp")
      * @Route("/ec/{project}", name="EditCounterProject")
      */
-    public function indexAction($project = null)
+    public function indexAction(Request $request, $project = null)
     {
-
         $lh = $this->get("app.labs_helper");
-
         $lh->checkEnabled("ec");
 
-        // Grab the request object, grab the values out of it.
-        $request = Request::createFromGlobals();
-
-        $project = $request->query->get('project');
+        $queryProject = $request->query->get('project');
         $username = $request->query->get('user');
 
-        if ($project != "" && $username != "") {
-            $routeParams = [ 'project'=>$project, 'username' => $username ];
+        if (($project || $queryProject) && $username) {
+            $routeParams = [ 'project'=>($project ?: $queryProject), 'username' => $username ];
             return $this->redirectToRoute("EditCounterResult", $routeParams);
-        } elseif ($project != "") {
-            return $this->redirectToRoute("EditCounterProject", [ 'project'=>$project ]);
+        } elseif (!$project && $queryProject) {
+            return $this->redirectToRoute("EditCounterProject", [ 'project'=>$queryProject ]);
         }
 
         // Otherwise fall through.
@@ -52,13 +48,11 @@ class EditCounterController extends Controller
      */
     public function resultAction($project, $username)
     {
-
+        /** @var LabsHelper $lh */
         $lh = $this->get("app.labs_helper");
-
         $lh->checkEnabled("ec");
 
         $username = ucfirst($username);
-
         $dbValues = $lh->databasePrepare($project, "SimpleEditCounter");
 
         $dbName = $dbValues["dbName"];
@@ -70,35 +64,37 @@ class EditCounterController extends Controller
 
         // Prepare the query and execute
         $resultQuery = $conn->prepare("
-            SELECT 'id' as source, user_id as value FROM $dbName.user
+            SELECT 'id' as source, user_id as value FROM ".$lh->getTable('user')."
                 WHERE user_name = :username
             UNION
-            SELECT 'arch' as source, COUNT(*) AS value FROM $dbName.archive_userindex
+            SELECT 'arch' as source, COUNT(*) AS value FROM ".$lh->getTable('archive')."
                 WHERE ar_user_text = :username
             UNION
-            SELECT 'rev' as source, COUNT(*) AS value FROM $dbName.revision_userindex
+            SELECT 'rev' as source, COUNT(*) AS value FROM ".$lh->getTable('revision')."
                 WHERE rev_user_text = :username
             UNION
-            (SELECT 'first_rev' as source, rev_timestamp FROM $dbName.`revision_userindex`
+            (SELECT 'first_rev' as source, rev_timestamp FROM ".$lh->getTable('revision')."
                 WHERE rev_user_text = :username ORDER BY rev_timestamp ASC LIMIT 1)
             UNION
-            (SELECT 'latest_rev' as source, rev_timestamp FROM $dbName.`revision_userindex`
+            (SELECT 'latest_rev' as source, rev_timestamp FROM ".$lh->getTable('revision')."
                 WHERE rev_user_text = :username ORDER BY rev_timestamp DESC LIMIT 1)
             UNION
-            SELECT 'rev_24h' as source, COUNT(*) as value FROM $dbName.revision_userindex
+            SELECT 'rev_24h' as source, COUNT(*) as value FROM ".$lh->getTable('revision')."
                 WHERE rev_user_text = :username AND rev_timestamp >= DATE_SUB(NOW(),INTERVAL 24 HOUR)
             UNION
-            SELECT 'rev_7d' as source, COUNT(*) as value FROM $dbName.revision_userindex
+            SELECT 'rev_7d' as source, COUNT(*) as value FROM ".$lh->getTable('revision')."
                 WHERE rev_user_text = :username AND rev_timestamp >= DATE_SUB(NOW(),INTERVAL 7 DAY)
             UNION
-            SELECT 'rev_30d' as source, COUNT(*) as value FROM $dbName.revision_userindex
+            SELECT 'rev_30d' as source, COUNT(*) as value FROM ".$lh->getTable('revision')."
                 WHERE rev_user_text = :username AND rev_timestamp >= DATE_SUB(NOW(),INTERVAL 30 DAY)
             UNION
-            SELECT 'rev_365d' as source, COUNT(*) as value FROM $dbName.revision_userindex
+            SELECT 'rev_365d' as source, COUNT(*) as value FROM ".$lh->getTable('revision')."
                 WHERE rev_user_text = :username AND rev_timestamp >= DATE_SUB(NOW(),INTERVAL 365 DAY)
             UNION
-            SELECT 'groups' as source, ug_group as value FROM $dbName.user_groups
-                JOIN $dbName.user on user_id = ug_user WHERE user_name = :username
+            SELECT 'groups' as source, ug_group as value
+                FROM ".$lh->getTable('user_groups')."
+                JOIN ".$lh->getTable('user')." on user_id = ug_user
+                WHERE user_name = :username
             ");
 
         $resultQuery->bindParam("username", $username);
@@ -200,16 +196,16 @@ class EditCounterController extends Controller
 
         $resultQuery = $conn->prepare("
             SELECT 'unique-pages' as source, COUNT(distinct rev_page) as value
-                FROM $dbName.`revision_userindex` where rev_user_text=:username
+                FROM ".$lh->getTable('revision')." where rev_user_text=:username
             UNION
-            SELECT 'pages-created-live' as source, COUNT(*) as value from $dbName.`revision_userindex`
+            SELECT 'pages-created-live' as source, COUNT(*) as value from ".$lh->getTable('revision')."
                 WHERE rev_user_text=:username and rev_parent_id=0
             UNION
-            SELECT 'pages-created-archive' as source, COUNT(*) as value from $dbName.`archive_userindex`
+            SELECT 'pages-created-archive' as source, COUNT(*) as value from ".$lh->getTable('archive')."
                 WHERE ar_user_text=:username and ar_parent_id=0
             UNION
-            SELECT 'pages-moved' as source, count(*) as value from $dbName.`logging`
-                WHERElog_type='move' and log_action='move' and log_user_text=:username
+            SELECT 'pages-moved' as source, count(*) as value from ".$lh->getTable('logging')."
+                WHERE log_type='move' and log_action='move' and log_user_text=:username
             ");
 
         $resultQuery->bindParam("username", $username);
@@ -248,37 +244,37 @@ class EditCounterController extends Controller
         // -------------------------
         // TODO: Turn into single query - not using UNION
         $resultQuery = $conn->prepare("
-        SELECT 'pages-thanked' as source, count(*) as value from $dbName.`logging`
+        SELECT 'pages-thanked' as source, count(*) as value from ".$lh->getTable('logging')."
             WHERE log_type='thank' and log_action='thank' and log_user_text=:username
         UNION
-        SELECT 'pages-approved' as source, count(*) as value from $dbName.`logging`
+        SELECT 'pages-approved' as source, count(*) as value from ".$lh->getTable('logging')."
             WHERE log_type='review' and log_action='approve' and log_user_text=:username
         UNION
-        SELECT 'pages-patrolled' as source, count(*) as value from $dbName.`logging`
+        SELECT 'pages-patrolled' as source, count(*) as value from ".$lh->getTable('logging')."
             WHERE log_type='patrol' and log_action='patrol' and log_user_text=:username
         UNION
-        SELECT 'users-blocked' as source, count(*) as value from $dbName.`logging`
+        SELECT 'users-blocked' as source, count(*) as value from ".$lh->getTable('logging')."
             WHERE log_type='block' and log_action='block' and log_user_text=:username
         UNION
-        SELECT 'users-unblocked' as source, count(*) as value from $dbName.`logging`
+        SELECT 'users-unblocked' as source, count(*) as value from ".$lh->getTable('logging')."
             WHERE log_type='block' and log_action='unblock' and log_user_text=:username
         UNION
-        SELECT 'pages-protected' as source, count(*) as value from $dbName.`logging`
+        SELECT 'pages-protected' as source, count(*) as value from ".$lh->getTable('logging')."
             WHERE log_type='protect' and log_action='protect' and log_user_text=:username
         UNION
-        SELECT 'pages-unprotected' as source, count(*) as value from $dbName.`logging`
+        SELECT 'pages-unprotected' as source, count(*) as value from ".$lh->getTable('logging')."
             WHERE log_type='protect' and log_action='unprotect' and log_user_text=:username
         UNION
-        SELECT 'pages-deleted' as source, count(*) as value from $dbName.`logging`
+        SELECT 'pages-deleted' as source, count(*) as value from ".$lh->getTable('logging')."
             WHERE log_type='delete' and log_action='delete' and log_user_text=:username
         UNION
-        SELECT 'pages-deleted-revision' as source, count(*) as value from $dbName.`logging`
+        SELECT 'pages-deleted-revision' as source, count(*) as value from ".$lh->getTable('logging')."
             WHERE log_type='delete' and log_action='revision' and log_user_text=:username
         UNION
-        SELECT 'pages-restored' as source, count(*) as value from $dbName.`logging`
+        SELECT 'pages-restored' as source, count(*) as value from ".$lh->getTable('logging')."
             WHERE log_type='delete' and log_action='restore' and log_user_text=:username
         UNION
-        SELECT 'pages-imported' as source, count(*) as value from $dbName.`logging`
+        SELECT 'pages-imported' as source, count(*) as value from ".$lh->getTable('logging')."
             WHERE log_type='import' and log_action='import' and log_user_text=:username
         ");
 
@@ -411,6 +407,8 @@ class EditCounterController extends Controller
                 207 => '#FFCC00',
                 208 => '#FF0000',
                 209 => '#FF6600',
+                250 => '#374652', # Random colour; please fix
+                252 => '#238292', # Random colour; please fix
                 446 => '#06DCFB',
                 447 => '#892EE4',
                 460 => '#99FF66',
@@ -428,7 +426,10 @@ class EditCounterController extends Controller
                 866 => '#FFFFFF',
                 867 => '#FFCCFF',
                 1198 => '#FF34B3',
-                1199 => '#8B1C62', ];
+                1199 => '#8B1C62',
+                2300 => '#298536', # Random colour; please fix
+
+            ];
 
             $colors2 = [ '#61a9f3',# blue
                 '#f381b9',# pink
@@ -461,8 +462,8 @@ class EditCounterController extends Controller
                 '#61a9f3', # blue' #FFFF55',
             ];
             $colorCounter2 = 0;
-            $sql = "SELECT page_namespace, count(*) as 'count' FROM $dbName.`revision_userindex` r
-                RIGHT JOIN $dbName.page p on r.rev_page = p.page_id
+            $sql = "SELECT page_namespace, count(*) as 'count' FROM ".$lh->getTable('revision')." r
+                RIGHT JOIN ".$lh->getTable('page')." p on r.rev_page = p.page_id
                 WHERE r.rev_user = :id GROUP BY page_namespace";
             $resultQuery = $conn->prepare($sql);
             $resultQuery->bindParam(":id", $id);
