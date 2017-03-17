@@ -207,7 +207,10 @@ class ArticleInfoController extends Controller
         });
 
         $this->pageInfo['general']['bot_revision_count'] = $sum;
-        $this->pageInfo['general']['bot_percentage'] = round(( $sum / $this->pageInfo['general']['revision_count'] ) * 100, 1);
+        $this->pageInfo['general']['bot_percentage'] = round(
+            ($sum / $this->pageInfo['general']['revision_count']) * 100,
+            1
+        );
 
         return $bots;
     }
@@ -509,7 +512,10 @@ class ArticleInfoController extends Controller
                     $data['textshares'][$username]['all'] += $newSize;
                 }
                 if ($diffSize > $data['general']['max_add']['size']) {
-                    $data['general']['max_add']['timestamp'] = DateTime::createFromFormat('YmdHis', $rev['rev_timestamp']);
+                    $data['general']['max_add']['timestamp'] = DateTime::createFromFormat(
+                        'YmdHis',
+                        $rev['rev_timestamp']
+                    );
                     $data['general']['max_add']['revid'] = $rev['rev_id'];
                     $data['general']['max_add']['user'] = $rev['rev_user_text'];
                     $data['general']['max_add']['size'] = $diffSize;
@@ -523,7 +529,10 @@ class ArticleInfoController extends Controller
 
                 // don't count this edit as content removal if the next edit reverted it
                 if (!$nextRevisionIsRevert && $diffSize < $data['general']['max_del']['size']) {
-                    $data['general']['max_del']['timestamp'] = DateTime::createFromFormat('YmdHis', $rev['rev_timestamp']);
+                    $data['general']['max_del']['timestamp'] = DateTime::createFromFormat(
+                        'YmdHis',
+                        $rev['rev_timestamp']
+                    );
                     $data['general']['max_del']['revid'] = $rev['rev_id'];
                     $data['general']['max_del']['user'] = $rev['rev_user_text'];
                     $data['general']['max_del']['size'] = $diffSize;
@@ -577,8 +586,14 @@ class ArticleInfoController extends Controller
         }
 
         // add percentages
-        $data['general']['minor_percentage'] = round(($data['general']['minor_count'] / $data['general']['revision_count']) * 100, 1);
-        $data['general']['anon_percentage'] = round(($data['general']['anon_count'] / $data['general']['revision_count']) * 100, 1);
+        $data['general']['minor_percentage'] = round(
+            ($data['general']['minor_count'] / $data['general']['revision_count']) * 100,
+            1
+        );
+        $data['general']['anon_percentage'] = round(
+            ($data['general']['anon_count'] / $data['general']['revision_count']) * 100,
+            1
+        );
 
         // other general statistics
         $dateFirst = DateTime::createFromFormat('YmdHis', $data['general']['first_edit']['timestamp']);

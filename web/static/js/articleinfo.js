@@ -97,39 +97,37 @@
         });
 
         // YEAR COUNTS: chart of all/minor/anon edits and page size year to year
-        var yearCountLabels = Object.keys(year_count),
-            yearDatasets = [
-                {
-                    type: 'bar',
-                    label: i18n.all,
-                    backgroundColor: colors[0],
-                    data: [],
-                    yAxisID: 'edits',
-                },
-                {
-                    type: 'bar',
-                    label: i18n.minor,
-                    backgroundColor: colors[1],
-                    data: [],
-                    yAxisID: 'edits',
-                },
-                {
-                    type: 'bar',
-                    label: i18n.anon,
-                    backgroundColor: colors[2],
-                    data: [],
-                    yAxisID: 'edits',
-                },
-                {
-                    type: 'line',
-                    label: i18n.size,
-                    borderColor: colors[3],
-                    backgroundColor: colors[3],
-                    fill: false,
-                    data: [],
-                    yAxisID: 'size',
-                },
-            ];
+        var yearCountLabels = Object.keys(year_count);
+        var yearDatasets = [{
+            type: 'bar',
+            label: i18n.all,
+            backgroundColor: colors[0],
+            data: [],
+            yAxisID: 'edits',
+        },
+        {
+            type: 'bar',
+            label: i18n.minor,
+            backgroundColor: colors[1],
+            data: [],
+            yAxisID: 'edits',
+        },
+        {
+            type: 'bar',
+            label: i18n.anon,
+            backgroundColor: colors[2],
+            data: [],
+            yAxisID: 'edits',
+        },
+        {
+            type: 'line',
+            label: i18n.size,
+            borderColor: colors[3],
+            backgroundColor: colors[3],
+            fill: false,
+            data: [],
+            yAxisID: 'size',
+        }];
 
         // restructure data the way Chart.js wants it
         yearCountLabels.forEach(function (yearLabel) {
@@ -146,12 +144,13 @@
         });
     });
 
-    function buildMultiBarChart(id, data) {
+    function buildMultiBarChart(id, data)
+    {
         var ctx = $('#' + id),
-            chartData = {
-                labels: data.labels,
-                datasets: data.datasets
-            };
+        var chartData = {
+            labels: data.labels,
+            datasets: data.datasets
+        };
 
         var chartObj = new Chart(ctx, {
             type: 'bar',
@@ -206,7 +205,8 @@
         $('#' + id + '_legend').html(chartObj.generateLegend());
     }
 
-    function buildPieChart(id, data) {
+    function buildPieChart(id, data)
+    {
         var ctx = $('#' + id);
         var chartData = {
             labels: data.labels,
