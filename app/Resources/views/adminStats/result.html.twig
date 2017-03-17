@@ -37,7 +37,8 @@
                     </tr>
 
 
-                {% for username,value in users %}
+                {% for key,value in users %}
+                    {% set username=value.user_name %}
                     <tr>
                         <td>{{ loop.index }}.</td>
                         <td style="max-width:150px;"><a style="max-width:120px;" href="{{ linkWiki(url, "User:"~username) }}">{{ username }}</a></td>
@@ -47,15 +48,15 @@
                             {% if isWMFLabs() %}<a title="Global User Contributions" href="//tools.wmflabs.org/guc/?user={{ username|e }}" >guc</a> &middot;{% endif %}
                             <a title="Log" href="//en.wikipedia.org/w/index.php?title=Special:Log&user=ProcseeBot " >log</a>
                         </td>
-                        <td class="tdnum" >{{ value.total }}</td>
-                        <td class="tdnum" >{{ value.delete }}</td>
-                        <td class="tdnum" >{{ value.restore }}</td>
-                        <td class="tdnum" >{{ value.block }}</td>
-                        <td class="tdnum" >{{ value.unblock }}</td>
-                        <td class="tdnum" >{{ value.protect }}</td>
-                        <td class="tdnum" >{{ value.unprotect }}</td>
-                        <td class="tdnum" >{{ value.import }}</td>
-                        <td class="tdnum" >{{ value.rights }}</td>
+                        <td class="tdnum" >{{ value.mtotal }}</td>
+                        <td class="tdnum" >{{ value.mdelete }}</td>
+                        <td class="tdnum" >{{ value.mrestore }}</td>
+                        <td class="tdnum" >{{ value.mblock }}</td>
+                        <td class="tdnum" >{{ value.munblock }}</td>
+                        <td class="tdnum" >{{ value.mprotect }}</td>
+                        <td class="tdnum" >{{ value.munprotect }}</td>
+                        <td class="tdnum" >{{ value.mimport }}</td>
+                        <td class="tdnum" >{{ value.mrights }}</td>
                     </tr>
                     {% endfor %}
 

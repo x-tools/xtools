@@ -56,7 +56,6 @@ class AdminStatsController extends Controller
         ]);
     }
 
-    // TODO: Handle start and end date
     /**
      * @Route("/adminstats/{project}/{start}/{end}", name="AdminStatsResult")
      */
@@ -64,28 +63,75 @@ class AdminStatsController extends Controller
     {
 
         $lh = $this->get("app.labs_helper");
+        $api = $this->get("app.api_helper");
 
         $lh->checkEnabled("adminstats");
 
         $dbValues = $lh->databasePrepare($project, "AdminStats");
 
+        $conn = $this->get('doctrine')->getManager("replicas")->getConnection();
+
         $dbName = $dbValues["dbName"];
         $wikiName = $dbValues["wikiName"];
         $url = $dbValues["url"];
 
-        $users = [
-            "Matthew" => [
-                "group" => "A", "delete" => "0", "restore" => "0", "block" => "0", "unblock" => "0",
-                "protect" => "0", "unprotect" => "0", "import" => "0", "rights"=>"0", "total"=>"0"
-            ],
-            "Aexandra" => [
-                "group" => "ABC", "delete" => "0", "restore" => "0", "block" => "0",
-                "unblock" => "0", "protect" => "0", "unprotect" => "0", "import" => "0",
-                "rights"=>"0", "total"=>"0"
-            ]
-        ];
+        // TODO: Fix this call within this controller
+        // $data = $api->getAdmins($project);
 
-        dump($users);
+        // Get admin ID's
+        $query = "
+    Select ug_user as user_id
+    FROM user_groups
+    WHERE ug_group = 'sysop'
+    UNION
+    SELECT ufg_user as user_id
+    FROM user_former_groups
+    WHERE ufg_group = 'sysop'
+    ";
+
+        $res = $conn->prepare( $query );
+        $res->execute();
+
+        $adminIdArr = [];
+
+        while ($row = $res->fetch()) {
+            $adminIdArr[] = $row["user_id"] ;
+        }
+        $adminIds = implode(',', $adminIdArr);
+
+        $userTable = $lh->getTable("user", $dbName);
+        $loggingTable = $lh->getTable("logging", $dbName);
+
+        $query = "
+    SELECT user_name, user_id
+    ,SUM(IF( (log_type='delete'  AND log_action != 'restore'),1,0)) as mdelete
+    ,SUM(IF( (log_type='delete'  AND log_action  = 'restore'),1,0)) as mrestore
+    ,SUM(IF( (log_type='block'   AND log_action != 'unblock'),1,0)) as mblock
+    ,SUM(IF( (log_type='block'   AND log_action  = 'unblock'),1,0)) as munblock
+    ,SUM(IF( (log_type='protect' AND log_action !='unprotect'),1,0)) as mprotect
+    ,SUM(IF( (log_type='protect' AND log_action  ='unprotect'),1,0)) as munprotect
+    ,SUM(IF( log_type='rights',1,0)) as mrights
+    ,SUM(IF( log_type='import',1,0)) as mimport
+    ,SUM(IF(log_type !='',1,0)) as mtotal
+    /* TODO: Fix this workaround */
+    ,'' as 'group'
+    FROM $loggingTable
+    JOIN $userTable ON user_id = log_user
+    WHERE  log_timestamp > '$start' AND log_timestamp <= '$end'
+      AND log_type IS NOT NULL
+      AND log_action IS NOT NULL
+      AND log_type in ('block', 'delete', 'protect', 'import', 'rights')
+      /*AND log_user in ( $adminIds )*/
+    GROUP BY user_name
+    HAVING mdelete > 0 OR user_id in ( $adminIds )
+    ORDER BY mtotal DESC
+
+    ";
+
+        $res = $conn->prepare( $query );
+        $res->execute();
+
+        $users = $res->fetchAll();
 
         return $this->render("adminStats/result.html.twig", [
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),

@@ -8,6 +8,7 @@ use Mediawiki\Api\SimpleRequest;
 use Mediawiki\Api\FluentRequest;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ApiHelper extends HelperBase
@@ -18,6 +19,12 @@ class ApiHelper extends HelperBase
 
     /** @var LabsHelper */
     private $labsHelper;
+
+    /** @var CacheItemPoolInterface */
+    protected $cache;
+
+    /** @var ContainerInterface */
+    private $container;
 
     public function __construct(ContainerInterface $container, LabsHelper $labsHelper)
     {
@@ -30,7 +37,26 @@ class ApiHelper extends HelperBase
     {
         if (!isset($this->api)) {
             $projectInfo = $this->labsHelper->databasePrepare($project);
-            $this->api = MediawikiApi::newFromPage($projectInfo['url']);
+
+            // TODO: Remove this debugging work around.
+            $projectInfo["url"] = "http://127.0.0.1/wiki/api.php";
+            dump($projectInfo);
+            // TODO: END
+            try {
+                if (isset($projectInfo["url"]) && strpos($projectInfo["url"], "api.php") !== false) {
+                    $this->api = MediawikiApi::newFromApiEndpoint($projectInfo["url"]);
+                } else {
+                    $this->api = MediawikiApi::newFromPage($projectInfo['url']);
+                }
+            }
+            catch (Exception $e)
+            {
+                dump($e->getMessage());
+            }
+            catch (FatalErrorException $e)
+            {
+                dump($e->getMessage());
+            }
         }
     }
 
@@ -119,6 +145,58 @@ class ApiHelper extends HelperBase
         }
 
         return $result;
+    }
+
+    public function getAdmins($project)
+    {
+
+        $this->setUp($project);
+        $query = new SimpleRequest('query', [
+            "list" => "allusers",
+            "augroup" => "sysop|bureaucrat|steward|oversight|checkuser",
+            "auprop" => "groups|editcount",
+            "aufrom" => "",
+            "aulimit" => "500" ]);
+
+        dump($query->getParams());
+
+        $result = [];
+
+        // TODO: Fix on a non work computer...
+        return $result;
+
+        try {
+
+            $continue = true;
+            $i=0;
+            while ( $continue ){
+                if ($i >0 ) { $data["aufrom"] = $continue; }
+                $res = $this->api->getRequest($query);
+                dump($res);
+                next;
+                $apiret2 = @$apiret->query->allusers;
+                $continue = @$apiret->{'query-continue'}->allusers->aufrom;
+                if( is_array($apiret2) ){
+                    foreach ( $apiret2 as $u => $obj ){
+                        $groups= array();
+                        if (in_array("sysop", $obj->groups)) {$groups[] = "A";}
+                        if (in_array("bureaucrat", $obj->groups)) { $groups[] = "B"; }
+                        if (in_array("steward", $obj->groups)) { $groups[] = "S" ; }
+                        if (in_array("checkuser", $obj->groups)) { $groups[] = "CU"; }
+                        if (in_array("oversight", $obj->groups)) { $groups[] = "OS"; }
+                        if (in_array("bot", $obj->groups)) { $groups[] = "Bot"; }
+                        $res[ $obj->name ] = array( "editcount" => $obj->editcount, "groups" => implode('/', $groups) );
+                    }
+                }
+
+            $i++; if($i>20 ) break;
+            }
+        } catch (Exception $e) {
+            // The api returned an error!  Ignore
+        }
+
+        return $result;
+
     }
 
     /**
