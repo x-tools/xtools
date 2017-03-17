@@ -16,15 +16,10 @@ class TopEditsController extends Controller
      * @Route("/topedits/", name="topEditsSlash")
      * @Route("/topedits/index.php", name="topEditsIndex")
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
-
         $lh = $this->get("app.labs_helper");
-
         $lh->checkEnabled("topedits");
-
-        // Grab the request object, grab the values out of it.
-        $request = Request::createFromGlobals();
 
         $project = $request->query->get('project');
         $username = $request->query->get('user');

@@ -112,7 +112,7 @@ class LabsHelper
 
         // For 'revision' and 'logging' tables (actually views) on Labs, use the indexed versions
         // (that have some rows hidden, e.g. for revdeleted users).
-        $isLoggingOrRevision = in_array($table, ['revision', 'logging']);
+        $isLoggingOrRevision = in_array($table, ['revision', 'logging', 'archive']);
         if (!$mapped && $isLoggingOrRevision && $this->container->getParameter('app.is_labs')) {
             $table = $table."_userindex";
         }

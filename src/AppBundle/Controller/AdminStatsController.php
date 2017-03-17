@@ -15,15 +15,12 @@ class AdminStatsController extends Controller
      * @Route("/adminstats/", name="AdminStatsSlash")
      * @Route("/adminstats/index.php", name="AdminStatsSlash")
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
 
         $lh = $this->get("app.labs_helper");
 
         $lh->checkEnabled("adminstats");
-
-        // Grab the request object, grab the values out of it.
-        $request = Request::createFromGlobals();
 
         $projectQuery = $request->query->get('project');
         $startDate = $request->query->get('begin');

@@ -18,15 +18,10 @@ class AdminScoreController extends Controller
      * @Route("/scottywong tools/adminscore.php", name="AdminScoreLegacy")
      * @Route("/adminscore/{project}", name="AdminScoreProject")
      */
-    public function indexAction($project = null)
+    public function indexAction(Request $request, $project = null)
     {
-
         $lh = $this->get("app.labs_helper");
-
         $lh->checkEnabled("adminscore");
-
-        // Grab the request object, grab the values out of it.
-        $request = Request::createFromGlobals();
 
         $projectQuery = $request->query->get('project');
         $username = $request->query->get('user');
