@@ -54,7 +54,7 @@
         });
 
         // TOP EDITORS: Top 10 by number of edits chart
-        var topEditors = Object.keys(editors).slice(0, 9),
+        var topEditors = editorsByEditCount.slice(0, 9),
             topByEditsData = [],
             topByEditsLegendLabels = [];
             topEditCountSum = 0;
@@ -76,10 +76,16 @@
         });
 
         // TOP EDITORS: Top 10 by added text chart
+
+        var editorsByAddedData = Object.keys(editors).sort(function (a,b) {
+            return editors[b].added - editors[a].added;
+        });
+
         var topByAddedData = [],
             topByAddedLegendLabels = [];
             topByAddedSum = 0;
-        topEditors.forEach(function (editor) {
+
+        editorsByAddedData.slice(0, 10).forEach(function (editor) {
             var added = Math.abs(editors[editor].added);
             topByAddedSum += added;
             // var percentage = ((editCount / general.revision_count) * 100).toFixed(1);
@@ -144,9 +150,10 @@
         });
     });
 
+    // TODO: move this to shared chart_helpers.js (or something)
     function buildMultiBarChart(id, data)
     {
-        var ctx = $('#' + id),
+        var ctx = $('#' + id);
         var chartData = {
             labels: data.labels,
             datasets: data.datasets
@@ -205,6 +212,7 @@
         $('#' + id + '_legend').html(chartObj.generateLegend());
     }
 
+    // TODO: move this to shared chart_helpers.js (or something)
     function buildPieChart(id, data)
     {
         var ctx = $('#' + id);
@@ -212,7 +220,7 @@
             labels: data.labels,
             datasets: [{
                 data: data.data,
-            }],
+            }]
         };
 
         var numEntries = data.labels.length;

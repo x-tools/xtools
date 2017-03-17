@@ -40,6 +40,7 @@
             {% endfor %}
         </div>
 
+        {# ======================== GENERAL STATS ======================== #}
         {% set content %}
             <dl class="col-lg-6 dl-horizontal stat-list clearfix">
                 <dt>ID</dt>
@@ -204,9 +205,13 @@
 
         <div style="clear:both"></div>
 
+        {# ======================== TOP EDITORS ======================== #}
         {% set content %}
             <script>
                 var editors = {{ editors | json_encode() | raw }};
+                // 'editors' may lose it's sorting after being interpolated into JavaScript object
+                // So have a separate array to keep track of the ordering
+                var editorsByEditCount = {{ editors | keys | json_encode() | raw }};
                 var i18n = {
                     others: "{{ msg('others') | capitalize_first }}",
                 };
@@ -230,7 +235,7 @@
             <div><sup>1</sup> {{ msg('atbe') }}</div>
             <table class="table table-bordered table-hover table-striped">
                 <thead><tr>
-                    {% for key in ['username', 'links', 'edits', 'minor', 'minor_percentage', 'firstedit', 'latestedit', 'atbe', 'net_change'] %}
+                    {% for key in ['username', 'links', 'edits', 'minor', 'minor_percentage', 'firstedit', 'latestedit', 'atbe', 'added_bytes'] %}
                         <th>
                             <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
                                 {% if key == 'atbe' %}
@@ -273,8 +278,8 @@
                         <td class="sort-entry--atbe" data-value="{{ stats.atbe }}">
                             {{ stats.atbe | number_format(1) }}
                         </td>
-                        <td class="sort-entry--net_change" data-value="{{ stats.added }}">
-                            {{ stats.added | diff_format }}
+                        <td class="sort-entry--added_bytes" data-value="{{ stats.added }}">
+                            {{ stats.added | number_format }}
                         </td>
                     </tr>
                 {% endfor %}
@@ -326,6 +331,7 @@
         {% endset %}
         {{ layout.content_block('usertable', content) }}
 
+        {# ======================== YEAR COUNTS ======================== #}
         {% set content %}
             <script>
                 var year_count = {{ year_count | json_encode() | raw }};
@@ -339,7 +345,7 @@
             </script>
             <div class="year-count-charts clearfix">
                 <div class="chart-wrapper">
-                    <canvas id="year_count"></canvas>
+                    <canvas id="year_count" height="400" width="800"></canvas>
                     <span class="chart-legend" id="year_count_legend"></span>
                 </div>
             </div>
@@ -377,6 +383,7 @@
         {% endset %}
         {{ layout.content_block('yearcounts', content) }}
 
+        {# ======================== MONTH COUNTS ======================== #}
         {% set content %}
             <table class="table table-bordered table-hover table-striped">
                 <thead><tr>
@@ -428,6 +435,7 @@
         {% endset %}
         {{ layout.content_block('monthcounts', content) }}
 
+        {# ======================== AUTOMATED EDITS ======================== #}
         {% set content %}
             <table class="table table-bordered table-hover table-striped">
                 <thead><tr>
@@ -452,6 +460,7 @@
         {% endset %}
         {{ layout.content_block('autoedits', content) }}
 
+        {# ======================== ASSESSMENTS ======================== #}
         {% set content %}
             <table class="table table-bordered table-hover table-striped assessments-table">
                 <thead><tr>

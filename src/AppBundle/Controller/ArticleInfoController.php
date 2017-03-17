@@ -226,22 +226,27 @@ class ArticleInfoController extends Controller
         $topTenCount = $counter = 0;
 
         foreach ($this->pageInfo['editors'] as $editor => $info) {
-            // Is the user in the top 10%?
+            // Count how many users are in the top 10% by number of edits
             if ($counter <= $this->pageInfo['general']['editor_count'] * 0.1) {
                 $topTenCount += $info['all'];
                 $counter++;
             }
 
+            // Compute the percentage of minor edits the user made
             $this->pageInfo['editors'][$editor]['minor_percentage'] = $info['all']
                 ? ($info['minor'] / $info['all']) * 100
                 : 0;
 
             if ($info['all'] > 1) {
+                // Number of seconds between first and last edit
                 $secs = intval(strtotime($info['last']) - strtotime($info['first']) / $info['all']);
+
+                // Average time between edits (in days)
                 $this->pageInfo['editors'][$editor]['atbe'] = $secs / ( 60 * 60 * 24 );
             }
 
             if (count($info['sizes'])) {
+                // Average Total KB divided by number of stored sizes (user's edit count to this page)
                 $this->pageInfo['editors'][$editor]['size'] = array_sum($info['sizes']) / count($info['sizes']);
             } else {
                 $this->pageInfo['editors'][$editor]['size'] = 0;
@@ -264,7 +269,7 @@ class ArticleInfoController extends Controller
         $pageLinksTable = $this->lh->getTable('pagelinks');
         $redirectTable = $this->lh->getTable('redirect');
 
-        // FIXME: probably need to make the $title mysql-safe or whatever
+        // FIXME: Probably need to make the $title mysql-safe or whatever
         $query = "SELECT COUNT(*) AS value, 'links_ext' AS type
                   FROM $externalLinksTable WHERE el_from = $pageId
                   UNION
@@ -281,7 +286,7 @@ class ArticleInfoController extends Controller
 
         $data = [];
 
-        // transform to associative array by 'type'
+        // Transform to associative array by 'type'
         foreach ($res as $row) {
             $data[$row['type'] . '_count'] = $row['value'];
         }
@@ -289,6 +294,10 @@ class ArticleInfoController extends Controller
         return $data;
     }
 
+    /**
+     * Query for log events during each year of the article's history,
+     *   and set the results in $this->pageInfo['year_count']
+     */
     private function setLogsEvents()
     {
         $loggingTable = $this->lh->getTable('logging');
@@ -413,6 +422,7 @@ class ArticleInfoController extends Controller
                 'textshare_total' => 0,
                 'automated_count' => 0,
                 'revert_count' => 0,
+                'added' => 0,
             ],
             'editors' => [],
             'anons' => [],
@@ -468,10 +478,7 @@ class ArticleInfoController extends Controller
             // Increment year and month counts for all edits
             $data['year_count'][$timestamp['year']]['all']++;
             $data['year_count'][$timestamp['year']]['months'][$timestamp['month']]['all']++;
-
-            if ($rev['rev_len'] > $data['year_count'][$timestamp['year']]['size']) {
-                $data['year_count'][$timestamp['year']]['size'] = (int) $rev['rev_len'];
-            }
+            $data['year_count'][$timestamp['year']]['size'] = (int) $rev['rev_len'];
 
             // Fill in various user stats
             if (!isset($data['editors'][$username])) {
@@ -492,9 +499,10 @@ class ArticleInfoController extends Controller
 
             // Increment user counts
             $data['editors'][$username]['all']++;
-            $data['editors'][$username]['added'] += $diffSize;
             $data['editors'][$username]['last'] = date('Y-m-d, H:i', strtotime($rev['rev_timestamp']));
             $data['editors'][$username]['last_id'] = $rev['rev_id'];
+
+            // Store number of KB added with this edit
             $data['editors'][$username]['sizes'][] = $rev['rev_len'] / 1024;
 
             // check if it was a revert
@@ -503,22 +511,9 @@ class ArticleInfoController extends Controller
             } else {
                 // edit was NOT a revert
 
-                if ($newSize > 0) {
-                    // FIXME: what are textshares?
-                    $data['general']['textshare_total'] += $newSize;
-                    if (!isset($data['textshares'][$username]['all'])) {
-                        $data['textshares'][$username]['all'] = 0;
-                    }
-                    $data['textshares'][$username]['all'] += $newSize;
-                }
-                if ($diffSize > $data['general']['max_add']['size']) {
-                    $data['general']['max_add']['timestamp'] = DateTime::createFromFormat(
-                        'YmdHis',
-                        $rev['rev_timestamp']
-                    );
-                    $data['general']['max_add']['revid'] = $rev['rev_id'];
-                    $data['general']['max_add']['user'] = $rev['rev_user_text'];
-                    $data['general']['max_add']['size'] = $diffSize;
+                if ($diffSize > 0) {
+                    $data['general']['added'] += $diffSize;
+                    $data['editors'][$username]['added'] += $diffSize;
                 }
 
                 // determine if the next revision was a revert
@@ -536,6 +531,26 @@ class ArticleInfoController extends Controller
                     $data['general']['max_del']['revid'] = $rev['rev_id'];
                     $data['general']['max_del']['user'] = $rev['rev_user_text'];
                     $data['general']['max_del']['size'] = $diffSize;
+                }
+
+                // FIXME: possibly remove this
+                if ($newSize > 0) {
+                    // keep track of added content
+                    $data['general']['textshare_total'] += $newSize;
+                    if (!isset($data['textshares'][$username]['all'])) {
+                        $data['textshares'][$username]['all'] = 0;
+                    }
+                    $data['textshares'][$username]['all'] += $newSize;
+                }
+
+                if ($diffSize > $data['general']['max_add']['size']) {
+                    $data['general']['max_add']['timestamp'] = DateTime::createFromFormat(
+                        'YmdHis',
+                        $rev['rev_timestamp']
+                    );
+                    $data['general']['max_add']['revid'] = $rev['rev_id'];
+                    $data['general']['max_add']['user'] = $rev['rev_user_text'];
+                    $data['general']['max_add']['size'] = $diffSize;
                 }
             }
 
