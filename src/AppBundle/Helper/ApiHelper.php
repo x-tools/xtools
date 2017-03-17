@@ -393,8 +393,6 @@ class ApiHelper
                 );
                 $isFinished = count($data['resolveData']['pages']) >= $data['limit'];
             } else {
-                var_dump('BEFORE');
-                var_dump($data['resolveData']);
                 // append new data to data from last request. We might want both 'pages' and dataKey
                 if ($result['query']['pages']) {
                     $data['resolveData']['pages'] = array_merge(
@@ -402,9 +400,6 @@ class ApiHelper
                         $result['query']['pages']
                     );
                 }
-                var_dump('AFTER');
-                var_dump($data['resolveData']);
-                var_dump('====');
                 if ($result['query'][$dataKey]) {
                     $newValues = isset($data['resolveData'][$dataKey]) ? $data['resolveData'][$dataKey] : [];
                     $data['resolveData'][$dataKey] = array_merge($newValues, $result['query'][$dataKey]);
