@@ -26,3 +26,4 @@
 /app/config/multisite.yml
 *.swp
 .DS_Store
+/composer.lock
