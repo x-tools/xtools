@@ -105,3 +105,4 @@ assetic:
     filters:
         scssphp:
             formatter: 'Leafo\ScssPhp\Formatter\Compressed'
+            apply_to:   '\.scss$'
