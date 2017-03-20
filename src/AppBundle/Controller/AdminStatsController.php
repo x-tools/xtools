@@ -76,7 +76,9 @@ class AdminStatsController extends Controller
         $url = $dbValues["url"];
 
         // TODO: Fix this call within this controller
-        // $data = $api->getAdmins($project);
+        $data = $api->getAdmins($project);
+
+        dump($data);
 
         // Get admin ID's
         $query = "

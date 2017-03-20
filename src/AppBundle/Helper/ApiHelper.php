@@ -39,7 +39,7 @@ class ApiHelper extends HelperBase
             $projectInfo = $this->labsHelper->databasePrepare($project);
 
             // TODO: Remove this debugging work around.
-            $projectInfo["url"] = "http://127.0.0.1/wiki/api.php";
+            //$projectInfo["url"] = "http://127.0.0.1/wiki/api.php";
             dump($projectInfo);
             // TODO: END
             try {
@@ -151,31 +151,27 @@ class ApiHelper extends HelperBase
     {
 
         $this->setUp($project);
-        $query = new SimpleRequest('query', [
-            "list" => "allusers",
-            "augroup" => "sysop|bureaucrat|steward|oversight|checkuser",
-            "auprop" => "groups|editcount",
-            "aufrom" => "",
-            "aulimit" => "500" ]);
-
-        dump($query->getParams());
 
         $result = [];
-
-        // TODO: Fix on a non work computer...
-        return $result;
 
         try {
 
             $continue = true;
             $i=0;
             while ( $continue ){
-                if ($i >0 ) { $data["aufrom"] = $continue; }
+                $query = new SimpleRequest('query', [
+                    "list" => "allusers",
+                    "augroup" => "sysop|bureaucrat|steward|oversight|checkuser",
+                    "auprop" => "groups|editcount",
+                    "aufrom" => ($i > 0 ? $continue : ""),
+                    "aulimit" => "500" ]);
+                //if ($i >0 ) { $data["aufrom"] = $continue; }
                 $res = $this->api->getRequest($query);
                 dump($res);
-                next;
-                $apiret2 = @$apiret->query->allusers;
-                $continue = @$apiret->{'query-continue'}->allusers->aufrom;
+                $apiret2 = $res["query"]["allusers"];
+                // $continue = @$apiret->{'query-continue'}->allusers->aufrom;
+                $continue = $res['query-continue']['allusers']['aufrom'];
+                $continue = false;
                 if( is_array($apiret2) ){
                     foreach ( $apiret2 as $u => $obj ){
                         $groups= array();

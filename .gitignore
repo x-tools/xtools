@@ -27,3 +27,4 @@
 *.swp
 .DS_Store
 /composer.lock
+/mrb_prepcommit.sh
