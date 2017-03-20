@@ -179,6 +179,7 @@
   "support": "Support",
   "tagged": "tagged",
   "text": "Text",
+  "text-added-description": "Added text is any positive addition that wasn't reverted with the next edit",
   "thank": "Thank",
   "time_ago": "$1 $2 ago",
   "timebwedits": "Average time between edits",

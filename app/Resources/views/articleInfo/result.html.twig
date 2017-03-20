@@ -221,19 +221,18 @@
                     <div class="chart-title">{{ msg('toptenbyedits') | capitalize_first }}</div>
                     <div class="chart-wrapper">
                         <canvas id="top_by_edits"></canvas>
-                        <span class="chart-legend" id="top_by_edits_legend"></span>
+                        <div class="chart-legend" id="top_by_edits_legend"></div>
                     </div>
                 </div>
                 <div class="pull-left">
                     <div class="chart-title">{{ msg('toptenbytext') | capitalize_first }}</div>
                     <div class="chart-wrapper">
                         <canvas id="top_by_added"></canvas>
-                        <span class="chart-legend" id="top_by_added_legend"></span>
+                        <div class="chart-legend" id="top_by_added_legend"></div>
                     </div>
                 </div>
             </div>
-            <div><sup>1</sup> {{ msg('atbe') }}</div>
-            <table class="table table-bordered table-hover table-striped">
+            <table class="table table-bordered table-hover table-striped top-editors-table">
                 <thead><tr>
                     {% for key in ['username', 'links', 'edits', 'minor', 'minor_percentage', 'firstedit', 'latestedit', 'atbe', 'added_bytes'] %}
                         <th>
@@ -242,6 +241,9 @@
                                     atbe<sup>1</sup>
                                 {% else %}
                                     {{ msg(key) | capitalize_first }}
+                                {% endif %}
+                                {% if key == 'added_bytes' %}
+                                    <sup style="margin-left:-4px">2</sup>
                                 {% endif %}
                                 {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
                             </span>
@@ -285,6 +287,10 @@
                 {% endfor %}
                 </tbody>
             </table>
+            <div class="footnotes">
+                <sup>1</sup> {{ msg('atbe') }}
+                <br/><sup>2</sup> {{ msg('text-added-description') }}
+            </div>
 
             <h4>{{ msg('bot_list') }}</h4>
             <table class="table table-bordered table-hover table-striped">

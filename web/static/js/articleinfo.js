@@ -24,8 +24,8 @@
             data: [usersCount, general.anon_count],
             labels: general.labels.users_ips,
             legendLabels: [
-                general.labels.users_ips[0] + ": " + usersCount + " (" + usersPercentage + "%)",
-                general.labels.users_ips[1] + ": " + general.anon_count + " (" + general.anon_percentage + "%)",
+                general.labels.users_ips[0] + ": " + formatNumber(usersCount) + " (" + usersPercentage + "%)",
+                general.labels.users_ips[1] + ": " + formatNumber(general.anon_count) + " (" + general.anon_percentage + "%)",
             ]
         });
 
@@ -36,8 +36,8 @@
             data: [general.minor_count, majorCount],
             labels: general.labels.minor_major,
             legendLabels: [
-                general.labels.minor_major[0] + ": " + majorCount + " (" + majorPercentage + "%)",
-                general.labels.minor_major[1] + ": " + general.minor_count + " (" + general.minor_percentage + "%)",
+                general.labels.minor_major[0] + ": " + formatNumber(majorCount) + " (" + majorPercentage + "%)",
+                general.labels.minor_major[1] + ": " + formatNumber(general.minor_count) + " (" + general.minor_percentage + "%)",
             ]
         });
 
@@ -48,8 +48,8 @@
             data: [general.top_ten_count, bottomTenCount],
             labels: general.labels.top_bottom,
             legendLabels: [
-                general.labels.top_bottom[0] + ": " + general.top_ten_count + " (" + general.top_ten_percentage + "%)",
-                general.labels.top_bottom[1] + ": " + bottomTenCount + " (" + bottomTenPercentage + "%)",
+                general.labels.top_bottom[0] + ": " + formatNumber(general.top_ten_count) + " (" + general.top_ten_percentage + "%)",
+                general.labels.top_bottom[1] + ": " + formatNumber(bottomTenCount) + " (" + bottomTenPercentage + "%)",
             ]
         });
 
@@ -64,41 +64,52 @@
             var percentage = ((editCount / general.revision_count) * 100).toFixed(1);
             topByEditsData.push(editCount);
             topByEditsLegendLabels.push(
-                editor + " · " + editCount + " (" + percentage + "%)"
+                "<span class='legend-label'>" + editor + "</span> · " + formatNumber(editCount) + " (" + percentage + "%)"
             );
         });
-        topByEditsData.push(general.revision_count - topEditCountSum);
-        topByEditsLegendLabels.push(i18n.others);
+        if (topEditors.length === 9) {
+            var othersEdits = general.revision_count - topEditCountSum,
+                othersEditsPercentage = ((othersEdits / general.revision_count) * 100).toFixed(1);
+            topEditors.push(i18n.others);
+            topByEditsData.push(othersEdits);
+            topByEditsLegendLabels.push(
+                i18n.others + " · " + formatNumber(othersEdits) + " (" + othersEditsPercentage + "%)"
+            );
+        }
         buildPieChart('top_by_edits', {
             data: topByEditsData,
-            labels: topEditors.concat([i18n.others]),
+            labels: topEditors,
             legendLabels: topByEditsLegendLabels,
         });
 
         // TOP EDITORS: Top 10 by added text chart
-
         var editorsByAddedData = Object.keys(editors).sort(function (a,b) {
             return editors[b].added - editors[a].added;
-        });
-
+        }).slice(0, 9);
         var topByAddedData = [],
             topByAddedLegendLabels = [];
             topByAddedSum = 0;
-
-        editorsByAddedData.slice(0, 10).forEach(function (editor) {
+        editorsByAddedData.forEach(function (editor) {
             var added = Math.abs(editors[editor].added);
             topByAddedSum += added;
-            // var percentage = ((editCount / general.revision_count) * 100).toFixed(1);
+            var percentage = ((added / general.added) * 100).toFixed(1);
             topByAddedData.push(added);
             topByAddedLegendLabels.push(
-                editor + " · " + added // + " (" + percentage + "%)"
+                "<span class='legend-label'>" + editor + "</span> · " + formatNumber(added) + " (" + percentage + "%)"
             );
         });
-        // topByAddedData.push(general.revision_count - topByAddedSum);
-        // topByAddedLegendLabels.push(i18n.others);
+        if (editorsByAddedData.length === 9) {
+            var othersAdded = general.added - topByAddedSum,
+                othersAddedPercentage = ((othersAdded / general.added) * 100).toFixed(1);
+            editorsByAddedData.push(i18n.others);
+            topByAddedData.push(othersAdded);
+            topByAddedLegendLabels.push(
+                i18n.others + " · " + formatNumber(othersAdded) + " (" + othersAddedPercentage + "%)"
+            );
+        }
         buildPieChart('top_by_added', {
             data: topByAddedData,
-            labels: topEditors, // .concat([i18n.others]),
+            labels: editorsByAddedData,
             legendLabels: topByAddedLegendLabels,
         });
 
@@ -149,6 +160,22 @@
             yAxesLabelRight: i18n.size,
         });
     });
+
+    /**
+     * Use JavaScripts toLocaleString() to format numbers
+     * (e.g. 1000 becomes 1,000)
+     * If unsupported the unformatted number is returned
+     * @param  {Number} number Number to format
+     * @return {String}        Formatted number as string
+     */
+    function formatNumber(number)
+    {
+        try {
+            return number.toLocaleString();
+        } catch (e) {
+            return number;
+        }
+    }
 
     // TODO: move this to shared chart_helpers.js (or something)
     function buildMultiBarChart(id, data)
