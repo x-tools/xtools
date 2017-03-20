@@ -33,7 +33,18 @@
         </p>
 
         <div class="text-center xt-toc">
-            {% for section in ['generalstats', 'usertable', 'yearcounts', 'monthcounts', 'autoedits', 'assessments'] %}
+            {% set sections = ['generalstats', 'usertable', 'yearcounts', 'monthcounts'] %}
+            {% if general.automated_count > 0 %}
+                {% set sections = sections | merge(['autoedits']) %}
+            {% endif %}
+            {% if assessments is defined %}
+                {% set sections = sections | merge(['assessments']) %}
+            {% endif %}
+            {% if checkwiki_errors is defined %}
+                {% set sections = sections | merge(['bugs']) %}
+            {% endif %}
+
+            {% for section in sections %}
                 <span>
                     <a href="#{{ section }}" data-section="{{ section }}">{{ msg(section) }}</a>
                 </span>
@@ -243,7 +254,7 @@
                                     {{ msg(key) | capitalize_first }}
                                 {% endif %}
                                 {% if key == 'added_bytes' %}
-                                    <sup style="margin-left:-4px">2</sup>
+                                    <sup class="rm-inline-margin">2</sup>
                                 {% endif %}
                                 {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
                             </span>
@@ -292,6 +303,7 @@
                 <br/><sup>2</sup> {{ msg('text-added-description') }}
             </div>
 
+            {% if bots is not empty %}
             <h4>{{ msg('bot_list') }}</h4>
             <table class="table table-bordered table-hover table-striped">
                 <thead><tr>
@@ -334,6 +346,7 @@
                 {% endfor %}
                 </tbody>
             </table>
+            {% endif %}
         {% endset %}
         {{ layout.content_block('usertable', content) }}
 
@@ -442,6 +455,7 @@
         {{ layout.content_block('monthcounts', content) }}
 
         {# ======================== AUTOMATED EDITS ======================== #}
+        {% if general.automated_count > 0 %}
         {% set content %}
             <table class="table table-bordered table-hover table-striped">
                 <thead><tr>
@@ -465,8 +479,10 @@
             </table>
         {% endset %}
         {{ layout.content_block('autoedits', content) }}
+        {% endif %}
 
         {# ======================== ASSESSMENTS ======================== #}
+        {% if assessments is defined %}
         {% set content %}
             <table class="table table-bordered table-hover table-striped assessments-table">
                 <thead><tr>
@@ -505,6 +521,7 @@
             </table>
         {% endset %}
         {{ layout.content_block('assessments', content) }}
+        {% endif %}
     </div>
 </div>
 {% endblock %}

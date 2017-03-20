@@ -201,7 +201,7 @@ class ApiHelper
      * Get assessments of the given pages, if a supported project
      * @param  string       $project    Project such as en.wikipedia.org
      * @param  string|array $pageTitles Single page title or array of titles
-     * @return array                    Page assessments info
+     * @return array|null               Page assessments info or null if none found
      */
     public function getPageAssessments($project, $pageTitles)
     {
@@ -232,6 +232,10 @@ class ApiHelper
         // This will be replaced with the first valid class defined for any WikiProject
         $overallQuality = $config['class']['Unknown'];
         $overallQuality['value'] = '???';
+
+        if (empty($assessments)) {
+            return null;
+        }
 
         // loop through each assessment and decorate with colors, category URLs and images, if applicable
         foreach ($assessments as $wikiproject => $assessment) {

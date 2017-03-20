@@ -92,6 +92,7 @@ class ArticleInfoController extends Controller
         $this->pageInfo = [
             'project' => preg_replace('#^https?://#', '', rtrim($projectUrl, '/')),
             'project_url' => $projectUrl,
+            'db_name' => $dbValues['dbName'],
             'id' => $basicInfo['pageid'],
             'namespace' => $basicInfo['ns'],
             'title' => $basicInfo['title'],
@@ -138,8 +139,16 @@ class ArticleInfoController extends Controller
             $this->pageInfo['title'],
             $this->pageInfo['general']['pageviews_offset']
         );
-        $this->pageInfo['assessments'] = $api->getPageAssessments($project, $page);
+        $assessments = $api->getPageAssessments($project, $page);
+        if ($assessments) {
+            $this->pageInfo['assessments'] = $assessments;
+        }
         $this->setLogsEvents();
+
+        // $checkWikiErrors = $this->getCheckWikiErrors();
+        // if (!empty($checkWikiErrors)) {
+        //     $this->pageInfo['checkwiki_errors'] = $checkWikiErrors;
+        // }
 
         $this->pageInfo['xtPage'] = 'articleinfo';
 
@@ -327,6 +336,29 @@ class ArticleInfoController extends Controller
                 $this->pageInfo['year_count'][$year]['events'] = $yearEvents;
             }
         }
+    }
+
+    /**
+     * Get any CheckWiki errors
+     * @return array Results from query
+     */
+    private function getCheckWikiErrors()
+    {
+        if ($this->pageInfo['namespace'] !== 0 || !$this->container->getParameter('app.is_labs')) {
+            return [];
+        }
+        $title = $this->pageInfo['title']; // no underscores
+        $dbName = preg_replace('/_p$/', '', $this->$pageInfo['db_name']); // remove _p if present
+
+        $query = "SELECT error, notice, found, name_trans, prio, text_trans
+                  FROM s51080__checkwiki_p.cw_error a
+                  JOIN s51080__checkwiki_p.cw_overview_errors b
+                  WHERE a.project = b.project AND a.project = '$dbName'
+                  AND a.title = '$title' AND a.error = b.id
+                  AND b.done IS NULL";
+
+        $res = $this->conn->query($query)->fetchAll();
+        return $res;
     }
 
     /**
