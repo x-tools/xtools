@@ -113,7 +113,6 @@ class ArticleInfoController extends Controller
         if (isset($pageProps['disambiguation'])) {
             $this->pageInfo['isDisamb'] = true;
         }
-        // $this->pageInfo['revision_count'] = $this->getRevCount();
 
         // TODO: Adapted from legacy code; may be used to indicate how many dead ext links there are
         // if ( isset( $basicInfo->extlinks ) ){
@@ -145,10 +144,10 @@ class ArticleInfoController extends Controller
         }
         $this->setLogsEvents();
 
-        // $checkWikiErrors = $this->getCheckWikiErrors();
-        // if (!empty($checkWikiErrors)) {
-        //     $this->pageInfo['checkwiki_errors'] = $checkWikiErrors;
-        // }
+        $checkWikiErrors = $this->getCheckWikiErrors();
+        if (!empty($checkWikiErrors)) {
+            $this->pageInfo['checkwiki_errors'] = $checkWikiErrors;
+        }
 
         $this->pageInfo['xtPage'] = 'articleinfo';
 
@@ -348,7 +347,7 @@ class ArticleInfoController extends Controller
             return [];
         }
         $title = $this->pageInfo['title']; // no underscores
-        $dbName = preg_replace('/_p$/', '', $this->$pageInfo['db_name']); // remove _p if present
+        $dbName = preg_replace('/_p$/', '', $this->pageInfo['db_name']); // remove _p if present
 
         $query = "SELECT error, notice, found, name_trans, prio, text_trans
                   FROM s51080__checkwiki_p.cw_error a
@@ -357,7 +356,8 @@ class ArticleInfoController extends Controller
                   AND a.title = '$title' AND a.error = b.id
                   AND b.done IS NULL";
 
-        $res = $this->conn->query($query)->fetchAll();
+        $conn = $this->container->get('doctrine')->getManager('toolsdb')->getConnection();
+        $res = $conn->query($query)->fetchAll();
         return $res;
     }
 
@@ -368,10 +368,10 @@ class ArticleInfoController extends Controller
     private function getHistory()
     {
         $query = "SELECT rev_id, rev_parent_id, rev_user_text, rev_user, rev_timestamp,
-                rev_minor_edit, rev_len, rev_comment
-            FROM $this->revisionTable
-            WHERE rev_page = '" . $this->pageInfo['id'] . "' AND rev_timestamp > 1
-            ORDER BY rev_timestamp";
+                  rev_minor_edit, rev_len, rev_comment
+                  FROM $this->revisionTable
+                  WHERE rev_page = '" . $this->pageInfo['id'] . "' AND rev_timestamp > 1
+                  ORDER BY rev_timestamp";
 
         $res = $this->conn->query($query)->fetchAll();
         return $res;

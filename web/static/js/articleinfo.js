@@ -33,7 +33,7 @@
         var majorCount = general.revision_count - general.minor_count,
             majorPercentage = 100 - general.minor_percentage;
         buildPieChart('minor_major', {
-            data: [general.minor_count, majorCount],
+            data: [majorCount, general.minor_count],
             labels: general.labels.minor_major,
             legendLabels: [
                 general.labels.minor_major[0] + ": " + formatNumber(majorCount) + " (" + majorPercentage + "%)",

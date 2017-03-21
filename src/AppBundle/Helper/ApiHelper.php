@@ -245,13 +245,15 @@ class ApiHelper
             if ($classValue === 'Unknown' || $classValue === '' || !isset($config['class'][$classValue])) {
                 $assessment['class'] = $config['class']['Unknown'];
                 $assessment['class']['value'] = '???';
+                // $1 is used to substitute the WikiProject name, e.g. Category:FA-Class Wikipedia 1.0 articles
+                $assessment['class']['category'] = str_replace('$1', $wikiproject, $assessment['class']['category']);
+                $assessment['class']['badge'] = "https://upload.wikimedia.org/wikipedia/commons/" . $assessment['class']['badge'];
             } else {
                 $classAttrs = $config['class'][$classValue];
                 $assessment['class'] = [
                     'value' => $classValue,
                     'color' => $classAttrs['color'],
-                    // $1 is used to substitute the WikiProject name, e.g. Category:FA-Class Wikipedia 1.0 articles
-                    'category' => str_replace('$1', $wikiproject, $classAttrs['category'])
+                    'category' => str_replace('$1', $wikiproject, $classAttrs['category']),
                 ];
 
                 // add full URL to badge icon
@@ -272,8 +274,10 @@ class ApiHelper
             $importanceUnknown = $importanceValue === 'Unknown' || $importanceValue === '';
 
             if ($importanceUnknown || !isset($config['importance'][$importanceValue])) {
-                $assessment['importance'] = $config['importance']['Unknown'];
+                $importanceAttrs = $config['importance']['Unknown'];
+                $assessment['importance'] = $importanceAttrs;
                 $assessment['importance']['value'] = '???';
+                $assessment['importance']['category'] = str_replace('$1', $wikiproject, $importanceAttrs['category']);
             } else {
                 $importanceAttrs = $config['importance'][$importanceValue];
                 $assessment['importance'] = [

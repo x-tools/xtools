@@ -22,8 +22,8 @@
             {{ wiki_history_link(title, project_url) }}
             &middot;
             {{ wiki_log_link(title, project_url) }}
-            &middot;
             {% if isWMFLabs() %}
+            &middot;
             {{ pageviews_links(title, project) }}
             {% if wikidataId is defined %}
                 &middot;
@@ -173,12 +173,14 @@
                 <dd>{{ links_ext_count | number_format }}</dd>
                 <dt>{{ msg('pagewatchers') }}</dt>
                 <dd>{{ watchers }}</dd>
+                {% if isWMFLabs() %}
                 <dt>{{ msg('pageviews') }} (60 {{ msg('days', [60]) }})</dt>
                 <dd>
                     <a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project }}&pages={{ title }}&range=latest-{{ general.pageviews_offset }}">
                         {{ general.pageviews | number_format }}
                     </a>
                 </dd>
+                {% endif %}
             </dl>
             <script>
                 var general = {{ general | json_encode() | raw }};
@@ -521,6 +523,40 @@
             </table>
         {% endset %}
         {{ layout.content_block('assessments', content) }}
+        {% endif %}
+
+        {# ======================== BUGS ======================== #}
+        {% if checkwiki_errors is defined %}
+        {% set content %}
+            <table class="table table-bordered table-hover table-striped bugs-table">
+                <thead><tr>
+                    {% for key in ['priority', 'name', 'notice', 'explanation'] %}
+                        <th>
+                            <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
+                                {{ msg(key) | capitalize_first }}
+                                <span class="glyphicon glyphicon-sort"></span>
+                            </span>
+                        </th>
+                    {% endfor %}
+                </tr></thead>
+                <tbody>
+                {% for bug in checkwiki_errors %}
+                    <tr>
+                        <td class="sort-entry--priority" data-value="{{ bug.prio }}">{{ bug.prio }}</td>
+                        <td class="sort-entry--name" data-value="{{ bug.name_trans }}">{{ bug.name_trans }}</td>
+                        <td class="sort-entry--notice" data-value="{{ bug.notice }}">
+                            <code>{{ bug.notice }}</code>
+                        </td>
+                        <td class="sort-entry--explanation" data-value="{{ bug.text_trans }}">{{ bug.text_trans | raw }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endset %}
+        {% set description_link %}
+            Powered by <a target='_blank' href='https://tools.wmflabs.org/checkwiki/'>Project Check Wikipedia</a>
+        {% endset %}
+        {{ layout.content_block('bugs', content, description_link) }}
         {% endif %}
     </div>
 </div>
