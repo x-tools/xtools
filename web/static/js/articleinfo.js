@@ -54,7 +54,7 @@
         });
 
         // TOP EDITORS: Top 10 by number of edits chart
-        var topEditors = editorsByEditCount.slice(0, 9),
+        var topEditors = editorsByEditCount.slice(0, 10),
             topByEditsData = [],
             topByEditsLegendLabels = [];
             topEditCountSum = 0;
@@ -67,15 +67,6 @@
                 "<span class='legend-label'>" + editor + "</span> · " + formatNumber(editCount) + " (" + percentage + "%)"
             );
         });
-        if (topEditors.length === 9) {
-            var othersEdits = general.revision_count - topEditCountSum,
-                othersEditsPercentage = ((othersEdits / general.revision_count) * 100).toFixed(1);
-            topEditors.push(i18n.others);
-            topByEditsData.push(othersEdits);
-            topByEditsLegendLabels.push(
-                i18n.others + " · " + formatNumber(othersEdits) + " (" + othersEditsPercentage + "%)"
-            );
-        }
         buildPieChart('top_by_edits', {
             data: topByEditsData,
             labels: topEditors,
@@ -85,7 +76,7 @@
         // TOP EDITORS: Top 10 by added text chart
         var editorsByAddedData = Object.keys(editors).sort(function (a,b) {
             return editors[b].added - editors[a].added;
-        }).slice(0, 9);
+        }).slice(0, 10);
         var topByAddedData = [],
             topByAddedLegendLabels = [];
             topByAddedSum = 0;
@@ -98,15 +89,6 @@
                 "<span class='legend-label'>" + editor + "</span> · " + formatNumber(added) + " (" + percentage + "%)"
             );
         });
-        if (editorsByAddedData.length === 9) {
-            var othersAdded = general.added - topByAddedSum,
-                othersAddedPercentage = ((othersAdded / general.added) * 100).toFixed(1);
-            editorsByAddedData.push(i18n.others);
-            topByAddedData.push(othersAdded);
-            topByAddedLegendLabels.push(
-                i18n.others + " · " + formatNumber(othersAdded) + " (" + othersAddedPercentage + "%)"
-            );
-        }
         buildPieChart('top_by_added', {
             data: topByAddedData,
             labels: editorsByAddedData,
