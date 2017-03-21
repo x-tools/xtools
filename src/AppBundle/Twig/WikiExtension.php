@@ -25,6 +25,7 @@ class WikiExtension extends Extension
         return [
             new Twig_SimpleFunction('wiki_link', [ $this, 'wikiLink' ], $options),
             new Twig_SimpleFunction('user_link', [ $this, 'userLink' ], $options),
+            new Twig_SimpleFunction('group_link', [ $this, 'groupLink' ], $options),
             new Twig_SimpleFunction('wiki_history_link', [ $this, 'wikiHistoryLink' ], $options),
             new Twig_SimpleFunction('wiki_log_link', [ $this, 'wikiLogLink' ], $options),
             new Twig_SimpleFunction('pageviews_links', [ $this, 'pageviewsLinks' ], $options),
@@ -70,6 +71,21 @@ class WikiExtension extends Extension
             $link = "User:$username";
         }
         return "<a href='$projectUrl/wiki/$link' target='_blank'>$label</a>";
+    }
+
+    /**
+     * Get a link to the given user's userpage, or to Special:Contribs if $username is an IP
+     * @param  string $username   Username
+     * @param  string $projectUrl Project domain and protocol such as https://en.wikipedia.org
+     * @param  string [$label]    The link text, defaults to $username
+     * @return string Markup
+     */
+    public function groupLink($group, $projectUrl, $label = null)
+    {
+        if (!$label) {
+            $label = $group;
+        }
+        return "<a href='$projectUrl/wiki/index.php?title=Special:ListUsers&group=$group&creationSort=1&limit=50' target='_blank'>$label</a>";
     }
 
     /**

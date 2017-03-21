@@ -59,7 +59,7 @@ class AdminStatsController extends Controller
     /**
      * @Route("/adminstats/{project}/{start}/{end}", name="AdminStatsResult")
      */
-    public function resultAction($project, $start = null, $end = null)
+    public function resultAction($project, $start = "1970-01-01", $end = "2099-01-01")
     {
 
         $lh = $this->get("app.labs_helper");
@@ -69,6 +69,9 @@ class AdminStatsController extends Controller
 
         $dbValues = $lh->databasePrepare($project, "AdminStats");
 
+        //$days = date_diff($end, $start);
+        $days = date_diff(new \DateTime($end), new \DateTime($start))->days;
+
         $conn = $this->get('doctrine')->getManager("replicas")->getConnection();
 
         $dbName = $dbValues["dbName"];
@@ -76,9 +79,9 @@ class AdminStatsController extends Controller
         $url = $dbValues["url"];
 
         // TODO: Fix this call within this controller
-        $data = $api->getAdmins($project);
+        //$data = $api->getAdmins($project);
 
-        dump($data);
+        //dump($data);
 
         // Get admin ID's
         $query = "
@@ -135,6 +138,20 @@ class AdminStatsController extends Controller
 
         $users = $res->fetchAll();
 
+        $adminsWithoutAction = 0;
+        $adminCount = sizeof($adminIdArr);
+
+        foreach ($users as $row) {
+            if ($row["mtotal"] == 0) {
+                $adminsWithoutAction++;
+            }
+        }
+
+        $adminsWithoutActionPct = 0;
+        if ($adminCount > 0) {
+            $adminsWithoutActionPct = $adminsWithoutAction/$adminCount;
+        }
+
         return $this->render("adminStats/result.html.twig", [
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
             "xtPage" => "adminstats",
@@ -144,6 +161,14 @@ class AdminStatsController extends Controller
             'url' => $url,
             'project' => $project,
             'wikiName' => $wikiName,
+
+            'start_date' => $start,
+            'end_date' => $end,
+            'days' => $days,
+
+            'adminsWithoutAction' => $adminsWithoutAction,
+            'admins_without_action_pct' => $adminsWithoutActionPct,
+            'adminCount' => $adminCount,
 
             'users' => $users,
         ]);

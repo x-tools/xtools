@@ -5,10 +5,10 @@
     <div class="panel-body xt-panel-body-top"  >
         <p>
         <table class="table-condensed xt-table" style="text-align:left">
-            <tr><td>Starting date:</td><td>Nov 1, 2016, 12:00 AM &middot; (100 days)</td></tr>
+            <tr><td>Starting date:</td><td>{{ start_date }} ({{ days }} {{ msg("days", days) }})</td></tr>
             <tr><td>Log types:</td><td>delete, block, protect, import, rights</td></tr>
-            <tr><td>Current Admins (grp):</td><td><a href="//en.wikipedia.org/w/index.php?title=Special:ListUsers&group=sysop&creationSort=1&limit=50" target="_blank">455</a></td></tr>
-            <tr><td>Admins without action:</td><td>240 (8.9%)</td></tr>
+            <tr><td>Current Admins (grp):</td><td>{{ group_link("sysop", url, adminCount) }}</td></tr>
+            <tr><td>Admins without action:</td><td>{{ adminsWithoutAction }} ({{ admins_without_action_pct }}%)</td></tr>
         </table>
         </p>
         <br />
