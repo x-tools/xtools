@@ -181,6 +181,12 @@
                     </a>
                 </dd>
                 {% endif %}
+                {% if checkwiki_errors is defined %}
+                <dt style='margin-top:20px'>
+                    <a href='#bugs' class='rm-inline-margin'>{{ msg('bugs') }}</a>
+                </dt>
+                <dd style='margin-top:20px'>{{ checkwiki_errors | length }}</dd>
+                {% endif %}
             </dl>
             <script>
                 var general = {{ general | json_encode() | raw }};
