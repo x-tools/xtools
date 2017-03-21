@@ -189,7 +189,7 @@ class EditCounterHelper
         $requiredCounts = [
             'thanks-thank', 'review-approve', 'patrol-patrol','block-block', 'block-unblock',
             'protect-protect', 'protect-unprotect', 'delete-delete', 'delete-revision',
-            'delete-restore', 'import-import'
+            'delete-restore', 'import-import', 'upload-upload'
         ];
         foreach ($requiredCounts as $req) {
             if (!isset($logCounts[$req])) {
@@ -199,9 +199,20 @@ class EditCounterHelper
 
         // Merge approvals together.
         $logCounts['review-approve'] = $logCounts['review-approve'] +
-            isset($logCounts['review-approve-a']) ? $logCounts['review-approve-a'] : 0 +
-            isset($logCounts['review-approve-i']) ? $logCounts['review-approve-i'] : 0 +
-            isset($logCounts['review-approve-ia']) ? $logCounts['review-approve-ia'] : 0;
+            (!empty($logCounts['review-approve-a']) ? $logCounts['review-approve-a'] : 0) +
+            (!empty($logCounts['review-approve-i']) ? $logCounts['review-approve-i'] : 0) +
+            (!empty($logCounts['review-approve-ia']) ? $logCounts['review-approve-ia'] : 0);
+
+        // Add Commons upload count, if applicable.
+        $logCounts['files_uploaded_commons'] = 0;
+        if ($this->labsHelper->isLabs()) {
+            $sql = "SELECT count(*) FROM commonswiki_p.logging_userindex
+                WHERE log_type = 'upload' AND log_action = 'upload' AND log_user_text LIKE :username";
+            $resultQuery = $this->replicas->prepare($sql);
+            $resultQuery->bindParam('username', $username);
+            $resultQuery->execute();
+            $logCounts['files_uploaded_commons'] = $resultQuery->fetchColumn();
+        }
 
         return $logCounts;
     }

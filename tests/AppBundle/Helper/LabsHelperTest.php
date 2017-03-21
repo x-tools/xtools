@@ -21,7 +21,7 @@ class LabsHelperTest extends WebTestCase
         $this->container = $client->getContainer();
         $this->labsHelper = new LabsHelper($this->container);
     }
-    
+
     public function testGetTable()
     {
         if ($this->container->getParameter('app.is_labs')) {
@@ -31,17 +31,6 @@ class LabsHelperTest extends WebTestCase
         } else {
             // When using wiki databases directly.
             $this->assertEquals('page', $this->labsHelper->getTable('page'));
-            $this->assertEquals('logging', $this->labsHelper->getTable('logging'));
-        }
-    }
-
-    public function testGetProjects()
-    {
-        if ($this->container->getParameter('app.is_labs')) {
-            // When using Labs.
-            $this->assertEquals([], $this->labsHelper->getProjects());
-        } else {
-            // When using wiki databases directly.
             $this->assertEquals('logging', $this->labsHelper->getTable('logging'));
         }
     }

@@ -33,6 +33,15 @@ class LabsHelper
     }
 
     /**
+     * Is xTools connecting to MMF Labs?
+     * @return boolean
+     */
+    public function isLabs()
+    {
+        return (bool)$this->container->getParameter('app.is_labs');
+    }
+
+    /**
      * Set up LabsHelper::$client and return get the database name, wiki name, and URL of a given
      * project.
      * @todo: Handle failure better

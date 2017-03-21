@@ -72,9 +72,10 @@ class EditCounterController extends Controller
 
         // Give it all to the template.
         return $this->render('editCounter/result.html.twig', [
-            'xtTitle' => "tool_ec",
-            'xtPage' => "ec",
+            'xtTitle' => 'tool_ec',
+            'xtPage' => 'ec',
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
+            'is_labs' => $lh->isLabs(),
 
             // Project.
             'project' => $project,
@@ -120,6 +121,9 @@ class EditCounterController extends Controller
             'pagesDeletedRevision' => $logCounts['delete-revision'],
             'pagesRestored' => $logCounts['delete-restore'],
             'pagesImported' => $logCounts['import-import'],
+            'files_uploaded' => $logCounts['upload-upload'],
+            'files_modified' => $logCounts['upload-overwrite'],
+            'files_uploaded_commons' => $logCounts['files_uploaded_commons'],
 
             // Namespace Totals
             'namespaceArray' => $namespaceTotals,

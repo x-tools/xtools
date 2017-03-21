@@ -83,10 +83,12 @@
                                 </tr>
                                 <tr><td>{{ msg("pages_moved") }}:</td><td><span class="tdgeneral" >{{ pagesMoved }}</span></td></tr>
                                 <tr><td title="{{ msg("average_per_page") }}" >{{ msg("average_per_page_sign") }}</td><td><span class="tdgeneral" >{{ editsPerPage }}</span></td></tr>
-                                <tr><td title="Average change per page" >Ø change per page (bytes):</td><td><span class="tdgeneral" >extended</span></td></tr>
+                                <tr><td title="Average change per page" >Ø change per page (bytes):</td><td><span class="tdgeneral" ></span></td></tr>
                                 <tr><td colspan=20 ></td></tr>
-                                <tr><td>Files uploaded:</td><td><span class="tdgeneral" ><a href="//en.wikipedia.org/wiki/Special:ListFiles/Matthewrbowker" >38</a></span></td></tr>
-                                <tr><td>Files uploaded (Commons):</td><td><span class="tdgeneral" ><a href="//commons.wikimedia.org/wiki/Special:ListFiles/Matthewrbowker" >16</a></span></td></tr>
+                                <tr><td>{{ msg('files_uploaded') }}</td><td><span class="tdgeneral" ><a href="//{{ url }}/wiki/Special:ListFiles/{{ username }}" >{{ files_uploaded }}</a></span></td></tr>
+                                {% if is_labs %}
+                                <tr><td>{{ msg('files_uploaded_commons') }}</td><td><span class="tdgeneral" ><a href="https://commons.wikimedia.org/wiki/Special:ListFiles/{{ username }}" >{{ files_uploaded_commons }}</a></span></td></tr>
+                                {% endif %}
                                 <tr><td colspan=20 ></td></tr>
                                 <tr><td>(Semi-)automated edits:</td><td><span class="tdgeneral" ><a href="#autoeditslist">3,784</a></span></td></tr>
                                 <tr><td>Reverted edits:</td><td><span class="tdgeneral" >18</span></td></tr>

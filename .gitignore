@@ -16,6 +16,8 @@
 /vendor/
 /web/bundles/
 /web/config.php
+/web/static/css/production*
+/web/static/js/production*
 ~
 
 .idea/
