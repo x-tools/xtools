@@ -43,3 +43,9 @@ services:
         public: true
         tags:
           - {name: automatededits.helper}
+    app.editcounter_helper:
+        class: AppBundle\Helper\EditCounterHelper
+        arguments: ["@service_container"]
+        public: true
+        tags:
+          - {name: editcounter.helper}

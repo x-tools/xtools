@@ -3,18 +3,20 @@
 {# TODO: Convert to link() and linkToWiki() functions #}
 
 {% block body %}
-    <div id="wrapper">
-        <div id="container">
+    <div class="panel panel-primary">
+        <header class="panel-heading">
+            <div class="text-center xt-heading-top">
+                <a class="back-to-search" href="{{ path('ec') }}">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                    Back
+                </a>
+                {{ user_link(username, url) }}
+                <small> &bull; {{ project }} </small>
+            </div>
+        </header>
 
-    <div class="panel panel-primary" style="text-align:center">
-        <div class="panel-heading">
-            <p class="xt-heading-top" >
-                <a href="{{ url }}/wiki/User:{{ username }}">{{ username }}</a>
-                <small><span style="padding-left:10px;" > &bull;&nbsp; {{ project }} </span></small>
-            </p>
-        </div>
         <div class="panel-body xt-panel-body-top" >
-            <p>
+            <p class="text-center xt-heading-subtitle">
                 <a href="{{ url }}/w/index.php?title=Special%3ALog&type=block&user=&page=User%{{ username }}&year=&month=-1&tagfilter=" >Block log</a> &middot;
                 <a href="//tools.wmflabs.org/guc/?user={{ username }}" >Global user contributions</a> &middot;
                 <a href="//meta.wikimedia.org/w/index.php?title=Special%3ACentralAuth&target={{ username }}" >Global Account Manager</a> &middot;
@@ -29,16 +31,20 @@
                 <div class="panel-body" id="generalstats">
                     <div class="row">
                         <div class="col">
-                            <table class="table-condensed  xt-table">
+                            <table class="table-condensed xt-table">
                                 <tr><td>{{ msg("userid") }}:</td><td>{{ user_id }}</td></tr>
-                                <tr><td style="vertical-align:top;">{{ msg("groups") }}:</td><td style="max-width:300px;" >{{ user_groups }}
-                                        {% if globalGroups is defined and globalGroups|length > 0 %}<br />
+                                <tr class="groups">
+                                    <td>{{ msg("groups") }}:</td>
+                                    <td>
+                                        {% for group in user_groups %}
+                                            {{ group }}{% if not loop.last %}, {% endif %}
+                                        {% endfor %}
+                                        {% if global_groups %}<br />
                                             &bull; {{ msg("global") }}:
-                                            {% for group in globalGroups %}
-                                                {{ group }}
-                                            {% endfor %}
+                                            {% for group in global_groups %}{{ group }}{% endfor %}
                                         {% endif %}
-                                </td></tr>
+                                    </td>
+                                </tr>
                                 <tr><td>{{ msg("firstedit") }}:</td><td>{{ first_rev }}</td></tr>
                                 <tr><td>{{ msg("latestedit") }}:</td><td>{{ latest_rev }}</td></tr>
                                 <tr><td colspan=20 ></td></tr>
@@ -54,7 +60,7 @@
                                 <tr><td>{{ msg("lastmonth") }}:</td><td><span class="tdgeneral" >{{ rev_30d }}</span></td></tr>
                                 <tr><td>{{ msg("lastyear") }}:</td><td><span class="tdgeneral" >{{ rev_365d }}</span></td></tr>
                                 <tr><td colspan=20 ></td></tr>
-                                <tr><td title="{{ days }} {{ msg('days', [days]) }}" >{{ msg("avg_edits_per_time_sign", [msg("days", [1])]) }}:</td><td><span class="tdgeneral" >{{ delta }}</span></td></tr>
+                                <tr><td title="{{ days }} {{ msg('days', [days]) }}" >{{ msg("avg_edits_per_time_sign", [msg("days", [1])]) }}:</td><td><span class="tdgeneral" >{{ avg_per_day }}</span></td></tr>
                             </table>
                         </div>
                     </div>
@@ -65,7 +71,16 @@
                             <table class="table-condensed  xt-table">
                                 <tr><td style="color:gray">{{ msg("live") }}:</td></tr>
                                 <tr><td>{{ msg("unique") }}:</td><td><span class="tdgeneral" >{{ uniquePages }}</span></td>    </tr>
-                                <tr><td>{{ msg("pages_created") }}:</td><td><span class="tdgeneral" ><!--a href="//tools.wmflabs.org/xtools/pages/?user=Matthewrbowker&lang=en&wiki=wikipedia&namespace=all&redirects=none" -->{{ pagesCreated }}</a></span></td></tr>
+                                <tr>
+                                    <td>{{ msg("pages_created") }}:</td>
+                                    <td>
+                                        <span class="tdgeneral">
+                                            <a href="{{ path('PagesResult', {project:project, username:username, namespace:'all', redirects:'none'}) }}">
+                                                {{ pagesCreated }}
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
                                 <tr><td>{{ msg("pages_moved") }}:</td><td><span class="tdgeneral" >{{ pagesMoved }}</span></td></tr>
                                 <tr><td title="{{ msg("average_per_page") }}" >{{ msg("average_per_page_sign") }}</td><td><span class="tdgeneral" >{{ editsPerPage }}</span></td></tr>
                                 <tr><td title="Average change per page" >Ø change per page (bytes):</td><td><span class="tdgeneral" >extended</span></td></tr>
@@ -199,12 +214,12 @@
                     <table>
                         <tr>
                             <td><table class="table-striped xt-table">
-                                    {% for key, value in namespaceArray %}
+                                    {% for nsId, value in namespaceArray %}
                                         <tr>
-                                            <td><span style="display:inline-block; border-radius:2px; height:14px; width:14px; margin-right:5px; background-color:{{ value['color'] }} "></span></td>
-                                            <td>{{ namespaces[key] }}</td>
-                                            <td style="text-align:right; padding-left:15px;">{{ value["num"] }}</td>
-                                            <td style="text-align:right; padding-left:10px;">{{ (value["num"]/namespaceTotal) * 100 }}</td>
+                                            <td><span style="display:inline-block; border-radius:2px; height:14px; width:14px; margin-right:5px; background-color:{{ color(nsId) }} "></span></td>
+                                            <td>{{ namespaces[nsId] }}</td>
+                                            <td style="text-align:right; padding-left:15px;">{{ value }}</td>
+                                            <td style="text-align:right; padding-left:10px;">{{ (value/namespaceTotal) * 100 }}</td>
                                         </tr>
 
                                     {% endfor %}
