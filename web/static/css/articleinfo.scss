@@ -52,4 +52,21 @@
             vertical-align: -2px;
         }
     }
+
+    .legend-label {
+        display: inline-block;
+        max-width: 200px;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+        vertical-align: middle;
+    }
+
+    .top-editors-table {
+        margin-bottom: 0;
+    }
+
+    .footnotes {
+        margin-bottom: 20px;
+        margin-top: 5px;
+    }
 }

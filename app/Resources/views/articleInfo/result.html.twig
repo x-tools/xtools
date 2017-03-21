@@ -22,8 +22,8 @@
             {{ wiki_history_link(title, project_url) }}
             &middot;
             {{ wiki_log_link(title, project_url) }}
-            &middot;
             {% if isWMFLabs() %}
+            &middot;
             {{ pageviews_links(title, project) }}
             {% if wikidataId is defined %}
                 &middot;
@@ -33,7 +33,18 @@
         </p>
 
         <div class="text-center xt-toc">
-            {% for section in ['generalstats', 'usertable', 'yearcounts', 'monthcounts', 'autoedits', 'assessments'] %}
+            {% set sections = ['generalstats', 'usertable', 'yearcounts', 'monthcounts'] %}
+            {% if general.automated_count > 0 %}
+                {% set sections = sections | merge(['autoedits']) %}
+            {% endif %}
+            {% if assessments is defined %}
+                {% set sections = sections | merge(['assessments']) %}
+            {% endif %}
+            {% if checkwiki_errors is defined %}
+                {% set sections = sections | merge(['bugs']) %}
+            {% endif %}
+
+            {% for section in sections %}
                 <span>
                     <a href="#{{ section }}" data-section="{{ section }}">{{ msg(section) }}</a>
                 </span>
@@ -162,12 +173,20 @@
                 <dd>{{ links_ext_count | number_format }}</dd>
                 <dt>{{ msg('pagewatchers') }}</dt>
                 <dd>{{ watchers }}</dd>
+                {% if isWMFLabs() %}
                 <dt>{{ msg('pageviews') }} (60 {{ msg('days', [60]) }})</dt>
                 <dd>
                     <a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project }}&pages={{ title }}&range=latest-{{ general.pageviews_offset }}">
                         {{ general.pageviews | number_format }}
                     </a>
                 </dd>
+                {% endif %}
+                {% if checkwiki_errors is defined %}
+                <dt style='margin-top:20px'>
+                    <a href='#bugs' class='rm-inline-margin'>{{ msg('bugs') }}</a>
+                </dt>
+                <dd style='margin-top:20px'>{{ checkwiki_errors | length }}</dd>
+                {% endif %}
             </dl>
             <script>
                 var general = {{ general | json_encode() | raw }};
@@ -221,19 +240,18 @@
                     <div class="chart-title">{{ msg('toptenbyedits') | capitalize_first }}</div>
                     <div class="chart-wrapper">
                         <canvas id="top_by_edits"></canvas>
-                        <span class="chart-legend" id="top_by_edits_legend"></span>
+                        <div class="chart-legend" id="top_by_edits_legend"></div>
                     </div>
                 </div>
                 <div class="pull-left">
                     <div class="chart-title">{{ msg('toptenbytext') | capitalize_first }}</div>
                     <div class="chart-wrapper">
                         <canvas id="top_by_added"></canvas>
-                        <span class="chart-legend" id="top_by_added_legend"></span>
+                        <div class="chart-legend" id="top_by_added_legend"></div>
                     </div>
                 </div>
             </div>
-            <div><sup>1</sup> {{ msg('atbe') }}</div>
-            <table class="table table-bordered table-hover table-striped">
+            <table class="table table-bordered table-hover table-striped top-editors-table">
                 <thead><tr>
                     {% for key in ['username', 'links', 'edits', 'minor', 'minor_percentage', 'firstedit', 'latestedit', 'atbe', 'added_bytes'] %}
                         <th>
@@ -242,6 +260,9 @@
                                     atbe<sup>1</sup>
                                 {% else %}
                                     {{ msg(key) | capitalize_first }}
+                                {% endif %}
+                                {% if key == 'added_bytes' %}
+                                    <sup class="rm-inline-margin">2</sup>
                                 {% endif %}
                                 {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
                             </span>
@@ -285,7 +306,12 @@
                 {% endfor %}
                 </tbody>
             </table>
+            <div class="footnotes">
+                <sup>1</sup> {{ msg('atbe') }}
+                <br/><sup>2</sup> {{ msg('text-added-description') }}
+            </div>
 
+            {% if bots is not empty %}
             <h4>{{ msg('bot_list') }}</h4>
             <table class="table table-bordered table-hover table-striped">
                 <thead><tr>
@@ -328,6 +354,7 @@
                 {% endfor %}
                 </tbody>
             </table>
+            {% endif %}
         {% endset %}
         {{ layout.content_block('usertable', content) }}
 
@@ -436,6 +463,7 @@
         {{ layout.content_block('monthcounts', content) }}
 
         {# ======================== AUTOMATED EDITS ======================== #}
+        {% if general.automated_count > 0 %}
         {% set content %}
             <table class="table table-bordered table-hover table-striped">
                 <thead><tr>
@@ -459,8 +487,10 @@
             </table>
         {% endset %}
         {{ layout.content_block('autoedits', content) }}
+        {% endif %}
 
         {# ======================== ASSESSMENTS ======================== #}
+        {% if assessments is defined %}
         {% set content %}
             <table class="table table-bordered table-hover table-striped assessments-table">
                 <thead><tr>
@@ -499,6 +529,41 @@
             </table>
         {% endset %}
         {{ layout.content_block('assessments', content) }}
+        {% endif %}
+
+        {# ======================== BUGS ======================== #}
+        {% if checkwiki_errors is defined %}
+        {% set content %}
+            <table class="table table-bordered table-hover table-striped bugs-table">
+                <thead><tr>
+                    {% for key in ['priority', 'name', 'notice', 'explanation'] %}
+                        <th>
+                            <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
+                                {{ msg(key) | capitalize_first }}
+                                <span class="glyphicon glyphicon-sort"></span>
+                            </span>
+                        </th>
+                    {% endfor %}
+                </tr></thead>
+                <tbody>
+                {% for bug in checkwiki_errors %}
+                    <tr>
+                        <td class="sort-entry--priority" data-value="{{ bug.prio }}">{{ bug.prio }}</td>
+                        <td class="sort-entry--name" data-value="{{ bug.name_trans }}">{{ bug.name_trans }}</td>
+                        <td class="sort-entry--notice" data-value="{{ bug.notice }}">
+                            <code>{{ bug.notice }}</code>
+                        </td>
+                        <td class="sort-entry--explanation" data-value="{{ bug.text_trans }}">{{ bug.text_trans | raw }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endset %}
+        {% set description_link %}
+            Powered by <a target='_blank' href='https://tools.wmflabs.org/checkwiki/'>Project Check Wikipedia</a>
+        {% endset %}
+        {{ layout.content_block('bugs', content, description_link) }}
+        {% endif %}
     </div>
 </div>
 {% endblock %}

@@ -60,7 +60,7 @@ parameters:
           color: '#ffdb58'
           category: 'Category:Category-Class $1 articles'
         Unknown:
-          badge: ''
+          badge: 'e/e0/Symbol_question.svg'
           color: ''
           category: 'Category:Unassessed $1 articles'
       importance:

@@ -201,7 +201,7 @@ class ApiHelper
      * Get assessments of the given pages, if a supported project
      * @param  string       $project    Project such as en.wikipedia.org
      * @param  string|array $pageTitles Single page title or array of titles
-     * @return array                    Page assessments info
+     * @return array|null               Page assessments info or null if none found
      */
     public function getPageAssessments($project, $pageTitles)
     {
@@ -233,21 +233,27 @@ class ApiHelper
         $overallQuality = $config['class']['Unknown'];
         $overallQuality['value'] = '???';
 
+        if (empty($assessments)) {
+            return null;
+        }
+
         // loop through each assessment and decorate with colors, category URLs and images, if applicable
         foreach ($assessments as $wikiproject => $assessment) {
             $classValue = $assessment['class'];
 
             // Use ??? as the presented value when the class is unknown or is not defined in the config
             if ($classValue === 'Unknown' || $classValue === '' || !isset($config['class'][$classValue])) {
-                $assessment['class'] = $config['class']['Unknown'];
+                $classAttrs = $config['class']['Unknown'];
                 $assessment['class']['value'] = '???';
+                // $1 is used to substitute the WikiProject name, e.g. Category:FA-Class Wikipedia 1.0 articles
+                $assessment['class']['category'] = str_replace('$1', $wikiproject, $classAttrs['category']);
+                $assessment['class']['badge'] = "https://upload.wikimedia.org/wikipedia/commons/". $classAttrs['badge'];
             } else {
                 $classAttrs = $config['class'][$classValue];
                 $assessment['class'] = [
                     'value' => $classValue,
                     'color' => $classAttrs['color'],
-                    // $1 is used to substitute the WikiProject name, e.g. Category:FA-Class Wikipedia 1.0 articles
-                    'category' => str_replace('$1', $wikiproject, $classAttrs['category'])
+                    'category' => str_replace('$1', $wikiproject, $classAttrs['category']),
                 ];
 
                 // add full URL to badge icon
@@ -268,8 +274,10 @@ class ApiHelper
             $importanceUnknown = $importanceValue === 'Unknown' || $importanceValue === '';
 
             if ($importanceUnknown || !isset($config['importance'][$importanceValue])) {
-                $assessment['importance'] = $config['importance']['Unknown'];
+                $importanceAttrs = $config['importance']['Unknown'];
+                $assessment['importance'] = $importanceAttrs;
                 $assessment['importance']['value'] = '???';
+                $assessment['importance']['category'] = str_replace('$1', $wikiproject, $importanceAttrs['category']);
             } else {
                 $importanceAttrs = $config['importance'][$importanceValue];
                 $assessment['importance'] = [

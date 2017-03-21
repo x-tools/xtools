@@ -126,4 +126,6 @@ class LabsHelper
 
         return $table;
     }
+
+    // TODO: figure out how to use Doctrine to query host 'tools-db'
 }

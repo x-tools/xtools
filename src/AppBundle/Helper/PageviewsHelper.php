@@ -21,7 +21,6 @@ class PageviewsHelper
 
     public function getLastDays($project, $title, $days = 60)
     {
-        $days -= 1;
         $start = date('Ymd', strtotime("-$days days"));
         $end = date('Ymd');
 
