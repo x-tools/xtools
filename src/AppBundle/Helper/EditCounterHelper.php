@@ -6,7 +6,8 @@ use Doctrine\DBAL\Connection;
 use Exception;
 use Symfony\Component\DependencyInjection\Container;
 
-class EditCounterHelper {
+class EditCounterHelper
+{
 
     /** @var Container */
     protected $container;
@@ -20,8 +21,8 @@ class EditCounterHelper {
     public function __construct(Container $container)
     {
         $this->container = $container;
-        $this->replicas = $container->get('doctrine')->getManager( 'replicas' )->getConnection();
-        $this->labsHelper = $container->get( 'app.labs_helper' );
+        $this->replicas = $container->get('doctrine')->getManager('replicas')->getConnection();
+        $this->labsHelper = $container->get('app.labs_helper');
     }
 
     /**
@@ -86,8 +87,12 @@ class EditCounterHelper {
         }
 
         $revisionCounts = array_combine(
-            array_map(function($e){ return $e['source']; }, $results),
-            array_map(function($e){ return $e['value']; }, $results)
+            array_map(function ($e) {
+                return $e['source'];
+            }, $results),
+            array_map(function ($e) {
+                return $e['value'];
+            }, $results)
         );
 
         // Count the number of days, accounting for when there's only one edit.
@@ -111,7 +116,7 @@ class EditCounterHelper {
     }
 
     /**
-     * 
+     *
      * @param $username
      * @return integer
      */
@@ -121,8 +126,7 @@ class EditCounterHelper {
             SELECT 'unique' as source, COUNT(distinct rev_page) as value
                 FROM ".$this->labsHelper->getTable('revision')." where rev_user_text=:username
             UNION
-            SELECT 'created-live' as source, COUNT(*) as value from ".$this->labsHelper->getTable
-            ('revision')."
+            SELECT 'created-live' as source, COUNT(*) as value from ".$this->labsHelper->getTable('revision')."
                 WHERE rev_user_text=:username and rev_parent_id=0
             UNION
             SELECT 'created-deleted' as source, COUNT(*) as value from "
@@ -137,8 +141,12 @@ class EditCounterHelper {
         $results = $resultQuery->fetchAll();
 
         $pageCounts = array_combine(
-            array_map(function($e){ return $e['source']; }, $results),
-            array_map(function($e){ return $e['value']; }, $results)
+            array_map(function ($e) {
+                return $e['source'];
+            }, $results),
+            array_map(function ($e) {
+                return $e['value'];
+            }, $results)
         );
 
         // Total created.
@@ -160,7 +168,7 @@ class EditCounterHelper {
      */
     public function getLogCounts($username)
     {
-       $sql = "SELECT CONCAT(log_type, '-', log_action) AS source, count(*) AS value
+        $sql = "SELECT CONCAT(log_type, '-', log_action) AS source, count(*) AS value
             FROM ".$this->labsHelper->getTable('logging')."
             WHERE log_user_text LIKE :username
             GROUP BY log_type, log_action";
@@ -169,8 +177,12 @@ class EditCounterHelper {
         $resultQuery->execute();
         $results = $resultQuery->fetchAll();
         $logCounts = array_combine(
-            array_map(function($e){ return $e['source']; }, $results),
-            array_map(function($e){ return $e['value']; }, $results)
+            array_map(function ($e) {
+                return $e['source'];
+            }, $results),
+            array_map(function ($e) {
+                return $e['value'];
+            }, $results)
         );
 
         // Make sure there is some value for each of the wanted counts.
@@ -186,7 +198,7 @@ class EditCounterHelper {
         }
 
         // Merge approvals together.
-        $logCounts['review-approve'] = $logCounts['review-approve'] + 
+        $logCounts['review-approve'] = $logCounts['review-approve'] +
             isset($logCounts['review-approve-a']) ? $logCounts['review-approve-a'] : 0 +
             isset($logCounts['review-approve-i']) ? $logCounts['review-approve-i'] : 0 +
             isset($logCounts['review-approve-ia']) ? $logCounts['review-approve-ia'] : 0;
@@ -210,8 +222,12 @@ class EditCounterHelper {
         $resultQuery->execute();
         $results = $resultQuery->fetchAll();
         $namespaceTotals = array_combine(
-            array_map(function($e){ return $e['page_namespace']; }, $results),
-            array_map(function($e){ return $e['total']; }, $results)
+            array_map(function ($e) {
+                return $e['page_namespace'];
+            }, $results),
+            array_map(function ($e) {
+                return $e['total'];
+            }, $results)
         );
         return $namespaceTotals;
     }
