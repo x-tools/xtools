@@ -59,8 +59,13 @@ class AdminStatsController extends Controller
     /**
      * @Route("/adminstats/{project}/{start}/{end}", name="AdminStatsResult")
      */
-    public function resultAction($project, $start = "1970-01-01", $end = "2099-01-01")
+    public function resultAction($project, $start = "1970-1-1", $end = "2038-1-18")
     {
+
+        if (strtotime($start) === false || strtotime($end) === false) {
+            $this->addFlash("notice", ["Invalid date format, using default dates"]);
+            return $this->redirectToRoute("AdminStatsResult", ["project" => $project]);
+        }
 
         $lh = $this->get("app.labs_helper");
         $api = $this->get("app.api_helper");
@@ -69,7 +74,6 @@ class AdminStatsController extends Controller
 
         $dbValues = $lh->databasePrepare($project, "AdminStats");
 
-        //$days = date_diff($end, $start);
         $days = date_diff(new \DateTime($end), new \DateTime($start))->days;
 
         $conn = $this->get('doctrine')->getManager("replicas")->getConnection();
@@ -78,10 +82,7 @@ class AdminStatsController extends Controller
         $wikiName = $dbValues["wikiName"];
         $url = $dbValues["url"];
 
-        // TODO: Fix this call within this controller
-        //$data = $api->getAdmins($project);
-
-        //dump($data);
+        $data = $api->getAdmins($project);
 
         // Get admin ID's
         $query = "
@@ -102,11 +103,13 @@ class AdminStatsController extends Controller
         while ($row = $res->fetch()) {
             $adminIdArr[] = $row["user_id"] ;
         }
+
         $adminIds = implode(',', $adminIdArr);
 
         $userTable = $lh->getTable("user", $dbName);
         $loggingTable = $lh->getTable("logging", $dbName);
 
+        // TODO: Fix this - inactive admins aren't getting shown
         $query = "
     SELECT user_name, user_id
     ,SUM(IF( (log_type='delete'  AND log_action != 'restore'),1,0)) as mdelete
@@ -118,8 +121,6 @@ class AdminStatsController extends Controller
     ,SUM(IF( log_type='rights',1,0)) as mrights
     ,SUM(IF( log_type='import',1,0)) as mimport
     ,SUM(IF(log_type !='',1,0)) as mtotal
-    /* TODO: Fix this workaround */
-    ,'' as 'group'
     FROM $loggingTable
     JOIN $userTable ON user_id = log_user
     WHERE  log_timestamp > '$start' AND log_timestamp <= '$end'
@@ -139,7 +140,7 @@ class AdminStatsController extends Controller
         $users = $res->fetchAll();
 
         $adminsWithoutAction = 0;
-        $adminCount = sizeof($adminIdArr);
+        $adminCount = sizeof($adminIds);
 
         foreach ($users as $row) {
             if ($row["mtotal"] == 0) {
@@ -150,6 +151,11 @@ class AdminStatsController extends Controller
         $adminsWithoutActionPct = 0;
         if ($adminCount > 0) {
             $adminsWithoutActionPct = $adminsWithoutAction/$adminCount;
+        }
+
+        foreach($users as $key => $value) {
+            $users[$key]["edit_count"] = $data[$value["user_name"]]["editcount"];
+            $users[$key]["groups"] = $data[$value["user_name"]]["groups"];
         }
 
         return $this->render("adminStats/result.html.twig", [

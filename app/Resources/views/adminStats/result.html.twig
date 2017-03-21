@@ -5,7 +5,7 @@
     <div class="panel-body xt-panel-body-top"  >
         <p>
         <table class="table-condensed xt-table" style="text-align:left">
-            <tr><td>Starting date:</td><td>{{ start_date }} ({{ days }} {{ msg("days", days) }})</td></tr>
+            <tr><td>Starting date:</td><td>{{ start_date }} ({{ days }} {{ msg("days", [days]) }})</td></tr>
             <tr><td>Log types:</td><td>delete, block, protect, import, rights</td></tr>
             <tr><td>Current Admins (grp):</td><td>{{ group_link("sysop", url, adminCount) }}</td></tr>
             <tr><td>Admins without action:</td><td>{{ adminsWithoutAction }} ({{ admins_without_action_pct }}%)</td></tr>
@@ -23,7 +23,7 @@
                     <tr>
                         <th>#</th>
                         <th>{{ msg("username") }}</th>
-                        <th>{{ msg("group") }}</th>
+                        <th>{{ msg("groups") }}</th>
                         <th>{{ msg("link") }}</th>
                         <th>{{ msg("total") }}</th>
                         <th>{{ msg("delete") }}</th>
@@ -42,11 +42,11 @@
                     <tr>
                         <td>{{ loop.index }}.</td>
                         <td style="max-width:150px;"><a style="max-width:120px;" href="{{ linkWiki(url, "User:"~username) }}">{{ username }}</a></td>
-                        <td>{{ value.group }}</td>
+                        <td>{{ value.groups }}</td>
                         <td style="white-space:nowrap;">
                             <a title="Edit Counter" href="{{ link("/ec/"~project~"/"~username) }}" >ec</a> &middot;
                             {% if isWMFLabs() %}<a title="Global User Contributions" href="//tools.wmflabs.org/guc/?user={{ username|e }}" >guc</a> &middot;{% endif %}
-                            <a title="Log" href="//en.wikipedia.org/w/index.php?title=Special:Log&user=ProcseeBot " >log</a>
+                            <a title="Log" href="//en.wikipedia.org/w/index.php?title=Special:Log&user={{ username }} " >log</a>
                         </td>
                         <td class="tdnum" >{{ value.mtotal }}</td>
                         <td class="tdnum" >{{ value.mdelete }}</td>
