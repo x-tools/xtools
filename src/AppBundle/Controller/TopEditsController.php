@@ -169,7 +169,7 @@ class TopEditsController extends Controller
                 $totalRemoved += $revision['length_change'];
             }
             $time = strtotime($revision['timestamp']);
-            $revision['timestamp'] = date('Y-m-d H:i', $time);
+            $revision['timestamp'] = $time; // formatted via Twig helper
             $revision['year'] = date('Y', $time);
             $revision['month'] = date('m', $time);
             $revisions[] = $revision;

@@ -29,6 +29,7 @@ class WikiExtension extends Extension
             new Twig_SimpleFunction('wiki_log_link', [ $this, 'wikiLogLink' ], $options),
             new Twig_SimpleFunction('pageviews_links', [ $this, 'pageviewsLinks' ], $options),
             new Twig_SimpleFunction('diff_link', [ $this, 'diffLink' ], $options),
+            new Twig_SimpleFunction('perma_link', [ $this, 'permaLink' ], $options),
         ];
     }
 
@@ -136,6 +137,24 @@ class WikiExtension extends Extension
     }
 
     /**
+     * Get a permanent link to the given page at given revision
+     * @param  number                   $diff       Revision ID
+     * @param  string                   $projectUrl Project domain and protocol such as https://en.wikipedia.org
+     * @param  string|Integer|DateTime  [$label]    The link text, if a number is assumed to be UNIX timestamp,
+     *                                              and will be converted to 'Y-m-d H:m'
+     * @return string Markup
+     */
+    public function permaLink($diff, $projectUrl, $label = '')
+    {
+        if (is_int($label)) {
+            $label = date('Y-m-d, H:i', $label);
+        } elseif (is_a($label, 'DateTime')) {
+            $label = date_format($label, 'Y-m-d, H:i');
+        }
+        return "<a href='$projectUrl/wiki/Special:PermaLink/$diff' target='_blank'>$label</a>";
+    }
+
+    /**
      * Get links to pageviews tools for the given page
      * @param  string $title      Title of page
      * @param  string $projectUrl Project domain such as en.wikipedia.org
@@ -163,6 +182,7 @@ class WikiExtension extends Extension
         return [
             new \Twig_SimpleFilter('percent_format', [ $this, 'percentFormat' ]),
             new \Twig_SimpleFilter('diff_format', [ $this, 'diffFormat' ], [ 'is_safe' => [ 'html' ] ]),
+            new \Twig_SimpleFilter('wikify_comment', [ $this, 'wikifyComment' ], [ 'is_safe' => [ 'html' ] ]),
         ];
     }
 
@@ -202,5 +222,38 @@ class WikiExtension extends Extension
         }
 
         return round($quotient, $precision) . '%';
+    }
+
+    /**
+     * Basic wikification of an edit summary (links, italicize section names)
+     * @param  string $wikitext   Wikitext from edit summary
+     * @param  string $title      Title of page
+     * @param  string $projectUrl Project domain and protocol such as https://en.wikipedia.org
+     * @return string             HTML markup
+     */
+    public function wikifyComment($wikitext, $title, $projectUrl)
+    {
+        $sectionMatch = null;
+        $isSection = preg_match_all("/^\/\* (.*?) \*\//", $wikitext, $sectionMatch);
+
+        if ($isSection) {
+            $sectionTitle = $sectionMatch[1][0];
+            $sectionTitleLink = str_replace(' ', '_', $sectionTitle);
+            $sectionWikitext = "<a target='_blank' href='$projectUrl/wiki/$title#$sectionTitleLink'>&rarr;</a>" .
+                "<em class='text-muted'>$sectionTitle:</em> ";
+            $wikitext = str_replace($sectionMatch[0][0], $sectionWikitext, $wikitext);
+        }
+
+        $linkMatch = null;
+
+        while (preg_match_all("/\[\[(.*?)\]\]/", $wikitext, $linkMatch)) {
+            $wikiLinkParts = explode('|', $linkMatch[1][0]);
+            $wikiLinkPath = $wikiLinkParts[0];
+            $wikiLinkText = isset($wikiLinkParts[1]) ? $wikiLinkParts[1] : $wikiLinkPath;
+            $link = "<a target='_blank' href='$projectUrl/wiki/$wikiLinkPath'>$wikiLinkText</a>";
+            $wikitext = str_replace($linkMatch[0][0], $link, $wikitext);
+        }
+
+        return $wikitext;
     }
 }
