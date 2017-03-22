@@ -3,6 +3,7 @@ parameters:
     - Generic rollback: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) edits by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\] \(\[\[User talk:.*?\|talk\]\]\) to last version by .*'
     - Undo: '^Undid revision \d+ by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\]'
     - Pending changes revert: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) \d+ (\[\[Wikipedia:Pending changes\|pending\]\]|pending) edits? (to revision \d+|by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\])'
+    - Bot revert: '^Reverting possible vandalism by.*?to version by|^BOT - (Reverted edits by|rv \[\[Special:Contributions)'
     - Page move: '^.*?moved page \[\[(?!.*?WP:AFCH)|moved \[\[.*?\]\] to \[\['
     - Page curation: 'using \[\[Wikipedia:Page Curation\|Page Curation'
     - Twinkle: 'WP:(TW|TWINKLE|Twinkle)|WP:FRIENDLY|Wikipedia:Twinkle'

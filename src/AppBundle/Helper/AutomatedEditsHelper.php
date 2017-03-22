@@ -17,7 +17,8 @@ class AutomatedEditsHelper
         'STiki',
         'Igloo',
         'WikiPatroller',
-        'Twinkle revert'
+        'Twinkle revert',
+        'Bot revert'
     ];
 
     public function __construct(ContainerInterface $container)

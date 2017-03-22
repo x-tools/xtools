@@ -122,13 +122,16 @@ class ArticleInfoController extends Controller
         // }
 
         $this->pageHistory = $this->getHistory();
-        $this->historyCount = count($this->getHistory());
-        $this->pageInfo = array_merge($this->pageInfo, $this->parseHistory());
+        $this->pageInfo['general']['revision_count'] = count($this->pageHistory);
+
+        // NOTE: bots are fetched first in case we want to restrict some stats to humans editors only
         $this->pageInfo['bots'] = $this->getBotData();
         $this->pageInfo['general']['bot_count'] = count($this->pageInfo['bots']);
+
+        $this->pageInfo = array_merge($this->pageInfo, $this->parseHistory());
         $this->pageInfo['general']['top_ten_count'] = $this->getTopTenCount();
         $this->pageInfo['general']['top_ten_percentage'] = round(
-            ( $this->pageInfo['general']['top_ten_count'] / $this->pageInfo['general']['revision_count'] ) * 100,
+            ($this->pageInfo['general']['top_ten_count'] / $this->pageInfo['general']['revision_count']) * 100,
             1
         );
         $this->pageInfo = array_merge($this->pageInfo, $this->getLinksAndRedirects());
@@ -192,7 +195,7 @@ class ArticleInfoController extends Controller
         $userFromerGroupsTable = $this->lh->getTable('user_former_groups');
         $query = "SELECT COUNT(rev_user_text) AS count, rev_user_text AS username, ug_group AS current
                   FROM $this->revisionTable
-                  JOIN $userGroupsTable ON rev_user = ug_user
+                  LEFT JOIN $userGroupsTable ON rev_user = ug_user
                   LEFT JOIN $userFromerGroupsTable ON rev_user = ufg_user
                   WHERE rev_page = " . $this->pageInfo['id'] . " AND (ug_group = 'bot' OR ufg_group = 'bot')
                   GROUP BY rev_user_text";
@@ -202,15 +205,14 @@ class ArticleInfoController extends Controller
         $bots = [];
         $sum = 0;
         foreach ($res as $bot) {
-            $bots[] = [
-                'username' =>$bot['username'],
-                'count' => $bot['count'],
+            $bots[$bot['username']] = [
+                'count' => (int) $bot['count'],
                 'current' => $bot['current'] === 'bot'
             ];
             $sum += $bot['count'];
         }
 
-        usort($bots, function ($a, $b) {
+        uasort($bots, function ($a, $b) {
             return $b['count'] - $a['count'];
         });
 
@@ -401,7 +403,8 @@ class ArticleInfoController extends Controller
      */
     private function parseHistory()
     {
-        if ($this->historyCount == 0) {
+        $revisionCount = $this->pageInfo['general']['revision_count'];
+        if ($revisionCount == 0) {
             // $this->error = "no records";
             return;
         }
@@ -411,11 +414,11 @@ class ArticleInfoController extends Controller
         // The month of the first edit. Used as a comparison when building the per-month data
         $firstEditMonth = strtotime(date('Y-m-01, 00:00', strtotime($firstEdit['rev_timestamp'])));
 
-        $lastEdit = $this->pageHistory[ $this->historyCount - 1 ];
-        $secondLastEdit = $this->historyCount === 1 ? $lastEdit : $this->pageHistory[ $this->historyCount - 2 ];
+        $lastEdit = $this->pageHistory[ $revisionCount - 1 ];
+        $secondLastEdit = $revisionCount === 1 ? $lastEdit : $this->pageHistory[ $revisionCount - 2 ];
 
         // Now we can start our master array. This one will be HUGE!
-        $lastEditSize = ($this->historyCount > 1)
+        $lastEditSize = ($revisionCount > 1)
             ? $lastEdit['rev_len'] - $secondLastEdit['rev_len']
             : $lastEdit['rev_len'];
         $data = [
@@ -444,12 +447,11 @@ class ArticleInfoController extends Controller
                     'user' => null,
                     'size' => 1000000,
                 ],
-                'revision_count' => count($this->pageHistory),
                 'editor_count' => 0,
                 'anon_count' => 0,
                 'minor_count' => 0,
                 'count_history' => ['day' => 0, 'week' => 0, 'month' => 0, 'year' => 0],
-                'current_size' => $this->pageHistory[$this->historyCount-1]['rev_len'],
+                'current_size' => $this->pageHistory[$revisionCount-1]['rev_len'],
                 'textshares' => [],
                 'textshare_total' => 0,
                 'automated_count' => 0,
@@ -461,6 +463,9 @@ class ArticleInfoController extends Controller
             'year_count' => [],
             'tools' => [],
         ];
+
+        // restore existing general data
+        $data['general'] = array_merge($data['general'], $this->pageInfo['general']);
 
         // And now comes the logic for filling said master array
         foreach ($this->pageHistory as $i => $rev) {
@@ -634,11 +639,11 @@ class ArticleInfoController extends Controller
 
         // add percentages
         $data['general']['minor_percentage'] = round(
-            ($data['general']['minor_count'] / $data['general']['revision_count']) * 100,
+            ($data['general']['minor_count'] / $revisionCount) * 100,
             1
         );
         $data['general']['anon_percentage'] = round(
-            ($data['general']['anon_count'] / $data['general']['revision_count']) * 100,
+            ($data['general']['anon_count'] / $revisionCount) * 100,
             1
         );
 
@@ -650,20 +655,20 @@ class ArticleInfoController extends Controller
         $interval = date_diff($dateLast, $dateFirst, true);
 
         $data['totaldays'] = $interval->format('%a');
-        $data['general']['average_days_per_edit'] = round($data['totaldays'] / $data['general']['revision_count'], 1);
+        $data['general']['average_days_per_edit'] = round($data['totaldays'] / $revisionCount, 1);
         $editsPerDay = $data['totaldays']
-            ? $data['general']['revision_count'] / ($data['totaldays'] / (365 / 12 / 24))
+            ? $revisionCount / ($data['totaldays'] / (365 / 12 / 24))
             : 0;
         $data['general']['edits_per_day'] = round($editsPerDay, 1);
         $editsPerMonth = $data['totaldays']
-            ? $data['general']['revision_count'] / ($data['totaldays'] / (365 / 12))
+            ? $revisionCount / ($data['totaldays'] / (365 / 12))
             : 0;
         $data['general']['edits_per_month'] = round($editsPerMonth, 1);
         $editsPerYear = $data['totaldays']
-            ? $data['general']['revision_count'] / ($data['totaldays'] / 365)
+            ? $revisionCount / ($data['totaldays'] / 365)
             : 0;
         $data['general']['edits_per_year'] = round($editsPerYear, 1);
-        $data['general']['edits_per_editor'] = round($data['general']['revision_count'] / count($data['editors']), 1);
+        $data['general']['edits_per_editor'] = round($revisionCount / count($data['editors']), 1);
 
         // Various sorts
         arsort($data['editors']);

@@ -253,7 +253,7 @@
             </div>
             <table class="table table-bordered table-hover table-striped top-editors-table">
                 <thead><tr>
-                    {% for key in ['username', 'links', 'edits', 'minor', 'minor_percentage', 'firstedit', 'latestedit', 'atbe', 'added_bytes'] %}
+                    {% for key in ['rank', 'username', 'links', 'edits', 'minor', 'minor_percentage', 'firstedit', 'latestedit', 'atbe', 'added_bytes'] %}
                         <th>
                             <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
                                 {% if key == 'atbe' %}
@@ -262,7 +262,7 @@
                                     {{ msg(key) | capitalize_first }}
                                 {% endif %}
                                 {% if key == 'added_bytes' %}
-                                    <sup class="rm-inline-margin">2</sup>
+                                    <sup class="rm-inline-margin-left">2</sup>
                                 {% endif %}
                                 {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
                             </span>
@@ -270,8 +270,14 @@
                     {% endfor %}
                 </tr></thead>
                 <tbody>
-                {% for editor, stats in editors | slice(0, 10) %}
+                {% set counter = 0 %}
+                {% set edit_sum = 0 %}
+                {% set editorlimit = app.request.query.get("editorlimit") | default(20) %}
+                {% for editor, stats in editors | slice(0, editorlimit ) %}
+                    {% set counter = counter + 1 %}
+                    {% set edit_sum = edit_sum + stats.all %}
                     <tr>
+                        <td class="sort-entry--rank" data-value="{{ counter }}">{{ counter }}</td>
                         <td class="sort-entry--username" data-value="{{ editor }}">
                             {{ user_link(editor, project_url) }}
                         </td>
@@ -304,6 +310,18 @@
                         </td>
                     </tr>
                 {% endfor %}
+                {% if counter < editors | length %}
+                <tr class="show-more-row">
+                    <td></td>
+                    <td>
+                        {% set expand_url = path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'editorlimit': editorlimit * 10})) %}
+                        <a href="{{ expand_url }}">{{ msg('num_others', [editors|length - counter]) }}</a>
+                    </td>
+                    <td></td>
+                    <td>{{ (general.revision_count - edit_sum) | number_format }}</td>
+                    <td colspan=6></td>
+                </tr>
+                {% endif %}
                 </tbody>
             </table>
             <div class="footnotes">
@@ -330,26 +348,26 @@
                     </th>
                 </tr></thead>
                 <tbody>
-                {% for bot in bots %}
+                {% for bot, bot_data in bots %}
                     <tr>
-                        <td class="sort-entry--username" data-value="{{ bot.username }}">
-                            {{ user_link(bot.username, project_url) }}
-                            {% if not bot.current %}
+                        <td class="sort-entry--username" data-value="{{ bot }}">
+                            {{ user_link(bot, project_url) }}
+                            {% if not bot_data.current %}
                                 <i>
-                                    (<a target="_blank" href="{{ project_url }}/w/index.php?title=Special:Log&action=view&page=User:{{ bot.username }}&type=rights">{{ msg('former_bot') }}</a>)
+                                    (<a target="_blank" href="{{ project_url }}/w/index.php?title=Special:Log&action=view&page=User:{{ bot }}&type=rights">{{ msg('former_bot') }}</a>)
                                 </i>
                             {% endif %}
                         </td>
                         <td>
                             {% if enabled('ec') %}
-                                <a href="{{ path('ec', { 'project': project, 'user': bot.username }) }}">{{ msg('tool_ec') }}</a>
+                                <a href="{{ path('ec', { 'project': project, 'user': bot }) }}">{{ msg('tool_ec') }}</a>
                             {% endif %}
                             &middot;
                             {% if enabled('topedits') %}
-                                <a href="{{ path('topedits', { 'project': project, 'user': bot.username }) }}">{{ msg('tool_topedits') }}</a>
+                                <a href="{{ path('topedits', { 'project': project, 'user': bot }) }}">{{ msg('tool_topedits') }}</a>
                             {% endif %}
                         </td>
-                        <td class="sort-entry--count" data-value="{{ bot.count }}">{{ bot.count }}</td>
+                        <td class="sort-entry--count" data-value="{{ bot_data.count }}">{{ bot_data.count }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
