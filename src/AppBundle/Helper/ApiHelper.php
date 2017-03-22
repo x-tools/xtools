@@ -44,13 +44,9 @@ class ApiHelper extends HelperBase
                 } else {
                     $this->api = MediawikiApi::newFromPage($projectInfo['url']);
                 }
-            }
-            catch (Exception $e)
-            {
+            } catch (Exception $e) {
                 // Do nothing...
-            }
-            catch (FatalErrorException $e)
-            {
+            } catch (FatalErrorException $e) {
                 // Do nothing...
             }
         }
@@ -151,44 +147,63 @@ class ApiHelper extends HelperBase
         $result = [];
 
         try {
-
             $continue = true;
             $i=0;
-            while ( $continue ){
-                $query = new SimpleRequest('query', [
-                    "list" => "allusers",
-                    "augroup" => "sysop|bureaucrat|steward|oversight|checkuser",
-                    "auprop" => "groups|editcount",
-                    "aufrom" => ($i > 0 ? $continue : ""),
-                    "aulimit" => "500" ]);
+            while ($continue) {
+                $query = new SimpleRequest(
+                    'query',
+                    [
+                        "list" => "allusers",
+                        "augroup" => "sysop|bureaucrat|steward|oversight|checkuser",
+                        "auprop" => "groups|editcount",
+                        "aufrom" => ($i > 0 ? $continue : ""),
+                        "aulimit" => "500"
+                    ]
+                );
                 $res = $this->api->getRequest($query);
                 $apiret2 = $res["query"]["allusers"];
                 $continue = false;
                 if (isset($res['query-continue'])) {
                     $continue = $res['query-continue']['allusers']['aufrom'];
-
                 }
-                if( is_array($apiret2) ){
-                    foreach ( $apiret2 as $u => $obj ){
+                if (is_array($apiret2)) {
+                    foreach ($apiret2 as $u => $obj) {
                         $groups= array();
-                        if (in_array("sysop", $obj["groups"])) {$groups[] = "A";}
-                        if (in_array("bureaucrat", $obj["groups"])) { $groups[] = "B"; }
-                        if (in_array("steward", $obj["groups"])) { $groups[] = "S" ; }
-                        if (in_array("checkuser", $obj["groups"])) { $groups[] = "CU"; }
-                        if (in_array("oversight", $obj["groups"])) { $groups[] = "OS"; }
-                        if (in_array("bot", $obj["groups"])) { $groups[] = "Bot"; }
-                        $result[ $obj["name"] ] = array( "editcount" => $obj["editcount"], "groups" => implode('/', $groups) );
+                        if (in_array("sysop", $obj["groups"])) {
+                            $groups[] = "A";
+                        }
+                        if (in_array("bureaucrat", $obj["groups"])) {
+                            $groups[] = "B";
+                        }
+                        if (in_array("steward", $obj["groups"])) {
+                            $groups[] = "S" ;
+                        }
+                        if (in_array("checkuser", $obj["groups"])) {
+                            $groups[] = "CU";
+                        }
+                        if (in_array("oversight", $obj["groups"])) {
+                            $groups[] = "OS";
+                        }
+                        if (in_array("bot", $obj["groups"])) {
+                            $groups[] = "Bot";
+                        }
+                        $result[ $obj["name"] ] = array(
+                            "editcount" => $obj["editcount"],
+                            "groups" => implode('/', $groups)
+                        );
                     }
                 }
 
-            $i++; if($i>20 ) break;
+                $i++;
+                if ($i>20) {
+                    break;
+                }
             }
         } catch (Exception $e) {
             // The api returned an error!  Ignore
         }
 
         return $result;
-
     }
 
     /**
