@@ -38,8 +38,8 @@ framework:
     http_method_override: true
     assets: ~
     cache:
-        app: cache.adapter.%cache.adapter%
-        default_redis_provider: %cache.redis_dsn%
+        app: "cache.adapter.%cache.adapter%"
+        default_redis_provider: "%cache.redis_dsn%"
 
 # Twig Configuration
 twig:
