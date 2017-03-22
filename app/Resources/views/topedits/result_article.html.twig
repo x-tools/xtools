@@ -54,7 +54,9 @@
 
             {% for rev in revisions %}
             <tr>
-                <td class="sort-entry--date" data-value="{{ rev.timestamp }}">{{ rev.timestamp }}</td>
+                <td class="sort-entry--date" data-value="{{ rev.timestamp }}">
+                    {{ perma_link(rev.id, project_url, rev.timestamp) }}
+                </td>
                 <td>
                     {{ diff_link(rev.id, project_url, msg('diff') | capitalize_first ) }}
                     &middot;
@@ -62,7 +64,7 @@
                     {{ wiki_history_link(article.title, project_url, msg('history'), offset) }}
                 </td>
                 <td class="sort-entry--size" data-value="{{ rev.length_change }}">{{ rev.length_change|diff_format }}</td>
-                <td class="sort-entry--comment" data-value="{{ rev.comment }}">{{ rev.comment }}</td>
+                <td class="sort-entry--comment" data-value="{{ rev.comment }}">{{ rev.comment | wikify_comment(article.title, project_url) }}</td>
             </tr>
             {% endfor %}
         </table>
