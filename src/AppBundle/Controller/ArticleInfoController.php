@@ -25,7 +25,6 @@ class ArticleInfoController extends Controller
      */
     public function setContainer(ContainerInterface $container = null)
     {
-
         parent::setContainer($container);
         $this->containerInitialized();
     }

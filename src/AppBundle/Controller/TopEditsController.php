@@ -10,6 +10,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 class TopEditsController extends Controller
 {
+    private $lh;
+    private $projectUrl;
+
     /**
      * @Route("/topedits", name="topedits")
      * @Route("/topedits", name="topEdits")
@@ -18,8 +21,8 @@ class TopEditsController extends Controller
      */
     public function indexAction(Request $request)
     {
-        $lh = $this->get("app.labs_helper");
-        $lh->checkEnabled("topedits");
+        $this->lh = $this->get("app.labs_helper");
+        $this->lh->checkEnabled("topedits");
 
         $project = $request->query->get('project');
         $username = $request->query->get('user');
@@ -50,9 +53,9 @@ class TopEditsController extends Controller
 
         // replace this example code with whatever you need
         return $this->render('topedits/index.html.twig', [
-            "xtPageTitle" => "tool_topedits",
-            "xtSubtitle" => "tool_topedits_desc",
-            'xtPage' => "topedits",
+            'xtPageTitle' => 'tool_topedits',
+            'xtSubtitle' => 'tool_topedits_desc',
+            'xtPage' => 'topedits',
         ]);
     }
 
@@ -62,32 +65,32 @@ class TopEditsController extends Controller
     public function resultAction($project, $username, $namespace = 0, $article = "")
     {
         /** @var LabsHelper $lh */
-        $lh = $this->get("app.labs_helper");
-        $lh->checkEnabled("topedits");
-        $lh->databasePrepare($project);
+        $this->lh = $this->get('app.labs_helper');
+        $this->lh->checkEnabled('topedits');
+        $dbValues = $this->lh->databasePrepare($project);
+        $this->projectUrl = $dbValues['url'];
 
         $username = ucfirst($username);
 
         if ($article === "") {
-            return $this->namespaceTopEdits($lh, $username, $project, $namespace);
+            return $this->namespaceTopEdits($username, $project, $namespace);
         } else {
-            return $this->singlePageTopEdits($lh, $project, $article, $username);
+            return $this->singlePageTopEdits($username, $project, $article);
         }
     }
 
     /**
      * List top edits by this user for all pages in a particular namespace.
-     * @param LabsHelper $lh
      * @param string $username
      * @param string $project
      * @param integer $namespace
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function namespaceTopEdits($lh, $username, $project, $namespace)
+    protected function namespaceTopEdits($username, $project, $namespace)
     {
         // Get the basic data about the pages edited by this user.
         $query = "SELECT page_namespace, page_title, page_is_redirect, COUNT(page_title) AS count
-                FROM ".$lh->getTable('page')." JOIN ".$lh->getTable('revision')." ON page_id = rev_page
+                FROM ".$this->lh->getTable('page')." JOIN ".$this->lh->getTable('revision')." ON page_id = rev_page
                 WHERE rev_user_text = :username AND page_namespace = :namespace
                 GROUP BY page_namespace, page_title
                 ORDER BY count DESC
@@ -101,7 +104,7 @@ class TopEditsController extends Controller
             return $e['page_title'];
         }, $editData);
         /** @var ApiHelper $apiHelper */
-        $apiHelper = $this->get("app.api_helper");
+        $apiHelper = $this->get('app.api_helper');
         $displayTitles = $apiHelper->displayTitles($project, $titles);
 
         // Put all together, and return the view.
@@ -111,26 +114,24 @@ class TopEditsController extends Controller
             $editDatum['displaytitle'] = $displayTitles[$pageTitle];
             $edits[] = $editDatum;
         }
-        return $this->render('topedits/result_namespace.html.twig', array(
-            "xtPageTitle" => "tool_topedits",
-            "xtSubtitle" => "tool_topedits_desc",
-            'xtPage' => "topedits",
+        return $this->render('topedits/result_namespace.html.twig', [
+            'xtPage' => 'topedits',
             'project' => $project,
+            'project_url' => $this->projectUrl,
             'username' => $username,
             'namespace' => $namespace,
             'edits' => $edits,
-        ));
+        ]);
     }
 
     /**
      * List top edits by this user for a particular page.
-     * @param LabsHelper $lh
+     * @param string $username
      * @param string $project
      * @param string $article
-     * @param string $username
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    protected function singlePageTopEdits($lh, $project, $article, $username)
+    protected function singlePageTopEdits($username, $project, $article)
     {
         /** @var ApiHelper $apiHelper */
         $apiHelper = $this->get("app.api_helper");
@@ -147,8 +148,8 @@ class TopEditsController extends Controller
                     revs.rev_timestamp AS timestamp,
                     (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
                     revs.rev_comment AS comment
-                FROM ".$lh->getTable('revision')." AS revs
-                    LEFT JOIN ".$lh->getTable('revision')."
+                FROM ".$this->lh->getTable('revision')." AS revs
+                    LEFT JOIN ".$this->lh->getTable('revision')."
                     AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                 WHERE revs.rev_user_text in (:username) AND revs.rev_page = :pageid
                 ORDER BY revs.rev_timestamp DESC
@@ -175,17 +176,16 @@ class TopEditsController extends Controller
         }
 
         // Send all to the template.
-        return $this->render('topedits/result_article.html.twig', array(
-            "xtPageTitle" => "tool_topedits",
-            "xtSubtitle" => "tool_topedits_desc",
-            'xtPage' => "topedits",
+        return $this->render('topedits/result_article.html.twig', [
+            'xtPage' => 'topedits',
             'project' => $project,
+            'project_url' => $this->projectUrl,
             'username' => $username,
             'article' => $pageInfo,
             'total_added' => $totalAdded,
             'total_removed' => $totalRemoved,
             'revisions' => $revisions,
             'revision_count' => count($revisions),
-        ));
+        ]);
     }
 }

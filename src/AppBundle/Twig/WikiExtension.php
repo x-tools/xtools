@@ -99,14 +99,21 @@ class WikiExtension extends Extension
      * @param  string $title      Title of page
      * @param  string $projectUrl Project domain and protocol such as https://en.wikipedia.org
      * @param  string [$label]    The link text, defaults to msg('log')
+     * @param  string [$type]     Log type (e.g. 'block'), defaults to full log.
      * @return string Markup
      */
-    public function wikiLogLink($title, $projectUrl, $label = null)
+    public function wikiLogLink($title, $projectUrl, $label = null, $type = null)
     {
         if (!isset($label)) {
             $label = $this->intuitionMessage('log');
         }
+
         $url = "$projectUrl/w/index.php?title=Special:Log&action=view&page=$title";
+
+        if ($type) {
+            $url .= "&type=$type";
+        }
+
         return "<a href='$url' target='_blank'>$label</a>";
     }
 

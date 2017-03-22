@@ -1,39 +1,76 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/layout.html.twig' as layout %}
 
 {% block body %}
-    
-<div class="panel panel-primary" style="text-align:center">
-    <div class="panel-heading">
-        <p class="xt-heading-top" >
-            <a href="//{{ project }}/wiki/User:{{ username }}">{{ username }}</a>
-            <span style="padding-left:10px;" > &bull;&nbsp; {{ project }} </span>
-        </p>
-    </div>
-    <div class="panel-body xt-panel-body-top" >
-        <p>
-            <a href="//en.wikipedia.org/w/index.php?title=Special%3ALog&type=block&user=&page=User%3A{{ username }}&year=&month=-1&tagfilter=" >Block log</a> &middot;
-            <a href="{{ path('EditCounterResult', {project:project, username:username}) }}" >Edit Counter</a> &middot;
-            <a href="//tools.wmflabs.org/guc/?user={{ username }}" >Global user contributions</a> &middot;
-            <a target="_blank" href="//tools.wmflabs.org/pageviews?project={{ project }}&pages=User:{{ username }}" >Userpage pageviews</a>
-        </p>
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h4>TOP edits per namespace</h4>
-            </div>
-            <div class="panel-body" id="nstotals">
-                <table class="table-condensed xt-table" ><tr><td colspan=22 ><h3>Article</h3></td></tr>
-                    {% for edit in edits %}
-                    <tr>
-                        <td class=tdnum >{{ edit.count }}</td>
-                        <td><a href="//{{ project }}/wiki/{{ edit.page_title }}" >{{ edit.displaytitle|raw }}</a></td>
-                        <td><a href="//{{ project }}/w/index.php?title=Special:Log&type=&page={{ edit.page_title }}" ><small>log</small></a> &middot; </td>
-                        <td><a href="{{ path('ArticleInfoResult', {project:project, article:edit.page_title|url_encode}) }}"><small>page history</small></a> &middot; </td>
-                        <td><a href="{{ path('TopEditsResults', {project:project, username:username, namespace:namespace, article:edit.page_title|url_encode}) }}" ><small>topedits</small></a></td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
+<div class="panel panel-primary">
+    <header class="panel-heading">
+        <div class="text-center xt-heading-top" >
+            <a class="back-to-search" href="{{ path('topedits') }}">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                {{ msg('back') }}
+            </a>
+            {{ user_link(username, project_url) }}
+            <small>
+                &bull;
+                {{ project }}
+            </small>
         </div>
+    </header>
+
+    <div class="panel-body xt-panel-body" >
+        <p class="text-center xt-heading-subtitle">
+            {{ wiki_log_link('User:'~username, project_url, msg('block_log'), 'block') }}
+            &middot;
+            <a href="{{ path('EditCounterResult', {project:project, username:username}) }}" >{{ msg('tool_ec') }}</a>
+            {% if not isSingleWiki() %}
+            &middot;
+            <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ username }}" >{{ msg('global_contribs') }}</a>
+            {% endif %}
+            {% if isWMFLabs() %}
+            &middot;
+            <a target="_blank" href="//tools.wmflabs.org/pageviews/?project={{ project }}&amp;pages=User:{{ username }}">{{ msg('pageviews_userpage') }}</a>
+            {% endif %}
+        </p>
+
+        <h3 class="text-center">{{ msg('topedits_per_namespace') }}</h3>
+
+        {% set content %}
+        <table class="table table-bordered table-hover table-striped topedits-namespace-table" >
+            <thead><tr>
+                <th>
+                    <span class="sort-link sort-link--edits" data-column="edits">
+                        {{ msg('edits') | capitalize_first }}
+                        <span class="glyphicon glyphicon-sort"></span>
+                    </span>
+                </th>
+                <th>
+                    <span class="sort-link sort-link--page" data-column="page">
+                        {{ msg('page') }}
+                        <span class="glyphicon glyphicon-sort"></span>
+                    </span>
+                </th>
+                <th>{{ msg('links') }}</th>
+            </tr></thead>
+            <tbody>
+                {% for edit in edits %}
+                <tr>
+                    <td class="sort-entry--edits" data-value="{{ edit.count }}">{{ edit.count }}</td>
+                    <td class="sort-entry--page" data-value="{{ edit.page_title }}">
+                        {{ wiki_link(edit.page_title, project_url, edit.displaytitle) }}
+                    </td>
+                    <td>
+                        {{ wiki_log_link(edit.page_title, project_url) }}
+                        &middot;
+                        <a href="{{ path('ArticleInfoResult', {project:project, article:edit.page_title}) }}">{{ msg('tool_articleinfo') }}</a>
+                        &middot;
+                        <a href="{{ path('TopEditsResults', {project:project, username:username, namespace:namespace, article:edit.page_title}) }}" >{{ msg('tool_topedits') }}</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endset %}
+        {{ layout.content_block('mainspace', content) }}
     </div>
 </div>
 {% endblock %}

@@ -1,73 +1,73 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/layout.html.twig' as layout %}
 
 {% block body %}
-
-
-    <div class="panel panel-primary" style="text-align:center">
-        <div class="panel-heading">
-            <p class="xt-heading-top" >
-                <a href="{{ article.fullurl }}">
-                    {% if article.pageprops.displaytitle is defined %}
-                        {{ article.pageprops.displaytitle|raw }}
-                    {% else %}
-                        {{ article.title }}
-                    {% endif %}
-                </a>
-                <span style="padding-left:10px;" > &bull;&nbsp; {{ project }} </span>
-            </p>
+<div class="panel panel-primary">
+    <header class="panel-heading">
+        <div class="text-center xt-heading-top" >
+            <a class="back-to-search" href="{{ path('topedits') }}">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                {{ msg('back') }}
+            </a>
+            {{ wiki_link(article.title, project_url) }}
+            <small>
+                &bull;
+                {{ project }}
+            </small>
         </div>
+    </header>
 
-        <div class="panel-body xt-panel-body-top" >
-            <p class="text-center xt-heading-subtitle">
-                {{ wiki_log_link(article.title, '//'~project) }} &middot;
-                <a href="{{ path('ArticleInfoResult', {project:project, article:article.title|url_encode}) }}">{{ msg('tool_articleinfo') }}</a>
-            </p>
+    <div class="panel-body xt-panel-body" >
+        <p class="text-center xt-heading-subtitle">
+            {{ wiki_log_link(article.title, project_url) }}
+            &middot;
+            <a href="{{ path('ArticleInfoResult', {project:project, article:article.title|url_encode}) }}">{{ msg('tool_articleinfo') }}</a>
+        </p>
 
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h4>Edits per page</h4>
-                </div>
-                <div class="panel-body" id="nstotals">
+        {% set content %}
+        <dl class="col-lg-6 dl-horizontal stat-list clearfix">
+            <dt>{{ msg('user') }}</dt>
+            <dd>
+                {{ user_link(username, project_url) }}
+                &middot;
+                <a href="{{ path('EditCounterResult', {project:project, username:username}) }}" >{{ msg('tool_ec') }}</a>
+            </dd>
+            <dt>{{ msg('count') }}</dt>
+            <dd>{{ revision_count }}</dd>
+            <dt>{{ msg('added') }}</dt>
+            <dd>{{ total_added|diff_format }}</dd>
+            <dt>{{ msg('deleted') }}</dt>
+            <dd>{{ total_removed|diff_format }}</dd>
+        </dl>
 
-                    <table class="table-condensed xt-table" >
-                        <tr>
-                            <td>User:</td>
-                            <td colspan="4" >
-                                {{ user_link(username, '//'~project ) }}
-                                &middot; <a href="{{ path('EditCounterResult', {project:project, username:username}) }}" >{{ msg('tool_ec') }}</a>
-                            </td>
-                        </tr>
-                        <tr><td>Number of edits:</td><td><span class="tdnum" colspan=1 >{{ revision_count }}</span></td></tr>
-                        <tr><td>Added:</td><td><span class="tdnum">{{ total_added|diff_format }}</span></td></tr>
-                        <tr><td>Deleted:</td><td><span class="tdnum" >{{ total_removed|diff_format }}</span></td></tr>
-                    </table>
+        <table class="table table-bordered table-hover table-striped top-editors-table">
+            <thead><tr>
+                {% for key in ['date', 'links', 'size', 'comment'] %}
+                    <th>
+                        <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
+                            {{ msg(key) | capitalize_first }}
+                            {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
+                        </span>
+                    </th>
+                {% endfor %}
+            </tr></thead>
 
-                    <table class="table-striped sortable table-condensed xt-table" >
-                        <tr>
-                            <th>Date</th>
-                            <th>Username</th>
-                            <th>Diff</th>
-                            <th>Hist</th>
-                            <th>Size</th>
-                            <th>Comment</th>
-                        </tr>
-
-                        {% for rev in revisions %}
-                        <tr>
-                            <td style="font-size:95%; white-space:nowrap;">{{ rev.timestamp }} &middot; </td>
-                            <td>{{ user_link(username, '//'~project) }}</td>
-                            <td>({{ diff_link(rev.id, '//'~project, 'diff') }})</td>
-                            <td>(<a href="//{{ project }}/w/index.php?title={{ article.title }}&amp;action=history&amp;year={{ rev.year }}&amp;month={{ rev.month }} " >hist</a>)</td>
-                            <td style="text-align:right;padding-right:5px" >
-                                {{ rev.length_change|diff_format }}
-                            </td>
-                            <td style="font-size:85%" >{{ rev.comment }}</td>
-                        </tr>
-                        {% endfor %}
-
-                    </table>
-                </div>
-            </div>
-        </div>
+            {% for rev in revisions %}
+            <tr>
+                <td class="sort-entry--date" data-value="{{ rev.timestamp }}">{{ rev.timestamp }}</td>
+                <td>
+                    {{ diff_link(rev.id, project_url, msg('diff') | capitalize_first ) }}
+                    &middot;
+                    {% set offset = date(rev.year~"-"~rev.month~"-01") | date("Ymt")~"235959" %}
+                    {{ wiki_history_link(article.title, project_url, msg('history'), offset) }}
+                </td>
+                <td class="sort-entry--size" data-value="{{ rev.length_change }}">{{ rev.length_change|diff_format }}</td>
+                <td class="sort-entry--comment" data-value="{{ rev.comment }}">{{ rev.comment }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endset %}
+        {{ layout.content_block('edits_per_page', content) }}
     </div>
+</div>
 {% endblock %}
