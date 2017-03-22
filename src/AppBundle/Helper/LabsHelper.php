@@ -33,6 +33,15 @@ class LabsHelper
     }
 
     /**
+     * Is xTools connecting to MMF Labs?
+     * @return boolean
+     */
+    public function isLabs()
+    {
+        return (bool)$this->container->getParameter('app.is_labs');
+    }
+
+    /**
      * Set up LabsHelper::$client and return get the database name, wiki name, and URL of a given
      * project.
      * @todo: Handle failure better
@@ -71,7 +80,7 @@ class LabsHelper
             // Throw an exception if we can't find the wiki
             if (count($wikis) < 1) {
                 // TODO: Fix so that we're rendering a flash rather than dying...
-                throw new Exception('Unable to find project');
+                throw new Exception("Unable to find project '$project'");
                 // $this->container->get('controller')->addFlash('notice', ["nowiki", $project]);
                 // return $this->container->redirectToRoute($route);
             }

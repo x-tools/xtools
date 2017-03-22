@@ -7,6 +7,7 @@
     <exclude-pattern>docs/</exclude-pattern>
     <exclude-pattern>web/static/js/unserialize.jquery.1.0.2.js</exclude-pattern>
     <exclude-pattern>web/static/js/xagent.js</exclude-pattern>
+    <exclude-pattern>web/static/*/production*</exclude-pattern>
     <exclude-pattern>*.min.js</exclude-pattern>
 
     <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">

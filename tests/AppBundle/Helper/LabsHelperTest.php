@@ -4,24 +4,34 @@ namespace Tests\AppBundle\Helper;
 
 use AppBundle\Helper\LabsHelper;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DependencyInjection\Container;
 
 class LabsHelperTest extends WebTestCase
 {
 
-    public function testGetTable()
+    /** @var Container */
+    protected $container;
+
+    /** @var LabsHelper */
+    protected $labsHelper;
+
+    public function setUp()
     {
         $client = static::createClient();
-        $container = $client->getContainer();
-        $lh = new LabsHelper($container);
+        $this->container = $client->getContainer();
+        $this->labsHelper = new LabsHelper($this->container);
+    }
 
-        if ($container->getParameter('app.is_labs')) {
+    public function testGetTable()
+    {
+        if ($this->container->getParameter('app.is_labs')) {
             // When using Labs.
-            $this->assertEquals('page', $lh->getTable('page'));
-            $this->assertEquals('logging_userindex', $lh->getTable('logging'));
+            $this->assertEquals('page', $this->labsHelper->getTable('page'));
+            $this->assertEquals('logging_userindex', $this->labsHelper->getTable('logging'));
         } else {
             // When using wiki databases directly.
-            $this->assertEquals('page', $lh->getTable('page'));
-            $this->assertEquals('logging', $lh->getTable('logging'));
+            $this->assertEquals('page', $this->labsHelper->getTable('page'));
+            $this->assertEquals('logging', $this->labsHelper->getTable('logging'));
         }
     }
 }
