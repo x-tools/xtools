@@ -60,5 +60,6 @@ parameters:
     # Leave blank if xTools is installed in the root directory
     app.base_path:
 
-    # Cache adapter: one of 'filesystem', 'redis', ...
-    app.cache: filesystem
+    # Caching.
+    cache.adapter: filesystem
+    cache.redis_dsn: redis://localhost
