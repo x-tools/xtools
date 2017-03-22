@@ -40,3 +40,12 @@ matrix:
       env: IS_LABS=1
     - php: 7.0
       env: IS_LABS=1
+
+notifications:
+  irc:
+    channels:
+      - "chat.freenode.net#wikimedia-xtools"
+    on_success: change
+    on_failure: always
+    template:
+      - "%{repository}/%{branch}/%{commit} - %{author} %{message} %{build_url}"
