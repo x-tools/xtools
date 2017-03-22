@@ -2,9 +2,11 @@
 
 namespace AppBundle\Helper;
 
+use DateInterval;
 use Mediawiki\Api\MediawikiApi;
 use Mediawiki\Api\SimpleRequest;
 use Mediawiki\Api\FluentRequest;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -17,10 +19,14 @@ class ApiHelper
     /** @var LabsHelper */
     private $labsHelper;
 
+    /** @var CacheItemPoolInterface */
+    protected $cache;
+
     public function __construct(ContainerInterface $container, LabsHelper $labsHelper)
     {
         $this->container = $container;
         $this->labsHelper = $labsHelper;
+        $this->cache = $container->get('cache.app');
     }
 
     private function setUp($project)
@@ -71,8 +77,19 @@ class ApiHelper
         return $result;
     }
 
+    /**
+     * Get a list of namespaces on the given project.
+     *
+     * @param string $project
+     * @return string[] Array of namespace IDs (keys) to names (values).
+     */
     public function namespaces($project)
     {
+        // Use cache if possible.
+        $cacheItem = $this->cache->getItem('api.namespaces.' . $project);
+        if ($cacheItem->isHit()) {
+            return $cacheItem->get();
+        }
 
         $this->setUp($project);
         $query = new SimpleRequest('query', [ "meta"=>"siteinfo", "siprop"=>"namespaces" ]);
@@ -102,6 +119,10 @@ class ApiHelper
                     $result[$row["id"]] = $name;
                 }
             }
+            // Save to cache.
+            $cacheItem->expiresAfter(new DateInterval('P7D'));
+            $cacheItem->set($result);
+            $this->cache->save($cacheItem);
         } catch (Exception $e) {
             // The api returned an error!  Ignore
         }
