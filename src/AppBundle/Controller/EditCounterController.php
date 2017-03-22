@@ -66,8 +66,8 @@ class EditCounterController extends Controller
         // Get statistics.
         $revisionCounts = $ec->getRevisionCounts($username);
         $pageCounts = $ec->getPageCounts($username, $revisionCounts['total']);
-        $logCounts = $ec->getLogCounts($username);
         $userId = $ec->getUserId($username);
+        $logCounts = $ec->getLogCounts($userId);
         $namespaceTotals = $ec->getNamespaceTotals($userId);
 
         // Give it all to the template.

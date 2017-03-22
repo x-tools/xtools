@@ -33,7 +33,7 @@ class EditCounterHelper
     public function getUserId($usernameOrIp)
     {
         $userTable = $this->labsHelper->getTable('user');
-        $sql = "SELECT user_id FROM $userTable WHERE user_name = :username";
+        $sql = "SELECT user_id FROM $userTable WHERE user_name = :username LIMIT 1";
         $resultQuery = $this->replicas->prepare($sql);
         $resultQuery->bindParam("username", $usernameOrIp);
         $resultQuery->execute();
@@ -163,17 +163,17 @@ class EditCounterHelper
 
     /**
      * Get log totals for a user.
-     * @param string $username The username.
+     * @param integer $userId The user ID.
      * @return integer[] Keys are log-action string, values are counts.
      */
-    public function getLogCounts($username)
+    public function getLogCounts($userId)
     {
-        $sql = "SELECT CONCAT(log_type, '-', log_action) AS source, count(*) AS value
+        $sql = "SELECT CONCAT(log_type, '-', log_action) AS source, COUNT(log_id) AS value
             FROM ".$this->labsHelper->getTable('logging')."
-            WHERE log_user_text LIKE :username
+            WHERE log_user = :userId
             GROUP BY log_type, log_action";
         $resultQuery = $this->replicas->prepare($sql);
-        $resultQuery->bindParam("username", $username);
+        $resultQuery->bindParam('userId', $userId);
         $resultQuery->execute();
         $results = $resultQuery->fetchAll();
         $logCounts = array_combine(
@@ -189,7 +189,7 @@ class EditCounterHelper
         $requiredCounts = [
             'thanks-thank', 'review-approve', 'patrol-patrol','block-block', 'block-unblock',
             'protect-protect', 'protect-unprotect', 'delete-delete', 'delete-revision',
-            'delete-restore', 'import-import', 'upload-upload'
+            'delete-restore', 'import-import', 'upload-upload', 'upload-overwrite',
         ];
         foreach ($requiredCounts as $req) {
             if (!isset($logCounts[$req])) {
@@ -206,10 +206,10 @@ class EditCounterHelper
         // Add Commons upload count, if applicable.
         $logCounts['files_uploaded_commons'] = 0;
         if ($this->labsHelper->isLabs()) {
-            $sql = "SELECT count(*) FROM commonswiki_p.logging_userindex
-                WHERE log_type = 'upload' AND log_action = 'upload' AND log_user_text LIKE :username";
+            $sql = "SELECT count(log_id) FROM commonswiki_p.logging_userindex
+                WHERE log_type = 'upload' AND log_action = 'upload' AND log_user = :userId";
             $resultQuery = $this->replicas->prepare($sql);
-            $resultQuery->bindParam('username', $username);
+            $resultQuery->bindParam('userId', $userId);
             $resultQuery->execute();
             $logCounts['files_uploaded_commons'] = $resultQuery->fetchColumn();
         }
@@ -224,9 +224,9 @@ class EditCounterHelper
      */
     public function getNamespaceTotals($userId)
     {
-        $sql = "SELECT page_namespace, count(*) AS total
+        $sql = "SELECT page_namespace, count(rev_id) AS total
             FROM ".$this->labsHelper->getTable('revision') ." r
-                RIGHT JOIN ".$this->labsHelper->getTable('page')." p on r.rev_page = p.page_id
+                JOIN ".$this->labsHelper->getTable('page')." p on r.rev_page = p.page_id
             WHERE r.rev_user = :id GROUP BY page_namespace";
         $resultQuery = $this->replicas->prepare($sql);
         $resultQuery->bindParam(":id", $userId);
