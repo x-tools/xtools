@@ -146,14 +146,10 @@ class SimpleEditCounterController extends Controller
 
         // Assign the values and display the template
         return $this->render('simpleEditCounter/result.html.twig', [
-            'xtTitle' => "tool_sc",
-            'xtPage' => "sc",
-            "xtPageTitle" => "tool_sc",
-            "xtSubtitle" => "tool_sc_desc",
-            'url' => $url,
+            'xtPage' => 'sc',
             'username' => $username,
-            'project' => $wikiName,
-
+            'project' => $project,
+            'project_url' => $url,
             'id' => $id,
             'arch' => $arch,
             'rev' => $rev + $arch,
