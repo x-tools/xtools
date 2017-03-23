@@ -64,9 +64,9 @@ class EditCounterController extends Controller
         $url = $dbValues["url"];
 
         // Get statistics.
-        $revisionCounts = $ec->getRevisionCounts($username);
-        $pageCounts = $ec->getPageCounts($username, $revisionCounts['total']);
         $userId = $ec->getUserId($username);
+        $revisionCounts = $ec->getRevisionCounts($userId);
+        $pageCounts = $ec->getPageCounts($username, $revisionCounts['total']);
         $logCounts = $ec->getLogCounts($userId);
         $namespaceTotals = $ec->getNamespaceTotals($userId);
 
@@ -102,6 +102,12 @@ class EditCounterController extends Controller
             'rev_7d' => $revisionCounts['7d'],
             'rev_30d' => $revisionCounts['30d'],
             'rev_365d' => $revisionCounts['365d'],
+            'rev_small' => $revisionCounts['small'],
+            'rev_large' => $revisionCounts['large'],
+            'with_comments' => $revisionCounts['with_comments'],
+            'without_comments' => $revisionCounts['live'] - $revisionCounts['with_comments'],
+            'minor_edits' => $revisionCounts['minor_edits'],
+            'nonminor_edits' => $revisionCounts['live'] - $revisionCounts['minor_edits'],
 
             // Page counts.
             'uniquePages' => $pageCounts['unique'],
