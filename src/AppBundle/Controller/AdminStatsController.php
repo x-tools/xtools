@@ -179,19 +179,15 @@ class AdminStatsController extends Controller
       AND log_action IS NOT NULL
       AND log_type in ('block', 'delete', 'protect', 'import', 'rights')
     GROUP BY user_name
-    HAVING mdelete > 0 OR user_id in ( $adminIds )
+    HAVING mdelete > 0 OR user_id in ($adminIds)
     ORDER BY mtotal DESC
 
     ";
-
-        print($query);
 
         $res = $conn->prepare($query);
         $res->execute();
 
         $users = $res->fetchAll();
-
-        dump($users);
 
         $adminsWithoutAction = 0;
         $adminCount = sizeof($adminIds);
