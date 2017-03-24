@@ -39,16 +39,19 @@ class AdminStatsController extends Controller
      */
     public function indexAction(Request $request)
     {
-
+        // Load up the labs helper and check if the tool is enabled.
         $lh = $this->get("app.labs_helper");
-
         $lh->checkEnabled("adminstats");
 
+        // Pull the values out of the query string.  These values default to
+        // empty strings.
         $projectQuery = $request->query->get('project');
         $startDate = $request->query->get('begin');
         $endDate = $request->query->get("end");
 
+        // Redirect if the values are set.
         if ($projectQuery != "" && $startDate != "" && $endDate != "") {
+            // Redirect ot the route fully
             return $this->redirectToRoute(
                 "AdminStatsResult",
                 [
@@ -58,6 +61,7 @@ class AdminStatsController extends Controller
                 ]
             );
         } elseif ($projectQuery != "" && $endDate != "") {
+            // Redirect if we have the enddate and project
             return $this->redirectToRoute(
                 "AdminStatsResult",
                 [
@@ -66,6 +70,7 @@ class AdminStatsController extends Controller
                 ]
             );
         } elseif ($projectQuery != "" && $startDate != "") {
+            // Redirect if we have the stardate and project
             return $this->redirectToRoute(
                 "AdminStatsResult",
                 [
@@ -74,6 +79,7 @@ class AdminStatsController extends Controller
                 ]
             );
         } elseif ($projectQuery != "") {
+            // Redirect if we have the project name
             return $this->redirectToRoute(
                 "AdminStatsResult",
                 [
@@ -107,9 +113,13 @@ class AdminStatsController extends Controller
      */
     public function resultAction($project, $start = "1970-1-1", $end = "2038-1-18")
     {
-
+        // Start by validating the dates.  If the dates are invalid, we'll redirect
+        // to the project only view.
         if (strtotime($start) === false || strtotime($end) === false) {
-            $this->addFlash("notice", ["Invalid date format, using default dates"]);
+            // Make sure to add the flash notice first.
+            $this->addFlash("notice", ["invalid_date"]);
+
+            // Then redirect us!
             return $this->redirectToRoute(
                 "AdminStatsResult",
                 [
@@ -118,45 +128,58 @@ class AdminStatsController extends Controller
             );
         }
 
+        // Initialize variables - prevents variable undefined errors
+        $adminIdArr = [];
+        $adminsWithoutAction = 0;
+        $adminsWithoutActionPct = 0;
+
+        // Pull the labs helper, API helper, and database.  Then check if we can
+        // use this tool
         $lh = $this->get("app.labs_helper");
         $api = $this->get("app.api_helper");
+        $conn = $this->get('doctrine')->getManager("replicas")->getConnection();
 
         $lh->checkEnabled("adminstats");
 
+        // Load the database information for the tool
         $dbValues = $lh->databasePrepare($project, "AdminStats");
-
-        $days = date_diff(new \DateTime($end), new \DateTime($start))->days;
-
-        $conn = $this->get('doctrine')->getManager("replicas")->getConnection();
 
         $dbName = $dbValues["dbName"];
         $wikiName = $dbValues["wikiName"];
         $url = $dbValues["url"];
 
+        // Generate a diff for the dates - this is the number of days we're spanning.
+        $days = date_diff(new \DateTime($end), new \DateTime($start))->days;
+
+        // Pull the admins from the API, for merging.
         $data = $api->getAdmins($project);
 
-        // Get admin ID's
+        // Get admin ID's, used to account for inactive admins
+        $user_groups_table = $lh->getTable("user_groups", $dbName);
+        $ufg_table = $lh->getTable("user_former_groups");
         $query = "
     Select ug_user as user_id
-    FROM user_groups
+    FROM $user_groups_table
     WHERE ug_group = 'sysop'
     UNION
     SELECT ufg_user as user_id
-    FROM user_former_groups
+    FROM $ufg_table
     WHERE ufg_group = 'sysop'
     ";
 
         $res = $conn->prepare($query);
         $res->execute();
 
-        $adminIdArr = [];
-
+        // Iterate over query results, loading each user id into the array
         while ($row = $res->fetch()) {
             $adminIdArr[] = $row["user_id"] ;
         }
 
+        // Set the query results to be useful in a sql statement.
         $adminIds = implode(',', $adminIdArr);
 
+        // Load up the tables we need and run the mega query.
+        // This query provides all of the statistics
         $userTable = $lh->getTable("user", $dbName);
         $loggingTable = $lh->getTable("logging", $dbName);
 
@@ -187,9 +210,12 @@ class AdminStatsController extends Controller
         $res = $conn->prepare($query);
         $res->execute();
 
+        // Fetch all the information out.  Because of pre-processing done
+        // in the query, we can use this practically raw.
         $users = $res->fetchAll();
 
-        $adminsWithoutAction = 0;
+        // Get the total number of admins, the number of admins without
+        // action, and then run percentage calculations on the same.
         $adminCount = sizeof($adminIds);
 
         foreach ($users as $row) {
@@ -198,16 +224,19 @@ class AdminStatsController extends Controller
             }
         }
 
-        $adminsWithoutActionPct = 0;
         if ($adminCount > 0) {
             $adminsWithoutActionPct = $adminsWithoutAction/$adminCount;
         }
 
+        // Combine the two arrays.  We can't use array_merge here because
+        // the arrays contain fundamentally different data.  Instead, it's
+        // done by hand.  Only two values are needed, edit count and groups.
         foreach ($users as $key => $value) {
             $users[$key]["edit_count"] = $data[$value["user_name"]]["editcount"];
             $users[$key]["groups"] = $data[$value["user_name"]]["groups"];
         }
 
+        // Render the result!
         return $this->render(
             "adminStats/result.html.twig",
             [
