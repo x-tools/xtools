@@ -211,7 +211,7 @@ class AppExtension extends Extension
         return $retVal;
     }
 
-    public function getColorList($num = false)
+    public static function getColorList($num = false)
     {
         $colors = [
             0 => '#Cc0000',# '#FF005A', #red '#FF5555',
@@ -316,8 +316,11 @@ class AppExtension extends Extension
 
         if ($num === false) {
             return $colors;
-        } else {
+        } elseif (isset($colors[$num])) {
             return $colors[$num];
+        } else {
+            // Default to grey.
+            return '#CCC';
         }
     }
 

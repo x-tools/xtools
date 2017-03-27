@@ -5,6 +5,7 @@ namespace AppBundle\Helper;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\VarDumper\VarDumper;
 
 class LabsHelper
 {
@@ -103,6 +104,18 @@ class LabsHelper
     }
 
     /**
+     * Get a list of all projects.
+     */
+    public function allProjects()
+    {
+        $wikiQuery = $this->client->createQueryBuilder();
+        $wikiQuery->select([ 'dbName', 'name', 'url' ])->from('wiki');
+        $stmt = $wikiQuery->execute();
+        $out = $stmt->fetchAll();
+        return $out;
+    }
+
+    /**
      * All mapping tables to environment-specific names, as specified in config/table_map.yml
      * Used for example to convert revision -> revision_replica
      * https://wikitech.wikimedia.org/wiki/Help:Tool_Labs/Database#Tables_for_revision_or_logging_queries_involving_user_names_and_IDs
@@ -124,18 +137,19 @@ class LabsHelper
         // For 'revision' and 'logging' tables (actually views) on Labs, use the indexed versions
         // (that have some rows hidden, e.g. for revdeleted users).
         $isLoggingOrRevision = in_array($table, ['revision', 'logging', 'archive']);
-        if (!$mapped && $isLoggingOrRevision && $this->container->getParameter('app.is_labs')) {
+        if (!$mapped && $isLoggingOrRevision && $this->isLabs()) {
             $table = $table."_userindex";
         }
 
-        // Prepend database name.
+        // Figure out database name.
         // Use class variable for the database name if not set via function parameter.
-        $dbName = $dbName || $this->dbName;
-        if (!empty($dbName)) {
-            $table = "$this->dbName.$table";
+        $dbNameActual = $dbName ? $dbName : $this->dbName;
+        if ($this->isLabs() && substr($dbNameActual, -2) != '_p') {
+            // Append '_p' if this is labs.
+            $dbNameActual .= '_p';
         }
 
-        return $table;
+        return $dbNameActual ? "$dbNameActual.$table" : $table;
     }
 
     // TODO: figure out how to use Doctrine to query host 'tools-db'

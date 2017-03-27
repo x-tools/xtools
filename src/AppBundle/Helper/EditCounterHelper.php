@@ -2,9 +2,12 @@
 
 namespace AppBundle\Helper;
 
+use AppBundle\Twig\AppExtension;
+use DateInterval;
 use Doctrine\DBAL\Connection;
 use Exception;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\VarDumper\VarDumper;
 
 class EditCounterHelper extends HelperBase
 {
@@ -42,6 +45,30 @@ class EditCounterHelper extends HelperBase
     }
 
     /**
+     * Get total edit counts for the top 10 projects for this user.
+     * @param string $username The username.
+     * @return string[] Elements are arrays with 'dbName', 'url', 'name', and 'total'.
+     */
+    public function getTopProjectsEditCounts($username, $numProjects = 10)
+    {
+        $topEditCounts = [];
+        foreach ($this->labsHelper->allProjects() as $project) {
+            // Get total edit count from DB otherwise.
+            $revisionTableName = $this->labsHelper->getTable('revision', $project['dbName']);
+            $sql = "SELECT COUNT(rev_id) FROM $revisionTableName WHERE rev_user_text=:username";
+            $stmt = $this->replicas->prepare($sql);
+            $stmt->bindParam("username", $username);
+            $stmt->execute();
+            $total = (int)$stmt->fetchColumn();
+            $topEditCounts[$project['dbName']] = array_merge($project, ['total' => $total]);
+        }
+        uasort($topEditCounts, function ($a, $b) {
+            return $b['total'] - $a['total'];
+        });
+        return array_slice($topEditCounts, 0, $numProjects);
+    }
+
+    /**
      * Get revision counts for the given user.
      * @param integer $userId The user's ID.
      * @returns string[] With keys: 'archived', 'total', 'first', 'last', '24h', '7d', '30d', and
@@ -50,6 +77,12 @@ class EditCounterHelper extends HelperBase
      */
     public function getRevisionCounts($userId)
     {
+        // Set up cache.
+        $cacheKey = 'revisioncounts.'.$userId;
+        if ($this->cacheHas($cacheKey)) {
+            return $this->cacheGet($cacheKey);
+        }
+
         // Prepare the query and execute
         $archiveTable = $this->labsHelper->getTable('archive');
         $revisionTable = $this->labsHelper->getTable('revision');
@@ -108,23 +141,32 @@ class EditCounterHelper extends HelperBase
             }, $results)
         );
 
-        // Count the number of days, accounting for when there's only one edit.
-        $editingTimeInSeconds = ceil($revisionCounts['last'] - $revisionCounts['first']);
-        $revisionCounts['days'] = $editingTimeInSeconds ? $editingTimeInSeconds/(60*60*24) : 1;
+        // Count the number of days, accounting for when there's zero or one edit.
+        $revisionCounts['days'] = 0;
+        if (isset($revisionCounts['first']) && isset($revisionCounts['last'])) {
+            $editingTimeInSeconds = ceil($revisionCounts['last'] - $revisionCounts['first']);
+            $revisionCounts['days'] = $editingTimeInSeconds ? $editingTimeInSeconds/(60*60*24) : 1;
+        }
 
         // Format the first and last dates.
-        $revisionCounts['first'] = date('Y-m-d H:i', strtotime($revisionCounts['first']));
-        $revisionCounts['last'] = date('Y-m-d H:i', strtotime($revisionCounts['last']));
+        $revisionCounts['first'] = isset($revisionCounts['first'])
+            ? date('Y-m-d H:i', strtotime($revisionCounts['first']))
+            : 0;
+        $revisionCounts['last'] = isset($revisionCounts['last'])
+            ? date('Y-m-d H:i', strtotime($revisionCounts['last']))
+            : 0;
 
         // Sum deleted and live to make the total.
         $revisionCounts['total'] = $revisionCounts['deleted'] + $revisionCounts['live'];
-        
+
         // Calculate the average number of live edits per day.
         $revisionCounts['avg_per_day'] = round(
             $revisionCounts['live'] / $revisionCounts['days'],
             3
         );
 
+        // Cache for 10 minutes, and return.
+        $this->cacheSave($cacheKey, $revisionCounts, 'PT10M');
         return $revisionCounts;
     }
 
@@ -254,5 +296,194 @@ class EditCounterHelper extends HelperBase
             }, $results)
         );
         return $namespaceTotals;
+    }
+
+    /**
+     * Get this user's most recent 10 edits across all projects.
+     * @param string $username The username.
+     * @param integer $contribCount The number of items to return.
+     * @param integer $days The number of days to search from each wiki.
+     * @return string[]
+     */
+    public function getRecentGlobalContribs($username, $contribCount = 10, $days = 30)
+    {
+        $allRevisions = [];
+        foreach ($this->labsHelper->allProjects() as $project) {
+            $cacheKey = "globalcontribs.{$project['dbName']}.$username";
+            if ($this->cacheHas($cacheKey)) {
+                $revisions = $this->cacheGet($cacheKey);
+            } else {
+                $sql =
+                    "SELECT rev_id, rev_comment, rev_timestamp, rev_minor_edit, rev_deleted, "
+                    . "     rev_len, rev_parent_id, page_title "
+                    . " FROM " . $this->labsHelper->getTable('revision', $project['dbName'])
+                    . "    JOIN " . $this->labsHelper->getTable('page', $project['dbName'])
+                    . "    ON (rev_page = page_id)"
+                    . " WHERE rev_timestamp > NOW() - INTERVAL $days DAY AND rev_user_text LIKE :username"
+                    . " ORDER BY rev_timestamp DESC"
+                    . " LIMIT 10";
+                $resultQuery = $this->replicas->prepare($sql);
+                $resultQuery->bindParam(":username", $username);
+                $resultQuery->execute();
+                $revisions = $resultQuery->fetchAll();
+                $this->cacheSave($cacheKey, $revisions, 'PT15M');
+            }
+            if (count($revisions) === 0) {
+                continue;
+            }
+            $revsWithProject = array_map(
+                function (&$item) use ($project) {
+                    $item['project_name'] = $project['name'];
+                    $item['project_url'] = $project['url'];
+                    $item['project_db_name'] = $project['dbName'];
+                    return $item;
+                },
+                $revisions
+            );
+            $allRevisions = array_merge($allRevisions, $revsWithProject);
+        }
+        usort($allRevisions, function ($a, $b) {
+            return $b['rev_timestamp'] - $a['rev_timestamp'];
+        });
+        return array_slice($allRevisions, 0, $contribCount);
+    }
+
+    /**
+     * Get data for a bar chart of monthly edit totals per namespace.
+     * @param string $username The username.
+     * @return string[]
+     */
+    public function getMonthCounts($username)
+    {
+        $cacheKey = "monthcounts.$username";
+        if ($this->cacheHas($cacheKey)) {
+            return $this->cacheGet($cacheKey);
+        }
+
+        $sql = "SELECT "
+            . "     YEAR(rev_timestamp) AS `year`,"
+            . "     MONTH(rev_timestamp) AS `month`,"
+            . "     page_namespace,"
+            . "     COUNT(rev_id) AS `count` "
+            . " FROM " . $this->labsHelper->getTable('revision')
+            . "    JOIN " . $this->labsHelper->getTable('page') . " ON (rev_page = page_id)"
+            . " WHERE rev_user_text = :username"
+            . " GROUP BY YEAR(rev_timestamp), MONTH(rev_timestamp), page_namespace "
+            . " ORDER BY rev_timestamp DESC";
+        $resultQuery = $this->replicas->prepare($sql);
+        $resultQuery->bindParam(":username", $username);
+        $resultQuery->execute();
+        $totals = $resultQuery->fetchAll();
+        $out = [
+            'years' => [],
+            'namespaces' => [],
+            'totals' => [],
+        ];
+        $out['max_year'] = 0;
+        $out['min_year'] = date('Y');
+        foreach ($totals as $total) {
+            // Collect all applicable years and namespaces.
+            $out['max_year'] = max($out['max_year'], $total['year']);
+            $out['min_year'] = min($out['min_year'], $total['year']);
+            // Collate the counts by namespace, and then year and month.
+            $ns = $total['page_namespace'];
+            if (!isset($out['totals'][$ns])) {
+                $out['totals'][$ns] = [];
+            }
+            $out['totals'][$ns][$total['year'].$total['month']] = $total['count'];
+        }
+        // Fill in the blanks (where no edits were made in a given month for a namespace).
+        for ($y = $out['min_year']; $y <= $out['max_year']; $y++) {
+            for ($m = 1; $m <= 12; $m++) {
+                foreach ($out['totals'] as $nsId => &$total) {
+                    if (!isset($total[$y.$m])) {
+                        $total[$y.$m] = 0;
+                    }
+                }
+            }
+        }
+        $this->cacheSave($cacheKey, $out, 'PT10M');
+        return $out;
+    }
+
+    /**
+     * Get yearly edit totals for this user, grouped by namespace.
+     * @param string $username
+     * @return string[] ['<namespace>' => ['<year>' => 'total', ... ], ... ]
+     */
+    public function getYearlyTotalsByNamespace($username)
+    {
+        $cacheKey = "yearcounts.$username";
+        if ($this->cacheHas($cacheKey)) {
+            return $this->cacheGet($cacheKey);
+        }
+
+        $sql = "SELECT "
+            . "     SUBSTR(CAST(rev_timestamp AS CHAR(4)), 1, 4) AS `year`,"
+            . "     page_namespace,"
+            . "     COUNT(rev_id) AS `count` "
+            . " FROM " . $this->labsHelper->getTable('revision')
+            . "    JOIN " . $this->labsHelper->getTable('page') . " ON (rev_page = page_id)" .
+            " WHERE rev_user_text = :username" .
+            " GROUP BY SUBSTR(CAST(rev_timestamp AS CHAR(4)), 1, 4), page_namespace " .
+            " ORDER BY rev_timestamp DESC ";
+        $resultQuery = $this->replicas->prepare($sql);
+        $resultQuery->bindParam(":username", $username);
+        $resultQuery->execute();
+        $totals = $resultQuery->fetchAll();
+        $out = [
+            'years' => [],
+            'namespaces' => [],
+            'totals' => [],
+        ];
+        foreach ($totals as $total) {
+            $out['years'][$total['year']] = $total['year'];
+            $out['namespaces'][$total['page_namespace']] = $total['page_namespace'];
+            if (!isset($out['totals'][$total['page_namespace']])) {
+                $out['totals'][$total['page_namespace']] = [];
+            }
+            $out['totals'][$total['page_namespace']][$total['year']] = $total['count'];
+        }
+        $this->cacheSave($cacheKey, $out, 'PT10M');
+        return $out;
+    }
+
+    /**
+     * Get data for the timecard chart, with totals grouped by day and to the nearest two-hours.
+     * @param string $username The user's username.
+     * @return string[]
+     */
+    public function getTimeCard($username)
+    {
+        $cacheKey = "timecard.$username";
+        if ($this->cacheHas($cacheKey)) {
+            return $this->cacheGet($cacheKey);
+        }
+
+        $hourInterval = 2;
+        $xCalc = "ROUND(HOUR(rev_timestamp)/$hourInterval)*$hourInterval";
+        $sql = "SELECT "
+            . "     DAYOFWEEK(rev_timestamp) AS `y`, "
+            . "     $xCalc AS `x`, "
+            . "     COUNT(rev_id) AS `r` "
+            . " FROM " . $this->labsHelper->getTable('revision')
+            . " WHERE rev_user_text = :username"
+            . " GROUP BY DAYOFWEEK(rev_timestamp), $xCalc "
+            . " ";
+        $resultQuery = $this->replicas->prepare($sql);
+        $resultQuery->bindParam(":username", $username);
+        $resultQuery->execute();
+        $totals = $resultQuery->fetchAll();
+        // Scale the radii: get the max, then scale each radius.
+        // This looks inefficient, but there's a max of 72 elements in this array.
+        $max = 0;
+        foreach ($totals as $total) {
+            $max = max($max, $total['r']);
+        }
+        foreach ($totals as &$total) {
+            $total['r'] = round($total['r'] / $max * 100);
+        }
+        $this->cacheSave($cacheKey, $totals, 'PT10M');
+        return $totals;
     }
 }

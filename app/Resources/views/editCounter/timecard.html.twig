@@ -1,0 +1,57 @@
+{% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
+
+{% block body %}
+
+<p>{{ msg('timecard-chart-desc') }}</p>
+<canvas id="timecard-bubble-chart"></canvas>
+<script type="text/javascript">
+    var days = {
+        1: "{{ msg('monday') }}",
+        2: "{{ msg('tuesday') }}",
+        3: "{{ msg('wednesday') }}",
+        4: "{{ msg('thursday') }}",
+        5: "{{ msg('friday') }}",
+        6: "{{ msg('saturday') }}",
+        7: "{{ msg('sunday') }}"
+    };
+    var localOffset = new Date().getTimezoneOffset() / 60;
+    console.log(localOffset);
+    new Chart($("#timecard-bubble-chart"), {
+        type: 'bubble',
+        data: {
+            datasets: [{
+                label: "{{ msg('total') }}",
+                backgroundColor: "#060",
+                data: [
+                    {% for d in datasets %}
+                    { x: {{ d.x }} - localOffset, y: {{ d.y }}, r: {{ d.r }} }{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ]
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        min: 0,
+                        max: 8,
+                        callback: function(value, index, values) {
+                            return days[index];
+                        }
+                    }
+                }],
+                xAxes: [{
+                    ticks: {
+                        min: 0,
+                        max: 24,
+                        callback: function(value, index, values) {
+                            return value + ":00"
+                        }
+                    }
+                }]
+            }
+        }
+    });
+</script>
+
+{% endblock %}

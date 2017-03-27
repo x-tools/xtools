@@ -1,0 +1,55 @@
+{% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
+
+{% block body %}
+
+<canvas id="monthcounts-bar-chart"></canvas>
+<script type="text/javascript">
+    new Chart($("#monthcounts-bar-chart"), {
+        type: 'bar',
+        data: {
+            labels: [
+                {%- for year in month_counts.min_year .. month_counts.max_year -%}
+                    {%- for month in 1..12 -%}
+                        "{{ year }}/{{ '%02d'|format(month) }}"
+                        {%- if not loop.last %},{% endif %}
+                    {%- endfor -%}
+                    {%- if not loop.last %},{% endif %}
+                {%- endfor -%}
+            ],
+            datasets: [
+                {% for ns_id,dataset in month_counts.totals %}
+                {
+                    label: "{{ attribute(namespaces, ns_id) }}",
+                    backgroundColor: "{{ color(ns_id) }}",
+                    data: [
+                        {% for year in month_counts.min_year .. month_counts.max_year %}
+                            {%- for month in 1..12 -%}
+                                {{- attribute(dataset, year~month) -}}
+                                {%- if not loop.last %},{% endif %}
+                            {%- endfor -%}
+                            {%- if not loop.last %},{% endif -%}
+                        {%- endfor -%}
+                    ]
+                }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    stacked: true
+                }],
+                xAxes: [{
+                    stacked: true,
+                    ticks: {
+                        callback: function(value, index, values) {
+                            return (index % 12 == 0) ? value : '';
+                        }
+                    }
+                }]
+            }
+        }
+    });
+</script>
+
+{% endblock %}

@@ -3,11 +3,14 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Helper\ApiHelper;
+use AppBundle\Helper\AutomatedEditsHelper;
 use AppBundle\Helper\EditCounterHelper;
 use AppBundle\Helper\LabsHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\VarDumper\VarDumper;
 
 class EditCounterController extends Controller
 {
@@ -49,11 +52,13 @@ class EditCounterController extends Controller
     public function resultAction($project, $username)
     {
         /** @var LabsHelper $lh */
-        $lh = $this->get("app.labs_helper");
+        $lh = $this->get('app.labs_helper');
         /** @var EditCounterHelper $ec */
-        $ec = $this->get("app.editcounter_helper");
+        $ec = $this->get('app.editcounter_helper');
         /** @var ApiHelper $api */
-        $api = $this->get("app.api_helper");
+        $api = $this->get('app.api_helper');
+        /** @var AutomatedEditsHelper $automatedEditsHelper */
+        $automatedEditsHelper = $this->get('app.automated_edits_helper');
 
         // Check, clean, and get inputs.
         $lh->checkEnabled("ec");
@@ -69,6 +74,10 @@ class EditCounterController extends Controller
         $pageCounts = $ec->getPageCounts($username, $revisionCounts['total']);
         $logCounts = $ec->getLogCounts($userId);
         $namespaceTotals = $ec->getNamespaceTotals($userId);
+        $automatedEditsSummary = $automatedEditsHelper->getEditsSummary($userId);
+        $topProjectsEditCounts = $ec->getTopProjectsEditCounts($username);
+        $recentGlobalContribs = $ec->getRecentGlobalContribs($username);
+        $yearlyTotalsByNamespace = $ec->getYearlyTotalsByNamespace($username);
 
         // Give it all to the template.
         return $this->render('editCounter/result.html.twig', [
@@ -134,7 +143,64 @@ class EditCounterController extends Controller
             // Namespace Totals
             'namespaceArray' => $namespaceTotals,
             'namespaceTotal' => array_sum($namespaceTotals),
+            'yearcounts' => $yearlyTotalsByNamespace,
 
+            // Semi-automated edits.
+            'auto_edits' => $automatedEditsSummary,
+            'auto_edits_total' => array_sum($automatedEditsSummary),
+
+            // Other projects.
+            'top_projects_edit_counts' => $topProjectsEditCounts,
+            'recent_global_contribs' => $recentGlobalContribs,
+
+        ]);
+    }
+
+    /**
+     * @Route("/ec-timecard/{project}/{username}", name="EditCounterTimeCard")
+     */
+    public function timecardAction($project, $username)
+    {
+        /** @var LabsHelper $lh */
+        $lh = $this->get('app.labs_helper');
+        /** @var EditCounterHelper $ec */
+        $ec = $this->get('app.editcounter_helper');
+
+        $lh->databasePrepare($project);
+        $username = ucfirst($username);
+        $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
+        $datasets = $ec->getTimeCard($username);
+        return $this->render('editCounter/timecard.html.twig', [
+            'xtTitle' => 'tool_ec',
+            'xtPage' => 'ec',
+            'is_sub_request' => $isSubRequest,
+            'datasets' => $datasets,
+        ]);
+    }
+    /**
+     * @Route("/ec-monthcounts/{project}/{username}", name="EditCounterMonthCounts")
+     */
+    public function monthcountsAction($project, $username)
+    {
+        /** @var LabsHelper $lh */
+        $lh = $this->get('app.labs_helper');
+        $lh->databasePrepare($project);
+
+        /** @var EditCounterHelper $ec */
+        $ec = $this->get('app.editcounter_helper');
+        $username = ucfirst($username);
+        $monthlyTotalsByNamespace = $ec->getMonthCounts($username);
+
+        /** @var ApiHelper $api */
+        $api = $this->get('app.api_helper');
+
+        $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
+        return $this->render('editCounter/monthcounts.html.twig', [
+            'xtTitle' => 'tool_ec',
+            'xtPage' => 'ec',
+            'is_sub_request' => $isSubRequest,
+            'month_counts' => $monthlyTotalsByNamespace,
+            'namespaces' => $api->namespaces($project),
         ]);
     }
 }
