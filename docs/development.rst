@@ -30,13 +30,11 @@ The development server does not cache data.  Any changes you make are visible af
 
 Developing against WMF databases
 --------------------------------
-If you want to use the WMF database replicas, open a tunnel with:
-::
+If you want to use the WMF database replicas, open a tunnel with::
 
     ssh -L 4711:enwiki.labsdb:3306 tools-login.wmflabs.org -N -l your-username-here
 
-And set the following in ``app/config/parameters.yml``:
-::
+And set the following in ``app/config/parameters.yml``::
 
     app.is_labs: 1
     database_replica_host: 127.0.0.1
@@ -46,7 +44,37 @@ And set the following in ``app/config/parameters.yml``:
     database_replica_user: your-uxxxx-username-here
     database_replica_password: your-password-here
 
-(Change the 'your-*-here' bits to your own values.)
+(Change the ``your-*-here`` bits to your own values.)
+
+Caching
+=======
+
+Caching should happen in helpers, with appropriate times-to-live.
+
+Every helper should extend HelperBase, which has ``cacheHas()``, ``cacheGet()``, and ``cacheSave()`` methods.
+These should be used in this pattern::
+
+    public function doSomething($input)
+    {
+        $cacheKey = 'something.'.$input;
+        if ($this->cacheHas($cacheKey)) {
+            return $this->cacheGet($cacheKey);
+        }
+        $something = 'big query here';
+        $this->cacheSave($cacheKey, $something, 'P1D');
+        return $something;
+    }
+
+The cache key can be anything, so long as it is unique within the current class
+(the ``cache*()`` methods prepend the classname, so you don't have to).
+The TTL syntax is from the DateInterval_ class (e.g. ``P1D`` is one day, ``PT1H`` is one hour).
+
+The above methods are just wrappers around a PSR-6_ implementation, intended to reduce the repetition of similar lines of code.
+You can, of course, retrieve the underlying CacheItemPoolInterface_ whenever you want with ``$container->get('cache.app')``.
+
+.. _PSR-6: http://www.php-fig.org/psr/psr-6/
+.. _CacheItemPoolInterface: http://www.php-fig.org/psr/psr-6/#cacheitempoolinterface
+.. _DateInterval: http://php.net/manual/en/class.dateinterval.php
 
 Additional Help
 ---------------

@@ -10,7 +10,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ApiHelper
+class ApiHelper extends HelperBase
 {
 
     /** @var MediawikiApi */
@@ -18,9 +18,6 @@ class ApiHelper
 
     /** @var LabsHelper */
     private $labsHelper;
-
-    /** @var CacheItemPoolInterface */
-    protected $cache;
 
     public function __construct(ContainerInterface $container, LabsHelper $labsHelper)
     {
@@ -39,7 +36,6 @@ class ApiHelper
 
     public function groups($project, $username)
     {
-
         $this->setUp($project);
         $params = [ "list"=>"users", "ususers"=>$username, "usprop"=>"groups" ];
         $query = new SimpleRequest('query', $params);
@@ -59,7 +55,6 @@ class ApiHelper
 
     public function globalGroups($project, $username)
     {
-
         $this->setUp($project);
         $params = [ "meta"=>"globaluserinfo", "guiuser"=>$username, "guiprop"=>"groups" ];
         $query = new SimpleRequest('query', $params);
@@ -85,10 +80,9 @@ class ApiHelper
      */
     public function namespaces($project)
     {
-        // Use cache if possible.
-        $cacheItem = $this->cache->getItem('api.namespaces.' . $project);
-        if ($cacheItem->isHit()) {
-            return $cacheItem->get();
+        $cacheKey = "namespaces.$project";
+        if ($this->cacheHas($cacheKey)) {
+            return $this->cacheGet($cacheKey);
         }
 
         $this->setUp($project);
@@ -119,10 +113,7 @@ class ApiHelper
                     $result[$row["id"]] = $name;
                 }
             }
-            // Save to cache.
-            $cacheItem->expiresAfter(new DateInterval('P7D'));
-            $cacheItem->set($result);
-            $this->cache->save($cacheItem);
+            $this->cacheSave($cacheKey, $result, 'P7D');
         } catch (Exception $e) {
             // The api returned an error!  Ignore
         }

@@ -2,13 +2,11 @@
 
 namespace AppBundle\Helper;
 
-use DateInterval;
 use Doctrine\DBAL\Connection;
 use Exception;
-use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\Container;
 
-class EditCounterHelper
+class EditCounterHelper extends HelperBase
 {
 
     /** @var Container */
@@ -20,15 +18,11 @@ class EditCounterHelper
     /** @var LabsHelper */
     protected $labsHelper;
 
-    /** @var CacheItemPoolInterface */
-    protected $cache;
-
     public function __construct(Container $container)
     {
         $this->container = $container;
         $this->replicas = $container->get('doctrine')->getManager('replicas')->getConnection();
         $this->labsHelper = $container->get('app.labs_helper');
-        $this->cache = $container->get('cache.app');
     }
 
     /**
@@ -38,24 +32,12 @@ class EditCounterHelper
      */
     public function getUserId($usernameOrIp)
     {
-        // Use cache if possible.
-        $cacheItem = $this->cache->getItem('ec.usernameOrIp.' . $usernameOrIp);
-        if ($cacheItem->isHit()) {
-            return $cacheItem->get();
-        }
-
         $userTable = $this->labsHelper->getTable('user');
         $sql = "SELECT user_id FROM $userTable WHERE user_name = :username LIMIT 1";
         $resultQuery = $this->replicas->prepare($sql);
         $resultQuery->bindParam("username", $usernameOrIp);
         $resultQuery->execute();
         $userId = (int)$resultQuery->fetchColumn();
-
-        // Save to cache.
-        $cacheItem->expiresAfter(new DateInterval('P7D'));
-        $cacheItem->set($userId);
-        $this->cache->save($cacheItem);
-
         return $userId;
     }
 
