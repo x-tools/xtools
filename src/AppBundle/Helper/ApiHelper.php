@@ -39,7 +39,7 @@ class ApiHelper extends HelperBase
             $projectInfo = $this->labsHelper->databasePrepare($project);
 
             try {
-                if (isset($projectInfo["url"]) && strpos($projectInfo["url"], "api.php") !== false) {
+                if (strpos($projectInfo["url"], "api.php") !== false) {
                     $this->api = MediawikiApi::newFromApiEndpoint($projectInfo["url"]);
                 } else {
                     $this->api = MediawikiApi::newFromPage($projectInfo['url']);

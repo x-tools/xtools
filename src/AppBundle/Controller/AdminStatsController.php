@@ -111,8 +111,17 @@ class AdminStatsController extends Controller
      *
      * @return Route|\Symfony\Component\HttpFoundation\Response
      */
-    public function resultAction($project, $start = "1970-1-1", $end = "2038-1-18")
+    public function resultAction($project, $start = null, $end = null)
     {
+
+        if ($start == null) {
+            $start = date("Y-m-d", strtotime("-1 month"));
+        }
+
+        if ($end == null) {
+            $end = date("Y-m-d");
+
+        }
         // Start by validating the dates.  If the dates are invalid, we'll redirect
         // to the project only view.
         if (strtotime($start) === false || strtotime($end) === false) {
