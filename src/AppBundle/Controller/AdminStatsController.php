@@ -120,7 +120,6 @@ class AdminStatsController extends Controller
 
         if ($end == null) {
             $end = date("Y-m-d");
-
         }
         // Start by validating the dates.  If the dates are invalid, we'll redirect
         // to the project only view.
