@@ -70,6 +70,28 @@
         setupTOC();
     });
 
+    /**
+     * Floating table of contents
+     *
+     * Example usage (see articleInfo/result.html.twig for more):
+     *     <p class="text-center xt-heading-subtitle">
+     *         ...
+     *     </p>
+     *     <div class="text-center xt-toc">
+     *         {% set sections = ['generalstats', 'usertable', 'yearcounts', 'monthcounts'] %}
+     *         {% for section in sections %}
+     *             <span>
+     *                 <a href="#{{ section }}" data-section="{{ section }}">{{ msg(section) }}</a>
+     *             </span>
+     *         {% endfor %}
+     *     </div>
+     *     ...
+     *     {% set content %}
+     *         ...content for general stats...
+     *     {% endset %}
+     *     {{ layout.content_block('generalstats', content) }}
+     *     ...
+     */
     function setupTOC()
     {
         var $toc = $('.xt-toc');
@@ -83,7 +105,6 @@
         // listeners on the section links
         var setupTocListeners = function () {
             $('.xt-toc').find('a').off('click').on('click', function (e) {
-                e.preventDefault();
                 document.activeElement.blur();
                 var $newSection = $('#' + $(e.target).data('section'));
                 $(window).scrollTop($newSection.offset().top - tocHeight);

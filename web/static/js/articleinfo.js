@@ -172,6 +172,7 @@
             type: 'bar',
             data: chartData,
             options: {
+                responsive: true,
                 legend: {
                     display: false,
                 },
@@ -241,7 +242,7 @@
             type: 'pie',
             data: chartData,
             options: Object.assign({
-                responsive: true,
+                responsive: false,
                 legend: {
                     display: false,
                 },

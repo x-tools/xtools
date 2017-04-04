@@ -266,15 +266,14 @@ class ApiHelper
             if ($classValue === 'Unknown' || $classValue === '' || !isset($config['class'][$classValue])) {
                 $classAttrs = $config['class']['Unknown'];
                 $assessment['class']['value'] = '???';
-                // $1 is used to substitute the WikiProject name, e.g. Category:FA-Class Wikipedia 1.0 articles
-                $assessment['class']['category'] = str_replace('$1', $wikiproject, $classAttrs['category']);
+                $assessment['class']['category'] = $classAttrs['category'];
                 $assessment['class']['badge'] = "https://upload.wikimedia.org/wikipedia/commons/". $classAttrs['badge'];
             } else {
                 $classAttrs = $config['class'][$classValue];
                 $assessment['class'] = [
                     'value' => $classValue,
                     'color' => $classAttrs['color'],
-                    'category' => str_replace('$1', $wikiproject, $classAttrs['category']),
+                    'category' => $classAttrs['category'],
                 ];
 
                 // add full URL to badge icon
@@ -285,9 +284,7 @@ class ApiHelper
 
                 if ($overallQuality['value'] === '???') {
                     $overallQuality = $assessment['class'];
-                    // Replace category with the root one for this class.
-                    // E.g. use 'Category:FA-Class articles' instead of 'Category:FA-Class Wikipedia 1.0 articles'
-                    $overallQuality['category'] = preg_replace('/\s?\$1\s?/', ' ', $classAttrs['category']);
+                    $overallQuality['category'] = $classAttrs['category'];
                 }
             }
 
@@ -298,14 +295,14 @@ class ApiHelper
                 $importanceAttrs = $config['importance']['Unknown'];
                 $assessment['importance'] = $importanceAttrs;
                 $assessment['importance']['value'] = '???';
-                $assessment['importance']['category'] = str_replace('$1', $wikiproject, $importanceAttrs['category']);
+                $assessment['importance']['category'] = $importanceAttrs['category'];
             } else {
                 $importanceAttrs = $config['importance'][$importanceValue];
                 $assessment['importance'] = [
                     'value' => $importanceValue,
                     'color' => $importanceAttrs['color'],
                     'weight' => $importanceAttrs['weight'], // numerical weight for sorting purposes
-                    'category' => str_replace('$1', $wikiproject, $importanceAttrs['category'])
+                    'category' => $importanceAttrs['category'],
                 ];
             }
 

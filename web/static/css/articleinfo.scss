@@ -17,6 +17,7 @@
         position: relative;
 
         canvas {
+            max-height: 250px;
             max-width: 250px;
         }
     }
@@ -72,5 +73,33 @@
     .footnotes {
         margin-bottom: 20px;
         margin-top: 5px;
+    }
+
+    .month-counts-table {
+        .stripes-column {
+            // effectively sets a min-height, but allows .strips to have percentage height
+            height: 30px;
+            padding: 0;
+        }
+
+        .color-icon {
+            vertical-align: -2px;
+        }
+
+        .stripes {
+            height: calc(100% / 3);
+        }
+    }
+}
+
+@media (max-width: $bootstrap-sm) {
+    .articleinfo {
+        .chart-wrapper {
+            display: block;
+
+            .chart-legend {
+                margin-bottom: 15px;
+            }
+        }
     }
 }

@@ -430,7 +430,7 @@
 
         {# ======================== MONTH COUNTS ======================== #}
         {% set content %}
-            <table class="table table-bordered table-hover table-striped">
+            <table class="table table-bordered table-hover table-striped month-counts-table">
                 <thead><tr>
                     {% for key in ['month', 'numedits', 'ips', 'ips_percentage', 'minor', 'minor_percentage'] %}
                         <th>
@@ -441,10 +441,13 @@
                         </th>
                     {% endfor %}
                     <th>
+                        <span class="color-icon" style="background:rgba(171, 212, 235, 1)"></span>
                         {{ msg('alledits') }}
                         &middot;
+                        <span class="color-icon" style="background:rgba(178, 223, 138, 1)"></span>
                         {{ msg('ips') }}
                         &middot;
+                        <span class="color-icon" style="background:rgba(251, 154, 153, 1)"></span>
                         {{ msg('minor') }}
                     </th>
                 </tr></thead>
@@ -471,7 +474,15 @@
                             <td class="sort-entry--minor" data-value="{{ stats.minor }}">{{ stats.minor | number_format }}</td>
                             {% set month_minor_percent = stats.minor | percent_format(stats.all) %}
                             <td class="sort-entry--minor_percentage" data-value="{{ month_minor_percent }}">{{ month_minor_percent }}</td>
-                            <td></td>
+                            <td class="stripes-column">
+                                {# stripes are shown as figure over max edits for all months, with a max width of 400px #}
+                                {% set all_edits_width = (stats.all / max_edits_per_month) * 400 %}
+                                <div class="stripes" style="background:rgba(171, 212, 235, 1); width:{{ all_edits_width }}px"></div>
+                                {% set anon_edits_width = (stats.anon / max_edits_per_month) * 400 %}
+                                <div class="stripes" style="background:rgba(178, 223, 138, 1); width:{{ anon_edits_width }}px"></div>
+                                {% set minor_edits_width = (stats.minor / max_edits_per_month) * 400 %}
+                                <div class="stripes" style="background:rgba(251, 154, 153, 1); width:{{ minor_edits_width }}px"></div>
+                            </td>
                         </tr>
                     {% endfor %}
                 {% endfor %}
@@ -529,11 +540,8 @@
                         </td>
                         <td style="background:{{ assessment.class.color }}" class="sort-entry--assessment" data-value="{{ assessment.class.value }}">
                             {% set assessment_value %}
-                                {% if assessment.class.badge is defined %}
-                                    <img alt="{{ assessment.class.value }}" src="{{ assessment.class.badge }}" class="assessment-badge" />
-                                {% else %}
-                                    {{ assessment.class.value }}
-                                {% endif %}
+                                <img alt="{{ assessment.class.value }}" src="{{ assessment.class.badge }}" class="assessment-badge" />
+                                {{ assessment.class.value }}
                             {% endset %}
                             {{ wiki_link(assessment.class.category, project_url, assessment_value) }}
                         </td>

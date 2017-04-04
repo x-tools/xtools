@@ -457,6 +457,7 @@ class ArticleInfoController extends Controller
                 'revert_count' => 0,
                 'added' => 0,
             ],
+            'max_edits_per_month' => 0, // for bar chart in "Month counts" section
             'editors' => [],
             'anons' => [],
             'year_count' => [],
@@ -515,6 +516,10 @@ class ArticleInfoController extends Controller
             $data['year_count'][$timestamp['year']]['all']++;
             $data['year_count'][$timestamp['year']]['months'][$timestamp['month']]['all']++;
             $data['year_count'][$timestamp['year']]['size'] = (int) $rev['rev_len'];
+
+            if ($data['year_count'][$timestamp['year']]['months'][$timestamp['month']]['all'] > $data['max_edits_per_month']) {
+              $data['max_edits_per_month'] = $data['year_count'][$timestamp['year']]['months'][$timestamp['month']]['all'];
+            }
 
             // Fill in various user stats
             if (!isset($data['editors'][$username])) {

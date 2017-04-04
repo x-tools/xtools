@@ -94,6 +94,7 @@ body {
 .tooltip-body {
     &::after,
     &::before {
+        @include prefix(transform, translateY(-50%));
         border-style: solid;
         color: transparent;
         content: '';
@@ -102,11 +103,6 @@ body {
         position: absolute;
         right: 100%;
         top: 50%;
-        transform: translateY(-50%);
-        -o-transform: translateY(-50%);
-        -ms-transform: translateY(-50%);
-        -moz-transform: translateY(-50%);
-        -webkit-transform: translateY(-50%);
         width: 0;
     }
     &::before {
@@ -448,13 +444,11 @@ div.outer_bar {
     margin-left: -4px;
 }
 
-.chart-legend {
-    .color-icon {
-        border-radius: 100%;
-        display: inline-block;
-        height: 15px;
-        width: 15px;
-    }
+.color-icon {
+    border-radius: 100%;
+    display: inline-block;
+    height: 15px;
+    width: 15px;
 }
 
 @media (min-width: $bootstrap-lg) {
@@ -480,4 +474,24 @@ div.outer_bar {
     #wrapper {
         margin: 15px 5px;
     }
+
+    .xt-toc {
+        display: none;
+    }
+
+    // FIXME: eventually will create a pop-out nav from the right
+    // .xt-toc {
+    //     @extend .fixed;
+    //     @include prefix(transform, initial);
+    //     box-shadow: 0px 0px 8px #CCC;
+    //     height: 100%;
+    //     left: 98%;
+    // }
+
+    // .xt-toc.fixed {
+    //     @include prefix(transform, initial);
+    //     box-shadow: 0px 0px 8px #CCC;
+    //     height: 100%;
+    //     left: 98%;
+    // }
 }
