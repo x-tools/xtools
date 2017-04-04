@@ -517,8 +517,9 @@ class ArticleInfoController extends Controller
             $data['year_count'][$timestamp['year']]['months'][$timestamp['month']]['all']++;
             $data['year_count'][$timestamp['year']]['size'] = (int) $rev['rev_len'];
 
-            if ($data['year_count'][$timestamp['year']]['months'][$timestamp['month']]['all'] > $data['max_edits_per_month']) {
-              $data['max_edits_per_month'] = $data['year_count'][$timestamp['year']]['months'][$timestamp['month']]['all'];
+            $editsThisMonth = $data['year_count'][$timestamp['year']]['months'][$timestamp['month']]['all'];
+            if ($editsThisMonth > $data['max_edits_per_month']) {
+                $data['max_edits_per_month'] = $editsThisMonth;
             }
 
             // Fill in various user stats
