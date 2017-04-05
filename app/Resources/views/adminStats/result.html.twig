@@ -29,7 +29,9 @@
                 <dt>{{ msg('current_admins') }}</dt>
                 <dd>{{ group_link('sysop', project_url, adminCount | number_format) }}</dd>
                 <dt>{{ msg('admins_without_action') }}</dt>
-                <dd>{{ adminsWithoutAction | number_format }} ({{ admins_without_action_pct }}%)</dd>
+                <dd>{{ adminsWithoutAction | number_format }} ({{ admins_without_action_pct | percent_format }})</dd>
+                <dt>{{ msg('non_admins_with_actions') }}</dt>
+                <dd>{{ (usersCount - adminCount) | number_format }}</dd>
             </dl>
         {% endset %}
         {{ layout.content_block('generalstats', content) }}
@@ -59,12 +61,14 @@
                             </td>
                             <td class="sort-entry--groups" data-value="{{ value.groups }}">{{ value.groups }}</td>
                             <td>
-                                <a title="Edit Counter" href="{{ link("/ec/"~project~"/"~username) }}" >ec</a>
-                                &middot;
+                                {% if enabled('ec') %}
+                                    <a title="Edit Counter" href="{{ link("/ec/"~project~"/"~username) }}" >ec</a>
+                                    &middot;
+                                {% endif %}
                                 {% if isWMFLabs() %}
                                     <a title="Global User Contributions" href="//tools.wmflabs.org/guc/?user={{ username|e }}" >guc</a> &middot;
                                 {% endif %}
-                                <a title="Log" href="//en.wikipedia.org/w/index.php?title=Special:Log&user={{ username }} " >log</a>
+                                {{ user_log_link(username, project_url, msg('log') | lower) }}
                             </td>
                             <td class="sort-entry--total_actions" data-value="{{ value.mtotal }}">{{ value.mtotal | number_format }}</td>
                             <td class="sort-entry--delete" data-value="{{ value.mdelete }}">{{ value.mdelete | number_format }}</td>

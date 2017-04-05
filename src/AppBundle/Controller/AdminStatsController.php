@@ -219,22 +219,12 @@ class AdminStatsController extends Controller
         // in the query, we can use this practically raw.
         $users = $res->fetchAll();
 
-        // Get the total number of admins, the number of admins without
-        // action, and then run percentage calculations on the same.
-        $adminCount = sizeof($adminIdArr);
-
-        foreach ($users as $row) {
-            if ($row["mtotal"] == 0) {
-                $adminsWithoutAction++;
-            }
-        }
-
-        if ($adminCount > 0) {
-            $adminsWithoutActionPct = $adminsWithoutAction/$adminCount;
-        }
-
         // Pull the admins from the API, for merging.
         $admins = $api->getAdmins($project);
+
+        // Get the total number of admins, the number of admins without
+        // action, and then later we'll run percentage calculations
+        $adminCount = count($admins);
 
         // Combine the two arrays.  We can't use array_merge here because
         // the arrays contain fundamentally different data.  Instead, it's
@@ -250,6 +240,10 @@ class AdminStatsController extends Controller
             }
             $users[$key]["edit_count"] = $admins[$username]["editcount"];
             $users[$key]["groups"] = $admins[$username]["groups"];
+
+            if ($users[$key]["mtotal"] === 0) {
+                $adminsWithoutAction++;
+            }
 
             unset($admins[$username]);
         }
@@ -271,7 +265,12 @@ class AdminStatsController extends Controller
                     'mtotal' => 0,
                     'groups' => $stats['groups'],
                 ];
+                $adminsWithoutAction++;
             }
+        }
+
+        if ($adminCount > 0) {
+            $adminsWithoutActionPct = ($adminsWithoutAction / $adminCount) * 100;
         }
 
         // Render the result!
@@ -294,6 +293,7 @@ class AdminStatsController extends Controller
                 'adminCount' => $adminCount,
 
                 'users' => $users,
+                'usersCount' => count($users),
             ]
         );
     }

@@ -25,6 +25,7 @@ class WikiExtension extends Extension
         return [
             new Twig_SimpleFunction('wiki_link', [ $this, 'wikiLink' ], $options),
             new Twig_SimpleFunction('user_link', [ $this, 'userLink' ], $options),
+            new Twig_SimpleFunction('user_log_link', [ $this, 'userLogLink' ], $options),
             new Twig_SimpleFunction('group_link', [ $this, 'groupLink' ], $options),
             new Twig_SimpleFunction('wiki_history_link', [ $this, 'wikiHistoryLink' ], $options),
             new Twig_SimpleFunction('wiki_log_link', [ $this, 'wikiLogLink' ], $options),
@@ -112,6 +113,29 @@ class WikiExtension extends Extension
         }
         if ($limit) {
             $url .= "&limit=$limit";
+        }
+
+        return "<a href='$url' target='_blank'>$label</a>";
+    }
+
+    /**
+     * Get a link to the logs for given user
+     * @param  string $username   Username
+     * @param  string $projectUrl Project domain and protocol such as https://en.wikipedia.org
+     * @param  string [$label]    The link text, defaults to msg('log')
+     * @param  string [$type]     Log type (e.g. 'block'), defaults to full log.
+     * @return string Markup
+     */
+    public function userLogLink($username, $projectUrl, $label = null, $type = null)
+    {
+        if (!isset($label)) {
+            $label = $this->intuitionMessage('log');
+        }
+
+        $url = "$projectUrl/w/index.php?title=Special:Log&action=view&user=$username";
+
+        if ($type) {
+            $url .= "&type=$type";
         }
 
         return "<a href='$url' target='_blank'>$label</a>";
@@ -238,7 +262,7 @@ class WikiExtension extends Extension
     public function percentFormat($numerator, $denominator = null, $precision = 1)
     {
         if (!$denominator) {
-            $quotient = 0;
+            $quotient = $numerator;
         } else {
             $quotient = ( $numerator / $denominator ) * 100;
         }

@@ -135,6 +135,7 @@
   "nofollowredir": "Don't follow redirects",
   "nograph": "User has not yet opted in. If you want to see graphs, please create $1 with any content or create $2 to opt-in across all Wikimedia wikis.",
   "nograph2": "Alternatively you can log in with Wikimedia OAuth (see also $1). That way, the more detailed results are for your eyes only.",
+  "non_admins_with_actions": "Non-admins with admin actions",
   "noresult": "No matching results found for: $1",
   "norevisions": "No revisions found",
   "notice": "Notice",
