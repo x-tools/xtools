@@ -87,7 +87,7 @@ class WikiExtension extends Extension
         }
         // Ignoring this inspection, as we want all of the output on one line.
         // @codingStandardsIgnoreStart
-        return "<a href='$projectUrl/wiki/index.php?title=Special:ListUsers&group=$group&creationSort=1&limit=50' target='_blank'>$label</a>";
+        return "<a href='$projectUrl/w/index.php?title=Special:ListUsers&group=$group&creationSort=1&limit=50' target='_blank'>$label</a>";
         // @codingStandardsIgnoreEnd
     }
 

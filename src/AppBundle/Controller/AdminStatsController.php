@@ -93,9 +93,9 @@ class AdminStatsController extends Controller
             'adminStats/index.html.twig',
             [
                 'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
-                "xtPage" => "adminstats",
-                "xtPageTitle" => "tool_adminstats",
-                "xtSubtitle" => "tool_adminstats_desc",
+                'xtPage' => 'adminstats',
+                'xtPageTitle' => 'tool_adminstats',
+                'xtSubtitle' => 'tool_adminstats_desc',
             ]
         );
     }
@@ -113,7 +113,6 @@ class AdminStatsController extends Controller
      */
     public function resultAction($project, $start = null, $end = null)
     {
-
         if ($start == null) {
             $start = date("Y-m-d", strtotime("-1 month"));
         }
@@ -159,9 +158,6 @@ class AdminStatsController extends Controller
         // Generate a diff for the dates - this is the number of days we're spanning.
         $days = date_diff(new \DateTime($end), new \DateTime($start))->days;
 
-        // Pull the admins from the API, for merging.
-        $data = $api->getAdmins($project);
-
         // Get admin ID's, used to account for inactive admins
         $user_groups_table = $lh->getTable("user_groups", $dbName);
         $ufg_table = $lh->getTable("user_former_groups");
@@ -191,6 +187,9 @@ class AdminStatsController extends Controller
         $userTable = $lh->getTable("user", $dbName);
         $loggingTable = $lh->getTable("logging", $dbName);
 
+        $startDb = date('Ymd000000', strtotime($start));
+        $endDb = date('Ymd000000', strtotime($end));
+
         // TODO: Fix this - inactive admins aren't getting shown
         $query = "
             SELECT user_name, user_id
@@ -205,7 +204,7 @@ class AdminStatsController extends Controller
             ,SUM(IF(log_type !='',1,0)) AS mtotal
             FROM $loggingTable
             JOIN $userTable ON user_id = log_user
-            WHERE  log_timestamp > '$start' AND log_timestamp <= '$end'
+            WHERE  log_timestamp > '$startDb' AND log_timestamp <= '$endDb'
               AND log_type IS NOT NULL
               AND log_action IS NOT NULL
               AND log_type IN ('block', 'delete', 'protect', 'import', 'rights')
@@ -222,7 +221,7 @@ class AdminStatsController extends Controller
 
         // Get the total number of admins, the number of admins without
         // action, and then run percentage calculations on the same.
-        $adminCount = sizeof($adminIds);
+        $adminCount = sizeof($adminIdArr);
 
         foreach ($users as $row) {
             if ($row["mtotal"] == 0) {
@@ -234,10 +233,22 @@ class AdminStatsController extends Controller
             $adminsWithoutActionPct = $adminsWithoutAction/$adminCount;
         }
 
+        // Pull the admins from the API, for merging.
+        $data = $api->getAdmins($project);
+
         // Combine the two arrays.  We can't use array_merge here because
         // the arrays contain fundamentally different data.  Instead, it's
         // done by hand.  Only two values are needed, edit count and groups.
         foreach ($users as $key => $value) {
+            // FIXME: workaround to get the page just to show some data,
+            //  since the API only returns 500 results and the admin returned
+            //  by the query may not have been returned by the API
+            if (empty($data[$value["user_name"]])) {
+                $data[$value["user_name"]] = [
+                    'editcount' => 0,
+                    'groups' => '',
+                ];
+            }
             $users[$key]["edit_count"] = $data[$value["user_name"]]["editcount"];
             $users[$key]["groups"] = $data[$value["user_name"]]["groups"];
         }

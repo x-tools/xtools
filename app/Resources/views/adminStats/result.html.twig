@@ -23,13 +23,13 @@
         {% set content %}
             <dl class="col-lg-12 dl-horizontal stat-list clearfix">
                 <dt>{{ msg('start') }}</dt>
-                <dd>{{ start_date }} ({{ days }} {{ msg("days", [days]) }})</dd>
+                <dd>{{ start_date }} ({{ days }} {{ msg("days", [days | number_format]) }})</dd>
                 <dt>{{ msg('log_types') }}</dt>
                 <dd>delete, block, protect, import, rights</dd>
                 <dt>{{ msg('current_admins') }}</dt>
-                <dd>{{ group_link('sysop', project_url, adminCount) }}</dd>
+                <dd>{{ group_link('sysop', project_url, adminCount | number_format) }}</dd>
                 <dt>{{ msg('admins_without_action') }}</dt>
-                <dd>{{ adminsWithoutAction }} ({{ admins_without_action_pct }}%)</dd>
+                <dd>{{ adminsWithoutAction | number_format }} ({{ admins_without_action_pct }}%)</dd>
             </dl>
         {% endset %}
         {{ layout.content_block('generalstats', content) }}
@@ -40,7 +40,7 @@
             <table class="table table-bordered table-hover table-striped top-editors-table">
                 <thead><tr>
                     <th>#</th>
-                    {% for key in ['username', 'groups', 'links', 'total', 'delete', 'restore', 're_block', 'unblock', 're_protect', 'unprotect', 'import', 'rights'] %}
+                    {% for key in ['username', 'groups', 'links', 'total_actions', 'delete', 'restore', 're_block', 'unblock', 're_protect', 'unprotect', 'import', 'rights'] %}
                         <th>
                             <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
                                 {{ msg(key) | capitalize_first }}
@@ -66,15 +66,15 @@
                                 {% endif %}
                                 <a title="Log" href="//en.wikipedia.org/w/index.php?title=Special:Log&user={{ username }} " >log</a>
                             </td>
-                            <td class="sort-entry--total" data-value="{{ value.mtotal }}">{{ value.mtotal }}</td>
-                            <td class="sort-entry--delete" data-value="{{ value.mdelete }}">{{ value.mdelete }}</td>
-                            <td class="sort-entry--restore" data-value="{{ value.mrestore }}">{{ value.mrestore }}</td>
-                            <td class="sort-entry--re_block" data-value="{{ value.mblock }}">{{ value.mblock }}</td>
-                            <td class="sort-entry--groups" data-value="{{ value.munblock }}">{{ value.munblock }}</td>
-                            <td class="sort-entry--re_protect" data-value="{{ value.mprotect }}">{{ value.mprotect }}</td>
-                            <td class="sort-entry--unprotect" data-value="{{ value.munprotect }}">{{ value.munprotect }}</td>
-                            <td class="sort-entry--import" data-value="{{ value.mimport }}">{{ value.mimport }}</td>
-                            <td class="sort-entry--rights" data-value="{{ value.mrights }}">{{ value.mrights }}</td>
+                            <td class="sort-entry--total_actions" data-value="{{ value.mtotal }}">{{ value.mtotal | number_format }}</td>
+                            <td class="sort-entry--delete" data-value="{{ value.mdelete }}">{{ value.mdelete | number_format }}</td>
+                            <td class="sort-entry--restore" data-value="{{ value.mrestore }}">{{ value.mrestore | number_format }}</td>
+                            <td class="sort-entry--re_block" data-value="{{ value.mblock }}">{{ value.mblock | number_format }}</td>
+                            <td class="sort-entry--groups" data-value="{{ value.munblock }}">{{ value.munblock | number_format }}</td>
+                            <td class="sort-entry--re_protect" data-value="{{ value.mprotect }}">{{ value.mprotect | number_format }}</td>
+                            <td class="sort-entry--unprotect" data-value="{{ value.munprotect }}">{{ value.munprotect | number_format }}</td>
+                            <td class="sort-entry--import" data-value="{{ value.mimport }}">{{ value.mimport | number_format }}</td>
+                            <td class="sort-entry--rights" data-value="{{ value.mrights }}">{{ value.mrights | number_format }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
