@@ -250,7 +250,7 @@ class AdminStatsController extends Controller
 
         // push any inactive admins back to $users with zero values
         if (count($admins)) {
-            foreach ( $admins as $username => $stats ) {
+            foreach ($admins as $username => $stats) {
                 $users[] = [
                     'user_name' => $username,
                     'editcount' => 0,
