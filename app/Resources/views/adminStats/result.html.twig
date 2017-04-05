@@ -1,67 +1,86 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/layout.html.twig' as layout %}
 
 {% block body %}
-
-    <div class="panel-body xt-panel-body-top"  >
-        <p>
-        <table class="table-condensed xt-table" style="text-align:left">
-            <tr><td>Starting date:</td><td>{{ start_date }} ({{ days }} {{ msg("days", [days]) }})</td></tr>
-            <tr><td>Log types:</td><td>delete, block, protect, import, rights</td></tr>
-            <tr><td>Current Admins (grp):</td><td>{{ group_link("sysop", url, adminCount) }}</td></tr>
-            <tr><td>Admins without action:</td><td>{{ adminsWithoutAction }} ({{ admins_without_action_pct }}%)</td></tr>
-        </table>
-        </p>
-        <br />
-
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h4  class="topcaption" >{{ msg('summary') }}</h4>
-            </div>
-            <div class="panel-body" id="generalstats">
-                <table class="table-striped table-condensed table-hover sortable xt-table">
-
-                    <tr>
-                        <th>#</th>
-                        <th>{{ msg("username") }}</th>
-                        <th>{{ msg("groups") }}</th>
-                        <th>{{ msg("link") }}</th>
-                        <th>{{ msg("total") }}</th>
-                        <th>{{ msg("delete") }}</th>
-                        <th>{{ msg("restore") }}</th>
-                        <th>{{ msg("block") }}</th>
-                        <th>{{ msg("unblock") }}</th>
-                        <th>{{ msg("protect") }}</th>
-                        <th>{{ msg("unprotect") }}</th>
-                        <th>{{ msg("import") }}</th>
-                        <th>{{ msg("rights") }}</th>
-                    </tr>
-
-
-                {% for key,value in users %}
-                    {% set username=value.user_name %}
-                    <tr>
-                        <td>{{ loop.index }}.</td>
-                        <td style="max-width:150px;"><a style="max-width:120px;" href="{{ linkWiki(url, "User:"~username) }}">{{ username }}</a></td>
-                        <td>{{ value.groups }}</td>
-                        <td style="white-space:nowrap;">
-                            <a title="Edit Counter" href="{{ link("/ec/"~project~"/"~username) }}" >ec</a> &middot;
-                            {% if isWMFLabs() %}<a title="Global User Contributions" href="//tools.wmflabs.org/guc/?user={{ username|e }}" >guc</a> &middot;{% endif %}
-                            <a title="Log" href="//en.wikipedia.org/w/index.php?title=Special:Log&user={{ username }} " >log</a>
-                        </td>
-                        <td class="tdnum" >{{ value.mtotal }}</td>
-                        <td class="tdnum" >{{ value.mdelete }}</td>
-                        <td class="tdnum" >{{ value.mrestore }}</td>
-                        <td class="tdnum" >{{ value.mblock }}</td>
-                        <td class="tdnum" >{{ value.munblock }}</td>
-                        <td class="tdnum" >{{ value.mprotect }}</td>
-                        <td class="tdnum" >{{ value.munprotect }}</td>
-                        <td class="tdnum" >{{ value.mimport }}</td>
-                        <td class="tdnum" >{{ value.mrights }}</td>
-                    </tr>
-                    {% endfor %}
-
-                </table>
-            </div>
+<div class="panel panel-primary">
+    <header class="panel-heading">
+        <div class="text-center xt-heading-top">
+            <a class="back-to-search" href="{{ path('adminstats') }}">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                {{ msg('back') }}
+            </a>
+            <a target="_blank" href="{{ project_url }}">{{ project }}</a>
+            <small>
+                &bull;
+                {{ start_date }}
+                &mdash;
+                {{ end_date }}
+            </small>
         </div>
+    </header>
+
+    <div class="panel-body xt-panel-body">
+        {% set content %}
+            <dl class="col-lg-12 dl-horizontal stat-list clearfix">
+                <dt>{{ msg('start') }}</dt>
+                <dd>{{ start_date }} ({{ days }} {{ msg("days", [days]) }})</dd>
+                <dt>{{ msg('log_types') }}</dt>
+                <dd>delete, block, protect, import, rights</dd>
+                <dt>{{ msg('current_admins') }}</dt>
+                <dd>{{ group_link('sysop', project_url, adminCount) }}</dd>
+                <dt>{{ msg('admins_without_action') }}</dt>
+                <dd>{{ adminsWithoutAction }} ({{ admins_without_action_pct }}%)</dd>
+            </dl>
+        {% endset %}
+        {{ layout.content_block('generalstats', content) }}
+
+        <div style="clear:both"></div>
+
+        {% set content %}
+            <table class="table table-bordered table-hover table-striped top-editors-table">
+                <thead><tr>
+                    <th>#</th>
+                    {% for key in ['username', 'groups', 'links', 'total', 'delete', 'restore', 're_block', 'unblock', 're_protect', 'unprotect', 'import', 'rights'] %}
+                        <th>
+                            <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
+                                {{ msg(key) | capitalize_first }}
+                                {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
+                            </span>
+                        </th>
+                    {% endfor %}
+                </tr></thead>
+                <tbody>
+                    {% for key,value in users %}
+                        {% set username = value.user_name %}
+                        <tr>
+                            <td>{{ loop.index }}.</td>
+                            <td class="sort-entry--username" data-value="{{ username }}">
+                                {{ user_link(username, project_url) }}
+                            </td>
+                            <td class="sort-entry--groups" data-value="{{ value.groups }}">{{ value.groups }}</td>
+                            <td>
+                                <a title="Edit Counter" href="{{ link("/ec/"~project~"/"~username) }}" >ec</a>
+                                &middot;
+                                {% if isWMFLabs() %}
+                                    <a title="Global User Contributions" href="//tools.wmflabs.org/guc/?user={{ username|e }}" >guc</a> &middot;
+                                {% endif %}
+                                <a title="Log" href="//en.wikipedia.org/w/index.php?title=Special:Log&user={{ username }} " >log</a>
+                            </td>
+                            <td class="sort-entry--total" data-value="{{ value.mtotal }}">{{ value.mtotal }}</td>
+                            <td class="sort-entry--delete" data-value="{{ value.mdelete }}">{{ value.mdelete }}</td>
+                            <td class="sort-entry--restore" data-value="{{ value.mrestore }}">{{ value.mrestore }}</td>
+                            <td class="sort-entry--re_block" data-value="{{ value.mblock }}">{{ value.mblock }}</td>
+                            <td class="sort-entry--groups" data-value="{{ value.munblock }}">{{ value.munblock }}</td>
+                            <td class="sort-entry--re_protect" data-value="{{ value.mprotect }}">{{ value.mprotect }}</td>
+                            <td class="sort-entry--unprotect" data-value="{{ value.munprotect }}">{{ value.munprotect }}</td>
+                            <td class="sort-entry--import" data-value="{{ value.mimport }}">{{ value.mimport }}</td>
+                            <td class="sort-entry--rights" data-value="{{ value.mrights }}">{{ value.mrights }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endset %}
+        {{ layout.content_block('summary', content) }}
     </div>
+</div>
 {% endblock %}

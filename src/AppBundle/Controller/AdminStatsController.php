@@ -166,14 +166,14 @@ class AdminStatsController extends Controller
         $user_groups_table = $lh->getTable("user_groups", $dbName);
         $ufg_table = $lh->getTable("user_former_groups");
         $query = "
-    Select ug_user as user_id
-    FROM $user_groups_table
-    WHERE ug_group = 'sysop'
-    UNION
-    SELECT ufg_user as user_id
-    FROM $ufg_table
-    WHERE ufg_group = 'sysop'
-    ";
+            SELECT ug_user AS user_id
+            FROM $user_groups_table
+            WHERE ug_group = 'sysop'
+            UNION
+            SELECT ufg_user AS user_id
+            FROM $ufg_table
+            WHERE ufg_group = 'sysop'
+            ";
 
         $res = $conn->prepare($query);
         $res->execute();
@@ -193,27 +193,25 @@ class AdminStatsController extends Controller
 
         // TODO: Fix this - inactive admins aren't getting shown
         $query = "
-    SELECT user_name, user_id
-    ,SUM(IF( (log_type='delete'  AND log_action != 'restore'),1,0)) as mdelete
-    ,SUM(IF( (log_type='delete'  AND log_action  = 'restore'),1,0)) as mrestore
-    ,SUM(IF( (log_type='block'   AND log_action != 'unblock'),1,0)) as mblock
-    ,SUM(IF( (log_type='block'   AND log_action  = 'unblock'),1,0)) as munblock
-    ,SUM(IF( (log_type='protect' AND log_action !='unprotect'),1,0)) as mprotect
-    ,SUM(IF( (log_type='protect' AND log_action  ='unprotect'),1,0)) as munprotect
-    ,SUM(IF( log_type='rights',1,0)) as mrights
-    ,SUM(IF( log_type='import',1,0)) as mimport
-    ,SUM(IF(log_type !='',1,0)) as mtotal
-    FROM $loggingTable
-    JOIN $userTable ON user_id = log_user
-    WHERE  log_timestamp > '$start' AND log_timestamp <= '$end'
-      AND log_type IS NOT NULL
-      AND log_action IS NOT NULL
-      AND log_type in ('block', 'delete', 'protect', 'import', 'rights')
-    GROUP BY user_name
-    HAVING mdelete > 0 OR user_id in ($adminIds)
-    ORDER BY mtotal DESC
-
-    ";
+            SELECT user_name, user_id
+            ,SUM(IF( (log_type='delete'  AND log_action != 'restore'),1,0)) AS mdelete
+            ,SUM(IF( (log_type='delete'  AND log_action  = 'restore'),1,0)) AS mrestore
+            ,SUM(IF( (log_type='block'   AND log_action != 'unblock'),1,0)) AS mblock
+            ,SUM(IF( (log_type='block'   AND log_action  = 'unblock'),1,0)) AS munblock
+            ,SUM(IF( (log_type='protect' AND log_action !='unprotect'),1,0)) AS mprotect
+            ,SUM(IF( (log_type='protect' AND log_action  ='unprotect'),1,0)) AS munprotect
+            ,SUM(IF( log_type='rights',1,0)) AS mrights
+            ,SUM(IF( log_type='import',1,0)) AS mimport
+            ,SUM(IF(log_type !='',1,0)) AS mtotal
+            FROM $loggingTable
+            JOIN $userTable ON user_id = log_user
+            WHERE  log_timestamp > '$start' AND log_timestamp <= '$end'
+              AND log_type IS NOT NULL
+              AND log_action IS NOT NULL
+              AND log_type IN ('block', 'delete', 'protect', 'import', 'rights')
+            GROUP BY user_name
+            HAVING mdelete > 0 OR user_id IN ($adminIds)
+            ORDER BY mtotal DESC";
 
         $res = $conn->prepare($query);
         $res->execute();
@@ -249,11 +247,9 @@ class AdminStatsController extends Controller
             "adminStats/result.html.twig",
             [
                 'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
-                "xtPage" => "adminstats",
-                "xtPageTitle" => "tool_adminstats",
-                "xtSubtitle" => "tool_adminstats_desc",
+                'xtPage' => 'adminstats',
 
-                'url' => $url,
+                'project_url' => $url,
                 'project' => $project,
                 'wikiName' => $wikiName,
 
