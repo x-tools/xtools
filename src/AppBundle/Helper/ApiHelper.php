@@ -141,66 +141,40 @@ class ApiHelper extends HelperBase
 
     public function getAdmins($project)
     {
-
-        $this->setUp($project);
+        $params = [
+            'list' => 'allusers',
+            'augroup' => 'sysop|bureaucrat|steward|oversight|checkuser',
+            'auprop' => 'groups|editcount',
+            'aulimit' => '500',
+        ];
 
         $result = [];
+        $admins = $this->massApi($params, $project, 'allusers', 'aufrom')['allusers'];
 
-        try {
-            $continue = true;
-            $i=0;
-            while ($continue) {
-                $query = new SimpleRequest(
-                    'query',
-                    [
-                        "list" => "allusers",
-                        "augroup" => "sysop|bureaucrat|steward|oversight|checkuser",
-                        "auprop" => "groups|editcount",
-                        "aufrom" => ($i > 0 ? $continue : ""),
-                        "aulimit" => "500"
-                    ]
-                );
-                $res = $this->api->getRequest($query);
-                $apiret2 = $res["query"]["allusers"];
-                $continue = false;
-                if (isset($res['query-continue'])) {
-                    $continue = $res['query-continue']['allusers']['aufrom'];
-                }
-                if (is_array($apiret2)) {
-                    foreach ($apiret2 as $u => $obj) {
-                        $groups= array();
-                        if (in_array("sysop", $obj["groups"])) {
-                            $groups[] = "A";
-                        }
-                        if (in_array("bureaucrat", $obj["groups"])) {
-                            $groups[] = "B";
-                        }
-                        if (in_array("steward", $obj["groups"])) {
-                            $groups[] = "S" ;
-                        }
-                        if (in_array("checkuser", $obj["groups"])) {
-                            $groups[] = "CU";
-                        }
-                        if (in_array("oversight", $obj["groups"])) {
-                            $groups[] = "OS";
-                        }
-                        if (in_array("bot", $obj["groups"])) {
-                            $groups[] = "Bot";
-                        }
-                        $result[ $obj["name"] ] = array(
-                            "editcount" => $obj["editcount"],
-                            "groups" => implode('/', $groups)
-                        );
-                    }
-                }
-
-                $i++;
-                if ($i>20) {
-                    break;
-                }
+        foreach ($admins as $admin) {
+            $groups = [];
+            if (in_array("sysop", $admin["groups"])) {
+                $groups[] = "A";
             }
-        } catch (Exception $e) {
-            // The api returned an error!  Ignore
+            if (in_array("bureaucrat", $admin["groups"])) {
+                $groups[] = "B";
+            }
+            if (in_array("steward", $admin["groups"])) {
+                $groups[] = "S" ;
+            }
+            if (in_array("checkuser", $admin["groups"])) {
+                $groups[] = "CU";
+            }
+            if (in_array("oversight", $admin["groups"])) {
+                $groups[] = "OS";
+            }
+            if (in_array("bot", $admin["groups"])) {
+                $groups[] = "Bot";
+            }
+            $result[ $admin["name"] ] = [
+                "editcount" => $admin["editcount"],
+                "groups" => implode('/', $groups)
+            ];
         }
 
         return $result;
@@ -427,7 +401,7 @@ class ApiHelper extends HelperBase
      *                                    and expected to return the data we want to concatentate.
      * @param  string      [$continueKey] the key to look in the continue hash, if present
      *                                    (e.g. 'cmcontinue' for API:Categorymembers)
-     * @param  integer     $limit         max number of pages to fetch
+     * @param  integer     [$limit]       Max number of pages to fetch
      * @return array                      Associative array with data
      */
     public function massApi($params, $project, $dataKey, $continueKey = 'continue', $limit = 5000)
@@ -496,7 +470,7 @@ class ApiHelper extends HelperBase
                 $isFinished = count($data['resolveData']['pages']) >= $data['limit'];
             } else {
                 // append new data to data from last request. We might want both 'pages' and dataKey
-                if ($result['query']['pages']) {
+                if (isset($result['query']['pages'])) {
                     $data['resolveData']['pages'] = array_merge(
                         $data['resolveData']['pages'],
                         $result['query']['pages']
