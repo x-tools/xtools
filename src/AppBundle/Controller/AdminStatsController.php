@@ -234,23 +234,44 @@ class AdminStatsController extends Controller
         }
 
         // Pull the admins from the API, for merging.
-        $data = $api->getAdmins($project);
+        $admins = $api->getAdmins($project);
 
         // Combine the two arrays.  We can't use array_merge here because
         // the arrays contain fundamentally different data.  Instead, it's
         // done by hand.  Only two values are needed, edit count and groups.
         foreach ($users as $key => $value) {
-            // FIXME: workaround to get the page just to show some data,
-            //  since the API only returns 500 results and the admin returned
-            //  by the query may not have been returned by the API
-            if (empty($data[$value["user_name"]])) {
-                $data[$value["user_name"]] = [
+            $username = $value["user_name"];
+
+            if (empty($admins[$username])) {
+                $admins[$username] = [
                     'editcount' => 0,
                     'groups' => '',
                 ];
             }
-            $users[$key]["edit_count"] = $data[$value["user_name"]]["editcount"];
-            $users[$key]["groups"] = $data[$value["user_name"]]["groups"];
+            $users[$key]["edit_count"] = $admins[$username]["editcount"];
+            $users[$key]["groups"] = $admins[$username]["groups"];
+
+            unset($admins[$username]);
+        }
+
+        // push any inactive admins back to $users with zero values
+        if (count($admins)) {
+            foreach ( $admins as $username => $stats ) {
+                $users[] = [
+                    'user_name' => $username,
+                    'editcount' => 0,
+                    'mdelete' => 0,
+                    'mrestore' => 0,
+                    'mblock' => 0,
+                    'munblock' => 0,
+                    'mprotect' => 0,
+                    'munprotect' => 0,
+                    'mrights' => 0,
+                    'mimport' => 0,
+                    'mtotal' => 0,
+                    'groups' => $stats['groups'],
+                ];
+            }
         }
 
         // Render the result!
