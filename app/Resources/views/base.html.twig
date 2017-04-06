@@ -132,19 +132,11 @@
 <main id="content" class="clearfix">
     {% block title %}
     <div class="col-lg-8 col-lg-offset-2">
-        {# if xtPageTitle is defined %}
-            <h3>
-                {{ xtPageTitle }}
-                {% if xtSubtitle is defined %}
-                    <small style="color:inherit"> &nbsp;&bull;&nbsp; {{ xtSubtitle }}</small>
-                {% endif %}
-            </h3>
-        {% endif #}
         {% if xtPageTitle is defined %}
-            <h2>
+            <h2 class="xt-page-title">
                 {{ msg(xtPageTitle) }}
                 {% if xtSubtitle is defined %}
-                    <small> &nbsp;&bull;&nbsp; {{ msg(xtSubtitle) }}</small>
+                    <small>{{ msg(xtSubtitle) }}</small>
                 {% endif %}
             </h2>
         {% endif %}

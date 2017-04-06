@@ -71,6 +71,13 @@ body {
     top: 2px;
 }
 
+.xt-page-title {
+    & > small::before {
+        content: '\2022';
+        margin-right: 10px;
+    }
+}
+
 .tooltipcss {
     position: inherit;
 
@@ -481,6 +488,10 @@ div.outer_bar {
 }
 
 @media (max-width: $bootstrap-sm) {
+    .app-footer {
+        position: relative;
+    }
+
     .stat-list {
         padding: 0;
     }
@@ -529,6 +540,45 @@ div.outer_bar {
 
     .xt-toc {
         display: none;
+    }
+
+    // FORMS
+    .xt-page-title {
+        & > small {
+            display: block;
+            padding: 3px 0 10px;
+
+            &::before {
+                display: none;
+            }
+        }
+    }
+    .input-group {
+        margin-bottom: 15px;
+        width: 100%;
+
+        .tooltipcss {
+            display: none;
+        }
+
+        input[type=text] {
+            border-radius: 0 !important;
+        }
+    }
+    .input-group-addon {
+        background: transparent;
+        border: 0;
+        display: block;
+        padding: 0;
+
+        &:first-child {
+            font-weight: bold;
+        }
+
+        &:last-child {
+            clear: both;
+            padding-top: 5px;
+        }
     }
 
     // FIXME: eventually will create a pop-out nav from the right

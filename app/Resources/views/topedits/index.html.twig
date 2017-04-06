@@ -4,7 +4,7 @@
 {% block body %}
     <form class="col-lg-8 col-lg-offset-2" action="{{ path("topedits") }}" method="get" accept-charset="utf-8" >
         <fieldset class="form-fieldset">
-            {{ forms.user_input(false, true) }}
+            {{ forms.user_input() }}
             {{ forms.wiki_input() }}
             {{ forms.namespace_select() }}
             {{ forms.page_input(false) }}
