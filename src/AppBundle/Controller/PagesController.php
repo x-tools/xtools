@@ -61,7 +61,7 @@ class PagesController extends Controller
 
         // Retrieving the global groups, using the ApiHelper class
         $api = $this->get("app.api_helper");
-        $namespaces = $api->namespaces("http://localhost/~wiki");
+        // $namespaces = $api->namespaces("enwiki"); // FIXME
 
         // Otherwise fall through.
         return $this->render('pages/index.html.twig', [
@@ -69,8 +69,7 @@ class PagesController extends Controller
             "xtSubtitle" => "tool_pages_desc",
             'xtPage' => "pages",
             'xtTitle' => "tool_pages",
-
-            'namespaces' => $namespaces,
+            // 'namespaces' => $namespaces,
             'project' => $project,
         ]);
     }
@@ -105,7 +104,7 @@ class PagesController extends Controller
 
         // Prepare the query and execute
         $resultQuery = $conn->prepare("
-			SELECT 'id' as source, user_id as value FROM $userTable WHERE user_name = :username
+			SELECT 'id' AS source, user_id AS value FROM $userTable WHERE user_name = :username
             ");
 
         $resultQuery->bindParam("username", $username);
@@ -144,27 +143,27 @@ class PagesController extends Controller
         }
 
         $stmt = "
-            (SELECT DISTINCT page_namespace as namespace, 'rev' as type, page_title as page_title,
-            page_is_redirect as page_is_redirect, rev_timestamp as timestamp, rev_user, rev_user_text
+            (SELECT DISTINCT page_namespace AS namespace, 'rev' AS type, page_title AS page_title,
+            page_is_redirect AS page_is_redirect, rev_timestamp AS timestamp, rev_user, rev_user_text
             FROM $pageTable
-            JOIN $revisionTable on page_id = rev_page
+            JOIN $revisionTable ON page_id = rev_page
             WHERE  $whereRev  AND rev_parent_id = '0'  $namespaceConditionRev  $redirectCondition
             )
-    
+
             UNION
-    
-            (SELECT  a.ar_namespace as namespace, 'arc' as type, a.ar_title as page_title,
-            '0' as page_is_redirect, min(a.ar_timestamp) as timestamp , a.ar_user as rev_user,
-            a.ar_user_text as rev_user_text
+
+            (SELECT  a.ar_namespace AS namespace, 'arc' AS type, a.ar_title AS page_title,
+            '0' AS page_is_redirect, min(a.ar_timestamp) AS timestamp , a.ar_user AS rev_user,
+            a.ar_user_text AS rev_user_text
             FROM $archiveTable a
             JOIN
              (
-              Select b.ar_namespace, b.ar_title
-              FROM $archiveTable as b
-              LEFT JOIN $logTable on log_namespace = b.ar_namespace and log_title = b.ar_title
-                AND log_user = b.ar_user and (log_action = 'move' or log_action = 'move_redir')
-              WHERE  $whereArc AND b.ar_parent_id = '0' $namespaceConditionArc and log_action is null
-             ) AS c on c.ar_namespace= a.ar_namespace and c.ar_title = a.ar_title
+              SELECT b.ar_namespace, b.ar_title
+              FROM $archiveTable AS b
+              LEFT JOIN $logTable ON log_namespace = b.ar_namespace AND log_title = b.ar_title
+                AND log_user = b.ar_user AND (log_action = 'move' or log_action = 'move_redir')
+              WHERE  $whereArc AND b.ar_parent_id = '0' $namespaceConditionArc AND log_action IS NULL
+             ) AS c ON c.ar_namespace= a.ar_namespace AND c.ar_title = a.ar_title
             GROUP BY a.ar_namespace, a.ar_title
             HAVING  $having
             )
@@ -231,15 +230,13 @@ class PagesController extends Controller
 
         // Retrieving the namespaces, using the ApiHelper class
         $api = $this->get("app.api_helper");
-        $namespaces = $api->namespaces($url);
+        $namespaces = $api->namespaces($project);
 
         // Assign the values and display the template
         return $this->render('pages/result.html.twig', [
-            'xtTitle' => "tool_pages",
             'xtPage' => "pages",
-            "xtPageTitle" => "tool_pages",
-            "xtSubtitle" => "tool_pages_desc",
-            'url' => $url,
+            'project' => $project,
+            'project_url' => $url,
 
             'project' => $project,
             'username' => $username,

@@ -20,6 +20,10 @@
             max-height: 250px;
             max-width: 250px;
         }
+
+        .color-icon {
+            vertical-align: -4px;
+        }
     }
 
     .year-count-charts {
@@ -50,7 +54,6 @@
 
         .color-icon {
             margin-right: 5px;
-            vertical-align: -2px;
         }
     }
 
@@ -80,10 +83,6 @@
             // effectively sets a min-height, but allows .strips to have percentage height
             height: 30px;
             padding: 0;
-        }
-
-        .color-icon {
-            vertical-align: -2px;
         }
 
         .stripes {

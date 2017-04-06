@@ -19,7 +19,7 @@
 
     <div class="panel-body xt-panel-body" >
         <p class="text-center xt-heading-subtitle">
-            {{ wiki_log_link('User:'~username, project_url, msg('block_log'), 'block') }}
+            {{ user_log_link(username, project_url, msg('block_log'), 'block') }}
             &middot;
             <a href="{{ path('EditCounterResult', {project:project, username:username}) }}" >{{ msg('tool_ec') }}</a>
             {% if not isSingleWiki() %}
