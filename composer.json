@@ -38,7 +38,9 @@
         "addwiki/mediawiki-api": "^0.7",
         "symfony/assetic-bundle": "^2.8",
         "leafo/scssphp": "^0.6",
-        "symfony/cache": "^3.2"
+        "symfony/cache": "^3.2",
+        "snc/redis-bundle": "^2.0",
+        "predis/predis": "^1.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",

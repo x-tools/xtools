@@ -39,7 +39,15 @@ framework:
     assets: ~
     cache:
         app: "cache.adapter.%cache.adapter%"
-        default_redis_provider: "%cache.redis_dsn%"
+        default_redis_provider: snc_redis.default
+
+# Redis configuration.
+snc_redis:
+    clients:
+        default:
+            type: predis
+            alias: default
+            dsn: "%cache.redis_dsn%"
 
 # Twig Configuration
 twig:
