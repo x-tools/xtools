@@ -24,7 +24,7 @@ class ApiHelper extends HelperBase
     protected $cache;
 
     /** @var ContainerInterface */
-    private $container;
+    protected $container;
 
     public function __construct(ContainerInterface $container, LabsHelper $labsHelper)
     {
@@ -144,7 +144,7 @@ class ApiHelper extends HelperBase
         $params = [
             'list' => 'allusers',
             'augroup' => 'sysop|bureaucrat|steward|oversight|checkuser',
-            'auprop' => 'groups|editcount',
+            'auprop' => 'groups',
             'aulimit' => '500',
         ];
 
@@ -172,7 +172,6 @@ class ApiHelper extends HelperBase
                 $groups[] = "Bot";
             }
             $result[ $admin["name"] ] = [
-                "editcount" => $admin["editcount"],
                 "groups" => implode('/', $groups)
             ];
         }

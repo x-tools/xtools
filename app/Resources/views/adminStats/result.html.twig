@@ -21,18 +21,30 @@
 
     <div class="panel-body xt-panel-body">
         {% set content %}
-            <dl class="col-lg-12 dl-horizontal stat-list clearfix">
-                <dt>{{ msg('start') }}</dt>
-                <dd>{{ start_date }} ({{ days }} {{ msg("days", [days | number_format]) }})</dd>
-                <dt>{{ msg('log_types') }}</dt>
-                <dd>delete, block, protect, import, rights</dd>
-                <dt>{{ msg('current_admins') }}</dt>
-                <dd>{{ group_link('sysop', project_url, adminCount | number_format) }}</dd>
-                <dt>{{ msg('admins_without_action') }}</dt>
-                <dd>{{ adminsWithoutAction | number_format }} ({{ admins_without_action_pct | percent_format }})</dd>
-                <dt>{{ msg('non_admins_with_actions') }}</dt>
-                <dd>{{ (usersCount - adminCount) | number_format }}</dd>
-            </dl>
+            <div class="col-lg-12 stat-list">
+                <table class="table"><tbody>
+                    <tr>
+                        <td>{{ msg('start') }}</td>
+                        <td>{{ start_date }} ({{ days }} {{ msg("days", [days | number_format]) }})</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('log_types') }}</td>
+                        <td>delete, block, protect, import, rights</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('current_admins') }}</td>
+                        <td>{{ group_link('sysop', project_url, adminCount | number_format) }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('admins_without_action') }}</td>
+                        <td>{{ adminsWithoutAction | number_format }} ({{ admins_without_action_pct | percent_format }})</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('non_admins_with_actions') }}</td>
+                        <td>{{ (usersCount - adminCount) | number_format }}</td>
+                    </tr>
+                </tbody></table>
+            </div>
         {% endset %}
         {{ layout.content_block('generalstats', content) }}
 

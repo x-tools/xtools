@@ -192,16 +192,16 @@ class AdminStatsController extends Controller
 
         // TODO: Fix this - inactive admins aren't getting shown
         $query = "
-            SELECT user_name, user_id
-            ,SUM(IF( (log_type='delete'  AND log_action != 'restore'),1,0)) AS mdelete
-            ,SUM(IF( (log_type='delete'  AND log_action  = 'restore'),1,0)) AS mrestore
-            ,SUM(IF( (log_type='block'   AND log_action != 'unblock'),1,0)) AS mblock
-            ,SUM(IF( (log_type='block'   AND log_action  = 'unblock'),1,0)) AS munblock
-            ,SUM(IF( (log_type='protect' AND log_action !='unprotect'),1,0)) AS mprotect
-            ,SUM(IF( (log_type='protect' AND log_action  ='unprotect'),1,0)) AS munprotect
-            ,SUM(IF( log_type='rights',1,0)) AS mrights
-            ,SUM(IF( log_type='import',1,0)) AS mimport
-            ,SUM(IF(log_type !='',1,0)) AS mtotal
+            SELECT user_name, user_id,
+                SUM(IF( (log_type='delete'  AND log_action != 'restore'),1,0)) AS mdelete,
+                SUM(IF( (log_type='delete'  AND log_action  = 'restore'),1,0)) AS mrestore,
+                SUM(IF( (log_type='block'   AND log_action != 'unblock'),1,0)) AS mblock,
+                SUM(IF( (log_type='block'   AND log_action  = 'unblock'),1,0)) AS munblock,
+                SUM(IF( (log_type='protect' AND log_action !='unprotect'),1,0)) AS mprotect,
+                SUM(IF( (log_type='protect' AND log_action  ='unprotect'),1,0)) AS munprotect,
+                SUM(IF( log_type='rights',1,0)) AS mrights,
+                SUM(IF( log_type='import',1,0)) AS mimport,
+                SUM(IF(log_type !='',1,0)) AS mtotal
             FROM $loggingTable
             JOIN $userTable ON user_id = log_user
             WHERE  log_timestamp > '$startDb' AND log_timestamp <= '$endDb'
@@ -234,11 +234,9 @@ class AdminStatsController extends Controller
 
             if (empty($admins[$username])) {
                 $admins[$username] = [
-                    'editcount' => 0,
                     'groups' => '',
                 ];
             }
-            $users[$key]["edit_count"] = $admins[$username]["editcount"];
             $users[$key]["groups"] = $admins[$username]["groups"];
 
             if ($users[$key]["mtotal"] === 0) {
@@ -253,7 +251,6 @@ class AdminStatsController extends Controller
             foreach ($admins as $username => $stats) {
                 $users[] = [
                     'user_name' => $username,
-                    'editcount' => 0,
                     'mdelete' => 0,
                     'mrestore' => 0,
                     'mblock' => 0,
