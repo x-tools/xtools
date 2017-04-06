@@ -53,141 +53,209 @@
 
         {# ======================== GENERAL STATS ======================== #}
         {% set content %}
-            <dl class="col-lg-6 dl-horizontal stat-list clearfix">
-                <dt>ID</dt>
-                <dd>
-                    <a target="_blank" href="{{ project_url }}/w/index.php?action=info&title={{ title }}">{{ id }}</a>
-                </dd>
-                {% if wikidataId is defined %}
-                    <dt>Wikidata ID</dt>
-                    <dd>
-                        <a target="_blank" href="https://www.wikidata.org/wiki/{{ wikidataId }}">{{ wikidataId }}</a>
-                        &middot;
-                        {{ msg('num_sitelinks', [numWikidataItems | number_format, numWikidataItems]) }}
-                    </dd>
-                {% endif %}
-                <dt>{{ msg('pagesize') }}</dt>
-                <dd>{{ msg('num_bytes', [length | number_format, length]) }}</dd>
-                <dt>{{ msg('totaledits') }}</dt>
-                <dd>{{ general.revision_count | number_format }}</dd>
-                <dt>
-                    <a class="rm-inline-margin" href="#usertable">{{ msg('editorcount') }}</a>
-                </dt>
-                <dd>{{ general.editor_count | number_format }}</dd>
-                {% if assessments is defined %}
-                    <dt>
-                        <a class="rm-inline-margin" href="#assessments">{{ msg('assessment') }}</a>
-                    </dt>
-                    <dd>
-                        {% set assessment_value %}
-                            {% if assessments.assessment.badge is defined %}
-                                <img alt="{{ assessments.assessment.value }}" src="{{ assessments.assessment.badge }}" class="assessment-badge" />
-                            {% else %}
-                                {{ assessments.assessment.value }}
-                            {% endif %}
-                        {% endset %}
-                        {{ wiki_link(assessments.assessment.category, project_url, assessment_value) }}
-                    </dd>
-                {% endif %}
-            </dl>
-            <dl class="col-lg-6 dl-horizontal stat-list clearfix">
-                <dt>{{ msg('firstedit') }}</dt>
-                <dd>
-                    {{ diff_link(general.first_edit.revid, project_url, general.datetime_first_edit) }}
-                    &bull;
-                    {{ user_link(general.first_edit.user, project_url) }}
-                    &bull;
-                    {{ general.first_edit.size | diff_format }}
-                </dd>
-                <dt>{{ msg('latestedit') }}</dt>
-                <dd>
-                    {{ diff_link(general.last_edit.revid, project_url, general.datetime_last_edit.timestamp) }}
-                    &bull;
-                    {{ user_link(general.last_edit.user, project_url) }}
-                    &bull;
-                    {{ general.last_edit.size | diff_format }}
-                </dd>
-                <dt>{{ msg('maxadd') }}</dt>
-                <dd>
-                    {{ diff_link(general.max_add.revid, project_url, general.max_add.timestamp) }}
-                    &bull;
-                    {{ user_link(general.max_add.user, project_url) }}
-                    &bull;
-                    {{ general.max_add.size | diff_format }}
-                </dd>
-                <dt>{{ msg('maxdel') }}</dt>
-                <dd>
-                    {{ diff_link(general.max_del.revid, project_url, general.max_del.timestamp) }}
-                    &bull;
-                    {{ user_link(general.max_del.user, project_url) }}
-                    &bull;
-                    {{ general.max_del.size | diff_format }}
-                </dd>
-            </dl>
-            <dl class="col-lg-6 dl-horizontal stat-list clearfix" style="clear:both">
-                <dt>{{ msg('minoredits') }}</dt>
-                <dd>{{ general.minor_count | number_format }} &middot; ({{ general.minor_percentage }}%)</dd>
-                <dt>{{ msg('anonedits') }}</dt>
-                <dd>{{ general.anon_count | number_format }} &middot; ({{ general.anon_percentage }}%)</dd>
-                <dt>{{ msg('botedits') }}</dt>
-                <dd>{{ general.bot_revision_count | number_format }} &middot; ({{ general.bot_percentage }}%)</dd>
-                <dt>
-                    <a class="rm-inline-margin" href="#autoedits">{{ msg('autoedits') }}</a>
-                </dt>
-                <dd>{{ general.automated_count | number_format }}</dd>
-                <dt>{{ msg('reverted') }}</dt>
-                <dd>{{ general.revert_count | number_format }}</dd>
-                <dt>{{ msg('avg_timebwedits_sign') }}</dt>
-                <dd>{{ general.average_days_per_edit }} {{ msg('days', [general.average_days_per_edit]) }}</dd>
-                <dt>{{ msg('editsperuser') }}</dt>
-                <dd>{{ general.edits_per_editor | number_format(1) }}</dd>
-                <dt>{{ msg('editsperday') }}</dt>
-                <dd>{{ general.edits_per_day }}</dd>
-                <dt>{{ msg('editspermonth') }}</dt>
-                <dd>{{ general.edits_per_month | number_format(1) }}</dd>
-                <dt>{{ msg('editsperyear') }}</dt>
-                <dd>{{ general.edits_per_year | number_format(1) }}</dd>
-                <dt>{{ msg('lastday') }}</dt>
-                <dd>{{ general.count_history.day | number_format }}</dd>
-                <dt>{{ msg('lastweek') }}</dt>
-                <dd>{{ general.count_history.week | number_format }}</dd>
-                <dt>{{ msg('lastmonth') }}</dt>
-                <dd>{{ general.count_history.month | number_format }}</dd>
-                <dt>{{ msg('lastyear') }}</dt>
-                <dd>{{ general.count_history.year | number_format }}</dd>
-                <dt>{{ msg('toptencount') }}</dt>
-                <dd>{{ general.top_ten_count | number_format }} &middot; ({{ general.top_ten_percentage }}%)</dd>
-            </dl>
-            <dl class="col-lg-6 dl-horizontal stat-list clearfix">
-                <dt>{{ msg('links_in') }}</dt>
-                <dd>
-                    <a target="_blank" href="{{ project_url }}/w/index.php?title=Special:WhatLinksHere/{{ title }}&hidetrans=1">{{ links_in_count | number_format }}</a>
-                </dd>
-                <dt>{{ msg('redirects') }}</dt>
-                <dd>
-                    <a target="_blank" href="{{ project_url }}/w/index.php?title=Special:WhatLinksHere/{{ title }}&hidetrans=1&hidelinks=1">{{ redirects_count | number_format }}</a>
-                </dd>
-                <dt>{{ msg('links_out') }}</dt>
-                <dd>{{ links_out_count | number_format }}</dd>
-                <dt>{{ msg('links_ext') }}</dt>
-                <dd>{{ links_ext_count | number_format }}</dd>
-                <dt>{{ msg('pagewatchers') }}</dt>
-                <dd>{{ watchers }}</dd>
-                {% if isWMFLabs() %}
-                <dt>{{ msg('pageviews') }} (60 {{ msg('days', [60]) }})</dt>
-                <dd>
-                    <a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project }}&pages={{ title }}&range=latest-{{ general.pageviews_offset }}">
-                        {{ general.pageviews | number_format }}
-                    </a>
-                </dd>
-                {% endif %}
-                {% if checkwiki_errors is defined %}
-                <dt style='margin-top:20px'>
-                    <a href='#bugs' class='rm-inline-margin'>{{ msg('bugs') }}</a>
-                </dt>
-                <dd style='margin-top:20px'>{{ checkwiki_errors | length }}</dd>
-                {% endif %}
-            </dl>
+            <div class="col-lg-6 stat-list clearfix">
+                <table class="table"><tbody>
+                    <tr>
+                        <td>ID</td>
+                        <td>
+                            <a target="_blank" href="{{ project_url }}/w/index.php?action=info&title={{ title }}">{{ id }}</a>
+                        </td>
+                    </tr>
+                    {% if wikidataId is defined %}
+                    <tr>
+                        <td>Wikidata ID</td>
+                        <td>
+                            <a target="_blank" href="https://www.wikidata.org/wiki/{{ wikidataId }}">{{ wikidataId }}</a>
+                            &middot;
+                            {{ msg('num_sitelinks', [numWikidataItems | number_format, numWikidataItems]) }}
+                        </td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td>{{ msg('pagesize') }}</td>
+                        <td>{{ msg('num_bytes', [length | number_format, length]) }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('totaledits') }}</td>
+                        <td>{{ general.revision_count | number_format }}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a class="rm-inline-margin" href="#usertable">{{ msg('editorcount') }}</a>
+                        </td>
+                        <td>{{ general.editor_count | number_format }}</td>
+                    </tr>
+                    {% if assessments is defined %}
+                        <tr>
+                            <td>
+                                <a class="rm-inline-margin" href="#assessments">{{ msg('assessment') }}</a>
+                            </td>
+                            <td>
+                                {% set assessment_value %}
+                                    {% if assessments.assessment.badge is defined %}
+                                        <img alt="{{ assessments.assessment.value }}" src="{{ assessments.assessment.badge }}" class="assessment-badge" />
+                                    {% else %}
+                                        {{ assessments.assessment.value }}
+                                    {% endif %}
+                                {% endset %}
+                                {{ wiki_link(assessments.assessment.category, project_url, assessment_value) }}
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    <tr>
+                        <td class="stat-list--new-group">{{ msg('minoredits') }}</td>
+                        <td class="stat-list--new-group">
+                            {{ general.minor_count | number_format }} &middot; ({{ general.minor_percentage }}%)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('anonedits') }}</td>
+                        <td>{{ general.anon_count | number_format }} &middot; ({{ general.anon_percentage }}%)</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('botedits') }}</td>
+                        <td>{{ general.bot_revision_count | number_format }} &middot; ({{ general.bot_percentage }}%)</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a class="rm-inline-margin" href="#autoedits">{{ msg('autoedits') }}</a>
+                        </td>
+                    </td>
+                    <td>{{ general.automated_count | number_format }}</td>
+                    <tr>
+                        <td>{{ msg('reverted') }}</td>
+                        <td>{{ general.revert_count | number_format }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('avg_timebwedits_sign') }}</td>
+                        <td>{{ general.average_days_per_edit }} {{ msg('days', [general.average_days_per_edit]) }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('editsperuser') }}</td>
+                        <td>{{ general.edits_per_editor | number_format(1) }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('editsperday') }}</td>
+                        <td>{{ general.edits_per_day }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('editspermonth') }}</td>
+                        <td>{{ general.edits_per_month | number_format(1) }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('editsperyear') }}</td>
+                        <td>{{ general.edits_per_year | number_format(1) }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('lastday') }}</td>
+                        <td>{{ general.count_history.day | number_format }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('lastweek') }}</td>
+                        <td>{{ general.count_history.week | number_format }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('lastmonth') }}</td>
+                        <td>{{ general.count_history.month | number_format }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('lastyear') }}</td>
+                        <td>{{ general.count_history.year | number_format }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('toptencount') }}</td>
+                        <td>{{ general.top_ten_count | number_format }} &middot; ({{ general.top_ten_percentage }}%)</td>
+                    </tr>
+                </tbody></table>
+            </div>
+            <div class="col-lg-6 stat-list clearfix">
+                <table class="table"><tbody>
+                    <tr>
+                        <td>{{ msg('firstedit') }}</td>
+                        <td>
+                            {{ diff_link(general.first_edit.revid, project_url, general.datetime_first_edit) }}
+                            &bull;
+                            {{ user_link(general.first_edit.user, project_url) }}
+                            &bull;
+                            {{ general.first_edit.size | diff_format }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('latestedit') }}</td>
+                        <td>
+                            {{ diff_link(general.last_edit.revid, project_url, general.datetime_last_edit.timestamp) }}
+                            &bull;
+                            {{ user_link(general.last_edit.user, project_url) }}
+                            &bull;
+                            {{ general.last_edit.size | diff_format }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('maxadd') }}</td>
+                        <td>
+                            {{ diff_link(general.max_add.revid, project_url, general.max_add.timestamp) }}
+                            &bull;
+                            {{ user_link(general.max_add.user, project_url) }}
+                            &bull;
+                            {{ general.max_add.size | diff_format }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('maxdel') }}</td>
+                        <td>
+                            {{ diff_link(general.max_del.revid, project_url, general.max_del.timestamp) }}
+                            &bull;
+                            {{ user_link(general.max_del.user, project_url) }}
+                            &bull;
+                            {{ general.max_del.size | diff_format }}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="stat-list--new-group">{{ msg('links_in') }}</td>
+                        <td class="stat-list--new-group">
+                            <a target="_blank" href="{{ project_url }}/w/index.php?title=Special:WhatLinksHere/{{ title }}&hidetrans=1">{{ links_in_count | number_format }}</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('redirects') }}</td>
+                        <td>
+                            <a target="_blank" href="{{ project_url }}/w/index.php?title=Special:WhatLinksHere/{{ title }}&hidetrans=1&hidelinks=1">{{ redirects_count | number_format }}</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('links_out') }}</td>
+                        <td>{{ links_out_count | number_format }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('links_ext') }}</td>
+                        <td>{{ links_ext_count | number_format }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('pagewatchers') }}</td>
+                        <td>{{ watchers }}</td>
+                    </tr>
+                    </tr>
+                    {% if isWMFLabs() %}
+                    <tr>
+                        <td>{{ msg('pageviews') }} (60 {{ msg('days', [60]) }})</td>
+                        <td>
+                            <a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project }}&pages={{ title }}&range=latest-{{ general.pageviews_offset }}">
+                                {{ general.pageviews | number_format }}
+                            </a>
+                        </td>
+                    </tr>
+                    {% endif %}
+
+                    {% if checkwiki_errors is defined %}
+                    <tr>
+                        <td class="stat-list--new-group"><a href='#bugs' class='rm-inline-margin'>{{ msg('bugs') }}</a></td>
+                        <td class="stat-list--new-group">{{ checkwiki_errors | length }}</td>
+                    </tr>
+                    {% endif %}
+                </tbody></table>
+            </div>
             <script>
                 var general = {{ general | json_encode() | raw }};
                 general.labels = {
@@ -390,7 +458,9 @@
             </script>
             <div class="year-count-charts clearfix">
                 <div class="chart-wrapper">
-                    <canvas id="year_count" height="400" width="800"></canvas>
+                    <div class="canvas-wrapper">
+                        <canvas id="year_count" height="400" width="800"></canvas>
+                    </div>
                     <span class="chart-legend" id="year_count_legend"></span>
                 </div>
             </div>

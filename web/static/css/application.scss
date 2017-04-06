@@ -369,13 +369,23 @@ div.outer_bar {
     }
 }
 
-.stat-list dt {
-    margin-right: 10px;
-    width: 300px;
+.stat-list > .table td {
+    border: 0;
+    padding-bottom: 0;
+    padding-top: 0;
 
-    &::after {
-        content: ':';
+    &:first-child {
+        font-weight: bold;
+        text-align: right;
+
+        &::after {
+            content: ':';
+        }
     }
+}
+
+.stat-list--new-group {
+    padding-top: 10px !important;
 }
 
 .diff-pos {
@@ -458,7 +468,48 @@ div.outer_bar {
     }
 }
 
+@media (max-width: $bootstrap-lg) {
+    .stat-list > .table td {
+        &:first-child {
+            width: 300px;
+        }
+    }
+}
+
+@media (max-width: $bootstrap-md) {
+
+}
+
 @media (max-width: $bootstrap-sm) {
+    .stat-list {
+        padding: 0;
+    }
+
+    .stat-list > .table td {
+        &:first-child {
+            display: block;
+            padding-top: 5px;
+            text-align: left;
+
+            &.stat-list--new-group {
+                padding-top: 15px !important;
+            }
+        }
+        &:last-child,
+        .stat-list--new-group {
+            display: block;
+            padding-top: 0 !important;
+        }
+    }
+
+    .back-to-search {
+        font-size: 0;
+
+        .glyphicon {
+            font-size: initial;
+        }
+    }
+
     .tool-links {
         clear: both;
         width: 100%;
