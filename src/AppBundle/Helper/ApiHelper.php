@@ -8,6 +8,7 @@ use Mediawiki\Api\SimpleRequest;
 use Mediawiki\Api\FluentRequest;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ApiHelper extends HelperBase
@@ -18,6 +19,12 @@ class ApiHelper extends HelperBase
 
     /** @var LabsHelper */
     private $labsHelper;
+
+    /** @var CacheItemPoolInterface */
+    protected $cache;
+
+    /** @var ContainerInterface */
+    protected $container;
 
     public function __construct(ContainerInterface $container, LabsHelper $labsHelper)
     {
@@ -30,7 +37,18 @@ class ApiHelper extends HelperBase
     {
         if (!isset($this->api)) {
             $projectInfo = $this->labsHelper->databasePrepare($project);
-            $this->api = MediawikiApi::newFromPage($projectInfo['url']);
+
+            try {
+                if (strpos($projectInfo["url"], "api.php") !== false) {
+                    $this->api = MediawikiApi::newFromApiEndpoint($projectInfo["url"]);
+                } else {
+                    $this->api = MediawikiApi::newFromPage($projectInfo['url']);
+                }
+            } catch (Exception $e) {
+                // Do nothing...
+            } catch (FatalErrorException $e) {
+                // Do nothing...
+            }
         }
     }
 
@@ -116,6 +134,46 @@ class ApiHelper extends HelperBase
             $this->cacheSave($cacheKey, $result, 'P7D');
         } catch (Exception $e) {
             // The api returned an error!  Ignore
+        }
+
+        return $result;
+    }
+
+    public function getAdmins($project)
+    {
+        $params = [
+            'list' => 'allusers',
+            'augroup' => 'sysop|bureaucrat|steward|oversight|checkuser',
+            'auprop' => 'groups',
+            'aulimit' => '500',
+        ];
+
+        $result = [];
+        $admins = $this->massApi($params, $project, 'allusers', 'aufrom')['allusers'];
+
+        foreach ($admins as $admin) {
+            $groups = [];
+            if (in_array("sysop", $admin["groups"])) {
+                $groups[] = "A";
+            }
+            if (in_array("bureaucrat", $admin["groups"])) {
+                $groups[] = "B";
+            }
+            if (in_array("steward", $admin["groups"])) {
+                $groups[] = "S" ;
+            }
+            if (in_array("checkuser", $admin["groups"])) {
+                $groups[] = "CU";
+            }
+            if (in_array("oversight", $admin["groups"])) {
+                $groups[] = "OS";
+            }
+            if (in_array("bot", $admin["groups"])) {
+                $groups[] = "Bot";
+            }
+            $result[ $admin["name"] ] = [
+                "groups" => implode('/', $groups)
+            ];
         }
 
         return $result;
@@ -342,7 +400,7 @@ class ApiHelper extends HelperBase
      *                                    and expected to return the data we want to concatentate.
      * @param  string      [$continueKey] the key to look in the continue hash, if present
      *                                    (e.g. 'cmcontinue' for API:Categorymembers)
-     * @param  integer     $limit         max number of pages to fetch
+     * @param  integer     [$limit]       Max number of pages to fetch
      * @return array                      Associative array with data
      */
     public function massApi($params, $project, $dataKey, $continueKey = 'continue', $limit = 5000)
@@ -411,7 +469,7 @@ class ApiHelper extends HelperBase
                 $isFinished = count($data['resolveData']['pages']) >= $data['limit'];
             } else {
                 // append new data to data from last request. We might want both 'pages' and dataKey
-                if ($result['query']['pages']) {
+                if (isset($result['query']['pages'])) {
                     $data['resolveData']['pages'] = array_merge(
                         $data['resolveData']['pages'],
                         $result['query']['pages']

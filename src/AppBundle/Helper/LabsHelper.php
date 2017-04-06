@@ -42,10 +42,9 @@ class LabsHelper
     }
 
     /**
-     * Set up LabsHelper::$client and return get the database name, wiki name, and URL of a given
+     * Set up LabsHelper::$client and return the database name, wiki name, and URL of a given
      * project.
      * @todo: Handle failure better
-     * @param string $project The project name (e.g. 'enwiki').
      * @return string[] With keys 'dbName', 'wikiName', and 'url'.
      */
     public function databasePrepare($project = 'wiki')
@@ -107,8 +106,10 @@ class LabsHelper
      * All mapping tables to environment-specific names, as specified in config/table_map.yml
      * Used for example to convert revision -> revision_replica
      * https://wikitech.wikimedia.org/wiki/Help:Tool_Labs/Database#Tables_for_revision_or_logging_queries_involving_user_names_and_IDs
-     * @param string $table Table name
+     *
+     * @param string $table  Table name
      * @param string $dbName Database name
+     *
      * @return string Converted table name
      */
     public function getTable($table, $dbName = null)
