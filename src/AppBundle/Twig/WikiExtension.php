@@ -33,6 +33,9 @@ class WikiExtension extends Extension
         ];
     }
 
+    // FIXME: make projectUrl globally accessible so we don't have to keep passing it in to these functions
+    //   Also do the same for the project language, and set lang= and dir= attributes accordingly
+
     /**
      * Get a link to the given page
      * @param  string $title      Title of page

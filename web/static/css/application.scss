@@ -15,6 +15,10 @@ body {
         display: block;
         min-height: 148px;
     }
+
+    &.rtl {
+        @import 'rtl.scss';
+    }
 }
 
 #wrapper {
@@ -411,24 +415,24 @@ div.outer_bar {
 }
 
 .sort-link {
-  @include prefix(user-select, none);
-  cursor: pointer;
+    @include prefix(user-select, none);
+    cursor: pointer;
 
-  .glyphicon {
-    top: 2px;
-    visibility: hidden;
-  }
-
-  .glyphicon-sort-by-alphabet,
-  .glyphicon-sort-by-alphabet-alt {
-    visibility: visible;
-  }
-
-  &:hover {
-    .glyphicon-sort {
-      visibility: visible;
+    .glyphicon {
+        top: 2px;
+        visibility: hidden;
     }
-  }
+
+    .glyphicon-sort-by-alphabet,
+    .glyphicon-sort-by-alphabet-alt {
+        visibility: visible;
+    }
+
+    &:hover {
+        .glyphicon-sort {
+            visibility: visible;
+        }
+    }
 }
 
 .assessment-badge {

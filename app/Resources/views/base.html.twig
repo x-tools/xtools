@@ -43,7 +43,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
-<body class="{{ xtPage }}">
+<body class="{{ xtPage }}{% if isRTL() %} rtl{% endif %}" >
 
 <header class="navbar navbar-default navbar-top" role="navigation">
     <button class="navbar-toggle collapsed pull-left" data-toggle="collapse" data-target=".tool-links" aria-expanded="false">
@@ -157,7 +157,7 @@
     </span>
     <hr>
     <div class="row">
-        <div class="col">
+        <div class="col footer-about">
             <span>
                 &copy; 2008-{{ year() }} &middot;
                 <a href="{{ path('aboutPage') }}">About these tools</a>  &middot;
@@ -166,7 +166,7 @@
             </span>
             <div>{{ msg_footer() }}</div>
         </div>
-        <div class="col pull-right">
+        <div class="col pull-right footer-branding">
             <a style="margin-right:5px;" href="//translatewiki.net/?setlang=en "><img height="36px" src="//upload.wikimedia.org/wikipedia/commons/5/51/Translatewiki.net_logo.svg" alt="translatewiki.net logo"/></a>
             {% if isWMFLabs() %}
             <a href="//tools.wmflabs.org" target="_blank"><img height="40px" src="{{ asset('static/images/labs.png') }}" alt="Powered by WMF Labs" /></a>

@@ -61,7 +61,7 @@ class LabsHelper
             // Create the query we're going to run against the meta database
             $wikiQuery = $this->client->createQueryBuilder();
             $wikiQuery
-                ->select([ 'dbName', 'name', 'url' ])
+                ->select([ 'dbName', 'name', 'url', 'lang' ])
                 ->from('wiki')
                 ->where($wikiQuery->expr()->eq('dbname', ':project'))
                 // The meta database will have the project's URL stored as https://en.wikipedia.org
@@ -90,6 +90,7 @@ class LabsHelper
             $dbName = $wikis[0]['dbName'];
             $wikiName = $wikis[0]['name'];
             $url = $wikis[0]['url'];
+            $lang = $wikis[0]['lang'];
         }
 
         if ($this->container->getParameter('app.is_labs') && substr($dbName, -2) != '_p') {
@@ -99,7 +100,7 @@ class LabsHelper
         $this->dbName = $dbName;
         $this->url = $url;
 
-        return [ 'dbName' => $dbName, 'wikiName' => $wikiName, 'url' => $url ];
+        return [ 'dbName' => $dbName, 'wikiName' => $wikiName, 'url' => $url, 'lang' => $lang ];
     }
 
     /**

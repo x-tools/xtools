@@ -29,6 +29,7 @@ class AppExtension extends Extension
             new \Twig_SimpleFunction('langName', [ $this, 'getLangName' ], $options),
             new \Twig_SimpleFunction('allLangs', [ $this, 'getAllLangs' ]),
             new \Twig_SimpleFunction('isRTL', [ $this, 'intuitionIsRTL' ]),
+            new \Twig_SimpleFunction('isRTLLang', [ $this, 'intuitionIsRTLLang' ]),
             new \Twig_SimpleFunction('shortHash', [ $this, 'gitShortHash' ]),
             new \Twig_SimpleFunction('hash', [ $this, 'gitHash' ]),
             new \Twig_SimpleFunction('enabled', [ $this, 'tabEnabled' ]),
@@ -175,6 +176,11 @@ class AppExtension extends Extension
     public function intuitionIsRTL()
     {
         return $this->getIntuition()->isRTL($this->getIntuition()->getLang());
+    }
+
+    public function intuitionIsRTLLang($lang)
+    {
+        return $this->getIntuition()->isRTL($lang);
     }
 
     public function gitShortHash()

@@ -1,0 +1,166 @@
+@import 'mixins.scss';
+
+body {
+    direction: rtl;
+}
+
+/********** HEADER **********/
+.tool-links {
+    float: right;
+
+    .nav {
+        padding-right: 0;
+
+        li {
+            float: right;
+        }
+    }
+}
+.lang-group ul {
+    left: 0;
+    right: auto;
+    text-align: right;
+}
+.nav-buttons {
+    float: left !important;
+}
+.navbar-toggle {
+    float: right !important;
+}
+.back-to-search {
+    left: auto;
+    right: 0;
+
+    .glyphicon-chevron-left {
+        @include prefix(transform, rotate(180deg));
+    }
+}
+@media (max-width: $bootstrap-sm) {
+    .tool-links li {
+        float: none !important;
+    }
+}
+
+/********** FORMS **********/
+$radius: 4px;
+$border: 1px solid #ccc;
+.form-row:first-child > *:first-child {
+    border-top-left-radius: 0;
+    border-top-right-radius: $radius;
+}
+.form-row:first-child > *:last-child {
+    border-top-left-radius: $radius;
+    border-top-right-radius: 0;
+}
+.input-group-addon:first-child {
+    border-left: 0;
+    border-right: $border;
+}
+.form-row:last-child > *:first-child {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: $radius;
+}
+.form-row:last-child > *:last-child {
+    border-bottom-left-radius: $radius;
+    border-bottom-right-radius: 0;
+}
+.input-group-addon:last-child {
+    border-left: $border;
+    border-right: 0;
+}
+.form-label {
+    text-align: right;
+
+    .tooltipcss {
+        float: left !important;
+    }
+}
+.tooltip-body {
+    margin-left: 0;
+    margin-right: 28px;
+
+    &::after,
+    &::before {
+        left: 100%;
+        right: initial;
+    }
+    &::before {
+        border-color: transparent transparent transparent #DCA;
+    }
+    &::after {
+        border-color: transparent transparent transparent #FFFAF0;
+    }
+}
+
+/********** FOOTER **********/
+.app-footer {
+    .footer-about {
+        padding-right: 15px;
+    }
+
+    .footer-branding {
+        float: left !important;
+    }
+}
+
+/********** TABLES **********/
+.table {
+    th,
+    td {
+        text-align: right;
+    }
+}
+@media (min-width: $bootstrap-lg) {
+    .stat-list {
+        float: right !important;
+    }
+}
+.stat-list > .table td {
+    &:first-child {
+        text-align: left;
+    }
+    &:last-child {
+        text-align: right;
+    }
+}
+@media (max-width: $bootstrap-sm) {
+    .stat-list > .table td {
+        &:first-child {
+            text-align: right;
+        }
+    }
+}
+.panel-heading {
+    text-align: right;
+}
+
+/********** ARTICLEINFO **********/
+&.articleinfo {
+    .chart-wrapper {
+        float: right;
+        margin-left: 50px;
+        margin-right: 0;
+    }
+    .legend-body {
+        text-align: right;
+    }
+    .chart-legend {
+        margin-left: 0;
+        margin-right: 15px;
+
+        .color-icon {
+            margin-left: 5px;
+            margin-right: 0;
+        }
+    }
+    .sort-entry--assessment,
+    .sort-entry--importance {
+        text-align: center;
+    }
+}
+
+/********** MISC. / LAYOUT **********/
+.rm-inline-margin {
+    margin-left: -4px;
+    margin-right: 0;
+}
