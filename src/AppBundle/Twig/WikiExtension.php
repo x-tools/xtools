@@ -71,6 +71,7 @@ class WikiExtension extends Extension
         } else {
             $link = "User:$username";
         }
+        $link = str_replace(' ', '_', $link);
         return "<a href='$projectUrl/wiki/$link' target='_blank'>$label</a>";
     }
 
@@ -106,6 +107,7 @@ class WikiExtension extends Extension
         if (!isset($label)) {
             $label = $this->intuitionMessage('history');
         }
+        $title = str_replace(' ', '_', $title);
         $url = "$projectUrl/w/index.php?title=$title&action=history";
 
         if ($offset) {
@@ -131,7 +133,7 @@ class WikiExtension extends Extension
         if (!isset($label)) {
             $label = $this->intuitionMessage('log');
         }
-
+        $username = str_replace(' ', '_', $username);
         $url = "$projectUrl/w/index.php?title=Special:Log&action=view&user=$username";
 
         if ($type) {
@@ -154,7 +156,7 @@ class WikiExtension extends Extension
         if (!isset($label)) {
             $label = $this->intuitionMessage('log');
         }
-
+        $title = str_replace(' ', '_', $title);
         $url = "$projectUrl/w/index.php?title=Special:Log&action=view&page=$title";
 
         if ($type) {
@@ -184,20 +186,20 @@ class WikiExtension extends Extension
 
     /**
      * Get a permanent link to the given page at given revision
-     * @param  number                   $diff       Revision ID
+     * @param  number                   $revId      Revision ID
      * @param  string                   $projectUrl Project domain and protocol such as https://en.wikipedia.org
      * @param  string|Integer|DateTime  [$label]    The link text, if a number is assumed to be UNIX timestamp,
      *                                              and will be converted to 'Y-m-d H:m'
      * @return string Markup
      */
-    public function permaLink($diff, $projectUrl, $label = '')
+    public function permaLink($revId, $projectUrl, $label = '')
     {
         if (is_int($label)) {
             $label = date('Y-m-d, H:i', $label);
         } elseif (is_a($label, 'DateTime')) {
             $label = date_format($label, 'Y-m-d, H:i');
         }
-        return "<a href='$projectUrl/wiki/Special:PermaLink/$diff' target='_blank'>$label</a>";
+        return "<a href='$projectUrl/wiki/Special:PermaLink/$revId' target='_blank'>$label</a>";
     }
 
     /**

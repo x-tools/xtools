@@ -19,16 +19,14 @@
 
     <div class="panel-body xt-panel-body" >
         <p class="text-center xt-heading-subtitle">
-            {{ wiki_log_link('User:'~username, project_url, msg('block_log'), 'block') }}
+            {{ user_log_link(username, project_url, msg('block_log'), 'block') }}
+            {% if isWMFLabs() %}
             &middot;
-            <a href="{{ path('EditCounterResult', {project:project, username:username}) }}" >{{ msg('tool_ec') }}</a>
+            <a href="{{ link("/ec/"~project~"/"~username) }}" >{{ msg('tool_ec') }}</a>
             {% if not isSingleWiki() %}
             &middot;
             <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ username }}" >{{ msg('global_contribs') }}</a>
             {% endif %}
-            {% if isWMFLabs() %}
-            &middot;
-            <a href="{{ link("/ec/"~project~"/"~username) }}" >{{ msg('tool_ec') }}</a>
             &middot;
             {# FIXME: make this link go to what options are set here (redirects, namespace, etc.) #}
             <a target="_blank" href="//tools.wmflabs.org/userviews/?project={{ project }}&amp;user={{ username }}">{{ msg('pageviews_pages_created') }}</a>
@@ -44,14 +42,14 @@
                     </tr>
                     <tr>
                         <td>{{ msg('redirects') }}</td>
-                        <td>{{ redirect }}</td>
+                        <td>{{ msg('redirfilter_' ~ redirect) }}</td>
                     </tr>
                 </tbody></table>
             </div>
             <div style="clear:both"></div>
             <table class="table table-bordered table-hover table-striped top-editors-table">
                 <thead><tr>
-                    {% for key in ['namespace', 'pages', 'redirects', 'deleted'] %}
+                    {% for key in summaryColumns %}
                         <th>
                             <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
                                 {{ msg(key) | capitalize_first }}
@@ -67,30 +65,34 @@
                             <span class="color-icon" style="background:{{ color(key) }}"></span>
                             <a href="#{{ key }}" >{{ namespaces[key] }}</a>
                         </td>
-                        <td class="sort-entry--pages" data-value="{{ value.total }}">
-                            {% if value.total is defined %}
+                        {% if redirect != 'onlyredirects' %}
+                            <td class="sort-entry--pages" data-value="{{ value.total }}">
                                 {{ value.total }}
-                            {% else %}
-                                0
-                            {% endif %}
-                        </td>
-                        {% if value.redirect is defined %}
+                            </td>
+                        {% endif %}
+                        {% if redirect != 'noredirects' %}
                             <td class="sort-entry--redirects" data-value="{{ value.redirect }}">
                                 {{ value.redirect }}
+                                {% if redirect != 'onlyredirects' %}
+                                    ({{ value.redirect | percent_format(value.total) }})
+                                {% endif %}
                             </td>
                         {% endif %}
                         <td class="sort-entry--deleted" data-value="{{ value.deleted }}">
                             {{ value.deleted }}
+                            ({{ value.deleted | percent_format(value.total) }})
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
+            {% if namespace == 'all' %}
             <div class="chart-wrapper">
                 <canvas id="pie_chart" width="400" height="400"></canvas>
             </div>
+            {% endif %}
         {% endset %}
-        {{ layout.content_block('namespacetotals', content) }}
+        {{ layout.content_block('summary', content) }}
 
         {% set content %}
             {% for key in pages|keys %}
@@ -98,7 +100,7 @@
                 <table class="table table-bordered table-hover table-striped top-editors-table">
                     <thead><tr>
                         <th>#</th>
-                        {% for key in ['page', 'date'] %}
+                        {% for key in ['page', 'date', 'original_size'] %}
                             <th>
                                 <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
                                     {{ msg(key) | capitalize_first }}
@@ -113,21 +115,24 @@
                         <tr>
                             <td>{{ loop.index }}</td>
                             {% if key == 0 %}
-                                {% set pagename = value['page_title']|e %}
+                                {% set pagename = value.page_title | e %}
                             {% else %}
-                                {% set pagename = namespaces[key]~":"~value["page_title"] %}
+                                {% set pagename = namespaces[key]~":"~value.page_title %}
                             {% endif %}
                             <td class="sort-entry--page" data-value="{{ pagename }}">
                                 {{ wiki_link(pagename, project_url) }}
-                                {% if value["page_is_redirect"] %}
+                                {% if value.page_is_redirect %}
                                     <small class="text-warning">&middot; ({{ msg("redirect") }})</small>
                                 {% endif %}
-                                {% if value["type"] == "arc" %}
+                                {% if value.type == "arc" %}
                                     <small class="text-danger">&middot; ({{ msg("deleted") }})</small>
                                 {% endif %}
                             </td>
-                            <td class="sort-entry--date" data-value="{{ value['human_time'] }}">
-                                {{ value["human_time"] }}
+                            <td class="sort-entry--date" data-value="{{ date }}">
+                                {{ perma_link(value.rev_id, project_url, date) }}
+                            </td>
+                            <td class="sort-entry--original_size" data-value="{{ value.rev_len }}">
+                                {{ value.rev_len | number_format }}
                             </td>
                             <td>
                                 {{ wiki_log_link(pagename, project_url) }}
@@ -151,24 +156,39 @@
         {{ layout.content_block('pages_created', content) }}
     </div>
 
-    <script>
-        var ctx = document.getElementById("pie_chart");
-        var myChart = new Chart(ctx, {
-            type: 'pie',
-            data: {
-        {% set first = 1 %}
-                labels: [{% for key,value in count %}{% if not first %},{% endif %}"{{ namespaces[key] }}"{% set first = 0 %}{% endfor %}],
-                datasets: [{
-                    {% set first = 1 %}
-                    data: [{% for value in count %}{% if not first %},{% endif %}{% if value.total is defined %}{{ value.total }}{% else %}0{% endif %}{% set first = 0 %}{% endfor %}],
-                    {% set first = 1 %}
-                    backgroundColor: [{% for key,value in count %}{% if not first %},{% endif %}'{{ color(key) }}'{% set first = 0 %}{% endfor %}],
-                    {% set first = 1 %}
-                    borderColor: [{% for key,value in count %}{% if not first %},{% endif %}'{{ color(key) }}'{% set first = 0 %}{% endfor %}],
-                    borderWidth: 1
-                }]
-            }
-        });
-    </script>
+    {% if namespace == 'all' %}
+        {% set nsIds = count|keys %}
+        <script>
+            var ctx = document.getElementById("pie_chart");
+            var myChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: [
+                        {% for ns in nsIds %}
+                            "{{ namespaces[ns] }}"{% if not loop.last %},{% endif %}
+                        {% endfor %}
+                    ],
+                    datasets: [{
+                        data: [
+                            {% for value in count %}
+                                {% if value.total is defined %}{{ value.total }}{% else %}0{% endif %}{% if not loop.last %},{% endif %}
+                            {% endfor %}
+                        ],
+                        backgroundColor: [
+                            {% for ns in nsIds %}
+                                '{{ color(ns) }}'{% if not loop.last %},{% endif %}
+                            {% endfor %}
+                        ],
+                        borderColor: [
+                            {% for ns in nsIds %}
+                                '{{ color(ns) }}'{% if not loop.last %},{% endif %}
+                            {% endfor %}
+                        ],
+                        borderWidth: 1
+                    }]
+                }
+            });
+        </script>
+    {% endif %}
 </div>
 {% endblock %}

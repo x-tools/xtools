@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -120,17 +121,28 @@ class PagesController extends Controller
         $namespaceConditionRev = "";
 
         if ($namespace != "all") {
-            $namespaceConditionRev = " and page_namespace = '".intval($namespace)."' ";
-            $namespaceConditionArc = " and ar_namespace = '".intval($namespace)."' ";
+            $namespaceConditionRev = " AND page_namespace = '".intval($namespace)."' ";
+            $namespaceConditionArc = " AND ar_namespace = '".intval($namespace)."' ";
         }
 
+        $summaryColumns = ['namespace']; // what columns to show in namespace totals table
         $redirectCondition = "";
         if ($redirects == "onlyredirects") {
-            $redirectCondition = " and page_is_redirect = '1' ";
+            // don't show redundant pages column if only getting data on redirects
+            $summaryColumns[] = 'redirects';
+
+            $redirectCondition = " AND page_is_redirect = '1' ";
+        } elseif ($redirects == "noredirects") {
+            // don't show redundant redirects column if only getting data on non-redirects
+            $summaryColumns[] = 'pages';
+
+            $redirectCondition = " AND page_is_redirect = '0' ";
+        } else {
+            // order is important here
+            $summaryColumns[] = 'pages';
+            $summaryColumns[] = 'redirects';
         }
-        if ($redirects == "noredirects") {
-            $redirectCondition = " and page_is_redirect = '0' ";
-        }
+        $summaryColumns[] = 'deleted'; // always show deleted column
 
         if ($user_id == 0) { // IP Editor or undefined username.
             $whereRev = " rev_user_text = '$username' AND rev_user = '0' ";
@@ -144,17 +156,18 @@ class PagesController extends Controller
 
         $stmt = "
             (SELECT DISTINCT page_namespace AS namespace, 'rev' AS type, page_title AS page_title,
-            page_is_redirect AS page_is_redirect, rev_timestamp AS timestamp, rev_user, rev_user_text
+                page_is_redirect AS page_is_redirect, rev_timestamp AS timestamp,
+                rev_user, rev_user_text, rev_len, rev_id
             FROM $pageTable
             JOIN $revisionTable ON page_id = rev_page
-            WHERE  $whereRev  AND rev_parent_id = '0'  $namespaceConditionRev  $redirectCondition
+            WHERE  $whereRev  AND rev_parent_id = '0' $namespaceConditionRev $redirectCondition
             )
 
             UNION
 
             (SELECT  a.ar_namespace AS namespace, 'arc' AS type, a.ar_title AS page_title,
-            '0' AS page_is_redirect, min(a.ar_timestamp) AS timestamp , a.ar_user AS rev_user,
-            a.ar_user_text AS rev_user_text
+                '0' AS page_is_redirect, min(a.ar_timestamp) AS timestamp, a.ar_user AS rev_user,
+                a.ar_user_text AS rev_user_text, a.ar_len AS rev_len, a.ar_rev_id AS rev_id
             FROM $archiveTable a
             JOIN
              (
@@ -180,10 +193,11 @@ class PagesController extends Controller
         $deletedTotal = 0;
 
         foreach ($result as $row) {
-            $datetime = date(DATE_W3C, strtotime($row["timestamp"]));
-            $human_time = date("Y-m-d", strtotime($row["timestamp"]));
+            $datetime = DateTime::createFromFormat('YmdHis', $row["timestamp"])->format('Y-m-d H:i');
             $pagesArray[$row["namespace"]][$datetime] = $row;
-            $pagesArray[$row["namespace"]][$datetime]["human_time"] = $human_time;
+            $pagesArray[$row["namespace"]][$datetime]["page_title"] = str_replace(
+                '_', ' ', $pagesArray[$row["namespace"]][$datetime]["page_title"]
+            );
 
             // Totals
             if (isset($countArray[$row["namespace"]]["total"])) {
@@ -228,6 +242,8 @@ class PagesController extends Controller
             krsort($pagesArray[$key]);
         }
 
+        // FIXME: get page assessments! :D
+
         // Retrieving the namespaces, using the ApiHelper class
         $api = $this->get("app.api_helper");
         $namespaces = $api->namespaces($project);
@@ -242,6 +258,7 @@ class PagesController extends Controller
             'username' => $username,
             'namespace' => $namespace,
             'redirect' => $redirects,
+            'summaryColumns' => $summaryColumns,
 
             'namespaces' => $namespaces,
 
