@@ -94,6 +94,7 @@
                                 {% set assessment_value %}
                                     {% if assessments.assessment.badge is defined %}
                                         <img alt="{{ assessments.assessment.value }}" src="{{ assessments.assessment.badge }}" class="assessment-badge" />
+                                        {{ assessments.assessment.value }}
                                     {% else %}
                                         {{ assessments.assessment.value }}
                                     {% endif %}
