@@ -19,19 +19,18 @@ class PagesController extends Controller
      */
     public function indexAction($project = null)
     {
-
         $lh = $this->get("app.labs_helper");
-
         $lh->checkEnabled("pages");
 
         // Grab the request object, grab the values out of it.
         $request = Request::createFromGlobals();
 
         $projectQuery = $request->query->get('project');
-        $username = $request->query->get('user');
+        $username = $request->query->get('username');
         $namespace = $request->query->get('namespace');
         $redirects = $request->query->get('redirects');
 
+        // if values for required parameters are present, redirect to result action
         if ($projectQuery != "" && $username != "" && $namespace != "" && $redirects != "") {
             return $this->redirectToRoute("PagesResult", [
                 'project'=>$projectQuery,
@@ -60,9 +59,23 @@ class PagesController extends Controller
             return $this->redirectToRoute("PagesProject", [ 'project'=>$projectQuery ]);
         }
 
+        // set default wiki so we can populate the namespace selector
+        if (!$project) {
+            $project = $this->container->getParameter('default_project');
+        }
+
         // Retrieving the global groups, using the ApiHelper class
         $api = $this->get("app.api_helper");
-        // $namespaces = $api->namespaces("enwiki"); // FIXME
+
+        // Try fetching namespaces. At this point $project has some sort of value
+        try {
+            $namespaces = $api->namespaces($project);
+        } catch (\Exception $e) {
+            // show error message and redirect back to default project
+            $this->addFlash("notice", [$e->getMessage()]);
+            $project = $this->container->getParameter('default_project');
+            return $this->redirectToRoute("PagesProject", [ 'project'=>$project ]);
+        }
 
         // Otherwise fall through.
         return $this->render('pages/index.html.twig', [
@@ -70,8 +83,8 @@ class PagesController extends Controller
             "xtSubtitle" => "tool_pages_desc",
             'xtPage' => "pages",
             'xtTitle' => "tool_pages",
-            // 'namespaces' => $namespaces,
             'project' => $project,
+            'namespaces' => $namespaces,
         ]);
     }
 

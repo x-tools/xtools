@@ -1,3 +1,4 @@
+// FIXME: move all of this to Twig file, like we do with EditCounter and Pages
 (function () {
     var colors = [
         'rgba(171, 212, 235, 1)',
@@ -13,7 +14,7 @@
     ];
 
     $(document).ready(function () {
-        if (!$('body').hasClass('articleinfo')) {
+        if (!$('body').hasClass('articleinfo') || !$('#users_ips')[0]) {
             return;
         }
 

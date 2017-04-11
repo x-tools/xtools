@@ -29,6 +29,7 @@
             'res/jquery.min.js'
             'bootstrap/js/bootstrap.min.js'
             'chartjs/Chart.min.js'
+            'static/js/core_extensions.js'
             'static/js/application.js'
             'static/js/articleinfo.js'
             'static/js/editcounter.js'
@@ -102,23 +103,19 @@
 
 <div class="site-notice">
     {% if noticeDisplay is defined and noticeDisplay == true %}
-    <div class="container-fluid">
         <p class='alert {% if noticeStyle is defined %}alert-{{ noticeStyle }}{% else %}alert-danger{% endif %} xt-alert'>
             {% if noticeText is defined %}{{ msgPrintExists(noticeText) }}
             {% else %}No notice has been defined but the notice has been turned on. Poke a maintainer to fix this.
             {% endif %}
         </p>
-    </div>
     {% endif %}
 
     {% if app.session.flashBag.peek('notice') %}
-        <div class="container-fluid">
-            {% for flash_message in app.session.flashBag.get('notice') %}
+        {% for flash_message in app.session.flashBag.get('notice') %}
             <p class="alert alert-danger xt-alert">
                 {{ msgPrintExists(flash_message) }}
             </p>
-            {% endfor %}
-        </div>
+        {% endfor %}
     {% endif %}
 
     {% set replagValue = replag() %}

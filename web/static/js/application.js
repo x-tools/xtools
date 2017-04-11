@@ -68,6 +68,10 @@
         });
 
         setupTOC();
+
+        if ($('#project_input').length && $('#namespace_select').length) {
+            setupNamespaceSelector();
+        }
     });
 
     /**
@@ -167,6 +171,48 @@
                 $tocClone.remove();
                 $tocClone = null;
             }
+        });
+    }
+
+    /**
+     * Use the wiki input field to populate the namespace selector
+     */
+    function setupNamespaceSelector() {
+        // keep track of last valid project
+        var lastProject = $('#project_input').val();
+
+        $('#project_input').on('change', function() {
+            // disable the namespace selector while the data loads
+            $('#namespace_select').prop('disabled', true);
+
+            var newProject = this.value;
+
+            $.get('/api/namespaces/' + newProject).done(function(namespaces) {
+                var $allOption = $('#namespace_select option').eq(0).clone();
+                $("#namespace_select").html($allOption);
+                for (var ns in namespaces) {
+                    $('#namespace_select').append(
+                        "<option value=" + ns + ">" + namespaces[ns] + "</option>"
+                    );
+                }
+                $("#namespace_select").val(0); // default to mainspace
+                lastProject = newProject;
+            }).fail(function() {
+                // revert back to last valid project
+                $('#project_input').val(lastProject);
+                // FIXME: i18n
+                $('.site-notice').append(
+                    "<div class='alert alert-warning alert-dismissible' role='alert'>" +
+                        "<a href='//" + newProject.escape() + "'>" + newProject + "</a> is not a valid project." +
+                        "<button class='close' data-dismiss='alert' aria-label='Close'>" +
+                            "<span aria-hidden='true'>&times;</span>" +
+                        "</button>" +
+                    "</div>"
+                );
+            }).always(function() {
+                $('#namespace_select').prop('disabled', false);
+                console.log('yeah');
+            });
         });
     }
 })();

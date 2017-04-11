@@ -19,6 +19,8 @@ parameters:
 
     wiki_url:                   http://en.wikipedia.org
 
+    default_project:            en.wikipedia.org
+
     mailer_transport:  smtp
     mailer_host:       127.0.0.1
     mailer_user:       ~

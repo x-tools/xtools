@@ -105,38 +105,38 @@ class ApiHelper extends HelperBase
 
         $this->setUp($project);
         $query = new SimpleRequest('query', [ "meta"=>"siteinfo", "siprop"=>"namespaces" ]);
-        $result = [];
+        $namespaces = [];
 
         try {
             $res = $this->api->getRequest($query);
             if (isset($res["batchcomplete"]) && isset($res["query"]["namespaces"])) {
-                foreach ($res["query"]["namespaces"] as $row) {
-                    if ($row["id"] < 0) {
+                foreach ($res["query"]["namespaces"] as $namespace) {
+                    if ($namespace["id"] < 0) {
                         continue;
                     }
 
-                    if (isset($row["name"])) {
-                        $name = $row["name"];
-                    } elseif (isset($row["*"])) {
-                        $name = $row["*"];
+                    if (isset($namespace["name"])) {
+                        $name = $namespace["name"];
+                    } elseif (isset($namespace["*"])) {
+                        $name = $namespace["*"];
                     } else {
                         continue;
                     }
 
-                    // TODO: Figure out a way to i18n-ize this
+                    // FIXME: Figure out a way to i18n-ize this
                     if ($name === "") {
                         $name = "Article";
                     }
 
-                    $result[$row["id"]] = $name;
+                    $namespaces[$namespace["id"]] = $name;
                 }
             }
-            $this->cacheSave($cacheKey, $result, 'P7D');
+            $this->cacheSave($cacheKey, $namespaces, 'P7D');
         } catch (Exception $e) {
             // The api returned an error!  Ignore
         }
 
-        return $result;
+        return $namespaces;
     }
 
     public function getAdmins($project)
