@@ -177,17 +177,18 @@
     /**
      * Use the wiki input field to populate the namespace selector
      */
-    function setupNamespaceSelector() {
+    function setupNamespaceSelector()
+    {
         // keep track of last valid project
         var lastProject = $('#project_input').val();
 
-        $('#project_input').on('change', function() {
+        $('#project_input').on('change', function () {
             // disable the namespace selector while the data loads
             $('#namespace_select').prop('disabled', true);
 
             var newProject = this.value;
 
-            $.get('/api/namespaces/' + newProject).done(function(namespaces) {
+            $.get('/api/namespaces/' + newProject).done(function (namespaces) {
                 var $allOption = $('#namespace_select option').eq(0).clone();
                 $("#namespace_select").html($allOption);
                 for (var ns in namespaces) {
@@ -197,7 +198,7 @@
                 }
                 $("#namespace_select").val(0); // default to mainspace
                 lastProject = newProject;
-            }).fail(function() {
+            }).fail(function () {
                 // revert back to last valid project
                 $('#project_input').val(lastProject);
                 // FIXME: i18n
@@ -209,7 +210,7 @@
                         "</button>" +
                     "</div>"
                 );
-            }).always(function() {
+            }).always(function () {
                 $('#namespace_select').prop('disabled', false);
                 console.log('yeah');
             });
