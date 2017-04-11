@@ -89,6 +89,16 @@
             height: calc(100% / 3);
         }
     }
+
+    .sort-entry--assessment,
+    .sort-entry--importance {
+        font-weight: bold;
+        text-align: center;
+
+        a {
+            color: #4365cc;
+        }
+    }
 }
 
 @media (max-width: $bootstrap-sm) {

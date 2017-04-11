@@ -275,12 +275,15 @@ class ApiHelper extends HelperBase
      */
     public function getPageAssessments($project, $pageTitles)
     {
-        $supportedProjects = ['en.wikipedia.org', 'en.wikivoyage.org'];
+        // From config/assessments.yml
+        $config = $this->getAssessmentsConfig();
 
         // return null if unsupported project
-        if (!in_array($project, $supportedProjects)) {
+        if (!in_array($project, array_keys($config))) {
             return null;
         }
+
+        $config = $config[$project];
 
         $params = [
             'prop' => 'pageassessments',
@@ -292,9 +295,6 @@ class ApiHelper extends HelperBase
         $assessments = $this->massApi($params, $project, function ($data) {
             return isset($data['pages'][0]['pageassessments']) ? $data['pages'][0]['pageassessments'] : [];
         }, 'pacontinue')['pages'];
-
-        // From config/assessments.yml
-        $config = $this->getAssessmentsConfig()[$project];
 
         $decoratedAssessments = [];
 
@@ -366,12 +366,22 @@ class ApiHelper extends HelperBase
     }
 
     /**
-     * Get the base path to WikiProjects for the given wiki
-     * @return string Path, such as 'Wikipedia:WikiProject_'
+     * Get the image URL of the badge for the given page assessment
+     * @param  string $project Project such as en.wikipedia.org
+     * @param  string $class   Valid classification for project, such as 'Start', 'GA', etc.
+     * @return string          URL to image
      */
-    public function getWikiProjectPrefix($project)
+    public function getAssessmentBadgeURL($project, $class)
     {
-        return $this->getAssessmentsConfig()[$project]['wikiproject_prefix'];
+        $config = $this->getAssessmentsConfig();
+
+        if (isset($config[$project]['class'][$class])) {
+            return "https://upload.wikimedia.org/wikipedia/commons/" . $config[$project]['class'][$class]['badge'];
+        } elseif (isset($config[$project]['class']['Unknown'])) {
+            return "https://upload.wikimedia.org/wikipedia/commons/" . $config[$project]['class']['Unknown']['badge'];
+        } else {
+            return "";
+        }
     }
 
     /**
@@ -385,6 +395,16 @@ class ApiHelper extends HelperBase
             $assessmentsConfig = $this->container->getParameter('assessments');
         }
         return $assessmentsConfig;
+    }
+
+    /**
+     * Does the given project support page assessments?
+     * @param  string  $project Project to query, e.g. en.wikipedia.org
+     * @return boolean True or false
+     */
+    public function projectHasPageAssessments($project)
+    {
+        return in_array($project, array_keys($this->getAssessmentsConfig()));
     }
 
     /**

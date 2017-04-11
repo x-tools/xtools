@@ -81,8 +81,9 @@ class PagesController extends Controller
     public function resultAction($project, $username, $namespace = "all", $redirects = "none")
     {
         $lh = $this->get("app.labs_helper");
-
         $lh->checkEnabled("pages");
+
+        $api = $this->get("app.api_helper");
 
         $username = ucfirst($username);
 
@@ -90,7 +91,7 @@ class PagesController extends Controller
 
         $dbName = $dbValues["dbName"];
         $wikiName = $dbValues["wikiName"];
-        $url = $dbValues["url"];
+        $projectUrl = $dbValues["url"];
 
         $user_id = 0;
 
@@ -154,13 +155,22 @@ class PagesController extends Controller
             $having = " rev_user = '$user_id' ";
         }
 
+        $hasPageAssessments = $lh->isLabs() && $api->projectHasPageAssessments($project);
+        $paSelects = $hasPageAssessments ? ', pa_class, pa_importance, pa_page_revision' : '';
+        $paSelectsArchive = $hasPageAssessments ?
+            ', NULL AS pa_class, NULL AS pa_page_id, NULL AS pa_page_revision'
+            : '';
+        $paJoin = $hasPageAssessments ? 'LEFT JOIN page_assessments ON rev_page = pa_page_id' : '';
+
         $stmt = "
             (SELECT DISTINCT page_namespace AS namespace, 'rev' AS type, page_title AS page_title,
                 page_is_redirect AS page_is_redirect, rev_timestamp AS timestamp,
-                rev_user, rev_user_text, rev_len, rev_id
+                rev_user, rev_user_text, rev_len, rev_id $paSelects
             FROM $pageTable
             JOIN $revisionTable ON page_id = rev_page
-            WHERE  $whereRev  AND rev_parent_id = '0' $namespaceConditionRev $redirectCondition
+            $paJoin
+            WHERE $whereRev AND rev_parent_id = '0' $namespaceConditionRev $redirectCondition
+            " . ($hasPageAssessments ? "GROUP BY rev_page" : "") . "
             )
 
             UNION
@@ -168,17 +178,18 @@ class PagesController extends Controller
             (SELECT  a.ar_namespace AS namespace, 'arc' AS type, a.ar_title AS page_title,
                 '0' AS page_is_redirect, min(a.ar_timestamp) AS timestamp, a.ar_user AS rev_user,
                 a.ar_user_text AS rev_user_text, a.ar_len AS rev_len, a.ar_rev_id AS rev_id
+                $paSelectsArchive
             FROM $archiveTable a
             JOIN
-             (
-              SELECT b.ar_namespace, b.ar_title
-              FROM $archiveTable AS b
-              LEFT JOIN $logTable ON log_namespace = b.ar_namespace AND log_title = b.ar_title
-                AND log_user = b.ar_user AND (log_action = 'move' or log_action = 'move_redir')
-              WHERE  $whereArc AND b.ar_parent_id = '0' $namespaceConditionArc AND log_action IS NULL
-             ) AS c ON c.ar_namespace= a.ar_namespace AND c.ar_title = a.ar_title
+            (
+                SELECT b.ar_namespace, b.ar_title
+                FROM $archiveTable AS b
+                LEFT JOIN $logTable ON log_namespace = b.ar_namespace AND log_title = b.ar_title
+                    AND log_user = b.ar_user AND (log_action = 'move' or log_action = 'move_redir')
+                WHERE $whereArc AND b.ar_parent_id = '0' $namespaceConditionArc AND log_action IS NULL
+            ) AS c ON c.ar_namespace= a.ar_namespace AND c.ar_title = a.ar_title
             GROUP BY a.ar_namespace, a.ar_title
-            HAVING  $having
+            HAVING $having
             )
             ";
         $resultQuery = $conn->prepare($stmt);
@@ -186,46 +197,58 @@ class PagesController extends Controller
 
         $result = $resultQuery->fetchAll();
 
-        $pagesArray = [];
-        $countArray = [];
+        $pagesByNamespaceByDate = [];
+        $pageTitles = [];
+        $countsByNamespace = [];
         $total = 0;
         $redirectTotal = 0;
         $deletedTotal = 0;
 
         foreach ($result as $row) {
-            $datetime = DateTime::createFromFormat('YmdHis', $row["timestamp"])->format('Y-m-d H:i');
-            $pagesArray[$row["namespace"]][$datetime] = $row;
-            $pagesArray[$row["namespace"]][$datetime]["page_title"] = str_replace(
-                '_', ' ', $pagesArray[$row["namespace"]][$datetime]["page_title"]
-            );
+            $datetime = DateTime::createFromFormat('YmdHis', $row["timestamp"]);
+            $datetimeKey = $datetime->format('Ymdhi');
+            $datetimeHuman = $datetime->format('Y-m-d H:i');
+
+            $pageData = array_merge($row, [
+                "human_time" => $datetimeHuman,
+                "page_title" => str_replace('_', ' ', $row["page_title"])
+            ]);
+
+            if ($hasPageAssessments) {
+                $pageData["badge"] = $api->getAssessmentBadgeURL($project, $pageData["pa_class"]);
+            }
+
+            $pagesByNamespaceByDate[$row["namespace"]][$datetimeKey][] = $pageData;
+
+            $pageTitles[] = $row["page_title"];
 
             // Totals
-            if (isset($countArray[$row["namespace"]]["total"])) {
-                $countArray[$row["namespace"]]["total"]++;
+            if (isset($countsByNamespace[$row["namespace"]]["total"])) {
+                $countsByNamespace[$row["namespace"]]["total"]++;
             } else {
-                $countArray[$row["namespace"]]["total"] = 1;
-                $countArray[$row["namespace"]]["redirect"] = 0;
-                $countArray[$row["namespace"]]["deleted"] = 0;
+                $countsByNamespace[$row["namespace"]]["total"] = 1;
+                $countsByNamespace[$row["namespace"]]["redirect"] = 0;
+                $countsByNamespace[$row["namespace"]]["deleted"] = 0;
             }
             $total++;
 
             if ($row["page_is_redirect"]) {
                 $redirectTotal++;
                 // Redirects
-                if (isset($countArray[$row["namespace"]]["redirect"])) {
-                    $countArray[$row["namespace"]]["redirect"]++;
+                if (isset($countsByNamespace[$row["namespace"]]["redirect"])) {
+                    $countsByNamespace[$row["namespace"]]["redirect"]++;
                 } else {
-                    $countArray[$row["namespace"]]["redirect"] = 1;
+                    $countsByNamespace[$row["namespace"]]["redirect"] = 1;
                 }
             }
 
             if ($row["type"] === "arc") {
                 $deletedTotal++;
                 // Deleted
-                if (isset($countArray[$row["namespace"]]["deleted"])) {
-                    $countArray[$row["namespace"]]["deleted"]++;
+                if (isset($countsByNamespace[$row["namespace"]]["deleted"])) {
+                    $countsByNamespace[$row["namespace"]]["deleted"]++;
                 } else {
-                    $countArray[$row["namespace"]]["deleted"] = 1;
+                    $countsByNamespace[$row["namespace"]]["deleted"] = 1;
                 }
             }
         }
@@ -235,24 +258,21 @@ class PagesController extends Controller
             return $this->redirectToRoute("PagesProject", [ "project"=>$project ]);
         }
 
-        ksort($pagesArray);
-        ksort($countArray);
+        ksort($pagesByNamespaceByDate);
+        ksort($countsByNamespace);
 
-        foreach (array_keys($pagesArray) as $key) {
-            krsort($pagesArray[$key]);
+        foreach (array_keys($pagesByNamespaceByDate) as $key) {
+            krsort($pagesByNamespaceByDate[$key]);
         }
 
-        // FIXME: get page assessments! :D
-
-        // Retrieving the namespaces, using the ApiHelper class
-        $api = $this->get("app.api_helper");
+        // Retrieve the namespaces
         $namespaces = $api->namespaces($project);
 
         // Assign the values and display the template
         return $this->render('pages/result.html.twig', [
             'xtPage' => "pages",
             'project' => $project,
-            'project_url' => $url,
+            'project_url' => $projectUrl,
 
             'project' => $project,
             'username' => $username,
@@ -262,12 +282,14 @@ class PagesController extends Controller
 
             'namespaces' => $namespaces,
 
-            'pages' => $pagesArray,
-            'count' => $countArray,
+            'pages' => $pagesByNamespaceByDate,
+            'count' => $countsByNamespace,
 
             'total' => $total,
             'redirectTotal' => $redirectTotal,
             'deletedTotal' => $deletedTotal,
+
+            'hasPageAssessments' => $hasPageAssessments,
         ]);
     }
 }

@@ -108,46 +108,66 @@
                                 </span>
                             </th>
                         {% endfor %}
+                        {% if hasPageAssessments %}
+                            <th>
+                                <span class="sort-link sort-link--assessment" data-column="assessment">
+                                    {{ msg('assessment') | capitalize_first }}
+                                    <span class="glyphicon glyphicon-sort"></span>
+                                </span>
+                            </th>
+                        {% endif %}
                         <th>{{ msg('links') }}</th>
                     </tr></thead>
                     <tbody>
-                        {% for date,value in pages[key] %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            {% if key == 0 %}
-                                {% set pagename = value.page_title | e %}
-                            {% else %}
-                                {% set pagename = namespaces[key]~":"~value.page_title %}
-                            {% endif %}
-                            <td class="sort-entry--page" data-value="{{ pagename }}">
-                                {{ wiki_link(pagename, project_url) }}
-                                {% if value.page_is_redirect %}
-                                    <small class="text-warning">&middot; ({{ msg("redirect") }})</small>
-                                {% endif %}
-                                {% if value.type == "arc" %}
-                                    <small class="text-danger">&middot; ({{ msg("deleted") }})</small>
-                                {% endif %}
-                            </td>
-                            <td class="sort-entry--date" data-value="{{ date }}">
-                                {{ perma_link(value.rev_id, project_url, date) }}
-                            </td>
-                            <td class="sort-entry--original_size" data-value="{{ value.rev_len }}">
-                                {{ value.rev_len | number_format }}
-                            </td>
-                            <td>
-                                {{ wiki_log_link(pagename, project_url) }}
-                                &middot;
-                                {{ wiki_history_link(pagename, project_url) }}
-                                {% if enabled('articleinfo') %}
-                                    &middot;
-                                    <a href="{{ path('articleinfo', { 'project': project, 'article': pagename }) }}">{{ msg('tool_articleinfo') }}</a>
-                                {% endif %}
-                                {% if enabled('topedits') %}
-                                    &middot;
-                                    <a href="{{ path('topedits', { 'project': project, 'username': username, 'namespace': namespace, 'page': value['page_title'] }) }}">{{ msg('tool_topedits') }}</a>
-                                {% endif %}
-                            </td>
-                        </tr>
+                        {% set index = 0 %}
+                        {% for date,pageList in pages[key] %}
+                            {% for page in pageList %}
+                                {% set index = index + 1 %}
+                                <tr>
+                                    <td>{{ index }}</td>
+                                    {% if key == 0 %}
+                                        {% set pagename = page.page_title | e %}
+                                    {% else %}
+                                        {% set pagename = namespaces[key]~":"~page.page_title %}
+                                    {% endif %}
+                                    <td class="sort-entry--page" data-value="{{ pagename }}">
+                                        {{ wiki_link(pagename, project_url) }}
+                                        {% if page.page_is_redirect %}
+                                            <small class="text-warning">&middot; ({{ msg("redirect") }})</small>
+                                        {% endif %}
+                                        {% if page.type == "arc" %}
+                                            <small class="text-danger">&middot; ({{ msg("deleted") }})</small>
+                                        {% endif %}
+                                    </td>
+                                    <td class="sort-entry--date" data-value="{{ date }}">
+                                        {{ perma_link(page.rev_id, project_url, page.human_time) }}
+                                    </td>
+                                    <td class="sort-entry--original_size" data-value="{{ page.rev_len }}">
+                                        {{ page.rev_len | number_format }}
+                                    </td>
+                                    {% if hasPageAssessments %}
+                                        <td class="sort-entry--assessment" data-value="{{ page.pa_class }}">
+                                            {% if page.badge is defined %}
+                                            <img alt="{{ page.pa_class }}" src="{{ page.badge }}" class="assessment-badge" />
+                                            {% endif %}
+                                            {{ page.pa_class ? page.pa_class : msg('unknown') }}
+                                        </td>
+                                    {% endif %}
+                                    <td>
+                                        {{ wiki_log_link(pagename, project_url) }}
+                                        &middot;
+                                        {{ wiki_history_link(pagename, project_url) }}
+                                        {% if enabled('articleinfo') %}
+                                            &middot;
+                                            <a href="{{ path('articleinfo', { 'project': project, 'article': pagename }) }}">{{ msg('tool_articleinfo') }}</a>
+                                        {% endif %}
+                                        {% if enabled('topedits') %}
+                                            &middot;
+                                            <a href="{{ path('topedits', { 'project': project, 'username': username, 'namespace': namespace, 'page': page['page_title'] }) }}">{{ msg('tool_topedits') }}</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
                         {% endfor %}
                     </tbody>
                 </table>

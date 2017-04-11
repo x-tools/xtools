@@ -444,16 +444,6 @@ div.outer_bar {
     width: 20px;
 }
 
-.sort-entry--assessment,
-.sort-entry--importance {
-    font-weight: bold;
-    text-align: center;
-
-    a {
-        color: #4365cc;
-    }
-}
-
 .comma-separated {
     &::after {
         content: ',';
