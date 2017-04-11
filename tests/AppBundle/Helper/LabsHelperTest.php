@@ -26,8 +26,8 @@ class LabsHelperTest extends WebTestCase
     {
         if ($this->container->getParameter('app.is_labs')) {
             // When using Labs.
-            $this->assertEquals('page', $this->labsHelper->getTable('page'));
-            $this->assertEquals('logging_userindex', $this->labsHelper->getTable('logging'));
+            $this->assertEquals('_p.page', $this->labsHelper->getTable('page'));
+            $this->assertEquals('_p.logging_logindex', $this->labsHelper->getTable('logging'));
         } else {
             // When using wiki databases directly.
             $this->assertEquals('page', $this->labsHelper->getTable('page'));
