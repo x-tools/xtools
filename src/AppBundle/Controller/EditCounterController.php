@@ -27,7 +27,7 @@ class EditCounterController extends Controller
         $lh->checkEnabled("ec");
 
         $queryProject = $request->query->get('project');
-        $username = $request->query->get('user');
+        $username = $request->query->get('username');
 
         if (($project || $queryProject) && $username) {
             $routeParams = [ 'project'=>($project ?: $queryProject), 'username' => $username ];

@@ -91,7 +91,7 @@ class PagesController extends Controller
     /**
      * @Route("/pages/{project}/{username}/{namespace}/{redirects}", name="PagesResult")
      */
-    public function resultAction($project, $username, $namespace = "all", $redirects = "none")
+    public function resultAction($project, $username, $namespace = "0", $redirects = "noredirects")
     {
         $lh = $this->get("app.labs_helper");
         $lh->checkEnabled("pages");

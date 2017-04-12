@@ -25,7 +25,7 @@ class TopEditsController extends Controller
         $this->lh->checkEnabled("topedits");
 
         $project = $request->query->get('project');
-        $username = $request->query->get('user');
+        $username = $request->query->get('username');
         $namespace = $request->query->get('namespace');
         $article = $request->query->get('article');
 

@@ -38,7 +38,13 @@
                 <table class="table"><tbody>
                     <tr>
                         <td>{{ msg('namespace') }}</td>
-                        <td>{{ namespaces[namespace] }}</td>
+                        <td>
+                            {% if namespace is sameas('all') %}
+                                {{ msg('all') | capitalize_first }}
+                            {% else %}
+                                {{ namespaces[namespace] }}
+                            {% endif %}
+                        </td>
                     </tr>
                     <tr>
                         <td>{{ msg('redirects') }}</td>
@@ -206,6 +212,11 @@
                         ],
                         borderWidth: 1
                     }]
+                },
+                options: {
+                    legend: {
+                      display: false,
+                    }
                 }
             });
         </script>
