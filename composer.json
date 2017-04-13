@@ -41,7 +41,9 @@
         "symfony/cache": "^3.2",
         "snc/redis-bundle": "^2.0",
         "predis/predis": "^1.0",
-        "nelmio/cors-bundle": "^1.5"
+        "nelmio/cors-bundle": "^1.5",
+        "friendsofsymfony/rest-bundle": "^2.1",
+        "jms/serializer-bundle": "^1.4"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",
