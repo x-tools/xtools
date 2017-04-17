@@ -1,0 +1,4 @@
+parameters:
+  # Replace <PROJECT_NAME> and <NEW_PROJECT_NAME> with the appropriate values.
+  # One mapping per project, but if you do not map the tables it uses the given project names
+  app.project.<PROJECT_NAME>: '<NEW_PROJECT_NAME>'
