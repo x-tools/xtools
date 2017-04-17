@@ -60,7 +60,6 @@ class LabsHelper
             if ($this->container->hasParameter("app.project.$project")) {
                 $project = $this->container->getParameter("app.project.$project");
             }
-            dump($project);
 
             // Grab the connection to the meta database
             $this->client = $this->container
