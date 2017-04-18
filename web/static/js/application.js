@@ -188,7 +188,7 @@
 
             var newProject = this.value;
 
-            $.get('/api/namespaces/' + newProject).done(function (namespaces) {
+            $.get(xtBaseUrl + 'api/namespaces/' + newProject).done(function (namespaces) {
                 var $allOption = $('#namespace_select option').eq(0).clone();
                 $("#namespace_select").html($allOption);
                 for (var ns in namespaces) {
@@ -212,7 +212,6 @@
                 );
             }).always(function () {
                 $('#namespace_select').prop('disabled', false);
-                console.log('yeah');
             });
         });
     }
