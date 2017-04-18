@@ -37,6 +37,9 @@
         <script src="{{ asset_url }}"></script>
         {% endjavascripts %}
     {% endif %}
+    <script type="text/javascript">
+        xtBaseUrl = "{{ absolute_url(path('homepage')) }}";
+    </script>
 
     <link rel="shortcut icon" href="/favicon.ico?v=3" />
 
