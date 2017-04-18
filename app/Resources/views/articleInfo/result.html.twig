@@ -40,7 +40,7 @@
             {% if assessments is defined %}
                 {% set sections = sections | merge(['assessments']) %}
             {% endif %}
-            {% if checkwiki_errors is defined %}
+            {% if bugs is defined %}
                 {% set sections = sections | merge(['bugs']) %}
             {% endif %}
 
@@ -249,10 +249,10 @@
                     </tr>
                     {% endif %}
 
-                    {% if checkwiki_errors is defined %}
+                    {% if bugs is defined %}
                     <tr>
                         <td class="stat-list--new-group"><a href='#bugs' class='rm-inline-margin'>{{ msg('bugs') }}</a></td>
-                        <td class="stat-list--new-group">{{ checkwiki_errors | length }}</td>
+                        <td class="stat-list--new-group">{{ bugs | length }}</td>
                     </tr>
                     {% endif %}
                 </tbody></table>
@@ -629,7 +629,7 @@
         {% endif %}
 
         {# ======================== BUGS ======================== #}
-        {% if checkwiki_errors is defined %}
+        {% if bugs is defined %}
         {% set content %}
             <table class="table table-bordered table-hover table-striped bugs-table">
                 <thead><tr>
@@ -641,16 +641,30 @@
                             </span>
                         </th>
                     {% endfor %}
+                    <th>{{ msg('edit') | capitalize_first }}</th>
                 </tr></thead>
                 <tbody>
-                {% for bug in checkwiki_errors %}
+                {% for bug in bugs %}
                     <tr>
                         <td class="sort-entry--priority" data-value="{{ bug.prio }}">{{ bug.prio }}</td>
-                        <td class="sort-entry--name" data-value="{{ bug.name_trans }}">{{ bug.name_trans }}</td>
+                        <td class="sort-entry--name" data-value="{{ bug.name }}">{{ bug.name }}</td>
                         <td class="sort-entry--notice" data-value="{{ bug.notice }}">
-                            <code>{{ bug.notice }}</code>
+                            {% if bug.name == 'Wikidata' %}
+                                {{ bug.notice | raw }}
+                            {% else %}
+                                <code>{{ bug.notice }}</code>
+                            {% endif %}
                         </td>
-                        <td class="sort-entry--explanation" data-value="{{ bug.text_trans }}">{{ bug.text_trans | raw }}</td>
+                        <td class="sort-entry--explanation" data-value="{{ bug.explanation }}">{{ bug.explanation | raw }}</td>
+                        <td>
+                            {% if bug.name == 'Wikidata' %}
+                                <a target='_blank' href='//www.wikidata.org/wiki/{{ wikidataId }}'>
+                                    {{ msg('edit') }}
+                                </a>
+                            {% else %}
+                                {{ edit_link(title, project_url) }}
+                            {% endif %}
+                        </td>
                     </tr>
                 {% endfor %}
                 </tbody>

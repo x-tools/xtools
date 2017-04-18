@@ -92,6 +92,7 @@ class ArticleInfoController extends Controller
             'project' => preg_replace('#^https?://#', '', rtrim($projectUrl, '/')),
             'project_url' => $projectUrl,
             'db_name' => $dbValues['dbName'],
+            'lang' => $dbValues['lang'],
             'id' => $basicInfo['pageid'],
             'namespace' => $basicInfo['ns'],
             'title' => $basicInfo['title'],
@@ -146,9 +147,9 @@ class ArticleInfoController extends Controller
         }
         $this->setLogsEvents();
 
-        $checkWikiErrors = $this->getCheckWikiErrors();
-        if (!empty($checkWikiErrors)) {
-            $this->pageInfo['checkwiki_errors'] = $checkWikiErrors;
+        $bugs = array_merge($this->getCheckWikiErrors(), $this->getWikidataErrors());
+        if (!empty($bugs)) {
+            $this->pageInfo['bugs'] = $bugs;
         }
 
         $this->pageInfo['xtPage'] = 'articleinfo';
@@ -350,7 +351,7 @@ class ArticleInfoController extends Controller
         $title = $this->pageInfo['title']; // no underscores
         $dbName = preg_replace('/_p$/', '', $this->pageInfo['db_name']); // remove _p if present
 
-        $query = "SELECT error, notice, found, name_trans, prio, text_trans
+        $query = "SELECT error, notice, found, name_trans AS name, prio, text_trans AS explanation
                   FROM s51080__checkwiki_p.cw_error a
                   JOIN s51080__checkwiki_p.cw_overview_errors b
                   WHERE a.project = b.project AND a.project = '$dbName'
@@ -360,6 +361,66 @@ class ArticleInfoController extends Controller
         $conn = $this->container->get('doctrine')->getManager('toolsdb')->getConnection();
         $res = $conn->query($query)->fetchAll();
         return $res;
+    }
+
+    /**
+     * Get basic wikidata on the page: label and description.
+     * Reported as "bugs" if they are missing.
+     * @return array Label and description, if present
+     */
+    private function getWikidataErrors()
+    {
+        $wikidataId = ltrim($this->pageInfo['wikidataId'], 'Q');
+        $lang = $this->pageInfo['lang'];
+
+        $query = "SELECT IF(term_type = 'label', 'label', 'description') AS term, term_text
+                  FROM wikidatawiki_p.wb_entity_per_page
+                  JOIN wikidatawiki_p.page ON epp_page_id = page_id
+                  JOIN wikidatawiki_p.wb_terms ON term_entity_id = epp_entity_id
+                    AND term_language = '$lang' AND term_type IN ('label', 'description')
+                  WHERE epp_entity_id = $wikidataId
+                  UNION
+                  SELECT pl_title AS term, wb_terms.term_text
+                  FROM wikidatawiki_p.pagelinks
+                  JOIN wikidatawiki_p.wb_terms ON term_entity_id = SUBSTRING(pl_title, 2)
+                    AND term_entity_type = (IF(SUBSTRING(pl_title, 1, 1) = 'Q', 'item', 'property'))
+                    AND term_language = '$lang'
+                    AND term_type = 'label'
+                  WHERE pl_namespace IN (0,120 )
+                  AND pl_from = (
+                    SELECT page_id FROM page
+                    WHERE page_namespace = 0 AND page_title = 'Q$wikidataId'
+                  )";
+
+        $conn = $this->container->get('doctrine')->getManager('replicas')->getConnection();
+        $res = $conn->query($query)->fetchAll();
+
+        $terms = array_map(function ($entry) {
+            return $entry['term'];
+        }, $res);
+
+        $errors = [];
+
+        if (!in_array('label', $terms)) {
+            $errors[] = [
+                'prio' => 2,
+                'name' => 'Wikidata',
+                'notice' => "Label for language <em>$lang</em> is missing", // FIXME: i18n
+                'explanation' => "See: <a target='_blank' " .
+                    "href='//www.wikidata.org/wiki/Help:Label'>Help:Label</a>",
+            ];
+        }
+        if (!in_array('description', $terms)) {
+            $errors[] = [
+                'prio' => 3,
+                'name' => 'Wikidata',
+                'notice' => "Description for language <em>$lang</em> is missing", // FIXME: i18n
+                'explanation' => "See: <a target='_blank' " .
+                    "href='//www.wikidata.org/wiki/Help:Description'>Help:Description</a>",
+            ];
+        }
+
+        return $errors;
     }
 
     /**

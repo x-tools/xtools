@@ -32,6 +32,7 @@ class WikiExtension extends Extension
             new Twig_SimpleFunction('pageviews_links', [ $this, 'pageviewsLinks' ], $options),
             new Twig_SimpleFunction('diff_link', [ $this, 'diffLink' ], $options),
             new Twig_SimpleFunction('perma_link', [ $this, 'permaLink' ], $options),
+            new Twig_SimpleFunction('edit_link', [ $this, 'editLink' ], $options),
         ];
     }
 
@@ -200,6 +201,21 @@ class WikiExtension extends Extension
             $label = date_format($label, 'Y-m-d, H:i');
         }
         return "<a href='$projectUrl/wiki/Special:PermaLink/$revId' target='_blank'>$label</a>";
+    }
+
+    /**
+     * Get a permanent link to the given page at given revision
+     * @param  string $title      Title of page
+     * @param  string $projectUrl Project domain and protocol such as https://en.wikipedia.org
+     * @param  string [$label]    The link text, defaults to 'Edit'
+     * @return string Markup
+     */
+    public function editLink($title, $projectUrl, $label = null)
+    {
+        if (!isset($label)) {
+            $label = $this->intuitionMessage('edit');
+        }
+        return "<a href='$projectUrl/wiki/$title?action=edit' target='_blank'>$label</a>";
     }
 
     /**
