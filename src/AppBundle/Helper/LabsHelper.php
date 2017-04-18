@@ -55,8 +55,17 @@ class LabsHelper
             $wikiName = 'wiki';
             $url = $this->container->getParameter('wiki_url');
         } else {
+            // First, run through our project map.  This is expected to return back
+            // to the project name if there is no defined mapping.
+            if ($this->container->hasParameter("app.project.$project")) {
+                $project = $this->container->getParameter("app.project.$project");
+            }
+
             // Grab the connection to the meta database
-            $this->client = $this->container->get('doctrine')->getManager('meta')->getConnection();
+            $this->client = $this->container
+                ->get('doctrine')
+                ->getManager('meta')
+                ->getConnection();
 
             // Create the query we're going to run against the meta database
             $wikiQuery = $this->client->createQueryBuilder();

@@ -1,4 +1,4 @@
 parameters:
-  # Replace <TABLE_NAME> and <NEW_TABLE_NAME> with the apropreate values.
+  # Replace <TABLE_NAME> and <NEW_TABLE_NAME> with the appropriate values.
   # One mapping per table, but if you do not map the tables it assumes you're using a standard MediaWiki configuration
-  - app.table.<TABLE_NAME>: '<NEW_TABLE_NAME>'
+  app.table.<TABLE_NAME>: '<NEW_TABLE_NAME>'

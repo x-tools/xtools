@@ -1,0 +1,5 @@
+parameters:
+  # Replace <PROJECT_NAME> and <NEW_PROJECT_NAME> with the appropriate values.
+  # You may have multiple mappings per project.
+  # Note that if you do not map, xtools will use the given name.
+  app.project.<PROJECT_NAME>: '<NEW_PROJECT_NAME>'
