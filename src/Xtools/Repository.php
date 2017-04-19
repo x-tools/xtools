@@ -5,6 +5,7 @@ namespace Xtools;
 use Doctrine\DBAL\Connection;
 use Mediawiki\Api\MediawikiApi;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\DependencyInjection\Container;
 
 /**
  * A repository is responsible for retrieving data from wherever it lives (databases, APIs,
@@ -12,6 +13,9 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 abstract class Repository
 {
+
+    /** @var Container */
+    protected $container;
 
     /** @var Connection */
     protected $metaConnection;
@@ -23,33 +27,33 @@ abstract class Repository
     protected $toolsConnection;
 
     /** @var CacheItemPoolInterface */
-    private $cache;
+    protected $cache;
 
     /**
-     * Set the database connection for the 'meta' database.
-     * @param Connection $connection
+     * @param Container $container
      */
-    public function setMetaConnection(Connection $connection)
+    public function setContainer(Container $container)
     {
-        $this->metaConnection = $connection;
+        $this->container = $container;
+        $this->cache = $container->get('cache.app');
     }
 
     /**
-     * Set the database connection for the 'projects' database.
-     * @param Connection $connection
+     * Get the database connection for the 'meta' database.
+     * @return Connection
      */
-    public function setProjectsConnection(Connection $connection)
+    protected function getMetaConnection()
     {
-        $this->projectsConnection = $connection;
+        return $this->container->get('doctrine')->getManager("meta")->getConnection();
     }
 
     /**
-     * Set the database connection for the 'tools' database.
-     * @param Connection $connection
+     * Get the database connection for the 'projects' database.
+     * @return Connection
      */
-    public function setToolsConnection(Connection $connection)
+    protected function getProjectsConnection()
     {
-        $this->toolsConnection = $connection;
+        return $this->container->get('doctrine')->getManager("replicas")->getConnection();
     }
 
     /**
@@ -65,7 +69,16 @@ abstract class Repository
     }
 
     /**
-     * Normalize and quote a table name.
+     * Is XTools connecting to MMF Labs?
+     * @return boolean
+     */
+    public function isLabs()
+    {
+        return (bool)$this->container->getParameter('app.is_labs');
+    }
+
+    /**
+     * Normalize and quote a table name for use in SQL.
      *
      * @param string $databaseName
      * @param string $tableName
@@ -73,17 +86,27 @@ abstract class Repository
      */
     public function getTableName($databaseName, $tableName)
     {
-        // @TODO Import from LabsHelper.
-        return "`$databaseName`.`$tableName`";
-    }
+        // Use the table specified in the table mapping configuration, if present.
+        $mapped = false;
+        if ($this->container->hasParameter("app.table.$tableName")) {
+            $mapped = true;
+            $tableName = $this->container->getParameter("app.table.$tableName");
+        }
 
-    /**
-     * Set the cache for this repository.
-     *
-     * @param CacheItemPoolInterface $pool The cache pool.
-     */
-    public function setCache(CacheItemPoolInterface $pool)
-    {
-        $this->cache = $pool;
+        // For 'revision' and 'logging' tables (actually views) on Labs, use the indexed versions
+        // (that have some rows hidden, e.g. for revdeleted users).
+        $isLoggingOrRevision = in_array($tableName, ['revision', 'logging', 'archive']);
+        if (!$mapped && $isLoggingOrRevision && $this->isLabs()) {
+            $tableName = $tableName."_userindex";
+        }
+
+        // Figure out database name.
+        // Use class variable for the database name if not set via function parameter.
+        if ($this->isLabs() && substr($databaseName, -2) != '_p') {
+            // Append '_p' if this is labs.
+            $databaseName .= '_p';
+        }
+
+        return "`$databaseName`.`$tableName`";
     }
 }

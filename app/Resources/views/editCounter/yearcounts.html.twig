@@ -1,0 +1,46 @@
+{% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
+
+{% block body %}
+
+<canvas id="yearcounts-canvas"></canvas>
+<script type="text/javascript">
+    new Chart($("#yearcounts-canvas"), {
+        type: 'horizontalBar',
+        data: {
+            labels: [{% for y in yearcounts.years %}"{{ y }}"{% if not loop.last %},{% endif %}{% endfor %}],
+            datasets: [
+                {% for ns_id,yeartotals in yearcounts.totals %}
+                {
+                    label: "{{ attribute(namespaces, ns_id) }}",
+                    data: [
+                        {% for y in yearcounts.years %}
+                        {% if attribute(yeartotals, y) is defined %}{{ attribute(yeartotals, y) }}{% else %}0{% endif %}{% if not loop.last %},{% endif %}
+                        {% endfor %}
+                    ],
+                    backgroundColor: "{{ color(ns_id) }}"
+                }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ]
+        },
+        options: {
+            tooltips: {
+                mode: 'index',
+                intersect: false
+            },
+            hover: {
+                mode: 'index'
+            },
+            responsive: true,
+            scales: {
+                xAxes: [{
+                    stacked: true
+                }],
+                yAxes: [{
+                    stacked: true
+                }]
+            }
+        }
+    });
+</script>
+
+{% endblock %}

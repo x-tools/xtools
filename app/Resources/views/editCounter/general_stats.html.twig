@@ -1,0 +1,177 @@
+{% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
+
+{% block body %}
+
+<div class="row">
+    <div class="col-md-6">
+        <table class="table-condensed xt-table">
+            <tr><td>{{ msg("userid") }}:</td><td>{{ user.id(project) }}</td></tr>
+            <tr class="groups">
+                <td><a href="{{ project.url }}/{{ project.scriptPath }}?title=Special:UserRights&user={{ user.username }}">{{ msg("groups") }}</a>:</td>
+                <td>
+                    {% for group in user.groups(project) %}
+                        {{ group }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                    {% if user.globalGroups %}<br />
+                        &bull; {{ msg("global") }}:
+                        {% for group in user.globalGroups %}
+                            {{ group }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </td>
+            </tr>
+            <tr><td>{{ msg("firstedit") }}:</td><td>{{ edit_counter.firstEditDatetime|date('Y-m-d H:i') }}</td></tr>
+            <tr><td>{{ msg("latestedit") }}:</td><td>{{ edit_counter.lastEditDatetime|date('Y-m-d H:i') }}</td></tr>
+            <tr>
+                <td style="border-left:1px solid blue" class="highlighted">{{ msg("live") }}:</td>
+                <td class="tdnum">{{ edit_counter.liveEditCount|number_format }}</td>
+            </tr>
+            <tr>
+                <td style="border-left:1px solid blue" class="highlighted" >{{ msg("deleted_edits") }}:</td>
+                <td class="tdnum">{{ edit_counter.deletedEditCount|number_format }}</td>
+            </tr>
+            <tr>
+                <td style="border-left:1px solid blue" class="highlighted" ><strong>{{ msg("total") }}:</strong></td>
+                <td class="tdnum"><strong>{{ edit_counter.totalEditCount|number_format }}</strong></td>
+            </tr>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <table class="table-condensed xt-table">
+            <tr><td>{{ msg("lastday") }}:</td><td><span class="tdgeneral" >{{ edit_counter.editCountInLast('day') }}</span></td></tr>
+            <tr><td>{{ msg("lastweek") }}:</td><td><span class="tdgeneral" >{{ edit_counter.editCountInLast('week') }}</span></td></tr>
+            <tr><td>{{ msg("lastmonth") }}:</td><td><span class="tdgeneral" >{{ edit_counter.editCountInLast('month') }}</span></td></tr>
+            <tr><td>{{ msg("lastyear") }}:</td><td><span class="tdgeneral" >{{ edit_counter.editCountInLast('year') }}</span></td></tr>
+            <tr class="averge-daily-edit-count">
+                <td title="{{ edit_counter.days }} {{ msg('num-days', [edit_counter.days]) }}" >{{ msg("avg_edits_per_time_sign", [msg("days", [1])]) }}:</td>
+                <td class="tdnum">{{ edit_counter.averageDailyEditCount|number_format }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="col">
+        <table class="table-condensed  xt-table">
+            <tr><td>{{ msg("live") }}:</td><td class="tdnum">{{ edit_counter.getTotalPagesEdited|number_format }}</td></tr>
+            <tr><td>{{ msg("unique") }}:</td><td class="tdnum">@TODO</td></tr>
+            <tr>
+                <td>{{ msg("pages_created") }}:</td>
+                <td class="tdnum">
+                    <a href="{{ path('PagesResult', {project:project.domain, username:user.username, namespace:'all', redirects:'none'}) }}">
+                        {{ edit_counter.createdPagesTotal|number_format }}
+                    </a>
+                </td>
+            </tr>
+            <tr><td>{{ msg("pages_moved") }}:</td><td class="tdnum">{{ edit_counter.movedPagesTotal|number_format }}</td></tr>
+            <tr>
+                <td title="{{ msg("average_per_page") }}">{{ msg("average_per_page_sign") }}</td>
+                <td class="tdnum">{{ edit_counter.averageEditCountPerPage }}</td>
+            </tr>
+            <tr><td>{{ msg('average_edit_size') }}</td><td class="tdnum">@TODO</td></tr>
+            <tr class="rule"><td colspan="2"><hr /></td></tr>
+            <tr>
+                <td>{{ msg('files_uploaded') }}</td>
+                <td><span class="tdgeneral" ><a href="//{{ project.url }}/wiki/Special:ListFiles/{{ user.username }}" >{{ files_uploaded }}</a></span></td>
+            </tr>
+            {% if is_labs %}
+                <tr>
+                    <td>{{ msg('files_uploaded_commons') }}</td>
+                    <td><span class="tdgeneral" ><a href="https://commons.wikimedia.org/wiki/Special:ListFiles/{{ user.username }}" >{{ files_uploaded_commons }}</a></span></td>
+                </tr>
+            {% endif %}
+            <tr><td>{{ msg('autoedits') }}</td><td><span class="tdgeneral" ><a href="#autoeditslist">{{ edit_counter.autoEditsTotal }}</a></span></td></tr>
+            <tr><td>Reverted edits:</td><td><span class="tdgeneral" >@TODO</span></td></tr>
+            <tr class="rule"><td colspan="2"><hr /></td></tr>
+            <tr><td>{{ msg('edits-with-comment') }}</td><td><span class="tdgeneral">{{ with_comments }}</span></td></tr>
+            <tr><td>{{ msg('minor-edits') }}</td><td><span class="tdgeneral">{{ minor_edits }}</span></td></tr>
+            <tr><td>{{ msg('small-edits') }}</td><td><span class="tdgeneral">{{ rev_small|number_format }}</span></td></tr>
+            <tr><td>{{ msg('large-edits') }}</td><td><span class="tdgeneral">{{ rev_large|number_format }}</span></td></tr>
+        </table>
+    </div>
+    <div class="col">
+        <table class="table-condensed  xt-table">
+            <tr><td style="color:gray">{{ msg("actions") }}:</td></tr>
+            <tr><td>{{ msg("thank") }}:</td><td><span class="tdgeneral"><a href="{{ url|raw }}/index.php?title=Special%3ALog&type=thanks&user={{ username }}&page=&year=&month=-1&tagfilter=" >{{ pagesThanked }} <small>x</small></a></span></td></tr>
+            <tr><td>{{ msg("approve") }}:</td><td><span class="tdgeneral"><a href="{{ url|raw }}/index.php?title=Special%3ALog&type=review&user={{ username }}&page=&year=&month=-1&tagfilter=&hide_patrol_log=1&hide_review_log=1&hide_thanks_log=1" >{{ pagesApproved }} <small>x</small></a></span></td></tr>
+            <!--    <tr><td>Unapprove:</td><td><span class="tdgeneral">0 <small>x</small></span></td></tr>   -->
+            <tr><td>{{ msg("patrol") }}:</td><td><span class="tdgeneral"><a href="{{ url|raw }}/index.php?title=Special%3ALog&type=patrol&user={{ username }}&page=&year=&month=-1&tagfilter=" >{{ pagesPatrolled }} <small>x</small></a></span></td></tr>
+            <tr><td colspan=2></td></tr>
+            <tr><td style="color:gray">{{ msg("actions_admin") }}:</td></tr>
+            <tr><td>{{ msg("block") }}:</td><td><span class="tdgeneral">{{ usersBlocked }} <small>x</small></span></td></tr>
+            <tr><td>{{ msg("unblock") }}:</td><td><span class="tdgeneral">{{ usersUnblocked }} <small>x</small></span></td></tr>
+            <tr><td>{{ msg("protect") }}:</td><td><span class="tdgeneral">{{ pagesProtected }} <small>x</small></span></td></tr>
+            <tr><td>{{ msg("unprotect") }}:</td><td><span class="tdgeneral">{{ pagesUnprotected }} <small>x</small></span></td></tr>
+            <tr><td>{{ msg("delete") }}:</td><td><span class="tdgeneral">{{ pagesDeleted }} <small>x</small></span></td></tr>
+            <tr><td>{{ msg("delete") }} ({{ msg("revisions", [1]) }}):</td><td><span class="tdgeneral">{{ pagesDeletedRevision }} <small>x</small></span></td></tr>
+            <tr><td>{{ msg("restore") }}:</td><td><span class="tdgeneral">{{ pagesRestored }} <small>x</small></span></td></tr>
+            <tr><td>{{ msg("import") }}:</td><td><span class="tdgeneral">{{ pagesImported }} <small>x</small></span></td></tr>
+            <tr><td colspan=2></td></tr>
+            <tr><td colspan=2></td></tr>
+            <tr><td style="color:gray">{{ msg("users", [1]) }}:</td></tr>
+            <tr>
+                <td>{{ msg('reblocked') }}</td>
+                <td><span class="tdgeneral"><a href="{{ wiki_log_link('User:'~username, project) }}">@TODO</a></span></td>
+            </tr>
+            <tr><td>Longest block:</td><td>@TODO</td></tr>
+            <tr><td>Current block:</td><td>@TODO</td></tr>
+        </table>
+    </div>
+    <div class="col">
+        <table class="table-condensed xt-table top-project-edit-counts">
+            <thead>
+            <tr>
+                <th colspan="2" title="{{ msg('top-projects-explanation') }}">{{ msg('top-projects-table-header') }}</th>
+                <th class="text-muted text-right"><a href="#latestglobal">{{ msg('top-projects-read-more-link') }}</a></th>
+            </tr>
+            </thead>
+            {% for top_project in top_projects_edit_counts %}
+                <tr>
+                    <td {% if top_project.dbName == project %}class="current"{% endif %}>
+                        {% if top_project.dbName == project %}<span title="{{ msg('selected') }}">►</span>{% endif %}
+                        {{ top_project.wikiName }}
+                    </td>
+                    <td class="tdgeneral">
+                        <a href="{{ path('TopEditsResults', {project:top_project.dbName, username:username}) }}">
+                            {{ top_project.total|number_format }}
+                        </a>
+                    </td>
+                    <td class="tdnum"><small class="text-muted">@TODO days</small></td>
+                </tr>
+            {% endfor %}
+            <tfoot>
+            <tr>
+                <td>@TODO {{ msg('sul-total-other-sites-count') }}</td>
+                <td><span class="tdgeneral" >@TODO</span></td>
+                <td class="tdnum"><small> @TODO days</small></td>
+            </tr>
+            <tr>
+                <th>{{ msg('sul-total-edits') }}</th>
+                <td><span class="tdgeneral">@TODO sul-total</span></td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-2">
+        <div class="chart-wrapper" data-chart-type="pie"
+             data-chart-labels='{{ [ msg('chart-label-small-edits'), msg('chart-label-large-edits') ] | json_encode() | raw }}'
+             data-chart-data='{{ [rev_small, rev_large] | json_encode() | raw }}'
+        >
+            <canvas class="chart" width="100" height="100"></canvas>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="chart-wrapper" data-chart-type="pie"
+             data-chart-labels='{{ [ msg('chart-label-edits-with-comments'), msg('chart-label-edits-without-comments') ] | json_encode() | raw }}'
+             data-chart-data='{{ [with_comments, without_comments] | json_encode() | raw }}'
+        >
+            <canvas class="chart" width="100" height="100"></canvas>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

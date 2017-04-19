@@ -1,356 +1,111 @@
 {% extends 'base.html.twig' %}
 
-{# TODO: Convert to link() and linkToWiki() functions #}
-
 {% block body %}
-    <div class="panel panel-primary">
-        <header class="panel-heading">
-            <div class="text-center xt-heading-top">
-                <a class="back-to-search" href="{{ path('ec') }}">
-                    <span class="glyphicon glyphicon-chevron-left"></span>
-                    Back
-                </a>
-                {{ user_link(username, url) }}
-                <small> &bull; {{ project }} </small>
-            </div>
-        </header>
 
-        <div class="panel-body xt-panel-body-top" >
-            <p class="text-center xt-heading-subtitle">
-                <a href="{{ url }}/w/index.php?title=Special%3ALog&type=block&user=&page=User%{{ username }}&year=&month=-1&tagfilter=" >Block log</a> &middot;
-                <a href="//tools.wmflabs.org/guc/?user={{ username }}" >Global user contributions</a> &middot;
-                <a href="//meta.wikimedia.org/w/index.php?title=Special%3ACentralAuth&target={{ username }}" >Global Account Manager</a> &middot;
-                <a href="//tools.wmflabs.org/quentinv57-tools/tools/sulinfo.php?username={{ username }}" >SUL Info</a> &middot;
-                <a href="//tools.wmflabs.org/wikiviewstats/?lang=en&wiki=wikipedia&page=User:{{ username }}*" >Pageviews in userspace</a>
-            </p>
-
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h4  class="topcaption" >{{ msg("generalstats") }}</h4>
-                </div>
-                <div class="panel-body" id="generalstats">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <table class="table-condensed xt-table">
-                                <tr><td>{{ msg("userid") }}:</td><td>{{ user_id }}</td></tr>
-                                <tr class="groups">
-                                    <td><a href="{{ url }}/index.php?title=Special:UserRights&user={{ username }}">{{ msg("groups") }}</a>:</td>
-                                    <td>
-                                        {% for group in user_groups %}
-                                            {{ group }}{% if not loop.last %}, {% endif %}
-                                        {% endfor %}
-                                        {% if global_groups %}<br />
-                                            &bull; {{ msg("global") }}:
-                                            {% for group in global_groups %}{{ group }}{% endfor %}
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr><td>{{ msg("firstedit") }}:</td><td>{{ first_rev }}</td></tr>
-                                <tr><td>{{ msg("latestedit") }}:</td><td>{{ latest_rev }}</td></tr>
-                                <tr><td colspan=20 ></td></tr>
-                                <tr><td style="border-left:1px solid blue" >{{ msg("live") }}:</td><td class="tdnum">{{ live_edits|number_format }}</td></tr>
-                                <tr><td style="border-left:1px solid blue" >{{ msg("deleted_edits") }}:</td><td class="tdnum">{{ deleted_edits|number_format }}</td></tr>
-                                <tr><td style="border-left:1px solid blue" ><b>{{ msg("total") }}:</b>&nbsp;&nbsp;</td><td class="tdnum"><b>{{ total_edits|number_format }}</b></td></tr>
-                            </table>
-                        </div>
-                        <div class="col-md-6">
-                            <table class="table-condensed  xt-table">
-                                <tr><td>{{ msg("lastday") }}:</td><td><span class="tdgeneral" >{{ rev_24h }}</span></td></tr>
-                                <tr><td>{{ msg("lastweek") }}:</td><td><span class="tdgeneral" >{{ rev_7d }}</span></td></tr>
-                                <tr><td>{{ msg("lastmonth") }}:</td><td><span class="tdgeneral" >{{ rev_30d }}</span></td></tr>
-                                <tr><td>{{ msg("lastyear") }}:</td><td><span class="tdgeneral" >{{ rev_365d }}</span></td></tr>
-                                <tr><td colspan=20 ></td></tr>
-                                <tr><td title="{{ days }} {{ msg('days', [days]) }}" >{{ msg("avg_edits_per_time_sign", [msg("days", [1])]) }}:</td><td><span class="tdnum" >{{ avg_per_day|number_format }}</span></td></tr>
-                            </table>
-                        </div>
-                    </div>
-                    <br />
-                    <hr />
-                    <div class="row">
-                        <div class="col">
-                            <table class="table-condensed  xt-table">
-                                <tr><td style="color:gray">{{ msg("live") }}:</td></tr>
-                                <tr><td>{{ msg("unique") }}:</td><td><span class="tdgeneral" >{{ uniquePages }}</span></td></tr>
-                                <tr>
-                                    <td>{{ msg("pages_created") }}:</td>
-                                    <td>
-                                        <span class="tdgeneral">
-                                            <a href="{{ path('PagesResult', {project:project, username:username, namespace:'all', redirects:'none'}) }}">
-                                                {{ pagesCreated }}
-                                            </a>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr><td>{{ msg("pages_moved") }}:</td><td><span class="tdgeneral" >{{ pagesMoved }}</span></td></tr>
-                                <tr><td title="{{ msg("average_per_page") }}" >{{ msg("average_per_page_sign") }}</td><td><span class="tdgeneral" >{{ editsPerPage }}</span></td></tr>
-                                <tr><td title="Average change per page" >Ø change per page (bytes):</td><td><span class="tdgeneral" ></span></td></tr>
-                                <tr><td colspan=20 ></td></tr>
-                                <tr><td>{{ msg('files_uploaded') }}</td><td><span class="tdgeneral" ><a href="//{{ url }}/wiki/Special:ListFiles/{{ username }}" >{{ files_uploaded }}</a></span></td></tr>
-                                {% if is_labs %}
-                                <tr><td>{{ msg('files_uploaded_commons') }}</td><td><span class="tdgeneral" ><a href="https://commons.wikimedia.org/wiki/Special:ListFiles/{{ username }}" >{{ files_uploaded_commons }}</a></span></td></tr>
-                                {% endif %}
-                                <tr><td colspan=20 ></td></tr>
-                                <tr><td>{{ msg('autoedits') }}</td><td><span class="tdgeneral" ><a href="#autoeditslist">{{ auto_edits_total }}</a></span></td></tr>
-                                <tr><td>Reverted edits:</td><td><span class="tdgeneral" >@TODO</span></td></tr>
-                                <tr><td colspan=20 ></td></tr>
-                                <tr><td>{{ msg('edits-with-comment') }}</td><td><span class="tdgeneral">{{ with_comments }}</span></td></tr>
-                                <tr><td>{{ msg('minor-edits') }}</td><td><span class="tdgeneral">{{ minor_edits }}</span></td></tr>
-                                <tr><td>{{ msg('small-edits') }}</td><td><span class="tdgeneral">{{ rev_small|number_format }}</span></td></tr>
-                                <tr><td>{{ msg('large-edits') }}</td><td><span class="tdgeneral">{{ rev_large|number_format }}</span></td></tr>
-                            </table>
-                        </div>
-                        <div class="col">
-                            <table class="table-condensed  xt-table">
-                                <tr><td style="color:gray">{{ msg("actions") }}:</td></tr>
-                                <tr><td>{{ msg("thank") }}:</td><td><span class="tdgeneral"><a href="{{ url|raw }}/index.php?title=Special%3ALog&type=thanks&user={{ username }}&page=&year=&month=-1&tagfilter=" >{{ pagesThanked }} <small>x</small></a></span></td></tr>
-                                <tr><td>{{ msg("approve") }}:</td><td><span class="tdgeneral"><a href="{{ url|raw }}/index.php?title=Special%3ALog&type=review&user={{ username }}&page=&year=&month=-1&tagfilter=&hide_patrol_log=1&hide_review_log=1&hide_thanks_log=1" >{{ pagesApproved }} <small>x</small></a></span></td></tr>
-                                <!--    <tr><td>Unapprove:</td><td><span class="tdgeneral">0 <small>x</small></span></td></tr>   -->
-                                <tr><td>{{ msg("patrol") }}:</td><td><span class="tdgeneral"><a href="{{ url|raw }}/index.php?title=Special%3ALog&type=patrol&user={{ username }}&page=&year=&month=-1&tagfilter=" >{{ pagesPatrolled }} <small>x</small></a></span></td></tr>
-                                <tr><td colspan=2></td></tr>
-                                <tr><td style="color:gray">{{ msg("actions_admin") }}:</td></tr>
-                                <tr><td>{{ msg("block") }}:</td><td><span class="tdgeneral">{{ usersBlocked }} <small>x</small></span></td></tr>
-                                <tr><td>{{ msg("unblock") }}:</td><td><span class="tdgeneral">{{ usersUnblocked }} <small>x</small></span></td></tr>
-                                <tr><td>{{ msg("protect") }}:</td><td><span class="tdgeneral">{{ pagesProtected }} <small>x</small></span></td></tr>
-                                <tr><td>{{ msg("unprotect") }}:</td><td><span class="tdgeneral">{{ pagesUnprotected }} <small>x</small></span></td></tr>
-                                <tr><td>{{ msg("delete") }}:</td><td><span class="tdgeneral">{{ pagesDeleted }} <small>x</small></span></td></tr>
-                                <tr><td>{{ msg("delete") }} ({{ msg("revisions", [1]) }}):</td><td><span class="tdgeneral">{{ pagesDeletedRevision }} <small>x</small></span></td></tr>
-                                <tr><td>{{ msg("restore") }}:</td><td><span class="tdgeneral">{{ pagesRestored }} <small>x</small></span></td></tr>
-                                <tr><td>{{ msg("import") }}:</td><td><span class="tdgeneral">{{ pagesImported }} <small>x</small></span></td></tr>
-                                <tr><td colspan=2></td></tr>
-                                <tr><td colspan=2></td></tr>
-                                <tr><td style="color:gray">{{ msg("users", [1]) }}:</td></tr>
-                                <tr>
-                                    <td>{{ msg('reblocked') }}</td>
-                                    <td><span class="tdgeneral"><a href="{{ wiki_log_link('User:'~username, project) }}">@TODO</a></span></td>
-                                </tr>
-                                <tr><td>Longest block:</td><td>@TODO</td></tr>
-                                <tr><td>Current block:</td><td>@TODO</td></tr>
-                            </table>
-                        </div>
-                        <div class="col">
-                            <table class="table-condensed xt-table">
-                                <thead>
-                                    <tr>
-                                        <th colspan="2" title="{{ msg('top-projects-explanation') }}">{{ msg('top-projects-table-header') }}</th>
-                                        <th class="text-muted text-right"><a href="#latestglobal">{{ msg('top-projects-read-more-link') }}</a></th>
-                                    </tr>
-                                </thead>
-                                {% for top_project in top_projects_edit_counts %}
-                                <tr>
-                                    <td>
-                                        {% if top_project.dbName == project %}►{% endif %}
-                                        <a href="{{ top_project.url }}">{{ top_project.name }}</a>
-                                    </td>
-                                    <td>
-                                        <span class="tdgeneral">
-                                            <a href="{{ path('TopEditsResults', {project:top_project.dbName, username:username}) }}">
-                                                {{ top_project.total|number_format }}
-                                            </a>
-                                        </span>
-                                    </td>
-                                    <td class="tdnum"><small class="text-muted">@TODO days</small></td>
-                                </tr>
-                                {% endfor %}
-                                <tfoot>
-                                    <tr>
-                                        <td>@TODO {{ msg('sul-total-other-sites-count') }}</td>
-                                        <td><span class="tdgeneral" >@TODO</span></td>
-                                        <td class="tdnum"><small> @TODO days</small></td>
-                                    </tr>
-                                    <tr>
-                                        <th>{{ msg('sul-total-edits') }}</th>
-                                        <td><span class="tdgeneral">@TODO sul-total</span></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-2">
-                            <div class="chart-wrapper" data-chart-type="pie"
-                                 data-chart-labels='{{ [ msg('chart-label-small-edits'), msg('chart-label-large-edits') ] | json_encode() | raw }}'
-                                 data-chart-data='{{ [rev_small, rev_large] | json_encode() | raw }}'
-                            >
-                                <canvas class="chart" width="100" height="100"></canvas>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="chart-wrapper" data-chart-type="pie"
-                                 data-chart-labels='{{ [ msg('chart-label-edits-with-comments'), msg('chart-label-edits-without-comments') ] | json_encode() | raw }}'
-                                 data-chart-data='{{ [with_comments, without_comments] | json_encode() | raw }}'
-                            >
-                                <canvas class="chart" width="100" height="100"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="panel panel-default" id="nstotals">
-                <div class="panel-heading"><h4>{{ msg('namespacetotals') }}</h4></div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-5">
-                            <table class="table table-striped xt-table">
-                                <tbody>
-                                {% for nsId, value in namespaceArray %}
-                                    <tr>
-                                        <td><span class="label label-default" style="background-color:{{ color(nsId) }}">&nbsp;&nbsp;</span></td>
-                                        <td>{{ namespaces[nsId] }}</td>
-                                        <td class="tdnum">{{ value|number_format }}</td>
-                                        <td class="tdnum">{{ ((value/namespaceTotal)*100)|round(1) }}%</td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col-md-7">
-                            <canvas id="namespace-canvas"></canvas>
-                            <script>
-                                new Chart($("#namespace-canvas"), {
-                                    type: 'pie',
-                                    data: {
-                                        labels: [{% for key,value in namespaceArray %}{% if not loop.first %},{% endif %}"{{ namespaces[key] }}"{% endfor %}],
-                                        datasets: [{
-                                            data: [{% for value in namespaceArray %}{% if not loop.first %},{% endif %}{{ value }}{% endfor %}],
-                                            backgroundColor: [{% for key,value in namespaceArray %}{% if not loop.first %},{% endif %}'{{ color(key) }}'{% set first = 0 %}{% endfor %}],
-                                            borderColor: [{% for key,value in namespaceArray %}{% if not loop.first %},{% endif %}'{{ color(key) }}'{% set first = 0 %}{% endfor %}],
-                                            borderWidth: 1
-                                        }]
-                                    }
-                                });
-                            </script>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="panel panel-default" id="yearcounts">
-                <div class="panel-heading"><h4>{{ msg('yearcounts') }}</h4></div>
-                <div class="panel-body">
-                    <canvas id="yearcounts-canvas"></canvas>
-                    <script type="text/javascript">
-                        new Chart($("#yearcounts-canvas"), {
-                            type: 'horizontalBar',
-                            data: {
-                                labels: [{% for y in yearcounts.years %}"{{ y }}"{% if not loop.last %},{% endif %}{% endfor %}],
-                                datasets: [
-                                    {% for ns_id,yeartotals in yearcounts.totals %}
-                                    {
-                                        label: "{{ attribute(namespaces, ns_id) }}",
-                                        data: [
-                                            {% for y in yearcounts.years %}
-                                                {% if attribute(yeartotals, y) is defined %}{{ attribute(yeartotals, y) }}{% else %}0{% endif %}{% if not loop.last %},{% endif %}
-                                            {% endfor %}
-                                        ],
-                                        backgroundColor: "{{ color(ns_id) }}"
-                                    }{% if not loop.last %},{% endif %}
-                                    {% endfor %}
-                                ]
-                            },
-                            options: {
-                                tooltips: {
-                                    mode: 'index',
-                                    intersect: false
-                                },
-                                hover: {
-                                    mode: 'index'
-                                },
-                                responsive: true,
-                                scales: {
-                                    xAxes: [{
-                                        stacked: true
-                                    }],
-                                    yAxes: [{
-                                        stacked: true
-                                    }]
-                                }
-                            }
-                        });
-                    </script>
-                </div>
-            </div>
-    
-            <div class="panel panel-default" id="timecard">
-                <div class="panel-heading"><h4>{{ msg('timecard') }}</h4></div>
-                <div class="panel-body">
-                    {{ render(path('EditCounterTimeCard', {
-                        'username': username,
-                        'project': project
-                    })) }}
-                </div>
-            </div>
-
-            <div class="panel panel-default" id="latestglobal">
-                <div class="panel-heading">
-                    <h4>{{ msg('latest-global-edits') }} <small>{{ msg('latest-global-edits-desc') }}</small></h4>
-                </div>
-                <div class="panel-body">
-                    <table class="table-striped table-condensed sortable xt-table">
-                        <thead>
-                            <tr>
-                                <th>{{ msg('latestglobal-time') }}</th>
-                                <th>{{ msg('latestglobal-project') }}</th>
-                                <th>{{ msg('latestglobal-actions') }}</th>
-                                <th>{{ msg('latestglobal-page') }}</th>
-                                <th>{{ msg('latestglobal-comment') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for edit in recent_global_contribs %}
-                        <tr>
-                            <td class="tddate">{{ edit.rev_timestamp }}</td>
-                            <td><a href="{{ edit.project_url }}">{{ edit.project_name }}</a></td>
-                            <td>(
-                                {{ diff_link(edit.rev_id, edit.project_url) }}
-                                &middot; <a title="Special:contributions" href="//en.wikipedia.org/w/index.php?title=Special:Contributions&tagfilter=&contribs=user&target=">log @TODO</a>
-                                &middot; <a href="{{ path('topedits', {project:edit.project_db_name, user:username, article:edit.page_title}) }}">topedits</a>
-                                )
-                            </td>
-                            <td class="tdtitle break">{{ wiki_link(edit.page_title, edit.project_url) }}</td>
-                            <td class="revtext break">{{ edit.rev_comment }}</td>
-                        </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="panel panel-default" id="monthcounts">
-                <div class="panel-heading"><h4>{{ msg('monthcounts') }}</h4></div>
-                <div class="panel-body">
-                    {{ render(path('EditCounterMonthCounts', {
-                        'username': username,
-                        'project': project
-                    })) }}
-                </div>
-            </div>
-
-            <div class="panel panel-default" id="topedited">
-                <div class="panel-heading"><h4>{{ msg('top-edited-pages') }}</h4></div>
-                <div class="panel-body">
-                    {# List of top edited pages, grouped by namespace. #}
-                    <p>@TODO</p>
-                </div>
-            </div>
-
-            <div class="panel panel-default" id="autoeditslist">
-                <div class="panel-heading">
-                    <h4>{{ msg('autoedits') }}</h4>
-                </div>
-                <div class="panel-body">
-                    <table>
-                        {% for tool,count in auto_edits %}
-                            <tr>
-                                <th>{{ tool }}</th>
-                                <td>{{ count|number_format }}</td>
-                            </tr>
-                        {% endfor %}
-                    </table>
-                </div>
-            </div>
-
+<div class="panel panel-primary">
+    <header class="panel-heading">
+        <div class="text-center xt-heading-top">
+            <a class="back-to-search" href="{{ path('ec') }}">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                Back
+            </a>
+            {{ user_link(username, url) }}
+            <small> &bull; {{ project }} </small>
         </div>
+    </header>
+
+    <div class="panel-body xt-panel-body-top">
+        <p class="text-center xt-heading-subtitle">&middot;
+            {{ user_log_link(username, project) }} &middot;
+            {% if is_labs %}
+                <a href="https://tools.wmflabs.org/guc/?user={{ username }}" >{{ msg('global_contribs') }}</a> &middot;
+                <a href="https://meta.wikimedia.org/w/index.php?title=Special%3ACentralAuth&target={{ username }}" >{{ msg('global-account-manager') }}</a> &middot;
+                <a href="https://tools.wmflabs.org/quentinv57-tools/tools/sulinfo.php?username={{ username }}" >{{ msg('sul-info') }}</a> &middot;
+                <a href="https://tools.wmflabs.org/wikiviewstats/?lang=en&wiki=wikipedia&page=User:{{ username }}*" >{{ msg('pageviews-in-userspace') }}</a> &middot;
+            {% endif %}
+        </p>
+
+        <div class="panel panel-default" id="generalstats">
+            <div class="panel-heading">
+                <h4 class="topcaption">{{ msg("generalstats") }}</h4>
+            </div>
+            <div class="panel-body" id="generalstats">
+                {{ render(path('EditCounterGeneralStats', {
+                    'username': username,
+                    'project': project
+                })) }}
+            </div>
+        </div>
+
+        <div class="panel panel-default" id="namespacetotals">
+            <div class="panel-heading"><h4>{{ msg('namespacetotals') }}</h4></div>
+            <div class="panel-body">
+                {{ render(path('EditCounterNamespaceTotals', {
+                    'username': username,
+                    'project': project
+                })) }}
+            </div>
+        </div>
+
+        <div class="panel panel-default" id="yearcounts">
+            <div class="panel-heading"><h4>{{ msg('yearcounts') }}</h4></div>
+            <div class="panel-body">
+                {{ render(path('EditCounterYearCounts', {
+                    'username': username,
+                    'project': project
+                })) }}
+            </div>
+        </div>
+
+        <div class="panel panel-default" id="timecard">
+            <div class="panel-heading"><h4>{{ msg('timecard') }}</h4></div>
+            <div class="panel-body">
+                {{ render(path('EditCounterTimeCard', {
+                    'username': username,
+                    'project': project
+                })) }}
+            </div>
+        </div>
+
+        <div class="panel panel-default" id="latestglobal">
+            <div class="panel-heading">
+                <h4>{{ msg('latest-global-edits') }} <small>{{ msg('latest-global-edits-desc') }}</small></h4>
+            </div>
+            <div class="panel-body">
+                {{ render(path('EditCounterLatestGlobal', {
+                    'username': username,
+                    'project': project
+                })) }}
+            </div>
+        </div>
+
+        <div class="panel panel-default" id="monthcounts">
+            <div class="panel-heading"><h4>{{ msg('monthcounts') }}</h4></div>
+            <div class="panel-body">
+                {{ render(path('EditCounterMonthCounts', {
+                    'username': username,
+                    'project': project
+                })) }}
+            </div>
+        </div>
+
+        <div class="panel panel-default" id="autoeditslist">
+            <div class="panel-heading">
+                <h4>{{ msg('autoedits') }}</h4>
+            </div>
+            <div class="panel-body">
+                <table class="table">
+                    {% for tool,count in auto_edits %}
+                        <tr>
+                            <th>{{ tool }}</th>
+                            <td>{{ count|number_format }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+
     </div>
+</div>
 
 {% endblock %}
