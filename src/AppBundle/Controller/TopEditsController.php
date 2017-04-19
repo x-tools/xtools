@@ -56,25 +56,15 @@ class TopEditsController extends Controller
             $project = $this->container->getParameter('default_project');
         }
 
-        // Retrieving the global groups, using the ApiHelper class
+        /** @var ApiHelper */
         $api = $this->get("app.api_helper");
-
-        // Try fetching namespaces. At this point $project has some sort of value
-        try {
-            $namespaces = $api->namespaces($project);
-        } catch (\Exception $e) {
-            // show error message and redirect back to default project
-            $this->addFlash("notice", [$e->getMessage()]);
-            $project = $this->container->getParameter('default_project');
-            return $this->redirectToRoute("PagesProject", [ 'project'=>$project ]);
-        }
 
         return $this->render('topedits/index.html.twig', [
             'xtPageTitle' => 'tool_topedits',
             'xtSubtitle' => 'tool_topedits_desc',
             'xtPage' => 'topedits',
             'project' => $project,
-            'namespaces' => $namespaces,
+            'namespaces' => $api->namespaces($project),
         ]);
     }
 
