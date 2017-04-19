@@ -19,12 +19,17 @@ class ApiControllerTest extends WebTestCase
     public function testNamespaces()
     {
         $client = static::createClient();
+        $isSingle = $this->container->getParameter('app.single_wiki');
 
-        // test 404
+        // Test 404 (for single-wiki setups, that wiki's namespaces are always returned).
         $crawler = $client->request('GET', '/api/namespaces/wiki.that.doesnt.exist.org');
-        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        if ($isSingle) {
+            $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        } else {
+            $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        }
 
-        if ($this->container->getParameter('app.is_labs')) {
+        if (!$isSingle && $this->container->getParameter('app.is_labs')) {
             $crawler = $client->request('GET', '/api/namespaces/fr.wikipedia.org');
             $this->assertEquals(200, $client->getResponse()->getStatusCode());
 

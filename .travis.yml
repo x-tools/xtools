@@ -14,7 +14,6 @@ php:
 
 # optionally specify a list of environments, for example to test different RDBMS
 env:
-  - IS_LABS=1
   - IS_LABS=0
 
 before_install:
@@ -22,7 +21,7 @@ before_install:
 
 install:
   - composer install
-  - 'sed -i "s/apps.is_labs: .*/apps.is_labs: $IS_LABS/" app/config/parameters.yml'
+  - 'sed -i "s/app.is_labs: .*/app.is_labs: $IS_LABS/" app/config/parameters.yml'
 
 script:
   - composer validate

@@ -46,7 +46,7 @@ class LabsHelper
      * Set up LabsHelper::$client and return the database name, wiki name, and URL of a given
      * project.
      * @todo: Handle failure better
-     * @return string[] With keys 'dbName', 'wikiName', and 'url'.
+     * @return string[] With keys 'dbName', 'wikiName', 'url', and 'lang'.
      */
     public function databasePrepare($project = 'wiki')
     {
@@ -54,6 +54,7 @@ class LabsHelper
             $dbName = $this->container->getParameter('database_replica_name');
             $wikiName = 'wiki';
             $url = $this->container->getParameter('wiki_url');
+            $lang = $this->container->getParameter('lang');
         } else {
             // First, run through our project map.  This is expected to return back
             // to the project name if there is no defined mapping.
