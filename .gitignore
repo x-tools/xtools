@@ -17,8 +17,7 @@
 /web/bundles/
 /web/config.php
 /web/css/
-/web/static/css/production*
-/web/static/js/production*
+/web/static/production/
 ~
 
 .idea/

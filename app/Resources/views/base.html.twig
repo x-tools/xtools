@@ -22,18 +22,18 @@
             'static/css/application.scss'
             'static/css/articleinfo.scss'
             'static/css/pages.scss'
-            output='static/css/production.css' %}
+            output='static/production/application.css' %}
         <link rel="stylesheet" href="{{ asset_url }}" />
         {% endstylesheets %}
         {% javascripts
-            'res/jquery.min.js'
+            'static/js/vendor/jquery.min.js'
             'bootstrap/js/bootstrap.min.js'
             'chartjs/Chart.min.js'
             'static/js/core_extensions.js'
             'static/js/application.js'
             'static/js/articleinfo.js'
             'static/js/editcounter.js'
-            output='static/js/production.js' %}
+            output='static/production/application.js' %}
         <script src="{{ asset_url }}"></script>
         {% endjavascripts %}
     {% endif %}
