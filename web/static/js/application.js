@@ -69,9 +69,20 @@
 
         setupTOC();
 
+        // if applicable, setup namespace selector with real time updates when changing projects
         if ($('#project_input').length && $('#namespace_select').length) {
             setupNamespaceSelector();
         }
+
+        // Load translations with 'en.json' as a fallback
+        var messagesToLoad = {};
+        messagesToLoad[i18nLang] = assetPath + 'static/i18n/' + i18nLang + '.json';
+        if (i18nLang !== 'en') {
+            messagesToLoad.en = assetPath + 'static/i18n/en.json';
+        }
+        $.i18n({
+            locale: i18nLang
+        }).load(messagesToLoad);
     });
 
     /**

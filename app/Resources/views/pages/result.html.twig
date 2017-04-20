@@ -33,13 +33,32 @@
             {% endif %}
         </p>
 
+        {% set multiNamspace = count|length > 1 %}
+
+        {% if multiNamspace %}
+        <div class="text-center xt-toc">
+            {#
+             # To save real estate, show "Namespace (talk)" where appropriate
+             # instead of "Namespace" "Namespace talk"
+             #}
+            {% for key, value in count if (key is even or (key is odd and not(count[key - 1] is defined))) %}
+                <span>
+                    <a href="#{{ key }}" data-section="{{ key }}">{{ namespaces[key] }}</a>
+                    {% if count[key + 1] is defined %}
+                        (<a href="#{{ key+1 }}" data-section="{{ key+1 }}">{{ msg('talk') | lower }}</a>)
+                    {% endif %}
+                </span>
+            {% endfor %}
+        </div>
+        {% endif %}
+
         {% set content %}
             <div class="col-lg-6 stat-list clearfix">
                 <table class="table"><tbody>
                     <tr>
                         <td>{{ msg('namespace') }}</td>
                         <td>
-                            {% if namespace is sameas('all') %}
+                            {% if namespace == 'all' %}
                                 {{ msg('all') | capitalize_first }}
                             {% else %}
                                 {{ namespaces[namespace] }}
@@ -53,7 +72,7 @@
                 </tbody></table>
             </div>
             <div style="clear:both"></div>
-            <table class="table table-bordered table-hover table-striped top-editors-table">
+            <table class="table table-bordered table-hover table-striped namespaces-table">
                 <thead><tr>
                     {% for key in summaryColumns %}
                         <th>
@@ -68,7 +87,15 @@
                     {% for key, value in count %}
                     <tr>
                         <td class="sort-entry--namespace" data-value="{{ namespaces[key] }}">
-                            <span class="color-icon" style="background:{{ color(key) }}"></span>
+                            {% if multiNamspace %}
+                            <span class="namespace-toggle" data-index="{{ loop.index }}" data-ns="{{ key }}">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            {% endif %}
+                                <span class="color-icon" style="background:{{ color(key) }}"></span>
+                            {% if multiNamspace %}
+                            </span>
+                            {% endif %}
+
                             <a href="#{{ key }}" >{{ namespaces[key] }}</a>
                         </td>
                         {% if redirect != 'onlyredirects' %}
@@ -91,6 +118,26 @@
                     </tr>
                     {% endfor %}
                 </tbody>
+                {% if pages|length > 1 %}
+                    <tfoot>
+                        <th class="namespaces--namespaces">
+                            {{ msg('num_namespaces', [pages|length|number_format, pages|length]) }}
+                        </th>
+                        <th class="namespaces--pages">
+                            {{ total | number_format }}
+                        </th>
+                        {% if 'redirects' in summaryColumns and 'pages' in summaryColumns %}
+                            <th class="namespaces--redirects">
+                                {{ redirectTotal | number_format }}
+                                ({{ redirectTotal | percent_format(total) }})
+                            </th>
+                        {% endif %}
+                        <th class="namespaces--deleted">
+                            {{ deletedTotal | number_format }}
+                            ({{ deletedTotal | percent_format(total) }})
+                        </th>
+                    </tfoot>
+                {% endif %}
             </table>
             {% if namespace == 'all' %}
             <div class="chart-wrapper">
@@ -100,34 +147,30 @@
         {% endset %}
         {{ layout.content_block('summary', content) }}
 
-        {% set content %}
-            {% for key in pages|keys %}
-                <h3 id={{ key }}>{{ namespaces[key] }}</h3>
+        {% for key in pages|keys %}
+            {% set content %}
                 <table class="table table-bordered table-hover table-striped top-editors-table">
                     <thead><tr>
                         <th>#</th>
-                        {% for key in ['page', 'date', 'original_size'] %}
+                        {% set columns = ['page', 'date', 'original_size', 'current_size'] %}
+                        {% if key == '0' and hasPageAssessments %}
+                            {% set columns = columns|merge(['assessment']) %}
+                        {% endif %}
+                        {% for thKey in columns %}
                             <th>
-                                <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                                    {{ msg(key) | capitalize_first }}
+                                <span class="sort-link sort-link--{{ thKey }}" data-column="{{ thKey }}">
+                                    {{ msg(thKey) | capitalize_first }}
                                     <span class="glyphicon glyphicon-sort"></span>
                                 </span>
                             </th>
                         {% endfor %}
-                        {% if hasPageAssessments %}
-                            <th>
-                                <span class="sort-link sort-link--assessment" data-column="assessment">
-                                    {{ msg('assessment') | capitalize_first }}
-                                    <span class="glyphicon glyphicon-sort"></span>
-                                </span>
-                            </th>
-                        {% endif %}
                         <th>{{ msg('links') }}</th>
                     </tr></thead>
                     <tbody>
                         {% set index = 0 %}
-                        {% for date,pageList in pages[key] %}
-                            {% for page in pageList %}
+                        {% set maxRows = 100 %}
+                        {% for date,pageList in pages[key] if not(multiNamspace) or (index < maxRows and multiNamspace) %}
+                            {% for page in pageList if not(multiNamspace) or (index < maxRows and multiNamspace) %}
                                 {% set index = index + 1 %}
                                 <tr>
                                     <td>{{ index }}</td>
@@ -151,8 +194,11 @@
                                     <td class="sort-entry--original_size" data-value="{{ page.rev_len }}">
                                         {{ page.rev_len | number_format }}
                                     </td>
-                                    {% if hasPageAssessments %}
-                                        <td class="sort-entry--assessment" data-value="{{ page.pa_class }}">
+                                    <td class="sort-entry--current_size" data-value="{{ page.page_len }}">
+                                        {{ page.page_len | number_format }}
+                                    </td>
+                                    {% if key == '0' and hasPageAssessments %}
+                                        <td class="sort-entry--assessment" data-value="{{ page.pa_class ? page.pa_class : 'Unknown' }}">
                                             {% if page.badge is defined %}
                                             <img alt="{{ page.pa_class }}" src="{{ page.badge }}" class="assessment-badge" />
                                             {% endif %}
@@ -169,24 +215,40 @@
                                         {% endif %}
                                         {% if enabled('topedits') %}
                                             &middot;
-                                            <a href="{{ path('topedits', { 'project': project, 'username': username, 'namespace': namespace, 'page': page['page_title'] }) }}">{{ msg('tool_topedits') }}</a>
+                                            <a href="{{ path('topedits', { 'project': project, 'username': username, 'namespace': namespace, 'page': page.page_title }) }}">{{ msg('tool_topedits') }}</a>
+                                        {% endif %}
+                                        {% if isWMFLabs() %}
+                                            &middot;
+                                            <a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project }}&pages={{ pagename }}">
+                                                {{ msg('pageviews') }}
+                                            </a>
                                         {% endif %}
                                     </td>
                                 </tr>
                             {% endfor %}
                         {% endfor %}
+                        {% if count[key]['total'] > maxRows and multiNamspace %}
+                            <tr class="show-more-row">
+                                <td></td>
+                                <td colspan=6>
+                                    <a href="{{ path('pages', { 'project': project, 'username': username, 'namespace': key, 'redirects': redirect }) }}">
+                                        {{ msg('num_others', [count[key]['total'] - maxRows]) }}
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endif %}
                     </tbody>
                 </table>
-            {% endfor %}
-        {% endset %}
-        {{ layout.content_block('pages_created', content) }}
+            {% endset %}
+            {{ layout.content_block(namespaces[key], content, null, key, true) }}
+        {% endfor %}
     </div>
 
     {% if namespace == 'all' %}
         {% set nsIds = count|keys %}
         <script>
             var ctx = document.getElementById("pie_chart");
-            var myChart = new Chart(ctx, {
+            window.pieChart = new Chart(ctx, {
                 type: 'pie',
                 data: {
                     labels: [
@@ -219,6 +281,7 @@
                     }
                 }
             });
+            window.countsByNamespace = {{ count | json_encode() | raw }};
         </script>
     {% endif %}
 </div>

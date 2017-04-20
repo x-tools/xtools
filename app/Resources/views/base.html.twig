@@ -27,18 +27,22 @@
         {% endstylesheets %}
         {% javascripts
             'static/js/vendor/jquery.min.js'
+            'static/js/vendor/jquery.i18n/jquery.i18n.dist.js'
             'bootstrap/js/bootstrap.min.js'
             'chartjs/Chart.min.js'
             'static/js/core_extensions.js'
             'static/js/application.js'
             'static/js/articleinfo.js'
             'static/js/editcounter.js'
+            'static/js/pages.js'
             output='static/production/application.js' %}
         <script src="{{ asset_url }}"></script>
         {% endjavascripts %}
     {% endif %}
     <script type="text/javascript">
         xtBaseUrl = "{{ absolute_url(path('homepage')) }}";
+        assetPath = "{{ asset('') }}";
+        i18nLang = "{{ lang() }}";
     </script>
 
     <link rel="shortcut icon" href="/favicon.ico?v=3" />

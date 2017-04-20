@@ -1,15 +1,29 @@
-{% macro content_block(title, content, description) %}
-<section class="panel panel-default clearfix" id="{{ title }}">
-    <header class="panel-heading col-lg-12">
-        <h4>
-            {{ msg(title) }}
-            <small class='xt-show'>[{{ msg('show') }}]</small>
-            <small class='xt-hide'>[{{ msg('hide') }}]</small>
-            {% if description is defined %}
-            <span class='pull-right text-muted xt-panel-description'>{{ description }}</span>
-            {% endif %}
-        </h4>
-    </header>
-    <div class="panel-body col-lg-12">{{ content }}</div>
-</section>
+{#
+ # Generate a collapsible Bootstrap .panel with a heading
+ # @param string title       - i18n message that is the title of the content block, shown in a header
+ # @param string content     - raw content to show in the section body
+ # @param string id          - id of the section, defaults to the title
+ # @param bool   notranslate - don't translate the 'title'
+ #}
+{% macro content_block(title, content, description, id = null, notranslate = false) %}
+    {% if id is null %}
+        {% set id = title %}
+    {% endif %}
+    <section class="panel panel-default clearfix" id="{{ id }}">
+        <header class="panel-heading col-lg-12">
+            <h4>
+                {% if notranslate %}
+                    {{ title }}
+                {% else %}
+                    {{ msg(title) }}
+                {% endif %}
+                <small class='xt-show'>[{{ msg('show') }}]</small>
+                <small class='xt-hide'>[{{ msg('hide') }}]</small>
+                {% if description is defined %}
+                <span class='pull-right text-muted xt-panel-description'>{{ description }}</span>
+                {% endif %}
+            </h4>
+        </header>
+        <div class="panel-body col-lg-12">{{ content }}</div>
+    </section>
 {% endmacro %}
