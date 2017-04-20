@@ -8,6 +8,7 @@ imports:
     - { resource: table_map.yml, ignore_errors: true }
     - { resource: project_map.yml, ignore_errors: true }
     - { resource: assessments.yml }
+    - { resource: quote.yml }
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
