@@ -114,8 +114,6 @@ class QuoteController extends Controller
                     $this->getParameter('kernel.root_dir') . '/..'
                 ),
                 "xtPage" => "bash",
-                "xtPageTitle" => "tool_bash",
-                "xtSubtitle" => "tool_bash_desc",
                 "quotes" => $quotes,
             ]
         );
@@ -164,8 +162,6 @@ class QuoteController extends Controller
                     $this->getParameter('kernel.root_dir') . '/..'
                 ),
                 "xtPage" => "bash",
-                "xtPageTitle" => "tool_bash",
-                "xtSubtitle" => "tool_bash_desc",
                 "text" => $text,
                 "id" => $id,
             ]

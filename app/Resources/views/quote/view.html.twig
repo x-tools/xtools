@@ -1,10 +1,25 @@
 {% extends 'base.html.twig' %}
-{% import 'macros/forms.html.twig' as forms %}
 
 {% block body %}
-    <div class="col-lg-12">
-        {{ msg("quote_id", id) }} &middot; <a href="{{ path("quoteRandom") }}">{{ msg("quote_random") }}</a> &middot; <a href="{{ path("quoteAll") }}">{{ msg("quote_showall") }}</a>
-        <pre>{{ text }}</pre>
+<div class="panel panel-primary">
+    <header class="panel-heading">
+        <div class="text-center xt-heading-top">
+            <a class="back-to-search" href="{{ path('bash') }}">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                {{ msg('back') }}
+            </a>
+            {{ msg('quote') }} #{{ id }}
+        </div>
+    </header>
+    <div class="panel-body xt-panel-body">
+        <blockquote>
+            {{ text }}
+        </blockquote>
 
+        <div>
+            <a class="btn btn-primary form-submit" href="{{ path('bashRandom') }}">{{ msg("quote_random") }}</a>
+            <a class="btn btn-primary form-submit" href="{{ path('bashAll') }}">{{ msg("quote_showall") }}</a>
+        </div>
     </div>
+</div>
 {% endblock %}
