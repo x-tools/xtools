@@ -265,6 +265,9 @@ section > .panel-body {
     font-size: 85%;
     word-wrap: break-word;
 }
+.table .show-more-row td {
+    border: 0;
+}
 .break {
     word-wrap: break-word;
     white-space: -moz-pre-wrap;

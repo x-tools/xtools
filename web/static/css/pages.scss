@@ -1,14 +1,54 @@
 @import 'mixins.scss';
 
 .pages {
-    .top-editors-table {
+    .namespaces-table {
         float: left;
+
+        tr:hover .namespace-toggle {
+            .color-icon {
+                visibility: hidden;
+            }
+
+            .glyphicon {
+                display: block;
+            }
+        }
+
+        tr.excluded {
+            .sort-entry--namespace a,
+            .sort-entry--pages,
+            .sort-entry--deleted,
+            .sort-entry--redirects {
+                opacity: 0.5;
+                text-decoration: line-through;
+            }
+
+            .color-icon {
+                opacity: 0.5;
+            }
+        }
+
+        .namespace-toggle {
+            cursor: pointer;
+            margin-right: 4px;
+            position: relative;
+        }
+
+        td .glyphicon {
+            display: none;
+            left: 1px;
+            position: absolute;
+        }
     }
 
     .chart-wrapper {
         float: left;
         margin-left: 100px;
         margin-top: 20px;
-        width: 300px;
+        max-width: 500px;
+    }
+
+    .panel-body h3 {
+        clear: both;
     }
 }

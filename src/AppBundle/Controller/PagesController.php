@@ -177,7 +177,7 @@ class PagesController extends Controller
 
         $stmt = "
             (SELECT DISTINCT page_namespace AS namespace, 'rev' AS type, page_title AS page_title,
-                page_is_redirect AS page_is_redirect, rev_timestamp AS timestamp,
+                page_len, page_is_redirect AS page_is_redirect, rev_timestamp AS timestamp,
                 rev_user, rev_user_text, rev_len, rev_id $paSelects
             FROM $pageTable
             JOIN $revisionTable ON page_id = rev_page
@@ -188,10 +188,10 @@ class PagesController extends Controller
 
             UNION
 
-            (SELECT  a.ar_namespace AS namespace, 'arc' AS type, a.ar_title AS page_title,
-                '0' AS page_is_redirect, min(a.ar_timestamp) AS timestamp, a.ar_user AS rev_user,
-                a.ar_user_text AS rev_user_text, a.ar_len AS rev_len, a.ar_rev_id AS rev_id
-                $paSelectsArchive
+            (SELECT a.ar_namespace AS namespace, 'arc' AS type, a.ar_title AS page_title,
+                0 AS page_len, '0' AS page_is_redirect, min(a.ar_timestamp) AS timestamp,
+                a.ar_user AS rev_user, a.ar_user_text AS rev_user_text, a.ar_len AS rev_len,
+                a.ar_rev_id AS rev_id $paSelectsArchive
             FROM $archiveTable a
             JOIN
             (
