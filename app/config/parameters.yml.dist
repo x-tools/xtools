@@ -47,13 +47,11 @@ parameters:
     enable.adminscore: 1
     enable.adminstats: 1
     enable.articleinfo: 1
-    enable.autoblock: 0
     enable.autoedits: 0
     enable.bash: 0
     enable.blame: 0
     enable.ec: 1
     enable.pages: 1
-    enable.rangecontribs: 0
     enable.rfa: 0
     enable.rfap: 0
     enable.sc: 1
