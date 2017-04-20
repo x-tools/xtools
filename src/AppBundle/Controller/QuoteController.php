@@ -44,11 +44,12 @@ class QuoteController extends Controller
 
         // Oterwise render the form.
         return $this->render(
-            'quote/index.html.twig', [
-            'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
-            "xtPage" => "bash",
-            "xtPageTitle" => "tool_bash",
-            "xtSubtitle" => "tool_bash_desc",
+            'quote/index.html.twig',
+            [
+                'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
+                "xtPage" => "bash",
+                "xtPageTitle" => "tool_bash",
+                "xtSubtitle" => "tool_bash_desc",
             ]
         );
     }
@@ -73,8 +74,7 @@ class QuoteController extends Controller
         // a flash notice.
         try {
             $id = rand(1, sizeof($this->getParameter("quotes")));
-        }
-        catch (InvalidParameterException $e) {
+        } catch (InvalidParameterException $e) {
             $this->addFlash("notice", ["noquotes"]);
             return $this->redirectToRoute("quote");
         }
@@ -101,15 +101,15 @@ class QuoteController extends Controller
         // a flash notice.
         try {
             $quotes = $this->getParameter("quotes");
-        }
-        catch (InvalidParameterException $e) {
+        } catch (InvalidParameterException $e) {
             $this->addFlash("notice", ["noquotes"]);
             return $this->redirectToRoute("quote");
         }
 
         // Render the page.
         return $this->render(
-            'quote/all.html.twig', [
+            'quote/all.html.twig',
+            [
                 'base_dir' => realpath(
                     $this->getParameter('kernel.root_dir') . '/..'
                 ),
@@ -157,7 +157,8 @@ class QuoteController extends Controller
 
         // Show the quote.
         return $this->render(
-            'quote/view.html.twig', [
+            'quote/view.html.twig',
+            [
                 'base_dir' => realpath(
                     $this->getParameter('kernel.root_dir') . '/..'
                 ),
