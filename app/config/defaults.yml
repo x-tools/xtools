@@ -1,0 +1,8 @@
+parameters:
+    app.base_path: null
+    cache.adapter: filesystem
+    cache.redis_dsn: 'redis://localhost'
+    app.is_labs: 0
+    database_toolsdb_host: 127.0.0.1
+    database_toolsdb_port: null
+    database_toolsdb_name: null
