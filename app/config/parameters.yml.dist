@@ -13,9 +13,6 @@ parameters:
     database_replica_user:      root
     database_replica_password:  ~
     database_meta_name:         meta_p
-    database_toolsdb_host:      127.0.0.1
-    database_toolsdb_port:      ~
-    database_toolsdb_name:      ~
 
     wiki_url:                   http://en.wikipedia.org
     lang:                       en
@@ -34,8 +31,6 @@ parameters:
     app.noticeDisplay: false
     app.noticeStyle:   ""
     app.noticeText:    ""
-
-    app.is_labs: 0
 
     app.load_stylesheets_from_cdn: 0
 
@@ -56,10 +51,3 @@ parameters:
     enable.rfap: 0
     enable.sc: 1
     enable.topedits: 1
-
-    # Leave blank if xTools is installed in the root directory
-    app.base_path:
-
-    # Caching.
-    cache.adapter: filesystem
-    cache.redis_dsn: redis://localhost
