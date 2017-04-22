@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+{% import 'macros/forms.html.twig' as forms %}
+
+{% block body %}
+    <form class="col-lg-8 col-lg-offset-2" action="{{ path("autoedits") }}" method="get" accept-charset="utf-8" >
+        <fieldset class="form-fieldset">
+            {{ forms.user_input() }}
+            {{ forms.wiki_input(project) }}
+            {{ forms.date_input('start') }}
+            {{ forms.date_input('end') }}
+        </fieldset>
+        {{ forms.submit_btn() }}
+    </form>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="col-lg-12">
+<div id="wrapper">
+<main id="content" class="clearfix">
+        <div class="col-lg-8 col-lg-offset-2">
+            </div>
+    
+    <div class="panel panel-primary">
+    <header class="panel-heading">
+        <div class="text-center xt-heading-top">
+            <a class="back-to-search" href="{{ path("autoedits") }}"">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                Back
+            </a>
+            {{ wiki_link("User:" ~ username, url, username) }} &middot; {{ wikiName }}
+        </div>
+    </header>
+    <div class="panel-body xt-panel-body">
+    		<p>
+				<a href="{{ linkWikiScript(url, "title=Special:Log&type=block&user=&year=&month=-1&tagfilter=&user=User:"~username) }} ">{{ msg("block_log") }}</a>
+				{% if isWMFLabs() %}
+				&middot;
+				<a href="//tools.wmflabs.org/guc/?user={{username}}" >Global user contributions</a>
+				&middot;
+				<a href="//meta.wikimedia.org/w/index.php?title=Special%3ACentralAuth&target={{username}}" >Global Account Manager</a>
+				{% endif %}
+			</p>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4  class="topcaption" >Summary <span class="showhide" onclick="javascript:switchShow( 'summary', this )">[hide]</span></h4>
+				</div>
+				<div class="panel-body" id="summary">
+					<table class="leantable table-condensed  xt-table">
+						<tr><td>Starting date</td>		<td>{{ begin }}</td></tr>
+						<tr><td>Ending date</td>		<td>{{ end }}</td></tr>	
+						<tr><td>(Semi-)automated edits</td>	<td class="tdnum" >{{ total_semi }}</td></tr>
+						<tr><td>Total edits</td>		<td class="tdnum" >{{ total }}</td></tr>
+						<tr><td>Percentage</td>	<td class="tdnum" >{{ total_pct|number_format(2) }}%</td></tr>
+					</table>
+				</div>
+			</div>
+			
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4  class="topcaption" >{{msg("autoedits")}}<span class="showhide" onclick="javascript:switchShow( 'generalstats', this )"> [{{msg("hide")}}]</span></h4>
+				</div>
+				<div class="panel-body" id="generalstats">
+					<table class="table-condensed  xt-table">
+						<tr><th>{{ msg("tool") }}</th><th>{{ msg("count") }}</th></tr>
+
+			    {% for tool, count in semi_automated %}
+			    	<tr>
+					<td>{{ wiki_link("project:" ~ tool, url, tool) }}</td>
+					<td class="tdnum" >{{ count|number_format(0, ".", ",") }}</td>
+					</tr>
+				{% endfor %}
+			
+					</table>
+				</div>
+			</div>
+			
+		</div>
+    </div>
+</div>
+{% endblock %}
