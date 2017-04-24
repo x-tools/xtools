@@ -18,6 +18,10 @@ class AutomatedEditsController extends Controller
 
     public function indexAction(Request $request)
     {
+        // Pull the labs helper and check if enabled
+        $lh = $this->get("app.labs_helper");
+        $lh->checkEnabled("autoedits");
+
         // Pull the values out of the query string.  These values default to
         // empty strings.
         $projectQuery = $request->query->get('project');
@@ -98,19 +102,24 @@ class AutomatedEditsController extends Controller
      */
     public function resultAction($project, $username, $begin = null, $end = null)
     {
+        // Pull the labs helper and check if enabled
         $lh = $this->get("app.labs_helper");
+        $lh->checkEnabled("autoedits");
 
-        $lh->checkEnabled("sc");
-
-        $username = ucfirst($username);
-
-        $dbValues = $lh->databasePrepare($project, "SimpleEditCounter");
+        // Pull information about the project from the Labs Helper
+        $dbValues = $lh->databasePrepare($project, "AutomatedEdits");
 
         $dbName = $dbValues["dbName"];
         $wikiName = $dbValues["wikiName"];
         $url = $dbValues["url"];
 
+        // Grab our database connection
         $dbh = $this->get('doctrine')->getManager("replicas")->getConnection();
+
+        // Variable parsing.
+        // Username needs to be uppercase first (yay Mediawiki),
+        // and we also need to handle undefined dates.
+        $username = ucfirst($username);
 
         if ($begin == null) {
             $begin = date("Y-m-d", strtotime("-1 month"));
@@ -120,8 +129,8 @@ class AutomatedEditsController extends Controller
             $end = date("Y-m-d");
         }
 
-        // Start by validating the dates.  If the dates are invalid, we'll redirect
-        // to the project only view.
+        // Validating the dates.  If the dates are invalid, we'll redirect
+        // to the project and username view.
         if (strtotime($begin) === false || strtotime($end) === false) {
             // Make sure to add the flash notice first.
             $this->addFlash("notice", ["invalid_date"]);
@@ -136,10 +145,11 @@ class AutomatedEditsController extends Controller
             );
         }
 
+        // Now, load the semi-automated edit types.
         $AEBTypes = [];
-
         $AEBTypes = $this->getParameter("automated_tools");
 
+        // Create a collection of queries that we're going to run.
         $queries = [];
 
         $rev = $lh->getTable("revision", $dbName);
@@ -161,6 +171,8 @@ class AutomatedEditsController extends Controller
                 $cond_end
             ";
         }
+
+        // Next, add two simple queries for the live and deleted edits.
         $queries[] = "
             SELECT 'live' as toolname ,count(*) as count
             from $rev
@@ -180,17 +192,23 @@ class AutomatedEditsController extends Controller
             $cond_end
         ";
 
+        // Create a big query and execute.
         $stmt = implode(" UNION ", $queries);
 
         $sth = $dbh->prepare($stmt);
 
         $sth->execute();
 
+        // handling results
         $results = [];
         $total_semi = 0;
         $total = 0;
 
         while ($row = $sth->fetch()) {
+            // Different variables need to get set if the tool is
+            // the live edits or deleted edits.
+            // If it is neither and greater than 0,
+            // add them to the array we're rendering and to our running total
             if ($row["toolname"] == "live") {
                 $total += $row["count"];
             } elseif ($row["toolname"] == "deleted") {
@@ -201,6 +219,7 @@ class AutomatedEditsController extends Controller
             }
         }
 
+        // Sort the array and do some simple math.
         arsort($results);
 
         if ($total != 0) {
@@ -210,7 +229,7 @@ class AutomatedEditsController extends Controller
         }
 
 
-        // replace this example code with whatever you need
+        // Render the view with all variables set.
         return $this->render('autoEdits/result.html.twig', [
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
             //"xtPageTitle" => "autoedits",
