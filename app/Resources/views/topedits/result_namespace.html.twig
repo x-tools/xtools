@@ -54,23 +54,23 @@
             <tbody>
                 {% for edit in edits %}
                 <tr>
-                    <td class="sort-entry--edits" data-value="{{ edit.count }}">{{ edit.count }}</td>
+                    <td class="sort-entry--edits tdnum" data-value="{{ edit.count }}">{{ edit.count|number_format }}</td>
                     <td class="sort-entry--page" data-value="{{ edit.page_title }}">
                         {{ wiki_link(edit.page_title, project_url, edit.displaytitle) }}
                     </td>
                     <td>
                         {{ wiki_log_link(edit.page_title, project_url) }}
                         &middot;
-                        <a href="{{ path('ArticleInfoResult', {project:project, article:edit.page_title}) }}">{{ msg('tool_articleinfo') }}</a>
+                        <a href="{{ path('ArticleInfoResult', {project:project, article:edit.page_title|url_encode}) }}">{{ msg('tool_articleinfo') }}</a>
                         &middot;
-                        <a href="{{ path('TopEditsResults', {project:project, username:username, namespace:namespace, article:edit.page_title}) }}" >{{ msg('tool_topedits') }}</a>
+                        <a href="{{ path('TopEditsResults', {project:project, username:username, namespace:namespace, article:edit.page_title|url_encode}) }}" >{{ msg('tool_topedits') }}</a>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         {% endset %}
-        {{ layout.content_block('mainspace', content) }}
+        {{ layout.content_block(content_title, content, '', null, false, false) }}
     </div>
 </div>
 {% endblock %}

@@ -194,20 +194,27 @@
         var lastProject = $('#project_input').val();
 
         $('#project_input').on('change', function () {
-            // disable the namespace selector while the data loads
+            // Disable the namespace selector and show a spinner while the data loads.
             $('#namespace_select').prop('disabled', true);
+            $loader = $('span.loader');
+            $('label[for="namespace_select"]').append($loader);
+            $loader.removeClass('hidden');
 
             var newProject = this.value;
 
             $.get(xtBaseUrl + 'api/namespaces/' + newProject).done(function (namespaces) {
-                var $allOption = $('#namespace_select option').eq(0).clone();
+                // Clone the 'all' option (even if there isn't one),
+                // and replace the current option list with this.
+                var $allOption = $('#namespace_select option[value="all"]').eq(0).clone();
                 $("#namespace_select").html($allOption);
+                // Add all of the new namespace options.
                 for (var ns in namespaces) {
                     $('#namespace_select').append(
                         "<option value=" + ns + ">" + namespaces[ns] + "</option>"
                     );
                 }
-                $("#namespace_select").val(0); // default to mainspace
+                // Default to mainspace being selected.
+                $("#namespace_select").val(0);
                 lastProject = newProject;
             }).fail(function () {
                 // revert back to last valid project
@@ -223,6 +230,7 @@
                 );
             }).always(function () {
                 $('#namespace_select').prop('disabled', false);
+                $loader.addClass('hidden');
             });
         });
     }
