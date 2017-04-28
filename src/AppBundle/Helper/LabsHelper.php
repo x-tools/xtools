@@ -43,8 +43,8 @@ class LabsHelper
     }
 
     /**
-     * Set up LabsHelper::$client and return the database name, wiki name, and URL of a given
-     * project.
+     * Set up LabsHelper::$client and return the database name, wiki name,
+     * and URL of a given project.
      * @todo: Handle failure better
      * @return string[] With keys 'dbName', 'wikiName', 'url', and 'lang'.
      */
@@ -56,58 +56,91 @@ class LabsHelper
             $url = $this->container->getParameter('wiki_url');
             $lang = $this->container->getParameter('lang');
         } else {
-            // First, run through our project map.  This is expected to return back
-            // to the project name if there is no defined mapping.
-            if ($this->container->hasParameter("app.project.$project")) {
-                $project = $this->container->getParameter("app.project.$project");
-            }
+            $metaData = $this->getProjectMetadata($project);
 
-            // Grab the connection to the meta database
-            $this->client = $this->container
-                ->get('doctrine')
-                ->getManager('meta')
-                ->getConnection();
-
-            // Create the query we're going to run against the meta database
-            $wikiQuery = $this->client->createQueryBuilder();
-            $wikiQuery
-                ->select([ 'dbName', 'name', 'url', 'lang' ])
-                ->from('wiki')
-                ->where($wikiQuery->expr()->eq('dbname', ':project'))
-                // The meta database will have the project's URL stored as https://en.wikipedia.org
-                // so we need to query for it accordingly, trying different variations the user
-                // might have inputted.
-                ->orwhere($wikiQuery->expr()->like('url', ':projectUrl'))
-                ->orwhere($wikiQuery->expr()->like('url', ':projectUrl2'))
-                ->setParameter('project', $project)
-                ->setParameter('projectUrl', "https://$project")
-                ->setParameter('projectUrl2', "https://$project.org");
-            $wikiStatement = $wikiQuery->execute();
-
-            // Fetch the wiki data
-            $wikis = $wikiStatement->fetchAll();
-
-            // Throw an exception if we can't find the wiki
-            if (count($wikis) < 1) {
+            if (!$metaData) {
                 throw new Exception("Unable to find project '$project'");
             }
 
-            // Grab the data we need out of it, using the first result
-            // (in the rare event there are more than one).
-            $dbName = $wikis[0]['dbName'];
-            $wikiName = $wikis[0]['name'];
-            $url = $wikis[0]['url'];
-            $lang = $wikis[0]['lang'];
-        }
-
-        if ($this->container->getParameter('app.is_labs') && substr($dbName, -2) != '_p') {
-            $dbName .= '_p';
+            $dbName = $metaData['dbname'];
+            $wikiName = $metaData['name'];
+            $url = $metaData['url'];
+            $lang = $metaData['lang'];
         }
 
         $this->dbName = $dbName;
         $this->url = $url;
 
         return [ 'dbName' => $dbName, 'wikiName' => $wikiName, 'url' => $url, 'lang' => $lang ];
+    }
+
+    /**
+     * Get the record for the given project in the meta.wiki table
+     * @param  string $project Valid project in the formats:
+     *                         https://en.wikipedia.org, en.wikipedia, enwiki
+     * @return array|false     Database record or false if no record was found.
+     *                         Relevant values returned include the 'dbname' (enwiki),
+     *                         'lang', 'name' (Wikipedia) and 'url' (https://en.wikipeda.org)
+     */
+    private function getProjectMetadata($project)
+    {
+        // First, run through our project map.  This is expected to return back
+        // to the project name if there is no defined mapping.
+        if ($this->container->hasParameter("app.project.$project")) {
+            $project = $this->container->getParameter("app.project.$project");
+        }
+
+        // Grab the connection to the meta database
+        $this->client = $this->container
+            ->get('doctrine')
+            ->getManager('meta')
+            ->getConnection();
+
+        // Create the query we're going to run against the meta database
+        $wikiQuery = $this->client->createQueryBuilder();
+        $wikiQuery
+            ->select([ 'dbname', 'name', 'url', 'lang' ])
+            ->from('wiki')
+            ->where($wikiQuery->expr()->eq('dbname', ':project'))
+            // The meta database will have the project's URL stored as https://en.wikipedia.org
+            // so we need to query for it accordingly, trying different variations the user
+            // might have inputted.
+            ->orwhere($wikiQuery->expr()->like('url', ':projectUrl'))
+            ->orwhere($wikiQuery->expr()->like('url', ':projectUrl2'))
+            ->setParameter('project', $project)
+            ->setParameter('projectUrl', "https://$project")
+            ->setParameter('projectUrl2', "https://$project.org");
+        $wikiStatement = $wikiQuery->execute();
+
+        // Fetch the wiki data
+        $wikis = $wikiStatement->fetchAll();
+
+        // Return false if we can't find the wiki
+        if (count($wikis) < 1) {
+            return false;
+        }
+
+        // Otherwise, return the first result (in the rare event there are more than one).
+        return $wikis[0];
+    }
+
+    /**
+     * Returns a project's domain (en.wikipedia) given various formats
+     * @param  string $project Valid project in the formats:
+     *                         https://en.wikipedia.org, en.wikipedia, enwiki
+     * @return string|false    lang.project.org ('url' value for that wiki)
+     *                         or false if project was not found
+     */
+    public function normalizeProject($project)
+    {
+        $metaData = $this->getProjectMetadata($project);
+
+        if ($metaData) {
+            // Get domain from the first result (in the rare event there are more than one).
+            return preg_replace("/https?:\/\//", '', $metaData['url']);
+        } else {
+            return false;
+        }
     }
 
     /**

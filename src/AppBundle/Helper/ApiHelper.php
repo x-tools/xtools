@@ -13,7 +13,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ApiHelper extends HelperBase
 {
-
     /** @var MediawikiApi */
     private $api;
 
@@ -36,20 +35,107 @@ class ApiHelper extends HelperBase
     private function setUp($project)
     {
         if (!isset($this->api)) {
-            $projectInfo = $this->labsHelper->databasePrepare($project);
+            $normalizedProject = $this->labsHelper->normalizeProject($project);
+            $apiPath = $this->container->getParameter('api_path');
 
             try {
-                if (strpos($projectInfo["url"], "api.php") !== false) {
-                    $this->api = MediawikiApi::newFromApiEndpoint($projectInfo["url"]);
-                } else {
-                    $this->api = MediawikiApi::newFromPage($projectInfo['url']);
-                }
+                $this->api = MediawikiApi::newFromApiEndpoint($normalizedProject . $apiPath);
             } catch (Exception $e) {
                 // Do nothing...
             } catch (FatalErrorException $e) {
                 // Do nothing...
             }
         }
+    }
+
+    /**
+     * Get general siteinfo and namespaces for a project and cache it.
+     * @param  string [$project] Base project domain with or without protocal, or database name
+     *                           such as 'en.wikipedia.org', 'https://en.wikipedia.org' or 'enwiki'
+     *                           Can be left blank for single wikis.
+     * @return string[] with keys 'general' and 'namespaces'. General info will include 'dbName',
+     *                           'wikiName', 'url', 'lang', 'articlePath', 'scriptPath',
+     *                           'script', 'timezone', and 'timeOffset'
+     */
+    public function getSiteInfo($project = '')
+    {
+        $normalizedProject = $this->labsHelper->normalizeProject($project);
+
+        if (!$normalizedProject) {
+            throw new Exception("Unable to find project '$project'");
+        }
+
+        if ($this->container->getParameter('app.single_wiki')) {
+            $project = $this->container->getParameter('wiki_url');
+        } else {
+            $project = "https://" . $normalizedProject;
+        }
+
+        $cacheKey = "siteinfo." . $normalizedProject;
+        if ($this->cacheHas($cacheKey)) {
+            return $this->cacheGet($cacheKey);
+        }
+
+        $this->setUp($normalizedProject);
+        $params = [ 'meta'=>'siteinfo', 'siprop'=>'general|namespaces' ];
+        $query = new SimpleRequest('query', $params);
+
+        $result = [
+            'general' => [],
+            'namespaces' => []
+        ];
+
+        try {
+            $res = $this->api->getRequest($query);
+
+            if (isset($res['query']['general'])) {
+                $info = $res['query']['general'];
+                $result['general'] = [
+                    'wikiName' => $info['sitename'],
+                    'dbName' => $info['wikiid'],
+                    'url' => $info['server'],
+                    'lang' => $info['lang'],
+                    'articlePath' => $info['articlepath'],
+                    'scriptPath' => $info['scriptpath'],
+                    'script' => $info['script'],
+                    'timezone' => $info['timezone'],
+                    'timeOffset' => $info['timeoffset'],
+                ];
+
+                if ($this->container->getParameter('app.is_labs') && substr($result['general']['dbName'], -2) != '_p') {
+                    $result['general']['dbName'] .= '_p';
+                }
+            }
+
+            if (isset($res['query']['namespaces'])) {
+                foreach ($res['query']['namespaces'] as $namespace) {
+                    if ($namespace['id'] < 0) {
+                        continue;
+                    }
+
+                    if (isset($namespace['name'])) {
+                        $name = $namespace['name'];
+                    } elseif (isset($namespace['*'])) {
+                        $name = $namespace['*'];
+                    } else {
+                        continue;
+                    }
+
+                    // FIXME: Figure out a way to i18n-ize this
+                    if ($name === '') {
+                        $name = 'Article';
+                    }
+
+                    $result['namespaces'][$namespace['id']] = $name;
+                }
+            }
+
+            $this->cacheSave($cacheKey, $result, 'P7D');
+        } catch (Exception $e) {
+            // The api returned an error!  Ignore
+        }
+
+        return $result;
     }
 
     public function groups($project, $username)
@@ -93,50 +179,12 @@ class ApiHelper extends HelperBase
     /**
      * Get a list of namespaces on the given project.
      *
-     * @param string $project
+     * @param string    $project such as en.wikipedia.org
      * @return string[] Array of namespace IDs (keys) to names (values).
      */
     public function namespaces($project)
     {
-        $cacheKey = "namespaces.$project";
-        if ($this->cacheHas($cacheKey)) {
-            return $this->cacheGet($cacheKey);
-        }
-
-        $this->setUp($project);
-        $query = new SimpleRequest('query', [ "meta"=>"siteinfo", "siprop"=>"namespaces" ]);
-        $namespaces = [];
-
-        try {
-            $res = $this->api->getRequest($query);
-            if (isset($res["batchcomplete"]) && isset($res["query"]["namespaces"])) {
-                foreach ($res["query"]["namespaces"] as $namespace) {
-                    if ($namespace["id"] < 0) {
-                        continue;
-                    }
-
-                    if (isset($namespace["name"])) {
-                        $name = $namespace["name"];
-                    } elseif (isset($namespace["*"])) {
-                        $name = $namespace["*"];
-                    } else {
-                        continue;
-                    }
-
-                    // FIXME: Figure out a way to i18n-ize this
-                    if ($name === "") {
-                        $name = "Article";
-                    }
-
-                    $namespaces[$namespace["id"]] = $name;
-                }
-            }
-            $this->cacheSave($cacheKey, $namespaces, 'P7D');
-        } catch (Exception $e) {
-            // The api returned an error!  Ignore
-        }
-
-        return $namespaces;
+        return $this->getSiteInfo($project)['namespaces'];
     }
 
     public function getAdmins($project)

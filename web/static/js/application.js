@@ -215,7 +215,7 @@
                 // FIXME: i18n
                 $('.site-notice').append(
                     "<div class='alert alert-warning alert-dismissible' role='alert'>" +
-                        "<a href='//" + newProject.escape() + "'>" + newProject + "</a> is not a valid project." +
+                        $.i18n('invalid_project', "<strong>" + newProject + "</strong>") +
                         "<button class='close' data-dismiss='alert' aria-label='Close'>" +
                             "<span aria-hidden='true'>&times;</span>" +
                         "</button>" +

@@ -15,6 +15,7 @@ parameters:
     database_meta_name:         meta_p
 
     wiki_url:                   http://en.wikipedia.org
+    api_path:                   /w/api.php
     lang:                       en
     default_project:            en.wikipedia.org
 
