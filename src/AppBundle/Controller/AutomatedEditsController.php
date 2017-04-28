@@ -26,7 +26,7 @@ class AutomatedEditsController extends Controller
         // empty strings.
         $projectQuery = $request->query->get('project');
         $username = $request->query->get('username');
-        $startDate = $request->query->get('begin');
+        $startDate = $request->query->get('start');
         $endDate = $request->query->get("end");
 
         // Redirect if the values are set.
@@ -98,9 +98,9 @@ class AutomatedEditsController extends Controller
     }
 
     /**
-     * @Route("/autoedits/{project}/{username}/{begin}/{end}", name="autoeditsResult")
+     * @Route("/autoedits/{project}/{username}/{start}/{end}", name="autoeditsResult")
      */
-    public function resultAction($project, $username, $begin = null, $end = null)
+    public function resultAction($project, $username, $start = null, $end = null)
     {
         // Pull the labs helper and check if enabled
         $lh = $this->get("app.labs_helper");
@@ -121,8 +121,8 @@ class AutomatedEditsController extends Controller
         // and we also need to handle undefined dates.
         $username = ucfirst($username);
 
-        if ($begin == null) {
-            $begin = date("Y-m-d", strtotime("-1 month"));
+        if ($start == null) {
+            $start = date("Y-m-d", strtotime("-1 month"));
         }
 
         if ($end == null) {
@@ -131,7 +131,7 @@ class AutomatedEditsController extends Controller
 
         // Validating the dates.  If the dates are invalid, we'll redirect
         // to the project and username view.
-        if (strtotime($begin) === false || strtotime($end) === false) {
+        if (strtotime($start) === false || strtotime($end) === false) {
             // Make sure to add the flash notice first.
             $this->addFlash("notice", ["invalid_date"]);
 
@@ -155,8 +155,8 @@ class AutomatedEditsController extends Controller
         $rev = $lh->getTable("revision", $dbName);
         $arc = $lh->getTable("archive", $dbName);
   
-        $cond_begin = ( $begin ) ? " AND rev_timestamp > '$begin' " : null;
-        $cond_end = ( $end ) ? " AND rev_timestamp < '$end' ": null;
+        $cond_begin = ( $start ) ? " AND rev_timestamp > :start " : null;
+        $cond_end = ( $end ) ? " AND rev_timestamp < :end ": null;
 
         foreach ($AEBTypes as $toolname => $check) {
             $toolname = $dbh->quote($toolname, \PDO::PARAM_STR);
@@ -165,7 +165,7 @@ class AutomatedEditsController extends Controller
             $queries[] .= "
                 SELECT $toolname as toolname, count(*) as count
                 FROM $rev
-                WHERE rev_user_text = '$username' 
+                WHERE rev_user_text = :username 
                 AND rev_comment REGEXP $check
                 $cond_begin
                 $cond_end
@@ -176,7 +176,7 @@ class AutomatedEditsController extends Controller
         $queries[] = "
             SELECT 'live' as toolname ,count(*) as count
             from $rev
-            WHERE rev_user_text = '$username'
+            WHERE rev_user_text = :username
             $cond_begin
             $cond_end
         ";
@@ -187,7 +187,7 @@ class AutomatedEditsController extends Controller
         $queries[] = "
             SELECT 'deleted' as toolname, count(*) as count
             from $arc
-            WHERE ar_user_text = '$username'
+            WHERE ar_user_text = :username
             $cond_begin
             $cond_end
         ";
@@ -196,6 +196,10 @@ class AutomatedEditsController extends Controller
         $stmt = implode(" UNION ", $queries);
 
         $sth = $dbh->prepare($stmt);
+
+        $sth->bindParam("username", $username);
+        $sth->bindParam("start", $start);
+        $sth->bindParam("end", $end);
 
         $sth->execute();
 
@@ -238,7 +242,7 @@ class AutomatedEditsController extends Controller
             "url" => $url,
             "wikiName" => $wikiName,
             "semi_automated" => $results,
-            "begin" => date("Y-m-d", strtotime($begin)),
+            "start" => date("Y-m-d", strtotime($start)),
             "end" => date("Y-m-d", strtotime($end)),
             "total_semi" => $total_semi,
             "total" => $total,
