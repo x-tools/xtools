@@ -24,7 +24,7 @@ class AdminScoreController extends Controller
         $lh->checkEnabled("adminscore");
 
         $projectQuery = $request->query->get('project');
-        $username = $request->query->get('user');
+        $username = $request->query->get('username');
 
         if ($projectQuery != "" && $username != "") {
             return $this->redirectToRoute("AdminScoreResult", [ 'project'=>$projectQuery, 'username' => $username ]);
