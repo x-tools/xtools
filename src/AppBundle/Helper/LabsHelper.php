@@ -133,11 +133,12 @@ class LabsHelper
      */
     public function normalizeProject($project)
     {
+        $project = preg_replace("/^https?:\/\//", '', $project);
         $metaData = $this->getProjectMetadata($project);
 
         if ($metaData) {
             // Get domain from the first result (in the rare event there are more than one).
-            return preg_replace("/https?:\/\//", '', $metaData['url']);
+            return preg_replace("/^https?:\/\//", '', $metaData['url']);
         } else {
             return false;
         }

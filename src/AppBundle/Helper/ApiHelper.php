@@ -59,6 +59,9 @@ class ApiHelper extends HelperBase
      */
     public function getSiteInfo($project = '')
     {
+        if ($this->container->getParameter('app.single_wiki')) {
+            $project = $this->container->getParameter('wiki_url');
+        }
         $normalizedProject = $this->labsHelper->normalizeProject($project);
 
         if (!$normalizedProject) {

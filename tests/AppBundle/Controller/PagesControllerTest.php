@@ -23,7 +23,7 @@ class PagesControllerTest extends WebTestCase
         $crawler = $client->request('GET', '/pages');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
-        if ($this->container->getParameter('app.is_labs')) {
+        if ($this->container->getParameter('app.is_labs') && !$this->container->getParameter('app.single_wiki')) {
             $crawler = $client->request('GET', '/pages/de.wikipedia.org');
             $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
