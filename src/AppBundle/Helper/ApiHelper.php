@@ -65,12 +65,6 @@ class ApiHelper extends HelperBase
             throw new Exception("Unable to find project '$project'");
         }
 
-        if ($this->container->getParameter('app.single_wiki')) {
-            $project = $this->container->getParameter('wiki_url');
-        } else {
-            $project = "https://" . $normalizedProject;
-        }
-
         $cacheKey = "siteinfo." . $normalizedProject;
         if ($this->cacheHas($cacheKey)) {
             return $this->cacheGet($cacheKey);
