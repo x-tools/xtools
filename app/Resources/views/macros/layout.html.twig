@@ -5,7 +5,7 @@
  # @param string id          - id of the section, defaults to the title
  # @param bool   notranslate - don't translate the 'title'
  #}
-{% macro content_block(title, content, description, id = null, notranslate = false) %}
+{% macro content_block(title, content, description, id = null, notranslate = false, toggle = true) %}
     {% if id is null %}
         {% set id = title %}
     {% endif %}
@@ -17,8 +17,10 @@
                 {% else %}
                     {{ msg(title) }}
                 {% endif %}
+                {% if toggle %}
                 <small class='xt-show'>[{{ msg('show') }}]</small>
                 <small class='xt-hide'>[{{ msg('hide') }}]</small>
+                {% endif %}
                 {% if description is defined %}
                 <span class='pull-right text-muted xt-panel-description'>{{ description }}</span>
                 {% endif %}
