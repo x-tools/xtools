@@ -47,3 +47,4 @@ of those options.
 - **app.single_wiki** - Point xTools to a single wiki, instead of using a meta database.  This ignores database_meta_name above.
 - **app.is_labs** - Whether xTools lives on the Wikimedia Foundation Labs environment.  This should be set to false.
 - **wiki_url** - URL to use if app.single_wiki is enabled.  The title of pages is attached to the end.
+- **api_path** - The API path for the project, usually /w/api.php

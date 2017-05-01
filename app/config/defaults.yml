@@ -1,0 +1,12 @@
+# These are some WMF Tool Labs specific parameters.
+# Putting them here hides them from the composer install without breaking xtools.
+# Manually add these settings to parameters.yml if you want to change them.
+
+parameters:
+    app.base_path: null
+    cache.adapter: filesystem
+    cache.redis_dsn: 'redis://localhost'
+    app.is_labs: 0
+    database_toolsdb_host: 127.0.0.1
+    database_toolsdb_port: null
+    database_toolsdb_name: null

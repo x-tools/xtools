@@ -97,30 +97,47 @@ class TopEditsController extends Controller
      */
     protected function namespaceTopEdits($username, $project, $namespace)
     {
+        // Get list of namespaces.
+        /** @var ApiHelper $apiHelper */
+        $apiHelper = $this->get('app.api_helper');
+        $namespaces = $apiHelper->namespaces($project);
+
         // Get the basic data about the pages edited by this user.
+        $params = ['username'=>$username];
+        $nsClause = '';
+        $namespaceMsg = 'namespaces_all';
+        if (is_numeric($namespace)) {
+            $nsClause = 'AND page_namespace = :namespace';
+            $params['namespace'] = $namespace;
+            $namespaceMsg = str_replace(' ', '_', strtolower($namespaces[$namespace]));
+        }
         $query = "SELECT page_namespace, page_title, page_is_redirect, COUNT(page_title) AS count
                 FROM ".$this->lh->getTable('page')." JOIN ".$this->lh->getTable('revision')." ON page_id = rev_page
-                WHERE rev_user_text = :username AND page_namespace = :namespace
+                WHERE rev_user_text = :username $nsClause
                 GROUP BY page_namespace, page_title
                 ORDER BY count DESC
                 LIMIT 100";
-        $params = ['username'=>$username, 'namespace'=> $namespace];
         $conn = $this->getDoctrine()->getManager('replicas')->getConnection();
         $editData = $conn->executeQuery($query, $params)->fetchAll();
+
+        // Inform user if no revisions found.
+        if (count($editData) === 0) {
+            $this->addFlash("notice", ["nocontribs"]);
+        }
 
         // Get page info about these 100 pages, so we can use their display title.
         $titles = array_map(function ($e) {
             return $e['page_title'];
         }, $editData);
-        /** @var ApiHelper $apiHelper */
-        $apiHelper = $this->get('app.api_helper');
         $displayTitles = $apiHelper->displayTitles($project, $titles);
 
         // Put all together, and return the view.
         $edits = [];
         foreach ($editData as $editDatum) {
             $pageTitle = $editDatum['page_title'];
-            $editDatum['displaytitle'] = $displayTitles[$pageTitle];
+            // If 'all' namespaces, prepend namespace to display title.
+            $nsTitle = !is_numeric($namespace) ? $namespaces[$editDatum['page_namespace']].':' : '';
+            $editDatum['displaytitle'] = $nsTitle.$displayTitles[$pageTitle];
             $edits[] = $editDatum;
         }
         return $this->render('topedits/result_namespace.html.twig', [
@@ -130,6 +147,7 @@ class TopEditsController extends Controller
             'username' => $username,
             'namespace' => $namespace,
             'edits' => $edits,
+            'content_title' => $namespaceMsg,
         ]);
     }
 

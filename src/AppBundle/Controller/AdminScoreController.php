@@ -24,7 +24,7 @@ class AdminScoreController extends Controller
         $lh->checkEnabled("adminscore");
 
         $projectQuery = $request->query->get('project');
-        $username = $request->query->get('user');
+        $username = $request->query->get('username');
 
         if ($projectQuery != "" && $username != "") {
             return $this->redirectToRoute("AdminScoreResult", [ 'project'=>$projectQuery, 'username' => $username ]);
@@ -105,8 +105,10 @@ class AdminScoreController extends Controller
                 AND log_namespace=0
                 AND log_deleted=0 and log_user_text=:username
         UNION
-        SELECT 'blocks' as source, COUNT(*) as value FROM $loggingTable
-            WHERE log_type='block' AND log_action='block' AND log_namespace=2 AND log_deleted=0 AND log_title=:username
+        SELECT 'blocks' as source, COUNT(*) as value FROM $loggingTable l
+            INNER JOIN $userTable u ON l.log_user = u.user_id
+            WHERE l.log_type='block' AND l.log_action='block'
+            AND l.log_namespace=2 AND l.log_deleted=0 AND u.user_name=:username
         UNION
         SELECT 'afd' as source, COUNT(*) as value FROM $revisionTable
             WHERE rev_page LIKE 'Articles for deletion/%'
