@@ -1,5 +1,5 @@
 # These are some WMF Tool Labs specific parameters.
-# Putting them here hides them from the composer install without breaking xtools. 
+# Putting them here hides them from the composer install without breaking xtools.
 # Manually add these settings to parameters.yml if you want to change them.
 
 parameters:

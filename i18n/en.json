@@ -80,6 +80,7 @@
   "importance": "Importance",
   "interrupted": "Sorry, but in order to save resources, a bot has automatically killed this query for being longer than $1 seconds.",
   "invalid_date": "Invalid date",
+  "invalid_project": "$1 is not a valid project",
   "invalid_type": "Invalid type selected",
   "ip_edits": "IP edits",
   "ip_list": "IP list",
