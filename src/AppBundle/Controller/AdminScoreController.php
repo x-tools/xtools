@@ -62,9 +62,9 @@ class AdminScoreController extends Controller
 
         $userTable = $lh->getTable("user", $dbName);
         $pageTable = $lh->getTable("page", $dbName);
-        $loggingTable = $lh->getTable("logging_userindex", $dbName);
-        $revisionTable = $lh->getTable("revision_userindex", $dbName);
-        $archiveTable = $lh->getTable("archive_userindex", $dbName);
+        $loggingTable = $lh->getTable("logging", $dbName);
+        $revisionTable = $lh->getTable("revision", $dbName);
+        $archiveTable = $lh->getTable("archive", $dbName);
 
         // MULTIPLIERS (to review)
         $ACCT_AGE_MULT = 1.25;   # 0 if = 365 jours
