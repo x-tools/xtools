@@ -68,7 +68,7 @@ class ApiHelper extends HelperBase
             throw new Exception("Unable to find project '$project'");
         }
 
-        $cacheKey = "siteinfo." . $normalizedProject;
+        $cacheKey = "siteinfo." . str_replace('/', '_', $normalizedProject);
         if ($this->cacheHas($cacheKey)) {
             return $this->cacheGet($cacheKey);
         }

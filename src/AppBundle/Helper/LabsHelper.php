@@ -90,6 +90,16 @@ class LabsHelper
             $project = $this->container->getParameter("app.project.$project");
         }
 
+        // If this is a single-project setup, manually construct the metadata.
+        if ($this->container->getParameter("app.single_wiki")) {
+            return [
+                'dbname' => $this->container->getParameter('database_replica_name'),
+                'url' => $this->container->getParameter('wiki_url'),
+                'lang' => $this->container->getParameter('lang'),
+                'name' => 'Xtools', // Not used?
+            ];
+        }
+
         // Grab the connection to the meta database
         $this->client = $this->container
             ->get('doctrine')
