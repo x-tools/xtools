@@ -59,13 +59,16 @@ class ApiHelper extends HelperBase
      */
     public function getSiteInfo($project = '')
     {
+        if ($this->container->getParameter('app.single_wiki')) {
+            $project = $this->container->getParameter('wiki_url');
+        }
         $normalizedProject = $this->labsHelper->normalizeProject($project);
 
         if (!$normalizedProject) {
             throw new Exception("Unable to find project '$project'");
         }
 
-        $cacheKey = "siteinfo." . $normalizedProject;
+        $cacheKey = "siteinfo." . str_replace('/', '_', $normalizedProject);
         if ($this->cacheHas($cacheKey)) {
             return $this->cacheGet($cacheKey);
         }
