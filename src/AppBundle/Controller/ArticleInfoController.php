@@ -370,6 +370,10 @@ class ArticleInfoController extends Controller
      */
     private function getWikidataErrors()
     {
+        if (empty($this->pageInfo['wikidataId'])) {
+            return [];
+        }
+
         $wikidataId = ltrim($this->pageInfo['wikidataId'], 'Q');
         $lang = $this->pageInfo['lang'];
 
