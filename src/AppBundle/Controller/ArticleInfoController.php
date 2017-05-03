@@ -458,7 +458,13 @@ class ArticleInfoController extends Controller
 
         $lastRev = $this->pageHistory[$revIndex - 1];
 
-        return $rev['rev_len'] - $lastRev['rev_len'];
+        // TODO: Remove once T101631 is resolved
+        // Treat as zero change in size if rev_len of previous edit is missing
+        if ($lastRev['rev_len'] === null) {
+            return 0;
+        } else {
+            return $rev['rev_len'] - $lastRev['rev_len'];
+        }
     }
 
     /**
