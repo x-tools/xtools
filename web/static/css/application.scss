@@ -387,7 +387,8 @@ div.outer_bar {
     }
 }
 
-.stat-list > .table td {
+.stat-list > .table td,
+.stat-list > .table th {
     border: 0;
     padding-bottom: 0;
     padding-top: 0;
@@ -481,7 +482,8 @@ div.outer_bar {
 }
 
 @media (max-width: $bootstrap-lg) {
-    .stat-list > .table td {
+    .stat-list > .table td,
+    .stat-list > .table th {
         &:first-child {
             width: 300px;
         }
@@ -501,7 +503,8 @@ div.outer_bar {
         padding: 0;
     }
 
-    .stat-list > .table td {
+    .stat-list > .table td,
+    .stat-list > .table th {
         &:first-child {
             display: block;
             padding-top: 5px;

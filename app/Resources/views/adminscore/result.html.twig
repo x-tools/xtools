@@ -1,13 +1,36 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/layout.html.twig' as layout %}
 
 {% block body %}
-    <table class="leantable table-condensed xt-table" >
-        <tr><td>{{ msg("username") }}: </td><td><a href="{{ user_link(username, url) }}" target="_blank">{{ username }} @ {{ project }}</a></td></tr>
-            {% for key in master|keys %}
-                {% if master[key]["value"] != 0 %}
-                    <tr><td>{{ msg(key) }}</td><td><span class="text-success">+{{ master[key]["score"] }}</span></td></tr>
-                {% endif %}
-            {% endfor %}
-    </table>
-    <h3>Total: {{ total }}</h3>
+<div class="panel panel-primary">
+    <header class="panel-heading">
+        <div class="text-center xt-heading-top">
+            <a class="back-to-search" href="{{ path('adminscore') }}">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                {{ msg('back') }}
+            </a>
+            <a target="_blank" href="{{ user_link(username, projectUrl) }}">{{ username }}</a>
+            &bull;
+            {{ project }}
+        </div>
+    </header>
+    <div class="panel-body xt-panel-body">
+        {% set content %}
+            <div class="col-lg-6 stat-list clearfix">
+                <table class="table"><tbody>
+                    {% for key in master|keys %}
+                        {% if master[key].value != 0 %}
+                            <tr><td>{{ msg(key) }}</td><td><span class="text-success">+{{ master[key].score }}</span></td></tr>
+                        {% endif %}
+                    {% endfor %}
+                    <tfoot>
+                        <th>{{ msg('total_actions') }}</th>
+                        <th>{{ total | number_format }}</th>
+                    </tfoot>
+                </tbody></table>
+            </div>
+        {% endset %}
+        {{ layout.content_block('tool_adminscore', content) }}
+    </div>
+</div>
 {% endblock %}

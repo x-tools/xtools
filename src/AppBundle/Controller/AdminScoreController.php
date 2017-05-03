@@ -87,54 +87,54 @@ class AdminScoreController extends Controller
 
         // Prepare the query and execute
         $resultQuery = $conn->prepare("
-        SELECT 'id' as source, user_id as value FROM $userTable
+        SELECT 'id' AS source, user_id AS value FROM $userTable
             WHERE user_name = :username
         UNION
-        SELECT 'acct_age' as source, user_registration as value FROM $userTable
+        SELECT 'acct_age' AS source, user_registration AS value FROM $userTable
             WHERE user_name=:username
         UNION
-        SELECT 'edit_count' as source, user_editcount as value FROM $userTable
+        SELECT 'edit_count' AS source, user_editcount AS value FROM $userTable
             WHERE user_name=:username
         UNION
-        SELECT 'user_page' as source, page_len as value FROM $pageTable
+        SELECT 'user_page' AS source, page_len AS value FROM $pageTable
             WHERE page_namespace=2 AND page_title=:username
         UNION
-        SELECT 'patrols' as source, COUNT(*) as value FROM $loggingTable
+        SELECT 'patrols' AS source, COUNT(*) AS value FROM $loggingTable
             WHERE log_type='patrol'
                 AND log_action='patrol'
                 AND log_namespace=0
-                AND log_deleted=0 and log_user_text=:username
+                AND log_deleted=0 AND log_user_text=:username
         UNION
-        SELECT 'blocks' as source, COUNT(*) as value FROM $loggingTable l
+        SELECT 'blocks' AS source, COUNT(*) AS value FROM $loggingTable l
             INNER JOIN $userTable u ON l.log_user = u.user_id
             WHERE l.log_type='block' AND l.log_action='block'
             AND l.log_namespace=2 AND l.log_deleted=0 AND u.user_name=:username
         UNION
-        SELECT 'afd' as source, COUNT(*) as value FROM $revisionTable
+        SELECT 'afd' AS source, COUNT(*) AS value FROM $revisionTable
             WHERE rev_page LIKE 'Articles for deletion/%'
                 AND rev_page NOT LIKE 'Articles_for_deletion/Log/%'
                 AND rev_user_text=:username
         UNION
-        SELECT 'recent_activity' as source, COUNT(*) as value FROM $revisionTable
-            WHERE rev_user_text=:username AND rev_timestamp > (now()-INTERVAL 730 day) and rev_timestamp < now()
+        SELECT 'recent_activity' AS source, COUNT(*) AS value FROM $revisionTable
+            WHERE rev_user_text=:username AND rev_timestamp > (now()-INTERVAL 730 day) AND rev_timestamp < now()
         UNION
-        SELECT 'aiv' as source, COUNT(*) as value FROM $revisionTable
-            WHERE rev_page like 'Administrator intervention against vandalism%' and rev_user_text=:username
+        SELECT 'aiv' AS source, COUNT(*) AS value FROM $revisionTable
+            WHERE rev_page LIKE 'Administrator intervention against vandalism%' AND rev_user_text=:username
         UNION
-        SELECT 'edit_summaries' as source, COUNT(*) as value FROM $revisionTable JOIN page ON rev_page=page_id
+        SELECT 'edit_summaries' AS source, COUNT(*) AS value FROM $revisionTable JOIN page ON rev_page=page_id
             WHERE page_namespace=0 AND rev_user_text=:username
         UNION
-        SELECT 'namespaces' as source, count(*) as value FROM $revisionTable JOIN page ON rev_page=page_id
+        SELECT 'namespaces' AS source, count(*) AS value FROM $revisionTable JOIN page ON rev_page=page_id
             WHERE rev_user_text=:username AND page_namespace=0
         UNION
-        SELECT 'pages_created_live' as source, COUNT(*) as value from $revisionTable
-            WHERE rev_user_text=:username and rev_parent_id=0
+        SELECT 'pages_created_live' AS source, COUNT(*) AS value FROM $revisionTable
+            WHERE rev_user_text=:username AND rev_parent_id=0
         UNION
-        SELECT 'pages_created_archive' as source, COUNT(*) as value from $archiveTable
-            WHERE ar_user_text=:username and ar_parent_id=0
+        SELECT 'pages_created_archive' AS source, COUNT(*) AS value FROM $archiveTable
+            WHERE ar_user_text=:username AND ar_parent_id=0
         UNION
-        SELECT 'rpp' as source, COUNT(*) as value FROM $revisionTable
-            WHERE rev_page like 'Requests_for_page_protection%' and rev_user_text=:username
+        SELECT 'rpp' AS source, COUNT(*) AS value FROM $revisionTable
+            WHERE rev_page LIKE 'Requests_for_page_protection%' AND rev_user_text=:username
         ");
 
         $resultQuery->bindParam("username", $username);
@@ -178,13 +178,9 @@ class AdminScoreController extends Controller
             return $this->redirectToRoute("AdminScore", [ "project"=>$project ]);
         }
 
-        // replace this example code with whatever you need
         return $this->render('adminscore/result.html.twig', [
-            "xtPage" => "adminscore",
-            "xtTitle" => "tool_adminscore",
-            "xtPageTitle" => "tool_adminscore",
-            "subtitle" => "tool_adminscore_desc",
-            'url' => $url,
+            'xtPage' => "adminscore",
+            'projectUrl' => $url,
             'username' => $username,
             'project' => $wikiName,
             'master' => $master,

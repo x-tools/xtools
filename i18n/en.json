@@ -214,6 +214,8 @@
   "timecard-chart-desc": "Note that times here are shown relative to your current timezone.",
   "title_xtools": "XTools",
   "tool": "Tool",
+  "tool_adminscore": "AdminScore",
+  "tool_adminscore_desc": "Find out how admin-worthy a user is",
   "tool_adminstats": "AdminStats",
   "tool_adminstats_desc": "Show statistics of admin actions",
   "tool_articleinfo": "Page history",
