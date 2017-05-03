@@ -20,6 +20,8 @@ To use xTools for a single wiki, set the following variables in ``parameters.yml
 * ``wiki_url`` to the full URL of your wiki
 * ``api_path`` to the path to the root of your wiki's API
 
+.. _wiki-family-installation:
+
 Wiki family
 ===========
 
