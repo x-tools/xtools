@@ -43,8 +43,8 @@
         });
 
         // GENERAL: Top 10% / bottom 90% chart
-        var bottomTenCount = general.revision_count - general.top_ten_count,
-            bottomTenPercentage = 100 - general.top_ten_percentage;
+        var bottomTenCount = (general.revision_count - general.top_ten_count).toFixed(1),
+            bottomTenPercentage = (100 - general.top_ten_percentage).toFixed(1);
         buildPieChart('top_bottom', {
             data: [general.top_ten_count, bottomTenCount],
             labels: general.labels.top_bottom,
