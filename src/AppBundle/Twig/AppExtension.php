@@ -19,8 +19,6 @@ class AppExtension extends Extension
             new \Twig_SimpleFunction('request_time', [ $this, 'requestTime' ], $options),
             new \Twig_SimpleFunction('memory_usage', [ $this, 'requestMemory' ], $options),
             new \Twig_SimpleFunction('year', [ $this, 'generateYear' ], $options),
-            new \Twig_SimpleFunction('linkWiki', [ $this, 'linkToWiki' ], $options),
-            new \Twig_SimpleFunction('linkWikiScript', [ $this, 'linkToWikiScript' ], $options),
             new \Twig_SimpleFunction('msgPrintExists', [ $this, 'intuitionMessagePrintExists' ], $options),
             new \Twig_SimpleFunction('msgExists', [ $this, 'intuitionMessageExists' ], $options),
             new \Twig_SimpleFunction('msg', [ $this, 'intuitionMessage' ], $options),
@@ -42,6 +40,7 @@ class AppExtension extends Extension
             new \Twig_SimpleFunction('isWMFLabs', [ $this, 'isWMFLabs' ]),
             new \Twig_SimpleFunction('replag', [ $this, 'replag' ]),
             new \Twig_SimpleFunction('link', [ $this, 'link' ]),
+            new \Twig_SimpleFunction('quote', [ $this, 'quote' ]),
         ];
     }
 
@@ -406,6 +405,16 @@ class AppExtension extends Extension
         $retVal = str_replace("//", "/", $retVal);
 
         return $retVal;
+    }
+
+    /**
+     * Get a random quote for the footer
+     * @return string
+     */
+    public function quote()
+    {
+        $id = rand(1, sizeof($this->container->getParameter('quotes')));
+        return $this->container->getParameter('quotes')[$id];
     }
 
     /*********************************** FILTERS ***********************************/

@@ -2,7 +2,7 @@
 
 {% block body %}
     <table class="leantable table-condensed xt-table" >
-        <tr><td>{{ msg("username") }}: </td><td><a href="{{ linkWiki(url, "User:"~username) }}" target="_blank">{{ username }} @ {{ project }}</a></td></tr>
+        <tr><td>{{ msg("username") }}: </td><td><a href="{{ user_link(username, url) }}" target="_blank">{{ username }} @ {{ project }}</a></td></tr>
             {% for key in master|keys %}
                 {% if master[key]["value"] != 0 %}
                     <tr><td>{{ msg(key) }}</td><td><span class="text-success">+{{ master[key]["score"] }}</span></td></tr>
