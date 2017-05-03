@@ -161,8 +161,14 @@
         </small>
     </span>
     <hr>
-    <div class="row">
-        <div class="col footer-about">
+    <div class="footer-content">
+        <div class="pull-right footer-branding">
+            <a style="margin-right:5px;" href="//translatewiki.net/?setlang=en "><img height="36px" src="//upload.wikimedia.org/wikipedia/commons/5/51/Translatewiki.net_logo.svg" alt="translatewiki.net logo"/></a>
+            {% if isWMFLabs() %}
+            <a href="//tools.wmflabs.org" target="_blank"><img height="40px" src="{{ asset('static/images/labs.png') }}" alt="Powered by WMF Labs" /></a>
+            {% endif %}
+        </div>
+        <div class="footer-about">
             <span>
                 &copy; 2008-{{ year() }} &middot;
                 <a href="{{ path('aboutPage') }}">About these tools</a>  &middot;
@@ -170,13 +176,7 @@
                 <a href="http://github.com/x-tools/xtools-rebirth/tree/{{ hash() }}" target="_blank">r.{{ shortHash() }}</a>
             </span>
             <div>{{ msg_footer() }}</div>
-            <small class="text-muted"><em>{{ quote() }}</em></small>
-        </div>
-        <div class="col pull-right footer-branding">
-            <a style="margin-right:5px;" href="//translatewiki.net/?setlang=en "><img height="36px" src="//upload.wikimedia.org/wikipedia/commons/5/51/Translatewiki.net_logo.svg" alt="translatewiki.net logo"/></a>
-            {% if isWMFLabs() %}
-            <a href="//tools.wmflabs.org" target="_blank"><img height="40px" src="{{ asset('static/images/labs.png') }}" alt="Powered by WMF Labs" /></a>
-            {% endif %}
+            <small class="footer-quote text-muted">{{ quote() }}</small>
         </div>
     </div>
 </footer>

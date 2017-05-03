@@ -342,6 +342,28 @@ div.outer_bar {
     width: 100%;
 }
 
+.footer-content {
+    padding-top: 20px;
+}
+
+.footer-about {
+    display: inline;
+    max-width: calc(100% - 200px);
+}
+
+.footer-branding {
+    white-space: nowrap;
+}
+
+.footer-quote {
+    display: inline-block;
+    font-style: italic;
+    max-width: 100%;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .app-footer hr {
     margin-bottom: 0;
 }
@@ -497,6 +519,17 @@ div.outer_bar {
 @media (max-width: $bootstrap-sm) {
     .app-footer {
         position: relative;
+    }
+
+    .footer-branding {
+        float: left !important;
+        margin-bottom: 10px;
+    }
+
+    .footer-about {
+        clear: both;
+        display: block;
+        max-width: 100%;
     }
 
     .stat-list {
