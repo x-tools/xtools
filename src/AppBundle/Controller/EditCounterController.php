@@ -38,10 +38,9 @@ class EditCounterController extends Controller
 
         // Otherwise fall through.
         return $this->render('editCounter/index.html.twig', [
-            "xtPageTitle" => "tool_ec",
-            "xtSubtitle" => "tool_ec_desc",
+            "xtPageTitle" => "tool-ec",
+            "xtSubtitle" => "tool-ec-desc",
             'xtPage' => "ec",
-            'xtTitle' => "tool_ec",
             'project' => $project,
         ]);
     }
@@ -81,7 +80,7 @@ class EditCounterController extends Controller
 
         // Give it all to the template.
         return $this->render('editCounter/result.html.twig', [
-            'xtTitle' => 'tool_ec',
+            'xtTitle' => $username,
             'xtPage' => 'ec',
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
             'is_labs' => $lh->isLabs(),

@@ -6,7 +6,7 @@
         <fieldset class="form-fieldset">
             <div class="input-group form-row">
                 <label class="input-group-addon form-label" for="id">
-                        {{ msg("quote_number") }}
+                        {{ msg("quote-number") }}
                 </label>
                 <input type="number" class="form-control" name="id" id="id" required>
                 <div class="input-group-btn">
@@ -15,8 +15,8 @@
             </div>
         </fieldset>
         <div>
-            <a class="btn btn-primary form-submit" href="{{ path('bashRandom') }}">{{ msg("quote_random") }}</a>
-            <a class="btn btn-primary form-submit" href="{{ path('bashAll') }}">{{ msg("quote_showall") }}</a>
+            <a class="btn btn-primary form-submit" href="{{ path('bashRandom') }}">{{ msg("quote-random") }}</a>
+            <a class="btn btn-primary form-submit" href="{{ path('bashAll') }}">{{ msg("quote-show-all") }}</a>
         </div>
     </form>
 {% endblock %}

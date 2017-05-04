@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ lang() }}"{% if isRTL() %} dir="rtl"{% endif %}>
 <head>
-    <title>{% if xtTitle is defined %}{{ msg(xtTitle) }} - {% endif %}{{ msg('title_xtools') }}</title>
+    <title>{% if xtTitle is defined %}{{ xtTitle }} - {% endif %}{{ msg('tool-'~xtPage) }} - {{ msg('title-xtools') }}</title>
 
     {% if loadStylesheetsFromCDN() %}
         <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"
@@ -94,13 +94,13 @@
     <nav class="tool-links navbar-collapse collapse">
         <ol class="nav navbar-nav navbar-left">
             <li{% if current_tool is defined and current_tool == "index" %} class="active"{% endif %} >
-                <a href="{{ path('homepage') }}">{{ msg("title_xtools") }}</a>
+                <a href="{{ path('homepage') }}">{{ msg("title-xtools") }}</a>
             </li>
 
             {% for tool in tools() %}
                 {% if enabled(tool) %}
                     <li{% if xtPage is defined and xtPage==tool %} class="active"{% endif %} >
-                        <a href="{{ path(tool) }}">{{ msg("tool_" ~ tool) }}</a>
+                        <a href="{{ path(tool) }}">{{ msg("tool-" ~ tool) }}</a>
                     </li>
                 {% endif %}
             {% endfor %}
@@ -128,7 +128,7 @@
     {% set replagValue = replag() %}
     {% if replagValue > getReplagThreshold() %}
         <p class="alert alert-warning xt-alert">
-            {{ msgPrintExists("highreplag", [replagValue ~ " " ~ msg("seconds", [replagValue])]) }}
+            {{ msgPrintExists("high-replag", [replagValue ~ " " ~ msg("num-seconds", [replagValue])]) }}
         </p>
     {% endif %}
 </div>
@@ -157,7 +157,7 @@
     <span>
         <small>
             <span>{{ msg("executed", [request_time()]) }}</span> &middot;
-            <span>{{ msg("memory", [memory_usage()]) }}</span>
+            <span>{{ msg("memory-usage", [memory_usage()]) }}</span>
         </small>
     </span>
     <hr>
@@ -171,7 +171,7 @@
         <div class="footer-about">
             <span>
                 &copy; 2008-{{ year() }} &middot;
-                <a href="{{ path('aboutPage') }}">About these tools</a>  &middot;
+                <a href="{{ path('aboutPage') }}">{{ msg('about-xtools') }}</a>  &middot;
                 v.{{ version }} &middot;
                 <a href="http://github.com/x-tools/xtools-rebirth/tree/{{ hash() }}" target="_blank">r.{{ shortHash() }}</a>
             </span>
@@ -181,7 +181,7 @@
     </div>
 </footer>
 <span class='hidden loader'>
-    <img src='{{ asset('static/images/loader.gif') }}' /> <span class="sr-only">Loading&hellip;</span>
+    <img src="{{ asset('static/images/loader.gif') }}" /> <span class="sr-only">{{ msg('loading') }}&hellip;</span>
 </span>
 </body>
 </html>

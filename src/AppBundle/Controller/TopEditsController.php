@@ -60,8 +60,8 @@ class TopEditsController extends Controller
         $api = $this->get("app.api_helper");
 
         return $this->render('topedits/index.html.twig', [
-            'xtPageTitle' => 'tool_topedits',
-            'xtSubtitle' => 'tool_topedits_desc',
+            'xtPageTitle' => 'tool-topedits',
+            'xtSubtitle' => 'tool-topedits-desc',
             'xtPage' => 'topedits',
             'project' => $project,
             'namespaces' => $api->namespaces($project),
