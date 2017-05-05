@@ -68,16 +68,16 @@ class AdminScoreController extends Controller
 
         // MULTIPLIERS (to review)
         $ACCT_AGE_MULT = 1.25;   # 0 if = 365 jours
-        $EDIT_COUNT_MULT = 1.25;     # 0 if = 10 000
+        $COUNT_MULT = 1.25;     # 0 if = 10 000
         $USER_PAGE_MULT = 0.1;     # 0 if =
-        $PATROLS_MULT = 1; # 0 if =
-        $BLOCKS_MULT = 1.4;     # 0 if = 10
+        $PATROL_MULT = 1; # 0 if =
+        $BLOCK_MULT = 1.4;     # 0 if = 10
         $AFD_MULT = 1.15;
         $RECENT_ACTIVITY_MULT = 0.9;     # 0 if =
         $AIV_MULT = 1.15;
-        $EDIT_SUMMARIES_MULT = 0.8;   # 0 if =
-        $NAMESPACES_MULT = 1.0;     # 0 if =
-        $PAGES_CREATED_LIVE_MULT = 1.4; # 0 if =
+        $EDITS_SUMMARY_MULT = 0.8;   # 0 if =
+        $NAMESPACE_MULT = 1.0;     # 0 if =
+        $PAGES_CREATED_MULT = 1.4; # 0 if =
         $PAGES_CREATED_ARCHIVE_MULT = 1.4; # 0 if =
         $RPP_MULT = 1.15;     # 0 if =
         $USERRIGHTS_MULT = 0.75;   # 0 if =
@@ -86,6 +86,8 @@ class AdminScoreController extends Controller
         $conn = $this->get('doctrine')->getManager("replicas")->getConnection();
 
         // Prepare the query and execute
+        // Note: The "source" field is also the i18n message
+        // used on the final page.
         $resultQuery = $conn->prepare("
         SELECT 'id' AS source, user_id AS value FROM $userTable
             WHERE user_name = :username
@@ -93,19 +95,19 @@ class AdminScoreController extends Controller
         SELECT 'acct_age' AS source, user_registration AS value FROM $userTable
             WHERE user_name=:username
         UNION
-        SELECT 'edit_count' AS source, user_editcount AS value FROM $userTable
+        SELECT 'count' AS source, user_editcount AS value FROM $userTable
             WHERE user_name=:username
         UNION
         SELECT 'user_page' AS source, page_len AS value FROM $pageTable
             WHERE page_namespace=2 AND page_title=:username
         UNION
-        SELECT 'patrols' AS source, COUNT(*) AS value FROM $loggingTable
+        SELECT 'patrol' AS source, COUNT(*) AS value FROM $loggingTable
             WHERE log_type='patrol'
                 AND log_action='patrol'
                 AND log_namespace=0
                 AND log_deleted=0 AND log_user_text=:username
         UNION
-        SELECT 'blocks' AS source, COUNT(*) AS value FROM $loggingTable l
+        SELECT 'block' AS source, COUNT(*) AS value FROM $loggingTable l
             INNER JOIN $userTable u ON l.log_user = u.user_id
             WHERE l.log_type='block' AND l.log_action='block'
             AND l.log_namespace=2 AND l.log_deleted=0 AND u.user_name=:username
@@ -121,13 +123,13 @@ class AdminScoreController extends Controller
         SELECT 'aiv' AS source, COUNT(*) AS value FROM $revisionTable
             WHERE rev_page LIKE 'Administrator intervention against vandalism%' AND rev_user_text=:username
         UNION
-        SELECT 'edit_summaries' AS source, COUNT(*) AS value FROM $revisionTable JOIN page ON rev_page=page_id
+        SELECT 'edits_summary' AS source, COUNT(*) AS value FROM $revisionTable JOIN page ON rev_page=page_id
             WHERE page_namespace=0 AND rev_user_text=:username
         UNION
-        SELECT 'namespaces' AS source, count(*) AS value FROM $revisionTable JOIN page ON rev_page=page_id
+        SELECT 'namespace' AS source, count(*) AS value FROM $revisionTable JOIN page ON rev_page=page_id
             WHERE rev_user_text=:username AND page_namespace=0
         UNION
-        SELECT 'pages_created_live' AS source, COUNT(*) AS value FROM $revisionTable
+        SELECT 'pages_created' AS source, COUNT(*) AS value FROM $revisionTable
             WHERE rev_user_text=:username AND rev_parent_id=0
         UNION
         SELECT 'pages_created_archive' AS source, COUNT(*) AS value FROM $archiveTable
