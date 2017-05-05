@@ -173,8 +173,6 @@ class AdminScoreController extends Controller
                 $master[$key]["score"] = $score;
                 $total += $score;
             }
-
-
         }
 
         if ($id == 0) {
