@@ -12,3 +12,5 @@ fi
 sudo chmod -R 777 var/cache/prod/annotations
 
 sudo chmod -R 777 var/cache/prod/twig
+
+sudo chmod -R 777 /var/www/var/cache/prod/jms_serializer
