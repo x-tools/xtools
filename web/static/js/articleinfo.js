@@ -114,7 +114,7 @@
         },
         {
             type: 'bar',
-            label: i18n.anon,
+            label: i18n.ips,
             backgroundColor: colors[2],
             data: [],
             yAxisID: 'edits',

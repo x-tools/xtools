@@ -19,17 +19,17 @@
 
     <div class="panel-body xt-panel-body" >
         <p class="text-center xt-heading-subtitle">
-            {{ user_log_link(username, project_url, msg('block_log'), 'block') }}
+            {{ user_log_link(username, project_url, msg('block-log'), 'block') }}
             {% if isWMFLabs() %}
             &middot;
-            <a href="{{ link("/ec/"~project~"/"~username) }}" >{{ msg('tool_ec') }}</a>
+            <a href="{{ link("/ec/"~project~"/"~username) }}" >{{ msg('tool-ec') }}</a>
             {% if not isSingleWiki() %}
             &middot;
-            <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ username }}" >{{ msg('global_contribs') }}</a>
+            <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ username }}" >{{ msg('global-contribs') }}</a>
             {% endif %}
             &middot;
             {# FIXME: make this link go to what options are set here (redirects, namespace, etc.) #}
-            <a target="_blank" href="//tools.wmflabs.org/userviews/?project={{ project }}&amp;user={{ username }}">{{ msg('pageviews_pages_created') }}</a>
+            <a target="_blank" href="//tools.wmflabs.org/userviews/?project={{ project }}&amp;user={{ username }}">{{ msg('pageviews-pages-created') }}</a>
             {% endif %}
         </p>
 
@@ -67,7 +67,7 @@
                     </tr>
                     <tr>
                         <td>{{ msg('redirects') }}</td>
-                        <td>{{ msg('redirfilter_' ~ redirect) }}</td>
+                        <td>{{ msg('redirfilter-' ~ redirect) }}</td>
                     </tr>
                 </tbody></table>
             </div>
@@ -152,7 +152,7 @@
                 <table class="table table-bordered table-hover table-striped top-editors-table">
                     <thead><tr>
                         <th>#</th>
-                        {% set columns = ['page', 'date', 'original_size', 'current_size'] %}
+                        {% set columns = ['page', 'date', 'original-size', 'current-size'] %}
                         {% if key == '0' and hasPageAssessments %}
                             {% set columns = columns|merge(['assessment']) %}
                         {% endif %}
@@ -191,10 +191,10 @@
                                     <td class="sort-entry--date" data-value="{{ date }}">
                                         {{ perma_link(page.rev_id, project_url, page.human_time) }}
                                     </td>
-                                    <td class="sort-entry--original_size" data-value="{{ page.rev_len }}">
+                                    <td class="sort-entry--original-size" data-value="{{ page.rev_len }}">
                                         {{ page.rev_len | number_format }}
                                     </td>
-                                    <td class="sort-entry--current_size" data-value="{{ page.page_len }}">
+                                    <td class="sort-entry--current-size" data-value="{{ page.page_len }}">
                                         {{ page.page_len | number_format }}
                                     </td>
                                     {% if key == '0' and hasPageAssessments %}

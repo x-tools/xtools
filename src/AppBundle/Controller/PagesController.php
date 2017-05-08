@@ -79,10 +79,9 @@ class PagesController extends Controller
 
         // Otherwise fall through.
         return $this->render('pages/index.html.twig', [
-            "xtPageTitle" => "tool_pages",
-            "xtSubtitle" => "tool_pages_desc",
-            'xtPage' => "pages",
-            'xtTitle' => "tool_pages",
+            'xtPageTitle' => 'tool-pages',
+            'xtSubtitle' => 'tool-pages-desc',
+            'xtPage' => 'pages',
             'project' => $project,
             'namespaces' => $namespaces,
         ]);
@@ -283,7 +282,8 @@ class PagesController extends Controller
 
         // Assign the values and display the template
         return $this->render('pages/result.html.twig', [
-            'xtPage' => "pages",
+            'xtPage' => 'pages',
+            'xtTitle' => $username,
             'project' => $project,
             'project_url' => $projectUrl,
 
