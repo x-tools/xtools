@@ -95,10 +95,7 @@ class AutomatedEditsHelper
         if (is_array($this->tools)) {
             return $this->tools;
         }
-        $this->tools = call_user_func_array(
-            'array_merge',
-            $this->container->getParameter("automated_tools")
-        );
+        $this->tools = $this->container->getParameter("automated_tools");
         return $this->tools;
     }
 

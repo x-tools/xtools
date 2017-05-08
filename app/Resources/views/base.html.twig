@@ -175,7 +175,10 @@
                 v.{{ version }} &middot;
                 <a href="http://github.com/x-tools/xtools-rebirth/tree/{{ hash() }}" target="_blank">r.{{ shortHash() }}</a>
             </span>
-            <div>{{ msg_footer() }}</div>
+            {% set translateWikiLink = "<a href='https://translatewiki.net'>translatewiki.net</a>" %}
+            {% set intuitionLink = "<a href='https://tools.wmflabs.org/intuition/#tab-about'>Intuition</a>" %}
+            {% set jqueryI18nLink = "<a href='https://github.com/wikimedia/jquery.i18n'>jQuery.i18n</a>" %}
+            <div>{{ msg('translation-credits', [translateWikiLink, intuitionLink, jqueryI18nLink]) }}</div>
             <small class="footer-quote text-muted">{{ quote() }}</small>
         </div>
     </div>

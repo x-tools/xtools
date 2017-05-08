@@ -1,6 +1,14 @@
 {
-  "hashtag-credits": "Omogoča $1",
+  "all": "Vse",
+  "bot": "Bot",
+  "current-size": "Trenutna velikost",
+  "date": "Datum",
+  "editors": "Urejevalci",
+  "edits": "Urejanja",
   "help-translate": "Pomoč pri prevajanju",
   "history": "Zgodovina",
+  "page-title": "Naslov strani",
+  "pages": "Strani",
+  "powered-by": "Omogoča $1",
   "user": "Uporabnik"
 }

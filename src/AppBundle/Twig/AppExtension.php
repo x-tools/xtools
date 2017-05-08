@@ -22,7 +22,6 @@ class AppExtension extends Extension
             new \Twig_SimpleFunction('msgPrintExists', [ $this, 'intuitionMessagePrintExists' ], $options),
             new \Twig_SimpleFunction('msgExists', [ $this, 'intuitionMessageExists' ], $options),
             new \Twig_SimpleFunction('msg', [ $this, 'intuitionMessage' ], $options),
-            new \Twig_SimpleFunction('msg_footer', [ $this, 'intuitionMessageFooter' ], $options),
             new \Twig_SimpleFunction('lang', [ $this, 'getLang' ], $options),
             new \Twig_SimpleFunction('langName', [ $this, 'getLangName' ], $options),
             new \Twig_SimpleFunction('allLangs', [ $this, 'getAllLangs' ]),
@@ -126,13 +125,6 @@ class AppExtension extends Extension
     public function intuitionMessage($message = "", $vars = [])
     {
         return $this->getIntuition()->msg($message, [ "domain" => "xtools", "variables" => $vars ]);
-    }
-
-    public function intuitionMessageFooter()
-    {
-        $message = $this->getIntuition()->getFooterLine(TSINT_HELP_NONE);
-        $message = preg_replace('/<a class.*?>Change language!<\/a>/i', "", $message);
-        return $message;
     }
 
     public function getLang()

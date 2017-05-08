@@ -67,13 +67,13 @@
                         <td>
                             <a target="_blank" href="https://www.wikidata.org/wiki/{{ wikidataId }}">{{ wikidataId }}</a>
                             &middot;
-                            {{ msg('num-sitelinks', [numWikidataItems | number_format, numWikidataItems]) }}
+                            {{ numWikidataItems | number_format }} {{ msg('num-sitelinks', [numWikidataItems]) }}
                         </td>
                     </tr>
                     {% endif %}
                     <tr>
                         <td>{{ msg('page-size') }}</td>
-                        <td>{{ msg('num-bytes', [length | number_format, length]) }}</td>
+                        <td>{{ length | number_format }} {{ msg('num-bytes', [length]) }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('total-edits') }}</td>
@@ -423,7 +423,7 @@
                             {{ user_link(bot, project_url) }}
                             {% if not bot_data.current %}
                                 <i>
-                                    (<a target="_blank" href="{{ project_url }}/w/index.php?title=Special:Log&action=view&page=User:{{ bot }}&type=rights">{{ msg('former_bot') }}</a>)
+                                    (<a target="_blank" href="{{ project_url }}/w/index.php?title=Special:Log&action=view&page=User:{{ bot }}&type=rights">{{ msg('former-bot') }}</a>)
                                 </i>
                             {% endif %}
                         </td>

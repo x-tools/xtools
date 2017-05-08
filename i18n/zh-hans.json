@@ -1,7 +1,22 @@
 {
-  "hashtag-credits": "由$1提供支持",
+  "all": "全部",
+  "bot": "机器人",
+  "comma-character": "、",
+  "current-size": "当前大小",
+  "date": "日期",
+  "editors": "编辑者数",
+  "edits": "编辑数",
   "help-translate": "帮助翻译",
   "history": "历史",
+  "namespace": "名字空间",
+  "page-title": "页面标题",
+  "pages": "页面",
+  "pageviews": "页面浏览",
+  "powered-by": "由$1提供支持",
+  "project": "项目",
+  "rank": "排名",
+  "size": "大小",
   "translation-credits": "翻译采用$1、$2和$3。",
+  "unknown": "未知",
   "user": "用户"
 }

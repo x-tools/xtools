@@ -1,6 +1,17 @@
 {
+  "all": "Све",
+  "bot": "Бот",
+  "date": "Датум",
+  "editors": "Уредника",
+  "edits": "Измена",
   "help-translate": "Преведи",
   "history": "Историја",
+  "page-title": "Име странице",
+  "pages": "Странице",
+  "pageviews": "Прегледа",
+  "project": "Пројекат",
+  "size": "Величина",
   "translation-credits": "За преводе су заслужни $1 и $2.",
+  "unknown": "Непознато",
   "user": "Корисник"
 }
