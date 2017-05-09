@@ -21,7 +21,7 @@
         <p class="text-center xt-heading-subtitle">
             {{ wiki_log_link(article.title, project.url) }}
             &middot;
-            <a href="{{ path('ArticleInfoResult', {project:project.domain, article:article.title|url_encode}) }}">{{ msg('tool_articleinfo') }}</a>
+            <a href="{{ path('ArticleInfoResult', {project:project.domain, article:article.title|url_encode}) }}">{{ msg('tool-articleinfo') }}</a>
         </p>
 
         {% set content %}
@@ -30,7 +30,7 @@
             <dd>
                 {{ user_link(user.username, project.url) }}
                 &middot;
-                <a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool_ec') }}</a>
+                <a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool-ec') }}</a>
             </dd>
             <dt>{{ msg('count') }}</dt>
             <dd>{{ revision_count }}</dd>
@@ -69,7 +69,7 @@
             {% endfor %}
         </table>
         {% endset %}
-        {{ layout.content_block('edits_per_page', content) }}
+        {{ layout.content_block('edits-per-page', content) }}
     </div>
 </div>
 {% endblock %}

@@ -19,20 +19,20 @@
 
     <div class="panel-body xt-panel-body" >
         <p class="text-center xt-heading-subtitle">
-            {{ user_log_link(user.username, project.url, msg('block_log'), 'block') }}
+            {{ user_log_link(user.username, project.url, msg('block-log'), 'block') }}
             &middot;
-            <a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool_ec') }}</a>
+            <a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool-ec') }}</a>
             {% if not isSingleWiki() %}
             &middot;
-            <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ user.username }}" >{{ msg('global_contribs') }}</a>
+            <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ user.username }}" >{{ msg('global-contribs') }}</a>
             {% endif %}
             {% if isWMFLabs() %}
             &middot;
-            <a target="_blank" href="//tools.wmflabs.org/pageviews/?project={{ project.domain }}&amp;pages=User:{{ user.username }}">{{ msg('pageviews_userpage') }}</a>
+            <a target="_blank" href="//tools.wmflabs.org/pageviews/?project={{ project.domain }}&amp;pages=User:{{ user.username }}">{{ msg('pageviews-userpage') }}</a>
             {% endif %}
         </p>
 
-        <h3 class="text-center">{{ msg('topedits_per_namespace') }}</h3>
+        <h3 class="text-center">{{ msg('topedits-per-namespace') }}</h3>
 
         {% set content %}
         <table class="table table-bordered table-hover table-striped topedits-namespace-table" >
@@ -61,9 +61,9 @@
                     <td>
                         {{ wiki_log_link(edit.page_title, project.url) }}
                         &middot;
-                        <a href="{{ path('ArticleInfoResult', {project:project.domain, article:edit.page_title|url_encode}) }}">{{ msg('tool_articleinfo') }}</a>
+                        <a href="{{ path('ArticleInfoResult', {project:project.domain, article:edit.page_title|url_encode}) }}">{{ msg('tool-articleinfo') }}</a>
                         &middot;
-                        <a href="{{ path('TopEditsResults', {project:project.domain, username:user.username, namespace:namespace, article:edit.page_title|url_encode}) }}" >{{ msg('tool_topedits') }}</a>
+                        <a href="{{ path('TopEditsResults', {project:project.domain, username:user.username, namespace:namespace, article:edit.page_title|url_encode}) }}" >{{ msg('tool-topedits') }}</a>
                     </td>
                 </tr>
                 {% endfor %}

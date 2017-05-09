@@ -5,7 +5,7 @@
         <p>We have the following tools available:</p>
         <ul id="tool-list">
             {% for tool in tools() %}
-                {% if enabled(tool) %}<li><a href="{{ path(tool) }}">{{ msg("tool_" ~ tool) }}</a></li>{% endif %}
+                {% if enabled(tool) %}<li><a href="{{ path(tool) }}">{{ msg("tool-" ~ tool) }}</a></li>{% endif %}
             {% endfor %}
         </ul>
     </div>
