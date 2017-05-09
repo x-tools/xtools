@@ -55,17 +55,19 @@
 </div>
 {% endmacro %}
 
-{% macro namespace_select(namespaces, allOption = false) %}
+{% macro namespace_select(namespaces, allOption = false, value = 0) %}
 <div class="input-group form-row">
     <label class="input-group-addon form-label" for="namespace_select">
         {{ msg('namespace') }}
     </label>
     <select class="form-control namespace-selector" name="namespace" id="namespace_select">
         {% if allOption %}
-            <option value="all">{{ msg('all') | capitalize_first }}</option>
+            <option value="all" {% if value is same as('all') %}selected="selected"{% endif %}>
+                {{ msg('all') | capitalize_first }}
+            </option>
         {% endif %}
         {% for id, name in namespaces %}
-            <option value="{{ id }}" {% if loop.first %}selected="selected"{% endif %}>
+            <option value="{{ id }}" {% if value is same as(id) %}selected="selected"{% endif %}>
                 {{ name }}
             </option>
         {% endfor %}

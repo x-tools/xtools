@@ -9,7 +9,7 @@
             <span class="glyphicon glyphicon-chevron-left"></span>
             {{ msg('back') }}
             </a>
-            {{ user_link(username, projectUrl) }} &middot; {{ wikiName }}
+            {{ user_link(username, projectUrl) }} &middot; {{ project }}
         </div>
     </header>
     <div class="panel-body xt-panel-body">
@@ -28,21 +28,25 @@
         {% set content %}
             <div class="panel-body stat-list clearfix" id="summary">
                 <table class="table">
+                    {% if start is defined %}
+                        <tr>
+                            <td>{{ msg('start') }}</td>
+                            <td>{{ start | date('Y-m-d') }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if end is defined %}
+                        <tr>
+                            <td>{{ msg('end') }}</td>
+                            <td>{{ end | date('Y-m-d') }}</td>
+                        </tr>
+                    {% endif %}
                     <tr>
-                        <td>{{ msg('start-date') }}</td>
-                        <td>{{ start }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ msg('end-date') }}</td>
-                        <td>{{ end }}</td>
+                        <td>{{ msg('total-edits') }}</td>
+                        <td>{{ total | number_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('auto-edits') }}</td>
                         <td>{{ total_semi | number_format }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ msg('total') }}</td>
-                        <td>{{ total | number_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('percentage') }}</td>

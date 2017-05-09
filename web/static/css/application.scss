@@ -363,6 +363,8 @@ div.outer_bar {
     font-style: italic;
     max-width: 100%;
     overflow-x: hidden;
+    position: relative;
+    top: 8px;
     text-overflow: ellipsis;
     white-space: nowrap;
 }

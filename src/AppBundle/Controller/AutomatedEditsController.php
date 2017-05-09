@@ -22,78 +22,66 @@ class AutomatedEditsController extends Controller
         $lh = $this->get("app.labs_helper");
         $lh->checkEnabled("autoedits");
 
-        // Pull the values out of the query string.  These values default to
+        // Pull the values out of the query string. These values default to
         // empty strings.
-        $projectQuery = $request->query->get('project');
+        $project = $request->query->get('project');
         $username = $request->query->get('username');
         $startDate = $request->query->get('start');
-        $endDate = $request->query->get("end");
+        $endDate = $request->query->get('end');
 
         // Redirect if the values are set.
-        if ($projectQuery != "" && $username != "" && $startDate != "" && $endDate != "") {
-            // Redirect ot the route fully
+        if ($project != "" && $username != "" && ($startDate != "" || $endDate != "")) {
+            // Redirect to the route fully if we have the username project, and any date
+
+            // Set start date to beginning of time if end date is provided
+            // This is nasty, but necessary given URL structure
+            if ($startDate === "") {
+                $startDate = date('Y-m-d', 0);
+            }
+
             return $this->redirectToRoute(
                 "autoeditsResult",
                 [
-                    'project'=>$projectQuery,
-                    'username'=>$username,
+                    'project' => $project,
+                    'username' => $username,
                     'start' => $startDate,
                     'end' => $endDate,
                 ]
             );
-        } elseif ($projectQuery != "" && $username != "" && $endDate != "") {
-            // Redirect if we have the username, enddate and project
-            return $this->redirectToRoute(
-                "autoeditsResult",
-                [
-                    'project'=>$projectQuery,
-                    'username'=>$username,
-                    'end' => $endDate,
-                ]
-            );
-        } elseif ($projectQuery != "" && $username != "" && $startDate != "") {
-            // Redirect if we have the username, stardate and project
-            return $this->redirectToRoute(
-                "autoeditsResult",
-                [
-                    'project' => $projectQuery,
-                    'username'=>$username,
-                    'start' => $startDate,
-                ]
-            );
-        } elseif ($projectQuery != "" && $username != "") {
+        } elseif ($project != "" && $username != "") {
             // Redirect if we have the username and project
             return $this->redirectToRoute(
                 "autoeditsResult",
                 [
-                    'project' => $projectQuery,
-                    'username'=>$username,
+                    'project' => $project,
+                    'username' => $username,
                 ]
             );
-        } elseif ($projectQuery != "") {
+        } elseif ($project != "") {
             // Redirect if we have the project name
             return $this->redirectToRoute(
                 "autoeditsResult",
                 [
-                    'project'=>$projectQuery
+                    'project' => $project
                 ]
             );
         }
 
         // set default wiki so we can populate the namespace selector
-        if (!$projectQuery) {
-            $projectQuery = $this->container->getParameter('default_project');
+        if (!$project) {
+            $project = $this->container->getParameter('default_project');
         }
 
         /** @var ApiHelper */
         $api = $this->get("app.api_helper");
 
+        // TODO: add namespace support
         return $this->render('autoEdits/index.html.twig', [
             'xtPageTitle' => 'tool-autoedits',
             'xtSubtitle' => 'tool-autoedits-desc',
             'xtPage' => 'autoedits',
-            'project' => $projectQuery,
-            'namespaces' => $api->namespaces($projectQuery),
+            'project' => $project,
+            // 'namespaces' => $api->namespaces($project),
         ]);
     }
 
@@ -111,7 +99,7 @@ class AutomatedEditsController extends Controller
 
         $dbName = $dbValues["dbName"];
         $wikiName = $dbValues["wikiName"];
-        $url = $dbValues["url"];
+        $projectUrl = $dbValues["url"];
 
         // Grab our database connection
         $dbh = $this->get('doctrine')->getManager("replicas")->getConnection();
@@ -121,17 +109,14 @@ class AutomatedEditsController extends Controller
         // and we also need to handle undefined dates.
         $username = ucfirst($username);
 
-        if ($start == null) {
-            $start = date("Ymd000000", strtotime("-1 month"));
-        }
+        $invalidDates = (
+            (isset($start) && strtotime($start) === false) ||
+            (isset($end) && strtotime($end) === false)
+        );
 
-        if ($end == null) {
-            $end = date("Ymd235959");
-        }
-
-        // Validating the dates.  If the dates are invalid, we'll redirect
+        // Validating the dates. If the dates are invalid, we'll redirect
         // to the project and username view.
-        if (strtotime($start) === false || strtotime($end) === false) {
+        if ($invalidDates) {
             // Make sure to add the flash notice first.
             $this->addFlash("notice", ["invalid-date"]);
 
@@ -244,20 +229,26 @@ class AutomatedEditsController extends Controller
             $total_pct = 0;
         }
 
-
-        // Render the view with all variables set.
-        return $this->render('autoEdits/result.html.twig', [
+        $ret = [
             'xtPage' => "autoedits",
             'xtTitle' => $username,
             'username' => $username,
-            'projectUrl' => $url,
-            'wikiName' => $wikiName,
+            'projectUrl' => $projectUrl,
+            'project' => $project,
             'semi_automated' => $results,
-            'start' => date('Y-m-d', strtotime($start)),
-            'end' => date('Y-m-d', strtotime($end)),
             'total_semi' => $total_semi,
             'total' => $total,
             'total_pct' => $total_pct,
-        ]);
+        ];
+
+        if (isset($start)) {
+            $ret['start'] = $start;
+        }
+        if (isset($end)) {
+            $ret['end'] = $end;
+        }
+
+        // Render the view with all variables set.
+        return $this->render('autoEdits/result.html.twig', $ret);
     }
 }

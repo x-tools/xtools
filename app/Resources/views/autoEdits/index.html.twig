@@ -6,6 +6,7 @@
         <fieldset class="form-fieldset">
             {{ forms.user_input() }}
             {{ forms.wiki_input(project) }}
+            {# forms.namespace_select(namespaces, true, 'all') #}
             {{ forms.date_input('start') }}
             {{ forms.date_input('end') }}
         </fieldset>
