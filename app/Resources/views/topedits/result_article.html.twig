@@ -9,28 +9,28 @@
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {{ msg('back') }}
             </a>
-            {{ wiki_link(article.title, project_url) }}
+            {{ wiki_link(article.title, project.url) }}
             <small>
                 &bull;
-                {{ project }}
+                {{ project.title }}
             </small>
         </div>
     </header>
 
     <div class="panel-body xt-panel-body" >
         <p class="text-center xt-heading-subtitle">
-            {{ wiki_log_link(article.title, project_url) }}
+            {{ wiki_log_link(article.title, project.url) }}
             &middot;
-            <a href="{{ path('ArticleInfoResult', {project:project, article:article.title|url_encode}) }}">{{ msg('tool_articleinfo') }}</a>
+            <a href="{{ path('ArticleInfoResult', {project:project.domain, article:article.title|url_encode}) }}">{{ msg('tool_articleinfo') }}</a>
         </p>
 
         {% set content %}
         <dl class="col-lg-6 dl-horizontal stat-list clearfix">
             <dt>{{ msg('user') }}</dt>
             <dd>
-                {{ user_link(username, project_url) }}
+                {{ user_link(user.username, project.url) }}
                 &middot;
-                <a href="{{ path('EditCounterResult', {project:project, username:username}) }}" >{{ msg('tool_ec') }}</a>
+                <a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool_ec') }}</a>
             </dd>
             <dt>{{ msg('count') }}</dt>
             <dd>{{ revision_count }}</dd>
@@ -55,16 +55,16 @@
             {% for rev in revisions %}
             <tr>
                 <td class="sort-entry--date" data-value="{{ rev.timestamp }}">
-                    {{ perma_link(rev.id, project_url, rev.timestamp) }}
+                    {{ perma_link(rev.id, project.url, rev.timestamp) }}
                 </td>
                 <td>
-                    {{ diff_link(rev.id, project_url, msg('diff') | capitalize_first ) }}
+                    {{ diff_link(rev.id, project.url, msg('diff') | capitalize_first ) }}
                     &middot;
                     {% set offset = date(rev.year~"-"~rev.month~"-01") | date("Ymt")~"235959" %}
-                    {{ wiki_history_link(article.title, project_url, msg('history'), offset) }}
+                    {{ wiki_history_link(article.title, project.url, msg('history'), offset) }}
                 </td>
                 <td class="sort-entry--size" data-value="{{ rev.length_change }}">{{ rev.length_change|diff_format }}</td>
-                <td class="sort-entry--comment" data-value="{{ rev.comment }}">{{ rev.comment | wikify_comment(article.title, project_url) }}</td>
+                <td class="sort-entry--comment" data-value="{{ rev.comment }}">{{ rev.comment | wikify_comment(article.title, project.url) }}</td>
             </tr>
             {% endfor %}
         </table>

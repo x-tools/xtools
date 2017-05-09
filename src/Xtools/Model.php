@@ -1,0 +1,38 @@
+<?php
+
+namespace Xtools;
+
+/**
+ * A model is any domain-side entity to be represented in the application.
+ * Models know nothing of persistence, transport, or presentation.
+ */
+abstract class Model
+{
+
+    /** @var Repository */
+    private $repository;
+
+    /**
+     * Set this model's data repository.
+     *
+     * @param Repository $repository
+     */
+    public function setRepository(Repository $repository)
+    {
+        $this->repository = $repository;
+    }
+
+    /**
+     * Get this model's repository.
+     *
+     * @return Repository A subclass of Repository.
+     * @throws \Exception If the repository hasn't been set yet.
+     */
+    public function getRepository()
+    {
+        if (!$this->repository instanceof Repository) {
+            throw new \Exception('Repository must be set before using.');
+        }
+        return $this->repository;
+    }
+}
