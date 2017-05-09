@@ -89,8 +89,8 @@ class AutomatedEditsController extends Controller
         $api = $this->get("app.api_helper");
 
         return $this->render('autoEdits/index.html.twig', [
-            'xtPageTitle' => 'tool_autoedits',
-            'xtSubtitle' => 'tool_autoedits_desc',
+            'xtPageTitle' => 'tool-autoedits',
+            'xtSubtitle' => 'tool-autoedits-desc',
             'xtPage' => 'autoedits',
             'project' => $projectQuery,
             'namespaces' => $api->namespaces($projectQuery),
@@ -122,18 +122,18 @@ class AutomatedEditsController extends Controller
         $username = ucfirst($username);
 
         if ($start == null) {
-            $start = date("Y-m-d", strtotime("-1 month"));
+            $start = date("Ymd000000", strtotime("-1 month"));
         }
 
         if ($end == null) {
-            $end = date("Y-m-d");
+            $end = date("Ymd235959");
         }
 
         // Validating the dates.  If the dates are invalid, we'll redirect
         // to the project and username view.
         if (strtotime($start) === false || strtotime($end) === false) {
             // Make sure to add the flash notice first.
-            $this->addFlash("notice", ["invalid_date"]);
+            $this->addFlash("notice", ["invalid-date"]);
 
             // Then redirect us!
             return $this->redirectToRoute(
@@ -146,36 +146,47 @@ class AutomatedEditsController extends Controller
         }
 
         // Now, load the semi-automated edit types.
-        $AEBTypes = [];
         $AEBTypes = $this->getParameter("automated_tools");
 
         // Create a collection of queries that we're going to run.
         $queries = [];
 
-        $rev = $lh->getTable("revision", $dbName);
-        $arc = $lh->getTable("archive", $dbName);
-  
-        $cond_begin = ( $start ) ? " AND rev_timestamp > :start " : null;
-        $cond_end = ( $end ) ? " AND rev_timestamp < :end ": null;
+        $revisionTable = $lh->getTable("revision", $dbName);
+        $archiveTable = $lh->getTable("archive", $dbName);
+
+        $cond_begin = $start ? " AND rev_timestamp > :start " : null;
+        $cond_end = $end ? " AND rev_timestamp < :end ": null;
 
         foreach ($AEBTypes as $toolname => $check) {
             $toolname = $dbh->quote($toolname, \PDO::PARAM_STR);
             $check = $dbh->quote($check, \PDO::PARAM_STR);
-        
+
             $queries[] .= "
-                SELECT $toolname as toolname, count(*) as count
-                FROM $rev
-                WHERE rev_user_text = :username 
+                SELECT $toolname AS toolname, COUNT(*) AS count
+                FROM $revisionTable
+                WHERE rev_user_text = :username
                 AND rev_comment REGEXP $check
                 $cond_begin
                 $cond_end
             ";
         }
 
+        // Query to get combined (semi)automated using for all edits
+        // (some automated edits overlap)
+        $allAETools = $dbh->quote(implode('|', $AEBTypes), \PDO::PARAM_STR);
+        $queries[] = "
+            SELECT 'total_live' AS toolname, COUNT(*) AS count
+            FROM $revisionTable
+            WHERE rev_user_text = :username
+            AND rev_comment REGEXP $allAETools
+            $cond_begin
+            $cond_end
+        ";
+
         // Next, add two simple queries for the live and deleted edits.
         $queries[] = "
-            SELECT 'live' as toolname ,count(*) as count
-            from $rev
+            SELECT 'live' AS toolname, COUNT(*) AS count
+            FROM $revisionTable
             WHERE rev_user_text = :username
             $cond_begin
             $cond_end
@@ -185,8 +196,8 @@ class AutomatedEditsController extends Controller
         $cond_end = str_replace("rev_timestamp", "ar_timestamp", $cond_end);
 
         $queries[] = "
-            SELECT 'deleted' as toolname, count(*) as count
-            from $arc
+            SELECT 'deleted' AS toolname, COUNT(*) AS count
+            FROM $archiveTable
             WHERE ar_user_text = :username
             $cond_begin
             $cond_end
@@ -213,13 +224,14 @@ class AutomatedEditsController extends Controller
             // the live edits or deleted edits.
             // If it is neither and greater than 0,
             // add them to the array we're rendering and to our running total
-            if ($row["toolname"] == "live") {
+            if ($row["toolname"] === "live") {
                 $total += $row["count"];
-            } elseif ($row["toolname"] == "deleted") {
+            } elseif ($row["toolname"] === "deleted") {
                 $total += $row["count"];
+            } elseif ($row["toolname"] === "total_live") {
+                $total_semi = $row["count"];
             } elseif ($row["count"] > 0) {
                 $results[$row["toolname"]] = $row["count"];
-                $total_semi = $total_semi+$row["count"];
             }
         }
 
@@ -235,19 +247,17 @@ class AutomatedEditsController extends Controller
 
         // Render the view with all variables set.
         return $this->render('autoEdits/result.html.twig', [
-            'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
-            //"xtPageTitle" => "autoedits",
             'xtPage' => "autoedits",
-            "username" => $username,
-            "url" => $url,
-            "wikiName" => $wikiName,
-            "semi_automated" => $results,
-            "start" => date("Y-m-d", strtotime($start)),
-            "end" => date("Y-m-d", strtotime($end)),
-            "total_semi" => $total_semi,
-            "total" => $total,
-            "total_pct" => $total_pct,
-
+            'xtTitle' => $username,
+            'username' => $username,
+            'projectUrl' => $url,
+            'wikiName' => $wikiName,
+            'semi_automated' => $results,
+            'start' => date('Y-m-d', strtotime($start)),
+            'end' => date('Y-m-d', strtotime($end)),
+            'total_semi' => $total_semi,
+            'total' => $total,
+            'total_pct' => $total_pct,
         ]);
     }
 }

@@ -415,6 +415,7 @@ class AppExtension extends Extension
     {
         return [
             new \Twig_SimpleFilter('capitalize_first', [ $this, 'capitalizeFirst' ]),
+            new \Twig_SimpleFilter('percent_format', [ $this, 'percentFormat' ]),
         ];
     }
 
@@ -427,5 +428,23 @@ class AppExtension extends Extension
     public function capitalizeFirst($str)
     {
         return ucfirst($str);
+    }
+
+    /**
+     * Format a given number or fraction as a percentage
+     * @param  number  $numerator     Numerator or single fraction if denominator is ommitted
+     * @param  number  [$denominator] Denominator
+     * @param  integer [$precision]   Number of decimal places to show
+     * @return string                 Formatted percentage
+     */
+    public function percentFormat($numerator, $denominator = null, $precision = 1)
+    {
+        if (!$denominator) {
+            $quotient = $numerator;
+        } else {
+            $quotient = ( $numerator / $denominator ) * 100;
+        }
+
+        return round($quotient, $precision) . '%';
     }
 }

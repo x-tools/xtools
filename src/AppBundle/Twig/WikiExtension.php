@@ -244,7 +244,6 @@ class WikiExtension extends Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('percent_format', [ $this, 'percentFormat' ]),
             new \Twig_SimpleFilter('diff_format', [ $this, 'diffFormat' ], [ 'is_safe' => [ 'html' ] ]),
             new \Twig_SimpleFilter('wikify_comment', [ $this, 'wikifyComment' ], [ 'is_safe' => [ 'html' ] ]),
         ];
@@ -268,24 +267,6 @@ class WikiExtension extends Extension
         $size = number_format($size);
 
         return "<span class='$class'>$size</span>";
-    }
-
-    /**
-     * Format a given number or fraction as a percentage
-     * @param  number  $numerator     Numerator or single fraction if denominator is ommitted
-     * @param  number  [$denominator] Denominator
-     * @param  integer [$precision]   Number of decimal places to show
-     * @return string                 Formatted percentage
-     */
-    public function percentFormat($numerator, $denominator = null, $precision = 1)
-    {
-        if (!$denominator) {
-            $quotient = $numerator;
-        } else {
-            $quotient = ( $numerator / $denominator ) * 100;
-        }
-
-        return round($quotient, $precision) . '%';
     }
 
     /**

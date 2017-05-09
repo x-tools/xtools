@@ -4,6 +4,10 @@
  *
  * To use, add the necessary code below
  * and run `node i18n_helper.js`.
+ *
+ * WARNING: these functions may run asynchronously,
+ * so use only one at a time (or implement a callback)
+ * to ensure you don't end up with corrupt files.
  */
 
 const dir = './i18n/';
