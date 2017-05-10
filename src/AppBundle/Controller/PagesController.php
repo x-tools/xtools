@@ -112,7 +112,7 @@ class PagesController extends Controller
         $pageTable = $lh->getTable("page", $dbName);
         $revisionTable = $lh->getTable("revision", $dbName);
         $archiveTable = $lh->getTable("archive", $dbName);
-        $logTable = $lh->getTable("logging", $dbName);
+        $logTable = $lh->getTable("logging", $dbName, "userindex");
 
         // Grab the connection to the replica database (which is separate from the above)
         $conn = $this->get('doctrine')->getManager("replicas")->getConnection();

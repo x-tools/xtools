@@ -62,7 +62,9 @@ class AdminScoreController extends Controller
 
         $userTable = $lh->getTable("user", $dbName);
         $pageTable = $lh->getTable("page", $dbName);
-        $loggingTable = $lh->getTable("logging", $dbName);
+        $loggingTable = $lh->getTable("logging", $dbName, "userindex");
+        dump($loggingTable);
+        dump($pageTable);
         $revisionTable = $lh->getTable("revision", $dbName);
         $archiveTable = $lh->getTable("archive", $dbName);
 
