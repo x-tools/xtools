@@ -31,7 +31,8 @@ abstract class Model
     public function getRepository()
     {
         if (!$this->repository instanceof Repository) {
-            throw new \Exception('Repository must be set before using.');
+            $msg = sprintf('Repository for %s must be set before using.', get_class($this));
+            throw new \Exception($msg);
         }
         return $this->repository;
     }

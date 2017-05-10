@@ -22,9 +22,6 @@ abstract class Repository
     /** @var Connection */
     protected $toolsConnection;
 
-    /** @var MediawikiApi */
-    protected $api;
-
     /** @var CacheItemPoolInterface */
     private $cache;
 
@@ -56,11 +53,15 @@ abstract class Repository
     }
 
     /**
-     * @param MediawikiApi $api
+     * Get the API object for the given project.
+     * @param Project $project
+     * @return MediawikiApi
      */
-    public function setApi(MediawikiApi $api)
+    protected function getMediawikiApi(Project $project)
     {
-        $this->api = $api;
+        // @TODO use newFromApiEndpoint instead.
+        $api = MediawikiApi::newFromPage($project->getUrl());
+        return $api;
     }
 
     /**

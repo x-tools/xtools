@@ -7,6 +7,8 @@ use AppBundle\Helper\LabsHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Xtools\Page;
+use Xtools\PagesRepository;
 use Xtools\Project;
 use Xtools\ProjectRepository;
 use Xtools\User;
@@ -179,17 +181,18 @@ class TopEditsController extends Controller
      * List top edits by this user for a particular page.
      * @param User $user
      * @param Project $project
-     * @param string $article
+     * @param string $pageName
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    protected function singlePageTopEdits(User $user, Project $project, $article)
+    protected function singlePageTopEdits(User $user, Project $project, $pageName)
     {
-        /** @var ApiHelper $apiHelper */
-        $apiHelper = $this->get("app.api_helper");
-        $pageInfo = $apiHelper->getBasicPageInfo($project->getDomain(), $article, true);
-        if (isset($pageInfo['missing']) && $pageInfo['missing']) {
+        $page = new Page($project, $pageName);
+        $pageRepo = new PagesRepository();
+        $page->setRepository($pageRepo);
+        
+        if (!$page->exists()) {
             // Redirect if the page doesn't exist.
-            $this->addFlash("notice", ["noresult", $article]);
+            $this->addFlash("notice", ["noresult", $pageName]);
             return $this->redirectToRoute("topedits");
         }
 
@@ -205,7 +208,7 @@ class TopEditsController extends Controller
                 WHERE revs.rev_user_text in (:username) AND revs.rev_page = :pageid
                 ORDER BY revs.rev_timestamp DESC
             ";
-        $params = ['username' => $user->getUsername(), 'pageid' => $pageInfo['pageid']];
+        $params = ['username' => $user->getUsername(), 'pageid' => $page->getId()];
         $conn = $this->getDoctrine()->getManager('replicas')->getConnection();
         $revisionsData = $conn->executeQuery($query, $params)->fetchAll();
 
@@ -231,7 +234,7 @@ class TopEditsController extends Controller
             'xtPage' => 'topedits',
             'project' => $project,
             'user' => $user,
-            'article' => $pageInfo,
+            'page' => $page,
             'total_added' => $totalAdded,
             'total_removed' => $totalRemoved,
             'revisions' => $revisions,

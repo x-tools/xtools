@@ -9,7 +9,7 @@
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {{ msg('back') }}
             </a>
-            {{ wiki_link(article.title, project.url) }}
+            <a href="{{ page.url }}">{{ page.displaytitle|raw }}</a>
             <small>
                 &bull;
                 {{ project.title }}
@@ -19,9 +19,9 @@
 
     <div class="panel-body xt-panel-body" >
         <p class="text-center xt-heading-subtitle">
-            {{ wiki_log_link(article.title, project.url) }}
+            {{ wiki_log_link(page.title, project.url) }}
             &middot;
-            <a href="{{ path('ArticleInfoResult', {project:project.domain, article:article.title|url_encode}) }}">{{ msg('tool-articleinfo') }}</a>
+            <a href="{{ path('ArticleInfoResult', {project:project.domain, article:page.title|url_encode}) }}">{{ msg('tool-articleinfo') }}</a>
         </p>
 
         {% set content %}
@@ -61,10 +61,10 @@
                     {{ diff_link(rev.id, project.url, msg('diff') | capitalize_first ) }}
                     &middot;
                     {% set offset = date(rev.year~"-"~rev.month~"-01") | date("Ymt")~"235959" %}
-                    {{ wiki_history_link(article.title, project.url, msg('history'), offset) }}
+                    {{ wiki_history_link(page.title, project.url, msg('history'), offset) }}
                 </td>
                 <td class="sort-entry--size" data-value="{{ rev.length_change }}">{{ rev.length_change|diff_format }}</td>
-                <td class="sort-entry--comment" data-value="{{ rev.comment }}">{{ rev.comment | wikify_comment(article.title, project.url) }}</td>
+                <td class="sort-entry--comment" data-value="{{ rev.comment }}">{{ rev.comment | wikify_comment(page.title, project.url) }}</td>
             </tr>
             {% endfor %}
         </table>
