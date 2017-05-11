@@ -121,7 +121,8 @@
                 {% if pages|length > 1 %}
                     <tfoot>
                         <th class="namespaces--namespaces">
-                            {{ msg('num-namespaces', [pages|length|number_format, pages|length]) }}
+                            {{ pages|length|number_format }}
+                            {{ msg('num-namespaces', [pages|length]) }}
                         </th>
                         <th class="namespaces--pages">
                             {{ total | number_format }}

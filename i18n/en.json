@@ -159,6 +159,7 @@
   "num-revisions": "{{PLURAL:$1|revision|revisions}}",
   "num-seconds": "{{PLURAL:$1|second|seconds}}",
   "num-sitelinks": "{{PLURAL:$1|sitelink|sitelinks}}",
+  "num-tools": "{{PLURAL:$1|tool|tools}}",
   "num-users": "{{PLURAL:$1|user|users}}",
   "num-weeks": "{{PLURAL:$1|week|weeks}}",
   "num-years": "{{PLURAL:$1|year|years}}",

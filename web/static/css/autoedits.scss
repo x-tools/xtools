@@ -1,0 +1,60 @@
+@import 'mixins.scss';
+
+.autoedits {
+    #summary .chart-wrapper {
+        margin-left: 50px;
+        max-width: 200px;
+
+        canvas {
+            max-width: 200px;
+        }
+
+        .chart-legend {
+            display: none;
+        }
+    }
+
+    .tools-table {
+        float: left;
+
+        tr:hover .tools-toggle {
+            .color-icon {
+                visibility: hidden;
+            }
+
+            .glyphicon {
+                display: block;
+            }
+        }
+
+        tr.excluded {
+            .sort-entry--tool {
+                opacity: 0.5;
+                text-decoration: line-through;
+            }
+
+            .color-icon {
+                opacity: 0.5;
+            }
+        }
+
+        .tools-toggle {
+            cursor: pointer;
+            margin-right: 4px;
+            position: relative;
+        }
+
+        td .glyphicon {
+            display: none;
+            left: 1px;
+            position: absolute;
+        }
+    }
+
+    .tools-chart-wrapper {
+        float: left;
+        margin-left: 100px;
+        margin-top: 20px;
+        max-width: 500px;
+    }
+}

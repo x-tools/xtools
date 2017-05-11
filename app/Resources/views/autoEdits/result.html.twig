@@ -1,5 +1,6 @@
 {% extends 'base.html.twig' %}
 {% import 'macros/layout.html.twig' as layout %}
+{% import 'macros/pieChart.html.twig' as chart %}
 
 {% block body %}
 <div class="panel panel-primary">
@@ -27,7 +28,7 @@
 
         {% set content %}
             <div class="panel-body stat-list clearfix" id="summary">
-                <table class="table">
+                <table class="table autoedits-table">
                     {% if start is defined %}
                         <tr>
                             <td>{{ msg('start') }}</td>
@@ -46,28 +47,52 @@
                     </tr>
                     <tr>
                         <td>{{ msg('auto-edits') }}</td>
-                        <td>{{ total_semi | number_format }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ msg('percentage') }}</td>
-                        <td>{{ total_pct | percent_format }}</td>
+                        <td>
+                            {{ total_semi | number_format }}
+                            ({{ total_pct | percent_format }})
+                        </td>
                     </tr>
                 </table>
+                {{
+                    chart.pie_chart('auto_edits',
+                        [{
+                            label: msg('total-edits'),
+                            value: total,
+                            percentage: 100 - total_pct
+                        },
+                        {
+                            label: msg('auto-edits'),
+                            value: total_semi,
+                            percentage: total_pct
+                        }]
+                    )
+                }}
             </div>
         {% endset %}
         {{ layout.content_block('summary', content) }}
 
-
         {% set edits %}
-            <table class="table table-bordered table-hover table-striped">
+            <table class="table table-bordered table-hover table-striped tools-table">
+                <thead>
                 {% for key in ['tool', 'count'] %}
-                    <th class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                        {{ msg(key) | capitalize_first }}
+                    <th>
+                        <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
+                            {{ msg(key) | capitalize_first }}
+                            <span class="glyphicon glyphicon-sort"></span>
+                        </span>
                     </th>
                 {% endfor %}
+                </thead>
+                <tbody>
+                {% set toolsTotal = 0 %}
                 {% for tool, count in semi_automated %}
+                    {% set toolsTotal = toolsTotal + count %}
                     <tr>
                         <td class="sort-entry--tool" data-value="{{ tool }}">
+                            <span class="tools-toggle" data-index="{{ loop.index0 }}" data-tool="{{ tool }}">
+                                <span class="glyphicon glyphicon-remove"></span>
+                                <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
+                            </span>
                             {{ tool }}
                         </td>
                         <td class="sort-entry--count" data-value="{{ count }}">
@@ -75,9 +100,53 @@
                         </td>
                     </tr>
                 {% endfor %}
+                </tbody>
+                <tfoot>
+                    <th class="tools--tools">
+                        {{ semi_automated | length | number_format }}
+                        {{ msg('num-tools', [semi_automated | length]) }}
+                    </th>
+                    <th class="tools--count">
+                        {{ toolsTotal | number_format }}
+                    </th>
+                </tfoot>
             </table>
+
+            <div class="chart-wrapper tools-chart-wrapper">
+                <canvas id="tool_chart" width="400" height="400"></canvas>
+            </div>
         {% endset %}
         {{ layout.content_block('auto-edits', edits) }}
+
+        {% set colors = [] %}
+        {% for i in 0..(semi_automated | length) %}
+            {% set colors = colors | merge([chartColor(i)]) %}
+        {% endfor %}
+
+        <script>
+            window.toolsChart = new Chart($('#tool_chart'), {
+                type: 'pie',
+                data: {
+                    labels: {{ semi_automated | keys | json_encode() | raw }},
+                    datasets: [{
+                        data: [
+                            {% for value in semi_automated %}
+                                {{ value }}{% if not loop.last %},{% endif %}
+                            {% endfor %}
+                        ],
+                        backgroundColor: {{ colors | json_encode() | raw }},
+                        borderColor: {{ colors | json_encode() | raw }},
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    legend: {
+                      display: false,
+                    }
+                }
+            });
+            window.countsByTool = {{ semi_automated | json_encode() | raw }};
+        </script>
     </div>
 </div>
 {% endblock %}
