@@ -58,3 +58,10 @@
         max-width: 500px;
     }
 }
+
+@media (max-width: $bootstrap-sm) {
+    .autoedits .chart-wrapper {
+        margin: 0;
+        max-width: 100%;
+    }
+}
