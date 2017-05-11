@@ -1,0 +1,33 @@
+{% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
+
+{% block body %}
+
+<table class="table-striped table-condensed sortable xt-table">
+    <thead>
+        <tr>
+            <th>{{ msg('ec-latestglobal-time') }}</th>
+            <th>{{ msg('ec-latestglobal-project') }}</th>
+            <th>{{ msg('ec-latestglobal-actions') }}</th>
+            <th>{{ msg('ec-latestglobal-page') }}</th>
+            <th>{{ msg('ec-latestglobal-comment') }}</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for edit in latest_global_contribs %}
+        <tr>
+            <td class="tddate">{{ edit.rev_time_formatted }}</td>
+            <td><a href="{{ edit.project_url }}">{{ edit.project_name }}</a></td>
+            <td>(
+                {{ diff_link(edit.rev_id, edit.project_url, 'diff') }}
+                &middot; {{ user_log_link(username, project, 'log') }}
+                &middot; <a href="{{ path('TopEditsResults', {project:edit.project_db_name, username:username, namespace:edit.page_namespace, article:edit.page_title|url_encode}) }}">topedits</a>
+                )
+            </td>
+            <td class="tdtitle break">{{ wiki_link(edit.page_title, edit.project_url) }}</td>
+            <td class="revtext break">{{ edit.rev_comment }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

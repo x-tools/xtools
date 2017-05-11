@@ -47,6 +47,15 @@ class User extends Model
      */
     public function getGroups(Project $project)
     {
+        return $this->getRepository()->getGroups($project, $this->getUsername());
+    }
+
+    /**
+     * Get a list of this user's groups on all projects.
+     */
+    public function getGlobalGroups()
+    {
+        return $this->getRepository()->getGlobalGroups($this->getUsername());
     }
 
     /**
@@ -58,5 +67,16 @@ class User extends Model
     {
         return $project->getUrl() . $project->getScriptPath() . "?title=Special:UserRights&user=" .
                $this->getUsername();
+    }
+
+    /**
+     * Does this user exist on the given project.
+     * @param Project $project
+     * @return bool
+     */
+    public function existsOnProject(Project $project)
+    {
+        $id = $this->getId($project);
+        return $id > 0;
     }
 }

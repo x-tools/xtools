@@ -4,6 +4,7 @@ namespace Xtools;
 
 use Mediawiki\Api\MediawikiApi;
 use Mediawiki\Api\SimpleRequest;
+use Symfony\Component\DependencyInjection\Container;
 
 class ProjectRepository extends Repository
 {
@@ -13,6 +14,27 @@ class ProjectRepository extends Repository
 
     /** @var string[] */
     protected $singleMetadata;
+
+    /**
+     * Convenience method to get a new Project object based on a given identification string.
+     * @param string $projectIdent The domain name, database name, or URL of a project.
+     * @param Container $container Symfony's container.
+     * @return Project
+     */
+    public static function getProject($projectIdent, Container $container)
+    {
+        $project = new Project($projectIdent);
+        $projectRepo = new ProjectRepository();
+        $projectRepo->setContainer($container);
+        if ($container->getParameter('app.single_wiki')) {
+            $projectRepo->setSingleMetadata([
+                'url' => $container->getParameter('wiki_url'),
+                'dbname' => $container->getParameter('database_replica_name'),
+            ]);
+        }
+        $project->setRepository($projectRepo);
+        return $project;
+    }
 
     /**
      * For single-wiki installations, you must manually set the wiki URL and database name
@@ -38,7 +60,7 @@ class ProjectRepository extends Repository
         if ($this->singleMetadata) {
             return [$this->getOne('')];
         }
-        $wikiQuery = $this->metaConnection->createQueryBuilder();
+        $wikiQuery = $this->getMetaConnection()->createQueryBuilder();
         $wikiQuery->select(['dbname', 'url'])->from('wiki');
         return $wikiQuery->execute()->fetchAll();
     }
@@ -56,7 +78,7 @@ class ProjectRepository extends Repository
         }
 
         // Otherwise, fetch the project's metadata from the meta.wiki table.
-        $wikiQuery = $this->metaConnection->createQueryBuilder();
+        $wikiQuery = $this->getMetaConnection()->createQueryBuilder();
         $wikiQuery->select(['dbname', 'url'])
             ->from('wiki')
             ->where($wikiQuery->expr()->eq('dbname', ':project'))

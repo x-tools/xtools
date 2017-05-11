@@ -20,28 +20,6 @@ class TopEditsController extends Controller
     private $lh;
 
     /**
-     * Get the Project.
-     * @todo This can probably be made more common.
-     * @param string $projectIdent The domain name, database name, or URL of a project.
-     * @return Project
-     */
-    protected function getProject($projectIdent)
-    {
-        $project = new Project($projectIdent);
-        $projectRepo = new ProjectRepository();
-        $projectRepo->setMetaConnection($this->get('doctrine')->getManager("meta")->getConnection());
-        $projectRepo->setCache($this->get('cache.app'));
-        if ($this->container->getParameter('app.single_wiki')) {
-            $projectRepo->setSingleMetadata([
-                'url' => $this->container->getParameter('wiki_url'),
-                'dbname' => $this->container->getParameter('database_replica_name'),
-            ]);
-        }
-        $project->setRepository($projectRepo);
-        return $project;
-    }
-
-    /**
      * @Route("/topedits", name="topedits")
      * @Route("/topedits", name="topEdits")
      * @Route("/topedits/", name="topEditsSlash")
@@ -84,7 +62,7 @@ class TopEditsController extends Controller
             $project = $this->container->getParameter('default_project');
         }
 
-        $project = $this->getProject($project);
+        $project = ProjectRepository::getProject($project, $this->container);
 
         return $this->render('topedits/index.html.twig', [
             'xtPageTitle' => 'tool-topedits',
@@ -103,7 +81,7 @@ class TopEditsController extends Controller
         $this->lh = $this->get('app.labs_helper');
         $this->lh->checkEnabled('topedits');
 
-        $project = $this->getProject($project);
+        $project = ProjectRepository::getProject($project, $this->container);
         $user = new User($username);
 
         if ($article === "") {
