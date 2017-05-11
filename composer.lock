@@ -1439,16 +1439,16 @@
         },
         {
             "name": "jms/serializer",
-            "version": "1.6.2",
+            "version": "1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/serializer.git",
-                "reference": "b8683d206e7297f54034f67a877f966c14dc12ea"
+                "reference": "b5abc84a55d7c7203561b3fd9049acd6859a5b62"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/b8683d206e7297f54034f67a877f966c14dc12ea",
-                "reference": "b8683d206e7297f54034f67a877f966c14dc12ea",
+                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/b5abc84a55d7c7203561b3fd9049acd6859a5b62",
+                "reference": "b5abc84a55d7c7203561b3fd9049acd6859a5b62",
                 "shasum": ""
             },
             "require": {
@@ -1487,7 +1487,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.6-dev"
+                    "dev-master": "1.7-dev"
                 }
             },
             "autoload": {
@@ -1514,25 +1514,25 @@
                 "serialization",
                 "xml"
             ],
-            "time": "2017-04-17T15:27:46+00:00"
+            "time": "2017-05-10T09:43:46+00:00"
         },
         {
             "name": "jms/serializer-bundle",
-            "version": "1.4.0",
+            "version": "1.5.0",
             "target-dir": "JMS/SerializerBundle",
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/JMSSerializerBundle.git",
-                "reference": "fdd73dbc8642940084deda2a96fa5db62d0f2384"
+                "reference": "85ee039a2b7f89d77c403e33cee7b43a875c31e5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/JMSSerializerBundle/zipball/fdd73dbc8642940084deda2a96fa5db62d0f2384",
-                "reference": "fdd73dbc8642940084deda2a96fa5db62d0f2384",
+                "url": "https://api.github.com/repos/schmittjoh/JMSSerializerBundle/zipball/85ee039a2b7f89d77c403e33cee7b43a875c31e5",
+                "reference": "85ee039a2b7f89d77c403e33cee7b43a875c31e5",
                 "shasum": ""
             },
             "require": {
-                "jms/serializer": "^1.6",
+                "jms/serializer": "^1.7",
                 "php": ">=5.4.0",
                 "phpoption/phpoption": "^1.1.0",
                 "symfony/framework-bundle": "~2.3|~3.0"
@@ -1559,7 +1559,7 @@
             "type": "symfony-bundle",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.4-dev"
+                    "dev-master": "1.5-dev"
                 }
             },
             "autoload": {
@@ -1569,7 +1569,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "Apache2"
+                "Apache-2.0"
             ],
             "authors": [
                 {
@@ -1586,7 +1586,7 @@
                 "serialization",
                 "xml"
             ],
-            "time": "2017-04-10T12:31:39+00:00"
+            "time": "2017-05-10T10:17:17+00:00"
         },
         {
             "name": "krinkle/intuition",
@@ -2539,16 +2539,16 @@
         },
         {
             "name": "swiftmailer/swiftmailer",
-            "version": "v5.4.7",
+            "version": "v5.4.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/swiftmailer/swiftmailer.git",
-                "reference": "56db4ed32a6d5c9824c3ecc1d2e538f663f47eb4"
+                "reference": "9a06dc570a0367850280eefd3f1dc2da45aef517"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/56db4ed32a6d5c9824c3ecc1d2e538f663f47eb4",
-                "reference": "56db4ed32a6d5c9824c3ecc1d2e538f663f47eb4",
+                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/9a06dc570a0367850280eefd3f1dc2da45aef517",
+                "reference": "9a06dc570a0367850280eefd3f1dc2da45aef517",
                 "shasum": ""
             },
             "require": {
@@ -2589,7 +2589,7 @@
                 "mail",
                 "mailer"
             ],
-            "time": "2017-04-20T17:32:18+00:00"
+            "time": "2017-05-01T15:54:03+00:00"
         },
         {
             "name": "symfony/assetic-bundle",

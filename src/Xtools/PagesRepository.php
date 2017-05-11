@@ -60,4 +60,29 @@ class PagesRepository extends Repository
         }
         return $result;
     }
+
+    /**
+     * Get revisions of a single page.
+     * @param Project $project
+     * @param Page $page
+     * @param User|null $user
+     * @return string[] Each member with keys: id, timestamp, length-
+     */
+    public function getRevisions(Page $page, User $user)
+    {
+        $revTable = $this->getTableName($page->getProject()->project->getDatabaseName(), 'revision');
+        $query = "SELECT
+                    revs.rev_id AS id,
+                    revs.rev_timestamp AS timestamp,
+                    (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
+                    revs.rev_comment AS comment
+                FROM $revTable AS revs
+                    LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+                WHERE revs.rev_user_text in (:username) AND revs.rev_page = :pageid
+                ORDER BY revs.rev_timestamp DESC
+            ";
+        $params = ['username' => $user->getUsername(), 'pageid' => $page->getId()];
+        $conn = $this->getDoctrine()->getManager('replicas')->getConnection();
+        return $conn->executeQuery($query, $params)->fetchAll();
+    }
 }

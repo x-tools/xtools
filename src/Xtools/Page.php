@@ -40,7 +40,7 @@ class Page extends Model
         }
         return $this->pageInfo;
     }
-    
+
     /**
      * @return string
      */
@@ -90,5 +90,39 @@ class Page extends Model
     {
         $info = $this->getPageInfo();
         return !isset($info['missing']);
+    }
+
+    /**
+     * Get the Project to which this page belongs.
+     * @return Project
+     */
+    public function getProject()
+    {
+        return $this->project;
+    }
+
+    /**
+     * Get all edits made to this page by the given user.
+     * @return array
+     */
+    public function getRevisions(User $user)
+    {
+        $data = $this->getRepository()->getRevisions($this, $user);
+        $totalAdded = 0;
+        $totalRemoved = 0;
+        $revisions = [];
+        foreach ($data as $revision) {
+            if ($revision['length_change'] > 0) {
+                $totalAdded += $revision['length_change'];
+            } else {
+                $totalRemoved += $revision['length_change'];
+            }
+            $time = strtotime($revision['timestamp']);
+            $revision['timestamp'] = $time; // formatted via Twig helper
+            $revision['year'] = date('Y', $time);
+            $revision['month'] = date('m', $time);
+            $revisions[] = $revision;
+        }
+        return $revisions;
     }
 }

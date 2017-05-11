@@ -7,6 +7,7 @@ use AppBundle\Helper\LabsHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\VarDumper\VarDumper;
 use Xtools\Page;
 use Xtools\PagesRepository;
 use Xtools\Project;
@@ -30,39 +31,39 @@ class TopEditsController extends Controller
         $this->lh = $this->get("app.labs_helper");
         $this->lh->checkEnabled("topedits");
 
-        $project = $request->query->get('project');
+        $projectName = $request->query->get('project');
         $username = $request->query->get('username');
         $namespace = $request->query->get('namespace');
         $article = $request->query->get('article');
 
-        if ($project != "" && $username != "" && $namespace != "" && $article != "") {
+        if ($projectName != "" && $username != "" && $namespace != "" && $article != "") {
             return $this->redirectToRoute("TopEditsResults", [
-                'project'=>$project,
+                'project'=>$projectName,
                 'username' => $username,
                 'namespace'=>$namespace,
                 'article'=>$article,
             ]);
-        } elseif ($project != "" && $username != "" && $namespace != "") {
+        } elseif ($projectName != "" && $username != "" && $namespace != "") {
             return $this->redirectToRoute("TopEditsResults", [
-                'project'=>$project,
+                'project'=>$projectName,
                 'username' => $username,
                 'namespace'=>$namespace,
             ]);
-        } elseif ($project != "" && $username != "") {
+        } elseif ($projectName != "" && $username != "") {
             return $this->redirectToRoute("TopEditsResults", [
-                'project' => $project,
+                'project' => $projectName,
                 'username' => $username,
             ]);
-        } elseif ($project != "") {
-            return $this->redirectToRoute("TopEditsResults", [ 'project'=>$project ]);
+        } elseif ($projectName != "") {
+            return $this->redirectToRoute("TopEditsResults", [ 'project'=>$projectName ]);
         }
 
-        // set default wiki so we can populate the namespace selector
-        if (!$project) {
-            $project = $this->container->getParameter('default_project');
+        // Set default project so we can populate the namespace selector.
+        if (!$projectName) {
+            $projectName = $this->container->getParameter('default_project');
         }
 
-        $project = ProjectRepository::getProject($project, $this->container);
+        $project = ProjectRepository::getProject($projectName, $this->container);
 
         return $this->render('topedits/index.html.twig', [
             'xtPageTitle' => 'tool-topedits',
@@ -87,7 +88,7 @@ class TopEditsController extends Controller
         if ($article === "") {
             return $this->namespaceTopEdits($user, $project, $namespace);
         } else {
-            return $this->singlePageTopEdits($user, $project, $article);
+            return $this->singlePageTopEdits($user, $project, $namespace, $article);
         }
     }
 
@@ -95,10 +96,10 @@ class TopEditsController extends Controller
      * List top edits by this user for all pages in a particular namespace.
      * @param User $user The User.
      * @param Project $project The project.
-     * @param integer|string $namespace The namespace ID or 'all'
+     * @param integer|string $namespaceId The namespace ID or 'all'
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function namespaceTopEdits(User $user, Project $project, $namespace)
+    protected function namespaceTopEdits(User $user, Project $project, $namespaceId)
     {
         // Get list of namespaces.
         $namespaces = $project->getNamespaces();
@@ -107,10 +108,10 @@ class TopEditsController extends Controller
         $params = ['username'=>$user->getUsername()];
         $nsClause = '';
         $namespaceMsg = 'namespaces_all';
-        if (is_numeric($namespace)) {
+        if (is_numeric($namespaceId)) {
             $nsClause = 'AND page_namespace = :namespace';
-            $params['namespace'] = $namespace;
-            $namespaceMsg = str_replace(' ', '_', strtolower($namespaces[$namespace]));
+            $params['namespace'] = $namespaceId;
+            $namespaceMsg = str_replace(' ', '_', strtolower($namespaces[$namespaceId]));
         }
         $revTable = $this->lh->getTable('revision', $project->getDatabaseName());
         $pageTable = $this->lh->getTable('page', $project->getDatabaseName());
@@ -141,7 +142,7 @@ class TopEditsController extends Controller
         foreach ($editData as $editDatum) {
             $pageTitle = $editDatum['page_title'];
             // If 'all' namespaces, prepend namespace to display title.
-            $nsTitle = !is_numeric($namespace) ? $namespaces[$editDatum['page_namespace']].':' : '';
+            $nsTitle = !is_numeric($namespaceId) ? $namespaces[$editDatum['page_namespace']] . ':' : '';
             $editDatum['displaytitle'] = $nsTitle.$displayTitles[$pageTitle];
             $edits[] = $editDatum;
         }
@@ -149,7 +150,7 @@ class TopEditsController extends Controller
             'xtPage' => 'topedits',
             'project' => $project,
             'user' => $user,
-            'namespace' => $namespace,
+            'namespace' => $namespaceId,
             'edits' => $edits,
             'content_title' => $namespaceMsg,
         ]);
@@ -157,21 +158,24 @@ class TopEditsController extends Controller
 
     /**
      * List top edits by this user for a particular page.
-     * @param User $user
-     * @param Project $project
-     * @param string $pageName
+     * @param User $user The user.
+     * @param Project $project The project.
+     * @param int $namespaceId The ID of the namespace of the page.
+     * @param string $pageName The title (without namespace) of the page.
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    protected function singlePageTopEdits(User $user, Project $project, $pageName)
+    protected function singlePageTopEdits(User $user, Project $project, $namespaceId, $pageName)
     {
-        $page = new Page($project, $pageName);
+        $namespaces = $project->getNamespaces();
+        $fullPageName = $namespaces[$namespaceId].':'.$pageName;
+        $page = new Page($project, $fullPageName);
         $pageRepo = new PagesRepository();
         $page->setRepository($pageRepo);
-        
+
         if (!$page->exists()) {
             // Redirect if the page doesn't exist.
             $this->addFlash("notice", ["noresult", $pageName]);
-            return $this->redirectToRoute("topedits");
+            //return $this->redirectToRoute("topedits");
         }
 
         // Get all revisions of this page by this user.

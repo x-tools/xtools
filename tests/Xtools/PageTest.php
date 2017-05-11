@@ -89,4 +89,30 @@ class PageTest extends PHPUnit_Framework_TestCase
         $page->setRepository($pageRepo);
         $this->assertEquals('https://example.org/Page', $page->getUrl());
     }
+
+    /**
+     * A list of a single user's edits on this page can be retrieved, along with the count of
+     * these revisions, and the total bytes added and removed.
+     * @TODO this is not finished yet
+     */
+    public function testUsersEdits()
+    {
+        $pageRepo = $this->getMock(PagesRepository::class, ['getRevisions']);
+        $pageRepo
+            ->method('getRevisions')
+            ->with()
+            ->willReturn([
+                [
+                    'id' => '1',
+                    'timestamp' => '20170505100000',
+                    'length_change' => '1',
+                    'comment' => 'One'
+                ],
+            ]);
+
+        $page = new Page(new Project('exampleWiki'), 'Page');
+        $page->setRepository($pageRepo);
+        $user = new User('Testuser');
+        //$this->assertCount(3, $page->getRevisions($user)->getCount());
+    }
 }
