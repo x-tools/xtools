@@ -28,7 +28,8 @@ const xtoolsPath = './i18n/';
  *     importMessages('../pageviews/messages/', messagesToCopy);
  * @param {Array} messagesToCopy - message keys
  */
-function importMessages(oldPath, messagesToCopy) {
+function importMessages(oldPath, messagesToCopy)
+{
     fs.readdir(oldPath, (err, files) => {
         files.forEach(file => {
             const oldJson = require(`${oldPath}${file}`);
@@ -63,7 +64,8 @@ function importMessages(oldPath, messagesToCopy) {
  * @param  {String} oldName - current key name
  * @param  {String} newName - new key name
  */
-function renameMessage(oldName, newName) {
+function renameMessage(oldName, newName)
+{
     fs.readdir(dir, (err, files) => {
         files.forEach(file => {
             let json = require(`${xtoolsPath}${file}`);
@@ -83,7 +85,8 @@ function renameMessage(oldName, newName) {
  *     deleteMessage('unused-message');
  * @param  {String} key - key name
  */
-function deleteMessage(key) {
+function deleteMessage(key)
+{
     fs.readdir(dir, (err, files) => {
         files.forEach(file => {
             let json = require(`${xtoolsPath}${file}`);
@@ -100,7 +103,8 @@ function deleteMessage(key) {
  * @param  {Object} json     - i18n messages file, without the .json
  * @param  {String} filename
  */
-function sortAndWriteToFile(json, filename) {
+function sortAndWriteToFile(json, filename)
+{
     let orderedJson = {};
     Object.keys(json).sort().forEach(key => {
         orderedJson[key] = json[key];
@@ -110,8 +114,6 @@ function sortAndWriteToFile(json, filename) {
         `${xtoolsPath}${filename}`,
         JSON.stringify(orderedJson, null, 2) + "\n",
         {},
-        err => {
-            console.log(err);
-        }
+        err => console.log(err)
     );
 }

@@ -288,7 +288,7 @@ class ArticleInfoController extends Controller
 
         // Then build a new array of top 10 editors by added text,
         //   in the data structure needed for the chart
-        $this->pageInfo['topTenEditorsByAdded'] = array_map(function($editor) {
+        $this->pageInfo['topTenEditorsByAdded'] = array_map(function ($editor) {
             $added = $this->pageInfo['editors'][$editor]['added'];
             return [
                 'label' => $editor,
