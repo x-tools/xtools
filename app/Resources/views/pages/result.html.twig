@@ -121,7 +121,7 @@
                 {% if pages|length > 1 %}
                     <tfoot>
                         <th class="namespaces--namespaces">
-                            {{ msg('num_namespaces', [pages|length|number_format, pages|length]) }}
+                            {{ msg('num-namespaces', [pages|length|number_format, pages|length]) }}
                         </th>
                         <th class="namespaces--pages">
                             {{ total | number_format }}
@@ -152,7 +152,7 @@
                 <table class="table table-bordered table-hover table-striped top-editors-table">
                     <thead><tr>
                         <th>#</th>
-                        {% set columns = ['page', 'date', 'original-size', 'current-size'] %}
+                        {% set columns = ['page-title', 'date', 'original-size', 'current-size'] %}
                         {% if key == '0' and hasPageAssessments %}
                             {% set columns = columns|merge(['assessment']) %}
                         {% endif %}
@@ -211,11 +211,11 @@
                                         {{ wiki_history_link(pagename, project_url) }}
                                         {% if enabled('articleinfo') %}
                                             &middot;
-                                            <a href="{{ path('articleinfo', { 'project': project, 'article': pagename }) }}">{{ msg('tool_articleinfo') }}</a>
+                                            <a href="{{ path('articleinfo', { 'project': project, 'article': pagename }) }}">{{ msg('tool-articleinfo') }}</a>
                                         {% endif %}
                                         {% if enabled('topedits') %}
                                             &middot;
-                                            <a href="{{ path('topedits', { 'project': project, 'username': username, 'namespace': namespace, 'page': page.page_title }) }}">{{ msg('tool_topedits') }}</a>
+                                            <a href="{{ path('topedits', { 'project': project, 'username': username, 'namespace': namespace, 'page': page.page_title }) }}">{{ msg('tool-topedits') }}</a>
                                         {% endif %}
                                         {% if isWMFLabs() %}
                                             &middot;
@@ -232,7 +232,7 @@
                                 <td></td>
                                 <td colspan=6>
                                     <a href="{{ path('pages', { 'project': project, 'username': username, 'namespace': key, 'redirects': redirect }) }}">
-                                        {{ msg('num_others', [count[key]['total'] - maxRows]) }}
+                                        {{ msg('num-others', [count[key]['total'] - maxRows]) }}
                                     </a>
                                 </td>
                             </tr>
