@@ -229,17 +229,29 @@ class ArticleInfoController extends Controller
      * Get the number of edits made to the page by the top 10% of editors
      * This is ran *after* parseHistory() since we need the grand totals first.
      * Various stats are also set for each editor in $this->pageInfo['editors']
+     *   and top ten editors are stored in $this->pageInfo['general']['top_ten']
+     *   to be used in the charts
      * @return integer Number of edits
      */
     private function getTopTenCount()
     {
         $topTenCount = $counter = 0;
+        $topTenEditors = [];
 
         foreach ($this->pageInfo['editors'] as $editor => $info) {
             // Count how many users are in the top 10% by number of edits
-            if ($counter <= $this->pageInfo['general']['editor_count'] * 0.1) {
+            if ($counter < 10) {
                 $topTenCount += $info['all'];
                 $counter++;
+
+                // To be used in the Top Ten charts
+                $topTenEditors[] = [
+                    'label' => $editor,
+                    'value' => $info['all'],
+                    'percentage' => (
+                        100 * ($info['all'] / $this->pageInfo['general']['revision_count'])
+                    )
+                ];
             }
 
             // Compute the percentage of minor edits the user made
@@ -262,6 +274,30 @@ class ArticleInfoController extends Controller
                 $this->pageInfo['editors'][$editor]['size'] = 0;
             }
         }
+
+        $this->pageInfo['topTenEditors'] = $topTenEditors;
+
+        // First sort editors array by the amount of text they added
+        $topTenEditorsByAdded = $this->pageInfo['editors'];
+        uasort($topTenEditorsByAdded, function ($a, $b) {
+            if ($a['added'] === $b['added']) {
+                return 0;
+            }
+            return $a['added'] > $b['added'] ? -1 : 1;
+        });
+
+        // Then build a new array of top 10 editors by added text,
+        //   in the data structure needed for the chart
+        $this->pageInfo['topTenEditorsByAdded'] = array_map(function($editor) {
+            $added = $this->pageInfo['editors'][$editor]['added'];
+            return [
+                'label' => $editor,
+                'value' => $added,
+                'percentage' => (
+                    100 * ($added / $this->pageInfo['general']['added'])
+                )
+            ];
+        }, array_keys(array_slice($topTenEditorsByAdded, 0, 10)));
 
         return $topTenCount;
     }

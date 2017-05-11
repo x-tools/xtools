@@ -1,5 +1,6 @@
 {% extends 'base.html.twig' %}
 {% import 'macros/layout.html.twig' as layout %}
+{% import 'articleInfo/pieChart.html.twig' as chart %}
 
 {% block body %}
 <div class="panel panel-primary">
@@ -257,36 +258,49 @@
                     {% endif %}
                 </tbody></table>
             </div>
-            <script>
-                var general = {{ general | json_encode() | raw }};
-                general.labels = {
-                    users_ips: [
-                        "{{ msg('accounts', [general.revision_count]) }}",
-                        "{{ msg('ips') }}",
-                    ],
-                    minor_major: [
-                        "{{ msg('major-edits') }}",
-                        "{{ msg('minor-edits') }}",
-                    ],
-                    top_bottom: [
-                        "{{ msg('top-ten-percent') }}",
-                        "{{ msg('bottom-ninety') }}",
-                    ],
-                };
-            </script>
             <div class="basic-info-charts clearfix">
-                <div class="chart-wrapper">
-                    <canvas id="users_ips"></canvas>
-                    <span class="chart-legend" id="users_ips_legend"></span>
-                </div>
-                <div class="chart-wrapper">
-                    <canvas id="minor_major"></canvas>
-                    <span class="chart-legend" id="minor_major_legend"></span>
-                </div>
-                <div class="chart-wrapper">
-                    <canvas id="top_bottom"></canvas>
-                    <span class="chart-legend" id="top_bottom_legend"></span>
-                </div>
+                {{
+                    chart.pie_chart('users_ips',
+                        [{
+                            label: msg('accounts'),
+                            value: general.revision_count - general.anon_count,
+                            percentage: 100 - general.anon_percentage
+                        },
+                        {
+                            label: msg('ips'),
+                            value: general.anon_count,
+                            percentage: general.anon_percentage
+                        }]
+                    )
+                }}
+                {{
+                    chart.pie_chart('minor_major',
+                        [{
+                            label: msg('major-edits'),
+                            value: general.revision_count - general.minor_count,
+                            percentage: 100 - general.minor_percentage,
+                        },
+                        {
+                            label: msg('minor-edits'),
+                            value: general.minor_count,
+                            percentage: general.minor_percentage,
+                        }]
+                    )
+                }}
+                {{
+                    chart.pie_chart('top_bottom',
+                        [{
+                            label: msg('top-ten-percent'),
+                            value: general.top_ten_count,
+                            percentage: general.top_ten_percentage,
+                        },
+                        {
+                            label: msg('bottom-ninety'),
+                            value: general.revision_count - general.top_ten_count,
+                            percentage: 100 - general.top_ten_percentage,
+                        }]
+                    )
+                }}
             </div>
         {% endset %}
         {{ layout.content_block('general-stats', content) }}
@@ -295,29 +309,14 @@
 
         {# ======================== TOP EDITORS ======================== #}
         {% set content %}
-            <script>
-                var editors = {{ editors | json_encode() | raw }};
-                // 'editors' may lose it's sorting after being interpolated into JavaScript object
-                // So have a separate array to keep track of the ordering
-                var editorsByEditCount = {{ editors | keys | json_encode() | raw }};
-                var i18n = {
-                    others: "{{ msg('others') | capitalize_first }}",
-                };
-            </script>
             <div class="top-editors-charts clearfix">
                 <div class="pull-left">
                     <div class="chart-title">{{ msg('top-ten-by-edits') | capitalize_first }}</div>
-                    <div class="chart-wrapper">
-                        <canvas id="top_by_edits"></canvas>
-                        <div class="chart-legend" id="top_by_edits_legend"></div>
-                    </div>
+                    {{ chart.pie_chart('top_by_edits', topTenEditors) }}
                 </div>
                 <div class="pull-left">
                     <div class="chart-title">{{ msg('top-ten-by-text') | capitalize_first }}</div>
-                    <div class="chart-wrapper">
-                        <canvas id="top_by_added"></canvas>
-                        <div class="chart-legend" id="top_by_added_legend"></div>
-                    </div>
+                    {{ chart.pie_chart('top_by_added', topTenEditorsByAdded) }}
                 </div>
             </div>
             <table class="table table-bordered table-hover table-striped top-editors-table">
@@ -352,11 +351,11 @@
                         </td>
                         <td>
                             {% if enabled('ec') %}
-                                <a href="{{ path('ec', { 'project': project, 'user': editor }) }}">{{ msg('tool-ec') }}</a>
+                                <a href="{{ path('ec', { 'project': project, 'username': editor }) }}">{{ msg('tool-ec') }}</a>
                             {% endif %}
                             &middot;
                             {% if enabled('topedits') %}
-                                <a href="{{ path('topedits', { 'project': project, 'user': editor }) }}">{{ msg('tool-topedits') }}</a>
+                                <a href="{{ path('topedits', { 'project': project, 'username': editor }) }}">{{ msg('tool-topedits') }}</a>
                             {% endif %}
                         </td>
                         <td class="sort-entry--edits" data-value="{{ stats.all }}">
@@ -423,6 +422,7 @@
                             {{ user_link(bot, project_url) }}
                             {% if not bot_data.current %}
                                 <i>
+                                    {# FIXME: hard-coded /w/ script path #}
                                     (<a target="_blank" href="{{ project_url }}/w/index.php?title=Special:Log&action=view&page=User:{{ bot }}&type=rights">{{ msg('former-bot') }}</a>)
                                 </i>
                             {% endif %}
@@ -448,13 +448,88 @@
         {# ======================== YEAR COUNTS ======================== #}
         {% set content %}
             <script>
-                var year_count = {{ year_count | json_encode() | raw }};
-                Object.assign(i18n, {
-                    all: "{{ msg('all-edits') | capitalize_first }}",
-                    minor: "{{ msg('minor-edits') | capitalize_first }}",
-                    ips: "{{ msg('ip-edits') | capitalize_first }}",
-                    size: "{{ msg('size') | capitalize_first }}",
-                    edits: "{{ msg('edits') | capitalize_first }}",
+                $(function() {
+                    var yearDatasets = [{
+                        type: 'bar',
+                        label: "{{ msg('all-edits') }}",
+                        backgroundColor: "{{ chartColor(0) }}",
+                        data: [],
+                        yAxisID: 'edits',
+                    },
+                    {
+                        type: 'bar',
+                        label: "{{ msg('minor-edits') }}",
+                        backgroundColor: "{{ chartColor(1) }}",
+                        data: [],
+                        yAxisID: 'edits',
+                    },
+                    {
+                        type: 'bar',
+                        label: "{{ msg('ip-edits') }}",
+                        backgroundColor: "{{ chartColor(2) }}",
+                        data: [],
+                        yAxisID: 'edits',
+                    },
+                    {
+                        type: 'line',
+                        label: "{{ msg('size') }}",
+                        borderColor: "{{ chartColor(3) }}",
+                        backgroundColor: "{{ chartColor(3) }}",
+                        fill: false,
+                        data: [],
+                        yAxisID: 'size',
+                    }];
+
+                    // restructure data the way Chart.js wants it
+                    {% for year in year_count | keys %}
+                        yearDatasets[0].data.push({{ year_count[year].all }});
+                        yearDatasets[1].data.push({{ year_count[year].minor }});
+                        yearDatasets[2].data.push({{ year_count[year].anon }});
+                        yearDatasets[3].data.push({{ year_count[year].size }});
+                    {% endfor %}
+
+                    new Chart($("#year_count"), {
+                        type: 'bar',
+                        data: {
+                            labels: {{ year_count | keys | json_encode() | raw }},
+                            datasets: yearDatasets,
+                        },
+                        options: {
+                            responsive: true,
+                            legend: {
+                                display: false,
+                            },
+                            tooltips: {
+                                mode: 'label'
+                            },
+                            barValueSpacing: 20,
+                            scales: {
+                                yAxes: [{
+                                    id: 'edits',
+                                    type: 'linear',
+                                    position: 'left',
+                                    gridLines:{
+                                        display: false
+                                    },
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: "{{ msg('edits') }}"
+                                    }
+                                }, {
+                                    id: 'size',
+                                    type: 'linear',
+                                    position: 'right',
+                                    gridLines:{
+                                        display: false
+                                    },
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: "{{ msg('size') }}"
+                                    }
+                                }],
+                            },
+                        },
+                    });
                 });
             </script>
             <div class="year-count-charts clearfix">
@@ -462,7 +537,26 @@
                     <div class="canvas-wrapper">
                         <canvas id="year_count" height="400" width="800"></canvas>
                     </div>
-                    <span class="chart-legend" id="year_count_legend"></span>
+                    <span class="chart-legend" id="year_count_legend">
+                        <div class="legend-body">
+                            <div>
+                                <span class="color-icon" style="background:{{ chartColor(0) }}"></span>
+                                <span class="legend-label">{{ msg('all-edits') }}</span>
+                            </div>
+                            <div>
+                                <span class="color-icon" style="background:{{ chartColor(1) }}"></span>
+                                <span class="legend-label">{{ msg('minor-edits') }}</span>
+                            </div>
+                            <div>
+                                <span class="color-icon" style="background:{{ chartColor(2) }}"></span>
+                                <span class="legend-label">{{ msg('ip-edits') }}</span>
+                            </div>
+                            <div>
+                                <span class="color-icon" style="background:{{ chartColor(3) }}"></span>
+                                <span class="legend-label">{{ msg('size') }}</span>
+                            </div>
+                        </div>
+                    </span>
                 </div>
             </div>
             <table class="table table-bordered table-hover table-striped">
@@ -489,7 +583,9 @@
                         <td class="sort-entry--minor-edits-percentage" data-value="{{ year_minor_percent }}">{{ year_minor_percent }}</td>
                         <td>
                             {% for event, count in stats.events %}
-                                <span class="comma-separated">{{ msg('num-'~event, [count | number_format, count]) }}</span>
+                                <span class="comma-separated">
+                                    {{ count | number_format }} {{ msg('num-'~event, [count]) }}
+                                </span>
                             {% endfor %}
                         </td>
                     </tr>

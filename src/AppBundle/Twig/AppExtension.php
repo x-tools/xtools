@@ -32,6 +32,7 @@ class AppExtension extends Extension
             new \Twig_SimpleFunction('enabled', [ $this, 'tabEnabled' ]),
             new \Twig_SimpleFunction('tools', [ $this, 'allTools' ]),
             new \Twig_SimpleFunction('color', [ $this, 'getColorList' ]),
+            new \Twig_SimpleFunction('chartColor', [ $this, 'chartColor' ]),
             new \Twig_SimpleFunction('isWMFLabs', [ $this, 'isWMFLabs' ]),
             new \Twig_SimpleFunction('isSingleWiki', [ $this, 'isSingleWiki' ]),
             new \Twig_SimpleFunction('getReplagThreshold', [ $this, 'getReplagThreshold' ]),
@@ -313,6 +314,29 @@ class AppExtension extends Extension
             // Default to grey.
             return '#CCC';
         }
+    }
+
+    /**
+     * Get color-blind friendly colors for use in charts
+     * @param  Integer $num Index of color
+     * @return String RGBA color (so you can more easily adjust the opacity)
+     */
+    public function chartColor($num)
+    {
+        $colors = [
+            'rgba(171, 212, 235, 1)',
+            'rgba(178, 223, 138, 1)',
+            'rgba(251, 154, 153, 1)',
+            'rgba(253, 191, 111, 1)',
+            'rgba(202, 178, 214, 1)',
+            'rgba(207, 182, 128, 1)',
+            'rgba(141, 211, 199, 1)',
+            'rgba(252, 205, 229, 1)',
+            'rgba(255, 247, 161, 1)',
+            'rgba(217, 217, 217, 1)',
+        ];
+
+        return $colors[$num % count($colors)];
     }
 
     public function isSingleWiki()
