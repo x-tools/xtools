@@ -1,6 +1,6 @@
-***********
+###########
 Development
-***********
+###########
 
 To contribute to the development of xTools, you may fork us on GitHub.  A few things to be aware of first:
 
@@ -10,8 +10,10 @@ To contribute to the development of xTools, you may fork us on GitHub.  A few th
 2. We use the ``@Route`` syntax to configure routes. 
 3. Every tool requires a twig directory and one controller. Also, core parts of xTools require the tool to be registered within `app/config/tools.yml`.
 
-Style Guideline
----------------
+Style Guidelines
+----------------
+
+- It's called "XTools" (with two capital letters).
 - We use 4 spaces to indent code.
 - Opening and closing curly braces must be on their own lines.
 - Variable names are camelCase.  Constants are ALL_CAPS_AND_UNDERSCORES.  Function names are camelCase.
@@ -19,6 +21,7 @@ Style Guideline
 
 Running Development server
 --------------------------
+
 Follow these steps
 
 1. Download the repository.
@@ -30,6 +33,7 @@ The development server does not cache data.  Any changes you make are visible af
 
 Developing against WMF databases
 --------------------------------
+
 If you want to use the WMF database replicas, open a tunnel with::
 
     ssh -L 4711:enwiki.labsdb:3306 tools-login.wmflabs.org -N -l your-username-here
@@ -76,6 +80,28 @@ You can, of course, retrieve the underlying CacheItemPoolInterface_ whenever you
 .. _CacheItemPoolInterface: http://www.php-fig.org/psr/psr-6/#cacheitempoolinterface
 .. _DateInterval: http://php.net/manual/en/class.dateinterval.php
 
+Writing the docs
+================
+
+We use ReadTheDocs; it's great.
+
+To build this documentation locally, you need ``python-sphinx`` installed,
+as well as the ``sphinx_rtd_theme`` theme_.
+
+.. _theme: https://github.com/rtfd/sphinx_rtd_theme
+
+Then, it's simply a matter of runnign ``make html`` in the ``docs/`` directory,
+and browsing to ``xtools/docs/_build/html/`` to view the documentation.
+
+Documentation sections use the following (standard Python) hierarchy of section symbols:
+
+* ``#`` with overline for parts
+* ``*`` with overline for chapters
+* ``=`` for sections
+* ``-`` for subsections
+
 Additional Help
----------------
-Please contact `User:Matthewrbowker <https://en.wikipedia.org/wiki/User:Matthewrbowker>`_ or `User:MusikAnimal <https://en.wikipedia.org/wiki/User:MusikAnimal>`_ if you need help.  Or, you are welcome to visit us on `IRC <https://webchat.freenode.net/?channels=#wikimedia-xtools>`_ (`Direct link <irc://irc.freenode.net/#wikimedia-xtools>`_ - Requires an IRC client).
+===============
+
+Please contact `User:Matthewrbowker <https://en.wikipedia.org/wiki/User:Matthewrbowker>`_ or `User:MusikAnimal <https://en.wikipedia.org/wiki/User:MusikAnimal>`_ if you need help.
+Or, you are welcome to visit us on `IRC <https://webchat.freenode.net/?channels=#wikimedia-xtools>`_ (`Direct link <irc://irc.freenode.net/#wikimedia-xtools>`_ - Requires an IRC client).

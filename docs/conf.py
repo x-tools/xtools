@@ -6,13 +6,13 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 project = u'xTools'
-copyright = u'2008-2016, xTools Maintainers'
+copyright = u'2008-2017, xTools Maintainers'
 
-version = '0.1.2'
+version = '0.2.0'
 
 # -- Options for HTML output ---------------------------------------------------
 
-# html_theme = 'dotted'
+html_theme = 'sphinx_rtd_theme'
 
 # -- HTML theme options for `dotted` style -------------------------------------
 
