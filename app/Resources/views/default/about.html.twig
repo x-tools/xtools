@@ -1,28 +1,40 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="col-lg-8 col-lg-offset-2">
-        {{ msg('welcome') }}
-        {{ msg('maintainers') }}:
-        <ul>
-            <li><a href="//en.wikipedia.org/wiki/User:Cyberpower678" target="_blank">Cyberpower678</a></li>
-            <li><a href="//de.wikipedia.org/wiki/User:Hedonil" target="_blank">Hedonil</a></li>
-            <li><a href="//en.wikipedia.org/wiki/User:Matthewrbowker" target="_blank">Matthewrbowker</a></li>
-            <li><a href="//en.wikipedia.org/wiki/User:MusikAnimal" target="_blank">MusikAnimal</a></li>
-            <li><a href="//meta.wikimedia.org/wiki/User:Samwilson" target="_blank">Samwilson</a></li>
-            <li><a href="//en.wikipedia.org/wiki/User:Scottywong" target="_blank">Scottywong</a></li>
-            <li><a href="//en.wikipedia.org/wiki/User:Technical_13" target="_blank">Technical 13</a></li>
-            <li><a href="//en.wikipedia.org/wiki/User:TParis" target="_blank">TParis</a></li>
-            <li><a href="//en.wikipedia.org/wiki/User:X!" target="_blank">X!</a></li>
-        </ul>
+<div class="panel panel-primary">
+    <header class="panel-heading">
+        <div class="text-center xt-heading-top">
+            <a class="back-to-search" href="{{ path('homepage') }}">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                {{ msg('back') }}
+            </a>
+            {{ msg('tool-index') }}
+        </div>
+    </header>
 
-        <ul>
-            <li><a href="//github.com/x-Tools/xtools/" target="_blank">{{ msg('view-source') }}</a></li>
-            <li><a href="https://phabricator.wikimedia.org/tag/tool-labs-tools-xtools/" target="_blank">{{ msg('bugs') }}</a></li>
-            <li>
-                <a href="irc://irc.freenode.net/#wikimedia-xtools" target="_blank">#wikimedia-xtools</a>
-                <sup><a style="color:green" href="https://webchat.freenode.net/?channels=#wikimedia-xtools" target="_blank">WebChat</a></sup>
-            </li>
-        </ul>
+    <div class="panel-body xt-panel-body">
+        <div class="col-lg-6 stat-list clearfix">
+            <h3>{{ msg('maintainers') }}</h3>
+            <ul>
+                <li><a href="//en.wikipedia.org/wiki/User:Matthewrbowker" target="_blank">Matthewrbowker</a></li>
+                <li><a href="//en.wikipedia.org/wiki/User:MusikAnimal" target="_blank">MusikAnimal</a></li>
+                <li><a href="//meta.wikimedia.org/wiki/User:Samwilson" target="_blank">Samwilson</a></li>
+            </ul>
+        </div>
+
+        <div class="col-lg-6 stat-list clearfix">
+            <h3>{{ msg('major-contributors') }}</h3>
+            <ul>
+                <li><a href="//en.wikipedia.org/wiki/User:Cyberpower678" target="_blank">Cyberpower678</a></li>
+                <li><a href="//de.wikipedia.org/wiki/User:Hedonil" target="_blank">Hedonil</a></li>
+                <li><a href="//en.wikipedia.org/wiki/User:Matthewrbowker" target="_blank">Matthewrbowker</a></li>
+                <li><a href="//en.wikipedia.org/wiki/User:MusikAnimal" target="_blank">MusikAnimal</a></li>
+                <li><a href="//meta.wikimedia.org/wiki/User:Samwilson" target="_blank">Samwilson</a></li>
+                <li><a href="//en.wikipedia.org/wiki/User:Scottywong" target="_blank">Scottywong</a></li>
+                <li><a href="//en.wikipedia.org/wiki/User:TParis" target="_blank">TParis</a></li>
+                <li><a href="//en.wikipedia.org/wiki/User:X!" target="_blank">X!</a></li>
+            </ul>
+        </div>
     </div>
+</div>
 {% endblock %}

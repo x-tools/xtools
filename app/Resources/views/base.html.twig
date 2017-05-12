@@ -29,6 +29,7 @@
             'static/css/application.scss'
             'static/css/articleinfo.scss'
             'static/css/autoedits.scss'
+            'static/css/index.scss'
             'static/css/pages.scss'
             output='static/production/application.css' %}
         <link rel="stylesheet" href="{{ asset_url }}" />
@@ -173,10 +174,17 @@
         </div>
         <div class="footer-about">
             <span>
-                &copy; 2008-{{ year() }} &middot;
-                <a href="{{ path('aboutPage') }}">{{ msg('about-xtools') }}</a>  &middot;
-                v.{{ version }} &middot;
+                &copy; 2008-{{ year() }}
+                &middot;
+                v.{{ version }}
                 <a href="http://github.com/x-tools/xtools-rebirth/tree/{{ hash() }}" target="_blank">r.{{ shortHash() }}</a>
+                &middot;
+                <a href="{{ path('aboutPage') }}">{{ msg('about-xtools') }}</a>
+                &middot;
+                <a href='https://phabricator.wikimedia.org/maniphest/task/create/?title=PLEASE REPLACE WITH A DESCRIPTION OF THE ISSUE&priority=75&projects=Tool-labs-tools-xtools&description=Please provide any further details you can here\r\n\r\nXtools version: {{ version }}-{{ shortHash() }}' target=_blank>{{ msg('report-issue') }}</a>
+                &middot;
+                <a href="irc://irc.freenode.net/#wikimedia-xtools" target="_blank">#wikimedia-xtools</a>
+                <sup><a style="color:green" href="https://webchat.freenode.net/?channels=#wikimedia-xtools" target="_blank">{{ msg('web-chat') }}</a></sup>
             </span>
             {% set translateWikiLink = "<a href='https://translatewiki.net'>translatewiki.net</a>" %}
             {% set intuitionLink = "<a href='https://tools.wmflabs.org/intuition/#tab-about'>Intuition</a>" %}

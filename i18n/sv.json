@@ -114,6 +114,7 @@
   "redirfilter-all": "Inkludera omdirigeringar och icke-omdirigeringar",
   "redirfilter-noredirects": "Uteslut omdirigeringar",
   "redirfilter-onlyredirects": "Inkludera enbart omdirigeringar",
+  "report-issue": "Rapportera ett problem",
   "restore": "Återställning",
   "result": "Resultat",
   "result-by-name": "Resultat per användare/IP",

@@ -114,6 +114,7 @@
   "redirfilter-all": "Включати перенаправлення та не-перенаправлення",
   "redirfilter-noredirects": "Виключити перенаправлення",
   "redirfilter-onlyredirects": "Включати лише перенаправлення",
+  "report-issue": "Повідомити про проблему",
   "restore": "Відновлення",
   "result": "Результат",
   "result-by-name": "Результат за іменем / IP",

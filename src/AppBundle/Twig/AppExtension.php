@@ -41,6 +41,7 @@ class AppExtension extends Extension
             new \Twig_SimpleFunction('replag', [ $this, 'replag' ]),
             new \Twig_SimpleFunction('link', [ $this, 'link' ]),
             new \Twig_SimpleFunction('quote', [ $this, 'quote' ]),
+            new \Twig_SimpleFunction('bugReportURL', [ $this, 'bugReportURL' ]),
         ];
     }
 
@@ -62,45 +63,6 @@ class AppExtension extends Extension
     public function generateYear()
     {
         return date('Y');
-    }
-
-    /**
-     * This function mainly acts as a workaround, as only WMF wikis use /w/ or /wiki/ in their path.
-     * @param string $url
-     * @param string $page
-     * @param string $secondary
-     * @return string
-     */
-    public function linkToWiki($url, $page, $secondary = "")
-    {
-        $link = $url . "/";
-
-        if ($this->isWMFLabs()) {
-            $link .= "wiki/";
-        }
-
-        $link .= $page;
-
-        if ($secondary != "") {
-            $link .= "?$secondary";
-        }
-
-        return $link;
-    }
-
-    public function linkToWikiScript($url, $secondary)
-    {
-        $link = $url . "/";
-
-        if ($this->isWMFLabs()) {
-            $link .= "w/";
-        }
-
-        $link .= "index.php?$secondary";
-
-        // $link = str_replace("//", "/", $link);
-
-        return $link;
     }
 
     // TODO: refactor all intuition stuff so it can be used anywhere

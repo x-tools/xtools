@@ -110,6 +110,7 @@
   "redirfilter-all": "Inkluder både omdirigeringer og vanlige sider",
   "redirfilter-noredirects": "Utelat omdirigeringer",
   "redirfilter-onlyredirects": "Inkluder kun omdirigeringer",
+  "report-issue": "Rapporter et problem",
   "restore": "Gjenoppretting",
   "result": "Resultat",
   "result-by-name": "Resultat etter navn / IP",

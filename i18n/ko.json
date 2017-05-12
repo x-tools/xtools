@@ -109,6 +109,7 @@
   "redirfilter-all": "넘겨주기와 넘겨주기가 아닌 문서 모두 포함",
   "redirfilter-noredirects": "넘겨주기 제외",
   "redirfilter-onlyredirects": "넘겨주기만 포함",
+  "report-issue": "이슈 보고",
   "restore": "복구",
   "result": "결과",
   "result-by-name": "이름 / IP 별 결과",

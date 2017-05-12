@@ -95,6 +95,7 @@
   "redirfilter-all": "リダイレクトと非リダイレクトの両方",
   "redirfilter-noredirects": "リダイレクトを除外",
   "redirfilter-onlyredirects": "リダイレクトのみ",
+  "report-issue": "問題の報告",
   "restore": "復元",
   "result": "結果",
   "result-by-name": "名前 / IP 順の結果",

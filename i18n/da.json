@@ -106,6 +106,7 @@
   "redirfilter-all": "Inkluder både omdirigeringer og ikke-omdirigeringer",
   "redirfilter-noredirects": "Udelad omdirigeringer",
   "redirfilter-onlyredirects": "Inkluder kun omdirigeringer",
+  "report-issue": "Rapporter et problem",
   "restore": "Gendan",
   "result": "Resultat",
   "result-by-name": "Resultat efter navn/IP",

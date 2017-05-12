@@ -112,6 +112,7 @@
   "redirfilter-all": "รวมเปลี่ยนทางและไม่เปลี่ยนทาง",
   "redirfilter-noredirects": "ไม่รวมเปลี่ยนทาง",
   "redirfilter-onlyredirects": "รวมเฉพาะเปลี่ยนทาง",
+  "report-issue": "รายงานผล",
   "restore": "กู้คืน",
   "result": "ผลลัพธ์",
   "result-by-name": "ผลลัพธ์ตามชื่อ / IP",

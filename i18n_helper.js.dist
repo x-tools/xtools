@@ -52,7 +52,7 @@ function importMessages(oldPath, messagesToCopy)
                 newJson[message] = oldMessage;
             });
 
-            sortAndWriteToFile(json, file);
+            sortAndWriteToFile(newJson, file);
         });
     });
 }

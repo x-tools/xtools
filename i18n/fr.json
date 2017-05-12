@@ -115,6 +115,7 @@
   "redirfilter-all": "Inclure les redirections et les non-redirections",
   "redirfilter-noredirects": "Exclure les redirections",
   "redirfilter-onlyredirects": "Inclure uniquement les redirections",
+  "report-issue": "Signaler un problème",
   "restore": "Restaurations",
   "result": "Résultat",
   "result-by-name": "Résultat par nom / adresse IP",
