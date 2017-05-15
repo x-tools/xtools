@@ -77,6 +77,12 @@ class ProjectRepository extends Repository
             return $this->singleMetadata;
         }
 
+        // For muli-wiki setups, first check the cache.
+        $cacheKey = "project.$project";
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
         // Otherwise, fetch the project's metadata from the meta.wiki table.
         $wikiQuery = $this->getMetaConnection()->createQueryBuilder();
         $wikiQuery->select(['dbname', 'url'])
@@ -93,8 +99,14 @@ class ProjectRepository extends Repository
             ->setParameter('projectUrl2', "https://$project.org");
         $wikiStatement = $wikiQuery->execute();
 
-        // Fetch the wiki data.
-        return $wikiStatement->fetch();
+        // Fetch and cache the wiki data.
+        $projectMetadata = $wikiStatement->fetch();
+        $cacheItem = $this->cache->getItem($cacheKey);
+        $cacheItem->set($projectMetadata)
+            ->expiresAfter(new \DateInterval('PT1H'));
+        $this->cache->save($cacheItem);
+
+        return $projectMetadata;
     }
 
     /**

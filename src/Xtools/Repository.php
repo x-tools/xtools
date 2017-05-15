@@ -5,6 +5,7 @@ namespace Xtools;
 use Doctrine\DBAL\Connection;
 use Mediawiki\Api\MediawikiApi;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
 
 /**
@@ -18,16 +19,19 @@ abstract class Repository
     protected $container;
 
     /** @var Connection */
-    protected $metaConnection;
+    private $metaConnection;
 
     /** @var Connection */
-    protected $projectsConnection;
+    private $projectsConnection;
 
     /** @var Connection */
-    protected $toolsConnection;
+    private $toolsConnection;
 
     /** @var CacheItemPoolInterface */
     protected $cache;
+
+    /** @var LoggerInterface */
+    protected $log;
 
     /**
      * @param Container $container
@@ -36,6 +40,7 @@ abstract class Repository
     {
         $this->container = $container;
         $this->cache = $container->get('cache.app');
+        $this->log = $container->get('logger');
     }
 
     /**
@@ -44,7 +49,13 @@ abstract class Repository
      */
     protected function getMetaConnection()
     {
-        return $this->container->get('doctrine')->getManager("meta")->getConnection();
+        if (!$this->metaConnection instanceof Connection) {
+            $this->metaConnection = $this->container
+                ->get('doctrine')
+                ->getManager("meta")
+                ->getConnection();
+        }
+        return $this->metaConnection;
     }
 
     /**
@@ -53,7 +64,29 @@ abstract class Repository
      */
     protected function getProjectsConnection()
     {
-        return $this->container->get('doctrine')->getManager("replicas")->getConnection();
+        if (!$this->projectsConnection instanceof Connection) {
+            $this->projectsConnection = $this->container
+                ->get('doctrine')
+                ->getManager("replicas")
+                ->getConnection();
+        }
+        return $this->projectsConnection;
+    }
+
+    /**
+     * Get the database connection for the 'tools' database
+     * (the one that other tools store data in).
+     * @return Connection
+     */
+    protected function getToolsConnection()
+    {
+        if (!$this->toolsConnection instanceof Connection) {
+            $this->toolsConnection = $this->container
+                ->get('doctrine')
+                ->getManager("toolsdb")
+                ->getConnection();
+        }
+        return $this->toolsConnection;
     }
 
     /**

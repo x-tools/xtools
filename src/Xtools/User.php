@@ -52,10 +52,11 @@ class User extends Model
 
     /**
      * Get a list of this user's groups on all projects.
+     * @param Project $project A project to query; if not provided, the default will be used.
      */
-    public function getGlobalGroups()
+    public function getGlobalGroups(Project $project = null)
     {
-        return $this->getRepository()->getGlobalGroups($this->getUsername());
+        return $this->getRepository()->getGlobalGroups($this->getUsername(), $project);
     }
 
     /**

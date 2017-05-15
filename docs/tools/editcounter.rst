@@ -13,12 +13,15 @@ General Statistics
 The general statistics section contains lots of statistics about the user and their work on the project,
 as well as some data about other projects that they're active on.
 
-**Edit counts** are displayed for:
+Firstly, some basic **user information**: ID, username, and group membership
+(including globally, if CentralAuth_ is installed).
+
+Then, **Edit counts** are displayed for:
 
 * the last day, week, month, year, and all time (the latter also including addition counts of deleted edits);
 * edits made with or without comments;
-* small (under 20 KB) and large (over 1MB) edits;
-* minor/non-minor edits (as determined by the user); and
+* small (under 20 KB) and large (over 1000 KB) edits;
+* minor/non-minor edits (as recorded by the user); and
 * what semi-automating tools they used to edit.
 
 Also, dates of activity on the project (earliest and latest) are displayed,
@@ -33,11 +36,12 @@ Next, **Page counts** are shown:
 
 And lastly, **Log counts** are summarized:
 
-* the number of times the user has `thanked`_ another user;
+* the number of times the user has thanked_ another user;
 * pages reviewed, patrolled, protected, and unprotected;
 * users blocked and unblocked;
 * files uploaded (and also those uploaded to Commons, for the WMF Labs installation).
 
+.. _CentralAuth: https://www.mediawiki.org/wiki/Extension:CentralAuth
 .. _thanked: https://www.mediawiki.org/wiki/Extension:Thanks
 
 Namespace totals

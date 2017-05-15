@@ -103,22 +103,16 @@ class EditCounterController extends Controller
      */
     public function generalStatsAction($project, $username)
     {
-        $this->init($project);
-        
-        $project = $this->getProject($project);
-        $user = $this->getWikiUser($username);
+        // Set up project and user.
+        $project = ProjectRepository::getProject($project, $this->container);
+        $user = UserRepository::getUser($username, $this->container);
 
+        // Get an edit-counter.
         $editCounterRepo = new EditCounterRepository();
         $editCounterRepo->setContainer($this->container);
-
         $editCounter = new EditCounter($project, $user);
         $editCounter->setRepository($editCounterRepo);
-        
-        /** @var AutomatedEditsHelper $automatedEditsHelper */
-        $automatedEditsHelper = $this->get('app.automated_edits_helper');
 
-        //$dbValues = $this->labsHelper->databasePrepare($project);
-        $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
 //        $revisionCounts = $this->editCounterHelper->getRevisionCounts($user->getId($project));
 //        $pageCounts = $this->editCounterHelper->getPageCounts($username, $revisionCounts['total']);
 //        $logCounts = $this->editCounterHelper->getLogCounts($user->getId($project));
@@ -126,14 +120,16 @@ class EditCounterController extends Controller
 //        $topProjectsEditCounts = $this->editCounterHelper->getTopProjectsEditCounts($project->getUrl(), 
 //            $user->getUsername());
 
+        // Render view.
+        $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/general_stats.html.twig', [
-            'xtTitle' => 'tool_ec',
+            'xtTitle' => 'tool-ec',
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
-            'is_labs' => $this->labsHelper->isLabs(),
+            'is_labs' => $editCounterRepo->isLabs(),
             'project' => $project,
             'user' => $user,
-            'edit_counter' => $editCounter,
+            'ec' => $editCounter,
 
             // Revision counts.
 //            'deleted_edits' => $revisionCounts['deleted'],

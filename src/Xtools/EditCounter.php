@@ -24,6 +24,9 @@ class EditCounter extends Model
 
     /** @var int[] */
     protected $pageCounts;
+    
+    /** @var int[] */
+    protected $logCounts;
 
     public function __construct(Project $project, User $user)
     {
@@ -45,6 +48,19 @@ class EditCounter extends Model
     }
 
     /**
+     * Get revision dates.
+     * @return int[]
+     */
+    protected function getRevisionDates()
+    {
+        if (! is_array($this->revisionDates)) {
+            $this->revisionDates = $this->getRepository()
+                ->getRevisionDates($this->project, $this->user);
+        }
+        return $this->revisionDates;
+    }
+
+    /**
      * Get page count data.
      * @return int[]
      */
@@ -61,22 +77,26 @@ class EditCounter extends Model
      * Get revision dates.
      * @return int[]
      */
-    protected function getRevisionDates()
+    protected function getLogCounts()
     {
-        if (! is_array($this->revisionDates)) {
-            $this->revisionDates = $this->getRepository()
-                ->getRevisionDates($this->project, $this->user);
+        if (! is_array($this->logCounts)) {
+            $this->logCounts = $this->getRepository()
+                ->getLogCounts($this->project, $this->user);
         }
-        return $this->revisionDates;
+        return $this->logCounts;
     }
 
-    public function getLiveEditCount()
+    public function countLiveRevisions()
     {
         $revCounts = $this->getRevisionCounts();
         return isset($revCounts['live']) ? $revCounts['live'] : 0;
     }
 
-    public function getDeletedEditCount()
+    /**
+     * Get the total number of revisions that have been deleted.
+     * @return int
+     */
+    public function countDeletedRevisions()
     {
         $revCounts = $this->getRevisionCounts();
         return isset($revCounts['deleted']) ? $revCounts['deleted'] : 0;
@@ -86,22 +106,69 @@ class EditCounter extends Model
      * Get the total edit count (live + deleted).
      * @return int
      */
-    public function getTotalEditCount()
+    public function countAllRevisions()
     {
-        return $this->getLiveEditCount() + $this->getDeletedEditCount();
+        return $this->countLiveRevisions() + $this->countDeletedRevisions();
+    }
+
+    /**
+     * Get the total number of revisions with comments.
+     * @return int
+     */
+    public function countRevisionsWithComments()
+    {
+        $revCounts = $this->getRevisionCounts();
+        return isset($revCounts['with_comments']) ? $revCounts['with_comments'] : 0;
+    }
+
+    /**
+     * Get the total number of revisions without comments.
+     * @return int
+     */
+    public function countRevisionsWithoutComments()
+    {
+        return $this->countAllRevisions() - $this->countRevisionsWithComments();
+    }
+
+    /**
+     * Get the total number of revisions marked as 'minor' by the user.
+     * @return int
+     */
+    public function countMinorRevisions()
+    {
+        $revCounts = $this->getRevisionCounts();
+        return isset($revCounts['minor']) ? $revCounts['minor'] : 0;
+    }
+
+    /**
+     * Get the total number of revisions under 20 bytes.
+     */
+    public function countSmallRevisions()
+    {
+        $revCounts = $this->getRevisionCounts();
+        return isset($revCounts['small']) ? $revCounts['small'] : 0;
+    }
+
+    /**
+     * Get the total number of revisions over 1000 bytes.
+     */
+    public function countLargeRevisions()
+    {
+        $revCounts = $this->getRevisionCounts();
+        return isset($revCounts['large']) ? $revCounts['large'] : 0;
     }
 
     /**
      * Get the total number of non-deleted pages edited by the user.
      * @return int
      */
-    public function getTotalLivePagesEdited()
+    public function countLivePagesEdited()
     {
         $pageCounts = $this->getPageCounts();
         return isset($pageCounts['edited-total']) ? $pageCounts['edited-total'] : 0;
     }
 
-    public function getTotalDeletedPagesEdited()
+    public function countDeletedPagesEdited()
     {
         $pageCounts = $this->getPageCounts();
         return isset($pageCounts['edited-total']) ? $pageCounts['edited-total'] : 0;
@@ -111,16 +178,16 @@ class EditCounter extends Model
      * Get the total number of pages ever edited by this user (both live and deleted).
      * @return int
      */
-    public function getTotalPagesEdited()
+    public function countAllPagesEdited()
     {
-        return $this->getTotalLivePagesEdited() + $this->getTotalDeletedPagesEdited();
+        return $this->countLivePagesEdited() + $this->countDeletedPagesEdited();
     }
 
     /**
      * Get the total number of semi-automated edits.
      * @return int
      */
-    public function getAutoEditsTotal()
+    public function countAutomatedEdits()
     {
     }
 
@@ -129,53 +196,74 @@ class EditCounter extends Model
      * by the user.
      * @return int
      */
-    public function getCreatedPagesTotal()
+    public function countPagesCreated()
     {
-        return $this->getCreatedPagesLive() + $this->getCreatedPagesDeleted();
+        return $this->countCreatedPagesLive() + $this->countPagesCreatedDeleted();
     }
 
     /**
      * Get the total number of pages created by the user, that have not been deleted.
      * @return int
      */
-    public function getCreatedPagesLive()
+    public function countCreatedPagesLive()
     {
         $pageCounts = $this->getPageCounts();
         return isset($pageCounts['created-live']) ? (int)$pageCounts['created-live'] : 0;
     }
-
-    public function getMovedPagesTotal()
-    {
-        $pageCounts = $this->getPageCounts();
-        return isset($pageCounts['moved']) ? (int)$pageCounts['moved'] : 0;
-    }
-
+    
     /**
      * Get the total number of pages created by the user, that have since been deleted.
      * @return int
      */
-    public function getCreatedPagesDeleted()
+    public function countPagesCreatedDeleted()
     {
         $pageCounts = $this->getPageCounts();
         return isset($pageCounts['created-deleted']) ? (int)$pageCounts['created-deleted'] : 0;
     }
 
     /**
-     * Get the average number of edits performed daily by the user (including deleted revisions
-     * and pages).
-     * @return float
+     * Get the total number of pages moved by the user.
+     * @return int
      */
-    public function getAverageEditCountPerPage()
+    public function countPagesMoved()
     {
-        return round($this->getTotalEditCount() / $this->getTotalPagesEdited(), 2);
+        $pageCounts = $this->getPageCounts();
+        return isset($pageCounts['moved']) ? (int)$pageCounts['moved'] : 0;
     }
 
+    /**
+     * Get the average number of edits per page (including deleted revisions and pages).
+     * @return float
+     */
+    public function averageRevisionsPerPage()
+    {
+        return round($this->countAllRevisions() / $this->countAllPagesEdited(), 2);
+    }
+
+    /**
+     * Average number of edits made per day.
+     * @return float
+     */
+    public function averageRevisionsPerDay()
+    {
+        return round($this->countAllRevisions() / $this->getDays(), 2);
+    }
+    
+    /**
+     * Get the total number of edits made by the user with semi-automating tools.
+     * @TODO
+     */
+    public function countAutomatedRevisions()
+    {
+        return 0;
+    }
+    
     /**
      * Get the count of (non-deleted) edits made in the given timeframe to now.
      * @param string $time One of 'day', 'week', 'month', or 'year'.
      * @return int The total number of live edits.
      */
-    public function getEditCountInLast($time)
+    public function countRevisionsInLast($time)
     {
         $revCounts = $this->getRevisionCounts();
         return isset($revCounts[$time]) ? $revCounts[$time] : 0;
@@ -184,7 +272,7 @@ class EditCounter extends Model
     /**
      * Get the date and time of the user's first edit.
      */
-    public function getFirstEditDatetime()
+    public function datetimeFirstRevision()
     {
         $first = $this->getRevisionDates()['first'];
         return new DateTime($first);
@@ -194,7 +282,7 @@ class EditCounter extends Model
      * Get the date and time of the user's first edit.
      * @return DateTime
      */
-    public function getLastEditDatetime()
+    public function datetimeLastRevision()
     {
         $last = $this->getRevisionDates()['last'];
         return new DateTime($last);
@@ -207,16 +295,52 @@ class EditCounter extends Model
      */
     public function getDays()
     {
-        $days = $this->getLastEditDatetime()->diff($this->getFirstEditDatetime())->days;
+        $days = $this->datetimeLastRevision()->diff($this->datetimeFirstRevision())->days;
         return $days > 0 ? $days : 1;
     }
 
-    /**
-     * Average number of edits made per day.
-     * @return float
-     */
-    public function getAverageDailyEditCount()
+    public function countFilesUploaded()
     {
-        return round($this->getTotalEditCount() / $this->getDays(), 2);
+        $logCounts = $this->getLogCounts();
+        return $logCounts['upload-upload'] ?: 0;
+    }
+
+    public function countFilesUploadedCommons()
+    {
+        $logCounts = $this->getLogCounts();
+        return $logCounts['files_uploaded_commons'] ?: 0;
+    }
+
+    /**
+     * Get the total number of revisions the user has sent thanks for.
+     * @return int
+     */
+    public function thanks()
+    {
+        $logCounts = $this->getLogCounts();
+        return $logCounts['thanks-thank'] ?: 0;
+    }
+
+    /**
+     * Get the total number of approvals
+     * @return int
+     */
+    public function approvals()
+    {
+        $logCounts = $this->getLogCounts();
+        $total = $logCounts['review-approve'] +
+        (!empty($logCounts['review-approve-a']) ? $logCounts['review-approve-a'] : 0) +
+        (!empty($logCounts['review-approve-i']) ? $logCounts['review-approve-i'] : 0) +
+        (!empty($logCounts['review-approve-ia']) ? $logCounts['review-approve-ia'] : 0);
+        return $total;
+    }
+
+    /**
+     * @return int
+     */
+    public function patrols()
+    {
+        $logCounts = $this->getLogCounts();
+        return $logCounts['patrol-patrol'] ?: 0;
     }
 }

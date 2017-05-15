@@ -8,6 +8,73 @@ class EditCounterRepository extends Repository
 {
 
     /**
+     * Get revision counts for the given user.
+     * @param User $user The user.
+     * @returns string[] With keys: 'deleted', 'live', 'total', 'first', 'last', '24h', '7d', '30d',
+     * '365d', 'small', 'large', 'with_comments', and 'minor_edits'.
+     */
+    public function getRevisionCounts(Project $project, User $user)
+    {
+        // Set up cache.
+        $cacheKey = 'revisioncounts.' . $user->getId($project);
+        if ($this->cache->hasItem($cacheKey)) {
+            $msg = "Using logged revision counts";
+            $this->log->debug($msg, [$project->getDatabaseName(), $user->getUsername()]);
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        // Prepare the queries and execute them.
+        $start = microtime();
+        $archiveTable = $this->getTableName($project->getDatabaseName(), 'archive');
+        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+        $queries = [
+            'deleted' => "SELECT COUNT(ar_id) FROM $archiveTable
+                WHERE ar_user = :userId",
+            'live' => "SELECT COUNT(rev_id) FROM $revisionTable
+                WHERE rev_user = :userId",
+            'day' => "SELECT COUNT(rev_id) FROM $revisionTable
+                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 DAY)",
+            'week' => "SELECT COUNT(rev_id) FROM $revisionTable
+                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 WEEK)",
+            'month' => "SELECT COUNT(rev_id) FROM $revisionTable
+                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 MONTH)",
+            'year' => "SELECT COUNT(rev_id) FROM $revisionTable
+                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 YEAR)",
+            'small' => "SELECT COUNT(rev_id) FROM $revisionTable
+                WHERE rev_user = :userId AND rev_len < 20",
+            'large' => "SELECT COUNT(rev_id) FROM $revisionTable
+                WHERE rev_user = :userId AND rev_len > 1000",
+            'with_comments' => "SELECT COUNT(rev_id) FROM $revisionTable
+                WHERE rev_user = :userId AND rev_comment = ''",
+            'minor' => "SELECT COUNT(rev_id) FROM $revisionTable
+                WHERE rev_user = :userId AND rev_minor_edit = 1",
+        ];
+        $revisionCounts = [];
+        foreach ($queries as $varName => $query) {
+            $resultQuery = $this->getProjectsConnection()->prepare($query);
+            $userId = $user->getId($project);
+            $resultQuery->bindParam("userId", $userId);
+            $resultQuery->execute();
+            $val = $resultQuery->fetchColumn();
+            $revisionCounts[$varName] = $val ?: 0;
+        }
+        $duration = microtime() - $start;
+        $this->log->debug(
+            "Retrieved revision counts in $duration",
+            [$project->getDatabaseName(), $user->getUsername()]
+        );
+
+        // Cache for 10 minutes, and return.
+        $cacheItem =
+            $this->cache->getItem($cacheKey)
+                ->set($revisionCounts)
+                ->expiresAfter(new \DateInterval('PT10M'));
+        $this->cache->save($cacheItem);
+
+        return $revisionCounts;
+    }
+
+    /**
      * Get the first and last revision dates (in MySQL YYYYMMDDHHMMSS format).
      * @return string[] With keys 'first' and 'last'.
      */
@@ -33,62 +100,105 @@ class EditCounterRepository extends Repository
     }
 
     /**
-     * Get revision counts for the given user.
-     * @param User $user The user.
-     * @returns string[] With keys: 'deleted', 'live', 'total', 'first', 'last', '24h', '7d', '30d',
-     * '365d', 'small', 'large', 'with_comments', and 'minor_edits'.
+     * Get page counts for the given user.
+     * @param User $user
+     * @return int[]
      */
-    public function getRevisionCounts(Project $project, User $user)
+    public function getPageCounts(Project $project, User $user)
     {
-        // Set up cache.
-        $cacheKey = 'revisioncounts.' . $user->getId($project);
-        if ($this->cache->hasItem($cacheKey)) {
-            return $this->cache->getItem($cacheKey)->get();
-        }
-
-        // Prepare the queries and execute them.
-        $archiveTable = $this->getTableName($project->getDatabaseName(), 'archive');
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $queries = [
-            'deleted' => "SELECT COUNT(ar_id) FROM $archiveTable
-                WHERE ar_user = :userId",
-            'live' => "SELECT COUNT(rev_id) FROM $revisionTable
-                WHERE rev_user = :userId",
-            'day' => "SELECT COUNT(rev_id) FROM $revisionTable
-                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 DAY)",
-            'week' => "SELECT COUNT(rev_id) FROM $revisionTable
-                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 WEEK)",
-            'month' => "SELECT COUNT(rev_id) FROM $revisionTable
-                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 MONTH)",
-            'year' => "SELECT COUNT(rev_id) FROM $revisionTable
-                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 YEAR)",
-            'small' => "SELECT COUNT(rev_id) FROM $revisionTable
-                WHERE rev_user = :userId AND rev_len < 20",
-            'large' => "SELECT COUNT(rev_id) FROM $revisionTable
-                WHERE rev_user = :userId AND rev_len > 1000",
-            'with_comments' => "SELECT COUNT(rev_id) FROM $revisionTable
-                WHERE rev_user = :userId AND rev_comment = ''",
-            'minor_edits' => "SELECT COUNT(rev_id) FROM $revisionTable
-                WHERE rev_user = :userId AND rev_minor_edit = 1",
+        $archiveTable = $this->getTableName($project->getDatabaseName(), 'archive');
+        $loggingTable = $this->getTableName($project->getDatabaseName(), 'logging');
+        $resultQuery = $this->getProjectsConnection()->prepare("
+            (SELECT 'edited-total' as source, COUNT(rev_page) as value
+                FROM $revisionTable where rev_user_text=:username)
+            UNION
+            (SELECT 'edited-unique' as source, COUNT(distinct rev_page) as value
+                FROM $revisionTable where rev_user_text=:username)
+            UNION
+            (SELECT 'created-live' as source, COUNT(*) as value from $revisionTable
+                WHERE rev_user_text=:username and rev_parent_id=0)
+            UNION
+            (SELECT 'created-deleted' as source, COUNT(*) as value from $archiveTable
+                WHERE ar_user_text=:username and ar_parent_id=0)
+            UNION
+            (SELECT 'moved' as source, count(*) as value from $loggingTable
+                WHERE log_type='move' and log_action='move' and log_user_text=:username)
+            ");
+        $username = $user->getUsername();
+        $resultQuery->bindParam("username", $username);
+        $resultQuery->execute();
+        $results = $resultQuery->fetchAll();
+
+        $pageCounts = array_combine(array_map(function ($e) {
+            return $e['source'];
+        }, $results), array_map(function ($e) {
+            return $e['value'];
+        }, $results));
+
+        return $pageCounts;
+    }
+
+    /**
+     * Get log totals for a user.
+     * @param Project $project The project.
+     * @param User $user The user.
+     * @return integer[] Keys are "<log>-<action>" strings, values are counts.
+     */
+    public function getLogCounts(Project $project, User $user)
+    {
+        $sql = "SELECT CONCAT(log_type, '-', log_action) AS source, COUNT(log_id) AS value
+            FROM " . $this->getTableName($project->getDatabaseName(), 'logging') . "
+            WHERE log_user = :userId
+            GROUP BY log_type, log_action";
+        $resultQuery = $this->getProjectsConnection()->prepare($sql);
+        $userId = $user->getId($project);
+        $resultQuery->bindParam('userId', $userId);
+        $resultQuery->execute();
+        $results = $resultQuery->fetchAll();
+        $logCounts = array_combine(
+            array_map(function ($e) {
+                return $e['source'];
+            }, $results),
+            array_map(function ($e) {
+                return $e['value'];
+            }, $results)
+        );
+
+        // Make sure there is some value for each of the wanted counts.
+        $requiredCounts = [
+            'thanks-thank',
+            'review-approve',
+            'patrol-patrol',
+            'block-block',
+            'block-unblock',
+            'protect-protect',
+            'protect-unprotect',
+            'delete-delete',
+            'delete-revision',
+            'delete-restore',
+            'import-import',
+            'upload-upload',
+            'upload-overwrite',
         ];
-        $revisionCounts = [];
-        foreach ($queries as $varName => $query) {
-            $resultQuery = $this->getProjectsConnection()->prepare($query);
-            $userId = $user->getId($project);
-            $resultQuery->bindParam("userId", $userId);
-            $resultQuery->execute();
-            $val = $resultQuery->fetchColumn();
-            $revisionCounts[$varName] = $val ?: 0;
+        foreach ($requiredCounts as $req) {
+            if (!isset($logCounts[$req])) {
+                $logCounts[$req] = 0;
+            }
         }
 
-        // Cache for 10 minutes, and return.
-        $cacheItem =
-            $this->cache->getItem($cacheKey)
-                ->set($revisionCounts)
-                ->expiresAfter(new \DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
+        // Add Commons upload count, if applicable.
+        $logCounts['files_uploaded_commons'] = 0;
+        if ($this->isLabs()) {
+            $sql = "SELECT COUNT(log_id) FROM commonswiki_p.logging_userindex
+                WHERE log_type = 'upload' AND log_action = 'upload' AND log_user = :userId";
+            $resultQuery = $this->getProjectsConnection()->prepare($sql);
+            $resultQuery->bindParam('userId', $userId);
+            $resultQuery->execute();
+            $logCounts['files_uploaded_commons'] = $resultQuery->fetchColumn();
+        }
 
-        return $revisionCounts;
+        return $logCounts;
     }
 
     /**
@@ -166,113 +276,6 @@ class EditCounterRepository extends Repository
     }
 
     /**
-     * Get page counts for the given user.
-     * @param User $user
-     * @return int[]
-     */
-    public function getPageCounts(Project $project, User $user)
-    {
-        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $archiveTable = $this->getTableName($project->getDatabaseName(), 'archive');
-        $loggingTable = $this->getTableName($project->getDatabaseName(), 'logging');
-        $resultQuery = $this->getProjectsConnection()->prepare("
-            (SELECT 'edited-total' as source, COUNT(rev_page) as value
-                FROM $revisionTable where rev_user_text=:username)
-            UNION
-            (SELECT 'edited-unique' as source, COUNT(distinct rev_page) as value
-                FROM $revisionTable where rev_user_text=:username)
-            UNION
-            (SELECT 'created-live' as source, COUNT(*) as value from $revisionTable
-                WHERE rev_user_text=:username and rev_parent_id=0)
-            UNION
-            (SELECT 'created-deleted' as source, COUNT(*) as value from $archiveTable
-                WHERE ar_user_text=:username and ar_parent_id=0)
-            UNION
-            (SELECT 'moved' as source, count(*) as value from $loggingTable
-                WHERE log_type='move' and log_action='move' and log_user_text=:username)
-            ");
-        $username = $user->getUsername();
-        $resultQuery->bindParam("username", $username);
-        $resultQuery->execute();
-        $results = $resultQuery->fetchAll();
-
-        $pageCounts = array_combine(
-            array_map(function ($e) {
-                    return $e['source'];
-            }, $results),
-            array_map(function ($e) {
-                    return $e['value'];
-            }, $results)
-        );
-
-        return $pageCounts;
-    }
-
-    /**
-     * Get log totals for a user.
-     * @param integer $userId The user ID.
-     * @return integer[] Keys are log-action string, values are counts.
-     */
-    public function getLogCounts($userId)
-    {
-        $sql = "SELECT CONCAT(log_type, '-', log_action) AS source, COUNT(log_id) AS value
-            FROM " . $this->labsHelper->getTable('logging') . "
-            WHERE log_user = :userId
-            GROUP BY log_type, log_action";
-        $resultQuery = $this->replicas->prepare($sql);
-        $resultQuery->bindParam('userId', $userId);
-        $resultQuery->execute();
-        $results = $resultQuery->fetchAll();
-        $logCounts = array_combine(array_map(function ($e) {
-            return $e['source'];
-        }, $results), array_map(function ($e) {
-                return $e['value'];
-        }, $results));
-
-        // Make sure there is some value for each of the wanted counts.
-        $requiredCounts = [
-            'thanks-thank',
-            'review-approve',
-            'patrol-patrol',
-            'block-block',
-            'block-unblock',
-            'protect-protect',
-            'protect-unprotect',
-            'delete-delete',
-            'delete-revision',
-            'delete-restore',
-            'import-import',
-            'upload-upload',
-            'upload-overwrite',
-        ];
-        foreach ($requiredCounts as $req) {
-            if (!isset($logCounts[$req])) {
-                $logCounts[$req] = 0;
-            }
-        }
-
-        // Merge approvals together.
-        $logCounts['review-approve'] =
-            $logCounts['review-approve'] +
-            (!empty($logCounts['review-approve-a']) ? $logCounts['review-approve-a'] : 0) +
-            (!empty($logCounts['review-approve-i']) ? $logCounts['review-approve-i'] : 0) +
-            (!empty($logCounts['review-approve-ia']) ? $logCounts['review-approve-ia'] : 0);
-
-        // Add Commons upload count, if applicable.
-        $logCounts['files_uploaded_commons'] = 0;
-        if ($this->labsHelper->isLabs()) {
-            $sql = "SELECT COUNT(log_id) FROM commonswiki_p.logging_userindex
-                WHERE log_type = 'upload' AND log_action = 'upload' AND log_user = :userId";
-            $resultQuery = $this->replicas->prepare($sql);
-            $resultQuery->bindParam('userId', $userId);
-            $resultQuery->execute();
-            $logCounts['files_uploaded_commons'] = $resultQuery->fetchColumn();
-        }
-
-        return $logCounts;
-    }
-
-    /**
      * Get the given user's total edit counts per namespace.
      * @param string $username The username of the user.
      * @return integer[] Array keys are namespace IDs, values are the edit counts.
@@ -291,7 +294,7 @@ class EditCounterRepository extends Repository
         $namespaceTotals = array_combine(array_map(function ($e) {
             return $e['page_namespace'];
         }, $results), array_map(function ($e) {
-                return $e['total'];
+            return $e['total'];
         }, $results));
 
         return $namespaceTotals;
@@ -489,12 +492,14 @@ class EditCounterRepository extends Repository
      * @param User $user The user.
      * @return integer[] Array of edit counts, keyed by all tool names from
      * app/config/semi_automated.yml
+     * @TODO this is broke
      */
-    public function getEditsSummary(Project $project, User $user)
+    public function countAutomatedRevisions(Project $project, User $user)
     {
         $userId = $user->getId($project);
-        $cacheKey = "automatedEdits.$userId";
+        $cacheKey = "automatedEdits.".$project->getDatabaseName().'.'.$userId;
         if ($this->cache->hasItem($cacheKey)) {
+            $this->log->debug("Using cache for $cacheKey");
             return $this->cache->getItem($cacheKey)->get();
         }
 
@@ -519,7 +524,9 @@ class EditCounterRepository extends Repository
         arsort($out);
 
         // Cache for 10 minutes.
+        $this->log->debug("Saving $cacheKey to cache", [$out]);
         $this->cacheSave($cacheKey, $out, 'PT10M');
+
         return $out;
     }
 }

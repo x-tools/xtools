@@ -2,6 +2,8 @@
 
 namespace AppBundle\Twig;
 
+use Symfony\Component\VarDumper\VarDumper;
+
 class AppExtension extends Extension
 {
 
@@ -391,8 +393,9 @@ class AppExtension extends Extension
      */
     public function quote()
     {
-        $id = rand(1, sizeof($this->container->getParameter('quotes')));
-        return $this->container->getParameter('quotes')[$id];
+        $quotes = $this->container->getParameter('quotes');
+        $id = array_rand($quotes);
+        return $quotes[$id];
     }
 
     /*********************************** FILTERS ***********************************/
