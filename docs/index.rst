@@ -2,25 +2,131 @@
 Welcome to xTools!
 ******************
 
+XTools is a suite of statistics tools for MediaWiki wikis, users, pages, and more.
+It is in operation for Wikimedia wikis and can also be installed for any MediaWiki installation.
 
-Xtools is a system of tools written by `User:X! on Wikipedia <http://en.wikipedia.org/wiki/User:Soxred93>`_.  The original version lives at
-`http://tools.wmflabs.org/xtools <http://tools.wmflabs.org/xtools>`_
+**Quick links:**
+
+* Demonstrations:
+
+  * Wikimedia installation: `tools.wmflabs.org/xtools <https://tools.wmflabs.org/xtools>`_
+  * Development installation: `tools.wmflabs.org/xtools-dev <https://tools.wmflabs.org/xtools-dev>`_
+
+* This documentation: `xtools.readthedocs.io <http://xtools.readthedocs.io/en/latest/>`_
+* Source code: `github.com/x-tools/xtools-rebirth <https://github.com/x-tools/xtools-rebirth>`_
+* Issue tracker: `phabricator.wikimedia.org <https://phabricator.wikimedia.org/project/view/803/>`_
+* IRC: `#wikimedia-xtools on Freenode <https://webchat.freenode.net/?channels=#wikimedia-xtools>`_
 
 .. toctree::
-    :maxdepth: 2
     :numbered:
     :titlesonly:
+    :caption: Table of Contents
+    :maxdepth: 3
+    :hidden:
 
     pre-requisites
     installation
     configuration
+    tools/index
     development
 
+The tools
+=========
+
+Here is a brief overview of all of the tools, with links to more detailed information.
+See the main menu in the side bar for more.
+
+Edit Counter
+------------
+
+Edit Counter provides summary information about a user and their activity on a project,
+such as the total numbers of certain types of edits;
+their most-edited pages;
+what semi-automating tools they've used to edit;
+and lots more.
+:ref:`Read more about Edit Counter... <editcounter>`.
+
+Admin Score
+-----------
+
+Find out how admin-worthy a user is.
+:ref:`Read more about Admin Score... <adminscore>`.
+
+Admin Stats
+-----------
+
+Statistics about administrators' actions.
+:ref:`Read more about Admin Stats... <adminstats>`.
+
+Article Info
+------------
+
+Get various statistics about the history of a page.
+:ref:`Read more about Article Info... <articleinfo>`.
+
+Auto Edits
+----------
+
+Explore the edits made by various semi-automated editing tools,
+from the point of view of pages or of users.
+:ref:`Read more about Auto Edits... <autoedits>`.
+
+Bash
+----
+
+A collection of humourous or insightful quotations about MediaWiki.
+:ref:`Read more about Bash... <bash>`.
+
+Blame
+-----
+
+Find out who last changed a given part of a page.
+:ref:`Read more about Blame... <blame>`.
+
+EC
+--
+
+Edit Counter again?
+:ref:`Read more about EC... <ec>`.
+
+Pages
+-----
+
+Information about pages that have been created by a user.
+:ref:`Read more about Pages... <pages>`.
+
+RFA
+---
+
+RFA
+:ref:`Read more about RFA... <rfa>`.
+
+RFAP
+----
+
+@TODO
+:ref:`Read more about RFAP... <rfap>`.
+
+Simple Counter
+--------------
+
+A simpler but quicker way to view edit counts (than Edit Counter, above).
+:ref:`Read more about Simple Counter... <sc>`.
+
+Top Edits
+---------
+
+View the pages that a user has edited most often,
+or all of their edits on one page.
+:ref:`Read more about Top Edits... <topedits>`.
 
 Help
-----
-For help with xTools, there are several places you can ask.
+====
 
-* `Github <http://github.com/x-Tools/xtools/issues/new>`_
+For more help with XTools, there are several places you can ask:
+
+* `IRC <https://webchat.freenode.net/?channels=#wikimedia-xtools>`_
+  (`direct link <irc://irc.freenode.net/#wikimedia-xtools>`_ requires an IRC client)
+  — to chat with the developers and other users.
 * `Phabricator <https://phabricator.wikimedia.org/maniphest/task/create/?project=Tool-labs-tools-xtools>`_
-* `IRC <https://webchat.freenode.net/?channels=#wikimedia-xtools>`_ (`Direct link <irc://irc.freenode.net/#wikimedia-xtools>`_ - Requires an IRC client)
+  — if you've found a bug.

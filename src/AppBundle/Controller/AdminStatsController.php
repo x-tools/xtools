@@ -94,8 +94,8 @@ class AdminStatsController extends Controller
             [
                 'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
                 'xtPage' => 'adminstats',
-                'xtPageTitle' => 'tool_adminstats',
-                'xtSubtitle' => 'tool_adminstats_desc',
+                'xtPageTitle' => 'tool-adminstats',
+                'xtSubtitle' => 'tool-adminstats-desc',
             ]
         );
     }
@@ -276,6 +276,7 @@ class AdminStatsController extends Controller
             [
                 'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
                 'xtPage' => 'adminstats',
+                'xtTitle' => $project,
 
                 'project_url' => $url,
                 'project' => $project,

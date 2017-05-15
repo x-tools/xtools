@@ -3,6 +3,7 @@
 namespace AppBundle\Helper;
 
 use DateInterval;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
 
 abstract class HelperBase
@@ -65,5 +66,20 @@ abstract class HelperBase
         $item->set($value);
         $item->expiresAfter(new DateInterval($expiresAfter));
         $cache->save($item);
+    }
+
+    /**
+     * Log a debug message.
+     * @param string $msg The log message.
+     * @param array $context The message context.
+     */
+    protected function debug($msg, $context = [])
+    {
+        /** @var LoggerInterface */
+        $logger = $this->container->get('logger');
+        if (!$logger instanceof LoggerInterface) {
+            return;
+        }
+        $logger->debug($msg, $context);
     }
 }

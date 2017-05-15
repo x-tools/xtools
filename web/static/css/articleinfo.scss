@@ -4,6 +4,7 @@
     .basic-info-charts {
         clear: both;
         display: block;
+        padding-top: 20px;
         position: relative;
 
         canvas {
@@ -19,10 +20,6 @@
         canvas {
             max-height: 250px;
             max-width: 250px;
-        }
-
-        .color-icon {
-            vertical-align: -4px;
         }
     }
 
@@ -53,7 +50,7 @@
         margin-left: 15px;
 
         .color-icon {
-            margin-right: 5px;
+            vertical-align: -4px;
         }
     }
 
@@ -63,6 +60,10 @@
         overflow-x: hidden;
         text-overflow: ellipsis;
         vertical-align: middle;
+    }
+
+    .legend-value {
+        vertical-align: bottom;
     }
 
     .top-editors-table {
@@ -104,6 +105,15 @@
 
             .chart-legend {
                 margin-bottom: 15px;
+            }
+        }
+
+        #year_count_legend {
+            margin: 0;
+
+            .legend-body > div {
+                display: inline;
+                margin-right: 10px;
             }
         }
     }

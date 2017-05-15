@@ -47,9 +47,9 @@ class QuoteController extends Controller
             'quote/index.html.twig',
             [
                 'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
-                "xtPage" => "bash",
-                "xtPageTitle" => "tool_bash",
-                "xtSubtitle" => "tool_bash_desc",
+                'xtPage' => 'bash',
+                'xtPageTitle' => 'tool-bash',
+                'xtSubtitle' => 'tool-bash-desc',
             ]
         );
     }
@@ -113,8 +113,8 @@ class QuoteController extends Controller
                 'base_dir' => realpath(
                     $this->getParameter('kernel.root_dir') . '/..'
                 ),
-                "xtPage" => "bash",
-                "quotes" => $quotes,
+                'xtPage' => 'bash',
+                'quotes' => $quotes,
             ]
         );
     }

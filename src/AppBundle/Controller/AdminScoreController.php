@@ -35,9 +35,9 @@ class AdminScoreController extends Controller
         // Otherwise fall through.
         return $this->render('adminscore/index.html.twig', [
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
-            "xtPage" => "adminscore",
-            "xtPageTitle" => "tool_adminscore",
-            "xtSubtitle" => "tool_adminscore_desc",
+            'xtPage' => 'adminscore',
+            'xtPageTitle' => 'tool-adminscore',
+            'xtSubtitle' => 'tool-adminscore-desc',
             "project" => $project,
         ]);
     }
@@ -63,8 +63,6 @@ class AdminScoreController extends Controller
         $userTable = $lh->getTable("user", $dbName);
         $pageTable = $lh->getTable("page", $dbName);
         $loggingTable = $lh->getTable("logging", $dbName, "userindex");
-        dump($loggingTable);
-        dump($pageTable);
         $revisionTable = $lh->getTable("revision", $dbName);
         $archiveTable = $lh->getTable("archive", $dbName);
 
@@ -92,13 +90,13 @@ class AdminScoreController extends Controller
         SELECT 'id' AS source, user_id AS value FROM $userTable
             WHERE user_name = :username
         UNION
-        SELECT 'acct_age' AS source, user_registration AS value FROM $userTable
+        SELECT 'account-age' AS source, user_registration AS value FROM $userTable
             WHERE user_name=:username
         UNION
-        SELECT 'edit_count' AS source, user_editcount AS value FROM $userTable
+        SELECT 'edit-count' AS source, user_editcount AS value FROM $userTable
             WHERE user_name=:username
         UNION
-        SELECT 'user_page' AS source, page_len AS value FROM $pageTable
+        SELECT 'user-page' AS source, page_len AS value FROM $pageTable
             WHERE page_namespace=2 AND page_title=:username
         UNION
         SELECT 'patrols' AS source, COUNT(*) AS value FROM $loggingTable
@@ -117,22 +115,22 @@ class AdminScoreController extends Controller
                 AND rev_page NOT LIKE 'Articles_for_deletion/Log/%'
                 AND rev_user_text=:username
         UNION
-        SELECT 'recent_activity' AS source, COUNT(*) AS value FROM $revisionTable
+        SELECT 'recent-activity' AS source, COUNT(*) AS value FROM $revisionTable
             WHERE rev_user_text=:username AND rev_timestamp > (now()-INTERVAL 730 day) AND rev_timestamp < now()
         UNION
         SELECT 'aiv' AS source, COUNT(*) AS value FROM $revisionTable
             WHERE rev_page LIKE 'Administrator intervention against vandalism%' AND rev_user_text=:username
         UNION
-        SELECT 'edit_summaries' AS source, COUNT(*) AS value FROM $revisionTable JOIN page ON rev_page=page_id
+        SELECT 'edit-summaries' AS source, COUNT(*) AS value FROM $revisionTable JOIN page ON rev_page=page_id
             WHERE page_namespace=0 AND rev_user_text=:username
         UNION
         SELECT 'namespaces' AS source, count(*) AS value FROM $revisionTable JOIN page ON rev_page=page_id
             WHERE rev_user_text=:username AND page_namespace=0
         UNION
-        SELECT 'pages_created_live' AS source, COUNT(*) AS value FROM $revisionTable
+        SELECT 'pages-created-live' AS source, COUNT(*) AS value FROM $revisionTable
             WHERE rev_user_text=:username AND rev_parent_id=0
         UNION
-        SELECT 'pages_created_archive' AS source, COUNT(*) AS value FROM $archiveTable
+        SELECT 'pages-created-deleted' AS source, COUNT(*) AS value FROM $archiveTable
             WHERE ar_user_text=:username AND ar_parent_id=0
         UNION
         SELECT 'rpp' AS source, COUNT(*) AS value FROM $revisionTable
@@ -181,7 +179,8 @@ class AdminScoreController extends Controller
         }
 
         return $this->render('adminscore/result.html.twig', [
-            'xtPage' => "adminscore",
+            'xtPage' => 'adminscore',
+            'xtTitle' => $username,
             'projectUrl' => $url,
             'username' => $username,
             'project' => $wikiName,

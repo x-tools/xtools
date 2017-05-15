@@ -1,0 +1,46 @@
+{% macro pie_chart(id, data) %}
+{% set labels = [] %}
+{% set values = [] %}
+{% set colors = [] %}
+<div class="chart-wrapper">
+    <canvas id="{{ id }}"></canvas>
+    <span class="chart-legend" id="{{ id }}_legend">
+        <div class="legend-body">
+            {% for entry in data %}
+                {% set labels = labels | merge([entry.label]) %}
+                {% set values = values | merge([entry.value]) %}
+                {% set colors = colors | merge([chartColor(loop.index0)]) %}
+                <div>
+                    <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
+                    <span class="legend-label">{{ entry.label }}</span>
+                    <span class="legend-value">
+                        &middot;
+                        {{ entry.value | number_format }} ({{ entry.percentage | percent_format }})
+                    </span>
+                </div>
+            {% endfor %}
+        </div>
+    </span>
+</div>
+<script type="text/javascript">
+    $(function() {
+        new Chart($("#{{ id }}"), {
+            type: 'pie',
+            data: {
+                labels: {{ labels | json_encode() | raw }},
+                datasets: [{
+                    data: {{ values | json_encode() | raw }},
+                    backgroundColor: {{ colors | json_encode() | raw }},
+                    hoverBackgroundColor: {{ colors | json_encode() | raw }},
+                }],
+            },
+            options: {
+                responsive: false,
+                legend: {
+                    display: false,
+                },
+            },
+        });
+    });
+</script>
+{% endmacro %}

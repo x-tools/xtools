@@ -41,10 +41,10 @@
                 totals.redirect += newData[ns].redirect;
             });
             $('.namespaces--namespaces').text(
+                Object.keys(newData).length.toLocaleString() + " " +
                 $.i18n(
-                    'num_namespaces',
+                    'num-namespaces',
                     Object.keys(newData).length,
-                    Object.keys(newData).length.toLocaleString()
                 )
             );
             $('.namespaces--pages').text(totals.count.toLocaleString());

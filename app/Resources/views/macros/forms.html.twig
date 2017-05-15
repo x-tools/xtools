@@ -1,11 +1,11 @@
 {% macro wiki_input(project) %}
 <div class="input-group{% if isSingleWiki() %} hidden{% endif %} form-row">
     <label class="input-group-addon form-label" for="project_input">
-        {{ msg("wiki") }}
+        {{ msg('project') }}
         <div class="glyphicon glyphicon-info-sign tooltipcss pull-right">
             <div class="tooltip-body">
-                <strong>Accepted formats:</strong>
-                <code>enwiki</code> or <code>en.wikipedia</code> or
+                <strong>{{ msg('accepted-formats') }}:</strong>
+                <code>enwiki</code>, <code>en.wikipedia</code>,
                 <span class="text-nowrap"><code>en.wikipedia.org</code></span>
             </div>
         </div>
@@ -24,13 +24,13 @@
 {% macro page_input(required = true) %}
 <div class="input-group form-row">
     <label class="input-group-addon form-label" for="article_input">
-        {{ msg("page") }}
+        {{ msg('page-title') }}
     </label>
     <input type="text" class="form-control" name="article" id="article_input"{% if required %} required{% endif %}>
     <span class="input-group-addon">
         <label>
             <input type="checkbox" name="nofollowredir" />
-            {{ msg("nofollowredir") }}
+            {{ msg('no-follow-redir') }}
         </label>
     </span>
 </div>
@@ -39,14 +39,14 @@
 {% macro user_input(required = true, multiple = false) %}
 <div class="input-group form-row">
     <label class="input-group-addon form-label" for="user_input">
-        {{ msg("username") }}
+        {{ msg('username') }}
         <div class="glyphicon glyphicon-info-sign tooltipcss pull-right">
             <div class="tooltip-body">
                 {% if multiple %}
-                    <strong>Multiple users allowed (separated by pipes):</strong>
-                    <br>eg: <code>UserX|UserY|UserZ</code>
+                    <strong>{{ msg('multiple-users-allowed') }}:</strong>
+                    <br>e.g. <code>UserX|UserY|UserZ</code>
                 {% else %}
-                    Username or IPv4 or IPv6
+                    {{ msg('username-or-ip') }}
                 {% endif %}
             </div>
         </div>
@@ -55,17 +55,19 @@
 </div>
 {% endmacro %}
 
-{% macro namespace_select(namespaces, allOption = false) %}
+{% macro namespace_select(namespaces, allOption = false, value = 0) %}
 <div class="input-group form-row">
     <label class="input-group-addon form-label" for="namespace_select">
-        {{ msg("namespace") }}
+        {{ msg('namespace') }}
     </label>
     <select class="form-control namespace-selector" name="namespace" id="namespace_select">
         {% if allOption %}
-            <option value="all">{{ msg('all') | capitalize_first }}</option>
+            <option value="all" {% if value is same as('all') %}selected="selected"{% endif %}>
+                {{ msg('all') | capitalize_first }}
+            </option>
         {% endif %}
         {% for id, name in namespaces %}
-            <option value="{{ id }}" {% if loop.first %}selected="selected"{% endif %}>
+            <option value="{{ id }}" {% if value is same as(id) %}selected="selected"{% endif %}>
                 {{ name }}
             </option>
         {% endfor %}
@@ -73,18 +75,31 @@
 </div>
 {% endmacro %}
 
-{% macro date_input(type = 'start', required = false) %}
+{% macro date_input(type = 'start', required = false, value) %}
 <div class="input-group form-row">
     <label class="input-group-addon form-label" for="date_{{ type }}_input">
         {{ msg(type) }}
-        {% if type == 'end' %}
-            <span class="text-muted">({{ msg("optional") }})</span>
+        {% if required == false %}
+            <span class="text-muted"><small>({{ msg('optional') }})</small></span>
         {% endif %}
     </label>
-    <input type="date" class="form-control" name="{{ type }}" placeholder="YYYY-MM-DD"{% if required %} required{% endif %} />
+    <input type="date" class="form-control" name="{{ type }}"
+        placeholder="2016-12-31"{% if required %} required{% endif %}
+        value="{{ value }}" />
+</div>
+{% endmacro %}
+
+{% macro redirects_select() %}
+<div class="input-group">
+    <span class="input-group-addon form-label">{{ msg('redirects') }}</span>
+    <select class="form-control" name="redirects">
+        <option value="noredirects" selected>{{ msg('redirfilter-noredirects') }}</option>
+        <option value="all">{{ msg('redirfilter-all') }}</option>
+        <option value="onlyredirects">{{ msg('redirfilter-onlyredirects') }}</option>
+    </select>
 </div>
 {% endmacro %}
 
 {% macro submit_btn() %}
-<button class="btn btn-large btn-primary form-submit">{{ msg("submit") }}</button>
+<button class="btn btn-large btn-primary form-submit">{{ msg('submit') }}</button>
 {% endmacro %}

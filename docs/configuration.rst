@@ -1,6 +1,6 @@
-*************
+#############
 Configuration
-*************
+#############
 
 As part of the installation of xTools, ``composer install`` or ``composer update`` may prompt you for configuration options.  This is a definition
 of those options.

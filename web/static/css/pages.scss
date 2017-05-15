@@ -3,6 +3,7 @@
 .pages {
     .namespaces-table {
         float: left;
+        margin-top: 20px;
 
         tr:hover .namespace-toggle {
             .color-icon {
@@ -50,5 +51,12 @@
 
     .panel-body h3 {
         clear: both;
+    }
+}
+
+@media (max-width: $bootstrap-sm) {
+    .pages .chart-wrapper {
+        margin: 0;
+        max-width: 100%;
     }
 }
