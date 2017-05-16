@@ -34,9 +34,7 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
     public function testDates()
     {
         $editCounterRepo = $this->getMock(EditCounterRepository::class);
-        $editCounterRepo->expects($this->once())
-            ->method('getRevisionDates')
-            ->willReturn([
+        $editCounterRepo->expects($this->once())->method('getRevisionDates')->willReturn([
                 'first' => '20170510100000',
                 'last' => '20170515150000',
             ]);
@@ -44,34 +42,62 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
         $user = new User('Testuser1');
         $editCounter = new EditCounter($project, $user);
         $editCounter->setRepository($editCounterRepo);
-        $this->assertEquals(
-            new \DateTime('2017-05-10 10:00'),
-            $editCounter->datetimeFirstRevision()
-        );
-        $this->assertEquals(
-            new \DateTime('2017-05-15 15:00'),
-            $editCounter->datetimeLastRevision()
-        );
+        $this->assertEquals(new \DateTime('2017-05-10 10:00'),
+            $editCounter->datetimeFirstRevision());
+        $this->assertEquals(new \DateTime('2017-05-15 15:00'),
+            $editCounter->datetimeLastRevision());
         $this->assertEquals(5, $editCounter->getDays());
+    }
 
-        // Only one edit means the dates will be the same.
-        $editCounterRepo2 = $this->getMock(EditCounterRepository::class);
-        $editCounterRepo2->expects($this->once())
+    /**
+     * Only one edit means the dates will be the same.
+     */
+    public function testDatesWithOneRevision()
+    {
+        $editCounterRepo = $this->getMock(EditCounterRepository::class);
+        $editCounterRepo->expects($this->once())
             ->method('getRevisionDates')
             ->willReturn([
                 'first' => '20170510110000',
                 'last' => '20170510110000',
             ]);
-        $editCounter2 = new EditCounter($project, $user);
-        $editCounter2->setRepository($editCounterRepo2);
+        $project = new Project('TestProject');
+        $user = new User('Testuser1');
+        $editCounter = new EditCounter($project, $user);
+        $editCounter->setRepository($editCounterRepo);
         $this->assertEquals(
             new \DateTime('2017-05-10 11:00'),
-            $editCounter2->datetimeFirstRevision()
+            $editCounter->datetimeFirstRevision()
         );
         $this->assertEquals(
             new \DateTime('2017-05-10 11:00'),
-            $editCounter2->datetimeLastRevision()
+            $editCounter->datetimeLastRevision()
         );
-        $this->assertEquals(1, $editCounter2->getDays());
+        $this->assertEquals(1, $editCounter->getDays());
+    }
+
+    public function testPageCounts()
+    {
+        $editCounterRepo = $this->getMock(EditCounterRepository::class);
+        $editCounterRepo->expects($this->once())
+            ->method('getPageCounts')
+            ->willReturn([
+                'edited-live' => '3',
+                'edited-deleted' => '1',
+                'created-live' => '6',
+                'created-deleted' => '2',
+            ]);
+        $project = new Project('TestProject');
+        $user = new User('Testuser1');
+        $editCounter = new EditCounter($project, $user);
+        $editCounter->setRepository($editCounterRepo);
+        
+        $this->assertEquals(3, $editCounter->countLivePagesEdited());
+        $this->assertEquals(1, $editCounter->countDeletedPagesEdited());
+        $this->assertEquals(4, $editCounter->countAllPagesEdited());
+        
+        $this->assertEquals(6, $editCounter->countCreatedPagesLive());
+        $this->assertEquals(2, $editCounter->countPagesCreatedDeleted());
+        $this->assertEquals(8, $editCounter->countPagesCreated());
     }
 }

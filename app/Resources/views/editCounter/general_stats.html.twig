@@ -158,15 +158,21 @@
             {#<tr><td>{{ msg("restore") }}:</td><td><span class="tdgeneral">{{ pagesRestored }} <small>x</small></span></td></tr>#}
             {#<tr><td>{{ msg("import") }}:</td><td><span class="tdgeneral">{{ pagesImported }} <small>x</small></span></td></tr>#}
             {% endif %}
+        </table>
 
-            <tr><td colspan=2></td></tr>
-            <tr><td style="color:gray">{{ msg("users", [1]) }}:</td></tr>
+        <table class="table-condensed xt-table">
+            <caption>{{ msg("blocks") }}</caption>
             <tr>
-                <td>{{ msg('reblocked') }}</td>
-                <td><span class="tdgeneral"><a href="{{ wiki_log_link('User:'~user.username, project.url) }}">@TODO</a></span></td>
+                <td>{{ msg('re-blocked') }}</td>
+                <td>{{ wiki_log_link('User:'~user.username, project.url, '@TODO') }}</td>
             </tr>
-            <tr><td>Longest block:</td><td>@TODO</td></tr>
-            <tr><td>Current block:</td><td>@TODO</td></tr>
+            <tr><td>{{ msg('block-longest') }}</td><td>@TODO</td></tr>
+            <tr><td>{{ msg('block-current') }}</td><td>@TODO</td></tr>
+            <tr>
+                <td colspan="2">
+                    <a href="{{ project.url }}/Special:BlockLog/{{ user.username }}">{{ msg('block-log') }}</a>
+                </td>
+            </tr>
         </table>
     </div>
     <div class="col">

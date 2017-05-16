@@ -3,6 +3,7 @@
 namespace Xtools;
 
 use \DateTime;
+use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * An EditCounter provides statistics about a user's edits on a project.
@@ -175,7 +176,7 @@ class EditCounter extends Model
     public function countLivePagesEdited()
     {
         $pageCounts = $this->getPageCounts();
-        return isset($pageCounts['edited-live']) ? $pageCounts['edited-deleted'] : 0;
+        return isset($pageCounts['edited-live']) ? $pageCounts['edited-live'] : 0;
     }
 
     /**
