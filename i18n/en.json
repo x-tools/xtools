@@ -270,6 +270,8 @@
   "tool-topedits-desc": "Get edits by a user, either top edits per namespace or edits per page",
   "top-edited-pages": "Top edited pages",
   "top-editors": "Top editors",
+  "top-projects-edit-counts": "Top projects' edit counts:",
+  "top-projects-read-more-link": "View recent global contributions...",
   "top-ten-by-edits": "TOP 10 by edits",
   "top-ten-by-text": "TOP 10 by added text",
   "top-ten-count": "Edits made by the top 10% of editors",

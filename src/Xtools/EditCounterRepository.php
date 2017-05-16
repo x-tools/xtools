@@ -249,30 +249,46 @@ class EditCounterRepository extends Repository
      * Requires the CentralAuth extension to be installed on the project.
      *
      * @param string $username The username.
-     * @param Project $project The project.
+     * @param Project $project The project to start from.
      * @return mixed[]|boolean Array of total edit counts, or false if none could be found.
      */
-    public function getRevisionCountsAllProjects($username, Project $project)
+    public function getRevisionCountsAllProjects(User $user, Project $project)
     {
+        // Set up cache and stopwatch.
+        $cacheKey = 'globalRevisionCounts.'.$user->getUsername();
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+        $this->stopwatch->start($cacheKey, 'XTools');
+
         $api = $this->getMediawikiApi($project);
         $params = [
             'meta' => 'globaluserinfo',
             'guiprop' => 'editcount|merged',
-            'guiuser' => $username,
+            'guiuser' => $user->getUsername(),
         ];
         $query = new SimpleRequest('query', $params);
         $result = $api->getRequest($query);
-        if (!isset($result['query']['globaluserinfo']['merged'])) {
-            return false;
-        }
         $out = [];
-        foreach ($result['query']['globaluserinfo']['merged'] as $merged) {
-            // The array structure here should match what's done in
-            // EditCounterHelper::getTopProjectsEditCounts()
-            $out[$merged['wiki']] = [
-                'total' => $merged['editcount'],
-            ];
+        if (isset($result['query']['globaluserinfo']['merged'])) {
+            foreach ($result['query']['globaluserinfo']['merged'] as $merged) {
+                $proj = ProjectRepository::getProject($merged['wiki'], $this->container);
+                $out[] = [
+                    'project' => $proj,
+                    'total' => $merged['editcount'],
+                ];
+            }
         }
+        if (empty($out)) {
+            $out = $this->getRevisionCountsAllProjectsNoCentralAuth($user, $project, $cacheKey);
+        }
+
+        // Cache for 10 minutes, and return.
+        $cacheItem = $this->cache->getItem($cacheKey)
+            ->set($out)
+            ->expiresAfter(new \DateInterval('PT10M'));
+        $this->cache->save($cacheItem);
+        $this->stopwatch->stop($cacheKey);
 
         return $out;
     }
@@ -282,40 +298,28 @@ class EditCounterRepository extends Repository
      * @param string $username The username.
      * @return string[] Elements are arrays with 'dbName', 'url', 'name', and 'total'.
      */
-    public function getTopProjectsEditCounts($projectUrl, $username, $numProjects = 10)
-    {
-        $this->debug("Getting top project edit counts for $username");
-        $cacheKey = 'topprojectseditcounts.' . $username;
-        if ($this->cacheHas($cacheKey)) {
-            return $this->cacheGet($cacheKey);
+    protected function getRevisionCountsAllProjectsNoCentralAuth(
+        User $user,
+        Project $project,
+        $stopwatchName
+    ) {
+        $allProjects = $project->getRepository()->getAll();
+        $topEditCounts = [];
+        foreach ($allProjects as $projectMeta) {
+            $revisionTableName = $this->getTableName($projectMeta['dbName'], 'revision');
+            $sql = "SELECT COUNT(rev_id) FROM $revisionTableName WHERE rev_user_text=:username";
+            $stmt = $this->getProjectsConnection()->prepare($sql);
+            $stmt->bindParam("username", $user->getUsername());
+            $stmt->execute();
+            $total = (int)$stmt->fetchColumn();
+            $project = ProjectRepository::getProject($projectMeta['dbName'], $this->container);
+            $topEditCounts[] = [
+                'project' => $project,
+                'total' => $total,
+            ];
+            $this->stopwatch->lap($stopwatchName);
         }
-
-        // First try to get the edit count from the API (if CentralAuth is installed).
-        /** @var ApiHelper */
-        $api = $this->container->get('app.api_helper');
-        $topEditCounts = $api->getEditCount($username, $projectUrl);
-        if (false === $topEditCounts) {
-            // If no CentralAuth, fall back to querying each database in turn.
-            foreach ($this->labsHelper->getProjectsInfo() as $project) {
-                $this->container->get('logger')->debug('Getting edit count for ' . $project['url']);
-                $revisionTableName = $this->labsHelper->getTable('revision', $project['dbName']);
-                $sql = "SELECT COUNT(rev_id) FROM $revisionTableName WHERE rev_user_text=:username";
-                $stmt = $this->replicas->prepare($sql);
-                $stmt->bindParam("username", $username);
-                $stmt->execute();
-                $total = (int)$stmt->fetchColumn();
-                $topEditCounts[$project['dbName']] = array_merge($project, ['total' => $total]);
-            }
-        }
-        uasort($topEditCounts, function ($a, $b) {
-            return $b['total'] - $a['total'];
-        });
-        $out = array_slice($topEditCounts, 0, $numProjects);
-
-        // Cache for ten minutes.
-        $this->cacheSave($cacheKey, $out, 'PT10M');
-
-        return $out;
+        return $topEditCounts;
     }
 
     /**

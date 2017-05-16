@@ -374,4 +374,23 @@ class EditCounter extends Model
         $logCounts = $this->getLogCounts();
         return $logCounts['patrol-patrol'] ?: 0;
     }
+
+    /**
+     * Get the total edit counts for the top n projects of this user.
+     * @param User $user
+     * @param Project $project
+     * @param int $numProjects
+     * @return mixed[] Each element has 'total' and 'project' keys.
+     */
+    public function topProjectsEditCounts(User $user, Project $project, $numProjects = 10)
+    {
+        // Get counts.
+        $editCounts = $this->getRepository()->getRevisionCountsAllProjects($user, $project);
+        // Sort.
+        uasort($editCounts, function ($a, $b) {
+            return $b['total'] - $a['total'];
+        });
+        // Truncate, and return.
+        return array_slice($editCounts, 0, $numProjects);
+    }
 }

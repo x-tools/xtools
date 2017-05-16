@@ -177,26 +177,29 @@
     </div>
     <div class="col">
         <table class="table-condensed xt-table top-project-edit-counts">
-            <thead>
-            <tr>
-                <th colspan="2" title="{{ msg('top-projects-explanation') }}">{{ msg('top-projects-table-header') }}</th>
-                <th class="text-muted text-right"><a href="#latestglobal">{{ msg('top-projects-read-more-link') }}</a></th>
-            </tr>
-            </thead>
-            {#{% for top_project in top_projects_edit_counts %}#}
-                {#<tr>#}
-                    {#<td {% if top_project.dbName == project %}class="current"{% endif %}>#}
-                        {#{% if top_project.dbName == project %}<span title="{{ msg('selected') }}">►</span>{% endif %}#}
-                        {#{{ top_project.wikiName }}#}
-                    {#</td>#}
-                    {#<td class="tdgeneral">#}
-                        {#<a href="{{ path('TopEditsResults', {project:top_project.dbName, username:username}) }}">#}
-                            {#{{ top_project.total|number_format }}#}
-                        {#</a>#}
-                    {#</td>#}
-                    {#<td class="tdnum"><small class="text-muted">@TODO days</small></td>#}
-                {#</tr>#}
-            {#{% endfor %}#}
+            <caption>
+                {{ msg('top-projects-edit-counts') }}
+                <span class="text-muted text-right"><a href="#latestglobal">{{ msg('top-projects-read-more-link') }}</a></span>
+            </caption>
+            {% for topProj in ec.topProjectsEditCounts(user, project) %}
+                <tr>
+                    {% if topProj.project.databaseName == project.databaseName %}
+                    <td class="current"><span title="{{ msg('selected') }}">►</span>
+                    {% else %}
+                    <td>
+                    {% endif %}
+                        <a href="{{ topProj.project.url }}/Special:Contributions/{{ user.username }}">
+                        {{ topProj.project.title }}
+                        </a>
+                    </td>
+                    <td class="tdnum">
+                        <a href="{{ path('TopEditsResults', {project:topProj.project.domain, username:user.username}) }}">
+                            {{ topProj.total|number_format }}
+                        </a>
+                    </td>
+                    <td class="tdnum"><small class="text-muted">@TODO days</small></td>
+                </tr>
+            {% endfor %}
             <tfoot>
             <tr>
                 <td>@TODO {{ msg('sul-total-other-sites-count') }}</td>
