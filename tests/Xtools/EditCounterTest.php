@@ -42,10 +42,14 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
         $user = new User('Testuser1');
         $editCounter = new EditCounter($project, $user);
         $editCounter->setRepository($editCounterRepo);
-        $this->assertEquals(new \DateTime('2017-05-10 10:00'),
-            $editCounter->datetimeFirstRevision());
-        $this->assertEquals(new \DateTime('2017-05-15 15:00'),
-            $editCounter->datetimeLastRevision());
+        $this->assertEquals(
+            new \DateTime('2017-05-10 10:00'),
+            $editCounter->datetimeFirstRevision()
+        );
+        $this->assertEquals(
+            new \DateTime('2017-05-15 15:00'),
+            $editCounter->datetimeLastRevision()
+        );
         $this->assertEquals(5, $editCounter->getDays());
     }
 
