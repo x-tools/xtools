@@ -20,6 +20,10 @@
                     {% endif %}
                 </td>
             </tr>
+            <tr>
+                <td>{{ msg('is-admin') }}</td>
+                <td>{% if user.isAdmin(project) %}<span class="alert-info">&check;{% else %}<span class="alert-warning">&cross;</span>{% endif %}</td>
+            </tr>
             <tr><td>{{ msg("first-edit") }}:</td><td>{{ ec.datetimeFirstRevision|date('Y-m-d H:i') }}</td></tr>
             <tr><td>{{ msg("latest-edit") }}:</td><td>{{ ec.datetimeLastRevision|date('Y-m-d H:i') }}</td></tr>
             <tr>
@@ -51,7 +55,7 @@
                     ({{ ec.days|number_format }} {{ msg('num-days', [ec.days]) }})
                 </td>
             </tr>
-            <tr><td>{{ msg('average-edit-size') }}</td><td class="tdnum">{{ ec.averageRevisionSize }}</td><td></td></tr>
+            <tr><td>{{ msg('average-edit-size') }}</td><td class="tdnum">{{ ec.averageRevisionSize }}</td><td>KB</td></tr>
         </table>
     </div>
 </div>
@@ -84,7 +88,7 @@
         <table class="table-condensed xt-table">
             <caption>{{ msg('files') }}</caption>
             <tr>
-                <td>{{ msg('files_uploaded') }}</td>
+                <td>{{ msg('files-uploaded') }}</td>
                 <td class="tdnum" >
                     <a href="//{{ project.url }}/wiki/Special:ListFiles/{{ user.username }}">{{ ec.countFilesUploaded|number_format }}</a>
                 </td>
@@ -92,7 +96,7 @@
             </tr>
             {% if is_labs %}
                 <tr>
-                    <td>{{ msg('files_uploaded_commons') }}</td>
+                    <td>{{ msg('files-uploaded-commons') }}</td>
                     <td class="tdnum" >
                         <a href="https://commons.wikimedia.org/wiki/Special:ListFiles/{{ user.username }}" >{{ ec.countFilesUploadedCommons }}</a>
                     </td>
@@ -113,13 +117,13 @@
 
     </div>
     <div class="col">
-        <table class="table-condensed  xt-table">
-            <tr><td style="color:gray">{{ msg("actions") }}:</td></tr>
+        <table class="table-condensed xt-table">
+            <caption>{{ msg('actions') }}</caption>
             <tr>
                 <td>{{ msg("thank") }}:</td>
                 <td class="tdnum">
                     <a href="{{ project.url }}/index.php?title=Special%3ALog&type=thanks&user={{ user.username }}&page=&year=&month=-1&tagfilter=" >
-                        {{ ec.thanks }} <small>x</small>
+                        {{ ec.thanks|number_format }}
                     </a>
                 </td>
             </tr>
@@ -127,7 +131,7 @@
                 <td>{{ msg("approve") }}:</td>
                 <td class="tdnum">
                     <a href="{{ project.url }}/index.php?title=Special%3ALog&type=review&user={{ user.username }}&page=&year=&month=-1&tagfilter=&hide_patrol_log=1&hide_review_log=1&hide_thanks_log=1" >
-                        {{ ec.approvals }} <small>x</small>
+                        {{ ec.approvals|number_format }}
                     </a>
                 </td>
             </tr>
@@ -135,12 +139,16 @@
                 <td>{{ msg("patrol") }}:</td>
                 <td class="tdnum">
                     <a href="{{ project.url }}/index.php?title=Special%3ALog&type=patrol&user={{ user.username }}&page=&year=&month=-1&tagfilter=" >
-                        {{ ec.patrols }} <small>x</small>
+                        {{ ec.patrols|number_format }}
                     </a>
                 </td>
             </tr>
-            <tr class="rule"><td colspan=2><hr /></td></tr>
-            <tr><td style="color:gray">{{ msg("actions_admin") }}:</td></tr>
+            <tr class="tr-mid-header"><th colspan="2">{{ msg("actions-as-admin") }}</th></tr>
+            {% if not user.isAdmin(project) %}
+                <tr>
+                    <td colspan="2" class="alert-warning">{{ msg('user-is-not-admin') }}</td>
+                </tr>
+            {% else %}
             {#<tr><td>{{ msg("block") }}:</td><td><span class="tdgeneral">{{ usersBlocked }} <small>x</small></span></td></tr>#}
             {#<tr><td>{{ msg("unblock") }}:</td><td><span class="tdgeneral">{{ usersUnblocked }} <small>x</small></span></td></tr>#}
             {#<tr><td>{{ msg("protect") }}:</td><td><span class="tdgeneral">{{ pagesProtected }} <small>x</small></span></td></tr>#}
@@ -149,7 +157,8 @@
             {#<tr><td>{{ msg("delete") }} ({{ msg("revisions", [1]) }}):</td><td><span class="tdgeneral">{{ pagesDeletedRevision }} <small>x</small></span></td></tr>#}
             {#<tr><td>{{ msg("restore") }}:</td><td><span class="tdgeneral">{{ pagesRestored }} <small>x</small></span></td></tr>#}
             {#<tr><td>{{ msg("import") }}:</td><td><span class="tdgeneral">{{ pagesImported }} <small>x</small></span></td></tr>#}
-            <tr><td colspan=2></td></tr>
+            {% endif %}
+
             <tr><td colspan=2></td></tr>
             <tr><td style="color:gray">{{ msg("users", [1]) }}:</td></tr>
             <tr>

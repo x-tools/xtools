@@ -261,6 +261,9 @@ class EditCounter extends Model
      */
     public function averageRevisionsPerPage()
     {
+        if ($this->countAllPagesEdited() == 0) {
+            return 0;
+        }
         return round($this->countAllRevisions() / $this->countAllPagesEdited(), 3);
     }
 
@@ -270,6 +273,9 @@ class EditCounter extends Model
      */
     public function averageRevisionsPerDay()
     {
+        if ($this->getDays() == 0) {
+            return 0;
+        }
         return round($this->countAllRevisions() / $this->getDays(), 3);
     }
     

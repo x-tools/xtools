@@ -53,6 +53,12 @@ class UserRepository extends Repository
      */
     public function getGroups(Project $project, $username)
     {
+        $cacheKey = 'usergroups.'.$project->getDatabaseName().'.'.$username;
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $this->stopwatch->start($cacheKey, 'XTools');
         $api = $this->getMediawikiApi($project);
         $params = [ "list"=>"users", "ususers"=>$username, "usprop"=>"groups" ];
         $query = new SimpleRequest('query', $params);
@@ -61,6 +67,14 @@ class UserRepository extends Repository
         if (isset($res["batchcomplete"]) && isset($res["query"]["users"][0]["groups"])) {
             $result = $res["query"]["users"][0]["groups"];
         }
+
+        // Cache for 10 minutes, and return.
+        $cacheItem = $this->cache->getItem($cacheKey)
+            ->set($result)
+            ->expiresAfter(new \DateInterval('PT10M'));
+        $this->cache->save($cacheItem);
+        $this->stopwatch->stop($cacheKey);
+
         return $result;
     }
 

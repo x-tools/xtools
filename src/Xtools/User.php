@@ -44,10 +44,14 @@ class User extends Model
 
     /**
      * Get a list of this user's groups on the given project.
+     * @return string[]
      */
     public function getGroups(Project $project)
     {
-        return $this->getRepository()->getGroups($project, $this->getUsername());
+        $groupsData = $this->getRepository()->getGroups($project, $this->getUsername());
+        $groups = preg_grep('/\*/', $groupsData, PREG_GREP_INVERT);
+        sort($groups);
+        return $groups;
     }
 
     /**
@@ -79,5 +83,14 @@ class User extends Model
     {
         $id = $this->getId($project);
         return $id > 0;
+    }
+
+    /**
+     * Is this user an Administrator on the given project?
+     * @return bool
+     */
+    public function isAdmin(Project $project)
+    {
+        return (false !== array_search('sysop', $this->getGroups($project)));
     }
 }
