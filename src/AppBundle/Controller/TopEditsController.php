@@ -166,15 +166,16 @@ class TopEditsController extends Controller
      */
     protected function singlePageTopEdits(User $user, Project $project, $namespaceId, $pageName)
     {
+        // Get the full page name (i.e. no namespace prefix if NS 0).
         $namespaces = $project->getNamespaces();
-        $fullPageName = $namespaces[$namespaceId].':'.$pageName;
+        $fullPageName = $namespaceId ? $namespaces[$namespaceId].':'.$pageName : $pageName;
         $page = new Page($project, $fullPageName);
         $pageRepo = new PagesRepository();
         $page->setRepository($pageRepo);
 
         if (!$page->exists()) {
             // Redirect if the page doesn't exist.
-            $this->addFlash("notice", ["noresult", $pageName]);
+            $this->addFlash("notice", ["no-result", $pageName]);
             //return $this->redirectToRoute("topedits");
         }
 
