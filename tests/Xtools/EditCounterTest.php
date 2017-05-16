@@ -23,9 +23,9 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
         $editCounter = new EditCounter($project, $user);
         $editCounter->setRepository($editCounterRepo);
 
-        $this->assertEquals(100, $editCounter->getLiveEditCount());
-        $this->assertEquals(10, $editCounter->getDeletedEditCount());
-        $this->assertEquals(110, $editCounter->getTotalEditCount());
+        $this->assertEquals(100, $editCounter->countLiveRevisions());
+        $this->assertEquals(10, $editCounter->countDeletedRevisions());
+        $this->assertEquals(110, $editCounter->countAllRevisions());
     }
 
     /**
@@ -46,11 +46,11 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
         $editCounter->setRepository($editCounterRepo);
         $this->assertEquals(
             new \DateTime('2017-05-10 10:00'),
-            $editCounter->getFirstEditDatetime()
+            $editCounter->datetimeFirstRevision()
         );
         $this->assertEquals(
             new \DateTime('2017-05-15 15:00'),
-            $editCounter->getLastEditDatetime()
+            $editCounter->datetimeLastRevision()
         );
         $this->assertEquals(5, $editCounter->getDays());
 
@@ -66,11 +66,11 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
         $editCounter2->setRepository($editCounterRepo2);
         $this->assertEquals(
             new \DateTime('2017-05-10 11:00'),
-            $editCounter2->getFirstEditDatetime()
+            $editCounter2->datetimeFirstRevision()
         );
         $this->assertEquals(
             new \DateTime('2017-05-10 11:00'),
-            $editCounter2->getLastEditDatetime()
+            $editCounter2->datetimeLastRevision()
         );
         $this->assertEquals(1, $editCounter2->getDays());
     }

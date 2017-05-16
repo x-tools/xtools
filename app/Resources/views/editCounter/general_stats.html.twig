@@ -12,9 +12,9 @@
                     {% for group in user.groups(project) %}
                         {{ group }}{% if not loop.last %}, {% endif %}
                     {% endfor %}
-                    {% if user.globalGroups(project) %}<br />
-                        &bull; {{ msg("global-user-groups") }}:
-                        {% for group in user.globalGroups %}
+                    {% if user.globalGroups(project) %}
+                        <br />&bull; {{ msg("global-user-groups") }}:
+                        {% for group in user.globalGroups(project) %}
                             {{ group }}{% if not loop.last %}, {% endif %}
                         {% endfor %}
                     {% endif %}
@@ -38,14 +38,20 @@
     </div>
     <div class="col-md-6">
         <table class="table-condensed xt-table">
-            <tr><td>{{ msg("lastday") }}:</td><td class="tdnum" >{{ ec.countRevisionsInLast('day')|number_format }}</td></tr>
-            <tr><td>{{ msg("lastweek") }}:</td><td class="tdnum" >{{ ec.countRevisionsInLast('week')|number_format }}</td></tr>
-            <tr><td>{{ msg("lastmonth") }}:</td><td class="tdnum" >{{ ec.countRevisionsInLast('month')|number_format }}</td></tr>
-            <tr><td>{{ msg("lastyear") }}:</td><td class="tdnum" >{{ ec.countRevisionsInLast('year')|number_format }}</td></tr>
+            <tr><td>{{ msg("lastday") }}:</td><td class="tdnum" >{{ ec.countRevisionsInLast('day')|number_format }}</td><td></td></tr>
+            <tr><td>{{ msg("lastweek") }}:</td><td class="tdnum" >{{ ec.countRevisionsInLast('week')|number_format }}</td><td></td></tr>
+            <tr><td>{{ msg("lastmonth") }}:</td><td class="tdnum" >{{ ec.countRevisionsInLast('month')|number_format }}</td><td></td></tr>
+            <tr><td>{{ msg("lastyear") }}:</td><td class="tdnum" >{{ ec.countRevisionsInLast('year')|number_format }}</td><td></td></tr>
             <tr class="averge-daily-edit-count">
-                <td title="{{ ec.days }} {{ msg('num-days', [ec.days]) }}" >{{ msg("avg_edits_per_time_sign", [msg("days", [1])]) }}:</td>
-                <td class="tdnum">{{ ec.averageRevisionsPerDay|number_format }}</td>
+                <td>{{ msg("average-edits-per-day", [msg("days", [1])]) }}:</td>
+                <td class="tdnum">
+                    {{ ec.averageRevisionsPerDay|number_format }}
+                </td>
+                <td class="tdgeneral text-muted">
+                    ({{ ec.days|number_format }} {{ msg('num-days', [ec.days]) }})
+                </td>
             </tr>
+            <tr><td>{{ msg('average-edit-size') }}</td><td class="tdnum">{{ ec.averageRevisionSize }}</td><td></td></tr>
         </table>
     </div>
 </div>
@@ -54,30 +60,35 @@
 
 <div class="row">
     <div class="col">
-        <table class="table-condensed  xt-table">
-            <tr><td>{{ msg("live") }}</td><td class="tdnum">{{ ec.countLivePagesEdited|number_format }}</td></tr>
-            <tr><td>{{ msg("deleted") }}</td><td class="tdnum">{{ ec.countDeletedPagesEdited|number_format }}</td></tr>
-            <tr><td>{{ msg("all") }}</td><td class="tdnum">{{ ec.countAllPagesEdited|number_format }}</td></tr>
+        <table class="table-condensed xt-table">
+            <caption>{{ msg('pages') }}</caption>
+            <tr><td>{{ msg("pages-edited-total") }}</td><td class="tdnum">{{ ec.countAllPagesEdited|number_format }}</td><td></td></tr>
             <tr>
-                <td>{{ msg("pages_created") }}:</td>
+                <td>{{ msg("average-per-page") }}</td>
+                <td class="tdnum">{{ ec.averageRevisionsPerPage }}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>{{ msg('pages-created') }}</td>
                 <td class="tdnum">
                     <a href="{{ path('PagesResult', {project:project.domain, username:user.username, namespace:'all', redirects:'none'}) }}">
                         {{ ec.countPagesCreated|number_format }}
                     </a>
                 </td>
+                <td class="text-muted">{{ msg('pages-created-since-deleted', [ec.countPagesCreatedDeleted|number_format]) }}</td>
             </tr>
-            <tr><td>{{ msg("pages_moved") }}:</td><td class="tdnum">{{ ec.countPagesMoved|number_format }}</td></tr>
-            <tr>
-                <td title="{{ msg("average_per_page") }}">{{ msg("average_per_page_sign") }}</td>
-                <td class="tdnum">{{ ec.averageRevisionsPerPage }}</td>
-            </tr>
-            <tr><td>{{ msg('average_edit_size') }}</td><td class="tdnum">@TODO</td></tr>
-            <tr class="rule"><td colspan="2"><hr /></td></tr>
+            <tr><td>{{ msg("pages-moved") }}:</td><td class="tdnum">{{ ec.countPagesMoved|number_format }}</td><td></td></tr>
+            <tr><td>{{ msg("pages-deleted") }}</td><td class="tdnum">{{ ec.countPagesDeleted|number_format }}</td><td></td></tr>
+        </table>
+
+        <table class="table-condensed xt-table">
+            <caption>{{ msg('files') }}</caption>
             <tr>
                 <td>{{ msg('files_uploaded') }}</td>
                 <td class="tdnum" >
-                    <a href="//{{ project.url }}/wiki/Special:ListFiles/{{ user.username }}" >{{ ec.countFilesUploaded|number_format }}</a>
+                    <a href="//{{ project.url }}/wiki/Special:ListFiles/{{ user.username }}">{{ ec.countFilesUploaded|number_format }}</a>
                 </td>
+                <td></td>
             </tr>
             {% if is_labs %}
                 <tr>
@@ -85,16 +96,21 @@
                     <td class="tdnum" >
                         <a href="https://commons.wikimedia.org/wiki/Special:ListFiles/{{ user.username }}" >{{ ec.countFilesUploadedCommons }}</a>
                     </td>
+                    <td></td>
                 </tr>
             {% endif %}
-            <tr><td>{{ msg('autoedits') }}</td><td><span class="tdgeneral" ><a href="#autoeditslist">{{ ec.countAutomatedRevisions }}</a></span></td></tr>
-            <tr><td>Reverted edits:</td><td><span class="tdnum" >@TODO</span></td></tr>
-            <tr class="rule"><td colspan="2"><hr /></td></tr>
-            <tr><td>{{ msg('edits-with-comment') }}</td><td class="tdnum">{{ ec.countRevisionsWithComments|number_format }}</td></tr>
-            <tr><td>{{ msg('minor-edits') }}</td><td class="tdnum">{{ ec.countMinorRevisions|number_format }}</td></tr>
-            <tr><td>{{ msg('small-edits') }}</td><td class="tdnum">{{ ec.countSmallRevisions|number_format }}</td></tr>
-            <tr><td>{{ msg('large-edits') }}</td><td class="tdnum">{{ ec.countLargeRevisions|number_format }}</td></tr>
         </table>
+
+        <table class="table-condensed xt-table">
+            <caption>{{ msg('edits') }}</caption>
+            <tr><td>{{ msg('autoedits') }}</td><td class="tdnum"><a href="#autoeditslist">{{ ec.countAutomatedRevisions }}</a></td><td></td></tr>
+            <tr><td>{{ msg('reverted-edits') }}</td><td class="tdnum" >@TODO</td><td></td></tr>
+            <tr><td>{{ msg('edits-with-comment') }}</td><td class="tdnum">{{ ec.countRevisionsWithComments|number_format }}</td><td></td></tr>
+            <tr><td>{{ msg('minor-edits') }}</td><td class="tdnum">{{ ec.countMinorRevisions|number_format }}</td><td></td></tr>
+            <tr><td>{{ msg('small-edits') }}</td><td class="tdnum">{{ ec.countSmallRevisions|number_format }}</td><td></td></tr>
+            <tr><td>{{ msg('large-edits') }}</td><td class="tdnum">{{ ec.countLargeRevisions|number_format }}</td><td></td></tr>
+        </table>
+
     </div>
     <div class="col">
         <table class="table-condensed  xt-table">

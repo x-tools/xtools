@@ -65,7 +65,7 @@ class UserRepository extends Repository
     }
 
     /**
-     * Get a user's global group membership (starting at XTools' default project if none is 
+     * Get a user's global group membership (starting at XTools' default project if none is
      * provided). This requires the CentralAuth extension to be installed.
      * @link https://www.mediawiki.org/wiki/Extension:CentralAuth
      * @param string $username The username.

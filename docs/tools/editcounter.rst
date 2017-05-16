@@ -20,6 +20,7 @@ Then, **Edit counts** are displayed for:
 
 * the last day, week, month, year, and all time (the latter also including addition counts of deleted edits);
 * edits made with or without comments;
+* edits that have been deleted;
 * small (under 20 KB) and large (over 1000 KB) edits;
 * minor/non-minor edits (as recorded by the user); and
 * what semi-automating tools they used to edit.

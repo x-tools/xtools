@@ -159,19 +159,33 @@ class EditCounter extends Model
     }
 
     /**
+     * Get the average revision size for the user.
+     * @return float Size in bytes.
+     */
+    public function averageRevisionSize()
+    {
+        $revisionCounts = $this->getRevisionCounts();
+        return round($revisionCounts['average_size'], 3);
+    }
+
+    /**
      * Get the total number of non-deleted pages edited by the user.
      * @return int
      */
     public function countLivePagesEdited()
     {
         $pageCounts = $this->getPageCounts();
-        return isset($pageCounts['edited-total']) ? $pageCounts['edited-total'] : 0;
+        return isset($pageCounts['edited-live']) ? $pageCounts['edited-deleted'] : 0;
     }
 
+    /**
+     * Get the total number of deleted pages ever edited by the user.
+     * @return int
+     */
     public function countDeletedPagesEdited()
     {
         $pageCounts = $this->getPageCounts();
-        return isset($pageCounts['edited-total']) ? $pageCounts['edited-total'] : 0;
+        return isset($pageCounts['edited-deleted']) ? $pageCounts['edited-deleted'] : 0;
     }
 
     /**
@@ -210,7 +224,7 @@ class EditCounter extends Model
         $pageCounts = $this->getPageCounts();
         return isset($pageCounts['created-live']) ? (int)$pageCounts['created-live'] : 0;
     }
-    
+
     /**
      * Get the total number of pages created by the user, that have since been deleted.
      * @return int
@@ -222,13 +236,23 @@ class EditCounter extends Model
     }
 
     /**
+     * Get the total number of pages that have been deleted by the user.
+     * @return int
+     */
+    public function countPagesDeleted()
+    {
+        $logCounts = $this->getLogCounts();
+        return isset($logCounts['delete-delete']) ? (int)$logCounts['delete-delete'] : 0;
+    }
+
+    /**
      * Get the total number of pages moved by the user.
      * @return int
      */
     public function countPagesMoved()
     {
-        $pageCounts = $this->getPageCounts();
-        return isset($pageCounts['moved']) ? (int)$pageCounts['moved'] : 0;
+        $logCounts = $this->getLogCounts();
+        return isset($logCounts['move-move']) ? (int)$logCounts['move-move'] : 0;
     }
 
     /**
@@ -237,7 +261,7 @@ class EditCounter extends Model
      */
     public function averageRevisionsPerPage()
     {
-        return round($this->countAllRevisions() / $this->countAllPagesEdited(), 2);
+        return round($this->countAllRevisions() / $this->countAllPagesEdited(), 3);
     }
 
     /**
@@ -246,7 +270,7 @@ class EditCounter extends Model
      */
     public function averageRevisionsPerDay()
     {
-        return round($this->countAllRevisions() / $this->getDays(), 2);
+        return round($this->countAllRevisions() / $this->getDays(), 3);
     }
     
     /**

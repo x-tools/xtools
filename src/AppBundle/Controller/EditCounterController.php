@@ -123,7 +123,6 @@ class EditCounterController extends Controller
         // Render view.
         $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/general_stats.html.twig', [
-            'xtTitle' => 'tool-ec',
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
             'is_labs' => $editCounterRepo->isLabs(),

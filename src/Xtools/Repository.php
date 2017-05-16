@@ -7,6 +7,7 @@ use Mediawiki\Api\MediawikiApi;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * A repository is responsible for retrieving data from wherever it lives (databases, APIs,
@@ -33,6 +34,9 @@ abstract class Repository
     /** @var LoggerInterface */
     protected $log;
 
+    /** @var Stopwatch */
+    protected $stopwatch;
+
     /**
      * @param Container $container
      */
@@ -41,6 +45,7 @@ abstract class Repository
         $this->container = $container;
         $this->cache = $container->get('cache.app');
         $this->log = $container->get('logger');
+        $this->stopwatch = $container->get('debug.stopwatch');
     }
 
     /**

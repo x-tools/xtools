@@ -16,15 +16,12 @@ class EditCounterRepository extends Repository
     public function getRevisionCounts(Project $project, User $user)
     {
         // Set up cache.
-        $cacheKey = 'revisioncounts.' . $user->getId($project);
+        $cacheKey = 'revisioncounts.' . $project->getDatabaseName() . '.' . $user->getUsername();
         if ($this->cache->hasItem($cacheKey)) {
-            $msg = "Using logged revision counts";
-            $this->log->debug($msg, [$project->getDatabaseName(), $user->getUsername()]);
             return $this->cache->getItem($cacheKey)->get();
         }
 
         // Prepare the queries and execute them.
-        $start = microtime();
         $archiveTable = $this->getTableName($project->getDatabaseName(), 'archive');
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
         $queries = [
@@ -48,7 +45,10 @@ class EditCounterRepository extends Repository
                 WHERE rev_user = :userId AND rev_comment = ''",
             'minor' => "SELECT COUNT(rev_id) FROM $revisionTable
                 WHERE rev_user = :userId AND rev_minor_edit = 1",
+            'average_size' => "SELECT AVG(rev_len) FROM $revisionTable
+                WHERE rev_user = :userId",
         ];
+        $this->stopwatch->start($cacheKey);
         $revisionCounts = [];
         foreach ($queries as $varName => $query) {
             $resultQuery = $this->getProjectsConnection()->prepare($query);
@@ -57,16 +57,12 @@ class EditCounterRepository extends Repository
             $resultQuery->execute();
             $val = $resultQuery->fetchColumn();
             $revisionCounts[$varName] = $val ?: 0;
+            $this->stopwatch->lap($cacheKey);
         }
-        $duration = microtime() - $start;
-        $this->log->debug(
-            "Retrieved revision counts in $duration",
-            [$project->getDatabaseName(), $user->getUsername()]
-        );
 
         // Cache for 10 minutes, and return.
-        $cacheItem =
-            $this->cache->getItem($cacheKey)
+        $this->stopwatch->stop($cacheKey);
+        $cacheItem = $this->cache->getItem($cacheKey)
                 ->set($revisionCounts)
                 ->expiresAfter(new \DateInterval('PT10M'));
         $this->cache->save($cacheItem);
@@ -80,6 +76,13 @@ class EditCounterRepository extends Repository
      */
     public function getRevisionDates(Project $project, User $user)
     {
+        // Set up cache.
+        $cacheKey = 'revisiondates.' . $project->getDatabaseName() . '.' . $user->getUsername();
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $this->stopwatch->start($cacheKey);
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
         $query = "(SELECT 'first' AS `key`, rev_timestamp AS `date` FROM $revisionTable
             WHERE rev_user = :userId ORDER BY rev_timestamp ASC LIMIT 1)
@@ -91,51 +94,75 @@ class EditCounterRepository extends Repository
         $resultQuery->bindParam("userId", $userId);
         $resultQuery->execute();
         $result = $resultQuery->fetchAll();
-        $out = [];
+        $revisionDates = [];
         foreach ($result as $res) {
-            $out[$res['key']] = $res['date'];
+            $revisionDates[$res['key']] = $res['date'];
         }
 
-        return $out;
+        // Cache for 10 minutes, and return.
+        $cacheItem = $this->cache->getItem($cacheKey)
+                ->set($revisionDates)
+                ->expiresAfter(new \DateInterval('PT10M'));
+        $this->cache->save($cacheItem);
+        $this->stopwatch->stop($cacheKey);
+        return $revisionDates;
     }
 
     /**
-     * Get page counts for the given user.
-     * @param User $user
-     * @return int[]
+     * Get page counts for the given user, both for live and deleted pages/revisions.
+     * @param Project $project The project.
+     * @param User $user The user.
+     * @return int[] With keys: edited-live, edited-deleted, created-live, created-deleted.
      */
     public function getPageCounts(Project $project, User $user)
     {
+        // Set up cache.
+        $cacheKey = 'pagecounts.'.$project->getDatabaseName().'.'.$user->getUsername();
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+        $this->stopwatch->start($cacheKey, 'XTools');
+
+        // Build and execute query.
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
         $archiveTable = $this->getTableName($project->getDatabaseName(), 'archive');
-        $loggingTable = $this->getTableName($project->getDatabaseName(), 'logging');
         $resultQuery = $this->getProjectsConnection()->prepare("
-            (SELECT 'edited-total' as source, COUNT(rev_page) as value
-                FROM $revisionTable where rev_user_text=:username)
+            (SELECT 'edited-live' AS source, COUNT(DISTINCT rev_page) AS value
+                FROM $revisionTable
+                WHERE rev_user_text=:username)
             UNION
-            (SELECT 'edited-unique' as source, COUNT(distinct rev_page) as value
-                FROM $revisionTable where rev_user_text=:username)
+            (SELECT 'edited-deleted' AS source, COUNT(DISTINCT ar_page_id) AS value
+                FROM $archiveTable
+                WHERE ar_user_text=:username)
             UNION
-            (SELECT 'created-live' as source, COUNT(*) as value from $revisionTable
-                WHERE rev_user_text=:username and rev_parent_id=0)
+            (SELECT 'created-live' AS source, COUNT(DISTINCT rev_page) AS value
+                FROM $revisionTable
+                WHERE rev_user_text=:username AND rev_parent_id=0)
             UNION
-            (SELECT 'created-deleted' as source, COUNT(*) as value from $archiveTable
-                WHERE ar_user_text=:username and ar_parent_id=0)
-            UNION
-            (SELECT 'moved' as source, count(*) as value from $loggingTable
-                WHERE log_type='move' and log_action='move' and log_user_text=:username)
+            (SELECT 'created-deleted' AS source, COUNT(DISTINCT ar_page_id) AS value
+                FROM $archiveTable
+                WHERE ar_user_text=:username AND ar_parent_id=0)
             ");
         $username = $user->getUsername();
         $resultQuery->bindParam("username", $username);
         $resultQuery->execute();
         $results = $resultQuery->fetchAll();
 
-        $pageCounts = array_combine(array_map(function ($e) {
-            return $e['source'];
-        }, $results), array_map(function ($e) {
-            return $e['value'];
-        }, $results));
+        $pageCounts = array_combine(
+            array_map(function ($e) {
+                return $e['source'];
+            }, $results),
+            array_map(function ($e) {
+                return $e['value'];
+            }, $results)
+        );
 
+        // Cache for 10 minutes, and return.
+        $cacheItem = $this->cache->getItem($cacheKey)
+            ->set($pageCounts)
+            ->expiresAfter(new \DateInterval('PT10M'));
+        $this->cache->save($cacheItem);
+        $this->stopwatch->stop($cacheKey);
         return $pageCounts;
     }
 
@@ -147,6 +174,14 @@ class EditCounterRepository extends Repository
      */
     public function getLogCounts(Project $project, User $user)
     {
+        // Set up cache.
+        $cacheKey = 'logcounts.'.$project->getDatabaseName().'.'.$user->getUsername();
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+        $this->stopwatch->start($cacheKey, 'XTools');
+
+        // Query.
         $sql = "SELECT CONCAT(log_type, '-', log_action) AS source, COUNT(log_id) AS value
             FROM " . $this->getTableName($project->getDatabaseName(), 'logging') . "
             WHERE log_user = :userId
@@ -174,6 +209,7 @@ class EditCounterRepository extends Repository
             'block-unblock',
             'protect-protect',
             'protect-unprotect',
+            'move-move',
             'delete-delete',
             'delete-revision',
             'delete-restore',
@@ -197,6 +233,13 @@ class EditCounterRepository extends Repository
             $resultQuery->execute();
             $logCounts['files_uploaded_commons'] = $resultQuery->fetchColumn();
         }
+
+        // Cache for 10 minutes, and return.
+        $cacheItem = $this->cache->getItem($cacheKey)
+            ->set($logCounts)
+            ->expiresAfter(new \DateInterval('PT10M'));
+        $this->cache->save($cacheItem);
+        $this->stopwatch->stop($cacheKey);
 
         return $logCounts;
     }
