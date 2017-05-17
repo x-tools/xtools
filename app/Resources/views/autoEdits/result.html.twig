@@ -52,6 +52,13 @@
                             ({{ total_pct | percent_format }})
                         </td>
                     </tr>
+                    <tr>
+                        <td>{{ msg('non-auto-edits') }}</td>
+                        <td>
+                            {{ (total - total_semi) | number_format }}
+                            ({{ (100 - total_pct) | percent_format }})
+                        </td>
+                    </tr>
                 </table>
                 {{
                     chart.pie_chart('auto_edits',
@@ -71,7 +78,7 @@
         {% endset %}
         {{ layout.content_block('summary', content) }}
 
-        {% set edits %}
+        {% set content %}
             <table class="table table-bordered table-hover table-striped tools-table">
                 <thead>
                 {% for key in ['tool', 'count'] %}
@@ -115,38 +122,45 @@
             <div class="chart-wrapper tools-chart-wrapper">
                 <canvas id="tool_chart" width="400" height="400"></canvas>
             </div>
-        {% endset %}
-        {{ layout.content_block('auto-edits', edits) }}
 
-        {% set colors = [] %}
-        {% for i in 0..(semi_automated | length) %}
-            {% set colors = colors | merge([chartColor(i)]) %}
-        {% endfor %}
+            {% set colors = [] %}
+            {% for i in 0..(semi_automated | length) %}
+                {% set colors = colors | merge([chartColor(i)]) %}
+            {% endfor %}
 
-        <script>
-            window.toolsChart = new Chart($('#tool_chart'), {
-                type: 'pie',
-                data: {
-                    labels: {{ semi_automated | keys | json_encode() | raw }},
-                    datasets: [{
-                        data: [
-                            {% for value in semi_automated %}
-                                {{ value }}{% if not loop.last %},{% endif %}
-                            {% endfor %}
-                        ],
-                        backgroundColor: {{ colors | json_encode() | raw }},
-                        borderColor: {{ colors | json_encode() | raw }},
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    legend: {
-                      display: false,
+            <script>
+                window.toolsChart = new Chart($('#tool_chart'), {
+                    type: 'pie',
+                    data: {
+                        labels: {{ semi_automated | keys | json_encode() | raw }},
+                        datasets: [{
+                            data: [
+                                {% for value in semi_automated %}
+                                    {{ value }}{% if not loop.last %},{% endif %}
+                                {% endfor %}
+                            ],
+                            backgroundColor: {{ colors | json_encode() | raw }},
+                            borderColor: {{ colors | json_encode() | raw }},
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        legend: {
+                          display: false,
+                        }
                     }
-                }
-            });
-            window.countsByTool = {{ semi_automated | json_encode() | raw }};
-        </script>
+                });
+                window.countsByTool = {{ semi_automated | json_encode() | raw }};
+            </script>
+        {% endset %}
+        {{ layout.content_block('auto-edits', content) }}
+
+        {% set content %}
+            <div class="non-auto-edits-container">
+                <em class="text-muted">{{ msg('loading') }}...</em>
+            </div>
+        {% endset %}
+        {{ layout.content_block('non-auto-edits', content) }}
     </div>
 </div>
 {% endblock %}

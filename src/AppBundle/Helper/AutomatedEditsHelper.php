@@ -2,12 +2,14 @@
 
 namespace AppBundle\Helper;
 
+use DateTime;
 use Doctrine\DBAL\Connection;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\VarDumper\VarDumper;
+use Xtools\ProjectRepository;
 
 class AutomatedEditsHelper extends HelperBase
 {
@@ -94,5 +96,87 @@ class AutomatedEditsHelper extends HelperBase
         }
         $this->tools = $this->container->getParameter("automated_tools");
         return $this->tools;
+    }
+
+    /**
+     * Get a list of nonautomated edits by a user
+     * @param  string         $project   Project domain such as en.wikipedia.org
+     * @param  string         $username
+     * @param  string|integer $namespace Numerical value or 'all' for all namespaces
+     * @param  integer        $offset    Used for pagination, offset results by N edits
+     * @return string[]       Data as returned by database query, includes:
+     *                        'page_title' (string, including namespace),
+     *                        'namespace' (integer), 'rev_id' (int),
+     *                        'timestamp' (DateTime), 'minor_edit' (bool)
+     *                        'sumamry' (string)
+     */
+    public function getNonautomatedEdits($project, $username, $namespace, $offset = 0)
+    {
+        $project = ProjectRepository::getProject($project, $this->container);
+        $namespaces = $project->getNamespaces();
+
+        $conn = $this->container->get('doctrine')->getManager('replicas')->getConnection();
+
+        $lh = $this->container->get('app.labs_helper');
+        $revTable = $lh->getTable('revision', $project->getDatabaseName());
+        $pageTable = $lh->getTable('page', $project->getDatabaseName());
+
+        $AEBTypes = $this->container->getParameter('automated_tools');
+        $allAETools = $conn->quote(implode('|', $AEBTypes), \PDO::PARAM_STR);
+
+        $namespaceClause = $namespace === 'all' ? '' : "AND rev_namespace = $namespace";
+
+        // First get the non-automated contribs
+        $query = "SELECT page_title, page_namespace, rev_id, rev_len, rev_parent_id,
+                         rev_timestamp, rev_minor_edit, rev_comment
+                  FROM $pageTable JOIN $revTable ON page_id = rev_page
+                  WHERE rev_user_text = :username
+                  AND rev_timestamp > 0
+                  AND rev_comment NOT RLIKE $allAETools
+                  ORDER BY rev_id DESC
+                  LIMIT 50
+                  OFFSET $offset";
+        $editData = $conn->executeQuery($query, ['username' => $username])->fetchAll();
+
+        // Get diff sizes, based on length of each parent revision
+        $parentRevIds = array_map(function ($edit) {
+            return $edit['rev_parent_id'];
+        }, $editData);
+        $query = "SELECT rev_len, rev_id
+                  FROM revision
+                  WHERE rev_id IN (" . implode(',', $parentRevIds) . ")";
+        $diffSizeData = $conn->executeQuery($query)->fetchAll();
+
+        // reformat with rev_id as the key, rev_len as the value
+        $diffSizes = [];
+        foreach ($diffSizeData as $diff) {
+            $diffSizes[$diff['rev_id']] = $diff['rev_len'];
+        }
+
+        // Build our array of nonautomated edits
+        $editData = array_map(function ($edit) use ($namespaces, $diffSizes) {
+            $pageTitle = $edit['page_title'];
+
+            if ($edit['page_namespace'] !== '0') {
+                $pageTitle = $namespaces[$edit['page_namespace']] . ":$pageTitle";
+            }
+
+            $diffSize = $edit['rev_len'];
+            if ($edit['rev_parent_id'] > 0) {
+                $diffSize = $edit['rev_len'] - $diffSizes[$edit['rev_parent_id']];
+            }
+
+            return [
+                'page_title' => $pageTitle,
+                'namespace' => (int) $edit['page_namespace'],
+                'rev_id' => (int) $edit['rev_id'],
+                'timestamp' => DateTime::createFromFormat('YmdHis', $edit['rev_timestamp']),
+                'minor_edit' => (bool) $edit['rev_minor_edit'],
+                'summary' => $edit['rev_comment'],
+                'size' => $diffSize
+            ];
+        }, $editData);
+
+        return $editData;
     }
 }

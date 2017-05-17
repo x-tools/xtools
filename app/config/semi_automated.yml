@@ -41,7 +41,7 @@ parameters:
     Dashes: 'using a \[\[User:GregU\/dashes.js\|script'
     SPI Helper: '^(Archiving case (to|from)|Adding sockpuppetry (tag|block notice) per) \[\[Wikipedia:Sockpuppet investigations'
     User:Doug/closetfd.js: '\(using \[\[User:Doug\/closetfd.js'
-    Cat-a-lot: '^\[\[Help:Cat-a-lot\|Cat-a-lot\]\]:'
+    Cat-a-lot: '\[\[Help:Cat-a-lot\|Cat-a-lot\]\]'
     autoFormatter: 'using (\[\[:meta:User:TMg\/autoFormatter|autoFormatter)'
     Citation bot: '\[\[WP:UCB\|Assisted by Citation bot'
     Red Link Recovery Live: '\[\[w:en:WP:RLR\|You can help!'
