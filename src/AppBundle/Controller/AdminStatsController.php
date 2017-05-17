@@ -185,7 +185,7 @@ class AdminStatsController extends Controller
         // Load up the tables we need and run the mega query.
         // This query provides all of the statistics
         $userTable = $lh->getTable("user", $dbName);
-        $loggingTable = $lh->getTable("logging", $dbName);
+        $loggingTable = $lh->getTable("logging", $dbName, "userindex");
 
         $startDb = date('Ymd000000', strtotime($start));
         $endDb = date('Ymd000000', strtotime($end));
