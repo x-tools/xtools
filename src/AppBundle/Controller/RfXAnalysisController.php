@@ -7,7 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class rfxAnalysisController extends Controller
+class RfXAnalysisController extends Controller
 {
     /**
      * @Route("/rfa",                  name="rfxAnalysis")
@@ -26,8 +26,7 @@ class rfxAnalysisController extends Controller
         $typeQuery = $request->get("type");
         $username = $request->get("username");
 
-        if ($projectQuery != "" && $typeQuery != "" && $username != "")
-        {
+        if ($projectQuery != "" && $typeQuery != "" && $username != "") {
             return $this->redirectToRoute(
                 "rfxAnalysisResult",
                 [
@@ -37,8 +36,7 @@ class rfxAnalysisController extends Controller
                 ]
             );
         }
-        else if ($projectQuery != "" && $typeQuery != "")
-        {
+        else if ($projectQuery != "" && $typeQuery != "") {
             return $this->redirectToRoute(
                 "rfxAnalysisProjectType",
                 [
@@ -48,11 +46,13 @@ class rfxAnalysisController extends Controller
             );
         }
         // replace this example code with whatever you need
-        return $this->render('rfxAnalysis/index.html.twig', [
+        return $this->render(
+            'rfxAnalysis/index.html.twig', [
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
             "xtPageTitle" => "rfa",
             'xtPage' => "rfa",
-        ]);
+            ]
+        );
     }
 
     /**
@@ -63,11 +63,13 @@ class rfxAnalysisController extends Controller
 
 
         // replace this example code with whatever you need
-        return $this->render('default/about.html.twig', array(
+        return $this->render(
+            'default/about.html.twig', array(
             "xtTitle" => "About",
             "xtPageTitle" => "about",
             'xtPage' => "index",
-        ));
+            )
+        );
     }
 
     /**
@@ -89,11 +91,13 @@ class rfxAnalysisController extends Controller
         }
 
         // replace this example code with whatever you need
-        return $this->render('default/config.html.twig', [
+        return $this->render(
+            'default/config.html.twig', [
             "xtTitle" => "Config",
             "xtPageTitle" => "Config",
             'xtPage' => "index",
             'dump' => print_r($params, true),
-        ]);
+            ]
+        );
     }
 }

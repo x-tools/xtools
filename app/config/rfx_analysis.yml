@@ -1,0 +1,13 @@
+parameters:
+  rfa:
+    enwiki:
+      rfa: "Wikipedia:Requests for Adminship"
+      rfb: "Wikipedia:Requests for bureaucratship"
+    dewiki:
+      rfa:
+      rfb:
+      os:
+      cu:
+    commonswiki:
+      rfa:
+      rfb:
