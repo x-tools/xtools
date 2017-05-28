@@ -182,8 +182,7 @@ class LabsHelper
         // This is a workaround for a one-to-many mapping
         // as required by Labs.  We combine $table with
         // $table_extension in order to generate the new table name
-        if ($this->isLabs() && $table_extension !== null)
-        {
+        if ($this->isLabs() && $table_extension !== null) {
             $table = $table . "_" . $table_extension;
         }
 

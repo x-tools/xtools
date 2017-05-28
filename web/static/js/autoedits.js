@@ -1,4 +1,4 @@
-$(function() {
+$(function () {
     var newData;
 
     $('.tools-table').on('click', '.tools-toggle', function () {

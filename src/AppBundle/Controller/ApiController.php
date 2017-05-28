@@ -44,7 +44,7 @@ class ApiController extends FOSRestController
     /**
      * @Rest\Get("/api/nonautomated_edits/{project}/{username}/{namespace}/{offset}")
      */
-    public function nonautomated_edits($project, $username, $namespace, $offset = 0)
+    public function nonautomatedEdits($project, $username, $namespace, $offset = 0)
     {
         $twig = $this->container->get('twig');
         $aeh = $this->get("app.automated_edits_helper");
