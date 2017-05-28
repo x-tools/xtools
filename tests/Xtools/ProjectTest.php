@@ -24,6 +24,7 @@ class ProjectTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('https://test.example.org/', $project->getUrl());
         $this->assertEquals('/w/index.php', $project->getScriptPath());
         $this->assertEquals('/wiki/', $project->getArticlePath());
+        $this->assertTrue($project->exists());
     }
 
     /**
@@ -55,5 +56,20 @@ class ProjectTest extends PHPUnit_Framework_TestCase
         $project->setRepository($projectRepo);
         $this->assertEquals('example_wiki', $project->getDatabaseName());
         $this->assertEquals('https://example.org/a-wiki/', $project->getUrl());
+    }
+
+    /**
+     * A project is considered to exist if it has at least a domain name.
+     */
+    public function testExists()
+    {
+        $projectRepo = $this->getMock(ProjectRepository::class);
+        $projectRepo->expects($this->once())
+            ->method('getOne')
+            ->willReturn([]);
+
+        $project = new Project('testWiki');
+        $project->setRepository($projectRepo);
+        $this->assertFalse($project->exists());
     }
 }

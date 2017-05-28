@@ -28,6 +28,15 @@ class Project extends Model
     }
 
     /**
+     * Does this project exist?
+     * @return bool
+     */
+    public function exists()
+    {
+        return !empty($this->getDomain());
+    }
+
+    /**
      * The unique domain name of this project, without protocol or path components.
      * This should be used as the canonical project identifier.
      *
@@ -35,7 +44,8 @@ class Project extends Model
      */
     public function getDomain()
     {
-        return parse_url($this->getMetadata()['url'], PHP_URL_HOST);
+        $url = isset($this->getMetadata()['url']) ? $this->getMetadata()['url'] : '';
+        return parse_url($url, PHP_URL_HOST);
     }
 
     /**
@@ -45,7 +55,7 @@ class Project extends Model
      */
     public function getDatabaseName()
     {
-        return $this->getMetadata()['dbname'];
+        return isset($this->getMetadata()['dbname']) ? $this->getMetadata()['dbname'] : '';
     }
 
     /**
