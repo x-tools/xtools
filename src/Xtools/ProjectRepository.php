@@ -37,6 +37,17 @@ class ProjectRepository extends Repository
     }
 
     /**
+     * Get the XTools default project.
+     * @param Container $container
+     * @return Project
+     */
+    public static function getDefaultProject(Container $container)
+    {
+        $defaultProjectName = $container->getParameter('default_project');
+        return self::getProject($defaultProjectName, $container);
+    }
+
+    /**
      * For single-wiki installations, you must manually set the wiki URL and database name
      * (because there's no meta.wiki database to query).
      * @param $metadata

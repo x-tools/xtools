@@ -9,19 +9,19 @@
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 Back
             </a>
-            {{ user_link(username, url) }}
-            <small> &bull; {{ project }} </small>
+            {{ user_link(user.username, project.url) }}
+            <small> &bull; {{ project.title }} </small>
         </div>
     </header>
 
     <div class="panel-body xt-panel-body-top">
         <p class="text-center xt-heading-subtitle">&middot;
-            {{ user_log_link(username, project) }} &middot;
+            {{ user_log_link(user.username, project.domain) }} &middot;
             {% if is_labs %}
-                <a href="https://tools.wmflabs.org/guc/?user={{ username }}" >{{ msg('global_contribs') }}</a> &middot;
-                <a href="https://meta.wikimedia.org/w/index.php?title=Special%3ACentralAuth&target={{ username }}" >{{ msg('global-account-manager') }}</a> &middot;
-                <a href="https://tools.wmflabs.org/quentinv57-tools/tools/sulinfo.php?username={{ username }}" >{{ msg('sul-info') }}</a> &middot;
-                <a href="https://tools.wmflabs.org/wikiviewstats/?lang=en&wiki=wikipedia&page=User:{{ username }}*" >{{ msg('pageviews-in-userspace') }}</a> &middot;
+                <a href="https://tools.wmflabs.org/guc/?user={{ user.username }}" >{{ msg('global_contribs') }}</a> &middot;
+                <a href="https://meta.wikimedia.org/w/index.php?title=Special%3ACentralAuth&target={{ user.username }}" >{{ msg('global-account-manager') }}</a> &middot;
+                <a href="https://tools.wmflabs.org/quentinv57-tools/tools/sulinfo.php?username={{ user.username }}" >{{ msg('sul-info') }}</a> &middot;
+                <a href="https://tools.wmflabs.org/wikiviewstats/?lang=en&wiki=wikipedia&page=User:{{ user.username }}*" >{{ msg('pageviews-in-userspace') }}</a> &middot;
             {% endif %}
         </p>
 
@@ -31,8 +31,8 @@
             </div>
             <div class="panel-body" id="generalstats">
                 {{ render(path('EditCounterGeneralStats', {
-                    'username': username,
-                    'project': project
+                    'username': user.username,
+                    'project': project.domain
                 })) }}
             </div>
         </div>
@@ -40,10 +40,7 @@
         <div class="panel panel-default" id="namespacetotals">
             <div class="panel-heading"><h4>{{ msg('namespacetotals') }}</h4></div>
             <div class="panel-body">
-                {{ render(path('EditCounterNamespaceTotals', {
-                    'username': username,
-                    'project': project
-                })) }}
+                {{ include( 'editCounter/namespace_totals.html.twig' ) }}
             </div>
         </div>
 
@@ -51,8 +48,8 @@
             <div class="panel-heading"><h4>{{ msg('yearcounts') }}</h4></div>
             <div class="panel-body">
                 {{ render(path('EditCounterYearCounts', {
-                    'username': username,
-                    'project': project
+                    'username': user.username,
+                    'project': project.domain
                 })) }}
             </div>
         </div>
@@ -61,8 +58,8 @@
             <div class="panel-heading"><h4>{{ msg('timecard') }}</h4></div>
             <div class="panel-body">
                 {{ render(path('EditCounterTimeCard', {
-                    'username': username,
-                    'project': project
+                    'username': user.username,
+                    'project': project.domain
                 })) }}
             </div>
         </div>
@@ -73,8 +70,8 @@
             </div>
             <div class="panel-body">
                 {{ render(path('EditCounterLatestGlobal', {
-                    'username': username,
-                    'project': project
+                    'username': user.username,
+                    'project': project.domain
                 })) }}
             </div>
         </div>
@@ -83,8 +80,8 @@
             <div class="panel-heading"><h4>{{ msg('monthcounts') }}</h4></div>
             <div class="panel-body">
                 {{ render(path('EditCounterMonthCounts', {
-                    'username': username,
-                    'project': project
+                    'username': user.username,
+                    'project': project.domain
                 })) }}
             </div>
         </div>

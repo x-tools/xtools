@@ -90,8 +90,7 @@ class UserRepository extends Repository
     {
         // Get the default project if not provided.
         if (!$project instanceof Project) {
-            $defaultProject = $this->container->getParameter('default_project');
-            $project = ProjectRepository::getProject($defaultProject, $this->container);
+            $project = ProjectRepository::getDefaultProject($this->container);
         }
 
         // Create the API query.

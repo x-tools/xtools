@@ -393,4 +393,14 @@ class EditCounter extends Model
         // Truncate, and return.
         return array_slice($editCounts, 0, $numProjects);
     }
+
+    /**
+     * Get the given user's total edit counts per namespace.
+     */
+    public function namespaceTotals()
+    {
+        $counts = $this->getRepository()->getNamespaceTotals($this->project, $this->user);
+        arsort($counts);
+        return $counts;
+    }
 }

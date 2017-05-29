@@ -323,18 +323,21 @@ class EditCounterRepository extends Repository
     }
 
     /**
-     * Get the given user's total edit counts per namespace.
-     * @param string $username The username of the user.
+     * Get the given user's total edit counts per namespace on the given project.
+     * @param Project $project The project.
+     * @param User $user The user.
      * @return integer[] Array keys are namespace IDs, values are the edit counts.
      */
-    public function getNamespaceTotals($username)
+    public function getNamespaceTotals(Project $project, User $user)
     {
-        $userId = $this->getUserId($username);
-        $sql = "SELECT page_namespace, count(rev_id) AS total
-            FROM " . $this->labsHelper->getTable('revision') . " r
-                JOIN " . $this->labsHelper->getTable('page') . " p on r.rev_page = p.page_id
-            WHERE r.rev_user = :id GROUP BY page_namespace";
-        $resultQuery = $this->replicas->prepare($sql);
+        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+        $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
+        $sql = "SELECT page_namespace, COUNT(rev_id) AS total
+            FROM $revisionTable r JOIN $pageTable p on r.rev_page = p.page_id
+            WHERE r.rev_user = :id
+            GROUP BY page_namespace";
+        $resultQuery = $this->getProjectsConnection()->prepare($sql);
+        $userId = $user->getId($project);
         $resultQuery->bindParam(":id", $userId);
         $resultQuery->execute();
         $results = $resultQuery->fetchAll();
@@ -343,7 +346,6 @@ class EditCounterRepository extends Repository
         }, $results), array_map(function ($e) {
             return $e['total'];
         }, $results));
-
         return $namespaceTotals;
     }
 

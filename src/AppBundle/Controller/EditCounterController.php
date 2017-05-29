@@ -8,6 +8,7 @@ use AppBundle\Helper\LabsHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\VarDumper\VarDumper;
 use Xtools\EditCounter;
 use Xtools\EditCounterRepository;
 use Xtools\Project;
@@ -18,23 +19,36 @@ use Xtools\UserRepository;
 class EditCounterController extends Controller
 {
 
-    /** @var ApiHelper */
-    protected $apiHelper;
-
-    /** @var LabsHelper */
-    protected $labsHelper;
+    /** @var User */
+    protected $user;
+    
+    /** @var Project */
+    protected $project;
+    
+    /** @var EditCounter */
+    protected $editCounter;
 
     /**
-     * Every action in this controller calls this first.
+     * Every action in this controller (other than 'index') calls this first.
      * @param string|boolean $project
      */
-    public function init($project = false, $username = false)
+    protected function setUpEditCounter($project = false, $username = false)
     {
-        $this->labsHelper = $this->get('app.labs_helper');
-        $this->apiHelper = $this->get('app.api_helper');
-        $this->labsHelper->checkEnabled("ec");
-        if ($project) {
-            $this->labsHelper->databasePrepare($project);
+        // Make sure EditCounter is enabled.
+        $this->get('app.labs_helper')->checkEnabled("ec");
+
+        $this->project = ProjectRepository::getProject($project, $this->container);
+        $this->user = UserRepository::getUser($username, $this->container);
+
+        // Get an edit-counter.
+        $editCounterRepo = new EditCounterRepository();
+        $editCounterRepo->setContainer($this->container);
+        $this->editCounter = new EditCounter($this->project, $this->user);
+        $this->editCounter->setRepository($editCounterRepo);
+
+        // Don't continue if the user doesn't exist.
+        if (!$this->user->existsOnProject($this->project)) {
+            $this->container->getSession()->getFlashBag()->set('notice', 'user-not-found');
         }
     }
 
@@ -57,7 +71,10 @@ class EditCounterController extends Controller
             return $this->redirectToRoute("EditCounterProject", [ 'project'=>$queryProject ]);
         }
 
-        $this->init($project);
+        $project = ProjectRepository::getProject($queryProject, $this->container);
+        if (!$project->exists()) {
+            $project = ProjectRepository::getDefaultProject($this->container);
+        }
 
         // Otherwise fall through.
         return $this->render('editCounter/index.html.twig', [
@@ -73,14 +90,7 @@ class EditCounterController extends Controller
      */
     public function resultAction(Request $request, $project, $username)
     {
-        $project = ProjectRepository::getProject($project, $this->container);
-        $user = UserRepository::getUser($username, $this->container());
-
-        // Don't continue if the user doesn't exist.
-        if ($user->existsOnProject($project)) {
-            $request->getSession()->getFlashBag()->set('notice', 'user-not-found');
-            return $this->redirectToRoute('ec');
-        }
+        $this->setUpEditCounter($project, $username);
 
         //$automatedEditsSummary = $automatedEditsHelper->getEditsSummary($user->getId());
 
@@ -89,9 +99,10 @@ class EditCounterController extends Controller
             'xtTitle' => $username,
             'xtPage' => 'ec',
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
-            'is_labs' => $this->labsHelper->isLabs(),
-            'user' => $user,
-            'project' => $project,
+            'is_labs' => $this->project->getRepository()->isLabs(),
+            'user' => $this->user,
+            'project' => $this->project,
+            'ec' => $this->editCounter,
 
             // Automated edits.
             //'auto_edits' => $automatedEditsSummary,
@@ -103,15 +114,7 @@ class EditCounterController extends Controller
      */
     public function generalStatsAction($project, $username)
     {
-        // Set up project and user.
-        $project = ProjectRepository::getProject($project, $this->container);
-        $user = UserRepository::getUser($username, $this->container);
-
-        // Get an edit-counter.
-        $editCounterRepo = new EditCounterRepository();
-        $editCounterRepo->setContainer($this->container);
-        $editCounter = new EditCounter($project, $user);
-        $editCounter->setRepository($editCounterRepo);
+        $this->setUpEditCounter($project, $username);
 
 //        $revisionCounts = $this->editCounterHelper->getRevisionCounts($user->getId($project));
 //        $pageCounts = $this->editCounterHelper->getPageCounts($username, $revisionCounts['total']);
@@ -125,10 +128,10 @@ class EditCounterController extends Controller
         return $this->render('editCounter/general_stats.html.twig', [
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
-            'is_labs' => $editCounterRepo->isLabs(),
-            'project' => $project,
-            'user' => $user,
-            'ec' => $editCounter,
+            'is_labs' => $this->project->getRepository()->isLabs(),
+            'user' => $this->user,
+            'project' => $this->project,
+            'ec' => $this->editCounter,
 
             // Revision counts.
 //            'deleted_edits' => $revisionCounts['deleted'],
@@ -182,17 +185,16 @@ class EditCounterController extends Controller
      */
     public function namespaceTotalsAction($project, $username)
     {
-        $this->init($project);
-        $username = ucfirst($username);
+        $this->setUpEditCounter($project, $username);
         $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
-
         return $this->render('editCounter/namespace_totals.html.twig', [
-            'xtTitle' => 'tool_ec',
+            'xtTitle' => 'namespacetotals',
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
-            'namespaces' => $this->apiHelper->namespaces($project),
-            'namespace_totals' => $namespaceTotals,
-            'namespace_total' => array_sum($namespaceTotals),
+            'is_labs' => $this->project->getRepository()->isLabs(),
+            'user' => $this->user,
+            'project' => $this->project,
+            'ec' => $this->editCounter,
         ]);
     }
 
@@ -201,13 +203,13 @@ class EditCounterController extends Controller
      */
     public function timecardAction($project, $username)
     {
-        $this->init($project);
+        $this->setUpEditCounter($project);
         $this->labsHelper->databasePrepare($project);
         $username = ucfirst($username);
         $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
         $datasets = $this->editCounterHelper->getTimeCard($username);
         return $this->render('editCounter/timecard.html.twig', [
-            'xtTitle' => 'tool_ec',
+            'xtTitle' => 'tool-ec',
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
             'datasets' => $datasets,
@@ -219,7 +221,7 @@ class EditCounterController extends Controller
      */
     public function yearcountsAction($project, $username)
     {
-        $this->init($project);
+        $this->setUpEditCounter($project);
         $this->labsHelper->databasePrepare($project);
         $username = ucfirst($username);
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
@@ -238,7 +240,7 @@ class EditCounterController extends Controller
      */
     public function monthcountsAction($project, $username)
     {
-        $this->init($project);
+        $this->setUpEditCounter($project);
         $this->labsHelper->databasePrepare($project);
         $username = ucfirst($username);
         $monthlyTotalsByNamespace = $this->editCounterHelper->getMonthCounts($username);
@@ -257,7 +259,7 @@ class EditCounterController extends Controller
      */
     public function latestglobalAction($project, $username)
     {
-        $this->init($project);
+        $this->setUpEditCounter($project);
         $info = $this->labsHelper->databasePrepare($project);
         $username = ucfirst($username);
 

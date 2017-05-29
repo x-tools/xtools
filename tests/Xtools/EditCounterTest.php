@@ -104,4 +104,25 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, $editCounter->countPagesCreatedDeleted());
         $this->assertEquals(8, $editCounter->countPagesCreated());
     }
+
+    public function testNamespaceTotals()
+    {
+        $namespaceTotals = [
+            // Namespace IDs => Edit counts
+            '1' => '3',
+            '2' => '6',
+            '3' => '9',
+            '4' => '12',
+        ];
+        $editCounterRepo = $this->getMock(EditCounterRepository::class);
+        $editCounterRepo->expects($this->once())
+            ->method('getNamespaceTotals')
+            ->willReturn($namespaceTotals);
+        $project = new Project('TestProject');
+        $user = new User('Testuser1');
+        $editCounter = new EditCounter($project, $user);
+        $editCounter->setRepository($editCounterRepo);
+
+        $this->assertEquals($namespaceTotals, $editCounter->namespaceTotals());
+    }
 }
