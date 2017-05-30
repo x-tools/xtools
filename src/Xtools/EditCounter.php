@@ -434,4 +434,41 @@ class EditCounter extends Model
 
         return $out;
     }
+
+    /**
+     * 
+     */
+    public function monthCounts()
+    {
+        $totals = $this->getRepository()->getMonthCounts($this->project, $this->user);
+        $out = [
+            'years' => [],
+            'namespaces' => [],
+            'totals' => [],
+        ];
+        $out['max_year'] = 0;
+        $out['min_year'] = date('Y');
+        foreach ($totals as $total) {
+            // Collect all applicable years and namespaces.
+            $out['max_year'] = max($out['max_year'], $total['year']);
+            $out['min_year'] = min($out['min_year'], $total['year']);
+            // Collate the counts by namespace, and then year and month.
+            $ns = $total['page_namespace'];
+            if (!isset($out['totals'][$ns])) {
+                $out['totals'][$ns] = [];
+            }
+            $out['totals'][$ns][$total['year'] . $total['month']] = $total['count'];
+        }
+        // Fill in the blanks (where no edits were made in a given month for a namespace).
+        for ($y = $out['min_year']; $y <= $out['max_year']; $y++) {
+            for ($m = 1; $m <= 12; $m++) {
+                foreach ($out['totals'] as $nsId => &$total) {
+                    if (!isset($total[$y . $m])) {
+                        $total[$y . $m] = 0;
+                    }
+                }
+            }
+        }
+        return $out;
+    }
 }

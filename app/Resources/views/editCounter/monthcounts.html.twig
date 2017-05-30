@@ -8,7 +8,7 @@
         type: 'bar',
         data: {
             labels: [
-                {%- for year in month_counts.min_year .. month_counts.max_year -%}
+                {%- for year in ec.monthCounts.min_year .. ec.monthCounts.max_year -%}
                     {%- for month in 1..12 -%}
                         "{{ year }}/{{ '%02d'|format(month) }}"
                         {%- if not loop.last %},{% endif %}
@@ -17,12 +17,12 @@
                 {%- endfor -%}
             ],
             datasets: [
-                {% for ns_id,dataset in month_counts.totals %}
+                {% for ns_id,dataset in ec.monthCounts.totals %}
                 {
-                    label: "{{ attribute(namespaces, ns_id) }}",
+                    label: "{{ attribute(project.namespaces, ns_id) }}",
                     backgroundColor: "{{ color(ns_id) }}",
                     data: [
-                        {% for year in month_counts.min_year .. month_counts.max_year %}
+                        {% for year in ec.monthCounts.min_year .. ec.monthCounts.max_year %}
                             {%- for month in 1..12 -%}
                                 {{- attribute(dataset, year~month) -}}
                                 {%- if not loop.last %},{% endif %}

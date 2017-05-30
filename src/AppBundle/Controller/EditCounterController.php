@@ -229,7 +229,7 @@ class EditCounterController extends Controller
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         //$yearcounts = $this->editCounterHelper->getYearCounts($username);
         return $this->render('editCounter/yearcounts.html.twig', [
-            'xtTitle' => 'tool_ec',
+            'xtTitle' => 'tool-ec',
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
             //'namespaces' => $this->apiHelper->namespaces($project),
@@ -247,14 +247,11 @@ class EditCounterController extends Controller
     public function monthcountsAction($project, $username)
     {
         $this->setUpEditCounter($project, $username);
-        $monthlyTotalsByNamespace = $this->editCounterHelper->getMonthCounts($username);
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/monthcounts.html.twig', [
-            'xtTitle' => 'tool_ec',
+            'xtTitle' => 'tool-ec',
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
-            'month_counts' => $monthlyTotalsByNamespace,
-            'namespaces' => $this->apiHelper->namespaces($project),
             'is_labs' => $this->project->getRepository()->isLabs(),
             'user' => $this->user,
             'project' => $this->project,

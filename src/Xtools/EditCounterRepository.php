@@ -405,56 +405,35 @@ class EditCounterRepository extends Repository
      * @param string $username The username.
      * @return string[]
      */
-    public function getMonthCounts($username)
+    public function getMonthCounts(Project $project, User $user)
     {
+        $username = $user->getUsername();
         $cacheKey = "monthcounts.$username";
-        if ($this->cacheHas($cacheKey)) {
-            return $this->cacheGet($cacheKey);
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
         }
 
+        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+        $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
         $sql =
             "SELECT " . "     YEAR(rev_timestamp) AS `year`," .
             "     MONTH(rev_timestamp) AS `month`," . "     page_namespace," .
-            "     COUNT(rev_id) AS `count` " . " FROM " . $this->labsHelper->getTable('revision') .
-            "    JOIN " . $this->labsHelper->getTable('page') . " ON (rev_page = page_id)" .
+            "     COUNT(rev_id) AS `count` " 
+            . " FROM $revisionTable    JOIN $pageTable ON (rev_page = page_id)" .
             " WHERE rev_user_text = :username" .
             " GROUP BY YEAR(rev_timestamp), MONTH(rev_timestamp), page_namespace " .
             " ORDER BY rev_timestamp DESC";
-        $resultQuery = $this->replicas->prepare($sql);
+        $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $resultQuery->bindParam(":username", $username);
         $resultQuery->execute();
         $totals = $resultQuery->fetchAll();
-        $out = [
-            'years' => [],
-            'namespaces' => [],
-            'totals' => [],
-        ];
-        $out['max_year'] = 0;
-        $out['min_year'] = date('Y');
-        foreach ($totals as $total) {
-            // Collect all applicable years and namespaces.
-            $out['max_year'] = max($out['max_year'], $total['year']);
-            $out['min_year'] = min($out['min_year'], $total['year']);
-            // Collate the counts by namespace, and then year and month.
-            $ns = $total['page_namespace'];
-            if (!isset($out['totals'][$ns])) {
-                $out['totals'][$ns] = [];
-            }
-            $out['totals'][$ns][$total['year'] . $total['month']] = $total['count'];
-        }
-        // Fill in the blanks (where no edits were made in a given month for a namespace).
-        for ($y = $out['min_year']; $y <= $out['max_year']; $y++) {
-            for ($m = 1; $m <= 12; $m++) {
-                foreach ($out['totals'] as $nsId => &$total) {
-                    if (!isset($total[$y . $m])) {
-                        $total[$y . $m] = 0;
-                    }
-                }
-            }
-        }
-        $this->cacheSave($cacheKey, $out, 'PT10M');
+        
+        $cacheItem = $this->cache->getItem($cacheKey);
+        $cacheItem->expiresAfter(new DateInterval('PT10M'));
+        $cacheItem->set($totals);
+        $this->cache->save($cacheItem);
 
-        return $out;
+        return $totals;
     }
 
     /**
