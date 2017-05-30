@@ -2,6 +2,7 @@
 
 namespace Xtools;
 
+use DateInterval;
 use Mediawiki\Api\SimpleRequest;
 
 class EditCounterRepository extends Repository
@@ -64,7 +65,7 @@ class EditCounterRepository extends Repository
         $this->stopwatch->stop($cacheKey);
         $cacheItem = $this->cache->getItem($cacheKey)
                 ->set($revisionCounts)
-                ->expiresAfter(new \DateInterval('PT10M'));
+                ->expiresAfter(new DateInterval('PT10M'));
         $this->cache->save($cacheItem);
 
         return $revisionCounts;
@@ -102,7 +103,7 @@ class EditCounterRepository extends Repository
         // Cache for 10 minutes, and return.
         $cacheItem = $this->cache->getItem($cacheKey)
                 ->set($revisionDates)
-                ->expiresAfter(new \DateInterval('PT10M'));
+                ->expiresAfter(new DateInterval('PT10M'));
         $this->cache->save($cacheItem);
         $this->stopwatch->stop($cacheKey);
         return $revisionDates;
@@ -160,7 +161,7 @@ class EditCounterRepository extends Repository
         // Cache for 10 minutes, and return.
         $cacheItem = $this->cache->getItem($cacheKey)
             ->set($pageCounts)
-            ->expiresAfter(new \DateInterval('PT10M'));
+            ->expiresAfter(new DateInterval('PT10M'));
         $this->cache->save($cacheItem);
         $this->stopwatch->stop($cacheKey);
         return $pageCounts;
@@ -237,7 +238,7 @@ class EditCounterRepository extends Repository
         // Cache for 10 minutes, and return.
         $cacheItem = $this->cache->getItem($cacheKey)
             ->set($logCounts)
-            ->expiresAfter(new \DateInterval('PT10M'));
+            ->expiresAfter(new DateInterval('PT10M'));
         $this->cache->save($cacheItem);
         $this->stopwatch->stop($cacheKey);
 
@@ -286,7 +287,7 @@ class EditCounterRepository extends Repository
         // Cache for 10 minutes, and return.
         $cacheItem = $this->cache->getItem($cacheKey)
             ->set($out)
-            ->expiresAfter(new \DateInterval('PT10M'));
+            ->expiresAfter(new DateInterval('PT10M'));
         $this->cache->save($cacheItem);
         $this->stopwatch->stop($cacheKey);
 
@@ -461,41 +462,35 @@ class EditCounterRepository extends Repository
      * @param string $username
      * @return string[] ['<namespace>' => ['<year>' => 'total', ... ], ... ]
      */
-    public function getYearCounts($username)
+    public function getYearCounts(Project $project, User $user)
     {
+        $username = $user->getUsername();
         $cacheKey = "yearcounts.$username";
-        if ($this->cacheHas($cacheKey)) {
-            return $this->cacheGet($cacheKey);
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
         }
 
-        $sql =
-            "SELECT " . "     SUBSTR(CAST(rev_timestamp AS CHAR(4)), 1, 4) AS `year`," .
-            "     page_namespace," . "     COUNT(rev_id) AS `count` " . " FROM " .
-            $this->labsHelper->getTable('revision') . "    JOIN " .
-            $this->labsHelper->getTable('page') . " ON (rev_page = page_id)" .
-            " WHERE rev_user_text = :username" .
-            " GROUP BY SUBSTR(CAST(rev_timestamp AS CHAR(4)), 1, 4), page_namespace " .
-            " ORDER BY rev_timestamp DESC ";
-        $resultQuery = $this->replicas->prepare($sql);
+        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+        $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
+        $sql = "SELECT "
+            . "     SUBSTR(CAST(rev_timestamp AS CHAR(4)), 1, 4) AS `year`,"
+            . "     page_namespace,"
+            . "     COUNT(rev_id) AS `count` "
+            . " FROM $revisionTable    JOIN $pageTable ON (rev_page = page_id)"
+            . " WHERE rev_user_text = :username"
+            . " GROUP BY SUBSTR(CAST(rev_timestamp AS CHAR(4)), 1, 4), page_namespace "
+            . " ORDER BY rev_timestamp DESC ";
+        $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $resultQuery->bindParam(":username", $username);
         $resultQuery->execute();
         $totals = $resultQuery->fetchAll();
-        $out = [
-            'years' => [],
-            'namespaces' => [],
-            'totals' => [],
-        ];
-        foreach ($totals as $total) {
-            $out['years'][$total['year']] = $total['year'];
-            $out['namespaces'][$total['page_namespace']] = $total['page_namespace'];
-            if (!isset($out['totals'][$total['page_namespace']])) {
-                $out['totals'][$total['page_namespace']] = [];
-            }
-            $out['totals'][$total['page_namespace']][$total['year']] = $total['count'];
-        }
-        $this->cacheSave($cacheKey, $out, 'PT10M');
 
-        return $out;
+        $cacheItem = $this->cache->getItem($cacheKey);
+        $cacheItem->set($totals);
+        $cacheItem->expiresAfter(new DateInterval('P10M'));
+        $this->cache->save($cacheItem);
+
+        return $totals;
     }
 
     /**
@@ -536,7 +531,7 @@ class EditCounterRepository extends Repository
             $total['r'] = round($total['r'] / $max * 100);
         }
         $cacheItem = $this->cache->getItem($cacheKey);
-        $cacheItem->expiresAfter(new \DateInterval('PT10M'));
+        $cacheItem->expiresAfter(new DateInterval('PT10M'));
         $cacheItem->set($totals);
         $this->cache->save($cacheItem);
 

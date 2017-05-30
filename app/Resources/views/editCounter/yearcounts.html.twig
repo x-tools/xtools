@@ -7,13 +7,13 @@
     new Chart($("#yearcounts-canvas"), {
         type: 'horizontalBar',
         data: {
-            labels: [{% for y in yearcounts.years %}"{{ y }}"{% if not loop.last %},{% endif %}{% endfor %}],
+            labels: [{% for y in ec.yearcounts.years %}"{{ y }}"{% if not loop.last %},{% endif %}{% endfor %}],
             datasets: [
-                {% for ns_id,yeartotals in yearcounts.totals %}
+                {% for ns_id,yeartotals in ec.yearcounts.totals %}
                 {
-                    label: "{{ attribute(namespaces, ns_id) }}",
+                    label: "{{ attribute(project.namespaces, ns_id) }}",
                     data: [
-                        {% for y in yearcounts.years %}
+                        {% for y in ec.yearcounts.years %}
                         {% if attribute(yeartotals, y) is defined %}{{ attribute(yeartotals, y) }}{% else %}0{% endif %}{% if not loop.last %},{% endif %}
                         {% endfor %}
                     ],

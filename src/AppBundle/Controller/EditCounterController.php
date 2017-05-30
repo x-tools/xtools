@@ -95,11 +95,13 @@ class EditCounterController extends Controller
         //$automatedEditsSummary = $automatedEditsHelper->getEditsSummary($user->getId());
 
         // Give it all to the template.
+        $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/result.html.twig', [
             'xtTitle' => $username,
             'xtPage' => 'ec',
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
             'is_labs' => $this->project->getRepository()->isLabs(),
+            'is_sub_request' => $isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
@@ -223,15 +225,15 @@ class EditCounterController extends Controller
      */
     public function yearcountsAction($project, $username)
     {
-        $this->setUpEditCounter($project);
+        $this->setUpEditCounter($project, $username);
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
-        $yearcounts = $this->editCounterHelper->getYearCounts($username);
+        //$yearcounts = $this->editCounterHelper->getYearCounts($username);
         return $this->render('editCounter/yearcounts.html.twig', [
             'xtTitle' => 'tool_ec',
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
-            'namespaces' => $this->apiHelper->namespaces($project),
-            'yearcounts' => $yearcounts,
+            //'namespaces' => $this->apiHelper->namespaces($project),
+            //'yearcounts' => $yearcounts,
             'is_labs' => $this->project->getRepository()->isLabs(),
             'user' => $this->user,
             'project' => $this->project,
@@ -244,7 +246,7 @@ class EditCounterController extends Controller
      */
     public function monthcountsAction($project, $username)
     {
-        $this->setUpEditCounter($project);
+        $this->setUpEditCounter($project, $username);
         $monthlyTotalsByNamespace = $this->editCounterHelper->getMonthCounts($username);
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/monthcounts.html.twig', [
@@ -265,9 +267,7 @@ class EditCounterController extends Controller
      */
     public function latestglobalAction($project, $username)
     {
-        $this->setUpEditCounter($project);
-        $info = $this->labsHelper->databasePrepare($project);
-        $username = ucfirst($username);
+        $this->setUpEditCounter($project, $username);
 
         $topProjectsEditCounts = $this->editCounterHelper->getTopProjectsEditCounts(
             $info['url'],

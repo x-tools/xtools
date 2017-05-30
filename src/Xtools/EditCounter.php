@@ -411,4 +411,27 @@ class EditCounter extends Model
     {
         return $this->getRepository()->getTimeCard($this->project, $this->user);
     }
+
+    /**
+     *
+     */
+    public function yearCounts()
+    {
+        $totals = $this->getRepository()->getYearCounts($this->project, $this->user);
+        $out = [
+            'years' => [],
+            'namespaces' => [],
+            'totals' => [],
+        ];
+        foreach ($totals as $total) {
+            $out['years'][$total['year']] = $total['year'];
+            $out['namespaces'][$total['page_namespace']] = $total['page_namespace'];
+            if (!isset($out['totals'][$total['page_namespace']])) {
+                $out['totals'][$total['page_namespace']] = [];
+            }
+            $out['totals'][$total['page_namespace']][$total['year']] = $total['count'];
+        }
+
+        return $out;
+    }
 }
