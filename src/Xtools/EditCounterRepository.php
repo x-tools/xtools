@@ -500,24 +500,29 @@ class EditCounterRepository extends Repository
 
     /**
      * Get data for the timecard chart, with totals grouped by day and to the nearest two-hours.
-     * @param string $username The user's username.
+     * @param Project $project
+     * @param User $user
      * @return string[]
      */
-    public function getTimeCard($username)
+    public function getTimeCard(Project $project, User $user)
     {
-        $cacheKey = "timecard.$username";
-        if ($this->cacheHas($cacheKey)) {
-            return $this->cacheGet($cacheKey);
+        $username = $user->getUsername();
+        $cacheKey = "timecard.".$username;
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
         }
 
         $hourInterval = 2;
-        $xCalc = "ROUND(HOUR(rev_timestamp)/$hourInterval)*$hourInterval";
-        $sql =
-            "SELECT " . "     DAYOFWEEK(rev_timestamp) AS `y`, " . "     $xCalc AS `x`, " .
-            "     COUNT(rev_id) AS `r` " . " FROM " . $this->labsHelper->getTable('revision') .
-            " WHERE rev_user_text = :username" . " GROUP BY DAYOFWEEK(rev_timestamp), $xCalc " .
-            " ";
-        $resultQuery = $this->replicas->prepare($sql);
+        $xCalc = "ROUND(HOUR(rev_timestamp)/$hourInterval) * $hourInterval";
+        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+        $sql = "SELECT "
+            . "     DAYOFWEEK(rev_timestamp) AS `y`, "
+            . "     $xCalc AS `x`, "
+            . "     COUNT(rev_id) AS `r` "
+            . " FROM $revisionTable"
+            . " WHERE rev_user_text = :username"
+            . " GROUP BY DAYOFWEEK(rev_timestamp), $xCalc ";
+        $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $resultQuery->bindParam(":username", $username);
         $resultQuery->execute();
         $totals = $resultQuery->fetchAll();
@@ -530,7 +535,10 @@ class EditCounterRepository extends Repository
         foreach ($totals as &$total) {
             $total['r'] = round($total['r'] / $max * 100);
         }
-        $this->cacheSave($cacheKey, $totals, 'PT10M');
+        $cacheItem = $this->cache->getItem($cacheKey);
+        $cacheItem->expiresAfter(new \DateInterval('PT10M'));
+        $cacheItem->set($totals);
+        $this->cache->save($cacheItem);
 
         return $totals;
     }

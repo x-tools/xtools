@@ -203,16 +203,18 @@ class EditCounterController extends Controller
      */
     public function timecardAction($project, $username)
     {
-        $this->setUpEditCounter($project);
-        $this->labsHelper->databasePrepare($project);
-        $username = ucfirst($username);
+        $this->setUpEditCounter($project, $username);
         $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
-        $datasets = $this->editCounterHelper->getTimeCard($username);
+        //$datasets = $this->editCounterHelper->getTimeCard($username);
         return $this->render('editCounter/timecard.html.twig', [
             'xtTitle' => 'tool-ec',
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
-            'datasets' => $datasets,
+            //'datasets' => $datasets,
+            'is_labs' => $this->project->getRepository()->isLabs(),
+            'user' => $this->user,
+            'project' => $this->project,
+            'ec' => $this->editCounter,
         ]);
     }
 
@@ -222,8 +224,6 @@ class EditCounterController extends Controller
     public function yearcountsAction($project, $username)
     {
         $this->setUpEditCounter($project);
-        $this->labsHelper->databasePrepare($project);
-        $username = ucfirst($username);
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         $yearcounts = $this->editCounterHelper->getYearCounts($username);
         return $this->render('editCounter/yearcounts.html.twig', [
@@ -232,6 +232,10 @@ class EditCounterController extends Controller
             'is_sub_request' => $isSubRequest,
             'namespaces' => $this->apiHelper->namespaces($project),
             'yearcounts' => $yearcounts,
+            'is_labs' => $this->project->getRepository()->isLabs(),
+            'user' => $this->user,
+            'project' => $this->project,
+            'ec' => $this->editCounter,
         ]);
     }
 
@@ -241,8 +245,6 @@ class EditCounterController extends Controller
     public function monthcountsAction($project, $username)
     {
         $this->setUpEditCounter($project);
-        $this->labsHelper->databasePrepare($project);
-        $username = ucfirst($username);
         $monthlyTotalsByNamespace = $this->editCounterHelper->getMonthCounts($username);
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/monthcounts.html.twig', [
@@ -251,6 +253,10 @@ class EditCounterController extends Controller
             'is_sub_request' => $isSubRequest,
             'month_counts' => $monthlyTotalsByNamespace,
             'namespaces' => $this->apiHelper->namespaces($project),
+            'is_labs' => $this->project->getRepository()->isLabs(),
+            'user' => $this->user,
+            'project' => $this->project,
+            'ec' => $this->editCounter,
         ]);
     }
 

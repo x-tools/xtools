@@ -23,7 +23,7 @@
                 label: "{{ msg('total') }}",
                 backgroundColor: "#060",
                 data: [
-                    {% for d in datasets %}
+                    {% for d in ec.timeCard %}
                     { x: {{ d.x }} - localOffset, y: {{ d.y }}, r: {{ d.r }} }{% if not loop.last %},{% endif %}
                     {% endfor %}
                 ]

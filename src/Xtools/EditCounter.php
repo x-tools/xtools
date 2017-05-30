@@ -403,4 +403,12 @@ class EditCounter extends Model
         arsort($counts);
         return $counts;
     }
+
+    /**
+     * Get a summary of the times of day and the days of the week that the user has edited.
+     */
+    public function timeCard()
+    {
+        return $this->getRepository()->getTimeCard($this->project, $this->user);
+    }
 }
