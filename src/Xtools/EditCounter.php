@@ -436,7 +436,7 @@ class EditCounter extends Model
     }
 
     /**
-     * 
+     *
      */
     public function monthCounts()
     {

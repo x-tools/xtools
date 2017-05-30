@@ -418,7 +418,7 @@ class EditCounterRepository extends Repository
         $sql =
             "SELECT " . "     YEAR(rev_timestamp) AS `year`," .
             "     MONTH(rev_timestamp) AS `month`," . "     page_namespace," .
-            "     COUNT(rev_id) AS `count` " 
+            "     COUNT(rev_id) AS `count` "
             . " FROM $revisionTable    JOIN $pageTable ON (rev_page = page_id)" .
             " WHERE rev_user_text = :username" .
             " GROUP BY YEAR(rev_timestamp), MONTH(rev_timestamp), page_namespace " .
