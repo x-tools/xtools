@@ -58,14 +58,14 @@
                         {{ edit.count|number_format }}
                     </td>
                     <td class="sort-entry--page" data-value="{{ edit.page_title }}">
-                        {{ wiki_link(edit.page_title, project.url, edit.displaytitle) }}
+                        {{ wiki_link(edit.page_title_ns, project.url, edit.displaytitle) }}
                     </td>
                     <td>
-                        {{ wiki_log_link(edit.page_title, project.url) }}
+                        {{ wiki_log_link(edit.page_title_ns, project.url) }}
                         &middot;
-                        <a href="{{ path('ArticleInfoResult', {project:project.domain, article:edit.page_title|url_encode}) }}">{{ msg('tool-articleinfo') }}</a>
+                        <a href="{{ path('ArticleInfoResult', {project:project.domain, article:edit.page_title_ns}) }}">{{ msg('tool-articleinfo') }}</a>
                         &middot;
-                        <a href="{{ path('TopEditsResults', {project:project.domain, username:user.username, namespace:namespace, article:edit.page_title|url_encode}) }}" >{{ msg('tool-topedits') }}</a>
+                        <a href="{{ path('TopEditsResults', {project:project.domain, username:user.username, namespace:edit.page_namespace, article:edit.page_title}) }}" >{{ msg('tool-topedits') }}</a>
                     </td>
                 </tr>
                 {% endfor %}

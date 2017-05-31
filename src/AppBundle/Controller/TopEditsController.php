@@ -74,7 +74,8 @@ class TopEditsController extends Controller
     }
 
     /**
-     * @Route("/topedits/{project}/{username}/{namespace}/{article}", name="TopEditsResults")
+     * @Route("/topedits/{project}/{username}/{namespace}/{article}", name="TopEditsResults",
+     *     requirements={"article"=".+"})
      */
     public function resultAction($project, $username, $namespace = 0, $article = "")
     {
@@ -130,7 +131,7 @@ class TopEditsController extends Controller
         }
 
         // Get page info about these 100 pages, so we can use their display title.
-        $titles = array_map(function ($e) use ( $namespaces ) {
+        $titles = array_map(function ($e) use ($namespaces) {
             // If non-mainspace, prepend namespace to the titles.
             $ns = $e['page_namespace'];
             $nsTitle = $ns > 0 ? $namespaces[$e['page_namespace']] . ':' : '';
@@ -148,7 +149,9 @@ class TopEditsController extends Controller
             $nsTitle = $ns > 0 ? $namespaces[$editDatum['page_namespace']] . ':' : '';
             $pageTitle = $nsTitle . $editDatum['page_title'];
             $editDatum['displaytitle'] = $displayTitles[$pageTitle];
-            $editDatum['page_title'] = $pageTitle;
+            // $editDatum['page_title'] is retained without the namespace
+            //  so we can link to TopEdits for that page
+            $editDatum['page_title_ns'] = $pageTitle;
             $edits[] = $editDatum;
         }
         return $this->render('topedits/result_namespace.html.twig', [
@@ -193,7 +196,7 @@ class TopEditsController extends Controller
                     revs.rev_comment AS comment
                 FROM $revTable AS revs
                     LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-                WHERE revs.rev_user_text in (:username) AND revs.rev_page = :pageid
+                WHERE revs.rev_user_text IN (:username) AND revs.rev_page = :pageid
                 ORDER BY revs.rev_timestamp DESC
             ";
         $params = ['username' => $user->getUsername(), 'pageid' => $page->getId()];

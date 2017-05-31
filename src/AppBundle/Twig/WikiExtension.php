@@ -52,7 +52,7 @@ class WikiExtension extends Extension
             $label = $title;
         }
         $title = str_replace(' ', '_', $title);
-        $projectUrl = rtrim( $projectUrl, '/' );
+        $projectUrl = rtrim($projectUrl, '/');
         return "<a href='$projectUrl/wiki/$title' target='_blank'>$label</a>";
     }
 
@@ -74,6 +74,7 @@ class WikiExtension extends Extension
             $link = "User:$username";
         }
         $link = str_replace(' ', '_', $link);
+        $projectUrl = rtrim($projectUrl, '/');
         return "<a href='$projectUrl/wiki/$link' target='_blank'>$label</a>";
     }
 
@@ -89,6 +90,7 @@ class WikiExtension extends Extension
         if (!$label) {
             $label = $group;
         }
+        $projectUrl = rtrim($projectUrl, '/');
         // Ignoring this inspection, as we want all of the output on one line.
         // @codingStandardsIgnoreStart
         return "<a href='$projectUrl/w/index.php?title=Special:ListUsers&group=$group&creationSort=1&limit=50' target='_blank'>$label</a>";
@@ -110,6 +112,7 @@ class WikiExtension extends Extension
             $label = $this->intuitionMessage('history');
         }
         $title = str_replace(' ', '_', $title);
+        $projectUrl = rtrim($projectUrl, '/');
         $url = "$projectUrl/w/index.php?title=$title&action=history";
 
         if ($offset) {
@@ -136,6 +139,7 @@ class WikiExtension extends Extension
             $label = $this->intuitionMessage('log');
         }
         $username = str_replace(' ', '_', $username);
+        $projectUrl = rtrim($projectUrl, '/');
         $url = "$projectUrl/w/index.php?title=Special:Log&action=view&user=$username";
 
         if ($type) {
@@ -159,6 +163,8 @@ class WikiExtension extends Extension
             $label = $this->intuitionMessage('log');
         }
         $title = str_replace(' ', '_', $title);
+        $projectUrl = rtrim($projectUrl, '/');
+        // FIXME: should be using the script path
         $url = "$projectUrl/w/index.php?title=Special:Log&action=view&page=$title";
 
         if ($type) {
@@ -183,6 +189,7 @@ class WikiExtension extends Extension
         } elseif (is_a($label, 'DateTime')) {
             $label = date_format($label, 'Y-m-d, H:i');
         }
+        $projectUrl = rtrim($projectUrl, '/');
         return "<a href='$projectUrl/wiki/Special:Diff/$diff' target='_blank'>$label</a>";
     }
 
@@ -201,6 +208,7 @@ class WikiExtension extends Extension
         } elseif (is_a($label, 'DateTime')) {
             $label = date_format($label, 'Y-m-d, H:i');
         }
+        $projectUrl = rtrim($projectUrl, '/');
         return "<a href='$projectUrl/wiki/Special:PermaLink/$revId' target='_blank'>$label</a>";
     }
 

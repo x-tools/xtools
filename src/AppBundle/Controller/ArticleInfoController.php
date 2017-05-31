@@ -69,7 +69,7 @@ class ArticleInfoController extends Controller
     }
 
     /**
-     * @Route("/articleinfo/{project}/{article}", name="ArticleInfoResult")
+     * @Route("/articleinfo/{project}/{article}", name="ArticleInfoResult", requirements={"article"=".+"})
      */
     public function resultAction(Request $request)
     {
