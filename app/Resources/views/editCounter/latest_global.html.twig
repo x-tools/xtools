@@ -20,7 +20,7 @@
             <td>(
                 {{ diff_link(edit.rev_id, edit.project_url, 'diff') }}
                 &middot; {{ user_log_link(username, project, 'log') }}
-                &middot; <a href="{{ path('TopEditsResults', {project:edit.project_db_name, username:username, namespace:edit.page_namespace, article:edit.page_title|url_encode}) }}">topedits</a>
+                &middot; <a href="{{ path('TopEditsResults', {project:edit.project_db_name, username:username, namespace:edit.page_namespace, article:edit.page_title}) }}">topedits</a>
                 )
             </td>
             <td class="tdtitle break">{{ wiki_link(edit.page_title, edit.project_url) }}</td>

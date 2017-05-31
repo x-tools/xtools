@@ -24,7 +24,7 @@
             <dd>
                 <a href="{{ page.url }}">{{ page.displaytitle|raw }}</a>
                 <small>({{ wiki_log_link(page.title, project.url) }}
-                &middot; <a href="{{ path('ArticleInfoResult', {project:project.domain, article:page.title|url_encode}) }}">{{ msg('tool-articleinfo') }}</a>)</small>
+                &middot; <a href="{{ path('ArticleInfoResult', {project:project.domain, article:page.title}) }}">{{ msg('tool-articleinfo') }}</a>)</small>
             </dd>
             <dt>{{ msg('user') }}</dt>
             <dd>
