@@ -43,8 +43,11 @@ $(function () {
         window.toolsChart.update();
     });
 
-    // Load the initial set of non-automated contributions
-    loadNonAutoedits();
+    // This file gets loaded on every page, so only try to load
+    //   non-automated edits if the container is in the DOM
+    if ($('.non-auto-edits-container')[0]) {
+        loadNonAutoedits();
+    }
 
     /**
      * Loads non-automated edits from the server and lists them in the DOM.
