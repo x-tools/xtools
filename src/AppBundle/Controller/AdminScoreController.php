@@ -174,7 +174,7 @@ class AdminScoreController extends Controller
         }
 
         if ($id == 0) {
-            $this->addFlash("notice", [ "noresult", $username ]);
+            $this->addFlash("notice", [ "no-result", $username ]);
             return $this->redirectToRoute("AdminScore", [ "project"=>$project ]);
         }
 

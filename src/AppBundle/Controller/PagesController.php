@@ -266,7 +266,7 @@ class PagesController extends Controller
         }
 
         if ($total < 1) {
-            $this->addFlash("notice", [ "noresult", $username ]);
+            $this->addFlash("notice", [ "no-result", $username ]);
             return $this->redirectToRoute("PagesProject", [ "project"=>$project ]);
         }
 

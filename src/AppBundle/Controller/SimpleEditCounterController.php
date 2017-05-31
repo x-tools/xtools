@@ -87,7 +87,7 @@ class SimpleEditCounterController extends Controller
         $resultQuery->execute();
 
         if ($resultQuery->errorCode() > 0) {
-            $this->addFlash("notice", [ "noresult", $username ]);
+            $this->addFlash("notice", [ "no-result", $username ]);
             return $this->redirectToRoute("SimpleEditCounterProject", [ "project"=>$project ]);
         }
 
@@ -119,7 +119,7 @@ class SimpleEditCounterController extends Controller
         // Unknown user - If the user is created the $results variable will have 3 entries.
         // This is a workaround to detect non-existent IPs.
         if (count($results) < 3 && $arch == 0 && $rev == 0) {
-            $this->addFlash('notice', [ "noresult", $username ]);
+            $this->addFlash('notice', [ "no-result", $username ]);
 
             return $this->redirectToRoute("SimpleEditCounterProject", [ "project"=>$project ]);
         }

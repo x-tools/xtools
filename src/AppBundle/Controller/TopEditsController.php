@@ -127,7 +127,7 @@ class TopEditsController extends Controller
 
         // Inform user if no revisions found.
         if (count($editData) === 0) {
-            $this->addFlash("notice", ["nocontribs"]);
+            $this->addFlash("notice", ["no-contribs"]);
         }
 
         // Get page info about these 100 pages, so we can use their display title.
@@ -184,7 +184,7 @@ class TopEditsController extends Controller
         if (!$page->exists()) {
             // Redirect if the page doesn't exist.
             $this->addFlash("notice", ["no-result", $pageName]);
-            //return $this->redirectToRoute("topedits");
+            return $this->redirectToRoute("topedits");
         }
 
         // Get all revisions of this page by this user.
