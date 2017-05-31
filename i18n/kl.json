@@ -1,4 +1,0 @@
-{
-  "pager-newer-n": "{{PLURAL:$1|nutaaneq 1|nutaanerit $1}}",
-  "pager-older-n": "{{PLURAL:$1|pisoqaaneq 1|pisoqaanerit $1}}"
-}

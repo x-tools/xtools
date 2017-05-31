@@ -1,4 +1,0 @@
-{
-  "pager-newer-n": "{{PLURAL:$1|noviji 1|novija $1|novijih $1}}",
-  "pager-older-n": "{{PLURAL:$1|stariji 1|starijih $1}}"
-}
