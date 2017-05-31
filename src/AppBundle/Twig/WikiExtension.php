@@ -52,6 +52,7 @@ class WikiExtension extends Extension
             $label = $title;
         }
         $title = str_replace(' ', '_', $title);
+        $projectUrl = rtrim( $projectUrl, '/' );
         return "<a href='$projectUrl/wiki/$title' target='_blank'>$label</a>";
     }
 

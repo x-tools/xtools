@@ -45,7 +45,7 @@
                 </th>
                 <th>
                     <span class="sort-link sort-link--page" data-column="page">
-                        {{ msg('page') }}
+                        {{ msg('page-title') }}
                         <span class="glyphicon glyphicon-sort"></span>
                     </span>
                 </th>
@@ -54,7 +54,9 @@
             <tbody>
                 {% for edit in edits %}
                 <tr>
-                    <td class="sort-entry--edits tdnum" data-value="{{ edit.count }}">{{ edit.count|number_format }}</td>
+                    <td class="sort-entry--edits tdnum" data-value="{{ edit.count }}">
+                        {{ edit.count|number_format }}
+                    </td>
                     <td class="sort-entry--page" data-value="{{ edit.page_title }}">
                         {{ wiki_link(edit.page_title, project.url, edit.displaytitle) }}
                     </td>
