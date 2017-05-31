@@ -1,0 +1,4 @@
+{
+  "pager-newer-n": "{{PLURAL:$1|ka cusub 1|ka cusub $1}}",
+  "pager-older-n": "{{PLURAL:$1|ka duqsan 1|ka duqsan $1}}"
+}

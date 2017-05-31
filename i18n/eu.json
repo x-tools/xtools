@@ -8,6 +8,8 @@
   "help-translate": "Lagundu euskaratzen",
   "history": "Historia",
   "page-title": "Orriaren izenburua",
+  "pager-newer-n": "{{PLURAL:$1|berriago den 1|berriagoak diren $1}}",
+  "pager-older-n": "{{PLURAL:$1|zaharragoa den 1|zaharragoak diren $1}}",
   "pages": "Orrialdeak",
   "pageviews": "Bisitaldiak",
   "powered-by": "Honek garatua:$1",

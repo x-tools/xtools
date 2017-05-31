@@ -4,6 +4,8 @@
   "help-translate": "Saidia tafsiri",
   "history": "Historia",
   "page-title": "Jina la ukurasa",
+  "pager-newer-n": "{{PLURAL:$1|1 ya karibu zaidi|$1 ya karibu zaidi}}",
+  "pager-older-n": "{{PLURAL:$1|$1 ya zamani zaidi}}",
   "pages": "Kurasa",
   "pageviews": "Idadi ya mitazamo ya kurasa",
   "project": "Mradi wa wikimedia",

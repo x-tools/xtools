@@ -220,6 +220,12 @@ class AutomatedEditsController extends Controller
             }
         }
 
+        // Inform user if no revisions found.
+        if ($total === 0) {
+            $this->addFlash('notice', ['no-contribs']);
+            return $this->redirectToRoute('autoedits');
+        }
+
         // Sort the array and do some simple math.
         arsort($results);
 

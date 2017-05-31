@@ -95,6 +95,8 @@
   "page-size": "ขนาดหน้า",
   "page-title": "ชื่อหน้า",
   "page-watchers": "ผู้ชมหน้า",
+  "pager-newer-n": "ใหม่กว่า $1",
+  "pager-older-n": "เก่ากว่า $1",
   "pages": "หน้า",
   "pages-created": "หน้าที่สร้าง",
   "pages-deleted": "ลบหน้า",

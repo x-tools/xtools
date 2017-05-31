@@ -1,0 +1,4 @@
+{
+  "pager-newer-n": "{{PLURAL:$1|mas bag-o 1|mas bag-o $1}}",
+  "pager-older-n": "{{PLURAL:$1|mas daan1|mas daan $1}}"
+}

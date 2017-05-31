@@ -92,6 +92,8 @@
   "page-size": "Page size",
   "page-title": "Page title",
   "page-watchers": "Page watchers",
+  "pager-newer-n": "{{PLURAL:$1|newer 1|newer $1}}",
+  "pager-older-n": "{{PLURAL:$1|aulder 1|aulder $1}}",
   "pages": "Pages",
   "pages-created": "Pages creatit",
   "pages-deleted": "Pages deletit",

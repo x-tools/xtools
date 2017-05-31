@@ -8,6 +8,8 @@
   "history": "Povijest",
   "namespace": "Imenski prostor",
   "page-title": "Ime stranice",
+  "pager-newer-n": "{{PLURAL:$1|novija $1|novije $1|novijih $1}}",
+  "pager-older-n": "{{PLURAL:$1|starija $1|starije $1|starijih $1}}",
   "pages": "Stranice",
   "pageviews": "Pregledi",
   "powered-by": "Pogoni $1",

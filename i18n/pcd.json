@@ -5,6 +5,8 @@
   "help-translate": "Aïuder à értréduire",
   "history": "Histoère",
   "page-title": "Tite deul pache",
+  "pager-newer-n": "{{PLURAL:$1|pu nouvieu 1|pu nouvieus $1}}",
+  "pager-older-n": "{{PLURAL:$1|pus viu 1|pus vius $1}}",
   "pages": "Paches",
   "pageviews": "Paches vues",
   "project": "Prodjét à vir",

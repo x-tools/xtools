@@ -70,6 +70,8 @@
   "page-size": "Sayfa boyutu",
   "page-title": "Sayfa başlığı",
   "page-watchers": "Sayfayı izlemeye alanlar",
+  "pager-newer-n": "$1 daha yeni",
+  "pager-older-n": "$1 daha eski",
   "pages": "Sayfalar",
   "pages-created": "Oluşturulan sayfalar",
   "pages-deleted": "Silinen sayfalar",

@@ -1,0 +1,4 @@
+{
+  "pager-newer-n": "{{PLURAL:$1|nýrri}} $1",
+  "pager-older-n": "{{PLURAL:$1|1 eldri|$1 eldri}}"
+}

@@ -9,6 +9,8 @@
   "history": "مێژوو",
   "namespace": "بۆشایی ناو",
   "page-title": "سەرناوی پەڕە",
+  "pager-newer-n": "{{PLURAL:$1|یەکێکی نوێتر|$1ی نوێتر}}",
+  "pager-older-n": "{{PLURAL:$1|یەکێک کۆنتر|$1ی کۆنتر}}",
   "pages": "پەڕەکان",
   "pageviews": "بینینەکانی پەڕە",
   "project": "پڕۆژە",

@@ -58,6 +58,8 @@
   "page-size": "Sivun koko",
   "page-title": "Sivun otsikko",
   "page-watchers": "Sivun katselijat",
+  "pager-newer-n": "← {{PLURAL:$1|1 uudempi|$1 uudempaa}}",
+  "pager-older-n": "{{PLURAL:$1|1 vanhempi|$1 vanhempaa}} →",
   "pages": "Sivut",
   "pages-created": "Sivuja luotu",
   "pages-deleted": "Sivuja poistettu",

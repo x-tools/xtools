@@ -96,6 +96,8 @@
   "page-size": "Sidstorlek",
   "page-title": "Sidnamn",
   "page-watchers": "Antal som bevakar sidan",
+  "pager-newer-n": "{{PLURAL:$1|1 nyare|$1 nyare}}",
+  "pager-older-n": "{{PLURAL:$1|1 äldre|$1 äldre}}",
   "pages": "Sidor",
   "pages-created": "Sidor skapade",
   "pages-deleted": "Sidor raderade",

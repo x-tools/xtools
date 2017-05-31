@@ -1,0 +1,4 @@
+{
+  "pager-newer-n": "← {{PLURAL:$1|1 uuempi|$1 uuempaa}}",
+  "pager-older-n": "{{PLURAL:$1|1 vanheempi|$1 vanheempaa}} →"
+}

@@ -4,6 +4,8 @@
   "help-translate": "Hellef beim Övversäze",
   "history": "Väsjohne",
   "page-title": "Dä Sigg ier Övverschreff",
+  "pager-newer-n": "{{PLURAL:$1|aller neuerste|neuer $1}}",
+  "pager-older-n": "{{PLURAL:$1|vörrije|vörrije $1}}",
   "pages": "Sigge",
   "pageviews": "Aanzahl Siggeaffrohfe",
   "project": "Projäk",

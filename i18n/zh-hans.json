@@ -10,6 +10,8 @@
   "history": "历史",
   "namespace": "名字空间",
   "page-title": "页面标题",
+  "pager-newer-n": "前$1个",
+  "pager-older-n": "后$1个",
   "pages": "页面",
   "pageviews": "页面浏览",
   "powered-by": "由$1提供支持",

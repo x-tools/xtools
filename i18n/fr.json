@@ -97,6 +97,8 @@
   "page-size": "Taille de page",
   "page-title": "Titre de la page",
   "page-watchers": "Suiveurs de la page",
+  "pager-newer-n": "{{PLURAL:$1|1 plus récente|$1 plus récentes}}",
+  "pager-older-n": "{{PLURAL:$1|1 plus ancienne|$1 plus anciennes}}",
   "pages": "Pages",
   "pages-created": "Pages créées",
   "pages-deleted": "Pages supprimées",

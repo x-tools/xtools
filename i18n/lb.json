@@ -77,6 +77,8 @@
   "others": "anerer",
   "page-size": "Gréisst vun der Säit",
   "page-title": "Titel vun der Säit",
+  "pager-newer-n": "{{PLURAL:$1|nächsten|nächst $1}}",
+  "pager-older-n": "{{PLURAL:$1|vireg|vireg $1}}",
   "pages": "Säiten",
   "pages-deleted": "Geläscht Säiten",
   "pages-moved": "Geréckelt Säiten",

@@ -83,6 +83,8 @@
   "others": "その他",
   "page-size": "ページ サイズ:",
   "page-title": "ページ名",
+  "pager-newer-n": "{{PLURAL:$1|以後の$1件}}",
+  "pager-older-n": "{{PLURAL:$1|以前の$1件}}",
   "pages": "ページ",
   "pages-created": "作成したページ",
   "pages-deleted": "削除されたページ",

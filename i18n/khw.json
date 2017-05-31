@@ -1,0 +1,4 @@
+{
+  "pager-newer-n": "{{PLURAL:$1|نوغ1|نوغ $1}}",
+  "pager-older-n": "{{PLURAL:$1|قدیم1|قدیم ترین $1}}"
+}

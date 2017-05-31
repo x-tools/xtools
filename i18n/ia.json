@@ -4,6 +4,8 @@
   "help-translate": "Adjutar a traducer",
   "history": "Historia",
   "page-title": "Titulo del pagina",
+  "pager-newer-n": "{{PLURAL:$1|1 plus recente|$1 plus recente}}",
+  "pager-older-n": "{{PLURAL:$1|1 minus recente|$1 minus recente}}",
   "pages": "Paginas",
   "pageviews": "Visitas",
   "project": "Projecto",

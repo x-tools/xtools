@@ -86,6 +86,8 @@
   "page-size": "Velikost stránky",
   "page-title": "Název stránky",
   "page-watchers": "Počet sledujících",
+  "pager-newer-n": "{{PLURAL:$1|1 novější|$1 novější|$1 novějších}}",
+  "pager-older-n": "{{PLURAL:$1|1 starší|$1 starší|$1 starších}}",
   "pages": "Stránky",
   "pages-created": "Vytvořených stránek",
   "pages-deleted": "Smazaných stránek",

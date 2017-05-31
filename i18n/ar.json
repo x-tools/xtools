@@ -95,6 +95,8 @@
   "page-size": "حجم الصفحة",
   "page-title": "عنوان الصفحة",
   "page-watchers": "مراقبو الصفحة",
+  "pager-newer-n": "{{PLURAL:$1|أجدد 1|أجدد $1}}",
+  "pager-older-n": "{{PLURAL:$1|أقدم 1|أقدم $1}}",
   "pages": "الصفحات",
   "pages-created": "الصفحات المنشأة",
   "pages-deleted": "الصفحات المحذوفة",

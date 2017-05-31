@@ -8,6 +8,8 @@
   "help-translate": "Sikour da dreiñ",
   "history": "Istor",
   "page-title": "Titl ar bajenn",
+  "pager-newer-n": "{{PLURAL:$1|1 nevesoc'h|$1 nevesoc'h}}",
+  "pager-older-n": "{{PLURAL:$1|1 koshoc'h|$1 koshoc'h}}",
   "pages": "Pajennoù",
   "pageviews": "Pajennoù gwelet",
   "powered-by": "O vont en-dro gant $1",

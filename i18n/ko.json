@@ -94,6 +94,8 @@
   "page-size": "문서 크기",
   "page-title": "문서 제목",
   "page-watchers": "주시하는 사용자",
+  "pager-newer-n": "{{PLURAL:$1|다음 1개|다음 $1개}}",
+  "pager-older-n": "{{PLURAL:$1|이전 1개|이전 $1개}}",
   "pages": "문서",
   "pages-created": "만든 문서",
   "pages-deleted": "삭제된 문서",

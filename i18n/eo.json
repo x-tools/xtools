@@ -1,5 +1,7 @@
 {
   "bot": "Roboto",
+  "pager-newer-n": "{{PLURAL:$1|pli novan 1|pli novajn $1}}",
+  "pager-older-n": "{{PLURAL:$1|pli malnovan 1|pli malnovajn $1}}",
   "pages": "Paĝoj",
   "project": "Projekto",
   "user": "Uzanto"

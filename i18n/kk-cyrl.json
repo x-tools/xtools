@@ -4,6 +4,8 @@
   "help-translate": "Аударуға көмектесу",
   "history": "Тарихы",
   "page-title": "Бет атауы",
+  "pager-newer-n": "{{PLURAL:$1|жаңалау 1|жаңалау $1}}",
+  "pager-older-n": "{{PLURAL:$1|ескілеу 1|ескілеу $1}}",
   "pages": "Беттер",
   "pageviews": "Бет қаралуы",
   "project": "Жоба",

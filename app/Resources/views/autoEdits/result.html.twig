@@ -156,8 +156,9 @@
         {{ layout.content_block('auto-edits', content) }}
 
         {% set content %}
-            <div class="non-auto-edits-container">
-                <em class="text-muted">{{ msg('loading') }}...</em>
+            <div>
+                <em class="non-auto-edits-loading text-muted">{{ msg('loading') }}...</em>
+                <div class="non-auto-edits-container" data-username="{{ username }}"></div>
             </div>
         {% endset %}
         {{ layout.content_block('non-auto-edits', content) }}

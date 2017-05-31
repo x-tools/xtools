@@ -96,6 +96,8 @@
   "page-size": "पृष्ठ का आकार",
   "page-title": "पृष्ठ शीर्षक",
   "page-watchers": "पृष्ठ दर्शक",
+  "pager-newer-n": "{{PLURAL:$1|नया|नये}} $1",
+  "pager-older-n": "{{PLURAL:$1|पुराना|पुराने}} $1",
   "pages": "पृष्ठ",
   "pages-created": "निर्मित पृष्ठ",
   "pages-deleted": "हटाये गये पृष्ठ",

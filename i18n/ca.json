@@ -3,6 +3,8 @@
   "bot": "Bot",
   "help-translate": "Ajudeu a traduir",
   "page-title": "Títol de pàgina",
+  "pager-newer-n": "{{PLURAL:$1|1 posterior|$1 posteriors}}",
+  "pager-older-n": "{{PLURAL:$1|anterior|$1 anteriors}}",
   "pages": "Pàgines",
   "pageviews": "Pàgines vistes",
   "project": "Projecte",

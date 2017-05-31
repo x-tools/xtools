@@ -1,0 +1,4 @@
+{
+  "pager-newer-n": "{{PLURAL:$1|labih hanyar 1|labih hanyar $1}}",
+  "pager-older-n": "{{PLURAL:$1|talawas 1|talawas $1}}"
+}

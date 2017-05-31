@@ -7,6 +7,8 @@
   "edits": "Modificar",
   "history": "Istoric",
   "page-title": "Títol de la pagina",
+  "pager-newer-n": "{{PLURAL:$1|1 mai recenta|$1 mai recentas}}",
+  "pager-older-n": "{{PLURAL:$1|1 mai anciana|$1 mai ancianas}}",
   "pages": "Paginas",
   "pageviews": "Paginas vistas",
   "powered-by": "Foncionant amb $1",

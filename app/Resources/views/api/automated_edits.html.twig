@@ -1,9 +1,10 @@
 <div class="non-auto-edits-nav clearfix">
     <a href="#" class="pull-left prev-edits">
-        <span class="glyphicon glyphicon-arrow-left"></span> Prev 50
+        <span class="glyphicon glyphicon-arrow-left"></span>
+        {{ msg('pager-older-n', [50]) | capitalize_first }}
     </a>
     <a href="#" class="pull-right next-edits">
-        Next 50
+        {{ msg('pager-newer-n', [50]) | capitalize_first }}
         <span class="glyphicon glyphicon-arrow-right"></span>
     </a>
 </div>
@@ -14,20 +15,26 @@
     {% endfor %}
     </thead>
     <tbody>
-        {% for edit in edits %}
+        {% if edits|length == 0 %}
             <tr>
-                <td>{{ wiki_link(edit.page_title, projectUrl, edit.page_title | replace('_', ' ')) }}</td>
-                <td>{{ perma_link(edit.rev_id, projectUrl, edit.timestamp) }}</td>
-                <td>
-                    {{ diff_link(edit.rev_id, projectUrl, msg('diff')) }}
-                    &middot;
-                    {{ wiki_history_link(edit.page_title, projectUrl) }}
-                </td>
-                <td>
-                    {{ edit.size | diff_format }}
-                </td>
-                <td>{{ edit.summary | wikify_comment(edit.page_title, projectUrl) }}</td>
+                <td colspan=5 class="text-center">{{ msg('no-contribs') }}</td>
             </tr>
-        {% endfor %}
+        {% else %}
+            {% for edit in edits %}
+                <tr>
+                    <td>{{ wiki_link(edit.page_title, projectUrl, edit.page_title | replace('_', ' ')) }}</td>
+                    <td>{{ perma_link(edit.rev_id, projectUrl, edit.timestamp) }}</td>
+                    <td>
+                        {{ diff_link(edit.rev_id, projectUrl, msg('diff')) }}
+                        &middot;
+                        {{ wiki_history_link(edit.page_title, projectUrl) }}
+                    </td>
+                    <td>
+                        {{ edit.size | diff_format }}
+                    </td>
+                    <td>{{ edit.summary | wikify_comment(edit.page_title, projectUrl) }}</td>
+                </tr>
+            {% endfor %}
+        {% endif %}
     </tbody>
 </table>

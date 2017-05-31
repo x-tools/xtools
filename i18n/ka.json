@@ -88,6 +88,8 @@
   "page-size": "გვერდის ზომა",
   "page-title": "გვერდის სათაური",
   "page-watchers": "გვერდის მაკონტროლებლები",
+  "pager-newer-n": "{{PLURAL:$1|უახლესი 1|უახლესი $1}}",
+  "pager-older-n": "{{PLURAL:$1|უფრო ძველი 1|უფრო ძველი $1}}",
   "pages": "გვერდი",
   "pages-created": "შექმნილი გვერდები",
   "pages-deleted": "წაშლილი გვერდები",

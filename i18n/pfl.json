@@ -1,0 +1,4 @@
+{
+  "pager-newer-n": "{{PLURAL:$1|negschd 1|negschd $1}}",
+  "pager-older-n": "{{PLURAL:$1|vorisch 1|vorische $1}}"
+}

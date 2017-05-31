@@ -96,6 +96,8 @@
   "page-size": "حجم صفحه",
   "page-title": "عنوان صفحه",
   "page-watchers": "پیگیری‌کنندگان",
+  "pager-newer-n": "{{PLURAL:$1|یک مورد جدیدتر|$1 مورد جدیدتر}}",
+  "pager-older-n": "{{PLURAL:$1|یک مورد قدیمی‌تر|$1 مورد قدیمی‌تر}}",
   "pages": "صفحه‌ها",
   "pages-created": "صفحات ساخته‌شده",
   "pages-deleted": "صفحات حذف شده",

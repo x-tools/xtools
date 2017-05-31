@@ -1,6 +1,8 @@
 {
   "all": "全部",
   "bot": "機械人",
+  "pager-newer-n": "新$1次",
+  "pager-older-n": "舊$1次",
   "pages": "版",
   "project": "專題",
   "report-issue": "報告問題",

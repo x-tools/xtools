@@ -1,0 +1,4 @@
+{
+  "pager-newer-n": "{{PLURAL:$1|recentiorem 1|recentiores $1}}",
+  "pager-older-n": "{{PLURAL:$1|superiorem 1|superiores $1}}"
+}

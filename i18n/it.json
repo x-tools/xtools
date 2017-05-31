@@ -90,6 +90,8 @@
   "others": "altro",
   "page-size": "Dimensioni pagina",
   "page-title": "Titolo della pagina",
+  "pager-newer-n": "{{PLURAL:$1|1 più recente|$1 più recenti}}",
+  "pager-older-n": "{{PLURAL:$1|1 meno recente|$1 meno recenti}}",
   "pages": "Pagine",
   "pages-created": "Pagine create",
   "pages-deleted": "Pagine cancellate",

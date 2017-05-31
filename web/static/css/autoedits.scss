@@ -61,6 +61,10 @@
     .non-auto-edits-nav {
         margin-bottom: 10px;
     }
+
+    .prev-edits {
+        display: none;
+    }
 }
 
 @media (max-width: $bootstrap-sm) {

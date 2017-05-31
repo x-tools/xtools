@@ -10,6 +10,8 @@
   "history": "頁面修訂歷史",
   "namespace": "命名空間",
   "page-title": "頁面標題",
+  "pager-newer-n": "較新 $1 筆",
+  "pager-older-n": "較舊 $1 筆",
   "pages": "頁面",
   "pageviews": "累積頁面瀏覽次數",
   "powered-by": "由$1提供支持",

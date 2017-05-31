@@ -6,6 +6,8 @@
   "help-translate": "ترجمہ کرنے میں مدد کریں",
   "history": "تاریخچہ",
   "page-title": "عنوان صفحہ",
+  "pager-newer-n": "{{PLURAL:$1|جدید $1}}",
+  "pager-older-n": "{{PLURAL:$1|قدیم}} $1",
   "pages": "صفحات",
   "pageviews": "مشاہدات صفحہ",
   "project": "منصوبہ",

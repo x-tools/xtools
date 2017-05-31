@@ -94,6 +94,8 @@
   "page-size": "Sidestørrelse",
   "page-title": "Sidetittel",
   "page-watchers": "Sideovervåkere",
+  "pager-newer-n": "{{PLURAL:$1|1 nyere|$1 nyere}}",
+  "pager-older-n": "{{PLURAL:$1|1 eldre|$1 eldre}}",
   "pages": "Sider",
   "pages-created": "Sider opprettet",
   "pages-deleted": "Sider slettet",

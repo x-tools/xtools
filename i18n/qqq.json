@@ -158,6 +158,8 @@
   "page-size": "Label for the size of a page.\n{{Identical|Page size}}",
   "page-title": "Label for the title of a page, or a page title form field.\n{{Identical|Page title}}",
   "page-watchers": "Wiki page watchers. This message should be short.",
+  "pager-newer-n": "This is part of the navigation on the top and bottom of lists of contributions that are ordered by date. $1 is the number of items shown per page.\n{{Identical|Newer}}",
+  "pager-older-n": "This is part of the navigation on the top and bottom of lists of contributions that are ordered by date. $1 is the number of items shown per page.\n{{Identical|Older}}",
   "pages": "General term for one or more pages.\n{{Identical|Pages}}",
   "pages-created": "Label for the pages a user has created.",
   "pages-created-deleted": "Label for pages a user has created that were later deleted.",

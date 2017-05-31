@@ -92,6 +92,8 @@
   "page-size": "താളിന്റെ വലിപ്പം",
   "page-title": "താളിന്റെ തലക്കെട്ട്",
   "page-watchers": "താൾ ശ്രദ്ധിക്കുന്നവർ",
+  "pager-newer-n": "{{PLURAL:$1|പുതിയ 1|പുതിയ $1}}",
+  "pager-older-n": "{{PLURAL:$1|പഴയ 1|പഴയ $1}}",
   "pages": "താളുകൾ",
   "pages-created": "സൃഷ്ടിച്ച താളുകൾ",
   "pages-deleted": "മായ്ച്ച താളുകൾ",

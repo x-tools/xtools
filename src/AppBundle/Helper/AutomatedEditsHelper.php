@@ -138,6 +138,10 @@ class AutomatedEditsHelper extends HelperBase
                   OFFSET $offset";
         $editData = $conn->executeQuery($query, ['username' => $username])->fetchAll();
 
+        if (empty($editData)) {
+            return [];
+        }
+
         // Get diff sizes, based on length of each parent revision
         $parentRevIds = array_map(function ($edit) {
             return $edit['rev_parent_id'];

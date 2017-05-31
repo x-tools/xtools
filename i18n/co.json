@@ -1,0 +1,4 @@
+{
+  "pager-newer-n": "{{PLURAL:$1|1 più ricente|$1 più ricenti}}",
+  "pager-older-n": "{{PLURAL:$1|1 menu ricente|$1 menu ricenti}}"
+}

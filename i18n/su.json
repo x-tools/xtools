@@ -1,0 +1,4 @@
+{
+  "pager-newer-n": "{{PLURAL:$1|leuwih anyar 1|leuwih anyar $1}}",
+  "pager-older-n": "{{PLURAL:$1|leuwih heubeul 1|leuwih heubeul $1}}"
+}

@@ -5,6 +5,8 @@
   "help-translate": "অনুবাদ কৰাত সহায় কৰক",
   "history": "ইতিহাস",
   "page-title": "পৃষ্ঠাৰ শিৰোনাম",
+  "pager-newer-n": "{{PLURAL:$1|নতুনতৰ ১টি|নতুনতৰ $1টি}}",
+  "pager-older-n": "{{PLURAL:$1|পুৰণতৰ ১|পুৰণতৰ $1}}",
   "pages": "পৃষ্ঠাসমূহ",
   "pageviews": "পৃষ্ঠাদৰ্শন",
   "project": "প্ৰকল্প",

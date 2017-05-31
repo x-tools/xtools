@@ -87,6 +87,8 @@
   "page-size": "পাতার আকার",
   "page-title": "পাতার শিরোনাম",
   "page-watchers": "পাতার নজরকারীগণ",
+  "pager-newer-n": "{{PLURAL:$1|নতুনতর ১টি|নতুনতর $1টি}}",
+  "pager-older-n": "{{PLURAL:$1|আরও পুরনো ১টি|আরও পুরনো $1টি}}",
   "pages": "পাতাসমূহ",
   "pages-created": "পাতা তৈরি করেছে",
   "pages-deleted": "পাতা অপসারণ করেছে",

@@ -90,6 +90,8 @@
   "page-size": "Sidestørrelse",
   "page-title": "Sidetitel",
   "page-watchers": "Sideovervågere",
+  "pager-newer-n": "{{PLURAL:$1|1 nyere|$1 nyere}}",
+  "pager-older-n": "{{PLURAL:$1|1 ældre|$1 ældre}}",
   "pages": "Sider",
   "pages-created": "Oprettede sider",
   "pages-deleted": "Slettede sider",

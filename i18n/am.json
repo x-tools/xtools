@@ -1,0 +1,4 @@
+{
+  "pager-newer-n": "{{PLURAL:$1|ኋለኛ 1|ኋለኛ $1}}",
+  "pager-older-n": "{{PLURAL:$1|ፊተኛ 1|ፊተኛ $1}}"
+}

@@ -8,6 +8,8 @@
   "help-translate": "Pomoč pri prevajanju",
   "history": "Zgodovina",
   "page-title": "Naslov strani",
+  "pager-newer-n": "{{PLURAL:$1|novejši|novejša|novejši|novejših}} $1",
+  "pager-older-n": "{{PLURAL:$1|starejši|starejša|starejši|starejših}} $1",
   "pages": "Strani",
   "powered-by": "Omogoča $1",
   "user": "Uporabnik"

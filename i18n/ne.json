@@ -62,6 +62,8 @@
   "others": "अन्य",
   "page-size": "पृष्ठको आकार",
   "page-title": "पृष्ठ शीर्षक",
+  "pager-newer-n": "{{PLURAL:$1|नयाँ १|नयाँ $1}}",
+  "pager-older-n": "{{PLURAL:$1|पुरानो १|पुरानो $1}}",
   "pages": "पृष्ठहरू",
   "pages-created": "निर्माण गरेका पृष्ठहरू",
   "pages-deleted": "मेटिएका पृष्ठहरू",

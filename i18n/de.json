@@ -93,6 +93,8 @@
   "page-size": "Seitengröße",
   "page-title": "Seitenname",
   "page-watchers": "Seitenbeobachter",
+  "pager-newer-n": "{{PLURAL:$1|nächster|nächste $1}}",
+  "pager-older-n": "{{PLURAL:$1|vorheriger|vorherige $1}}",
   "pages": "Seiten",
   "pages-created": "Seiten erstellt",
   "pages-deleted": "Seiten gelöscht",

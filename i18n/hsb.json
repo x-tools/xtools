@@ -1,0 +1,4 @@
+{
+  "pager-newer-n": "{{PLURAL:$1|nowši 1|nowšej $1|nowše $1|nowšich $1}}",
+  "pager-older-n": "{{PLURAL:$1|starši 1|staršej $1|starše $1|staršich $1}}"
+}

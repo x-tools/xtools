@@ -1,0 +1,4 @@
+{
+  "pager-newer-n": "{{PLURAL:$1|quel pi novo|i $1 pi novi}}",
+  "pager-older-n": "{{PLURAL:$1|quel pi vecio|i $1 pi vèci}}"
+}

@@ -4,6 +4,8 @@
   "help-translate": "چئویرمه‌یه کؤمک",
   "history": "گئچمیش",
   "page-title": "صفحه باشلیغی",
+  "pager-newer-n": "{{PLURAL:$1|بیر داها یئنی|$1 داها یئنی}}",
+  "pager-older-n": "{{PLURAL:$1|بیر داها کؤهنه|$1 داها کؤهنه}}",
   "pages": "صفحه‌لر",
   "pageviews": "صفحه گؤروشو",
   "project": "پروژه",

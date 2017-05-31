@@ -4,6 +4,8 @@
   "help-translate": "په ژباړلو کې مرسته وکړئ",
   "history": "پېښليک",
   "page-title": "مخ سرليک",
+  "pager-newer-n": "{{PLURAL:$1|نوی 1|نوي $1}}",
+  "pager-older-n": "{{PLURAL:$1|زوړ 1|زاړه $1}}",
   "pages": "مخونه",
   "project": "پروژه",
   "report-issue": "د يوې ستونزې راپور ورکړئ",

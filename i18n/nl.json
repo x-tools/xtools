@@ -93,6 +93,8 @@
   "page-size": "Paginagrootte",
   "page-title": "Paginatitel",
   "page-watchers": "Paginavolgers",
+  "pager-newer-n": "{{PLURAL:$1|1 nieuwere|$1 nieuwere}}",
+  "pager-older-n": "{{PLURAL:$1|1 oudere|$1 oudere}}",
   "pages": "Pagina's",
   "pages-created": "Pagina's aangemaakt",
   "pages-deleted": "Pagina's verwijderd",

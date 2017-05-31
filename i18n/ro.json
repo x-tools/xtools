@@ -9,6 +9,8 @@
   "history": "Istoric",
   "namespace": "Spațiu de nume",
   "page-title": "Titlul paginii",
+  "pager-newer-n": "{{PLURAL:$1|1 mai nou|$1 mai noi}}",
+  "pager-older-n": "{{PLURAL:$1|1|$1}} mai vechi",
   "pages": "Pagini",
   "pageviews": "Vizualizări de pagină",
   "powered-by": "Pus în funcțiune prin $1",

@@ -92,6 +92,8 @@
   "page-size": "Էջի չափը",
   "page-title": "Էջի վերնագիրը",
   "page-watchers": "Էջը հսկող",
+  "pager-newer-n": "{{PLURAL:$1|ավելի թարմ 1|ավելի թարմ $1}}",
+  "pager-older-n": "{{PLURAL:$1|ավելի հին 1|ավելի հին $1}}",
   "pages": "Էջերը",
   "pages-created": "Ստեղծված էջերը",
   "pages-deleted": "Ջնջված էջերը",

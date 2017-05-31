@@ -83,6 +83,8 @@
   "page-size": "Lehekülje suurus",
   "page-title": "Lehekülje pealkiri",
   "page-watchers": "Jälgijaid",
+  "pager-newer-n": "{{PLURAL:$1|uuem 1|uuemad $1}}",
+  "pager-older-n": "{{PLURAL:$1|vanem 1|vanemad $1}}",
   "pages": "Lehekülgi",
   "pages-created": "Alustatud leheküljed",
   "pages-deleted": "Kustutatud leheküljed",
