@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Xtools\ProjectRepository;
 
 class SimpleEditCounterController extends Controller
 {
@@ -57,11 +58,15 @@ class SimpleEditCounterController extends Controller
 
         $username = ucfirst($username);
 
-        $dbValues = $lh->databasePrepare($project, "SimpleEditCounter");
+        $projectData = ProjectRepository::getProject($project, $this->container);
 
-        $dbName = $dbValues["dbName"];
-        $wikiName = $dbValues["wikiName"];
-        $url = $dbValues["url"];
+        if (!$projectData->exists()) {
+            $this->addFlash("notice", ["invalid-project", $project]);
+            return $this->redirectToRoute("SimpleEditCounter");
+        }
+
+        $dbName = $projectData->getDatabaseName();
+        $url = $projectData->getUrl();
 
         $userTable = $lh->getTable("user", $dbName);
         $archiveTable = $lh->getTable("archive", $dbName);

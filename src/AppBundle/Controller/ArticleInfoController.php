@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use AppBundle\Helper\Apihelper;
 use AppBundle\Helper\PageviewsHelper;
 use AppBundle\Helper\AutomatedEditsHelper;
+use Xtools\ProjectRepository;
 
 class ArticleInfoController extends Controller
 {
@@ -76,9 +77,14 @@ class ArticleInfoController extends Controller
         $project = $request->attributes->get('project');
         $page = $request->attributes->get('article');
 
-        // sets the database name within $this->lh
-        $dbValues = $this->lh->databasePrepare($project, 'ArticleInfo');
-        $projectUrl = $dbValues['url'];
+        $projectData = ProjectRepository::getProject($project, $this->container);
+
+        if (!$projectData->exists()) {
+            $this->addFlash("notice", ["invalid-project", $project]);
+            return $this->redirectToRoute("articleInfo");
+        }
+
+        $projectUrl = $projectData->getUrl();
 
         $this->revisionTable = $this->lh->getTable('revision');
 

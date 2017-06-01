@@ -6,6 +6,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Xtools\ProjectRepository;
 
 class AutomatedEditsController extends Controller
 {
@@ -67,21 +68,30 @@ class AutomatedEditsController extends Controller
             );
         }
 
-        // set default wiki so we can populate the namespace selector
+        /** @var ApiHelper */
+        $api = $this->get("app.api_helper");
+
+        // Set default project so we can populate the namespace selector.
         if (!$project) {
             $project = $this->container->getParameter('default_project');
         }
 
-        /** @var ApiHelper */
-        $api = $this->get("app.api_helper");
+        $projectData = ProjectRepository::getProject($project, $this->container);
 
-        // TODO: add namespace support
+        // Default values for the variables to keep the template happy
+        $namespaces = null;
+
+        // If the project exists, actually populate the values
+        if ($projectData->exists()) {
+            $namespaces = $projectData->getNamespaces();
+        }
+
         return $this->render('autoEdits/index.html.twig', [
             'xtPageTitle' => 'tool-autoedits',
             'xtSubtitle' => 'tool-autoedits-desc',
             'xtPage' => 'autoedits',
             'project' => $project,
-            // 'namespaces' => $api->namespaces($project),
+            'namespaces' => $namespaces,
         ]);
     }
 
@@ -94,12 +104,16 @@ class AutomatedEditsController extends Controller
         $lh = $this->get("app.labs_helper");
         $lh->checkEnabled("autoedits");
 
-        // Pull information about the project from the Labs Helper
-        $dbValues = $lh->databasePrepare($project, "AutomatedEdits");
+        // Pull information about the project
+        $projectData = ProjectRepository::getProject($project, $this->container);
 
-        $dbName = $dbValues["dbName"];
-        $wikiName = $dbValues["wikiName"];
-        $projectUrl = $dbValues["url"];
+        if (!$projectData->exists()) {
+            $this->addFlash("notice", ["invalid-project", $project]);
+            return $this->redirectToRoute("autoedits");
+        }
+
+        $dbName = $projectData->getDatabaseName();
+        $projectUrl = $projectData->getUrl();
 
         // Grab our database connection
         $dbh = $this->get('doctrine')->getManager("replicas")->getConnection();

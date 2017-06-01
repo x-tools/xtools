@@ -34,44 +34,13 @@ class LabsHelper
     }
 
     /**
-     * Is xTools connecting to MMF Labs?
+     * Is xTools connecting to WMF Labs?
+     *
      * @return boolean
      */
     public function isLabs()
     {
         return (bool)$this->container->getParameter('app.is_labs');
-    }
-
-    /**
-     * Set up LabsHelper::$client and return the database name, wiki name,
-     * and URL of a given project.
-     * @todo: Handle failure better
-     * @return string[] With keys 'dbName', 'wikiName', 'url', and 'lang'.
-     */
-    public function databasePrepare($project = 'wiki')
-    {
-        if ($this->container->getParameter('app.single_wiki')) {
-            $dbName = $this->container->getParameter('database_replica_name');
-            $wikiName = 'wiki';
-            $url = $this->container->getParameter('wiki_url');
-            $lang = $this->container->getParameter('lang');
-        } else {
-            $metaData = $this->getProjectMetadata($project);
-
-            if (!$metaData) {
-                throw new Exception("Unable to find project '$project'");
-            }
-
-            $dbName = $metaData['dbname'];
-            $wikiName = $metaData['name'];
-            $url = $metaData['url'];
-            $lang = $metaData['lang'];
-        }
-
-        $this->dbName = $dbName;
-        $this->url = $url;
-
-        return [ 'dbName' => $dbName, 'wikiName' => $wikiName, 'url' => $url, 'lang' => $lang ];
     }
 
     /**

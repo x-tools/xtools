@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use DateTime;
+use Xtools\ProjectRepository;
 
 class AdminScoreController extends Controller
 {
@@ -54,11 +55,16 @@ class AdminScoreController extends Controller
 
         $username = ucfirst($username);
 
-        $dbValues = $lh->databasePrepare($project, "AdminScore");
+        $projectData = ProjectRepository::getProject($project, $this->container);
 
-        $dbName = $dbValues["dbName"];
-        $wikiName = $dbValues["wikiName"];
-        $url = $dbValues["url"];
+        if (!$projectData->exists()) {
+            $this->addFlash("notice", ["invalid-project", $project]);
+            return $this->redirectToRoute("adminscore");
+        }
+
+        $dbName = $projectData->getDatabaseName();
+        $wikiName = $projectData->getDatabaseName();
+        $url = $projectData->getUrl();
 
         $userTable = $lh->getTable("user", $dbName);
         $pageTable = $lh->getTable("page", $dbName);
