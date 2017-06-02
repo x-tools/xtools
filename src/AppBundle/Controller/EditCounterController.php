@@ -1,11 +1,15 @@
 <?php
+/**
+ * This file contains only the EditCounterController class.
+ */
 
 namespace AppBundle\Controller;
 
-use AppBundle\Helper\AutomatedEditsHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Xtools\EditCounter;
 use Xtools\EditCounterRepository;
 use Xtools\Project;
@@ -13,6 +17,9 @@ use Xtools\ProjectRepository;
 use Xtools\User;
 use Xtools\UserRepository;
 
+/**
+ * Class EditCounterController
+ */
 class EditCounterController extends Controller
 {
 
@@ -27,7 +34,8 @@ class EditCounterController extends Controller
 
     /**
      * Every action in this controller (other than 'index') calls this first.
-     * @param string|boolean $project
+     * @param string|bool $project The project name.
+     * @param string|bool $username The username.
      */
     protected function setUpEditCounter($project = false, $username = false)
     {
@@ -50,11 +58,17 @@ class EditCounterController extends Controller
     }
 
     /**
+     * The initial GET request that displays the search form.
+     *
      * @Route("/ec", name="ec")
      * @Route("/ec", name="EditCounter")
      * @Route("/ec/", name="EditCounterSlash")
      * @Route("/ec/index.php", name="EditCounterIndexPhp")
      * @Route("/ec/{project}", name="EditCounterProject")
+     *
+     * @param Request $request
+     * @param string|null $project
+     * @return RedirectResponse|Response
      */
     public function indexAction(Request $request, $project = null)
     {
@@ -84,12 +98,14 @@ class EditCounterController extends Controller
 
     /**
      * @Route("/ec/{project}/{username}", name="EditCounterResult")
+     * @param Request $request
+     * @param string $project
+     * @param string $username
+     * @return Response
      */
     public function resultAction(Request $request, $project, $username)
     {
         $this->setUpEditCounter($project, $username);
-
-        // Give it all to the template.
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/result.html.twig', [
             'xtTitle' => $username,
@@ -105,19 +121,13 @@ class EditCounterController extends Controller
 
     /**
      * @Route("/ec-generalstats/{project}/{username}", name="EditCounterGeneralStats")
+     * @param string $project
+     * @param string $username
+     * @return Response
      */
     public function generalStatsAction($project, $username)
     {
         $this->setUpEditCounter($project, $username);
-
-//        $revisionCounts = $this->editCounterHelper->getRevisionCounts($user->getId($project));
-//        $pageCounts = $this->editCounterHelper->getPageCounts($username, $revisionCounts['total']);
-//        $logCounts = $this->editCounterHelper->getLogCounts($user->getId($project));
-//        $automatedEditsSummary = $automatedEditsHelper->getEditsSummary($user->getId($project));
-//        $topProjectsEditCounts = $this->editCounterHelper->getTopProjectsEditCounts($project->getUrl(), 
-//            $user->getUsername());
-
-        // Render view.
         $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/general_stats.html.twig', [
             'xtPage' => 'ec',
@@ -126,56 +136,14 @@ class EditCounterController extends Controller
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
-
-            // Revision counts.
-//            'deleted_edits' => $revisionCounts['deleted'],
-//            'total_edits' => $revisionCounts['total'],
-//            'live_edits' => $revisionCounts['live'],
-//            'first_rev' => $revisionCounts['first'],
-//            'latest_rev' => $revisionCounts['last'],
-//            'days' => $revisionCounts['days'],
-//            'avg_per_day' => $revisionCounts['avg_per_day'],
-//            'rev_24h' => $revisionCounts['24h'],
-//            'rev_7d' => $revisionCounts['7d'],
-//            'rev_30d' => $revisionCounts['30d'],
-//            'rev_365d' => $revisionCounts['365d'],
-//            'rev_small' => $revisionCounts['small'],
-//            'rev_large' => $revisionCounts['large'],
-//            'with_comments' => $revisionCounts['with_comments'],
-//            'without_comments' => $revisionCounts['live'] - $revisionCounts['with_comments'],
-//            'minor_edits' => $revisionCounts['minor_edits'],
-//            'nonminor_edits' => $revisionCounts['live'] - $revisionCounts['minor_edits'],
-//            'auto_edits_total' => array_sum($automatedEditsSummary),
-//
-//            // Page counts.
-//            'uniquePages' => $pageCounts['unique'],
-//            'pagesCreated' => $pageCounts['created'],
-//            'pagesMoved' => $pageCounts['moved'],
-//            'editsPerPage' => $pageCounts['edits_per_page'],
-//
-//            // Log counts (keys are 'log name'-'action').
-//            'pagesThanked' => $logCounts['thanks-thank'],
-//            'pagesApproved' => $logCounts['review-approve'], // Merged -a, -i, and -ia approvals.
-//            'pagesPatrolled' => $logCounts['patrol-patrol'],
-//            'usersBlocked' => $logCounts['block-block'],
-//            'usersUnblocked' => $logCounts['block-unblock'],
-//            'pagesProtected' => $logCounts['protect-protect'],
-//            'pagesUnprotected' => $logCounts['protect-unprotect'],
-//            'pagesDeleted' => $logCounts['delete-delete'],
-//            'pagesDeletedRevision' => $logCounts['delete-revision'],
-//            'pagesRestored' => $logCounts['delete-restore'],
-//            'pagesImported' => $logCounts['import-import'],
-//            'files_uploaded' => $logCounts['upload-upload'],
-//            'files_modified' => $logCounts['upload-overwrite'],
-//            'files_uploaded_commons' => $logCounts['files_uploaded_commons'],
-//
-//            // Other projects.
-//            'top_projects_edit_counts' => $topProjectsEditCounts,
         ]);
     }
 
     /**
      * @Route("/ec-namespacetotals/{project}/{username}", name="EditCounterNamespaceTotals")
+     * @param string $project
+     * @param string $username
+     * @return Response
      */
     public function namespaceTotalsAction($project, $username)
     {
@@ -194,6 +162,9 @@ class EditCounterController extends Controller
 
     /**
      * @Route("/ec-timecard/{project}/{username}", name="EditCounterTimeCard")
+     * @param string $project
+     * @param string $username
+     * @return Response
      */
     public function timecardAction($project, $username)
     {
@@ -214,6 +185,9 @@ class EditCounterController extends Controller
 
     /**
      * @Route("/ec-yearcounts/{project}/{username}", name="EditCounterYearCounts")
+     * @param string $project
+     * @param string $username
+     * @return Response
      */
     public function yearcountsAction($project, $username)
     {
@@ -235,6 +209,9 @@ class EditCounterController extends Controller
 
     /**
      * @Route("/ec-monthcounts/{project}/{username}", name="EditCounterMonthCounts")
+     * @param string $project
+     * @param string $username
+     * @return Response
      */
     public function monthcountsAction($project, $username)
     {
@@ -253,6 +230,9 @@ class EditCounterController extends Controller
 
     /**
      * @Route("/ec-latestglobal/{project}/{username}", name="EditCounterLatestGlobal")
+     * @param string $project
+     * @param string $username
+     * @return Response
      */
     public function latestglobalAction($project, $username)
     {

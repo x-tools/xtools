@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file contains only the EditCounter class.
+ */
 
 namespace Xtools;
 
@@ -28,6 +31,11 @@ class EditCounter extends Model
     /** @var int[] */
     protected $logCounts;
 
+    /**
+     * EditCounter constructor.
+     * @param Project $project The base project to count edits
+     * @param User $user
+     */
     public function __construct(Project $project, User $user)
     {
         $this->project = $project;
