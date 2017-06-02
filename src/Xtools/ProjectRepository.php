@@ -12,8 +12,11 @@ class ProjectRepository extends Repository
     /** @var array Project metadata. */
     protected $metadata;
 
-    /** @var string[] */
+    /** @var string[] Metadata if XTools is in single-wiki mode. */
     protected $singleMetadata;
+
+    /** @var string[][] Metadata of all projects, populated by self::getAll(). */
+    protected $projectsMetadata;
 
     /**
      * Convenience method to get a new Project object based on a given identification string.
@@ -68,12 +71,22 @@ class ProjectRepository extends Repository
      */
     public function getAll()
     {
+        // Single wiki mode?
         if ($this->singleMetadata) {
             return [$this->getOne('')];
         }
+        // Maybe we've already fetched it.
+        if (is_array($this->projectsMetadata)) {
+            return $this->projectsMetadata;
+        }
         $wikiQuery = $this->getMetaConnection()->createQueryBuilder();
         $wikiQuery->select(['dbname', 'url'])->from('wiki');
-        return $wikiQuery->execute()->fetchAll();
+        $projects = $wikiQuery->execute()->fetchAll();
+        $this->projectsMetadata = [];
+        foreach ($projects as $project) {
+            $this->projectsMetadata[$project['url']] = $project;
+        }
+        return $this->projectsMetadata;
     }
 
     /**
@@ -86,6 +99,14 @@ class ProjectRepository extends Repository
         // For single-wiki setups, every project is the same.
         if ($this->singleMetadata) {
             return $this->singleMetadata;
+        }
+
+        // Maybe we've already fetched it (if we're requesting via a domain).
+        if (isset($this->projectsMetadata[$project])) {
+            return $this->projectsMetadata[$project];
+        }
+        if (isset($this->projectsMetadata['https://'.$project])) {
+            return $this->projectsMetadata['https://'.$project];
         }
 
         // For muli-wiki setups, first check the cache.

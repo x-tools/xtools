@@ -3,6 +3,7 @@
 namespace Xtools;
 
 use DateInterval;
+use DateTime;
 use Mediawiki\Api\SimpleRequest;
 
 class EditCounterRepository extends Repository
@@ -262,6 +263,9 @@ class EditCounterRepository extends Repository
         }
         $this->stopwatch->start($cacheKey, 'XTools');
 
+        // Load all projects, so it doesn't have to request metadata about each one as it goes.
+        $project->getRepository()->getAll();
+
         $api = $this->getMediawikiApi($project);
         $params = [
             'meta' => 'globaluserinfo',
@@ -351,34 +355,81 @@ class EditCounterRepository extends Repository
     }
 
     /**
+     * Get revisions by this user.
+     * @param Project $project
+     * @param User $user
+     * @param DateTime $oldest
+     * @return array|mixed
+     */
+    public function getRevisions(Project $project, User $user, $oldest = null)
+    {
+        $username = $user->getUsername();
+        $cacheKey = "globalcontribs.{$project->getDatabaseName()}.$username";
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+        $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
+        $whereTimestamp = ($oldest instanceof DateTime)
+            ? ' AND rev_timestamp > '.$oldest->getTimestamp()
+            : '';
+        $sql = "SELECT rev_id, rev_timestamp, UNIX_TIMESTAMP(rev_timestamp) AS unix_timestamp, "
+            ." rev_minor_edit, rev_deleted, rev_len, rev_parent_id, rev_comment, "
+            ." page_title, page_namespace "
+            ."FROM $revisionTable JOIN $pageTable ON (rev_page = page_id)"
+            ." WHERE rev_user_text LIKE :username $whereTimestamp"
+            ." ORDER BY rev_timestamp DESC";
+        $resultQuery = $this->getProjectsConnection()->prepare($sql);
+        $resultQuery->bindParam(":username", $username);
+        $resultQuery->execute();
+        $revisions = $resultQuery->fetchAll();
+
+        // Cache this.
+        $cacheItem = $this->cache->getItem($cacheKey);
+        $cacheItem->set($revisions);
+        $cacheItem->expiresAfter(new DateInterval('PT15M'));
+        $this->cache->save($cacheItem);
+
+        return $revisions;
+    }
+
+    /**
      * Get this user's most recent 10 edits across all projects.
      * @param string $username The username.
      * @param integer $topN The number of items to return.
      * @param integer $days The number of days to search from each wiki.
      * @return string[]
      */
-    public function getRecentGlobalContribs($username, $projects = [], $topN = 10, $days = 30)
+    public function getRecentGlobalContribs(User $user, $topN = 10, $days = 30)
     {
+        $defaultProject =
+        $projects = $this->getRevisionCountsAllProjects($user, $project);
+        $username = $user->getUsername();
         $allRevisions = [];
-        foreach ($this->labsHelper->getProjectsInfo($projects) as $project) {
-            $cacheKey = "globalcontribs.{$project['dbName']}.$username";
-            if ($this->cacheHas($cacheKey)) {
-                $revisions = $this->cacheGet($cacheKey);
+        foreach ($projects as $project) {
+            $cacheKey = "globalcontribs.{$project['dbname']}.$username";
+            if ($this->cache->hasItem($cacheKey)) {
+                $revisions = $this->cache->getItem($cacheKey)->get();
             } else {
                 $sql =
                     "SELECT rev_id, rev_timestamp, UNIX_TIMESTAMP(rev_timestamp) AS unix_timestamp, " .
                     " rev_minor_edit, rev_deleted, rev_len, rev_parent_id, rev_comment, " .
                     " page_title, page_namespace " . " FROM " .
-                    $this->labsHelper->getTable('revision', $project['dbName']) . "    JOIN " .
-                    $this->labsHelper->getTable('page', $project['dbName']) .
+                    $this->getTableName($project['dbname'], 'revision') . "    JOIN " .
+                    $this->getTableName($project['dbname'], 'page') .
                     "    ON (rev_page = page_id)" .
                     " WHERE rev_timestamp > NOW() - INTERVAL $days DAY AND rev_user_text LIKE :username" .
                     " ORDER BY rev_timestamp DESC" . " LIMIT 10";
-                $resultQuery = $this->replicas->prepare($sql);
+                $resultQuery = $this->getProjectsConnection()->prepare($sql);
                 $resultQuery->bindParam(":username", $username);
                 $resultQuery->execute();
                 $revisions = $resultQuery->fetchAll();
-                $this->cacheSave($cacheKey, $revisions, 'PT15M');
+
+                // Cache this.
+                $cacheItem = $this->cache->getItem($cacheKey);
+                $cacheItem->set($revisions);
+                $cacheItem->expiresAfter(new DateInterval('PT15M'));
+                $this->cache->save($cacheItem);
             }
             if (count($revisions) === 0) {
                 continue;

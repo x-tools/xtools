@@ -3,7 +3,6 @@
 namespace Xtools;
 
 use \DateTime;
-use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * An EditCounter provides statistics about a user's edits on a project.
@@ -470,5 +469,39 @@ class EditCounter extends Model
             }
         }
         return $out;
+    }
+
+    public function latestGlobalRevisions($max = 40)
+    {
+        // Re-use the list of active projects from all-project revision counting.
+        $editCounts = $this->getRepository()->getRevisionCountsAllProjects($this->user, $this->project);
+        // Go through each project that has any edits.
+        $globalRevisions = [];
+        $oldest = null;
+        foreach ($editCounts as $editCount) {
+            // Don't query revisions if there aren't any.
+            if ($editCount['total'] == 0) {
+                continue;
+            }
+            // Get this project's revisions.
+            $revisions = $this->getRepository()
+                ->getRevisions($editCount['project'], $this->user, $oldest);
+            foreach ($revisions as &$revision) {
+                $revision['project'] = $editCount['project'];
+                $revision['timestamp'] = DateTime::createFromFormat('U', $revision['unix_timestamp']);
+                // If we've already got enough, only check for those newer than the current oldest.
+                $enough = (count($globalRevisions) >= $max);
+                $isOlder = ($oldest === null
+                            || ($oldest !== null && $revision['unix_timestamp'] < $oldest));
+                if ($enough && $isOlder) {
+                    $oldest = $revision['unix_timestamp'];
+                }
+                $globalRevisions[$revision['unix_timestamp']] = $revision;
+            }
+            // Sort and prune, before adding more.
+            krsort($globalRevisions);
+            $globalRevisions = array_slice($globalRevisions, 0, $max);
+        }
+        return $globalRevisions;
     }
 }

@@ -265,25 +265,14 @@ class EditCounterController extends Controller
     public function latestglobalAction($project, $username)
     {
         $this->setUpEditCounter($project, $username);
-
-        $topProjectsEditCounts = $this->editCounterHelper->getTopProjectsEditCounts(
-            $info['url'],
-            $username
-        );
-        $recentGlobalContribs = $this->editCounterHelper->getRecentGlobalContribs(
-            $username,
-            array_keys($topProjectsEditCounts)
-        );
-
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/latest_global.html.twig', [
             'xtTitle' => 'tool_ec',
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
-            'latest_global_contribs' => $recentGlobalContribs,
-            'username' => $username,
-            'project' => $project,
-            'namespaces' => $this->apiHelper->namespaces($project),
+            'user' => $this->user,
+            'project' => $this->project,
+            'ec' => $this->editCounter,
         ]);
     }
 }

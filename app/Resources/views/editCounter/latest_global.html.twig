@@ -13,18 +13,21 @@
         </tr>
     </thead>
     <tbody>
-    {% for edit in latest_global_contribs %}
+    {% for rev in ec.latestGlobalRevisions %}
         <tr>
-            <td class="tddate">{{ edit.rev_time_formatted }}</td>
-            <td><a href="{{ edit.project_url }}">{{ edit.project_name }}</a></td>
+            <td class="tddate">{{ rev.timestamp|date('Y-m-d H:i') }}</td>
+            <td><a href="{{ rev.project.url }}">{{ rev.project.title }}</a></td>
             <td>(
-                {{ diff_link(edit.rev_id, edit.project_url, 'diff') }}
-                &middot; {{ user_log_link(username, project, 'log') }}
-                &middot; <a href="{{ path('TopEditsResults', {project:edit.project_db_name, username:username, namespace:edit.page_namespace, article:edit.page_title}) }}">topedits</a>
+                {{ diff_link(rev.rev_id, rev.project.url, 'diff') }}
+                &middot; {{ user_log_link(user.username, rev.project.url, 'log') }}
+                &middot;
+                <a href="{{ path('TopEditsResults', {project:rev.project.databaseName, username:user.username, namespace:rev.page_namespace, article:rev.page_title}) }}">
+                    topedits
+                </a>
                 )
             </td>
-            <td class="tdtitle break">{{ wiki_link(edit.page_title, edit.project_url) }}</td>
-            <td class="revtext break">{{ edit.rev_comment }}</td>
+            <td class="tdtitle break">{{ wiki_link(rev.page_title, rev.project.url) }}</td>
+            <td class="revtext break">{{ rev.rev_comment }}</td>
         </tr>
     {% endfor %}
     </tbody>
