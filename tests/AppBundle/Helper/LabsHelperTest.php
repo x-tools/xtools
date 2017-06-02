@@ -35,16 +35,6 @@ class LabsHelperTest extends WebTestCase
         }
     }
 
-    public function testDatabasePrepare()
-    {
-        if ($this->container->getParameter('app.is_labs')) {
-            // When using Labs.
-            $dbVales = $this->labsHelper->databasePrepare('en.wikipedia');
-            $this->assertEquals('enwiki', $dbVales['dbName']);
-            $this->assertEquals('https://en.wikipedia.org', $dbVales['url']);
-        }
-    }
-
     public function testNormalizeProject()
     {
         if ($this->container->getParameter('app.is_labs')) {

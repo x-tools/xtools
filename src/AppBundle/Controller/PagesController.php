@@ -7,6 +7,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Xtools\ProjectRepository;
 
 class PagesController extends Controller
 {
@@ -61,20 +62,15 @@ class PagesController extends Controller
 
         // set default wiki so we can populate the namespace selector
         if (!$project) {
-            $project = $this->container->getParameter('default_project');
+            $project = $this->getParameter('default_project');
         }
 
-        // Retrieving the global groups, using the ApiHelper class
-        $api = $this->get("app.api_helper");
+        $projectData = ProjectRepository::getProject($project, $this->container);
 
-        // Try fetching namespaces. At this point $project has some sort of value
-        try {
-            $namespaces = $api->namespaces($project);
-        } catch (\Exception $e) {
-            // show error message and redirect back to default project
-            $this->addFlash("notice", [$e->getMessage()]);
-            $project = $this->container->getParameter('default_project');
-            return $this->redirectToRoute("PagesProject", [ 'project'=>$project ]);
+        $namespaces = null;
+
+        if ($projectData->exists()) {
+            $namespaces = $projectData->getNamespaces();
         }
 
         // Otherwise fall through.
@@ -99,11 +95,16 @@ class PagesController extends Controller
 
         $username = ucfirst($username);
 
-        $dbValues = $lh->databasePrepare($project, "Pages");
+        $projectData = ProjectRepository::getProject($project, $this->container);
 
-        $dbName = $dbValues["dbName"];
-        $wikiName = $dbValues["wikiName"];
-        $projectUrl = $dbValues["url"];
+        // If the project exists, actually populate the values
+        if (!$projectData->exists()) {
+            $this->addFlash("notice", ["invalid-project", $project]);
+            return $this->redirectToRoute("pages");
+        }
+
+        $dbName = $projectData->getDatabaseName();
+        $projectUrl = $projectData->getUrl();
 
         $user_id = 0;
 
