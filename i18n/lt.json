@@ -1,0 +1,20 @@
+{
+  "all": "Visi",
+  "bot": "Robotas",
+  "date": "Data",
+  "editors": "Redaktoriai",
+  "edits": "Keitimai",
+  "help-translate": "Padėti išversti",
+  "history": "Istorija",
+  "page-title": "Puslapio pavadinimas",
+  "pager-newer-n": "$1 {{PLURAL:$1|naujesnis|naujesni|naujesnių}}",
+  "pager-older-n": "$1 {{PLURAL:$1|senesnis|senesni|senesnių}}",
+  "pages": "Puslapiai",
+  "pageviews": "Puslapio peržiūrų skaičius",
+  "project": "Projektas",
+  "report-issue": "Pranešti apie problemą",
+  "size": "Dydis",
+  "translation-credits": "Vertimus pateikė $1, $2 ir $3.",
+  "unknown": "Nežinoma",
+  "user": "Naudotojas"
+}

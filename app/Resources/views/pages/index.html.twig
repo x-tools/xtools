@@ -7,14 +7,7 @@
             {{ forms.user_input() }}
             {{ forms.wiki_input(project) }}
             {{ forms.namespace_select(namespaces, true) }}
-            <div class="input-group">
-                <span class="input-group-addon form-label">Redirects</span>
-                <select class="form-control" name="redirects">
-                    <option value="noredirects" selected>{{ msg('redirfilter_noredirects') }}</option>
-                    <option value="all">{{ msg('redirfilter_all') }}</option>
-                    <option value="onlyredirects">{{ msg('redirfilter_onlyredirects') }}</option>
-                </select>
-            </div>
+            {{ forms.redirects_select() }}
         </fieldset>
         {{ forms.submit_btn() }}
     </form>

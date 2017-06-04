@@ -1,5 +1,6 @@
 /app/config/table_map.yml
 /app/config/parameters.yml
+/app/config/labs_overrides.yml
 /build/
 /phpunit.xml
 /var/*
@@ -29,3 +30,4 @@
 /composer.lock
 /mrb_prepcommit.sh
 /app/config/project_map.yml
+i18n_helper.js

@@ -79,10 +79,9 @@ class PagesController extends Controller
 
         // Otherwise fall through.
         return $this->render('pages/index.html.twig', [
-            "xtPageTitle" => "tool_pages",
-            "xtSubtitle" => "tool_pages_desc",
-            'xtPage' => "pages",
-            'xtTitle' => "tool_pages",
+            'xtPageTitle' => 'tool-pages',
+            'xtSubtitle' => 'tool-pages-desc',
+            'xtPage' => 'pages',
             'project' => $project,
             'namespaces' => $namespaces,
         ]);
@@ -112,7 +111,7 @@ class PagesController extends Controller
         $pageTable = $lh->getTable("page", $dbName);
         $revisionTable = $lh->getTable("revision", $dbName);
         $archiveTable = $lh->getTable("archive", $dbName);
-        $logTable = $lh->getTable("logging", $dbName);
+        $logTable = $lh->getTable("logging", $dbName, "userindex");
 
         // Grab the connection to the replica database (which is separate from the above)
         $conn = $this->get('doctrine')->getManager("replicas")->getConnection();
@@ -267,7 +266,7 @@ class PagesController extends Controller
         }
 
         if ($total < 1) {
-            $this->addFlash("notice", [ "noresult", $username ]);
+            $this->addFlash("notice", [ "no-result", $username ]);
             return $this->redirectToRoute("PagesProject", [ "project"=>$project ]);
         }
 
@@ -283,7 +282,8 @@ class PagesController extends Controller
 
         // Assign the values and display the template
         return $this->render('pages/result.html.twig', [
-            'xtPage' => "pages",
+            'xtPage' => 'pages',
+            'xtTitle' => $username,
             'project' => $project,
             'project_url' => $projectUrl,
 

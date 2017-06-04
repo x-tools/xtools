@@ -39,11 +39,9 @@ class SimpleEditCounterController extends Controller
 
         // Otherwise fall through.
         return $this->render('simpleEditCounter/index.html.twig', [
-            "xtPageTitle" => "tool_sc",
-            "xtSubtitle" => "tool_sc_desc",
-            'xtPage' => "sc",
-            'xtTitle' => "tool_sc",
-
+            'xtPageTitle' => 'tool-sc',
+            'xtSubtitle' => 'tool-sc-desc',
+            'xtPage' => 'sc',
             'project' => $project,
         ]);
     }
@@ -89,7 +87,7 @@ class SimpleEditCounterController extends Controller
         $resultQuery->execute();
 
         if ($resultQuery->errorCode() > 0) {
-            $this->addFlash("notice", [ "noresult", $username ]);
+            $this->addFlash("notice", [ "no-result", $username ]);
             return $this->redirectToRoute("SimpleEditCounterProject", [ "project"=>$project ]);
         }
 
@@ -121,7 +119,7 @@ class SimpleEditCounterController extends Controller
         // Unknown user - If the user is created the $results variable will have 3 entries.
         // This is a workaround to detect non-existent IPs.
         if (count($results) < 3 && $arch == 0 && $rev == 0) {
-            $this->addFlash('notice', [ "noresult", $username ]);
+            $this->addFlash('notice', [ "no-result", $username ]);
 
             return $this->redirectToRoute("SimpleEditCounterProject", [ "project"=>$project ]);
         }
@@ -147,6 +145,7 @@ class SimpleEditCounterController extends Controller
         // Assign the values and display the template
         return $this->render('simpleEditCounter/result.html.twig', [
             'xtPage' => 'sc',
+            'xtTitle' => $username,
             'username' => $username,
             'project' => $project,
             'project_url' => $url,

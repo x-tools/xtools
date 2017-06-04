@@ -1,0 +1,16 @@
+{
+  "all": "Összes",
+  "bot": "Bot",
+  "date": "Dátum",
+  "help-translate": "Segíts fordítani",
+  "history": "Laptörténet",
+  "page-title": "Lapcím",
+  "pager-newer-n": "{{PLURAL:$1|1 újabb|$1 újabb}}",
+  "pager-older-n": "{{PLURAL:$1|1 régebbi|$1 régebbi}}",
+  "pages": "Lapok",
+  "pageviews": "Megtekintések",
+  "project": "Projekt",
+  "report-issue": "Hibabejelentés",
+  "translation-credits": "A fordítást a $1, az $2 és a $3 teszi lehetővé.",
+  "user": "Felhasználó"
+}

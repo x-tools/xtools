@@ -1,6 +1,7 @@
+# If you change the key names, do a find/replace to update their usage throughout the rest of XTools
 parameters:
   automated_tools:
-    Rollback: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) edits by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\] \(\[\[User talk:.*?\|talk\]\]\) to last version by .*'
+    Generic rollback: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) edits by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\] \(\[\[User talk:.*?\|talk\]\]\) to last version by .*'
     Undo: '^Undid revision \d+ by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\]'
     Pending changes revert: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) \d+ (\[\[Wikipedia:Pending changes\|pending\]\]|pending) edits? (to revision \d+|by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\])'
     Bot revert: '^Reverting possible vandalism by.*?to version by|^BOT (Reverted edits by|rv \[\[Special:Contributions)'
@@ -40,7 +41,7 @@ parameters:
     Dashes: 'using a \[\[User:GregU\/dashes.js\|script'
     SPI Helper: '^(Archiving case (to|from)|Adding sockpuppetry (tag|block notice) per) \[\[Wikipedia:Sockpuppet investigations'
     User:Doug/closetfd.js: '\(using \[\[User:Doug\/closetfd.js'
-    Cat-a-lot: '^\[\[Help:Cat-a-lot\|Cat-a-lot\]\]:'
+    Cat-a-lot: '\[\[Help:Cat-a-lot\|Cat-a-lot\]\]'
     autoFormatter: 'using (\[\[:meta:User:TMg\/autoFormatter|autoFormatter)'
     Citation bot: '\[\[WP:UCB\|Assisted by Citation bot'
     Red Link Recovery Live: '\[\[w:en:WP:RLR\|You can help!'
@@ -55,7 +56,7 @@ parameters:
     AFC/R HS: 'Using \[\[User:PhantomTech\/scripts\/AFCRHS.js\|AFC\/R HS'
     For the Common Good: 'WP:FTCG\|FtCG'
     Twinkle revert: '(Reverted to revision|Reverted \d+ edits).*(WP:(TW|TWINKLE|Twinkle)|Wikipedia:Twinkle)'
-    User:Technical13/Scripts/OrphanStatus.js: '\[\[User:Technical_13/Scripts/OrphanStatus\|'
+    User:Technical13/Scripts/OrphanStatus.js: '\[\[User:Technical_13\/Scripts\/OrphanStatus\|'
     The Wikipedia Adventure: 'simulated automatically as part of \[\[WP:The Wikipedia Adventure\|'
 
   semi-automated edits source: https://tools.wmflabs.org/musikanimal/nonautomated_edits/about

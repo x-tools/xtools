@@ -207,6 +207,9 @@ body {
 section > .panel-body {
     overflow-x: scroll;
 }
+.panel-body .table:only-child {
+    margin-bottom: 0;
+}
 .xt-panel-body table {
     white-space: nowrap;
 }
@@ -360,6 +363,8 @@ div.outer_bar {
     font-style: italic;
     max-width: 100%;
     overflow-x: hidden;
+    position: relative;
+    top: 8px;
     text-overflow: ellipsis;
     white-space: nowrap;
 }

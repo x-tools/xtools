@@ -1,5 +1,6 @@
+##############
 Pre-requisites
-==============
+##############
 
 Xtools requires the following to run:
 
@@ -15,7 +16,7 @@ Xtools requires the following to run:
 - Composer 1.0.0+
 
 Databases
----------
+=========
 
 1. One or more project databases.  These should be current mediawiki installations.  The meta database should point to them.
 2. A Meta database.

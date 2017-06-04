@@ -173,23 +173,24 @@ class LabsHelper
      *
      * @param string $table  Table name
      * @param string $dbName Database name
+     * @param string|null $table_extension Optional table extension, which will only get used if we're on labs.
      *
      * @return string Converted table name
      */
-    public function getTable($table, $dbName = null)
+    public function getTable($table, $dbName = null, $table_extension = null)
     {
+        // This is a workaround for a one-to-many mapping
+        // as required by Labs.  We combine $table with
+        // $table_extension in order to generate the new table name
+        if ($this->isLabs() && $table_extension !== null) {
+            $table = $table . "_" . $table_extension;
+        }
+
         // Use the table specified in the table mapping configuration, if present.
         $mapped = false;
         if ($this->container->hasParameter("app.table.$table")) {
             $mapped = true;
             $table = $this->container->getParameter("app.table.$table");
-        }
-
-        // For 'revision' and 'logging' tables (actually views) on Labs, use the indexed versions
-        // (that have some rows hidden, e.g. for revdeleted users).
-        $isLoggingOrRevision = in_array($table, ['revision', 'logging', 'archive']);
-        if (!$mapped && $isLoggingOrRevision && $this->isLabs()) {
-            $table = $table."_userindex";
         }
 
         // Figure out database name.

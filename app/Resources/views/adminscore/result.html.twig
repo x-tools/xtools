@@ -24,13 +24,13 @@
                         {% endif %}
                     {% endfor %}
                     <tfoot>
-                        <th>{{ msg('total_actions') }}</th>
+                        <th>{{ msg('total') }}</th>
                         <th>{{ total | number_format }}</th>
                     </tfoot>
                 </tbody></table>
             </div>
         {% endset %}
-        {{ layout.content_block('tool_adminscore', content) }}
+        {{ layout.content_block('tool-adminscore', content) }}
     </div>
 </div>
 {% endblock %}

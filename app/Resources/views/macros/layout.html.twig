@@ -18,8 +18,8 @@
                     {{ msg(title) }}
                 {% endif %}
                 {% if toggle %}
-                <small class='xt-show'>[{{ msg('show') }}]</small>
-                <small class='xt-hide'>[{{ msg('hide') }}]</small>
+                <small class='xt-show'>[{{ msg('show') | lower }}]</small>
+                <small class='xt-hide'>[{{ msg('hide') | lower }}]</small>
                 {% endif %}
                 {% if description is defined %}
                 <span class='pull-right text-muted xt-panel-description'>{{ description }}</span>

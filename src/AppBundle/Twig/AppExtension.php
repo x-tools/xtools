@@ -2,6 +2,8 @@
 
 namespace AppBundle\Twig;
 
+use Symfony\Component\VarDumper\VarDumper;
+
 class AppExtension extends Extension
 {
 
@@ -22,7 +24,6 @@ class AppExtension extends Extension
             new \Twig_SimpleFunction('msgPrintExists', [ $this, 'intuitionMessagePrintExists' ], $options),
             new \Twig_SimpleFunction('msgExists', [ $this, 'intuitionMessageExists' ], $options),
             new \Twig_SimpleFunction('msg', [ $this, 'intuitionMessage' ], $options),
-            new \Twig_SimpleFunction('msg_footer', [ $this, 'intuitionMessageFooter' ], $options),
             new \Twig_SimpleFunction('lang', [ $this, 'getLang' ], $options),
             new \Twig_SimpleFunction('langName', [ $this, 'getLangName' ], $options),
             new \Twig_SimpleFunction('allLangs', [ $this, 'getAllLangs' ]),
@@ -33,6 +34,7 @@ class AppExtension extends Extension
             new \Twig_SimpleFunction('enabled', [ $this, 'tabEnabled' ]),
             new \Twig_SimpleFunction('tools', [ $this, 'allTools' ]),
             new \Twig_SimpleFunction('color', [ $this, 'getColorList' ]),
+            new \Twig_SimpleFunction('chartColor', [ $this, 'chartColor' ]),
             new \Twig_SimpleFunction('isWMFLabs', [ $this, 'isWMFLabs' ]),
             new \Twig_SimpleFunction('isSingleWiki', [ $this, 'isSingleWiki' ]),
             new \Twig_SimpleFunction('getReplagThreshold', [ $this, 'getReplagThreshold' ]),
@@ -41,6 +43,7 @@ class AppExtension extends Extension
             new \Twig_SimpleFunction('replag', [ $this, 'replag' ]),
             new \Twig_SimpleFunction('link', [ $this, 'link' ]),
             new \Twig_SimpleFunction('quote', [ $this, 'quote' ]),
+            new \Twig_SimpleFunction('bugReportURL', [ $this, 'bugReportURL' ]),
         ];
     }
 
@@ -62,45 +65,6 @@ class AppExtension extends Extension
     public function generateYear()
     {
         return date('Y');
-    }
-
-    /**
-     * This function mainly acts as a workaround, as only WMF wikis use /w/ or /wiki/ in their path.
-     * @param string $url
-     * @param string $page
-     * @param string $secondary
-     * @return string
-     */
-    public function linkToWiki($url, $page, $secondary = "")
-    {
-        $link = $url . "/";
-
-        if ($this->isWMFLabs()) {
-            $link .= "wiki/";
-        }
-
-        $link .= $page;
-
-        if ($secondary != "") {
-            $link .= "?$secondary";
-        }
-
-        return $link;
-    }
-
-    public function linkToWikiScript($url, $secondary)
-    {
-        $link = $url . "/";
-
-        if ($this->isWMFLabs()) {
-            $link .= "w/";
-        }
-
-        $link .= "index.php?$secondary";
-
-        // $link = str_replace("//", "/", $link);
-
-        return $link;
     }
 
     // TODO: refactor all intuition stuff so it can be used anywhere
@@ -126,13 +90,6 @@ class AppExtension extends Extension
     public function intuitionMessage($message = "", $vars = [])
     {
         return $this->getIntuition()->msg($message, [ "domain" => "xtools", "variables" => $vars ]);
-    }
-
-    public function intuitionMessageFooter()
-    {
-        $message = $this->getIntuition()->getFooterLine(TSINT_HELP_NONE);
-        $message = preg_replace('/<a class.*?>Change language!<\/a>/i', "", $message);
-        return $message;
     }
 
     public function getLang()
@@ -323,6 +280,29 @@ class AppExtension extends Extension
         }
     }
 
+    /**
+     * Get color-blind friendly colors for use in charts
+     * @param  Integer $num Index of color
+     * @return String RGBA color (so you can more easily adjust the opacity)
+     */
+    public function chartColor($num)
+    {
+        $colors = [
+            'rgba(171, 212, 235, 1)',
+            'rgba(178, 223, 138, 1)',
+            'rgba(251, 154, 153, 1)',
+            'rgba(253, 191, 111, 1)',
+            'rgba(202, 178, 214, 1)',
+            'rgba(207, 182, 128, 1)',
+            'rgba(141, 211, 199, 1)',
+            'rgba(252, 205, 229, 1)',
+            'rgba(255, 247, 161, 1)',
+            'rgba(217, 217, 217, 1)',
+        ];
+
+        return $colors[$num % count($colors)];
+    }
+
     public function isSingleWiki()
     {
         $param = true;
@@ -413,8 +393,9 @@ class AppExtension extends Extension
      */
     public function quote()
     {
-        $id = rand(1, sizeof($this->container->getParameter('quotes')));
-        return $this->container->getParameter('quotes')[$id];
+        $quotes = $this->container->getParameter('quotes');
+        $id = array_rand($quotes);
+        return $quotes[$id];
     }
 
     /*********************************** FILTERS ***********************************/
@@ -423,6 +404,7 @@ class AppExtension extends Extension
     {
         return [
             new \Twig_SimpleFilter('capitalize_first', [ $this, 'capitalizeFirst' ]),
+            new \Twig_SimpleFilter('percent_format', [ $this, 'percentFormat' ]),
         ];
     }
 
@@ -435,5 +417,23 @@ class AppExtension extends Extension
     public function capitalizeFirst($str)
     {
         return ucfirst($str);
+    }
+
+    /**
+     * Format a given number or fraction as a percentage
+     * @param  number  $numerator     Numerator or single fraction if denominator is ommitted
+     * @param  number  [$denominator] Denominator
+     * @param  integer [$precision]   Number of decimal places to show
+     * @return string                 Formatted percentage
+     */
+    public function percentFormat($numerator, $denominator = null, $precision = 1)
+    {
+        if (!$denominator) {
+            $quotient = $numerator;
+        } else {
+            $quotient = ( $numerator / $denominator ) * 100;
+        }
+
+        return round($quotient, $precision) . '%';
     }
 }

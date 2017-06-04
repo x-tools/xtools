@@ -1,0 +1,21 @@
+{
+  "all": "Totes",
+  "bot": "Bot",
+  "current-size": "Talha actuala",
+  "date": "Data",
+  "editors": "Editors",
+  "edits": "Modificar",
+  "history": "Istoric",
+  "page-title": "Títol de la pagina",
+  "pager-newer-n": "{{PLURAL:$1|1 mai recenta|$1 mai recentas}}",
+  "pager-older-n": "{{PLURAL:$1|1 mai anciana|$1 mai ancianas}}",
+  "pages": "Paginas",
+  "pageviews": "Paginas vistas",
+  "powered-by": "Foncionant amb $1",
+  "project": "Projècte",
+  "report-issue": "Senhalar un problèma",
+  "size": "Talha",
+  "translation-credits": "Traduccions prepausadas per $1 e $2.",
+  "unknown": "Desconegut",
+  "user": "Utilizaire"
+}

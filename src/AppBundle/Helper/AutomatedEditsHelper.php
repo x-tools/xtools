@@ -2,18 +2,17 @@
 
 namespace AppBundle\Helper;
 
+use DateTime;
 use Doctrine\DBAL\Connection;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\VarDumper\VarDumper;
+use Xtools\ProjectRepository;
 
-class AutomatedEditsHelper
+class AutomatedEditsHelper extends HelperBase
 {
-
-    /** @var ContainerInterface */
-    private $container;
 
     /** @var string[] The list of tools that are considered reverting. */
     public $revertTools = [
@@ -95,58 +94,93 @@ class AutomatedEditsHelper
         if (is_array($this->tools)) {
             return $this->tools;
         }
-        $this->tools = call_user_func_array(
-            'array_merge',
-            $this->container->getParameter("automated_tools")
-        );
+        $this->tools = $this->container->getParameter("automated_tools");
         return $this->tools;
     }
 
     /**
-     * Get a summary of automated edits made by the given user in their last 1000 edits.
-     * Will cache the result for 10 minutes.
-     * @param integer $userId The user ID.
-     * @return integer[] Array of edit counts, keyed by all tool names from
-     * app/config/semi_automated.yml
+     * Get a list of nonautomated edits by a user
+     * @param  string         $project   Project domain such as en.wikipedia.org
+     * @param  string         $username
+     * @param  string|integer $namespace Numerical value or 'all' for all namespaces
+     * @param  integer        $offset    Used for pagination, offset results by N edits
+     * @return string[]       Data as returned by database query, includes:
+     *                        'page_title' (string, including namespace),
+     *                        'namespace' (integer), 'rev_id' (int),
+     *                        'timestamp' (DateTime), 'minor_edit' (bool)
+     *                        'sumamry' (string)
      */
-    public function getEditsSummary($userId)
+    public function getNonautomatedEdits($project, $username, $namespace, $offset = 0)
     {
-        // Set up cache.
-        /** @var CacheItemPoolInterface $cache */
-        $cache = $this->container->get('cache.app');
-        $cacheItem = $cache->getItem('automatedEdits.'.$userId);
-        if ($cacheItem->isHit()) {
-            return $cacheItem->get();
+        $project = ProjectRepository::getProject($project, $this->container);
+        $namespaces = $project->getNamespaces();
+
+        $conn = $this->container->get('doctrine')->getManager('replicas')->getConnection();
+
+        $lh = $this->container->get('app.labs_helper');
+        $revTable = $lh->getTable('revision', $project->getDatabaseName());
+        $pageTable = $lh->getTable('page', $project->getDatabaseName());
+
+        $AEBTypes = $this->container->getParameter('automated_tools');
+        $allAETools = $conn->quote(implode('|', $AEBTypes), \PDO::PARAM_STR);
+
+        $namespaceClause = $namespace === 'all' ? '' : "AND rev_namespace = $namespace";
+
+        // First get the non-automated contribs
+        $query = "SELECT page_title, page_namespace, rev_id, rev_len, rev_parent_id,
+                         rev_timestamp, rev_minor_edit, rev_comment
+                  FROM $pageTable JOIN $revTable ON page_id = rev_page
+                  WHERE rev_user_text = :username
+                  AND rev_timestamp > 0
+                  AND rev_comment NOT RLIKE $allAETools
+                  ORDER BY rev_id DESC
+                  LIMIT 50
+                  OFFSET $offset";
+        $editData = $conn->executeQuery($query, ['username' => $username])->fetchAll();
+
+        if (empty($editData)) {
+            return [];
         }
 
-        // Get the most recent 1000 edit summaries.
-        /** @var Connection $replicas */
-        $replicas = $this->container->get('doctrine')->getManager('replicas')->getConnection();
-        /** @var LabsHelper $labsHelper */
-        $labsHelper = $this->container->get('app.labs_helper');
-        $sql = "SELECT rev_comment FROM ".$labsHelper->getTable('revision')
-               ." WHERE rev_user=:userId ORDER BY rev_timestamp DESC LIMIT 1000";
-        $resultQuery = $replicas->prepare($sql);
-        $resultQuery->bindParam("userId", $userId);
-        $resultQuery->execute();
-        $results = $resultQuery->fetchAll();
-        $out = [];
-        foreach ($results as $result) {
-            $toolName = $this->getTool($result['rev_comment']);
-            if ($toolName) {
-                if (!isset($out[$toolName])) {
-                    $out[$toolName] = 0;
-                }
-                $out[$toolName]++;
+        // Get diff sizes, based on length of each parent revision
+        $parentRevIds = array_map(function ($edit) {
+            return $edit['rev_parent_id'];
+        }, $editData);
+        $query = "SELECT rev_len, rev_id
+                  FROM revision
+                  WHERE rev_id IN (" . implode(',', $parentRevIds) . ")";
+        $diffSizeData = $conn->executeQuery($query)->fetchAll();
+
+        // reformat with rev_id as the key, rev_len as the value
+        $diffSizes = [];
+        foreach ($diffSizeData as $diff) {
+            $diffSizes[$diff['rev_id']] = $diff['rev_len'];
+        }
+
+        // Build our array of nonautomated edits
+        $editData = array_map(function ($edit) use ($namespaces, $diffSizes) {
+            $pageTitle = $edit['page_title'];
+
+            if ($edit['page_namespace'] !== '0') {
+                $pageTitle = $namespaces[$edit['page_namespace']] . ":$pageTitle";
             }
-        }
-        arsort($out);
 
-        // Cache for 10 minutes.
-        $cacheItem->expiresAfter(new \DateInterval('PT10M'));
-        $cacheItem->set($out);
-        $cache->save($cacheItem);
+            $diffSize = $edit['rev_len'];
+            if ($edit['rev_parent_id'] > 0) {
+                $diffSize = $edit['rev_len'] - $diffSizes[$edit['rev_parent_id']];
+            }
 
-        return $out;
+            return [
+                'page_title' => $pageTitle,
+                'namespace' => (int) $edit['page_namespace'],
+                'rev_id' => (int) $edit['rev_id'],
+                'timestamp' => DateTime::createFromFormat('YmdHis', $edit['rev_timestamp']),
+                'minor_edit' => (bool) $edit['rev_minor_edit'],
+                'summary' => $edit['rev_comment'],
+                'size' => $diffSize
+            ];
+        }, $editData);
+
+        return $editData;
     }
 }

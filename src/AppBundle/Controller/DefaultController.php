@@ -18,7 +18,7 @@ class DefaultController extends Controller
         // replace this example code with whatever you need
         return $this->render('default/index.html.twig', [
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
-            "xtPageTitle" => "welcome",
+            'xtPageTitle' => 'welcome',
             'xtPage' => "index",
         ]);
     }
@@ -31,9 +31,7 @@ class DefaultController extends Controller
 
         // replace this example code with whatever you need
         return $this->render('default/about.html.twig', array(
-            "xtTitle" => "About",
-            "xtPageTitle" => "about",
-            'xtPage' => "index",
+            'xtPage' => 'index',
         ));
     }
 

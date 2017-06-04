@@ -94,8 +94,8 @@ class AdminStatsController extends Controller
             [
                 'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
                 'xtPage' => 'adminstats',
-                'xtPageTitle' => 'tool_adminstats',
-                'xtSubtitle' => 'tool_adminstats_desc',
+                'xtPageTitle' => 'tool-adminstats',
+                'xtSubtitle' => 'tool-adminstats-desc',
             ]
         );
     }
@@ -185,7 +185,7 @@ class AdminStatsController extends Controller
         // Load up the tables we need and run the mega query.
         // This query provides all of the statistics
         $userTable = $lh->getTable("user", $dbName);
-        $loggingTable = $lh->getTable("logging", $dbName);
+        $loggingTable = $lh->getTable("logging", $dbName, "userindex");
 
         $startDb = date('Ymd000000', strtotime($start));
         $endDb = date('Ymd000000', strtotime($end));
@@ -276,6 +276,7 @@ class AdminStatsController extends Controller
             [
                 'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
                 'xtPage' => 'adminstats',
+                'xtTitle' => $project,
 
                 'project_url' => $url,
                 'project' => $project,

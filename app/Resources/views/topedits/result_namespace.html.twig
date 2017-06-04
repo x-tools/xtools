@@ -9,30 +9,30 @@
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {{ msg('back') }}
             </a>
-            {{ user_link(username, project_url) }}
+            {{ user_link(user.username, project.url) }}
             <small>
                 &bull;
-                {{ project }}
+                {{ project.title }}
             </small>
         </div>
     </header>
 
     <div class="panel-body xt-panel-body" >
         <p class="text-center xt-heading-subtitle">
-            {{ user_log_link(username, project_url, msg('block_log'), 'block') }}
+            {{ user_log_link(user.username, project.url, msg('block-log'), 'block') }}
             &middot;
-            <a href="{{ path('EditCounterResult', {project:project, username:username}) }}" >{{ msg('tool_ec') }}</a>
+            <a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool-ec') }}</a>
             {% if not isSingleWiki() %}
             &middot;
-            <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ username }}" >{{ msg('global_contribs') }}</a>
+            <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ user.username }}" >{{ msg('global-contribs') }}</a>
             {% endif %}
             {% if isWMFLabs() %}
             &middot;
-            <a target="_blank" href="//tools.wmflabs.org/pageviews/?project={{ project }}&amp;pages=User:{{ username }}">{{ msg('pageviews_userpage') }}</a>
+            <a target="_blank" href="//tools.wmflabs.org/pageviews/?project={{ project.domain }}&amp;pages=User:{{ user.username }}">{{ msg('pageviews-userpage') }}</a>
             {% endif %}
         </p>
 
-        <h3 class="text-center">{{ msg('topedits_per_namespace') }}</h3>
+        <h3 class="text-center">{{ msg('topedits-per-namespace') }}</h3>
 
         {% set content %}
         <table class="table table-bordered table-hover table-striped topedits-namespace-table" >
@@ -45,7 +45,7 @@
                 </th>
                 <th>
                     <span class="sort-link sort-link--page" data-column="page">
-                        {{ msg('page') }}
+                        {{ msg('page-title') }}
                         <span class="glyphicon glyphicon-sort"></span>
                     </span>
                 </th>
@@ -54,16 +54,18 @@
             <tbody>
                 {% for edit in edits %}
                 <tr>
-                    <td class="sort-entry--edits tdnum" data-value="{{ edit.count }}">{{ edit.count|number_format }}</td>
+                    <td class="sort-entry--edits tdnum" data-value="{{ edit.count }}">
+                        {{ edit.count|number_format }}
+                    </td>
                     <td class="sort-entry--page" data-value="{{ edit.page_title }}">
-                        {{ wiki_link(edit.page_title, project_url, edit.displaytitle) }}
+                        {{ wiki_link(edit.page_title_ns, project.url, edit.displaytitle) }}
                     </td>
                     <td>
-                        {{ wiki_log_link(edit.page_title, project_url) }}
+                        {{ wiki_log_link(edit.page_title_ns, project.url) }}
                         &middot;
-                        <a href="{{ path('ArticleInfoResult', {project:project, article:edit.page_title|url_encode}) }}">{{ msg('tool_articleinfo') }}</a>
+                        <a href="{{ path('ArticleInfoResult', {project:project.domain, article:edit.page_title_ns}) }}">{{ msg('tool-articleinfo') }}</a>
                         &middot;
-                        <a href="{{ path('TopEditsResults', {project:project, username:username, namespace:namespace, article:edit.page_title|url_encode}) }}" >{{ msg('tool_topedits') }}</a>
+                        <a href="{{ path('TopEditsResults', {project:project.domain, username:user.username, namespace:edit.page_namespace, article:edit.page_title}) }}" >{{ msg('tool-topedits') }}</a>
                     </td>
                 </tr>
                 {% endfor %}

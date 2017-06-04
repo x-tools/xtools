@@ -1,6 +1,16 @@
 (function () {
     var sortDirection, sortColumn, $tocClone, tocHeight, sectionOffset = {};
 
+    // Load translations with 'en.json' as a fallback
+    var messagesToLoad = {};
+    messagesToLoad[i18nLang] = assetPath + 'static/i18n/' + i18nLang + '.json';
+    if (i18nLang !== 'en') {
+        messagesToLoad.en = assetPath + 'static/i18n/en.json';
+    }
+    $.i18n({
+        locale: i18nLang
+    }).load(messagesToLoad);
+
     $(document).ready(function () {
         $('.xt-hide').on('click', function () {
             $(this).hide();
@@ -73,16 +83,6 @@
         if ($('#project_input').length && $('#namespace_select').length) {
             setupNamespaceSelector();
         }
-
-        // Load translations with 'en.json' as a fallback
-        var messagesToLoad = {};
-        messagesToLoad[i18nLang] = assetPath + 'static/i18n/' + i18nLang + '.json';
-        if (i18nLang !== 'en') {
-            messagesToLoad.en = assetPath + 'static/i18n/en.json';
-        }
-        $.i18n({
-            locale: i18nLang
-        }).load(messagesToLoad);
     });
 
     /**
@@ -222,7 +222,7 @@
                 // FIXME: i18n
                 $('.site-notice').append(
                     "<div class='alert alert-warning alert-dismissible' role='alert'>" +
-                        $.i18n('invalid_project', "<strong>" + newProject + "</strong>") +
+                        $.i18n('invalid-project', "<strong>" + newProject + "</strong>") +
                         "<button class='close' data-dismiss='alert' aria-label='Close'>" +
                             "<span aria-hidden='true'>&times;</span>" +
                         "</button>" +

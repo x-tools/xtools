@@ -1,0 +1,47 @@
+{% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
+
+{% block body %}
+
+<div class="row">
+    <div class="col-md-5">
+        <table class="table table-striped xt-table">
+            <tbody>
+            {% for nsId, value in ec.namespaceTotals %}
+                <tr>
+                    <td style="background-color:{{ color(nsId) }}">&nbsp;&nbsp;</td>
+                    <td class="tdtitle">{{ project.namespaces[nsId] }}</td>
+                    <td class="tdnum">{{ value|number_format }}</td>
+                    <td class="tdnum">{{ ((value/ec.countLiveRevisions)*100)|round(1) }}%</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <td></td>
+                <td></td>
+                <td class="tdnum">{{ ec.countLiveRevisions|number_format }}</td>
+                <td class="tdnum">100%</td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+    <div class="col-md-5 col-md-pull-1 col-md-push-1">
+        <canvas id="namespace-canvas"></canvas>
+        <script>
+            new Chart($("#namespace-canvas"), {
+                type: 'pie',
+                data: {
+                    labels: [{% for key,value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}"{{ project.namespaces[key] }}"{% endfor %}],
+                    datasets: [{
+                        data: [{% for value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}{{ value }}{% endfor %}],
+                        backgroundColor: [{% for key,value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}'{{ color(key) }}'{% set first = 0 %}{% endfor %}],
+                        borderColor: [{% for key,value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}'{{ color(key) }}'{% set first = 0 %}{% endfor %}],
+                        borderWidth: 1
+                    }]
+                }
+            });
+        </script>
+    </div>
+</div>
+
+{% endblock %}

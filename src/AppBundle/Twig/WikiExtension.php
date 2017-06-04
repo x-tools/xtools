@@ -52,6 +52,7 @@ class WikiExtension extends Extension
             $label = $title;
         }
         $title = str_replace(' ', '_', $title);
+        $projectUrl = rtrim($projectUrl, '/');
         return "<a href='$projectUrl/wiki/$title' target='_blank'>$label</a>";
     }
 
@@ -73,6 +74,7 @@ class WikiExtension extends Extension
             $link = "User:$username";
         }
         $link = str_replace(' ', '_', $link);
+        $projectUrl = rtrim($projectUrl, '/');
         return "<a href='$projectUrl/wiki/$link' target='_blank'>$label</a>";
     }
 
@@ -88,6 +90,7 @@ class WikiExtension extends Extension
         if (!$label) {
             $label = $group;
         }
+        $projectUrl = rtrim($projectUrl, '/');
         // Ignoring this inspection, as we want all of the output on one line.
         // @codingStandardsIgnoreStart
         return "<a href='$projectUrl/w/index.php?title=Special:ListUsers&group=$group&creationSort=1&limit=50' target='_blank'>$label</a>";
@@ -109,6 +112,7 @@ class WikiExtension extends Extension
             $label = $this->intuitionMessage('history');
         }
         $title = str_replace(' ', '_', $title);
+        $projectUrl = rtrim($projectUrl, '/');
         $url = "$projectUrl/w/index.php?title=$title&action=history";
 
         if ($offset) {
@@ -135,6 +139,7 @@ class WikiExtension extends Extension
             $label = $this->intuitionMessage('log');
         }
         $username = str_replace(' ', '_', $username);
+        $projectUrl = rtrim($projectUrl, '/');
         $url = "$projectUrl/w/index.php?title=Special:Log&action=view&user=$username";
 
         if ($type) {
@@ -158,6 +163,8 @@ class WikiExtension extends Extension
             $label = $this->intuitionMessage('log');
         }
         $title = str_replace(' ', '_', $title);
+        $projectUrl = rtrim($projectUrl, '/');
+        // FIXME: should be using the script path
         $url = "$projectUrl/w/index.php?title=Special:Log&action=view&page=$title";
 
         if ($type) {
@@ -182,6 +189,7 @@ class WikiExtension extends Extension
         } elseif (is_a($label, 'DateTime')) {
             $label = date_format($label, 'Y-m-d, H:i');
         }
+        $projectUrl = rtrim($projectUrl, '/');
         return "<a href='$projectUrl/wiki/Special:Diff/$diff' target='_blank'>$label</a>";
     }
 
@@ -200,6 +208,7 @@ class WikiExtension extends Extension
         } elseif (is_a($label, 'DateTime')) {
             $label = date_format($label, 'Y-m-d, H:i');
         }
+        $projectUrl = rtrim($projectUrl, '/');
         return "<a href='$projectUrl/wiki/Special:PermaLink/$revId' target='_blank'>$label</a>";
     }
 
@@ -244,7 +253,6 @@ class WikiExtension extends Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('percent_format', [ $this, 'percentFormat' ]),
             new \Twig_SimpleFilter('diff_format', [ $this, 'diffFormat' ], [ 'is_safe' => [ 'html' ] ]),
             new \Twig_SimpleFilter('wikify_comment', [ $this, 'wikifyComment' ], [ 'is_safe' => [ 'html' ] ]),
         ];
@@ -268,24 +276,6 @@ class WikiExtension extends Extension
         $size = number_format($size);
 
         return "<span class='$class'>$size</span>";
-    }
-
-    /**
-     * Format a given number or fraction as a percentage
-     * @param  number  $numerator     Numerator or single fraction if denominator is ommitted
-     * @param  number  [$denominator] Denominator
-     * @param  integer [$precision]   Number of decimal places to show
-     * @return string                 Formatted percentage
-     */
-    public function percentFormat($numerator, $denominator = null, $precision = 1)
-    {
-        if (!$denominator) {
-            $quotient = $numerator;
-        } else {
-            $quotient = ( $numerator / $denominator ) * 100;
-        }
-
-        return round($quotient, $precision) . '%';
     }
 
     /**
