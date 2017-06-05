@@ -11,6 +11,7 @@ namespace AppBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Xtools\ProjectRepository;
 
 /**
  * Class AdminStatsController
@@ -46,7 +47,7 @@ class AdminStatsController extends Controller
         // Pull the values out of the query string.  These values default to
         // empty strings.
         $projectQuery = $request->query->get('project');
-        $startDate = $request->query->get('begin');
+        $startDate = $request->query->get('start');
         $endDate = $request->query->get("end");
 
         // Redirect if the values are set.
@@ -149,11 +150,16 @@ class AdminStatsController extends Controller
         $lh->checkEnabled("adminstats");
 
         // Load the database information for the tool
-        $dbValues = $lh->databasePrepare($project, "AdminStats");
+        $projectData = ProjectRepository::getProject($project, $this->container);
 
-        $dbName = $dbValues["dbName"];
-        $wikiName = $dbValues["wikiName"];
-        $url = $dbValues["url"];
+        if (!$projectData->exists()) {
+            $this->addFlash("notice", ["invalid-project", $project]);
+            return $this->redirectToRoute("adminstats");
+        }
+
+        $dbName = $projectData->getDatabaseName();
+        $wikiName = $projectData->getDatabaseName();
+        $url = $projectData->getUrl();
 
         // Generate a diff for the dates - this is the number of days we're spanning.
         $days = date_diff(new \DateTime($end), new \DateTime($start))->days;

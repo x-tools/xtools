@@ -65,11 +65,22 @@ class TopEditsController extends Controller
 
         $project = ProjectRepository::getProject($projectName, $this->container);
 
+        // Default values for the variables to keep the template happy
+        $domain = null;
+        $namespaces = null;
+
+        // If the project exists, actually populate the values
+        if ($project->exists()) {
+            $domain = $project->getDomain();
+            $namespaces = $project->getNamespaces();
+        }
+
         return $this->render('topedits/index.html.twig', [
             'xtPageTitle' => 'tool-topedits',
             'xtSubtitle' => 'tool-topedits-desc',
             'xtPage' => 'topedits',
-            'project' => $project,
+            'domain' => $domain,
+            'namespaces' => $namespaces,
         ]);
     }
 
@@ -83,13 +94,19 @@ class TopEditsController extends Controller
         $this->lh = $this->get('app.labs_helper');
         $this->lh->checkEnabled('topedits');
 
-        $project = ProjectRepository::getProject($project, $this->container);
+        $projectData = ProjectRepository::getProject($project, $this->container);
+
+        if (!$projectData->exists()) {
+            $this->addFlash("notice", ["invalid-project", $project]);
+            return $this->redirectToRoute("topedits");
+        }
+
         $user = new User($username);
 
         if ($article === "") {
-            return $this->namespaceTopEdits($user, $project, $namespace);
+            return $this->namespaceTopEdits($user, $projectData, $namespace);
         } else {
-            return $this->singlePageTopEdits($user, $project, $namespace, $article);
+            return $this->singlePageTopEdits($user, $projectData, $namespace, $article);
         }
     }
 

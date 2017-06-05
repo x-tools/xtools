@@ -5,8 +5,8 @@
     <form class="col-lg-8 col-lg-offset-2" action="{{ path("topedits") }}" method="get" accept-charset="utf-8" >
         <fieldset class="form-fieldset">
             {{ forms.user_input() }}
-            {{ forms.wiki_input(project.domain) }}
-            {{ forms.namespace_select(project.namespaces, true) }}
+            {{ forms.wiki_input(domain) }}
+            {{ forms.namespace_select(namespaces, true) }}
             {{ forms.page_input(false) }}
         </fieldset>
         {{ forms.submit_btn() }}
