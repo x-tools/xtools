@@ -108,8 +108,8 @@ class AutomatedEditsController extends Controller
         $projectData = ProjectRepository::getProject($project, $this->container);
 
         if (!$projectData->exists()) {
-           $this->addFlash("notice", ["invalid-project", $project]);
-           return $this->redirectToRoute("autoedits");
+            $this->addFlash('notice', ['invalid-project', $project]);
+            return $this->redirectToRoute('autoedits');
         }
 
         $dbName = $projectData->getDatabaseName();
@@ -248,7 +248,7 @@ class AutomatedEditsController extends Controller
         }
 
         // Sort the array and do some simple math.
-        uasort($results, function($a, $b) {
+        uasort($results, function ($a, $b) {
             return $b['count'] - $a['count'];
         });
 
