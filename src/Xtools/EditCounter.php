@@ -278,16 +278,28 @@ class EditCounter extends Model
         }
         return round($this->countAllRevisions() / $this->getDays(), 3);
     }
-    
+
     /**
      * Get the total number of edits made by the user with semi-automating tools.
-     * @TODO
      */
     public function countAutomatedRevisions()
     {
-        return 0;
+        $autoSummary = $this->automatedRevisionsSummary();
+        $count = 0;
+        foreach ($autoSummary as $summary) {
+            $count += $summary;
+        }
+        return $count;
     }
-    
+
+    /**
+     * Get a summary of the numbers of edits made by the user with semi-automating tools.
+     */
+    public function automatedRevisionsSummary()
+    {
+        return $this->getRepository()->countAutomatedRevisions($this->project, $this->user);
+    }
+
     /**
      * Get the count of (non-deleted) edits made in the given timeframe to now.
      * @param string $time One of 'day', 'week', 'month', or 'year'.

@@ -2,13 +2,10 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Helper\ApiHelper;
 use AppBundle\Helper\AutomatedEditsHelper;
-use AppBundle\Helper\LabsHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\VarDumper\VarDumper;
 use Xtools\EditCounter;
 use Xtools\EditCounterRepository;
 use Xtools\Project;
@@ -92,8 +89,6 @@ class EditCounterController extends Controller
     {
         $this->setUpEditCounter($project, $username);
 
-        //$automatedEditsSummary = $automatedEditsHelper->getEditsSummary($user->getId());
-
         // Give it all to the template.
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/result.html.twig', [
@@ -105,9 +100,6 @@ class EditCounterController extends Controller
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
-
-            // Automated edits.
-            //'auto_edits' => $automatedEditsSummary,
         ]);
     }
 

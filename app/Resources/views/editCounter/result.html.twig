@@ -27,7 +27,7 @@
 
         <div class="panel panel-default" id="generalstats">
             <div class="panel-heading">
-                <h4 class="topcaption">{{ msg("generalstats") }}</h4>
+                <h4 class="topcaption">{{ msg("general-stats") }}</h4>
             </div>
             <div class="panel-body" id="generalstats">
                 {{ render(path('EditCounterGeneralStats', {
@@ -37,14 +37,14 @@
             </div>
         </div>
 
-        <div class="panel panel-default" id="namespacetotals">
+        <div class="panel panel-default" id="namespace-totals">
             <div class="panel-heading"><h4>{{ msg('namespacetotals') }}</h4></div>
             <div class="panel-body">
                 {{ include( 'editCounter/namespace_totals.html.twig' ) }}
             </div>
         </div>
 
-        <div class="panel panel-default" id="yearcounts">
+        <div class="panel panel-default" id="year-counts">
             <div class="panel-heading"><h4>{{ msg('yearcounts') }}</h4></div>
             <div class="panel-body">
                 {{ render(path('EditCounterYearCounts', {
@@ -77,7 +77,7 @@
         </div>
 
         <div class="panel panel-default" id="monthcounts">
-            <div class="panel-heading"><h4>{{ msg('monthcounts') }}</h4></div>
+            <div class="panel-heading"><h4>{{ msg('month-counts') }}</h4></div>
             <div class="panel-body">
                 {{ render(path('EditCounterMonthCounts', {
                     'username': user.username,
@@ -87,12 +87,10 @@
         </div>
 
         <div class="panel panel-default" id="autoeditslist">
-            <div class="panel-heading">
-                <h4>{{ msg('autoedits') }}</h4>
-            </div>
+            <div class="panel-heading"><h4>{{ msg('auto-edits') }}</h4></div>
             <div class="panel-body">
                 <table class="table">
-                    {% for tool,count in auto_edits %}
+                    {% for tool,count in ec.automatedRevisionsSummary %}
                         <tr>
                             <th>{{ tool }}</th>
                             <td>{{ count|number_format }}</td>
