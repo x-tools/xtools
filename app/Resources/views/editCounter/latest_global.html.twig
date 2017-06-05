@@ -26,7 +26,14 @@
                 </a>
                 )
             </td>
-            <td class="tdtitle break">{{ wiki_link(rev.page_title, rev.project.url) }}</td>
+            <td class="tdtitle break">
+                {% if rev.page_namespace != 0 %}
+                    {% set qualified_name = attribute(rev.project.namespaces, rev.page_namespace)~':'~rev.page_title %}
+                {% else %}
+                    {% set qualified_name = rev.page_title %}
+                {% endif %}
+                {{ wiki_link(qualified_name, rev.project.url) }}
+            </td>
             <td class="revtext break">{{ rev.rev_comment }}</td>
         </tr>
     {% endfor %}
