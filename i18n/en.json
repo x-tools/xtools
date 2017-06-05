@@ -17,6 +17,7 @@
   "all-edits": "All edits",
   "all-namespaces": "All namespaces",
   "all-quotes": "All quotes",
+  "api-error": "Error querying $1",
   "approve": "Approve",
   "approximate": "Approximate",
   "article": "Article",

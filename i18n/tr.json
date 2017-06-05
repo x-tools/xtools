@@ -2,6 +2,7 @@
   "actions": "Eylemler",
   "added": "Eklendi",
   "all": "hepsi",
+  "api-error": "$1 sorgu hatası",
   "approve": "Onay",
   "approximate": "yaklaşık",
   "article": "Madde",

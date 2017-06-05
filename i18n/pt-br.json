@@ -1,5 +1,6 @@
 {
   "all": "Todas",
+  "api-error": "Erro ao consultar $1",
   "bot": "Robô",
   "date": "Data",
   "editors": "Editores",

@@ -1,5 +1,6 @@
 {
   "all": "Te katoa",
+  "api-error": "I ngā raraunga nō te API $1 e tukua ana, ka ngere:",
   "bot": "Ngā keretao anake",
   "current-size": "Nui inaianei",
   "date": "Rā",

@@ -42,21 +42,23 @@ class ApiController extends FOSRestController
     }
 
     /**
-     * @Rest\Get("/api/nonautomated_edits/{project}/{username}/{namespace}/{offset}")
+     * @Rest\Get("/api/nonautomated_edits/{project}/{username}/{namespace}/{offset}/{format}")
      */
-    public function nonautomatedEdits($project, $username, $namespace, $offset = 0)
+    public function nonautomatedEdits($project, $username, $namespace, $offset = 0, $format = 'json')
     {
         $twig = $this->container->get('twig');
         $aeh = $this->get("app.automated_edits_helper");
-        $editData = $aeh->getNonautomatedEdits($project, $username, $namespace, $offset);
+        $data = $aeh->getNonautomatedEdits($project, $username, $namespace, $offset);
 
-        $markup = $twig->render('api/automated_edits.html.twig', [
-            'edits' => $editData,
-            'projectUrl' =>  "https://$project",
-        ]);
+        if ($format === 'html') {
+            $data = $twig->render('api/automated_edits.html.twig', [
+                'edits' => $data,
+                'projectUrl' =>  "https://$project",
+            ]);
+        }
 
         return new View(
-            ['markup' => $markup],
+            ['data' => $data],
             Response::HTTP_OK
         );
     }

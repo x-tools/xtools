@@ -3,6 +3,7 @@
   "added": "Ajouté",
   "all": "tous",
   "all-edits": "Toutes les modifications",
+  "api-error": "Erreur lors de la requête $1",
   "approve": "Approuver",
   "approximate": "approximatif",
   "article": "Article",

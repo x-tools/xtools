@@ -3,6 +3,7 @@
   "added": "追加",
   "all": "すべて",
   "all-edits": "すべての編集",
+  "api-error": "$1のクエリー中にエラーが発生しました。",
   "approve": "承認",
   "approximate": "概算",
   "article": "記事",

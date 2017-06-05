@@ -26,6 +26,18 @@
             {% endif %}
         </p>
 
+        {# Show TOC when the user has a ton of automated tools, making the page hard to navigate #}
+        {% if semi_automated|length > 15 %}
+            <div class="text-center xt-toc">
+                {% set sections = ['summary', 'auto-edits', 'non-auto-edits'] %}
+                {% for section in sections %}
+                    <span>
+                        <a href="#{{ section }}" data-section="{{ section }}">{{ msg(section) }}</a>
+                    </span>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         {% set content %}
             <div class="panel-body stat-list clearfix" id="summary">
                 <table class="table autoedits-table">
@@ -92,18 +104,18 @@
                 </thead>
                 <tbody>
                 {% set toolsTotal = 0 %}
-                {% for tool, count in semi_automated %}
-                    {% set toolsTotal = toolsTotal + count %}
+                {% for tool, values in semi_automated %}
+                    {% set toolsTotal = toolsTotal + values.count %}
                     <tr>
                         <td class="sort-entry--tool" data-value="{{ tool }}">
                             <span class="tools-toggle" data-index="{{ loop.index0 }}" data-tool="{{ tool }}">
                                 <span class="glyphicon glyphicon-remove"></span>
                                 <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
                             </span>
-                            {{ tool }}
+                            {{ wiki_link(values.link, projectUrl, tool) }}
                         </td>
-                        <td class="sort-entry--count" data-value="{{ count }}">
-                            {{ count|number_format(0, ".", ",") }}
+                        <td class="sort-entry--count" data-value="{{ values.count }}">
+                            {{ values.count|number_format(0, ".", ",") }}
                         </td>
                     </tr>
                 {% endfor %}
@@ -135,8 +147,8 @@
                         labels: {{ semi_automated | keys | json_encode() | raw }},
                         datasets: [{
                             data: [
-                                {% for value in semi_automated %}
-                                    {{ value }}{% if not loop.last %},{% endif %}
+                                {% for tool, values in semi_automated %}
+                                    {{ values.count }}{% if not loop.last %},{% endif %}
                                 {% endfor %}
                             ],
                             backgroundColor: {{ colors | json_encode() | raw }},

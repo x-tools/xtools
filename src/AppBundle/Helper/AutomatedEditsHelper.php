@@ -42,7 +42,8 @@ class AutomatedEditsHelper extends HelperBase
      */
     public function isAutomated($summary)
     {
-        foreach ($this->getTools() as $tool => $regex) {
+        foreach ($this->getTools() as $tool => $values) {
+            $regex = $values['regex'];
             if (preg_match("/$regex/", $summary)) {
                 return true;
             }
@@ -59,7 +60,7 @@ class AutomatedEditsHelper extends HelperBase
     public function isRevert($summary)
     {
         foreach ($this->revertTools as $tool) {
-            $regex = $this->getTools()[$tool];
+            $regex = $this->getTools()[$tool]['regex'];
 
             if (preg_match("/$regex/", $summary)) {
                 return true;
@@ -76,7 +77,8 @@ class AutomatedEditsHelper extends HelperBase
      */
     public function getTool($summary)
     {
-        foreach ($this->getTools() as $tool => $regex) {
+        foreach ($this->getTools() as $tool => $values) {
+            $regex = $values['regex'];
             if (preg_match("/$regex/", $summary)) {
                 return $tool;
             }
@@ -94,7 +96,7 @@ class AutomatedEditsHelper extends HelperBase
         if (is_array($this->tools)) {
             return $this->tools;
         }
-        $this->tools = $this->container->getParameter("automated_tools");
+        $this->tools = $this->container->getParameter('automated_tools');
         return $this->tools;
     }
 
@@ -121,7 +123,10 @@ class AutomatedEditsHelper extends HelperBase
         $revTable = $lh->getTable('revision', $project->getDatabaseName());
         $pageTable = $lh->getTable('page', $project->getDatabaseName());
 
-        $AEBTypes = $this->container->getParameter('automated_tools');
+        $AEBTypes = array_map(function ($AEBType) {
+            return $AEBType['regex'];
+        }, $this->container->getParameter('automated_tools'));
+
         $allAETools = $conn->quote(implode('|', $AEBTypes), \PDO::PARAM_STR);
 
         $namespaceClause = $namespace === 'all' ? '' : "AND rev_namespace = $namespace";

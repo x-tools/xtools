@@ -14,7 +14,7 @@ $(function () {
         // must use .attr instead of .prop as sorting script will clone DOM elements
         if ($(this).attr('data-disabled') === 'true') {
             newData[tool] = window.countsByTool[tool];
-            window.toolsChart.data.datasets[0].data[index] = parseInt(newData[tool], 10);
+            window.toolsChart.data.datasets[0].data[index] = parseInt(newData[tool].count, 10);
             $(this).attr('data-disabled', 'false');
         } else {
             delete newData[tool];
@@ -31,7 +31,7 @@ $(function () {
         // update stats
         var total = 0;
         Object.keys(newData).forEach(function (tool) {
-            total += parseInt(newData[tool], 10);
+            total += parseInt(newData[tool].count, 10);
         });
         var toolsCount = Object.keys(newData).length;
         $('.tools--tools').text(
@@ -59,8 +59,11 @@ $(function () {
         $('.non-auto-edits-container').hide();
         var username = $('.non-auto-edits-container').data('username');
 
-        $.getJSON(xtBaseUrl + 'api/nonautomated_edits/en.wikipedia.org/' + username + '/all/' + editOffset).then(function (data) {
-            $('.non-auto-edits-container').html(data.markup).show();
+        $.ajax({
+            url: xtBaseUrl + 'api/nonautomated_edits/en.wikipedia.org/' + username + '/all/' + editOffset + '/html',
+            timeout: 30000
+        }).done(function (data) {
+            $('.non-auto-edits-container').html(data.data).show();
             $('.non-auto-edits-loading').hide();
             setupNavListeners();
 
@@ -70,6 +73,11 @@ $(function () {
             if ($('.contribs-table tbody tr').length < 50) {
                 $('.next-edits').hide();
             }
+        }).fail(function (_xhr, _status, message) {
+            $('.non-auto-edits-loading').hide();
+            $('.non-auto-edits-container').html(
+                $.i18n('api-error', 'Non-automated edits API: <code>' + message + '</code>')
+            ).show();
         });
     }
 

@@ -1,5 +1,6 @@
 {
   "all": "所有",
+  "api-error": "查詢$1出現錯誤。",
   "bot": "網路機器人",
   "comma-character": "、",
   "current-size": "目前大小",

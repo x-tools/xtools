@@ -1,5 +1,6 @@
 {
   "all": "Totes",
+  "api-error": "Error de requestatge de $1",
   "bot": "Bot",
   "current-size": "Talha actuala",
   "date": "Data",

@@ -28,7 +28,8 @@
         }
 
         tr.excluded {
-            .sort-entry--tool {
+            .sort-entry--tool,
+            .sort-entry--count {
                 opacity: 0.5;
                 text-decoration: line-through;
             }
