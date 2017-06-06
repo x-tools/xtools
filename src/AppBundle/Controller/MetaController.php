@@ -11,13 +11,16 @@ class MetaController extends Controller
 {
     /**
      * @Route("/meta", name="meta")
+     * @Route("/meta", name="Meta")
+     * @Route("/meta/", name="MetaSlash")
+     * @Route("/meta/index.php", name="MetaIndexPhp")
      */
     public function indexAction(Request $request)
     {
         $start = $request->query->get('start');
         $end = $request->query->get('end');
 
-        if ($start !== '' && $end !== '') {
+        if ($start != '' && $end != '') {
             return $this->redirectToRoute('MetaResult', [ 'start' => $start, 'end' => $end ]);
         }
 
