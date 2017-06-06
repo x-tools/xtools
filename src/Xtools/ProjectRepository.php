@@ -85,6 +85,7 @@ class ProjectRepository extends Repository
         $this->projectsMetadata = [];
         foreach ($projects as $project) {
             $this->projectsMetadata[$project['url']] = $project;
+            $this->projectsMetadata[$project['dbname']] = $project;
         }
         return $this->projectsMetadata;
     }
