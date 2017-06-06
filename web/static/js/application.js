@@ -1,5 +1,6 @@
 (function () {
-    var sortDirection, sortColumn, $tocClone, tocHeight, sectionOffset = {};
+    var sortDirection, sortColumn, $tocClone, tocHeight, sectionOffset = {},
+        toggleTableData;
 
     // Load translations with 'en.json' as a fallback
     var messagesToLoad = {};
@@ -23,24 +24,124 @@
             $(this).parents('.panel-heading').siblings('.panel-body').show();
         });
 
-        // Sorting of columns
-        //
-        //  Example usage:
-        //   {% for key in ['username', 'edits', 'minor', 'date'] %}
-        //      <th>
-        //         <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-        //            {{ msg(key) | capitalize }}
-        //            <span class="glyphicon glyphicon-sort"></span>
-        //         </span>
-        //      </th>
-        //  {% endfor %}
-        //   <th class="sort-link" data-column="username">Username</th>
-        //   ...
-        //   <td class="sort-entry--username" data-value="{{ username }}">{{ username }}</td>
-        //   ...
-        //
-        // Data type is automatically determined, with support for integer,
-        //   floats, and strings, including date strings (e.g. "2016-01-01 12:59")
+        setupColumnSorting();
+
+        setupTOC();
+
+        // if applicable, setup namespace selector with real time updates when changing projects
+        if ($('#project_input').length && $('#namespace_select').length) {
+            setupNamespaceSelector();
+        }
+    });
+
+    /**
+     * Script to make interactive toggle table and pie chart.
+     * For visual example, see the "Semi-automated edits" section of the AutoEdits tool.
+     *
+     * Example usage (see autoEdits/result.html.twig and js/autoedits.js for more):
+     *     <table class="table table-bordered table-hover table-striped toggle-table">
+     *         <thead>...</thead>
+     *         <tbody>
+     *             {% for tool, values in semi_automated %}
+     *             <tr>
+     *                 <!-- use the 'linked' class here because the cell contains a link -->
+     *                 <td class="sort-entry--tool linked" data-value="{{ tool }}">
+     *                     <span class="toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ tool }}">
+     *                         <span class="glyphicon glyphicon-remove"></span>
+     *                         <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
+     *                     </span>
+     *                     {{ wiki_link(...) }}
+     *                 </td>
+     *                 <td class="sort-entry--count" data-value="{{ values.count }}">
+     *                     {{ values.count }}
+     *                 </td>
+     *             </tr>
+     *             {% endfor %}
+     *             ...
+     *         </tbody>
+     *     </table>
+     *     <div class="toggle-table--chart">
+     *         <canvas id="tool_chart" width="400" height="400"></canvas>
+     *     </div>
+     *     <script>
+     *         window.toolsChart = new Chart($('#tool_chart'), { ... });
+     *         window.countsByTool = {{ semi_automated | json_encode() | raw }};
+     *         ...
+     *
+     *         // See autoedits.js for more
+     *         window.setupToggleTable(window.countsByTool, window.toolsChart, 'count', function (newData) {
+     *             // update the totals in toggle table based on newData
+     *         });
+     *     </script>
+     *
+     * @param  {Object}   dataSource     Object of data that makes up the chart
+     * @param  {Chart}    chartObj       Reference to the pie chart associated with the .toggle-table
+     * @param  {String}   [valueKey]     The name of the key within entries of dataSource,
+     *                                   where the value is what's shown in the chart.
+     *                                   If omitted or null, `dataSource` is assumed to be of the structure:
+     *                                   { 'a' => 123, 'b' => 456 }
+     * @param  {Function} updateCallback Callback to update the .toggle-table totals. `toggleTableData`
+     *                                   is passed in which contains the new data, you just need to
+     *                                   format it (maybe need to use i18n, update multiple cells, etc.)
+     */
+    window.setupToggleTable = function (dataSource, chartObj, valueKey, updateCallback) {
+        $('.toggle-table').on('click', '.toggle-table--toggle', function () {
+            if (!toggleTableData) {
+                // must be cloned
+                toggleTableData = Object.assign({}, dataSource);
+            }
+
+            var index = $(this).data('index'),
+                key = $(this).data('key'),
+                $row = $(this).parents('tr');
+
+            // must use .attr instead of .prop as sorting script will clone DOM elements
+            if ($(this).attr('data-disabled') === 'true') {
+                toggleTableData[key] = dataSource[key];
+                var oldValue = parseInt(valueKey ? toggleTableData[key][valueKey] : toggleTableData[key], 10);
+                chartObj.data.datasets[0].data[index] = oldValue;
+                $(this).attr('data-disabled', 'false');
+            } else {
+                delete toggleTableData[key];
+                chartObj.data.datasets[0].data[index] = null;
+                $(this).attr('data-disabled', 'true');
+            }
+
+            // gray out row in table
+            $(this).parents('tr').toggleClass('excluded');
+
+            // change the hover icon from a 'x' to a '+'
+            $(this).find('.glyphicon').toggleClass('glyphicon-remove').toggleClass('glyphicon-plus');
+
+            // update stats
+            updateCallback(toggleTableData);
+
+            chartObj.update();
+        });
+    }
+
+    /**
+     * Sorting of columns
+     *
+     *  Example usage:
+     *   {% for key in ['username', 'edits', 'minor', 'date'] %}
+     *      <th>
+     *         <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
+     *            {{ msg(key) | capitalize }}
+     *            <span class="glyphicon glyphicon-sort"></span>
+     *         </span>
+     *      </th>
+     *  {% endfor %}
+     *   <th class="sort-link" data-column="username">Username</th>
+     *   ...
+     *   <td class="sort-entry--username" data-value="{{ username }}">{{ username }}</td>
+     *   ...
+     *
+     * Data type is automatically determined, with support for integer,
+     *   floats, and strings, including date strings (e.g. "2016-01-01 12:59")
+     */
+    function setupColumnSorting()
+    {
         $('.sort-link').on('click', function () {
             sortDirection = sortColumn === $(this).data('column') ? -sortDirection : 1;
 
@@ -76,14 +177,7 @@
 
             $table.find('tbody').html($(entries));
         });
-
-        setupTOC();
-
-        // if applicable, setup namespace selector with real time updates when changing projects
-        if ($('#project_input').length && $('#namespace_select').length) {
-            setupNamespaceSelector();
-        }
-    });
+    }
 
     /**
      * Floating table of contents
