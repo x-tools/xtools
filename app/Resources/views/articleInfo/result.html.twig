@@ -10,7 +10,7 @@
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {{ msg('back') }}
             </a>
-            {{ wiki_link(title, project_url) }}
+            {{ wiki_link(title, projectUrl) }}
             <small>
                 &bull;
                 {{ project }}
@@ -20,9 +20,9 @@
 
     <div class="panel-body xt-panel-body">
         <p class="text-center xt-heading-subtitle">
-            {{ wiki_history_link(title, project_url) }}
+            {{ wiki_history_link(title, projectUrl) }}
             &middot;
-            {{ wiki_log_link(title, project_url) }}
+            {{ wiki_log_link(title, projectUrl) }}
             {% if isWMFLabs() %}
             &middot;
             {{ pageviews_links(title, project) }}
@@ -59,7 +59,7 @@
                     <tr>
                         <td>ID</td>
                         <td>
-                            <a target="_blank" href="{{ project_url }}/w/index.php?action=info&title={{ title }}">{{ id }}</a>
+                            <a target="_blank" href="{{ projectUrl }}/w/index.php?action=info&title={{ title }}">{{ id }}</a>
                         </td>
                     </tr>
                     {% if wikidataId is defined %}
@@ -100,7 +100,7 @@
                                         {{ assessments.assessment.value }}
                                     {% endif %}
                                 {% endset %}
-                                {{ wiki_link(assessments.assessment.category, project_url, assessment_value) }}
+                                {{ wiki_link(assessments.assessment.category, projectUrl, assessment_value) }}
                             </td>
                         </tr>
                     {% endif %}
@@ -176,9 +176,9 @@
                     <tr>
                         <td>{{ msg('first-edit') }}</td>
                         <td>
-                            {{ diff_link(general.first_edit.revid, project_url, general.datetime_first_edit) }}
+                            {{ diff_link(general.first_edit.revid, projectUrl, general.datetime_first_edit) }}
                             &bull;
-                            {{ user_link(general.first_edit.user, project_url) }}
+                            {{ user_link(general.first_edit.user, projectUrl) }}
                             &bull;
                             {{ general.first_edit.size | diff_format }}
                         </td>
@@ -186,9 +186,9 @@
                     <tr>
                         <td>{{ msg('latest-edit') }}</td>
                         <td>
-                            {{ diff_link(general.last_edit.revid, project_url, general.datetime_last_edit.timestamp) }}
+                            {{ diff_link(general.last_edit.revid, projectUrl, general.datetime_last_edit.timestamp) }}
                             &bull;
-                            {{ user_link(general.last_edit.user, project_url) }}
+                            {{ user_link(general.last_edit.user, projectUrl) }}
                             &bull;
                             {{ general.last_edit.size | diff_format }}
                         </td>
@@ -196,9 +196,9 @@
                     <tr>
                         <td>{{ msg('max-text-added') }}</td>
                         <td>
-                            {{ diff_link(general.max_add.revid, project_url, general.max_add.timestamp) }}
+                            {{ diff_link(general.max_add.revid, projectUrl, general.max_add.timestamp) }}
                             &bull;
-                            {{ user_link(general.max_add.user, project_url) }}
+                            {{ user_link(general.max_add.user, projectUrl) }}
                             &bull;
                             {{ general.max_add.size | diff_format }}
                         </td>
@@ -206,9 +206,9 @@
                     <tr>
                         <td>{{ msg('max-text-deleted') }}</td>
                         <td>
-                            {{ diff_link(general.max_del.revid, project_url, general.max_del.timestamp) }}
+                            {{ diff_link(general.max_del.revid, projectUrl, general.max_del.timestamp) }}
                             &bull;
-                            {{ user_link(general.max_del.user, project_url) }}
+                            {{ user_link(general.max_del.user, projectUrl) }}
                             &bull;
                             {{ general.max_del.size | diff_format }}
                         </td>
@@ -217,13 +217,13 @@
                     <tr>
                         <td class="stat-list--new-group">{{ msg('links-in') }}</td>
                         <td class="stat-list--new-group">
-                            <a target="_blank" href="{{ project_url }}/w/index.php?title=Special:WhatLinksHere/{{ title }}&hidetrans=1">{{ links_in_count | number_format }}</a>
+                            <a target="_blank" href="{{ projectUrl }}/w/index.php?title=Special:WhatLinksHere/{{ title }}&hidetrans=1">{{ links_in_count | number_format }}</a>
                         </td>
                     </tr>
                     <tr>
                         <td>{{ msg('redirects') }}</td>
                         <td>
-                            <a target="_blank" href="{{ project_url }}/w/index.php?title=Special:WhatLinksHere/{{ title }}&hidetrans=1&hidelinks=1">{{ redirects_count | number_format }}</a>
+                            <a target="_blank" href="{{ projectUrl }}/w/index.php?title=Special:WhatLinksHere/{{ title }}&hidetrans=1&hidelinks=1">{{ redirects_count | number_format }}</a>
                         </td>
                     </tr>
                     <tr>
@@ -347,7 +347,7 @@
                     <tr>
                         <td class="sort-entry--rank" data-value="{{ counter }}">{{ counter }}</td>
                         <td class="sort-entry--username" data-value="{{ editor }}">
-                            {{ user_link(editor, project_url) }}
+                            {{ user_link(editor, projectUrl) }}
                         </td>
                         <td>
                             {% if enabled('ec') %}
@@ -365,10 +365,10 @@
                         {% set user_minor_percent = stats.minor | percent_format(stats.all) %}
                         <td class="sort-entry--minor-percentage" data-value="{{ user_minor_percent }}">{{ user_minor_percent }}</td>
                         <td class="sort-entry--first-edit" data-value="{{ stats.first_id }}">
-                            <a target="_blank" href="{{ project_url }}/wiki/Special:Diff/{{ stats.first_id }}">{{ stats.first }}</a>
+                            <a target="_blank" href="{{ projectUrl }}/wiki/Special:Diff/{{ stats.first_id }}">{{ stats.first }}</a>
                         </td>
                         <td class="sort-entry--latest-edit" data-value="{{ stats.last_id }}">
-                            <a target="_blank" href="{{ project_url }}/wiki/Special:Diff/{{ stats.last_id }}">{{ stats.last }}</a>
+                            <a target="_blank" href="{{ projectUrl }}/wiki/Special:Diff/{{ stats.last_id }}">{{ stats.last }}</a>
                         </td>
                         <td class="sort-entry--average-time-bw-edits" data-value="{{ stats.atbe }}">
                             {{ stats.atbe | number_format(1) }}
@@ -419,11 +419,11 @@
                 {% for bot, bot_data in bots %}
                     <tr>
                         <td class="sort-entry--username" data-value="{{ bot }}">
-                            {{ user_link(bot, project_url) }}
+                            {{ user_link(bot, projectUrl) }}
                             {% if not bot_data.current %}
                                 <i>
                                     {# FIXME: hard-coded /w/ script path #}
-                                    (<a target="_blank" href="{{ project_url }}/w/index.php?title=Special:Log&action=view&page=User:{{ bot }}&type=rights">{{ msg('former-bot') }}</a>)
+                                    (<a target="_blank" href="{{ projectUrl }}/w/index.php?title=Special:Log&action=view&page=User:{{ bot }}&type=rights">{{ msg('former-bot') }}</a>)
                                 </i>
                             {% endif %}
                         </td>
@@ -630,7 +630,7 @@
                                 {% if stats.all > 0 %}
                                     {# Generate link to revision history showing all edits for the given month #}
                                     {% set offset = date(year~"-"~month_str~"-01") | date("Ymt")~"235959" %}
-                                    {{ wiki_history_link(title, project_url, stats.all | number_format, offset, stats.all) }}
+                                    {{ wiki_history_link(title, projectUrl, stats.all | number_format, offset, stats.all) }}
                                 {% else %}
                                     0
                                 {% endif %}
@@ -703,18 +703,18 @@
                 {% for wikiproject, assessment in assessments.wikiprojects %}
                     <tr>
                         <td class="sort-entry--wikiproject" data-value="{{ wikiproject }}">
-                            {{ wiki_link(assessments.wikiproject_prefix ~ wikiproject, project_url, wikiproject) }}
+                            {{ wiki_link(assessments.wikiproject_prefix ~ wikiproject, projectUrl, wikiproject) }}
                         </td>
                         <td style="background:{{ assessment.class.color }}" class="sort-entry--assessment" data-value="{{ assessment.class.value }}">
                             {% set assessment_value %}
                                 <img alt="{{ assessment.class.value }}" src="{{ assessment.class.badge }}" class="assessment-badge" />
                                 {{ assessment.class.value }}
                             {% endset %}
-                            {{ wiki_link(assessment.class.category, project_url, assessment_value) }}
+                            {{ wiki_link(assessment.class.category, projectUrl, assessment_value) }}
                         </td>
                         <td style="background:{{ assessment.importance.color }}" class="sort-entry--importance" data-value="{{ assessment.importance.weight }}">
                             {% set importance_label = assessment.importance ? assessment.importance.value : '???' %}
-                            {{ wiki_link(assessment.importance.category, project_url, importance_label) }}
+                            {{ wiki_link(assessment.importance.category, projectUrl, importance_label) }}
                         </td>
                     </tr>
                 {% endfor %}
@@ -758,7 +758,7 @@
                                     {{ msg('edit') }}
                                 </a>
                             {% else %}
-                                {{ edit_link(title, project_url) }}
+                                {{ edit_link(title, projectUrl) }}
                             {% endif %}
                         </td>
                     </tr>

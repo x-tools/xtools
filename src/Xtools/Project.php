@@ -61,6 +61,16 @@ class Project extends Model
     }
 
     /**
+     * The language for this project.
+     *
+     * @return string
+     */
+    public function getLang()
+    {
+        return isset($this->getMetadata()['lang']) ? $this->getMetadata()['lang'] : '';
+    }
+
+    /**
      * The project URL is the fully-qualified domain name, with protocol and trailing slash.
      *
      * @return string
