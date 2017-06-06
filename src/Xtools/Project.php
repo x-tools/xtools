@@ -2,6 +2,8 @@
 
 namespace Xtools;
 
+use Mediawiki\Api\MediawikiApi;
+
 /**
  * A Project is a single wiki that Xtools is querying.
  */
@@ -66,6 +68,16 @@ class Project extends Model
     public function getUrl()
     {
         return rtrim($this->getMetadata()['url'], '/') . '/';
+    }
+
+    /**
+     * Get a MediawikiApi object for this Project.
+     *
+     * @return MediawikiApi
+     */
+    public function getApi()
+    {
+        return $this->getRepository()->getMediawikiApi($this);
     }
 
     /**

@@ -18,7 +18,7 @@
         <p class="text-center xt-heading-subtitle">&middot;
             {{ user_log_link(user.username, project.domain) }} &middot;
             {% if is_labs %}
-                <a href="https://tools.wmflabs.org/guc/?user={{ user.username }}" >{{ msg('global_contribs') }}</a> &middot;
+                <a href="https://tools.wmflabs.org/guc/?user={{ user.username }}" >{{ msg('global-contribs') }}</a> &middot;
                 <a href="https://meta.wikimedia.org/w/index.php?title=Special%3ACentralAuth&target={{ user.username }}" >{{ msg('global-account-manager') }}</a> &middot;
                 <a href="https://tools.wmflabs.org/quentinv57-tools/tools/sulinfo.php?username={{ user.username }}" >{{ msg('sul-info') }}</a> &middot;
                 <a href="https://tools.wmflabs.org/wikiviewstats/?lang=en&wiki=wikipedia&page=User:{{ user.username }}*" >{{ msg('pageviews-in-userspace') }}</a> &middot;

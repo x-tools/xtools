@@ -96,13 +96,18 @@ abstract class Repository
 
     /**
      * Get the API object for the given project.
+     *
      * @param Project $project
      * @return MediawikiApi
      */
-    protected function getMediawikiApi(Project $project)
+    public function getMediawikiApi(Project $project)
     {
-        // @TODO use newFromApiEndpoint instead.
-        $api = MediawikiApi::newFromPage($project->getUrl());
+        $apiPath = $this->container->getParameter('api_path');
+        if ($apiPath) {
+            $api = MediawikiApi::newFromApiEndpoint($project->getUrl().$apiPath);
+        } else {
+            $api = MediawikiApi::newFromPage($project->getUrl());
+        }
         return $api;
     }
 
