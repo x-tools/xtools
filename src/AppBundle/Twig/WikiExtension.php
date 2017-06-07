@@ -49,9 +49,8 @@ class WikiExtension extends Extension
     public function wikiLink($title, $projectUrl, $label = null)
     {
         if (!$label) {
-            $label = $title;
+            $label = str_replace('_', ' ', $title);
         }
-        $label = str_replace('_', ' ', $label);
         $title = urlencode(str_replace(' ', '_', $title));
         $projectUrl = rtrim($projectUrl, '/');
         return "<a href='$projectUrl/wiki/$title' target='_blank'>$label</a>";

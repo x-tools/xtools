@@ -91,7 +91,7 @@
         {{ layout.content_block('summary', content) }}
 
         {% set content %}
-            <table class="table table-bordered table-hover table-striped tools-table">
+            <table class="table table-bordered table-hover table-striped tools-table toggle-table">
                 <thead>
                 {% for key in ['tool', 'count'] %}
                     <th>
@@ -107,8 +107,8 @@
                 {% for tool, values in semi_automated %}
                     {% set toolsTotal = toolsTotal + values.count %}
                     <tr>
-                        <td class="sort-entry--tool" data-value="{{ tool }}">
-                            <span class="tools-toggle" data-index="{{ loop.index0 }}" data-tool="{{ tool }}">
+                        <td class="sort-entry--tool linked" data-value="{{ tool }}">
+                            <span class="tools-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ tool }}">
                                 <span class="glyphicon glyphicon-remove"></span>
                                 <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
                             </span>
@@ -131,7 +131,7 @@
                 </tfoot>
             </table>
 
-            <div class="chart-wrapper tools-chart-wrapper">
+            <div class="chart-wrapper tools-chart-wrapper toggle-table--chart">
                 <canvas id="tool_chart" width="400" height="400"></canvas>
             </div>
 

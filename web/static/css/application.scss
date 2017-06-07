@@ -414,6 +414,14 @@ div.outer_bar {
     }
 }
 
+.stat-list {
+    margin-bottom: 20px;
+}
+
+.panel-body .stat-list:only-child {
+    margin-bottom: 0;
+}
+
 .stat-list > .table td,
 .stat-list > .table th {
     border: 0;
@@ -502,6 +510,57 @@ div.outer_bar {
     width: 15px;
 }
 
+// See pages/result.html.twig for example usage
+.toggle-table {
+    float: left;
+
+    .toggle-table--toggle {
+        cursor: pointer;
+        margin-right: 4px;
+        position: relative;
+    }
+
+    tr:hover .toggle-table--toggle {
+        .color-icon {
+            visibility: hidden;
+        }
+
+        .glyphicon {
+            display: block;
+        }
+    }
+
+    tr.excluded {
+        td.linked a,
+        td:not(.linked) {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+
+        .color-icon {
+            opacity: 0.5;
+        }
+    }
+
+    td .glyphicon {
+        display: none;
+        left: 1px;
+        position: absolute;
+    }
+}
+
+.toggle-table--chart {
+    float: left;
+    margin-left: 100px;
+    margin-top: 20px;
+    max-width: 500px;
+
+    canvas {
+        height: 400px;
+        width: 400px;
+    }
+}
+
 @media (min-width: $bootstrap-lg) {
     .xt-panel-body table {
         width: auto;
@@ -586,6 +645,11 @@ div.outer_bar {
 
     .xt-toc {
         display: none;
+    }
+
+    .toggle-table--chart {
+        margin: 0;
+        max-width: 100%;
     }
 
     // FORMS

@@ -85,8 +85,9 @@ class ArticleInfoController extends Controller
         }
 
         $projectUrl = $projectData->getUrl();
+        $dbName = $projectData->getDatabaseName();
 
-        $this->revisionTable = $this->lh->getTable('revision');
+        $this->revisionTable = $this->lh->getTable('revision', $dbName);
 
         $api = $this->get('app.api_helper');
         $basicInfo = $api->getBasicPageInfo($project, $page, !$request->query->get('nofollowredir'));
@@ -95,9 +96,9 @@ class ArticleInfoController extends Controller
 
         $this->pageInfo = [
             'project' => preg_replace('#^https?://#', '', rtrim($projectUrl, '/')),
-            'project_url' => $projectUrl,
-            'db_name' => $dbValues['dbName'],
-            'lang' => $dbValues['lang'],
+            'projectUrl' => $projectUrl,
+            'dbName' => $dbName,
+            'lang' => $projectData->getLang(),
             'id' => $basicInfo['pageid'],
             'namespace' => $basicInfo['ns'],
             'title' => $basicInfo['title'],
@@ -197,8 +198,8 @@ class ArticleInfoController extends Controller
      */
     private function getBotData()
     {
-        $userGroupsTable = $this->lh->getTable('user_groups');
-        $userFromerGroupsTable = $this->lh->getTable('user_former_groups');
+        $userGroupsTable = $this->lh->getTable('user_groups', $this->pageInfo['dbName']);
+        $userFromerGroupsTable = $this->lh->getTable('user_former_groups', $this->pageInfo['dbName']);
         $query = "SELECT COUNT(rev_user_text) AS count, rev_user_text AS username, ug_group AS current
                   FROM $this->revisionTable
                   LEFT JOIN $userGroupsTable ON rev_user = ug_user
@@ -317,9 +318,9 @@ class ArticleInfoController extends Controller
         $pageId = $this->pageInfo['id'];
         $namespace = $this->pageInfo['namespace'];
         $title = str_replace(' ', '_', $this->pageInfo['title']);
-        $externalLinksTable = $this->lh->getTable('externallinks');
-        $pageLinksTable = $this->lh->getTable('pagelinks');
-        $redirectTable = $this->lh->getTable('redirect');
+        $externalLinksTable = $this->lh->getTable('externallinks', $this->pageInfo['dbName']);
+        $pageLinksTable = $this->lh->getTable('pagelinks', $this->pageInfo['dbName']);
+        $redirectTable = $this->lh->getTable('redirect', $this->pageInfo['dbName']);
 
         // FIXME: Probably need to make the $title mysql-safe or whatever
         $query = "SELECT COUNT(*) AS value, 'links_ext' AS type
@@ -352,7 +353,7 @@ class ArticleInfoController extends Controller
      */
     private function setLogsEvents()
     {
-        $loggingTable = $this->lh->getTable('logging');
+        $loggingTable = $this->lh->getTable('logging', $this->pageInfo['dbName'], 'logindex');
         $title = str_replace(' ', '_', $this->pageInfo['title']);
         $query = "SELECT log_action, log_type, log_timestamp AS timestamp
                   FROM $loggingTable
@@ -391,7 +392,7 @@ class ArticleInfoController extends Controller
             return [];
         }
         $title = $this->pageInfo['title']; // no underscores
-        $dbName = preg_replace('/_p$/', '', $this->pageInfo['db_name']); // remove _p if present
+        $dbName = preg_replace('/_p$/', '', $this->pageInfo['dbName']); // remove _p if present
 
         $query = "SELECT error, notice, found, name_trans AS name, prio, text_trans AS explanation
                   FROM s51080__checkwiki_p.cw_error a

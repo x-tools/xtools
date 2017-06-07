@@ -4,7 +4,7 @@
 {% block body %}
 <div class="panel panel-primary">
     <header class="panel-heading">
-        <div class="text-center xt-heading-top" >
+        <div class="text-center xt-heading-top">
             <a class="back-to-search" href="{{ path('pages') }}">
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {{ msg('back') }}
@@ -17,7 +17,7 @@
         </div>
     </header>
 
-    <div class="panel-body xt-panel-body" >
+    <div class="panel-body xt-panel-body">
         <p class="text-center xt-heading-subtitle">
             {{ user_log_link(username, project_url, msg('block-log'), 'block') }}
             {% if isWMFLabs() %}
@@ -72,7 +72,7 @@
                 </tbody></table>
             </div>
             <div style="clear:both"></div>
-            <table class="table table-bordered table-hover table-striped namespaces-table">
+            <table class="table table-bordered table-hover table-striped namespaces-table toggle-table">
                 <thead><tr>
                     {% for key in summaryColumns %}
                         <th>
@@ -86,9 +86,9 @@
                 <tbody>
                     {% for key, value in count %}
                     <tr>
-                        <td class="sort-entry--namespace" data-value="{{ namespaces[key] }}">
+                        <td class="sort-entry--namespace linked" data-value="{{ namespaces[key] }}">
                             {% if multiNamspace %}
-                            <span class="namespace-toggle" data-index="{{ loop.index }}" data-ns="{{ key }}">
+                            <span class="namespace-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ key }}">
                                 <span class="glyphicon glyphicon-remove"></span>
                             {% endif %}
                                 <span class="color-icon" style="background:{{ color(key) }}"></span>
@@ -141,7 +141,7 @@
                 {% endif %}
             </table>
             {% if namespace == 'all' %}
-            <div class="chart-wrapper">
+            <div class="chart-wrapper toggle-table--chart">
                 <canvas id="pie_chart" width="400" height="400"></canvas>
             </div>
             {% endif %}
