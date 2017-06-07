@@ -36,6 +36,7 @@
         "Krinkle/intuition": "^0.2",
         "nnnick/chartjs": "^2.1",
         "addwiki/mediawiki-api": "^0.7",
+        "mediawiki/oauthclient": "^0.1",
         "symfony/assetic-bundle": "^2.8",
         "leafo/scssphp": "^0.6",
         "symfony/cache": "^3.2",

@@ -86,14 +86,21 @@
             </div>
         </li>
         {% endif %}
-        {% if isWMFLabs() %}
+
         <li>
-            <a class="btn btn-default login-btn" href="https://tools.wmflabs.org/xtools/oauthredirector.php?action=login&amp;callto=https://www.mediawiki.org/w/api.php&amp;returnto=https://tools.wmflabs.org/xtools-ec/">
+        {% if logged_in_user() %}
+            <a class="btn btn-default logout-btn" href="{{ path('logout') }}" title="{{ msg("logout-msg", [logged_in_user().username]) }}">
+                <span class="glyphicon glyphicon-user"></span>
+                {{ msg("logout") }}
+            </a>
+        {% else %}
+            <a class="btn btn-default login-btn" href="{{ path('login') }}">
                 <span class="glyphicon glyphicon-user"></span>
                 {{ msg("login") }}
             </a>
-        </li>
         {% endif %}
+        </li>
+
     </ol>
     <nav class="tool-links navbar-collapse collapse">
         <ol class="nav navbar-nav navbar-left">

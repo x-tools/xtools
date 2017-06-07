@@ -123,6 +123,7 @@
   "log-types": "Log types",
   "login": "Log in",
   "logout": "Log out",
+  "logout-msg": "Currently logged in as $1",
   "mainspace": "Mainspace",
   "maintainers": "Active maintainers",
   "major-contributors": "Major contributors",

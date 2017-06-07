@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "4045fe41e13404e9f09d4d0ce542790c",
+    "content-hash": "0a5bd1c1f92347f18ed53f094319fbfd",
     "packages": [
         {
             "name": "addwiki/mediawiki-api",
@@ -1843,6 +1843,56 @@
                 "stylesheet"
             ],
             "time": "2017-02-23T05:07:33+00:00"
+        },
+        {
+            "name": "mediawiki/oauthclient",
+            "version": "0.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wikimedia/mediawiki-oauthclient-php.git",
+                "reference": "5d9c748c6deb83cdc74ea3dc85194b2ae2de416d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wikimedia/mediawiki-oauthclient-php/zipball/5d9c748c6deb83cdc74ea3dc85194b2ae2de416d",
+                "reference": "5d9c748c6deb83cdc74ea3dc85194b2ae2de416d",
+                "shasum": ""
+            },
+            "require": {
+                "psr/log": "1.0.*"
+            },
+            "require-dev": {
+                "jakub-onderka/php-parallel-lint": "~0.9",
+                "mediawiki/mediawiki-codesniffer": "0.5.0",
+                "phpunit/phpunit": "~4.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "MediaWiki\\OAuthClient\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0+"
+            ],
+            "authors": [
+                {
+                    "name": "Bryan Davis",
+                    "email": "bd808@wikimedia.org"
+                },
+                {
+                    "name": "Andy Smith",
+                    "homepage": "http://termie.pbworks.com/w/page/20571888/AndySmith"
+                },
+                {
+                    "name": "Chris Steipp",
+                    "email": "csteipp@wikimedia.org"
+                }
+            ],
+            "description": "PHP OAuth client for use with Wikipedia and other MediaWiki-based wikis running the OAuth extension",
+            "homepage": "https://www.mediawiki.org/wiki/oauthclient-php",
+            "time": "2016-06-03T17:14:22+00:00"
         },
         {
             "name": "monolog/monolog",

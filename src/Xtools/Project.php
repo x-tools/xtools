@@ -63,11 +63,12 @@ class Project extends Model
     /**
      * The project URL is the fully-qualified domain name, with protocol and trailing slash.
      *
+     * @param bool $withTrailingSlash Whether to append a slash.
      * @return string
      */
-    public function getUrl()
+    public function getUrl($withTrailingSlash = true)
     {
-        return rtrim($this->getMetadata()['url'], '/') . '/';
+        return rtrim($this->getMetadata()['url'], '/') . ($withTrailingSlash ? '/' : '');
     }
 
     /**
@@ -96,7 +97,8 @@ class Project extends Model
     }
 
     /**
-     * The URL path to index.php
+     * The URL path of the directory that contains index.php, with no trailing slash.
+     * Defaults to '/w' which is the same as the normal WMF set-up.
      *
      * @link https://www.mediawiki.org/wiki/Manual:$wgScriptPath
      *
@@ -107,7 +109,7 @@ class Project extends Model
         $metadata = $this->getRepository()->getMetadata($this->getUrl());
         return isset($metadata['general']['scriptPath'])
             ? $metadata['general']['scriptPath']
-            : '/w/index.php';
+            : '/w';
     }
 
     /**

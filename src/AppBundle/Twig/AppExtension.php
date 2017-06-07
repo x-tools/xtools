@@ -2,8 +2,6 @@
 
 namespace AppBundle\Twig;
 
-use Symfony\Component\VarDumper\VarDumper;
-
 class AppExtension extends Extension
 {
 
@@ -44,6 +42,7 @@ class AppExtension extends Extension
             new \Twig_SimpleFunction('link', [ $this, 'link' ]),
             new \Twig_SimpleFunction('quote', [ $this, 'quote' ]),
             new \Twig_SimpleFunction('bugReportURL', [ $this, 'bugReportURL' ]),
+            new \Twig_SimpleFunction('logged_in_user', [$this, 'functionLoggedInUser']),
         ];
     }
 
@@ -397,6 +396,16 @@ class AppExtension extends Extension
         $id = array_rand($quotes);
         return $quotes[$id];
     }
+
+    /**
+     * Get the currently logged in user's details.
+     * @return string[]
+     */
+    public function functionLoggedInUser()
+    {
+        return $this->container->get('session')->get('logged_in_user');
+    }
+
 
     /*********************************** FILTERS ***********************************/
 

@@ -2,13 +2,24 @@
 
 namespace AppBundle\Controller;
 
+use Exception;
+use MediaWiki\OAuthClient\Client;
+use MediaWiki\OAuthClient\ClientConfig;
+use MediaWiki\OAuthClient\Consumer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Xtools\ProjectRepository;
 
 class DefaultController extends Controller
 {
+
+    /** @var Client */
+    protected $oauthClient;
+
     /**
      * @Route("/", name="homepage")
      * @Route("/index.php", name="homepageIndexPhp")
@@ -60,5 +71,90 @@ class DefaultController extends Controller
             'xtPage' => "index",
             'dump' => print_r($params, true),
         ]);
+    }
+
+    /**
+     * @Route("/login", name="login")
+     */
+    public function loginAction(Request $request)
+    {
+        try {
+            list( $next, $token ) = $this->getOauthClient()->initiate();
+        } catch (Exception $oauthException) {
+            throw $oauthException;
+            // @TODO Make this work.
+            //$this->addFlash('error', $oauthException->getMessage());
+            //return $this->redirectToRoute('homepage');
+        }
+
+        // Save the request token to the session.
+        /** @var Session $session */
+        $session = $this->get('session');
+        $session->set('oauth_request_token', $token);
+        return new RedirectResponse($next);
+    }
+
+    /**
+     * @Route("/oauth_callback", name="oauth_callback")
+     */
+    public function oauthCallbackAction(Request $request)
+    {
+        // Give up if the required GET params don't exist.
+        if (!$request->get('oauth_verifier')) {
+            return $this->createNotFoundException();
+        }
+
+        /** @var Session $session */
+        $session = $this->get('session');
+
+        // Complete authentication.
+        $client = $this->getOauthClient();
+        $token = $session->get('oauth_request_token');
+        $verifier = $request->get('oauth_verifier');
+        $accessToken = $client->complete($token, $verifier);
+
+        // Store access token, and remove request token.
+        $session->set('oauth_access_token', $accessToken);
+        $session->remove('oauth_request_token');
+
+        // Store user identity.
+        $ident = $client->identify($accessToken);
+        $session->set('logged_in_user', $ident);
+
+        // Send back to homepage.
+        return $this->redirectToRoute('homepage');
+    }
+
+    /**
+     * Get an OAuth client, configured to the default project.
+     * (This shouldn't really be in this class, but oh well.)
+     * @return Client
+     */
+    protected function getOauthClient()
+    {
+        if ($this->oauthClient instanceof Client) {
+            return $this->oauthClient;
+        }
+        $defaultProject = ProjectRepository::getDefaultProject($this->container);
+        $endpoint = $defaultProject->getUrl(false)
+                    . $defaultProject->getScriptPath()
+                    . '/index.php?title=Special:OAuth';
+        $conf = new ClientConfig($endpoint);
+        $consumerKey = $this->getParameter('oauth_key');
+        $consumerSecret =  $this->getParameter('oauth_secret');
+        $conf->setConsumer(new Consumer($consumerKey, $consumerSecret));
+        $this->oauthClient = new Client($conf);
+        // Callback URL is hardcoded in the consumer registration.
+        $this->oauthClient->setCallback('oob');
+        return $this->oauthClient;
+    }
+
+    /**
+     * @Route("/logout", name="logout")
+     */
+    public function logoutAction()
+    {
+        $this->get('session')->invalidate();
+        return $this->redirectToRoute('homepage');
     }
 }
