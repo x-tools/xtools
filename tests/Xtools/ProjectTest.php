@@ -22,7 +22,7 @@ class ProjectTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('test.example.org', $project->getDomain());
         $this->assertEquals('test_wiki', $project->getDatabaseName());
         $this->assertEquals('https://test.example.org/', $project->getUrl());
-        $this->assertEquals('/w/index.php', $project->getScriptPath());
+        $this->assertEquals('/w', $project->getScriptPath());
         $this->assertEquals('/wiki/', $project->getArticlePath());
         $this->assertTrue($project->exists());
     }
@@ -71,5 +71,36 @@ class ProjectTest extends PHPUnit_Framework_TestCase
         $project = new Project('testWiki');
         $project->setRepository($projectRepo);
         $this->assertFalse($project->exists());
+    }
+
+    /**
+     * @dataProvider optedInProvider
+     */
+    public function testOptedIn($optedInProjects, $dbname, $hasOptedIn)
+    {
+        $projectRepo = $this->getMock(ProjectRepository::class);
+        $projectRepo->expects($this->once())
+            ->method('optedIn')
+            ->willReturn($optedInProjects);
+        $projectRepo->expects($this->once())
+            ->method('getOne')
+            ->willReturn(['dbname' => $dbname]);
+            
+        $project = new Project($dbname);
+        $project->setRepository($projectRepo);
+        
+        // Check that the user has opted in or not.
+        $user = new User('TestUser');
+        $this->assertEquals($hasOptedIn, $project->userHasOptedIn($user));
+    }
+
+    public function optedInProvider()
+    {
+        $optedInProjects = ['project1'];
+        return [
+            [$optedInProjects, 'project1', true],
+            [$optedInProjects, 'project2', false],
+            [$optedInProjects, 'project3', false],
+        ];
     }
 }

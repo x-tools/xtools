@@ -206,14 +206,6 @@ class EditCounter extends Model
     }
 
     /**
-     * Get the total number of semi-automated edits.
-     * @return int
-     */
-    public function countAutomatedEdits()
-    {
-    }
-
-    /**
      * Get the total number of pages (both still live and those that have been deleted) created
      * by the user.
      * @return int

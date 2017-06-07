@@ -4,6 +4,7 @@ namespace Xtools;
 
 use Mediawiki\Api\SimpleRequest;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\VarDumper\VarDumper;
 
 class UserRepository extends Repository
 {

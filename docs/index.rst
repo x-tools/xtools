@@ -27,6 +27,7 @@ It is in operation for Wikimedia wikis and can also be installed for any MediaWi
     pre-requisites
     installation
     configuration
+    opt-in
     tools/index
     development
 

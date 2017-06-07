@@ -214,4 +214,30 @@ class ProjectRepository extends Repository
 
         return $this->metadata;
     }
+
+    /**
+     * Get a list of projects that have opted in to having all their users' restricted statistics
+     * available to anyone.
+     *
+     * @return string[]
+     */
+    public function optedIn()
+    {
+        $optedIn = $this->container->getParameter('opted_in');
+        return $optedIn;
+    }
+
+    /**
+     * Check to see if a page exists on this project.
+     * @param $pageTitle
+     * @return bool
+     */
+    public function pageExists(Project $project, $pageTitle)
+    {
+        $conn = $this->getProjectsConnection();
+        $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
+        $query = "SELECT page_id FROM $pageTable WHERE page_title = :title LIMIT 1";
+        $pages = $conn->executeQuery($query, ['title'=>$pageTitle])->fetchAll();
+        return count($pages) > 0;
+    }
 }

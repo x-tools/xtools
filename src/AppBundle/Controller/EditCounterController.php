@@ -169,8 +169,12 @@ class EditCounterController extends Controller
     public function timecardAction($project, $username)
     {
         $this->setUpEditCounter($project, $username);
+
+        // Make sure they've opted in to see this data.
+        if (!$this->project->userHasOptedIn($this->user)) {
+        }
+
         $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
-        //$datasets = $this->editCounterHelper->getTimeCard($username);
         return $this->render('editCounter/timecard.html.twig', [
             'xtTitle' => 'tool-ec',
             'xtPage' => 'ec',

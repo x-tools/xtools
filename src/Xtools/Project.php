@@ -3,6 +3,7 @@
 namespace Xtools;
 
 use Mediawiki\Api\MediawikiApi;
+use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * A Project is a single wiki that Xtools is querying.
@@ -141,5 +142,42 @@ class Project extends Model
     {
         $metadata = $this->getRepository()->getMetadata($this->getUrl());
         return $metadata['namespaces'];
+    }
+
+    /**
+     * Get the name of the page on this project that the user must create in order to opt in for 
+     * restricted statistics display.
+     * @param User $user
+     * @return string
+     */
+    public function userOptInPage(User $user)
+    {
+        $localPageName = 'User:' . $user->getUsername() . '/EditCounterOptIn.js';
+        return $localPageName;
+    }
+
+    /**
+     * Has a user opted in to having their restricted statistics displayed to anyone?
+     * @param User $user
+     * @return bool
+     */
+    public function userHasOptedIn(User $user)
+    {
+        // 1. First check to see if the whole project has opted in.
+        if (!isset($this->metadata['opted_in'])) {
+            $optedInProjects = $this->getRepository()->optedIn();
+            $this->metadata['opted_in'] = in_array($this->getDatabaseName(), $optedInProjects);
+        }
+        if ($this->metadata['opted_in']) {
+            return true;
+        }
+
+        // 2. Then see if the user has opted in on this project.
+        $localExists = $this->getRepository()->pageExists($this, $this->userOptInPage($user));
+        if ($localExists) {
+            return true;
+        }
+
+        return false;
     }
 }

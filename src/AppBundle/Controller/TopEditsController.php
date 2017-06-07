@@ -13,6 +13,7 @@ use Xtools\PagesRepository;
 use Xtools\Project;
 use Xtools\ProjectRepository;
 use Xtools\User;
+use Xtools\UserRepository;
 
 class TopEditsController extends Controller
 {
@@ -101,7 +102,7 @@ class TopEditsController extends Controller
             return $this->redirectToRoute("topedits");
         }
 
-        $user = new User($username);
+        $user = UserRepository::getUser($username, $this->container);
 
         if ($article === "") {
             return $this->namespaceTopEdits($user, $projectData, $namespace);
@@ -119,6 +120,15 @@ class TopEditsController extends Controller
      */
     protected function namespaceTopEdits(User $user, Project $project, $namespaceId)
     {
+        // Make sure they've opted in to see this data.
+        if (!$project->userHasOptedIn($user)) {
+            $this->addFlash('notice', ['not-opted-in']);
+            $title = $project->userOptInPage($user);
+            $url = $project->getUrl().$project->getArticlePath().$title;
+            $anchor = "<a href='".urlencode($url).">$title</a>";
+            return $this->redirectToRoute('topedits', [$anchor]);
+        }
+
         // Get list of namespaces.
         $namespaces = $project->getNamespaces();
 

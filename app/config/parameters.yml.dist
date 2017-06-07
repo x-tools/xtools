@@ -18,6 +18,7 @@ parameters:
     api_path:                   /w/api.php
     lang:                       en
     default_project:            en.wikipedia.org
+    opted_in:                   ~
 
     # Oauth consumer credentials, from https://meta.wikimedia.org/wiki/Special:OAuthConsumerRegistration
     oauth_key:                  ~
