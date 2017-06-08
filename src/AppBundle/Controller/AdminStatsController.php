@@ -166,7 +166,7 @@ class AdminStatsController extends Controller
 
         // Get admin ID's, used to account for inactive admins
         $user_groups_table = $lh->getTable("user_groups", $dbName);
-        $ufg_table = $lh->getTable("user_former_groups");
+        $ufg_table = $lh->getTable("user_former_groups", $dbName);
         $query = "
             SELECT ug_user AS user_id
             FROM $user_groups_table
