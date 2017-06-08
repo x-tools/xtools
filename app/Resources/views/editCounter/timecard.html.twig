@@ -2,6 +2,12 @@
 
 {% block body %}
 
+{% if not project.userHasOptedIn(user) %}
+<div class="alert alert-info">
+    <p>{{ msg('not-opted-in', [wiki_link(project.userOptInPage(user), project.url~project.articlePath)]) }}</p>
+</div>
+{% else %}
+
 <p>{{ msg('timecard-chart-desc') }}</p>
 <canvas id="timecard-bubble-chart"></canvas>
 <script type="text/javascript">
@@ -53,5 +59,7 @@
         }
     });
 </script>
+
+{% endif %}
 
 {% endblock %}

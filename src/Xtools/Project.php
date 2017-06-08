@@ -152,7 +152,7 @@ class Project extends Model
      */
     public function userOptInPage(User $user)
     {
-        $localPageName = 'User:' . $user->getUsername() . '/EditCounterOptIn.js';
+        $localPageName = $user->getUsername() . '/EditCounterOptIn.js';
         return $localPageName;
     }
 
@@ -173,8 +173,19 @@ class Project extends Model
         }
 
         // 2. Then see if the user has opted in on this project.
-        $localExists = $this->getRepository()->pageExists($this, $this->userOptInPage($user));
+        $userNsId = 2;
+        $localExists = $this->getRepository()
+            ->pageHasContent($this, $userNsId, $this->userOptInPage($user));
         if ($localExists) {
+            return true;
+        }
+
+        // 3. Lastly, see if they've opted in globally on the default project or Meta.
+        $globalPageName = $user->getUsername() . '/EditCounterGlobalOptIn.js';
+        $globalProject = $this->getRepository()->getGlobalProject();
+        $globalExists = $globalProject->getRepository()
+            ->pageHasContent($globalProject, $userNsId, $globalPageName);
+        if ($globalExists) {
             return true;
         }
 

@@ -16,8 +16,8 @@
     {% for rev in ec.latestGlobalRevisions %}
         <tr>
             <td class="tddate">{{ rev.timestamp|date('Y-m-d H:i') }}</td>
-            <td><a href="{{ rev.project.url }}">{{ rev.project.title }}</a></td>
-            <td>(
+            <td class="tdgeneral"><a href="{{ rev.project.url }}">{{ rev.project.title }}</a></td>
+            <td class="text-nowrap">(
                 {{ diff_link(rev.rev_id, rev.project.url, 'diff') }}
                 &middot; {{ user_log_link(user.username, rev.project.url, 'log') }}
                 &middot;
@@ -26,7 +26,7 @@
                 </a>
                 )
             </td>
-            <td class="tdtitle break">
+            <td class="tdgeneral">
                 {% if rev.page_namespace != 0 %}
                     {% set qualified_name = attribute(rev.project.namespaces, rev.page_namespace)~':'~rev.page_title %}
                 {% else %}
@@ -34,7 +34,7 @@
                 {% endif %}
                 {{ wiki_link(qualified_name, rev.project.url) }}
             </td>
-            <td class="revtext break">{{ rev.rev_comment }}</td>
+            <td class="tdrevtext">{{ rev.rev_comment }}</td>
         </tr>
     {% endfor %}
     </tbody>

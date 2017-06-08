@@ -2,6 +2,12 @@
 
 {% block body %}
 
+{% if not project.userHasOptedIn(user) %}
+    <div class="alert alert-info">
+        <p>{{ msg('not-opted-in', [wiki_link(project.userOptInPage(user), project.url~project.articlePath)]) }}</p>
+    </div>
+{% else %}
+
 <canvas id="monthcounts-bar-chart"></canvas>
 <script type="text/javascript">
     new Chart($("#monthcounts-bar-chart"), {
@@ -51,5 +57,7 @@
         }
     });
 </script>
+
+{% endif %}
 
 {% endblock %}

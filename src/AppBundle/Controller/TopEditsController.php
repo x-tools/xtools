@@ -122,11 +122,14 @@ class TopEditsController extends Controller
     {
         // Make sure they've opted in to see this data.
         if (!$project->userHasOptedIn($user)) {
-            $this->addFlash('notice', ['not-opted-in']);
-            $title = $project->userOptInPage($user);
-            $url = $project->getUrl().$project->getArticlePath().$title;
-            $anchor = "<a href='".urlencode($url).">$title</a>";
-            return $this->redirectToRoute('topedits', [$anchor]);
+            return $this->render('topedits/result_namespace.html.twig', [
+                'xtPage' => 'topedits',
+                'project' => $project,
+                'user' => $user,
+                'namespace' => $namespaceId,
+                'edits' => [],
+                'content_title' => '',
+            ]);
         }
 
         // Get list of namespaces.

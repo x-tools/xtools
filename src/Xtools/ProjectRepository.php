@@ -51,6 +51,19 @@ class ProjectRepository extends Repository
     }
 
     /**
+     * Get the global 'meta' project, which is either Meta (if this is Labs) or the default project.
+     * @return Project
+     */
+    public function getGlobalProject()
+    {
+        if ($this->isLabs()) {
+            return self::getProject('metawiki', $this->container);
+        } else {
+            return self::getDefaultProject($this->container);
+        }
+    }
+
+    /**
      * For single-wiki installations, you must manually set the wiki URL and database name
      * (because there's no meta.wiki database to query).
      * @param $metadata
@@ -228,16 +241,24 @@ class ProjectRepository extends Repository
     }
 
     /**
-     * Check to see if a page exists on this project.
-     * @param $pageTitle
+     * Check to see if a page exists on this project and has some content.
+     * @param int $namespaceId The page namespace ID.
+     * @param string $pageTitle The page title, without namespace,
      * @return bool
      */
-    public function pageExists(Project $project, $pageTitle)
+    public function pageHasContent(Project $project, $namespaceId, $pageTitle)
     {
         $conn = $this->getProjectsConnection();
         $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
-        $query = "SELECT page_id FROM $pageTable WHERE page_title = :title LIMIT 1";
-        $pages = $conn->executeQuery($query, ['title'=>$pageTitle])->fetchAll();
+        $query = "SELECT page_id "
+             . " FROM $pageTable "
+             . " WHERE page_namespace = :ns AND page_title = :title AND page_len > 0 "
+             . " LIMIT 1";
+        $params = [
+            'ns' => $namespaceId,
+            'title' => $pageTitle,
+        ];
+        $pages = $conn->executeQuery($query, $params)->fetchAll();
         return count($pages) > 0;
     }
 }

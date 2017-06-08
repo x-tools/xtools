@@ -25,11 +25,11 @@
             {% endif %}
         </p>
 
-        <div class="panel panel-default" id="generalstats">
+        <div class="panel panel-default" id="general-stats">
             <div class="panel-heading">
                 <h4 class="topcaption">{{ msg("general-stats") }}</h4>
             </div>
-            <div class="panel-body" id="generalstats">
+            <div class="panel-body">
                 {{ render(path('EditCounterGeneralStats', {
                     'username': user.username,
                     'project': project.domain
@@ -38,16 +38,29 @@
         </div>
 
         <div class="panel panel-default" id="namespace-totals">
-            <div class="panel-heading"><h4>{{ msg('namespacetotals') }}</h4></div>
+            <div class="panel-heading"><h4>{{ msg('namespace-totals') }}</h4></div>
             <div class="panel-body">
-                {{ include( 'editCounter/namespace_totals.html.twig' ) }}
+                {{ render(path('EditCounterNamespaceTotals', {
+                    'username': user.username,
+                    'project': project.domain
+                })) }}
             </div>
         </div>
 
         <div class="panel panel-default" id="year-counts">
-            <div class="panel-heading"><h4>{{ msg('yearcounts') }}</h4></div>
+            <div class="panel-heading"><h4>{{ msg('year-counts') }}</h4></div>
             <div class="panel-body">
                 {{ render(path('EditCounterYearCounts', {
+                    'username': user.username,
+                    'project': project.domain
+                })) }}
+            </div>
+        </div>
+
+        <div class="panel panel-default" id="month-counts">
+            <div class="panel-heading"><h4>{{ msg('month-counts') }}</h4></div>
+            <div class="panel-body">
+                {{ render(path('EditCounterMonthCounts', {
                     'username': user.username,
                     'project': project.domain
                 })) }}
@@ -76,19 +89,10 @@
             </div>
         </div>
 
-        <div class="panel panel-default" id="monthcounts">
-            <div class="panel-heading"><h4>{{ msg('month-counts') }}</h4></div>
-            <div class="panel-body">
-                {{ render(path('EditCounterMonthCounts', {
-                    'username': user.username,
-                    'project': project.domain
-                })) }}
-            </div>
-        </div>
-
         <div class="panel panel-default" id="autoeditslist">
             <div class="panel-heading"><h4>{{ msg('auto-edits') }}</h4></div>
             <div class="panel-body">
+                {% if ec.automatedRevisionsSummary %}
                 <table class="table">
                     {% for tool,count in ec.automatedRevisionsSummary %}
                         <tr>
@@ -97,6 +101,11 @@
                         </tr>
                     {% endfor %}
                 </table>
+                {% else %}
+                <div class="alert alert-success">
+                    <p>{{ msg('no-revisions') }}</p>
+                </div>
+                {% endif %}
             </div>
         </div>
 

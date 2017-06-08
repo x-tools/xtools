@@ -72,7 +72,14 @@
             </tbody>
         </table>
         {% endset %}
-        {{ layout.content_block(content_title, content, '', null, false, false) }}
+
+        {% if project.userHasOptedIn(user) %}
+            {{ layout.content_block(content_title, content, '', null, false, false) }}
+        {% else %}
+            <div class="alert alert-info">
+                <p>{{ msg('not-opted-in', [wiki_link(project.userOptInPage(user), project.url~project.articlePath)]) }}</p>
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
