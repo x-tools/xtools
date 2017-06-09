@@ -29,7 +29,7 @@ class SimpleEditCounterController extends Controller
         $request = Request::createFromGlobals();
 
         $projectQuery = $request->query->get('project');
-        $username = $request->query->get('username');
+        $username = $request->query->get('username', $request->query->get('user'));
 
         if ($projectQuery != "" && $username != "") {
             $routeParams = [ 'project'=>$projectQuery, 'username' => $username ];

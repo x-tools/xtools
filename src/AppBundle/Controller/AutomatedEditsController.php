@@ -26,7 +26,7 @@ class AutomatedEditsController extends Controller
         // Pull the values out of the query string. These values default to
         // empty strings.
         $project = $request->query->get('project');
-        $username = $request->query->get('username');
+        $username = $request->query->get('username', $request->query->get('user'));
         $startDate = $request->query->get('start');
         $endDate = $request->query->get('end');
 

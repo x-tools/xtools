@@ -27,7 +27,7 @@ class PagesController extends Controller
         $request = Request::createFromGlobals();
 
         $projectQuery = $request->query->get('project');
-        $username = $request->query->get('username');
+        $username = $request->query->get('username', $request->query->get('user'));
         $namespace = $request->query->get('namespace');
         $redirects = $request->query->get('redirects');
 

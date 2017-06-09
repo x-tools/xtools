@@ -73,7 +73,7 @@ class EditCounterController extends Controller
     public function indexAction(Request $request, $project = null)
     {
         $queryProject = $request->query->get('project');
-        $username = $request->query->get('username');
+        $username = $request->query->get('username', $request->query->get('user'));
 
         if (($project || $queryProject) && $username) {
             $routeParams = [ 'project'=>($project ?: $queryProject), 'username' => $username ];

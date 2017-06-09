@@ -282,7 +282,7 @@ class ApiHelper extends HelperBase
                 'titles' => join('|', $titleSlice),
             ];
             $query = new SimpleRequest('query', $params);
-            $result = $this->api->getRequest($query);
+            $result = $this->api->postRequest($query);
 
             // Extract normalization info.
             $normalized = [];
