@@ -6,6 +6,9 @@ use AppBundle\Helper\AutomatedEditsHelper;
 use DateInterval;
 use DateTime;
 use Mediawiki\Api\SimpleRequest;
+use Mediawiki\Api\UsageException;
+use MediaWiki\OAuthClient\Exception;
+use Symfony\Component\VarDumper\VarDumper;
 
 class EditCounterRepository extends Repository
 {
@@ -247,15 +250,41 @@ class EditCounterRepository extends Repository
         return $logCounts;
     }
 
+    /*
+     * Get a user's total edit count on all projects.
+     *
+     * @see EditCounterRepository::globalEditCountsFromCentralAuth()
+     * @see EditCounterRepository::globalEditCountsFromDatabases()
+     *
+     * @param string $username The username.
+     * @param Project $project The project to start from.
+     *
+     * @return mixed[] Elements are arrays with 'project' (Project), and 'total' (int).
+     */
+    public function globalEditCounts(User $user, Project $project) {
+        $editCounts = $this->globalEditCountsFromCentralAuth($user, $project);
+        if ($editCounts === false) {
+            $editCounts = $this->globalEditCountsFromDatabases($user, $project);
+        }
+        $out = [];
+        foreach ($editCounts as $editCount) {
+            $out[] = [
+                'project' => ProjectRepository::getProject($editCount['dbname'], $this->container),
+                'total' => $editCount['total'],
+            ];
+        }
+        return $out;
+    }
+
     /**
      * Get a user's total edit count on one or more project.
      * Requires the CentralAuth extension to be installed on the project.
      *
-     * @param string $username The username.
+     * @param User $user The user.
      * @param Project $project The project to start from.
-     * @return mixed[]|boolean Array of total edit counts, or false if none could be found.
+     * @return mixed[] Elements are arrays with 'dbname' (string), and 'total' (int).
      */
-    public function getRevisionCountsAllProjects(User $user, Project $project)
+    protected function globalEditCountsFromCentralAuth(User $user, Project $project)
     {
         // Set up cache and stopwatch.
         $cacheKey = 'globalRevisionCounts.'.$user->getUsername();
@@ -275,18 +304,15 @@ class EditCounterRepository extends Repository
         ];
         $query = new SimpleRequest('query', $params);
         $result = $api->getRequest($query);
-        $out = [];
-        if (isset($result['query']['globaluserinfo']['merged'])) {
-            foreach ($result['query']['globaluserinfo']['merged'] as $merged) {
-                $proj = ProjectRepository::getProject($merged['wiki'], $this->container);
-                $out[] = [
-                    'project' => $proj,
-                    'total' => $merged['editcount'],
-                ];
-            }
+        if (!isset($result['query']['globaluserinfo']['merged'])) {
+            return [];
         }
-        if (empty($out)) {
-            $out = $this->getRevisionCountsAllProjectsNoCentralAuth($user, $project, $cacheKey);
+        $out = [];
+        foreach ($result['query']['globaluserinfo']['merged'] as $result) {
+            $out[] = [
+                'dbname' => $result['wiki'],
+                'total' => $result['editcount'],
+            ];
         }
 
         // Cache for 10 minutes, and return.
@@ -300,15 +326,12 @@ class EditCounterRepository extends Repository
     }
 
     /**
-     * Get total edit counts for the top 10 projects for this user.
-     * @param string $username The username.
-     * @return string[] Elements are arrays with 'dbName', 'url', 'name', and 'total'.
+     * Get total edit counts from all projects for this user.
+     * @see EditCounterRepository::globalEditCountsFromCentralAuth()
+     * @return mixed[] Elements are arrays with 'dbname' (string), and 'total' (int).
      */
-    protected function getRevisionCountsAllProjectsNoCentralAuth(
-        User $user,
-        Project $project,
-        $stopwatchName
-    ) {
+    protected function globalEditCountsFromDatabases(User $user, Project $project) {
+        $stopwatchName = 'globalRevisionCounts.'.$user->getUsername();
         $allProjects = $project->getRepository()->getAll();
         $topEditCounts = [];
         foreach ($allProjects as $projectMeta) {
@@ -318,9 +341,8 @@ class EditCounterRepository extends Repository
             $stmt->bindParam("username", $user->getUsername());
             $stmt->execute();
             $total = (int)$stmt->fetchColumn();
-            $project = ProjectRepository::getProject($projectMeta['dbName'], $this->container);
             $topEditCounts[] = [
-                'project' => $project,
+                'dbname' => $projectMeta['dbName'],
                 'total' => $total,
             ];
             $this->stopwatch->lap($stopwatchName);

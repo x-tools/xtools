@@ -89,6 +89,7 @@
   "global-account-manager": "Global account manager",
   "global-contribs": "Global user contributions",
   "global-user-groups": "Global user groups",
+  "global-total-edit-count": "Total of all edits on all projects:",
   "help-translate": "Help translate",
   "hide": "Hide",
   "high-replag": "Caution: Replication lag is high, changes newer than $1 may not be shown.",

@@ -183,10 +183,12 @@ class Project extends Model
         // 3. Lastly, see if they've opted in globally on the default project or Meta.
         $globalPageName = $user->getUsername() . '/EditCounterGlobalOptIn.js';
         $globalProject = $this->getRepository()->getGlobalProject();
-        $globalExists = $globalProject->getRepository()
-            ->pageHasContent($globalProject, $userNsId, $globalPageName);
-        if ($globalExists) {
-            return true;
+        if ($globalProject instanceof Project) {
+            $globalExists = $globalProject->getRepository()
+                ->pageHasContent($globalProject, $userNsId, $globalPageName);
+            if ($globalExists) {
+                return true;
+            }
         }
 
         return false;

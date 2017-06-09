@@ -13,7 +13,7 @@
         </tr>
     </thead>
     <tbody>
-    {% for rev in ec.latestGlobalRevisions %}
+    {% for rev in ec.globalEdits(40) %}
         <tr>
             <td class="tddate">{{ rev.timestamp|date('Y-m-d H:i') }}</td>
             <td class="tdgeneral"><a href="{{ rev.project.url }}">{{ rev.project.title }}</a></td>

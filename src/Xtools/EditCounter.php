@@ -31,6 +31,9 @@ class EditCounter extends Model
     /** @var int[] */
     protected $logCounts;
 
+    /** @var int[] Keys are project DB names. */
+    protected $globalEditCounts;
+
     /**
      * EditCounter constructor.
      * @param Project $project The base project to count edits
@@ -387,25 +390,6 @@ class EditCounter extends Model
     }
 
     /**
-     * Get the total edit counts for the top n projects of this user.
-     * @param User $user
-     * @param Project $project
-     * @param int $numProjects
-     * @return mixed[] Each element has 'total' and 'project' keys.
-     */
-    public function topProjectsEditCounts(User $user, Project $project, $numProjects = 10)
-    {
-        // Get counts.
-        $editCounts = $this->getRepository()->getRevisionCountsAllProjects($user, $project);
-        // Sort.
-        uasort($editCounts, function ($a, $b) {
-            return $b['total'] - $a['total'];
-        });
-        // Truncate, and return.
-        return array_slice($editCounts, 0, $numProjects);
-    }
-
-    /**
      * Get the given user's total edit counts per namespace.
      */
     public function namespaceTotals()
@@ -483,18 +467,66 @@ class EditCounter extends Model
         return $out;
     }
 
-    public function latestGlobalRevisions($max = 40)
+    /**
+     * Get the total edit counts for the top n projects of this user.
+     * @param int $numProjects
+     * @return mixed[] Each element has 'total' and 'project' keys.
+     */
+    public function globalEditCountsTopN($numProjects = 10)
     {
-        // Re-use the list of active projects from all-project revision counting.
-        $editCounts = $this->getRepository()->getRevisionCountsAllProjects($this->user, $this->project);
+        // Get counts.
+        $editCounts = $this->globalEditCounts();
+        // Sort.
+        uasort($editCounts, function ($a, $b) {
+            return $b['total'] - $a['total'];
+        });
+        // Truncate, and return.
+        return array_slice($editCounts, 0, $numProjects);
+    }
+
+    /**
+     * Get the grand total of all edits on all projects.
+     * @return int
+     */
+    public function globalEditCount()
+    {
+        $total = 0;
+        foreach ($this->globalEditCounts() as $editCount) {
+            $total += $editCount['total'];
+        }
+        return $total;
+    }
+
+    /**
+     * Get the total revision counts for all projects for this user.
+     * @return mixed[] Each element has 'total' and 'project' keys.
+     */
+    public function globalEditCounts()
+    {
+        if (!$this->globalEditCounts) {
+            $this->globalEditCounts = $this->getRepository()
+                ->globalEditCounts($this->user, $this->project);
+        }
+        return $this->globalEditCounts;
+    }
+
+    /**
+     * Get the most recent n revisions across all projects.
+     * @param int $max
+     * @return Edit[]
+     */
+    public function globalEdits($max) {
         // Go through each project that has any edits.
         $globalRevisions = [];
         $oldest = null;
-        foreach ($editCounts as $editCount) {
+
+        foreach ($this->globalEditCounts() as $editCount) {
             // Don't query revisions if there aren't any.
             if ($editCount['total'] == 0) {
                 continue;
             }
+            dump($editCount);
+
             // Get this project's revisions.
             $revisions = $this->getRepository()
                 ->getRevisions($editCount['project'], $this->user, $oldest);
@@ -514,6 +546,7 @@ class EditCounter extends Model
             krsort($globalRevisions);
             $globalRevisions = array_slice($globalRevisions, 0, $max);
         }
+        dump($globalRevisions);exit();
         return $globalRevisions;
     }
 }

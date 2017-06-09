@@ -181,7 +181,7 @@
                 {{ msg('top-projects-edit-counts') }}
                 <span class="text-muted text-right"><a href="#latestglobal">{{ msg('top-projects-read-more-link') }}</a></span>
             </caption>
-            {% for topProj in ec.topProjectsEditCounts(user, project) %}
+            {% for topProj in ec.globalEditCountsTopN(10) %}
                 <tr>
                     {% if topProj.project.databaseName == project.databaseName %}
                     <td class="current"><span title="{{ msg('selected') }}">►</span>
@@ -201,15 +201,15 @@
                 </tr>
             {% endfor %}
             <tfoot>
-            <tr>
-                <td>@TODO {{ msg('sul-total-other-sites-count') }}</td>
-                <td><span class="tdgeneral" >@TODO</span></td>
-                <td class="tdnum"><small> @TODO days</small></td>
-            </tr>
-            <tr>
-                <th>{{ msg('sul-total-edits') }}</th>
-                <td><span class="tdgeneral">@TODO sul-total</span></td>
-            </tr>
+                <tr>
+                    <th>{{ msg('global-other-sites-edit-count') }}</th>
+                    <td class="tdnum">@TODO</td>
+                </tr>
+                <tr>
+                    <th>{{ msg('global-total-edit-count') }}</th>
+                    <td class="tdnum">{{ ec.globalEditCount|number_format }}</td>
+                    <td class="tdnum"><small>@TODO days</small></td>
+                </tr>
             </tfoot>
         </table>
     </div>
