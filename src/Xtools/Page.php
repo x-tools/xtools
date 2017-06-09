@@ -115,6 +115,20 @@ class Page extends Model
     }
 
     /**
+     * Get the Wikidata ID of this page.
+     * @return string
+     */
+    public function getWikidataId()
+    {
+        $info = $this->getPageInfo();
+        if (isset($info['pageprops']['wikibase_item'])) {
+            return $info['pageprops']['wikibase_item'];
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Get the number of revisions the page has.
      * @return int
      */

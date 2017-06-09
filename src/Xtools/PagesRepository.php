@@ -77,6 +77,7 @@ class PagesRepository extends Repository
                     revs.rev_id AS id,
                     revs.rev_timestamp AS timestamp,
                     revs.rev_minor_edit AS minor,
+                    revs.rev_len AS length,
                     (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
                     revs.rev_user AS user_id,
                     revs.rev_user_text AS username,
