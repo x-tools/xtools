@@ -14,6 +14,7 @@ use AppBundle\Helper\AutomatedEditsHelper;
 use Xtools\ProjectRepository;
 use Xtools\Page;
 use Xtools\PagesRepository;
+use Xtools\Edit;
 
 class ArticleInfoController extends Controller
 {
@@ -91,6 +92,16 @@ class ArticleInfoController extends Controller
         $pageRepo->setContainer($this->container);
         $page->setRepository($pageRepo);
 
+        $edit = new Edit($page, [
+            'id' => 123,
+            'timestamp' => '20170123235959',
+            'minor' => '1',
+            'length' => 1353,
+            'length_change' => -523,
+            'username' => 'MusikAnimal',
+            'comment' => 'BLAH',
+        ]);
+
         if (!$page->exists()) {
             $this->addFlash('notice', ['no-exist', $pageQuery]);
             return $this->redirectToRoute('articleInfo');
@@ -104,7 +115,7 @@ class ArticleInfoController extends Controller
         // TODO: throw error if $basicInfo['missing'] is set
 
         $this->pageInfo = [
-            'project' => preg_replace('#^https?://#', '', rtrim($projectUrl, '/')),
+            'project' => $project,
             'projectUrl' => $projectUrl,
             'page' => $page,
             'dbName' => $dbName,
@@ -153,7 +164,7 @@ class ArticleInfoController extends Controller
         $this->pageInfo = array_merge($this->pageInfo, $this->getLinksAndRedirects());
         $this->pageInfo['general']['pageviews_offset'] = 60;
         $this->pageInfo['general']['pageviews'] = $this->ph->sumLastDays(
-            $this->pageInfo['project'],
+            $this->pageInfo['project']->getDomain(),
             $this->pageInfo['title'],
             $this->pageInfo['general']['pageviews_offset']
         );

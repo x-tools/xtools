@@ -1,5 +1,6 @@
 {% extends 'base.html.twig' %}
 {% import 'macros/layout.html.twig' as layout %}
+{% import 'macros/wiki.html.twig' as wiki %}
 {% import 'macros/pieChart.html.twig' as chart %}
 
 {% block body %}
@@ -10,26 +11,26 @@
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {{ msg('back') }}
             </a>
-            {{ wiki_link(title, projectUrl) }}
+            {{ wiki.pageLink(page) }}
             <small>
                 &bull;
-                {{ project }}
+                {{ project.domain }}
             </small>
         </div>
     </header>
 
     <div class="panel-body xt-panel-body">
         <p class="text-center xt-heading-subtitle">
-            {{ wiki_history_link(title, projectUrl) }}
+            {{ wiki.pageHistLink(page) }}
             &middot;
-            {{ wiki_log_link(title, projectUrl) }}
+            {{ wiki.pageLogLink(page) }}
             {% if isWMFLabs() %}
-            &middot;
-            {{ pageviews_links(title, project) }}
-            {% if wikidataId is defined %}
                 &middot;
-                <a target="_blank" href="http://tools.wmflabs.org/reasonator/?q={{ wikidataId }}">Resonator (Wikidata)</a>
-            {% endif %}
+                {{ wiki.pageviewsLinks(page) }}
+                {% if page.wikidataId is defined %}
+                    &middot;
+                    {{ wiki.extLink('https://tools.wmflabs.org/reasonator/?q=' ~ page.wikidataId, 'Resonator (Wikidata)') }}
+                {% endif %}
             {% endif %}
         </p>
 
@@ -59,14 +60,14 @@
                     <tr>
                         <td>ID</td>
                         <td>
-                            <a target="_blank" href="{{ projectUrl }}/w/index.php?action=info&title={{ title }}">{{ page.id }}</a>
+                            {{ wiki.pageInfoLink(page, page.id) }}
                         </td>
                     </tr>
-                    {% if wikidataId is defined %}
+                    {% if page.wikidataId is defined %}
                     <tr>
                         <td>Wikidata ID</td>
                         <td>
-                            <a target="_blank" href="https://www.wikidata.org/wiki/{{ wikidataId }}">{{ page.wikidataId }}</a>
+                            {{ wiki.extLink('https://www.wikidata.org/wiki/' ~ page.wikidataId, page.wikidataId) }}
                             &middot;
                             {{ numWikidataItems | number_format }} {{ msg('num-sitelinks', [numWikidataItems]) }}
                         </td>
@@ -217,13 +218,13 @@
                     <tr>
                         <td class="stat-list--new-group">{{ msg('links-in') }}</td>
                         <td class="stat-list--new-group">
-                            <a target="_blank" href="{{ projectUrl }}/w/index.php?title=Special:WhatLinksHere/{{ title }}&hidetrans=1">{{ links_in_count | number_format }}</a>
+                            {{ wiki.pageLinksInLink(page, links_in_count | number_format) }}
                         </td>
                     </tr>
                     <tr>
                         <td>{{ msg('redirects') }}</td>
                         <td>
-                            <a target="_blank" href="{{ projectUrl }}/w/index.php?title=Special:WhatLinksHere/{{ title }}&hidetrans=1&hidelinks=1">{{ redirects_count | number_format }}</a>
+                            {{ wiki.pageRedirectsLink(page, redirects_count | number_format) }}
                         </td>
                     </tr>
                     <tr>
@@ -231,7 +232,7 @@
                         <td>{{ links_out_count | number_format }}</td>
                     </tr>
                     <tr>
-                        <td>{{ msg('links-ext') }}</td>
+                        <td>{{ msg('links-external') }}</td>
                         <td>{{ links_ext_count | number_format }}</td>
                     </tr>
                     <tr>
@@ -243,9 +244,7 @@
                     <tr>
                         <td>{{ msg('pageviews') }} (60 {{ msg('num-days', [60]) }})</td>
                         <td>
-                            <a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project }}&pages={{ title }}&range=latest-{{ general.pageviews_offset }}">
-                                {{ general.pageviews | number_format }}
-                            </a>
+                            {{ wiki.pageviewsLink(page, general.pageviews|number_format, '&range=latest-'~general.pageviews_offset) }}
                         </td>
                     </tr>
                     {% endif %}
@@ -351,11 +350,11 @@
                         </td>
                         <td>
                             {% if enabled('ec') %}
-                                <a href="{{ path('ec', { 'project': project, 'username': editor }) }}">{{ msg('tool-ec') }}</a>
+                                <a href="{{ path('ec', { 'project': project.domain, 'username': editor }) }}">{{ msg('tool-ec') }}</a>
                             {% endif %}
                             &middot;
                             {% if enabled('topedits') %}
-                                <a href="{{ path('topedits', { 'project': project, 'username': editor }) }}">{{ msg('tool-topedits') }}</a>
+                                <a href="{{ path('topedits', { 'project': project.domain, 'username': editor }) }}">{{ msg('tool-topedits') }}</a>
                             {% endif %}
                         </td>
                         <td class="sort-entry--edits" data-value="{{ stats.all }}">
@@ -429,11 +428,11 @@
                         </td>
                         <td>
                             {% if enabled('ec') %}
-                                <a href="{{ path('ec', { 'project': project, 'user': bot }) }}">{{ msg('tool-ec') }}</a>
+                                <a href="{{ path('ec', { 'project': project.domain, 'user': bot }) }}">{{ msg('tool-ec') }}</a>
                             {% endif %}
                             &middot;
                             {% if enabled('topedits') %}
-                                <a href="{{ path('topedits', { 'project': project, 'user': bot }) }}">{{ msg('tool-topedits') }}</a>
+                                <a href="{{ path('topedits', { 'project': project.domain, 'user': bot }) }}">{{ msg('tool-topedits') }}</a>
                             {% endif %}
                         </td>
                         <td class="sort-entry--count" data-value="{{ bot_data.count }}">{{ bot_data.count }}</td>
@@ -703,18 +702,18 @@
                 {% for wikiproject, assessment in assessments.wikiprojects %}
                     <tr>
                         <td class="sort-entry--wikiproject" data-value="{{ wikiproject }}">
-                            {{ wiki_link(assessments.wikiproject_prefix ~ wikiproject, projectUrl, wikiproject) }}
+                            {{ wiki.pageLinkRaw(assessments.wikiproject_prefix ~ wikiproject, project, wikiproject) }}
                         </td>
                         <td style="background:{{ assessment.class.color }}" class="sort-entry--assessment" data-value="{{ assessment.class.value }}">
                             {% set assessment_value %}
                                 <img alt="{{ assessment.class.value }}" src="{{ assessment.class.badge }}" class="assessment-badge" />
                                 {{ assessment.class.value }}
                             {% endset %}
-                            {{ wiki_link(assessment.class.category, projectUrl, assessment_value) }}
+                            {{ wiki.pageLinkRaw(assessment.class.category, project, assessment_value) }}
                         </td>
                         <td style="background:{{ assessment.importance.color }}" class="sort-entry--importance" data-value="{{ assessment.importance.weight }}">
                             {% set importance_label = assessment.importance ? assessment.importance.value : '???' %}
-                            {{ wiki_link(assessment.importance.category, projectUrl, importance_label) }}
+                            {{ wiki.pageLinkRaw(assessment.importance.category, project, importance_label) }}
                         </td>
                     </tr>
                 {% endfor %}

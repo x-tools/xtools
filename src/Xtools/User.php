@@ -64,17 +64,6 @@ class User extends Model
     }
 
     /**
-     * Get the full URL to Special:UserRights for this user on the given project.
-     * @param Project $project
-     * @return string
-     */
-    public function userRightsUrl(Project $project)
-    {
-        return $project->getUrl() . $project->getScriptPath() . "?title=Special:UserRights&user=" .
-               $this->getUsername();
-    }
-
-    /**
      * Does this user exist on the given project.
      * @param Project $project
      * @return bool

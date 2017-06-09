@@ -94,6 +94,8 @@ class Project extends Model
 
     /**
      * The base URL path of this project (that page titles are appended to).
+     * For some wikis the title (apparently) may not be at the end.
+     * Replace $1 with the article name.
      *
      * @link https://www.mediawiki.org/wiki/Manual:$wgArticlePath
      *
@@ -104,7 +106,7 @@ class Project extends Model
         $metadata = $this->getRepository()->getMetadata($this->getUrl());
         return isset($metadata['general']['articlePath'])
             ? $metadata['general']['articlePath']
-            : '/wiki/';
+            : '/wiki/$1';
     }
 
     /**
@@ -121,6 +123,20 @@ class Project extends Model
         return isset($metadata['general']['scriptPath'])
             ? $metadata['general']['scriptPath']
             : '/w';
+    }
+
+    /**
+     * The URL path to index.php
+     * Defaults to '/w/index.php' which is the same as the normal WMF set-up.
+     *
+     * @return string
+     */
+    public function getScript()
+    {
+        $metadata = $this->getRepository()->getMetadata($this->getUrl());
+        return isset($metadata['general']['script'])
+            ? $metadata['general']['script']
+            : $this->getScriptPath() . '/index.php';
     }
 
     /**
@@ -145,7 +161,7 @@ class Project extends Model
     }
 
     /**
-     * Get the name of the page on this project that the user must create in order to opt in for 
+     * Get the name of the page on this project that the user must create in order to opt in for
      * restricted statistics display.
      * @param User $user
      * @return string

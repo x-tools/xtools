@@ -79,7 +79,7 @@ class WikiExtension extends Extension
     }
 
     /**
-     * Get a link to the given user's userpage, or to Special:Contribs if $username is an IP
+     * Link to list of users who are in the given user group
      * @param  string $username   Username
      * @param  string $projectUrl Project domain and protocol such as https://en.wikipedia.org
      * @param  string [$label]    The link text, defaults to $username

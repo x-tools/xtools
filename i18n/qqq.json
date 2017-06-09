@@ -14,6 +14,7 @@
   "admins-without-action": "Label for value showing the number of admins who did not take any admins actions during a given timeframe.",
   "all": "{{Identical|All}}",
   "all-edits": "Label for the line representing the number of total edits an article received over time.\n{{Identical|All edits}}",
+  "all-languages": "A link to show the article in the multilingual pageviews tool. This appears in the 'info tiles' on Pageviews Analysis\n{{Identical|All languages}}",
   "all-namespaces": "Label for the option to show data for all namespaces.",
   "all-quotes": "Label for the button to show all quotes in the Bash Quote tool.",
   "api-error": "Generic error message for when something went wrong while querying an API. $1 is the name of the API. This message is followed by the error returned by the API.",
