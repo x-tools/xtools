@@ -136,7 +136,6 @@ class Page extends Model
     {
         // Return the count of revisions if already present
         if ($this->revisions) {
-            var_dump('yeah');
             return count($this->revisions);
         }
 
@@ -166,10 +165,6 @@ class Page extends Model
             } else {
                 $totalRemoved += $revision['length_change'];
             }
-            $time = strtotime($revision['timestamp']);
-            $revision['timestamp'] = $time; // formatted via Twig helper
-            $revision['year'] = date('Y', $time);
-            $revision['month'] = date('m', $time);
             $revisions[] = $revision;
         }
         $this->revisions = $revisions;

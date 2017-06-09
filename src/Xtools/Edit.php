@@ -18,7 +18,7 @@ class Edit extends Model
     /** @var int ID of the revision */
     protected $id;
 
-    /** @var DateTime Timestamp fo the revision */
+    /** @var DateTime Timestamp of the revision */
     protected $timestamp;
 
     /** @var bool Whether or not this edit was a minor edit */
@@ -60,7 +60,7 @@ class Edit extends Model
      */
     public function getPage()
     {
-        return $page;
+        return $this->page;
     }
 
     /**
@@ -68,7 +68,7 @@ class Edit extends Model
      */
     public function getId()
     {
-        return $id;
+        return $this->id;
     }
 
     /**
@@ -76,7 +76,24 @@ class Edit extends Model
      */
     public function getTimestamp()
     {
-        return $timestamp;
+        return $this->timestamp;
+    }
+
+    /**
+     * @return string Year the revision was made
+     */
+    public function getYear()
+    {
+        return $this->timestamp->format('Y');
+    }
+
+    /**
+     * @return string Numeric representation of the month
+     *                the revision was made, with leading zeros
+     */
+    public function getMonth()
+    {
+        return $this->timestamp->format('m');
     }
 
     /**
@@ -84,7 +101,16 @@ class Edit extends Model
      */
     public function getMinor()
     {
-        return $minor;
+        return $this->minor;
+    }
+
+    /**
+     * Alias of getMinor()
+     * @return bool Whether or not this edit was a minor edit
+     */
+    public function isMinor()
+    {
+        return $this->getMinor();
     }
 
     /**
@@ -92,7 +118,7 @@ class Edit extends Model
      */
     public function getLength()
     {
-        return $length;
+        return $this->length;
     }
 
     /**
@@ -100,7 +126,7 @@ class Edit extends Model
      */
     public function getSize()
     {
-        return $length_change;
+        return $this->length_change;
     }
 
     /**
@@ -117,7 +143,7 @@ class Edit extends Model
      */
     public function getUser()
     {
-        return $user;
+        return $this->user;
     }
 
     /**
@@ -125,7 +151,7 @@ class Edit extends Model
      */
     public function getComment()
     {
-        return $comment;
+        return $this->comment;
     }
 
     /**
@@ -158,11 +184,20 @@ class Edit extends Model
 
     /**
      * Was the edit (semi-)automated, based on the edit summary?
-     * @return bool
+     * @return string|false The name of the tool that was used to make the edit
      */
     public function isAutomated()
     {
         $automatedEditsHelper = $this->container->get('app.automated_edits_helper');
-        return $automatedEditsHelper->isAutomated($this->comment);
+        return $automatedEditsHelper->getTool($this->comment);
+    }
+
+    /**
+     * Was the edit made by a logged out user?
+     * @return bool
+     */
+    public function isAnon()
+    {
+        return $this->user->isAnon();
     }
 }

@@ -85,7 +85,7 @@ class PagesRepository extends Repository
                 FROM $revTable AS revs
                 LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                 WHERE $userClause revs.rev_page = :pageid
-                ORDER BY revs.rev_timestamp DESC
+                ORDER BY revs.rev_timestamp ASC
             ";
         $params = ['pageid' => $page->getId()];
         if ($user) {

@@ -82,4 +82,13 @@ class User extends Model
     {
         return (false !== array_search('sysop', $this->getGroups($project)));
     }
+
+    /**
+     * Is this user an anonymous user (IP)?
+     * @return bool
+     */
+    public function isAnon()
+    {
+        return filter_var($this->username, FILTER_VALIDATE_IP);
+    }
 }
