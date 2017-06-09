@@ -672,10 +672,12 @@
                     {% endfor %}
                 </tr></thead>
                 <tbody>
-                {% for tool, tool_count in tools %}
+                {% for tool, values in tools %}
                     <tr>
-                        <td class="sort-entry--tool" data-value="{{ tool }}">{{ tool }}</td>
-                        <td class="sort-entry--edits" data-value="{{ tool_count }}">{{ tool_count }}</td>
+                        <td class="sort-entry--tool" data-value="{{ tool }}">
+                            {{ wiki.pageLinkRaw(values.link, project, tool) }}
+                        </td>
+                        <td class="sort-entry--edits" data-value="{{ values.count }}">{{ values.count }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>

@@ -24,13 +24,13 @@ parameters:
         link: Project:Twinkle
     Huggle:
         regex: 'WP:HG'
-        link: Project:Huggle
+        link: w:en:Wikipedia:Huggle
     STiki:
         regex: 'WP:STiki|WP:STIKI'
-        link: Project:STiki
+        link: w:en:Wikipedia:STiki
     Igloo:
         regex: 'Wikipedia:Igloo'
-        link: Project:Igloo
+        link: w:en:Wikipedia:Igloo
     Popups:
         regex: 'Wikipedia:Tools\/Navigation_popups|popups'
         link: Project:Popups
@@ -122,7 +122,7 @@ parameters:
         link: User:Doug/closetfd.js
     Cat-a-lot:
         regex: '\[\[Help:Cat-a-lot\|Cat-a-lot\]\]'
-        link: Project:Cat-a-lot
+        link: commons:Cat-a-lot
     autoFormatter:
         regex: 'using (\[\[:meta:User:TMg\/autoFormatter|autoFormatter)'
         link: meta:User:TMg/autoFormatter

@@ -92,16 +92,6 @@ class ArticleInfoController extends Controller
         $pageRepo->setContainer($this->container);
         $page->setRepository($pageRepo);
 
-        $edit = new Edit($page, [
-            'id' => 123,
-            'timestamp' => '20170123235959',
-            'minor' => '1',
-            'length' => 1353,
-            'length_change' => -523,
-            'username' => 'MusikAnimal',
-            'comment' => 'BLAH',
-        ]);
-
         if (!$page->exists()) {
             $this->addFlash('notice', ['no-exist', $pageQuery]);
             return $this->redirectToRoute('articleInfo');
@@ -756,9 +746,12 @@ class ArticleInfoController extends Controller
                 $data['year_count'][$timestamp['year']]['months'][$timestamp['month']]['automated']++;
 
                 if (!isset($data['tools'][$automatedTool])) {
-                    $data['tools'][$automatedTool] = 1;
+                    $data['tools'][$automatedTool] = [
+                        'count' => 1,
+                        'link' => $this->aeh->getTools()[$automatedTool]['link'],
+                    ];
                 } else {
-                    $data['tools'][$automatedTool]++;
+                    $data['tools'][$automatedTool]['count']++;
                 }
             }
 
