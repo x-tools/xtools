@@ -12,6 +12,8 @@ use AppBundle\Helper\Apihelper;
 use AppBundle\Helper\PageviewsHelper;
 use AppBundle\Helper\AutomatedEditsHelper;
 use Xtools\ProjectRepository;
+use Xtools\Page;
+use Xtools\PagesRepository;
 
 class ArticleInfoController extends Controller
 {
@@ -74,31 +76,39 @@ class ArticleInfoController extends Controller
      */
     public function resultAction(Request $request)
     {
-        $project = $request->attributes->get('project');
-        $page = $request->attributes->get('article');
-
-        $projectData = ProjectRepository::getProject($project, $this->container);
-
-        if (!$projectData->exists()) {
-            $this->addFlash("notice", ["invalid-project", $project]);
-            return $this->redirectToRoute("articleInfo");
+        $projectQuery = $request->attributes->get('project');
+        $project = ProjectRepository::getProject($projectQuery, $this->container);
+        if (!$project->exists()) {
+            $this->addFlash('notice', ['invalid-project', $projectQuery]);
+            return $this->redirectToRoute('articleInfo');
         }
+        $projectUrl = $project->getUrl();
+        $dbName = $project->getDatabaseName();
 
-        $projectUrl = $projectData->getUrl();
-        $dbName = $projectData->getDatabaseName();
+        $pageQuery = $request->attributes->get('article');
+        $page = new Page($project, $pageQuery);
+        $pageRepo = new PagesRepository();
+        $pageRepo->setContainer($this->container);
+        $page->setRepository($pageRepo);
+
+        if (!$page->exists()) {
+            $this->addFlash('notice', ['no-exist', $pageQuery]);
+            return $this->redirectToRoute('articleInfo');
+        }
 
         $this->revisionTable = $this->lh->getTable('revision', $dbName);
 
         $api = $this->get('app.api_helper');
-        $basicInfo = $api->getBasicPageInfo($project, $page, !$request->query->get('nofollowredir'));
+        $basicInfo = $api->getBasicPageInfo($projectQuery, $pageQuery, !$request->query->get('nofollowredir'));
 
         // TODO: throw error if $basicInfo['missing'] is set
 
         $this->pageInfo = [
             'project' => preg_replace('#^https?://#', '', rtrim($projectUrl, '/')),
             'projectUrl' => $projectUrl,
+            'page' => $page,
             'dbName' => $dbName,
-            'lang' => $projectData->getLang(),
+            'lang' => $project->getLang(),
             'id' => $basicInfo['pageid'],
             'namespace' => $basicInfo['ns'],
             'title' => $basicInfo['title'],
@@ -147,7 +157,7 @@ class ArticleInfoController extends Controller
             $this->pageInfo['title'],
             $this->pageInfo['general']['pageviews_offset']
         );
-        $assessments = $api->getPageAssessments($project, $page);
+        $assessments = $api->getPageAssessments($projectQuery, $pageQuery);
         if ($assessments) {
             $this->pageInfo['assessments'] = $assessments;
         }

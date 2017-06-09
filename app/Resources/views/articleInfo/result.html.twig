@@ -59,7 +59,7 @@
                     <tr>
                         <td>ID</td>
                         <td>
-                            <a target="_blank" href="{{ projectUrl }}/w/index.php?action=info&title={{ title }}">{{ id }}</a>
+                            <a target="_blank" href="{{ projectUrl }}/w/index.php?action=info&title={{ title }}">{{ page.id }}</a>
                         </td>
                     </tr>
                     {% if wikidataId is defined %}
@@ -74,11 +74,11 @@
                     {% endif %}
                     <tr>
                         <td>{{ msg('page-size') }}</td>
-                        <td>{{ length | number_format }} {{ msg('num-bytes', [length]) }}</td>
+                        <td>{{ page.length | number_format }} {{ msg('num-bytes', [page.length]) }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('total-edits') }}</td>
-                        <td>{{ general.revision_count | number_format }}</td>
+                        <td>{{ page.numRevisions | number_format }}</td>
                     </tr>
                     <tr>
                         <td>

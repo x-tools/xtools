@@ -10,12 +10,15 @@ class Page extends Model
 
     /** @var Project */
     protected $project;
-    
+
     /** @var string */
     protected $unnormalizedPageName;
-    
+
     /** @var string[] Metadata about this page. */
     protected $pageInfo;
+
+    /** @var string[] Revision history of this page */
+    protected $revisions;
 
     /**
      * Page constructor.
@@ -61,6 +64,16 @@ class Page extends Model
     }
 
     /**
+     * Get this page's length in bytes.
+     * @return int
+     */
+    public function getLength()
+    {
+        $info = $this->getPageInfo();
+        return isset($info['length']) ? $info['length'] : null;
+    }
+
+    /**
      * Get HTML for the stylized display of the title.
      * The text will be the same as Page::getTitle().
      * @return string
@@ -102,11 +115,33 @@ class Page extends Model
     }
 
     /**
-     * Get all edits made to this page by the given user.
+     * Get the number of revisions the page has.
+     * @return int
+     */
+    public function getNumRevisions(User $user = null)
+    {
+        // Return the count of revisions if already present
+        if ($this->revisions) {
+            var_dump('yeah');
+            return count($this->revisions);
+        }
+
+        // Otherwise do a COUNT in the event fetching
+        // all revisions is not desired
+        return $this->getRepository()->getNumRevisions($this, $user);
+    }
+
+    /**
+     * Get all edits made to this page.
+     * @param User|null $user Specify to get only revisions by the given user.
      * @return array
      */
-    public function getRevisions(User $user)
+    public function getRevisions(User $user = null)
     {
+        if ($this->revisions) {
+            return $this->revisions;
+        }
+
         $data = $this->getRepository()->getRevisions($this, $user);
         $totalAdded = 0;
         $totalRemoved = 0;
@@ -123,6 +158,8 @@ class Page extends Model
             $revision['month'] = date('m', $time);
             $revisions[] = $revision;
         }
+        $this->revisions = $revisions;
+
         return $revisions;
     }
 }

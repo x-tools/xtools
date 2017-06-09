@@ -72,7 +72,7 @@ abstract class Repository
         if (!$this->projectsConnection instanceof Connection) {
             $this->projectsConnection = $this->container
                 ->get('doctrine')
-                ->getManager("replicas")
+                ->getManager('replicas')
                 ->getConnection();
         }
         return $this->projectsConnection;

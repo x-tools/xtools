@@ -209,6 +209,7 @@ class TopEditsController extends Controller
         $fullPageName = $namespaceId ? $namespaces[$namespaceId].':'.$pageName : $pageName;
         $page = new Page($project, $fullPageName);
         $pageRepo = new PagesRepository();
+        $pageRepo->setContainer($this->container);
         $page->setRepository($pageRepo);
 
         if (!$page->exists()) {

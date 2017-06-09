@@ -65,24 +65,56 @@ class PagesRepository extends Repository
      * Get revisions of a single page.
      * @param Project $project
      * @param Page $page
-     * @param User|null $user
+     * @param User|null $user Specify to get only revisions by the given user.
      * @return string[] Each member with keys: id, timestamp, length-
      */
-    public function getRevisions(Page $page, User $user)
+    public function getRevisions(Page $page, User $user = null)
     {
-        $revTable = $this->getTableName($page->getProject()->project->getDatabaseName(), 'revision');
+        $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
+        $userClause = $user ? "revs.rev_user_text in (:username) AND " : "";
+
         $query = "SELECT
                     revs.rev_id AS id,
                     revs.rev_timestamp AS timestamp,
+                    revs.rev_minor_edit AS minor,
                     (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
+                    revs.rev_user AS user_id,
+                    revs.rev_user_text AS username,
                     revs.rev_comment AS comment
                 FROM $revTable AS revs
-                    LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-                WHERE revs.rev_user_text in (:username) AND revs.rev_page = :pageid
+                LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+                WHERE $userClause revs.rev_page = :pageid
                 ORDER BY revs.rev_timestamp DESC
             ";
-        $params = ['username' => $user->getUsername(), 'pageid' => $page->getId()];
-        $conn = $this->getDoctrine()->getManager('replicas')->getConnection();
+        $params = ['pageid' => $page->getId()];
+        if ($user) {
+            $params['username'] = $user->getUsername();
+        }
+        $conn = $this->getProjectsConnection();
         return $conn->executeQuery($query, $params)->fetchAll();
+    }
+
+    /**
+     * Get a count of the number of revisions of a single page
+     * @param Project $project
+     * @param Page $page
+     * @param User|null $user Specify to only count revisions by the given user.
+     * @return int
+     */
+    public function getNumRevisions(Page $page, User $user = null)
+    {
+        $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
+        $userClause = $user ? "rev_user_text in (:username) AND " : "";
+
+        $query = "SELECT COUNT(*)
+                FROM $revTable
+                WHERE $userClause rev_page = :pageid
+            ";
+        $params = ['pageid' => $page->getId()];
+        if ($user) {
+            $params['username'] = $user->getUsername();
+        }
+        $conn = $this->getProjectsConnection();
+        return $conn->executeQuery($query, $params)->fetchColumn(0);
     }
 }
