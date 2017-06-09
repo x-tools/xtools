@@ -1,0 +1,123 @@
+{% macro extLink(url, label, overrideLabel) %}{% spaceless %}
+    {% if overrideLabel is not empty %}
+        {% set label = overrideLabel %}
+    {% endif %}
+    <a href='{{ url }}' target='_blank'>{{ label }}</a>
+    {% endspaceless %}
+{% endmacro %}
+
+{% macro pageLink(page, label = null) %}
+    {% from _self import extLink as extLink %}
+    {{ extLink(page.url, page.title, label) }}
+{% endmacro %}
+
+{% macro pageLinkRaw(pageTitle, project, label = null) %}
+    {% from _self import extLink as extLink %}
+    {% set articlePath = project.articlePath | replace({'$1': (pageTitle | replace({' ': '_'}))}) %}
+    {{ extLink((project.url | trim('/')) ~ articlePath, pageTitle, label) }}
+{% endmacro %}
+
+{% macro pageHistLink(page, label = null, offset = null, limit = null) %}
+    {% from _self import extLink as extLink %}
+    {% set url = page.url ~ '?action=history' %}
+    {% if offset is not empty %}
+        {% set url = url ~ '&offset=' ~ offset %}
+    {% endif %}
+    {% if limit is not empty %}
+        {% set url = url ~ '&limit=' ~ limit %}
+    {% endif %}
+    {{ extLink(url, msg('history'), label) }}
+{% endmacro %}
+
+{% macro pageInfoLink(page, label = null) %}
+    {% from _self import extLink as extLink %}
+    {% set projectUrl = page.project.url | trim('/') %}
+    {% set url = projectUrl ~ page.project.script ~ '?action=info&title=' ~ page.title %}
+    {{ extLink(url, msg('log'), label) }}
+{% endmacro %}
+
+{% macro pageLinksInLink(page, label = null) %}
+    {% from _self import extLink as extLink %}
+    {% set projectUrl = page.project.url | trim('/') %}
+    {% set url = projectUrl ~ page.project.script ~ '?title=Special:WhatLinksHere/' ~ page.title ~ '&hidetrans=1' %}
+    {{ extLink(url, msg('links-in'), label) }}
+{% endmacro %}
+
+{% macro pageRedirectsLink(page, label = null) %}
+    {% from _self import extLink as extLink %}
+    {% set projectUrl = page.project.url | trim('/') %}
+    {% set url = projectUrl ~ page.project.script ~ '?title=Special:WhatLinksHere/' ~ page.title ~ '&hidetrans=1&hidelinks=1' %}
+    {{ extLink(url, msg('redirects'), label) }}
+{% endmacro %}
+
+{% macro userLink(user, project, label = null) %}
+    {% from _self import extLink as extLink %}
+    {% set articlePath = project.articlePath | replace({'$1': ('User:' ~ user.username | replace({' ': '_'}))}) %}
+    {{ extLink((project.url | trim('/')) ~ articlePath, user.username, label) }}
+{% endmacro %}
+
+{% macro userGroupLink(group, project, label = null) %}
+    {% from _self import extLink as extLink %}
+    {{ extLink(
+        (project.url | trim('/')) ~ project.script ~ '?title=Special:ListUsers&creationSort=1&group=' ~ group,
+        group,
+        label
+    )}}
+{% endmacro %}
+
+{% macro userLogLink(user, label = null, type = null) %}
+    {% from _self import extLink as extLink %}
+    {% set url = page.url ~ '?offset=' ~ offset ~ '&limit=' ~ limit %}
+    {% if type is not empty %}
+        {% set url = url ~ '&type=' ~ type %}
+    {% endif %}
+    {{ extLink(url, msg('log'), label) }}
+{% endmacro %}
+
+{% macro pageLogLink(page, label = null, type = null) %}
+    {% from _self import extLink as extLink %}
+    {% set projectUrl = page.project.url | trim('/') %}
+    {% set url = projectUrl ~ page.project.script ~ '?title=Special:Log&action=view&page=' ~ page.title %}
+    {% if type is not empty %}
+        {% set url = url ~ '&type=' ~ type %}
+    {% endif %}
+    {{ extLink(url, msg('log'), label) }}
+{% endmacro %}
+
+{% macro diffLink(edit, label = null) %}
+    {% from _self import extLink as extLink %}
+    {{ extLink(edit.diffUrl, msg('diff'), label) }}
+{% endmacro %}
+
+{% macro permaLink(edit, label = null) %}
+    {% from _self import extLink as extLink %}
+    {{ extLink(edit.permaUrl, edit.timestamp | date('Y-m-d, H:i'), label) }}
+{% endmacro %}
+
+{% macro editLink(page, label = null) %}
+    {% from _self import extLink as extLink %}
+    {{ extLink(page.url ~ '?action=edit', msg('edit'), label) }}
+{% endmacro %}
+
+{% macro pageviewsLink(page, label, opts = null) %}
+    {% from _self import extLink as extLink %}
+    {% set url = 'https://tools.wmflabs.org/pageviews?project=' ~ page.project.domain ~ '&pages=' ~ page.title %}
+    {% if opts is not empty %}
+        {% set url = url ~ '&' ~ opts %}
+    {% endif %}
+    {{ extLink(url, msg('pageviews'), label) }}
+{% endmacro %}
+
+{% macro pageviewsLinks(page) %}
+    {% from _self import extLink as extLink %}
+    {{ extLink(
+        'https://tools.wmflabs.org/pageviews?project=' ~ page.project.domain ~ '&pages=' ~ page.title,
+        msg('pageviews')
+    )}} ({{ extLink(
+        'https://tools.wmflabs.org/langviews?project=' ~ page.project.domain ~ '&page=' ~ page.title,
+        msg('all-languages')
+    )}} &middot; {{ extLink(
+        'https://tools.wmflabs.org/redirectviews?project=' ~ page.project.domain ~ '&page=' ~ page.title,
+        msg('redirects')
+    )}})
+{% endmacro %}
