@@ -138,8 +138,11 @@ class ArticleInfoController extends Controller
         //     }
         // }
 
-        $this->pageHistory = $this->getHistory();
-        $this->pageInfo['general']['revision_count'] = count($this->pageHistory);
+        $this->pageHistory = $page->getRevisions();
+        $this->pageInfo['firstEdit'] = new Edit($this->pageInfo['page'], $this->pageHistory[0]);
+        $this->pageInfo['lastEdit'] = new Edit(
+            $this->pageInfo['page'], $this->pageHistory[$page->getNumRevisions() - 1]
+        );
 
         // NOTE: bots are fetched first in case we want to restrict some stats to humans editors only
         $this->pageInfo['bots'] = $this->getBotData();
@@ -148,7 +151,7 @@ class ArticleInfoController extends Controller
         $this->pageInfo = array_merge($this->pageInfo, $this->parseHistory());
         $this->pageInfo['general']['top_ten_count'] = $this->getTopTenCount();
         $this->pageInfo['general']['top_ten_percentage'] = round(
-            ($this->pageInfo['general']['top_ten_count'] / $this->pageInfo['general']['revision_count']) * 100,
+            ($this->pageInfo['general']['top_ten_count'] / $page->getNumRevisions()) * 100,
             1
         );
         $this->pageInfo = array_merge($this->pageInfo, $this->getLinksAndRedirects());
@@ -236,7 +239,7 @@ class ArticleInfoController extends Controller
 
         $this->pageInfo['general']['bot_revision_count'] = $sum;
         $this->pageInfo['general']['bot_percentage'] = round(
-            ($sum / $this->pageInfo['general']['revision_count']) * 100,
+            ($sum / $this->pageInfo['page']->getNumRevisions()) * 100,
             1
         );
 
@@ -267,7 +270,7 @@ class ArticleInfoController extends Controller
                     'label' => $editor,
                     'value' => $info['all'],
                     'percentage' => (
-                        100 * ($info['all'] / $this->pageInfo['general']['revision_count'])
+                        100 * ($info['all'] / $this->pageInfo['page']->getNumRevisions())
                     )
                 ];
             }
@@ -482,22 +485,6 @@ class ArticleInfoController extends Controller
     }
 
     /**
-     * Get every revision of the page
-     * @return array The data
-     */
-    private function getHistory()
-    {
-        $query = "SELECT rev_id, rev_parent_id, rev_user_text, rev_user, rev_timestamp,
-                  rev_minor_edit, rev_len, rev_comment
-                  FROM $this->revisionTable
-                  WHERE rev_page = '" . $this->pageInfo['id'] . "' AND rev_timestamp > 1
-                  ORDER BY rev_timestamp";
-
-        $res = $this->conn->query($query)->fetchAll();
-        return $res;
-    }
-
-    /**
      * Get the size of the diff
      * @param  int $rev The index of the revision within $this->pageHistory
      * @return int Size of the diff
@@ -507,17 +494,17 @@ class ArticleInfoController extends Controller
         $rev = $this->pageHistory[$revIndex];
 
         if ($revIndex === 0) {
-            return $rev['rev_len'];
+            return $rev['length'];
         }
 
         $lastRev = $this->pageHistory[$revIndex - 1];
 
         // TODO: Remove once T101631 is resolved
-        // Treat as zero change in size if rev_len of previous edit is missing
-        if ($lastRev['rev_len'] === null) {
+        // Treat as zero change in size if length of previous edit is missing
+        if ($lastRev['length'] === null) {
             return 0;
         } else {
-            return $rev['rev_len'] - $lastRev['rev_len'];
+            return $rev['length'] - $lastRev['length'];
         }
     }
 
@@ -527,38 +514,24 @@ class ArticleInfoController extends Controller
      */
     private function parseHistory()
     {
-        $revisionCount = $this->pageInfo['general']['revision_count'];
+        $revisionCount = $this->pageInfo['page']->getNumRevisions();
         if ($revisionCount == 0) {
             // $this->error = "no records";
             return;
         }
 
-        $firstEdit = $this->pageHistory[0];
+        $firstEdit = $this->pageInfo['firstEdit'];
 
-        // The month of the first edit. Used as a comparison when building the per-month data
-        $firstEditMonth = strtotime(date('Y-m-01, 00:00', strtotime($firstEdit['rev_timestamp'])));
+        // Get UNIX timestamp of the first day of the month of the first edit
+        // This is used as a comparison when building our array of per-month stats
+        $firstEditMonth = mktime(0, 0, 0, (int) $firstEdit->getMonth(), 1, $firstEdit->getYear());
 
-        $lastEdit = $this->pageHistory[ $revisionCount - 1 ];
+        $lastEdit = $this->pageInfo['lastEdit'];
         $secondLastEdit = $revisionCount === 1 ? $lastEdit : $this->pageHistory[ $revisionCount - 2 ];
 
         // Now we can start our master array. This one will be HUGE!
-        $lastEditSize = ($revisionCount > 1)
-            ? $lastEdit['rev_len'] - $secondLastEdit['rev_len']
-            : $lastEdit['rev_len'];
         $data = [
             'general' => [
-                'first_edit' => [
-                    'timestamp' => $firstEdit['rev_timestamp'],
-                    'revid' => $firstEdit['rev_id'],
-                    'user' => $firstEdit['rev_user_text'],
-                    'size' => $firstEdit['rev_len']
-                ],
-                'last_edit' => [
-                    'timestamp' => $lastEdit['rev_timestamp'],
-                    'revid' => $lastEdit['rev_id'],
-                    'user' => $lastEdit['rev_user_text'],
-                    'size' => $lastEditSize,
-                ],
                 'max_add' => [
                     'timestamp' =>  null,
                     'revid' => null,
@@ -575,7 +548,7 @@ class ArticleInfoController extends Controller
                 'anon_count' => 0,
                 'minor_count' => 0,
                 'count_history' => ['day' => 0, 'week' => 0, 'month' => 0, 'year' => 0],
-                'current_size' => $this->pageHistory[$revisionCount-1]['rev_len'],
+                'current_size' => $this->pageHistory[$revisionCount-1]['length'],
                 'textshares' => [],
                 'textshare_total' => 0,
                 'automated_count' => 0,
@@ -594,23 +567,18 @@ class ArticleInfoController extends Controller
 
         // And now comes the logic for filling said master array
         foreach ($this->pageHistory as $i => $rev) {
-            $newSize = $rev['rev_len'];
+            $edit = new Edit($this->pageInfo['page'], $rev);
             $diffSize = $this->getDiffSize($i);
-            $timestamp = date_parse($rev['rev_timestamp']);
-            $username = htmlspecialchars($rev['rev_user_text']);
+            $username = htmlspecialchars($rev['username']);
 
             // Sometimes, with old revisions (2001 era), the revisions from 2002 come before 2001
-            if (strtotime($rev['rev_timestamp']) < strtotime($data['general']['first_edit']['timestamp'])) {
-                $data['general']['first_edit'] = [
-                    'timestamp' => $rev['rev_timestamp'],
-                    'user' => htmlspecialchars($rev['rev_user_text']),
-                    'size' => $rev['rev_len']
-                ];
+            if ($edit->getTimestamp() < $firstEdit->getTimestamp()) {
+                $firstEdit = $edit;
             }
 
             // Fill in the blank arrays for the year and 12 months
-            if (!isset($data['year_count'][$timestamp['year']])) {
-                $data['year_count'][$timestamp['year']] = [
+            if (!isset($data['year_count'][$edit->getYear()])) {
+                $data['year_count'][$edit->getYear()] = [
                     'all' => 0,
                     'minor' => 0,
                     'anon' => 0,
@@ -621,14 +589,14 @@ class ArticleInfoController extends Controller
                 ];
 
                 for ($i = 1; $i <= 12; $i++) {
-                    $timeObj = mktime(0, 0, 0, $i, 1, $timestamp['year']);
+                    $timeObj = mktime(0, 0, 0, $i, 1, $edit->getYear());
 
                     // don't show zeros for months before the first edit or after the current month
                     if ($timeObj < $firstEditMonth || $timeObj > strtotime('last day of this month')) {
                         continue;
                     }
 
-                    $data['year_count'][$timestamp['year']]['months'][$i] = [
+                    $data['year_count'][$edit->getYear()]['months'][sprintf('%02d', $i)] = [
                         'all' => 0,
                         'minor' => 0,
                         'anon' => 0,
@@ -638,11 +606,11 @@ class ArticleInfoController extends Controller
             }
 
             // Increment year and month counts for all edits
-            $data['year_count'][$timestamp['year']]['all']++;
-            $data['year_count'][$timestamp['year']]['months'][$timestamp['month']]['all']++;
-            $data['year_count'][$timestamp['year']]['size'] = (int) $rev['rev_len'];
+            $data['year_count'][$edit->getYear()]['all']++;
+            $data['year_count'][$edit->getYear()]['months'][$edit->getMonth()]['all']++;
+            $data['year_count'][$edit->getYear()]['size'] = (int) $rev['length'];
 
-            $editsThisMonth = $data['year_count'][$timestamp['year']]['months'][$timestamp['month']]['all'];
+            $editsThisMonth = $data['year_count'][$edit->getYear()]['months'][$edit->getMonth()]['all'];
             if ($editsThisMonth > $data['max_edits_per_month']) {
                 $data['max_edits_per_month'] = $editsThisMonth;
             }
@@ -654,96 +622,96 @@ class ArticleInfoController extends Controller
                     'all' => 0,
                     'minor' => 0,
                     'minor_percentage' => 0,
-                    'first' => date('Y-m-d, H:i', strtotime($rev['rev_timestamp'])),
-                    'first_id' => $rev['rev_id'],
+                    'first' => date('Y-m-d, H:i', strtotime($rev['timestamp'])),
+                    'first_id' => $rev['id'],
                     'last' => null,
                     'atbe' => null,
                     'added' => 0,
                     'sizes' => [],
-                    'urlencoded' => rawurlencode($rev['rev_user_text']),
+                    'urlencoded' => rawurlencode($rev['username']),
                 ];
             }
 
             // Increment user counts
             $data['editors'][$username]['all']++;
-            $data['editors'][$username]['last'] = date('Y-m-d, H:i', strtotime($rev['rev_timestamp']));
-            $data['editors'][$username]['last_id'] = $rev['rev_id'];
+            $data['editors'][$username]['last'] = date('Y-m-d, H:i', strtotime($rev['timestamp']));
+            $data['editors'][$username]['last_id'] = $rev['id'];
 
             // Store number of KB added with this edit
-            $data['editors'][$username]['sizes'][] = $rev['rev_len'] / 1024;
+            $data['editors'][$username]['sizes'][] = $rev['length'] / 1024;
 
             // check if it was a revert
-            if ($this->aeh->isRevert($rev['rev_comment'])) {
+            if ($this->aeh->isRevert($rev['comment'])) {
                 $data['general']['revert_count']++;
             } else {
                 // edit was NOT a revert
 
-                if ($diffSize > 0) {
-                    $data['general']['added'] += $diffSize;
-                    $data['editors'][$username]['added'] += $diffSize;
+                if ($edit->getSize() > 0) {
+                    $data['general']['added'] += $edit->getSize();
+                    $data['editors'][$username]['added'] += $edit->getSize();
                 }
 
                 // determine if the next revision was a revert
                 $nextRevision = isset($this->pageHistory[$i + 1]) ? $this->pageHistory[$i + 1] : null;
                 $nextRevisionIsRevert = $nextRevision &&
-                    $this->getDiffSize($i + 1) === -$diffSize &&
-                    $this->aeh->isRevert($nextRevision['rev_comment']);
+                    $this->getDiffSize($i + 1) === -$edit->getSize() &&
+                    $this->aeh->isRevert($nextRevision['comment']);
 
                 // don't count this edit as content removal if the next edit reverted it
-                if (!$nextRevisionIsRevert && $diffSize < $data['general']['max_del']['size']) {
+                if (!$nextRevisionIsRevert && $edit->getSize() < $data['general']['max_del']['size']) {
                     $data['general']['max_del']['timestamp'] = DateTime::createFromFormat(
                         'YmdHis',
-                        $rev['rev_timestamp']
+                        $rev['timestamp']
                     );
-                    $data['general']['max_del']['revid'] = $rev['rev_id'];
-                    $data['general']['max_del']['user'] = $rev['rev_user_text'];
-                    $data['general']['max_del']['size'] = $diffSize;
+                    $data['general']['max_del']['revid'] = $rev['id'];
+                    $data['general']['max_del']['user'] = $rev['username'];
+                    $data['general']['max_del']['size'] = $edit->getSize();
                 }
 
                 // FIXME: possibly remove this
-                if ($newSize > 0) {
+                if ($edit->getLength() > 0) {
                     // keep track of added content
-                    $data['general']['textshare_total'] += $newSize;
+                    $data['general']['textshare_total'] += $edit->getLength();
                     if (!isset($data['textshares'][$username]['all'])) {
                         $data['textshares'][$username]['all'] = 0;
                     }
-                    $data['textshares'][$username]['all'] += $newSize;
+                    $data['textshares'][$username]['all'] += $edit->getLength();
                 }
 
-                if ($diffSize > $data['general']['max_add']['size']) {
+                if ($edit->getSize() > $data['general']['max_add']['size']) {
                     $data['general']['max_add']['timestamp'] = DateTime::createFromFormat(
                         'YmdHis',
-                        $rev['rev_timestamp']
+                        $rev['timestamp']
                     );
-                    $data['general']['max_add']['revid'] = $rev['rev_id'];
-                    $data['general']['max_add']['user'] = $rev['rev_user_text'];
-                    $data['general']['max_add']['size'] = $diffSize;
+                    $data['general']['max_add']['revid'] = $rev['id'];
+                    $data['general']['max_add']['user'] = $rev['username'];
+                    $data['general']['max_add']['size'] = $edit->getSize();
                 }
             }
 
-            if (!$rev['rev_user']) {
+            if ($edit->isAnon()) {
                 if (!isset($rev['rev_user']['anons'][$username])) {
                     $data['general']['anon_count']++;
                 }
                 // Anonymous, increase counts
                 $data['anons'][] = $username;
-                $data['year_count'][$timestamp['year']]['anon']++;
-                $data['year_count'][$timestamp['year']]['months'][$timestamp['month']]['anon']++;
+                $data['year_count'][$edit->getYear()]['anon']++;
+                $data['year_count'][$edit->getYear()]['months'][$edit->getMonth()]['anon']++;
             }
 
-            if ($rev['rev_minor_edit']) {
+            if ($edit->isMinor()) {
                 // Logged in, increase counts
                 $data['general']['minor_count']++;
-                $data['year_count'][$timestamp['year']]['minor']++;
-                $data['year_count'][$timestamp['year']]['months'][$timestamp['month']]['minor']++;
+                $data['year_count'][$edit->getYear()]['minor']++;
+                $data['year_count'][$edit->getYear()]['months'][$edit->getMonth()]['minor']++;
                 $data['editors'][$username]['minor']++;
             }
 
-            $automatedTool = $this->aeh->getTool($rev['rev_comment']);
+            $automatedTool = $this->aeh->getTool($rev['comment']);
             if ($automatedTool) {
                 $data['general']['automated_count']++;
-                $data['year_count'][$timestamp['year']]['automated']++;
-                $data['year_count'][$timestamp['year']]['months'][$timestamp['month']]['automated']++;
+                $data['year_count'][$edit->getYear()]['automated']++;
+                $data['year_count'][$edit->getYear()]['months'][$edit->getMonth()]['automated']++;
 
                 if (!isset($data['tools'][$automatedTool])) {
                     $data['tools'][$automatedTool] = [
@@ -756,16 +724,16 @@ class ArticleInfoController extends Controller
             }
 
             // Increment "edits per <time>" counts
-            if (strtotime($rev['rev_timestamp']) > strtotime('-1 day')) {
+            if (strtotime($rev['timestamp']) > strtotime('-1 day')) {
                 $data['general']['count_history']['day']++;
             }
-            if (strtotime($rev['rev_timestamp']) > strtotime('-1 week')) {
+            if (strtotime($rev['timestamp']) > strtotime('-1 week')) {
                 $data['general']['count_history']['week']++;
             }
-            if (strtotime($rev['rev_timestamp']) > strtotime('-1 month')) {
+            if (strtotime($rev['timestamp']) > strtotime('-1 month')) {
                 $data['general']['count_history']['month']++;
             }
-            if (strtotime($rev['rev_timestamp']) > strtotime('-1 year')) {
+            if (strtotime($rev['timestamp']) > strtotime('-1 year')) {
                 $data['general']['count_history']['year']++;
             }
         }
@@ -781,8 +749,8 @@ class ArticleInfoController extends Controller
         );
 
         // other general statistics
-        $dateFirst = DateTime::createFromFormat('YmdHis', $data['general']['first_edit']['timestamp']);
-        $dateLast = DateTime::createFromFormat('YmdHis', $data['general']['last_edit']['timestamp']);
+        $dateFirst = $firstEdit->getTimestamp();
+        $dateLast = $lastEdit->getTimestamp();
         $data['general']['datetime_first_edit'] = $dateFirst;
         $data['general']['datetime_last_edit'] = $dateLast;
         $interval = date_diff($dateLast, $dateFirst, true);

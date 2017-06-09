@@ -177,21 +177,21 @@
                     <tr>
                         <td>{{ msg('first-edit') }}</td>
                         <td>
-                            {{ diff_link(general.first_edit.revid, projectUrl, general.datetime_first_edit) }}
+                            {{ diff_link(firstEdit.id, projectUrl, firstEdit.timestamp) }}
                             &bull;
-                            {{ user_link(general.first_edit.user, projectUrl) }}
+                            {{ user_link(firstEdit.user.username, projectUrl) }}
                             &bull;
-                            {{ general.first_edit.size | diff_format }}
+                            {{ firstEdit.size | diff_format }}
                         </td>
                     </tr>
                     <tr>
                         <td>{{ msg('latest-edit') }}</td>
                         <td>
-                            {{ diff_link(general.last_edit.revid, projectUrl, general.datetime_last_edit.timestamp) }}
+                            {{ diff_link(lastEdit.id, projectUrl, lastEdit.timestamp) }}
                             &bull;
-                            {{ user_link(general.last_edit.user, projectUrl) }}
+                            {{ user_link(lastEdit.user.username, projectUrl) }}
                             &bull;
-                            {{ general.last_edit.size | diff_format }}
+                            {{ lastEdit.size | diff_format }}
                         </td>
                     </tr>
                     <tr>
@@ -262,7 +262,7 @@
                     chart.pie_chart('users_ips',
                         [{
                             label: msg('accounts'),
-                            value: general.revision_count - general.anon_count,
+                            value: page.numRevisions - general.anon_count,
                             percentage: 100 - general.anon_percentage
                         },
                         {
@@ -276,7 +276,7 @@
                     chart.pie_chart('minor_major',
                         [{
                             label: msg('major-edits'),
-                            value: general.revision_count - general.minor_count,
+                            value: page.numRevisions - general.minor_count,
                             percentage: 100 - general.minor_percentage,
                         },
                         {
@@ -295,7 +295,7 @@
                         },
                         {
                             label: msg('bottom-ninety'),
-                            value: general.revision_count - general.top_ten_count,
+                            value: page.numRevisions - general.top_ten_count,
                             percentage: 100 - general.top_ten_percentage,
                         }]
                     )
@@ -385,7 +385,7 @@
                         <a href="{{ expand_url }}">{{ msg('num-others', [editors|length - counter]) }}</a>
                     </td>
                     <td></td>
-                    <td>{{ (general.revision_count - edit_sum) | number_format }}</td>
+                    <td>{{ (page.numRevisions - edit_sum) | number_format }}</td>
                     <td colspan=6></td>
                 </tr>
                 {% endif %}
