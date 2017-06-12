@@ -10,7 +10,7 @@ class EditTest extends \PHPUnit_Framework_TestCase
     public function testBasic()
     {
         $project = new Project('TestProject');
-        $page = new Page( $project, 'Test_page');
+        $page = new Page($project, 'Test_page');
         $edit = new Edit($page, [
             'id' => '1',
             'timestamp' => '20170101100000',
@@ -27,5 +27,4 @@ class EditTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $edit->getId());
         $this->assertFalse($edit->isMinor());
     }
-    
 }
