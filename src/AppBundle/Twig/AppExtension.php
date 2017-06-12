@@ -43,6 +43,7 @@ class AppExtension extends Extension
             new \Twig_SimpleFunction('quote', [ $this, 'quote' ]),
             new \Twig_SimpleFunction('bugReportURL', [ $this, 'bugReportURL' ]),
             new \Twig_SimpleFunction('logged_in_user', [$this, 'functionLoggedInUser']),
+            new \Twig_SimpleFunction('isUserAnon', [$this, 'isUserAnon']),
         ];
     }
 
@@ -444,5 +445,21 @@ class AppExtension extends Extension
         }
 
         return round($quotient, $precision) . '%';
+    }
+
+    /**
+     * Helper to return whether the given user is an anonymous (logged out) user
+     * @param  User|string $user User object or username as a string
+     * @return bool
+     */
+    public function isUserAnon($user)
+    {
+        if ($user instanceof User) {
+            $username = $user.username;
+        } else {
+            $username = $user;
+        }
+
+        return filter_var($username, FILTER_VALIDATE_IP);
     }
 }

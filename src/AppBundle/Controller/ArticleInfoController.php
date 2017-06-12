@@ -141,7 +141,8 @@ class ArticleInfoController extends Controller
         $this->pageHistory = $page->getRevisions();
         $this->pageInfo['firstEdit'] = new Edit($this->pageInfo['page'], $this->pageHistory[0]);
         $this->pageInfo['lastEdit'] = new Edit(
-            $this->pageInfo['page'], $this->pageHistory[$page->getNumRevisions() - 1]
+            $this->pageInfo['page'],
+            $this->pageHistory[$page->getNumRevisions() - 1]
         );
 
         // NOTE: bots are fetched first in case we want to restrict some stats to humans editors only
@@ -532,18 +533,8 @@ class ArticleInfoController extends Controller
         // Now we can start our master array. This one will be HUGE!
         $data = [
             'general' => [
-                'max_add' => [
-                    'timestamp' =>  null,
-                    'revid' => null,
-                    'user' => null,
-                    'size' => -1000000,
-                ],
-                'max_del' => [
-                    'timestamp' =>  null,
-                    'revid' => null,
-                    'user' => null,
-                    'size' => 1000000,
-                ],
+                'max_add' => $firstEdit,
+                'max_del' => $firstEdit,
                 'editor_count' => 0,
                 'anon_count' => 0,
                 'minor_count' => 0,
@@ -658,14 +649,8 @@ class ArticleInfoController extends Controller
                     $this->aeh->isRevert($nextRevision['comment']);
 
                 // don't count this edit as content removal if the next edit reverted it
-                if (!$nextRevisionIsRevert && $edit->getSize() < $data['general']['max_del']['size']) {
-                    $data['general']['max_del']['timestamp'] = DateTime::createFromFormat(
-                        'YmdHis',
-                        $rev['timestamp']
-                    );
-                    $data['general']['max_del']['revid'] = $rev['id'];
-                    $data['general']['max_del']['user'] = $rev['username'];
-                    $data['general']['max_del']['size'] = $edit->getSize();
+                if (!$nextRevisionIsRevert && $edit->getSize() < $data['general']['max_del']->getSize()) {
+                    $data['general']['max_del'] = $edit;
                 }
 
                 // FIXME: possibly remove this
@@ -678,14 +663,8 @@ class ArticleInfoController extends Controller
                     $data['textshares'][$username]['all'] += $edit->getLength();
                 }
 
-                if ($edit->getSize() > $data['general']['max_add']['size']) {
-                    $data['general']['max_add']['timestamp'] = DateTime::createFromFormat(
-                        'YmdHis',
-                        $rev['timestamp']
-                    );
-                    $data['general']['max_add']['revid'] = $rev['id'];
-                    $data['general']['max_add']['user'] = $rev['username'];
-                    $data['general']['max_add']['size'] = $edit->getSize();
+                if ($edit->getSize() > $data['general']['max_add']->getSize()) {
+                    $data['general']['max_add'] = $edit;
                 }
             }
 

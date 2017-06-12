@@ -37,13 +37,13 @@
         <div class="text-center xt-toc">
             {% set sections = ['general-stats', 'top-editors', 'year-counts', 'month-counts'] %}
             {% if general.automated_count > 0 %}
-                {% set sections = sections | merge(['auto-edits']) %}
+                {% set sections = sections|merge(['auto-edits']) %}
             {% endif %}
             {% if assessments is defined %}
-                {% set sections = sections | merge(['assessments']) %}
+                {% set sections = sections|merge(['assessments']) %}
             {% endif %}
             {% if bugs is defined %}
-                {% set sections = sections | merge(['bugs']) %}
+                {% set sections = sections|merge(['bugs']) %}
             {% endif %}
 
             {% for section in sections %}
@@ -69,23 +69,23 @@
                         <td>
                             {{ wiki.extLink('https://www.wikidata.org/wiki/' ~ page.wikidataId, page.wikidataId) }}
                             &middot;
-                            {{ numWikidataItems | number_format }} {{ msg('num-sitelinks', [numWikidataItems]) }}
+                            {{ numWikidataItems|number_format }} {{ msg('num-sitelinks', [numWikidataItems]) }}
                         </td>
                     </tr>
                     {% endif %}
                     <tr>
                         <td>{{ msg('page-size') }}</td>
-                        <td>{{ page.length | number_format }} {{ msg('num-bytes', [page.length]) }}</td>
+                        <td>{{ page.length|number_format }} {{ msg('num-bytes', [page.length]) }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('total-edits') }}</td>
-                        <td>{{ page.numRevisions | number_format }}</td>
+                        <td>{{ page.numRevisions|number_format }}</td>
                     </tr>
                     <tr>
                         <td>
                             <a class="rm-inline-margin" href="#usertable">{{ msg('editors') }}</a>
                         </td>
-                        <td>{{ general.editor_count | number_format }}</td>
+                        <td>{{ general.editor_count|number_format }}</td>
                     </tr>
                     {% if assessments is defined %}
                         <tr>
@@ -109,26 +109,26 @@
                     <tr>
                         <td class="stat-list--new-group">{{ msg('minor-edits') }}</td>
                         <td class="stat-list--new-group">
-                            {{ general.minor_count | number_format }} &middot; ({{ general.minor_percentage }}%)
+                            {{ general.minor_count|number_format }} &middot; ({{ general.minor_percentage }}%)
                         </td>
                     </tr>
                     <tr>
                         <td>{{ msg('ip-edits') }}</td>
-                        <td>{{ general.anon_count | number_format }} &middot; ({{ general.anon_percentage }}%)</td>
+                        <td>{{ general.anon_count|number_format }} &middot; ({{ general.anon_percentage }}%)</td>
                     </tr>
                     <tr>
                         <td>{{ msg('bot-edits') }}</td>
-                        <td>{{ general.bot_revision_count | number_format }} &middot; ({{ general.bot_percentage }}%)</td>
+                        <td>{{ general.bot_revision_count|number_format }} &middot; ({{ general.bot_percentage }}%)</td>
                     </tr>
                     <tr>
                         <td>
                             <a class="rm-inline-margin" href="#auto-edits">{{ msg('auto-edits') }}</a>
                         </td>
                     </td>
-                    <td>{{ general.automated_count | number_format }}</td>
+                    <td>{{ general.automated_count|number_format }}</td>
                     <tr>
                         <td>{{ msg('reverted-edits') }}</td>
-                        <td>{{ general.revert_count | number_format }}</td>
+                        <td>{{ general.revert_count|number_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('average-time-bw-edits') }}</td>
@@ -136,7 +136,7 @@
                     </tr>
                     <tr>
                         <td>{{ msg('average-edits-per-user') }}</td>
-                        <td>{{ general.edits_per_editor | number_format(1) }}</td>
+                        <td>{{ general.edits_per_editor|number_format(1) }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('average-edits-per-day') }}</td>
@@ -144,31 +144,31 @@
                     </tr>
                     <tr>
                         <td>{{ msg('average-edits-per-month') }}</td>
-                        <td>{{ general.edits_per_month | number_format(1) }}</td>
+                        <td>{{ general.edits_per_month|number_format(1) }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('average-edits-per-year') }}</td>
-                        <td>{{ general.edits_per_year | number_format(1) }}</td>
+                        <td>{{ general.edits_per_year|number_format(1) }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('edits-last-day') }}</td>
-                        <td>{{ general.count_history.day | number_format }}</td>
+                        <td>{{ general.count_history.day|number_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('edits-last-week') }}</td>
-                        <td>{{ general.count_history.week | number_format }}</td>
+                        <td>{{ general.count_history.week|number_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('edits-last-month') }}</td>
-                        <td>{{ general.count_history.month | number_format }}</td>
+                        <td>{{ general.count_history.month|number_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('edits-last-year') }}</td>
-                        <td>{{ general.count_history.year | number_format }}</td>
+                        <td>{{ general.count_history.year|number_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('top-ten-count') }}</td>
-                        <td>{{ general.top_ten_count | number_format }} &middot; ({{ general.top_ten_percentage }}%)</td>
+                        <td>{{ general.top_ten_count|number_format }} &middot; ({{ general.top_ten_percentage }}%)</td>
                     </tr>
                 </tbody></table>
             </div>
@@ -177,63 +177,63 @@
                     <tr>
                         <td>{{ msg('first-edit') }}</td>
                         <td>
-                            {{ diff_link(firstEdit.id, projectUrl, firstEdit.timestamp) }}
+                            {{ wiki.diffLink(firstEdit, firstEdit.timestamp) }}
                             &bull;
-                            {{ user_link(firstEdit.user.username, projectUrl) }}
+                            {{ wiki.userLink(firstEdit.user, project) }}
                             &bull;
-                            {{ firstEdit.size | diff_format }}
+                            {{ firstEdit.size|diff_format }}
                         </td>
                     </tr>
                     <tr>
                         <td>{{ msg('latest-edit') }}</td>
                         <td>
-                            {{ diff_link(lastEdit.id, projectUrl, lastEdit.timestamp) }}
+                            {{ wiki.diffLink(lastEdit, lastEdit.timestamp) }}
                             &bull;
-                            {{ user_link(lastEdit.user.username, projectUrl) }}
+                            {{ wiki.userLink(lastEdit.user, project) }}
                             &bull;
-                            {{ lastEdit.size | diff_format }}
+                            {{ lastEdit.size|diff_format }}
                         </td>
                     </tr>
                     <tr>
                         <td>{{ msg('max-text-added') }}</td>
                         <td>
-                            {{ diff_link(general.max_add.revid, projectUrl, general.max_add.timestamp) }}
+                            {{ wiki.diffLink(general.max_add, general.max_add.timestamp) }}
                             &bull;
-                            {{ user_link(general.max_add.user, projectUrl) }}
+                            {{ wiki.userLink(general.max_add.user, project) }}
                             &bull;
-                            {{ general.max_add.size | diff_format }}
+                            {{ general.max_add.size|diff_format }}
                         </td>
                     </tr>
                     <tr>
                         <td>{{ msg('max-text-deleted') }}</td>
                         <td>
-                            {{ diff_link(general.max_del.revid, projectUrl, general.max_del.timestamp) }}
+                            {{ wiki.diffLink(general.max_del, general.max_del.timestamp) }}
                             &bull;
-                            {{ user_link(general.max_del.user, projectUrl) }}
+                            {{ wiki.userLink(general.max_del.user, project) }}
                             &bull;
-                            {{ general.max_del.size | diff_format }}
+                            {{ general.max_del.size|diff_format }}
                         </td>
                     </tr>
 
                     <tr>
                         <td class="stat-list--new-group">{{ msg('links-in') }}</td>
                         <td class="stat-list--new-group">
-                            {{ wiki.pageLinksInLink(page, links_in_count | number_format) }}
+                            {{ wiki.pageLinksInLink(page, links_in_count|number_format) }}
                         </td>
                     </tr>
                     <tr>
                         <td>{{ msg('redirects') }}</td>
                         <td>
-                            {{ wiki.pageRedirectsLink(page, redirects_count | number_format) }}
+                            {{ wiki.pageRedirectsLink(page, redirects_count|number_format) }}
                         </td>
                     </tr>
                     <tr>
                         <td>{{ msg('links-out') }}</td>
-                        <td>{{ links_out_count | number_format }}</td>
+                        <td>{{ links_out_count|number_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('links-external') }}</td>
-                        <td>{{ links_ext_count | number_format }}</td>
+                        <td>{{ links_ext_count|number_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('page-watchers') }}</td>
@@ -252,7 +252,7 @@
                     {% if bugs is defined %}
                     <tr>
                         <td class="stat-list--new-group"><a href='#bugs'>{{ msg('bugs') }}</a></td>
-                        <td class="stat-list--new-group">{{ bugs | length }}</td>
+                        <td class="stat-list--new-group">{{ bugs|length }}</td>
                     </tr>
                     {% endif %}
                 </tbody></table>
@@ -310,11 +310,11 @@
         {% set content %}
             <div class="top-editors-charts clearfix">
                 <div class="pull-left">
-                    <div class="chart-title">{{ msg('top-ten-by-edits') | capitalize_first }}</div>
+                    <div class="chart-title">{{ msg('top-ten-by-edits')|capitalize_first }}</div>
                     {{ chart.pie_chart('top_by_edits', topTenEditors) }}
                 </div>
                 <div class="pull-left">
-                    <div class="chart-title">{{ msg('top-ten-by-text') | capitalize_first }}</div>
+                    <div class="chart-title">{{ msg('top-ten-by-text')|capitalize_first }}</div>
                     {{ chart.pie_chart('top_by_added', topTenEditorsByAdded) }}
                 </div>
             </div>
@@ -326,7 +326,7 @@
                                 {% if key == 'average-time-bw-edits' %}
                                     atbe<sup>1</sup>
                                 {% else %}
-                                    {{ msg(key) | capitalize_first }}
+                                    {{ msg(key)|capitalize_first }}
                                 {% endif %}
                                 {% if key == 'added_bytes' %}
                                     <sup class="rm-inline-margin-left">2</sup>
@@ -339,14 +339,14 @@
                 <tbody>
                 {% set counter = 0 %}
                 {% set edit_sum = 0 %}
-                {% set editorlimit = app.request.query.get("editorlimit") | default(20) %}
-                {% for editor, stats in editors | slice(0, editorlimit ) %}
+                {% set editorlimit = app.request.query.get("editorlimit")|default(20) %}
+                {% for editor, stats in editors|slice(0, editorlimit ) %}
                     {% set counter = counter + 1 %}
                     {% set edit_sum = edit_sum + stats.all %}
                     <tr>
                         <td class="sort-entry--rank" data-value="{{ counter }}">{{ counter }}</td>
                         <td class="sort-entry--username" data-value="{{ editor }}">
-                            {{ user_link(editor, projectUrl) }}
+                            {{ wiki.userLink(editor, project) }}
                         </td>
                         <td>
                             {% if enabled('ec') %}
@@ -358,26 +358,26 @@
                             {% endif %}
                         </td>
                         <td class="sort-entry--edits" data-value="{{ stats.all }}">
-                            {{ stats.all | number_format }}
+                            {{ stats.all|number_format }}
                         </td>
-                        <td class="sort-entry--minor-edits" data-value="{{ stats.minor }}">{{ stats.minor | number_format }}</td>
-                        {% set user_minor_percent = stats.minor | percent_format(stats.all) %}
+                        <td class="sort-entry--minor-edits" data-value="{{ stats.minor }}">{{ stats.minor|number_format }}</td>
+                        {% set user_minor_percent = stats.minor|percent_format(stats.all) %}
                         <td class="sort-entry--minor-percentage" data-value="{{ user_minor_percent }}">{{ user_minor_percent }}</td>
                         <td class="sort-entry--first-edit" data-value="{{ stats.first_id }}">
-                            <a target="_blank" href="{{ projectUrl }}/wiki/Special:Diff/{{ stats.first_id }}">{{ stats.first }}</a>
+                            <a target="_blank" href="{{ projectUrl }}wiki/Special:Diff/{{ stats.first_id }}">{{ stats.first }}</a>
                         </td>
                         <td class="sort-entry--latest-edit" data-value="{{ stats.last_id }}">
-                            <a target="_blank" href="{{ projectUrl }}/wiki/Special:Diff/{{ stats.last_id }}">{{ stats.last }}</a>
+                            <a target="_blank" href="{{ projectUrl }}wiki/Special:Diff/{{ stats.last_id }}">{{ stats.last }}</a>
                         </td>
                         <td class="sort-entry--average-time-bw-edits" data-value="{{ stats.atbe }}">
-                            {{ stats.atbe | number_format(1) }}
+                            {{ stats.atbe|number_format(1) }}
                         </td>
                         <td class="sort-entry--added-bytes" data-value="{{ stats.added }}">
-                            {{ stats.added | number_format }}
+                            {{ stats.added|number_format }}
                         </td>
                     </tr>
                 {% endfor %}
-                {% if counter < editors | length %}
+                {% if counter < editors|length %}
                 <tr class="show-more-row">
                     <td></td>
                     <td>
@@ -385,7 +385,7 @@
                         <a href="{{ expand_url }}">{{ msg('num-others', [editors|length - counter]) }}</a>
                     </td>
                     <td></td>
-                    <td>{{ (page.numRevisions - edit_sum) | number_format }}</td>
+                    <td>{{ (page.numRevisions - edit_sum)|number_format }}</td>
                     <td colspan=6></td>
                 </tr>
                 {% endif %}
@@ -418,7 +418,7 @@
                 {% for bot, bot_data in bots %}
                     <tr>
                         <td class="sort-entry--username" data-value="{{ bot }}">
-                            {{ user_link(bot, projectUrl) }}
+                            {{ wiki.userLink(bot, project) }}
                             {% if not bot_data.current %}
                                 <i>
                                     {# FIXME: hard-coded /w/ script path #}
@@ -480,7 +480,7 @@
                     }];
 
                     // restructure data the way Chart.js wants it
-                    {% for year in year_count | keys %}
+                    {% for year in year_count|keys %}
                         yearDatasets[0].data.push({{ year_count[year].all }});
                         yearDatasets[1].data.push({{ year_count[year].minor }});
                         yearDatasets[2].data.push({{ year_count[year].anon }});
@@ -490,7 +490,7 @@
                     new Chart($("#year_count"), {
                         type: 'bar',
                         data: {
-                            labels: {{ year_count | keys | json_encode() | raw }},
+                            labels: {{ year_count|keys|json_encode()|raw }},
                             datasets: yearDatasets,
                         },
                         options: {
@@ -563,7 +563,7 @@
                     {% for key in ['year', 'edits', 'ips', 'ips-percentage', 'minor-edits', 'minor-edits-percentage', 'log-events'] %}
                         <th>
                             <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                                {{ msg(key) | capitalize_first }}
+                                {{ msg(key)|capitalize_first }}
                                 <span class="glyphicon glyphicon-sort"></span>
                             </span>
                         </th>
@@ -573,17 +573,17 @@
                 {% for year, stats in year_count %}
                     <tr>
                         <td class="sort-entry--year" data-value="{{ year }}">{{ year }}</td>
-                        <td class="sort-entry--edits" data-value="{{ stats.all }}">{{ stats.all | number_format }}</td>
+                        <td class="sort-entry--edits" data-value="{{ stats.all }}">{{ stats.all|number_format }}</td>
                         <td class="sort-entry--ips" data-value="{{ stats.anon }}">{{ stats.anon }}</td>
-                        {% set year_ips_percent = stats.anon | percent_format(stats.all) %}
+                        {% set year_ips_percent = stats.anon|percent_format(stats.all) %}
                         <td class="sort-entry--ips-percentage" data-value="{{ year_ips_percent }}">{{ year_ips_percent }}</td>
-                        <td class="sort-entry--minor-edits" data-value="{{ stats.minor }}">{{ stats.minor | number_format }}</td>
-                        {% set year_minor_percent = stats.minor | percent_format(stats.all) %}
+                        <td class="sort-entry--minor-edits" data-value="{{ stats.minor }}">{{ stats.minor|number_format }}</td>
+                        {% set year_minor_percent = stats.minor|percent_format(stats.all) %}
                         <td class="sort-entry--minor-edits-percentage" data-value="{{ year_minor_percent }}">{{ year_minor_percent }}</td>
                         <td>
                             {% for event, count in stats.events %}
                                 <span class="comma-separated">
-                                    {{ count | number_format }} {{ msg('num-'~event, [count]) }}
+                                    {{ count|number_format }} {{ msg('num-'~event, [count]) }}
                                 </span>
                             {% endfor %}
                         </td>
@@ -601,7 +601,7 @@
                     {% for key in ['month', 'edits', 'ips', 'ips-percentage', 'minor-edits', 'minor-edits-percentage'] %}
                         <th>
                             <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                                {{ msg(key) | capitalize_first }}
+                                {{ msg(key)|capitalize_first }}
                                 <span class="glyphicon glyphicon-sort"></span>
                             </span>
                         </th>
@@ -620,25 +620,25 @@
                 <tbody>
                 {% for year, year_stats in year_count %}
                     {% for month, stats in year_stats.months %}
-                        {% set month_str = '%02d' | format(month) %}
+                        {% set month_str = '%02d'|format(month) %}
                         <tr>
                             <td class="sort-entry--month" data-value="{{ year }}{{ month_str }}">
-                                {{ year }}-{{ "%02d" | format(month) }}
+                                {{ year }}-{{ "%02d"|format(month) }}
                             </td>
                             <td class="sort-entry--edits" data-value="{{ stats.all }}">
                                 {% if stats.all > 0 %}
                                     {# Generate link to revision history showing all edits for the given month #}
-                                    {% set offset = date(year~"-"~month_str~"-01") | date("Ymt")~"235959" %}
-                                    {{ wiki_history_link(title, projectUrl, stats.all | number_format, offset, stats.all) }}
+                                    {% set offset = date(year~"-"~month_str~"-01")|date("Ymt")~"235959" %}
+                                    {{ wiki.pageHistLink(page, stats.all|number_format, offset, stats.all) }}
                                 {% else %}
                                     0
                                 {% endif %}
                             </td>
-                            <td class="sort-entry--ips" data-value="{{ stats.anon }}">{{ stats.anon | number_format }}</td>
-                            {% set month_ips_percent = stats.anon | percent_format(stats.all) %}
+                            <td class="sort-entry--ips" data-value="{{ stats.anon }}">{{ stats.anon|number_format }}</td>
+                            {% set month_ips_percent = stats.anon|percent_format(stats.all) %}
                             <td class="sort-entry--ips-percentage" data-value="{{ month_ips_percent }}">{{ month_ips_percent }}</td>
-                            <td class="sort-entry--minor-edits" data-value="{{ stats.minor }}">{{ stats.minor | number_format }}</td>
-                            {% set month_minor_percent = stats.minor | percent_format(stats.all) %}
+                            <td class="sort-entry--minor-edits" data-value="{{ stats.minor }}">{{ stats.minor|number_format }}</td>
+                            {% set month_minor_percent = stats.minor|percent_format(stats.all) %}
                             <td class="sort-entry--minor-edits-percentage" data-value="{{ month_minor_percent }}">{{ month_minor_percent }}</td>
                             <td class="stripes-column">
                                 {# stripes are shown as figure over max edits for all months, with a max width of 400px #}
@@ -665,7 +665,7 @@
                     {% for key in ['tool', 'edits'] %}
                         <th>
                             <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                                {{ msg(key) | capitalize_first }}
+                                {{ msg(key)|capitalize_first }}
                                 <span class="glyphicon glyphicon-sort"></span>
                             </span>
                         </th>
@@ -694,7 +694,7 @@
                     {% for key in ['wikiproject', 'assessment', 'importance'] %}
                         <th>
                             <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                                {{ msg(key) | capitalize_first }}
+                                {{ msg(key)|capitalize_first }}
                                 <span class="glyphicon glyphicon-sort"></span>
                             </span>
                         </th>
@@ -733,12 +733,12 @@
                     {% for key in ['priority', 'name', 'notice', 'explanation'] %}
                         <th>
                             <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                                {{ msg(key) | capitalize_first }}
+                                {{ msg(key)|capitalize_first }}
                                 <span class="glyphicon glyphicon-sort"></span>
                             </span>
                         </th>
                     {% endfor %}
-                    <th>{{ msg('edit') | capitalize_first }}</th>
+                    <th>{{ msg('edit')|capitalize_first }}</th>
                 </tr></thead>
                 <tbody>
                 {% for bug in bugs %}
@@ -747,19 +747,19 @@
                         <td class="sort-entry--name" data-value="{{ bug.name }}">{{ bug.name }}</td>
                         <td class="sort-entry--notice" data-value="{{ bug.notice }}">
                             {% if bug.name == 'Wikidata' %}
-                                {{ bug.notice | raw }}
+                                {{ bug.notice|raw }}
                             {% else %}
                                 <code>{{ bug.notice }}</code>
                             {% endif %}
                         </td>
-                        <td class="sort-entry--explanation" data-value="{{ bug.explanation }}">{{ bug.explanation | raw }}</td>
+                        <td class="sort-entry--explanation" data-value="{{ bug.explanation }}">{{ bug.explanation|raw }}</td>
                         <td>
                             {% if bug.name == 'Wikidata' %}
                                 <a target='_blank' href='//www.wikidata.org/wiki/{{ wikidataId }}'>
                                     {{ msg('edit') }}
                                 </a>
                             {% else %}
-                                {{ edit_link(title, projectUrl) }}
+                                {{ wiki.editLink(page) }}
                             {% endif %}
                         </td>
                     </tr>
@@ -768,7 +768,10 @@
             </table>
         {% endset %}
         {% set description_link %}
-            Powered by <a target='_blank' href='https://tools.wmflabs.org/checkwiki/'>Project Check Wikipedia</a>
+            {% set pcwLink %}
+                <a target='_blank' href='https://tools.wmflabs.org/checkwiki/'>Project Check Wikipedia</a>
+            {% endset %}
+            {{ msg('powered-by', [pcwLink]) }}
         {% endset %}
         {{ layout.content_block('bugs', content, description_link) }}
         {% endif %}

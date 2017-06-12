@@ -173,6 +173,17 @@ class Edit extends Model
     }
 
     /**
+     * Get the full URL to the diff of the edit
+     * @return string
+     */
+    public function getDiffUrl()
+    {
+        $project = $this->getProject();
+        $path = str_replace('$1', 'Special:Diff/' . $this->id, $project->getArticlePath());
+        return rtrim($project->getUrl(), '/') . $path;
+    }
+
+    /**
      * Was the edit a revert, based on the edit summary?
      * @return bool
      */
