@@ -22,7 +22,7 @@
             {{ user_log_link(username, project_url, msg('block-log'), 'block') }}
             {% if isWMFLabs() %}
             &middot;
-            <a href="{{ link("/ec/"~project~"/"~username) }}" >{{ msg('tool-ec') }}</a>
+            <a href="{{ path('ec', {'project':project, 'username':username}) }}" >{{ msg('tool-ec') }}</a>
             {% if not isSingleWiki() %}
             &middot;
             <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ username }}" >{{ msg('global-contribs') }}</a>
