@@ -285,7 +285,7 @@ class AdminStatsController extends Controller
                 'xtTitle' => $project,
 
                 'project_url' => $url,
-                'project' => $project,
+                'project' => $projectData,
                 'wikiName' => $wikiName,
 
                 'start_date' => $start,

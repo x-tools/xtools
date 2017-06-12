@@ -75,7 +75,7 @@
     {% else %}
         {% set username = user %}
     {% endif %}
-    {% set url = project.url|trim('/') ~ project.script ~ '?title=Special:Log&action=view&user=' ~ username %}
+    {% set url = project.url|trim('/') ~ project.script ~ '?title=Special:Log&action=view&user=' ~ username|replace({' ': '_'}) %}
     {% if type is not empty %}
         {% set url = url ~ '&type=' ~ type %}
     {% endif %}
