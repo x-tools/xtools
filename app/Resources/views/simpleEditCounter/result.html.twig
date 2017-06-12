@@ -1,5 +1,6 @@
 {% extends 'base.html.twig' %}
 {% import 'macros/layout.html.twig' as layout %}
+{% import 'macros/wiki.html.twig' as wiki %}
 
 {% block body %}
 <div class="panel panel-primary">
@@ -9,33 +10,33 @@
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {{ msg('back') }}
             </a>
-            {{ user_link(username, project_url) }}
+            {{ wiki.userLink(user, project) }}
             <small>
                 &bull;
-                {{ project }}
+                {{ project.domain }}
             </small>
         </div>
     </header>
 
     <div class="panel-body xt-panel-body">
         <p class="text-center xt-heading-subtitle">
-            {{ wiki_log_link('User:'~username, project_url, msg('block-log'), 'block') }}
+            {{ wiki.userLogLink(user, project, msg('block-log'), 'block') }}
             &middot;
-            <a href="{{ path('EditCounterResult', {project:project, username:username}) }}" >{{ msg('tool-ec') }}</a>
+            <a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool-ec') }}</a>
             {% if not isSingleWiki() %}
             &middot;
-            <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ username }}" >{{ msg('global-contribs') }}</a>
+            <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ user.username }}" >{{ msg('global-contribs') }}</a>
             {% endif %}
             {% if isWMFLabs() %}
             &middot;
-            <a target="_blank" href="//tools.wmflabs.org/pageviews/?project={{ project }}&amp;pages=User:{{ username }}">{{ msg('pageviews-userpage') }}</a>
+            <a target="_blank" href="//tools.wmflabs.org/pageviews/?project={{ project.domain }}&amp;pages=User:{{ user.username }}">{{ msg('pageviews-userpage') }}</a>
             {% endif %}
         </p>
 
         {% set content %}
             <dl class="col-lg-12 dl-horizontal stat-list clearfix">
                 <dt>{{ msg('username') }}</dt>
-                <dd>{{ user_link(username, project_url) }}</dd>
+                <dd>{{ wiki.userLink(user, project) }}</dd>
                 <dt>{{ msg('user-id') }}</dt>
                 <dd>{{ id }}</dd>
                 <dt>{{ msg('user-groups') }}</dt>
