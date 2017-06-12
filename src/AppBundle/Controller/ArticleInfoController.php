@@ -99,9 +99,6 @@ class ArticleInfoController extends Controller
 
         $this->revisionTable = $this->lh->getTable('revision', $dbName);
 
-        $api = $this->get('app.api_helper');
-        $basicInfo = $api->getBasicPageInfo($projectQuery, $pageQuery, !$request->query->get('nofollowredir'));
-
         // TODO: throw error if $basicInfo['missing'] is set
 
         $this->pageInfo = [
@@ -110,25 +107,10 @@ class ArticleInfoController extends Controller
             'page' => $page,
             'dbName' => $dbName,
             'lang' => $project->getLang(),
-            'id' => $basicInfo['pageid'],
-            'namespace' => $basicInfo['ns'],
-            'title' => $basicInfo['title'],
-            'lastrevid' => $basicInfo['lastrevid'],
-            'length' => $basicInfo['length'],
-            'protection' => $basicInfo['protection'],
-            'url' => $basicInfo['fullurl']
         ];
 
-        $this->pageInfo['watchers'] = ( isset($basicInfo['watchers']) ) ? $basicInfo['watchers'] : "< 30";
-
-        $pageProps = isset($basicInfo['pageprops']) ? $basicInfo['pageprops'] : [];
-
-        if (isset($pageProps['wikibase_item'])) {
-            $this->pageInfo['wikidataId'] = $pageProps['wikibase_item'];
+        if ($page->getWikidataId()) {
             $this->pageInfo['numWikidataItems'] = $this->getNumWikidataItems();
-        }
-        if (isset($pageProps['disambiguation'])) {
-            $this->pageInfo['isDisamb'] = true;
         }
 
         // TODO: Adapted from legacy code; may be used to indicate how many dead ext links there are
@@ -159,9 +141,10 @@ class ArticleInfoController extends Controller
         $this->pageInfo['general']['pageviews_offset'] = 60;
         $this->pageInfo['general']['pageviews'] = $this->ph->sumLastDays(
             $this->pageInfo['project']->getDomain(),
-            $this->pageInfo['title'],
+            $this->pageInfo['page']->getTitle(),
             $this->pageInfo['general']['pageviews_offset']
         );
+        $api = $this->get('app.api_helper');
         $assessments = $api->getPageAssessments($projectQuery, $pageQuery);
         if ($assessments) {
             $this->pageInfo['assessments'] = $assessments;
@@ -174,22 +157,9 @@ class ArticleInfoController extends Controller
         }
 
         $this->pageInfo['xtPage'] = 'articleinfo';
-        $this->pageInfo['xtTitle'] = $this->pageInfo['title'];
+        $this->pageInfo['xtTitle'] = $this->pageInfo['page']->getTitle();
 
         return $this->render("articleInfo/result.html.twig", $this->pageInfo);
-    }
-
-    /**
-     * Quickly get number of revisions of page with ID $this->pageInfo['id']
-     * May be used to bypass expensive processing if the page has a extremely large number of revision
-     * @return integer Revision count
-     */
-    private function getRevCount()
-    {
-        $query = "SELECT COUNT(*) AS count FROM " . $this->revisionTable
-                 . " WHERE rev_page = '" . $this->pageInfo['id'] . "'";
-        $res = $this->conn->query($query)->fetchAll();
-        return $res[0]['count'];
     }
 
     /**
@@ -200,7 +170,7 @@ class ArticleInfoController extends Controller
     {
         $query = "SELECT COUNT(*) AS count
                   FROM wikidatawiki_p.wb_items_per_site
-                  WHERE ips_item_id = ". ltrim($this->pageInfo['wikidataId'], 'Q');
+                  WHERE ips_item_id = ". ltrim($this->pageInfo['page']->getWikidataId(), 'Q');
         $res = $this->conn->query($query)->fetchAll();
         return $res[0]['count'];
     }
@@ -219,7 +189,7 @@ class ArticleInfoController extends Controller
                   FROM $this->revisionTable
                   LEFT JOIN $userGroupsTable ON rev_user = ug_user
                   LEFT JOIN $userFromerGroupsTable ON rev_user = ufg_user
-                  WHERE rev_page = " . $this->pageInfo['id'] . " AND (ug_group = 'bot' OR ufg_group = 'bot')
+                  WHERE rev_page = " . $this->pageInfo['page']->getId() . " AND (ug_group = 'bot' OR ufg_group = 'bot')
                   GROUP BY rev_user_text";
         $res = $this->conn->query($query)->fetchAll();
 
@@ -330,9 +300,9 @@ class ArticleInfoController extends Controller
      */
     private function getLinksAndRedirects()
     {
-        $pageId = $this->pageInfo['id'];
-        $namespace = $this->pageInfo['namespace'];
-        $title = str_replace(' ', '_', $this->pageInfo['title']);
+        $pageId = $this->pageInfo['page']->getId();
+        $namespace = $this->pageInfo['page']->getNamespace();
+        $title = str_replace(' ', '_', $this->pageInfo['page']->getTitle());
         $externalLinksTable = $this->lh->getTable('externallinks', $this->pageInfo['dbName']);
         $pageLinksTable = $this->lh->getTable('pagelinks', $this->pageInfo['dbName']);
         $redirectTable = $this->lh->getTable('redirect', $this->pageInfo['dbName']);
@@ -369,10 +339,10 @@ class ArticleInfoController extends Controller
     private function setLogsEvents()
     {
         $loggingTable = $this->lh->getTable('logging', $this->pageInfo['dbName'], 'logindex');
-        $title = str_replace(' ', '_', $this->pageInfo['title']);
+        $title = str_replace(' ', '_', $this->pageInfo['page']->getTitle());
         $query = "SELECT log_action, log_type, log_timestamp AS timestamp
                   FROM $loggingTable
-                  WHERE log_namespace = '" . $this->pageInfo['namespace'] . "'
+                  WHERE log_namespace = '" . $this->pageInfo['page']->getNamespace() . "'
                   AND log_title = '$title' AND log_timestamp > 1
                   AND log_type IN ('delete', 'move', 'protect', 'stable')";
         $events = $this->conn->query($query)->fetchAll();
@@ -403,10 +373,10 @@ class ArticleInfoController extends Controller
      */
     private function getCheckWikiErrors()
     {
-        if ($this->pageInfo['namespace'] !== 0 || !$this->container->getParameter('app.is_labs')) {
+        if ($this->pageInfo['page']->getNamespace() !== 0 || !$this->container->getParameter('app.is_labs')) {
             return [];
         }
-        $title = $this->pageInfo['title']; // no underscores
+        $title = $this->pageInfo['page']->getTitle(); // no underscores
         $dbName = preg_replace('/_p$/', '', $this->pageInfo['dbName']); // remove _p if present
 
         $query = "SELECT error, notice, found, name_trans AS name, prio, text_trans AS explanation
@@ -749,6 +719,11 @@ class ArticleInfoController extends Controller
             : 0;
         $data['general']['edits_per_year'] = round($editsPerYear, 1);
         $data['general']['edits_per_editor'] = round($revisionCount / count($data['editors']), 1);
+
+        // If after processing max_del is positive, no edit actually removed text, so unset this value
+        if ($data['general']['max_del']->getSize() > 0) {
+            unset($data['general']['max_del']);
+        }
 
         // Various sorts
         arsort($data['editors']);

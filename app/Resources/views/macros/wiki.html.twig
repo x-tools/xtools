@@ -94,7 +94,7 @@
 {% macro pageLogLink(page, label = null, type = null) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {% set articlePath = page.project.articlePath|replace({'$1': ('Special:Log'|replace({' ': '_'}))}) %}
-    {% set url = (page.project.url|trim('/')) ~ articlePath ~ '&page=' ~ pageTitle|replace({' ': '_'}) %}
+    {% set url = (page.project.url|trim('/')) ~ articlePath ~ '&page=' ~ page.title|replace({' ': '_'}) %}
     {% if type is not empty %}
         {% set url = url ~ '&type=' ~ type %}
     {% endif %}

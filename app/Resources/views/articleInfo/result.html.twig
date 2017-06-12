@@ -63,7 +63,7 @@
                             {{ wiki.pageInfoLink(page, page.id) }}
                         </td>
                     </tr>
-                    {% if page.wikidataId is defined %}
+                    {% if page.wikidataId is not empty %}
                     <tr>
                         <td>Wikidata ID</td>
                         <td>
@@ -204,16 +204,18 @@
                             {{ general.max_add.size|diff_format }}
                         </td>
                     </tr>
-                    <tr>
-                        <td>{{ msg('max-text-deleted') }}</td>
-                        <td>
-                            {{ wiki.diffLink(general.max_del, general.max_del.timestamp) }}
-                            &bull;
-                            {{ wiki.userLink(general.max_del.user, project) }}
-                            &bull;
-                            {{ general.max_del.size|diff_format }}
-                        </td>
-                    </tr>
+                    {% if general.max_del is defined %}
+                        <tr>
+                            <td>{{ msg('max-text-deleted') }}</td>
+                            <td>
+                                {{ wiki.diffLink(general.max_del, general.max_del.timestamp) }}
+                                &bull;
+                                {{ wiki.userLink(general.max_del.user, project) }}
+                                &bull;
+                                {{ general.max_del.size|diff_format }}
+                            </td>
+                        </tr>
+                    {% endif %}
 
                     <tr>
                         <td class="stat-list--new-group">{{ msg('links-in') }}</td>
@@ -237,7 +239,7 @@
                     </tr>
                     <tr>
                         <td>{{ msg('page-watchers') }}</td>
-                        <td>{{ watchers }}</td>
+                        <td>{{ page.watchers is defined ? page.watchers : '< 30' }}</td>
                     </tr>
                     </tr>
                     {% if isWMFLabs() %}

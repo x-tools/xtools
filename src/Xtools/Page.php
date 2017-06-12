@@ -97,6 +97,26 @@ class Page extends Model
     }
 
     /**
+     * Get the numerical value for the namespace
+     * @return int
+     */
+    public function getNamespace()
+    {
+        $info = $this->getPageInfo();
+        return isset($info['ns']) ? $info['ns'] : null;
+    }
+
+    /**
+     * Get the number of page watchers
+     * @return int
+     */
+    public function getWatchers()
+    {
+        $info = $this->getPageInfo();
+        return isset($info['ns']) ? $info['ns'] : null;
+    }
+
+    /**
      * @return bool
      */
     public function exists()
