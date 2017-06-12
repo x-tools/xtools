@@ -169,7 +169,7 @@ class Edit extends Model
      */
     public function getProject()
     {
-        return $this->$page->getProject();
+        return $this->getPage()->getProject();
     }
 
     /**
@@ -198,6 +198,6 @@ class Edit extends Model
      */
     public function isAnon()
     {
-        return $this->user->isAnon();
+        return $this->getUser()->isAnon();
     }
 }
