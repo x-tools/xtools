@@ -168,7 +168,7 @@ class Project extends Model
      */
     public function userOptInPage(User $user)
     {
-        $localPageName = $user->getUsername() . '/EditCounterOptIn.js';
+        $localPageName = 'User:' . $user->getUsername() . '/EditCounterOptIn.js';
         return $localPageName;
     }
 

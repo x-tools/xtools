@@ -184,6 +184,17 @@ class Edit extends Model
     }
 
     /**
+     * Get the full permanent URL to the page at the time of the edit
+     * @return string
+     */
+    public function getPermaUrl()
+    {
+        $project = $this->getProject();
+        $path = str_replace('$1', 'Special:PermaLink/' . $this->id, $project->getArticlePath());
+        return rtrim($project->getUrl(), '/') . $path;
+    }
+
+    /**
      * Was the edit a revert, based on the edit summary?
      * @return bool
      */

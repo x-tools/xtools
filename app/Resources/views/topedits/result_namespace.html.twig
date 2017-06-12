@@ -1,5 +1,6 @@
 {% extends 'base.html.twig' %}
 {% import 'macros/layout.html.twig' as layout %}
+{% import 'macros/wiki.html.twig' as wiki %}
 
 {% block body %}
 <div class="panel panel-primary">
@@ -9,7 +10,7 @@
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {{ msg('back') }}
             </a>
-            {{ user_link(user.username, project.url) }}
+            {{ wiki.userLink(user, project) }}
             <small>
                 &bull;
                 {{ project.title }}
@@ -19,7 +20,7 @@
 
     <div class="panel-body xt-panel-body" >
         <p class="text-center xt-heading-subtitle">
-            {{ user_log_link(user.username, project.url, msg('block-log'), 'block') }}
+            {{ wiki.userLogLink(user, project, msg('block-log'), 'block') }}
             &middot;
             <a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool-ec') }}</a>
             {% if not isSingleWiki() %}
@@ -57,11 +58,11 @@
                     <td class="sort-entry--edits tdnum" data-value="{{ edit.count }}">
                         {{ edit.count|number_format }}
                     </td>
-                    <td class="sort-entry--page" data-value="{{ edit.page_title }}">
-                        {{ wiki_link(edit.page_title_ns, project.url, edit.displaytitle) }}
+                    <td class="sort-entry--page" data-value="{{ edit.page_title_ns }}">
+                        {{ wiki.pageLinkRaw(edit.page_title_ns, project, edit.displaytitle) }}
                     </td>
                     <td>
-                        {{ wiki_log_link(edit.page_title_ns, project.url) }}
+                        {{ wiki.pageLogLinkRaw(edit.page_title_ns, project) }}
                         &middot;
                         <a href="{{ path('ArticleInfoResult', {project:project.domain, article:edit.page_title_ns}) }}">{{ msg('tool-articleinfo') }}</a>
                         &middot;
@@ -77,7 +78,7 @@
             {{ layout.content_block(content_title, content, '', null, false, false) }}
         {% else %}
             <div class="alert alert-info">
-                <p>{{ msg('not-opted-in', [wiki_link(project.userOptInPage(user), project.url~project.articlePath)]) }}</p>
+                <p>{{ msg('not-opted-in', [wiki.pageLinkRaw(project.userOptInPage(user), project)]) }}</p>
             </div>
         {% endif %}
     </div>

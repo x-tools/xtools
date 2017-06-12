@@ -14,6 +14,7 @@ use Xtools\Project;
 use Xtools\ProjectRepository;
 use Xtools\User;
 use Xtools\UserRepository;
+use Xtools\Edit;
 
 class TopEditsController extends Controller
 {
@@ -171,6 +172,10 @@ class TopEditsController extends Controller
         $apiHelper = $this->get('app.api_helper');
         $displayTitles = $apiHelper->displayTitles($project->getDomain(), $titles);
 
+        // Create page repo to be used in page objects
+        $pageRepo = new PagesRepository();
+        $pageRepo->setContainer($this->container);
+
         // Put all together, and return the view.
         $edits = [];
         foreach ($editData as $editDatum) {
@@ -219,20 +224,7 @@ class TopEditsController extends Controller
         }
 
         // Get all revisions of this page by this user.
-        $revTable = $this->lh->getTable('revision', $project->getDatabaseName());
-        $query = "SELECT
-                    revs.rev_id AS id,
-                    revs.rev_timestamp AS timestamp,
-                    (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
-                    revs.rev_comment AS comment
-                FROM $revTable AS revs
-                    LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-                WHERE revs.rev_user_text IN (:username) AND revs.rev_page = :pageid
-                ORDER BY revs.rev_timestamp DESC
-            ";
-        $params = ['username' => $user->getUsername(), 'pageid' => $page->getId()];
-        $conn = $this->getDoctrine()->getManager('replicas')->getConnection();
-        $revisionsData = $conn->executeQuery($query, $params)->fetchAll();
+        $revisionsData = $page->getRevisions($user);
 
         // Loop through all revisions and format dates, find totals, etc.
         $totalAdded = 0;
@@ -244,11 +236,7 @@ class TopEditsController extends Controller
             } else {
                 $totalRemoved += $revision['length_change'];
             }
-            $time = strtotime($revision['timestamp']);
-            $revision['timestamp'] = $time; // formatted via Twig helper
-            $revision['year'] = date('Y', $time);
-            $revision['month'] = date('m', $time);
-            $revisions[] = $revision;
+            $revisions[] = new Edit($page, $revision);
         }
 
         // Send all to the template.
