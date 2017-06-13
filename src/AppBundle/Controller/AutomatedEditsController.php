@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Xtools\ProjectRepository;
+use Xtools\User;
 
 class AutomatedEditsController extends Controller
 {
@@ -118,18 +119,12 @@ class AutomatedEditsController extends Controller
         // Grab our database connection
         $dbh = $this->get('doctrine')->getManager('replicas')->getConnection();
 
-        // Variable parsing.
-        // Username needs to be uppercase first (yay Mediawiki),
-        // and we also need to handle undefined dates.
-        $username = ucfirst($username);
-
+        // Validating the dates. If the dates are invalid, we'll redirect
+        // to the project and username view.
         $invalidDates = (
             (isset($start) && strtotime($start) === false) ||
             (isset($end) && strtotime($end) === false)
         );
-
-        // Validating the dates. If the dates are invalid, we'll redirect
-        // to the project and username view.
         if ($invalidDates) {
             // Make sure to add the flash notice first.
             $this->addFlash('notice', ['invalid-date']);
@@ -143,6 +138,9 @@ class AutomatedEditsController extends Controller
                 ]
             );
         }
+
+        $user = new User($username);
+        $username = $user->getUsername(); // use normalized user name
 
         // Now, load the semi-automated edit types.
         $AEBTypes = $this->getParameter('automated_tools');
@@ -261,9 +259,8 @@ class AutomatedEditsController extends Controller
         $ret = [
             'xtPage' => 'autoedits',
             'xtTitle' => $username,
-            'username' => $username,
-            'projectUrl' => $projectUrl,
-            'project' => $project,
+            'user' => $user,
+            'project' => $projectData,
             'semi_automated' => $results,
             'total_semi' => $total_semi,
             'total' => $total,

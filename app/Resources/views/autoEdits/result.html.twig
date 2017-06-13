@@ -1,28 +1,29 @@
 {% extends 'base.html.twig' %}
 {% import 'macros/layout.html.twig' as layout %}
 {% import 'macros/pieChart.html.twig' as chart %}
+{% import 'macros/wiki.html.twig' as wiki %}
 
 {% block body %}
 <div class="panel panel-primary">
     <header class="panel-heading">
         <div class="text-center xt-heading-top">
-            <a class="back-to-search" href="{{ path("autoedits") }}"">
+            <a class="back-to-search" href="{{ path('autoedits') }}">
             <span class="glyphicon glyphicon-chevron-left"></span>
             {{ msg('back') }}
             </a>
-            {{ user_link(username, projectUrl) }} &middot; {{ project }}
+            {{ wiki.userLink(user, project) }} &middot; {{ project.domain }}
         </div>
     </header>
     <div class="panel-body xt-panel-body">
         <p class="text-center xt-heading-subtitle">
-            {{ user_log_link(username, projectUrl, msg('block-log'), 'block') }}
+            {{ wiki.userLogLink(user, project, msg('block-log'), 'block') }}
             {% if isWMFLabs() %}
                 &middot;
-                <a href="//tools.wmflabs.org/guc/?user={{ username }}" target="_blank">{{ msg('global-contribs') }}</a>
+                <a href="//tools.wmflabs.org/guc/?user={{ user.username }}" target="_blank">{{ msg('global-contribs') }}</a>
             {% endif %}
             {% if not(isSingleWiki()) %}
                 &middot;
-                {{ wiki_link('Special:CentralAuth/'~username, projectUrl, 'CentralAuth') }}
+                {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, 'CentralAuth') }}
             {% endif %}
         </p>
 
@@ -112,7 +113,7 @@
                                 <span class="glyphicon glyphicon-remove"></span>
                                 <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
                             </span>
-                            {{ wiki_link(values.link, projectUrl, tool) }}
+                            {{ wiki.pageLinkRaw(values.link, project, tool) }}
                         </td>
                         <td class="sort-entry--count" data-value="{{ values.count }}">
                             {{ values.count|number_format(0, ".", ",") }}
@@ -170,7 +171,7 @@
         {% set content %}
             <div>
                 <em class="non-auto-edits-loading text-muted">{{ msg('loading') }}...</em>
-                <div class="non-auto-edits-container" data-username="{{ username }}"></div>
+                <div class="non-auto-edits-container" data-username="{{ user.username }}"></div>
             </div>
         {% endset %}
         {{ layout.content_block('non-auto-edits', content) }}
