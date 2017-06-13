@@ -241,6 +241,24 @@ class ProjectRepository extends Repository
     }
 
     /**
+     * Get a page from the given Project.
+     * @param Project $project The project.
+     * @param string $pageName The name of the page.
+     * @return Page
+     */
+    public function getPage(Project $project, $pageName)
+    {
+        $pageRepo = new PagesRepository();
+        if (!$this->container) {
+            dump($project);exit();
+        }
+        $pageRepo->setContainer($this->container);
+        $page = new Page($project, $pageName);
+        $page->setRepository($pageRepo);
+        return $page;
+    }
+
+    /**
      * Check to see if a page exists on this project and has some content.
      * @param int $namespaceId The page namespace ID.
      * @param string $pageTitle The page title, without namespace,

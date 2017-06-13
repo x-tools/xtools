@@ -9,32 +9,34 @@
             <th>{{ msg('ec-latestglobal-project') }}</th>
             <th>{{ msg('ec-latestglobal-actions') }}</th>
             <th>{{ msg('ec-latestglobal-page') }}</th>
+            <th>{{ msg('size') }}</th>
             <th>{{ msg('ec-latestglobal-comment') }}</th>
         </tr>
     </thead>
     <tbody>
-    {% for rev in ec.globalEdits(40) %}
+    {% for edit in ec.globalEdits(40) %}
         <tr>
-            <td class="tddate">{{ rev.timestamp|date('Y-m-d H:i') }}</td>
-            <td class="tdgeneral"><a href="{{ rev.project.url }}">{{ rev.project.title }}</a></td>
+            <td class="tddate">{{ edit.timestamp.format('Y-m-d H:i') }}</td>
+            <td class="tdgeneral"><a href="{{ edit.project.url }}">{{ edit.project.title }}</a></td>
             <td class="text-nowrap">(
-                {{ diff_link(rev.rev_id, rev.project.url, 'diff') }}
-                &middot; {{ user_log_link(user.username, rev.project.url, 'log') }}
+                {{ diff_link(edit.id, edit.project.url, 'diff') }}
+                &middot; {{ user_log_link(user.username, edit.project.url, 'log') }}
                 &middot;
-                <a href="{{ path('TopEditsResults', {project:rev.project.databaseName, username:user.username, namespace:rev.page_namespace, article:rev.page_title}) }}">
+                <a href="{{ path('TopEditsResults', {project:edit.project.databaseName, username:user.username, namespace:edit.page.namespace, article:edit.page.title}) }}">
                     topedits
                 </a>
                 )
             </td>
             <td class="tdgeneral">
-                {% if rev.page_namespace != 0 %}
-                    {% set qualified_name = attribute(rev.project.namespaces, rev.page_namespace)~':'~rev.page_title %}
+                {% if edit.page.namespace != 0 %}
+                    {% set qualified_name = attribute(edit.project.namespaces, edit.page.namespace)~':'~edit.page.title %}
                 {% else %}
-                    {% set qualified_name = rev.page_title %}
+                    {% set qualified_name = edit.page.title %}
                 {% endif %}
-                {{ wiki_link(qualified_name, rev.project.url) }}
+                {{ wiki_link(qualified_name, edit.project.url, edit.page.displayTitle) }}
             </td>
-            <td class="tdrevtext">{{ rev.rev_comment }}</td>
+            <td class="tdnum">{{ edit.lengthChange|diff_format }}</td>
+            <td class="tdrevtext">{{ edit.comment }}</td>
         </tr>
     {% endfor %}
     </tbody>

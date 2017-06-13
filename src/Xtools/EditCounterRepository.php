@@ -399,7 +399,7 @@ class EditCounterRepository extends Repository
      * @param DateTime $oldest
      * @return array|mixed
      */
-    public function getRevisions(Project $project, User $user, $oldest = null)
+    public function getRevisions(Project $project, User $user, DateTime $oldest = null, $lim = null)
     {
         $username = $user->getUsername();
         $cacheKey = "globalcontribs.{$project->getDatabaseName()}.$username";
@@ -410,14 +410,30 @@ class EditCounterRepository extends Repository
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
         $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
         $whereTimestamp = ($oldest instanceof DateTime)
-            ? ' AND rev_timestamp > '.$oldest->getTimestamp()
+            ? ' AND revs.rev_timestamp > '.$oldest->format('YmdHis')
             : '';
-        $sql = "SELECT rev_id, rev_timestamp, UNIX_TIMESTAMP(rev_timestamp) AS unix_timestamp, "
-            ." rev_minor_edit, rev_deleted, rev_len, rev_parent_id, rev_comment, "
-            ." page_title, page_namespace "
-            ."FROM $revisionTable JOIN $pageTable ON (rev_page = page_id)"
-            ." WHERE rev_user_text LIKE :username $whereTimestamp"
-            ." ORDER BY rev_timestamp DESC";
+        // Column aliases here should match those used in PagesRepository::getRevisions()
+        $sql = "SELECT
+                revs.rev_id AS id,
+                revs.rev_timestamp AS timestamp,
+                UNIX_TIMESTAMP(revs.rev_timestamp) AS unix_timestamp,
+                revs.rev_minor_edit AS minor,
+                revs.rev_deleted AS deleted,
+                revs.rev_len AS length,
+                (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
+                revs.rev_parent_id AS parent_id,
+                revs.rev_comment AS comment,
+                revs.rev_user_text AS username,
+                page.page_title,
+                page.page_namespace
+            FROM $revisionTable AS revs
+                JOIN $pageTable AS page ON (rev_page = page_id)
+                LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+            WHERE revs.rev_user_text LIKE :username $whereTimestamp
+            ORDER BY revs.rev_timestamp DESC";
+        if (is_numeric($lim)) {
+            $sql .= " LIMIT $lim";
+        }
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $resultQuery->bindParam(":username", $username);
         $resultQuery->execute();

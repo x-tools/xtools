@@ -512,41 +512,43 @@ class EditCounter extends Model
 
     /**
      * Get the most recent n revisions across all projects.
-     * @param int $max
+     * @param int $max The maximum number of revisions to return.
      * @return Edit[]
      */
     public function globalEdits($max) {
-        // Go through each project that has any edits.
+        // Store the top n Edits.
         $globalRevisions = [];
+        // Only look for revisions newer than this.
         $oldest = null;
-
         foreach ($this->globalEditCounts() as $editCount) {
             // Don't query revisions if there aren't any.
             if ($editCount['total'] == 0) {
                 continue;
             }
-            dump($editCount);
 
             // Get this project's revisions.
             $revisions = $this->getRepository()
-                ->getRevisions($editCount['project'], $this->user, $oldest);
+                ->getRevisions($editCount['project'], $this->user, $oldest, $max);
             foreach ($revisions as &$revision) {
-                $revision['project'] = $editCount['project'];
-                $revision['timestamp'] = DateTime::createFromFormat('U', $revision['unix_timestamp']);
+                //$page = new Page($editCount['project'], $revision['page_title']);
+                $page = $this->project->getRepository()->getPage($this->project, $revision['page_title']);
+                //$page->setRepository(new PagesRepository());
+                $edit = new Edit($page, $revision);
+
                 // If we've already got enough, only check for those newer than the current oldest.
-                $enough = (count($globalRevisions) >= $max);
-                $isOlder = ($oldest === null
-                            || ($oldest !== null && $revision['unix_timestamp'] < $oldest));
-                if ($enough && $isOlder) {
-                    $oldest = $revision['unix_timestamp'];
+                $haveEnough = (count($globalRevisions) >= $max);
+                $thisIsOlder = ($oldest === null
+                    || ($oldest !== null && $edit->getTimestamp() < $oldest));
+                if ($haveEnough && $thisIsOlder) {
+                    // Use this as the new oldest time.
+                    $oldest = $edit->getTimestamp(); //$revision['unix_timestamp'];
                 }
-                $globalRevisions[$revision['unix_timestamp']] = $revision;
+                $globalRevisions[$edit->getTimestamp()->getTimestamp().'-'.$edit->getId()] = $edit;
             }
             // Sort and prune, before adding more.
             krsort($globalRevisions);
             $globalRevisions = array_slice($globalRevisions, 0, $max);
         }
-        dump($globalRevisions);exit();
         return $globalRevisions;
     }
 }
