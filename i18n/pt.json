@@ -76,7 +76,6 @@
   "neutral": "Neutros",
   "no-contribs": "Não foram encontradas contribuições",
   "no-exist": "$1 não existe",
-  "no-follow-redir": "Não incluir redirecionamentos",
   "no-graph": "O(a) utilizador(a) ainda não ativou. Se pretende ter acesso aos gráficos, por favor crie $1 com qualquer conteúdo ou crie $2 para ativar em todas as wikis da Wikimedia.",
   "no-graph-alt": "Alternativamente, poderá iniciar sessão com o Wikimedia OAuth (ver também $1). Dessa forma, e de forma exclusiva, poderá consultar mais detalhes dos resultados.",
   "no-result": "Não foram encontrados resultados para: $1",

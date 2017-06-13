@@ -75,7 +75,6 @@
   "neutral": "Nøytral",
   "no-contribs": "Ingen bidrag funnet",
   "no-exist": "$1 eksisterer ikke enda",
-  "no-follow-redir": "Ikke følg omdirigeringer",
   "no-graph": "Brukeren har ikke samtykket til at detaljert statistikk kan vises. For å samtykke, opprett $1 med valgfritt innehold eller opprett $2 for å gi samtykke for alle Wikimedia-wikier.",
   "no-graph-alt": "Alternativt kan du logge inn med Wikimedia OAuth (see also $1). De detaljerte resultatene vil da bare bli synlige for deg.",
   "no-result": "Ingen treff for: $1",

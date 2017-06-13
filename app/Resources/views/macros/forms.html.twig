@@ -27,12 +27,6 @@
         {{ msg('page-title') }}
     </label>
     <input type="text" class="form-control" name="article" id="article_input"{% if required %} required{% endif %}>
-    <span class="input-group-addon">
-        <label>
-            <input type="checkbox" name="nofollowredir" />
-            {{ msg('no-follow-redir') }}
-        </label>
-    </span>
 </div>
 {% endmacro %}
 

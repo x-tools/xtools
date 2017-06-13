@@ -71,7 +71,6 @@
   "neutral": "Neutral",
   "no-contribs": "Ingen bidrag fundet",
   "no-exist": "$1 findes ikke",
-  "no-follow-redir": "Følg ikke omdirigeringer",
   "no-graph": "Brugeren har endnu ikke tilmeldt sig denne funktion. Hvis du ønsker at se graferne, skal du oprette $1 med noget indhold eller oprette  $2  at tilmelde dig på tværs af alle Wikimedias wikier.",
   "no-graph-alt": "Alternativt kan du logge ind med Wikimedia OAuth (se også $1). På den måde er det kun dig, der kan se de mere detaljerede oplysninger.",
   "no-result": "Ingen matchende resultater for: $1",

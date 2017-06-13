@@ -110,7 +110,7 @@ parameters:
         link: User:Kephir/gadgets/sagittarius
     Redirect:
         regex: '\[\[WP:AES\|←\]\]Redirected page to \[\[.*?\]\]'
-        link: Project:AES
+        link: Project:Redirect
     Dashes:
         regex: 'using a \[\[User:GregU\/dashes.js\|script'
         link: User:GregU/dashes

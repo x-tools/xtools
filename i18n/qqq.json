@@ -127,7 +127,6 @@
   "next": "Text for link that shows the next page of contributions by a user.\n{{Identical|Next}}",
   "no-contribs": "Error shown when a user has not contributions.",
   "no-exist": "Error shown when a user or page does not exist. $1 is the user or page",
-  "no-follow-redir": "Form option to not follow redirects",
   "no-graph": "Message shown when full data cannot be provided because the user has not opted-in. $1 and $2 are page links.",
   "no-graph-alt": "Message shown telling the user they can log in to see detailed results for their own account. $1 is the OAuth help link.",
   "no-result": "Error message shown when there were no matching results. $1 is the search term",

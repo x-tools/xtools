@@ -78,7 +78,6 @@
   "neutral": "Neutre",
   "no-contribs": "Aucune contribution trouvée",
   "no-exist": "$1 n'existe pas",
-  "no-follow-redir": "Ne pas suivre les redirections",
   "no-graph": "L’utilisateur n’a pas encore accepté. Si vous voulez voir des graphes, veuillez créer $1 avec un contenu quelconque ou créer $2 pour accepter à travers tous les wikis de Wikimédia.",
   "no-graph-alt": "À la place, vous pouvez vous connecter avec OAuth de Wikimédia (voyez aussi$1). Ainsi, les résultats les plus détaillés vous seront réservés.",
   "no-result": "Aucun résultat correspondant trouvé pour : $1",
