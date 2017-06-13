@@ -165,7 +165,7 @@
   "num-moves": "{{PLURAL:$1|move|moves}}",
   "num-namespaces": "{{PLURAL:$1|namespace|namespaces}}",
   "num-others": "$1 others",
-  "num-protect": "{{PLURAL:$1|protection|protections}}",
+  "num-protections": "{{PLURAL:$1|protection|protections}}",
   "num-revisions": "{{PLURAL:$1|revision|revisions}}",
   "num-seconds": "{{PLURAL:$1|second|seconds}}",
   "num-sitelinks": "{{PLURAL:$1|sitelink|sitelinks}}",

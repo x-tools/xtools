@@ -353,8 +353,22 @@ class ArticleInfoController extends Controller
             if (isset($this->pageInfo['year_count'][$year])) {
                 $yearEvents = $this->pageInfo['year_count'][$year]['events'];
 
-                // count pending-changes protections along with normal protections
-                $action = $event['log_type'] === 'stable' ? 'protect' : $event['log_type'];
+                // Convert log type value to i18n key
+                switch ($event['log_type']) {
+                  case 'protect':
+                    $action = 'protections';
+                    break;
+                  case 'delete':
+                    $action = 'deletions';
+                    break;
+                  case 'move':
+                    $action = 'moves';
+                    break;
+                  // count pending-changes protections along with normal protections
+                  case 'stable':
+                    $action = 'protections';
+                    break;
+                }
 
                 if (empty($yearEvents[$action])) {
                     $yearEvents[$action] = 1;
