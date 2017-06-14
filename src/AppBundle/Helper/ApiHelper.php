@@ -169,7 +169,7 @@ class ApiHelper extends HelperBase
 
     /**
      * Get the given user's globally-applicable groups.
-     * @deprecated Use User::getGlobalGroups() instead. 
+     * @deprecated Use User::getGlobalGroups() instead.
      * @param string $project
      * @param string $username
      * @return string[]

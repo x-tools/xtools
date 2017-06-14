@@ -515,7 +515,8 @@ class EditCounter extends Model
      * @param int $max The maximum number of revisions to return.
      * @return Edit[]
      */
-    public function globalEdits($max) {
+    public function globalEdits($max)
+    {
         // Store the top n Edits.
         $globalRevisions = [];
         // Only look for revisions newer than this.

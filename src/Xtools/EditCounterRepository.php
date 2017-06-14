@@ -11,7 +11,7 @@ use DateTime;
 use Mediawiki\Api\SimpleRequest;
 
 /**
- * An EditCounterRepository is responsible for retrieving edit count information from the 
+ * An EditCounterRepository is responsible for retrieving edit count information from the
  * databases and API. It doesn't do any post-processing of that information.
  */
 class EditCounterRepository extends Repository
@@ -265,7 +265,8 @@ class EditCounterRepository extends Repository
      * @param Project $project The project to start from.
      * @return mixed[] Elements are arrays with 'project' (Project), and 'total' (int).
      */
-    public function globalEditCounts(User $user, Project $project) {
+    public function globalEditCounts(User $user, Project $project)
+    {
         $editCounts = $this->globalEditCountsFromCentralAuth($user, $project);
         if ($editCounts === false) {
             $editCounts = $this->globalEditCountsFromDatabases($user, $project);
@@ -336,7 +337,8 @@ class EditCounterRepository extends Repository
      * @param Project $project The project to start from.
      * @return mixed[] Elements are arrays with 'dbname' (string), and 'total' (int).
      */
-    protected function globalEditCountsFromDatabases(User $user, Project $project) {
+    protected function globalEditCountsFromDatabases(User $user, Project $project)
+    {
         $stopwatchName = 'globalRevisionCounts.'.$user->getUsername();
         $allProjects = $project->getRepository()->getAll();
         $topEditCounts = [];
