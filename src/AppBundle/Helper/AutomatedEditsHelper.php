@@ -1,16 +1,17 @@
 <?php
+/**
+ * This file contains only the AutomatedEditsHelper class.
+ */
 
 namespace AppBundle\Helper;
 
 use DateTime;
-use Doctrine\DBAL\Connection;
-use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Component\Config\Definition\Exception\Exception;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\VarDumper\VarDumper;
 use Xtools\ProjectRepository;
 
+/**
+ * Helper class for getting information about semi-automated edits.
+ */
 class AutomatedEditsHelper extends HelperBase
 {
 
@@ -30,6 +31,10 @@ class AutomatedEditsHelper extends HelperBase
     /** @var string[] The list of tool names and their regexes. */
     protected $tools;
 
+    /**
+     * AutomatedEditsHelper constructor.
+     * @param ContainerInterface $container
+     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;

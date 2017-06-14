@@ -1,11 +1,14 @@
 <?php
+/**
+ * This file contains only the DefaultController class.
+ */
 
 namespace AppBundle\Controller;
 
-use Exception;
 use MediaWiki\OAuthClient\Client;
 use MediaWiki\OAuthClient\ClientConfig;
 use MediaWiki\OAuthClient\Consumer;
+use MediaWiki\OAuthClient\Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -14,13 +17,17 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Xtools\ProjectRepository;
 
+/**
+ * The DefaultController handles the homepage, about pages, and user authentication.
+ */
 class DefaultController extends Controller
 {
 
-    /** @var Client */
+    /** @var Client The Oauth HTTP client. */
     protected $oauthClient;
 
     /**
+     * Display the homepage.
      * @Route("/", name="homepage")
      * @Route("/index.php", name="homepageIndexPhp")
      */
@@ -35,18 +42,19 @@ class DefaultController extends Controller
     }
 
     /**
+     * Diplay XTools' about page.
      * @Route("/about", name="aboutPage")
+     * @Route("/info.php", name="info")
      */
     public function aboutAction()
     {
-
-        // replace this example code with whatever you need
         return $this->render('default/about.html.twig', array(
             'xtPage' => 'index',
         ));
     }
 
     /**
+     * Display some configuration details, when in development mode.
      * @Route("/config", name="configPage")
      */
     public function configAction()
@@ -74,9 +82,12 @@ class DefaultController extends Controller
     }
 
     /**
+     * Redirect to the default project (or Meta) for Oauth authentication.
      * @Route("/login", name="login")
+     * @return RedirectResponse
+     * @throws Exception If initialization fails.
      */
-    public function loginAction(Request $request)
+    public function loginAction()
     {
         try {
             list( $next, $token ) = $this->getOauthClient()->initiate();
@@ -95,7 +106,10 @@ class DefaultController extends Controller
     }
 
     /**
+     * Receive authentication credentials back from the Oauth wiki.
      * @Route("/oauth_callback", name="oauth_callback")
+     * @param Request $request The HTTP request.
+     * @return RedirectResponse
      */
     public function oauthCallbackAction(Request $request)
     {
@@ -150,6 +164,7 @@ class DefaultController extends Controller
     }
 
     /**
+     * Log out the user and return to the homepage.
      * @Route("/logout", name="logout")
      */
     public function logoutAction()

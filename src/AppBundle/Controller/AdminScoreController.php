@@ -1,23 +1,35 @@
 <?php
+/**
+ * This file contains only the AdminScoreController class.
+ */
 
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use DateTime;
 use Xtools\ProjectRepository;
+use Xtools\UserRepository;
 
+/**
+ * The AdminScoreController serves the search form and results page of the AdminScore tool
+ */
 class AdminScoreController extends Controller
 {
     /**
+     * Display the AdminScore search form.
      * @Route("/adminscore", name="adminscore")
      * @Route("/adminscore", name="AdminScore")
      * @Route("/adminscore/", name="AdminScoreSlash")
      * @Route("/adminscore/index.php", name="AdminScoreIndexPhp")
      * @Route("/scottywong tools/adminscore.php", name="AdminScoreLegacy")
      * @Route("/adminscore/{project}", name="AdminScoreProject")
+     * @param Request $request The HTTP request.
+     * @param string $project The project name.
+     * @return Response
      */
     public function indexAction(Request $request, $project = null)
     {
@@ -44,7 +56,11 @@ class AdminScoreController extends Controller
     }
 
     /**
+     * Display the AdminScore results.
      * @Route("/adminscore/{project}/{username}", name="AdminScoreResult")
+     * @param string $project The project name.
+     * @param string $username The username.
+     * @return Response
      */
     public function resultAction($project, $username)
     {
@@ -52,8 +68,6 @@ class AdminScoreController extends Controller
         $lh = $this->get("app.labs_helper");
 
         $lh->checkEnabled("adminscore");
-
-        $username = ucfirst($username);
 
         $projectData = ProjectRepository::getProject($project, $this->container);
 
@@ -127,10 +141,10 @@ class AdminScoreController extends Controller
         SELECT 'aiv' AS source, COUNT(*) AS value FROM $revisionTable
             WHERE rev_page LIKE 'Administrator intervention against vandalism%' AND rev_user_text=:username
         UNION
-        SELECT 'edit-summaries' AS source, COUNT(*) AS value FROM $revisionTable JOIN page ON rev_page=page_id
+        SELECT 'edit-summaries' AS source, COUNT(*) AS value FROM $revisionTable JOIN $pageTable ON rev_page=page_id
             WHERE page_namespace=0 AND rev_user_text=:username
         UNION
-        SELECT 'namespaces' AS source, count(*) AS value FROM $revisionTable JOIN page ON rev_page=page_id
+        SELECT 'namespaces' AS source, count(*) AS value FROM $revisionTable JOIN $pageTable ON rev_page=page_id
             WHERE rev_user_text=:username AND page_namespace=0
         UNION
         SELECT 'pages-created-live' AS source, COUNT(*) AS value FROM $revisionTable
@@ -143,6 +157,8 @@ class AdminScoreController extends Controller
             WHERE rev_page LIKE 'Requests_for_page_protection%' AND rev_user_text=:username
         ");
 
+        $user = UserRepository::getUser($username, $this->container);
+        $username = $user->getUsername();
         $resultQuery->bindParam("username", $username);
         $resultQuery->execute();
 

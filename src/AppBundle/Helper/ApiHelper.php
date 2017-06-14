@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file contains only the ApiHelper class.
+ */
 
 namespace AppBundle\Helper;
 

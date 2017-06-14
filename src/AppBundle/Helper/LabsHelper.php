@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file contains only the LabsHelper class.
+ */
 
 namespace AppBundle\Helper;
 

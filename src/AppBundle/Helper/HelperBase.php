@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file contains only the HelperBase class.
+ */
 
 namespace AppBundle\Helper;
 
