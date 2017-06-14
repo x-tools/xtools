@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file contains only the EditCounterRepository class.
+ */
 
 namespace Xtools;
 
@@ -6,15 +9,17 @@ use AppBundle\Helper\AutomatedEditsHelper;
 use DateInterval;
 use DateTime;
 use Mediawiki\Api\SimpleRequest;
-use Mediawiki\Api\UsageException;
-use MediaWiki\OAuthClient\Exception;
-use Symfony\Component\VarDumper\VarDumper;
 
+/**
+ * An EditCounterRepository is responsible for retrieving edit count information from the 
+ * databases and API. It doesn't do any post-processing of that information.
+ */
 class EditCounterRepository extends Repository
 {
 
     /**
      * Get revision counts for the given user.
+     * @param Project $project The project.
      * @param User $user The user.
      * @returns string[] With keys: 'deleted', 'live', 'total', 'first', 'last', '24h', '7d', '30d',
      * '365d', 'small', 'large', 'with_comments', and 'minor_edits'.
@@ -78,6 +83,8 @@ class EditCounterRepository extends Repository
 
     /**
      * Get the first and last revision dates (in MySQL YYYYMMDDHHMMSS format).
+     * @param Project $project The project.
+     * @param User $user The user.
      * @return string[] With keys 'first' and 'last'.
      */
     public function getRevisionDates(Project $project, User $user)
@@ -250,15 +257,12 @@ class EditCounterRepository extends Repository
         return $logCounts;
     }
 
-    /*
+    /**
      * Get a user's total edit count on all projects.
-     *
      * @see EditCounterRepository::globalEditCountsFromCentralAuth()
      * @see EditCounterRepository::globalEditCountsFromDatabases()
-     *
-     * @param string $username The username.
+     * @param User $user The user.
      * @param Project $project The project to start from.
-     *
      * @return mixed[] Elements are arrays with 'project' (Project), and 'total' (int).
      */
     public function globalEditCounts(User $user, Project $project) {
@@ -328,6 +332,8 @@ class EditCounterRepository extends Repository
     /**
      * Get total edit counts from all projects for this user.
      * @see EditCounterRepository::globalEditCountsFromCentralAuth()
+     * @param User $user The user.
+     * @param Project $project The project to start from.
      * @return mixed[] Elements are arrays with 'dbname' (string), and 'total' (int).
      */
     protected function globalEditCountsFromDatabases(User $user, Project $project) {
@@ -394,9 +400,10 @@ class EditCounterRepository extends Repository
 
     /**
      * Get revisions by this user.
-     * @param Project $project
-     * @param User $user
-     * @param DateTime $oldest
+     * @param Project $project The project.
+     * @param User $user The user.
+     * @param DateTime $oldest The oldest revision time of interest (only return greater than this).
+     * @param int $lim The number of results to return.
      * @return array|mixed
      */
     public function getRevisions(Project $project, User $user, DateTime $oldest = null, $lim = null)
@@ -451,7 +458,8 @@ class EditCounterRepository extends Repository
 
     /**
      * Get data for a bar chart of monthly edit totals per namespace.
-     * @param string $username The username.
+     * @param Project $project The project.
+     * @param User $user The user.
      * @return string[]
      */
     public function getMonthCounts(Project $project, User $user)
@@ -491,8 +499,8 @@ class EditCounterRepository extends Repository
 
     /**
      * Get yearly edit totals for this user, grouped by namespace.
-     * @param Project $project
-     * @param User $user
+     * @param Project $project The project.
+     * @param User $user The user.
      * @return string[] ['<namespace>' => ['<year>' => 'total', ... ], ... ]
      */
     public function getYearCounts(Project $project, User $user)
@@ -578,6 +586,7 @@ class EditCounterRepository extends Repository
     /**
      * Get a summary of automated edits made by the given user in their last 1000 edits.
      * Will cache the result for 10 minutes.
+     * @param Project $project The project.
      * @param User $user The user.
      * @return integer[] Array of edit counts, keyed by all tool names from
      * app/config/semi_automated.yml

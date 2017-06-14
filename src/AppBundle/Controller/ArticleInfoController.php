@@ -1,4 +1,8 @@
 <?php
+/**
+ * This file contains only the ArticleInfoController class.
+ */
+
 
 namespace AppBundle\Controller;
 

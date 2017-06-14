@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file contains only the User class.
+ */
 
 namespace Xtools;
 

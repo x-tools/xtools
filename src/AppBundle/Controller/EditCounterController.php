@@ -23,13 +23,13 @@ use Xtools\UserRepository;
 class EditCounterController extends Controller
 {
 
-    /** @var User */
+    /** @var User The user being queried. */
     protected $user;
     
-    /** @var Project */
+    /** @var Project The project being queried. */
     protected $project;
     
-    /** @var EditCounter */
+    /** @var EditCounter The edit-counter, that does all the work. */
     protected $editCounter;
 
     /**
@@ -97,6 +97,7 @@ class EditCounterController extends Controller
     }
 
     /**
+     * Display all results.
      * @Route("/ec/{project}/{username}", name="EditCounterResult")
      * @param Request $request
      * @param string $project
@@ -120,6 +121,7 @@ class EditCounterController extends Controller
     }
 
     /**
+     * Display the general statistics section.
      * @Route("/ec-generalstats/{project}/{username}", name="EditCounterGeneralStats")
      * @param string $project
      * @param string $username
@@ -140,6 +142,7 @@ class EditCounterController extends Controller
     }
 
     /**
+     * Display the namespace totals section.
      * @Route("/ec-namespacetotals/{project}/{username}", name="EditCounterNamespaceTotals")
      * @param string $project
      * @param string $username
@@ -161,6 +164,7 @@ class EditCounterController extends Controller
     }
 
     /**
+     * Display the timecard section.
      * @Route("/ec-timecard/{project}/{username}", name="EditCounterTimeCard")
      * @param string $project
      * @param string $username
@@ -188,6 +192,7 @@ class EditCounterController extends Controller
     }
 
     /**
+     * Display the year counts section.
      * @Route("/ec-yearcounts/{project}/{username}", name="EditCounterYearCounts")
      * @param string $project
      * @param string $username
@@ -212,6 +217,7 @@ class EditCounterController extends Controller
     }
 
     /**
+     * Display the month counts section.
      * @Route("/ec-monthcounts/{project}/{username}", name="EditCounterMonthCounts")
      * @param string $project
      * @param string $username
@@ -233,6 +239,7 @@ class EditCounterController extends Controller
     }
 
     /**
+     * Display the latest global edits section.
      * @Route("/ec-latestglobal/{project}/{username}", name="EditCounterLatestGlobal")
      * @param string $project
      * @param string $username

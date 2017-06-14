@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdoc>
+    <title>XTools</title>
+    <parser>
+        <target>docs/api</target>
+    </parser>
+    <transformer>
+        <target>docs/api</target>
+    </transformer>
+    <files>
+        <directory>src</directory>
+        <directory>tests</directory>
+    </files>
+    <transformations>
+        <template name="clean" />
+    </transformations>
+</phpdoc>

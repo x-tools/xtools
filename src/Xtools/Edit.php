@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file contains only the Edit class.
+ */
 
 namespace Xtools;
 
@@ -56,6 +59,7 @@ class Edit extends Model
     }
 
     /**
+     * Get the page to which this edit belongs.
      * @return Page
      */
     public function getPage()
@@ -64,7 +68,8 @@ class Edit extends Model
     }
 
     /**
-     * @return int ID of the revision
+     * ID of the edit.
+     * @return int
      */
     public function getId()
     {
@@ -72,7 +77,8 @@ class Edit extends Model
     }
 
     /**
-     * @return DateTime Timestamp fo the revision
+     * Get the edit's timestamp.
+     * @return DateTime
      */
     public function getTimestamp()
     {
@@ -80,7 +86,8 @@ class Edit extends Model
     }
 
     /**
-     * @return string Year the revision was made
+     * Year the revision was made.
+     * @return string
      */
     public function getYear()
     {
@@ -88,8 +95,8 @@ class Edit extends Model
     }
 
     /**
-     * @return string Numeric representation of the month
-     *                the revision was made, with leading zeros
+     * Get the numeric representation of the month the revision was made, with leading zeros.
+     * @return string
      */
     public function getMonth()
     {
@@ -97,7 +104,8 @@ class Edit extends Model
     }
 
     /**
-     * @return bool Whether or not this edit was a minor edit
+     * Whether or not this edit was a minor edit.
+     * @return bool
      */
     public function getMinor()
     {
@@ -114,7 +122,9 @@ class Edit extends Model
     }
 
     /**
-     * @return int Length of the page as of this edit, in bytes
+     * Length of the page as of this edit, in bytes.
+     * @see Edit::getSize() Edit::getSize() for the size <em>change</em>.
+     * @return int
      */
     public function getLength()
     {
@@ -122,7 +132,8 @@ class Edit extends Model
     }
 
     /**
-     * @return int The diff size of this edit
+     * The diff size of this edit.
+     * @return int Signed length change in bytes.
      */
     public function getSize()
     {
@@ -139,7 +150,8 @@ class Edit extends Model
     }
 
     /**
-     * @return User - User object of who made the edit
+     * Get the user who made the edit.
+     * @return User
      */
     public function getUser()
     {
@@ -147,7 +159,8 @@ class Edit extends Model
     }
 
     /**
-     * @return string The edit summary
+     * Get the edit summary.
+     * @return string
      */
     public function getComment()
     {
@@ -155,8 +168,8 @@ class Edit extends Model
     }
 
     /**
-     * Alias of getComment()
-     * @return string The edit summary
+     * Get the edit summary (alias of Edit::getComment()).
+     * @return string
      */
     public function getSummary()
     {
