@@ -10,7 +10,7 @@
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {{ msg('back') }}
             </a>
-            <a target="_blank" href="{{ project.url }}">{{ project.domain }}</a>
+            <a target="_blank" href="{{ project.url }}">{{ project.title }}</a>
             <small>
                 &bull;
                 {{ start_date }}
@@ -75,7 +75,7 @@
                             <td class="sort-entry--groups" data-value="{{ value.groups }}">{{ value.groups }}</td>
                             <td>
                                 {% if enabled('ec') %}
-                                    <a title="{{ msg('tool-ec') }}" href="{{ link("/ec/"~project.domain~"/"~username) }}" >ec</a>
+                                    <a title="{{ msg('tool-ec') }}" href="{{ path('EditCounterResult', {project: project.domain, username: username}) }}" >ec</a>
                                     &middot;
                                 {% endif %}
                                 {% if isWMFLabs() %}

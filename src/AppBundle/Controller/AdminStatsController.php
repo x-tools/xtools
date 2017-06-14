@@ -114,11 +114,12 @@ class AdminStatsController extends Controller
      */
     public function resultAction($project, $start = null, $end = null)
     {
-        if ($start == null) {
+        $start = trim($start);
+        if (empty($start)) {
             $start = date("Y-m-d", strtotime("-1 month"));
         }
-
-        if ($end == null) {
+        $end = trim($end);
+        if (empty($end)) {
             $end = date("Y-m-d");
         }
         // Start by validating the dates.  If the dates are invalid, we'll redirect
