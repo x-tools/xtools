@@ -28,12 +28,12 @@
                 )
             </td>
             <td class="tdgeneral">
-                {% if edit.page.namespace != 0 %}
-                    {% set qualified_name = attribute(edit.project.namespaces, edit.page.namespace)~':'~edit.page.title %}
-                {% else %}
-                    {% set qualified_name = edit.page.title %}
-                {% endif %}
-                {{ wiki_link(qualified_name, edit.project.url, edit.page.displayTitle) }}
+                {#{% if edit.page.namespace != 0 %}#}
+                    {#{% set qualified_name = attribute(edit.project.namespaces, edit.page.namespace)~':'~edit.page.title %}#}
+                {#{% else %}#}
+                    {#{% set qualified_name = edit.page.title %}#}
+                {#{% endif %}#}
+                {{ wiki_link(edit.page.title, edit.project.url, edit.page.displayTitle) }}
             </td>
             <td class="tdnum">{{ edit.lengthChange|diff_format }}</td>
             <td class="tdrevtext">{{ edit.comment }}</td>

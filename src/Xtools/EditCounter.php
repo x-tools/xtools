@@ -527,13 +527,14 @@ class EditCounter extends Model
                 continue;
             }
 
-            // Get this project's revisions.
+            /** @var Project $otherProject */
+            $otherProject = $editCount['project'];
             $revisions = $this->getRepository()
-                ->getRevisions($editCount['project'], $this->user, $oldest, $max);
+                ->getRevisions($otherProject, $this->user, $oldest, $max);
             foreach ($revisions as &$revision) {
-                //$page = new Page($editCount['project'], $revision['page_title']);
-                $page = $this->project->getRepository()->getPage($this->project, $revision['page_title']);
-                //$page->setRepository(new PagesRepository());
+                $nsName = $otherProject->getNamespaces()[$revision['page_namespace']];
+                $page = $otherProject->getRepository()
+                    ->getPage($otherProject, $nsName . ':' . $revision['page_title']);
                 $edit = new Edit($page, $revision);
 
                 // If we've already got enough, only check for those newer than the current oldest.
