@@ -1,9 +1,15 @@
 <?php
+/**
+ * This file contains only the PageTest class.
+ */
 
-namespace Xtools;
+namespace Tests\Xtools;
 
 use PHPUnit_Framework_TestCase;
 
+/**
+ * Tests for the Page class.
+ */
 class PageTest extends PHPUnit_Framework_TestCase
 {
 

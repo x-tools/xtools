@@ -1,6 +1,6 @@
 <?php
 
-namespace Xtools;
+namespace Tests\Xtools;
 
 class EditCounterTest extends \PHPUnit_Framework_TestCase
 {

@@ -11,10 +11,10 @@ namespace Xtools;
 class User extends Model
 {
 
-    /** @var int */
+    /** @var int The user's ID. */
     protected $id;
 
-    /** @var string */
+    /** @var string The user's username. */
     protected $username;
 
     /**
@@ -47,6 +47,7 @@ class User extends Model
 
     /**
      * Get a list of this user's groups on the given project.
+     * @param Project $project The project.
      * @return string[]
      */
     public function getGroups(Project $project)
@@ -79,6 +80,7 @@ class User extends Model
 
     /**
      * Is this user an Administrator on the given project?
+     * @param Project $project The project.
      * @return bool
      */
     public function isAdmin(Project $project)

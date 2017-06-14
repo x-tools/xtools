@@ -1,6 +1,6 @@
 <?php
 
-namespace Xtools;
+namespace Tests\Xtools;
 
 use PHPUnit_Framework_TestCase;
 

@@ -3,33 +3,36 @@
  * This file contains only the ArticleInfoController class.
  */
 
-
 namespace AppBundle\Controller;
 
-use DateTime;
+use AppBundle\Helper\LabsHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use AppBundle\Helper\Apihelper;
-use AppBundle\Helper\PageviewsHelper;
-use AppBundle\Helper\AutomatedEditsHelper;
+use Symfony\Component\HttpFoundation\Response;
 use Xtools\ProjectRepository;
 use Xtools\Page;
 use Xtools\PagesRepository;
 use Xtools\Edit;
 
+/**
+ * This controller serves the search form and results for the ArticleInfo tool
+ */
 class ArticleInfoController extends Controller
 {
+    /** @var LabsHelper The Labs helper object. */
     private $lh;
+    /** @var string Information about the page in question. */
     private $pageInfo;
+    /** @var Edit[] All edits of the page. */
     private $pageHistory;
+    /** @var string The fully-qualified name of the revision table. */
     private $revisionTable;
 
     /**
-     * Override method to call #containerInitialized method when container set.
-     * {@inheritdoc}
+     * Override method to call ArticleInfoController::containerInitialized() when container set.
+     * @param ContainerInterface|null $container A ContainerInterface instance or null
      */
     public function setContainer(ContainerInterface $container = null)
     {
@@ -42,7 +45,6 @@ class ArticleInfoController extends Controller
      */
     private function containerInitialized()
     {
-
         $this->lh = $this->get('app.labs_helper');
         $this->lh->checkEnabled('articleinfo');
         $this->conn = $this->getDoctrine()->getManager('replicas')->getConnection();
@@ -51,11 +53,14 @@ class ArticleInfoController extends Controller
     }
 
     /**
+     * The search form.
      * @Route("/articleinfo", name="articleinfo")
      * @Route("/articleinfo", name="articleInfo")
      * @Route("/articleinfo/", name="articleInfoSlash")
      * @Route("/articleinfo/index.php", name="articleInfoIndexPhp")
      * @Route("/articleinfo/{project}", name="ArticleInfoProject")
+     * @param Request $request The HTTP request.
+     * @return Response
      */
     public function indexAction(Request $request)
     {
@@ -83,7 +88,10 @@ class ArticleInfoController extends Controller
     }
 
     /**
+     * Display the results.
      * @Route("/articleinfo/{project}/{article}", name="ArticleInfoResult", requirements={"article"=".+"})
+     * @param Request $request The HTTP request.
+     * @return Response
      */
     public function resultAction(Request $request)
     {
@@ -480,8 +488,8 @@ class ArticleInfoController extends Controller
     }
 
     /**
-     * Get the size of the diff
-     * @param  int $rev The index of the revision within $this->pageHistory
+     * Get the size of the diff.
+     * @param  int $revIndex The index of the revision within $this->pageHistory
      * @return int Size of the diff
      */
     private function getDiffSize($revIndex)

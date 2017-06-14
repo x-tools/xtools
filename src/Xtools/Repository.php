@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file contains only the Repository class.
+ */
 
 namespace Xtools;
 
@@ -16,28 +19,29 @@ use Symfony\Component\Stopwatch\Stopwatch;
 abstract class Repository
 {
 
-    /** @var Container */
+    /** @var Container The application's DI container. */
     protected $container;
 
-    /** @var Connection */
+    /** @var Connection The database connection to the meta database. */
     private $metaConnection;
 
-    /** @var Connection */
+    /** @var Connection The database connection to the projects' databases. */
     private $projectsConnection;
 
-    /** @var Connection */
+    /** @var Connection The database connection to other tools' databases.  */
     private $toolsConnection;
 
-    /** @var CacheItemPoolInterface */
+    /** @var CacheItemPoolInterface The cache. */
     protected $cache;
 
-    /** @var LoggerInterface */
+    /** @var LoggerInterface The log. */
     protected $log;
 
-    /** @var Stopwatch */
+    /** @var Stopwatch The stopwatch for time profiling. */
     protected $stopwatch;
 
     /**
+     * Set the DI container.
      * @param Container $container
      */
     public function setContainer(Container $container)

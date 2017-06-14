@@ -5,30 +5,36 @@
 
 namespace AppBundle\Helper;
 
-use DateInterval;
 use Mediawiki\Api\MediawikiApi;
 use Mediawiki\Api\SimpleRequest;
 use Mediawiki\Api\FluentRequest;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
-use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Xtools\ProjectRepository;
 
+/**
+ * This is a helper for calling the MediaWiki API.
+ */
 class ApiHelper extends HelperBase
 {
-    /** @var MediawikiApi */
+    /** @var MediawikiApi The API object. */
     private $api;
 
-    /** @var LabsHelper */
+    /** @var LabsHelper The Labs helper. */
     private $labsHelper;
 
-    /** @var CacheItemPoolInterface */
+    /** @var CacheItemPoolInterface The cache. */
     protected $cache;
 
-    /** @var ContainerInterface */
+    /** @var ContainerInterface The DI container. */
     protected $container;
 
+    /**
+     * ApiHelper constructor.
+     * @param ContainerInterface $container
+     * @param LabsHelper $labsHelper
+     */
     public function __construct(ContainerInterface $container, LabsHelper $labsHelper)
     {
         $this->container = $container;
@@ -135,6 +141,13 @@ class ApiHelper extends HelperBase
         return $result;
     }
 
+    /**
+     * Get the given user's groups on the given project.
+     * @deprecated Use User::getGroups() instead.
+     * @param string $project
+     * @param string $username
+     * @return string[]
+     */
     public function groups($project, $username)
     {
         $this->setUp($project);
@@ -154,6 +167,13 @@ class ApiHelper extends HelperBase
         return $result;
     }
 
+    /**
+     * Get the given user's globally-applicable groups.
+     * @deprecated Use User::getGlobalGroups() instead. 
+     * @param string $project
+     * @param string $username
+     * @return string[]
+     */
     public function globalGroups($project, $username)
     {
         $this->setUp($project);
@@ -184,6 +204,12 @@ class ApiHelper extends HelperBase
         return $this->getSiteInfo($project)['namespaces'];
     }
 
+    /**
+     * Get a list of administrators for the given project.
+     * @TODO Move to the Project class?
+     * @param string $project
+     * @return string[]
+     */
     public function getAdmins($project)
     {
         $params = [
