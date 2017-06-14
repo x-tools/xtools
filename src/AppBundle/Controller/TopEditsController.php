@@ -81,8 +81,7 @@ class TopEditsController extends Controller
             'xtPageTitle' => 'tool-topedits',
             'xtSubtitle' => 'tool-topedits-desc',
             'xtPage' => 'topedits',
-            'domain' => $domain,
-            'namespaces' => $namespaces,
+            'project' => $project,
         ]);
     }
 

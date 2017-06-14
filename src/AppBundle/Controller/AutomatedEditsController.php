@@ -91,7 +91,7 @@ class AutomatedEditsController extends Controller
             'xtPageTitle' => 'tool-autoedits',
             'xtSubtitle' => 'tool-autoedits-desc',
             'xtPage' => 'autoedits',
-            'project' => $project,
+            'project' => $projectData,
             'namespaces' => $namespaces,
         ]);
     }

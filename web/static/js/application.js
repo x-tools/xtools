@@ -1,6 +1,6 @@
 (function () {
     var sortDirection, sortColumn, $tocClone, tocHeight, sectionOffset = {},
-        toggleTableData;
+        toggleTableData, apiPath;
 
     // Load translations with 'en.json' as a fallback
     var messagesToLoad = {};
@@ -25,8 +25,8 @@
         });
 
         setupColumnSorting();
-
         setupTOC();
+        setupAutocompletion();
 
         // if applicable, setup namespace selector with real time updates when changing projects
         if ($('#project_input').length && $('#namespace_select').length) {
@@ -296,24 +296,30 @@
 
             var newProject = this.value;
 
-            $.get(xtBaseUrl + 'api/namespaces/' + newProject).done(function (namespaces) {
+            $.get(xtBaseUrl + 'api/namespaces/' + newProject).done(function (data) {
                 // Clone the 'all' option (even if there isn't one),
                 // and replace the current option list with this.
                 var $allOption = $('#namespace_select option[value="all"]').eq(0).clone();
                 $("#namespace_select").html($allOption);
+
+                // Keep track of project API path for use in page title autocompletion
+                apiPath = data.api;
+
                 // Add all of the new namespace options.
-                for (var ns in namespaces) {
+                for (var ns in data.namespaces) {
                     $('#namespace_select').append(
-                        "<option value=" + ns + ">" + namespaces[ns] + "</option>"
+                        "<option value=" + ns + ">" + data.namespaces[ns] + "</option>"
                     );
                 }
                 // Default to mainspace being selected.
                 $("#namespace_select").val(0);
                 lastProject = newProject;
+
+                // Re-init autocompletion
+                setupAutocompletion();
             }).fail(function () {
                 // revert back to last valid project
                 $('#project_input').val(lastProject);
-                // FIXME: i18n
                 $('.site-notice').append(
                     "<div class='alert alert-warning alert-dismissible' role='alert'>" +
                         $.i18n('invalid-project', "<strong>" + newProject + "</strong>") +
@@ -326,6 +332,48 @@
                 $('#namespace_select').prop('disabled', false);
                 $loader.addClass('hidden');
             });
+        });
+    }
+
+    /**
+     * Setup autocompletion of pages if a page input field is present
+     */
+    function setupAutocompletion()
+    {
+        var $articleInput = $('#article_input');
+
+        if ($articleInput.data('typeahead')) {
+            $articleInput.data('typeahead').destroy();
+        }
+
+        // Make sure project and page title fields are present
+        if (!$articleInput[0] || !$('#project_input')[0]) {
+            return;
+        }
+
+        // set initial value for the API url, which is put as a data attribute in forms.html.twig
+        apiPath = $('#article_input').data('api');
+
+        $articleInput.typeahead({
+            ajax: {
+                url: apiPath,
+                timeout: 200,
+                triggerLength: 1,
+                method: 'get',
+                preDispatch: function (query) {
+                    return {
+                        action: 'query',
+                        list: 'prefixsearch',
+                        format: 'json',
+                        pssearch: query
+                    };
+                },
+                preProcess: function (data) {
+                    return data.query.prefixsearch.map(function (elem) {
+                        return elem.title;
+                    });
+                }
+            }
         });
     }
 })();

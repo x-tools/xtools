@@ -168,7 +168,7 @@ class ProjectRepository extends Repository
         if ($this->metadata) {
             return $this->metadata;
         }
-        
+
         $api = MediawikiApi::newFromPage($projectUrl);
 
         $params = ['meta' => 'siteinfo', 'siprop' => 'general|namespaces'];
@@ -238,6 +238,16 @@ class ProjectRepository extends Repository
     {
         $optedIn = $this->container->getParameter('opted_in');
         return $optedIn;
+    }
+
+    /**
+     * The path to api.php
+     *
+     * @return string
+     */
+    public function getApiPath()
+    {
+        return $this->container->getParameter('api_path');
     }
 
     /**

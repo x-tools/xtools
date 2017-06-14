@@ -1,4 +1,4 @@
-{% macro wiki_input(project) %}
+{% macro wiki_input(project = null) %}
 <div class="input-group{% if isSingleWiki() %} hidden{% endif %} form-row">
     <label class="input-group-addon form-label" for="project_input">
         {{ msg('project') }}
@@ -11,7 +11,7 @@
         </div>
     </label>
     <input type="text" class="form-control"
-        {% if (project is defined) and (project != "") %}value="{{ project }}"
+        {% if project is not null %}value="{{ project.domain }}"
         {% elseif isSingleWiki() %}value="wiki"
         {% endif %}
         name="project"
@@ -21,12 +21,14 @@
 </div>
 {% endmacro %}
 
-{% macro page_input(required = true) %}
+{% macro page_input(required = true, project = null) %}
 <div class="input-group form-row">
     <label class="input-group-addon form-label" for="article_input">
         {{ msg('page-title') }}
     </label>
-    <input type="text" class="form-control" name="article" id="article_input"{% if required %} required{% endif %}>
+    <input type="text" class="form-control" autocomplete="off"
+           name="article" id="article_input"{% if required %} required{% endif %}
+           {% if project is not null %}data-api="{{ project.apiUrl }}"{% endif %}>
 </div>
 {% endmacro %}
 
@@ -49,7 +51,7 @@
 </div>
 {% endmacro %}
 
-{% macro namespace_select(namespaces, allOption = false, value = 0) %}
+{% macro namespace_select(project, allOption = false, value = 0) %}
 <div class="input-group form-row">
     <label class="input-group-addon form-label" for="namespace_select">
         {{ msg('namespace') }}
@@ -60,7 +62,7 @@
                 {{ msg('all') | capitalize_first }}
             </option>
         {% endif %}
-        {% for id, name in namespaces %}
+        {% for id, name in project.namespaces %}
             <option value="{{ id }}" {% if value is same as(id) %}selected="selected"{% endif %}>
                 {{ name }}
             </option>

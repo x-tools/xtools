@@ -78,7 +78,7 @@ class PagesController extends Controller
             'xtPageTitle' => 'tool-pages',
             'xtSubtitle' => 'tool-pages-desc',
             'xtPage' => 'pages',
-            'project' => $project,
+            'project' => $projectData,
             'namespaces' => $namespaces,
         ]);
     }

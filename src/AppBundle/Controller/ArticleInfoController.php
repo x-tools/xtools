@@ -53,7 +53,7 @@ class ArticleInfoController extends Controller
      * @Route("/articleinfo/index.php", name="articleInfoIndexPhp")
      * @Route("/articleinfo/{project}", name="ArticleInfoProject")
      */
-    public function indexAction(Request $request, $project = null)
+    public function indexAction(Request $request)
     {
         $projectQuery = $request->query->get('project');
         $article = $request->query->get('article');
@@ -63,6 +63,12 @@ class ArticleInfoController extends Controller
         } elseif ($article != '') {
             return $this->redirectToRoute('ArticleInfoProject', [ 'project'=>$projectQuery ]);
         }
+
+        if ($projectQuery == '') {
+            $projectQuery = $this->container->getParameter('default_project');
+        }
+
+        $project = ProjectRepository::getProject($projectQuery, $this->container);
 
         return $this->render('articleInfo/index.html.twig', [
             'xtPage' => 'articleinfo',
@@ -355,19 +361,19 @@ class ArticleInfoController extends Controller
 
                 // Convert log type value to i18n key
                 switch ($event['log_type']) {
-                  case 'protect':
-                    $action = 'protections';
-                    break;
-                  case 'delete':
-                    $action = 'deletions';
-                    break;
-                  case 'move':
-                    $action = 'moves';
-                    break;
-                  // count pending-changes protections along with normal protections
-                  case 'stable':
-                    $action = 'protections';
-                    break;
+                    case 'protect':
+                        $action = 'protections';
+                        break;
+                    case 'delete':
+                        $action = 'deletions';
+                        break;
+                    case 'move':
+                        $action = 'moves';
+                        break;
+                    // count pending-changes protections along with normal protections
+                    case 'stable':
+                        $action = 'protections';
+                        break;
                 }
 
                 if (empty($yearEvents[$action])) {

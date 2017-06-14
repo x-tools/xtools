@@ -2,8 +2,6 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Helper\ApiHelper;
-use AppBundle\Helper\LabsHelper;
 use AppBundle\Helper\AutomatedEditsHelper;
 use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -14,6 +12,7 @@ use Symfony\Component\Debug\Exception\FatalErrorException;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
+use Xtools\ProjectRepository;
 
 class ApiController extends FOSRestController
 {
@@ -22,21 +21,22 @@ class ApiController extends FOSRestController
      */
     public function namespaces($project)
     {
-        $api = $this->get("app.api_helper");
+        $project = ProjectRepository::getProject($project, $this->container);
 
-        try {
-            $namespaces = $api->namespaces($project);
-        } catch (Exception $e) {
+        if (!$project->exists()) {
             return new View(
                 [
-                    'error' => $e->getMessage(),
+                    'error' => "$project is not a valid project",
                 ],
                 Response::HTTP_NOT_FOUND
             );
         }
 
         return new View(
-            $namespaces,
+            [
+                'api' => $project->getApiUrl(),
+                'namespaces' => $project->getNamespaces(),
+            ],
             Response::HTTP_OK
         );
     }
@@ -47,7 +47,7 @@ class ApiController extends FOSRestController
     public function nonautomatedEdits($project, $username, $namespace, $offset = 0, $format = 'json')
     {
         $twig = $this->container->get('twig');
-        $aeh = $this->get("app.automated_edits_helper");
+        $aeh = $this->get('app.automated_edits_helper');
         $data = $aeh->getNonautomatedEdits($project, $username, $namespace, $offset);
 
         if ($format === 'html') {

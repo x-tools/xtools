@@ -140,6 +140,16 @@ class Project extends Model
     }
 
     /**
+     * The full URL to api.php
+     *
+     * @return string
+     */
+    public function getApiUrl()
+    {
+        return rtrim($this->getUrl(), '/') . $this->getRepository()->getApiPath();
+    }
+
+    /**
      * Get this project's title, the human-language full title of the wiki (e.g. "English
      * Wikipedia" or
      */

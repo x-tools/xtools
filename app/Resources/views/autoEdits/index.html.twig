@@ -4,8 +4,8 @@
 {% block body %}
     <form class="col-lg-8 col-lg-offset-2" action="{{ path('autoedits') }}" method="get" accept-charset="utf-8" >
         <fieldset class="form-fieldset">
-            {{ forms.user_input() }}
             {{ forms.wiki_input(project) }}
+            {{ forms.user_input() }}
             {# forms.namespace_select(namespaces, true, 'all') #}
             {{ forms.date_input('start') }}
             {{ forms.date_input('end') }}
