@@ -5,30 +5,41 @@
 
 namespace AppBundle\Helper;
 
-use Symfony\Component\Config\Definition\Exception\Exception;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\VarDumper\VarDumper;
 
+/**
+ * The Labs helper provides information relating to the WMF Labs installation of XTools.
+ */
 class LabsHelper
 {
-    /** @var string */
+    /** @var string The current database name. */
     protected $dbName;
 
-    /** @var \Doctrine\DBAL\Connection */
+    /** @var Connection The database connection. */
     protected $client;
 
-    /** @var ContainerInterface */
+    /** @var ContainerInterface The DI container. */
     protected $container;
 
-    /** @var string */
+    /** @var string The project URL. */
     protected $url;
 
+    /**
+     * LabsHelper constructor.
+     * @param ContainerInterface $container
+     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
 
+    /**
+     * Check to see if a given tool is enabled.
+     * @param string $tool The tool short name.
+     * @return bool
+     */
     public function checkEnabled($tool)
     {
         if (!$this->container->getParameter("enable.$tool")) {
@@ -104,26 +115,6 @@ class LabsHelper
 
         // Otherwise, return the first result (in the rare event there are more than one).
         return $wikis[0];
-    }
-
-    /**
-     * Returns a project's domain (en.wikipedia) given various formats
-     * @param  string $project Valid project in the formats:
-     *                         https://en.wikipedia.org, en.wikipedia, enwiki
-     * @return string|false    lang.project.org ('url' value for that wiki)
-     *                         or false if project was not found
-     */
-    public function normalizeProject($project)
-    {
-        $project = preg_replace("/^https?:\/\//", '', $project);
-        $metaData = $this->getProjectMetadata($project);
-
-        if ($metaData) {
-            // Get domain from the first result (in the rare event there are more than one).
-            return preg_replace("/^https?:\/\//", '', $metaData['url']);
-        } else {
-            return false;
-        }
     }
 
     /**

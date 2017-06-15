@@ -9,6 +9,9 @@ use Mediawiki\Api\MediawikiApi;
 use Mediawiki\Api\SimpleRequest;
 use Symfony\Component\DependencyInjection\Container;
 
+/**
+ * This class provides data to the Project class.
+ */
 class ProjectRepository extends Repository
 {
 
@@ -270,8 +273,9 @@ class ProjectRepository extends Repository
 
     /**
      * Check to see if a page exists on this project and has some content.
+     * @param Project $project The project.
      * @param int $namespaceId The page namespace ID.
-     * @param string $pageTitle The page title, without namespace,
+     * @param string $pageTitle The page title, without namespace.
      * @return bool
      */
     public function pageHasContent(Project $project, $namespaceId, $pageTitle)

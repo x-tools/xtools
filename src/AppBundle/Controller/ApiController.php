@@ -21,9 +21,9 @@ class ApiController extends FOSRestController
      */
     public function normalizeProject($project)
     {
-        $project = ProjectRepository::getProject($project, $this->container);
+        $proj = ProjectRepository::getProject($project, $this->container);
 
-        if (!$project->exists()) {
+        if (!$proj->exists()) {
             return new View(
                 [
                     'error' => "$project is not a valid project",
@@ -34,9 +34,9 @@ class ApiController extends FOSRestController
 
         return new View(
             [
-                'domain' => $project->getDomain(),
-                'url' => $project->getUrl(),
-                'api' => $project->getApiUrl(),
+                'domain' => $proj->getDomain(),
+                'url' => $proj->getUrl(),
+                'api' => $proj->getApiUrl(),
             ],
             Response::HTTP_OK
         );

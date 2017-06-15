@@ -14,6 +14,9 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class DefaultControllerTest extends WebTestCase
 {
 
+    /**
+     * Test that the homepage is served, including in multiple languages.
+     */
     public function testIndex()
     {
         $client = static::createClient();

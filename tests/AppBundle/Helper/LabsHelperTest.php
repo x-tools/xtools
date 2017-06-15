@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file contains only the LabsHelperTest class.
+ */
 
 namespace Tests\AppBundle\Helper;
 
@@ -6,15 +9,21 @@ use AppBundle\Helper\LabsHelper;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
 
+/**
+ * The Labs helper provides information relating to the WMF Labs installation of XTools.
+ */
 class LabsHelperTest extends WebTestCase
 {
 
-    /** @var Container */
+    /** @var Container The DI container. */
     protected $container;
 
-    /** @var LabsHelper */
+    /** @var LabsHelper The  */
     protected $labsHelper;
 
+    /**
+     * Set up the tests.
+     */
     public function setUp()
     {
         $client = static::createClient();
@@ -22,6 +31,9 @@ class LabsHelperTest extends WebTestCase
         $this->labsHelper = new LabsHelper($this->container);
     }
 
+    /**
+     * Test that the table-name transformations are correct.
+     */
     public function testGetTable()
     {
         if ($this->container->getParameter('app.is_labs')) {
@@ -32,16 +44,6 @@ class LabsHelperTest extends WebTestCase
             // When using wiki databases directly.
             $this->assertEquals('page', $this->labsHelper->getTable('page'));
             $this->assertEquals('logging', $this->labsHelper->getTable('logging'));
-        }
-    }
-
-    public function testNormalizeProject()
-    {
-        if ($this->container->getParameter('app.is_labs')) {
-            // When using Labs.
-            $this->assertEquals('en.wikipedia.org', $this->labsHelper->normalizeProject('enwiki'));
-            $this->assertEquals('en.wikipedia.org', $this->labsHelper->normalizeProject('en.wikipedia'));
-            $this->assertEquals(false, $this->labsHelper->normalizeProject('invalid.wiki'));
         }
     }
 }

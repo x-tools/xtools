@@ -1,10 +1,20 @@
 <?php
+/**
+ * This file contains only the AppExtension class.
+ */
 
 namespace AppBundle\Twig;
 
+/**
+ * Twig functions and filters for XTools.
+ */
 class AppExtension extends Extension
 {
 
+    /**
+     * Get the name of this extension.
+     * @return string
+     */
     public function getName()
     {
         return 'app_extension';
@@ -12,6 +22,10 @@ class AppExtension extends Extension
 
     /*********************************** FUNCTIONS ***********************************/
 
+    /**
+     * Get all functions that this class provides.
+     * @return array
+     */
     public function getFunctions()
     {
         $options = ['is_safe' => ['html']];
@@ -47,12 +61,20 @@ class AppExtension extends Extension
         ];
     }
 
+    /**
+     * Get the duration of the current HTTP request in microseconds.
+     * @param int $decimals
+     * @return string
+     */
     public function requestTime($decimals = 3)
     {
-
         return number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], $decimals);
     }
 
+    /**
+     * Get the formatted real memory usage.
+     * @return float
+     */
     public function requestMemory()
     {
         $mem = memory_get_usage(false);
@@ -62,17 +84,32 @@ class AppExtension extends Extension
         return round($mem, 2);
     }
 
+    /**
+     * Get the current year.
+     * @return string
+     */
     public function generateYear()
     {
         return date('Y');
     }
 
-    // TODO: refactor all intuition stuff so it can be used anywhere
+    /**
+     * See if a given i18n message exists.
+     * @TODO: refactor all intuition stuff so it can be used anywhere
+     * @param string $message The message.
+     * @return bool
+     */
     public function intuitionMessageExists($message = "")
     {
         return $this->getIntuition()->msgExists($message, [ "domain" => "xtools" ]);
     }
 
+    /**
+     * Get an i18n message if it exists, otherwise just get the message key.
+     * @param string $message
+     * @param array $vars
+     * @return mixed|null|string
+     */
     public function intuitionMessagePrintExists($message = "", $vars = [])
     {
         if (is_array($message)) {
@@ -87,16 +124,30 @@ class AppExtension extends Extension
         }
     }
 
+    /**
+     * Get an i18n message.
+     * @param string $message
+     * @param array $vars
+     * @return mixed|null|string
+     */
     public function intuitionMessage($message = "", $vars = [])
     {
         return $this->getIntuition()->msg($message, [ "domain" => "xtools", "variables" => $vars ]);
     }
 
+    /**
+     * Get the current language code.
+     * @return string
+     */
     public function getLang()
     {
         return $this->getIntuition()->getLang();
     }
 
+    /**
+     * Get the current language name (defaults to 'English').
+     * @return string
+     */
     public function getLangName()
     {
         return in_array($this->getIntuition()->getLangName(), $this->getAllLangs())
@@ -129,26 +180,48 @@ class AppExtension extends Extension
         return $availableLanguages;
     }
 
+    /**
+     * Whether the current language is right-to-left.
+     * @return bool
+     */
     public function intuitionIsRTL()
     {
         return $this->getIntuition()->isRTL($this->getIntuition()->getLang());
     }
 
+    /**
+     * Whether the given language is right-to-left.
+     * @param string $lang The language code.
+     * @return bool
+     */
     public function intuitionIsRTLLang($lang)
     {
         return $this->getIntuition()->isRTL($lang);
     }
 
+    /**
+     * Get the short hash of the currently checked-out Git commit.
+     * @return string
+     */
     public function gitShortHash()
     {
         return exec("git rev-parse --short HEAD");
     }
 
+    /**
+     * Get the full hash of the currently checkout-out Git commit.
+     * @return string
+     */
     public function gitHash()
     {
         return exec("git rev-parse HEAD");
     }
 
+    /**
+     * Check whether a given tool is enabled.
+     * @param string $tool The short name of the tool.
+     * @return bool
+     */
     public function tabEnabled($tool = "index")
     {
         $param = false;
@@ -158,6 +231,10 @@ class AppExtension extends Extension
         return $param;
     }
 
+    /**
+     * Get a list of the short names of all tools.
+     * @return string[]
+     */
     public function allTools()
     {
         $retVal = [];
@@ -167,6 +244,11 @@ class AppExtension extends Extension
         return $retVal;
     }
 
+    /**
+     * Get a list of namespace colours (one or all).
+     * @param bool $num The NS ID to get.
+     * @return string[]|string Indexed by namespace ID.
+     */
     public static function getColorList($num = false)
     {
         $colors = [
@@ -303,6 +385,10 @@ class AppExtension extends Extension
         return $colors[$num % count($colors)];
     }
 
+    /**
+     * Whether XTools is running in single-project mode.
+     * @return bool
+     */
     public function isSingleWiki()
     {
         $param = true;
@@ -312,6 +398,10 @@ class AppExtension extends Extension
         return $param;
     }
 
+    /**
+     * Get the database replication-lag threshold.
+     * @return int
+     */
     public function getReplagThreshold()
     {
         $param = 30;
@@ -321,6 +411,10 @@ class AppExtension extends Extension
         return $param;
     }
 
+    /**
+     * Whether we should load stylesheets from external CDNs or not.
+     * @return bool
+     */
     public function loadStylesheetsFromCDN()
     {
         $param = false;
@@ -330,6 +424,10 @@ class AppExtension extends Extension
         return $param;
     }
 
+    /**
+     * Whether XTools is running in WMF Labs mode.
+     * @return bool
+     */
     public function isWMFLabs()
     {
         $param = false;
@@ -339,6 +437,10 @@ class AppExtension extends Extension
         return $param;
     }
 
+    /**
+     * The current replication lag.
+     * @return int
+     */
     public function replag()
     {
         $retVal = 0;
@@ -373,6 +475,12 @@ class AppExtension extends Extension
         return $retVal;
     }
 
+    /**
+     * Generate an XTools URL.
+     * @deprecated Use path() instead.
+     * @param string $path The path.
+     * @return string
+     */
     public function link($path = "/")
     {
         $base_path = $this->container->getParameter("app.base_path");
@@ -410,6 +518,10 @@ class AppExtension extends Extension
 
     /*********************************** FILTERS ***********************************/
 
+    /**
+     * Get all filters for this extension.
+     * @return array
+     */
     public function getFilters()
     {
         return [

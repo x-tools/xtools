@@ -61,8 +61,7 @@ class PagesRepository extends Repository
 
     /**
      * Get revisions of a single page.
-     * @param Project $project
-     * @param Page $page
+     * @param Page $page The page.
      * @param User|null $user Specify to get only revisions by the given user.
      * @return string[] Each member with keys: id, timestamp, length-
      */
@@ -95,8 +94,7 @@ class PagesRepository extends Repository
 
     /**
      * Get a count of the number of revisions of a single page
-     * @param Project $project
-     * @param Page $page
+     * @param Page $page The page.
      * @param User|null $user Specify to only count revisions by the given user.
      * @return int
      */
