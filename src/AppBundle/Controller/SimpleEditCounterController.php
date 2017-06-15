@@ -20,7 +20,7 @@ class SimpleEditCounterController extends Controller
      * @Route("/sc/index.php", name="SimpleEditCounterIndexPhp")
      * @Route("/sc/{project}", name="SimpleEditCounterProject")
      */
-    public function indexAction($project = null)
+    public function indexAction()
     {
 
         $lh = $this->get('app.labs_helper');
@@ -39,6 +39,12 @@ class SimpleEditCounterController extends Controller
         } elseif ($projectQuery != '') {
             return $this->redirectToRoute('SimpleEditCounterProject', [ 'project' => $projectQuery ]);
         }
+
+        // Set default project to be used by autocompletion
+        if ($projectQuery == '') {
+            $projectQuery = $this->container->getParameter('default_project');
+        }
+        $project = ProjectRepository::getProject($projectQuery, $this->container);
 
         // Otherwise fall through.
         return $this->render('simpleEditCounter/index.html.twig', [

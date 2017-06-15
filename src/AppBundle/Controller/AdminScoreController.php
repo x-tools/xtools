@@ -31,19 +31,26 @@ class AdminScoreController extends Controller
      * @param string $project The project name.
      * @return Response
      */
-    public function indexAction(Request $request, $project = null)
+    public function indexAction(Request $request)
     {
-        $lh = $this->get("app.labs_helper");
-        $lh->checkEnabled("adminscore");
+        $lh = $this->get('app.labs_helper');
+        $lh->checkEnabled('adminscore');
 
         $projectQuery = $request->query->get('project');
         $username = $request->query->get('username', $request->query->get('user'));
 
-        if ($projectQuery != "" && $username != "") {
-            return $this->redirectToRoute("AdminScoreResult", [ 'project'=>$projectQuery, 'username' => $username ]);
-        } elseif ($projectQuery != "") {
-            return $this->redirectToRoute("AdminScoreProject", [ 'project'=>$projectQuery ]);
+        if ($projectQuery != '' && $username != '') {
+            return $this->redirectToRoute('AdminScoreResult', [ 'project' => $projectQuery, 'username' => $username ]);
+        } elseif ($projectQuery != '') {
+            return $this->redirectToRoute('AdminScoreProject', [ 'project' => $projectQuery ]);
         }
+
+        // Set default project so we can populate the namespace selector.
+        if ($projectQuery == '') {
+            $projectQuery = $this->container->getParameter('default_project');
+        }
+        // and set it as a Project object
+        $project = ProjectRepository::getProject($projectQuery, $this->container);
 
         // Otherwise fall through.
         return $this->render('adminscore/index.html.twig', [
@@ -51,7 +58,7 @@ class AdminScoreController extends Controller
             'xtPage' => 'adminscore',
             'xtPageTitle' => 'tool-adminscore',
             'xtSubtitle' => 'tool-adminscore-desc',
-            "project" => $project,
+            'project' => $project,
         ]);
     }
 

@@ -17,6 +17,32 @@ use Xtools\ProjectRepository;
 class ApiController extends FOSRestController
 {
     /**
+     * @Rest\Get("/api/normalizeProject/{project}")
+     */
+    public function normalizeProject($project)
+    {
+        $project = ProjectRepository::getProject($project, $this->container);
+
+        if (!$project->exists()) {
+            return new View(
+                [
+                    'error' => "$project is not a valid project",
+                ],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+
+        return new View(
+            [
+                'domain' => $project->getDomain(),
+                'url' => $project->getUrl(),
+                'api' => $project->getApiUrl(),
+            ],
+            Response::HTTP_OK
+        );
+    }
+
+    /**
      * @Rest\Get("/api/namespaces/{project}")
      */
     public function namespaces($project)

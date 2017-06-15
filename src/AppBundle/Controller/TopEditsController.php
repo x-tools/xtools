@@ -64,18 +64,7 @@ class TopEditsController extends Controller
         if (!$projectName) {
             $projectName = $this->container->getParameter('default_project');
         }
-
         $project = ProjectRepository::getProject($projectName, $this->container);
-
-        // Default values for the variables to keep the template happy
-        $domain = null;
-        $namespaces = null;
-
-        // If the project exists, actually populate the values
-        if ($project->exists()) {
-            $domain = $project->getDomain();
-            $namespaces = $project->getNamespaces();
-        }
 
         return $this->render('topedits/index.html.twig', [
             'xtPageTitle' => 'tool-topedits',

@@ -1,6 +1,6 @@
 (function () {
     var sortDirection, sortColumn, $tocClone, tocHeight, sectionOffset = {},
-        toggleTableData, apiPath;
+        toggleTableData, apiPath, lastProject;
 
     // Load translations with 'en.json' as a fallback
     var messagesToLoad = {};
@@ -26,12 +26,8 @@
 
         setupColumnSorting();
         setupTOC();
+        setupProjectListener();
         setupAutocompletion();
-
-        // if applicable, setup namespace selector with real time updates when changing projects
-        if ($('#project_input').length && $('#namespace_select').length) {
-            setupNamespaceSelector();
-        }
     });
 
     /**
@@ -280,12 +276,47 @@
     }
 
     /**
-     * Use the wiki input field to populate the namespace selector
+     * Add listener to the project input field to update any
+     * namespace selectors and autocompletion fields.
+     */
+    function setupProjectListener()
+    {
+        // Stop here if there is no project field
+        if (!$("#project_input")) {
+            return;
+        }
+
+        // If applicable, setup namespace selector with real time updates when changing projects.
+        // This will also set `apiPath` so that autocompletion will query the right wiki.
+        if ($('#project_input').length && $('#namespace_select').length) {
+            setupNamespaceSelector();
+        // Otherwise, if there's a user or page input field, we still need to update `apiPath`
+        // for the user input autocompletion when the project is changed.
+        } else if ($('#user_input')[0] || $('#article_input')[0]) {
+            // keep track of last valid project
+            lastProject = $('#project_input').val();
+
+            $('#project_input').on('change', function () {
+                var newProject = this.value;
+
+                $.get(xtBaseUrl + 'api/normalizeProject/' + newProject).done(function (data) {
+                    // Keep track of project API path for use in page title autocompletion
+                    apiPath = data.api;
+                    lastProject = newProject;
+                    setupAutocompletion();
+                }).fail(revertToValidProject.bind(this, newProject));
+            });
+        }
+    }
+
+    /**
+     * Use the wiki input field to populate the namespace selector.
+     * This also updates `apiPath` and calls setupAutocompletion()
      */
     function setupNamespaceSelector()
     {
         // keep track of last valid project
-        var lastProject = $('#project_input').val();
+        lastProject = $('#project_input').val();
 
         $('#project_input').on('change', function () {
             // Disable the namespace selector and show a spinner while the data loads.
@@ -317,63 +348,129 @@
 
                 // Re-init autocompletion
                 setupAutocompletion();
-            }).fail(function () {
-                // revert back to last valid project
-                $('#project_input').val(lastProject);
-                $('.site-notice').append(
-                    "<div class='alert alert-warning alert-dismissible' role='alert'>" +
-                        $.i18n('invalid-project', "<strong>" + newProject + "</strong>") +
-                        "<button class='close' data-dismiss='alert' aria-label='Close'>" +
-                            "<span aria-hidden='true'>&times;</span>" +
-                        "</button>" +
-                    "</div>"
-                );
-            }).always(function () {
+            }).fail(revertToValidProject.bind(this, newProject)).always(function () {
                 $('#namespace_select').prop('disabled', false);
                 $loader.addClass('hidden');
             });
         });
+
+        // If they change the namespace, update autocompletion,
+        // which will ensure only pages in the selected namespace
+        // show up in the autocompletion
+        $('#namespace_select').on('change', setupAutocompletion);
     }
 
     /**
-     * Setup autocompletion of pages if a page input field is present
+     * Called by setupNamespaceSelector or setupProjectListener
+     *   when the user changes to a project that doesn't exist.
+     * This throws a warning message and reverts back to the
+     *   last valid project.
+     * @param {string} newProject - project they attempted to add
+     */
+    function revertToValidProject(newProject)
+    {
+        $('#project_input').val(lastProject);
+        $('.site-notice').append(
+            "<div class='alert alert-warning alert-dismissible' role='alert'>" +
+                $.i18n('invalid-project', "<strong>" + newProject + "</strong>") +
+                "<button class='close' data-dismiss='alert' aria-label='Close'>" +
+                    "<span aria-hidden='true'>&times;</span>" +
+                "</button>" +
+            "</div>"
+        );
+    }
+
+    /**
+     * Setup autocompletion of pages if a page input field is present.
      */
     function setupAutocompletion()
     {
-        var $articleInput = $('#article_input');
+        var $articleInput = $('#article_input'),
+            $userInput = $('#user_input'),
+            $namespaceInput = $("#namespace_select");
 
-        if ($articleInput.data('typeahead')) {
-            $articleInput.data('typeahead').destroy();
-        }
-
-        // Make sure project and page title fields are present
-        if (!$articleInput[0] || !$('#project_input')[0]) {
+        // Make sure typeahead-compatible fields are present
+        if (!$articleInput[0] && !$userInput[0] && !$('#project_input')[0]) {
             return;
         }
 
-        // set initial value for the API url, which is put as a data attribute in forms.html.twig
-        apiPath = $('#article_input').data('api');
+        // Destroy any existing instances
+        if ($articleInput.data('typeahead')) {
+            $articleInput.data('typeahead').destroy();
+        }
+        if ($userInput.data('typeahead')) {
+            $userInput.data('typeahead').destroy();
+        }
 
-        $articleInput.typeahead({
-            ajax: {
+        // set initial value for the API url, which is put as a data attribute in forms.html.twig
+        if (!apiPath) {
+            apiPath = $('#article_input').data('api') || $('#user_input').data('api');
+        }
+
+        // Defaults for typeahead options. preDispatch and preProcess will be
+        // set accordingly for each typeahead instance
+        var typeaheadOpts = {
                 url: apiPath,
                 timeout: 200,
                 triggerLength: 1,
                 method: 'get',
-                preDispatch: function (query) {
-                    return {
-                        action: 'query',
-                        list: 'prefixsearch',
-                        format: 'json',
-                        pssearch: query
-                    };
-                },
-                preProcess: function (data) {
-                    return data.query.prefixsearch.map(function (elem) {
-                        return elem.title;
-                    });
-                }
-            }
-        });
+                preDispatch: null,
+                preProcess: null,
+            };
+
+        if ($articleInput[0]) {
+            $articleInput.typeahead({
+                ajax: Object.assign(typeaheadOpts, {
+                    preDispatch: function (query) {
+                        // If there is a namespace selector, make sure we search
+                        // only within that namespace
+                        if ($namespaceInput[0] && $namespaceInput.val() !== '0') {
+                            var nsName = $namespaceInput.find('option:selected').text().trim();
+                            query = nsName + ':' + query;
+                        }
+                        return {
+                            action: 'query',
+                            list: 'prefixsearch',
+                            format: 'json',
+                            pssearch: query
+                        };
+                    },
+                    preProcess: function (data) {
+                        var nsName = '';
+                        // Strip out namespace name if applicable
+                        if ($namespaceInput[0] && $namespaceInput.val() !== '0') {
+                            nsName = $namespaceInput.find('option:selected').text().trim();
+                        }
+                        return data.query.prefixsearch.map(function (elem) {
+                            return elem.title.replace(new RegExp('^' + nsName + ':'), '');
+                        });
+                    },
+                })
+            });
+        }
+
+        if ($userInput[0]) {
+            $userInput.typeahead({
+                ajax: Object.assign(typeaheadOpts, {
+                    preDispatch: function (query) {
+                        return {
+                            action: 'query',
+                            list: 'prefixsearch',
+                            format: 'json',
+                            pssearch: 'User:' + query
+                        };
+                    },
+                    preProcess: function (data) {
+                        var results = data.query.prefixsearch.map(function (elem) {
+                            return elem.title.split('/')[0].substr(elem.title.indexOf(':') + 1);
+                        });
+
+                        return results.filter(function(value, index, array) {
+                            return array.indexOf(value) === index;
+                        });
+                    },
+                })
+            });
+        }
     }
 })();
