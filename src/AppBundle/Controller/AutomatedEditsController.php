@@ -1,23 +1,31 @@
 <?php
+/**
+ * This file contains only the AutomatedEditsController class.
+ */
 
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Response;
 use Xtools\ProjectRepository;
 use Xtools\User;
 
+/**
+ * This controller serves the AutomatedEdits tool.
+ */
 class AutomatedEditsController extends Controller
 {
     /**
+     * Display the search form.
      * @Route("/autoedits", name="autoedits")
      * @Route("/automatededits", name="autoeditsLong")
      * @Route("/autoedits/index.php", name="autoeditsIndexPhp")
      * @Route("/automatededits/index.php", name="autoeditsLongIndexPhp")
+     * @param Request $request The HTTP request.
      */
-
     public function indexAction(Request $request)
     {
         // Pull the labs helper and check if enabled
@@ -97,7 +105,13 @@ class AutomatedEditsController extends Controller
     }
 
     /**
+     * Display the results.
      * @Route("/autoedits/{project}/{username}/{start}/{end}", name="autoeditsResult")
+     * @param $project
+     * @param $username
+     * @param null $start
+     * @param null $end
+     * @return RedirectResponse|Response
      */
     public function resultAction($project, $username, $start = null, $end = null)
     {

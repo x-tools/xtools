@@ -7,6 +7,9 @@ namespace AppBundle\Helper;
 
 use GuzzleHttp;
 
+/**
+ * A helper class to retrieve data about page-views.
+ */
 class PageviewsHelper
 {
 

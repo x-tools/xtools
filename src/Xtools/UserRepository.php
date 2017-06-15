@@ -9,15 +9,19 @@ use Mediawiki\Api\SimpleRequest;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\VarDumper\VarDumper;
 
+/**
+ * This class provides data for the User class.
+ */
 class UserRepository extends Repository
 {
 
-    /** @var int[] */
+    /** @var int[] The user's IDs on different projects. */
     protected $userIds;
 
     /**
      * Convenience method to get a new User object.
-     * @param string $username
+     * @param string $username The username.
+     * @param Container $container The DI container.
      * @return User
      */
     public static function getUser($username, Container $container)
@@ -51,9 +55,10 @@ class UserRepository extends Repository
     }
 
     /**
-     * @param Project $project
-     * @param string $username
-     * @return array
+     * Get group names of the given user.
+     * @param Project $project The project.
+     * @param string $username The username.
+     * @return string[]
      */
     public function getGroups(Project $project, $username)
     {

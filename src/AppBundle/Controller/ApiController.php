@@ -44,12 +44,14 @@ class ApiController extends FOSRestController
 
     /**
      * @Rest\Get("/api/namespaces/{project}")
+     * @param string $project The project name.
+     * @return View
      */
     public function namespaces($project)
     {
-        $project = ProjectRepository::getProject($project, $this->container);
+        $proj = ProjectRepository::getProject($project, $this->container);
 
-        if (!$project->exists()) {
+        if (!$proj->exists()) {
             return new View(
                 [
                     'error' => "$project is not a valid project",
@@ -60,8 +62,8 @@ class ApiController extends FOSRestController
 
         return new View(
             [
-                'api' => $project->getApiUrl(),
-                'namespaces' => $project->getNamespaces(),
+                'api' => $proj->getApiUrl(),
+                'namespaces' => $proj->getNamespaces(),
             ],
             Response::HTTP_OK
         );

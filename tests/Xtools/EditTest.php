@@ -1,12 +1,21 @@
 <?php
+/**
+ * This file contains only the EditTest class.
+ */
 
 namespace Tests\Xtools;
 
 use DateTime;
 
+/**
+ * Tests of the Edit class.
+ */
 class EditTest extends \PHPUnit_Framework_TestCase
 {
 
+    /**
+     * Test the basic functionality of Edit.
+     */
     public function testBasic()
     {
         $project = new Project('TestProject');

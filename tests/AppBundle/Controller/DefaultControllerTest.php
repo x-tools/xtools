@@ -1,9 +1,16 @@
 <?php
+/**
+ * This file contains only the DefaultControllerTest class.
+ */
 
 namespace Tests\AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
+/**
+ * Integration tests for the homepage and user authentication.
+ * @group integration
+ */
 class DefaultControllerTest extends WebTestCase
 {
 

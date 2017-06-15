@@ -1,22 +1,33 @@
 <?php
+/**
+ * This file contains only the PagesController class.
+ */
 
 namespace AppBundle\Controller;
 
 use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Xtools\ProjectRepository;
 
+/**
+ * This controller serves the Pages tool.
+ */
 class PagesController extends Controller
 {
     /**
+     * Display the form.
      * @Route("/pages", name="pages")
      * @Route("/pages", name="Pages")
      * @Route("/pages/", name="PagesSlash")
      * @Route("/pages/index.php", name="PagesIndexPhp")
      * @Route("/pages/{project}", name="PagesProject")
+     * @param string $project The project domain name.
+     * @return Response
      */
     public function indexAction($project = null)
     {
@@ -84,7 +95,13 @@ class PagesController extends Controller
     }
 
     /**
+     * Display the results.
      * @Route("/pages/{project}/{username}/{namespace}/{redirects}", name="PagesResult")
+     * @param string $project The project domain name.
+     * @param string $username The username.
+     * @param string $namespace The ID of the namespace.
+     * @param string $redirects Whether to follow redirects or not.
+     * @return RedirectResponse|Response
      */
     public function resultAction($project, $username, $namespace = "0", $redirects = "noredirects")
     {

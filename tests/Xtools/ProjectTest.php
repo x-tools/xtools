@@ -1,9 +1,15 @@
 <?php
+/**
+ * This file contains only the ProjectTest class.
+ */
 
 namespace Tests\Xtools;
 
 use PHPUnit_Framework_TestCase;
 
+/**
+ * Tests for the Project class.
+ */
 class ProjectTest extends PHPUnit_Framework_TestCase
 {
 
@@ -74,7 +80,11 @@ class ProjectTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * A user or a whole project can opt in to displaying restricted statistics.
      * @dataProvider optedInProvider
+     * @param string[] $optedInProjects List of projects.
+     * @param string $dbname The database name.
+     * @param bool $hasOptedIn The result to check against.
      */
     public function testOptedIn($optedInProjects, $dbname, $hasOptedIn)
     {
@@ -94,6 +104,10 @@ class ProjectTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($hasOptedIn, $project->userHasOptedIn($user));
     }
 
+    /**
+     * Data for self::testOptedIn().
+     * @return array
+     */
     public function optedInProvider()
     {
         $optedInProjects = ['project1'];

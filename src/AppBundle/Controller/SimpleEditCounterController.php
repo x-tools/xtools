@@ -1,19 +1,24 @@
 <?php
+/**
+ * This file contains only the SimpleEditCounterController class.
+ */
 
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Response;
 use Xtools\ProjectRepository;
 use Xtools\User;
-use Xtools\UserRepository;
 
+/**
+ * This controller handles the Simple Edit Counter tool.
+ */
 class SimpleEditCounterController extends Controller
 {
     /**
+     * The Simple Edit Counter search form.
      * @Route("/sc", name="sc")
      * @Route("/sc", name="SimpleEditCounter")
      * @Route("/sc/", name="SimpleEditCounterSlash")
@@ -56,7 +61,11 @@ class SimpleEditCounterController extends Controller
     }
 
     /**
+     * Display the
      * @Route("/sc/{project}/{username}", name="SimpleEditCounterResult")
+     * @param string $project The project domain name.
+     * @param string $username The username.
+     * @return Response
      */
     public function resultAction($project, $username)
     {
@@ -86,15 +95,15 @@ class SimpleEditCounterController extends Controller
 
         // Prepare the query and execute
         $resultQuery = $conn->prepare("
-			SELECT 'id' as source, user_id as value FROM $userTable WHERE user_name = :username
-			UNION
-			SELECT 'arch' as source, COUNT(*) AS value FROM $archiveTable WHERE ar_user_text = :username
-			UNION
-			SELECT 'rev' as source, COUNT(*) AS value FROM $revisionTable WHERE rev_user_text = :username
-			UNION
-			SELECT 'groups' as source, ug_group as value
-				FROM $userGroupsTable JOIN $userTable on user_id = ug_user WHERE user_name = :username
-			");
+            SELECT 'id' as source, user_id as value FROM $userTable WHERE user_name = :username
+            UNION
+            SELECT 'arch' as source, COUNT(*) AS value FROM $archiveTable WHERE ar_user_text = :username
+            UNION
+            SELECT 'rev' as source, COUNT(*) AS value FROM $revisionTable WHERE rev_user_text = :username
+            UNION
+            SELECT 'groups' as source, ug_group as value
+                FROM $userGroupsTable JOIN $userTable on user_id = ug_user WHERE user_name = :username
+        ");
 
         $resultQuery->bindParam('username', $username);
         $resultQuery->execute();

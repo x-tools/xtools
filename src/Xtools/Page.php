@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file contains only the Page class.
+ */
 
 namespace Xtools;
 
@@ -8,10 +11,10 @@ namespace Xtools;
 class Page extends Model
 {
 
-    /** @var Project */
+    /** @var Project The project that this page belongs to. */
     protected $project;
 
-    /** @var string */
+    /** @var string The page name as provided at instantiation. */
     protected $unnormalizedPageName;
 
     /** @var string[] Metadata about this page. */
@@ -45,6 +48,7 @@ class Page extends Model
     }
 
     /**
+     * Get the page's title.
      * @return string
      */
     public function getTitle()
@@ -88,6 +92,7 @@ class Page extends Model
     }
 
     /**
+     * Get the full URL of this page.
      * @return string
      */
     public function getUrl()
@@ -97,7 +102,7 @@ class Page extends Model
     }
 
     /**
-     * Get the numerical value for the namespace
+     * Get the numerical ID of the namespace of this page.
      * @return int
      */
     public function getNamespace()
@@ -107,7 +112,7 @@ class Page extends Model
     }
 
     /**
-     * Get the number of page watchers
+     * Get the number of page watchers.
      * @return int
      */
     public function getWatchers()
@@ -117,6 +122,7 @@ class Page extends Model
     }
 
     /**
+     * Whether or not this page exists.
      * @return bool
      */
     public function exists()
@@ -150,6 +156,7 @@ class Page extends Model
 
     /**
      * Get the number of revisions the page has.
+     * @param User $user Optionally limit to those of this user.
      * @return int
      */
     public function getNumRevisions(User $user = null)

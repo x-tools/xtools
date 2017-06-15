@@ -13,22 +13,22 @@ use \DateTime;
 class EditCounter extends Model
 {
     
-    /** @var Project */
+    /** @var Project The project. */
     protected $project;
     
-    /** @var User */
+    /** @var User The user. */
     protected $user;
 
-    /** @var int[] */
+    /** @var int[] The total revision counts. */
     protected $revisionCounts;
 
-    /** @var string[] */
+    /** @var string[] The start and end dates of revisions. */
     protected $revisionDates;
 
-    /** @var int[] */
+    /** @var int[] The total page counts. */
     protected $pageCounts;
     
-    /** @var int[] */
+    /** @var int[] The lot totals. */
     protected $logCounts;
 
     /** @var int[] Keys are project DB names. */
@@ -97,6 +97,10 @@ class EditCounter extends Model
         return $this->logCounts;
     }
 
+    /**
+     * Get the total number of currently-live revisions.
+     * @return int
+     */
     public function countLiveRevisions()
     {
         $revCounts = $this->getRevisionCounts();
@@ -344,12 +348,21 @@ class EditCounter extends Model
         return $days > 0 ? $days : 1;
     }
 
+    /**
+     * Get the total number of files uploaded (including those now deleted).
+     * @return int
+     */
     public function countFilesUploaded()
     {
         $logCounts = $this->getLogCounts();
         return $logCounts['upload-upload'] ?: 0;
     }
 
+    /**
+     * Get the total number of files uploaded to Commons (including those now deleted).
+     * This is only applicable for WMF labs installations.
+     * @return int
+     */
     public function countFilesUploadedCommons()
     {
         $logCounts = $this->getLogCounts();
@@ -381,6 +394,7 @@ class EditCounter extends Model
     }
 
     /**
+     * Get the total number of patrols performed by the user.
      * @return int
      */
     public function patrols()
@@ -391,6 +405,7 @@ class EditCounter extends Model
 
     /**
      * Get the given user's total edit counts per namespace.
+     * @return integer[] Array keys are namespace IDs, values are the edit counts.
      */
     public function namespaceTotals()
     {
@@ -401,6 +416,7 @@ class EditCounter extends Model
 
     /**
      * Get a summary of the times of day and the days of the week that the user has edited.
+     * @return string[]
      */
     public function timeCard()
     {
@@ -408,7 +424,8 @@ class EditCounter extends Model
     }
 
     /**
-     *
+     * Get the total numbers of edits per year.
+     * @return int[]
      */
     public function yearCounts()
     {
@@ -431,7 +448,8 @@ class EditCounter extends Model
     }
 
     /**
-     *
+     * Get the total numbers of edits per month.
+     * @return mixed[] With keys 'years', 'namespaces' and 'totals'.
      */
     public function monthCounts()
     {
