@@ -1,21 +1,34 @@
 <?php
+/**
+ * This file contains only the PagesControllerTest class.
+ */
 
 namespace Tests\AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
 
+/**
+ * Integration tests for the PagesController.
+ * @group integration
+ */
 class PagesControllerTest extends WebTestCase
 {
-    /** @var Container */
+    /** @var Container The DI container. */
     protected $container;
 
+    /**
+     * Set up the tests.
+     */
     public function setUp()
     {
         $client = static::createClient();
         $this->container = $client->getContainer();
     }
 
+    /**
+     * Test that the Pages tool index page displays correctly.
+     */
     public function testIndex()
     {
         $client = static::createClient();

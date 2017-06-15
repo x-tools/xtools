@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file contains only the UserTest class.
+ */
 
 namespace Tests\Xtools;
 
@@ -8,6 +11,9 @@ use Xtools\ProjectRepository;
 use Xtools\User;
 use Xtools\UserRepository;
 
+/**
+ * Tests for the User class.
+ */
 class UserTest extends PHPUnit_Framework_TestCase
 {
 
@@ -49,6 +55,9 @@ class UserTest extends PHPUnit_Framework_TestCase
     /**
      * Is a user an admin on a given project?
      * @dataProvider isAdminProvider
+     * @param string $username The username.
+     * @param string[] $groups The groups to test.
+     * @param bool $isAdmin The desired result.
      */
     public function testIsAdmin($username, $groups, $isAdmin)
     {
@@ -61,6 +70,10 @@ class UserTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($isAdmin, $user->isAdmin(new Project('testWiki')));
     }
 
+    /**
+     * Data for self::testIsAdmin().
+     * @return string[]
+     */
     public function isAdminProvider()
     {
         return [

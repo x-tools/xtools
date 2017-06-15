@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file contains only the ApiController class.
+ */
 
 namespace AppBundle\Controller;
 
@@ -14,10 +17,16 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
 use Xtools\ProjectRepository;
 
+/**
+ * Serves the external API of XTools.
+ */
 class ApiController extends FOSRestController
 {
     /**
+     * Get domain name, URL, and API URL of the given project.
      * @Rest\Get("/api/normalizeProject/{project}")
+     * @param string $project Project database name, URL, or domain name.
+     * @return View
      */
     public function normalizeProject($project)
     {
@@ -43,6 +52,7 @@ class ApiController extends FOSRestController
     }
 
     /**
+     * Get all namespaces of the given project.
      * @Rest\Get("/api/namespaces/{project}")
      * @param string $project The project name.
      * @return View
@@ -70,7 +80,14 @@ class ApiController extends FOSRestController
     }
 
     /**
+     * Get non-automated edits for the given user.
      * @Rest\Get("/api/nonautomated_edits/{project}/{username}/{namespace}/{offset}/{format}")
+     * @param string $project
+     * @param string $username
+     * @param string $namespace
+     * @param int $offset
+     * @param string $format
+     * @return View
      */
     public function nonautomatedEdits($project, $username, $namespace, $offset = 0, $format = 'json')
     {

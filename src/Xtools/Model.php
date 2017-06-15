@@ -12,7 +12,7 @@ namespace Xtools;
 abstract class Model
 {
 
-    /** @var Repository */
+    /** @var Repository The repository for this model. */
     private $repository;
 
     /**

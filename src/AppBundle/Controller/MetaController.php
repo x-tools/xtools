@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file contains only the MetaController class.
+ */
 
 namespace AppBundle\Controller;
 
@@ -6,14 +9,21 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use DateTime;
+use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * This controller serves everything for the Meta tool.
+ */
 class MetaController extends Controller
 {
     /**
+     * Display the form.
      * @Route("/meta", name="meta")
      * @Route("/meta", name="Meta")
      * @Route("/meta/", name="MetaSlash")
      * @Route("/meta/index.php", name="MetaIndexPhp")
+     * @param Request $request
+     * @return Response
      */
     public function indexAction(Request $request)
     {
@@ -32,7 +42,10 @@ class MetaController extends Controller
     }
 
     /**
+     * Display the results.
      * @Route("/meta/{start}/{end}", name="MetaResult")
+     * @param Request $request
+     * @return Response
      */
     public function resultAction(Request $request)
     {

@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\Container;
  */
 class ApiControllerTest extends WebTestCase
 {
-    /** @var Container */
+    /** @var Container The DI container. */
     protected $container;
 
     /**

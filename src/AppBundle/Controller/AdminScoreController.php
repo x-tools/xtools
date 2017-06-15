@@ -31,12 +31,12 @@ class AdminScoreController extends Controller
      * @param string $project The project name.
      * @return Response
      */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request, $project)
     {
         $lh = $this->get('app.labs_helper');
         $lh->checkEnabled('adminscore');
 
-        $projectQuery = $request->query->get('project');
+        $projectQuery = $request->query->get('project', $project);
         $username = $request->query->get('username', $request->query->get('user'));
 
         if ($projectQuery != '' && $username != '') {

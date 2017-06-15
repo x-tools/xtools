@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file contains only the TopEditsController class.
+ */
 
 namespace AppBundle\Controller;
 
@@ -6,8 +9,9 @@ use AppBundle\Helper\ApiHelper;
 use AppBundle\Helper\LabsHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\VarDumper\VarDumper;
+use Symfony\Component\HttpFoundation\Response;
 use Xtools\Page;
 use Xtools\PagesRepository;
 use Xtools\Project;
@@ -16,17 +20,23 @@ use Xtools\User;
 use Xtools\UserRepository;
 use Xtools\Edit;
 
+/**
+ * The Top Edits tool.
+ */
 class TopEditsController extends Controller
 {
 
-    /** @var LabsHelper */
+    /** @var LabsHelper The Labs helper, for WMF Labs installations. */
     private $lh;
 
     /**
+     * Display the form.
      * @Route("/topedits", name="topedits")
      * @Route("/topedits", name="topEdits")
      * @Route("/topedits/", name="topEditsSlash")
      * @Route("/topedits/index.php", name="topEditsIndex")
+     * @param Request $request
+     * @return Response
      */
     public function indexAction(Request $request)
     {
@@ -75,8 +85,14 @@ class TopEditsController extends Controller
     }
 
     /**
+     * Display the results.
      * @Route("/topedits/{project}/{username}/{namespace}/{article}", name="TopEditsResults",
      *     requirements={"article"=".+"})
+     * @param string $project
+     * @param string $username
+     * @param int $namespace
+     * @param string $article
+     * @return RedirectResponse|Response
      */
     public function resultAction($project, $username, $namespace = 0, $article = "")
     {
@@ -193,7 +209,7 @@ class TopEditsController extends Controller
      * @param Project $project The project.
      * @param int $namespaceId The ID of the namespace of the page.
      * @param string $pageName The title (without namespace) of the page.
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     protected function singlePageTopEdits(User $user, Project $project, $namespaceId, $pageName)
     {

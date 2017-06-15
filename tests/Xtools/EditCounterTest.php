@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file contains only the EditCounterTest class.
+ */
 
 namespace Tests\Xtools;
 
@@ -7,6 +10,9 @@ use Xtools\EditCounterRepository;
 use Xtools\Project;
 use Xtools\User;
 
+/**
+ * Tests for the EditCounter.
+ */
 class EditCounterTest extends \PHPUnit_Framework_TestCase
 {
 
@@ -85,6 +91,9 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $editCounter->getDays());
     }
 
+    /**
+     * Test that page counts are reported correctly.
+     */
     public function testPageCounts()
     {
         $editCounterRepo = $this->getMock(EditCounterRepository::class);
@@ -110,6 +119,9 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(8, $editCounter->countPagesCreated());
     }
 
+    /**
+     * Test that namespace totals are reported correctly.
+     */
     public function testNamespaceTotals()
     {
         $namespaceTotals = [

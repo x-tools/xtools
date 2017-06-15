@@ -20,11 +20,19 @@ class Project extends Model
     /** @var string[] Basic metadata about the project */
     protected $metadata;
 
+    /**
+     * Create a new Project.
+     * @param string $nameOrUrl The project's database name or URL.
+     */
     public function __construct($nameOrUrl)
     {
         $this->nameUnnormalized = $nameOrUrl;
     }
 
+    /**
+     * Get basic metadata about the project.
+     * @return \string[]
+     */
     protected function getMetadata()
     {
         if (!$this->metadata) {

@@ -1,17 +1,33 @@
 <?php
+/**
+ * This file contains only the WikiExtension class.
+ */
 
 namespace AppBundle\Twig;
 
 use Twig_SimpleFunction;
 
+/**
+ * Twig extension filters and functions for MediaWiki project links.
+ */
 class WikiExtension extends Extension
 {
 
+    /**
+     * Get the name of this extension.
+     * @return string
+     */
     public function getName()
     {
         return 'wiki_extension';
     }
 
+    /**
+     * Get a i18n message.
+     * @param string $message
+     * @param array $vars
+     * @return mixed|null|string
+     */
     public function intuitionMessage($message = "", $vars = [])
     {
         return $this->getIntuition()->msg($message, [ "domain" => "xtools", "variables" => $vars ]);
@@ -19,6 +35,10 @@ class WikiExtension extends Extension
 
     /*********************************** FUNCTIONS ***********************************/
 
+    /**
+     * Get all functions provided by this extension.
+     * @return array
+     */
     public function getFunctions()
     {
         $options = [ 'is_safe' => [ 'html']];
@@ -80,9 +100,9 @@ class WikiExtension extends Extension
 
     /**
      * Link to list of users who are in the given user group
-     * @param  string $username   Username
+     * @param  string $group The group name.
      * @param  string $projectUrl Project domain and protocol such as https://en.wikipedia.org
-     * @param  string [$label]    The link text, defaults to $username
+     * @param  string [$label] The link text, defaults to $username
      * @return string Markup
      */
     public function groupLink($group, $projectUrl, $label = null)
@@ -229,8 +249,8 @@ class WikiExtension extends Extension
 
     /**
      * Get links to pageviews tools for the given page
-     * @param  string $title      Title of page
-     * @param  string $projectUrl Project domain such as en.wikipedia.org
+     * @param string $title Title of page
+     * @param string $project Project domain such as en.wikipedia.org
      * @return string Markup
      */
     public function pageviewsLinks($title, $project)
@@ -250,6 +270,10 @@ class WikiExtension extends Extension
 
     /*********************************** FILTERS ***********************************/
 
+    /**
+     * Get all functions provided by this extension.
+     * @return array
+     */
     public function getFilters()
     {
         return [

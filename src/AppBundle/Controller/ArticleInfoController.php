@@ -115,7 +115,10 @@ class ArticleInfoController extends Controller
             return $this->redirectToRoute('articleInfo');
         }
 
-        $this->revisionTable = $this->lh->getTable('revision', $dbName);
+        $this->revisionTable = $project->getRepository()->getTableName(
+            $project->getDatabaseName(),
+            'revision'
+        );
 
         // TODO: throw error if $basicInfo['missing'] is set
 
