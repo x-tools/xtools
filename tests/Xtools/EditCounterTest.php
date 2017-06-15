@@ -2,6 +2,11 @@
 
 namespace Tests\Xtools;
 
+use Xtools\EditCounter;
+use Xtools\EditCounterRepository;
+use Xtools\Project;
+use Xtools\User;
+
 class EditCounterTest extends \PHPUnit_Framework_TestCase
 {
 

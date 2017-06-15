@@ -6,6 +6,9 @@
 namespace Tests\Xtools;
 
 use DateTime;
+use Xtools\Edit;
+use Xtools\Page;
+use Xtools\Project;
 
 /**
  * Tests of the Edit class.

@@ -3,6 +3,10 @@
 namespace Tests\Xtools;
 
 use PHPUnit_Framework_TestCase;
+use Xtools\Project;
+use Xtools\ProjectRepository;
+use Xtools\User;
+use Xtools\UserRepository;
 
 class UserTest extends PHPUnit_Framework_TestCase
 {

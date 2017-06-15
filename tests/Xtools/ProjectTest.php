@@ -6,6 +6,9 @@
 namespace Tests\Xtools;
 
 use PHPUnit_Framework_TestCase;
+use Xtools\Project;
+use Xtools\ProjectRepository;
+use Xtools\User;
 
 /**
  * Tests for the Project class.
@@ -29,7 +32,7 @@ class ProjectTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('test_wiki', $project->getDatabaseName());
         $this->assertEquals('https://test.example.org/', $project->getUrl());
         $this->assertEquals('/w', $project->getScriptPath());
-        $this->assertEquals('/wiki/', $project->getArticlePath());
+        $this->assertEquals('/wiki/$1', $project->getArticlePath());
         $this->assertTrue($project->exists());
     }
 
