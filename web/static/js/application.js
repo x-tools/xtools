@@ -410,13 +410,13 @@
         // Defaults for typeahead options. preDispatch and preProcess will be
         // set accordingly for each typeahead instance
         var typeaheadOpts = {
-                url: apiPath,
-                timeout: 200,
-                triggerLength: 1,
-                method: 'get',
-                preDispatch: null,
-                preProcess: null,
-            };
+            url: apiPath,
+            timeout: 200,
+            triggerLength: 1,
+            method: 'get',
+            preDispatch: null,
+            preProcess: null,
+        };
 
         if ($articleInput[0]) {
             $articleInput.typeahead({
@@ -465,7 +465,7 @@
                             return elem.title.split('/')[0].substr(elem.title.indexOf(':') + 1);
                         });
 
-                        return results.filter(function(value, index, array) {
+                        return results.filter(function (value, index, array) {
                             return array.indexOf(value) === index;
                         });
                     },
