@@ -5,10 +5,12 @@
 
 namespace AppBundle\Controller;
 
+use Doctrine\DBAL\Connection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Xtools\Project;
 use Xtools\ProjectRepository;
 use Xtools\User;
 
@@ -24,39 +26,36 @@ class SimpleEditCounterController extends Controller
      * @Route("/sc/", name="SimpleEditCounterSlash")
      * @Route("/sc/index.php", name="SimpleEditCounterIndexPhp")
      * @Route("/sc/{project}", name="SimpleEditCounterProject")
+     * @param Request $request The HTTP request.
+     * @return Response
      */
-    public function indexAction()
+    public function indexAction(Request $request, $project = null)
     {
-
+        // Check that SC is enabled.
         $lh = $this->get('app.labs_helper');
-
         $lh->checkEnabled('sc');
 
-        // Grab the request object, grab the values out of it.
-        $request = Request::createFromGlobals();
-
-        $projectQuery = $request->query->get('project');
+        // Get the query parameters.
+        $projectName = $project ?: $request->query->get('project');
         $username = $request->query->get('username', $request->query->get('user'));
 
-        if ($projectQuery != '' && $username != '') {
-            $routeParams = [ 'project' => $projectQuery, 'username' => $username ];
+        // If we've got a project and user, redirect to results.
+        if ($projectName != '' && $username != '') {
+            $routeParams = [ 'project' => $projectName, 'username' => $username ];
             return $this->redirectToRoute('SimpleEditCounterResult', $routeParams);
-        } elseif ($projectQuery != '') {
-            return $this->redirectToRoute('SimpleEditCounterProject', [ 'project' => $projectQuery ]);
         }
 
-        // Set default project to be used by autocompletion
-        if ($projectQuery == '') {
-            $projectQuery = $this->container->getParameter('default_project');
-        }
-        $project = ProjectRepository::getProject($projectQuery, $this->container);
+        // Instantiate the project if we can, or use the default.
+        $theProject = (!empty($projectName))
+            ? ProjectRepository::getProject($projectName, $this->container)
+            : ProjectRepository::getDefaultProject($this->container);
 
-        // Otherwise fall through.
+        // Show the form.
         return $this->render('simpleEditCounter/index.html.twig', [
             'xtPageTitle' => 'tool-sc',
             'xtSubtitle' => 'tool-sc-desc',
             'xtPage' => 'sc',
-            'project' => $project,
+            'project' => $theProject,
         ]);
     }
 
@@ -72,15 +71,13 @@ class SimpleEditCounterController extends Controller
         $lh = $this->get('app.labs_helper');
         $lh->checkEnabled('sc');
 
-        $user = new User($username);
-        $username = $user->getUsername();
-
+        /** @var Project $project */
         $project = ProjectRepository::getProject($project, $this->container);
 
-        // if (!$project->exists()) {
-        //     $this->addFlash('notice', ['invalid-project', $projectQuery]);
-        //     return $this->redirectToRoute('SimpleEditCounter');
-        // }
+        if (!$project->exists()) {
+            $this->addFlash('notice', ['invalid-project', $project]);
+            return $this->redirectToRoute('SimpleEditCounter');
+        }
 
         $dbName = $project->getDatabaseName();
         $url = $project->getUrl();
@@ -90,27 +87,29 @@ class SimpleEditCounterController extends Controller
         $revisionTable = $lh->getTable('revision', $dbName);
         $userGroupsTable = $lh->getTable('user_groups', $dbName);
 
-        // Grab the connection to the replica database (which is separate from the above)
+        /** @var Connection $conn */
         $conn = $this->get('doctrine')->getManager('replicas')->getConnection();
 
         // Prepare the query and execute
         $resultQuery = $conn->prepare("
-            SELECT 'id' as source, user_id as value FROM $userTable WHERE user_name = :username
+            SELECT 'id' AS source, user_id as value FROM $userTable WHERE user_name = :username
             UNION
-            SELECT 'arch' as source, COUNT(*) AS value FROM $archiveTable WHERE ar_user_text = :username
+            SELECT 'arch' AS source, COUNT(*) AS value FROM $archiveTable WHERE ar_user_text = :username
             UNION
-            SELECT 'rev' as source, COUNT(*) AS value FROM $revisionTable WHERE rev_user_text = :username
+            SELECT 'rev' AS source, COUNT(*) AS value FROM $revisionTable WHERE rev_user_text = :username
             UNION
-            SELECT 'groups' as source, ug_group as value
+            SELECT 'groups' AS source, ug_group AS value
                 FROM $userGroupsTable JOIN $userTable on user_id = ug_user WHERE user_name = :username
         ");
 
-        $resultQuery->bindParam('username', $username);
+        $user = new User($username);
+        $usernameParam = $user->getUsername();
+        $resultQuery->bindParam('username', $usernameParam);
         $resultQuery->execute();
 
         if ($resultQuery->errorCode() > 0) {
             $this->addFlash('notice', [ 'no-result', $username ]);
-            return $this->redirectToRoute('SimpleEditCounterProject', [ 'project' => $projectQuery ]);
+            return $this->redirectToRoute('SimpleEditCounterProject', [ 'project' => $project->getDomain() ]);
         }
 
         // Fetch the result data
@@ -143,7 +142,7 @@ class SimpleEditCounterController extends Controller
         if (count($results) < 3 && $arch == 0 && $rev == 0) {
             $this->addFlash('notice', [ 'no-result', $username ]);
 
-            return $this->redirectToRoute('SimpleEditCounterProject', [ 'project' => $projectQuery ]);
+            return $this->redirectToRoute('SimpleEditCounterProject', [ 'project' => $project->getDomain() ]);
         }
 
         // Remove the last comma and space

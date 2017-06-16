@@ -7,7 +7,7 @@ namespace Xtools;
 
 use Mediawiki\Api\MediawikiApi;
 use Mediawiki\Api\SimpleRequest;
-use Symfony\Component\DependencyInjection\Container;
+use Psr\Container\ContainerInterface;
 
 /**
  * This class provides data to the Project class.
@@ -27,10 +27,10 @@ class ProjectRepository extends Repository
     /**
      * Convenience method to get a new Project object based on a given identification string.
      * @param string $projectIdent The domain name, database name, or URL of a project.
-     * @param Container $container Symfony's container.
+     * @param ContainerInterface $container Symfony's container.
      * @return Project
      */
-    public static function getProject($projectIdent, Container $container)
+    public static function getProject($projectIdent, ContainerInterface $container)
     {
         $project = new Project($projectIdent);
         $projectRepo = new ProjectRepository();
@@ -47,10 +47,10 @@ class ProjectRepository extends Repository
 
     /**
      * Get the XTools default project.
-     * @param Container $container
+     * @param ContainerInterface $container
      * @return Project
      */
-    public static function getDefaultProject(Container $container)
+    public static function getDefaultProject(ContainerInterface $container)
     {
         $defaultProjectName = $container->getParameter('default_project');
         return self::getProject($defaultProjectName, $container);

@@ -2724,16 +2724,16 @@
         },
         {
             "name": "snc/redis-bundle",
-            "version": "2.0.1",
+            "version": "2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/snc/SncRedisBundle.git",
-                "reference": "02c808d157c79ac32777e19f3ec31af24a32d2df"
+                "reference": "60b82fd31432c78d976470eae179211af7d17c60"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/snc/SncRedisBundle/zipball/02c808d157c79ac32777e19f3ec31af24a32d2df",
-                "reference": "02c808d157c79ac32777e19f3ec31af24a32d2df",
+                "url": "https://api.github.com/repos/snc/SncRedisBundle/zipball/60b82fd31432c78d976470eae179211af7d17c60",
+                "reference": "60b82fd31432c78d976470eae179211af7d17c60",
                 "shasum": ""
             },
             "require": {
@@ -2785,7 +2785,7 @@
                 "redis",
                 "symfony"
             ],
-            "time": "2017-02-16T12:02:10+00:00"
+            "time": "2017-06-15T08:51:06+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",

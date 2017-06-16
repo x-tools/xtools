@@ -2,7 +2,7 @@
 {% import 'macros/forms.html.twig' as forms %}
 
 {% block body %}
-    <form class="col-lg-8 col-lg-offset-2" action="{{ link('/sc') }}" method="get" accept-charset="utf-8" >
+    <form class="col-lg-8 col-lg-offset-2" action="{{ path('sc') }}" method="get" accept-charset="utf-8" >
         <fieldset class="form-fieldset">
             {{ forms.wiki_input(project) }}
             {{ forms.user_input(true, false, project) }}
