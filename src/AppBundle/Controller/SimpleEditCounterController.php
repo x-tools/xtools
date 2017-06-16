@@ -27,6 +27,7 @@ class SimpleEditCounterController extends Controller
      * @Route("/sc/index.php", name="SimpleEditCounterIndexPhp")
      * @Route("/sc/{project}", name="SimpleEditCounterProject")
      * @param Request $request The HTTP request.
+     * @param string $project The project database name or domain.
      * @return Response
      */
     public function indexAction(Request $request, $project = null)
