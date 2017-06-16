@@ -5,7 +5,10 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Helper\AutomatedEditsHelper;
 use AppBundle\Helper\LabsHelper;
+use AppBundle\Helper\PageviewsHelper;
+use Doctrine\DBAL\Connection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,12 +26,18 @@ class ArticleInfoController extends Controller
 {
     /** @var LabsHelper The Labs helper object. */
     private $lh;
-    /** @var string Information about the page in question. */
+    /** @var mixed[] Information about the page in question. */
     private $pageInfo;
     /** @var Edit[] All edits of the page. */
     private $pageHistory;
     /** @var string The fully-qualified name of the revision table. */
     private $revisionTable;
+    /** @var Connection The projects' database connection. */
+    protected $conn;
+    /** @var AutomatedEditsHelper The semi-automated edits helper. */
+    protected $aeh;
+    /** @var PageviewsHelper The page-views helper. */
+    protected $ph;
 
     /**
      * Override method to call ArticleInfoController::containerInitialized() when container set.
