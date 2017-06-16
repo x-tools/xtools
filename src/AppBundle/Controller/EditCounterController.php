@@ -109,7 +109,7 @@ class EditCounterController extends Controller
         $this->setUpEditCounter($project, $username);
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/result.html.twig', [
-            'xtTitle' => $username,
+            'xtTitle' => $this->user->getUsername() . ' - ' . $this->project->getTitle(),
             'xtPage' => 'ec',
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
             'is_labs' => $this->project->getRepository()->isLabs(),

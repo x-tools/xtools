@@ -320,21 +320,22 @@ class EditCounter extends Model
 
     /**
      * Get the date and time of the user's first edit.
+     * @return DateTime|bool The time of the first revision, or false.
      */
     public function datetimeFirstRevision()
     {
-        $first = $this->getRevisionDates()['first'];
-        return new DateTime($first);
+        $revDates = $this->getRevisionDates();
+        return isset($revDates['first']) ? new DateTime($revDates['first']) : false;
     }
 
     /**
      * Get the date and time of the user's first edit.
-     * @return DateTime
+     * @return DateTime|bool The time of the last revision, or false.
      */
     public function datetimeLastRevision()
     {
-        $last = $this->getRevisionDates()['last'];
-        return new DateTime($last);
+        $revDates = $this->getRevisionDates();
+        return isset($revDates['last']) ? new DateTime($revDates['last']) : false;
     }
 
     /**
@@ -344,7 +345,12 @@ class EditCounter extends Model
      */
     public function getDays()
     {
-        $days = $this->datetimeLastRevision()->diff($this->datetimeFirstRevision())->days;
+        $first = $this->datetimeFirstRevision();
+        $last = $this->datetimeLastRevision();
+        if ($first === false || $last === false) {
+            return 0;
+        }
+        $days = $last->diff($first)->days;
         return $days > 0 ? $days : 1;
     }
 

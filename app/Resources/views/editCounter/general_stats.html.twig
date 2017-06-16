@@ -24,8 +24,14 @@
                 <td>{{ msg('is-admin') }}</td>
                 <td>{% if user.isAdmin(project) %}<span class="alert-info">&check;{% else %}<span class="alert-warning">&cross;</span>{% endif %}</td>
             </tr>
-            <tr><td>{{ msg("first-edit") }}:</td><td>{{ ec.datetimeFirstRevision|date('Y-m-d H:i') }}</td></tr>
-            <tr><td>{{ msg("latest-edit") }}:</td><td>{{ ec.datetimeLastRevision|date('Y-m-d H:i') }}</td></tr>
+            <tr>
+                <td>{{ msg("first-edit") }}:</td>
+                <td>{% if ec.datetimeFirstRevision %}{{ ec.datetimeFirstRevision|date('Y-m-d H:i') }}{% endif %}</td>
+            </tr>
+            <tr>
+                <td>{{ msg("latest-edit") }}:</td>
+                <td>{% if ec.datetimeLastRevision %}{{ ec.datetimeLastRevision|date('Y-m-d H:i') }}{% endif %}</td>
+            </tr>
             <tr>
                 <td style="border-left:1px solid blue" class="highlighted">{{ msg("live-edits") }}:</td>
                 <td class="tdnum">{{ ec.countLiveRevisions|number_format }}</td>
@@ -188,7 +194,7 @@
                     {% else %}
                     <td>
                     {% endif %}
-                        <a href="{{ topProj.project.url }}/Special:Contributions/{{ user.username }}">
+                        <a href="{{ topProj.project.url }}{{ topProj.project.articlePath }}/Special:Contributions/{{ user.username }}">
                         {{ topProj.project.title }}
                         </a>
                     </td>
