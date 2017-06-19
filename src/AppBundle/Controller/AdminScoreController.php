@@ -31,7 +31,7 @@ class AdminScoreController extends Controller
      * @param string $project The project name.
      * @return Response
      */
-    public function indexAction(Request $request, $project)
+    public function indexAction(Request $request, $project = null)
     {
         $lh = $this->get('app.labs_helper');
         $lh->checkEnabled('adminscore');
