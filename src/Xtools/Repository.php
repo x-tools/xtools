@@ -9,6 +9,7 @@ use Doctrine\DBAL\Connection;
 use Mediawiki\Api\MediawikiApi;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Stopwatch\Stopwatch;
 
@@ -39,6 +40,14 @@ abstract class Repository
 
     /** @var Stopwatch The stopwatch for time profiling. */
     protected $stopwatch;
+
+    /**
+     * Create a new Repository with nothing but a null-logger.
+     */
+    public function __construct()
+    {
+        $this->log = new NullLogger();
+    }
 
     /**
      * Set the DI container.
