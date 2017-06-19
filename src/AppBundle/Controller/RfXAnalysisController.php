@@ -6,6 +6,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Xtools\ProjectRepository;
+use Xtools\RFA;
 
 class RfXAnalysisController extends Controller
 {
@@ -35,8 +37,7 @@ class RfXAnalysisController extends Controller
                     "username"=>$username
                 ]
             );
-        }
-        else if ($projectQuery != "" && $typeQuery != "") {
+        } else if ($projectQuery != "" && $typeQuery != "") {
             return $this->redirectToRoute(
                 "rfxAnalysisProjectType",
                 [
@@ -58,46 +59,57 @@ class RfXAnalysisController extends Controller
     /**
      * @Route("/rfa/{project}/{type}/{username}", name="rfxAnalysisResult")
      */
-    public function aboutAction()
+    public function resultAction($project, $type, $username)
     {
+        $lh = $this->get("app.labs_helper");
+        $api = $this->get("app.api_helper");
+        $lh->checkEnabled("rfa");
 
+        $projectData = ProjectRepository::getProject($project, $this->container);
+
+        if (!$projectData->exists()) {
+            $this->addFlash("notice", ["invalid-project", $project]);
+            return $this->redirectToRoute("rfa");
+        }
+
+        $db = $projectData->getDatabaseName();
+        $wikiUrl = $projectData->getUrl();
+
+        if ($this->getParameter("rfa")[$db] === null) {
+            $this->addFlash("notice", ["invalid-project", $project]);
+            return $this->redirectToRoute("rfa");
+        }
+
+        // Construct the page name
+        if (!isset($this->getParameter("rfa")[$db]["pages"][$type])) {
+            $pagename = "";
+        } else {
+            $pagename = $this->getParameter("rfa")[$db]["pages"][$type];
+        }
+
+        $pagename .= "/$username";
+
+        dump($pagename);
+
+        $text = $api->getPageText($project, $pagename);
+
+        $rfa = new RFA($text, $this->getParameter("rfa")[$db]["sections"], "User");
+
+        if ($rfa->get_lasterror() != null) {
+            $this->addFlash("notice", [$rfa->get_lasterror()]);
+            return $this->redirectToRoute("rfa");
+        }
+
+        dump($rfa);
 
         // replace this example code with whatever you need
         return $this->render(
-            'default/about.html.twig', array(
-            "xtTitle" => "About",
-            "xtPageTitle" => "about",
-            'xtPage' => "index",
+            'rfxAnalysis/result.html.twig', array(
+                "xtTitle" => "rfa",
+                "xtPageTitle" => "rfa",
+                'xtPage' => "rfa",
+                'url' => $wikiUrl,
             )
-        );
-    }
-
-    /**
-     * @Route("/config", name="configPage")
-     */
-    public function configAction()
-    {
-
-        if ($this->container->getParameter('kernel.environment') != "dev") {
-            throw new NotFoundHttpException();
-        }
-
-        $params = $this->container->getParameterBag()->all();
-
-        foreach ($params as $key => $value) {
-            if (strpos($key, "password") !== false) {
-                $params[$key] = "<REDACTED>";
-            }
-        }
-
-        // replace this example code with whatever you need
-        return $this->render(
-            'default/config.html.twig', [
-            "xtTitle" => "Config",
-            "xtPageTitle" => "Config",
-            'xtPage' => "index",
-            'dump' => print_r($params, true),
-            ]
         );
     }
 }

@@ -2,6 +2,7 @@ imports:
     - { resource: defaults.yml }
     - { resource: parameters.yml }
     - { resource: labs_overrides.yml, ignore_errors: true }
+    - { resource: rfx_analysis.yml, ignore_errors: true }
     - { resource: security.yml }
     - { resource: services.yml }
     - { resource: semi_automated.yml }

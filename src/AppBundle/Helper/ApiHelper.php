@@ -565,4 +565,27 @@ class ApiHelper extends HelperBase
             }
         });
     }
+
+    public function getPageText($project, $title) {
+        $this->setUp($project);
+
+        $result = null;
+
+        $params = [
+            "page" => $title,
+            "prop" => "wikitext"
+        ];
+
+        try {
+            $query = new SimpleRequest("parse", $params);
+            $res = $this->api->getRequest($query);
+            if (isset($res['parse']['wikitext']['*'])) {
+                $result = $res['parse']['wikitext']['*'];
+            }
+        } catch (Exception $e) {
+            // The api returned an error!  Ignore
+        }
+
+        return $result;
+    }
 }

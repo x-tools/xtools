@@ -393,6 +393,7 @@ class AppExtension extends Extension
      */
     public function quote()
     {
+        if (!$this->container->getParameter("enable.bash")) return "";
         $quotes = $this->container->getParameter('quotes');
         $id = array_rand($quotes);
         return $quotes[$id];

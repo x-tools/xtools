@@ -1,13 +1,11 @@
 parameters:
   rfa:
-    enwiki:
-      rfa: "Wikipedia:Requests for Adminship"
-      rfb: "Wikipedia:Requests for bureaucratship"
-    dewiki:
-      rfa:
-      rfb:
-      os:
-      cu:
-    commonswiki:
-      rfa:
-      rfb:
+    tilda_wiki_p:
+      sections:
+        - "support"
+        - "oppose"
+        - "neutral"
+        - "comments"
+      pages:
+        rfa: "Project:Requests for Adminship"
+        rfb: "Project:Requests for bureaucratship"
