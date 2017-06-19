@@ -267,10 +267,16 @@ class EditCounterRepository extends Repository
      */
     public function globalEditCounts(User $user, Project $project)
     {
+        // Get the edit counts from CentralAuth or database.
         $editCounts = $this->globalEditCountsFromCentralAuth($user, $project);
         if ($editCounts === false) {
             $editCounts = $this->globalEditCountsFromDatabases($user, $project);
         }
+
+        // Pre-populate all projects' metadata, to prevent each project call from fetching it.
+        $project->getRepository()->getAll();
+
+        // Compile the output.
         $out = [];
         foreach ($editCounts as $editCount) {
             $out[] = [
@@ -291,6 +297,7 @@ class EditCounterRepository extends Repository
      */
     protected function globalEditCountsFromCentralAuth(User $user, Project $project)
     {
+        $this->log->debug(__METHOD__." Getting global edit counts for ".$user->getUsername());
         // Set up cache and stopwatch.
         $cacheKey = 'globalRevisionCounts.'.$user->getUsername();
         if ($this->cache->hasItem($cacheKey)) {

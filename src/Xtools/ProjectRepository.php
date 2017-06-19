@@ -21,8 +21,9 @@ class ProjectRepository extends Repository
     /** @var string[] Metadata if XTools is in single-wiki mode. */
     protected $singleMetadata;
 
-    /** @var string[][] Metadata of all projects, populated by self::getAll(). */
-    protected $projectsMetadata;
+    /** @var string The cache key for the 'all project' metadata.
+     */
+    protected $cacheKeyAllProjects = 'allprojects';
 
     /**
      * Convenience method to get a new Project object based on a given identification string.
@@ -90,23 +91,32 @@ class ProjectRepository extends Repository
      */
     public function getAll()
     {
+        $this->log->debug(__METHOD__." Getting all projects' metadata");
         // Single wiki mode?
         if ($this->singleMetadata) {
             return [$this->getOne('')];
         }
+
         // Maybe we've already fetched it.
-        if (is_array($this->projectsMetadata)) {
-            return $this->projectsMetadata;
+        if ($this->cache->hasItem($this->cacheKeyAllProjects)) {
+            return $this->cache->getItem($this->cacheKeyAllProjects)->get();
         }
+
+        // Otherwise, fetch all from the database.
         $wikiQuery = $this->getMetaConnection()->createQueryBuilder();
         $wikiQuery->select(['dbname', 'url'])->from('wiki');
         $projects = $wikiQuery->execute()->fetchAll();
-        $this->projectsMetadata = [];
+        $projectsMetadata = [];
         foreach ($projects as $project) {
-            $this->projectsMetadata[$project['url']] = $project;
-            $this->projectsMetadata[$project['dbname']] = $project;
+            $projectsMetadata[$project['dbname']] = $project;
         }
-        return $this->projectsMetadata;
+
+        // Cache and return.
+        $cacheItem = $this->cache->getItem($this->cacheKeyAllProjects);
+        $cacheItem->set($projectsMetadata);
+        $cacheItem->expiresAfter(new \DateInterval('P1D'));
+        $this->cache->save($cacheItem);
+        return $projectsMetadata;
     }
 
     /**
@@ -116,20 +126,24 @@ class ProjectRepository extends Repository
      */
     public function getOne($project)
     {
+        $this->log->debug(__METHOD__." Getting metadata about $project");
         // For single-wiki setups, every project is the same.
         if ($this->singleMetadata) {
             return $this->singleMetadata;
         }
 
-        // Maybe we've already fetched it (if we're requesting via a domain).
-        if (isset($this->projectsMetadata[$project])) {
-            return $this->projectsMetadata[$project];
-        }
-        if (isset($this->projectsMetadata['https://'.$project])) {
-            return $this->projectsMetadata['https://'.$project];
-        }
-
         // For muli-wiki setups, first check the cache.
+        // First the all-projects cache, then the individual one.
+        if ($this->cache->hasItem($this->cacheKeyAllProjects)) {
+            foreach ($this->cache->getItem($this->cacheKeyAllProjects)->get() as $projMetadata) {
+                if ($projMetadata['dbname'] == "$project"
+                    || $projMetadata['url'] == "$project"
+                    || $projMetadata['url'] == "https://$project") {
+                    $this->log->debug(__METHOD__ . " Using cached data for $project");
+                    return $projMetadata;
+                }
+            }
+        }
         $cacheKey = "project.$project";
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
