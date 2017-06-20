@@ -132,6 +132,7 @@ class EditCounterController extends Controller
         $this->setUpEditCounter($project, $username);
         $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/general_stats.html.twig', [
+            'xtTitle' => 'general-stats',
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
             'is_labs' => $this->project->getRepository()->isLabs(),
@@ -153,7 +154,7 @@ class EditCounterController extends Controller
         $this->setUpEditCounter($project, $username);
         $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/namespace_totals.html.twig', [
-            'xtTitle' => 'namespacetotals',
+            'xtTitle' => 'namespace-totals',
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
             'is_labs' => $this->project->getRepository()->isLabs(),
@@ -165,7 +166,7 @@ class EditCounterController extends Controller
 
     /**
      * Display the timecard section.
-     * @Route("/ec-timecard/{project}/{username}", name="EditCounterTimeCard")
+     * @Route("/ec-timecard/{project}/{username}", name="EditCounterTimecard")
      * @param string $project
      * @param string $username
      * @return Response
@@ -180,7 +181,7 @@ class EditCounterController extends Controller
 
         $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/timecard.html.twig', [
-            'xtTitle' => 'tool-ec',
+            'xtTitle' => 'timecard',
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
             //'datasets' => $datasets,
@@ -204,7 +205,7 @@ class EditCounterController extends Controller
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         //$yearcounts = $this->editCounterHelper->getYearCounts($username);
         return $this->render('editCounter/yearcounts.html.twig', [
-            'xtTitle' => 'tool-ec',
+            'xtTitle' => 'year-counts',
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
             //'namespaces' => $this->apiHelper->namespaces($project),
@@ -228,7 +229,7 @@ class EditCounterController extends Controller
         $this->setUpEditCounter($project, $username);
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/monthcounts.html.twig', [
-            'xtTitle' => 'tool-ec',
+            'xtTitle' => 'month-counts',
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
             'is_labs' => $this->project->getRepository()->isLabs(),
@@ -250,7 +251,7 @@ class EditCounterController extends Controller
         $this->setUpEditCounter($project, $username);
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/latest_global.html.twig', [
-            'xtTitle' => 'tool_ec',
+            'xtTitle' => 'latest-global-edits',
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
             'user' => $this->user,

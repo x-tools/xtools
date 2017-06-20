@@ -27,7 +27,11 @@
 
         <div class="panel panel-default" id="general-stats">
             <div class="panel-heading">
-                <h4 class="topcaption">{{ msg("general-stats") }}</h4>
+                <h4 class="topcaption">
+                    <a href="{{ path('EditCounterGeneralStats', {project:project.domain, username:user.username})}}">
+                        {{ msg("general-stats") }}
+                    </a>
+                </h4>
             </div>
             <div class="panel-body">
                 {{ render(path('EditCounterGeneralStats', {
@@ -38,7 +42,13 @@
         </div>
 
         <div class="panel panel-default" id="namespace-totals">
-            <div class="panel-heading"><h4>{{ msg('namespace-totals') }}</h4></div>
+            <div class="panel-heading">
+                <h4>
+                    <a href="{{ path('EditCounterNamespaceTotals', {project:project.domain, username:user.username})}}">
+                        {{ msg('namespace-totals') }}
+                    </a>
+                </h4>
+            </div>
             <div class="panel-body">
                 {{ render(path('EditCounterNamespaceTotals', {
                     'username': user.username,
@@ -48,7 +58,13 @@
         </div>
 
         <div class="panel panel-default" id="year-counts">
-            <div class="panel-heading"><h4>{{ msg('year-counts') }}</h4></div>
+            <div class="panel-heading">
+                <h4>
+                    <a href="{{ path('EditCounterYearCounts', {project:project.domain, username:user.username})}}">
+                        {{ msg('year-counts') }}
+                    </a>
+                </h4>
+            </div>
             <div class="panel-body">
                 {{ render(path('EditCounterYearCounts', {
                     'username': user.username,
@@ -58,7 +74,13 @@
         </div>
 
         <div class="panel panel-default" id="month-counts">
-            <div class="panel-heading"><h4>{{ msg('month-counts') }}</h4></div>
+            <div class="panel-heading">
+                <h4>
+                    <a href="{{ path('EditCounterMonthCounts', {project:project.domain, username:user.username})}}">
+                        {{ msg('month-counts') }}
+                    </a>
+                </h4>
+            </div>
             <div class="panel-body">
                 {{ render(path('EditCounterMonthCounts', {
                     'username': user.username,
@@ -68,9 +90,15 @@
         </div>
 
         <div class="panel panel-default" id="timecard">
-            <div class="panel-heading"><h4>{{ msg('timecard') }}</h4></div>
+            <div class="panel-heading">
+                <h4>
+                    <a href="{{ path('EditCounterTimecard', {project:project.domain, username:user.username})}}">
+                        {{ msg('timecard') }}
+                    </a>
+                </h4>
+            </div>
             <div class="panel-body">
-                {{ render(path('EditCounterTimeCard', {
+                {{ render(path('EditCounterTimecard', {
                     'username': user.username,
                     'project': project.domain
                 })) }}
@@ -79,7 +107,12 @@
 
         <div class="panel panel-default" id="latestglobal">
             <div class="panel-heading">
-                <h4>{{ msg('latest-global-edits') }} <small>{{ msg('latest-global-edits-desc') }}</small></h4>
+                <h4>
+                    <a href="{{ path('EditCounterLatestGlobal', {project:project.domain, username:user.username})}}">
+                        {{ msg('latest-global-edits') }}
+                    </a>
+                    <small>{{ msg('latest-global-edits-desc') }}</small>
+                </h4>
             </div>
             <div class="panel-body">
                 {{ render(path('EditCounterLatestGlobal', {
