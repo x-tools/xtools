@@ -385,7 +385,7 @@ class EditCounterRepository extends Repository
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
         $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
         $sql = "SELECT page_namespace, COUNT(rev_id) AS total
-            FROM $revisionTable r JOIN $pageTable p on r.rev_page = p.page_id
+            FROM $pageTable p JOIN $revisionTable r ON (r.rev_page = p.page_id)
             WHERE r.rev_user = :id
             GROUP BY page_namespace";
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
