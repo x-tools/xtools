@@ -257,6 +257,10 @@ class ProjectRepository extends Repository
     public function optedIn()
     {
         $optedIn = $this->container->getParameter('opted_in');
+        // In case there's just one given.
+        if (!is_array($optedIn)) {
+            $optedIn = [ $optedIn ];
+        }
         return $optedIn;
     }
 
