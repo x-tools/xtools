@@ -5,18 +5,15 @@
 
 namespace Xtools;
 
+use DateInterval;
 use Mediawiki\Api\SimpleRequest;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * This class provides data for the User class.
  */
 class UserRepository extends Repository
 {
-
-    /** @var int[] The user's IDs on different projects. */
-    protected $userIds;
 
     /**
      * Convenience method to get a new User object.
@@ -41,16 +38,24 @@ class UserRepository extends Repository
      */
     public function getId($databaseName, $username)
     {
-        if (isset($this->userIds[$databaseName][$username])) {
-            return $this->userIds[$databaseName][$username];
+        $cacheKey = 'user_id.'.$databaseName.'.'.$username;
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
         }
+
         $userTable = $this->getTableName($databaseName, 'user');
         $sql = "SELECT user_id FROM $userTable WHERE user_name = :username LIMIT 1";
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $resultQuery->bindParam("username", $username);
         $resultQuery->execute();
         $userId = (int)$resultQuery->fetchColumn();
-        $this->userIds[$databaseName][$username] = $userId;
+
+        // Cache for 10 minutes.
+        $cacheItem = $this->cache
+            ->getItem($cacheKey)
+            ->set($userId)
+            ->expiresAfter(new DateInterval('PT10M'));
+        $this->cache->save($cacheItem);
         return $userId;
     }
 
@@ -80,7 +85,7 @@ class UserRepository extends Repository
         // Cache for 10 minutes, and return.
         $cacheItem = $this->cache->getItem($cacheKey)
             ->set($result)
-            ->expiresAfter(new \DateInterval('PT10M'));
+            ->expiresAfter(new DateInterval('PT10M'));
         $this->cache->save($cacheItem);
         $this->stopwatch->stop($cacheKey);
 
