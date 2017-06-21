@@ -1,4 +1,13 @@
 <?php
+/**
+ * This file contains the code that powers the AdminStats page of xTools.
+ *
+ * @category RfXAnalysis
+ * @package  AppBundle\Controller
+ * @author   Xtools Team <xtools@lists.wikimedia.org>
+ * @license  GPL 3.0
+ * @link     http://tools.wmflabs.org/xtools/rfa
+ */
 
 namespace AppBundle\Controller;
 
@@ -9,14 +18,31 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Xtools\ProjectRepository;
 use Xtools\RFA;
 
+/**
+ * Class RfXAnalysisController
+ *
+ * @category RfXAnalysis
+ * @package  AppBundle\Controller
+ * @author   Xtools Team <xtools@lists.wikimedia.org>
+ * @license  GPL 3.0
+ * @link     http://tools.wmflabs.org/xtools/rfa
+ */
 class RfXAnalysisController extends Controller
 {
     /**
+     * Renders the index page for the RfX Tool
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request Given by Symfony
+     * @param string                                    $project Optional project.
+     * @param string                                    $type    Optional RfX type
+     *
      * @Route("/rfa",                  name="rfxAnalysis")
      * @Route("/rfa",                  name="rfa")
      * @Route("/rfa/index.php",        name="rfxAnalysisIndexPhp")
      * @Route("/rfa/{project}",        name="rfxAnalysisProject")
      * @Route("/rfa/{project}/{type}", name="rfxAnalysisProjectType")
+     *
+     * @return \Symfony\Component\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function indexAction(Request $request, $project = null, $type = null)
     {
@@ -57,7 +83,15 @@ class RfXAnalysisController extends Controller
     }
 
     /**
+     * Renders the output page for the RfX Tool
+     *
+     * @param string $project  Optional project.
+     * @param string $type     Type of RfX we are processing.
+     * @param string $username Username of the person we're analizing.
+     *
      * @Route("/rfa/{project}/{type}/{username}", name="rfxAnalysisResult")
+     *
+     * @return \Symfony\Component\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function resultAction($project, $type, $username)
     {
