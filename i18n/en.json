@@ -222,6 +222,7 @@
   "reverted-edits": "Reverted edits",
   "rfx-bureaucrat": "This tool can also analyze Requests for bureaucratship pages",
   "rfx-intro": "This tool analyzes votes and identifies duplicate voters in a:",
+  "rfx-duplicates": "Found $1 duplicate votes, which are highlighted in red",
   "rfx-page": "RfX page",
   "rights": "Rights",
   "saturday": "Saturday",

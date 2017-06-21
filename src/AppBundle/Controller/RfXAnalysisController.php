@@ -89,8 +89,6 @@ class RfXAnalysisController extends Controller
 
         $pagename .= "/$username";
 
-        dump($pagename);
-
         $text = $api->getPageText($project, $pagename);
 
         $rfa = new RFA($text, $this->getParameter("rfa")[$db]["sections"], "User");
@@ -100,15 +98,38 @@ class RfXAnalysisController extends Controller
             return $this->redirectToRoute("rfa");
         }
 
-        dump($rfa);
+        $support = $rfa->get_support();
+        $oppose = $rfa->get_oppose();
+        $neutral = $rfa->get_neutral();
+        $dup = $rfa->get_duplicates();
+
+        $end = $rfa->get_enddate();
+
+        $percent = (sizeof($support) /
+            (sizeof($support) + sizeof($oppose) + sizeof($neutral)));
+
+        $percent = $percent * 100;
+
+        $percent = round($percent, 2);
 
         // replace this example code with whatever you need
         return $this->render(
             'rfxAnalysis/result.html.twig', array(
-                "xtTitle" => "rfa",
-                "xtPageTitle" => "rfa",
+                "xtTitle" => $username,
                 'xtPage' => "rfa",
                 'url' => $wikiUrl,
+                'username' => $username,
+                'type' => $type,
+                'project' => $projectData->getDatabaseName(),
+                'support' => $support,
+                'oppose' => $oppose,
+                'neutral' => $neutral,
+                'duplicates' => $dup,
+                'enddate' => $end,
+                'percent' => $percent,
+                'project_url' => $projectData->getUrl(),
+                'pagename' => $pagename,
+
             )
         );
     }

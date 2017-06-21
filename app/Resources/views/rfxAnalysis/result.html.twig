@@ -1,1 +1,60 @@
 {% extends "base.html.twig" %}
+
+{% block body %}
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <p class="xt-heading-top">
+                <a href="{{ wiki_link(pagename, project_url) }}">{{ pagename }}</a>
+            </p>
+        </div>
+        <div class="panel-body xt-panel-body-top">
+            <p>
+                {{ wiki_log_link('User:'~username, project_url, msg('block-log'), 'block') }}
+                &middot;
+                <a href="{{ path('EditCounterResult', {"project":project, "username":username}) }}">{{ msg("tool-ec") }}</a>
+                {% if isWMFLabs() %}
+                &middot;
+                <a href="https://tools.wmflabs.org/guc/?user=ONUnicorn">Global user contributions</a>
+                    &middot;
+                <a href="https://meta.wikimedia.org/w/index.php?title=Special%3ACentralAuth&amp;target=ONUnicorn">Global Account Manager</a>
+                    &middot;
+                <a href="https://tools.wmflabs.org/pageviews/?project=en.wikipedia.org&amp;pages=User:ONUnicorn">Userpage pageviews</a>
+                {% endif %}
+            </p>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="topcaption">{{ msg("general-stats") }}<span class="showhide" onclick="switchShow( 'generalstats', this )">[hide]</span></h4>
+                </div>
+                <div class="panel-body" id="generalstats">
+                    {{ user_link(username, project_url) }}'s {{ type|upper }} ({{ support|length }}/{{ oppose|length }}/{{ neutral|length }}, {{ percent }}%)
+                    <br />
+                    {{ msg("end") }}: {{ enddate }}
+                    <br />
+                    {{ msg("rfx-duplicates", [duplicates|length]) }}
+                        <div class="container">
+                                <h3>{{ msg("support") }}</h3>
+                                <ol>
+                                    {% for username in support %}
+                                        <li>{{ user_link(username.name, project_url) }}</li>
+                                    {% endfor %}
+                                </ol>
+                                <h3>{{ msg("oppose") }}</h3>
+                                <ol>
+                                    {% for username in oppose %}
+                                        <li>{{ user_link(username.name, project_url) }}</li>
+                                    {% endfor %}
+                                </ol>
+                                <h3>{{ msg("neutral") }}</h3>
+                                <ol>
+                                    {% for username in neutral %}
+                                        <li>{{ user_link(username.name, project_url) }}</li>
+                                    {% endfor %}
+                                </ol>
+                                </ol>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
