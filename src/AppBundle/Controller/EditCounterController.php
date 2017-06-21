@@ -53,7 +53,7 @@ class EditCounterController extends Controller
 
         // Don't continue if the user doesn't exist.
         if (!$this->user->existsOnProject($this->project)) {
-            $this->container->getSession()->getFlashBag()->set('notice', 'user-not-found');
+            $this->addFlash('notice', 'user-not-found');
         }
     }
 
