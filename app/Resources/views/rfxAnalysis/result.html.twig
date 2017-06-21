@@ -13,12 +13,12 @@
                 &middot;
                 <a href="{{ path('EditCounterResult', {"project":project, "username":username}) }}">{{ msg("tool-ec") }}</a>
                 {% if isWMFLabs() %}
-                &middot;
-                <a href="https://tools.wmflabs.org/guc/?user=ONUnicorn">Global user contributions</a>
                     &middot;
-                <a href="https://meta.wikimedia.org/w/index.php?title=Special%3ACentralAuth&amp;target=ONUnicorn">Global Account Manager</a>
+                <a href="https://tools.wmflabs.org/guc/?user={{ username }}">Global user contributions</a>
                     &middot;
-                <a href="https://tools.wmflabs.org/pageviews/?project=en.wikipedia.org&amp;pages=User:ONUnicorn">Userpage pageviews</a>
+                <a href="https://meta.wikimedia.org/w/index.php?title=Special%3ACentralAuth&amp;target={{ username }}">Global Account Manager</a>
+                    &middot;
+                <a href="https://tools.wmflabs.org/pageviews/?project=en.wikipedia.org&amp;pages=User:{{ username }}">Userpage pageviews</a>
                 {% endif %}
             </p>
 
