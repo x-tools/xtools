@@ -32,7 +32,9 @@ body {
 }
 
 .navbar-top {
-    padding: 10px 15px 0;
+    border-top: 0;
+    min-height: 51px;
+    padding: 0;
 
     li:last-child {
         padding-right: 0;
@@ -42,13 +44,45 @@ body {
     float: left;
     padding: 0;
 
+    &.in {
+        position: relative;
+        top: 8px;
+    }
+
     .nav {
         margin: 0;
     }
 }
 
+.nav-buttons {
+    left: 1px;
+    margin-right: 8px;
+    position: relative;
+    top: 8px;
+}
+
+.navbar-nav > li > a {
+    height: 50px;
+    line-height: 50px;
+    padding: 0 10px;
+}
+
+.home-link {
+    bottom: 1px;
+    margin: 0 12px;
+    padding: 0 !important;
+    position: relative;
+
+    img {
+        height: 32px;
+    }
+}
+
 .navbar-toggle {
+    left: 5px;
     margin: 0;
+    position: relative;
+    top: 7px;
 }
 
 .lang-group {
@@ -65,7 +99,7 @@ body {
         height: 17px;
         left: 8px;
         position: absolute;
-        top: 7px;
+        top: 8px;
         width: 17px;
     }
 }
@@ -82,15 +116,20 @@ body {
     }
 }
 
+/** TOOLTIPS */
+$tooltip-bg: #fff;
+$tooltip-border: #ddd;
+$tooltip-shadow: #ccc;
+
 .tooltipcss {
     position: inherit;
 
     .tooltip-body {
         @include center('vertical');
-        background: #FFFAF0;
-        border: 1px solid #DCA;
+        background: $tooltip-bg;
+        border: 1px solid $tooltip-border;
         border-radius: 4px;
-        box-shadow: 5px 5px 8px #CCC;
+        box-shadow: 5px 5px 8px $tooltip-shadow;
         color: #111;
         display: none;
         font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
@@ -117,11 +156,11 @@ body {
         width: 0;
     }
     &::before {
-        border-color: transparent #DCA transparent transparent;
+        border-color: transparent $tooltip-border transparent transparent;
         border-width: 11px;
     }
     &::after {
-        border-color: transparent #FFFAF0 transparent transparent;
+        border-color: transparent $tooltip-bg transparent transparent;
         border-width: 10px;
     }
 }
@@ -142,9 +181,6 @@ body {
     white-space: normal;
 }
 
-.navbar-nav > li > a, .navbar-header > a {
-    padding: 10px;
-}
 .col {
     display: inline-block;
     padding: 20px 60px 0px 15px;

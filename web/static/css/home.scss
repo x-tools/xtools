@@ -1,0 +1,46 @@
+@import 'mixins.scss';
+
+.home {
+    #wrapper {
+        background: transparent;
+    }
+
+    .logo {
+        margin: 20px 0 10px;
+        width: 600px;
+    }
+
+    .tool-list {
+        padding-top: 10px;
+        text-align: left;
+
+        .btn {
+            display: block;
+            height: 65px;
+            line-height: 51px;
+            margin-top: 15px;
+            overflow: hidden;
+            padding-left: 70px;
+            position: relative;
+            text-align: left;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        img {
+            @include center('vertical');
+            left: 12px;
+            width: 50px;
+        }
+    }
+}
+
+@media (max-width: $bootstrap-sm) {
+    .home {
+        .splash-logo {
+            max-width: 450px;
+            width: 90%;
+        }
+    }
+}

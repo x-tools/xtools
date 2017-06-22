@@ -2,17 +2,21 @@
 
 {% block body %}
     <div class="col-lg-8 col-lg-offset-2">
-        <p>We have the following tools available:</p>
-        <ul id="tool-list">
+        <div class="text-center">
+            <img class="splash-logo" src="{{ asset('static/images/logo.svg') }}" />
+            <h4>Feeding your data hunger</h4>
+        </div>
+        <div class="tool-list">
             {% for tool in tools() %}
                 {% if enabled(tool) %}
-                    <li>
-                        <a href="{{ path(tool) }}">{{ msg("tool-" ~ tool) }}</a>
+                    <a class="btn btn-default" href="{{ path(tool) }}">
+                        <img src="{{ asset('static/images/' ~ tool ~ '.svg') }}" />
+                        {{ msg("tool-" ~ tool) }}
                         &mdash;
                         {{ msg("tool-" ~ tool ~ "-desc") }}
-                    </li>
+                    </a>
                 {% endif %}
             {% endfor %}
-        </ul>
+        </div>
     </div>
 {% endblock %}
