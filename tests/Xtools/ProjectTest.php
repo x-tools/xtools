@@ -52,7 +52,7 @@ class ProjectTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Xtools can be run in single-wiki mode, where there is only one project.
+     * XTools can be run in single-wiki mode, where there is only one project.
      */
     public function testSingleWiki()
     {

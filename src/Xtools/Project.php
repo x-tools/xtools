@@ -9,7 +9,7 @@ use Mediawiki\Api\MediawikiApi;
 use Symfony\Component\VarDumper\VarDumper;
 
 /**
- * A Project is a single wiki that Xtools is querying.
+ * A Project is a single wiki that XTools is querying.
  */
 class Project extends Model
 {

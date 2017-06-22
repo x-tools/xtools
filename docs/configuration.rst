@@ -4,7 +4,7 @@
 Configuration
 #############
 
-As part of the installation of xTools, ``composer install`` or ``composer update`` may prompt you for configuration options.  This is a definition
+As part of the installation of XTools, ``composer install`` or ``composer update`` may prompt you for configuration options.  This is a definition
 of those options.
 
 Databases
@@ -43,9 +43,9 @@ Application
 - **app.noticeStyle** - Style of the notice banner.  Available options: "error," "warning," "succeess," "info."
 - **app.noticeText** - Message shown to the user.  If you provide a valid intuition key, it will display that message instead
 - **app.replag_threshold** - Number of seconds to consider the replicas as "lagged", and show a warning to the user that the data may be out of date
-- **app.load_stylesheets_from_cdn** - Whether to load our stylesheets and scripts from a CDN.  This is required if xTools is installed on a Windows server
-- **app.single_wiki** - Point xTools to a single wiki, instead of using a meta database.  This ignores database_meta_name above.
-- **app.is_labs** - Whether xTools lives on the Wikimedia Foundation Labs environment.  This should be set to false.
+- **app.load_stylesheets_from_cdn** - Whether to load our stylesheets and scripts from a CDN.  This is required if XTools is installed on a Windows server
+- **app.single_wiki** - Point XTools to a single wiki, instead of using a meta database.  This ignores database_meta_name above.
+- **app.is_labs** - Whether XTools lives on the Wikimedia Foundation Labs environment.  This should be set to false.
 - **wiki_url** - URL to use if app.single_wiki is enabled.  The title of pages is attached to the end.
 - **api_path** - The API path for the project, usually /w/api.php
 - **opted_in** - A list of database names of projects that will display :ref:`restricted statistics <optin>` regardless of individual users' preferences

@@ -48,7 +48,7 @@ class LabsHelper
     }
 
     /**
-     * Is xTools connecting to WMF Labs?
+     * Is XTools connecting to WMF Labs?
      *
      * @return boolean
      */
@@ -79,7 +79,7 @@ class LabsHelper
                 'dbname' => $this->container->getParameter('database_replica_name'),
                 'url' => $this->container->getParameter('wiki_url'),
                 'lang' => $this->container->getParameter('lang'),
-                'name' => 'Xtools', // Not used?
+                'name' => 'XTools', // Not used?
             ];
         }
 

@@ -1,5 +1,5 @@
 ******************
-Welcome to xTools!
+Welcome to XTools!
 ******************
 
 XTools is a suite of statistics tools for MediaWiki wikis, users, pages, and more.

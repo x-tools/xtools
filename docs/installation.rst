@@ -2,19 +2,19 @@
 Installation
 ############
 
-To install xTools, please follow these steps:
+To install XTools, please follow these steps:
 
 1. Download the repository into a web-accessible location.
 2. Ensure that ``var/`` and all files within it (other than ``var/SymfonyRequirements.php``) are writable by the web server.
 3. Run ``composer install`` and be prompted to enter database details and other configuration information.
-4. Open xTools in your browser; you should see the xTools landing page.
+4. Open XTools in your browser; you should see the XTools landing page.
 
 To update the cache after making configuration changes, run ``./bin/console cache:clear``.
 
 Single wiki
 ===========
 
-To use xTools for a single wiki, set the following variables in ``parameters.yml``:
+To use XTools for a single wiki, set the following variables in ``parameters.yml``:
 
 * ``app.single_wiki`` to ``true``
 * ``wiki_url`` to the full URL of your wiki
@@ -25,7 +25,7 @@ To use xTools for a single wiki, set the following variables in ``parameters.yml
 Wiki family
 ===========
 
-To use xTools for a family of wikis, set ``app.single_wiki`` to ``false`` in ``parameters.yml``.
+To use XTools for a family of wikis, set ``app.single_wiki`` to ``false`` in ``parameters.yml``.
 
 You will also need to create a new database table to record the meta information about your wikis.
 It can live wherever you want;

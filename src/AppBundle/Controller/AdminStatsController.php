@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file contains the code that powers the AdminStats page of xTools.
+ * This file contains the code that powers the AdminStats page of XTools.
  *
  * @version 1.5.1
  */
@@ -18,7 +18,7 @@ use Xtools\ProjectRepository;
  *
  * @category AdminStats
  * @package  AppBundle\Controller
- * @author   Xtools Team <xtools@lists.wikimedia.org>
+ * @author   XTools Team <xtools@lists.wikimedia.org>
  * @license  GPL 3.0
  * @link     http://tools.wmflabs.org/xtools/adminstats
  */

@@ -6,7 +6,7 @@
 namespace Xtools;
 
 /**
- * A User is a wiki user who has the same username across all projects in an Xtools installation.
+ * A User is a wiki user who has the same username across all projects in an XTools installation.
  */
 class User extends Model
 {
