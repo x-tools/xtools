@@ -127,6 +127,9 @@ class TopEditsController extends Controller
     {
         // Make sure they've opted in to see this data.
         if (!$project->userHasOptedIn($user)) {
+            $optedInPage = $project
+                ->getRepository()
+                ->getPage($project, $project->userOptInPage($user));
             return $this->render('topedits/result_namespace.html.twig', [
                 'xtPage' => 'topedits',
                 'project' => $project,
@@ -134,6 +137,7 @@ class TopEditsController extends Controller
                 'namespace' => $namespaceId,
                 'edits' => [],
                 'content_title' => '',
+                'opted_in_page' => $optedInPage,
             ]);
         }
 

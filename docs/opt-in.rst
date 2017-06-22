@@ -20,7 +20,6 @@ The affected tools are as follows:
 
   * Monthly counts bar chart
   * Timecard punch chart
-  * Top edited pages
 
 * :ref:`Top Edits <topedits>`:
 

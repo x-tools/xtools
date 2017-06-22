@@ -78,7 +78,7 @@
             {{ layout.content_block(content_title, content, '', null, false, false) }}
         {% else %}
             <div class="alert alert-info">
-                <p>{{ msg('not-opted-in', [wiki.pageLinkRaw(project.userOptInPage(user), project)]) }}</p>
+                <p>{{ msg('not-opted-in', [ wiki.pageLink(opted_in_page) ]) }}</p>
             </div>
         {% endif %}
     </div>

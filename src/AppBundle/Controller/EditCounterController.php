@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Xtools\EditCounter;
 use Xtools\EditCounterRepository;
+use Xtools\Page;
 use Xtools\Project;
 use Xtools\ProjectRepository;
 use Xtools\User;
@@ -174,21 +175,19 @@ class EditCounterController extends Controller
     public function timecardAction($project, $username)
     {
         $this->setUpEditCounter($project, $username);
-
-        // Make sure they've opted in to see this data.
-        if (!$this->project->userHasOptedIn($this->user)) {
-        }
-
         $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
+        $optedInPage = $this->project
+            ->getRepository()
+            ->getPage($this->project, $this->project->userOptInPage($this->user));
         return $this->render('editCounter/timecard.html.twig', [
             'xtTitle' => 'timecard',
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
-            //'datasets' => $datasets,
             'is_labs' => $this->project->getRepository()->isLabs(),
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
+            'opted_in_page' => $optedInPage,
         ]);
     }
 
@@ -228,6 +227,9 @@ class EditCounterController extends Controller
     {
         $this->setUpEditCounter($project, $username);
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
+        $optedInPage = $this->project
+            ->getRepository()
+            ->getPage($this->project, $this->project->userOptInPage($this->user));
         return $this->render('editCounter/monthcounts.html.twig', [
             'xtTitle' => 'month-counts',
             'xtPage' => 'ec',
@@ -236,6 +238,7 @@ class EditCounterController extends Controller
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
+            'opted_in_page' => $optedInPage,
         ]);
     }
 

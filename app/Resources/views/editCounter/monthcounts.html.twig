@@ -1,10 +1,11 @@
 {% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
+{% import 'macros/wiki.html.twig' as wiki %}
 
 {% block body %}
 
 {% if not project.userHasOptedIn(user) %}
     <div class="alert alert-info">
-        <p>{{ msg('not-opted-in', [wiki_link(project.userOptInPage(user), project.url~project.articlePath)]) }}</p>
+        <p>{{ msg('not-opted-in', [ wiki.pageLink(opted_in_page) ] ) }}</p>
     </div>
 {% else %}
 
