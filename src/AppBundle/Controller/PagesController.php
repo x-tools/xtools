@@ -127,6 +127,7 @@ class PagesController extends Controller
 
         $userTable = $lh->getTable("user", $dbName);
         $pageTable = $lh->getTable("page", $dbName);
+        $pageAssessmentsTable = $lh->getTable("page_assessments", $dbName);
         $revisionTable = $lh->getTable("revision", $dbName);
         $archiveTable = $lh->getTable("archive", $dbName);
         $logTable = $lh->getTable("logging", $dbName, "userindex");
@@ -190,7 +191,7 @@ class PagesController extends Controller
         $paSelectsArchive = $hasPageAssessments ?
             ', NULL AS pa_class, NULL AS pa_page_id, NULL AS pa_page_revision'
             : '';
-        $paJoin = $hasPageAssessments ? 'LEFT JOIN page_assessments ON rev_page = pa_page_id' : '';
+        $paJoin = $hasPageAssessments ? "LEFT JOIN $pageAssessmentsTable ON rev_page = pa_page_id" : '';
 
         $stmt = "
             (SELECT DISTINCT page_namespace AS namespace, 'rev' AS type, page_title AS page_title,
