@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+{% import 'macros/forms.html.twig' as forms %}
+
+{% block body %}
+    <form class="col-lg-8 col-lg-offset-2" action="{{ link("/rfap") }}" method="get" accept-charset="utf-8" >
+        <fieldset class="form-fieldset">
+            {{ forms.user_input(true, false, true) }}
+            {{ forms.wiki_input() }}
+        </fieldset>
+        {{ forms.submit_btn() }}
+    </form>
+{% endblock %}

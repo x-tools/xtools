@@ -1,0 +1,211 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<div class="panel panel-primary" style="text-align:center">
+    <div class="panel-heading">
+        <p class="xt-heading-top">
+            <a href="https://en.wikipedia.org/wiki/User:Matthewrbowker">Matthewrbowker</a>
+            <small><span style="padding-left:10px;"> •&nbsp; en.wikipedia.org </span></small>
+        </p>
+    </div>
+    <div class="panel-body xt-panel-body-top">
+        <p>
+            <a href="https://en.wikipedia.org/w/index.php?title=Special%3ALog&amp;type=block&amp;user=&amp;page=User%3AMatthewrbowker&amp;year=&amp;month=-1&amp;tagfilter=">Block log</a> ·
+            <a href="https://tools.wmflabs.org/xtools-ec/?user=Matthewrbowker&amp;lang=en&amp;wiki=wikipedia">Edit Counter</a> ·
+            <a href="https://tools.wmflabs.org/guc/?user=Matthewrbowker">Global user contributions</a> ·
+            <a href="https://meta.wikimedia.org/w/index.php?title=Special%3ACentralAuth&amp;target=Matthewrbowker">Global Account Manager</a> ·
+            <a href="https://tools.wmflabs.org/pageviews/?project=en.wikipedia.org&amp;pages=User:Matthewrbowker">Userpage pageviews</a>
+        </p>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="topcaption">Requests for adminship <span class="showhide" onclick="javascript:switchShow( 'admin', this )">[hide]</span></h4>
+            </div>
+            <div class="panel-body" id="admin">
+                <table><tbody><tr><td><p>Considered usernames:</p><ul style="padding-top:5px;"><li><a href="https://en.wikipedia.org/wiki/User:Matthewrbowker">Matthewrbowker</a></li> </ul>
+                            <span>Matthewrbowker has edited 17 Requests for adminship pages!</span><br>
+                            <span>
+			Support: 15,
+			Oppose: 2,
+			Neutral: 0,
+			Unknown: 0
+		</span></td>
+                        <td><img src="data:image/png;base64,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 " alt="chart" height=""></td></tr></tbody></table><br>
+                <h4>Support</h4>
+                <table class="leantable tble-condensed, xt-table">
+
+                    <tbody><tr>
+                        <td>1. &nbsp; </td>
+                        <td style="font-size:90%; padding-right:1em">2017-01-05</td>
+                        <td style="font-size:90%">(<span style="color:green">181</span>, <span style="color:red">6</span>, <span style="color:gray">3</span>)</td>
+                        <td style="padding-left:1em"><a href="https://en.wikipedia.org/wiki/Wikipedia:Requests_for_adminship/Cyberpower678_2">Cyberpower678 2</a></td>
+                    </tr>
+
+                    <tr>
+                        <td>2. &nbsp; </td>
+                        <td style="font-size:90%; padding-right:1em">2016-08-29</td>
+                        <td style="font-size:90%">(<span style="color:green">189</span>, <span style="color:red">63</span>, <span style="color:gray">20</span>)</td>
+                        <td style="padding-left:1em"><a href="https://en.wikipedia.org/wiki/Wikipedia:Requests_for_adminship/Oshwah_2">Oshwah 2</a></td>
+                    </tr>
+
+                    <tr>
+                        <td>3. &nbsp; </td>
+                        <td style="font-size:90%; padding-right:1em">2014-11-11</td>
+                        <td style="font-size:90%">(<span style="color:green">156</span>, <span style="color:red">0</span>, <span style="color:gray">3</span>)</td>
+                        <td style="padding-left:1em"><a href="https://en.wikipedia.org/wiki/Wikipedia:Requests_for_adminship/I_JethroBT">I JethroBT</a></td>
+                    </tr>
+
+                    <tr>
+                        <td>4. &nbsp; </td>
+                        <td style="font-size:90%; padding-right:1em">2013-10-29</td>
+                        <td style="font-size:90%">(<span style="color:green">22</span>, <span style="color:red">20</span>, <span style="color:gray">9</span>)</td>
+                        <td style="padding-left:1em"><a href="https://en.wikipedia.org/wiki/Wikipedia:Requests_for_adminship/Mdann52">Mdann52</a></td>
+                    </tr>
+
+                    <tr>
+                        <td>5. &nbsp; </td>
+                        <td style="font-size:90%; padding-right:1em">2013-05-08</td>
+                        <td style="font-size:90%">(<span style="color:green">149</span>, <span style="color:red">3</span>, <span style="color:gray">4</span>)</td>
+                        <td style="padding-left:1em"><a href="https://en.wikipedia.org/wiki/Wikipedia:Requests_for_adminship/Legoktm">Legoktm</a></td>
+                    </tr>
+
+                    <tr>
+                        <td>6. &nbsp; </td>
+                        <td style="font-size:90%; padding-right:1em">2012-08-04</td>
+                        <td style="font-size:90%">(<span style="color:green">82</span>, <span style="color:red">30</span>, <span style="color:gray">8</span>)</td>
+                        <td style="padding-left:1em"><a href="https://en.wikipedia.org/wiki/Wikipedia:Requests_for_adminship/Mlpearc">Mlpearc</a></td>
+                    </tr>
+
+                    <tr>
+                        <td>7. &nbsp; </td>
+                        <td style="font-size:90%; padding-right:1em">2011-12-14</td>
+                        <td style="font-size:90%">(<span style="color:green">84</span>, <span style="color:red">13</span>, <span style="color:gray">4</span>)</td>
+                        <td style="padding-left:1em"><a href="https://en.wikipedia.org/wiki/Wikipedia:Requests_for_adminship/Slon02_4">Slon02 4</a></td>
+                    </tr>
+
+                    <tr>
+                        <td>8. &nbsp; </td>
+                        <td style="font-size:90%; padding-right:1em">2011-12-04</td>
+                        <td style="font-size:90%">(<span style="color:green">133</span>, <span style="color:red">1</span>, <span style="color:gray">0</span>)</td>
+                        <td style="padding-left:1em"><a href="https://en.wikipedia.org/wiki/Wikipedia:Requests_for_adminship/The_Blade_of_the_Northern_Lights">The Blade of the Northern Lights</a></td>
+                    </tr>
+
+                    <tr>
+                        <td>9. &nbsp; </td>
+                        <td style="font-size:90%; padding-right:1em">2011-11-23</td>
+                        <td style="font-size:90%">(<span style="color:green">85</span>, <span style="color:red">2</span>, <span style="color:gray">1</span>)</td>
+                        <td style="padding-left:1em"><a href="https://en.wikipedia.org/wiki/Wikipedia:Requests_for_adminship/CharlieEchoTango">CharlieEchoTango</a></td>
+                    </tr>
+
+                    <tr>
+                        <td>10. &nbsp; </td>
+                        <td style="font-size:90%; padding-right:1em">2011-11-06</td>
+                        <td style="font-size:90%">(<span style="color:green">124</span>, <span style="color:red">45</span>, <span style="color:gray">7</span>)</td>
+                        <td style="padding-left:1em"><a href="https://en.wikipedia.org/wiki/Wikipedia:Requests_for_adminship/Steven_Zhang">Steven Zhang</a></td>
+                    </tr>
+
+                    <tr>
+                        <td>11. &nbsp; </td>
+                        <td style="font-size:90%; padding-right:1em">2011-05-20</td>
+                        <td style="font-size:90%">(<span style="color:green">76</span>, <span style="color:red">29</span>, <span style="color:gray">4</span>)</td>
+                        <td style="padding-left:1em"><a href="https://en.wikipedia.org/wiki/Wikipedia:Requests_for_adminship/Logan">Logan</a></td>
+                    </tr>
+
+                    <tr>
+                        <td>12. &nbsp; </td>
+                        <td style="font-size:90%; padding-right:1em">2011-03-15</td>
+                        <td style="font-size:90%">(<span style="color:green">128</span>, <span style="color:red">23</span>, <span style="color:gray">6</span>)</td>
+                        <td style="padding-left:1em"><a href="https://en.wikipedia.org/wiki/Wikipedia:Requests_for_adminship/F%C3%A6">Fæ</a></td>
+                    </tr>
+
+                    <tr>
+                        <td>13. &nbsp; </td>
+                        <td style="font-size:90%; padding-right:1em">2011-03-07</td>
+                        <td style="font-size:90%">(<span style="color:green">71</span>, <span style="color:red">10</span>, <span style="color:gray">4</span>)</td>
+                        <td style="padding-left:1em"><a href="https://en.wikipedia.org/wiki/Wikipedia:Requests_for_adminship/Gfoley4">Gfoley4</a></td>
+                    </tr>
+
+                    <tr>
+                        <td>14. &nbsp; </td>
+                        <td style="font-size:90%; padding-right:1em">2011-02-22</td>
+                        <td style="font-size:90%">(<span style="color:green">160</span>, <span style="color:red">1</span>, <span style="color:gray">0</span>)</td>
+                        <td style="padding-left:1em"><a href="https://en.wikipedia.org/wiki/Wikipedia:Requests_for_adminship/Boing!_said_Zebedee">Boing! said Zebedee</a></td>
+                    </tr>
+
+                    <tr>
+                        <td>15. &nbsp; </td>
+                        <td style="font-size:90%; padding-right:1em">2011-02-02</td>
+                        <td style="font-size:90%">(<span style="color:green">101</span>, <span style="color:red">2</span>, <span style="color:gray">1</span>)</td>
+                        <td style="padding-left:1em"><a href="https://en.wikipedia.org/wiki/Wikipedia:Requests_for_adminship/5_albert_square">5 albert square</a></td>
+                    </tr>
+                    </tbody></table>
+                <h4>Oppose</h4>
+                <table class="leantable tble-condensed, xt-table">
+
+                    <tbody><tr>
+                        <td>1. &nbsp; </td>
+                        <td style="font-size:90%; padding-right:1em">2012-03-26</td>
+                        <td style="font-size:90%">(<span style="color:green">84</span>, <span style="color:red">39</span>, <span style="color:gray">11</span>)</td>
+                        <td style="padding-left:1em"><a href="https://en.wikipedia.org/wiki/Wikipedia:Requests_for_adminship/Mabdul">Mabdul</a></td>
+                    </tr>
+
+                    <tr>
+                        <td>2. &nbsp; </td>
+                        <td style="font-size:90%; padding-right:1em">2011-12-11</td>
+                        <td style="font-size:90%">(<span style="color:green">0</span>, <span style="color:red">3</span>, <span style="color:gray">0</span>)</td>
+                        <td style="padding-left:1em"><a href="https://en.wikipedia.org/wiki/Wikipedia:Requests_for_adminship/AwesomeSponge">AwesomeSponge</a></td>
+                    </tr>
+                    </tbody></table>
+                <h4>Neutral</h4>
+                <table class="leantable tble-condensed, xt-table">
+                </table>
+                <h4>Unknown</h4>
+                <table class="leantable tble-condensed, xt-table">
+                </table>
+                <h4>Dupes</h4>
+                <table class="leantable tble-condensed, xt-table">
+                </table>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="topcaption">Requests for bureaucratship <span class="showhide" onclick="javascript:switchShow( 'bureaucrat', this )">[hide]</span></h4>
+            </div>
+            <div class="panel-body" id="bureaucrat">
+                <table><tbody><tr><td><p>Considered usernames:</p><ul style="padding-top:5px;"><li><a href="https://en.wikipedia.org/wiki/User:Matthewrbowker">Matthewrbowker</a></li> </ul>
+                            <span>Matthewrbowker has edited 1 Requests for bureaucratship pages!</span><br>
+                            <span>
+			Support: 1,
+			Oppose: 0,
+			Neutral: 0,
+			Unknown: 0
+		</span></td>
+                        <td><img src="data:image/png;base64,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 " alt="chart" height=""></td></tr></tbody></table><br>
+                <h4>Support</h4>
+                <table class="leantable tble-condensed, xt-table">
+
+                    <tbody><tr>
+                        <td>1. &nbsp; </td>
+                        <td style="font-size:90%; padding-right:1em">2012-03-20</td>
+                        <td style="font-size:90%">(<span style="color:green">125</span>, <span style="color:red">0</span>, <span style="color:gray">2</span>)</td>
+                        <td style="padding-left:1em"><a href="https://en.wikipedia.org/wiki/Wikipedia:Requests_for_bureaucratship/WilliamH">WilliamH</a></td>
+                    </tr>
+                    </tbody></table>
+                <h4>Oppose</h4>
+                <table class="leantable tble-condensed, xt-table">
+                </table>
+                <h4>Neutral</h4>
+                <table class="leantable tble-condensed, xt-table">
+                </table>
+                <h4>Unknown</h4>
+                <table class="leantable tble-condensed, xt-table">
+                </table>
+                <h4>Dupes</h4>
+                <table class="leantable tble-condensed, xt-table">
+                </table>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
