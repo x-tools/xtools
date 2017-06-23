@@ -69,9 +69,21 @@ body {
 
 .home-link {
     bottom: 1px;
-    margin: 0 12px;
-    padding: 0 !important;
+    padding: 0 12px;
     position: relative;
+
+    &::after {
+        background: #e7e7e7;
+        bottom: 0;
+        content: '';
+        display: inline-block;
+        height: 80%;
+        left: 100%;
+        margin: auto;
+        position: absolute;
+        top: 3px;
+        width: 1px;
+    }
 
     img {
         height: 32px;
@@ -82,7 +94,7 @@ body {
     left: 5px;
     margin: 0;
     position: relative;
-    top: 7px;
+    top: 9px;
 }
 
 .lang-group {
