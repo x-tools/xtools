@@ -19,6 +19,16 @@ use Xtools\ProjectRepository;
  */
 class PagesController extends Controller
 {
+
+    /**
+     * Get the tool's shortname.
+     * @return string
+     */
+    public function getToolShortname()
+    {
+        return 'pages';
+    }
+
     /**
      * Display the form.
      * @Route("/pages", name="pages")
@@ -31,9 +41,6 @@ class PagesController extends Controller
      */
     public function indexAction($project = null)
     {
-        $lh = $this->get("app.labs_helper");
-        $lh->checkEnabled("pages");
-
         // Grab the request object, grab the values out of it.
         $request = Request::createFromGlobals();
 
@@ -106,7 +113,6 @@ class PagesController extends Controller
     public function resultAction($project, $username, $namespace = "0", $redirects = "noredirects")
     {
         $lh = $this->get("app.labs_helper");
-        $lh->checkEnabled("pages");
 
         $api = $this->get("app.api_helper");
 

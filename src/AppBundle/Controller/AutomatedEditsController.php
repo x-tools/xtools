@@ -18,6 +18,16 @@ use Xtools\User;
  */
 class AutomatedEditsController extends Controller
 {
+
+    /**
+     * Get the tool's shortname.
+     * @return string
+     */
+    public function getToolShortname()
+    {
+        return 'autoedits';
+    }
+
     /**
      * Display the search form.
      * @Route("/autoedits", name="autoedits")
@@ -25,13 +35,10 @@ class AutomatedEditsController extends Controller
      * @Route("/autoedits/index.php", name="autoeditsIndexPhp")
      * @Route("/automatededits/index.php", name="autoeditsLongIndexPhp")
      * @param Request $request The HTTP request.
+     * @return Response
      */
     public function indexAction(Request $request)
     {
-        // Pull the labs helper and check if enabled
-        $lh = $this->get("app.labs_helper");
-        $lh->checkEnabled("autoedits");
-
         // Pull the values out of the query string. These values default to
         // empty strings.
         $project = $request->query->get('project');
@@ -117,7 +124,6 @@ class AutomatedEditsController extends Controller
     {
         // Pull the labs helper and check if enabled
         $lh = $this->get('app.labs_helper');
-        $lh->checkEnabled('autoedits');
 
         // Pull information about the project
         $projectData = ProjectRepository::getProject($project, $this->container);

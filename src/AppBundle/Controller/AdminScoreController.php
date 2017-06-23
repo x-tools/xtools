@@ -19,6 +19,16 @@ use Xtools\UserRepository;
  */
 class AdminScoreController extends Controller
 {
+
+    /**
+     * Get the tool's shortname.
+     * @return string
+     */
+    public function getToolShortname()
+    {
+        return 'adminscore';
+    }
+
     /**
      * Display the AdminScore search form.
      * @Route("/adminscore", name="adminscore")
@@ -33,9 +43,6 @@ class AdminScoreController extends Controller
      */
     public function indexAction(Request $request, $project = null)
     {
-        $lh = $this->get('app.labs_helper');
-        $lh->checkEnabled('adminscore');
-
         $projectQuery = $request->query->get('project', $project);
         $username = $request->query->get('username', $request->query->get('user'));
 
@@ -71,10 +78,7 @@ class AdminScoreController extends Controller
      */
     public function resultAction($project, $username)
     {
-
         $lh = $this->get("app.labs_helper");
-
-        $lh->checkEnabled("adminscore");
 
         $projectData = ProjectRepository::getProject($project, $this->container);
 

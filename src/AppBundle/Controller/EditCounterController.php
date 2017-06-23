@@ -34,15 +34,21 @@ class EditCounterController extends Controller
     protected $editCounter;
 
     /**
+     * Get the tool's shortname.
+     * @return string
+     */
+    public function getToolShortname()
+    {
+        return 'ec';
+    }
+
+    /**
      * Every action in this controller (other than 'index') calls this first.
      * @param string|bool $project The project name.
      * @param string|bool $username The username.
      */
     protected function setUpEditCounter($project = false, $username = false)
     {
-        // Make sure EditCounter is enabled.
-        $this->get('app.labs_helper')->checkEnabled("ec");
-
         $this->project = ProjectRepository::getProject($project, $this->container);
         $this->user = UserRepository::getUser($username, $this->container);
 

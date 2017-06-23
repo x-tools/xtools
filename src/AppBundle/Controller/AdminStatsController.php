@@ -40,10 +40,6 @@ class AdminStatsController extends Controller
      */
     public function indexAction(Request $request)
     {
-        // Load up the labs helper and check if the tool is enabled.
-        $lh = $this->get("app.labs_helper");
-        $lh->checkEnabled("adminstats");
-
         // Pull the values out of the query string.  These values default to
         // empty strings.
         $projectQuery = $request->query->get('project');
@@ -147,8 +143,6 @@ class AdminStatsController extends Controller
         $lh = $this->get("app.labs_helper");
         $api = $this->get("app.api_helper");
         $conn = $this->get('doctrine')->getManager("replicas")->getConnection();
-
-        $lh->checkEnabled("adminstats");
 
         // Load the database information for the tool
         $projectData = ProjectRepository::getProject($project, $this->container);

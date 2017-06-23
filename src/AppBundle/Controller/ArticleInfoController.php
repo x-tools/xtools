@@ -40,6 +40,15 @@ class ArticleInfoController extends Controller
     protected $ph;
 
     /**
+     * Get the tool's shortname.
+     * @return string
+     */
+    public function getToolShortname()
+    {
+        return 'articleinfo';
+    }
+
+    /**
      * Override method to call ArticleInfoController::containerInitialized() when container set.
      * @param ContainerInterface|null $container A ContainerInterface instance or null
      */
@@ -55,7 +64,6 @@ class ArticleInfoController extends Controller
     private function containerInitialized()
     {
         $this->lh = $this->get('app.labs_helper');
-        $this->lh->checkEnabled('articleinfo');
         $this->conn = $this->getDoctrine()->getManager('replicas')->getConnection();
         $this->ph = $this->get('app.pageviews_helper');
         $this->aeh = $this->get('app.automated_edits_helper');

@@ -6,7 +6,6 @@
 namespace AppBundle\Helper;
 
 use Doctrine\DBAL\Connection;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -33,18 +32,6 @@ class LabsHelper
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * Check to see if a given tool is enabled.
-     * @param string $tool The tool short name.
-     * @return bool
-     */
-    public function checkEnabled($tool)
-    {
-        if (!$this->container->getParameter("enable.$tool")) {
-            throw new NotFoundHttpException('This tool is disabled');
-        }
     }
 
     /**

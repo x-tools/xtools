@@ -4,9 +4,19 @@ parameters:
 #    parameter_name: value
 
 services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
 #    service_name:
 #        class: AppBundle\Directory\ClassName
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
+
+    disabled_tool_subscriber:
+        class: AppBundle\EventSubscriber\DisabledToolSubscriber
+        arguments: ['@service_container']
+
     app.twig_extension:
         class: AppBundle\Twig\AppExtension
         arguments: ["@service_container", "@request_stack", "@session"]

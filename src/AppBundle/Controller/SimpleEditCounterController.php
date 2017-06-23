@@ -19,6 +19,16 @@ use Xtools\User;
  */
 class SimpleEditCounterController extends Controller
 {
+
+    /**
+     * Get the tool's shortname.
+     * @return string
+     */
+    public function getToolShortname()
+    {
+        return 'sc';
+    }
+
     /**
      * The Simple Edit Counter search form.
      * @Route("/sc", name="sc")
@@ -32,10 +42,6 @@ class SimpleEditCounterController extends Controller
      */
     public function indexAction(Request $request, $project = null)
     {
-        // Check that SC is enabled.
-        $lh = $this->get('app.labs_helper');
-        $lh->checkEnabled('sc');
-
         // Get the query parameters.
         $projectName = $project ?: $request->query->get('project');
         $username = $request->query->get('username', $request->query->get('user'));
@@ -70,7 +76,6 @@ class SimpleEditCounterController extends Controller
     public function resultAction($project, $username)
     {
         $lh = $this->get('app.labs_helper');
-        $lh->checkEnabled('sc');
 
         /** @var Project $project */
         $project = ProjectRepository::getProject($project, $this->container);

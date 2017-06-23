@@ -30,6 +30,15 @@ class TopEditsController extends Controller
     private $lh;
 
     /**
+     * Get the tool's shortname.
+     * @return string
+     */
+    public function getToolShortname()
+    {
+        return 'topedits';
+    }
+
+    /**
      * Display the form.
      * @Route("/topedits", name="topedits")
      * @Route("/topedits", name="topEdits")
@@ -41,7 +50,6 @@ class TopEditsController extends Controller
     public function indexAction(Request $request)
     {
         $this->lh = $this->get("app.labs_helper");
-        $this->lh->checkEnabled("topedits");
 
         $projectName = $request->query->get('project');
         $username = $request->query->get('username', $request->query->get('user'));
@@ -98,7 +106,6 @@ class TopEditsController extends Controller
     {
         /** @var LabsHelper $lh */
         $this->lh = $this->get('app.labs_helper');
-        $this->lh->checkEnabled('topedits');
 
         $projectData = ProjectRepository::getProject($project, $this->container);
 
