@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class DisabledToolSubscriber implements EventSubscriberInterface
 {
 
-    /** @var Container */
+    /** @var Container The DI container. */
     protected $container;
 
     /**
