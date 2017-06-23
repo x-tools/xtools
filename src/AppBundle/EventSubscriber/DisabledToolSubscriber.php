@@ -22,7 +22,7 @@ class DisabledToolSubscriber implements EventSubscriberInterface
 
     /**
      * Save the container for later use.
-     * @param Container $container
+     * @param Container $container The DI container.
      */
     public function __construct(Container $container)
     {
