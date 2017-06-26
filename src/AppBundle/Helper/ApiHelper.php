@@ -220,7 +220,14 @@ class ApiHelper extends HelperBase
         ];
 
         $result = [];
-        $admins = $this->massApi($params, $project, 'allusers', 'aufrom')['allusers'];
+        $adminData = $this->massApi($params, $project, 'allusers', 'aufrom');
+
+        if (!isset($adminData['allusers'])) {
+            // Invalid result
+            return array();
+        }
+
+        $admins = $adminData['allusers'];
 
         foreach ($admins as $admin) {
             $groups = [];
