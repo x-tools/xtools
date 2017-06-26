@@ -6,6 +6,11 @@
     {% endspaceless %}
 {% endmacro %}
 
+{% macro pageUrlRaw(pageTitle, project) %}{% spaceless %}
+    {% set articlePath = project.articlePath|replace({'$1': (pageTitle|replace({' ': '_'}))}) %}
+    {{ (project.url|trim('/')) ~ articlePath }}
+{% endspaceless %}{% endmacro %}
+
 {% macro pageLink(page, label = null) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {{ extLink(page.url, page.title, label) }}
@@ -13,13 +18,27 @@
 
 {% macro pageLinkRaw(pageTitle, project, label = null) %}{% spaceless %}
     {% from _self import extLink as extLink %}
-    {% set articlePath = project.articlePath|replace({'$1': (pageTitle|replace({' ': '_'}))}) %}
-    {{ extLink((project.url|trim('/')) ~ articlePath, pageTitle, label) }}
+    {% from _self import pageUrlRaw as pageUrlRaw %}
+    {{ extLink(pageUrlRaw(pageTitle, project), pageTitle, label) }}
 {% endspaceless %}{% endmacro %}
 
 {% macro pageHistLink(page, label = null, offset = null, limit = null) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {% set url = page.url ~ '?action=history' %}
+    {% if offset is not empty %}
+        {% set url = url ~ '&offset=' ~ offset %}
+    {% endif %}
+    {% if limit is not empty %}
+        {% set url = url ~ '&limit=' ~ limit %}
+    {% endif %}
+    {{ extLink(url, msg('history'), label) }}
+{% endspaceless %}{% endmacro %}
+
+{% macro pageHistLinkRaw(pageTitle, project, label = null, offset = null, limit = null) %}{% spaceless %}
+    {% from _self import extLink as extLink %}
+    {% from _self import pageUrlRaw as pageUrlRaw %}
+    {% set pageUrl = pageUrlRaw(pageTitle, project) %}
+    {% set url = pageUrl ~ '?action=history' %}
     {% if offset is not empty %}
         {% set url = url ~ '&offset=' ~ offset %}
     {% endif %}
@@ -94,7 +113,7 @@
 {% macro pageLogLink(page, label = null, type = null) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {% set articlePath = page.project.articlePath|replace({'$1': ('Special:Log'|replace({' ': '_'}))}) %}
-    {% set url = (page.project.url|trim('/')) ~ articlePath ~ '&page=' ~ page.title|replace({' ': '_'}) %}
+    {% set url = (page.project.url|trim('/')) ~ articlePath ~ '?page=' ~ page.title|replace({' ': '_'}) %}
     {% if type is not empty %}
         {% set url = url ~ '&type=' ~ type %}
     {% endif %}
@@ -104,7 +123,7 @@
 {% macro pageLogLinkRaw(pageTitle, project, label = null, type = null) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {% set articlePath = project.articlePath|replace({'$1': ('Special:Log'|replace({' ': '_'}))}) %}
-    {% set url = (project.url|trim('/')) ~ articlePath ~ '&page=' ~ pageTitle|replace({' ': '_'}) %}
+    {% set url = (project.url|trim('/')) ~ articlePath ~ '?page=' ~ pageTitle|replace({' ': '_'}) %}
     {% if type is not empty %}
         {% set url = url ~ '&type=' ~ type %}
     {% endif %}
@@ -123,6 +142,13 @@
 {% macro permaLink(edit, label = null) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {{ extLink(edit.permaUrl, edit.timestamp|date('Y-m-d, H:i'), label) }}
+{% endspaceless %}{% endmacro %}
+
+{% macro permaLinkRaw(revId, project, label = null) %}{% spaceless %}
+    {% from _self import extLink as extLink %}
+    {% set articlePath = project.articlePath|replace({'$1': ('Special:PermaLink'|replace({' ': '_'}))}) %}
+    {% set url = (project.url|trim('/')) ~ articlePath ~ '/' ~ revId %}
+    {{ extLink(url, label) }}
 {% endspaceless %}{% endmacro %}
 
 {% macro editLink(page, label = null) %}{% spaceless %}
