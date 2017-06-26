@@ -17,7 +17,7 @@
     {% for edit in ec.globalEdits(40) %}
         <tr>
             <td class="tddate">{{ edit.timestamp.format('Y-m-d H:i') }}</td>
-            <td class="tdgeneral"><a href="{{ edit.project.url }}">{{ edit.project.title }}</a></td>
+            <td><a href="{{ edit.project.url }}">{{ edit.project.title }}</a></td>
             <td class="text-nowrap">(
                 {{ diff_link(edit.id, edit.project.url, 'diff') }}
                 &middot; {{ user_log_link(user.username, edit.project.url, 'log') }}
@@ -27,14 +27,7 @@
                 </a>
                 )
             </td>
-            <td class="tdgeneral">
-                {#{% if edit.page.namespace != 0 %}#}
-                    {#{% set qualified_name = attribute(edit.project.namespaces, edit.page.namespace)~':'~edit.page.title %}#}
-                {#{% else %}#}
-                    {#{% set qualified_name = edit.page.title %}#}
-                {#{% endif %}#}
-                {{ wiki_link(edit.page.title, edit.project.url, edit.page.displayTitle) }}
-            </td>
+            <td>{{ wiki_link(edit.page.title, edit.project.url, edit.page.displayTitle) }}</td>
             <td class="tdnum">{{ edit.lengthChange|diff_format }}</td>
             <td class="tdrevtext">{{ edit.comment }}</td>
         </tr>
