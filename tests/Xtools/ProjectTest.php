@@ -37,6 +37,16 @@ class ProjectTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Make sure there's an error when trying to get project metadata without a Repository.
+     * @expectedException \Exception
+     * @expectedExceptionMessage Repository for Xtools\Project must be set before using.
+     */
+    public function testNoRepository() {
+        $project2 = new Project('test.example.wiki');
+        $project2->getTitle();
+    }
+
+    /**
      * A project has a set of namespaces, comprising integer IDs and string titles.
      */
     public function testNamespaces()
