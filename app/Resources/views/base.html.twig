@@ -106,7 +106,7 @@
     </ol>
     <nav class="tool-links navbar-collapse collapse">
         <ol class="nav navbar-nav navbar-left">
-            <li{% if current_tool is defined and current_tool == "index" %} class="active"{% endif %} >
+            <li{% if current_tool is defined and current_tool == "index" %} class="active"{% endif %}>
                 <a class="home-link" href="{{ path('homepage') }}">
                     <img src="{{ asset('static/images/logo.svg') }}" />
                 </a>
@@ -208,5 +208,13 @@
 <span class='hidden loader'>
     <img src="{{ asset('static/images/loader.gif') }}" /> <span class="sr-only">{{ msg('loading') }}&hellip;</span>
 </span>
+{% if xtPage is defined and project.domain is defined %}
+<script>
+    $.ajax({
+        url: "/api/usage/{{ xtPage }}/{{ project.domain }}/{{ csrf_token('intention') }}",
+        method: 'PUT'
+    });
+</script>
+{% endif %}
 </body>
 </html>

@@ -309,11 +309,8 @@ class PagesController extends Controller
         return $this->render('pages/result.html.twig', [
             'xtPage' => 'pages',
             'xtTitle' => $username,
-            'project' => $project,
-            'project_url' => $projectUrl,
-
-            'project' => $project,
-            'username' => $username,
+            'project' => $projectData,
+            'username' => $username, // FIXME: should be User object
             'namespace' => $namespace,
             'redirect' => $redirects,
             'summaryColumns' => $summaryColumns,

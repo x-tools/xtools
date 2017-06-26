@@ -41,7 +41,8 @@ class ProjectTest extends PHPUnit_Framework_TestCase
      * @expectedException \Exception
      * @expectedExceptionMessage Repository for Xtools\Project must be set before using.
      */
-    public function testNoRepository() {
+    public function testNoRepository()
+    {
         $project2 = new Project('test.example.wiki');
         $project2->getTitle();
     }
@@ -108,10 +109,10 @@ class ProjectTest extends PHPUnit_Framework_TestCase
         $projectRepo->expects($this->once())
             ->method('getOne')
             ->willReturn(['dbname' => $dbname]);
-            
+
         $project = new Project($dbname);
         $project->setRepository($projectRepo);
-        
+
         // Check that the user has opted in or not.
         $user = new User('TestUser');
         $this->assertEquals($hasOptedIn, $project->userHasOptedIn($user));

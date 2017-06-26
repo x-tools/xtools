@@ -45,7 +45,8 @@
         "nelmio/cors-bundle": "^1.5",
         "friendsofsymfony/rest-bundle": "^2.1",
         "jms/serializer-bundle": "^1.4",
-        "symfony/stopwatch": "^3.2"
+        "symfony/stopwatch": "^3.2",
+        "doctrine/doctrine-migrations-bundle": "^1.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",

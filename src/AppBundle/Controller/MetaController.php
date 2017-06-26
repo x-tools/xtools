@@ -36,37 +36,36 @@ class MetaController extends Controller
 
         return $this->render('meta/index.html.twig', [
             'xtPage' => 'meta',
-            'xtPageTitle' => 'Usage tracking',
-            'xtSubtitle' => 'See which XTools are the most popular over time',
+            'xtPageTitle' => 'tool-meta',
+            'xtSubtitle' => 'tool-meta-desc',
         ]);
     }
 
     /**
      * Display the results.
-     * @Route("/meta/{start}/{end}", name="MetaResult")
-     * @param Request $request
+     * @Route("/meta/{start}/{end}/{legacy}", name="MetaResult")
+     * @param string $start    Start date
+     * @param string $end      End date
+     * @param string [$legacy] Non-blank value indicates to show stats for legacy XTools
      * @return Response
      */
-    public function resultAction(Request $request)
+    public function resultAction($start, $end, $legacy = false)
     {
-        $start = $request->attributes->get('start');
-        $end = $request->attributes->get('end');
+        $db = $legacy ? 'toolsdb' : 'default';
+        $table = $legacy ? 's51187__metadata.xtools_timeline' : 'usage_timeline';
 
-        $this->client = $this->container
+        $client = $this->container
             ->get('doctrine')
-            ->getManager('toolsdb')
+            ->getManager($db)
             ->getConnection();
 
-        $query = $this->client->createQueryBuilder();
-        $query->select([ 'date', 'tool', 'count' ])
-            ->where($query->expr()->gte('date', ':start'))
-            ->where($query->expr()->lte('date', ':end'))
-            ->where($query->expr()->neq('tool', '""'))
-            ->setParameter('start', $start)
-            ->setParameter('end', $end)
-            ->from('s51187__metadata.xtools_timeline');
+        $query = $client->prepare("SELECT * FROM $table
+                                 WHERE date >= :start AND date <= :end");
+        $query->bindParam('start', $start);
+        $query->bindParam('end', $end);
+        $query->execute();
 
-        $data = $query->execute()->fetchAll();
+        $data = $query->fetchAll();
 
         // Create array of totals, along with formatted timeline data as needed by Chart.js
         $totals = [];
@@ -77,26 +76,30 @@ class MetaController extends Controller
         $numDays = (int) $endObj->diff($startObj)->format("%a");
         $grandSum = 0;
 
+        // Generate array of date labels
+        $dateObj = new DateTime($start);
+        $dateLabels = [];
+        for ($dateObj = new DateTime($start); $dateObj <= $endObj; $dateObj->modify('+1 day')) {
+            $dateLabels[] = $dateObj->format('Y-m-d');
+        }
+
         foreach ($data as $entry) {
-            $dateLabels[] = $entry['date'];
             if (!isset($totals[$entry['tool']])) {
-                $totals[$entry['tool']] = $entry['count'];
+                $totals[$entry['tool']] = (int) $entry['count'];
 
                 // Create arrays for each tool, filled with zeros for each date in the timeline
                 $timeline[$entry['tool']] = array_fill(0, $numDays, 0);
             } else {
-                $totals[$entry['tool']] += $entry['count'];
+                $totals[$entry['tool']] += (int) $entry['count'];
             }
 
             $date = new DateTime($entry['date']);
             $dateIndex = (int) $date->diff($startObj)->format("%a");
-            $timeline[$entry['tool']][$dateIndex] = $entry['count'];
+            $timeline[$entry['tool']][$dateIndex] = (int) $entry['count'];
 
             $grandSum += $entry['count'];
         }
         arsort($totals);
-        $dateLabels = array_unique($dateLabels);
-        sort($dateLabels);
 
         return $this->render('meta/result.html.twig', [
             'xtPage' => 'meta',

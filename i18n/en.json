@@ -266,6 +266,8 @@
   "tool-ec": "Edit Counter",
   "tool-ec-desc": "Analysis of user contributions",
   "tool-index": "About",
+  "tool-meta": "Usage statistics",
+  "tool-meta-desc": "See which XTools are the most popular over time",
   "tool-pages": "Pages created",
   "tool-pages-desc": "Get pages that have been created by a user",
   "tool-rfa": "RfX Analysis",

@@ -1,5 +1,6 @@
 {% extends 'base.html.twig' %}
 {% import 'macros/layout.html.twig' as layout %}
+{% import 'macros/wiki.html.twig' as wiki %}
 
 {% block body %}
 <div class="panel panel-primary">
@@ -9,27 +10,27 @@
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {{ msg('back') }}
             </a>
-            {{ user_link(username, project_url) }}
+            {{ user_link(username, project.domain) }}
             <small>
                 &bull;
-                {{ project }}
+                {{ project.domain }}
             </small>
         </div>
     </header>
 
     <div class="panel-body xt-panel-body">
         <p class="text-center xt-heading-subtitle">
-            {{ user_log_link(username, project_url, msg('block-log'), 'block') }}
+            {{ user_log_link(username, project.domain, msg('block-log'), 'block') }}
             {% if isWMFLabs() %}
             &middot;
-            <a href="{{ path('ec', {'project':project, 'username':username}) }}" >{{ msg('tool-ec') }}</a>
+            <a href="{{ path('ec', {'project':project.domain, 'username':username}) }}" >{{ msg('tool-ec') }}</a>
             {% if not isSingleWiki() %}
             &middot;
             <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ username }}" >{{ msg('global-contribs') }}</a>
             {% endif %}
             &middot;
             {# FIXME: make this link go to what options are set here (redirects, namespace, etc.) #}
-            <a target="_blank" href="//tools.wmflabs.org/userviews/?project={{ project }}&amp;user={{ username }}">{{ msg('pageviews-pages-created') }}</a>
+            <a target="_blank" href="//tools.wmflabs.org/userviews/?project={{ project.domain }}&amp;user={{ username }}">{{ msg('pageviews-pages-created') }}</a>
             {% endif %}
         </p>
 
@@ -181,7 +182,7 @@
                                         {% set pagename = namespaces[key]~":"~page.page_title %}
                                     {% endif %}
                                     <td class="sort-entry--page" data-value="{{ pagename }}">
-                                        {{ wiki_link(pagename, project_url) }}
+                                        {{ wiki_link(pagename, project.domain) }}
                                         {% if page.page_is_redirect %}
                                             <small class="text-warning">&middot; ({{ msg("redirect") }})</small>
                                         {% endif %}
@@ -190,7 +191,7 @@
                                         {% endif %}
                                     </td>
                                     <td class="sort-entry--date" data-value="{{ date }}">
-                                        {{ perma_link(page.rev_id, project_url, page.human_time) }}
+                                        {{ perma_link(page.rev_id, project.domain, page.human_time) }}
                                     </td>
                                     <td class="sort-entry--original-size" data-value="{{ page.rev_len }}">
                                         {{ page.rev_len | number_format }}
@@ -207,20 +208,20 @@
                                         </td>
                                     {% endif %}
                                     <td>
-                                        {{ wiki_log_link(pagename, project_url) }}
+                                        {{ wiki_log_link(pagename, project.domain) }}
                                         &middot;
-                                        {{ wiki_history_link(pagename, project_url) }}
+                                        {{ wiki_history_link(pagename, project.domain) }}
                                         {% if enabled('articleinfo') %}
                                             &middot;
-                                            <a href="{{ path('articleinfo', { 'project': project, 'article': pagename }) }}">{{ msg('tool-articleinfo') }}</a>
+                                            <a href="{{ path('articleinfo', { 'project': project.domain, 'article': pagename }) }}">{{ msg('tool-articleinfo') }}</a>
                                         {% endif %}
                                         {% if enabled('topedits') %}
                                             &middot;
-                                            <a href="{{ path('topedits', { 'project': project, 'username': username, 'namespace': namespace, 'page': page.page_title }) }}">{{ msg('tool-topedits') }}</a>
+                                            <a href="{{ path('topedits', { 'project': project.domain, 'username': username, 'namespace': namespace, 'page': page.page_title }) }}">{{ msg('tool-topedits') }}</a>
                                         {% endif %}
                                         {% if isWMFLabs() %}
                                             &middot;
-                                            <a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project }}&pages={{ pagename }}">
+                                            <a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project.domain }}&amp;pages={{ pagename }}">
                                                 {{ msg('pageviews') }}
                                             </a>
                                         {% endif %}
@@ -232,7 +233,7 @@
                             <tr class="show-more-row">
                                 <td></td>
                                 <td colspan=6>
-                                    <a href="{{ path('pages', { 'project': project, 'username': username, 'namespace': key, 'redirects': redirect }) }}">
+                                    <a href="{{ path('pages', { 'project': project.domain, 'username': username, 'namespace': key, 'redirects': redirect }) }}">
                                         {{ msg('num-others', [count[key]['total'] - maxRows]) }}
                                     </a>
                                 </td>
