@@ -20,7 +20,6 @@ use Xtools\ProjectRepository;
  * @package  AppBundle\Controller
  * @author   XTools Team <xtools@lists.wikimedia.org>
  * @license  GPL 3.0
- * @link     http://tools.wmflabs.org/xtools/adminstats
  */
 class AdminStatsController extends Controller
 {
