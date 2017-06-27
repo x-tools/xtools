@@ -16,6 +16,11 @@
             </div>
         </header>
         <div class="panel-body xt-panel-body">
+            <section class="panel panel-default clearfix">
+                <header class="panel-heading col-lg-12">
+                    <h4>{{ msg('general-stats') }}</h4>
+                </header>
+                <div class="panel-body col-lg-12">
 {% endif %}
 
 <div class="col-lg-6 stat-list clearfix">
@@ -308,7 +313,7 @@
 {#</div>#}
 
 {% if not is_sub_request %}
-    </div></div>
+    </div></section></div></div>
 {% endif %}
 
 {% endblock %}

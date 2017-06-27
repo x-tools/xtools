@@ -16,6 +16,11 @@
             </div>
         </header>
         <div class="panel-body xt-panel-body">
+            <section class="panel panel-default clearfix">
+                <header class="panel-heading col-lg-12">
+                    <h4>{{ msg('namespace-totals') }}</h4>
+                </header>
+                <div class="panel-body col-lg-12">
 {% endif %}
 
 <table class="table table-bordered table-hover table-striped tools-table toggle-table">
@@ -83,7 +88,7 @@
 </div>
 
 {% if not is_sub_request %}
-    </div></div>
+    </div></section></div></div>
 {% endif %}
 
 {% endblock %}
