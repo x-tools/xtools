@@ -1,5 +1,4 @@
 {% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
-{% import 'macros/layout.html.twig' as layout %}
 {% import 'macros/wiki.html.twig' as wiki %}
 
 {% block body %}
@@ -308,7 +307,7 @@
     {#</div>#}
 {#</div>#}
 
-{% if is_sub_request %}
+{% if not is_sub_request %}
     </div></div>
 {% endif %}
 
