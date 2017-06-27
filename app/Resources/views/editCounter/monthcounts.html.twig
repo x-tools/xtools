@@ -3,6 +3,26 @@
 
 {% block body %}
 
+{% if not is_sub_request %}
+    <div class="panel panel-primary">
+        <header class="panel-heading">
+            <div class="text-center xt-heading-top">
+                <a class="back-to-search" href="{{ path('ec') }}">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                    {{ msg('back') }}
+                </a>
+                {{ wiki.userLink(user, project) }}
+                <small> &bull; {{ project.title }} </small>
+            </div>
+        </header>
+        <div class="panel-body xt-panel-body">
+            <section class="panel panel-default clearfix">
+                <header class="panel-heading col-lg-12">
+                    <h4>{{ msg('month-counts') }}</h4>
+                </header>
+                <div class="panel-body col-lg-12">
+{% endif %}
+
 {% if not project.userHasOptedIn(user) %}
     <div class="alert alert-info">
         <p>{{ msg('not-opted-in', [ wiki.pageLink(opted_in_page) ] ) }}</p>
@@ -59,6 +79,10 @@
     });
 </script>
 
+{% endif %}
+
+{% if not is_sub_request %}
+    </div></section></div></div>
 {% endif %}
 
 {% endblock %}
