@@ -26,10 +26,10 @@ class EditCounterController extends Controller
 
     /** @var User The user being queried. */
     protected $user;
-    
+
     /** @var Project The project being queried. */
     protected $project;
-    
+
     /** @var EditCounter The edit-counter, that does all the work. */
     protected $editCounter;
 
