@@ -101,7 +101,7 @@
                                         {{ assessments.assessment.value }}
                                     {% endif %}
                                 {% endset %}
-                                {{ wiki_link(assessments.assessment.category, projectUrl, assessment_value) }}
+                                {{ wiki.pageLinkRaw(assessments.assessment.category, project, assessment_value) }}
                             </td>
                         </tr>
                     {% endif %}

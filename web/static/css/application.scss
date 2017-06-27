@@ -261,10 +261,6 @@ section > .panel-body {
 .xt-panel-body table {
     white-space: nowrap;
 }
-.xt-panel-body-top {
-    padding: 8px;
-    margin-bottom: 5px;
-}
 .xt-table > tbody > tr > td {
     padding-top: 1px;
     padding-bottom: 1px;
@@ -459,6 +455,10 @@ div.outer_bar {
 
 .stat-list {
     margin-bottom: 20px;
+
+    caption {
+        text-align: center;
+    }
 }
 
 .panel-body .stat-list:only-child {

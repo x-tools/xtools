@@ -23,7 +23,7 @@
             {% endif %}
             {% if not(isSingleWiki()) %}
                 &middot;
-                {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, 'CentralAuth') }}
+                {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, msg('sul-info')) }}
             {% endif %}
         </p>
 
