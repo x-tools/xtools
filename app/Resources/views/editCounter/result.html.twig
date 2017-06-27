@@ -115,10 +115,9 @@
                 </h4>
             </div>
             <div class="panel-body">
-                {{ render(path('EditCounterLatestGlobal', {
-                    'username': user.username,
-                    'project': project.domain
-                })) }}
+                <div id="latestglobal-container" data-username="{{ user.username }}" data-project="{{ project.domain }}">
+                    <img src="{{ asset('static/images/loader.gif') }}" />
+                </div>
             </div>
         </div>
 

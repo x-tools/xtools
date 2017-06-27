@@ -255,10 +255,11 @@ class EditCounterController extends Controller
      * @param string $username
      * @return Response
      */
-    public function latestglobalAction($project, $username)
+    public function latestglobalAction(Request $request, $project, $username)
     {
         $this->setUpEditCounter($project, $username);
-        $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
+        $isSubRequest = $request->get('htmlonly')
+                        || $this->container->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/latest_global.html.twig', [
             'xtTitle' => 'latest-global-edits',
             'xtPage' => 'ec',

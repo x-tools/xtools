@@ -211,7 +211,7 @@
 {% if xtPage is defined and project.domain is defined %}
 <script>
     $.ajax({
-        url: "/api/usage/{{ xtPage }}/{{ project.domain }}/{{ csrf_token('intention') }}",
+        url: "{{ path('homepage') }}api/usage/{{ xtPage }}/{{ project.domain }}/{{ csrf_token('intention') }}",
         method: 'PUT'
     });
 </script>
