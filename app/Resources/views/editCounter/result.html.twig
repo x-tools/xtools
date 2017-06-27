@@ -116,13 +116,40 @@
 
         {% set content %}
             {% if ec.automatedRevisionsSummary %}
-                <table class="table">
+                <table class="table table-bordered table-hover table-striped autoedits-table">
+                    <thead><tr>
+                        {% for key in ['tool', 'count'] %}
+                            <th>
+                                <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
+                                    {{ msg(key) | capitalize_first }}
+                                    <span class="glyphicon glyphicon-sort"></span>
+                                </span>
+                            </th>
+                        {% endfor %}
+                    </tr></thead>
+                    <tbody>
+                    {% set toolsCountSum = 0 %}
                     {% for tool,count in ec.automatedRevisionsSummary %}
+                        {% set toolsCountSum = toolsCountSum + count %}
                         <tr>
-                            <th>{{ tool }}</th>
-                            <td>{{ count|number_format }}</td>
+                            <td class="sort-entry--tool" data-value="{{ tool }}">
+                                {{ tool }}
+                            </td>
+                            <td class="sort-entry--count" data-value="{{ count }}">
+                                {{ count|number_format }}
+                            </td>
                         </tr>
                     {% endfor %}
+                    </tbody>
+                    <tfoot><tr>
+                        <th>
+                            {{ ec.automatedRevisionsSummary|length }}
+                            {{ msg('num-tools', [ec.automatedRevisionsSummary|length]) }}
+                        </th>
+                        <th>
+                            {{ toolsCountSum|number_format }}
+                        </th>
+                    </tr></tfoot>
                 </table>
             {% else %}
                 <div class="alert alert-success">
@@ -130,7 +157,10 @@
                 </div>
             {% endif %}
         {% endset %}
-        {{ layout.content_block('auto-edits', content) }}
+        {% set headerLink %}
+            <a href="{{ path('autoeditsResult', {project:project.domain, username:user.username})}}">{{ msg('auto-edits') }}</a>
+        {% endset %}
+        {{ layout.content_block(headerLink, content, '', 'auto-edits', true) }}
 
     </div>
 </div>
