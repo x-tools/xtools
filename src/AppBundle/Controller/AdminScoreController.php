@@ -88,8 +88,6 @@ class AdminScoreController extends Controller
         }
 
         $dbName = $projectData->getDatabaseName();
-        $wikiName = $projectData->getDatabaseName();
-        $url = $projectData->getUrl();
 
         $userTable = $lh->getTable("user", $dbName);
         $pageTable = $lh->getTable("page", $dbName);
@@ -214,9 +212,8 @@ class AdminScoreController extends Controller
         return $this->render('adminscore/result.html.twig', [
             'xtPage' => 'adminscore',
             'xtTitle' => $username,
-            'projectUrl' => $url,
-            'username' => $username,
-            'project' => $wikiName,
+            'project' => $projectData,
+            'user' => $user,
             'master' => $master,
             'total' => $total,
         ]);
