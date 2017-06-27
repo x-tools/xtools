@@ -485,6 +485,20 @@ div.outer_bar {
     padding-top: 10px !important;
 }
 
+.stat-list--group {
+    border-top: 0 !important;
+
+    & > tr:first-child > td {
+        border-bottom: solid 1px #eee !important;
+        padding-top: 15px !important;
+        text-align: center !important;
+    }
+
+    & > tr:nth-child(2) > td {
+        padding-top: 5px !important;
+    }
+}
+
 .color-icon {
     vertical-align: -2px;
 }
@@ -658,6 +672,18 @@ div.outer_bar {
         .stat-list--new-group {
             display: block;
             padding-top: 0 !important;
+        }
+    }
+
+    .stat-list--group {
+        padding-top: 15px !important;
+
+        tr > td {
+            padding-top: 5px !important;
+        }
+
+        & > tr:first-child > td {
+            text-align: left !important;
         }
     }
 

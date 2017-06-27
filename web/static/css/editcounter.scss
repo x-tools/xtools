@@ -1,0 +1,15 @@
+@import 'mixins.scss';
+
+.ec {
+    .stat-list .table {
+        margin: 0 auto;
+    }
+
+    .stat-list--empty-group {
+        font-weight: normal !important;
+
+        &::after {
+            content: '' !important;
+        }
+    }
+}

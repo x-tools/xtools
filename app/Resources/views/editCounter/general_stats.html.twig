@@ -1,224 +1,293 @@
 {% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
+{% import 'macros/layout.html.twig' as layout %}
+{% import 'macros/wiki.html.twig' as wiki %}
 
 {% block body %}
 
-<div class="row">
-    <div class="col-md-6">
-        <table class="table-condensed xt-table">
-            <tr><td>{{ msg("user-id") }}:</td><td>{{ user.id(project) }}</td></tr>
-            <tr class="groups">
-                <td><a href="{{ project.url }}/{{ project.scriptPath }}?title=Special:UserRights&user={{ user.username }}">{{ msg("user-groups") }}</a>:</td>
-                <td>
-                    {% for group in user.groups(project) %}
+{% if not is_sub_request %}
+    <div class="panel panel-primary">
+        <header class="panel-heading">
+            <div class="text-center xt-heading-top">
+                <a class="back-to-search" href="{{ path('ec') }}">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                    {{ msg('back') }}
+                </a>
+                {{ wiki.userLink(user, project) }}
+                <small> &bull; {{ project.title }} </small>
+            </div>
+        </header>
+        <div class="panel-body xt-panel-body">
+{% endif %}
+
+<div class="col-lg-6 stat-list clearfix">
+    <table class="table"><tbody>
+        <tr>
+            <td>{{ msg('user-id') }}</td>
+            <td>{{ user.id(project) }}</td>
+        </tr>
+        <tr>
+            <td><a target="_blank" href="{{ wiki.pageUrlRaw('Special:UserRights', project) }}?user={{ user.username }}">{{ msg('user-groups') }}</a></td>
+            <td>
+                {% for group in user.groups(project) %}
+                    {{ group }}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+                {% if user.globalGroups(project) %}
+                    <br />&bull; {{ msg("global-user-groups") }}
+                    {% for group in user.globalGroups(project) %}
                         {{ group }}{% if not loop.last %}, {% endif %}
                     {% endfor %}
-                    {% if user.globalGroups(project) %}
-                        <br />&bull; {{ msg("global-user-groups") }}:
-                        {% for group in user.globalGroups(project) %}
-                            {{ group }}{% if not loop.last %}, {% endif %}
-                        {% endfor %}
-                    {% endif %}
-                </td>
-            </tr>
-            <tr>
-                <td>{{ msg('is-admin') }}</td>
-                <td>{% if user.isAdmin(project) %}<span class="alert-info">&check;{% else %}<span class="alert-warning">&cross;</span>{% endif %}</td>
-            </tr>
-            <tr>
-                <td>{{ msg("first-edit") }}:</td>
-                <td>{% if ec.datetimeFirstRevision %}{{ ec.datetimeFirstRevision|date('Y-m-d H:i') }}{% endif %}</td>
-            </tr>
-            <tr>
-                <td>{{ msg("latest-edit") }}:</td>
-                <td>{% if ec.datetimeLastRevision %}{{ ec.datetimeLastRevision|date('Y-m-d H:i') }}{% endif %}</td>
-            </tr>
-            <tr>
-                <td style="border-left:1px solid blue" class="highlighted">{{ msg("live-edits") }}:</td>
-                <td class="tdnum">{{ ec.countLiveRevisions|number_format }}</td>
-            </tr>
-            <tr>
-                <td style="border-left:1px solid blue" class="highlighted" >{{ msg("deleted-edits") }}:</td>
-                <td class="tdnum">{{ ec.countDeletedRevisions|number_format }}</td>
-            </tr>
-            <tr>
-                <td style="border-left:1px solid blue" class="highlighted" ><strong>{{ msg("total-edits") }}:</strong></td>
-                <td class="tdnum"><strong>{{ ec.countAllRevisions|number_format }}</strong></td>
-            </tr>
-        </table>
-    </div>
-    <div class="col-md-6">
-        <table class="table-condensed xt-table">
-            <tr><td>{{ msg("lastday") }}:</td><td class="tdnum" >{{ ec.countRevisionsInLast('day')|number_format }}</td><td></td></tr>
-            <tr><td>{{ msg("lastweek") }}:</td><td class="tdnum" >{{ ec.countRevisionsInLast('week')|number_format }}</td><td></td></tr>
-            <tr><td>{{ msg("lastmonth") }}:</td><td class="tdnum" >{{ ec.countRevisionsInLast('month')|number_format }}</td><td></td></tr>
-            <tr><td>{{ msg("lastyear") }}:</td><td class="tdnum" >{{ ec.countRevisionsInLast('year')|number_format }}</td><td></td></tr>
-            <tr class="averge-daily-edit-count">
-                <td>{{ msg("average-edits-per-day", [msg("days", [1])]) }}:</td>
-                <td class="tdnum">
-                    {{ ec.averageRevisionsPerDay|number_format }}
-                </td>
-                <td class="text-muted">
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td>{{ msg('is-admin') }}</td>
+            <td>{% if user.isAdmin(project) %}<span class="text-info">&check;{% else %}<span class="text-warning">&cross;</span>{% endif %}</td>
+        </tr>
+        <tr>
+            <td>{{ msg('first-edit') }}</td>
+            <td>{% if ec.datetimeFirstRevision %}{{ ec.datetimeFirstRevision|date('Y-m-d H:i') }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td>{{ msg('latest-edit') }}</td>
+            <td>{% if ec.datetimeLastRevision %}{{ ec.datetimeLastRevision|date('Y-m-d H:i') }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="stat-list--new-group">{{ msg('live-edits') }}</td>
+            <td class="stat-list--new-group">{{ ec.countLiveRevisions|number_format }}</td>
+        </tr>
+        <tr>
+            <td>{{ msg('deleted-edits') }}</td>
+            <td>{{ ec.countDeletedRevisions|number_format }}</td>
+        </tr>
+        <tr>
+            <td><strong>{{ msg('total-edits') }}</strong></td>
+            <td><strong>{{ ec.countAllRevisions|number_format }}</strong></td>
+        </tr>
+    </tbody></table>
+</div>
+<div class="col-lg-6 stat-list clearfix">
+    <table class="table"><tbody>
+        <tr><td>{{ msg('lastday') }}</td><td>{{ ec.countRevisionsInLast('day')|number_format }}</td></tr>
+        <tr><td>{{ msg('lastweek') }}</td><td>{{ ec.countRevisionsInLast('week')|number_format }}</td></tr>
+        <tr><td>{{ msg('lastmonth') }}</td><td>{{ ec.countRevisionsInLast('month')|number_format }}</td></tr>
+        <tr><td>{{ msg('lastyear') }}</td><td>{{ ec.countRevisionsInLast('year')|number_format }}</td></tr>
+        <tr>
+            <td>{{ msg("average-edits-per-day", [msg("days", [1])]) }}</td>
+            <td>
+                {{ ec.averageRevisionsPerDay|number_format(1) }}
+                <span class="text-muted">
                     ({{ ec.days|number_format }} {{ msg('num-days', [ec.days]) }})
-                </td>
-            </tr>
-            <tr><td>{{ msg('average-edit-size') }}</td><td class="tdnum">{{ ec.averageRevisionSize }}</td><td>KB</td></tr>
-        </table>
-    </div>
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <td>{{ msg('average-edit-size') }}</td>
+            <td>{{ ec.averageRevisionSize|number_format(1) }}</td>
+        </tr>
+    </tbody></table>
 </div>
 
-<hr />
+<hr style="clear:both" />
 
-<div class="row">
-    <div class="col">
-        <table class="table-condensed xt-table">
-            <caption>{{ msg('pages') }}</caption>
-            <tr><td>{{ msg("pages-edited-total") }}</td><td class="tdnum">{{ ec.countAllPagesEdited|number_format }}</td><td></td></tr>
+<div class="col-lg-4 stat-list clearfix">
+    <table class="table">
+        {# ======================== PAGES ======================== #}
+        <tbody class="stat-list--group">
             <tr>
-                <td>{{ msg("average-per-page") }}</td>
-                <td class="tdnum">{{ ec.averageRevisionsPerPage }}</td>
-                <td></td>
+                <td colspan="2" class="text-muted">{{ msg('pages') }}</td>
+            </tr>
+            <tr>
+                <td>{{ msg('pages-edited-total') }}</td>
+                <td>{{ ec.countAllPagesEdited|number_format }}</td>
+            </tr>
+            <tr>
+                <td>{{ msg('average-per-page') }}</td>
+                <td>{{ ec.averageRevisionsPerPage }}</td>
             </tr>
             <tr>
                 <td>{{ msg('pages-created') }}</td>
-                <td class="tdnum">
+                <td>
                     <a href="{{ path('PagesResult', {project:project.domain, username:user.username, namespace:'all', redirects:'none'}) }}">
                         {{ ec.countPagesCreated|number_format }}
                     </a>
+                    <span class="text-muted">({{ msg('pages-created-since-deleted', [ec.countPagesCreatedDeleted|number_format]) }})</span>
                 </td>
-                <td class="text-muted">{{ msg('pages-created-since-deleted', [ec.countPagesCreatedDeleted|number_format]) }}</td>
             </tr>
-            <tr><td>{{ msg("pages-moved") }}:</td><td class="tdnum">{{ ec.countPagesMoved|number_format }}</td><td></td></tr>
-            <tr><td>{{ msg("pages-deleted") }}</td><td class="tdnum">{{ ec.countPagesDeleted|number_format }}</td><td></td></tr>
-        </table>
+            <tr>
+                <td>{{ msg('pages-moved') }}</td>
+                <td>{{ ec.countPagesMoved|number_format }}</td>
+            </tr>
+            <tr>
+                <td>{{ msg('pages-deleted') }}</td>
+                <td>{{ ec.countPagesDeleted|number_format }}</td>
+            </tr>
+        </tbody>
 
-        <table class="table-condensed xt-table">
-            <caption>{{ msg('files') }}</caption>
+        {# ======================== FILES ======================== #}
+        <tbody class="stat-list--group">
+            <tr>
+                <td colspan="2" class="text-muted">{{ msg('files') }}</td>
+            </tr>
             <tr>
                 <td>{{ msg('files-uploaded') }}</td>
-                <td class="tdnum" >
-                    <a href="//{{ project.url }}/wiki/Special:ListFiles/{{ user.username }}">{{ ec.countFilesUploaded|number_format }}</a>
+                <td>
+                    <a href="{{ wiki.pageUrlRaw('Special:ListFiles', project) }}/{{ user.username }}">{{ ec.countFilesUploaded|number_format }}</a>
                 </td>
-                <td></td>
             </tr>
-            {% if is_labs %}
+            {% if isWMFLabs() %}
                 <tr>
                     <td>{{ msg('files-uploaded-commons') }}</td>
-                    <td class="tdnum" >
+                    <td>
                         <a href="https://commons.wikimedia.org/wiki/Special:ListFiles/{{ user.username }}" >{{ ec.countFilesUploadedCommons }}</a>
                     </td>
-                    <td></td>
                 </tr>
             {% endif %}
-        </table>
+        </tbody>
 
-        <table class="table-condensed xt-table">
-            <caption>{{ msg('edits') }}</caption>
-            <tr><td>{{ msg('auto-edits') }}</td><td class="tdnum"><a href="#autoeditslist">{{ ec.countAutomatedRevisions }}</a></td><td></td></tr>
-            <tr><td>{{ msg('reverted-edits') }}</td><td class="tdnum" >@TODO</td><td></td></tr>
-            <tr><td>{{ msg('edits-with-comment') }}</td><td class="tdnum">{{ ec.countRevisionsWithComments|number_format }}</td><td></td></tr>
-            <tr><td>{{ msg('minor-edits') }}</td><td class="tdnum">{{ ec.countMinorRevisions|number_format }}</td><td></td></tr>
-            <tr><td>{{ msg('small-edits') }}</td><td class="tdnum">{{ ec.countSmallRevisions|number_format }}</td><td></td></tr>
-            <tr><td>{{ msg('large-edits') }}</td><td class="tdnum">{{ ec.countLargeRevisions|number_format }}</td><td></td></tr>
-        </table>
-
-    </div>
-    <div class="col">
-        <table class="table-condensed xt-table">
-            <caption>{{ msg('actions') }}</caption>
+        {# ======================== EDITS ======================== #}
+        <tbody class="stat-list--group">
             <tr>
-                <td>{{ msg("thank") }}:</td>
-                <td class="tdnum">
-                    <a href="{{ project.url }}/index.php?title=Special%3ALog&type=thanks&user={{ user.username }}&page=&year=&month=-1&tagfilter=" >
-                        {{ ec.thanks|number_format }}
-                    </a>
+                <td colspan="2" class="text-muted">{{ msg('edits') }}</td>
+            </tr>
+            <tr>
+                <td>{{ msg('auto-edits') }}</td>
+                <td><a href="#autoeditslist">{{ ec.countAutomatedRevisions }}</a></td>
+            </tr>
+            <tr>
+                <td>{{ msg('reverted-edits') }}</td>
+                <td>@TODO</td>
+            </tr>
+            <tr>
+                <td>{{ msg('edits-with-comment') }}</td>
+                <td>{{ ec.countRevisionsWithComments|number_format }}</td>
+            </tr>
+            <tr>
+                <td>{{ msg('minor-edits') }}</td>
+                <td>{{ ec.countMinorRevisions|number_format }}</td>
+            </tr>
+            <tr>
+                <td>{{ msg('small-edits') }}</td>
+                <td>{{ ec.countSmallRevisions|number_format }}</td>
+            </tr>
+            <tr>
+                <td>{{ msg('large-edits') }}</td>
+                <td>{{ ec.countLargeRevisions|number_format }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="col-lg-4 stat-list clearfix">
+    <table class="table">
+        {# ======================== ACTIONS ======================== #}
+        <tbody class="stat-list--group">
+            <tr>
+                <td colspan="2" class="text-muted">{{ msg('actions') }}</td>
+            </tr>
+            <tr>
+                <td>{{ msg('thank') }}</td>
+                <td>
+                    {{ wiki.userLogLink(user, project, ec.thanks|number_format, 'thanks') }}
                 </td>
             </tr>
             <tr>
-                <td>{{ msg("approve") }}:</td>
-                <td class="tdnum">
-                    <a href="{{ project.url }}/index.php?title=Special%3ALog&type=review&user={{ user.username }}&page=&year=&month=-1&tagfilter=&hide_patrol_log=1&hide_review_log=1&hide_thanks_log=1" >
-                        {{ ec.approvals|number_format }}
-                    </a>
+                <td>{{ msg('approve') }}</td>
+                <td>
+                    {{ wiki.userLogLink(user, project, ec.approvals|number_format, 'review') }}
                 </td>
             </tr>
             <tr>
-                <td>{{ msg("patrol") }}:</td>
-                <td class="tdnum">
-                    <a href="{{ project.url }}/index.php?title=Special%3ALog&type=patrol&user={{ user.username }}&page=&year=&month=-1&tagfilter=" >
-                        {{ ec.patrols|number_format }}
-                    </a>
+                <td>{{ msg('patrol') }}</td>
+                <td>
+                    {{ wiki.userLogLink(user, project, ec.patrols|number_format, 'patrol') }}
                 </td>
             </tr>
-            <tr class="tr-mid-header"><th colspan="2">{{ msg("actions-as-admin") }}</th></tr>
-            {% if not user.isAdmin(project) %}
+        </tbody>
+        {% if not user.isAdmin(project) %}
+            <tbody class="stat-list--group">
                 <tr>
-                    <td colspan="2" class="alert-warning">{{ msg('user-is-not-admin') }}</td>
+                    <td colspan="2" class="text-muted">{{ msg('actions-as-admin') }}</td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="stat-list--empty-group">{{ msg('user-is-not-admin') }}</td>
                 </tr>
             {% else %}
-            {#<tr><td>{{ msg("block") }}:</td><td><span class="tdgeneral">{{ usersBlocked }} <small>x</small></span></td></tr>#}
-            {#<tr><td>{{ msg("unblock") }}:</td><td><span class="tdgeneral">{{ usersUnblocked }} <small>x</small></span></td></tr>#}
-            {#<tr><td>{{ msg("protect") }}:</td><td><span class="tdgeneral">{{ pagesProtected }} <small>x</small></span></td></tr>#}
-            {#<tr><td>{{ msg("unprotect") }}:</td><td><span class="tdgeneral">{{ pagesUnprotected }} <small>x</small></span></td></tr>#}
-            {#<tr><td>{{ msg("delete") }}:</td><td><span class="tdgeneral">{{ pagesDeleted }} <small>x</small></span></td></tr>#}
-            {#<tr><td>{{ msg("delete") }} ({{ msg("revisions", [1]) }}):</td><td><span class="tdgeneral">{{ pagesDeletedRevision }} <small>x</small></span></td></tr>#}
-            {#<tr><td>{{ msg("restore") }}:</td><td><span class="tdgeneral">{{ pagesRestored }} <small>x</small></span></td></tr>#}
-            {#<tr><td>{{ msg("import") }}:</td><td><span class="tdgeneral">{{ pagesImported }} <small>x</small></span></td></tr>#}
-            {% endif %}
-        </table>
+                {#<tr><td>{{ msg("block") }}</td><td><span class="tdgeneral">{{ usersBlocked }} <small>x</small></span></td></tr>#}
+                {#<tr><td>{{ msg("unblock") }}</td><td><span class="tdgeneral">{{ usersUnblocked }} <small>x</small></span></td></tr>#}
+                {#<tr><td>{{ msg("protect") }}</td><td><span class="tdgeneral">{{ pagesProtected }} <small>x</small></span></td></tr>#}
+                {#<tr><td>{{ msg("unprotect") }}</td><td><span class="tdgeneral">{{ pagesUnprotected }} <small>x</small></span></td></tr>#}
+                {#<tr><td>{{ msg("delete") }}</td><td><span class="tdgeneral">{{ pagesDeleted }} <small>x</small></span></td></tr>#}
+                {#<tr><td>{{ msg("delete") }} ({{ msg("revisions", [1]) }})</td><td><span class="tdgeneral">{{ pagesDeletedRevision }} <small>x</small></span></td></tr>#}
+                {#<tr><td>{{ msg("restore") }}</td><td><span class="tdgeneral">{{ pagesRestored }} <small>x</small></span></td></tr>#}
+                {#<tr><td>{{ msg("import") }}</td><td><span class="tdgeneral">{{ pagesImported }} <small>x</small></span></td></tr>#}
+            </tbody>
+        {% endif %}
 
-        <table class="table-condensed xt-table">
-            <caption>{{ msg("blocks") }}</caption>
+        {# ======================== BLOCKS ======================== #}
+        <tbody class="stat-list--group">
             <tr>
-                <td>{{ msg('re-blocked') }}</td>
-                <td>{{ wiki_log_link('User:'~user.username, project.url, '@TODO') }}</td>
-            </tr>
-            <tr><td>{{ msg('block-longest') }}</td><td>@TODO</td></tr>
-            <tr><td>{{ msg('block-current') }}</td><td>@TODO</td></tr>
-            <tr>
-                <td colspan="2">
-                    <a href="{{ project.url }}/Special:BlockLog/{{ user.username }}">{{ msg('block-log') }}</a>
+                <td colspan="2" class="text-muted">
+                    {{ msg('blocks') }}
                 </td>
             </tr>
-        </table>
-    </div>
-    <div class="col">
-        <table class="table-condensed xt-table top-project-edit-counts">
-            <caption>
-                {{ msg('top-projects-edit-counts') }}
-                <span class="text-muted text-right"><a href="#latestglobal">{{ msg('top-projects-read-more-link') }}</a></span>
-            </caption>
+            <tr>
+                <td>{{ msg('re-blocked') }}</td>
+                <td>
+                    {{ wiki.userLogLink(user, project, '@TODO', 'block') }}
+                </td>
+            </tr>
+            <tr>
+                <td>{{ msg('block-longest') }}</td>
+                <td>@TODO</td>
+            </tr>
+            <tr>
+                <td>{{ msg('block-current') }}</td>
+                <td>@TODO</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="col-lg-4 stat-list clearfix">
+    <table class="table top-project-edit-counts">
+        <tbody class="stat-list--group">
+            <tr>
+                <td colspan="2" class="text-muted">
+                    {{ msg('top-projects-edit-counts') }}{% spaceless %}
+                    {% if is_sub_request %}
+                        (<a href="#latestglobal">{{ msg('top-projects-read-more-link') }}</a>)
+                    {% endif %}
+                {% endspaceless %}</td>
+            </tr>
             {% for topProj in ec.globalEditCountsTopN(10) %}
                 <tr>
-                    {% if topProj.project.databaseName == project.databaseName %}
-                    <td class="current"><span title="{{ msg('selected') }}">►</span>
-                    {% else %}
                     <td>
-                    {% endif %}
+                        {% if topProj.project.databaseName == project.databaseName %}
+                            <span title="{{ msg('selected') }}">&#9658;</span>
+                        {% endif %}
                         <a href="{{ topProj.project.url }}{{ topProj.project.articlePath }}/Special:Contributions/{{ user.username }}">
                         {{ topProj.project.title }}
                         </a>
                     </td>
-                    <td class="tdnum">
+                    <td>
                         <a href="{{ path('TopEditsResults', {project:topProj.project.domain, username:user.username}) }}">
                             {{ topProj.total|number_format }}
                         </a>
+
+                        <small class="text-muted">@TODO days</small>
                     </td>
-                    <td class="tdnum"><small class="text-muted">@TODO days</small></td>
                 </tr>
             {% endfor %}
-            <tfoot>
-                <tr>
-                    <th>{{ msg('global-other-sites-edit-count') }}</th>
-                    <td class="tdnum">@TODO</td>
-                </tr>
-                <tr>
-                    <th>{{ msg('global-total-edit-count') }}</th>
-                    <td class="tdnum">{{ ec.globalEditCount|number_format }}</td>
-                    <td class="tdnum"><small>@TODO days</small></td>
-                </tr>
-            </tfoot>
-        </table>
-    </div>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>{{ msg('global-other-sites-edit-count') }}</td>
+                <td>@TODO</td>
+            </tr>
+            <tr>
+                <td>{{ msg('global-total-edit-count') }}</td>
+                <td>{{ ec.globalEditCount|number_format }} <small>@TODO days</small></td>
+            </tr>
+        </tfoot>
+    </table>
 </div>
 {#<div class="row">#}
     {#<div class="col-md-2">#}
@@ -238,5 +307,9 @@
         {#</div>#}
     {#</div>#}
 {#</div>#}
+
+{% if is_sub_request %}
+    </div></div>
+{% endif %}
 
 {% endblock %}
