@@ -93,12 +93,13 @@ class ApiController extends FOSRestController
     {
         $twig = $this->container->get('twig');
         $aeh = $this->get('app.automated_edits_helper');
+        $project = ProjectRepository::getProject($project, $this->container);
         $data = $aeh->getNonautomatedEdits($project, $username, $namespace, $offset);
 
         if ($format === 'html') {
             $data = $twig->render('api/automated_edits.html.twig', [
                 'edits' => $data,
-                'projectUrl' =>  "https://$project",
+                'project' => $project,
             ]);
         }
 

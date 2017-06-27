@@ -1,3 +1,5 @@
+{% import 'macros/wiki.html.twig' as wiki %}
+
 <div class="non-auto-edits-nav clearfix">
     <a href="#" class="pull-left prev-edits">
         <span class="glyphicon glyphicon-arrow-left"></span>
@@ -22,17 +24,17 @@
         {% else %}
             {% for edit in edits %}
                 <tr>
-                    <td>{{ wiki_link(edit.page_title, projectUrl, edit.page_title | replace('_', ' ')) }}</td>
-                    <td>{{ perma_link(edit.rev_id, projectUrl, edit.timestamp) }}</td>
+                    <td>{{ wiki.pageLinkRaw(edit.page_title, project) }}</td>
+                    <td>{{ wiki.permaLinkRaw(edit.rev_id, project, edit.timestamp) }}</td>
                     <td>
-                        {{ diff_link(edit.rev_id, projectUrl, msg('diff')) }}
+                        {{ wiki.diffLinkRaw(edit.rev_id, project) }}
                         &middot;
-                        {{ wiki_history_link(edit.page_title, projectUrl) }}
+                        {{ wiki.pageHistLinkRaw(edit.page_title, project) }}
                     </td>
                     <td>
                         {{ edit.size | diff_format }}
                     </td>
-                    <td>{{ edit.summary | wikify_comment(edit.page_title, projectUrl) }}</td>
+                    <td>{{ edit.summary | wikify_comment(edit.page_title, project.url) }}</td>
                 </tr>
             {% endfor %}
         {% endif %}

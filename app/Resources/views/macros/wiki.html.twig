@@ -19,7 +19,7 @@
 {% macro pageLinkRaw(pageTitle, project, label = null) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {% from _self import pageUrlRaw as pageUrlRaw %}
-    {{ extLink(pageUrlRaw(pageTitle, project), pageTitle, label) }}
+    {{ extLink(pageUrlRaw(pageTitle, project), pageTitle|replace({'_': ' '}), label) }}
 {% endspaceless %}{% endmacro %}
 
 {% macro pageHistLink(page, label = null, offset = null, limit = null) %}{% spaceless %}
@@ -139,6 +139,18 @@
     {{ extLink(edit.diffUrl, msg('diff'), label) }}
 {% endspaceless %}{% endmacro %}
 
+{% macro diffLinkRaw(revId, project, label = null) %}{% spaceless %}
+    {% from _self import extLink as extLink %}
+    {% from _self import pageUrlRaw as pageUrlRaw %}
+    {% set pageUrl = pageUrlRaw('Special:Diff', project) %}
+    {% if label.timestamp is defined %}
+        {% set label = label|date('Y-m-d, H:i') %}
+    {% elseif label is null %}
+        {% set label = msg('diff') %}
+    {% endif %}
+    {{ extLink(pageUrl ~ '/' ~ revId, label) }}
+{% endspaceless %}{% endmacro %}
+
 {% macro permaLink(edit, label = null) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {{ extLink(edit.permaUrl, edit.timestamp|date('Y-m-d, H:i'), label) }}
@@ -148,6 +160,9 @@
     {% from _self import extLink as extLink %}
     {% set articlePath = project.articlePath|replace({'$1': ('Special:PermaLink'|replace({' ': '_'}))}) %}
     {% set url = (project.url|trim('/')) ~ articlePath ~ '/' ~ revId %}
+    {% if label.setDate is defined %}
+        {% set label = label|date('Y-m-d, H:i') %}
+    {% endif %}
     {{ extLink(url, label) }}
 {% endspaceless %}{% endmacro %}
 

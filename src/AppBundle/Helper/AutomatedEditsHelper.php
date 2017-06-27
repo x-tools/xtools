@@ -107,7 +107,7 @@ class AutomatedEditsHelper extends HelperBase
 
     /**
      * Get a list of nonautomated edits by a user
-     * @param  string         $project   Project domain such as en.wikipedia.org
+     * @param  Project        $project   Project object
      * @param  string         $username
      * @param  string|integer $namespace Numerical value or 'all' for all namespaces
      * @param  integer        $offset    Used for pagination, offset results by N edits
@@ -119,7 +119,6 @@ class AutomatedEditsHelper extends HelperBase
      */
     public function getNonautomatedEdits($project, $username, $namespace, $offset = 0)
     {
-        $project = ProjectRepository::getProject($project, $this->container);
         $namespaces = $project->getNamespaces();
 
         $conn = $this->container->get('doctrine')->getManager('replicas')->getConnection();
