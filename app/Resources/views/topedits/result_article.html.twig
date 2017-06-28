@@ -10,7 +10,9 @@
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {{ msg('back') }}
             </a>
-            <a href="{{ page.url }}">{{ page.displaytitle|raw }}</a>
+            {{ wiki.userLink(user, project) }}
+            &bull;
+            {{ wiki.pageLink(page, page.displayTitle|raw) }}
             <small>
                 &bull;
                 {{ project.title }}
@@ -20,25 +22,37 @@
 
     <div class="panel-body xt-panel-body" >
         {% set content %}
-        <dl class="col-lg-6 dl-horizontal stat-list clearfix">
-            <dt>{{ msg('article') }}</dt>
-            <dd>
-                {{ wiki.pageLink(page, page.displaytitle|raw) }}
-                <small>({{ wiki.pageLogLink(page) }}
-                &middot; <a href="{{ path('ArticleInfoResult', {project:project.domain, article:page.title}) }}">{{ msg('tool-articleinfo') }}</a>)</small>
-            </dd>
-            <dt>{{ msg('user') }}</dt>
-            <dd>
-                {{ wiki.userLink(user, project) }}
-                <small>(<a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool-ec') }}</a>)</small>
-            </dd>
-            <dt>{{ msg('count') }}</dt>
-            <dd>{{ revision_count|number_format }}</dd>
-            <dt>{{ msg('added') }}</dt>
-            <dd>{{ total_added|diff_format }}</dd>
-            <dt>{{ msg('deleted') }}</dt>
-            <dd>{{ total_removed|diff_format }}</dd>
-        </dl>
+        <div class="col-lg-6 stat-list clearfix">
+            <table class="table">
+                <tr>
+                    <td>{{ msg('article') }}</td>
+                    <td>
+                        {{ wiki.pageLink(page, page.displaytitle|raw) }}
+                        <small>({{ wiki.pageLogLink(page) }}
+                        &middot; <a href="{{ path('ArticleInfoResult', {project:project.domain, article:page.title}) }}">{{ msg('tool-articleinfo') }}</a>)</small>
+                    </td>
+                </tr>
+                <tr>
+                    <td>{{ msg('user') }}</td>
+                    <td>
+                        {{ wiki.userLink(user, project) }}
+                        <small>(<a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool-ec') }}</a>)</small>
+                    </td>
+                </tr>
+                <tr>
+                    <td>{{ msg('count') }}</td>
+                    <td>{{ revision_count|number_format }}</td>
+                </tr>
+                <tr>
+                    <td>{{ msg('added') }}</td>
+                    <td>{{ total_added|diff_format }}</td>
+                </tr>
+                <tr>
+                    <td>{{ msg('deleted') }}</td>
+                    <td>{{ total_removed|diff_format }}</td>
+                </tr>
+            </table>
+        </div>
 
         <table class="table table-bordered table-hover table-striped top-editors-table">
             <thead><tr>

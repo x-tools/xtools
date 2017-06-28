@@ -21,15 +21,17 @@
     <div class="panel-body xt-panel-body" >
         <p class="text-center xt-heading-subtitle">
             {{ wiki.userLogLink(user, project, msg('block-log'), 'block') }}
-            &middot;
-            <a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool-ec') }}</a>
+            {% if enabled('ec') %}
+                &middot;
+                <a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool-ec') }}</a>
+            {% endif %}
             {% if not isSingleWiki() %}
-            &middot;
-            <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ user.username }}" >{{ msg('global-contribs') }}</a>
+                &middot;
+                <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ user.username }}" >{{ msg('global-contribs') }}</a>
             {% endif %}
             {% if isWMFLabs() %}
-            &middot;
-            <a target="_blank" href="//tools.wmflabs.org/pageviews/?project={{ project.domain }}&amp;pages=User:{{ user.username }}">{{ msg('pageviews-userpage') }}</a>
+                &middot;
+                <a target="_blank" href="//tools.wmflabs.org/pageviews/?project={{ project.domain }}&amp;pages=User:{{ user.username }}">{{ msg('pageviews-userpage') }}</a>
             {% endif %}
         </p>
 
