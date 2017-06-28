@@ -255,7 +255,8 @@
         <tbody class="stat-list--group">
             <tr>
                 <td colspan="2" class="text-muted">
-                    {{ msg('top-projects-edit-counts') }}{% spaceless %}
+                    {{ msg('top-projects-edit-counts') }}
+                    {% spaceless %}
                     {% if is_sub_request %}
                         (<a href="#latest-global-edits">{{ msg('top-projects-read-more-link') }}</a>)
                     {% endif %}
@@ -268,7 +269,8 @@
                             <span title="{{ msg('selected') }}">&#9658;</span>
                         {% endif %}
                         <a href="{{ topProj.project.url }}{{ topProj.project.articlePath }}/Special:Contributions/{{ user.username }}">
-                        {{ topProj.project.title }}
+                        {# use project.domain instead of title due to limited space available in the interface #}
+                        {{ topProj.project.domain }}
                         </a>
                     </td>
                     <td>
