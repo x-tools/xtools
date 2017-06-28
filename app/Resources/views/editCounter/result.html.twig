@@ -104,10 +104,6 @@
             <div id="latestglobal-container" data-username="{{ user.username }}" data-project="{{ project.domain }}">
                 <img src="{{ asset('static/images/loader.gif') }}" />
             </div>
-            {{ render(path('EditCounterLatestGlobal', {
-                'username': user.username,
-                'project': project.domain
-            })) }}
         {% endset %}
         {% set headerLink %}
             <a href="{{ path('EditCounterLatestGlobal', {project:project.domain, username:user.username})}}">{{ msg('latest-global-edits') }}</a>
