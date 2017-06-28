@@ -1,22 +1,19 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="col-lg-8 col-lg-offset-2">
-        <div class="text-center">
-            <img class="splash-logo" src="{{ asset('static/images/logo.svg') }}" />
-            <h4>Feeding your data hunger</h4>
-        </div>
-        <div class="tool-list">
-            {% for tool in tools() %}
-                {% if enabled(tool) %}
-                    <a class="btn btn-default" href="{{ path(tool) }}">
-                        <img src="{{ asset('static/images/' ~ tool ~ '.svg') }}" />
-                        {{ msg("tool-" ~ tool) }}
-                        &mdash;
-                        {{ msg("tool-" ~ tool ~ "-desc") }}
-                    </a>
-                {% endif %}
-            {% endfor %}
-        </div>
+    <div class="col-lg-3 col-lg-offset-1 text-center">
+        <img class="splash-logo" src="{{ asset('static/images/logo.svg') }}" />
+        <h4>Feeding your data hunger</h4>
+    </div>
+    <div class="col-lg-7 tool-list">
+        {% for tool in tools() %}
+            {% if enabled(tool) %}
+                <a class="btn btn-default" href="{{ path(tool) }}">
+                    <span class="tool-name">{{ msg("tool-" ~ tool) }}</span>
+                    &mdash;
+                    {{ msg("tool-" ~ tool ~ "-desc") }}
+                </a>
+            {% endif %}
+        {% endfor %}
     </div>
 {% endblock %}

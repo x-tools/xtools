@@ -6,8 +6,9 @@
     }
 
     .splash-logo {
-        margin: 20px 0 10px;
-        width: 450px;
+        margin-top: 30px;
+        max-width: 320px;
+        width: 100%;
     }
 
     .tool-list {
@@ -16,23 +17,16 @@
 
         .btn {
             display: block;
-            height: 65px;
-            line-height: 51px;
             margin-top: 15px;
-            overflow: hidden;
-            padding-left: 70px;
             position: relative;
             text-align: left;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            white-space: normal;
             width: 100%;
         }
+    }
 
-        img {
-            @include center('vertical');
-            left: 12px;
-            width: 50px;
-        }
+    .tool-name {
+        font-weight: bold;
     }
 }
 
