@@ -219,6 +219,7 @@ class EditCounterRepository extends Repository
             'review-approve',
             'patrol-patrol',
             'block-block',
+            'block-reblock',
             'block-unblock',
             'protect-protect',
             'protect-unprotect',
@@ -255,6 +256,38 @@ class EditCounterRepository extends Repository
         $this->stopwatch->stop($cacheKey);
 
         return $logCounts;
+    }
+
+    /**
+     * @param Project $project
+     * @param User $user
+     * @return array
+     */
+    public function getBlocksSet(Project $project, User $user)
+    {
+        $ipblocksTable = $this->getTableName($project->getDatabaseName(), 'ipblocks');
+        $sql = "SELECT * FROM $ipblocksTable WHERE ipb_by = :userId";
+        $resultQuery = $this->getProjectsConnection()->prepare($sql);
+        $userId = $user->getId($project);
+        $resultQuery->bindParam('userId', $userId);
+        $resultQuery->execute();
+        return $resultQuery->fetchAll();
+    }
+
+    /**
+     * @param Project $project
+     * @param User $user
+     * @return array
+     */
+    public function getBlocksReceived(Project $project, User $user)
+    {
+        $ipblocksTable = $this->getTableName($project->getDatabaseName(), 'ipblocks');
+        $sql = "SELECT * FROM $ipblocksTable WHERE ipb_user = :userId";
+        $resultQuery = $this->getProjectsConnection()->prepare($sql);
+        $userId = $user->getId($project);
+        $resultQuery->bindParam('userId', $userId);
+        $resultQuery->execute();
+        return $resultQuery->fetchAll();
     }
 
     /**

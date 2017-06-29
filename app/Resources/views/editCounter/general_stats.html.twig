@@ -158,11 +158,7 @@
                 <td><a href="#autoeditslist">{{ ec.countAutomatedRevisions }}</a></td>
             </tr>
             <tr>
-                <td>{{ msg('reverted-edits') }}</td>
-                <td>@TODO</td>
-            </tr>
-            <tr>
-                <td>{{ msg('edits-with-comment') }}</td>
+                <td>{{ msg('edits-with-comments') }}</td>
                 <td>{{ ec.countRevisionsWithComments|number_format }}</td>
             </tr>
             <tr>
@@ -206,25 +202,32 @@
                 </td>
             </tr>
         </tbody>
-        {% if not user.isAdmin(project) %}
-            <tbody class="stat-list--group">
-                <tr>
-                    <td colspan="2" class="text-muted">{{ msg('actions-as-admin') }}</td>
-                </tr>
+
+        <tbody class="stat-list--group">
+            <tr>
+                <td colspan="2" class="text-muted">{{ msg('actions-as-admin') }}</td>
+            </tr>
+            {% if not user.isAdmin(project) %}
                 <tr>
                     <td colspan="2" class="stat-list--empty-group">{{ msg('user-is-not-admin') }}</td>
                 </tr>
             {% else %}
-                {#<tr><td>{{ msg("block") }}</td><td><span class="tdgeneral">{{ usersBlocked }} <small>x</small></span></td></tr>#}
-                {#<tr><td>{{ msg("unblock") }}</td><td><span class="tdgeneral">{{ usersUnblocked }} <small>x</small></span></td></tr>#}
-                {#<tr><td>{{ msg("protect") }}</td><td><span class="tdgeneral">{{ pagesProtected }} <small>x</small></span></td></tr>#}
-                {#<tr><td>{{ msg("unprotect") }}</td><td><span class="tdgeneral">{{ pagesUnprotected }} <small>x</small></span></td></tr>#}
-                {#<tr><td>{{ msg("delete") }}</td><td><span class="tdgeneral">{{ pagesDeleted }} <small>x</small></span></td></tr>#}
-                {#<tr><td>{{ msg("delete") }} ({{ msg("revisions", [1]) }})</td><td><span class="tdgeneral">{{ pagesDeletedRevision }} <small>x</small></span></td></tr>#}
-                {#<tr><td>{{ msg("restore") }}</td><td><span class="tdgeneral">{{ pagesRestored }} <small>x</small></span></td></tr>#}
-                {#<tr><td>{{ msg("import") }}</td><td><span class="tdgeneral">{{ pagesImported }} <small>x</small></span></td></tr>#}
-            </tbody>
-        {% endif %}
+                <tr>
+                    <td>{{ msg("block") }}</td>
+                    <td>{{ ec.countUsersBlocked|number_format }} ({{ ec.countBlocksLifted|number_format }}{{ msg('num-blocks', [ec.countBlocksSet]) }})</td>
+                </tr>
+                <tr>
+                    <td>{{ msg("unblock") }}</td>
+                    <td>@TODO {# ec.countUsersUnblocked #} ({{ ec.countBlocksLifted|number_format }} {{ msg('num-blocks', [ec.countBlocksLifted]) }})</td>
+                </tr>
+                <tr><td>{{ msg("protect") }}</td><td>{{ ec.countPagesProtected|number_format }}</td></tr>
+                <tr><td>{{ msg("unprotect") }}</td><td>{{ ec.countPagesUnprotected|number_format }}</td></tr>
+                <tr><td>{{ msg("delete") }}</td><td>{{ ec.countPagesDeleted|number_format }}</td></tr>
+                <tr><td>{{ msg("deleted-edits") }})</td><td>{{ ec.countEditsDeleted|number_format }}</td></tr>
+                <tr><td>{{ msg("restore") }}</td><td>{{ ec.countPagesRestored|number_format }}</td></tr>
+                <tr><td>{{ msg("import") }}</td><td>{{ ec.countPagesImported|number_format }}</td></tr>
+            {% endif %}
+        </tbody>
 
         {# ======================== BLOCKS ======================== #}
         <tbody class="stat-list--group">
@@ -236,7 +239,8 @@
             <tr>
                 <td>{{ msg('re-blocked') }}</td>
                 <td>
-                    {{ wiki.userLogLink(user, project, '@TODO', 'block') }}
+                    {# @TODO fix link. https://en.wikisource.org/w/index.php?title=Special%3ALog&type=block&user=&page=User%3ASamwilson&year=&month=-1&tagfilter=&subtype=#}
+                    {{ wiki.userLogLink(user, project, ec.countBlocksReceived, 'block') }}
                 </td>
             </tr>
             <tr>

@@ -34,6 +34,9 @@ class EditCounter extends Model
     /** @var int[] Keys are project DB names. */
     protected $globalEditCounts;
 
+    /** @var array Block data, with keys 'set' and 'received'. */
+    protected $blocks;
+
     /**
      * EditCounter constructor.
      * @param Project $project The base project to count edits
@@ -98,6 +101,22 @@ class EditCounter extends Model
     }
 
     /**
+     * Get block data.
+     * @param string $type Either 'set' or 'received'.
+     * @return array
+     */
+    protected function getBlocks($type)
+    {
+        if (isset($this->blocks[$type]) && is_array($this->blocks[$type])) {
+            return $this->blocks[$type];
+        }
+        $method = "getBlocks".ucfirst($type);
+        $blocks = $this->getRepository()->$method($this->project, $this->user);
+        $this->blocks[$type] = $blocks;
+        return $this->blocks[$type];
+    }
+
+    /**
      * Get the total number of currently-live revisions.
      * @return int
      */
@@ -108,7 +127,7 @@ class EditCounter extends Model
     }
 
     /**
-     * Get the total number of revisions that have been deleted.
+     * Get the total number of the user's revisions that have been deleted.
      * @return int
      */
     public function countDeletedRevisions()
@@ -262,6 +281,112 @@ class EditCounter extends Model
         return isset($logCounts['move-move']) ? (int)$logCounts['move-move'] : 0;
     }
 
+    /**
+     * Get the total number of times the user has blocked or re-blocked a user.
+     * @return int
+     */
+    public function countBlocksSet()
+    {
+        $logCounts = $this->getLogCounts();
+        $block = isset($logCounts['block-block']) ? (int)$logCounts['block-block'] : 0;
+        $reBlock = isset($logCounts['block-reblock']) ? (int)$logCounts['block-reblock'] : 0;
+        return $block + $reBlock;
+    }
+
+    /**
+     * Get the total number of blocks that have been lifted (i.e. unblocks) by this user.
+     * @return int
+     */
+    public function countBlocksLifted()
+    {
+        $logCounts = $this->getLogCounts();
+        return isset($logCounts['block-unblock']) ? (int)$logCounts['block-unblock'] : 0;
+    }
+
+    /**
+     * Get the total number of times the user has been blocked.
+     * @return int
+     */
+    public function countBlocksReceived()
+    {
+        $blocks = $this->getBlocks('received');
+        return count($blocks);
+    }
+
+    /**
+     * Get the total number of users blocked by this user.
+     * @return int
+     */
+    public function countUsersBlocked()
+    {
+        $blocks = $this->getBlocks('set');
+        $usersBlocked = [];
+        foreach ($blocks as $block) {
+            $usersBlocked[$block['ipb_user']] = true;
+        }
+        return count($usersBlocked);
+    }
+
+    /**
+     * Get the total number of users that this user has unblocked.
+     * @todo
+     * @return int
+     */
+    public function countUsersUnblocked()
+    {
+        return 0;
+    }
+
+    /**
+     * Get the total number of pages protected by the user.
+     * @return int
+     */
+    public function countPagesProtected()
+    {
+        $logCounts = $this->getLogCounts();
+        return isset($logCounts['protect-protect']) ? (int)$logCounts['protect-protect'] : 0;
+    }
+    
+    /**
+     * Get the total number of pages unprotected by the user.
+     * @return int
+     */
+    public function countPagesUnprotected()
+    {
+        $logCounts = $this->getLogCounts();
+        return isset($logCounts['protect-unprotect']) ? (int)$logCounts['protect-unprotect'] : 0;
+    }
+
+    /**
+     * Get the total number of edits deleted by the user.
+     * @return int
+     */
+    public function countEditsDeleted()
+    {
+        $logCounts = $this->getLogCounts();
+        return isset($logCounts['delete-revision']) ? (int)$logCounts['delete-revision'] : 0;
+    }
+
+    /**
+     * Get the total number of pages restored by the user.
+     * @return int
+     */
+    public function countPagesRestored()
+    {
+        $logCounts = $this->getLogCounts();
+        return isset($logCounts['delete-restore']) ? (int)$logCounts['delete-restore'] : 0;
+    }
+
+    /**
+     * Get the total number of pages imported by the user.
+     * @return int
+     */
+    public function countPagesImported()
+    {
+        $logCounts = $this->getLogCounts();
+        return isset($logCounts['import-import']) ? (int)$logCounts['import-import'] : 0;
+    }
+    
     /**
      * Get the average number of edits per page (including deleted revisions and pages).
      * @return float
