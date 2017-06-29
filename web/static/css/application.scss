@@ -470,10 +470,12 @@ div.outer_bar {
     border: 0;
     padding-bottom: 0;
     padding-top: 0;
+    white-space: normal;
 
     &:first-child {
         font-weight: bold;
         text-align: right;
+        white-space: nowrap;
 
         &::after {
             content: ':';

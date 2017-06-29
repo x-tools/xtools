@@ -137,8 +137,10 @@ class TopEditsController extends Controller
             $optedInPage = $project
                 ->getRepository()
                 ->getPage($project, $project->userOptInPage($user));
+
             return $this->render('topedits/result_namespace.html.twig', [
                 'xtPage' => 'topedits',
+                'xtTitle' => $user->getUsername(),
                 'project' => $project,
                 'user' => $user,
                 'namespace' => $namespaceId,
@@ -206,6 +208,7 @@ class TopEditsController extends Controller
         }
         return $this->render('topedits/result_namespace.html.twig', [
             'xtPage' => 'topedits',
+            'xtTitle' => $user->getUsername(),
             'project' => $project,
             'user' => $user,
             'namespace' => $namespaceId,
@@ -257,6 +260,7 @@ class TopEditsController extends Controller
         // Send all to the template.
         return $this->render('topedits/result_article.html.twig', [
             'xtPage' => 'topedits',
+            'xtTitle' => $user->getUsername() . ' - ' . $page->getTitle(),
             'project' => $project,
             'user' => $user,
             'page' => $page,

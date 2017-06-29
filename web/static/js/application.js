@@ -46,7 +46,7 @@
      *                         <span class="glyphicon glyphicon-remove"></span>
      *                         <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
      *                     </span>
-     *                     {{ wiki_link(...) }}
+     *                     {{ wiki.pageLink(...) }}
      *                 </td>
      *                 <td class="sort-entry--count" data-value="{{ values.count }}">
      *                     {{ values.count }}

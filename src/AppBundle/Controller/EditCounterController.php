@@ -139,7 +139,7 @@ class EditCounterController extends Controller
         $this->setUpEditCounter($project, $username);
         $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/general_stats.html.twig', [
-            'xtTitle' => 'general-stats',
+            'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
             'is_labs' => $this->project->getRepository()->isLabs(),
@@ -161,7 +161,7 @@ class EditCounterController extends Controller
         $this->setUpEditCounter($project, $username);
         $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/namespace_totals.html.twig', [
-            'xtTitle' => 'namespace-totals',
+            'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
             'is_labs' => $this->project->getRepository()->isLabs(),
@@ -186,7 +186,7 @@ class EditCounterController extends Controller
             ->getRepository()
             ->getPage($this->project, $this->project->userOptInPage($this->user));
         return $this->render('editCounter/timecard.html.twig', [
-            'xtTitle' => 'timecard',
+            'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
             'is_labs' => $this->project->getRepository()->isLabs(),
@@ -210,7 +210,7 @@ class EditCounterController extends Controller
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         //$yearcounts = $this->editCounterHelper->getYearCounts($username);
         return $this->render('editCounter/yearcounts.html.twig', [
-            'xtTitle' => 'year-counts',
+            'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
             //'namespaces' => $this->apiHelper->namespaces($project),
@@ -237,7 +237,7 @@ class EditCounterController extends Controller
             ->getRepository()
             ->getPage($this->project, $this->project->userOptInPage($this->user));
         return $this->render('editCounter/monthcounts.html.twig', [
-            'xtTitle' => 'month-counts',
+            'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
             'is_labs' => $this->project->getRepository()->isLabs(),
@@ -261,7 +261,7 @@ class EditCounterController extends Controller
         $isSubRequest = $request->get('htmlonly')
                         || $this->container->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/latest_global.html.twig', [
-            'xtTitle' => 'latest-global-edits',
+            'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
             'user' => $this->user,

@@ -48,7 +48,8 @@
                 {{ wiki.permaLink(edit) }}
             </td>
             <td class="sort-entry--project" data-value="{{ edit.project.domain }}">
-                <a href="{{ edit.project.url }}">{{ edit.project.title }}</a>
+                {# Use project.domain here instead of title to preserve limited space in the interface #}
+                <a href="{{ edit.project.url }}">{{ edit.project.domain }}</a>
             </td>
             <td>
                 {{ wiki.diffLink(edit) }}
