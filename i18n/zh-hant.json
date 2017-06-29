@@ -1,5 +1,7 @@
 {
   "all": "所有",
+  "all-languages": "頁面各語言版本統計",
+  "api-error": "查詢$1出現錯誤。",
   "bot": "網路機器人",
   "comma-character": "、",
   "current-size": "目前大小",

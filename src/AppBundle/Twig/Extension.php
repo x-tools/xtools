@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file contains only the Extension class.
+ */
 
 namespace AppBundle\Twig;
 
@@ -9,21 +12,30 @@ use Intuition;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Twig_Extension;
 
-class Extension extends Twig_Extension
+/**
+ * The parent class for all of XTools' Twig extensions, in order to centralize the i18n set-up.
+ */
+abstract class Extension extends Twig_Extension
 {
 
-    /** @var ContainerInterface */
+    /** @var ContainerInterface The DI container. */
     protected $container;
 
-    /** @var RequestStack */
+    /** @var RequestStack The request stack. */
     protected $requestStack;
 
-    /** @var Session */
+    /** @var Session User's current session. */
     protected $session;
 
-    /** @var Intuition */
+    /** @var Intuition The i18n object. */
     private $intuition;
 
+    /**
+     * Extension constructor.
+     * @param ContainerInterface $container The DI container.
+     * @param RequestStack $requestStack The request stack.
+     * @param Session $session
+     */
     public function __construct(ContainerInterface $container, RequestStack $requestStack, Session $session)
     {
         $this->container = $container;

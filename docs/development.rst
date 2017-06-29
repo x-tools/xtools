@@ -2,13 +2,13 @@
 Development
 ###########
 
-To contribute to the development of xTools, you may fork us on GitHub.  A few things to be aware of first:
+To contribute to the development of XTools, you may fork us on GitHub.  A few things to be aware of first:
 
-1. xTools is based on Symfony 3. We use Twig as our template engine.  Symfony is a full MVC system.
+1. XTools is based on Symfony 3. We use Twig as our template engine.  Symfony is a full MVC system.
    a. The controllers are located at ``src/AppBundle/controller``.  They are sorted by tool
    b. The twig templates are located at ``app/resources/views``.  They are sorted by tool.
 2. We use the ``@Route`` syntax to configure routes. 
-3. Every tool requires a twig directory and one controller. Also, core parts of xTools require the tool to be registered within `app/config/tools.yml`.
+3. Every tool requires a twig directory and one controller. Also, core parts of XTools require the tool to be registered within `app/config/tools.yml`.
 
 Style Guidelines
 ----------------

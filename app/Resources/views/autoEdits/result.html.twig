@@ -1,30 +1,45 @@
 {% extends 'base.html.twig' %}
 {% import 'macros/layout.html.twig' as layout %}
 {% import 'macros/pieChart.html.twig' as chart %}
+{% import 'macros/wiki.html.twig' as wiki %}
 
 {% block body %}
 <div class="panel panel-primary">
     <header class="panel-heading">
         <div class="text-center xt-heading-top">
-            <a class="back-to-search" href="{{ path("autoedits") }}"">
+            <a class="back-to-search" href="{{ path('autoedits') }}">
             <span class="glyphicon glyphicon-chevron-left"></span>
             {{ msg('back') }}
             </a>
-            {{ user_link(username, projectUrl) }} &middot; {{ project }}
+            {{ wiki.userLink(user, project) }}
+            &middot;
+            {{ project.title }}
         </div>
     </header>
     <div class="panel-body xt-panel-body">
         <p class="text-center xt-heading-subtitle">
-            {{ user_log_link(username, projectUrl, msg('block-log'), 'block') }}
+            {{ wiki.userLogLink(user, project, msg('block-log'), 'block') }}
             {% if isWMFLabs() %}
                 &middot;
-                <a href="//tools.wmflabs.org/guc/?user={{ username }}" target="_blank">{{ msg('global-contribs') }}</a>
+                <a href="//tools.wmflabs.org/guc/?user={{ user.username }}" target="_blank">{{ msg('global-contribs') }}</a>
             {% endif %}
             {% if not(isSingleWiki()) %}
                 &middot;
-                {{ wiki_link('Special:CentralAuth/'~username, projectUrl, 'CentralAuth') }}
+                {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, msg('sul-info')) }}
             {% endif %}
         </p>
+
+        {# Show TOC when the user has a ton of automated tools, making the page hard to navigate #}
+        {% if semi_automated|length > 15 %}
+            <div class="text-center xt-toc">
+                {% set sections = ['summary', 'auto-edits', 'non-auto-edits'] %}
+                {% for section in sections %}
+                    <span>
+                        <a href="#{{ section }}" data-section="{{ section }}">{{ msg(section) }}</a>
+                    </span>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         {% set content %}
             <div class="panel-body stat-list clearfix" id="summary">
@@ -79,7 +94,7 @@
         {{ layout.content_block('summary', content) }}
 
         {% set content %}
-            <table class="table table-bordered table-hover table-striped tools-table">
+            <table class="table table-bordered table-hover table-striped tools-table toggle-table">
                 <thead>
                 {% for key in ['tool', 'count'] %}
                     <th>
@@ -92,18 +107,18 @@
                 </thead>
                 <tbody>
                 {% set toolsTotal = 0 %}
-                {% for tool, count in semi_automated %}
-                    {% set toolsTotal = toolsTotal + count %}
+                {% for tool, values in semi_automated %}
+                    {% set toolsTotal = toolsTotal + values.count %}
                     <tr>
-                        <td class="sort-entry--tool" data-value="{{ tool }}">
-                            <span class="tools-toggle" data-index="{{ loop.index0 }}" data-tool="{{ tool }}">
+                        <td class="sort-entry--tool linked" data-value="{{ tool }}">
+                            <span class="tools-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ tool }}">
                                 <span class="glyphicon glyphicon-remove"></span>
                                 <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
                             </span>
-                            {{ tool }}
+                            {{ wiki.pageLinkRaw(values.link, project, tool) }}
                         </td>
-                        <td class="sort-entry--count" data-value="{{ count }}">
-                            {{ count|number_format(0, ".", ",") }}
+                        <td class="sort-entry--count" data-value="{{ values.count }}">
+                            {{ values.count|number_format(0, ".", ",") }}
                         </td>
                     </tr>
                 {% endfor %}
@@ -119,7 +134,7 @@
                 </tfoot>
             </table>
 
-            <div class="chart-wrapper tools-chart-wrapper">
+            <div class="chart-wrapper tools-chart-wrapper toggle-table--chart">
                 <canvas id="tool_chart" width="400" height="400"></canvas>
             </div>
 
@@ -135,8 +150,8 @@
                         labels: {{ semi_automated | keys | json_encode() | raw }},
                         datasets: [{
                             data: [
-                                {% for value in semi_automated %}
-                                    {{ value }}{% if not loop.last %},{% endif %}
+                                {% for tool, values in semi_automated %}
+                                    {{ values.count }}{% if not loop.last %},{% endif %}
                                 {% endfor %}
                             ],
                             backgroundColor: {{ colors | json_encode() | raw }},
@@ -158,7 +173,7 @@
         {% set content %}
             <div>
                 <em class="non-auto-edits-loading text-muted">{{ msg('loading') }}...</em>
-                <div class="non-auto-edits-container" data-username="{{ username }}"></div>
+                <div class="non-auto-edits-container" data-username="{{ user.username }}"></div>
             </div>
         {% endset %}
         {{ layout.content_block('non-auto-edits', content) }}

@@ -1,9 +1,15 @@
 <?php
+/**
+ * This file contains only the Project class.
+ */
 
 namespace Xtools;
 
+use Mediawiki\Api\MediawikiApi;
+use Symfony\Component\VarDumper\VarDumper;
+
 /**
- * A Project is a single wiki that Xtools is querying.
+ * A Project is a single wiki that XTools is querying.
  */
 class Project extends Model
 {
@@ -14,11 +20,19 @@ class Project extends Model
     /** @var string[] Basic metadata about the project */
     protected $metadata;
 
+    /**
+     * Create a new Project.
+     * @param string $nameOrUrl The project's database name or URL.
+     */
     public function __construct($nameOrUrl)
     {
         $this->nameUnnormalized = $nameOrUrl;
     }
 
+    /**
+     * Get basic metadata about the project.
+     * @return \string[]
+     */
     protected function getMetadata()
     {
         if (!$this->metadata) {
@@ -59,17 +73,40 @@ class Project extends Model
     }
 
     /**
-     * The project URL is the fully-qualified domain name, with protocol and trailing slash.
+     * The language for this project.
      *
      * @return string
      */
-    public function getUrl()
+    public function getLang()
     {
-        return rtrim($this->getMetadata()['url'], '/') . '/';
+        return isset($this->getMetadata()['lang']) ? $this->getMetadata()['lang'] : '';
+    }
+
+    /**
+     * The project URL is the fully-qualified domain name, with protocol and trailing slash.
+     *
+     * @param bool $withTrailingSlash Whether to append a slash.
+     * @return string
+     */
+    public function getUrl($withTrailingSlash = true)
+    {
+        return rtrim($this->getMetadata()['url'], '/') . ($withTrailingSlash ? '/' : '');
+    }
+
+    /**
+     * Get a MediawikiApi object for this Project.
+     *
+     * @return MediawikiApi
+     */
+    public function getApi()
+    {
+        return $this->getRepository()->getMediawikiApi($this);
     }
 
     /**
      * The base URL path of this project (that page titles are appended to).
+     * For some wikis the title (apparently) may not be at the end.
+     * Replace $1 with the article name.
      *
      * @link https://www.mediawiki.org/wiki/Manual:$wgArticlePath
      *
@@ -80,11 +117,12 @@ class Project extends Model
         $metadata = $this->getRepository()->getMetadata($this->getUrl());
         return isset($metadata['general']['articlePath'])
             ? $metadata['general']['articlePath']
-            : '/wiki/';
+            : '/wiki/$1';
     }
 
     /**
-     * The URL path to index.php
+     * The URL path of the directory that contains index.php, with no trailing slash.
+     * Defaults to '/w' which is the same as the normal WMF set-up.
      *
      * @link https://www.mediawiki.org/wiki/Manual:$wgScriptPath
      *
@@ -95,7 +133,31 @@ class Project extends Model
         $metadata = $this->getRepository()->getMetadata($this->getUrl());
         return isset($metadata['general']['scriptPath'])
             ? $metadata['general']['scriptPath']
-            : '/w/index.php';
+            : '/w';
+    }
+
+    /**
+     * The URL path to index.php
+     * Defaults to '/w/index.php' which is the same as the normal WMF set-up.
+     *
+     * @return string
+     */
+    public function getScript()
+    {
+        $metadata = $this->getRepository()->getMetadata($this->getUrl());
+        return isset($metadata['general']['script'])
+            ? $metadata['general']['script']
+            : $this->getScriptPath() . '/index.php';
+    }
+
+    /**
+     * The full URL to api.php
+     *
+     * @return string
+     */
+    public function getApiUrl()
+    {
+        return rtrim($this->getUrl(), '/') . $this->getRepository()->getApiPath();
     }
 
     /**
@@ -117,5 +179,55 @@ class Project extends Model
     {
         $metadata = $this->getRepository()->getMetadata($this->getUrl());
         return $metadata['namespaces'];
+    }
+
+    /**
+     * Get the name of the page on this project that the user must create in order to opt in for
+     * restricted statistics display.
+     * @param User $user
+     * @return string
+     */
+    public function userOptInPage(User $user)
+    {
+        $localPageName = 'User:' . $user->getUsername() . '/EditCounterOptIn.js';
+        return $localPageName;
+    }
+
+    /**
+     * Has a user opted in to having their restricted statistics displayed to anyone?
+     * @param User $user
+     * @return bool
+     */
+    public function userHasOptedIn(User $user)
+    {
+        // 1. First check to see if the whole project has opted in.
+        if (!isset($this->metadata['opted_in'])) {
+            $optedInProjects = $this->getRepository()->optedIn();
+            $this->metadata['opted_in'] = in_array($this->getDatabaseName(), $optedInProjects);
+        }
+        if ($this->metadata['opted_in']) {
+            return true;
+        }
+
+        // 2. Then see if the user has opted in on this project.
+        $userNsId = 2;
+        $localExists = $this->getRepository()
+            ->pageHasContent($this, $userNsId, $this->userOptInPage($user));
+        if ($localExists) {
+            return true;
+        }
+
+        // 3. Lastly, see if they've opted in globally on the default project or Meta.
+        $globalPageName = $user->getUsername() . '/EditCounterGlobalOptIn.js';
+        $globalProject = $this->getRepository()->getGlobalProject();
+        if ($globalProject instanceof Project) {
+            $globalExists = $globalProject->getRepository()
+                ->pageHasContent($globalProject, $userNsId, $globalPageName);
+            if ($globalExists) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

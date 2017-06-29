@@ -71,7 +71,6 @@
   "neutral": "Neutral",
   "no-contribs": "No contreibutions foond",
   "no-exist": "$1 daes nae exist",
-  "no-follow-redir": "Dinna follae redirects",
   "no-graph": "Uiser haes nae yet optit in. If ye want tae see graphs, please create $1 wi ony content or create $2 tae opt-in across aw Wikimedia wikis.",
   "no-graph-alt": "Alternatively ye can log in wi Wikimedia OAuth (see an aa $1). That way, the mair detailed results are for yer ees anly.",
   "no-result": "No matchin results foond for: $1",

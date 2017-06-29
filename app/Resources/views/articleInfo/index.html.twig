@@ -4,8 +4,8 @@
 {% block body %}
     <form class="col-lg-8 col-lg-offset-2" action="{{ path("articleinfo") }}" method="get" accept-charset="utf-8" >
         <fieldset class="form-fieldset">
-            {{ forms.page_input() }}
-            {{ forms.wiki_input() }}
+            {{ forms.wiki_input(project) }}
+            {{ forms.page_input(true, project) }}
         </fieldset>
         {{ forms.submit_btn }}
     </form>

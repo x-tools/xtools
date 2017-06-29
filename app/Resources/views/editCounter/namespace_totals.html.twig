@@ -1,47 +1,94 @@
 {% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
+{% import 'macros/wiki.html.twig' as wiki %}
 
 {% block body %}
 
-<div class="row">
-    <div class="col-md-5">
-        <table class="table table-striped xt-table">
-            <tbody>
-            {% for nsId, value in ec.namespaceTotals %}
-                <tr>
-                    <td style="background-color:{{ color(nsId) }}">&nbsp;&nbsp;</td>
-                    <td class="tdtitle">{{ project.namespaces[nsId] }}</td>
-                    <td class="tdnum">{{ value|number_format }}</td>
-                    <td class="tdnum">{{ ((value/ec.countLiveRevisions)*100)|round(1) }}%</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-            <tfoot>
+{% if not is_sub_request %}
+    <div class="panel panel-primary">
+        <header class="panel-heading">
+            <div class="text-center xt-heading-top">
+                <a class="back-to-search" href="{{ path('ec') }}">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                    {{ msg('back') }}
+                </a>
+                {{ wiki.userLink(user, project) }}
+                <small> &bull; {{ project.title }} </small>
+            </div>
+        </header>
+        <div class="panel-body xt-panel-body">
+            <section class="panel panel-default clearfix">
+                <header class="panel-heading col-lg-12">
+                    <h4>{{ msg('namespace-totals') }}</h4>
+                </header>
+                <div class="panel-body col-lg-12">
+{% endif %}
+
+<table class="table table-bordered table-hover table-striped tools-table toggle-table">
+    <thead>
+        {% for key in ['namespace', 'count'] %}
+            <th>
+                <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
+                    {{ msg(key) | capitalize_first }}
+                    <span class="glyphicon glyphicon-sort"></span>
+                </span>
+            </th>
+        {% endfor %}
+    </thead>
+    <tbody>
+        {% for nsId, value in ec.namespaceTotals %}
             <tr>
-                <td></td>
-                <td></td>
-                <td class="tdnum">{{ ec.countLiveRevisions|number_format }}</td>
-                <td class="tdnum">100%</td>
+                <td class="sort-entry--namespace" data-value="{{ nsId }}">
+                    <span class="tools-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ nsId }}">
+                        <span class="glyphicon glyphicon-remove"></span>
+                        <span class="color-icon" style="background:{{ color(nsId) }}"></span>
+                    </span>
+                    {{ project.namespaces[nsId] }}
+                </td>
+                <td class="sort-entry--count" data-value="{{ value }}">
+                    {{ value|number_format }}
+                    ({{ ((value/ec.countLiveRevisions)*100)|round(1) }}%)
+                </td>
             </tr>
-            </tfoot>
-        </table>
-    </div>
-    <div class="col-md-5 col-md-pull-1 col-md-push-1">
-        <canvas id="namespace-canvas"></canvas>
-        <script>
-            new Chart($("#namespace-canvas"), {
-                type: 'pie',
-                data: {
-                    labels: [{% for key,value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}"{{ project.namespaces[key] }}"{% endfor %}],
-                    datasets: [{
-                        data: [{% for value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}{{ value }}{% endfor %}],
-                        backgroundColor: [{% for key,value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}'{{ color(key) }}'{% set first = 0 %}{% endfor %}],
-                        borderColor: [{% for key,value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}'{{ color(key) }}'{% set first = 0 %}{% endfor %}],
-                        borderWidth: 1
-                    }]
-                }
-            });
-        </script>
-    </div>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <th class="namespaces--namespaces">
+                {{ ec.namespaceTotals|length}} {{ msg('num-namespaces', [ec.namespaceTotals|length]) }}
+            </th>
+            <th class="namespaces--count">
+                {{ ec.countLiveRevisions|number_format }}
+            </th>
+        </tr>
+    </tfoot>
+</table>
+<div class="chart-wrapper namespaces-chart-wrapper toggle-table--chart">
+    <canvas id="namespace-canvas"></canvas>
+    <script>
+        window.namespaceTotals = {{ ec.namespaceTotals|json_encode()|raw }};
+        window.namespaceChart = new Chart($("#namespace-canvas"), {
+            type: 'pie',
+            data: {
+                labels: [{% for key,value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}"{{ project.namespaces[key] }}"{% endfor %}],
+                datasets: [{
+                    data: [{% for value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}{{ value }}{% endfor %}],
+                    backgroundColor: [{% for key,value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}'{{ color(key) }}'{% set first = 0 %}{% endfor %}],
+                    borderColor: [{% for key,value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}'{{ color(key) }}'{% set first = 0 %}{% endfor %}],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: false,
+                legend: {
+                    display: false,
+                },
+            },
+        });
+    </script>
 </div>
+
+{% if not is_sub_request %}
+    </div></section></div></div>
+{% endif %}
 
 {% endblock %}

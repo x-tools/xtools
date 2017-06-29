@@ -1,5 +1,7 @@
 {
   "all": "Sve",
+  "all-languages": "Svi jezici",
+  "api-error": "Greška pri upitu $1",
   "bot": "Bot",
   "current-size": "Trenutna veličina",
   "date": "Datum",

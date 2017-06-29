@@ -1,5 +1,6 @@
 {
   "all": "Tot",
+  "api-error": "Error consultar $1",
   "bot": "Bot",
   "help-translate": "Ajudeu a traduir",
   "page-title": "Títol de pàgina",

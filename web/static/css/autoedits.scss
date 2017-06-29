@@ -14,62 +14,11 @@
         }
     }
 
-    .tools-table {
-        float: left;
-
-        tr:hover .tools-toggle {
-            .color-icon {
-                visibility: hidden;
-            }
-
-            .glyphicon {
-                display: block;
-            }
-        }
-
-        tr.excluded {
-            .sort-entry--tool {
-                opacity: 0.5;
-                text-decoration: line-through;
-            }
-
-            .color-icon {
-                opacity: 0.5;
-            }
-        }
-
-        .tools-toggle {
-            cursor: pointer;
-            margin-right: 4px;
-            position: relative;
-        }
-
-        td .glyphicon {
-            display: none;
-            left: 1px;
-            position: absolute;
-        }
-    }
-
-    .tools-chart-wrapper {
-        float: left;
-        margin-left: 100px;
-        margin-top: 20px;
-        max-width: 500px;
-    }
-
     .non-auto-edits-nav {
         margin-bottom: 10px;
     }
 
     .prev-edits {
         display: none;
-    }
-}
-
-@media (max-width: $bootstrap-sm) {
-    .autoedits .chart-wrapper {
-        margin: 0;
-        max-width: 100%;
     }
 }

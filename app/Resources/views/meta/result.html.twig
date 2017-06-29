@@ -1,0 +1,174 @@
+{% extends 'base.html.twig' %}
+{% import 'macros/layout.html.twig' as layout %}
+{% import 'macros/pieChart.html.twig' as chart %}
+
+{% block body %}
+<div class="panel panel-primary">
+    <header class="panel-heading">
+        <div class="text-center xt-heading-top">
+            <a class="back-to-search" href="{{ path('meta') }}">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+            {{ msg('back') }}
+            </a>
+            {{ msg('tool-meta') }}
+        </div>
+    </header>
+
+    <div class="panel-body xt-panel-body">
+        {% set content %}
+            <div class="col-lg-6 stat-list clearfix">
+                <table class="table"><tbody>
+                    <tr>
+                        <td>{{ msg('start') }}</td>
+                        <td>{{ start }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('end') }}</td>
+                        <td>{{ end }}</td>
+                    </tr>
+                </tbody></table>
+            </div>
+            <div style="clear:both"></div>
+            <table class="table table-bordered table-hover table-striped top-editors-table toggle-table">
+                <thead><tr>
+                    <th>
+                        <span class="sort-link sort-link--tool" data-column="tool">
+                            {{ msg('tool') | capitalize_first }}
+                            <span class="glyphicon glyphicon-sort"></span>
+                        </span>
+                    </th>
+                    <th>
+                        <span class="sort-link sort-link--count" data-column="count">
+                            {{ msg('count') | capitalize_first }}
+                            <span class="glyphicon glyphicon-sort"></span>
+                        </span>
+                    </th>
+                </tr></thead>
+                <tbody>
+                    {% set total = 0 %}
+                    {% for tool, count in totals %}
+                        <tr>
+                            <td class="sort-entry--tool" data-value="{{ tool }}">
+                                <span class="tools-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ tool }}">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                    <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
+                                </span>
+                                {{ msg('tool-'~tool) }}
+                            </td>
+                            <td class="sort-entry--count" data-value="{{ count }}">
+                                {{ count | number_format }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th class="tools--tools">
+                            {{ totals | length }}
+                            {{ msg('num-tools', [totals | length]) }}
+                        </th>
+                        <th class="tools--count">
+                            {{ grandSum | number_format }}
+                        </th>
+                    </tr>
+                </tfoot>
+            </table>
+            {% set totalChartData = [] %}
+            {% for tool, count in totals %}
+                {% set totalChartData = totalChartData | merge([{
+                    label: msg('tool-'~tool),
+                    value: count,
+                    percentage: (count / grandSum) * 100,
+                }]) %}
+            {% endfor %}
+            {{ chart.pie_chart('totals_chart', totalChartData, false, 'toggle-table--chart') }}
+        {% endset %}
+        {{ layout.content_block('summary', content) }}
+
+        {% set content %}
+            <div class="chart-container">
+                <canvas id="usage_chart"></canvas>
+            </div>
+        {% endset %}
+        {{ layout.content_block('timeline', content) }}
+
+        {% set toolNames = totals | keys %}
+
+        <script>
+            // Attempt to fine-tune the pointer detection spacing based on how cluttered the chart is
+            var numTicks = {{ dateLabels | length | raw }};
+            if (numTicks > 50) {
+                Chart.defaults.global.elements.point.hitRadius = 3;
+            } else if (numTicks > 30) {
+                Chart.defaults.global.elements.point.hitRadius = 5;
+            } else if (numTicks > 20) {
+                Chart.defaults.global.elements.point.hitRadius = 10;
+            } else {
+                Chart.defaults.global.elements.point.hitRadius = 30;
+            }
+
+            var datasets = [];
+            {% for tool in toolNames %}
+                var data = {{ timeline[tool] | json_encode | raw }};
+                datasets.push({
+                    backgroundColor: 'rgba(0,0,0,0)',
+                    borderColor: '{{ chartColor(loop.index0) }}',
+                    borderWidth: 2,
+                    color: '{{ chartColor(loop.index0) }}',
+                    data: data,
+                    label: "{{ msg('tool-'~tool) }}",
+                    lineTension: 0,
+                    pointBackgroundColor: '{{ chartColor(loop.index0) }}',
+                    pointHoverRadius: 5,
+                });
+            {% endfor %}
+
+            var ctx = document.getElementById('usage_chart');
+            window.lineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {{ dateLabels | json_encode | raw }},
+                    datasets: datasets,
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    },
+                    tooltips: {
+                        mode: 'x-axis',
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                var toolName = datasets[tooltipItem.datasetIndex].label;
+                                return toolName + ': ' + (new Number(tooltipItem.yLabel)).toLocaleString();
+                            }
+                        },
+                        bodyFontSize: 14,
+                        bodySpacing: 7,
+                        caretSize: 0,
+                        titleFontSize: 14
+                    }
+                }
+            });
+
+            // for the pie chart created with chart.pie_chart()
+            $(document).ready(function () {
+                window.setupToggleTable({{ totals | json_encode | raw }}, window.totals_chart, null, function (newData) {
+                    var total = Object.keys(newData).reduce(function (sum, key) {
+                        return sum + parseInt(newData[key], 10);
+                    }, 0);
+                    var toolsCount = Object.keys(newData).length;
+                    $('.tools--tools').text(
+                        toolsCount.toLocaleString() + " " +
+                        $.i18n('num-tools', toolsCount)
+                    );
+                    $('.tools--count').text(total.toLocaleString());
+                });
+            });
+        </script>
+    </div>
+</div>
+{% endblock %}

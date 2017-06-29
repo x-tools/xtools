@@ -1,8 +1,35 @@
 {% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
+{% import 'macros/wiki.html.twig' as wiki %}
 
 {% block body %}
 
-<p>{{ msg('timecard-chart-desc') }}</p>
+{% if not is_sub_request %}
+    <div class="panel panel-primary">
+        <header class="panel-heading">
+            <div class="text-center xt-heading-top">
+                <a class="back-to-search" href="{{ path('ec') }}">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                    {{ msg('back') }}
+                </a>
+                {{ wiki.userLink(user, project) }}
+                <small> &bull; {{ project.title }} </small>
+            </div>
+        </header>
+        <div class="panel-body xt-panel-body">
+            <section class="panel panel-default clearfix">
+                <header class="panel-heading col-lg-12">
+                    <h4>{{ msg('timecard') }}</h4>
+                </header>
+                <div class="panel-body col-lg-12">
+{% endif %}
+
+{% if not project.userHasOptedIn(user) %}
+<div class="alert alert-info">
+    <p>{{ msg('not-opted-in', [ wiki.pageLink(opted_in_page) ] ) }}</p>
+</div>
+{% else %}
+
+{# <p>{{ msg('timecard-chart-desc') }}</p> #}
 <canvas id="timecard-bubble-chart"></canvas>
 <script type="text/javascript">
     var days = {
@@ -14,8 +41,9 @@
         6: "{{ msg('saturday') }}",
         7: "{{ msg('sunday') }}"
     };
-    var localOffset = new Date().getTimezoneOffset() / 60;
-    console.log(localOffset);
+    // var localOffset = new Date().getTimezoneOffset() / 60;
+    // console.log(localOffset);
+    var timeCardData = {{ ec.timeCard|json_encode|raw }};
     new Chart($("#timecard-bubble-chart"), {
         type: 'bubble',
         data: {
@@ -24,12 +52,15 @@
                 backgroundColor: "#060",
                 data: [
                     {% for d in ec.timeCard %}
-                    { x: {{ d.x }} - localOffset, y: {{ d.y }}, r: {{ d.r }} }{% if not loop.last %},{% endif %}
+                    { x: {{ d.x }}, y: {{ d.y }}, r: {{ d.r }} }{% if not loop.last %},{% endif %}
                     {% endfor %}
                 ]
             }]
         },
         options: {
+            legend: {
+                display: false,
+            },
             scales: {
                 yAxes: [{
                     ticks: {
@@ -49,9 +80,22 @@
                         }
                     }
                 }]
+            },
+            tooltips: {
+                callbacks: {
+                    label: function(item) {
+                        return days[item.yLabel] + ' ' + item.xLabel + ':00';
+                    }
+                }
             }
         }
     });
 </script>
+
+{% endif %}
+
+{% if not is_sub_request %}
+    </div></section></div></div>
+{% endif %}
 
 {% endblock %}

@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file contains only the HelperBase class.
+ */
 
 namespace AppBundle\Helper;
 
@@ -6,10 +9,13 @@ use DateInterval;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
 
+/**
+ * All helper classes inherit from this.
+ */
 abstract class HelperBase
 {
 
-    /** @var Container */
+    /** @var Container The DI container. */
     protected $container;
 
     /**

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file contains the code that powers the AdminStats page of xTools.
+ * This file contains the code that powers the AdminStats page of XTools.
  *
  * @version 1.5.1
  */
@@ -11,15 +11,15 @@ namespace AppBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Xtools\ProjectRepository;
 
 /**
  * Class AdminStatsController
  *
  * @category AdminStats
  * @package  AppBundle\Controller
- * @author   Xtools Team <xtools@lists.wikimedia.org>
+ * @author   XTools Team <xtools@lists.wikimedia.org>
  * @license  GPL 3.0
- * @link     http://tools.wmflabs.org/xtools/adminstats
  */
 class AdminStatsController extends Controller
 {
@@ -39,14 +39,10 @@ class AdminStatsController extends Controller
      */
     public function indexAction(Request $request)
     {
-        // Load up the labs helper and check if the tool is enabled.
-        $lh = $this->get("app.labs_helper");
-        $lh->checkEnabled("adminstats");
-
         // Pull the values out of the query string.  These values default to
         // empty strings.
         $projectQuery = $request->query->get('project');
-        $startDate = $request->query->get('begin');
+        $startDate = $request->query->get('start');
         $endDate = $request->query->get("end");
 
         // Redirect if the values are set.
@@ -113,11 +109,12 @@ class AdminStatsController extends Controller
      */
     public function resultAction($project, $start = null, $end = null)
     {
-        if ($start == null) {
+        $start = trim($start);
+        if (empty($start)) {
             $start = date("Y-m-d", strtotime("-1 month"));
         }
-
-        if ($end == null) {
+        $end = trim($end);
+        if (empty($end)) {
             $end = date("Y-m-d");
         }
         // Start by validating the dates.  If the dates are invalid, we'll redirect
@@ -146,21 +143,24 @@ class AdminStatsController extends Controller
         $api = $this->get("app.api_helper");
         $conn = $this->get('doctrine')->getManager("replicas")->getConnection();
 
-        $lh->checkEnabled("adminstats");
-
         // Load the database information for the tool
-        $dbValues = $lh->databasePrepare($project, "AdminStats");
+        $projectData = ProjectRepository::getProject($project, $this->container);
 
-        $dbName = $dbValues["dbName"];
-        $wikiName = $dbValues["wikiName"];
-        $url = $dbValues["url"];
+        if (!$projectData->exists()) {
+            $this->addFlash("notice", ["invalid-project", $project]);
+            return $this->redirectToRoute("adminstats");
+        }
+
+        $dbName = $projectData->getDatabaseName();
+        $wikiName = $projectData->getDatabaseName();
+        $url = $projectData->getUrl();
 
         // Generate a diff for the dates - this is the number of days we're spanning.
         $days = date_diff(new \DateTime($end), new \DateTime($start))->days;
 
         // Get admin ID's, used to account for inactive admins
         $user_groups_table = $lh->getTable("user_groups", $dbName);
-        $ufg_table = $lh->getTable("user_former_groups");
+        $ufg_table = $lh->getTable("user_former_groups", $dbName);
         $query = "
             SELECT ug_user AS user_id
             FROM $user_groups_table
@@ -279,7 +279,7 @@ class AdminStatsController extends Controller
                 'xtTitle' => $project,
 
                 'project_url' => $url,
-                'project' => $project,
+                'project' => $projectData,
                 'wikiName' => $wikiName,
 
                 'start_date' => $start,

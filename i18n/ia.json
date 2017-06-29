@@ -1,5 +1,7 @@
 {
   "all": "Totes",
+  "all-languages": "Tote le linguas",
+  "api-error": "Error al consultar $1",
   "bot": "Robot",
   "help-translate": "Adjutar a traducer",
   "history": "Historia",

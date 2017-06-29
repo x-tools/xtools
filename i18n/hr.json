@@ -1,5 +1,7 @@
 {
   "all": "Sve",
+  "all-languages": "Svi jezici",
+  "api-error": "Greška prilikom upita $1",
   "bot": "Bot",
   "current-size": "Trenutačna veličina",
   "editors": "Urednika",

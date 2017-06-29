@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file contains only the Repository class.
+ */
 
 namespace Xtools;
 
@@ -6,6 +9,7 @@ use Doctrine\DBAL\Connection;
 use Mediawiki\Api\MediawikiApi;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Stopwatch\Stopwatch;
 
@@ -16,28 +20,37 @@ use Symfony\Component\Stopwatch\Stopwatch;
 abstract class Repository
 {
 
-    /** @var Container */
+    /** @var Container The application's DI container. */
     protected $container;
 
-    /** @var Connection */
+    /** @var Connection The database connection to the meta database. */
     private $metaConnection;
 
-    /** @var Connection */
+    /** @var Connection The database connection to the projects' databases. */
     private $projectsConnection;
 
-    /** @var Connection */
+    /** @var Connection The database connection to other tools' databases.  */
     private $toolsConnection;
 
-    /** @var CacheItemPoolInterface */
+    /** @var CacheItemPoolInterface The cache. */
     protected $cache;
 
-    /** @var LoggerInterface */
+    /** @var LoggerInterface The log. */
     protected $log;
 
-    /** @var Stopwatch */
+    /** @var Stopwatch The stopwatch for time profiling. */
     protected $stopwatch;
 
     /**
+     * Create a new Repository with nothing but a null-logger.
+     */
+    public function __construct()
+    {
+        $this->log = new NullLogger();
+    }
+
+    /**
+     * Set the DI container.
      * @param Container $container
      */
     public function setContainer(Container $container)
@@ -72,7 +85,7 @@ abstract class Repository
         if (!$this->projectsConnection instanceof Connection) {
             $this->projectsConnection = $this->container
                 ->get('doctrine')
-                ->getManager("replicas")
+                ->getManager('replicas')
                 ->getConnection();
         }
         return $this->projectsConnection;
@@ -96,13 +109,18 @@ abstract class Repository
 
     /**
      * Get the API object for the given project.
+     *
      * @param Project $project
      * @return MediawikiApi
      */
-    protected function getMediawikiApi(Project $project)
+    public function getMediawikiApi(Project $project)
     {
-        // @TODO use newFromApiEndpoint instead.
-        $api = MediawikiApi::newFromPage($project->getUrl());
+        $apiPath = $this->container->getParameter('api_path');
+        if ($apiPath) {
+            $api = MediawikiApi::newFromApiEndpoint($project->getUrl().$apiPath);
+        } else {
+            $api = MediawikiApi::newFromPage($project->getUrl());
+        }
         return $api;
     }
 

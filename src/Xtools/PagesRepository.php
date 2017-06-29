@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file contains only the PagesRepository class.
+ */
 
 namespace Xtools;
 
@@ -14,13 +17,12 @@ class PagesRepository extends Repository
      * Get metadata about a single page from the API.
      * @param Project $project The project to which the page belongs.
      * @param string $pageTitle Page title.
-     * @param boolean $followRedirects Whether or not to resolve redirects
      * @return string[] Array with some of the following keys: pageid, title, missing, displaytitle,
      * url.
      */
-    public function getPageInfo(Project $project, $pageTitle, $followRedirects = true)
+    public function getPageInfo(Project $project, $pageTitle)
     {
-        $info = $this->getPagesInfo($project, [$pageTitle], $followRedirects);
+        $info = $this->getPagesInfo($project, [$pageTitle]);
         return array_shift($info);
     }
 
@@ -28,11 +30,10 @@ class PagesRepository extends Repository
      * Get metadata about a set of pages from the API.
      * @param Project $project The project to which the pages belong.
      * @param string[] $pageTitles Array of page titles.
-     * @param boolean $followRedirects Whether or not to resolve redirects
      * @return string[] Array keyed by the page names, each element with some of the
      * following keys: pageid, title, missing, displaytitle, url.
      */
-    public function getPagesInfo(Project $project, $pageTitles, $followRedirects = true)
+    public function getPagesInfo(Project $project, $pageTitles)
     {
         // @TODO: Also include 'extlinks' prop when we start checking for dead external links.
         $params = [
@@ -45,9 +46,6 @@ class PagesRepository extends Repository
             'formatversion' => 2
             // 'pageids' => $pageIds // FIXME: allow page IDs
         ];
-        if ($followRedirects) {
-            $params['redirects'] = '';
-        }
 
         $query = new SimpleRequest('query', $params);
         $api = $this->getMediawikiApi($project);
@@ -63,26 +61,57 @@ class PagesRepository extends Repository
 
     /**
      * Get revisions of a single page.
-     * @param Project $project
-     * @param Page $page
-     * @param User|null $user
+     * @param Page $page The page.
+     * @param User|null $user Specify to get only revisions by the given user.
      * @return string[] Each member with keys: id, timestamp, length-
      */
-    public function getRevisions(Page $page, User $user)
+    public function getRevisions(Page $page, User $user = null)
     {
-        $revTable = $this->getTableName($page->getProject()->project->getDatabaseName(), 'revision');
+        $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
+        $userClause = $user ? "revs.rev_user_text in (:username) AND " : "";
+
         $query = "SELECT
                     revs.rev_id AS id,
                     revs.rev_timestamp AS timestamp,
+                    revs.rev_minor_edit AS minor,
+                    revs.rev_len AS length,
                     (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
+                    revs.rev_user AS user_id,
+                    revs.rev_user_text AS username,
                     revs.rev_comment AS comment
                 FROM $revTable AS revs
-                    LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-                WHERE revs.rev_user_text in (:username) AND revs.rev_page = :pageid
-                ORDER BY revs.rev_timestamp DESC
+                LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+                WHERE $userClause revs.rev_page = :pageid
+                ORDER BY revs.rev_timestamp ASC
             ";
-        $params = ['username' => $user->getUsername(), 'pageid' => $page->getId()];
-        $conn = $this->getDoctrine()->getManager('replicas')->getConnection();
+        $params = ['pageid' => $page->getId()];
+        if ($user) {
+            $params['username'] = $user->getUsername();
+        }
+        $conn = $this->getProjectsConnection();
         return $conn->executeQuery($query, $params)->fetchAll();
+    }
+
+    /**
+     * Get a count of the number of revisions of a single page
+     * @param Page $page The page.
+     * @param User|null $user Specify to only count revisions by the given user.
+     * @return int
+     */
+    public function getNumRevisions(Page $page, User $user = null)
+    {
+        $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
+        $userClause = $user ? "rev_user_text in (:username) AND " : "";
+
+        $query = "SELECT COUNT(*)
+                FROM $revTable
+                WHERE $userClause rev_page = :pageid
+            ";
+        $params = ['pageid' => $page->getId()];
+        if ($user) {
+            $params['username'] = $user->getUsername();
+        }
+        $conn = $this->getProjectsConnection();
+        return $conn->executeQuery($query, $params)->fetchColumn(0);
     }
 }

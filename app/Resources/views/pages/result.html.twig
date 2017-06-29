@@ -1,35 +1,34 @@
 {% extends 'base.html.twig' %}
 {% import 'macros/layout.html.twig' as layout %}
+{% import 'macros/wiki.html.twig' as wiki %}
 
 {% block body %}
 <div class="panel panel-primary">
     <header class="panel-heading">
-        <div class="text-center xt-heading-top" >
+        <div class="text-center xt-heading-top">
             <a class="back-to-search" href="{{ path('pages') }}">
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {{ msg('back') }}
             </a>
-            {{ user_link(username, project_url) }}
+            {{ wiki.userLink(user, project) }}
             <small>
                 &bull;
-                {{ project }}
+                {{ project.domain }}
             </small>
         </div>
     </header>
 
-    <div class="panel-body xt-panel-body" >
+    <div class="panel-body xt-panel-body">
         <p class="text-center xt-heading-subtitle">
-            {{ user_log_link(username, project_url, msg('block-log'), 'block') }}
+            {{ wiki.userLogLink(user, project, msg('block-log'), 'block') }}
             {% if isWMFLabs() %}
-            &middot;
-            <a href="{{ link("/ec/"~project~"/"~username) }}" >{{ msg('tool-ec') }}</a>
-            {% if not isSingleWiki() %}
-            &middot;
-            <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ username }}" >{{ msg('global-contribs') }}</a>
-            {% endif %}
-            &middot;
-            {# FIXME: make this link go to what options are set here (redirects, namespace, etc.) #}
-            <a target="_blank" href="//tools.wmflabs.org/userviews/?project={{ project }}&amp;user={{ username }}">{{ msg('pageviews-pages-created') }}</a>
+                &middot;
+                <a href="{{ path('ec', {'project':project.domain, 'username':user.username}) }}" >{{ msg('tool-ec') }}</a>
+                &middot;
+                <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ user.username }}" >{{ msg('global-contribs') }}</a>
+                &middot;
+                {# FIXME: make this link go to what options are set here (redirects, namespace, etc.) #}
+                <a target="_blank" href="//tools.wmflabs.org/userviews/?project={{ project.domain }}&amp;user={{ user.username }}">{{ msg('pageviews-pages-created') }}</a>
             {% endif %}
         </p>
 
@@ -72,7 +71,7 @@
                 </tbody></table>
             </div>
             <div style="clear:both"></div>
-            <table class="table table-bordered table-hover table-striped namespaces-table">
+            <table class="table table-bordered table-hover table-striped namespaces-table toggle-table">
                 <thead><tr>
                     {% for key in summaryColumns %}
                         <th>
@@ -86,9 +85,9 @@
                 <tbody>
                     {% for key, value in count %}
                     <tr>
-                        <td class="sort-entry--namespace" data-value="{{ namespaces[key] }}">
+                        <td class="sort-entry--namespace linked" data-value="{{ namespaces[key] }}">
                             {% if multiNamspace %}
-                            <span class="namespace-toggle" data-index="{{ loop.index }}" data-ns="{{ key }}">
+                            <span class="namespace-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ key }}">
                                 <span class="glyphicon glyphicon-remove"></span>
                             {% endif %}
                                 <span class="color-icon" style="background:{{ color(key) }}"></span>
@@ -141,7 +140,7 @@
                 {% endif %}
             </table>
             {% if namespace == 'all' %}
-            <div class="chart-wrapper">
+            <div class="chart-wrapper toggle-table--chart">
                 <canvas id="pie_chart" width="400" height="400"></canvas>
             </div>
             {% endif %}
@@ -181,7 +180,7 @@
                                         {% set pagename = namespaces[key]~":"~page.page_title %}
                                     {% endif %}
                                     <td class="sort-entry--page" data-value="{{ pagename }}">
-                                        {{ wiki_link(pagename, project_url) }}
+                                        {{ wiki.pageLinkRaw(pagename, project) }}
                                         {% if page.page_is_redirect %}
                                             <small class="text-warning">&middot; ({{ msg("redirect") }})</small>
                                         {% endif %}
@@ -190,7 +189,7 @@
                                         {% endif %}
                                     </td>
                                     <td class="sort-entry--date" data-value="{{ date }}">
-                                        {{ perma_link(page.rev_id, project_url, page.human_time) }}
+                                        {{ wiki.permaLinkRaw(page.rev_id, project, page.human_time) }}
                                     </td>
                                     <td class="sort-entry--original-size" data-value="{{ page.rev_len }}">
                                         {{ page.rev_len | number_format }}
@@ -207,20 +206,20 @@
                                         </td>
                                     {% endif %}
                                     <td>
-                                        {{ wiki_log_link(pagename, project_url) }}
+                                        {{ wiki.pageLogLinkRaw(pagename, project) }}
                                         &middot;
-                                        {{ wiki_history_link(pagename, project_url) }}
+                                        {{ wiki.pageHistLinkRaw(pagename, project) }}
                                         {% if enabled('articleinfo') %}
                                             &middot;
-                                            <a href="{{ path('articleinfo', { 'project': project, 'article': pagename }) }}">{{ msg('tool-articleinfo') }}</a>
+                                            <a href="{{ path('articleinfo', { 'project': project.domain, 'article': pagename }) }}">{{ msg('tool-articleinfo') }}</a>
                                         {% endif %}
                                         {% if enabled('topedits') %}
                                             &middot;
-                                            <a href="{{ path('topedits', { 'project': project, 'username': username, 'namespace': namespace, 'page': page.page_title }) }}">{{ msg('tool-topedits') }}</a>
+                                            <a href="{{ path('topedits', { 'project': project.domain, 'username': user.username, 'namespace': namespace, 'page': page.page_title }) }}">{{ msg('tool-topedits') }}</a>
                                         {% endif %}
                                         {% if isWMFLabs() %}
                                             &middot;
-                                            <a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project }}&pages={{ pagename }}">
+                                            <a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project.domain }}&amp;pages={{ pagename }}">
                                                 {{ msg('pageviews') }}
                                             </a>
                                         {% endif %}
@@ -232,7 +231,7 @@
                             <tr class="show-more-row">
                                 <td></td>
                                 <td colspan=6>
-                                    <a href="{{ path('pages', { 'project': project, 'username': username, 'namespace': key, 'redirects': redirect }) }}">
+                                    <a href="{{ path('pages', { 'project': project.domain, 'username': user.username, 'namespace': key, 'redirects': redirect }) }}">
                                         {{ msg('num-others', [count[key]['total'] - maxRows]) }}
                                     </a>
                                 </td>

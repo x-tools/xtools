@@ -1,5 +1,7 @@
 {
   "all": "全部",
+  "all-languages": "所有语言",
+  "api-error": "查询$1时出错",
   "bot": "机器人",
   "comma-character": "、",
   "current-size": "当前大小",

@@ -1,5 +1,6 @@
 {% extends 'base.html.twig' %}
 {% import 'macros/layout.html.twig' as layout %}
+{% import 'macros/wiki.html.twig' as wiki %}
 
 {% block body %}
 <div class="panel panel-primary">
@@ -9,9 +10,9 @@
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {{ msg('back') }}
             </a>
-            <a target="_blank" href="{{ user_link(username, projectUrl) }}">{{ username }}</a>
+            {{ wiki.userLink(user, project) }}
             &bull;
-            {{ project }}
+            {{ project.domain }}
         </div>
     </header>
     <div class="panel-body xt-panel-body">

@@ -1,9 +1,11 @@
 <?php
+/**
+ * This file contains only the EditCounter class.
+ */
 
 namespace Xtools;
 
 use \DateTime;
-use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * An EditCounter provides statistics about a user's edits on a project.
@@ -11,24 +13,35 @@ use Symfony\Component\VarDumper\VarDumper;
 class EditCounter extends Model
 {
     
-    /** @var Project */
+    /** @var Project The project. */
     protected $project;
     
-    /** @var User */
+    /** @var User The user. */
     protected $user;
 
-    /** @var int[] */
+    /** @var int[] The total revision counts. */
     protected $revisionCounts;
 
-    /** @var string[] */
+    /** @var string[] The start and end dates of revisions. */
     protected $revisionDates;
 
-    /** @var int[] */
+    /** @var int[] The total page counts. */
     protected $pageCounts;
     
-    /** @var int[] */
+    /** @var int[] The lot totals. */
     protected $logCounts;
 
+    /** @var int[] Keys are project DB names. */
+    protected $globalEditCounts;
+
+    /** @var array Block data, with keys 'set' and 'received'. */
+    protected $blocks;
+
+    /**
+     * EditCounter constructor.
+     * @param Project $project The base project to count edits
+     * @param User $user
+     */
     public function __construct(Project $project, User $user)
     {
         $this->project = $project;
@@ -87,6 +100,26 @@ class EditCounter extends Model
         return $this->logCounts;
     }
 
+    /**
+     * Get block data.
+     * @param string $type Either 'set' or 'received'.
+     * @return array
+     */
+    protected function getBlocks($type)
+    {
+        if (isset($this->blocks[$type]) && is_array($this->blocks[$type])) {
+            return $this->blocks[$type];
+        }
+        $method = "getBlocks".ucfirst($type);
+        $blocks = $this->getRepository()->$method($this->project, $this->user);
+        $this->blocks[$type] = $blocks;
+        return $this->blocks[$type];
+    }
+
+    /**
+     * Get the total number of currently-live revisions.
+     * @return int
+     */
     public function countLiveRevisions()
     {
         $revCounts = $this->getRevisionCounts();
@@ -94,7 +127,7 @@ class EditCounter extends Model
     }
 
     /**
-     * Get the total number of revisions that have been deleted.
+     * Get the total number of the user's revisions that have been deleted.
      * @return int
      */
     public function countDeletedRevisions()
@@ -199,14 +232,6 @@ class EditCounter extends Model
     }
 
     /**
-     * Get the total number of semi-automated edits.
-     * @return int
-     */
-    public function countAutomatedEdits()
-    {
-    }
-
-    /**
      * Get the total number of pages (both still live and those that have been deleted) created
      * by the user.
      * @return int
@@ -257,6 +282,116 @@ class EditCounter extends Model
     }
 
     /**
+     * Get the total number of times the user has blocked or re-blocked a user.
+     * @return int
+     */
+    public function countBlocksSet()
+    {
+        $logCounts = $this->getLogCounts();
+        $block = isset($logCounts['block-block']) ? (int)$logCounts['block-block'] : 0;
+        $reBlock = isset($logCounts['block-reblock']) ? (int)$logCounts['block-reblock'] : 0;
+        return $block + $reBlock;
+    }
+
+    /**
+     * Get the total number of blocks that have been lifted (i.e. unblocks) by this user.
+     * @return int
+     */
+    public function countBlocksLifted()
+    {
+        $logCounts = $this->getLogCounts();
+        return isset($logCounts['block-unblock']) ? (int)$logCounts['block-unblock'] : 0;
+    }
+
+    /**
+     * Get the total number of times the user has been blocked.
+     * @return int
+     */
+    public function countBlocksReceived()
+    {
+        $blocks = $this->getBlocks('received');
+        return count($blocks);
+    }
+
+    /**
+     * Get the total number of users blocked by this user.
+     * @return int
+     */
+    public function countUsersBlocked()
+    {
+        $blocks = $this->getBlocks('set');
+        $usersBlocked = [];
+        foreach ($blocks as $block) {
+            $usersBlocked[$block['ipb_user']] = true;
+        }
+        return count($usersBlocked);
+    }
+
+    /**
+     * Get the total number of users that this user has unblocked.
+     * @todo
+     * @return int
+     */
+    public function countUsersUnblocked()
+    {
+        return 0;
+    }
+
+    /**
+     * Get the total number of pages protected by the user.
+     * @return int
+     */
+    public function countPagesProtected()
+    {
+        $logCounts = $this->getLogCounts();
+        return isset($logCounts['protect-protect']) ? (int)$logCounts['protect-protect'] : 0;
+    }
+    
+    /**
+     * Get the total number of pages unprotected by the user.
+     * @return int
+     */
+    public function countPagesUnprotected()
+    {
+        $logCounts = $this->getLogCounts();
+        return isset($logCounts['protect-unprotect']) ? (int)$logCounts['protect-unprotect'] : 0;
+    }
+
+    /**
+     * Get the total number of edits deleted by the user.
+     * @return int
+     */
+    public function countEditsDeleted()
+    {
+        $logCounts = $this->getLogCounts();
+        return isset($logCounts['delete-revision']) ? (int)$logCounts['delete-revision'] : 0;
+    }
+
+    /**
+     * Get the total number of pages restored by the user.
+     * @return int
+     */
+    public function countPagesRestored()
+    {
+        $logCounts = $this->getLogCounts();
+        return isset($logCounts['delete-restore']) ? (int)$logCounts['delete-restore'] : 0;
+    }
+
+    /**
+     * Get the total number of pages imported by the user (through any import mechanism:
+     * interwiki, or XML upload).
+     * @return int
+     */
+    public function countPagesImported()
+    {
+        $logCounts = $this->getLogCounts();
+        $import = isset($logCounts['import-import']) ? (int)$logCounts['import-import'] : 0;
+        $interwiki = isset($logCounts['import-interwiki']) ? (int)$logCounts['import-interwiki'] : 0;
+        $upload = isset($logCounts['import-upload']) ? (int)$logCounts['import-upload'] : 0;
+        return $import + $interwiki + $upload;
+    }
+
+    /**
      * Get the average number of edits per page (including deleted revisions and pages).
      * @return float
      */
@@ -279,16 +414,28 @@ class EditCounter extends Model
         }
         return round($this->countAllRevisions() / $this->getDays(), 3);
     }
-    
+
     /**
      * Get the total number of edits made by the user with semi-automating tools.
-     * @TODO
      */
     public function countAutomatedRevisions()
     {
-        return 0;
+        $autoSummary = $this->automatedRevisionsSummary();
+        $count = 0;
+        foreach ($autoSummary as $summary) {
+            $count += $summary;
+        }
+        return $count;
     }
-    
+
+    /**
+     * Get a summary of the numbers of edits made by the user with semi-automating tools.
+     */
+    public function automatedRevisionsSummary()
+    {
+        return $this->getRepository()->countAutomatedRevisions($this->project, $this->user);
+    }
+
     /**
      * Get the count of (non-deleted) edits made in the given timeframe to now.
      * @param string $time One of 'day', 'week', 'month', or 'year'.
@@ -302,21 +449,22 @@ class EditCounter extends Model
 
     /**
      * Get the date and time of the user's first edit.
+     * @return DateTime|bool The time of the first revision, or false.
      */
     public function datetimeFirstRevision()
     {
-        $first = $this->getRevisionDates()['first'];
-        return new DateTime($first);
+        $revDates = $this->getRevisionDates();
+        return isset($revDates['first']) ? new DateTime($revDates['first']) : false;
     }
 
     /**
      * Get the date and time of the user's first edit.
-     * @return DateTime
+     * @return DateTime|bool The time of the last revision, or false.
      */
     public function datetimeLastRevision()
     {
-        $last = $this->getRevisionDates()['last'];
-        return new DateTime($last);
+        $revDates = $this->getRevisionDates();
+        return isset($revDates['last']) ? new DateTime($revDates['last']) : false;
     }
 
     /**
@@ -326,16 +474,30 @@ class EditCounter extends Model
      */
     public function getDays()
     {
-        $days = $this->datetimeLastRevision()->diff($this->datetimeFirstRevision())->days;
+        $first = $this->datetimeFirstRevision();
+        $last = $this->datetimeLastRevision();
+        if ($first === false || $last === false) {
+            return 0;
+        }
+        $days = $last->diff($first)->days;
         return $days > 0 ? $days : 1;
     }
 
+    /**
+     * Get the total number of files uploaded (including those now deleted).
+     * @return int
+     */
     public function countFilesUploaded()
     {
         $logCounts = $this->getLogCounts();
         return $logCounts['upload-upload'] ?: 0;
     }
 
+    /**
+     * Get the total number of files uploaded to Commons (including those now deleted).
+     * This is only applicable for WMF labs installations.
+     * @return int
+     */
     public function countFilesUploadedCommons()
     {
         $logCounts = $this->getLogCounts();
@@ -367,6 +529,7 @@ class EditCounter extends Model
     }
 
     /**
+     * Get the total number of patrols performed by the user.
      * @return int
      */
     public function patrols()
@@ -376,26 +539,8 @@ class EditCounter extends Model
     }
 
     /**
-     * Get the total edit counts for the top n projects of this user.
-     * @param User $user
-     * @param Project $project
-     * @param int $numProjects
-     * @return mixed[] Each element has 'total' and 'project' keys.
-     */
-    public function topProjectsEditCounts(User $user, Project $project, $numProjects = 10)
-    {
-        // Get counts.
-        $editCounts = $this->getRepository()->getRevisionCountsAllProjects($user, $project);
-        // Sort.
-        uasort($editCounts, function ($a, $b) {
-            return $b['total'] - $a['total'];
-        });
-        // Truncate, and return.
-        return array_slice($editCounts, 0, $numProjects);
-    }
-
-    /**
      * Get the given user's total edit counts per namespace.
+     * @return integer[] Array keys are namespace IDs, values are the edit counts.
      */
     public function namespaceTotals()
     {
@@ -406,6 +551,7 @@ class EditCounter extends Model
 
     /**
      * Get a summary of the times of day and the days of the week that the user has edited.
+     * @return string[]
      */
     public function timeCard()
     {
@@ -413,7 +559,8 @@ class EditCounter extends Model
     }
 
     /**
-     *
+     * Get the total numbers of edits per year.
+     * @return int[]
      */
     public function yearCounts()
     {
@@ -436,7 +583,8 @@ class EditCounter extends Model
     }
 
     /**
-     *
+     * Get the total numbers of edits per month.
+     * @return mixed[] With keys 'years', 'namespaces' and 'totals'.
      */
     public function monthCounts()
     {
@@ -470,5 +618,92 @@ class EditCounter extends Model
             }
         }
         return $out;
+    }
+
+    /**
+     * Get the total edit counts for the top n projects of this user.
+     * @param int $numProjects
+     * @return mixed[] Each element has 'total' and 'project' keys.
+     */
+    public function globalEditCountsTopN($numProjects = 10)
+    {
+        // Get counts.
+        $editCounts = $this->globalEditCounts();
+        // Sort.
+        uasort($editCounts, function ($a, $b) {
+            return $b['total'] - $a['total'];
+        });
+        // Truncate, and return.
+        return array_slice($editCounts, 0, $numProjects);
+    }
+
+    /**
+     * Get the grand total of all edits on all projects.
+     * @return int
+     */
+    public function globalEditCount()
+    {
+        $total = 0;
+        foreach ($this->globalEditCounts() as $editCount) {
+            $total += $editCount['total'];
+        }
+        return $total;
+    }
+
+    /**
+     * Get the total revision counts for all projects for this user.
+     * @return mixed[] Each element has 'total' and 'project' keys.
+     */
+    public function globalEditCounts()
+    {
+        if (!$this->globalEditCounts) {
+            $this->globalEditCounts = $this->getRepository()
+                ->globalEditCounts($this->user, $this->project);
+        }
+        return $this->globalEditCounts;
+    }
+
+    /**
+     * Get the most recent n revisions across all projects.
+     * @param int $max The maximum number of revisions to return.
+     * @return Edit[]
+     */
+    public function globalEdits($max)
+    {
+        // Store the top n Edits.
+        $globalRevisions = [];
+        // Only look for revisions newer than this.
+        $oldest = null;
+        foreach ($this->globalEditCounts() as $editCount) {
+            // Don't query revisions if there aren't any.
+            if ($editCount['total'] == 0) {
+                continue;
+            }
+
+            /** @var Project $otherProject */
+            $otherProject = $editCount['project'];
+            $revisions = $this->getRepository()
+                ->getRevisions($otherProject, $this->user, $oldest, $max);
+            foreach ($revisions as &$revision) {
+                $nsName = $otherProject->getNamespaces()[$revision['page_namespace']];
+                $page = $otherProject->getRepository()
+                    ->getPage($otherProject, $nsName . ':' . $revision['page_title']);
+                $edit = new Edit($page, $revision);
+
+                // If we've already got enough, only check for those newer than the current oldest.
+                $haveEnough = (count($globalRevisions) >= $max);
+                $thisIsOlder = ($oldest === null
+                    || ($oldest !== null && $edit->getTimestamp() < $oldest));
+                if ($haveEnough && $thisIsOlder) {
+                    // Use this as the new oldest time.
+                    $oldest = $edit->getTimestamp(); //$revision['unix_timestamp'];
+                }
+                $globalRevisions[$edit->getTimestamp()->getTimestamp().'-'.$edit->getId()] = $edit;
+            }
+            // Sort and prune, before adding more.
+            krsort($globalRevisions);
+            $globalRevisions = array_slice($globalRevisions, 0, $max);
+        }
+        return $globalRevisions;
     }
 }

@@ -1,9 +1,18 @@
 <?php
+/**
+ * This file contains only the ProjectTest class.
+ */
 
-namespace Xtools;
+namespace Tests\Xtools;
 
 use PHPUnit_Framework_TestCase;
+use Xtools\Project;
+use Xtools\ProjectRepository;
+use Xtools\User;
 
+/**
+ * Tests for the Project class.
+ */
 class ProjectTest extends PHPUnit_Framework_TestCase
 {
 
@@ -22,9 +31,20 @@ class ProjectTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('test.example.org', $project->getDomain());
         $this->assertEquals('test_wiki', $project->getDatabaseName());
         $this->assertEquals('https://test.example.org/', $project->getUrl());
-        $this->assertEquals('/w/index.php', $project->getScriptPath());
-        $this->assertEquals('/wiki/', $project->getArticlePath());
+        $this->assertEquals('/w', $project->getScriptPath());
+        $this->assertEquals('/wiki/$1', $project->getArticlePath());
         $this->assertTrue($project->exists());
+    }
+
+    /**
+     * Make sure there's an error when trying to get project metadata without a Repository.
+     * @expectedException \Exception
+     * @expectedExceptionMessage Repository for Xtools\Project must be set before using.
+     */
+    public function testNoRepository()
+    {
+        $project2 = new Project('test.example.wiki');
+        $project2->getTitle();
     }
 
     /**
@@ -43,7 +63,7 @@ class ProjectTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Xtools can be run in single-wiki mode, where there is only one project.
+     * XTools can be run in single-wiki mode, where there is only one project.
      */
     public function testSingleWiki()
     {
@@ -71,5 +91,44 @@ class ProjectTest extends PHPUnit_Framework_TestCase
         $project = new Project('testWiki');
         $project->setRepository($projectRepo);
         $this->assertFalse($project->exists());
+    }
+
+    /**
+     * A user or a whole project can opt in to displaying restricted statistics.
+     * @dataProvider optedInProvider
+     * @param string[] $optedInProjects List of projects.
+     * @param string $dbname The database name.
+     * @param bool $hasOptedIn The result to check against.
+     */
+    public function testOptedIn($optedInProjects, $dbname, $hasOptedIn)
+    {
+        $projectRepo = $this->getMock(ProjectRepository::class);
+        $projectRepo->expects($this->once())
+            ->method('optedIn')
+            ->willReturn($optedInProjects);
+        $projectRepo->expects($this->once())
+            ->method('getOne')
+            ->willReturn(['dbname' => $dbname]);
+
+        $project = new Project($dbname);
+        $project->setRepository($projectRepo);
+
+        // Check that the user has opted in or not.
+        $user = new User('TestUser');
+        $this->assertEquals($hasOptedIn, $project->userHasOptedIn($user));
+    }
+
+    /**
+     * Data for self::testOptedIn().
+     * @return array
+     */
+    public function optedInProvider()
+    {
+        $optedInProjects = ['project1'];
+        return [
+            [$optedInProjects, 'project1', true],
+            [$optedInProjects, 'project2', false],
+            [$optedInProjects, 'project3', false],
+        ];
     }
 }

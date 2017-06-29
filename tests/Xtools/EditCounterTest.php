@@ -1,7 +1,18 @@
 <?php
+/**
+ * This file contains only the EditCounterTest class.
+ */
 
-namespace Xtools;
+namespace Tests\Xtools;
 
+use Xtools\EditCounter;
+use Xtools\EditCounterRepository;
+use Xtools\Project;
+use Xtools\User;
+
+/**
+ * Tests for the EditCounter.
+ */
 class EditCounterTest extends \PHPUnit_Framework_TestCase
 {
 
@@ -80,6 +91,9 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $editCounter->getDays());
     }
 
+    /**
+     * Test that page counts are reported correctly.
+     */
     public function testPageCounts()
     {
         $editCounterRepo = $this->getMock(EditCounterRepository::class);
@@ -105,6 +119,9 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(8, $editCounter->countPagesCreated());
     }
 
+    /**
+     * Test that namespace totals are reported correctly.
+     */
     public function testNamespaceTotals()
     {
         $namespaceTotals = [
@@ -124,5 +141,41 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
         $editCounter->setRepository($editCounterRepo);
 
         $this->assertEquals($namespaceTotals, $editCounter->namespaceTotals());
+    }
+
+    /**
+     * Get all global edit counts, or just the top N, or the overall grand total.
+     */
+    public function testGlobalEditCounts()
+    {
+        $wiki1 = new Project('wiki1');
+        $wiki2 = new Project('wiki2');
+        $editCounts = [
+            ['project' => new Project('wiki0'), 'total' => 30],
+            ['project' => $wiki1, 'total' => 50],
+            ['project' => $wiki2, 'total' => 40],
+            ['project' => new Project('wiki3'), 'total' => 20],
+            ['project' => new Project('wiki4'), 'total' => 10],
+            ['project' => new Project('wiki5'), 'total' => 35],
+        ];
+        $editCounterRepo = $this->getMock(EditCounterRepository::class);
+        $editCounterRepo->expects($this->once())
+            ->method('globalEditCounts')
+            ->willReturn($editCounts);
+        $user = new User('Testuser1');
+        $editCounter = new EditCounter($wiki1, $user);
+        $editCounter->setRepository($editCounterRepo);
+
+        // Get the top 2.
+        $this->assertEquals(
+            [
+                ['project' => $wiki1, 'total' => 50],
+                ['project' => $wiki2, 'total' => 40],
+            ],
+            $editCounter->globalEditCountsTopN(2)
+        );
+
+        // Grand total.
+        $this->assertEquals(185, $editCounter->globalEditCount());
     }
 }

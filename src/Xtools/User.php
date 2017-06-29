@@ -1,17 +1,20 @@
 <?php
+/**
+ * This file contains only the User class.
+ */
 
 namespace Xtools;
 
 /**
- * A User is a wiki user who has the same username across all projects in an Xtools installation.
+ * A User is a wiki user who has the same username across all projects in an XTools installation.
  */
 class User extends Model
 {
 
-    /** @var int */
+    /** @var int The user's ID. */
     protected $id;
 
-    /** @var string */
+    /** @var string The user's username. */
     protected $username;
 
     /**
@@ -20,7 +23,7 @@ class User extends Model
      */
     public function __construct($username)
     {
-        $this->username = ucfirst($username);
+        $this->username = ucfirst(trim($username));
     }
 
     /**
@@ -44,6 +47,7 @@ class User extends Model
 
     /**
      * Get a list of this user's groups on the given project.
+     * @param Project $project The project.
      * @return string[]
      */
     public function getGroups(Project $project)
@@ -64,17 +68,6 @@ class User extends Model
     }
 
     /**
-     * Get the full URL to Special:UserRights for this user on the given project.
-     * @param Project $project
-     * @return string
-     */
-    public function userRightsUrl(Project $project)
-    {
-        return $project->getUrl() . $project->getScriptPath() . "?title=Special:UserRights&user=" .
-               $this->getUsername();
-    }
-
-    /**
      * Does this user exist on the given project.
      * @param Project $project
      * @return bool
@@ -87,10 +80,20 @@ class User extends Model
 
     /**
      * Is this user an Administrator on the given project?
+     * @param Project $project The project.
      * @return bool
      */
     public function isAdmin(Project $project)
     {
         return (false !== array_search('sysop', $this->getGroups($project)));
+    }
+
+    /**
+     * Is this user an anonymous user (IP)?
+     * @return bool
+     */
+    public function isAnon()
+    {
+        return filter_var($this->username, FILTER_VALIDATE_IP);
     }
 }

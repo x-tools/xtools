@@ -18,6 +18,11 @@ parameters:
     api_path:                   /w/api.php
     lang:                       en
     default_project:            en.wikipedia.org
+    opted_in:                   ~
+
+    # Oauth consumer credentials, from https://meta.wikimedia.org/wiki/Special:OAuthConsumerRegistration
+    oauth_key:                  ~
+    oauth_secret:               ~
 
     mailer_transport:  smtp
     mailer_host:       127.0.0.1
@@ -36,6 +41,7 @@ parameters:
     app.load_stylesheets_from_cdn: 0
 
     app.single_wiki: 1
+    app.is_labs: 0
 
     app.replag_threshold: 30
 

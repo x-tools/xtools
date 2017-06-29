@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file contains only the TopEditsController class.
+ */
 
 namespace AppBundle\Controller;
 
@@ -6,33 +9,50 @@ use AppBundle\Helper\ApiHelper;
 use AppBundle\Helper\LabsHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\VarDumper\VarDumper;
+use Symfony\Component\HttpFoundation\Response;
 use Xtools\Page;
 use Xtools\PagesRepository;
 use Xtools\Project;
 use Xtools\ProjectRepository;
 use Xtools\User;
+use Xtools\UserRepository;
+use Xtools\Edit;
 
+/**
+ * The Top Edits tool.
+ */
 class TopEditsController extends Controller
 {
 
-    /** @var LabsHelper */
+    /** @var LabsHelper The Labs helper, for WMF Labs installations. */
     private $lh;
 
     /**
+     * Get the tool's shortname.
+     * @return string
+     */
+    public function getToolShortname()
+    {
+        return 'topedits';
+    }
+
+    /**
+     * Display the form.
      * @Route("/topedits", name="topedits")
      * @Route("/topedits", name="topEdits")
      * @Route("/topedits/", name="topEditsSlash")
      * @Route("/topedits/index.php", name="topEditsIndex")
+     * @param Request $request
+     * @return Response
      */
     public function indexAction(Request $request)
     {
         $this->lh = $this->get("app.labs_helper");
-        $this->lh->checkEnabled("topedits");
 
         $projectName = $request->query->get('project');
-        $username = $request->query->get('username');
+        $username = $request->query->get('username', $request->query->get('user'));
         $namespace = $request->query->get('namespace');
         $article = $request->query->get('article');
 
@@ -62,7 +82,6 @@ class TopEditsController extends Controller
         if (!$projectName) {
             $projectName = $this->container->getParameter('default_project');
         }
-
         $project = ProjectRepository::getProject($projectName, $this->container);
 
         return $this->render('topedits/index.html.twig', [
@@ -74,22 +93,33 @@ class TopEditsController extends Controller
     }
 
     /**
+     * Display the results.
      * @Route("/topedits/{project}/{username}/{namespace}/{article}", name="TopEditsResults",
      *     requirements={"article"=".+"})
+     * @param string $project
+     * @param string $username
+     * @param int $namespace
+     * @param string $article
+     * @return RedirectResponse|Response
      */
     public function resultAction($project, $username, $namespace = 0, $article = "")
     {
         /** @var LabsHelper $lh */
         $this->lh = $this->get('app.labs_helper');
-        $this->lh->checkEnabled('topedits');
 
-        $project = ProjectRepository::getProject($project, $this->container);
-        $user = new User($username);
+        $projectData = ProjectRepository::getProject($project, $this->container);
+
+        if (!$projectData->exists()) {
+            $this->addFlash("notice", ["invalid-project", $project]);
+            return $this->redirectToRoute("topedits");
+        }
+
+        $user = UserRepository::getUser($username, $this->container);
 
         if ($article === "") {
-            return $this->namespaceTopEdits($user, $project, $namespace);
+            return $this->namespaceTopEdits($user, $projectData, $namespace);
         } else {
-            return $this->singlePageTopEdits($user, $project, $namespace, $article);
+            return $this->singlePageTopEdits($user, $projectData, $namespace, $article);
         }
     }
 
@@ -102,6 +132,24 @@ class TopEditsController extends Controller
      */
     protected function namespaceTopEdits(User $user, Project $project, $namespaceId)
     {
+        // Make sure they've opted in to see this data.
+        if (!$project->userHasOptedIn($user)) {
+            $optedInPage = $project
+                ->getRepository()
+                ->getPage($project, $project->userOptInPage($user));
+
+            return $this->render('topedits/result_namespace.html.twig', [
+                'xtPage' => 'topedits',
+                'xtTitle' => $user->getUsername(),
+                'project' => $project,
+                'user' => $user,
+                'namespace' => $namespaceId,
+                'edits' => [],
+                'content_title' => '',
+                'opted_in_page' => $optedInPage,
+            ]);
+        }
+
         // Get list of namespaces.
         $namespaces = $project->getNamespaces();
 
@@ -141,6 +189,10 @@ class TopEditsController extends Controller
         $apiHelper = $this->get('app.api_helper');
         $displayTitles = $apiHelper->displayTitles($project->getDomain(), $titles);
 
+        // Create page repo to be used in page objects
+        $pageRepo = new PagesRepository();
+        $pageRepo->setContainer($this->container);
+
         // Put all together, and return the view.
         $edits = [];
         foreach ($editData as $editDatum) {
@@ -156,6 +208,7 @@ class TopEditsController extends Controller
         }
         return $this->render('topedits/result_namespace.html.twig', [
             'xtPage' => 'topedits',
+            'xtTitle' => $user->getUsername(),
             'project' => $project,
             'user' => $user,
             'namespace' => $namespaceId,
@@ -170,7 +223,7 @@ class TopEditsController extends Controller
      * @param Project $project The project.
      * @param int $namespaceId The ID of the namespace of the page.
      * @param string $pageName The title (without namespace) of the page.
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     protected function singlePageTopEdits(User $user, Project $project, $namespaceId, $pageName)
     {
@@ -179,6 +232,7 @@ class TopEditsController extends Controller
         $fullPageName = $namespaceId ? $namespaces[$namespaceId].':'.$pageName : $pageName;
         $page = new Page($project, $fullPageName);
         $pageRepo = new PagesRepository();
+        $pageRepo->setContainer($this->container);
         $page->setRepository($pageRepo);
 
         if (!$page->exists()) {
@@ -188,20 +242,7 @@ class TopEditsController extends Controller
         }
 
         // Get all revisions of this page by this user.
-        $revTable = $this->lh->getTable('revision', $project->getDatabaseName());
-        $query = "SELECT
-                    revs.rev_id AS id,
-                    revs.rev_timestamp AS timestamp,
-                    (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
-                    revs.rev_comment AS comment
-                FROM $revTable AS revs
-                    LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-                WHERE revs.rev_user_text IN (:username) AND revs.rev_page = :pageid
-                ORDER BY revs.rev_timestamp DESC
-            ";
-        $params = ['username' => $user->getUsername(), 'pageid' => $page->getId()];
-        $conn = $this->getDoctrine()->getManager('replicas')->getConnection();
-        $revisionsData = $conn->executeQuery($query, $params)->fetchAll();
+        $revisionsData = $page->getRevisions($user);
 
         // Loop through all revisions and format dates, find totals, etc.
         $totalAdded = 0;
@@ -213,16 +254,13 @@ class TopEditsController extends Controller
             } else {
                 $totalRemoved += $revision['length_change'];
             }
-            $time = strtotime($revision['timestamp']);
-            $revision['timestamp'] = $time; // formatted via Twig helper
-            $revision['year'] = date('Y', $time);
-            $revision['month'] = date('m', $time);
-            $revisions[] = $revision;
+            $revisions[] = new Edit($page, $revision);
         }
 
         // Send all to the template.
         return $this->render('topedits/result_article.html.twig', [
             'xtPage' => 'topedits',
+            'xtTitle' => $user->getUsername() . ' - ' . $page->getTitle(),
             'project' => $project,
             'user' => $user,
             'page' => $page,

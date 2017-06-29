@@ -1,16 +1,17 @@
 <?php
+/**
+ * This file contains only the AutomatedEditsHelper class.
+ */
 
 namespace AppBundle\Helper;
 
 use DateTime;
-use Doctrine\DBAL\Connection;
-use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Component\Config\Definition\Exception\Exception;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\VarDumper\VarDumper;
 use Xtools\ProjectRepository;
 
+/**
+ * Helper class for getting information about semi-automated edits.
+ */
 class AutomatedEditsHelper extends HelperBase
 {
 
@@ -30,6 +31,10 @@ class AutomatedEditsHelper extends HelperBase
     /** @var string[] The list of tool names and their regexes. */
     protected $tools;
 
+    /**
+     * AutomatedEditsHelper constructor.
+     * @param ContainerInterface $container
+     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -42,7 +47,8 @@ class AutomatedEditsHelper extends HelperBase
      */
     public function isAutomated($summary)
     {
-        foreach ($this->getTools() as $tool => $regex) {
+        foreach ($this->getTools() as $tool => $values) {
+            $regex = $values['regex'];
             if (preg_match("/$regex/", $summary)) {
                 return true;
             }
@@ -59,7 +65,7 @@ class AutomatedEditsHelper extends HelperBase
     public function isRevert($summary)
     {
         foreach ($this->revertTools as $tool) {
-            $regex = $this->getTools()[$tool];
+            $regex = $this->getTools()[$tool]['regex'];
 
             if (preg_match("/$regex/", $summary)) {
                 return true;
@@ -76,7 +82,8 @@ class AutomatedEditsHelper extends HelperBase
      */
     public function getTool($summary)
     {
-        foreach ($this->getTools() as $tool => $regex) {
+        foreach ($this->getTools() as $tool => $values) {
+            $regex = $values['regex'];
             if (preg_match("/$regex/", $summary)) {
                 return $tool;
             }
@@ -94,13 +101,13 @@ class AutomatedEditsHelper extends HelperBase
         if (is_array($this->tools)) {
             return $this->tools;
         }
-        $this->tools = $this->container->getParameter("automated_tools");
+        $this->tools = $this->container->getParameter('automated_tools');
         return $this->tools;
     }
 
     /**
      * Get a list of nonautomated edits by a user
-     * @param  string         $project   Project domain such as en.wikipedia.org
+     * @param  Project        $project   Project object
      * @param  string         $username
      * @param  string|integer $namespace Numerical value or 'all' for all namespaces
      * @param  integer        $offset    Used for pagination, offset results by N edits
@@ -112,7 +119,6 @@ class AutomatedEditsHelper extends HelperBase
      */
     public function getNonautomatedEdits($project, $username, $namespace, $offset = 0)
     {
-        $project = ProjectRepository::getProject($project, $this->container);
         $namespaces = $project->getNamespaces();
 
         $conn = $this->container->get('doctrine')->getManager('replicas')->getConnection();
@@ -121,7 +127,10 @@ class AutomatedEditsHelper extends HelperBase
         $revTable = $lh->getTable('revision', $project->getDatabaseName());
         $pageTable = $lh->getTable('page', $project->getDatabaseName());
 
-        $AEBTypes = $this->container->getParameter('automated_tools');
+        $AEBTypes = array_map(function ($AEBType) {
+            return $AEBType['regex'];
+        }, $this->container->getParameter('automated_tools'));
+
         $allAETools = $conn->quote(implode('|', $AEBTypes), \PDO::PARAM_STR);
 
         $namespaceClause = $namespace === 'all' ? '' : "AND rev_namespace = $namespace";

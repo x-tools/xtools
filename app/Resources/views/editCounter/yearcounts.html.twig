@@ -1,6 +1,27 @@
 {% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
+{% import 'macros/wiki.html.twig' as wiki %}
 
 {% block body %}
+
+{% if not is_sub_request %}
+    <div class="panel panel-primary">
+        <header class="panel-heading">
+            <div class="text-center xt-heading-top">
+                <a class="back-to-search" href="{{ path('ec') }}">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                    {{ msg('back') }}
+                </a>
+                {{ wiki.userLink(user, project) }}
+                <small> &bull; {{ project.title }} </small>
+            </div>
+        </header>
+        <div class="panel-body xt-panel-body">
+            <section class="panel panel-default clearfix">
+                <header class="panel-heading col-lg-12">
+                    <h4>{{ msg('year-counts') }}</h4>
+                </header>
+                <div class="panel-body col-lg-12">
+{% endif %}
 
 <canvas id="yearcounts-canvas"></canvas>
 <script type="text/javascript">
@@ -42,5 +63,9 @@
         }
     });
 </script>
+
+{% if not is_sub_request %}
+    </div></section></div></div>
+{% endif %}
 
 {% endblock %}

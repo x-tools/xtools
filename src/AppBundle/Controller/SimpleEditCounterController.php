@@ -1,127 +1,154 @@
 <?php
+/**
+ * This file contains only the SimpleEditCounterController class.
+ */
 
 namespace AppBundle\Controller;
 
+use Doctrine\DBAL\Connection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Response;
+use Xtools\Project;
+use Xtools\ProjectRepository;
+use Xtools\User;
 
+/**
+ * This controller handles the Simple Edit Counter tool.
+ */
 class SimpleEditCounterController extends Controller
 {
+
     /**
+     * Get the tool's shortname.
+     * @return string
+     */
+    public function getToolShortname()
+    {
+        return 'sc';
+    }
+
+    /**
+     * The Simple Edit Counter search form.
      * @Route("/sc", name="sc")
      * @Route("/sc", name="SimpleEditCounter")
      * @Route("/sc/", name="SimpleEditCounterSlash")
      * @Route("/sc/index.php", name="SimpleEditCounterIndexPhp")
      * @Route("/sc/{project}", name="SimpleEditCounterProject")
+     * @param Request $request The HTTP request.
+     * @param string $project The project database name or domain.
+     * @return Response
      */
-    public function indexAction($project = null)
+    public function indexAction(Request $request, $project = null)
     {
+        // Get the query parameters.
+        $projectName = $project ?: $request->query->get('project');
+        $username = $request->query->get('username', $request->query->get('user'));
 
-        $lh = $this->get("app.labs_helper");
-
-        $lh->checkEnabled("sc");
-
-        // Grab the request object, grab the values out of it.
-        $request = Request::createFromGlobals();
-
-        $projectQuery = $request->query->get('project');
-        $username = $request->query->get('username');
-
-        if ($projectQuery != "" && $username != "") {
-            $routeParams = [ 'project'=>$projectQuery, 'username' => $username ];
-            return $this->redirectToRoute("SimpleEditCounterResult", $routeParams);
-        } elseif ($projectQuery != "") {
-            return $this->redirectToRoute("SimpleEditCounterProject", [ 'project'=>$projectQuery ]);
+        // If we've got a project and user, redirect to results.
+        if ($projectName != '' && $username != '') {
+            $routeParams = [ 'project' => $projectName, 'username' => $username ];
+            return $this->redirectToRoute('SimpleEditCounterResult', $routeParams);
         }
 
-        // Otherwise fall through.
+        // Instantiate the project if we can, or use the default.
+        $theProject = (!empty($projectName))
+            ? ProjectRepository::getProject($projectName, $this->container)
+            : ProjectRepository::getDefaultProject($this->container);
+
+        // Show the form.
         return $this->render('simpleEditCounter/index.html.twig', [
             'xtPageTitle' => 'tool-sc',
             'xtSubtitle' => 'tool-sc-desc',
             'xtPage' => 'sc',
-            'project' => $project,
+            'project' => $theProject,
         ]);
     }
 
     /**
+     * Display the
      * @Route("/sc/{project}/{username}", name="SimpleEditCounterResult")
+     * @param string $project The project domain name.
+     * @param string $username The username.
+     * @return Response
      */
     public function resultAction($project, $username)
     {
-        $lh = $this->get("app.labs_helper");
+        $lh = $this->get('app.labs_helper');
 
-        $lh->checkEnabled("sc");
+        /** @var Project $project */
+        $project = ProjectRepository::getProject($project, $this->container);
 
-        $username = ucfirst($username);
+        if (!$project->exists()) {
+            $this->addFlash('notice', ['invalid-project', $project]);
+            return $this->redirectToRoute('SimpleEditCounter');
+        }
 
-        $dbValues = $lh->databasePrepare($project, "SimpleEditCounter");
+        $dbName = $project->getDatabaseName();
+        $url = $project->getUrl();
 
-        $dbName = $dbValues["dbName"];
-        $wikiName = $dbValues["wikiName"];
-        $url = $dbValues["url"];
+        $userTable = $lh->getTable('user', $dbName);
+        $archiveTable = $lh->getTable('archive', $dbName);
+        $revisionTable = $lh->getTable('revision', $dbName);
+        $userGroupsTable = $lh->getTable('user_groups', $dbName);
 
-        $userTable = $lh->getTable("user", $dbName);
-        $archiveTable = $lh->getTable("archive", $dbName);
-        $revisionTable = $lh->getTable("revision", $dbName);
-        $userGroupsTable = $lh->getTable("user_groups", $dbName);
-
-        // Grab the connection to the replica database (which is separate from the above)
-        $conn = $this->get('doctrine')->getManager("replicas")->getConnection();
+        /** @var Connection $conn */
+        $conn = $this->get('doctrine')->getManager('replicas')->getConnection();
 
         // Prepare the query and execute
         $resultQuery = $conn->prepare("
-			SELECT 'id' as source, user_id as value FROM $userTable WHERE user_name = :username
-			UNION
-			SELECT 'arch' as source, COUNT(*) AS value FROM $archiveTable WHERE ar_user_text = :username
-			UNION
-			SELECT 'rev' as source, COUNT(*) AS value FROM $revisionTable WHERE rev_user_text = :username
-			UNION
-			SELECT 'groups' as source, ug_group as value
-				FROM $userGroupsTable JOIN $userTable on user_id = ug_user WHERE user_name = :username
-			");
+            SELECT 'id' AS source, user_id as value FROM $userTable WHERE user_name = :username
+            UNION
+            SELECT 'arch' AS source, COUNT(*) AS value FROM $archiveTable WHERE ar_user_text = :username
+            UNION
+            SELECT 'rev' AS source, COUNT(*) AS value FROM $revisionTable WHERE rev_user_text = :username
+            UNION
+            SELECT 'groups' AS source, ug_group AS value
+                FROM $userGroupsTable JOIN $userTable on user_id = ug_user WHERE user_name = :username
+        ");
 
-        $resultQuery->bindParam("username", $username);
+        $user = new User($username);
+        $usernameParam = $user->getUsername();
+        $resultQuery->bindParam('username', $usernameParam);
         $resultQuery->execute();
 
         if ($resultQuery->errorCode() > 0) {
-            $this->addFlash("notice", [ "no-result", $username ]);
-            return $this->redirectToRoute("SimpleEditCounterProject", [ "project"=>$project ]);
+            $this->addFlash('notice', [ 'no-result', $username ]);
+            return $this->redirectToRoute('SimpleEditCounterProject', [ 'project' => $project->getDomain() ]);
         }
 
         // Fetch the result data
         $results = $resultQuery->fetchAll();
 
         // Initialize the variables - just so we don't get variable undefined errors if there is a problem
-        $id = "";
-        $arch = "";
-        $rev = "";
-        $groups = "";
+        $id = '';
+        $arch = '';
+        $rev = '';
+        $groups = '';
 
         // Iterate over the results, putting them in the right variables
         foreach ($results as $row) {
-            if ($row["source"] == "id") {
-                $id = $row["value"];
+            if ($row['source'] == 'id') {
+                $id = $row['value'];
             }
-            if ($row["source"] == "arch") {
-                $arch = $row["value"];
+            if ($row['source'] == 'arch') {
+                $arch = $row['value'];
             }
-            if ($row["source"] == "rev") {
-                $rev = $row["value"];
+            if ($row['source'] == 'rev') {
+                $rev = $row['value'];
             }
-            if ($row["source"] == "groups") {
-                $groups .= $row["value"]. ", ";
+            if ($row['source'] == 'groups') {
+                $groups .= $row['value']. ', ';
             }
         }
 
         // Unknown user - If the user is created the $results variable will have 3 entries.
         // This is a workaround to detect non-existent IPs.
         if (count($results) < 3 && $arch == 0 && $rev == 0) {
-            $this->addFlash('notice', [ "no-result", $username ]);
+            $this->addFlash('notice', [ 'no-result', $username ]);
 
-            return $this->redirectToRoute("SimpleEditCounterProject", [ "project"=>$project ]);
+            return $this->redirectToRoute('SimpleEditCounterProject', [ 'project' => $project->getDomain() ]);
         }
 
         // Remove the last comma and space
@@ -131,14 +158,14 @@ class SimpleEditCounterController extends Controller
 
         // If the user isn't in any groups, show a message.
         if (strlen($groups) == 0) {
-            $groups = "---";
+            $groups = '---';
         }
 
-        $globalGroups = "";
+        $globalGroups = '';
 
-        if (boolval($this->getParameter("app.single_wiki"))) {
+        if (boolval($this->getParameter('app.single_wiki'))) {
             // Retrieving the global groups, using the ApiHelper class
-            $api = $this->get("app.api_helper");
+            $api = $this->get('app.api_helper');
             $globalGroups = $api->globalGroups($url, $username);
         }
 
@@ -146,7 +173,7 @@ class SimpleEditCounterController extends Controller
         return $this->render('simpleEditCounter/result.html.twig', [
             'xtPage' => 'sc',
             'xtTitle' => $username,
-            'username' => $username,
+            'user' => $user,
             'project' => $project,
             'project_url' => $url,
             'id' => $id,

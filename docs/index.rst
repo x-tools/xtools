@@ -1,5 +1,5 @@
 ******************
-Welcome to xTools!
+Welcome to XTools!
 ******************
 
 XTools is a suite of statistics tools for MediaWiki wikis, users, pages, and more.
@@ -9,8 +9,8 @@ It is in operation for Wikimedia wikis and can also be installed for any MediaWi
 
 * Demonstrations:
 
-  * Wikimedia installation: `tools.wmflabs.org/xtools <https://tools.wmflabs.org/xtools>`_
-  * Development installation: `tools.wmflabs.org/xtools-dev <https://tools.wmflabs.org/xtools-dev>`_
+  * Wikimedia installation: `xtools.wmflabs.org <https://xtools.wmflabs.org/>`_
+  * Development installation: `xtools-dev.wmflabs.org <https://xtools-dev.wmflabs.org/>`_
 
 * This documentation: `xtools.readthedocs.io <http://xtools.readthedocs.io/en/latest/>`_
 * Source code: `github.com/x-tools/xtools-rebirth <https://github.com/x-tools/xtools-rebirth>`_
@@ -27,6 +27,7 @@ It is in operation for Wikimedia wikis and can also be installed for any MediaWi
     pre-requisites
     installation
     configuration
+    opt-in
     tools/index
     development
 

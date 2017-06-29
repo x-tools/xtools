@@ -1,9 +1,19 @@
 <?php
+/**
+ * This file contains only the PageTest class.
+ */
 
-namespace Xtools;
+namespace Tests\Xtools;
 
 use PHPUnit_Framework_TestCase;
+use Xtools\Page;
+use Xtools\PagesRepository;
+use Xtools\Project;
+use Xtools\User;
 
+/**
+ * Tests for the Page class.
+ */
 class PageTest extends PHPUnit_Framework_TestCase
 {
 
@@ -15,8 +25,8 @@ class PageTest extends PHPUnit_Framework_TestCase
         $project = new Project('TestProject');
         $pageRepo = $this->getMock(PagesRepository::class, ['getPageInfo']);
         $data = [
-            [$project, 'Test_Page_1', true, ['title' => 'Test_Page_1']],
-            [$project, 'Test_Page_2', true, ['title' => 'Test_Page_2', 'displaytitle' => '<em>Test</em> page 2']],
+            [$project, 'Test_Page_1', ['title' => 'Test_Page_1']],
+            [$project, 'Test_Page_2', ['title' => 'Test_Page_2', 'displaytitle' => '<em>Test</em> page 2']],
         ];
         $pageRepo->method('getPageInfo')->will($this->returnValueMap($data));
 
@@ -42,8 +52,8 @@ class PageTest extends PHPUnit_Framework_TestCase
         $project = new Project('TestProject');
         // Mock data (last element of each array is the return value).
         $data = [
-            [$project, 'Existing_page', true, []],
-            [$project, 'Missing_page', true, ['missing' => '']],
+            [$project, 'Existing_page', []],
+            [$project, 'Missing_page', ['missing' => '']],
         ];
         $pageRepo //->expects($this->exactly(2))
             ->method('getPageInfo')

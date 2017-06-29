@@ -1,12 +1,26 @@
 <?php
+/**
+ * This file contains only the PageviewsHelper class.
+ */
 
 namespace AppBundle\Helper;
 
 use GuzzleHttp;
-use Symfony\Component\Config\Definition\Exception\Exception;
 
+/**
+ * A helper class to retrieve data about page-views.
+ */
 class PageviewsHelper
 {
+
+    /**
+     * Get page views.
+     * @param string $project
+     * @param string $title
+     * @param string $start
+     * @param string $end
+     * @return string[]
+     */
     public function getPageviews($project, $title, $start, $end)
     {
         $title = str_replace(' ', '_', $title);
@@ -19,6 +33,13 @@ class PageviewsHelper
         return json_decode($res->getBody()->getContents());
     }
 
+    /**
+     * Get last days.
+     * @param string $project
+     * @param string $title
+     * @param int $days
+     * @return string[]
+     */
     public function getLastDays($project, $title, $days = 60)
     {
         $start = date('Ymd', strtotime("-$days days"));
@@ -27,6 +48,13 @@ class PageviewsHelper
         return $this->getPageviews($project, $title, $start, $end);
     }
 
+    /**
+     * Sum last days.
+     * @param string $project
+     * @param string $title
+     * @param int $days
+     * @return int
+     */
     public function sumLastDays($project, $title, $days)
     {
         $data = $this->getLastDays($project, $title, $days);

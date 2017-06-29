@@ -7,7 +7,7 @@
 $url = "https://tools.wmflabs.org/musikanimal/api/nonautomated_edits/tools";
 
 // Set a useragent, as required
-ini_set("user_agent", "Xtools-rebirth - http://xtools-dev.wmflabs.org");
+ini_set("user_agent", "XTools - https://xtools.wmflabs.org");
 
 // Pull Down the contents and decode
 $file = file_get_contents($url);

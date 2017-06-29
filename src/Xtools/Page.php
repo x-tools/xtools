@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file contains only the Page class.
+ */
 
 namespace Xtools;
 
@@ -8,14 +11,17 @@ namespace Xtools;
 class Page extends Model
 {
 
-    /** @var Project */
+    /** @var Project The project that this page belongs to. */
     protected $project;
-    
-    /** @var string */
+
+    /** @var string The page name as provided at instantiation. */
     protected $unnormalizedPageName;
-    
+
     /** @var string[] Metadata about this page. */
     protected $pageInfo;
+
+    /** @var string[] Revision history of this page */
+    protected $revisions;
 
     /**
      * Page constructor.
@@ -42,6 +48,7 @@ class Page extends Model
     }
 
     /**
+     * Get the page's title.
      * @return string
      */
     public function getTitle()
@@ -61,6 +68,16 @@ class Page extends Model
     }
 
     /**
+     * Get this page's length in bytes.
+     * @return int
+     */
+    public function getLength()
+    {
+        $info = $this->getPageInfo();
+        return isset($info['length']) ? $info['length'] : null;
+    }
+
+    /**
      * Get HTML for the stylized display of the title.
      * The text will be the same as Page::getTitle().
      * @return string
@@ -75,6 +92,7 @@ class Page extends Model
     }
 
     /**
+     * Get the full URL of this page.
      * @return string
      */
     public function getUrl()
@@ -84,6 +102,27 @@ class Page extends Model
     }
 
     /**
+     * Get the numerical ID of the namespace of this page.
+     * @return int
+     */
+    public function getNamespace()
+    {
+        $info = $this->getPageInfo();
+        return isset($info['ns']) ? $info['ns'] : null;
+    }
+
+    /**
+     * Get the number of page watchers.
+     * @return int
+     */
+    public function getWatchers()
+    {
+        $info = $this->getPageInfo();
+        return isset($info['ns']) ? $info['ns'] : null;
+    }
+
+    /**
+     * Whether or not this page exists.
      * @return bool
      */
     public function exists()
@@ -102,11 +141,47 @@ class Page extends Model
     }
 
     /**
-     * Get all edits made to this page by the given user.
+     * Get the Wikidata ID of this page.
+     * @return string
+     */
+    public function getWikidataId()
+    {
+        $info = $this->getPageInfo();
+        if (isset($info['pageprops']['wikibase_item'])) {
+            return $info['pageprops']['wikibase_item'];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Get the number of revisions the page has.
+     * @param User $user Optionally limit to those of this user.
+     * @return int
+     */
+    public function getNumRevisions(User $user = null)
+    {
+        // Return the count of revisions if already present
+        if ($this->revisions) {
+            return count($this->revisions);
+        }
+
+        // Otherwise do a COUNT in the event fetching
+        // all revisions is not desired
+        return $this->getRepository()->getNumRevisions($this, $user);
+    }
+
+    /**
+     * Get all edits made to this page.
+     * @param User|null $user Specify to get only revisions by the given user.
      * @return array
      */
-    public function getRevisions(User $user)
+    public function getRevisions(User $user = null)
     {
+        if ($this->revisions) {
+            return $this->revisions;
+        }
+
         $data = $this->getRepository()->getRevisions($this, $user);
         $totalAdded = 0;
         $totalRemoved = 0;
@@ -117,12 +192,10 @@ class Page extends Model
             } else {
                 $totalRemoved += $revision['length_change'];
             }
-            $time = strtotime($revision['timestamp']);
-            $revision['timestamp'] = $time; // formatted via Twig helper
-            $revision['year'] = date('Y', $time);
-            $revision['month'] = date('m', $time);
             $revisions[] = $revision;
         }
+        $this->revisions = $revisions;
+
         return $revisions;
     }
 }

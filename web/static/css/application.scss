@@ -32,7 +32,9 @@ body {
 }
 
 .navbar-top {
-    padding: 10px 15px 0;
+    border-top: 0;
+    min-height: 51px;
+    padding: 0;
 
     li:last-child {
         padding-right: 0;
@@ -42,13 +44,57 @@ body {
     float: left;
     padding: 0;
 
+    &.in {
+        position: relative;
+        top: 8px;
+    }
+
     .nav {
         margin: 0;
     }
 }
 
+.nav-buttons {
+    left: 1px;
+    margin-right: 8px;
+    position: relative;
+    top: 8px;
+}
+
+.navbar-nav > li > a {
+    height: 50px;
+    line-height: 50px;
+    padding: 0 10px;
+}
+
+.home-link {
+    bottom: 1px;
+    padding: 0 12px;
+    position: relative;
+
+    &::after {
+        background: #e7e7e7;
+        bottom: 0;
+        content: '';
+        display: inline-block;
+        height: 80%;
+        left: 100%;
+        margin: auto;
+        position: absolute;
+        top: 3px;
+        width: 1px;
+    }
+
+    img {
+        height: 32px;
+    }
+}
+
 .navbar-toggle {
+    left: 5px;
     margin: 0;
+    position: relative;
+    top: 9px;
 }
 
 .lang-group {
@@ -65,7 +111,7 @@ body {
         height: 17px;
         left: 8px;
         position: absolute;
-        top: 7px;
+        top: 8px;
         width: 17px;
     }
 }
@@ -82,15 +128,20 @@ body {
     }
 }
 
+/** TOOLTIPS */
+$tooltip-bg: #fff;
+$tooltip-border: #ddd;
+$tooltip-shadow: #ccc;
+
 .tooltipcss {
     position: inherit;
 
     .tooltip-body {
         @include center('vertical');
-        background: #FFFAF0;
-        border: 1px solid #DCA;
+        background: $tooltip-bg;
+        border: 1px solid $tooltip-border;
         border-radius: 4px;
-        box-shadow: 5px 5px 8px #CCC;
+        box-shadow: 5px 5px 8px $tooltip-shadow;
         color: #111;
         display: none;
         font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
@@ -117,11 +168,11 @@ body {
         width: 0;
     }
     &::before {
-        border-color: transparent #DCA transparent transparent;
+        border-color: transparent $tooltip-border transparent transparent;
         border-width: 11px;
     }
     &::after {
-        border-color: transparent #FFFAF0 transparent transparent;
+        border-color: transparent $tooltip-bg transparent transparent;
         border-width: 10px;
     }
 }
@@ -142,9 +193,6 @@ body {
     white-space: normal;
 }
 
-.navbar-nav > li > a, .navbar-header > a {
-    padding: 10px;
-}
 .col {
     display: inline-block;
     padding: 20px 60px 0px 15px;
@@ -213,10 +261,6 @@ section > .panel-body {
 .xt-panel-body table {
     white-space: nowrap;
 }
-.xt-panel-body-top {
-    padding: 8px;
-    margin-bottom: 5px;
-}
 .xt-table > tbody > tr > td {
     padding-top: 1px;
     padding-bottom: 1px;
@@ -275,11 +319,6 @@ section > .panel-body {
     word-wrap: break-word;
     white-space: -moz-pre-wrap;
     white-space: pre-line;
-}
-.tdgeneral {
-    display: inline-block;
-    min-width: 55px;
-    text-align: right;
 }
 .panel-primary {
     margin-bottom: 0;
@@ -414,15 +453,29 @@ div.outer_bar {
     }
 }
 
+.stat-list {
+    margin-bottom: 20px;
+
+    caption {
+        text-align: center;
+    }
+}
+
+.panel-body .stat-list:only-child {
+    margin-bottom: 0;
+}
+
 .stat-list > .table td,
 .stat-list > .table th {
     border: 0;
     padding-bottom: 0;
     padding-top: 0;
+    white-space: normal;
 
     &:first-child {
         font-weight: bold;
         text-align: right;
+        white-space: nowrap;
 
         &::after {
             content: ':';
@@ -432,6 +485,20 @@ div.outer_bar {
 
 .stat-list--new-group {
     padding-top: 10px !important;
+}
+
+.stat-list--group {
+    border-top: 0 !important;
+
+    & > tr:first-child > td {
+        border-bottom: solid 1px #eee !important;
+        padding-top: 15px !important;
+        text-align: center !important;
+    }
+
+    & > tr:nth-child(2) > td {
+        padding-top: 5px !important;
+    }
 }
 
 .color-icon {
@@ -502,6 +569,57 @@ div.outer_bar {
     width: 15px;
 }
 
+// See pages/result.html.twig for example usage
+.toggle-table {
+    float: left;
+
+    .toggle-table--toggle {
+        cursor: pointer;
+        margin-right: 4px;
+        position: relative;
+    }
+
+    tr:hover .toggle-table--toggle {
+        .color-icon {
+            visibility: hidden;
+        }
+
+        .glyphicon {
+            display: block;
+        }
+    }
+
+    tr.excluded {
+        td.linked a,
+        td:not(.linked) {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+
+        .color-icon {
+            opacity: 0.5;
+        }
+    }
+
+    td .glyphicon {
+        display: none;
+        left: 1px;
+        position: absolute;
+    }
+}
+
+.toggle-table--chart {
+    float: left;
+    margin-left: 100px;
+    margin-top: 20px;
+    max-width: 500px;
+
+    canvas {
+        height: 400px;
+        width: 400px;
+    }
+}
+
 @media (min-width: $bootstrap-lg) {
     .xt-panel-body table {
         width: auto;
@@ -559,6 +677,18 @@ div.outer_bar {
         }
     }
 
+    .stat-list--group {
+        padding-top: 15px !important;
+
+        tr > td {
+            padding-top: 5px !important;
+        }
+
+        & > tr:first-child > td {
+            text-align: left !important;
+        }
+    }
+
     .back-to-search {
         font-size: 0;
 
@@ -586,6 +716,11 @@ div.outer_bar {
 
     .xt-toc {
         display: none;
+    }
+
+    .toggle-table--chart {
+        margin: 0;
+        max-width: 100%;
     }
 
     // FORMS

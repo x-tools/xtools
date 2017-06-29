@@ -1,0 +1,40 @@
+@import 'mixins.scss';
+
+.home {
+    #wrapper {
+        background: transparent;
+    }
+
+    .splash-logo {
+        margin-top: 30px;
+        max-width: 320px;
+        width: 100%;
+    }
+
+    .tool-list {
+        padding-top: 10px;
+        text-align: left;
+
+        .btn {
+            display: block;
+            margin-top: 15px;
+            position: relative;
+            text-align: left;
+            white-space: normal;
+            width: 100%;
+        }
+    }
+
+    .tool-name {
+        font-weight: bold;
+    }
+}
+
+@media (max-width: $bootstrap-sm) {
+    .home {
+        .splash-logo {
+            max-width: 450px;
+            width: 90%;
+        }
+    }
+}

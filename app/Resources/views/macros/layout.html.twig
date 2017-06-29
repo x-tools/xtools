@@ -2,6 +2,7 @@
  # Generate a collapsible Bootstrap .panel with a heading
  # @param string title       - i18n message that is the title of the content block, shown in a header
  # @param string content     - raw content to show in the section body
+ # @param string description - shown on the right in grayed text
  # @param string id          - id of the section, defaults to the title
  # @param bool   notranslate - don't translate the 'title'
  #}
@@ -18,11 +19,11 @@
                     {{ msg(title) }}
                 {% endif %}
                 {% if toggle %}
-                <small class='xt-show'>[{{ msg('show') | lower }}]</small>
-                <small class='xt-hide'>[{{ msg('hide') | lower }}]</small>
+                    <small class='xt-show'>[{{ msg('show') | lower }}]</small>
+                    <small class='xt-hide'>[{{ msg('hide') | lower }}]</small>
                 {% endif %}
                 {% if description is defined %}
-                <span class='pull-right text-muted xt-panel-description'>{{ description }}</span>
+                    <span class='pull-right text-muted xt-panel-description'>{{ description }}</span>
                 {% endif %}
             </h4>
         </header>

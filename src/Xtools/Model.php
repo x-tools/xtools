@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file contains only the Model class.
+ */
 
 namespace Xtools;
 
@@ -9,7 +12,7 @@ namespace Xtools;
 abstract class Model
 {
 
-    /** @var Repository */
+    /** @var Repository The repository for this model. */
     private $repository;
 
     /**

@@ -1,5 +1,7 @@
 {
   "all": "Todas",
+  "all-languages": "Todos os idiomas",
+  "api-error": "Erro ao consultar $1",
   "bot": "Robô",
   "date": "Data",
   "editors": "Editores",

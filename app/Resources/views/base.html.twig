@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ lang() }}"{% if isRTL() %} dir="rtl"{% endif %}>
 <head>
-    <title>{% if xtTitle is defined %}{{ xtTitle }} - {% endif %}{{ msg('tool-'~xtPage) }} - {{ msg('title-xtools') }}</title>
+    <title>{% if xtTitle is defined %}{{ xtTitle }} - {% endif %}{% if xtPage != 'home' %}{{ msg('tool-'~xtPage) }} - {% endif %}{{ msg('title-xtools') }}</title>
 
     {# must be before loading the individual JS files #}
     <script type="text/javascript">
@@ -27,8 +27,10 @@
         {% stylesheets
             'bootstrap/css/bootstrap.min.css'
             'static/css/application.scss'
+            'static/css/home.scss'
             'static/css/articleinfo.scss'
             'static/css/autoedits.scss'
+            'static/css/editcounter.scss'
             'static/css/index.scss'
             'static/css/pages.scss'
             output='static/production/application.css' %}
@@ -38,12 +40,14 @@
             'static/js/vendor/jquery.min.js'
             'static/js/vendor/jquery.i18n/jquery.i18n.dist.js'
             'bootstrap/js/bootstrap.min.js'
+            'static/js/vendor/bootstrap-typeahead.js'
             'chartjs/Chart.min.js'
             'static/js/core_extensions.js'
             'static/js/application.js'
             'static/js/autoedits.js'
             'static/js/editcounter.js'
             'static/js/pages.js'
+            'static/js/topedits.js'
             output='static/production/application.js' %}
         <script src="{{ asset_url }}"></script>
         {% endjavascripts %}
@@ -57,7 +61,6 @@
 </head>
 
 <body class="{{ xtPage }}{% if isRTL() %} rtl{% endif %}" >
-
 <header class="navbar navbar-default navbar-top" role="navigation">
     <button class="navbar-toggle collapsed pull-left" data-toggle="collapse" data-target=".tool-links" aria-expanded="false">
       <span class="sr-only">Toggle navigation</span>
@@ -86,19 +89,28 @@
             </div>
         </li>
         {% endif %}
-        {% if isWMFLabs() %}
+
         <li>
-            <a class="btn btn-default login-btn" href="https://tools.wmflabs.org/xtools/oauthredirector.php?action=login&amp;callto=https://www.mediawiki.org/w/api.php&amp;returnto=https://tools.wmflabs.org/xtools-ec/">
+        {% if logged_in_user() %}
+            <a class="btn btn-default logout-btn" href="{{ path('logout') }}" title="{{ msg("logout-msg", [logged_in_user().username]) }}">
+                <span class="glyphicon glyphicon-user"></span>
+                {{ msg("logout") }}
+            </a>
+        {% else %}
+            <a class="btn btn-default login-btn" href="{{ path('login') }}">
                 <span class="glyphicon glyphicon-user"></span>
                 {{ msg("login") }}
             </a>
-        </li>
         {% endif %}
+        </li>
+
     </ol>
     <nav class="tool-links navbar-collapse collapse">
         <ol class="nav navbar-nav navbar-left">
-            <li{% if current_tool is defined and current_tool == "index" %} class="active"{% endif %} >
-                <a href="{{ path('homepage') }}">{{ msg("title-xtools") }}</a>
+            <li{% if current_tool is defined and current_tool == "index" %} class="active"{% endif %}>
+                <a class="home-link" href="{{ path('homepage') }}">
+                    <img src="{{ asset('static/images/logo.svg') }}" />
+                </a>
             </li>
 
             {% for tool in tools() %}
@@ -181,7 +193,7 @@
                 &middot;
                 <a href="{{ path('aboutPage') }}">{{ msg('about-xtools') }}</a>
                 &middot;
-                <a href='https://phabricator.wikimedia.org/maniphest/task/create/?title=PLEASE REPLACE WITH A DESCRIPTION OF THE ISSUE&priority=75&projects=Tool-labs-tools-xtools&description=Please provide any further details you can here\r\n\r\nXtools version: {{ version }}-{{ shortHash() }}' target=_blank>{{ msg('report-issue') }}</a>
+                <a href='https://phabricator.wikimedia.org/maniphest/task/create/?title=PLEASE REPLACE WITH A DESCRIPTION OF THE ISSUE&amp;priority=75&amp;projects=Tool-labs-tools-xtools&amp;description=Please provide any further details you can here\r\n\r\nXtools version: {{ version }}-{{ shortHash() }}' target=_blank>{{ msg('report-issue') }}</a>
                 &middot;
                 <a href="irc://irc.freenode.net/#wikimedia-xtools" target="_blank">#wikimedia-xtools</a>
                 <sup><a style="color:green" href="https://webchat.freenode.net/?channels=#wikimedia-xtools" target="_blank">{{ msg('web-chat') }}</a></sup>
@@ -197,5 +209,13 @@
 <span class='hidden loader'>
     <img src="{{ asset('static/images/loader.gif') }}" /> <span class="sr-only">{{ msg('loading') }}&hellip;</span>
 </span>
+{% if xtPage is defined and project.domain is defined %}
+<script>
+    $.ajax({
+        url: "{{ path('homepage') }}api/usage/{{ xtPage }}/{{ project.domain }}/{{ csrf_token('intention') }}",
+        method: 'PUT'
+    });
+</script>
+{% endif %}
 </body>
 </html>

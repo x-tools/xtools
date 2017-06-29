@@ -1,15 +1,25 @@
 <?php
+/**
+ * This file contains only the EditCounterRepository class.
+ */
 
 namespace Xtools;
 
+use AppBundle\Helper\AutomatedEditsHelper;
 use DateInterval;
+use DateTime;
 use Mediawiki\Api\SimpleRequest;
 
+/**
+ * An EditCounterRepository is responsible for retrieving edit count information from the
+ * databases and API. It doesn't do any post-processing of that information.
+ */
 class EditCounterRepository extends Repository
 {
 
     /**
      * Get revision counts for the given user.
+     * @param Project $project The project.
      * @param User $user The user.
      * @returns string[] With keys: 'deleted', 'live', 'total', 'first', 'last', '24h', '7d', '30d',
      * '365d', 'small', 'large', 'with_comments', and 'minor_edits'.
@@ -73,6 +83,8 @@ class EditCounterRepository extends Repository
 
     /**
      * Get the first and last revision dates (in MySQL YYYYMMDDHHMMSS format).
+     * @param Project $project The project.
+     * @param User $user The user.
      * @return string[] With keys 'first' and 'last'.
      */
     public function getRevisionDates(Project $project, User $user)
@@ -207,6 +219,7 @@ class EditCounterRepository extends Repository
             'review-approve',
             'patrol-patrol',
             'block-block',
+            'block-reblock',
             'block-unblock',
             'protect-protect',
             'protect-unprotect',
@@ -215,6 +228,8 @@ class EditCounterRepository extends Repository
             'delete-revision',
             'delete-restore',
             'import-import',
+            'import-interwiki',
+            'import-upload',
             'upload-upload',
             'upload-overwrite',
         ];
@@ -246,21 +261,89 @@ class EditCounterRepository extends Repository
     }
 
     /**
+     * Get data for all blocks set by the given user.
+     * @param Project $project
+     * @param User $user
+     * @return array
+     */
+    public function getBlocksSet(Project $project, User $user)
+    {
+        $ipblocksTable = $this->getTableName($project->getDatabaseName(), 'ipblocks');
+        $sql = "SELECT * FROM $ipblocksTable WHERE ipb_by = :userId";
+        $resultQuery = $this->getProjectsConnection()->prepare($sql);
+        $userId = $user->getId($project);
+        $resultQuery->bindParam('userId', $userId);
+        $resultQuery->execute();
+        return $resultQuery->fetchAll();
+    }
+
+    /**
+     * Get data for all blocks set on the given user.
+     * @param Project $project
+     * @param User $user
+     * @return array
+     */
+    public function getBlocksReceived(Project $project, User $user)
+    {
+        $ipblocksTable = $this->getTableName($project->getDatabaseName(), 'ipblocks');
+        $sql = "SELECT * FROM $ipblocksTable WHERE ipb_user = :userId";
+        $resultQuery = $this->getProjectsConnection()->prepare($sql);
+        $userId = $user->getId($project);
+        $resultQuery->bindParam('userId', $userId);
+        $resultQuery->execute();
+        return $resultQuery->fetchAll();
+    }
+
+    /**
+     * Get a user's total edit count on all projects.
+     * @see EditCounterRepository::globalEditCountsFromCentralAuth()
+     * @see EditCounterRepository::globalEditCountsFromDatabases()
+     * @param User $user The user.
+     * @param Project $project The project to start from.
+     * @return mixed[] Elements are arrays with 'project' (Project), and 'total' (int).
+     */
+    public function globalEditCounts(User $user, Project $project)
+    {
+        // Get the edit counts from CentralAuth or database.
+        $editCounts = $this->globalEditCountsFromCentralAuth($user, $project);
+        if ($editCounts === false) {
+            $editCounts = $this->globalEditCountsFromDatabases($user, $project);
+        }
+
+        // Pre-populate all projects' metadata, to prevent each project call from fetching it.
+        $project->getRepository()->getAll();
+
+        // Compile the output.
+        $out = [];
+        foreach ($editCounts as $editCount) {
+            $out[] = [
+                'project' => ProjectRepository::getProject($editCount['dbname'], $this->container),
+                'total' => $editCount['total'],
+            ];
+        }
+        return $out;
+    }
+
+    /**
      * Get a user's total edit count on one or more project.
      * Requires the CentralAuth extension to be installed on the project.
      *
-     * @param string $username The username.
+     * @param User $user The user.
      * @param Project $project The project to start from.
-     * @return mixed[]|boolean Array of total edit counts, or false if none could be found.
+     * @return mixed[] Elements are arrays with 'dbname' (string), and 'total' (int).
      */
-    public function getRevisionCountsAllProjects(User $user, Project $project)
+    protected function globalEditCountsFromCentralAuth(User $user, Project $project)
     {
+        $this->log->debug(__METHOD__." Getting global edit counts for ".$user->getUsername());
         // Set up cache and stopwatch.
         $cacheKey = 'globalRevisionCounts.'.$user->getUsername();
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
         $this->stopwatch->start($cacheKey, 'XTools');
+
+        // Load all projects, so it doesn't have to request metadata about each one as it goes.
+        $project->getRepository()->getAll();
 
         $api = $this->getMediawikiApi($project);
         $params = [
@@ -270,18 +353,15 @@ class EditCounterRepository extends Repository
         ];
         $query = new SimpleRequest('query', $params);
         $result = $api->getRequest($query);
-        $out = [];
-        if (isset($result['query']['globaluserinfo']['merged'])) {
-            foreach ($result['query']['globaluserinfo']['merged'] as $merged) {
-                $proj = ProjectRepository::getProject($merged['wiki'], $this->container);
-                $out[] = [
-                    'project' => $proj,
-                    'total' => $merged['editcount'],
-                ];
-            }
+        if (!isset($result['query']['globaluserinfo']['merged'])) {
+            return [];
         }
-        if (empty($out)) {
-            $out = $this->getRevisionCountsAllProjectsNoCentralAuth($user, $project, $cacheKey);
+        $out = [];
+        foreach ($result['query']['globaluserinfo']['merged'] as $result) {
+            $out[] = [
+                'dbname' => $result['wiki'],
+                'total' => $result['editcount'],
+            ];
         }
 
         // Cache for 10 minutes, and return.
@@ -295,15 +375,15 @@ class EditCounterRepository extends Repository
     }
 
     /**
-     * Get total edit counts for the top 10 projects for this user.
-     * @param string $username The username.
-     * @return string[] Elements are arrays with 'dbName', 'url', 'name', and 'total'.
+     * Get total edit counts from all projects for this user.
+     * @see EditCounterRepository::globalEditCountsFromCentralAuth()
+     * @param User $user The user.
+     * @param Project $project The project to start from.
+     * @return mixed[] Elements are arrays with 'dbname' (string), and 'total' (int).
      */
-    protected function getRevisionCountsAllProjectsNoCentralAuth(
-        User $user,
-        Project $project,
-        $stopwatchName
-    ) {
+    protected function globalEditCountsFromDatabases(User $user, Project $project)
+    {
+        $stopwatchName = 'globalRevisionCounts.'.$user->getUsername();
         $allProjects = $project->getRepository()->getAll();
         $topEditCounts = [];
         foreach ($allProjects as $projectMeta) {
@@ -313,9 +393,8 @@ class EditCounterRepository extends Repository
             $stmt->bindParam("username", $user->getUsername());
             $stmt->execute();
             $total = (int)$stmt->fetchColumn();
-            $project = ProjectRepository::getProject($projectMeta['dbName'], $this->container);
             $topEditCounts[] = [
-                'project' => $project,
+                'dbname' => $projectMeta['dbName'],
                 'total' => $total,
             ];
             $this->stopwatch->lap($stopwatchName);
@@ -331,14 +410,22 @@ class EditCounterRepository extends Repository
      */
     public function getNamespaceTotals(Project $project, User $user)
     {
+        // Cache?
+        $userId = $user->getId($project);
+        $cacheKey = "ec.namespacetotals.{$project->getDatabaseName()}.$userId";
+        $this->stopwatch->start($cacheKey, 'XTools');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        // Query.
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
         $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
         $sql = "SELECT page_namespace, COUNT(rev_id) AS total
-            FROM $revisionTable r JOIN $pageTable p on r.rev_page = p.page_id
+            FROM $pageTable p JOIN $revisionTable r ON (r.rev_page = p.page_id)
             WHERE r.rev_user = :id
             GROUP BY page_namespace";
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $userId = $user->getId($project);
         $resultQuery->bindParam(":id", $userId);
         $resultQuery->execute();
         $results = $resultQuery->fetchAll();
@@ -347,68 +434,85 @@ class EditCounterRepository extends Repository
         }, $results), array_map(function ($e) {
             return $e['total'];
         }, $results));
+
+        // Cache and return.
+        $cacheItem = $this->cache->getItem($cacheKey);
+        $cacheItem->set($namespaceTotals);
+        $cacheItem->expiresAfter(new DateInterval('PT15M'));
+        $this->cache->save($cacheItem);
+        $this->stopwatch->stop($cacheKey);
         return $namespaceTotals;
     }
 
     /**
-     * Get this user's most recent 10 edits across all projects.
-     * @param string $username The username.
-     * @param integer $topN The number of items to return.
-     * @param integer $days The number of days to search from each wiki.
-     * @return string[]
+     * Get revisions by this user.
+     * @param Project $project The project.
+     * @param User $user The user.
+     * @param DateTime $oldest The oldest revision time of interest (only return greater than this).
+     * @param int $lim The number of results to return.
+     * @return array|mixed
      */
-    public function getRecentGlobalContribs($username, $projects = [], $topN = 10, $days = 30)
+    public function getRevisions(Project $project, User $user, DateTime $oldest = null, $lim = null)
     {
-        $allRevisions = [];
-        foreach ($this->labsHelper->getProjectsInfo($projects) as $project) {
-            $cacheKey = "globalcontribs.{$project['dbName']}.$username";
-            if ($this->cacheHas($cacheKey)) {
-                $revisions = $this->cacheGet($cacheKey);
-            } else {
-                $sql =
-                    "SELECT rev_id, rev_timestamp, UNIX_TIMESTAMP(rev_timestamp) AS unix_timestamp, " .
-                    " rev_minor_edit, rev_deleted, rev_len, rev_parent_id, rev_comment, " .
-                    " page_title, page_namespace " . " FROM " .
-                    $this->labsHelper->getTable('revision', $project['dbName']) . "    JOIN " .
-                    $this->labsHelper->getTable('page', $project['dbName']) .
-                    "    ON (rev_page = page_id)" .
-                    " WHERE rev_timestamp > NOW() - INTERVAL $days DAY AND rev_user_text LIKE :username" .
-                    " ORDER BY rev_timestamp DESC" . " LIMIT 10";
-                $resultQuery = $this->replicas->prepare($sql);
-                $resultQuery->bindParam(":username", $username);
-                $resultQuery->execute();
-                $revisions = $resultQuery->fetchAll();
-                $this->cacheSave($cacheKey, $revisions, 'PT15M');
-            }
-            if (count($revisions) === 0) {
-                continue;
-            }
-            $revsWithProject = array_map(function (&$item) use ($project) {
-                $item['project_name'] = $project['wikiName'];
-                $item['project_url'] = $project['url'];
-                $item['project_db_name'] = $project['dbName'];
-                $item['rev_time_formatted'] = date('Y-m-d H:i', $item['unix_timestamp']);
-
-                return $item;
-            }, $revisions);
-            $allRevisions = array_merge($allRevisions, $revsWithProject);
+        $username = $user->getUsername();
+        $cacheKey = "globalcontribs.{$project->getDatabaseName()}.$username";
+        $this->stopwatch->start($cacheKey, 'XTools');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
         }
-        usort($allRevisions, function ($a, $b) {
-            return $b['rev_timestamp'] - $a['rev_timestamp'];
-        });
+        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+        $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
+        $whereTimestamp = ($oldest instanceof DateTime)
+            ? ' AND revs.rev_timestamp > '.$oldest->format('YmdHis')
+            : '';
+        // Column aliases here should match those used in PagesRepository::getRevisions()
+        $sql = "SELECT
+                revs.rev_id AS id,
+                revs.rev_timestamp AS timestamp,
+                UNIX_TIMESTAMP(revs.rev_timestamp) AS unix_timestamp,
+                revs.rev_minor_edit AS minor,
+                revs.rev_deleted AS deleted,
+                revs.rev_len AS length,
+                (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
+                revs.rev_parent_id AS parent_id,
+                revs.rev_comment AS comment,
+                revs.rev_user_text AS username,
+                page.page_title,
+                page.page_namespace
+            FROM $revisionTable AS revs
+                JOIN $pageTable AS page ON (rev_page = page_id)
+                LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+            WHERE revs.rev_user_text LIKE :username $whereTimestamp
+            ORDER BY revs.rev_timestamp DESC";
+        if (is_numeric($lim)) {
+            $sql .= " LIMIT $lim";
+        }
+        $resultQuery = $this->getProjectsConnection()->prepare($sql);
+        $resultQuery->bindParam(":username", $username);
+        $resultQuery->execute();
+        $revisions = $resultQuery->fetchAll();
 
-        return array_slice($allRevisions, 0, $topN);
+        // Cache this.
+        $cacheItem = $this->cache->getItem($cacheKey);
+        $cacheItem->set($revisions);
+        $cacheItem->expiresAfter(new DateInterval('PT15M'));
+        $this->cache->save($cacheItem);
+
+        $this->stopwatch->stop($cacheKey);
+        return $revisions;
     }
 
     /**
      * Get data for a bar chart of monthly edit totals per namespace.
-     * @param string $username The username.
+     * @param Project $project The project.
+     * @param User $user The user.
      * @return string[]
      */
     public function getMonthCounts(Project $project, User $user)
     {
         $username = $user->getUsername();
         $cacheKey = "monthcounts.$username";
+        $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -416,13 +520,15 @@ class EditCounterRepository extends Repository
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
         $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
         $sql =
-            "SELECT " . "     YEAR(rev_timestamp) AS `year`," .
-            "     MONTH(rev_timestamp) AS `month`," . "     page_namespace," .
-            "     COUNT(rev_id) AS `count` "
-            . " FROM $revisionTable    JOIN $pageTable ON (rev_page = page_id)" .
-            " WHERE rev_user_text = :username" .
-            " GROUP BY YEAR(rev_timestamp), MONTH(rev_timestamp), page_namespace " .
-            " ORDER BY rev_timestamp DESC";
+            "SELECT "
+            . "     YEAR(rev_timestamp) AS `year`,"
+            . "     MONTH(rev_timestamp) AS `month`,"
+            . "     page_namespace,"
+            . "     COUNT(rev_id) AS `count` "
+            .  " FROM $revisionTable JOIN $pageTable ON (rev_page = page_id)"
+            . " WHERE rev_user_text = :username"
+            . " GROUP BY YEAR(rev_timestamp), MONTH(rev_timestamp), page_namespace "
+            . " ORDER BY rev_timestamp DESC";
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $resultQuery->bindParam(":username", $username);
         $resultQuery->execute();
@@ -433,18 +539,21 @@ class EditCounterRepository extends Repository
         $cacheItem->set($totals);
         $this->cache->save($cacheItem);
 
+        $this->stopwatch->stop($cacheKey);
         return $totals;
     }
 
     /**
      * Get yearly edit totals for this user, grouped by namespace.
-     * @param string $username
+     * @param Project $project The project.
+     * @param User $user The user.
      * @return string[] ['<namespace>' => ['<year>' => 'total', ... ], ... ]
      */
     public function getYearCounts(Project $project, User $user)
     {
         $username = $user->getUsername();
         $cacheKey = "yearcounts.$username";
+        $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -452,12 +561,12 @@ class EditCounterRepository extends Repository
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
         $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
         $sql = "SELECT "
-            . "     SUBSTR(CAST(rev_timestamp AS CHAR(4)), 1, 4) AS `year`,"
+            . "     YEAR(rev_timestamp) AS `year`,"
             . "     page_namespace,"
             . "     COUNT(rev_id) AS `count` "
-            . " FROM $revisionTable    JOIN $pageTable ON (rev_page = page_id)"
+            . " FROM $revisionTable JOIN $pageTable ON (rev_page = page_id)"
             . " WHERE rev_user_text = :username"
-            . " GROUP BY SUBSTR(CAST(rev_timestamp AS CHAR(4)), 1, 4), page_namespace "
+            . " GROUP BY YEAR(rev_timestamp), page_namespace "
             . " ORDER BY rev_timestamp DESC ";
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $resultQuery->bindParam(":username", $username);
@@ -469,6 +578,7 @@ class EditCounterRepository extends Repository
         $cacheItem->expiresAfter(new DateInterval('P10M'));
         $this->cache->save($cacheItem);
 
+        $this->stopwatch->stop($cacheKey);
         return $totals;
     }
 
@@ -482,6 +592,7 @@ class EditCounterRepository extends Repository
     {
         $username = $user->getUsername();
         $cacheKey = "timecard.".$username;
+        $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -514,25 +625,31 @@ class EditCounterRepository extends Repository
         $cacheItem->set($totals);
         $this->cache->save($cacheItem);
 
+        $this->stopwatch->stop($cacheKey);
         return $totals;
     }
 
     /**
      * Get a summary of automated edits made by the given user in their last 1000 edits.
      * Will cache the result for 10 minutes.
+     * @param Project $project The project.
      * @param User $user The user.
      * @return integer[] Array of edit counts, keyed by all tool names from
      * app/config/semi_automated.yml
-     * @TODO this is broke
+     * @TODO This currently uses AutomatedEditsHelper but that could probably be refactored.
      */
     public function countAutomatedRevisions(Project $project, User $user)
     {
         $userId = $user->getId($project);
         $cacheKey = "automatedEdits.".$project->getDatabaseName().'.'.$userId;
+        $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             $this->log->debug("Using cache for $cacheKey");
             return $this->cache->getItem($cacheKey)->get();
         }
+
+        /** @var AutomatedEditsHelper $automatedEditsHelper */
+        $automatedEditsHelper = $this->container->get("app.automated_edits_helper");
 
         // Get the most recent 1000 edit summaries.
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
@@ -542,22 +659,26 @@ class EditCounterRepository extends Repository
         $resultQuery->bindParam("userId", $userId);
         $resultQuery->execute();
         $results = $resultQuery->fetchAll();
-        $out = [];
+        $editCounts = [];
         foreach ($results as $result) {
-            $toolName = $this->getTool($result['rev_comment']);
+            $toolName = $automatedEditsHelper->getTool($result['rev_comment']);
             if ($toolName) {
-                if (!isset($out[$toolName])) {
-                    $out[$toolName] = 0;
+                if (!isset($editCounts[$toolName])) {
+                    $editCounts[$toolName] = 0;
                 }
-                $out[$toolName]++;
+                $editCounts[$toolName]++;
             }
         }
-        arsort($out);
+        arsort($editCounts);
 
         // Cache for 10 minutes.
-        $this->log->debug("Saving $cacheKey to cache", [$out]);
-        $this->cacheSave($cacheKey, $out, 'PT10M');
+        $this->log->debug("Saving $cacheKey to cache", [$editCounts]);
+        $cacheItem = $this->cache->getItem($cacheKey);
+        $cacheItem->set($editCounts);
+        $cacheItem->expiresAfter(new DateInterval('PT10M'));
+        $this->cache->save($cacheItem);
 
-        return $out;
+        $this->stopwatch->stop($cacheKey);
+        return $editCounts;
     }
 }

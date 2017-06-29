@@ -1,27 +1,37 @@
 <?php
+/**
+ * This file contains only the ProjectRepository class.
+ */
 
 namespace Xtools;
 
 use Mediawiki\Api\MediawikiApi;
 use Mediawiki\Api\SimpleRequest;
-use Symfony\Component\DependencyInjection\Container;
+use Psr\Container\ContainerInterface;
 
+/**
+ * This class provides data to the Project class.
+ */
 class ProjectRepository extends Repository
 {
 
     /** @var array Project metadata. */
     protected $metadata;
 
-    /** @var string[] */
+    /** @var string[] Metadata if XTools is in single-wiki mode. */
     protected $singleMetadata;
+
+    /** @var string The cache key for the 'all project' metadata.
+     */
+    protected $cacheKeyAllProjects = 'allprojects';
 
     /**
      * Convenience method to get a new Project object based on a given identification string.
      * @param string $projectIdent The domain name, database name, or URL of a project.
-     * @param Container $container Symfony's container.
+     * @param ContainerInterface $container Symfony's container.
      * @return Project
      */
-    public static function getProject($projectIdent, Container $container)
+    public static function getProject($projectIdent, ContainerInterface $container)
     {
         $project = new Project($projectIdent);
         $projectRepo = new ProjectRepository();
@@ -38,13 +48,26 @@ class ProjectRepository extends Repository
 
     /**
      * Get the XTools default project.
-     * @param Container $container
+     * @param ContainerInterface $container
      * @return Project
      */
-    public static function getDefaultProject(Container $container)
+    public static function getDefaultProject(ContainerInterface $container)
     {
         $defaultProjectName = $container->getParameter('default_project');
         return self::getProject($defaultProjectName, $container);
+    }
+
+    /**
+     * Get the global 'meta' project, which is either Meta (if this is Labs) or the default project.
+     * @return Project
+     */
+    public function getGlobalProject()
+    {
+        if ($this->isLabs()) {
+            return self::getProject('metawiki', $this->container);
+        } else {
+            return self::getDefaultProject($this->container);
+        }
     }
 
     /**
@@ -68,12 +91,32 @@ class ProjectRepository extends Repository
      */
     public function getAll()
     {
+        $this->log->debug(__METHOD__." Getting all projects' metadata");
+        // Single wiki mode?
         if ($this->singleMetadata) {
             return [$this->getOne('')];
         }
+
+        // Maybe we've already fetched it.
+        if ($this->cache->hasItem($this->cacheKeyAllProjects)) {
+            return $this->cache->getItem($this->cacheKeyAllProjects)->get();
+        }
+
+        // Otherwise, fetch all from the database.
         $wikiQuery = $this->getMetaConnection()->createQueryBuilder();
         $wikiQuery->select(['dbname', 'url'])->from('wiki');
-        return $wikiQuery->execute()->fetchAll();
+        $projects = $wikiQuery->execute()->fetchAll();
+        $projectsMetadata = [];
+        foreach ($projects as $project) {
+            $projectsMetadata[$project['dbname']] = $project;
+        }
+
+        // Cache and return.
+        $cacheItem = $this->cache->getItem($this->cacheKeyAllProjects);
+        $cacheItem->set($projectsMetadata);
+        $cacheItem->expiresAfter(new \DateInterval('P1D'));
+        $this->cache->save($cacheItem);
+        return $projectsMetadata;
     }
 
     /**
@@ -83,12 +126,24 @@ class ProjectRepository extends Repository
      */
     public function getOne($project)
     {
+        $this->log->debug(__METHOD__." Getting metadata about $project");
         // For single-wiki setups, every project is the same.
         if ($this->singleMetadata) {
             return $this->singleMetadata;
         }
 
         // For muli-wiki setups, first check the cache.
+        // First the all-projects cache, then the individual one.
+        if ($this->cache->hasItem($this->cacheKeyAllProjects)) {
+            foreach ($this->cache->getItem($this->cacheKeyAllProjects)->get() as $projMetadata) {
+                if ($projMetadata['dbname'] == "$project"
+                    || $projMetadata['url'] == "$project"
+                    || $projMetadata['url'] == "https://$project") {
+                    $this->log->debug(__METHOD__ . " Using cached data for $project");
+                    return $projMetadata;
+                }
+            }
+        }
         $cacheKey = "project.$project";
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
@@ -133,7 +188,7 @@ class ProjectRepository extends Repository
         if ($this->metadata) {
             return $this->metadata;
         }
-        
+
         $api = MediawikiApi::newFromPage($projectUrl);
 
         $params = ['meta' => 'siteinfo', 'siprop' => 'general|namespaces'];
@@ -191,5 +246,69 @@ class ProjectRepository extends Repository
         }
 
         return $this->metadata;
+    }
+
+    /**
+     * Get a list of projects that have opted in to having all their users' restricted statistics
+     * available to anyone.
+     *
+     * @return string[]
+     */
+    public function optedIn()
+    {
+        $optedIn = $this->container->getParameter('opted_in');
+        // In case there's just one given.
+        if (!is_array($optedIn)) {
+            $optedIn = [ $optedIn ];
+        }
+        return $optedIn;
+    }
+
+    /**
+     * The path to api.php
+     *
+     * @return string
+     */
+    public function getApiPath()
+    {
+        return $this->container->getParameter('api_path');
+    }
+
+    /**
+     * Get a page from the given Project.
+     * @param Project $project The project.
+     * @param string $pageName The name of the page.
+     * @return Page
+     */
+    public function getPage(Project $project, $pageName)
+    {
+        $pageRepo = new PagesRepository();
+        $pageRepo->setContainer($this->container);
+        $page = new Page($project, $pageName);
+        $page->setRepository($pageRepo);
+        return $page;
+    }
+
+    /**
+     * Check to see if a page exists on this project and has some content.
+     * @param Project $project The project.
+     * @param int $namespaceId The page namespace ID.
+     * @param string $pageTitle The page title, without namespace.
+     * @return bool
+     */
+    public function pageHasContent(Project $project, $namespaceId, $pageTitle)
+    {
+        $conn = $this->getProjectsConnection();
+        $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
+        $query = "SELECT page_id "
+             . " FROM $pageTable "
+             . " WHERE page_namespace = :ns AND page_title = :title AND page_len > 0 "
+             . " LIMIT 1";
+        $params = [
+            'ns' => $namespaceId,
+            'title' => $pageTitle,
+        ];
+        $pages = $conn->executeQuery($query, $params)->fetchAll();
+        return count($pages) > 0;
     }
 }

@@ -1,21 +1,34 @@
 <?php
+/**
+ * This file contains only the ApiControllerTest class.
+ */
 
 namespace Tests\AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
 
+/**
+ * Integration tests for XTools' external API.
+ * @group integration
+ */
 class ApiControllerTest extends WebTestCase
 {
-    /** @var Container */
+    /** @var Container The DI container. */
     protected $container;
 
+    /**
+     * Create the HTTP client and get the DI container.
+     */
     public function setUp()
     {
         $client = static::createClient();
         $this->container = $client->getContainer();
     }
 
+    /**
+     * Test that we can retrieve the namespace information.
+     */
     public function testNamespaces()
     {
         $client = static::createClient();

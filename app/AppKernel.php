@@ -3,15 +3,14 @@
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 
-// MRB - Local System Workaround
-date_default_timezone_set("America/Denver");
-
 class AppKernel extends Kernel
 {
     public function registerBundles()
     {
 
         $bundles = [
+            new Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle(),
+            new Symfony\Bundle\WebServerBundle\WebServerBundle(),
             new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
             new Symfony\Bundle\SecurityBundle\SecurityBundle(),
             new Symfony\Bundle\TwigBundle\TwigBundle(),

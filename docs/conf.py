@@ -5,8 +5,8 @@
 source_suffix = '.rst'
 master_doc = 'index'
 
-project = u'xTools'
-copyright = u'2008-2017, xTools Maintainers'
+project = u'XTools'
+copyright = u'2008-2017, STools Maintainers'
 
 version = '0.2.0'
 

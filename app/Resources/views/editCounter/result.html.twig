@@ -1,4 +1,6 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/layout.html.twig' as layout %}
+{% import 'macros/wiki.html.twig' as wiki %}
 
 {% block body %}
 
@@ -7,100 +9,154 @@
         <div class="text-center xt-heading-top">
             <a class="back-to-search" href="{{ path('ec') }}">
                 <span class="glyphicon glyphicon-chevron-left"></span>
-                Back
+                {{ msg('back') }}
             </a>
-            {{ user_link(user.username, project.url) }}
+            {{ wiki.userLink(user, project) }}
             <small> &bull; {{ project.title }} </small>
         </div>
     </header>
 
-    <div class="panel-body xt-panel-body-top">
-        <p class="text-center xt-heading-subtitle">&middot;
-            {{ user_log_link(user.username, project.domain) }} &middot;
-            {% if is_labs %}
-                <a href="https://tools.wmflabs.org/guc/?user={{ user.username }}" >{{ msg('global_contribs') }}</a> &middot;
-                <a href="https://meta.wikimedia.org/w/index.php?title=Special%3ACentralAuth&target={{ user.username }}" >{{ msg('global-account-manager') }}</a> &middot;
-                <a href="https://tools.wmflabs.org/quentinv57-tools/tools/sulinfo.php?username={{ user.username }}" >{{ msg('sul-info') }}</a> &middot;
-                <a href="https://tools.wmflabs.org/wikiviewstats/?lang=en&wiki=wikipedia&page=User:{{ user.username }}*" >{{ msg('pageviews-in-userspace') }}</a> &middot;
+    <div class="panel-body xt-panel-body">
+        <p class="text-center xt-heading-subtitle">
+            {{ wiki.userLogLink(user, project) }}
+            &middot;
+            {% if isWMFLabs() %}
+                <a href="https://tools.wmflabs.org/guc/?user={{ user.username }}" >{{ msg('global-contribs') }}</a>
+                &middot;
+            {% endif %}
+            {% if not(isSingleWiki()) %}
+                {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, msg('sul-info')) }}
+                &middot;
+            {% endif %}
+            {% if isWMFLabs() %}
+                <a target="_blank" href="//tools.wmflabs.org/pageviews/?project={{ project.domain }}&amp;pages=User:{{ user.username }}">{{ msg('pageviews-userpage') }}</a>
             {% endif %}
         </p>
 
-        <div class="panel panel-default" id="generalstats">
-            <div class="panel-heading">
-                <h4 class="topcaption">{{ msg("generalstats") }}</h4>
-            </div>
-            <div class="panel-body" id="generalstats">
-                {{ render(path('EditCounterGeneralStats', {
-                    'username': user.username,
-                    'project': project.domain
-                })) }}
-            </div>
+        <div class="text-center xt-toc">
+            {% set sections = ['general-stats', 'namespace-totals', 'year-counts', 'month-counts', 'timecard', 'latest-global-edits', 'auto-edits'] %}
+
+            {% for section in sections %}
+                <span>
+                    <a href="#{{ section }}" data-section="{{ section }}">{{ msg(section) }}</a>
+                </span>
+            {% endfor %}
         </div>
 
-        <div class="panel panel-default" id="namespacetotals">
-            <div class="panel-heading"><h4>{{ msg('namespacetotals') }}</h4></div>
-            <div class="panel-body">
-                {{ include( 'editCounter/namespace_totals.html.twig' ) }}
-            </div>
-        </div>
+        {% set content %}
+            {{ render(path('EditCounterGeneralStats', {
+                'username': user.username,
+                'project': project.domain
+            })) }}
+        {% endset %}
+        {% set headerLink %}
+            <a href="{{ path('EditCounterGeneralStats', {project:project.domain, username:user.username})}}">{{ msg("general-stats") }}</a>
+        {% endset %}
+        {{ layout.content_block(headerLink, content, '', 'general-stats', true) }}
 
-        <div class="panel panel-default" id="yearcounts">
-            <div class="panel-heading"><h4>{{ msg('yearcounts') }}</h4></div>
-            <div class="panel-body">
-                {{ render(path('EditCounterYearCounts', {
-                    'username': user.username,
-                    'project': project.domain
-                })) }}
-            </div>
-        </div>
+        {% set content %}
+            {{ render(path('EditCounterNamespaceTotals', {
+                'username': user.username,
+                'project': project.domain
+            })) }}
+        {% endset %}
+        {% set headerLink %}
+            <a href="{{ path('EditCounterNamespaceTotals', {project:project.domain, username:user.username})}}">{{ msg('namespace-totals') }}</a>
+        {% endset %}
+        {{ layout.content_block(headerLink, content, '', 'namespace-totals', true) }}
 
-        <div class="panel panel-default" id="timecard">
-            <div class="panel-heading"><h4>{{ msg('timecard') }}</h4></div>
-            <div class="panel-body">
-                {{ render(path('EditCounterTimeCard', {
-                    'username': user.username,
-                    'project': project.domain
-                })) }}
-            </div>
-        </div>
+        {% set content %}
+            {{ render(path('EditCounterYearCounts', {
+                'username': user.username,
+                'project': project.domain
+            })) }}
+        {% endset %}
+        {% set headerLink %}
+            <a href="{{ path('EditCounterYearCounts', {project:project.domain, username:user.username})}}">{{ msg('year-counts') }}</a>
+        {% endset %}
+        {{ layout.content_block(headerLink, content, '', 'year-counts', true) }}
 
-        <div class="panel panel-default" id="latestglobal">
-            <div class="panel-heading">
-                <h4>{{ msg('latest-global-edits') }} <small>{{ msg('latest-global-edits-desc') }}</small></h4>
-            </div>
-            <div class="panel-body">
-                {{ render(path('EditCounterLatestGlobal', {
-                    'username': user.username,
-                    'project': project.domain
-                })) }}
-            </div>
-        </div>
+        {% set content %}
+            {{ render(path('EditCounterMonthCounts', {
+                'username': user.username,
+                'project': project.domain
+            })) }}
+        {% endset %}
+        {% set headerLink %}
+            <a href="{{ path('EditCounterMonthCounts', {project:project.domain, username:user.username})}}">
+                {{ msg('month-counts') }}
+            </a>
+        {% endset %}
+        {{ layout.content_block(headerLink, content, '', 'month-counts', true) }}
 
-        <div class="panel panel-default" id="monthcounts">
-            <div class="panel-heading"><h4>{{ msg('monthcounts') }}</h4></div>
-            <div class="panel-body">
-                {{ render(path('EditCounterMonthCounts', {
-                    'username': user.username,
-                    'project': project.domain
-                })) }}
-            </div>
-        </div>
+        {% set content %}
+            {{ render(path('EditCounterTimecard', {
+                'username': user.username,
+                'project': project.domain
+            })) }}
+        {% endset %}
+        {% set headerLink %}
+            <a href="{{ path('EditCounterTimecard', {project:project.domain, username:user.username})}}">{{ msg('timecard') }}</a>
+        {% endset %}
+        {{ layout.content_block(headerLink, content, '', 'timecard', true) }}
 
-        <div class="panel panel-default" id="autoeditslist">
-            <div class="panel-heading">
-                <h4>{{ msg('autoedits') }}</h4>
+        {% set content %}
+            <div id="latestglobal-container" data-username="{{ user.username }}" data-project="{{ project.domain }}">
+                <img src="{{ asset('static/images/loader.gif') }}" />
             </div>
-            <div class="panel-body">
-                <table class="table">
-                    {% for tool,count in auto_edits %}
+        {% endset %}
+        {% set headerLink %}
+            <a href="{{ path('EditCounterLatestGlobal', {project:project.domain, username:user.username})}}">{{ msg('latest-global-edits') }}</a>
+        {% endset %}
+        {{ layout.content_block(headerLink, content, '', 'latest-global-edits', true) }}
+
+        {% set content %}
+            {% if ec.automatedRevisionsSummary %}
+                <table class="table table-bordered table-hover table-striped autoedits-table">
+                    <thead><tr>
+                        {% for key in ['tool', 'count'] %}
+                            <th>
+                                <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
+                                    {{ msg(key) | capitalize_first }}
+                                    <span class="glyphicon glyphicon-sort"></span>
+                                </span>
+                            </th>
+                        {% endfor %}
+                    </tr></thead>
+                    <tbody>
+                    {% set toolsCountSum = 0 %}
+                    {% for tool,count in ec.automatedRevisionsSummary %}
+                        {% set toolsCountSum = toolsCountSum + count %}
                         <tr>
-                            <th>{{ tool }}</th>
-                            <td>{{ count|number_format }}</td>
+                            <td class="sort-entry--tool" data-value="{{ tool }}">
+                                {{ tool }}
+                            </td>
+                            <td class="sort-entry--count" data-value="{{ count }}">
+                                {{ count|number_format }}
+                            </td>
                         </tr>
                     {% endfor %}
+                    </tbody>
+                    <tfoot><tr>
+                        <th>
+                            {{ ec.automatedRevisionsSummary|length }}
+                            {{ msg('num-tools', [ec.automatedRevisionsSummary|length]) }}
+                        </th>
+                        <th>
+                            {{ toolsCountSum|number_format }}
+                        </th>
+                    </tr></tfoot>
                 </table>
-            </div>
-        </div>
+            {% else %}
+                <div class="alert alert-success">
+                    <p>{{ msg('no-revisions') }}</p>
+                </div>
+            {% endif %}
+        {% endset %}
+        {% set headerLink %}
+            <a href="{{ path('autoeditsResult', {project:project.domain, username:user.username})}}">{{ msg('auto-edits') }}</a>
+        {% endset %}
+        {{ layout.content_block(headerLink, content, '', 'auto-edits', true) }}
 
     </div>
 </div>

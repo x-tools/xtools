@@ -1,20 +1,31 @@
 <?php
+/**
+ * This file contains only the QuoteController class.
+ */
 
 namespace AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Component\Debug\Exception\ContextErrorException;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\HttpFoundation\Request;
 
-// A quick note: This tool is referred to as "bash" in much of
-// the legacy code base.  As such, the terms "quote" and
-// "bash" are used interchangeably here, so as to not break
-// many conventions.
-
+/**
+ * A quick note: This tool is referred to as "bash" in much of the legacy code base.  As such,
+ * the terms "quote" and "bash" are used interchangeably here, so as to not break many conventions.
+ */
 class QuoteController extends Controller
 {
+
+    /**
+     * Get the tool's shortname.
+     * @return string
+     */
+    public function getToolShortname()
+    {
+        return 'bash';
+    }
+
     /**
      * Method for rendering the Bash Main Form.
      * This method redirects if valid parameters are found, making it a
@@ -29,10 +40,6 @@ class QuoteController extends Controller
      */
     public function indexAction(Request $request)
     {
-        // Check if enabled
-        $lh = $this->get("app.labs_helper");
-        $lh->checkEnabled("bash");
-
         // Check to see if the quote is a param.  If so,
         // redirect to the proper route.
         if ($request->query->get('id') != '') {
@@ -65,10 +72,6 @@ class QuoteController extends Controller
      */
     public function randomQuoteAction()
     {
-        // Check if enabled
-        $lh = $this->get("app.labs_helper");
-        $lh->checkEnabled("bash");
-
         // Choose a random quote by ID.
         // if we can't find the quotes, return back to  the main form with
         // a flash notice.
@@ -92,10 +95,6 @@ class QuoteController extends Controller
      */
     public function quoteAllAction()
     {
-        // Check if enabled
-        $lh = $this->get("app.labs_helper");
-        $lh->checkEnabled("bash");
-
         // Load up an array of all the quotes.
         // if we can't find the quotes, return back to  the main form with
         // a flash notice.
@@ -131,9 +130,6 @@ class QuoteController extends Controller
      */
     public function quoteAction($id)
     {
-        $lh = $this->get("app.labs_helper");
-        $lh->checkEnabled("bash");
-
         // Get the singular quote.
         // if we can't find the quotes, return back to  the main form with
         // a flash notice.

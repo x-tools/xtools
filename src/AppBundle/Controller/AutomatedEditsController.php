@@ -1,31 +1,48 @@
 <?php
+/**
+ * This file contains only the AutomatedEditsController class.
+ */
 
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Response;
+use Xtools\ProjectRepository;
+use Xtools\User;
 
+/**
+ * This controller serves the AutomatedEdits tool.
+ */
 class AutomatedEditsController extends Controller
 {
+
     /**
+     * Get the tool's shortname.
+     * @return string
+     */
+    public function getToolShortname()
+    {
+        return 'autoedits';
+    }
+
+    /**
+     * Display the search form.
      * @Route("/autoedits", name="autoedits")
      * @Route("/automatededits", name="autoeditsLong")
      * @Route("/autoedits/index.php", name="autoeditsIndexPhp")
      * @Route("/automatededits/index.php", name="autoeditsLongIndexPhp")
+     * @param Request $request The HTTP request.
+     * @return Response
      */
-
     public function indexAction(Request $request)
     {
-        // Pull the labs helper and check if enabled
-        $lh = $this->get("app.labs_helper");
-        $lh->checkEnabled("autoedits");
-
         // Pull the values out of the query string. These values default to
         // empty strings.
         $project = $request->query->get('project');
-        $username = $request->query->get('username');
+        $username = $request->query->get('username', $request->query->get('user'));
         $startDate = $request->query->get('start');
         $endDate = $request->query->get('end');
 
@@ -67,105 +84,123 @@ class AutomatedEditsController extends Controller
             );
         }
 
-        // set default wiki so we can populate the namespace selector
+        /** @var ApiHelper */
+        $api = $this->get("app.api_helper");
+
+        // Set default project so we can populate the namespace selector.
         if (!$project) {
             $project = $this->container->getParameter('default_project');
         }
 
-        /** @var ApiHelper */
-        $api = $this->get("app.api_helper");
+        $projectData = ProjectRepository::getProject($project, $this->container);
 
-        // TODO: add namespace support
+        // Default values for the variables to keep the template happy
+        $namespaces = null;
+
+        // If the project exists, actually populate the values
+        if ($projectData->exists()) {
+            $namespaces = $projectData->getNamespaces();
+        }
+
         return $this->render('autoEdits/index.html.twig', [
             'xtPageTitle' => 'tool-autoedits',
             'xtSubtitle' => 'tool-autoedits-desc',
             'xtPage' => 'autoedits',
-            'project' => $project,
-            // 'namespaces' => $api->namespaces($project),
+            'project' => $projectData,
+            'namespaces' => $namespaces,
         ]);
     }
 
     /**
+     * Display the results.
      * @Route("/autoedits/{project}/{username}/{start}/{end}", name="autoeditsResult")
+     * @param $project
+     * @param $username
+     * @param null $start
+     * @param null $end
+     * @return RedirectResponse|Response
      */
     public function resultAction($project, $username, $start = null, $end = null)
     {
         // Pull the labs helper and check if enabled
-        $lh = $this->get("app.labs_helper");
-        $lh->checkEnabled("autoedits");
+        $lh = $this->get('app.labs_helper');
 
-        // Pull information about the project from the Labs Helper
-        $dbValues = $lh->databasePrepare($project, "AutomatedEdits");
+        // Pull information about the project
+        $projectData = ProjectRepository::getProject($project, $this->container);
 
-        $dbName = $dbValues["dbName"];
-        $wikiName = $dbValues["wikiName"];
-        $projectUrl = $dbValues["url"];
+        if (!$projectData->exists()) {
+            $this->addFlash('notice', ['invalid-project', $project]);
+            return $this->redirectToRoute('autoedits');
+        }
+
+        $dbName = $projectData->getDatabaseName();
+        $projectUrl = $projectData->getUrl();
 
         // Grab our database connection
-        $dbh = $this->get('doctrine')->getManager("replicas")->getConnection();
+        $dbh = $this->get('doctrine')->getManager('replicas')->getConnection();
 
-        // Variable parsing.
-        // Username needs to be uppercase first (yay Mediawiki),
-        // and we also need to handle undefined dates.
-        $username = ucfirst($username);
-
+        // Validating the dates. If the dates are invalid, we'll redirect
+        // to the project and username view.
         $invalidDates = (
             (isset($start) && strtotime($start) === false) ||
             (isset($end) && strtotime($end) === false)
         );
-
-        // Validating the dates. If the dates are invalid, we'll redirect
-        // to the project and username view.
         if ($invalidDates) {
             // Make sure to add the flash notice first.
-            $this->addFlash("notice", ["invalid-date"]);
+            $this->addFlash('notice', ['invalid-date']);
 
             // Then redirect us!
             return $this->redirectToRoute(
-                "autoeditsResult",
+                'autoeditsResult',
                 [
-                    "project" => $project,
-                    "username" => $username,
+                    'project' => $project,
+                    'username' => $username,
                 ]
             );
         }
 
+        $user = new User($username);
+        $username = $user->getUsername(); // use normalized user name
+
         // Now, load the semi-automated edit types.
-        $AEBTypes = $this->getParameter("automated_tools");
+        $AEBTypes = $this->getParameter('automated_tools');
 
         // Create a collection of queries that we're going to run.
         $queries = [];
 
-        $revisionTable = $lh->getTable("revision", $dbName);
-        $archiveTable = $lh->getTable("archive", $dbName);
+        $revisionTable = $lh->getTable('revision', $dbName);
+        $archiveTable = $lh->getTable('archive', $dbName);
 
-        $cond_begin = $start ? " AND rev_timestamp > :start " : null;
-        $cond_end = $end ? " AND rev_timestamp < :end ": null;
+        $condBegin = $start ? " AND rev_timestamp > :start " : null;
+        $condEnd = $end ? " AND rev_timestamp < :end ": null;
 
-        foreach ($AEBTypes as $toolname => $check) {
+        $regexes = [];
+
+        foreach ($AEBTypes as $toolname => $values) {
             $toolname = $dbh->quote($toolname, \PDO::PARAM_STR);
-            $check = $dbh->quote($check, \PDO::PARAM_STR);
+            $regexes[] = $values['regex'];
+            $regex = $dbh->quote($values['regex'], \PDO::PARAM_STR);
 
             $queries[] .= "
                 SELECT $toolname AS toolname, COUNT(*) AS count
                 FROM $revisionTable
                 WHERE rev_user_text = :username
-                AND rev_comment REGEXP $check
-                $cond_begin
-                $cond_end
+                AND rev_comment REGEXP $regex
+                $condBegin
+                $condEnd
             ";
         }
 
         // Query to get combined (semi)automated using for all edits
         // (some automated edits overlap)
-        $allAETools = $dbh->quote(implode('|', $AEBTypes), \PDO::PARAM_STR);
+        $allAETools = $dbh->quote(implode('|', $regexes), \PDO::PARAM_STR);
         $queries[] = "
             SELECT 'total_live' AS toolname, COUNT(*) AS count
             FROM $revisionTable
             WHERE rev_user_text = :username
             AND rev_comment REGEXP $allAETools
-            $cond_begin
-            $cond_end
+            $condBegin
+            $condEnd
         ";
 
         // Next, add two simple queries for the live and deleted edits.
@@ -173,29 +208,29 @@ class AutomatedEditsController extends Controller
             SELECT 'live' AS toolname, COUNT(*) AS count
             FROM $revisionTable
             WHERE rev_user_text = :username
-            $cond_begin
-            $cond_end
+            $condBegin
+            $condEnd
         ";
 
-        $cond_begin = str_replace("rev_timestamp", "ar_timestamp", $cond_begin);
-        $cond_end = str_replace("rev_timestamp", "ar_timestamp", $cond_end);
+        $condBegin = str_replace('rev_timestamp', 'ar_timestamp', $condBegin);
+        $condEnd = str_replace('rev_timestamp', 'ar_timestamp', $condEnd);
 
         $queries[] = "
             SELECT 'deleted' AS toolname, COUNT(*) AS count
             FROM $archiveTable
             WHERE ar_user_text = :username
-            $cond_begin
-            $cond_end
+            $condBegin
+            $condEnd
         ";
 
         // Create a big query and execute.
-        $stmt = implode(" UNION ", $queries);
+        $stmt = implode(' UNION ', $queries);
 
         $sth = $dbh->prepare($stmt);
 
-        $sth->bindParam("username", $username);
-        $sth->bindParam("start", $start);
-        $sth->bindParam("end", $end);
+        $sth->bindParam('username', $username);
+        $sth->bindParam('start', $start);
+        $sth->bindParam('end', $end);
 
         $sth->execute();
 
@@ -209,14 +244,18 @@ class AutomatedEditsController extends Controller
             // the live edits or deleted edits.
             // If it is neither and greater than 0,
             // add them to the array we're rendering and to our running total
-            if ($row["toolname"] === "live") {
-                $total += $row["count"];
-            } elseif ($row["toolname"] === "deleted") {
-                $total += $row["count"];
-            } elseif ($row["toolname"] === "total_live") {
-                $total_semi = $row["count"];
-            } elseif ($row["count"] > 0) {
-                $results[$row["toolname"]] = $row["count"];
+            $tool = $row['toolname'];
+            if ($tool === 'live') {
+                $total += $row['count'];
+            } elseif ($tool === 'deleted') {
+                $total += $row['count'];
+            } elseif ($tool === 'total_live') {
+                $total_semi = $row['count'];
+            } elseif ($row['count'] > 0) {
+                $results[$tool] = [
+                    'link' => $AEBTypes[$tool]['link'],
+                    'count' => $row['count'],
+                ];
             }
         }
 
@@ -227,7 +266,9 @@ class AutomatedEditsController extends Controller
         }
 
         // Sort the array and do some simple math.
-        arsort($results);
+        uasort($results, function ($a, $b) {
+            return $b['count'] - $a['count'];
+        });
 
         if ($total != 0) {
             $total_pct = ($total_semi / $total) * 100;
@@ -236,11 +277,10 @@ class AutomatedEditsController extends Controller
         }
 
         $ret = [
-            'xtPage' => "autoedits",
+            'xtPage' => 'autoedits',
             'xtTitle' => $username,
-            'username' => $username,
-            'projectUrl' => $projectUrl,
-            'project' => $project,
+            'user' => $user,
+            'project' => $projectData,
             'semi_automated' => $results,
             'total_semi' => $total_semi,
             'total' => $total,

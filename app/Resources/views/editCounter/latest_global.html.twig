@@ -1,33 +1,79 @@
 {% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
+{% import 'macros/wiki.html.twig' as wiki %}
 
 {% block body %}
 
-<table class="table-striped table-condensed sortable xt-table">
-    <thead>
-        <tr>
-            <th>{{ msg('ec-latestglobal-time') }}</th>
-            <th>{{ msg('ec-latestglobal-project') }}</th>
-            <th>{{ msg('ec-latestglobal-actions') }}</th>
-            <th>{{ msg('ec-latestglobal-page') }}</th>
-            <th>{{ msg('ec-latestglobal-comment') }}</th>
-        </tr>
-    </thead>
+{% if not is_sub_request %}
+    <div class="panel panel-primary">
+        <header class="panel-heading">
+            <div class="text-center xt-heading-top">
+                <a class="back-to-search" href="{{ path('ec') }}">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                    {{ msg('back') }}
+                </a>
+                {{ wiki.userLink(user, project) }}
+                <small> &bull; {{ project.title }} </small>
+            </div>
+        </header>
+        <div class="panel-body xt-panel-body">
+            <section class="panel panel-default clearfix">
+                <header class="panel-heading col-lg-12">
+                    <h4>{{ msg('latest-global-edits') }}</h4>
+                </header>
+                <div class="panel-body col-lg-12">
+{% endif %}
+
+<table class="table table-bordered table-hover table-striped latest-global-table">
+    <thead><tr>
+        {% for key in ['date', 'project', 'links', 'page-title', 'size', 'comment'] %}
+            <th>
+                <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
+                    {% if key == 'average-time-bw-edits' %}
+                        atbe<sup>1</sup>
+                    {% else %}
+                        {{ msg(key)|capitalize_first }}
+                    {% endif %}
+                    {% if key == 'added_bytes' %}
+                        <sup class="rm-inline-margin-left">2</sup>
+                    {% endif %}
+                    {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
+                </span>
+            </th>
+        {% endfor %}
+    </tr></thead>
     <tbody>
-    {% for edit in latest_global_contribs %}
+    {% for edit in ec.globalEdits(40) %}
         <tr>
-            <td class="tddate">{{ edit.rev_time_formatted }}</td>
-            <td><a href="{{ edit.project_url }}">{{ edit.project_name }}</a></td>
-            <td>(
-                {{ diff_link(edit.rev_id, edit.project_url, 'diff') }}
-                &middot; {{ user_log_link(username, project, 'log') }}
-                &middot; <a href="{{ path('TopEditsResults', {project:edit.project_db_name, username:username, namespace:edit.page_namespace, article:edit.page_title}) }}">topedits</a>
-                )
+            <td class="sort-entry--date" data-value="{{ edit.timestamp.format('U') }}">
+                {{ wiki.permaLink(edit) }}
             </td>
-            <td class="tdtitle break">{{ wiki_link(edit.page_title, edit.project_url) }}</td>
-            <td class="revtext break">{{ edit.rev_comment }}</td>
+            <td class="sort-entry--project" data-value="{{ edit.project.domain }}">
+                {# Use project.domain here instead of title to preserve limited space in the interface #}
+                <a href="{{ edit.project.url }}">{{ edit.project.domain }}</a>
+            </td>
+            <td>
+                {{ wiki.diffLink(edit) }}
+                &middot;
+                {{ wiki.userLogLink(user, edit.project) }}
+                &middot;
+                <a href="{{ path('TopEditsResults', {project:edit.project.databaseName, username:user.username, namespace:edit.page.namespace, article:edit.page.title}) }}">{{ msg('tool-topedits') }}</a>
+            </td>
+            <td class="sort-entry--page-title" data-value="{{ edit.page.title }}">
+                {{ wiki.pageLink(edit.page, edit.page.displayTitle) }}
+            </td>
+            <td class="sort-entry--size" data-value="{{ edit.lengthChange }}">
+                {{ edit.lengthChange|diff_format }}
+            </td>
+            <td class="sort-entry--comment" data-value="{{ edit.comment }}">
+                {{ edit.comment|wikify_comment(edit.page.title, project.url) }}
+            </td>
         </tr>
     {% endfor %}
     </tbody>
 </table>
+
+{% if not is_sub_request %}
+    </div></section></div></div>
+{% endif %}
 
 {% endblock %}

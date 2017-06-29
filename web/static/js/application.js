@@ -1,5 +1,6 @@
 (function () {
-    var sortDirection, sortColumn, $tocClone, tocHeight, sectionOffset = {};
+    var sortDirection, sortColumn, $tocClone, tocHeight, sectionOffset = {},
+        toggleTableData, apiPath, lastProject;
 
     // Load translations with 'en.json' as a fallback
     var messagesToLoad = {};
@@ -23,24 +24,120 @@
             $(this).parents('.panel-heading').siblings('.panel-body').show();
         });
 
-        // Sorting of columns
-        //
-        //  Example usage:
-        //   {% for key in ['username', 'edits', 'minor', 'date'] %}
-        //      <th>
-        //         <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-        //            {{ msg(key) | capitalize }}
-        //            <span class="glyphicon glyphicon-sort"></span>
-        //         </span>
-        //      </th>
-        //  {% endfor %}
-        //   <th class="sort-link" data-column="username">Username</th>
-        //   ...
-        //   <td class="sort-entry--username" data-value="{{ username }}">{{ username }}</td>
-        //   ...
-        //
-        // Data type is automatically determined, with support for integer,
-        //   floats, and strings, including date strings (e.g. "2016-01-01 12:59")
+        setupColumnSorting();
+        setupTOC();
+        setupProjectListener();
+        setupAutocompletion();
+    });
+
+    /**
+     * Script to make interactive toggle table and pie chart.
+     * For visual example, see the "Semi-automated edits" section of the AutoEdits tool.
+     *
+     * Example usage (see autoEdits/result.html.twig and js/autoedits.js for more):
+     *     <table class="table table-bordered table-hover table-striped toggle-table">
+     *         <thead>...</thead>
+     *         <tbody>
+     *             {% for tool, values in semi_automated %}
+     *             <tr>
+     *                 <!-- use the 'linked' class here because the cell contains a link -->
+     *                 <td class="sort-entry--tool linked" data-value="{{ tool }}">
+     *                     <span class="toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ tool }}">
+     *                         <span class="glyphicon glyphicon-remove"></span>
+     *                         <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
+     *                     </span>
+     *                     {{ wiki.pageLink(...) }}
+     *                 </td>
+     *                 <td class="sort-entry--count" data-value="{{ values.count }}">
+     *                     {{ values.count }}
+     *                 </td>
+     *             </tr>
+     *             {% endfor %}
+     *             ...
+     *         </tbody>
+     *     </table>
+     *     <div class="toggle-table--chart">
+     *         <canvas id="tool_chart" width="400" height="400"></canvas>
+     *     </div>
+     *     <script>
+     *         window.toolsChart = new Chart($('#tool_chart'), { ... });
+     *         window.countsByTool = {{ semi_automated | json_encode() | raw }};
+     *         ...
+     *
+     *         // See autoedits.js for more
+     *         window.setupToggleTable(window.countsByTool, window.toolsChart, 'count', function (newData) {
+     *             // update the totals in toggle table based on newData
+     *         });
+     *     </script>
+     *
+     * @param  {Object}   dataSource     Object of data that makes up the chart
+     * @param  {Chart}    chartObj       Reference to the pie chart associated with the .toggle-table
+     * @param  {String}   [valueKey]     The name of the key within entries of dataSource,
+     *                                   where the value is what's shown in the chart.
+     *                                   If omitted or null, `dataSource` is assumed to be of the structure:
+     *                                   { 'a' => 123, 'b' => 456 }
+     * @param  {Function} updateCallback Callback to update the .toggle-table totals. `toggleTableData`
+     *                                   is passed in which contains the new data, you just need to
+     *                                   format it (maybe need to use i18n, update multiple cells, etc.)
+     */
+    window.setupToggleTable = function (dataSource, chartObj, valueKey, updateCallback) {
+        $('.toggle-table').on('click', '.toggle-table--toggle', function () {
+            if (!toggleTableData) {
+                // must be cloned
+                toggleTableData = Object.assign({}, dataSource);
+            }
+
+            var index = $(this).data('index'),
+                key = $(this).data('key'),
+                $row = $(this).parents('tr');
+
+            // must use .attr instead of .prop as sorting script will clone DOM elements
+            if ($(this).attr('data-disabled') === 'true') {
+                toggleTableData[key] = dataSource[key];
+                var oldValue = parseInt(valueKey ? toggleTableData[key][valueKey] : toggleTableData[key], 10);
+                chartObj.data.datasets[0].data[index] = oldValue;
+                $(this).attr('data-disabled', 'false');
+            } else {
+                delete toggleTableData[key];
+                chartObj.data.datasets[0].data[index] = null;
+                $(this).attr('data-disabled', 'true');
+            }
+
+            // gray out row in table
+            $(this).parents('tr').toggleClass('excluded');
+
+            // change the hover icon from a 'x' to a '+'
+            $(this).find('.glyphicon').toggleClass('glyphicon-remove').toggleClass('glyphicon-plus');
+
+            // update stats
+            updateCallback(toggleTableData);
+
+            chartObj.update();
+        });
+    }
+
+    /**
+     * Sorting of columns
+     *
+     *  Example usage:
+     *   {% for key in ['username', 'edits', 'minor', 'date'] %}
+     *      <th>
+     *         <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
+     *            {{ msg(key) | capitalize }}
+     *            <span class="glyphicon glyphicon-sort"></span>
+     *         </span>
+     *      </th>
+     *  {% endfor %}
+     *   <th class="sort-link" data-column="username">Username</th>
+     *   ...
+     *   <td class="sort-entry--username" data-value="{{ username }}">{{ username }}</td>
+     *   ...
+     *
+     * Data type is automatically determined, with support for integer,
+     *   floats, and strings, including date strings (e.g. "2016-01-01 12:59")
+     */
+    function setupColumnSorting()
+    {
         $('.sort-link').on('click', function () {
             sortDirection = sortColumn === $(this).data('column') ? -sortDirection : 1;
 
@@ -76,14 +173,7 @@
 
             $table.find('tbody').html($(entries));
         });
-
-        setupTOC();
-
-        // if applicable, setup namespace selector with real time updates when changing projects
-        if ($('#project_input').length && $('#namespace_select').length) {
-            setupNamespaceSelector();
-        }
-    });
+    }
 
     /**
      * Floating table of contents
@@ -186,12 +276,47 @@
     }
 
     /**
-     * Use the wiki input field to populate the namespace selector
+     * Add listener to the project input field to update any
+     * namespace selectors and autocompletion fields.
+     */
+    function setupProjectListener()
+    {
+        // Stop here if there is no project field
+        if (!$("#project_input")) {
+            return;
+        }
+
+        // If applicable, setup namespace selector with real time updates when changing projects.
+        // This will also set `apiPath` so that autocompletion will query the right wiki.
+        if ($('#project_input').length && $('#namespace_select').length) {
+            setupNamespaceSelector();
+        // Otherwise, if there's a user or page input field, we still need to update `apiPath`
+        // for the user input autocompletion when the project is changed.
+        } else if ($('#user_input')[0] || $('#article_input')[0]) {
+            // keep track of last valid project
+            lastProject = $('#project_input').val();
+
+            $('#project_input').on('change', function () {
+                var newProject = this.value;
+
+                $.get(xtBaseUrl + 'api/normalizeProject/' + newProject).done(function (data) {
+                    // Keep track of project API path for use in page title autocompletion
+                    apiPath = data.api;
+                    lastProject = newProject;
+                    setupAutocompletion();
+                }).fail(revertToValidProject.bind(this, newProject));
+            });
+        }
+    }
+
+    /**
+     * Use the wiki input field to populate the namespace selector.
+     * This also updates `apiPath` and calls setupAutocompletion()
      */
     function setupNamespaceSelector()
     {
         // keep track of last valid project
-        var lastProject = $('#project_input').val();
+        lastProject = $('#project_input').val();
 
         $('#project_input').on('change', function () {
             // Disable the namespace selector and show a spinner while the data loads.
@@ -202,36 +327,150 @@
 
             var newProject = this.value;
 
-            $.get(xtBaseUrl + 'api/namespaces/' + newProject).done(function (namespaces) {
+            $.get(xtBaseUrl + 'api/namespaces/' + newProject).done(function (data) {
                 // Clone the 'all' option (even if there isn't one),
                 // and replace the current option list with this.
                 var $allOption = $('#namespace_select option[value="all"]').eq(0).clone();
                 $("#namespace_select").html($allOption);
+
+                // Keep track of project API path for use in page title autocompletion
+                apiPath = data.api;
+
                 // Add all of the new namespace options.
-                for (var ns in namespaces) {
+                for (var ns in data.namespaces) {
                     $('#namespace_select').append(
-                        "<option value=" + ns + ">" + namespaces[ns] + "</option>"
+                        "<option value=" + ns + ">" + data.namespaces[ns] + "</option>"
                     );
                 }
                 // Default to mainspace being selected.
                 $("#namespace_select").val(0);
                 lastProject = newProject;
-            }).fail(function () {
-                // revert back to last valid project
-                $('#project_input').val(lastProject);
-                // FIXME: i18n
-                $('.site-notice').append(
-                    "<div class='alert alert-warning alert-dismissible' role='alert'>" +
-                        $.i18n('invalid-project', "<strong>" + newProject + "</strong>") +
-                        "<button class='close' data-dismiss='alert' aria-label='Close'>" +
-                            "<span aria-hidden='true'>&times;</span>" +
-                        "</button>" +
-                    "</div>"
-                );
-            }).always(function () {
+
+                // Re-init autocompletion
+                setupAutocompletion();
+            }).fail(revertToValidProject.bind(this, newProject)).always(function () {
                 $('#namespace_select').prop('disabled', false);
                 $loader.addClass('hidden');
             });
         });
+
+        // If they change the namespace, update autocompletion,
+        // which will ensure only pages in the selected namespace
+        // show up in the autocompletion
+        $('#namespace_select').on('change', setupAutocompletion);
+    }
+
+    /**
+     * Called by setupNamespaceSelector or setupProjectListener
+     *   when the user changes to a project that doesn't exist.
+     * This throws a warning message and reverts back to the
+     *   last valid project.
+     * @param {string} newProject - project they attempted to add
+     */
+    function revertToValidProject(newProject)
+    {
+        $('#project_input').val(lastProject);
+        $('.site-notice').append(
+            "<div class='alert alert-warning alert-dismissible' role='alert'>" +
+                $.i18n('invalid-project', "<strong>" + newProject + "</strong>") +
+                "<button class='close' data-dismiss='alert' aria-label='Close'>" +
+                    "<span aria-hidden='true'>&times;</span>" +
+                "</button>" +
+            "</div>"
+        );
+    }
+
+    /**
+     * Setup autocompletion of pages if a page input field is present.
+     */
+    function setupAutocompletion()
+    {
+        var $articleInput = $('#article_input'),
+            $userInput = $('#user_input'),
+            $namespaceInput = $("#namespace_select");
+
+        // Make sure typeahead-compatible fields are present
+        if (!$articleInput[0] && !$userInput[0] && !$('#project_input')[0]) {
+            return;
+        }
+
+        // Destroy any existing instances
+        if ($articleInput.data('typeahead')) {
+            $articleInput.data('typeahead').destroy();
+        }
+        if ($userInput.data('typeahead')) {
+            $userInput.data('typeahead').destroy();
+        }
+
+        // set initial value for the API url, which is put as a data attribute in forms.html.twig
+        if (!apiPath) {
+            apiPath = $('#article_input').data('api') || $('#user_input').data('api');
+        }
+
+        // Defaults for typeahead options. preDispatch and preProcess will be
+        // set accordingly for each typeahead instance
+        var typeaheadOpts = {
+            url: apiPath,
+            timeout: 200,
+            triggerLength: 1,
+            method: 'get',
+            preDispatch: null,
+            preProcess: null,
+        };
+
+        if ($articleInput[0]) {
+            $articleInput.typeahead({
+                ajax: Object.assign(typeaheadOpts, {
+                    preDispatch: function (query) {
+                        // If there is a namespace selector, make sure we search
+                        // only within that namespace
+                        if ($namespaceInput[0] && $namespaceInput.val() !== '0') {
+                            var nsName = $namespaceInput.find('option:selected').text().trim();
+                            query = nsName + ':' + query;
+                        }
+                        return {
+                            action: 'query',
+                            list: 'prefixsearch',
+                            format: 'json',
+                            pssearch: query
+                        };
+                    },
+                    preProcess: function (data) {
+                        var nsName = '';
+                        // Strip out namespace name if applicable
+                        if ($namespaceInput[0] && $namespaceInput.val() !== '0') {
+                            nsName = $namespaceInput.find('option:selected').text().trim();
+                        }
+                        return data.query.prefixsearch.map(function (elem) {
+                            return elem.title.replace(new RegExp('^' + nsName + ':'), '');
+                        });
+                    },
+                })
+            });
+        }
+
+        if ($userInput[0]) {
+            $userInput.typeahead({
+                ajax: Object.assign(typeaheadOpts, {
+                    preDispatch: function (query) {
+                        return {
+                            action: 'query',
+                            list: 'prefixsearch',
+                            format: 'json',
+                            pssearch: 'User:' + query
+                        };
+                    },
+                    preProcess: function (data) {
+                        var results = data.query.prefixsearch.map(function (elem) {
+                            return elem.title.split('/')[0].substr(elem.title.indexOf(':') + 1);
+                        });
+
+                        return results.filter(function (value, index, array) {
+                            return array.indexOf(value) === index;
+                        });
+                    },
+                })
+            });
+        }
     }
 })();
