@@ -261,6 +261,7 @@ class EditCounterRepository extends Repository
     }
 
     /**
+     * Get data for all blocks set by the given user.
      * @param Project $project
      * @param User $user
      * @return array
@@ -277,6 +278,7 @@ class EditCounterRepository extends Repository
     }
 
     /**
+     * Get data for all blocks set on the given user.
      * @param Project $project
      * @param User $user
      * @return array

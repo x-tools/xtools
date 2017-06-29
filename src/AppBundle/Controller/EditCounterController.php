@@ -251,8 +251,9 @@ class EditCounterController extends Controller
     /**
      * Display the latest global edits section.
      * @Route("/ec-latestglobal/{project}/{username}", name="EditCounterLatestGlobal")
-     * @param string $project
-     * @param string $username
+     * @param Request $request The HTTP request.
+     * @param string $project The project name.
+     * @param string $username The username.
      * @return Response
      */
     public function latestglobalAction(Request $request, $project, $username)
