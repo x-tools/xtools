@@ -87,7 +87,7 @@
 {% endspaceless %}{% endmacro %}
 
 {# `user` can be of type `User` or string (username) #}
-{% macro userLogLink(user, project, label = null, type = null) %}{% spaceless %}
+{% macro userLogLink(user, project, label = null, type = null, subtype = null) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {% if user.username is defined %}
         {% set username = user.username %}
@@ -97,6 +97,9 @@
     {% set url = project.url|trim('/') ~ project.script ~ '?title=Special:Log&action=view&user=' ~ username|replace({' ': '_'}) %}
     {% if type is not empty %}
         {% set url = url ~ '&type=' ~ type %}
+    {% endif %}
+    {% if subtype is not empty %}
+        {% set url = url ~ '&subtype=' ~ subtype %}
     {% endif %}
     {{ extLink(url, msg('log'), label) }}
 {% endspaceless %}{% endmacro %}

@@ -214,18 +214,24 @@
             {% else %}
                 <tr>
                     <td>{{ msg("block") }}</td>
-                    <td>{{ ec.countUsersBlocked|number_format }} ({{ ec.countBlocksLifted|number_format }}{{ msg('num-blocks', [ec.countBlocksSet]) }})</td>
+                    <td>
+                        {{ ec.countUsersBlocked|number_format }}
+                        ({{ wiki.userLogLink(user, project, ec.countBlocksSet|number_format, 'block', 'block') }} {{ msg('num-blocks', [ec.countBlocksSet]) }})
+                    </td>
                 </tr>
                 <tr>
                     <td>{{ msg("unblock") }}</td>
-                    <td>@TODO {# ec.countUsersUnblocked #} ({{ ec.countBlocksLifted|number_format }} {{ msg('num-blocks', [ec.countBlocksLifted]) }})</td>
+                    <td>
+                        @TODO {# ec.countUsersUnblocked #}
+                        ({{ wiki.userLogLink(user, project, ec.countBlocksLifted|number_format, 'block', 'unblock') }} {{ msg('num-blocks', [ec.countBlocksLifted]) }})
+                    </td>
                 </tr>
-                <tr><td>{{ msg("protect") }}</td><td>{{ ec.countPagesProtected|number_format }}</td></tr>
-                <tr><td>{{ msg("unprotect") }}</td><td>{{ ec.countPagesUnprotected|number_format }}</td></tr>
-                <tr><td>{{ msg("delete") }}</td><td>{{ ec.countPagesDeleted|number_format }}</td></tr>
+                <tr><td>{{ msg("protect") }}</td><td>{{ wiki.userLogLink(user, project, ec.countPagesProtected|number_format, 'protect', 'protect') }}</td></tr>
+                <tr><td>{{ msg("unprotect") }}</td><td>{{ wiki.userLogLink(user, project, ec.countPagesUnprotected|number_format, 'protect', 'unprotect') }}</td></tr>
+                <tr><td>{{ msg("delete") }}</td><td>{{ wiki.userLogLink(user, project, ec.countPagesDeleted|number_format, 'delete', 'delete') }}</td></tr>
                 <tr><td>{{ msg("deleted-edits") }})</td><td>{{ ec.countEditsDeleted|number_format }}</td></tr>
-                <tr><td>{{ msg("restore") }}</td><td>{{ ec.countPagesRestored|number_format }}</td></tr>
-                <tr><td>{{ msg("import") }}</td><td>{{ ec.countPagesImported|number_format }}</td></tr>
+                <tr><td>{{ msg("restore") }}</td><td>{{ wiki.userLogLink(user, project, ec.countPagesRestored|number_format, 'delete', 'restore') }}</td></tr>
+                <tr><td>{{ msg("import") }}</td><td>{{ wiki.userLogLink(user, project, ec.countPagesImported|number_format, 'import') }}</td></tr>
             {% endif %}
         </tbody>
 

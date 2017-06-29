@@ -378,15 +378,19 @@ class EditCounter extends Model
     }
 
     /**
-     * Get the total number of pages imported by the user.
+     * Get the total number of pages imported by the user (through any import mechanism:
+     * interwiki, or XML upload).
      * @return int
      */
     public function countPagesImported()
     {
         $logCounts = $this->getLogCounts();
-        return isset($logCounts['import-import']) ? (int)$logCounts['import-import'] : 0;
+        $import = isset($logCounts['import-import']) ? (int)$logCounts['import-import'] : 0;
+        $interwiki = isset($logCounts['import-interwiki']) ? (int)$logCounts['import-interwiki'] : 0;
+        $upload = isset($logCounts['import-upload']) ? (int)$logCounts['import-upload'] : 0;
+        return $import + $interwiki + $upload;
     }
-    
+
     /**
      * Get the average number of edits per page (including deleted revisions and pages).
      * @return float

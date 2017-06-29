@@ -228,6 +228,8 @@ class EditCounterRepository extends Repository
             'delete-revision',
             'delete-restore',
             'import-import',
+            'import-interwiki',
+            'import-upload',
             'upload-upload',
             'upload-overwrite',
         ];
