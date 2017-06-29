@@ -29,6 +29,16 @@ use Xtools\RFA;
  */
 class RfXAnalysisController extends Controller
 {
+
+    /**
+     * Get the tool's shortname.
+     * @return string
+     */
+    public function getToolShortname()
+    {
+        return 'rfa';
+    }
+
     /**
      * Renders the index page for the RfX Tool
      *
@@ -46,10 +56,6 @@ class RfXAnalysisController extends Controller
      */
     public function indexAction(Request $request, $project = null, $type = null)
     {
-        // Check if enabled
-        $lh = $this->get("app.labs_helper");
-        $lh->checkEnabled("rfa");
-
         $projectQuery = $request->get("project");
         $typeQuery = $request->get("type");
         $username = $request->get("username");
@@ -95,9 +101,7 @@ class RfXAnalysisController extends Controller
      */
     public function resultAction($project, $type, $username)
     {
-        $lh = $this->get("app.labs_helper");
         $api = $this->get("app.api_helper");
-        $lh->checkEnabled("rfa");
 
         $projectData = ProjectRepository::getProject($project, $this->container);
 

@@ -12,6 +12,16 @@ use Xtools\ProjectRepository;
 
 class RfXVoteCalculatorController extends Controller
 {
+
+    /**
+     * Get the tool's shortname.
+     * @return string
+     */
+    public function getToolShortname()
+    {
+        return 'rfap';
+    }
+
     /**
      * @Route("/rfap", name="rfap")
      * @Route("/rfap", name="RfXVoteCalculator")
@@ -19,9 +29,6 @@ class RfXVoteCalculatorController extends Controller
      */
     public function indexAction()
     {
-        $lh = $this->get("app.labs_helper");
-        $lh->checkEnabled("rfap");
-
         // Grab the request object, grab the values out of it.
         $request = Request::createFromGlobals();
 
@@ -48,9 +55,7 @@ class RfXVoteCalculatorController extends Controller
      */
     public function resultAction($project, $username)
     {
-        $lh = $this->get("app.labs_helper");
         $api = $this->get("app.api_helper");
-        $lh->checkEnabled("rfap");
 
         $projectData = ProjectRepository::getProject($project, $this->container);
 
