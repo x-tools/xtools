@@ -29,7 +29,7 @@ class DefaultControllerTest extends WebTestCase
         // Change language.
         $crawler = $client->request('GET', '/?uselang=es');
         $this->assertContains(
-            'Te damos la bienvenida a las herramientas de X!',
+            'Herramientas de X!',
             $crawler->filter('.splash-logo')->attr('alt')
         );
 

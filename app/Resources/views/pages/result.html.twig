@@ -21,14 +21,21 @@
     <div class="panel-body xt-panel-body">
         <p class="text-center xt-heading-subtitle">
             {{ wiki.userLogLink(user, project, msg('block-log'), 'block') }}
-            {% if isWMFLabs() %}
+            {% if enabled('ec') %}
                 &middot;
                 <a href="{{ path('ec', {'project':project.domain, 'username':user.username}) }}" >{{ msg('tool-ec') }}</a>
+            {% endif %}
+            {% if isWMFLabs() %}
                 &middot;
                 <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ user.username }}" >{{ msg('global-contribs') }}</a>
                 &middot;
-                {# FIXME: make this link go to what options are set here (redirects, namespace, etc.) #}
-                <a target="_blank" href="//tools.wmflabs.org/userviews/?project={{ project.domain }}&amp;user={{ user.username }}">{{ msg('pageviews-pages-created') }}</a>
+                {% set redirectParam = 0 %}
+                {% if redirect == 'onlyredirects' %}
+                    {% set redirectParam = 1 %}
+                {% elseif redirect == 'all' %}
+                    {% set redirectParam = 2 %}
+                {% endif %}
+                <a target="_blank" href="//tools.wmflabs.org/userviews/?project={{ project.domain }}&amp;user={{ user.username }}&amp;namespace={{ namespace }}&amp;redirects={{ redirectParam }}">{{ msg('pageviews-pages-created') }}</a>
             {% endif %}
         </p>
 

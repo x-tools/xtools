@@ -345,7 +345,6 @@ class ArticleInfoController extends Controller
         $pageLinksTable = $this->lh->getTable('pagelinks', $this->pageInfo['dbName']);
         $redirectTable = $this->lh->getTable('redirect', $this->pageInfo['dbName']);
 
-        // FIXME: Probably need to make the $title mysql-safe or whatever
         $query = "SELECT COUNT(*) AS value, 'links_ext' AS type
                   FROM $externalLinksTable WHERE el_from = $pageId
                   UNION
@@ -357,8 +356,10 @@ class ArticleInfoController extends Controller
                   UNION
                   SELECT COUNT(*) AS value, 'redirects' AS type
                   FROM $redirectTable WHERE rd_namespace = $namespace AND rd_title = \"$title\"";
-
-        $res = $this->conn->query($query)->fetchAll();
+        $statement = $this->conn->prepare($query);
+        $statement->bindParam('title', $title);
+        $statement->execute();
+        $res = $statement->fetchAll();
 
         $data = [];
 

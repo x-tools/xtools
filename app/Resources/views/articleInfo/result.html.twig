@@ -423,8 +423,7 @@
                             {{ wiki.userLink(bot, project) }}
                             {% if not bot_data.current %}
                                 <i>
-                                    {# FIXME: hard-coded /w/ script path #}
-                                    (<a target="_blank" href="{{ projectUrl }}/w/index.php?title=Special:Log&action=view&page=User:{{ bot }}&type=rights">{{ msg('former-bot') }}</a>)
+                                    ({{ wiki.pageLogLinkRaw('User:'~bot, project, msg('former-bot'), 'rights') }})
                                 </i>
                             {% endif %}
                         </td>
