@@ -8,6 +8,7 @@ namespace Xtools;
 use DateInterval;
 use Mediawiki\Api\SimpleRequest;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * This class provides data for the User class.
@@ -119,5 +120,16 @@ class UserRepository extends Repository
             $result = $res["query"]["globaluserinfo"]["groups"];
         }
         return $result;
+    }
+
+    /**
+     * Get information about the currently-logged in user.
+     * @return array
+     */
+    public function getXtoolsUserInfo()
+    {
+        /** @var Session $session */
+        $session = $this->container->get('session');
+        return $session->get('logged_in_user');
     }
 }

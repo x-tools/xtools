@@ -96,4 +96,14 @@ class User extends Model
     {
         return filter_var($this->username, FILTER_VALIDATE_IP);
     }
+
+    /**
+     * Is this user the same as the current XTools user?
+     * @return bool
+     */
+    public function isCurrentlyLoggedIn()
+    {
+        $ident = $this->getRepository()->getXtoolsUserInfo();
+        return isset($ident->username) && $ident->username === $this->getUsername();
+    }
 }

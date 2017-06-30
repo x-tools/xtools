@@ -209,7 +209,12 @@ class Project extends Model
             return true;
         }
 
-        // 2. Then see if the user has opted in on this project.
+        // 2. Then see if the currently-logged-in user is requesting their own statistics.
+        if ($user->isCurrentlyLoggedIn()) {
+            return true;
+        }
+
+        // 3. Then see if the user has opted in on this project.
         $userNsId = 2;
         $localExists = $this->getRepository()
             ->pageHasContent($this, $userNsId, $this->userOptInPage($user));
@@ -217,7 +222,7 @@ class Project extends Model
             return true;
         }
 
-        // 3. Lastly, see if they've opted in globally on the default project or Meta.
+        // 4. Lastly, see if they've opted in globally on the default project or Meta.
         $globalPageName = $user->getUsername() . '/EditCounterGlobalOptIn.js';
         $globalProject = $this->getRepository()->getGlobalProject();
         if ($globalProject instanceof Project) {
