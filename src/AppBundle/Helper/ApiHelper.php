@@ -161,48 +161,6 @@ class ApiHelper extends HelperBase
     }
 
     /**
-     * Get basic info about a page via the API
-     * @param  string  $project      Full domain of project (en.wikipedia.org)
-     * @param  string  $page         Page title
-     * @param  boolean $followRedir  Whether or not to resolve redirects
-     * @return array   Associative array of data
-     */
-    public function getBasicPageInfo($project, $page, $followRedir)
-    {
-        $this->setUp($project);
-
-        // @TODO: Also include 'extlinks' prop when we start checking for dead external links.
-        $params = [
-            'prop' => 'info|pageprops',
-            'inprop' => 'protection|talkid|watched|watchers|notificationtimestamp|subjectid|url|readable',
-            'converttitles' => '',
-            // 'ellimit' => 20,
-            // 'elexpandurl' => '',
-            'titles' => $page,
-            'formatversion' => 2
-            // 'pageids' => $pageIds // FIXME: allow page IDs
-        ];
-
-        if ($followRedir) {
-            $params['redirects'] = '';
-        }
-
-        $query = new SimpleRequest('query', $params);
-        $result = [];
-
-        try {
-            $res = $this->api->getRequest($query);
-            if (isset($res['query']['pages'])) {
-                $result = $res['query']['pages'][0];
-            }
-        } catch (Exception $e) {
-            // The api returned an error!  Ignore
-        }
-
-        return $result;
-    }
-
-    /**
      * Get HTML display titles of a set of pages (or the normal title if there's no display title).
      * This will send t/50 API requests where t is the number of titles supplied.
      * @param string $project The project.

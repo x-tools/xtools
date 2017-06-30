@@ -117,8 +117,6 @@ class PagesController extends Controller
     {
         $lh = $this->get('app.labs_helper');
 
-        $api = $this->get('app.api_helper');
-
         $user = UserRepository::getUser($username, $this->container);
         $username = $user->getUsername(); // use normalized user name
 
