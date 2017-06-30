@@ -37,8 +37,8 @@ class RepositoryTest extends WebTestCase
             $this->assertEquals('`testwiki_p`.`logging_userindex`', $this->stub->getTableName('testwiki', 'logging'));
         } else {
             // When using wiki databases directly.
-            $this->assertEquals('`page`', $this->stub->getTableName('testwiki', 'page'));
-            $this->assertEquals('`logging`', $this->stub->getTableName('testwiki', 'logging'));
+            $this->assertEquals('`testwiki`.`page`', $this->stub->getTableName('testwiki', 'page'));
+            $this->assertEquals('`testwiki`.`logging`', $this->stub->getTableName('testwiki', 'logging'));
         }
     }
 }
