@@ -183,7 +183,7 @@ class ArticleInfoController extends Controller
             $this->pageInfo['general']['pageviews_offset']
         );
         $api = $this->get('app.api_helper');
-        $assessments = $api->getPageAssessments($projectQuery, $pageQuery);
+        $assessments = $page->getAssessments();
         if ($assessments) {
             $this->pageInfo['assessments'] = $assessments;
         }

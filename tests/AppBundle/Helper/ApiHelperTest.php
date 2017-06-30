@@ -34,4 +34,9 @@ class ApiHelperTest extends WebTestCase
         $this->apiHelper = new ApiHelper($this->container, $labsHelper);
         $this->cache = $this->container->get('cache.app');
     }
+
+    public function testGroups()
+    {
+        // placeholder
+    }
 }

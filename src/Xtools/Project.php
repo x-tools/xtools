@@ -235,4 +235,31 @@ class Project extends Model
 
         return false;
     }
+
+    /**
+     * Does this project support page assessments?
+     * @return bool
+     */
+    public function hasPageAssessments()
+    {
+        return (bool) $this->getRepository()->getAssessmentsConfig($this->getDomain());
+    }
+
+    /**
+     * Get the image URL of the badge for the given page assessment
+     * @param  string $class  Valid classification for project, such as 'Start', 'GA', etc.
+     * @return string         URL to image
+     */
+    public function getAssessmentBadgeURL($class)
+    {
+        $config = $this->getRepository()->getAssessmentsConfig($this->getDomain());
+
+        if (isset($config['class'][$class])) {
+            return "https://upload.wikimedia.org/wikipedia/commons/" . $config['class'][$class]['badge'];
+        } elseif (isset($config['class']['Unknown'])) {
+            return "https://upload.wikimedia.org/wikipedia/commons/" . $config['class']['Unknown']['badge'];
+        } else {
+            return "";
+        }
+    }
 }

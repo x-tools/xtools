@@ -114,4 +114,27 @@ class PagesRepository extends Repository
         $conn = $this->getProjectsConnection();
         return $conn->executeQuery($query, $params)->fetchColumn(0);
     }
+
+    /**
+     * Get assessment data for the given pages
+     * @param Project   $project The project to which the pages belong.
+     * @param  int[]    $pageIds Page IDs
+     * @return string[] Assessment data as retrieved from the database.
+     */
+    public function getAssessments(Project $project, $pageIds)
+    {
+        if (!$project->hasPageAssessments()) {
+            return [];
+        }
+        $pageAssessmentsTable = $this->getTableName($project->getDatabaseName(), 'page_assessments');
+        $pageIds = implode($pageIds, ',');
+
+        $query = "SELECT pap_project_title AS wikiproject, pa_class AS class, pa_importance AS importance
+                  FROM page_assessments
+                  LEFT JOIN page_assessments_projects ON pa_project_id = pap_project_id
+                  WHERE pa_page_id IN ($pageIds)";
+
+        $conn = $this->getProjectsConnection();
+        return $conn->executeQuery($query)->fetchAll();
+    }
 }

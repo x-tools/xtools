@@ -119,6 +119,32 @@ class ProjectTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Whether page assessments are supported for the project
+     */
+    public function testHasPageAssessments()
+    {
+        $projectRepo = $this->getMock(ProjectRepository::class);
+
+        $project = new Project('testWiki');
+        $project->setRepository($projectRepo);
+
+        // Unconfigured project
+        $this->assertEquals(false, $project->hasPageAssessments());
+
+        // Mock and re-test
+        $projectRepo
+            ->method('getAssessmentsConfig')
+            ->with()
+            ->willReturn([
+                [
+                    'wikiproject_prefix' => 'Wikipedia:WikiProject_',
+                ],
+            ]);
+
+        $this->assertEquals(true, $project->hasPageAssessments());
+    }
+
+    /**
      * Data for self::testOptedIn().
      * @return array
      */

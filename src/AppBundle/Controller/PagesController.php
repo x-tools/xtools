@@ -181,7 +181,7 @@ class PagesController extends Controller
             $having = " rev_user = '$user_id' ";
         }
 
-        $hasPageAssessments = $lh->isLabs() && $api->projectHasPageAssessments($project);
+        $hasPageAssessments = $lh->isLabs() && $projectData->hasPageAssessments();
         $paSelects = $hasPageAssessments ? ', pa_class, pa_importance, pa_page_revision' : '';
         $paSelectsArchive = $hasPageAssessments ?
             ', NULL AS pa_class, NULL AS pa_page_id, NULL AS pa_page_revision'
@@ -241,7 +241,7 @@ class PagesController extends Controller
             ]);
 
             if ($hasPageAssessments) {
-                $pageData['badge'] = $api->getAssessmentBadgeURL($project, $pageData['pa_class']);
+                $pageData['badge'] = $projectData->getAssessmentBadgeURL($pageData['pa_class']);
             }
 
             $pagesByNamespaceByDate[$row['namespace']][$datetimeKey][] = $pageData;

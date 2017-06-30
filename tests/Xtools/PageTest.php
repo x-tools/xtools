@@ -5,17 +5,21 @@
 
 namespace Tests\Xtools;
 
-use PHPUnit_Framework_TestCase;
+// use PHPUnit_Framework_TestCase;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Xtools\Page;
 use Xtools\PagesRepository;
 use Xtools\Project;
+use Xtools\ProjectRepository;
 use Xtools\User;
 
 /**
  * Tests for the Page class.
  */
-class PageTest extends PHPUnit_Framework_TestCase
+class PageTest extends KernelTestCase
 {
+    /** @var Container The Symfony container. */
+    protected $container;
 
     /**
      * A page has a title and an HTML display title.
@@ -125,4 +129,50 @@ class PageTest extends PHPUnit_Framework_TestCase
         $user = new User('Testuser');
         //$this->assertCount(3, $page->getRevisions($user)->getCount());
     }
+
+    // public function testPageAssessments()
+    // {
+    //     $projectRepo = $this->getMock(ProjectRepository::class, ['getAssessmentsConfig']);
+    //     $projectRepo
+    //         ->method('getAssessmentsConfig')
+    //         ->willReturn([
+    //             'wikiproject_prefix' => 'Wikipedia:WikiProject_'
+    //         ]);
+
+    //     $project = $this->getMock(Project::class, ['getDomain']);
+    //     $project
+    //         ->method('getDomain')
+    //         ->willReturn('test.wiki.org');
+    //     $project->setRepository($projectRepo);
+
+    //     $pageRepo = $this->getMock(PagesRepository::class, ['getAssessments', 'getPageInfo']);
+    //     $pageRepo
+    //         ->method('getAssessments')
+    //         ->with($project)
+    //         ->willReturn([
+    //             [
+    //                 'wikiproject' => 'Military history',
+    //                 'class' => 'Start',
+    //                 'importance' => 'Low',
+    //             ],
+    //             [
+    //                 'wikiproject' => 'Firearms',
+    //                 'class' => 'C',
+    //                 'importance' => 'High',
+    //             ],
+    //         ]);
+    //     $pageRepo
+    //         ->method('getPageInfo')
+    //         ->with($project, 'Test_page')
+    //         ->willReturn([
+    //             'pageid' => 5,
+    //         ]);
+
+    //     $page = new Page($project, 'Test_page');
+    //     $page->setRepository($pageRepo);
+
+    //     $assessments = $page->getAssessments();
+
+    //     $this->assertEquals('C', $assessments['assessment']);
+    // }
 }

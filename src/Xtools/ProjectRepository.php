@@ -311,4 +311,29 @@ class ProjectRepository extends Repository
         $pages = $conn->executeQuery($query, $params)->fetchAll();
         return count($pages) > 0;
     }
+
+    /**
+     * Get page assessments configuration for this project
+     *   and cache in static variable.
+     * @param string $projectDomain The project domain such as en.wikipedia.org
+     * @return string[]|bool As defined in config/assessments.yml,
+     *                       or false if none exists
+     */
+    public function getAssessmentsConfig($projectDomain)
+    {
+        static $assessmentsConfig = null;
+        if ($assessmentsConfig !== null) {
+            return $assessmentsConfig;
+        }
+
+        $projectsConfig = $this->container->getParameter('assessments');
+
+        if (isset($projectsConfig[$projectDomain])) {
+            $assessmentsConfig = $projectsConfig[$projectDomain];
+        } else {
+            $assessmentsConfig = false;
+        }
+
+        return $assessmentsConfig;
+    }
 }

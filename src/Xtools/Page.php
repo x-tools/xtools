@@ -198,4 +198,88 @@ class Page extends Model
 
         return $revisions;
     }
+
+    /**
+     * Get assessments of this page
+     * @return string[]|false `false` if unsupported, or array in the format of:
+     *         [
+     *             'assessment' => 'C', // overall assessment
+     *             'wikiprojects' => [
+     *                 'Biography' => [
+     *                     'assessment' => 'C',
+     *                     'badge' => 'url',
+     *                 ],
+     *                 ...
+     *             ],
+     *             'wikiproject_prefix' => 'Wikipedia:WikiProject_',
+     *         ]
+     */
+    public function getAssessments()
+    {
+        $projectDomain = $this->project->getDomain();
+        $config = $this->project->getRepository()->getAssessmentsConfig($projectDomain);
+        $data = $this->getRepository()->getAssessments($this->project, [$this->getId()]);
+
+        // Set the default decorations for the overall quality assessment
+        // This will be replaced with the first valid class defined for any WikiProject
+        $overallQuality = $config['class']['Unknown'];
+        $overallQuality['value'] = '???';
+
+        $decoratedAssessments = [];
+
+        foreach ($data as $assessment) {
+            $classValue = $assessment['class'];
+
+            // Use ??? as the presented value when the class is unknown or is not defined in the config
+            if ($classValue === 'Unknown' || $classValue === '' || !isset($config['class'][$classValue])) {
+                $classAttrs = $config['class']['Unknown'];
+                $assessment['class']['value'] = '???';
+                $assessment['class']['category'] = $classAttrs['category'];
+                $assessment['class']['badge'] = "https://upload.wikimedia.org/wikipedia/commons/". $classAttrs['badge'];
+            } else {
+                $classAttrs = $config['class'][$classValue];
+                $assessment['class'] = [
+                    'value' => $classValue,
+                    'color' => $classAttrs['color'],
+                    'category' => $classAttrs['category'],
+                ];
+
+                // add full URL to badge icon
+                if ($classAttrs['badge'] !== '') {
+                    $assessment['class']['badge'] = $this->project->getAssessmentBadgeURL($classValue);
+                }
+
+                if ($overallQuality['value'] === '???') {
+                    $overallQuality = $assessment['class'];
+                    $overallQuality['category'] = $classAttrs['category'];
+                }
+            }
+
+            $importanceValue = $assessment['importance'];
+            $importanceUnknown = $importanceValue === 'Unknown' || $importanceValue === '';
+
+            if ($importanceUnknown || !isset($config['importance'][$importanceValue])) {
+                $importanceAttrs = $config['importance']['Unknown'];
+                $assessment['importance'] = $importanceAttrs;
+                $assessment['importance']['value'] = '???';
+                $assessment['importance']['category'] = $importanceAttrs['category'];
+            } else {
+                $importanceAttrs = $config['importance'][$importanceValue];
+                $assessment['importance'] = [
+                    'value' => $importanceValue,
+                    'color' => $importanceAttrs['color'],
+                    'weight' => $importanceAttrs['weight'], // numerical weight for sorting purposes
+                    'category' => $importanceAttrs['category'],
+                ];
+            }
+
+            $decoratedAssessments[$assessment['wikiproject']] = $assessment;
+        }
+
+        return [
+            'assessment' => $overallQuality,
+            'wikiprojects' => $decoratedAssessments,
+            'wikiproject_prefix' => $config['wikiproject_prefix']
+        ];
+    }
 }
