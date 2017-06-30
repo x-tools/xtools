@@ -292,7 +292,7 @@ class PagesController extends Controller
         }
 
         // Retrieve the namespaces
-        $namespaces = $api->namespaces($project);
+        $namespaces = $projectData->getNamespaces();
 
         // Assign the values and display the template
         return $this->render('pages/result.html.twig', [

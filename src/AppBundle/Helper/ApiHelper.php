@@ -56,92 +56,6 @@ class ApiHelper extends HelperBase
     }
 
     /**
-     * Get general siteinfo and namespaces for a project and cache it.
-     * @param  string [$project] Base project domain with or without protocal, or database name
-     *                           such as 'en.wikipedia.org', 'https://en.wikipedia.org' or 'enwiki'
-     *                           Can be left blank for single wikis.
-     * @return string[] with keys 'general' and 'namespaces'. General info will include 'dbName',
-     *                           'wikiName', 'url', 'lang', 'articlePath', 'scriptPath',
-     *                           'script', 'timezone', and 'timeOffset'
-     */
-    public function getSiteInfo($projectName = '')
-    {
-        if ($this->container->getParameter('app.single_wiki')) {
-            $projectName = $this->container->getParameter('wiki_url');
-        }
-        $project = ProjectRepository::getProject($projectName, $this->container);
-
-        if (!$project->exists()) {
-            throw new Exception("Unable to find project '$projectName'");
-        }
-
-        $cacheKey = "siteinfo." . $project->getDatabaseName();
-        if ($this->cacheHas($cacheKey)) {
-            return $this->cacheGet($cacheKey);
-        }
-
-        $params = [ 'meta'=>'siteinfo', 'siprop'=>'general|namespaces' ];
-        $query = new SimpleRequest('query', $params);
-
-        $result = [
-            'general' => [],
-            'namespaces' => []
-        ];
-
-        try {
-            $res = $project->getApi()->getRequest($query);
-
-            if (isset($res['query']['general'])) {
-                $info = $res['query']['general'];
-                $result['general'] = [
-                    'wikiName' => $info['sitename'],
-                    'dbName' => $info['wikiid'],
-                    'url' => $info['server'],
-                    'lang' => $info['lang'],
-                    'articlePath' => $info['articlepath'],
-                    'scriptPath' => $info['scriptpath'],
-                    'script' => $info['script'],
-                    'timezone' => $info['timezone'],
-                    'timeOffset' => $info['timeoffset'],
-                ];
-
-                if ($this->container->getParameter('app.is_labs') && substr($result['general']['dbName'], -2) != '_p') {
-                    $result['general']['dbName'] .= '_p';
-                }
-            }
-
-            if (isset($res['query']['namespaces'])) {
-                foreach ($res['query']['namespaces'] as $namespace) {
-                    if ($namespace['id'] < 0) {
-                        continue;
-                    }
-
-                    if (isset($namespace['name'])) {
-                        $name = $namespace['name'];
-                    } elseif (isset($namespace['*'])) {
-                        $name = $namespace['*'];
-                    } else {
-                        continue;
-                    }
-
-                    // FIXME: Figure out a way to i18n-ize this
-                    if ($name === '') {
-                        $name = 'Article';
-                    }
-
-                    $result['namespaces'][$namespace['id']] = $name;
-                }
-            }
-
-            $this->cacheSave($cacheKey, $result, 'P7D');
-        } catch (Exception $e) {
-            // The api returned an error!  Ignore
-        }
-
-        return $result;
-    }
-
-    /**
      * Get the given user's groups on the given project.
      * @deprecated Use User::getGroups() instead.
      * @param string $project
@@ -191,17 +105,6 @@ class ApiHelper extends HelperBase
         }
 
         return $result;
-    }
-
-    /**
-     * Get a list of namespaces on the given project.
-     *
-     * @param string    $project such as en.wikipedia.org
-     * @return string[] Array of namespace IDs (keys) to names (values).
-     */
-    public function namespaces($project)
-    {
-        return $this->getSiteInfo($project)['namespaces'];
     }
 
     /**

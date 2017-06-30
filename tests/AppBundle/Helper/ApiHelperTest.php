@@ -34,27 +34,4 @@ class ApiHelperTest extends WebTestCase
         $this->apiHelper = new ApiHelper($this->container, $labsHelper);
         $this->cache = $this->container->get('cache.app');
     }
-
-    /**
-     * Test general site info: article and script paths, etc.
-     */
-    public function testSiteInfo()
-    {
-        if ($this->container->getParameter('app.is_labs')) {
-            $siteInfo = $this->apiHelper->getSiteInfo('enwiki');
-            $this->assertEquals($siteInfo['general']['articlePath'], '/wiki/');
-        }
-    }
-
-    /**
-     * Test that namespace names etc. can be fetched.
-     */
-    public function testNamespaces()
-    {
-        if ($this->container->getParameter('app.is_labs')) {
-            $namespaces = $this->apiHelper->namespaces('enwiki');
-            $this->assertEquals($namespaces['1'], 'Talk');
-            $this->assertEquals($namespaces['2'], 'User');
-        }
-    }
 }

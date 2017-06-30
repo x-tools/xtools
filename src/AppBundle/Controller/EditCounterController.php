@@ -213,7 +213,6 @@ class EditCounterController extends Controller
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
-            //'namespaces' => $this->apiHelper->namespaces($project),
             //'yearcounts' => $yearcounts,
             'is_labs' => $this->project->getRepository()->isLabs(),
             'user' => $this->user,
