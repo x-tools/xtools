@@ -222,7 +222,6 @@
   "thursday": "{{Identical|Thursday}}",
   "timecard": "Chart that shows the edit behaviour",
   "timecard-chart-desc": "Description of timecard chart.",
-  "title-xtools": "The tool's title",
   "too-many-revisions": "Error message shown when a page has too many revisions to process.",
   "tool": "{{Identical|Tool}}",
   "tool-adminscore": "AdminScore",
@@ -279,10 +278,10 @@
   "vote-msg": "$1 is the username, $2 is the number, $3 is the name of vote page e.g.: Requests for adminship",
   "web-chat": "Text for link to the XTools IRC channel. This message should be short or abbreviated.",
   "wednesday": "{{Identical|Wednesday}}",
-  "welcome": "Welcome message",
   "wiki": "Short label for Wiki\n{{Identical|Wiki}}",
   "wikiproject": "{{Identical|WikiProject}}",
   "with-summary": "Chart label for edits with summary. This message should be short",
+  "xtools-title": "The tool's title",
   "year": "General term for 'year'.\n{{Identical|Year}}",
   "year-counts": "Section heading for the section showing data for each individual year."
 }

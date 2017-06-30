@@ -133,7 +133,6 @@
   "text-to-serach": "Tekst waar naar moet worden gezocht",
   "thank": "Bedankjes",
   "timecard": "Tijdoverzicht",
-  "title-xtools": "X!'s tools",
   "too-many-revisions": "Dit artikel heeft meer dan 50.000 bewerkingen. Gegevens voor de eerste 50.000 worden hieronder getoond.",
   "tool-adminstats": "Moderatorstatistieken",
   "tool-adminstats-desc": "Laat statistieken van beheerdersacties zien",
@@ -177,8 +176,8 @@
   "username": "Gebruikersnaam",
   "view-source": "Brontekst bekijken",
   "vote-msg": "$1 heeft $2 $3 pagina's bewerkt!",
-  "welcome": "Welkom bij X!'s tools!",
   "wiki": "Wiki",
   "with-summary": "met samenvatting",
+  "xtools-title": "X!'s tools",
   "year-counts": "Jaaroverzicht"
 }

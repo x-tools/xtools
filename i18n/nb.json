@@ -135,7 +135,6 @@
   "text-to-serach": "Søketekst",
   "thank": "Takk",
   "timecard": "Tidsoversikt",
-  "title-xtools": "X!'s verktøy",
   "too-many-revisions": "Denne artikkelen har over 50 000 revisjoner. Data for de første 50 000 vises under.",
   "tool-adminstats": "AdminStatistikk",
   "tool-adminstats-desc": "Vis statistikk over adminhandlinger",
@@ -180,8 +179,8 @@
   "username": "Brukernavn",
   "view-source": "Vis kilde",
   "vote-msg": "$1 har redigert $2 $3 sider!",
-  "welcome": "Velkommen til X!'s verktøy",
   "wiki": "Wiki",
   "with-summary": "med redigeringsforklaring",
+  "xtools-title": "X!'s verktøy",
   "year-counts": "Årsoversikt"
 }

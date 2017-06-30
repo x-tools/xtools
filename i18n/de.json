@@ -134,7 +134,6 @@
   "text-to-serach": "Suchtext",
   "thank": "Dankeschön",
   "timecard": "Zeitkarte",
-  "title-xtools": "X!'s tools",
   "too-many-revisions": "Dieser Artikel hat mehr als 50,000 Versionen, es werden daher nur Daten für die ersten 50,000 Versionen angezeigt. ",
   "tool-adminstats-desc": "Statistik der Admin-Aktionen",
   "tool-articleinfo": "Seitenhistorie",
@@ -166,8 +165,8 @@
   "username": "Benutzername",
   "view-source": "Quelltext betrachten",
   "vote-msg": "$1 hat $2 $3-Seiten bearbeitet!",
-  "welcome": "Willkommen zu X!'s tools!",
   "wiki": "Wiki",
   "with-summary": "mit Zusammenfassung",
+  "xtools-title": "X!'s tools",
   "year-counts": "Jahresübersicht"
 }

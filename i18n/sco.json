@@ -129,7 +129,6 @@
   "text-to-serach": "Text tae rake for",
   "thank": "Thank",
   "timecard": "Time caird",
-  "title-xtools": "X!'s tuils",
   "too-many-revisions": "This airticle haes ower 50,000 reveesions. Data for the first 50,000 are shawn ablo.",
   "tool-adminstats": "AdminStats",
   "tool-adminstats-desc": "Shaw statistics o admin actions",
@@ -172,8 +171,8 @@
   "username": "Uisername",
   "view-source": "View Soorce",
   "vote-msg": "$1 haes eeditit $2 $3 pages!",
-  "welcome": "Walcome tae X!'s tools!",
   "wiki": "Wiki",
   "with-summary": "wi summary",
+  "xtools-title": "X!'s tuils",
   "year-counts": "Year coonts"
 }

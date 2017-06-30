@@ -97,7 +97,6 @@
   "text-to-serach": "Aranacak metin",
   "thank": "Teşekkür",
   "timecard": "Zaman çizelgesi",
-  "title-xtools": "X!'in araçları",
   "too-many-revisions": "Bu makalede 50.000'den fazla düzeltme var. İlk 50.000 için veriler aşağıda gösterilmektedir.",
   "tool-adminstats-desc": "Admin eylemler istatistiklerini göster",
   "tool-articleinfo": "Sayfa geçmişi",
@@ -119,7 +118,7 @@
   "user-id": "Kullanıcı ID'si:",
   "username": "Kullanıcı adı",
   "view-source": "Kaynağı gör",
-  "welcome": "X!'in araçlarına hoş geldiniz",
   "wiki": "Viki",
-  "with-summary": "Özet ile"
+  "with-summary": "Özet ile",
+  "xtools-title": "X!'in araçları"
 }

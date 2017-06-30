@@ -114,7 +114,6 @@
   "text": "Text",
   "text-to-serach": "Text fir ze sichen",
   "thank": "Merci",
-  "title-xtools": "X!'s tools",
   "too-many-revisions": "Dësen Artikel huet méi wéi 50 000 Versiounen Donnéeë fir déi éischt 50 000 Versioune ginn hei drënner gewisen.",
   "tool-adminstats": "Statistike vun den Administrateuren",
   "tool-adminstats-desc": "Statistik vun den Admin-Aktiounen",
@@ -144,7 +143,7 @@
   "username": "Benotzernumm",
   "view-source": "Quellcode weisen",
   "vote-msg": "$1 huet $2 $3-Säite geännert!",
-  "welcome": "Wëllkomm bei den X!'s Tools!",
   "wiki": "Wiki",
-  "with-summary": "mat Resumé"
+  "with-summary": "mat Resumé",
+  "xtools-title": "X!'s tools"
 }

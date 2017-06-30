@@ -141,7 +141,6 @@
   "text-to-serach": "Texte à rechercher",
   "thank": "Remerciements",
   "timecard": "Histogramme",
-  "title-xtools": "Outils de X!",
   "too-many-revisions": "Cet article a plus de 50000 révisions. Les données pour les premières 50000 sont affichées ci-dessous.",
   "tool-adminstats": "Statistiques d’administration",
   "tool-adminstats-desc": "Afficher les statistiques des actions d’administration",
@@ -186,8 +185,8 @@
   "username": "Nom d'utilisateur",
   "view-source": "Voir source",
   "vote-msg": "$1 a modifié $2 $3 pages !",
-  "welcome": "Bienvenue aux outils de X! !",
   "wiki": "Wiki",
   "with-summary": "Avec résumé",
+  "xtools-title": "Outils de X!",
   "year-counts": "Compteurs annuels"
 }

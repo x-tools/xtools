@@ -81,7 +81,6 @@
   "text": "Teksti",
   "text-to-serach": "Etsittävä teksti",
   "thank": "Kiitoksia",
-  "title-xtools": "X!:n työkalut",
   "tool-articleinfo": "Sivuhistoria",
   "tool-ec": "Muokkauslaskuri",
   "tool-pages": "Sivuja luotu",
@@ -95,7 +94,7 @@
   "user-id": "Käyttäjätunniste",
   "username": "Käyttäjänimi",
   "view-source": "Lähdekoodi",
-  "welcome": "Tervetuloa X!:n työkaluihin!",
   "wiki": "Wiki",
-  "with-summary": "yhteenvedolla"
+  "with-summary": "yhteenvedolla",
+  "xtools-title": "X!:n työkalut"
 }

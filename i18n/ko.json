@@ -135,7 +135,6 @@
   "text-to-serach": "검색할 텍스트",
   "thank": "감사",
   "timecard": "타임카드",
-  "title-xtools": "X!의 도구",
   "too-many-revisions": "이 문서는 5만 번 넘게 편집되었습니다. 처음 5만 개 판에 대한 정보는 아래에 있습니다.",
   "tool-adminstats": "관리자 통계",
   "tool-adminstats-desc": "관리자 권한 사용 통계 보기",
@@ -179,8 +178,8 @@
   "username": "사용자 이름",
   "view-source": "소스 보기",
   "vote-msg": "$1는 $3에서 $2번 편집했습니다!",
-  "welcome": "X!의 도구 사용을 환영합니다!",
   "wiki": "위키",
   "with-summary": "편집 요약 있음",
+  "xtools-title": "X!의 도구",
   "year-counts": "연단위 분석"
 }

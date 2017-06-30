@@ -140,7 +140,6 @@
   "text-to-serach": "متن جستجو",
   "thank": "سپاس",
   "timecard": "کارت زمان",
-  "title-xtools": "ابزار X!'s",
   "too-many-revisions": "این مقاله بیش از ۵۰۰۰۰ نسخه دارد. اطلاعات ۵۰۰۰۰ نسخهٔ نخست در پایین نمایش داده‌شده‌است.",
   "tool-adminstats": "آمار مدیران",
   "tool-adminstats-desc": "نمایش آمار کارهای مدیریتی",
@@ -184,8 +183,8 @@
   "username": "نام کاربری",
   "view-source": "نمایش مبدأ",
   "vote-msg": "$1 $2 $3 صفحات را ویرایش کرده است!",
-  "welcome": "به X!'s tools خوش‌آمدید",
   "wiki": "ویکی",
   "with-summary": "با خلاصه ویرایش",
+  "xtools-title": "ابزار X!'s",
   "year-counts": "شمارش سال"
 }

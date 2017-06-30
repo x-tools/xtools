@@ -140,7 +140,6 @@
   "text-to-serach": "Text att söka efter",
   "thank": "Tack",
   "timecard": "Tidsöversikt",
-  "title-xtools": "X!:s verktyg",
   "too-many-revisions": "Denna artikel har över 50 0000 redigeringar. Information för de 50 000 första visas nedan.",
   "tool-adminstats": "Administratörsstatistik",
   "tool-adminstats-desc": "Visa statistik över administratörers åtgärder",
@@ -185,8 +184,8 @@
   "username": "Användarnamn",
   "view-source": "Visa källkod",
   "vote-msg": "$1 har redigerat $2 $3-sidor",
-  "welcome": "Välkommen till X!:s verktyg!",
   "wiki": "Wiki",
   "with-summary": "med redigeringssammanfattning",
+  "xtools-title": "X!:s verktyg",
   "year-counts": "Redigeringar per år"
 }

@@ -258,8 +258,14 @@ section > .panel-body {
 .panel-body .table:only-child {
     margin-bottom: 0;
 }
-.xt-panel-body table {
-    white-space: nowrap;
+.xt-panel-body {
+    table {
+        white-space: nowrap;
+    }
+
+    .panel-body {
+        width: 100%;
+    }
 }
 .xt-table > tbody > tr > td {
     padding-top: 1px;
@@ -653,6 +659,12 @@ div.outer_bar {
         clear: both;
         display: block;
         max-width: 100%;
+    }
+
+    .xt-panel-description {
+        display: block;
+        float: none !important;
+        margin-top: 5px;
     }
 
     .stat-list {

@@ -86,7 +86,6 @@
   "text-to-serach": "Testu a guetar",
   "thank": "Agradecimientu",
   "timecard": "Tarxeta de tiempu",
-  "title-xtools": "Ferramientes de X!",
   "tool-adminstats": "AdminStats",
   "tool-adminstats-desc": "Ver les estadístiques d'aiciones alministratives",
   "tool-articleinfo": "Historial de páxina",
@@ -122,7 +121,7 @@
   "user-id": "ID d'usuariu",
   "username": "Nome d'usuariu",
   "view-source": "Ver fonte",
-  "welcome": "Bienveníos a les ferramientes de X!",
   "wiki": "Wiki",
-  "with-summary": "con resume"
+  "with-summary": "con resume",
+  "xtools-title": "Ferramientes de X!"
 }

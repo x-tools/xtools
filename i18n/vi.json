@@ -138,7 +138,6 @@
   "text-to-serach": "Văn bản để tìm kiếm",
   "thank": "Cảm ơn",
   "timecard": "Thời biểu",
-  "title-xtools": "Các công cụ của X!",
   "too-many-revisions": "Bài này được sửa đổi hơn 50.000 lần. Dữ liệu từ 50.000 sửa đổi đầu tiên được hiển thị bên dưới.",
   "tool-adminstats": "Thống kê BQV",
   "tool-adminstats-desc": "Xem thống kê về tác vụ bảo quản viên",
@@ -183,8 +182,8 @@
   "username": "Tên người dùng",
   "view-source": "Xem mã nguồn",
   "vote-msg": "$1 đã sửa đổi $2 trang $3!",
-  "welcome": "Chào mừng đến với các công cụ của X!",
   "wiki": "Wiki",
   "with-summary": "có tóm lược",
+  "xtools-title": "Các công cụ của X!",
   "year-counts": "Số trong năm"
 }

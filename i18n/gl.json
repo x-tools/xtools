@@ -138,7 +138,6 @@
   "text-to-serach": "Procurar texto",
   "thank": "Agradecemento",
   "timecard": "Horario",
-  "title-xtools": "Ferramentas X!",
   "too-many-revisions": "Este artigo ten máis de 50.000 revisións. Os datos para as primeiras 50.000 amósanse embaixo.",
   "tool-adminstats": "AdminStats",
   "tool-adminstats-desc": "Amosar estatísticas de accións de administrador",
@@ -183,8 +182,8 @@
   "username": "Nome de usuario",
   "view-source": "Ver o código fonte",
   "vote-msg": "$1 editou $2 $3 páxinas!",
-  "welcome": "Benvido(a) ás ferramentas X!",
   "wiki": "Wiki",
   "with-summary": "con resumo",
+  "xtools-title": "Ferramentas X!",
   "year-counts": "Contador de ano"
 }

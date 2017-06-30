@@ -127,7 +127,6 @@
   "text-to-serach": "要搜索的文本",
   "thank": "感谢",
   "timecard": "工时卡",
-  "title-xtools": "X!'s tools",
   "too-many-revisions": "这篇文章修订超过50,000次。下方显示的是前50,000次修订的数据。",
   "tool-adminstats": "管理统计",
   "tool-adminstats-desc": "显示管理操作统计信息",
@@ -170,8 +169,8 @@
   "username": "用户名",
   "view-source": "查看源代码",
   "vote-msg": "$1编辑过$2个$3页面！",
-  "welcome": "欢迎使用X!'s tools！",
   "wiki": "维基名",
   "with-summary": "带摘要",
+  "xtools-title": "X!'s tools",
   "year-counts": "年度统计"
 }

@@ -128,7 +128,6 @@
   "text": "Testo",
   "text-to-serach": "Testo da cercare",
   "thank": "Ringrazia",
-  "title-xtools": "Strumenti di X!",
   "too-many-revisions": "Questa voce ha più di 50000 modifiche. I dati per le prime 50000 sono mostrati qua sotto.",
   "tool-adminstats": "StatAdmin",
   "tool-adminstats-desc": "Mostra le statistiche delle azioni da amministratore",
@@ -167,8 +166,8 @@
   "username": "Nome utente",
   "view-source": "Visualizza sorgente",
   "vote-msg": "$1 ha modificato $2 pagine di $3!",
-  "welcome": "Benvenuto agli strumenti di X!",
   "wiki": "Wiki",
   "with-summary": "con oggetto",
+  "xtools-title": "Strumenti di X!",
   "year-counts": "Conteggio annuale"
 }

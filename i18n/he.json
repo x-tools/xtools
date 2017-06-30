@@ -140,7 +140,6 @@
   "text-to-serach": "איזה טקסט לחפש",
   "thank": "תודה",
   "timecard": "כרטיס זמן",
-  "title-xtools": "הכלים של X!‎",
   "too-many-revisions": "בערך הזה יש יותר מ־50,000. נתונים ל־50,000 הראשונות מוצגות להלן.",
   "tool-adminstats": "סטטיסטיקות מפעילים",
   "tool-adminstats-desc": "הצגת סטטיסטיקות של פעולות מפעיל",
@@ -185,8 +184,8 @@
   "username": "שם משתמש",
   "view-source": "הצגת מקור",
   "vote-msg": "$1 ערך $2 דפי $3",
-  "welcome": "ברוך בואך לכלים של X!‎!",
   "wiki": "ויקי",
   "with-summary": "עם תקציר",
+  "xtools-title": "הכלים של X!‎",
   "year-counts": "ספירה לשנה"
 }

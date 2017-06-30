@@ -114,7 +114,6 @@
   "text-to-serach": "Hledaný text",
   "thank": "Poděkování",
   "timecard": "Hodinový přehled",
-  "title-xtools": "Nástroje X!",
   "too-many-revisions": "Tento článek má více než 50 000 revizí. Níže se zobrazují data pro prvních 50 000.",
   "tool-adminstats": "Správcovská statistika",
   "tool-adminstats-desc": "Statistika správcovských akcí",
@@ -148,7 +147,7 @@
   "user-id": "Uživatelské ID",
   "username": "Uživatelské jméno",
   "view-source": "Zobrazit zdrojový kód",
-  "welcome": "Vítejte na nástrojích X!",
   "wiki": "Wiki",
-  "with-summary": "bez shrnutí"
+  "with-summary": "bez shrnutí",
+  "xtools-title": "Nástroje X!"
 }

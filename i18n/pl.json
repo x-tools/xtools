@@ -126,7 +126,6 @@
   "text-to-serach": "Tekst do wyszukania",
   "thank": "Podziękowania",
   "timecard": "Przedziały godzinowe",
-  "title-xtools": "X!'s tools",
   "tool-adminstats": "Statystyki administratorów",
   "tool-adminstats-desc": "Pokaż statystyki działań administracyjnych",
   "tool-articleinfo": "Historia edycji strony",
@@ -163,8 +162,8 @@
   "user-id": "ID użytkownika",
   "username": "Nazwa użytkownika",
   "view-source": "Zobacz źródło",
-  "welcome": "Witaj w X!'s tools!",
   "wiki": "Wiki",
   "with-summary": "z opisem zmian",
+  "xtools-title": "X!'s tools",
   "year-counts": "Liczniki roczne"
 }

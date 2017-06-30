@@ -127,7 +127,6 @@
   "text-to-serach": "საძიებო ტექსტი",
   "thank": "მადლობა",
   "timecard": "ქრონოლოგია",
-  "title-xtools": "X!'s tools",
   "tool-adminstats": "ადმინისტრატორების სტატისტიკა",
   "tool-adminstats-desc": "ადმინისტრატორთა მოქმედებების სტატისტიკის ჩვენება",
   "tool-articleinfo": "გვერდის ისტორია",
@@ -167,8 +166,8 @@
   "username": "მომხმარებლის სახელი",
   "view-source": "წყაროს ხილვა",
   "vote-msg": "მომხმარებელმა $1 დაარედაქტირა $2 $3 გვერდი!",
-  "welcome": "მოგესალმებით X!'s tools!-ში",
   "wiki": "ვიკი",
   "with-summary": "რეზიუმეთი",
+  "xtools-title": "X!'s tools",
   "year-counts": "წლიური სტატისტიკა"
 }
