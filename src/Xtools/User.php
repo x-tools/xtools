@@ -5,6 +5,8 @@
 
 namespace Xtools;
 
+use Exception;
+
 /**
  * A User is a wiki user who has the same username across all projects in an XTools installation.
  */
@@ -103,7 +105,11 @@ class User extends Model
      */
     public function isCurrentlyLoggedIn()
     {
-        $ident = $this->getRepository()->getXtoolsUserInfo();
+        try {
+            $ident = $this->getRepository()->getXtoolsUserInfo();
+        } catch (Exception $exception) {
+            return false;
+        }
         return isset($ident->username) && $ident->username === $this->getUsername();
     }
 }
