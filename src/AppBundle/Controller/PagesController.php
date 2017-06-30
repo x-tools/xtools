@@ -121,6 +121,7 @@ class PagesController extends Controller
         $username = $user->getUsername(); // use normalized user name
 
         $projectData = ProjectRepository::getProject($project, $this->container);
+        $projectRepo = $projectData->getRepository();
 
         // If the project exists, actually populate the values
         if (!$projectData->exists()) {
@@ -129,13 +130,12 @@ class PagesController extends Controller
         }
 
         $dbName = $projectData->getDatabaseName();
-        $projectUrl = $projectData->getUrl();
 
-        $pageTable = $lh->getTable('page', $dbName);
-        $pageAssessmentsTable = $lh->getTable('page_assessments', $dbName);
-        $revisionTable = $lh->getTable('revision', $dbName);
-        $archiveTable = $lh->getTable('archive', $dbName);
-        $logTable = $lh->getTable('logging', $dbName, 'userindex');
+        $pageTable = $projectRepo->getTableName($dbName, 'page');
+        $pageAssessmentsTable = $projectRepo->getTableName($dbName, 'page_assessments');
+        $revisionTable = $projectRepo->getTableName($dbName, 'revision');
+        $archiveTable = $projectRepo->getTableName($dbName, 'archive');
+        $logTable = $projectRepo->getTableName($dbName, 'logging', 'userindex');
 
         // Grab the connection to the replica database (which is separate from the above)
         $conn = $this->get('doctrine')->getManager('replicas')->getConnection();

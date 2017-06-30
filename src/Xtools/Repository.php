@@ -138,19 +138,28 @@ abstract class Repository
      *
      * @param string $databaseName
      * @param string $tableName
+     * @param string|null [$tableExtension] Optional table extension, which will only get used if we're on labs.
      * @return string Fully-qualified and quoted table name.
      */
-    public function getTableName($databaseName, $tableName)
+    public function getTableName($databaseName, $tableName, $tableExtension = null)
     {
-        // Use the table specified in the table mapping configuration, if present.
         $mapped = false;
-        if ($this->container->hasParameter("app.table.$tableName")) {
+
+        // This is a workaround for a one-to-many mapping
+        // as required by Labs. We combine $tableName with
+        // $tableExtension in order to generate the new table name
+        if ($this->isLabs() && $tableExtension !== null) {
+            $mapped = true;
+            $tableName = $tableName . '_' . $tableExtension;
+        } elseif ($this->container->hasParameter("app.table.$tableName")) {
+            // Use the table specified in the table mapping configuration, if present.
             $mapped = true;
             $tableName = $this->container->getParameter("app.table.$tableName");
         }
 
         // For 'revision' and 'logging' tables (actually views) on Labs, use the indexed versions
         // (that have some rows hidden, e.g. for revdeleted users).
+        // This is a safeguard in case table mapping isn't properly set up.
         $isLoggingOrRevision = in_array($tableName, ['revision', 'logging', 'archive']);
         if (!$mapped && $isLoggingOrRevision && $this->isLabs()) {
             $tableName = $tableName."_userindex";
