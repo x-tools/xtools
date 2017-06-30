@@ -133,7 +133,7 @@ class ArticleInfoController extends Controller
         }
 
         $this->revisionTable = $project->getRepository()->getTableName(
-            $project->getDatabaseName(),
+            $dbName,
             'revision'
         );
 
@@ -141,7 +141,6 @@ class ArticleInfoController extends Controller
 
         $this->pageInfo = [
             'project' => $project,
-            'projectUrl' => $projectUrl,
             'page' => $page,
             'dbName' => $dbName,
             'lang' => $project->getLang(),

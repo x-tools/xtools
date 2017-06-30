@@ -137,37 +137,34 @@ class AdminStatsController extends Controller
         $adminsWithoutAction = 0;
         $adminsWithoutActionPct = 0;
 
-        // Pull the labs helper, API helper, and database.  Then check if we can
-        // use this tool
-        $lh = $this->get("app.labs_helper");
-        $api = $this->get("app.api_helper");
-        $conn = $this->get('doctrine')->getManager("replicas")->getConnection();
+        // Pull the API helper and database. Then check if we can use this tool
+        $api = $this->get('app.api_helper');
+        $conn = $this->get('doctrine')->getManager('replicas')->getConnection();
 
         // Load the database information for the tool
         $projectData = ProjectRepository::getProject($project, $this->container);
+        $projectRepo = $projectData->getRepository();
 
         if (!$projectData->exists()) {
-            $this->addFlash("notice", ["invalid-project", $project]);
-            return $this->redirectToRoute("adminstats");
+            $this->addFlash('notice', ['invalid-project', $project]);
+            return $this->redirectToRoute('adminstats');
         }
 
         $dbName = $projectData->getDatabaseName();
-        $wikiName = $projectData->getDatabaseName();
-        $url = $projectData->getUrl();
 
         // Generate a diff for the dates - this is the number of days we're spanning.
         $days = date_diff(new \DateTime($end), new \DateTime($start))->days;
 
         // Get admin ID's, used to account for inactive admins
-        $user_groups_table = $lh->getTable("user_groups", $dbName);
-        $ufg_table = $lh->getTable("user_former_groups", $dbName);
+        $userGroupsTable = $projectRepo->getTableName($dbName, 'user_groups');
+        $ufgTable = $projectRepo->getTableName($dbName, 'user_former_groups');
         $query = "
             SELECT ug_user AS user_id
-            FROM $user_groups_table
+            FROM $userGroupsTable
             WHERE ug_group = 'sysop'
             UNION
             SELECT ufg_user AS user_id
-            FROM $ufg_table
+            FROM $ufgTable
             WHERE ufg_group = 'sysop'
             ";
 
@@ -184,8 +181,8 @@ class AdminStatsController extends Controller
 
         // Load up the tables we need and run the mega query.
         // This query provides all of the statistics
-        $userTable = $lh->getTable("user", $dbName);
-        $loggingTable = $lh->getTable("logging", $dbName, "userindex");
+        $userTable = $projectRepo->getTableName($dbName, 'user');
+        $loggingTable = $projectRepo->getTableName($dbName, 'logging', 'userindex');
 
         $startDb = date('Ymd000000', strtotime($start));
         $endDb = date('Ymd000000', strtotime($end));
@@ -230,16 +227,16 @@ class AdminStatsController extends Controller
         // the arrays contain fundamentally different data.  Instead, it's
         // done by hand.  Only two values are needed, edit count and groups.
         foreach ($users as $key => $value) {
-            $username = $value["user_name"];
+            $username = $value['user_name'];
 
             if (empty($admins[$username])) {
                 $admins[$username] = [
                     'groups' => '',
                 ];
             }
-            $users[$key]["groups"] = $admins[$username]["groups"];
+            $users[$key]['groups'] = $admins[$username]['groups'];
 
-            if ($users[$key]["mtotal"] === 0) {
+            if ($users[$key]['mtotal'] === 0) {
                 $adminsWithoutAction++;
             }
 
@@ -271,28 +268,22 @@ class AdminStatsController extends Controller
         }
 
         // Render the result!
-        return $this->render(
-            "adminStats/result.html.twig",
-            [
-                'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
-                'xtPage' => 'adminstats',
-                'xtTitle' => $project,
+        return $this->render('adminStats/result.html.twig', [
+            'xtPage' => 'adminstats',
+            'xtTitle' => $project,
 
-                'project_url' => $url,
-                'project' => $projectData,
-                'wikiName' => $wikiName,
+            'project' => $projectData,
 
-                'start_date' => $start,
-                'end_date' => $end,
-                'days' => $days,
+            'start_date' => $start,
+            'end_date' => $end,
+            'days' => $days,
 
-                'adminsWithoutAction' => $adminsWithoutAction,
-                'admins_without_action_pct' => $adminsWithoutActionPct,
-                'adminCount' => $adminCount,
+            'adminsWithoutAction' => $adminsWithoutAction,
+            'admins_without_action_pct' => $adminsWithoutActionPct,
+            'adminCount' => $adminCount,
 
-                'users' => $users,
-                'usersCount' => count($users),
-            ]
-        );
+            'users' => $users,
+            'usersCount' => count($users),
+        ]);
     }
 }

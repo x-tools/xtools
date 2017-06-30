@@ -6,7 +6,6 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Helper\ApiHelper;
-use AppBundle\Helper\LabsHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -25,9 +24,6 @@ use Xtools\Edit;
  */
 class TopEditsController extends Controller
 {
-
-    /** @var LabsHelper The Labs helper, for WMF Labs installations. */
-    private $lh;
 
     /**
      * Get the tool's shortname.
@@ -49,8 +45,6 @@ class TopEditsController extends Controller
      */
     public function indexAction(Request $request)
     {
-        $this->lh = $this->get("app.labs_helper");
-
         $projectName = $request->query->get('project');
         $username = $request->query->get('username', $request->query->get('user'));
         $namespace = $request->query->get('namespace');
@@ -104,9 +98,6 @@ class TopEditsController extends Controller
      */
     public function resultAction($project, $username, $namespace = 0, $article = "")
     {
-        /** @var LabsHelper $lh */
-        $this->lh = $this->get('app.labs_helper');
-
         $projectData = ProjectRepository::getProject($project, $this->container);
 
         if (!$projectData->exists()) {
@@ -162,8 +153,8 @@ class TopEditsController extends Controller
             $params['namespace'] = $namespaceId;
             $namespaceMsg = str_replace(' ', '_', strtolower($namespaces[$namespaceId]));
         }
-        $revTable = $this->lh->getTable('revision', $project->getDatabaseName());
-        $pageTable = $this->lh->getTable('page', $project->getDatabaseName());
+        $revTable = $project->getRepository()->getTableName($project->getDatabaseName(), 'revision');
+        $pageTable = $project->getRepository()->getTableName($project->getDatabaseName(), 'page');
         $query = "SELECT page_namespace, page_title, page_is_redirect, COUNT(page_title) AS count
                 FROM $pageTable JOIN $revTable ON page_id = rev_page
                 WHERE rev_user_text = :username $nsClause

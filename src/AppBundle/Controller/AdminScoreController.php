@@ -78,9 +78,8 @@ class AdminScoreController extends Controller
      */
     public function resultAction($project, $username)
     {
-        $lh = $this->get("app.labs_helper");
-
         $projectData = ProjectRepository::getProject($project, $this->container);
+        $projectRepo = $projectData->getRepository();
 
         if (!$projectData->exists()) {
             $this->addFlash("notice", ["invalid-project", $project]);
@@ -89,11 +88,11 @@ class AdminScoreController extends Controller
 
         $dbName = $projectData->getDatabaseName();
 
-        $userTable = $lh->getTable("user", $dbName);
-        $pageTable = $lh->getTable("page", $dbName);
-        $loggingTable = $lh->getTable("logging", $dbName, "userindex");
-        $revisionTable = $lh->getTable("revision", $dbName);
-        $archiveTable = $lh->getTable("archive", $dbName);
+        $userTable = $projectRepo->getTableName($dbName, 'user');
+        $pageTable = $projectRepo->getTableName($dbName, 'page');
+        $loggingTable = $projectRepo->getTableName($dbName, 'logging', 'userindex');
+        $revisionTable = $projectRepo->getTableName($dbName, 'revision');
+        $archiveTable = $projectRepo->getTableName($dbName, 'archive');
 
         // MULTIPLIERS (to review)
         $ACCT_AGE_MULT = 1.25;   # 0 if = 365 jours
