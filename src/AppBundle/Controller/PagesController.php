@@ -115,8 +115,6 @@ class PagesController extends Controller
      */
     public function resultAction($project, $username, $namespace = '0', $redirects = 'noredirects')
     {
-        $lh = $this->get('app.labs_helper');
-
         $user = UserRepository::getUser($username, $this->container);
         $username = $user->getUsername(); // use normalized user name
 
@@ -179,7 +177,7 @@ class PagesController extends Controller
             $having = " rev_user = '$user_id' ";
         }
 
-        $hasPageAssessments = $lh->isLabs() && $projectData->hasPageAssessments();
+        $hasPageAssessments = $projectRepo->isLabs() && $projectData->hasPageAssessments();
         $paSelects = $hasPageAssessments ? ', pa_class, pa_importance, pa_page_revision' : '';
         $paSelectsArchive = $hasPageAssessments ?
             ', NULL AS pa_class, NULL AS pa_page_id, NULL AS pa_page_revision'

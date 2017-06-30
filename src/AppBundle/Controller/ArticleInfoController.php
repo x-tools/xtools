@@ -6,7 +6,6 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Helper\AutomatedEditsHelper;
-use AppBundle\Helper\LabsHelper;
 use AppBundle\Helper\PageviewsHelper;
 use Doctrine\DBAL\Connection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -24,14 +23,14 @@ use Xtools\Edit;
  */
 class ArticleInfoController extends Controller
 {
-    /** @var LabsHelper The Labs helper object. */
-    private $lh;
     /** @var mixed[] Information about the page in question. */
     private $pageInfo;
     /** @var Edit[] All edits of the page. */
     private $pageHistory;
-    /** @var string The fully-qualified name of the revision table. */
-    private $revisionTable;
+    /** @var ProjectRepository Shared Project repository for use of getting table names, etc. */
+    private $projectRepo;
+    /** @var string Database name, for us of getting table names, etc. */
+    private $dbName;
     /** @var Connection The projects' database connection. */
     protected $conn;
     /** @var AutomatedEditsHelper The semi-automated edits helper. */
@@ -63,7 +62,6 @@ class ArticleInfoController extends Controller
      */
     private function containerInitialized()
     {
-        $this->lh = $this->get('app.labs_helper');
         $this->conn = $this->getDoctrine()->getManager('replicas')->getConnection();
         $this->ph = $this->get('app.pageviews_helper');
         $this->aeh = $this->get('app.automated_edits_helper');
@@ -114,12 +112,12 @@ class ArticleInfoController extends Controller
     {
         $projectQuery = $request->attributes->get('project');
         $project = ProjectRepository::getProject($projectQuery, $this->container);
+        $this->projectRepo = $project->getRepository();
         if (!$project->exists()) {
             $this->addFlash('notice', ['invalid-project', $projectQuery]);
             return $this->redirectToRoute('articleInfo');
         }
-        $projectUrl = $project->getUrl();
-        $dbName = $project->getDatabaseName();
+        $this->dbName = $project->getDatabaseName();
 
         $pageQuery = $request->attributes->get('article');
         $page = new Page($project, $pageQuery);
@@ -132,17 +130,11 @@ class ArticleInfoController extends Controller
             return $this->redirectToRoute('articleInfo');
         }
 
-        $this->revisionTable = $project->getRepository()->getTableName(
-            $dbName,
-            'revision'
-        );
-
         // TODO: throw error if $basicInfo['missing'] is set
 
         $this->pageInfo = [
             'project' => $project,
             'page' => $page,
-            'dbName' => $dbName,
             'lang' => $project->getLang(),
         ];
 
@@ -220,10 +212,10 @@ class ArticleInfoController extends Controller
      */
     private function getBotData()
     {
-        $userGroupsTable = $this->lh->getTable('user_groups', $this->pageInfo['dbName']);
-        $userFromerGroupsTable = $this->lh->getTable('user_former_groups', $this->pageInfo['dbName']);
+        $userGroupsTable = $this->projectRepo->getTableName($this->dbName, 'user_groups');
+        $userFromerGroupsTable = $this->projectRepo->getTableName($this->dbName, 'user_former_groups');
         $query = "SELECT COUNT(rev_user_text) AS count, rev_user_text AS username, ug_group AS current
-                  FROM $this->revisionTable
+                  FROM " . $this->projectRepo->getTableName($this->dbName, 'revision') . "
                   LEFT JOIN $userGroupsTable ON rev_user = ug_user
                   LEFT JOIN $userFromerGroupsTable ON rev_user = ufg_user
                   WHERE rev_page = " . $this->pageInfo['page']->getId() . " AND (ug_group = 'bot' OR ufg_group = 'bot')
@@ -340,9 +332,9 @@ class ArticleInfoController extends Controller
         $pageId = $this->pageInfo['page']->getId();
         $namespace = $this->pageInfo['page']->getNamespace();
         $title = str_replace(' ', '_', $this->pageInfo['page']->getTitle());
-        $externalLinksTable = $this->lh->getTable('externallinks', $this->pageInfo['dbName']);
-        $pageLinksTable = $this->lh->getTable('pagelinks', $this->pageInfo['dbName']);
-        $redirectTable = $this->lh->getTable('redirect', $this->pageInfo['dbName']);
+        $externalLinksTable = $this->projectRepo->getTableName($this->dbName, 'externallinks');
+        $pageLinksTable = $this->projectRepo->getTableName($this->dbName, 'pagelinks');
+        $redirectTable = $this->projectRepo->getTableName($this->dbName, 'redirect');
 
         $query = "SELECT COUNT(*) AS value, 'links_ext' AS type
                   FROM $externalLinksTable WHERE el_from = $pageId
@@ -376,7 +368,7 @@ class ArticleInfoController extends Controller
      */
     private function setLogsEvents()
     {
-        $loggingTable = $this->lh->getTable('logging', $this->pageInfo['dbName'], 'logindex');
+        $loggingTable = $this->projectRepo->getTableName($this->dbName, 'logging', 'logindex');
         $title = str_replace(' ', '_', $this->pageInfo['page']->getTitle());
         $query = "SELECT log_action, log_type, log_timestamp AS timestamp
                   FROM $loggingTable
@@ -429,7 +421,7 @@ class ArticleInfoController extends Controller
             return [];
         }
         $title = $this->pageInfo['page']->getTitle(); // no underscores
-        $dbName = preg_replace('/_p$/', '', $this->pageInfo['dbName']); // remove _p if present
+        $dbName = preg_replace('/_p$/', '', $this->dbName); // remove _p if present
 
         $query = "SELECT error, notice, found, name_trans AS name, prio, text_trans AS explanation
                   FROM s51080__checkwiki_p.cw_error a

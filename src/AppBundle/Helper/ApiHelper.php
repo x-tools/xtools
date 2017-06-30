@@ -21,9 +21,6 @@ class ApiHelper extends HelperBase
     /** @var MediawikiApi The API object. */
     private $api;
 
-    /** @var LabsHelper The Labs helper. */
-    private $labsHelper;
-
     /** @var CacheItemPoolInterface The cache. */
     protected $cache;
 
@@ -33,12 +30,10 @@ class ApiHelper extends HelperBase
     /**
      * ApiHelper constructor.
      * @param ContainerInterface $container
-     * @param LabsHelper $labsHelper
      */
-    public function __construct(ContainerInterface $container, LabsHelper $labsHelper)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->labsHelper = $labsHelper;
         $this->cache = $container->get('cache.app');
     }
 
