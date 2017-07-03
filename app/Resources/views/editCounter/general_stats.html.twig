@@ -243,10 +243,9 @@
                 </td>
             </tr>
             <tr>
-                <td>{{ msg('re-blocked') }}</td>
+                <td>{{ msg('number-of-times-blocked') }}</td>
                 <td>
-                    {# @TODO fix link. https://en.wikisource.org/w/index.php?title=Special%3ALog&type=block&user=&page=User%3ASamwilson&year=&month=-1&tagfilter=&subtype=#}
-                    {{ wiki.userLogLink(user, project, ec.countBlocksReceived, 'block') }}
+                    {{ wiki.userLogLink(null, project, ec.countBlocksReceived, 'block', null, 'User:'~user.username) }}
                 </td>
             </tr>
             <tr>
@@ -272,7 +271,8 @@
                     {% endif %}
                 {% endspaceless %}</td>
             </tr>
-            {% for topProj in ec.globalEditCountsTopN(10) %}
+            {% set topN = 10 %}
+            {% for topProj in ec.globalEditCountsTopN(topN) %}
                 <tr>
                     <td>
                         {% if topProj.project.databaseName == project.databaseName %}
@@ -283,12 +283,13 @@
                         {{ topProj.project.domain }}
                         </a>
                     </td>
-                    <td>
+                    <td class="tdnum">
                         <a href="{{ path('TopEditsResults', {project:topProj.project.domain, username:user.username}) }}">
                             {{ topProj.total|number_format }}
                         </a>
-
-                        <small class="text-muted">@TODO days</small>
+                    </td>
+                    <td>
+                        <small class="text-muted">{# @TODO days #}</small>
                     </td>
                 </tr>
             {% endfor %}
@@ -296,11 +297,12 @@
         <tfoot>
             <tr>
                 <td>{{ msg('global-other-sites-edit-count') }}</td>
-                <td>@TODO</td>
+                <td class="tdnum">{{ ec.globalEditCountWithoutTopN(topN)|number_format }}</td>
             </tr>
             <tr>
                 <td>{{ msg('global-total-edit-count') }}</td>
-                <td>{{ ec.globalEditCount|number_format }} <small>@TODO days</small></td>
+                <td class="tdnum"><strong>{{ ec.globalEditCount|number_format }}</strong></td>
+                <td><small>{# @TODO days #}</small></td>
             </tr>
         </tfoot>
     </table>

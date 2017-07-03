@@ -628,13 +628,24 @@ class EditCounter extends Model
     public function globalEditCountsTopN($numProjects = 10)
     {
         // Get counts.
-        $editCounts = $this->globalEditCounts();
-        // Sort.
-        uasort($editCounts, function ($a, $b) {
-            return $b['total'] - $a['total'];
-        });
+        $editCounts = $this->globalEditCounts(true);
         // Truncate, and return.
         return array_slice($editCounts, 0, $numProjects);
+    }
+
+    /**
+     * Get the total number of edits excluding the top n.
+     * @return int
+     */
+    public function globalEditCountWithoutTopN($numProjects = 10)
+    {
+        $editCounts = $this->globalEditCounts(true);
+        $bottomM = array_slice($editCounts, $numProjects);
+        $total = 0;
+        foreach ($bottomM as $editCount) {
+            $total += $editCount['total'];
+        }
+        return $total;
     }
 
     /**
@@ -654,11 +665,17 @@ class EditCounter extends Model
      * Get the total revision counts for all projects for this user.
      * @return mixed[] Each element has 'total' and 'project' keys.
      */
-    public function globalEditCounts()
+    public function globalEditCounts($sorted = false)
     {
         if (!$this->globalEditCounts) {
             $this->globalEditCounts = $this->getRepository()
                 ->globalEditCounts($this->user, $this->project);
+            if ($sorted) {
+                // Sort.
+                uasort($this->globalEditCounts, function ($a, $b) {
+                    return $b['total'] - $a['total'];
+                });
+            }
         }
         return $this->globalEditCounts;
     }

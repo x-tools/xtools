@@ -175,6 +175,9 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
             $editCounter->globalEditCountsTopN(2)
         );
 
+        // And the bottom 4.
+        $this->assertEquals(95, $editCounter->globalEditCountWithoutTopN(2));
+
         // Grand total.
         $this->assertEquals(185, $editCounter->globalEditCount());
     }
