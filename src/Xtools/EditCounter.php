@@ -635,6 +635,7 @@ class EditCounter extends Model
 
     /**
      * Get the total number of edits excluding the top n.
+     * @param int $numProjects
      * @return int
      */
     public function globalEditCountWithoutTopN($numProjects = 10)
@@ -663,6 +664,7 @@ class EditCounter extends Model
 
     /**
      * Get the total revision counts for all projects for this user.
+     * @param bool $sorted Whether to sort the list by total, or not.
      * @return mixed[] Each element has 'total' and 'project' keys.
      */
     public function globalEditCounts($sorted = false)
