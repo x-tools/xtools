@@ -302,6 +302,8 @@
   "username": "Username",
   "username-or-ip": "Username or IPv4 or IPv6",
   "users": "Users",
+  "users-blocked": "Users blocked",
+  "users-unblocked": "Users un-blocked",
   "view-source": "View Source",
   "vote-msg": "$1 has edited $2 $3 pages!",
   "web-chat": "WebChat",

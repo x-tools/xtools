@@ -195,10 +195,21 @@ class EditCounterRepository extends Repository
         $this->stopwatch->start($cacheKey, 'XTools');
 
         // Query.
-        $sql = "SELECT CONCAT(log_type, '-', log_action) AS source, COUNT(log_id) AS value
-            FROM " . $this->getTableName($project->getDatabaseName(), 'logging') . "
+        $userNamespaceId = 2;
+        $loggingTable = $this->getTableName($project->getDatabaseName(), 'logging');
+        $sql = "
+        (SELECT CONCAT(log_type, '-', log_action) AS source, COUNT(log_id) AS value
+            FROM $loggingTable
             WHERE log_user = :userId
-            GROUP BY log_type, log_action";
+            GROUP BY log_type, log_action
+        ) UNION
+        (SELECT 'users-unblocked' AS source, COUNT(DISTINCT log_title) AS value
+            FROM $loggingTable
+            WHERE log_user = :userId
+                AND log_type = 'block'
+                AND log_action = 'unblock'
+                AND log_namespace = $userNamespaceId
+        )";
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $userId = $user->getId($project);
         $resultQuery->bindParam('userId', $userId);
@@ -221,6 +232,7 @@ class EditCounterRepository extends Repository
             'block-block',
             'block-reblock',
             'block-unblock',
+            'users-unblocked', // Second query above.
             'protect-protect',
             'protect-unprotect',
             'move-move',

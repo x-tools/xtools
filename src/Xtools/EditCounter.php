@@ -329,12 +329,12 @@ class EditCounter extends Model
 
     /**
      * Get the total number of users that this user has unblocked.
-     * @todo
      * @return int
      */
     public function countUsersUnblocked()
     {
-        return 0;
+        $logCounts = $this->getLogCounts();
+        return isset($logCounts['users-unblocked']) ? (int)$logCounts['users-unblocked'] : 0;
     }
 
     /**

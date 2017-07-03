@@ -213,16 +213,16 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td>{{ msg("block") }}</td>
+                    <td>{{ msg("users-blocked") }}</td>
                     <td>
                         {{ ec.countUsersBlocked|number_format }}
                         ({{ wiki.userLogLink(user, project, ec.countBlocksSet|number_format, 'block', 'block') }} {{ msg('num-blocks', [ec.countBlocksSet]) }})
                     </td>
                 </tr>
                 <tr>
-                    <td>{{ msg("unblock") }}</td>
+                    <td>{{ msg("users-unblocked") }}</td>
                     <td>
-                        @TODO {# ec.countUsersUnblocked #}
+                        {{ ec.countUsersUnblocked|number_format }}
                         ({{ wiki.userLogLink(user, project, ec.countBlocksLifted|number_format, 'block', 'unblock') }} {{ msg('num-blocks', [ec.countBlocksLifted]) }})
                     </td>
                 </tr>
