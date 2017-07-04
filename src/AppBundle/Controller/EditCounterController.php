@@ -57,11 +57,6 @@ class EditCounterController extends Controller
         $editCounterRepo->setContainer($this->container);
         $this->editCounter = new EditCounter($this->project, $this->user);
         $this->editCounter->setRepository($editCounterRepo);
-
-        // Don't continue if the user doesn't exist.
-        if (!$this->user->existsOnProject($this->project)) {
-            $this->addFlash('notice', 'user-not-found');
-        }
     }
 
     /**
@@ -114,6 +109,11 @@ class EditCounterController extends Controller
     public function resultAction(Request $request, $project, $username)
     {
         $this->setUpEditCounter($project, $username);
+        // Don't continue if the user doesn't exist.
+        if (!$this->user->existsOnProject($this->project)) {
+            $this->addFlash('notice', 'user-not-found');
+            return $this->redirectToRoute('ec');
+        }
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/result.html.twig', [
             'xtTitle' => $this->user->getUsername() . ' - ' . $this->project->getTitle(),
@@ -137,6 +137,11 @@ class EditCounterController extends Controller
     public function generalStatsAction($project, $username)
     {
         $this->setUpEditCounter($project, $username);
+        // Don't continue if the user doesn't exist.
+        if (!$this->user->existsOnProject($this->project)) {
+            $this->addFlash('notice', 'user-not-found');
+            return $this->redirectToRoute('ec');
+        }
         $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/general_stats.html.twig', [
             'xtTitle' => $this->user->getUsername(),
@@ -159,6 +164,11 @@ class EditCounterController extends Controller
     public function namespaceTotalsAction($project, $username)
     {
         $this->setUpEditCounter($project, $username);
+        // Don't continue if the user doesn't exist.
+        if (!$this->user->existsOnProject($this->project)) {
+            $this->addFlash('notice', 'user-not-found');
+            return $this->redirectToRoute('ec');
+        }
         $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/namespace_totals.html.twig', [
             'xtTitle' => $this->user->getUsername(),
@@ -181,6 +191,11 @@ class EditCounterController extends Controller
     public function timecardAction($project, $username)
     {
         $this->setUpEditCounter($project, $username);
+        // Don't continue if the user doesn't exist.
+        if (!$this->user->existsOnProject($this->project)) {
+            $this->addFlash('notice', 'user-not-found');
+            return $this->redirectToRoute('ec');
+        }
         $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
         $optedInPage = $this->project
             ->getRepository()
@@ -207,6 +222,11 @@ class EditCounterController extends Controller
     public function yearcountsAction($project, $username)
     {
         $this->setUpEditCounter($project, $username);
+        // Don't continue if the user doesn't exist.
+        if (!$this->user->existsOnProject($this->project)) {
+            $this->addFlash('notice', 'user-not-found');
+            return $this->redirectToRoute('ec');
+        }
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         //$yearcounts = $this->editCounterHelper->getYearCounts($username);
         return $this->render('editCounter/yearcounts.html.twig', [
@@ -231,6 +251,11 @@ class EditCounterController extends Controller
     public function monthcountsAction($project, $username)
     {
         $this->setUpEditCounter($project, $username);
+        // Don't continue if the user doesn't exist.
+        if (!$this->user->existsOnProject($this->project)) {
+            $this->addFlash('notice', 'user-not-found');
+            return $this->redirectToRoute('ec');
+        }
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         $optedInPage = $this->project
             ->getRepository()
@@ -258,6 +283,11 @@ class EditCounterController extends Controller
     public function latestglobalAction(Request $request, $project, $username)
     {
         $this->setUpEditCounter($project, $username);
+        // Don't continue if the user doesn't exist.
+        if (!$this->user->existsOnProject($this->project)) {
+            $this->addFlash('notice', 'user-not-found');
+            return $this->redirectToRoute('ec');
+        }
         $isSubRequest = $request->get('htmlonly')
                         || $this->container->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/latest_global.html.twig', [

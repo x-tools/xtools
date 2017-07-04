@@ -495,7 +495,7 @@ class EditCounterRepository extends Repository
                 FROM $revisionTable AS revs
                     JOIN $pageTable AS page ON (rev_page = page_id)
                     LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-                WHERE revs.rev_user_text LIKE :username
+                WHERE revs.rev_user_text = :username
                 ORDER BY revs.rev_timestamp DESC";
             if (is_numeric($lim)) {
                 $sql .= " LIMIT $lim";

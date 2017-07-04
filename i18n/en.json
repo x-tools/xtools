@@ -299,6 +299,7 @@
   "user-groups": "User groups",
   "user-id": "User ID",
   "user-is-not-admin": "This user is not an admin",
+  "user-not-found": "The requested user does not exist",
   "user-page": "User page",
   "username": "Username",
   "username-or-ip": "Username or IPv4 or IPv6",
