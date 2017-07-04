@@ -458,47 +458,51 @@ class EditCounterRepository extends Repository
 
     /**
      * Get revisions by this user.
-     * @param Project $project The project.
+     * @param Project[] $projects The projects.
      * @param User $user The user.
-     * @param DateTime $oldest The oldest revision time of interest (only return greater than this).
-     * @param int $lim The number of results to return.
+     * @param int $lim The maximum number of revisions to fetch from each project.
      * @return array|mixed
      */
-    public function getRevisions(Project $project, User $user, DateTime $oldest = null, $lim = null)
+    public function getRevisions($projects, User $user, $lim = 40)
     {
+        // Check cache.
         $username = $user->getUsername();
-        $cacheKey = "globalcontribs.{$project->getDatabaseName()}.$username";
+        $cacheKey = "globalcontribs.$username";
         $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
-        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
-        $whereTimestamp = ($oldest instanceof DateTime)
-            ? ' AND revs.rev_timestamp > '.$oldest->format('YmdHis')
-            : '';
-        // Column aliases here should match those used in PagesRepository::getRevisions()
-        $sql = "SELECT
-                revs.rev_id AS id,
-                revs.rev_timestamp AS timestamp,
-                UNIX_TIMESTAMP(revs.rev_timestamp) AS unix_timestamp,
-                revs.rev_minor_edit AS minor,
-                revs.rev_deleted AS deleted,
-                revs.rev_len AS length,
-                (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
-                revs.rev_parent_id AS parent_id,
-                revs.rev_comment AS comment,
-                revs.rev_user_text AS username,
-                page.page_title,
-                page.page_namespace
-            FROM $revisionTable AS revs
-                JOIN $pageTable AS page ON (rev_page = page_id)
-                LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-            WHERE revs.rev_user_text LIKE :username $whereTimestamp
-            ORDER BY revs.rev_timestamp DESC";
-        if (is_numeric($lim)) {
-            $sql .= " LIMIT $lim";
+
+        // Assemble queries.
+        $queries = [];
+        foreach ($projects as $project) {
+            $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+            $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
+            $sql = "SELECT
+                    '".$project->getDatabaseName()."' AS project_name,
+                    revs.rev_id AS id,
+                    revs.rev_timestamp AS timestamp,
+                    UNIX_TIMESTAMP(revs.rev_timestamp) AS unix_timestamp,
+                    revs.rev_minor_edit AS minor,
+                    revs.rev_deleted AS deleted,
+                    revs.rev_len AS length,
+                    (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
+                    revs.rev_parent_id AS parent_id,
+                    revs.rev_comment AS comment,
+                    revs.rev_user_text AS username,
+                    page.page_title,
+                    page.page_namespace
+                FROM $revisionTable AS revs
+                    JOIN $pageTable AS page ON (rev_page = page_id)
+                    LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+                WHERE revs.rev_user_text LIKE :username
+                ORDER BY revs.rev_timestamp DESC";
+            if (is_numeric($lim)) {
+                $sql .= " LIMIT $lim";
+            }
+            $queries[] = $sql;
         }
+        $sql = "(\n" . join("\n) UNION (\n", $queries) . ")\n";
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $resultQuery->bindParam(":username", $username);
         $resultQuery->execute();

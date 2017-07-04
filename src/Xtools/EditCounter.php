@@ -689,40 +689,38 @@ class EditCounter extends Model
      */
     public function globalEdits($max)
     {
-        // Store the top n Edits.
-        $globalRevisions = [];
         // Only look for revisions newer than this.
         $oldest = null;
+        // Collect all projects with any edits.
+        $projects = [];
         foreach ($this->globalEditCounts() as $editCount) {
             // Don't query revisions if there aren't any.
             if ($editCount['total'] == 0) {
                 continue;
             }
-
-            /** @var Project $otherProject */
-            $otherProject = $editCount['project'];
-            $revisions = $this->getRepository()
-                ->getRevisions($otherProject, $this->user, $oldest, $max);
-            foreach ($revisions as &$revision) {
-                $nsName = $otherProject->getNamespaces()[$revision['page_namespace']];
-                $page = $otherProject->getRepository()
-                    ->getPage($otherProject, $nsName . ':' . $revision['page_title']);
-                $edit = new Edit($page, $revision);
-
-                // If we've already got enough, only check for those newer than the current oldest.
-                $haveEnough = (count($globalRevisions) >= $max);
-                $thisIsOlder = ($oldest === null
-                    || ($oldest !== null && $edit->getTimestamp() < $oldest));
-                if ($haveEnough && $thisIsOlder) {
-                    // Use this as the new oldest time.
-                    $oldest = $edit->getTimestamp(); //$revision['unix_timestamp'];
-                }
-                $globalRevisions[$edit->getTimestamp()->getTimestamp().'-'.$edit->getId()] = $edit;
-            }
-            // Sort and prune, before adding more.
-            krsort($globalRevisions);
-            $globalRevisions = array_slice($globalRevisions, 0, $max);
+            $projects[$editCount['project']->getDatabaseName()] = $editCount['project'];
         }
-        return $globalRevisions;
+
+        // Get all revisions for those projects.
+        $globalRevisionsData = $this->getRepository()
+            ->getRevisions($projects, $this->user, $max);
+        $globalEdits = [];
+        foreach ($globalRevisionsData as $revision) {
+            /** @var Project $project */
+            $project = $projects[$revision['project_name']];
+            $nsName = '';
+            if ($revision['page_namespace']) {
+                $nsName = $project->getNamespaces()[$revision['page_namespace']];
+            }
+            $page = $project->getRepository()
+                ->getPage($project, $nsName . ':' . $revision['page_title']);
+            $edit = new Edit($page, $revision);
+            $globalEdits[$edit->getTimestamp()->getTimestamp().'-'.$edit->getId()] = $edit;
+        }
+
+        // Sort and prune, before adding more.
+        krsort($globalEdits);
+        $globalEdits = array_slice($globalEdits, 0, $max);
+        return $globalEdits;
     }
 }
