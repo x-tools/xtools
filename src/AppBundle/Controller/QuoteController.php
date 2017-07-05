@@ -35,7 +35,7 @@ class QuoteController extends Controller
      *
      * @Route("/bash",  name="bash")
      * @Route("/quote", name="quote")
-     *
+     * @Route("/bash/base.php", name="bashBase")
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction(Request $request)
