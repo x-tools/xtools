@@ -23,7 +23,7 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
     {
         $editCounterRepo = $this->getMock(EditCounterRepository::class);
         $editCounterRepo->expects($this->once())
-            ->method('getRevisionCounts')
+            ->method('getPairData')
             ->willReturn([
                 'deleted' => 10,
                 'live' => 100,
@@ -45,7 +45,7 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
     public function testDates()
     {
         $editCounterRepo = $this->getMock(EditCounterRepository::class);
-        $editCounterRepo->expects($this->once())->method('getRevisionDates')->willReturn([
+        $editCounterRepo->expects($this->once())->method('getPairData')->willReturn([
                 'first' => '20170510100000',
                 'last' => '20170515150000',
             ]);
@@ -71,7 +71,7 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
     {
         $editCounterRepo = $this->getMock(EditCounterRepository::class);
         $editCounterRepo->expects($this->once())
-            ->method('getRevisionDates')
+            ->method('getPairData')
             ->willReturn([
                 'first' => '20170510110000',
                 'last' => '20170510110000',
@@ -98,7 +98,7 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
     {
         $editCounterRepo = $this->getMock(EditCounterRepository::class);
         $editCounterRepo->expects($this->once())
-            ->method('getPageCounts')
+            ->method('getPairData')
             ->willReturn([
                 'edited-live' => '3',
                 'edited-deleted' => '1',
