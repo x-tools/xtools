@@ -18,16 +18,16 @@ class EditCounterRepository extends Repository
 {
 
     /**
-     * Get revision counts for the given user.
+     * Get data about revisions, pages, etc.
      * @param Project $project The project.
      * @param User $user The user.
      * @returns string[] With keys: 'deleted', 'live', 'total', 'first', 'last', '24h', '7d', '30d',
-     * '365d', 'small', 'large', 'with_comments', and 'minor_edits'.
+     * '365d', 'small', 'large', 'with_comments', and 'minor_edits', ...
      */
-    public function getRevisionCounts(Project $project, User $user)
+    public function getPairData(Project $project, User $user)
     {
         // Set up cache.
-        $cacheKey = 'revisioncounts.' . $project->getDatabaseName() . '.' . $user->getUsername();
+        $cacheKey = 'pairdata.' . $project->getDatabaseName() . '.' . $user->getUsername();
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -35,148 +35,85 @@ class EditCounterRepository extends Repository
         // Prepare the queries and execute them.
         $archiveTable = $this->getTableName($project->getDatabaseName(), 'archive');
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $queries = [
-            'deleted' => "SELECT COUNT(ar_id) FROM $archiveTable
-                WHERE ar_user = :userId",
-            'live' => "SELECT COUNT(rev_id) FROM $revisionTable
-                WHERE rev_user = :userId",
-            'day' => "SELECT COUNT(rev_id) FROM $revisionTable
-                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 DAY)",
-            'week' => "SELECT COUNT(rev_id) FROM $revisionTable
-                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 WEEK)",
-            'month' => "SELECT COUNT(rev_id) FROM $revisionTable
-                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 MONTH)",
-            'year' => "SELECT COUNT(rev_id) FROM $revisionTable
-                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 YEAR)",
-            'small' => "SELECT COUNT(rev_id) FROM $revisionTable
-                WHERE rev_user = :userId AND rev_len < 20",
-            'large' => "SELECT COUNT(rev_id) FROM $revisionTable
-                WHERE rev_user = :userId AND rev_len > 1000",
-            'with_comments' => "SELECT COUNT(rev_id) FROM $revisionTable
-                WHERE rev_user = :userId AND rev_comment = ''",
-            'minor' => "SELECT COUNT(rev_id) FROM $revisionTable
-                WHERE rev_user = :userId AND rev_minor_edit = 1",
-            'average_size' => "SELECT AVG(rev_len) FROM $revisionTable
-                WHERE rev_user = :userId",
-        ];
-        $this->stopwatch->start($cacheKey);
+        $queries = "
+
+            -- Revision counts.
+            (SELECT 'deleted' AS `key`, COUNT(ar_id) AS val FROM $archiveTable
+                WHERE ar_user = :userId
+            ) UNION (
+            SELECT 'live' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
+                WHERE rev_user = :userId
+            ) UNION (
+            SELECT 'day' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
+                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 DAY)
+            ) UNION (
+            SELECT 'week' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
+                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 WEEK)
+            ) UNION (
+            SELECT 'month' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
+                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
+            ) UNION (
+            SELECT 'year' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
+                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+            ) UNION (
+            SELECT 'small' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
+                WHERE rev_user = :userId AND rev_len < 20
+            ) UNION (
+            SELECT 'large' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
+                WHERE rev_user = :userId AND rev_len > 1000
+            ) UNION (
+            SELECT 'with_comments' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
+                WHERE rev_user = :userId AND rev_comment = ''
+            ) UNION (
+            SELECT 'minor' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
+                WHERE rev_user = :userId AND rev_minor_edit = 1
+            ) UNION (
+            SELECT 'average_size' AS `key`, AVG(rev_len) AS val FROM $revisionTable
+                WHERE rev_user = :userId
+
+            -- Dates.
+            ) UNION (
+            SELECT 'first' AS `key`, rev_timestamp AS `val` FROM $revisionTable
+                WHERE rev_user = :userId ORDER BY rev_timestamp ASC LIMIT 1
+            ) UNION (
+            SELECT 'last' AS `key`, rev_timestamp AS `date` FROM $revisionTable
+                WHERE rev_user = :userId ORDER BY rev_timestamp DESC LIMIT 1
+
+            -- Page counts.
+            ) UNION (
+            SELECT 'edited-live' AS `key`, COUNT(DISTINCT rev_page) AS `val`
+                FROM $revisionTable
+                WHERE rev_user = :userId
+            ) UNION (
+            SELECT 'edited-deleted' AS `key`, COUNT(DISTINCT ar_page_id) AS `val`
+                FROM $archiveTable
+                WHERE ar_user = :userId
+            ) UNION (
+            SELECT 'created-live' AS `key`, COUNT(DISTINCT rev_page) AS `val`
+                FROM $revisionTable
+                WHERE rev_user = :userId AND rev_parent_id=0
+            ) UNION (
+            SELECT 'created-deleted' AS `key`, COUNT(DISTINCT ar_page_id) AS `val`
+                FROM $archiveTable
+                WHERE ar_user = :userId AND ar_parent_id=0
+            )
+        ";
+        $resultQuery = $this->getProjectsConnection()->prepare($queries);
+        $userId = $user->getId($project);
+        $resultQuery->bindParam("userId", $userId);
+        $resultQuery->execute();
         $revisionCounts = [];
-        foreach ($queries as $varName => $query) {
-            $resultQuery = $this->getProjectsConnection()->prepare($query);
-            $userId = $user->getId($project);
-            $resultQuery->bindParam("userId", $userId);
-            $resultQuery->execute();
-            $val = $resultQuery->fetchColumn();
-            $revisionCounts[$varName] = $val ?: 0;
-            $this->stopwatch->lap($cacheKey);
+        while ($result = $resultQuery->fetch()) {
+            $revisionCounts[$result['key']] = $result['val'];
         }
 
         // Cache for 10 minutes, and return.
-        $this->stopwatch->stop($cacheKey);
         $cacheItem = $this->cache->getItem($cacheKey)
                 ->set($revisionCounts)
                 ->expiresAfter(new DateInterval('PT10M'));
         $this->cache->save($cacheItem);
 
         return $revisionCounts;
-    }
-
-    /**
-     * Get the first and last revision dates (in MySQL YYYYMMDDHHMMSS format).
-     * @param Project $project The project.
-     * @param User $user The user.
-     * @return string[] With keys 'first' and 'last'.
-     */
-    public function getRevisionDates(Project $project, User $user)
-    {
-        // Set up cache.
-        $cacheKey = 'revisiondates.' . $project->getDatabaseName() . '.' . $user->getUsername();
-        if ($this->cache->hasItem($cacheKey)) {
-            return $this->cache->getItem($cacheKey)->get();
-        }
-
-        $this->stopwatch->start($cacheKey);
-        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $query = "(SELECT 'first' AS `key`, rev_timestamp AS `date` FROM $revisionTable
-            WHERE rev_user = :userId ORDER BY rev_timestamp ASC LIMIT 1)
-            UNION
-            (SELECT 'last' AS `key`, rev_timestamp AS `date` FROM $revisionTable
-            WHERE rev_user = :userId ORDER BY rev_timestamp DESC LIMIT 1)";
-        $resultQuery = $this->getProjectsConnection()->prepare($query);
-        $userId = $user->getId($project);
-        $resultQuery->bindParam("userId", $userId);
-        $resultQuery->execute();
-        $result = $resultQuery->fetchAll();
-        $revisionDates = [];
-        foreach ($result as $res) {
-            $revisionDates[$res['key']] = $res['date'];
-        }
-
-        // Cache for 10 minutes, and return.
-        $cacheItem = $this->cache->getItem($cacheKey)
-                ->set($revisionDates)
-                ->expiresAfter(new DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
-        $this->stopwatch->stop($cacheKey);
-        return $revisionDates;
-    }
-
-    /**
-     * Get page counts for the given user, both for live and deleted pages/revisions.
-     * @param Project $project The project.
-     * @param User $user The user.
-     * @return int[] With keys: edited-live, edited-deleted, created-live, created-deleted.
-     */
-    public function getPageCounts(Project $project, User $user)
-    {
-        // Set up cache.
-        $cacheKey = 'pagecounts.'.$project->getDatabaseName().'.'.$user->getUsername();
-        if ($this->cache->hasItem($cacheKey)) {
-            return $this->cache->getItem($cacheKey)->get();
-        }
-        $this->stopwatch->start($cacheKey, 'XTools');
-
-        // Build and execute query.
-        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $archiveTable = $this->getTableName($project->getDatabaseName(), 'archive');
-        $resultQuery = $this->getProjectsConnection()->prepare("
-            (SELECT 'edited-live' AS source, COUNT(DISTINCT rev_page) AS value
-                FROM $revisionTable
-                WHERE rev_user_text=:username)
-            UNION
-            (SELECT 'edited-deleted' AS source, COUNT(DISTINCT ar_page_id) AS value
-                FROM $archiveTable
-                WHERE ar_user_text=:username)
-            UNION
-            (SELECT 'created-live' AS source, COUNT(DISTINCT rev_page) AS value
-                FROM $revisionTable
-                WHERE rev_user_text=:username AND rev_parent_id=0)
-            UNION
-            (SELECT 'created-deleted' AS source, COUNT(DISTINCT ar_page_id) AS value
-                FROM $archiveTable
-                WHERE ar_user_text=:username AND ar_parent_id=0)
-            ");
-        $username = $user->getUsername();
-        $resultQuery->bindParam("username", $username);
-        $resultQuery->execute();
-        $results = $resultQuery->fetchAll();
-
-        $pageCounts = array_combine(
-            array_map(function ($e) {
-                return $e['source'];
-            }, $results),
-            array_map(function ($e) {
-                return $e['value'];
-            }, $results)
-        );
-
-        // Cache for 10 minutes, and return.
-        $cacheItem = $this->cache->getItem($cacheKey)
-            ->set($pageCounts)
-            ->expiresAfter(new DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
-        $this->stopwatch->stop($cacheKey);
-        return $pageCounts;
     }
 
     /**

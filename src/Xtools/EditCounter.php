@@ -19,8 +19,8 @@ class EditCounter extends Model
     /** @var User The user. */
     protected $user;
 
-    /** @var int[] The total revision counts. */
-    protected $revisionCounts;
+    /** @var int[] Revision and page counts etc. */
+    protected $pairData;
 
     /** @var string[] The start and end dates of revisions. */
     protected $revisionDates;
@@ -49,42 +49,16 @@ class EditCounter extends Model
     }
 
     /**
-     * Get revision count data.
+     * Get revision and page counts etc.
      * @return int[]
      */
-    protected function getRevisionCounts()
+    protected function getPairData()
     {
-        if (! is_array($this->revisionCounts)) {
-            $this->revisionCounts = $this->getRepository()
-                ->getRevisionCounts($this->project, $this->user);
+        if (! is_array($this->pairData)) {
+            $this->pairData = $this->getRepository()
+                ->getPairData($this->project, $this->user);
         }
-        return $this->revisionCounts;
-    }
-
-    /**
-     * Get revision dates.
-     * @return int[]
-     */
-    protected function getRevisionDates()
-    {
-        if (! is_array($this->revisionDates)) {
-            $this->revisionDates = $this->getRepository()
-                ->getRevisionDates($this->project, $this->user);
-        }
-        return $this->revisionDates;
-    }
-
-    /**
-     * Get page count data.
-     * @return int[]
-     */
-    protected function getPageCounts()
-    {
-        if (! is_array($this->pageCounts)) {
-            $this->pageCounts = $this->getRepository()
-                ->getPageCounts($this->project, $this->user);
-        }
-        return $this->pageCounts;
+        return $this->pairData;
     }
 
     /**
@@ -122,7 +96,7 @@ class EditCounter extends Model
      */
     public function countLiveRevisions()
     {
-        $revCounts = $this->getRevisionCounts();
+        $revCounts = $this->getPairData();
         return isset($revCounts['live']) ? $revCounts['live'] : 0;
     }
 
@@ -132,7 +106,7 @@ class EditCounter extends Model
      */
     public function countDeletedRevisions()
     {
-        $revCounts = $this->getRevisionCounts();
+        $revCounts = $this->getPairData();
         return isset($revCounts['deleted']) ? $revCounts['deleted'] : 0;
     }
 
@@ -151,7 +125,7 @@ class EditCounter extends Model
      */
     public function countRevisionsWithComments()
     {
-        $revCounts = $this->getRevisionCounts();
+        $revCounts = $this->getPairData();
         return isset($revCounts['with_comments']) ? $revCounts['with_comments'] : 0;
     }
 
@@ -170,7 +144,7 @@ class EditCounter extends Model
      */
     public function countMinorRevisions()
     {
-        $revCounts = $this->getRevisionCounts();
+        $revCounts = $this->getPairData();
         return isset($revCounts['minor']) ? $revCounts['minor'] : 0;
     }
 
@@ -179,7 +153,7 @@ class EditCounter extends Model
      */
     public function countSmallRevisions()
     {
-        $revCounts = $this->getRevisionCounts();
+        $revCounts = $this->getPairData();
         return isset($revCounts['small']) ? $revCounts['small'] : 0;
     }
 
@@ -188,7 +162,7 @@ class EditCounter extends Model
      */
     public function countLargeRevisions()
     {
-        $revCounts = $this->getRevisionCounts();
+        $revCounts = $this->getPairData();
         return isset($revCounts['large']) ? $revCounts['large'] : 0;
     }
 
@@ -198,7 +172,10 @@ class EditCounter extends Model
      */
     public function averageRevisionSize()
     {
-        $revisionCounts = $this->getRevisionCounts();
+        $revisionCounts = $this->getPairData();
+        if (!isset($revisionCounts['average_size'])) {
+            return 0;
+        }
         return round($revisionCounts['average_size'], 3);
     }
 
@@ -208,7 +185,7 @@ class EditCounter extends Model
      */
     public function countLivePagesEdited()
     {
-        $pageCounts = $this->getPageCounts();
+        $pageCounts = $this->getPairData();
         return isset($pageCounts['edited-live']) ? $pageCounts['edited-live'] : 0;
     }
 
@@ -218,7 +195,7 @@ class EditCounter extends Model
      */
     public function countDeletedPagesEdited()
     {
-        $pageCounts = $this->getPageCounts();
+        $pageCounts = $this->getPairData();
         return isset($pageCounts['edited-deleted']) ? $pageCounts['edited-deleted'] : 0;
     }
 
@@ -247,7 +224,7 @@ class EditCounter extends Model
      */
     public function countCreatedPagesLive()
     {
-        $pageCounts = $this->getPageCounts();
+        $pageCounts = $this->getPairData();
         return isset($pageCounts['created-live']) ? (int)$pageCounts['created-live'] : 0;
     }
 
@@ -257,7 +234,7 @@ class EditCounter extends Model
      */
     public function countPagesCreatedDeleted()
     {
-        $pageCounts = $this->getPageCounts();
+        $pageCounts = $this->getPairData();
         return isset($pageCounts['created-deleted']) ? (int)$pageCounts['created-deleted'] : 0;
     }
 
@@ -443,7 +420,7 @@ class EditCounter extends Model
      */
     public function countRevisionsInLast($time)
     {
-        $revCounts = $this->getRevisionCounts();
+        $revCounts = $this->getPairData();
         return isset($revCounts[$time]) ? $revCounts[$time] : 0;
     }
 
@@ -453,7 +430,7 @@ class EditCounter extends Model
      */
     public function datetimeFirstRevision()
     {
-        $revDates = $this->getRevisionDates();
+        $revDates = $this->getPairData();
         return isset($revDates['first']) ? new DateTime($revDates['first']) : false;
     }
 
@@ -463,7 +440,7 @@ class EditCounter extends Model
      */
     public function datetimeLastRevision()
     {
-        $revDates = $this->getRevisionDates();
+        $revDates = $this->getPairData();
         return isset($revDates['last']) ? new DateTime($revDates['last']) : false;
     }
 
