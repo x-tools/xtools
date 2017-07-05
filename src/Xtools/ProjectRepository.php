@@ -14,15 +14,16 @@ use Psr\Container\ContainerInterface;
  */
 class ProjectRepository extends Repository
 {
+    /** @var array Project's 'dbName', 'url' and 'lang'. */
+    protected $basicInfo;
 
-    /** @var array Project metadata. */
+    /** @var string[] Basic metadata if XTools is in single-wiki mode. */
+    protected $singleBasicInfo;
+
+    /** @var array Full Project metadata, including $basicInfo. */
     protected $metadata;
 
-    /** @var string[] Metadata if XTools is in single-wiki mode. */
-    protected $singleMetadata;
-
-    /** @var string The cache key for the 'all project' metadata.
-     */
+    /** @var string The cache key for the 'all project' metadata. */
     protected $cacheKeyAllProjects = 'allprojects';
 
     /**
@@ -37,9 +38,9 @@ class ProjectRepository extends Repository
         $projectRepo = new ProjectRepository();
         $projectRepo->setContainer($container);
         if ($container->getParameter('app.single_wiki')) {
-            $projectRepo->setSingleMetadata([
+            $projectRepo->setSingleBasicInfo([
                 'url' => $container->getParameter('wiki_url'),
-                'dbname' => $container->getParameter('database_replica_name'),
+                'dbName' => $container->getParameter('database_replica_name'),
             ]);
         }
         $project->setRepository($projectRepo);
@@ -76,24 +77,28 @@ class ProjectRepository extends Repository
      * @param $metadata
      * @throws \Exception
      */
-    public function setSingleMetadata($metadata)
+    public function setSingleBasicInfo($metadata)
     {
-        if (!array_key_exists('url', $metadata) || !array_key_exists('dbname', $metadata)) {
-            $error = "Single-wiki metadata should contain 'url' and 'dbname' keys.";
+        if (!array_key_exists('url', $metadata) || !array_key_exists('dbName', $metadata)) {
+            $error = "Single-wiki metadata should contain 'url', 'dbName' and 'lang' keys.";
             throw new \Exception($error);
         }
-        $this->singleMetadata = array_intersect_key($metadata, ['url' => '', 'dbname' => '']);
+        $this->singleBasicInfo = array_intersect_key($metadata, [
+            'url' => '',
+            'dbName' => '',
+            'lang' => '',
+        ]);
     }
 
     /**
-     * Get metadata about all projects.
-     * @return string[] Each item has 'dbname' and 'url' keys.
+     * Get the 'dbName', 'url' and 'lang' of all projects.
+     * @return string[] Each item has 'dbName', 'url' and 'lang' keys.
      */
     public function getAll()
     {
         $this->log->debug(__METHOD__." Getting all projects' metadata");
         // Single wiki mode?
-        if ($this->singleMetadata) {
+        if ($this->singleBasicInfo) {
             return [$this->getOne('')];
         }
 
@@ -104,11 +109,11 @@ class ProjectRepository extends Repository
 
         // Otherwise, fetch all from the database.
         $wikiQuery = $this->getMetaConnection()->createQueryBuilder();
-        $wikiQuery->select(['dbname', 'url'])->from('wiki');
+        $wikiQuery->select(['dbname AS dbName', 'url', 'lang'])->from('wiki');
         $projects = $wikiQuery->execute()->fetchAll();
         $projectsMetadata = [];
         foreach ($projects as $project) {
-            $projectsMetadata[$project['dbname']] = $project;
+            $projectsMetadata[$project['dbName']] = $project;
         }
 
         // Cache and return.
@@ -120,23 +125,25 @@ class ProjectRepository extends Repository
     }
 
     /**
-     * Get metadata about one project.
+     * Get the 'dbName', 'url' and 'lang' of a project. This is all you need
+     *   to make database queries. More comprehensive metadata can be fetched
+     *   with getMetadata() at the expense of an API call.
      * @param string $project A project URL, domain name, or database name.
-     * @return string[] With 'dbname' and 'url' keys.
+     * @return string[] With 'dbName', 'url' and 'lang' keys.
      */
     public function getOne($project)
     {
         $this->log->debug(__METHOD__." Getting metadata about $project");
         // For single-wiki setups, every project is the same.
-        if ($this->singleMetadata) {
-            return $this->singleMetadata;
+        if ($this->singleBasicInfo) {
+            return $this->singleBasicInfo;
         }
 
         // For muli-wiki setups, first check the cache.
         // First the all-projects cache, then the individual one.
         if ($this->cache->hasItem($this->cacheKeyAllProjects)) {
             foreach ($this->cache->getItem($this->cacheKeyAllProjects)->get() as $projMetadata) {
-                if ($projMetadata['dbname'] == "$project"
+                if ($projMetadata['dbName'] == "$project"
                     || $projMetadata['url'] == "$project"
                     || $projMetadata['url'] == "https://$project") {
                     $this->log->debug(__METHOD__ . " Using cached data for $project");
@@ -151,7 +158,7 @@ class ProjectRepository extends Repository
 
         // Otherwise, fetch the project's metadata from the meta.wiki table.
         $wikiQuery = $this->getMetaConnection()->createQueryBuilder();
-        $wikiQuery->select(['dbname', 'url'])
+        $wikiQuery->select(['dbname AS dbName', 'url', 'lang'])
             ->from('wiki')
             ->where($wikiQuery->expr()->eq('dbname', ':project'))
             // The meta database will have the project's URL stored as https://en.wikipedia.org
@@ -166,26 +173,36 @@ class ProjectRepository extends Repository
         $wikiStatement = $wikiQuery->execute();
 
         // Fetch and cache the wiki data.
-        $projectMetadata = $wikiStatement->fetch();
+        $basicInfo = $wikiStatement->fetch();
+
         $cacheItem = $this->cache->getItem($cacheKey);
-        $cacheItem->set($projectMetadata)
+        $cacheItem->set($basicInfo)
             ->expiresAfter(new \DateInterval('PT1H'));
         $this->cache->save($cacheItem);
 
-        return $projectMetadata;
+        return $basicInfo;
     }
 
     /**
-     * Get metadata about a project.
+     * Get metadata about a project, including the 'dbName', 'url' and 'lang'
      *
      * @param string $projectUrl The project's URL.
-     * @return array With 'general' and 'namespaces' keys: the former contains 'wikiName',
-     * 'wikiId', 'url', 'lang', 'articlePath', 'scriptPath', 'script', 'timezone', and
-     * 'timezoneOffset'; the latter contains all namespace names, keyed by their IDs.
+     * @return array With 'dbName', 'url', 'lang', 'general' and 'namespaces' keys.
+     *   'general' contains: 'wikiName', 'articlePath', 'scriptPath', 'script',
+     *   'timezone', and 'timezoneOffset'; 'namespaces' contains all namespace
+     *   names, keyed by their IDs.
      */
     public function getMetadata($projectUrl)
     {
+        // First try variable cache
         if ($this->metadata) {
+            return $this->metadata;
+        }
+
+        // Redis cache
+        $cacheKey = "projectMetadata." . preg_replace("/[^A-Za-z0-9]/", '', $projectUrl);
+        if ($this->cache->hasItem($cacheKey)) {
+            $this->metadata = $this->cache->getItem($cacheKey)->get();
             return $this->metadata;
         }
 
@@ -199,27 +216,31 @@ class ProjectRepository extends Repository
             'namespaces' => [],
         ];
 
+        // Even if general info could not be fetched,
+        //   return dbName, url and lang if already known
+        if ($this->basicInfo) {
+            $this->metadata['dbName'] = $this->basicInfo['dbName'];
+            $this->metadata['url'] = $this->basicInfo['url'];
+            $this->metadata['lang'] = $this->basicInfo['lang'];
+        }
+
         $res = $api->getRequest($query);
 
         if (isset($res['query']['general'])) {
             $info = $res['query']['general'];
+
+            $this->metadata['dbName'] = $info['wikiid'];
+            $this->metadata['url'] = $info['server'];
+            $this->metadata['lang'] = $info['lang'];
+
             $this->metadata['general'] = [
                 'wikiName' => $info['sitename'],
-                'wikiId' => $info['wikiid'],
-                'url' => $info['server'],
-                'lang' => $info['lang'],
                 'articlePath' => $info['articlepath'],
                 'scriptPath' => $info['scriptpath'],
                 'script' => $info['script'],
                 'timezone' => $info['timezone'],
                 'timeOffset' => $info['timeoffset'],
             ];
-
-//            if ($this->container->getParameter('app.is_labs') &&
-//                substr($result['general']['dbName'], -2) != '_p'
-//            ) {
-//                $result['general']['dbName'] .= '_p';
-//            }
         }
 
         if (isset($res['query']['namespaces'])) {
@@ -236,14 +257,14 @@ class ProjectRepository extends Repository
                     continue;
                 }
 
-                // FIXME: Figure out a way to i18n-ize this
-                if ($name === '') {
-                    $name = 'Article';
-                }
-
                 $this->metadata['namespaces'][$namespace['id']] = $name;
             }
         }
+
+        $cacheItem = $this->cache->getItem($cacheKey);
+        $cacheItem->set($this->metadata)
+            ->expiresAfter(new \DateInterval('PT1H'));
+        $this->cache->save($cacheItem);
 
         return $this->metadata;
     }

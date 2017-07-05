@@ -32,7 +32,7 @@
             datasets: [
                 {% for ns_id,yeartotals in ec.yearcounts.totals %}
                 {
-                    label: "{{ attribute(project.namespaces, ns_id) }}",
+                    label: "{{ nsName(ns_id, project.namespaces) }}",
                     data: [
                         {% for y in ec.yearcounts.years %}
                         {% if attribute(yeartotals, y) is defined %}{{ attribute(yeartotals, y) }}{% else %}0{% endif %}{% if not loop.last %},{% endif %}

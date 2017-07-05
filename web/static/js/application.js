@@ -338,8 +338,9 @@
 
                 // Add all of the new namespace options.
                 for (var ns in data.namespaces) {
+                    var nsName = parseInt(ns, 10) === 0 ? $.i18n('mainspace') : data.namespaces[ns];
                     $('#namespace_select').append(
-                        "<option value=" + ns + ">" + data.namespaces[ns] + "</option>"
+                        "<option value=" + ns + ">" + nsName + "</option>"
                     );
                 }
                 // Default to mainspace being selected.

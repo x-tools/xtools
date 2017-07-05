@@ -24,15 +24,28 @@ class ProjectTest extends PHPUnit_Framework_TestCase
         $projectRepo = $this->getMock(ProjectRepository::class);
         $projectRepo->expects($this->once())
             ->method('getOne')
-            ->willReturn(['url' => 'https://test.example.org', 'dbname' => 'test_wiki']);
+            ->willReturn([
+                'url' => 'https://test.example.org',
+                'dbName' => 'test_wiki',
+                'lang' => 'en',
+            ]);
+        $projectRepo->expects($this->once())
+            ->method('getMetadata')
+            ->willReturn([
+                'general' => [
+                    'articlePath' => '/test_wiki/$1',
+                    'scriptPath' => '/test_w',
+                ],
+            ]);
 
         $project = new Project('testWiki');
         $project->setRepository($projectRepo);
         $this->assertEquals('test.example.org', $project->getDomain());
         $this->assertEquals('test_wiki', $project->getDatabaseName());
         $this->assertEquals('https://test.example.org/', $project->getUrl());
-        $this->assertEquals('/w', $project->getScriptPath());
-        $this->assertEquals('/wiki/$1', $project->getArticlePath());
+        $this->assertEquals('en', $project->getLang());
+        $this->assertEquals('/test_w', $project->getScriptPath());
+        $this->assertEquals('/test_wiki/$1', $project->getArticlePath());
         $this->assertTrue($project->exists());
     }
 
@@ -55,11 +68,14 @@ class ProjectTest extends PHPUnit_Framework_TestCase
         $projectRepo = $this->getMock(ProjectRepository::class);
         $projectRepo->expects($this->once())
             ->method('getMetadata')
-            ->willReturn(['namespaces' => [0 => 'Article', 1 => 'Article_talk']]);
+            ->willReturn(['namespaces' => [0 => 'Main', 1 => 'Article_talk']]);
 
         $project = new Project('testWiki');
         $project->setRepository($projectRepo);
         $this->assertCount(2, $project->getNamespaces());
+
+        // Tests that getMetadata was in fact called only once and cached afterwards
+        $this->assertEquals($project->getNamespaces()[0], 'Main');
     }
 
     /**
@@ -68,14 +84,16 @@ class ProjectTest extends PHPUnit_Framework_TestCase
     public function testSingleWiki()
     {
         $projectRepo = new ProjectRepository();
-        $projectRepo->setSingleMetadata([
+        $projectRepo->setSingleBasicInfo([
             'url' => 'https://example.org/a-wiki/',
-            'dbname' => 'example_wiki',
+            'dbName' => 'example_wiki',
+            'lang' => 'en',
         ]);
         $project = new Project('disregarded_wiki_name');
         $project->setRepository($projectRepo);
         $this->assertEquals('example_wiki', $project->getDatabaseName());
         $this->assertEquals('https://example.org/a-wiki/', $project->getUrl());
+        $this->assertEquals('en', $project->getLang());
     }
 
     /**
@@ -108,7 +126,7 @@ class ProjectTest extends PHPUnit_Framework_TestCase
             ->willReturn($optedInProjects);
         $projectRepo->expects($this->once())
             ->method('getOne')
-            ->willReturn(['dbname' => $dbname]);
+            ->willReturn(['dbName' => $dbname]);
 
         $project = new Project($dbname);
         $project->setRepository($projectRepo);

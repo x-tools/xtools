@@ -44,12 +44,12 @@
         {% if multiNamspace %}
         <div class="text-center xt-toc">
             {#
-             # To save real estate, show "Namespace (talk)" where appropriate
+             # To save real estate, show "Namespace (talk)" as separate links
              # instead of "Namespace" "Namespace talk"
              #}
             {% for key, value in count if (key is even or (key is odd and not(count[key - 1] is defined))) %}
                 <span>
-                    <a href="#{{ key }}" data-section="{{ key }}">{{ namespaces[key] }}</a>
+                    <a href="#{{ key }}" data-section="{{ key }}">{{ nsName(key, namespaces) }}</a>
                     {% if count[key + 1] is defined %}
                         (<a href="#{{ key+1 }}" data-section="{{ key+1 }}">{{ msg('talk') | lower }}</a>)
                     {% endif %}
@@ -64,11 +64,7 @@
                     <tr>
                         <td>{{ msg('namespace') }}</td>
                         <td>
-                            {% if namespace == 'all' %}
-                                {{ msg('all') | capitalize_first }}
-                            {% else %}
-                                {{ namespaces[namespace] }}
-                            {% endif %}
+                            {{ nsName(namespace, namespaces) }}
                         </td>
                     </tr>
                     <tr>
@@ -102,7 +98,7 @@
                             </span>
                             {% endif %}
 
-                            <a href="#{{ key }}" >{{ namespaces[key] }}</a>
+                            <a href="#{{ key }}" >{{ nsName(key, namespaces) }}</a>
                         </td>
                         {% if redirect != 'onlyredirects' %}
                             <td class="sort-entry--pages" data-value="{{ value.total }}">
@@ -247,7 +243,7 @@
                     </tbody>
                 </table>
             {% endset %}
-            {{ layout.content_block(namespaces[key], content, null, key, true) }}
+            {{ layout.content_block(nsName(key, namespaces), content, null, key, true) }}
         {% endfor %}
     </div>
 
@@ -260,7 +256,7 @@
                 data: {
                     labels: [
                         {% for ns in nsIds %}
-                            "{{ namespaces[ns] }}"{% if not loop.last %},{% endif %}
+                            "{{ nsName(ns, namespaces) }}"{% if not loop.last %},{% endif %}
                         {% endfor %}
                     ],
                     datasets: [{

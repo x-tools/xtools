@@ -58,6 +58,7 @@ class AppExtension extends Extension
             new \Twig_SimpleFunction('bugReportURL', [ $this, 'bugReportURL' ]),
             new \Twig_SimpleFunction('logged_in_user', [$this, 'functionLoggedInUser']),
             new \Twig_SimpleFunction('isUserAnon', [$this, 'isUserAnon']),
+            new \Twig_SimpleFunction('nsName', [$this, 'nsName']),
         ];
     }
 
@@ -453,8 +454,8 @@ class AppExtension extends Extension
             }
 
             $stmt = "SELECT lag FROM `heartbeat_p`.`heartbeat` h
-            RIGHT JOIN `meta_p`.`wiki` w on concat(h.shard, \".labsdb\")=w.slice
-            where dbname like :project or name like :project or url like :project limit 1";
+            RIGHT JOIN `meta_p`.`wiki` w ON concat(h.shard, \".labsdb\")=w.slice
+            WHERE dbname LIKE :project OR name LIKE :project OR url LIKE :project LIMIT 1";
 
             $conn = $this->container->get('doctrine')->getManager("replicas")->getConnection();
 
@@ -573,5 +574,23 @@ class AppExtension extends Extension
         }
 
         return filter_var($username, FILTER_VALIDATE_IP);
+    }
+
+    /**
+     * Helper to properly translate a namespace name
+     * @param  int|string $namespace Namespace key as a string or ID
+     * @param  array      $namespaces List of available namespaces
+     *                                as retrieved from Project::getNamespaces
+     * @return string Namespace name
+     */
+    public function nsName($namespace, $namespaces)
+    {
+        if ($namespace === 'all') {
+            return $this->getIntuition()->msg('all');
+        } elseif ($namespace === '0' || $namespace === 0 || $namespace === 'Main') {
+            return $this->getIntuition()->msg('mainspace');
+        } else {
+            return $namespaces[$namespace];
+        }
     }
 }

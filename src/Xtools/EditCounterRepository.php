@@ -266,7 +266,7 @@ class EditCounterRepository extends Repository
         $out = [];
         foreach ($editCounts as $editCount) {
             $out[] = [
-                'project' => ProjectRepository::getProject($editCount['dbname'], $this->container),
+                'project' => ProjectRepository::getProject($editCount['dbName'], $this->container),
                 'total' => $editCount['total'],
             ];
         }
@@ -279,7 +279,7 @@ class EditCounterRepository extends Repository
      *
      * @param User $user The user.
      * @param Project $project The project to start from.
-     * @return mixed[] Elements are arrays with 'dbname' (string), and 'total' (int).
+     * @return mixed[] Elements are arrays with 'dbName' (string), and 'total' (int).
      */
     protected function globalEditCountsFromCentralAuth(User $user, Project $project)
     {
@@ -308,7 +308,7 @@ class EditCounterRepository extends Repository
         $out = [];
         foreach ($result['query']['globaluserinfo']['merged'] as $result) {
             $out[] = [
-                'dbname' => $result['wiki'],
+                'dbName' => $result['wiki'],
                 'total' => $result['editcount'],
             ];
         }
@@ -328,7 +328,7 @@ class EditCounterRepository extends Repository
      * @see EditCounterRepository::globalEditCountsFromCentralAuth()
      * @param User $user The user.
      * @param Project $project The project to start from.
-     * @return mixed[] Elements are arrays with 'dbname' (string), and 'total' (int).
+     * @return mixed[] Elements are arrays with 'dbName' (string), and 'total' (int).
      */
     protected function globalEditCountsFromDatabases(User $user, Project $project)
     {
@@ -339,11 +339,11 @@ class EditCounterRepository extends Repository
             $revisionTableName = $this->getTableName($projectMeta['dbName'], 'revision');
             $sql = "SELECT COUNT(rev_id) FROM $revisionTableName WHERE rev_user_text=:username";
             $stmt = $this->getProjectsConnection()->prepare($sql);
-            $stmt->bindParam("username", $user->getUsername());
+            $stmt->bindParam('username', $user->getUsername());
             $stmt->execute();
             $total = (int)$stmt->fetchColumn();
             $topEditCounts[] = [
-                'dbname' => $projectMeta['dbName'],
+                'dbName' => $projectMeta['dbName'],
                 'total' => $total,
             ];
             $this->stopwatch->lap($stopwatchName);
@@ -486,7 +486,7 @@ class EditCounterRepository extends Repository
         $resultQuery->bindParam(":username", $username);
         $resultQuery->execute();
         $totals = $resultQuery->fetchAll();
-        
+
         $cacheItem = $this->cache->getItem($cacheKey);
         $cacheItem->expiresAfter(new DateInterval('PT10M'));
         $cacheItem->set($totals);

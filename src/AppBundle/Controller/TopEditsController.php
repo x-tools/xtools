@@ -166,7 +166,7 @@ class TopEditsController extends Controller
 
         // Inform user if no revisions found.
         if (count($editData) === 0) {
-            $this->addFlash("notice", ["no-contribs"]);
+            $this->addFlash('notice', ['no-contribs']);
         }
 
         // Get page info about these 100 pages, so we can use their display title.
@@ -176,6 +176,7 @@ class TopEditsController extends Controller
             $nsTitle = $ns > 0 ? $namespaces[$e['page_namespace']] . ':' : '';
             return $nsTitle . $e['page_title'];
         }, $editData);
+
         /** @var ApiHelper $apiHelper */
         $apiHelper = $this->get('app.api_helper');
         $displayTitles = $apiHelper->displayTitles($project->getDomain(), $titles);
@@ -204,7 +205,6 @@ class TopEditsController extends Controller
             'user' => $user,
             'namespace' => $namespaceId,
             'edits' => $edits,
-            'content_title' => $namespaceMsg,
         ]);
     }
 

@@ -65,7 +65,11 @@
         {% endif %}
         {% for id, name in project.namespaces %}
             <option value="{{ id }}" {% if value is same as(id) %}selected="selected"{% endif %}>
-                {{ name }}
+                {% if id == 0 %}
+                    {{ msg('mainspace') }}
+                {% else %}
+                    {{ name }}
+                {% endif %}
             </option>
         {% endfor %}
     </select>
