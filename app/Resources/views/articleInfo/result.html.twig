@@ -83,7 +83,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <a class="rm-inline-margin" href="#usertable">{{ msg('editors') }}</a>
+                            <a class="rm-inline-margin" href="#top-editors">{{ msg('editors') }}</a>
                         </td>
                         <td>{{ general.editor_count|number_format }}</td>
                     </tr>
@@ -246,7 +246,7 @@
                     <tr>
                         <td>{{ msg('pageviews') }} (60 {{ msg('num-days', [60]) }})</td>
                         <td>
-                            {{ wiki.pageviewsLink(page, general.pageviews|number_format, '&range=latest-'~general.pageviews_offset) }}
+                            {{ wiki.pageviewsLink(page, general.pageviews|number_format, 'range=latest-'~general.pageviews_offset) }}
                         </td>
                     </tr>
                     {% endif %}

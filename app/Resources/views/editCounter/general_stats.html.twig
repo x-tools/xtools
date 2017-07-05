@@ -35,17 +35,21 @@
                 {% for group in user.groups(project) %}
                     {{ group }}{% if not loop.last %}, {% endif %}
                 {% endfor %}
-                {% if user.globalGroups(project) %}
-                    <br />&bull; {{ msg("global-user-groups") }}
+            </td>
+        </tr>
+        {% if user.globalGroups(project) %}
+            <tr>
+                <td>{{ msg("global-user-groups") }}</td>
+                <td>
                     {% for group in user.globalGroups(project) %}
                         {{ group }}{% if not loop.last %}, {% endif %}
                     {% endfor %}
-                {% endif %}
-            </td>
-        </tr>
+                </td>
+            </tr>
+        {% endif %}
         <tr>
             <td>{{ msg('is-admin') }}</td>
-            <td>{% if user.isAdmin(project) %}<span class="text-info">&check;{% else %}<span class="text-warning">&cross;</span>{% endif %}</td>
+            <td>{% if user.isAdmin(project) %}<span class="text-success">&check;{% else %}<span class="text-warning">&cross;</span>{% endif %}</td>
         </tr>
         <tr>
             <td>{{ msg('first-edit') }}</td>
@@ -57,11 +61,15 @@
         </tr>
         <tr>
             <td class="stat-list--new-group">{{ msg('live-edits') }}</td>
-            <td class="stat-list--new-group">{{ ec.countLiveRevisions|number_format }}</td>
+            <td class="stat-list--new-group">
+                {{ wiki.pageLinkRaw('Special:Contributions/'~user.username, project, ec.countLiveRevisions|number_format) }}
+            </td>
         </tr>
         <tr>
             <td>{{ msg('deleted-edits') }}</td>
-            <td>{{ ec.countDeletedRevisions|number_format }}</td>
+            <td>
+                {{ wiki.pageLinkRaw('Special:DeletedContributions/'~user.username, project, ec.countDeletedRevisions|number_format) }}
+            </td>
         </tr>
         <tr>
             <td><strong>{{ msg('total-edits') }}</strong></td>
@@ -71,10 +79,10 @@
 </div>
 <div class="col-lg-6 stat-list clearfix">
     <table class="table"><tbody>
-        <tr><td>{{ msg('lastday') }}</td><td>{{ ec.countRevisionsInLast('day')|number_format }}</td></tr>
-        <tr><td>{{ msg('lastweek') }}</td><td>{{ ec.countRevisionsInLast('week')|number_format }}</td></tr>
-        <tr><td>{{ msg('lastmonth') }}</td><td>{{ ec.countRevisionsInLast('month')|number_format }}</td></tr>
-        <tr><td>{{ msg('lastyear') }}</td><td>{{ ec.countRevisionsInLast('year')|number_format }}</td></tr>
+        <tr><td>{{ msg('last-day') }}</td><td>{{ ec.countRevisionsInLast('day')|number_format }}</td></tr>
+        <tr><td>{{ msg('last-week') }}</td><td>{{ ec.countRevisionsInLast('week')|number_format }}</td></tr>
+        <tr><td>{{ msg('last-month') }}</td><td>{{ ec.countRevisionsInLast('month')|number_format }}</td></tr>
+        <tr><td>{{ msg('last-year') }}</td><td>{{ ec.countRevisionsInLast('year')|number_format }}</td></tr>
         <tr>
             <td>{{ msg("average-edits-per-day", [msg("days", [1])]) }}</td>
             <td>
@@ -111,9 +119,7 @@
             <tr>
                 <td>{{ msg('pages-created') }}</td>
                 <td>
-                    <a href="{{ path('PagesResult', {project:project.domain, username:user.username, namespace:'all', redirects:'none'}) }}">
-                        {{ ec.countPagesCreated|number_format }}
-                    </a>
+                    <a href="{{ path('PagesResult', {project:project.domain, username:user.username, namespace:'all', redirects:'none'}) }}">{{ ec.countPagesCreated|number_format }}</a>
                     <span class="text-muted">({{ msg('pages-created-since-deleted', [ec.countPagesCreatedDeleted|number_format]) }})</span>
                 </td>
             </tr>
@@ -155,10 +161,18 @@
             </tr>
             <tr>
                 <td>{{ msg('auto-edits') }}</td>
-                <td><a href="#autoeditslist">{{ ec.countAutomatedRevisions }}</a></td>
+                <td>
+                    {% if is_sub_request %}
+                        <a href="#autoeditslist">{{ ec.countAutomatedRevisions }}</a>
+                    {% elseif enabled('autoedits') %}
+                        <a href="{{ path('autoedits', {project:project.domain, username:user.username}) }}">{{ ec.countAutomatedRevisions }}</a>
+                    {% else %}
+                        {{ ec.countAutomatedRevisions }}
+                    {% endif %}
+                </td>
             </tr>
             <tr>
-                <td>{{ msg('edits-with-comments') }}</td>
+                <td>{{ msg('edits-with-summaries') }}</td>
                 <td>{{ ec.countRevisionsWithComments|number_format }}</td>
             </tr>
             <tr>
@@ -213,37 +227,53 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td>{{ msg("users-blocked") }}</td>
+                    <td>{{ msg('block') }}</td>
                     <td>
                         {{ ec.countUsersBlocked|number_format }}
                         ({{ wiki.userLogLink(user, project, ec.countBlocksSet|number_format, 'block', 'block') }} {{ msg('num-blocks', [ec.countBlocksSet]) }})
                     </td>
                 </tr>
                 <tr>
-                    <td>{{ msg("users-unblocked") }}</td>
+                    <td>{{ msg('unblock') }}</td>
                     <td>
                         {{ ec.countUsersUnblocked|number_format }}
                         ({{ wiki.userLogLink(user, project, ec.countBlocksLifted|number_format, 'block', 'unblock') }} {{ msg('num-blocks', [ec.countBlocksLifted]) }})
                     </td>
                 </tr>
-                <tr><td>{{ msg("protect") }}</td><td>{{ wiki.userLogLink(user, project, ec.countPagesProtected|number_format, 'protect', 'protect') }}</td></tr>
-                <tr><td>{{ msg("unprotect") }}</td><td>{{ wiki.userLogLink(user, project, ec.countPagesUnprotected|number_format, 'protect', 'unprotect') }}</td></tr>
-                <tr><td>{{ msg("delete") }}</td><td>{{ wiki.userLogLink(user, project, ec.countPagesDeleted|number_format, 'delete', 'delete') }}</td></tr>
-                <tr><td>{{ msg("deleted-edits") }})</td><td>{{ ec.countEditsDeleted|number_format }}</td></tr>
-                <tr><td>{{ msg("restore") }}</td><td>{{ wiki.userLogLink(user, project, ec.countPagesRestored|number_format, 'delete', 'restore') }}</td></tr>
-                <tr><td>{{ msg("import") }}</td><td>{{ wiki.userLogLink(user, project, ec.countPagesImported|number_format, 'import') }}</td></tr>
+                <tr>
+                    <td>{{ msg('protect') }}</td>
+                    <td>{{ wiki.userLogLink(user, project, ec.countPagesProtected|number_format, 'protect', 'protect') }}</td>
+                </tr>
+                <tr>
+                    <td>{{ msg('unprotect') }}</td>
+                    <td>{{ wiki.userLogLink(user, project, ec.countPagesUnprotected|number_format, 'protect', 'unprotect') }}</td>
+                </tr>
+                <tr>
+                    <td>{{ msg('delete') }}</td>
+                    <td>{{ wiki.userLogLink(user, project, ec.countPagesDeleted|number_format, 'delete', 'delete') }}</td>
+                </tr>
+                <tr>
+                    <td>{{ msg('revision-delete') }}</td>
+                    <td>{{ wiki.userLogLink(user, project, ec.countEditsDeleted|number_format, 'delete', 'revision') }}</td>
+                </tr>
+                <tr>
+                    <td>{{ msg('restore') }}</td>
+                    <td>{{ wiki.userLogLink(user, project, ec.countPagesRestored|number_format, 'delete', 'restore') }}</td>
+                </tr>
+                <tr>
+                    <td>{{ msg('import') }}</td>
+                    <td>{{ wiki.userLogLink(user, project, ec.countPagesImported|number_format, 'import') }}</td>
+                </tr>
             {% endif %}
         </tbody>
 
         {# ======================== BLOCKS ======================== #}
         <tbody class="stat-list--group">
             <tr>
-                <td colspan="2" class="text-muted">
-                    {{ msg('blocks') }}
-                </td>
+                <td colspan="2" class="text-muted">{{ msg('blocks') }}</td>
             </tr>
             <tr>
-                <td>{{ msg('number-of-times-blocked') }}</td>
+                <td>{{ msg('re-blocks') }}</td>
                 <td>
                     {{ wiki.userLogLink(null, project, ec.countBlocksReceived, 'block', null, 'User:'~user.username) }}
                 </td>
@@ -264,8 +294,7 @@
         <tbody class="stat-list--group">
             <tr>
                 <td colspan="2" class="text-muted">
-                    {{ msg('top-projects-edit-counts') }}
-                    {% spaceless %}
+                    {{ msg('top-projects-edit-counts') }}{% spaceless %}
                     {% if is_sub_request %}
                         (<a href="#latest-global-edits">{{ msg('top-projects-read-more-link') }}</a>)
                     {% endif %}
@@ -278,18 +307,14 @@
                         {% if topProj.project.databaseName == project.databaseName %}
                             <span title="{{ msg('selected') }}">&#9658;</span>
                         {% endif %}
-                        <a href="{{ topProj.project.url }}{{ topProj.project.articlePath }}/Special:Contributions/{{ user.username }}">
                         {# use project.domain instead of title due to limited space available in the interface #}
-                        {{ topProj.project.domain }}
-                        </a>
+                        {{- wiki.pageLinkRaw('Special:Contributions/'~user.username, topProj.project, topProj.project.domain) -}}
                     </td>
-                    <td class="tdnum">
+                    <td>
                         <a href="{{ path('TopEditsResults', {project:topProj.project.domain, username:user.username}) }}">
                             {{ topProj.total|number_format }}
                         </a>
-                    </td>
-                    <td>
-                        <small class="text-muted">{# @TODO days #}</small>
+                        {# <small class="text-muted">@TODO days</small> #}
                     </td>
                 </tr>
             {% endfor %}
@@ -297,12 +322,14 @@
         <tfoot>
             <tr>
                 <td>{{ msg('global-other-sites-edit-count') }}</td>
-                <td class="tdnum">{{ ec.globalEditCountWithoutTopN(topN)|number_format }}</td>
+                <td>{{ ec.globalEditCountWithoutTopN(topN)|number_format }}</td>
             </tr>
             <tr>
                 <td>{{ msg('global-total-edit-count') }}</td>
-                <td class="tdnum"><strong>{{ ec.globalEditCount|number_format }}</strong></td>
-                <td><small>{# @TODO days #}</small></td>
+                <td>
+                    <strong>{{ ec.globalEditCount|number_format }}</strong>
+                    {# <small>@TODO days</small> #}
+                </td>
             </tr>
         </tfoot>
     </table>

@@ -56,7 +56,7 @@
 
         <table class="table table-bordered table-hover table-striped top-editors-table">
             <thead><tr>
-                {% for key in ['date', 'links', 'size', 'comment'] %}
+                {% for key in ['date', 'links', 'size', 'edit-summary'] %}
                     <th>
                         <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
                             {{ msg(key)|capitalize_first }}
@@ -80,7 +80,7 @@
                 <td class="sort-entry--size" data-value="{{ rev.size }}">
                     {{ rev.size|diff_format }}
                 </td>
-                <td class="sort-entry--comment" data-value="{{ rev.comment }}">
+                <td class="sort-entry--summary" data-value="{{ rev.comment }}">
                     {{ rev.comment|wikify_comment(page.title, project.url) }}
                 </td>
             </tr>

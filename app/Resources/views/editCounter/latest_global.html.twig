@@ -25,7 +25,7 @@
 
 <table class="table table-bordered table-hover table-striped latest-global-table">
     <thead><tr>
-        {% for key in ['date', 'project', 'links', 'page-title', 'size', 'comment'] %}
+        {% for key in ['date', 'project', 'links', 'page-title', 'size', 'edit-summary'] %}
             <th>
                 <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
                     {% if key == 'average-time-bw-edits' %}
@@ -64,7 +64,7 @@
             <td class="sort-entry--size" data-value="{{ edit.lengthChange }}">
                 {{ edit.lengthChange|diff_format }}
             </td>
-            <td class="sort-entry--comment" data-value="{{ edit.comment }}">
+            <td class="sort-entry--summary" data-value="{{ edit.comment }}">
                 {{ edit.comment|wikify_comment(edit.page.title, project.url) }}
             </td>
         </tr>
