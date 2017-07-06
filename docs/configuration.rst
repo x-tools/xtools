@@ -10,23 +10,39 @@ of those options.
 Databases
 =========
 
-- **database_host** - Hostname for the server with the symfony database
-- **database_port** - Port for the server with the symfony database
-- **database_name** - Database Name for the server with the symfony database
-- **database_user** - Username for the server with the symfony database
-- **database_password** - Password for the server with the symfony database
+XTools' own database:
 
-- **database_replica_host** - Hostname for the server with the MediaWiki database
-- **database_replica_port** - Port for the server with the MediaWiki database
-- **database_replica_name** - Database Name for the server with the MediaWiki database
-- **database_replica_user** - Username for the server with the MediaWiki database
-- **database_replica_password** - Password for the server with the MediaWiki database
-- **database_meta_name** - Database Name for the server with the meta_p table (This is optional if ``app.single_wiki`` is set)
+- **database_host** - Hostname for the server with the XTools database
+- **database_port** - Port for the server with the XTools database
+- **database_name** - Database name of the XTools database
+- **database_user** - Username for the XTools database
+- **database_password** - Password for the user for the XTools database
+
+The projects' databases:
+
+- **database_replica_host** - Hostname for the server with the MediaWiki databases
+- **database_replica_port** - Port for the server with the MediaWiki databases
+- **database_replica_name** - Database name of any one of the MediaWiki databases (usually the default, or the 'meta'; it doesn't matter which).
+- **database_replica_user** - Username for the MediaWiki databases
+- **database_replica_password** - Password for the user for the MediaWiki databases
+
+The 'meta' database:
+
+- **database_meta_name** - Database Name for the server with the meta_p table (this is not required if ``app.single_wiki`` is set)
+
+Other tools' database (e.g. checkwiki_):
+
+- **database_toolsdb_host** - MySQL host name
+- **database_toolsdb_port** - MySQL port number
+- **database_toolsdb_name** - Username to connect as
+- **database_toolsdb_password** - Password to use for the user
+
+.. _checkwiki: https://tools.wmflabs.org/checkwiki/
 
 Authentication and Email
 ========================
 
-The Oauth details need to requested from Special:OAuthConsumerRegistration on your default wiki.
+The Oauth details need to be requested from ``Special:OAuthConsumerRegistration`` on your default wiki.
 
 - **auth_key** - Oauth consumer key
 - **auth_secret** - Oauth consumer secret
