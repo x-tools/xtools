@@ -234,11 +234,15 @@ class EditCounterRepository extends Repository
      */
     public function getBlocksReceived(Project $project, User $user)
     {
-        $ipblocksTable = $this->getTableName($project->getDatabaseName(), 'ipblocks');
-        $sql = "SELECT * FROM $ipblocksTable WHERE ipb_user = :userId";
+        $loggingTable = $this->getTableName($project->getDatabaseName(), 'logging', 'logindex');
+        $sql = "SELECT log_timestamp, log_params FROM $loggingTable
+                WHERE log_type = 'block'
+                AND log_action = 'block'
+                AND log_timestamp > 0
+                AND log_title = :username";
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $userId = $user->getId($project);
-        $resultQuery->bindParam('userId', $userId);
+        $username = str_replace(' ', '_', $user->getUsername());
+        $resultQuery->bindParam('username', $username);
         $resultQuery->execute();
         return $resultQuery->fetchAll();
     }

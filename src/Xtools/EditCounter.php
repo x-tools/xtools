@@ -12,10 +12,10 @@ use \DateTime;
  */
 class EditCounter extends Model
 {
-    
+
     /** @var Project The project. */
     protected $project;
-    
+
     /** @var User The user. */
     protected $user;
 
@@ -27,7 +27,7 @@ class EditCounter extends Model
 
     /** @var int[] The total page counts. */
     protected $pageCounts;
-    
+
     /** @var int[] The lot totals. */
     protected $logCounts;
 
@@ -36,6 +36,13 @@ class EditCounter extends Model
 
     /** @var array Block data, with keys 'set' and 'received'. */
     protected $blocks;
+
+    /**
+     * Duration of the longest block in days; -1 if indefinite,
+     *   or false if could not be parsed from log params
+     * @var int|bool
+     */
+    protected $longestBlockDays;
 
     /**
      * EditCounter constructor.
@@ -291,6 +298,52 @@ class EditCounter extends Model
     }
 
     /**
+     * Get the length of the longest block the user received.
+     * @return int|bool Number of days or false if it could not be determined.
+     *                  If the longest duration is indefinite, -1 is returned.
+     */
+    public function getLongestBlockDays()
+    {
+        if (isset($this->longestBlockDays)) {
+            return $this->longestBlockDays;
+        }
+
+        $blocks = $this->getBlocks('received'); // FIXME: make sure this is only called once
+        $this->longestBlockDays = false;
+
+        foreach ($blocks as $block) {
+            $timestamp = strtotime($block['log_timestamp']);
+
+            // First check if the string is serialized, and if so parse it to get the block duration
+            if (@unserialize($block['log_params']) !== false) {
+                $parsedParams = unserialize($block['log_params']);
+                $durationStr = $parsedParams['5::duration'];
+            } else {
+                // Old format, the duration in English + block options separated by new lines
+                $durationStr = explode("\n", $block['log_params'])[0];
+            }
+
+            if (in_array($durationStr, ['indefinite', 'infinity', 'infinite'])) {
+                return -1;
+            }
+
+            // Try block just in case there are older, unpredictable formats
+            try {
+                $expiry = strtotime($durationStr, $timestamp);
+                $duration = ($expiry - $timestamp) / (60 * 60 * 24);
+
+                if (!$duration || $duration > $this->longestBlockDays) {
+                    $this->longestBlockDays = $duration;
+                }
+            } catch (Exception $error) {
+                // do nothing, leaving the longest block at false
+            }
+        }
+
+        return $this->longestBlockDays;
+    }
+
+    /**
      * Get the total number of users blocked by this user.
      * @return int
      */
@@ -323,7 +376,7 @@ class EditCounter extends Model
         $logCounts = $this->getLogCounts();
         return isset($logCounts['protect-protect']) ? (int)$logCounts['protect-protect'] : 0;
     }
-    
+
     /**
      * Get the total number of pages unprotected by the user.
      * @return int

@@ -123,6 +123,26 @@ class UserRepository extends Repository
     }
 
     /**
+     * Search the ipblocks table to see if the user is currently blocked
+     *   and return the expiry if they are
+     * @param $databaseName The database to query.
+     * @param $userid The ID of the user to search for.
+     * @return bool|string Expiry of active block or false
+     */
+    public function getBlockExpiry($databaseName, $userid)
+    {
+        $ipblocksTable = $this->getTableName($databaseName, 'ipblocks');
+        $sql = "SELECT ipb_expiry
+                FROM $ipblocksTable
+                WHERE ipb_user = :userid
+                LIMIT 1";
+        $resultQuery = $this->getProjectsConnection()->prepare($sql);
+        $resultQuery->bindParam('userid', $userid);
+        $resultQuery->execute();
+        return $resultQuery->fetchColumn();
+    }
+
+    /**
      * Get information about the currently-logged in user.
      * @return array
      */

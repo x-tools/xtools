@@ -6,6 +6,7 @@
 namespace Xtools;
 
 use Exception;
+use DateTime;
 
 /**
  * A User is a wiki user who has the same username across all projects in an XTools installation.
@@ -18,6 +19,9 @@ class User extends Model
 
     /** @var string The user's username. */
     protected $username;
+
+    /** @var string Expiry of the current block of the user */
+    protected $blockExpiry;
 
     /**
      * Create a new User given a username.
@@ -97,6 +101,44 @@ class User extends Model
     public function isAnon()
     {
         return filter_var($this->username, FILTER_VALIDATE_IP);
+    }
+
+    /**
+     * Get the expiry of the current block on the user
+     * @param Project $project The project.
+     * @return DateTime|bool Expiry as DateTime, true if indefinite,
+     *                       or false if they are not blocked.
+     */
+    public function getBlockExpiry(Project $project)
+    {
+        if (isset($this->blockExpiry)) {
+            return $this->blockExpiry;
+        }
+
+        $expiry = $this->getRepository()->getBlockExpiry(
+            $project->getDatabaseName(),
+            $this->getId($project)
+        );
+
+        if ($expiry === 'infinity') {
+            $this->blockExpiry = true;
+        } elseif ($expiry === false) {
+            $this->blockExpiry = false;
+        } else {
+            $this->blockExpiry = new DateTime($expiry);
+        }
+
+        return $this->blockExpiry;
+    }
+
+    /**
+     * Is this user currently blocked on the given project?
+     * @param Project $project The project.
+     * @return bool
+     */
+    public function isBlocked(Project $project)
+    {
+        return $this->getBlockExpiry($project) !== false;
     }
 
     /**

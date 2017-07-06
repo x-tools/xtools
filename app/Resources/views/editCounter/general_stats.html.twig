@@ -160,11 +160,15 @@
                 <td colspan="2" class="text-muted">{{ msg('edits') }}</td>
             </tr>
             <tr>
-                <td>{{ msg('auto-edits') }}</td>
-                <td>
+                <td>{% spaceless %}
                     {% if is_sub_request %}
-                        <a href="#autoeditslist">{{ ec.countAutomatedRevisions }}</a>
-                    {% elseif enabled('autoedits') %}
+                        <a href="#auto-edits">{{ msg('auto-edits') }}</a>
+                    {% else %}
+                        {{ msg('auto-edits') }}
+                    {% endif %}
+                {% endspaceless %}</td>
+                <td>
+                    {% if enabled('autoedits') %}
                         <a href="{{ path('autoedits', {project:project.domain, username:user.username}) }}">{{ ec.countAutomatedRevisions }}</a>
                     {% else %}
                         {{ ec.countAutomatedRevisions }}
@@ -280,11 +284,31 @@
             </tr>
             <tr>
                 <td>{{ msg('block-longest') }}</td>
-                <td>@TODO</td>
+                <td>
+                    {% if ec.longestBlockDays == -1 %}
+                        &#x221e; {# infinity #}
+                    {% elseif ec.longestBlockDays == false %}
+                        &ndash;
+                    {% else %}
+                        {{ ec.longestBlockDays|number_format }} {{ msg('num-days', [ec.longestBlockDays]) }}
+                    {% endif %}
+                </td>
             </tr>
             <tr>
                 <td>{{ msg('block-current') }}</td>
-                <td>@TODO</td>
+                <td>
+                    {% if user.isBlocked(project) %}
+                        <a href="{{ wiki.pageUrlRaw('Special:BlockList', project)~'?wpTarget='~user.username }}">{% spaceless %}
+                            {% if user.getBlockExpiry(project) == 'infinity' %}
+                                &#x221e; {# infinity #}
+                            {% else %}
+                                {{ user.getBlockExpiry(project)|date('Y-m-d H:i') }}
+                            {% endif %}
+                        {% endspaceless %}
+                    {% else %}
+                        &ndash;
+                    {% endif %}
+                </td>
             </tr>
         </tbody>
     </table>
