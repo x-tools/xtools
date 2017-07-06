@@ -192,9 +192,10 @@ class EditCounterRepository extends Repository
         $logCounts['files_uploaded_commons'] = 0;
         if ($this->isLabs()) {
             $sql = "SELECT COUNT(log_id) FROM commonswiki_p.logging_userindex
-                WHERE log_type = 'upload' AND log_action = 'upload' AND log_user = :userId";
+                WHERE log_type = 'upload' AND log_action = 'upload' AND log_user_text = :username";
             $resultQuery = $this->getProjectsConnection()->prepare($sql);
-            $resultQuery->bindParam('userId', $userId);
+            $username = $user->getUsername();
+            $resultQuery->bindParam('username', $username);
             $resultQuery->execute();
             $logCounts['files_uploaded_commons'] = $resultQuery->fetchColumn();
         }
