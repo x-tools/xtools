@@ -148,7 +148,7 @@
                 <tr>
                     <td>{{ msg('files-uploaded-commons') }}</td>
                     <td>
-                        <a href="https://commons.wikimedia.org/wiki/Special:ListFiles/{{ user.username }}" >{{ ec.countFilesUploadedCommons }}</a>
+                        <a href="https://commons.wikimedia.org/wiki/Special:ListFiles/{{ user.username }}" >{{ ec.countFilesUploadedCommons|number_format }}</a>
                     </td>
                 </tr>
             {% endif %}
