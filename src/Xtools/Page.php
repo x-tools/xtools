@@ -235,7 +235,8 @@ class Page extends Model
                 $classAttrs = $config['class']['Unknown'];
                 $assessment['class']['value'] = '???';
                 $assessment['class']['category'] = $classAttrs['category'];
-                $assessment['class']['badge'] = "https://upload.wikimedia.org/wikipedia/commons/". $classAttrs['badge'];
+                $assessment['class']['color'] = $classAttrs['color'];
+                $assessment['class']['badge'] = "https://upload.wikimedia.org/wikipedia/commons/" . $classAttrs['badge'];
             } else {
                 $classAttrs = $config['class'][$classValue];
                 $assessment['class'] = [
@@ -248,11 +249,11 @@ class Page extends Model
                 if ($classAttrs['badge'] !== '') {
                     $assessment['class']['badge'] = $this->project->getAssessmentBadgeURL($classValue);
                 }
+            }
 
-                if ($overallQuality['value'] === '???') {
-                    $overallQuality = $assessment['class'];
-                    $overallQuality['category'] = $classAttrs['category'];
-                }
+            if ($overallQuality['value'] === '???') {
+                $overallQuality = $assessment['class'];
+                $overallQuality['category'] = $classAttrs['category'];
             }
 
             $importanceValue = $assessment['importance'];
