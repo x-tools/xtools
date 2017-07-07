@@ -182,7 +182,7 @@
                                 {% endif %}
                                 <tr>
                                     <td>{{ index }}</td>
-                                    <td class="sort-entry--page" data-value="{{ pagename }}">
+                                    <td class="sort-entry--page-title" data-value="{{ pagename }}">
                                         {% if page.page_is_redirect %}
                                             {{ wiki.pageLinkRaw(pagename ~ '?redirect=no', project, pagename) }}
                                             <small class="text-muted">&middot; ({{ msg('redirect') }})</small>

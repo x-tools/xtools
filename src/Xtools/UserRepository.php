@@ -143,6 +143,113 @@ class UserRepository extends Repository
     }
 
     /**
+     * Get pages created by a user
+     * @param Project $project
+     * @param User $user
+     * @param string|int $namespace Namespace ID or 'all'
+     * @param string $redirects One of 'noredirects', 'onlyredirects' or blank for both
+     */
+    public function getPagesCreated(Project $project, User $user, $namespace, $redirects)
+    {
+        $username = $user->getUsername();
+
+        $cacheKey = 'pages.' . $project->getDatabaseName() . '.'
+            . $username . '.' . $namespace . '.' . $redirects;
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+        $this->stopwatch->start($cacheKey, 'XTools');
+
+        $dbName = $project->getDatabaseName();
+        $projectRepo = $project->getRepository();
+
+        $pageTable = $projectRepo->getTableName($dbName, 'page');
+        $pageAssessmentsTable = $projectRepo->getTableName($dbName, 'page_assessments');
+        $revisionTable = $projectRepo->getTableName($dbName, 'revision');
+        $archiveTable = $projectRepo->getTableName($dbName, 'archive');
+        $logTable = $projectRepo->getTableName($dbName, 'logging', 'userindex');
+
+        $userId = $user->getId($project);
+
+        $namespaceConditionArc = '';
+        $namespaceConditionRev = '';
+
+        if ($namespace != 'all') {
+            $namespaceConditionRev = " AND page_namespace = '".intval($namespace)."' ";
+            $namespaceConditionArc = " AND ar_namespace = '".intval($namespace)."' ";
+        }
+
+        $redirectCondition = '';
+
+        if ($redirects == 'onlyredirects') {
+            $redirectCondition = " AND page_is_redirect = '1' ";
+        } elseif ($redirects == 'noredirects') {
+            $redirectCondition = " AND page_is_redirect = '0' ";
+        }
+
+        if ($userId == 0) { // IP Editor or undefined username.
+            $whereRev = " rev_user_text = '$username' AND rev_user = '0' ";
+            $whereArc = " ar_user_text = '$username' AND ar_user = '0' ";
+            $having = " rev_user_text = '$username' ";
+        } else {
+            $whereRev = " rev_user = '$userId' AND rev_timestamp > 1 ";
+            $whereArc = " ar_user = '$userId' AND ar_timestamp > 1 ";
+            $having = " rev_user = '$userId' ";
+        }
+
+        $hasPageAssessments = $this->isLabs() && $project->hasPageAssessments();
+        $paSelects = $hasPageAssessments ? ', pa_class, pa_importance, pa_page_revision' : '';
+        $paSelectsArchive = $hasPageAssessments ?
+            ', NULL AS pa_class, NULL AS pa_page_id, NULL AS pa_page_revision'
+            : '';
+        $paJoin = $hasPageAssessments ? "LEFT JOIN $pageAssessmentsTable ON rev_page = pa_page_id" : '';
+
+        $sql = "
+            (SELECT DISTINCT page_namespace AS namespace, 'rev' AS type, page_title AS page_title,
+                page_len, page_is_redirect, rev_timestamp AS rev_timestamp,
+                rev_user, rev_user_text AS username, rev_len, rev_id $paSelects
+            FROM $pageTable
+            JOIN $revisionTable ON page_id = rev_page
+            $paJoin
+            WHERE $whereRev AND rev_parent_id = '0' $namespaceConditionRev $redirectCondition
+            " . ($hasPageAssessments ? 'GROUP BY rev_page' : '') . "
+            )
+
+            UNION
+
+            (SELECT a.ar_namespace AS namespace, 'arc' AS type, a.ar_title AS page_title,
+                0 AS page_len, '0' AS page_is_redirect, MIN(a.ar_timestamp) AS rev_timestamp,
+                a.ar_user AS rev_user, a.ar_user_text AS username, a.ar_len AS rev_len,
+                a.ar_rev_id AS rev_id $paSelectsArchive
+            FROM $archiveTable a
+            JOIN
+            (
+                SELECT b.ar_namespace, b.ar_title
+                FROM $archiveTable AS b
+                LEFT JOIN $logTable ON log_namespace = b.ar_namespace AND log_title = b.ar_title
+                    AND log_user = b.ar_user AND (log_action = 'move' OR log_action = 'move_redir')
+                WHERE $whereArc AND b.ar_parent_id = '0' $namespaceConditionArc AND log_action IS NULL
+            ) AS c ON c.ar_namespace= a.ar_namespace AND c.ar_title = a.ar_title
+            GROUP BY a.ar_namespace, a.ar_title
+            HAVING $having
+            )
+            ";
+
+        $resultQuery = $this->getProjectsConnection()->prepare($sql);
+        $resultQuery->execute();
+        $result = $resultQuery->fetchAll();
+
+        // Cache for 10 minutes, and return.
+        $cacheItem = $this->cache->getItem($cacheKey)
+            ->set($result)
+            ->expiresAfter(new DateInterval('PT10M'));
+        $this->cache->save($cacheItem);
+        $this->stopwatch->stop($cacheKey);
+
+        return $result;
+    }
+
+    /**
      * Get information about the currently-logged in user.
      * @return array
      */
