@@ -175,24 +175,30 @@
                         {% for date,pageList in pages[key] if not(multiNamspace) or (index < maxRows and multiNamspace) %}
                             {% for page in pageList if not(multiNamspace) or (index < maxRows and multiNamspace) %}
                                 {% set index = index + 1 %}
+                                {% if key == 0 %}
+                                    {% set pagename = page.page_title | e %}
+                                {% else %}
+                                    {% set pagename = namespaces[key] ~ ":" ~ page.page_title %}
+                                {% endif %}
                                 <tr>
                                     <td>{{ index }}</td>
-                                    {% if key == 0 %}
-                                        {% set pagename = page.page_title | e %}
-                                    {% else %}
-                                        {% set pagename = namespaces[key]~":"~page.page_title %}
-                                    {% endif %}
                                     <td class="sort-entry--page" data-value="{{ pagename }}">
-                                        {{ wiki.pageLinkRaw(pagename, project) }}
                                         {% if page.page_is_redirect %}
-                                            <small class="text-warning">&middot; ({{ msg("redirect") }})</small>
+                                            {{ wiki.pageLinkRaw(pagename ~ '?redirect=no', project, pagename) }}
+                                            <small class="text-muted">&middot; ({{ msg('redirect') }})</small>
+                                        {% else %}
+                                            {{ wiki.pageLinkRaw(pagename, project) }}
                                         {% endif %}
-                                        {% if page.type == "arc" %}
-                                            <small class="text-danger">&middot; ({{ msg("deleted") }})</small>
+                                        {% if page.type == 'arc' %}
+                                            <small class="text-danger">&middot; ({{ msg('deleted') }})</small>
                                         {% endif %}
                                     </td>
                                     <td class="sort-entry--date" data-value="{{ date }}">
-                                        {{ wiki.permaLinkRaw(page.rev_id, project, page.human_time) }}
+                                        {% if page.type == 'arc' %}
+                                            {{ wiki.pageLinkRaw('Special:Undelete/' ~ pagename ~ '?timestamp=' ~ page.raw_time, project, page.human_time) }}
+                                        {% else %}
+                                            {{ wiki.permaLinkRaw(page.rev_id, project, page.human_time) }}
+                                        {% endif %}
                                     </td>
                                     <td class="sort-entry--original-size" data-value="{{ page.rev_len }}">
                                         {{ page.rev_len | number_format }}

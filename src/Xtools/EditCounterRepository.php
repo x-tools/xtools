@@ -91,11 +91,11 @@ class EditCounterRepository extends Repository
             ) UNION (
             SELECT 'created-live' AS `key`, COUNT(DISTINCT rev_page) AS `val`
                 FROM $revisionTable
-                WHERE rev_user = :userId AND rev_parent_id=0
+                WHERE rev_user = :userId AND rev_parent_id = 0
             ) UNION (
             SELECT 'created-deleted' AS `key`, COUNT(DISTINCT ar_page_id) AS `val`
                 FROM $archiveTable
-                WHERE ar_user = :userId AND ar_parent_id=0
+                WHERE ar_user = :userId AND ar_parent_id = 0
             )
         ";
         $resultQuery = $this->getProjectsConnection()->prepare($queries);

@@ -202,7 +202,7 @@ class PagesController extends Controller
             UNION
 
             (SELECT a.ar_namespace AS namespace, 'arc' AS type, a.ar_title AS page_title,
-                0 AS page_len, '0' AS page_is_redirect, min(a.ar_timestamp) AS rev_timestamp,
+                0 AS page_len, '0' AS page_is_redirect, MIN(a.ar_timestamp) AS rev_timestamp,
                 a.ar_user AS rev_user, a.ar_user_text AS username, a.ar_len AS rev_len,
                 a.ar_rev_id AS rev_id $paSelectsArchive
             FROM $archiveTable a
@@ -211,7 +211,7 @@ class PagesController extends Controller
                 SELECT b.ar_namespace, b.ar_title
                 FROM $archiveTable AS b
                 LEFT JOIN $logTable ON log_namespace = b.ar_namespace AND log_title = b.ar_title
-                    AND log_user = b.ar_user AND (log_action = 'move' or log_action = 'move_redir')
+                    AND log_user = b.ar_user AND (log_action = 'move' OR log_action = 'move_redir')
                 WHERE $whereArc AND b.ar_parent_id = '0' $namespaceConditionArc AND log_action IS NULL
             ) AS c ON c.ar_namespace= a.ar_namespace AND c.ar_title = a.ar_title
             GROUP BY a.ar_namespace, a.ar_title
@@ -236,6 +236,7 @@ class PagesController extends Controller
             $datetimeHuman = $datetime->format('Y-m-d H:i');
 
             $pageData = array_merge($row, [
+                'raw_time' => $row['rev_timestamp'],
                 'human_time' => $datetimeHuman,
                 'page_title' => str_replace('_', ' ', $row['page_title'])
             ]);

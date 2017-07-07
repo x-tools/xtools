@@ -393,8 +393,8 @@ class AppExtension extends Extension
     public function isSingleWiki()
     {
         $param = true;
-        if ($this->container->hasParameter("app.single_wiki")) {
-            $param = boolval($this->container->getParameter("app.single_wiki"));
+        if ($this->container->hasParameter('app.single_wiki')) {
+            $param = boolval($this->container->getParameter('app.single_wiki'));
         }
         return $param;
     }
@@ -406,8 +406,8 @@ class AppExtension extends Extension
     public function getReplagThreshold()
     {
         $param = 30;
-        if ($this->container->hasParameter("app.replag_threshold")) {
-            $param = $this->container->getParameter("app.replag_threshold");
+        if ($this->container->hasParameter('app.replag_threshold')) {
+            $param = $this->container->getParameter('app.replag_threshold');
         };
         return $param;
     }
@@ -419,8 +419,8 @@ class AppExtension extends Extension
     public function loadStylesheetsFromCDN()
     {
         $param = false;
-        if ($this->container->hasParameter("app.load_stylesheets_from_cdn")) {
-            $param = boolval($this->container->getParameter("app.load_stylesheets_from_cdn"));
+        if ($this->container->hasParameter('app.load_stylesheets_from_cdn')) {
+            $param = boolval($this->container->getParameter('app.load_stylesheets_from_cdn'));
         }
         return $param;
     }
@@ -432,8 +432,8 @@ class AppExtension extends Extension
     public function isWMFLabs()
     {
         $param = false;
-        if ($this->container->hasParameter("app.is_labs")) {
-            $param = boolval($this->container->getParameter("app.is_labs"));
+        if ($this->container->hasParameter('app.is_labs')) {
+            $param = boolval($this->container->getParameter('app.is_labs'));
         }
         return $param;
     }
@@ -447,28 +447,28 @@ class AppExtension extends Extension
         $retVal = 0;
 
         if ($this->isWMFLabs()) {
-            $project = $this->container->get("request_stack")->getCurrentRequest()->get('project');
+            $project = $this->container->get('request_stack')->getCurrentRequest()->get('project');
 
             if (!isset($project)) {
-                $project = "enwiki";
+                $project = 'enwiki';
             }
 
             $stmt = "SELECT lag FROM `heartbeat_p`.`heartbeat` h
             RIGHT JOIN `meta_p`.`wiki` w ON concat(h.shard, \".labsdb\")=w.slice
             WHERE dbname LIKE :project OR name LIKE :project OR url LIKE :project LIMIT 1";
 
-            $conn = $this->container->get('doctrine')->getManager("replicas")->getConnection();
+            $conn = $this->container->get('doctrine')->getManager('replicas')->getConnection();
 
             // Prepare the query and execute
             $resultQuery = $conn->prepare($stmt);
-            $resultQuery->bindParam("project", $project);
+            $resultQuery->bindParam('project', $project);
             $resultQuery->execute();
 
             if ($resultQuery->errorCode() == 0) {
                 $results = $resultQuery->fetchAll();
 
-                if (isset($results[0]["lag"])) {
-                    $retVal = $results[0]["lag"];
+                if (isset($results[0]['lag'])) {
+                    $retVal = $results[0]['lag'];
                 }
             }
         }
