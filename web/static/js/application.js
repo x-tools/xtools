@@ -28,6 +28,7 @@
         setupTOC();
         setupProjectListener();
         setupAutocompletion();
+        displayWaitingNoticeOnSubmission();
     });
 
     /**
@@ -474,4 +475,29 @@
             });
         }
     }
+
+    /**
+     * For any form submission, this disables the submit button and replaces its text with
+     * a loading message and a counting timer.
+     */
+    function displayWaitingNoticeOnSubmission()
+    {
+        var $submitButtons = $("form, button.form-submit");
+        $submitButtons.on("submit", function () {
+            // Change the submit button text.
+            var $submitButtons = $(this).find(":submit");
+            $submitButtons.attr("disabled", true);
+            $submitButtons.html($.i18n('loading') + " <span id='submitTimer'></span>");
+            // Add the counter.
+            var startTime =  Date.now();
+            setInterval(function () {
+                var elapsedSeconds = Math.round((Date.now() - startTime) / 1000);
+                var minutes = Math.floor(elapsedSeconds/60);
+                var seconds = (String)(elapsedSeconds - (minutes * 60)).padStart(2, "0");
+                $("#submitTimer").text(minutes + ":" + seconds);
+            }, 200);
+            return true;
+        });
+    }
+
 })();
