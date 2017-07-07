@@ -191,13 +191,16 @@ class EditCounterRepository extends Repository
         // Add Commons upload count, if applicable.
         $logCounts['files_uploaded_commons'] = 0;
         if ($this->isLabs()) {
-            $sql = "SELECT COUNT(log_id) FROM commonswiki_p.logging_userindex
-                WHERE log_type = 'upload' AND log_action = 'upload' AND log_user_text = :username";
-            $resultQuery = $this->getProjectsConnection()->prepare($sql);
-            $username = $user->getUsername();
-            $resultQuery->bindParam('username', $username);
-            $resultQuery->execute();
-            $logCounts['files_uploaded_commons'] = $resultQuery->fetchColumn();
+            $commons = ProjectRepository::getProject('commonswiki', $this->container);
+            $userId = $user->getId($commons);
+            if ($userId) {
+                $sql = "SELECT COUNT(log_id) FROM commonswiki_p.logging_userindex
+                    WHERE log_type = 'upload' AND log_action = 'upload' AND log_user = :userId";
+                $resultQuery = $this->getProjectsConnection()->prepare($sql);
+                $resultQuery->bindParam('userId', $userId);
+                $resultQuery->execute();
+                $logCounts['files_uploaded_commons'] = $resultQuery->fetchColumn();
+            }
         }
 
         // Cache for 10 minutes, and return.
