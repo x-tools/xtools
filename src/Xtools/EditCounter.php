@@ -637,6 +637,10 @@ class EditCounter extends Model
             $out['totals'][$total['page_namespace']][$total['year']] = $total['count'];
         }
 
+        // Make sure data is sorted by namespace
+        ksort($out['namespaces']);
+        ksort($out['totals']);
+
         return $out;
     }
 
@@ -649,7 +653,6 @@ class EditCounter extends Model
         $totals = $this->getRepository()->getMonthCounts($this->project, $this->user);
         $out = [
             'years' => [],
-            'namespaces' => [],
             'totals' => [],
         ];
         $out['max_year'] = 0;
@@ -675,6 +678,10 @@ class EditCounter extends Model
                 }
             }
         }
+
+        // Sort by namespace
+        ksort($out['totals']);
+
         return $out;
     }
 
