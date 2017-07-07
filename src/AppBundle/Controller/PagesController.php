@@ -126,6 +126,10 @@ class PagesController extends Controller
             $this->addFlash('notice', ['invalid-project', $project]);
             return $this->redirectToRoute('pages');
         }
+        if (!$user->existsOnProject($projectData)) {
+            $this->addFlash('notice', ['user-not-found']);
+            return $this->redirectToRoute('pages');
+        }
 
         $dbName = $projectData->getDatabaseName();
 
