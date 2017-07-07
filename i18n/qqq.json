@@ -114,6 +114,7 @@
   "links-external": "Label for the number of external links that are on a wiki page. This message should be short.",
   "links-in": "Label for the number of incoming links that go to a wiki page. This message should be short.",
   "links-out": "Label for the number of outgoing links that are on a wiki page. This message should be short.",
+  "live": "Short word for 'live', referring to live edits (not deleted edits) that a user made.\n{{Identical|Live}}",
   "live-edits": "Live edits, visible edits of a user.",
   "loading": "Shown when content is loading.\n{{Identical|Loading}}",
   "log": "Link to the logs for a user or page.\n{{Identical|Log}}",
