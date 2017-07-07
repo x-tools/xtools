@@ -1,5 +1,6 @@
 {% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
 {% import 'macros/wiki.html.twig' as wiki %}
+{% import 'macros/pieChart.html.twig' as chart %}
 
 {% block body %}
 
@@ -404,24 +405,50 @@
         </tfoot>
     </table>
 </div>
-{#<div class="row">#}
-    {#<div class="col-md-2">#}
-        {#<div class="chart-wrapper" data-chart-type="pie"#}
-             {#data-chart-labels='{{ [ msg('chart-label-small-edits'), msg('chart-label-large-edits') ] | json_encode() | raw }}'#}
-             {#data-chart-data='{{ [rev_small, rev_large] | json_encode() | raw }}'#}
-        {#>#}
-            {#<canvas class="chart" width="100" height="100"></canvas>#}
-        {#</div>#}
-    {#</div>#}
-    {#<div class="col-md-2">#}
-        {#<div class="chart-wrapper" data-chart-type="pie"#}
-             {#data-chart-labels='{{ [ msg('chart-label-edits-with-comments'), msg('chart-label-edits-without-comments') ] | json_encode() | raw }}'#}
-             {#data-chart-data='{{ [with_comments, without_comments] | json_encode() | raw }}'#}
-        {#>#}
-            {#<canvas class="chart" width="100" height="100"></canvas>#}
-        {#</div>#}
-    {#</div>#}
-{#</div>#}
+<div class="basic-info-charts col-lg-12 clearfix">
+    {{
+        chart.pie_chart('summaries',
+            [{
+                label: msg('with-summary'),
+                value: ec.countRevisionsWithComments,
+                percentage: (ec.countRevisionsWithComments / ec.countLiveRevisions) * 100
+            },
+            {
+                label: msg('no-summary'),
+                value: ec.countLiveRevisions - ec.countRevisionsWithComments,
+                percentage: 100 - ((ec.countRevisionsWithComments / ec.countLiveRevisions) * 100)
+            }]
+        )
+    }}
+    {{
+        chart.pie_chart('small_edits',
+            [{
+                label: '< 20 ' ~ msg('num-bytes', [20]),
+                value: ec.countSmallRevisions,
+                percentage: ((ec.countSmallRevisions / ec.countLiveRevisions) * 100)
+            },
+            {
+                label: '≥ 20 ' ~ msg('num-bytes', [20]),
+                value: ec.countLiveRevisions - ec.countSmallRevisions,
+                percentage: 100 - ((ec.countSmallRevisions / ec.countLiveRevisions) * 100)
+            }]
+        )
+    }}
+    {{
+        chart.pie_chart('large_edits',
+            [{
+                label: '< 1000 ' ~ msg('num-bytes', [1000]),
+                value: ec.countLargeRevisions,
+                percentage: ((ec.countLargeRevisions / ec.countLiveRevisions) * 100)
+            },
+            {
+                label: '≥ 1000 ' ~ msg('num-bytes', [1000]),
+                value: ec.countLiveRevisions - ec.countLargeRevisions,
+                percentage: 100 - ((ec.countLargeRevisions / ec.countLiveRevisions) * 100)
+            }]
+        )
+    }}
+</div>
 
 {% if not is_sub_request %}
     </div></section></div></div>
