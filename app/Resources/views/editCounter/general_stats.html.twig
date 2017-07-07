@@ -219,6 +219,12 @@
                     {{ wiki.userLogLink(user, project, ec.patrols|number_format, 'patrol') }}
                 </td>
             </tr>
+            <tr>
+                <td>{{ msg('accounts-created') }}</td>
+                <td>
+                    {{ wiki.userLogLink(user, project, ec.accountsCreated|number_format, 'newusers') }}
+                </td>
+            </tr>
         </tbody>
 
         <tbody class="stat-list--group">
@@ -233,20 +239,28 @@
                 <tr>
                     <td>{{ msg('block') }}</td>
                     <td>
-                        {{ ec.countUsersBlocked|number_format }}
-                        ({{ wiki.userLogLink(user, project, ec.countBlocksSet|number_format, 'block', 'block') }} {{ msg('num-blocks', [ec.countBlocksSet]) }})
+                        {{ wiki.userLogLink(user, project, ec.countBlocksSet|number_format, 'block', 'block') }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>{{ msg('reblock') }}</td>
+                    <td>
+                        {{ wiki.userLogLink(user, project, ec.countReblocksSet|number_format, 'block', 'reblock') }}
                     </td>
                 </tr>
                 <tr>
                     <td>{{ msg('unblock') }}</td>
                     <td>
-                        {{ ec.countUsersUnblocked|number_format }}
-                        ({{ wiki.userLogLink(user, project, ec.countBlocksLifted|number_format, 'block', 'unblock') }} {{ msg('num-blocks', [ec.countBlocksLifted]) }})
+                        {{ wiki.userLogLink(user, project, ec.countUnblocksSet|number_format, 'block', 'unblock') }}
                     </td>
                 </tr>
                 <tr>
                     <td>{{ msg('protect') }}</td>
                     <td>{{ wiki.userLogLink(user, project, ec.countPagesProtected|number_format, 'protect', 'protect') }}</td>
+                </tr>
+                <tr>
+                    <td>{{ msg('reprotect') }}</td>
+                    <td>{{ wiki.userLogLink(user, project, ec.countPagesReprotected|number_format, 'protect', 'modify') }}</td>
                 </tr>
                 <tr>
                     <td>{{ msg('unprotect') }}</td>
@@ -263,6 +277,10 @@
                 <tr>
                     <td>{{ msg('restore') }}</td>
                     <td>{{ wiki.userLogLink(user, project, ec.countPagesRestored|number_format, 'delete', 'restore') }}</td>
+                </tr>
+                <tr>
+                    <td>{{ msg('rights') }}</td>
+                    <td>{{ wiki.userLogLink(user, project, ec.countRightsModified|number_format, 'rights') }}</td>
                 </tr>
                 <tr>
                     <td>{{ msg('import') }}</td>

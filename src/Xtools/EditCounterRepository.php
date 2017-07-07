@@ -139,13 +139,6 @@ class EditCounterRepository extends Repository
             FROM $loggingTable
             WHERE log_user = :userId
             GROUP BY log_type, log_action
-        ) UNION
-        (SELECT 'users-unblocked' AS source, COUNT(DISTINCT log_title) AS value
-            FROM $loggingTable
-            WHERE log_user = :userId
-                AND log_type = 'block'
-                AND log_action = 'unblock'
-                AND log_namespace = $userNamespaceId
         )";
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $userId = $user->getId($project);
@@ -165,13 +158,16 @@ class EditCounterRepository extends Repository
         $requiredCounts = [
             'thanks-thank',
             'review-approve',
+            'newusers-create2',
+            'newusers-byemail',
             'patrol-patrol',
             'block-block',
             'block-reblock',
             'block-unblock',
-            'users-unblocked', // Second query above.
             'protect-protect',
+            'protect-modify',
             'protect-unprotect',
+            'rights-rights',
             'move-move',
             'delete-delete',
             'delete-revision',
@@ -211,23 +207,6 @@ class EditCounterRepository extends Repository
         $this->stopwatch->stop($cacheKey);
 
         return $logCounts;
-    }
-
-    /**
-     * Get data for all blocks set by the given user.
-     * @param Project $project
-     * @param User $user
-     * @return array
-     */
-    public function getBlocksSet(Project $project, User $user)
-    {
-        $ipblocksTable = $this->getTableName($project->getDatabaseName(), 'ipblocks');
-        $sql = "SELECT * FROM $ipblocksTable WHERE ipb_by = :userId";
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $userId = $user->getId($project);
-        $resultQuery->bindParam('userId', $userId);
-        $resultQuery->execute();
-        return $resultQuery->fetchAll();
     }
 
     /**
