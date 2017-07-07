@@ -63,7 +63,7 @@ class EditCounterRepository extends Repository
                 WHERE rev_user = :userId AND rev_len > 1000
             ) UNION (
             SELECT 'with_comments' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_user = :userId AND rev_comment = ''
+                WHERE rev_user = :userId AND rev_comment != ''
             ) UNION (
             SELECT 'minor' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
                 WHERE rev_user = :userId AND rev_minor_edit = 1
@@ -570,13 +570,13 @@ class EditCounterRepository extends Repository
     }
 
     /**
-     * Get a summary of automated edits made by the given user in their last 1000 edits.
+     * Get a summary of automated edits made by the given user
      * Will cache the result for 10 minutes.
      * @param Project $project The project.
      * @param User $user The user.
      * @return integer[] Array of edit counts, keyed by all tool names from
      * app/config/semi_automated.yml
-     * @TODO This currently uses AutomatedEditsHelper but that could probably be refactored.
+     * @TODO Load from AutoEditsController via AJAX
      */
     public function countAutomatedRevisions(Project $project, User $user)
     {
@@ -591,10 +591,8 @@ class EditCounterRepository extends Repository
         /** @var AutomatedEditsHelper $automatedEditsHelper */
         $automatedEditsHelper = $this->container->get("app.automated_edits_helper");
 
-        // Get the most recent 1000 edit summaries.
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $sql = "SELECT rev_comment FROM $revisionTable
-            WHERE rev_user=:userId ORDER BY rev_timestamp DESC LIMIT 1000";
+        $sql = "SELECT rev_comment FROM $revisionTable WHERE rev_user = :userId";
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $resultQuery->bindParam("userId", $userId);
         $resultQuery->execute();

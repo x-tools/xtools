@@ -169,7 +169,7 @@
                 {% endspaceless %}</td>
                 <td>
                     {% if enabled('autoedits') %}
-                        <a href="{{ path('autoedits', {project:project.domain, username:user.username}) }}">{{ ec.countAutomatedRevisions }}</a>
+                        <a href="{{ path('autoedits', {project:project.domain, username:user.username}) }}">{{ ec.countAutomatedRevisions|number_format }}</a>
                     {% else %}
                         {{ ec.countAutomatedRevisions }}
                     {% endif %}
@@ -336,11 +336,8 @@
         <tbody class="stat-list--group">
             <tr>
                 <td colspan="2" class="text-muted">
-                    {{ msg('top-projects-edit-counts') }} {% spaceless %}
-                    {% if is_sub_request %}
-                        (<a href="#latest-global-edits">{{ msg('top-projects-read-more-link') }}</a>)
-                    {% endif %}
-                {% endspaceless %}</td>
+                    {{- msg('top-projects-edit-counts') ~ ' (' ~ msg('approximate')|lower ~ ')' -}}
+                </td>
             </tr>
             {% set topN = 10 %}
             {% for topProj in ec.globalEditCountsTopN(topN) %}
@@ -369,7 +366,13 @@
             <tr>
                 <td>{{ msg('global-total-edit-count') }}</td>
                 <td>
-                    <strong>{{ ec.globalEditCount|number_format }}</strong>
+                    <strong>
+                        {% if is_sub_request %}
+                            <a href="#latest-global-edits">{{ ec.globalEditCount|number_format }}</a>
+                        {% else %}
+                            {{ ec.globalEditCount|number_format }}
+                        {% endif %}
+                    </strong>
                     {# <small>@TODO days</small> #}
                 </td>
             </tr>
