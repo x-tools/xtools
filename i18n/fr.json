@@ -50,6 +50,7 @@
   "hide": "cacher",
   "high-replag": "Attention : le délai de réplication est élevé, les modifications de moins de $1 ne sont pas prises en compte.",
   "history": "Historique",
+  "image-attribution": "Crédits d'image",
   "import": "Importer",
   "interrupted": "Désolé, mais afin d’économiser des ressources, un robot a détruit automatiquement cette requête qui avait dépassé les $1 secondes.",
   "invalid-date": "Date invalide",

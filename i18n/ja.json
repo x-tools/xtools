@@ -45,6 +45,7 @@
   "hide": "非表示",
   "high-replag": "警告: 複製の遅延が大きいため、$1前以降の変更内容が表示されていないおそれがあります。",
   "history": "履歴",
+  "image-attribution": "画像の帰属",
   "import": "取り込み",
   "invalid-date": "日付が無効です",
   "ip-edits": "IP による編集の回数",

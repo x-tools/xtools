@@ -13,7 +13,7 @@
     </header>
 
     <div class="panel-body xt-panel-body">
-        <div class="col-lg-6 stat-list clearfix">
+        <div class="col-lg-3 stat-list clearfix">
             <h3>{{ msg('maintainers') }}</h3>
             <ul>
                 <li><a href="//en.wikipedia.org/wiki/User:Matthewrbowker" target="_blank">Matthewrbowker</a></li>
@@ -22,7 +22,7 @@
             </ul>
         </div>
 
-        <div class="col-lg-6 stat-list clearfix">
+        <div class="col-lg-3 stat-list clearfix">
             <h3>{{ msg('major-contributors') }}</h3>
             <ul>
                 <li><a href="//en.wikipedia.org/wiki/User:Cyberpower678" target="_blank">Cyberpower678</a></li>
@@ -35,6 +35,19 @@
                 <li><a href="//en.wikipedia.org/wiki/User:X!" target="_blank">X!</a></li>
             </ul>
         </div>
+
+        <div class="col-lg-6 stat-list clearfix">
+            <h3>{{ msg('image-attribution') }}</h3>
+            <p>
+                {% set logoAuthor = "<a target='_blank' href='https://meta.wikimedia.org/wiki/User:Ricordisamoa'>Ricordisamoa</a>" %}
+                {% set wrench = "<a target='_blank' href='https://commons.wikimedia.org/wiki/File:Wrench_icon-72a7cf.svg'>Wikimedia Commons</a>" %}
+                {% set wrenchAuthor = "<a target='_blank' href='https://commons.wikimedia.org/wiki/User:Offnfopt'>Offnfopt</a>" %}
+                {% set commTech = "<a target='_blank' href='https://www.mediawiki.org/wiki/Community_Tech'>Community Tech</a>" %}
+                {{ msg('image-attribution-text', [logoAuthor, wrench, wrenchAuthor, commTech]) }}
+            </p>
+        </div>
+
+        <hr style="clear:both">
     </div>
 </div>
 {% endblock %}
