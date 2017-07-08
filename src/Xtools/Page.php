@@ -236,7 +236,8 @@ class Page extends Model
                 $assessment['class']['value'] = '???';
                 $assessment['class']['category'] = $classAttrs['category'];
                 $assessment['class']['color'] = $classAttrs['color'];
-                $assessment['class']['badge'] = "https://upload.wikimedia.org/wikipedia/commons/" . $classAttrs['badge'];
+                $assessment['class']['badge'] = "https://upload.wikimedia.org/wikipedia/commons/"
+                    . $classAttrs['badge'];
             } else {
                 $classAttrs = $config['class'][$classValue];
                 $assessment['class'] = [
