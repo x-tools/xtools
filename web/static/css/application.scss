@@ -326,7 +326,8 @@ section > .panel-body {
     white-space: -moz-pre-wrap;
     white-space: pre-line;
 }
-.panel-primary {
+.panel-primary,
+.panel-danger {
     margin-bottom: 0;
 }
 .panel-default {
@@ -626,6 +627,23 @@ div.outer_bar {
     }
 }
 
+.error-wrapper {
+    font-size: 18px;
+
+    p {
+        margin-bottom: 30px;
+    }
+}
+
+.wikipe-tan-error {
+    float: right;
+
+    img {
+        max-width: 100%;
+        width: 512px;
+    }
+}
+
 @media (min-width: $bootstrap-lg) {
     .xt-panel-body table {
         width: auto;
@@ -771,6 +789,15 @@ div.outer_bar {
         &:last-child {
             clear: both;
             padding-top: 5px;
+        }
+    }
+
+    .error-wrapper {
+        padding: 10px;
+
+        p:first-of-type {
+            clear: both;
+            padding-top: 20px;
         }
     }
 
