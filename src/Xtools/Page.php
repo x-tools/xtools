@@ -216,6 +216,10 @@ class Page extends Model
      */
     public function getAssessments()
     {
+        if (!$this->project->hasPageAssessments() || $this->getNamespace() !== 0) {
+            return false;
+        }
+
         $projectDomain = $this->project->getDomain();
         $config = $this->project->getRepository()->getAssessmentsConfig($projectDomain);
         $data = $this->getRepository()->getAssessments($this->project, [$this->getId()]);
