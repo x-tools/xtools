@@ -148,6 +148,7 @@ class UserRepository extends Repository
      * @param User $user
      * @param string|int $namespace Namespace ID or 'all'
      * @param string $redirects One of 'noredirects', 'onlyredirects' or blank for both
+     * @return string[] Result of query, see below. Includes live and deleted pages.
      */
     public function getPagesCreated(Project $project, User $user, $namespace, $redirects)
     {

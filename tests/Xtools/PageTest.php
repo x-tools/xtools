@@ -130,6 +130,51 @@ class PageTest extends KernelTestCase
         //$this->assertCount(3, $page->getRevisions($user)->getCount());
     }
 
+    /**
+     * Wikidata errors. With this test getWikidataInfo doesn't return a Description,
+     *     so getWikidataErrors should complain accordingly
+     */
+    public function testWikidataErrors()
+    {
+        $pageRepo = $this->getMock(PagesRepository::class, ['getWikidataInfo', 'getPageInfo']);
+
+        $pageRepo
+            ->method('getWikidataInfo')
+            ->with()
+            ->willReturn([
+                [
+                    'term' => 'label',
+                    'term_text' => 'My article',
+                ],
+            ]);
+        $pageRepo
+            ->method('getPageInfo')
+            ->with()
+            ->willReturn([
+                'pagelanguage' => 'en',
+                'pageprops' => [
+                    'wikibase_item' => 'Q123',
+                ],
+            ]);
+
+        $page = new Page(new Project('exampleWiki'), 'Page');
+        $page->setRepository($pageRepo);
+
+        $wikidataErrors = $page->getWikidataErrors();
+
+        $this->assertArraySubset(
+            [
+                'prio' => 3,
+                'name' => 'Wikidata',
+            ],
+            $wikidataErrors[0]
+        );
+        $this->assertContains(
+            'Description',
+            $wikidataErrors[0]['notice']
+        );
+    }
+
     // public function testPageAssessments()
     // {
     //     $projectRepo = $this->getMock(ProjectRepository::class, ['getAssessmentsConfig']);

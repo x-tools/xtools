@@ -141,6 +141,21 @@ class Page extends Model
     }
 
     /**
+     * Get the language code for this page.
+     * If not set, the language code for the project is returned.
+     * @return string
+     */
+    public function getLang()
+    {
+        $info = $this->getPageInfo();
+        if (isset($info['pagelanguage'])) {
+            return $info['pagelanguage'];
+        } else {
+            return $this->getProject()->getLang();
+        }
+    }
+
+    /**
      * Get the Wikidata ID of this page.
      * @return string
      */
@@ -287,5 +302,97 @@ class Page extends Model
             'wikiprojects' => $decoratedAssessments,
             'wikiproject_prefix' => $config['wikiproject_prefix']
         ];
+    }
+
+    /**
+     * Get CheckWiki errors for this page
+     * @return string[] See getErrors() for format
+     */
+    public function getCheckWikiErrors()
+    {
+        return $this->getRepository()->getCheckWikiErrors($this);
+    }
+
+    /**
+     * Get Wikidata errors for this page
+     * @return string[] See getErrors() for format
+     */
+    public function getWikidataErrors()
+    {
+        $errors = [];
+
+        if (empty($this->getWikidataId())) {
+            return [];
+        }
+
+        $wikidataInfo = $this->getRepository()->getWikidataInfo($this);
+
+        $terms = array_map(function ($entry) {
+            return $entry['term'];
+        }, $wikidataInfo);
+
+        $lang = $this->getLang();
+
+        if (!in_array('label', $terms)) {
+            $errors[] = [
+                'prio' => 2,
+                'name' => 'Wikidata',
+                'notice' => "Label for language <em>$lang</em> is missing", // FIXME: i18n
+                'explanation' => "See: <a target='_blank' " .
+                    "href='//www.wikidata.org/wiki/Help:Label'>Help:Label</a>",
+            ];
+        }
+
+        if (!in_array('description', $terms)) {
+            $errors[] = [
+                'prio' => 3,
+                'name' => 'Wikidata',
+                'notice' => "Description for language <em>$lang</em> is missing", // FIXME: i18n
+                'explanation' => "See: <a target='_blank' " .
+                    "href='//www.wikidata.org/wiki/Help:Description'>Help:Description</a>",
+            ];
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Get Wikidata and CheckWiki errors, if present
+     * @return string[] List of errors in the format:
+     *    [[
+     *         'prio' => int,
+     *         'name' => string,
+     *         'notice' => string (HTML),
+     *         'explanation' => string (HTML)
+     *     ], ... ]
+     */
+    public function getErrors()
+    {
+        // Includes label and description
+        $wikidataErrors = $this->getWikidataErrors();
+
+        $checkWikiErrors = $this->getCheckWikiErrors();
+
+        return array_merge($wikidataErrors, $checkWikiErrors);
+    }
+
+    /**
+     * Get all wikidata items for the page, not just languages of sister projects
+     * @param Page $page
+     * @return int Number of records.
+     */
+    public function getWikidataItems()
+    {
+        return $this->getRepository()->getWikidataItems($this);
+    }
+
+    /**
+     * Count wikidata items for the page, not just languages of sister projects
+     * @param Page $page
+     * @return int Number of records.
+     */
+    public function countWikidataItems()
+    {
+        return $this->getRepository()->countWikidataItems($this);
     }
 }
