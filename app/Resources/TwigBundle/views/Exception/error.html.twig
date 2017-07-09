@@ -10,7 +10,9 @@
     </header>
 
     <div class="panel-body xt-panel-body error-wrapper">
-        <a class="pull-right wikipe-tan-error" title="By Uncle_Wikipe-tan-blood.svg: *Uncle_Wikipe-tan.svg: User:Mikael Häggström form Kasuga~commonswiki original work. derivative work: Esby (talk) derivative work (File:Обгон Японской Википедии2.svg): Das steinerne Herz (File:Обгон Японской Википедии2.svg) [CC BY-SA 2.5-2.0-1.0 (http://creativecommons.org/licenses/by-sa/2.5-2.0-1.0), CC-BY-SA-3.0 (http://creativecommons.org/licenses/by-sa/3.0/), CC BY-SA 4.0 (http://creativecommons.org/licenses/by-sa/4.0) or GFDL (http://www.gnu.org/copyleft/fdl.html)], via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File%3AWikipe-tan_tears.svg"><img alt="Wikipe-tan tears" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Wikipe-tan_tears.svg/512px-Wikipe-tan_tears.svg.png"/></a>
+        <div class="error-mascot--wrapper pull-right">
+            <a target="_blank" title="By Lilyu (Own work) [WTFPL], via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File%3ALapinou_Furieux.svg"><img class="error-mascot" alt="Lapinou Furieux" src="{{ asset('static/images/error_mascot.svg') }}"/></a>
+        </div>
 
         {% if exception is defined and attribute(exception, 'message') is defined %}
             {%  set message = attribute(exception, 'message') %}

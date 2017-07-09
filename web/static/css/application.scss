@@ -635,13 +635,10 @@ div.outer_bar {
     }
 }
 
-.wikipe-tan-error {
-    float: right;
-
-    img {
-        max-width: 100%;
-        width: 512px;
-    }
+.error-mascot {
+    margin-right: 30px;
+    max-width: 100%;
+    width: 300px;
 }
 
 @media (min-width: $bootstrap-lg) {
@@ -660,7 +657,9 @@ div.outer_bar {
 }
 
 @media (max-width: $bootstrap-md) {
-
+    .error-mascot {
+        width: 200px;
+    }
 }
 
 @media (max-width: $bootstrap-sm) {
@@ -794,11 +793,12 @@ div.outer_bar {
 
     .error-wrapper {
         padding: 10px;
+    }
 
-        p:first-of-type {
-            clear: both;
-            padding-top: 20px;
-        }
+    .error-mascot--wrapper {
+        margin-bottom: 20px;
+        text-align: center;
+        width: 100%;
     }
 
     // FIXME: eventually will create a pop-out nav from the right
