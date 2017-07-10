@@ -486,14 +486,14 @@
         $submitButtons.on("submit", function () {
             // Change the submit button text.
             var $submitButtons = $(this).find(":submit");
-            $submitButtons.attr("disabled", true);
+            $submitButtons.prop("disabled", true);
             $submitButtons.html($.i18n('loading') + " <span id='submitTimer'></span>");
             // Add the counter.
             var startTime =  Date.now();
             setInterval(function () {
                 var elapsedSeconds = Math.round((Date.now() - startTime) / 1000);
                 var minutes = Math.floor(elapsedSeconds/60);
-                var seconds = (String)(elapsedSeconds - (minutes * 60)).padStart(2, "0");
+                var seconds = ('00' + (elapsedSeconds - (minutes * 60))).slice(-2);
                 $("#submitTimer").text(minutes + ":" + seconds);
             }, 200);
             return true;
