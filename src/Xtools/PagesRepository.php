@@ -145,12 +145,13 @@ class PagesRepository extends Repository
         if (!$project->hasPageAssessments()) {
             return [];
         }
-        $pageAssessmentsTable = $this->getTableName($project->getDatabaseName(), 'page_assessments');
+        $paTable = $this->getTableName($project->getDatabaseName(), 'page_assessments');
+        $papTable = $this->getTableName($project->getDatabaseName(), 'page_assessments_projects');
         $pageIds = implode($pageIds, ',');
 
         $query = "SELECT pap_project_title AS wikiproject, pa_class AS class, pa_importance AS importance
-                  FROM page_assessments
-                  LEFT JOIN page_assessments_projects ON pa_project_id = pap_project_id
+                  FROM $paTable
+                  LEFT JOIN $papTable ON pa_project_id = pap_project_id
                   WHERE pa_page_id IN ($pageIds)";
 
         $conn = $this->getProjectsConnection();
@@ -228,7 +229,7 @@ class PagesRepository extends Repository
                     AND term_type = 'label'
                 WHERE pl_namespace IN (0, 120)
                     AND pl_from = (
-                        SELECT page_id FROM page
+                        SELECT page_id FROM wikidatawiki_p.page
                         WHERE page_namespace = 0
                             AND page_title = 'Q:wikidataId'
                     )";

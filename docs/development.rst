@@ -34,9 +34,10 @@ The development server does not cache data.  Any changes you make are visible af
 Developing against WMF databases
 --------------------------------
 
-If you want to use the WMF database replicas, open a tunnel with::
+If you want to use the WMF database replicas, open two tunnels with::
 
     ssh -L 4711:enwiki.labsdb:3306 tools-login.wmflabs.org -N -l your-username-here
+    ssh -L 4712:tools.labsdb:3306 tools-login.wmflabs.org -N -l your-username-here
 
 And set the following in ``app/config/parameters.yml``::
 
@@ -47,6 +48,9 @@ And set the following in ``app/config/parameters.yml``::
     database_meta_name: meta_p
     database_replica_user: your-uxxxx-username-here
     database_replica_password: your-password-here
+    database_toolsdb_host: 127.0.0.1
+    database_toolsdb_port: 4712
+    database_toolsdb_name: toollabs_p
 
 (Change the ``your-*-here`` bits to your own values.)
 
