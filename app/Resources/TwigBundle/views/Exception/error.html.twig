@@ -1,16 +1,35 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/layout.html.twig' as layout %}
 
 {% block body %}
-    {% if exception is defined and attribute(exception, "message") is defined %}
-        {%  set message = attribute(exception, "message") %}
-    {% else %}
-        {% set message = "unknown" %}
-    {% endif %}
+<div class="panel panel-danger">
+    <header class="panel-heading">
+        <div class="text-center xt-heading-top">
+            <strong>{{ status_code }}: {{ status_text }}</strong>
+        </div>
+    </header>
 
-    <h2>{{ status_code }}: {{ status_text }}</h2>
-    An error has occurred within XTools. <br /><br />
+    <div class="panel-body xt-panel-body error-wrapper">
+        <div class="error-mascot--wrapper pull-right">
+            <a target="_blank" title="By Lilyu (Own work) [WTFPL], via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File%3ALapinou_Furieux.svg"><img class="error-mascot" alt="Lapinou Furieux" src="{{ asset('static/images/error_mascot.svg') }}"/></a>
+        </div>
 
-    The server said: {{ msgPrintExists(message) }} <br /><br />
+        {% if exception is defined and attribute(exception, 'message') is defined %}
+            {%  set message = attribute(exception, 'message') %}
+        {% else %}
+            {% set message = 'unknown' %}
+        {% endif %}
 
-    Please feel free to file a task to report the error <a href='https://phabricator.wikimedia.org/maniphest/task/create/?title=PLEASE REPLACE WITH A DESCRIPTION OF THE ERROR&priority=75&projects=Tool-labs-tools-xtools&description={{ attribute(exception, "file") }}: {{ attribute(exception, "line") }} - {{ message }}\r\n\r\nPlease provide any further details you can here\r\n\r\nXTools version: {{ version }}-{{ shortHash() }}' target=_blank>on Phabricator</a> (Requires a Phabricator account).
+        <p>{{ msg('error-title') }}</p>
+
+        <p>{{ msg('error-server-message', ['<code>' ~ msgPrintExists(message) ~ '</code>']) }}</p>
+
+        <p>
+            {% set phabLink %}
+                <a target="_blank" href="https://phabricator.wikimedia.org/maniphest/task/create/?title=PLEASE REPLACE WITH A DESCRIPTION OF THE ERROR&amp;priority=75&amp;projects=Tool-labs-tools-xtools&amp;description=```{{ attribute(exception, 'file') }}: {{ attribute(exception, 'line') }} - {{ message }}```">Phabricator</a>
+            {% endset %}
+            {{ msg('error-report', [phabLink]) }}
+        </p>
+    </div>
+</div>
 {% endblock %}

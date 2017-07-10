@@ -48,6 +48,7 @@
   "hide": "verbergen",
   "high-replag": "Achtung: Replag ist hoch, Änderungen neuer als $1 werden nicht angezeigt.",
   "history": "Versionsgeschichte",
+  "image-attribution": "Bildnennung",
   "interrupted": "Uups, um die System-Ressourcen zu schonen, hat ein Bot die Abfrage terminiert, weil sie länger als $1 Sekunden gedauert hat.",
   "invalid-date": "Ungültiges Datum.",
   "invalid-type": "Ungültiger Typ ausgewählt",

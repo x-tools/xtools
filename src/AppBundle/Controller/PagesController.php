@@ -131,37 +131,14 @@ class PagesController extends Controller
             return $this->redirectToRoute('pages');
         }
 
-        $dbName = $projectData->getDatabaseName();
-
-        $pageTable = $projectRepo->getTableName($dbName, 'page');
-        $pageAssessmentsTable = $projectRepo->getTableName($dbName, 'page_assessments');
-        $revisionTable = $projectRepo->getTableName($dbName, 'revision');
-        $archiveTable = $projectRepo->getTableName($dbName, 'archive');
-        $logTable = $projectRepo->getTableName($dbName, 'logging', 'userindex');
-
-        // Grab the connection to the replica database (which is separate from the above)
-        $conn = $this->get('doctrine')->getManager('replicas')->getConnection();
-
-        $namespaceConditionArc = '';
-        $namespaceConditionRev = '';
-
-        if ($namespace != 'all') {
-            $namespaceConditionRev = " AND page_namespace = '".intval($namespace)."' ";
-            $namespaceConditionArc = " AND ar_namespace = '".intval($namespace)."' ";
-        }
-
-        $summaryColumns = ['namespace']; // what columns to show in namespace totals table
-        $redirectCondition = '';
+        // what columns to show in namespace totals table
+        $summaryColumns = ['namespace'];
         if ($redirects == 'onlyredirects') {
             // don't show redundant pages column if only getting data on redirects
             $summaryColumns[] = 'redirects';
-
-            $redirectCondition = " AND page_is_redirect = '1' ";
         } elseif ($redirects == 'noredirects') {
             // don't show redundant redirects column if only getting data on non-redirects
             $summaryColumns[] = 'pages';
-
-            $redirectCondition = " AND page_is_redirect = '0' ";
         } else {
             // order is important here
             $summaryColumns[] = 'pages';
@@ -169,60 +146,9 @@ class PagesController extends Controller
         }
         $summaryColumns[] = 'deleted'; // always show deleted column
 
-        $user_id = $user->getId($projectData);
-
-        if ($user_id == 0) { // IP Editor or undefined username.
-            $whereRev = " rev_user_text = '$username' AND rev_user = '0' ";
-            $whereArc = " ar_user_text = '$username' AND ar_user = '0' ";
-            $having = " rev_user_text = '$username' ";
-        } else {
-            $whereRev = " rev_user = '$user_id' AND rev_timestamp > 1 ";
-            $whereArc = " ar_user = '$user_id' AND ar_timestamp > 1 ";
-            $having = " rev_user = '$user_id' ";
-        }
+        $result = $user->getRepository()->getPagesCreated($projectData, $user, $namespace, $redirects);
 
         $hasPageAssessments = $projectRepo->isLabs() && $projectData->hasPageAssessments();
-        $paSelects = $hasPageAssessments ? ', pa_class, pa_importance, pa_page_revision' : '';
-        $paSelectsArchive = $hasPageAssessments ?
-            ', NULL AS pa_class, NULL AS pa_page_id, NULL AS pa_page_revision'
-            : '';
-        $paJoin = $hasPageAssessments ? "LEFT JOIN $pageAssessmentsTable ON rev_page = pa_page_id" : '';
-
-        $stmt = "
-            (SELECT DISTINCT page_namespace AS namespace, 'rev' AS type, page_title AS page_title,
-                page_len, page_is_redirect, rev_timestamp AS rev_timestamp,
-                rev_user, rev_user_text AS username, rev_len, rev_id $paSelects
-            FROM $pageTable
-            JOIN $revisionTable ON page_id = rev_page
-            $paJoin
-            WHERE $whereRev AND rev_parent_id = '0' $namespaceConditionRev $redirectCondition
-            " . ($hasPageAssessments ? 'GROUP BY rev_page' : '') . "
-            )
-
-            UNION
-
-            (SELECT a.ar_namespace AS namespace, 'arc' AS type, a.ar_title AS page_title,
-                0 AS page_len, '0' AS page_is_redirect, MIN(a.ar_timestamp) AS rev_timestamp,
-                a.ar_user AS rev_user, a.ar_user_text AS username, a.ar_len AS rev_len,
-                a.ar_rev_id AS rev_id $paSelectsArchive
-            FROM $archiveTable a
-            JOIN
-            (
-                SELECT b.ar_namespace, b.ar_title
-                FROM $archiveTable AS b
-                LEFT JOIN $logTable ON log_namespace = b.ar_namespace AND log_title = b.ar_title
-                    AND log_user = b.ar_user AND (log_action = 'move' OR log_action = 'move_redir')
-                WHERE $whereArc AND b.ar_parent_id = '0' $namespaceConditionArc AND log_action IS NULL
-            ) AS c ON c.ar_namespace= a.ar_namespace AND c.ar_title = a.ar_title
-            GROUP BY a.ar_namespace, a.ar_title
-            HAVING $having
-            )
-            ";
-        $resultQuery = $conn->prepare($stmt);
-        $resultQuery->execute();
-
-        $result = $resultQuery->fetchAll();
-
         $pagesByNamespaceByDate = [];
         $pageTitles = [];
         $countsByNamespace = [];

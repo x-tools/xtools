@@ -96,6 +96,11 @@
             color: #4365cc;
         }
     }
+
+    .bugs-table .sort-entry--explanation {
+        min-width: 400px;
+        white-space: pre-wrap;
+    }
 }
 
 @media (max-width: $bootstrap-sm) {

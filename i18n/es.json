@@ -50,6 +50,7 @@
   "hide": "ocultar",
   "high-replag": "Precaución: el retardo de replicación es alto. Los cambios más recientes que $1 podrían no aparecer.",
   "history": "Historial",
+  "image-attribution": "Atribución de imagen",
   "import": "Importar",
   "interrupted": "Lo sentimos, pero con el fin de ahorrar recursos, un bot automáticamente ha matado esta consulta por ser más larga de $1 segundos.",
   "invalid-date": "Fecha no válida",

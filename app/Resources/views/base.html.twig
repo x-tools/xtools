@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="{{ lang() }}"{% if isRTL() %} dir="rtl"{% endif %}>
 <head>
-    <title>{% if xtTitle is defined %}{{ xtTitle }} - {% endif %}{% if xtPage != 'home' %}{{ msg('tool-'~xtPage) }} - {% endif %}{{ msg('xtools-title') }}</title>
+    <title>
+        {% if xtTitle is defined %}{{ xtTitle }} - {% endif %}{% if xtPage != 'home' and xtPage != '' %}{{ msg('tool-'~xtPage) }} - {% endif %}{{ msg('xtools-title') }}
+    </title>
 
     {# must be before loading the individual JS files #}
     <script type="text/javascript">

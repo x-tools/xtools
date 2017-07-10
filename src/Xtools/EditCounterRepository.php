@@ -63,7 +63,7 @@ class EditCounterRepository extends Repository
                 WHERE rev_user = :userId AND rev_len > 1000
             ) UNION (
             SELECT 'with_comments' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_user = :userId AND rev_comment = ''
+                WHERE rev_user = :userId AND rev_comment != ''
             ) UNION (
             SELECT 'minor' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
                 WHERE rev_user = :userId AND rev_minor_edit = 1
@@ -139,13 +139,6 @@ class EditCounterRepository extends Repository
             FROM $loggingTable
             WHERE log_user = :userId
             GROUP BY log_type, log_action
-        ) UNION
-        (SELECT 'users-unblocked' AS source, COUNT(DISTINCT log_title) AS value
-            FROM $loggingTable
-            WHERE log_user = :userId
-                AND log_type = 'block'
-                AND log_action = 'unblock'
-                AND log_namespace = $userNamespaceId
         )";
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $userId = $user->getId($project);
@@ -165,13 +158,16 @@ class EditCounterRepository extends Repository
         $requiredCounts = [
             'thanks-thank',
             'review-approve',
+            'newusers-create2',
+            'newusers-byemail',
             'patrol-patrol',
             'block-block',
             'block-reblock',
             'block-unblock',
-            'users-unblocked', // Second query above.
             'protect-protect',
+            'protect-modify',
             'protect-unprotect',
+            'rights-rights',
             'move-move',
             'delete-delete',
             'delete-revision',
@@ -211,23 +207,6 @@ class EditCounterRepository extends Repository
         $this->stopwatch->stop($cacheKey);
 
         return $logCounts;
-    }
-
-    /**
-     * Get data for all blocks set by the given user.
-     * @param Project $project
-     * @param User $user
-     * @return array
-     */
-    public function getBlocksSet(Project $project, User $user)
-    {
-        $ipblocksTable = $this->getTableName($project->getDatabaseName(), 'ipblocks');
-        $sql = "SELECT * FROM $ipblocksTable WHERE ipb_by = :userId";
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $userId = $user->getId($project);
-        $resultQuery->bindParam('userId', $userId);
-        $resultQuery->execute();
-        return $resultQuery->fetchAll();
     }
 
     /**
@@ -591,13 +570,13 @@ class EditCounterRepository extends Repository
     }
 
     /**
-     * Get a summary of automated edits made by the given user in their last 1000 edits.
+     * Get a summary of automated edits made by the given user
      * Will cache the result for 10 minutes.
      * @param Project $project The project.
      * @param User $user The user.
      * @return integer[] Array of edit counts, keyed by all tool names from
      * app/config/semi_automated.yml
-     * @TODO This currently uses AutomatedEditsHelper but that could probably be refactored.
+     * @TODO Load from AutoEditsController via AJAX
      */
     public function countAutomatedRevisions(Project $project, User $user)
     {
@@ -612,10 +591,8 @@ class EditCounterRepository extends Repository
         /** @var AutomatedEditsHelper $automatedEditsHelper */
         $automatedEditsHelper = $this->container->get("app.automated_edits_helper");
 
-        // Get the most recent 1000 edit summaries.
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $sql = "SELECT rev_comment FROM $revisionTable
-            WHERE rev_user=:userId ORDER BY rev_timestamp DESC LIMIT 1000";
+        $sql = "SELECT rev_comment FROM $revisionTable WHERE rev_user = :userId";
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $resultQuery->bindParam("userId", $userId);
         $resultQuery->execute();

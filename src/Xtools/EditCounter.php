@@ -266,15 +266,35 @@ class EditCounter extends Model
     }
 
     /**
-     * Get the total number of times the user has blocked or re-blocked a user.
+     * Get the total number of times the user has blocked a user.
      * @return int
      */
     public function countBlocksSet()
     {
         $logCounts = $this->getLogCounts();
-        $block = isset($logCounts['block-block']) ? (int)$logCounts['block-block'] : 0;
+        $reBlock = isset($logCounts['block-block']) ? (int)$logCounts['block-block'] : 0;
+        return $reBlock;
+    }
+
+    /**
+     * Get the total number of times the user has re-blocked a user.
+     * @return int
+     */
+    public function countReblocksSet()
+    {
+        $logCounts = $this->getLogCounts();
         $reBlock = isset($logCounts['block-reblock']) ? (int)$logCounts['block-reblock'] : 0;
-        return $block + $reBlock;
+        return $reBlock;
+    }
+
+    /**
+     * Get the total number of times the user has unblocked a user.
+     * @return int
+     */
+    public function countUnblocksSet()
+    {
+        $logCounts = $this->getLogCounts();
+        return isset($logCounts['block-unblock']) ? (int)$logCounts['block-unblock'] : 0;
     }
 
     /**
@@ -344,30 +364,6 @@ class EditCounter extends Model
     }
 
     /**
-     * Get the total number of users blocked by this user.
-     * @return int
-     */
-    public function countUsersBlocked()
-    {
-        $blocks = $this->getBlocks('set');
-        $usersBlocked = [];
-        foreach ($blocks as $block) {
-            $usersBlocked[$block['ipb_user']] = true;
-        }
-        return count($usersBlocked);
-    }
-
-    /**
-     * Get the total number of users that this user has unblocked.
-     * @return int
-     */
-    public function countUsersUnblocked()
-    {
-        $logCounts = $this->getLogCounts();
-        return isset($logCounts['users-unblocked']) ? (int)$logCounts['users-unblocked'] : 0;
-    }
-
-    /**
      * Get the total number of pages protected by the user.
      * @return int
      */
@@ -375,6 +371,16 @@ class EditCounter extends Model
     {
         $logCounts = $this->getLogCounts();
         return isset($logCounts['protect-protect']) ? (int)$logCounts['protect-protect'] : 0;
+    }
+
+    /**
+     * Get the total number of pages reprotected by the user.
+     * @return int
+     */
+    public function countPagesReprotected()
+    {
+        $logCounts = $this->getLogCounts();
+        return isset($logCounts['protect-modify']) ? (int)$logCounts['protect-modify'] : 0;
     }
 
     /**
@@ -405,6 +411,16 @@ class EditCounter extends Model
     {
         $logCounts = $this->getLogCounts();
         return isset($logCounts['delete-restore']) ? (int)$logCounts['delete-restore'] : 0;
+    }
+
+    /**
+     * Get the total number of times the user has modified the rights of a user.
+     * @return int
+     */
+    public function countRightsModified()
+    {
+        $logCounts = $this->getLogCounts();
+        return isset($logCounts['rights-rights']) ? (int)$logCounts['rights-rights'] : 0;
     }
 
     /**
@@ -569,6 +585,18 @@ class EditCounter extends Model
     }
 
     /**
+     * Get the total number of accounts created by the user.
+     * @return int
+     */
+    public function accountsCreated()
+    {
+        $logCounts = $this->getLogCounts();
+        $create2 = $logCounts['newusers-create2'] ?: 0;
+        $byemail = $logCounts['newusers-byemail'] ?: 0;
+        return $create2 + $byemail;
+    }
+
+    /**
      * Get the given user's total edit counts per namespace.
      * @return integer[] Array keys are namespace IDs, values are the edit counts.
      */
@@ -609,6 +637,10 @@ class EditCounter extends Model
             $out['totals'][$total['page_namespace']][$total['year']] = $total['count'];
         }
 
+        // Make sure data is sorted by namespace
+        ksort($out['namespaces']);
+        ksort($out['totals']);
+
         return $out;
     }
 
@@ -621,7 +653,6 @@ class EditCounter extends Model
         $totals = $this->getRepository()->getMonthCounts($this->project, $this->user);
         $out = [
             'years' => [],
-            'namespaces' => [],
             'totals' => [],
         ];
         $out['max_year'] = 0;
@@ -647,6 +678,10 @@ class EditCounter extends Model
                 }
             }
         }
+
+        // Sort by namespace
+        ksort($out['totals']);
+
         return $out;
     }
 

@@ -69,7 +69,7 @@
                         <td>
                             {{ wiki.extLink('https://www.wikidata.org/wiki/' ~ page.wikidataId, page.wikidataId) }}
                             &middot;
-                            {{ numWikidataItems|number_format }} {{ msg('num-sitelinks', [numWikidataItems]) }}
+                            {{ page.countWikidataItems|number_format }} {{ msg('num-sitelinks', [page.countWikidataItems]) }}
                         </td>
                     </tr>
                     {% endif %}
@@ -330,7 +330,7 @@
                                 {% else %}
                                     {{ msg(key)|capitalize_first }}
                                 {% endif %}
-                                {% if key == 'added_bytes' %}
+                                {% if key == 'added-bytes' %}
                                     <sup class="rm-inline-margin-left">2</sup>
                                 {% endif %}
                                 {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
@@ -756,7 +756,7 @@
                         <td class="sort-entry--explanation" data-value="{{ bug.explanation }}">{{ bug.explanation|raw }}</td>
                         <td>
                             {% if bug.name == 'Wikidata' %}
-                                <a target='_blank' href='//www.wikidata.org/wiki/{{ wikidataId }}'>
+                                <a target='_blank' href='//www.wikidata.org/wiki/{{ page.wikidataId }}'>
                                     {{ msg('edit') }}
                                 </a>
                             {% else %}
