@@ -75,15 +75,19 @@ class RfXAnalysisController extends Controller
                 [
                     "project"=>$projectQuery,
                     "type"=>$typeQuery
-                ]
+                ] 
             );
         }
+
+        $projects = array_keys($this->getParameter("rfa"));
+
         // replace this example code with whatever you need
         return $this->render(
-            'rfxAnalysis/index.html.twig', [
-            'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
-            "xtPageTitle" => "rfa",
-            'xtPage' => "rfa",
+            'rfxAnalysis/index.html.twig',
+            [
+                "xtPageTitle" => "tool-rfa",
+                'xtPage' => "rfa",
+                "projects" => $projects,
             ]
         );
     }
