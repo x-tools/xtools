@@ -11,7 +11,7 @@ parameters:
         regex: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) \d+ (\[\[Wikipedia:Pending changes\|pending\]\]|pending) edits? (to revision \d+|by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\])'
         link: Project:Pending changes
     Bot revert:
-        regex: '^Reverting possible vandalism by.*?to version by|^BOT (Reverted edits by|rv \[\[Special:Contributions)'
+        regex: '^Reverting possible vandalism,? by.*\(Bot\)$|^BOT (- )?(Reverted edits? by|rv)|^vandalism from \[\[.*?\(\d+\) - reverted'
         link: Project:Bots
     Page move:
         regex: '^.*?moved page \[\[(?!.*?WP:AFCH)|moved \[\[.*?\]\] to \[\['

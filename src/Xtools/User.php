@@ -42,6 +42,17 @@ class User extends Model
     }
 
     /**
+     * Get a md5 hash of the username to be used as a cache key.
+     * This ensures the cache key does not contain reserved characters.
+     * You could also use the ID, but that may require an unnecessary DB query.
+     * @return string
+     */
+    public function getCacheKey()
+    {
+        return md5($this->username);
+    }
+
+    /**
      * Get the user's ID on the given project.
      * @param Project $project
      * @return int

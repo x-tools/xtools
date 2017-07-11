@@ -197,21 +197,20 @@ class Page extends Model
             return $this->revisions;
         }
 
-        $data = $this->getRepository()->getRevisions($this, $user);
-        $totalAdded = 0;
-        $totalRemoved = 0;
-        $revisions = [];
-        foreach ($data as $revision) {
-            if ($revision['length_change'] > 0) {
-                $totalAdded += $revision['length_change'];
-            } else {
-                $totalRemoved += $revision['length_change'];
-            }
-            $revisions[] = $revision;
-        }
-        $this->revisions = $revisions;
+        $this->revisions = $this->getRepository()->getRevisions($this, $user);
 
-        return $revisions;
+        return $this->revisions;
+    }
+
+    /**
+     * Get the statement for a single revision,
+     * so that you can iterate row by row.
+     * @param User|null $user Specify to get only revisions by the given user.
+     * @return Doctrine\DBAL\Driver\PDOStatement
+     */
+    public function getRevisionsStmt(User $user = null)
+    {
+        return $this->getRepository()->getRevisionsStmt($this, $user);
     }
 
     /**
@@ -394,5 +393,15 @@ class Page extends Model
     public function countWikidataItems()
     {
         return $this->getRepository()->countWikidataItems($this);
+    }
+
+    /**
+     * Get number of in and outgoing links and redirects to this page.
+     * @return string[] Counts with the keys 'links_ext_count', 'links_out_count',
+     *                  'links_in_count' and 'redirects_count'
+     */
+    public function countLinksAndRedirects()
+    {
+        return $this->getRepository()->countLinksAndRedirects($this);
     }
 }

@@ -52,8 +52,12 @@ class Edit extends Model
         $this->id = (int) $attrs['id'];
         $this->timestamp = DateTime::createFromFormat('YmdHis', $attrs['timestamp']);
         $this->minor = $attrs['minor'] === '1';
-        $this->length = (int) $attrs['length'];
-        $this->length_change = (int) $attrs['length_change'];
+
+        // NOTE: Do not type cast into an integer. Null values are
+        //   our indication that the revision was revision-deleted.
+        $this->length = $attrs['length'];
+        $this->length_change = $attrs['length_change'];
+
         $this->user = new User($attrs['username']);
         $this->comment = $attrs['comment'];
     }

@@ -356,7 +356,7 @@
                             {% endif %}
                             &middot;
                             {% if enabled('topedits') %}
-                                <a href="{{ path('topedits', { 'project': project.domain, 'username': editor }) }}">{{ msg('tool-topedits') }}</a>
+                                <a href="{{ path('topedits', { 'project': project.domain, 'username': editor, 'namespace': page.namespace, 'article': page.title }) }}">{{ msg('tool-topedits') }}</a>
                             {% endif %}
                         </td>
                         <td class="sort-entry--edits" data-value="{{ stats.all }}">
@@ -366,10 +366,10 @@
                         {% set user_minor_percent = stats.minor|percent_format(stats.all) %}
                         <td class="sort-entry--minor-percentage" data-value="{{ user_minor_percent }}">{{ user_minor_percent }}</td>
                         <td class="sort-entry--first-edit" data-value="{{ stats.first_id }}">
-                            {{ wiki.pageLinkRaw('Special:Diff/'~stats.first_id, project, stats.first) }}
+                            {{ wiki.pageLinkRaw('Special:Diff/' ~ stats.first_id, project, stats.first|date('Y-m-d H:i')) }}
                         </td>
                         <td class="sort-entry--latest-edit" data-value="{{ stats.last_id }}">
-                            {{ wiki.pageLinkRaw('Special:Diff/'~stats.last_id, project, stats.last) }}
+                            {{ wiki.pageLinkRaw('Special:Diff/' ~ stats.last_id, project, stats.last|date('Y-m-d H:i')) }}
                         </td>
                         <td class="sort-entry--average-time-bw-edits" data-value="{{ stats.atbe }}">
                             {{ stats.atbe|number_format(1) }}

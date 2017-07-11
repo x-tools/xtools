@@ -70,7 +70,7 @@ class PagesRepository extends Repository
     {
         $cacheKey = 'revisions.'.$page->getId();
         if ($user) {
-            $cacheKey .= '.'.$user->getUsername();
+            $cacheKey .= '.'.$user->getCacheKey();
         }
 
         if ($this->cache->hasItem($cacheKey)) {
@@ -79,10 +79,31 @@ class PagesRepository extends Repository
 
         $this->stopwatch->start($cacheKey, 'XTools');
 
+        $stmt = $this->getRevisionsStmt($page, $user);
+        $result = $stmt->fetchAll();
+
+        // Cache for 10 minutes, and return.
+        $cacheItem = $this->cache->getItem($cacheKey)
+            ->set($result)
+            ->expiresAfter(new DateInterval('PT10M'));
+        $this->cache->save($cacheItem);
+        $this->stopwatch->stop($cacheKey);
+
+        return $result;
+    }
+
+    /**
+     * Get the statement for a single revision, so that you can iterate row by row.
+     * @param Page $page The page.
+     * @param User|null $user Specify to get only revisions by the given user.
+     * @return Doctrine\DBAL\Driver\PDOStatement
+     */
+    public function getRevisionsStmt(Page $page, User $user = null)
+    {
         $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
         $userClause = $user ? "revs.rev_user_text in (:username) AND " : "";
 
-        $query = "SELECT
+        $sql = "SELECT
                     revs.rev_id AS id,
                     revs.rev_timestamp AS timestamp,
                     revs.rev_minor_edit AS minor,
@@ -94,21 +115,15 @@ class PagesRepository extends Repository
                 FROM $revTable AS revs
                 LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                 WHERE $userClause revs.rev_page = :pageid
-                ORDER BY revs.rev_timestamp ASC
-            ";
+                ORDER BY revs.rev_timestamp ASC";
+
         $params = ['pageid' => $page->getId()];
         if ($user) {
             $params['username'] = $user->getUsername();
         }
-        $conn = $this->getProjectsConnection();
-        $result = $conn->executeQuery($query, $params)->fetchAll();
 
-        // Cache for 10 minutes, and return.
-        $cacheItem = $this->cache->getItem($cacheKey)
-            ->set($result)
-            ->expiresAfter(new DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
-        $this->stopwatch->stop($cacheKey);
+        $conn = $this->getProjectsConnection();
+        return $conn->executeQuery($sql, $params);
     }
 
     /**
@@ -122,16 +137,15 @@ class PagesRepository extends Repository
         $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
         $userClause = $user ? "rev_user_text in (:username) AND " : "";
 
-        $query = "SELECT COUNT(*)
+        $sql = "SELECT COUNT(*)
                 FROM $revTable
-                WHERE $userClause rev_page = :pageid
-            ";
+                WHERE $userClause rev_page = :pageid";
         $params = ['pageid' => $page->getId()];
         if ($user) {
             $params['username'] = $user->getUsername();
         }
         $conn = $this->getProjectsConnection();
-        return $conn->executeQuery($query, $params)->fetchColumn(0);
+        return $conn->executeQuery($sql, $params)->fetchColumn(0);
     }
 
     /**
@@ -269,6 +283,50 @@ class PagesRepository extends Repository
         $result = $resultQuery->fetchAll();
 
         return $count ? (int) $result[0]['count'] : $result;
+    }
+
+    /**
+     * Get number of in and outgoing links and redirects to the given page.
+     * @param Page $page
+     * @return string[] Counts with the keys 'links_ext_count', 'links_out_count',
+     *                  'links_in_count' and 'redirects_count'
+     */
+    public function countLinksAndRedirects(Page $page)
+    {
+        $externalLinksTable = $this->getTableName($page->getProject()->getDatabaseName(), 'externallinks');
+        $pageLinksTable = $this->getTableName($page->getProject()->getDatabaseName(), 'pagelinks');
+        $redirectTable = $this->getTableName($page->getProject()->getDatabaseName(), 'redirect');
+
+        $sql = "SELECT COUNT(*) AS value, 'links_ext' AS type
+                FROM $externalLinksTable WHERE el_from = :id
+                UNION
+                SELECT COUNT(*) AS value, 'links_out' AS type
+                FROM $pageLinksTable WHERE pl_from = :id
+                UNION
+                SELECT COUNT(*) AS value, 'links_in' AS type
+                FROM $pageLinksTable WHERE pl_namespace = :namespace AND pl_title = :title
+                UNION
+                SELECT COUNT(*) AS value, 'redirects' AS type
+                FROM $redirectTable WHERE rd_namespace = :namespace AND rd_title = :title";
+        $statement = $this->getProjectsConnection()->prepare($sql);
+
+        $params = [
+            'id' => $page->getId(),
+            'title' => str_replace(' ', '_', $page->getTitle()),
+            'namespace' => $page->getNamespace(),
+        ];
+
+        $conn = $this->getProjectsConnection();
+        $res = $conn->executeQuery($sql, $params);
+
+        $data = [];
+
+        // Transform to associative array by 'type'
+        foreach ($res as $row) {
+            $data[$row['type'] . '_count'] = $row['value'];
+        }
+
+        return $data;
     }
 
     /**
