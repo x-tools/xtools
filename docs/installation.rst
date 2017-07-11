@@ -5,6 +5,7 @@ Installation
 To install XTools, please follow these steps:
 
 1. Download the repository into a web-accessible location.
+   If you're using Git, the ``master`` branch is always stable so you can clone that.
 2. Ensure that ``var/`` and all files within it (other than ``var/SymfonyRequirements.php``) are writable by the web server.
 3. Run ``composer install`` and be prompted to enter database details and other configuration information.
 4. Open XTools in your browser; you should see the XTools landing page.
