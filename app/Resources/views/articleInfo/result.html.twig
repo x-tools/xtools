@@ -124,8 +124,8 @@
                         <td>
                             <a class="rm-inline-margin" href="#auto-edits">{{ msg('auto-edits') }}</a>
                         </td>
-                    </td>
-                    <td>{{ general.automated_count|number_format }}</td>
+                        <td>{{ general.automated_count|number_format }}</td>
+                    </tr>
                     <tr>
                         <td>{{ msg('reverted-edits') }}</td>
                         <td>{{ general.revert_count|number_format }}</td>
@@ -320,6 +320,12 @@
                     {{ chart.pie_chart('top_by_added', topTenEditorsByAdded) }}
                 </div>
             </div>
+            <p class="export">
+                <a href="{{ path('ArticleInfoResult', {project:project.domain, article:page.title}) }}?format=wikitext">
+                    <span class="glyphicon glyphicon-export"></span>
+                    {{ msg('export-wikitext') }}
+                </a>
+            </p>
             <table class="table table-bordered table-hover table-striped top-editors-table">
                 <thead><tr>
                     {% for key in ['rank', 'username', 'links', 'edits', 'minor-edits', 'minor-edits-percentage', 'first-edit', 'latest-edit', 'average-time-bw-edits', 'added-bytes'] %}
@@ -341,7 +347,6 @@
                 <tbody>
                 {% set counter = 0 %}
                 {% set edit_sum = 0 %}
-                {% set editorlimit = app.request.query.get("editorlimit")|default(20) %}
                 {% for editor, stats in editors|slice(0, editorlimit ) %}
                     {% set counter = counter + 1 %}
                     {% set edit_sum = edit_sum + stats.all %}
