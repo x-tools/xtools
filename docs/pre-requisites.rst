@@ -1,3 +1,5 @@
+.. _pre-requisites:
+
 ##############
 Pre-requisites
 ##############
