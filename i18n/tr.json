@@ -27,7 +27,7 @@
   "edits-last-month": "Son 30 gün içindeki değişiklikler",
   "edits-last-week": "Son 7 gün içindeki değişiklikler",
   "edits-last-year": "Son 365 gün içindeki değişiklikler",
-  "edits-summary": "Özet girilmiş değişiklikler",
+  "edits-with-summaries": "Özet girilmiş değişiklikler",
   "end": "Bitiş tarihi",
   "file": "Dosya",
   "files-uploaded": "Yüklenen dosyalar",
@@ -40,6 +40,10 @@
   "invalid-date": "Geçersiz tarih",
   "invalid-type": "Seçilen tür geçersiz",
   "ip-edits": "IP değişiklikleri sayısı",
+  "last-day": "Son 24 saat içindeki değişiklikler",
+  "last-month": "Son 30 gün içindeki değişiklikler",
+  "last-week": "Son 7 gün içindeki değişiklikler",
+  "last-year": "Son 365 gün içindeki değişiklikler",
   "latest-edit": "Son değişiklik",
   "links-external": "Dış bağlantılar",
   "links-in": "Bu sayfaya bağlantılar",
@@ -97,7 +101,6 @@
   "text-to-serach": "Aranacak metin",
   "thank": "Teşekkür",
   "timecard": "Zaman çizelgesi",
-  "title-xtools": "X!'in araçları",
   "too-many-revisions": "Bu makalede 50.000'den fazla düzeltme var. İlk 50.000 için veriler aşağıda gösterilmektedir.",
   "tool-adminstats-desc": "Admin eylemler istatistiklerini göster",
   "tool-articleinfo": "Sayfa geçmişi",
@@ -119,7 +122,7 @@
   "user-id": "Kullanıcı ID'si:",
   "username": "Kullanıcı adı",
   "view-source": "Kaynağı gör",
-  "welcome": "X!'in araçlarına hoş geldiniz",
   "wiki": "Viki",
-  "with-summary": "Özet ile"
+  "with-summary": "Özet ile",
+  "xtools-title": "X!'in araçları"
 }

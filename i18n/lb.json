@@ -36,7 +36,7 @@
   "edits-last-month": "Ännerungen an de leschten 30 Deeg",
   "edits-last-week": "Ännerungen an de leschte 7 Deeg",
   "edits-last-year": "Ännerungen an de leschten 365 Deeg",
-  "edits-summary": "Ännerunge mat Resumé",
+  "edits-with-summaries": "Ännerunge mat Resumé",
   "end": "Schlussdatum",
   "events": "Evenementer",
   "file": "Fichier",
@@ -48,6 +48,10 @@
   "history": "Versiounen",
   "invalid-date": "Net valabelen Datum",
   "ips": "IPen",
+  "last-day": "Ännerungen an de leschte 24 Stonnen",
+  "last-month": "Ännerungen an de leschten 30 Deeg",
+  "last-week": "Ännerungen an de leschte 7 Deeg",
+  "last-year": "Ännerungen an de leschten 365 Deeg",
   "latest-edit": "Lescht Ännerung",
   "limit": "Limit",
   "links-external": "Extern Linken",
@@ -114,7 +118,6 @@
   "text": "Text",
   "text-to-serach": "Text fir ze sichen",
   "thank": "Merci",
-  "title-xtools": "X!'s tools",
   "too-many-revisions": "Dësen Artikel huet méi wéi 50 000 Versiounen Donnéeë fir déi éischt 50 000 Versioune ginn hei drënner gewisen.",
   "tool-adminstats": "Statistike vun den Administrateuren",
   "tool-adminstats-desc": "Statistik vun den Admin-Aktiounen",
@@ -144,7 +147,7 @@
   "username": "Benotzernumm",
   "view-source": "Quellcode weisen",
   "vote-msg": "$1 huet $2 $3-Säite geännert!",
-  "welcome": "Wëllkomm bei den X!'s Tools!",
   "wiki": "Wiki",
-  "with-summary": "mat Resumé"
+  "with-summary": "mat Resumé",
+  "xtools-title": "X!'s tools"
 }

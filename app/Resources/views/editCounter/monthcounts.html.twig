@@ -46,7 +46,7 @@
             datasets: [
                 {% for ns_id,dataset in ec.monthCounts.totals %}
                 {
-                    label: "{{ attribute(project.namespaces, ns_id) }}",
+                    label: "{{ nsName(ns_id, project.namespaces) }}",
                     backgroundColor: "{{ color(ns_id) }}",
                     data: [
                         {% for year in ec.monthCounts.min_year .. ec.monthCounts.max_year %}

@@ -122,9 +122,6 @@ class AutomatedEditsController extends Controller
      */
     public function resultAction($project, $username, $start = null, $end = null)
     {
-        // Pull the labs helper and check if enabled
-        $lh = $this->get('app.labs_helper');
-
         // Pull information about the project
         $projectData = ProjectRepository::getProject($project, $this->container);
 
@@ -134,7 +131,6 @@ class AutomatedEditsController extends Controller
         }
 
         $dbName = $projectData->getDatabaseName();
-        $projectUrl = $projectData->getUrl();
 
         // Grab our database connection
         $dbh = $this->get('doctrine')->getManager('replicas')->getConnection();
@@ -168,8 +164,8 @@ class AutomatedEditsController extends Controller
         // Create a collection of queries that we're going to run.
         $queries = [];
 
-        $revisionTable = $lh->getTable('revision', $dbName);
-        $archiveTable = $lh->getTable('archive', $dbName);
+        $revisionTable = $projectData->getRepository()->getTableName($dbName, 'revision');
+        $archiveTable = $projectData->getRepository()->getTableName($dbName, 'archive');
 
         $condBegin = $start ? " AND rev_timestamp > :start " : null;
         $condEnd = $end ? " AND rev_timestamp < :end ": null;

@@ -47,7 +47,8 @@ class ApiControllerTest extends WebTestCase
             $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
             // Check that a correct namespace value was returned
-            $namespaces = (array) json_decode($client->getResponse()->getContent());
+            $response = (array) json_decode($client->getResponse()->getContent());
+            $namespaces = (array) $response['namespaces'];
             $this->assertEquals('Utilisateur', array_values($namespaces)[2]); // User in French
         }
     }

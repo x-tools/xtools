@@ -141,6 +141,21 @@ class Page extends Model
     }
 
     /**
+     * Get the language code for this page.
+     * If not set, the language code for the project is returned.
+     * @return string
+     */
+    public function getLang()
+    {
+        $info = $this->getPageInfo();
+        if (isset($info['pagelanguage'])) {
+            return $info['pagelanguage'];
+        } else {
+            return $this->getProject()->getLang();
+        }
+    }
+
+    /**
      * Get the Wikidata ID of this page.
      * @return string
      */
@@ -182,20 +197,211 @@ class Page extends Model
             return $this->revisions;
         }
 
-        $data = $this->getRepository()->getRevisions($this, $user);
-        $totalAdded = 0;
-        $totalRemoved = 0;
-        $revisions = [];
-        foreach ($data as $revision) {
-            if ($revision['length_change'] > 0) {
-                $totalAdded += $revision['length_change'];
-            } else {
-                $totalRemoved += $revision['length_change'];
-            }
-            $revisions[] = $revision;
-        }
-        $this->revisions = $revisions;
+        $this->revisions = $this->getRepository()->getRevisions($this, $user);
 
-        return $revisions;
+        return $this->revisions;
+    }
+
+    /**
+     * Get the statement for a single revision,
+     * so that you can iterate row by row.
+     * @param User|null $user Specify to get only revisions by the given user.
+     * @return Doctrine\DBAL\Driver\PDOStatement
+     */
+    public function getRevisionsStmt(User $user = null)
+    {
+        return $this->getRepository()->getRevisionsStmt($this, $user);
+    }
+
+    /**
+     * Get assessments of this page
+     * @return string[]|false `false` if unsupported, or array in the format of:
+     *         [
+     *             'assessment' => 'C', // overall assessment
+     *             'wikiprojects' => [
+     *                 'Biography' => [
+     *                     'assessment' => 'C',
+     *                     'badge' => 'url',
+     *                 ],
+     *                 ...
+     *             ],
+     *             'wikiproject_prefix' => 'Wikipedia:WikiProject_',
+     *         ]
+     */
+    public function getAssessments()
+    {
+        if (!$this->project->hasPageAssessments() || $this->getNamespace() !== 0) {
+            return false;
+        }
+
+        $projectDomain = $this->project->getDomain();
+        $config = $this->project->getRepository()->getAssessmentsConfig($projectDomain);
+        $data = $this->getRepository()->getAssessments($this->project, [$this->getId()]);
+
+        // Set the default decorations for the overall quality assessment
+        // This will be replaced with the first valid class defined for any WikiProject
+        $overallQuality = $config['class']['Unknown'];
+        $overallQuality['value'] = '???';
+
+        $decoratedAssessments = [];
+
+        foreach ($data as $assessment) {
+            $classValue = $assessment['class'];
+
+            // Use ??? as the presented value when the class is unknown or is not defined in the config
+            if ($classValue === 'Unknown' || $classValue === '' || !isset($config['class'][$classValue])) {
+                $classAttrs = $config['class']['Unknown'];
+                $assessment['class']['value'] = '???';
+                $assessment['class']['category'] = $classAttrs['category'];
+                $assessment['class']['color'] = $classAttrs['color'];
+                $assessment['class']['badge'] = "https://upload.wikimedia.org/wikipedia/commons/"
+                    . $classAttrs['badge'];
+            } else {
+                $classAttrs = $config['class'][$classValue];
+                $assessment['class'] = [
+                    'value' => $classValue,
+                    'color' => $classAttrs['color'],
+                    'category' => $classAttrs['category'],
+                ];
+
+                // add full URL to badge icon
+                if ($classAttrs['badge'] !== '') {
+                    $assessment['class']['badge'] = $this->project->getAssessmentBadgeURL($classValue);
+                }
+            }
+
+            if ($overallQuality['value'] === '???') {
+                $overallQuality = $assessment['class'];
+                $overallQuality['category'] = $classAttrs['category'];
+            }
+
+            $importanceValue = $assessment['importance'];
+            $importanceUnknown = $importanceValue === 'Unknown' || $importanceValue === '';
+
+            if ($importanceUnknown || !isset($config['importance'][$importanceValue])) {
+                $importanceAttrs = $config['importance']['Unknown'];
+                $assessment['importance'] = $importanceAttrs;
+                $assessment['importance']['value'] = '???';
+                $assessment['importance']['category'] = $importanceAttrs['category'];
+            } else {
+                $importanceAttrs = $config['importance'][$importanceValue];
+                $assessment['importance'] = [
+                    'value' => $importanceValue,
+                    'color' => $importanceAttrs['color'],
+                    'weight' => $importanceAttrs['weight'], // numerical weight for sorting purposes
+                    'category' => $importanceAttrs['category'],
+                ];
+            }
+
+            $decoratedAssessments[$assessment['wikiproject']] = $assessment;
+        }
+
+        return [
+            'assessment' => $overallQuality,
+            'wikiprojects' => $decoratedAssessments,
+            'wikiproject_prefix' => $config['wikiproject_prefix']
+        ];
+    }
+
+    /**
+     * Get CheckWiki errors for this page
+     * @return string[] See getErrors() for format
+     */
+    public function getCheckWikiErrors()
+    {
+        return $this->getRepository()->getCheckWikiErrors($this);
+    }
+
+    /**
+     * Get Wikidata errors for this page
+     * @return string[] See getErrors() for format
+     */
+    public function getWikidataErrors()
+    {
+        $errors = [];
+
+        if (empty($this->getWikidataId())) {
+            return [];
+        }
+
+        $wikidataInfo = $this->getRepository()->getWikidataInfo($this);
+
+        $terms = array_map(function ($entry) {
+            return $entry['term'];
+        }, $wikidataInfo);
+
+        $lang = $this->getLang();
+
+        if (!in_array('label', $terms)) {
+            $errors[] = [
+                'prio' => 2,
+                'name' => 'Wikidata',
+                'notice' => "Label for language <em>$lang</em> is missing", // FIXME: i18n
+                'explanation' => "See: <a target='_blank' " .
+                    "href='//www.wikidata.org/wiki/Help:Label'>Help:Label</a>",
+            ];
+        }
+
+        if (!in_array('description', $terms)) {
+            $errors[] = [
+                'prio' => 3,
+                'name' => 'Wikidata',
+                'notice' => "Description for language <em>$lang</em> is missing", // FIXME: i18n
+                'explanation' => "See: <a target='_blank' " .
+                    "href='//www.wikidata.org/wiki/Help:Description'>Help:Description</a>",
+            ];
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Get Wikidata and CheckWiki errors, if present
+     * @return string[] List of errors in the format:
+     *    [[
+     *         'prio' => int,
+     *         'name' => string,
+     *         'notice' => string (HTML),
+     *         'explanation' => string (HTML)
+     *     ], ... ]
+     */
+    public function getErrors()
+    {
+        // Includes label and description
+        $wikidataErrors = $this->getWikidataErrors();
+
+        $checkWikiErrors = $this->getCheckWikiErrors();
+
+        return array_merge($wikidataErrors, $checkWikiErrors);
+    }
+
+    /**
+     * Get all wikidata items for the page, not just languages of sister projects
+     * @param Page $page
+     * @return int Number of records.
+     */
+    public function getWikidataItems()
+    {
+        return $this->getRepository()->getWikidataItems($this);
+    }
+
+    /**
+     * Count wikidata items for the page, not just languages of sister projects
+     * @param Page $page
+     * @return int Number of records.
+     */
+    public function countWikidataItems()
+    {
+        return $this->getRepository()->countWikidataItems($this);
+    }
+
+    /**
+     * Get number of in and outgoing links and redirects to this page.
+     * @return string[] Counts with the keys 'links_ext_count', 'links_out_count',
+     *                  'links_in_count' and 'redirects_count'
+     */
+    public function countLinksAndRedirects()
+    {
+        return $this->getRepository()->countLinksAndRedirects($this);
     }
 }

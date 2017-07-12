@@ -1,7 +1,7 @@
 {
     "name": "xtools/xtools-rebirth",
     "description": "A set of article and user statistics tools for MediaWiki sites",
-    "license": "GPL-3.0",
+    "license": "GPL-3.0+",
     "type": "project",
     "autoload": {
         "psr-4": {

@@ -258,8 +258,14 @@ section > .panel-body {
 .panel-body .table:only-child {
     margin-bottom: 0;
 }
-.xt-panel-body table {
-    white-space: nowrap;
+.xt-panel-body {
+    table {
+        white-space: nowrap;
+    }
+
+    .panel-body {
+        width: 100%;
+    }
 }
 .xt-table > tbody > tr > td {
     padding-top: 1px;
@@ -320,7 +326,8 @@ section > .panel-body {
     white-space: -moz-pre-wrap;
     white-space: pre-line;
 }
-.panel-primary {
+.panel-primary,
+.panel-danger {
     margin-bottom: 0;
 }
 .panel-default {
@@ -620,6 +627,20 @@ div.outer_bar {
     }
 }
 
+.error-wrapper {
+    font-size: 18px;
+
+    p {
+        margin-bottom: 30px;
+    }
+}
+
+.error-mascot {
+    margin-right: 30px;
+    max-width: 100%;
+    width: 300px;
+}
+
 @media (min-width: $bootstrap-lg) {
     .xt-panel-body table {
         width: auto;
@@ -636,7 +657,9 @@ div.outer_bar {
 }
 
 @media (max-width: $bootstrap-md) {
-
+    .error-mascot {
+        width: 200px;
+    }
 }
 
 @media (max-width: $bootstrap-sm) {
@@ -653,6 +676,12 @@ div.outer_bar {
         clear: both;
         display: block;
         max-width: 100%;
+    }
+
+    .xt-panel-description {
+        display: block;
+        float: none !important;
+        margin-top: 5px;
     }
 
     .stat-list {
@@ -760,6 +789,16 @@ div.outer_bar {
             clear: both;
             padding-top: 5px;
         }
+    }
+
+    .error-wrapper {
+        padding: 10px;
+    }
+
+    .error-mascot--wrapper {
+        margin-bottom: 20px;
+        text-align: center;
+        width: 100%;
     }
 
     // FIXME: eventually will create a pop-out nav from the right

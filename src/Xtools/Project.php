@@ -20,6 +20,16 @@ class Project extends Model
     /** @var string[] Basic metadata about the project */
     protected $metadata;
 
+    /** @var string[] Project's 'dbName', 'url' and 'lang'. */
+    protected $basicInfo;
+
+    /**
+     * Whether the user being queried for in this session
+     *   has opted in to restricted statistics
+     * @var bool
+     */
+    protected $userOptedIn;
+
     /**
      * Create a new Project.
      * @param string $nameOrUrl The project's database name or URL.
@@ -30,13 +40,30 @@ class Project extends Model
     }
 
     /**
-     * Get basic metadata about the project.
-     * @return \string[]
+     * Get 'dbName', 'url' and 'lang' of the project, the relevant basic info
+     *   we can get from the meta database. This is all you need to make
+     *   database queries. More comprehensive metadata can be fetched with
+     *   getMetadata() at the expense of an API call, which may be cached.
+     * @return string[]
+     */
+    protected function getBasicInfo()
+    {
+        if (!$this->basicInfo) {
+            $this->basicInfo = $this->getRepository()->getOne($this->nameUnnormalized);
+        }
+        return $this->basicInfo;
+    }
+
+    /**
+     * Get full metadata about the project. See ProjectRepository::getMetadata
+     *   for more information.
+     * @return string[]
      */
     protected function getMetadata()
     {
         if (!$this->metadata) {
-            $this->metadata = $this->getRepository()->getOne($this->nameUnnormalized);
+            $url = $this->getBasicInfo($this->nameUnnormalized)['url'];
+            $this->metadata = $this->getRepository()->getMetadata($url);
         }
         return $this->metadata;
     }
@@ -58,7 +85,7 @@ class Project extends Model
      */
     public function getDomain()
     {
-        $url = isset($this->getMetadata()['url']) ? $this->getMetadata()['url'] : '';
+        $url = isset($this->getBasicInfo()['url']) ? $this->getBasicInfo()['url'] : '';
         return parse_url($url, PHP_URL_HOST);
     }
 
@@ -69,7 +96,7 @@ class Project extends Model
      */
     public function getDatabaseName()
     {
-        return isset($this->getMetadata()['dbname']) ? $this->getMetadata()['dbname'] : '';
+        return isset($this->getBasicInfo()['dbName']) ? $this->getBasicInfo()['dbName'] : '';
     }
 
     /**
@@ -79,7 +106,7 @@ class Project extends Model
      */
     public function getLang()
     {
-        return isset($this->getMetadata()['lang']) ? $this->getMetadata()['lang'] : '';
+        return isset($this->getBasicInfo()['lang']) ? $this->getBasicInfo()['lang'] : '';
     }
 
     /**
@@ -90,7 +117,7 @@ class Project extends Model
      */
     public function getUrl($withTrailingSlash = true)
     {
-        return rtrim($this->getMetadata()['url'], '/') . ($withTrailingSlash ? '/' : '');
+        return rtrim($this->getBasicInfo()['url'], '/') . ($withTrailingSlash ? '/' : '');
     }
 
     /**
@@ -114,7 +141,7 @@ class Project extends Model
      */
     public function getArticlePath()
     {
-        $metadata = $this->getRepository()->getMetadata($this->getUrl());
+        $metadata = $this->getMetadata();
         return isset($metadata['general']['articlePath'])
             ? $metadata['general']['articlePath']
             : '/wiki/$1';
@@ -130,7 +157,7 @@ class Project extends Model
      */
     public function getScriptPath()
     {
-        $metadata = $this->getRepository()->getMetadata($this->getUrl());
+        $metadata = $this->getMetadata();
         return isset($metadata['general']['scriptPath'])
             ? $metadata['general']['scriptPath']
             : '/w';
@@ -144,7 +171,7 @@ class Project extends Model
      */
     public function getScript()
     {
-        $metadata = $this->getRepository()->getMetadata($this->getUrl());
+        $metadata = $this->getMetadata();
         return isset($metadata['general']['script'])
             ? $metadata['general']['script']
             : $this->getScriptPath() . '/index.php';
@@ -166,7 +193,7 @@ class Project extends Model
      */
     public function getTitle()
     {
-        $metadata = $this->getRepository()->getMetadata($this->getUrl());
+        $metadata = $this->getMetadata();
         return $metadata['general']['wikiName'].' ('.$this->getDomain().')';
     }
 
@@ -177,7 +204,7 @@ class Project extends Model
      */
     public function getNamespaces()
     {
-        $metadata = $this->getRepository()->getMetadata($this->getUrl());
+        $metadata = $this->getMetadata();
         return $metadata['namespaces'];
     }
 
@@ -201,15 +228,20 @@ class Project extends Model
     public function userHasOptedIn(User $user)
     {
         // 1. First check to see if the whole project has opted in.
-        if (!isset($this->metadata['opted_in'])) {
+        if (!$this->userOptedIn) {
             $optedInProjects = $this->getRepository()->optedIn();
-            $this->metadata['opted_in'] = in_array($this->getDatabaseName(), $optedInProjects);
+            $this->userOptedIn = in_array($this->getDatabaseName(), $optedInProjects);
         }
-        if ($this->metadata['opted_in']) {
+        if ($this->userOptedIn) {
             return true;
         }
 
-        // 2. Then see if the user has opted in on this project.
+        // 2. Then see if the currently-logged-in user is requesting their own statistics.
+        if ($user->isCurrentlyLoggedIn()) {
+            return true;
+        }
+
+        // 3. Then see if the user has opted in on this project.
         $userNsId = 2;
         $localExists = $this->getRepository()
             ->pageHasContent($this, $userNsId, $this->userOptInPage($user));
@@ -217,7 +249,7 @@ class Project extends Model
             return true;
         }
 
-        // 3. Lastly, see if they've opted in globally on the default project or Meta.
+        // 4. Lastly, see if they've opted in globally on the default project or Meta.
         $globalPageName = $user->getUsername() . '/EditCounterGlobalOptIn.js';
         $globalProject = $this->getRepository()->getGlobalProject();
         if ($globalProject instanceof Project) {
@@ -229,5 +261,32 @@ class Project extends Model
         }
 
         return false;
+    }
+
+    /**
+     * Does this project support page assessments?
+     * @return bool
+     */
+    public function hasPageAssessments()
+    {
+        return (bool) $this->getRepository()->getAssessmentsConfig($this->getDomain());
+    }
+
+    /**
+     * Get the image URL of the badge for the given page assessment
+     * @param  string $class  Valid classification for project, such as 'Start', 'GA', etc.
+     * @return string         URL to image
+     */
+    public function getAssessmentBadgeURL($class)
+    {
+        $config = $this->getRepository()->getAssessmentsConfig($this->getDomain());
+
+        if (isset($config['class'][$class])) {
+            return "https://upload.wikimedia.org/wikipedia/commons/" . $config['class'][$class]['badge'];
+        } elseif (isset($config['class']['Unknown'])) {
+            return "https://upload.wikimedia.org/wikipedia/commons/" . $config['class']['Unknown']['badge'];
+        } else {
+            return "";
+        }
     }
 }

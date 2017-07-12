@@ -21,14 +21,21 @@
     <div class="panel-body xt-panel-body">
         <p class="text-center xt-heading-subtitle">
             {{ wiki.userLogLink(user, project, msg('block-log'), 'block') }}
-            {% if isWMFLabs() %}
+            {% if enabled('ec') %}
                 &middot;
                 <a href="{{ path('ec', {'project':project.domain, 'username':user.username}) }}" >{{ msg('tool-ec') }}</a>
+            {% endif %}
+            {% if isWMFLabs() %}
                 &middot;
                 <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ user.username }}" >{{ msg('global-contribs') }}</a>
                 &middot;
-                {# FIXME: make this link go to what options are set here (redirects, namespace, etc.) #}
-                <a target="_blank" href="//tools.wmflabs.org/userviews/?project={{ project.domain }}&amp;user={{ user.username }}">{{ msg('pageviews-pages-created') }}</a>
+                {% set redirectParam = 0 %}
+                {% if redirect == 'onlyredirects' %}
+                    {% set redirectParam = 1 %}
+                {% elseif redirect == 'all' %}
+                    {% set redirectParam = 2 %}
+                {% endif %}
+                <a target="_blank" href="//tools.wmflabs.org/userviews/?project={{ project.domain }}&amp;user={{ user.username }}&amp;namespace={{ namespace }}&amp;redirects={{ redirectParam }}">{{ msg('pageviews-pages-created') }}</a>
             {% endif %}
         </p>
 
@@ -37,12 +44,12 @@
         {% if multiNamspace %}
         <div class="text-center xt-toc">
             {#
-             # To save real estate, show "Namespace (talk)" where appropriate
+             # To save real estate, show "Namespace (talk)" as separate links
              # instead of "Namespace" "Namespace talk"
              #}
             {% for key, value in count if (key is even or (key is odd and not(count[key - 1] is defined))) %}
                 <span>
-                    <a href="#{{ key }}" data-section="{{ key }}">{{ namespaces[key] }}</a>
+                    <a href="#{{ key }}" data-section="{{ key }}">{{ nsName(key, namespaces) }}</a>
                     {% if count[key + 1] is defined %}
                         (<a href="#{{ key+1 }}" data-section="{{ key+1 }}">{{ msg('talk') | lower }}</a>)
                     {% endif %}
@@ -57,11 +64,7 @@
                     <tr>
                         <td>{{ msg('namespace') }}</td>
                         <td>
-                            {% if namespace == 'all' %}
-                                {{ msg('all') | capitalize_first }}
-                            {% else %}
-                                {{ namespaces[namespace] }}
-                            {% endif %}
+                            {{ nsName(namespace, namespaces) }}
                         </td>
                     </tr>
                     <tr>
@@ -95,7 +98,7 @@
                             </span>
                             {% endif %}
 
-                            <a href="#{{ key }}" >{{ namespaces[key] }}</a>
+                            <a href="#{{ key }}" >{{ nsName(key, namespaces) }}</a>
                         </td>
                         {% if redirect != 'onlyredirects' %}
                             <td class="sort-entry--pages" data-value="{{ value.total }}">
@@ -172,24 +175,30 @@
                         {% for date,pageList in pages[key] if not(multiNamspace) or (index < maxRows and multiNamspace) %}
                             {% for page in pageList if not(multiNamspace) or (index < maxRows and multiNamspace) %}
                                 {% set index = index + 1 %}
+                                {% if key == 0 %}
+                                    {% set pagename = page.page_title | e %}
+                                {% else %}
+                                    {% set pagename = namespaces[key] ~ ":" ~ page.page_title %}
+                                {% endif %}
                                 <tr>
                                     <td>{{ index }}</td>
-                                    {% if key == 0 %}
-                                        {% set pagename = page.page_title | e %}
-                                    {% else %}
-                                        {% set pagename = namespaces[key]~":"~page.page_title %}
-                                    {% endif %}
-                                    <td class="sort-entry--page" data-value="{{ pagename }}">
-                                        {{ wiki.pageLinkRaw(pagename, project) }}
+                                    <td class="sort-entry--page-title" data-value="{{ pagename }}">
                                         {% if page.page_is_redirect %}
-                                            <small class="text-warning">&middot; ({{ msg("redirect") }})</small>
+                                            {{ wiki.pageLinkRaw(pagename ~ '?redirect=no', project, pagename) }}
+                                            <small class="text-muted">&middot; ({{ msg('redirect') }})</small>
+                                        {% else %}
+                                            {{ wiki.pageLinkRaw(pagename, project) }}
                                         {% endif %}
-                                        {% if page.type == "arc" %}
-                                            <small class="text-danger">&middot; ({{ msg("deleted") }})</small>
+                                        {% if page.type == 'arc' %}
+                                            <small class="text-danger">&middot; ({{ msg('deleted') }})</small>
                                         {% endif %}
                                     </td>
                                     <td class="sort-entry--date" data-value="{{ date }}">
-                                        {{ wiki.permaLinkRaw(page.rev_id, project, page.human_time) }}
+                                        {% if page.type == 'arc' %}
+                                            {{ wiki.pageLinkRaw('Special:Undelete/' ~ pagename ~ '?timestamp=' ~ page.raw_time, project, page.human_time) }}
+                                        {% else %}
+                                            {{ wiki.permaLinkRaw(page.rev_id, project, page.human_time) }}
+                                        {% endif %}
                                     </td>
                                     <td class="sort-entry--original-size" data-value="{{ page.rev_len }}">
                                         {{ page.rev_len | number_format }}
@@ -240,7 +249,7 @@
                     </tbody>
                 </table>
             {% endset %}
-            {{ layout.content_block(namespaces[key], content, null, key, true) }}
+            {{ layout.content_block(nsName(key, namespaces), content, null, key, true) }}
         {% endfor %}
     </div>
 
@@ -253,7 +262,7 @@
                 data: {
                     labels: [
                         {% for ns in nsIds %}
-                            "{{ namespaces[ns] }}"{% if not loop.last %},{% endif %}
+                            "{{ nsName(ns, namespaces) }}"{% if not loop.last %},{% endif %}
                         {% endfor %}
                     ],
                     datasets: [{

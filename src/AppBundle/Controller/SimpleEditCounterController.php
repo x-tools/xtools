@@ -75,10 +75,9 @@ class SimpleEditCounterController extends Controller
      */
     public function resultAction($project, $username)
     {
-        $lh = $this->get('app.labs_helper');
-
         /** @var Project $project */
         $project = ProjectRepository::getProject($project, $this->container);
+        $projectRepo = $project->getRepository();
 
         if (!$project->exists()) {
             $this->addFlash('notice', ['invalid-project', $project]);
@@ -86,26 +85,33 @@ class SimpleEditCounterController extends Controller
         }
 
         $dbName = $project->getDatabaseName();
-        $url = $project->getUrl();
 
-        $userTable = $lh->getTable('user', $dbName);
-        $archiveTable = $lh->getTable('archive', $dbName);
-        $revisionTable = $lh->getTable('revision', $dbName);
-        $userGroupsTable = $lh->getTable('user_groups', $dbName);
+        $userTable = $projectRepo->getTableName($dbName, 'user');
+        $archiveTable = $projectRepo->getTableName($dbName, 'archive');
+        $revisionTable = $projectRepo->getTableName($dbName, 'revision');
+        $userGroupsTable = $projectRepo->getTableName($dbName, 'user_groups');
 
         /** @var Connection $conn */
         $conn = $this->get('doctrine')->getManager('replicas')->getConnection();
 
         // Prepare the query and execute
         $resultQuery = $conn->prepare("
-            SELECT 'id' AS source, user_id as value FROM $userTable WHERE user_name = :username
+            SELECT 'id' AS source, user_id as value
+                FROM $userTable
+                WHERE user_name = :username
             UNION
-            SELECT 'arch' AS source, COUNT(*) AS value FROM $archiveTable WHERE ar_user_text = :username
+            SELECT 'arch' AS source, COUNT(*) AS value
+                FROM $archiveTable
+                WHERE ar_user_text = :username
             UNION
-            SELECT 'rev' AS source, COUNT(*) AS value FROM $revisionTable WHERE rev_user_text = :username
+            SELECT 'rev' AS source, COUNT(*) AS value
+                FROM $revisionTable
+                WHERE rev_user_text = :username
             UNION
             SELECT 'groups' AS source, ug_group AS value
-                FROM $userGroupsTable JOIN $userTable on user_id = ug_user WHERE user_name = :username
+                FROM $userGroupsTable
+                JOIN $userTable ON user_id = ug_user
+                WHERE user_name = :username
         ");
 
         $user = new User($username);
@@ -166,7 +172,7 @@ class SimpleEditCounterController extends Controller
         if (boolval($this->getParameter('app.single_wiki'))) {
             // Retrieving the global groups, using the ApiHelper class
             $api = $this->get('app.api_helper');
-            $globalGroups = $api->globalGroups($url, $username);
+            $globalGroups = $api->globalGroups($project->getUrl(), $username);
         }
 
         // Assign the values and display the template
@@ -175,7 +181,6 @@ class SimpleEditCounterController extends Controller
             'xtTitle' => $username,
             'user' => $user,
             'project' => $project,
-            'project_url' => $url,
             'id' => $id,
             'arch' => $arch,
             'rev' => $rev + $arch,
