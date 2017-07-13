@@ -39,7 +39,8 @@ class UserRepository extends Repository
      */
     public function getId($databaseName, $username)
     {
-        $cacheKey = 'user_id.'.$databaseName.'.'.$username;
+        // Use md5 to ensure the key does not contain reserved characters.
+        $cacheKey = 'user_id.'.$databaseName.'.'.md5($username);
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -68,7 +69,8 @@ class UserRepository extends Repository
      */
     public function getGroups(Project $project, $username)
     {
-        $cacheKey = 'usergroups.'.$project->getDatabaseName().'.'.$username;
+        // Use md5 to ensure the key does not contain reserved characters.
+        $cacheKey = 'usergroups.'.$project->getDatabaseName().'.'.md5($username);
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -155,7 +157,7 @@ class UserRepository extends Repository
         $username = $user->getUsername();
 
         $cacheKey = 'pages.' . $project->getDatabaseName() . '.'
-            . $username . '.' . $namespace . '.' . $redirects;
+            . $user->getCacheKey() . '.' . $namespace . '.' . $redirects;
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
