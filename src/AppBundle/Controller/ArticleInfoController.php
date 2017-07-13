@@ -173,8 +173,19 @@ class ArticleInfoController extends Controller
 
         $this->pageInfo['xtPage'] = 'articleinfo';
         $this->pageInfo['xtTitle'] = $page->getTitle();
+        $this->pageInfo['editorlimit'] = $request->query->get('editorlimit', 20);
 
-        return $this->render('articleInfo/result.html.twig', $this->pageInfo);
+        // Output the relevant format template.
+        $format = $request->query->get('format', 'html');
+        if ($format == '') {
+            // The default above doesn't work when the 'format' parameter is blank.
+            $format = 'html';
+        }
+        $response = $this->render("articleInfo/result.$format.twig", $this->pageInfo);
+        if ($format == 'wikitext') {
+            $response->headers->set('Content-Type', 'text/plain');
+        }
+        return $response;
     }
 
     /**
