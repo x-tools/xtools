@@ -6,3 +6,4 @@ Tools
 
     editcounter
     topedits
+    simplecounter

@@ -21,9 +21,6 @@ class ApiHelper extends HelperBase
     /** @var MediawikiApi The API object. */
     private $api;
 
-    /** @var LabsHelper The Labs helper. */
-    private $labsHelper;
-
     /** @var CacheItemPoolInterface The cache. */
     protected $cache;
 
@@ -33,12 +30,10 @@ class ApiHelper extends HelperBase
     /**
      * ApiHelper constructor.
      * @param ContainerInterface $container
-     * @param LabsHelper $labsHelper
      */
-    public function __construct(ContainerInterface $container, LabsHelper $labsHelper)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->labsHelper = $labsHelper;
         $this->cache = $container->get('cache.app');
     }
 
@@ -53,92 +48,6 @@ class ApiHelper extends HelperBase
             $project = ProjectRepository::getProject($project, $this->container);
             $this->api = $project->getApi();
         }
-    }
-
-    /**
-     * Get general siteinfo and namespaces for a project and cache it.
-     * @param  string [$project] Base project domain with or without protocal, or database name
-     *                           such as 'en.wikipedia.org', 'https://en.wikipedia.org' or 'enwiki'
-     *                           Can be left blank for single wikis.
-     * @return string[] with keys 'general' and 'namespaces'. General info will include 'dbName',
-     *                           'wikiName', 'url', 'lang', 'articlePath', 'scriptPath',
-     *                           'script', 'timezone', and 'timeOffset'
-     */
-    public function getSiteInfo($projectName = '')
-    {
-        if ($this->container->getParameter('app.single_wiki')) {
-            $projectName = $this->container->getParameter('wiki_url');
-        }
-        $project = ProjectRepository::getProject($projectName, $this->container);
-
-        if (!$project->exists()) {
-            throw new Exception("Unable to find project '$projectName'");
-        }
-
-        $cacheKey = "siteinfo." . $project->getDatabaseName();
-        if ($this->cacheHas($cacheKey)) {
-            return $this->cacheGet($cacheKey);
-        }
-
-        $params = [ 'meta'=>'siteinfo', 'siprop'=>'general|namespaces' ];
-        $query = new SimpleRequest('query', $params);
-
-        $result = [
-            'general' => [],
-            'namespaces' => []
-        ];
-
-        try {
-            $res = $project->getApi()->getRequest($query);
-
-            if (isset($res['query']['general'])) {
-                $info = $res['query']['general'];
-                $result['general'] = [
-                    'wikiName' => $info['sitename'],
-                    'dbName' => $info['wikiid'],
-                    'url' => $info['server'],
-                    'lang' => $info['lang'],
-                    'articlePath' => $info['articlepath'],
-                    'scriptPath' => $info['scriptpath'],
-                    'script' => $info['script'],
-                    'timezone' => $info['timezone'],
-                    'timeOffset' => $info['timeoffset'],
-                ];
-
-                if ($this->container->getParameter('app.is_labs') && substr($result['general']['dbName'], -2) != '_p') {
-                    $result['general']['dbName'] .= '_p';
-                }
-            }
-
-            if (isset($res['query']['namespaces'])) {
-                foreach ($res['query']['namespaces'] as $namespace) {
-                    if ($namespace['id'] < 0) {
-                        continue;
-                    }
-
-                    if (isset($namespace['name'])) {
-                        $name = $namespace['name'];
-                    } elseif (isset($namespace['*'])) {
-                        $name = $namespace['*'];
-                    } else {
-                        continue;
-                    }
-
-                    // FIXME: Figure out a way to i18n-ize this
-                    if ($name === '') {
-                        $name = 'Article';
-                    }
-
-                    $result['namespaces'][$namespace['id']] = $name;
-                }
-            }
-
-            $this->cacheSave($cacheKey, $result, 'P7D');
-        } catch (Exception $e) {
-            // The api returned an error!  Ignore
-        }
-
-        return $result;
     }
 
     /**
@@ -191,17 +100,6 @@ class ApiHelper extends HelperBase
         }
 
         return $result;
-    }
-
-    /**
-     * Get a list of namespaces on the given project.
-     *
-     * @param string    $project such as en.wikipedia.org
-     * @return string[] Array of namespace IDs (keys) to names (values).
-     */
-    public function namespaces($project)
-    {
-        return $this->getSiteInfo($project)['namespaces'];
     }
 
     /**
@@ -258,48 +156,6 @@ class ApiHelper extends HelperBase
     }
 
     /**
-     * Get basic info about a page via the API
-     * @param  string  $project      Full domain of project (en.wikipedia.org)
-     * @param  string  $page         Page title
-     * @param  boolean $followRedir  Whether or not to resolve redirects
-     * @return array   Associative array of data
-     */
-    public function getBasicPageInfo($project, $page, $followRedir)
-    {
-        $this->setUp($project);
-
-        // @TODO: Also include 'extlinks' prop when we start checking for dead external links.
-        $params = [
-            'prop' => 'info|pageprops',
-            'inprop' => 'protection|talkid|watched|watchers|notificationtimestamp|subjectid|url|readable',
-            'converttitles' => '',
-            // 'ellimit' => 20,
-            // 'elexpandurl' => '',
-            'titles' => $page,
-            'formatversion' => 2
-            // 'pageids' => $pageIds // FIXME: allow page IDs
-        ];
-
-        if ($followRedir) {
-            $params['redirects'] = '';
-        }
-
-        $query = new SimpleRequest('query', $params);
-        $result = [];
-
-        try {
-            $res = $this->api->getRequest($query);
-            if (isset($res['query']['pages'])) {
-                $result = $res['query']['pages'][0];
-            }
-        } catch (Exception $e) {
-            // The api returned an error!  Ignore
-        }
-
-        return $result;
-    }
-
-    /**
      * Get HTML display titles of a set of pages (or the normal title if there's no display title).
      * This will send t/50 API requests where t is the number of titles supplied.
      * @param string $project The project.
@@ -343,146 +199,6 @@ class ApiHelper extends HelperBase
         }
 
         return $displayTitles;
-    }
-
-    /**
-     * Get assessments of the given pages, if a supported project
-     * @param  string       $project    Project such as en.wikipedia.org
-     * @param  string|array $pageTitles Single page title or array of titles
-     * @return array|null               Page assessments info or null if none found
-     */
-    public function getPageAssessments($project, $pageTitles)
-    {
-        // From config/assessments.yml
-        $config = $this->getAssessmentsConfig();
-
-        // return null if unsupported project
-        if (!in_array($project, array_keys($config))) {
-            return null;
-        }
-
-        $config = $config[$project];
-
-        $params = [
-            'prop' => 'pageassessments',
-            'titles' => is_string($pageTitles) ? $pageTitles : implode('|', $pageTitles),
-            'palimit' => 500,
-        ];
-
-        // get assessments for this page from the API
-        $assessments = $this->massApi($params, $project, function ($data) {
-            return isset($data['pages'][0]['pageassessments']) ? $data['pages'][0]['pageassessments'] : [];
-        }, 'pacontinue')['pages'];
-
-        $decoratedAssessments = [];
-
-        // Set the default decorations for the overall quality assessment
-        // This will be replaced with the first valid class defined for any WikiProject
-        $overallQuality = $config['class']['Unknown'];
-        $overallQuality['value'] = '???';
-
-        if (empty($assessments)) {
-            return null;
-        }
-
-        // loop through each assessment and decorate with colors, category URLs and images, if applicable
-        foreach ($assessments as $wikiproject => $assessment) {
-            $classValue = $assessment['class'];
-
-            // Use ??? as the presented value when the class is unknown or is not defined in the config
-            if ($classValue === 'Unknown' || $classValue === '' || !isset($config['class'][$classValue])) {
-                $classAttrs = $config['class']['Unknown'];
-                $assessment['class']['value'] = '???';
-                $assessment['class']['category'] = $classAttrs['category'];
-                $assessment['class']['badge'] = "https://upload.wikimedia.org/wikipedia/commons/". $classAttrs['badge'];
-            } else {
-                $classAttrs = $config['class'][$classValue];
-                $assessment['class'] = [
-                    'value' => $classValue,
-                    'color' => $classAttrs['color'],
-                    'category' => $classAttrs['category'],
-                ];
-
-                // add full URL to badge icon
-                if ($classAttrs['badge'] !== '') {
-                    $assessment['class']['badge'] = "https://upload.wikimedia.org/wikipedia/commons/" .
-                        $classAttrs['badge'];
-                }
-
-                if ($overallQuality['value'] === '???') {
-                    $overallQuality = $assessment['class'];
-                    $overallQuality['category'] = $classAttrs['category'];
-                }
-            }
-
-            $importanceValue = $assessment['importance'];
-            $importanceUnknown = $importanceValue === 'Unknown' || $importanceValue === '';
-
-            if ($importanceUnknown || !isset($config['importance'][$importanceValue])) {
-                $importanceAttrs = $config['importance']['Unknown'];
-                $assessment['importance'] = $importanceAttrs;
-                $assessment['importance']['value'] = '???';
-                $assessment['importance']['category'] = $importanceAttrs['category'];
-            } else {
-                $importanceAttrs = $config['importance'][$importanceValue];
-                $assessment['importance'] = [
-                    'value' => $importanceValue,
-                    'color' => $importanceAttrs['color'],
-                    'weight' => $importanceAttrs['weight'], // numerical weight for sorting purposes
-                    'category' => $importanceAttrs['category'],
-                ];
-            }
-
-            $decoratedAssessments[$wikiproject] = $assessment;
-        }
-
-        return [
-            'assessment' => $overallQuality,
-            'wikiprojects' => $decoratedAssessments,
-            'wikiproject_prefix' => $config['wikiproject_prefix']
-        ];
-    }
-
-    /**
-     * Get the image URL of the badge for the given page assessment
-     * @param  string $project Project such as en.wikipedia.org
-     * @param  string $class   Valid classification for project, such as 'Start', 'GA', etc.
-     * @return string          URL to image
-     */
-    public function getAssessmentBadgeURL($project, $class)
-    {
-        $config = $this->getAssessmentsConfig();
-
-        if (isset($config[$project]['class'][$class])) {
-            return "https://upload.wikimedia.org/wikipedia/commons/" . $config[$project]['class'][$class]['badge'];
-        } elseif (isset($config[$project]['class']['Unknown'])) {
-            return "https://upload.wikimedia.org/wikipedia/commons/" . $config[$project]['class']['Unknown']['badge'];
-        } else {
-            return "";
-        }
-    }
-
-    /**
-     * Fetch assessments data from config/assessments.yml and cache in static variable
-     * @return array Mappings of project/quality/class with badges, colors and category links
-     */
-    private function getAssessmentsConfig()
-    {
-        static $assessmentsConfig = null;
-        if ($assessmentsConfig === null) {
-            $assessmentsConfig = $this->container->getParameter('assessments');
-        }
-        return $assessmentsConfig;
-    }
-
-    /**
-     * Does the given project support page assessments?
-     * @param  string  $project Project to query, e.g. en.wikipedia.org
-     * @return boolean True or false
-     */
-    public function projectHasPageAssessments($project)
-    {
-        return in_array($project, array_keys($this->getAssessmentsConfig()));
     }
 
     /**

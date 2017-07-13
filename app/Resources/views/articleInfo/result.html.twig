@@ -69,7 +69,7 @@
                         <td>
                             {{ wiki.extLink('https://www.wikidata.org/wiki/' ~ page.wikidataId, page.wikidataId) }}
                             &middot;
-                            {{ numWikidataItems|number_format }} {{ msg('num-sitelinks', [numWikidataItems]) }}
+                            {{ page.countWikidataItems|number_format }} {{ msg('num-sitelinks', [page.countWikidataItems]) }}
                         </td>
                     </tr>
                     {% endif %}
@@ -83,7 +83,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <a class="rm-inline-margin" href="#usertable">{{ msg('editors') }}</a>
+                            <a class="rm-inline-margin" href="#top-editors">{{ msg('editors') }}</a>
                         </td>
                         <td>{{ general.editor_count|number_format }}</td>
                     </tr>
@@ -124,8 +124,8 @@
                         <td>
                             <a class="rm-inline-margin" href="#auto-edits">{{ msg('auto-edits') }}</a>
                         </td>
-                    </td>
-                    <td>{{ general.automated_count|number_format }}</td>
+                        <td>{{ general.automated_count|number_format }}</td>
+                    </tr>
                     <tr>
                         <td>{{ msg('reverted-edits') }}</td>
                         <td>{{ general.revert_count|number_format }}</td>
@@ -246,7 +246,7 @@
                     <tr>
                         <td>{{ msg('pageviews') }} (60 {{ msg('num-days', [60]) }})</td>
                         <td>
-                            {{ wiki.pageviewsLink(page, general.pageviews|number_format, '&range=latest-'~general.pageviews_offset) }}
+                            {{ wiki.pageviewsLink(page, general.pageviews|number_format, 'range=latest-'~general.pageviews_offset) }}
                         </td>
                     </tr>
                     {% endif %}
@@ -320,6 +320,12 @@
                     {{ chart.pie_chart('top_by_added', topTenEditorsByAdded) }}
                 </div>
             </div>
+            <p class="export">
+                <a href="{{ path('ArticleInfoResult', {project:project.domain, article:page.title}) }}?format=wikitext">
+                    <span class="glyphicon glyphicon-export"></span>
+                    {{ msg('export-wikitext') }}
+                </a>
+            </p>
             <table class="table table-bordered table-hover table-striped top-editors-table">
                 <thead><tr>
                     {% for key in ['rank', 'username', 'links', 'edits', 'minor-edits', 'minor-edits-percentage', 'first-edit', 'latest-edit', 'average-time-bw-edits', 'added-bytes'] %}
@@ -330,7 +336,7 @@
                                 {% else %}
                                     {{ msg(key)|capitalize_first }}
                                 {% endif %}
-                                {% if key == 'added_bytes' %}
+                                {% if key == 'added-bytes' %}
                                     <sup class="rm-inline-margin-left">2</sup>
                                 {% endif %}
                                 {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
@@ -341,7 +347,6 @@
                 <tbody>
                 {% set counter = 0 %}
                 {% set edit_sum = 0 %}
-                {% set editorlimit = app.request.query.get("editorlimit")|default(20) %}
                 {% for editor, stats in editors|slice(0, editorlimit ) %}
                     {% set counter = counter + 1 %}
                     {% set edit_sum = edit_sum + stats.all %}
@@ -356,7 +361,7 @@
                             {% endif %}
                             &middot;
                             {% if enabled('topedits') %}
-                                <a href="{{ path('topedits', { 'project': project.domain, 'username': editor }) }}">{{ msg('tool-topedits') }}</a>
+                                <a href="{{ path('topedits', { 'project': project.domain, 'username': editor, 'namespace': page.namespace, 'article': page.title }) }}">{{ msg('tool-topedits') }}</a>
                             {% endif %}
                         </td>
                         <td class="sort-entry--edits" data-value="{{ stats.all }}">
@@ -366,10 +371,10 @@
                         {% set user_minor_percent = stats.minor|percent_format(stats.all) %}
                         <td class="sort-entry--minor-percentage" data-value="{{ user_minor_percent }}">{{ user_minor_percent }}</td>
                         <td class="sort-entry--first-edit" data-value="{{ stats.first_id }}">
-                            <a target="_blank" href="{{ projectUrl }}wiki/Special:Diff/{{ stats.first_id }}">{{ stats.first }}</a>
+                            {{ wiki.pageLinkRaw('Special:Diff/' ~ stats.first_id, project, stats.first|date('Y-m-d H:i')) }}
                         </td>
                         <td class="sort-entry--latest-edit" data-value="{{ stats.last_id }}">
-                            <a target="_blank" href="{{ projectUrl }}wiki/Special:Diff/{{ stats.last_id }}">{{ stats.last }}</a>
+                            {{ wiki.pageLinkRaw('Special:Diff/' ~ stats.last_id, project, stats.last|date('Y-m-d H:i')) }}
                         </td>
                         <td class="sort-entry--average-time-bw-edits" data-value="{{ stats.atbe }}">
                             {{ stats.atbe|number_format(1) }}
@@ -423,8 +428,7 @@
                             {{ wiki.userLink(bot, project) }}
                             {% if not bot_data.current %}
                                 <i>
-                                    {# FIXME: hard-coded /w/ script path #}
-                                    (<a target="_blank" href="{{ projectUrl }}/w/index.php?title=Special:Log&action=view&page=User:{{ bot }}&type=rights">{{ msg('former-bot') }}</a>)
+                                    ({{ wiki.pageLogLinkRaw('User:'~bot, project, msg('former-bot'), 'rights') }})
                                 </i>
                             {% endif %}
                         </td>
@@ -434,7 +438,7 @@
                             {% endif %}
                             &middot;
                             {% if enabled('topedits') %}
-                                <a href="{{ path('topedits', { 'project': project.domain, 'user': bot }) }}">{{ msg('tool-topedits') }}</a>
+                                <a href="{{ path('topedits', { 'project': project.domain, 'user': bot, 'namespace': page.namespace, 'article': page.title }) }}">{{ msg('tool-topedits') }}</a>
                             {% endif %}
                         </td>
                         <td class="sort-entry--count" data-value="{{ bot_data.count }}">{{ bot_data.count }}</td>
@@ -757,7 +761,7 @@
                         <td class="sort-entry--explanation" data-value="{{ bug.explanation }}">{{ bug.explanation|raw }}</td>
                         <td>
                             {% if bug.name == 'Wikidata' %}
-                                <a target='_blank' href='//www.wikidata.org/wiki/{{ wikidataId }}'>
+                                <a target='_blank' href='//www.wikidata.org/wiki/{{ page.wikidataId }}'>
                                     {{ msg('edit') }}
                                 </a>
                             {% else %}

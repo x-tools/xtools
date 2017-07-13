@@ -77,7 +77,7 @@
         {% endset %}
 
         {% if project.userHasOptedIn(user) %}
-            {{ layout.content_block(content_title, content, '', null, false, false) }}
+            {{ layout.content_block(nsName(namespace, project.namespaces), content, '', null, true, false) }}
         {% else %}
             <div class="alert alert-info">
                 <p>{{ msg('not-opted-in', [ wiki.pageLink(opted_in_page) ]) }}</p>

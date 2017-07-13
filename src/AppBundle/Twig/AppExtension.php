@@ -58,6 +58,7 @@ class AppExtension extends Extension
             new \Twig_SimpleFunction('bugReportURL', [ $this, 'bugReportURL' ]),
             new \Twig_SimpleFunction('logged_in_user', [$this, 'functionLoggedInUser']),
             new \Twig_SimpleFunction('isUserAnon', [$this, 'isUserAnon']),
+            new \Twig_SimpleFunction('nsName', [$this, 'nsName']),
         ];
     }
 
@@ -252,42 +253,44 @@ class AppExtension extends Extension
     public static function getColorList($num = false)
     {
         $colors = [
-            0 => '#Cc0000',# '#FF005A', #red '#FF5555',
-            1 => '#F7b7b7',
-            2 => '#5c8d20',# '#008800', #green'#55FF55',
-            3 => '#85eD82',
-            4 => '#2E97E0', # blue
-            5 => '#B9E3F9',
-            6 => '#e1711d',  # orange
-            7 => '#ffc04c',
-            8 => '#FDFF98', # yellow
-            9 => '#5555FF',
-            10 => '#55FFFF',
-            11 => '#0000C0',  #
-            12 => '#008800',  # green
-            13 => '#00C0C0',
-            14 => '#FFAFAF',  # rosé
-            15 => '#808080',  # gray
-            16 => '#00C000',
-            17 => '#404040',
-            18 => '#C0C000',  # green
-            19 => '#C000C0',
-            100 => '#75A3D1',  # blue
-            101 => '#A679D2',  # purple
+            0 => '#FF5555',
+            1 => '#55FF55',
+            2 => '#FFEE22',
+            3 => '#FF55FF',
+            4 => '#5555FF',
+            5 => '#55FFFF',
+            6 => '#C00000',
+            7 => '#0000C0',
+            8 => '#008800',
+            9 => '#00C0C0',
+            10 => '#FFAFAF',
+            11 => '#808080',
+            12 => '#00C000',
+            13 => '#404040',
+            14 => '#C0C000',
+            15 => '#C000C0',
+            90 => '#991100',
+            91 => '#99FF00',
+            92 => '#000000',
+            93 => '#777777',
+            100 => '#75A3D1',
+            101 => '#A679D2',
             102 => '#660000',
             103 => '#000066',
-            104 => '#FAFFAF',  # caramel
+            104 => '#FAFFAF',
             105 => '#408345',
             106 => '#5c8d20',
-            107 => '#e1711d',  # red
-            108 => '#94ef2b',  # light green
-            109 => '#756a4a',  # brown
+            107 => '#e1711d',
+            108 => '#94ef2b',
+            109 => '#756a4a',
             110 => '#6f1dab',
             111 => '#301e30',
             112 => '#5c9d96',
-            113 => '#a8cd8c',  # earth green
-            114 => '#f2b3f1',  # light purple
+            113 => '#a8cd8c',
+            114 => '#f2b3f1',
             115 => '#9b5828',
+            116 => '#002288',
+            117 => '#0000CC',
             118 => '#99FFFF',
             119 => '#99BBFF',
             120 => '#FF99FF',
@@ -304,14 +307,22 @@ class AppExtension extends Extension
             207 => '#FFCC00',
             208 => '#FF0000',
             209 => '#FF6600',
+            250 => '#6633CC',
+            251 => '#6611AA',
+            252 => '#66FF99',
+            253 => '#66FF66',
             446 => '#06DCFB',
             447 => '#892EE4',
             460 => '#99FF66',
-            461 => '#99CC66',  # green
-            470 => '#CCCC33',  # ocker
+            461 => '#99CC66',
+            470 => '#CCCC33',
             471 => '#CCFF33',
             480 => '#6699FF',
             481 => '#66FFFF',
+            484 => '#07C8D6',
+            485 => '#2AF1FF',
+            486 => '#79CB21',
+            487 => '#80D822',
             490 => '#995500',
             491 => '#998800',
             710 => '#FFCECE',
@@ -322,34 +333,11 @@ class AppExtension extends Extension
             867 => '#FFCCFF',
             1198 => '#FF34B3',
             1199 => '#8B1C62',
-
-            '#61a9f3',# blue
-            '#f381b9',# pink
-            '#61E3A9',
-            '#D56DE2',
-            '#85eD82',
-            '#F7b7b7',
-            '#CFDF49',
-            '#88d8f2',
-            '#07AF7B',# green
-            '#B9E3F9',
-            '#FFF3AD',
-            '#EF606A',# red
-            '#EC8833',
-            '#FFF100',
-            '#87C9A5',
-            '#FFFB11',
-            '#005EBC',
-            '#9AEB67',
-            '#FF4A26',
-            '#FDFF98',
-            '#6B7EFF',
-            '#BCE02E',
-            '#E0642E',
-            '#E0D62E',
-            '#02927F',
-            '#FF005A',
-            '#61a9f3', # blue' #FFFF55',
+            2300 => '#A900B8',
+            2301 => '#C93ED6',
+            2302 => '#8A09C1',
+            2303 => '#974AB8',
+            2600 => '#000000',
         ];
 
         if ($num === false) {
@@ -392,8 +380,8 @@ class AppExtension extends Extension
     public function isSingleWiki()
     {
         $param = true;
-        if ($this->container->hasParameter("app.single_wiki")) {
-            $param = boolval($this->container->getParameter("app.single_wiki"));
+        if ($this->container->hasParameter('app.single_wiki')) {
+            $param = boolval($this->container->getParameter('app.single_wiki'));
         }
         return $param;
     }
@@ -405,8 +393,8 @@ class AppExtension extends Extension
     public function getReplagThreshold()
     {
         $param = 30;
-        if ($this->container->hasParameter("app.replag_threshold")) {
-            $param = $this->container->getParameter("app.replag_threshold");
+        if ($this->container->hasParameter('app.replag_threshold')) {
+            $param = $this->container->getParameter('app.replag_threshold');
         };
         return $param;
     }
@@ -418,8 +406,8 @@ class AppExtension extends Extension
     public function loadStylesheetsFromCDN()
     {
         $param = false;
-        if ($this->container->hasParameter("app.load_stylesheets_from_cdn")) {
-            $param = boolval($this->container->getParameter("app.load_stylesheets_from_cdn"));
+        if ($this->container->hasParameter('app.load_stylesheets_from_cdn')) {
+            $param = boolval($this->container->getParameter('app.load_stylesheets_from_cdn'));
         }
         return $param;
     }
@@ -431,8 +419,8 @@ class AppExtension extends Extension
     public function isWMFLabs()
     {
         $param = false;
-        if ($this->container->hasParameter("app.is_labs")) {
-            $param = boolval($this->container->getParameter("app.is_labs"));
+        if ($this->container->hasParameter('app.is_labs')) {
+            $param = boolval($this->container->getParameter('app.is_labs'));
         }
         return $param;
     }
@@ -446,28 +434,28 @@ class AppExtension extends Extension
         $retVal = 0;
 
         if ($this->isWMFLabs()) {
-            $project = $this->container->get("request_stack")->getCurrentRequest()->get('project');
+            $project = $this->container->get('request_stack')->getCurrentRequest()->get('project');
 
             if (!isset($project)) {
-                $project = "enwiki";
+                $project = 'enwiki';
             }
 
             $stmt = "SELECT lag FROM `heartbeat_p`.`heartbeat` h
-            RIGHT JOIN `meta_p`.`wiki` w on concat(h.shard, \".labsdb\")=w.slice
-            where dbname like :project or name like :project or url like :project limit 1";
+            RIGHT JOIN `meta_p`.`wiki` w ON concat(h.shard, \".labsdb\")=w.slice
+            WHERE dbname LIKE :project OR name LIKE :project OR url LIKE :project LIMIT 1";
 
-            $conn = $this->container->get('doctrine')->getManager("replicas")->getConnection();
+            $conn = $this->container->get('doctrine')->getManager('replicas')->getConnection();
 
             // Prepare the query and execute
             $resultQuery = $conn->prepare($stmt);
-            $resultQuery->bindParam("project", $project);
+            $resultQuery->bindParam('project', $project);
             $resultQuery->execute();
 
             if ($resultQuery->errorCode() == 0) {
                 $results = $resultQuery->fetchAll();
 
-                if (isset($results[0]["lag"])) {
-                    $retVal = $results[0]["lag"];
+                if (isset($results[0]['lag'])) {
+                    $retVal = $results[0]['lag'];
                 }
             }
         }
@@ -574,5 +562,23 @@ class AppExtension extends Extension
         }
 
         return filter_var($username, FILTER_VALIDATE_IP);
+    }
+
+    /**
+     * Helper to properly translate a namespace name
+     * @param  int|string $namespace Namespace key as a string or ID
+     * @param  array      $namespaces List of available namespaces
+     *                                as retrieved from Project::getNamespaces
+     * @return string Namespace name
+     */
+    public function nsName($namespace, $namespaces)
+    {
+        if ($namespace === 'all') {
+            return $this->getIntuition()->msg('all');
+        } elseif ($namespace === '0' || $namespace === 0 || $namespace === 'Main') {
+            return $this->getIntuition()->msg('mainspace');
+        } else {
+            return $namespaces[$namespace];
+        }
     }
 }

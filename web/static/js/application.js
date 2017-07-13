@@ -8,6 +8,7 @@
     if (i18nLang !== 'en') {
         messagesToLoad.en = assetPath + 'static/i18n/en.json';
     }
+
     $.i18n({
         locale: i18nLang
     }).load(messagesToLoad);
@@ -28,6 +29,15 @@
         setupTOC();
         setupProjectListener();
         setupAutocompletion();
+        displayWaitingNoticeOnSubmission();
+
+        // Re-init forms, workaround for issues with Safari and Firefox.
+        // See displayWaitingNoticeOnSubmission() for more.
+        window.onpageshow = function (e) {
+            if (e.persisted) {
+                displayWaitingNoticeOnSubmission(true);
+            }
+        };
     });
 
     /**
@@ -338,8 +348,9 @@
 
                 // Add all of the new namespace options.
                 for (var ns in data.namespaces) {
+                    var nsName = parseInt(ns, 10) === 0 ? $.i18n('mainspace') : data.namespaces[ns];
                     $('#namespace_select').append(
-                        "<option value=" + ns + ">" + data.namespaces[ns] + "</option>"
+                        "<option value=" + ns + ">" + nsName + "</option>"
                     );
                 }
                 // Default to mainspace being selected.
@@ -473,4 +484,43 @@
             });
         }
     }
+
+    /**
+     * For any form submission, this disables the submit button and replaces its text with
+     * a loading message and a counting timer.
+     * @param {boolean} [undo] Revert the form back to the initial state.
+     *                         This is used on page load to solve an issue with Safari and Firefox
+     *                         where after browsing back to the form, the "loading" state persists.
+     */
+    function displayWaitingNoticeOnSubmission(undo)
+    {
+        if (undo) {
+            // Re-enable form
+            $('.form-control').prop('readonly', false);
+            $('.form-submit').prop('disabled', false);
+            $('.form-submit').text($.i18n('submit')).prop('disabled', false);
+        } else {
+            $('#content form').on('submit', function () {
+                // Remove focus from any active element
+                document.activeElement.blur();
+
+                // Disable the form so they can't hit Enter to re-submit
+                $('.form-control').prop('readonly', true);
+
+                // Change the submit button text.
+                $('.form-submit').prop('disabled', true)
+                    .html($.i18n('loading') + " <span id='submit_timer'></span>");
+
+                // Add the counter.
+                var startTime = Date.now();
+                setInterval(function () {
+                    var elapsedSeconds = Math.round((Date.now() - startTime) / 1000);
+                    var minutes = Math.floor(elapsedSeconds / 60);
+                    var seconds = ('00' + (elapsedSeconds - (minutes * 60))).slice(-2);
+                    $('#submit_timer').text(minutes + ":" + seconds);
+                }, 1000);
+            });
+        }
+    }
+
 })();

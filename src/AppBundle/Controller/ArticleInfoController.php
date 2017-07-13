@@ -6,7 +6,6 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Helper\AutomatedEditsHelper;
-use AppBundle\Helper\LabsHelper;
 use AppBundle\Helper\PageviewsHelper;
 use Doctrine\DBAL\Connection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -18,20 +17,21 @@ use Xtools\ProjectRepository;
 use Xtools\Page;
 use Xtools\PagesRepository;
 use Xtools\Edit;
+use DateTime;
 
 /**
  * This controller serves the search form and results for the ArticleInfo tool
  */
 class ArticleInfoController extends Controller
 {
-    /** @var LabsHelper The Labs helper object. */
-    private $lh;
     /** @var mixed[] Information about the page in question. */
     private $pageInfo;
     /** @var Edit[] All edits of the page. */
     private $pageHistory;
-    /** @var string The fully-qualified name of the revision table. */
-    private $revisionTable;
+    /** @var ProjectRepository Shared Project repository for use of getting table names, etc. */
+    private $projectRepo;
+    /** @var string Database name, for us of getting table names, etc. */
+    private $dbName;
     /** @var Connection The projects' database connection. */
     protected $conn;
     /** @var AutomatedEditsHelper The semi-automated edits helper. */
@@ -63,7 +63,6 @@ class ArticleInfoController extends Controller
      */
     private function containerInitialized()
     {
-        $this->lh = $this->get('app.labs_helper');
         $this->conn = $this->getDoctrine()->getManager('replicas')->getConnection();
         $this->ph = $this->get('app.pageviews_helper');
         $this->aeh = $this->get('app.automated_edits_helper');
@@ -114,12 +113,12 @@ class ArticleInfoController extends Controller
     {
         $projectQuery = $request->attributes->get('project');
         $project = ProjectRepository::getProject($projectQuery, $this->container);
+        $this->projectRepo = $project->getRepository();
         if (!$project->exists()) {
             $this->addFlash('notice', ['invalid-project', $projectQuery]);
             return $this->redirectToRoute('articleInfo');
         }
-        $projectUrl = $project->getUrl();
-        $dbName = $project->getDatabaseName();
+        $this->dbName = $project->getDatabaseName();
 
         $pageQuery = $request->attributes->get('article');
         $page = new Page($project, $pageQuery);
@@ -132,24 +131,11 @@ class ArticleInfoController extends Controller
             return $this->redirectToRoute('articleInfo');
         }
 
-        $this->revisionTable = $project->getRepository()->getTableName(
-            $project->getDatabaseName(),
-            'revision'
-        );
-
-        // TODO: throw error if $basicInfo['missing'] is set
-
         $this->pageInfo = [
             'project' => $project,
-            'projectUrl' => $projectUrl,
             'page' => $page,
-            'dbName' => $dbName,
             'lang' => $project->getLang(),
         ];
-
-        if ($page->getWikidataId()) {
-            $this->pageInfo['numWikidataItems'] = $this->getNumWikidataItems();
-        }
 
         // TODO: Adapted from legacy code; may be used to indicate how many dead ext links there are
         // if ( isset( $basicInfo->extlinks ) ){
@@ -158,59 +144,48 @@ class ArticleInfoController extends Controller
         //     }
         // }
 
-        $this->pageHistory = $page->getRevisions();
-        $this->pageInfo['firstEdit'] = new Edit($this->pageInfo['page'], $this->pageHistory[0]);
-        $this->pageInfo['lastEdit'] = new Edit(
-            $this->pageInfo['page'],
-            $this->pageHistory[$page->getNumRevisions() - 1]
-        );
-
-        // NOTE: bots are fetched first in case we want to restrict some stats to humans editors only
+        $this->pageInfo = array_merge($this->pageInfo, $this->parseHistory($page));
         $this->pageInfo['bots'] = $this->getBotData();
         $this->pageInfo['general']['bot_count'] = count($this->pageInfo['bots']);
-
-        $this->pageInfo = array_merge($this->pageInfo, $this->parseHistory());
         $this->pageInfo['general']['top_ten_count'] = $this->getTopTenCount();
         $this->pageInfo['general']['top_ten_percentage'] = round(
             ($this->pageInfo['general']['top_ten_count'] / $page->getNumRevisions()) * 100,
             1
         );
-        $this->pageInfo = array_merge($this->pageInfo, $this->getLinksAndRedirects());
+        $this->pageInfo = array_merge($this->pageInfo, $page->countLinksAndRedirects());
         $this->pageInfo['general']['pageviews_offset'] = 60;
         $this->pageInfo['general']['pageviews'] = $this->ph->sumLastDays(
             $this->pageInfo['project']->getDomain(),
             $this->pageInfo['page']->getTitle(),
             $this->pageInfo['general']['pageviews_offset']
         );
-        $api = $this->get('app.api_helper');
-        $assessments = $api->getPageAssessments($projectQuery, $pageQuery);
+
+        $assessments = $page->getAssessments();
         if ($assessments) {
             $this->pageInfo['assessments'] = $assessments;
         }
         $this->setLogsEvents();
 
-        $bugs = array_merge($this->getCheckWikiErrors(), $this->getWikidataErrors());
+        $bugs = $page->getErrors();
         if (!empty($bugs)) {
             $this->pageInfo['bugs'] = $bugs;
         }
 
         $this->pageInfo['xtPage'] = 'articleinfo';
-        $this->pageInfo['xtTitle'] = $this->pageInfo['page']->getTitle();
+        $this->pageInfo['xtTitle'] = $page->getTitle();
+        $this->pageInfo['editorlimit'] = $request->query->get('editorlimit', 20);
 
-        return $this->render("articleInfo/result.html.twig", $this->pageInfo);
-    }
-
-    /**
-     * Get number of wikidata items (not just languages of sister projects)
-     * @return integer Number of items
-     */
-    private function getNumWikidataItems()
-    {
-        $query = "SELECT COUNT(*) AS count
-                  FROM wikidatawiki_p.wb_items_per_site
-                  WHERE ips_item_id = ". ltrim($this->pageInfo['page']->getWikidataId(), 'Q');
-        $res = $this->conn->query($query)->fetchAll();
-        return $res[0]['count'];
+        // Output the relevant format template.
+        $format = $request->query->get('format', 'html');
+        if ($format == '') {
+            // The default above doesn't work when the 'format' parameter is blank.
+            $format = 'html';
+        }
+        $response = $this->render("articleInfo/result.$format.twig", $this->pageInfo);
+        if ($format == 'wikitext') {
+            $response->headers->set('Content-Type', 'text/plain');
+        }
+        return $response;
     }
 
     /**
@@ -221,10 +196,10 @@ class ArticleInfoController extends Controller
      */
     private function getBotData()
     {
-        $userGroupsTable = $this->lh->getTable('user_groups', $this->pageInfo['dbName']);
-        $userFromerGroupsTable = $this->lh->getTable('user_former_groups', $this->pageInfo['dbName']);
+        $userGroupsTable = $this->projectRepo->getTableName($this->dbName, 'user_groups');
+        $userFromerGroupsTable = $this->projectRepo->getTableName($this->dbName, 'user_former_groups');
         $query = "SELECT COUNT(rev_user_text) AS count, rev_user_text AS username, ug_group AS current
-                  FROM $this->revisionTable
+                  FROM " . $this->projectRepo->getTableName($this->dbName, 'revision') . "
                   LEFT JOIN $userGroupsTable ON rev_user = ug_user
                   LEFT JOIN $userFromerGroupsTable ON rev_user = ufg_user
                   WHERE rev_page = " . $this->pageInfo['page']->getId() . " AND (ug_group = 'bot' OR ufg_group = 'bot')
@@ -291,7 +266,7 @@ class ArticleInfoController extends Controller
 
             if ($info['all'] > 1) {
                 // Number of seconds between first and last edit
-                $secs = intval(strtotime($info['last']) - strtotime($info['first']) / $info['all']);
+                $secs = $info['last']->getTimestamp() - $info['first']->getTimestamp();
 
                 // Average time between edits (in days)
                 $this->pageInfo['editors'][$editor]['atbe'] = $secs / ( 60 * 60 * 24 );
@@ -333,50 +308,12 @@ class ArticleInfoController extends Controller
     }
 
     /**
-     * Get number of in and outgoing links and redirects to the page
-     * @return array Associative array containing counts
-     */
-    private function getLinksAndRedirects()
-    {
-        $pageId = $this->pageInfo['page']->getId();
-        $namespace = $this->pageInfo['page']->getNamespace();
-        $title = str_replace(' ', '_', $this->pageInfo['page']->getTitle());
-        $externalLinksTable = $this->lh->getTable('externallinks', $this->pageInfo['dbName']);
-        $pageLinksTable = $this->lh->getTable('pagelinks', $this->pageInfo['dbName']);
-        $redirectTable = $this->lh->getTable('redirect', $this->pageInfo['dbName']);
-
-        // FIXME: Probably need to make the $title mysql-safe or whatever
-        $query = "SELECT COUNT(*) AS value, 'links_ext' AS type
-                  FROM $externalLinksTable WHERE el_from = $pageId
-                  UNION
-                  SELECT COUNT(*) AS value, 'links_out' AS type
-                  FROM $pageLinksTable WHERE pl_from = $pageId
-                  UNION
-                  SELECT COUNT(*) AS value, 'links_in' AS type
-                  FROM $pageLinksTable WHERE pl_namespace = $namespace AND pl_title = \"$title\"
-                  UNION
-                  SELECT COUNT(*) AS value, 'redirects' AS type
-                  FROM $redirectTable WHERE rd_namespace = $namespace AND rd_title = \"$title\"";
-
-        $res = $this->conn->query($query)->fetchAll();
-
-        $data = [];
-
-        // Transform to associative array by 'type'
-        foreach ($res as $row) {
-            $data[$row['type'] . '_count'] = $row['value'];
-        }
-
-        return $data;
-    }
-
-    /**
      * Query for log events during each year of the article's history,
      *   and set the results in $this->pageInfo['year_count']
      */
     private function setLogsEvents()
     {
-        $loggingTable = $this->lh->getTable('logging', $this->pageInfo['dbName'], 'logindex');
+        $loggingTable = $this->projectRepo->getTableName($this->dbName, 'logging', 'logindex');
         $title = str_replace(' ', '_', $this->pageInfo['page']->getTitle());
         $query = "SELECT log_action, log_type, log_timestamp AS timestamp
                   FROM $loggingTable
@@ -420,148 +357,26 @@ class ArticleInfoController extends Controller
     }
 
     /**
-     * Get any CheckWiki errors
-     * @return array Results from query
-     */
-    private function getCheckWikiErrors()
-    {
-        if ($this->pageInfo['page']->getNamespace() !== 0 || !$this->container->getParameter('app.is_labs')) {
-            return [];
-        }
-        $title = $this->pageInfo['page']->getTitle(); // no underscores
-        $dbName = preg_replace('/_p$/', '', $this->pageInfo['dbName']); // remove _p if present
-
-        $query = "SELECT error, notice, found, name_trans AS name, prio, text_trans AS explanation
-                  FROM s51080__checkwiki_p.cw_error a
-                  JOIN s51080__checkwiki_p.cw_overview_errors b
-                  WHERE a.project = b.project AND a.project = '$dbName'
-                  AND a.title = '$title' AND a.error = b.id
-                  AND b.done IS NULL";
-
-        $conn = $this->container->get('doctrine')->getManager('toolsdb')->getConnection();
-        $res = $conn->query($query)->fetchAll();
-        return $res;
-    }
-
-    /**
-     * Get basic wikidata on the page: label and description.
-     * Reported as "bugs" if they are missing.
-     * @return array Label and description, if present
-     */
-    private function getWikidataErrors()
-    {
-        if (empty($this->pageInfo['wikidataId'])) {
-            return [];
-        }
-
-        $wikidataId = ltrim($this->pageInfo['wikidataId'], 'Q');
-        $lang = $this->pageInfo['lang'];
-
-        $query = "SELECT IF(term_type = 'label', 'label', 'description') AS term, term_text
-                  FROM wikidatawiki_p.wb_entity_per_page
-                  JOIN wikidatawiki_p.page ON epp_page_id = page_id
-                  JOIN wikidatawiki_p.wb_terms ON term_entity_id = epp_entity_id
-                    AND term_language = '$lang' AND term_type IN ('label', 'description')
-                  WHERE epp_entity_id = $wikidataId
-                  UNION
-                  SELECT pl_title AS term, wb_terms.term_text
-                  FROM wikidatawiki_p.pagelinks
-                  JOIN wikidatawiki_p.wb_terms ON term_entity_id = SUBSTRING(pl_title, 2)
-                    AND term_entity_type = (IF(SUBSTRING(pl_title, 1, 1) = 'Q', 'item', 'property'))
-                    AND term_language = '$lang'
-                    AND term_type = 'label'
-                  WHERE pl_namespace IN (0,120 )
-                  AND pl_from = (
-                    SELECT page_id FROM page
-                    WHERE page_namespace = 0 AND page_title = 'Q$wikidataId'
-                  )";
-
-        $conn = $this->container->get('doctrine')->getManager('replicas')->getConnection();
-        $res = $conn->query($query)->fetchAll();
-
-        $terms = array_map(function ($entry) {
-            return $entry['term'];
-        }, $res);
-
-        $errors = [];
-
-        if (!in_array('label', $terms)) {
-            $errors[] = [
-                'prio' => 2,
-                'name' => 'Wikidata',
-                'notice' => "Label for language <em>$lang</em> is missing", // FIXME: i18n
-                'explanation' => "See: <a target='_blank' " .
-                    "href='//www.wikidata.org/wiki/Help:Label'>Help:Label</a>",
-            ];
-        }
-        if (!in_array('description', $terms)) {
-            $errors[] = [
-                'prio' => 3,
-                'name' => 'Wikidata',
-                'notice' => "Description for language <em>$lang</em> is missing", // FIXME: i18n
-                'explanation' => "See: <a target='_blank' " .
-                    "href='//www.wikidata.org/wiki/Help:Description'>Help:Description</a>",
-            ];
-        }
-
-        return $errors;
-    }
-
-    /**
-     * Get the size of the diff.
-     * @param  int $revIndex The index of the revision within $this->pageHistory
-     * @return int Size of the diff
-     */
-    private function getDiffSize($revIndex)
-    {
-        $rev = $this->pageHistory[$revIndex];
-
-        if ($revIndex === 0) {
-            return $rev['length'];
-        }
-
-        $lastRev = $this->pageHistory[$revIndex - 1];
-
-        // TODO: Remove once T101631 is resolved
-        // Treat as zero change in size if length of previous edit is missing
-        if ($lastRev['length'] === null) {
-            return 0;
-        } else {
-            return $rev['length'] - $lastRev['length'];
-        }
-    }
-
-    /**
-     * Parse the revision history, which should be at $this->pageHistory
+     * Parse the revision history. This also sets some $this->pageInfo vars
+     *   like 'firstEdit' and 'lastEdit'
+     * @param Page $page Page to parse
      * @return array Associative "master" array of metadata about the page
      */
-    private function parseHistory()
+    private function parseHistory(Page $page)
     {
-        $revisionCount = $this->pageInfo['page']->getNumRevisions();
-        if ($revisionCount == 0) {
-            // $this->error = "no records";
-            return;
-        }
+        $revStmt = $page->getRevisionsStmt();
+        $revCount = 0;
 
-        $firstEdit = $this->pageInfo['firstEdit'];
-
-        // Get UNIX timestamp of the first day of the month of the first edit
-        // This is used as a comparison when building our array of per-month stats
-        $firstEditMonth = mktime(0, 0, 0, (int) $firstEdit->getMonth(), 1, $firstEdit->getYear());
-
-        $lastEdit = $this->pageInfo['lastEdit'];
-        $secondLastEdit = $revisionCount === 1 ? $lastEdit : $this->pageHistory[ $revisionCount - 2 ];
-
-        // Now we can start our master array. This one will be HUGE!
+        /** @var string[] Master array containing all the data we need */
         $data = [
             'general' => [
-                'max_add' => $firstEdit,
-                'max_del' => $firstEdit,
+                'max_add' => null, // Edit
+                'max_del' => null, // Edit
                 'editor_count' => 0,
                 'anon_count' => 0,
                 'minor_count' => 0,
                 'count_history' => ['day' => 0, 'week' => 0, 'month' => 0, 'year' => 0],
-                'current_size' => $this->pageHistory[$revisionCount-1]['length'],
+                'current_size' => null,
                 'textshares' => [],
                 'textshare_total' => 0,
                 'automated_count' => 0,
@@ -575,23 +390,62 @@ class ArticleInfoController extends Controller
             'tools' => [],
         ];
 
-        // restore existing general data
-        $data['general'] = array_merge($data['general'], $this->pageInfo['general']);
+        /** @var Edit|null */
+        $firstEdit = null;
 
-        // And now comes the logic for filling said master array
-        foreach ($this->pageHistory as $i => $rev) {
+        /** @var Edit|null The previous edit, used to discount content that was reverted */
+        $prevEdit = null;
+
+        /**
+         * The edit previously deemed as having the maximum amount of content added.
+         * This is used to discount content that was reverted.
+         * @var Edit|null
+        */
+        $prevMaxAddEdit = null;
+
+        /**
+         * The edit previously deemed as having the maximum amount of content deleted.
+         * This is used to discount content that was reverted
+         * @var Edit|null
+         */
+        $prevMaxDelEdit = null;
+
+        /** @var Time|null Time of first revision, used as a comparison for month counts */
+        $firstEditMonth = null;
+
+        while ($rev = $revStmt->fetch()) {
             $edit = new Edit($this->pageInfo['page'], $rev);
-            $diffSize = $this->getDiffSize($i);
-            $username = htmlspecialchars($rev['username']);
+
+            // Some shorthands
+            $editYear = $edit->getYear();
+            $editMonth = $edit->getMonth();
+            $editTimestamp = $edit->getTimestamp();
+
+            // Don't return actual edit size if last revision had a length of null.
+            // This happens when the edit follows other edits that were revision-deleted.
+            // See T148857 for more information.
+            // @TODO: Remove once T101631 is resolved
+            if ($prevEdit && $prevEdit->getLength() === null) {
+                $editSize = 0;
+            } else {
+                $editSize = $edit->getSize();
+            }
+
+            if ($revCount === 0) {
+                $firstEdit = $edit;
+                $firstEditMonth = mktime(0, 0, 0, (int) $firstEdit->getMonth(), 1, $firstEdit->getYear());
+            }
+
+            $username = $edit->getUser()->getUsername();
 
             // Sometimes, with old revisions (2001 era), the revisions from 2002 come before 2001
-            if ($edit->getTimestamp() < $firstEdit->getTimestamp()) {
+            if ($editTimestamp < $firstEdit->getTimestamp()) {
                 $firstEdit = $edit;
             }
 
             // Fill in the blank arrays for the year and 12 months
-            if (!isset($data['year_count'][$edit->getYear()])) {
-                $data['year_count'][$edit->getYear()] = [
+            if (!isset($data['year_count'][$editYear])) {
+                $data['year_count'][$editYear] = [
                     'all' => 0,
                     'minor' => 0,
                     'anon' => 0,
@@ -602,14 +456,14 @@ class ArticleInfoController extends Controller
                 ];
 
                 for ($i = 1; $i <= 12; $i++) {
-                    $timeObj = mktime(0, 0, 0, $i, 1, $edit->getYear());
+                    $timeObj = mktime(0, 0, 0, $i, 1, $editYear);
 
                     // don't show zeros for months before the first edit or after the current month
                     if ($timeObj < $firstEditMonth || $timeObj > strtotime('last day of this month')) {
                         continue;
                     }
 
-                    $data['year_count'][$edit->getYear()]['months'][sprintf('%02d', $i)] = [
+                    $data['year_count'][$editYear]['months'][sprintf('%02d', $i)] = [
                         'all' => 0,
                         'minor' => 0,
                         'anon' => 0,
@@ -619,100 +473,107 @@ class ArticleInfoController extends Controller
             }
 
             // Increment year and month counts for all edits
-            $data['year_count'][$edit->getYear()]['all']++;
-            $data['year_count'][$edit->getYear()]['months'][$edit->getMonth()]['all']++;
-            $data['year_count'][$edit->getYear()]['size'] = (int) $rev['length'];
+            $data['year_count'][$editYear]['all']++;
+            $data['year_count'][$editYear]['months'][$editMonth]['all']++;
+            // This will ultimately be the size of the page by the end of the year
+            $data['year_count'][$editYear]['size'] = $edit->getLength();
 
-            $editsThisMonth = $data['year_count'][$edit->getYear()]['months'][$edit->getMonth()]['all'];
+            // Keep track of which month had the most edits
+            $editsThisMonth = $data['year_count'][$editYear]['months'][$editMonth]['all'];
             if ($editsThisMonth > $data['max_edits_per_month']) {
                 $data['max_edits_per_month'] = $editsThisMonth;
             }
 
-            // Fill in various user stats
+            // Initialize various user stats
             if (!isset($data['editors'][$username])) {
                 $data['general']['editor_count']++;
                 $data['editors'][$username] = [
                     'all' => 0,
                     'minor' => 0,
                     'minor_percentage' => 0,
-                    'first' => date('Y-m-d, H:i', strtotime($rev['timestamp'])),
-                    'first_id' => $rev['id'],
+                    'first' => $editTimestamp,
+                    'first_id' => $edit->getId(),
                     'last' => null,
                     'atbe' => null,
                     'added' => 0,
                     'sizes' => [],
-                    'urlencoded' => rawurlencode($rev['username']),
                 ];
             }
 
             // Increment user counts
             $data['editors'][$username]['all']++;
-            $data['editors'][$username]['last'] = date('Y-m-d, H:i', strtotime($rev['timestamp']));
-            $data['editors'][$username]['last_id'] = $rev['id'];
+            $data['editors'][$username]['last'] = $editTimestamp;
+            $data['editors'][$username]['last_id'] = $edit->getId();
 
             // Store number of KB added with this edit
-            $data['editors'][$username]['sizes'][] = $rev['length'] / 1024;
+            $data['editors'][$username]['sizes'][] = $edit->getLength() / 1024;
 
-            // check if it was a revert
-            if ($this->aeh->isRevert($rev['comment'])) {
+            // Check if it was a revert
+            if ($this->aeh->isRevert($edit->getComment())) {
                 $data['general']['revert_count']++;
-            } else {
-                // edit was NOT a revert
 
-                if ($edit->getSize() > 0) {
-                    $data['general']['added'] += $edit->getSize();
-                    $data['editors'][$username]['added'] += $edit->getSize();
+                // Since this was a revert, we don't want to treat the previous
+                //   edit as legit content addition or removal
+                if ($prevEdit && $prevEdit->getSize() > 0) {
+                    $data['general']['added'] -= $prevEdit->getSize();
                 }
 
-                // determine if the next revision was a revert
-                $nextRevision = isset($this->pageHistory[$i + 1]) ? $this->pageHistory[$i + 1] : null;
-                $nextRevisionIsRevert = $nextRevision &&
-                    $this->getDiffSize($i + 1) === -$edit->getSize() &&
-                    $this->aeh->isRevert($nextRevision['comment']);
+                // @TODO: Test this against an edit war (use your sandbox)
+                // Also remove as max added or deleted, if applicable
+                if ($data['general']['max_add'] &&
+                    $prevEdit->getId() === $data['general']['max_add']->getId()
+                ) {
+                    $data['general']['max_add'] = $prevMaxAddEdit;
+                    $prevMaxAddEdit = $prevEdit; // in the event of edit wars
+                } elseif ($data['general']['max_del'] &&
+                    $prevEdit->getId() === $data['general']['max_del']->getId()
+                ) {
+                    $data['general']['max_del'] = $prevMaxDelEdit;
+                    $prevMaxDelEdit = $prevEdit; // in the event of edit wars
+                }
+            } else {
+                // Edit was not a revert, so treat size > 0 as content added
+                if ($editSize > 0) {
+                    $data['general']['added'] += $editSize;
+                    $data['editors'][$username]['added'] += $editSize;
 
-                // don't count this edit as content removal if the next edit reverted it
-                if (!$nextRevisionIsRevert && $edit->getSize() < $data['general']['max_del']->getSize()) {
+                    // Keep track of edit with max addition
+                    if (!$data['general']['max_add'] || $editSize > $data['general']['max_add']->getSize()) {
+                        // Keep track of old max_add in case we find out the next $edit was reverted
+                        //   (and was also a max edit), in which case we'll want to use this one ($edit)
+                        $prevMaxAddEdit = $data['general']['max_add'];
+
+                        $data['general']['max_add'] = $edit;
+                    }
+                } elseif ($editSize < 0 && (
+                    !$data['general']['max_del'] || $editSize < $data['general']['max_del']->getSize()
+                )) {
                     $data['general']['max_del'] = $edit;
                 }
-
-                // FIXME: possibly remove this
-                if ($edit->getLength() > 0) {
-                    // keep track of added content
-                    $data['general']['textshare_total'] += $edit->getLength();
-                    if (!isset($data['textshares'][$username]['all'])) {
-                        $data['textshares'][$username]['all'] = 0;
-                    }
-                    $data['textshares'][$username]['all'] += $edit->getLength();
-                }
-
-                if ($edit->getSize() > $data['general']['max_add']->getSize()) {
-                    $data['general']['max_add'] = $edit;
-                }
             }
 
+            // If anonymous, increase counts
             if ($edit->isAnon()) {
-                if (!isset($rev['rev_user']['anons'][$username])) {
-                    $data['general']['anon_count']++;
-                }
-                // Anonymous, increase counts
-                $data['anons'][] = $username;
-                $data['year_count'][$edit->getYear()]['anon']++;
-                $data['year_count'][$edit->getYear()]['months'][$edit->getMonth()]['anon']++;
+                $data['general']['anon_count']++;
+                $data['year_count'][$editYear]['anon']++;
+                $data['year_count'][$editYear]['months'][$editMonth]['anon']++;
             }
 
+            // If minor edit, increase counts
             if ($edit->isMinor()) {
-                // Logged in, increase counts
                 $data['general']['minor_count']++;
-                $data['year_count'][$edit->getYear()]['minor']++;
-                $data['year_count'][$edit->getYear()]['months'][$edit->getMonth()]['minor']++;
+                $data['year_count'][$editYear]['minor']++;
+                $data['year_count'][$editYear]['months'][$editMonth]['minor']++;
+
+                // Increment minor counts for this user
                 $data['editors'][$username]['minor']++;
             }
 
-            $automatedTool = $this->aeh->getTool($rev['comment']);
+            $automatedTool = $this->aeh->getTool($edit->getComment());
             if ($automatedTool) {
                 $data['general']['automated_count']++;
-                $data['year_count'][$edit->getYear()]['automated']++;
-                $data['year_count'][$edit->getYear()]['months'][$edit->getMonth()]['automated']++;
+                $data['year_count'][$editYear]['automated']++;
+                $data['year_count'][$editYear]['months'][$editMonth]['automated']++;
 
                 if (!isset($data['tools'][$automatedTool])) {
                     $data['tools'][$automatedTool] = [
@@ -725,27 +586,31 @@ class ArticleInfoController extends Controller
             }
 
             // Increment "edits per <time>" counts
-            if (strtotime($rev['timestamp']) > strtotime('-1 day')) {
+            if ($editTimestamp > new DateTime('-1 day')) {
                 $data['general']['count_history']['day']++;
             }
-            if (strtotime($rev['timestamp']) > strtotime('-1 week')) {
+            if ($editTimestamp > new DateTime('-1 week')) {
                 $data['general']['count_history']['week']++;
             }
-            if (strtotime($rev['timestamp']) > strtotime('-1 month')) {
+            if ($editTimestamp > new DateTime('-1 month')) {
                 $data['general']['count_history']['month']++;
             }
-            if (strtotime($rev['timestamp']) > strtotime('-1 year')) {
+            if ($editTimestamp > new DateTime('-1 year')) {
                 $data['general']['count_history']['year']++;
             }
+
+            $revCount++;
+            $prevEdit = $edit;
+            $lastEdit = $edit;
         }
 
         // add percentages
         $data['general']['minor_percentage'] = round(
-            ($data['general']['minor_count'] / $revisionCount) * 100,
+            ($data['general']['minor_count'] / $revCount) * 100,
             1
         );
         $data['general']['anon_percentage'] = round(
-            ($data['general']['anon_count'] / $revisionCount) * 100,
+            ($data['general']['anon_count'] / $revCount) * 100,
             1
         );
 
@@ -757,29 +622,26 @@ class ArticleInfoController extends Controller
         $interval = date_diff($dateLast, $dateFirst, true);
 
         $data['totaldays'] = $interval->format('%a');
-        $data['general']['average_days_per_edit'] = round($data['totaldays'] / $revisionCount, 1);
+        $data['general']['average_days_per_edit'] = round($data['totaldays'] / $revCount, 1);
         $editsPerDay = $data['totaldays']
-            ? $revisionCount / ($data['totaldays'] / (365 / 12 / 24))
+            ? $revCount / ($data['totaldays'] / (365 / 12 / 24))
             : 0;
         $data['general']['edits_per_day'] = round($editsPerDay, 1);
         $editsPerMonth = $data['totaldays']
-            ? $revisionCount / ($data['totaldays'] / (365 / 12))
+            ? $revCount / ($data['totaldays'] / (365 / 12))
             : 0;
         $data['general']['edits_per_month'] = round($editsPerMonth, 1);
         $editsPerYear = $data['totaldays']
-            ? $revisionCount / ($data['totaldays'] / 365)
+            ? $revCount / ($data['totaldays'] / 365)
             : 0;
         $data['general']['edits_per_year'] = round($editsPerYear, 1);
-        $data['general']['edits_per_editor'] = round($revisionCount / count($data['editors']), 1);
+        $data['general']['edits_per_editor'] = round($revCount / count($data['editors']), 1);
 
-        // If after processing max_del is positive, no edit actually removed text, so unset this value
-        if ($data['general']['max_del']->getSize() > 0) {
-            unset($data['general']['max_del']);
-        }
+        $data['firstEdit'] = $firstEdit;
+        $data['lastEdit'] = $lastEdit;
 
         // Various sorts
         arsort($data['editors']);
-        arsort($data['textshares']);
         arsort($data['tools']);
         ksort($data['year_count']);
 

@@ -23,7 +23,7 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
     {
         $editCounterRepo = $this->getMock(EditCounterRepository::class);
         $editCounterRepo->expects($this->once())
-            ->method('getRevisionCounts')
+            ->method('getPairData')
             ->willReturn([
                 'deleted' => 10,
                 'live' => 100,
@@ -45,7 +45,7 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
     public function testDates()
     {
         $editCounterRepo = $this->getMock(EditCounterRepository::class);
-        $editCounterRepo->expects($this->once())->method('getRevisionDates')->willReturn([
+        $editCounterRepo->expects($this->once())->method('getPairData')->willReturn([
                 'first' => '20170510100000',
                 'last' => '20170515150000',
             ]);
@@ -71,7 +71,7 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
     {
         $editCounterRepo = $this->getMock(EditCounterRepository::class);
         $editCounterRepo->expects($this->once())
-            ->method('getRevisionDates')
+            ->method('getPairData')
             ->willReturn([
                 'first' => '20170510110000',
                 'last' => '20170510110000',
@@ -98,7 +98,7 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
     {
         $editCounterRepo = $this->getMock(EditCounterRepository::class);
         $editCounterRepo->expects($this->once())
-            ->method('getPageCounts')
+            ->method('getPairData')
             ->willReturn([
                 'edited-live' => '3',
                 'edited-deleted' => '1',
@@ -109,11 +109,11 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
         $user = new User('Testuser1');
         $editCounter = new EditCounter($project, $user);
         $editCounter->setRepository($editCounterRepo);
-        
+
         $this->assertEquals(3, $editCounter->countLivePagesEdited());
         $this->assertEquals(1, $editCounter->countDeletedPagesEdited());
         $this->assertEquals(4, $editCounter->countAllPagesEdited());
-        
+
         $this->assertEquals(6, $editCounter->countCreatedPagesLive());
         $this->assertEquals(2, $editCounter->countPagesCreatedDeleted());
         $this->assertEquals(8, $editCounter->countPagesCreated());
@@ -175,7 +175,76 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
             $editCounter->globalEditCountsTopN(2)
         );
 
+        // And the bottom 4.
+        $this->assertEquals(95, $editCounter->globalEditCountWithoutTopN(2));
+
         // Grand total.
         $this->assertEquals(185, $editCounter->globalEditCount());
+    }
+
+    /**
+     * Ensure parsing of log_params properly works, based on known formats
+     */
+    public function testLongestBlockDays()
+    {
+        $wiki = new Project('wiki1');
+        $user = new User('Testuser1');
+
+        // Scenario 1
+        $editCounter = new EditCounter($wiki, $user);
+        $editCounterRepo = $this->getMock(EditCounterRepository::class);
+        $editCounter->setRepository($editCounterRepo);
+        $editCounterRepo->expects($this->once())
+            ->method('getBlocksReceived')
+            ->with($wiki, $user)
+            ->willReturn([
+                [
+                    'log_timestamp' => '20170101000000',
+                    'log_params' => 'a:2:{s:11:"5::duration";s:8:"72 hours";s:8:"6::flags";s:8:"nocreate";}',
+                ],
+                [
+                    'log_timestamp' => '20170301000000',
+                    'log_params' => 'a:2:{s:11:"5::duration";s:7:"1 month";s:8:"6::flags";s:11:"noautoblock";}',
+                ],
+            ]);
+        $this->assertEquals(31, $editCounter->getLongestBlockDays());
+
+        // Scenario 2
+        $editCounter2 = new EditCounter($wiki, $user);
+        $editCounterRepo2 = $this->getMock(EditCounterRepository::class);
+        $editCounter2->setRepository($editCounterRepo2);
+        $editCounterRepo2->expects($this->once())
+            ->method('getBlocksReceived')
+            ->with($wiki, $user)
+            ->willReturn([
+                [
+                    'log_timestamp' => '20170201000000',
+                    'log_params' => 'a:2:{s:11:"5::duration";s:8:"infinite";s:8:"6::flags";s:8:"nocreate";}',
+                ],
+                [
+                    'log_timestamp' => '20170701000000',
+                    'log_params' => 'a:2:{s:11:"5::duration";s:7:"60 days";s:8:"6::flags";s:8:"nocreate";}',
+                ],
+            ]);
+        $this->assertEquals(-1, $editCounter2->getLongestBlockDays());
+
+        // Scenario 3
+        $editCounter3 = new EditCounter($wiki, $user);
+        $editCounterRepo3 = $this->getMock(EditCounterRepository::class);
+        $editCounter3->setRepository($editCounterRepo3);
+        $editCounterRepo3->expects($this->once())
+            ->method('getBlocksReceived')
+            ->with($wiki, $user)
+            ->willReturn([
+                [
+                    'log_timestamp' => '20170701000000',
+                    'log_params' => 'a:2:{s:11:"5::duration";s:7:"60 days";s:8:"6::flags";s:8:"nocreate";}',
+                ],
+                [
+                    'log_timestamp' => '20170101000000',
+                    'log_params' => "9 weeks\nnoautoblock",
+                ],
+            ]);
+        $this->assertEquals(63, $editCounter3->getLongestBlockDays());
     }
 }

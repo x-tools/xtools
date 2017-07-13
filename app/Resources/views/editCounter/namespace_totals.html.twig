@@ -42,7 +42,7 @@
                         <span class="glyphicon glyphicon-remove"></span>
                         <span class="color-icon" style="background:{{ color(nsId) }}"></span>
                     </span>
-                    {{ project.namespaces[nsId] }}
+                    {{ nsName(nsId, project.namespaces) }}
                 </td>
                 <td class="sort-entry--count" data-value="{{ value }}">
                     {{ value|number_format }}
@@ -69,7 +69,7 @@
         window.namespaceChart = new Chart($("#namespace-canvas"), {
             type: 'pie',
             data: {
-                labels: [{% for key,value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}"{{ project.namespaces[key] }}"{% endfor %}],
+                labels: [{% for key,value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}"{{ nsName(key, project.namespaces) }}"{% endfor %}],
                 datasets: [{
                     data: [{% for value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}{{ value }}{% endfor %}],
                     backgroundColor: [{% for key,value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}'{{ color(key) }}'{% set first = 0 %}{% endfor %}],

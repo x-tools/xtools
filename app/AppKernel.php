@@ -5,9 +5,9 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 
 class AppKernel extends Kernel
 {
+
     public function registerBundles()
     {
-
         $bundles = [
             new Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle(),
             new Symfony\Bundle\WebServerBundle\WebServerBundle(),
@@ -38,7 +38,6 @@ class AppKernel extends Kernel
 
     public function getRootDir()
     {
-
         return __DIR__;
     }
 
@@ -49,13 +48,11 @@ class AppKernel extends Kernel
 
     public function getLogDir()
     {
-
         return dirname(__DIR__).'/var/logs';
     }
 
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
-
         $loader->load($this->getRootDir().'/config/config_'.$this->getEnvironment().'.yml');
     }
 }

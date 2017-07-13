@@ -10,6 +10,7 @@ use Xtools\Project;
 use Xtools\ProjectRepository;
 use Xtools\User;
 use Xtools\UserRepository;
+use DateTime;
 
 /**
  * Tests for the User class.
@@ -80,5 +81,43 @@ class UserTest extends PHPUnit_Framework_TestCase
             ['AdminUser', ['sysop', 'autopatrolled'], true],
             ['NormalUser', ['autopatrolled'], false],
         ];
+    }
+
+    /**
+     * Get the expiry of the current block of a user on a given project
+     */
+    public function testExpiry()
+    {
+        $userRepo = $this->getMock(UserRepository::class);
+        $userRepo->expects($this->once())
+            ->method('getBlockExpiry')
+            ->willReturn('20500601000000');
+        $user = new User('TestUser');
+        $user->setRepository($userRepo);
+
+        $projectRepo = $this->getMock(ProjectRepository::class);
+        $project = new Project('wiki.example.org');
+        $project->setRepository($projectRepo);
+
+        $this->assertEquals(new DateTime('20500601000000'), $user->getBlockExpiry($project));
+    }
+
+    /**
+     * Is the user currently blocked on a given project?
+     */
+    public function testIsBlocked()
+    {
+        $userRepo = $this->getMock(UserRepository::class);
+        $userRepo->expects($this->once())
+            ->method('getBlockExpiry')
+            ->willReturn('infinity');
+        $user = new User('TestUser');
+        $user->setRepository($userRepo);
+
+        $projectRepo = $this->getMock(ProjectRepository::class);
+        $project = new Project('wiki.example.org');
+        $project->setRepository($projectRepo);
+
+        $this->assertEquals(true, $user->isBlocked($project));
     }
 }

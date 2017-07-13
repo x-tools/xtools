@@ -5,17 +5,21 @@
 
 namespace Tests\Xtools;
 
-use PHPUnit_Framework_TestCase;
+// use PHPUnit_Framework_TestCase;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Xtools\Page;
 use Xtools\PagesRepository;
 use Xtools\Project;
+use Xtools\ProjectRepository;
 use Xtools\User;
 
 /**
  * Tests for the Page class.
  */
-class PageTest extends PHPUnit_Framework_TestCase
+class PageTest extends KernelTestCase
 {
+    /** @var Container The Symfony container. */
+    protected $container;
 
     /**
      * A page has a title and an HTML display title.
@@ -125,4 +129,95 @@ class PageTest extends PHPUnit_Framework_TestCase
         $user = new User('Testuser');
         //$this->assertCount(3, $page->getRevisions($user)->getCount());
     }
+
+    /**
+     * Wikidata errors. With this test getWikidataInfo doesn't return a Description,
+     *     so getWikidataErrors should complain accordingly
+     */
+    public function testWikidataErrors()
+    {
+        $pageRepo = $this->getMock(PagesRepository::class, ['getWikidataInfo', 'getPageInfo']);
+
+        $pageRepo
+            ->method('getWikidataInfo')
+            ->with()
+            ->willReturn([
+                [
+                    'term' => 'label',
+                    'term_text' => 'My article',
+                ],
+            ]);
+        $pageRepo
+            ->method('getPageInfo')
+            ->with()
+            ->willReturn([
+                'pagelanguage' => 'en',
+                'pageprops' => [
+                    'wikibase_item' => 'Q123',
+                ],
+            ]);
+
+        $page = new Page(new Project('exampleWiki'), 'Page');
+        $page->setRepository($pageRepo);
+
+        $wikidataErrors = $page->getWikidataErrors();
+
+        $this->assertArraySubset(
+            [
+                'prio' => 3,
+                'name' => 'Wikidata',
+            ],
+            $wikidataErrors[0]
+        );
+        $this->assertContains(
+            'Description',
+            $wikidataErrors[0]['notice']
+        );
+    }
+
+    // public function testPageAssessments()
+    // {
+    //     $projectRepo = $this->getMock(ProjectRepository::class, ['getAssessmentsConfig']);
+    //     $projectRepo
+    //         ->method('getAssessmentsConfig')
+    //         ->willReturn([
+    //             'wikiproject_prefix' => 'Wikipedia:WikiProject_'
+    //         ]);
+
+    //     $project = $this->getMock(Project::class, ['getDomain']);
+    //     $project
+    //         ->method('getDomain')
+    //         ->willReturn('test.wiki.org');
+    //     $project->setRepository($projectRepo);
+
+    //     $pageRepo = $this->getMock(PagesRepository::class, ['getAssessments', 'getPageInfo']);
+    //     $pageRepo
+    //         ->method('getAssessments')
+    //         ->with($project)
+    //         ->willReturn([
+    //             [
+    //                 'wikiproject' => 'Military history',
+    //                 'class' => 'Start',
+    //                 'importance' => 'Low',
+    //             ],
+    //             [
+    //                 'wikiproject' => 'Firearms',
+    //                 'class' => 'C',
+    //                 'importance' => 'High',
+    //             ],
+    //         ]);
+    //     $pageRepo
+    //         ->method('getPageInfo')
+    //         ->with($project, 'Test_page')
+    //         ->willReturn([
+    //             'pageid' => 5,
+    //         ]);
+
+    //     $page = new Page($project, 'Test_page');
+    //     $page->setRepository($pageRepo);
+
+    //     $assessments = $page->getAssessments();
+
+    //     $this->assertEquals('C', $assessments['assessment']);
+    // }
 }

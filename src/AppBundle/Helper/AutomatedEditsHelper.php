@@ -123,9 +123,8 @@ class AutomatedEditsHelper extends HelperBase
 
         $conn = $this->container->get('doctrine')->getManager('replicas')->getConnection();
 
-        $lh = $this->container->get('app.labs_helper');
-        $revTable = $lh->getTable('revision', $project->getDatabaseName());
-        $pageTable = $lh->getTable('page', $project->getDatabaseName());
+        $revTable = $project->getRepository()->getTableName($project->getDatabaseName(), 'revision');
+        $pageTable = $project->getRepository()->getTableName($project->getDatabaseName(), 'page');
 
         $AEBTypes = array_map(function ($AEBType) {
             return $AEBType['regex'];

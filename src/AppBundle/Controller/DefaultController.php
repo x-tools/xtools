@@ -107,6 +107,7 @@ class DefaultController extends Controller
     /**
      * Receive authentication credentials back from the Oauth wiki.
      * @Route("/oauth_callback", name="oauth_callback")
+     * @Route("/oauthredirector.php", name="old_oauth_callback")
      * @param Request $request The HTTP request.
      * @return RedirectResponse
      */

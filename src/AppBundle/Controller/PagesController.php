@@ -11,11 +11,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Xtools\ProjectRepository;
 use Xtools\UserRepository;
-use Xtools\Page;
-use Xtools\Edit;
 
 /**
  * This controller serves the Pages tool.
@@ -115,53 +112,30 @@ class PagesController extends Controller
      */
     public function resultAction($project, $username, $namespace = '0', $redirects = 'noredirects')
     {
-        $lh = $this->get('app.labs_helper');
-
-        $api = $this->get('app.api_helper');
-
         $user = UserRepository::getUser($username, $this->container);
         $username = $user->getUsername(); // use normalized user name
 
         $projectData = ProjectRepository::getProject($project, $this->container);
+        $projectRepo = $projectData->getRepository();
 
         // If the project exists, actually populate the values
         if (!$projectData->exists()) {
             $this->addFlash('notice', ['invalid-project', $project]);
             return $this->redirectToRoute('pages');
         }
-
-        $dbName = $projectData->getDatabaseName();
-        $projectUrl = $projectData->getUrl();
-
-        $pageTable = $lh->getTable('page', $dbName);
-        $pageAssessmentsTable = $lh->getTable('page_assessments', $dbName);
-        $revisionTable = $lh->getTable('revision', $dbName);
-        $archiveTable = $lh->getTable('archive', $dbName);
-        $logTable = $lh->getTable('logging', $dbName, 'userindex');
-
-        // Grab the connection to the replica database (which is separate from the above)
-        $conn = $this->get('doctrine')->getManager('replicas')->getConnection();
-
-        $namespaceConditionArc = '';
-        $namespaceConditionRev = '';
-
-        if ($namespace != 'all') {
-            $namespaceConditionRev = " AND page_namespace = '".intval($namespace)."' ";
-            $namespaceConditionArc = " AND ar_namespace = '".intval($namespace)."' ";
+        if (!$user->existsOnProject($projectData)) {
+            $this->addFlash('notice', ['user-not-found']);
+            return $this->redirectToRoute('pages');
         }
 
-        $summaryColumns = ['namespace']; // what columns to show in namespace totals table
-        $redirectCondition = '';
+        // what columns to show in namespace totals table
+        $summaryColumns = ['namespace'];
         if ($redirects == 'onlyredirects') {
             // don't show redundant pages column if only getting data on redirects
             $summaryColumns[] = 'redirects';
-
-            $redirectCondition = " AND page_is_redirect = '1' ";
         } elseif ($redirects == 'noredirects') {
             // don't show redundant redirects column if only getting data on non-redirects
             $summaryColumns[] = 'pages';
-
-            $redirectCondition = " AND page_is_redirect = '0' ";
         } else {
             // order is important here
             $summaryColumns[] = 'pages';
@@ -169,60 +143,9 @@ class PagesController extends Controller
         }
         $summaryColumns[] = 'deleted'; // always show deleted column
 
-        $user_id = $user->getId($projectData);
+        $result = $user->getRepository()->getPagesCreated($projectData, $user, $namespace, $redirects);
 
-        if ($user_id == 0) { // IP Editor or undefined username.
-            $whereRev = " rev_user_text = '$username' AND rev_user = '0' ";
-            $whereArc = " ar_user_text = '$username' AND ar_user = '0' ";
-            $having = " rev_user_text = '$username' ";
-        } else {
-            $whereRev = " rev_user = '$user_id' AND rev_timestamp > 1 ";
-            $whereArc = " ar_user = '$user_id' AND ar_timestamp > 1 ";
-            $having = " rev_user = '$user_id' ";
-        }
-
-        $hasPageAssessments = $lh->isLabs() && $api->projectHasPageAssessments($project);
-        $paSelects = $hasPageAssessments ? ', pa_class, pa_importance, pa_page_revision' : '';
-        $paSelectsArchive = $hasPageAssessments ?
-            ', NULL AS pa_class, NULL AS pa_page_id, NULL AS pa_page_revision'
-            : '';
-        $paJoin = $hasPageAssessments ? "LEFT JOIN $pageAssessmentsTable ON rev_page = pa_page_id" : '';
-
-        $stmt = "
-            (SELECT DISTINCT page_namespace AS namespace, 'rev' AS type, page_title AS page_title,
-                page_len, page_is_redirect, rev_timestamp AS rev_timestamp,
-                rev_user, rev_user_text AS username, rev_len, rev_id $paSelects
-            FROM $pageTable
-            JOIN $revisionTable ON page_id = rev_page
-            $paJoin
-            WHERE $whereRev AND rev_parent_id = '0' $namespaceConditionRev $redirectCondition
-            " . ($hasPageAssessments ? 'GROUP BY rev_page' : '') . "
-            )
-
-            UNION
-
-            (SELECT a.ar_namespace AS namespace, 'arc' AS type, a.ar_title AS page_title,
-                0 AS page_len, '0' AS page_is_redirect, min(a.ar_timestamp) AS rev_timestamp,
-                a.ar_user AS rev_user, a.ar_user_text AS username, a.ar_len AS rev_len,
-                a.ar_rev_id AS rev_id $paSelectsArchive
-            FROM $archiveTable a
-            JOIN
-            (
-                SELECT b.ar_namespace, b.ar_title
-                FROM $archiveTable AS b
-                LEFT JOIN $logTable ON log_namespace = b.ar_namespace AND log_title = b.ar_title
-                    AND log_user = b.ar_user AND (log_action = 'move' or log_action = 'move_redir')
-                WHERE $whereArc AND b.ar_parent_id = '0' $namespaceConditionArc AND log_action IS NULL
-            ) AS c ON c.ar_namespace= a.ar_namespace AND c.ar_title = a.ar_title
-            GROUP BY a.ar_namespace, a.ar_title
-            HAVING $having
-            )
-            ";
-        $resultQuery = $conn->prepare($stmt);
-        $resultQuery->execute();
-
-        $result = $resultQuery->fetchAll();
-
+        $hasPageAssessments = $projectRepo->isLabs() && $projectData->hasPageAssessments();
         $pagesByNamespaceByDate = [];
         $pageTitles = [];
         $countsByNamespace = [];
@@ -236,12 +159,13 @@ class PagesController extends Controller
             $datetimeHuman = $datetime->format('Y-m-d H:i');
 
             $pageData = array_merge($row, [
+                'raw_time' => $row['rev_timestamp'],
                 'human_time' => $datetimeHuman,
                 'page_title' => str_replace('_', ' ', $row['page_title'])
             ]);
 
             if ($hasPageAssessments) {
-                $pageData['badge'] = $api->getAssessmentBadgeURL($project, $pageData['pa_class']);
+                $pageData['badge'] = $projectData->getAssessmentBadgeURL($pageData['pa_class']);
             }
 
             $pagesByNamespaceByDate[$row['namespace']][$datetimeKey][] = $pageData;
@@ -292,7 +216,7 @@ class PagesController extends Controller
         }
 
         // Retrieve the namespaces
-        $namespaces = $api->namespaces($project);
+        $namespaces = $projectData->getNamespaces();
 
         // Assign the values and display the template
         return $this->render('pages/result.html.twig', [

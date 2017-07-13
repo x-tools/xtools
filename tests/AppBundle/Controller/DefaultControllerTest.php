@@ -24,12 +24,12 @@ class DefaultControllerTest extends WebTestCase
         // Check basics.
         $crawler = $client->request('GET', '/');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertContains('Welcome to XTools!', $crawler->filter('.splash-logo')->attr('alt'));
+        $this->assertContains('XTools', $crawler->filter('.splash-logo')->attr('alt'));
 
         // Change language.
         $crawler = $client->request('GET', '/?uselang=es');
         $this->assertContains(
-            'Te damos la bienvenida a las herramientas de X!',
+            'Herramientas de X!',
             $crawler->filter('.splash-logo')->attr('alt')
         );
 

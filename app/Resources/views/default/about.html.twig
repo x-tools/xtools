@@ -13,7 +13,10 @@
     </header>
 
     <div class="panel-body xt-panel-body">
-        <div class="col-lg-6 stat-list clearfix">
+        <div class="col-lg-12 text-center">
+            <img class="splash-logo" style="width:300px" src="{{ asset('static/images/logo.svg') }}" alt="{{ msg('xtools-title') }}" />
+        </div>
+        <div class="col-lg-3 stat-list clearfix">
             <h3>{{ msg('maintainers') }}</h3>
             <ul>
                 <li><a href="//en.wikipedia.org/wiki/User:Matthewrbowker" target="_blank">Matthewrbowker</a></li>
@@ -22,17 +25,37 @@
             </ul>
         </div>
 
-        <div class="col-lg-6 stat-list clearfix">
+        <div class="col-lg-3 stat-list clearfix">
             <h3>{{ msg('major-contributors') }}</h3>
             <ul>
                 <li><a href="//en.wikipedia.org/wiki/User:Cyberpower678" target="_blank">Cyberpower678</a></li>
                 <li><a href="//de.wikipedia.org/wiki/User:Hedonil" target="_blank">Hedonil</a></li>
+                <li><a href="//en.wikipedia.org/wiki/User:Kaldari" target="_blank">Kaldari</a></li>
                 <li><a href="//en.wikipedia.org/wiki/User:Matthewrbowker" target="_blank">Matthewrbowker</a></li>
                 <li><a href="//en.wikipedia.org/wiki/User:MusikAnimal" target="_blank">MusikAnimal</a></li>
                 <li><a href="//meta.wikimedia.org/wiki/User:Samwilson" target="_blank">Samwilson</a></li>
                 <li><a href="//en.wikipedia.org/wiki/User:Scottywong" target="_blank">Scottywong</a></li>
                 <li><a href="//en.wikipedia.org/wiki/User:TParis" target="_blank">TParis</a></li>
                 <li><a href="//en.wikipedia.org/wiki/User:X!" target="_blank">X!</a></li>
+            </ul>
+        </div>
+
+        <div class="col-lg-6 stat-list clearfix">
+            <h3>{{ msg('image-attribution') }}</h3>
+            <ul>
+                <li>
+                    {% set logoAuthor = "<a target='_blank' href='https://meta.wikimedia.org/wiki/User:Ricordisamoa'>Ricordisamoa</a>" %}
+                    {{ msg('image-attribution-text-1', [logoAuthor]) }}
+                </li>
+                <li>
+                    {% set wrench = "<a target='_blank' href='https://commons.wikimedia.org/wiki/File:Wrench_icon-72a7cf.svg'>Wikimedia Commons</a>" %}
+                    {% set wrenchAuthor = "<a target='_blank' href='https://commons.wikimedia.org/wiki/User:Offnfopt'>Offnfopt</a>" %}
+                    {{ msg('image-attribution-text-2', [wrench, wrenchAuthor]) }}
+                </li>
+                <li>
+                    {% set commTech = "<a target='_blank' href='https://www.mediawiki.org/wiki/Community_Tech'>Community Tech</a>" %}
+                    {{ msg('image-attribution-text-3', [commTech]) }}
+                </li>
             </ul>
         </div>
     </div>
