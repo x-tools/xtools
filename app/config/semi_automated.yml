@@ -11,7 +11,7 @@ parameters:
         regex: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) \d+ (\[\[Wikipedia:Pending changes\|pending\]\]|pending) edits? (to revision \d+|by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\])'
         link: Project:Pending changes
     Bot revert:
-        regex: '^Reverting possible vandalism,? by.*\(Bot\)$|^BOT (- )?(Reverted edits? by|rv)|^vandalism from \[\[.*?\(\d+\) - reverted'
+        regex: '^Reverting possible (vandalism|test edit).*by.*\(Bot|BOT( EDIT)?\)$|^BOT (- )?(Reverted edits? by|rv)|^vandalism from \[\[.*?\(\d+\) - reverted'
         link: Project:Bots
     Page move:
         regex: '^.*?moved page \[\[(?!.*?WP:AFCH)|moved \[\[.*?\]\] to \[\['
@@ -57,6 +57,7 @@ parameters:
         link: Project:DABSOLVER
     Dabfix:
         regex: 'using \[\[tools:~dispenser\/cgi-bin\/dabfix.py'
+        link: toollabs:dispenser/cgi-bin/dabfix.py
     Reflinks:
         regex: '\[\[(tools:~dispenser\/view\/Reflinks|WP:REFLINKS)\|Reflinks'
         link: Project:REFLINKS

@@ -510,10 +510,14 @@ class ArticleInfoController extends Controller
 
                 // @TODO: Test this against an edit war (use your sandbox)
                 // Also remove as max added or deleted, if applicable
-                if ($prevEdit->getId() === $data['general']['max_add']->getId()) {
+                if ($data['general']['max_add'] &&
+                    $prevEdit->getId() === $data['general']['max_add']->getId()
+                ) {
                     $data['general']['max_add'] = $prevMaxAddEdit;
                     $prevMaxAddEdit = $prevEdit; // in the event of edit wars
-                } elseif ($prevEdit->getId() === $data['general']['max_del']->getId()) {
+                } elseif ($data['general']['max_del'] &&
+                    $prevEdit->getId() === $data['general']['max_del']->getId()
+                ) {
                     $data['general']['max_del'] = $prevMaxDelEdit;
                     $prevMaxDelEdit = $prevEdit; // in the event of edit wars
                 }
