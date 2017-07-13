@@ -56,20 +56,11 @@ class EditCounterRepository extends Repository
             SELECT 'year' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
                 WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
             ) UNION (
-            SELECT 'small' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_user = :userId AND rev_len < 20
-            ) UNION (
-            SELECT 'large' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_user = :userId AND rev_len > 1000
-            ) UNION (
             SELECT 'with_comments' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
                 WHERE rev_user = :userId AND rev_comment != ''
             ) UNION (
             SELECT 'minor' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
                 WHERE rev_user = :userId AND rev_minor_edit = 1
-            ) UNION (
-            SELECT 'average_size' AS `key`, AVG(rev_len) AS val FROM $revisionTable
-                WHERE rev_user = :userId
 
             -- Dates.
             ) UNION (

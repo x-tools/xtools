@@ -89,7 +89,7 @@
         <tr><td>{{ msg('last-month') }}</td><td>{{ ec.countRevisionsInLast('month')|number_format }}</td></tr>
         <tr><td>{{ msg('last-year') }}</td><td>{{ ec.countRevisionsInLast('year')|number_format }}</td></tr>
         <tr>
-            <td>{{ msg("average-edits-per-day", [msg("days", [1])]) }}</td>
+            <td>{{ msg('average-edits-per-day') }}</td>
             <td>
                 {{ ec.averageRevisionsPerDay|number_format(1) }}
                 <span class="text-muted">
@@ -97,10 +97,10 @@
                 </span>
             </td>
         </tr>
-        <tr>
+        {# <tr>
             <td>{{ msg('average-edit-size') }}</td>
             <td>{{ ec.averageRevisionSize|number_format(1) }}</td>
-        </tr>
+        </tr> #}
     </tbody></table>
 </div>
 
@@ -201,7 +201,7 @@
                     ({{ ((ec.countMinorRevisions / ec.countLiveRevisions) * 100)|percent_format }})
                 </td>
             </tr>
-            <tr>
+            {# <tr>
                 <td>{{ msg('small-edits') }}</td>
                 <td>
                     {{ ec.countSmallRevisions|number_format }}
@@ -216,7 +216,7 @@
                     &middot;
                     ({{ ((ec.countLargeRevisions / ec.countLiveRevisions) * 100)|percent_format }})
                 </td>
-            </tr>
+            </tr> #}
         </tbody>
     </table>
 </div>
@@ -420,7 +420,7 @@
             }]
         )
     }}
-    {{
+    {# {{
         chart.pie_chart('small_edits',
             [{
                 label: '< 20 ' ~ msg('num-bytes', [20]),
@@ -447,7 +447,7 @@
                 percentage: 100 - ((ec.countLargeRevisions / ec.countLiveRevisions) * 100)
             }]
         )
-    }}
+    }} #}
 </div>
 
 {% if not is_sub_request %}
