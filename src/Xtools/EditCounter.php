@@ -156,37 +156,6 @@ class EditCounter extends Model
     }
 
     /**
-     * Get the total number of revisions under 20 bytes.
-     */
-    public function countSmallRevisions()
-    {
-        $revCounts = $this->getPairData();
-        return isset($revCounts['small']) ? $revCounts['small'] : 0;
-    }
-
-    /**
-     * Get the total number of revisions over 1000 bytes.
-     */
-    public function countLargeRevisions()
-    {
-        $revCounts = $this->getPairData();
-        return isset($revCounts['large']) ? $revCounts['large'] : 0;
-    }
-
-    /**
-     * Get the average revision size for the user.
-     * @return float Size in bytes.
-     */
-    public function averageRevisionSize()
-    {
-        $revisionCounts = $this->getPairData();
-        if (!isset($revisionCounts['average_size'])) {
-            return 0;
-        }
-        return round($revisionCounts['average_size'], 3);
-    }
-
-    /**
      * Get the total number of non-deleted pages edited by the user.
      * @return int
      */
