@@ -91,9 +91,9 @@ class EditCounterController extends Controller
 
         // Otherwise fall through.
         return $this->render('editCounter/index.html.twig', [
-            "xtPageTitle" => "tool-ec",
-            "xtSubtitle" => "tool-ec-desc",
-            'xtPage' => "ec",
+            'xtPageTitle' => 'tool-ec',
+            'xtSubtitle' => 'tool-ec-desc',
+            'xtPage' => 'ec',
             'project' => $project,
         ]);
     }

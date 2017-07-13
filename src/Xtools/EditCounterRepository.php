@@ -27,7 +27,7 @@ class EditCounterRepository extends Repository
     public function getPairData(Project $project, User $user)
     {
         // Set up cache.
-        $cacheKey = 'pairdata.' . $project->getDatabaseName() . '.' . $user->getUsername();
+        $cacheKey = 'pairdata.'.$project->getDatabaseName().'.'.$user->getCacheKey();
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -125,7 +125,7 @@ class EditCounterRepository extends Repository
     public function getLogCounts(Project $project, User $user)
     {
         // Set up cache.
-        $cacheKey = 'logcounts.'.$project->getDatabaseName().'.'.$user->getUsername();
+        $cacheKey = 'logcounts.'.$project->getDatabaseName().'.'.$user->getCacheKey();
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -272,7 +272,7 @@ class EditCounterRepository extends Repository
     {
         $this->log->debug(__METHOD__." Getting global edit counts for ".$user->getUsername());
         // Set up cache and stopwatch.
-        $cacheKey = 'globalRevisionCounts.'.$user->getUsername();
+        $cacheKey = 'globalRevisionCounts.'.$user->getCacheKey();
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -322,11 +322,12 @@ class EditCounterRepository extends Repository
         $stopwatchName = 'globalRevisionCounts.'.$user->getUsername();
         $allProjects = $project->getRepository()->getAll();
         $topEditCounts = [];
+        $username = $user->getUsername();
         foreach ($allProjects as $projectMeta) {
             $revisionTableName = $this->getTableName($projectMeta['dbName'], 'revision');
             $sql = "SELECT COUNT(rev_id) FROM $revisionTableName WHERE rev_user_text=:username";
             $stmt = $this->getProjectsConnection()->prepare($sql);
-            $stmt->bindParam('username', $user->getUsername());
+            $stmt->bindParam('username', $username);
             $stmt->execute();
             $total = (int)$stmt->fetchColumn();
             $topEditCounts[] = [
@@ -390,14 +391,14 @@ class EditCounterRepository extends Repository
     public function getRevisions($projects, User $user, $lim = 40)
     {
         // Check cache.
-        $username = $user->getUsername();
-        $cacheKey = "globalcontribs.$username";
+        $cacheKey = "globalcontribs.".$user->getCacheKey();
         $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
         // Assemble queries.
+        $username = $user->getUsername();
         $queries = [];
         foreach ($projects as $project) {
             $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
@@ -450,13 +451,13 @@ class EditCounterRepository extends Repository
      */
     public function getMonthCounts(Project $project, User $user)
     {
-        $username = $user->getUsername();
-        $cacheKey = "monthcounts.$username";
+        $cacheKey = "monthcounts.".$user->getCacheKey();
         $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
+        $username = $user->getUsername();
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
         $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
         $sql =
@@ -491,13 +492,13 @@ class EditCounterRepository extends Repository
      */
     public function getYearCounts(Project $project, User $user)
     {
-        $username = $user->getUsername();
-        $cacheKey = "yearcounts.$username";
+        $cacheKey = "yearcounts.".$user->getCacheKey();
         $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
+        $username = $user->getUsername();
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
         $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
         $sql = "SELECT "
@@ -507,7 +508,7 @@ class EditCounterRepository extends Repository
             . " FROM $revisionTable JOIN $pageTable ON (rev_page = page_id)"
             . " WHERE rev_user_text = :username"
             . " GROUP BY YEAR(rev_timestamp), page_namespace "
-            . " ORDER BY rev_timestamp DESC ";
+            . " ORDER BY rev_timestamp ASC ";
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $resultQuery->bindParam(":username", $username);
         $resultQuery->execute();
@@ -530,13 +531,13 @@ class EditCounterRepository extends Repository
      */
     public function getTimeCard(Project $project, User $user)
     {
-        $username = $user->getUsername();
-        $cacheKey = "timecard.".$username;
+        $cacheKey = "timecard.".$user->getCacheKey();
         $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
+        $username = $user->getUsername();
         $hourInterval = 2;
         $xCalc = "ROUND(HOUR(rev_timestamp)/$hourInterval) * $hourInterval";
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
