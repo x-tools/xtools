@@ -404,7 +404,6 @@ class ArticleInfoController extends Controller
 
         while ($rev = $revStmt->fetch()) {
             $edit = new Edit($this->pageInfo['page'], $rev);
-            // $edit->setContainer($this->container);
 
             // Some shorthands
             $editYear = $edit->getYear();
