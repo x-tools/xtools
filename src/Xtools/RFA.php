@@ -36,13 +36,20 @@ class RFA {
     protected $neutral = array();
     protected $duplicates = array();
     protected $lasterror = '';
+    protected $userLookingFor = null;
+    protected $userSectionFound = "Unknown";
 
     /**
      * Analyzes an RFA. Returns TRUE on success, FALSE on failure
      *
      * @param string|null $rawwikitext
      */
-    public function __construct( $rawwikitext, $section_array = ["Support", "Oppose", "Neutral", "Comments"], $user_namespace = "User" ) {
+    public function __construct(
+        $rawwikitext,
+        $section_array = ["Support", "Oppose", "Neutral", "Comments"],
+        $user_namespace = "User",
+        $user_looking_for = null
+    ) {
 
         $sections = join("|", $section_array);
 
@@ -68,6 +75,9 @@ class RFA {
         if( preg_match( "/end(?:ing|ed)?(?: no earlier than)? (.*?) \(UTC\)/i", $header, $matches ) ) {
             $this->enddate = $matches[1];
         }
+
+        $this->userLookingFor = $user_looking_for;
+
         //=== End header stuff ===//
 
         //Now parse through each non-header section, figuring out what they are
@@ -80,11 +90,11 @@ class RFA {
                 continue;
             }
 
-            if( strcasecmp( $splut, 'Support' ) == 0 ) {
+            if (strcasecmp($splut, 'Support') == 0) {
                 $nextsection = 1;
-            } elseif( strcasecmp( $splut, 'Oppose' ) == 0 ) {
+            } elseif (strcasecmp($splut, 'Oppose') == 0) {
                 $nextsection = 2;
-            } elseif( strcasecmp( $splut, 'Neutral' ) == 0 ) {
+            } elseif (strcasecmp($splut, 'Neutral') == 0) {
                 $nextsection = 3;
             } else {
                 switch( $nextsection ){
@@ -123,12 +133,21 @@ class RFA {
         $m = array();
         foreach( $this->support as $s ){
             if( isset( $s['name'] ) ) $m[] = $s['name'];
+            if ($this->userLookingFor == $s['name']) {
+                $this->userSectionFound = "support";
+            }
         }
         foreach( $this->oppose as $o ){
             if( isset( $o['name'] ) ) $m[] = $o['name'];
+            if ($this->userLookingFor == $o['name']) {
+                $this->userSectionFound = "oppose";
+            }
         }
         foreach( $this->neutral as $n ){
             if( isset( $n['name'] ) ) $m[] = $n['name'];
+            if ($this->userLookingFor == $n['name']) {
+                $this->userSectionFound = "neutral";
+            }
         }
         sort( $m );
         //Find duplicates:
@@ -169,6 +188,14 @@ class RFA {
 
     public function get_lasterror() {
         return $this->lasterror;
+    }
+
+    public function get_userLookingFor() {
+        return $this->userLookingFor;
+    }
+
+    public function get_userSectionFound() {
+        return $this->userSectionFound;
     }
 
     /**

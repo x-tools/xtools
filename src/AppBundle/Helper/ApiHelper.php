@@ -337,4 +337,34 @@ class ApiHelper extends HelperBase
 
         return $result;
     }
+
+    public function getMassPageText($project, $titles = []) {
+        $this->setUp($project);
+
+        $result = [];
+
+        $titleText = join("|", $titles);
+
+        $params= [
+            "titles" => $titleText,
+            "prop" => "revisions",
+            "rvprop" =>"content"
+        ];
+
+
+        try {
+            $query = new SimpleRequest("query", $params);
+            $res = $this->api->getRequest($query);
+            if (!isset($res["query"]["pages"])) {
+                return [];
+            }
+            foreach($res["query"]["pages"] as $key => $value) {
+                $result[$value["title"]] = $value["revisions"][0]["*"];
+            }
+        } catch (Exception $e) {
+            // The api returned an error!  Ignore
+        }
+
+        return $result;
+    }
 }

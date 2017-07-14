@@ -1,6 +1,7 @@
 parameters:
   rfa:
     tilda_wiki_p:
+      rfa_namespace: 4
       sections:
         - "support"
         - "oppose"
