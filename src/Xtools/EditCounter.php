@@ -38,6 +38,12 @@ class EditCounter extends Model
     protected $blocks;
 
     /**
+     * Revision size data, with keys 'average_size', 'large_edits' and 'small_edits'.
+     * @var string[] As returned by the DB, unconverted to int or float
+     */
+    protected $editSizeData;
+
+    /**
      * Duration of the longest block in days; -1 if indefinite,
      *   or false if could not be parsed from log params
      * @var int|bool
@@ -153,37 +159,6 @@ class EditCounter extends Model
     {
         $revCounts = $this->getPairData();
         return isset($revCounts['minor']) ? $revCounts['minor'] : 0;
-    }
-
-    /**
-     * Get the total number of revisions under 20 bytes.
-     */
-    public function countSmallRevisions()
-    {
-        $revCounts = $this->getPairData();
-        return isset($revCounts['small']) ? $revCounts['small'] : 0;
-    }
-
-    /**
-     * Get the total number of revisions over 1000 bytes.
-     */
-    public function countLargeRevisions()
-    {
-        $revCounts = $this->getPairData();
-        return isset($revCounts['large']) ? $revCounts['large'] : 0;
-    }
-
-    /**
-     * Get the average revision size for the user.
-     * @return float Size in bytes.
-     */
-    public function averageRevisionSize()
-    {
-        $revisionCounts = $this->getPairData();
-        if (!isset($revisionCounts['average_size'])) {
-            return 0;
-        }
-        return round($revisionCounts['average_size'], 3);
     }
 
     /**
@@ -787,5 +762,62 @@ class EditCounter extends Model
         krsort($globalEdits);
         $globalEdits = array_slice($globalEdits, 0, $max);
         return $globalEdits;
+    }
+
+    /**
+     * Get average edit size, and number of large and small edits.
+     * @return int[]
+     */
+    protected function getEditSizeData()
+    {
+        if (! is_array($this->editSizeData)) {
+            $this->editSizeData = $this->getRepository()
+                ->getEditSizeData($this->project, $this->user);
+        }
+        return $this->editSizeData;
+    }
+
+    /**
+     * Get the total edit count of this user or 5,000 if they've made more than 5,000 edits.
+     * This is used to ensure percentages of small and large edits are computed properly.
+     * @return int
+     */
+    public function countLast5000()
+    {
+        return $this->countLiveRevisions() > 5000 ? 5000 : $this->countLiveRevisions();
+    }
+
+    /**
+     * Get the number of edits under 20 bytes of the user's past 5000 edits.
+     * @return int
+     */
+    public function countSmallEdits()
+    {
+        $editSizeData = $this->getEditSizeData();
+        return isset($editSizeData['small_edits']) ? (int) $editSizeData['small_edits'] : 0;
+    }
+
+    /**
+     * Get the total number of edits over 1000 bytes of the user's past 5000 edits.
+     * @return int
+     */
+    public function countLargeEdits()
+    {
+        $editSizeData = $this->getEditSizeData();
+        return isset($editSizeData['large_edits']) ? (int) $editSizeData['large_edits'] : 0;
+    }
+
+    /**
+     * Get the average size of the user's past 5000 edits.
+     * @return float Size in bytes.
+     */
+    public function averageEditSize()
+    {
+        $editSizeData = $this->getEditSizeData();
+        if (isset($editSizeData['average_size'])) {
+            return round($editSizeData['average_size'], 3);
+        } else {
+            return 0;
+        }
     }
 }

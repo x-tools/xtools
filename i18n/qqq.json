@@ -54,6 +54,7 @@
   "created-by": "Created by",
   "current-admins": "Label for the current number of admins for a project.",
   "current-size": "Indicates the current size of a page.\n{{Identical|Current size}}",
+  "data-limit": "Footnote indictaing that data only accounts for the past $1 edits the user has made. $1 is the raw number that can be used in {{PLURAL}}, and $2 is the formatted number.",
   "date": "Label for a date field\n{{Identical|Date}}",
   "delete": "Name of a MediaWiki log action, used as header of a row in the table of log action counts for a user.\n{{Identical|Delete}}",
   "deleted": "Deleted in the context of deleted text or deleted edits.\n{{Identical|Deleted}}",

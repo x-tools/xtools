@@ -56,20 +56,11 @@ class EditCounterRepository extends Repository
             SELECT 'year' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
                 WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
             ) UNION (
-            SELECT 'small' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_user = :userId AND rev_len < 20
-            ) UNION (
-            SELECT 'large' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_user = :userId AND rev_len > 1000
-            ) UNION (
             SELECT 'with_comments' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
                 WHERE rev_user = :userId AND rev_comment != ''
             ) UNION (
             SELECT 'minor' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
                 WHERE rev_user = :userId AND rev_minor_edit = 1
-            ) UNION (
-            SELECT 'average_size' AS `key`, AVG(rev_len) AS val FROM $revisionTable
-                WHERE rev_user = :userId
 
             -- Dates.
             ) UNION (
@@ -577,7 +568,7 @@ class EditCounterRepository extends Repository
      * @param User $user The user.
      * @return integer[] Array of edit counts, keyed by all tool names from
      * app/config/semi_automated.yml
-     * @TODO Load from AutoEditsController via AJAX
+     * @todo Load from AutoEditsController via AJAX
      */
     public function countAutomatedRevisions(Project $project, User $user)
     {
@@ -619,5 +610,51 @@ class EditCounterRepository extends Repository
 
         $this->stopwatch->stop($cacheKey);
         return $editCounts;
+    }
+
+    /**
+     * Get various data about edit sizes of the past 5,000 edits.
+     * Will cache the result for 10 minutes.
+     * @param Project $project The project.
+     * @param User $user The user.
+     * @return string[] Values with for keys 'average_size',
+     *                  'small_edits' and 'large_edits'
+     */
+    public function getEditSizeData(Project $project, User $user)
+    {
+        // Set up cache.
+        $cacheKey = 'editsizedata.'.$project->getDatabaseName().'.'.$user->getCacheKey();
+        $this->stopwatch->start($cacheKey, 'XTools');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        // Prepare the queries and execute them.
+        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+        $userId = $user->getId($project);
+        $sql = "SELECT AVG(sizes.size) AS average_size,
+                COUNT(CASE WHEN sizes.size < 20 THEN 1 END) AS small_edits,
+                COUNT(CASE WHEN sizes.size > 1000 THEN 1 END) AS large_edits
+                FROM (
+                    SELECT (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS size
+                    FROM $revisionTable AS revs
+                    LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+                    WHERE revs.rev_user = :userId
+                    ORDER BY revs.rev_timestamp DESC
+                    LIMIT 5000
+                ) sizes";
+        $resultQuery = $this->getProjectsConnection()->prepare($sql);
+        $resultQuery->bindParam('userId', $userId);
+        $resultQuery->execute();
+        $results = $resultQuery->fetchAll()[0];
+
+        // Cache for 10 minutes.
+        $cacheItem = $this->cache->getItem($cacheKey);
+        $cacheItem->set($results);
+        $cacheItem->expiresAfter(new DateInterval('PT10M'));
+        $this->cache->save($cacheItem);
+
+        $this->stopwatch->stop($cacheKey);
+        return $results;
     }
 }
