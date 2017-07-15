@@ -168,21 +168,15 @@
                 {% endspaceless %}</td>
             </tr>
             <tr>
-                <td>{% spaceless %}
-                    {% if is_sub_request %}
-                        <a href="#auto-edits">{{ msg('auto-edits') }}</a>
-                    {% else %}
-                        {{ msg('auto-edits') }}
-                    {% endif %}
-                {% endspaceless %}</td>
+                <td>{{ msg('auto-edits') }}</td>
                 <td>
                     {% if enabled('autoedits') %}
-                        <a href="{{ path('autoedits', {project:project.domain, username:user.username}) }}">{{ ec.countAutomatedRevisions|number_format }}</a>
+                        <a href="{{ path('autoedits', {project:project.domain, username:user.username, namespace:'all'}) }}">{{ ec.countAutomatedEdits|number_format }}</a>
                     {% else %}
-                        {{ ec.countAutomatedRevisions }}
+                        {{ ec.countAutomatedEdits }}
                     {% endif %}
                     &middot;
-                    ({{ ((ec.countAutomatedRevisions / ec.countLiveRevisions) * 100)|percent_format }})
+                    ({{ ((ec.countAutomatedEdits / ec.countLiveRevisions) * 100)|percent_format }})
                 </td>
             </tr>
             <tr>

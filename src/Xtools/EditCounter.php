@@ -37,6 +37,9 @@ class EditCounter extends Model
     /** @var array Block data, with keys 'set' and 'received'. */
     protected $blocks;
 
+    /** @var int Number of semi-automated edits */
+    protected $autoEditCount;
+
     /**
      * Revision size data, with keys 'average_size', 'large_edits' and 'small_edits'.
      * @var string[] As returned by the DB, unconverted to int or float
@@ -439,22 +442,13 @@ class EditCounter extends Model
     /**
      * Get the total number of edits made by the user with semi-automating tools.
      */
-    public function countAutomatedRevisions()
+    public function countAutomatedEdits()
     {
-        $autoSummary = $this->automatedRevisionsSummary();
-        $count = 0;
-        foreach ($autoSummary as $summary) {
-            $count += $summary;
+        if ($this->autoEditCount) {
+            return $this->autoEditCount;
         }
-        return $count;
-    }
-
-    /**
-     * Get a summary of the numbers of edits made by the user with semi-automating tools.
-     */
-    public function automatedRevisionsSummary()
-    {
-        return $this->getRepository()->countAutomatedRevisions($this->project, $this->user);
+        $this->autoEditCount = $this->user->countAutomatedEdits($this->project);
+        return $this->autoEditCount;
     }
 
     /**

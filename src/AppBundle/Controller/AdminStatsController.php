@@ -185,7 +185,7 @@ class AdminStatsController extends Controller
         $loggingTable = $projectRepo->getTableName($dbName, 'logging', 'userindex');
 
         $startDb = date('Ymd000000', strtotime($start));
-        $endDb = date('Ymd000000', strtotime($end));
+        $endDb = date('Ymd235959', strtotime($end));
 
         // TODO: Fix this - inactive admins aren't getting shown
         $query = "

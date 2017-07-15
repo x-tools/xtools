@@ -30,7 +30,7 @@
         </p>
 
         {# Show TOC when the user has a ton of automated tools, making the page hard to navigate #}
-        {% if semi_automated|length > 15 %}
+        {% if toolCounts|length > 15 %}
             <div class="text-center xt-toc">
                 {% set sections = ['summary', 'auto-edits', 'non-auto-edits'] %}
                 {% for section in sections %}
@@ -44,34 +44,38 @@
         {% set content %}
             <div class="panel-body stat-list clearfix" id="summary">
                 <table class="table autoedits-table">
-                    {% if start is defined %}
+                    {% if start != '' %}
                         <tr>
                             <td>{{ msg('start') }}</td>
-                            <td>{{ start | date('Y-m-d') }}</td>
+                            <td>{{ start|date('Y-m-d') }}</td>
                         </tr>
                     {% endif %}
-                    {% if end is defined %}
+                    {% if end != '' %}
                         <tr>
                             <td>{{ msg('end') }}</td>
-                            <td>{{ end | date('Y-m-d') }}</td>
+                            <td>{{ end|date('Y-m-d') }}</td>
                         </tr>
                     {% endif %}
                     <tr>
+                        <td>{{ msg('namespace') }}</td>
+                        <td>{{ nsName(namespace, project.namespaces) }}</td>
+                    </tr>
+                    <tr>
                         <td>{{ msg('total-edits') }}</td>
-                        <td>{{ total | number_format }}</td>
+                        <td>{{ editCount|number_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('auto-edits') }}</td>
                         <td>
-                            {{ total_semi | number_format }}
-                            ({{ total_pct | percent_format }})
+                            {{ autoCount|number_format }}
+                            ({{ autoPct|percent_format }})
                         </td>
                     </tr>
                     <tr>
                         <td>{{ msg('non-auto-edits') }}</td>
                         <td>
-                            {{ (total - total_semi) | number_format }}
-                            ({{ (100 - total_pct) | percent_format }})
+                            {{ (editCount - autoCount)|number_format }}
+                            ({{ (100 - autoPct)|percent_format }})
                         </td>
                     </tr>
                 </table>
@@ -79,13 +83,13 @@
                     chart.pie_chart('auto_edits',
                         [{
                             label: msg('total-edits'),
-                            value: total,
-                            percentage: 100 - total_pct
+                            value: editCount,
+                            percentage: 100 - autoPct
                         },
                         {
                             label: msg('auto-edits'),
-                            value: total_semi,
-                            percentage: total_pct
+                            value: autoCount,
+                            percentage: autoPct
                         }]
                     )
                 }}
@@ -99,7 +103,7 @@
                 {% for key in ['tool', 'count'] %}
                     <th>
                         <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                            {{ msg(key) | capitalize_first }}
+                            {{ msg(key)|capitalize_first }}
                             <span class="glyphicon glyphicon-sort"></span>
                         </span>
                     </th>
@@ -107,7 +111,7 @@
                 </thead>
                 <tbody>
                 {% set toolsTotal = 0 %}
-                {% for tool, values in semi_automated %}
+                {% for tool, values in toolCounts %}
                     {% set toolsTotal = toolsTotal + values.count %}
                     <tr>
                         <td class="sort-entry--tool linked" data-value="{{ tool }}">
@@ -125,11 +129,11 @@
                 </tbody>
                 <tfoot>
                     <th class="tools--tools">
-                        {{ semi_automated | length | number_format }}
-                        {{ msg('num-tools', [semi_automated | length]) }}
+                        {{ toolCounts|length|number_format }}
+                        {{ msg('num-tools', [toolCounts|length]) }}
                     </th>
                     <th class="tools--count">
-                        {{ toolsTotal | number_format }}
+                        {{ toolsTotal|number_format }}
                     </th>
                 </tfoot>
             </table>
@@ -139,23 +143,23 @@
             </div>
 
             {% set colors = [] %}
-            {% for i in 0..(semi_automated | length) %}
-                {% set colors = colors | merge([chartColor(i)]) %}
+            {% for i in 0..(toolCounts|length) %}
+                {% set colors = colors|merge([chartColor(i)]) %}
             {% endfor %}
 
             <script>
                 window.toolsChart = new Chart($('#tool_chart'), {
                     type: 'pie',
                     data: {
-                        labels: {{ semi_automated | keys | json_encode() | raw }},
+                        labels: {{ toolCounts|keys|json_encode()|raw }},
                         datasets: [{
                             data: [
-                                {% for tool, values in semi_automated %}
+                                {% for tool, values in toolCounts %}
                                     {{ values.count }}{% if not loop.last %},{% endif %}
                                 {% endfor %}
                             ],
-                            backgroundColor: {{ colors | json_encode() | raw }},
-                            borderColor: {{ colors | json_encode() | raw }},
+                            backgroundColor: {{ colors|json_encode()|raw }},
+                            borderColor: {{ colors|json_encode()|raw }},
                             borderWidth: 1
                         }]
                     },
@@ -165,7 +169,7 @@
                         }
                     }
                 });
-                window.countsByTool = {{ semi_automated | json_encode() | raw }};
+                window.countsByTool = {{ toolCounts|json_encode()|raw }};
             </script>
         {% endset %}
         {{ layout.content_block('auto-edits', content) }}
@@ -173,7 +177,12 @@
         {% set content %}
             <div>
                 <em class="non-auto-edits-loading text-muted">{{ msg('loading') }}...</em>
-                <div class="non-auto-edits-container" data-username="{{ user.username }}"></div>
+                <div class="non-auto-edits-container"
+                    data-username="{{ user.username }}"
+                    data-start="{{ start }}"
+                    data-end="{{ end }}"
+                    data-namespace="{{ namespace }}">
+                </div>
             </div>
         {% endset %}
         {{ layout.content_block('non-auto-edits', content) }}

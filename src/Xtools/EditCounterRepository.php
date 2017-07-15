@@ -5,7 +5,6 @@
 
 namespace Xtools;
 
-use AppBundle\Helper\AutomatedEditsHelper;
 use DateInterval;
 use DateTime;
 use Mediawiki\Api\SimpleRequest;
@@ -559,57 +558,6 @@ class EditCounterRepository extends Repository
 
         $this->stopwatch->stop($cacheKey);
         return $totals;
-    }
-
-    /**
-     * Get a summary of automated edits made by the given user
-     * Will cache the result for 10 minutes.
-     * @param Project $project The project.
-     * @param User $user The user.
-     * @return integer[] Array of edit counts, keyed by all tool names from
-     * app/config/semi_automated.yml
-     * @todo Load from AutoEditsController via AJAX
-     */
-    public function countAutomatedRevisions(Project $project, User $user)
-    {
-        $userId = $user->getId($project);
-        $cacheKey = "automatedEdits.".$project->getDatabaseName().'.'.$userId;
-        $this->stopwatch->start($cacheKey, 'XTools');
-        if ($this->cache->hasItem($cacheKey)) {
-            $this->log->debug("Using cache for $cacheKey");
-            return $this->cache->getItem($cacheKey)->get();
-        }
-
-        /** @var AutomatedEditsHelper $automatedEditsHelper */
-        $automatedEditsHelper = $this->container->get("app.automated_edits_helper");
-
-        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $sql = "SELECT rev_comment FROM $revisionTable WHERE rev_user = :userId";
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $resultQuery->bindParam("userId", $userId);
-        $resultQuery->execute();
-        $results = $resultQuery->fetchAll();
-        $editCounts = [];
-        foreach ($results as $result) {
-            $toolName = $automatedEditsHelper->getTool($result['rev_comment']);
-            if ($toolName) {
-                if (!isset($editCounts[$toolName])) {
-                    $editCounts[$toolName] = 0;
-                }
-                $editCounts[$toolName]++;
-            }
-        }
-        arsort($editCounts);
-
-        // Cache for 10 minutes.
-        $this->log->debug("Saving $cacheKey to cache", [$editCounts]);
-        $cacheItem = $this->cache->getItem($cacheKey);
-        $cacheItem->set($editCounts);
-        $cacheItem->expiresAfter(new DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
-
-        $this->stopwatch->stop($cacheKey);
-        return $editCounts;
     }
 
     /**
