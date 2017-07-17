@@ -142,11 +142,15 @@ Documentation sections use the following (standard Python) hierarchy of section 
 Releases
 ========
 
-Before tagging a new release,
-update the version numbers in ``docs/conf.py`` and ``app/config/version.yml``,
-and check the copyright year in ``README.md``, ``docs/conf.py``, and ``app/Resources/views/base.html.twig``.
+Before tagging a new release:
 
-Then tag the release (follow the `Semantic Versioning guidelines`_) and push it to GitHub.
+* update the version numbers in ``docs/conf.py`` and ``app/config/version.yml``;
+* check the copyright year in ``README.md``, ``docs/conf.py``, and ``app/Resources/views/base.html.twig``; and
+* update ``RELEASE_NOTES.md`` with any notable new information for the end user.
+
+Then tag the release
+(follow the `Semantic Versioning guidelines`_, and annotate the tag with the above release notes)
+and push it to GitHub.
 
 Lastly, update the ``version`` and ``update`` parameters at https://www.mediawiki.org/wiki/XTools
 
