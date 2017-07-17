@@ -127,7 +127,7 @@ class ArticleInfoController extends Controller
         $page->setRepository($pageRepo);
 
         if (!$page->exists()) {
-            $this->addFlash('notice', ['no-exist', $pageQuery]);
+            $this->addFlash('notice', ['no-exist', str_replace('_', ' ', $pageQuery)]);
             return $this->redirectToRoute('articleInfo');
         }
 
