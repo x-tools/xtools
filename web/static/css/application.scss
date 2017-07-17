@@ -588,6 +588,10 @@ section > .panel-body {
     width: 300px;
 }
 
+.times-in-utc {
+    margin-top: 15px;
+}
+
 @media (min-width: $bootstrap-lg) {
     .xt-panel-body table {
         width: auto;

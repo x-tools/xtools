@@ -109,6 +109,10 @@
             <a href="{{ path('EditCounterLatestGlobal', {project:project.domain, username:user.username})}}">{{ msg('latest-global-edits') }}</a>
         {% endset %}
         {{ layout.content_block(headerLink, content, '', 'latest-global-edits', true) }}
+
+        <div class="text-muted times-in-utc">
+            {{ msg('times-in-utc') }}
+        </div>
     </div>
 </div>
 

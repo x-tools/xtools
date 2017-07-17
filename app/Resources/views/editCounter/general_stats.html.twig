@@ -448,7 +448,11 @@
 </div>
 
 {% if not is_sub_request %}
-    </div></section></div></div>
+    </div></section>
+    <div class="text-muted times-in-utc" style="clear:both">
+        {{ msg('times-in-utc') }}
+    </div>
+    </div></div>
 {% endif %}
 
 {% endblock %}

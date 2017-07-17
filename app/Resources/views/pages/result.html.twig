@@ -251,6 +251,10 @@
             {% endset %}
             {{ layout.content_block(nsName(key, namespaces), content, null, key, true) }}
         {% endfor %}
+
+        <div class="text-muted times-in-utc" style="clear:both">
+            {{ msg('times-in-utc') }}
+        </div>
     </div>
 
     {% if namespace == 'all' %}
