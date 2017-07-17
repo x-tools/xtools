@@ -153,6 +153,99 @@ class User extends Model
     }
 
     /**
+     * Get edit count within given timeframe and namespace
+     * @param Project $project
+     * @param int|string [$namespace] Namespace ID or 'all' for all namespaces
+     * @param string [$start] Start date in a format accepted by strtotime()
+     * @param string [$end] End date in a format accepted by strtotime()
+     */
+    public function countEdits(Project $project, $namespace = 'all', $start = '', $end = '')
+    {
+        return $this->getRepository()->countEdits($project, $this, $namespace, $start, $end);
+    }
+
+    /**
+     * Get the number of edits this user made using semi-automated tools.
+     * @param Project $project
+     * @param string|int [$namespace] Namespace ID or 'all'
+     * @param string [$start] Start date in a format accepted by strtotime()
+     * @param string [$end] End date in a format accepted by strtotime()
+     * @return string[] Result of query, see below.
+     */
+    public function countAutomatedEdits(Project $project, $namespace = 'all', $start = '', $end = '')
+    {
+        return $this->getRepository()->countAutomatedEdits($project, $this, $namespace, $start, $end);
+    }
+
+    /**
+     * Get non-automated contributions for this user.
+     * @param Project $project
+     * @param string|int [$namespace] Namespace ID or 'all'
+     * @param string [$start] Start date in a format accepted by strtotime()
+     * @param string [$end] End date in a format accepted by strtotime()
+     * @param int [$offset] Used for pagination, offset results by N edits
+     * @return array[] Result of query, with columns (string) 'page_title',
+     *   (int) 'page_namespace', (int) 'rev_id', (DateTime) 'timestamp',
+     *   (bool) 'minor', (int) 'length', (int) 'length_change', (string) 'comment'
+     */
+    public function getNonAutomatedEdits(
+        Project $project,
+        $namespace = 'all',
+        $start = '',
+        $end = '',
+        $offset = 0
+    ) {
+        $revs = $this->getRepository()->getNonAutomatedEdits(
+            $project,
+            $this,
+            $namespace,
+            $start,
+            $end,
+            $offset
+        );
+
+        $namespaces = $project->getNamespaces();
+
+        return array_map(function ($rev) use ($namespaces) {
+            $pageTitle = $rev['page_title'];
+
+            if ($rev['page_namespace'] !== '0') {
+                $pageTitle = $namespaces[$rev['page_namespace']] . ":$pageTitle";
+            }
+
+            return [
+                'page_title' => $pageTitle,
+                'page_namespace' => (int) $rev['page_namespace'],
+                'rev_id' => (int) $rev['rev_id'],
+                'timestamp' => DateTime::createFromFormat('YmdHis', $rev['timestamp']),
+                'minor' => (bool) $rev['minor'],
+                'length' => (int) $rev['length'],
+                'length_change' => (int) $rev['length_change'],
+                'comment' => $rev['comment'],
+            ];
+        }, $revs);
+    }
+
+    /**
+     * Get non-automated contributions for the given user.
+     * @param Project $project
+     * @param string|int [$namespace] Namespace ID or 'all'
+     * @param string [$start] Start date in a format accepted by strtotime()
+     * @param string [$end] End date in a format accepted by strtotime()
+     * @return string[] Each tool that they used along with the count and link:
+     *                  [
+     *                      'Twinkle' => [
+     *                          'count' => 50,
+     *                          'link' => 'Wikipedia:Twinkle',
+     *                      ],
+     *                  ]
+     */
+    public function getAutomatedCounts(Project $project, $namespace = 'all', $start = '', $end = '')
+    {
+        return $this->getRepository()->getAutomatedCounts($project, $this, $namespace, $start, $end);
+    }
+
+    /**
      * Is this user the same as the current XTools user?
      * @return bool
      */
