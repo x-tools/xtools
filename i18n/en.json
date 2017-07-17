@@ -55,6 +55,7 @@
   "created-by": "Created by",
   "current-admins": "Current admins",
   "current-size": "Current size",
+  "data-limit": "Data limited to the past $2 {{PLURAL:$1|edit|edits}}",
   "date": "Date",
   "delete": "Delete",
   "deleted": "Deleted",
