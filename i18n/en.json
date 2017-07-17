@@ -2,7 +2,8 @@
   "@metadata": {
     "authors": [
       "MusikAnimal",
-      "Samwilson"
+      "Samwilson",
+      "Framawiki"
     ]
   },
   "about-xtools": "About these tools",
@@ -73,7 +74,7 @@
   "edits-last-year": "Edits in the past 365 days",
   "edits-with-summaries": "Edits with summaries",
   "end": "Ending date",
-  "error-report": "Please feel free to report this error on $1 (Requires a Phabricator account).",
+  "error-report": "Please feel free to report this error on $1 (requires a Wikimedia account).",
   "error-server-message": "The server said: $1",
   "error-title": "A fatal error has occurred within XTools.",
   "events": "Events",
