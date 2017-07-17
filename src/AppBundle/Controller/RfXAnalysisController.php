@@ -162,14 +162,13 @@ class RfXAnalysisController extends Controller
                 'url' => $wikiUrl,
                 'username' => $username,
                 'type' => $type,
-                'project' => $projectData->getDatabaseName(),
+                'project' => $projectData,
                 'support' => $support,
                 'oppose' => $oppose,
                 'neutral' => $neutral,
                 'duplicates' => $dup,
                 'enddate' => $end,
                 'percent' => $percent,
-                'project_url' => $projectData->getUrl(),
                 'pagename' => $pagename,
 
             )

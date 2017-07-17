@@ -135,6 +135,8 @@ And p.page_title LIKE \"$type/%\"";
             [
                 "xtPage" => "rfap",
                 "xtTitle" => $username,
+                "username" => $username,
+                "project" => $project,
                 "data", $finalData
             ]
         );

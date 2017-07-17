@@ -1,15 +1,16 @@
 {% extends "base.html.twig" %}
+{% import 'macros/wiki.html.twig' as wiki %}
 
 {% block body %}
     <div class="panel panel-primary">
         <div class="panel-heading">
             <p class="xt-heading-top">
-                <a href="{{ wiki_link(pagename, project_url) }}">{{ pagename }}</a>
+                {{ wiki.pageLinkRaw(pagename, project, pagename) }}
             </p>
         </div>
         <div class="panel-body xt-panel-body-top">
             <p>
-                {{ wiki_log_link('User:'~username, project_url, msg('block-log'), 'block') }}
+                {{ wiki.userLogLink(user, project, msg('block-log'), 'block') }}
                 &middot;
                 <a href="{{ path('EditCounterResult', {"project":project, "username":username}) }}">{{ msg("tool-ec") }}</a>
                 {% if isWMFLabs() %}
@@ -27,7 +28,7 @@
                     <h4 class="topcaption">{{ msg("general-stats") }}<span class="showhide" onclick="switchShow( 'generalstats', this )">[hide]</span></h4>
                 </div>
                 <div class="panel-body" id="generalstats">
-                    {{ user_link(username, project_url) }}'s {{ type|upper }} ({{ support|length }}/{{ oppose|length }}/{{ neutral|length }}, {{ percent }}%)
+                    {{ wiki.userLink(username, project_url) }}'s {{ type|upper }} ({{ support|length }}/{{ oppose|length }}/{{ neutral|length }}, {{ percent }}%)
                     <br />
                     {{ msg("end") }}: {{ enddate }}
                     <br />
@@ -36,19 +37,19 @@
                                 <h3>{{ msg("support") }}</h3>
                                 <ol>
                                     {% for username in support %}
-                                        <li>{{ user_link(username.name, project_url) }}</li>
+                                        <li>{{ wiki.userLink(username.name, project_url) }}</li>
                                     {% endfor %}
                                 </ol>
                                 <h3>{{ msg("oppose") }}</h3>
                                 <ol>
                                     {% for username in oppose %}
-                                        <li>{{ user_link(username.name, project_url) }}</li>
+                                        <li>{{ wiki.userLink(username.name, project_url) }}</li>
                                     {% endfor %}
                                 </ol>
                                 <h3>{{ msg("neutral") }}</h3>
                                 <ol>
                                     {% for username in neutral %}
-                                        <li>{{ user_link(username.name, project_url) }}</li>
+                                        <li>{{ wiki.userLink(username.name, project_url) }}</li>
                                     {% endfor %}
                                 </ol>
                                 </ol>
