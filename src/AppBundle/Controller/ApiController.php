@@ -16,6 +16,8 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
 use Xtools\ProjectRepository;
 use Xtools\UserRepository;
+use Xtools\Page;
+use Xtools\Edit;
 
 /**
  * Serves the external API of XTools.
@@ -103,8 +105,20 @@ class ApiController extends FOSRestController
         $data = $user->getNonautomatedEdits($project, $namespace, $start, $end, $offset);
 
         if ($format === 'html') {
+            $edits = array_map(function ($attrs) use ($project, $username) {
+                $nsName = '';
+                if ($attrs['page_namespace']) {
+                    $nsName = $project->getNamespaces()[$attrs['page_namespace']];
+                }
+                $page = $project->getRepository()
+                    ->getPage($project, $nsName . ':' . $attrs['page_title']);
+                $attrs['id'] = $attrs['rev_id'];
+                $attrs['username'] = $username;
+                return new Edit($page, $attrs);
+            }, $data);
+
             $data = $twig->render('api/automated_edits.html.twig', [
-                'edits' => $data,
+                'edits' => $edits,
                 'project' => $project,
             ]);
         }

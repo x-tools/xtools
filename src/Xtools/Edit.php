@@ -50,7 +50,14 @@ class Edit extends Model
 
         // Copy over supported attributes
         $this->id = (int) $attrs['id'];
-        $this->timestamp = DateTime::createFromFormat('YmdHis', $attrs['timestamp']);
+
+        // Allow DateTime or string (latter assumed to be of format YmdHis)
+        if ($attrs['timestamp'] instanceof DateTime) {
+            $this->timestamp = $attrs['timestamp'];
+        } else {
+            $this->timestamp = DateTime::createFromFormat('YmdHis', $attrs['timestamp']);
+        }
+
         $this->minor = $attrs['minor'] === '1';
 
         // NOTE: Do not type cast into an integer. Null values are
@@ -178,6 +185,60 @@ class Edit extends Model
     public function getSummary()
     {
         return $this->getComment();
+    }
+
+    /**
+     * Get edit summary as 'wikified' HTML markup
+     * @return string Safe HTML
+     */
+    public function getWikifiedComment()
+    {
+        $summary = htmlspecialchars($this->getSummary());
+        $sectionMatch = null;
+        $isSection = preg_match_all("/^\/\* (.*?) \*\//", $summary, $sectionMatch);
+
+        if ($isSection) {
+            $pageUrl = str_replace('$1', $this->getPage()->getTitle(), $this->getProject()->getArticlePath());
+            $sectionTitle = $sectionMatch[1][0];
+
+            // Must have underscores for the link to properly go to the section
+            $sectionTitleLink = htmlspecialchars(str_replace(' ', '_', $sectionTitle));
+
+            $sectionWikitext = "<a target='_blank' href='$pageUrl#$sectionTitleLink'>&rarr;</a>" .
+                "<em class='text-muted'>" . htmlspecialchars($sectionTitle) . ":</em> ";
+            $summary = str_replace($sectionMatch[0][0], $sectionWikitext, $summary);
+        }
+
+        $linkMatch = null;
+
+        while (preg_match_all("/\[\[(.*?)\]\]/", $summary, $linkMatch)) {
+            $wikiLinkParts = explode('|', $linkMatch[1][0]);
+            $wikiLinkPath = htmlspecialchars($wikiLinkParts[0]);
+            $wikiLinkText = htmlspecialchars(
+                isset($wikiLinkParts[1]) ? $wikiLinkParts[1] : $wikiLinkPath
+            );
+
+            // Use normalized page title (underscored, capitalized)
+            $pageUrl = str_replace(
+                '$1',
+                ucfirst(str_replace(' ', '_', $wikiLinkPath)),
+                $this->getProject()->getArticlePath()
+            );
+
+            $link = "<a target='_blank' href='$pageUrl'>$wikiLinkText</a>";
+            $summary = str_replace($linkMatch[0][0], $link, $summary);
+        }
+
+        return $summary;
+    }
+
+    /**
+     * Get edit summary as 'wikified' HTML markup (alias of Edit::getWikifiedSummary()).
+     * @return string
+     */
+    public function getWikifiedSummary()
+    {
+        return $this->getWikifiedComment();
     }
 
     /**

@@ -81,7 +81,7 @@
                     {{ rev.size|diff_format }}
                 </td>
                 <td class="sort-entry--summary" data-value="{{ rev.comment }}">
-                    {{ rev.comment|wikify_comment(page.title, project.url) }}
+                    {{ rev.wikifiedSummary|raw }}
                 </td>
             </tr>
             {% endfor %}

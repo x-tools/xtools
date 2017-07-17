@@ -65,7 +65,7 @@
                 {{ edit.lengthChange|diff_format }}
             </td>
             <td class="sort-entry--summary" data-value="{{ edit.comment }}">
-                {{ edit.comment|wikify_comment(edit.page.title, project.url) }}
+                {{ edit.wikifiedComment|raw }}
             </td>
         </tr>
     {% endfor %}
