@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.0.1 ##
+- T170367 Figure out XTools Git Repositories
+- PR46 Wikimedia account instead of Phabricator
+
 ## 3.0.0 ##
 - Converted XTools core to Symfony
 - Converted the following tools to Symfony
