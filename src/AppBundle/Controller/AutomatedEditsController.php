@@ -48,9 +48,7 @@ class AutomatedEditsController extends Controller
         $endDate = $request->query->get('end');
 
         // Redirect if the values are set.
-        if ($projectName != '' && $username != '' && ($startDate != '' || $endDate != '')) {
-            // Redirect to the route fully if we have the username project, and any date
-
+        if ($projectName != '' && $username != '' && $namespace != '' && ($startDate != '' || $endDate != '')) {
             // Set start date to beginning of time if end date is provided
             // This is nasty, but necessary given URL structure
             if ($startDate === '') {
@@ -62,25 +60,26 @@ class AutomatedEditsController extends Controller
                 [
                     'project' => $projectName,
                     'username' => $username,
+                    'namespace' => $namespace,
                     'start' => $startDate,
                     'end' => $endDate,
                 ]
             );
-        } elseif ($projectName != '' && $username != '') {
-            // Redirect if we have the username and project
+        } elseif ($projectName != '' && $username != '' && $namespace != '') {
             return $this->redirectToRoute(
                 'autoeditsResult',
                 [
                     'project' => $projectName,
                     'username' => $username,
+                    'namespace' => $namespace,
                 ]
             );
-        } elseif ($projectName != '') {
-            // Redirect if we have the project name
+        } elseif ($projectName != '' && $username != '') {
             return $this->redirectToRoute(
                 'autoeditsResult',
                 [
-                    'project' => $projectName
+                    'project' => $projectName,
+                    'username' => $username,
                 ]
             );
         }

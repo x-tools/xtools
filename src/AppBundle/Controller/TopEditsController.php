@@ -68,8 +68,6 @@ class TopEditsController extends Controller
                 'project' => $projectName,
                 'username' => $username,
             ]);
-        } elseif ($projectName != "") {
-            return $this->redirectToRoute("TopEditsResults", [ 'project'=>$projectName ]);
         }
 
         // Set default project so we can populate the namespace selector.
