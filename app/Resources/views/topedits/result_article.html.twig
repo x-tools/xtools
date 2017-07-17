@@ -88,6 +88,10 @@
         </table>
         {% endset %}
         {{ layout.content_block('topedits-article', content, msg('topedits-article-desc'), null, false, false) }}
+
+        <div class="text-muted times-in-utc" style="clear:both">
+            {{ msg('times-in-utc') }}
+        </div>
     </div>
 </div>
 {% endblock %}
