@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.0.3 ##
+- T170808 Bug fix to allow pages with apostophes in the title
+
 ## 3.0.2 ##
 - T170185 Remove automated edits interface in Edit Counter
 
