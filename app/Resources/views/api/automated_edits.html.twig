@@ -24,17 +24,17 @@
         {% else %}
             {% for edit in edits %}
                 <tr>
-                    <td>{{ wiki.pageLinkRaw(edit.page_title, project) }}</td>
-                    <td>{{ wiki.permaLinkRaw(edit.rev_id, project, edit.timestamp) }}</td>
+                    <td>{{ wiki.pageLink(edit.page) }}</td>
+                    <td>{{ wiki.permaLink(edit) }}</td>
                     <td>
-                        {{ wiki.diffLinkRaw(edit.rev_id, project) }}
+                        {{ wiki.diffLink(edit) }}
                         &middot;
-                        {{ wiki.pageHistLinkRaw(edit.page_title, project) }}
+                        {{ wiki.pageHistLink(edit.page) }}
                     </td>
                     <td>
-                        {{ edit.length_change | diff_format }}
+                        {{ edit.size|diff_format }}
                     </td>
-                    <td>{{ edit.comment | wikify_comment(edit.page_title, project.url) }}</td>
+                    <td>{{ edit.wikifiedComment|raw }}</td>
                 </tr>
             {% endfor %}
         {% endif %}
