@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.0.2 ##
+- T170185 Remove automated edits interface in Edit Counter
+
 ## 3.0.1 ##
 - T170367 Figure out XTools Git Repositories
 - PR46 Wikimedia account instead of Phabricator
