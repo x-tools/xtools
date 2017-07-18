@@ -5,6 +5,7 @@
 
 namespace Xtools;
 
+use Exception;
 use DateInterval;
 use Mediawiki\Api\SimpleRequest;
 use Symfony\Component\DependencyInjection\Container;
@@ -287,11 +288,12 @@ class UserRepository extends Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
+        $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
         $condNamespace = $namespace === 'all' ? '' : 'AND page_namespace = :namespace';
-        $pageJoin = $namespace === 'all' ? '' : 'JOIN page ON page_id = rev_page';
+        $pageJoin = $namespace === 'all' ? '' : "JOIN $pageTable ON rev_page = page_id";
 
-        $sql = "SELECT COUNT(*)
+        $sql = "SELECT COUNT(rev_id)
                 FROM $revisionTable
                 $pageJoin
                 WHERE rev_user_text = :username
@@ -361,21 +363,33 @@ class UserRepository extends Repository
         }
         $this->stopwatch->start($cacheKey, 'XTools');
 
+        // Get the combined regex and tags for the tools
         $conn = $this->getProjectsConnection();
-        $tools = $this->container->getParameter('automated_tools');
-        $toolRegexes = array_map(function ($tool) {
-            return $tool['regex'];
-        }, $tools);
-        $regex = $conn->quote(implode('|', $toolRegexes), \PDO::PARAM_STR);
+        list($regex, $tags) = $this->getToolRegexAndTags($project->getDomain(), $conn);
 
+        $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+        $tagTable = $this->getTableName($project->getDatabaseName(), 'change_tag');
         $condNamespace = $namespace === 'all' ? '' : 'AND page_namespace = :namespace';
-        $pageJoin = $namespace === 'all' ? '' : 'JOIN page ON page_id = rev_page';
-        $sql = "SELECT COUNT(*)
+        $pageJoin = $namespace === 'all' ? '' : "JOIN $pageTable ON page_id = rev_page";
+
+        // Build SQL for detecting autoedits via regex and/or tags
+        $condTools = [];
+        if ($regex != '') {
+            $condTools[] = "rev_comment REGEXP $regex";
+        }
+        if ($tags != '') {
+            $tagJoin = $tags != '' ? "LEFT OUTER JOIN $tagTable ON ct_rev_id = rev_id" : '';
+            $condTools[] = "ct_tag IN ($tags)";
+        }
+        $condTool = 'AND (' . implode(' OR ', $condTools) . ')';
+
+        $sql = "SELECT COUNT(DISTINCT(rev_id))
                 FROM $revisionTable
                 $pageJoin
+                $tagJoin
                 WHERE rev_user_text = :username
-                AND rev_comment REGEXP $regex
+                $condTool
                 $condNamespace
                 $condBegin
                 $condEnd";
@@ -451,18 +465,16 @@ class UserRepository extends Repository
         }
         $this->stopwatch->start($cacheKey, 'XTools');
 
+        // Get the combined regex and tags for the tools
         $conn = $this->getProjectsConnection();
-
-        // Build regex for all semi-automated tools
-        $tools = $this->container->getParameter('automated_tools');
-        $toolRegexes = array_map(function ($tool) {
-            return $tool['regex'];
-        }, $tools);
-        $regex = $conn->quote(implode('|', $toolRegexes), \PDO::PARAM_STR);
+        list($regex, $tags) = $this->getToolRegexAndTags($project->getDomain(), $conn);
 
         $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+        $tagTable = $this->getTableName($project->getDatabaseName(), 'change_tag');
         $condNamespace = $namespace === 'all' ? '' : 'AND page_namespace = :namespace';
+        $tagJoin = $tags != '' ? "LEFT OUTER JOIN $tagTable ON (ct_rev_id = revs.rev_id)" : '';
+        $condTag = $tags != '' ? "AND (ct_tag NOT IN ($tags) OR ct_tag IS NULL)" : '';
         $sql = "SELECT
                     page_title,
                     page_namespace,
@@ -475,9 +487,11 @@ class UserRepository extends Repository
                 FROM $pageTable
                 JOIN $revisionTable AS revs ON (page_id = revs.rev_page)
                 LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+                $tagJoin
                 WHERE revs.rev_user_text = :username
                 AND revs.rev_timestamp > 0
                 AND revs.rev_comment NOT RLIKE $regex
+                $condTag
                 $condBegin
                 $condEnd
                 $condNamespace
@@ -561,7 +575,7 @@ class UserRepository extends Repository
         $conn = $this->getProjectsConnection();
 
         // Load the semi-automated edit types.
-        $tools = $this->container->getParameter('automated_tools');
+        $tools = $this->getTools($project->getDomain());
 
         // Create a collection of queries that we're going to run.
         $queries = [];
@@ -569,20 +583,47 @@ class UserRepository extends Repository
         $revisionTable = $project->getRepository()->getTableName($project->getDatabaseName(), 'revision');
         $archiveTable = $project->getRepository()->getTableName($project->getDatabaseName(), 'archive');
         $pageTable = $project->getRepository()->getTableName($project->getDatabaseName(), 'page');
+        $tagTable = $project->getRepository()->getTableName($project->getDatabaseName(), 'change_tag');
 
-        $pageJoin = $namespace !== 'all' ? "JOIN $pageTable ON rev_page = page_id" : null;
+        $pageJoin = $namespace !== 'all' ? "LEFT JOIN $pageTable ON rev_page = page_id" : null;
         $condNamespace = $namespace !== 'all' ? "AND page_namespace = :namespace" : null;
 
         foreach ($tools as $toolname => $values) {
+            $tagJoin = '';
+            $condTool = '';
             $toolname = $conn->quote($toolname, \PDO::PARAM_STR);
-            $regex = $conn->quote($values['regex'], \PDO::PARAM_STR);
+
+            if (isset($values['regex'])) {
+                $regex = $conn->quote($values['regex'], \PDO::PARAM_STR);
+                $condTool = "rev_comment REGEXP $regex";
+            }
+            if (isset($values['tag'])) {
+                $tagJoin = "LEFT OUTER JOIN $tagTable ON ct_rev_id = rev_id";
+                $tag = $conn->quote($values['tag'], \PDO::PARAM_STR);
+
+                // Append to regex clause if already present.
+                // Tags are more reliable but may not be present for edits made with
+                //   older versions of the tool, before it started adding tags.
+                if ($condTool === '') {
+                    $condTool = "ct_tag = $tag";
+                } else {
+                    $condTool = '(' . $condTool . " OR ct_tag = $tag)";
+                }
+            }
+
+            // Developer error, no regex or tag provided for this tool.
+            if ($condTool === '') {
+                throw new Exception("No regex or tag found for the tool $toolname. " .
+                    "Please verify this entry in semi_automated.yml");
+            }
 
             $queries[] .= "
-                SELECT $toolname AS toolname, COUNT(*) AS count
+                SELECT $toolname AS toolname, COUNT(rev_id) AS count
                 FROM $revisionTable
                 $pageJoin
+                $tagJoin
                 WHERE rev_user_text = :username
-                AND rev_comment REGEXP $regex
+                AND $condTool
                 $condNamespace
                 $condBegin
                 $condEnd";
@@ -647,5 +688,54 @@ class UserRepository extends Repository
         /** @var Session $session */
         $session = $this->container->get('session');
         return $session->get('logged_in_user');
+    }
+
+    /**
+     * Get list of automated tools and their associated info for the
+     *   given project. This defaults to the 'default_project' if
+     *   entries for the given project are not found.
+     * @param  string $projectDomain Such as en.wikipedia.org
+     * @return string[] Each tool with the tool name as the key,
+     *   and 'link', 'regex' or 'tag' as the subarray keys.
+     */
+    private function getTools($projectDomain)
+    {
+        // Load the semi-automated edit types.
+        $toolsByWiki = $this->container->getParameter('automated_tools');
+
+        // Default to default project (e.g. enwiki) if wiki not configured
+        if (isset($toolsByWiki[$projectDomain])) {
+            return $toolsByWiki[$projectDomain];
+        } else {
+            return $toolsByWiki[$this->container->getParameter('default_project')];
+        }
+    }
+
+    /**
+     * Get the combined regex and tags for all semi-automated tools,
+     *   ready to be used in a query.
+     * @param string $projectDomain Such as en.wikipedia.org
+     * @param $conn Doctrine\DBAL\Connection Used for proper escaping
+     * @return string[] In the format:
+     *    ['combined|regex', 'combined,tags']
+     */
+    private function getToolRegexAndTags($projectDomain, $conn)
+    {
+        $tools = $this->getTools($projectDomain);
+        $regexes = [];
+        $tags = [];
+        foreach ($tools as $tool => $values) {
+            if (isset($values['regex'])) {
+                $regexes[] = $values['regex'];
+            }
+            if (isset($values['tag'])) {
+                $tags[] = $conn->quote($values['tag'], \PDO::PARAM_STR);
+            }
+        }
+
+        return [
+            $conn->quote(implode('|', $regexes), \PDO::PARAM_STR),
+            implode(',', $tags),
+        ];
     }
 }

@@ -30,13 +30,14 @@ $(function () {
     {
         $('.non-auto-edits-loading').show();
         $('.non-auto-edits-container').hide();
-        var username = $('.non-auto-edits-container').data('username'),
+        var project = $('.non-auto-edits-container').data('project'),
+            username = $('.non-auto-edits-container').data('username'),
             start = $('.non-auto-edits-container').data('start'),
             end = $('.non-auto-edits-container').data('end'),
             namespace = $('.non-auto-edits-container').data('namespace');
 
         $.ajax({
-            url: xtBaseUrl + 'api/nonautomated_edits/en.wikipedia.org/' + username + '/' +
+            url: xtBaseUrl + 'api/nonautomated_edits/' + project + '/' + username + '/' +
                 namespace + '/' + start + '/' + end + '/' + editOffset + '/html',
             timeout: 30000
         }).done(function (data) {
