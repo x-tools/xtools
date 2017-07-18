@@ -124,7 +124,7 @@
             <tr>
                 <td>{{ msg('pages-created') }}</td>
                 <td>
-                    <a href="{{ path('PagesResult', {project:project.domain, username:user.username, namespace:'all', redirects:'none'}) }}">{{ ec.countPagesCreated|number_format }}</a>
+                    <a href="{{ path('PagesResult', {project:project.domain, username:user.username, namespace:'all', redirects:'noredirects'}) }}">{{ ec.countPagesCreated|number_format }}</a>
                     <span class="text-muted">({{ msg('pages-created-since-deleted', [ec.countPagesCreatedDeleted|number_format]) }})</span>
                 </td>
             </tr>
