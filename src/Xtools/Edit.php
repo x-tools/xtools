@@ -198,7 +198,11 @@ class Edit extends Model
         $isSection = preg_match_all("/^\/\* (.*?) \*\//", $summary, $sectionMatch);
 
         if ($isSection) {
-            $pageUrl = str_replace('$1', $this->getPage()->getTitle(), $this->getProject()->getArticlePath());
+            $pageUrl = $this->getProject()->getUrl(false) . str_replace(
+                '$1',
+                $this->getPage()->getTitle(),
+                $this->getProject()->getArticlePath()
+            );
             $sectionTitle = $sectionMatch[1][0];
 
             // Must have underscores for the link to properly go to the section
@@ -219,7 +223,7 @@ class Edit extends Model
             );
 
             // Use normalized page title (underscored, capitalized)
-            $pageUrl = str_replace(
+            $pageUrl = $this->getProject()->getUrl(false) . str_replace(
                 '$1',
                 ucfirst(str_replace(' ', '_', $wikiLinkPath)),
                 $this->getProject()->getArticlePath()

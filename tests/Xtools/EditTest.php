@@ -48,6 +48,13 @@ class EditTest extends \PHPUnit_Framework_TestCase
     {
         $project = new Project('TestProject');
         $projectRepo = $this->getMock(ProjectRepository::class);
+        $projectRepo->expects($this->once())
+            ->method('getOne')
+            ->willReturn([
+                'url' => 'https://test.example.org',
+                'dbName' => 'test_wiki',
+                'lang' => 'en',
+            ]);
         $project->setRepository($projectRepo);
         $page = new Page($project, 'Test_page');
         $edit = new Edit($page, [
@@ -62,7 +69,7 @@ class EditTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             "&lt;script&gt;alert(&quot;XSS baby&quot;)&lt;/script&gt; " .
-                "<a target='_blank' href='/wiki/Test_page'>test page</a>",
+                "<a target='_blank' href='https://test.example.org/wiki/Test_page'>test page</a>",
             $edit->getWikifiedSummary()
         );
     }
