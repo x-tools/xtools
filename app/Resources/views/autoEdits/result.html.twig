@@ -82,8 +82,8 @@
                 {{
                     chart.pie_chart('auto_edits',
                         [{
-                            label: msg('total-edits'),
-                            value: editCount,
+                            label: msg('non-auto-edits'),
+                            value: editCount - autoCount,
                             percentage: 100 - autoPct
                         },
                         {
@@ -171,6 +171,9 @@
                 });
                 window.countsByTool = {{ toolCounts|json_encode()|raw }};
             </script>
+            <p style="clear:both">
+                <a target="_blank" href="https://phabricator.wikimedia.org/maniphest/task/create/?title=Request to add tool to AutoEdits&amp;projects=Tool-labs-tools-xtools&amp;description=Project: {{ project.domain }}%0A%0AName of tool:%0A%0ALinks to example edits:%0A%0ALink to the tool's documentation or homepage:">{{ msg('auto-edits-request') }}</a>
+            </p>
         {% endset %}
         {{ layout.content_block('auto-edits', content) }}
 
@@ -178,6 +181,7 @@
             <div>
                 <em class="non-auto-edits-loading text-muted">{{ msg('loading') }}...</em>
                 <div class="non-auto-edits-container"
+                    data-project="{{ project.domain }}"
                     data-username="{{ user.username }}"
                     data-start="{{ start }}"
                     data-end="{{ end }}"

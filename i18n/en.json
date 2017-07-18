@@ -28,6 +28,7 @@
   "assessment": "Assessment",
   "assessments": "Assessments",
   "auto-edits": "(Semi-)automated edits",
+  "auto-edits-request": "Request that a new (semi-)automated tool be added",
   "average-change-per-page": "Average change per page",
   "average-edit-size": "Average edit size",
   "average-edits-per-day": "Average edits per day",
