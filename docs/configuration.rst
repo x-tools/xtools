@@ -44,8 +44,8 @@ Authentication and Email
 
 The Oauth details need to be requested from ``Special:OAuthConsumerRegistration`` on your default wiki.
 
-- **auth_key** - Oauth consumer key
-- **auth_secret** - Oauth consumer secret
+- **oauth_key** - Oauth consumer key
+- **oauth_secret** - Oauth consumer secret
 - **mailer_transport** - Software for the mailer
 - **mailer_host** - Hostname for the mailer
 - **mailer_user** - Username for the mailer software
