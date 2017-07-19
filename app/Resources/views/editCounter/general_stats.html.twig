@@ -64,16 +64,20 @@
             <td class="stat-list--new-group">{{ msg('live-edits') }}</td>
             <td class="stat-list--new-group">
                 {{ wiki.pageLinkRaw('Special:Contributions/'~user.username, project, ec.countLiveRevisions|number_format) }}
-                &middot;
-                ({{ ((ec.countLiveRevisions / ec.countAllRevisions) * 100)|percent_format }})
+                {% if ec.countAllRevisions %}
+                    &middot;
+                    ({{ ((ec.countLiveRevisions / ec.countAllRevisions) * 100)|percent_format }})
+                {% endif %}
             </td>
         </tr>
         <tr>
             <td>{{ msg('deleted-edits') }}</td>
             <td>
                 {{ wiki.pageLinkRaw('Special:DeletedContributions/'~user.username, project, ec.countDeletedRevisions|number_format) }}
-                &middot;
-                ({{ ((ec.countDeletedRevisions / ec.countAllRevisions) * 100)|percent_format }})
+                {% if ec.countAllRevisions %}
+                    &middot;
+                    ({{ ((ec.countDeletedRevisions / ec.countAllRevisions) * 100)|percent_format }})
+                {% endif %}
             </td>
         </tr>
         <tr>
@@ -175,40 +179,50 @@
                     {% else %}
                         {{ ec.countAutomatedEdits }}
                     {% endif %}
-                    &middot;
-                    ({{ ((ec.countAutomatedEdits / ec.countLiveRevisions) * 100)|percent_format }})
+                    {% if ec.countLiveRevisions %}
+                        &middot;
+                        ({{ ((ec.countAutomatedEdits / ec.countLiveRevisions) * 100)|percent_format }})
+                    {% endif %}
                 </td>
             </tr>
             <tr>
                 <td>{{ msg('edits-with-summaries') }}</td>
                 <td>
                     {{ ec.countRevisionsWithComments|number_format }}
-                    &middot;
-                    ({{ ((ec.countRevisionsWithComments / ec.countLiveRevisions) * 100)|percent_format }})
+                    {% if ec.countLiveRevisions %}
+                        &middot;
+                        ({{ ((ec.countRevisionsWithComments / ec.countLiveRevisions) * 100)|percent_format }})
+                    {% endif %}
                 </td>
             </tr>
             <tr>
                 <td>{{ msg('minor-edits') }}</td>
                 <td>
                     {{ ec.countMinorRevisions|number_format }}
-                    &middot;
-                    ({{ ((ec.countMinorRevisions / ec.countLiveRevisions) * 100)|percent_format }})
+                    {% if ec.countLiveRevisions %}
+                        &middot;
+                        ({{ ((ec.countMinorRevisions / ec.countLiveRevisions) * 100)|percent_format }})
+                    {% endif %}
                 </td>
             </tr>
             <tr>
                 <td>{{ msg('small-edits') }}*</td>
                 <td>
                     {{ ec.countSmallEdits|number_format }}
-                    &middot;
-                    ({{ ((ec.countSmallEdits / ec.countLast5000) * 100)|percent_format }})
+                    {% if ec.countLast5000 %}
+                        &middot;
+                        ({{ ((ec.countSmallEdits / ec.countLast5000) * 100)|percent_format }})
+                    {% endif %}
                 </td>
             </tr>
             <tr>
                 <td>{{ msg('large-edits') }}*</td>
                 <td>
                     {{ ec.countLargeEdits|number_format }}
-                    &middot;
-                    ({{ ((ec.countLargeEdits / ec.countLast5000) * 100)|percent_format }})
+                    {% if ec.countLast5000 %}
+                        &middot;
+                        ({{ ((ec.countLargeEdits / ec.countLast5000) * 100)|percent_format }})
+                    {% endif %}
                 </td>
             </tr>
         </tbody>
@@ -399,6 +413,7 @@
         </tfoot>
     </table>
 </div>
+{% if ec.countLiveRevisions %}
 <div class="basic-info-charts col-lg-12 clearfix">
     {{
         chart.pie_chart('summaries',
@@ -446,6 +461,7 @@
         * {{ msg('data-limit', [5000, 5000|number_format]) }}
     </div>
 </div>
+{% endif %}
 
 {% if not is_sub_request %}
     </div></section>
