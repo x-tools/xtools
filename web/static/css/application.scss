@@ -398,7 +398,9 @@ section > .panel-body {
     &:last-child > *:first-child {
         border-bottom-left-radius: 4px;
     }
-    &:last-child > *:last-child {
+    // Use .form-control:last-of-type to account for
+    //   typeahead DOM element at bottom of form
+    &:last-child > .form-control:last-of-type {
         border-bottom-right-radius: 4px;
     }
 }
