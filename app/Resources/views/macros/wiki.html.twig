@@ -7,7 +7,7 @@
 {% endmacro %}
 
 {% macro pageUrlRaw(pageTitle, project) %}{% spaceless %}
-    {% set articlePath = project.articlePath|replace({'$1': (pageTitle|replace({' ': '_'}))}) %}
+    {% set articlePath = project.articlePath|replace({'$1': (pageTitle|replace({' ': '_'})|e('url'))}) %}
     {{ (project.url|trim('/')) ~ articlePath }}
 {% endspaceless %}{% endmacro %}
 
@@ -133,7 +133,7 @@
 {% macro pageLogLinkRaw(pageTitle, project, label = null, type = null) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {% set articlePath = project.articlePath|replace({'$1': ('Special:Log'|replace({' ': '_'}))}) %}
-    {% set url = (project.url|trim('/')) ~ articlePath ~ '?page=' ~ pageTitle|replace({' ': '_'}) %}
+    {% set url = (project.url|trim('/')) ~ articlePath ~ '?page=' ~ pageTitle|replace({' ': '_'})|e('url') %}
     {% if type is not empty %}
         {% set url = url ~ '&type=' ~ type %}
     {% endif %}

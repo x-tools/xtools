@@ -79,7 +79,7 @@
                                     &middot;
                                 {% endif %}
                                 {% if isWMFLabs() %}
-                                    <a title="{{ msg('global-contribs') }}" href="//tools.wmflabs.org/guc/?user={{ username|e }}" >guc</a> &middot;
+                                    <a title="{{ msg('global-contribs') }}" href="//tools.wmflabs.org/guc/?user={{ username|e('url') }}" >guc</a> &middot;
                                 {% endif %}
                                 {{ wiki.userLogLink(username, project, msg('log')|lower) }}
                             </td>
