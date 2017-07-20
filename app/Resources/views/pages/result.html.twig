@@ -51,7 +51,7 @@
                 <span>
                     <a href="#{{ key }}" data-section="{{ key }}">{{ nsName(key, namespaces) }}</a>
                     {% if count[key + 1] is defined %}
-                        (<a href="#{{ key+1 }}" data-section="{{ key+1 }}">{{ msg('talk') | lower }}</a>)
+                        (<a href="#{{ key+1 }}" data-section="{{ key+1 }}">{{ msg('talk')|lower }}</a>)
                     {% endif %}
                 </span>
             {% endfor %}
@@ -79,7 +79,7 @@
                     {% for key in summaryColumns %}
                         <th>
                             <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                                {{ msg(key) | capitalize_first }}
+                                {{ msg(key)|capitalize_first }}
                                 <span class="glyphicon glyphicon-sort"></span>
                             </span>
                         </th>
@@ -109,13 +109,13 @@
                             <td class="sort-entry--redirects" data-value="{{ value.redirect }}">
                                 {{ value.redirect }}
                                 {% if redirect != 'onlyredirects' %}
-                                    ({{ value.redirect | percent_format(value.total) }})
+                                    ({{ value.redirect|percent_format(value.total) }})
                                 {% endif %}
                             </td>
                         {% endif %}
                         <td class="sort-entry--deleted" data-value="{{ value.deleted }}">
                             {{ value.deleted }}
-                            ({{ value.deleted | percent_format(value.total) }})
+                            ({{ value.deleted|percent_format(value.total) }})
                         </td>
                     </tr>
                     {% endfor %}
@@ -127,17 +127,17 @@
                             {{ msg('num-namespaces', [pages|length]) }}
                         </th>
                         <th class="namespaces--pages">
-                            {{ total | number_format }}
+                            {{ total|number_format }}
                         </th>
                         {% if 'redirects' in summaryColumns and 'pages' in summaryColumns %}
                             <th class="namespaces--redirects">
-                                {{ redirectTotal | number_format }}
-                                ({{ redirectTotal | percent_format(total) }})
+                                {{ redirectTotal|number_format }}
+                                ({{ redirectTotal|percent_format(total) }})
                             </th>
                         {% endif %}
                         <th class="namespaces--deleted">
-                            {{ deletedTotal | number_format }}
-                            ({{ deletedTotal | percent_format(total) }})
+                            {{ deletedTotal|number_format }}
+                            ({{ deletedTotal|percent_format(total) }})
                         </th>
                     </tfoot>
                 {% endif %}
@@ -162,7 +162,7 @@
                         {% for thKey in columns %}
                             <th>
                                 <span class="sort-link sort-link--{{ thKey }}" data-column="{{ thKey }}">
-                                    {{ msg(thKey) | capitalize_first }}
+                                    {{ msg(thKey)|capitalize_first }}
                                     <span class="glyphicon glyphicon-sort"></span>
                                 </span>
                             </th>
@@ -176,7 +176,7 @@
                             {% for page in pageList if not(multiNamspace) or (index < maxRows and multiNamspace) %}
                                 {% set index = index + 1 %}
                                 {% if key == 0 %}
-                                    {% set pagename = page.page_title | e %}
+                                    {% set pagename = page.page_title %}
                                 {% else %}
                                     {% set pagename = namespaces[key] ~ ":" ~ page.page_title %}
                                 {% endif %}
@@ -201,10 +201,10 @@
                                         {% endif %}
                                     </td>
                                     <td class="sort-entry--original-size" data-value="{{ page.rev_len }}">
-                                        {{ page.rev_len | number_format }}
+                                        {{ page.rev_len|number_format }}
                                     </td>
                                     <td class="sort-entry--current-size" data-value="{{ page.page_len }}">
-                                        {{ page.page_len | number_format }}
+                                        {{ page.page_len|number_format }}
                                     </td>
                                     {% if key == '0' and hasPageAssessments %}
                                         <td class="sort-entry--assessment" data-value="{{ page.pa_class ? page.pa_class : 'Unknown' }}">
@@ -228,7 +228,7 @@
                                         {% endif %}
                                         {% if isWMFLabs() %}
                                             &middot;
-                                            <a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project.domain }}&amp;pages={{ pagename }}">
+                                            <a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project.domain }}&amp;pages={{ pagename|e('url') }}">
                                                 {{ msg('pageviews') }}
                                             </a>
                                         {% endif %}
@@ -294,7 +294,7 @@
                     }
                 }
             });
-            window.countsByNamespace = {{ count | json_encode() | raw }};
+            window.countsByNamespace = {{ count|json_encode()|raw }};
         </script>
     {% endif %}
 </div>
