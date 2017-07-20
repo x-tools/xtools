@@ -25,3 +25,7 @@ monolog:
             level: debug
         console:
             type:  console
+
+assetic:
+    bundles:
+      - AppBundle
