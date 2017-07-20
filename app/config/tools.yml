@@ -8,6 +8,7 @@ parameters:
     autoedits: autoedits
     adminstats: adminstats
     adminscore: adminscore
+    es: es
     rfa: rfa
     rfap: rfap
     bash: bash
