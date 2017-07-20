@@ -127,7 +127,7 @@ class ArticleInfoController extends Controller
         $page->setRepository($pageRepo);
 
         if (!$page->exists()) {
-            $this->addFlash('notice', ['no-exist', $pageQuery]);
+            $this->addFlash('notice', ['no-exist', str_replace('_', ' ', $pageQuery)]);
             return $this->redirectToRoute('articleInfo');
         }
 
@@ -164,7 +164,7 @@ class ArticleInfoController extends Controller
         if ($assessments) {
             $this->pageInfo['assessments'] = $assessments;
         }
-        $this->setLogsEvents();
+        $this->setLogsEvents($page);
 
         $bugs = $page->getErrors();
         if (!empty($bugs)) {
@@ -310,17 +310,21 @@ class ArticleInfoController extends Controller
     /**
      * Query for log events during each year of the article's history,
      *   and set the results in $this->pageInfo['year_count']
+     * @param Page $page
      */
-    private function setLogsEvents()
+    private function setLogsEvents($page)
     {
         $loggingTable = $this->projectRepo->getTableName($this->dbName, 'logging', 'logindex');
-        $title = str_replace(' ', '_', $this->pageInfo['page']->getTitle());
-        $query = "SELECT log_action, log_type, log_timestamp AS timestamp
-                  FROM $loggingTable
-                  WHERE log_namespace = '" . $this->pageInfo['page']->getNamespace() . "'
-                  AND log_title = '$title' AND log_timestamp > 1
-                  AND log_type IN ('delete', 'move', 'protect', 'stable')";
-        $events = $this->conn->query($query)->fetchAll();
+        $title = str_replace(' ', '_', $page->getTitle());
+        $sql = "SELECT log_action, log_type, log_timestamp AS timestamp
+                FROM $loggingTable
+                WHERE log_namespace = '" . $page->getNamespace() . "'
+                AND log_title = :title AND log_timestamp > 1
+                AND log_type IN ('delete', 'move', 'protect', 'stable')";
+        $resultQuery = $this->conn->prepare($sql);
+        $resultQuery->bindParam(':title', $title);
+        $resultQuery->execute();
+        $events = $resultQuery->fetchAll();
 
         foreach ($events as $event) {
             $time = strtotime($event['timestamp']);

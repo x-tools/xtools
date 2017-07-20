@@ -5,7 +5,6 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Helper\AutomatedEditsHelper;
 use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -16,6 +15,9 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
 use Xtools\ProjectRepository;
+use Xtools\UserRepository;
+use Xtools\Page;
+use Xtools\Edit;
 
 /**
  * Serves the external API of XTools.
@@ -81,24 +83,42 @@ class ApiController extends FOSRestController
 
     /**
      * Get non-automated edits for the given user.
-     * @Rest\Get("/api/nonautomated_edits/{project}/{username}/{namespace}/{offset}/{format}")
+     * @Rest\Get(
+     *   "/api/nonautomated_edits/{project}/{username}/{namespace}/{start}/{end}/{offset}/{format}",
+     *   requirements={"start" = "|\d{4}-\d{2}-\d{2}", "end" = "|\d{4}-\d{2}-\d{2}"}
+     * )
      * @param string $project
      * @param string $username
-     * @param string $namespace
-     * @param int $offset
-     * @param string $format
+     * @param int|string $namespace ID of the namespace, or 'all' for all namespaces
+     * @param string $start In the format YYYY-MM-DD
+     * @param string $end In the format YYYY-MM-DD
+     * @param int $offset For pagination, offset results by N edits
+     * @param string $format 'json' or 'html'
      * @return View
      */
-    public function nonautomatedEdits($project, $username, $namespace, $offset = 0, $format = 'json')
+    public function nonautomatedEdits($project, $username, $namespace, $start, $end, $offset = 0, $format = 'json')
     {
         $twig = $this->container->get('twig');
         $aeh = $this->get('app.automated_edits_helper');
         $project = ProjectRepository::getProject($project, $this->container);
-        $data = $aeh->getNonautomatedEdits($project, $username, $namespace, $offset);
+        $user = UserRepository::getUser($username, $this->container);
+        $data = $user->getNonautomatedEdits($project, $namespace, $start, $end, $offset);
 
         if ($format === 'html') {
+            $edits = array_map(function ($attrs) use ($project, $username) {
+                $nsName = '';
+                if ($attrs['page_namespace']) {
+                    $nsName = $project->getNamespaces()[$attrs['page_namespace']];
+                }
+                $page = $project->getRepository()
+                    ->getPage($project, $nsName . ':' . $attrs['page_title']);
+                $attrs['id'] = $attrs['rev_id'];
+                $attrs['username'] = $username;
+                return new Edit($page, $attrs);
+            }, $data);
+
             $data = $twig->render('api/automated_edits.html.twig', [
-                'edits' => $data,
+                'edits' => $edits,
                 'project' => $project,
             ]);
         }

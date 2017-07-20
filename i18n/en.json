@@ -2,7 +2,8 @@
   "@metadata": {
     "authors": [
       "MusikAnimal",
-      "Samwilson"
+      "Samwilson",
+      "Framawiki"
     ]
   },
   "about-xtools": "About these tools",
@@ -55,6 +56,7 @@
   "created-by": "Created by",
   "current-admins": "Current admins",
   "current-size": "Current size",
+  "data-limit": "Data limited to the past $2 {{PLURAL:$1|edit|edits}}",
   "date": "Date",
   "delete": "Delete",
   "deleted": "Deleted",
@@ -72,7 +74,7 @@
   "edits-last-year": "Edits in the past 365 days",
   "edits-with-summaries": "Edits with summaries",
   "end": "Ending date",
-  "error-report": "Please feel free to report this error on $1 (Requires a Phabricator account).",
+  "error-report": "Please feel free to report this error on $1 (requires a Wikimedia account).",
   "error-server-message": "The server said: $1",
   "error-title": "A fatal error has occurred within XTools.",
   "events": "Events",
@@ -256,7 +258,7 @@
   "thank": "Thank",
   "thursday": "Thursday",
   "timecard": "Time card",
-  "timecard-chart-desc": "Note that times here are shown relative to your current timezone.",
+  "times-in-utc": "All times are in UTC.",
   "too-many-revisions": "This article has over 50,000 revisions. Data for the first 50,000 are shown below.",
   "tool": "Tool",
   "tool-adminscore": "Admin Score",

@@ -6,9 +6,11 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 project = u'XTools'
-copyright = u'2008-2017, STools Maintainers'
 
-version = '0.2.0'
+# The release process is documented at https://xtools.readthedocs.io/en/latest/development.html#releases
+copyright = u'2008–2017, XTools contributors'
+version = '3.0'
+release = '3.0.3'
 
 # -- Options for HTML output ---------------------------------------------------
 

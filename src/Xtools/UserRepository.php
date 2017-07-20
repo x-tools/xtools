@@ -253,6 +253,392 @@ class UserRepository extends Repository
     }
 
     /**
+     * Get edit count within given timeframe and namespace
+     * @param Project $project
+     * @param User $user
+     * @param int|string [$namespace] Namespace ID or 'all' for all namespaces
+     * @param string [$start] Start date in a format accepted by strtotime()
+     * @param string [$end] End date in a format accepted by strtotime()
+     */
+    public function countEdits(Project $project, User $user, $namespace = 'all', $start = '', $end = '')
+    {
+        $cacheKey = 'editcount.' . $project->getDatabaseName() . '.'
+            . $user->getCacheKey() . '.' . $namespace;
+
+        $condBegin = '';
+        $condEnd = '';
+
+        if (!empty($start)) {
+            $cacheKey .= '.' . $start;
+
+            // For the query
+            $start = date('Ymd000000', strtotime($start));
+            $condBegin = 'AND rev_timestamp >= :start ';
+        }
+        if (!empty($end)) {
+            $cacheKey .= '.' . $end;
+
+            // For the query
+            $end = date('Ymd235959', strtotime($end));
+            $condEnd = 'AND rev_timestamp <= :end ';
+        }
+
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+        $condNamespace = $namespace === 'all' ? '' : 'AND page_namespace = :namespace';
+        $pageJoin = $namespace === 'all' ? '' : 'JOIN page ON page_id = rev_page';
+
+        $sql = "SELECT COUNT(*)
+                FROM $revisionTable
+                $pageJoin
+                WHERE rev_user_text = :username
+                $condNamespace
+                $condBegin
+                $condEnd";
+
+        $username = $user->getUsername();
+        $conn = $this->getProjectsConnection();
+        $resultQuery = $conn->prepare($sql);
+        $resultQuery->bindParam('username', $username);
+        if (!empty($start)) {
+            $resultQuery->bindParam('start', $start);
+        }
+        if (!empty($end)) {
+            $resultQuery->bindParam('end', $end);
+        }
+        if ($namespace !== 'all') {
+            $resultQuery->bindParam('namespace', $namespace);
+        }
+        $resultQuery->execute();
+        $result = $resultQuery->fetchColumn();
+
+        // Cache for 10 minutes, and return.
+        $cacheItem = $this->cache->getItem($cacheKey)
+            ->set($result)
+            ->expiresAfter(new DateInterval('PT10M'));
+        $this->cache->save($cacheItem);
+
+        return $result;
+    }
+
+    /**
+     * Get the number of edits this user made using semi-automated tools.
+     * @param Project $project
+     * @param User $user
+     * @param string|int [$namespace] Namespace ID or 'all'
+     * @param string [$start] Start date in a format accepted by strtotime()
+     * @param string [$end] End date in a format accepted by strtotime()
+     * @return string[] Result of query, see below.
+     */
+    public function countAutomatedEdits(Project $project, User $user, $namespace = 'all', $start = '', $end = '')
+    {
+        $cacheKey = 'autoeditcount.' . $project->getDatabaseName() . '.'
+            . $user->getCacheKey() . '.' . $namespace;
+
+        $condBegin = '';
+        $condEnd = '';
+
+        if (!empty($start)) {
+            $cacheKey .= '.' . $start;
+
+            // For the query
+            $start = date('Ymd000000', strtotime($start));
+            $condBegin = 'AND rev_timestamp >= :start ';
+        }
+        if (!empty($end)) {
+            $cacheKey .= '.' . $end;
+
+            // For the query
+            $end = date('Ymd235959', strtotime($end));
+            $condEnd = 'AND rev_timestamp <= :end ';
+        }
+
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+        $this->stopwatch->start($cacheKey, 'XTools');
+
+        $conn = $this->getProjectsConnection();
+        $tools = $this->container->getParameter('automated_tools');
+        $toolRegexes = array_map(function ($tool) {
+            return $tool['regex'];
+        }, $tools);
+        $regex = $conn->quote(implode('|', $toolRegexes), \PDO::PARAM_STR);
+
+        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+        $condNamespace = $namespace === 'all' ? '' : 'AND page_namespace = :namespace';
+        $pageJoin = $namespace === 'all' ? '' : 'JOIN page ON page_id = rev_page';
+        $sql = "SELECT COUNT(*)
+                FROM $revisionTable
+                $pageJoin
+                WHERE rev_user_text = :username
+                AND rev_comment REGEXP $regex
+                $condNamespace
+                $condBegin
+                $condEnd";
+
+        $username = $user->getUsername();
+        $resultQuery = $conn->prepare($sql);
+        $resultQuery->bindParam('username', $username);
+        if (!empty($start)) {
+            $resultQuery->bindParam('start', $start);
+        }
+        if (!empty($end)) {
+            $resultQuery->bindParam('end', $end);
+        }
+        if ($namespace !== 'all') {
+            $resultQuery->bindParam('namespace', $namespace);
+        }
+        $resultQuery->execute();
+        $result = $resultQuery->fetchColumn();
+
+        // Cache for 10 minutes, and return.
+        $cacheItem = $this->cache->getItem($cacheKey)
+            ->set($result)
+            ->expiresAfter(new DateInterval('PT10M'));
+        $this->cache->save($cacheItem);
+        $this->stopwatch->stop($cacheKey);
+
+        return $result;
+    }
+
+    /**
+     * Get non-automated contributions for the given user.
+     * @param Project $project
+     * @param User $user
+     * @param string|int [$namespace] Namespace ID or 'all'
+     * @param string [$start] Start date in a format accepted by strtotime()
+     * @param string [$end] End date in a format accepted by strtotime()
+     * @param int [$offset] Used for pagination, offset results by N edits
+     * @return string[] Result of query, with columns 'page_title',
+     *   'page_namespace', 'rev_id', 'timestamp', 'minor',
+     *   'length', 'length_change', 'comment'
+     */
+    public function getNonAutomatedEdits(
+        Project $project,
+        User $user,
+        $namespace = 'all',
+        $start = '',
+        $end = '',
+        $offset = 0
+    ) {
+        $cacheKey = 'nonautoedits.' . $project->getDatabaseName() . '.'
+            . $user->getCacheKey() . '.' . $namespace . '.' . $offset;
+
+        $condBegin = '';
+        $condEnd = '';
+
+        if (!empty($start)) {
+            $cacheKey .= '.' . $start;
+
+            // For the query
+            $start = date('Ymd000000', strtotime($start));
+            $condBegin = 'AND revs.rev_timestamp >= :start ';
+        }
+        if (!empty($end)) {
+            $cacheKey .= '.' . $end;
+
+            // For the query
+            $end = date('Ymd235959', strtotime($end));
+            $condEnd = 'AND revs.rev_timestamp <= :end ';
+        }
+
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+        $this->stopwatch->start($cacheKey, 'XTools');
+
+        $conn = $this->getProjectsConnection();
+
+        // Build regex for all semi-automated tools
+        $tools = $this->container->getParameter('automated_tools');
+        $toolRegexes = array_map(function ($tool) {
+            return $tool['regex'];
+        }, $tools);
+        $regex = $conn->quote(implode('|', $toolRegexes), \PDO::PARAM_STR);
+
+        $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
+        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+        $condNamespace = $namespace === 'all' ? '' : 'AND page_namespace = :namespace';
+        $sql = "SELECT
+                    page_title,
+                    page_namespace,
+                    revs.rev_id AS rev_id,
+                    revs.rev_timestamp AS timestamp,
+                    revs.rev_minor_edit AS minor,
+                    revs.rev_len AS length,
+                    (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
+                    revs.rev_comment AS comment
+                FROM $pageTable
+                JOIN $revisionTable AS revs ON (page_id = revs.rev_page)
+                LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+                WHERE revs.rev_user_text = :username
+                AND revs.rev_timestamp > 0
+                AND revs.rev_comment NOT RLIKE $regex
+                $condBegin
+                $condEnd
+                $condNamespace
+                ORDER BY revs.rev_timestamp DESC
+                LIMIT 50
+                OFFSET $offset";
+
+        $username = $user->getUsername();
+        $resultQuery = $conn->prepare($sql);
+        $resultQuery->bindParam('username', $username);
+        if (!empty($start)) {
+            $resultQuery->bindParam('start', $start);
+        }
+        if (!empty($end)) {
+            $resultQuery->bindParam('end', $end);
+        }
+        if ($namespace !== 'all') {
+            $resultQuery->bindParam('namespace', $namespace);
+        }
+        $resultQuery->execute();
+        $result = $resultQuery->fetchAll();
+
+        // Cache for 10 minutes, and return.
+        $cacheItem = $this->cache->getItem($cacheKey)
+            ->set($result)
+            ->expiresAfter(new DateInterval('PT10M'));
+        $this->cache->save($cacheItem);
+        $this->stopwatch->stop($cacheKey);
+
+        return $result;
+    }
+
+    /**
+     * Get non-automated contributions for the given user.
+     * @param Project $project
+     * @param User $user
+     * @param string|int [$namespace] Namespace ID or 'all'
+     * @param string [$start] Start date in a format accepted by strtotime()
+     * @param string [$end] End date in a format accepted by strtotime()
+     * @return string[] Each tool that they used along with the count and link:
+     *                  [
+     *                      'Twinkle' => [
+     *                          'count' => 50,
+     *                          'link' => 'Wikipedia:Twinkle',
+     *                      ],
+     *                  ]
+     */
+    public function getAutomatedCounts(
+        Project $project,
+        User $user,
+        $namespace = 'all',
+        $start = '',
+        $end = ''
+    ) {
+        $cacheKey = 'autotoolcounts.' . $project->getDatabaseName() . '.'
+            . $user->getCacheKey() . '.' . $namespace;
+
+        $condBegin = '';
+        $condEnd = '';
+
+        if (!empty($start)) {
+            $cacheKey .= '.' . $start;
+
+            // For the query
+            $start = date('Ymd000000', strtotime($start));
+            $condBegin = 'AND rev_timestamp >= :start ';
+        }
+        if (!empty($end)) {
+            $cacheKey .= '.' . $end;
+
+            // For the query
+            $end = date('Ymd235959', strtotime($end));
+            $condEnd = 'AND rev_timestamp <= :end ';
+        }
+
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+        $this->stopwatch->start($cacheKey, 'XTools');
+
+        $conn = $this->getProjectsConnection();
+
+        // Load the semi-automated edit types.
+        $tools = $this->container->getParameter('automated_tools');
+
+        // Create a collection of queries that we're going to run.
+        $queries = [];
+
+        $revisionTable = $project->getRepository()->getTableName($project->getDatabaseName(), 'revision');
+        $archiveTable = $project->getRepository()->getTableName($project->getDatabaseName(), 'archive');
+        $pageTable = $project->getRepository()->getTableName($project->getDatabaseName(), 'page');
+
+        $pageJoin = $namespace !== 'all' ? "JOIN $pageTable ON rev_page = page_id" : null;
+        $condNamespace = $namespace !== 'all' ? "AND page_namespace = :namespace" : null;
+
+        foreach ($tools as $toolname => $values) {
+            $toolname = $conn->quote($toolname, \PDO::PARAM_STR);
+            $regex = $conn->quote($values['regex'], \PDO::PARAM_STR);
+
+            $queries[] .= "
+                SELECT $toolname AS toolname, COUNT(*) AS count
+                FROM $revisionTable
+                $pageJoin
+                WHERE rev_user_text = :username
+                AND rev_comment REGEXP $regex
+                $condNamespace
+                $condBegin
+                $condEnd";
+        }
+
+        // Create a big query and execute.
+        $sql = implode(' UNION ', $queries);
+
+        $resultQuery = $conn->prepare($sql);
+
+        $username = $user->getUsername(); // use normalized user name
+        $resultQuery->bindParam('username', $username);
+        if (!empty($start)) {
+            $startParam = date('Ymd000000', strtotime($start));
+            $resultQuery->bindParam('start', $startParam);
+        }
+        if (!empty($end)) {
+            $endParam = date('Ymd235959', strtotime($end));
+            $resultQuery->bindParam('end', $endParam);
+        }
+        if ($namespace !== 'all') {
+            $resultQuery->bindParam('namespace', $namespace);
+        }
+
+        $resultQuery->execute();
+
+        // handling results
+        $results = [];
+
+        while ($row = $resultQuery->fetch()) {
+            // Only track tools that they've used at least once
+            $tool = $row['toolname'];
+            if ($row['count'] > 0) {
+                $results[$tool] = [
+                    'link' => $tools[$tool]['link'],
+                    'count' => $row['count'],
+                ];
+            }
+        }
+
+        // Sort the array by count
+        uasort($results, function ($a, $b) {
+            return $b['count'] - $a['count'];
+        });
+
+        // Cache for 10 minutes, and return.
+        $cacheItem = $this->cache->getItem($cacheKey)
+            ->set($results)
+            ->expiresAfter(new DateInterval('PT10M'));
+        $this->cache->save($cacheItem);
+        $this->stopwatch->stop($cacheKey);
+
+        return $results;
+    }
+
+    /**
      * Get information about the currently-logged in user.
      * @return array
      */

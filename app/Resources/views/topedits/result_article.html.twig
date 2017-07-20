@@ -81,13 +81,17 @@
                     {{ rev.size|diff_format }}
                 </td>
                 <td class="sort-entry--summary" data-value="{{ rev.comment }}">
-                    {{ rev.comment|wikify_comment(page.title, project.url) }}
+                    {{ rev.wikifiedSummary|raw }}
                 </td>
             </tr>
             {% endfor %}
         </table>
         {% endset %}
         {{ layout.content_block('topedits-article', content, msg('topedits-article-desc'), null, false, false) }}
+
+        <div class="text-muted times-in-utc" style="clear:both">
+            {{ msg('times-in-utc') }}
+        </div>
     </div>
 </div>
 {% endblock %}

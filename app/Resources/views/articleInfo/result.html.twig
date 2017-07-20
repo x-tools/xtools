@@ -781,6 +781,10 @@
         {% endset %}
         {{ layout.content_block('bugs', content, description_link) }}
         {% endif %}
+
+        <div class="text-muted times-in-utc">
+            {{ msg('times-in-utc') }}
+        </div>
     </div>
 </div>
 {% endblock %}

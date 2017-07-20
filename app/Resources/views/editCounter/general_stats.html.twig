@@ -89,7 +89,7 @@
         <tr><td>{{ msg('last-month') }}</td><td>{{ ec.countRevisionsInLast('month')|number_format }}</td></tr>
         <tr><td>{{ msg('last-year') }}</td><td>{{ ec.countRevisionsInLast('year')|number_format }}</td></tr>
         <tr>
-            <td>{{ msg("average-edits-per-day", [msg("days", [1])]) }}</td>
+            <td>{{ msg('average-edits-per-day', [msg('days', [1])]) }}</td>
             <td>
                 {{ ec.averageRevisionsPerDay|number_format(1) }}
                 <span class="text-muted">
@@ -98,8 +98,8 @@
             </td>
         </tr>
         <tr>
-            <td>{{ msg('average-edit-size') }}</td>
-            <td>{{ ec.averageRevisionSize|number_format(1) }}</td>
+            <td>{{ msg('average-edit-size') }}*</td>
+            <td>{{ ec.averageEditSize|number_format(1) }} {{ msg('num-bytes', [ec.averageEditSize]) }}</td>
         </tr>
     </tbody></table>
 </div>
@@ -168,21 +168,15 @@
                 {% endspaceless %}</td>
             </tr>
             <tr>
-                <td>{% spaceless %}
-                    {% if is_sub_request %}
-                        <a href="#auto-edits">{{ msg('auto-edits') }}</a>
-                    {% else %}
-                        {{ msg('auto-edits') }}
-                    {% endif %}
-                {% endspaceless %}</td>
+                <td>{{ msg('auto-edits') }}</td>
                 <td>
                     {% if enabled('autoedits') %}
-                        <a href="{{ path('autoedits', {project:project.domain, username:user.username}) }}">{{ ec.countAutomatedRevisions|number_format }}</a>
+                        <a href="{{ path('autoedits', {project:project.domain, username:user.username, namespace:'all'}) }}">{{ ec.countAutomatedEdits|number_format }}</a>
                     {% else %}
-                        {{ ec.countAutomatedRevisions }}
+                        {{ ec.countAutomatedEdits }}
                     {% endif %}
                     &middot;
-                    ({{ ((ec.countAutomatedRevisions / ec.countLiveRevisions) * 100)|percent_format }})
+                    ({{ ((ec.countAutomatedEdits / ec.countLiveRevisions) * 100)|percent_format }})
                 </td>
             </tr>
             <tr>
@@ -202,19 +196,19 @@
                 </td>
             </tr>
             <tr>
-                <td>{{ msg('small-edits') }}</td>
+                <td>{{ msg('small-edits') }}*</td>
                 <td>
-                    {{ ec.countSmallRevisions|number_format }}
+                    {{ ec.countSmallEdits|number_format }}
                     &middot;
-                    ({{ ((ec.countSmallRevisions / ec.countLiveRevisions) * 100)|percent_format }})
+                    ({{ ((ec.countSmallEdits / ec.countLast5000) * 100)|percent_format }})
                 </td>
             </tr>
             <tr>
-                <td>{{ msg('large-edits') }}</td>
+                <td>{{ msg('large-edits') }}*</td>
                 <td>
-                    {{ ec.countLargeRevisions|number_format }}
+                    {{ ec.countLargeEdits|number_format }}
                     &middot;
-                    ({{ ((ec.countLargeRevisions / ec.countLiveRevisions) * 100)|percent_format }})
+                    ({{ ((ec.countLargeEdits / ec.countLast5000) * 100)|percent_format }})
                 </td>
             </tr>
         </tbody>
@@ -423,35 +417,42 @@
     {{
         chart.pie_chart('small_edits',
             [{
-                label: '< 20 ' ~ msg('num-bytes', [20]),
-                value: ec.countSmallRevisions,
-                percentage: ((ec.countSmallRevisions / ec.countLiveRevisions) * 100)
+                label: '< 20 ' ~ msg('num-bytes', [20]) ~ '*',
+                value: ec.countSmallEdits,
+                percentage: ((ec.countSmallEdits / ec.countLast5000) * 100)
             },
             {
-                label: '≥ 20 ' ~ msg('num-bytes', [20]),
-                value: ec.countLiveRevisions - ec.countSmallRevisions,
-                percentage: 100 - ((ec.countSmallRevisions / ec.countLiveRevisions) * 100)
+                label: '≥ 20 ' ~ msg('num-bytes', [20]) ~ '*',
+                value: ec.countLast5000 - ec.countSmallEdits,
+                percentage: 100 - ((ec.countSmallEdits / ec.countLast5000) * 100)
             }]
         )
     }}
     {{
         chart.pie_chart('large_edits',
             [{
-                label: '< 1000 ' ~ msg('num-bytes', [1000]),
-                value: ec.countLargeRevisions,
-                percentage: ((ec.countLargeRevisions / ec.countLiveRevisions) * 100)
+                label: '< 1000 ' ~ msg('num-bytes', [1000]) ~ '*',
+                value: ec.countLargeEdits,
+                percentage: ((ec.countLargeEdits / ec.countLast5000) * 100)
             },
             {
-                label: '≥ 1000 ' ~ msg('num-bytes', [1000]),
-                value: ec.countLiveRevisions - ec.countLargeRevisions,
-                percentage: 100 - ((ec.countLargeRevisions / ec.countLiveRevisions) * 100)
+                label: '≥ 1000 ' ~ msg('num-bytes', [1000]) ~ '*',
+                value: ec.countLast5000 - ec.countLargeEdits,
+                percentage: 100 - ((ec.countLargeEdits / ec.countLast5000) * 100)
             }]
         )
     }}
+    <div class="footnotes">
+        * {{ msg('data-limit', [5000, 5000|number_format]) }}
+    </div>
 </div>
 
 {% if not is_sub_request %}
-    </div></section></div></div>
+    </div></section>
+    <div class="text-muted times-in-utc" style="clear:both">
+        {{ msg('times-in-utc') }}
+    </div>
+    </div></div>
 {% endif %}
 
 {% endblock %}

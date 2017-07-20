@@ -9,6 +9,7 @@ use DateTime;
 use Xtools\Edit;
 use Xtools\Page;
 use Xtools\Project;
+use Xtools\ProjectRepository;
 
 /**
  * Tests of the Edit class.
@@ -38,5 +39,31 @@ class EditTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('1483264800', $edit->getTimestamp()->getTimestamp());
         $this->assertEquals(1, $edit->getId());
         $this->assertFalse($edit->isMinor());
+    }
+
+    /**
+     * Wikified edit summary
+     */
+    public function testWikifiedComment()
+    {
+        $project = new Project('TestProject');
+        $projectRepo = $this->getMock(ProjectRepository::class);
+        $project->setRepository($projectRepo);
+        $page = new Page($project, 'Test_page');
+        $edit = new Edit($page, [
+            'id' => '1',
+            'timestamp' => '20170101100000',
+            'minor' => '0',
+            'length' => '12',
+            'length_change' => '2',
+            'username' => 'Testuser',
+            'comment' => '<script>alert("XSS baby")</script> [[test page]]',
+        ]);
+
+        $this->assertEquals(
+            "&lt;script&gt;alert(&quot;XSS baby&quot;)&lt;/script&gt; " .
+                "<a target='_blank' href='/wiki/Test_page'>test page</a>",
+            $edit->getWikifiedSummary()
+        );
     }
 }

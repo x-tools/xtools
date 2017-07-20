@@ -128,7 +128,7 @@ class Page extends Model
     public function exists()
     {
         $info = $this->getPageInfo();
-        return !isset($info['missing']);
+        return !isset($info['missing']) && !isset($info['invalid']);
     }
 
     /**
