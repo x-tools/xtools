@@ -164,7 +164,7 @@
 
             entries.sort(function (a, b) {
                 var before = $(a).find('.sort-entry--' + sortColumn).data('value'),
-                after = $(b).find('.sort-entry--' + sortColumn).data('value');
+                    after = $(b).find('.sort-entry--' + sortColumn).data('value');
 
                 // test data type, assumed to be string if can't be parsed as float
                 if (!isNaN(parseFloat(before, 10))) {

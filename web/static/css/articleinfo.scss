@@ -1,17 +1,6 @@
 @import 'mixins.scss';
 
 .articleinfo {
-    .basic-info-charts {
-        clear: both;
-        display: block;
-        padding-top: 20px;
-        position: relative;
-
-        canvas {
-            max-width: 150px;
-        }
-    }
-
     .top-editors-charts {
         display: block;
         margin-bottom: 25px;
