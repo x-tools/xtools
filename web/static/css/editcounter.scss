@@ -17,32 +17,6 @@
         white-space: nowrap;
     }
 
-    .basic-info-charts {
-        clear: both;
-        display: block;
-        padding-top: 20px;
-        position: relative;
-
-        canvas {
-            max-width: 150px;
-        }
-
-        .chart-wrapper {
-            display: flex;
-            float: left;
-            margin-right: 50px;
-        }
-
-        .chart-legend {
-            align-self: center;
-            margin-left: 15px;
-
-            .color-icon {
-                vertical-align: -4px;
-            }
-        }
-    }
-
     .footnotes {
         clear: both;
         padding-top: 20px;

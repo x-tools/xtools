@@ -10,9 +10,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Psr\Cache\CacheItemPoolInterface;
 use Xtools\Project;
 use Xtools\ProjectRepository;
 use Xtools\User;
+use DateTime;
+use DateInterval;
 
 /**
  * This controller handles the Simple Edit Counter tool.
@@ -47,11 +50,16 @@ class EditSummaryController extends Controller
     {
         // Get the query parameters.
         $projectName = $project ?: $request->query->get('project');
-        $username = $request->query->get('username', $request->query->get('user'));
+        $username = $request->query->get('username');
+        $namespace = $request->query->get('namespace');
 
-        // If we've got a project and user, redirect to results.
-        if ($projectName != '' && $username != '') {
-            $routeParams = [ 'project' => $projectName, 'username' => $username ];
+        // If we've got a project, user, and namespace, redirect to results.
+        if ($projectName != '' && $username != '' && $namespace != '') {
+            $routeParams = [
+                'project' => $projectName,
+                'username' => $username,
+                'namespace' => $namespace,
+            ];
             return $this->redirectToRoute('EditSummaryResult', $routeParams);
         }
 
@@ -77,12 +85,13 @@ class EditSummaryController extends Controller
      *
      * @param string $project  The project domain name.
      * @param string $username The username.
+     * @param string $namespace Namespace ID or 'all' for all namespaces.
      *
-     * @Route("/editsummary/{project}/{username}", name="EditSummaryResult")
+     * @Route("/editsummary/{project}/{username}/{namespace}", name="EditSummaryResult")
      *
      * @return Response
      */
-    public function resultAction($project, $username)
+    public function resultAction($project, $username, $namespace = 'all')
     {
         /**
          * ProjectRepository object representing the project
@@ -99,11 +108,52 @@ class EditSummaryController extends Controller
             return $this->redirectToRoute('EditSummary');
         }
 
-        // Load the database tables
+        $user = new User($username);
+
+        $editSummaryUsage = $this->getEditSummaryUsage($project, $user, $namespace);
+
+        // If they have no edits, we have nothing to show
+        if ($editSummaryUsage['totalEdits'] === 0) {
+            $this->addFlash('notice', ['no-contribs']);
+            return $this->redirectToRoute('EditSummary');
+        }
+
+        // Assign the values and display the template
+        return $this->render(
+            'editSummary/result.html.twig',
+            array_merge($editSummaryUsage, [
+                'xtPage' => 'es',
+                'xtTitle' => $user->getUsername(),
+                'user' => $user,
+                'project' => $project,
+                'namespace' => $namespace,
+            ])
+        );
+    }
+
+    /**
+     * Get data on edit summary usage of the given user
+     * @param  Project $project
+     * @param  User $user
+     * @param  string $namespace
+     * @return string[]
+     * @todo Should we move this to an actual Repository? Very specific to this controller
+     */
+    private function getEditSummaryUsage($project, $user, $namespace)
+    {
         $dbName = $project->getDatabaseName();
 
-        $revisionTable = $projectRepo->getTableName($dbName, 'revision');
-        $pageTable = $projectRepo->getTableName($dbName, 'page');
+        $cacheKey = 'editsummaryusage.' . $dbName . '.'
+            . $user->getCacheKey() . '.' . $namespace;
+
+        $cache = $this->container->get('cache.app');
+        if ($cache->hasItem($cacheKey)) {
+            return $cache->getItem($cacheKey)->get();
+        }
+
+        // Load the database tables
+        $revisionTable = $project->getRepository()->getTableName($dbName, 'revision');
+        $pageTable = $project->getRepository()->getTableName($dbName, 'page');
 
         /**
          * Connection to the replica database
@@ -112,22 +162,27 @@ class EditSummaryController extends Controller
          */
         $conn = $this->get('doctrine')->getManager('replicas')->getConnection();
 
-        // Prepare the query and execute
-        $resultQuery = $conn->prepare(
-            "SELECT rev_comment, rev_timestamp, rev_minor_edit
-            FROM  $revisionTable 
-​            JOIN $pageTable ON page_id = rev_page
-            WHERE rev_user_text = :username
-            ORDER BY rev_timestamp DESC"
-        );
+        $condNamespace = $namespace === 'all' ? '' : 'AND page_namespace = :namespace';
+        $pageJoin = $namespace === 'all' ? '' : "JOIN $pageTable ON rev_page = page_id";
+        $username = $user->getUsername();
 
-        $user = new User($username);
-        $usernameParam = $user->getUsername();
-        $resultQuery->bindParam('username', $usernameParam);
+        // Prepare the query and execute
+        $sql = "SELECT rev_comment, rev_timestamp, rev_minor_edit
+                FROM  $revisionTable
+    ​            $pageJoin
+                WHERE rev_user_text = :username
+                $condNamespace
+                ORDER BY rev_timestamp DESC";
+
+        $resultQuery = $conn->prepare($sql);
+        $resultQuery->bindParam('username', $username);
+        if ($namespace !== 'all') {
+            $resultQuery->bindParam('namespace', $namespace);
+        }
         $resultQuery->execute();
 
         if ($resultQuery->errorCode() > 0) {
-            $this->addFlash('notice', [ 'no-result', $username ]);
+            $this->addFlash('notice', ['no-result', $username]);
             return $this->redirectToRoute(
                 'EditSummaryProject',
                 [
@@ -137,109 +192,102 @@ class EditSummaryController extends Controller
         }
 
         // Set defaults, so we don't get variable undefined errors
-        $edit_sum_maj = 0;
-        $edit_sum_min = 0;
-        $maj = 0;
-        $minn = 0;
-        $rmaj = 0;
-        $rmin = 0;
-        $redit_sum_maj = 0;
-        $redit_sum_min = 0;
-        $month_totals = array();
-        $month_editsummary_totals = array();
+        $totalSummariesMajor = 0;
+        $totalSummariesMinor = 0;
+        $totalEditsMajor = 0;
+        $totalEditsMinor = 0;
+        $recentEditsMajor = 0;
+        $recentEditsMinor = 0;
+        $recentSummariesMajor = 0;
+        $recentSummariesMinor = 0;
+        $monthTotals = [];
+        $monthEditsummaryTotals = [];
+        $totalEdits = 0;
+        $totalSummaries = 0;
 
         while ($row = $resultQuery->fetch()) {
             // Extract the date out of the date field
-            preg_match(
-                '/(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)/',
-                $row['rev_timestamp'],
-                $d
-            );
+            $timestamp = DateTime::createFromFormat('YmdHis', $row['rev_timestamp']);
 
-            // Note there are some unused variables here.
-            // This is expected, to make the regex work.
-            list($arr,$year,$month,$day,$hour,$min,$sec) = $d;
-
-            $monthkey = $year."/".$month;
-            $first_month = strtotime("$year-$month-$day");
+            $monthkey = date_format($timestamp, 'Y-m');
 
             // Check and see if the month is set for all major edits edits.
             // If not, default it to 1.
-            if (!isset($month_totals[$monthkey])) {
-                $month_totals[$monthkey] = 1;
+            if (!isset($monthTotals[$monthkey])) {
+                $monthTotals[$monthkey] = 1;
             } else {
-                $month_totals[$monthkey]++;
+                $monthTotals[$monthkey]++;
             }
+
+            // Grand total for number of edits
+            $totalEdits++;
+
+            // Total edit summaries
+            if ($row['rev_comment'] !== '') {
+                $totalSummaries++;
+            }
+
             // Now do the same, if we have an edit summary
             if ($row['rev_minor_edit'] == 0) {
                 if ($row['rev_comment'] !== '') {
-                    isset($month_editsummary_totals[$monthkey]) ?
-                        $month_editsummary_totals[$monthkey]++ :
-                        $month_editsummary_totals[$monthkey] = 1;
-                    $edit_sum_maj++;
+                    isset($monthEditsummaryTotals[$monthkey]) ?
+                        $monthEditsummaryTotals[$monthkey]++ :
+                        $monthEditsummaryTotals[$monthkey] = 1;
+                    $totalSummariesMajor++;
                 }
 
                 // Now do the same for recent edits
-                $maj++;
-                if ($rmaj <= 149) {
-                    $rmaj++;
+                $totalEditsMajor++;
+                if ($recentEditsMajor < 150) {
+                    $recentEditsMajor++;
                     if ($row['rev_comment'] != '') {
-                        $redit_sum_maj++;
+                        $recentSummariesMajor++;
                     }
                 }
             } else {
                 // The exact same procedure as documented above for minor edits
                 // If there is a comment, count it
                 if ($row['rev_comment'] !== '') {
-                    isset($month_editsummary_totals[$monthkey]) ?
-                        $month_editsummary_totals[$monthkey]++ :
-                        $month_editsummary_totals[$monthkey] = 1;
-                    $edit_sum_min++;
-                    $minn++;
+                    isset($monthEditsummaryTotals[$monthkey]) ?
+                        $monthEditsummaryTotals[$monthkey]++ :
+                        $monthEditsummaryTotals[$monthkey] = 1;
+                    $totalSummariesMinor++;
+                    $totalEditsMinor++;
                 } else {
-                    $minn++;
+                    $totalEditsMinor++;
                 }
 
                 // Handle recent edits
-                if ($rmin <= 149) {
-                    $rmin++;
+                if ($recentEditsMinor < 150) {
+                    $recentEditsMinor++;
                     if ($row['rev_comment'] != '') {
-                        $redit_sum_min++;
+                        $recentSummariesMinor++;
                     }
                 }
             }
         }
 
-        // Some rounding to make things look pretty
-        $edit_sum_maj
-            = sprintf('%.2f', $edit_sum_maj ? $edit_sum_maj / $maj : 0) * 100;
-        $edit_sum_min
-            = sprintf('%.2f', $edit_sum_min ? $edit_sum_min / $min : 0) * 100;
-        $redit_sum_maj
-            = sprintf('%.2f', $redit_sum_maj ? $redit_sum_maj / $rmaj : 0) * 100;
-        $redit_sum_min
-            = sprintf('%.2f', $redit_sum_min ? $redit_sum_min / $rmin : 0) * 100;
+        $result = [
+            'totalEdits' => $totalEdits,
+            'totalEditsMajor' => $totalEditsMajor,
+            'totalEditsMinor' => $totalEditsMinor,
+            'totalSummaries' => $totalSummaries,
+            'totalSummariesMajor' => $totalSummariesMajor,
+            'totalSummariesMinor' => $totalSummariesMinor,
+            'recentEditsMajor' => $recentEditsMajor,
+            'recentEditsMinor' => $recentEditsMinor,
+            'recentSummariesMajor' => $recentSummariesMajor,
+            'recentSummariesMinor' => $recentSummariesMinor,
+            'monthTotals' => $monthTotals,
+            'monthEditSumTotals' => $monthEditsummaryTotals,
+        ];
 
-        // Assign the values and display the template
-        return $this->render(
-            'editSummary/result.html.twig',
-            [
-                'xtPage' => 'es',
-                'xtTitle' => $username,
-                'user' => $user,
-                'project' => $project,
+        // Cache for 10 minutes, and return.
+        $cacheItem = $cache->getItem($cacheKey)
+            ->set($result)
+            ->expiresAfter(new DateInterval('PT10M'));
+        $cache->save($cacheItem);
 
-                "edit_sum_maj" => $edit_sum_maj,
-                "edit_sum_min" => $edit_sum_min,
-                "maj" => $maj,
-                "minn" => $minn,
-                "rmaj" => $rmaj,
-                "rmin" => $rmin,
-                "redit_sum_maj" => $redit_sum_maj,
-                "redit_sum_min" => $redit_sum_min,
-                "month_totals" => $month_totals,
-                "month_editsummary_totals" => $month_editsummary_totals,
-            ]
-        );
+        return $result;
     }
 }
