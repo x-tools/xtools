@@ -62,7 +62,7 @@ class EditSummaryController extends Controller
 
         // Show the form.
         return $this->render(
-            'simpleEditCounter/index.html.twig',
+            'editsummary/index.html.twig',
             [
                 'xtPageTitle' => 'tool-es',
                 'xtSubtitle' => 'tool-es-desc',
