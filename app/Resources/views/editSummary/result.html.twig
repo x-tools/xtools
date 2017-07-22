@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+{% import 'macros/layout.html.twig' as layout %}
+{% import 'macros/wiki.html.twig' as wiki %}
+
+{% block body %}
+<div class="panel panel-primary">
+    <header class="panel-heading">
+        <div class="text-center xt-heading-top">
+            <a class="back-to-search" href="{{ path('es') }}">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                {{ msg('back') }}
+            </a>
+            {{ wiki.userLink(user, project) }}
+            <small>
+                &bull;
+                {{ project.domain }}
+            </small>
+        </div>
+    </header>
+
+    <div class="panel-body xt-panel-body">
+        <p class="text-center xt-heading-subtitle">
+            {{ wiki.userLogLink(user, project, msg('block-log'), 'block') }}
+            &middot;
+            <a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool-ec') }}</a>
+            {% if isWMFLabs() %}
+                &middot;
+                <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ user.username }}" >{{ msg('global-contribs') }}</a>
+                &middot;
+                <a target="_blank" href="//tools.wmflabs.org/pageviews/?project={{ project.domain }}&amp;pages=User:{{ user.username }}">{{ msg('pageviews-userpage') }}</a>
+            {% endif %}
+        </p>
+
+        {% set content %}
+            <div class="col-lg-12 stat-list clearfix">
+                <table class="table">
+                    <tr>
+                        <td>{{ msg('username') }}</td>
+                        <td>{{ wiki.userLink(user, project) }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('edit-summary-all-major') }}</td>
+                        <td>{{ edit_sum_maj }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('edit-summary-all-minor') }}</td>
+                        <td>{{ edit_sum_min }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('edit-summary-recent-major', [rmaj]) }}</td>
+                        <td>{{ redit_sum_maj }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('edit-summary-recent-minor', [rmin]) }}</td>
+                        <td>{{ redit_sum_min }}</td>
+                    </tr>
+                </table>
+
+                <table class="table table-striped">
+                    <tr>
+                        <th>{{ msg("month") }}</th>
+                        <th>{{ msg("edit-summary-use") }}</th>
+                        <th>{{ msg("total-edits") }}</th>
+                    </tr>
+                    {% for key in month_totals|keys %}
+                        <tr>
+                            <td>{{ key }}</td>
+                            {% if month_editsummary_totals[key] is defined %}
+                            <td>{{ month_editsummary_totals[key] }}</td>
+                            {% else %}
+                            <td>0</td>
+                            {% endif %}
+                            <td>{{ month_totals[key] }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% endset %}
+        {{ layout.content_block('tool-es-desc', content) }}
+    </div>
+</div>
+{% endblock %}

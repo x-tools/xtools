@@ -61,6 +61,7 @@ parameters:
     enable.bash: 0
     enable.blame: 0
     enable.ec: 1
+    enable.es: 0
     enable.pages: 1
     enable.rfa: 0
     enable.rfap: 0
