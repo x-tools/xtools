@@ -513,7 +513,7 @@ class ArticleInfoController extends Controller
             $data['editors'][$username]['sizes'][] = $edit->getLength() / 1024;
 
             // Check if it was a revert
-            if ($this->aeh->isRevert($edit->getComment())) {
+            if ($edit->isRevert($this->container)) {
                 $data['general']['revert_count']++;
 
                 // Since this was a revert, we don't want to treat the previous
@@ -573,19 +573,19 @@ class ArticleInfoController extends Controller
                 $data['editors'][$username]['minor']++;
             }
 
-            $automatedTool = $this->aeh->getTool($edit->getComment());
+            $automatedTool = $edit->getTool($this->container);
             if ($automatedTool) {
                 $data['general']['automated_count']++;
                 $data['year_count'][$editYear]['automated']++;
                 $data['year_count'][$editYear]['months'][$editMonth]['automated']++;
 
-                if (!isset($data['tools'][$automatedTool])) {
-                    $data['tools'][$automatedTool] = [
+                if (!isset($data['tools'][$automatedTool['name']])) {
+                    $data['tools'][$automatedTool['name']] = [
                         'count' => 1,
-                        'link' => $this->aeh->getTools()[$automatedTool]['link'],
+                        'link' => $automatedTool['link'],
                     ];
                 } else {
-                    $data['tools'][$automatedTool]['count']++;
+                    $data['tools'][$automatedTool['name']]['count']++;
                 }
             }
 

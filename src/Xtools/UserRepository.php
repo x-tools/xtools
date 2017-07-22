@@ -575,7 +575,8 @@ class UserRepository extends Repository
         $conn = $this->getProjectsConnection();
 
         // Load the semi-automated edit types.
-        $tools = $this->getTools($project->getDomain());
+        $automatedEditsHelper = $this->container->get('app.automated_edits_helper');
+        $tools = $automatedEditsHelper->getTools($project->getDomain());
 
         // Create a collection of queries that we're going to run.
         $queries = [];
@@ -691,27 +692,6 @@ class UserRepository extends Repository
     }
 
     /**
-     * Get list of automated tools and their associated info for the
-     *   given project. This defaults to the 'default_project' if
-     *   entries for the given project are not found.
-     * @param  string $projectDomain Such as en.wikipedia.org
-     * @return string[] Each tool with the tool name as the key,
-     *   and 'link', 'regex' or 'tag' as the subarray keys.
-     */
-    private function getTools($projectDomain)
-    {
-        // Load the semi-automated edit types.
-        $toolsByWiki = $this->container->getParameter('automated_tools');
-
-        // Default to default project (e.g. enwiki) if wiki not configured
-        if (isset($toolsByWiki[$projectDomain])) {
-            return $toolsByWiki[$projectDomain];
-        } else {
-            return $toolsByWiki[$this->container->getParameter('default_project')];
-        }
-    }
-
-    /**
      * Get the combined regex and tags for all semi-automated tools,
      *   ready to be used in a query.
      * @param string $projectDomain Such as en.wikipedia.org
@@ -721,7 +701,8 @@ class UserRepository extends Repository
      */
     private function getToolRegexAndTags($projectDomain, $conn)
     {
-        $tools = $this->getTools($projectDomain);
+        $automatedEditsHelper = $this->container->get('app.automated_edits_helper');
+        $tools = $automatedEditsHelper->getTools($projectDomain);
         $regexes = [];
         $tags = [];
         foreach ($tools as $tool => $values) {
