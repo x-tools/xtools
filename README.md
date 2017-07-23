@@ -5,7 +5,9 @@ XTools is a suite of statistics tools for MediaWiki wikis, users, pages, and mor
 See it in operation for Wikimedia wikis at [xtools.wmflabs.org](https://xtools.wmflabs.org/)
 (it can also be installed for any MediaWiki installation).
 
-**For full documentation, please see: [xtools.readthedocs.io](https://xtools.readthedocs.io)**
+For **full documentation**, please see [xtools.readthedocs.io](https://xtools.readthedocs.io).
+
+To **report an issue**, create a ticket on [Phabricator](https://phabricator.wikimedia.org/maniphest/task/edit/form/1/?title=PLEASE%20REPLACE%20WITH%20A%20DESCRIPTION%20OF%20THE%20ISSUE&projects=XTools&description=Please%20provide%20any%20further%20details%20here) (requires a Wikimedia account) or use the [talk page](https://www.mediawiki.org/wiki/Talk:XTools) on [mediawiki.org/XTools](https://www.mediawiki.org/wiki/XTools).
 
 [![Docs](https://readthedocs.org/projects/xtools/badge/?version=latest)](https://xtools.readthedocs.io/en/latest/?badge=latest)
 [![Dependency Status](https://www.versioneye.com/user/projects/58d352f8dcaf9e0040b1b1ba/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/58d352f8dcaf9e0040b1b1ba)
