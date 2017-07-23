@@ -56,8 +56,18 @@ class RfXAnalysisController extends Controller
      */
     public function indexAction(Request $request, $project = null, $type = null)
     {
-        $projectQuery = $request->get("project");
-        $typeQuery = $request->get("type");
+        if ($request->get("projecttype")
+            && (strpos($request->get("projecttype"), "|") !== false)
+        ) {
+            $projectType = explode("|", $request->get("projecttype"), 2);
+            $projectQuery = $projectType[0];
+            $typeQuery = $projectType[1];
+        } else {
+            $projectQuery = $request->get("project");
+            $typeQuery = $request->get("type");
+
+        }
+
         $username = $request->get("username");
 
         if ($projectQuery != "" && $typeQuery != "" && $username != "") {
@@ -79,7 +89,13 @@ class RfXAnalysisController extends Controller
             );
         }
 
-        $projects = array_keys($this->getParameter("rfa"));
+        $rfa = $this->getParameter("rfa");
+
+        $projectFields = [];
+
+        foreach (array_keys($rfa) as $row) {
+            $projectFields[$row] = $rfa[$row]["pages"];
+        }
 
         // replace this example code with whatever you need
         return $this->render(
@@ -87,7 +103,8 @@ class RfXAnalysisController extends Controller
             [
                 "xtPageTitle" => "tool-rfa",
                 'xtPage' => "rfa",
-                "projects" => $projects,
+                "project" => $projectQuery,
+                "available" => $projectFields,
             ]
         );
     }
