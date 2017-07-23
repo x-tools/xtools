@@ -642,6 +642,16 @@ section > .panel-body {
 }
 
 @media (max-width: $bootstrap-sm) {
+    .basic-info-charts {
+        .chart-wrapper {
+            display: block !important;
+
+            .chart-legend {
+                margin-bottom: 15px;
+            }
+        }
+    }
+
     .app-footer {
         position: relative;
     }
