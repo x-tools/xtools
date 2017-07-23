@@ -108,7 +108,7 @@
 
     </ol>
     <nav class="tool-links navbar-collapse collapse">
-        <ol class="nav navbar-nav navbar-left">
+        <ol class="tool-links--nav nav navbar-nav navbar-left">
             <li{% if current_tool is defined and current_tool == "index" %} class="active"{% endif %}>
                 <a class="home-link" href="{{ path('homepage') }}">
                     <img src="{{ asset('static/images/logo.svg') }}" />
@@ -117,11 +117,20 @@
 
             {% for tool in tools() %}
                 {% if enabled(tool) %}
-                    <li{% if xtPage is defined and xtPage==tool %} class="active"{% endif %} >
+                    <li class="tool-links--entry{% if xtPage is defined and xtPage==tool %} active{% endif %}">
                         <a href="{{ path(tool) }}">{{ msg("tool-" ~ tool) }}</a>
                     </li>
                 {% endif %}
             {% endfor %}
+
+            {# Populated by JS when not all entires fit in the nav #}
+            <li class="tool-links--more dropdown hidden">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    {{ msg('more') }}
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu"></ul>
+            </li>
         </ol>
     </nav>
 </header>
