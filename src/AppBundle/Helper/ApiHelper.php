@@ -66,7 +66,9 @@ class ApiHelper extends HelperBase
 
         try {
             $res = $this->api->getRequest($query);
-            if (isset($res["batchcomplete"]) && isset($res["query"]["users"][0]["groups"])) {
+            if (isset($res["batchcomplete"])
+                && isset($res["query"]["users"][0]["groups"])
+            ) {
                 $result = $res["query"]["users"][0]["groups"];
             }
         } catch (Exception $e) {
@@ -359,7 +361,12 @@ class ApiHelper extends HelperBase
                 return [];
             }
             foreach($res["query"]["pages"] as $key => $value) {
-                $result[$value["title"]] = $value["revisions"][0]["*"];
+                if(isset($value["revisions"][0]["*"])) {
+                    $result[$value["title"]] = $value["revisions"][0]["*"];
+                }
+                else {
+                    $result[$value["title"]] = "";
+                }
             }
         } catch (Exception $e) {
             // The api returned an error!  Ignore

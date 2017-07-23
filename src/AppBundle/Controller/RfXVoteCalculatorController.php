@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Xtools\ProjectRepository;
 use Xtools\RFA;
+use Xtools\User;
 
 // Note: In the legacy xTools, this tool was referred to as "rfap."
 // Thus we have several references to it below, including in routes
@@ -41,9 +42,17 @@ class RfXVoteCalculatorController extends Controller
 
         if ($projectQuery != "" && $username != "") {
             $routeParams = [ 'project'=>$projectQuery, 'username' => $username ];
-            return $this->redirectToRoute("rfapResult", $routeParams);
+            return $this->redirectToRoute(
+                "rfapResult",
+                $routeParams
+            );
         } elseif ($projectQuery != "") {
-            return $this->redirectToRoute("rfapResult", ['project'=>$projectQuery]);
+            return $this->redirectToRoute(
+                "rfapResult",
+                [
+                    'project'=>$projectQuery
+                ]
+            );
         }
 
         return $this->render(
@@ -64,6 +73,7 @@ class RfXVoteCalculatorController extends Controller
         $conn = $this->getDoctrine()->getManager("replicas")->getConnection();
 
         $projectData = ProjectRepository::getProject($project, $this->container);
+        $userData = new User($username);
 
         $rfaParam = $this->getParameter("rfa");
 
@@ -81,6 +91,27 @@ class RfXVoteCalculatorController extends Controller
 
         $finalData = [];
 
+        // We sould probably figure out a better way to do this...
+        $ignoredPages = "";
+
+        if (isset($rfaParam[$projectData->getDatabaseName()]["excluded_title"])) {
+            foreach (
+                $rfaParam[$projectData->getDatabaseName()]["excluded_title"]
+                as $ignoredPage
+            ) {
+                $ignoredPages .= "AND p.page_title != \"$ignoredPage\"\r\n";
+            }
+        }
+
+        if (isset($rfaParam[$projectData->getDatabaseName()]["excluded_regex"])) {
+            foreach (
+                $rfaParam[$projectData->getDatabaseName()]["excluded_regex"]
+                as $ignoredPage
+            ) {
+                $ignoredPages .= "AND p.page_title NOT LIKE \"%$ignoredPage%\"\r\n";
+            }
+        }
+
         foreach ($pageTypes as $type) {
             $type = explode(":", $type, 2)[1];
 
@@ -91,7 +122,9 @@ FROM `page` p
 RIGHT JOIN revision r on p.page_id=r.rev_page
 WHERE p.page_namespace=:namespace
 AND r.rev_user_text=:username
-And p.page_title LIKE \"$type/%\"";
+And p.page_title LIKE \"$type/%\"
+AND p.page_title NOT LIKE \"%$type/$username%\"
+$ignoredPages";
 
             $sth = $conn->prepare($query);
             $sth->bindParam("namespace", $namespace);
@@ -106,26 +139,34 @@ And p.page_title LIKE \"$type/%\"";
                     ":" .$row["page_title"];
             }
 
-            $pageData = $api->getMassPageText($project, $titles);
+            // Chunking... it's possible to make a URI too long
+            $titleArray = array_chunk($titles, 20);
 
-            foreach ($pageData as $title => $text) {
-                $rfa = new RFA(
-                    $text,
-                    $rfaParam[$projectData->getDatabaseName()]["sections"],
-                    $namespaces[2],
-                    $username
-                );
-                $section = $rfa->get_userSectionFound();
-                $finalData[$type][$section][$title]["Support"]
-                    = sizeof($rfa->get_support());
-                $finalData[$type][$section][$title]["Oppose"]
-                    = sizeof($rfa->get_oppose());
-                $finalData[$type][$section][$title]["Neutral"]
-                    = sizeof($rfa->get_neutral());
-                $finalData[$type][$section][$title]["Date"]
-                    = $rfa->get_enddate();
+            foreach ($titleArray as $titlesWorked) {
+                $pageData = $api->getMassPageText($project, $titlesWorked);
 
-                unset($rfa);
+                foreach ($pageData as $title => $text) {
+                    $type = str_replace("_", " ", $type);
+                    $rfa = new RFA(
+                        $text,
+                        $rfaParam[$projectData->getDatabaseName()]["sections"],
+                        $namespaces[2],
+                        $username
+                    );
+                    $section = $rfa->get_userSectionFound();
+                    $finalData[$type][$section][$title]["Support"]
+                        = sizeof($rfa->get_support());
+                    $finalData[$type][$section][$title]["Oppose"]
+                        = sizeof($rfa->get_oppose());
+                    $finalData[$type][$section][$title]["Neutral"]
+                        = sizeof($rfa->get_neutral());
+                    $finalData[$type][$section][$title]["Date"]
+                        = $rfa->get_enddate();
+                    $finalData[$type][$section][$title]["name"]
+                        = explode("/", $title)[1];
+
+                    unset($rfa);
+                }
             }
 
         }
@@ -135,9 +176,9 @@ And p.page_title LIKE \"$type/%\"";
             [
                 "xtPage" => "rfap",
                 "xtTitle" => $username,
-                "username" => $username,
-                "project" => $project,
-                "data", $finalData
+                "user" => $userData,
+                "project" => $projectData,
+                "data"=> $finalData
             ]
         );
     }

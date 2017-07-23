@@ -133,19 +133,19 @@ class RFA {
         $m = array();
         foreach( $this->support as $s ){
             if( isset( $s['name'] ) ) $m[] = $s['name'];
-            if ($this->userLookingFor == $s['name']) {
+            if (isset($s['name']) && $this->userLookingFor == $s['name']) {
                 $this->userSectionFound = "support";
             }
         }
         foreach( $this->oppose as $o ){
             if( isset( $o['name'] ) ) $m[] = $o['name'];
-            if ($this->userLookingFor == $o['name']) {
+            if (isset($o['name']) && $this->userLookingFor == $o['name']) {
                 $this->userSectionFound = "oppose";
             }
         }
         foreach( $this->neutral as $n ){
             if( isset( $n['name'] ) ) $m[] = $n['name'];
-            if ($this->userLookingFor == $n['name']) {
+            if (isset($n['name']) && $this->userLookingFor == $n['name']) {
                 $this->userSectionFound = "neutral";
             }
         }
