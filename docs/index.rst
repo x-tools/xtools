@@ -13,7 +13,7 @@ It is in operation for Wikimedia wikis and can also be installed for any MediaWi
   * Development installation: `xtools-dev.wmflabs.org <https://xtools-dev.wmflabs.org/>`_
 
 * This documentation: `xtools.readthedocs.io <http://xtools.readthedocs.io/en/latest/>`_
-* Source code: `github.com/x-tools/xtools-rebirth <https://github.com/x-tools/xtools-rebirth>`_
+* Source code: `github.com/x-tools/xtools <https://github.com/x-tools/xtools>`_
 * Issue tracker: `phabricator.wikimedia.org <https://phabricator.wikimedia.org/project/view/803/>`_
 * IRC: `#wikimedia-xtools on Freenode <https://webchat.freenode.net/?channels=#wikimedia-xtools>`_
 
@@ -30,6 +30,7 @@ It is in operation for Wikimedia wikis and can also be installed for any MediaWi
     opt-in
     tools/index
     development
+    administration
 
 The tools
 =========

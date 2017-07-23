@@ -17,6 +17,10 @@ services:
         class: AppBundle\EventSubscriber\DisabledToolSubscriber
         arguments: ['@service_container']
 
+    rate_limit_subscriber:
+        class: AppBundle\EventSubscriber\RateLimitSubscriber
+        arguments: ['@service_container']
+
     app.twig_extension:
         class: AppBundle\Twig\AppExtension
         arguments: ["@service_container", "@request_stack", "@session"]

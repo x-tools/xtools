@@ -10,6 +10,7 @@ imports:
     - { resource: project_map.yml, ignore_errors: true }
     - { resource: assessments.yml }
     - { resource: quote.yml }
+    - { resource: request_blacklist.yml, ignore_errors: true }
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
@@ -161,3 +162,13 @@ fos_rest:
         view_response_listener: 'force'
         formats:
             json: true
+
+monolog:
+    channels: ['rate_limit']
+    handlers:
+        rate_limit:
+            # log all messages (since debug is the lowest level)
+            level:    info
+            type:     stream
+            path:     '%kernel.logs_dir%/rate_limit.log'
+            channels: [rate_limit]
