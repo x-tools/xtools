@@ -9,7 +9,7 @@ See it in operation for Wikimedia wikis at [xtools.wmflabs.org](https://xtools.w
 
 [![Docs](https://readthedocs.org/projects/xtools/badge/?version=latest)](https://xtools.readthedocs.io/en/latest/?badge=latest)
 [![Dependency Status](https://www.versioneye.com/user/projects/58d352f8dcaf9e0040b1b1ba/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/58d352f8dcaf9e0040b1b1ba)
-[![Build Status](https://travis-ci.org/x-tools/xtools-rebirth.svg?branch=master)](https://travis-ci.org/x-tools/xtools-rebirth)
+[![Build Status](https://travis-ci.org/x-tools/xtools.svg?branch=master)](https://travis-ci.org/x-tools/xtools)
 
 ## Kudos and history
 
