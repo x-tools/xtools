@@ -1,5 +1,14 @@
 # Release Notes #
 
+## 3.0.5 ##
+- T170905 New "Edit Summaries" tool to analyize edit summary usage. Defaulted off.
+- T171135 Fix ArticleInfo to properly reference project when detecting autoedits
+- T170961 Fix link to Page Created from the Edit Counter
+- T170608 Fix divison by zero warnings in Edit Counter
+- T171133 URL-encode page titles and usernames when linking to a wiki
+- T170233 Only use the AppBundle for Assetic in production
+- Various styling fixes, mobile compatibility
+
 ## 3.0.4 ##
 - T170050 Better cross-wiki support of AutoEdits tool
     - Include link to request a new semi-automated tool be added

@@ -7,7 +7,7 @@ To contribute to the development of XTools, you may fork us on GitHub.  A few th
 1. XTools is based on Symfony 3. We use Twig as our template engine.  Symfony is a full MVC system.
    a. The controllers are located at ``src/AppBundle/controller``.  They are sorted by tool.
    b. The twig templates are located at ``app/resources/views``.  They are sorted by tool.
-2. We use the ``@Route`` syntax to configure routes. 
+2. We use the ``@Route`` syntax to configure routes.
 3. Every tool requires a twig directory and one controller. Also, core parts of XTools require the tool to be registered within `app/config/tools.yml`.
 
 Style Guidelines
@@ -145,7 +145,8 @@ Releases
 Before tagging a new release:
 
 * update the version numbers in ``docs/conf.py`` and ``app/config/version.yml``;
-* check the copyright year in ``README.md``, ``docs/conf.py``, and ``app/Resources/views/base.html.twig``; and
+* check the copyright year in ``README.md``, ``docs/conf.py``, and ``app/Resources/views/base.html.twig``;
+* update the branch of the stable build status badge in ``README.md``; and
 * update ``RELEASE_NOTES.md`` with any notable new information for the end user.
 
 Then tag the release
