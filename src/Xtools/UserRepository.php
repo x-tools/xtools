@@ -63,6 +63,36 @@ class UserRepository extends Repository
     }
 
     /**
+     * Get the user's registration date.
+     * @param string $databaseName The database to query.
+     * @param string $username The username to find.
+     * @return string|null As returned by the database.
+     */
+    public function getRegistrationDate($databaseName, $username)
+    {
+        // Use md5 to ensure the key does not contain reserved characters.
+        $cacheKey = 'user_registration.'.$databaseName.'.'.md5($username);
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $userTable = $this->getTableName($databaseName, 'user');
+        $sql = "SELECT user_registration FROM $userTable WHERE user_name = :username LIMIT 1";
+        $resultQuery = $this->getProjectsConnection()->prepare($sql);
+        $resultQuery->bindParam('username', $username);
+        $resultQuery->execute();
+        $registrationDate = $resultQuery->fetchColumn();
+
+        // Cache for 10 minutes.
+        $cacheItem = $this->cache
+            ->getItem($cacheKey)
+            ->set($registrationDate)
+            ->expiresAfter(new DateInterval('PT10M'));
+        $this->cache->save($cacheItem);
+        return $registrationDate;
+    }
+
+    /**
      * Get group names of the given user.
      * @param Project $project The project.
      * @param string $username The username.

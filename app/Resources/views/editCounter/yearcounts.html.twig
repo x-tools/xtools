@@ -23,40 +23,54 @@
                 <div class="panel-body col-lg-12">
 {% endif %}
 
-<canvas id="yearcounts-canvas"></canvas>
+{# 8 * year count seems to be the magic equation for the height (minimum 28) #}
+<canvas id="yearcounts-canvas" height="{{ max(8 * ec.yearCounts.yearLabels|length, 28) }}"></canvas>
 <script type="text/javascript">
-    new Chart($("#yearcounts-canvas"), {
-        type: 'horizontalBar',
-        data: {
-            labels: [{% for y in ec.yearcounts.years %}"{{ y }}"{% if not loop.last %},{% endif %}{% endfor %}],
-            datasets: [
-                {% for ns_id,yeartotals in ec.yearcounts.totals %}
-                {
-                    label: "{{ nsName(ns_id, project.namespaces) }}",
-                    data: [
-                        {% for y in ec.yearcounts.years %}
-                        {% if attribute(yeartotals, y) is defined %}{{ attribute(yeartotals, y) }}{% else %}0{% endif %}{% if not loop.last %},{% endif %}
-                        {% endfor %}
-                    ],
-                    backgroundColor: "{{ color(ns_id) }}"
-                }{% if not loop.last %},{% endif %}
-                {% endfor %}
-            ]
-        },
-        options: {
-            tooltips: {
-                intersect: true
+    $(function() {
+        var datasets = [];
+        {% for nsId,namespaceData in ec.yearCounts.totals %}
+            var dataset = {
+                label: "{{ nsName(nsId, project.namespaces) }}",
+                backgroundColor: "{{ color(nsId) }}",
+                data: [],
+            };
+
+            {% for year,yearData in namespaceData %}
+                dataset.data.push({{ yearData }});
+            {%- endfor -%}
+
+            datasets.push(dataset);
+        {% endfor %}
+
+        new Chart($("#yearcounts-canvas"), {
+            type: 'horizontalBar',
+            data: {
+                labels: {{ ec.monthCounts.yearLabels|json_encode|raw }},
+                datasets: datasets
             },
-            responsive: true,
-            scales: {
-                xAxes: [{
-                    stacked: true
-                }],
-                yAxes: [{
-                    stacked: true
-                }]
+            options: {
+                tooltips: {
+                    intersect: true
+                },
+                responsive: true,
+                scales: {
+                    xAxes: [{
+                        stacked: true,
+                        ticks: {
+                            beginAtZero: true,
+                            callback: function(value, index, values) {
+                                if (Math.floor(value) === value) {
+                                    return value;
+                                }
+                            }
+                        }
+                    }],
+                    yAxes: [{
+                        stacked: true
+                    }]
+                }
             }
-        }
+        });
     });
 </script>
 

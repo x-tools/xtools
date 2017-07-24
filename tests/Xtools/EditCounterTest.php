@@ -8,35 +8,61 @@ namespace Tests\Xtools;
 use Xtools\EditCounter;
 use Xtools\EditCounterRepository;
 use Xtools\Project;
+use Xtools\ProjectRepository;
 use Xtools\User;
+use Xtools\UserRepository;
+use DateTime;
 
 /**
  * Tests for the EditCounter.
  */
 class EditCounterTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var Project The project instance. */
+    protected $project;
+
+    /** @var ProjectRepository The project repository instance. */
+    protected $projectRepo;
+
+    /** @var EditCounter The edit counter instance. */
+    protected $editCounter;
+
+    /** @var EditCounterRepository The edit counter repository instance. */
+    protected $editCounterRepo;
+
+    /** @var User The user instance. */
+    protected $user;
+
+    /**
+     * Set up shared mocks and class instances.
+     */
+    public function setUp()
+    {
+        $this->editCounterRepo = $this->getMock(EditCounterRepository::class);
+        $this->projectRepo = $this->getMock(ProjectRepository::class);
+        $this->project = new Project('TestProject');
+        $this->project->setRepository($this->projectRepo);
+        $this->user = new User('Testuser');
+        $this->editCounter = new EditCounter($this->project, $this->user);
+        $this->editCounter->setRepository($this->editCounterRepo);
+    }
 
     /**
      * Get counts of revisions: deleted, not-deleted, and total.
      */
     public function testLiveAndDeletedEdits()
     {
-        $editCounterRepo = $this->getMock(EditCounterRepository::class);
-        $editCounterRepo->expects($this->once())
+        $this->editCounterRepo->expects($this->once())
             ->method('getPairData')
             ->willReturn([
                 'deleted' => 10,
                 'live' => 100,
             ]);
 
-        $project = new Project('TestProject');
-        $user = new User('Testuser');
-        $editCounter = new EditCounter($project, $user);
-        $editCounter->setRepository($editCounterRepo);
-
-        $this->assertEquals(100, $editCounter->countLiveRevisions());
-        $this->assertEquals(10, $editCounter->countDeletedRevisions());
-        $this->assertEquals(110, $editCounter->countAllRevisions());
+        $this->assertEquals(100, $this->editCounter->countLiveRevisions());
+        $this->assertEquals(10, $this->editCounter->countDeletedRevisions());
+        $this->assertEquals(110, $this->editCounter->countAllRevisions());
+        $this->assertEquals(100, $this->editCounter->countLast5000());
     }
 
     /**
@@ -44,24 +70,19 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
      */
     public function testDates()
     {
-        $editCounterRepo = $this->getMock(EditCounterRepository::class);
-        $editCounterRepo->expects($this->once())->method('getPairData')->willReturn([
+        $this->editCounterRepo->expects($this->once())->method('getPairData')->willReturn([
                 'first' => '20170510100000',
                 'last' => '20170515150000',
             ]);
-        $project = new Project('TestProject');
-        $user = new User('Testuser1');
-        $editCounter = new EditCounter($project, $user);
-        $editCounter->setRepository($editCounterRepo);
         $this->assertEquals(
             new \DateTime('2017-05-10 10:00'),
-            $editCounter->datetimeFirstRevision()
+            $this->editCounter->datetimeFirstRevision()
         );
         $this->assertEquals(
             new \DateTime('2017-05-15 15:00'),
-            $editCounter->datetimeLastRevision()
+            $this->editCounter->datetimeLastRevision()
         );
-        $this->assertEquals(5, $editCounter->getDays());
+        $this->assertEquals(5, $this->editCounter->getDays());
     }
 
     /**
@@ -69,26 +90,21 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
      */
     public function testDatesWithOneRevision()
     {
-        $editCounterRepo = $this->getMock(EditCounterRepository::class);
-        $editCounterRepo->expects($this->once())
+        $this->editCounterRepo->expects($this->once())
             ->method('getPairData')
             ->willReturn([
                 'first' => '20170510110000',
                 'last' => '20170510110000',
             ]);
-        $project = new Project('TestProject');
-        $user = new User('Testuser1');
-        $editCounter = new EditCounter($project, $user);
-        $editCounter->setRepository($editCounterRepo);
         $this->assertEquals(
             new \DateTime('2017-05-10 11:00'),
-            $editCounter->datetimeFirstRevision()
+            $this->editCounter->datetimeFirstRevision()
         );
         $this->assertEquals(
             new \DateTime('2017-05-10 11:00'),
-            $editCounter->datetimeLastRevision()
+            $this->editCounter->datetimeLastRevision()
         );
-        $this->assertEquals(1, $editCounter->getDays());
+        $this->assertEquals(1, $this->editCounter->getDays());
     }
 
     /**
@@ -96,8 +112,7 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
      */
     public function testPageCounts()
     {
-        $editCounterRepo = $this->getMock(EditCounterRepository::class);
-        $editCounterRepo->expects($this->once())
+        $this->editCounterRepo->expects($this->once())
             ->method('getPairData')
             ->willReturn([
                 'edited-live' => '3',
@@ -105,18 +120,14 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
                 'created-live' => '6',
                 'created-deleted' => '2',
             ]);
-        $project = new Project('TestProject');
-        $user = new User('Testuser1');
-        $editCounter = new EditCounter($project, $user);
-        $editCounter->setRepository($editCounterRepo);
 
-        $this->assertEquals(3, $editCounter->countLivePagesEdited());
-        $this->assertEquals(1, $editCounter->countDeletedPagesEdited());
-        $this->assertEquals(4, $editCounter->countAllPagesEdited());
+        $this->assertEquals(3, $this->editCounter->countLivePagesEdited());
+        $this->assertEquals(1, $this->editCounter->countDeletedPagesEdited());
+        $this->assertEquals(4, $this->editCounter->countAllPagesEdited());
 
-        $this->assertEquals(6, $editCounter->countCreatedPagesLive());
-        $this->assertEquals(2, $editCounter->countPagesCreatedDeleted());
-        $this->assertEquals(8, $editCounter->countPagesCreated());
+        $this->assertEquals(6, $this->editCounter->countCreatedPagesLive());
+        $this->assertEquals(2, $this->editCounter->countPagesCreatedDeleted());
+        $this->assertEquals(8, $this->editCounter->countPagesCreated());
     }
 
     /**
@@ -131,16 +142,189 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
             '3' => '9',
             '4' => '12',
         ];
-        $editCounterRepo = $this->getMock(EditCounterRepository::class);
-        $editCounterRepo->expects($this->once())
+        $this->editCounterRepo->expects($this->once())
             ->method('getNamespaceTotals')
             ->willReturn($namespaceTotals);
-        $project = new Project('TestProject');
-        $user = new User('Testuser1');
-        $editCounter = new EditCounter($project, $user);
-        $editCounter->setRepository($editCounterRepo);
 
-        $this->assertEquals($namespaceTotals, $editCounter->namespaceTotals());
+        $this->assertEquals($namespaceTotals, $this->editCounter->namespaceTotals());
+    }
+
+    /**
+     * Test that month counts are properly put together.
+     */
+    public function testMonthCounts()
+    {
+        $this->editCounterRepo->expects($this->once())
+            ->method('getMonthCounts')
+            ->willReturn([
+                [
+                    'year' => '2016',
+                    'month' => '12',
+                    'page_namespace' => '0',
+                    'count' => '10',
+                ],
+                [
+                    'year' => '2017',
+                    'month' => '3',
+                    'page_namespace' => '0',
+                    'count' => '20',
+                ],
+                [
+                    'year' => '2017',
+                    'month' => '2',
+                    'page_namespace' => '1',
+                    'count' => '50',
+                ],
+            ]);
+        $userRepo = $this->getMock(UserRepository::class);
+        $userRepo->expects($this->once())
+            ->method('getRegistrationDate')
+            ->willReturn('20161105000000');
+        $this->user->setRepository($userRepo);
+
+        // Mock current time by passing it in (dummy parameter, so to speak).
+        $monthCounts = $this->editCounter->monthCounts(new DateTime('2017-04-30 23:59:59'));
+
+        // Make sure zeros were filled in for months with no edits,
+        //   and for each namespace.
+        $this->assertArraySubset(
+            [
+                1 => 0,
+                2 => 0,
+                3 => 20,
+                4 => 0,
+            ],
+            $monthCounts['totals'][0][2017]
+        );
+        $this->assertArraySubset(
+            [
+                11 => 0,
+                12 => 0,
+            ],
+            $monthCounts['totals'][1][2016]
+        );
+
+        // Assert only active months are reported.
+        $this->assertEquals([11, 12], array_keys($monthCounts['totals'][0][2016]));
+        $this->assertEquals(['01', '02', '03', '04'], array_keys($monthCounts['totals'][0][2017]));
+
+        // Assert that only active years are reported
+        $this->assertEquals([2016, 2017], array_keys($monthCounts['totals'][0]));
+
+        // Assert that only active namespaces are reported.
+        $this->assertEquals([0, 1], array_keys($monthCounts['totals']));
+
+        // Labels for the months
+        $this->assertEquals(
+            ['2016/11', '2016/12', '2017/01', '2017/02', '2017/03', '2017/04'],
+            $monthCounts['monthLabels']
+        );
+
+        // Labels for the years
+        $this->assertEquals(['2016', '2017'], $monthCounts['yearLabels']);
+    }
+
+    /**
+     * Month counts when user registration date is unknown
+     */
+    public function testMonthCountsUknownRegDate()
+    {
+        $this->editCounterRepo->expects($this->once())
+            ->method('getMonthCounts')
+            ->willReturn([
+                [
+                    'year' => '2017',
+                    'month' => '3',
+                    'page_namespace' => '0',
+                    'count' => '20',
+                ],
+            ]);
+        $userRepo = $this->getMock(UserRepository::class);
+        $userRepo->expects($this->once())
+            ->method('getRegistrationDate')
+            ->willReturn(null);
+        $this->user->setRepository($userRepo);
+        $monthCounts = $this->editCounter->monthCounts(new DateTime('2017-05-30 23:59:59'));
+
+        // All months of the year of the first edit should be reported
+        $this->assertEquals(
+            ['2017/01', '2017/02', '2017/03', '2017/04', '2017/05'],
+            $monthCounts['monthLabels']
+        );
+        $this->assertEquals([2017], array_keys($monthCounts['totals'][0]));
+    }
+
+    /**
+     * Test that year counts are properly put together.
+     */
+    public function testYearCounts()
+    {
+        $this->editCounterRepo->expects($this->once())
+            ->method('getMonthCounts')
+            ->willReturn([
+                [
+                    'year' => '2015',
+                    'month' => '6',
+                    'page_namespace' => '1',
+                    'count' => '5',
+                ],
+                [
+                    'year' => '2016',
+                    'month' => '12',
+                    'page_namespace' => '0',
+                    'count' => '10',
+                ],
+                [
+                    'year' => '2017',
+                    'month' => '3',
+                    'page_namespace' => '0',
+                    'count' => '20',
+                ],
+                [
+                    'year' => '2017',
+                    'month' => '2',
+                    'page_namespace' => '1',
+                    'count' => '50',
+                ],
+            ]);
+        $userRepo = $this->getMock(UserRepository::class);
+        $userRepo->expects($this->once())
+            ->method('getRegistrationDate')
+            ->willReturn('20140505000000');
+        $this->user->setRepository($userRepo);
+
+        // Mock current time by passing it in (dummy parameter, so to speak).
+        $yearCounts = $this->editCounter->yearCounts(new DateTime('2017-04-30 23:59:59'));
+
+        // Make sure zeros were filled in for months with no edits,
+        //   and for each namespace.
+        $this->assertArraySubset(
+            [
+                2014 => 0,
+                2015 => 0,
+                2016 => 10,
+                2017 => 20,
+            ],
+            $yearCounts['totals'][0]
+        );
+        $this->assertArraySubset(
+            [
+                2014 => 0,
+                2015 => 5,
+                2016 => 0,
+                2017 => 50,
+            ],
+            $yearCounts['totals'][1]
+        );
+
+        // Assert that only active years are reported
+        $this->assertEquals([2014, 2015, 2016, 2017], array_keys($yearCounts['totals'][0]));
+
+        // Assert that only active namespaces are reported.
+        $this->assertEquals([0, 1], array_keys($yearCounts['totals']));
+
+        // Labels for the years
+        $this->assertEquals(['2014', '2015', '2016', '2017'], $yearCounts['yearLabels']);
     }
 
     /**
@@ -158,13 +342,9 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
             ['project' => new Project('wiki4'), 'total' => 10],
             ['project' => new Project('wiki5'), 'total' => 35],
         ];
-        $editCounterRepo = $this->getMock(EditCounterRepository::class);
-        $editCounterRepo->expects($this->once())
+        $this->editCounterRepo->expects($this->once())
             ->method('globalEditCounts')
             ->willReturn($editCounts);
-        $user = new User('Testuser1');
-        $editCounter = new EditCounter($wiki1, $user);
-        $editCounter->setRepository($editCounterRepo);
 
         // Get the top 2.
         $this->assertEquals(
@@ -172,14 +352,14 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
                 ['project' => $wiki1, 'total' => 50],
                 ['project' => $wiki2, 'total' => 40],
             ],
-            $editCounter->globalEditCountsTopN(2)
+            $this->editCounter->globalEditCountsTopN(2)
         );
 
         // And the bottom 4.
-        $this->assertEquals(95, $editCounter->globalEditCountWithoutTopN(2));
+        $this->assertEquals(95, $this->editCounter->globalEditCountWithoutTopN(2));
 
         // Grand total.
-        $this->assertEquals(185, $editCounter->globalEditCount());
+        $this->assertEquals(185, $this->editCounter->globalEditCount());
     }
 
     /**
@@ -187,16 +367,10 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
      */
     public function testLongestBlockDays()
     {
-        $wiki = new Project('wiki1');
-        $user = new User('Testuser1');
-
         // Scenario 1
-        $editCounter = new EditCounter($wiki, $user);
-        $editCounterRepo = $this->getMock(EditCounterRepository::class);
-        $editCounter->setRepository($editCounterRepo);
-        $editCounterRepo->expects($this->once())
+        $this->editCounterRepo->expects($this->once())
             ->method('getBlocksReceived')
-            ->with($wiki, $user)
+            ->with($this->project, $this->user)
             ->willReturn([
                 [
                     'log_timestamp' => '20170101000000',
@@ -207,15 +381,15 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
                     'log_params' => 'a:2:{s:11:"5::duration";s:7:"1 month";s:8:"6::flags";s:11:"noautoblock";}',
                 ],
             ]);
-        $this->assertEquals(31, $editCounter->getLongestBlockDays());
+        $this->assertEquals(31, $this->editCounter->getLongestBlockDays());
 
         // Scenario 2
-        $editCounter2 = new EditCounter($wiki, $user);
+        $editCounter2 = new EditCounter($this->project, $this->user);
         $editCounterRepo2 = $this->getMock(EditCounterRepository::class);
         $editCounter2->setRepository($editCounterRepo2);
         $editCounterRepo2->expects($this->once())
             ->method('getBlocksReceived')
-            ->with($wiki, $user)
+            ->with($this->project, $this->user)
             ->willReturn([
                 [
                     'log_timestamp' => '20170201000000',
@@ -229,12 +403,12 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(-1, $editCounter2->getLongestBlockDays());
 
         // Scenario 3
-        $editCounter3 = new EditCounter($wiki, $user);
+        $editCounter3 = new EditCounter($this->project, $this->user);
         $editCounterRepo3 = $this->getMock(EditCounterRepository::class);
         $editCounter3->setRepository($editCounterRepo3);
         $editCounterRepo3->expects($this->once())
             ->method('getBlocksReceived')
-            ->with($wiki, $user)
+            ->with($this->project, $this->user)
             ->willReturn([
                 [
                     'log_timestamp' => '20170701000000',
