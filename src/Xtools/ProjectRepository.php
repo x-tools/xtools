@@ -206,7 +206,12 @@ class ProjectRepository extends Repository
             return $this->metadata;
         }
 
-        $api = MediawikiApi::newFromPage($projectUrl);
+        try {
+            $api = MediawikiApi::newFromPage($projectUrl);
+        }
+        catch (\Exception $e) {
+            return null;
+        }
 
         $params = ['meta' => 'siteinfo', 'siprop' => 'general|namespaces'];
         $query = new SimpleRequest('query', $params);

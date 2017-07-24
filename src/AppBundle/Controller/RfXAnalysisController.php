@@ -150,17 +150,24 @@ class RfXAnalysisController extends Controller
 
         $text = $api->getPageText($project, $pagename);
 
-        $rfa = new RFA($text, $this->getParameter("rfa")[$db]["sections"], "User");
+        $rfa = new RFA(
+            $text,
+            $this->getParameter("rfa")[$db]["sections"],
+            "User"
+        );
 
-        if ($rfa->get_lasterror() != null) {
+        /*if ($rfa->get_lasterror() != null) {
             $this->addFlash("notice", [$rfa->get_lasterror()]);
             return $this->redirectToRoute("rfa");
-        }
+        }*/
+
+        // TODO: Get an error state.
 
         $support = $rfa->get_support();
         $oppose = $rfa->get_oppose();
         $neutral = $rfa->get_neutral();
-        $dup = $rfa->get_duplicates();
+        //$dup = $rfa->get_duplicates();
+        $dup = [];
 
         $end = $rfa->get_enddate();
 

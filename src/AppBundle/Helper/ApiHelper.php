@@ -333,7 +333,7 @@ class ApiHelper extends HelperBase
             if (isset($res['parse']['wikitext']['*'])) {
                 $result = $res['parse']['wikitext']['*'];
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // The api returned an error!  Ignore
         }
 
@@ -368,7 +368,7 @@ class ApiHelper extends HelperBase
                     $result[$value["title"]] = "";
                 }
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // The api returned an error!  Ignore
         }
 

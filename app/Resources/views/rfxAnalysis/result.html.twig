@@ -37,19 +37,19 @@
                                 <h3>{{ msg("support") }}</h3>
                                 <ol>
                                     {% for username in support %}
-                                        <li>{{ wiki.userLink(username.name, project) }}</li>
+                                        <li>{{ wiki.userLink(username, project) }}</li>
                                     {% endfor %}
                                 </ol>
                                 <h3>{{ msg("oppose") }}</h3>
                                 <ol>
                                     {% for username in oppose %}
-                                        <li>{{ wiki.userLink(username.name, project) }}</li>
+                                        <li>{{ wiki.userLink(username, project) }}</li>
                                     {% endfor %}
                                 </ol>
                                 <h3>{{ msg("neutral") }}</h3>
                                 <ol>
                                     {% for username in neutral %}
-                                        <li>{{ wiki.userLink(username.name, project) }}</li>
+                                        <li>{{ wiki.userLink(username, project) }}</li>
                                     {% endfor %}
                                 </ol>
                                 </ol>
