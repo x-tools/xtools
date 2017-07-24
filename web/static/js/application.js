@@ -25,6 +25,7 @@
             $(this).parents('.panel-heading').siblings('.panel-body').show();
         });
 
+        setupNavCollapsing();
         setupColumnSorting();
         setupTOC();
         setupProjectListener();
@@ -124,6 +125,39 @@
 
             chartObj.update();
         });
+    }
+
+    /**
+     * If there are more tool links in the nav than will fit in the viewport,
+     *   move the last entry to the More menu, one at a time, until it all fits.
+     * This does not listen for window resize events.
+     */
+    function setupNavCollapsing()
+    {
+        var windowWidth = $(window).width(),
+            toolNavWidth = $('.tool-links').outerWidth(),
+            navRightWidth = $('.nav-buttons').outerWidth();
+
+        // Ignore if in mobile responsive view
+        if (windowWidth < 768) {
+            return;
+        }
+
+        // Do this first so we account for the space the More menu takes up
+        if (toolNavWidth + navRightWidth > windowWidth) {
+            $('.tool-links--more').removeClass('hidden');
+        }
+
+        // Don't loop more than there are links in the nav.
+        // This more just a safeguard against an infinite loop should something go wrong.
+        var numLinks = $('.tool-links--entry').length;
+        while (numLinks > 0 && toolNavWidth + navRightWidth > windowWidth) {
+            // Remove the last tool link that is not the current tool being used
+            var $link = $('.tool-links--nav > .tool-links--entry:not(.active)').last().remove();
+            $('.tool-links--more .dropdown-menu').append($link);
+            toolNavWidth = $('.tool-links').outerWidth();
+            numLinks--;
+        }
     }
 
     /**
