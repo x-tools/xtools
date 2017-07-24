@@ -92,13 +92,13 @@ class ProjectRepository extends Repository
 
     /**
      * Get the 'dbName', 'url' and 'lang' of all projects.
-     * @return string[] Each item has 'dbName', 'url' and 'lang' keys.
+     * @return string[][] Each item has 'dbName', 'url' and 'lang' keys.
      */
     public function getAll()
     {
         $this->log->debug(__METHOD__." Getting all projects' metadata");
         // Single wiki mode?
-        if ($this->singleBasicInfo) {
+        if (!empty($this->singleBasicInfo)) {
             return [$this->getOne('')];
         }
 
@@ -135,7 +135,7 @@ class ProjectRepository extends Repository
     {
         $this->log->debug(__METHOD__." Getting metadata about $project");
         // For single-wiki setups, every project is the same.
-        if ($this->singleBasicInfo) {
+        if (!empty($this->singleBasicInfo)) {
             return $this->singleBasicInfo;
         }
 
@@ -195,7 +195,7 @@ class ProjectRepository extends Repository
     public function getMetadata($projectUrl)
     {
         // First try variable cache
-        if ($this->metadata) {
+        if (!empty($this->metadata)) {
             return $this->metadata;
         }
 
@@ -218,7 +218,7 @@ class ProjectRepository extends Repository
 
         // Even if general info could not be fetched,
         //   return dbName, url and lang if already known
-        if ($this->basicInfo) {
+        if (!empty($this->basicInfo)) {
             $this->metadata['dbName'] = $this->basicInfo['dbName'];
             $this->metadata['url'] = $this->basicInfo['url'];
             $this->metadata['lang'] = $this->basicInfo['lang'];

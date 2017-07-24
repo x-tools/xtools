@@ -79,7 +79,7 @@ class PagesController extends Controller
         }
 
         // set default wiki so we can populate the namespace selector
-        if (!$project) {
+        if (empty($project)) {
             $project = $this->getParameter('default_project');
         }
 

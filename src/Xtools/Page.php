@@ -40,7 +40,7 @@ class Page extends Model
      */
     protected function getPageInfo()
     {
-        if (!$this->pageInfo) {
+        if (empty($this->pageInfo)) {
             $this->pageInfo = $this->getRepository()
                     ->getPageInfo($this->project, $this->unnormalizedPageName);
         }
@@ -177,7 +177,7 @@ class Page extends Model
     public function getNumRevisions(User $user = null)
     {
         // Return the count of revisions if already present
-        if ($this->revisions) {
+        if (!empty($this->revisions)) {
             return count($this->revisions);
         }
 
@@ -377,7 +377,6 @@ class Page extends Model
 
     /**
      * Get all wikidata items for the page, not just languages of sister projects
-     * @param Page $page
      * @return int Number of records.
      */
     public function getWikidataItems()
@@ -387,7 +386,6 @@ class Page extends Model
 
     /**
      * Count wikidata items for the page, not just languages of sister projects
-     * @param Page $page
      * @return int Number of records.
      */
     public function countWikidataItems()

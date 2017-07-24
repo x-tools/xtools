@@ -5,6 +5,8 @@
 
 namespace AppBundle\Twig;
 
+use Xtools\User;
+
 /**
  * Twig functions and filters for XTools.
  */

@@ -4,7 +4,11 @@
 
     // Load translations with 'en.json' as a fallback
     var messagesToLoad = {};
+
+    /** global: assetPath */
+    /** global: i18nLang */
     messagesToLoad[i18nLang] = assetPath + 'static/i18n/' + i18nLang + '.json';
+
     if (i18nLang !== 'en') {
         messagesToLoad.en = assetPath + 'static/i18n/en.json';
     }
@@ -99,8 +103,7 @@
             }
 
             var index = $(this).data('index'),
-                key = $(this).data('key'),
-                $row = $(this).parents('tr');
+                key = $(this).data('key');
 
             // must use .attr instead of .prop as sorting script will clone DOM elements
             if ($(this).attr('data-disabled') === 'true') {
@@ -343,6 +346,7 @@
             $('#project_input').on('change', function () {
                 var newProject = this.value;
 
+                /** global: xtBaseUrl */
                 $.get(xtBaseUrl + 'api/normalizeProject/' + newProject).done(function (data) {
                     // Keep track of project API path for use in page title autocompletion
                     apiPath = data.api;
@@ -365,12 +369,14 @@
         $('#project_input').on('change', function () {
             // Disable the namespace selector and show a spinner while the data loads.
             $('#namespace_select').prop('disabled', true);
-            $loader = $('span.loader');
+
+            var $loader = $('span.loader');
             $('label[for="namespace_select"]').append($loader);
             $loader.removeClass('hidden');
 
             var newProject = this.value;
 
+            /** global: xtBaseUrl */
             $.get(xtBaseUrl + 'api/namespaces/' + newProject).done(function (data) {
                 // Clone the 'all' option (even if there isn't one),
                 // and replace the current option list with this.
@@ -382,6 +388,10 @@
 
                 // Add all of the new namespace options.
                 for (var ns in data.namespaces) {
+                    if (!data.namespaces.hasOwnProperty(ns)) {
+                        continue; // Skip keys from the prototype.
+                    }
+
                     var nsName = parseInt(ns, 10) === 0 ? $.i18n('mainspace') : data.namespaces[ns];
                     $('#namespace_select').append(
                         "<option value=" + ns + ">" + nsName + "</option>"

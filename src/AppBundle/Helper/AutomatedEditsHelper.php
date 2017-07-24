@@ -98,7 +98,7 @@ class AutomatedEditsHelper extends HelperBase
      * Revert detection happens only by testing against a regular expression,
      *   and not by checking tags.
      * @param  string $projectDomain Such as en.wikipedia.org
-     * @return string Each tool with the tool name as the key,
+     * @return string[] Each tool with the tool name as the key,
      *   and 'link' and 'regex' as the subarray keys.
      */
     public function getRevertTools($projectDomain)

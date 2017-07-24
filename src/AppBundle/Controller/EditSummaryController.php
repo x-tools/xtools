@@ -94,23 +94,21 @@ class EditSummaryController extends Controller
     public function resultAction($project, $username, $namespace = 'all')
     {
         /**
-         * ProjectRepository object representing the project
-         *
-         * @var Project $project
+         * Project object representing the project
+         * @var Project $projectData
          */
-        $project = ProjectRepository::getProject($project, $this->container);
-        $projectRepo = $project->getRepository();
+        $projectData = ProjectRepository::getProject($project, $this->container);
 
         // Start by checking if the project exits.
         // If not, show a message and redirect
-        if (!$project->exists()) {
-            $this->addFlash('notice', ['invalid-project', $project]);
+        if (!$projectData->exists()) {
+            $this->addFlash('notice', ['invalid-project', $projectData]);
             return $this->redirectToRoute('EditSummary');
         }
 
         $user = new User($username);
 
-        $editSummaryUsage = $this->getEditSummaryUsage($project, $user, $namespace);
+        $editSummaryUsage = $this->getEditSummaryUsage($projectData, $user, $namespace);
 
         // If they have no edits, we have nothing to show
         if ($editSummaryUsage['totalEdits'] === 0) {
@@ -125,7 +123,7 @@ class EditSummaryController extends Controller
                 'xtPage' => 'es',
                 'xtTitle' => $user->getUsername(),
                 'user' => $user,
-                'project' => $project,
+                'project' => $projectData,
                 'namespace' => $namespace,
             ])
         );
@@ -136,7 +134,7 @@ class EditSummaryController extends Controller
      * @param  Project $project
      * @param  User $user
      * @param  string $namespace
-     * @return string[]
+     * @return array
      * @todo Should we move this to an actual Repository? Very specific to this controller
      */
     private function getEditSummaryUsage($project, $user, $namespace)

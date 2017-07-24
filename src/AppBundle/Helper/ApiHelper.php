@@ -166,7 +166,8 @@ class ApiHelper extends HelperBase
     {
         $this->setUp($project);
         $displayTitles = [];
-        for ($n = 0; $n < count($pageTitles); $n += 50) {
+        $numPages = count($pageTitles);
+        for ($n = 0; $n < $numPages; $n += 50) {
             $titleSlice = array_slice($pageTitles, $n, 50);
             $params = [
                 'prop' => 'info|pageprops',

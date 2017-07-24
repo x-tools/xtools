@@ -26,8 +26,6 @@ class ArticleInfoController extends Controller
 {
     /** @var mixed[] Information about the page in question. */
     private $pageInfo;
-    /** @var Edit[] All edits of the page. */
-    private $pageHistory;
     /** @var ProjectRepository Shared Project repository for use of getting table names, etc. */
     private $projectRepo;
     /** @var string Database name, for us of getting table names, etc. */
@@ -414,6 +412,12 @@ class ArticleInfoController extends Controller
          */
         $prevMaxDelEdit = null;
 
+        /**
+         * The last edit made to the article.
+         * @var Edit|null
+         */
+        $lastEdit = null;
+
         /** @var Time|null Time of first revision, used as a comparison for month counts */
         $firstEditMonth = null;
 
@@ -574,7 +578,7 @@ class ArticleInfoController extends Controller
             }
 
             $automatedTool = $edit->getTool($this->container);
-            if ($automatedTool) {
+            if ($automatedTool !== false) {
                 $data['general']['automated_count']++;
                 $data['year_count'][$editYear]['automated']++;
                 $data['year_count'][$editYear]['months'][$editMonth]['automated']++;

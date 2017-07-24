@@ -308,7 +308,6 @@ class PagesRepository extends Repository
                 UNION
                 SELECT COUNT(*) AS value, 'redirects' AS type
                 FROM $redirectTable WHERE rd_namespace = :namespace AND rd_title = :title";
-        $statement = $this->getProjectsConnection()->prepare($sql);
 
         $params = [
             'id' => $page->getId(),
