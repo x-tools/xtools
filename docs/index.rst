@@ -84,12 +84,6 @@ Blame
 Find out who last changed a given part of a page.
 :ref:`Read more about Blame... <blame>`.
 
-EC
---
-
-Edit Counter again?
-:ref:`Read more about EC... <ec>`.
-
 Pages
 -----
 
@@ -112,7 +106,7 @@ Simple Counter
 --------------
 
 A simpler but quicker way to view edit counts (than Edit Counter, above).
-:ref:`Read more about Simple Counter... <sc>`.
+:ref:`Read more about Simple Counter... <simplecounter>`.
 
 Top Edits
 ---------
