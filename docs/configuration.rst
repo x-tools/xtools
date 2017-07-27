@@ -62,6 +62,8 @@ Application
 - **app.load_stylesheets_from_cdn** - Whether to load our stylesheets and scripts from a CDN.  This is required if XTools is installed on a Windows server
 - **app.single_wiki** - Point XTools to a single wiki, instead of using a meta database.  This ignores database_meta_name above.
 - **app.is_labs** - Whether XTools lives on the Wikimedia Foundation Labs environment.  This should be set to false.
+- **app.rate_limit_time** - Number of minutes during which ``app.rate_limit_count`` requests from the same user are allowed. Set this to ``0`` to disable rate limiting.
+- **app.rate_limit_count** - Number of requests from the same user that are allowed during the time frame specified by ``app.rate_limit_time``. Set this to ``0`` to disable rate limiting.
 - **wiki_url** - URL to use if app.single_wiki is enabled.  The title of pages is attached to the end.
 - **api_path** - The API path for the project, usually /w/api.php
 - **opted_in** - A list of database names of projects that will display :ref:`restricted statistics <optin>` regardless of individual users' preferences
@@ -81,3 +83,4 @@ Tools
 - **enable.rfap** - Enable "RfX Vote Calculator" tool
 - **enable.bash** - Enable "Quote Database" tool
 - **enable.sc** - Enable "Plain, Dirty, Simple Edit Counter" tool
+- **enable.es** - Enable "Edit Summaries" tool

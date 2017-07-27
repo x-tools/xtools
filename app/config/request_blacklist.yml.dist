@@ -1,0 +1,9 @@
+# This file is used to prevent automated programs from using XTools.
+# You can block access based on user agent or requested URI.
+parameters:
+    request_blacklist:
+        # Any request with a user agent containing the strings below will be blocked.
+        user_agent:
+
+        # Any request of a URI matching the strings below will be blocked.
+        uri:

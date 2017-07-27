@@ -26,7 +26,7 @@ Running Development server
 
 First make sure you meet the :ref:`pre-requisites`, and then follow these steps:
 
-1. Clone the repository: ``git clone https://github.com/x-tools/xtools-rebirth.git && cd xtools-rebirth``
+1. Clone the repository: ``git clone https://github.com/x-tools/xtools.git && cd xtools``
 2. Run ``composer install`` and answer all the prompts.
 3. Create a new local database: ``./bin/console doctrine:database:create`` (or ``d:d:c``).
 4. Run the database migrations: ``./bin/console doctrine:migrations:migrate`` (or ``d:m:m``)
@@ -87,7 +87,7 @@ Tool Labs has different versions of tables that utilize indexing to improve perf
       app.table.revision: 'revision_userindex'
       app.table.logging: 'logging_logindex'
 
-Sometimes we want <code>logging_userindex</code> and not the logindex. This is handled in the code via the <code>getTableName()</code> function in [https://github.com/x-tools/xtools-rebirth/blob/master/src/Xtools/Repository.php#L144 Repository.php].
+Sometimes we want <code>logging_userindex</code> and not the logindex. This is handled in the code via the <code>getTableName()</code> function in [https://github.com/x-tools/xtools/blob/master/src/Xtools/Repository.php#L144 Repository.php].
 
 Caching
 =======

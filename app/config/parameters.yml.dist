@@ -53,6 +53,9 @@ parameters:
 
     app.replag_threshold: 30
 
+    app.rate_limit_time: 5
+    app.rate_limit_count: 10
+
     # Enabling or disabling of individual tools
     enable.adminscore: 1
     enable.adminstats: 1
