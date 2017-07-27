@@ -48,7 +48,7 @@ class AdminScoreController extends Controller
 
         if ($projectQuery != '' && $username != '') {
             return $this->redirectToRoute('AdminScoreResult', [ 'project' => $projectQuery, 'username' => $username ]);
-        } elseif ($projectQuery != '') {
+        } elseif ($projectQuery != '' && $project === null) {
             return $this->redirectToRoute('AdminScoreProject', [ 'project' => $projectQuery ]);
         }
 
