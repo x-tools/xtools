@@ -23,11 +23,29 @@ namespace Xtools;
  */
 class RFA
 {
-    private $sections;
+    /**
+     * @var array Data we parsed out of the page text
+     */
     private $data;
+
+    /**
+     * @var array Duplicate voters
+     */
     private $duplicates;
+
+    /**
+     * @var null|string Username of the user we're looking for.
+     */
     private $user_looking_for;
+
+    /**
+     * @var string Section we found the user we're looking for
+     */
     private $userSectionFound;
+
+    /**
+     * @var string Ending date of the RFA
+     */
     private $endDate;
 
     /**
@@ -84,7 +102,6 @@ class RFA
         $date_regexp = "final .*end(?:ing|ed)?(?: no earlier than)? (.*?)? \(UTC\)",
         $user_looking_for = null
     ) {
-        $this->sections = $section_array;
         $this->user_looking_for = $user_looking_for;
 
         $lines = explode("\n", $rawWikiText);

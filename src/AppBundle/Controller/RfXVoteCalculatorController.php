@@ -130,9 +130,7 @@ class RfXVoteCalculatorController extends Controller
         if (isset($rfaParam[$projectData->getDatabaseName()]["excluded_title"])) {
             $titlesExcluded
                 = $rfaParam[$projectData->getDatabaseName()]["excluded_title"];
-            foreach (
-                $titlesExcluded as $ignoredPage
-            ) {
+            foreach ($titlesExcluded as $ignoredPage) {
                 $ignoredPages .= "AND p.page_title != \"$ignoredPage\"\r\n";
             }
         }
@@ -140,9 +138,7 @@ class RfXVoteCalculatorController extends Controller
         if (isset($rfaParam[$projectData->getDatabaseName()]["excluded_regex"])) {
             $titlesExcluded
                 = $rfaParam[$projectData->getDatabaseName()]["excluded_regex"];
-            foreach (
-                $titlesExcluded as $ignoredPage
-            ) {
+            foreach ($titlesExcluded as $ignoredPage) {
                 $ignoredPages .= "AND p.page_title NOT LIKE \"%$ignoredPage%\"\r\n";
             }
         }
