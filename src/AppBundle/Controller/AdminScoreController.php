@@ -138,16 +138,19 @@ class AdminScoreController extends Controller
             WHERE l.log_type='block' AND l.log_action='block'
             AND l.log_namespace=2 AND l.log_deleted=0 AND u.user_name=:username
         UNION
-        SELECT 'afd' AS source, COUNT(*) AS value FROM $revisionTable
-            WHERE rev_page LIKE 'Articles for deletion/%'
-                AND rev_page NOT LIKE 'Articles_for_deletion/Log/%'
-                AND rev_user_text=:username
+        SELECT 'afd' AS source, COUNT(*) AS value FROM $revisionTable r
+          RIGHT JOIN $pageTable p on p.page_id=r.rev_page
+            WHERE p.page_title LIKE 'Articles_for_deletion/%'
+                AND p.page_title NOT LIKE 'Articles_for_deletion/Log/%'
+                AND r.rev_user_text=:username
         UNION
         SELECT 'recent-activity' AS source, COUNT(*) AS value FROM $revisionTable
             WHERE rev_user_text=:username AND rev_timestamp > (now()-INTERVAL 730 day) AND rev_timestamp < now()
         UNION
-        SELECT 'aiv' AS source, COUNT(*) AS value FROM $revisionTable
-            WHERE rev_page LIKE 'Administrator intervention against vandalism%' AND rev_user_text=:username
+        SELECT 'aiv' AS source, COUNT(*) AS value FROM $revisionTable r
+          RIGHT JOIN $pageTable p on p.page_id=r.rev_page
+            WHERE p.page_title LIKE 'Administrator_intervention_against_vandalism%'
+                AND r.rev_user_text=:username
         UNION
         SELECT 'edit-summaries' AS source, COUNT(*) AS value FROM $revisionTable JOIN $pageTable ON rev_page=page_id
             WHERE page_namespace=0 AND rev_user_text=:username
@@ -161,8 +164,10 @@ class AdminScoreController extends Controller
         SELECT 'pages-created-deleted' AS source, COUNT(*) AS value FROM $archiveTable
             WHERE ar_user_text=:username AND ar_parent_id=0
         UNION
-        SELECT 'rpp' AS source, COUNT(*) AS value FROM $revisionTable
-            WHERE rev_page LIKE 'Requests_for_page_protection%' AND rev_user_text=:username
+        SELECT 'rpp' AS source, COUNT(*) AS value FROM $revisionTable r
+          RIGHT JOIN $pageTable p on p.page_id=r.rev_page
+            WHERE p.page_title LIKE 'Requests_for_page_protection%'
+                AND r.rev_user_text=:username;
         ");
 
         $user = UserRepository::getUser($username, $this->container);
