@@ -198,6 +198,7 @@
   "pages-created-deleted": "Label for pages a user has created that were later deleted.",
   "pages-created-live": "Label for pages a user has created that are still live.",
   "pages-created-since-deleted": "Text indicating the number of pages a user created that have since been deleted. $1 is the number.",
+  "pages-created-tooltip": "Text shown when hovering on a link near the 'pages created' label to explain what is excluded.",
   "pages-deleted": "Label for pages a user has deleted.",
   "pages-edited-total": "Label for number of total pages a user has edited.",
   "pages-moved": "Label for pages a user has moved.",

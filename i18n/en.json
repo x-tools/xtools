@@ -198,6 +198,7 @@
   "pager-older-n": "{{PLURAL:$1|older 1|older $1}}",
   "pages": "Pages",
   "pages-created": "Pages created",
+  "pages-created-tooltip": "Total of all pages created, inlcuding those created as a redirect when moving a page. See the documentation for more details.",
   "pages-created-deleted": "Pages created (deleted)",
   "pages-created-live": "Pages created (live)",
   "pages-created-since-deleted": "$1 since deleted",

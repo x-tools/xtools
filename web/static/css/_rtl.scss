@@ -78,6 +78,7 @@ $border: 1px solid #ccc;
 .tooltip-body {
     margin-left: 0;
     margin-right: 28px;
+    text-align: right;
 
     &::after,
     &::before {

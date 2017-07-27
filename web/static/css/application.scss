@@ -134,7 +134,8 @@ $tooltip-border: #ddd;
 $tooltip-shadow: #ccc;
 
 .tooltipcss {
-    position: inherit;
+    position: relative;
+    text-decoration: none;
 
     .tooltip-body {
         @include center('vertical');
@@ -144,9 +145,11 @@ $tooltip-shadow: #ccc;
         box-shadow: 5px 5px 8px $tooltip-shadow;
         color: #111;
         display: none;
+        text-align: left;
         font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
         line-height: 16px;
         margin-left: 28px;
+        min-width: 200px;
         max-width: 350px;
         padding: 14px 20px;
         white-space: normal;
