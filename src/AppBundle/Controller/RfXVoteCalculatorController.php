@@ -4,7 +4,7 @@
  *
  * @category RfXVoteCalculator
  * @package  AppBundle\Controller
- * @author   Xtools Team <xtools@lists.wikimedia.org>
+ * @author   XTools Team <xtools@lists.wikimedia.org>
  * @license  GPL 3.0
  * @link     http://xtools.wmflabs.org/rfap
  */
@@ -20,7 +20,7 @@ use Xtools\ProjectRepository;
 use Xtools\RFA;
 use Xtools\User;
 
-// Note: In the legacy xTools, this tool was referred to as "rfap."
+// Note: In the legacy XTools, this tool was referred to as "rfap."
 // Thus we have several references to it below, including in routes
 
 /**
@@ -28,7 +28,7 @@ use Xtools\User;
  *
  * @category RfXVoteCalculator
  * @package  AppBundle\Controller
- * @author   Xtools Team <xtools@lists.wikimedia.org>
+ * @author   XTools Team <xtools@lists.wikimedia.org>
  * @license  GPL 3.0
  * @link     http://xtools.wmflabs.org/rfap
  */
@@ -112,32 +112,32 @@ class RfXVoteCalculatorController extends Controller
 
         $namespaces = $projectData->getNamespaces();
 
-        if (!isset($rfaParam[$projectData->getDatabaseName()])) {
+        if (!isset($rfaParam[$projectData->getDomain()])) {
             $this->addFlash("notice", ["invalid-project-cant-use", $project]);
             return $this->redirectToRoute("rfap");
         }
 
-        $pageTypes = $rfaParam[$projectData->getDatabaseName()]["pages"];
+        $pageTypes = $rfaParam[$projectData->getDomain()]["pages"];
         $namespace
-            = $rfaParam[$projectData->getDatabaseName()]["rfa_namespace"] !== null
-            ? $rfaParam[$projectData->getDatabaseName()]["rfa_namespace"] : 4;
+            = $rfaParam[$projectData->getDomain()]["rfa_namespace"] !== null
+            ? $rfaParam[$projectData->getDomain()]["rfa_namespace"] : 4;
 
         $finalData = [];
 
         // We should probably figure out a better way to do this...
         $ignoredPages = "";
 
-        if (isset($rfaParam[$projectData->getDatabaseName()]["excluded_title"])) {
+        if (isset($rfaParam[$projectData->getDomain()]["excluded_title"])) {
             $titlesExcluded
-                = $rfaParam[$projectData->getDatabaseName()]["excluded_title"];
+                = $rfaParam[$projectData->getDomain()]["excluded_title"];
             foreach ($titlesExcluded as $ignoredPage) {
                 $ignoredPages .= "AND p.page_title != \"$ignoredPage\"\r\n";
             }
         }
 
-        if (isset($rfaParam[$projectData->getDatabaseName()]["excluded_regex"])) {
+        if (isset($rfaParam[$projectData->getDomain()]["excluded_regex"])) {
             $titlesExcluded
-                = $rfaParam[$projectData->getDatabaseName()]["excluded_regex"];
+                = $rfaParam[$projectData->getDomain()]["excluded_regex"];
             foreach ($titlesExcluded as $ignoredPage) {
                 $ignoredPages .= "AND p.page_title NOT LIKE \"%$ignoredPage%\"\r\n";
             }
@@ -180,9 +180,9 @@ $ignoredPages";
                     $type = str_replace("_", " ", $type);
                     $rfa = new RFA(
                         $text,
-                        $rfaParam[$projectData->getDatabaseName()]["sections"],
+                        $rfaParam[$projectData->getDomain()]["sections"],
                         $namespaces[2],
-                        $rfaParam[$projectData->getDatabaseName()]["date_regexp"],
+                        $rfaParam[$projectData->getDomain()]["date_regexp"],
                         $username
                     );
                     $section = $rfa->getUserSectionFound();

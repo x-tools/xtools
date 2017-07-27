@@ -1,6 +1,6 @@
 parameters:
   rfa:
-    enwiki:
+    en.wikipedia.org:
       rfa_namespace: 4
       sections:
         - "support"

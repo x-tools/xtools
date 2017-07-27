@@ -236,7 +236,7 @@
   "revision-delete": "Revision delete",
   "rfx-bureaucrat": "This tool can also analyze Requests for bureaucratship pages",
   "rfx-intro": "This tool analyzes votes and identifies duplicate voters in a:",
-  "rfx-duplicates": "Found $1 duplicate votes",
+  "rfx-duplicates": "Found $1 duplicate {{PLURAL:$1|vote|votes}}",
   "rfx-page": "RfX page",
   "rights": "Rights",
   "saturday": "Saturday",

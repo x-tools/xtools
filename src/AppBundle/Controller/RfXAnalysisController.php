@@ -4,7 +4,7 @@
  *
  * @category RfXAnalysis
  * @package  AppBundle\Controller
- * @author   Xtools Team <xtools@lists.wikimedia.org>
+ * @author   XTools Team <xtools@lists.wikimedia.org>
  * @license  GPL 3.0
  * @link     http://xtools.wmflabs.org/rfa
  */
@@ -23,9 +23,9 @@ use Xtools\RFA;
  *
  * @category RfXAnalysis
  * @package  AppBundle\Controller
- * @author   Xtools Team <xtools@lists.wikimedia.org>
+ * @author   XTools Team <xtools@lists.wikimedia.org>
  * @license  GPL 3.0
- * @link     http://tools.wmflabs.org/xtools/rfa
+ * @link     http://xtools.wmflabs.org/rfa
  */
 class RfXAnalysisController extends Controller
 {
@@ -132,18 +132,19 @@ class RfXAnalysisController extends Controller
         }
 
         $db = $projectData->getDatabaseName();
+        $domain = $projectData->getDomain();
         $wikiUrl = $projectData->getUrl();
 
-        if ($this->getParameter("rfa")[$db] === null) {
+        if ($this->getParameter("rfa")[$domain] === null) {
             $this->addFlash("notice", ["invalid-project-cant-use", $project]);
             return $this->redirectToRoute("rfa");
         }
 
         // Construct the page name
-        if (!isset($this->getParameter("rfa")[$db]["pages"][$type])) {
+        if (!isset($this->getParameter("rfa")[$domain]["pages"][$type])) {
             $pagename = "";
         } else {
-            $pagename = $this->getParameter("rfa")[$db]["pages"][$type];
+            $pagename = $this->getParameter("rfa")[$domain]["pages"][$type];
         }
 
         $pagename .= "/$username";
@@ -162,7 +163,7 @@ class RfXAnalysisController extends Controller
 
         $rfa = new RFA(
             $text,
-            $this->getParameter("rfa")[$db]["sections"],
+            $this->getParameter("rfa")[$domain]["sections"],
             "User"
         );
         $support = $rfa->getSection("support");
