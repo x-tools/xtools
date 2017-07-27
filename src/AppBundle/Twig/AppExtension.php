@@ -151,7 +151,7 @@ class AppExtension extends Extension
      */
     public function getLangName()
     {
-        return in_array($this->getIntuition()->getLangName(), $this->getAllLangs())
+        return in_array(ucfirst($this->getIntuition()->getLangName()), $this->getAllLangs())
             ? $this->getIntuition()->getLangName()
             : 'English';
     }
