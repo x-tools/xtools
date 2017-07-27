@@ -130,5 +130,5 @@ For more help with XTools, there are several places you can ask:
 * `IRC <https://webchat.freenode.net/?channels=#wikimedia-xtools>`_
   (`direct link <irc://irc.freenode.net/#wikimedia-xtools>`_ requires an IRC client)
   — to chat with the developers and other users.
-* `Phabricator <https://phabricator.wikimedia.org/maniphest/task/create/?project=Tool-labs-tools-xtools>`_
+* `Phabricator <https://phabricator.wikimedia.org/maniphest/task/create/?project=XTools>`_
   — if you've found a bug.

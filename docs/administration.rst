@@ -16,12 +16,15 @@ To configure, set the following variables in ``parameters.yml``:
 
 Using the above example, if you try to load the same page more than 5 times within 10 minutes, the request will be denied and you will have to wait 10 minutes before you can make the same request. This only applies to result pages and the API, and not index pages. Additionally, no rate limitations are imposed if the user is authenticated.
 
+Any requests that are denied are logged at ``var/logs/rate_limit.log``.
+
 Killing slow queries
 ====================
 
 Some queries on users with a high edit count may take a very long time to finish or even timout. You may wish to add a query killer to ensure stability.
 
 If you are running on a Linux environment, consider using `pt-kill <https://www.percona.com/doc/percona-toolkit/LATEST/pt-kill.html>`_. A query killer daemon could be configured like so:
+::
 
     pt-kill --user=xxxx --password=xxxx --host=xxxx \
            --busy-time=90 \
