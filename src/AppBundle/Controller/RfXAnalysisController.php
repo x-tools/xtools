@@ -135,7 +135,7 @@ class RfXAnalysisController extends Controller
         $wikiUrl = $projectData->getUrl();
 
         if ($this->getParameter("rfa")[$db] === null) {
-            $this->addFlash("notice", ["invalid-project", $project]);
+            $this->addFlash("notice", ["invalid-project-cant-use", $project]);
             return $this->redirectToRoute("rfa");
         }
 
@@ -150,26 +150,37 @@ class RfXAnalysisController extends Controller
 
         $text = $api->getPageText($project, $pagename);
 
+        if (!isset($text)) {
+            $this->addFlash("notice", ["no-result", $pagename]);
+            return $this->redirectToRoute(
+                "rfxAnalysisProject",
+                [
+                    "project" => $projectData->getDatabaseName()
+                ]
+            );
+        }
+
         $rfa = new RFA(
             $text,
             $this->getParameter("rfa")[$db]["sections"],
             "User"
         );
+        $support = $rfa->getSection("support");
+        $oppose = $rfa->getSection("oppose");
+        $neutral = $rfa->getSection("neutral");
+        $dup = $rfa->getDuplicates();
 
-        /*if ($rfa->get_lasterror() != null) {
-            $this->addFlash("notice", [$rfa->get_lasterror()]);
-            return $this->redirectToRoute("rfa");
-        }*/
+        if ((sizeof($support) + sizeof($oppose) + sizeof($neutral)) == 0) {
+            $this->addFlash("notice", ["no-result", $pagename]);
+            return $this->redirectToRoute(
+                "rfxAnalysisProject",
+                [
+                    "project" => $projectData->getDatabaseName()
+                ]
+            );
+        }
 
-        // TODO: Get an error state.
-
-        $support = $rfa->get_support();
-        $oppose = $rfa->get_oppose();
-        $neutral = $rfa->get_neutral();
-        //$dup = $rfa->get_duplicates();
-        $dup = [];
-
-        $end = $rfa->get_enddate();
+        $end = $rfa->getEndDate();
 
         $percent = (sizeof($support) /
             (sizeof($support) + sizeof($oppose) + sizeof($neutral)));

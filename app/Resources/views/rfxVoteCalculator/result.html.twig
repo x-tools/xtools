@@ -32,7 +32,6 @@
                 {% endif %}
             </p>
 
-            {% set content %}
                 <div class="col-lg-12 stat-list clearfix">
                     {% for type in data|keys %}
                         {% set innercontent %}
@@ -44,7 +43,7 @@
                                     {% set parsedData=data[type][vote][pagename] %}
                                     <tr>
                                         <td>{{ loop.index }}</td>
-                                        {# TODO: Fix this: <td>{{ parsedData.Date }}</td>#}
+                                        <td>{{ parsedData.Date }}</td>
                                         <td>(<span class="text-success">{{ parsedData.Support }}</span>, <span class="text-danger">{{ parsedData.Oppose }}</span>, <span class="text-muted">{{ parsedData.Neutral }}</span>)</td>
                                         <td>{{ wiki.pageLinkRaw(pagename, project, parsedData.name) }}</td>
                                     </tr>
@@ -55,8 +54,6 @@
                         {{ layout.content_block(type, innercontent, "", type, true) }}
                     {% endfor %}
                 </div>
-            {% endset %}
-            {{ layout.content_block("tool-rfap-desx", content) }}
         </div>
     </div>
 {% endblock %}

@@ -11,6 +11,7 @@ class RFA
 {
     private $sections;
     private $data;
+    private $duplicates;
     private $user_looking_for;
     private $userSectionFound;
     private $endDate;
@@ -41,6 +42,7 @@ class RFA
         $rawWikiText,
         $section_array = ["Support", "Oppose", "Neutral"],
         $user_namespace = "User",
+        $date_regexp = "final .*end(?:ing|ed)?(?: no earlier than)? (.*?)? \(UTC\)",
         $user_looking_for = null
     ) {
         $this->sections = $section_array;
@@ -56,10 +58,8 @@ class RFA
             if (preg_match("/={1,6}\s?($keys)\s?={1,6}/i", $line, $matches)) {
                 $lastSection = strtolower($matches[1]);
             } elseif ($lastSection == ""
-                // TODO: Make this cross-project
-                // TODO: Handle other date possibilities
                 && preg_match(
-                    "/final .*end(?:ing|ed)?(?: no earlier than)? (.*?)? \(UTC\)/i",
+                    "/$date_regexp/",
                     $line,
                     $matches
                 )
@@ -79,6 +79,24 @@ class RFA
                 }
             }
         }
+
+        $final = [];    // initialize the final array
+        $finalRaw = []; // Initialize the raw data array
+
+        foreach ($this->data as $key => $value) {
+            $finalRaw = array_merge($finalRaw, $this->data[$key]);
+        }
+
+        foreach ($finalRaw as $foundUsername) {
+            $final[] = $foundUsername; // group all array's elements
+        }
+
+        $final = array_count_values($final); // find repetition and its count
+
+        $final = array_diff($final, [1]);    // remove single occurrences
+
+        $this->duplicates = array_keys($final);
+
     }
 
     public function getUserSectionFound() {
@@ -95,30 +113,11 @@ class RFA
         }
     }
 
+    public function getDuplicates() {
+        return $this->duplicates;
+    }
+
     public function getEndDate() {
         return $this->endDate;
-    }
-
-    // MRB - Compatibility functions with Peachy's version.
-    // MRB - To remove.
-
-    public function get_userSectionFound() {
-        return $this->getUserSectionFound();
-    }
-
-    public function get_support() {
-        return $this->getSection("support");
-    }
-
-    public function get_oppose() {
-        return $this->getSection("oppose");
-    }
-
-    public function get_neutral() {
-        return $this->getSection("neutral");
-    }
-
-    public function get_enddate() {
-        return $this->getEndDate();
     }
 }

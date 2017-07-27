@@ -37,7 +37,12 @@
                                 <h3>{{ msg("support") }}</h3>
                                 <ol>
                                     {% for username in support %}
-                                        <li>{{ wiki.userLink(username, project) }}</li>
+                                        <li>
+                                            {{ wiki.userLink(username, project) }}
+                                            {% if username in duplicates %}
+                                                <span class="text-danger">({{ msg("duplicate-vote") }})</span>
+                                            {% endif %}
+                                        </li>
                                     {% endfor %}
                                 </ol>
                                 <h3>{{ msg("oppose") }}</h3>

@@ -84,6 +84,11 @@ class RfXVoteCalculatorController extends Controller
 
         $namespaces = $projectData->getNamespaces();
 
+        if (!isset($rfaParam[$projectData->getDatabaseName()])) {
+            $this->addFlash("notice", ["invalid-project-cant-use", $project]);
+            return $this->redirectToRoute("rfap");
+        }
+
         $pageTypes = $rfaParam[$projectData->getDatabaseName()]["pages"];
         $namespace
             = $rfaParam[$projectData->getDatabaseName()]["rfa_namespace"] !== null
@@ -151,17 +156,23 @@ $ignoredPages";
                         $text,
                         $rfaParam[$projectData->getDatabaseName()]["sections"],
                         $namespaces[2],
+                        $rfaParam[$projectData->getDatabaseName()]["date_regexp"],
                         $username
                     );
-                    $section = $rfa->get_userSectionFound();
+                    $section = $rfa->getUserSectionFound();
+                    if ($section == "") {
+                        // Skip over ones where the user didn't !vote.
+                        continue;
+                    }
+                    // Todo: i18n-ize this
                     $finalData[$type][$section][$title]["Support"]
-                        = sizeof($rfa->get_support());
+                        = sizeof($rfa->getSection("support"));
                     $finalData[$type][$section][$title]["Oppose"]
-                        = sizeof($rfa->get_oppose());
+                        = sizeof($rfa->getSection("oppose"));
                     $finalData[$type][$section][$title]["Neutral"]
-                        = sizeof($rfa->get_neutral());
+                        = sizeof($rfa->getSection("neutral"));
                     $finalData[$type][$section][$title]["Date"]
-                        = $rfa->get_enddate();
+                        = $rfa->getEndDate();
                     $finalData[$type][$section][$title]["name"]
                         = explode("/", $title)[1];
 

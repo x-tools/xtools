@@ -21,9 +21,11 @@ parameters:
         - "Requests_for_adminship/Header"
         - "Requests_for_adminship/?"
         - "Requests_for_adminship/"
+        - "Requests_for_adminship/Recent"
         - "Requests_for_adminship/Sample_Vote_on_sub-page_for_User:Jimbo_Wales"
         - "Requests_for_adminship/Promotion_guidelines"
         - "Wikipedia:Requests_for_adminship/Standards"
       excluded_regex:
         - "Requests_for_adminship/Nomination_cabal"
         - "Requests_for_adminship/%/"
+      date_regexp: "final .*end(?:ing|ed)?(?: no earlier than)? (.*?)? \\(UTC\\)"
