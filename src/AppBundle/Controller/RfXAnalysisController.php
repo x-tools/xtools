@@ -1,12 +1,12 @@
 <?php
 /**
- * This file contains the code that powers the AdminStats page of xTools.
+ * This file contains the code that powers the RfX Analysis page of xTools.
  *
  * @category RfXAnalysis
  * @package  AppBundle\Controller
  * @author   Xtools Team <xtools@lists.wikimedia.org>
  * @license  GPL 3.0
- * @link     http://tools.wmflabs.org/xtools/rfa
+ * @link     http://xtools.wmflabs.org/rfa
  */
 
 namespace AppBundle\Controller;
@@ -32,6 +32,7 @@ class RfXAnalysisController extends Controller
 
     /**
      * Get the tool's shortname.
+     *
      * @return string
      */
     public function getToolShortname()
@@ -65,7 +66,6 @@ class RfXAnalysisController extends Controller
         } else {
             $projectQuery = $request->get("project");
             $typeQuery = $request->get("type");
-
         }
 
         $username = $request->get("username");
@@ -79,13 +79,13 @@ class RfXAnalysisController extends Controller
                     "username"=>$username
                 ]
             );
-        } else if ($projectQuery != "" && $typeQuery != "") {
+        } elseif ($projectQuery != "" && $typeQuery != "") {
             return $this->redirectToRoute(
                 "rfxAnalysisProjectType",
                 [
                     "project"=>$projectQuery,
                     "type"=>$typeQuery
-                ] 
+                ]
             );
         }
 
@@ -191,7 +191,8 @@ class RfXAnalysisController extends Controller
 
         // replace this example code with whatever you need
         return $this->render(
-            'rfxAnalysis/result.html.twig', array(
+            'rfxAnalysis/result.html.twig',
+            array(
                 "xtTitle" => $username,
                 'xtPage' => "rfa",
                 'url' => $wikiUrl,

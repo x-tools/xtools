@@ -208,8 +208,7 @@ class ProjectRepository extends Repository
 
         try {
             $api = MediawikiApi::newFromPage($projectUrl);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return null;
         }
 

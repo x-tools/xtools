@@ -1,4 +1,13 @@
 <?php
+/**
+ * This file contains the code that powers the RfX Vote Calculator page of xTools.
+ *
+ * @category RfXVoteCalculator
+ * @package  AppBundle\Controller
+ * @author   Xtools Team <xtools@lists.wikimedia.org>
+ * @license  GPL 3.0
+ * @link     http://xtools.wmflabs.org/rfap
+ */
 
 namespace AppBundle\Controller;
 
@@ -14,6 +23,15 @@ use Xtools\User;
 // Note: In the legacy xTools, this tool was referred to as "rfap."
 // Thus we have several references to it below, including in routes
 
+/**
+ * Class RfXVoteCalculatorController
+ *
+ * @category RfXVoteCalculator
+ * @package  AppBundle\Controller
+ * @author   Xtools Team <xtools@lists.wikimedia.org>
+ * @license  GPL 3.0
+ * @link     http://xtools.wmflabs.org/rfap
+ */
 class RfXVoteCalculatorController extends Controller
 {
 
@@ -28,8 +46,11 @@ class RfXVoteCalculatorController extends Controller
     }
 
     /**
+     * Renders the index page for RfXVoteCalculator
+     *
      * @Route("/rfap", name="rfap")
      * @Route("/rfap", name="RfXVoteCalculator")
+     *
      * @return \Symfony\Component\HttpFoundation\Response]
      */
     public function indexAction()
@@ -64,7 +85,14 @@ class RfXVoteCalculatorController extends Controller
     }
 
     /**
+     * Result View of RfXVoteCalculator
+     *
+     * @param string $project  The project we're working on
+     * @param string $username Username of the user we're analysing.
+     *
      * @Route("/rfap/{project}/{username}", name="rfapResult")
+     *
+     * @return Response
      */
     public function resultAction($project, $username)
     {
@@ -96,22 +124,24 @@ class RfXVoteCalculatorController extends Controller
 
         $finalData = [];
 
-        // We sould probably figure out a better way to do this...
+        // We should probably figure out a better way to do this...
         $ignoredPages = "";
 
         if (isset($rfaParam[$projectData->getDatabaseName()]["excluded_title"])) {
+            $titlesExcluded
+                = $rfaParam[$projectData->getDatabaseName()]["excluded_title"];
             foreach (
-                $rfaParam[$projectData->getDatabaseName()]["excluded_title"]
-                as $ignoredPage
+                $titlesExcluded as $ignoredPage
             ) {
                 $ignoredPages .= "AND p.page_title != \"$ignoredPage\"\r\n";
             }
         }
 
         if (isset($rfaParam[$projectData->getDatabaseName()]["excluded_regex"])) {
+            $titlesExcluded
+                = $rfaParam[$projectData->getDatabaseName()]["excluded_regex"];
             foreach (
-                $rfaParam[$projectData->getDatabaseName()]["excluded_regex"]
-                as $ignoredPage
+                $titlesExcluded as $ignoredPage
             ) {
                 $ignoredPages .= "AND p.page_title NOT LIKE \"%$ignoredPage%\"\r\n";
             }
@@ -179,7 +209,6 @@ $ignoredPages";
                     unset($rfa);
                 }
             }
-
         }
 
         return $this->render(

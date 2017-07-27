@@ -317,7 +317,16 @@ class ApiHelper extends HelperBase
         });
     }
 
-    public function getPageText($project, $title) {
+    /**
+     * Query the MediaWiki API and return the text of a single page
+     *
+     * @param xtools/Project $project Project that we're working on
+     * @param string         $title   Title of the page we're pulling
+     *
+     * @return string|null
+     */
+    public function getPageText($project, $title)
+    {
         $this->setUp($project);
 
         $result = null;
@@ -340,7 +349,16 @@ class ApiHelper extends HelperBase
         return $result;
     }
 
-    public function getMassPageText($project, $titles = []) {
+    /**
+     * Query the MediaWiki API and return the text of a many pages
+     *
+     * @param xtools/Project $project Project that we're working on
+     * @param array          $titles   Titles of the pages we're pulling
+     *
+     * @return array|null
+     */
+    public function getMassPageText($project, $titles = [])
+    {
         $this->setUp($project);
 
         $result = [];
@@ -360,11 +378,10 @@ class ApiHelper extends HelperBase
             if (!isset($res["query"]["pages"])) {
                 return [];
             }
-            foreach($res["query"]["pages"] as $key => $value) {
-                if(isset($value["revisions"][0]["*"])) {
+            foreach ($res["query"]["pages"] as $key => $value) {
+                if (isset($value["revisions"][0]["*"])) {
                     $result[$value["title"]] = $value["revisions"][0]["*"];
-                }
-                else {
+                } else {
                     $result[$value["title"]] = "";
                 }
             }

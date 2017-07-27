@@ -2,11 +2,25 @@
 
 /**
  * An RFA object contains the parsed information for an RFA
+ *
+ * @category RFA
+ * @package  Xtools
+ * @author   Xtools Team <xtools@lists.wikimedia.org>
+ * @license  GPL 3.0
+ * @link     http://xtools.wmflabs.org/rfa
  */
 
 namespace Xtools;
 
-
+/**
+ * Class RFA
+ *
+ * @category RFA
+ * @package  Xtools
+ * @author   Xtools Team <xtools@lists.wikimedia.org>
+ * @license  GPL 3.0
+ * @link     http://xtools.wmflabs.org/rfa
+ */
 class RFA
 {
     private $sections;
@@ -20,24 +34,49 @@ class RFA
      * Attempts to find a signature in $input using the default regex.
      * Returns matches.
      *
-     * @param $input
-     * @param $matches
+     * @param string $input   The line we're looking for
+     * @param array  $matches Pointer to an array where we stash results
+     *
+     * @TODO: Make this cleaner
      *
      * @return int
      */
-    protected function findSig( $input, &$matches ) {
-        //Supports User: and User talk: wikilinks, {{fullurl}}, unsubsted {{unsigned}}, unsubsted {{unsigned2}}, anything that looks like a custom sig template
+    protected function findSig($input, &$matches)
+    {
+        //Supports User: and User talk: wikilinks, {{fullurl}},
+        // unsubsted {{unsigned}}, unsubsted {{unsigned2}},
+        // anything that looks like a custom sig template
         // TODO: Cross-wiki this sucker
+        $regexp
+            = //1: Normal [[User:XX]] and [[User talk:XX]]
+            "/\[\[[Uu]ser(?:[\s_][Tt]alk)?\:([^\]\|\/]*)(?:\|[^\]]*)?\]\]"
+            //2: {{fullurl}} and {{unsigned}} templates
+            . "|\{\{(?:[Ff]ullurl\:[Uu]ser(?:[\s_][Tt]alk)?\:|"
+            . "[Uu]nsigned\|)([^\}\|]*)(?:|[\|\}]*)?\}\}"
+            //3: {{User:XX/sig}} templates
+            . "|(?:\{\{)[Uu]ser(?:[\s_][Tt]alk)?\:([^\}\/\|]*)"
+            //4: {{unsigned2|Date|XX}} templates
+            . "|\{\{[Uu]nsigned2\|[^\|]*\|([^\}]*)\}\}"
+            //5: [[User:XX/sig]] links (compromise measure)
+            . "|(?:\[\[)[Uu]ser\:([^\]\/\|]*)\/[Ss]ig[\|\]]/";
+
         return preg_match_all(
-            "/\[\[[Uu]ser(?:[\s_][Tt]alk)?\:([^\]\|\/]*)(?:\|[^\]]*)?\]\]" //1: Normal [[User:XX]] and [[User talk:XX]]
-            . "|\{\{(?:[Ff]ullurl\:[Uu]ser(?:[\s_][Tt]alk)?\:|[Uu]nsigned\|)([^\}\|]*)(?:|[\|\}]*)?\}\}" //2: {{fullurl}} and {{unsigned}} templates
-            . "|(?:\{\{)[Uu]ser(?:[\s_][Tt]alk)?\:([^\}\/\|]*)" //3: {{User:XX/sig}} templates
-            . "|\{\{[Uu]nsigned2\|[^\|]*\|([^\}]*)\}\}" //4: {{unsigned2|Date|XX}} templates
-            . "|(?:\[\[)[Uu]ser\:([^\]\/\|]*)\/[Ss]ig[\|\]]/" //5: [[User:XX/sig]] links (compromise measure)
-            , $input, $matches, PREG_OFFSET_CAPTURE
+            $regexp,
+            $input,
+            $matches,
+            PREG_OFFSET_CAPTURE
         );
     }
 
+    /**
+     * RFA constructor.
+     *
+     * @param string      $rawWikiText      The text of the page we're parsing
+     * @param array       $section_array    Section names that we're looking for
+     * @param string      $user_namespace   Plain text of the user namespace
+     * @param string      $date_regexp      Valid Regular Expression for the end date
+     * @param string|null $user_looking_for User we're trying to find.
+     */
     public function __construct(
         $rawWikiText,
         $section_array = ["Support", "Oppose", "Neutral"],
@@ -96,28 +135,52 @@ class RFA
         $final = array_diff($final, [1]);    // remove single occurrences
 
         $this->duplicates = array_keys($final);
-
     }
 
-    public function getUserSectionFound() {
+    /**
+     * Which section we found the user we're looking for.
+     *
+     * @return string
+     */
+    public function getUserSectionFound()
+    {
         return $this->userSectionFound;
     }
 
-    public function getSection($sectionName) {
+    /**
+     * Returns data on the given section name.
+     *
+     * @param string $sectionName The section we're looking at
+     *
+     * @return array
+     */
+    public function getSection($sectionName)
+    {
         $sectionName = strtolower($sectionName);
         if (!isset($this->data[$sectionName])) {
             return [];
-        }
-        else {
+        } else {
             return $this->data[$sectionName];
         }
     }
 
-    public function getDuplicates() {
+    /**
+     * Get an array of duplicate votes.
+     *
+     * @return array
+     */
+    public function getDuplicates()
+    {
         return $this->duplicates;
     }
 
-    public function getEndDate() {
+    /**
+     * Get the End Date of the RFA
+     *
+     * @return string
+     */
+    public function getEndDate()
+    {
         return $this->endDate;
     }
 }
