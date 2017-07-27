@@ -126,12 +126,12 @@
                 <td>{{ ec.averageRevisionsPerPage }}</td>
             </tr>
             <tr>
-                <td>
-                    <a class="glyphicon glyphicon-info-sign tooltipcss" href="https://xtools.readthedocs.io/en/latest/tools/editcounter.html#general-statistics">
-                        <span class="tooltip-body">{{ msg('pages-created-tooltip') }}</span>
+                <td>{% spaceless %}
+                    <a class="glyphicon glyphicon-info-sign tooltipcss tooltipcss--pages-created" href="https://xtools.readthedocs.io/en/latest/tools/editcounter.html#general-statistics">
+                        <div class="tooltip-body">{{ msg('pages-created-tooltip') }}</div>
                     </a>
                     {{ msg('pages-created') }}
-                </td>
+                {% endspaceless %}</td>
                 <td>
                     <a href="{{ path('PagesResult', {project:project.domain, username:user.username, namespace:'all', redirects:'noredirects'}) }}">{{ ec.countPagesCreated|number_format }}</a>
                     <span class="text-muted">({{ msg('pages-created-since-deleted', [ec.countPagesCreatedDeleted|number_format]) }})</span>

@@ -21,4 +21,16 @@
         clear: both;
         padding-top: 20px;
     }
+
+    .tooltipcss--pages-created {
+        vertical-align: -1px;
+
+        &:hover {
+            text-decoration: none;
+        }
+
+        .tooltip-body {
+            min-width: 300px;
+        }
+    }
 }
