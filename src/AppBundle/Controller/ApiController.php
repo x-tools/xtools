@@ -99,7 +99,6 @@ class ApiController extends FOSRestController
     public function nonautomatedEdits($project, $username, $namespace, $start, $end, $offset = 0, $format = 'json')
     {
         $twig = $this->container->get('twig');
-        $aeh = $this->get('app.automated_edits_helper');
         $project = ProjectRepository::getProject($project, $this->container);
         $user = UserRepository::getUser($username, $this->container);
         $data = $user->getNonautomatedEdits($project, $namespace, $start, $end, $offset);

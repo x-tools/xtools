@@ -27,10 +27,10 @@ class Edit extends Model
     /** @var bool Whether or not this edit was a minor edit */
     protected $minor;
 
-    /** @var int Length of the page as of this edit, in bytes */
+    /** @var int|string|null Length of the page as of this edit, in bytes */
     protected $length;
 
-    /** @var int The diff size of this edit */
+    /** @var int|string|null The diff size of this edit */
     protected $length_change;
 
     /** @var User - User object of who made the edit */

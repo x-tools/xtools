@@ -145,11 +145,9 @@ class TopEditsController extends Controller
         // Get the basic data about the pages edited by this user.
         $params = ['username'=>$user->getUsername()];
         $nsClause = '';
-        $namespaceMsg = 'all-namespaces';
         if (is_numeric($namespaceId)) {
             $nsClause = 'AND page_namespace = :namespace';
             $params['namespace'] = $namespaceId;
-            $namespaceMsg = str_replace(' ', '_', strtolower($namespaces[$namespaceId]));
         }
         $revTable = $project->getRepository()->getTableName($project->getDatabaseName(), 'revision');
         $pageTable = $project->getRepository()->getTableName($project->getDatabaseName(), 'page');

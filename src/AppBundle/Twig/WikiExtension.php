@@ -41,7 +41,6 @@ class WikiExtension extends Extension
      */
     public function getFunctions()
     {
-        $options = [ 'is_safe' => [ 'html']];
         return [];
     }
 

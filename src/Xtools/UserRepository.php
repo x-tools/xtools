@@ -333,7 +333,7 @@ class UserRepository extends Repository
      * @param string|int [$namespace] Namespace ID or 'all'
      * @param string [$start] Start date in a format accepted by strtotime()
      * @param string [$end] End date in a format accepted by strtotime()
-     * @return string[] Result of query, see below.
+     * @return int Result of query, see below.
      */
     public function countAutomatedEdits(Project $project, User $user, $namespace = 'all', $start = '', $end = '')
     {
@@ -372,6 +372,7 @@ class UserRepository extends Repository
         $tagTable = $this->getTableName($project->getDatabaseName(), 'change_tag');
         $condNamespace = $namespace === 'all' ? '' : 'AND page_namespace = :namespace';
         $pageJoin = $namespace === 'all' ? '' : "JOIN $pageTable ON page_id = rev_page";
+        $tagJoin = '';
 
         // Build SQL for detecting autoedits via regex and/or tags
         $condTools = [];
@@ -407,7 +408,7 @@ class UserRepository extends Repository
             $resultQuery->bindParam('namespace', $namespace);
         }
         $resultQuery->execute();
-        $result = $resultQuery->fetchColumn();
+        $result = (int) $resultQuery->fetchColumn();
 
         // Cache for 10 minutes, and return.
         $cacheItem = $this->cache->getItem($cacheKey)
@@ -582,7 +583,6 @@ class UserRepository extends Repository
         $queries = [];
 
         $revisionTable = $project->getRepository()->getTableName($project->getDatabaseName(), 'revision');
-        $archiveTable = $project->getRepository()->getTableName($project->getDatabaseName(), 'archive');
         $pageTable = $project->getRepository()->getTableName($project->getDatabaseName(), 'page');
         $tagTable = $project->getRepository()->getTableName($project->getDatabaseName(), 'change_tag');
 

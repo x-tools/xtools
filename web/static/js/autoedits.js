@@ -36,6 +36,7 @@ $(function () {
             end = $('.non-auto-edits-container').data('end'),
             namespace = $('.non-auto-edits-container').data('namespace');
 
+        /** global: xtBaseUrl */
         $.ajax({
             url: xtBaseUrl + 'api/nonautomated_edits/' + project + '/' + username + '/' +
                 namespace + '/' + start + '/' + end + '/' + editOffset + '/html',

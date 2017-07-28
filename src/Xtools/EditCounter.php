@@ -5,7 +5,8 @@
 
 namespace Xtools;
 
-use \DateTime;
+use DateTime;
+use Exception;
 
 /**
  * An EditCounter provides statistics about a user's edits on a project.
@@ -703,7 +704,7 @@ class EditCounter extends Model
      */
     public function globalEditCounts($sorted = false)
     {
-        if (!$this->globalEditCounts) {
+        if (empty($this->globalEditCounts)) {
             $this->globalEditCounts = $this->getRepository()
                 ->globalEditCounts($this->user, $this->project);
             if ($sorted) {
@@ -723,8 +724,6 @@ class EditCounter extends Model
      */
     public function globalEdits($max)
     {
-        // Only look for revisions newer than this.
-        $oldest = null;
         // Collect all projects with any edits.
         $projects = [];
         foreach ($this->globalEditCounts() as $editCount) {

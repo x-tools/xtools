@@ -48,7 +48,7 @@ class Project extends Model
      */
     protected function getBasicInfo()
     {
-        if (!$this->basicInfo) {
+        if (empty($this->basicInfo)) {
             $this->basicInfo = $this->getRepository()->getOne($this->nameUnnormalized);
         }
         return $this->basicInfo;
@@ -61,8 +61,8 @@ class Project extends Model
      */
     protected function getMetadata()
     {
-        if (!$this->metadata) {
-            $url = $this->getBasicInfo($this->nameUnnormalized)['url'];
+        if (empty($this->metadata)) {
+            $url = $this->getBasicInfo()['url'];
             $this->metadata = $this->getRepository()->getMetadata($url);
         }
         return $this->metadata;

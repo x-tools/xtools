@@ -122,7 +122,6 @@ class EditCounterRepository extends Repository
         $this->stopwatch->start($cacheKey, 'XTools');
 
         // Query.
-        $userNamespaceId = 2;
         $loggingTable = $this->getTableName($project->getDatabaseName(), 'logging');
         $sql = "
         (SELECT CONCAT(log_type, '-', log_action) AS source, COUNT(log_id) AS value

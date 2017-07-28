@@ -13,6 +13,8 @@ $(function () {
         var data = $(this).data("chart-data");
         var labels = $(this).data("chart-labels");
         var $ctx = $("canvas", $(this));
+
+        /** global: Chart */
         new Chart($ctx, {
             type: chartType,
             data: {
@@ -20,12 +22,15 @@ $(function () {
                 datasets: [ { data: data } ]
             }
         });
+
+        return undefined;
     });
 
     // Load recent global edits' HTML via Ajax, to not slow down the initial page load.
     // Only load if container is present, which is missing subroutes, e.g. ec-namespacetotals, etc.
     var $latestGlobalContainer = $("#latestglobal-container");
     if ($latestGlobalContainer[0]) {
+        /** global: xtBaseUrl */
         var url = xtBaseUrl + 'ec-latestglobal/'
             + $latestGlobalContainer.data("project") + '/'
             + $latestGlobalContainer.data("username") + '?htmlonly=yes';
