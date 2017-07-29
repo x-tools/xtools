@@ -29,7 +29,7 @@ class User extends Model
      */
     public function __construct($username)
     {
-        $this->username = ucfirst(trim($username));
+        $this->username = ucfirst(str_replace('_', ' ', trim($username)));
     }
 
     /**

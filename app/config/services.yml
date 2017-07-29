@@ -27,24 +27,12 @@ services:
         public: false
         tags:
             - { name: twig.extension }
-    app.wiki_extension:
-        class: AppBundle\Twig\WikiExtension
-        arguments: ["@service_container", "@request_stack", "@session"]
-        public: false
-        tags:
-            - { name: twig.extension }
     app.api_helper:
         class: AppBundle\Helper\ApiHelper
         arguments: ["@service_container"]
         public: true
         tags:
           - {name: api.helper}
-    app.pageviews_helper:
-        class: AppBundle\Helper\PageviewsHelper
-        arguments: ["@service_container"]
-        public: true
-        tags:
-          - {name: pageviews.helper}
     app.automated_edits_helper:
         class: AppBundle\Helper\AutomatedEditsHelper
         arguments: ["@service_container"]

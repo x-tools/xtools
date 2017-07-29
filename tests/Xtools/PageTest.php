@@ -175,6 +175,31 @@ class PageTest extends KernelTestCase
         );
     }
 
+    /**
+     * Tests for pageviews-related functions
+     */
+    public function testPageviews()
+    {
+        $pageviewsData = [
+            'items' => [
+                ['views' => 2500],
+                ['views' => 1000],
+            ],
+        ];
+
+        $pageRepo = $this->getMock(PagesRepository::class, ['getPageviews']);
+        $pageRepo->method('getPageviews')->willReturn($pageviewsData);
+        $page = new Page(new Project('exampleWiki'), 'Page');
+        $page->setRepository($pageRepo);
+
+        $this->assertArraySubset(
+            $pageviewsData,
+            $page->getPageviews('20160101', '20160201')
+        );
+
+        $this->assertEquals(3500, $page->getLastPageviews(30));
+    }
+
     // public function testPageAssessments()
     // {
     //     $projectRepo = $this->getMock(ProjectRepository::class, ['getAssessmentsConfig']);

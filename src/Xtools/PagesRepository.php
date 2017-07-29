@@ -7,6 +7,7 @@ namespace Xtools;
 
 use DateInterval;
 use Mediawiki\Api\SimpleRequest;
+use GuzzleHttp;
 
 /**
  * A PagesRepository fetches data about Pages, either singularly or for multiple.
@@ -146,6 +147,55 @@ class PagesRepository extends Repository
         }
         $conn = $this->getProjectsConnection();
         return $conn->executeQuery($sql, $params)->fetchColumn(0);
+    }
+
+    /**
+     * Get various basic info used in the API, including the
+     *   number of revisions, unique authors, initial author
+     *   and edit count of the initial author.
+     * This is combined into one query for better performance.
+     * Caching is intentionally disabled, because using the gadget,
+     *   this will get hit for a different page constantly, where
+     *   the likelihood of cache benefiting us is slim.
+     * @param Page $page The page.
+     * @return string[]
+     */
+    public function getBasicEditingInfo(Page $page)
+    {
+        $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
+        $userTable = $this->getTableName($page->getProject()->getDatabaseName(), 'user');
+
+        $sql = "SELECT *, (
+                   SELECT user_editcount
+                   FROM $userTable
+                   WHERE user_name = author
+                ) AS author_editcount
+                FROM (
+                    (
+                        SELECT COUNT(*) AS num_edits,
+                               COUNT(DISTINCT(rev_user_text)) AS num_editors
+                        FROM $revTable
+                        WHERE rev_page = :pageid
+                    ) totals,
+                    (
+                        # With really old pages, the rev_timestamp may need to be sorted ASC,
+                        #   and the lowest rev_id may not be the first revision.
+                        SELECT rev_user_text AS author,
+                               rev_timestamp AS created_at
+                        FROM $revTable
+                        WHERE rev_page = :pageid
+                        ORDER BY rev_timestamp ASC
+                        LIMIT 1
+                    ) initial_rev,
+                    (
+                        SELECT MAX(rev_timestamp) AS modified_at
+                        FROM $revTable
+                        WHERE rev_page = :pageid
+                    ) last_rev
+                );";
+        $params = ['pageid' => $page->getId()];
+        $conn = $this->getProjectsConnection();
+        return $conn->executeQuery($sql, $params)->fetch();
     }
 
     /**
@@ -336,5 +386,33 @@ class PagesRepository extends Repository
     public function countWikidataItems(Page $page)
     {
         return $this->getWikidataItems($page, true);
+    }
+
+    /**
+     * Get page views for the given page and timeframe.
+     * @param Page $page
+     * @param string|DateTime $start In the format YYYYMMDD
+     * @param string|DateTime $end In the format YYYYMMDD
+     * @return string[]
+     */
+    public function getPageviews($page, $start, $end)
+    {
+        $title = rawurldecode(str_replace(' ', '_', $page->getTitle()));
+        $client = new GuzzleHttp\Client();
+
+        if ($start instanceof DateTime) {
+            $start = $start->format('YYYYMMDD');
+        }
+        if ($end instanceof DateTime) {
+            $end = $end->format('YYYYMMDD');
+        }
+
+        $project = $page->getProject()->getDomain();
+
+        $url = 'https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/' .
+            "$project/all-access/user/$title/daily/$start/$end";
+
+        $res = $client->request('GET', $url);
+        return json_decode($res->getBody()->getContents(), true);
     }
 }

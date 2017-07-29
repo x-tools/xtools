@@ -17,7 +17,9 @@ use FOS\RestBundle\View\View;
 use Xtools\ProjectRepository;
 use Xtools\UserRepository;
 use Xtools\Page;
+use Xtools\PagesRepository;
 use Xtools\Edit;
+use DateTime;
 
 /**
  * Serves the external API of XTools.
@@ -27,6 +29,7 @@ class ApiController extends FOSRestController
     /**
      * Get domain name, URL, and API URL of the given project.
      * @Rest\Get("/api/normalizeProject/{project}")
+     * @Rest\Get("/api/normalize_project/{project}")
      * @param string $project Project database name, URL, or domain name.
      * @return View
      */
@@ -48,6 +51,7 @@ class ApiController extends FOSRestController
                 'domain' => $proj->getDomain(),
                 'url' => $proj->getUrl(),
                 'api' => $proj->getApiUrl(),
+                'database' => $proj->getDatabaseName(),
             ],
             Response::HTTP_OK
         );
@@ -90,14 +94,21 @@ class ApiController extends FOSRestController
      * @param string $project
      * @param string $username
      * @param int|string $namespace ID of the namespace, or 'all' for all namespaces
-     * @param string $start In the format YYYY-MM-DD
-     * @param string $end In the format YYYY-MM-DD
+     * @param string [$start] In the format YYYY-MM-DD
+     * @param string [$end] In the format YYYY-MM-DD
      * @param int $offset For pagination, offset results by N edits
      * @param string $format 'json' or 'html'
      * @return View
      */
-    public function nonautomatedEdits($project, $username, $namespace, $start, $end, $offset = 0, $format = 'json')
-    {
+    public function nonautomatedEdits(
+        $project,
+        $username,
+        $namespace,
+        $start = '',
+        $end = '',
+        $offset = 0,
+        $format = 'json'
+    ) {
         $twig = $this->container->get('twig');
         $project = ProjectRepository::getProject($project, $this->container);
         $user = UserRepository::getUser($username, $this->container);
@@ -119,6 +130,65 @@ class ApiController extends FOSRestController
             $data = $twig->render('api/automated_edits.html.twig', [
                 'edits' => $edits,
                 'project' => $project,
+            ]);
+        }
+
+        return new View(
+            ['data' => $data],
+            Response::HTTP_OK
+        );
+    }
+
+    /**
+     * Get basic info on a given article.
+     * @Rest\Get("/api/articleinfo/{project}/{article}/{format}")
+     * @param string $project
+     * @param string $article
+     * @param string $format 'json' or 'wikitext'
+     * @return View
+     */
+    public function articleInfo($project, $article, $format = 'json')
+    {
+        /** @var integer Number of days to query for pageviews */
+        $pageviewsOffset = 30;
+
+        $project = ProjectRepository::getProject($project, $this->container);
+        if (!$project->exists()) {
+            return new View(
+                ['error' => "$project is not a valid project"],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $page = new Page($project, $article);
+        $pageRepo = new PagesRepository();
+        $pageRepo->setContainer($this->container);
+        $page->setRepository($pageRepo);
+
+        $info = $page->getBasicEditingInfo();
+        $creationDateTime = DateTime::createFromFormat('YmdHis', $info['created_at']);
+        $modifiedDateTime = DateTime::createFromFormat('YmdHis', $info['modified_at']);
+        $secsSinceLastEdit = $modifiedDateTime->getTimestamp() - $creationDateTime->getTimestamp();
+
+        $data = [
+            'revisions' => (int) $info['num_edits'],
+            'editors' => (int) $info['num_editors'],
+            'author' => $info['author'],
+            'author_editcount' => (int) $info['author_editcount'],
+            'created_at' => $creationDateTime->format('Y-m-d H:i'),
+            'modified_at' => $modifiedDateTime->format('Y-m-d H:i'),
+            'secs_since_last_edit' => $secsSinceLastEdit,
+            'watchers' => (int) $page->getWatchers(),
+            'pageviews' => $page->getLastPageviews($pageviewsOffset),
+            'pageviews_offset' => $pageviewsOffset,
+        ];
+
+        if ($format === 'wikitext') {
+            $twig = $this->container->get('twig');
+            $data = $twig->render('api/gadget.wikitext.twig', [
+                'data' => $data,
+                'project' => $project,
+                'page' => $page,
             ]);
         }
 
