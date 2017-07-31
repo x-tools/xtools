@@ -41,6 +41,9 @@ class EditCounter extends Model
     /** @var int Number of semi-automated edits */
     protected $autoEditCount;
 
+    /** @var string[] Data needed for time card chart */
+    protected $timeCardData;
+
     /**
      * Revision size data, with keys 'average_size', 'large_edits' and 'small_edits'.
      * @var string[] As returned by the DB, unconverted to int or float
@@ -583,7 +586,12 @@ class EditCounter extends Model
      */
     public function timeCard()
     {
-        return $this->getRepository()->getTimeCard($this->project, $this->user);
+        if ($this->timeCardData) {
+            return $this->timeCardData;
+        }
+        $totals = $this->getRepository()->getTimeCard($this->project, $this->user);
+        $this->timeCardData = $totals;
+        return $totals;
     }
 
     /**
