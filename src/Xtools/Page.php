@@ -118,7 +118,7 @@ class Page extends Model
     public function getWatchers()
     {
         $info = $this->getPageInfo();
-        return isset($info['ns']) ? $info['ns'] : null;
+        return isset($info['watchers']) ? $info['watchers'] : null;
     }
 
     /**
