@@ -13,8 +13,7 @@ filter:
 build:
     tests:
         override:
-            -
-                command: 'vendor/bin/phpunit --coverage-clover=tests/coverage.xml'
-                coverage:
-                    file: 'coverage.xml'
-                    format: 'clover'
+            command: 'vendor/bin/phpunit --coverage-clover=tests/coverage.xml'
+            coverage:
+                file: 'coverage.xml'
+                format: 'clover'
