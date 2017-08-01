@@ -31,6 +31,7 @@ It is in operation for Wikimedia wikis and can also be installed for any MediaWi
     tools/index
     development
     administration
+    api/index
 
 The tools
 =========

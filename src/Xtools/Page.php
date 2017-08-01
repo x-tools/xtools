@@ -183,7 +183,7 @@ class Page extends Model
 
         // Otherwise do a COUNT in the event fetching
         // all revisions is not desired
-        return $this->getRepository()->getNumRevisions($this, $user);
+        return (int) $this->getRepository()->getNumRevisions($this, $user);
     }
 
     /**
@@ -211,6 +211,21 @@ class Page extends Model
     public function getRevisionsStmt(User $user = null)
     {
         return $this->getRepository()->getRevisionsStmt($this, $user);
+    }
+
+    /**
+     * Get various basic info used in the API, including the
+     *   number of revisions, unique authors, initial author
+     *   and edit count of the initial author.
+     * This is combined into one query for better performance.
+     * Caching is intentionally disabled, because using the gadget,
+     *   this will get hit for a different page constantly, where
+     *   the likelihood of cache benefiting us is slim.
+     * @return string[]
+     */
+    public function getBasicEditingInfo()
+    {
+        return $this->getRepository()->getBasicEditingInfo($this);
     }
 
     /**
@@ -401,5 +416,33 @@ class Page extends Model
     public function countLinksAndRedirects()
     {
         return $this->getRepository()->countLinksAndRedirects($this);
+    }
+
+    /**
+     * Get page views for the given page and timeframe.
+     * @param string|DateTime $start In the format YYYYMMDD
+     * @param string|DateTime $end In the format YYYYMMDD
+     * @return string[]
+     */
+    public function getPageviews($start, $end)
+    {
+        return $this->getRepository()->getPageviews($this, $start, $end);
+    }
+
+    /**
+     * Get the sum of pageviews over the last N days
+     * @param int [$days] Default 30
+     * @return int Number of pageviews
+     */
+    public function getLastPageviews($days = 30)
+    {
+        $start = date('Ymd', strtotime("-$days days"));
+        $end = date('Ymd');
+
+        $pageviews = $this->getPageviews($start, $end);
+
+        return array_sum(array_map(function ($item) {
+            return (int) $item['views'];
+        }, $pageviews['items']));
     }
 }

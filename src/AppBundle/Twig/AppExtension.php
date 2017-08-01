@@ -61,6 +61,7 @@ class AppExtension extends Extension
             new \Twig_SimpleFunction('logged_in_user', [$this, 'functionLoggedInUser']),
             new \Twig_SimpleFunction('isUserAnon', [$this, 'isUserAnon']),
             new \Twig_SimpleFunction('nsName', [$this, 'nsName']),
+            new \Twig_SimpleFunction('formatDuration', [$this, 'formatDuration']),
         ];
     }
 
@@ -517,6 +518,7 @@ class AppExtension extends Extension
         return [
             new \Twig_SimpleFilter('capitalize_first', [ $this, 'capitalizeFirst' ]),
             new \Twig_SimpleFilter('percent_format', [ $this, 'percentFormat' ]),
+            new \Twig_SimpleFilter('diff_format', [ $this, 'diffFormat' ], [ 'is_safe' => [ 'html' ] ]),
         ];
     }
 
@@ -580,6 +582,63 @@ class AppExtension extends Extension
             return $this->getIntuition()->msg('mainspace');
         } else {
             return $namespaces[$namespace];
+        }
+    }
+
+    /**
+     * Format a given number as a diff, colouring it green if it's postive, red if negative, gary if zero
+     * @param  number $size Diff size
+     * @return string       Markup with formatted number
+     */
+    public function diffFormat($size)
+    {
+        if ($size < 0) {
+            $class = 'diff-neg';
+        } elseif ($size > 0) {
+            $class = 'diff-pos';
+        } else {
+            $class = 'diff-zero';
+        }
+
+        $size = number_format($size);
+
+        return "<span class='$class'>$size</span>";
+    }
+
+    /**
+     * Format a time duration as humanized string.
+     * @param int $seconds Number of seconds
+     * @param bool $translate Used for unit testing. Set to false to return
+     *   the value and i18n key, instead of the actual translation.
+     * @return string|array Examples: '30 seconds', '2 minutes', '15 hours', '500 days',
+     *   or [30, 'num-seconds'] (etc.) if $translate is true
+     */
+    public function formatDuration($seconds, $translate = true)
+    {
+        /** @var int Value to show in message */
+        $val = $seconds;
+
+        /** @var string Unit of time, used in the key for the i18n message */
+        $key = 'seconds';
+
+        if ($seconds >= 86400) {
+            // Over a day
+            $val = (int) floor($seconds / 86400);
+            $key = 'days';
+        } elseif ($seconds >= 3600) {
+            // Over an hour, less than a day
+            $val = (int) floor($seconds / 3600);
+            $key = 'hours';
+        } elseif ($seconds >= 60) {
+            // Over a minute, less than an hour
+            $val = (int) floor($seconds / 60);
+            $key = 'minutes';
+        }
+
+        if ($translate) {
+            return number_format($val) . ' ' . $this->intuitionMessage("num-$key", [$val]);
+        } else {
+            return [number_format($val), "num-$key"];
         }
     }
 }

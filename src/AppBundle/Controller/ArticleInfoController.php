@@ -6,7 +6,6 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Helper\AutomatedEditsHelper;
-use AppBundle\Helper\PageviewsHelper;
 use Doctrine\DBAL\Connection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -34,8 +33,6 @@ class ArticleInfoController extends Controller
     protected $conn;
     /** @var AutomatedEditsHelper The semi-automated edits helper. */
     protected $aeh;
-    /** @var PageviewsHelper The page-views helper. */
-    protected $ph;
 
     /**
      * Get the tool's shortname.
@@ -62,7 +59,6 @@ class ArticleInfoController extends Controller
     private function containerInitialized()
     {
         $this->conn = $this->getDoctrine()->getManager('replicas')->getConnection();
-        $this->ph = $this->get('app.pageviews_helper');
         $this->aeh = $this->get('app.automated_edits_helper');
     }
 
@@ -152,11 +148,7 @@ class ArticleInfoController extends Controller
         );
         $this->pageInfo = array_merge($this->pageInfo, $page->countLinksAndRedirects());
         $this->pageInfo['general']['pageviews_offset'] = 60;
-        $this->pageInfo['general']['pageviews'] = $this->ph->sumLastDays(
-            $this->pageInfo['project']->getDomain(),
-            $this->pageInfo['page']->getTitle(),
-            $this->pageInfo['general']['pageviews_offset']
-        );
+        $this->pageInfo['general']['pageviews'] = $page->getLastPageviews(60);
 
         $assessments = $page->getAssessments();
         if ($assessments) {
