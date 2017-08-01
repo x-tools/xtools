@@ -9,3 +9,12 @@ filter:
     - 'web/chartjs/*'
     - 'web/static/js/vendor/*'
     - '*.min.js'
+
+build:
+    tests:
+        override:
+            -
+                command: 'vendor/bin/phpunit --coverage-clover=tests/coverage.xml'
+                coverage:
+                    file: 'coverage.xml'
+                    format: 'clover'
