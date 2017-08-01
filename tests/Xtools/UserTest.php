@@ -122,6 +122,26 @@ class UserTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Registration date of the user
+     */
+    public function testRegistrationDate()
+    {
+        $userRepo = $this->getMock(UserRepository::class);
+        $userRepo->expects($this->once())
+            ->method('getRegistrationDate')
+            ->willReturn('20170101000000');
+        $user = new User('TestUser');
+        $user->setRepository($userRepo);
+
+        $projectRepo = $this->getMock(ProjectRepository::class);
+        $project = new Project('wiki.example.org');
+        $project->setRepository($projectRepo);
+
+        $regDateTime = new DateTime('2017-01-01 00:00:00');
+        $this->assertEquals($regDateTime, $user->getRegistrationDate($project));
+    }
+
+    /**
      * User's non-automated edits
      */
     public function testGetNonAutomatedEdits()
