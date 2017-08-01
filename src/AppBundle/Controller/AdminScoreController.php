@@ -139,7 +139,7 @@ class AdminScoreController extends Controller
             AND l.log_namespace=2 AND l.log_deleted=0 AND u.user_name=:username
         UNION
         SELECT 'afd' AS source, COUNT(*) AS value FROM $revisionTable r
-          RIGHT JOIN $pageTable p on p.page_id=r.rev_page
+          INNER JOIN $pageTable p on p.page_id=r.rev_page
             WHERE p.page_title LIKE 'Articles_for_deletion/%'
                 AND p.page_title NOT LIKE 'Articles_for_deletion/Log/%'
                 AND r.rev_user_text=:username
@@ -148,7 +148,7 @@ class AdminScoreController extends Controller
             WHERE rev_user_text=:username AND rev_timestamp > (now()-INTERVAL 730 day) AND rev_timestamp < now()
         UNION
         SELECT 'aiv' AS source, COUNT(*) AS value FROM $revisionTable r
-          RIGHT JOIN $pageTable p on p.page_id=r.rev_page
+          INNER JOIN $pageTable p on p.page_id=r.rev_page
             WHERE p.page_title LIKE 'Administrator_intervention_against_vandalism%'
                 AND r.rev_user_text=:username
         UNION
@@ -165,7 +165,7 @@ class AdminScoreController extends Controller
             WHERE ar_user_text=:username AND ar_parent_id=0
         UNION
         SELECT 'rpp' AS source, COUNT(*) AS value FROM $revisionTable r
-          RIGHT JOIN $pageTable p on p.page_id=r.rev_page
+          INNER JOIN $pageTable p on p.page_id=r.rev_page
             WHERE p.page_title LIKE 'Requests_for_page_protection%'
                 AND r.rev_user_text=:username;
         ");
