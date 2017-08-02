@@ -250,8 +250,8 @@ class PageTest extends KernelTestCase
         $page = new Page(new Project('exampleWiki'), 'Page');
         $page->setRepository($pageRepo);
 
-        $this->assertArraySubset(
-            $pageviewsData,
+        $this->assertEquals(
+            3500,
             $page->getPageviews('20160101', '20160201')
         );
 
