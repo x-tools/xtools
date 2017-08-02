@@ -82,7 +82,7 @@
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right">
-                    {% for key, value in allLangs() %}
+                    {% for key, value in allLangs() if key != 'qqq' %}
                         <li>
                             <a class="lang-link" href="{{ path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'uselang': key})) }}" data-lang="{{ key }}">{{ value|e }}</a>
                         </li>
