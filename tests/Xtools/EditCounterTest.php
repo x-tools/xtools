@@ -177,9 +177,6 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
                 ],
             ]);
         $userRepo = $this->getMock(UserRepository::class);
-        $userRepo->expects($this->once())
-            ->method('getRegistrationDate')
-            ->willReturn('20161105000000');
         $this->user->setRepository($userRepo);
 
         // Mock current time by passing it in (dummy parameter, so to speak).
@@ -198,14 +195,13 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertArraySubset(
             [
-                11 => 0,
                 12 => 0,
             ],
             $monthCounts['totals'][1][2016]
         );
 
         // Assert only active months are reported.
-        $this->assertEquals([11, 12], array_keys($monthCounts['totals'][0][2016]));
+        $this->assertEquals([12], array_keys($monthCounts['totals'][0][2016]));
         $this->assertEquals(['01', '02', '03', '04'], array_keys($monthCounts['totals'][0][2017]));
 
         // Assert that only active years are reported
@@ -216,42 +212,12 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
 
         // Labels for the months
         $this->assertEquals(
-            ['2016/11', '2016/12', '2017/01', '2017/02', '2017/03', '2017/04'],
+            ['2016-12', '2017-01', '2017-02', '2017-03', '2017-04'],
             $monthCounts['monthLabels']
         );
 
         // Labels for the years
         $this->assertEquals(['2016', '2017'], $monthCounts['yearLabels']);
-    }
-
-    /**
-     * Month counts when user registration date is unknown
-     */
-    public function testMonthCountsUknownRegDate()
-    {
-        $this->editCounterRepo->expects($this->once())
-            ->method('getMonthCounts')
-            ->willReturn([
-                [
-                    'year' => '2017',
-                    'month' => '3',
-                    'page_namespace' => '0',
-                    'count' => '20',
-                ],
-            ]);
-        $userRepo = $this->getMock(UserRepository::class);
-        $userRepo->expects($this->once())
-            ->method('getRegistrationDate')
-            ->willReturn(null);
-        $this->user->setRepository($userRepo);
-        $monthCounts = $this->editCounter->monthCounts(new DateTime('2017-05-30 23:59:59'));
-
-        // All months of the year of the first edit should be reported
-        $this->assertEquals(
-            ['2017/01', '2017/02', '2017/03', '2017/04', '2017/05'],
-            $monthCounts['monthLabels']
-        );
-        $this->assertEquals([2017], array_keys($monthCounts['totals'][0]));
     }
 
     /**
@@ -288,9 +254,6 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
                 ],
             ]);
         $userRepo = $this->getMock(UserRepository::class);
-        $userRepo->expects($this->once())
-            ->method('getRegistrationDate')
-            ->willReturn('20140505000000');
         $this->user->setRepository($userRepo);
 
         // Mock current time by passing it in (dummy parameter, so to speak).
@@ -300,7 +263,6 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
         //   and for each namespace.
         $this->assertArraySubset(
             [
-                2014 => 0,
                 2015 => 0,
                 2016 => 10,
                 2017 => 20,
@@ -309,7 +271,6 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertArraySubset(
             [
-                2014 => 0,
                 2015 => 5,
                 2016 => 0,
                 2017 => 50,
@@ -318,13 +279,13 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
         );
 
         // Assert that only active years are reported
-        $this->assertEquals([2014, 2015, 2016, 2017], array_keys($yearCounts['totals'][0]));
+        $this->assertEquals([2015, 2016, 2017], array_keys($yearCounts['totals'][0]));
 
         // Assert that only active namespaces are reported.
         $this->assertEquals([0, 1], array_keys($yearCounts['totals']));
 
         // Labels for the years
-        $this->assertEquals(['2014', '2015', '2016', '2017'], $yearCounts['yearLabels']);
+        $this->assertEquals(['2015', '2016', '2017'], $yearCounts['yearLabels']);
     }
 
     /**

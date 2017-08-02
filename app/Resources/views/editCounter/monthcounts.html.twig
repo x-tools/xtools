@@ -29,9 +29,23 @@
     </div>
 {% else %}
 
+{# Set height of chart based on how many months (horizontal rows) are being reported. #}
+<div style="position:relative; height:{{ 35 * ec.monthCounts.monthLabels|length }}px">
+    <canvas id="monthcounts-canvas"></canvas>
+</div>
+
 <script type="text/javascript">
     $(function() {
+        /** @type {Array} To be passed into Chart.js */
         var datasets = [];
+
+        /** @type {Array} The labels for the y-axis. */
+        var labels = {{ ec.monthCounts.monthLabels|json_encode|raw }};
+
+        /** @type {Number} Max value of the year totals */
+        var maxTotal = 0;
+
+        // Format data for use in charts.
         {% for nsId,namespaceData in ec.monthCounts.totals %}
             var dataset = {
                 label: "{{ nsName(nsId, project.namespaces) }}",
@@ -42,44 +56,21 @@
             {% for year,yearData in namespaceData %}
                 {% for month,monthData in yearData %}
                     dataset.data.push({{ monthData }});
+
+                    // Determine maximum value for the totals. This is needed
+                    //   so that we know how much spacing to add in the labels.
+                    if ({{ monthData }} > maxTotal) {
+                        maxTotal = {{ monthData }};
+                    }
                 {% endfor %}
             {%- endfor -%}
 
             datasets.push(dataset);
         {% endfor %}
 
-        window.chart = new Chart($("#monthcounts-bar-chart"), {
-            type: 'horizontalBar',
-            data: {
-                labels: {{ ec.monthCounts.monthLabels|json_encode|raw }},
-                datasets: datasets
-            },
-            options: {
-                tooltips: {
-                    intersect: true
-                },
-                scales: {
-                    xAxes: [{
-                        stacked: true,
-                        ticks: {
-                            beginAtZero: true,
-                            callback: function(value, index, values) {
-                                if (Math.floor(value) === value) {
-                                    return value;
-                                }
-                            }
-                        }
-                    }],
-                    yAxes: [{
-                        stacked: true
-                    }]
-                }
-            }
-        });
+        window.setupMonthYearChart('month', datasets, labels, maxTotal);
     });
 </script>
-{# 8 * number of months seems to be the magic equation for the height (minimum 28) #}
-<canvas id="monthcounts-bar-chart" height="{{ max(8 * ec.monthCounts.monthLabels|length, 28) }}"></canvas>
 
 {% endif %}
 

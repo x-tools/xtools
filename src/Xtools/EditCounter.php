@@ -627,26 +627,16 @@ class EditCounter extends Model
             'totals' => [], // actual totals, grouped by namespace, year and then month
         ];
 
-        // This may be null for really old accounts, which we'll account for!
-        $registrationDate = $this->user->getRegistrationDate($this->project);
-        // If not empty, we know the first month/year to show.
-        if (!empty($registrationDate)) {
-            $minYear = (int) $registrationDate->format('Y');
-            $minMonth = $registrationDate->format('m');
-        } else {
-            $minYear = (int) $currentTime->format('Y');
-
-            // For users without a registration date, we'll just
-            //   use January as the first month.
-            $minMonth = 1;
-        }
+        /** @var DateTime Keep track of the date of their first edit. */
+        $firstEdit = new DateTime();
 
         // Loop through the database results and fill in the values
         //   for the months that we have data for.
         foreach ($totals as $total) {
-            // Figure out the first year they made an edit if we don't have a registration date.
-            if (empty($registrationDate)) {
-                $minYear = (int) min($minYear, $total['year']);
+            // Keep track of first edit
+            $date = new DateTime($total['year'].'-'.$total['month'].'-01');
+            if ($date < $firstEdit) {
+                $firstEdit = $date;
             }
 
             // Collate the counts by namespace, and then year and month.
@@ -664,7 +654,7 @@ class EditCounter extends Model
         }
 
         $dateRange = new DatePeriod(
-            new DateTime("$minYear-$minMonth-01"),
+            $firstEdit,
             new DateInterval('P1M'),
             $currentTime->modify('first day of this month')
         );
@@ -674,7 +664,7 @@ class EditCounter extends Model
             $month = (int) $monthObj->format('n');
 
             // Fill in labels
-            $out['monthLabels'][] = $monthObj->format('Y/m');
+            $out['monthLabels'][] = $monthObj->format('Y-m');
             if (!in_array($year, $out['yearLabels'])) {
                 $out['yearLabels'][] = $year;
             }
