@@ -211,7 +211,8 @@ class EditCounterRepository extends Repository
                 WHERE log_type = 'block'
                 AND log_action = 'block'
                 AND log_timestamp > 0
-                AND log_title = :username";
+                AND log_title = :username
+                AND log_namespace = 2";
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $username = str_replace(' ', '_', $user->getUsername());
         $resultQuery->bindParam('username', $username);
