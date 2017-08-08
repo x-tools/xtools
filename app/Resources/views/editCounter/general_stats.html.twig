@@ -452,13 +452,13 @@
         chart.pie_chart('large_edits',
             [{
                 label: '< 1000 ' ~ msg('num-bytes', [1000]) ~ '*',
-                value: ec.countLargeEdits,
-                percentage: ((ec.countLargeEdits / ec.countLast5000) * 100)
+                value: ec.countLast5000 - ec.countLargeEdits,
+                percentage: 100 - ((ec.countLargeEdits / ec.countLast5000) * 100)
             },
             {
                 label: '≥ 1000 ' ~ msg('num-bytes', [1000]) ~ '*',
-                value: ec.countLast5000 - ec.countLargeEdits,
-                percentage: 100 - ((ec.countLargeEdits / ec.countLast5000) * 100)
+                value: ec.countLargeEdits,
+                percentage: ((ec.countLargeEdits / ec.countLast5000) * 100)
             }]
         )
     }}
