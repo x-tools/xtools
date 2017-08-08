@@ -120,6 +120,8 @@ class ProjectTest extends PHPUnit_Framework_TestCase
      */
     public function testOptedIn($optedInProjects, $dbname, $hasOptedIn)
     {
+        $project = new Project($dbname);
+
         $projectRepo = $this->getMock(ProjectRepository::class);
         $projectRepo->expects($this->once())
             ->method('optedIn')
@@ -127,8 +129,11 @@ class ProjectTest extends PHPUnit_Framework_TestCase
         $projectRepo->expects($this->once())
             ->method('getOne')
             ->willReturn(['dbName' => $dbname]);
+        $projectRepo
+            ->method('pageHasContent')
+            ->with($project, 2, 'TestUser/EditCounterOptIn.js')
+            ->willReturn(false);
 
-        $project = new Project($dbname);
         $project->setRepository($projectRepo);
 
         // Check that the user has opted in or not.
