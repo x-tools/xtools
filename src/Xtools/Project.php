@@ -243,8 +243,9 @@ class Project extends Model
 
         // 3. Then see if the user has opted in on this project.
         $userNsId = 2;
-        $localExists = $this->getRepository()
-            ->pageHasContent($this, $userNsId, $this->userOptInPage($user));
+        // Remove namespace since we're querying the database and supplying a namespace ID.
+        $optInPage = preg_replace('/^User:/', '', $this->userOptInPage($user));
+        $localExists = $this->getRepository()->pageHasContent($this, $userNsId, $optInPage);
         if ($localExists) {
             return true;
         }
