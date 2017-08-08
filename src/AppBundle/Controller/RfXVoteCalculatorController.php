@@ -101,7 +101,10 @@ class RfXVoteCalculatorController extends Controller
         $conn = $this->getDoctrine()->getManager("replicas")->getConnection();
 
         $projectData = ProjectRepository::getProject($project, $this->container);
+        $projectRepo = $projectData->getRepository();
         $userData = new User($username);
+
+        $dbName = $projectData->getDatabaseName();
 
         $rfaParam = $this->getParameter("rfa");
 
@@ -148,9 +151,13 @@ class RfXVoteCalculatorController extends Controller
 
             $type = str_replace(" ", "_", $type);
 
+            $pageTable = $projectRepo->getTableName($dbName, 'page');
+            $revisionTable
+                = $projectRepo->getTableName($dbName, 'revision');
+
             $query = "SELECT DISTINCT p.page_namespace, p.page_title
-FROM `page` p
-RIGHT JOIN revision r on p.page_id=r.rev_page
+FROM $pageTable p
+RIGHT JOIN $revisionTable r on p.page_id=r.rev_page
 WHERE p.page_namespace=:namespace
 AND r.rev_user_text=:username
 And p.page_title LIKE \"$type/%\"
