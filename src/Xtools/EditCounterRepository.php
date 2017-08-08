@@ -466,8 +466,7 @@ class EditCounterRepository extends Repository
             . "     COUNT(rev_id) AS `count` "
             .  " FROM $revisionTable JOIN $pageTable ON (rev_page = page_id)"
             . " WHERE rev_user_text = :username"
-            . " GROUP BY YEAR(rev_timestamp), MONTH(rev_timestamp), page_namespace "
-            . " ORDER BY rev_timestamp DESC";
+            . " GROUP BY YEAR(rev_timestamp), MONTH(rev_timestamp), page_namespace";
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $resultQuery->bindParam(":username", $username);
         $resultQuery->execute();
