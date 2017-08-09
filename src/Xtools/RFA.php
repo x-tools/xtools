@@ -102,6 +102,7 @@ class RFA
         $date_regexp = "final .*end(?:ing|ed)?(?: no earlier than)? (.*?)? \(UTC\)",
         $user_looking_for = null
     ) {
+        $this->data = array();
         $this->user_looking_for = $user_looking_for;
 
         $lines = explode("\n", $rawWikiText);
