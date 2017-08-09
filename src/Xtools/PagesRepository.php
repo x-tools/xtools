@@ -182,7 +182,8 @@ class PagesRepository extends Repository
                         # With really old pages, the rev_timestamp may need to be sorted ASC,
                         #   and the lowest rev_id may not be the first revision.
                         SELECT rev_user_text AS author,
-                               rev_timestamp AS created_at
+                               rev_timestamp AS created_at,
+                               rev_id AS created_rev_id
                         FROM $revTable
                         WHERE rev_page = :pageid
                         ORDER BY rev_timestamp ASC
