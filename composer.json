@@ -43,7 +43,7 @@
         "snc/redis-bundle": "^2.0",
         "predis/predis": "^1.0",
         "nelmio/cors-bundle": "^1.5",
-        "friendsofsymfony/rest-bundle": "^2.1",
+        "friendsofsymfony/rest-bundle": "2.1.1",
         "jms/serializer-bundle": "^1.4",
         "symfony/stopwatch": "^3.2",
         "doctrine/doctrine-migrations-bundle": "^1.0",

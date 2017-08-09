@@ -88,33 +88,35 @@ class ApiController extends FOSRestController
     /**
      * Get non-automated edits for the given user.
      * @Rest\Get(
-     *   "/api/nonautomated_edits/{project}/{username}/{namespace}/{start}/{end}/{offset}/{format}",
+     *   "/api/nonautomated_edits/{project}/{username}/{namespace}/{start}/{end}/{offset}",
      *   requirements={"start" = "|\d{4}-\d{2}-\d{2}", "end" = "|\d{4}-\d{2}-\d{2}"}
      * )
+     * @param Request $request The HTTP request.
      * @param string $project
      * @param string $username
      * @param int|string $namespace ID of the namespace, or 'all' for all namespaces
-     * @param string [$start] In the format YYYY-MM-DD
-     * @param string [$end] In the format YYYY-MM-DD
+     * @param string $start In the format YYYY-MM-DD
+     * @param string $end In the format YYYY-MM-DD
      * @param int $offset For pagination, offset results by N edits
-     * @param string $format 'json' or 'html'
      * @return View
      */
     public function nonautomatedEdits(
+        Request $request,
         $project,
         $username,
         $namespace,
         $start = '',
         $end = '',
-        $offset = 0,
-        $format = 'json'
+        $offset = 0
     ) {
         $twig = $this->container->get('twig');
         $project = ProjectRepository::getProject($project, $this->container);
         $user = UserRepository::getUser($username, $this->container);
         $data = $user->getNonautomatedEdits($project, $namespace, $start, $end, $offset);
 
-        if ($format === 'html') {
+        $view = View::create()->setStatusCode(Response::HTTP_OK);
+
+        if ($request->query->get('format') === 'html') {
             $edits = array_map(function ($attrs) use ($project, $username) {
                 $nsName = '';
                 if ($attrs['page_namespace']) {
@@ -127,27 +129,30 @@ class ApiController extends FOSRestController
                 return new Edit($page, $attrs);
             }, $data);
 
-            $data = $twig->render('api/automated_edits.html.twig', [
+            $twig = $this->container->get('twig');
+            $view->setTemplate('api/nonautomated_edits.html.twig');
+            $view->setTemplateData([
                 'edits' => $edits,
                 'project' => $project,
             ]);
+            $view->setFormat('html');
+        } else {
+            $view->setData(['data' => $data])
+                ->setFormat('json');
         }
 
-        return new View(
-            ['data' => $data],
-            Response::HTTP_OK
-        );
+        return $view;
     }
 
     /**
      * Get basic info on a given article.
-     * @Rest\Get("/api/articleinfo/{project}/{article}/{format}")
+     * @Rest\Get("/api/articleinfo/{project}/{article}", requirements={"article"=".+"})
+     * @param Request $request The HTTP request.
      * @param string $project
      * @param string $article
-     * @param string $format 'json' or 'wikitext'
      * @return View
      */
-    public function articleInfo($project, $article, $format = 'json')
+    public function articleInfo(Request $request, $project, $article)
     {
         /** @var integer Number of days to query for pageviews */
         $pageviewsOffset = 30;
@@ -165,6 +170,13 @@ class ApiController extends FOSRestController
         $pageRepo->setContainer($this->container);
         $page->setRepository($pageRepo);
 
+        if (!$page->exists()) {
+            return new View(
+                ['error' => "$article was not found"],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+
         $info = $page->getBasicEditingInfo();
         $creationDateTime = DateTime::createFromFormat('YmdHis', $info['created_at']);
         $modifiedDateTime = DateTime::createFromFormat('YmdHis', $info['modified_at']);
@@ -178,24 +190,29 @@ class ApiController extends FOSRestController
             'created_at' => $creationDateTime->format('Y-m-d H:i'),
             'modified_at' => $modifiedDateTime->format('Y-m-d H:i'),
             'secs_since_last_edit' => $secsSinceLastEdit,
+            'last_edit_id' => (int) $info['modified_rev_id'],
             'watchers' => (int) $page->getWatchers(),
             'pageviews' => $page->getLastPageviews($pageviewsOffset),
             'pageviews_offset' => $pageviewsOffset,
         ];
 
-        if ($format === 'wikitext') {
+        $view = View::create()->setStatusCode(Response::HTTP_OK);
+
+        if ($request->query->get('format') === 'html') {
             $twig = $this->container->get('twig');
-            $data = $twig->render('api/gadget.wikitext.twig', [
+            $view->setTemplate('api/articleinfo.html.twig');
+            $view->setTemplateData([
                 'data' => $data,
                 'project' => $project,
                 'page' => $page,
             ]);
+            $view->setFormat('html');
+        } else {
+            $view->setData(['data' => $data])
+                ->setFormat('json');
         }
 
-        return new View(
-            ['data' => $data],
-            Response::HTTP_OK
-        );
+        return $view;
     }
 
     /**

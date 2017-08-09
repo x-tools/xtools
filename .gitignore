@@ -25,6 +25,8 @@
 .idea/
 
 /docs/_build
+/docs/api/phpdoc-cache-*
+/docs/api/checkstyle.xml
 /app/config/multisite.yml
 *.swp
 .DS_Store

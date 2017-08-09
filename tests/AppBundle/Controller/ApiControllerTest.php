@@ -43,15 +43,16 @@ class ApiControllerTest extends WebTestCase
                 'domain' => 'en.wikipedia.org',
                 'url' => 'https://en.wikipedia.org/',
                 'api' => 'https://en.wikipedia.org/w/api.php',
+                'database' => 'enwiki',
             ];
 
             // from database name
-            $crawler = $this->client->request('GET', '/api/normalizeProject/enwiki');
+            $crawler = $this->client->request('GET', '/api/normalize_project/enwiki');
             $output = json_decode($this->client->getResponse()->getContent(), true);
             $this->assertEquals($expectedOutput, $output);
 
             // from domain name (without .org)
-            $crawler = $this->client->request('GET', '/api/normalizeProject/en.wikipedia');
+            $crawler = $this->client->request('GET', '/api/normalize_project/en.wikipedia');
             $output = json_decode($this->client->getResponse()->getContent(), true);
             $this->assertEquals($expectedOutput, $output);
         }
@@ -82,12 +83,40 @@ class ApiControllerTest extends WebTestCase
     }
 
     /**
+     * Test nonautomated edits endpoint.
+     */
+    public function testNonautomatedEdits()
+    {
+        if ($this->isSingle || !$this->container->getParameter('app.is_labs')) {
+            // untestable :(
+            return;
+        }
+
+        $url = '/api/nonautomated_edits/en.wikipedia/ThisIsaTest/all///0';
+
+        // Test 404 (for single-wiki setups, that wiki's namespaces are always returned).
+        $crawler = $this->client->request('GET', $url);
+        $response = $this->client->getResponse();
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals($response->headers->get('content-type'), 'application/json');
+
+        // This test account *should* never edit again and be safe for testing...
+        $this->assertCount(1, json_decode($response->getContent(), true)['data']);
+
+        // Test again for HTML
+        $crawler = $this->client->request('GET', $url . '?format=html');
+        $response = $this->client->getResponse();
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertContains('text/html', $response->headers->get('content-type'));
+    }
+
+    /**
      * articleinfo endpoint, used for the XTools gadget
      */
     public function testArticleInfo()
     {
         if (!$this->isSingle && $this->container->getParameter('app.is_labs')) {
-            $crawler = $this->client->request('GET', '/api/articleinfo/en.wikipedia.org/Main_Page/json');
+            $crawler = $this->client->request('GET', '/api/articleinfo/en.wikipedia.org/Main_Page');
 
             $response = $this->client->getResponse();
             $this->assertEquals(200, $response->getStatusCode());
@@ -103,7 +132,8 @@ class ApiControllerTest extends WebTestCase
             $this->assertEquals(
                 [
                     'revisions', 'editors', 'author', 'author_editcount', 'created_at',
-                    'modified_at', 'watchers', 'pageviews', 'pageviews_offset',
+                    'modified_at', 'secs_since_last_edit', 'last_edit_id', 'watchers',
+                    'pageviews', 'pageviews_offset',
                 ],
                 array_keys($data)
             );

@@ -162,6 +162,10 @@ fos_rest:
         view_response_listener: 'force'
         formats:
             json: true
+            html: true
+        mime_types:
+            json: ['application/json']
+            html: ['text/html']
 
 monolog:
     channels: ['rate_limit']

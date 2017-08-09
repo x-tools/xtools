@@ -39,10 +39,10 @@ $(function () {
         /** global: xtBaseUrl */
         $.ajax({
             url: xtBaseUrl + 'api/nonautomated_edits/' + project + '/' + username + '/' +
-                namespace + '/' + start + '/' + end + '/' + editOffset + '/html',
+                namespace + '/' + start + '/' + end + '/' + editOffset + '?format=html',
             timeout: 30000
         }).done(function (data) {
-            $('.non-auto-edits-container').html(data.data).show();
+            $('.non-auto-edits-container').html(data).show();
             $('.non-auto-edits-loading').hide();
             setupNavListeners();
 

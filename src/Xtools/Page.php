@@ -419,14 +419,23 @@ class Page extends Model
     }
 
     /**
-     * Get page views for the given page and timeframe.
+     * Get the sum of pageviews for the given page and timeframe.
      * @param string|DateTime $start In the format YYYYMMDD
      * @param string|DateTime $end In the format YYYYMMDD
      * @return string[]
      */
     public function getPageviews($start, $end)
     {
-        return $this->getRepository()->getPageviews($this, $start, $end);
+        try {
+            $pageviews = $this->getRepository()->getPageviews($this, $start, $end);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            // 404 means zero pageviews
+            return 0;
+        }
+
+        return array_sum(array_map(function ($item) {
+            return (int) $item['views'];
+        }, $pageviews['items']));
     }
 
     /**
@@ -438,11 +447,6 @@ class Page extends Model
     {
         $start = date('Ymd', strtotime("-$days days"));
         $end = date('Ymd');
-
-        $pageviews = $this->getPageviews($start, $end);
-
-        return array_sum(array_map(function ($item) {
-            return (int) $item['views'];
-        }, $pageviews['items']));
+        return $this->getPageviews($start, $end);
     }
 }

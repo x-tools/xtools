@@ -164,6 +164,7 @@ class PagesRepository extends Repository
     {
         $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
         $userTable = $this->getTableName($page->getProject()->getDatabaseName(), 'user');
+        $pageTable = $this->getTableName($page->getProject()->getDatabaseName(), 'page');
 
         $sql = "SELECT *, (
                    SELECT user_editcount
@@ -176,7 +177,7 @@ class PagesRepository extends Repository
                                COUNT(DISTINCT(rev_user_text)) AS num_editors
                         FROM $revTable
                         WHERE rev_page = :pageid
-                    ) totals,
+                    ) a,
                     (
                         # With really old pages, the rev_timestamp may need to be sorted ASC,
                         #   and the lowest rev_id may not be the first revision.
@@ -186,12 +187,17 @@ class PagesRepository extends Repository
                         WHERE rev_page = :pageid
                         ORDER BY rev_timestamp ASC
                         LIMIT 1
-                    ) initial_rev,
+                    ) b,
                     (
                         SELECT MAX(rev_timestamp) AS modified_at
                         FROM $revTable
                         WHERE rev_page = :pageid
-                    ) last_rev
+                    ) c,
+                    (
+                        SELECT page_latest AS modified_rev_id
+                        FROM $pageTable
+                        WHERE page_id = :pageid
+                    ) d
                 );";
         $params = ['pageid' => $page->getId()];
         $conn = $this->getProjectsConnection();
