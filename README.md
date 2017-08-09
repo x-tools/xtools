@@ -13,7 +13,7 @@ To **report an issue**, create a ticket on [Phabricator](https://phabricator.wik
 
 [![release](https://img.shields.io/github/release/x-tools/xtools.svg)](https://github.com/x-tools/xtools/releases/latest)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Build Status](https://travis-ci.org/x-tools/xtools.svg?branch=3.0.5)](https://travis-ci.org/x-tools/xtools)
+[![Build Status](https://travis-ci.org/x-tools/xtools.svg?branch=3.0.6)](https://travis-ci.org/x-tools/xtools)
 
 **Master:**
 
