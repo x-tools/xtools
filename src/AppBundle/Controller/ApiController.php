@@ -180,14 +180,15 @@ class ApiController extends FOSRestController
         $info = $page->getBasicEditingInfo();
         $creationDateTime = DateTime::createFromFormat('YmdHis', $info['created_at']);
         $modifiedDateTime = DateTime::createFromFormat('YmdHis', $info['modified_at']);
-        $secsSinceLastEdit = $modifiedDateTime->getTimestamp() - $creationDateTime->getTimestamp();
+        $secsSinceLastEdit = (new DateTime)->getTimestamp() - $modifiedDateTime->getTimestamp();
 
         $data = [
             'revisions' => (int) $info['num_edits'],
             'editors' => (int) $info['num_editors'],
             'author' => $info['author'],
             'author_editcount' => (int) $info['author_editcount'],
-            'created_at' => $creationDateTime->format('Y-m-d H:i'),
+            'created_at' => $creationDateTime->format('Y-m-d'),
+            'created_rev_id' => $info['created_rev_id'],
             'modified_at' => $modifiedDateTime->format('Y-m-d H:i'),
             'secs_since_last_edit' => $secsSinceLastEdit,
             'last_edit_id' => (int) $info['modified_rev_id'],

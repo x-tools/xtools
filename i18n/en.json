@@ -185,6 +185,7 @@
   "num-pageviews": "{{PLURAL:$1|pageview|pageviews}}",
   "num-protections": "{{PLURAL:$1|protection|protections}}",
   "num-revisions": "{{PLURAL:$1|revision|revisions}}",
+  "num-revisions-since": "$1 {{PLURAL:$2|revision|revisions}} since $3",
   "num-seconds": "{{PLURAL:$1|second|seconds}}",
   "num-sitelinks": "{{PLURAL:$1|sitelink|sitelinks}}",
   "num-tools": "{{PLURAL:$1|tool|tools}}",

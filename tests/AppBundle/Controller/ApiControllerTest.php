@@ -127,13 +127,14 @@ class ApiControllerTest extends WebTestCase
             $this->assertTrue($data['revisions'] > 4000);
             $this->assertTrue($data['editors'] > 400);
             $this->assertEquals($data['author'], 'TwoOneTwo');
-            $this->assertEquals($data['created_at'], '2002-01-26 15:28');
+            $this->assertEquals($data['created_at'], '2002-01-26');
+            $this->assertEquals($data['created_rev_id'], 139992);
 
             $this->assertEquals(
                 [
                     'revisions', 'editors', 'author', 'author_editcount', 'created_at',
-                    'modified_at', 'secs_since_last_edit', 'last_edit_id', 'watchers',
-                    'pageviews', 'pageviews_offset',
+                    'created_rev_id', 'modified_at', 'secs_since_last_edit', 'last_edit_id',
+                    'watchers', 'pageviews', 'pageviews_offset',
                 ],
                 array_keys($data)
             );
