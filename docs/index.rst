@@ -13,7 +13,7 @@ It is in operation for Wikimedia wikis and can also be installed for any MediaWi
   * Development installation: `xtools-dev.wmflabs.org <https://xtools-dev.wmflabs.org/>`_
 
 * This documentation: `xtools.readthedocs.io <http://xtools.readthedocs.io/en/latest/>`_
-* Source code: `github.com/x-tools/xtools-rebirth <https://github.com/x-tools/xtools-rebirth>`_
+* Source code: `github.com/x-tools/xtools <https://github.com/x-tools/xtools>`_
 * Issue tracker: `phabricator.wikimedia.org <https://phabricator.wikimedia.org/project/view/803/>`_
 * IRC: `#wikimedia-xtools on Freenode <https://webchat.freenode.net/?channels=#wikimedia-xtools>`_
 
@@ -30,6 +30,8 @@ It is in operation for Wikimedia wikis and can also be installed for any MediaWi
     opt-in
     tools/index
     development
+    administration
+    api/index
 
 The tools
 =========
@@ -84,12 +86,6 @@ Blame
 Find out who last changed a given part of a page.
 :ref:`Read more about Blame... <blame>`.
 
-EC
---
-
-Edit Counter again?
-:ref:`Read more about EC... <ec>`.
-
 Pages
 -----
 
@@ -112,7 +108,7 @@ Simple Counter
 --------------
 
 A simpler but quicker way to view edit counts (than Edit Counter, above).
-:ref:`Read more about Simple Counter... <sc>`.
+:ref:`Read more about Simple Counter... <simplecounter>`.
 
 Top Edits
 ---------
@@ -129,5 +125,5 @@ For more help with XTools, there are several places you can ask:
 * `IRC <https://webchat.freenode.net/?channels=#wikimedia-xtools>`_
   (`direct link <irc://irc.freenode.net/#wikimedia-xtools>`_ requires an IRC client)
   — to chat with the developers and other users.
-* `Phabricator <https://phabricator.wikimedia.org/maniphest/task/create/?project=Tool-labs-tools-xtools>`_
+* `Phabricator <https://phabricator.wikimedia.org/maniphest/task/create/?project=XTools>`_
   — if you've found a bug.

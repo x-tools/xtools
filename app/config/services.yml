@@ -17,14 +17,12 @@ services:
         class: AppBundle\EventSubscriber\DisabledToolSubscriber
         arguments: ['@service_container']
 
+    rate_limit_subscriber:
+        class: AppBundle\EventSubscriber\RateLimitSubscriber
+        arguments: ['@service_container']
+
     app.twig_extension:
         class: AppBundle\Twig\AppExtension
-        arguments: ["@service_container", "@request_stack", "@session"]
-        public: false
-        tags:
-            - { name: twig.extension }
-    app.wiki_extension:
-        class: AppBundle\Twig\WikiExtension
         arguments: ["@service_container", "@request_stack", "@session"]
         public: false
         tags:
@@ -35,12 +33,6 @@ services:
         public: true
         tags:
           - {name: api.helper}
-    app.pageviews_helper:
-        class: AppBundle\Helper\PageviewsHelper
-        arguments: ["@service_container"]
-        public: true
-        tags:
-          - {name: pageviews.helper}
     app.automated_edits_helper:
         class: AppBundle\Helper\AutomatedEditsHelper
         arguments: ["@service_container"]

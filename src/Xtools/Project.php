@@ -48,7 +48,7 @@ class Project extends Model
      */
     protected function getBasicInfo()
     {
-        if (!$this->basicInfo) {
+        if (empty($this->basicInfo)) {
             $this->basicInfo = $this->getRepository()->getOne($this->nameUnnormalized);
         }
         return $this->basicInfo;
@@ -61,8 +61,8 @@ class Project extends Model
      */
     protected function getMetadata()
     {
-        if (!$this->metadata) {
-            $url = $this->getBasicInfo($this->nameUnnormalized)['url'];
+        if (empty($this->metadata)) {
+            $url = $this->getBasicInfo()['url'];
             $this->metadata = $this->getRepository()->getMetadata($url);
         }
         return $this->metadata;
@@ -243,8 +243,9 @@ class Project extends Model
 
         // 3. Then see if the user has opted in on this project.
         $userNsId = 2;
-        $localExists = $this->getRepository()
-            ->pageHasContent($this, $userNsId, $this->userOptInPage($user));
+        // Remove namespace since we're querying the database and supplying a namespace ID.
+        $optInPage = preg_replace('/^User:/', '', $this->userOptInPage($user));
+        $localExists = $this->getRepository()->pageHasContent($this, $userNsId, $optInPage);
         if ($localExists) {
             return true;
         }

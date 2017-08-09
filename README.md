@@ -5,11 +5,21 @@ XTools is a suite of statistics tools for MediaWiki wikis, users, pages, and mor
 See it in operation for Wikimedia wikis at [xtools.wmflabs.org](https://xtools.wmflabs.org/)
 (it can also be installed for any MediaWiki installation).
 
-**For full documentation, please see: [xtools.readthedocs.io](https://xtools.readthedocs.io)**
+For **full documentation**, please see [xtools.readthedocs.io](https://xtools.readthedocs.io).
+
+To **report an issue**, create a ticket on [Phabricator](https://phabricator.wikimedia.org/maniphest/task/edit/form/1/?title=PLEASE%20REPLACE%20WITH%20A%20DESCRIPTION%20OF%20THE%20ISSUE&projects=XTools&description=Please%20provide%20any%20further%20details%20here) (requires a Wikimedia account) or use the [talk page](https://www.mediawiki.org/wiki/Talk:XTools) on [mediawiki.org/XTools](https://www.mediawiki.org/wiki/XTools).
+
+**Stable:**
+
+[![release](https://img.shields.io/github/release/x-tools/xtools.svg)](https://github.com/x-tools/xtools/releases/latest)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Build Status](https://travis-ci.org/x-tools/xtools.svg?branch=3.0.6)](https://travis-ci.org/x-tools/xtools)
+
+**Master:**
 
 [![Docs](https://readthedocs.org/projects/xtools/badge/?version=latest)](https://xtools.readthedocs.io/en/latest/?badge=latest)
 [![Dependency Status](https://www.versioneye.com/user/projects/58d352f8dcaf9e0040b1b1ba/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/58d352f8dcaf9e0040b1b1ba)
-[![Build Status](https://travis-ci.org/x-tools/xtools-rebirth.svg?branch=master)](https://travis-ci.org/x-tools/xtools-rebirth)
+[![Build Status](https://travis-ci.org/x-tools/xtools.svg?branch=master)](https://travis-ci.org/x-tools/xtools)
 
 ## Kudos and history
 
@@ -23,7 +33,7 @@ and other members of the Wikimedia Foundation's [Community Tech Team](https://me
 
 ## Licence (GPL-3.0+)
 
-Copyright © 2017 Matthewrbowker, MusikAnimal, Cyberpower678, Hedonil, X!, Samwilson.
+Copyright © 2017 Cyberpower678, Hedonil, Matthewrbowker, MusikAnimal, Samwilson, Scottywong, TParis, X!.
 
 This program is free software:
 you can redistribute it and/or modify it under the terms of the GNU General Public License

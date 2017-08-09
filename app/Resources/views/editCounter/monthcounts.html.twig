@@ -29,53 +29,46 @@
     </div>
 {% else %}
 
-<canvas id="monthcounts-bar-chart"></canvas>
+{# Set height of chart based on how many months (horizontal rows) are being reported. #}
+<div style="position:relative; height:{{ 35 * ec.monthCounts.monthLabels|length }}px">
+    <canvas id="monthcounts-canvas"></canvas>
+</div>
+
 <script type="text/javascript">
-    new Chart($("#monthcounts-bar-chart"), {
-        type: 'bar',
-        data: {
-            labels: [
-                {%- for year in ec.monthCounts.min_year .. ec.monthCounts.max_year -%}
-                    {%- for month in 1..12 -%}
-                        "{{ year }}/{{ '%02d'|format(month) }}"
-                        {%- if not loop.last %},{% endif %}
-                    {%- endfor -%}
-                    {%- if not loop.last %},{% endif %}
-                {%- endfor -%}
-            ],
-            datasets: [
-                {% for ns_id,dataset in ec.monthCounts.totals %}
-                {
-                    label: "{{ nsName(ns_id, project.namespaces) }}",
-                    backgroundColor: "{{ color(ns_id) }}",
-                    data: [
-                        {% for year in ec.monthCounts.min_year .. ec.monthCounts.max_year %}
-                            {%- for month in 1..12 -%}
-                                {{- attribute(dataset, year~month) -}}
-                                {%- if not loop.last %},{% endif %}
-                            {%- endfor -%}
-                            {%- if not loop.last %},{% endif -%}
-                        {%- endfor -%}
-                    ]
-                }{% if not loop.last %},{% endif %}
-                {% endfor %}
-            ]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    stacked: true
-                }],
-                xAxes: [{
-                    stacked: true,
-                    ticks: {
-                        callback: function(value, index, values) {
-                            return (index % 12 == 0) ? value : '';
-                        }
+    $(function() {
+        /** @type {Array} To be passed into Chart.js */
+        var datasets = [];
+
+        /** @type {Array} The labels for the y-axis. */
+        var labels = {{ ec.monthCounts.monthLabels|json_encode|raw }};
+
+        /** @type {Number} Max value of the year totals */
+        var maxTotal = 0;
+
+        // Format data for use in charts.
+        {% for nsId,namespaceData in ec.monthCounts.totals %}
+            var dataset = {
+                label: "{{ nsName(nsId, project.namespaces) }}",
+                backgroundColor: "{{ color(nsId) }}",
+                data: [],
+            };
+
+            {% for year,yearData in namespaceData %}
+                {% for month,monthData in yearData %}
+                    dataset.data.push({{ monthData }});
+
+                    // Determine maximum value for the totals. This is needed
+                    //   so that we know how much spacing to add in the labels.
+                    if ({{ monthData }} > maxTotal) {
+                        maxTotal = {{ monthData }};
                     }
-                }]
-            }
-        }
+                {% endfor %}
+            {%- endfor -%}
+
+            datasets.push(dataset);
+        {% endfor %}
+
+        window.setupMonthYearChart('month', datasets, labels, maxTotal);
     });
 </script>
 

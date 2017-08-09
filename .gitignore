@@ -1,6 +1,7 @@
 /app/config/table_map.yml
 /app/config/parameters.yml
 /app/config/labs_overrides.yml
+/app/config/request_blacklist.yml
 /build/
 /phpunit.xml
 /var/*
@@ -24,6 +25,8 @@
 .idea/
 
 /docs/_build
+/docs/api/phpdoc-cache-*
+/docs/api/checkstyle.xml
 /app/config/multisite.yml
 *.swp
 .DS_Store

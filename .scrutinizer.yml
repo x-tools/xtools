@@ -1,3 +1,11 @@
 filter:
   excluded_paths:
     - var/*
+    - 'app/*'
+    - 'tests/*'
+    - 'bin/*'
+    - 'vendor/*'
+    - 'web/bootstrap/*'
+    - 'web/chartjs/*'
+    - 'web/static/js/vendor/*'
+    - '*.min.js'

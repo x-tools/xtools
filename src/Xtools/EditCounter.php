@@ -5,7 +5,10 @@
 
 namespace Xtools;
 
-use \DateTime;
+use DateTime;
+use Exception;
+use DatePeriod;
+use DateInterval;
 
 /**
  * An EditCounter provides statistics about a user's edits on a project.
@@ -31,6 +34,12 @@ class EditCounter extends Model
     /** @var int[] The lot totals. */
     protected $logCounts;
 
+    /** @var mixed[] Total numbers of edits per month */
+    protected $monthCounts;
+
+    /** @var mixed[] Total numbers of edits per year */
+    protected $yearCounts;
+
     /** @var int[] Keys are project DB names. */
     protected $globalEditCounts;
 
@@ -39,6 +48,9 @@ class EditCounter extends Model
 
     /** @var int Number of semi-automated edits */
     protected $autoEditCount;
+
+    /** @var string[] Data needed for time card chart */
+    protected $timeCardData;
 
     /**
      * Revision size data, with keys 'average_size', 'large_edits' and 'small_edits'.
@@ -113,7 +125,7 @@ class EditCounter extends Model
     public function countLiveRevisions()
     {
         $revCounts = $this->getPairData();
-        return isset($revCounts['live']) ? $revCounts['live'] : 0;
+        return isset($revCounts['live']) ? (int)$revCounts['live'] : 0;
     }
 
     /**
@@ -123,7 +135,7 @@ class EditCounter extends Model
     public function countDeletedRevisions()
     {
         $revCounts = $this->getPairData();
-        return isset($revCounts['deleted']) ? $revCounts['deleted'] : 0;
+        return isset($revCounts['deleted']) ? (int)$revCounts['deleted'] : 0;
     }
 
     /**
@@ -142,7 +154,7 @@ class EditCounter extends Model
     public function countRevisionsWithComments()
     {
         $revCounts = $this->getPairData();
-        return isset($revCounts['with_comments']) ? $revCounts['with_comments'] : 0;
+        return isset($revCounts['with_comments']) ? (int)$revCounts['with_comments'] : 0;
     }
 
     /**
@@ -161,7 +173,7 @@ class EditCounter extends Model
     public function countMinorRevisions()
     {
         $revCounts = $this->getPairData();
-        return isset($revCounts['minor']) ? $revCounts['minor'] : 0;
+        return isset($revCounts['minor']) ? (int)$revCounts['minor'] : 0;
     }
 
     /**
@@ -171,7 +183,7 @@ class EditCounter extends Model
     public function countLivePagesEdited()
     {
         $pageCounts = $this->getPairData();
-        return isset($pageCounts['edited-live']) ? $pageCounts['edited-live'] : 0;
+        return isset($pageCounts['edited-live']) ? (int)$pageCounts['edited-live'] : 0;
     }
 
     /**
@@ -181,7 +193,7 @@ class EditCounter extends Model
     public function countDeletedPagesEdited()
     {
         $pageCounts = $this->getPairData();
-        return isset($pageCounts['edited-deleted']) ? $pageCounts['edited-deleted'] : 0;
+        return isset($pageCounts['edited-deleted']) ? (int)$pageCounts['edited-deleted'] : 0;
     }
 
     /**
@@ -582,74 +594,124 @@ class EditCounter extends Model
      */
     public function timeCard()
     {
-        return $this->getRepository()->getTimeCard($this->project, $this->user);
-    }
-
-    /**
-     * Get the total numbers of edits per year.
-     * @return int[]
-     */
-    public function yearCounts()
-    {
-        $totals = $this->getRepository()->getYearCounts($this->project, $this->user);
-        $out = [
-            'years' => [],
-            'namespaces' => [],
-            'totals' => [],
-        ];
-        foreach ($totals as $total) {
-            $out['years'][$total['year']] = $total['year'];
-            $out['namespaces'][$total['page_namespace']] = $total['page_namespace'];
-            if (!isset($out['totals'][$total['page_namespace']])) {
-                $out['totals'][$total['page_namespace']] = [];
-            }
-            $out['totals'][$total['page_namespace']][$total['year']] = $total['count'];
+        if ($this->timeCardData) {
+            return $this->timeCardData;
         }
-
-        // Make sure data is sorted by namespace
-        ksort($out['namespaces']);
-        ksort($out['totals']);
-
-        return $out;
+        $totals = $this->getRepository()->getTimeCard($this->project, $this->user);
+        $this->timeCardData = $totals;
+        return $totals;
     }
 
     /**
      * Get the total numbers of edits per month.
-     * @return mixed[] With keys 'years', 'namespaces' and 'totals'.
+     * @param null|DateTime [$currentTime] - *USED ONLY FOR UNIT TESTING*
+     *   so we can mock the current DateTime.
+     * @return mixed[] With keys 'yearLabels', 'monthLabels' and 'totals',
+     *   the latter keyed by namespace, year and then month.
      */
-    public function monthCounts()
+    public function monthCounts($currentTime = null)
     {
+        if (isset($this->monthCounts)) {
+            return $this->monthCounts;
+        }
+
+        // Set to current month if we're not unit-testing
+        if (!($currentTime instanceof DateTime)) {
+            $currentTime = new DateTime('last day of this month');
+        }
+
         $totals = $this->getRepository()->getMonthCounts($this->project, $this->user);
         $out = [
-            'years' => [],
-            'totals' => [],
+            'yearLabels' => [],  // labels for years
+            'monthLabels' => [], // labels for months
+            'totals' => [], // actual totals, grouped by namespace, year and then month
         ];
-        $out['max_year'] = 0;
-        $out['min_year'] = date('Y');
+
+        /** @var DateTime Keep track of the date of their first edit. */
+        $firstEdit = new DateTime();
+
+        // Loop through the database results and fill in the values
+        //   for the months that we have data for.
         foreach ($totals as $total) {
-            // Collect all applicable years and namespaces.
-            $out['max_year'] = max($out['max_year'], $total['year']);
-            $out['min_year'] = min($out['min_year'], $total['year']);
+            // Keep track of first edit
+            $date = new DateTime($total['year'].'-'.$total['month'].'-01');
+            if ($date < $firstEdit) {
+                $firstEdit = $date;
+            }
+
             // Collate the counts by namespace, and then year and month.
             $ns = $total['page_namespace'];
             if (!isset($out['totals'][$ns])) {
                 $out['totals'][$ns] = [];
             }
-            $out['totals'][$ns][$total['year'] . $total['month']] = $total['count'];
+
+            // Start array for this year if not already present.
+            if (!isset($out['totals'][$ns][$total['year']])) {
+                $out['totals'][$ns][$total['year']] = [];
+            }
+
+            $out['totals'][$ns][$total['year']][$total['month']] = (int) $total['count'];
         }
-        // Fill in the blanks (where no edits were made in a given month for a namespace).
-        for ($y = $out['min_year']; $y <= $out['max_year']; $y++) {
-            for ($m = 1; $m <= 12; $m++) {
-                foreach ($out['totals'] as $nsId => &$total) {
-                    if (!isset($total[$y . $m])) {
-                        $total[$y . $m] = 0;
-                    }
+
+        $dateRange = new DatePeriod(
+            $firstEdit,
+            new DateInterval('P1M'),
+            $currentTime->modify('first day of this month')
+        );
+
+        foreach ($dateRange as $monthObj) {
+            $year = (int) $monthObj->format('Y');
+            $month = (int) $monthObj->format('n');
+
+            // Fill in labels
+            $out['monthLabels'][] = $monthObj->format('Y-m');
+            if (!in_array($year, $out['yearLabels'])) {
+                $out['yearLabels'][] = $year;
+            }
+
+            foreach (array_keys($out['totals']) as $nsId) {
+                if (!isset($out['totals'][$nsId][$year])) {
+                    $out['totals'][$nsId][$year] = [];
+                }
+
+                if (!isset($out['totals'][$nsId][$year][$month])) {
+                    $out['totals'][$nsId][$year][$month] = 0;
                 }
             }
         }
 
-        // Sort by namespace
+        // One more set of loops to sort by year/month
+        foreach (array_keys($out['totals']) as $nsId) {
+            ksort($out['totals'][$nsId]);
+
+            foreach ($out['totals'][$nsId] as &$yearData) {
+                ksort($yearData);
+            }
+        }
+
+        // Finally, sort the namespaces
         ksort($out['totals']);
+
+        $this->monthCounts = $out;
+        return $out;
+    }
+
+    /**
+     * Get the total numbers of edits per year.
+     * @param null|DateTime [$currentTime] - *USED ONLY FOR UNIT TESTING*
+     *   so we can mock the current DateTime.
+     * @return mixed[] With keys 'yearLabels' and 'totals', the latter
+     *   keyed by namespace then year.
+     */
+    public function yearCounts($currentTime = null)
+    {
+        $out = $this->monthCounts($currentTime);
+
+        foreach ($out['totals'] as $nsId => $years) {
+            foreach ($years as $year => $months) {
+                $out['totals'][$nsId][$year] = array_sum(array_values($months));
+            }
+        }
 
         return $out;
     }
@@ -703,7 +765,7 @@ class EditCounter extends Model
      */
     public function globalEditCounts($sorted = false)
     {
-        if (!$this->globalEditCounts) {
+        if (empty($this->globalEditCounts)) {
             $this->globalEditCounts = $this->getRepository()
                 ->globalEditCounts($this->user, $this->project);
             if ($sorted) {
@@ -723,8 +785,6 @@ class EditCounter extends Model
      */
     public function globalEdits($max)
     {
-        // Only look for revisions newer than this.
-        $oldest = null;
         // Collect all projects with any edits.
         $projects = [];
         foreach ($this->globalEditCounts() as $editCount) {

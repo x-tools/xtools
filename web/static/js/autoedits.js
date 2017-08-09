@@ -30,17 +30,19 @@ $(function () {
     {
         $('.non-auto-edits-loading').show();
         $('.non-auto-edits-container').hide();
-        var username = $('.non-auto-edits-container').data('username'),
+        var project = $('.non-auto-edits-container').data('project'),
+            username = $('.non-auto-edits-container').data('username'),
             start = $('.non-auto-edits-container').data('start'),
             end = $('.non-auto-edits-container').data('end'),
             namespace = $('.non-auto-edits-container').data('namespace');
 
+        /** global: xtBaseUrl */
         $.ajax({
-            url: xtBaseUrl + 'api/nonautomated_edits/en.wikipedia.org/' + username + '/' +
-                namespace + '/' + start + '/' + end + '/' + editOffset + '/html',
+            url: xtBaseUrl + 'api/nonautomated_edits/' + project + '/' + username + '/' +
+                namespace + '/' + start + '/' + end + '/' + editOffset + '?format=html',
             timeout: 30000
         }).done(function (data) {
-            $('.non-auto-edits-container').html(data.data).show();
+            $('.non-auto-edits-container').html(data).show();
             $('.non-auto-edits-loading').hide();
             setupNavListeners();
 

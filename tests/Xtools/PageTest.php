@@ -75,33 +75,91 @@ class PageTest extends KernelTestCase
     }
 
     /**
-     * A page has an integer ID on a given project.
+     * Test basic getters
      */
-    public function testId()
+    public function testBasicGetters()
     {
         $pageRepo = $this->getMock(PagesRepository::class, ['getPageInfo']);
         $pageRepo->expects($this->once())
             ->method('getPageInfo')
-            ->willReturn(['pageid' => '42']);
+            ->willReturn([
+                'pageid' => '42',
+                'fullurl' => 'https://example.org/Page',
+                'watchers' => 5000,
+                'ns' => 0,
+                'length' => 300,
+                'pageprops' => [
+                    'wikibase_item' => 'Q95',
+                ],
+            ]);
 
         $page = new Page(new Project('TestProject'), 'Test_Page');
         $page->setRepository($pageRepo);
+
         $this->assertEquals(42, $page->getId());
+        $this->assertEquals('https://example.org/Page', $page->getUrl());
+        $this->assertEquals(5000, $page->getWatchers());
+        $this->assertEquals(300, $page->getLength());
+        $this->assertEquals(0, $page->getNamespace());
+        $this->assertEquals('Q95', $page->getWikidataId());
     }
 
     /**
-     * A page has a URL.
+     * Tests wikidata item getter.
      */
-    public function testUrls()
+    public function testWikidataItems()
     {
-        $pageRepo = $this->getMock(PagesRepository::class, ['getPageInfo']);
-        $pageRepo->expects($this->once())
-            ->method('getPageInfo')
-            ->willReturn(['fullurl' => 'https://example.org/Page']);
+        $wikidataItems = [
+            [
+                'ips_site_id' => 'enwiki',
+                'ips_site_page' => 'Google',
+            ],
+            [
+                'ips_site_id' => 'arwiki',
+                'ips_site_page' => 'جوجل',
+            ],
+        ];
 
-        $page = new Page(new Project('exampleWiki'), 'Page');
+        $pageRepo = $this->getMock(PagesRepository::class, ['getPageInfo', 'getWikidataItems']);
+        $pageRepo->method('getPageInfo')
+            ->willReturn([
+                'pageprops' => [
+                    'wikibase_item' => 'Q95',
+                ],
+            ]);
+        $pageRepo->expects($this->once())
+            ->method('getWikidataItems')
+            ->willReturn($wikidataItems);
+        $page = new Page(new Project('TestProject'), 'Test_Page');
         $page->setRepository($pageRepo);
-        $this->assertEquals('https://example.org/Page', $page->getUrl());
+
+        $this->assertArraySubset($wikidataItems, $page->getWikidataItems());
+
+        // If no wikidata item...
+        $pageRepo2 = $this->getMock(PagesRepository::class, ['getPageInfo']);
+        $pageRepo2->expects($this->once())
+            ->method('getPageInfo')
+            ->willReturn([
+                'pageprops' => [],
+            ]);
+        $page->setRepository($pageRepo2);
+        $this->assertNull($page->getWikidataId());
+        $this->assertEquals(0, $page->countWikidataItems());
+    }
+
+    /**
+     * Tests wikidata item counter.
+     */
+    public function testCountWikidataItems()
+    {
+        $pageRepo = $this->getMock(PagesRepository::class, ['getWikidataItems']);
+        $page = new Page(new Project('TestProject'), 'Test_Page');
+        $pageRepo->method('getWikidataItems')
+            ->with($page, true)
+            ->willReturn(2);
+        $page->setRepository($pageRepo);
+
+        $this->assertEquals(2, $page->countWikidataItems());
     }
 
     /**
@@ -173,6 +231,31 @@ class PageTest extends KernelTestCase
             'Description',
             $wikidataErrors[0]['notice']
         );
+    }
+
+    /**
+     * Tests for pageviews-related functions
+     */
+    public function testPageviews()
+    {
+        $pageviewsData = [
+            'items' => [
+                ['views' => 2500],
+                ['views' => 1000],
+            ],
+        ];
+
+        $pageRepo = $this->getMock(PagesRepository::class, ['getPageviews']);
+        $pageRepo->method('getPageviews')->willReturn($pageviewsData);
+        $page = new Page(new Project('exampleWiki'), 'Page');
+        $page->setRepository($pageRepo);
+
+        $this->assertEquals(
+            3500,
+            $page->getPageviews('20160101', '20160201')
+        );
+
+        $this->assertEquals(3500, $page->getLastPageviews(30));
     }
 
     // public function testPageAssessments()

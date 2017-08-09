@@ -134,7 +134,8 @@ $tooltip-border: #ddd;
 $tooltip-shadow: #ccc;
 
 .tooltipcss {
-    position: inherit;
+    position: relative;
+    text-decoration: none;
 
     .tooltip-body {
         @include center('vertical');
@@ -144,9 +145,11 @@ $tooltip-shadow: #ccc;
         box-shadow: 5px 5px 8px $tooltip-shadow;
         color: #111;
         display: none;
+        text-align: left;
         font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
         line-height: 16px;
         margin-left: 28px;
+        min-width: 200px;
         max-width: 350px;
         padding: 14px 20px;
         white-space: normal;
@@ -398,7 +401,9 @@ section > .panel-body {
     &:last-child > *:first-child {
         border-bottom-left-radius: 4px;
     }
-    &:last-child > *:last-child {
+    // Use .form-control:last-of-type to account for
+    //   typeahead DOM element at bottom of form
+    &:last-child > .form-control:last-of-type {
         border-bottom-right-radius: 4px;
     }
 }
@@ -574,6 +579,32 @@ section > .panel-body {
     }
 }
 
+.basic-info-charts {
+    clear: both;
+    display: block;
+    padding-top: 20px;
+    position: relative;
+
+    canvas {
+        max-width: 150px;
+    }
+
+    .chart-wrapper {
+        display: flex;
+        float: left;
+        margin-right: 50px;
+    }
+
+    .chart-legend {
+        align-self: center;
+        margin-left: 15px;
+
+        .color-icon {
+            vertical-align: -4px;
+        }
+    }
+}
+
 .error-wrapper {
     font-size: 18px;
 
@@ -614,6 +645,16 @@ section > .panel-body {
 }
 
 @media (max-width: $bootstrap-sm) {
+    .basic-info-charts {
+        .chart-wrapper {
+            display: block !important;
+
+            .chart-legend {
+                margin-bottom: 15px;
+            }
+        }
+    }
+
     .app-footer {
         position: relative;
     }

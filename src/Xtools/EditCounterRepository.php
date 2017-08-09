@@ -122,7 +122,6 @@ class EditCounterRepository extends Repository
         $this->stopwatch->start($cacheKey, 'XTools');
 
         // Query.
-        $userNamespaceId = 2;
         $loggingTable = $this->getTableName($project->getDatabaseName(), 'logging');
         $sql = "
         (SELECT CONCAT(log_type, '-', log_action) AS source, COUNT(log_id) AS value
@@ -212,7 +211,8 @@ class EditCounterRepository extends Repository
                 WHERE log_type = 'block'
                 AND log_action = 'block'
                 AND log_timestamp > 0
-                AND log_title = :username";
+                AND log_title = :username
+                AND log_namespace = 2";
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $username = str_replace(' ', '_', $user->getUsername());
         $resultQuery->bindParam('username', $username);
@@ -437,7 +437,15 @@ class EditCounterRepository extends Repository
      * Get data for a bar chart of monthly edit totals per namespace.
      * @param Project $project The project.
      * @param User $user The user.
-     * @return string[]
+     * @return string[] [
+     *                      [
+     *                          'year' => <year>,
+     *                          'month' => <month>,
+     *                          'page_namespace' => <namespace>,
+     *                          'count' => <count>,
+     *                      ],
+     *                      ...
+     *                  ]
      */
     public function getMonthCounts(Project $project, User $user)
     {
@@ -458,8 +466,7 @@ class EditCounterRepository extends Repository
             . "     COUNT(rev_id) AS `count` "
             .  " FROM $revisionTable JOIN $pageTable ON (rev_page = page_id)"
             . " WHERE rev_user_text = :username"
-            . " GROUP BY YEAR(rev_timestamp), MONTH(rev_timestamp), page_namespace "
-            . " ORDER BY rev_timestamp DESC";
+            . " GROUP BY YEAR(rev_timestamp), MONTH(rev_timestamp), page_namespace";
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $resultQuery->bindParam(":username", $username);
         $resultQuery->execute();
@@ -468,45 +475,6 @@ class EditCounterRepository extends Repository
         $cacheItem = $this->cache->getItem($cacheKey);
         $cacheItem->expiresAfter(new DateInterval('PT10M'));
         $cacheItem->set($totals);
-        $this->cache->save($cacheItem);
-
-        $this->stopwatch->stop($cacheKey);
-        return $totals;
-    }
-
-    /**
-     * Get yearly edit totals for this user, grouped by namespace.
-     * @param Project $project The project.
-     * @param User $user The user.
-     * @return string[] ['<namespace>' => ['<year>' => 'total', ... ], ... ]
-     */
-    public function getYearCounts(Project $project, User $user)
-    {
-        $cacheKey = "yearcounts.".$user->getCacheKey();
-        $this->stopwatch->start($cacheKey, 'XTools');
-        if ($this->cache->hasItem($cacheKey)) {
-            return $this->cache->getItem($cacheKey)->get();
-        }
-
-        $username = $user->getUsername();
-        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
-        $sql = "SELECT "
-            . "     YEAR(rev_timestamp) AS `year`,"
-            . "     page_namespace,"
-            . "     COUNT(rev_id) AS `count` "
-            . " FROM $revisionTable JOIN $pageTable ON (rev_page = page_id)"
-            . " WHERE rev_user_text = :username"
-            . " GROUP BY YEAR(rev_timestamp), page_namespace "
-            . " ORDER BY rev_timestamp ASC ";
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $resultQuery->bindParam(":username", $username);
-        $resultQuery->execute();
-        $totals = $resultQuery->fetchAll();
-
-        $cacheItem = $this->cache->getItem($cacheKey);
-        $cacheItem->set($totals);
-        $cacheItem->expiresAfter(new DateInterval('P10M'));
         $this->cache->save($cacheItem);
 
         $this->stopwatch->stop($cacheKey);

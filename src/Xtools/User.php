@@ -20,7 +20,7 @@ class User extends Model
     /** @var string The user's username. */
     protected $username;
 
-    /** @var string Expiry of the current block of the user */
+    /** @var DateTime|bool Expiry of the current block of the user */
     protected $blockExpiry;
 
     /**
@@ -29,7 +29,7 @@ class User extends Model
      */
     public function __construct($username)
     {
-        $this->username = ucfirst(trim($username));
+        $this->username = ucfirst(str_replace('_', ' ', trim($username)));
     }
 
     /**
@@ -60,6 +60,21 @@ class User extends Model
     public function getId(Project $project)
     {
         return $this->getRepository()->getId($project->getDatabaseName(), $this->getUsername());
+    }
+
+    /**
+     * Get the user's registration date on the given project.
+     * @param Project $project
+     * @return DateTime|false False if no registration date was found.
+     */
+    public function getRegistrationDate(Project $project)
+    {
+        $registrationDate = $this->getRepository()->getRegistrationDate(
+            $project->getDatabaseName(),
+            $this->getUsername()
+        );
+
+        return DateTime::createFromFormat('YmdHis', $registrationDate);
     }
 
     /**
@@ -170,11 +185,11 @@ class User extends Model
      * @param string|int [$namespace] Namespace ID or 'all'
      * @param string [$start] Start date in a format accepted by strtotime()
      * @param string [$end] End date in a format accepted by strtotime()
-     * @return string[] Result of query, see below.
+     * @return int Result of query, see below.
      */
     public function countAutomatedEdits(Project $project, $namespace = 'all', $start = '', $end = '')
     {
-        return $this->getRepository()->countAutomatedEdits($project, $this, $namespace, $start, $end);
+        return (int) $this->getRepository()->countAutomatedEdits($project, $this, $namespace, $start, $end);
     }
 
     /**

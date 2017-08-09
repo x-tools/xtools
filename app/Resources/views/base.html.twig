@@ -82,7 +82,7 @@
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right">
-                    {% for key, value in allLangs() %}
+                    {% for key, value in allLangs() if key != 'qqq' %}
                         <li>
                             <a class="lang-link" href="{{ path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'uselang': key})) }}" data-lang="{{ key }}">{{ value|e }}</a>
                         </li>
@@ -108,7 +108,7 @@
 
     </ol>
     <nav class="tool-links navbar-collapse collapse">
-        <ol class="nav navbar-nav navbar-left">
+        <ol class="tool-links--nav nav navbar-nav navbar-left">
             <li{% if current_tool is defined and current_tool == "index" %} class="active"{% endif %}>
                 <a class="home-link" href="{{ path('homepage') }}">
                     <img src="{{ asset('static/images/logo.svg') }}" />
@@ -117,11 +117,20 @@
 
             {% for tool in tools() %}
                 {% if enabled(tool) %}
-                    <li{% if xtPage is defined and xtPage==tool %} class="active"{% endif %} >
+                    <li class="tool-links--entry{% if xtPage is defined and xtPage==tool %} active{% endif %}">
                         <a href="{{ path(tool) }}">{{ msg("tool-" ~ tool) }}</a>
                     </li>
                 {% endif %}
             {% endfor %}
+
+            {# Populated by JS when not all entires fit in the nav #}
+            <li class="tool-links--more dropdown hidden">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    {{ msg('more') }}
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu"></ul>
+            </li>
         </ol>
     </nav>
 </header>
@@ -146,7 +155,7 @@
     {% set replagValue = replag() %}
     {% if replagValue > getReplagThreshold() %}
         <p class="alert alert-warning xt-alert">
-            {{ msgPrintExists("high-replag", [replagValue ~ " " ~ msg("num-seconds", [replagValue])]) }}
+            {{ msgPrintExists('high-replag', [formatDuration(replagValue)]) }}
         </p>
     {% endif %}
 </div>
@@ -196,7 +205,7 @@
                 &middot;
                 <a href="{{ path('aboutPage') }}">{{ msg('about-xtools') }}</a>
                 &middot;
-                <a href='https://phabricator.wikimedia.org/maniphest/task/create/?title=PLEASE REPLACE WITH A DESCRIPTION OF THE ISSUE&amp;priority=75&amp;projects=Tool-labs-tools-xtools&amp;description=Please provide any further details you can here\r\n\r\nXtools version: {{ version }}-{{ shortHash() }}' target=_blank>{{ msg('report-issue') }}</a>
+                <a href='https://phabricator.wikimedia.org/maniphest/task/create/?title=PLEASE REPLACE WITH A DESCRIPTION OF THE ISSUE&amp;projects=XTools&amp;description=Please provide any further details here%0A%0AXTools version: {{ version }}-{{ shortHash() }}' target=_blank>{{ msg('report-issue') }}</a>
                 &middot;
                 <a href="irc://irc.freenode.net/#wikimedia-xtools" target="_blank">#wikimedia-xtools</a>
                 <sup><a style="color:green" href="https://webchat.freenode.net/?channels=#wikimedia-xtools" target="_blank">{{ msg('web-chat') }}</a></sup>

@@ -32,7 +32,10 @@ Averages (per day) are given for some of the above metrics.
 
 Next, **Page counts** are shown:
 
-* pages created, imported, moved, deleted, and undeleted;
+* pages created (note that this shows *all* pages created,
+  including those created as redirects during a page move;
+  the :ref:`Pages Created <pages>` tool excludes these);
+* pages imported, moved, deleted, and undeleted;
 * total number of unique pages edited.
 
 And lastly, **Log counts** are summarized:

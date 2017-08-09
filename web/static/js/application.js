@@ -4,7 +4,11 @@
 
     // Load translations with 'en.json' as a fallback
     var messagesToLoad = {};
+
+    /** global: assetPath */
+    /** global: i18nLang */
     messagesToLoad[i18nLang] = assetPath + 'static/i18n/' + i18nLang + '.json';
+
     if (i18nLang !== 'en') {
         messagesToLoad.en = assetPath + 'static/i18n/en.json';
     }
@@ -25,6 +29,7 @@
             $(this).parents('.panel-heading').siblings('.panel-body').show();
         });
 
+        setupNavCollapsing();
         setupColumnSorting();
         setupTOC();
         setupProjectListener();
@@ -98,8 +103,7 @@
             }
 
             var index = $(this).data('index'),
-                key = $(this).data('key'),
-                $row = $(this).parents('tr');
+                key = $(this).data('key');
 
             // must use .attr instead of .prop as sorting script will clone DOM elements
             if ($(this).attr('data-disabled') === 'true') {
@@ -124,6 +128,39 @@
 
             chartObj.update();
         });
+    }
+
+    /**
+     * If there are more tool links in the nav than will fit in the viewport,
+     *   move the last entry to the More menu, one at a time, until it all fits.
+     * This does not listen for window resize events.
+     */
+    function setupNavCollapsing()
+    {
+        var windowWidth = $(window).width(),
+            toolNavWidth = $('.tool-links').outerWidth(),
+            navRightWidth = $('.nav-buttons').outerWidth();
+
+        // Ignore if in mobile responsive view
+        if (windowWidth < 768) {
+            return;
+        }
+
+        // Do this first so we account for the space the More menu takes up
+        if (toolNavWidth + navRightWidth > windowWidth) {
+            $('.tool-links--more').removeClass('hidden');
+        }
+
+        // Don't loop more than there are links in the nav.
+        // This more just a safeguard against an infinite loop should something go wrong.
+        var numLinks = $('.tool-links--entry').length;
+        while (numLinks > 0 && toolNavWidth + navRightWidth > windowWidth) {
+            // Remove the last tool link that is not the current tool being used
+            var $link = $('.tool-links--nav > .tool-links--entry:not(.active)').last().remove();
+            $('.tool-links--more .dropdown-menu').append($link);
+            toolNavWidth = $('.tool-links').outerWidth();
+            numLinks--;
+        }
     }
 
     /**
@@ -164,7 +201,7 @@
 
             entries.sort(function (a, b) {
                 var before = $(a).find('.sort-entry--' + sortColumn).data('value'),
-                after = $(b).find('.sort-entry--' + sortColumn).data('value');
+                    after = $(b).find('.sort-entry--' + sortColumn).data('value');
 
                 // test data type, assumed to be string if can't be parsed as float
                 if (!isNaN(parseFloat(before, 10))) {
@@ -309,6 +346,7 @@
             $('#project_input').on('change', function () {
                 var newProject = this.value;
 
+                /** global: xtBaseUrl */
                 $.get(xtBaseUrl + 'api/normalizeProject/' + newProject).done(function (data) {
                     // Keep track of project API path for use in page title autocompletion
                     apiPath = data.api;
@@ -331,12 +369,14 @@
         $('#project_input').on('change', function () {
             // Disable the namespace selector and show a spinner while the data loads.
             $('#namespace_select').prop('disabled', true);
-            $loader = $('span.loader');
+
+            var $loader = $('span.loader');
             $('label[for="namespace_select"]').append($loader);
             $loader.removeClass('hidden');
 
             var newProject = this.value;
 
+            /** global: xtBaseUrl */
             $.get(xtBaseUrl + 'api/namespaces/' + newProject).done(function (data) {
                 // Clone the 'all' option (even if there isn't one),
                 // and replace the current option list with this.
@@ -348,6 +388,10 @@
 
                 // Add all of the new namespace options.
                 for (var ns in data.namespaces) {
+                    if (!data.namespaces.hasOwnProperty(ns)) {
+                        continue; // Skip keys from the prototype.
+                    }
+
                     var nsName = parseInt(ns, 10) === 0 ? $.i18n('mainspace') : data.namespaces[ns];
                     $('#namespace_select').append(
                         "<option value=" + ns + ">" + nsName + "</option>"

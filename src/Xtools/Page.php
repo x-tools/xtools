@@ -40,7 +40,7 @@ class Page extends Model
      */
     protected function getPageInfo()
     {
-        if (!$this->pageInfo) {
+        if (empty($this->pageInfo)) {
             $this->pageInfo = $this->getRepository()
                     ->getPageInfo($this->project, $this->unnormalizedPageName);
         }
@@ -118,7 +118,7 @@ class Page extends Model
     public function getWatchers()
     {
         $info = $this->getPageInfo();
-        return isset($info['ns']) ? $info['ns'] : null;
+        return isset($info['watchers']) ? $info['watchers'] : null;
     }
 
     /**
@@ -177,13 +177,13 @@ class Page extends Model
     public function getNumRevisions(User $user = null)
     {
         // Return the count of revisions if already present
-        if ($this->revisions) {
+        if (!empty($this->revisions)) {
             return count($this->revisions);
         }
 
         // Otherwise do a COUNT in the event fetching
         // all revisions is not desired
-        return $this->getRepository()->getNumRevisions($this, $user);
+        return (int) $this->getRepository()->getNumRevisions($this, $user);
     }
 
     /**
@@ -211,6 +211,21 @@ class Page extends Model
     public function getRevisionsStmt(User $user = null)
     {
         return $this->getRepository()->getRevisionsStmt($this, $user);
+    }
+
+    /**
+     * Get various basic info used in the API, including the
+     *   number of revisions, unique authors, initial author
+     *   and edit count of the initial author.
+     * This is combined into one query for better performance.
+     * Caching is intentionally disabled, because using the gadget,
+     *   this will get hit for a different page constantly, where
+     *   the likelihood of cache benefiting us is slim.
+     * @return string[]
+     */
+    public function getBasicEditingInfo()
+    {
+        return $this->getRepository()->getBasicEditingInfo($this);
     }
 
     /**
@@ -377,7 +392,6 @@ class Page extends Model
 
     /**
      * Get all wikidata items for the page, not just languages of sister projects
-     * @param Page $page
      * @return int Number of records.
      */
     public function getWikidataItems()
@@ -387,7 +401,6 @@ class Page extends Model
 
     /**
      * Count wikidata items for the page, not just languages of sister projects
-     * @param Page $page
      * @return int Number of records.
      */
     public function countWikidataItems()
@@ -403,5 +416,37 @@ class Page extends Model
     public function countLinksAndRedirects()
     {
         return $this->getRepository()->countLinksAndRedirects($this);
+    }
+
+    /**
+     * Get the sum of pageviews for the given page and timeframe.
+     * @param string|DateTime $start In the format YYYYMMDD
+     * @param string|DateTime $end In the format YYYYMMDD
+     * @return string[]
+     */
+    public function getPageviews($start, $end)
+    {
+        try {
+            $pageviews = $this->getRepository()->getPageviews($this, $start, $end);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            // 404 means zero pageviews
+            return 0;
+        }
+
+        return array_sum(array_map(function ($item) {
+            return (int) $item['views'];
+        }, $pageviews['items']));
+    }
+
+    /**
+     * Get the sum of pageviews over the last N days
+     * @param int [$days] Default 30
+     * @return int Number of pageviews
+     */
+    public function getLastPageviews($days = 30)
+    {
+        $start = date('Ymd', strtotime("-$days days"));
+        $end = date('Ymd');
+        return $this->getPageviews($start, $end);
     }
 }

@@ -31,16 +31,16 @@
 
 <canvas id="timecard-bubble-chart"></canvas>
 <script type="text/javascript">
+    // MySQL uses ODBC standard, treating the first day (1) as Sunday
     var days = {
-        1: "{{ msg('monday') }}",
-        2: "{{ msg('tuesday') }}",
-        3: "{{ msg('wednesday') }}",
-        4: "{{ msg('thursday') }}",
-        5: "{{ msg('friday') }}",
-        6: "{{ msg('saturday') }}",
-        7: "{{ msg('sunday') }}"
+        1: "{{ msg('sunday') }}",
+        2: "{{ msg('monday') }}",
+        3: "{{ msg('tuesday') }}",
+        4: "{{ msg('wednesday') }}",
+        5: "{{ msg('thursday') }}",
+        6: "{{ msg('friday') }}",
+        7: "{{ msg('saturday') }}"
     };
-    var timeCardData = {{ ec.timeCard|json_encode|raw }};
     var timeCardDatasets = [];
     {% for i in 0..7 %}
         timeCardDatasets.push({
@@ -89,7 +89,8 @@
             tooltips: {
                 callbacks: {
                     label: function(item) {
-                        return days[item.yLabel] + ' ' + item.xLabel + ':00';
+                        // yLabels are reversed, and zero-indexed
+                        return days[7 - item.yLabel + 1] + ' ' + item.xLabel + ':00';
                     }
                 }
             }

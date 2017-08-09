@@ -6,7 +6,6 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Helper\AutomatedEditsHelper;
-use AppBundle\Helper\PageviewsHelper;
 use Doctrine\DBAL\Connection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -26,8 +25,6 @@ class ArticleInfoController extends Controller
 {
     /** @var mixed[] Information about the page in question. */
     private $pageInfo;
-    /** @var Edit[] All edits of the page. */
-    private $pageHistory;
     /** @var ProjectRepository Shared Project repository for use of getting table names, etc. */
     private $projectRepo;
     /** @var string Database name, for us of getting table names, etc. */
@@ -36,8 +33,6 @@ class ArticleInfoController extends Controller
     protected $conn;
     /** @var AutomatedEditsHelper The semi-automated edits helper. */
     protected $aeh;
-    /** @var PageviewsHelper The page-views helper. */
-    protected $ph;
 
     /**
      * Get the tool's shortname.
@@ -64,7 +59,6 @@ class ArticleInfoController extends Controller
     private function containerInitialized()
     {
         $this->conn = $this->getDoctrine()->getManager('replicas')->getConnection();
-        $this->ph = $this->get('app.pageviews_helper');
         $this->aeh = $this->get('app.automated_edits_helper');
     }
 
@@ -154,11 +148,7 @@ class ArticleInfoController extends Controller
         );
         $this->pageInfo = array_merge($this->pageInfo, $page->countLinksAndRedirects());
         $this->pageInfo['general']['pageviews_offset'] = 60;
-        $this->pageInfo['general']['pageviews'] = $this->ph->sumLastDays(
-            $this->pageInfo['project']->getDomain(),
-            $this->pageInfo['page']->getTitle(),
-            $this->pageInfo['general']['pageviews_offset']
-        );
+        $this->pageInfo['general']['pageviews'] = $page->getLastPageviews(60);
 
         $assessments = $page->getAssessments();
         if ($assessments) {
@@ -414,6 +404,12 @@ class ArticleInfoController extends Controller
          */
         $prevMaxDelEdit = null;
 
+        /**
+         * The last edit made to the article.
+         * @var Edit|null
+         */
+        $lastEdit = null;
+
         /** @var Time|null Time of first revision, used as a comparison for month counts */
         $firstEditMonth = null;
 
@@ -513,7 +509,7 @@ class ArticleInfoController extends Controller
             $data['editors'][$username]['sizes'][] = $edit->getLength() / 1024;
 
             // Check if it was a revert
-            if ($this->aeh->isRevert($edit->getComment())) {
+            if ($edit->isRevert($this->container)) {
                 $data['general']['revert_count']++;
 
                 // Since this was a revert, we don't want to treat the previous
@@ -573,19 +569,19 @@ class ArticleInfoController extends Controller
                 $data['editors'][$username]['minor']++;
             }
 
-            $automatedTool = $this->aeh->getTool($edit->getComment());
-            if ($automatedTool) {
+            $automatedTool = $edit->getTool($this->container);
+            if ($automatedTool !== false) {
                 $data['general']['automated_count']++;
                 $data['year_count'][$editYear]['automated']++;
                 $data['year_count'][$editYear]['months'][$editMonth]['automated']++;
 
-                if (!isset($data['tools'][$automatedTool])) {
-                    $data['tools'][$automatedTool] = [
+                if (!isset($data['tools'][$automatedTool['name']])) {
+                    $data['tools'][$automatedTool['name']] = [
                         'count' => 1,
-                        'link' => $this->aeh->getTools()[$automatedTool]['link'],
+                        'link' => $automatedTool['link'],
                     ];
                 } else {
-                    $data['tools'][$automatedTool]['count']++;
+                    $data['tools'][$automatedTool['name']]['count']++;
                 }
             }
 

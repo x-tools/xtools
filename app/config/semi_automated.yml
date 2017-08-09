@@ -1,176 +1,210 @@
 # If you change the key names, do a find/replace to update their usage throughout the rest of XTools
+#
+# Format for individual entries:
+#
+#   Tool name:
+#       regex: Regular expression to match against edit summary
+#       tag: Tag name for the tool, if applicable. See [[Special:Tags]] for full list
+#       link: Wiki link to tool documentation
+#       revert: If the tool is used *only* to revert edits (and not also issue talk page
+#               notifications, etc.), set this to `true`. If the tool is capable of reverting
+#               edits, set 'revert' to regex that would only account for reverts.
+#               See the 'Twinkle' entry for an example. The revert-only regex is necessary
+#               for ArticleInfo and elsewhere, so as to differentiate edits that added content
+#               from edits that restored content.
+#
+# Either 'regex' or 'tag' are required. In some cases you might want to include both,
+#   say if older versions of the tool did not add tags to the edits.
 parameters:
   automated_tools:
-    Generic rollback:
-        regex: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) edits by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\] \(\[\[User talk:.*?\|talk\]\]\) to last version by .*'
-        link: Project:Rollback
-    Undo:
-        regex: '^Undid revision \d+ by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\]'
-        link: Project:Undo
-    Pending changes revert:
-        regex: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) \d+ (\[\[Wikipedia:Pending changes\|pending\]\]|pending) edits? (to revision \d+|by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\])'
-        link: Project:Pending changes
-    Bot revert:
-        regex: '^Reverting possible (vandalism|test edit).*by.*\(Bot|BOT( EDIT)?\)$|^BOT (- )?(Reverted edits? by|rv)|^vandalism from \[\[.*?\(\d+\) - reverted'
-        link: Project:Bots
-    Page move:
-        regex: '^.*?moved page \[\[(?!.*?WP:AFCH)|moved \[\[.*?\]\] to \[\['
-        link: Project:Move
-    Page curation:
-        regex: 'using \[\[Wikipedia:Page Curation\|Page Curation'
-        link: Project:Page curation
-    Twinkle:
-        regex: 'WP:(TW|TWINKLE|Twinkle)|WP:FRIENDLY|Wikipedia:Twinkle'
-        link: Project:Twinkle
-    Huggle:
-        regex: 'WP:HG'
-        link: w:en:Wikipedia:Huggle
-    STiki:
-        regex: 'WP:STiki|WP:STIKI'
-        link: w:en:Wikipedia:STiki
-    Igloo:
-        regex: 'Wikipedia:Igloo'
-        link: w:en:Wikipedia:Igloo
-    Popups:
-        regex: 'Wikipedia:Tools\/Navigation_popups|popups'
-        link: Project:Popups
-    AFCH:
-        regex: 'WP:AFCH|WP:AFCHRW'
-        link: Project:AFCH
-    AWB:
-        regex: 'Wikipedia:AWB|WP:AWB|Project:AWB'
-        link: Project:AutoWikiBrowser
-    WPCleaner:
-        regex: 'WP:CLEANER|\[\[\Wikipedia:DPL|\[\[WP:WCW\]\] project \('
-        link: Project:WPCleaner
-    HotCat:
-        regex: 'using \[\[(WP:HOTCAT|WP:HC|Help:Gadget-HotCat)\|HotCat'
-        link: Project:HotCat
-    reFill:
-        regex: 'User:Zhaofeng Li\/Reflinks|WP:REFILL'
-        link: Project:ReFill
-    Checklinks:
-        regex: 'using \[\[w:WP:CHECKLINKS\|Checklinks'
-        link: Project:CHECKLINKS
-    Dab solver:
-        regex: 'using \[\[(tools:~dispenser\/view\/Dab_solver|WP:DABSOLVER)\|Dab solver|(Disambiguated|Unlinked|Help needed): \[\[|Disambiguated \d+ links|Repaired link.*?\[\[Wikipedia:WikiProject Disambiguation\|please help'
-        link: Project:DABSOLVER
-    Dabfix:
-        regex: 'using \[\[tools:~dispenser\/cgi-bin\/dabfix.py'
-        link: toollabs:dispenser/cgi-bin/dabfix.py
-    Reflinks:
-        regex: '\[\[(tools:~dispenser\/view\/Reflinks|WP:REFLINKS)\|Reflinks'
-        link: Project:REFLINKS
-    WikiPatroller:
-        regex: 'User:Jfmantis\/WikiPatroller'
-        link: User:Jfmantis/WikiPatroller
-    delsort:
-        regex: 'Wikipedia:WP:FWDS|WP:FWDS|User:APerson\/delsort\|delsort.js|User:Enterprisey\/delsort\|assisted'
-        link: WP:DELSORT
-    Ohconfucius script:
-        regex: '\[\[(User:Ohconfucius\/.*?|WP:MOSNUMscript)\|script'
-        link: Project:MOSNUMscript
-    OneClickArchiver:
-        regex: '\[\[(User:Equazcion\/OneClickArchiver|User:Technical 13\/1CA)\|OneClickArchiver'
-        link: Project:OneClickArchiver
-    editProtectedHelper:
-        regex: 'WP:EPH|EPH'
-        link: Project:EPH
-    WikiLove:
-        regex: 'new WikiLove message'
-        link: Project:WikiLove
-    AutoEd:
-        regex: 'using \[\[(Wikipedia|WP):AutoEd\|AutoEd'
-        link: Project:AutoEd
-    Mike's Wiki Tool:
-        regex: User:MichaelBillington\/MWT\|MWT|Mike's Wiki Tool
-        link: Project:Mike's Wiki Tool
-    Global replace:
-        regex: '\(\[\[c:GR\|GR\]\]\) '
-        link: commons:Commons:GlobalReplace
-    Admin actions:
-        regex: '^(Protected|Changed protection).*?\[[Ee]dit=|^Removed protection from|^Configured pending changes.*?\[[Aa]uto-accept|^Reset pending changes settings'
-        link: Project:Administrators
-    CSD Helper:
-        regex: '\(\[\[User:Ale_jrb\/Scripts\|CSDH'
-        link: Project:CSDH
-    Find link:
-        regex: 'using \[\[User:Edward\/Find link\|Find link'
-        link: User:Edward/Find link
-    responseHelper:
-        regex: '\(using \[\[User:MusikAnimal\/responseHelper\|responseHelper'
-        link: User:MusikAnimal/responseHelper
-    Advisor.js:
-        regex: '\(using \[\[User:Cameltrader#Advisor.js\|Advisor.js'
-        link: User:Cameltrader/Advisor
-    AfD closures:
-        regex: '^\[\[Wikipedia:Articles for deletion\/.*?closed as'
-        link: Project:Articles for deletion
-    Sagittarius:
-        regex: '\(\[\[User:Kephir\/gadgets\/sagittarius\|'
-        link: User:Kephir/gadgets/sagittarius
-    Redirect:
-        regex: '\[\[WP:AES\|←\]\]Redirected page to \[\[.*?\]\]'
-        link: Project:Redirect
-    Dashes:
-        regex: 'using a \[\[User:GregU\/dashes.js\|script'
-        link: User:GregU/dashes
-    SPI Helper:
-        regex: '^(Archiving case (to|from)|Adding sockpuppetry (tag|block notice) per) \[\[Wikipedia:Sockpuppet investigations'
-        link: User:Timotheus Canens/spihelper.js
-    User:Doug/closetfd.js:
-        regex: '\(using \[\[User:Doug\/closetfd.js'
-        link: User:Doug/closetfd.js
-    Cat-a-lot:
-        regex: '\[\[Help:Cat-a-lot\|Cat-a-lot\]\]'
-        link: commons:Cat-a-lot
-    autoFormatter:
-        regex: 'using (\[\[:meta:User:TMg\/autoFormatter|autoFormatter)'
-        link: meta:User:TMg/autoFormatter
-    Citation bot:
-        regex: '\[\[WP:UCB\|Assisted by Citation bot'
-        link: Project:UCB
-    Red Link Recovery Live:
-        regex: '\[\[w:en:WP:RLR\|You can help!'
-        link: en:WP:RLR
-    Script Installer:
-        regex: '\[\[User:Equazcion\/ScriptInstaller\|Script Installer'
-        link: User:Equazcion/ScriptInstaller
-    findargdups:
-        regex: '\[\[:en:User:Frietjes\/findargdups'
-        link: User:Frietjes/findargdups
-    closemfd.js:
-        regex: '\(using \[\[User:Doug\/closemfd.js'
-        link: User:Doug/closemfd.js
-    DisamAssist:
-        regex: 'using \[\[User:Qwertyytrewqqwerty\/DisamAssist'
-        link: User:Qwertyytrewqqwerty/DisamAssist
-    Vada:
-        regex: '\(\[\[WP:Vada\]\]\)'
-        link: Project:Vada
-    stubtagtab.js:
-        regex: 'using \[\[User:MC10\/stubtagtab.js'
-        link: User:MC10/stubtagtab.js
-    AutoSpell:
-        regex: 'User:Symplectic_Map\/AutoSpell\|Script-assisted'
-        link: User:Symplectic_Map/AutoSpell
-    Draftify:
-        regex: '\(\[\[WP:DFY\|DFY\]\]\)'
-        link: Project:DFY
-    AFC/R HS:
-        regex: 'Using \[\[User:PhantomTech\/scripts\/AFCRHS.js\|AFC\/R HS'
-        link: User:PhantomTech/scripts/AFCRHS.js
-    For the Common Good:
-        regex: 'WP:FTCG\|FtCG'
-        link: Project:FTCG
-    Twinkle revert:
-        regex: '(Reverted to revision|Reverted \d+ edits).*(WP:(TW|TWINKLE|Twinkle)|Wikipedia:Twinkle)'
-        link: Project:Twinkle
-    User:Technical13/Scripts/OrphanStatus.js:
-        regex: '\[\[User:Technical_13\/Scripts\/OrphanStatus\|'
-        link: User:Technical13/Scripts/OrphanStatus.js
-    The Wikipedia Adventure:
-        regex: 'simulated automatically as part of \[\[WP:The Wikipedia Adventure\|'
-        link: Project:TWA
 
-  semi-automated edits source: https://tools.wmflabs.org/musikanimal/nonautomated_edits/about
+    # These tools work on multiple wikis. These should probably include tags
+    #   as the regex may not apply to non-English wikis.
+    # You can also set wiki-specific values that will get merged into the global one.
+    # See 'Hugge' under 'global' and 'en.wikipedia.org' for an example.
+    global:
+        Huggle:
+            regex: '\(\[\[WP:HG'
+            tag: huggle
+            link: w:en:Wikipedia:Huggle
+        WPCleaner:
+            regex: 'WP:CLEANER|\[\[\Wikipedia:DPL|\[\[WP:WCW\]\] project \('
+            tag: WPCleaner
+            link: Project:WPCleaner
+
+    # Per-wiki lists
+    en.wikipedia.org:
+        Generic rollback:
+            regex: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) edits by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\] \(\[\[User talk:.*?\|talk\]\]\) to last version by .*'
+            link: Project:Rollback
+            revert: true
+        Undo:
+            regex: '^Undid revision \d+ by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\]'
+            link: Project:Undo
+            revert: true
+        Pending changes revert:
+            regex: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) \d+ (\[\[Wikipedia:Pending changes\|pending\]\]|pending) edits? (to revision \d+|by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\])'
+            link: Project:Pending changes
+            revert: true
+        Bot revert:
+            regex: '^Reverting possible (vandalism|test edit).*by.*\(Bot|BOT( EDIT)?\)$|^BOT (- )?(Reverted edits? by|rv)|^vandalism from \[\[.*?\(\d+\) - reverted'
+            link: Project:Bots
+            revert: true
+        Huggle: # This gets merged into the global Huggle definition (the revert regex here is enwiki-specific)
+            revert: 'Reverted edits by.*?WP:HG'
+        Page move:
+            regex: '^.*?moved page \[\[(?!.*?WP:AFCH)|moved \[\[.*?\]\] to \[\['
+            link: Project:Move
+        Page curation:
+            regex: 'using \[\[Wikipedia:Page Curation\|Page Curation'
+            link: Project:Page curation
+        Twinkle:
+            regex: '(Wikipedia|WP):(TW|TWINKLE|Twinkle|FRIENDLY)'
+            link: Project:Twinkle
+            revert: '(Reverted to revision|Reverted \d+ edits).*(WP:(TW|TWINKLE|Twinkle)|Wikipedia:Twinkle)'
+        STiki:
+            regex: 'WP:(STiki|STIKI)'
+            link: w:en:Wikipedia:STiki
+            revert: Reverted \d+.*WP:(STiki|STIKI)
+        Igloo:
+            regex: 'Wikipedia:Igloo'
+            link: w:en:Wikipedia:Igloo
+        Popups:
+            regex: 'Wikipedia:Tools\/Navigation_popups|popups'
+            link: Project:Popups
+        AFCH:
+            regex: 'WP:(AFCH|AFCHRW)'
+            link: Project:AFCH
+        AutoWikiBrowser:
+            regex: '(Wikipedia|WP|Project):AWB'
+            link: Project:AutoWikiBrowser
+        HotCat:
+            regex: 'using \[\[(WP:HOTCAT|WP:HC|Help:Gadget-HotCat)\|HotCat'
+            link: Project:HotCat
+        reFill:
+            regex: 'User:Zhaofeng Li\/Reflinks|WP:REFILL'
+            link: Project:ReFill
+        Checklinks:
+            regex: 'using \[\[w:WP:CHECKLINKS'
+            link: Project:CHECKLINKS
+        Dab solver:
+            regex: 'using \[\[(tools:~dispenser\/view\/Dab_solver|WP:DABSOLVER)\|Dab solver|(Disambiguated|Unlinked|Help needed): \[\[|Disambiguated \d+ links|Repaired link.*?\[\[Wikipedia:WikiProject Disambiguation\|please help'
+            link: Project:DABSOLVER
+        Dabfix:
+            regex: 'using \[\[tools:~dispenser\/cgi-bin\/dabfix.py'
+            link: toollabs:dispenser/cgi-bin/dabfix.py
+        Reflinks:
+            regex: '\[\[(tools:~dispenser\/view\/Reflinks|WP:REFLINKS)\|Reflinks'
+            link: Project:REFLINKS
+        WikiPatroller:
+            regex: 'User:Jfmantis\/WikiPatroller'
+            link: User:Jfmantis/WikiPatroller
+        delsort:
+            regex: 'Wikipedia:WP:FWDS|WP:FWDS|User:APerson\/delsort\|delsort.js|User:Enterprisey\/delsort\|assisted'
+            link: WP:DELSORT
+        Ohconfucius script:
+            regex: '\[\[(User:Ohconfucius\/.*?|WP:MOSNUMscript)\|script'
+            link: Project:MOSNUMscript
+        OneClickArchiver:
+            regex: '\[\[(User:Equazcion\/OneClickArchiver|User:Technical 13\/1CA)\|OneClickArchiver'
+            link: Project:OneClickArchiver
+        editProtectedHelper:
+            regex: 'WP:EPH|EPH'
+            link: Project:EPH
+        WikiLove:
+            regex: 'new WikiLove message'
+            tag: 'wikilove'
+            link: Project:WikiLove
+        AutoEd:
+            regex: 'using \[\[(Wikipedia|WP):AutoEd\|AutoEd'
+            link: Project:AutoEd
+        Mike's Wiki Tool:
+            regex: User:MichaelBillington\/MWT\|MWT|Mike's Wiki Tool
+            link: Project:Mike's Wiki Tool
+        Global replace:
+            regex: '\(\[\[c:GR\|GR\]\]\) '
+            link: commons:Commons:GlobalReplace
+        Admin actions:
+            regex: '^(Protected|Changed protection).*?\[[Ee]dit=|^Removed protection from|^Configured pending changes.*?\[[Aa]uto-accept|^Reset pending changes settings'
+            link: Project:Administrators
+        CSD Helper:
+            regex: '\(\[\[User:Ale_jrb\/Scripts\|CSDH'
+            link: Project:CSDH
+        Find link:
+            regex: 'using \[\[User:Edward\/Find link\|Find link'
+            link: User:Edward/Find link
+        responseHelper:
+            regex: '\(using \[\[User:MusikAnimal\/responseHelper\|responseHelper'
+            link: User:MusikAnimal/responseHelper
+        Advisor.js:
+            regex: '\(using \[\[User:Cameltrader#Advisor.js\|Advisor.js'
+            link: User:Cameltrader/Advisor
+        AfD closures:
+            regex: '^\[\[Wikipedia:Articles for deletion\/.*?closed as'
+            link: Project:Articles for deletion
+        Sagittarius:
+            regex: '\(\[\[User:Kephir\/gadgets\/sagittarius\|'
+            link: User:Kephir/gadgets/sagittarius
+        Redirect:
+            regex: '\[\[WP:AES\|←\]\]Redirected page to \[\[.*?\]\]'
+            link: Project:Redirect
+        Dashes:
+            regex: 'using a \[\[User:GregU\/dashes.js\|script'
+            link: User:GregU/dashes
+        SPI Helper:
+            regex: '^(Archiving case (to|from)|Adding sockpuppetry (tag|block notice) per) \[\[Wikipedia:Sockpuppet investigations'
+            link: User:Timotheus Canens/spihelper.js
+        User:Doug/closetfd.js:
+            regex: '\(using \[\[User:Doug\/closetfd.js'
+            link: User:Doug/closetfd.js
+        Cat-a-lot:
+            regex: '\[\[Help:Cat-a-lot\|Cat-a-lot\]\]'
+            link: commons:Cat-a-lot
+        autoFormatter:
+            regex: 'using (\[\[:meta:User:TMg\/autoFormatter|autoFormatter)'
+            link: meta:User:TMg/autoFormatter
+        Citation bot:
+            regex: '\[\[WP:UCB\|Assisted by Citation bot'
+            link: Project:UCB
+        Red Link Recovery Live:
+            regex: '\[\[w:en:WP:RLR\|You can help!'
+            link: en:WP:RLR
+        Script Installer:
+            regex: '\[\[User:Equazcion\/ScriptInstaller\|Script Installer'
+            link: User:Equazcion/ScriptInstaller
+        findargdups:
+            regex: '\[\[:en:User:Frietjes\/findargdups'
+            link: User:Frietjes/findargdups
+        closemfd.js:
+            regex: '\(using \[\[User:Doug\/closemfd.js'
+            link: User:Doug/closemfd.js
+        DisamAssist:
+            regex: 'using \[\[User:Qwertyytrewqqwerty\/DisamAssist'
+            link: User:Qwertyytrewqqwerty/DisamAssist
+        Vada:
+            regex: '\(\[\[WP:Vada\]\]\)'
+            link: Project:Vada
+        stubtagtab.js:
+            regex: 'using \[\[User:MC10\/stubtagtab.js'
+            link: User:MC10/stubtagtab.js
+        AutoSpell:
+            regex: 'User:Symplectic_Map\/AutoSpell\|Script-assisted'
+            link: User:Symplectic_Map/AutoSpell
+        Draftify:
+            regex: '\(\[\[WP:DFY\|DFY\]\]\)'
+            link: Project:DFY
+        AFC/R HS:
+            regex: 'Using \[\[User:PhantomTech\/scripts\/AFCRHS.js\|AFC\/R HS'
+            link: User:PhantomTech/scripts/AFCRHS.js
+        For the Common Good:
+            regex: 'WP:FTCG\|FtCG'
+            link: Project:FTCG
+        User:Technical13/Scripts/OrphanStatus.js:
+            regex: '\[\[User:Technical_13\/Scripts\/OrphanStatus\|'
+            link: User:Technical13/Scripts/OrphanStatus.js
+        The Wikipedia Adventure:
+            regex: 'simulated automatically as part of \[\[WP:The Wikipedia Adventure\|'
+            link: Project:TWA
+        OABot:
+            tag: 'OAuth CID: 817'
+            link: Project:OABOT

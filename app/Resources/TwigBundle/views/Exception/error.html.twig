@@ -28,7 +28,7 @@
 
         <p>
             {% set phabLink %}
-                <a target="_blank" href="https://phabricator.wikimedia.org/maniphest/task/create/?title=PLEASE REPLACE WITH A DESCRIPTION OF THE ERROR&amp;priority=75&amp;projects=Tool-labs-tools-xtools&amp;description=```{{ attribute(exception, 'file') }}: {{ attribute(exception, 'line') }} - {{ message }}```%0A%0APlease provide any further details you can here%0A%0AXTools version: {{ version }}-{{ shortHash() }}">Phabricator</a>
+                <a target="_blank" href="https://phabricator.wikimedia.org/maniphest/task/create/?title=PLEASE REPLACE WITH A DESCRIPTION OF THE ERROR&amp;priority=75&amp;projects=XTools&amp;description=```{{ attribute(exception, 'file') }}: {{ attribute(exception, 'line') }} - {{ message }}```%0A%0APlease provide any further details here%0A%0AXTools version: {{ version }}-{{ shortHash() }}">Phabricator</a>
             {% endset %}
             {{ msg('error-report', [phabLink]) }}
         </p>

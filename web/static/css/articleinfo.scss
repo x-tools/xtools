@@ -1,17 +1,6 @@
 @import 'mixins.scss';
 
 .articleinfo {
-    .basic-info-charts {
-        clear: both;
-        display: block;
-        padding-top: 20px;
-        position: relative;
-
-        canvas {
-            max-width: 150px;
-        }
-    }
-
     .top-editors-charts {
         display: block;
         margin-bottom: 25px;
@@ -105,14 +94,6 @@
 
 @media (max-width: $bootstrap-sm) {
     .articleinfo {
-        .chart-wrapper {
-            display: block;
-
-            .chart-legend {
-                margin-bottom: 15px;
-            }
-        }
-
         #year_count_legend {
             margin: 0;
 

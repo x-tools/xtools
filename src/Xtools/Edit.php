@@ -6,7 +6,7 @@
 namespace Xtools;
 
 use Xtools\User;
-use AppBundle\Helper\AutomatedEditsHelper;
+use Symfony\Component\DependencyInjection\Container;
 use DateTime;
 
 /**
@@ -27,10 +27,10 @@ class Edit extends Model
     /** @var bool Whether or not this edit was a minor edit */
     protected $minor;
 
-    /** @var int Length of the page as of this edit, in bytes */
+    /** @var int|string|null Length of the page as of this edit, in bytes */
     protected $length;
 
-    /** @var int The diff size of this edit */
+    /** @var int|string|null The diff size of this edit */
     protected $length_change;
 
     /** @var User - User object of who made the edit */
@@ -198,7 +198,11 @@ class Edit extends Model
         $isSection = preg_match_all("/^\/\* (.*?) \*\//", $summary, $sectionMatch);
 
         if ($isSection) {
-            $pageUrl = str_replace('$1', $this->getPage()->getTitle(), $this->getProject()->getArticlePath());
+            $pageUrl = $this->getProject()->getUrl(false) . str_replace(
+                '$1',
+                $this->getPage()->getTitle(),
+                $this->getProject()->getArticlePath()
+            );
             $sectionTitle = $sectionMatch[1][0];
 
             // Must have underscores for the link to properly go to the section
@@ -219,7 +223,7 @@ class Edit extends Model
             );
 
             // Use normalized page title (underscored, capitalized)
-            $pageUrl = str_replace(
+            $pageUrl = $this->getProject()->getUrl(false) . str_replace(
                 '$1',
                 ucfirst(str_replace(' ', '_', $wikiLinkPath)),
                 $this->getProject()->getArticlePath()
@@ -274,22 +278,34 @@ class Edit extends Model
 
     /**
      * Was the edit a revert, based on the edit summary?
+     * @param Container $container The DI container.
      * @return bool
      */
-    public function isRevert()
+    public function isRevert(Container $container)
     {
-        $automatedEditsHelper = $this->container->get('app.automated_edits_helper');
-        return $automatedEditsHelper->isRevert($this->comment);
+        $automatedEditsHelper = $container->get('app.automated_edits_helper');
+        return $automatedEditsHelper->isRevert($this->comment, $this->getProject()->getDomain());
+    }
+
+    /**
+     * Get the name of the tool that was used to make this edit.
+     * @param Container $container The DI container.
+     * @return string|false The name of the tool that was used to make the edit
+     */
+    public function getTool(Container $container)
+    {
+        $automatedEditsHelper = $container->get('app.automated_edits_helper');
+        return $automatedEditsHelper->getTool($this->comment, $this->getProject()->getDomain());
     }
 
     /**
      * Was the edit (semi-)automated, based on the edit summary?
-     * @return string|false The name of the tool that was used to make the edit
+     * @param  Container $container [description]
+     * @return bool
      */
-    public function isAutomated()
+    public function isAutomated(Container $container)
     {
-        $automatedEditsHelper = $this->container->get('app.automated_edits_helper');
-        return $automatedEditsHelper->getTool($this->comment);
+        return (bool) $this->getTool($container);
     }
 
     /**

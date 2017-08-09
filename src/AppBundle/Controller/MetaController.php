@@ -77,8 +77,6 @@ class MetaController extends Controller
         $grandSum = 0;
 
         // Generate array of date labels
-        $dateObj = new DateTime($start);
-        $dateLabels = [];
         for ($dateObj = new DateTime($start); $dateObj <= $endObj; $dateObj->modify('+1 day')) {
             $dateLabels[] = $dateObj->format('Y-m-d');
         }

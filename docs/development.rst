@@ -7,7 +7,7 @@ To contribute to the development of XTools, you may fork us on GitHub.  A few th
 1. XTools is based on Symfony 3. We use Twig as our template engine.  Symfony is a full MVC system.
    a. The controllers are located at ``src/AppBundle/controller``.  They are sorted by tool.
    b. The twig templates are located at ``app/resources/views``.  They are sorted by tool.
-2. We use the ``@Route`` syntax to configure routes. 
+2. We use the ``@Route`` syntax to configure routes.
 3. Every tool requires a twig directory and one controller. Also, core parts of XTools require the tool to be registered within `app/config/tools.yml`.
 
 Style Guidelines
@@ -26,7 +26,7 @@ Running Development server
 
 First make sure you meet the :ref:`pre-requisites`, and then follow these steps:
 
-1. Clone the repository: ``git clone https://github.com/x-tools/xtools-rebirth.git && cd xtools-rebirth``
+1. Clone the repository: ``git clone https://github.com/x-tools/xtools.git && cd xtools``
 2. Run ``composer install`` and answer all the prompts.
 3. Create a new local database: ``./bin/console doctrine:database:create`` (or ``d:d:c``).
 4. Run the database migrations: ``./bin/console doctrine:migrations:migrate`` (or ``d:m:m``)
@@ -87,7 +87,7 @@ Tool Labs has different versions of tables that utilize indexing to improve perf
       app.table.revision: 'revision_userindex'
       app.table.logging: 'logging_logindex'
 
-Sometimes we want <code>logging_userindex</code> and not the logindex. This is handled in the code via the <code>getTableName()</code> function in [https://github.com/x-tools/xtools-rebirth/blob/master/src/Xtools/Repository.php#L144 Repository.php].
+Sometimes we want <code>logging_userindex</code> and not the logindex. This is handled in the code via the <code>getTableName()</code> function in [https://github.com/x-tools/xtools/blob/master/src/Xtools/Repository.php#L144 Repository.php].
 
 Caching
 =======
@@ -145,7 +145,8 @@ Releases
 Before tagging a new release:
 
 * update the version numbers in ``docs/conf.py`` and ``app/config/version.yml``;
-* check the copyright year in ``README.md``, ``docs/conf.py``, and ``app/Resources/views/base.html.twig``; and
+* check the copyright year in ``README.md``, ``docs/conf.py``, and ``app/Resources/views/base.html.twig``;
+* update the branch of the stable build status badge in ``README.md``; and
 * update ``RELEASE_NOTES.md`` with any notable new information for the end user.
 
 Then tag the release

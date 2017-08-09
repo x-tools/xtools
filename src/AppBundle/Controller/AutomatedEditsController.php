@@ -163,7 +163,7 @@ class AutomatedEditsController extends Controller
             'toolCounts' => $toolCounts,
             'autoCount' => $autoCount,
             'editCount' => $editCount,
-            'autoPct' => ($autoCount / $editCount) * 100,
+            'autoPct' => $editCount ? ($autoCount / $editCount) * 100 : 0,
             'start' => $start ?: '',
             'end' => $end ?: '',
             'namespace' => $namespace,

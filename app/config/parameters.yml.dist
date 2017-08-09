@@ -53,6 +53,9 @@ parameters:
 
     app.replag_threshold: 30
 
+    app.rate_limit_time: 5
+    app.rate_limit_count: 10
+
     # Enabling or disabling of individual tools
     enable.adminscore: 1
     enable.adminstats: 1
@@ -61,6 +64,7 @@ parameters:
     enable.bash: 0
     enable.blame: 0
     enable.ec: 1
+    enable.es: 0
     enable.pages: 1
     enable.rfa: 0
     enable.rfap: 0
