@@ -1,5 +1,10 @@
 {
-	"@metadata": [],
+	"@metadata": {
+		"authors": [
+			"Facenapalm",
+			"Mailman"
+		]
+	},
 	"actions": "Действия",
 	"added": "Добавлено",
 	"all": "все",
@@ -96,6 +101,7 @@
 	"num-years": "{{PLURAL: $1|год|года|лет}}",
 	"oppose": "Против",
 	"optional": "необязательно",
+	"original-size": "Исходный размер",
 	"others": "другие",
 	"page-size": "Размер страницы",
 	"page-title": "Заголовок страницы",
@@ -181,7 +187,7 @@
 	"unique-pages-edited": "Отредактированных страниц",
 	"unknown": "Неизвестно",
 	"unprotect": "Снятие защиты",
-	"user": "Пользователь",
+	"user": "Участник",
 	"user-groups": "Группы пользователя",
 	"user-id": "Идентификатор участника",
 	"username": "Имя участника",
