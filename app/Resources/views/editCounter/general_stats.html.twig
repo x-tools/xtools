@@ -425,12 +425,12 @@
             [{
                 label: msg('with-summary'),
                 value: ec.countRevisionsWithComments,
-                percentage: (ec.countRevisionsWithComments / ec.countLiveRevisions) * 100
+                percentage: (ec.countRevisionsWithComments / ec.countAllRevisions) * 100
             },
             {
                 label: msg('no-summary'),
                 value: ec.countRevisionsWithoutComments,
-                percentage: 100 - ((ec.countRevisionsWithComments / ec.countLiveRevisions) * 100)
+                percentage: 100 - ((ec.countRevisionsWithComments / ec.countAllRevisions) * 100)
             }]
         )
     }}
