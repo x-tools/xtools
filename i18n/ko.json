@@ -68,7 +68,7 @@
 	"error-server-message": "서버 응답: $1",
 	"error-title": "XTools에 치명적인 오류가 발생했습니다.",
 	"events": "사건",
-	"executed": "$1{{PLURAL:$1|second|초}} 전에 실행됨.",
+	"executed": "$1{{PLURAL:$1|초}} 전에 실행됨.",
 	"explanation": "설명",
 	"export-wikitext": "위키텍스트 내보내기",
 	"file": "파일",
