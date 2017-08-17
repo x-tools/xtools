@@ -16,6 +16,7 @@ XTools requires the following to run:
   - Curl must be enabled.
 
 - Composer 1.0.0+
+- Node and npm (tested with versions 6.2.1 and 3.9.3, respectively)
 
 Databases
 =========

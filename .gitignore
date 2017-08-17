@@ -2,6 +2,7 @@
 /app/config/parameters.yml
 /app/config/labs_overrides.yml
 /app/config/request_blacklist.yml
+/app/Resources/node_modules
 /build/
 /phpunit.xml
 /var/*

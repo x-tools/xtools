@@ -146,6 +146,7 @@ Before tagging a new release:
 
 * update the version numbers in ``docs/conf.py`` and ``app/config/version.yml``;
 * check the copyright year in ``README.md``, ``docs/conf.py``, and ``app/Resources/views/base.html.twig``;
+* if assets were modified, bump the version number in config.yml under framework/assets/version;
 * update the branch of the stable build status badge in ``README.md``; and
 * update ``RELEASE_NOTES.md`` with any notable new information for the end user.
 
@@ -153,7 +154,7 @@ Then tag the release
 (follow the `Semantic Versioning guidelines`_, and annotate the tag with the above release notes)
 and push it to GitHub.
 
-Lastly, update the ``version`` and ``update`` parameters at https://www.mediawiki.org/wiki/XTools
+Lastly, update the ``version`` and ``updated`` parameters at https://www.mediawiki.org/wiki/XTools
 
 Additional Help
 ===============
