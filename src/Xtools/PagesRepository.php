@@ -368,7 +368,7 @@ class PagesRepository extends Repository
 
         $params = [
             'id' => $page->getId(),
-            'title' => str_replace(' ', '_', $page->getTitle()),
+            'title' => str_replace(' ', '_', $page->getTitleWithoutNamespace()),
             'namespace' => $page->getNamespace(),
         ];
 

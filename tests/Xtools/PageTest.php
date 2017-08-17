@@ -79,29 +79,38 @@ class PageTest extends KernelTestCase
      */
     public function testBasicGetters()
     {
+        $project = $this->getMock(Project::class, ['getNamespaces'], ['TestProject']);
+        $project->method('getNamespaces')
+            ->willReturn([
+                '',
+                'Talk',
+                'User',
+            ]);
+
         $pageRepo = $this->getMock(PagesRepository::class, ['getPageInfo']);
         $pageRepo->expects($this->once())
             ->method('getPageInfo')
             ->willReturn([
                 'pageid' => '42',
-                'fullurl' => 'https://example.org/Page',
+                'fullurl' => 'https://example.org/User:Test',
                 'watchers' => 5000,
-                'ns' => 0,
+                'ns' => 2,
                 'length' => 300,
                 'pageprops' => [
                     'wikibase_item' => 'Q95',
                 ],
             ]);
-
-        $page = new Page(new Project('TestProject'), 'Test_Page');
+        $page = new Page($project, 'User:Test');
         $page->setRepository($pageRepo);
 
         $this->assertEquals(42, $page->getId());
-        $this->assertEquals('https://example.org/Page', $page->getUrl());
+        $this->assertEquals('https://example.org/User:Test', $page->getUrl());
         $this->assertEquals(5000, $page->getWatchers());
         $this->assertEquals(300, $page->getLength());
-        $this->assertEquals(0, $page->getNamespace());
+        $this->assertEquals(2, $page->getNamespace());
+        $this->assertEquals('User', $page->getNamespaceName());
         $this->assertEquals('Q95', $page->getWikidataId());
+        $this->assertEquals('Test', $page->getTitleWithoutNamespace());
     }
 
     /**
