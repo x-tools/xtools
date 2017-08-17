@@ -151,6 +151,9 @@ class AutomatedEditsController extends Controller
         // Get individual counts of how many times each tool was used.
         // This also includes a wikilink to the tool.
         $toolCounts = $user->getAutomatedCounts($projectData, $namespace, $start, $end);
+        $toolsTotal = array_reduce($toolCounts, function ($a, $b) {
+            return $a + $b['count'];
+        });
 
         // Query to get combined (semi)automated using for all edits
         //   as some automated edits overlap.
@@ -161,6 +164,7 @@ class AutomatedEditsController extends Controller
             'user' => $user,
             'project' => $projectData,
             'toolCounts' => $toolCounts,
+            'toolsTotal' => $toolsTotal,
             'autoCount' => $autoCount,
             'editCount' => $editCount,
             'autoPct' => $editCount ? ($autoCount / $editCount) * 100 : 0,
