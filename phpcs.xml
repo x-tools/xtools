@@ -12,6 +12,10 @@
     <exclude-pattern>web/static/production/*</exclude-pattern>
     <exclude-pattern>*.min.js</exclude-pattern>
 
+    <rule ref="Squiz.NamingConventions.ValidVariableName.MemberNotCamelCaps">
+        <exclude name="Squiz.NamingConventions.ValidVariableName.PrivateNoUnderscore"/>
+    </rule>
+    <rule ref="Squiz.NamingConventions.ValidVariableName.StringNotCamelCaps"/>
     <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
         <exclude-pattern>app/AppKernel.php</exclude-pattern>
     </rule>
