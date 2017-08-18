@@ -605,6 +605,11 @@ section > .panel-body {
     }
 }
 
+// Don't let fonts in display titles get too big
+.display-title * {
+    font-size: inherit !important;
+}
+
 .error-wrapper {
     font-size: 18px;
 

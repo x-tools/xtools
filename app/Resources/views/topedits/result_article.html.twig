@@ -12,7 +12,7 @@
             </a>
             {{ wiki.userLink(user, project) }}
             &bull;
-            {{ wiki.pageLink(page, page.displayTitle|raw) }}
+            {{ wiki.pageLink(page, page.title) }}
             <small>
                 &bull;
                 {{ project.title }}
@@ -27,7 +27,9 @@
                 <tr>
                     <td>{{ msg('article') }}</td>
                     <td>
-                        {{ wiki.pageLink(page, page.displaytitle|raw) }}
+                        <span class="display-title">
+                            {{ wiki.pageLink(page, page.displaytitle|raw) }}
+                        </span>
                         <small>({{ wiki.pageLogLink(page) }}
                         &middot; <a href="{{ path('ArticleInfoResult', {project:project.domain, article:page.title}) }}">{{ msg('tool-articleinfo') }}</a>)</small>
                     </td>

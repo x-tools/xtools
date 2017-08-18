@@ -58,7 +58,7 @@
                 &middot;
                 <a href="{{ path('TopEditsResults', {project:edit.project.databaseName, username:user.username, namespace:edit.page.namespace, article:edit.page.title}) }}">{{ msg('tool-topedits') }}</a>
             </td>
-            <td class="sort-entry--page-title" data-value="{{ edit.page.title }}">
+            <td class="sort-entry--page-title display-title" data-value="{{ edit.page.title }}">
                 {{ wiki.pageLink(edit.page, edit.page.displayTitle) }}
             </td>
             <td class="sort-entry--size" data-value="{{ edit.lengthChange }}">
