@@ -31,6 +31,9 @@ parameters:
             regex: 'WP:CLEANER|\[\[\Wikipedia:DPL|\[\[WP:WCW\]\] project \('
             tag: WPCleaner
             link: Project:WPCleaner
+        IABot:
+            tag: 'OAuth CID: 678'
+            link: User:InternetArchiveBot
 
     # Per-wiki lists
     en.wikipedia.org:
