@@ -211,3 +211,6 @@ parameters:
         OABot:
             tag: 'OAuth CID: 817'
             link: Project:OABOT
+        XFDCloser:
+            regex: '\[\[WP:XFDC\|XFDcloser'
+            link: User:Evad37/XFDcloser.js
