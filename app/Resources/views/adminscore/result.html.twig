@@ -20,8 +20,14 @@
             <div class="col-lg-6 stat-list clearfix">
                 <table class="table"><tbody>
                     {% for key in master|keys %}
-                        {% if master[key].value != 0 %}
-                            <tr><td>{{ msg(key) }}</td><td><span class="text-success">+{{ master[key].score }}</span></td></tr>
+                        {# Don't confuse people by showing 0 for blocks #}
+                        {% if not(key == 'blocks' and master[key].score == 0) %}
+                            <tr>
+                                <td>{{ msg(key) }}</td>
+                                <td>
+                                    <span class="text-success">{{ master[key].score|diff_format }}</span>
+                                </td>
+                            </tr>
                         {% endif %}
                     {% endfor %}
                     <tfoot>
