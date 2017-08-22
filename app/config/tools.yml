@@ -9,7 +9,7 @@ parameters:
     adminstats: adminstats
     adminscore: adminscore
     es: es
-    rfa: rfa
-    rfap: rfap
+    rfx: rfx
+    rfxvote: rfxvote
     bash: bash
     sc: sc

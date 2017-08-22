@@ -66,7 +66,7 @@ parameters:
     enable.ec: 1
     enable.es: 0
     enable.pages: 1
-    enable.rfa: 0
-    enable.rfap: 0
+    enable.rfx: 0
+    enable.rfxvote: 0
     enable.sc: 1
     enable.topedits: 1

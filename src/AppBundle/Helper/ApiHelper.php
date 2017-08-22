@@ -66,7 +66,9 @@ class ApiHelper extends HelperBase
 
         try {
             $res = $this->api->getRequest($query);
-            if (isset($res["batchcomplete"]) && isset($res["query"]["users"][0]["groups"])) {
+            if (isset($res["batchcomplete"])
+                && isset($res["query"]["users"][0]["groups"])
+            ) {
                 $result = $res["query"]["users"][0]["groups"];
             }
         } catch (Exception $e) {

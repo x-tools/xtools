@@ -187,10 +187,11 @@ class ProjectRepository extends Repository
      * Get metadata about a project, including the 'dbName', 'url' and 'lang'
      *
      * @param string $projectUrl The project's URL.
-     * @return array With 'dbName', 'url', 'lang', 'general' and 'namespaces' keys.
+     * @return array|null With 'dbName', 'url', 'lang', 'general' and 'namespaces' keys.
      *   'general' contains: 'wikiName', 'articlePath', 'scriptPath', 'script',
      *   'timezone', and 'timezoneOffset'; 'namespaces' contains all namespace
-     *   names, keyed by their IDs.
+     *   names, keyed by their IDs.  If this function returns null, the API call
+     *   failed.
      */
     public function getMetadata($projectUrl)
     {
@@ -206,7 +207,11 @@ class ProjectRepository extends Repository
             return $this->metadata;
         }
 
-        $api = MediawikiApi::newFromPage($projectUrl);
+        try {
+            $api = MediawikiApi::newFromPage($projectUrl);
+        } catch (\Exception $e) {
+            return null;
+        }
 
         $params = ['meta' => 'siteinfo', 'siprop' => 'general|namespaces'];
         $query = new SimpleRequest('query', $params);

@@ -1,0 +1,31 @@
+parameters:
+  rfx:
+    en.wikipedia.org:
+      rfx_namespace: 4
+      sections:
+        - "support"
+        - "oppose"
+        - "neutral"
+        - "comments"
+      pages:
+        rfa: "Project:Requests for adminship"
+        rfb: "Project:Requests for bureaucratship"
+      excluded_title:
+        - "Requests_for_adminship/RfA_and_RfB_Report"
+        - "Requests_for_adminship/BAG"
+        - "Requests_for_adminship/Front_matter"
+        - "Requests_for_adminship/RfB_bar"
+        - "Requests_for_adminship/nominate"
+        - "Requests_for_adminship/desysop_poll"
+        - "Requests_for_adminship/Draft"
+        - "Requests_for_adminship/Header"
+        - "Requests_for_adminship/?"
+        - "Requests_for_adminship/"
+        - "Requests_for_adminship/Recent"
+        - "Requests_for_adminship/Sample_Vote_on_sub-page_for_User:Jimbo_Wales"
+        - "Requests_for_adminship/Promotion_guidelines"
+        - "Wikipedia:Requests_for_adminship/Standards"
+      excluded_regex:
+        - "Requests_for_adminship/Nomination_cabal"
+        - "Requests_for_adminship/%/"
+      date_regexp: "(?:Final|Closed|Scheduled to end).*?(\\d+:\\d+,? \\d+ \\w+ \\d{4}) \\(UTC\\)"

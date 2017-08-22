@@ -112,7 +112,7 @@ function sortAndWriteToFile(json, filename)
 
     fs.writeFile(
         `${xtoolsPath}${filename}`,
-        JSON.stringify(orderedJson, null, 2) + "\n",
+        JSON.stringify(orderedJson, null, '\t') + "\n",
         {},
         err => console.log(err)
     );

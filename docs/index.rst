@@ -92,17 +92,17 @@ Pages
 Information about pages that have been created by a user.
 :ref:`Read more about Pages... <pages>`.
 
-RFA
+RFX
 ---
 
-RFA
-:ref:`Read more about RFA... <rfa>`.
+RFX
+:ref:`Read more about RFX... <rfx>`.
 
-RFAP
-----
+RFX Vote
+--------
 
 @TODO
-:ref:`Read more about RFAP... <rfap>`.
+:ref:`Read more about RFAVote... <rfxvote>`.
 
 Simple Counter
 --------------
