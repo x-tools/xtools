@@ -17,9 +17,7 @@ namespace Xtools;
  *
  * @category RFA
  * @package  Xtools
- * @author   Xtools Team <xtools@lists.wikimedia.org>
  * @license  GPL 3.0
- * @link     http://xtools.wmflabs.org/rfa
  */
 class RFA
 {
@@ -36,7 +34,7 @@ class RFA
     /**
      * @var null|string Username of the user we're looking for.
      */
-    private $user_looking_for;
+    private $userLookingFor;
 
     /**
      * @var string Section we found the user we're looking for
@@ -87,27 +85,22 @@ class RFA
     }
 
     /**
-     * RFA constructor.
+     * This function parses the wikitext and stores it within this function.
+     * It's been split out to make this class testable
      *
-     * @param string      $rawWikiText      The text of the page we're parsing
-     * @param array       $section_array    Section names that we're looking for
-     * @param string      $user_namespace   Plain text of the user namespace
-     * @param string      $date_regexp      Valid Regular Expression for the end date
-     * @param string|null $user_looking_for User we're trying to find.
+     * @param array  $sectionArray Section names that we're looking for
+     * @param string $rawWikiText  The text of the page we're parsing
+     * @param string $dateRegexp   Valid Regular Expression for the end date
+     *
+     * @return null
      */
-    public function __construct(
-        $rawWikiText,
-        $section_array = ["Support", "Oppose", "Neutral"],
-        $user_namespace = "User",
-        $date_regexp = "final .*end(?:ing|ed)?(?: no earlier than)? (.*?)? \(UTC\)",
-        $user_looking_for = null
-    ) {
+    private function setUp($sectionArray, $rawWikiText, $dateRegexp)
+    {
         $this->data = array();
-        $this->user_looking_for = $user_looking_for;
 
         $lines = explode("\n", $rawWikiText);
 
-        $keys = join("|", $section_array);
+        $keys = join("|", $sectionArray);
 
         $lastSection = "";
 
@@ -116,7 +109,7 @@ class RFA
                 $lastSection = strtolower($matches[1]);
             } elseif ($lastSection == ""
                 && preg_match(
-                    "/$date_regexp/",
+                    "/$dateRegexp/",
                     $line,
                     $matches
                 )
@@ -131,7 +124,7 @@ class RFA
                 }
                 $foundUser = trim($matches[1][0][0]);
                 $this->data[$lastSection][] = $foundUser;
-                if (strtolower($foundUser) == strtolower($this->user_looking_for)) {
+                if (strtolower($foundUser) == strtolower($this->userLookingFor)) {
                     $this->userSectionFound = $lastSection;
                 }
             }
@@ -153,6 +146,27 @@ class RFA
         $final = array_diff($final, [1]);    // remove single occurrences
 
         $this->duplicates = array_keys($final);
+    }
+
+    /**
+     * RFA constructor.
+     *
+     * @param string      $rawWikiText    The text of the page we're parsing
+     * @param array       $sectionArray   Section names that we're looking for
+     * @param string      $userNamespace  Plain text of the user namespace
+     * @param string      $dateRegexp     Valid Regular Expression for the end date
+     * @param string|null $userLookingFor User we're trying to find.
+     */
+    public function __construct(
+        $rawWikiText,
+        $sectionArray = ["Support", "Oppose", "Neutral"],
+        $userNamespace = "User",
+        $dateRegexp = "final .*end(?:ing|ed)?(?: no earlier than)? (.*?)? \(UTC\)",
+        $userLookingFor = null
+    ) {
+        $this->userLookingFor = $userLookingFor;
+
+        $this->setUp($sectionArray, $rawWikiText, $dateRegexp);
     }
 
     /**

@@ -28,9 +28,7 @@ use Xtools\User;
  *
  * @category RfXVoteCalculator
  * @package  AppBundle\Controller
- * @author   XTools Team <xtools@lists.wikimedia.org>
  * @license  GPL 3.0
- * @link     http://xtools.wmflabs.org/rfap
  */
 class RfXVoteCalculatorController extends Controller
 {
@@ -51,7 +49,7 @@ class RfXVoteCalculatorController extends Controller
      * @Route("/rfap", name="rfap")
      * @Route("/rfap", name="RfXVoteCalculator")
      *
-     * @return \Symfony\Component\HttpFoundation\Response]
+     * @return Response
      */
     public function indexAction()
     {

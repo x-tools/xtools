@@ -321,8 +321,8 @@ class ApiHelper extends HelperBase
     /**
      * Query the MediaWiki API and return the text of a single page
      *
-     * @param xtools/Project $project Project that we're working on
-     * @param string         $title   Title of the page we're pulling
+     * @param xtools/Project|string $project Project that we're working on
+     * @param string                $title   Title of the page we're pulling
      *
      * @return string|null
      */

@@ -23,9 +23,7 @@ use Xtools\RFA;
  *
  * @category RfXAnalysis
  * @package  AppBundle\Controller
- * @author   XTools Team <xtools@lists.wikimedia.org>
  * @license  GPL 3.0
- * @link     http://xtools.wmflabs.org/rfa
  */
 class RfXAnalysisController extends Controller
 {
