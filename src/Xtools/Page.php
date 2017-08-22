@@ -203,6 +203,22 @@ class Page extends Model
     }
 
     /**
+     * Get the full page wikitext.
+     * @return string|null Null if nothing was found.
+     */
+    public function getWikitext()
+    {
+        $content = $this->getRepository()->getPagesWikitext(
+            $this->getProject(),
+            [ $this->getTitle() ]
+        );
+
+        return isset($content[$this->getTitle()])
+            ? $content[$this->getTitle()]
+            : null;
+    }
+
+    /**
      * Get the statement for a single revision,
      * so that you can iterate row by row.
      * @param User|null $user Specify to get only revisions by the given user.

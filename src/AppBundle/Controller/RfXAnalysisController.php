@@ -145,14 +145,14 @@ class RfXAnalysisController extends Controller
         $pageRepo->setContainer($this->container);
         $page->setRepository($pageRepo);
 
-        $text = $api->getPageText($project, $pagename);
+        $text = $page->getWikitext();
 
         if (!isset($text)) {
-            $this->addFlash("notice", ["no-result", $pagename]);
+            $this->addFlash('notice', ['no-result', $pagename]);
             return $this->redirectToRoute(
-                "rfxAnalysisProject",
+                'rfxAnalysisProject',
                 [
-                    "project" => $projectData->getDatabaseName()
+                    'project' => $projectData->getDatabaseName()
                 ]
             );
         }

@@ -62,6 +62,40 @@ class PagesRepository extends Repository
     }
 
     /**
+     * Get the full page text of a set of pages.
+     * @param Project $project The project to which the pages belong.
+     * @param string[] $pageTitles Array of page titles.
+     * @return string[] Array keyed by the page names, with the page text as the values.
+     */
+    public function getPagesWikitext(Project $project, $pageTitles)
+    {
+        $query = new SimpleRequest('query', [
+            'prop' => 'revisions',
+            'rvprop' => 'content',
+            'titles' => join('|', $pageTitles),
+            'formatversion' => 2,
+        ]);
+        $result = [];
+
+        $api = $this->getMediawikiApi($project);
+        $res = $api->getRequest($query);
+
+        if (!isset($res['query']['pages'])) {
+            return [];
+        }
+
+        foreach ($res['query']['pages'] as $page) {
+            if (isset($page['revisions'][0]['content'])) {
+                $result[$page['title']] = $page['revisions'][0]['content'];
+            } else {
+                $result[$page['title']] = '';
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Get revisions of a single page.
      * @param Page $page The page.
      * @param User|null $user Specify to get only revisions by the given user.

@@ -5,8 +5,7 @@
 
 namespace Tests\Xtools;
 
-// use PHPUnit_Framework_TestCase;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Xtools\Page;
 use Xtools\PagesRepository;
 use Xtools\Project;
@@ -16,10 +15,19 @@ use Xtools\User;
 /**
  * Tests for the Page class.
  */
-class PageTest extends KernelTestCase
+class PageTest extends WebTestCase
 {
     /** @var Container The Symfony container. */
     protected $container;
+
+    /**
+     * Set up the ApiHelper object for testing.
+     */
+    public function setUp()
+    {
+        $client = static::createClient();
+        $this->container = $client->getContainer();
+    }
 
     /**
      * A page has a title and an HTML display title.
@@ -102,6 +110,23 @@ class PageTest extends KernelTestCase
         $this->assertEquals(300, $page->getLength());
         $this->assertEquals(0, $page->getNamespace());
         $this->assertEquals('Q95', $page->getWikidataId());
+    }
+
+    /**
+     * Test fetching of wikitext
+     */
+    public function testWikitext()
+    {
+        $pageRepo = new PagesRepository();
+        $pageRepo->setContainer($this->container);
+        $project = ProjectRepository::getProject('en.wikipedia.org', $this->container);
+        $page = new Page($project, 'Main Page');
+        $page->setRepository($pageRepo);
+
+        // We want to do a real-world test. enwiki's Main Page does not change much,
+        // and {{Main Page banner}} in particular should be there indefinitely, hopefully :)
+        $content = $page->getWikitext();
+        $this->assertContains('{{Main Page banner}}', $content);
     }
 
     /**

@@ -319,38 +319,6 @@ class ApiHelper extends HelperBase
     }
 
     /**
-     * Query the MediaWiki API and return the text of a single page
-     *
-     * @param xtools/Project|string $project Project that we're working on
-     * @param string                $title   Title of the page we're pulling
-     *
-     * @return string|null
-     */
-    public function getPageText($project, $title)
-    {
-        $this->setUp($project);
-
-        $result = null;
-
-        $params = [
-            "page" => $title,
-            "prop" => "wikitext"
-        ];
-
-        try {
-            $query = new SimpleRequest("parse", $params);
-            $res = $this->api->getRequest($query);
-            if (isset($res['parse']['wikitext']['*'])) {
-                $result = $res['parse']['wikitext']['*'];
-            }
-        } catch (\Exception $e) {
-            // The api returned an error!  Ignore
-        }
-
-        return $result;
-    }
-
-    /**
      * Query the MediaWiki API and return the text of a many pages
      *
      * @param xtools/Project $project Project that we're working on
