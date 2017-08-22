@@ -1,6 +1,6 @@
 <?php
 /**
- * This file contains the code that powers the RfX Analysis page of xTools.
+ * This file contains the code that powers the RfX Analysis page of XTools.
  */
 
 namespace AppBundle\Controller;
@@ -13,7 +13,7 @@ use Xtools\ProjectRepository;
 use Xtools\Page;
 use Xtools\PagesRepository;
 use Xtools\UserRepository;
-use Xtools\RFA;
+use Xtools\RFX;
 
 /**
  * This controller handles the RfX Analysis tool.
@@ -28,7 +28,7 @@ class RfXAnalysisController extends Controller
      */
     public function getToolShortname()
     {
-        return 'rfa';
+        return 'rfx';
     }
 
     /**
@@ -38,11 +38,11 @@ class RfXAnalysisController extends Controller
      * @param string  $project Optional project.
      * @param string  $type    Optional RfX type
      *
-     * @Route("/rfa",                  name="rfxAnalysis")
-     * @Route("/rfa",                  name="rfa")
-     * @Route("/rfa/index.php",        name="rfxAnalysisIndexPhp")
-     * @Route("/rfa/{project}",        name="rfxAnalysisProject")
-     * @Route("/rfa/{project}/{type}", name="rfxAnalysisProjectType")
+     * @Route("/rfx",                  name="rfxAnalysis")
+     * @Route("/rfx",                  name="rfx")
+     * @Route("/rfx/index.php",        name="rfxAnalysisIndexPhp")
+     * @Route("/rfx/{project}",        name="rfxAnalysisProject")
+     * @Route("/rfx/{project}/{type}", name="rfxAnalysisProjectType")
      *
      * @return Response|RedirectResponse
      */
@@ -80,21 +80,21 @@ class RfXAnalysisController extends Controller
             );
         }
 
-        $rfa = $this->getParameter('rfa');
+        $rfx = $this->getParameter('rfx');
 
         $projectFields = [];
 
-        foreach (array_keys($rfa) as $row) {
-            $projectFields[$row] = $rfa[$row]['pages'];
+        foreach (array_keys($rfx) as $row) {
+            $projectFields[$row] = $rfx[$row]['pages'];
         }
 
         // replace this example code with whatever you need
         return $this->render(
             'rfxAnalysis/index.html.twig',
             [
-                'xtPageTitle' => 'tool-rfa',
-                'xtSubtitle' => 'tool-rfa-desc',
-                'xtPage' => 'rfa',
+                'xtPageTitle' => 'tool-rfx',
+                'xtSubtitle' => 'tool-rfx-desc',
+                'xtPage' => 'rfx',
                 'project' => $projectQuery,
                 'available' => $projectFields,
             ]
@@ -108,7 +108,7 @@ class RfXAnalysisController extends Controller
      * @param string $type     Type of RfX we are processing.
      * @param string $username Username of the person we're analizing.
      *
-     * @Route("/rfa/{project}/{type}/{username}", name="rfxAnalysisResult")
+     * @Route("/rfx/{project}/{type}/{username}", name="rfxAnalysisResult")
      *
      * @return Response|RedirectResponse
      */
@@ -117,23 +117,23 @@ class RfXAnalysisController extends Controller
         $projectData = ProjectRepository::getProject($project, $this->container);
 
         if (!$projectData->exists()) {
-            $this->addFlash("notice", ["invalid-project", $project]);
-            return $this->redirectToRoute("rfa");
+            $this->addFlash('notice', ['invalid-project', $project]);
+            return $this->redirectToRoute('rfx');
         }
 
         $db = $projectData->getDatabaseName();
         $domain = $projectData->getDomain();
 
-        if ($this->getParameter("rfa")[$domain] === null) {
-            $this->addFlash("notice", ["invalid-project-cant-use", $project]);
-            return $this->redirectToRoute("rfa");
+        if ($this->getParameter('rfx')[$domain] === null) {
+            $this->addFlash('notice', ['invalid-project-cant-use', $project]);
+            return $this->redirectToRoute('rfx');
         }
 
         // Construct the page name
-        if (!isset($this->getParameter("rfa")[$domain]["pages"][$type])) {
-            $pagename = "";
+        if (!isset($this->getParameter('rfx')[$domain]['pages'][$type])) {
+            $pagename = '';
         } else {
-            $pagename = $this->getParameter("rfa")[$domain]["pages"][$type];
+            $pagename = $this->getParameter('rfx')[$domain]['pages'][$type];
         }
 
         $user = UserRepository::getUser($username, $this->container);
@@ -156,34 +156,34 @@ class RfXAnalysisController extends Controller
             );
         }
 
-        $rfa = new RFA(
+        $rfx = new RFX(
             $text,
-            $this->getParameter("rfa")[$domain]["sections"],
-            "User"
+            $this->getParameter('rfx')[$domain]['sections'],
+            'User'
         );
-        $support = $rfa->getSection("support");
-        $oppose = $rfa->getSection("oppose");
-        $neutral = $rfa->getSection("neutral");
-        $dup = $rfa->getDuplicates();
+        $support = $rfx->getSection('support');
+        $oppose = $rfx->getSection('oppose');
+        $neutral = $rfx->getSection('neutral');
+        $dup = $rfx->getDuplicates();
 
         if ((sizeof($support) + sizeof($oppose) + sizeof($neutral)) == 0) {
-            $this->addFlash("notice", ["no-result", $pagename]);
+            $this->addFlash('notice', ['no-result', $pagename]);
             return $this->redirectToRoute(
-                "rfxAnalysisProject",
+                'rfxAnalysisProject',
                 [
-                    "project" => $projectData->getDatabaseName()
+                    'project' => $projectData->getDatabaseName(),
                 ]
             );
         }
 
-        $end = $rfa->getEndDate();
+        $end = $rfx->getEndDate();
 
         // replace this example code with whatever you need
         return $this->render(
             'rfxAnalysis/result.html.twig',
             [
                 'xtTitle' => $user->getUsername(),
-                'xtPage' => 'rfa',
+                'xtPage' => 'rfx',
                 'project' => $projectData,
                 'user' => $user,
                 'page' => $page,

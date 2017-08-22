@@ -80,7 +80,7 @@ Tools
 - **enable.adminstats** - Enable "Admin Statistics" tool
 - **enable.adminscore** - Enable "Admin Score" tool
 - **enable.rfa** - Enable "RfX Analysis" tool
-- **enable.rfap** - Enable "RfX Vote Calculator" tool
+- **enable.rfavote** - Enable "RfX Vote Calculator" tool
 - **enable.bash** - Enable "Quote Database" tool
 - **enable.sc** - Enable "Plain, Dirty, Simple Edit Counter" tool
 - **enable.es** - Enable "Edit Summaries" tool

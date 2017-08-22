@@ -1,7 +1,7 @@
 parameters:
-  rfa:
+  rfx:
     en.wikipedia.org:
-      rfa_namespace: 4
+      rfx_namespace: 4
       sections:
         - "support"
         - "oppose"

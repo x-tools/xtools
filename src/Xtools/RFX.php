@@ -1,25 +1,14 @@
 <?php
-
 /**
- * An RFA object contains the parsed information for an RFA
- *
- * @category RFA
- * @package  Xtools
- * @author   Xtools Team <xtools@lists.wikimedia.org>
- * @license  GPL 3.0
- * @link     http://xtools.wmflabs.org/rfa
+ * An RFX object contains the parsed information for an RFX
  */
 
 namespace Xtools;
 
 /**
- * Class RFA
- *
- * @category RFA
- * @package  Xtools
- * @license  GPL 3.0
+ * This class contains information about a single RfX page.
  */
-class RFA
+class RFX
 {
     /**
      * @var array Data we parsed out of the page text
@@ -42,7 +31,7 @@ class RFA
     private $userSectionFound;
 
     /**
-     * @var string Ending date of the RFA
+     * @var string Ending date of the RFX
      */
     private $endDate;
 
@@ -149,7 +138,7 @@ class RFA
     }
 
     /**
-     * RFA constructor.
+     * RFX constructor.
      *
      * @param string      $rawWikiText    The text of the page we're parsing
      * @param array       $sectionArray   Section names that we're looking for
@@ -207,7 +196,7 @@ class RFA
     }
 
     /**
-     * Get the End Date of the RFA
+     * Get the End Date of the RFX
      *
      * @return string
      */

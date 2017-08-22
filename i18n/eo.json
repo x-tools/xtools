@@ -1,12 +1,12 @@
 {
-  "bot": "Roboto",
-  "last-day": "Redaktoj en lastaj 24 horoj",
-  "last-month": "Redaktoj en lastaj 30 tagoj",
-  "last-week": "Redaktoj en lastaj 7 tagoj",
-  "last-year": "Redaktoj en lastaj 365 tagoj",
-  "pager-newer-n": "{{PLURAL:$1|pli novan 1|pli novajn $1}}",
-  "pager-older-n": "{{PLURAL:$1|pli malnovan 1|pli malnovajn $1}}",
-  "pages": "Paĝoj",
-  "project": "Projekto",
-  "user": "Uzanto"
+	"bot": "Roboto",
+	"last-day": "Redaktoj en lastaj 24 horoj",
+	"last-month": "Redaktoj en lastaj 30 tagoj",
+	"last-week": "Redaktoj en lastaj 7 tagoj",
+	"last-year": "Redaktoj en lastaj 365 tagoj",
+	"pager-newer-n": "{{PLURAL:$1|pli novan 1|pli novajn $1}}",
+	"pager-older-n": "{{PLURAL:$1|pli malnovan 1|pli malnovajn $1}}",
+	"pages": "Paĝoj",
+	"project": "Projekto",
+	"user": "Uzanto"
 }

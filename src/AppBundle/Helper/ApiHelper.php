@@ -317,47 +317,4 @@ class ApiHelper extends HelperBase
             }
         });
     }
-
-    /**
-     * Query the MediaWiki API and return the text of a many pages
-     *
-     * @param xtools/Project $project Project that we're working on
-     * @param array          $titles   Titles of the pages we're pulling
-     *
-     * @return array|null
-     */
-    public function getMassPageText($project, $titles = [])
-    {
-        $this->setUp($project);
-
-        $result = [];
-
-        $titleText = join("|", $titles);
-
-        $params= [
-            "titles" => $titleText,
-            "prop" => "revisions",
-            "rvprop" =>"content"
-        ];
-
-
-        try {
-            $query = new SimpleRequest("query", $params);
-            $res = $this->api->getRequest($query);
-            if (!isset($res["query"]["pages"])) {
-                return [];
-            }
-            foreach ($res["query"]["pages"] as $key => $value) {
-                if (isset($value["revisions"][0]["*"])) {
-                    $result[$value["title"]] = $value["revisions"][0]["*"];
-                } else {
-                    $result[$value["title"]] = "";
-                }
-            }
-        } catch (\Exception $e) {
-            // The api returned an error!  Ignore
-        }
-
-        return $result;
-    }
 }

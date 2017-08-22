@@ -1,12 +1,6 @@
 <?php
 /**
- * This file contains the code that powers the RfX Vote Calculator page of xTools.
- *
- * @category RfXVoteCalculator
- * @package  AppBundle\Controller
- * @author   XTools Team <xtools@lists.wikimedia.org>
- * @license  GPL 3.0
- * @link     http://xtools.wmflabs.org/rfap
+ * This file contains the code that powers the RfX Vote Calculator page of XTools.
  */
 
 namespace AppBundle\Controller;
@@ -17,18 +11,12 @@ use Symfony\Component\Debug\Exception\ContextErrorException;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Xtools\ProjectRepository;
-use Xtools\RFA;
+use Xtools\PagesRepository;
+use Xtools\RFX;
 use Xtools\User;
 
-// Note: In the legacy XTools, this tool was referred to as "rfap."
-// Thus we have several references to it below, including in routes
-
 /**
- * Class RfXVoteCalculatorController
- *
- * @category RfXVoteCalculator
- * @package  AppBundle\Controller
- * @license  GPL 3.0
+ * Controller for the RfX Vote Calculator.
  */
 class RfXVoteCalculatorController extends Controller
 {
@@ -40,14 +28,14 @@ class RfXVoteCalculatorController extends Controller
      */
     public function getToolShortname()
     {
-        return 'rfap';
+        return 'rfxvote';
     }
 
     /**
      * Renders the index page for RfXVoteCalculator
      *
-     * @Route("/rfap", name="rfap")
-     * @Route("/rfap", name="RfXVoteCalculator")
+     * @Route("/rfxvote", name="rfxvote")
+     * @Route("/rfxvote", name="RfXVoteCalculator")
      *
      * @return Response
      */
@@ -62,12 +50,12 @@ class RfXVoteCalculatorController extends Controller
         if ($projectQuery != '' && $username != '') {
             $routeParams = [ 'project' => $projectQuery, 'username' => $username ];
             return $this->redirectToRoute(
-                'rfapResult',
+                'rfxvoteResult',
                 $routeParams
             );
         } elseif ($projectQuery != '') {
             return $this->redirectToRoute(
-                'rfapResult',
+                'rfxvoteResult',
                 [
                     'project' => $projectQuery
                 ]
@@ -82,9 +70,9 @@ class RfXVoteCalculatorController extends Controller
         return $this->render(
             'rfxVoteCalculator/index.html.twig',
             [
-                'xtPageTitle' => 'tool-rfap',
-                'xtSubtitle' => 'tool-rfap-desc',
-                'xtPage' => 'rfap',
+                'xtPageTitle' => 'tool-rfxvote',
+                'xtSubtitle' => 'tool-rfxvote-desc',
+                'xtPage' => 'rfxvote',
                 'project' => $project,
             ]
         );
@@ -96,57 +84,57 @@ class RfXVoteCalculatorController extends Controller
      * @param string $project  The project we're working on
      * @param string $username Username of the user we're analysing.
      *
-     * @Route("/rfap/{project}/{username}", name="rfapResult")
+     * @Route("/rfxvote/{project}/{username}", name="rfxvoteResult")
      *
      * @return Response
      */
     public function resultAction($project, $username)
     {
-        $api = $this->get('app.api_helper');
-
         $conn = $this->getDoctrine()->getManager('replicas')->getConnection();
 
         $projectData = ProjectRepository::getProject($project, $this->container);
         $projectRepo = $projectData->getRepository();
         $userData = new User($username);
+        $pagesRepo = new PagesRepository();
+        $pagesRepo->setContainer($this->container);
 
         $dbName = $projectData->getDatabaseName();
 
-        $rfaParam = $this->getParameter('rfa');
+        $rfxParam = $this->getParameter('rfx');
 
-        if (!$projectData->exists() || $rfaParam == null) {
+        if (!$projectData->exists() || $rfxParam == null) {
             $this->addFlash('notice', ['invalid-project', $project]);
-            return $this->redirectToRoute('rfap');
+            return $this->redirectToRoute('rfxvote');
         }
 
         $namespaces = $projectData->getNamespaces();
 
-        if (!isset($rfaParam[$projectData->getDomain()])) {
+        if (!isset($rfxParam[$projectData->getDomain()])) {
             $this->addFlash('notice', ['invalid-project-cant-use', $project]);
-            return $this->redirectToRoute('rfap');
+            return $this->redirectToRoute('rfxvote');
         }
 
-        $pageTypes = $rfaParam[$projectData->getDomain()]['pages'];
+        $pageTypes = $rfxParam[$projectData->getDomain()]['pages'];
         $namespace
-            = $rfaParam[$projectData->getDomain()]['rfa_namespace'] !== null
-            ? $rfaParam[$projectData->getDomain()]['rfa_namespace'] : 4;
+            = $rfxParam[$projectData->getDomain()]['rfx_namespace'] !== null
+            ? $rfxParam[$projectData->getDomain()]['rfx_namespace'] : 4;
 
         $finalData = [];
 
         // We should probably figure out a better way to do this...
         $ignoredPages = '';
 
-        if (isset($rfaParam[$projectData->getDomain()]['excluded_title'])) {
+        if (isset($rfxParam[$projectData->getDomain()]['excluded_title'])) {
             $titlesExcluded
-                = $rfaParam[$projectData->getDomain()]['excluded_title'];
+                = $rfxParam[$projectData->getDomain()]['excluded_title'];
             foreach ($titlesExcluded as $ignoredPage) {
                 $ignoredPages .= "AND p.page_title != \"$ignoredPage\"\r\n";
             }
         }
 
-        if (isset($rfaParam[$projectData->getDomain()]['excluded_regex'])) {
+        if (isset($rfxParam[$projectData->getDomain()]['excluded_regex'])) {
             $titlesExcluded
-                = $rfaParam[$projectData->getDomain()]['excluded_regex'];
+                = $rfxParam[$projectData->getDomain()]['excluded_regex'];
             foreach ($titlesExcluded as $ignoredPage) {
                 $ignoredPages .= "AND p.page_title NOT LIKE \"%$ignoredPage%\"\r\n";
             }
@@ -187,35 +175,35 @@ class RfXVoteCalculatorController extends Controller
             $titleArray = array_chunk($titles, 20);
 
             foreach ($titleArray as $titlesWorked) {
-                $pageData = $api->getMassPageText($project, $titlesWorked);
+                $pageData = $pagesRepo->getPagesWikitext($projectData, $titlesWorked);
 
                 foreach ($pageData as $title => $text) {
                     $type = str_replace('_', ' ', $type);
-                    $rfa = new RFA(
+                    $rfx = new RFX(
                         $text,
-                        $rfaParam[$projectData->getDomain()]['sections'],
+                        $rfxParam[$projectData->getDomain()]['sections'],
                         $namespaces[2],
-                        $rfaParam[$projectData->getDomain()]['date_regexp'],
+                        $rfxParam[$projectData->getDomain()]['date_regexp'],
                         $username
                     );
-                    $section = $rfa->getUserSectionFound();
+                    $section = $rfx->getUserSectionFound();
                     if ($section == '') {
                         // Skip over ones where the user didn't !vote.
                         continue;
                     }
                     // Todo: i18n-ize this
                     $finalData[$type][$section][$title]['Support']
-                        = sizeof($rfa->getSection('support'));
+                        = sizeof($rfx->getSection('support'));
                     $finalData[$type][$section][$title]['Oppose']
-                        = sizeof($rfa->getSection('oppose'));
+                        = sizeof($rfx->getSection('oppose'));
                     $finalData[$type][$section][$title]['Neutral']
-                        = sizeof($rfa->getSection('neutral'));
+                        = sizeof($rfx->getSection('neutral'));
                     $finalData[$type][$section][$title]['Date']
-                        = $rfa->getEndDate();
+                        = $rfx->getEndDate();
                     $finalData[$type][$section][$title]['name']
                         = explode('/', $title)[1];
 
-                    unset($rfa);
+                    unset($rfx);
                 }
             }
         }
@@ -223,7 +211,7 @@ class RfXVoteCalculatorController extends Controller
         return $this->render(
             'rfxVoteCalculator/result.html.twig',
             [
-                'xtPage' => 'rfap',
+                'xtPage' => 'rfxvote',
                 'xtTitle' => $username,
                 'user' => $userData,
                 'project' => $projectData,
