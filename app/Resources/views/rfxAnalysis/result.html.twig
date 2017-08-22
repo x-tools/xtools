@@ -1,66 +1,107 @@
-{% extends "base.html.twig" %}
+{% extends 'base.html.twig' %}
+{% import 'macros/layout.html.twig' as layout %}
 {% import 'macros/wiki.html.twig' as wiki %}
 
 {% block body %}
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            <p class="xt-heading-top">
-                {{ wiki.pageLinkRaw(pagename, project, pagename) }}
-            </p>
+<div class="panel panel-primary">
+    <header class="panel-heading">
+        <div class="text-center xt-heading-top">
+            <a class="back-to-search" href="{{ path('rfa') }}">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                {{ msg('back') }}
+            </a>
+            {{ wiki.pageLink(page) }}
+            <small>
+                &bull;
+                {{ project.domain }}
+            </small>
         </div>
-        <div class="panel-body xt-panel-body-top">
-            <p>
-                {{ wiki.userLogLink(username, project, msg('block-log'), 'block') }}
+    </header>
+    <div class="panel-body xt-panel-body">
+        <p class="text-center xt-heading-subtitle">
+            {{ wiki.pageLogLinkRaw('User:' ~ user.username, project, msg('block-log'), 'block') }}
+            {% if enabled('ec') %}
                 &middot;
-                <a href="{{ path('EditCounterResult', {"project":project.DatabaseName, "username":username}) }}">{{ msg("tool-ec") }}</a>
-                {% if isWMFLabs() %}
-                    &middot;
-                <a href="https://tools.wmflabs.org/guc/?user={{ username }}">Global user contributions</a>
-                    &middot;
-                <a href="https://meta.wikimedia.org/w/index.php?title=Special%3ACentralAuth&amp;target={{ username }}">Global Account Manager</a>
-                    &middot;
-                <a href="https://tools.wmflabs.org/pageviews/?project=en.wikipedia.org&amp;pages=User:{{ username }}">Userpage pageviews</a>
-                {% endif %}
-            </p>
+                <a href="{{ path('EditCounterResult', {'project':project.domain, 'username':user.username}) }}">{{ msg('tool-ec') }}</a>
+            {% endif %}
+            {% if isWMFLabs() %}
+                &middot;
+                <a href="//tools.wmflabs.org/guc/?user={{ user.username }}" target="_blank">{{ msg('global-contribs') }}</a>
+            {% endif %}
+            {% if not(isSingleWiki()) %}
+                &middot;
+                {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, msg('sul-info')) }}
+            {% endif %}
+            {% if isWMFLabs() %}
+                &middot;
+                <a target="_blank" href="//tools.wmflabs.org/pageviews/?project={{ project.domain }}&amp;pages=User:{{ user.username }}">{{ msg('pageviews-userpage') }}</a>
+            {% endif %}
+        </p>
 
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h4 class="topcaption">{{ msg("general-stats") }}<span class="showhide" onclick="switchShow( 'generalstats', this )">[hide]</span></h4>
-                </div>
-                <div class="panel-body" id="generalstats">
-                    {{ wiki.userLink(username, project) }}'s {{ type|upper }} ({{ support|length }}/{{ oppose|length }}/{{ neutral|length }}, {{ percent }}%)
-                    <br />
-                    {{ msg("end") }}: {{ enddate }}
-                    <br />
-                    {{ msg("rfx-duplicates", [duplicates|length]) }}
-                        <div class="container">
-                                <h3>{{ msg("support") }}</h3>
-                                <ol>
-                                    {% for username in support %}
-                                        <li>
-                                            {{ wiki.userLink(username, project) }}
-                                            {% if username in duplicates %}
-                                                <span class="text-danger">({{ msg("duplicate-vote") }})</span>
-                                            {% endif %}
-                                        </li>
-                                    {% endfor %}
-                                </ol>
-                                <h3>{{ msg("oppose") }}</h3>
-                                <ol>
-                                    {% for username in oppose %}
-                                        <li>{{ wiki.userLink(username, project) }}</li>
-                                    {% endfor %}
-                                </ol>
-                                <h3>{{ msg("neutral") }}</h3>
-                                <ol>
-                                    {% for username in neutral %}
-                                        <li>{{ wiki.userLink(username, project) }}</li>
-                                    {% endfor %}
-                                </ol>
-                                </ol>
-                        </div>
-                </div>
+        {% set content %}
+            <div class="col-lg-6 stat-list clearfix">
+                <table class="table"><tbody>
+                    <tr>
+                        <td>{{ msg('user') }}</td>
+                        <td>{{ wiki.userLink(user, project) }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('type') }}</td>
+                        <td>{{ type|upper }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('rfx-tally') }}</td>
+                        <td>
+                            {{ support|length }}/{{ oppose|length }}/{{ neutral|length }}
+                            ({{ support|length|percent_format(support|length + oppose|length + neutral|length) }})
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('end') }}</td>
+                        <td>{{ enddate }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('rfx-duplicates') }}</td>
+                        <td>
+                            {{ duplicates|length|number_format }}
+                        </td>
+                    </tr>
+                </tbody></table>
             </div>
-        </div>
+        {% endset %}
+        {{ layout.content_block('summary', content) }}
+
+        {% set content %}
+            <ol>
+                {% for username in support %}
+                    <li>
+                        {{ wiki.userLink(username, project) }}
+                        {% if username in duplicates %}
+                            <span class="text-danger">({{ msg("duplicate-vote")|lower }})</span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ol>
+        {% endset %}
+        {{ layout.content_block('support', content) }}
+
+        {% set content %}
+            <ol>
+                {% for username in oppose %}
+                    <li>{{ wiki.userLink(username, project) }}</li>
+                {% endfor %}
+            </ol>
+        {% endset %}
+        {{ layout.content_block('oppose', content) }}
+
+        {% set content %}
+            <ol>
+                {% for username in neutral %}
+                    <li>{{ wiki.userLink(username, project) }}</li>
+                {% endfor %}
+            </ol>
+        {% endset %}
+        {{ layout.content_block('neutral', content) }}
     </div>
+</div>
 {% endblock %}

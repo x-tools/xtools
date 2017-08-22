@@ -1,12 +1,6 @@
 <?php
 /**
  * This file contains the code that powers the RfX Analysis page of xTools.
- *
- * @category RfXAnalysis
- * @package  AppBundle\Controller
- * @author   XTools Team <xtools@lists.wikimedia.org>
- * @license  GPL 3.0
- * @link     http://xtools.wmflabs.org/rfa
  */
 
 namespace AppBundle\Controller;
@@ -16,14 +10,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Xtools\ProjectRepository;
+use Xtools\Page;
+use Xtools\PagesRepository;
+use Xtools\UserRepository;
 use Xtools\RFA;
 
 /**
- * Class RfXAnalysisController
- *
- * @category RfXAnalysis
- * @package  AppBundle\Controller
- * @license  GPL 3.0
+ * This controller handles the RfX Analysis tool.
  */
 class RfXAnalysisController extends Controller
 {
@@ -41,9 +34,9 @@ class RfXAnalysisController extends Controller
     /**
      * Renders the index page for the RfX Tool
      *
-     * @param \Symfony\Component\HttpFoundation\Request $request Given by Symfony
-     * @param string                                    $project Optional project.
-     * @param string                                    $type    Optional RfX type
+     * @param Request $request Given by Symfony
+     * @param string  $project Optional project.
+     * @param string  $type    Optional RfX type
      *
      * @Route("/rfa",                  name="rfxAnalysis")
      * @Route("/rfa",                  name="rfa")
@@ -51,7 +44,7 @@ class RfXAnalysisController extends Controller
      * @Route("/rfa/{project}",        name="rfxAnalysisProject")
      * @Route("/rfa/{project}/{type}", name="rfxAnalysisProjectType")
      *
-     * @return \Symfony\Component\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return Response|RedirectResponse
      */
     public function indexAction(Request $request, $project = null, $type = null)
     {
@@ -116,7 +109,7 @@ class RfXAnalysisController extends Controller
      *
      * @Route("/rfa/{project}/{type}/{username}", name="rfxAnalysisResult")
      *
-     * @return \Symfony\Component\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return Response|RedirectResponse
      */
     public function resultAction($project, $type, $username)
     {
@@ -131,7 +124,6 @@ class RfXAnalysisController extends Controller
 
         $db = $projectData->getDatabaseName();
         $domain = $projectData->getDomain();
-        $wikiUrl = $projectData->getUrl();
 
         if ($this->getParameter("rfa")[$domain] === null) {
             $this->addFlash("notice", ["invalid-project-cant-use", $project]);
@@ -145,7 +137,13 @@ class RfXAnalysisController extends Controller
             $pagename = $this->getParameter("rfa")[$domain]["pages"][$type];
         }
 
-        $pagename .= "/$username";
+        $user = UserRepository::getUser($username, $this->container);
+
+        $pagename .= '/'.$user->getUsername();
+        $page = new Page($projectData, $pagename);
+        $pageRepo = new PagesRepository();
+        $pageRepo->setContainer($this->container);
+        $page->setRepository($pageRepo);
 
         $text = $api->getPageText($project, $pagename);
 
@@ -181,32 +179,22 @@ class RfXAnalysisController extends Controller
 
         $end = $rfa->getEndDate();
 
-        $percent = (sizeof($support) /
-            (sizeof($support) + sizeof($oppose) + sizeof($neutral)));
-
-        $percent = $percent * 100;
-
-        $percent = round($percent, 2);
-
         // replace this example code with whatever you need
         return $this->render(
             'rfxAnalysis/result.html.twig',
-            array(
-                "xtTitle" => $username,
-                'xtPage' => "rfa",
-                'url' => $wikiUrl,
-                'username' => $username,
-                'type' => $type,
+            [
+                'xtTitle' => $user->getUsername(),
+                'xtPage' => 'rfa',
                 'project' => $projectData,
+                'user' => $user,
+                'page' => $page,
+                'type' => $type,
                 'support' => $support,
                 'oppose' => $oppose,
                 'neutral' => $neutral,
                 'duplicates' => $dup,
                 'enddate' => $end,
-                'percent' => $percent,
-                'pagename' => $pagename,
-
-            )
+            ]
         );
     }
 }
