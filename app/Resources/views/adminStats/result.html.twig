@@ -26,7 +26,7 @@
                 <table class="table"><tbody>
                     <tr>
                         <td>{{ msg('start') }}</td>
-                        <td>{{ start_date }} ({{ days }} {{ msg('num-days', [days|number_format]) }})</td>
+                        <td>{{ start_date }} ({{ days|number_format }} {{ msg('num-days', [days]) }})</td>
                     </tr>
                     <tr>
                         <td>{{ msg('log-types') }}</td>
