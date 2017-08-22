@@ -48,7 +48,7 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Get counts of revisions: deleted, not-deleted, and total.
+     * Get counts of revisions: deleted, not-deleted, total, and edit summary usage.
      */
     public function testLiveAndDeletedEdits()
     {
@@ -57,12 +57,15 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
             ->willReturn([
                 'deleted' => 10,
                 'live' => 100,
+                'with_comments' => 75,
             ]);
 
         $this->assertEquals(100, $this->editCounter->countLiveRevisions());
         $this->assertEquals(10, $this->editCounter->countDeletedRevisions());
         $this->assertEquals(110, $this->editCounter->countAllRevisions());
         $this->assertEquals(100, $this->editCounter->countLast5000());
+        $this->assertEquals(75, $this->editCounter->countRevisionsWithComments());
+        $this->assertEquals(25, $this->editCounter->countRevisionsWithoutComments());
     }
 
     /**

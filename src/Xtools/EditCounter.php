@@ -148,7 +148,7 @@ class EditCounter extends Model
     }
 
     /**
-     * Get the total number of revisions with comments.
+     * Get the total number of live revisions with comments.
      * @return int
      */
     public function countRevisionsWithComments()
@@ -158,12 +158,12 @@ class EditCounter extends Model
     }
 
     /**
-     * Get the total number of revisions without comments.
+     * Get the total number of live revisions without comments.
      * @return int
      */
     public function countRevisionsWithoutComments()
     {
-        return $this->countAllRevisions() - $this->countRevisionsWithComments();
+        return $this->countLiveRevisions() - $this->countRevisionsWithComments();
     }
 
     /**
