@@ -1,0 +1,12 @@
+{
+  "name": "XTools",
+  "description": "A suite of tools to analyze article, user and project data of MediaWiki websites",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/x-tools/xtools.git"
+  },
+  "devDependencies": {
+    "uglify-es": "^3.0.27"
+  }
+}
