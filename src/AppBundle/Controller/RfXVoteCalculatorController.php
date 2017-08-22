@@ -140,6 +140,13 @@ class RfXVoteCalculatorController extends Controller
             }
         }
 
+        /**
+         * Contains the total number of !votes the user made, keyed by the RfX
+         * type and then the vote type.
+         * @var array
+         */
+        $totals = [];
+
         foreach ($pageTypes as $type) {
             $type = explode(':', $type, 2)[1];
 
@@ -187,10 +194,24 @@ class RfXVoteCalculatorController extends Controller
                         $username
                     );
                     $section = $rfx->getUserSectionFound();
+
                     if ($section == '') {
                         // Skip over ones where the user didn't !vote.
                         continue;
                     }
+
+                    if (!isset($totals[$type])) {
+                        $totals[$type] = [];
+                    }
+                    if (!isset($totals[$type][$section])) {
+                        $totals[$type][$section] = 0;
+                    }
+                    if (!isset($totals[$type]['total'])) {
+                        $totals[$type]['total'] = 0;
+                    }
+                    $totals[$type][$section] += 1;
+                    $totals[$type]['total'] += 1;
+
                     // Todo: i18n-ize this
                     $finalData[$type][$section][$title]['Support']
                         = sizeof($rfx->getSection('support'));
@@ -216,6 +237,7 @@ class RfXVoteCalculatorController extends Controller
                 'user' => $userData,
                 'project' => $projectData,
                 'data'=> $finalData,
+                'totals' => $totals,
             ]
         );
     }

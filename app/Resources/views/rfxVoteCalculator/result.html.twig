@@ -49,20 +49,19 @@
                         </tr>
                         <tr>
                             <td>{{ msg('rfx-total-votes') }}</td>
-                            <td></td>
+                            <td>
+                                {{ totals[type].total|number_format }}
+                            </td>
                         </tr>
-                        <tr>
-                            <td>{{ msg('support') }}</td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>{{ msg('oppose') }}</td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>{{ msg('neutral') }}</td>
-                            <td></td>
-                        </tr>
+                        {% for voteType in data[type]|keys %}
+                            {% set count = totals[type][voteType] is defined ? totals[type][voteType]|number_format : 0 %}
+                            <tr>
+                                <td>{{ msg(voteType) }}</td>
+                                <td>
+                                    {{ count }} ({{ count|percent_format(totals[type].total) }})
+                                </td>
+                            </tr>
+                        {% endfor %}
                     </tbody></table>
                 </div>
 
@@ -90,6 +89,7 @@
                                 <td class="sort-entry--date linked" data-value="{{ parsedData.Date }}">
                                     {{ parsedData.Date }}
                                 </td>
+                                {# FIXME: assume support/oppose/neutral sections #}
                                 {% set tally = parsedData.Support + parsedData.Oppose + parsedData.Neutral %}
                                 <td class="sort-entry--rfx-tally linked" data-value="{{ tally }}">
                                     <span class="text-success">{{ parsedData.Support }}</span> /

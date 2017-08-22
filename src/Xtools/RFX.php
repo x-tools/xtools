@@ -113,7 +113,7 @@ class RFX
                 }
                 $foundUser = trim($matches[1][0][0]);
                 $this->data[$lastSection][] = $foundUser;
-                if (strtolower($foundUser) == strtolower($this->userLookingFor)) {
+                if (strtolower($foundUser) === strtolower($this->userLookingFor)) {
                     $this->userSectionFound = $lastSection;
                 }
             }
