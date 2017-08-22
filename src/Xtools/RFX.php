@@ -98,7 +98,7 @@ class RFX
                 $lastSection = strtolower($matches[1]);
             } elseif ($lastSection == ""
                 && preg_match(
-                    "/$dateRegexp/",
+                    "/$dateRegexp/i",
                     $line,
                     $matches
                 )

@@ -50,10 +50,24 @@
                         <td>{{ type|upper }}</td>
                     </tr>
                     <tr>
-                        <td>{{ msg('rfx-tally') }}</td>
+                        <td>{{ msg('support') }}</td>
                         <td>
-                            {{ support|length }}/{{ oppose|length }}/{{ neutral|length }}
-                            ({{ support|length|percent_format(support|length + oppose|length + neutral|length) }})
+                            {{ support|length }}
+                            ({{ support|length|percent_format(total) }})
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('oppose') }}</td>
+                        <td>
+                            {{ oppose|length }}
+                            ({{ oppose|length|percent_format(total) }})
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('neutral') }}</td>
+                        <td>
+                            {{ neutral|length }}
+                            ({{ neutral|length|percent_format(total) }})
                         </td>
                     </tr>
                     <tr>

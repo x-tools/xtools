@@ -92,9 +92,9 @@
                                 </td>
                                 {% set tally = parsedData.Support + parsedData.Oppose + parsedData.Neutral %}
                                 <td class="sort-entry--rfx-tally linked" data-value="{{ tally }}">
-                                    (<span class="text-success">{{ parsedData.Support }}</span>,
-                                    <span class="text-danger">{{ parsedData.Oppose }}</span>,
-                                    <span class="text-muted">{{ parsedData.Neutral }}</span>)
+                                    <span class="text-success">{{ parsedData.Support }}</span> /
+                                    <span class="text-danger">{{ parsedData.Oppose }}</span> /
+                                    <span class="text-muted">{{ parsedData.Neutral }}</span>
                                 </td>
                                 <td class="sort-entry--user" data-value="{{ parsedData.name }}">
                                     {{ wiki.pageLinkRaw(pagename, project, parsedData.name) }}

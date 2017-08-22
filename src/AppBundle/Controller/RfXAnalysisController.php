@@ -166,7 +166,9 @@ class RfXAnalysisController extends Controller
         $neutral = $rfx->getSection('neutral');
         $dup = $rfx->getDuplicates();
 
-        if ((sizeof($support) + sizeof($oppose) + sizeof($neutral)) == 0) {
+        $total = count($support) + count($oppose) + count($neutral);
+
+        if ($total === 0) {
             $this->addFlash('notice', ['no-result', $pagename]);
             return $this->redirectToRoute(
                 'rfxAnalysisProject',
@@ -191,6 +193,7 @@ class RfXAnalysisController extends Controller
                 'support' => $support,
                 'oppose' => $oppose,
                 'neutral' => $neutral,
+                'total' => $total,
                 'duplicates' => $dup,
                 'enddate' => $end,
             ]

@@ -28,4 +28,4 @@ parameters:
       excluded_regex:
         - "Requests_for_adminship/Nomination_cabal"
         - "Requests_for_adminship/%/"
-      date_regexp: "final .*end(?:ing|ed)?(?: no earlier than)? (.*?)? \\(UTC\\)"
+      date_regexp: "(?:Final|Closed|Scheduled to end).*?(\\d+:\\d+,? \\d+ \\w+ \\d{4}) \\(UTC\\)"
