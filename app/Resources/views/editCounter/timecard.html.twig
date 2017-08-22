@@ -50,7 +50,17 @@
         });
     {% endfor %}
 
-    {% for data in ec.timeCard %}
+    {##
+     # Here we find the max value for midnight (leftmost column),
+     # which we can then use to fine-tune the offset of the bubbles
+     # to ensure they don't overlap the labels. This isn't 100%
+     # fool-proof but it does help.
+     #}
+    {% set maxMidnight = 0 %}
+    {% for data in ec.timeCard if data.x != 24 %}
+        {% if data.x == 0 and data.r > maxMidnight %}
+            {% set maxMidnight = maxMidnight + data.r %}
+        {% endif %}
         {% set datasetIndex = data.y - 1 %}
         var entry = {{ data|json_encode|raw }};
         entry.r = entry.r / 2;
@@ -71,6 +81,7 @@
                     ticks: {
                         min: 0,
                         max: 8,
+                        padding: {{ maxMidnight }} * 0.4,
                         callback: function(value, index, values) {
                             return days[index];
                         }
@@ -78,10 +89,14 @@
                 }],
                 xAxes: [{
                     ticks: {
+                        beginAtZero: true,
                         min: 0,
-                        max: 24,
+                        max: 23,
+                        stepSize: 2,
                         callback: function(value, index, values) {
-                            return value + ":00"
+                            if (value % 2 === 0) {
+                                return value + ":00";
+                            }
                         }
                     }
                 }]
