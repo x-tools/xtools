@@ -24,11 +24,11 @@
             {{ wiki.pageLogLinkRaw('User:' ~ user.username, project, msg('block-log'), 'block') }}
             {% if enabled('ec') %}
                 &middot;
-                <a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool-ec') }}</a>
+                <a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}">{{ msg('tool-ec') }}</a>
             {% endif %}
             {% if isWMFLabs() %}
                 &middot;
-                <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ user.username }}" >{{ msg('global-contribs') }}</a>
+                <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ user.username }}">{{ msg('global-contribs') }}</a>
                 &middot;
                 <a target="_blank" href="//tools.wmflabs.org/pageviews/?project={{ project.domain }}&amp;pages=User:{{ user.username }}">{{ msg('pageviews-userpage') }}</a>
             {% endif %}
