@@ -474,11 +474,11 @@ class AppExtension extends Extension
      */
     public function link($path = "/")
     {
-        $base_path = $this->container->getParameter("app.base_path");
+        $basePath = $this->container->getParameter("app.base_path");
         $retVal = $path;
 
-        if (isset($base_path)) {
-            $retVal = "$base_path/$path";
+        if (isset($basePath)) {
+            $retVal = "$basePath/$path";
         }
 
         $retVal = str_replace("//", "/", $retVal);

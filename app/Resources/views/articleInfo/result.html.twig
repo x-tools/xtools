@@ -237,11 +237,12 @@
                         <td>{{ msg('links-external') }}</td>
                         <td>{{ links_ext_count|number_format }}</td>
                     </tr>
-                    <tr>
-                        <td>{{ msg('page-watchers') }}</td>
-                        <td>{{ page.watchers is defined ? page.watchers : '< 30' }}</td>
-                    </tr>
-                    </tr>
+                    {% if page.watchers is not empty %}
+                        <tr>
+                            <td>{{ msg('page-watchers') }}</td>
+                            <td>{{ page.watchers is not empty }}</td>
+                        </tr>
+                    {% endif %}
                     {% if isWMFLabs() %}
                     <tr>
                         <td>{{ msg('pageviews') }} (60 {{ msg('num-days', [60]) }})</td>

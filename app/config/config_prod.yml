@@ -27,5 +27,6 @@ monolog:
             type:  console
 
 assetic:
+    node: /usr/bin/nodejs
     bundles:
       - AppBundle

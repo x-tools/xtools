@@ -402,7 +402,7 @@ class PagesRepository extends Repository
 
         $params = [
             'id' => $page->getId(),
-            'title' => str_replace(' ', '_', $page->getTitle()),
+            'title' => str_replace(' ', '_', $page->getTitleWithoutNamespace()),
             'namespace' => $page->getNamespace(),
         ];
 
@@ -438,7 +438,7 @@ class PagesRepository extends Repository
      */
     public function getPageviews($page, $start, $end)
     {
-        $title = rawurldecode(str_replace(' ', '_', $page->getTitle()));
+        $title = rawurlencode(str_replace(' ', '_', $page->getTitle()));
         $client = new GuzzleHttp\Client();
 
         if ($start instanceof DateTime) {

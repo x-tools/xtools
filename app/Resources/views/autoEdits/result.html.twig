@@ -100,7 +100,7 @@
         {% set content %}
             <table class="table table-bordered table-hover table-striped tools-table toggle-table">
                 <thead>
-                {% for key in ['tool', 'count'] %}
+                {% for key in ['tool', 'count', 'percent-of-tools', 'percent-of-editcount'] %}
                     <th>
                         <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
                             {{ msg(key)|capitalize_first }}
@@ -110,9 +110,7 @@
                 {% endfor %}
                 </thead>
                 <tbody>
-                {% set toolsTotal = 0 %}
                 {% for tool, values in toolCounts %}
-                    {% set toolsTotal = toolsTotal + values.count %}
                     <tr>
                         <td class="sort-entry--tool linked" data-value="{{ tool }}">
                             <span class="tools-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ tool }}">
@@ -123,6 +121,12 @@
                         </td>
                         <td class="sort-entry--count" data-value="{{ values.count }}">
                             {{ values.count|number_format(0, ".", ",") }}
+                        </td>
+                        <td class="sort-entry--percent-of-tools" data-value="{{ values.count }}">
+                            {{ values.count|percent_format(toolsTotal) }}
+                        </td>
+                        <td class="sort-entry--percent-of-editcount" data-value="{{ values.count }}">
+                            {{ values.count|percent_format(editCount) }}
                         </td>
                     </tr>
                 {% endfor %}
@@ -135,6 +139,7 @@
                     <th class="tools--count">
                         {{ toolsTotal|number_format }}
                     </th>
+                    <th colspan=2></th>
                 </tfoot>
             </table>
 
@@ -148,33 +153,34 @@
             {% endfor %}
 
             <script>
-                $(function () {
-                    window.toolsChart = new Chart($('#tool_chart'), {
-                        type: 'pie',
-                        data: {
-                            labels: {{ toolCounts|keys|json_encode()|raw }},
-                            datasets: [{
-                                data: [
-                                    {% for tool, values in toolCounts %}
-                                        {{ values.count }}{% if not loop.last %},{% endif %}
-                                    {% endfor %}
-                                ],
-                                backgroundColor: {{ colors|json_encode()|raw }},
-                                borderColor: {{ colors|json_encode()|raw }},
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            legend: {
-                              display: false,
-                            }
+                window.toolsChart = new Chart($('#tool_chart'), {
+                    type: 'pie',
+                    data: {
+                        labels: {{ toolCounts|keys|json_encode()|raw }},
+                        datasets: [{
+                            data: [
+                                {% for tool, values in toolCounts %}
+                                    {{ values.count }}{% if not loop.last %},{% endif %}
+                                {% endfor %}
+                            ],
+                            backgroundColor: {{ colors|json_encode()|raw }},
+                            borderColor: {{ colors|json_encode()|raw }},
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        legend: {
+                          display: false,
                         }
-                    });
-                    window.countsByTool = {{ toolCounts|json_encode()|raw }};
+                    }
                 });
+                window.countsByTool = {{ toolCounts|json_encode()|raw }};
             </script>
             <p style="clear:both">
-                <a target="_blank" href="https://phabricator.wikimedia.org/maniphest/task/create/?title=Request to add tool to AutoEdits&amp;projects=XTools&amp;description=Project: {{ project.domain }}%0A%0AName of tool:%0A%0ALinks to example edits:%0A%0ALink to the tool's documentation or homepage:">{{ msg('auto-edits-request') }}</a>
+                <a target="_blank" href="https://phabricator.wikimedia.org/maniphest/task/create/?title=Request to add tool to AutoEdits&amp;projects=XTools&amp;description=Project: {{ project.domain }}%0A%0AName of tool:%0A%0ALinks to example edits:%0A%0ALink to the tool's documentation or homepage:">
+                    {{ msg('auto-edits-request') }}
+                    <span class="glyphicon glyphicon-new-window"></span>
+                </a>
             </p>
         {% endset %}
         {{ layout.content_block('auto-edits', content) }}

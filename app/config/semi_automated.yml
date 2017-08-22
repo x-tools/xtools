@@ -31,6 +31,9 @@ parameters:
             regex: 'WP:CLEANER|\[\[\Wikipedia:DPL|\[\[WP:WCW\]\] project \('
             tag: WPCleaner
             link: Project:WPCleaner
+        IABot:
+            tag: 'OAuth CID: 678'
+            link: User:InternetArchiveBot
 
     # Per-wiki lists
     en.wikipedia.org:
@@ -208,3 +211,6 @@ parameters:
         OABot:
             tag: 'OAuth CID: 817'
             link: Project:OABOT
+        XFDCloser:
+            regex: '\[\[WP:XFDC\|XFDcloser'
+            link: User:Evad37/XFDcloser.js

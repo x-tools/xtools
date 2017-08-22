@@ -58,6 +58,18 @@ class Page extends Model
     }
 
     /**
+     * Get the page's title without the namespace.
+     * @return string
+     */
+    public function getTitleWithoutNamespace()
+    {
+        $info = $this->getPageInfo();
+        $title = isset($info['title']) ? $info['title'] : $this->unnormalizedPageName;
+        $nsName = $this->getNamespaceName();
+        return str_replace($nsName . ':', '', $title);
+    }
+
+    /**
      * Get this page's database ID.
      * @return int
      */
@@ -109,6 +121,18 @@ class Page extends Model
     {
         $info = $this->getPageInfo();
         return isset($info['ns']) ? $info['ns'] : null;
+    }
+
+    /**
+     * Get the name of the namespace of this page.
+     * @return string
+     */
+    public function getNamespaceName()
+    {
+        $info = $this->getPageInfo();
+        return isset($info['ns'])
+            ? $this->getProject()->getNamespaces()[$info['ns']]
+            : null;
     }
 
     /**

@@ -41,7 +41,9 @@ framework:
         save_path:   "%kernel.root_dir%/../var/sessions/%kernel.environment%"
     fragments:       ~
     http_method_override: true
-    assets: ~
+    assets:
+        version: '1'
+        version_format: '%%s?v=%%s'
     cache:
         app: "cache.adapter.%cache.adapter%"
         default_redis_provider: snc_redis.default
@@ -138,6 +140,8 @@ assetic:
         scssphp:
             formatter: 'Leafo\ScssPhp\Formatter\Compressed'
             apply_to:  '\.scss$'
+        uglifyjs:
+            bin: '%kernel.root_dir%/Resources/node_modules/uglify-es/bin/uglifyjs'
 
 # Nelmio CORS Configuration
 nelmio_cors:

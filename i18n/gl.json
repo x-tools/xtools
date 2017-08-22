@@ -1,5 +1,13 @@
 {
-	"@metadata": [],
+	"@metadata": {
+		"authors": [
+			"Elisardojm"
+		]
+	},
+	"about-xtools": "Sobre estas ferramentas",
+	"accepted-formats": "Formatos aceptados",
+	"accounts": "Contas",
+	"accounts-created": "Contas creadas",
 	"actions": "Accións",
 	"added": "Engadido",
 	"all": "todos",
@@ -188,5 +196,6 @@
 	"wiki": "Wiki",
 	"with-summary": "con resumo",
 	"xtools-title": "Ferramentas X!",
+	"year": "Ano",
 	"year-counts": "Contador de ano"
 }

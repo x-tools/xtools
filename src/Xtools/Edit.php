@@ -31,7 +31,7 @@ class Edit extends Model
     protected $length;
 
     /** @var int|string|null The diff size of this edit */
-    protected $length_change;
+    protected $lengthChange;
 
     /** @var User - User object of who made the edit */
     protected $user;
@@ -63,7 +63,7 @@ class Edit extends Model
         // NOTE: Do not type cast into an integer. Null values are
         //   our indication that the revision was revision-deleted.
         $this->length = $attrs['length'];
-        $this->length_change = $attrs['length_change'];
+        $this->lengthChange = $attrs['length_change'];
 
         $this->user = new User($attrs['username']);
         $this->comment = $attrs['comment'];
@@ -148,7 +148,7 @@ class Edit extends Model
      */
     public function getSize()
     {
-        return $this->length_change;
+        return $this->lengthChange;
     }
 
     /**

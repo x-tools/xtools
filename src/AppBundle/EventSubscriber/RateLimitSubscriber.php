@@ -67,8 +67,14 @@ class RateLimitSubscriber implements EventSubscriberInterface
         $controller = $event->getController();
         $loggedIn = (bool) $this->container->get('session')->get('logged_in_user');
 
-        // No rate limits on index pages or if they are logged in.
-        if ($controller[1] === 'indexAction' || $loggedIn) {
+        /**
+         * Rate limiting will not apply to these actions
+         * @var array
+         */
+        $actionWhitelist = ['indexAction', 'showAction', 'aboutAction'];
+
+        // No rate limits on lightweight pages or if they are logged in.
+        if (in_array($controller[1], $actionWhitelist) || $loggedIn) {
             return;
         }
 

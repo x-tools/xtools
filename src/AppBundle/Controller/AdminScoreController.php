@@ -95,20 +95,22 @@ class AdminScoreController extends Controller
         $archiveTable = $projectRepo->getTableName($dbName, 'archive');
 
         // MULTIPLIERS (to review)
-        $ACCT_AGE_MULT = 1.25;   # 0 if = 365 jours
-        $EDIT_COUNT_MULT = 1.25;     # 0 if = 10 000
-        $USER_PAGE_MULT = 0.1;     # 0 if =
-        $PATROLS_MULT = 1; # 0 if =
-        $BLOCKS_MULT = 1.4;     # 0 if = 10
-        $AFD_MULT = 1.15;
-        $RECENT_ACTIVITY_MULT = 0.9;     # 0 if =
-        $AIV_MULT = 1.15;
-        $EDIT_SUMMARIES_MULT = 0.8;   # 0 if =
-        $NAMESPACES_MULT = 1.0;     # 0 if =
-        $PAGES_CREATED_LIVE_MULT = 1.4; # 0 if =
-        $PAGES_CREATED_ARCHIVE_MULT = 1.4; # 0 if =
-        $RPP_MULT = 1.15;     # 0 if =
-        $USERRIGHTS_MULT = 0.75;   # 0 if =
+        $multipliers = [
+            'account-age-mult' => 1.25,             # 0 if = 365 jours
+            'edit-count-mult' => 1.25,              # 0 if = 10 000
+            'user-page-mult' => 0.1,                # 0 if =
+            'patrols-mult' => 1,                    # 0 if =
+            'blocks-mult' => 1.4,                   # 0 if = 10
+            'afd-mult' => 1.15,
+            'recent-activity-mult' => 0.9,          # 0 if =
+            'aiv-mult' => 1.15,
+            'edit-summaries-mult' => 0.8,           # 0 if =
+            'namespaces-mult' => 1.0,               # 0 if =
+            'pages-created-live-mult' => 1.4,       # 0 if =
+            'pages-created-deleted-mult' => 1.4,    # 0 if =
+            'rpp-mult' => 1.15,                     # 0 if =
+            'user-rights-mult' => 0.75,             # 0 if =
+        ];
 
         // Grab the connection to the replica database (which is separate from the above)
         $conn = $this->get('doctrine')->getManager("replicas")->getConnection();
@@ -119,55 +121,55 @@ class AdminScoreController extends Controller
             WHERE user_name = :username
         UNION
         SELECT 'account-age' AS source, user_registration AS value FROM $userTable
-            WHERE user_name=:username
+            WHERE user_name = :username
         UNION
         SELECT 'edit-count' AS source, user_editcount AS value FROM $userTable
-            WHERE user_name=:username
+            WHERE user_name = :username
         UNION
         SELECT 'user-page' AS source, page_len AS value FROM $pageTable
-            WHERE page_namespace=2 AND page_title=:username
+            WHERE page_namespace = 2 AND page_title = :username
         UNION
         SELECT 'patrols' AS source, COUNT(*) AS value FROM $loggingTable
-            WHERE log_type='patrol'
-                AND log_action='patrol'
-                AND log_namespace=0
-                AND log_deleted=0 AND log_user_text=:username
+            WHERE log_type = 'patrol'
+                AND log_action = 'patrol'
+                AND log_namespace = 0
+                AND log_deleted = 0 AND log_user_text = :username
         UNION
         SELECT 'blocks' AS source, COUNT(*) AS value FROM $loggingTable l
             INNER JOIN $userTable u ON l.log_user = u.user_id
-            WHERE l.log_type='block' AND l.log_action='block'
-            AND l.log_namespace=2 AND l.log_deleted=0 AND u.user_name=:username
+            WHERE l.log_type = 'block' AND l.log_action = 'block'
+            AND l.log_namespace = 2 AND l.log_deleted = 0 AND u.user_name = :username
         UNION
         SELECT 'afd' AS source, COUNT(*) AS value FROM $revisionTable r
-          INNER JOIN $pageTable p on p.page_id=r.rev_page
+          INNER JOIN $pageTable p on p.page_id = r.rev_page
             WHERE p.page_title LIKE 'Articles_for_deletion/%'
                 AND p.page_title NOT LIKE 'Articles_for_deletion/Log/%'
-                AND r.rev_user_text=:username
+                AND r.rev_user_text = :username
         UNION
         SELECT 'recent-activity' AS source, COUNT(*) AS value FROM $revisionTable
-            WHERE rev_user_text=:username AND rev_timestamp > (now()-INTERVAL 730 day) AND rev_timestamp < now()
+            WHERE rev_user_text = :username AND rev_timestamp > (now()-INTERVAL 730 day) AND rev_timestamp < now()
         UNION
         SELECT 'aiv' AS source, COUNT(*) AS value FROM $revisionTable r
-          INNER JOIN $pageTable p on p.page_id=r.rev_page
+          INNER JOIN $pageTable p on p.page_id = r.rev_page
             WHERE p.page_title LIKE 'Administrator_intervention_against_vandalism%'
-                AND r.rev_user_text=:username
+                AND r.rev_user_text = :username
         UNION
-        SELECT 'edit-summaries' AS source, COUNT(*) AS value FROM $revisionTable JOIN $pageTable ON rev_page=page_id
-            WHERE page_namespace=0 AND rev_user_text=:username
+        SELECT 'edit-summaries' AS source, COUNT(*) AS value FROM $revisionTable JOIN $pageTable ON rev_page = page_id
+            WHERE page_namespace = 0 AND rev_user_text = :username
         UNION
-        SELECT 'namespaces' AS source, count(*) AS value FROM $revisionTable JOIN $pageTable ON rev_page=page_id
-            WHERE rev_user_text=:username AND page_namespace=0
+        SELECT 'namespaces' AS source, count(*) AS value FROM $revisionTable JOIN $pageTable ON rev_page = page_id
+            WHERE rev_user_text = :username AND page_namespace = 0
         UNION
         SELECT 'pages-created-live' AS source, COUNT(*) AS value FROM $revisionTable
-            WHERE rev_user_text=:username AND rev_parent_id=0
+            WHERE rev_user_text = :username AND rev_parent_id = 0
         UNION
         SELECT 'pages-created-deleted' AS source, COUNT(*) AS value FROM $archiveTable
-            WHERE ar_user_text=:username AND ar_parent_id=0
+            WHERE ar_user_text = :username AND ar_parent_id = 0
         UNION
         SELECT 'rpp' AS source, COUNT(*) AS value FROM $revisionTable r
-          INNER JOIN $pageTable p on p.page_id=r.rev_page
+          INNER JOIN $pageTable p on p.page_id = r.rev_page
             WHERE p.page_title LIKE 'Requests_for_page_protection%'
-                AND r.rev_user_text=:username;
+                AND r.rev_user_text = :username;
         ");
 
         $user = UserRepository::getUser($username, $this->container);
@@ -187,19 +189,19 @@ class AdminScoreController extends Controller
             $key = $row["source"];
             $value = $row["value"];
 
-            if ($key == "acct_age") {
+            if ($key === "account-age") {
                 $now = new DateTime();
                 $date = new DateTime($value);
                 $diff = $date->diff($now);
-                $formula = 365*$diff->format("%y")+30*$diff->format("%m")+$diff->format("%d");
-                $value = $formula-365;
+                $formula = 365 * $diff->format("%y") + 30 * $diff->format("%m") + $diff->format("%d");
+                $value = $formula - 365;
             }
 
-            if ($key == "id") {
+            if ($key === "id") {
                 $id = $value;
             } else {
-                $multiplierKey = strtoupper($row["source"] . "_MULT");
-                $multiplier = ( isset($$multiplierKey) ? $$multiplierKey : 1 );
+                $multiplierKey = $row['source'] . '-mult';
+                $multiplier = isset($multipliers[$multiplierKey]) ? $multipliers[$multiplierKey] : 1;
                 $score = max(min($value * $multiplier, 100), -100);
                 $master[$key]["mult"] = $multiplier;
                 $master[$key]["value"] = $value;
@@ -210,7 +212,7 @@ class AdminScoreController extends Controller
 
         if ($id == 0) {
             $this->addFlash("notice", [ "no-result", $username ]);
-            return $this->redirectToRoute("AdminScore", [ "project"=>$project ]);
+            return $this->redirectToRoute("AdminScore", [ "project" => $project ]);
         }
 
         return $this->render('adminscore/result.html.twig', [
