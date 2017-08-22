@@ -59,25 +59,33 @@ class RfXVoteCalculatorController extends Controller
         $projectQuery = $request->query->get('project');
         $username = $request->query->get('username');
 
-        if ($projectQuery != "" && $username != "") {
-            $routeParams = [ 'project'=>$projectQuery, 'username' => $username ];
+        if ($projectQuery != '' && $username != '') {
+            $routeParams = [ 'project' => $projectQuery, 'username' => $username ];
             return $this->redirectToRoute(
-                "rfapResult",
+                'rfapResult',
                 $routeParams
             );
-        } elseif ($projectQuery != "") {
+        } elseif ($projectQuery != '') {
             return $this->redirectToRoute(
-                "rfapResult",
+                'rfapResult',
                 [
-                    'project'=>$projectQuery
+                    'project' => $projectQuery
                 ]
             );
         }
 
+        // Instantiate the project if we can, or use the default.
+        $project = (!empty($projectQuery))
+            ? ProjectRepository::getProject($projectQuery, $this->container)
+            : ProjectRepository::getDefaultProject($this->container);
+
         return $this->render(
             'rfxVoteCalculator/index.html.twig',
             [
-                "xtPage" => "rfap",
+                'xtPageTitle' => 'tool-rfap',
+                'xtSubtitle' => 'tool-rfap-desc',
+                'xtPage' => 'rfap',
+                'project' => $project,
             ]
         );
     }
@@ -94,9 +102,9 @@ class RfXVoteCalculatorController extends Controller
      */
     public function resultAction($project, $username)
     {
-        $api = $this->get("app.api_helper");
+        $api = $this->get('app.api_helper');
 
-        $conn = $this->getDoctrine()->getManager("replicas")->getConnection();
+        $conn = $this->getDoctrine()->getManager('replicas')->getConnection();
 
         $projectData = ProjectRepository::getProject($project, $this->container);
         $projectRepo = $projectData->getRepository();
@@ -104,75 +112,75 @@ class RfXVoteCalculatorController extends Controller
 
         $dbName = $projectData->getDatabaseName();
 
-        $rfaParam = $this->getParameter("rfa");
+        $rfaParam = $this->getParameter('rfa');
 
         if (!$projectData->exists() || $rfaParam == null) {
-            $this->addFlash("notice", ["invalid-project", $project]);
-            return $this->redirectToRoute("rfap");
+            $this->addFlash('notice', ['invalid-project', $project]);
+            return $this->redirectToRoute('rfap');
         }
 
         $namespaces = $projectData->getNamespaces();
 
         if (!isset($rfaParam[$projectData->getDomain()])) {
-            $this->addFlash("notice", ["invalid-project-cant-use", $project]);
-            return $this->redirectToRoute("rfap");
+            $this->addFlash('notice', ['invalid-project-cant-use', $project]);
+            return $this->redirectToRoute('rfap');
         }
 
-        $pageTypes = $rfaParam[$projectData->getDomain()]["pages"];
+        $pageTypes = $rfaParam[$projectData->getDomain()]['pages'];
         $namespace
-            = $rfaParam[$projectData->getDomain()]["rfa_namespace"] !== null
-            ? $rfaParam[$projectData->getDomain()]["rfa_namespace"] : 4;
+            = $rfaParam[$projectData->getDomain()]['rfa_namespace'] !== null
+            ? $rfaParam[$projectData->getDomain()]['rfa_namespace'] : 4;
 
         $finalData = [];
 
         // We should probably figure out a better way to do this...
-        $ignoredPages = "";
+        $ignoredPages = '';
 
-        if (isset($rfaParam[$projectData->getDomain()]["excluded_title"])) {
+        if (isset($rfaParam[$projectData->getDomain()]['excluded_title'])) {
             $titlesExcluded
-                = $rfaParam[$projectData->getDomain()]["excluded_title"];
+                = $rfaParam[$projectData->getDomain()]['excluded_title'];
             foreach ($titlesExcluded as $ignoredPage) {
                 $ignoredPages .= "AND p.page_title != \"$ignoredPage\"\r\n";
             }
         }
 
-        if (isset($rfaParam[$projectData->getDomain()]["excluded_regex"])) {
+        if (isset($rfaParam[$projectData->getDomain()]['excluded_regex'])) {
             $titlesExcluded
-                = $rfaParam[$projectData->getDomain()]["excluded_regex"];
+                = $rfaParam[$projectData->getDomain()]['excluded_regex'];
             foreach ($titlesExcluded as $ignoredPage) {
                 $ignoredPages .= "AND p.page_title NOT LIKE \"%$ignoredPage%\"\r\n";
             }
         }
 
         foreach ($pageTypes as $type) {
-            $type = explode(":", $type, 2)[1];
+            $type = explode(':', $type, 2)[1];
 
-            $type = str_replace(" ", "_", $type);
+            $type = str_replace(' ', '_', $type);
 
             $pageTable = $projectRepo->getTableName($dbName, 'page');
             $revisionTable
                 = $projectRepo->getTableName($dbName, 'revision');
 
-            $query = "SELECT DISTINCT p.page_namespace, p.page_title
-FROM $pageTable p
-RIGHT JOIN $revisionTable r on p.page_id=r.rev_page
-WHERE p.page_namespace=:namespace
-AND r.rev_user_text=:username
-And p.page_title LIKE \"$type/%\"
-AND p.page_title NOT LIKE \"%$type/$username%\"
-$ignoredPages";
+            $sql = "SELECT DISTINCT p.page_namespace, p.page_title
+                    FROM $pageTable p
+                    RIGHT JOIN $revisionTable r on p.page_id=r.rev_page
+                    WHERE p.page_namespace = :namespace
+                    AND r.rev_user_text = :username
+                    And p.page_title LIKE \"$type/%\"
+                    AND p.page_title NOT LIKE \"%$type/$username%\"
+                    $ignoredPages";
 
-            $sth = $conn->prepare($query);
-            $sth->bindParam("namespace", $namespace);
-            $sth->bindParam("username", $username);
+            $sth = $conn->prepare($sql);
+            $sth->bindParam('namespace', $namespace);
+            $sth->bindParam('username', $username);
 
             $sth->execute();
 
             $titles = [];
 
             while ($row = $sth->fetch()) {
-                $titles[] = $namespaces[$row["page_namespace"]] .
-                    ":" .$row["page_title"];
+                $titles[] = $namespaces[$row['page_namespace']] .
+                    ':' .$row['page_title'];
             }
 
             // Chunking... it's possible to make a URI too long
@@ -182,30 +190,30 @@ $ignoredPages";
                 $pageData = $api->getMassPageText($project, $titlesWorked);
 
                 foreach ($pageData as $title => $text) {
-                    $type = str_replace("_", " ", $type);
+                    $type = str_replace('_', ' ', $type);
                     $rfa = new RFA(
                         $text,
-                        $rfaParam[$projectData->getDomain()]["sections"],
+                        $rfaParam[$projectData->getDomain()]['sections'],
                         $namespaces[2],
-                        $rfaParam[$projectData->getDomain()]["date_regexp"],
+                        $rfaParam[$projectData->getDomain()]['date_regexp'],
                         $username
                     );
                     $section = $rfa->getUserSectionFound();
-                    if ($section == "") {
+                    if ($section == '') {
                         // Skip over ones where the user didn't !vote.
                         continue;
                     }
                     // Todo: i18n-ize this
-                    $finalData[$type][$section][$title]["Support"]
-                        = sizeof($rfa->getSection("support"));
-                    $finalData[$type][$section][$title]["Oppose"]
-                        = sizeof($rfa->getSection("oppose"));
-                    $finalData[$type][$section][$title]["Neutral"]
-                        = sizeof($rfa->getSection("neutral"));
-                    $finalData[$type][$section][$title]["Date"]
+                    $finalData[$type][$section][$title]['Support']
+                        = sizeof($rfa->getSection('support'));
+                    $finalData[$type][$section][$title]['Oppose']
+                        = sizeof($rfa->getSection('oppose'));
+                    $finalData[$type][$section][$title]['Neutral']
+                        = sizeof($rfa->getSection('neutral'));
+                    $finalData[$type][$section][$title]['Date']
                         = $rfa->getEndDate();
-                    $finalData[$type][$section][$title]["name"]
-                        = explode("/", $title)[1];
+                    $finalData[$type][$section][$title]['name']
+                        = explode('/', $title)[1];
 
                     unset($rfa);
                 }
@@ -215,11 +223,11 @@ $ignoredPages";
         return $this->render(
             'rfxVoteCalculator/result.html.twig',
             [
-                "xtPage" => "rfap",
-                "xtTitle" => $username,
-                "user" => $userData,
-                "project" => $projectData,
-                "data"=> $finalData
+                'xtPage' => 'rfap',
+                'xtTitle' => $username,
+                'user' => $userData,
+                'project' => $projectData,
+                'data'=> $finalData,
             ]
         );
     }

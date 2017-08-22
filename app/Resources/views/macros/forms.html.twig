@@ -35,18 +35,20 @@
 <div class="input-group form-row">
     <label class="input-group-addon form-label" for="user_input">
         {{ msg('username') }}
-        <div class="glyphicon glyphicon-info-sign tooltipcss pull-right">
-            <div class="tooltip-body">
-                {% if multiple %}
-                    <strong>{{ msg('multiple-users-allowed') }}:</strong>
-                    <br>e.g. <code>UserX|UserY|UserZ</code>
-                {% elseif noip %}
-                    {{ msg('username') }}
-                {% else %}
-                    {{ msg('username-or-ip') }}
-                {% endif %}
+        {% if multiple or noip == false %}
+            <div class="glyphicon glyphicon-info-sign tooltipcss pull-right">
+                <div class="tooltip-body">
+                    {% if multiple %}
+                        <strong>{{ msg('multiple-users-allowed') }}:</strong>
+                        <br>e.g. <code>UserX|UserY|UserZ</code>
+                    {% elseif noip %}
+                        {{ msg('username') }}
+                    {% else %}
+                        {{ msg('username-or-ip') }}
+                    {% endif %}
+                </div>
             </div>
-        </div>
+        {% endif %}
     </label>
     <input type="text" class="form-control" name="username"
            id="user_input"{% if required %} required{% endif %}

@@ -2,12 +2,10 @@
 {% import 'macros/forms.html.twig' as forms %}
 
 {% block body %}
-<div class="col-lg-12">
-    <form class="form-horizontal" style="width:80%; margin:0 auto" action="{{ path("rfa") }}" method="get" accept-charset="utf-8" >
+    <form class="col-lg-8 col-lg-offset-2" action="{{ path('rfa') }}" method="get" accept-charset="utf-8">
         <fieldset class="form-fieldset">
-
             <div class="input-group">
-                <span class="input-group-addon form-label">{{ msg("project") }}</span>
+                <span class="input-group-addon form-label">{{ msg('project') }}</span>
                 <select class="form-control" name="projecttype">
                     {% for project in available|keys %}
                         {% for type in available[project]|keys %}
@@ -17,10 +15,7 @@
                 </select>
             </div>
             {{ forms.user_input(true, false, null, true) }}
-
-            <br />
-            <input class="btn btn-large btn-primary" type="submit" value="Submit" />
         </fieldset>
+        {{ forms.submit_btn() }}
     </form>
-</div>
 {% endblock %}

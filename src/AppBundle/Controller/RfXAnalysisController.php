@@ -48,54 +48,55 @@ class RfXAnalysisController extends Controller
      */
     public function indexAction(Request $request, $project = null, $type = null)
     {
-        if ($request->get("projecttype")
-            && (strpos($request->get("projecttype"), "|") !== false)
+        if ($request->get('projecttype')
+            && (strpos($request->get('projecttype'), '|') !== false)
         ) {
-            $projectType = explode("|", $request->get("projecttype"), 2);
+            $projectType = explode('|', $request->get('projecttype'), 2);
             $projectQuery = $projectType[0];
             $typeQuery = $projectType[1];
         } else {
-            $projectQuery = $request->get("project");
-            $typeQuery = $request->get("type");
+            $projectQuery = $request->get('project');
+            $typeQuery = $request->get('type');
         }
 
-        $username = $request->get("username");
+        $username = $request->get('username');
 
-        if ($projectQuery != "" && $typeQuery != "" && $username != "") {
+        if ($projectQuery != '' && $typeQuery != '' && $username != '') {
             return $this->redirectToRoute(
-                "rfxAnalysisResult",
+                'rfxAnalysisResult',
                 [
-                    "project"=>$projectQuery,
-                    "type"=>$typeQuery,
-                    "username"=>$username
+                    'project' => $projectQuery,
+                    'type' => $typeQuery,
+                    'username' => $username
                 ]
             );
-        } elseif ($projectQuery != "" && $typeQuery != "") {
+        } elseif ($projectQuery != '' && $typeQuery != '') {
             return $this->redirectToRoute(
-                "rfxAnalysisProjectType",
+                'rfxAnalysisProjectType',
                 [
-                    "project"=>$projectQuery,
-                    "type"=>$typeQuery
+                    'project' => $projectQuery,
+                    'type' => $typeQuery
                 ]
             );
         }
 
-        $rfa = $this->getParameter("rfa");
+        $rfa = $this->getParameter('rfa');
 
         $projectFields = [];
 
         foreach (array_keys($rfa) as $row) {
-            $projectFields[$row] = $rfa[$row]["pages"];
+            $projectFields[$row] = $rfa[$row]['pages'];
         }
 
         // replace this example code with whatever you need
         return $this->render(
             'rfxAnalysis/index.html.twig',
             [
-                "xtPageTitle" => "tool-rfa",
-                'xtPage' => "rfa",
-                "project" => $projectQuery,
-                "available" => $projectFields,
+                'xtPageTitle' => 'tool-rfa',
+                'xtSubtitle' => 'tool-rfa-desc',
+                'xtPage' => 'rfa',
+                'project' => $projectQuery,
+                'available' => $projectFields,
             ]
         );
     }
@@ -113,8 +114,6 @@ class RfXAnalysisController extends Controller
      */
     public function resultAction($project, $type, $username)
     {
-        $api = $this->get("app.api_helper");
-
         $projectData = ProjectRepository::getProject($project, $this->container);
 
         if (!$projectData->exists()) {

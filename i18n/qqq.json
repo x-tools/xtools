@@ -250,6 +250,7 @@
 	"rfx-intro": "This sentence is followed by a list of wiki pages.",
 	"rfx-page": "Label for a wiki page used for voting.",
 	"rfx-tally": "Label for the tally count of votes in a RfX.",
+	"rfx-total-votes": "Label for number of votes a user has made to RfX pages.",
 	"rights": "Shortened column heading for the number of user rights changes an admin has made. This message should be brief.\n{{Identical|Rights}}",
 	"rpp": "Requests for page protection page label",
 	"saturday": "{{Identical|Saturday}}",
