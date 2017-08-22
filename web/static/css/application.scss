@@ -415,6 +415,10 @@ section > .panel-body {
     opacity: 0.8;
 }
 
+input.form-control.show-loader {
+    background: url("../images/loader.gif") no-repeat right center;
+}
+
 .stat-list {
     margin-bottom: 20px;
 

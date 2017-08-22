@@ -129,7 +129,7 @@ class ProjectRepository extends Repository
      *   to make database queries. More comprehensive metadata can be fetched
      *   with getMetadata() at the expense of an API call.
      * @param string $project A project URL, domain name, or database name.
-     * @return string[] With 'dbName', 'url' and 'lang' keys.
+     * @return string[]|bool With 'dbName', 'url' and 'lang' keys; or false if not found.
      */
     public function getOne($project)
     {
@@ -145,7 +145,9 @@ class ProjectRepository extends Repository
             foreach ($this->cache->getItem($this->cacheKeyAllProjects)->get() as $projMetadata) {
                 if ($projMetadata['dbName'] == "$project"
                     || $projMetadata['url'] == "$project"
-                    || $projMetadata['url'] == "https://$project") {
+                    || $projMetadata['url'] == "https://$project"
+                    || $projMetadata['url'] == "https://$project.org"
+                    || $projMetadata['url'] == "https://www.$project") {
                     $this->log->debug(__METHOD__ . " Using cached data for $project");
                     return $projMetadata;
                 }
@@ -165,11 +167,14 @@ class ProjectRepository extends Repository
             // so we need to query for it accordingly, trying different variations the user
             // might have inputted.
             ->orwhere($wikiQuery->expr()->like('url', ':projectUrl'))
-            ->orwhere($wikiQuery->expr()
-                ->like('url', ':projectUrl2'))
+            ->orwhere($wikiQuery->expr()->like('url', ':projectUrl2'))
+            ->orwhere($wikiQuery->expr()->like('url', ':projectUrl3'))
+            ->orwhere($wikiQuery->expr()->like('url', ':projectUrl4'))
             ->setParameter('project', $project)
             ->setParameter('projectUrl', "https://$project")
-            ->setParameter('projectUrl2', "https://$project.org");
+            ->setParameter('projectUrl2', "https://$project.org")
+            ->setParameter('projectUrl3', "https://www.$project")
+            ->setParameter('projectUrl4', "https://www.$project.org");
         $wikiStatement = $wikiQuery->execute();
 
         // Fetch and cache the wiki data.
