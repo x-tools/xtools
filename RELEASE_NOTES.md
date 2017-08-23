@@ -1,5 +1,23 @@
 # Release Notes #
 
+## 3.1.0 ##
+- T165709, T165710 Introduce "RfX Analysis" and "RfX Voter" tools, both of which
+  are functional but still a work in progress.
+- T172915 Fix the time since last edit in ArticleInfo API, and add date of
+  page creation
+- T172883 Improve display of bubbles within EditCounter timecard so that they
+  don't overlap the Y-axis labels
+- T173173 Fix edit summary charts in EditCounter
+- T172907 Minify and version assets in production
+- T173483 Fix "links to this page" and "redirects" in ArticleInfo
+- T173795 Fix i18n bug in AdminStats
+- T173497 Limit the size of page display titles to avoid disruption the layout
+- T173690 Add XfDCloser to list of enwiki's semi-automated tools
+- Add IABot to list of enwiki's semi-automated tools
+- Fix toggle chart in AutoEdits and show % of all tools and total edit count
+- Fix bug in fetching pageviews from pages that are subpage of another page
+- i18n updates from translatewiki
+
 ## 3.0.6 ##
 - T171277 Add totals for year/month counts in EditCounter, make charts responsive
 - Fixes to ArticleInfo API, making on-wiki XTools gadget possible
