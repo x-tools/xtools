@@ -5,11 +5,14 @@
         {% if xtTitle is defined %}{{ xtTitle }} - {% endif %}{% if xtPage != 'home' and xtPage != '' %}{{ msg('tool-'~xtPage) }} - {% endif %}{{ msg('xtools-title') }}
     </title>
 
-    {# must be before loading the individual JS files #}
+    {# Must be before loading the individual JS files #}
     <script type="text/javascript">
         xtBaseUrl = "{{ path('homepage') }}";
-        assetPath = "{{ asset('') }}";
+
+        {# For $.i18n, loaded in application.js #}
         i18nLang = "{{ lang() }}";
+        i18nPath = "{{ asset('static/i18n/' ~ lang() ~ '.json') }}";
+        i18nEnPath = "{{ asset('static/i18n/en.json') }}";
     </script>
 
     {% if loadStylesheetsFromCDN() %}
