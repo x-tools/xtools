@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"Aftabuzzaman"
+			"Aftabuzzaman",
+			"Nemo bis"
 		]
 	},
 	"about-xtools": "এই সরঞ্জামগুলি সম্পর্কে",
@@ -61,6 +62,7 @@
 	"edit": "সম্পাদনা",
 	"edit-count": "সম্পাদনা গণনা",
 	"edit-summaries": "সম্পাদনা সারাংশ",
+	"edit-summaries-percentage": "সম্পাদনা সারাংশ %",
 	"edit-summary": "মন্তব্য",
 	"edit-summary-recent-major": "সারাংশসহ শেষ $1টি মুখ্য সম্পাদনা",
 	"edit-summary-recent-minor": "সারাংশসহ শেষ $1টি অনুল্লেখ্য সম্পাদনা",
@@ -105,11 +107,14 @@
 	"ips": "আইপি সমূহ",
 	"ips-percentage": "আইপি %",
 	"is-admin": "ইনি প্রশাসক?",
+	"large-edits": "বৃহৎ সম্পাদনা (>১০০০ বাইট)",
 	"last-day": "গত ২৪ ঘণ্টায় সম্পাদনা",
 	"last-month": "গত ৩০ দিনে সম্পাদনা",
 	"last-week": "গত ৭ দিনে সম্পাদনা",
 	"last-year": "গত ৩৬৫ দিনে সম্পাদনা",
 	"latest-edit": "সর্বশেষ সম্পাদনা",
+	"latest-global-edits": "সাম্প্রতিক বৈশ্বিক সম্পাদনা",
+	"latest-global-edits-desc": "শীর্ষ ১০টি প্রকল্পে গত মাসে এই ব্যবহারকারীর সাম্প্রতিকতম সম্পাদনাগুলি",
 	"limit": "সীমা",
 	"links": "সংযোগ",
 	"links-external": "বহিঃসংযোগ",
@@ -129,6 +134,8 @@
 	"memory-usage": "নিষ্পন্ন করতে মেমরির $1 {{PLURAL:$1|মেগাবাইট}} নেয়া হয়েছে।",
 	"minor": "অনুল্লেখ্য",
 	"minor-edits": "অনুল্লেখ্য সম্পাদনা",
+	"minor-edits-percentage": "অনুল্লেখ্য সম্পাদনা %",
+	"minor-edits-with-summaries": "সারাংশসহ অনুল্লেখ্য সম্পাদনা",
 	"monday": "সোমবার",
 	"month": "মাস",
 	"month-counts": "মাস গণক",
@@ -144,6 +151,7 @@
 	"no-result": "$1-এর সাথে মিল আছে এমন কোনো ফলাফল পাওয়া যায়নি",
 	"no-revisions": "কোনো সংস্করণ পাওয়া যায়নি",
 	"no-summary": "সারাংশ নেই",
+	"non-auto-edits": "অ-স্বয়ংক্রিয় সম্পাদনা",
 	"notice": "বিজ্ঞপ্তি",
 	"num-bytes": "{{PLURAL:$1|বাইট}}",
 	"num-days": "{{PLURAL:$1|দিন}}",
@@ -169,6 +177,8 @@
 	"pager-older-n": "{{PLURAL:$1|আরও পুরনো ১টি|আরও পুরনো $1টি}}",
 	"pages": "পাতাসমূহ",
 	"pages-created": "পাতা তৈরি করেছে",
+	"pages-created-deleted": "তৈরিকৃত পাতা (অপসারিত)",
+	"pages-created-live": "তৈরিকৃত পাতা (বর্তমান)",
 	"pages-deleted": "পাতা অপসারণ করেছে",
 	"pages-edited-total": "সম্পাদিত পাতা (মোট)",
 	"pages-moved": "পাতা স্থানান্তর করেছে",
@@ -267,6 +277,7 @@
 	"top-ten-by-text": "লেখা সংযোজন অনুযায়ী শীর্ষ দশ",
 	"top-ten-count": "সম্পাদকদের শীর্ষ ১০% দ্বারা করা সম্পাদনাগুলি",
 	"top-ten-percent": "শীর্ষ ১০%",
+	"topedits-article": "একটি নিবন্ধে শীর্ষ সম্পাদনাগুলি",
 	"topedits-per-namespace": "প্রতি নামস্থান অনুযায়ী সর্বোচ্চ সম্পাদনা",
 	"total": "মোট",
 	"total-edits": "মোট সম্পাদনা",

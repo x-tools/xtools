@@ -1,5 +1,9 @@
 {
-	"@metadata": [],
+	"@metadata": {
+		"authors": [
+			"Nemo bis"
+		]
+	},
 	"actions": "Дії",
 	"added": "Додано",
 	"all": "усе",

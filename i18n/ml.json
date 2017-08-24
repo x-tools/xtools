@@ -1,5 +1,9 @@
 {
-	"@metadata": [],
+	"@metadata": {
+		"authors": [
+			"Nemo bis"
+		]
+	},
 	"actions": "പ്രവൃത്തികൾ",
 	"added": "കൂട്ടിച്ചേർത്തു",
 	"all": "എല്ലാം",

@@ -1,5 +1,9 @@
 {
-	"@metadata": [],
+	"@metadata": {
+		"authors": [
+			"Nemo bis"
+		]
+	},
 	"actions": "การแก้ไข",
 	"added": "ถูกเพิ่ม",
 	"all": "ทั้งหมด",

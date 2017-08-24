@@ -1,5 +1,9 @@
 {
-	"@metadata": [],
+	"@metadata": {
+		"authors": [
+			"Nemo bis"
+		]
+	},
 	"actions": "操作",
 	"added": "增加文本",
 	"all": "全部",

@@ -1,5 +1,9 @@
 {
-	"@metadata": [],
+	"@metadata": {
+		"authors": [
+			"Nemo bis"
+		]
+	},
 	"actions": "Tác vụ",
 	"added": "Đã thêm",
 	"all": "tất cả",

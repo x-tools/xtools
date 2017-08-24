@@ -1,7 +1,9 @@
 {
 	"@metadata": {
 		"authors": [
-			"Fitoschido"
+			"Fitoschido",
+			"Macofe",
+			"Nemo bis"
 		]
 	},
 	"actions": "Acciones",
@@ -152,7 +154,7 @@
 	"rfx-bureaucrat": "Esta herramienta también puede analizar las páginas de candidacía a burócrata",
 	"rfx-intro": "Esta herramienta analiza los votos e identifica votantes duplicados en una:",
 	"rfx-page": "Página de RfX",
-	"rpp": "Solicitudes de prtección de páginas",
+	"rpp": "Solicitudes de protección de páginas",
 	"see-full-edit-counts": "Ver los valores completos en el Contador de ediciones",
 	"see-full-page-stats": "Ver las estadísticas completas de la página",
 	"show": "mostrar",
