@@ -31,7 +31,6 @@
 /app/config/multisite.yml
 *.swp
 .DS_Store
-/composer.lock
 /mrb_prepcommit.sh
 /app/config/project_map.yml
 i18n_helper.js
