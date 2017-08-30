@@ -449,7 +449,7 @@ class EditCounterRepository extends Repository
      */
     public function getMonthCounts(Project $project, User $user)
     {
-        $cacheKey = "monthcounts.".$user->getCacheKey();
+        $cacheKey = "monthcounts.".$project->getDatabaseName().$user->getCacheKey();
         $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
@@ -489,7 +489,7 @@ class EditCounterRepository extends Repository
      */
     public function getTimeCard(Project $project, User $user)
     {
-        $cacheKey = "timecard.".$user->getCacheKey();
+        $cacheKey = "timecard.".$project->getDatabaseName().$user->getCacheKey();
         $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
