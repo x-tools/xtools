@@ -12,6 +12,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Xtools\ProjectRepository;
 use Xtools\Page;
 use Xtools\PagesRepository;
@@ -95,6 +97,60 @@ class ArticleInfoController extends Controller
             'xtSubtitle' => 'tool-articleinfo-desc',
             'project' => $project,
         ]);
+    }
+
+    /**
+     * Generate ArticleInfo gadget script for use on-wiki. This automatically points the
+     * script to this installation's API. Pass ?uglify=1 to uglify the code.
+     *
+     * @Route("/articleinfo-gadget.js", name="ArticleInfoGadget")
+     * @link https://www.mediawiki.org/wiki/XTools#ArticleInfo_gadget
+     *
+     * @param Request $request The HTTP request
+     * @return Response
+     */
+    public function gadgetAction(Request $request)
+    {
+        $rendered = $this->renderView('articleInfo/articleinfo.js.twig');
+
+        // SUPER hacky, but it works and is safe.
+        if ($request->query->get('uglify') != '') {
+            // $ and " need to be escaped.
+            $rendered = str_replace('$', '\$', trim($rendered));
+            $rendered = str_replace('"', '\"', trim($rendered));
+
+            // Uglify temporary file.
+            $tmpFile = sys_get_temp_dir() . '/xtools_articleinfo_gadget.js';
+            $script = "echo \"$rendered\" | tee $tmpFile >/dev/null && ";
+            $script .= $this->get('kernel')->getRootDir() .
+                "/Resources/node_modules/uglify-es/bin/uglifyjs $tmpFile --mangle " .
+                "&& rm $tmpFile >/dev/null";
+            $process = new Process($script);
+            $process->run();
+
+            // Check for errors.
+            $errorOutput = $process->getErrorOutput();
+            if ($errorOutput != '') {
+                $response = new \Symfony\Component\HttpFoundation\Response(
+                    "Error generating uglified JS. The server said:\n\n$errorOutput"
+                );
+                return $response;
+            }
+
+            // Remove escaping.
+            $rendered = str_replace('\$', '$', trim($process->getOutput()));
+            $rendered = str_replace('\"', '"', trim($rendered));
+
+            // Add comment after uglifying since it removes comments.
+            $rendered = "/**\n * This code was automatically generated and should not " .
+                "be manually edited.\n * For updates, please copy and paste from " .
+                $this->generateUrl('ArticleInfoGadget', ['uglify' => 1], UrlGeneratorInterface::ABSOLUTE_URL) .
+                "\n * Released under GPL v3 license.\n */\n" . $rendered;
+        }
+
+        $response = new \Symfony\Component\HttpFoundation\Response($rendered);
+        $response->headers->set('Content-Type', 'text/javascript');
+        return $response;
     }
 
     /**
