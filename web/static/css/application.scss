@@ -242,6 +242,16 @@ $tooltip-shadow: #ccc;
         white-space: nowrap;
     }
 }
+.table-sticky-header {
+    position: relative;
+
+    .sticky-heading {
+        background: white;
+        left: 0;
+        position: absolute;
+        top: 0;
+    }
+}
 .xt-alert {
     padding: 5px;
     margin: 5px;
