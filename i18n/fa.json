@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"Nemo bis"
+			"Nemo bis",
+			"Fatemi127"
 		]
 	},
 	"actions": "عملکردها",
@@ -102,7 +103,7 @@
 	"others": "سایر",
 	"page-size": "حجم صفحه",
 	"page-title": "عنوان صفحه",
-	"page-watchers": "پیگیری‌کنندگان",
+	"page-watchers": "پیگیری‌کننده",
 	"pager-newer-n": "{{PLURAL:$1|یک مورد جدیدتر|$1 مورد جدیدتر}}",
 	"pager-older-n": "{{PLURAL:$1|یک مورد قدیمی‌تر|$1 مورد قدیمی‌تر}}",
 	"pages": "صفحه‌ها",
