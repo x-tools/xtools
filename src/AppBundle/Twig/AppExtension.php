@@ -492,8 +492,11 @@ class AppExtension extends Extension
      */
     public function quote()
     {
-        if (!$this->container->getParameter("enable.bash")) {
-            return "";
+        // Don't show if bash is turned off, but always show for Labs
+        // (so quote is in footer but not in nav).
+        $isLabs = $this->container->getParameter('app.is_labs');
+        if (!$isLabs && !$this->container->getParameter('enable.bash')) {
+            return '';
         }
         $quotes = $this->container->getParameter('quotes');
         $id = array_rand($quotes);

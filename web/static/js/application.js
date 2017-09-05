@@ -377,7 +377,7 @@
                 // but for Y we must go by the window scroll position.
                 $headerRow.css(
                     'top',
-                     $(window).scrollTop() - $header.offset().top
+                    $(window).scrollTop() - $header.offset().top
                 );
             }
         });
