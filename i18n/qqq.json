@@ -217,6 +217,8 @@
 	"pageviews-userpage": "Label for the pageviews of a user's userpage.",
 	"patrol": "Name of a MediaWiki log action, used as header of a row in the table of log action counts for a user.\n{{Identical|Patrol}}",
 	"patrols": "General use plural form of 'patrol', may be the label for the number of a patrols a user has made.\n{{Identical|Patrols}}",
+	"percent-of-edit-count": "In the AutoEdits tool, this is the heading for the column that shows the percentage that a tool was used compared to the user's total edit count.",
+	"percent-of-tools": "In the AutoEdits tool, this is the heading for the column that shows the percentage that a tool was used compared to all other tools that were used.",
 	"percentage": "Label for the a percentage value.\n{{Identical|Percentage}}",
 	"powered-by": "Message giving credit to the a tool that makes some functionality possible. $1 is a link to the tool with the non-translatable name of the tool.",
 	"prev": "Text for link that shows the previous page of contributions by a user. This may be an abbreviated form of the word 'previous'.\n{{Identical|Prev}}",

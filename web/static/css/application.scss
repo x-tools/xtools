@@ -134,7 +134,7 @@ $tooltip-border: #ddd;
 $tooltip-shadow: #ccc;
 
 .tooltipcss {
-    position: relative;
+    position: static;
     text-decoration: none;
 
     .tooltip-body {
@@ -426,7 +426,7 @@ section > .panel-body {
 }
 
 input.form-control.show-loader {
-    background: url("../images/loader.gif") no-repeat right center;
+    background: url("../images/loader.gif") no-repeat right 5px center;
 }
 
 .stat-list {

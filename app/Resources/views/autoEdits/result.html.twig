@@ -100,7 +100,7 @@
         {% set content %}
             <table class="table table-bordered table-hover table-striped tools-table toggle-table">
                 <thead>
-                {% for key in ['tool', 'count', 'percent-of-tools', 'percent-of-editcount'] %}
+                {% for key in ['tool', 'count', 'percent-of-tools', 'percent-of-edit-count'] %}
                     <th>
                         <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
                             {{ msg(key)|capitalize_first }}
@@ -125,7 +125,7 @@
                         <td class="sort-entry--percent-of-tools" data-value="{{ values.count }}">
                             {{ values.count|percent_format(toolsTotal) }}
                         </td>
-                        <td class="sort-entry--percent-of-editcount" data-value="{{ values.count }}">
+                        <td class="sort-entry--percent-of-edit-count" data-value="{{ values.count }}">
                             {{ values.count|percent_format(editCount) }}
                         </td>
                     </tr>
