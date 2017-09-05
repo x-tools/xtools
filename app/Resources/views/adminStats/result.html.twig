@@ -52,7 +52,7 @@
         <div style="clear:both"></div>
 
         {% set content %}
-            <table class="table table-bordered table-hover table-striped top-editors-table">
+            <table class="table table-bordered table-hover table-striped top-editors-table table-sticky-header">
                 <thead><tr>
                     <th>#</th>
                     {% for key in ['username', 'user-groups', 'links', 'total', 'delete', 'restore', 're-block', 'unblock', 're-protect', 'unprotect', 'import', 'rights'] %}
@@ -72,7 +72,7 @@
                             <td class="sort-entry--username" data-value="{{ username }}">
                                 {{ wiki.userLink(username, project) }}
                             </td>
-                            <td class="sort-entry--groups" data-value="{{ value.groups }}">{{ value.groups }}</td>
+                            <td class="sort-entry--user-groups" data-value="{{ value.groups }}">{{ value.groups }}</td>
                             <td>
                                 {% if enabled('ec') %}
                                     <a title="{{ msg('tool-ec') }}" href="{{ path('EditCounterResult', {project: project.domain, username: username}) }}" >ec</a>
@@ -86,9 +86,9 @@
                             <td class="sort-entry--total" data-value="{{ value.mtotal }}">{{ value.mtotal|number_format }}</td>
                             <td class="sort-entry--delete" data-value="{{ value.mdelete }}">{{ value.mdelete|number_format }}</td>
                             <td class="sort-entry--restore" data-value="{{ value.mrestore }}">{{ value.mrestore|number_format }}</td>
-                            <td class="sort-entry--re_block" data-value="{{ value.mblock }}">{{ value.mblock|number_format }}</td>
-                            <td class="sort-entry--groups" data-value="{{ value.munblock }}">{{ value.munblock|number_format }}</td>
-                            <td class="sort-entry--re_protect" data-value="{{ value.mprotect }}">{{ value.mprotect|number_format }}</td>
+                            <td class="sort-entry--re-block" data-value="{{ value.mblock }}">{{ value.mblock|number_format }}</td>
+                            <td class="sort-entry--unblock" data-value="{{ value.munblock }}">{{ value.munblock|number_format }}</td>
+                            <td class="sort-entry--re-protect" data-value="{{ value.mprotect }}">{{ value.mprotect|number_format }}</td>
                             <td class="sort-entry--unprotect" data-value="{{ value.munprotect }}">{{ value.munprotect|number_format }}</td>
                             <td class="sort-entry--import" data-value="{{ value.mimport }}">{{ value.mimport|number_format }}</td>
                             <td class="sort-entry--rights" data-value="{{ value.mrights }}">{{ value.mrights|number_format }}</td>
