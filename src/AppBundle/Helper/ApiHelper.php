@@ -310,7 +310,7 @@ class ApiHelper extends HelperBase
                 return $this->massApiInternal($data);
             } else {
                 // indicate there were more entries than the limit
-                if ($result['continue']) {
+                if (isset($result['continue'])) {
                     $data['resolveData']['continue'] = true;
                 }
                 $data['promise']->resolve($data);

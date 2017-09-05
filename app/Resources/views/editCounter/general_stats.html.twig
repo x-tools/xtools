@@ -193,7 +193,11 @@
             <tr>
                 <td>{{ msg('edits-with-summaries') }}</td>
                 <td>
-                    {{ ec.countRevisionsWithComments|number_format }}
+                    {% if enabled('es') %}
+                        <a href="{{ path('es', {project:project.domain, username:user.username, namespace:'all'}) }}">{{ ec.countRevisionsWithComments|number_format }}</a>
+                    {% else %}
+                        {{ ec.countRevisionsWithComments|number_format }}
+                    {% endif %}
                     {% if ec.countLiveRevisions %}
                         &middot;
                         ({{ ((ec.countRevisionsWithComments / ec.countLiveRevisions) * 100)|percent_format }})
