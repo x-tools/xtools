@@ -220,6 +220,7 @@ class ArticleInfoController extends Controller
         $this->pageInfo['xtPage'] = 'articleinfo';
         $this->pageInfo['xtTitle'] = $page->getTitle();
         $this->pageInfo['editorlimit'] = $request->query->get('editorlimit', 20);
+        $this->pageInfo['botlimit'] = $request->query->get('botlimit', 10);
 
         // Output the relevant format template.
         $format = $request->query->get('format', 'html');
@@ -311,11 +312,12 @@ class ArticleInfoController extends Controller
                 : 0;
 
             if ($info['all'] > 1) {
-                // Number of seconds between first and last edit
+                // Number of seconds/days between first and last edit
                 $secs = $info['last']->getTimestamp() - $info['first']->getTimestamp();
+                $days = $secs / ( 60 * 60 * 24 );
 
                 // Average time between edits (in days)
-                $this->pageInfo['editors'][$editor]['atbe'] = $secs / ( 60 * 60 * 24 );
+                $this->pageInfo['editors'][$editor]['atbe'] = $days / $info['all'];
             }
 
             if (count($info['sizes'])) {
