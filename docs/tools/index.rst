@@ -4,8 +4,9 @@ Tools
 
 .. toctree::
 
-    adminscore
     editcounter
+    articleinfo
     pages
     topedits
+    adminscore
     simplecounter
