@@ -1,5 +1,14 @@
 # Release Notes #
 
+## 3.1.1 ##
+- T174527 Fix caching of year/month counts in Edit Counter
+- T172162 Fix sorting of some columns in AdminStats, make heading row sticky
+- T170101 Endpoint to fetch JS for ArticleInfo gadget
+- T170763 Resolve www. domains (accept www.wikidata.org or wikidata.org)
+- Code refactoring and unifying the headers and user links atop each tool
+- Fix 'average time between edits' statistic in ArticleInfo
+- Various i18n fixes and updates from translatewiki
+
 ## 3.1.0 ##
 - T165709, T165710 Introduce "RfX Analysis" and "RfX Voter" tools, both of which
   are functional but still a work in progress.
