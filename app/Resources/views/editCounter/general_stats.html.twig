@@ -340,7 +340,7 @@
             <tr>
                 <td>{{ msg('re-blocks') }}</td>
                 <td>
-                    {{ wiki.userLogLink(null, project, ec.countBlocksReceived, 'block', null, 'User:'~user.username) }}
+                    {{ wiki.blockLogLink(user.username, project, ec.countBlocksReceived) }}
                 </td>
             </tr>
             <tr>

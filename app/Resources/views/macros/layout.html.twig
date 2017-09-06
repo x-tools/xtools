@@ -30,3 +30,26 @@
         <div class="panel-body col-lg-12">{{ content }}</div>
     </section>
 {% endmacro %}
+
+{#
+ # Use standard heading that goes at the top of a tool that relates to a single user.
+ # @param User user
+ # @param Project project
+ # @param string tool The current tool that is being used.
+ #}
+{% macro userHeading(user, project, tool) %}
+    {% import 'macros/wiki.html.twig' as wiki %}
+    <header class="panel-heading">
+        <div class="text-center xt-heading-top">
+            <a class="back-to-search" href="{{ path(tool) }}">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                {{ msg('back') }}
+            </a>
+            {{ wiki.userLink(user, project) }}
+            <small>
+                &bull;
+                {{ project.title }}
+            </small>
+        </div>
+    </header>
+{% endmacro %}

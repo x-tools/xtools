@@ -4,18 +4,11 @@
 
 {% block body %}
 <div class="panel panel-primary">
-    <header class="panel-heading">
-        <div class="text-center xt-heading-top">
-            <a class="back-to-search" href="{{ path('adminscore') }}">
-                <span class="glyphicon glyphicon-chevron-left"></span>
-                {{ msg('back') }}
-            </a>
-            {{ wiki.userLink(user, project) }}
-            &bull;
-            {{ project.domain }}
-        </div>
-    </header>
+    {{ layout.userHeading(user, project, xtPage) }}
+
     <div class="panel-body xt-panel-body">
+        {{ wiki.userLinks(user, project, xtPage) }}
+
         {% set content %}
             <div class="col-lg-6 stat-list clearfix">
                 <table class="table"><tbody>

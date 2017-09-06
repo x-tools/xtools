@@ -18,25 +18,7 @@
         </div>
     </header>
     <div class="panel-body xt-panel-body">
-        <p class="text-center xt-heading-subtitle">
-            {{ wiki.pageLogLinkRaw('User:' ~ user.username, project, msg('block-log'), 'block') }}
-            {% if enabled('ec') %}
-                &middot;
-                <a href="{{ path('EditCounterResult', {'project':project.domain, 'username':user.username}) }}">{{ msg('tool-ec') }}</a>
-            {% endif %}
-            {% if isWMFLabs() %}
-                &middot;
-                <a href="//tools.wmflabs.org/guc/?user={{ user.username }}" target="_blank">{{ msg('global-contribs') }}</a>
-            {% endif %}
-            {% if not(isSingleWiki()) %}
-                &middot;
-                {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, msg('sul-info')) }}
-            {% endif %}
-            {% if isWMFLabs() %}
-                &middot;
-                <a target="_blank" href="//tools.wmflabs.org/pageviews/?project={{ project.domain }}&amp;pages=User:{{ user.username }}">{{ msg('pageviews-userpage') }}</a>
-            {% endif %}
-        </p>
+        {{ wiki.userLinks(user, project, xtPage) }}
 
         {% set content %}
             <div class="col-lg-6 stat-list clearfix">

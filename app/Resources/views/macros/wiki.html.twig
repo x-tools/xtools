@@ -181,6 +181,23 @@
     {{ extLink(page.url ~ '?action=edit', msg('edit'), label) }}
 {% endspaceless %}{% endmacro %}
 
+{% macro blockLogLink(username, project, label = null) %}{% spaceless %}
+    {% from _self import pageLogLinkRaw as pageLogLinkRaw %}
+    {% if label is null %}
+        {% set label = msg('block-log') %}
+    {% endif %}
+    {{ pageLogLinkRaw('User:' ~ username, project, label, 'block') }}
+{% endspaceless %}{% endmacro %}
+
+{% macro gucLink(username, label = null) %}{% spaceless %}
+    {% from _self import extLink as extLink %}
+    {% set url = 'https://tools.wmflabs.org/guc/?user=' ~ username|e('url') %}
+    {% if label is null %}
+        {% set label = msg('global-contribs') %}
+    {% endif %}
+    {{ extLink(url, label) }}
+{% endspaceless %}{% endmacro %}
+
 {% macro pageviewsLink(page, label = null, opts = null) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {% set url = 'https://tools.wmflabs.org/pageviews?project=' ~ page.project.domain ~ '&pages=' ~ page.title %}
@@ -202,4 +219,32 @@
         'https://tools.wmflabs.org/redirectviews?project=' ~ page.project.domain ~ '&page=' ~ page.title,
         msg('redirects')
     )}})
+{% endspaceless %}{% endmacro %}
+
+{% macro userLinks(user, project, tool) %}{% spaceless %}
+    {% import _self as wiki %}
+    <p class="text-center xt-heading-subtitle">
+        {% if tool == 'ec' %}
+            {{ wiki.userLogLink(user, project) }}
+        {% else %}
+            {{ wiki.blockLogLink(user.username, project) }}
+            {% if enabled('ec') %}
+                &middot;
+                <a href="{{ path('EditCounterResult', {'project':project.domain, 'username':user.username}) }}">{{ msg('tool-ec') }}</a>
+            {% endif %}
+        {% endif %}
+        &middot;
+        {% if isWMFLabs() %}
+            {{ wiki.gucLink(user.username) }}
+            &middot;
+        {% endif %}
+        {% if not(isSingleWiki()) %}
+            {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, msg('sul-info')) }}
+            &middot;
+        {% endif %}
+        {% if isWMFLabs() %}
+            {% set url = 'https://tools.wmflabs.org/pageviews/?project=' ~ project.domain ~ '&pages=User:' ~ user.username %}
+            {{ wiki.extLink(url, msg('pageviews-userpage')) }}
+        {% endif %}
+    </p>
 {% endspaceless %}{% endmacro %}

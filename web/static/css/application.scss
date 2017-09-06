@@ -812,6 +812,10 @@ input.form-control.show-loader {
         width: 100%;
     }
 
+    .times-in-utc {
+        padding: 0 15px;
+    }
+
     // FIXME: eventually will create a pop-out nav from the right
     // .xt-toc {
     //     @extend .fixed;

@@ -5,29 +5,12 @@
 
 {% block body %}
 <div class="panel panel-primary">
-    <header class="panel-heading">
-        <div class="text-center xt-heading-top">
-            <a class="back-to-search" href="{{ path('autoedits') }}">
-            <span class="glyphicon glyphicon-chevron-left"></span>
-            {{ msg('back') }}
-            </a>
-            {{ wiki.userLink(user, project) }}
-            &middot;
-            {{ project.title }}
-        </div>
-    </header>
+    {{ layout.userHeading(user, project, xtPage) }}
+
     <div class="panel-body xt-panel-body">
-        <p class="text-center xt-heading-subtitle">
-            {{ wiki.userLogLink(user, project, msg('block-log'), 'block') }}
-            {% if isWMFLabs() %}
-                &middot;
-                <a href="//tools.wmflabs.org/guc/?user={{ user.username }}" target="_blank">{{ msg('global-contribs') }}</a>
-            {% endif %}
-            {% if not(isSingleWiki()) %}
-                &middot;
-                {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, msg('sul-info')) }}
-            {% endif %}
-        </p>
+        {{ wiki.userLinks(user, project, xtPage) }}
+
+        <h3 class="text-center">{{ msg('tool-autoedits') }}</h3>
 
         {# Show TOC when the user has a ton of automated tools, making the page hard to navigate #}
         {% if toolCounts|length > 15 %}

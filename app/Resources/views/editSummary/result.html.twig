@@ -5,34 +5,10 @@
 
 {% block body %}
 <div class="panel panel-primary">
-    <header class="panel-heading">
-        <div class="text-center xt-heading-top">
-            <a class="back-to-search" href="{{ path('es') }}">
-                <span class="glyphicon glyphicon-chevron-left"></span>
-                {{ msg('back') }}
-            </a>
-            {{ wiki.userLink(user, project) }}
-            <small>
-                &bull;
-                {{ project.domain }}
-            </small>
-        </div>
-    </header>
+    {{ layout.userHeading(user, project, xtPage) }}
 
     <div class="panel-body xt-panel-body">
-        <p class="text-center xt-heading-subtitle">
-            {{ wiki.pageLogLinkRaw('User:' ~ user.username, project, msg('block-log'), 'block') }}
-            {% if enabled('ec') %}
-                &middot;
-                <a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}">{{ msg('tool-ec') }}</a>
-            {% endif %}
-            {% if isWMFLabs() %}
-                &middot;
-                <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ user.username }}">{{ msg('global-contribs') }}</a>
-                &middot;
-                <a target="_blank" href="//tools.wmflabs.org/pageviews/?project={{ project.domain }}&amp;pages=User:{{ user.username }}">{{ msg('pageviews-userpage') }}</a>
-            {% endif %}
-        </p>
+        {{ wiki.userLinks(user, project, xtPage) }}
 
         <h3 class="text-center">{{ msg('tool-es-desc') }}</h3>
 

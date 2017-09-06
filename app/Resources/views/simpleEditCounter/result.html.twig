@@ -4,32 +4,10 @@
 
 {% block body %}
 <div class="panel panel-primary">
-    <header class="panel-heading">
-        <div class="text-center xt-heading-top">
-            <a class="back-to-search" href="{{ path('sc') }}">
-                <span class="glyphicon glyphicon-chevron-left"></span>
-                {{ msg('back') }}
-            </a>
-            {{ wiki.userLink(user, project) }}
-            <small>
-                &bull;
-                {{ project.domain }}
-            </small>
-        </div>
-    </header>
+    {{ layout.userHeading(user, project, xtPage) }}
 
     <div class="panel-body xt-panel-body">
-        <p class="text-center xt-heading-subtitle">
-            {{ wiki.userLogLink(user, project, msg('block-log'), 'block') }}
-            &middot;
-            <a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool-ec') }}</a>
-            {% if isWMFLabs() %}
-                &middot;
-                <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ user.username }}" >{{ msg('global-contribs') }}</a>
-                &middot;
-                <a target="_blank" href="//tools.wmflabs.org/pageviews/?project={{ project.domain }}&amp;pages=User:{{ user.username }}">{{ msg('pageviews-userpage') }}</a>
-            {% endif %}
-        </p>
+        {{ wiki.userLinks(user, project, xtPage) }}
 
         {% set content %}
             <div class="col-lg-12 stat-list clearfix">

@@ -5,33 +5,10 @@
 {% block body %}
 
 <div class="panel panel-primary">
-    <header class="panel-heading">
-        <div class="text-center xt-heading-top">
-            <a class="back-to-search" href="{{ path('ec') }}">
-                <span class="glyphicon glyphicon-chevron-left"></span>
-                {{ msg('back') }}
-            </a>
-            {{ wiki.userLink(user, project) }}
-            <small> &bull; {{ project.title }} </small>
-        </div>
-    </header>
+    {{ layout.userHeading(user, project, xtPage) }}
 
     <div class="panel-body xt-panel-body">
-        <p class="text-center xt-heading-subtitle">
-            {{ wiki.userLogLink(user, project) }}
-            &middot;
-            {% if isWMFLabs() %}
-                <a href="https://tools.wmflabs.org/guc/?user={{ user.username }}" >{{ msg('global-contribs') }}</a>
-                &middot;
-            {% endif %}
-            {% if not(isSingleWiki()) %}
-                {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, msg('sul-info')) }}
-                &middot;
-            {% endif %}
-            {% if isWMFLabs() %}
-                <a target="_blank" href="//tools.wmflabs.org/pageviews/?project={{ project.domain }}&amp;pages=User:{{ user.username }}">{{ msg('pageviews-userpage') }}</a>
-            {% endif %}
-        </p>
+        {{ wiki.userLinks(user, project, xtPage) }}
 
         <div class="text-center xt-toc">
             {% set sections = ['general-stats', 'namespace-totals', 'year-counts', 'month-counts', 'timecard', 'latest-global-edits'] %}

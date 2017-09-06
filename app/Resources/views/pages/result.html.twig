@@ -4,40 +4,12 @@
 
 {% block body %}
 <div class="panel panel-primary">
-    <header class="panel-heading">
-        <div class="text-center xt-heading-top">
-            <a class="back-to-search" href="{{ path('pages') }}">
-                <span class="glyphicon glyphicon-chevron-left"></span>
-                {{ msg('back') }}
-            </a>
-            {{ wiki.userLink(user, project) }}
-            <small>
-                &bull;
-                {{ project.domain }}
-            </small>
-        </div>
-    </header>
+    {{ layout.userHeading(user, project, xtPage) }}
 
     <div class="panel-body xt-panel-body">
-        <p class="text-center xt-heading-subtitle">
-            {{ wiki.userLogLink(user, project, msg('block-log'), 'block') }}
-            {% if enabled('ec') %}
-                &middot;
-                <a href="{{ path('ec', {'project':project.domain, 'username':user.username}) }}" >{{ msg('tool-ec') }}</a>
-            {% endif %}
-            {% if isWMFLabs() %}
-                &middot;
-                <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ user.username }}" >{{ msg('global-contribs') }}</a>
-                &middot;
-                {% set redirectParam = 0 %}
-                {% if redirect == 'onlyredirects' %}
-                    {% set redirectParam = 1 %}
-                {% elseif redirect == 'all' %}
-                    {% set redirectParam = 2 %}
-                {% endif %}
-                <a target="_blank" href="//tools.wmflabs.org/userviews/?project={{ project.domain }}&amp;user={{ user.username }}&amp;namespace={{ namespace }}&amp;redirects={{ redirectParam }}">{{ msg('pageviews-pages-created') }}</a>
-            {% endif %}
-        </p>
+        {{ wiki.userLinks(user, project, xtPage) }}
+
+        <h3 class="text-center">{{ msg('tool-pages') }}</h3>
 
         {% set multiNamspace = count|length > 1 %}
 
