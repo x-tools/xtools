@@ -385,19 +385,22 @@
                         </td>
                     </tr>
                 {% endfor %}
+                </tbody>
                 {% if counter < editors|length %}
-                <tr class="show-more-row">
+                <tfoot><tr class="show-more-row">
                     <td></td>
                     <td>
-                        {% set expand_url = path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'editorlimit': editorlimit * 10})) %}
-                        <a href="{{ expand_url }}">{{ msg('num-others', [editors|length - counter]) }}</a>
+                        {% set expandUrl = path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'editorlimit': editorlimit * 10})) %}
+                        {% set otherEditors = editors|length - counter %}
+                        <a href="{{ expandUrl }}">
+                            {{ otherEditors|number_format }} {{ msg('num-others', [otherEditors]) }}
+                        </a>
                     </td>
                     <td></td>
                     <td>{{ (page.numRevisions - edit_sum)|number_format }}</td>
                     <td colspan=6></td>
-                </tr>
+                </tr></tfoot>
                 {% endif %}
-                </tbody>
             </table>
             <div class="footnotes">
                 <sup>1</sup> {{ msg('average-time-bw-edits') }}
@@ -408,24 +411,22 @@
             <h4>{{ msg('bot-list') }}</h4>
             <table class="table table-bordered table-hover table-striped">
                 <thead><tr>
-                    <th>
-                        <span class="sort-link sort-link--username" data-column="username">
-                            {{ msg('bot') }}
-                            <span class="glyphicon glyphicon-sort"></span>
-                        </span>
-                    </th>
-                    <th>{{ msg('links') }}</th>
-                    <th>
-                        <span class="sort-link sort-link--edits" data-column="count">
-                            {{ msg('edits') }}
-                            <span class="glyphicon glyphicon-sort"></span>
-                        </span>
-                    </th>
+                    {% for key in ['rank', 'bot', 'links', 'edits'] %}
+                        <th>
+                            <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
+                                {{ msg(key)|capitalize_first }}
+                                {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
+                            </span>
+                        </th>
+                    {% endfor %}
                 </tr></thead>
                 <tbody>
-                {% for bot, bot_data in bots %}
+                {% set counter = 0 %}
+                {% for bot, bot_data in bots|slice(0, botlimit) %}
+                    {% set counter = counter + 1 %}
                     <tr>
-                        <td class="sort-entry--username" data-value="{{ bot }}">
+                        <td class="sort-entry--rank" data-value="{{ counter }}">{{ counter }}</td>
+                        <td class="sort-entry--bot" data-value="{{ bot }}">
                             {{ wiki.userLink(bot, project) }}
                             {% if not bot_data.current %}
                                 <i>
@@ -442,10 +443,23 @@
                                 <a href="{{ path('topedits', { 'project': project.domain, 'user': bot, 'namespace': page.namespace, 'article': page.title }) }}">{{ msg('tool-topedits') }}</a>
                             {% endif %}
                         </td>
-                        <td class="sort-entry--count" data-value="{{ bot_data.count }}">{{ bot_data.count }}</td>
+                        <td class="sort-entry--edits" data-value="{{ bot_data.count }}">{{ bot_data.count }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
+                {% if counter < bots|length %}
+                <tfoot><tr class="show-more-row">
+                    <td></td>
+                    <td>
+                        {% set expandUrl = path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'botlimit': botlimit * 10})) %}
+                        {% set otherBots = bots|length - counter %}
+                        <a href="{{ expandUrl }}">
+                            {{ otherBots|number_format }} {{ msg('num-others', [otherBots]) }}
+                        </a>
+                    </td>
+                    <td colspan=8></td>
+                </tr></tfoot>
+                {% endif %}
             </table>
             {% endif %}
         {% endset %}
