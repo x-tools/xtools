@@ -59,8 +59,7 @@ Timecard
 ========
 
 A 'punchcard' chart showing what days of the week and hours of the day the user made most edits.
-The times are given in the timezone of the XTools user
-(and keep in mind that the editing user may also have edited in multiple different timezones).
+The times given are in UTC.
 
 Year counts
 ===========
