@@ -27,7 +27,7 @@ $(function () {
 
     $.get(
         '{{ app.request.getSchemeAndHttpHost()|raw }}' +
-        '/api/articleinfo/' +
+        '/api/page/articleinfo/' +
         mw.config.get('wgServerName') + '/' +
         mw.config.get('wgPageName') + '?format=html' +
         '&uselang=' + mw.config.get('wgUserLanguage')
