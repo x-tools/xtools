@@ -45,6 +45,7 @@ class AppExtension extends Extension
             new \Twig_SimpleFunction('isRTLLang', [ $this, 'intuitionIsRTLLang' ]),
             new \Twig_SimpleFunction('shortHash', [ $this, 'gitShortHash' ]),
             new \Twig_SimpleFunction('hash', [ $this, 'gitHash' ]),
+            new \Twig_SimpleFunction('releaseDate', [ $this, 'gitDate' ]),
             new \Twig_SimpleFunction('enabled', [ $this, 'tabEnabled' ]),
             new \Twig_SimpleFunction('tools', [ $this, 'allTools' ]),
             new \Twig_SimpleFunction('color', [ $this, 'getColorList' ]),
@@ -219,6 +220,16 @@ class AppExtension extends Extension
     public function gitHash()
     {
         return exec("git rev-parse HEAD");
+    }
+
+    /**
+     * Get the date of the HEAD commit.
+     * @return string
+     */
+    public function gitDate()
+    {
+        $date = new \DateTime(exec('git show -s --format=%ci'));
+        return $date->format('Y-m-d');
     }
 
     /**

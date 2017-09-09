@@ -1,7 +1,11 @@
 @import 'mixins.scss';
 
-.index {
+.about {
     #content {
         font-size: 16px;
+    }
+
+    .about-subtitle {
+        margin-top: 20px;
     }
 }
