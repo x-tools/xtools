@@ -303,6 +303,7 @@
 	"user-page": "사용자 문서",
 	"username": "사용자 이름",
 	"username-or-ip": "사용자 이름 또는 IPV4 또는 IPV6",
+	"version": "버전 $1",
 	"view-source": "원본 보기",
 	"vote-msg": "$1님은 $3에서 $2번 편집했습니다!",
 	"web-chat": "웹 채팅",

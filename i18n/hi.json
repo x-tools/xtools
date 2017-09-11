@@ -3,10 +3,14 @@
 		"authors": [
 			"Anamdas",
 			"Sachinkatiyar",
-			"Nemo bis"
+			"Nemo bis",
+			"Jayprakash12345"
 		]
 	},
+	"accounts": "खाते",
+	"accounts-created": "खाता निर्मित",
 	"actions": "कार्रवाई",
+	"actions-as-admin": "प्रबन्धक कार्रवाई",
 	"added": "जोड़ा",
 	"all": "सभी",
 	"all-edits": "सभी सम्पादन",

@@ -341,6 +341,7 @@
 	"user-page": "用户页",
 	"username": "用户名",
 	"username-or-ip": "用户名或IPv4/IPv6",
+	"version": "版本$1",
 	"view-source": "查看源代码",
 	"vote-msg": "$1已编辑$2个$3页面！",
 	"web-chat": "WebChat",
