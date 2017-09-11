@@ -53,6 +53,22 @@ class EditSummaryController extends Controller
         $username = $request->query->get('username');
         $namespace = $request->query->get('namespace');
 
+        // Default to mainspace.
+        if (empty($namespace)) {
+            $namespace = '0';
+        }
+
+        // Legacy XTools.
+        $user = $request->query->get('name');
+        if (empty($username) && isset($user)) {
+            $username = $user;
+        }
+        $wiki = $request->query->get('wiki');
+        $lang = $request->query->get('lang');
+        if (isset($wiki) && isset($lang) && empty($project)) {
+            $projectName = $lang.'.'.$wiki.'.org';
+        }
+
         // If we've got a project, user, and namespace, redirect to results.
         if ($projectName != '' && $username != '' && $namespace != '') {
             $routeParams = [
@@ -76,6 +92,7 @@ class EditSummaryController extends Controller
                 'xtSubtitle' => 'tool-es-desc',
                 'xtPage' => 'es',
                 'project' => $theProject,
+                'namespace' => (int) $namespace,
             ]
         );
     }
@@ -91,7 +108,7 @@ class EditSummaryController extends Controller
      *
      * @return Response
      */
-    public function resultAction($project, $username, $namespace = 'all')
+    public function resultAction($project, $username, $namespace = 0)
     {
         /**
          * Project object representing the project
