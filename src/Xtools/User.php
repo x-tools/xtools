@@ -78,6 +78,21 @@ class User extends Model
     }
 
     /**
+     * Get the user's (system) edit count.
+     * @param Project $project
+     * @return int
+     */
+    public function getEditCount(Project $project)
+    {
+        $editCount = $this->getRepository()->getEditCount(
+            $project->getDatabaseName(),
+            $this->getUsername()
+        );
+
+        return (int) $editCount;
+    }
+
+    /**
      * Get a list of this user's groups on the given project.
      * @param Project $project The project.
      * @return string[]

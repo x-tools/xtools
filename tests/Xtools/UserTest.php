@@ -142,6 +142,25 @@ class UserTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * System edit count.
+     */
+    public function testEditCount()
+    {
+        $userRepo = $this->getMock(UserRepository::class);
+        $userRepo->expects($this->once())
+            ->method('getEditCount')
+            ->willReturn('12345');
+        $user = new User('TestUser');
+        $user->setRepository($userRepo);
+
+        $projectRepo = $this->getMock(ProjectRepository::class);
+        $project = new Project('wiki.example.org');
+        $project->setRepository($projectRepo);
+
+        $this->assertEquals(12345, $user->getEditCount($project));
+    }
+
+    /**
      * User's non-automated edits
      */
     public function testGetNonAutomatedEdits()

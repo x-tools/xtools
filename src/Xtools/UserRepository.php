@@ -93,6 +93,22 @@ class UserRepository extends Repository
     }
 
     /**
+     * Get the user's (system) edit count.
+     * @param string $databaseName The database to query.
+     * @param string $username The username to find.
+     * @return int|null As returned by the database.
+     */
+    public function getEditCount($databaseName, $username)
+    {
+        $userTable = $this->getTableName($databaseName, 'user');
+        $sql = "SELECT user_editcount FROM $userTable WHERE user_name = :username LIMIT 1";
+        $resultQuery = $this->getProjectsConnection()->prepare($sql);
+        $resultQuery->bindParam('username', $username);
+        $resultQuery->execute();
+        return $resultQuery->fetchColumn();
+    }
+
+    /**
      * Get group names of the given user.
      * @param Project $project The project.
      * @param string $username The username.
