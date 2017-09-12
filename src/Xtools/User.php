@@ -185,9 +185,9 @@ class User extends Model
     /**
      * Get edit count within given timeframe and namespace
      * @param Project $project
-     * @param int|string [$namespace] Namespace ID or 'all' for all namespaces
-     * @param string [$start] Start date in a format accepted by strtotime()
-     * @param string [$end] End date in a format accepted by strtotime()
+     * @param int|string $namespace Namespace ID or 'all' for all namespaces
+     * @param string $start Start date in a format accepted by strtotime()
+     * @param string $end End date in a format accepted by strtotime()
      */
     public function countEdits(Project $project, $namespace = 'all', $start = '', $end = '')
     {
@@ -197,9 +197,9 @@ class User extends Model
     /**
      * Get the number of edits this user made using semi-automated tools.
      * @param Project $project
-     * @param string|int [$namespace] Namespace ID or 'all'
-     * @param string [$start] Start date in a format accepted by strtotime()
-     * @param string [$end] End date in a format accepted by strtotime()
+     * @param string|int $namespace Namespace ID or 'all'
+     * @param string $start Start date in a format accepted by strtotime()
+     * @param string $end End date in a format accepted by strtotime()
      * @return int Result of query, see below.
      */
     public function countAutomatedEdits(Project $project, $namespace = 'all', $start = '', $end = '')
@@ -210,10 +210,10 @@ class User extends Model
     /**
      * Get non-automated contributions for this user.
      * @param Project $project
-     * @param string|int [$namespace] Namespace ID or 'all'
-     * @param string [$start] Start date in a format accepted by strtotime()
-     * @param string [$end] End date in a format accepted by strtotime()
-     * @param int [$offset] Used for pagination, offset results by N edits
+     * @param string|int $namespace Namespace ID or 'all'
+     * @param string $start Start date in a format accepted by strtotime()
+     * @param string $end End date in a format accepted by strtotime()
+     * @param int $offset Used for pagination, offset results by N edits
      * @return array[] Result of query, with columns (string) 'page_title',
      *   (int) 'page_namespace', (int) 'rev_id', (DateTime) 'timestamp',
      *   (bool) 'minor', (int) 'length', (int) 'length_change', (string) 'comment'
@@ -257,11 +257,11 @@ class User extends Model
     }
 
     /**
-     * Get non-automated contributions for the given user.
+     * Get counts of known automated tools used by the given user.
      * @param Project $project
-     * @param string|int [$namespace] Namespace ID or 'all'
-     * @param string [$start] Start date in a format accepted by strtotime()
-     * @param string [$end] End date in a format accepted by strtotime()
+     * @param string|int $namespace Namespace ID or 'all'
+     * @param string $start Start date in a format accepted by strtotime()
+     * @param string $end End date in a format accepted by strtotime()
      * @return string[] Each tool that they used along with the count and link:
      *                  [
      *                      'Twinkle' => [

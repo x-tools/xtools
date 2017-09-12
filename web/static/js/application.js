@@ -411,7 +411,7 @@
                 $(this).addClass('show-loader');
 
                 /** global: xtBaseUrl */
-                $.get(xtBaseUrl + 'api/normalizeProject/' + newProject).done(function (data) {
+                $.get(xtBaseUrl + 'api/project/normalize_project/' + newProject).done(function (data) {
                     // Keep track of project API path for use in page title autocompletion
                     apiPath = data.api;
                     lastProject = newProject;
@@ -442,7 +442,7 @@
             var newProject = this.value;
 
             /** global: xtBaseUrl */
-            $.get(xtBaseUrl + 'api/namespaces/' + newProject).done(function (data) {
+            $.get(xtBaseUrl + 'api/project/namespaces/' + newProject).done(function (data) {
                 // Clone the 'all' option (even if there isn't one),
                 // and replace the current option list with this.
                 var $allOption = $('#namespace_select option[value="all"]').eq(0).clone();

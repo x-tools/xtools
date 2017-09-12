@@ -8,7 +8,7 @@ API endpoints related to a single page.
 
 Article info
 ============
-``GET /api/articleinfo/{project}/{article}/{format}``
+``GET /api/page/articleinfo/{project}/{article}/{format}``
 
 Get basic information about the history of a page.
 
@@ -21,4 +21,4 @@ Get basic information about the history of a page.
 
 Get basic information about `Albert Einstein <https://en.wikipedia.org/wiki/Albert_Einstein>`_.
 
-    https://xtools.wmflabs.org/api/articleinfo/en.wikipedia.org/Albert_Einstein
+    https://xtools.wmflabs.org/api/page/articleinfo/en.wikipedia.org/Albert_Einstein

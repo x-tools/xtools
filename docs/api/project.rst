@@ -6,7 +6,7 @@ API endpoints related to a project.
 
 Normalize project
 =================
-``GET /api/normalize_project/{project}``
+``GET /api/project/normalize/{project}``
 
 Get the URL, database name, domain and API path of a given project.
 
@@ -18,13 +18,13 @@ Get the URL, database name, domain and API path of a given project.
 
 Basic access information about the English Wikipedia.
 
-    https://xtools.wmflabs.org/api/normalize_project/enwiki
-    https://xtools.wmflabs.org/api/normalize_project/en.wikipedia
-    https://xtools.wmflabs.org/api/normalize_project/en.wikipedia.org
+    https://xtools.wmflabs.org/api/project/normalize/enwiki
+    https://xtools.wmflabs.org/api/project/normalize/en.wikipedia
+    https://xtools.wmflabs.org/api/project/normalize/en.wikipedia.org
 
 Namespaces
 ==========
-``GET /api/namespaces/{project}``
+``GET /api/project/namespaces/{project}``
 
 Get the localized names for each namespace of the given project.
 The API endpoint for the project is also returned.
@@ -37,6 +37,6 @@ The API endpoint for the project is also returned.
 
 Get the namespace IDs and names of the German Wikipedia.
 
-    https://xtools.wmflabs.org/api/namespaces/dewiki
-    https://xtools.wmflabs.org/api/namespaces/de.wikipedia
-    https://xtools.wmflabs.org/api/namespaces/de.wikipedia.org
+    https://xtools.wmflabs.org/api/project/namespaces/dewiki
+    https://xtools.wmflabs.org/api/project/namespaces/de.wikipedia
+    https://xtools.wmflabs.org/api/project/namespaces/de.wikipedia.org

@@ -28,8 +28,7 @@ class ApiController extends FOSRestController
 {
     /**
      * Get domain name, URL, and API URL of the given project.
-     * @Rest\Get("/api/normalizeProject/{project}")
-     * @Rest\Get("/api/normalize_project/{project}")
+     * @Rest\Get("/api/project/normalize/{project}")
      * @param string $project Project database name, URL, or domain name.
      * @return View
      */
@@ -58,8 +57,9 @@ class ApiController extends FOSRestController
     }
 
     /**
-     * Get all namespaces of the given project.
-     * @Rest\Get("/api/namespaces/{project}")
+     * Get all namespaces of the given project. This endpoint also does the same thing
+     * as the normalize_project endpoint, returning other basic info about the project.
+     * @Rest\Get("/api/project/namespaces/{project}")
      * @param string $project The project name.
      * @return View
      */
@@ -78,7 +78,10 @@ class ApiController extends FOSRestController
 
         return new View(
             [
+                'domain' => $proj->getDomain(),
+                'url' => $proj->getUrl(),
                 'api' => $proj->getApiUrl(),
+                'database' => $proj->getDatabaseName(),
                 'namespaces' => $proj->getNamespaces(),
             ],
             Response::HTTP_OK
@@ -86,9 +89,57 @@ class ApiController extends FOSRestController
     }
 
     /**
+     * Count the number of automated edits the given user has made.
+     * @Rest\Get(
+     *   "/api/user/automated_editcount/{project}/{username}/{namespace}/{start}/{end}/{tools}",
+     *   requirements={"start" = "|\d{4}-\d{2}-\d{2}", "end" = "|\d{4}-\d{2}-\d{2}"}
+     * )
+     * @param Request $request The HTTP request.
+     * @param string $project
+     * @param string $username
+     * @param int|string $namespace ID of the namespace, or 'all' for all namespaces
+     * @param string $start In the format YYYY-MM-DD
+     * @param string $end In the format YYYY-MM-DD
+     * @param string $tools Non-blank to show which tools were used and how many times.
+     */
+    public function automatedEditCount(
+        Request $request,
+        $project,
+        $username,
+        $namespace = 'all',
+        $start = '',
+        $end = '',
+        $tools = ''
+    ) {
+        $project = ProjectRepository::getProject($project, $this->container);
+        $user = UserRepository::getUser($username, $this->container);
+
+        $res = [
+            'project' => $project->getDomain(),
+            'username' => $user->getUsername(),
+        ];
+
+        if ($tools != '') {
+            $tools = $user->getAutomatedCounts($project, $namespace, $start, $end);
+            $res['automated_editcount'] = 0;
+            foreach ($tools as $tool) {
+                $res['automated_editcount'] += $tool['count'];
+            }
+            $res['automated_tools'] = $tools;
+        } else {
+            $res['automated_editcount'] = $user->countAutomatedEdits($project, $namespace, $start, $end);
+        }
+
+        $view = View::create()->setStatusCode(Response::HTTP_OK);
+        $view->setData($res);
+
+        return $view->setFormat('json');
+    }
+
+    /**
      * Get non-automated edits for the given user.
      * @Rest\Get(
-     *   "/api/nonautomated_edits/{project}/{username}/{namespace}/{start}/{end}/{offset}",
+     *   "/api/user/nonautomated_edits/{project}/{username}/{namespace}/{start}/{end}/{offset}",
      *   requirements={"start" = "|\d{4}-\d{2}-\d{2}", "end" = "|\d{4}-\d{2}-\d{2}"}
      * )
      * @param Request $request The HTTP request.
@@ -137,8 +188,23 @@ class ApiController extends FOSRestController
             ]);
             $view->setFormat('html');
         } else {
-            $view->setData(['data' => $data])
-                ->setFormat('json');
+            $res = [
+                'project' => $project->getDomain(),
+                'username' => $user->getUsername(),
+            ];
+            if ($namespace != '' && $namespace !== 'all') {
+                $res['namespace'] = $namespace;
+            }
+            if ($start != '') {
+                $res['start'] = $start;
+            }
+            if ($end != '') {
+                $res['end'] = $end;
+            }
+            $res['offset'] = $offset;
+            $res['nonautomated_edits'] = $data;
+
+            $view->setData($res)->setFormat('json');
         }
 
         return $view;
@@ -147,6 +213,7 @@ class ApiController extends FOSRestController
     /**
      * Get basic info on a given article.
      * @Rest\Get("/api/articleinfo/{project}/{article}", requirements={"article"=".+"})
+     * @Rest\Get("/api/page/articleinfo/{project}/{article}", requirements={"article"=".+"})
      * @param Request $request The HTTP request.
      * @param string $project
      * @param string $article
@@ -209,8 +276,11 @@ class ApiController extends FOSRestController
             ]);
             $view->setFormat('html');
         } else {
-            $view->setData(['data' => $data])
-                ->setFormat('json');
+            $res = array_merge([
+                'project' => $project->getDomain(),
+                'page' => $page->getTitle(),
+            ], $data);
+            $view->setData($res)->setFormat('json');
         }
 
         return $view;
