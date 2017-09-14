@@ -455,18 +455,18 @@ class AppExtension extends Extension
                 $project = 'enwiki';
             }
 
-            $projectName = ProjectRepository::getProject($project, $this->container)
+            $dbName = ProjectRepository::getProject($project, $this->container)
                 ->getDatabaseName();
 
             $stmt = "SELECT lag FROM `heartbeat_p`.`heartbeat` h
             RIGHT JOIN `meta_p`.`wiki` w ON concat(h.shard, \".labsdb\")=w.slice
-            WHERE dbname LIKE :project OR name LIKE :project OR url LIKE :project LIMIT 1";
+            WHERE dbname LIKE :project LIMIT 1";
 
             $conn = $this->container->get('doctrine')->getManager('replicas')->getConnection();
 
             // Prepare the query and execute
             $resultQuery = $conn->prepare($stmt);
-            $resultQuery->bindParam('project', $projectName);
+            $resultQuery->bindParam('project', $dbName);
             $resultQuery->execute();
 
             if ($resultQuery->errorCode() == 0) {
