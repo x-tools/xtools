@@ -5,6 +5,7 @@
 
 namespace AppBundle\Twig;
 
+use Xtools\ProjectRepository;
 use Xtools\User;
 
 /**
@@ -454,6 +455,9 @@ class AppExtension extends Extension
                 $project = 'enwiki';
             }
 
+            $projectName = ProjectRepository::getProject($project, $this->container)
+                ->getDatabaseName();
+
             $stmt = "SELECT lag FROM `heartbeat_p`.`heartbeat` h
             RIGHT JOIN `meta_p`.`wiki` w ON concat(h.shard, \".labsdb\")=w.slice
             WHERE dbname LIKE :project OR name LIKE :project OR url LIKE :project LIMIT 1";
@@ -462,7 +466,7 @@ class AppExtension extends Extension
 
             // Prepare the query and execute
             $resultQuery = $conn->prepare($stmt);
-            $resultQuery->bindParam('project', $project);
+            $resultQuery->bindParam('project', $projectName);
             $resultQuery->execute();
 
             if ($resultQuery->errorCode() == 0) {
