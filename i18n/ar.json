@@ -3,7 +3,8 @@
 		"authors": [
 			"Helmoony",
 			"ديفيد",
-			"Nemo bis"
+			"Nemo bis",
+			"محمد أحمد عبد الفتاح"
 		]
 	},
 	"about-xtools": "عن هذه الأدوات",
@@ -64,6 +65,7 @@
 	"deleted": "حُذفت",
 	"deleted-edits": "التعديلات المحذوفة",
 	"diff": "فرق",
+	"documentation": "التوثيق",
 	"duplicate-vote": "تصويت مكرر",
 	"edit": "عدل",
 	"edit-count": "عدد التعديلات",
@@ -338,6 +340,7 @@
 	"user-page": "صفحة مستخدم",
 	"username": "اسم المستخدم",
 	"username-or-ip": "اسم المستخد أو IPv4 أو IPv6",
+	"version": "الإصدار $1",
 	"view-source": "اعرض المصدر",
 	"vote-msg": "$1 قام بتحرير $2 $3 صفحة/صفحات!",
 	"web-chat": "الدردشة على شبكة الإنترنت",

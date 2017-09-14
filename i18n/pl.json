@@ -3,7 +3,8 @@
 		"authors": [
 			"Vesihiisi",
 			"Chrumps",
-			"Nemo bis"
+			"Nemo bis",
+			"Wojtas"
 		]
 	},
 	"about-xtools": "O narzędziu",
@@ -210,6 +211,7 @@
 	"user-is-not-admin": "Użytkownik nie jest administratorem",
 	"user-page": "Strona użytkownika",
 	"username": "Nazwa użytkownika",
+	"version": "Wersja $1",
 	"view-source": "Zobacz źródło",
 	"wednesday": "Środa",
 	"wiki": "Wiki",

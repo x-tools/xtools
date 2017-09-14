@@ -343,6 +343,7 @@
 	"user-page": "Page utilisateur",
 	"username": "Nom d'utilisateur",
 	"username-or-ip": "Nom d’utilisateur ou IPv4 ou IPv6",
+	"version": "Version $1",
 	"view-source": "Voir source",
 	"vote-msg": "$1 a modifié $2 $3 pages !",
 	"web-chat": "WebChat",

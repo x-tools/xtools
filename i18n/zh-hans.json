@@ -254,7 +254,7 @@
 	"rfx-intro": "此工具用于分析以下投票，并将重复票视为一票：",
 	"rfx-page": "RfX页",
 	"rfx-tally": "计票",
-	"rfx-total-votes": "总投票数",
+	"rfx-total-votes": "总非投票数",
 	"rights": "权限",
 	"rpp": "页面保护请求",
 	"saturday": "星期六",
