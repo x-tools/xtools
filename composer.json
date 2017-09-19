@@ -47,7 +47,8 @@
         "jms/serializer-bundle": "^1.4",
         "symfony/stopwatch": "^3.2",
         "doctrine/doctrine-migrations-bundle": "^1.0",
-        "doctrine/migrations": "1.2.*"
+        "doctrine/migrations": "1.2.*",
+        "eightpoints/guzzle-bundle": "^6.1"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",

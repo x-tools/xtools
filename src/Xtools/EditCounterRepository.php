@@ -260,13 +260,14 @@ class EditCounterRepository extends Repository
      */
     protected function globalEditCountsFromCentralAuth(User $user, Project $project)
     {
-        $this->log->debug(__METHOD__." Getting global edit counts for ".$user->getUsername());
         // Set up cache and stopwatch.
         $cacheKey = 'globalRevisionCounts.'.$user->getCacheKey();
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
         $this->stopwatch->start($cacheKey, 'XTools');
+
+        $this->log->debug(__METHOD__." Getting global edit counts from for ".$user->getUsername());
 
         // Load all projects, so it doesn't have to request metadata about each one as it goes.
         $project->getRepository()->getAll();
@@ -309,6 +310,7 @@ class EditCounterRepository extends Repository
      */
     protected function globalEditCountsFromDatabases(User $user, Project $project)
     {
+        $this->log->debug(__METHOD__." Getting global edit counts for ".$user->getUsername());
         $stopwatchName = 'globalRevisionCounts.'.$user->getUsername();
         $allProjects = $project->getRepository()->getAll();
         $topEditCounts = [];

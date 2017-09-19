@@ -9,6 +9,8 @@ use DateTime;
 use Exception;
 use DatePeriod;
 use DateInterval;
+use GuzzleHttp;
+use GuzzleHttp\Promise\Promise;
 
 /**
  * An EditCounter provides statistics about a user's edits on a project.
@@ -46,6 +48,9 @@ class EditCounter extends Model
     /** @var array Block data, with keys 'set' and 'received'. */
     protected $blocks;
 
+    /** @var integer[] Array keys are namespace IDs, values are the edit counts */
+    protected $namespaceTotals;
+
     /** @var int Number of semi-automated edits */
     protected $autoEditCount;
 
@@ -77,12 +82,75 @@ class EditCounter extends Model
     }
 
     /**
+     * This method asynchronously fetches all the expensive data, waits
+     * for each request to finish, and copies the values to the class instance.
+     * @return null
+     */
+    public function prepareData()
+    {
+        $project = $this->project->getDomain();
+        $username = $this->user->getUsername();
+
+        /**
+         * The URL of each endpoint, keyed by the name of the corresponding class-level
+         * instance variable.
+         * @var array[]
+         */
+        $endpoints = [
+            "pairData" => "ec/pairdata/$project/$username",
+            "logCounts" => "ec/logcounts/$project/$username",
+            "namespaceTotals" => "ec/namespacetotals/$project/$username",
+            "editSizeData" => "ec/editsizes/$project/$username",
+            "monthCounts" => "ec/monthcounts/$project/$username",
+            // "globalEditCounts" => "ec-globaleditcounts/$project/$username",
+            "autoEditCount" => "api/user/automated_editcount/$project/$username",
+        ];
+
+        /**
+         * Keep track of all promises so we can wait for all of them to complete.
+         * @var GuzzleHttp\Promise\Promise[]
+         */
+        $promises = [];
+
+        foreach ($endpoints as $key => $endpoint) {
+            $promise = $this->getRepository()->queryXToolsApi($endpoint, true);
+            $promises[] = $promise;
+
+            // Handle response of $promise asynchronously.
+            $promise->then(function ($response) use ($key, $endpoint) {
+                $result = (array) json_decode($response->getBody()->getContents());
+
+                if (isset($result)) {
+                    // Copy result to the class class instance. From here any subsequent
+                    // calls to the getters (e.g. getPairData()) will return these cached values.
+                    $this->{$key} = $result;
+                } else {
+                    // The API should *always* return something, so if $result is not set,
+                    // something went wrong, so we simply won't set it and the getters will in
+                    // turn re-attempt to get the data synchronously.
+                    // We'll log this to see how often it happens.
+                    $this->getRepository()
+                        ->getLog()
+                        ->error("Failed to fetch data for $endpoint via async, " .
+                            "re-attempting synchoronously.");
+                }
+            });
+        }
+
+        // Wait for all promises to complete, even if some of them fail.
+        GuzzleHttp\Promise\settle($promises)->wait();
+
+        // Everything we need now lives on the class instance, so we're done.
+        return;
+    }
+
+    /**
      * Get revision and page counts etc.
      * @return int[]
      */
-    protected function getPairData()
+    public function getPairData()
     {
-        if (! is_array($this->pairData)) {
+        if (!is_array($this->pairData)) {
             $this->pairData = $this->getRepository()
                 ->getPairData($this->project, $this->user);
         }
@@ -93,9 +161,9 @@ class EditCounter extends Model
      * Get revision dates.
      * @return int[]
      */
-    protected function getLogCounts()
+    public function getLogCounts()
     {
-        if (! is_array($this->logCounts)) {
+        if (!is_array($this->logCounts)) {
             $this->logCounts = $this->getRepository()
                 ->getLogCounts($this->project, $this->user);
         }
@@ -107,7 +175,7 @@ class EditCounter extends Model
      * @param string $type Either 'set' or 'received'.
      * @return array
      */
-    protected function getBlocks($type)
+    public function getBlocks($type)
     {
         if (isset($this->blocks[$type]) && is_array($this->blocks[$type])) {
             return $this->blocks[$type];
@@ -583,8 +651,12 @@ class EditCounter extends Model
      */
     public function namespaceTotals()
     {
+        if ($this->namespaceTotals) {
+            return $this->namespaceTotals;
+        }
         $counts = $this->getRepository()->getNamespaceTotals($this->project, $this->user);
         arsort($counts);
+        $this->namespaceTotals = $counts;
         return $counts;
     }
 
@@ -705,6 +777,10 @@ class EditCounter extends Model
      */
     public function yearCounts($currentTime = null)
     {
+        if (isset($this->yearCounts)) {
+            return $this->yearCounts;
+        }
+
         $out = $this->monthCounts($currentTime);
 
         foreach ($out['totals'] as $nsId => $years) {
@@ -713,6 +789,7 @@ class EditCounter extends Model
             }
         }
 
+        $this->yearCounts = $out;
         return $out;
     }
 
@@ -768,13 +845,15 @@ class EditCounter extends Model
         if (empty($this->globalEditCounts)) {
             $this->globalEditCounts = $this->getRepository()
                 ->globalEditCounts($this->user, $this->project);
-            if ($sorted) {
-                // Sort.
-                uasort($this->globalEditCounts, function ($a, $b) {
-                    return $b['total'] - $a['total'];
-                });
-            }
         }
+
+        if ($sorted) {
+            // Sort.
+            uasort($this->globalEditCounts, function ($a, $b) {
+                return $b['total'] - $a['total'];
+            });
+        }
+
         return $this->globalEditCounts;
     }
 
@@ -822,9 +901,9 @@ class EditCounter extends Model
      * Get average edit size, and number of large and small edits.
      * @return int[]
      */
-    protected function getEditSizeData()
+    public function getEditSizeData()
     {
-        if (! is_array($this->editSizeData)) {
+        if (!is_array($this->editSizeData)) {
             $this->editSizeData = $this->getRepository()
                 ->getEditSizeData($this->project, $this->user);
         }
