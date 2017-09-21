@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"Nemo bis"
+			"Nemo bis",
+			"Ans"
 		]
 	},
 	"actions": "การแก้ไข",
@@ -94,6 +95,7 @@
 	"num-months": "{{PLURAL: $1|เดือน|เดือน}}",
 	"num-revisions": "{{PLURAL: $1|รุ่นการแก้ไข|รุ่นการแก้ไข}}",
 	"num-seconds": "{{PLURAL: $1|วินาที|วินาที}}",
+	"num-sitelinks": "{{PLURAL:$1|การเชื่อมโยงข้ามไซต์}}",
 	"num-users": "{{PLURAL: $1|ผู้ใช้|ผู้ใช้}}",
 	"num-weeks": "{{PLURAL: $1|สัปดาห์|สัปดาห์}}",
 	"num-years": "{{PLURAL: $1|ปี|ปี}}",
