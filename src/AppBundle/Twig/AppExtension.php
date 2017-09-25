@@ -102,11 +102,19 @@ class AppExtension extends Extension
      * See if a given i18n message exists.
      * @TODO: refactor all intuition stuff so it can be used anywhere
      * @param string $message The message.
+     * @param array $vars
      * @return bool
      */
-    public function intuitionMessageExists($message = "")
+    public function intuitionMessageExists($message = '', $vars = [])
     {
-        return $this->getIntuition()->msgExists($message, [ "domain" => "xtools" ]);
+        return $this->getIntuition()->msgExists($message, array_merge(
+            [
+                'domain' => 'xtools'
+            ],
+            [
+                'variables' => $vars
+            ]
+        ));
     }
 
     /**
@@ -122,7 +130,7 @@ class AppExtension extends Extension
             $message = $message[0];
             $vars = array_slice($vars, 1);
         }
-        if ($this->intuitionMessageExists($message)) {
+        if ($this->intuitionMessageExists($message, $vars)) {
             return $this->intuitionMessage($message, $vars);
         } else {
             return $message;

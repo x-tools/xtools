@@ -20,8 +20,17 @@ class Page extends Model
     /** @var string[] Metadata about this page. */
     protected $pageInfo;
 
-    /** @var string[] Revision history of this page */
+    /** @var string[] Revision history of this page. */
     protected $revisions;
+
+    /** @var int Number of revisions for this page. */
+    protected $numRevisions;
+
+    /** @var string[] List of Wikidata sitelinks for this page. */
+    protected $wikidataItems;
+
+    /** @var int Number of Wikidata sitelinks for this page. */
+    protected $numWikidataItems;
 
     /**
      * Page constructor.
@@ -206,14 +215,25 @@ class Page extends Model
      */
     public function getNumRevisions(User $user = null)
     {
-        // Return the count of revisions if already present
-        if (!empty($this->revisions)) {
-            return count($this->revisions);
+        // If a user is given, we will not cache the result via instance variable.
+        if ($user !== null) {
+            return (int) $this->getRepository()->getNumRevisions($this, $user);
         }
 
-        // Otherwise do a COUNT in the event fetching
-        // all revisions is not desired
-        return (int) $this->getRepository()->getNumRevisions($this, $user);
+        // Return cached value, if present.
+        if ($this->numRevisions !== null) {
+            return $this->numRevisions;
+        }
+
+        // Otherwise, return the count of all revisions if already present.
+        if ($this->revisions !== null) {
+            $this->numRevisions = count($this->revisions);
+        } else {
+            // Otherwise do a COUNT in the event fetching all revisions is not desired.
+            $this->numRevisions = (int) $this->getRepository()->getNumRevisions($this);
+        }
+
+        return $this->numRevisions;
     }
 
     /**
@@ -249,14 +269,23 @@ class Page extends Model
     }
 
     /**
-     * Get the statement for a single revision,
-     * so that you can iterate row by row.
+     * Get the statement for a single revision, so that you can iterate row by row.
+     * @see PagesRepository::getRevisionsStmt()
      * @param User|null $user Specify to get only revisions by the given user.
+     * @param int $limit Max number of revisions to process.
+     * @param int $numRevisions Number of revisions, if known. This is used solely to determine the
+     *   OFFSET if we are given a $limit. If $limit is set and $numRevisions is not set, a
+     *   separate query is ran to get the nuber of revisions.
      * @return Doctrine\DBAL\Driver\PDOStatement
      */
-    public function getRevisionsStmt(User $user = null)
+    public function getRevisionsStmt(User $user = null, $limit = null, $numRevisions = null)
     {
-        return $this->getRepository()->getRevisionsStmt($this, $user);
+        // If we have a limit, we need to know the total number of revisions so that PagesRepo
+        // will properly set the OFFSET. See PagesRepository::getRevisionsStmt() for more info.
+        if (isset($limit) && $numRevisions === null) {
+            $numRevisions = $this->getNumRevisions($user);
+        }
+        return $this->getRepository()->getRevisionsStmt($this, $user, $limit, $numRevisions);
     }
 
     /**
@@ -276,6 +305,7 @@ class Page extends Model
 
     /**
      * Get assessments of this page
+     * @see https://www.mediawiki.org/wiki/Extension:PageAssessments
      * @return string[]|false `false` if unsupported, or array in the format of:
      *         [
      *             'assessment' => 'C', // overall assessment
@@ -303,6 +333,7 @@ class Page extends Model
         // This will be replaced with the first valid class defined for any WikiProject
         $overallQuality = $config['class']['Unknown'];
         $overallQuality['value'] = '???';
+        $overallQuality['badge'] = $this->project->getAssessmentBadgeURL($overallQuality['badge']);
 
         $decoratedAssessments = [];
 
@@ -442,7 +473,10 @@ class Page extends Model
      */
     public function getWikidataItems()
     {
-        return $this->getRepository()->getWikidataItems($this);
+        if (!is_array($this->wikidataItems)) {
+            $this->wikidataItems = $this->getRepository()->getWikidataItems($this);
+        }
+        return $this->wikidataItems;
     }
 
     /**
@@ -451,7 +485,12 @@ class Page extends Model
      */
     public function countWikidataItems()
     {
-        return $this->getRepository()->countWikidataItems($this);
+        if (is_array($this->wikidataItems)) {
+            $this->numWikidataItems = count($this->wikidataItems);
+        } elseif ($this->numWikidataItems === null) {
+            $this->numWikidataItems = $this->getRepository()->countWikidataItems($this);
+        }
+        return $this->numWikidataItems;
     }
 
     /**
@@ -486,7 +525,7 @@ class Page extends Model
 
     /**
      * Get the sum of pageviews over the last N days
-     * @param int [$days] Default 30
+     * @param int $days Default 30
      * @return int Number of pageviews
      */
     public function getLastPageviews($days = 30)
@@ -494,5 +533,14 @@ class Page extends Model
         $start = date('Ymd', strtotime("-$days days"));
         $end = date('Ymd');
         return $this->getPageviews($start, $end);
+    }
+
+    /**
+     * Is the page the project's Main Page?
+     * @return bool
+     */
+    public function isMainPage()
+    {
+        return $this->getProject()->getMainPage() === $this->getTitle();
     }
 }

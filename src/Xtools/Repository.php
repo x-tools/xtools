@@ -172,7 +172,7 @@ abstract class Repository
      *
      * @param string $databaseName
      * @param string $tableName
-     * @param string|null [$tableExtension] Optional table extension, which will only get used if we're on labs.
+     * @param string|null $tableExtension Optional table extension, which will only get used if we're on labs.
      * @return string Fully-qualified and quoted table name.
      */
     public function getTableName($databaseName, $tableName, $tableExtension = null)
