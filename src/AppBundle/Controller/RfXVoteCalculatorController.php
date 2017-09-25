@@ -35,6 +35,8 @@ class RfXVoteCalculatorController extends Controller
      * Renders the index page for RfXVoteCalculator
      *
      * @Route("/rfxvote", name="rfxvote")
+     * @Route("/rfxvote/", name="rfxvoteSlash")
+     * @Route("/rfxvote/index.php", name="rfxvoteIndexPhp")
      * @Route("/rfxvote", name="RfXVoteCalculator")
      *
      * @return Response

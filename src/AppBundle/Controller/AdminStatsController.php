@@ -33,7 +33,7 @@ class AdminStatsController extends Controller
      *
      * @Route("/adminstats",           name="adminstats")
      * @Route("/adminstats/",          name="AdminStatsSlash")
-     * @Route("/adminstats/index.php", name="AdminStatsSlash")
+     * @Route("/adminstats/index.php", name="AdminStatsIndexPhp")
      *
      * @return Route|\Symfony\Component\HttpFoundation\Response
      */

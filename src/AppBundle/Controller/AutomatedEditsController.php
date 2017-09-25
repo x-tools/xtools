@@ -32,7 +32,9 @@ class AutomatedEditsController extends Controller
     /**
      * Display the search form.
      * @Route("/autoedits", name="autoedits")
+     * @Route("/autoedits/", name="autoeditsSlash")
      * @Route("/automatededits", name="autoeditsLong")
+     * @Route("/automatededits/", name="autoeditsLongSlash")
      * @Route("/autoedits/index.php", name="autoeditsIndexPhp")
      * @Route("/automatededits/index.php", name="autoeditsLongIndexPhp")
      * @param Request $request The HTTP request.

@@ -40,6 +40,7 @@ class RfXAnalysisController extends Controller
      *
      * @Route("/rfx",                  name="rfxAnalysis")
      * @Route("/rfx",                  name="rfx")
+     * @Route("/rfx/",                 name="rfxSlash")
      * @Route("/rfx/index.php",        name="rfxAnalysisIndexPhp")
      * @Route("/rfx/{project}",        name="rfxAnalysisProject")
      * @Route("/rfx/{project}/{type}", name="rfxAnalysisProjectType")
