@@ -3,7 +3,8 @@
 		"authors": [
 			"Fitoschido",
 			"Macofe",
-			"Nemo bis"
+			"Nemo bis",
+			"MarcoAurelio"
 		]
 	},
 	"about-xtools": "Acerca de estas herramientas",
@@ -191,6 +192,7 @@
 	"num-seconds": "{{PLURAL: $1|segundo|segundos}}",
 	"num-tools": "{{PLURAL:$1|herramienta|herramientas}}",
 	"num-users": "{{PLURAL: $1|Usuario|Usuarios}}",
+	"num-watchers": "{{PLURAL:$1|seguidor|seguidores}}",
 	"num-weeks": "{{PLURAL: $1|semana|semanas}}",
 	"num-years": "{{PLURAL: $1|año|años}}",
 	"oppose": "Oponerse",
@@ -259,6 +261,7 @@
 	"small-edits": "Ediciones menores (<20 bytes)",
 	"start": "Fecha de inicio",
 	"submit": "Enviar",
+	"sul-info": "Información de la cuenta global del usuario (SUL)",
 	"summary": "Resumen",
 	"sunday": "Domingo",
 	"support": "Asistencia",
@@ -307,8 +310,8 @@
 	"top-edited-pages": "Páginas más editadas",
 	"top-editors": "Editores principales",
 	"top-projects-edit-counts": "Conteos de ediciones globales",
-	"top-ten-by-edits": "TOP 10 por ediciones",
-	"top-ten-by-text": "TOP 10 de adición de texto",
+	"top-ten-by-edits": "Primeras 10 por ediciones",
+	"top-ten-by-text": "Primeras 10 de adición de texto",
 	"top-ten-count": "Número de ediciones hechas por el top 10% de usuarios activos",
 	"top-ten-percent": "Top 10%",
 	"topedits-article": "Ediciones principales a un artículo",

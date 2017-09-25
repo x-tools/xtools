@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"Nemo bis",
-			"Fatemi127"
+			"Fatemi127",
+			"Obzord"
 		]
 	},
 	"actions": "عملکردها",
@@ -94,9 +95,12 @@
 	"num-hours": "{{PLURAL: $1|ساعت|ساعت}}",
 	"num-minutes": "{{PLURAL: $1|دقیقه|دقیقه}}",
 	"num-months": "{{PLURAL: $1|ماه|ماه}}",
+	"num-pageviews": "{{PLURAL:$1|بازدید صفحه|بازدیدهای صفحه}}",
 	"num-revisions": "{{PLURAL:$1|نسخه|نسخه}}",
+	"num-revisions-since": "$1 {{PLURAL:$2|نسخه|نسخه‌ها}} از $3",
 	"num-seconds": "{{PLURAL: $1|ثانیه|ثانیه}}",
 	"num-users": "{{PLURAL: $1|کاربر|کاربر}}",
+	"num-watchers": "{{PLURAL:$1|پیگیری‌کننده|پیگیری‌کننده‌ها}}",
 	"num-weeks": "{{PLURAL: $1|هفته|هفته}}",
 	"num-years": "{{PLURAL: $1|سال|سال}}",
 	"oppose": "مخالفت",
@@ -112,6 +116,8 @@
 	"pages-deleted": "صفحات حذف شده",
 	"pages-moved": "صفحات منتقل شده",
 	"pageviews": "پیش‌نمایش صفحه‌ها",
+	"pageviews-pages-created": "بازدیدهای صفحات ایجادشده",
+	"pageviews-userpage": "بازدیدهای صفحهٔ کاربری",
 	"patrol": "گشت",
 	"percentage": "درصد",
 	"powered-by": "طراحی‌شده توسط $1",
@@ -131,6 +137,7 @@
 	"result-by-name": "نتیجه با نام / آی‌پی",
 	"result-by-time": "نتیجه بر پایه زمان",
 	"reverted-edits": "ویرایش‌های واگردانی‌شده",
+	"revision-delete": "حذف نسخه",
 	"rfx-bureaucrat": "این ابزار می‌تواند درخواست برای صفحات دیوان سالاری را هم تحلیل کند.",
 	"rfx-intro": "این ابزار آراء را آنالیز کرده و رأی‌دهندگان تکراری را مشخص می‌سازد:",
 	"rfx-page": "صفحهٔ RfX",
