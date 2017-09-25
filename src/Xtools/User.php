@@ -214,8 +214,8 @@ class User extends Model
      * @param string $start Start date in a format accepted by strtotime()
      * @param string $end End date in a format accepted by strtotime()
      * @param int $offset Used for pagination, offset results by N edits
-     * @return array[] Result of query, with columns (string) 'page_title',
-     *   (int) 'page_namespace', (int) 'rev_id', (DateTime) 'timestamp',
+     * @return array[] Result of query, with columns (string) 'full_page_title' including namespace,
+     *   (string) 'page_title', (int) 'page_namespace', (int) 'rev_id', (DateTime) 'timestamp',
      *   (bool) 'minor', (int) 'length', (int) 'length_change', (string) 'comment'
      */
     public function getNonAutomatedEdits(
@@ -238,12 +238,14 @@ class User extends Model
 
         return array_map(function ($rev) use ($namespaces) {
             $pageTitle = $rev['page_title'];
+            $fullPageTitle = '';
 
             if ($rev['page_namespace'] !== '0') {
-                $pageTitle = $namespaces[$rev['page_namespace']] . ":$pageTitle";
+                $fullPageTitle = $namespaces[$rev['page_namespace']] . ":$pageTitle";
             }
 
             return [
+                'full_page_title' => $fullPageTitle,
                 'page_title' => $pageTitle,
                 'page_namespace' => (int) $rev['page_namespace'],
                 'rev_id' => (int) $rev['rev_id'],

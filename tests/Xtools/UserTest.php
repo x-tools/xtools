@@ -169,6 +169,7 @@ class UserTest extends PHPUnit_Framework_TestCase
         $userRepo->expects($this->once())
             ->method('getNonAutomatedEdits')
             ->willReturn([[
+                'full_page_title' => 'Talk:Test_page',
                 'page_title' => 'Test_page',
                 'page_namespace' => '1',
                 'rev_id' => '123',
@@ -196,7 +197,8 @@ class UserTest extends PHPUnit_Framework_TestCase
         // Asserts type casting and page title normalization worked
         $this->assertArraySubset(
             [
-                'page_title' => 'Talk:Test_page',
+                'full_page_title' => 'Talk:Test_page',
+                'page_title' => 'Test_page',
                 'page_namespace' => 1,
                 'rev_id' => 123,
                 'timestamp' => DateTime::createFromFormat('YmdHis', '20170101000000'),

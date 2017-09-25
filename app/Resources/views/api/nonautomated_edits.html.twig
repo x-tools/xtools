@@ -23,12 +23,12 @@
         {% else %}
             {% for edit in edits %}
                 <tr>
-                    <td>{{ wiki.pageLink(edit.page) }}</td>
+                    <td>{{ wiki.pageLinkRaw(edit.page.title(true), project) }}</td>
                     <td>{{ wiki.permaLink(edit) }}</td>
                     <td>
                         {{ wiki.diffLink(edit) }}
                         &middot;
-                        {{ wiki.pageHistLink(edit.page) }}
+                        {{ wiki.pageHistLinkRaw(edit.page.title(true), project) }}
                     </td>
                     <td>
                         {{ edit.size|diff_format }}

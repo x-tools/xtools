@@ -49,10 +49,16 @@ class Page extends Model
 
     /**
      * Get the page's title.
+     * @param bool $useUnnormalized Use the unnormalized page title to avoid an
+     *    API call. This should be used only if you fetched the page title via
+     *    other means (SQL query), and is not from user input alone.
      * @return string
      */
-    public function getTitle()
+    public function getTitle($useUnnormalized = false)
     {
+        if ($useUnnormalized) {
+            return $this->unnormalizedPageName;
+        }
         $info = $this->getPageInfo();
         return isset($info['title']) ? $info['title'] : $this->unnormalizedPageName;
     }

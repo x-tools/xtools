@@ -21,6 +21,7 @@
 	"afd": "Articles for deletion page label",
 	"aiv": "Administrator intervention against vandalism page label",
 	"all": "{{Identical|All}}",
+	"all-approximate": "Message indicating all data on the page is approximate.",
 	"all-edits": "Label for the line representing the number of total edits an article received over time.",
 	"all-languages": "A link to show the article in the multilingual pageviews tool. This appears in the 'info tiles' on Pageviews Analysis\n{{Identical|All languages}}",
 	"all-namespaces": "Label for the option to show data for all namespaces.",

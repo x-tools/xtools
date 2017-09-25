@@ -169,12 +169,9 @@ class ApiController extends FOSRestController
 
         if ($request->query->get('format') === 'html') {
             $edits = array_map(function ($attrs) use ($project, $username) {
-                $nsName = '';
-                if ($attrs['page_namespace']) {
-                    $nsName = $project->getNamespaces()[$attrs['page_namespace']];
-                }
                 $page = $project->getRepository()
-                    ->getPage($project, $nsName . ':' . $attrs['page_title']);
+                    ->getPage($project, $attrs['full_page_title']);
+                $pageTitles[] = $attrs['full_page_title'];
                 $attrs['id'] = $attrs['rev_id'];
                 $attrs['username'] = $username;
                 return new Edit($page, $attrs);

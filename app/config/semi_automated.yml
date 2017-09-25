@@ -23,6 +23,14 @@ parameters:
     # You can also set wiki-specific values that will get merged into the global one.
     # See 'Hugge' under 'global' and 'en.wikipedia.org' for an example.
     global:
+        Generic rollback:
+            regex: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) edits by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\] \(\[\[User talk:.*?\|talk\]\]\) to last (version|revision) by .*'
+            link: Special:MyLanguage/Project:Rollback
+            revert: true
+        Undo:
+            regex: '^(Undid|Undo) revision \d+ by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\]'
+            link: Special:MyLanguage/Project:Undo
+            revert: true
         Huggle:
             regex: '\(\[\[WP:HG'
             tag: huggle
@@ -30,21 +38,28 @@ parameters:
         WPCleaner:
             regex: 'WP:CLEANER|\[\[\Wikipedia:DPL|\[\[WP:WCW\]\] project \('
             tag: WPCleaner
-            link: Project:WPCleaner
+            link: Special:MyLanguage/Project:WPCleaner
         IABot:
             tag: 'OAuth CID: 678'
-            link: User:InternetArchiveBot
+            link: Special:MyLanguage/User:InternetArchiveBot
+        HotCat:
+            regex: 'using \[\[(WP:HOTCAT|WP:HC|Help:Gadget-HotCat)\|HotCat'
+            link: Special:MyLanguage/Project:HotCat
+        Cat-a-lot:
+            regex: '\[\[Help:Cat-a-lot\|Cat-a-lot\]\]'
+            link: commons:Cat-a-lot
+        Global rename:
+            regex: 'Automatically moved page while renaming the user'
+            link: meta:Special:MyLanguage/Global renamers
+        Page move:
+            regex: 'moved page \[\[(?!.*?WP:AFCH)|moved \[\[.*?\]\] to \[\['
+            link: Special:MyLanguage/Project:Move
+        Popups:
+            regex: 'Wikipedia:Tools\/Navigation_popups|popups'
+            link: w:en:Project:Popups
 
     # Per-wiki lists
     en.wikipedia.org:
-        Generic rollback:
-            regex: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) edits by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\] \(\[\[User talk:.*?\|talk\]\]\) to last version by .*'
-            link: Project:Rollback
-            revert: true
-        Undo:
-            regex: '^Undid revision \d+ by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\]'
-            link: Project:Undo
-            revert: true
         Pending changes revert:
             regex: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) \d+ (\[\[Wikipedia:Pending changes\|pending\]\]|pending) edits? (to revision \d+|by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\])'
             link: Project:Pending changes
@@ -55,9 +70,6 @@ parameters:
             revert: true
         Huggle: # This gets merged into the global Huggle definition (the revert regex here is enwiki-specific)
             revert: 'Reverted edits by.*?WP:HG'
-        Page move:
-            regex: '^.*?moved page \[\[(?!.*?WP:AFCH)|moved \[\[.*?\]\] to \[\['
-            link: Project:Move
         Page curation:
             regex: 'using \[\[Wikipedia:Page Curation\|Page Curation'
             link: Project:Page curation
@@ -72,18 +84,12 @@ parameters:
         Igloo:
             regex: 'Wikipedia:Igloo'
             link: w:en:Wikipedia:Igloo
-        Popups:
-            regex: 'Wikipedia:Tools\/Navigation_popups|popups'
-            link: Project:Popups
         AFCH:
             regex: 'WP:(AFCH|AFCHRW)'
             link: Project:AFCH
         AutoWikiBrowser:
             regex: '(Wikipedia|WP|Project):AWB'
             link: Project:AutoWikiBrowser
-        HotCat:
-            regex: 'using \[\[(WP:HOTCAT|WP:HC|Help:Gadget-HotCat)\|HotCat'
-            link: Project:HotCat
         reFill:
             regex: 'User:Zhaofeng Li\/Reflinks|WP:REFILL'
             link: Project:ReFill
@@ -160,9 +166,6 @@ parameters:
         User:Doug/closetfd.js:
             regex: '\(using \[\[User:Doug\/closetfd.js'
             link: User:Doug/closetfd.js
-        Cat-a-lot:
-            regex: '\[\[Help:Cat-a-lot\|Cat-a-lot\]\]'
-            link: commons:Cat-a-lot
         autoFormatter:
             regex: 'using (\[\[:meta:User:TMg\/autoFormatter|autoFormatter)'
             link: meta:User:TMg/autoFormatter
@@ -214,3 +217,41 @@ parameters:
         XFDCloser:
             regex: '\[\[WP:XFDC\|XFDcloser'
             link: User:Evad37/XFDcloser.js
+    commons.wikimedia.org:
+        UploadWizard:
+            regex: '^User created page with UploadWizard$'
+            link: Special:MyLanguage/Commons:Upload Wizard
+        File rename:
+            regex: '\[\[COM:FR\|File renamed\]\]:'
+            link: Special:MyLanguage/Commons:File_renaming
+        VisualFileChange:
+            regex: 'Using \[\[COM:VFC'
+            tag: VisualFileChange
+            link: Special:MyLanguage/Help:VisualFileChange.js
+        AjaxQuickDelete:
+            regex: '^(This category needs discussion|\[\[:.*?\]\] needs discussion|Starting category discussion|Nominating for deletion|\[\[:.*?\]\] has been nominated for deletion|Starting deletion request|Listing \[\[.*?\]\])$|#Autoreport by AjaxQuickDelete|^Updating redirect while processing'
+            link: Special:MyLanguage/Help:Nominate_for_deletion
+        QuickDelete:
+            regex: '^(Marking as possible copyvio because|Notification of possible copyright violation for|\[\[.*?\]\] does not have a source|Please send permission for \[\[|\]\] does not have a license)|^(File has no source|Missing permission)$'
+            link: Special:MyLanguage/Help:QuickDelete
+        POTY:
+            regex: '\[\[Help:(?:Gadget-)EnhancedPOTY.js|POTY App\]\]$'
+            link: Help:Gadget-EnhancedPOTY.js
+        Flickr2Commons:
+            regex: 'via \[\[(?:Special:MyLanguage\/)?Commons:Flickr2Commons'
+            link: Special:MyLanguage/Flickr2Commons
+        Android Commons:
+            regex: '^Uploaded using Android Commons app$'
+            link: Special:MyLanguage/Commons:Mobile_app
+        Commonsist:
+            regex: '^commonist \d\.\d'
+            link: Special:MyLanguage/Commons:Commonist
+        RenameLink:
+            regex: '^\(\[\[Help:RenameLink\|Script'
+            link: Special:MyLanguage/Help:RenameLink
+        Geograph2commons:
+            regex: 'Transferred from geograph.co.uk using'
+            link: toollabs:geograph2commons
+        SettingsManager:
+            regex: '\[\[MediaWiki:Gadget-SettingsManager.js\|SettingsManager'
+            link: MediaWiki:Gadget-SettingsManager.js

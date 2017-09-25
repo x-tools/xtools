@@ -53,6 +53,12 @@ class PageTest extends WebTestCase
         $page->setRepository($pageRepo);
         $this->assertEquals('Test_Page_2', $page->getTitle());
         $this->assertEquals('<em>Test</em> page 2', $page->getDisplayTitle());
+
+        // Getting the unnormalized title should not call getPageInfo.
+        $page = new Page($project, 'talk:Test Page_3');
+        $page->setRepository($pageRepo);
+        $pageRepo->expects($this->never())->method('getPageInfo');
+        $this->assertEquals('talk:Test Page_3', $page->getTitle(true));
     }
 
     /**
