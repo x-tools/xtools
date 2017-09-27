@@ -328,61 +328,179 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Ensure parsing of log_params properly works, based on known formats
+     * @dataProvider longestBlockProvider
      */
-    public function testLongestBlockDays()
+    public function testLongestBlockSeconds($blockLog, $longestDuration)
     {
-        // Scenario 1
+        $currentTime = time();
         $this->editCounterRepo->expects($this->once())
             ->method('getBlocksReceived')
             ->with($this->project, $this->user)
-            ->willReturn([
-                [
+            ->willReturn($blockLog);
+        $this->assertEquals($this->editCounter->getLongestBlockSeconds(), $longestDuration);
+    }
+
+    /**
+     * Data for self::testLongestBlockSeconds().
+     * @return string[]
+     */
+    public function longestBlockProvider()
+    {
+        return [
+            // // Blocks that don't overlap, longest was 31 days.
+            [
+                [[
                     'log_timestamp' => '20170101000000',
-                    'log_params' => 'a:2:{s:11:"5::duration";s:8:"72 hours";s:8:"6::flags";s:8:"nocreate";}',
+                    'log_params' => 'a:2:{s:11:"5::duration";s:8:"72 hours"' .
+                        ';s:8:"6::flags";s:8:"nocreate";}',
+                    'log_action' => 'block',
                 ],
                 [
                     'log_timestamp' => '20170301000000',
-                    'log_params' => 'a:2:{s:11:"5::duration";s:7:"1 month";s:8:"6::flags";s:11:"noautoblock";}',
+                    'log_params' => 'a:2:{s:11:"5::duration";s:7:"1 month"' .
+                        ';s:8:"6::flags";s:11:"noautoblock";}',
+                    'log_action' => 'block',
+                ]],
+                2678400 // 31 days in seconds.
+            ],
+            // Blocks that do overlap, without any unblocks. Combined 10 days.
+            [
+                [[
+                    'log_timestamp' => '20170101000000',
+                    'log_params' => 'a:2:{s:11:"5::duration";s:7:"1 month"' .
+                        ';s:8:"6::flags";s:8:"nocreate";}',
+                    'log_action' => 'block',
                 ],
-            ]);
-        $this->assertEquals(31, $this->editCounter->getLongestBlockDays());
-
-        // Scenario 2
-        $editCounter2 = new EditCounter($this->project, $this->user);
-        $editCounterRepo2 = $this->getMock(EditCounterRepository::class);
-        $editCounter2->setRepository($editCounterRepo2);
-        $editCounterRepo2->expects($this->once())
-            ->method('getBlocksReceived')
-            ->with($this->project, $this->user)
-            ->willReturn([
+                [
+                    'log_timestamp' => '20170110000000',
+                    'log_params' => 'a:2:{s:11:"5::duration";s:8:"24 hours"' .
+                        ';s:8:"6::flags";s:11:"noautoblock";}',
+                    'log_action' => 'reblock',
+                ]],
+                864000 // 10 days in seconds.
+            ],
+            // 30 day block that was later unblocked at only 10 days, followed by a shorter block.
+            [
+                [[
+                    'log_timestamp' => '20170101000000',
+                    'log_params' => 'a:2:{s:11:"5::duration";s:7:"1 month"' .
+                        ';s:8:"6::flags";s:8:"nocreate";}',
+                    'log_action' => 'block',
+                ],
+                [
+                    'log_timestamp' => '20170111000000',
+                    'log_params' => 'a:0:{}',
+                    'log_action' => 'unblock',
+                ],
                 [
                     'log_timestamp' => '20170201000000',
-                    'log_params' => 'a:2:{s:11:"5::duration";s:8:"infinite";s:8:"6::flags";s:8:"nocreate";}',
+                    'log_params' => 'a:2:{s:11:"5::duration";s:8:"24 hours"' .
+                        ';s:8:"6::flags";s:11:"noautoblock";}',
+                    'log_action' => 'block',
+                ]],
+                864000 // 10 days in seconds.
+            ],
+            // Blocks ending with a still active indefinite block. Older block uses legacy format.
+            [
+                [[
+                    'log_timestamp' => '20170101000000',
+                    'log_params' => "1 month\nnoautoblock",
+                    'log_action' => 'block',
                 ],
                 [
-                    'log_timestamp' => '20170701000000',
-                    'log_params' => 'a:2:{s:11:"5::duration";s:7:"60 days";s:8:"6::flags";s:8:"nocreate";}',
+                    'log_timestamp' => '20170301000000',
+                    'log_params' => 'a:2:{s:11:"5::duration";s:10:"indefinite"' .
+                        ';s:8:"6::flags";s:11:"noautoblock";}',
+                    'log_action' => 'block',
+                ]],
+                -1 // Indefinite
+            ],
+            // Block that's active, with an explicit expiry set.
+            [
+                [[
+                    'log_timestamp' => '20170927203624',
+                    'log_params' => 'a:2:{s:11:"5::duration";s:29:"Sat, 06 Oct 2026 12:36:00 GMT"' .
+                        ';s:8:"6::flags";s:11:"noautoblock";}',
+                    'log_action' => 'block',
+                ]],
+                285091176
+            ],
+            // Two indefinite blocks.
+            [
+                [[
+                    'log_timestamp' => '20160513200200',
+                    'log_params' => 'a:2:{s:11:"5::duration";s:10:"indefinite"' .
+                        ';s:8:"6::flags";s:19:"nocreate,nousertalk";}',
+                    'log_action' => 'block',
                 ],
-            ]);
-        $this->assertEquals(-1, $editCounter2->getLongestBlockDays());
+                [
+                    'log_timestamp' => '20160717021328',
+                    'log_params' => 'a:2:{s:11:"5::duration";s:8:"infinite"' .
+                        ';s:8:"6::flags";s:31:"nocreate,noautoblock,nousertalk";}',
+                    'log_action' => 'reblock',
+                ]],
+                -1
+            ],
+        ];
+    }
 
-        // Scenario 3
-        $editCounter3 = new EditCounter($this->project, $this->user);
-        $editCounterRepo3 = $this->getMock(EditCounterRepository::class);
-        $editCounter3->setRepository($editCounterRepo3);
-        $editCounterRepo3->expects($this->once())
-            ->method('getBlocksReceived')
-            ->with($this->project, $this->user)
-            ->willReturn([
+    /**
+     * Parsing block log entries.
+     * @dataProvider blockLogProvider
+     */
+    public function testParseBlockLogEntry($logEntry, $assertion)
+    {
+        $editCounter = new EditCounter($this->project, $this->user);
+        $this->assertEquals(
+            $editCounter->parseBlockLogEntry($logEntry),
+            $assertion
+        );
+    }
+
+    /**
+     * Data for self::testParseBlockLogEntry().
+     * @return string[]
+     */
+    public function blockLogProvider()
+    {
+        return [
+            [
                 [
                     'log_timestamp' => '20170701000000',
-                    'log_params' => 'a:2:{s:11:"5::duration";s:7:"60 days";s:8:"6::flags";s:8:"nocreate";}',
+                    'log_params' => 'a:2:{s:11:"5::duration";s:7:"60 days";' .
+                        's:8:"6::flags";s:8:"nocreate";}',
                 ],
+                [1498867200, 5184000]
+            ],
+            [
                 [
                     'log_timestamp' => '20170101000000',
                     'log_params' => "9 weeks\nnoautoblock",
                 ],
-            ]);
-        $this->assertEquals(63, $editCounter3->getLongestBlockDays());
+                [1483228800, 5443200]
+            ],
+            [
+                [
+                    'log_timestamp' => '20170101000000',
+                    'log_params' => "invalid format",
+                ],
+                [1483228800, null]
+            ],
+            [
+                [
+                    'log_timestamp' => '20170101000000',
+                    'log_params' => "infinity\nnocreate",
+                ],
+                [1483228800, -1]
+            ],
+            [
+                [
+                    'log_timestamp' => '20170927203205',
+                    'log_params' => 'a:2:{s:11:"5::duration";s:19:"2017-09-30 12:36 PM";' .
+                        's:8:"6::flags";s:11:"noautoblock";}'
+                ],
+                [1506544325, 230635]
+            ]
+        ];
     }
 }

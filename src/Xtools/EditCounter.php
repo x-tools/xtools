@@ -64,11 +64,11 @@ class EditCounter extends Model
     protected $editSizeData;
 
     /**
-     * Duration of the longest block in days; -1 if indefinite,
+     * Duration of the longest block in seconds; -1 if indefinite,
      *   or false if could not be parsed from log params
      * @var int|bool
      */
-    protected $longestBlockDays;
+    protected $longestBlockSeconds;
 
     /**
      * EditCounter constructor.
@@ -172,10 +172,11 @@ class EditCounter extends Model
 
     /**
      * Get block data.
-     * @param string $type Either 'set' or 'received'.
+     * @param string $type Either 'set', 'received'
+     * @param bool $blocksOnly Whether to include only blocks, and not reblocks and unblocks.
      * @return array
      */
-    public function getBlocks($type)
+    protected function getBlocks($type, $blocksOnly = true)
     {
         if (isset($this->blocks[$type]) && is_array($this->blocks[$type])) {
             return $this->blocks[$type];
@@ -183,7 +184,15 @@ class EditCounter extends Model
         $method = "getBlocks".ucfirst($type);
         $blocks = $this->getRepository()->$method($this->project, $this->user);
         $this->blocks[$type] = $blocks;
-        return $this->blocks[$type];
+
+        // Filter out unblocks unless requested.
+        if ($blocksOnly) {
+            $blocks = array_filter($blocks, function ($block) {
+                return $block['log_action'] === 'block';
+            });
+        }
+
+        return $blocks;
     }
 
     /**
@@ -376,49 +385,117 @@ class EditCounter extends Model
     }
 
     /**
-     * Get the length of the longest block the user received.
-     * @return int|bool Number of days or false if it could not be determined.
-     *                  If the longest duration is indefinite, -1 is returned.
+     * Get the length of the longest block the user received, in seconds.
+     * @return int Number of seconds or false if it could not be determined.
+     *   If the user is blocked, the time since the block is returned. If the block is
+     *   indefinite, -1 is returned. 0 if there was never a block.
      */
-    public function getLongestBlockDays()
+    public function getLongestBlockSeconds()
     {
-        if (isset($this->longestBlockDays)) {
-            return $this->longestBlockDays;
+        if (isset($this->longestBlockSeconds)) {
+            return $this->longestBlockSeconds;
         }
 
-        $blocks = $this->getBlocks('received'); // FIXME: make sure this is only called once
-        $this->longestBlockDays = false;
+        $blocks = $this->getBlocks('received', false);
+        $this->longestBlockSeconds = false;
 
-        foreach ($blocks as $block) {
-            $timestamp = strtotime($block['log_timestamp']);
+        // If there was never a block, the longest was zero seconds.
+        if (empty($blocks)) {
+            return 0;
+        }
 
-            // First check if the string is serialized, and if so parse it to get the block duration
-            if (@unserialize($block['log_params']) !== false) {
-                $parsedParams = unserialize($block['log_params']);
-                $durationStr = $parsedParams['5::duration'];
-            } else {
-                // Old format, the duration in English + block options separated by new lines
-                $durationStr = explode("\n", $block['log_params'])[0];
-            }
+        /**
+         * Keep track of the last block so we can determine the duration
+         * if the current block in the loop is an unblock.
+         * @var int[] [
+         *              Unix timestamp,
+         *              Duration in seconds (-1 if indefinite)
+         *            ]
+         */
+        $lastBlock = [null, null];
 
-            if (in_array($durationStr, ['indefinite', 'infinity', 'infinite'])) {
-                return -1;
-            }
+        foreach ($blocks as $index => $block) {
+            list($timestamp, $duration) = $this->parseBlockLogEntry($block);
 
-            // Try block just in case there are older, unpredictable formats
-            try {
-                $expiry = strtotime($durationStr, $timestamp);
-                $duration = ($expiry - $timestamp) / (60 * 60 * 24);
-
-                if (!$duration || $duration > $this->longestBlockDays) {
-                    $this->longestBlockDays = $duration;
+            if ($block['log_action'] === 'block') {
+                // This is a new block, so first see if the duration of the last
+                // block exceeded our longest duration. -1 duration means indefinite.
+                if ($lastBlock[1] > $this->longestBlockSeconds || $lastBlock[1] === -1) {
+                    $this->longestBlockSeconds = $lastBlock[1];
                 }
-            } catch (Exception $error) {
-                // do nothing, leaving the longest block at false
+
+                // Now set this as the last block.
+                $lastBlock = [$timestamp, $duration];
+            } elseif ($block['log_action'] === 'unblock') {
+                // The last block was lifted. So the duration will be the time from when the
+                // last block was set to the time of the unblock.
+                $timeSinceLastBlock = $timestamp - $lastBlock[0];
+                if ($timeSinceLastBlock > $this->longestBlockSeconds) {
+                    $this->longestBlockSeconds = $timeSinceLastBlock;
+
+                    // Reset the last block, as it has now been accounted for.
+                    $lastBlock = null;
+                }
+            } elseif ($block['log_action'] === 'reblock' && $lastBlock[1] !== -1) {
+                // The last block was modified. So we will adjust $lastBlock to include
+                // the difference of the duration of the new reblock, and time since the last block.
+                // $lastBlock is left unchanged if its duration was indefinite.
+                $timeSinceLastBlock = $timestamp - $lastBlock[0];
+                $lastBlock[1] = $timeSinceLastBlock + $duration;
             }
         }
 
-        return $this->longestBlockDays;
+        // If the last block was indefinite, we'll return that as the longest duration.
+        if ($lastBlock[1] === -1) {
+            return -1;
+        }
+
+        // Test if the last block is still active, and if so use the expiry as the duration.
+        $lastBlockExpiry = $lastBlock[0] + $lastBlock[1];
+        if ($lastBlockExpiry > time() && $lastBlockExpiry > $this->longestBlockSeconds) {
+            $this->longestBlockSeconds = $lastBlock[1];
+        // Otherwise, test if the duration of the last block is now the longest overall.
+        } elseif ($lastBlock[1] > $this->longestBlockSeconds) {
+            $this->longestBlockSeconds = $lastBlock[1];
+        }
+
+        return $this->longestBlockSeconds;
+    }
+
+    /**
+     * Given a block log entry from the database, get the timestamp and duration in seconds.
+     * @param  mixed[] $block Block log entry as fetched via self::getBlocks()
+     * @return int[] [
+     *                 Unix timestamp,
+     *                 Duration in seconds (-1 if indefinite, null if unparsable or unblock)
+     *               ]
+     */
+    public function parseBlockLogEntry($block)
+    {
+        $timestamp = strtotime($block['log_timestamp']);
+        $duration = null;
+
+        // First check if the string is serialized, and if so parse it to get the block duration.
+        if (@unserialize($block['log_params']) !== false) {
+            $parsedParams = unserialize($block['log_params']);
+            $durationStr = isset($parsedParams['5::duration']) ? $parsedParams['5::duration'] : null;
+        } else {
+            // Old format, the duration in English + block options separated by new lines.
+            $durationStr = explode("\n", $block['log_params'])[0];
+        }
+
+        if (in_array($durationStr, ['indefinite', 'infinity', 'infinite'])) {
+            $duration = -1;
+        }
+
+        // Make sure $durationStr is valid just in case it is in an older, unpredictable format.
+        // If invalid, $duration is left as null.
+        if (strtotime($durationStr)) {
+            $expiry = strtotime($durationStr, $timestamp);
+            $duration = $expiry - $timestamp;
+        }
+
+        return [$timestamp, $duration];
     }
 
     /**
@@ -676,7 +753,7 @@ class EditCounter extends Model
 
     /**
      * Get the total numbers of edits per month.
-     * @param null|DateTime [$currentTime] - *USED ONLY FOR UNIT TESTING*
+     * @param null|DateTime $currentTime - *USED ONLY FOR UNIT TESTING*
      *   so we can mock the current DateTime.
      * @return mixed[] With keys 'yearLabels', 'monthLabels' and 'totals',
      *   the latter keyed by namespace, year and then month.
