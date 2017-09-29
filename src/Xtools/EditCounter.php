@@ -103,7 +103,7 @@ class EditCounter extends Model
             "editSizeData" => "ec/editsizes/$project/$username",
             "monthCounts" => "ec/monthcounts/$project/$username",
             // "globalEditCounts" => "ec-globaleditcounts/$project/$username",
-            "autoEditCount" => "api/user/automated_editcount/$project/$username",
+            "autoEditCount" => "user/automated_editcount/$project/$username",
         ];
 
         /**
