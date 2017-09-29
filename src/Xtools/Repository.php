@@ -12,6 +12,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Stopwatch\Stopwatch;
+use GuzzleHttp\Promise\Promise;
 
 /**
  * A repository is responsible for retrieving data from wherever it lives (databases, APIs,
@@ -31,6 +32,9 @@ abstract class Repository
 
     /** @var Connection The database connection to other tools' databases.  */
     private $toolsConnection;
+
+    /** @var GuzzleHttp\Client $apiConnection Connection to XTools API. */
+    private $apiConnection;
 
     /** @var CacheItemPoolInterface The cache. */
     protected $cache;
@@ -59,6 +63,15 @@ abstract class Repository
         $this->cache = $container->get('cache.app');
         $this->log = $container->get('logger');
         $this->stopwatch = $container->get('debug.stopwatch');
+    }
+
+    /**
+     * Get the NullLogger instance.
+     * @return NullLogger
+     */
+    public function getLog()
+    {
+        return $this->log;
     }
 
     /**
@@ -131,6 +144,29 @@ abstract class Repository
     public function isLabs()
     {
         return (bool)$this->container->getParameter('app.is_labs');
+    }
+
+    /**
+     * Make a request to the XTools API. This requires that app.multithread.api_url be set.
+     * @param string $endpoint Relative path to endpoint with relevant query parameters.
+     * @param bool $async Set to true to asynchronously query and return a promise.
+     * @return mixed|GuzzleHttp\Promise\Promise
+     */
+    public function queryXToolsApi($endpoint, $async = false)
+    {
+        if (!$this->apiConnection) {
+            $this->apiConnection = $this->container->get('guzzle.client.xtools');
+        }
+
+        // Ensure there's a trailing slash.
+        $apiRoot = trim($this->container->getParameter('app.multithread.api_url'), '/');
+        $endpoint = $apiRoot . '/api/' . $endpoint;
+
+        if ($async) {
+            return $this->apiConnection->getAsync($endpoint);
+        } else {
+            return $this->apiConnection->get($endpoint);
+        }
     }
 
     /**

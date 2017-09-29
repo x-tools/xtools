@@ -65,6 +65,7 @@ twig:
         noticeDisplay: '%app.noticeDisplay%'
         noticeStyle:   '%app.noticeStyle%'
         noticeText:    '%app.noticeText%'
+        apiUrl:        '%app.multithread.api_url%'
 
 
 # Doctrine Configuration
@@ -171,6 +172,16 @@ fos_rest:
         mime_types:
             json: ['application/json']
             html: ['text/html']
+
+guzzle:
+    logging: true
+
+    clients:
+        xtools:
+            options:
+                headers:
+                    Accept: "application/json"
+                timeout: 30
 
 monolog:
     channels: ['rate_limit']

@@ -7,9 +7,10 @@ namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Xtools\EditCounter;
 use Xtools\EditCounterRepository;
 use Xtools\Page;
@@ -52,7 +53,16 @@ class EditCounterController extends Controller
         $this->project = ProjectRepository::getProject($project, $this->container);
         $this->user = UserRepository::getUser($username, $this->container);
 
-        // Get an edit-counter.
+        // Don't continue if the user doesn't exist.
+        if (!$this->user->existsOnProject($this->project)) {
+            $this->addFlash('notice', 'user-not-found');
+            return $this->redirectToRoute('ec');
+        }
+
+        // Get an edit-counter if we don't already have it set.
+        if ($this->editCounter instanceof EditCounter) {
+            return;
+        }
         $editCounterRepo = new EditCounterRepository();
         $editCounterRepo->setContainer($this->container);
         $this->editCounter = new EditCounter($this->project, $this->user);
@@ -109,12 +119,17 @@ class EditCounterController extends Controller
     public function resultAction(Request $request, $project, $username)
     {
         $this->setUpEditCounter($project, $username);
-        // Don't continue if the user doesn't exist.
-        if (!$this->user->existsOnProject($this->project)) {
-            $this->addFlash('notice', 'user-not-found');
-            return $this->redirectToRoute('ec');
+
+        // Asynchronously collect some of the data that will be shown.
+        // If multithreading is turned off, the normal getters in the views will
+        // collect the necessary data synchronously.
+        if ($this->container->getParameter('app.multithread.enable')) {
+            $this->editCounter->prepareData($this->container);
         }
+
+        // FIXME: is this needed? It shouldn't ever be a subrequest here in the resultAction.
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
+
         return $this->render('editCounter/result.html.twig', [
             'xtTitle' => $this->user->getUsername() . ' - ' . $this->project->getTitle(),
             'xtPage' => 'ec',
@@ -136,11 +151,7 @@ class EditCounterController extends Controller
     public function generalStatsAction($project, $username)
     {
         $this->setUpEditCounter($project, $username);
-        // Don't continue if the user doesn't exist.
-        if (!$this->user->existsOnProject($this->project)) {
-            $this->addFlash('notice', 'user-not-found');
-            return $this->redirectToRoute('ec');
-        }
+
         $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/general_stats.html.twig', [
             'xtTitle' => $this->user->getUsername(),
@@ -155,18 +166,14 @@ class EditCounterController extends Controller
     /**
      * Display the namespace totals section.
      * @Route("/ec-namespacetotals/{project}/{username}", name="EditCounterNamespaceTotals")
+     * @param Request $request
      * @param string $project
      * @param string $username
      * @return Response
      */
-    public function namespaceTotalsAction($project, $username)
+    public function namespaceTotalsAction(Request $request, $project, $username)
     {
         $this->setUpEditCounter($project, $username);
-        // Don't continue if the user doesn't exist.
-        if (!$this->user->existsOnProject($this->project)) {
-            $this->addFlash('notice', 'user-not-found');
-            return $this->redirectToRoute('ec');
-        }
         $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/namespace_totals.html.twig', [
             'xtTitle' => $this->user->getUsername(),
@@ -188,11 +195,6 @@ class EditCounterController extends Controller
     public function timecardAction($project, $username)
     {
         $this->setUpEditCounter($project, $username);
-        // Don't continue if the user doesn't exist.
-        if (!$this->user->existsOnProject($this->project)) {
-            $this->addFlash('notice', 'user-not-found');
-            return $this->redirectToRoute('ec');
-        }
         $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
         $optedInPage = $this->project
             ->getRepository()
@@ -218,18 +220,11 @@ class EditCounterController extends Controller
     public function yearcountsAction($project, $username)
     {
         $this->setUpEditCounter($project, $username);
-        // Don't continue if the user doesn't exist.
-        if (!$this->user->existsOnProject($this->project)) {
-            $this->addFlash('notice', 'user-not-found');
-            return $this->redirectToRoute('ec');
-        }
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
-        //$yearcounts = $this->editCounterHelper->getYearCounts($username);
         return $this->render('editCounter/yearcounts.html.twig', [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
-            //'yearcounts' => $yearcounts,
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
@@ -239,18 +234,14 @@ class EditCounterController extends Controller
     /**
      * Display the month counts section.
      * @Route("/ec-monthcounts/{project}/{username}", name="EditCounterMonthCounts")
+     * @param Request $request
      * @param string $project
      * @param string $username
      * @return Response
      */
-    public function monthcountsAction($project, $username)
+    public function monthcountsAction(Request $request, $project, $username)
     {
         $this->setUpEditCounter($project, $username);
-        // Don't continue if the user doesn't exist.
-        if (!$this->user->existsOnProject($this->project)) {
-            $this->addFlash('notice', 'user-not-found');
-            return $this->redirectToRoute('ec');
-        }
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         $optedInPage = $this->project
             ->getRepository()
@@ -277,11 +268,6 @@ class EditCounterController extends Controller
     public function latestglobalAction(Request $request, $project, $username)
     {
         $this->setUpEditCounter($project, $username);
-        // Don't continue if the user doesn't exist.
-        if (!$this->user->existsOnProject($this->project)) {
-            $this->addFlash('notice', 'user-not-found');
-            return $this->redirectToRoute('ec');
-        }
         $isSubRequest = $request->get('htmlonly')
                         || $this->container->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/latest_global.html.twig', [
@@ -292,5 +278,115 @@ class EditCounterController extends Controller
             'project' => $this->project,
             'ec' => $this->editCounter,
         ]);
+    }
+
+
+    /**
+     * Below are internal API endpoints for the Edit Counter.
+     * All only respond with JSON and only to requests from the localhost
+     * (see access_control in security.yml).
+     */
+
+    /**
+     * Get (most) of the general statistics as JSON.
+     * @Route("/api/ec/pairdata/{project}/{username}", name="EditCounterApiPairData")
+     * @param Request $request
+     * @param string $project
+     * @param string $username
+     * @return JsonResponse
+     */
+    public function pairDataApiAction(Request $request, $project, $username)
+    {
+        $this->setUpEditCounter($project, $username);
+        return new JsonResponse(
+            $this->editCounter->getPairData(),
+            Response::HTTP_OK
+        );
+    }
+
+    /**
+     * Get various log counts for the user as JSON.
+     * @Route("/api/ec/logcounts/{project}/{username}", name="EditCounterApiLogCounts")
+     * @param Request $request
+     * @param string $project
+     * @param string $username
+     * @return JsonResponse
+     */
+    public function logCountsApiAction(Request $request, $project, $username)
+    {
+        $this->setUpEditCounter($project, $username);
+        return new JsonResponse(
+            $this->editCounter->getLogCounts(),
+            Response::HTTP_OK
+        );
+    }
+
+    /**
+     * Get edit sizes for the user as JSON.
+     * @Route("/api/ec/editsizes/{project}/{username}", name="EditCounterApiEditSizes")
+     * @param Request $request
+     * @param string $project
+     * @param string $username
+     * @return JsonResponse
+     */
+    public function editSizesApiAction(Request $request, $project, $username)
+    {
+        $this->setUpEditCounter($project, $username);
+        return new JsonResponse(
+            $this->editCounter->getEditSizeData(),
+            Response::HTTP_OK
+        );
+    }
+
+    /**
+     * Get the namespace totals for the user as JSON.
+     * @Route("/api/ec/namespacetotals/{project}/{username}", name="EditCounterApiNamespaceTotals")
+     * @param Request $request
+     * @param string $project
+     * @param string $username
+     * @return Response
+     */
+    public function namespaceTotalsApiAction(Request $request, $project, $username)
+    {
+        $this->setUpEditCounter($project, $username);
+        return new JsonResponse(
+            $this->editCounter->namespaceTotals(),
+            Response::HTTP_OK
+        );
+    }
+
+    /**
+     * Display or fetch the month counts for the user.
+     * @Route("/api/ec/monthcounts/{project}/{username}", name="EditCounterApiMonthCounts")
+     * @param Request $request
+     * @param string $project
+     * @param string $username
+     * @return Response
+     */
+    public function monthcountsApiAction(Request $request, $project, $username)
+    {
+        $this->setUpEditCounter($project, $username);
+        return new JsonResponse(
+            $this->editCounter->monthCounts(),
+            Response::HTTP_OK
+        );
+    }
+
+
+    /**
+     * Get global (system) edit counts for this user as JSON.
+     * @Route("/api/ec/globaleditcounts/{project}/{username}", name="EditCounterApiGlobalEditCounts")
+     * @param Request $request
+     * @param string $project
+     * @param string $username
+     * @return JsonResponse
+     */
+    public function globalEditCountsApiAction(Request $request, $project, $username)
+    {
+        $this->setUpEditCounter($project, $username);
+        return new JsonResponse(
+            $this->editCounter->getGlobalEditCounts(),
+            Response::HTTP_OK
+        );
     }
 }

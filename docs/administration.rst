@@ -18,6 +18,16 @@ Using the above example, if you try to load the same page more than 5 times with
 
 Any requests that are denied are logged at ``var/logs/rate_limit.log``.
 
+You can blacklist user agents and URIs using the request_blacklist.yml file.
+
+.. _offload_api:
+
+Offloading API requests
+=======================
+XTools features a rich public API. If you expect your XTools installation will receive a lot of traffic, you can send your API consumers (which may include bots, for instance) to a dedicated server so that resources on the main app server are not hogged.
+
+@TODO document how to forward API requests to another server via Apache config.
+
 Killing slow queries
 ====================
 

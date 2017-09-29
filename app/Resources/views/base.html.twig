@@ -9,6 +9,9 @@
     <script type="text/javascript">
         xtBaseUrl = "{{ path('homepage') }}";
 
+        {# For the JavaScript variable, we don't want to include the protocol, just to safeguard against x-origin policy violation #}
+        xtApiUrl = "{{ apiUrl is defined ? apiUrl : path('homepage') }}".replace(/^https?:\/\//, '//');
+
         {# For $.i18n, loaded in application.js #}
         i18nLang = "{{ lang() }}";
         i18nPath = "{{ asset('static/i18n/' ~ lang() ~ '.json') }}";
