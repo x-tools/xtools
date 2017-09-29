@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.1.3 ##
+- Hotfix for showing mainspace page titles in non-automated edits API endpoint
+
 ## 3.1.2 ##
 - T163284 Add option to optimize Edit Counter by querying internal API
   asynchronously
