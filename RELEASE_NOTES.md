@@ -7,6 +7,7 @@
 - T176590, T176591 Add numerous Commons tools to AutoEdits, along with some bug
   fixes and performance improvments
 - T175796 Fix display of replication lag
+- Revamp API endpoint routing to be object-oriented
 
 ## 3.1.1 ##
 - T174527 Fix caching of year/month counts in Edit Counter
