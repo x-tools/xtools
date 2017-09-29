@@ -1,5 +1,13 @@
 # Release Notes #
 
+## 3.1.2 ##
+- T163284 Add option to optimize Edit Counter by querying internal API
+  asynchronously
+- T176676 Add missing routes with a trailing slash
+- T176590, T176591 Add numerous Commons tools to AutoEdits, along with some bug
+  fixes and performance improvments
+- T175796 Fix display of replication lag
+
 ## 3.1.1 ##
 - T174527 Fix caching of year/month counts in Edit Counter
 - T172162 Fix sorting of some columns in AdminStats, make heading row sticky
