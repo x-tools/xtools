@@ -242,6 +242,8 @@ class User extends Model
 
             if ($rev['page_namespace'] !== '0') {
                 $fullPageTitle = $namespaces[$rev['page_namespace']] . ":$pageTitle";
+            } else {
+                $fullPageTitle = $pageTitle;
             }
 
             return [
