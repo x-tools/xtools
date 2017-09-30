@@ -43,7 +43,13 @@ class AdminStatsController extends Controller
         // empty strings.
         $projectQuery = $request->query->get('project');
         $startDate = $request->query->get('start');
-        $endDate = $request->query->get("end");
+        $endDate = $request->query->get('end');
+
+        // Legacy XTools.
+        $begin = $request->query->get('begin');
+        if (empty($startDate) && isset($begin)) {
+            $startDate = $begin;
+        }
 
         // Redirect if the values are set.
         if ($projectQuery != "" && $startDate != "" && $endDate != "") {
@@ -66,7 +72,7 @@ class AdminStatsController extends Controller
                 ]
             );
         } elseif ($projectQuery != "" && $startDate != "") {
-            // Redirect if we have the stardate and project
+            // Redirect if we have the start date and project
             return $this->redirectToRoute(
                 "AdminStatsResult",
                 [
