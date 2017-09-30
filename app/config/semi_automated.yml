@@ -132,7 +132,7 @@ parameters:
             link: Project:Mike's Wiki Tool
         Global replace:
             regex: '\(\[\[c:GR\|GR\]\]\) '
-            link: commons:Commons:GlobalReplace
+            link: commons:Commons:File renaming/Global replace
         Admin actions:
             regex: '^(Protected|Changed protection).*?\[[Ee]dit=|^Removed protection from|^Configured pending changes.*?\[[Aa]uto-accept|^Reset pending changes settings'
             link: Project:Administrators
