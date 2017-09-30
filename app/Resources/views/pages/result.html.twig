@@ -208,12 +208,12 @@
                                 </tr>
                             {% endfor %}
                         {% endfor %}
-                        {% if count[key]['total'] > maxRows and multiNamspace %}
+                        {% if count[key].total > maxRows and multiNamspace %}
                             <tr class="show-more-row">
                                 <td></td>
                                 <td colspan=6>
                                     <a href="{{ path('pages', { 'project': project.domain, 'username': user.username, 'namespace': key, 'redirects': redirect }) }}">
-                                        {{ msg('num-others', [count[key]['total'] - maxRows]) }}
+                                        {{ count[key].total - maxRows }} {{ msg('num-others', [count[key].total - maxRows]) }}
                                     </a>
                                 </td>
                             </tr>
