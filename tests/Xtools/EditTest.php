@@ -89,7 +89,7 @@ class EditTest extends WebTestCase
         ]);
 
         $this->assertEquals(
-            "&lt;script&gt;alert(&quot;XSS baby&quot;)&lt;/script&gt; " .
+            "&lt;script&gt;alert(\"XSS baby\")&lt;/script&gt; " .
                 "<a target='_blank' href='https://test.example.org/wiki/Test_page'>test page</a>",
             $edit->getWikifiedSummary()
         );

@@ -101,7 +101,7 @@ parameters:
             link: Project:DABSOLVER
         Dabfix:
             regex: 'using \[\[tools:~dispenser\/cgi-bin\/dabfix.py'
-            link: toollabs:dispenser/cgi-bin/dabfix.py
+            link: Special:GoToInterwiki/toollabs:dispenser/cgi-bin/dabfix.py
         Reflinks:
             regex: '\[\[(tools:~dispenser\/view\/Reflinks|WP:REFLINKS)\|Reflinks'
             link: Project:REFLINKS
@@ -251,7 +251,7 @@ parameters:
             link: Special:MyLanguage/Help:RenameLink
         Geograph2commons:
             regex: 'Transferred from geograph.co.uk using'
-            link: toollabs:geograph2commons
+            link: Special:GoToInterwiki/toollabs:geograph2commons
         SettingsManager:
             regex: '\[\[MediaWiki:Gadget-SettingsManager.js\|SettingsManager'
             link: MediaWiki:Gadget-SettingsManager.js
