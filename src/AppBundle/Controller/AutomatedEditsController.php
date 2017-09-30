@@ -49,6 +49,15 @@ class AutomatedEditsController extends Controller
         $startDate = $request->query->get('start');
         $endDate = $request->query->get('end');
 
+        // Legacy XTools.
+        $begin = $request->query->get('begin');
+        if (empty($startDate) && isset($begin)) {
+            $startDate = $begin;
+        }
+        if (empty($namespace)) {
+            $namespace = '0';
+        }
+
         // Redirect if the values are set.
         if ($projectName != '' && $username != '' && $namespace != '' && ($startDate != '' || $endDate != '')) {
             // Set start date to beginning of time if end date is provided
