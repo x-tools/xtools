@@ -50,24 +50,35 @@ class TopEditsController extends Controller
         $namespace = $request->query->get('namespace');
         $article = $request->query->get('article');
 
-        if ($projectName != "" && $username != "" && $namespace != "" && $article != "") {
-            return $this->redirectToRoute("TopEditsResults", [
-                'project'=>$projectName,
-                'username' => $username,
-                'namespace'=>$namespace,
-                'article'=>$article,
-            ]);
-        } elseif ($projectName != "" && $username != "" && $namespace != "") {
-            return $this->redirectToRoute("TopEditsResults", [
-                'project'=>$projectName,
-                'username' => $username,
-                'namespace'=>$namespace,
-            ]);
-        } elseif ($projectName != "" && $username != "") {
-            return $this->redirectToRoute("TopEditsResults", [
-                'project' => $projectName,
-                'username' => $username,
-            ]);
+        // Legacy XTools.
+        $user = $request->query->get('user');
+        if (empty($username) && isset($user)) {
+            $username = $user;
+        }
+        $page = $request->query->get('page');
+        if (empty($article) && isset($page)) {
+            $article = $page;
+        }
+        $wiki = $request->query->get('wiki');
+        $lang = $request->query->get('lang');
+        if (isset($wiki) && isset($lang) && empty($project)) {
+            $projectName = $lang.'.'.$wiki.'.org';
+        }
+
+        $redirectParams = [
+            'project' => $projectName,
+            'username' => $username,
+        ];
+        if ($article != '') {
+            $redirectParams['article'] = $article;
+        }
+        if ($namespace != '') {
+            $redirectParams['namespace'] = $namespace;
+        }
+
+        // Redirect if at minimum project and username are provided.
+        if ($projectName != '' && $username != '') {
+            return $this->redirectToRoute('TopEditsResults', $redirectParams);
         }
 
         // Set default project so we can populate the namespace selector.
@@ -143,7 +154,7 @@ class TopEditsController extends Controller
         $namespaces = $project->getNamespaces();
 
         // Get the basic data about the pages edited by this user.
-        $params = ['username'=>$user->getUsername()];
+        $params = ['username' => $user->getUsername()];
         $nsClause = '';
         if (is_numeric($namespaceId)) {
             $nsClause = 'AND page_namespace = :namespace';
