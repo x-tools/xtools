@@ -43,7 +43,7 @@ parameters:
             tag: 'OAuth CID: 678'
             link: Special:MyLanguage/User:InternetArchiveBot
         HotCat:
-            regex: 'using \[\[(WP:HOTCAT|WP:HC|Help:Gadget-HotCat)\|HotCat'
+            regex: 'using \[\[(WP:HOTCAT|WP:HC|Help:Gadget-HotCat)\|HotCat|Gadget-Hotcat(?:check)?\.js\|Script'
             link: Special:MyLanguage/Project:HotCat
         Cat-a-lot:
             regex: '\[\[Help:Cat-a-lot\|Cat-a-lot\]\]'
@@ -255,3 +255,6 @@ parameters:
         SettingsManager:
             regex: '\[\[MediaWiki:Gadget-SettingsManager.js\|SettingsManager'
             link: MediaWiki:Gadget-SettingsManager.js
+        RotateLink:
+            regex: '\(\[\[Help:RotateLink\|Script'
+            link: Help:RotateLink

@@ -193,7 +193,7 @@ class Edit extends Model
      */
     public function getWikifiedComment()
     {
-        $summary = htmlspecialchars($this->getSummary());
+        $summary = htmlspecialchars($this->getSummary(), ENT_NOQUOTES);
         $sectionMatch = null;
         $isSection = preg_match_all("/^\/\* (.*?) \*\//", $summary, $sectionMatch);
 
