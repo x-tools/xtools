@@ -65,7 +65,6 @@ twig:
         noticeDisplay: '%app.noticeDisplay%'
         noticeStyle:   '%app.noticeStyle%'
         noticeText:    '%app.noticeText%'
-        apiUrl:        '%app.multithread.api_url%'
 
 
 # Doctrine Configuration

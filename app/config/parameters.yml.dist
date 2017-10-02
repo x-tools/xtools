@@ -41,8 +41,6 @@ parameters:
     app.noticeStyle:   ""
     app.noticeText:    ""
 
-    app.base_path: null
-
     cache.adapter: filesystem
     cache.redis_dsn: 'redis://localhost'
 

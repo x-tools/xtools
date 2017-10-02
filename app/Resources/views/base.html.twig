@@ -10,7 +10,7 @@
         xtBaseUrl = "{{ path('homepage') }}";
 
         {# For the JavaScript variable, we don't want to include the protocol, just to safeguard against x-origin policy violation #}
-        xtApiUrl = "{{ apiUrl is defined ? apiUrl : path('homepage') }}".replace(/^https?:\/\//, '//');
+        xtApiUrl = "{{ xtApiUrl() }}".replace(/^https?:\/\//, '//');
 
         {# For $.i18n, loaded in application.js #}
         i18nLang = "{{ lang() }}";

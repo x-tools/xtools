@@ -51,7 +51,7 @@ class AppExtension extends Extension
             new \Twig_SimpleFunction('tools', [ $this, 'allTools' ]),
             new \Twig_SimpleFunction('color', [ $this, 'getColorList' ]),
             new \Twig_SimpleFunction('chartColor', [ $this, 'chartColor' ]),
-            new \Twig_SimpleFunction('isWMFLabs', [ $this, 'isWMFLabs' ]),
+            new \Twig_SimpleFunction('xtApiUrl', [ $this, 'xtApiUrl' ]),
             new \Twig_SimpleFunction('isSingleWiki', [ $this, 'isSingleWiki' ]),
             new \Twig_SimpleFunction('getReplagThreshold', [ $this, 'getReplagThreshold' ]),
             new \Twig_SimpleFunction('loadStylesheetsFromCDN', [ $this, 'loadStylesheetsFromCDN' ]),
@@ -441,6 +441,23 @@ class AppExtension extends Extension
     }
 
     /**
+     * What URL to use as the internal API, based on configuration.
+     * @return string
+     */
+    public function xtApiUrl()
+    {
+        if ($this->container->hasParameter('app.multithread.enable') &&
+            (bool) $this->container->getParameter('app.multithread.enable')
+        ) {
+            return $this->container->getParameter('app.multithread.api_url');
+        } else {
+            // Use root URL of application.
+            $router = $this->container->get('router');
+            return $router->generate('homepage', [], true);
+        }
+    }
+
+    /**
      * The current replication lag.
      * @return int
      */
@@ -477,26 +494,6 @@ class AppExtension extends Extension
                 }
             }
         }
-
-        return $retVal;
-    }
-
-    /**
-     * Generate an XTools URL.
-     * @deprecated Use path() instead.
-     * @param string $path The path.
-     * @return string
-     */
-    public function link($path = "/")
-    {
-        $basePath = $this->container->getParameter("app.base_path");
-        $retVal = $path;
-
-        if (isset($basePath)) {
-            $retVal = "$basePath/$path";
-        }
-
-        $retVal = str_replace("//", "/", $retVal);
 
         return $retVal;
     }
