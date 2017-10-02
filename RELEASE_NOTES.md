@@ -1,5 +1,16 @@
 # Release Notes #
 
+## 3.1.4 ##
+- T177172 Fix path to normalize project API endpoint
+- T174012 Rework "longest block" field in Edit Counter to show actual duration
+  of the block
+- T177168 Fix sorting of 'atbe' column in ArticleInfo
+- T177137 Add 'RotateLink' tool to AutoEdits
+- T177138 Add 'Hotcatcheck' tool to AutoEdits
+- T177140 Fix link to Global replace tool in AutoEdits
+- Include current URL in bug report link
+- Update all controllers to support routes of legacy XTools
+
 ## 3.1.3 ##
 - Hotfix for showing mainspace page titles in non-automated edits API endpoint
 
