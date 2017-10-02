@@ -346,12 +346,12 @@
             <tr>
                 <td>{{ msg('block-longest') }}</td>
                 <td>
-                    {% if ec.longestBlockDays == -1 %}
+                    {% if ec.longestBlockSeconds == -1 %}
                         &#x221e; {# infinity #}
-                    {% elseif ec.longestBlockDays == false %}
+                    {% elseif ec.longestBlockSeconds == false %}
                         &ndash;
                     {% else %}
-                        {{ ec.longestBlockDays|number_format }} {{ msg('num-days', [ec.longestBlockDays]) }}
+                        {{ formatDuration(ec.longestBlockSeconds) }}
                     {% endif %}
                 </td>
             </tr>
