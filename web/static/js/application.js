@@ -411,7 +411,7 @@
                 $(this).addClass('show-loader');
 
                 /** global: xtBaseUrl */
-                $.get(xtBaseUrl + 'api/project/normalize_project/' + newProject).done(function (data) {
+                $.get(xtBaseUrl + 'api/project/normalize/' + newProject).done(function (data) {
                     // Keep track of project API path for use in page title autocompletion
                     apiPath = data.api;
                     lastProject = newProject;

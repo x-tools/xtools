@@ -58,7 +58,7 @@ class ApiController extends FOSRestController
 
     /**
      * Get all namespaces of the given project. This endpoint also does the same thing
-     * as the normalize_project endpoint, returning other basic info about the project.
+     * as the /project/normalize endpoint, returning other basic info about the project.
      * @Rest\Get("/api/project/namespaces/{project}")
      * @param string $project The project name.
      * @return View
