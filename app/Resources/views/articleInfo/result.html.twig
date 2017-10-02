@@ -377,7 +377,7 @@
                         <td class="sort-entry--latest-edit" data-value="{{ stats.last_id }}">
                             {{ wiki.pageLinkRaw('Special:Diff/' ~ stats.last_id, project, stats.last|date('Y-m-d H:i')) }}
                         </td>
-                        <td class="sort-entry--average-time-bw-edits" data-value="{{ stats.atbe }}">
+                        <td class="sort-entry--average-time-bw-edits" data-value="{{ stats.atbe|number_format(1) }}">
                             {{ stats.atbe|number_format(1) }}
                         </td>
                         <td class="sort-entry--added-bytes" data-value="{{ stats.added }}">
