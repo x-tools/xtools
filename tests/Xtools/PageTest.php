@@ -182,9 +182,10 @@ class PageTest extends WebTestCase
             ->willReturn([
                 'pageprops' => [],
             ]);
-        $page->setRepository($pageRepo2);
-        $this->assertNull($page->getWikidataId());
-        $this->assertEquals(0, $page->countWikidataItems());
+        $page2 = new Page(new Project('TestProject'), 'Test_Page');
+        $page2->setRepository($pageRepo2);
+        $this->assertNull($page2->getWikidataId());
+        $this->assertEquals(0, $page2->countWikidataItems());
     }
 
     /**
@@ -296,6 +297,19 @@ class PageTest extends WebTestCase
         );
 
         $this->assertEquals(3500, $page->getLastPageviews(30));
+    }
+
+    /**
+     * Is the page the Main Page?
+     */
+    public function testIsMainPage()
+    {
+        $pageRepo = new PagesRepository();
+        $pageRepo->setContainer($this->container);
+        $project = ProjectRepository::getProject('en.wikipedia.org', $this->container);
+        $page = new Page($project, 'Main Page');
+        $page->setRepository($pageRepo);
+        $this->assertTrue($page->isMainPage());
     }
 
     // public function testPageAssessments()

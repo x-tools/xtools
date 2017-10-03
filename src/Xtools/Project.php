@@ -209,6 +209,18 @@ class Project extends Model
     }
 
     /**
+     * Get the title of the Main Page.
+     * @return string
+     */
+    public function getMainPage()
+    {
+        $metadata = $this->getMetadata();
+        return isset($metadata['general']['mainpage'])
+            ? $metadata['general']['mainpage']
+            : '';
+    }
+
+    /**
      * Get the name of the page on this project that the user must create in order to opt in for
      * restricted statistics display.
      * @param User $user
@@ -289,5 +301,16 @@ class Project extends Model
         } else {
             return "";
         }
+    }
+
+    /**
+     * Normalize and quote a table name for use in SQL.
+     * @param string $tableName
+     * @param string|null $tableExtension Optional table extension, which will only get used if we're on Labs.
+     * @return string Fully-qualified and quoted table name.
+     */
+    public function getTableName($tableName, $tableExtension = null)
+    {
+        return $this->getRepository()->getTableName($this->getDatabaseName(), $tableName, $tableExtension);
     }
 }

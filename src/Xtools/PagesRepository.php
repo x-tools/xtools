@@ -131,12 +131,26 @@ class PagesRepository extends Repository
      * Get the statement for a single revision, so that you can iterate row by row.
      * @param Page $page The page.
      * @param User|null $user Specify to get only revisions by the given user.
+     * @param int $limit Max number of revisions to process.
+     * @param int $numRevisions Number of revisions, if known. This is used solely to determine the
+     *   OFFSET if we are given a $limit (see below). If $limit is set and $numRevisions is not set,
+     *   a separate query is ran to get the nuber of revisions.
      * @return Doctrine\DBAL\Driver\PDOStatement
      */
-    public function getRevisionsStmt(Page $page, User $user = null)
+    public function getRevisionsStmt(Page $page, User $user = null, $limit = null, $numRevisions = null)
     {
         $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
         $userClause = $user ? "revs.rev_user_text in (:username) AND " : "";
+
+        // This sorts ascending by rev_timestamp because ArticleInfo must start with the oldest
+        // revision and work its way forward for proper processing. Consequently, if we want to do
+        // a LIMIT we want the most recent revisions, so we also need to know the total count to
+        // supply as the OFFSET.
+        $limitClause = '';
+        if (intval($limit) > 0 && isset($numRevisions)) {
+            $offset = $numRevisions - $limit;
+            $limitClause = "LIMIT $offset, $limit";
+        }
 
         $sql = "SELECT
                     revs.rev_id AS id,
@@ -150,7 +164,8 @@ class PagesRepository extends Repository
                 FROM $revTable AS revs
                 LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                 WHERE $userClause revs.rev_page = :pageid
-                ORDER BY revs.rev_timestamp ASC";
+                ORDER BY revs.rev_timestamp ASC
+                $limitClause";
 
         $params = ['pageid' => $page->getId()];
         if ($user) {
@@ -431,12 +446,13 @@ class PagesRepository extends Repository
 
     /**
      * Get page views for the given page and timeframe.
+     * @FIXME use Symfony Guzzle package.
      * @param Page $page
      * @param string|DateTime $start In the format YYYYMMDD
      * @param string|DateTime $end In the format YYYYMMDD
      * @return string[]
      */
-    public function getPageviews($page, $start, $end)
+    public function getPageviews(Page $page, $start, $end)
     {
         $title = rawurlencode(str_replace(' ', '_', $page->getTitle()));
         $client = new GuzzleHttp\Client();
