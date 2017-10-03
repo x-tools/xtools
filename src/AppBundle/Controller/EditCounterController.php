@@ -61,6 +61,17 @@ class EditCounterController extends Controller
             return $this->redirectToRoute('ec', ['project' => $project]);
         }
 
+        // Don't attempt to process users with an excessively high edit count.
+        if ($this->user->hasTooManyEdits($this->project)) {
+            $this->addFlash('danger', ['too-many-edits', number_format($this->user->maxEdits())]);
+            // FIXME: i18n of 'Simple Counter'
+            $this->addFlash('info', ['too-many-edits-redir', 'Simple Counter']);
+            return $this->redirectToRoute('SimpleEditCounterResult', [
+                'project' => $project,
+                'username' => $username
+            ]);
+        }
+
         // Get an edit-counter if we don't already have it set.
         if ($this->editCounter instanceof EditCounter) {
             return;

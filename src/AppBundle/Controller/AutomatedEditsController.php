@@ -116,7 +116,7 @@ class AutomatedEditsController extends Controller
         $projectData = ProjectRepository::getProject($project, $this->container);
 
         if (!$projectData->exists()) {
-            $this->addFlash('notice', ['invalid-project', $project]);
+            $this->addFlash('danger', ['invalid-project', $project]);
             return $this->redirectToRoute('autoedits');
         }
 
@@ -146,6 +146,28 @@ class AutomatedEditsController extends Controller
         }
 
         $user = UserRepository::getUser($username, $this->container);
+
+        // Don't continue if the user doesn't exist.
+        if (!$user->existsOnProject($projectData)) {
+            $this->addFlash('danger', 'user-not-found');
+            return $this->redirectToRoute('topedits', [
+                'project' => $project,
+                'namespace' => $namespace,
+                'start' => $start,
+                'end' => $end,
+            ]);
+        }
+
+        // Reject users with a crazy high edit count.
+        if ($user->hasTooManyEdits($projectData)) {
+            $this->addFlash('danger', ['too-many-edits', number_format($user->maxEdits())]);
+            return $this->redirectToRoute('topedits', [
+                'project' => $project,
+                'namespace' => $namespace,
+                'start' => $start,
+                'end' => $end,
+            ]);
+        }
 
         $editCount = $user->countEdits($projectData, $namespace, $start, $end);
 

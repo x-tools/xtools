@@ -163,25 +163,45 @@ class ApiController extends FOSRestController
         $twig = $this->container->get('twig');
         $project = ProjectRepository::getProject($project, $this->container);
         $user = UserRepository::getUser($username, $this->container);
-        $data = $user->getNonautomatedEdits($project, $namespace, $start, $end, $offset);
+
+        // Reject if they've made too many edits.
+        if ($user->hasTooManyEdits($project)) {
+            if ($request->query->get('format') !== 'html') {
+                return new View(
+                    [
+                        'error' => 'Unable to show any data. User has made over ' .
+                            $user->maxEdits() . ' edits.',
+                    ],
+                    Response::HTTP_FORBIDDEN
+                );
+            }
+
+            $data = false;
+            $edits = false;
+        } else {
+            $data = $user->getNonautomatedEdits($project, $namespace, $start, $end, $offset);
+        }
 
         $view = View::create()->setStatusCode(Response::HTTP_OK);
 
         if ($request->query->get('format') === 'html') {
-            $edits = array_map(function ($attrs) use ($project, $username) {
-                $page = $project->getRepository()
-                    ->getPage($project, $attrs['full_page_title']);
-                $pageTitles[] = $attrs['full_page_title'];
-                $attrs['id'] = $attrs['rev_id'];
-                $attrs['username'] = $username;
-                return new Edit($page, $attrs);
-            }, $data);
+            if ($data) {
+                $edits = array_map(function ($attrs) use ($project, $username) {
+                    $page = $project->getRepository()
+                        ->getPage($project, $attrs['full_page_title']);
+                    $pageTitles[] = $attrs['full_page_title'];
+                    $attrs['id'] = $attrs['rev_id'];
+                    $attrs['username'] = $username;
+                    return new Edit($page, $attrs);
+                }, $data);
+            }
 
             $twig = $this->container->get('twig');
             $view->setTemplate('api/nonautomated_edits.html.twig');
             $view->setTemplateData([
                 'edits' => $edits,
                 'project' => $project,
+                'maxEdits' => $user->maxEdits(),
             ]);
             $view->setFormat('html');
         } else {

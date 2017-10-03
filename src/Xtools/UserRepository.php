@@ -738,6 +738,15 @@ class UserRepository extends Repository
     }
 
     /**
+     * Maximum number of edits to process, based on configuration.
+     * @return int
+     */
+    public function maxEdits()
+    {
+        return $this->container->getParameter('app.max_user_edits');
+    }
+
+    /**
      * Get the combined regex and tags for all semi-automated tools,
      *   ready to be used in a query.
      * @param string $projectDomain Such as en.wikipedia.org
