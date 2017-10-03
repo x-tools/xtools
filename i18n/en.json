@@ -301,7 +301,6 @@
 	"tool-ec": "Edit Counter",
 	"tool-ec-desc": "Analysis of user contributions",
 	"tool-error": "Error",
-	"tool-error-desc": "Something broke!",
 	"tool-es": "Edit Summaries",
 	"tool-es-desc": "Analysis of edit summary usage",
 	"tool-meta": "Usage Statistics",

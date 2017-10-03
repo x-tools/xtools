@@ -299,7 +299,6 @@
 	"tool-ec": "Compteur de modifications",
 	"tool-ec-desc": "Analyse des contributions d'un utilisateur",
 	"tool-error": "Erreur",
-	"tool-error-desc": "Quelque chose s’est cassé !",
 	"tool-es": "Résumés de modification",
 	"tool-es-desc": "Analyse de l’utilisation du résumé de modification",
 	"tool-meta": "Statistiques d’utilisation",

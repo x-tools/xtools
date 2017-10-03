@@ -301,7 +301,6 @@
 	"tool-ec": "Top menu title: short phrase! or shortcut (to fit into the design) or leave untranslated",
 	"tool-ec-desc": "Description of the Edit Counter tool.",
 	"tool-error": "Title for the error page.\n{{Identical|Error}}",
-	"tool-error-desc": "Description for the error page.",
 	"tool-es": "Top menu title for the Edit Summaries tool. This phrase should be short to fit into the design.",
 	"tool-es-desc": "Description for the Edit Summaries tool.",
 	"tool-meta": "Name of the tool that shows the usage stats of the other tools. This is mainly used for internal purposes and may be left untranslated.",

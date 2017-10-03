@@ -292,7 +292,6 @@
 	"tool-ec": "Contador de ediciones",
 	"tool-ec-desc": "Análisis de las contribuciones de usuario",
 	"tool-error": "Error",
-	"tool-error-desc": "Se produjo un error.",
 	"tool-es": "Resúmenes de edición",
 	"tool-es-desc": "Análisis del uso de resúmenes de edición",
 	"tool-meta": "Estadísticas de uso",
