@@ -37,15 +37,17 @@ class TopEditsController extends Controller
     /**
      * Display the form.
      * @Route("/topedits", name="topedits")
-     * @Route("/topedits", name="topEdits")
+     * @Route("/topedits", name="TopEdits")
      * @Route("/topedits/", name="topEditsSlash")
-     * @Route("/topedits/index.php", name="topEditsIndex")
+     * @Route("/topedits/index.php", name="TopEditsIndex")
+     * @Route("/topedits/{project}", name="TopEditsProject")
      * @param Request $request
+     * @param string $project The project name.
      * @return Response
      */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request, $project = null)
     {
-        $projectName = $request->query->get('project');
+        $project = $request->query->get('project') ?: $project;
         $username = $request->query->get('username', $request->query->get('user'));
         $namespace = $request->query->get('namespace');
         $article = $request->query->get('article');
@@ -62,11 +64,11 @@ class TopEditsController extends Controller
         $wiki = $request->query->get('wiki');
         $lang = $request->query->get('lang');
         if (isset($wiki) && isset($lang) && empty($project)) {
-            $projectName = $lang.'.'.$wiki.'.org';
+            $project = $lang.'.'.$wiki.'.org';
         }
 
         $redirectParams = [
-            'project' => $projectName,
+            'project' => $project,
             'username' => $username,
         ];
         if ($article != '') {
@@ -77,21 +79,23 @@ class TopEditsController extends Controller
         }
 
         // Redirect if at minimum project and username are provided.
-        if ($projectName != '' && $username != '') {
+        if ($project != '' && $username != '') {
             return $this->redirectToRoute('TopEditsResults', $redirectParams);
         }
 
         // Set default project so we can populate the namespace selector.
-        if (!$projectName) {
-            $projectName = $this->container->getParameter('default_project');
+        if (!$project) {
+            $project = $this->container->getParameter('default_project');
         }
-        $project = ProjectRepository::getProject($projectName, $this->container);
+        $project = ProjectRepository::getProject($project, $this->container);
 
         return $this->render('topedits/index.html.twig', [
             'xtPageTitle' => 'tool-topedits',
             'xtSubtitle' => 'tool-topedits-desc',
             'xtPage' => 'topedits',
             'project' => $project,
+            'namespace' => (int) $namespace,
+            'article' => $article,
         ]);
     }
 
@@ -105,18 +109,28 @@ class TopEditsController extends Controller
      * @param string $article
      * @return RedirectResponse|Response
      */
-    public function resultAction($project, $username, $namespace = 0, $article = "")
+    public function resultAction($project, $username, $namespace = 0, $article = '')
     {
         $projectData = ProjectRepository::getProject($project, $this->container);
 
         if (!$projectData->exists()) {
-            $this->addFlash("notice", ["invalid-project", $project]);
-            return $this->redirectToRoute("topedits");
+            $this->addFlash('notice', ['invalid-project', $project]);
+            return $this->redirectToRoute('topedits');
         }
 
         $user = UserRepository::getUser($username, $this->container);
 
-        if ($article === "") {
+        // Don't continue if the user doesn't exist.
+        if (!$user->existsOnProject($projectData)) {
+            $this->addFlash('notice', 'user-not-found');
+            return $this->redirectToRoute('topedits', [
+                'project' => $project,
+                'namespace' => $namespace,
+                'article' => $article,
+            ]);
+        }
+
+        if ($article === '') {
             return $this->namespaceTopEdits($user, $projectData, $namespace);
         } else {
             return $this->singlePageTopEdits($user, $projectData, $namespace, $article);

@@ -127,7 +127,7 @@ class AdminStatsController extends Controller
         // to the project only view.
         if (strtotime($start) === false || strtotime($end) === false) {
             // Make sure to add the flash notice first.
-            $this->addFlash("notice", ["invalid_date"]);
+            $this->addFlash("notice", ["invalid-date"]);
 
             // Then redirect us!
             return $this->redirectToRoute(
