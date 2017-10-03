@@ -51,7 +51,6 @@ class AppExtension extends Extension
             new \Twig_SimpleFunction('tools', [ $this, 'allTools' ]),
             new \Twig_SimpleFunction('color', [ $this, 'getColorList' ]),
             new \Twig_SimpleFunction('chartColor', [ $this, 'chartColor' ]),
-            new \Twig_SimpleFunction('xtApiUrl', [ $this, 'xtApiUrl' ]),
             new \Twig_SimpleFunction('isSingleWiki', [ $this, 'isSingleWiki' ]),
             new \Twig_SimpleFunction('getReplagThreshold', [ $this, 'getReplagThreshold' ]),
             new \Twig_SimpleFunction('loadStylesheetsFromCDN', [ $this, 'loadStylesheetsFromCDN' ]),
@@ -438,23 +437,6 @@ class AppExtension extends Extension
             $param = boolval($this->container->getParameter('app.is_labs'));
         }
         return $param;
-    }
-
-    /**
-     * What URL to use as the internal API, based on configuration.
-     * @return string
-     */
-    public function xtApiUrl()
-    {
-        if ($this->container->hasParameter('app.multithread.enable') &&
-            (bool) $this->container->getParameter('app.multithread.enable')
-        ) {
-            return $this->container->getParameter('app.multithread.api_url');
-        } else {
-            // Use root URL of application.
-            $router = $this->container->get('router');
-            return $router->generate('homepage', [], true);
-        }
     }
 
     /**

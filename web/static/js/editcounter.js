@@ -30,8 +30,8 @@ $(function () {
     // Only load if container is present, which is missing in subroutes, e.g. ec-namespacetotals, etc.
     var $latestGlobalContainer = $("#latestglobal-container");
     if ($latestGlobalContainer[0]) {
-        /** global: xtApiUrl */
-        var url = xtApiUrl + 'ec-latestglobal/'
+        /** global: xtBaseUrl */
+        var url = xtBaseUrl + 'ec-latestglobal/'
             + $latestGlobalContainer.data("project") + '/'
             + $latestGlobalContainer.data("username") + '?htmlonly=yes';
         $.ajax({

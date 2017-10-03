@@ -36,9 +36,9 @@ $(function () {
             end = $('.non-auto-edits-container').data('end'),
             namespace = $('.non-auto-edits-container').data('namespace');
 
-        /** global: xtApiUrl */
+        /** global: xtBaseUrl */
         $.ajax({
-            url: xtApiUrl + 'api/user/nonautomated_edits/' + project + '/' + username + '/' +
+            url: xtBaseUrl + 'api/user/nonautomated_edits/' + project + '/' + username + '/' +
                 namespace + '/' + start + '/' + end + '/' + editOffset + '?format=html',
             timeout: 30000
         }).done(function (data) {

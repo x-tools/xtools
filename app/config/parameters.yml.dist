@@ -54,8 +54,7 @@ parameters:
     app.rate_limit_time: 5
     app.rate_limit_count: 10
 
-    app.multithread.enable: 0
-    app.multithread.api_url: https://xtools.example.org/
+    app.multithread: 0
 
     # Enabling or disabling of individual tools
     enable.adminscore: 1

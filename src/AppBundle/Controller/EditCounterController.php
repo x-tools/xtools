@@ -123,7 +123,7 @@ class EditCounterController extends Controller
         // Asynchronously collect some of the data that will be shown.
         // If multithreading is turned off, the normal getters in the views will
         // collect the necessary data synchronously.
-        if ($this->container->getParameter('app.multithread.enable')) {
+        if ($this->container->getParameter('app.multithread')) {
             $this->editCounter->prepareData($this->container);
         }
 
