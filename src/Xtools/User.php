@@ -141,7 +141,7 @@ class User extends Model
      */
     public function isAnon()
     {
-        return filter_var($this->username, FILTER_VALIDATE_IP);
+        return (bool) filter_var($this->username, FILTER_VALIDATE_IP);
     }
 
     /**
