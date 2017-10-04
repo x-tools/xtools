@@ -37,13 +37,15 @@ class AutomatedEditsController extends Controller
      * @Route("/automatededits/", name="autoeditsLongSlash")
      * @Route("/autoedits/index.php", name="autoeditsIndexPhp")
      * @Route("/automatededits/index.php", name="autoeditsLongIndexPhp")
+     * @Route("/autoedits/{project}", name="autoeditsProject")
      * @param Request $request The HTTP request.
+     * @param string $project The project name.
      * @return Response
      */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request, $project = null)
     {
         // Pull the values out of the query string. These values default to empty strings.
-        $projectName = $request->query->get('project');
+        $projectName = $request->query->get('project') ?: $project;
         $username = $request->query->get('username', $request->query->get('user'));
         $namespace = $request->query->get('namespace');
         $startDate = $request->query->get('start');
@@ -58,41 +60,20 @@ class AutomatedEditsController extends Controller
             $namespace = '0';
         }
 
-        // Redirect if the values are set.
-        if ($projectName != '' && $username != '' && $namespace != '' && ($startDate != '' || $endDate != '')) {
-            // Set start date to beginning of time if end date is provided
-            // This is nasty, but necessary given URL structure
-            if ($startDate === '') {
-                $startDate = date('Y-m-d', 0);
-            }
+        $redirectParams = [
+            'project' => $projectName,
+            'username' => $username,
+        ];
 
-            return $this->redirectToRoute(
-                'autoeditsResult',
-                [
-                    'project' => $projectName,
-                    'username' => $username,
-                    'namespace' => $namespace,
-                    'start' => $startDate,
-                    'end' => $endDate,
-                ]
-            );
-        } elseif ($projectName != '' && $username != '' && $namespace != '') {
-            return $this->redirectToRoute(
-                'autoeditsResult',
-                [
-                    'project' => $projectName,
-                    'username' => $username,
-                    'namespace' => $namespace,
-                ]
-            );
-        } elseif ($projectName != '' && $username != '') {
-            return $this->redirectToRoute(
-                'autoeditsResult',
-                [
-                    'project' => $projectName,
-                    'username' => $username,
-                ]
-            );
+        // Redirect if at minimum project and username are provided.
+        if ($project != '' && $username != '') {
+            return $this->redirectToRoute('autoeditsResult', [
+                'project' => $projectName,
+                'username' => $username,
+                'namespace' => $namespace,
+                'start' => $startDate,
+                'end' => $endDate,
+            ]);
         }
 
         // Set default project so we can populate the namespace selector.
@@ -106,12 +87,22 @@ class AutomatedEditsController extends Controller
             'xtSubtitle' => 'tool-autoedits-desc',
             'xtPage' => 'autoedits',
             'project' => $project,
+            'namespace' => (int) $namespace,
+            'start' => $startDate,
+            'end' => $endDate,
         ]);
     }
 
     /**
      * Display the results.
-     * @Route("/autoedits/{project}/{username}/{namespace}/{start}/{end}", name="autoeditsResult")
+     * @Route(
+     *     "/autoedits/{project}/{username}/{namespace}/{start}/{end}", name="autoeditsResult",
+     *     requirements={
+     *         "start" = "|\d{4}-\d{2}-\d{2}",
+     *         "end" = "|\d{4}-\d{2}-\d{2}",
+     *         "namespace" = "|all|\d"
+     *     }
+     * )
      * @param string $project
      * @param string $username
      * @param int|string [$namespace]
@@ -132,12 +123,12 @@ class AutomatedEditsController extends Controller
         // Validating the dates. If the dates are invalid, we'll redirect
         // to the project and username view.
         $invalidDates = (
-            (isset($start) && strtotime($start) === false) ||
-            (isset($end) && strtotime($end) === false)
+            ($start != '' && strtotime($start) === false) ||
+            ($end != '' && strtotime($end) === false)
         );
         if ($invalidDates) {
             // Make sure to add the flash notice first.
-            $this->addFlash('notice', ['invalid-date']);
+            $this->addFlash('warning', ['invalid-date']);
 
             // Then redirect us!
             return $this->redirectToRoute(
@@ -149,13 +140,18 @@ class AutomatedEditsController extends Controller
             );
         }
 
+        // Normalize default namespace.
+        if ($namespace == '') {
+            $namespace = 0;
+        }
+
         $user = UserRepository::getUser($username, $this->container);
 
         $editCount = $user->countEdits($projectData, $namespace, $start, $end);
 
         // Inform user if no revisions found.
         if ($editCount === 0) {
-            $this->addFlash('notice', ['no-contribs']);
+            $this->addFlash('danger', ['no-contribs']);
             return $this->redirectToRoute('autoedits');
         }
 

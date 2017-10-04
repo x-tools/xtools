@@ -250,6 +250,7 @@ class ProjectRepository extends Repository
                 'script' => $info['script'],
                 'timezone' => $info['timezone'],
                 'timeOffset' => $info['timeoffset'],
+                'mainpage' => $info['mainpage'],
             ];
         }
 

@@ -51,7 +51,6 @@ class AppExtension extends Extension
             new \Twig_SimpleFunction('tools', [ $this, 'allTools' ]),
             new \Twig_SimpleFunction('color', [ $this, 'getColorList' ]),
             new \Twig_SimpleFunction('chartColor', [ $this, 'chartColor' ]),
-            new \Twig_SimpleFunction('xtApiUrl', [ $this, 'xtApiUrl' ]),
             new \Twig_SimpleFunction('isSingleWiki', [ $this, 'isSingleWiki' ]),
             new \Twig_SimpleFunction('getReplagThreshold', [ $this, 'getReplagThreshold' ]),
             new \Twig_SimpleFunction('loadStylesheetsFromCDN', [ $this, 'loadStylesheetsFromCDN' ]),
@@ -103,11 +102,19 @@ class AppExtension extends Extension
      * See if a given i18n message exists.
      * @TODO: refactor all intuition stuff so it can be used anywhere
      * @param string $message The message.
+     * @param array $vars
      * @return bool
      */
-    public function intuitionMessageExists($message = "")
+    public function intuitionMessageExists($message = '', $vars = [])
     {
-        return $this->getIntuition()->msgExists($message, [ "domain" => "xtools" ]);
+        return $this->getIntuition()->msgExists($message, array_merge(
+            [
+                'domain' => 'xtools'
+            ],
+            [
+                'variables' => $vars
+            ]
+        ));
     }
 
     /**
@@ -123,7 +130,7 @@ class AppExtension extends Extension
             $message = $message[0];
             $vars = array_slice($vars, 1);
         }
-        if ($this->intuitionMessageExists($message)) {
+        if ($this->intuitionMessageExists($message, $vars)) {
             return $this->intuitionMessage($message, $vars);
         } else {
             return $message;
@@ -438,23 +445,6 @@ class AppExtension extends Extension
             $param = boolval($this->container->getParameter('app.is_labs'));
         }
         return $param;
-    }
-
-    /**
-     * What URL to use as the internal API, based on configuration.
-     * @return string
-     */
-    public function xtApiUrl()
-    {
-        if ($this->container->hasParameter('app.multithread.enable') &&
-            (bool) $this->container->getParameter('app.multithread.enable')
-        ) {
-            return $this->container->getParameter('app.multithread.api_url');
-        } else {
-            // Use root URL of application.
-            $router = $this->container->get('router');
-            return $router->generate('homepage', [], true);
-        }
     }
 
     /**

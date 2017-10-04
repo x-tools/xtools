@@ -1,6 +1,6 @@
 <?php
 /**
- * This file contains only the TopEditsControllerTest class.
+ * This file contains only the AutomatedEditsControllerTest class.
  */
 
 namespace Tests\AppBundle\Controller;
@@ -8,10 +8,10 @@ namespace Tests\AppBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
- * Integration tests for the Top Edits tool.
+ * Integration tests for the Auto Edits tool.
  * @group integration
  */
-class TopEditsControllerTest extends WebTestCase
+class AutomatedEditsControllerTest extends WebTestCase
 {
     /** @var Container The DI container. */
     protected $container;
@@ -34,7 +34,7 @@ class TopEditsControllerTest extends WebTestCase
     public function testIndex()
     {
         // Check basics.
-        $crawler = $this->client->request('GET', '/topedits');
+        $crawler = $this->client->request('GET', '/autoedits');
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
 
         // For now...
@@ -43,17 +43,17 @@ class TopEditsControllerTest extends WebTestCase
         }
 
         // Should populate the appropriate fields.
-        $crawler = $this->client->request('GET', '/topedits/de.wikipedia.org?namespace=3&article=Test');
+        $crawler = $this->client->request('GET', '/autoedits/de.wikipedia.org?namespace=3&end=2017-01-01');
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
         $this->assertEquals('de.wikipedia.org', $crawler->filter('#project_input')->attr('value'));
         $this->assertEquals(3, $crawler->filter('#namespace_select option:selected')->attr('value'));
-        $this->assertEquals('Test', $crawler->filter('#article_input')->attr('value'));
+        $this->assertEquals('2017-01-01', $crawler->filter('[name=end]')->attr('value'));
 
         // Legacy URL params.
-        $crawler = $this->client->request('GET', '/topedits/?namespace=5&page=Test&wiki=wikipedia&lang=fr');
+        $crawler = $this->client->request('GET', '/autoedits/?project=fr.wikipedia.org&namespace=5&begin=2017-02-01');
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
         $this->assertEquals('fr.wikipedia.org', $crawler->filter('#project_input')->attr('value'));
         $this->assertEquals(5, $crawler->filter('#namespace_select option:selected')->attr('value'));
-        $this->assertEquals('Test', $crawler->filter('#article_input')->attr('value'));
+        $this->assertEquals('2017-02-01', $crawler->filter('[name=start]')->attr('value'));
     }
 }

@@ -147,7 +147,7 @@ abstract class Repository
     }
 
     /**
-     * Make a request to the XTools API. This requires that app.multithread.api_url be set.
+     * Make a request to the XTools API, optionally doing so asynchronously via Guzzle.
      * @param string $endpoint Relative path to endpoint with relevant query parameters.
      * @param bool $async Set to true to asynchronously query and return a promise.
      * @return mixed|GuzzleHttp\Promise\Promise
@@ -158,9 +158,7 @@ abstract class Repository
             $this->apiConnection = $this->container->get('guzzle.client.xtools');
         }
 
-        // Ensure there's a trailing slash.
-        $apiRoot = trim($this->container->getParameter('app.multithread.api_url'), '/');
-        $endpoint = $apiRoot . '/api/' . $endpoint;
+        $endpoint = "/api/$endpoint";
 
         if ($async) {
             return $this->apiConnection->getAsync($endpoint);
@@ -174,7 +172,7 @@ abstract class Repository
      *
      * @param string $databaseName
      * @param string $tableName
-     * @param string|null [$tableExtension] Optional table extension, which will only get used if we're on labs.
+     * @param string|null $tableExtension Optional table extension, which will only get used if we're on labs.
      * @return string Fully-qualified and quoted table name.
      */
     public function getTableName($databaseName, $tableName, $tableExtension = null)

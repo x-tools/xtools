@@ -20,14 +20,15 @@
 </div>
 {% endmacro %}
 
-{% macro page_input(required = true, project = null) %}
+{% macro page_input(required = true, project = null, value = '') %}
 <div class="input-group form-row">
     <label class="input-group-addon form-label" for="article_input">
         {{ msg('page-title') }}
     </label>
     <input type="text" class="form-control"
            name="article" id="article_input"{% if required %} required{% endif %}
-           {% if project is not null %}autocomplete="off" data-api="{{ project.apiUrl }}"{% endif %}>
+           {% if project is not null %}autocomplete="off" data-api="{{ project.apiUrl }}"
+            value="{{ value }}"{% endif %}>
 </div>
 {% endmacro %}
 
