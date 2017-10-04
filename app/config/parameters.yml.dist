@@ -32,7 +32,7 @@ parameters:
     mailer_user:       ~
     mailer_password:   ~
 
-    # A secret key that's used to generate certain security-related tokens
+    # A secret key that's used to generate certain security-related tokens, and as the secret for the internal API.
     secret:            ThisTokenIsNotSoSecretChangeIt
 
     # Code for the display of the notice.  noticeDisplay is bool, display or not. noticeStyle is one of "error,"

@@ -54,7 +54,7 @@ The Oauth details need to be requested from ``Special:OAuthConsumerRegistration`
 Application
 ===========
 
-- **secret** - A secret key that's used to generate certain security-related tokens
+- **secret** - A secret key that's used to generate certain security-related tokens, and as the secret for the internal API. If you are using a separate API server (as explained in the :ref:`administration <offload_api>` section), this parameter must have the same value on both the app server and API server.
 - **app.noticeDisplay** - Display the notice or not
 - **app.noticeStyle** - Style of the notice banner.  Available options: "error," "warning," "succeess," "info."
 - **app.noticeText** - Message shown to the user.  If you provide a valid intuition key, it will display that message instead

@@ -158,7 +158,9 @@ abstract class Repository
             $this->apiConnection = $this->container->get('guzzle.client.xtools');
         }
 
-        $endpoint = "/api/$endpoint";
+        $key = $this->container->getParameter('secret');
+
+        $endpoint = "/api/$endpoint/$key";
 
         if ($async) {
             return $this->apiConnection->getAsync($endpoint);

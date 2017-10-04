@@ -48,10 +48,16 @@ class EditCounterController extends Controller
      * If a response is returned, the calling action is expected to return it.
      * @param string|bool $project The project name.
      * @param string|bool $username The username.
+     * @param string $key API key, as given in the reuqest. Omit this for actions
+     *   that are public (only /api/ec actions should pass this in).
      * @return null|RedirectResponse
      */
-    protected function setUpEditCounter($project = false, $username = false)
+    protected function setUpEditCounter($project = false, $username = false, $key = null)
     {
+        if ($key && $key !== $this->container->getParameter('secret')) {
+            throw $this->createAccessDeniedException('This endpoint is for internal use only.');
+        }
+
         $this->project = ProjectRepository::getProject($project, $this->container);
         $this->user = UserRepository::getUser($username, $this->container);
 
@@ -311,21 +317,23 @@ class EditCounterController extends Controller
 
     /**
      * Below are internal API endpoints for the Edit Counter.
-     * All only respond with JSON and only to requests from the localhost
-     * (see access_control in security.yml).
+     * All only respond with JSON and only to requests passing in the value
+     * of the 'secret' parameter. This should not be used in JavaScript or clientside
+     * applications, rather only used internally.
      */
 
     /**
      * Get (most) of the general statistics as JSON.
-     * @Route("/api/ec/pairdata/{project}/{username}", name="EditCounterApiPairData")
+     * @Route("/api/ec/pairdata/{project}/{username}/{key}", name="EditCounterApiPairData")
      * @param Request $request
      * @param string $project
      * @param string $username
+     * @param string $key API key.
      * @return JsonResponse
      */
-    public function pairDataApiAction(Request $request, $project, $username)
+    public function pairDataApiAction(Request $request, $project, $username, $key)
     {
-        $ret = $this->setUpEditCounter($project, $username);
+        $ret = $this->setUpEditCounter($project, $username, $key);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
@@ -338,15 +346,16 @@ class EditCounterController extends Controller
 
     /**
      * Get various log counts for the user as JSON.
-     * @Route("/api/ec/logcounts/{project}/{username}", name="EditCounterApiLogCounts")
+     * @Route("/api/ec/logcounts/{project}/{username}/{key}", name="EditCounterApiLogCounts")
      * @param Request $request
      * @param string $project
      * @param string $username
+     * @param string $key API key.
      * @return JsonResponse
      */
-    public function logCountsApiAction(Request $request, $project, $username)
+    public function logCountsApiAction(Request $request, $project, $username, $key)
     {
-        $ret = $this->setUpEditCounter($project, $username);
+        $ret = $this->setUpEditCounter($project, $username, $key);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
@@ -359,15 +368,16 @@ class EditCounterController extends Controller
 
     /**
      * Get edit sizes for the user as JSON.
-     * @Route("/api/ec/editsizes/{project}/{username}", name="EditCounterApiEditSizes")
+     * @Route("/api/ec/editsizes/{project}/{username}/{key}", name="EditCounterApiEditSizes")
      * @param Request $request
      * @param string $project
      * @param string $username
+     * @param string $key API key.
      * @return JsonResponse
      */
-    public function editSizesApiAction(Request $request, $project, $username)
+    public function editSizesApiAction(Request $request, $project, $username, $key)
     {
-        $ret = $this->setUpEditCounter($project, $username);
+        $ret = $this->setUpEditCounter($project, $username, $key);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
@@ -380,15 +390,16 @@ class EditCounterController extends Controller
 
     /**
      * Get the namespace totals for the user as JSON.
-     * @Route("/api/ec/namespacetotals/{project}/{username}", name="EditCounterApiNamespaceTotals")
+     * @Route("/api/ec/namespacetotals/{project}/{username}/{key}", name="EditCounterApiNamespaceTotals")
      * @param Request $request
      * @param string $project
      * @param string $username
+     * @param string $key API key.
      * @return Response
      */
-    public function namespaceTotalsApiAction(Request $request, $project, $username)
+    public function namespaceTotalsApiAction(Request $request, $project, $username, $key)
     {
-        $ret = $this->setUpEditCounter($project, $username);
+        $ret = $this->setUpEditCounter($project, $username, $key);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
@@ -401,15 +412,16 @@ class EditCounterController extends Controller
 
     /**
      * Display or fetch the month counts for the user.
-     * @Route("/api/ec/monthcounts/{project}/{username}", name="EditCounterApiMonthCounts")
+     * @Route("/api/ec/monthcounts/{project}/{username}/{key}", name="EditCounterApiMonthCounts")
      * @param Request $request
      * @param string $project
      * @param string $username
+     * @param string $key API key.
      * @return Response
      */
-    public function monthcountsApiAction(Request $request, $project, $username)
+    public function monthcountsApiAction(Request $request, $project, $username, $key)
     {
-        $ret = $this->setUpEditCounter($project, $username);
+        $ret = $this->setUpEditCounter($project, $username, $key);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
