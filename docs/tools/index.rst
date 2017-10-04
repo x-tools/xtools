@@ -9,4 +9,5 @@ Tools
     pages
     topedits
     adminscore
+    bash
     simplecounter

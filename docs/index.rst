@@ -83,7 +83,7 @@ A collection of humourous or insightful quotations about MediaWiki.
 Blame
 -----
 
-Find out who last changed a given part of a page.
+Find out who last changed a given part of a page. (Blame is currently not implemented.)
 :ref:`Read more about Blame... <blame>`.
 
 Pages
