@@ -157,12 +157,12 @@
         {% endfor %}
     {% endif %}
 
-    {% set replagValue = replag() %}
+    {# {% set replagValue = replag() %}
     {% if replagValue > getReplagThreshold() %}
         <p class="alert alert-warning xt-alert">
             {{ msgPrintExists('high-replag', [formatDuration(replagValue)]) }}
         </p>
-    {% endif %}
+    {% endif %} #}
 </div>
 
 <div id="wrapper">
