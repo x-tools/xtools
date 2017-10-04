@@ -95,6 +95,17 @@ class EditCounterController extends Controller
         $queryProject = $request->query->get('project');
         $username = $request->query->get('username', $request->query->get('user'));
 
+        // Legacy XTools.
+        $user = $request->query->get('user');
+        if (empty($username) && isset($user)) {
+            $username = $user;
+        }
+        $wiki = $request->query->get('wiki');
+        $lang = $request->query->get('lang');
+        if (isset($wiki) && isset($lang) && empty($project)) {
+            $project = $lang.'.'.$wiki.'.org';
+        }
+
         if (($project || $queryProject) && $username) {
             $routeParams = ['project' => ($project ?: $queryProject), 'username' => $username];
             return $this->redirectToRoute('EditCounterResult', $routeParams);
