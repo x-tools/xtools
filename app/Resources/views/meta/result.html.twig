@@ -56,7 +56,7 @@
                                 {{ msg('tool-'~tool) }}
                             </td>
                             <td class="sort-entry--count" data-value="{{ count }}">
-                                {{ count | number_format }}
+                                {{ count|num_format }}
                             </td>
                         </tr>
                     {% endfor %}
@@ -68,7 +68,7 @@
                             {{ msg('num-tools', [totals | length]) }}
                         </th>
                         <th class="tools--count">
-                            {{ grandSum | number_format }}
+                            {{ grandSum|num_format }}
                         </th>
                     </tr>
                 </tfoot>

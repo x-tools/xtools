@@ -45,19 +45,19 @@
                     </tr>
                     <tr>
                         <td>{{ msg('total-edits') }}</td>
-                        <td>{{ editCount|number_format }}</td>
+                        <td>{{ editCount|num_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('auto-edits') }}</td>
                         <td>
-                            {{ autoCount|number_format }}
+                            {{ autoCount|num_format }}
                             ({{ autoPct|percent_format }})
                         </td>
                     </tr>
                     <tr>
                         <td>{{ msg('non-auto-edits') }}</td>
                         <td>
-                            {{ (editCount - autoCount)|number_format }}
+                            {{ (editCount - autoCount)|num_format }}
                             ({{ (100 - autoPct)|percent_format }})
                         </td>
                     </tr>
@@ -107,7 +107,7 @@
                             {{ wiki.pageLinkRaw(values.link, project, tool) }}
                         </td>
                         <td class="sort-entry--count" data-value="{{ values.count }}">
-                            {{ values.count|number_format(0, ".", ",") }}
+                            {{ values.count|num_format }}
                         </td>
                         <td class="sort-entry--percent-of-tools" data-value="{{ values.count }}">
                             {{ values.count|percent_format(toolsTotal) }}
@@ -120,11 +120,11 @@
                 </tbody>
                 <tfoot>
                     <th class="tools--tools">
-                        {{ toolCounts|length|number_format }}
+                        {{ toolCounts|length|num_format }}
                         {{ msg('num-tools', [toolCounts|length]) }}
                     </th>
                     <th class="tools--count">
-                        {{ toolsTotal|number_format }}
+                        {{ toolsTotal|num_format }}
                     </th>
                     <th colspan=2></th>
                 </tfoot>

@@ -69,18 +69,18 @@
                         <td>
                             {{ wiki.extLink('https://www.wikidata.org/wiki/' ~ page.wikidataId, page.wikidataId) }}
                             &middot;
-                            {{ page.countWikidataItems|number_format }} {{ msg('num-sitelinks', [page.countWikidataItems]) }}
+                            {{ page.countWikidataItems|num_format }} {{ msg('num-sitelinks', [page.countWikidataItems]) }}
                         </td>
                     </tr>
                     {% endif %}
                     <tr>
                         <td>{{ msg('page-size') }}</td>
-                        <td>{{ page.length|number_format }} {{ msg('num-bytes', [page.length]) }}</td>
+                        <td>{{ page.length|num_format }} {{ msg('num-bytes', [page.length]) }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('total-edits') }}</td>
                         <td>
-                            {{ ai.numRevisions|number_format }}
+                            {{ ai.numRevisions|num_format }}
                             {% if ai.tooManyRevisions %}
                                 ({{ msg('num-revisions-processed', [ai.numRevisionsProcessed]) }})
                             {% endif %}
@@ -90,7 +90,7 @@
                         <td>
                             <a class="rm-inline-margin" href="#top-editors">{{ msg('editors') }}</a>
                         </td>
-                        <td>{{ ai.numEditors|number_format }}</td>
+                        <td>{{ ai.numEditors|num_format }}</td>
                     </tr>
                     {% if ai.assessments and not (page.isMainPage) %}
                         <tr>
@@ -114,16 +114,26 @@
                     <tr>
                         <td class="stat-list--new-group">{{ msg('minor-edits') }}</td>
                         <td class="stat-list--new-group">
-                            {{ ai.minorCount|number_format }} &middot; ({{ ai.minorPercentage }}%)
+                            {{ ai.minorCount|num_format }}
+                            &middot;
+                            ({{ ai.minorCount|percent_format(ai.numRevisionsProcessed) }})
                         </td>
                     </tr>
                     <tr>
                         <td>{{ msg('ip-edits') }}</td>
-                        <td>{{ ai.anonCount|number_format }} &middot; ({{ ai.anonPercentage }}%)</td>
+                        <td>
+                            {{ ai.anonCount|num_format }}
+                            &middot;
+                            ({{ ai.anonCount|percent_format(ai.numRevisionsProcessed) }})
+                        </td>
                     </tr>
                     <tr>
                         <td>{{ msg('bot-edits') }}</td>
-                        <td>{{ ai.botRevisionCount|number_format }} &middot; ({{ ai.botPercentage }}%)</td>
+                        <td>
+                            {{ ai.botRevisionCount|num_format }}
+                            &middot;
+                            ({{ ai.botRevisionCount|percent_format(ai.numRevisionsProcessed) }})
+                        </td>
                     </tr>
                     <tr>
                         <td>
@@ -133,11 +143,11 @@
                                 {{ msg('auto-edits') }}
                             {% endif %}
                         </td>
-                        <td>{{ ai.automatedCount|number_format }}</td>
+                        <td>{{ ai.automatedCount|num_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('reverted-edits') }}</td>
-                        <td>{{ ai.revertCount|number_format }}</td>
+                        <td>{{ ai.revertCount|num_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('average-time-bw-edits') }}</td>
@@ -145,7 +155,7 @@
                     </tr>
                     <tr>
                         <td>{{ msg('average-edits-per-user') }}</td>
-                        <td>{{ ai.editsPerEditor|number_format(1) }}</td>
+                        <td>{{ ai.editsPerEditor|num_format(1) }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('average-edits-per-day') }}</td>
@@ -153,31 +163,35 @@
                     </tr>
                     <tr>
                         <td>{{ msg('average-edits-per-month') }}</td>
-                        <td>{{ ai.editsPerMonth|number_format(1) }}</td>
+                        <td>{{ ai.editsPerMonth|num_format(1) }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('average-edits-per-year') }}</td>
-                        <td>{{ ai.editsPerYear|number_format(1) }}</td>
+                        <td>{{ ai.editsPerYear|num_format(1) }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('edits-last-day') }}</td>
-                        <td>{{ ai.countHistory.day|number_format }}</td>
+                        <td>{{ ai.countHistory.day|num_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('edits-last-week') }}</td>
-                        <td>{{ ai.countHistory.week|number_format }}</td>
+                        <td>{{ ai.countHistory.week|num_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('edits-last-month') }}</td>
-                        <td>{{ ai.countHistory.month|number_format }}</td>
+                        <td>{{ ai.countHistory.month|num_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('edits-last-year') }}</td>
-                        <td>{{ ai.countHistory.year|number_format }}</td>
+                        <td>{{ ai.countHistory.year|num_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('top-ten-count') }}</td>
-                        <td>{{ ai.topTenCount|number_format }} &middot; ({{ ai.topTenPercentage }}%)</td>
+                        <td>
+                            {{ ai.topTenCount|num_format }}
+                            &middot;
+                            ({{ ai.topTenCount|percent_format(ai.numRevisionsProcessed) }})
+                        </td>
                     </tr>
                 </tbody></table>
             </div>
@@ -229,22 +243,22 @@
                     <tr>
                         <td class="stat-list--new-group">{{ msg('links-in') }}</td>
                         <td class="stat-list--new-group">
-                            {{ wiki.pageLinksInLink(page, ai.linksInCount|number_format) }}
+                            {{ wiki.pageLinksInLink(page, ai.linksInCount|num_format) }}
                         </td>
                     </tr>
                     <tr>
                         <td>{{ msg('redirects') }}</td>
                         <td>
-                            {{ wiki.pageRedirectsLink(page, ai.redirectsCount|number_format) }}
+                            {{ wiki.pageRedirectsLink(page, ai.redirectsCount|num_format) }}
                         </td>
                     </tr>
                     <tr>
                         <td>{{ msg('links-out') }}</td>
-                        <td>{{ ai.linksOutCount|number_format }}</td>
+                        <td>{{ ai.linksOutCount|num_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('links-external') }}</td>
-                        <td>{{ ai.linksExtCount|number_format }}</td>
+                        <td>{{ ai.linksExtCount|num_format }}</td>
                     </tr>
                     {% if page.watchers is not empty %}
                         <tr>
@@ -256,7 +270,7 @@
                     <tr>
                         <td>{{ msg('pageviews') }} (60 {{ msg('num-days', [60]) }})</td>
                         <td>
-                            {{ wiki.pageviewsLink(page, ai.pageviews(pageviewsOffset)|number_format, 'range=latest-' ~ pageviewsOffset) }}
+                            {{ wiki.pageviewsLink(page, ai.pageviews(pageviewsOffset)|num_format, 'range=latest-' ~ pageviewsOffset) }}
                         </td>
                     </tr>
                     {% endif %}
@@ -375,9 +389,9 @@
                             {% endif %}
                         </td>
                         <td class="sort-entry--edits" data-value="{{ stats.all }}">
-                            {{ stats.all|number_format }}
+                            {{ stats.all|num_format }}
                         </td>
-                        <td class="sort-entry--minor-edits" data-value="{{ stats.minor }}">{{ stats.minor|number_format }}</td>
+                        <td class="sort-entry--minor-edits" data-value="{{ stats.minor }}">{{ stats.minor|num_format }}</td>
                         {% set userMinorPercent = stats.minor|percent_format(stats.all) %}
                         <td class="sort-entry--minor-percentage" data-value="{{ userMinorPercent }}">{{ userMinorPercent }}</td>
                         <td class="sort-entry--first-edit" data-value="{{ stats.firstId }}">
@@ -386,11 +400,11 @@
                         <td class="sort-entry--latest-edit" data-value="{{ stats.lastId }}">
                             {{ wiki.pageLinkRaw('Special:Diff/' ~ stats.lastId, project, stats.last|date('Y-m-d H:i')) }}
                         </td>
-                        <td class="sort-entry--average-time-bw-edits" data-value="{{ stats.atbe|number_format(1) }}">
-                            {{ stats.atbe|number_format(1) }}
+                        <td class="sort-entry--average-time-bw-edits" data-value="{{ stats.atbe|num_format(1) }}">
+                            {{ stats.atbe|num_format(1) }}
                         </td>
                         <td class="sort-entry--added-bytes" data-value="{{ stats.added }}">
-                            {{ stats.added|number_format }}
+                            {{ stats.added|num_format }}
                         </td>
                     </tr>
                 {% endfor %}
@@ -402,11 +416,11 @@
                         {% set expandUrl = path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'editorlimit': editorlimit * 10})) %}
                         {% set otherEditors = ai.numEditors - counter %}
                         <a href="{{ expandUrl }}">
-                            {{ otherEditors|number_format }} {{ msg('num-others', [otherEditors]) }}
+                            {{ otherEditors|num_format }} {{ msg('num-others', [otherEditors]) }}
                         </a>
                     </td>
                     <td></td>
-                    <td>{{ (ai.numRevisionsProcessed - editSum)|number_format }}</td>
+                    <td>{{ (ai.numRevisionsProcessed - editSum)|num_format }}</td>
                     <td colspan=6></td>
                 </tr></tfoot>
                 {% endif %}
@@ -463,7 +477,7 @@
                         {% set expandUrl = path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'botlimit': botlimit * 10})) %}
                         {% set otherBots = ai.numBots - counter %}
                         <a href="{{ expandUrl }}">
-                            {{ otherBots|number_format }} {{ msg('num-others', [otherBots]) }}
+                            {{ otherBots|num_format }} {{ msg('num-others', [otherBots]) }}
                         </a>
                     </td>
                     <td colspan=8></td>
@@ -529,7 +543,13 @@
                                 display: false,
                             },
                             tooltips: {
-                                mode: 'label'
+                                mode: 'label',
+                                callbacks: {
+                                    label: function(tooltipItem) {
+                                        return yearDatasets[tooltipItem.datasetIndex].label + ': '
+                                            + (new Number(tooltipItem.yLabel)).toLocaleString();
+                                    }
+                                }
                             },
                             barValueSpacing: 20,
                             scales: {
@@ -543,6 +563,14 @@
                                     scaleLabel: {
                                         display: true,
                                         labelString: "{{ msg('edits') }}"
+                                    },
+                                    ticks: {
+                                        beginAtZero: true,
+                                        callback: function (value) {
+                                            if (Math.floor(value) === value) {
+                                                return value.toLocaleString();
+                                            }
+                                        }
                                     }
                                 }, {
                                     id: 'size',
@@ -554,6 +582,14 @@
                                     scaleLabel: {
                                         display: true,
                                         labelString: "{{ msg('size') }}"
+                                    },
+                                    ticks: {
+                                        beginAtZero: true,
+                                        callback: function (value) {
+                                            if (Math.floor(value) === value) {
+                                                return value.toLocaleString();
+                                            }
+                                        }
                                     }
                                 }],
                             },
@@ -603,17 +639,17 @@
                 {% for year, stats in ai.yearMonthCounts %}
                     <tr>
                         <td class="sort-entry--year" data-value="{{ year }}">{{ year }}</td>
-                        <td class="sort-entry--edits" data-value="{{ stats.all }}">{{ stats.all|number_format }}</td>
+                        <td class="sort-entry--edits" data-value="{{ stats.all }}">{{ stats.all|num_format }}</td>
                         <td class="sort-entry--ips" data-value="{{ stats.anon }}">{{ stats.anon }}</td>
                         {% set year_ips_percent = stats.anon|percent_format(stats.all) %}
                         <td class="sort-entry--ips-percentage" data-value="{{ year_ips_percent }}">{{ year_ips_percent }}</td>
-                        <td class="sort-entry--minor-edits" data-value="{{ stats.minor }}">{{ stats.minor|number_format }}</td>
+                        <td class="sort-entry--minor-edits" data-value="{{ stats.minor }}">{{ stats.minor|num_format }}</td>
                         {% set year_minor_percent = stats.minor|percent_format(stats.all) %}
                         <td class="sort-entry--minor-edits-percentage" data-value="{{ year_minor_percent }}">{{ year_minor_percent }}</td>
                         <td>
                             {% for event, count in stats.events %}
                                 <span class="comma-separated">
-                                    {{ count|number_format }} {{ msg('num-'~event, [count]) }}
+                                    {{ count|num_format }} {{ msg('num-'~event, [count]) }}
                                 </span>
                             {% endfor %}
                         </td>
@@ -659,15 +695,15 @@
                                 {% if stats.all > 0 %}
                                     {# Generate link to revision history showing all edits for the given month #}
                                     {% set offset = date(year~"-"~month_str~"-01")|date("Ymt")~"235959" %}
-                                    {{ wiki.pageHistLink(page, stats.all|number_format, offset, stats.all) }}
+                                    {{ wiki.pageHistLink(page, stats.all|num_format, offset, stats.all) }}
                                 {% else %}
                                     0
                                 {% endif %}
                             </td>
-                            <td class="sort-entry--ips" data-value="{{ stats.anon }}">{{ stats.anon|number_format }}</td>
+                            <td class="sort-entry--ips" data-value="{{ stats.anon }}">{{ stats.anon|num_format }}</td>
                             {% set month_ips_percent = stats.anon|percent_format(stats.all) %}
                             <td class="sort-entry--ips-percentage" data-value="{{ month_ips_percent }}">{{ month_ips_percent }}</td>
-                            <td class="sort-entry--minor-edits" data-value="{{ stats.minor }}">{{ stats.minor|number_format }}</td>
+                            <td class="sort-entry--minor-edits" data-value="{{ stats.minor }}">{{ stats.minor|num_format }}</td>
                             {% set month_minor_percent = stats.minor|percent_format(stats.all) %}
                             <td class="sort-entry--minor-edits-percentage" data-value="{{ month_minor_percent }}">{{ month_minor_percent }}</td>
                             <td class="stripes-column">

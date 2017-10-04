@@ -68,7 +68,7 @@
 	"editors": "Editors",
 	"edits": "Modificar",
 	"events": "Eveniments",
-	"executed": "Executat en $1 {{PLURAL:$1|segonda|segondas}}.",
+	"executed": "Executat en $1 {{PLURAL:$2|segonda|segondas}}.",
 	"explanation": "Explicacion",
 	"export-wikitext": "Exportar lo wikitèxte",
 	"file": "Fichièr",

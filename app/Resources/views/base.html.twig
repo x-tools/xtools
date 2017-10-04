@@ -188,8 +188,8 @@
 <footer class="app-footer container-fluid">
     <span>
         <small>
-            <span>{{ msg("executed", [request_time()]) }}</span> &middot;
-            <span>{{ msg("memory-usage", [memory_usage()]) }}</span>
+            <span>{{ msg('executed', [request_time()|num_format(3), request_time()]) }}</span> &middot;
+            <span>{{ msg('memory-usage', [memory_usage()|num_format(2), memory_usage()]) }}</span>
         </small>
     </span>
     <hr>

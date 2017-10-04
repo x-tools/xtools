@@ -32,7 +32,7 @@
                 {% for edit in edits %}
                 <tr>
                     <td class="sort-entry--edits tdnum" data-value="{{ edit.count }}">
-                        {{ edit.count|number_format }}
+                        {{ edit.count|num_format }}
                     </td>
                     <td class="sort-entry--page display-title" data-value="{{ edit.page_title_ns }}">
                         {{ wiki.pageLinkRaw(edit.page_title_ns, project, edit.displaytitle) }}

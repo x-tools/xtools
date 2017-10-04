@@ -73,7 +73,7 @@
 	"end": "Schlussdatum",
 	"error-server-message": "Äntwert vum Server: $1",
 	"events": "Evenementer",
-	"executed": "A(n) $1 {{PLURAL:$1|Sekonn|Sekonnen}} ausgeféiert.",
+	"executed": "A(n) $1 {{PLURAL:$2|Sekonn|Sekonnen}} ausgeféiert.",
 	"explanation": "Erklärung",
 	"export-wikitext": "Wikitext exportéieren",
 	"file": "Fichier",

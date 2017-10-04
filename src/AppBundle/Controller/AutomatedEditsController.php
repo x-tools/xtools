@@ -66,7 +66,7 @@ class AutomatedEditsController extends Controller
         ];
 
         // Redirect if at minimum project and username are provided.
-        if ($project != '' && $username != '') {
+        if ($projectName != '' && $username != '') {
             return $this->redirectToRoute('autoeditsResult', [
                 'project' => $projectName,
                 'username' => $username,

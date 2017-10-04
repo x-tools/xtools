@@ -28,7 +28,7 @@
                 <table class="table"><tbody>
                     <tr>
                         <td>{{ msg('start') }}</td>
-                        <td>{{ start_date }} ({{ days|number_format }} {{ msg('num-days', [days]) }})</td>
+                        <td>{{ start_date }} ({{ days|num_format }} {{ msg('num-days', [days]) }})</td>
                     </tr>
                     <tr>
                         <td>{{ msg('log-types') }}</td>
@@ -36,15 +36,15 @@
                     </tr>
                     <tr>
                         <td>{{ msg('current-admins') }}</td>
-                        <td>{{ wiki.userGroupLink('sysop', project, adminCount|number_format) }}</td>
+                        <td>{{ wiki.userGroupLink('sysop', project, adminCount|num_format) }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('admins-without-action') }}</td>
-                        <td>{{ adminsWithoutAction|number_format }} ({{ admins_without_action_pct|percent_format }})</td>
+                        <td>{{ adminsWithoutAction|num_format }} ({{ admins_without_action_pct|percent_format }})</td>
                     </tr>
                     <tr>
                         <td>{{ msg('non-admins-with-actions') }}</td>
-                        <td>{{ (usersCount - adminCount)|number_format }}</td>
+                        <td>{{ (usersCount - adminCount)|num_format }}</td>
                     </tr>
                 </tbody></table>
             </div>
@@ -86,15 +86,15 @@
                                 {% endif %}
                                 {{ wiki.userLogLink(username, project, msg('log')|lower) }}
                             </td>
-                            <td class="sort-entry--total" data-value="{{ value.mtotal }}">{{ value.mtotal|number_format }}</td>
-                            <td class="sort-entry--delete" data-value="{{ value.mdelete }}">{{ value.mdelete|number_format }}</td>
-                            <td class="sort-entry--restore" data-value="{{ value.mrestore }}">{{ value.mrestore|number_format }}</td>
-                            <td class="sort-entry--re-block" data-value="{{ value.mblock }}">{{ value.mblock|number_format }}</td>
-                            <td class="sort-entry--unblock" data-value="{{ value.munblock }}">{{ value.munblock|number_format }}</td>
-                            <td class="sort-entry--re-protect" data-value="{{ value.mprotect }}">{{ value.mprotect|number_format }}</td>
-                            <td class="sort-entry--unprotect" data-value="{{ value.munprotect }}">{{ value.munprotect|number_format }}</td>
-                            <td class="sort-entry--import" data-value="{{ value.mimport }}">{{ value.mimport|number_format }}</td>
-                            <td class="sort-entry--rights" data-value="{{ value.mrights }}">{{ value.mrights|number_format }}</td>
+                            <td class="sort-entry--total" data-value="{{ value.mtotal }}">{{ value.mtotal|num_format }}</td>
+                            <td class="sort-entry--delete" data-value="{{ value.mdelete }}">{{ value.mdelete|num_format }}</td>
+                            <td class="sort-entry--restore" data-value="{{ value.mrestore }}">{{ value.mrestore|num_format }}</td>
+                            <td class="sort-entry--re-block" data-value="{{ value.mblock }}">{{ value.mblock|num_format }}</td>
+                            <td class="sort-entry--unblock" data-value="{{ value.munblock }}">{{ value.munblock|num_format }}</td>
+                            <td class="sort-entry--re-protect" data-value="{{ value.mprotect }}">{{ value.mprotect|num_format }}</td>
+                            <td class="sort-entry--unprotect" data-value="{{ value.munprotect }}">{{ value.munprotect|num_format }}</td>
+                            <td class="sort-entry--import" data-value="{{ value.mimport }}">{{ value.mimport|num_format }}</td>
+                            <td class="sort-entry--rights" data-value="{{ value.mrights }}">{{ value.mrights|num_format }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

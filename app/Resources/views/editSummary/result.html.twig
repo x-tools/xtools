@@ -25,12 +25,12 @@
                     </tr>
                     <tr>
                         <td class="stat-list--new-group">{{ msg('live-edits') }}</td>
-                        <td class="stat-list--new-group">{{ totalEdits|number_format }}</td>
+                        <td class="stat-list--new-group">{{ totalEdits|num_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('edits-with-summaries') }}</td>
                         <td>
-                            {{ totalSummaries|number_format }}
+                            {{ totalSummaries|num_format }}
                             &middot;
                             ({{ totalSummaries|percent_format(totalEdits) }})
                         </td>
@@ -38,12 +38,12 @@
 
                     <tr>
                         <td class="stat-list--new-group">{{ msg('major-edits') }}</td>
-                        <td class="stat-list--new-group">{{ totalEditsMajor|number_format }}</td>
+                        <td class="stat-list--new-group">{{ totalEditsMajor|num_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('major-edits-with-summaries') }}</td>
                         <td>
-                            {{ totalSummariesMajor|number_format }}
+                            {{ totalSummariesMajor|num_format }}
                             &middot;
                             ({{ totalSummariesMajor|percent_format(totalEditsMajor) }})
                         </td>
@@ -59,12 +59,12 @@
 
                     <tr>
                         <td class="stat-list--new-group">{{ msg('minor-edits') }}</td>
-                        <td class="stat-list--new-group">{{ totalEditsMinor|number_format }}</td>
+                        <td class="stat-list--new-group">{{ totalEditsMinor|num_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('minor-edits-with-summaries') }}</td>
                         <td>
-                            {{ totalSummariesMinor|number_format }}
+                            {{ totalSummariesMinor|num_format }}
                             &middot;
                             ({{ totalSummariesMinor|percent_format(totalEditsMinor) }})
                         </td>
@@ -132,11 +132,11 @@
                                 {{ month }}
                             </td>
                             <td class="sort-entry--total-edits" data-value="{{ monthTotals[month] }}">
-                                {{ monthTotals[month]|number_format }}
+                                {{ monthTotals[month]|num_format }}
                             </td>
                             {% if monthEditSumTotals[month] is defined %}
                                 <td class="sort-entry--edit-summaries" data-value="{{ monthEditSumTotals[month] }}">
-                                    {{ monthEditSumTotals[month]|number_format }}
+                                    {{ monthEditSumTotals[month]|num_format }}
                                 </td>
 
                                 {% set editSummaryPercentage = monthEditSumTotals[month]|percent_format(monthTotals[month]) %}

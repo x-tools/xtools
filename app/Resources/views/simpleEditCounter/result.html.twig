@@ -36,15 +36,15 @@
                     {% endif %}
                     <tr>
                         <td>{{ msg('total') }}</td>
-                        <td>{{ rev | number_format }}</td>
+                        <td>{{ rev|num_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('live-edits') }}</td>
-                        <td>{{ live | number_format }}</td>
+                        <td>{{ live|num_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('deleted-edits') }}</td>
-                        <td>{{ arch | number_format }}</td>
+                        <td>{{ arch|num_format }}</td>
                     </tr>
                 </table>
             </div>
