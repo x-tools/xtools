@@ -103,7 +103,12 @@ class ApiControllerTest extends WebTestCase
 
         $this->assertEquals($data['project'], 'en.wikipedia.org');
         $this->assertEquals($data['username'], 'MusikPuppet');
-        $this->assertGreaterThan(10, $data['automated_editcount']);
+        $this->assertGreaterThan(15, $data['automated_editcount']);
+        $this->assertGreaterThan(35, $data['nonautomated_editcount']);
+        $this->assertEquals(
+            $data['automated_editcount'] + $data['nonautomated_editcount'],
+            $data['total_editcount']
+        );
         $this->assertContains('Twinkle', $toolNames);
         $this->assertContains('Huggle', $toolNames);
     }

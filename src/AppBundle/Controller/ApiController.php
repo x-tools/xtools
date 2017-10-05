@@ -117,6 +117,7 @@ class ApiController extends FOSRestController
         $res = [
             'project' => $project->getDomain(),
             'username' => $user->getUsername(),
+            'total_editcount' => $user->countEdits($project, $namespace, $start, $end),
         ];
 
         if ($tools != '') {
@@ -129,6 +130,8 @@ class ApiController extends FOSRestController
         } else {
             $res['automated_editcount'] = $user->countAutomatedEdits($project, $namespace, $start, $end);
         }
+
+        $res['nonautomated_editcount'] = $res['total_editcount'] - $res['automated_editcount'];
 
         $view = View::create()->setStatusCode(Response::HTTP_OK);
         $view->setData($res);

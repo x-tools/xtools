@@ -188,10 +188,11 @@ class User extends Model
      * @param int|string $namespace Namespace ID or 'all' for all namespaces
      * @param string $start Start date in a format accepted by strtotime()
      * @param string $end End date in a format accepted by strtotime()
+     * @return int
      */
     public function countEdits(Project $project, $namespace = 'all', $start = '', $end = '')
     {
-        return $this->getRepository()->countEdits($project, $this, $namespace, $start, $end);
+        return (int) $this->getRepository()->countEdits($project, $this, $namespace, $start, $end);
     }
 
     /**
