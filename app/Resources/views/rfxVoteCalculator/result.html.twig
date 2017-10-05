@@ -28,11 +28,11 @@
                         <tr>
                             <td>{{ msg('rfx-total-votes') }}</td>
                             <td>
-                                {{ totals[type].total|number_format }}
+                                {{ totals[type].total|num_format }}
                             </td>
                         </tr>
                         {% for voteType in data[type]|keys %}
-                            {% set count = totals[type][voteType] is defined ? totals[type][voteType]|number_format : 0 %}
+                            {% set count = totals[type][voteType] is defined ? totals[type][voteType]|num_format : 0 %}
                             <tr>
                                 <td>{{ msg(voteType) }}</td>
                                 <td>

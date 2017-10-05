@@ -95,20 +95,20 @@
                 {% if pages|length > 1 %}
                     <tfoot>
                         <th class="namespaces--namespaces">
-                            {{ pages|length|number_format }}
+                            {{ pages|length|num_format }}
                             {{ msg('num-namespaces', [pages|length]) }}
                         </th>
                         <th class="namespaces--pages">
-                            {{ total|number_format }}
+                            {{ total|num_format }}
                         </th>
                         {% if 'redirects' in summaryColumns and 'pages' in summaryColumns %}
                             <th class="namespaces--redirects">
-                                {{ redirectTotal|number_format }}
+                                {{ redirectTotal|num_format }}
                                 ({{ redirectTotal|percent_format(total) }})
                             </th>
                         {% endif %}
                         <th class="namespaces--deleted">
-                            {{ deletedTotal|number_format }}
+                            {{ deletedTotal|num_format }}
                             ({{ deletedTotal|percent_format(total) }})
                         </th>
                     </tfoot>
@@ -173,10 +173,10 @@
                                         {% endif %}
                                     </td>
                                     <td class="sort-entry--original-size" data-value="{{ page.rev_len }}">
-                                        {{ page.rev_len|number_format }}
+                                        {{ page.rev_len|num_format }}
                                     </td>
                                     <td class="sort-entry--current-size" data-value="{{ page.page_len }}">
-                                        {{ page.page_len|number_format }}
+                                        {{ page.page_len|num_format }}
                                     </td>
                                     {% if key == '0' and hasPageAssessments %}
                                         <td class="sort-entry--assessment" data-value="{{ page.pa_class ? page.pa_class : 'Unknown' }}">

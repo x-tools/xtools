@@ -1,7 +1,7 @@
 * [[{{ page.title }}]]
 * {{ project.domain }}
-* {{ msg('total-edits') }}: {{ ai.numRevisions|number_format }}
-* {{ msg('editors') }}: {{ ai.numEditors|number_format }}
+* {{ msg('total-edits') }}: {{ ai.numRevisions|num_format }}
+* {{ msg('editors') }}: {{ ai.numEditors|num_format }}
 * {{ 'now'|date('Y-m-d H:i:s') }}
 
 <sup>1</sup> {{ msg('edits') }}<br />
@@ -18,13 +18,13 @@
 |-
 {% for editor, stats in ai.editors|slice(0, editorlimit ) %}
 | [[ {{ attribute(project.namespaces, 2) }}:{{ editor }}|{{ editor }} ]] {#
-#} || {{ stats.all|number_format }} {#
-#} || {{ stats.minor|number_format }} {#
+#} || {{ stats.all|num_format }} {#
+#} || {{ stats.minor|num_format }} {#
 #} || {{ stats.minor|percent_format(stats.all) }} {#
 #} || {{ stats.first|date('Y-m-d H:i') }} {#
 #} || {{ stats.last|date('Y-m-d H:i') }} {#
-#} || {{ stats.atbe|number_format(1) }} {#
-#} || {{ stats.added|number_format }}
+#} || {{ stats.atbe|num_format(1) }} {#
+#} || {{ stats.added|num_format }}
 |-
 {% endfor %}
 |}

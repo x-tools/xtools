@@ -45,8 +45,8 @@
                     {{ nsName(nsId, project.namespaces) }}
                 </td>
                 <td class="sort-entry--count" data-value="{{ value }}">
-                    {{ value|number_format }}
-                    ({{ ((value/ec.countLiveRevisions)*100)|round(1) }}%)
+                    {{ value|num_format }}
+                    ({{ value|percent_format(ec.countLiveRevisions) }})
                 </td>
             </tr>
         {% endfor %}
@@ -57,7 +57,7 @@
                 {{ ec.namespaceTotals|length}} {{ msg('num-namespaces', [ec.namespaceTotals|length]) }}
             </th>
             <th class="namespaces--count">
-                {{ ec.countLiveRevisions|number_format }}
+                {{ ec.countLiveRevisions|num_format }}
             </th>
         </tr>
     </tfoot>

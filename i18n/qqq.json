@@ -88,7 +88,7 @@
 	"error-server-message": "Error message. $1 is the message given by the server.",
 	"error-title": "Title for the error page.",
 	"events": "Events that have a log entry\n{{Identical|Event}}",
-	"executed": "Execution time. $1 is the number of seconds.",
+	"executed": "Execution time. $1 is the formatted number of seconds, and $2 is the unformatted number for use with PLURAL.",
 	"explanation": "Column heading in the Bugs table, explaining how to fix the bug.\n{{Identical|Explanation}}",
 	"export-wikitext": "Link text that appears above a table, for exporing wikitext relating to the table.",
 	"file": "label for file\n{{Identical|File}}",

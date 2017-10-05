@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use AppBundle\Twig\AppExtension;
 use AppBundle\Twig\Extension;
+use DateTime;
 
 /**
  * Tests for the AppExtension class.
@@ -36,7 +37,7 @@ class AppExtensionTest extends WebTestCase
     }
 
     /**
-     * Format number as a diff size
+     * Format number as a diff size.
      */
     public function testDiffFormat()
     {
@@ -52,6 +53,17 @@ class AppExtensionTest extends WebTestCase
             "<span class='diff-zero'>0</span>",
             $this->appExtension->diffFormat(0)
         );
+    }
+
+    /**
+     * Format number as a percentage.
+     */
+    public function testPercentFormat()
+    {
+        $this->assertEquals('45%', $this->appExtension->percentFormat(45));
+        $this->assertEquals('30%', $this->appExtension->percentFormat(30, null, 3));
+        $this->assertEquals('33.33%', $this->appExtension->percentFormat(2, 6, 2));
+        $this->assertEquals('25%', $this->appExtension->percentFormat(2, 8));
     }
 
     /**
@@ -78,6 +90,31 @@ class AppExtensionTest extends WebTestCase
         $this->assertEquals(
             [10, 'num-days'],
             $this->appExtension->formatDuration(864000, false)
+        );
+    }
+
+    /**
+     * Format a number.
+     */
+    public function testNumberFormat()
+    {
+        $this->assertEquals('1,234', $this->appExtension->numberFormat(1234));
+        $this->assertEquals('1,234.32', $this->appExtension->numberFormat(1234.316, 2));
+        $this->assertEquals('50', $this->appExtension->numberFormat(50.0000, 4));
+    }
+
+    /**
+     * Format a date.
+     */
+    public function testDateFormat()
+    {
+        $this->assertEquals(
+            '2/1/17, 11:45 PM',
+            $this->appExtension->dateFormat(new DateTime('2017-02-01 23:45:34'))
+        );
+        $this->assertEquals(
+            '8/12/15, 11:45 AM',
+            $this->appExtension->dateFormat('2015-08-12 11:45:50')
         );
     }
 }
