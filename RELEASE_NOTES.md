@@ -1,5 +1,14 @@
 # Release Notes #
 
+## 3.1.5 ##
+- T170652 Add option to limit how many edits to analyize in the Edit Counter,
+  Top Edits, and Automated Edits tools, and a revision limit option for
+  ArticleInfo.
+- T176030 Localize all numbers across the application based on language.
+- T177300 Fix links to Top Edits from the Edit Counter.
+- T177089 Make Edit Counter internal API only accessible by XTools.
+- Make autoedits API endpoint also return number of nonautomated edits.
+
 ## 3.1.4 ##
 - T177172 Fix path to normalize project API endpoint
 - T174012 Rework "longest block" field in Edit Counter to show actual duration
