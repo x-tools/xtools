@@ -226,10 +226,10 @@
 <span class='hidden loader'>
     <img src="{{ asset('static/images/loader.gif') }}" /> <span class="sr-only">{{ msg('loading') }}&hellip;</span>
 </span>
-{% if xtPage is defined and project.domain is defined %}
+{% if xtPage is defined and project.domain is defined and 'indexAction' not in app.request.attributes.get('_controller') %}
 <script>
     $.ajax({
-        url: "{{ path('homepage') }}api/usage/{{ xtPage }}/{{ project.domain }}/{{ csrf_token('intention') }}",
+        url: "{{ path('homepage') }}meta/usage/{{ xtPage }}/{{ project.domain }}/{{ csrf_token('intention') }}",
         method: 'PUT'
     });
 </script>

@@ -110,4 +110,79 @@ class MetaController extends Controller
             'timeline' => $timeline,
         ]);
     }
+
+    /**
+     * Record usage of a particular XTools tool. This is called automatically
+     *   in base.html.twig via JavaScript so that it is done asynchronously
+     * @Route("/meta/usage/{tool}/{project}/{token}")
+     * @param  $request Request
+     * @param  string $tool    Internal name of tool
+     * @param  string $project Project domain such as en.wikipedia.org
+     * @param  string $token   Unique token for this request, so we don't have people
+     *                         meddling with these statistics
+     * @return Response
+     */
+    public function recordUsage(Request $request, $tool, $project, $token)
+    {
+        // Validate method and token.
+        if ($request->getMethod() !== 'PUT' || !$this->isCsrfTokenValid('intention', $token)) {
+            throw $this->createAccessDeniedException('This endpoint is for internal use only.');
+        }
+
+        // Ready the response object.
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+
+        // Don't update counts for tools that aren't enabled
+        if (!$this->container->getParameter("enable.$tool")) {
+            $response->setStatusCode(Response::HTTP_FORBIDDEN);
+            $response->setContent(json_encode([
+                'error' => 'This tool is disabled'
+            ]));
+            return $response;
+        }
+
+        $conn = $this->container->get('doctrine')->getManager('default')->getConnection();
+        $date =  date('Y-m-d');
+
+        // Increment count in timeline
+        $existsSql = "SELECT 1 FROM usage_timeline
+                      WHERE date = '$date'
+                      AND tool = '$tool'";
+
+        if (count($conn->query($existsSql)->fetchAll()) === 0) {
+            $createSql = "INSERT INTO usage_timeline
+                          VALUES(NULL, '$date', '$tool', 1)";
+            $conn->query($createSql);
+        } else {
+            $updateSql = "UPDATE usage_timeline
+                          SET count = count + 1
+                          WHERE tool = '$tool'
+                          AND date = '$date'";
+            $conn->query($updateSql);
+        }
+
+        // Update per-project usage, if applicable
+        if (!$this->container->getParameter('app.single_wiki')) {
+            $existsSql = "SELECT 1 FROM usage_projects
+                          WHERE tool = '$tool'
+                          AND project = '$project'";
+
+            if (count($conn->query($existsSql)->fetchAll()) === 0) {
+                $createSql = "INSERT INTO usage_projects
+                              VALUES(NULL, '$tool', '$project', 1)";
+                $conn->query($createSql);
+            } else {
+                $updateSql = "UPDATE usage_projects
+                              SET count = count + 1
+                              WHERE tool = '$tool'
+                              AND project = '$project'";
+                $conn->query($updateSql);
+            }
+        }
+
+        $response->setStatusCode(Response::HTTP_NO_CONTENT);
+        $response->setContent(json_encode([]));
+        return $response;
+    }
 }
