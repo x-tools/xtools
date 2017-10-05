@@ -56,7 +56,7 @@
                 &middot;
                 {{ wiki.userLogLink(user, edit.project) }}
                 &middot;
-                <a href="{{ path('TopEditsResults', {project:edit.project.databaseName, username:user.username, namespace:edit.page.namespace, article:edit.page.title}) }}">{{ msg('tool-topedits') }}</a>
+                <a href="{{ path('TopEditsResults', {project:edit.project.databaseName, username:user.username, namespace:edit.page.namespace, article:edit.page.titleWithoutNamespace}) }}">{{ msg('tool-topedits') }}</a>
             </td>
             <td class="sort-entry--page-title display-title" data-value="{{ edit.page.title }}">
                 {{ wiki.pageLink(edit.page, edit.page.displayTitle) }}
