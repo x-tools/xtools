@@ -171,6 +171,7 @@
 	"thursday": "Četvrtak",
 	"timecard": "Dnevni pregled",
 	"times-in-utc": "Sva vremena su po UTC-u.",
+	"too-many-revisions": "Članak ima preko 50.000 izmjena. Ispod su prikazani podaci samo za prvih 50.000.",
 	"tool": "Alat",
 	"tool-adminscore": "Admin. podobnost",
 	"tool-adminstats": "Admin. statistika",

@@ -129,6 +129,7 @@
 	"text-to-serach": "要搜索的文本",
 	"thank": "感谢",
 	"timecard": "工时卡",
+	"too-many-revisions": "这篇文章修订超过50,000次。下方显示的是前50,000次修订的数据。",
 	"tool-adminstats": "管理统计",
 	"tool-adminstats-desc": "显示管理操作统计信息",
 	"tool-articleinfo": "页面历史",
