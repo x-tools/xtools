@@ -57,6 +57,7 @@ parameters:
     app.multithread: 0
 
     app.max_page_revisions: 50000
+    app.max_user_edits: 350000
 
     # Enabling or disabling of individual tools
     enable.adminscore: 1

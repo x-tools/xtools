@@ -20,8 +20,11 @@ class User extends Model
     /** @var string The user's username. */
     protected $username;
 
-    /** @var DateTime|bool Expiry of the current block of the user */
+    /** @var DateTime|bool Expiry of the current block of the user. */
     protected $blockExpiry;
+
+    /** @var int Quick cache of edit counts, keyed by project domain. */
+    protected $editCounts = [];
 
     /**
      * Create a new User given a username.
@@ -84,12 +87,26 @@ class User extends Model
      */
     public function getEditCount(Project $project)
     {
-        $editCount = $this->getRepository()->getEditCount(
+        $domain = $project->getDomain();
+        if (isset($this->editCounts[$domain])) {
+            return $this->editCounts[$domain];
+        }
+
+        $this->editCounts[$domain] = (int) $this->getRepository()->getEditCount(
             $project->getDatabaseName(),
             $this->getUsername()
         );
 
-        return (int) $editCount;
+        return $this->editCounts[$domain];
+    }
+
+    /**
+     * Maximum number of edits to process, based on configuration.
+     * @return int
+     */
+    public function maxEdits()
+    {
+        return $this->getRepository()->maxEdits();
     }
 
     /**
@@ -180,6 +197,17 @@ class User extends Model
     public function isBlocked(Project $project)
     {
         return $this->getBlockExpiry($project) !== false;
+    }
+
+    /**
+     * Does the user have more edits than maximum amount allowed for processing?
+     * @param Project $project
+     * @return bool
+     */
+    public function hasTooManyEdits(Project $project)
+    {
+        $editCount = $this->getEditCount($project);
+        return $this->maxEdits() > 0 && $editCount > $this->maxEdits();
     }
 
     /**

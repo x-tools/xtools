@@ -1,41 +1,47 @@
 {% import 'macros/wiki.html.twig' as wiki %}
-<div class="non-auto-edits-nav clearfix">
-    <a href="#" class="pull-left prev-edits">
-        <span class="glyphicon glyphicon-arrow-left"></span>
-        {{ msg('pager-newer-n', [50]) | capitalize_first }}
-    </a>
-    <a href="#" class="pull-right next-edits">
-        {{ msg('pager-older-n', [50]) | capitalize_first }}
-        <span class="glyphicon glyphicon-arrow-right"></span>
-    </a>
-</div>
-<table class="table table-bordered table-hover table-striped contribs-table">
-    <thead>
-    {% for key in ['page-title', 'date', 'links', 'size', 'edit-summary'] %}
-        <th>{{ msg(key) | capitalize_first }}</th>
-    {% endfor %}
-    </thead>
-    <tbody>
-        {% if edits|length == 0 %}
-            <tr>
-                <td colspan=5 class="text-center">{{ msg('no-contribs') }}</td>
-            </tr>
-        {% else %}
-            {% for edit in edits %}
+{% if edits is iterable %}
+    <div class="non-auto-edits-nav clearfix">
+        <a href="#" class="pull-left prev-edits">
+            <span class="glyphicon glyphicon-arrow-left"></span>
+            {{ msg('pager-newer-n', [50]) | capitalize_first }}
+        </a>
+        <a href="#" class="pull-right next-edits">
+            {{ msg('pager-older-n', [50]) | capitalize_first }}
+            <span class="glyphicon glyphicon-arrow-right"></span>
+        </a>
+    </div>
+    <table class="table table-bordered table-hover table-striped contribs-table">
+        <thead>
+        {% for key in ['page-title', 'date', 'links', 'size', 'edit-summary'] %}
+            <th>{{ msg(key) | capitalize_first }}</th>
+        {% endfor %}
+        </thead>
+        <tbody>
+            {% if edits|length == 0 %}
                 <tr>
-                    <td>{{ wiki.pageLinkRaw(edit.page.title(true), project) }}</td>
-                    <td>{{ wiki.permaLink(edit) }}</td>
-                    <td>
-                        {{ wiki.diffLink(edit) }}
-                        &middot;
-                        {{ wiki.pageHistLinkRaw(edit.page.title(true), project) }}
-                    </td>
-                    <td>
-                        {{ edit.size|diff_format }}
-                    </td>
-                    <td>{{ edit.wikifiedComment|raw }}</td>
+                    <td colspan=5 class="text-center">{{ msg('no-contribs') }}</td>
                 </tr>
-            {% endfor %}
-        {% endif %}
-    </tbody>
-</table>
+            {% else %}
+                {% for edit in edits %}
+                    <tr>
+                        <td>{{ wiki.pageLinkRaw(edit.page.title(true), project) }}</td>
+                        <td>{{ wiki.permaLink(edit) }}</td>
+                        <td>
+                            {{ wiki.diffLink(edit) }}
+                            &middot;
+                            {{ wiki.pageHistLinkRaw(edit.page.title(true), project) }}
+                        </td>
+                        <td>
+                            {{ edit.size|diff_format }}
+                        </td>
+                        <td>{{ edit.wikifiedComment|raw }}</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="text-danger">
+        {{ msg('too-many-edits', [maxEdits|number_format, maxEdits]) }}
+    </div>
+{% endif %}
