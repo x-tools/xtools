@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.1.6 ##
+- Hotfix to move internal 'usage API' out of /api namespace and into /meta.
+  This is because the Wikimedia installation reroutes /api requests to a
+  different server, which we don't want for the usage API.
+
 ## 3.1.5 ##
 - T170652 Add option to limit how many edits to analyize in the Edit Counter,
   Top Edits, and Automated Edits tools, and a revision limit option for
