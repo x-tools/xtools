@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.1.8 ##
+- Revert back to Chart.js v2.6.0
+
 ## 3.1.7 ##
 - Hotfix for async queries of internal API. This requires a new parameter
   'app.base_path' be defined.
