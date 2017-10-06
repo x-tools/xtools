@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "3cc4341e71ea88bb4a35eb85da288e1e",
+    "content-hash": "58187d9e5adf9d05bc57a1b75678ebff",
     "packages": [
         {
             "name": "addwiki/mediawiki-api",
@@ -2288,16 +2288,16 @@
         },
         {
             "name": "nnnick/chartjs",
-            "version": "v2.7.0",
+            "version": "v2.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/chartjs/Chart.js.git",
-                "reference": "3043a58605d08c7e16ceb548596fae8efc666350"
+                "reference": "28cb390c4102fc34391289d955d342281cac0e85"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/chartjs/Chart.js/zipball/3043a58605d08c7e16ceb548596fae8efc666350",
-                "reference": "3043a58605d08c7e16ceb548596fae8efc666350",
+                "url": "https://api.github.com/repos/chartjs/Chart.js/zipball/28cb390c4102fc34391289d955d342281cac0e85",
+                "reference": "28cb390c4102fc34391289d955d342281cac0e85",
                 "shasum": ""
             },
             "require": {
@@ -2325,7 +2325,7 @@
                 "JS",
                 "chart"
             ],
-            "time": "2017-09-10T17:31:25+00:00"
+            "time": "2017-05-25T14:00:45+00:00"
         },
         {
             "name": "ocramius/proxy-manager",
