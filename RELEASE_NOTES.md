@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.1.9 ##
+- T172801: Show top edited pages in Edit Counter.
+- Downsize the timecard based on feedback.
+
 ## 3.1.8 ##
 - Revert back to Chart.js v2.6.0
 
