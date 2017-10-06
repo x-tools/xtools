@@ -154,7 +154,7 @@ class TopEditsController extends Controller
      * @param integer|string $namespaceId The namespace ID or 'all'
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function namespaceTopEdits(User $user, Project $project, $namespaceId)
+    public function namespaceTopEdits(User $user, Project $project, $namespaceId)
     {
         // Make sure they've opted in to see this data.
         if (!$project->userHasOptedIn($user)) {
@@ -229,6 +229,9 @@ class TopEditsController extends Controller
             $editDatum['page_title_ns'] = $pageTitle;
             $edits[] = $editDatum;
         }
+
+        $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
+
         return $this->render('topedits/result_namespace.html.twig', [
             'xtPage' => 'topedits',
             'xtTitle' => $user->getUsername(),
@@ -236,6 +239,7 @@ class TopEditsController extends Controller
             'user' => $user,
             'namespace' => $namespaceId,
             'edits' => $edits,
+            'is_sub_request' => $isSubRequest,
         ]);
     }
 

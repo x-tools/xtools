@@ -1,62 +1,68 @@
-{% extends 'base.html.twig' %}
+{% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
 {% import 'macros/layout.html.twig' as layout %}
 {% import 'macros/wiki.html.twig' as wiki %}
 
 {% block body %}
-<div class="panel panel-primary">
-    {{ layout.userHeading(user, project, xtPage) }}
 
-    <div class="panel-body xt-panel-body" >
-        {{ wiki.userLinks(user, project, xtPage) }}
+{% if not is_sub_request %}
+    <div class="panel panel-primary">
+        {{ layout.userHeading(user, project, xtPage) }}
+        <div class="panel-body xt-panel-body" >
+            {{ wiki.userLinks(user, project, xtPage) }}
+            <h3 class="text-center">{{ msg('topedits-per-namespace') }}</h3>
+{% endif %}
+{% set content %}
+<table class="table table-bordered table-hover table-striped topedits-namespace-table" >
+    <thead><tr>
+        <th>
+            <span class="sort-link sort-link--edits" data-column="edits">
+                {{ msg('edits') | capitalize_first }}
+                <span class="glyphicon glyphicon-sort"></span>
+            </span>
+        </th>
+        <th>
+            <span class="sort-link sort-link--page" data-column="page">
+                {{ msg('page-title') }}
+                <span class="glyphicon glyphicon-sort"></span>
+            </span>
+        </th>
+        <th>{{ msg('links') }}</th>
+    </tr></thead>
+    <tbody>
+        {% for edit in edits %}
+        <tr>
+            <td class="sort-entry--edits tdnum" data-value="{{ edit.count }}">
+                {{ edit.count|num_format }}
+            </td>
+            <td class="sort-entry--page display-title" data-value="{{ edit.page_title_ns }}">
+                {{ wiki.pageLinkRaw(edit.page_title_ns, project, edit.displaytitle) }}
+            </td>
+            <td>
+                {{ wiki.pageLogLinkRaw(edit.page_title_ns, project) }}
+                &middot;
+                <a href="{{ path('ArticleInfoResult', {project:project.domain, article:edit.page_title_ns}) }}">{{ msg('tool-articleinfo') }}</a>
+                &middot;
+                <a href="{{ path('TopEditsResults', {project:project.domain, username:user.username, namespace:edit.page_namespace, article:edit.page_title}) }}" >{{ msg('tool-topedits') }}</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endset %}
 
-        <h3 class="text-center">{{ msg('topedits-per-namespace') }}</h3>
-
-        {% set content %}
-        <table class="table table-bordered table-hover table-striped topedits-namespace-table" >
-            <thead><tr>
-                <th>
-                    <span class="sort-link sort-link--edits" data-column="edits">
-                        {{ msg('edits') | capitalize_first }}
-                        <span class="glyphicon glyphicon-sort"></span>
-                    </span>
-                </th>
-                <th>
-                    <span class="sort-link sort-link--page" data-column="page">
-                        {{ msg('page-title') }}
-                        <span class="glyphicon glyphicon-sort"></span>
-                    </span>
-                </th>
-                <th>{{ msg('links') }}</th>
-            </tr></thead>
-            <tbody>
-                {% for edit in edits %}
-                <tr>
-                    <td class="sort-entry--edits tdnum" data-value="{{ edit.count }}">
-                        {{ edit.count|num_format }}
-                    </td>
-                    <td class="sort-entry--page display-title" data-value="{{ edit.page_title_ns }}">
-                        {{ wiki.pageLinkRaw(edit.page_title_ns, project, edit.displaytitle) }}
-                    </td>
-                    <td>
-                        {{ wiki.pageLogLinkRaw(edit.page_title_ns, project) }}
-                        &middot;
-                        <a href="{{ path('ArticleInfoResult', {project:project.domain, article:edit.page_title_ns}) }}">{{ msg('tool-articleinfo') }}</a>
-                        &middot;
-                        <a href="{{ path('TopEditsResults', {project:project.domain, username:user.username, namespace:edit.page_namespace, article:edit.page_title}) }}" >{{ msg('tool-topedits') }}</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% endset %}
-
-        {% if project.userHasOptedIn(user) %}
-            {{ layout.content_block(nsName(namespace, project.namespaces), content, '', null, true, false) }}
-        {% else %}
-            <div class="alert alert-info">
-                <p>{{ msg('not-opted-in', [ wiki.pageLink(opted_in_page) ]) }}</p>
-            </div>
-        {% endif %}
+{% if project.userHasOptedIn(user) %}
+    {% if is_sub_request %}
+        {{ content }}
+    {% else %}
+        {{ layout.content_block(nsName(namespace, project.namespaces), content, '', null, true, false) }}
+    {% endif %}
+{% else %}
+    <div class="alert alert-info">
+        <p>{{ msg('not-opted-in', [ wiki.pageLink(opted_in_page) ]) }}</p>
     </div>
-</div>
+{% endif %}
+
+{% if not is_sub_request %}
+    </div></div>
+{% endif %}
 {% endblock %}

@@ -30,6 +30,7 @@
 {% else %}
 
 <canvas id="timecard-bubble-chart"></canvas>
+
 <script type="text/javascript">
     // MySQL uses ODBC standard, treating the first day (1) as Sunday
     var days = {
@@ -63,7 +64,7 @@
         {% endif %}
         {% set datasetIndex = data.y - 1 %}
         var entry = {{ data|json_encode|raw }};
-        entry.r = entry.r / 2;
+        entry.r = entry.r / 3;
         timeCardDatasets[{{ datasetIndex }}].data.push(entry);
     {% endfor %}
 

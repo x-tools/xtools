@@ -11,7 +11,7 @@
         {{ wiki.userLinks(user, project, xtPage) }}
 
         <div class="text-center xt-toc">
-            {% set sections = ['general-stats', 'namespace-totals', 'year-counts', 'month-counts', 'timecard', 'latest-global-edits'] %}
+            {% set sections = ['general-stats', 'namespace-totals', 'year-counts', 'month-counts', 'timecard', 'top-edited-pages', 'latest-global-edits'] %}
 
             {% for section in sections %}
                 <span>
@@ -76,6 +76,18 @@
             <a href="{{ path('EditCounterTimecard', {project:project.domain, username:user.username})}}">{{ msg('timecard') }}</a>
         {% endset %}
         {{ layout.content_block(headerLink, content, '', 'timecard', true) }}
+
+        {% set content %}
+            {{ render(path('TopEditsResults', {
+                'username': user.username,
+                'project': project.domain,
+                'namespace': 'all'
+            })) }}
+        {% endset %}
+        {% set headerLink %}
+            <a href="{{ path('TopEditsResults', {project:project.domain, username:user.username, namespace:'all'})}}">{{ msg('top-edited-pages') }}</a>
+        {% endset %}
+        {{ layout.content_block(headerLink, content, '', 'top-edited-pages', true) }}
 
         {% set content %}
             <div id="latestglobal-container" data-username="{{ user.username }}" data-project="{{ project.domain }}">
