@@ -160,7 +160,10 @@ abstract class Repository
 
         $key = $this->container->getParameter('secret');
 
-        $endpoint = "/api/$endpoint/$key";
+        // Remove trailing slash if present.
+        $basePath = trim($this->container->getParameter('app.base_path'), '/');
+
+        $endpoint = "$basePath/api/$endpoint/$key";
 
         if ($async) {
             return $this->apiConnection->getAsync($endpoint);

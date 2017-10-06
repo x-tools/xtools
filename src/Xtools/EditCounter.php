@@ -120,6 +120,10 @@ class EditCounter extends Model
             $promise->then(function ($response) use ($key, $endpoint) {
                 $result = (array) json_decode($response->getBody()->getContents());
 
+                $this->getRepository()
+                    ->getLog()
+                    ->debug("$key promise resolved successfully.");
+
                 if (isset($result)) {
                     // Copy result to the class class instance. From here any subsequent
                     // calls to the getters (e.g. getPairData()) will return these cached values.

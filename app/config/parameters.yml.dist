@@ -55,6 +55,7 @@ parameters:
     app.rate_limit_count: 10
 
     app.multithread: 0
+    app.base_path: https://xtools.example.org
 
     app.max_page_revisions: 50000
     app.max_user_edits: 350000

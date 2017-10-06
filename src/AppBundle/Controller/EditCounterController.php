@@ -54,7 +54,7 @@ class EditCounterController extends Controller
      */
     protected function setUpEditCounter($project = false, $username = false, $key = null)
     {
-        if ($key && $key !== $this->container->getParameter('secret')) {
+        if ($key && (string)$key !== (string)$this->container->getParameter('secret')) {
             throw $this->createAccessDeniedException('This endpoint is for internal use only.');
         }
 
