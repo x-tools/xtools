@@ -4,7 +4,8 @@
 			"Gomoko",
 			"Wladek92",
 			"Nemo bis",
-			"Verdy p"
+			"Verdy p",
+			"Framawiki"
 		]
 	},
 	"about-xtools": "À propos de ces outils",
@@ -283,7 +284,9 @@
 	"thursday": "Jeudi",
 	"timecard": "Histogramme",
 	"times-in-utc": "Toutes les heures sont en UTC.",
-	"too-many-revisions": "Cet article a plus de 50&nbsp;000 révisions. Les données pour les 50&nbsp;000 premières sont affichées ci-dessous.",
+	"too-many-edits": "L'utilisateur dépasse le nombre d'éditions autorisé ! (celui-ci est de $1)",
+	"too-many-edits-redir": "Affichage de $1 .",
+	"too-many-revisions": "Cette page a plus de $1 {{PLURAL:$2|révision|révisions}}. Seules les données pour les $1 premières sont affichées.",
 	"tool": "Outil",
 	"tool-about": "À propos",
 	"tool-adminscore": "Score d’administration",

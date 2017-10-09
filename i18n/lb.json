@@ -229,6 +229,7 @@
 	"thank": "Merci",
 	"thursday": "Donneschdeg",
 	"times-in-utc": "All Zäite bezéie sech op UTC.",
+	"too-many-edits": "De Benotzer huet ze vill Ännerungen! (Maximum $1)",
 	"too-many-revisions": "Dësen Artikel huet méi wéi $1 {{PLURAL:$2|Versioun|Versiounen}}. Donnéeë fir déi éischt $1 Versioune gi gewisen.",
 	"tool": "Geschir (Tool)",
 	"tool-about": "Iwwer",

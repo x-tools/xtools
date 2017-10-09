@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"Kly",
-			"Nemo bis"
+			"Nemo bis",
+			"Liuxinyu970226"
 		]
 	},
 	"about-xtools": "關於這些工具",
@@ -86,7 +87,7 @@
 	"error-server-message": "伺服器報告：$1",
 	"error-title": "XTools 發生嚴重錯誤。",
 	"events": "事件",
-	"executed": "執行時間 $1 {{PLURAL:$2|秒|秒}}",
+	"executed": "執行時間 $1 {{PLURAL:$2|秒}}。",
 	"explanation": "解釋",
 	"export-wikitext": "匯出 wiki 文字",
 	"file": "檔案",
@@ -149,7 +150,7 @@
 	"major-edits-with-summaries": "帶有摘要的大修改",
 	"max-text-added": "最大文字加入量",
 	"max-text-deleted": "最大文字刪除量",
-	"memory-usage": "佔用了 $1 {{PLURAL:$2|百萬位元組|百萬位元組}}記憶體來執行。",
+	"memory-usage": "佔用了 $1 {{PLURAL:$2|百萬位元組}}記憶體來執行。",
 	"minor": "小",
 	"minor-edits": "鏡像編輯",
 	"minor-edits-percentage": "小修改 %",
@@ -281,7 +282,8 @@
 	"thursday": "星期四",
 	"timecard": "計時卡",
 	"times-in-utc": "所有時間為 UTC 標準。",
-	"too-many-edits": "此使用者已建立超過 $1 {{PLURAL:$2|編輯次數|編輯次數}}。僅顯示最後 $1 筆資料。",
+	"too-many-edits": "使用者已做出太多編輯！（最多 $1 筆）",
+	"too-many-edits-redir": "改用 $1 顯示。",
 	"too-many-revisions": "此頁面已超過 $1 {{PLURAL:$2|修訂|修訂}}。僅顯示最後 $1 筆資料。。",
 	"tool": "工具",
 	"tool-about": "關於",
