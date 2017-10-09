@@ -26,14 +26,34 @@ $(function () {
         return undefined;
     });
 
+    // Load top edits HTML via AJAX, to not slow down the initial page load.
+    // Only load if container is present, which is missing in subroutes, e.g. ec-namespacetotals, etc.
+    var $topEditsContainer = $("#topedits-container");
+    if ($topEditsContainer[0]) {
+        /** global: xtBaseUrl */
+        var url = xtBaseUrl + 'topedits/'
+            + $topEditsContainer.data('project') + '/'
+            + $topEditsContainer.data('username') + '/all?htmlonly=yes';
+        $.ajax({
+            url: url,
+            timeout: 30000
+        }).done(function (data) {
+            $topEditsContainer.replaceWith(data);
+        }).fail(function (_xhr, _status, message) {
+            $topEditsContainer.replaceWith(
+                $.i18n('api-error', 'TopEdits API: <code>' + message + '</code>')
+            );
+        });
+    }
+
     // Load recent global edits' HTML via AJAX, to not slow down the initial page load.
     // Only load if container is present, which is missing in subroutes, e.g. ec-namespacetotals, etc.
     var $latestGlobalContainer = $("#latestglobal-container");
     if ($latestGlobalContainer[0]) {
         /** global: xtBaseUrl */
         var url = xtBaseUrl + 'ec-latestglobal/'
-            + $latestGlobalContainer.data("project") + '/'
-            + $latestGlobalContainer.data("username") + '?htmlonly=yes';
+            + $latestGlobalContainer.data('project') + '/'
+            + $latestGlobalContainer.data('username') + '?htmlonly=yes';
         $.ajax({
             url: url,
             timeout: 30000

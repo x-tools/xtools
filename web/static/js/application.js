@@ -19,15 +19,26 @@
     }).load(messagesToLoad);
 
     $(document).ready(function () {
+        // TODO: move these listeners to a setup function and document how to use it.
         $('.xt-hide').on('click', function () {
             $(this).hide();
             $(this).siblings('.xt-show').show();
-            $(this).parents('.panel-heading').siblings('.panel-body').hide();
+
+            if ($(this).parents('.panel-heading').length) {
+                $(this).parents('.panel-heading').siblings('.panel-body').hide();
+            } else {
+                $(this).parents('.xt-show-hide--parent').next('.xt-show-hide--target').hide();
+            }
         });
         $('.xt-show').on('click', function () {
             $(this).hide();
             $(this).siblings('.xt-hide').show();
-            $(this).parents('.panel-heading').siblings('.panel-body').show();
+
+            if ($(this).parents('.panel-heading').length) {
+                $(this).parents('.panel-heading').siblings('.panel-body').show();
+            } else {
+                $(this).parents('.xt-show-hide--parent').next('.xt-show-hide--target').show();
+            }
         });
 
         setupNavCollapsing();
