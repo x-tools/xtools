@@ -106,7 +106,9 @@
      *                                   { 'a' => 123, 'b' => 456 }
      * @param  {Function} updateCallback Callback to update the .toggle-table totals. `toggleTableData`
      *                                   is passed in which contains the new data, you just need to
-     *                                   format it (maybe need to use i18n, update multiple cells, etc.)
+     *                                   format it (maybe need to use i18n, update multiple cells, etc.).
+     *                                   The second parameter that is passed back is the 'key' of the toggled
+     *                                   item, and the third is the index of the item.
      */
     window.setupToggleTable = function (dataSource, chartObj, valueKey, updateCallback) {
         $('.toggle-table').on('click', '.toggle-table--toggle', function () {
@@ -137,7 +139,7 @@
             $(this).find('.glyphicon').toggleClass('glyphicon-remove').toggleClass('glyphicon-plus');
 
             // update stats
-            updateCallback(toggleTableData);
+            updateCallback(toggleTableData, key, index);
 
             chartObj.update();
         });
