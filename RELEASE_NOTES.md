@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.1.10 ##
+- T177730: Show per-namespace breakdown of top edited pages.
+- T177696: Fix ordering of Edit Counter timecard data.
+
 ## 3.1.9 ##
 - T172801: Show top edited pages in Edit Counter.
 - Downsize the timecard based on feedback.
