@@ -78,9 +78,11 @@
         {{ layout.content_block(headerLink, content, '', 'timecard', true) }}
 
         {% set content %}
-            <div id="topedits-container" data-username="{{ user.username }}" data-project="{{ project.domain }}">
-                <img src="{{ asset('static/images/loader.gif') }}" />
-            </div>
+            {{ render(path('TopEditsResults', {
+                'username': user.username,
+                'project': project.domain,
+                'namespace': 'all'
+            })) }}
         {% endset %}
         {% set headerLink %}
             <a href="{{ path('TopEditsResults', {project:project.domain, username:user.username, namespace:'all'})}}">{{ msg('top-edited-pages') }}</a>
