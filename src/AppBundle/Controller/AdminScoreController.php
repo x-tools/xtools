@@ -75,6 +75,8 @@ class AdminScoreController extends Controller
      * @param string $project The project name.
      * @param string $username The username.
      * @return Response
+     * @todo Move SQL to a model.
+     * @codeCoverageIgnore
      */
     public function resultAction($project, $username)
     {

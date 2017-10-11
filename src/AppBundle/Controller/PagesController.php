@@ -109,6 +109,7 @@ class PagesController extends Controller
      * @param string $namespace The ID of the namespace.
      * @param string $redirects Whether to follow redirects or not.
      * @return RedirectResponse|Response
+     * @codeCoverageIgnore
      */
     public function resultAction($project, $username, $namespace = '0', $redirects = 'noredirects')
     {

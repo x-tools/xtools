@@ -109,6 +109,7 @@ class AutomatedEditsController extends Controller
      * @param null|string [$start]
      * @param null|string [$end]
      * @return RedirectResponse|Response
+     * @codeCoverageIgnore
      */
     public function resultAction($project, $username, $namespace = 0, $start = null, $end = null)
     {
