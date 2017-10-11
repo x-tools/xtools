@@ -139,7 +139,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertContains('text/html', $response->headers->get('content-type'));
 
         // Test again for too many edits.
-        $url = '/api/user/nonautomated_edits/en.wikipedia/Widr/0';
+        $url = '/api/user/nonautomated_edits/en.wikipedia/Materialscientist/0';
         $crawler = $this->client->request('GET', $url);
         $response = $this->client->getResponse();
         $this->assertEquals(403, $response->getStatusCode());

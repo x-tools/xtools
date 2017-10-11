@@ -68,7 +68,7 @@ parameters:
     enable.bash: 0
     enable.blame: 0
     enable.ec: 1
-    enable.es: 0
+    enable.es: 1
     enable.pages: 1
     enable.rfx: 0
     enable.rfxvote: 0
