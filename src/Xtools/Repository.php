@@ -77,13 +77,15 @@ abstract class Repository
     /**
      * Get the database connection for the 'meta' database.
      * @return Connection
+     * @codeCoverageIgnore
      */
     protected function getMetaConnection()
     {
+        var_dump('yeah');
         if (!$this->metaConnection instanceof Connection) {
             $this->metaConnection = $this->container
                 ->get('doctrine')
-                ->getManager("meta")
+                ->getManager('meta')
                 ->getConnection();
         }
         return $this->metaConnection;
@@ -92,6 +94,7 @@ abstract class Repository
     /**
      * Get the database connection for the 'projects' database.
      * @return Connection
+     * @codeCoverageIgnore
      */
     protected function getProjectsConnection()
     {
@@ -108,6 +111,7 @@ abstract class Repository
      * Get the database connection for the 'tools' database
      * (the one that other tools store data in).
      * @return Connection
+     * @codeCoverageIgnore
      */
     protected function getToolsConnection()
     {
