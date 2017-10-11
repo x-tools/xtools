@@ -1,6 +1,6 @@
 parameters:
   deletion_counter:
-    enwiki:
+    en.wikipedia.org:
       CSD: "WP:CSD"
       PROD: "WP:PROD"
       AFD: "Articles for deletion"

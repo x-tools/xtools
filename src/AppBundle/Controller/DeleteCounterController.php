@@ -99,17 +99,17 @@ class DeleteCounterController extends Controller
          */
         $project = ProjectRepository::getProject($project, $this->container);
         $projectRepo = $project->getRepository();
+        $dbName = $project->getDatabaseName();
+        $domain = $project->getDomain();
 
         $user = UserRepository::getUser($username, $this->container);
 
         $userID = $user->getId($project);
 
         if (!$project->exists()) {
-            $this->addFlash('notice', ['invalid-project', $project]);
+            $this->addFlash('notice', ['invalid-project', $domain]);
             return $this->redirectToRoute('SimpleEditCounter');
         }
-
-        $dbName = $project->getDatabaseName();
 
         $loggingTable = $projectRepo->getTableName(
             $dbName,
@@ -126,7 +126,7 @@ class DeleteCounterController extends Controller
 
         $types = $this->container->getParameter("deletion_counter");
 
-        if (!isset($types[$project->getDatabaseName()])) {
+        if (!isset($types[$domain])) {
             $this->addFlash('notice', [ 'no-result', $username ]);
             return $this->redirectToRoute(
                 'DeletionCounter',
@@ -136,7 +136,7 @@ class DeleteCounterController extends Controller
             );
         }
 
-        $data = $types[$project->getDatabaseName()];
+        $data = $types[$domain];
 
         $queryArray = [];
 
@@ -163,8 +163,21 @@ class DeleteCounterController extends Controller
         }
 
         $total = 0;
+        $resultData = $resultQuery->fetchAll();
 
-        foreach ($resultQuery->fetchAll() as $row) {
+        if (count($resultData) == 0) {
+            $this->addFlash('notice', [ 'no-result', $username ]);
+            return $this->redirectToRoute(
+                'DeletionCounterProject',
+                [
+                    'project' => $project->getDomain()
+                ]
+            );
+        }
+
+        $results = [];
+
+        foreach ($resultData as $row) {
             $results[$row["type"]] = $row["count"];
             $total += $row["count"];
         }
