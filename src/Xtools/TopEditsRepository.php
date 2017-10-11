@@ -36,12 +36,12 @@ class TopEditsRepository extends Repository
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
 
         $hasPageAssessments = $this->isLabs() && $project->hasPageAssessments() && $namespace === 0;
-        $pageAssessmentsTable = $this->getTableName($project->getDatabaseName(), 'page_assessments');
         $paSelect = $hasPageAssessments
             ?  ", (
                     SELECT pa_class
                     FROM page_assessments
                     WHERE pa_page_id = page_id
+                    AND pa_class != 'Unknown'
                     LIMIT 1
                 ) AS pa_class"
             : '';
