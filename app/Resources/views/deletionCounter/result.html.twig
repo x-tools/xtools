@@ -23,7 +23,7 @@
                 {% for key, value in results %}
                     <tr>
                         <td>{{ key }}</td>
-                        <td>{{ value|format_number }}</td>
+                        <td>{{ value|number_format }}</td>
                     </tr>
                 {% endfor %}
                 <tr>
@@ -31,7 +31,7 @@
                         <b>{{ msg("total") }}</b>
                     </td>
                     <td>
-                        <b>{{ total|format_number }}</b>
+                        <b>{{ total|number_format }}</b>
                     </td>
                 </tr>
                 </tbody>
