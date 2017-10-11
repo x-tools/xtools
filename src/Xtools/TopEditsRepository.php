@@ -38,13 +38,18 @@ class TopEditsRepository extends Repository
 
         $hasPageAssessments = $this->isLabs() && $project->hasPageAssessments() && $namespace === 0;
         $pageAssessmentsTable = $this->getTableName($project->getDatabaseName(), 'page_assessments');
-        $paJoin = $hasPageAssessments ? "LEFT JOIN $pageAssessmentsTable ON rev_page = pa_page_id" : '';
-        $paSelects = $hasPageAssessments ? ', pa_class' : '';
+        $paSelect = $hasPageAssessments
+            ?  ", (
+                    SELECT pa_class
+                    FROM page_assessments
+                    WHERE pa_page_id = page_id
+                    LIMIT 1
+                ) AS pa_class"
+            : '';
 
         $sql = "SELECT page_namespace, page_title, page_is_redirect, COUNT(page_title) AS count
-                    $paSelects
+                    $paSelect
                 FROM $pageTable JOIN $revisionTable ON page_id = rev_page
-                $paJoin
                 WHERE rev_user_text = :username
                 AND page_namespace = :namespace
                 GROUP BY page_namespace, page_title
