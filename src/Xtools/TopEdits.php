@@ -85,58 +85,57 @@ class TopEdits extends Model
             return $this->topEdits;
         }
 
-        /** @var string[] The top edited pages, keyed by namespace ID. */
-        $topEditedPages = [];
-
-        /** @var int[] Which namespaces to iterate over. */
-        $namespaces = $this->namespace === 'all'
-            ? array_keys($this->project->getNamespaces())
-            : [$this->namespace];
-
-        foreach ($namespaces as $nsId) {
-            $pages = $this->getTopEditsByNamespace($nsId);
-
-            if (count($pages)) {
-                $topEditedPages[$nsId] = $pages;
-            }
+        if ($this->namespace === 'all') {
+            $pages = $this->getRepository()->getTopEditsAllNamespaces(
+                $this->project,
+                $this->user,
+                $this->limit
+            );
+        } else {
+            $pages = $this->getRepository()->getTopEditsNamespace(
+                $this->project,
+                $this->user,
+                $this->namespace,
+                $this->limit
+            );
         }
 
-        $this->topEdits = $topEditedPages;
-        return $topEditedPages;
+        $this->topEdits = $this->formatTopPages($pages);
+        return $this->topEdits;
     }
 
     /**
-     * Get the top edits by a user in the given namespace.
-     * @param int $namespace Namespace ID.
-     * @return string[] page_namespace, page_title, page_is_redirect,
-     *   count (number of edits), assessment (page assessment).
+     * [formatTopPages description]
+     * @param  string[] $pages As returned by TopEditsRepository::getTopEditsNamespace
+     *                         or TopEditsRepository::getTopEditsAllNamespaces.
+     * @return string[] Same as input but with 'displaytitle', and 'page_title_ns'.
      */
-    protected function getTopEditsByNamespace($namespace = 0)
+    private function formatTopPages($pages)
     {
-        $topPages = $this->getRepository()->getTopEdits(
-            $this->project,
-            $this->user,
-            $namespace,
-            $this->limit
-        );
+        /** @var string[] The top edited pages, keyed by namespace ID. */
+        $topEditedPages = [];
 
-        // Display titles need to be fetched ahead of time.
-        $displayTitles = $this->getDisplayTitles($topPages);
+        /** @var string[] Display titles of the pages, which need to be fetched ahead of time. */
+        $displayTitles = $this->getDisplayTitles($pages);
 
-        $pages = [];
-        foreach ($topPages as $page) {
-            // If non-mainspace, prepend namespace to the titles.
-            $ns = (int) $page['page_namespace'];
-            $nsTitle = $ns > 0 ? $this->project->getNamespaces()[$page['page_namespace']] . ':' : '';
+        foreach ($pages as $page) {
+            $nsId = (int) $page['page_namespace'];
+            $nsTitle = $nsId > 0 ? $this->project->getNamespaces()[$page['page_namespace']] . ':' : '';
             $pageTitle = $nsTitle . $page['page_title'];
             $page['displaytitle'] = $displayTitles[$pageTitle];
+
             // $page['page_title'] is retained without the namespace
             //  so we can link to TopEdits for that page.
             $page['page_title_ns'] = $pageTitle;
-            $pages[] = $page;
+
+            if (isset($topEditedPages[$nsId])) {
+                $topEditedPages[$nsId][] = $page;
+            } else {
+                $topEditedPages[$nsId] = [$page];
+            }
         }
 
-        return $pages;
+        return $topEditedPages;
     }
 
     /**
