@@ -12,4 +12,5 @@ parameters:
     rfx: rfx
     rfxvote: rfxvote
     bash: bash
+    dc: dc
     sc: sc

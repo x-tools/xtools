@@ -1,0 +1,8 @@
+parameters:
+  deletion_counter:
+    enwiki:
+      CSD: "WP:CSD"
+      PROD: "WP:PROD"
+      AFD: "Articles for deletion"
+      TFD: "Templates for discussion"
+      MFD: "Miscellany for deletion"
