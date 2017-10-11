@@ -57,6 +57,10 @@ class RepositoryTest extends WebTestCase
      */
     public function testQueryXToolsApi()
     {
+        if (!$this->container->getParameter('app.is_labs') || !$this->container->getParameter('app.multithread')) {
+            return;
+        }
+
         $apiObj = $this->stub->queryXToolsApi('ec/monthcounts/en.wikipedia.org/Example');
         $this->assertInstanceOf(\GuzzleHttp\Psr7\Response::class, $apiObj);
         $this->assertEquals(200, $apiObj->getStatusCode());
