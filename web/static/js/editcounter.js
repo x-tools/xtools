@@ -208,6 +208,7 @@ window.setupMonthYearChart = function (id, datasets, labels, maxTotal) {
         },
         options: {
             tooltips: {
+                mode: 'nearest',
                 intersect: true,
                 callbacks: {
                     label: function (tooltip) {

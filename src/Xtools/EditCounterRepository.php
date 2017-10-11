@@ -505,7 +505,7 @@ class EditCounterRepository extends Repository
         $sql = "SELECT "
             . "     DAYOFWEEK(rev_timestamp) AS `y`, "
             . "     $xCalc AS `x`, "
-            . "     COUNT(rev_id) AS `r` "
+            . "     COUNT(rev_id) AS `value` "
             . " FROM $revisionTable"
             . " WHERE rev_user_text = :username"
             . " GROUP BY DAYOFWEEK(rev_timestamp), $xCalc ";
@@ -517,10 +517,10 @@ class EditCounterRepository extends Repository
         // This looks inefficient, but there's a max of 72 elements in this array.
         $max = 0;
         foreach ($totals as $total) {
-            $max = max($max, $total['r']);
+            $max = max($max, $total['value']);
         }
         foreach ($totals as &$total) {
-            $total['r'] = round($total['r'] / $max * 100);
+            $total['value'] = round($total['value'] / $max * 100);
         }
         $cacheItem = $this->cache->getItem($cacheKey);
         $cacheItem->expiresAfter(new DateInterval('PT10M'));
