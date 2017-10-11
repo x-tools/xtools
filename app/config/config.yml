@@ -42,7 +42,7 @@ framework:
     fragments:       ~
     http_method_override: true
     assets:
-        version: '7'
+        version: '8'
         version_format: '%%s?v=%%s'
     cache:
         app: "cache.adapter.%cache.adapter%"

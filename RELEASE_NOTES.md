@@ -1,5 +1,12 @@
 # Release Notes #
 
+## 3.1.11 ##
+- Fix counting of Top Edits that broke when joining on page_assessments.
+- T174581: Ensure bars of year/month counts in Edit Counter are of consistent
+  size, and downsize them overall for better readability.
+- Remove namespace toggles above year/month count charts in the Edit Counter,
+  instead going off of toggles in the namespace counts table.
+
 ## 3.1.10 ##
 - T177730: Show per-namespace breakdown of top edited pages.
 - T177696: Fix ordering of Edit Counter timecard data.
