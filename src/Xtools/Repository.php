@@ -77,13 +77,14 @@ abstract class Repository
     /**
      * Get the database connection for the 'meta' database.
      * @return Connection
+     * @codeCoverageIgnore
      */
     protected function getMetaConnection()
     {
         if (!$this->metaConnection instanceof Connection) {
             $this->metaConnection = $this->container
                 ->get('doctrine')
-                ->getManager("meta")
+                ->getManager('meta')
                 ->getConnection();
         }
         return $this->metaConnection;
@@ -92,6 +93,7 @@ abstract class Repository
     /**
      * Get the database connection for the 'projects' database.
      * @return Connection
+     * @codeCoverageIgnore
      */
     protected function getProjectsConnection()
     {
@@ -108,6 +110,7 @@ abstract class Repository
      * Get the database connection for the 'tools' database
      * (the one that other tools store data in).
      * @return Connection
+     * @codeCoverageIgnore
      */
     protected function getToolsConnection()
     {
@@ -140,6 +143,7 @@ abstract class Repository
     /**
      * Is XTools connecting to MMF Labs?
      * @return boolean
+     * @codeCoverageIgnore
      */
     public function isLabs()
     {
@@ -150,7 +154,7 @@ abstract class Repository
      * Make a request to the XTools API, optionally doing so asynchronously via Guzzle.
      * @param string $endpoint Relative path to endpoint with relevant query parameters.
      * @param bool $async Set to true to asynchronously query and return a promise.
-     * @return mixed|GuzzleHttp\Promise\Promise
+     * @return GuzzleHttp\Psr7\Response|GuzzleHttp\Promise\Promise
      */
     public function queryXToolsApi($endpoint, $async = false)
     {
