@@ -81,7 +81,6 @@ abstract class Repository
      */
     protected function getMetaConnection()
     {
-        var_dump('yeah');
         if (!$this->metaConnection instanceof Connection) {
             $this->metaConnection = $this->container
                 ->get('doctrine')
@@ -144,6 +143,7 @@ abstract class Repository
     /**
      * Is XTools connecting to MMF Labs?
      * @return boolean
+     * @codeCoverageIgnore
      */
     public function isLabs()
     {
@@ -154,7 +154,7 @@ abstract class Repository
      * Make a request to the XTools API, optionally doing so asynchronously via Guzzle.
      * @param string $endpoint Relative path to endpoint with relevant query parameters.
      * @param bool $async Set to true to asynchronously query and return a promise.
-     * @return mixed|GuzzleHttp\Promise\Promise
+     * @return GuzzleHttp\Psr7\Response|GuzzleHttp\Promise\Promise
      */
     public function queryXToolsApi($endpoint, $async = false)
     {
