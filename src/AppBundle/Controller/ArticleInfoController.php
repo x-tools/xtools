@@ -47,9 +47,9 @@ class ArticleInfoController extends Controller
         $article = $request->query->get('article');
 
         if ($projectQuery != '' && $article != '') {
-            return $this->redirectToRoute('ArticleInfoResult', [ 'project'=>$projectQuery, 'article' => $article ]);
+            return $this->redirectToRoute('ArticleInfoResult', [ 'project' => $projectQuery, 'article' => $article ]);
         } elseif ($article != '') {
-            return $this->redirectToRoute('ArticleInfoProject', [ 'project'=>$projectQuery ]);
+            return $this->redirectToRoute('ArticleInfoProject', [ 'project' => $projectQuery ]);
         }
 
         if ($projectQuery == '') {
@@ -75,6 +75,7 @@ class ArticleInfoController extends Controller
      *
      * @param Request $request The HTTP request
      * @return Response
+     * @codeCoverageIgnore
      */
     public function gadgetAction(Request $request)
     {

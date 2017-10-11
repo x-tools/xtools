@@ -111,6 +111,7 @@ class TopEditsController extends Controller
      * @param int $namespace
      * @param string $article
      * @return RedirectResponse|Response
+     * @codeCoverageIgnore
      */
     public function resultAction(Request $request, $project, $username, $namespace = 0, $article = '')
     {

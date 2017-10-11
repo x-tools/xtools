@@ -107,6 +107,7 @@ class EditSummaryController extends Controller
      * @Route("/editsummary/{project}/{username}/{namespace}", name="EditSummaryResult")
      *
      * @return Response
+     * @codeCoverageIgnore
      */
     public function resultAction($project, $username, $namespace = 0)
     {

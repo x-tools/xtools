@@ -112,6 +112,8 @@ class AdminStatsController extends Controller
      * @Route("/adminstats/{project}/{start}/{end}", name="AdminStatsResult")
      *
      * @return Route|\Symfony\Component\HttpFoundation\Response
+     * @todo Move SQL to a model.
+     * @codeCoverageIgnore
      */
     public function resultAction($project, $start = null, $end = null)
     {

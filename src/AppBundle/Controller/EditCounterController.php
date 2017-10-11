@@ -145,6 +145,7 @@ class EditCounterController extends Controller
      * @param string $project
      * @param string $username
      * @return Response
+     * @codeCoverageIgnore
      */
     public function resultAction(Request $request, $project, $username)
     {
@@ -180,6 +181,7 @@ class EditCounterController extends Controller
      * @param string $project
      * @param string $username
      * @return Response
+     * @codeCoverageIgnore
      */
     public function generalStatsAction($project, $username)
     {
@@ -206,6 +208,7 @@ class EditCounterController extends Controller
      * @param string $project
      * @param string $username
      * @return Response
+     * @codeCoverageIgnore
      */
     public function namespaceTotalsAction(Request $request, $project, $username)
     {
@@ -231,6 +234,7 @@ class EditCounterController extends Controller
      * @param string $project
      * @param string $username
      * @return Response
+     * @codeCoverageIgnore
      */
     public function timecardAction($project, $username)
     {
@@ -260,6 +264,7 @@ class EditCounterController extends Controller
      * @param string $project
      * @param string $username
      * @return Response
+     * @codeCoverageIgnore
      */
     public function yearcountsAction($project, $username)
     {
@@ -286,6 +291,7 @@ class EditCounterController extends Controller
      * @param string $project
      * @param string $username
      * @return Response
+     * @codeCoverageIgnore
      */
     public function monthcountsAction(Request $request, $project, $username)
     {
@@ -316,6 +322,7 @@ class EditCounterController extends Controller
      * @param string $project The project name.
      * @param string $username The username.
      * @return Response
+     * @codeCoverageIgnore
      */
     public function latestglobalAction(Request $request, $project, $username)
     {
@@ -352,6 +359,7 @@ class EditCounterController extends Controller
      * @param string $username
      * @param string $key API key.
      * @return JsonResponse
+     * @codeCoverageIgnore
      */
     public function pairDataApiAction(Request $request, $project, $username, $key)
     {
@@ -374,6 +382,7 @@ class EditCounterController extends Controller
      * @param string $username
      * @param string $key API key.
      * @return JsonResponse
+     * @codeCoverageIgnore
      */
     public function logCountsApiAction(Request $request, $project, $username, $key)
     {
@@ -396,6 +405,7 @@ class EditCounterController extends Controller
      * @param string $username
      * @param string $key API key.
      * @return JsonResponse
+     * @codeCoverageIgnore
      */
     public function editSizesApiAction(Request $request, $project, $username, $key)
     {
@@ -418,6 +428,7 @@ class EditCounterController extends Controller
      * @param string $username
      * @param string $key API key.
      * @return Response
+     * @codeCoverageIgnore
      */
     public function namespaceTotalsApiAction(Request $request, $project, $username, $key)
     {
@@ -440,6 +451,7 @@ class EditCounterController extends Controller
      * @param string $username
      * @param string $key API key.
      * @return Response
+     * @codeCoverageIgnore
      */
     public function monthcountsApiAction(Request $request, $project, $username, $key)
     {
