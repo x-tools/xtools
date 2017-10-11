@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.1.12 ##
+- T177883: Improve TopEdits and Edit Counter performance by collecting
+  top-edited pages across all namespaces with a single query.
+- T177898: Scale bubbles of time card chart with screen size.
+
 ## 3.1.11 ##
 - Fix counting of Top Edits that broke when joining on page_assessments.
 - T174581: Ensure bars of year/month counts in Edit Counter are of consistent
