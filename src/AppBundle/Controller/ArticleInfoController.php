@@ -25,6 +25,7 @@ class ArticleInfoController extends Controller
     /**
      * Get the tool's shortname.
      * @return string
+     * @codeCoverageIgnore
      */
     public function getToolShortname()
     {
@@ -126,6 +127,7 @@ class ArticleInfoController extends Controller
      * @Route("/articleinfo/{project}/{article}", name="ArticleInfoResult", requirements={"article"=".+"})
      * @param Request $request The HTTP request.
      * @return Response
+     * @codeCoverageIgnore
      */
     public function resultAction(Request $request)
     {

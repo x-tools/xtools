@@ -112,6 +112,7 @@ class RfXAnalysisController extends Controller
      * @Route("/rfx/{project}/{type}/{username}", name="rfxAnalysisResult")
      *
      * @return Response|RedirectResponse
+     * @codeCoverageIgnore
      */
     public function resultAction($project, $type, $username)
     {

@@ -89,6 +89,7 @@ class RfXVoteCalculatorController extends Controller
      * @Route("/rfxvote/{project}/{username}", name="rfxvoteResult")
      *
      * @return Response
+     * @codeCoverageIgnore
      */
     public function resultAction($project, $username)
     {

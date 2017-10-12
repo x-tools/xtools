@@ -48,6 +48,7 @@ class MetaController extends Controller
      * @param string $end      End date
      * @param string [$legacy] Non-blank value indicates to show stats for legacy XTools
      * @return Response
+     * @codeCoverageIgnore
      */
     public function resultAction($start, $end, $legacy = false)
     {
@@ -121,6 +122,7 @@ class MetaController extends Controller
      * @param  string $token   Unique token for this request, so we don't have people
      *                         meddling with these statistics
      * @return Response
+     * @codeCoverageIgnore
      */
     public function recordUsage(Request $request, $tool, $project, $token)
     {

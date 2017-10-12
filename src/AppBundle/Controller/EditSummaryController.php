@@ -26,6 +26,7 @@ class EditSummaryController extends Controller
     /**
      * Get the tool's shortname.
      * @return string
+     * @codeCoverageIgnore
      */
     public function getToolShortname()
     {

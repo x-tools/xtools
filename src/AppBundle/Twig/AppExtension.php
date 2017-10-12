@@ -463,6 +463,7 @@ class AppExtension extends Extension
     /**
      * The current replication lag.
      * @return int
+     * @codeCoverageIgnore
      */
     public function replag()
     {

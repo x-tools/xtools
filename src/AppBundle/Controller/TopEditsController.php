@@ -158,6 +158,7 @@ class TopEditsController extends Controller
      * @param Project $project The project.
      * @param integer|string $namespace The namespace ID or 'all'
      * @return \Symfony\Component\HttpFoundation\Response
+     * @codeCoverageIgnore
      */
     public function namespaceTopEdits(Request $request, User $user, Project $project, $namespace)
     {
@@ -213,6 +214,7 @@ class TopEditsController extends Controller
      * @param int $namespaceId The ID of the namespace of the page.
      * @param string $pageName The title (without namespace) of the page.
      * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @codeCoverageIgnore
      */
     protected function singlePageTopEdits(User $user, Project $project, $namespaceId, $pageName)
     {
