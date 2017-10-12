@@ -5,7 +5,6 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Helper\ApiHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -24,12 +23,13 @@ use Xtools\Edit;
 /**
  * The Top Edits tool.
  */
-class TopEditsController extends Controller
+class TopEditsController extends XtoolsController
 {
 
     /**
      * Get the tool's shortname.
      * @return string
+     * @codeCoverageIgnore
      */
     public function getToolShortname()
     {
@@ -44,61 +44,29 @@ class TopEditsController extends Controller
      * @Route("/topedits/index.php", name="TopEditsIndex")
      * @Route("/topedits/{project}", name="TopEditsProject")
      * @param Request $request
-     * @param string $project The project name.
      * @return Response
      */
-    public function indexAction(Request $request, $project = null)
+    public function indexAction(Request $request)
     {
-        $project = $request->query->get('project') ?: $project;
-        $username = $request->query->get('username', $request->query->get('user'));
-        $namespace = $request->query->get('namespace');
-        $article = $request->query->get('article');
-
-        // Legacy XTools.
-        $user = $request->query->get('user');
-        if (empty($username) && isset($user)) {
-            $username = $user;
-        }
-        $page = $request->query->get('page');
-        if (empty($article) && isset($page)) {
-            $article = $page;
-        }
-        $wiki = $request->query->get('wiki');
-        $lang = $request->query->get('lang');
-        if (isset($wiki) && isset($lang) && empty($project)) {
-            $project = $lang.'.'.$wiki.'.org';
-        }
-
-        $redirectParams = [
-            'project' => $project,
-            'username' => $username,
-        ];
-        if ($article != '') {
-            $redirectParams['article'] = $article;
-        }
-        if ($namespace != '') {
-            $redirectParams['namespace'] = $namespace;
-        }
+        $params = $this->parseQueryParams($request);
 
         // Redirect if at minimum project and username are provided.
-        if ($project != '' && $username != '') {
-            return $this->redirectToRoute('TopEditsResults', $redirectParams);
+        if (isset($params['project']) && isset($params['username'])) {
+            return $this->redirectToRoute('TopEditsResults', $params);
         }
 
-        // Set default project so we can populate the namespace selector.
-        if (!$project) {
-            $project = $this->container->getParameter('default_project');
-        }
-        $project = ProjectRepository::getProject($project, $this->container);
+        // Convert the given project (or default project) into a Project instance.
+        $params['project'] = $this->getProjectFromQuery($params);
 
-        return $this->render('topedits/index.html.twig', [
+        return $this->render('topedits/index.html.twig', array_merge([
             'xtPageTitle' => 'tool-topedits',
             'xtSubtitle' => 'tool-topedits-desc',
             'xtPage' => 'topedits',
-            'project' => $project,
-            'namespace' => (int) $namespace,
-            'article' => $article,
-        ]);
+
+            // Defaults that will get overriden if in $params.
+            'namespace' => 0,
+            'article' => '',
+        ], $params));
     }
 
     /**
@@ -106,42 +74,19 @@ class TopEditsController extends Controller
      * @Route("/topedits/{project}/{username}/{namespace}/{article}", name="TopEditsResults",
      *     requirements={"article"=".+"})
      * @param Request $request The HTTP request.
-     * @param string $project
-     * @param string $username
      * @param int $namespace
      * @param string $article
      * @return RedirectResponse|Response
      * @codeCoverageIgnore
      */
-    public function resultAction(Request $request, $project, $username, $namespace = 0, $article = '')
+    public function resultAction(Request $request, $namespace = 0, $article = '')
     {
-        $projectData = ProjectRepository::getProject($project, $this->container);
-
-        if (!$projectData->exists()) {
-            $this->addFlash('danger', ['invalid-project', $project]);
-            return $this->redirectToRoute('topedits');
-        }
-
-        $user = UserRepository::getUser($username, $this->container);
-
-        // Don't continue if the user doesn't exist.
-        if (!$user->existsOnProject($projectData)) {
-            $this->addFlash('danger', 'user-not-found');
-            return $this->redirectToRoute('topedits', [
-                'project' => $project,
-                'namespace' => $namespace,
-                'article' => $article,
-            ]);
-        }
-
-        // Reject users with a crazy high edit count.
-        if ($user->hasTooManyEdits($projectData)) {
-            $this->addFlash('danger', ['too-many-edits', number_format($user->maxEdits())]);
-            return $this->redirectToRoute('topedits', [
-                'project' => $project,
-                'namespace' => $namespace,
-                'article' => $article,
-            ]);
+        // Second parameter causes it return a Redirect to the index if the user has too many edits.
+        $ret = $this->validateProjectAndUser($request, 'topedits');
+        if ($ret instanceof RedirectResponse) {
+            return $ret;
+        } else {
+            list($projectData, $user) = $ret;
         }
 
         if ($article === '') {
@@ -221,15 +166,10 @@ class TopEditsController extends Controller
         // Get the full page name (i.e. no namespace prefix if NS 0).
         $namespaces = $project->getNamespaces();
         $fullPageName = $namespaceId ? $namespaces[$namespaceId].':'.$pageName : $pageName;
-        $page = new Page($project, $fullPageName);
-        $pageRepo = new PagesRepository();
-        $pageRepo->setContainer($this->container);
-        $page->setRepository($pageRepo);
 
-        if (!$page->exists()) {
-            // Redirect if the page doesn't exist.
-            $this->addFlash('notice', ['no-result', $pageName]);
-            return $this->redirectToRoute('topedits');
+        $page = $this->getAndValidatePage($project, $fullPageName);
+        if (is_a($page, 'Symfony\Component\HttpFoundation\RedirectResponse')) {
+            return $page;
         }
 
         // Get all revisions of this page by this user.

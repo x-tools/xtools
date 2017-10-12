@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * This controller serves everything for the Meta tool.
  */
-class MetaController extends Controller
+class MetaController extends XtoolsController
 {
     /**
      * Display the form.
@@ -27,11 +27,10 @@ class MetaController extends Controller
      */
     public function indexAction(Request $request)
     {
-        $start = $request->query->get('start');
-        $end = $request->query->get('end');
+        $params = $this->parseQueryParams($request);
 
-        if ($start != '' && $end != '') {
-            return $this->redirectToRoute('MetaResult', [ 'start' => $start, 'end' => $end ]);
+        if (isset($params['start']) && isset($params['end'])) {
+            return $this->redirectToRoute('MetaResult', $params);
         }
 
         return $this->render('meta/index.html.twig', [

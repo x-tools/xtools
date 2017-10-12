@@ -143,7 +143,11 @@ class ApiController extends FOSRestController
      * Get non-automated edits for the given user.
      * @Rest\Get(
      *   "/api/user/nonautomated_edits/{project}/{username}/{namespace}/{start}/{end}/{offset}",
-     *   requirements={"start" = "|\d{4}-\d{2}-\d{2}", "end" = "|\d{4}-\d{2}-\d{2}"}
+     *   requirements={
+     *       "start" = "|\d{4}-\d{2}-\d{2}",
+     *       "end" = "|\d{4}-\d{2}-\d{2}",
+     *       "offset" = "\d*"
+     *   }
      * )
      * @param Request $request The HTTP request.
      * @param string $project
@@ -179,16 +183,15 @@ class ApiController extends FOSRestController
                 );
             }
 
-            $data = false;
-            $edits = false;
+            $edits = [];
         } else {
-            $data = $user->getNonautomatedEdits($project, $namespace, $start, $end, $offset);
+            $edits = $user->getNonautomatedEdits($project, $namespace, $start, $end, $offset);
         }
 
         $view = View::create()->setStatusCode(Response::HTTP_OK);
 
         if ($request->query->get('format') === 'html') {
-            if ($data) {
+            if ($edits) {
                 $edits = array_map(function ($attrs) use ($project, $username) {
                     $page = $project->getRepository()
                         ->getPage($project, $attrs['full_page_title']);
@@ -196,7 +199,7 @@ class ApiController extends FOSRestController
                     $attrs['id'] = $attrs['rev_id'];
                     $attrs['username'] = $username;
                     return new Edit($page, $attrs);
-                }, $data);
+                }, $edits);
             }
 
             $twig = $this->container->get('twig');
@@ -222,7 +225,7 @@ class ApiController extends FOSRestController
                 $res['end'] = $end;
             }
             $res['offset'] = $offset;
-            $res['nonautomated_edits'] = $data;
+            $res['nonautomated_edits'] = $edits;
 
             $view->setData($res)->setFormat('json');
         }

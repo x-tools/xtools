@@ -17,12 +17,13 @@ use Xtools\UserRepository;
 /**
  * This controller serves the AutomatedEdits tool.
  */
-class AutomatedEditsController extends Controller
+class AutomatedEditsController extends XtoolsController
 {
 
     /**
      * Get the tool's shortname.
      * @return string
+     * @codeCoverageIgnore
      */
     public function getToolShortname()
     {
@@ -39,58 +40,30 @@ class AutomatedEditsController extends Controller
      * @Route("/automatededits/index.php", name="autoeditsLongIndexPhp")
      * @Route("/autoedits/{project}", name="autoeditsProject")
      * @param Request $request The HTTP request.
-     * @param string $project The project name.
      * @return Response
      */
-    public function indexAction(Request $request, $project = null)
+    public function indexAction(Request $request)
     {
-        // Pull the values out of the query string. These values default to empty strings.
-        $projectName = $request->query->get('project') ?: $project;
-        $username = $request->query->get('username', $request->query->get('user'));
-        $namespace = $request->query->get('namespace');
-        $startDate = $request->query->get('start');
-        $endDate = $request->query->get('end');
-
-        // Legacy XTools.
-        $begin = $request->query->get('begin');
-        if (empty($startDate) && isset($begin)) {
-            $startDate = $begin;
-        }
-        if (empty($namespace)) {
-            $namespace = '0';
-        }
-
-        $redirectParams = [
-            'project' => $projectName,
-            'username' => $username,
-        ];
+        $params = $this->parseQueryParams($request);
 
         // Redirect if at minimum project and username are provided.
-        if ($projectName != '' && $username != '') {
-            return $this->redirectToRoute('autoeditsResult', [
-                'project' => $projectName,
-                'username' => $username,
-                'namespace' => $namespace,
-                'start' => $startDate,
-                'end' => $endDate,
-            ]);
+        if (isset($params['project']) && isset($params['username'])) {
+            return $this->redirectToRoute('autoeditsResult', $params);
         }
 
-        // Set default project so we can populate the namespace selector.
-        if (!$projectName) {
-            $projectName = $this->container->getParameter('default_project');
-        }
-        $project = ProjectRepository::getProject($projectName, $this->container);
+        // Convert the given project (or default project) into a Project instance.
+        $params['project'] = $this->getProjectFromQuery($params);
 
-        return $this->render('autoEdits/index.html.twig', [
+        return $this->render('autoEdits/index.html.twig', array_merge([
             'xtPageTitle' => 'tool-autoedits',
             'xtSubtitle' => 'tool-autoedits-desc',
             'xtPage' => 'autoedits',
-            'project' => $project,
-            'namespace' => (int) $namespace,
-            'start' => $startDate,
-            'end' => $endDate,
-        ]);
+
+            // Defaults that will get overriden if in $params.
+            'namespace' => 0,
+            'start' => '',
+            'end' => '',
+        ], $params));
     }
 
     /**
@@ -103,42 +76,35 @@ class AutomatedEditsController extends Controller
      *         "namespace" = "|all|\d"
      *     }
      * )
-     * @param string $project
-     * @param string $username
-     * @param int|string [$namespace]
-     * @param null|string [$start]
-     * @param null|string [$end]
+     * @param Request $request The HTTP request.
+     * @param int|string $namespace
+     * @param null|string $start
+     * @param null|string $end
      * @return RedirectResponse|Response
      * @codeCoverageIgnore
      */
-    public function resultAction($project, $username, $namespace = 0, $start = null, $end = null)
+    public function resultAction(Request $request, $namespace = 0, $start = null, $end = null)
     {
-        // Pull information about the project
-        $projectData = ProjectRepository::getProject($project, $this->container);
-
-        if (!$projectData->exists()) {
-            $this->addFlash('danger', ['invalid-project', $project]);
-            return $this->redirectToRoute('autoedits');
+        // Will redirect back to index if the user has too high of an edit count.
+        $ret = $this->validateProjectAndUser($request, 'autoedits');
+        if ($ret instanceof RedirectResponse) {
+            return $ret;
+        } else {
+            list($projectData, $user) = $ret;
         }
 
-        // Validating the dates. If the dates are invalid, we'll redirect
-        // to the project and username view.
-        $invalidDates = (
-            ($start != '' && strtotime($start) === false) ||
-            ($end != '' && strtotime($end) === false)
-        );
-        if ($invalidDates) {
-            // Make sure to add the flash notice first.
-            $this->addFlash('warning', ['invalid-date']);
+        // 'false' means the dates are optional and returned as 'false' if empty.
+        list($start, $end) = $this->getUTCFromDateParams($start, $end, false);
 
-            // Then redirect us!
-            return $this->redirectToRoute(
-                'autoeditsResult',
-                [
-                    'project' => $project,
-                    'username' => $username,
-                ]
-            );
+        // We'll want to conditionally show some things in the view if there is a start date.
+        $hasStartDate = $start > 0;
+
+        // Format dates as needed by User model, if the date is present.
+        if ($start !== false) {
+            $start = date('Y-m-d', $start);
+        }
+        if ($end !== false) {
+            $end = date('Y-m-d', $end);
         }
 
         // Normalize default namespace.
@@ -146,37 +112,7 @@ class AutomatedEditsController extends Controller
             $namespace = 0;
         }
 
-        $user = UserRepository::getUser($username, $this->container);
-
-        // Don't continue if the user doesn't exist.
-        if (!$user->existsOnProject($projectData)) {
-            $this->addFlash('danger', 'user-not-found');
-            return $this->redirectToRoute('topedits', [
-                'project' => $project,
-                'namespace' => $namespace,
-                'start' => $start,
-                'end' => $end,
-            ]);
-        }
-
-        // Reject users with a crazy high edit count.
-        if ($user->hasTooManyEdits($projectData)) {
-            $this->addFlash('danger', ['too-many-edits', number_format($user->maxEdits())]);
-            return $this->redirectToRoute('topedits', [
-                'project' => $project,
-                'namespace' => $namespace,
-                'start' => $start,
-                'end' => $end,
-            ]);
-        }
-
         $editCount = $user->countEdits($projectData, $namespace, $start, $end);
-
-        // Inform user if no revisions found.
-        if ($editCount === 0) {
-            $this->addFlash('danger', ['no-contribs']);
-            return $this->redirectToRoute('autoedits');
-        }
 
         // Get individual counts of how many times each tool was used.
         // This also includes a wikilink to the tool.
@@ -198,8 +134,9 @@ class AutomatedEditsController extends Controller
             'autoCount' => $autoCount,
             'editCount' => $editCount,
             'autoPct' => $editCount ? ($autoCount / $editCount) * 100 : 0,
-            'start' => $start ?: '',
-            'end' => $end ?: '',
+            'hasStartDate' => $hasStartDate,
+            'start' => $start,
+            'end' => $end,
             'namespace' => $namespace,
         ];
 

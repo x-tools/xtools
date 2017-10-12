@@ -69,7 +69,8 @@
             </option>
         {% endif %}
         {% for id, name in project.namespaces %}
-            <option value="{{ id }}" {% if value is same as(id) %}selected="selected"{% endif %}>
+            {# (value + 0) typecasts into an integer #}
+            <option value="{{ id }}" {% if (value + 0) is same as(id) %}selected="selected"{% endif %}>
                 {% if id == 0 %}
                     {{ msg('mainspace') }}
                 {% else %}
@@ -95,13 +96,15 @@
 </div>
 {% endmacro %}
 
-{% macro redirects_select() %}
+{% macro redirects_select(value) %}
 <div class="input-group">
     <span class="input-group-addon form-label">{{ msg('redirects') }}</span>
     <select class="form-control" name="redirects">
-        <option value="noredirects" selected>{{ msg('redirfilter-noredirects') }}</option>
-        <option value="all">{{ msg('redirfilter-all') }}</option>
-        <option value="onlyredirects">{{ msg('redirfilter-onlyredirects') }}</option>
+        {% for type in ['noredirects', 'all', 'onlyredirects'] %}
+            <option value="{{ type }}"{% if value == type %} selected="selected"{% endif %}>
+                {{ msg('redirfilter-' ~ type) }}
+            </option>
+        {% endfor %}
     </select>
 </div>
 {% endmacro %}

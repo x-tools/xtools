@@ -27,6 +27,7 @@
                         <td class="stat-list--new-group">{{ msg('live-edits') }}</td>
                         <td class="stat-list--new-group">{{ totalEdits|num_format }}</td>
                     </tr>
+
                     <tr>
                         <td>{{ msg('edits-with-summaries') }}</td>
                         <td>
@@ -80,77 +81,85 @@
                 </tbody></table>
             </div>
             <div style="clear:both"></div>
-            <div class="basic-info-charts col-lg-12 clearfix">
-                {{
-                    chart.pie_chart('total_summaries',
-                        [{
-                            label: msg('with-summary'),
-                            value: totalSummaries,
-                            percentage: (totalSummaries / totalEdits) * 100
-                        },
-                        {
-                            label: msg('no-summary'),
-                            value: totalEdits - totalSummaries,
-                            percentage: 100 - ((totalSummaries / totalEdits) * 100)
-                        }]
-                    )
-                }}
-                {{
-                    chart.pie_chart('major_summaries',
-                        [{
-                            label: msg('major-edits-with-summaries'),
-                            value: totalSummariesMajor,
-                            percentage: (totalSummariesMajor / totalEditsMajor) * 100
-                        },
-                        {
-                            label: msg('no-summary'),
-                            value: totalEditsMajor - totalSummariesMajor,
-                            percentage: 100 - ((totalSummariesMajor / totalEditsMajor) * 100)
-                        }]
-                    )
-                }}
-            </div>
+            {% if totalEdits > 0 %}
+                <div class="basic-info-charts col-lg-12 clearfix">
+                    {{
+                        chart.pie_chart('total_summaries',
+                            [{
+                                label: msg('with-summary'),
+                                value: totalSummaries,
+                                percentage: (totalSummaries / totalEdits) * 100
+                            },
+                            {
+                                label: msg('no-summary'),
+                                value: totalEdits - totalSummaries,
+                                percentage: 100 - ((totalSummaries / totalEdits) * 100)
+                            }]
+                        )
+                    }}
+                    {{
+                        chart.pie_chart('major_summaries',
+                            [{
+                                label: msg('major-edits-with-summaries'),
+                                value: totalSummariesMajor,
+                                percentage: (totalSummariesMajor / totalEditsMajor) * 100
+                            },
+                            {
+                                label: msg('no-summary'),
+                                value: totalEditsMajor - totalSummariesMajor,
+                                percentage: 100 - ((totalSummariesMajor / totalEditsMajor) * 100)
+                            }]
+                        )
+                    }}
+                </div>
+            {% endif %}
         {% endset %}
         {{ layout.content_block('summary', content) }}
 
         {% set content %}
-            <table class="table table-bordered table-hover table-striped">
-                <thead><tr>
-                    {% for key in ['month', 'total-edits', 'edit-summaries', 'edit-summaries-percentage'] %}
-                        <th>
-                            <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                                {{ msg(key)|capitalize_first }}
-                                <span class="glyphicon glyphicon-sort"></span>
-                            </span>
-                        </th>
-                    {% endfor %}
-                </tr></thead>
-                <tbody>
-                    {% for month in monthTotals|keys %}
-                        <tr>
-                            <td class="sort-entry--month" data-value="{{ month|replace({'-': ''}) }}">
-                                {{ month }}
-                            </td>
-                            <td class="sort-entry--total-edits" data-value="{{ monthTotals[month] }}">
-                                {{ monthTotals[month]|num_format }}
-                            </td>
-                            {% if monthEditSumTotals[month] is defined %}
-                                <td class="sort-entry--edit-summaries" data-value="{{ monthEditSumTotals[month] }}">
-                                    {{ monthEditSumTotals[month]|num_format }}
+            {% if totalEdits > 0 %}
+                <table class="table table-bordered table-hover table-striped">
+                    <thead><tr>
+                        {% for key in ['month', 'total-edits', 'edit-summaries', 'edit-summaries-percentage'] %}
+                            <th>
+                                <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
+                                    {{ msg(key)|capitalize_first }}
+                                    <span class="glyphicon glyphicon-sort"></span>
+                                </span>
+                            </th>
+                        {% endfor %}
+                    </tr></thead>
+                    <tbody>
+                        {% for month in monthTotals|keys %}
+                            <tr>
+                                <td class="sort-entry--month" data-value="{{ month|replace({'-': ''}) }}">
+                                    {{ month }}
                                 </td>
+                                <td class="sort-entry--total-edits" data-value="{{ monthTotals[month] }}">
+                                    {{ monthTotals[month]|num_format }}
+                                </td>
+                                {% if monthEditSumTotals[month] is defined %}
+                                    <td class="sort-entry--edit-summaries" data-value="{{ monthEditSumTotals[month] }}">
+                                        {{ monthEditSumTotals[month]|num_format }}
+                                    </td>
 
-                                {% set editSummaryPercentage = monthEditSumTotals[month]|percent_format(monthTotals[month]) %}
-                                <td class="sort-entry--edit-summaries-percentage" data-value="{{ editSummaryPercentage }}">
-                                    {{ editSummaryPercentage }}
-                                </td>
-                            {% else %}
-                                <td class="sort-entry--edit-summaries" data-value="0">0</td>
-                                <td class="sort-entry--edit-summaries-percentage" data-value="0">0%</td>
-                            {% endif %}
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                                    {% set editSummaryPercentage = monthEditSumTotals[month]|percent_format(monthTotals[month]) %}
+                                    <td class="sort-entry--edit-summaries-percentage" data-value="{{ editSummaryPercentage }}">
+                                        {{ editSummaryPercentage }}
+                                    </td>
+                                {% else %}
+                                    <td class="sort-entry--edit-summaries" data-value="0">0</td>
+                                    <td class="sort-entry--edit-summaries-percentage" data-value="0">0%</td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="alert alert-info">
+                    {{ msg('no-contribs') }}
+                </div>
+            {% endif %}
         {% endset %}
         {{ layout.content_block('month-counts', content) }}
     </div>

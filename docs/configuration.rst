@@ -71,6 +71,7 @@ Application
 - **wiki_url** - URL to use if app.single_wiki is enabled.  The title of pages is attached to the end.
 - **api_path** - The API path for the project, usually /w/api.php
 - **opted_in** - A list of database names of projects that will display :ref:`restricted statistics <optin>` regardless of individual users' preferences
+- **languageless_wikis** - This should be left blank for any non-WMF installation. This is used only to convert legacy XTools URL parameters to the modern equivalents, listing any wikis where there is no specific language associated with it. "meta.wikimedia.org" is intentionally not included.
 
 Tools
 =====

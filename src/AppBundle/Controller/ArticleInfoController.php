@@ -20,7 +20,7 @@ use Xtools\ArticleInfo;
 /**
  * This controller serves the search form and results for the ArticleInfo tool
  */
-class ArticleInfoController extends Controller
+class ArticleInfoController extends XtoolsController
 {
     /**
      * Get the tool's shortname.
@@ -44,26 +44,20 @@ class ArticleInfoController extends Controller
      */
     public function indexAction(Request $request)
     {
-        $projectQuery = $request->query->get('project');
-        $article = $request->query->get('article');
+        $params = $this->parseQueryParams($request);
 
-        if ($projectQuery != '' && $article != '') {
-            return $this->redirectToRoute('ArticleInfoResult', [ 'project' => $projectQuery, 'article' => $article ]);
-        } elseif ($article != '') {
-            return $this->redirectToRoute('ArticleInfoProject', [ 'project' => $projectQuery ]);
+        if (isset($params['project']) && isset($params['article'])) {
+            return $this->redirectToRoute('ArticleInfoResult', $params);
         }
 
-        if ($projectQuery == '') {
-            $projectQuery = $this->container->getParameter('default_project');
-        }
-
-        $project = ProjectRepository::getProject($projectQuery, $this->container);
+        // Convert the given project (or default project) into a Project instance.
+        $params['project'] = $this->getProjectFromQuery($params);
 
         return $this->render('articleInfo/index.html.twig', [
             'xtPage' => 'articleinfo',
             'xtPageTitle' => 'tool-articleinfo',
             'xtSubtitle' => 'tool-articleinfo-desc',
-            'project' => $project,
+            'project' => $params['project'],
         ]);
     }
 
@@ -126,29 +120,23 @@ class ArticleInfoController extends Controller
      * Display the results.
      * @Route("/articleinfo/{project}/{article}", name="ArticleInfoResult", requirements={"article"=".+"})
      * @param Request $request The HTTP request.
+     * @param string $article
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction(Request $request)
+    public function resultAction(Request $request, $article)
     {
-        $projectQuery = $request->attributes->get('project');
-        $project = ProjectRepository::getProject($projectQuery, $this->container);
-        $this->projectRepo = $project->getRepository();
-        if (!$project->exists()) {
-            $this->addFlash('notice', ['invalid-project', $projectQuery]);
-            return $this->redirectToRoute('articleInfo');
+        // In this case only the project is validated.
+        $ret = $this->validateProjectAndUser($request);
+        if ($ret instanceof RedirectResponse) {
+            return $ret;
+        } else {
+            $project = $ret[0];
         }
-        $this->dbName = $project->getDatabaseName();
 
-        $pageQuery = $request->attributes->get('article');
-        $page = new Page($project, $pageQuery);
-        $pageRepo = new PagesRepository();
-        $pageRepo->setContainer($this->container);
-        $page->setRepository($pageRepo);
-
-        if (!$page->exists()) {
-            $this->addFlash('notice', ['no-exist', str_replace('_', ' ', $pageQuery)]);
-            return $this->redirectToRoute('articleInfo');
+        $page = $this->getAndValidatePage($project, $article);
+        if ($page instanceof RedirectResponse) {
+            return $page;
         }
 
         $articleInfo = new ArticleInfo($page, $this->container);
@@ -184,6 +172,7 @@ class ArticleInfoController extends Controller
         if ($format == 'wikitext') {
             $response->headers->set('Content-Type', 'text/plain');
         }
+
         return $response;
     }
 }

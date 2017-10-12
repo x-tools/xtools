@@ -20,7 +20,7 @@ use DateInterval;
 /**
  * This controller handles the Simple Edit Counter tool.
  */
-class EditSummaryController extends Controller
+class EditSummaryController extends XtoolsController
 {
 
     /**
@@ -37,7 +37,6 @@ class EditSummaryController extends Controller
      * The Edit Summary search form.
      *
      * @param Request $request The HTTP request.
-     * @param string  $project The project database name or domain.
      *
      * @Route("/editsummary",           name="es")
      * @Route("/editsummary",           name="EditSummary")
@@ -47,62 +46,33 @@ class EditSummaryController extends Controller
      *
      * @return Response
      */
-    public function indexAction(Request $request, $project = null)
+    public function indexAction(Request $request)
     {
-        // Get the query parameters.
-        $projectName = $project ?: $request->query->get('project');
-        $username = $request->query->get('username');
-        $namespace = $request->query->get('namespace');
-
-        // Default to mainspace.
-        if (empty($namespace)) {
-            $namespace = '0';
-        }
-
-        // Legacy XTools.
-        $user = $request->query->get('name');
-        if (empty($username) && isset($user)) {
-            $username = $user;
-        }
-        $wiki = $request->query->get('wiki');
-        $lang = $request->query->get('lang');
-        if (isset($wiki) && isset($lang) && empty($project)) {
-            $projectName = $lang.'.'.$wiki.'.org';
-        }
+        $params = $this->parseQueryParams($request);
 
         // If we've got a project, user, and namespace, redirect to results.
-        if ($projectName != '' && $username != '' && $namespace != '') {
-            $routeParams = [
-                'project' => $projectName,
-                'username' => $username,
-                'namespace' => $namespace,
-            ];
-            return $this->redirectToRoute('EditSummaryResult', $routeParams);
+        if (isset($params['project']) && isset($params['username']) && isset($params['namespace'])) {
+            return $this->redirectToRoute('EditSummaryResult', $params);
         }
 
-        // Instantiate the project if we can, or use the default.
-        $theProject = (!empty($projectName))
-            ? ProjectRepository::getProject($projectName, $this->container)
-            : ProjectRepository::getDefaultProject($this->container);
+        // Convert the given project (or default project) into a Project instance.
+        $params['project'] = $this->getProjectFromQuery($params);
 
         // Show the form.
-        return $this->render(
-            'editSummary/index.html.twig',
-            [
-                'xtPageTitle' => 'tool-es',
-                'xtSubtitle' => 'tool-es-desc',
-                'xtPage' => 'es',
-                'project' => $theProject,
-                'namespace' => (int) $namespace,
-            ]
-        );
+        return $this->render('editSummary/index.html.twig', array_merge([
+            'xtPageTitle' => 'tool-es',
+            'xtSubtitle' => 'tool-es-desc',
+            'xtPage' => 'es',
+
+            // Defaults that will get overriden if in $params.
+            'namespace' => 0,
+        ], $params));
     }
 
     /**
      * Display the Edit Summary results
      *
-     * @param string $project  The project domain name.
-     * @param string $username The username.
+     * @param Request $request The HTTP request.
      * @param string $namespace Namespace ID or 'all' for all namespaces.
      *
      * @Route("/editsummary/{project}/{username}/{namespace}", name="EditSummaryResult")
@@ -110,30 +80,16 @@ class EditSummaryController extends Controller
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction($project, $username, $namespace = 0)
+    public function resultAction(Request $request, $namespace = 0)
     {
-        /**
-         * Project object representing the project
-         * @var Project $projectData
-         */
-        $projectData = ProjectRepository::getProject($project, $this->container);
-
-        // Start by checking if the project exits.
-        // If not, show a message and redirect
-        if (!$projectData->exists()) {
-            $this->addFlash('notice', ['invalid-project', $projectData]);
-            return $this->redirectToRoute('EditSummary');
+        $ret = $this->validateProjectAndUser($request);
+        if ($ret instanceof RedirectResponse) {
+            return $ret;
+        } else {
+            list($projectData, $user) = $ret;
         }
-
-        $user = new User($username);
 
         $editSummaryUsage = $this->getEditSummaryUsage($projectData, $user, $namespace);
-
-        // If they have no edits, we have nothing to show
-        if ($editSummaryUsage['totalEdits'] === 0) {
-            $this->addFlash('notice', ['no-contribs']);
-            return $this->redirectToRoute('EditSummary');
-        }
 
         // Assign the values and display the template
         return $this->render(
@@ -156,7 +112,7 @@ class EditSummaryController extends Controller
      * @return array
      * @todo Should we move this to an actual Repository? Very specific to this controller
      */
-    private function getEditSummaryUsage($project, $user, $namespace)
+    private function getEditSummaryUsage(Project $project, User $user, $namespace)
     {
         $dbName = $project->getDatabaseName();
 
