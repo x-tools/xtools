@@ -72,6 +72,7 @@ class SimpleEditCounterController extends Controller
      * @param string $project The project domain name.
      * @param string $username The username.
      * @return Response
+     * @codeCoverageIgnore
      */
     public function resultAction($project, $username)
     {
