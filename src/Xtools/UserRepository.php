@@ -217,7 +217,7 @@ class UserRepository extends Repository
         $pageAssessmentsTable = $projectRepo->getTableName($dbName, 'page_assessments');
         $revisionTable = $projectRepo->getTableName($dbName, 'revision');
         $archiveTable = $projectRepo->getTableName($dbName, 'archive');
-        $logTable = $projectRepo->getTableName($dbName, 'logging', 'userindex');
+        $logTable = $projectRepo->getTableName($dbName, 'logging', 'logindex');
 
         $userId = $user->getId($project);
 
@@ -255,35 +255,31 @@ class UserRepository extends Repository
         $paJoin = $hasPageAssessments ? "LEFT JOIN $pageAssessmentsTable ON rev_page = pa_page_id" : '';
 
         $sql = "
-            (SELECT DISTINCT page_namespace AS namespace, 'rev' AS type, page_title AS page_title,
-                page_len, page_is_redirect, rev_timestamp AS rev_timestamp,
-                rev_user, rev_user_text AS username, rev_len, rev_id $paSelects
-            FROM $pageTable
-            JOIN $revisionTable ON page_id = rev_page
-            $paJoin
-            WHERE $whereRev AND rev_parent_id = '0' $namespaceConditionRev $redirectCondition
-            " . ($hasPageAssessments ? 'GROUP BY rev_page' : '') . "
+            (
+                SELECT DISTINCT page_namespace AS namespace, 'rev' AS type, page_title AS page_title,
+                    page_len, page_is_redirect, rev_timestamp AS rev_timestamp,
+                    rev_user, rev_user_text AS username, rev_len, rev_id $paSelects
+                FROM $pageTable
+                JOIN $revisionTable ON page_id = rev_page
+                $paJoin
+                WHERE $whereRev AND rev_parent_id = '0' $namespaceConditionRev $redirectCondition" .
+                ($hasPageAssessments ? 'GROUP BY rev_page' : '') . "
             )
 
             UNION
 
-            (SELECT a.ar_namespace AS namespace, 'arc' AS type, a.ar_title AS page_title,
-                0 AS page_len, '0' AS page_is_redirect, MIN(a.ar_timestamp) AS rev_timestamp,
-                a.ar_user AS rev_user, a.ar_user_text AS username, a.ar_len AS rev_len,
-                a.ar_rev_id AS rev_id $paSelectsArchive
-            FROM $archiveTable a
-            JOIN
             (
-                SELECT b.ar_namespace, b.ar_title
-                FROM $archiveTable AS b
-                LEFT JOIN $logTable ON log_namespace = b.ar_namespace AND log_title = b.ar_title
-                    AND log_user = b.ar_user AND (log_action = 'move' OR log_action = 'move_redir')
-                WHERE $whereArc AND b.ar_parent_id = '0' $namespaceConditionArc AND log_action IS NULL
-            ) AS c ON c.ar_namespace= a.ar_namespace AND c.ar_title = a.ar_title
-            GROUP BY a.ar_namespace, a.ar_title
-            HAVING $having
-            )
-            ";
+                SELECT ar_namespace AS namespace, 'arc' AS type, ar_title AS page_title,
+                    0 AS page_len, '0' AS page_is_redirect, MIN(ar_timestamp) AS rev_timestamp,
+                    ar_user AS rev_user, ar_user_text AS username, ar_len AS rev_len,
+                    ar_rev_id AS rev_id $paSelectsArchive
+                FROM $archiveTable
+                LEFT JOIN $logTable ON log_namespace = ar_namespace AND log_title = ar_title
+                    AND log_user = ar_user AND (log_action = 'move' OR log_action = 'move_redir')
+                    AND log_type = 'move'
+                WHERE $whereArc AND ar_parent_id = '0' AND ar_namespace = '0' AND log_action IS NULL
+                GROUP BY ar_namespace, ar_title
+            )";
 
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $resultQuery->execute();

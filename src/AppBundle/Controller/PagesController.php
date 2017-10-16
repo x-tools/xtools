@@ -75,7 +75,7 @@ class PagesController extends XtoolsController
      */
     public function resultAction(Request $request, $namespace = '0', $redirects = 'noredirects')
     {
-        $ret = $this->validateProjectAndUser($request, 'topedits');
+        $ret = $this->validateProjectAndUser($request, 'pages');
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {
