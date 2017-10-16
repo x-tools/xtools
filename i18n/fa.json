@@ -3,7 +3,8 @@
 		"authors": [
 			"Nemo bis",
 			"Fatemi127",
-			"Obzord"
+			"Obzord",
+			"Ommmmid"
 		]
 	},
 	"about-xtools": "دربارهٔ این ابزارها",
@@ -179,6 +180,7 @@
 	"text-to-serach": "متن جستجو",
 	"thank": "سپاس",
 	"timecard": "کارت زمان",
+	"too-many-edits": "کاربر ویرایشهای بیش از اندازه کرده است. (حداکثر مجاز $1 )",
 	"too-many-revisions": "این مقاله بیش از ۵۰۰۰۰ نسخه دارد. اطلاعات ۵۰۰۰۰ نسخهٔ نخست در پایین نمایش داده‌شده‌است.",
 	"tool-adminstats": "آمار مدیران",
 	"tool-adminstats-desc": "نمایش آمار کارهای مدیریتی",

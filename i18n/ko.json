@@ -7,6 +7,7 @@
 		]
 	},
 	"about-xtools": "이 도구 정보",
+	"accepted-formats": "허용되는 형식",
 	"account-age": "계정 나이",
 	"accounts": "계정",
 	"accounts-created": "만든 계정",
@@ -254,6 +255,8 @@
 	"too-many-revisions": "이 문서는 $1개가 넘는 {{PLURAL:$2|판}}이 있습니다. 마지막 %1개의 데이터만 표시됩니다.",
 	"tool": "도구",
 	"tool-about": "정보",
+	"tool-adminscore": "관리자 점수",
+	"tool-adminscore-desc": "사용자가 얼마나 관리자 자격이 있는지 확인하기",
 	"tool-adminstats": "관리자 통계",
 	"tool-adminstats-desc": "관리자 권한 사용 통계 보기",
 	"tool-articleinfo": "문서 역사",
