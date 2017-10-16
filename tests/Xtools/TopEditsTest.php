@@ -1,6 +1,6 @@
 <?php
 /**
- * This file contains only the TopEdits class.
+ * This file contains only the TopEditsTest class.
  */
 
 namespace Tests\Xtools;

@@ -105,59 +105,6 @@ class ApiHelper extends HelperBase
     }
 
     /**
-     * Get a list of administrators for the given project.
-     * @TODO Move to the Project class?
-     * @param string $project
-     * @return string[]
-     */
-    public function getAdmins($project)
-    {
-        $params = [
-            'list' => 'allusers',
-            'augroup' => 'sysop|bureaucrat|steward|oversight|checkuser',
-            'auprop' => 'groups',
-            'aulimit' => '500',
-        ];
-
-        $result = [];
-        $adminData = $this->massApi($params, $project, 'allusers', 'aufrom');
-
-        if (!isset($adminData['allusers'])) {
-            // Invalid result
-            return array();
-        }
-
-        $admins = $adminData['allusers'];
-
-        foreach ($admins as $admin) {
-            $groups = [];
-            if (in_array("sysop", $admin["groups"])) {
-                $groups[] = "A";
-            }
-            if (in_array("bureaucrat", $admin["groups"])) {
-                $groups[] = "B";
-            }
-            if (in_array("steward", $admin["groups"])) {
-                $groups[] = "S" ;
-            }
-            if (in_array("checkuser", $admin["groups"])) {
-                $groups[] = "CU";
-            }
-            if (in_array("oversight", $admin["groups"])) {
-                $groups[] = "OS";
-            }
-            if (in_array("bot", $admin["groups"])) {
-                $groups[] = "Bot";
-            }
-            $result[ $admin["name"] ] = [
-                "groups" => implode('/', $groups)
-            ];
-        }
-
-        return $result;
-    }
-
-    /**
      * Get HTML display titles of a set of pages (or the normal title if there's no display title).
      * This will send t/50 API requests where t is the number of titles supplied.
      * @param string $project The project.
