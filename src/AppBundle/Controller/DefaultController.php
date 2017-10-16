@@ -20,9 +20,8 @@ use Xtools\ProjectRepository;
 /**
  * The DefaultController handles the homepage, about pages, and user authentication.
  */
-class DefaultController extends Controller
+class DefaultController extends XtoolsController
 {
-
     /** @var Client The Oauth HTTP client. */
     protected $oauthClient;
 
@@ -55,6 +54,7 @@ class DefaultController extends Controller
     /**
      * Display some configuration details, when in development mode.
      * @Route("/config", name="configPage")
+     * @codeCoverageIgnore
      */
     public function configAction()
     {
@@ -73,9 +73,9 @@ class DefaultController extends Controller
 
         // replace this example code with whatever you need
         return $this->render('default/config.html.twig', [
-            "xtTitle" => "Config",
-            "xtPageTitle" => "Config",
-            'xtPage' => "index",
+            'xtTitle' => 'Config',
+            'xtPageTitle' => 'Config',
+            'xtPage' => 'index',
             'dump' => print_r($params, true),
         ]);
     }

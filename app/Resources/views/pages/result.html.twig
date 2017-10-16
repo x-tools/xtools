@@ -46,78 +46,84 @@
                 </tbody></table>
             </div>
             <div style="clear:both"></div>
-            <table class="table table-bordered table-hover table-striped namespaces-table toggle-table">
-                <thead><tr>
-                    {% for key in summaryColumns %}
-                        <th>
-                            <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                                {{ msg(key)|capitalize_first }}
-                                <span class="glyphicon glyphicon-sort"></span>
-                            </span>
-                        </th>
-                    {% endfor %}
-                </tr></thead>
-                <tbody>
-                    {% for key, value in count %}
-                    <tr>
-                        <td class="sort-entry--namespace linked" data-value="{{ namespaces[key] }}">
-                            {% if multiNamspace %}
-                            <span class="namespace-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ key }}">
-                                <span class="glyphicon glyphicon-remove"></span>
-                            {% endif %}
-                                <span class="color-icon" style="background:{{ color(key) }}"></span>
-                            {% if multiNamspace %}
-                            </span>
-                            {% endif %}
-
-                            <a href="#{{ key }}" >{{ nsName(key, namespaces) }}</a>
-                        </td>
-                        {% if redirect != 'onlyredirects' %}
-                            <td class="sort-entry--pages" data-value="{{ value.total }}">
-                                {{ value.total }}
-                            </td>
-                        {% endif %}
-                        {% if redirect != 'noredirects' %}
-                            <td class="sort-entry--redirects" data-value="{{ value.redirect }}">
-                                {{ value.redirect }}
-                                {% if redirect != 'onlyredirects' %}
-                                    ({{ value.redirect|percent_format(value.total) }})
-                                {% endif %}
-                            </td>
-                        {% endif %}
-                        <td class="sort-entry--deleted" data-value="{{ value.deleted }}">
-                            {{ value.deleted }}
-                            ({{ value.deleted|percent_format(value.total) }})
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-                {% if pages|length > 1 %}
-                    <tfoot>
-                        <th class="namespaces--namespaces">
-                            {{ pages|length|num_format }}
-                            {{ msg('num-namespaces', [pages|length]) }}
-                        </th>
-                        <th class="namespaces--pages">
-                            {{ total|num_format }}
-                        </th>
-                        {% if 'redirects' in summaryColumns and 'pages' in summaryColumns %}
-                            <th class="namespaces--redirects">
-                                {{ redirectTotal|num_format }}
-                                ({{ redirectTotal|percent_format(total) }})
+            {% if total == 0 %}
+                <div class="alert alert-info">
+                    {{ msg('no-result', [user.username]) }}
+                </div>
+            {% else %}
+                <table class="table table-bordered table-hover table-striped namespaces-table toggle-table">
+                    <thead><tr>
+                        {% for key in summaryColumns %}
+                            <th>
+                                <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
+                                    {{ msg(key)|capitalize_first }}
+                                    <span class="glyphicon glyphicon-sort"></span>
+                                </span>
                             </th>
-                        {% endif %}
-                        <th class="namespaces--deleted">
-                            {{ deletedTotal|num_format }}
-                            ({{ deletedTotal|percent_format(total) }})
-                        </th>
-                    </tfoot>
+                        {% endfor %}
+                    </tr></thead>
+                    <tbody>
+                        {% for key, value in count %}
+                        <tr>
+                            <td class="sort-entry--namespace linked" data-value="{{ namespaces[key] }}">
+                                {% if multiNamspace %}
+                                <span class="namespace-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ key }}">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                {% endif %}
+                                    <span class="color-icon" style="background:{{ color(key) }}"></span>
+                                {% if multiNamspace %}
+                                </span>
+                                {% endif %}
+
+                                <a href="#{{ key }}" >{{ nsName(key, namespaces) }}</a>
+                            </td>
+                            {% if redirect != 'onlyredirects' %}
+                                <td class="sort-entry--pages" data-value="{{ value.total }}">
+                                    {{ value.total }}
+                                </td>
+                            {% endif %}
+                            {% if redirect != 'noredirects' %}
+                                <td class="sort-entry--redirects" data-value="{{ value.redirect }}">
+                                    {{ value.redirect }}
+                                    {% if redirect != 'onlyredirects' %}
+                                        ({{ value.redirect|percent_format(value.total) }})
+                                    {% endif %}
+                                </td>
+                            {% endif %}
+                            <td class="sort-entry--deleted" data-value="{{ value.deleted }}">
+                                {{ value.deleted }}
+                                ({{ value.deleted|percent_format(value.total) }})
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% if pages|length > 1 %}
+                        <tfoot>
+                            <th class="namespaces--namespaces">
+                                {{ pages|length|num_format }}
+                                {{ msg('num-namespaces', [pages|length]) }}
+                            </th>
+                            <th class="namespaces--pages">
+                                {{ total|num_format }}
+                            </th>
+                            {% if 'redirects' in summaryColumns and 'pages' in summaryColumns %}
+                                <th class="namespaces--redirects">
+                                    {{ redirectTotal|num_format }}
+                                    ({{ redirectTotal|percent_format(total) }})
+                                </th>
+                            {% endif %}
+                            <th class="namespaces--deleted">
+                                {{ deletedTotal|num_format }}
+                                ({{ deletedTotal|percent_format(total) }})
+                            </th>
+                        </tfoot>
+                    {% endif %}
+                </table>
+                {% if namespace == 'all' %}
+                <div class="chart-wrapper toggle-table--chart">
+                    <canvas id="pie_chart" width="400" height="400"></canvas>
+                </div>
                 {% endif %}
-            </table>
-            {% if namespace == 'all' %}
-            <div class="chart-wrapper toggle-table--chart">
-                <canvas id="pie_chart" width="400" height="400"></canvas>
-            </div>
             {% endif %}
         {% endset %}
         {{ layout.content_block('summary', content) }}

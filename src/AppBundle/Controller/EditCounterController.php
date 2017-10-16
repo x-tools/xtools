@@ -22,7 +22,7 @@ use Xtools\UserRepository;
 /**
  * Class EditCounterController
  */
-class EditCounterController extends Controller
+class EditCounterController extends XtoolsController
 {
 
     /** @var User The user being queried. */
@@ -37,6 +37,7 @@ class EditCounterController extends Controller
     /**
      * Get the tool's shortname.
      * @return string
+     * @codeCoverageIgnore
      */
     public function getToolShortname()
     {
@@ -46,42 +47,33 @@ class EditCounterController extends Controller
     /**
      * Every action in this controller (other than 'index') calls this first.
      * If a response is returned, the calling action is expected to return it.
-     * @param string|bool $project The project name.
-     * @param string|bool $username The username.
+     * @param Request $request
      * @param string $key API key, as given in the reuqest. Omit this for actions
      *   that are public (only /api/ec actions should pass this in).
      * @return null|RedirectResponse
      */
-    protected function setUpEditCounter($project = false, $username = false, $key = null)
+    protected function setUpEditCounter(Request $request, $key = null)
     {
+        // Return the EditCounter if we already have one.
+        if ($this->editCounter instanceof EditCounter) {
+            return;
+        }
+
+        // Validate key if attempted to make internal API request.
         if ($key && (string)$key !== (string)$this->container->getParameter('secret')) {
             throw $this->createAccessDeniedException('This endpoint is for internal use only.');
         }
 
-        $this->project = ProjectRepository::getProject($project, $this->container);
-        $this->user = UserRepository::getUser($username, $this->container);
-
-        // Don't continue if the user doesn't exist.
-        if (!$this->user->existsOnProject($this->project)) {
-            $this->addFlash('notice', 'user-not-found');
-            return $this->redirectToRoute('ec', ['project' => $project]);
+        // Will redirect to Simple Edit Counter if they have too many edits.
+        $ret = $this->validateProjectAndUser($request, 'SimpleEditCounterResult');
+        if ($ret instanceof RedirectResponse) {
+            return $ret;
+        } else {
+            // Get Project and User instances.
+            list($this->project, $this->user) = $ret;
         }
 
-        // Don't attempt to process users with an excessively high edit count.
-        if ($this->user->hasTooManyEdits($this->project)) {
-            $this->addFlash('danger', ['too-many-edits', number_format($this->user->maxEdits())]);
-            // FIXME: i18n of 'Simple Counter'
-            $this->addFlash('info', ['too-many-edits-redir', 'Simple Counter']);
-            return $this->redirectToRoute('SimpleEditCounterResult', [
-                'project' => $project,
-                'username' => $username
-            ]);
-        }
-
-        // Get an edit-counter if we don't already have it set.
-        if ($this->editCounter instanceof EditCounter) {
-            return;
-        }
+        // Instantiate EditCounter.
         $editCounterRepo = new EditCounterRepository();
         $editCounterRepo->setContainer($this->container);
         $this->editCounter = new EditCounter($this->project, $this->user);
@@ -98,43 +90,25 @@ class EditCounterController extends Controller
      * @Route("/ec/{project}", name="EditCounterProject")
      *
      * @param Request $request
-     * @param string|null $project
      * @return RedirectResponse|Response
      */
-    public function indexAction(Request $request, $project = null)
+    public function indexAction(Request $request)
     {
-        $queryProject = $request->query->get('project');
-        $username = $request->query->get('username', $request->query->get('user'));
+        $params = $this->parseQueryParams($request);
 
-        // Legacy XTools.
-        $user = $request->query->get('user');
-        if (empty($username) && isset($user)) {
-            $username = $user;
-        }
-        $wiki = $request->query->get('wiki');
-        $lang = $request->query->get('lang');
-        if (isset($wiki) && isset($lang) && empty($project)) {
-            $project = $lang.'.'.$wiki.'.org';
+        if (isset($params['project']) && isset($params['username'])) {
+            return $this->redirectToRoute('EditCounterResult', $params);
         }
 
-        if (($project || $queryProject) && $username) {
-            $routeParams = ['project' => ($project ?: $queryProject), 'username' => $username];
-            return $this->redirectToRoute('EditCounterResult', $routeParams);
-        } elseif (!$project && $queryProject) {
-            return $this->redirectToRoute('EditCounterProject', ['project' => $queryProject]);
-        }
-
-        $project = ProjectRepository::getProject($project, $this->container);
-        if (!$project->exists()) {
-            $project = ProjectRepository::getDefaultProject($this->container);
-        }
+        // Convert the given project (or default project) into a Project instance.
+        $params['project'] = $this->getProjectFromQuery($params);
 
         // Otherwise fall through.
         return $this->render('editCounter/index.html.twig', [
             'xtPageTitle' => 'tool-ec',
             'xtSubtitle' => 'tool-ec-desc',
             'xtPage' => 'ec',
-            'project' => $project,
+            'project' => $params['project'],
         ]);
     }
 
@@ -149,7 +123,7 @@ class EditCounterController extends Controller
      */
     public function resultAction(Request $request, $project, $username)
     {
-        $ret = $this->setUpEditCounter($project, $username);
+        $ret = $this->setUpEditCounter($request);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
@@ -178,14 +152,13 @@ class EditCounterController extends Controller
     /**
      * Display the general statistics section.
      * @Route("/ec-generalstats/{project}/{username}", name="EditCounterGeneralStats")
-     * @param string $project
-     * @param string $username
+     * @param Request $request
      * @return Response
      * @codeCoverageIgnore
      */
-    public function generalStatsAction($project, $username)
+    public function generalStatsAction(Request $request)
     {
-        $ret = $this->setUpEditCounter($project, $username);
+        $ret = $this->setUpEditCounter($request);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
@@ -205,14 +178,12 @@ class EditCounterController extends Controller
      * Display the namespace totals section.
      * @Route("/ec-namespacetotals/{project}/{username}", name="EditCounterNamespaceTotals")
      * @param Request $request
-     * @param string $project
-     * @param string $username
      * @return Response
      * @codeCoverageIgnore
      */
-    public function namespaceTotalsAction(Request $request, $project, $username)
+    public function namespaceTotalsAction(Request $request)
     {
-        $ret = $this->setUpEditCounter($project, $username);
+        $ret = $this->setUpEditCounter($request);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
@@ -231,14 +202,13 @@ class EditCounterController extends Controller
     /**
      * Display the timecard section.
      * @Route("/ec-timecard/{project}/{username}", name="EditCounterTimecard")
-     * @param string $project
-     * @param string $username
+     * @param Request $request
      * @return Response
      * @codeCoverageIgnore
      */
-    public function timecardAction($project, $username)
+    public function timecardAction(Request $request)
     {
-        $ret = $this->setUpEditCounter($project, $username);
+        $ret = $this->setUpEditCounter($request);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
@@ -261,14 +231,13 @@ class EditCounterController extends Controller
     /**
      * Display the year counts section.
      * @Route("/ec-yearcounts/{project}/{username}", name="EditCounterYearCounts")
-     * @param string $project
-     * @param string $username
+     * @param Request $request
      * @return Response
      * @codeCoverageIgnore
      */
-    public function yearcountsAction($project, $username)
+    public function yearcountsAction(Request $request)
     {
-        $ret = $this->setUpEditCounter($project, $username);
+        $ret = $this->setUpEditCounter($request);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
@@ -288,14 +257,12 @@ class EditCounterController extends Controller
      * Display the month counts section.
      * @Route("/ec-monthcounts/{project}/{username}", name="EditCounterMonthCounts")
      * @param Request $request
-     * @param string $project
-     * @param string $username
      * @return Response
      * @codeCoverageIgnore
      */
-    public function monthcountsAction(Request $request, $project, $username)
+    public function monthcountsAction(Request $request)
     {
-        $ret = $this->setUpEditCounter($project, $username);
+        $ret = $this->setUpEditCounter($request);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
@@ -319,14 +286,12 @@ class EditCounterController extends Controller
      * Display the latest global edits section.
      * @Route("/ec-latestglobal/{project}/{username}", name="EditCounterLatestGlobal")
      * @param Request $request The HTTP request.
-     * @param string $project The project name.
-     * @param string $username The username.
      * @return Response
      * @codeCoverageIgnore
      */
-    public function latestglobalAction(Request $request, $project, $username)
+    public function latestglobalAction(Request $request)
     {
-        $ret = $this->setUpEditCounter($project, $username);
+        $ret = $this->setUpEditCounter($request);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
@@ -355,15 +320,13 @@ class EditCounterController extends Controller
      * Get (most) of the general statistics as JSON.
      * @Route("/api/ec/pairdata/{project}/{username}/{key}", name="EditCounterApiPairData")
      * @param Request $request
-     * @param string $project
-     * @param string $username
      * @param string $key API key.
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function pairDataApiAction(Request $request, $project, $username, $key)
+    public function pairDataApiAction(Request $request, $key)
     {
-        $ret = $this->setUpEditCounter($project, $username, $key);
+        $ret = $this->setUpEditCounter($request, $key);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
@@ -378,15 +341,13 @@ class EditCounterController extends Controller
      * Get various log counts for the user as JSON.
      * @Route("/api/ec/logcounts/{project}/{username}/{key}", name="EditCounterApiLogCounts")
      * @param Request $request
-     * @param string $project
-     * @param string $username
      * @param string $key API key.
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function logCountsApiAction(Request $request, $project, $username, $key)
+    public function logCountsApiAction(Request $request, $key)
     {
-        $ret = $this->setUpEditCounter($project, $username, $key);
+        $ret = $this->setUpEditCounter($request, $key);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
@@ -401,15 +362,13 @@ class EditCounterController extends Controller
      * Get edit sizes for the user as JSON.
      * @Route("/api/ec/editsizes/{project}/{username}/{key}", name="EditCounterApiEditSizes")
      * @param Request $request
-     * @param string $project
-     * @param string $username
      * @param string $key API key.
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function editSizesApiAction(Request $request, $project, $username, $key)
+    public function editSizesApiAction(Request $request, $key)
     {
-        $ret = $this->setUpEditCounter($project, $username, $key);
+        $ret = $this->setUpEditCounter($request, $key);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
@@ -424,15 +383,13 @@ class EditCounterController extends Controller
      * Get the namespace totals for the user as JSON.
      * @Route("/api/ec/namespacetotals/{project}/{username}/{key}", name="EditCounterApiNamespaceTotals")
      * @param Request $request
-     * @param string $project
-     * @param string $username
      * @param string $key API key.
      * @return Response
      * @codeCoverageIgnore
      */
-    public function namespaceTotalsApiAction(Request $request, $project, $username, $key)
+    public function namespaceTotalsApiAction(Request $request, $key)
     {
-        $ret = $this->setUpEditCounter($project, $username, $key);
+        $ret = $this->setUpEditCounter($request, $key);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
@@ -447,15 +404,13 @@ class EditCounterController extends Controller
      * Display or fetch the month counts for the user.
      * @Route("/api/ec/monthcounts/{project}/{username}/{key}", name="EditCounterApiMonthCounts")
      * @param Request $request
-     * @param string $project
-     * @param string $username
      * @param string $key API key.
      * @return Response
      * @codeCoverageIgnore
      */
-    public function monthcountsApiAction(Request $request, $project, $username, $key)
+    public function monthcountsApiAction(Request $request, $key)
     {
-        $ret = $this->setUpEditCounter($project, $username, $key);
+        $ret = $this->setUpEditCounter($request, $key);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }

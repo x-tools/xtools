@@ -17,12 +17,13 @@ use Xtools\UserRepository;
 /**
  * The AdminScoreController serves the search form and results page of the AdminScore tool
  */
-class AdminScoreController extends Controller
+class AdminScoreController extends XtoolsController
 {
 
     /**
      * Get the tool's shortname.
      * @return string
+     * @codeCoverageIgnore
      */
     public function getToolShortname()
     {
@@ -38,57 +39,48 @@ class AdminScoreController extends Controller
      * @Route("/scottywong tools/adminscore.php", name="AdminScoreLegacy")
      * @Route("/adminscore/{project}", name="AdminScoreProject")
      * @param Request $request The HTTP request.
-     * @param string $project The project name.
      * @return Response
      */
-    public function indexAction(Request $request, $project = null)
+    public function indexAction(Request $request)
     {
-        $projectQuery = $request->query->get('project', $project);
-        $username = $request->query->get('username', $request->query->get('user'));
+        $params = $this->parseQueryParams($request);
 
-        if ($projectQuery != '' && $username != '') {
-            return $this->redirectToRoute('AdminScoreResult', [ 'project' => $projectQuery, 'username' => $username ]);
-        } elseif ($projectQuery != '' && $project === null) {
-            return $this->redirectToRoute('AdminScoreProject', [ 'project' => $projectQuery ]);
+        // Redirect if we have a project and user.
+        if (isset($params['project']) && isset($params['username'])) {
+            return $this->redirectToRoute('AdminScoreResult', $params);
         }
 
-        // Set default project so we can populate the namespace selector.
-        if ($projectQuery == '') {
-            $projectQuery = $this->container->getParameter('default_project');
-        }
-        // and set it as a Project object
-        $project = ProjectRepository::getProject($projectQuery, $this->container);
+        // Convert the given project (or default project) into a Project instance.
+        $params['project'] = $this->getProjectFromQuery($params);
 
-        // Otherwise fall through.
         return $this->render('adminscore/index.html.twig', [
-            'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
             'xtPage' => 'adminscore',
             'xtPageTitle' => 'tool-adminscore',
             'xtSubtitle' => 'tool-adminscore-desc',
-            'project' => $project,
+            'project' => $params['project'],
         ]);
     }
 
     /**
      * Display the AdminScore results.
      * @Route("/adminscore/{project}/{username}", name="AdminScoreResult")
-     * @param string $project The project name.
-     * @param string $username The username.
+     * @param Request $request The HTTP request.
      * @return Response
      * @todo Move SQL to a model.
      * @codeCoverageIgnore
      */
-    public function resultAction($project, $username)
+    public function resultAction(Request $request)
     {
-        $projectData = ProjectRepository::getProject($project, $this->container);
-        $projectRepo = $projectData->getRepository();
-
-        if (!$projectData->exists()) {
-            $this->addFlash("notice", ["invalid-project", $project]);
-            return $this->redirectToRoute("adminscore");
+        // Second parameter causes it return a Redirect to the index if the user has too many edits.
+        $ret = $this->validateProjectAndUser($request, 'adminscore');
+        if ($ret instanceof RedirectResponse) {
+            return $ret;
+        } else {
+            list($projectData, $user) = $ret;
         }
 
         $dbName = $projectData->getDatabaseName();
+        $projectRepo = $projectData->getRepository();
 
         $userTable = $projectRepo->getTableName($dbName, 'user');
         $pageTable = $projectRepo->getTableName($dbName, 'page');
@@ -119,9 +111,6 @@ class AdminScoreController extends Controller
 
         // Prepare the query and execute
         $resultQuery = $conn->prepare("
-        SELECT 'id' AS source, user_id AS value FROM $userTable
-            WHERE user_name = :username
-        UNION
         SELECT 'account-age' AS source, user_registration AS value FROM $userTable
             WHERE user_name = :username
         UNION
@@ -174,7 +163,6 @@ class AdminScoreController extends Controller
                 AND r.rev_user_text = :username;
         ");
 
-        $user = UserRepository::getUser($username, $this->container);
         $username = $user->getUsername();
         $resultQuery->bindParam("username", $username);
         $resultQuery->execute();
@@ -185,36 +173,25 @@ class AdminScoreController extends Controller
         $master = [];
         $total = 0;
 
-        $id = 0;
-
         foreach ($results as $row) {
-            $key = $row["source"];
-            $value = $row["value"];
+            $key = $row['source'];
+            $value = $row['value'];
 
-            if ($key === "account-age") {
+            if ($key === 'account-age') {
                 $now = new DateTime();
                 $date = new DateTime($value);
                 $diff = $date->diff($now);
-                $formula = 365 * $diff->format("%y") + 30 * $diff->format("%m") + $diff->format("%d");
+                $formula = 365 * $diff->format('%y') + 30 * $diff->format('%m') + $diff->format('%d');
                 $value = $formula - 365;
             }
 
-            if ($key === "id") {
-                $id = $value;
-            } else {
-                $multiplierKey = $row['source'] . '-mult';
-                $multiplier = isset($multipliers[$multiplierKey]) ? $multipliers[$multiplierKey] : 1;
-                $score = max(min($value * $multiplier, 100), -100);
-                $master[$key]["mult"] = $multiplier;
-                $master[$key]["value"] = $value;
-                $master[$key]["score"] = $score;
-                $total += $score;
-            }
-        }
-
-        if ($id == 0) {
-            $this->addFlash("notice", [ "no-result", $username ]);
-            return $this->redirectToRoute("AdminScore", [ "project" => $project ]);
+            $multiplierKey = $row['source'] . '-mult';
+            $multiplier = isset($multipliers[$multiplierKey]) ? $multipliers[$multiplierKey] : 1;
+            $score = max(min($value * $multiplier, 100), -100);
+            $master[$key]['mult'] = $multiplier;
+            $master[$key]['value'] = $value;
+            $master[$key]['score'] = $score;
+            $total += $score;
         }
 
         return $this->render('adminscore/result.html.twig', [

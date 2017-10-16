@@ -17,12 +17,13 @@ use Xtools\User;
 /**
  * This controller handles the Simple Edit Counter tool.
  */
-class SimpleEditCounterController extends Controller
+class SimpleEditCounterController extends XtoolsController
 {
 
     /**
      * Get the tool's shortname.
      * @return string
+     * @codeCoverageIgnore
      */
     public function getToolShortname()
     {
@@ -37,60 +38,49 @@ class SimpleEditCounterController extends Controller
      * @Route("/sc/index.php", name="SimpleEditCounterIndexPhp")
      * @Route("/sc/{project}", name="SimpleEditCounterProject")
      * @param Request $request The HTTP request.
-     * @param string $project The project database name or domain.
      * @return Response
      */
-    public function indexAction(Request $request, $project = null)
+    public function indexAction(Request $request)
     {
-        // Get the query parameters.
-        $projectName = $project ?: $request->query->get('project');
-        $username = $request->query->get('username', $request->query->get('user'));
+        $params = $this->parseQueryParams($request);
 
-        // If we've got a project and user, redirect to results.
-        if ($projectName != '' && $username != '') {
-            $routeParams = [ 'project' => $projectName, 'username' => $username ];
-            return $this->redirectToRoute('SimpleEditCounterResult', $routeParams);
+        // Redirect if project and username are given.
+        if (isset($params['project']) && isset($params['username'])) {
+            return $this->redirectToRoute('SimpleEditCounterResult', $params);
         }
 
-        // Instantiate the project if we can, or use the default.
-        $theProject = (!empty($projectName))
-            ? ProjectRepository::getProject($projectName, $this->container)
-            : ProjectRepository::getDefaultProject($this->container);
+        // Convert the given project (or default project) into a Project instance.
+        $params['project'] = $this->getProjectFromQuery($params);
 
         // Show the form.
         return $this->render('simpleEditCounter/index.html.twig', [
             'xtPageTitle' => 'tool-sc',
             'xtSubtitle' => 'tool-sc-desc',
             'xtPage' => 'sc',
-            'project' => $theProject,
+            'project' => $params['project'],
         ]);
     }
 
     /**
      * Display the
      * @Route("/sc/{project}/{username}", name="SimpleEditCounterResult")
-     * @param string $project The project domain name.
-     * @param string $username The username.
+     * @param Request $request The HTTP request.
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction($project, $username)
+    public function resultAction(Request $request)
     {
-        /** @var Project $project */
-        $project = ProjectRepository::getProject($project, $this->container);
-        $projectRepo = $project->getRepository();
-
-        if (!$project->exists()) {
-            $this->addFlash('notice', ['invalid-project', $project]);
-            return $this->redirectToRoute('SimpleEditCounter');
+        $ret = $this->validateProjectAndUser($request);
+        if ($ret instanceof RedirectResponse) {
+            return $ret;
+        } else {
+            list($project, $user) = $ret;
         }
 
-        $dbName = $project->getDatabaseName();
-
-        $userTable = $projectRepo->getTableName($dbName, 'user');
-        $archiveTable = $projectRepo->getTableName($dbName, 'archive');
-        $revisionTable = $projectRepo->getTableName($dbName, 'revision');
-        $userGroupsTable = $projectRepo->getTableName($dbName, 'user_groups');
+        $userTable = $project->getTableName('user');
+        $archiveTable = $project->getTableName('archive');
+        $revisionTable = $project->getTableName('revision');
+        $userGroupsTable = $project->getTableName('user_groups');
 
         /** @var Connection $conn */
         $conn = $this->get('doctrine')->getManager('replicas')->getConnection();
@@ -115,15 +105,9 @@ class SimpleEditCounterController extends Controller
                 WHERE user_name = :username
         ");
 
-        $user = new User($username);
-        $usernameParam = $user->getUsername();
-        $resultQuery->bindParam('username', $usernameParam);
+        $username = $user->getUsername();
+        $resultQuery->bindParam('username', $username);
         $resultQuery->execute();
-
-        if ($resultQuery->errorCode() > 0) {
-            $this->addFlash('notice', [ 'no-result', $username ]);
-            return $this->redirectToRoute('SimpleEditCounterProject', [ 'project' => $project->getDomain() ]);
-        }
 
         // Fetch the result data
         $results = $resultQuery->fetchAll();
@@ -153,7 +137,7 @@ class SimpleEditCounterController extends Controller
         // Unknown user - If the user is created the $results variable will have 3 entries.
         // This is a workaround to detect non-existent IPs.
         if (count($results) < 3 && $arch == 0 && $rev == 0) {
-            $this->addFlash('notice', [ 'no-result', $username ]);
+            $this->addFlash('notice', [ 'no-result', $username]);
 
             return $this->redirectToRoute('SimpleEditCounterProject', [ 'project' => $project->getDomain() ]);
         }

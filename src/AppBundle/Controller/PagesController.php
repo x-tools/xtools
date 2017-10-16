@@ -17,12 +17,13 @@ use Xtools\UserRepository;
 /**
  * This controller serves the Pages tool.
  */
-class PagesController extends Controller
+class PagesController extends XtoolsController
 {
 
     /**
      * Get the tool's shortname.
      * @return string
+     * @codeCoverageIgnore
      */
     public function getToolShortname()
     {
@@ -36,97 +37,49 @@ class PagesController extends Controller
      * @Route("/pages/", name="PagesSlash")
      * @Route("/pages/index.php", name="PagesIndexPhp")
      * @Route("/pages/{project}", name="PagesProject")
-     * @param string $project The project domain name.
+     * @param Request $request
      * @return Response
      */
-    public function indexAction($project = null)
+    public function indexAction(Request $request)
     {
-        // Grab the request object, grab the values out of it.
-        $request = Request::createFromGlobals();
+        $params = $this->parseQueryParams($request);
 
-        $projectQuery = $request->query->get('project');
-        $username = $request->query->get('username', $request->query->get('user'));
-        $namespace = $request->query->get('namespace');
-        $redirects = $request->query->get('redirects');
-
-        // if values for required parameters are present, redirect to result action
-        if ($projectQuery != "" && $username != "" && $namespace != "" && $redirects != "") {
-            return $this->redirectToRoute("PagesResult", [
-                'project'=>$projectQuery,
-                'username' => $username,
-                'namespace'=>$namespace,
-                'redirects'=>$redirects,
-            ]);
-        } elseif ($projectQuery != "" && $username != "" && $namespace != "") {
-            return $this->redirectToRoute("PagesResult", [
-                'project'=>$projectQuery,
-                'username' => $username,
-                'namespace'=>$namespace,
-            ]);
-        } elseif ($projectQuery != "" && $username != "" && $redirects != "") {
-            return $this->redirectToRoute("PagesResult", [
-                'project'=>$projectQuery,
-                'username' => $username,
-                'redirects'=>$redirects,
-            ]);
-        } elseif ($projectQuery != "" && $username != "") {
-            return $this->redirectToRoute("PagesResult", [
-                'project'=>$projectQuery,
-                'username' => $username,
-            ]);
-        } elseif ($projectQuery != "") {
-            return $this->redirectToRoute("PagesProject", [ 'project'=>$projectQuery ]);
+        // Redirect if at minimum project and username are given.
+        if (isset($params['project']) && isset($params['username'])) {
+            return $this->redirectToRoute('PagesResult', $params);
         }
 
-        // set default wiki so we can populate the namespace selector
-        if (empty($project)) {
-            $project = $this->getParameter('default_project');
-        }
-
-        $projectData = ProjectRepository::getProject($project, $this->container);
-
-        $namespaces = null;
-
-        if ($projectData->exists()) {
-            $namespaces = $projectData->getNamespaces();
-        }
+        // Convert the given project (or default project) into a Project instance.
+        $params['project'] = $this->getProjectFromQuery($params);
 
         // Otherwise fall through.
-        return $this->render('pages/index.html.twig', [
+        return $this->render('pages/index.html.twig', array_merge([
             'xtPageTitle' => 'tool-pages',
             'xtSubtitle' => 'tool-pages-desc',
             'xtPage' => 'pages',
-            'project' => $projectData,
-            'namespaces' => $namespaces,
-        ]);
+
+            // Defaults that will get overriden if in $params.
+            'namespace' => 0,
+            'redirects' => 'noredirects',
+        ], $params));
     }
 
     /**
      * Display the results.
      * @Route("/pages/{project}/{username}/{namespace}/{redirects}", name="PagesResult")
-     * @param string $project The project domain name.
-     * @param string $username The username.
+     * @param Request $request
      * @param string $namespace The ID of the namespace.
      * @param string $redirects Whether to follow redirects or not.
      * @return RedirectResponse|Response
      * @codeCoverageIgnore
      */
-    public function resultAction($project, $username, $namespace = '0', $redirects = 'noredirects')
+    public function resultAction(Request $request, $namespace = '0', $redirects = 'noredirects')
     {
-        $user = UserRepository::getUser($username, $this->container);
-        $username = $user->getUsername(); // use normalized user name
-
-        $projectData = ProjectRepository::getProject($project, $this->container);
-        $projectRepo = $projectData->getRepository();
-
-        // If the project exists, actually populate the values
-        if (!$projectData->exists()) {
-            $this->addFlash('notice', ['invalid-project', $project]);
-            return $this->redirectToRoute('pages');
-        }
-        if (!$user->existsOnProject($projectData)) {
-            $this->addFlash('notice', ['user-not-found']);
-            return $this->redirectToRoute('pages');
+        $ret = $this->validateProjectAndUser($request, 'topedits');
+        if ($ret instanceof RedirectResponse) {
+            return $ret;
+        } else {
+            list($projectData, $user) = $ret;
         }
 
         // what columns to show in namespace totals table
@@ -146,7 +99,7 @@ class PagesController extends Controller
 
         $result = $user->getRepository()->getPagesCreated($projectData, $user, $namespace, $redirects);
 
-        $hasPageAssessments = $projectRepo->isLabs() && $projectData->hasPageAssessments();
+        $hasPageAssessments = $projectData->hasPageAssessments();
         $pagesByNamespaceByDate = [];
         $pageTitles = [];
         $countsByNamespace = [];
@@ -204,11 +157,6 @@ class PagesController extends Controller
             }
         }
 
-        if ($total < 1) {
-            $this->addFlash('notice', [ 'no-result', $username ]);
-            return $this->redirectToRoute('PagesProject', [ 'project' => $project ]);
-        }
-
         ksort($pagesByNamespaceByDate);
         ksort($countsByNamespace);
 
@@ -222,7 +170,7 @@ class PagesController extends Controller
         // Assign the values and display the template
         return $this->render('pages/result.html.twig', [
             'xtPage' => 'pages',
-            'xtTitle' => $username,
+            'xtTitle' => $user->getUsername(),
             'project' => $projectData,
             'user' => $user,
             'namespace' => $namespace,

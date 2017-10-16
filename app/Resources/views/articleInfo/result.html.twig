@@ -753,7 +753,7 @@
         {% endif %}
 
         {# ======================== ASSESSMENTS ======================== #}
-        {% if ai.assessments %}
+        {% if ai.assessments and not (page.isMainPage) %}
         {% set content %}
             <table class="table table-bordered table-hover table-striped assessments-table">
                 <thead><tr>
