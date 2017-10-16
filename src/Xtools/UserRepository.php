@@ -240,11 +240,9 @@ class UserRepository extends Repository
         if ($userId == 0) { // IP Editor or undefined username.
             $whereRev = " rev_user_text = '$username' AND rev_user = '0' ";
             $whereArc = " ar_user_text = '$username' AND ar_user = '0' ";
-            $having = " rev_user_text = '$username' ";
         } else {
             $whereRev = " rev_user = '$userId' AND rev_timestamp > 1 ";
             $whereArc = " ar_user = '$userId' AND ar_timestamp > 1 ";
-            $having = " rev_user = '$userId' ";
         }
 
         $hasPageAssessments = $this->isLabs() && $project->hasPageAssessments();
@@ -277,7 +275,7 @@ class UserRepository extends Repository
                 LEFT JOIN $logTable ON log_namespace = ar_namespace AND log_title = ar_title
                     AND log_user = ar_user AND (log_action = 'move' OR log_action = 'move_redir')
                     AND log_type = 'move'
-                WHERE $whereArc AND ar_parent_id = '0' AND ar_namespace = '0' AND log_action IS NULL
+                WHERE $whereArc AND ar_parent_id = '0' AND $namespaceConditionArc AND log_action IS NULL
                 GROUP BY ar_namespace, ar_title
             )";
 
