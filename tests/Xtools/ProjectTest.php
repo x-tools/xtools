@@ -261,4 +261,33 @@ class ProjectTest extends PHPUnit_Framework_TestCase
             [$optedInProjects, 'project3', false],
         ];
     }
+
+    /**
+     * Getting a list of the users within specific user groups.
+     */
+    public function testUsersInGroups()
+    {
+        $projectRepo = $this->getMock(ProjectRepository::class);
+        $projectRepo->expects($this->once())
+            ->method('getUsersInGroups')
+            ->willReturn([
+                ['user_name' => 'Bob', 'ug_group' => 'sysop'],
+                ['user_name' => 'Bob', 'ug_group' => 'checkuser'],
+                ['user_name' => 'Julie', 'ug_group' => 'sysop'],
+                ['user_name' => 'Herald', 'ug_group' => 'oversight'],
+                ['user_name' => 'Isosceles', 'ug_group' => 'oversight'],
+                ['user_name' => 'Isosceles', 'ug_group' => 'sysop'],
+            ]);
+        $project = new Project('testWiki');
+        $project->setRepository($projectRepo);
+        $this->assertEquals(
+            [
+                'Bob' => ['sysop', 'checkuser'],
+                'Julie' => ['sysop'],
+                'Herald' => ['oversight'],
+                'Isosceles' => ['oversight', 'sysop'],
+            ],
+            $project->getUsersInGroups(['sysop', 'oversight'])
+        );
+    }
 }

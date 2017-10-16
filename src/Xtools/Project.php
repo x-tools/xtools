@@ -221,6 +221,26 @@ class Project extends Model
     }
 
     /**
+     * Get a list of users who are in one of the given user groups.
+     * @param string[] User groups to search for.
+     * @return string[] User groups keyed by user name.
+     */
+    public function getUsersInGroups($groups)
+    {
+        $users = [];
+        $usersAndGroups = $this->getRepository()->getUsersInGroups($this, $groups);
+        foreach ($usersAndGroups as $userAndGroup) {
+            $username = $userAndGroup['user_name'];
+            if (isset($users[$username])) {
+                array_push($users[$username], $userAndGroup['ug_group']);
+            } else {
+                $users[$username] = [$userAndGroup['ug_group']];
+            }
+        }
+        return $users;
+    }
+
+    /**
      * Get the name of the page on this project that the user must create in order to opt in for
      * restricted statistics display.
      * @param User $user

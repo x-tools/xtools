@@ -11,7 +11,11 @@ namespace AppBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Xtools\AdminStats;
+use Xtools\AdminStatsRepository;
 use Xtools\ProjectRepository;
 
 /**
@@ -24,6 +28,12 @@ use Xtools\ProjectRepository;
  */
 class AdminStatsController extends XtoolsController
 {
+    /** @var Project The project being queried. */
+    protected $project;
+
+    /** @var AdminStats The admin stats instance that does all the work. */
+    protected $adminStats;
+
     /**
      * Get the tool's shortname.
      * @return string
@@ -32,6 +42,35 @@ class AdminStatsController extends XtoolsController
     public function getToolShortname()
     {
         return 'adminstats';
+    }
+
+    /**
+     * Every action in this controller (other than 'index') calls this first.
+     * If a response is returned, the calling action is expected to return it.
+     * @param string $project
+     * @param string $start
+     * @param string $end
+     * @return AdminStats|RedirectResponse
+     */
+    public function setUpAdminStats($project, $start = null, $end = null)
+    {
+        // Load the database information for the tool.
+        // $projectData will be a redirect if the project is invalid.
+        $projectData = $this->validateProject($project);
+        if ($projectData instanceof RedirectResponse) {
+            return $projectData;
+        }
+        $this->project = $projectData;
+
+        list($start, $end) = $this->getUTCFromDateParams($start, $end);
+
+        $this->adminStats = new AdminStats($this->project, $start, $end);
+        $adminStatsRepo = new AdminStatsRepository();
+        $adminStatsRepo->setContainer($this->container);
+        $this->adminStats->setRepository($adminStatsRepo);
+
+        // For testing purposes.
+        return $this->adminStats;
     }
 
     /**
@@ -83,156 +122,79 @@ class AdminStatsController extends XtoolsController
      */
     public function resultAction(Request $request, $project, $start = null, $end = null)
     {
-        // Load the database information for the tool.
-        // $projectData will be a redirect if the project is invalid.
-        $projectData = $this->validateProject($project);
-        if ($projectData instanceof RedirectResponse) {
-            return $projectData;
+        $ret = $this->setUpAdminStats($project, $start, $end);
+        if ($ret instanceof RedirectResponse) {
+            return $ret;
         }
 
-        list($start, $end) = $this->getUTCFromDateParams($start, $end);
-
-        // Initialize variables - prevents variable undefined errors
-        $adminIdArr = [];
-        $adminsWithoutAction = 0;
-        $adminsWithoutActionPct = 0;
-
-        // Pull the API helper and database. Then check if we can use this tool
-        $api = $this->get('app.api_helper');
-        $conn = $this->get('doctrine')->getManager('replicas')->getConnection();
-
-        // Generate a diff for the dates - this is the number of days we're spanning.
-        $days = ($end - $start) / 60 / 60 / 24;
-
-        // Get admin ID's, used to account for inactive admins
-        $userGroupsTable = $projectData->getTableName('user_groups');
-        $ufgTable = $projectData->getTableName('user_former_groups');
-        $query = "
-            SELECT ug_user AS user_id
-            FROM $userGroupsTable
-            WHERE ug_group = 'sysop'
-            UNION
-            SELECT ufg_user AS user_id
-            FROM $ufgTable
-            WHERE ufg_group = 'sysop'
-            ";
-
-        $res = $conn->prepare($query);
-        $res->execute();
-
-        // Iterate over query results, loading each user id into the array
-        while ($row = $res->fetch()) {
-            $adminIdArr[] = $row['user_id'] ;
-        }
-
-        // Set the query results to be useful in a sql statement.
-        $adminIds = implode(',', $adminIdArr);
-
-        // Load up the tables we need and run the mega query.
-        // This query provides all of the statistics
-        $userTable = $projectData->getTableName('user');
-        $loggingTable = $projectData->getTableName('logging', 'userindex');
-
-        $startDb = date('Ymd000000', $start);
-        $endDb = date('Ymd235959', $end);
-
-        // TODO: Fix this - inactive admins aren't getting shown
-        $query = "
-            SELECT user_name, user_id,
-                SUM(IF( (log_type = 'delete'  AND log_action != 'restore'),1,0)) AS mdelete,
-                SUM(IF( (log_type = 'delete'  AND log_action  = 'restore'),1,0)) AS mrestore,
-                SUM(IF( (log_type = 'block'   AND log_action != 'unblock'),1,0)) AS mblock,
-                SUM(IF( (log_type = 'block'   AND log_action  = 'unblock'),1,0)) AS munblock,
-                SUM(IF( (log_type = 'protect' AND log_action != 'unprotect'),1,0)) AS mprotect,
-                SUM(IF( (log_type = 'protect' AND log_action  = 'unprotect'),1,0)) AS munprotect,
-                SUM(IF( log_type  = 'rights',1,0)) AS mrights,
-                SUM(IF( log_type  = 'import',1,0)) AS mimport,
-                SUM(IF(log_type  != '',1,0)) AS mtotal
-            FROM $loggingTable
-            JOIN $userTable ON user_id = log_user
-            WHERE log_timestamp > '$startDb' AND log_timestamp <= '$endDb'
-              AND log_type IS NOT NULL
-              AND log_action IS NOT NULL
-              AND log_type IN ('block', 'delete', 'protect', 'import', 'rights')
-            GROUP BY user_name
-            HAVING mdelete > 0 OR user_id IN ($adminIds)
-            ORDER BY mtotal DESC";
-
-        $res = $conn->prepare($query);
-        $res->execute();
-
-        // Fetch all the information out.  Because of pre-processing done
-        // in the query, we can use this practically raw.
-        $users = $res->fetchAll();
-
-        // Pull the admins from the API, for merging.
-        $admins = $api->getAdmins($project);
-
-        // Get the total number of admins, the number of admins without
-        // action, and then later we'll run percentage calculations
-        $adminCount = count($admins);
-
-        // Combine the two arrays.  We can't use array_merge here because
-        // the arrays contain fundamentally different data.  Instead, it's
-        // done by hand.  Only two values are needed, edit count and groups.
-        foreach ($users as $key => $value) {
-            $username = $value['user_name'];
-
-            if (empty($admins[$username])) {
-                $admins[$username] = [
-                    'groups' => '',
-                ];
-            }
-            $users[$key]['groups'] = $admins[$username]['groups'];
-
-            if ($users[$key]['mtotal'] === 0) {
-                $adminsWithoutAction++;
-            }
-
-            unset($admins[$username]);
-        }
-
-        // push any inactive admins back to $users with zero values
-        if (count($admins)) {
-            foreach ($admins as $username => $stats) {
-                $users[] = [
-                    'user_name' => $username,
-                    'mdelete' => 0,
-                    'mrestore' => 0,
-                    'mblock' => 0,
-                    'munblock' => 0,
-                    'mprotect' => 0,
-                    'munprotect' => 0,
-                    'mrights' => 0,
-                    'mimport' => 0,
-                    'mtotal' => 0,
-                    'groups' => $stats['groups'],
-                ];
-                $adminsWithoutAction++;
-            }
-        }
-
-        if ($adminCount > 0) {
-            $adminsWithoutActionPct = ($adminsWithoutAction / $adminCount) * 100;
-        }
+        $this->adminStats->prepareStats();
 
         // Render the result!
         return $this->render('adminStats/result.html.twig', [
             'xtPage' => 'adminstats',
-            'xtTitle' => $project,
-
-            'project' => $projectData,
-
-            'start_date' => date('Y-m-d', $start),
-            'end_date' => date('Y-m-d', $end),
-            'days' => $days,
-
-            'adminsWithoutAction' => $adminsWithoutAction,
-            'admins_without_action_pct' => $adminsWithoutActionPct,
-            'adminCount' => $adminCount,
-
-            'users' => $users,
-            'usersCount' => count($users),
+            'xtTitle' => $this->project->getDomain(),
+            'project' => $this->project,
+            'as' => $this->adminStats,
         ]);
+    }
+
+    /************************ API endpoints ************************/
+
+    /**
+     * Get users of the project that are capable of making 'admin actions',
+     * keyed by user name with a list of the relevant user groups as the values.
+     * @Route("/api/project/admins_groups/{project}", name="ProjectApiAdminsGroups")
+     * @param string $project Project domain or database name.
+     * @return Response
+     * @codeCoverageIgnore
+     */
+    public function adminsGroupsApiAction($project)
+    {
+        $ret = $this->setUpAdminStats($project);
+        if ($ret instanceof RedirectResponse) {
+            return $ret;
+        }
+
+        return new JsonResponse(
+            $this->adminStats->getAdminsAndGroups(false),
+            Response::HTTP_OK
+        );
+    }
+
+    /**
+     * Get users of the project that are capable of making 'admin actions',
+     * along with various stats about which actions they took. Time period is limited
+     * to one month.
+     * @Route("/api/project/adminstats/{project}/{days}", name="ProjectApiAdminStats")
+     * @param string $project Project domain or database name.
+     * @param int $days Number of days from present to grab data for. Maximum 30.
+     * @return Response
+     * @codeCoverageIgnore
+     */
+    public function adminStatsApiAction($project, $days = 30)
+    {
+        // Maximum 30 days.
+        $days = min((int) $days, 30);
+        $start = date('Y-m-d', strtotime("-$days days"));
+        $end = date('Y-m-d');
+
+        $ret = $this->setUpAdminStats($project, $start, $end);
+        if ($ret instanceof RedirectResponse) {
+            return $ret;
+        }
+
+        $this->adminStats->prepareStats(false);
+
+        $response = [
+            'project' => $this->project->getDomain(),
+            'start' => $this->adminStats->getStart(),
+            'end' => $this->adminStats->getEnd(),
+            'users' => $this->adminStats->getStats(false),
+        ];
+
+        return new JsonResponse(
+            $response,
+            Response::HTTP_OK
+        );
     }
 }

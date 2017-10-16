@@ -9,8 +9,7 @@ use Symfony\Component\DependencyInjection\Container;
 use DateTime;
 
 /**
- * TopEdits returns the top-edited pages by a user. There is not a separate
- * repository because there is only one query :)
+ * TopEdits returns the top-edited pages by a user.
  */
 class TopEdits extends Model
 {

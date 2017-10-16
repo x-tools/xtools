@@ -345,6 +345,43 @@ class ProjectRepository extends Repository
     }
 
     /**
+     * Get a list of users who are in one of the given user groups.
+     * @param  Project $project
+     * @param  string[] List of user groups to look for.
+     * @return string[] with keys 'user_name' and 'ug_group'
+     */
+    public function getUsersInGroups(Project $project, $groups)
+    {
+        $cacheKey = 'usersInGroups.'.$project->getDatabaseName().md5(join($groups));
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $userTable = $project->getTableName('user');
+        $userGroupsTable = $project->getTableName('user_groups');
+
+        $query = $this->getProjectsConnection()->createQueryBuilder();
+        $query->select(['user_name', 'ug_group'])
+            ->from($userTable)
+            ->join($userTable, $userGroupsTable, null, 'ug_user = user_id')
+            ->where($query->expr()->in('ug_group', ':groups'))
+            ->groupBy('user_name, ug_group')
+            ->setParameter(
+                'groups',
+                $groups,
+                \Doctrine\DBAL\Connection::PARAM_STR_ARRAY
+            );
+        $admins = $query->execute()->fetchAll();
+
+        $cacheItem = $this->cache->getItem($cacheKey);
+        $cacheItem->set($admins)
+            ->expiresAfter(new \DateInterval('PT1H'));
+        $this->cache->save($cacheItem);
+
+        return $admins;
+    }
+
+    /**
      * Get page assessments configuration for this project
      *   and cache in static variable.
      * @param string $projectDomain The project domain such as en.wikipedia.org
