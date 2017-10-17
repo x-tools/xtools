@@ -1,5 +1,18 @@
 # Release Notes #
 
+## 3.1.13 ##
+- Major refactoring of controllers, standardizing parsing and decoding of
+  URL parameters.
+- T178203: Speed up Pages Created query, and improve detection of pages
+  created that have since been deleted.
+- Show "no contributions found" on result pages rather than redirect to index.
+- T175763: Cache results of ArticleInfo API if the query took an usual
+  amount of time to finish.
+- Major refactor of AdminStats, and improvements to ensure only report users
+  who were at some point in a qualifying user group (with admin-like actions).
+- New AdminStats API endpoint.
+- Improved test coverage.
+
 ## 3.1.12 ##
 - T177883: Improve TopEdits and Edit Counter performance by collecting
   top-edited pages across all namespaces with a single query.
