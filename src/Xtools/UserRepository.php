@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * This class provides data for the User class.
+ * @codeCoverageIgnore
  */
 class UserRepository extends Repository
 {

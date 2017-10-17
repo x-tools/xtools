@@ -11,6 +11,7 @@ use GuzzleHttp;
 
 /**
  * A PagesRepository fetches data about Pages, either singularly or for multiple.
+ * @codeCoverageIgnore
  */
 class PagesRepository extends Repository
 {

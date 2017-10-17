@@ -11,6 +11,7 @@ use Psr\Container\ContainerInterface;
 
 /**
  * This class provides data to the Project class.
+ * @codeCoverageIgnore
  */
 class ProjectRepository extends Repository
 {

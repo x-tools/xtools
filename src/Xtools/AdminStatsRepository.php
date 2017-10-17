@@ -12,6 +12,7 @@ use Mediawiki\Api\SimpleRequest;
 /**
  * AdminStatsRepository is responsible for retrieving data from the database
  * about users with administrative rights on a given wiki.
+ * @codeCoverageIgnore
  */
 class AdminStatsRepository extends Repository
 {
