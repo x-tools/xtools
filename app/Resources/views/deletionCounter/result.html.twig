@@ -4,59 +4,59 @@
 {% import 'macros/pieChart.html.twig' as chart %}
 
 {% block body %}
-<div class="panel panel-primary">
-    {{ layout.userHeading(user, project, xtPage) }}
+    <div class="panel panel-primary">
+        {{ layout.userHeading(user, project, xtPage) }}
 
-    <div class="panel-body xt-panel-body">
-        {{ wiki.userLinks(user, project, xtPage) }}
+        <div class="panel-body xt-panel-body">
+            {{ wiki.userLinks(user, project, xtPage) }}
 
-        {% set content %}
-            <div class="col-lg-6">
-            <table class="table table-bordered table-hover table-striped xt-show-hide--target">
-                <thead>
-                <tr>
-                    <th>{{ msg("deletion-process") }}</th>
-                    <th>{{ msg("count") }}</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for key, value in results %}
-                    <tr>
-                        <td>{{ key }}</td>
-                        <td>{{ value|number_format }}</td>
-                    </tr>
-                {% endfor %}
-                <tr>
-                    <td>
-                        <b>{{ msg("total") }}</b>
-                    </td>
-                    <td>
-                        <b>{{ total|number_format }}</b>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="col-lg-6">
-            {% if total > 0 %}
+            {% set content %}
+                <div class="col-lg-6">
+                    <table class="table table-bordered table-hover table-striped">
+                        <thead>
+                        <tr>
+                            <th>{{ msg("type") }}</th>
+                            <th>{{ msg("count") }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for key, value in results %}
+                            <tr>
+                                <td>{{ key }}</td>
+                                <td>{{ value|number_format }}</td>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <td>
+                                <b>{{ msg("total") }}</b>
+                            </td>
+                            <td>
+                                <b>{{ total|number_format }}</b>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-lg-6">
+                    {% if total > 0 %}
 
-            {% set code = {} %}
+                        {% set code = {} %}
 
-            {% for key, value in results %}
-                {% set code = code|merge ( { (key): {
-                        "label": key,
-                        "value": value,
-                        "percentage": (value / total) * 100
-                }} ) %}
-            {% endfor %}
-                <div style="clear:both"></div>
-            <div class="basic-info-charts col-lg-12 clearfix">
-        {{ chart.pie_chart('percent', code) }}
-            </div>
-            {% endif %}
-                {% endset %}
+                        {% for key, value in results %}
+                            {% set code = code|merge ( { (key): {
+                            "label": key,
+                            "value": value,
+                            "percentage": (value / total) * 100
+                            }} ) %}
+                        {% endfor %}
+                        <div style="clear:both"></div>
+                        <div class="basic-info-charts col-lg-12 clearfix">
+                            {{ chart.pie_chart('percent', code) }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endset %}
             {{ layout.content_block('tool-dc-desc', content) }}
         </div>
     </div>
-</div>
 {% endblock %}

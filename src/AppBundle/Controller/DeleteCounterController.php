@@ -1,6 +1,6 @@
 <?php
 /**
- * This file contains only the DeletionCounter class.
+ * This file contains only the DeleteCounterController class.
  */
 
 namespace AppBundle\Controller;
@@ -16,7 +16,7 @@ use Xtools\User;
 use Xtools\UserRepository;
 
 /**
- * This controller handles the Simple Edit Counter tool.
+ * This controller handles the Delete Counter tool.
  */
 class DeleteCounterController extends Controller
 {
@@ -32,7 +32,7 @@ class DeleteCounterController extends Controller
     }
 
     /**
-     * The Simple Edit Counter search form.
+     * The Delete Counter Counter search form.
      *
      * @param Request $request The HTTP request.
      * @param string  $project The project database name or domain.

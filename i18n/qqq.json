@@ -67,7 +67,6 @@
 	"delete": "Name of a MediaWiki log action, used as header of a row in the table of log action counts for a user.\n{{Identical|Delete}}",
 	"deleted": "Deleted in the context of deleted text or deleted edits.\n{{Identical|Deleted}}",
 	"deleted-edits": "Deleted edits of a user",
-	"deletion-process": "On-wiki process by which an edit was deleted.",
 	"diff": "Link to a MediaWiki diff on a wiki\n{{Identical|Diff}}",
 	"documentation": "The word documentation. This is used as the text for a link to a documentation page.\n{{Identical|Documentation}}",
 	"edit": "Link to edit a page\n{{Identical|Edit}}",
