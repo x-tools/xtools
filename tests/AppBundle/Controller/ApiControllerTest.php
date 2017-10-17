@@ -144,37 +144,4 @@ class ApiControllerTest extends WebTestCase
         $response = $this->client->getResponse();
         $this->assertEquals(403, $response->getStatusCode());
     }
-
-    /**
-     * articleinfo endpoint, used for the XTools gadget
-     */
-    public function testArticleInfo()
-    {
-        if (!$this->isSingle && $this->container->getParameter('app.is_labs')) {
-            $crawler = $this->client->request('GET', '/api/page/articleinfo/en.wikipedia.org/Main_Page');
-
-            $response = $this->client->getResponse();
-            $this->assertEquals(200, $response->getStatusCode());
-
-            $data = json_decode($response->getContent(), true);
-
-            // Some basic tests that should always hold true
-            $this->assertEquals($data['project'], 'en.wikipedia.org');
-            $this->assertEquals($data['page'], 'Main Page');
-            $this->assertTrue($data['revisions'] > 4000);
-            $this->assertTrue($data['editors'] > 400);
-            $this->assertEquals($data['author'], 'TwoOneTwo');
-            $this->assertEquals($data['created_at'], '2002-01-26');
-            $this->assertEquals($data['created_rev_id'], 139992);
-
-            $this->assertEquals(
-                [
-                    'project', 'page', 'revisions', 'editors', 'author', 'author_editcount',
-                    'created_at', 'created_rev_id', 'modified_at', 'secs_since_last_edit',
-                    'last_edit_id', 'watchers', 'pageviews', 'pageviews_offset',
-                ],
-                array_keys($data)
-            );
-        }
-    }
 }

@@ -10,12 +10,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Xtools\ProjectRepository;
 use Xtools\Page;
 use Xtools\PagesRepository;
 use Xtools\ArticleInfo;
+use DateTime;
 
 /**
  * This controller serves the search form and results for the ArticleInfo tool
@@ -174,5 +177,87 @@ class ArticleInfoController extends XtoolsController
         }
 
         return $response;
+    }
+
+    /************************ API endpoints ************************/
+
+    /**
+     * Get basic info on a given article.
+     * @Route("/api/articleinfo/{project}/{article}", requirements={"article"=".+"})
+     * @Route("/api/page/articleinfo/{project}/{article}", requirements={"article"=".+"})
+     * @param Request $request The HTTP request.
+     * @param string $project
+     * @param string $article
+     * @return View
+     * See ArticleInfoControllerTest::testArticleInfoApi()
+     * @codeCoverageIgnore
+     */
+    public function articleInfoApiAction(Request $request, $project, $article)
+    {
+        /** @var integer Number of days to query for pageviews */
+        $pageviewsOffset = 30;
+
+        $project = ProjectRepository::getProject($project, $this->container);
+        if (!$project->exists()) {
+            return new JsonResponse(
+                ['error' => "$project is not a valid project"],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $page = $this->getAndValidatePage($project, $article);
+        if ($page instanceof RedirectResponse) {
+            return new JsonResponse(
+                ['error' => "$article was not found"],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $info = $page->getBasicEditingInfo();
+        $creationDateTime = DateTime::createFromFormat('YmdHis', $info['created_at']);
+        $modifiedDateTime = DateTime::createFromFormat('YmdHis', $info['modified_at']);
+        $secsSinceLastEdit = (new DateTime)->getTimestamp() - $modifiedDateTime->getTimestamp();
+
+        $data = [
+            'revisions' => (int) $info['num_edits'],
+            'editors' => (int) $info['num_editors'],
+            'author' => $info['author'],
+            'author_editcount' => (int) $info['author_editcount'],
+            'created_at' => $creationDateTime->format('Y-m-d'),
+            'created_rev_id' => $info['created_rev_id'],
+            'modified_at' => $modifiedDateTime->format('Y-m-d H:i'),
+            'secs_since_last_edit' => $secsSinceLastEdit,
+            'last_edit_id' => (int) $info['modified_rev_id'],
+            'watchers' => (int) $page->getWatchers(),
+            'pageviews' => $page->getLastPageviews($pageviewsOffset),
+            'pageviews_offset' => $pageviewsOffset,
+        ];
+
+        if ($request->query->get('format') === 'html') {
+            $response = $this->render('articleInfo/api.html.twig', [
+                'data' => $data,
+                'project' => $project,
+                'page' => $page,
+            ]);
+
+            // All /api routes by default respond with a JSON content type.
+            $response->headers->set('Content-Type', 'text/html');
+
+            // This endpoint is hit constantly and user could be browsing the same page over
+            // and over (popular noticeboard, for instance), so offload brief caching to browser.
+            $response->setClientTtl(350);
+
+            return $response;
+        }
+
+        $body = array_merge([
+            'project' => $project->getDomain(),
+            'page' => $page->getTitle(),
+        ], $data);
+
+        return new JsonResponse(
+            $body,
+            Response::HTTP_OK
+        );
     }
 }
