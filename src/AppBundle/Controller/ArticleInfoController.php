@@ -8,17 +8,15 @@ namespace AppBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Xtools\ProjectRepository;
-use Xtools\Page;
-use Xtools\PagesRepository;
 use Xtools\ArticleInfo;
 use DateTime;
+use Xtools\ArticleInfoRepository;
 
 /**
  * This controller serves the search form and results for the ArticleInfo tool
@@ -142,10 +140,13 @@ class ArticleInfoController extends XtoolsController
             return $page;
         }
 
+        $articleInfoRepo = new ArticleInfoRepository();
+        $articleInfoRepo->setContainer($this->container);
         $articleInfo = new ArticleInfo($page, $this->container);
+        $articleInfo->setRepository($articleInfoRepo);
+
         $articleInfo->prepareData();
 
-        $numRevisions = $articleInfo->getNumRevisions();
         $maxRevisions = $this->container->getParameter('app.max_page_revisions');
 
         // Show message if we hit the max revisions.
