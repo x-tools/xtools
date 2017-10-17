@@ -13,9 +13,6 @@ php:
 env:
   - IS_LABS=0
 
-before_install:
-  - pip install --user codecov
-
 install:
   - composer install
   - 'sed -i "s/app.is_labs: .*/app.is_labs: $IS_LABS/" app/config/parameters.yml'
@@ -25,7 +22,6 @@ script:
   - composer validate
   - ./vendor/bin/parallel-lint --exclude vendor .
   - ./vendor/bin/phpunit --coverage-clover=coverage.xml
-  - codecov
   - ./vendor/bin/phpcs -s .
   - php phpDocumentor.phar -d src -t docs/api --template="checkstyle"
   - ( ! grep --quiet "error" docs/api/checkstyle.xml )
