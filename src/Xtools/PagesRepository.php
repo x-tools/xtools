@@ -203,14 +203,19 @@ class PagesRepository extends Repository
      *   number of revisions, unique authors, initial author
      *   and edit count of the initial author.
      * This is combined into one query for better performance.
-     * Caching is intentionally disabled, because using the gadget,
-     *   this will get hit for a different page constantly, where
-     *   the likelihood of cache benefiting us is slim.
+     * Caching is only applied if it took considerable time to process,
+     *   because using the gadget, this will get hit for a different page
+     *   constantly, where the likelihood of cache benefiting us is slim.
      * @param Page $page The page.
      * @return string[]
      */
     public function getBasicEditingInfo(Page $page)
     {
+        $cacheKey = 'page.basicInfo.'.$page->getId();
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
         $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
         $userTable = $this->getTableName($page->getProject()->getDatabaseName(), 'user');
         $pageTable = $this->getTableName($page->getProject()->getDatabaseName(), 'page');
@@ -251,7 +256,23 @@ class PagesRepository extends Repository
                 );";
         $params = ['pageid' => $page->getId()];
         $conn = $this->getProjectsConnection();
-        return $conn->executeQuery($sql, $params)->fetch();
+
+        // Get current time so we can compare timestamps
+        // and decide whether or to cache the result.
+        $time1 = time();
+        $result = $conn->executeQuery($sql, $params)->fetch();
+        $time2 = time();
+
+        // If it took over 5 seconds, cache the result for 20 minutes.
+        if ($time2 - $time1 > 5) {
+            $cacheItem = $this->cache->getItem($cacheKey)
+                ->set($result)
+                ->expiresAfter(new DateInterval('PT20M'));
+            $this->cache->save($cacheItem);
+            $this->stopwatch->stop($cacheKey);
+        }
+
+        return $result;
     }
 
     /**
