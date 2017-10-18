@@ -134,6 +134,7 @@ class ArticleInfo extends Model
     /**
      * Shorthand to get the page's project.
      * @return Project
+     * @codeCoverageIgnore
      */
     public function getProject()
     {
@@ -196,20 +197,20 @@ class ArticleInfo extends Model
 
     /**
      * Fetch and store all the data we need to show the ArticleInfo view.
+     * @codeCoverageIgnore
      */
     public function prepareData()
     {
         $this->parseHistory();
         $this->setLogsEvents();
         $this->setTopTenCounts();
-        $this->bots = $this->getBotData();
     }
 
     /**
      * Get the number of editors that edited the page.
      * @return int
      */
-    public function numEditors()
+    public function getNumEditors()
     {
         return count($this->editors);
     }
@@ -218,9 +219,9 @@ class ArticleInfo extends Model
      * Get the number of bots that edited the page.
      * @return int
      */
-    public function numBots()
+    public function getNumBots()
     {
-        return count($this->bots);
+        return count($this->getBots());
     }
 
     /**
@@ -235,7 +236,8 @@ class ArticleInfo extends Model
         $dateFirst = $this->firstEdit->getTimestamp();
         $dateLast = $this->lastEdit->getTimestamp();
         $interval = date_diff($dateLast, $dateFirst, true);
-        return $interval->format('%a');
+        $this->totalDays = $interval->format('%a');
+        return $this->totalDays;
     }
 
     /**
@@ -244,7 +246,7 @@ class ArticleInfo extends Model
      */
     public function averageDaysPerEdit()
     {
-        return round($this->getTotalDays() / $this->getNumRevisions(), 1);
+        return round($this->getTotalDays() / $this->getNumRevisionsProcessed(), 1);
     }
 
     /**
@@ -254,7 +256,7 @@ class ArticleInfo extends Model
     public function editsPerDay()
     {
         $editsPerDay = $this->getTotalDays()
-            ? $this->getNumRevisions() / ($this->getTotalDays() / (365 / 12 / 24))
+            ? $this->getNumRevisionsProcessed() / ($this->getTotalDays() / (365 / 12 / 24))
             : 0;
         return round($editsPerDay, 1);
     }
@@ -266,9 +268,9 @@ class ArticleInfo extends Model
     public function editsPerMonth()
     {
         $editsPerMonth = $this->getTotalDays()
-            ? $this->getNumRevisions() / ($this->getTotalDays() / (365 / 12))
+            ? $this->getNumRevisionsProcessed() / ($this->getTotalDays() / (365 / 12))
             : 0;
-        return round($editsPerMonth, 1);
+        return min($this->getNumRevisionsProcessed(), round($editsPerMonth, 1));
     }
 
     /**
@@ -278,9 +280,9 @@ class ArticleInfo extends Model
     public function editsPerYear()
     {
         $editsPerYear = $this->getTotalDays()
-            ? $this->getNumRevisions() / ($this->getTotalDays() / 365)
+            ? $this->getNumRevisionsProcessed() / ($this->getTotalDays() / 365)
             : 0;
-        return round($editsPerYear, 1);
+        return min($this->getNumRevisionsProcessed(), round($editsPerYear, 1));
     }
 
     /**
@@ -289,7 +291,7 @@ class ArticleInfo extends Model
      */
     public function editsPerEditor()
     {
-        return round($this->getNumRevisions() / count($this->editors), 1);
+        return round($this->getNumRevisionsProcessed() / count($this->editors), 1);
     }
 
     /**
@@ -299,7 +301,7 @@ class ArticleInfo extends Model
     public function minorPercentage()
     {
         return round(
-            ($this->minorCount / $this->getNumRevisions()) * 100,
+            ($this->minorCount / $this->getNumRevisionsProcessed()) * 100,
             1
         );
     }
@@ -311,7 +313,7 @@ class ArticleInfo extends Model
     public function anonPercentage()
     {
         return round(
-            ($this->anonCount / $this->getNumRevisions()) * 100,
+            ($this->anonCount / $this->getNumRevisionsProcessed()) * 100,
             1
         );
     }
@@ -322,7 +324,7 @@ class ArticleInfo extends Model
      */
     public function topTenPercentage()
     {
-        return round(($this->topTenCount / $this->getNumRevisions()) * 100, 1);
+        return round(($this->topTenCount / $this->getNumRevisionsProcessed()) * 100, 1);
     }
 
     /**
@@ -339,6 +341,7 @@ class ArticleInfo extends Model
      * Get the page assessments of the page.
      * @see https://www.mediawiki.org/wiki/Extension:PageAssessments
      * @return string[]|false False if unsupported.
+     * @codeCoverageIgnore
      */
     public function getAssessments()
     {
@@ -382,15 +385,6 @@ class ArticleInfo extends Model
     public function getMinorCount()
     {
         return $this->minorCount;
-    }
-
-    /**
-     * Get the number edits to the page made by bots.
-     * @return int
-     */
-    public function getBotRevisionCount()
-    {
-        return $this->botRevisionCount;
     }
 
     /**
@@ -472,15 +466,6 @@ class ArticleInfo extends Model
     public function topTenEditorsByAdded()
     {
         return $this->topTenEditorsByAdded;
-    }
-
-    /**
-     * Get the list of bots that edited the page, including various statistics.
-     * @return mixed[]
-     */
-    public function getBots()
-    {
-        return $this->bots;
     }
 
     /**
@@ -574,6 +559,7 @@ class ArticleInfo extends Model
      * Get the number of external, incoming and outgoing links, along with
      * the number of redirects to the page.
      * @return int
+     * @codeCoverageIgnore
      */
     private function getLinksAndRedirects()
     {
@@ -585,9 +571,11 @@ class ArticleInfo extends Model
 
     /**
      * Parse the revision history, collecting our core statistics.
-     * @todo Break this out into separate functions, perhaps with the loop body
-     *   as a separate class.
      * @return mixed[] Associative "master" array of metadata about the page.
+     *
+     * Untestable because it relies on getting a PDO statement. All the important
+     * logic lives in other methods which are tested.
+     * @codeCoverageIgnore
      */
     private function parseHistory()
     {
@@ -596,217 +584,47 @@ class ArticleInfo extends Model
         } else {
             $limit = null;
         }
+
         // Third parameter is ignored if $limit is null.
         $revStmt = $this->page->getRevisionsStmt(null, $limit, $this->getNumRevisions());
         $revCount = 0;
 
-        /** @var Edit|null The previous edit, used to discount content that was reverted */
-        $prevEdit = null;
-
         /**
-         * The edit previously deemed as having the maximum amount of content added.
-         * This is used to discount content that was reverted.
-         * @var Edit|null
-        */
-        $prevMaxAddEdit = null;
-
-        /**
-         * The edit previously deemed as having the maximum amount of content deleted.
-         * This is used to discount content that was reverted
-         * @var Edit|null
+         * Data about previous edits so that we can use them as a basis for comparison.
+         * @var Edit[]
          */
-        $prevMaxDelEdit = null;
+        $prevEdits = [
+            // The previous Edit, used to discount content that was reverted.
+            'prev' => null,
 
-        /** @var Time|null Time of first revision, used as a comparison for month counts */
-        $firstEditMonth = null;
+            // The last edit deemed to be the max addition of content. This is kept track of
+            // in case we find out the next edit was reverted (and was also a max edit),
+            // in which case we'll want to discount it and use this one instead.
+            'maxAddition' => null,
+
+            // Same as with maxAddition, except the maximum amount of content deleted.
+            // This is used to discount content that was reverted.
+            'maxDeletion' => null,
+        ];
 
         while ($rev = $revStmt->fetch()) {
             $edit = new Edit($this->page, $rev);
 
-            // Some shorthands
-            $editYear = $edit->getYear();
-            $editMonth = $edit->getMonth();
-            $editTimestamp = $edit->getTimestamp();
-
-            // Don't return actual edit size if last revision had a length of null.
-            // This happens when the edit follows other edits that were revision-deleted.
-            // See T148857 for more information.
-            // @TODO: Remove once T101631 is resolved
-            if ($prevEdit && $prevEdit->getLength() === null) {
-                $editSize = 0;
-            } else {
-                $editSize = $edit->getSize();
-            }
-
             if ($revCount === 0) {
                 $this->firstEdit = $edit;
-                $firstEditMonth = mktime(0, 0, 0, (int) $this->firstEdit->getMonth(), 1, $this->firstEdit->getYear());
             }
 
-            $username = $edit->getUser()->getUsername();
-
             // Sometimes, with old revisions (2001 era), the revisions from 2002 come before 2001
-            if ($editTimestamp < $this->firstEdit->getTimestamp()) {
+            if ($edit->getTimestamp() < $this->firstEdit->getTimestamp()) {
                 $this->firstEdit = $edit;
             }
 
-            // Fill in the blank arrays for the year and 12 months
-            if (!isset($this->yearMonthCounts[$editYear])) {
-                $this->yearMonthCounts[$editYear] = [
-                    'all' => 0,
-                    'minor' => 0,
-                    'anon' => 0,
-                    'automated' => 0,
-                    'size' => 0, // keep track of the size by the end of the year
-                    'events' => [],
-                    'months' => [],
-                ];
-
-                for ($i = 1; $i <= 12; $i++) {
-                    $timeObj = mktime(0, 0, 0, $i, 1, $editYear);
-
-                    // don't show zeros for months before the first edit or after the current month
-                    if ($timeObj < $firstEditMonth || $timeObj > strtotime('last day of this month')) {
-                        continue;
-                    }
-
-                    $this->yearMonthCounts[$editYear]['months'][sprintf('%02d', $i)] = [
-                        'all' => 0,
-                        'minor' => 0,
-                        'anon' => 0,
-                        'automated' => 0,
-                    ];
-                }
-            }
-
-            // Increment year and month counts for all edits
-            $this->yearMonthCounts[$editYear]['all']++;
-            $this->yearMonthCounts[$editYear]['months'][$editMonth]['all']++;
-            // This will ultimately be the size of the page by the end of the year
-            $this->yearMonthCounts[$editYear]['size'] = $edit->getLength();
-
-            // Keep track of which month had the most edits
-            $editsThisMonth = $this->yearMonthCounts[$editYear]['months'][$editMonth]['all'];
-            if ($editsThisMonth > $this->maxEditsPerMonth) {
-                $this->maxEditsPerMonth = $editsThisMonth;
-            }
-
-            // Initialize various user stats
-            if (!isset($this->editors[$username])) {
-                $this->editors[$username] = [
-                    'all' => 0,
-                    'minor' => 0,
-                    'minorPercentage' => 0,
-                    'first' => $editTimestamp,
-                    'firstId' => $edit->getId(),
-                    'last' => null,
-                    'atbe' => null,
-                    'added' => 0,
-                    'sizes' => [],
-                ];
-            }
-
-            // Increment user counts
-            $this->editors[$username]['all']++;
-            $this->editors[$username]['last'] = $editTimestamp;
-            $this->editors[$username]['lastId'] = $edit->getId();
-
-            // Store number of KB added with this edit
-            $this->editors[$username]['sizes'][] = $edit->getLength() / 1024;
-
-            // Check if it was a revert
-            if ($edit->isRevert($this->container)) {
-                $this->revertCount++;
-
-                // Since this was a revert, we don't want to treat the previous
-                //   edit as legit content addition or removal
-                if ($prevEdit && $prevEdit->getSize() > 0) {
-                    $this->addedBytes -= $prevEdit->getSize();
-                }
-
-                // @TODO: Test this against an edit war (use your sandbox)
-                // Also remove as max added or deleted, if applicable
-                if ($this->maxAddition && $prevEdit->getId() === $this->maxAddition->getId()) {
-                    $this->maxAddition = $prevMaxAddEdit;
-                    $prevMaxAddEdit = $prevEdit; // in the event of edit wars
-                } elseif ($this->maxDeletion &&
-                    $prevEdit->getId() === $this->maxDeletion->getId()
-                ) {
-                    $this->maxDeletion = $prevMaxDelEdit;
-                    $prevMaxDelEdit = $prevEdit; // in the event of edit wars
-                }
-            } else {
-                // Edit was not a revert, so treat size > 0 as content added
-                if ($editSize > 0) {
-                    $this->addedBytes += $editSize;
-                    $this->editors[$username]['added'] += $editSize;
-
-                    // Keep track of edit with max addition
-                    if (!$this->maxAddition || $editSize > $this->maxAddition->getSize()) {
-                        // Keep track of old maxAddition in case we find out the next $edit was reverted
-                        //   (and was also a max edit), in which case we'll want to use this one ($edit)
-                        $prevMaxAddEdit = $this->maxAddition;
-
-                        $this->maxAddition = $edit;
-                    }
-                } elseif ($editSize < 0 && (
-                    !$this->maxDeletion || $editSize < $this->maxDeletion->getSize()
-                )) {
-                    $this->maxDeletion = $edit;
-                }
-            }
-
-            // If anonymous, increase counts
-            if ($edit->isAnon()) {
-                $this->anonCount++;
-                $this->yearMonthCounts[$editYear]['anon']++;
-                $this->yearMonthCounts[$editYear]['months'][$editMonth]['anon']++;
-            }
-
-            // If minor edit, increase counts
-            if ($edit->isMinor()) {
-                $this->minorCount++;
-                $this->yearMonthCounts[$editYear]['minor']++;
-                $this->yearMonthCounts[$editYear]['months'][$editMonth]['minor']++;
-
-                // Increment minor counts for this user
-                $this->editors[$username]['minor']++;
-            }
-
-            $automatedTool = $edit->getTool($this->container);
-            if ($automatedTool !== false) {
-                $this->automatedCount++;
-                $this->yearMonthCounts[$editYear]['automated']++;
-                $this->yearMonthCounts[$editYear]['months'][$editMonth]['automated']++;
-
-                if (!isset($this->tools[$automatedTool['name']])) {
-                    $this->tools[$automatedTool['name']] = [
-                        'count' => 1,
-                        'link' => $automatedTool['link'],
-                    ];
-                } else {
-                    $this->tools[$automatedTool['name']]['count']++;
-                }
-            }
-
-            // Increment "edits per <time>" counts
-            if ($editTimestamp > new DateTime('-1 day')) {
-                $this->countHistory['day']++;
-            }
-            if ($editTimestamp > new DateTime('-1 week')) {
-                $this->countHistory['week']++;
-            }
-            if ($editTimestamp > new DateTime('-1 month')) {
-                $this->countHistory['month']++;
-            }
-            if ($editTimestamp > new DateTime('-1 year')) {
-                $this->countHistory['year']++;
-            }
+            $prevEdits = $this->updateCounts($edit, $prevEdits);
 
             $revCount++;
-            $prevEdit = $edit;
-            $this->lastEdit = $edit;
         }
+
+        $this->numRevisionsProcessed = $revCount;
 
         // Various sorts
         arsort($this->editors);
@@ -817,49 +635,371 @@ class ArticleInfo extends Model
     }
 
     /**
+     * Update various counts based on the current edit.
+     * @param  Edit   $edit
+     * @param  Edit[] $prevEdits With 'prev', 'maxAddition' and 'maxDeletion'
+     * @return Edit[] Updated version of $prevEdits.
+     */
+    private function updateCounts(Edit $edit, $prevEdits)
+    {
+        // Update the counts for the year and month of the current edit.
+        $this->updateYearMonthCounts($edit);
+
+        // Update counts for the user who made the edit.
+        $this->updateUserCounts($edit);
+
+        // Update the year/month/user counts of anon and minor edits.
+        $this->updateAnonMinorCounts($edit);
+
+        // Update counts for automated tool usage, if applicable.
+        $this->updateToolCounts($edit);
+
+        // Increment "edits per <time>" counts
+        $this->updateCountHistory($edit);
+
+        // Update figures regarding content addition/removal, and the revert count.
+        $prevEdits = $this->updateContentSizes($edit, $prevEdits);
+
+        // Now that we've updated all the counts, we can reset
+        // the prev and last edits, which are used for tracking.
+        $prevEdits['prev'] = $edit;
+        $this->lastEdit = $edit;
+
+        return $prevEdits;
+    }
+
+    /**
+     * Update various figures about content sizes based on the given edit.
+     * @param  Edit   $edit
+     * @param  Edit[] $prevEdits With 'prev', 'maxAddition' and 'maxDeletion'
+     * @return Edit[] Updated version of $prevEdits.
+     */
+    private function updateContentSizes(Edit $edit, $prevEdits)
+    {
+        // Check if it was a revert
+        if ($edit->isRevert($this->container)) {
+            return $this->updateContentSizesRevert($prevEdits);
+        } else {
+            return $this->updateContentSizesNonRevert($edit, $prevEdits);
+        }
+    }
+
+    /**
+     * Updates the figures on content sizes assuming the given edit was a revert of the previous one.
+     * In such a case, we don't want to treat the previous edit as legit content addition or removal.
+     * @param  Edit[] $prevEdits With 'prev', 'maxAddition' and 'maxDeletion'.
+     * @return Edit[] Updated version of $prevEdits, for tracking.
+     */
+    private function updateContentSizesRevert($prevEdits)
+    {
+        $this->revertCount++;
+
+        // Adjust addedBytes given this edit was a revert of the previous one.
+        if ($prevEdits['prev'] && $prevEdits['prev']->getSize() > 0) {
+            $this->addedBytes -= $prevEdits['prev']->getSize();
+        }
+
+        // @TODO: Test this against an edit war (use your sandbox).
+        // Also remove as max added or deleted, if applicable.
+        if ($this->maxAddition && $prevEdits['prev']->getId() === $this->maxAddition->getId()) {
+            $this->maxAddition = $prevEdits['maxAddition'];
+            $prevEdits['maxAddition'] = $prevEdits['prev']; // in the event of edit wars
+        } elseif ($this->maxDeletion && $prevEdits['prev']->getId() === $this->maxDeletion->getId()) {
+            $this->maxDeletion = $prevEdits['maxDeletion'];
+            $prevEdits['maxDeletion'] = $prevEdits['prev']; // in the event of edit wars
+        }
+
+        return $prevEdits;
+    }
+
+    /**
+     * Updates the figures on content sizes assuming the given edit
+     * was NOT a revert of the previous edit.
+     * @param  Edit   $edit
+     * @param  Edit[] $prevEdits With 'prev', 'maxAddition' and 'maxDeletion'.
+     * @return Edit[] Updated version of $prevEdits, for tracking.
+     */
+    private function updateContentSizesNonRevert(Edit $edit, $prevEdits)
+    {
+        $editSize = $this->getEditSize($edit, $prevEdits);
+
+        // Edit was not a revert, so treat size > 0 as content added.
+        if ($editSize > 0) {
+            $this->addedBytes += $editSize;
+            $this->editors[$edit->getUser()->getUsername()]['added'] += $editSize;
+
+            // Keep track of edit with max addition.
+            if (!$this->maxAddition || $editSize > $this->maxAddition->getSize()) {
+                // Keep track of old maxAddition in case we find out the next $edit was reverted
+                // (and was also a max edit), in which case we'll want to use this one ($edit).
+                $prevEdits['maxAddition'] = $this->maxAddition;
+
+                $this->maxAddition = $edit;
+            }
+        } elseif ($editSize < 0 && (!$this->maxDeletion || $editSize < $this->maxDeletion->getSize())) {
+            // Keep track of old maxDeletion in case we find out the next edit was reverted
+            // (and was also a max deletion), in which case we'll want to use this one.
+            $prevEdits['maxDeletion'] = $this->maxDeletion;
+
+            $this->maxDeletion = $edit;
+        }
+
+        return $prevEdits;
+    }
+
+    /**
+     * Get the size of the given edit, based on the previous edit (if present).
+     * We also don't return the actual edit size if last revision had a length of null.
+     * This happens when the edit follows other edits that were revision-deleted.
+     * @see T148857 for more information.
+     * @todo Remove once T101631 is resolved.
+     * @param  Edit   $edit
+     * @param  Edit[] $prevEdits With 'prev', 'maxAddition' and 'maxDeletion'.
+     * @return Edit[] Updated version of $prevEdits, for tracking.
+     */
+    private function getEditSize(Edit $edit, $prevEdits)
+    {
+        if ($prevEdits['prev'] && $prevEdits['prev']->getLength() === null) {
+            return 0;
+        } else {
+            return $edit->getSize();
+        }
+    }
+
+    /**
+     * Update counts of automated tool usage for the given edit.
+     * @param Edit $edit
+     */
+    private function updateToolCounts(Edit $edit)
+    {
+        $automatedTool = $edit->getTool($this->container);
+
+        if ($automatedTool === false) {
+            // Nothing to do.
+            return;
+        }
+
+        $editYear = $edit->getYear();
+        $editMonth = $edit->getMonth();
+
+        $this->automatedCount++;
+        $this->yearMonthCounts[$editYear]['automated']++;
+        $this->yearMonthCounts[$editYear]['months'][$editMonth]['automated']++;
+
+        if (!isset($this->tools[$automatedTool['name']])) {
+            $this->tools[$automatedTool['name']] = [
+                'count' => 1,
+                'link' => $automatedTool['link'],
+            ];
+        } else {
+            $this->tools[$automatedTool['name']]['count']++;
+        }
+    }
+
+    /**
+     * Update various counts for the year and month of the given edit.
+     * @param Edit $edit
+     */
+    private function updateYearMonthCounts(Edit $edit)
+    {
+        $editYear = $edit->getYear();
+        $editMonth = $edit->getMonth();
+
+        // Fill in the blank arrays for the year and 12 months if needed.
+        if (!isset($this->yearMonthCounts[$editYear])) {
+            $this->addYearMonthCountEntry($edit);
+        }
+
+        // Increment year and month counts for all edits
+        $this->yearMonthCounts[$editYear]['all']++;
+        $this->yearMonthCounts[$editYear]['months'][$editMonth]['all']++;
+        // This will ultimately be the size of the page by the end of the year
+        $this->yearMonthCounts[$editYear]['size'] = (int) $edit->getLength();
+
+        // Keep track of which month had the most edits
+        $editsThisMonth = $this->yearMonthCounts[$editYear]['months'][$editMonth]['all'];
+        if ($editsThisMonth > $this->maxEditsPerMonth) {
+            $this->maxEditsPerMonth = $editsThisMonth;
+        }
+    }
+
+    /**
+     * Add a new entry to $this->yearMonthCounts for the given year,
+     * with blank values for each month. This called during self::parseHistory().
+     * @param Edit $edit
+     */
+    private function addYearMonthCountEntry(Edit $edit)
+    {
+        $editYear = $edit->getYear();
+
+        // Beginning of the month at 00:00:00.
+        $firstEditTime = mktime(0, 0, 0, (int) $this->firstEdit->getMonth(), 1, $this->firstEdit->getYear());
+
+        $this->yearMonthCounts[$editYear] = [
+            'all' => 0,
+            'minor' => 0,
+            'anon' => 0,
+            'automated' => 0,
+            'size' => 0, // Keep track of the size by the end of the year.
+            'events' => [],
+            'months' => [],
+        ];
+
+        for ($i = 1; $i <= 12; $i++) {
+            $timeObj = mktime(0, 0, 0, $i, 1, $editYear);
+
+            // Don't show zeros for months before the first edit or after the current month.
+            if ($timeObj < $firstEditTime || $timeObj > strtotime('last day of this month')) {
+                continue;
+            }
+
+            $this->yearMonthCounts[$editYear]['months'][sprintf('%02d', $i)] = [
+                'all' => 0,
+                'minor' => 0,
+                'anon' => 0,
+                'automated' => 0,
+            ];
+        }
+    }
+
+    /**
+     * Update the counts of anon and minor edits for year, month,
+     * and user of the given edit.
+     * @param Edit $edit
+     */
+    private function updateAnonMinorCounts(Edit $edit)
+    {
+        $editYear = $edit->getYear();
+        $editMonth = $edit->getMonth();
+
+        // If anonymous, increase counts
+        if ($edit->isAnon()) {
+            $this->anonCount++;
+            $this->yearMonthCounts[$editYear]['anon']++;
+            $this->yearMonthCounts[$editYear]['months'][$editMonth]['anon']++;
+        }
+
+        // If minor edit, increase counts
+        if ($edit->isMinor()) {
+            $this->minorCount++;
+            $this->yearMonthCounts[$editYear]['minor']++;
+            $this->yearMonthCounts[$editYear]['months'][$editMonth]['minor']++;
+        }
+    }
+
+    /**
+     * Update various counts for the user of the given edit.
+     * @param Edit $edit
+     */
+    private function updateUserCounts(Edit $edit)
+    {
+        $username = $edit->getUser()->getUsername();
+
+        // Initialize various user stats if needed.
+        if (!isset($this->editors[$username])) {
+            $this->editors[$username] = [
+                'all' => 0,
+                'minor' => 0,
+                'minorPercentage' => 0,
+                'first' => $edit->getTimestamp(),
+                'firstId' => $edit->getId(),
+                'last' => null,
+                'atbe' => null,
+                'added' => 0,
+                'sizes' => [],
+            ];
+        }
+
+        // Increment user counts
+        $this->editors[$username]['all']++;
+        $this->editors[$username]['last'] = $edit->getTimestamp();
+        $this->editors[$username]['lastId'] = $edit->getId();
+
+        // Store number of KB added with this edit
+        $this->editors[$username]['sizes'][] = $edit->getLength() / 1024;
+
+        // Increment minor counts for this user
+        if ($edit->isMinor()) {
+            $this->editors[$username]['minor']++;
+        }
+    }
+
+    /**
+     * Increment "edits per <time>" counts based on the given edit.
+     * @param Edit $edit
+     */
+    private function updateCountHistory(Edit $edit)
+    {
+        $editTimestamp = $edit->getTimestamp();
+
+        if ($editTimestamp > new DateTime('-1 day')) {
+            $this->countHistory['day']++;
+        }
+        if ($editTimestamp > new DateTime('-1 week')) {
+            $this->countHistory['week']++;
+        }
+        if ($editTimestamp > new DateTime('-1 month')) {
+            $this->countHistory['month']++;
+        }
+        if ($editTimestamp > new DateTime('-1 year')) {
+            $this->countHistory['year']++;
+        }
+    }
+
+    /**
      * Get info about bots that edited the page.
-     * This also sets $this->botRevisionCount and $this->botPercentage.
      * @return mixed[] Contains the bot's username, edit count to the page,
      *   and whether or not they are currently a bot.
      */
-    private function getBotData()
+    public function getBots()
     {
-        $userGroupsTable = $this->getProject()->getTableName('user_groups');
-        $userFromerGroupsTable = $this->getProject()->getTableName('user_former_groups');
-        $sql = "SELECT COUNT(rev_user_text) AS count, rev_user_text AS username, ug_group AS current
-                FROM " . $this->getProject()->getTableName('revision') . "
-                LEFT JOIN $userGroupsTable ON rev_user = ug_user
-                LEFT JOIN $userFromerGroupsTable ON rev_user = ufg_user
-                WHERE rev_page = :pageId AND (ug_group = 'bot' OR ufg_group = 'bot')
-                GROUP BY rev_user_text";
-        $resultQuery = $this->conn->prepare($sql);
-        $pageId = $this->page->getId();
-        $resultQuery->bindParam('pageId', $pageId);
-        $resultQuery->execute();
+        if (isset($this->bots)) {
+            return $this->bots;
+        }
 
         // Parse the botedits
         $bots = [];
-        $sum = 0;
-        while ($bot = $resultQuery->fetch()) {
+        $botData = $this->getRepository()->getBotData($this->page);
+        while ($bot = $botData->fetch()) {
             $bots[$bot['username']] = [
                 'count' => (int) $bot['count'],
-                'current' => $bot['current'] === 'bot'
+                'current' => $bot['current'] === 'bot',
             ];
-            $sum += $bot['count'];
         }
 
+        // Sort by edit count.
         uasort($bots, function ($a, $b) {
             return $b['count'] - $a['count'];
         });
 
-        $this->botRevisionCount = $sum;
-        $this->botPercentage = round(
-            // FIXME: should be processed revisions
-            ($sum / $this->getNumRevisions()) * 100,
-            1
-        );
-
+        $this->bots = $bots;
         return $bots;
+    }
+
+    /**
+     * Number of edits made to the page by current or former bots.
+     * @param string[] $bots Used only in unit tests, where we
+     *   supply mock data for the bots that will get processed.
+     * @return int
+     */
+    public function getBotRevisionCount($bots = null)
+    {
+        if (isset($this->botRevisionCount)) {
+            return $this->botRevisionCount;
+        }
+
+        if ($bots === null) {
+            $bots = $this->getBots();
+        }
+
+        $count = 0;
+
+        foreach ($bots as $username => $data) {
+            $count += $data['count'];
+        }
+
+        $this->botRevisionCount = $count;
+        return $count;
     }
 
     /**
@@ -868,48 +1008,42 @@ class ArticleInfo extends Model
      */
     private function setLogsEvents()
     {
-        $loggingTable = $this->getProject()->getTableName('logging', 'logindex');
-        $title = str_replace(' ', '_', $this->page->getTitle());
-        $sql = "SELECT log_action, log_type, log_timestamp AS timestamp
-                FROM $loggingTable
-                WHERE log_namespace = '" . $this->page->getNamespace() . "'
-                AND log_title = :title AND log_timestamp > 1
-                AND log_type IN ('delete', 'move', 'protect', 'stable')";
-        $resultQuery = $this->conn->prepare($sql);
-        $resultQuery->bindParam(':title', $title);
-        $resultQuery->execute();
+        $logData = $this->getRepository()->getLogEvents($this->page);
 
-        while ($event = $resultQuery->fetch()) {
+        foreach ($logData as $event) {
             $time = strtotime($event['timestamp']);
             $year = date('Y', $time);
-            if (isset($this->yearMonthCounts[$year])) {
-                $yearEvents = $this->yearMonthCounts[$year]['events'];
 
-                // Convert log type value to i18n key
-                switch ($event['log_type']) {
-                    case 'protect':
-                        $action = 'protections';
-                        break;
-                    case 'delete':
-                        $action = 'deletions';
-                        break;
-                    case 'move':
-                        $action = 'moves';
-                        break;
-                    // count pending-changes protections along with normal protections
-                    case 'stable':
-                        $action = 'protections';
-                        break;
-                }
-
-                if (empty($yearEvents[$action])) {
-                    $yearEvents[$action] = 1;
-                } else {
-                    $yearEvents[$action]++;
-                }
-
-                $this->yearMonthCounts[$year]['events'] = $yearEvents;
+            if (!isset($this->yearMonthCounts[$year])) {
+                break;
             }
+
+            $yearEvents = $this->yearMonthCounts[$year]['events'];
+
+            // Convert log type value to i18n key
+            switch ($event['log_type']) {
+                case 'protect':
+                    $action = 'protections';
+                    break;
+                case 'delete':
+                    $action = 'deletions';
+                    break;
+                case 'move':
+                    $action = 'moves';
+                    break;
+                // count pending-changes protections along with normal protections
+                case 'stable':
+                    $action = 'protections';
+                    break;
+            }
+
+            if (empty($yearEvents[$action])) {
+                $yearEvents[$action] = 1;
+            } else {
+                $yearEvents[$action]++;
+            }
+
+            $this->yearMonthCounts[$year]['events'] = $yearEvents;
         }
     }
 
@@ -935,7 +1069,7 @@ class ArticleInfo extends Model
                     'label' => $editor,
                     'value' => $info['all'],
                     'percentage' => (
-                        100 * ($info['all'] / $this->getNumRevisions())
+                        100 * ($info['all'] / $this->getNumRevisionsProcessed())
                     )
                 ];
             }
