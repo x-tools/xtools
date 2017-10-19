@@ -153,6 +153,14 @@ class AdminStats extends Model
         // Group by username.
         $stats = $this->groupAdminStatsByUsername($stats, $abbreviateGroups);
 
+        // Resort, as for some reason the SQL isn't doing this properly.
+        uasort($stats, function ($a, $b) {
+            if ($a['total'] === $b['total']) {
+                return 0;
+            }
+            return ($a['total'] < $b['total']) ? 1 : -1;
+        });
+
         $this->adminStats = $stats;
         return $this->adminStats;
     }

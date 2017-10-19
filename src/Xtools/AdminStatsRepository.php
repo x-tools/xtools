@@ -66,7 +66,7 @@ class AdminStatsRepository extends Repository
                     SUM(IF( (log_type = 'protect' AND log_action  = 'unprotect'),1,0)) AS 'unprotect',
                     SUM(IF( log_type  = 'rights',1,0)) AS 'rights',
                     SUM(IF( log_type  = 'import',1,0)) AS 'import',
-                    SUM(IF(log_type  != '',1,0)) AS 'total'
+                    SUM(IF( log_type != '',1,0)) AS 'total'
                 FROM $loggingTable
                 JOIN $userTable ON user_id = log_user
                 WHERE log_timestamp > '$start' AND log_timestamp <= '$end'
