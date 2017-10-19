@@ -4,7 +4,8 @@
 			"Fitoschido",
 			"Macofe",
 			"Nemo bis",
-			"MarcoAurelio"
+			"MarcoAurelio",
+			"RicardoSGZ"
 		]
 	},
 	"about-xtools": "Acerca de estas herramientas",
@@ -279,6 +280,7 @@
 	"thursday": "Jueves",
 	"timecard": "Tarjeta de tiempo",
 	"times-in-utc": "La hora está en UTC.",
+	"too-many-edits": "¡El usuario ha efectuado demasiadas ediciones! (Máximo $1)",
 	"too-many-edits-redir": "En su lugar se muestra $1.",
 	"too-many-revisions": "Esta página tiene más de $1 {{PLURAL:$2|revisión|revisiones}}. Se muestran únicamente los datos de las últimas $1.",
 	"tool": "Herramienta",
