@@ -39,7 +39,7 @@
             {% if ai.automatedCount > 0 %}
                 {% set sections = sections|merge(['auto-edits']) %}
             {% endif %}
-            {% if ai.assessments %}
+            {% if ai.assessments and not (page.isMainPage) %}
                 {% set sections = sections|merge(['assessments']) %}
             {% endif %}
             {% if ai.numBugs > 0 %}
