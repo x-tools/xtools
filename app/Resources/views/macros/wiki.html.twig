@@ -16,10 +16,14 @@
     {{ extLink(page.url, page.title, label) }}
 {% endspaceless %}{% endmacro %}
 
-{% macro pageLinkRaw(pageTitle, project, label = null) %}{% spaceless %}
+{% macro pageLinkRaw(pageTitle, project, label = null, queryString) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {% from _self import pageUrlRaw as pageUrlRaw %}
-    {{ extLink(pageUrlRaw(pageTitle, project), pageTitle|replace({'_': ' '}), label) }}
+    {% set url = pageUrlRaw(pageTitle, project) %}
+    {% if queryString is not empty %}
+        {% set url = url ~ '?' ~ queryString %}
+    {% endif %}
+    {{ extLink(url, pageTitle|replace({'_': ' '}), label) }}
 {% endspaceless %}{% endmacro %}
 
 {% macro pageHistLink(page, label = null, offset = null, limit = null) %}{% spaceless %}

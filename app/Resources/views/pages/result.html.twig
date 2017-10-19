@@ -162,7 +162,7 @@
                                     <td>{{ index }}</td>
                                     <td class="sort-entry--page-title" data-value="{{ pagename }}">
                                         {% if page.page_is_redirect %}
-                                            {{ wiki.pageLinkRaw(pagename ~ '?redirect=no', project, pagename) }}
+                                            {{ wiki.pageLinkRaw(pagename, project, pagename, 'redirect=no') }}
                                             <small class="text-muted">&middot; ({{ msg('redirect') }})</small>
                                         {% else %}
                                             {{ wiki.pageLinkRaw(pagename, project) }}
@@ -173,7 +173,7 @@
                                     </td>
                                     <td class="sort-entry--date" data-value="{{ date }}">
                                         {% if page.type == 'arc' %}
-                                            {{ wiki.pageLinkRaw('Special:Undelete/' ~ pagename ~ '?timestamp=' ~ page.raw_time, project, page.human_time) }}
+                                            {{ wiki.pageLinkRaw('Special:Undelete/' ~ pagename, project, page.human_time, 'timestamp=' ~ page.raw_time) }}
                                         {% else %}
                                             {{ wiki.permaLinkRaw(page.rev_id, project, page.human_time) }}
                                         {% endif %}
