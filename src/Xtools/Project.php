@@ -40,6 +40,16 @@ class Project extends Model
     }
 
     /**
+     * Unique identifier this Project, to be used in cache keys.
+     * @see Repository::getCacheKey()
+     * @return string
+     */
+    public function getCacheKey()
+    {
+        return $this->getDatabaseName();
+    }
+
+    /**
      * Get 'dbName', 'url' and 'lang' of the project, the relevant basic info
      *   we can get from the meta database. This is all you need to make
      *   database queries. More comprehensive metadata can be fetched with

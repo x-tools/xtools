@@ -104,11 +104,7 @@ class PagesRepository extends Repository
      */
     public function getRevisions(Page $page, User $user = null)
     {
-        $cacheKey = 'revisions.'.$page->getId();
-        if ($user) {
-            $cacheKey .= '.'.$user->getCacheKey();
-        }
-
+        $cacheKey = $this->getCacheKey(func_get_args(), 'page_revisions');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -185,7 +181,12 @@ class PagesRepository extends Repository
      */
     public function getNumRevisions(Page $page, User $user = null)
     {
-        $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
+        $cacheKey = $this->getCacheKey(func_get_args(), 'page_numrevisions');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $revTable = $page->getProject()->getTableName('revision');
         $userClause = $user ? "rev_user_text in (:username) AND " : "";
 
         $sql = "SELECT COUNT(*)
@@ -195,8 +196,16 @@ class PagesRepository extends Repository
         if ($user) {
             $params['username'] = $user->getUsername();
         }
+
         $conn = $this->getProjectsConnection();
-        return $conn->executeQuery($sql, $params)->fetchColumn(0);
+        $result = $conn->executeQuery($sql, $params)->fetchColumn(0);
+
+        // Cache for 10 minutes, and return.
+        $cacheItem = $this->cache->getItem($cacheKey)
+            ->set($result)
+            ->expiresAfter(new DateInterval('PT10M'));
+        $this->cache->save($cacheItem);
+        return $result;
     }
 
     /**
@@ -212,7 +221,7 @@ class PagesRepository extends Repository
      */
     public function getBasicEditingInfo(Page $page)
     {
-        $cacheKey = 'page.basicInfo.'.$page->getId();
+        $cacheKey = $this->getCacheKey(func_get_args(), 'page_basicinfo');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -284,6 +293,11 @@ class PagesRepository extends Repository
      */
     public function getAssessments(Project $project, $pageIds)
     {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'page_assessments');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
         if (!$project->hasPageAssessments()) {
             return [];
         }
@@ -297,7 +311,14 @@ class PagesRepository extends Repository
                   WHERE pa_page_id IN ($pageIds)";
 
         $conn = $this->getProjectsConnection();
-        return $conn->executeQuery($query)->fetchAll();
+        $result = $conn->executeQuery($query)->fetchAll();
+
+        // Cache for 10 minutes, and return.
+        $cacheItem = $this->cache->getItem($cacheKey)
+            ->set($result)
+            ->expiresAfter(new DateInterval('PT10M'));
+        $this->cache->save($cacheItem);
+        return $result;
     }
 
     /**

@@ -27,7 +27,7 @@ class EditCounterRepository extends Repository
     public function getPairData(Project $project, User $user)
     {
         // Set up cache.
-        $cacheKey = 'pairdata.'.$project->getDatabaseName().'.'.$user->getCacheKey();
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_pairdata');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -116,7 +116,7 @@ class EditCounterRepository extends Repository
     public function getLogCounts(Project $project, User $user)
     {
         // Set up cache.
-        $cacheKey = 'logcounts.'.$project->getDatabaseName().'.'.$user->getCacheKey();
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_logcounts');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -263,7 +263,7 @@ class EditCounterRepository extends Repository
     protected function globalEditCountsFromCentralAuth(User $user, Project $project)
     {
         // Set up cache and stopwatch.
-        $cacheKey = 'globalRevisionCounts.'.$user->getCacheKey();
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_globaleditcounts');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -342,12 +342,13 @@ class EditCounterRepository extends Repository
     public function getNamespaceTotals(Project $project, User $user)
     {
         // Cache?
-        $userId = $user->getId($project);
-        $cacheKey = "ec.namespacetotals.{$project->getDatabaseName()}.$userId";
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_namespacetotals');
         $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
+
+        $userId = $user->getId($project);
 
         // Query.
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
@@ -385,7 +386,7 @@ class EditCounterRepository extends Repository
     public function getRevisions($projects, User $user, $lim = 40)
     {
         // Check cache.
-        $cacheKey = "globalcontribs.".$user->getCacheKey();
+        $cacheKey = $this->getCacheKey('ec_globalcontribs.'.$user->getCacheKey().'.'.$lim);
         $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
@@ -395,8 +396,8 @@ class EditCounterRepository extends Repository
         $username = $user->getUsername();
         $queries = [];
         foreach ($projects as $project) {
-            $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-            $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
+            $revisionTable = $project->getTableName('revision');
+            $pageTable = $project->getTableName('page');
             $sql = "SELECT
                     '".$project->getDatabaseName()."' AS project_name,
                     revs.rev_id AS id,
@@ -453,15 +454,15 @@ class EditCounterRepository extends Repository
      */
     public function getMonthCounts(Project $project, User $user)
     {
-        $cacheKey = "monthcounts.".$project->getDatabaseName().$user->getCacheKey();
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_monthcounts');
         $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
         $username = $user->getUsername();
-        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
+        $revisionTable = $project->getTableName('revision');
+        $pageTable = $project->getTableName('page');
         $sql =
             "SELECT "
             . "     YEAR(rev_timestamp) AS `year`,"
@@ -493,7 +494,7 @@ class EditCounterRepository extends Repository
      */
     public function getTimeCard(Project $project, User $user)
     {
-        $cacheKey = "timecard.".$project->getDatabaseName().$user->getCacheKey();
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_timecard');
         $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
@@ -543,7 +544,7 @@ class EditCounterRepository extends Repository
     public function getEditSizeData(Project $project, User $user)
     {
         // Set up cache.
-        $cacheKey = 'editsizedata.'.$project->getDatabaseName().'.'.$user->getCacheKey();
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_editsizes');
         $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();

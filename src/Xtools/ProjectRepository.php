@@ -207,7 +207,12 @@ class ProjectRepository extends Repository
         }
 
         // Redis cache
-        $cacheKey = "projectMetadata." . preg_replace("/[^A-Za-z0-9]/", '', $projectUrl);
+        $cacheKey = $this->getCacheKey(
+            // Removed non-alphanumeric characters
+            preg_replace("/[^A-Za-z0-9]/", '', $projectUrl),
+            'project_metadata'
+        );
+
         if ($this->cache->hasItem($cacheKey)) {
             $this->metadata = $this->cache->getItem($cacheKey)->get();
             return $this->metadata;
@@ -353,7 +358,7 @@ class ProjectRepository extends Repository
      */
     public function getUsersInGroups(Project $project, $groups)
     {
-        $cacheKey = 'usersInGroups.'.$project->getDatabaseName().md5(join($groups));
+        $cacheKey = $this->getCacheKey(func_get_args(), 'project_useringroups');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
