@@ -43,7 +43,7 @@ class AdminStatsRepository extends Repository
      */
     public function getStats(Project $project, $start, $end)
     {
-        $cacheKey = 'adminstats.'.$project->getDatabaseName().$start.$end;
+        $cacheKey = $this->getCacheKey(func_get_args(), 'adminstats');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -106,7 +106,7 @@ class AdminStatsRepository extends Repository
      */
     public function getAdminGroups(Project $project)
     {
-        $cacheKey = 'admingroups.'.$project->getDatabaseName();
+        $cacheKey = $this->getCacheKey(func_get_args(), 'admingroups');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }

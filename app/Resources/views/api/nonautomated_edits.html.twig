@@ -34,7 +34,7 @@
                         <td>
                             {{ edit.size|diff_format }}
                         </td>
-                        <td>{{ edit.wikifiedComment|raw }}</td>
+                        <td>{{ edit.wikifiedComment(true)|raw }}</td>
                     </tr>
                 {% endfor %}
             {% endif %}

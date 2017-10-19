@@ -41,8 +41,7 @@ class UserRepository extends Repository
      */
     public function getId($databaseName, $username)
     {
-        // Use md5 to ensure the key does not contain reserved characters.
-        $cacheKey = 'user_id.'.$databaseName.'.'.md5($username);
+        $cacheKey = $this->getCacheKey(func_get_args(), 'user_id');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -71,8 +70,7 @@ class UserRepository extends Repository
      */
     public function getRegistrationDate($databaseName, $username)
     {
-        // Use md5 to ensure the key does not contain reserved characters.
-        $cacheKey = 'user_registration.'.$databaseName.'.'.md5($username);
+        $cacheKey = $this->getCacheKey(func_get_args(), 'user_registration');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -118,7 +116,7 @@ class UserRepository extends Repository
     public function getGroups(Project $project, $username)
     {
         // Use md5 to ensure the key does not contain reserved characters.
-        $cacheKey = 'usergroups.'.$project->getDatabaseName().'.'.md5($username);
+        $cacheKey = $this->getCacheKey(func_get_args(), 'user_groups');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -160,21 +158,25 @@ class UserRepository extends Repository
 
         // Create the API query.
         $api = $this->getMediawikiApi($project);
-        $params = [ "meta"=>"globaluserinfo", "guiuser"=>$username, "guiprop"=>"groups" ];
+        $params = [
+            'meta' => 'globaluserinfo',
+            'guiuser' => $username,
+            'guiprop' => 'groups'
+        ];
         $query = new SimpleRequest('query', $params);
 
         // Get the result.
         $res = $api->getRequest($query);
         $result = [];
-        if (isset($res["batchcomplete"]) && isset($res["query"]["globaluserinfo"]["groups"])) {
-            $result = $res["query"]["globaluserinfo"]["groups"];
+        if (isset($res['batchcomplete']) && isset($res['query']['globaluserinfo']['groups'])) {
+            $result = $res['query']['globaluserinfo']['groups'];
         }
         return $result;
     }
 
     /**
      * Search the ipblocks table to see if the user is currently blocked
-     *   and return the expiry if they are
+     * and return the expiry if they are.
      * @param $databaseName The database to query.
      * @param $userid The ID of the user to search for.
      * @return bool|string Expiry of active block or false
@@ -202,24 +204,19 @@ class UserRepository extends Repository
      */
     public function getPagesCreated(Project $project, User $user, $namespace, $redirects)
     {
-        $username = $user->getUsername();
-
-        $cacheKey = 'pages.' . $project->getDatabaseName() . '.'
-            . $user->getCacheKey() . '.' . $namespace . '.' . $redirects;
+        $cacheKey = $this->getCacheKey(func_get_args(), 'user_pages_created');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
         $this->stopwatch->start($cacheKey, 'XTools');
 
-        $dbName = $project->getDatabaseName();
-        $projectRepo = $project->getRepository();
+        $pageTable = $project->getTableName('page');
+        $pageAssessmentsTable = $project->getTableName('page_assessments');
+        $revisionTable = $project->getTableName('revision');
+        $archiveTable = $project->getTableName('archive');
+        $logTable = $project->getTableName('logging', 'logindex');
 
-        $pageTable = $projectRepo->getTableName($dbName, 'page');
-        $pageAssessmentsTable = $projectRepo->getTableName($dbName, 'page_assessments');
-        $revisionTable = $projectRepo->getTableName($dbName, 'revision');
-        $archiveTable = $projectRepo->getTableName($dbName, 'archive');
-        $logTable = $projectRepo->getTableName($dbName, 'logging', 'logindex');
-
+        $username = $user->getUsername();
         $userId = $user->getId($project);
 
         $namespaceConditionArc = '';
@@ -295,42 +292,36 @@ class UserRepository extends Repository
     }
 
     /**
-     * Get edit count within given timeframe and namespace
+     * Get edit count within given timeframe and namespace.
      * @param Project $project
      * @param User $user
-     * @param int|string [$namespace] Namespace ID or 'all' for all namespaces
-     * @param string [$start] Start date in a format accepted by strtotime()
-     * @param string [$end] End date in a format accepted by strtotime()
+     * @param int|string $namespace Namespace ID or 'all' for all namespaces
+     * @param string $start Start date in a format accepted by strtotime()
+     * @param string $end End date in a format accepted by strtotime()
      */
     public function countEdits(Project $project, User $user, $namespace = 'all', $start = '', $end = '')
     {
-        $cacheKey = 'editcount.' . $project->getDatabaseName() . '.'
-            . $user->getCacheKey() . '.' . $namespace;
+        $cacheKey = $this->getCacheKey(func_get_args(), 'user_editcount');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
 
         $condBegin = '';
         $condEnd = '';
 
         if (!empty($start)) {
-            $cacheKey .= '.' . $start;
-
             // For the query
             $start = date('Ymd000000', strtotime($start));
             $condBegin = 'AND rev_timestamp >= :start ';
         }
         if (!empty($end)) {
-            $cacheKey .= '.' . $end;
-
             // For the query
             $end = date('Ymd235959', strtotime($end));
             $condEnd = 'AND rev_timestamp <= :end ';
         }
 
-        if ($this->cache->hasItem($cacheKey)) {
-            return $this->cache->getItem($cacheKey)->get();
-        }
-
-        $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
-        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+        $pageTable = $project->getTableName('page');
+        $revisionTable = $project->getTableName('revision');
         $condNamespace = $namespace === 'all' ? '' : 'AND page_namespace = :namespace';
         $pageJoin = $namespace === 'all' ? '' : "JOIN $pageTable ON rev_page = page_id";
 
@@ -371,15 +362,17 @@ class UserRepository extends Repository
      * Get the number of edits this user made using semi-automated tools.
      * @param Project $project
      * @param User $user
-     * @param string|int [$namespace] Namespace ID or 'all'
-     * @param string [$start] Start date in a format accepted by strtotime()
-     * @param string [$end] End date in a format accepted by strtotime()
+     * @param string|int $namespace Namespace ID or 'all'
+     * @param string $start Start date in a format accepted by strtotime()
+     * @param string $end End date in a format accepted by strtotime()
      * @return int Result of query, see below.
      */
     public function countAutomatedEdits(Project $project, User $user, $namespace = 'all', $start = '', $end = '')
     {
-        $cacheKey = 'autoeditcount.' . $project->getDatabaseName() . '.'
-            . $user->getCacheKey() . '.' . $namespace;
+        $cacheKey = $this->getCacheKey(func_get_args(), 'user_autoeditcount');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
 
         $condBegin = '';
         $condEnd = '';
@@ -399,18 +392,15 @@ class UserRepository extends Repository
             $condEnd = 'AND rev_timestamp <= :end ';
         }
 
-        if ($this->cache->hasItem($cacheKey)) {
-            return $this->cache->getItem($cacheKey)->get();
-        }
         $this->stopwatch->start($cacheKey, 'XTools');
 
         // Get the combined regex and tags for the tools
         $conn = $this->getProjectsConnection();
         list($regex, $tags) = $this->getToolRegexAndTags($project->getDomain(), $conn);
 
-        $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
-        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $tagTable = $this->getTableName($project->getDatabaseName(), 'change_tag');
+        $pageTable = $project->getTableName('page');
+        $revisionTable = $project->getTableName('revision');
+        $tagTable = $project->getTableName('change_tag');
         $condNamespace = $namespace === 'all' ? '' : 'AND page_namespace = :namespace';
         $pageJoin = $namespace === 'all' ? '' : "JOIN $pageTable ON page_id = rev_page";
         $tagJoin = '';
@@ -465,10 +455,10 @@ class UserRepository extends Repository
      * Get non-automated contributions for the given user.
      * @param Project $project
      * @param User $user
-     * @param string|int [$namespace] Namespace ID or 'all'
-     * @param string [$start] Start date in a format accepted by strtotime()
-     * @param string [$end] End date in a format accepted by strtotime()
-     * @param int [$offset] Used for pagination, offset results by N edits
+     * @param string|int $namespace Namespace ID or 'all'
+     * @param string $start Start date in a format accepted by strtotime()
+     * @param string $end End date in a format accepted by strtotime()
+     * @param int $offset Used for pagination, offset results by N edits
      * @return string[] Result of query, with columns 'page_title',
      *   'page_namespace', 'rev_id', 'timestamp', 'minor',
      *   'length', 'length_change', 'comment'
@@ -481,39 +471,33 @@ class UserRepository extends Repository
         $end = '',
         $offset = 0
     ) {
-        $cacheKey = 'nonautoedits.' . $project->getDatabaseName() . '.'
-            . $user->getCacheKey() . '.' . $namespace . '.' . $offset;
-
-        $condBegin = '';
-        $condEnd = '';
-
-        if (!empty($start)) {
-            $cacheKey .= '.' . $start;
-
-            // For the query
-            $start = date('Ymd000000', strtotime($start));
-            $condBegin = 'AND revs.rev_timestamp >= :start ';
-        }
-        if (!empty($end)) {
-            $cacheKey .= '.' . $end;
-
-            // For the query
-            $end = date('Ymd235959', strtotime($end));
-            $condEnd = 'AND revs.rev_timestamp <= :end ';
-        }
-
+        $cacheKey = $this->getCacheKey(func_get_args(), 'user_nonautoedits');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
         $this->stopwatch->start($cacheKey, 'XTools');
 
+        $condBegin = '';
+        $condEnd = '';
+
+        if (!empty($start)) {
+            // For the query
+            $start = date('Ymd000000', strtotime($start));
+            $condBegin = 'AND revs.rev_timestamp >= :start ';
+        }
+        if (!empty($end)) {
+            // For the query
+            $end = date('Ymd235959', strtotime($end));
+            $condEnd = 'AND revs.rev_timestamp <= :end ';
+        }
+
         // Get the combined regex and tags for the tools
         $conn = $this->getProjectsConnection();
         list($regex, $tags) = $this->getToolRegexAndTags($project->getDomain(), $conn);
 
-        $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
-        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $tagTable = $this->getTableName($project->getDatabaseName(), 'change_tag');
+        $pageTable = $project->getTableName('page');
+        $revisionTable = $project->getTableName('revision');
+        $tagTable = $project->getTableName('change_tag');
         $condNamespace = $namespace === 'all' ? '' : 'AND page_namespace = :namespace';
         $tagJoin = $tags != '' ? "LEFT OUTER JOIN $tagTable ON (ct_rev_id = revs.rev_id)" : '';
         $condTag = $tags != '' ? "AND (ct_tag NOT IN ($tags) OR ct_tag IS NULL)" : '';
@@ -570,9 +554,9 @@ class UserRepository extends Repository
      * Get non-automated contributions for the given user.
      * @param Project $project
      * @param User $user
-     * @param string|int [$namespace] Namespace ID or 'all'
-     * @param string [$start] Start date in a format accepted by strtotime()
-     * @param string [$end] End date in a format accepted by strtotime()
+     * @param string|int $namespace Namespace ID or 'all'.
+     * @param string $start Start date in a format accepted by strtotime()
+     * @param string $end End date in a format accepted by strtotime()
      * @return string[] Each tool that they used along with the count and link:
      *                  [
      *                      'Twinkle' => [
@@ -588,31 +572,25 @@ class UserRepository extends Repository
         $start = '',
         $end = ''
     ) {
-        $cacheKey = 'autotoolcounts.' . $project->getDatabaseName() . '.'
-            . $user->getCacheKey() . '.' . $namespace;
+        $cacheKey = $this->getCacheKey(func_get_args(), 'user_autotoolcounts');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+        $this->stopwatch->start($cacheKey, 'XTools');
 
         $condBegin = '';
         $condEnd = '';
 
         if (!empty($start)) {
-            $cacheKey .= '.' . $start;
-
             // For the query
             $start = date('Ymd000000', strtotime($start));
             $condBegin = 'AND rev_timestamp >= :start ';
         }
         if (!empty($end)) {
-            $cacheKey .= '.' . $end;
-
             // For the query
             $end = date('Ymd235959', strtotime($end));
             $condEnd = 'AND rev_timestamp <= :end ';
         }
-
-        if ($this->cache->hasItem($cacheKey)) {
-            return $this->cache->getItem($cacheKey)->get();
-        }
-        $this->stopwatch->start($cacheKey, 'XTools');
 
         $conn = $this->getProjectsConnection();
 

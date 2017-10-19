@@ -7,6 +7,10 @@ namespace Tests\Xtools;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Xtools\Repository;
+use Xtools\Project;
+use Xtools\User;
+use Xtools\Page;
+use Xtools\Edit;
 
 /**
  * Tests for the Repository class.
@@ -67,5 +71,39 @@ class RepositoryTest extends WebTestCase
 
         $apiObj2 = $this->stub->queryXToolsApi('ec/monthcounts/en.wikipedia.org/Example', true);
         $this->assertInstanceOf(\GuzzleHttp\Promise\Promise::class, $apiObj2);
+    }
+
+    /**
+     * Test getting a unique cache key for a given set of arguments.
+     */
+    public function testCacheKey()
+    {
+        // Set up example Models that we'll pass to Repository::getCacheKey().
+        $project = $this->getMock(Project::class, ['getCacheKey'], ['enwiki']);
+        $project->method('getCacheKey')->willReturn('enwiki');
+        $user = $this->getMock(User::class, ['getCacheKey'], ['Test user']);
+        $user->method('getCacheKey')->willReturn('Test_user');
+
+        // Given explicit cache prefix.
+        $this->assertEquals(
+            'cachePrefix.enwiki.Test_user.20170101.123',
+            $this->stub->getCacheKey(
+                [$project, $user, '20170101', '', null, [1, 2, 3]],
+                'cachePrefix'
+            )
+        );
+
+        // It will use the name of the caller, in this case testCacheKey.
+        $this->assertEquals(
+            // The `false` argument generates the trailing `.`
+            'testCacheKey.enwiki.Test_user.20170101.',
+            $this->stub->getCacheKey([$project, $user, '20170101', '', false, null])
+        );
+
+        // Single argument, no prefix.
+        $this->assertEquals(
+            'testCacheKey.mycache',
+            $this->stub->getCacheKey('mycache')
+        );
     }
 }

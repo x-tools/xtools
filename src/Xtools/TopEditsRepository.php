@@ -27,8 +27,7 @@ class TopEditsRepository extends Repository
     public function getTopEditsNamespace(Project $project, User $user, $namespace = 0, $limit = 100)
     {
         // Set up cache.
-        $cacheKey = 'topedits.'.$project->getDatabaseName().'.'.$user->getCacheKey().
-            $namespace.$limit;
+        $cacheKey = $this->getCacheKey(func_get_args(), 'topedits');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -82,8 +81,7 @@ class TopEditsRepository extends Repository
     public function getTopEditsAllNamespaces(Project $project, User $user, $limit = 10)
     {
         // Set up cache.
-        $cacheKey = 'topedits.'.$project->getDatabaseName().'.'.$user->getCacheKey().
-            'all'.$limit;
+        $cacheKey = $this->getCacheKey(func_get_args(), 'topedits_all');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }

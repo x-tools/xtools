@@ -44,6 +44,17 @@ class Page extends Model
     }
 
     /**
+     * Unique identifier for this Page, to be used in cache keys.
+     * Use of md5 ensures the cache key does not contain reserved characters.
+     * @see Repository::getCacheKey()
+     * @return string
+     */
+    public function getCacheKey()
+    {
+        return md5($this->getId());
+    }
+
+    /**
      * Get basic information about this page from the repository.
      * @return \string[]
      */

@@ -70,6 +70,16 @@ class Edit extends Model
     }
 
     /**
+     * Unique identifier for this Edit, to be used in cache keys.
+     * @see Repository::getCacheKey()
+     * @return string
+     */
+    public function getCacheKey()
+    {
+        return $this->id;
+    }
+
+    /**
      * Get the page to which this edit belongs.
      * @return Page
      */
@@ -189,9 +199,12 @@ class Edit extends Model
 
     /**
      * Get edit summary as 'wikified' HTML markup
+     * @param bool $useUnnormalizedPageTitle Use the unnormalized page title to avoid
+     *   an API call. This should be used only if you fetched the page title via other
+     *   means (SQL query), and is not from user input alone.
      * @return string Safe HTML
      */
-    public function getWikifiedComment()
+    public function getWikifiedComment($useUnnormalizedPageTitle = false)
     {
         $summary = htmlspecialchars($this->getSummary(), ENT_NOQUOTES);
         $sectionMatch = null;
@@ -200,7 +213,7 @@ class Edit extends Model
         if ($isSection) {
             $pageUrl = $this->getProject()->getUrl(false) . str_replace(
                 '$1',
-                $this->getPage()->getTitle(),
+                $this->getPage()->getTitle($useUnnormalizedPageTitle),
                 $this->getProject()->getArticlePath()
             );
             $sectionTitle = $sectionMatch[1][0];

@@ -45,9 +45,10 @@ class User extends Model
     }
 
     /**
-     * Get a md5 hash of the username to be used as a cache key.
-     * This ensures the cache key does not contain reserved characters.
+     * Unique identifier for this User, to be used in cache keys.
+     * Use of md5 ensures the cache key does not contain reserved characters.
      * You could also use the ID, but that may require an unnecessary DB query.
+     * @see Repository::getCacheKey()
      * @return string
      */
     public function getCacheKey()
