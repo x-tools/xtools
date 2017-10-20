@@ -279,7 +279,6 @@ class PagesRepository extends Repository
                 ->set($result)
                 ->expiresAfter(new DateInterval('PT20M'));
             $this->cache->save($cacheItem);
-            $this->stopwatch->stop($cacheKey);
         }
 
         return $result;
