@@ -49,7 +49,7 @@ class UserRepository extends Repository
         $userTable = $this->getTableName($databaseName, 'user');
         $sql = "SELECT user_id FROM $userTable WHERE user_name = :username LIMIT 1";
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $resultQuery->bindParam("username", $username);
+        $resultQuery->bindParam('username', $username);
         $resultQuery->execute();
         $userId = (int)$resultQuery->fetchColumn();
 
@@ -310,19 +310,7 @@ class UserRepository extends Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $condBegin = '';
-        $condEnd = '';
-
-        if (!empty($start)) {
-            // For the query
-            $start = date('Ymd000000', strtotime($start));
-            $condBegin = 'AND rev_timestamp >= :start ';
-        }
-        if (!empty($end)) {
-            // For the query
-            $end = date('Ymd235959', strtotime($end));
-            $condEnd = 'AND rev_timestamp <= :end ';
-        }
+        list($condBegin, $condEnd) = $this->getRevTimestampConditions($start, $end);
 
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
@@ -337,20 +325,7 @@ class UserRepository extends Repository
                 $condBegin
                 $condEnd";
 
-        $username = $user->getUsername();
-        $conn = $this->getProjectsConnection();
-        $resultQuery = $conn->prepare($sql);
-        $resultQuery->bindParam('username', $username);
-        if (!empty($start)) {
-            $resultQuery->bindParam('start', $start);
-        }
-        if (!empty($end)) {
-            $resultQuery->bindParam('end', $end);
-        }
-        if ($namespace !== 'all') {
-            $resultQuery->bindParam('namespace', $namespace);
-        }
-        $resultQuery->execute();
+        $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end);
         $result = $resultQuery->fetchColumn();
 
         // Cache for 10 minutes, and return.
@@ -377,30 +352,12 @@ class UserRepository extends Repository
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
-
-        $condBegin = '';
-        $condEnd = '';
-
-        if (!empty($start)) {
-            $cacheKey .= '.' . $start;
-
-            // For the query
-            $start = date('Ymd000000', strtotime($start));
-            $condBegin = 'AND rev_timestamp >= :start ';
-        }
-        if (!empty($end)) {
-            $cacheKey .= '.' . $end;
-
-            // For the query
-            $end = date('Ymd235959', strtotime($end));
-            $condEnd = 'AND rev_timestamp <= :end ';
-        }
-
         $this->stopwatch->start($cacheKey, 'XTools');
 
+        list($condBegin, $condEnd) = $this->getRevTimestampConditions($start, $end);
+
         // Get the combined regex and tags for the tools
-        $conn = $this->getProjectsConnection();
-        list($regex, $tags) = $this->getToolRegexAndTags($project->getDomain(), $conn);
+        list($regex, $tags) = $this->getToolRegexAndTags($project->getDomain());
 
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
@@ -430,19 +387,7 @@ class UserRepository extends Repository
                 $condBegin
                 $condEnd";
 
-        $username = $user->getUsername();
-        $resultQuery = $conn->prepare($sql);
-        $resultQuery->bindParam('username', $username);
-        if (!empty($start)) {
-            $resultQuery->bindParam('start', $start);
-        }
-        if (!empty($end)) {
-            $resultQuery->bindParam('end', $end);
-        }
-        if ($namespace !== 'all') {
-            $resultQuery->bindParam('namespace', $namespace);
-        }
-        $resultQuery->execute();
+        $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end);
         $result = (int) $resultQuery->fetchColumn();
 
         // Cache for 10 minutes, and return.
@@ -481,23 +426,10 @@ class UserRepository extends Repository
         }
         $this->stopwatch->start($cacheKey, 'XTools');
 
-        $condBegin = '';
-        $condEnd = '';
-
-        if (!empty($start)) {
-            // For the query
-            $start = date('Ymd000000', strtotime($start));
-            $condBegin = 'AND revs.rev_timestamp >= :start ';
-        }
-        if (!empty($end)) {
-            // For the query
-            $end = date('Ymd235959', strtotime($end));
-            $condEnd = 'AND revs.rev_timestamp <= :end ';
-        }
+        list($condBegin, $condEnd) = $this->getRevTimestampConditions($start, $end);
 
         // Get the combined regex and tags for the tools
-        $conn = $this->getProjectsConnection();
-        list($regex, $tags) = $this->getToolRegexAndTags($project->getDomain(), $conn);
+        list($regex, $tags) = $this->getToolRegexAndTags($project->getDomain());
 
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
@@ -529,19 +461,7 @@ class UserRepository extends Repository
                 LIMIT 50
                 OFFSET $offset";
 
-        $username = $user->getUsername();
-        $resultQuery = $conn->prepare($sql);
-        $resultQuery->bindParam('username', $username);
-        if (!empty($start)) {
-            $resultQuery->bindParam('start', $start);
-        }
-        if (!empty($end)) {
-            $resultQuery->bindParam('end', $end);
-        }
-        if ($namespace !== 'all') {
-            $resultQuery->bindParam('namespace', $namespace);
-        }
-        $resultQuery->execute();
+        $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end);
         $result = $resultQuery->fetchAll();
 
         // Cache for 10 minutes, and return.
@@ -555,7 +475,7 @@ class UserRepository extends Repository
     }
 
     /**
-     * Get non-automated contributions for the given user.
+     * Get counts of known automated tools used by the given user.
      * @param Project $project
      * @param User $user
      * @param string|int $namespace Namespace ID or 'all'.
@@ -582,97 +502,11 @@ class UserRepository extends Repository
         }
         $this->stopwatch->start($cacheKey, 'XTools');
 
-        $condBegin = '';
-        $condEnd = '';
+        $sql = $this->getAutomatedCountsSql($project, $namespace, $start, $end);
+        $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end);
 
-        if (!empty($start)) {
-            // For the query
-            $start = date('Ymd000000', strtotime($start));
-            $condBegin = 'AND rev_timestamp >= :start ';
-        }
-        if (!empty($end)) {
-            // For the query
-            $end = date('Ymd235959', strtotime($end));
-            $condEnd = 'AND rev_timestamp <= :end ';
-        }
-
-        $conn = $this->getProjectsConnection();
-
-        // Load the semi-automated edit types.
         $automatedEditsHelper = $this->container->get('app.automated_edits_helper');
         $tools = $automatedEditsHelper->getTools($project->getDomain());
-
-        // Create a collection of queries that we're going to run.
-        $queries = [];
-
-        $revisionTable = $project->getRepository()->getTableName($project->getDatabaseName(), 'revision');
-        $pageTable = $project->getRepository()->getTableName($project->getDatabaseName(), 'page');
-        $tagTable = $project->getRepository()->getTableName($project->getDatabaseName(), 'change_tag');
-
-        $pageJoin = $namespace !== 'all' ? "LEFT JOIN $pageTable ON rev_page = page_id" : null;
-        $condNamespace = $namespace !== 'all' ? "AND page_namespace = :namespace" : null;
-
-        foreach ($tools as $toolname => $values) {
-            $tagJoin = '';
-            $condTool = '';
-            $toolname = $conn->quote($toolname, \PDO::PARAM_STR);
-
-            if (isset($values['regex'])) {
-                $regex = $conn->quote($values['regex'], \PDO::PARAM_STR);
-                $condTool = "rev_comment REGEXP $regex";
-            }
-            if (isset($values['tag'])) {
-                $tagJoin = "LEFT OUTER JOIN $tagTable ON ct_rev_id = rev_id";
-                $tag = $conn->quote($values['tag'], \PDO::PARAM_STR);
-
-                // Append to regex clause if already present.
-                // Tags are more reliable but may not be present for edits made with
-                //   older versions of the tool, before it started adding tags.
-                if ($condTool === '') {
-                    $condTool = "ct_tag = $tag";
-                } else {
-                    $condTool = '(' . $condTool . " OR ct_tag = $tag)";
-                }
-            }
-
-            // Developer error, no regex or tag provided for this tool.
-            if ($condTool === '') {
-                throw new Exception("No regex or tag found for the tool $toolname. " .
-                    "Please verify this entry in semi_automated.yml");
-            }
-
-            $queries[] .= "
-                SELECT $toolname AS toolname, COUNT(rev_id) AS count
-                FROM $revisionTable
-                $pageJoin
-                $tagJoin
-                WHERE rev_user_text = :username
-                AND $condTool
-                $condNamespace
-                $condBegin
-                $condEnd";
-        }
-
-        // Create a big query and execute.
-        $sql = implode(' UNION ', $queries);
-
-        $resultQuery = $conn->prepare($sql);
-
-        $username = $user->getUsername(); // use normalized user name
-        $resultQuery->bindParam('username', $username);
-        if (!empty($start)) {
-            $startParam = date('Ymd000000', strtotime($start));
-            $resultQuery->bindParam('start', $startParam);
-        }
-        if (!empty($end)) {
-            $endParam = date('Ymd235959', strtotime($end));
-            $resultQuery->bindParam('end', $endParam);
-        }
-        if ($namespace !== 'all') {
-            $resultQuery->bindParam('namespace', $namespace);
-        }
-
-        $resultQuery->execute();
 
         // handling results
         $results = [];
@@ -704,6 +538,95 @@ class UserRepository extends Repository
     }
 
     /**
+     * Get SQL for getting counts of known automated tools used by the given user.
+     * @see self::getAutomatedCounts()
+     * @param Project $project
+     * @param string|int $namespace Namespace ID or 'all'.
+     * @param string $start Start date in a format accepted by strtotime()
+     * @param string $end End date in a format accepted by strtotime()
+     * @return string The SQL.
+     */
+    private function getAutomatedCountsSql(Project $project, $namespace, $start, $end)
+    {
+        list($condBegin, $condEnd) = $this->getRevTimestampConditions($start, $end);
+
+        // Load the semi-automated edit types.
+        $automatedEditsHelper = $this->container->get('app.automated_edits_helper');
+        $tools = $automatedEditsHelper->getTools($project->getDomain());
+
+        // Create a collection of queries that we're going to run.
+        $queries = [];
+
+        $revisionTable = $project->getTableName('revision');
+        $pageTable = $project->getTableName('page');
+        $tagTable = $project->getTableName('change_tag');
+
+        $pageJoin = $namespace !== 'all' ? "LEFT JOIN $pageTable ON rev_page = page_id" : null;
+        $condNamespace = $namespace !== 'all' ? "AND page_namespace = :namespace" : null;
+
+        $conn = $this->getProjectsConnection();
+
+        foreach ($tools as $toolname => $values) {
+            list($condTool, $tagJoin) = $this->getInnerAutomatedCountsSql($tagTable, $values);
+
+            $toolname = $conn->quote($toolname, \PDO::PARAM_STR);
+
+            // Developer error, no regex or tag provided for this tool.
+            if ($condTool === '') {
+                throw new Exception("No regex or tag found for the tool $toolname. " .
+                    "Please verify this entry in semi_automated.yml");
+            }
+
+            $queries[] .= "
+                SELECT $toolname AS toolname, COUNT(rev_id) AS count
+                FROM $revisionTable
+                $pageJoin
+                $tagJoin
+                WHERE rev_user_text = :username
+                AND $condTool
+                $condNamespace
+                $condBegin
+                $condEnd";
+        }
+
+        // Combine to one big query.
+        return implode(' UNION ', $queries);
+    }
+
+    /**
+     * Get some of the inner SQL for self::getAutomatedCountsSql().
+     * @param  string $tagTable Name of the `change_tag` table.
+     * @param  string[] $values Values as defined in semi_automated.yml
+     * @return string[] [Equality clause, JOIN clause]
+     */
+    private function getInnerAutomatedCountsSql($tagTable, $values)
+    {
+        $conn = $this->getProjectsConnection();
+        $tagJoin = '';
+        $condTool = '';
+
+        if (isset($values['regex'])) {
+            $regex = $conn->quote($values['regex'], \PDO::PARAM_STR);
+            $condTool = "rev_comment REGEXP $regex";
+        }
+        if (isset($values['tag'])) {
+            $tagJoin = "LEFT OUTER JOIN $tagTable ON ct_rev_id = rev_id";
+            $tag = $conn->quote($values['tag'], \PDO::PARAM_STR);
+
+            // Append to regex clause if already present.
+            // Tags are more reliable but may not be present for edits made with
+            //   older versions of the tool, before it started adding tags.
+            if ($condTool === '') {
+                $condTool = "ct_tag = $tag";
+            } else {
+                $condTool = '(' . $condTool . " OR ct_tag = $tag)";
+            }
+        }
+
+        return [$condTool, $tagJoin];
+    }
+
+    /**
      * Get information about the currently-logged in user.
      * @return array
      */
@@ -727,16 +650,17 @@ class UserRepository extends Repository
      * Get the combined regex and tags for all semi-automated tools,
      *   ready to be used in a query.
      * @param string $projectDomain Such as en.wikipedia.org
-     * @param $conn Doctrine\DBAL\Connection Used for proper escaping
      * @return string[] In the format:
      *    ['combined|regex', 'combined,tags']
      */
-    private function getToolRegexAndTags($projectDomain, $conn)
+    private function getToolRegexAndTags($projectDomain)
     {
+        $conn = $this->getProjectsConnection();
         $automatedEditsHelper = $this->container->get('app.automated_edits_helper');
         $tools = $automatedEditsHelper->getTools($projectDomain);
         $regexes = [];
         $tags = [];
+
         foreach ($tools as $tool => $values) {
             if (isset($values['regex'])) {
                 $regexes[] = $values['regex'];
@@ -750,5 +674,59 @@ class UserRepository extends Repository
             $conn->quote(implode('|', $regexes), \PDO::PARAM_STR),
             implode(',', $tags),
         ];
+    }
+
+    /**
+     * Get SQL clauses for rev_timestamp, based on whether values for
+     * the given start and end parameters exist.
+     * @param  string $start
+     * @param  string $end
+     * @return string[] Clauses for start and end timestamps.
+     */
+    private function getRevTimestampConditions($start, $end)
+    {
+        $condBegin = '';
+        $condEnd = '';
+
+        if (!empty($start)) {
+            $condBegin = 'AND rev_timestamp >= :start ';
+        }
+        if (!empty($end)) {
+            $condEnd = 'AND rev_timestamp <= :end ';
+        }
+
+        return [$condBegin, $condEnd];
+    }
+
+    /**
+     * Prepare the given SQL, bind the given parameters, and execute the Doctrine Statement.
+     * @param  string $sql
+     * @param  User   $user
+     * @param  string $namespace
+     * @param  string $start
+     * @param  string $end
+     * @return Doctrine\DBAL\Statement
+     */
+    private function executeQuery($sql, User $user, $namespace = 'all', $start = '', $end = '')
+    {
+        $resultQuery = $this->getProjectsConnection()->prepare($sql);
+        $username = $user->getUsername();
+        $resultQuery->bindParam('username', $username);
+
+        if (!empty($start)) {
+            $start = date('Ymd000000', strtotime($start));
+            $resultQuery->bindParam('start', $start);
+        }
+        if (!empty($end)) {
+            $end = date('Ymd235959', strtotime($end));
+            $resultQuery->bindParam('end', $end);
+        }
+        if ($namespace !== 'all') {
+            $resultQuery->bindParam('namespace', $namespace);
+        }
+
+        $resultQuery->execute();
+
+        return $resultQuery;
     }
 }
