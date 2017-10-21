@@ -123,12 +123,16 @@ class UserRepository extends Repository
 
         $this->stopwatch->start($cacheKey, 'XTools');
         $api = $this->getMediawikiApi($project);
-        $params = [ "list"=>"users", "ususers"=>$username, "usprop"=>"groups" ];
+        $params = [
+            'list' => 'users',
+            'ususers' => $username,
+            'usprop' => 'groups'
+        ];
         $query = new SimpleRequest('query', $params);
         $result = [];
         $res = $api->getRequest($query);
-        if (isset($res["batchcomplete"]) && isset($res["query"]["users"][0]["groups"])) {
-            $result = $res["query"]["users"][0]["groups"];
+        if (isset($res['batchcomplete']) && isset($res['query']['users'][0]['groups'])) {
+            $result = $res['query']['users'][0]['groups'];
         }
 
         // Cache for 10 minutes, and return.
