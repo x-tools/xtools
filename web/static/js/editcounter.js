@@ -76,9 +76,8 @@ function toggleNamespace(newData, key)
     // Now that we have the total, loop through once more time to update percentages.
     counts.forEach(function (count) {
         // Calculate percentage, rounded to tenths.
-        var percentage = +(Math.round(
-            ((count / total) * 100) + 'e+1'
-        ) + 'e-1');
+        var percentage = getPercentage(count, total);
+
         // Update text with new value and percentage.
         $('.namespaces-table .sort-entry--count[data-value='+count+']').text(
             count.toLocaleString() + ' (' + percentage + '%)'
@@ -151,8 +150,34 @@ function loadLatestGlobal()
  * all namespaces in that year/month.
  * @param {String} id ID prefix of the chart, either 'month' or 'year'.
  * @param {Array} datasets Datasets making up the chart.
+ * @return {Array} Labels for each year/month.
  */
 function getYAxisLabels(id, datasets)
+{
+    var labelsAndTotals = getMonthYearTotals(id, datasets);
+
+    // Format labels with totals next to them. This is a bit hacky,
+    // but it works! We use tabs (\t) to make the labels/totals
+    // for each namespace line up perfectly.
+    // The caveat is that we can't localize the numbers because
+    // the commas are not monospaced :(
+    return Object.keys(labelsAndTotals).map(function (year) {
+        var digitCount = labelsAndTotals[year].toString().length;
+        var numTabs = (window.maxDigits[id] - digitCount) * 2;
+
+        // +5 for a bit of extra spacing.
+        return year + Array(numTabs + 5).join("\t") +
+            labelsAndTotals[year];
+    });
+}
+
+/**
+ * Get the total number of edits for the given dataset (year or month).
+ * @param {String} id ID prefix of the chart, either 'month' or 'year'.
+ * @param {Array} datasets Datasets making up the chart.
+ * @return {Object} Labels for each year/month as keys, totals as the values.
+ */
+function getMonthYearTotals(id, datasets)
 {
     var labelsAndTotals = {};
     datasets.forEach(function (namespace) {
@@ -168,19 +193,20 @@ function getYAxisLabels(id, datasets)
         });
     });
 
-    // Format labels with totals next to them. This is a bit hacky,
-    // but it works! We use tabs (\t) to make the labels/totals
-    // for each namespace line up perfectly.
-    // The caveat is that we can't localize the numbers because
-    // the commas are not monospaced :(
-    return Object.keys(labelsAndTotals).map(function (year) {
-        var digitCount = labelsAndTotals[year].toString().length;
-        var numTabs = (window.maxDigits[id] - digitCount) * 2;
+    return labelsAndTotals;
+}
 
-        // +5 for a bit of extra spacing.
-        return year + Array(numTabs + 5).join("\t") +
-            labelsAndTotals[year];
-    });
+/**
+ * Calculate and format a percentage, rounded to the tenths place.
+ * @param  {Number} numerator
+ * @param  {Number} denominator
+ * @return {Number}
+ */
+function getPercentage(numerator, denominator)
+{
+    return +(Math.round(
+        ((numerator / denominator) * 100) + 'e+1'
+    ) + 'e-1');
 }
 
 /**
@@ -212,7 +238,15 @@ window.setupMonthYearChart = function (id, datasets, labels, maxTotal) {
                 intersect: true,
                 callbacks: {
                     label: function (tooltip) {
-                        return tooltip.xLabel.toLocaleString();
+                        var labelsAndTotals = getMonthYearTotals(id, datasets),
+                            totals = Object.keys(labelsAndTotals).map(function (label) {
+                                return labelsAndTotals[label];
+                            }),
+                            total = totals[tooltip.index],
+                            percentage = getPercentage(tooltip.xLabel, total);
+
+                        return tooltip.xLabel.toLocaleString() + ' ' +
+                            '(' + percentage + '%)';
                     },
                     title: function (tooltip) {
                         var yLabel = tooltip[0].yLabel.replace(/\t.*/, '');
