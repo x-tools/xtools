@@ -783,8 +783,47 @@ class EditCounter extends Model
         /** @var DateTime Keep track of the date of their first edit. */
         $firstEdit = new DateTime();
 
-        // Loop through the database results and fill in the values
-        //   for the months that we have data for.
+        list($out, $firstEdit) = $this->fillInMonthCounts($out, $totals, $firstEdit);
+
+        $dateRange = new DatePeriod(
+            $firstEdit,
+            new DateInterval('P1M'),
+            $currentTime->modify('first day of this month')
+        );
+
+        $out = $this->fillInMonthTotalsAndLabels($out, $dateRange);
+
+        // One more set of loops to sort by year/month
+        foreach (array_keys($out['totals']) as $nsId) {
+            ksort($out['totals'][$nsId]);
+
+            foreach ($out['totals'][$nsId] as &$yearData) {
+                ksort($yearData);
+            }
+        }
+
+        // Finally, sort the namespaces
+        ksort($out['totals']);
+
+        $this->monthCounts = $out;
+        return $out;
+    }
+
+    /**
+     * Loop through the database results and fill in the values
+     * for the months that we have data for.
+     * @param array $out
+     * @param string[] $totals
+     * @param DateTime $firstEdit
+     * @return array [
+     *           string[] - Modified $out filled with month stats,
+     *           DateTime - timestamp of first edit
+     *         ]
+     * Tests covered in self::monthCounts().
+     * @codeCoverageIgnore
+     */
+    private function fillInMonthCounts($out, $totals, $firstEdit)
+    {
         foreach ($totals as $total) {
             // Keep track of first edit
             $date = new DateTime($total['year'].'-'.$total['month'].'-01');
@@ -806,12 +845,19 @@ class EditCounter extends Model
             $out['totals'][$ns][$total['year']][$total['month']] = (int) $total['count'];
         }
 
-        $dateRange = new DatePeriod(
-            $firstEdit,
-            new DateInterval('P1M'),
-            $currentTime->modify('first day of this month')
-        );
+        return [$out, $firstEdit];
+    }
 
+    /**
+     * Given the output array, fill each month's totals and labels.
+     * @param array $out
+     * @param DatePeriod $dateRange From first edit to present.
+     * @return string[] - Modified $out filled with month stats.
+     * Tests covered in self::monthCounts().
+     * @codeCoverageIgnore
+     */
+    private function fillInMonthTotalsAndLabels($out, DatePeriod $dateRange)
+    {
         foreach ($dateRange as $monthObj) {
             $year = (int) $monthObj->format('Y');
             $month = (int) $monthObj->format('n');
@@ -833,19 +879,6 @@ class EditCounter extends Model
             }
         }
 
-        // One more set of loops to sort by year/month
-        foreach (array_keys($out['totals']) as $nsId) {
-            ksort($out['totals'][$nsId]);
-
-            foreach ($out['totals'][$nsId] as &$yearData) {
-                ksort($yearData);
-            }
-        }
-
-        // Finally, sort the namespaces
-        ksort($out['totals']);
-
-        $this->monthCounts = $out;
         return $out;
     }
 
