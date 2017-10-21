@@ -15,8 +15,8 @@ To **report an issue**, create a ticket on [Phabricator](https://phabricator.wik
 [![Dependency Status](https://www.versioneye.com/user/projects/58d352f8dcaf9e0040b1b1ba/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/58d352f8dcaf9e0040b1b1ba)
 
 [![Build Status](https://travis-ci.org/x-tools/xtools.svg?branch=master)](https://travis-ci.org/x-tools/xtools)
-[![Scrutinizer](https://img.shields.io/scrutinizer/g/x-tools/xtools.svg)](Scrutinizer)
-<!-- [![Codecov](https://img.shields.io/codecov/c/github/x-tools/xtools.svg)]() -->
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/x-tools/xtools/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/x-tools/xtools/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/x-tools/xtools/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/x-tools/xtools/?branch=master)
 
 ## Kudos and history
 
