@@ -59,15 +59,15 @@ class DefaultController extends XtoolsController
     public function configAction()
     {
 
-        if ($this->container->getParameter('kernel.environment') != "dev") {
+        if ($this->container->getParameter('kernel.environment') !== 'dev') {
             throw new NotFoundHttpException();
         }
 
         $params = $this->container->getParameterBag()->all();
 
         foreach ($params as $key => $value) {
-            if (strpos($key, "password") !== false) {
-                $params[$key] = "<REDACTED>";
+            if (strpos($key, 'password') !== false) {
+                $params[$key] = '<REDACTED>';
             }
         }
 
@@ -115,7 +115,7 @@ class DefaultController extends XtoolsController
     {
         // Give up if the required GET params don't exist.
         if (!$request->get('oauth_verifier')) {
-            return $this->createNotFoundException();
+            throw $this->createNotFoundException('No OAuth verifier given.');
         }
 
         /** @var Session $session */
@@ -143,6 +143,7 @@ class DefaultController extends XtoolsController
      * Get an OAuth client, configured to the default project.
      * (This shouldn't really be in this class, but oh well.)
      * @return Client
+     * @codeCoverageIgnore
      */
     protected function getOauthClient()
     {
@@ -151,8 +152,8 @@ class DefaultController extends XtoolsController
         }
         $defaultProject = ProjectRepository::getDefaultProject($this->container);
         $endpoint = $defaultProject->getUrl(false)
-                    . $defaultProject->getScriptPath()
-                    . '/index.php?title=Special:OAuth';
+                    . $defaultProject->getScript()
+                    . '?title=Special:OAuth';
         $conf = new ClientConfig($endpoint);
         $consumerKey = $this->getParameter('oauth_key');
         $consumerSecret =  $this->getParameter('oauth_secret');
