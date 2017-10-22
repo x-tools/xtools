@@ -311,11 +311,8 @@ class UserRepository extends Repository
         }
 
         list($condBegin, $condEnd) = $this->getRevTimestampConditions($start, $end);
-
-        $pageTable = $project->getTableName('page');
+        list($pageJoin, $condNamespace) = $this->getPageAndNamespaceSql($project, $namespace);
         $revisionTable = $project->getTableName('revision');
-        $condNamespace = $namespace === 'all' ? '' : 'AND page_namespace = :namespace';
-        $pageJoin = $namespace === 'all' ? '' : "JOIN $pageTable ON rev_page = page_id";
 
         $sql = "SELECT COUNT(rev_id)
                 FROM $revisionTable
@@ -359,11 +356,10 @@ class UserRepository extends Repository
         // Get the combined regex and tags for the tools
         list($regex, $tags) = $this->getToolRegexAndTags($project->getDomain());
 
-        $pageTable = $project->getTableName('page');
+        list($pageJoin, $condNamespace) = $this->getPageAndNamespaceSql($project, $namespace);
+
         $revisionTable = $project->getTableName('revision');
         $tagTable = $project->getTableName('change_tag');
-        $condNamespace = $namespace === 'all' ? '' : 'AND page_namespace = :namespace';
-        $pageJoin = $namespace === 'all' ? '' : "JOIN $pageTable ON page_id = rev_page";
         $tagJoin = '';
 
         // Build SQL for detecting autoedits via regex and/or tags
@@ -558,11 +554,9 @@ class UserRepository extends Repository
         $queries = [];
 
         $revisionTable = $project->getTableName('revision');
-        $pageTable = $project->getTableName('page');
         $tagTable = $project->getTableName('change_tag');
 
-        $pageJoin = $namespace !== 'all' ? "LEFT JOIN $pageTable ON rev_page = page_id" : null;
-        $condNamespace = $namespace !== 'all' ? "AND page_namespace = :namespace" : null;
+        list($pageJoin, $condNamespace) = $this->getPageAndNamespaceSql($project, $namespace);
 
         $conn = $this->getProjectsConnection();
 
@@ -591,6 +585,25 @@ class UserRepository extends Repository
 
         // Combine to one big query.
         return implode(' UNION ', $queries);
+    }
+
+    /**
+     * Get SQL clauses for joining on `page` and restricting to a namespace.
+     * @param  Project $project
+     * @param  int|string $namespace Namespace ID or 'all' for all namespaces.
+     * @return array [page join clause, page namespace clause]
+     */
+    private function getPageAndNamespaceSql(Project $project, $namespace)
+    {
+        if ($namespace === 'all') {
+            return [null, null];
+        }
+
+        $pageTable = $project->getTableName('page');
+        $pageJoin = $namespace !== 'all' ? "LEFT JOIN $pageTable ON rev_page = page_id" : null;
+        $condNamespace = 'AND page_namespace = :namespace';
+
+        return [$pageJoin, $condNamespace];
     }
 
     /**
