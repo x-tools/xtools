@@ -17,7 +17,7 @@ You can optionally pass in ``?tools=1`` to get individual counts of each (semi-)
 
 * ``project`` (**required**) - Project domain or database name.
 * ``username`` (**required**) - Account's username.
-* ``namespace`` (**required**) - Namespace ID or 'all' for all namespaces.
+* ``namespace`` - Namespace ID or ``all`` for all namespaces.
 * ``start`` - Start date in the format ``YYYY-MM-DD``. Leave this and ``end`` blank to retrieve the most recent data.
 * ``end`` - End date in the format ``YYYY-MM-DD``. Leave this and ``start`` blank to retrieve the most recent data.
 * ``tools`` - Set to any non-blank value to include the tools that were used and thier counts.
@@ -42,7 +42,7 @@ Get non-automated contributions for the given user, namespace and date range.
 
 * ``project`` (**required**) - Project domain or database name.
 * ``username`` (**required**) - Account's username.
-* ``namespace`` (**required**) - Namespace ID or 'all' for all namespaces.
+* ``namespace`` (**required**) - Namespace ID or  ``all`` for all namespaces.
 * ``start`` - Start date in the format ``YYYY-MM-DD``. Leave this and ``end`` blank to retrieve the most recent contributions.
 * ``end`` - End date in the format ``YYYY-MM-DD``. Leave this and ``start`` blank to retrieve the most recent contributions.
 * ``offset`` - Number of edits from the start date.
@@ -52,3 +52,21 @@ Get non-automated contributions for the given user, namespace and date range.
 Get the newest non-automated mainspace contributions made by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ on the English Wikipedia.
 
     https://xtools.wmflabs.org/api/user/nonautomated_edits/en.wikipedia/Jimbo_Wales/0
+
+Edit summaries
+==============
+``GET /api/user/edit_summeries/{project}/{username}/{namespace}``
+
+Get statistics about a user's usage of edit summaries.
+
+**Parameters:**
+
+* ``project`` (**required**) - Project domain or database name.
+* ``username`` (**required**) - Account's username.
+* ``namespace`` - Namespace ID or ``all`` for all namespaces.
+
+**Example:**
+
+Get `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_'s edit summary statistics on the English Wikipedia.
+
+    https://xtools.wmflabs.org/api/user/edit_summeries/en.wikipedia/Jimbo_Wales
