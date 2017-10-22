@@ -6,7 +6,6 @@
 namespace Xtools;
 
 use Exception;
-use DateInterval;
 use Mediawiki\Api\SimpleRequest;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -53,12 +52,8 @@ class UserRepository extends Repository
         $resultQuery->execute();
         $userId = (int)$resultQuery->fetchColumn();
 
-        // Cache for 10 minutes.
-        $cacheItem = $this->cache
-            ->getItem($cacheKey)
-            ->set($userId)
-            ->expiresAfter(new DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
+        // Cache for 10 minutes and return.
+        $this->setCache($cacheKey, $userId);
         return $userId;
     }
 
@@ -82,12 +77,8 @@ class UserRepository extends Repository
         $resultQuery->execute();
         $registrationDate = $resultQuery->fetchColumn();
 
-        // Cache for 10 minutes.
-        $cacheItem = $this->cache
-            ->getItem($cacheKey)
-            ->set($registrationDate)
-            ->expiresAfter(new DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
+        // Cache and return.
+        $this->setCache($cacheKey, $registrationDate);
         return $registrationDate;
     }
 
@@ -136,10 +127,7 @@ class UserRepository extends Repository
         }
 
         // Cache for 10 minutes, and return.
-        $cacheItem = $this->cache->getItem($cacheKey)
-            ->set($result)
-            ->expiresAfter(new DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
+        $this->setCache($cacheKey, $result);
         $this->stopwatch->stop($cacheKey);
 
         return $result;
@@ -286,10 +274,7 @@ class UserRepository extends Repository
         $result = $resultQuery->fetchAll();
 
         // Cache for 10 minutes, and return.
-        $cacheItem = $this->cache->getItem($cacheKey)
-            ->set($result)
-            ->expiresAfter(new DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
+        $this->setCache($cacheKey, $result);
         $this->stopwatch->stop($cacheKey);
 
         return $result;
@@ -311,11 +296,8 @@ class UserRepository extends Repository
         }
 
         list($condBegin, $condEnd) = $this->getRevTimestampConditions($start, $end);
-
-        $pageTable = $project->getTableName('page');
+        list($pageJoin, $condNamespace) = $this->getPageAndNamespaceSql($project, $namespace);
         $revisionTable = $project->getTableName('revision');
-        $condNamespace = $namespace === 'all' ? '' : 'AND page_namespace = :namespace';
-        $pageJoin = $namespace === 'all' ? '' : "JOIN $pageTable ON rev_page = page_id";
 
         $sql = "SELECT COUNT(rev_id)
                 FROM $revisionTable
@@ -329,10 +311,7 @@ class UserRepository extends Repository
         $result = $resultQuery->fetchColumn();
 
         // Cache for 10 minutes, and return.
-        $cacheItem = $this->cache->getItem($cacheKey)
-            ->set($result)
-            ->expiresAfter(new DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
+        $this->setCache($cacheKey, $result);
 
         return $result;
     }
@@ -359,11 +338,10 @@ class UserRepository extends Repository
         // Get the combined regex and tags for the tools
         list($regex, $tags) = $this->getToolRegexAndTags($project->getDomain());
 
-        $pageTable = $project->getTableName('page');
+        list($pageJoin, $condNamespace) = $this->getPageAndNamespaceSql($project, $namespace);
+
         $revisionTable = $project->getTableName('revision');
         $tagTable = $project->getTableName('change_tag');
-        $condNamespace = $namespace === 'all' ? '' : 'AND page_namespace = :namespace';
-        $pageJoin = $namespace === 'all' ? '' : "JOIN $pageTable ON page_id = rev_page";
         $tagJoin = '';
 
         // Build SQL for detecting autoedits via regex and/or tags
@@ -391,10 +369,7 @@ class UserRepository extends Repository
         $result = (int) $resultQuery->fetchColumn();
 
         // Cache for 10 minutes, and return.
-        $cacheItem = $this->cache->getItem($cacheKey)
-            ->set($result)
-            ->expiresAfter(new DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
+        $this->setCache($cacheKey, $result);
         $this->stopwatch->stop($cacheKey);
 
         return $result;
@@ -465,10 +440,7 @@ class UserRepository extends Repository
         $result = $resultQuery->fetchAll();
 
         // Cache for 10 minutes, and return.
-        $cacheItem = $this->cache->getItem($cacheKey)
-            ->set($result)
-            ->expiresAfter(new DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
+        $this->setCache($cacheKey, $result);
         $this->stopwatch->stop($cacheKey);
 
         return $result;
@@ -528,10 +500,7 @@ class UserRepository extends Repository
         });
 
         // Cache for 10 minutes, and return.
-        $cacheItem = $this->cache->getItem($cacheKey)
-            ->set($results)
-            ->expiresAfter(new DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
+        $this->setCache($cacheKey, $results);
         $this->stopwatch->stop($cacheKey);
 
         return $results;
@@ -558,11 +527,9 @@ class UserRepository extends Repository
         $queries = [];
 
         $revisionTable = $project->getTableName('revision');
-        $pageTable = $project->getTableName('page');
         $tagTable = $project->getTableName('change_tag');
 
-        $pageJoin = $namespace !== 'all' ? "LEFT JOIN $pageTable ON rev_page = page_id" : null;
-        $condNamespace = $namespace !== 'all' ? "AND page_namespace = :namespace" : null;
+        list($pageJoin, $condNamespace) = $this->getPageAndNamespaceSql($project, $namespace);
 
         $conn = $this->getProjectsConnection();
 
@@ -591,6 +558,25 @@ class UserRepository extends Repository
 
         // Combine to one big query.
         return implode(' UNION ', $queries);
+    }
+
+    /**
+     * Get SQL clauses for joining on `page` and restricting to a namespace.
+     * @param  Project $project
+     * @param  int|string $namespace Namespace ID or 'all' for all namespaces.
+     * @return array [page join clause, page namespace clause]
+     */
+    private function getPageAndNamespaceSql(Project $project, $namespace)
+    {
+        if ($namespace === 'all') {
+            return [null, null];
+        }
+
+        $pageTable = $project->getTableName('page');
+        $pageJoin = $namespace !== 'all' ? "LEFT JOIN $pageTable ON rev_page = page_id" : null;
+        $condNamespace = 'AND page_namespace = :namespace';
+
+        return [$pageJoin, $condNamespace];
     }
 
     /**
