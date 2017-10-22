@@ -152,6 +152,7 @@ class AdminStatsController extends XtoolsController
     {
         $ret = $this->setUpAdminStats($project);
         if ($ret instanceof RedirectResponse) {
+            // FIXME: needs to render as JSON, fetching the message from the FlashBag.
             return $ret;
         }
 
@@ -180,6 +181,7 @@ class AdminStatsController extends XtoolsController
 
         $ret = $this->setUpAdminStats($project, $start, $end);
         if ($ret instanceof RedirectResponse) {
+            // FIXME: needs to render as JSON, fetching the message from the FlashBag.
             return $ret;
         }
 

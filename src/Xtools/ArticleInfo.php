@@ -125,10 +125,6 @@ class ArticleInfo extends Model
     {
         $this->page = $page;
         $this->container = $container;
-        $this->conn = $this->container
-            ->get('doctrine')
-            ->getManager('replicas')
-            ->getConnection();
     }
 
     /**
