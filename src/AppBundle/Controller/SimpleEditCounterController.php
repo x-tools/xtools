@@ -154,10 +154,8 @@ class SimpleEditCounterController extends XtoolsController
 
         $globalGroups = '';
 
-        if (boolval($this->getParameter('app.single_wiki'))) {
-            // Retrieving the global groups, using the ApiHelper class
-            $api = $this->get('app.api_helper');
-            $globalGroups = $api->globalGroups($project->getUrl(), $username);
+        if (!$this->getParameter('app.single_wiki')) {
+            $globalGroups = $user->getGlobalGroups($project);
         }
 
         // Assign the values and display the template

@@ -51,60 +51,6 @@ class ApiHelper extends HelperBase
     }
 
     /**
-     * Get the given user's groups on the given project.
-     * @deprecated Use User::getGroups() instead.
-     * @param string $project
-     * @param string $username
-     * @return string[]
-     */
-    public function groups($project, $username)
-    {
-        $this->setUp($project);
-        $params = [ "list"=>"users", "ususers"=>$username, "usprop"=>"groups" ];
-        $query = new SimpleRequest('query', $params);
-        $result = [];
-
-        try {
-            $res = $this->api->getRequest($query);
-            if (isset($res["batchcomplete"])
-                && isset($res["query"]["users"][0]["groups"])
-            ) {
-                $result = $res["query"]["users"][0]["groups"];
-            }
-        } catch (Exception $e) {
-            // The api returned an error!  Ignore
-        }
-
-        return $result;
-    }
-
-    /**
-     * Get the given user's globally-applicable groups.
-     * @deprecated Use User::getGlobalGroups() instead.
-     * @param string $project
-     * @param string $username
-     * @return string[]
-     */
-    public function globalGroups($project, $username)
-    {
-        $this->setUp($project);
-        $params = [ "meta"=>"globaluserinfo", "guiuser"=>$username, "guiprop"=>"groups" ];
-        $query = new SimpleRequest('query', $params);
-        $result = [];
-
-        try {
-            $res = $this->api->getRequest($query);
-            if (isset($res["batchcomplete"]) && isset($res["query"]["globaluserinfo"]["groups"])) {
-                $result = $res["query"]["globaluserinfo"]["groups"];
-            }
-        } catch (Exception $e) {
-            // The api returned an error!  Ignore
-        }
-
-        return $result;
-    }
-
-    /**
      * Get HTML display titles of a set of pages (or the normal title if there's no display title).
      * This will send t/50 API requests where t is the number of titles supplied.
      * @param string $project The project.
