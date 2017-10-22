@@ -13,6 +13,7 @@ use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Stopwatch\Stopwatch;
 use GuzzleHttp\Promise\Promise;
+use DateInterval;
 
 /**
  * A repository is responsible for retrieving data from wherever it lives (databases, APIs,
@@ -271,5 +272,20 @@ abstract class Repository
             // Assumed to be a string, number or boolean.
             return '.'.md5($arg);
         }
+    }
+
+    /**
+     * Set the cache with given options.
+     * @param string $cacheKey
+     * @param mixed  $value
+     * @param string $duration Valid DateInterval string.
+     */
+    public function setCache($cacheKey, $value, $duration = 'PT10M')
+    {
+        $cacheItem = $this->cache
+            ->getItem($cacheKey)
+            ->set($value)
+            ->expiresAfter(new DateInterval($duration));
+        $this->cache->save($cacheItem);
     }
 }
