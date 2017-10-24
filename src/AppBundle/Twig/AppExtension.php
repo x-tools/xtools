@@ -80,7 +80,9 @@ class AppExtension extends Extension
 
     /**
      * Get the duration of the current HTTP request in seconds.
-     * @return string
+     * @return double
+     * Untestable since there is no request stack in the tests.
+     * @codeCoverageIgnore
      */
     public function requestTime()
     {
@@ -628,7 +630,7 @@ class AppExtension extends Extension
     public function isUserAnon($user)
     {
         if ($user instanceof User) {
-            $username = $user.username;
+            $username = $user->username;
         } else {
             $username = $user;
         }
@@ -676,13 +678,29 @@ class AppExtension extends Extension
 
     /**
      * Format a time duration as humanized string.
-     * @param int $seconds Number of seconds
+     * @param int $seconds Number of seconds.
      * @param bool $translate Used for unit testing. Set to false to return
      *   the value and i18n key, instead of the actual translation.
      * @return string|array Examples: '30 seconds', '2 minutes', '15 hours', '500 days',
-     *   or [30, 'num-seconds'] (etc.) if $translate is true
+     *   or [30, 'num-seconds'] (etc.) if $translate is false.
      */
     public function formatDuration($seconds, $translate = true)
+    {
+        list($val, $key) = $this->getDurationMessageKey($seconds);
+
+        if ($translate) {
+            return $this->numberFormat($val) . ' ' . $this->intuitionMessage("num-$key", [$val]);
+        } else {
+            return [$this->numberFormat($val), "num-$key"];
+        }
+    }
+
+    /**
+     * Given a time duration in seconds, generate a i18n message key and value.
+     * @param  int $seconds Number of seconds.
+     * @return array<integer|string> [int - message value, string - message key]
+     */
+    private function getDurationMessageKey($seconds)
     {
         /** @var int Value to show in message */
         $val = $seconds;
@@ -704,10 +722,6 @@ class AppExtension extends Extension
             $key = 'minutes';
         }
 
-        if ($translate) {
-            return $this->numberFormat($val) . ' ' . $this->intuitionMessage("num-$key", [$val]);
-        } else {
-            return [$this->numberFormat($val), "num-$key"];
-        }
+        return [$val, $key];
     }
 }
