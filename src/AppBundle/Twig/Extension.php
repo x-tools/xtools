@@ -7,6 +7,7 @@ namespace AppBundle\Twig;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Intuition;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -86,6 +87,8 @@ abstract class Extension extends Twig_Extension
     /**
      * Shorthand to get the current request from the request stack.
      * @return Request
+     * There is no request stack in the tests.
+     * @codeCoverageIgnore
      */
     protected function getCurrentRequest()
     {
