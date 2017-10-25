@@ -1,5 +1,13 @@
 # Release Notes #
 
+## 3.1.14 ##
+- New Edit Summaries API endpoint.
+- T178622: Show percentages when hovering over namespaces in the year/month
+  counts charts in the Edit Counter tool.
+- T178618: Fix default sorting of AdminStats.
+- T178259: Fix links to redirect pages in the Pages Created tool.
+- Improved test coverage and code quality.
+
 ## 3.1.13 ##
 - Major refactoring of controllers, standardizing parsing and decoding of
   URL parameters.

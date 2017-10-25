@@ -630,12 +630,12 @@ class AppExtension extends Extension
     public function isUserAnon($user)
     {
         if ($user instanceof User) {
-            $username = $user->username;
+            $username = $user->getUsername();
         } else {
             $username = $user;
         }
 
-        return filter_var($username, FILTER_VALIDATE_IP);
+        return (bool)filter_var($username, FILTER_VALIDATE_IP);
     }
 
     /**

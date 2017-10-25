@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use AppBundle\Twig\AppExtension;
 use AppBundle\Twig\Extension;
 use DateTime;
+use Xtools\User;
 
 /**
  * Tests for the AppExtension class.
@@ -166,5 +167,19 @@ class AppExtensionTest extends WebTestCase
     public function testRequestTime()
     {
         $this->assertTrue(is_double($this->appExtension->requestMemory()));
+    }
+
+    /**
+     * Is the given user logged out?
+     */
+    public function testUserIsAnon()
+    {
+        $user = new User('68.229.186.65');
+        $user2 = new User('Test user');
+        $this->assertTrue($this->appExtension->isUserAnon($user));
+        $this->assertFalse($this->appExtension->isUserAnon($user2));
+
+        $this->assertTrue($this->appExtension->isUserAnon('2605:E000:855A:4B00:3035:523D:F7E9:8F82'));
+        $this->assertFalse($this->appExtension->isUserAnon('192.0.blah.1'));
     }
 }
