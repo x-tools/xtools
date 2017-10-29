@@ -269,7 +269,7 @@ abstract class Repository
             return '.'.join('', $arg);
         } else {
             // Assumed to be a string, number or boolean.
-            return '.'.$arg;
+            return '.'.md5($arg);
         }
     }
 }

@@ -81,12 +81,11 @@ class RepositoryTest extends WebTestCase
         // Set up example Models that we'll pass to Repository::getCacheKey().
         $project = $this->getMock(Project::class, ['getCacheKey'], ['enwiki']);
         $project->method('getCacheKey')->willReturn('enwiki');
-        $user = $this->getMock(User::class, ['getCacheKey'], ['Test user']);
-        $user->method('getCacheKey')->willReturn('Test_user');
+        $user = new User('Test user (WMF)');
 
         // Given explicit cache prefix.
         $this->assertEquals(
-            'cachePrefix.enwiki.Test_user.20170101.123',
+            'cachePrefix.enwiki.f475a8ac7f25e162bba0eb1b4b245027.a84e19e5268bf01623c8a130883df668.123',
             $this->stub->getCacheKey(
                 [$project, $user, '20170101', '', null, [1, 2, 3]],
                 'cachePrefix'
@@ -96,13 +95,14 @@ class RepositoryTest extends WebTestCase
         // It will use the name of the caller, in this case testCacheKey.
         $this->assertEquals(
             // The `false` argument generates the trailing `.`
-            'testCacheKey.enwiki.Test_user.20170101.',
+            'testCacheKey.enwiki.f475a8ac7f25e162bba0eb1b4b245027.' .
+                'a84e19e5268bf01623c8a130883df668.d41d8cd98f00b204e9800998ecf8427e',
             $this->stub->getCacheKey([$project, $user, '20170101', '', false, null])
         );
 
         // Single argument, no prefix.
         $this->assertEquals(
-            'testCacheKey.mycache',
+            'testCacheKey.838763cbdc764f1740370a8ee1000c65',
             $this->stub->getCacheKey('mycache')
         );
     }
