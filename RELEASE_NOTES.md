@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.1.15 ##
+- T179258: Don't use reserved characters in cache keys.
+
 ## 3.1.14 ##
 - New Edit Summaries API endpoint.
 - T178622: Show percentages when hovering over namespaces in the year/month
