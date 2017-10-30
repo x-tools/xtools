@@ -344,7 +344,7 @@ class ProjectRepository extends Repository
              . " LIMIT 1";
         $params = [
             'ns' => $namespaceId,
-            'title' => $pageTitle,
+            'title' => str_replace(' ', '_', $pageTitle),
         ];
         $pages = $conn->executeQuery($query, $params)->fetchAll();
         return count($pages) > 0;

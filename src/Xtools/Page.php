@@ -421,41 +421,45 @@ class Page extends Model
      */
     public function getWikidataErrors()
     {
-        $errors = [];
+        // FIXME: wikidatawiki_p.wb_entity_per_page is no more.
+        // Figure out how to check for missing description, etc.
+        return [];
 
-        if (empty($this->getWikidataId())) {
-            return [];
-        }
+        // $errors = [];
 
-        $wikidataInfo = $this->getRepository()->getWikidataInfo($this);
+        // if (empty($this->getWikidataId())) {
+        //     return [];
+        // }
 
-        $terms = array_map(function ($entry) {
-            return $entry['term'];
-        }, $wikidataInfo);
+        // $wikidataInfo = $this->getRepository()->getWikidataInfo($this);
 
-        $lang = $this->getLang();
+        // $terms = array_map(function ($entry) {
+        //     return $entry['term'];
+        // }, $wikidataInfo);
 
-        if (!in_array('label', $terms)) {
-            $errors[] = [
-                'prio' => 2,
-                'name' => 'Wikidata',
-                'notice' => "Label for language <em>$lang</em> is missing", // FIXME: i18n
-                'explanation' => "See: <a target='_blank' " .
-                    "href='//www.wikidata.org/wiki/Help:Label'>Help:Label</a>",
-            ];
-        }
+        // $lang = $this->getLang();
 
-        if (!in_array('description', $terms)) {
-            $errors[] = [
-                'prio' => 3,
-                'name' => 'Wikidata',
-                'notice' => "Description for language <em>$lang</em> is missing", // FIXME: i18n
-                'explanation' => "See: <a target='_blank' " .
-                    "href='//www.wikidata.org/wiki/Help:Description'>Help:Description</a>",
-            ];
-        }
+        // if (!in_array('label', $terms)) {
+        //     $errors[] = [
+        //         'prio' => 2,
+        //         'name' => 'Wikidata',
+        //         'notice' => "Label for language <em>$lang</em> is missing", // FIXME: i18n
+        //         'explanation' => "See: <a target='_blank' " .
+        //             "href='//www.wikidata.org/wiki/Help:Label'>Help:Label</a>",
+        //     ];
+        // }
 
-        return $errors;
+        // if (!in_array('description', $terms)) {
+        //     $errors[] = [
+        //         'prio' => 3,
+        //         'name' => 'Wikidata',
+        //         'notice' => "Description for language <em>$lang</em> is missing", // FIXME: i18n
+        //         'explanation' => "See: <a target='_blank' " .
+        //             "href='//www.wikidata.org/wiki/Help:Description'>Help:Description</a>",
+        //     ];
+        // }
+
+        // return $errors;
     }
 
     /**

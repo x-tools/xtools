@@ -229,50 +229,50 @@ class PageTest extends WebTestCase
         //$this->assertCount(3, $page->getRevisions($user)->getCount());
     }
 
-    /**
-     * Wikidata errors. With this test getWikidataInfo doesn't return a Description,
-     *     so getWikidataErrors should complain accordingly
-     */
-    public function testWikidataErrors()
-    {
-        $pageRepo = $this->getMock(PagesRepository::class, ['getWikidataInfo', 'getPageInfo']);
+    // /**
+    //  * Wikidata errors. With this test getWikidataInfo doesn't return a Description,
+    //  *     so getWikidataErrors should complain accordingly
+    //  */
+    // public function testWikidataErrors()
+    // {
+    //     $pageRepo = $this->getMock(PagesRepository::class, ['getWikidataInfo', 'getPageInfo']);
 
-        $pageRepo
-            ->method('getWikidataInfo')
-            ->with()
-            ->willReturn([
-                [
-                    'term' => 'label',
-                    'term_text' => 'My article',
-                ],
-            ]);
-        $pageRepo
-            ->method('getPageInfo')
-            ->with()
-            ->willReturn([
-                'pagelanguage' => 'en',
-                'pageprops' => [
-                    'wikibase_item' => 'Q123',
-                ],
-            ]);
+    //     $pageRepo
+    //         ->method('getWikidataInfo')
+    //         ->with()
+    //         ->willReturn([
+    //             [
+    //                 'term' => 'label',
+    //                 'term_text' => 'My article',
+    //             ],
+    //         ]);
+    //     $pageRepo
+    //         ->method('getPageInfo')
+    //         ->with()
+    //         ->willReturn([
+    //             'pagelanguage' => 'en',
+    //             'pageprops' => [
+    //                 'wikibase_item' => 'Q123',
+    //             ],
+    //         ]);
 
-        $page = new Page(new Project('exampleWiki'), 'Page');
-        $page->setRepository($pageRepo);
+    //     $page = new Page(new Project('exampleWiki'), 'Page');
+    //     $page->setRepository($pageRepo);
 
-        $wikidataErrors = $page->getWikidataErrors();
+    //     $wikidataErrors = $page->getWikidataErrors();
 
-        $this->assertArraySubset(
-            [
-                'prio' => 3,
-                'name' => 'Wikidata',
-            ],
-            $wikidataErrors[0]
-        );
-        $this->assertContains(
-            'Description',
-            $wikidataErrors[0]['notice']
-        );
-    }
+    //     $this->assertArraySubset(
+    //         [
+    //             'prio' => 3,
+    //             'name' => 'Wikidata',
+    //         ],
+    //         $wikidataErrors[0]
+    //     );
+    //     $this->assertContains(
+    //         'Description',
+    //         $wikidataErrors[0]['notice']
+    //     );
+    // }
 
     /**
      * Test getErros and getCheckWikiErrors.
@@ -292,15 +292,16 @@ class PageTest extends WebTestCase
                 'explanation' => 'This is how to fix the error'
             ],
         ];
-        $wikidataErrors = [
-            [
-                'prio' => 3,
-                'name' => 'Wikidata',
-                'notice' => 'Description for language <em>en</em> is missing',
-                'explanation' => "See: <a target='_blank' " .
-                    "href='//www.wikidata.org/wiki/Help:Description'>Help:Description</a>",
-            ],
-        ];
+        // $wikidataErrors = [
+        //     [
+        //         'prio' => 3,
+        //         'name' => 'Wikidata',
+        //         'notice' => 'Description for language <em>en</em> is missing',
+        //         'explanation' => "See: <a target='_blank' " .
+        //             "href='//www.wikidata.org/wiki/Help:Description'>Help:Description</a>",
+        //     ],
+        // ];
+        $wikidataErrors = [];
 
         $pageRepo->method('getCheckWikiErrors')
             ->willReturn($checkWikiErrors);
