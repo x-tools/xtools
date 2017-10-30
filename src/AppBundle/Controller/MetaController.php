@@ -145,10 +145,7 @@ class MetaController extends Controller
         $newReleaseNotes = $request->get("releaseNotes");
         $newGit = $request->get("git");
 
-        dump($request);
-
         if ($newVersion !== null) {
-
             $fRL = "$path/RELEASE_NOTES.md";
             $fAV = "$path/app/config/version.yml";
             $fRM = "$path/README.md";
