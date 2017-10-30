@@ -125,7 +125,7 @@
 	"text-to-serach": "Hledaný text",
 	"thank": "Poděkování",
 	"timecard": "Hodinový přehled",
-	"too-many-revisions": "Tento článek má více než 50 000 revizí. Níže se zobrazují data pro prvních 50 000.",
+	"too-many-revisions": "Tento článek má více než $1 {{PLURAL:$2|revizi|revize|revizí}}. Níže se zobrazují data pro posledních $1.",
 	"tool-adminstats": "Správcovská statistika",
 	"tool-adminstats-desc": "Statistika správcovských akcí",
 	"tool-articleinfo": "Historie stránky",

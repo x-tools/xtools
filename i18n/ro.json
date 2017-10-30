@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"Andreyyshore"
+			"Andreyyshore",
+			"Adrianbblk"
 		]
 	},
 	"about-xtools": "Despre aceste unelte",
@@ -260,7 +261,7 @@
 	"thursday": "joi",
 	"timecard": "Cronologie",
 	"times-in-utc": "Toate datele și orele sunt în UTC.",
-	"too-many-edits": "Acest utilizator a efectuat peste $1 {{PLURAL:$2|modificare|modificări|de modificări}}. Sunt afișate numai datele pentru ultimele $1.",
+	"too-many-edits": "Utilizatorul a facut prea multe editari! (Maxim $1)",
 	"too-many-revisions": "Această pagină are peste $1 {{PLURAL:$2|revizuire|revizuiri|de revizuiri}}. Sunt afișate numai datele pentru ultimele $1.",
 	"tool": "Unealtă",
 	"tool-about": "Despre",
