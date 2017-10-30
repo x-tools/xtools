@@ -19,12 +19,13 @@ class MetaController extends XtoolsController
 {
     /**
      * Display the form.
-     * @Route("/meta", name="meta")
-     * @Route("/meta", name="Meta")
-     * @Route("/meta/", name="MetaSlash")
+     *
+     * @Route("/meta",           name="meta")
+     * @Route("/meta",           name="Meta")
+     * @Route("/meta/",          name="MetaSlash")
      * @Route("/meta/index.php", name="MetaIndexPhp")
-     * @param Request $request
-     * @return Response
+     * @param                    Request $request
+     * @return                   Response
      */
     public function indexAction(Request $request)
     {
@@ -34,20 +35,23 @@ class MetaController extends XtoolsController
             return $this->redirectToRoute('MetaResult', $params);
         }
 
-        return $this->render('meta/index.html.twig', [
+        return $this->render(
+            'meta/index.html.twig', [
             'xtPage' => 'meta',
             'xtPageTitle' => 'tool-meta',
             'xtSubtitle' => 'tool-meta-desc',
-        ]);
+            ]
+        );
     }
 
     /**
      * Display the results.
+     *
      * @Route("/meta/{start}/{end}/{legacy}", name="MetaResult")
-     * @param string $start    Start date
-     * @param string $end      End date
-     * @param string [$legacy] Non-blank value indicates to show stats for legacy XTools
-     * @return Response
+     * @param                                 string   $start   Start date
+     * @param                                 string   $end     End date
+     * @param                                 string [ $legacy] Non-blank value indicates to show stats for legacy XTools
+     * @return                                Response
      * @codeCoverageIgnore
      */
     public function resultAction($start, $end, $legacy = false)
@@ -123,13 +127,14 @@ class MetaController extends XtoolsController
     /**
      * Record usage of a particular XTools tool. This is called automatically
      *   in base.html.twig via JavaScript so that it is done asynchronously
+     *
      * @Route("/meta/usage/{tool}/{project}/{token}")
-     * @param  $request Request
-     * @param  string $tool    Internal name of tool
-     * @param  string $project Project domain such as en.wikipedia.org
-     * @param  string $token   Unique token for this request, so we don't have people
-     *                         meddling with these statistics
-     * @return Response
+     * @param                                         $request Request
+     * @param                                         string          $tool    Internal name of tool
+     * @param                                         string          $project Project domain such as en.wikipedia.org
+     * @param                                         string          $token   Unique token for this request, so we don't have people
+     *                                  meddling with these statistics
+     * @return                                        Response
      * @codeCoverageIgnore
      */
     public function recordUsage(Request $request, $tool, $project, $token)
@@ -146,9 +151,13 @@ class MetaController extends XtoolsController
         // Don't update counts for tools that aren't enabled
         if (!$this->container->getParameter("enable.$tool")) {
             $response->setStatusCode(Response::HTTP_FORBIDDEN);
-            $response->setContent(json_encode([
-                'error' => 'This tool is disabled'
-            ]));
+            $response->setContent(
+                json_encode(
+                    [
+                    'error' => 'This tool is disabled'
+                    ]
+                )
+            );
             return $response;
         }
 
