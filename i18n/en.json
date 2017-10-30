@@ -288,7 +288,7 @@
 	"tool": "Tool",
 	"tool-about": "About",
 	"tool-adminscore": "Admin Score",
-	"tool-adminscore-desc": "Find out how admin-worthy a user is",
+	"tool-adminscore-desc": "Score indicating a user's readiness for adminship",
 	"tool-adminstats": "Admin Stats",
 	"tool-adminstats-desc": "Show statistics of admin actions",
 	"tool-articleinfo": "Page History",
