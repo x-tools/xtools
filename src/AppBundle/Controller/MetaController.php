@@ -211,13 +211,18 @@ class MetaController extends XtoolsController
      * @Route("/meta/tag", name="MetaTag")
      *
      * @return Response
+     *
+     * @codeCoverageIgnore
      */
     public function tagIndexAction()
     {
         if ($this->container->getParameter("kernel.environment") !== "dev") {
             // We don't want any more than this, this must be hidden entirely on
             // prod environments.
-            throw new FileNotFoundException();
+            throw
+            $this->createNotFoundException(
+                'This action is only available in the dev environment.'
+            );
         }
 
         $path = realpath($this->getParameter('kernel.root_dir').'/..');
