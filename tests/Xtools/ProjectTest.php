@@ -112,6 +112,37 @@ class ProjectTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Get the relative URL to the index.php script.
+     */
+    public function testGetScript()
+    {
+        $projectRepo = $this->getMock(ProjectRepository::class);
+        $projectRepo->expects($this->once())
+            ->method('getMetadata')
+            ->willReturn([
+                'general' => [
+                    'script' => '/w/index.php'
+                ],
+            ]);
+        $project = new Project('testWiki');
+        $project->setRepository($projectRepo);
+        $this->assertEquals('/w/index.php', $project->getScript());
+
+        // No script from API.
+        $projectRepo2 = $this->getMock(ProjectRepository::class);
+        $projectRepo2->expects($this->once())
+            ->method('getMetadata')
+            ->willReturn([
+                'general' => [
+                    'scriptPath' => '/w'
+                ],
+            ]);
+        $project2 = new Project('testWiki');
+        $project2->setRepository($projectRepo2);
+        $this->assertEquals('/w/index.php', $project2->getScript());
+    }
+
+    /**
      * A user or a whole project can opt in to displaying restricted statistics.
      * @dataProvider optedInProvider
      * @param string[] $optedInProjects List of projects.
@@ -168,6 +199,56 @@ class ProjectTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Get the URL to the assessment badge on Commons.
+     */
+    public function testAssessmentBadgeURL()
+    {
+        $projectRepo = $this->getMock(ProjectRepository::class);
+        $projectRepo->expects($this->exactly(2))
+            ->method('getAssessmentsConfig')
+            ->willReturn([
+                'class' => [
+                    'C' => [
+                        'badge' => 'e/e6/Symbol_c_class.svg',
+                    ],
+                    'Unknown' => [
+                        'badge' => 'e/e0/Symbol_question.svg',
+                    ],
+                ],
+            ]);
+        $project = new Project('testWiki');
+        $project->setRepository($projectRepo);
+
+        $this->assertEquals(
+            'https://upload.wikimedia.org/wikipedia/commons/e/e6/Symbol_c_class.svg',
+            $project->getAssessmentBadgeURL('C')
+        );
+
+        // Unknown class.
+        $this->assertEquals(
+            'https://upload.wikimedia.org/wikipedia/commons/e/e0/Symbol_question.svg',
+            $project->getAssessmentBadgeURL('D')
+        );
+    }
+
+    /**
+     * Normalized, quoted table name.
+     */
+    public function testTableName()
+    {
+        $projectRepo = $this->getMock(ProjectRepository::class);
+        $projectRepo->expects($this->once())
+            ->method('getTableName')
+            ->willReturn('testwiki_p.revision_userindex');
+        $project = new Project('testWiki');
+        $project->setRepository($projectRepo);
+        $this->assertEquals(
+            'testwiki_p.revision_userindex',
+            $project->getTableName('testwiki', 'revision')
+        );
+    }
+
+    /**
      * Data for self::testOptedIn().
      * @return array
      */
@@ -179,5 +260,34 @@ class ProjectTest extends PHPUnit_Framework_TestCase
             [$optedInProjects, 'project2', false],
             [$optedInProjects, 'project3', false],
         ];
+    }
+
+    /**
+     * Getting a list of the users within specific user groups.
+     */
+    public function testUsersInGroups()
+    {
+        $projectRepo = $this->getMock(ProjectRepository::class);
+        $projectRepo->expects($this->once())
+            ->method('getUsersInGroups')
+            ->willReturn([
+                ['user_name' => 'Bob', 'ug_group' => 'sysop'],
+                ['user_name' => 'Bob', 'ug_group' => 'checkuser'],
+                ['user_name' => 'Julie', 'ug_group' => 'sysop'],
+                ['user_name' => 'Herald', 'ug_group' => 'oversight'],
+                ['user_name' => 'Isosceles', 'ug_group' => 'oversight'],
+                ['user_name' => 'Isosceles', 'ug_group' => 'sysop'],
+            ]);
+        $project = new Project('testWiki');
+        $project->setRepository($projectRepo);
+        $this->assertEquals(
+            [
+                'Bob' => ['sysop', 'checkuser'],
+                'Julie' => ['sysop'],
+                'Herald' => ['oversight'],
+                'Isosceles' => ['oversight', 'sysop'],
+            ],
+            $project->getUsersInGroups(['sysop', 'oversight'])
+        );
     }
 }

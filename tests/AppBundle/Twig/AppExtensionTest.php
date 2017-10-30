@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use AppBundle\Twig\AppExtension;
 use AppBundle\Twig\Extension;
+use DateTime;
+use Xtools\User;
 
 /**
  * Tests for the AppExtension class.
@@ -36,7 +38,7 @@ class AppExtensionTest extends WebTestCase
     }
 
     /**
-     * Format number as a diff size
+     * Format number as a diff size.
      */
     public function testDiffFormat()
     {
@@ -52,6 +54,17 @@ class AppExtensionTest extends WebTestCase
             "<span class='diff-zero'>0</span>",
             $this->appExtension->diffFormat(0)
         );
+    }
+
+    /**
+     * Format number as a percentage.
+     */
+    public function testPercentFormat()
+    {
+        $this->assertEquals('45%', $this->appExtension->percentFormat(45));
+        $this->assertEquals('30%', $this->appExtension->percentFormat(30, null, 3));
+        $this->assertEquals('33.33%', $this->appExtension->percentFormat(2, 6, 2));
+        $this->assertEquals('25%', $this->appExtension->percentFormat(2, 8));
     }
 
     /**
@@ -79,5 +92,94 @@ class AppExtensionTest extends WebTestCase
             [10, 'num-days'],
             $this->appExtension->formatDuration(864000, false)
         );
+    }
+
+    /**
+     * Format a number.
+     */
+    public function testNumberFormat()
+    {
+        $this->assertEquals('1,234', $this->appExtension->numberFormat(1234));
+        $this->assertEquals('1,234.32', $this->appExtension->numberFormat(1234.316, 2));
+        $this->assertEquals('50', $this->appExtension->numberFormat(50.0000, 4));
+    }
+
+    /**
+     * Format a date.
+     */
+    public function testDateFormat()
+    {
+        $this->assertEquals(
+            '2/1/17, 11:45 PM',
+            $this->appExtension->dateFormat(new DateTime('2017-02-01 23:45:34'))
+        );
+        $this->assertEquals(
+            '8/12/15, 11:45 AM',
+            $this->appExtension->dateFormat('2015-08-12 11:45:50')
+        );
+    }
+
+    /**
+     * Intution methods.
+     */
+    public function testIntution()
+    {
+        $this->assertEquals('en', $this->appExtension->getLang());
+        $this->assertEquals('English', $this->appExtension->getLangName());
+
+        $allLangs = $this->appExtension->getAllLangs();
+
+        // There should be a bunch.
+        $this->assertGreaterThan(20, count($allLangs));
+
+        // Keys should be the language codes, with name as the values.
+        $this->assertArraySubset(['en' => 'English'], $allLangs);
+        $this->assertArraySubset(['de' => 'Deutsch'], $allLangs);
+        $this->assertArraySubset(['es' => 'Español'], $allLangs);
+
+        // Testing if the language is RTL.
+        $this->assertFalse($this->appExtension->intuitionIsRTLLang('en'));
+        $this->assertTrue($this->appExtension->intuitionIsRTLLang('ar'));
+    }
+
+    /**
+     * Methods that fetch data about the git repository.
+     */
+    public function testGitMethods()
+    {
+        $this->assertEquals(7, strlen($this->appExtension->gitShortHash()));
+        $this->assertEquals(40, strlen($this->appExtension->gitHash()));
+        $this->assertRegExp('/\d{4}-\d{2}-\d{2}/', $this->appExtension->gitDate());
+    }
+
+    /**
+     * Capitalizing first letter.
+     */
+    public function testCapitalizeFirst()
+    {
+        $this->assertEquals('Foo', $this->appExtension->capitalizeFirst('foo'));
+        $this->assertEquals('Bar', $this->appExtension->capitalizeFirst('Bar'));
+    }
+
+    /**
+     * Getting amount of time it took to complete the request.
+     */
+    public function testRequestTime()
+    {
+        $this->assertTrue(is_double($this->appExtension->requestMemory()));
+    }
+
+    /**
+     * Is the given user logged out?
+     */
+    public function testUserIsAnon()
+    {
+        $user = new User('68.229.186.65');
+        $user2 = new User('Test user');
+        $this->assertTrue($this->appExtension->isUserAnon($user));
+        $this->assertFalse($this->appExtension->isUserAnon($user2));
+
+        $this->assertTrue($this->appExtension->isUserAnon('2605:E000:855A:4B00:3035:523D:F7E9:8F82'));
+        $this->assertFalse($this->appExtension->isUserAnon('192.0.blah.1'));
     }
 }

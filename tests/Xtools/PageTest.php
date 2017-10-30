@@ -53,6 +53,12 @@ class PageTest extends WebTestCase
         $page->setRepository($pageRepo);
         $this->assertEquals('Test_Page_2', $page->getTitle());
         $this->assertEquals('<em>Test</em> page 2', $page->getDisplayTitle());
+
+        // Getting the unnormalized title should not call getPageInfo.
+        $page = new Page($project, 'talk:Test Page_3');
+        $page->setRepository($pageRepo);
+        $pageRepo->expects($this->never())->method('getPageInfo');
+        $this->assertEquals('talk:Test Page_3', $page->getTitle(true));
     }
 
     /**
@@ -176,9 +182,10 @@ class PageTest extends WebTestCase
             ->willReturn([
                 'pageprops' => [],
             ]);
-        $page->setRepository($pageRepo2);
-        $this->assertNull($page->getWikidataId());
-        $this->assertEquals(0, $page->countWikidataItems());
+        $page2 = new Page(new Project('TestProject'), 'Test_Page');
+        $page2->setRepository($pageRepo2);
+        $this->assertNull($page2->getWikidataId());
+        $this->assertEquals(0, $page2->countWikidataItems());
     }
 
     /**
@@ -222,48 +229,101 @@ class PageTest extends WebTestCase
         //$this->assertCount(3, $page->getRevisions($user)->getCount());
     }
 
-    /**
-     * Wikidata errors. With this test getWikidataInfo doesn't return a Description,
-     *     so getWikidataErrors should complain accordingly
-     */
-    public function testWikidataErrors()
-    {
-        $pageRepo = $this->getMock(PagesRepository::class, ['getWikidataInfo', 'getPageInfo']);
+    // /**
+    //  * Wikidata errors. With this test getWikidataInfo doesn't return a Description,
+    //  *     so getWikidataErrors should complain accordingly
+    //  */
+    // public function testWikidataErrors()
+    // {
+    //     $pageRepo = $this->getMock(PagesRepository::class, ['getWikidataInfo', 'getPageInfo']);
 
-        $pageRepo
-            ->method('getWikidataInfo')
-            ->with()
-            ->willReturn([
-                [
-                    'term' => 'label',
-                    'term_text' => 'My article',
-                ],
-            ]);
-        $pageRepo
-            ->method('getPageInfo')
-            ->with()
+    //     $pageRepo
+    //         ->method('getWikidataInfo')
+    //         ->with()
+    //         ->willReturn([
+    //             [
+    //                 'term' => 'label',
+    //                 'term_text' => 'My article',
+    //             ],
+    //         ]);
+    //     $pageRepo
+    //         ->method('getPageInfo')
+    //         ->with()
+    //         ->willReturn([
+    //             'pagelanguage' => 'en',
+    //             'pageprops' => [
+    //                 'wikibase_item' => 'Q123',
+    //             ],
+    //         ]);
+
+    //     $page = new Page(new Project('exampleWiki'), 'Page');
+    //     $page->setRepository($pageRepo);
+
+    //     $wikidataErrors = $page->getWikidataErrors();
+
+    //     $this->assertArraySubset(
+    //         [
+    //             'prio' => 3,
+    //             'name' => 'Wikidata',
+    //         ],
+    //         $wikidataErrors[0]
+    //     );
+    //     $this->assertContains(
+    //         'Description',
+    //         $wikidataErrors[0]['notice']
+    //     );
+    // }
+
+    /**
+     * Test getErros and getCheckWikiErrors.
+     */
+    public function testErrors()
+    {
+        $pageRepo = $this->getMock(PagesRepository::class, [
+            'getWikidataInfo', 'getCheckWikiErrors', 'getPageInfo'
+        ]);
+        $checkWikiErrors = [
+            [
+                'error' => '61',
+                'notice' => 'This is where the error is',
+                'found' => '2017-08-09 00:05:09',
+                'name' => 'Reference before punctuation',
+                'prio' => '3',
+                'explanation' => 'This is how to fix the error'
+            ],
+        ];
+        // $wikidataErrors = [
+        //     [
+        //         'prio' => 3,
+        //         'name' => 'Wikidata',
+        //         'notice' => 'Description for language <em>en</em> is missing',
+        //         'explanation' => "See: <a target='_blank' " .
+        //             "href='//www.wikidata.org/wiki/Help:Description'>Help:Description</a>",
+        //     ],
+        // ];
+        $wikidataErrors = [];
+
+        $pageRepo->method('getCheckWikiErrors')
+            ->willReturn($checkWikiErrors);
+        $pageRepo->method('getWikidataInfo')
+            ->willReturn([[
+                'term' => 'label',
+                'term_text' => 'My article',
+            ]]);
+        $pageRepo->method('getPageInfo')
             ->willReturn([
                 'pagelanguage' => 'en',
                 'pageprops' => [
                     'wikibase_item' => 'Q123',
                 ],
             ]);
-
         $page = new Page(new Project('exampleWiki'), 'Page');
         $page->setRepository($pageRepo);
 
-        $wikidataErrors = $page->getWikidataErrors();
-
-        $this->assertArraySubset(
-            [
-                'prio' => 3,
-                'name' => 'Wikidata',
-            ],
-            $wikidataErrors[0]
-        );
-        $this->assertContains(
-            'Description',
-            $wikidataErrors[0]['notice']
+        $this->assertEquals($checkWikiErrors, $page->getCheckWikiErrors());
+        $this->assertEquals(
+            array_merge($wikidataErrors, $checkWikiErrors),
+            $page->getErrors()
         );
     }
 
@@ -292,49 +352,86 @@ class PageTest extends WebTestCase
         $this->assertEquals(3500, $page->getLastPageviews(30));
     }
 
-    // public function testPageAssessments()
-    // {
-    //     $projectRepo = $this->getMock(ProjectRepository::class, ['getAssessmentsConfig']);
-    //     $projectRepo
-    //         ->method('getAssessmentsConfig')
-    //         ->willReturn([
-    //             'wikiproject_prefix' => 'Wikipedia:WikiProject_'
-    //         ]);
+    /**
+     * Is the page the Main Page?
+     */
+    public function testIsMainPage()
+    {
+        $pageRepo = new PagesRepository();
+        $pageRepo->setContainer($this->container);
+        $project = ProjectRepository::getProject('en.wikipedia.org', $this->container);
+        $page = new Page($project, 'Main Page');
+        $page->setRepository($pageRepo);
+        $this->assertTrue($page->isMainPage());
+    }
 
-    //     $project = $this->getMock(Project::class, ['getDomain']);
-    //     $project
-    //         ->method('getDomain')
-    //         ->willReturn('test.wiki.org');
-    //     $project->setRepository($projectRepo);
+    /**
+     * Links and redirects.
+     */
+    public function testLinksAndRedirects()
+    {
+        $data = [
+            'links_ext_count' => '418',
+            'links_out_count' => '1085',
+            'links_in_count' => '33300',
+            'redirects_count' => '61',
+        ];
+        $pageRepo = $this->getMock(PagesRepository::class, ['countLinksAndRedirects']);
+        $pageRepo->method('countLinksAndRedirects')->willReturn($data);
+        $page = new Page(new Project('exampleWiki'), 'Page');
+        $page->setRepository($pageRepo);
 
-    //     $pageRepo = $this->getMock(PagesRepository::class, ['getAssessments', 'getPageInfo']);
-    //     $pageRepo
-    //         ->method('getAssessments')
-    //         ->with($project)
-    //         ->willReturn([
-    //             [
-    //                 'wikiproject' => 'Military history',
-    //                 'class' => 'Start',
-    //                 'importance' => 'Low',
-    //             ],
-    //             [
-    //                 'wikiproject' => 'Firearms',
-    //                 'class' => 'C',
-    //                 'importance' => 'High',
-    //             ],
-    //         ]);
-    //     $pageRepo
-    //         ->method('getPageInfo')
-    //         ->with($project, 'Test_page')
-    //         ->willReturn([
-    //             'pageid' => 5,
-    //         ]);
+        $this->assertEquals($data, $page->countLinksAndRedirects());
+    }
 
-    //     $page = new Page($project, 'Test_page');
-    //     $page->setRepository($pageRepo);
+    /**
+     * Page assements.
+     */
+    public function testPageAssessments()
+    {
+        $projectRepo = $this->getMock(ProjectRepository::class, ['getAssessmentsConfig']);
+        $projectRepo->method('getAssessmentsConfig')
+            ->willReturn([
+                'wikiproject_prefix' => 'Wikipedia:WikiProject_'
+            ]);
 
-    //     $assessments = $page->getAssessments();
+        $project = ProjectRepository::getProject('en.wikipedia.org', $this->container);
 
-    //     $this->assertEquals('C', $assessments['assessment']);
-    // }
+        $pageRepo = $this->getMock(PagesRepository::class, ['getAssessments', 'getPageInfo']);
+        $pageRepo->method('getAssessments')
+            ->with($project)
+            ->willReturn([
+                [
+                    'wikiproject' => 'Military history',
+                    'class' => 'Start',
+                    'importance' => 'Low',
+                ],
+                [
+                    'wikiproject' => 'Firearms',
+                    'class' => 'C',
+                    'importance' => 'High',
+                ],
+            ]);
+        $pageRepo->method('getPageInfo')
+            ->with($project, 'Test_page')
+            ->willReturn([
+                'pageid' => 5,
+                'ns' => 0,
+            ]);
+
+        $page = new Page($project, 'Test_page');
+        $page->setRepository($pageRepo);
+
+        $assessments = $page->getAssessments();
+
+        // Picks the first assessment.
+        $this->assertEquals([
+            'value' => 'Start',
+            'color' => '#ffaa66',
+            'category' => 'Category:Start-Class articles',
+            'badge' => 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Symbol_start_class.svg',
+        ], $assessments['assessment']);
+
+        $this->assertEquals(2, count($assessments['wikiprojects']));
+    }
 }

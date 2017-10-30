@@ -5,32 +5,10 @@
 
 {% block body %}
 <div class="panel panel-primary">
-    <header class="panel-heading">
-        <div class="text-center xt-heading-top">
-            <a class="back-to-search" href="{{ path('sc') }}">
-                <span class="glyphicon glyphicon-chevron-left"></span>
-                {{ msg('back') }}
-            </a>
-            {{ wiki.userLink(user, project) }}
-            <small>
-                &bull;
-                {{ project.domain }}
-            </small>
-        </div>
-    </header>
+    {{ layout.userHeading(user, project, xtPage) }}
 
     <div class="panel-body xt-panel-body">
-        <p class="text-center xt-heading-subtitle">
-            {{ wiki.userLogLink(user, project, msg('block-log'), 'block') }}
-            &middot;
-            <a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool-ec') }}</a>
-            {% if isWMFLabs() %}
-                &middot;
-                <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ user.username }}" >{{ msg('global-contribs') }}</a>
-                &middot;
-                <a target="_blank" href="//tools.wmflabs.org/pageviews/?project={{ project.domain }}&amp;pages=User:{{ user.username }}">{{ msg('pageviews-userpage') }}</a>
-            {% endif %}
-        </p>
+        {{ wiki.userLinks(user, project, xtPage) }}
 
         {% set content %}
             <div class="col-lg-6 stat-list clearfix">
@@ -49,20 +27,19 @@
                         </tr>
                         <tr>
                             <td>{{ msg('rfx-total-votes') }}</td>
-                            <td></td>
+                            <td>
+                                {{ totals[type].total|num_format }}
+                            </td>
                         </tr>
-                        <tr>
-                            <td>{{ msg('support') }}</td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>{{ msg('oppose') }}</td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>{{ msg('neutral') }}</td>
-                            <td></td>
-                        </tr>
+                        {% for voteType in data[type]|keys %}
+                            {% set count = totals[type][voteType] is defined ? totals[type][voteType]|num_format : 0 %}
+                            <tr>
+                                <td>{{ msg(voteType) }}</td>
+                                <td>
+                                    {{ count }} ({{ count|percent_format(totals[type].total) }})
+                                </td>
+                            </tr>
+                        {% endfor %}
                     </tbody></table>
                 </div>
 
@@ -90,6 +67,7 @@
                                 <td class="sort-entry--date linked" data-value="{{ parsedData.Date }}">
                                     {{ parsedData.Date }}
                                 </td>
+                                {# FIXME: assume support/oppose/neutral sections #}
                                 {% set tally = parsedData.Support + parsedData.Oppose + parsedData.Neutral %}
                                 <td class="sort-entry--rfx-tally linked" data-value="{{ tally }}">
                                     <span class="text-success">{{ parsedData.Support }}</span> /

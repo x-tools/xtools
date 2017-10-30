@@ -5,29 +5,12 @@
 
 {% block body %}
 <div class="panel panel-primary">
-    <header class="panel-heading">
-        <div class="text-center xt-heading-top">
-            <a class="back-to-search" href="{{ path('autoedits') }}">
-            <span class="glyphicon glyphicon-chevron-left"></span>
-            {{ msg('back') }}
-            </a>
-            {{ wiki.userLink(user, project) }}
-            &middot;
-            {{ project.title }}
-        </div>
-    </header>
+    {{ layout.userHeading(user, project, xtPage) }}
+
     <div class="panel-body xt-panel-body">
-        <p class="text-center xt-heading-subtitle">
-            {{ wiki.userLogLink(user, project, msg('block-log'), 'block') }}
-            {% if isWMFLabs() %}
-                &middot;
-                <a href="//tools.wmflabs.org/guc/?user={{ user.username }}" target="_blank">{{ msg('global-contribs') }}</a>
-            {% endif %}
-            {% if not(isSingleWiki()) %}
-                &middot;
-                {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, msg('sul-info')) }}
-            {% endif %}
-        </p>
+        {{ wiki.userLinks(user, project, xtPage) }}
+
+        <h3 class="text-center">{{ msg('tool-autoedits') }}</h3>
 
         {# Show TOC when the user has a ton of automated tools, making the page hard to navigate #}
         {% if toolCounts|length > 15 %}
@@ -44,159 +27,180 @@
         {% set content %}
             <div class="panel-body stat-list clearfix" id="summary">
                 <table class="table autoedits-table">
-                    {% if start != '' %}
+                    {% if hasStartDate %}
                         <tr>
                             <td>{{ msg('start') }}</td>
                             <td>{{ start|date('Y-m-d') }}</td>
                         </tr>
                     {% endif %}
-                    {% if end != '' %}
-                        <tr>
-                            <td>{{ msg('end') }}</td>
-                            <td>{{ end|date('Y-m-d') }}</td>
-                        </tr>
-                    {% endif %}
+                    <tr>
+                        <td>{{ msg('end') }}</td>
+                        <td class="xt-test--end-date">{{ end|date('Y-m-d') }}</td>
+                    </tr>
                     <tr>
                         <td>{{ msg('namespace') }}</td>
                         <td>{{ nsName(namespace, project.namespaces) }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('total-edits') }}</td>
-                        <td>{{ editCount|number_format }}</td>
+                        <td>{{ editCount|num_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('auto-edits') }}</td>
                         <td>
-                            {{ autoCount|number_format }}
+                            {{ autoCount|num_format }}
                             ({{ autoPct|percent_format }})
                         </td>
                     </tr>
                     <tr>
                         <td>{{ msg('non-auto-edits') }}</td>
                         <td>
-                            {{ (editCount - autoCount)|number_format }}
+                            {{ (editCount - autoCount)|num_format }}
                             ({{ (100 - autoPct)|percent_format }})
                         </td>
                     </tr>
                 </table>
-                {{
-                    chart.pie_chart('auto_edits',
-                        [{
-                            label: msg('non-auto-edits'),
-                            value: editCount - autoCount,
-                            percentage: 100 - autoPct
-                        },
-                        {
-                            label: msg('auto-edits'),
-                            value: autoCount,
-                            percentage: autoPct
-                        }]
-                    )
-                }}
+                {% if editCount > 0 %}
+                    {{
+                        chart.pie_chart('auto_edits',
+                            [{
+                                label: msg('non-auto-edits'),
+                                value: editCount - autoCount,
+                                percentage: 100 - autoPct
+                            },
+                            {
+                                label: msg('auto-edits'),
+                                value: autoCount,
+                                percentage: autoPct
+                            }]
+                        )
+                    }}
+                {% endif %}
+            </div>
+
+            <div class="footnotes text-muted">
+                {{ msg('all-approximate') }}
             </div>
         {% endset %}
         {{ layout.content_block('summary', content) }}
 
-        {% set content %}
-            <table class="table table-bordered table-hover table-striped tools-table toggle-table">
-                <thead>
-                {% for key in ['tool', 'count', 'percent-of-tools', 'percent-of-editcount'] %}
-                    <th>
-                        <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                            {{ msg(key)|capitalize_first }}
-                            <span class="glyphicon glyphicon-sort"></span>
-                        </span>
-                    </th>
-                {% endfor %}
-                </thead>
-                <tbody>
-                {% for tool, values in toolCounts %}
-                    <tr>
-                        <td class="sort-entry--tool linked" data-value="{{ tool }}">
-                            <span class="tools-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ tool }}">
-                                <span class="glyphicon glyphicon-remove"></span>
-                                <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
+        {% if editCount == 0 %}
+            {% set content %}
+                <div class="alert alert-info">
+                    {{ msg('no-contribs') }}
+                </div>
+            {% endset %}
+        {% else %}
+            {% set content %}
+                <table class="table table-bordered table-hover table-striped tools-table toggle-table">
+                    <thead>
+                    {% for key in ['tool', 'count', 'percent-of-tools', 'percent-of-edit-count'] %}
+                        <th>
+                            <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
+                                {{ msg(key)|capitalize_first }}
+                                <span class="glyphicon glyphicon-sort"></span>
                             </span>
-                            {{ wiki.pageLinkRaw(values.link, project, tool) }}
-                        </td>
-                        <td class="sort-entry--count" data-value="{{ values.count }}">
-                            {{ values.count|number_format(0, ".", ",") }}
-                        </td>
-                        <td class="sort-entry--percent-of-tools" data-value="{{ values.count }}">
-                            {{ values.count|percent_format(toolsTotal) }}
-                        </td>
-                        <td class="sort-entry--percent-of-editcount" data-value="{{ values.count }}">
-                            {{ values.count|percent_format(editCount) }}
-                        </td>
-                    </tr>
+                        </th>
+                    {% endfor %}
+                    </thead>
+                    <tbody>
+                    {% for tool, values in toolCounts %}
+                        <tr>
+                            <td class="sort-entry--tool linked" data-value="{{ tool }}">
+                                <span class="tools-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ tool }}">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                    <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
+                                </span>
+                                {{ wiki.pageLinkRaw(values.link, project, tool) }}
+                            </td>
+                            <td class="sort-entry--count" data-value="{{ values.count }}">
+                                {{ values.count|num_format }}
+                            </td>
+                            <td class="sort-entry--percent-of-tools" data-value="{{ values.count }}">
+                                {{ values.count|percent_format(toolsTotal) }}
+                            </td>
+                            <td class="sort-entry--percent-of-edit-count" data-value="{{ values.count }}">
+                                {{ values.count|percent_format(editCount) }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <th class="tools--tools">
+                            {{ toolCounts|length|num_format }}
+                            {{ msg('num-tools', [toolCounts|length]) }}
+                        </th>
+                        <th class="tools--count">
+                            {{ toolsTotal|num_format }}
+                        </th>
+                        <th colspan=2></th>
+                    </tfoot>
+                </table>
+
+                <div class="chart-wrapper tools-chart-wrapper toggle-table--chart">
+                    <canvas id="tool_chart" width="400" height="400"></canvas>
+                </div>
+
+                {% set colors = [] %}
+                {% for i in 0..(toolCounts|length) %}
+                    {% set colors = colors|merge([chartColor(i)]) %}
                 {% endfor %}
-                </tbody>
-                <tfoot>
-                    <th class="tools--tools">
-                        {{ toolCounts|length|number_format }}
-                        {{ msg('num-tools', [toolCounts|length]) }}
-                    </th>
-                    <th class="tools--count">
-                        {{ toolsTotal|number_format }}
-                    </th>
-                    <th colspan=2></th>
-                </tfoot>
-            </table>
 
-            <div class="chart-wrapper tools-chart-wrapper toggle-table--chart">
-                <canvas id="tool_chart" width="400" height="400"></canvas>
-            </div>
-
-            {% set colors = [] %}
-            {% for i in 0..(toolCounts|length) %}
-                {% set colors = colors|merge([chartColor(i)]) %}
-            {% endfor %}
-
-            <script>
-                window.toolsChart = new Chart($('#tool_chart'), {
-                    type: 'pie',
-                    data: {
-                        labels: {{ toolCounts|keys|json_encode()|raw }},
-                        datasets: [{
-                            data: [
-                                {% for tool, values in toolCounts %}
-                                    {{ values.count }}{% if not loop.last %},{% endif %}
-                                {% endfor %}
-                            ],
-                            backgroundColor: {{ colors|json_encode()|raw }},
-                            borderColor: {{ colors|json_encode()|raw }},
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        legend: {
-                          display: false,
+                <script>
+                    window.toolsChart = new Chart($('#tool_chart'), {
+                        type: 'pie',
+                        data: {
+                            labels: {{ toolCounts|keys|json_encode()|raw }},
+                            datasets: [{
+                                data: [
+                                    {% for tool, values in toolCounts %}
+                                        {{ values.count }}{% if not loop.last %},{% endif %}
+                                    {% endfor %}
+                                ],
+                                backgroundColor: {{ colors|json_encode()|raw }},
+                                borderColor: {{ colors|json_encode()|raw }},
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            aspectRatio: 1,
+                            legend: {
+                              display: false,
+                            }
                         }
-                    }
-                });
-                window.countsByTool = {{ toolCounts|json_encode()|raw }};
-            </script>
-            <p style="clear:both">
-                <a target="_blank" href="https://phabricator.wikimedia.org/maniphest/task/create/?title=Request to add tool to AutoEdits&amp;projects=XTools&amp;description=Project: {{ project.domain }}%0A%0AName of tool:%0A%0ALinks to example edits:%0A%0ALink to the tool's documentation or homepage:">
-                    {{ msg('auto-edits-request') }}
-                    <span class="glyphicon glyphicon-new-window"></span>
-                </a>
-            </p>
-        {% endset %}
+                    });
+                    window.countsByTool = {{ toolCounts|json_encode()|raw }};
+                </script>
+                <p style="clear:both">
+                    <a target="_blank" href="https://phabricator.wikimedia.org/maniphest/task/create/?title=Request to add tool to AutoEdits&amp;projects=XTools&amp;description=Project: {{ project.domain }}%0A%0AName of tool:%0A%0ALinks to example edits:%0A%0ALink to the tool's documentation or homepage:">
+                        {{ msg('auto-edits-request') }}
+                        <span class="glyphicon glyphicon-new-window"></span>
+                    </a>
+                </p>
+            {% endset %}
+        {% endif %}
         {{ layout.content_block('auto-edits', content) }}
 
-        {% set content %}
-            <div>
-                <em class="non-auto-edits-loading text-muted">{{ msg('loading') }}...</em>
-                <div class="non-auto-edits-container"
-                    data-project="{{ project.domain }}"
-                    data-username="{{ user.username }}"
-                    data-start="{{ start }}"
-                    data-end="{{ end }}"
-                    data-namespace="{{ namespace }}">
+        {% if editCount == 0 %}
+            {% set content %}
+                <div class="alert alert-info">
+                    {{ msg('no-contribs') }}
                 </div>
-            </div>
-        {% endset %}
+            {% endset %}
+        {% else %}
+            {% set content %}
+                <div>
+                    <em class="non-auto-edits-loading text-muted">{{ msg('loading') }}...</em>
+                    <div class="non-auto-edits-container"
+                        data-project="{{ project.domain }}"
+                        data-username="{{ user.username }}"
+                        data-start="{{ start }}"
+                        data-end="{{ end }}"
+                        data-namespace="{{ namespace }}">
+                    </div>
+                </div>
+            {% endset %}
+        {% endif %}
         {{ layout.content_block('non-auto-edits', content) }}
 
         <div class="times-in-utc text-muted">

@@ -20,9 +20,8 @@ use Xtools\ProjectRepository;
 /**
  * The DefaultController handles the homepage, about pages, and user authentication.
  */
-class DefaultController extends Controller
+class DefaultController extends XtoolsController
 {
-
     /** @var Client The Oauth HTTP client. */
     protected $oauthClient;
 
@@ -47,35 +46,36 @@ class DefaultController extends Controller
      */
     public function aboutAction()
     {
-        return $this->render('default/about.html.twig', array(
-            'xtPage' => 'index',
-        ));
+        return $this->render('default/about.html.twig', [
+            'xtPage' => 'about',
+        ]);
     }
 
     /**
      * Display some configuration details, when in development mode.
      * @Route("/config", name="configPage")
+     * @codeCoverageIgnore
      */
     public function configAction()
     {
 
-        if ($this->container->getParameter('kernel.environment') != "dev") {
+        if ($this->container->getParameter('kernel.environment') !== 'dev') {
             throw new NotFoundHttpException();
         }
 
         $params = $this->container->getParameterBag()->all();
 
         foreach ($params as $key => $value) {
-            if (strpos($key, "password") !== false) {
-                $params[$key] = "<REDACTED>";
+            if (strpos($key, 'password') !== false) {
+                $params[$key] = '<REDACTED>';
             }
         }
 
         // replace this example code with whatever you need
         return $this->render('default/config.html.twig', [
-            "xtTitle" => "Config",
-            "xtPageTitle" => "Config",
-            'xtPage' => "index",
+            'xtTitle' => 'Config',
+            'xtPageTitle' => 'Config',
+            'xtPage' => 'index',
             'dump' => print_r($params, true),
         ]);
     }
@@ -115,7 +115,7 @@ class DefaultController extends Controller
     {
         // Give up if the required GET params don't exist.
         if (!$request->get('oauth_verifier')) {
-            return $this->createNotFoundException();
+            throw $this->createNotFoundException('No OAuth verifier given.');
         }
 
         /** @var Session $session */
@@ -143,6 +143,7 @@ class DefaultController extends Controller
      * Get an OAuth client, configured to the default project.
      * (This shouldn't really be in this class, but oh well.)
      * @return Client
+     * @codeCoverageIgnore
      */
     protected function getOauthClient()
     {
@@ -151,8 +152,8 @@ class DefaultController extends Controller
         }
         $defaultProject = ProjectRepository::getDefaultProject($this->container);
         $endpoint = $defaultProject->getUrl(false)
-                    . $defaultProject->getScriptPath()
-                    . '/index.php?title=Special:OAuth';
+                    . $defaultProject->getScript()
+                    . '?title=Special:OAuth';
         $conf = new ClientConfig($endpoint);
         $consumerKey = $this->getParameter('oauth_key');
         $consumerSecret =  $this->getParameter('oauth_secret');

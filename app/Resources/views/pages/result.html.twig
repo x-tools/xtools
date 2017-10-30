@@ -4,40 +4,12 @@
 
 {% block body %}
 <div class="panel panel-primary">
-    <header class="panel-heading">
-        <div class="text-center xt-heading-top">
-            <a class="back-to-search" href="{{ path('pages') }}">
-                <span class="glyphicon glyphicon-chevron-left"></span>
-                {{ msg('back') }}
-            </a>
-            {{ wiki.userLink(user, project) }}
-            <small>
-                &bull;
-                {{ project.domain }}
-            </small>
-        </div>
-    </header>
+    {{ layout.userHeading(user, project, xtPage) }}
 
     <div class="panel-body xt-panel-body">
-        <p class="text-center xt-heading-subtitle">
-            {{ wiki.userLogLink(user, project, msg('block-log'), 'block') }}
-            {% if enabled('ec') %}
-                &middot;
-                <a href="{{ path('ec', {'project':project.domain, 'username':user.username}) }}" >{{ msg('tool-ec') }}</a>
-            {% endif %}
-            {% if isWMFLabs() %}
-                &middot;
-                <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ user.username }}" >{{ msg('global-contribs') }}</a>
-                &middot;
-                {% set redirectParam = 0 %}
-                {% if redirect == 'onlyredirects' %}
-                    {% set redirectParam = 1 %}
-                {% elseif redirect == 'all' %}
-                    {% set redirectParam = 2 %}
-                {% endif %}
-                <a target="_blank" href="//tools.wmflabs.org/userviews/?project={{ project.domain }}&amp;user={{ user.username }}&amp;namespace={{ namespace }}&amp;redirects={{ redirectParam }}">{{ msg('pageviews-pages-created') }}</a>
-            {% endif %}
-        </p>
+        {{ wiki.userLinks(user, project, xtPage) }}
+
+        <h3 class="text-center">{{ msg('tool-pages') }}</h3>
 
         {% set multiNamspace = count|length > 1 %}
 
@@ -74,78 +46,84 @@
                 </tbody></table>
             </div>
             <div style="clear:both"></div>
-            <table class="table table-bordered table-hover table-striped namespaces-table toggle-table">
-                <thead><tr>
-                    {% for key in summaryColumns %}
-                        <th>
-                            <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                                {{ msg(key)|capitalize_first }}
-                                <span class="glyphicon glyphicon-sort"></span>
-                            </span>
-                        </th>
-                    {% endfor %}
-                </tr></thead>
-                <tbody>
-                    {% for key, value in count %}
-                    <tr>
-                        <td class="sort-entry--namespace linked" data-value="{{ namespaces[key] }}">
-                            {% if multiNamspace %}
-                            <span class="namespace-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ key }}">
-                                <span class="glyphicon glyphicon-remove"></span>
-                            {% endif %}
-                                <span class="color-icon" style="background:{{ color(key) }}"></span>
-                            {% if multiNamspace %}
-                            </span>
-                            {% endif %}
-
-                            <a href="#{{ key }}" >{{ nsName(key, namespaces) }}</a>
-                        </td>
-                        {% if redirect != 'onlyredirects' %}
-                            <td class="sort-entry--pages" data-value="{{ value.total }}">
-                                {{ value.total }}
-                            </td>
-                        {% endif %}
-                        {% if redirect != 'noredirects' %}
-                            <td class="sort-entry--redirects" data-value="{{ value.redirect }}">
-                                {{ value.redirect }}
-                                {% if redirect != 'onlyredirects' %}
-                                    ({{ value.redirect|percent_format(value.total) }})
-                                {% endif %}
-                            </td>
-                        {% endif %}
-                        <td class="sort-entry--deleted" data-value="{{ value.deleted }}">
-                            {{ value.deleted }}
-                            ({{ value.deleted|percent_format(value.total) }})
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-                {% if pages|length > 1 %}
-                    <tfoot>
-                        <th class="namespaces--namespaces">
-                            {{ pages|length|number_format }}
-                            {{ msg('num-namespaces', [pages|length]) }}
-                        </th>
-                        <th class="namespaces--pages">
-                            {{ total|number_format }}
-                        </th>
-                        {% if 'redirects' in summaryColumns and 'pages' in summaryColumns %}
-                            <th class="namespaces--redirects">
-                                {{ redirectTotal|number_format }}
-                                ({{ redirectTotal|percent_format(total) }})
+            {% if total == 0 %}
+                <div class="alert alert-info">
+                    {{ msg('no-result', [user.username]) }}
+                </div>
+            {% else %}
+                <table class="table table-bordered table-hover table-striped namespaces-table toggle-table">
+                    <thead><tr>
+                        {% for key in summaryColumns %}
+                            <th>
+                                <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
+                                    {{ msg(key)|capitalize_first }}
+                                    <span class="glyphicon glyphicon-sort"></span>
+                                </span>
                             </th>
-                        {% endif %}
-                        <th class="namespaces--deleted">
-                            {{ deletedTotal|number_format }}
-                            ({{ deletedTotal|percent_format(total) }})
-                        </th>
-                    </tfoot>
+                        {% endfor %}
+                    </tr></thead>
+                    <tbody>
+                        {% for key, value in count %}
+                        <tr>
+                            <td class="sort-entry--namespace linked" data-value="{{ namespaces[key] }}">
+                                {% if multiNamspace %}
+                                <span class="namespace-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ key }}">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                {% endif %}
+                                    <span class="color-icon" style="background:{{ color(key) }}"></span>
+                                {% if multiNamspace %}
+                                </span>
+                                {% endif %}
+
+                                <a href="#{{ key }}" >{{ nsName(key, namespaces) }}</a>
+                            </td>
+                            {% if redirect != 'onlyredirects' %}
+                                <td class="sort-entry--pages" data-value="{{ value.total }}">
+                                    {{ value.total }}
+                                </td>
+                            {% endif %}
+                            {% if redirect != 'noredirects' %}
+                                <td class="sort-entry--redirects" data-value="{{ value.redirect }}">
+                                    {{ value.redirect }}
+                                    {% if redirect != 'onlyredirects' %}
+                                        ({{ value.redirect|percent_format(value.total) }})
+                                    {% endif %}
+                                </td>
+                            {% endif %}
+                            <td class="sort-entry--deleted" data-value="{{ value.deleted }}">
+                                {{ value.deleted }}
+                                ({{ value.deleted|percent_format(value.total) }})
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% if pages|length > 1 %}
+                        <tfoot>
+                            <th class="namespaces--namespaces">
+                                {{ pages|length|num_format }}
+                                {{ msg('num-namespaces', [pages|length]) }}
+                            </th>
+                            <th class="namespaces--pages">
+                                {{ total|num_format }}
+                            </th>
+                            {% if 'redirects' in summaryColumns and 'pages' in summaryColumns %}
+                                <th class="namespaces--redirects">
+                                    {{ redirectTotal|num_format }}
+                                    ({{ redirectTotal|percent_format(total) }})
+                                </th>
+                            {% endif %}
+                            <th class="namespaces--deleted">
+                                {{ deletedTotal|num_format }}
+                                ({{ deletedTotal|percent_format(total) }})
+                            </th>
+                        </tfoot>
+                    {% endif %}
+                </table>
+                {% if namespace == 'all' %}
+                <div class="chart-wrapper toggle-table--chart">
+                    <canvas id="pie_chart" width="400" height="400"></canvas>
+                </div>
                 {% endif %}
-            </table>
-            {% if namespace == 'all' %}
-            <div class="chart-wrapper toggle-table--chart">
-                <canvas id="pie_chart" width="400" height="400"></canvas>
-            </div>
             {% endif %}
         {% endset %}
         {{ layout.content_block('summary', content) }}
@@ -184,7 +162,7 @@
                                     <td>{{ index }}</td>
                                     <td class="sort-entry--page-title" data-value="{{ pagename }}">
                                         {% if page.page_is_redirect %}
-                                            {{ wiki.pageLinkRaw(pagename ~ '?redirect=no', project, pagename) }}
+                                            {{ wiki.pageLinkRaw(pagename, project, pagename, 'redirect=no') }}
                                             <small class="text-muted">&middot; ({{ msg('redirect') }})</small>
                                         {% else %}
                                             {{ wiki.pageLinkRaw(pagename, project) }}
@@ -195,16 +173,16 @@
                                     </td>
                                     <td class="sort-entry--date" data-value="{{ date }}">
                                         {% if page.type == 'arc' %}
-                                            {{ wiki.pageLinkRaw('Special:Undelete/' ~ pagename ~ '?timestamp=' ~ page.raw_time, project, page.human_time) }}
+                                            {{ wiki.pageLinkRaw('Special:Undelete/' ~ pagename, project, page.human_time, 'timestamp=' ~ page.raw_time) }}
                                         {% else %}
                                             {{ wiki.permaLinkRaw(page.rev_id, project, page.human_time) }}
                                         {% endif %}
                                     </td>
                                     <td class="sort-entry--original-size" data-value="{{ page.rev_len }}">
-                                        {{ page.rev_len|number_format }}
+                                        {{ page.rev_len|num_format }}
                                     </td>
                                     <td class="sort-entry--current-size" data-value="{{ page.page_len }}">
-                                        {{ page.page_len|number_format }}
+                                        {{ page.page_len|num_format }}
                                     </td>
                                     {% if key == '0' and hasPageAssessments %}
                                         <td class="sort-entry--assessment" data-value="{{ page.pa_class ? page.pa_class : 'Unknown' }}">
@@ -236,12 +214,12 @@
                                 </tr>
                             {% endfor %}
                         {% endfor %}
-                        {% if count[key]['total'] > maxRows and multiNamspace %}
+                        {% if count[key].total > maxRows and multiNamspace %}
                             <tr class="show-more-row">
                                 <td></td>
                                 <td colspan=6>
                                     <a href="{{ path('pages', { 'project': project.domain, 'username': user.username, 'namespace': key, 'redirects': redirect }) }}">
-                                        {{ msg('num-others', [count[key]['total'] - maxRows]) }}
+                                        {{ count[key].total - maxRows }} {{ msg('num-others', [count[key].total - maxRows]) }}
                                     </a>
                                 </td>
                             </tr>
@@ -289,6 +267,7 @@
                     }]
                 },
                 options: {
+                    aspectRatio: 1,
                     legend: {
                       display: false,
                     }

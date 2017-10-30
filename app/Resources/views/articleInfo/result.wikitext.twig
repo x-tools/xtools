@@ -1,12 +1,12 @@
 * [[{{ page.title }}]]
 * {{ project.domain }}
-* {{ msg('total-edits') }}: {{ page.numRevisions|number_format }}
-* {{ msg('editors') }}: {{ general.editor_count|number_format }}
+* {{ msg('total-edits') }}: {{ ai.numRevisions|num_format }}
+* {{ msg('editors') }}: {{ ai.numEditors|num_format }}
 * {{ 'now'|date('Y-m-d H:i:s') }}
 
 <sup>1</sup> {{ msg('edits') }}<br />
 <sup>2</sup> {{ msg('average-time-bw-edits') }}
-{| class="wikitable sortable" 
+{| class="wikitable sortable"
 ! {{ msg('username') }}
 !#<sup>1</sup>
 ! {{ msg('minor-edits') }}
@@ -16,15 +16,15 @@
 !{{ msg('average-time-bw-edits-abbr') }}<sup>2</sup>
 !{{ msg('added-bytes') }}
 |-
-{% for editor, stats in editors|slice(0, editorlimit ) %}
+{% for editor, stats in ai.editors|slice(0, editorlimit ) %}
 | [[ {{ attribute(project.namespaces, 2) }}:{{ editor }}|{{ editor }} ]] {#
-#} || {{ stats.all|number_format }} {#
-#} || {{ stats.minor|number_format }} {#
+#} || {{ stats.all|num_format }} {#
+#} || {{ stats.minor|num_format }} {#
 #} || {{ stats.minor|percent_format(stats.all) }} {#
 #} || {{ stats.first|date('Y-m-d H:i') }} {#
 #} || {{ stats.last|date('Y-m-d H:i') }} {#
-#} || {{ stats.atbe|number_format(1) }} {#
-#} || {{ stats.added|number_format }}
+#} || {{ stats.atbe|num_format(1) }} {#
+#} || {{ stats.added|num_format }}
 |-
 {% endfor %}
 |}

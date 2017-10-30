@@ -1,88 +1,125 @@
-{% extends 'base.html.twig' %}
+{% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
 {% import 'macros/layout.html.twig' as layout %}
 {% import 'macros/wiki.html.twig' as wiki %}
 
 {% block body %}
-<div class="panel panel-primary">
-    <header class="panel-heading">
-        <div class="text-center xt-heading-top" >
-            <a class="back-to-search" href="{{ path('topedits') }}">
-                <span class="glyphicon glyphicon-chevron-left"></span>
-                {{ msg('back') }}
-            </a>
-            {{ wiki.userLink(user, project) }}
-            <small>
-                &bull;
-                {{ project.title }}
-            </small>
-        </div>
-    </header>
 
-    <div class="panel-body xt-panel-body" >
-        <p class="text-center xt-heading-subtitle">
-            {{ wiki.userLogLink(user, project, msg('block-log'), 'block') }}
-            {% if enabled('ec') %}
-                &middot;
-                <a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool-ec') }}</a>
-            {% endif %}
-            {% if not isSingleWiki() %}
-                &middot;
-                <a target="_blank" href="//tools.wmflabs.org/guc/?user={{ user.username }}" >{{ msg('global-contribs') }}</a>
-            {% endif %}
-            {% if isWMFLabs() %}
-                &middot;
-                <a target="_blank" href="//tools.wmflabs.org/pageviews/?project={{ project.domain }}&amp;pages=User:{{ user.username }}">{{ msg('pageviews-userpage') }}</a>
-            {% endif %}
-        </p>
+{% if not is_sub_request %}
+    <div class="panel panel-primary">
+        {{ layout.userHeading(user, project, xtPage) }}
+        <div class="panel-body xt-panel-body" >
+            {{ wiki.userLinks(user, project, xtPage) }}
+            <h3 class="text-center">{{ msg('topedits-per-namespace') }}</h3>
 
-        <h3 class="text-center">{{ msg('topedits-per-namespace') }}</h3>
+            {% if project.userHasOptedIn(user) and te.topEdits|length > 2 %}
+                <div class="text-center xt-toc">
+                    {#
+                     # To save real estate, show "Namespace (talk)" as separate links
+                     # instead of "Namespace" "Namespace talk".
+                     #}
+                    {% for ns in te.topEdits|keys if ns is even or (ns is odd and not(te.topEdits[ns - 1] is defined)) %}
+                        <span>
+                            <a href="#{{ ns }}" data-section="{{ ns }}">{{ nsName(ns, project.namespaces) }}</a>
+                            {% if te.topEdits[ns + 1] is defined %}
+                                (<a href="#{{ ns + 1 }}" data-section="{{ ns + 1 }}">{{ msg('talk')|lower }}</a>)
+                            {% endif %}
+                        </span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+{% endif %}
 
-        {% set content %}
-        <table class="table table-bordered table-hover table-striped topedits-namespace-table" >
-            <thead><tr>
+{% if not(project.userHasOptedIn(user)) %}
+    <div class="alert alert-info">
+        <p>{{ msg('not-opted-in', [ wiki.pageLink(opted_in_page) ]) }}</p>
+    </div>
+{% else %}
+
+{% for ns, pages in te.topEdits %}
+    {% set showPageAssessment = ns == 0 and project.hasPageAssessments %}
+    {% set content %}
+    <table class="table table-bordered table-hover table-striped topedits-namespace-table xt-show-hide--target">
+        <thead><tr>
+            <th>
+                <span class="sort-link sort-link--edits" data-column="edits">
+                    {{ msg('edits') | capitalize_first }}
+                    <span class="glyphicon glyphicon-sort"></span>
+                </span>
+            </th>
+            <th>
+                <span class="sort-link sort-link--page" data-column="page">
+                    {{ msg('page-title') }}
+                    <span class="glyphicon glyphicon-sort"></span>
+                </span>
+            </th>
+            {% if showPageAssessment %}
                 <th>
-                    <span class="sort-link sort-link--edits" data-column="edits">
-                        {{ msg('edits') | capitalize_first }}
+                    <span class="sort-link sort-link--assessment" data-column="assessment">
+                        {{ msg('assessment') }}
                         <span class="glyphicon glyphicon-sort"></span>
                     </span>
                 </th>
-                <th>
-                    <span class="sort-link sort-link--page" data-column="page">
-                        {{ msg('page-title') }}
-                        <span class="glyphicon glyphicon-sort"></span>
-                    </span>
-                </th>
-                <th>{{ msg('links') }}</th>
-            </tr></thead>
-            <tbody>
-                {% for edit in edits %}
+            {% endif %}
+            <th>{{ msg('links') }}</th>
+        </tr></thead>
+        <tbody>
+            {% for page in pages %}
+            <tr>
+                <td class="sort-entry--edits" data-value="{{ page.count }}">
+                    {{ page.count|num_format }}
+                </td>
+                <td class="sort-entry--page display-title" data-value="{{ page.page_title_ns }}">
+                    {{ wiki.pageLinkRaw(page.page_title_ns, project, page.displaytitle) }}
+                </td>
+                {% if showPageAssessment %}
+                    <td class="sort-entry--assessment" data-value="{{ page.pa_class ? page.pa_class : 'Unknown' }}">
+                        {% set badge = project.assessmentBadgeURL(page.pa_class)%}
+                        {% if badge is defined %}
+                            <img alt="{{ page.pa_class }}" src="{{ badge }}" class="assessment-badge" />
+                        {% endif %}
+                        {{ page.pa_class ? page.pa_class : msg('unknown') }}
+                    </td>
+                {% endif %}
+                <td>
+                    {{ wiki.pageLogLinkRaw(page.page_title_ns, project) }}
+                    &middot;
+                    <a href="{{ path('ArticleInfoResult', {project:project.domain, article:page.page_title_ns}) }}">{{ msg('tool-articleinfo') }}</a>
+                    &middot;
+                    <a href="{{ path('TopEditsResults', {project:project.domain, username:user.username, namespace:page.page_namespace, article:page.page_title}) }}" >{{ msg('tool-topedits') }}</a>
+                </td>
+            </tr>
+            {% endfor %}
+            {% if pages|length >= 10 and te.topEdits|length > 1 %}
                 <tr>
-                    <td class="sort-entry--edits tdnum" data-value="{{ edit.count }}">
-                        {{ edit.count|number_format }}
-                    </td>
-                    <td class="sort-entry--page display-title" data-value="{{ edit.page_title_ns }}">
-                        {{ wiki.pageLinkRaw(edit.page_title_ns, project, edit.displaytitle) }}
-                    </td>
-                    <td>
-                        {{ wiki.pageLogLinkRaw(edit.page_title_ns, project) }}
-                        &middot;
-                        <a href="{{ path('ArticleInfoResult', {project:project.domain, article:edit.page_title_ns}) }}">{{ msg('tool-articleinfo') }}</a>
-                        &middot;
-                        <a href="{{ path('TopEditsResults', {project:project.domain, username:user.username, namespace:edit.page_namespace, article:edit.page_title}) }}" >{{ msg('tool-topedits') }}</a>
+                    <td colspan={{ showPageAssessment ? 4 : 3 }}>
+                        <a href="{{ path('TopEditsResults', {project:project.domain, username:user.username, namespace:ns, article:''}) }}">
+                            {{ msg('more') }}&hellip;
+                        </a>
                     </td>
                 </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% endset %}
+            {% endif %}
+        </tbody>
+    </table>
+    {% endset %}
 
-        {% if project.userHasOptedIn(user) %}
-            {{ layout.content_block(nsName(namespace, project.namespaces), content, '', null, true, false) }}
-        {% else %}
-            <div class="alert alert-info">
-                <p>{{ msg('not-opted-in', [ wiki.pageLink(opted_in_page) ]) }}</p>
-            </div>
-        {% endif %}
-    </div>
-</div>
+    {% if is_sub_request %}
+        <h4 class="xt-show-hide--parent">
+            {{ nsName(ns, project.namespaces) }}
+            <small class='xt-show'>[{{ msg('show') | lower }}]</small>
+            <small class='xt-hide'>[{{ msg('hide') | lower }}]</small>
+        </h4>
+    {% endif %}
+
+    {% if is_sub_request %}
+        {{ content }}
+    {% else %}
+        {{ layout.content_block(nsName(ns, project.namespaces), content, '', ns, true, te.topEdits|length > 1) }}
+    {% endif %}
+{% endfor %}
+
+{% endif %}
+
+{% if not is_sub_request %}
+    </div></div>
+{% endif %}
 {% endblock %}

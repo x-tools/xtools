@@ -38,7 +38,7 @@ $(function () {
 
         /** global: xtBaseUrl */
         $.ajax({
-            url: xtBaseUrl + 'api/nonautomated_edits/' + project + '/' + username + '/' +
+            url: xtBaseUrl + 'api/user/nonautomated_edits/' + project + '/' + username + '/' +
                 namespace + '/' + start + '/' + end + '/' + editOffset + '?format=html',
             timeout: 30000
         }).done(function (data) {

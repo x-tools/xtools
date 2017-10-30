@@ -13,6 +13,12 @@
         }
     }
 
+    #timecard-bubble-chart,
+    #yearcounts-canvas,
+    #monthcounts-canvas {
+        max-width: 1000px;
+    }
+
     .top-project-edit-counts td {
         white-space: nowrap;
     }
@@ -23,6 +29,7 @@
     }
 
     .tooltipcss--pages-created {
+        position: relative;
         vertical-align: -1px;
 
         &:hover {

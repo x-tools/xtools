@@ -33,10 +33,10 @@
             'bootstrap/css/bootstrap.min.css'
             'static/css/application.scss'
             'static/css/home.scss'
+            'static/css/about.scss'
             'static/css/articleinfo.scss'
             'static/css/autoedits.scss'
             'static/css/editcounter.scss'
-            'static/css/index.scss'
             'static/css/pages.scss'
             output='static/production/application.css' %}
         <link rel="stylesheet" href="{{ asset_url }}" />
@@ -113,7 +113,7 @@
     </ol>
     <nav class="tool-links navbar-collapse collapse">
         <ol class="tool-links--nav nav navbar-nav navbar-left">
-            <li{% if current_tool is defined and current_tool == "index" %} class="active"{% endif %}>
+            <li>
                 <a class="home-link" href="{{ path('homepage') }}">
                     <img src="{{ asset('static/images/logo.svg') }}" />
                 </a>
@@ -148,20 +148,21 @@
         </p>
     {% endif %}
 
-    {% if app.session.flashBag.peek('notice') %}
-        {% for flash_message in app.session.flashBag.get('notice') %}
-            <p class="alert alert-danger xt-alert">
-                {{ msgPrintExists(flash_message) }}
+    {% if app.session.flashBag.peekAll %}
+        {% for level, messages in app.session.flashBag.all %}
+            {% set level = level == 'notice' ? 'danger' : level %}
+            <p class="alert alert-{{ level }} xt-alert">
+                {{ msgPrintExists(messages[0]) }}
             </p>
         {% endfor %}
     {% endif %}
 
-    {% set replagValue = replag() %}
+    {# {% set replagValue = replag() %}
     {% if replagValue > getReplagThreshold() %}
         <p class="alert alert-warning xt-alert">
             {{ msgPrintExists('high-replag', [formatDuration(replagValue)]) }}
         </p>
-    {% endif %}
+    {% endif %} #}
 </div>
 
 <div id="wrapper">
@@ -187,8 +188,8 @@
 <footer class="app-footer container-fluid">
     <span>
         <small>
-            <span>{{ msg("executed", [request_time()]) }}</span> &middot;
-            <span>{{ msg("memory-usage", [memory_usage()]) }}</span>
+            <span>{{ msg('executed', [request_time()|num_format(3), request_time()]) }}</span> &middot;
+            <span>{{ msg('memory-usage', [memory_usage()|num_format(2), memory_usage()]) }}</span>
         </small>
     </span>
     <hr>
@@ -196,7 +197,7 @@
         <div class="pull-right footer-branding">
             <a style="margin-right:5px;" href="//translatewiki.net/?setlang=en "><img height="36px" src="//upload.wikimedia.org/wikipedia/commons/5/51/Translatewiki.net_logo.svg" alt="translatewiki.net logo"/></a>
             {% if isWMFLabs() %}
-            <a href="//tools.wmflabs.org" target="_blank"><img height="40px" src="{{ asset('static/images/labs.png') }}" alt="Powered by WMF Labs" /></a>
+            <a href="https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS" target="_blank"><img height="40px" src="{{ asset('static/images/VPS-badge.svg') }}" alt="Powered by Wikimedia Cloud Services" /></a>
             {% endif %}
         </div>
         <div class="footer-about">
@@ -205,7 +206,7 @@
                 &copy; 2008-2017
                 &middot;
                 <a href="https://github.com/x-tools/xtools/releases/tag/{{ version }}" target="_blank" title="Current XTools version">v.{{ version }}</a>
-                (<a href="http://github.com/x-tools/xtools/tree/{{ hash() }}" target="_blank" title="Current code revision">r.{{ shortHash() }}</a>)
+                (<a href="https://github.com/x-tools/xtools/tree/{{ hash() }}" target="_blank" title="Current code revision">r.{{ shortHash() }}</a>)
                 &middot;
                 <a href="{{ path('aboutPage') }}">{{ msg('about-xtools') }}</a>
                 &middot;
@@ -225,10 +226,10 @@
 <span class='hidden loader'>
     <img src="{{ asset('static/images/loader.gif') }}" /> <span class="sr-only">{{ msg('loading') }}&hellip;</span>
 </span>
-{% if xtPage is defined and project.domain is defined %}
+{% if xtPage is defined and project.domain is defined and 'indexAction' not in app.request.attributes.get('_controller') %}
 <script>
     $.ajax({
-        url: "{{ path('homepage') }}api/usage/{{ xtPage }}/{{ project.domain }}/{{ csrf_token('intention') }}",
+        url: "{{ path('homepage') }}meta/usage/{{ xtPage }}/{{ project.domain }}/{{ csrf_token('intention') }}",
         method: 'PUT'
     });
 </script>

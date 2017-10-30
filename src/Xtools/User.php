@@ -20,8 +20,11 @@ class User extends Model
     /** @var string The user's username. */
     protected $username;
 
-    /** @var DateTime|bool Expiry of the current block of the user */
+    /** @var DateTime|bool Expiry of the current block of the user. */
     protected $blockExpiry;
+
+    /** @var int Quick cache of edit counts, keyed by project domain. */
+    protected $editCounts = [];
 
     /**
      * Create a new User given a username.
@@ -42,9 +45,10 @@ class User extends Model
     }
 
     /**
-     * Get a md5 hash of the username to be used as a cache key.
-     * This ensures the cache key does not contain reserved characters.
+     * Unique identifier for this User, to be used in cache keys.
+     * Use of md5 ensures the cache key does not contain reserved characters.
      * You could also use the ID, but that may require an unnecessary DB query.
+     * @see Repository::getCacheKey()
      * @return string
      */
     public function getCacheKey()
@@ -75,6 +79,35 @@ class User extends Model
         );
 
         return DateTime::createFromFormat('YmdHis', $registrationDate);
+    }
+
+    /**
+     * Get the user's (system) edit count.
+     * @param Project $project
+     * @return int
+     */
+    public function getEditCount(Project $project)
+    {
+        $domain = $project->getDomain();
+        if (isset($this->editCounts[$domain])) {
+            return $this->editCounts[$domain];
+        }
+
+        $this->editCounts[$domain] = (int) $this->getRepository()->getEditCount(
+            $project->getDatabaseName(),
+            $this->getUsername()
+        );
+
+        return $this->editCounts[$domain];
+    }
+
+    /**
+     * Maximum number of edits to process, based on configuration.
+     * @return int
+     */
+    public function maxEdits()
+    {
+        return $this->getRepository()->maxEdits();
     }
 
     /**
@@ -126,7 +159,7 @@ class User extends Model
      */
     public function isAnon()
     {
-        return filter_var($this->username, FILTER_VALIDATE_IP);
+        return (bool) filter_var($this->username, FILTER_VALIDATE_IP);
     }
 
     /**
@@ -168,23 +201,35 @@ class User extends Model
     }
 
     /**
+     * Does the user have more edits than maximum amount allowed for processing?
+     * @param Project $project
+     * @return bool
+     */
+    public function hasTooManyEdits(Project $project)
+    {
+        $editCount = $this->getEditCount($project);
+        return $this->maxEdits() > 0 && $editCount > $this->maxEdits();
+    }
+
+    /**
      * Get edit count within given timeframe and namespace
      * @param Project $project
-     * @param int|string [$namespace] Namespace ID or 'all' for all namespaces
-     * @param string [$start] Start date in a format accepted by strtotime()
-     * @param string [$end] End date in a format accepted by strtotime()
+     * @param int|string $namespace Namespace ID or 'all' for all namespaces
+     * @param string $start Start date in a format accepted by strtotime()
+     * @param string $end End date in a format accepted by strtotime()
+     * @return int
      */
     public function countEdits(Project $project, $namespace = 'all', $start = '', $end = '')
     {
-        return $this->getRepository()->countEdits($project, $this, $namespace, $start, $end);
+        return (int) $this->getRepository()->countEdits($project, $this, $namespace, $start, $end);
     }
 
     /**
      * Get the number of edits this user made using semi-automated tools.
      * @param Project $project
-     * @param string|int [$namespace] Namespace ID or 'all'
-     * @param string [$start] Start date in a format accepted by strtotime()
-     * @param string [$end] End date in a format accepted by strtotime()
+     * @param string|int $namespace Namespace ID or 'all'
+     * @param string $start Start date in a format accepted by strtotime()
+     * @param string $end End date in a format accepted by strtotime()
      * @return int Result of query, see below.
      */
     public function countAutomatedEdits(Project $project, $namespace = 'all', $start = '', $end = '')
@@ -195,12 +240,12 @@ class User extends Model
     /**
      * Get non-automated contributions for this user.
      * @param Project $project
-     * @param string|int [$namespace] Namespace ID or 'all'
-     * @param string [$start] Start date in a format accepted by strtotime()
-     * @param string [$end] End date in a format accepted by strtotime()
-     * @param int [$offset] Used for pagination, offset results by N edits
-     * @return array[] Result of query, with columns (string) 'page_title',
-     *   (int) 'page_namespace', (int) 'rev_id', (DateTime) 'timestamp',
+     * @param string|int $namespace Namespace ID or 'all'
+     * @param string $start Start date in a format accepted by strtotime()
+     * @param string $end End date in a format accepted by strtotime()
+     * @param int $offset Used for pagination, offset results by N edits
+     * @return array[] Result of query, with columns (string) 'full_page_title' including namespace,
+     *   (string) 'page_title', (int) 'page_namespace', (int) 'rev_id', (DateTime) 'timestamp',
      *   (bool) 'minor', (int) 'length', (int) 'length_change', (string) 'comment'
      */
     public function getNonAutomatedEdits(
@@ -223,12 +268,16 @@ class User extends Model
 
         return array_map(function ($rev) use ($namespaces) {
             $pageTitle = $rev['page_title'];
+            $fullPageTitle = '';
 
             if ($rev['page_namespace'] !== '0') {
-                $pageTitle = $namespaces[$rev['page_namespace']] . ":$pageTitle";
+                $fullPageTitle = $namespaces[$rev['page_namespace']] . ":$pageTitle";
+            } else {
+                $fullPageTitle = $pageTitle;
             }
 
             return [
+                'full_page_title' => $fullPageTitle,
                 'page_title' => $pageTitle,
                 'page_namespace' => (int) $rev['page_namespace'],
                 'rev_id' => (int) $rev['rev_id'],
@@ -242,11 +291,11 @@ class User extends Model
     }
 
     /**
-     * Get non-automated contributions for the given user.
+     * Get counts of known automated tools used by the given user.
      * @param Project $project
-     * @param string|int [$namespace] Namespace ID or 'all'
-     * @param string [$start] Start date in a format accepted by strtotime()
-     * @param string [$end] End date in a format accepted by strtotime()
+     * @param string|int $namespace Namespace ID or 'all'
+     * @param string $start Start date in a format accepted by strtotime()
+     * @param string $end End date in a format accepted by strtotime()
      * @return string[] Each tool that they used along with the count and link:
      *                  [
      *                      'Twinkle' => [

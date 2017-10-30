@@ -25,6 +25,7 @@ class RfXAnalysisController extends Controller
      * Get the tool's shortname.
      *
      * @return string
+     * @codeCoverageIgnore
      */
     public function getToolShortname()
     {
@@ -40,6 +41,7 @@ class RfXAnalysisController extends Controller
      *
      * @Route("/rfx",                  name="rfxAnalysis")
      * @Route("/rfx",                  name="rfx")
+     * @Route("/rfx/",                 name="rfxSlash")
      * @Route("/rfx/index.php",        name="rfxAnalysisIndexPhp")
      * @Route("/rfx/{project}",        name="rfxAnalysisProject")
      * @Route("/rfx/{project}/{type}", name="rfxAnalysisProjectType")
@@ -111,6 +113,7 @@ class RfXAnalysisController extends Controller
      * @Route("/rfx/{project}/{type}/{username}", name="rfxAnalysisResult")
      *
      * @return Response|RedirectResponse
+     * @codeCoverageIgnore
      */
     public function resultAction($project, $type, $username)
     {

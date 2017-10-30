@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"Nemo bis"
+			"Nemo bis",
+			"Otokoume"
 		]
 	},
 	"actions": "操作",
@@ -32,6 +33,7 @@
 	"delete": "削除",
 	"deleted": "削除済",
 	"deleted-edits": "削除された編集",
+	"documentation": "説明書",
 	"edit-summary": "コメント",
 	"editors": "編集者数",
 	"edits": "編集",
@@ -153,6 +155,7 @@
 	"user-groups": "利用者グループ",
 	"user-id": "利用者 ID",
 	"username": "利用者名",
+	"version": "バージョン $1",
 	"view-source": "ソースを閲覧",
 	"vote-msg": "$1 は $2 件の $3 ページを編集しました!",
 	"wiki": "ウィキ",

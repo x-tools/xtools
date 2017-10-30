@@ -21,7 +21,7 @@ Then, **Edit counts** are displayed for:
 * the last day, week, month, year, and all time (the latter also including addition counts of deleted edits);
 * edits made with or without comments;
 * edits that have been deleted;
-* small (under 20 KB) and large (over 1000 KB) edits;
+* small (under 20 bytes) and large (over 1000 bytes) edits;
 * minor/non-minor edits (as recorded by the user); and
 * what semi-automating tools they used to edit.
 
@@ -59,8 +59,7 @@ Timecard
 ========
 
 A 'punchcard' chart showing what days of the week and hours of the day the user made most edits.
-The times are given in the timezone of the XTools user
-(and keep in mind that the editing user may also have edited in multiple different timezones).
+The times given are in UTC.
 
 Year counts
 ===========
@@ -76,7 +75,7 @@ The same as the year counts, except the columns are months instead of years.
 
 Latest global edits
 ===================
- 
+
 A list of the user's thirty most recent edits from all projects.
 
 Automated edits

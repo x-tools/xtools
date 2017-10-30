@@ -23,7 +23,7 @@
                 <div class="panel-body col-lg-12">
 {% endif %}
 
-<table class="table table-bordered table-hover table-striped tools-table toggle-table">
+<table class="table table-bordered table-hover table-striped namespaces-table toggle-table">
     <thead>
         {% for key in ['namespace', 'count'] %}
             <th>
@@ -35,7 +35,9 @@
         {% endfor %}
     </thead>
     <tbody>
+        {% set availableNamespaces = [] %}
         {% for nsId, value in ec.namespaceTotals %}
+            {% set availableNamespaces = availableNamespaces|merge([nsId]) %}
             <tr>
                 <td class="sort-entry--namespace" data-value="{{ nsId }}">
                     <span class="tools-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ nsId }}">
@@ -45,8 +47,8 @@
                     {{ nsName(nsId, project.namespaces) }}
                 </td>
                 <td class="sort-entry--count" data-value="{{ value }}">
-                    {{ value|number_format }}
-                    ({{ ((value/ec.countLiveRevisions)*100)|round(1) }}%)
+                    {{ value|num_format }}
+                    ({{ value|percent_format(ec.countLiveRevisions) }})
                 </td>
             </tr>
         {% endfor %}
@@ -57,7 +59,7 @@
                 {{ ec.namespaceTotals|length}} {{ msg('num-namespaces', [ec.namespaceTotals|length]) }}
             </th>
             <th class="namespaces--count">
-                {{ ec.countLiveRevisions|number_format }}
+                {{ ec.countLiveRevisions|num_format }}
             </th>
         </tr>
     </tfoot>
@@ -65,6 +67,7 @@
 <div class="chart-wrapper namespaces-chart-wrapper toggle-table--chart">
     <canvas id="namespace-canvas"></canvas>
     <script>
+        window.namespaces = {{ project.namespaces|json_encode()|raw }};
         window.namespaceTotals = {{ ec.namespaceTotals|json_encode()|raw }};
         window.namespaceChart = new Chart($("#namespace-canvas"), {
             type: 'pie',
@@ -79,6 +82,7 @@
             },
             options: {
                 responsive: false,
+                aspectRatio: 1,
                 legend: {
                     display: false,
                 },

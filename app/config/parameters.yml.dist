@@ -32,7 +32,7 @@ parameters:
     mailer_user:       ~
     mailer_password:   ~
 
-    # A secret key that's used to generate certain security-related tokens
+    # A secret key that's used to generate certain security-related tokens, and as the secret for the internal API.
     secret:            ThisTokenIsNotSoSecretChangeIt
 
     # Code for the display of the notice.  noticeDisplay is bool, display or not. noticeStyle is one of "error,"
@@ -40,8 +40,6 @@ parameters:
     app.noticeDisplay: false
     app.noticeStyle:   ""
     app.noticeText:    ""
-
-    app.base_path: null
 
     cache.adapter: filesystem
     cache.redis_dsn: 'redis://localhost'
@@ -56,15 +54,24 @@ parameters:
     app.rate_limit_time: 5
     app.rate_limit_count: 10
 
+    app.multithread: 0
+    app.base_path: https://xtools.example.org
+
+    app.max_page_revisions: 50000
+    app.max_user_edits: 350000
+
+    # Ignore for any non-WMF installation. This is only meant to convert legacy parameters.
+    languageless_wikis:
+
     # Enabling or disabling of individual tools
     enable.adminscore: 1
     enable.adminstats: 1
     enable.articleinfo: 1
-    enable.autoedits: 0
+    enable.autoedits: 1
     enable.bash: 0
     enable.blame: 0
     enable.ec: 1
-    enable.es: 0
+    enable.es: 1
     enable.pages: 1
     enable.rfx: 0
     enable.rfxvote: 0

@@ -13,6 +13,9 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * A quick note: This tool is referred to as "bash" in much of the legacy code base.  As such,
  * the terms "quote" and "bash" are used interchangeably here, so as to not break many conventions.
+ *
+ * This tool is intentionally disabled in the WMF installation.
+ * @codeCoverageIgnore
  */
 class QuoteController extends Controller
 {
@@ -20,6 +23,7 @@ class QuoteController extends Controller
     /**
      * Get the tool's shortname.
      * @return string
+     * @codeCoverageIgnore
      */
     public function getToolShortname()
     {
@@ -68,7 +72,7 @@ class QuoteController extends Controller
      * @Route("/quote/random", name="quoteRandom")
      * @Route("/bash/random",  name="bashRandom")
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return RedirectResponse
      */
     public function randomQuoteAction()
     {
@@ -91,7 +95,7 @@ class QuoteController extends Controller
      * @Route("/quote/all", name="quoteAll")
      * @Route("/bash/all",  name="bashAll")
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function quoteAllAction()
     {
@@ -126,7 +130,7 @@ class QuoteController extends Controller
      * @Route("/quote/{id}", name="quoteID")
      * @Route("/bash/{id}",  name="bashID")
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function quoteAction($id)
     {

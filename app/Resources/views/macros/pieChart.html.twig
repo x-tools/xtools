@@ -16,7 +16,7 @@
                     <span class="legend-label">{{ entry.label }}</span>
                     <span class="legend-value">
                         &middot;
-                        {{ entry.value | number_format }} ({{ entry.percentage | percent_format }})
+                        {{ entry.value|num_format }} ({{ entry.percentage|percent_format }})
                     </span>
                 </div>
                 {% endif %}
@@ -38,9 +38,19 @@
             },
             options: {
                 responsive: false,
+                aspectRatio: 1,
                 legend: {
                     display: false,
                 },
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem, chartInstance) {
+                            var value = chartInstance.datasets[tooltipItem.datasetIndex].data[tooltipItem.index],
+                                label = chartInstance.labels[tooltipItem.index];
+                            return label + ': ' + value.toLocaleString();
+                        }
+                    }
+                }
             },
         });
     });

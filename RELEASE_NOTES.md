@@ -1,5 +1,108 @@
 # Release Notes #
 
+## 3.1.16 ##
+- T179293: Remove references to wikidatawiki_p.wb_entity_per_page which was
+  removed with T95685. Checking basic wikidata fields will be reimplemented
+  at a later time.
+- T179304: Fix user opt-in check for usernames with spaces.
+
+## 3.1.15 ##
+- T179258: Don't use reserved characters in cache keys.
+
+## 3.1.14 ##
+- New Edit Summaries API endpoint.
+- T178622: Show percentages when hovering over namespaces in the year/month
+  counts charts in the Edit Counter tool.
+- T178618: Fix default sorting of AdminStats.
+- T178259: Fix links to redirect pages in the Pages Created tool.
+- Improved test coverage and code quality.
+
+## 3.1.13 ##
+- Major refactoring of controllers, standardizing parsing and decoding of
+  URL parameters.
+- T178203: Speed up Pages Created query, and improve detection of pages
+  created that have since been deleted.
+- Show "no contributions found" on result pages rather than redirect to index.
+- T175763: Cache results of ArticleInfo API if the query took an usual
+  amount of time to finish.
+- Major refactor of AdminStats, and improvements to ensure only report users
+  who were at some point in a qualifying user group (with admin-like actions).
+- New AdminStats API endpoint.
+- Improved test coverage.
+
+## 3.1.12 ##
+- T177883: Improve TopEdits and Edit Counter performance by collecting
+  top-edited pages across all namespaces with a single query.
+- T177898: Scale bubbles of time card chart with screen size.
+
+## 3.1.11 ##
+- Fix counting of Top Edits that broke when joining on page_assessments.
+- T174581: Ensure bars of year/month counts in Edit Counter are of consistent
+  size, and downsize them overall for better readability.
+- Remove namespace toggles above year/month count charts in the Edit Counter,
+  instead going off of toggles in the namespace counts table.
+
+## 3.1.10 ##
+- T177730: Show per-namespace breakdown of top edited pages.
+- T177696: Fix ordering of Edit Counter timecard data.
+
+## 3.1.9 ##
+- T172801: Show top edited pages in Edit Counter.
+- Downsize the timecard based on feedback.
+
+## 3.1.8 ##
+- Revert back to Chart.js v2.6.0
+
+## 3.1.7 ##
+- Hotfix for async queries of internal API. This requires a new parameter
+  'app.base_path' be defined.
+
+## 3.1.6 ##
+- Hotfix to move internal 'usage API' out of /api namespace and into /meta.
+  This is because the Wikimedia installation reroutes /api requests to a
+  different server, which we don't want for the usage API.
+
+## 3.1.5 ##
+- T170652 Add option to limit how many edits to analyize in the Edit Counter,
+  Top Edits, and Automated Edits tools, and a revision limit option for
+  ArticleInfo.
+- T176030 Localize all numbers across the application based on language.
+- T177300 Fix links to Top Edits from the Edit Counter.
+- T177089 Make Edit Counter internal API only accessible by XTools.
+- Make autoedits API endpoint also return number of nonautomated edits.
+
+## 3.1.4 ##
+- T177172 Fix path to normalize project API endpoint
+- T174012 Rework "longest block" field in Edit Counter to show actual duration
+  of the block
+- T177168 Fix sorting of 'atbe' column in ArticleInfo
+- T177137 Add 'RotateLink' tool to AutoEdits
+- T177138 Add 'Hotcatcheck' tool to AutoEdits
+- T177140 Fix link to Global replace tool in AutoEdits
+- Include current URL in bug report link
+- Update all controllers to support routes of legacy XTools
+
+## 3.1.3 ##
+- Hotfix for showing mainspace page titles in non-automated edits API endpoint
+
+## 3.1.2 ##
+- T163284 Add option to optimize Edit Counter by querying internal API
+  asynchronously
+- T176676 Add missing routes with a trailing slash
+- T176590, T176591 Add numerous Commons tools to AutoEdits, along with some bug
+  fixes and performance improvments
+- T175796 Fix display of replication lag
+- Revamp API endpoint routing to be object-oriented
+
+## 3.1.1 ##
+- T174527 Fix caching of year/month counts in Edit Counter
+- T172162 Fix sorting of some columns in AdminStats, make heading row sticky
+- T170101 Endpoint to fetch JS for ArticleInfo gadget
+- T170763 Resolve www. domains (accept www.wikidata.org or wikidata.org)
+- Code refactoring and unifying the headers and user links atop each tool
+- Fix 'average time between edits' statistic in ArticleInfo
+- Various i18n fixes and updates from translatewiki
+
 ## 3.1.0 ##
 - T165709, T165710 Introduce "RfX Analysis" and "RfX Voter" tools, both of which
   are functional but still a work in progress.

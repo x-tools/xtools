@@ -31,6 +31,9 @@ class EditTest extends WebTestCase
     /** @var Page The page instance. */
     protected $page;
 
+    /** @var string[] Basic attritubes for edit factory. */
+    protected $editAttrs;
+
     /**
      * Set up container, class instances and mocks.
      */
@@ -47,16 +50,16 @@ class EditTest extends WebTestCase
                 'dbName' => 'test_wiki',
                 'lang' => 'en',
             ]);
+        $this->projectRepo->method('getMetadata')
+            ->willReturn([
+                'general' => [
+                    'articlePath' => '/wiki/$1',
+                ],
+            ]);
         $this->project->setRepository($this->projectRepo);
         $this->page = new Page($this->project, 'Test_page');
-    }
 
-    /**
-     * Test the basic functionality of Edit.
-     */
-    public function testBasic()
-    {
-        $edit = new Edit($this->page, [
+        $this->editAttrs = [
             'id' => '1',
             'timestamp' => '20170101100000',
             'minor' => '0',
@@ -64,7 +67,17 @@ class EditTest extends WebTestCase
             'length_change' => '2',
             'username' => 'Testuser',
             'comment' => 'Test',
-        ]);
+        ];
+    }
+
+    /**
+     * Test the basic functionality of Edit.
+     */
+    public function testBasic()
+    {
+        $edit = new Edit($this->page, array_merge($this->editAttrs, [
+            'comment' => 'Test',
+        ]));
         $this->assertEquals($this->project, $edit->getProject());
         $this->assertInstanceOf(DateTime::class, $edit->getTimestamp());
         $this->assertEquals($this->page, $edit->getPage());
@@ -78,18 +91,12 @@ class EditTest extends WebTestCase
      */
     public function testWikifiedComment()
     {
-        $edit = new Edit($this->page, [
-            'id' => '1',
-            'timestamp' => '20170101100000',
-            'minor' => '0',
-            'length' => '12',
-            'length_change' => '2',
-            'username' => 'Testuser',
+        $edit = new Edit($this->page, array_merge($this->editAttrs, [
             'comment' => '<script>alert("XSS baby")</script> [[test page]]',
-        ]);
+        ]));
 
         $this->assertEquals(
-            "&lt;script&gt;alert(&quot;XSS baby&quot;)&lt;/script&gt; " .
+            "&lt;script&gt;alert(\"XSS baby\")&lt;/script&gt; " .
                 "<a target='_blank' href='https://test.example.org/wiki/Test_page'>test page</a>",
             $edit->getWikifiedSummary()
         );
@@ -100,15 +107,9 @@ class EditTest extends WebTestCase
      */
     public function testTool()
     {
-        $edit = new Edit($this->page, [
-            'id' => '1',
-            'timestamp' => '20170101100000',
-            'minor' => '0',
-            'length' => '12',
-            'length_change' => '2',
-            'username' => 'Testuser',
+        $edit = new Edit($this->page, array_merge($this->editAttrs, [
             'comment' => 'Level 2 warning re. [[Barack Obama]] ([[WP:HG|HG]]) (3.2.0)',
-        ]);
+        ]));
 
         $this->assertArraySubset(
             [
@@ -123,27 +124,15 @@ class EditTest extends WebTestCase
      */
     public function testIsRevert()
     {
-        $edit = new Edit($this->page, [
-            'id' => '1',
-            'timestamp' => '20170101100000',
-            'minor' => '0',
-            'length' => '12',
-            'length_change' => '2',
-            'username' => 'Testuser',
+        $edit = new Edit($this->page, array_merge($this->editAttrs, [
             'comment' => 'You should have reverted this edit using [[WP:HG|Huggle]]',
-        ]);
+        ]));
 
         $this->assertFalse($edit->isRevert($this->container));
 
-        $edit2 = new Edit($this->page, [
-            'id' => '1',
-            'timestamp' => '20170101100000',
-            'minor' => '0',
-            'length' => '12',
-            'length_change' => '2',
-            'username' => 'Testuser',
+        $edit2 = new Edit($this->page, array_merge($this->editAttrs, [
             'comment' => 'Reverted edits by Mogultalk (talk) ([[WP:HG|HG]]) (3.2.0)',
-        ]);
+        ]));
 
         $this->assertTrue($edit2->isRevert($this->container));
     }
@@ -153,28 +142,69 @@ class EditTest extends WebTestCase
      */
     public function testIsAutomated()
     {
-        $edit = new Edit($this->page, [
-            'id' => '1',
-            'timestamp' => '20170101100000',
-            'minor' => '0',
-            'length' => '12',
-            'length_change' => '2',
-            'username' => 'Testuser',
+        $edit = new Edit($this->page, array_merge($this->editAttrs, [
             'comment' => 'You should have reverted this edit using [[WP:HG|Huggle]]',
-        ]);
+        ]));
 
         $this->assertFalse($edit->isAutomated($this->container));
 
-        $edit2 = new Edit($this->page, [
-            'id' => '1',
-            'timestamp' => '20170101100000',
-            'minor' => '0',
-            'length' => '12',
-            'length_change' => '2',
-            'username' => 'Testuser',
+        $edit2 = new Edit($this->page, array_merge($this->editAttrs, [
             'comment' => 'Reverted edits by Mogultalk (talk) ([[WP:HG|HG]]) (3.2.0)',
-        ]);
+        ]));
 
         $this->assertTrue($edit2->isAutomated($this->container));
+    }
+
+    /**
+     * Test some basic getters.
+     */
+    public function testGetters()
+    {
+        $edit = new Edit($this->page, $this->editAttrs);
+        $this->assertEquals('2017', $edit->getYear());
+        $this->assertEquals('1', $edit->getMonth());
+        $this->assertEquals(12, $edit->getLength());
+        $this->assertEquals(2, $edit->getSize());
+        $this->assertEquals(2, $edit->getLengthChange());
+        $this->assertEquals('Testuser', $edit->getUser()->getUsername());
+    }
+
+    /**
+     * URL to the diff.
+     */
+    public function testDiffUrl()
+    {
+        $edit = new Edit($this->page, $this->editAttrs);
+        $this->assertEquals(
+            'https://test.example.org/wiki/Special:Diff/1',
+            $edit->getDiffUrl()
+        );
+    }
+
+    /**
+     * URL to the diff.
+     */
+    public function testPermaUrl()
+    {
+        $edit = new Edit($this->page, $this->editAttrs);
+        $this->assertEquals(
+            'https://test.example.org/wiki/Special:PermaLink/1',
+            $edit->getPermaUrl()
+        );
+    }
+
+    /**
+     * Was the edit made by a logged out user?
+     */
+    public function testIsAnon()
+    {
+        // Edit made by User:Testuser
+        $edit = new Edit($this->page, $this->editAttrs);
+        $this->assertFalse($edit->isAnon());
+
+        $edit = new Edit($this->page, array_merge($this->editAttrs, [
+            'username' => '192.168.0.1'
+        ]));
+        $this->assertTrue($edit->isAnon());
     }
 }

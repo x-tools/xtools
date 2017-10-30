@@ -42,7 +42,7 @@ framework:
     fragments:       ~
     http_method_override: true
     assets:
-        version: '2'
+        version: '10'
         version_format: '%%s?v=%%s'
     cache:
         app: "cache.adapter.%cache.adapter%"
@@ -171,6 +171,16 @@ fos_rest:
         mime_types:
             json: ['application/json']
             html: ['text/html']
+
+guzzle:
+    logging: true
+
+    clients:
+        xtools:
+            options:
+                headers:
+                    Accept: "application/json"
+                timeout: 30
 
 monolog:
     channels: ['rate_limit']

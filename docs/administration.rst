@@ -18,6 +18,45 @@ Using the above example, if you try to load the same page more than 5 times with
 
 Any requests that are denied are logged at ``var/logs/rate_limit.log``.
 
+You can blacklist user agents and URIs using the request_blacklist.yml file.
+
+.. _offload_api:
+
+Offloading API requests
+=======================
+XTools features a rich public API. In addition, the internal API used for the Edit Counter can be very expensive in terms of resources. If you expect your XTools installation will receive a lot of traffic, you might consider setting up a dedicated API server so that resources on the main app server are not hogged.
+
+This documentation covers how to set up forwarding so that all requests to /api go to the API server, assuming you are using Apache in a Linux environment.
+
+1. Install libapache2-mod-proxy-html and libxml2-dev:
+   ``sudo apt-get install libapache2-mod-proxy-html libxml2-dev``
+
+2.  Enable the necessary modules (if some are already enabled it will simply make sure they are active):
+  ::
+
+    sudo a2enmod proxy
+    sudo a2enmod proxy_http
+    sudo a2enmod proxy_ajp
+    sudo a2enmod rewrite
+    sudo a2enmod deflate
+    sudo a2enmod headers
+    sudo a2enmod proxy_balancer
+    sudo a2enmod proxy_connect
+    sudo a2enmod proxy_html
+    sudo a2enmod xml2enc
+
+3. In your Apache coniguration, within the ``<VirtualHost>`` block, add this to the bottom:
+  ::
+
+    ProxyPreserveHost On
+    ProxyPass /api http://X.X.X.X:80/app.php/api
+    ProxyPassReverse /api http://X.X.X.X:80/app.php/api
+
+  ...replacing ``X.X.X.X`` with the IP of the API server.
+
+4. Finally, restart apache with ``sudo apachectl -k graceful``
+
+
 Killing slow queries
 ====================
 

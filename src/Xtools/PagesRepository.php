@@ -11,6 +11,7 @@ use GuzzleHttp;
 
 /**
  * A PagesRepository fetches data about Pages, either singularly or for multiple.
+ * @codeCoverageIgnore
  */
 class PagesRepository extends Repository
 {
@@ -103,11 +104,7 @@ class PagesRepository extends Repository
      */
     public function getRevisions(Page $page, User $user = null)
     {
-        $cacheKey = 'revisions.'.$page->getId();
-        if ($user) {
-            $cacheKey .= '.'.$user->getCacheKey();
-        }
-
+        $cacheKey = $this->getCacheKey(func_get_args(), 'page_revisions');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -131,12 +128,26 @@ class PagesRepository extends Repository
      * Get the statement for a single revision, so that you can iterate row by row.
      * @param Page $page The page.
      * @param User|null $user Specify to get only revisions by the given user.
+     * @param int $limit Max number of revisions to process.
+     * @param int $numRevisions Number of revisions, if known. This is used solely to determine the
+     *   OFFSET if we are given a $limit (see below). If $limit is set and $numRevisions is not set,
+     *   a separate query is ran to get the nuber of revisions.
      * @return Doctrine\DBAL\Driver\PDOStatement
      */
-    public function getRevisionsStmt(Page $page, User $user = null)
+    public function getRevisionsStmt(Page $page, User $user = null, $limit = null, $numRevisions = null)
     {
         $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
         $userClause = $user ? "revs.rev_user_text in (:username) AND " : "";
+
+        // This sorts ascending by rev_timestamp because ArticleInfo must start with the oldest
+        // revision and work its way forward for proper processing. Consequently, if we want to do
+        // a LIMIT we want the most recent revisions, so we also need to know the total count to
+        // supply as the OFFSET.
+        $limitClause = '';
+        if (intval($limit) > 0 && isset($numRevisions)) {
+            $offset = $numRevisions - $limit;
+            $limitClause = "LIMIT $offset, $limit";
+        }
 
         $sql = "SELECT
                     revs.rev_id AS id,
@@ -150,7 +161,8 @@ class PagesRepository extends Repository
                 FROM $revTable AS revs
                 LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                 WHERE $userClause revs.rev_page = :pageid
-                ORDER BY revs.rev_timestamp ASC";
+                ORDER BY revs.rev_timestamp ASC
+                $limitClause";
 
         $params = ['pageid' => $page->getId()];
         if ($user) {
@@ -169,7 +181,12 @@ class PagesRepository extends Repository
      */
     public function getNumRevisions(Page $page, User $user = null)
     {
-        $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
+        $cacheKey = $this->getCacheKey(func_get_args(), 'page_numrevisions');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $revTable = $page->getProject()->getTableName('revision');
         $userClause = $user ? "rev_user_text in (:username) AND " : "";
 
         $sql = "SELECT COUNT(*)
@@ -179,8 +196,16 @@ class PagesRepository extends Repository
         if ($user) {
             $params['username'] = $user->getUsername();
         }
+
         $conn = $this->getProjectsConnection();
-        return $conn->executeQuery($sql, $params)->fetchColumn(0);
+        $result = $conn->executeQuery($sql, $params)->fetchColumn(0);
+
+        // Cache for 10 minutes, and return.
+        $cacheItem = $this->cache->getItem($cacheKey)
+            ->set($result)
+            ->expiresAfter(new DateInterval('PT10M'));
+        $this->cache->save($cacheItem);
+        return $result;
     }
 
     /**
@@ -188,14 +213,19 @@ class PagesRepository extends Repository
      *   number of revisions, unique authors, initial author
      *   and edit count of the initial author.
      * This is combined into one query for better performance.
-     * Caching is intentionally disabled, because using the gadget,
-     *   this will get hit for a different page constantly, where
-     *   the likelihood of cache benefiting us is slim.
+     * Caching is only applied if it took considerable time to process,
+     *   because using the gadget, this will get hit for a different page
+     *   constantly, where the likelihood of cache benefiting us is slim.
      * @param Page $page The page.
      * @return string[]
      */
     public function getBasicEditingInfo(Page $page)
     {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'page_basicinfo');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
         $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
         $userTable = $this->getTableName($page->getProject()->getDatabaseName(), 'user');
         $pageTable = $this->getTableName($page->getProject()->getDatabaseName(), 'page');
@@ -236,7 +266,22 @@ class PagesRepository extends Repository
                 );";
         $params = ['pageid' => $page->getId()];
         $conn = $this->getProjectsConnection();
-        return $conn->executeQuery($sql, $params)->fetch();
+
+        // Get current time so we can compare timestamps
+        // and decide whether or to cache the result.
+        $time1 = time();
+        $result = $conn->executeQuery($sql, $params)->fetch();
+        $time2 = time();
+
+        // If it took over 5 seconds, cache the result for 20 minutes.
+        if ($time2 - $time1 > 5) {
+            $cacheItem = $this->cache->getItem($cacheKey)
+                ->set($result)
+                ->expiresAfter(new DateInterval('PT20M'));
+            $this->cache->save($cacheItem);
+        }
+
+        return $result;
     }
 
     /**
@@ -247,6 +292,11 @@ class PagesRepository extends Repository
      */
     public function getAssessments(Project $project, $pageIds)
     {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'page_assessments');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
         if (!$project->hasPageAssessments()) {
             return [];
         }
@@ -260,7 +310,14 @@ class PagesRepository extends Repository
                   WHERE pa_page_id IN ($pageIds)";
 
         $conn = $this->getProjectsConnection();
-        return $conn->executeQuery($query)->fetchAll();
+        $result = $conn->executeQuery($query)->fetchAll();
+
+        // Cache for 10 minutes, and return.
+        $cacheItem = $this->cache->getItem($cacheKey)
+            ->set($result)
+            ->expiresAfter(new DateInterval('PT10M'));
+        $this->cache->save($cacheItem);
+        return $result;
     }
 
     /**
@@ -431,12 +488,13 @@ class PagesRepository extends Repository
 
     /**
      * Get page views for the given page and timeframe.
+     * @FIXME use Symfony Guzzle package.
      * @param Page $page
      * @param string|DateTime $start In the format YYYYMMDD
      * @param string|DateTime $end In the format YYYYMMDD
      * @return string[]
      */
-    public function getPageviews($page, $start, $end)
+    public function getPageviews(Page $page, $start, $end)
     {
         $title = rawurlencode(str_replace(' ', '_', $page->getTitle()));
         $client = new GuzzleHttp\Client();

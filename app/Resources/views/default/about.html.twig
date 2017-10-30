@@ -8,13 +8,21 @@
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {{ msg('back') }}
             </a>
-            {{ msg('tool-index') }}
+            {{ msg('tool-about') }}
         </div>
     </header>
 
     <div class="panel-body xt-panel-body">
         <div class="col-lg-12 text-center">
             <img class="splash-logo" style="width:300px" src="{{ asset('static/images/logo.svg') }}" alt="{{ msg('xtools-title') }}" />
+            <h5 class="about-subtitle">
+                {{ msg('version', [version]) }}
+                ({{ releaseDate() }})
+                &middot;
+                <a target="_blank" href="https://xtools.readthedocs.io">{{ msg('documentation') }}</a>
+                &middot;
+                <a target="_blank" href="https://github.com/x-tools/xtools">{{ msg('view-source') }}</a>
+            </h5>
         </div>
         <div class="col-lg-3 stat-list clearfix">
             <h3>{{ msg('maintainers') }}</h3>

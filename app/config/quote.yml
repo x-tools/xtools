@@ -266,7 +266,7 @@ parameters:
     - "<Reedy> $oldLang = $wgLang; $wgLang='en'; wfMsg( 'foobar' ); $wgLang=$oldLang;"
     - "<Qcoder00> I've found a bug <Nikerabbit> I've found hundreds... I usually report them to bugzilla.wikimedia.org"
     - "<TimStarling> fusion power is just a sci-fi fantasy designed to keep physicists in jobs"
-    - "08:47 < yuvipanda> Growing up sucks, since you can no longer freely attentionwhore"
+    - "<yuvipanda> Growing up sucks, since you can no longer freely attentionwhore"
     - "<TimStarling> I mean, if you configure CN to give a banner to 50% of people, you wouldn't be surprised when it gets an impression rate equal to 50% of page views"
     - "<saper> what's a084ddab1f6b0ed412a2e722732db3b1cebfea35 ? <Reedy> A hash <saper> \"They gave me technically correct, but completely useless answer.\""
     - "<Reedy> Mobile staff are weird. <Reedy> Can we all join in?"

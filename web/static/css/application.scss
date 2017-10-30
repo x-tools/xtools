@@ -134,7 +134,7 @@ $tooltip-border: #ddd;
 $tooltip-shadow: #ccc;
 
 .tooltipcss {
-    position: relative;
+    position: static;
     text-decoration: none;
 
     .tooltip-body {
@@ -240,6 +240,16 @@ $tooltip-shadow: #ccc;
         top: 0;
         width: auto;
         white-space: nowrap;
+    }
+}
+.table-sticky-header {
+    position: relative;
+
+    .sticky-heading {
+        background: white;
+        left: 0;
+        position: absolute;
+        top: 0;
     }
 }
 .xt-alert {
@@ -416,7 +426,7 @@ section > .panel-body {
 }
 
 input.form-control.show-loader {
-    background: url("../images/loader.gif") no-repeat right center;
+    background: url("../images/loader.gif") no-repeat right 5px center;
 }
 
 .stat-list {
@@ -800,6 +810,10 @@ input.form-control.show-loader {
         margin-bottom: 20px;
         text-align: center;
         width: 100%;
+    }
+
+    .times-in-utc {
+        padding: 0 15px;
     }
 
     // FIXME: eventually will create a pop-out nav from the right

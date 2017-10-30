@@ -15,12 +15,12 @@
             {{ wiki.pageLink(page, page.title) }}
             <small>
                 &bull;
-                {{ project.title }}
+                {{ project.domain }}
             </small>
         </div>
     </header>
 
-    <div class="panel-body xt-panel-body" >
+    <div class="panel-body xt-panel-body">
         {% set content %}
         <div class="col-lg-6 stat-list clearfix">
             <table class="table">
@@ -43,7 +43,7 @@
                 </tr>
                 <tr>
                     <td>{{ msg('count') }}</td>
-                    <td>{{ revision_count|number_format }}</td>
+                    <td>{{ revision_count|num_format }}</td>
                 </tr>
                 <tr>
                     <td>{{ msg('added') }}</td>

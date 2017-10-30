@@ -63,7 +63,7 @@
         <tr>
             <td class="stat-list--new-group">{{ msg('live-edits') }}</td>
             <td class="stat-list--new-group">
-                {{ wiki.pageLinkRaw('Special:Contributions/'~user.username, project, ec.countLiveRevisions|number_format) }}
+                {{ wiki.pageLinkRaw('Special:Contributions/'~user.username, project, ec.countLiveRevisions|num_format) }}
                 {% if ec.countAllRevisions %}
                     &middot;
                     ({{ ((ec.countLiveRevisions / ec.countAllRevisions) * 100)|percent_format }})
@@ -73,7 +73,7 @@
         <tr>
             <td>{{ msg('deleted-edits') }}</td>
             <td>
-                {{ wiki.pageLinkRaw('Special:DeletedContributions/'~user.username, project, ec.countDeletedRevisions|number_format) }}
+                {{ wiki.pageLinkRaw('Special:DeletedContributions/'~user.username, project, ec.countDeletedRevisions|num_format) }}
                 {% if ec.countAllRevisions %}
                     &middot;
                     ({{ ((ec.countDeletedRevisions / ec.countAllRevisions) * 100)|percent_format }})
@@ -82,28 +82,28 @@
         </tr>
         <tr>
             <td><strong>{{ msg('total-edits') }}</strong></td>
-            <td><strong>{{ ec.countAllRevisions|number_format }}</strong></td>
+            <td class="xt-test--total-edits"><strong>{{ ec.countAllRevisions|num_format }}</strong></td>
         </tr>
     </tbody></table>
 </div>
 <div class="col-lg-6 stat-list clearfix">
     <table class="table"><tbody>
-        <tr><td>{{ msg('last-day') }}</td><td>{{ ec.countRevisionsInLast('day')|number_format }}</td></tr>
-        <tr><td>{{ msg('last-week') }}</td><td>{{ ec.countRevisionsInLast('week')|number_format }}</td></tr>
-        <tr><td>{{ msg('last-month') }}</td><td>{{ ec.countRevisionsInLast('month')|number_format }}</td></tr>
-        <tr><td>{{ msg('last-year') }}</td><td>{{ ec.countRevisionsInLast('year')|number_format }}</td></tr>
+        <tr><td>{{ msg('last-day') }}</td><td>{{ ec.countRevisionsInLast('day')|num_format }}</td></tr>
+        <tr><td>{{ msg('last-week') }}</td><td>{{ ec.countRevisionsInLast('week')|num_format }}</td></tr>
+        <tr><td>{{ msg('last-month') }}</td><td>{{ ec.countRevisionsInLast('month')|num_format }}</td></tr>
+        <tr><td>{{ msg('last-year') }}</td><td>{{ ec.countRevisionsInLast('year')|num_format }}</td></tr>
         <tr>
             <td>{{ msg('average-edits-per-day', [msg('days', [1])]) }}</td>
             <td>
-                {{ ec.averageRevisionsPerDay|number_format(1) }}
+                {{ ec.averageRevisionsPerDay|num_format(1) }}
                 <span class="text-muted">
-                    ({{ ec.days|number_format }} {{ msg('num-days', [ec.days]) }})
+                    ({{ ec.days|num_format }} {{ msg('num-days', [ec.days]) }})
                 </span>
             </td>
         </tr>
         <tr>
             <td>{{ msg('average-edit-size') }}*</td>
-            <td>{{ ec.averageEditSize|number_format(1) }} {{ msg('num-bytes', [ec.averageEditSize]) }}</td>
+            <td>{{ ec.averageEditSize|num_format(1) }} {{ msg('num-bytes', [ec.averageEditSize]) }}</td>
         </tr>
     </tbody></table>
 </div>
@@ -119,7 +119,7 @@
             </tr>
             <tr>
                 <td>{{ msg('pages-edited-total') }}</td>
-                <td>{{ ec.countAllPagesEdited|number_format }}</td>
+                <td>{{ ec.countAllPagesEdited|num_format }}</td>
             </tr>
             <tr>
                 <td>{{ msg('average-per-page') }}</td>
@@ -133,17 +133,17 @@
                     {{ msg('pages-created') }}
                 {% endspaceless %}</td>
                 <td>
-                    <a href="{{ path('PagesResult', {project:project.domain, username:user.username, namespace:'all', redirects:'noredirects'}) }}">{{ ec.countPagesCreated|number_format }}</a>
-                    <span class="text-muted">({{ msg('pages-created-since-deleted', [ec.countPagesCreatedDeleted|number_format]) }})</span>
+                    <a href="{{ path('PagesResult', {project:project.domain, username:user.username, namespace:'all', redirects:'noredirects'}) }}">{{ ec.countPagesCreated|num_format }}</a>
+                    <span class="text-muted">({{ msg('pages-created-since-deleted', [ec.countPagesCreatedDeleted|num_format]) }})</span>
                 </td>
             </tr>
             <tr>
                 <td>{{ msg('pages-moved') }}</td>
-                <td>{{ ec.countPagesMoved|number_format }}</td>
+                <td>{{ ec.countPagesMoved|num_format }}</td>
             </tr>
             <tr>
                 <td>{{ msg('pages-deleted') }}</td>
-                <td>{{ ec.countPagesDeleted|number_format }}</td>
+                <td>{{ ec.countPagesDeleted|num_format }}</td>
             </tr>
         </tbody>
 
@@ -155,14 +155,14 @@
             <tr>
                 <td>{{ msg('files-uploaded') }}</td>
                 <td>
-                    <a href="{{ wiki.pageUrlRaw('Special:ListFiles', project) }}/{{ user.username }}">{{ ec.countFilesUploaded|number_format }}</a>
+                    <a href="{{ wiki.pageUrlRaw('Special:ListFiles', project) }}/{{ user.username }}">{{ ec.countFilesUploaded|num_format }}</a>
                 </td>
             </tr>
             {% if isWMFLabs() %}
                 <tr>
                     <td>{{ msg('files-uploaded-commons') }}</td>
                     <td>
-                        <a href="https://commons.wikimedia.org/wiki/Special:ListFiles/{{ user.username }}" >{{ ec.countFilesUploadedCommons|number_format }}</a>
+                        <a href="https://commons.wikimedia.org/wiki/Special:ListFiles/{{ user.username }}" >{{ ec.countFilesUploadedCommons|num_format }}</a>
                     </td>
                 </tr>
             {% endif %}
@@ -180,7 +180,7 @@
                 <td>{{ msg('auto-edits') }}</td>
                 <td>
                     {% if enabled('autoedits') %}
-                        <a href="{{ path('autoedits', {project:project.domain, username:user.username, namespace:'all'}) }}">{{ ec.countAutomatedEdits|number_format }}</a>
+                        <a href="{{ path('autoedits', {project:project.domain, username:user.username, namespace:'all'}) }}">{{ ec.countAutomatedEdits|num_format }}</a>
                     {% else %}
                         {{ ec.countAutomatedEdits }}
                     {% endif %}
@@ -193,7 +193,11 @@
             <tr>
                 <td>{{ msg('edits-with-summaries') }}</td>
                 <td>
-                    {{ ec.countRevisionsWithComments|number_format }}
+                    {% if enabled('es') %}
+                        <a href="{{ path('es', {project:project.domain, username:user.username, namespace:'all'}) }}">{{ ec.countRevisionsWithComments|num_format }}</a>
+                    {% else %}
+                        {{ ec.countRevisionsWithComments|num_format }}
+                    {% endif %}
                     {% if ec.countLiveRevisions %}
                         &middot;
                         ({{ ((ec.countRevisionsWithComments / ec.countLiveRevisions) * 100)|percent_format }})
@@ -203,7 +207,7 @@
             <tr>
                 <td>{{ msg('minor-edits') }}</td>
                 <td>
-                    {{ ec.countMinorRevisions|number_format }}
+                    {{ ec.countMinorRevisions|num_format }}
                     {% if ec.countLiveRevisions %}
                         &middot;
                         ({{ ((ec.countMinorRevisions / ec.countLiveRevisions) * 100)|percent_format }})
@@ -213,7 +217,7 @@
             <tr>
                 <td>{{ msg('small-edits') }}*</td>
                 <td>
-                    {{ ec.countSmallEdits|number_format }}
+                    {{ ec.countSmallEdits|num_format }}
                     {% if ec.countLast5000 %}
                         &middot;
                         ({{ ((ec.countSmallEdits / ec.countLast5000) * 100)|percent_format }})
@@ -223,7 +227,7 @@
             <tr>
                 <td>{{ msg('large-edits') }}*</td>
                 <td>
-                    {{ ec.countLargeEdits|number_format }}
+                    {{ ec.countLargeEdits|num_format }}
                     {% if ec.countLast5000 %}
                         &middot;
                         ({{ ((ec.countLargeEdits / ec.countLast5000) * 100)|percent_format }})
@@ -243,25 +247,25 @@
             <tr>
                 <td>{{ msg('thank') }}</td>
                 <td>
-                    {{ wiki.userLogLink(user, project, ec.thanks|number_format, 'thanks') }}
+                    {{ wiki.userLogLink(user, project, ec.thanks|num_format, 'thanks') }}
                 </td>
             </tr>
             <tr>
                 <td>{{ msg('approve') }}</td>
                 <td>
-                    {{ wiki.userLogLink(user, project, ec.approvals|number_format, 'review') }}
+                    {{ wiki.userLogLink(user, project, ec.approvals|num_format, 'review') }}
                 </td>
             </tr>
             <tr>
                 <td>{{ msg('patrol') }}</td>
                 <td>
-                    {{ wiki.userLogLink(user, project, ec.patrols|number_format, 'patrol') }}
+                    {{ wiki.userLogLink(user, project, ec.patrols|num_format, 'patrol') }}
                 </td>
             </tr>
             <tr>
                 <td>{{ msg('accounts-created') }}</td>
                 <td>
-                    {{ wiki.userLogLink(user, project, ec.accountsCreated|number_format, 'newusers') }}
+                    {{ wiki.userLogLink(user, project, ec.accountsCreated|num_format, 'newusers') }}
                 </td>
             </tr>
         </tbody>
@@ -278,52 +282,52 @@
                 <tr>
                     <td>{{ msg('block') }}</td>
                     <td>
-                        {{ wiki.userLogLink(user, project, ec.countBlocksSet|number_format, 'block', 'block') }}
+                        {{ wiki.userLogLink(user, project, ec.countBlocksSet|num_format, 'block', 'block') }}
                     </td>
                 </tr>
                 <tr>
                     <td>{{ msg('reblock') }}</td>
                     <td>
-                        {{ wiki.userLogLink(user, project, ec.countReblocksSet|number_format, 'block', 'reblock') }}
+                        {{ wiki.userLogLink(user, project, ec.countReblocksSet|num_format, 'block', 'reblock') }}
                     </td>
                 </tr>
                 <tr>
                     <td>{{ msg('unblock') }}</td>
                     <td>
-                        {{ wiki.userLogLink(user, project, ec.countUnblocksSet|number_format, 'block', 'unblock') }}
+                        {{ wiki.userLogLink(user, project, ec.countUnblocksSet|num_format, 'block', 'unblock') }}
                     </td>
                 </tr>
                 <tr>
                     <td>{{ msg('protect') }}</td>
-                    <td>{{ wiki.userLogLink(user, project, ec.countPagesProtected|number_format, 'protect', 'protect') }}</td>
+                    <td>{{ wiki.userLogLink(user, project, ec.countPagesProtected|num_format, 'protect', 'protect') }}</td>
                 </tr>
                 <tr>
                     <td>{{ msg('reprotect') }}</td>
-                    <td>{{ wiki.userLogLink(user, project, ec.countPagesReprotected|number_format, 'protect', 'modify') }}</td>
+                    <td>{{ wiki.userLogLink(user, project, ec.countPagesReprotected|num_format, 'protect', 'modify') }}</td>
                 </tr>
                 <tr>
                     <td>{{ msg('unprotect') }}</td>
-                    <td>{{ wiki.userLogLink(user, project, ec.countPagesUnprotected|number_format, 'protect', 'unprotect') }}</td>
+                    <td>{{ wiki.userLogLink(user, project, ec.countPagesUnprotected|num_format, 'protect', 'unprotect') }}</td>
                 </tr>
                 <tr>
                     <td>{{ msg('delete') }}</td>
-                    <td>{{ wiki.userLogLink(user, project, ec.countPagesDeleted|number_format, 'delete', 'delete') }}</td>
+                    <td>{{ wiki.userLogLink(user, project, ec.countPagesDeleted|num_format, 'delete', 'delete') }}</td>
                 </tr>
                 <tr>
                     <td>{{ msg('revision-delete') }}</td>
-                    <td>{{ wiki.userLogLink(user, project, ec.countEditsDeleted|number_format, 'delete', 'revision') }}</td>
+                    <td>{{ wiki.userLogLink(user, project, ec.countEditsDeleted|num_format, 'delete', 'revision') }}</td>
                 </tr>
                 <tr>
                     <td>{{ msg('restore') }}</td>
-                    <td>{{ wiki.userLogLink(user, project, ec.countPagesRestored|number_format, 'delete', 'restore') }}</td>
+                    <td>{{ wiki.userLogLink(user, project, ec.countPagesRestored|num_format, 'delete', 'restore') }}</td>
                 </tr>
                 <tr>
                     <td>{{ msg('rights') }}</td>
-                    <td>{{ wiki.userLogLink(user, project, ec.countRightsModified|number_format, 'rights') }}</td>
+                    <td>{{ wiki.userLogLink(user, project, ec.countRightsModified|num_format, 'rights') }}</td>
                 </tr>
                 <tr>
                     <td>{{ msg('import') }}</td>
-                    <td>{{ wiki.userLogLink(user, project, ec.countPagesImported|number_format, 'import') }}</td>
+                    <td>{{ wiki.userLogLink(user, project, ec.countPagesImported|num_format, 'import') }}</td>
                 </tr>
             {% endif %}
         </tbody>
@@ -336,18 +340,18 @@
             <tr>
                 <td>{{ msg('re-blocks') }}</td>
                 <td>
-                    {{ wiki.userLogLink(null, project, ec.countBlocksReceived, 'block', null, 'User:'~user.username) }}
+                    {{ wiki.blockLogLink(user.username, project, ec.countBlocksReceived) }}
                 </td>
             </tr>
             <tr>
                 <td>{{ msg('block-longest') }}</td>
                 <td>
-                    {% if ec.longestBlockDays == -1 %}
+                    {% if ec.longestBlockSeconds == -1 %}
                         &#x221e; {# infinity #}
-                    {% elseif ec.longestBlockDays == false %}
+                    {% elseif ec.longestBlockSeconds == false %}
                         &ndash;
                     {% else %}
-                        {{ ec.longestBlockDays|number_format }} {{ msg('num-days', [ec.longestBlockDays]) }}
+                        {{ formatDuration(ec.longestBlockSeconds) }}
                     {% endif %}
                 </td>
             </tr>
@@ -370,6 +374,8 @@
         </tbody>
     </table>
 </div>
+
+{# ======================== GLOBAL EDITS ======================== #}
 <div class="col-lg-4 stat-list clearfix">
     <table class="table top-project-edit-counts">
         <tbody class="stat-list--group">
@@ -390,7 +396,7 @@
                     </td>
                     <td>
                         <a href="{{ path('TopEditsResults', {project:topProj.project.domain, username:user.username}) }}">
-                            {{ topProj.total|number_format }}
+                            {{ topProj.total|num_format }}
                         </a>
                         {# <small class="text-muted">@TODO days</small> #}
                     </td>
@@ -400,16 +406,16 @@
         <tfoot>
             <tr>
                 <td>{{ msg('global-other-sites-edit-count') }}</td>
-                <td>{{ ec.globalEditCountWithoutTopN(topN)|number_format }}</td>
+                <td>{{ ec.globalEditCountWithoutTopN(topN)|num_format }}</td>
             </tr>
             <tr>
                 <td>{{ msg('global-total-edit-count') }}</td>
                 <td>
                     <strong>
                         {% if is_sub_request %}
-                            <a href="#latest-global-edits">{{ ec.globalEditCount|number_format }}</a>
+                            <a href="#latest-global-edits">{{ ec.globalEditCount|num_format }}</a>
                         {% else %}
-                            {{ ec.globalEditCount|number_format }}
+                            {{ ec.globalEditCount|num_format }}
                         {% endif %}
                     </strong>
                     {# <small>@TODO days</small> #}
@@ -463,7 +469,7 @@
         )
     }}
     <div class="footnotes">
-        * {{ msg('data-limit', [5000, 5000|number_format]) }}
+        * {{ msg('data-limit', [5000, 5000|num_format]) }}
     </div>
 </div>
 {% endif %}

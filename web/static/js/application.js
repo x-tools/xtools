@@ -19,20 +19,32 @@
     }).load(messagesToLoad);
 
     $(document).ready(function () {
+        // TODO: move these listeners to a setup function and document how to use it.
         $('.xt-hide').on('click', function () {
             $(this).hide();
             $(this).siblings('.xt-show').show();
-            $(this).parents('.panel-heading').siblings('.panel-body').hide();
+
+            if ($(this).parents('.panel-heading').length) {
+                $(this).parents('.panel-heading').siblings('.panel-body').hide();
+            } else {
+                $(this).parents('.xt-show-hide--parent').next('.xt-show-hide--target').hide();
+            }
         });
         $('.xt-show').on('click', function () {
             $(this).hide();
             $(this).siblings('.xt-hide').show();
-            $(this).parents('.panel-heading').siblings('.panel-body').show();
+
+            if ($(this).parents('.panel-heading').length) {
+                $(this).parents('.panel-heading').siblings('.panel-body').show();
+            } else {
+                $(this).parents('.xt-show-hide--parent').next('.xt-show-hide--target').show();
+            }
         });
 
         setupNavCollapsing();
         setupColumnSorting();
         setupTOC();
+        setupStickyHeader();
         setupProjectListener();
         setupAutocompletion();
         displayWaitingNoticeOnSubmission();
@@ -94,7 +106,9 @@
      *                                   { 'a' => 123, 'b' => 456 }
      * @param  {Function} updateCallback Callback to update the .toggle-table totals. `toggleTableData`
      *                                   is passed in which contains the new data, you just need to
-     *                                   format it (maybe need to use i18n, update multiple cells, etc.)
+     *                                   format it (maybe need to use i18n, update multiple cells, etc.).
+     *                                   The second parameter that is passed back is the 'key' of the toggled
+     *                                   item, and the third is the index of the item.
      */
     window.setupToggleTable = function (dataSource, chartObj, valueKey, updateCallback) {
         $('.toggle-table').on('click', '.toggle-table--toggle', function () {
@@ -125,7 +139,7 @@
             $(this).find('.glyphicon').toggleClass('glyphicon-remove').toggleClass('glyphicon-plus');
 
             // update stats
-            updateCallback(toggleTableData);
+            updateCallback(toggleTableData, key, index);
 
             chartObj.update();
         });
@@ -295,7 +309,7 @@
         setupTocListeners();
 
         var tocOffsetTop = $toc.offset().top;
-        $(window).on('scroll', function (e) {
+        $(window).on('scroll.toc', function (e) {
             var windowOffset = $(e.target).scrollTop();
             var inRange = windowOffset > tocOffsetTop;
 
@@ -319,6 +333,65 @@
                 // remove the clone once we're out of range
                 $tocClone.remove();
                 $tocClone = null;
+            }
+        });
+    }
+
+    /**
+     * Make any tables with the class 'table-sticky-header' have sticky headers.
+     * E.g. as you scroll the heading row will be fixed at the top for reference.
+     */
+    function setupStickyHeader()
+    {
+        var $header = $('.table-sticky-header');
+
+        if (!$header || !$header[0]) {
+            return;
+        }
+
+        var headerHeight = $header.height(),
+            $headerRow = $header.find('thead tr').eq(0),
+            $headerClone;
+
+        // Make a clone of the header to maintain placement of the original header,
+        // making the original header the sticky one. This way event listeners on it
+        // (such as column sorting) will still work.
+        var cloneHeader = function () {
+            if ($headerClone) {
+                return;
+            }
+
+            $headerClone = $headerRow.clone();
+            $headerRow.addClass('sticky-heading');
+            $headerRow.before($headerClone);
+
+            // Explicitly set widths of each column, which are lost with position:absolute.
+            $headerRow.find('th').each(function (index) {
+                $(this).css('width', $headerClone.find('th').eq(index).outerWidth());
+            });
+            $headerRow.css('width', $headerClone.outerWidth() + 1);
+        };
+
+        var headerOffsetTop = $header.offset().top;
+        $(window).on('scroll.stickyHeader', function (e) {
+            var windowOffset = $(e.target).scrollTop();
+            var inRange = windowOffset > headerOffsetTop;
+
+            if (inRange && !$headerClone) {
+                cloneHeader();
+            } else if (!inRange && $headerClone) {
+                // Remove the clone once we're out of range,
+                // and make the original un-sticky.
+                $headerRow.removeClass('sticky-heading');
+                $headerClone.remove();
+                $headerClone = null;
+            } else if ($headerClone) {
+                // The header is position:absolute so it will follow with X scrolling,
+                // but for Y we must go by the window scroll position.
+                $headerRow.css(
+                    'top',
+                    $(window).scrollTop() - $header.offset().top
+                );
             }
         });
     }
@@ -351,7 +424,7 @@
                 $(this).addClass('show-loader');
 
                 /** global: xtBaseUrl */
-                $.get(xtBaseUrl + 'api/normalizeProject/' + newProject).done(function (data) {
+                $.get(xtBaseUrl + 'api/project/normalize/' + newProject).done(function (data) {
                     // Keep track of project API path for use in page title autocompletion
                     apiPath = data.api;
                     lastProject = newProject;
@@ -382,7 +455,7 @@
             var newProject = this.value;
 
             /** global: xtBaseUrl */
-            $.get(xtBaseUrl + 'api/namespaces/' + newProject).done(function (data) {
+            $.get(xtBaseUrl + 'api/project/namespaces/' + newProject).done(function (data) {
                 // Clone the 'all' option (even if there isn't one),
                 // and replace the current option list with this.
                 var $allOption = $('#namespace_select option[value="all"]').eq(0).clone();

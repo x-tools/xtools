@@ -5,13 +5,25 @@
 
 namespace AppBundle\Twig;
 
+use Xtools\ProjectRepository;
 use Xtools\User;
+use NumberFormatter;
+use IntlDateFormatter;
+use DateTime;
 
 /**
  * Twig functions and filters for XTools.
  */
 class AppExtension extends Extension
 {
+    /** @var NumberFormatter Instance of NumberFormatter class, used in localizing numbers. */
+    protected $numFormatter;
+
+    /** @var IntlDateFormatter Instance of IntlDateFormatter class, used in localizing dates. */
+    protected $dateFormatter;
+
+    /** @var float Duration of the current HTTP request in seconds. */
+    protected $requestTime;
 
     /**
      * Get the name of this extension.
@@ -45,11 +57,11 @@ class AppExtension extends Extension
             new \Twig_SimpleFunction('isRTLLang', [ $this, 'intuitionIsRTLLang' ]),
             new \Twig_SimpleFunction('shortHash', [ $this, 'gitShortHash' ]),
             new \Twig_SimpleFunction('hash', [ $this, 'gitHash' ]),
+            new \Twig_SimpleFunction('releaseDate', [ $this, 'gitDate' ]),
             new \Twig_SimpleFunction('enabled', [ $this, 'tabEnabled' ]),
             new \Twig_SimpleFunction('tools', [ $this, 'allTools' ]),
             new \Twig_SimpleFunction('color', [ $this, 'getColorList' ]),
             new \Twig_SimpleFunction('chartColor', [ $this, 'chartColor' ]),
-            new \Twig_SimpleFunction('isWMFLabs', [ $this, 'isWMFLabs' ]),
             new \Twig_SimpleFunction('isSingleWiki', [ $this, 'isSingleWiki' ]),
             new \Twig_SimpleFunction('getReplagThreshold', [ $this, 'getReplagThreshold' ]),
             new \Twig_SimpleFunction('loadStylesheetsFromCDN', [ $this, 'loadStylesheetsFromCDN' ]),
@@ -62,17 +74,23 @@ class AppExtension extends Extension
             new \Twig_SimpleFunction('isUserAnon', [$this, 'isUserAnon']),
             new \Twig_SimpleFunction('nsName', [$this, 'nsName']),
             new \Twig_SimpleFunction('formatDuration', [$this, 'formatDuration']),
+            new \Twig_SimpleFunction('numberFormat', [$this, 'numberFormat']),
         ];
     }
 
     /**
-     * Get the duration of the current HTTP request in microseconds.
-     * @param int $decimals
-     * @return string
+     * Get the duration of the current HTTP request in seconds.
+     * @return double
+     * Untestable since there is no request stack in the tests.
+     * @codeCoverageIgnore
      */
-    public function requestTime($decimals = 3)
+    public function requestTime()
     {
-        return number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], $decimals);
+        if (!isset($this->requestTime)) {
+            $this->requestTime = microtime(true) - $this->getCurrentRequest()->server->get('REQUEST_TIME_FLOAT');
+        }
+
+        return $this->requestTime;
     }
 
     /**
@@ -83,9 +101,7 @@ class AppExtension extends Extension
     {
         $mem = memory_get_usage(false);
         $div = pow(1024, 2);
-        $mem = $mem / $div;
-
-        return round($mem, 2);
+        return $mem / $div;
     }
 
     /**
@@ -101,11 +117,19 @@ class AppExtension extends Extension
      * See if a given i18n message exists.
      * @TODO: refactor all intuition stuff so it can be used anywhere
      * @param string $message The message.
+     * @param array $vars
      * @return bool
      */
-    public function intuitionMessageExists($message = "")
+    public function intuitionMessageExists($message = '', $vars = [])
     {
-        return $this->getIntuition()->msgExists($message, [ "domain" => "xtools" ]);
+        return $this->getIntuition()->msgExists($message, array_merge(
+            [
+                'domain' => 'xtools'
+            ],
+            [
+                'variables' => $vars
+            ]
+        ));
     }
 
     /**
@@ -121,7 +145,7 @@ class AppExtension extends Extension
             $message = $message[0];
             $vars = array_slice($vars, 1);
         }
-        if ($this->intuitionMessageExists($message)) {
+        if ($this->intuitionMessageExists($message, $vars)) {
             return $this->intuitionMessage($message, $vars);
         } else {
             return $message;
@@ -219,6 +243,16 @@ class AppExtension extends Extension
     public function gitHash()
     {
         return exec("git rev-parse HEAD");
+    }
+
+    /**
+     * Get the date of the HEAD commit.
+     * @return string
+     */
+    public function gitDate()
+    {
+        $date = new DateTime(exec('git show -s --format=%ci'));
+        return $date->format('Y-m-d');
     }
 
     /**
@@ -431,27 +465,31 @@ class AppExtension extends Extension
     /**
      * The current replication lag.
      * @return int
+     * @codeCoverageIgnore
      */
     public function replag()
     {
         $retVal = 0;
 
         if ($this->isWMFLabs()) {
-            $project = $this->container->get('request_stack')->getCurrentRequest()->get('project');
+            $project = $this->getCurrentRequest()->get('project');
 
             if (!isset($project)) {
                 $project = 'enwiki';
             }
 
+            $dbName = ProjectRepository::getProject($project, $this->container)
+                ->getDatabaseName();
+
             $stmt = "SELECT lag FROM `heartbeat_p`.`heartbeat` h
             RIGHT JOIN `meta_p`.`wiki` w ON concat(h.shard, \".labsdb\")=w.slice
-            WHERE dbname LIKE :project OR name LIKE :project OR url LIKE :project LIMIT 1";
+            WHERE dbname LIKE :project LIMIT 1";
 
             $conn = $this->container->get('doctrine')->getManager('replicas')->getConnection();
 
             // Prepare the query and execute
             $resultQuery = $conn->prepare($stmt);
-            $resultQuery->bindParam('project', $project);
+            $resultQuery->bindParam('project', $dbName);
             $resultQuery->execute();
 
             if ($resultQuery->errorCode() == 0) {
@@ -467,33 +505,16 @@ class AppExtension extends Extension
     }
 
     /**
-     * Generate an XTools URL.
-     * @deprecated Use path() instead.
-     * @param string $path The path.
-     * @return string
-     */
-    public function link($path = "/")
-    {
-        $basePath = $this->container->getParameter("app.base_path");
-        $retVal = $path;
-
-        if (isset($basePath)) {
-            $retVal = "$basePath/$path";
-        }
-
-        $retVal = str_replace("//", "/", $retVal);
-
-        return $retVal;
-    }
-
-    /**
      * Get a random quote for the footer
      * @return string
      */
     public function quote()
     {
-        if (!$this->container->getParameter("enable.bash")) {
-            return "";
+        // Don't show if bash is turned off, but always show for Labs
+        // (so quote is in footer but not in nav).
+        $isLabs = $this->container->getParameter('app.is_labs');
+        if (!$isLabs && !$this->container->getParameter('enable.bash')) {
+            return '';
         }
         $quotes = $this->container->getParameter('quotes');
         $id = array_rand($quotes);
@@ -522,7 +543,54 @@ class AppExtension extends Extension
             new \Twig_SimpleFilter('capitalize_first', [ $this, 'capitalizeFirst' ]),
             new \Twig_SimpleFilter('percent_format', [ $this, 'percentFormat' ]),
             new \Twig_SimpleFilter('diff_format', [ $this, 'diffFormat' ], [ 'is_safe' => [ 'html' ] ]),
+            new \Twig_SimpleFilter('num_format', [$this, 'numberFormat']),
+            new \Twig_SimpleFilter('date_format', [$this, 'dateFormat']),
         ];
+    }
+
+    /**
+     * Format a number based on language settings.
+     * @param  int|float $number
+     * @param  int $decimals Number of decimals to format to.
+     * @return string
+     */
+    public function numberFormat($number, $decimals = 0)
+    {
+        if (!isset($this->numFormatter)) {
+            $lang = $this->getIntuition()->getLang();
+            $this->numFormatter = new NumberFormatter($lang, NumberFormatter::DECIMAL);
+        }
+
+        // Get separator symbols.
+        $decimal = $this->numFormatter->getSymbol(NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
+        $thousands = $this->numFormatter->getSymbol(NumberFormatter::GROUPING_SEPARATOR_SYMBOL);
+
+        $formatted = number_format($number, $decimals, $decimal, $thousands);
+
+        // Remove trailing .0's (e.g. 40.00 -> 40).
+        return preg_replace("/\\".$decimal."0+$/", '', $formatted);
+    }
+
+    /**
+     * Localize the given date based on language settings.
+     * @param  string|DateTime $datetime
+     * @return string
+     */
+    public function dateFormat($datetime)
+    {
+        if (!isset($this->dateFormatter)) {
+            $this->dateFormatter = new IntlDateFormatter(
+                $this->getIntuition()->getLang(),
+                IntlDateFormatter::SHORT,
+                IntlDateFormatter::SHORT
+            );
+        }
+
+        if (is_string($datetime)) {
+            $datetime = new DateTime($datetime);
+        }
+
+        return $this->dateFormatter->format($datetime);
     }
 
     /**
@@ -537,11 +605,11 @@ class AppExtension extends Extension
     }
 
     /**
-     * Format a given number or fraction as a percentage
-     * @param  number  $numerator     Numerator or single fraction if denominator is ommitted
-     * @param  number  [$denominator] Denominator
-     * @param  integer [$precision]   Number of decimal places to show
-     * @return string                 Formatted percentage
+     * Format a given number or fraction as a percentage.
+     * @param  number  $numerator   Numerator or single fraction if denominator is ommitted.
+     * @param  number  $denominator Denominator.
+     * @param  integer $precision   Number of decimal places to show.
+     * @return string               Formatted percentage.
      */
     public function percentFormat($numerator, $denominator = null, $precision = 1)
     {
@@ -551,23 +619,23 @@ class AppExtension extends Extension
             $quotient = ( $numerator / $denominator ) * 100;
         }
 
-        return round($quotient, $precision) . '%';
+        return $this->numberFormat($quotient, $precision) . '%';
     }
 
     /**
-     * Helper to return whether the given user is an anonymous (logged out) user
-     * @param  User|string $user User object or username as a string
+     * Helper to return whether the given user is an anonymous (logged out) user.
+     * @param  User|string $user User object or username as a string.
      * @return bool
      */
     public function isUserAnon($user)
     {
         if ($user instanceof User) {
-            $username = $user.username;
+            $username = $user->getUsername();
         } else {
             $username = $user;
         }
 
-        return filter_var($username, FILTER_VALIDATE_IP);
+        return (bool)filter_var($username, FILTER_VALIDATE_IP);
     }
 
     /**
@@ -603,20 +671,36 @@ class AppExtension extends Extension
             $class = 'diff-zero';
         }
 
-        $size = number_format($size);
+        $size = $this->numberFormat($size);
 
         return "<span class='$class'>$size</span>";
     }
 
     /**
      * Format a time duration as humanized string.
-     * @param int $seconds Number of seconds
+     * @param int $seconds Number of seconds.
      * @param bool $translate Used for unit testing. Set to false to return
      *   the value and i18n key, instead of the actual translation.
      * @return string|array Examples: '30 seconds', '2 minutes', '15 hours', '500 days',
-     *   or [30, 'num-seconds'] (etc.) if $translate is true
+     *   or [30, 'num-seconds'] (etc.) if $translate is false.
      */
     public function formatDuration($seconds, $translate = true)
+    {
+        list($val, $key) = $this->getDurationMessageKey($seconds);
+
+        if ($translate) {
+            return $this->numberFormat($val) . ' ' . $this->intuitionMessage("num-$key", [$val]);
+        } else {
+            return [$this->numberFormat($val), "num-$key"];
+        }
+    }
+
+    /**
+     * Given a time duration in seconds, generate a i18n message key and value.
+     * @param  int $seconds Number of seconds.
+     * @return array<integer|string> [int - message value, string - message key]
+     */
+    private function getDurationMessageKey($seconds)
     {
         /** @var int Value to show in message */
         $val = $seconds;
@@ -638,10 +722,6 @@ class AppExtension extends Extension
             $key = 'minutes';
         }
 
-        if ($translate) {
-            return number_format($val) . ' ' . $this->intuitionMessage("num-$key", [$val]);
-        } else {
-            return [number_format($val), "num-$key"];
-        }
+        return [$val, $key];
     }
 }

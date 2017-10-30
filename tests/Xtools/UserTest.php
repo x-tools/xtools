@@ -142,6 +142,54 @@ class UserTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * System edit count.
+     */
+    public function testEditCount()
+    {
+        $userRepo = $this->getMock(UserRepository::class);
+        $userRepo->expects($this->once())
+            ->method('getEditCount')
+            ->willReturn('12345');
+        $user = new User('TestUser');
+        $user->setRepository($userRepo);
+
+        $projectRepo = $this->getMock(ProjectRepository::class);
+        $project = new Project('wiki.example.org');
+        $project->setRepository($projectRepo);
+
+        $this->assertEquals(12345, $user->getEditCount($project));
+
+        // Should not call UserRepository::getEditCount() again.
+        $this->assertEquals(12345, $user->getEditCount($project));
+    }
+
+    /**
+     * Too many edits to process?
+     */
+    public function testHasTooManyEdits()
+    {
+        $userRepo = $this->getMock(UserRepository::class);
+        $userRepo->expects($this->once())
+            ->method('getEditCount')
+            ->willReturn('123456789');
+        $userRepo->expects($this->exactly(3))
+            ->method('maxEdits')
+            ->willReturn('250000');
+        $user = new User('TestUser');
+        $user->setRepository($userRepo);
+
+        $projectRepo = $this->getMock(ProjectRepository::class);
+        $project = new Project('wiki.example.org');
+        $project->setRepository($projectRepo);
+
+        // User::maxEdits()
+        $this->assertEquals(250000, $user->maxEdits());
+
+        // User::tooManyEdits()
+        $this->assertTrue($user->hasTooManyEdits($project));
+    }
+
+    /**
      * User's non-automated edits
      */
     public function testGetNonAutomatedEdits()
@@ -150,6 +198,7 @@ class UserTest extends PHPUnit_Framework_TestCase
         $userRepo->expects($this->once())
             ->method('getNonAutomatedEdits')
             ->willReturn([[
+                'full_page_title' => 'Talk:Test_page',
                 'page_title' => 'Test_page',
                 'page_namespace' => '1',
                 'rev_id' => '123',
@@ -177,7 +226,8 @@ class UserTest extends PHPUnit_Framework_TestCase
         // Asserts type casting and page title normalization worked
         $this->assertArraySubset(
             [
-                'page_title' => 'Talk:Test_page',
+                'full_page_title' => 'Talk:Test_page',
+                'page_title' => 'Test_page',
                 'page_namespace' => 1,
                 'rev_id' => 123,
                 'timestamp' => DateTime::createFromFormat('YmdHis', '20170101000000'),

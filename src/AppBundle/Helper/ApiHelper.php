@@ -51,113 +51,6 @@ class ApiHelper extends HelperBase
     }
 
     /**
-     * Get the given user's groups on the given project.
-     * @deprecated Use User::getGroups() instead.
-     * @param string $project
-     * @param string $username
-     * @return string[]
-     */
-    public function groups($project, $username)
-    {
-        $this->setUp($project);
-        $params = [ "list"=>"users", "ususers"=>$username, "usprop"=>"groups" ];
-        $query = new SimpleRequest('query', $params);
-        $result = [];
-
-        try {
-            $res = $this->api->getRequest($query);
-            if (isset($res["batchcomplete"])
-                && isset($res["query"]["users"][0]["groups"])
-            ) {
-                $result = $res["query"]["users"][0]["groups"];
-            }
-        } catch (Exception $e) {
-            // The api returned an error!  Ignore
-        }
-
-        return $result;
-    }
-
-    /**
-     * Get the given user's globally-applicable groups.
-     * @deprecated Use User::getGlobalGroups() instead.
-     * @param string $project
-     * @param string $username
-     * @return string[]
-     */
-    public function globalGroups($project, $username)
-    {
-        $this->setUp($project);
-        $params = [ "meta"=>"globaluserinfo", "guiuser"=>$username, "guiprop"=>"groups" ];
-        $query = new SimpleRequest('query', $params);
-        $result = [];
-
-        try {
-            $res = $this->api->getRequest($query);
-            if (isset($res["batchcomplete"]) && isset($res["query"]["globaluserinfo"]["groups"])) {
-                $result = $res["query"]["globaluserinfo"]["groups"];
-            }
-        } catch (Exception $e) {
-            // The api returned an error!  Ignore
-        }
-
-        return $result;
-    }
-
-    /**
-     * Get a list of administrators for the given project.
-     * @TODO Move to the Project class?
-     * @param string $project
-     * @return string[]
-     */
-    public function getAdmins($project)
-    {
-        $params = [
-            'list' => 'allusers',
-            'augroup' => 'sysop|bureaucrat|steward|oversight|checkuser',
-            'auprop' => 'groups',
-            'aulimit' => '500',
-        ];
-
-        $result = [];
-        $adminData = $this->massApi($params, $project, 'allusers', 'aufrom');
-
-        if (!isset($adminData['allusers'])) {
-            // Invalid result
-            return array();
-        }
-
-        $admins = $adminData['allusers'];
-
-        foreach ($admins as $admin) {
-            $groups = [];
-            if (in_array("sysop", $admin["groups"])) {
-                $groups[] = "A";
-            }
-            if (in_array("bureaucrat", $admin["groups"])) {
-                $groups[] = "B";
-            }
-            if (in_array("steward", $admin["groups"])) {
-                $groups[] = "S" ;
-            }
-            if (in_array("checkuser", $admin["groups"])) {
-                $groups[] = "CU";
-            }
-            if (in_array("oversight", $admin["groups"])) {
-                $groups[] = "OS";
-            }
-            if (in_array("bot", $admin["groups"])) {
-                $groups[] = "Bot";
-            }
-            $result[ $admin["name"] ] = [
-                "groups" => implode('/', $groups)
-            ];
-        }
-
-        return $result;
-    }
-
-    /**
      * Get HTML display titles of a set of pages (or the normal title if there's no display title).
      * This will send t/50 API requests where t is the number of titles supplied.
      * @param string $project The project.
@@ -310,7 +203,7 @@ class ApiHelper extends HelperBase
                 return $this->massApiInternal($data);
             } else {
                 // indicate there were more entries than the limit
-                if ($result['continue']) {
+                if (isset($result['continue'])) {
                     $data['resolveData']['continue'] = true;
                 }
                 $data['promise']->resolve($data);

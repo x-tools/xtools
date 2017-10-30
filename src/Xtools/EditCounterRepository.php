@@ -12,6 +12,7 @@ use Mediawiki\Api\SimpleRequest;
 /**
  * An EditCounterRepository is responsible for retrieving edit count information from the
  * databases and API. It doesn't do any post-processing of that information.
+ * @codeCoverageIgnore
  */
 class EditCounterRepository extends Repository
 {
@@ -26,7 +27,7 @@ class EditCounterRepository extends Repository
     public function getPairData(Project $project, User $user)
     {
         // Set up cache.
-        $cacheKey = 'pairdata.'.$project->getDatabaseName().'.'.$user->getCacheKey();
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_pairdata');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -115,7 +116,7 @@ class EditCounterRepository extends Repository
     public function getLogCounts(Project $project, User $user)
     {
         // Set up cache.
-        $cacheKey = 'logcounts.'.$project->getDatabaseName().'.'.$user->getCacheKey();
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_logcounts');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -207,12 +208,13 @@ class EditCounterRepository extends Repository
     public function getBlocksReceived(Project $project, User $user)
     {
         $loggingTable = $this->getTableName($project->getDatabaseName(), 'logging', 'logindex');
-        $sql = "SELECT log_timestamp, log_params FROM $loggingTable
+        $sql = "SELECT log_action, log_timestamp, log_params FROM $loggingTable
                 WHERE log_type = 'block'
-                AND log_action = 'block'
+                AND log_action IN ('block', 'reblock', 'unblock')
                 AND log_timestamp > 0
                 AND log_title = :username
-                AND log_namespace = 2";
+                AND log_namespace = 2
+                ORDER BY log_timestamp ASC";
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $username = str_replace(' ', '_', $user->getUsername());
         $resultQuery->bindParam('username', $username);
@@ -260,13 +262,14 @@ class EditCounterRepository extends Repository
      */
     protected function globalEditCountsFromCentralAuth(User $user, Project $project)
     {
-        $this->log->debug(__METHOD__." Getting global edit counts for ".$user->getUsername());
         // Set up cache and stopwatch.
-        $cacheKey = 'globalRevisionCounts.'.$user->getCacheKey();
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_globaleditcounts');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
         $this->stopwatch->start($cacheKey, 'XTools');
+
+        $this->log->debug(__METHOD__." Getting global edit counts from for ".$user->getUsername());
 
         // Load all projects, so it doesn't have to request metadata about each one as it goes.
         $project->getRepository()->getAll();
@@ -309,6 +312,7 @@ class EditCounterRepository extends Repository
      */
     protected function globalEditCountsFromDatabases(User $user, Project $project)
     {
+        $this->log->debug(__METHOD__." Getting global edit counts for ".$user->getUsername());
         $stopwatchName = 'globalRevisionCounts.'.$user->getUsername();
         $allProjects = $project->getRepository()->getAll();
         $topEditCounts = [];
@@ -338,12 +342,13 @@ class EditCounterRepository extends Repository
     public function getNamespaceTotals(Project $project, User $user)
     {
         // Cache?
-        $userId = $user->getId($project);
-        $cacheKey = "ec.namespacetotals.{$project->getDatabaseName()}.$userId";
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_namespacetotals');
         $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
+
+        $userId = $user->getId($project);
 
         // Query.
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
@@ -381,7 +386,7 @@ class EditCounterRepository extends Repository
     public function getRevisions($projects, User $user, $lim = 40)
     {
         // Check cache.
-        $cacheKey = "globalcontribs.".$user->getCacheKey();
+        $cacheKey = $this->getCacheKey('ec_globalcontribs.'.$user->getCacheKey().'.'.$lim);
         $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
@@ -391,8 +396,8 @@ class EditCounterRepository extends Repository
         $username = $user->getUsername();
         $queries = [];
         foreach ($projects as $project) {
-            $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-            $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
+            $revisionTable = $project->getTableName('revision');
+            $pageTable = $project->getTableName('page');
             $sql = "SELECT
                     '".$project->getDatabaseName()."' AS project_name,
                     revs.rev_id AS id,
@@ -449,15 +454,15 @@ class EditCounterRepository extends Repository
      */
     public function getMonthCounts(Project $project, User $user)
     {
-        $cacheKey = "monthcounts.".$user->getCacheKey();
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_monthcounts');
         $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
         $username = $user->getUsername();
-        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
+        $revisionTable = $project->getTableName('revision');
+        $pageTable = $project->getTableName('page');
         $sql =
             "SELECT "
             . "     YEAR(rev_timestamp) AS `year`,"
@@ -489,7 +494,7 @@ class EditCounterRepository extends Repository
      */
     public function getTimeCard(Project $project, User $user)
     {
-        $cacheKey = "timecard.".$user->getCacheKey();
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_timecard');
         $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
@@ -502,7 +507,7 @@ class EditCounterRepository extends Repository
         $sql = "SELECT "
             . "     DAYOFWEEK(rev_timestamp) AS `y`, "
             . "     $xCalc AS `x`, "
-            . "     COUNT(rev_id) AS `r` "
+            . "     COUNT(rev_id) AS `value` "
             . " FROM $revisionTable"
             . " WHERE rev_user_text = :username"
             . " GROUP BY DAYOFWEEK(rev_timestamp), $xCalc ";
@@ -514,10 +519,10 @@ class EditCounterRepository extends Repository
         // This looks inefficient, but there's a max of 72 elements in this array.
         $max = 0;
         foreach ($totals as $total) {
-            $max = max($max, $total['r']);
+            $max = max($max, $total['value']);
         }
         foreach ($totals as &$total) {
-            $total['r'] = round($total['r'] / $max * 100);
+            $total['value'] = round($total['value'] / $max * 100);
         }
         $cacheItem = $this->cache->getItem($cacheKey);
         $cacheItem->expiresAfter(new DateInterval('PT10M'));
@@ -539,7 +544,7 @@ class EditCounterRepository extends Repository
     public function getEditSizeData(Project $project, User $user)
     {
         // Set up cache.
-        $cacheKey = 'editsizedata.'.$project->getDatabaseName().'.'.$user->getCacheKey();
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_editsizes');
         $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();

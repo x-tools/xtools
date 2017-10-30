@@ -3,7 +3,8 @@
 		"authors": [
 			"Vesihiisi",
 			"Chrumps",
-			"Nemo bis"
+			"Nemo bis",
+			"Wojtas"
 		]
 	},
 	"about-xtools": "O narzędziu",
@@ -40,6 +41,7 @@
 	"delete": "Usuwanie",
 	"deleted": "Usunięte",
 	"deleted-edits": "Usunięte edycje",
+	"documentation": "Dokumentacja",
 	"edit-count": "Liczba edycji",
 	"edit-summary": "Komentarz",
 	"editors": "Liczba edytorów",
@@ -51,7 +53,7 @@
 	"edits-with-summaries": "Edycje z opisem zmian",
 	"end": "Data zakończenia",
 	"events": "Rejestry",
-	"executed": "Wykonywane w $1 s.",
+	"executed": "Wykonano w $1 {{PLURAL:$2|sekundę|sekundy|sekund}}.",
 	"explanation": "Wyjaśnienie",
 	"file": "Plik",
 	"files": "Pliki",
@@ -169,6 +171,8 @@
 	"thank": "Podziękowania",
 	"thursday": "Czwartek",
 	"timecard": "Przedziały godzinowe",
+	"too-many-edits": "Użytkownik wykonał zbyt dużo edycji! (maksimum $1)",
+	"too-many-revisions": "Ta strona ma ponad $1 {{PLURAL:$2|wersję|wersje|wersji}}. Pokazane są tylko dane z ostatnich $1.",
 	"tool": "Narzędzie",
 	"tool-adminstats": "Statystyki administratorów",
 	"tool-adminstats-desc": "Pokaż statystyki działań administracyjnych",
@@ -209,6 +213,7 @@
 	"user-is-not-admin": "Użytkownik nie jest administratorem",
 	"user-page": "Strona użytkownika",
 	"username": "Nazwa użytkownika",
+	"version": "Wersja $1",
 	"view-source": "Zobacz źródło",
 	"wednesday": "Środa",
 	"wiki": "Wiki",

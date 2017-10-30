@@ -17,6 +17,11 @@
             "Tests\\": "tests/"
         }
     },
+    "config": {
+        "platform": {
+            "php": "5.6"
+        }
+    },
     "require": {
         "php": "^5.6|^7.0",
         "symfony/symfony": "^3.0",
@@ -34,7 +39,7 @@
         "incenteev/composer-parameter-handler": "^2.0",
         "twbs/bootstrap": "^3.1",
         "Krinkle/intuition": "^0.2",
-        "nnnick/chartjs": "^2.1",
+        "nnnick/chartjs": "2.7.0",
         "addwiki/mediawiki-api": "^0.7",
         "mediawiki/oauthclient": "^0.1",
         "symfony/assetic-bundle": "^2.8",
@@ -47,7 +52,7 @@
         "jms/serializer-bundle": "^1.4",
         "symfony/stopwatch": "^3.2",
         "doctrine/doctrine-migrations-bundle": "^1.0",
-        "doctrine/migrations": "1.2.*"
+        "eightpoints/guzzle-bundle": "^6.1"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",
@@ -57,6 +62,9 @@
         "jakub-onderka/php-parallel-lint": "^0.9"
     },
     "scripts": {
+        "node_scripts": [
+            "npm install --prefix app/Resources/"
+        ],
         "post-install-cmd": [
             "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
@@ -64,7 +72,7 @@
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget",
-            "npm install --prefix app/Resources/"
+            "@node_scripts"
         ],
         "post-update-cmd": [
             "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
@@ -73,7 +81,7 @@
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget",
-            "npm install --prefix app/Resources/"
+            "@node_scripts"
         ]
     },
     "extra": {

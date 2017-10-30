@@ -54,7 +54,7 @@ The Oauth details need to be requested from ``Special:OAuthConsumerRegistration`
 Application
 ===========
 
-- **secret** - A secret key that's used to generate certain security-related tokens
+- **secret** - A secret key that's used to generate certain security-related tokens, and as the secret for the internal API. If you are using a separate API server (as explained in the :ref:`administration <offload_api>` section), this parameter must have the same value on both the app server and API server.
 - **app.noticeDisplay** - Display the notice or not
 - **app.noticeStyle** - Style of the notice banner.  Available options: "error," "warning," "succeess," "info."
 - **app.noticeText** - Message shown to the user.  If you provide a valid intuition key, it will display that message instead
@@ -64,9 +64,14 @@ Application
 - **app.is_labs** - Whether XTools lives on the Wikimedia Foundation Labs environment.  This should be set to false.
 - **app.rate_limit_time** - Number of minutes during which ``app.rate_limit_count`` requests from the same user are allowed. Set this to ``0`` to disable rate limiting.
 - **app.rate_limit_count** - Number of requests from the same user that are allowed during the time frame specified by ``app.rate_limit_time``. Set this to ``0`` to disable rate limiting.
+- **app.multithread** Set to 1 to speed up the Edit Counter and other tools by making multiple asynchronous queries. This requires a multithreaded server (such as Apache), so you should set this to 0 if you are using the default Symfony server in your development environment. It may also be possible to forward all requests to ``/api`` to a dedicated API server. See the :ref:`administration <offload_api>` section for more. You must also set the ``app.base_path`` parameter for multithreading to work.
+- **app.base_path** The base URL of your XTools installation, including the protocol. This parameter is required if ``app.multithread`` is turned on.
+- **app.max_page_revisions** - Set a maximum number of revisions to process for pages. This is to safeguard against unnecessarily consuming too many resources for queries that will most surely timeout. Set this to `0` to disable all limitations.
+- **app.max_user_edits** - Querying a user that has more edits than this will be rejected. This is to safeguard against unnecessarily consuming too many resources for queries that will most surely timeout. Set this to `0` to disable all limitations.
 - **wiki_url** - URL to use if app.single_wiki is enabled.  The title of pages is attached to the end.
 - **api_path** - The API path for the project, usually /w/api.php
 - **opted_in** - A list of database names of projects that will display :ref:`restricted statistics <optin>` regardless of individual users' preferences
+- **languageless_wikis** - This should be left blank for any non-WMF installation. This is used only to convert legacy XTools URL parameters to the modern equivalents, listing any wikis where there is no specific language associated with it. "meta.wikimedia.org" is intentionally not included.
 
 Tools
 =====

@@ -9,6 +9,8 @@ use DateTime;
 use Exception;
 use DatePeriod;
 use DateInterval;
+use GuzzleHttp;
+use GuzzleHttp\Promise\Promise;
 
 /**
  * An EditCounter provides statistics about a user's edits on a project.
@@ -46,6 +48,9 @@ class EditCounter extends Model
     /** @var array Block data, with keys 'set' and 'received'. */
     protected $blocks;
 
+    /** @var integer[] Array keys are namespace IDs, values are the edit counts */
+    protected $namespaceTotals;
+
     /** @var int Number of semi-automated edits */
     protected $autoEditCount;
 
@@ -59,11 +64,11 @@ class EditCounter extends Model
     protected $editSizeData;
 
     /**
-     * Duration of the longest block in days; -1 if indefinite,
+     * Duration of the longest block in seconds; -1 if indefinite,
      *   or false if could not be parsed from log params
      * @var int|bool
      */
-    protected $longestBlockDays;
+    protected $longestBlockSeconds;
 
     /**
      * EditCounter constructor.
@@ -77,12 +82,79 @@ class EditCounter extends Model
     }
 
     /**
+     * This method asynchronously fetches all the expensive data, waits
+     * for each request to finish, and copies the values to the class instance.
+     * @return null
+     */
+    public function prepareData()
+    {
+        $project = $this->project->getDomain();
+        $username = $this->user->getUsername();
+
+        /**
+         * The URL of each endpoint, keyed by the name of the corresponding class-level
+         * instance variable.
+         * @var array[]
+         */
+        $endpoints = [
+            "pairData" => "ec/pairdata/$project/$username",
+            "logCounts" => "ec/logcounts/$project/$username",
+            "namespaceTotals" => "ec/namespacetotals/$project/$username",
+            "editSizeData" => "ec/editsizes/$project/$username",
+            "monthCounts" => "ec/monthcounts/$project/$username",
+            // "globalEditCounts" => "ec-globaleditcounts/$project/$username",
+            "autoEditCount" => "user/automated_editcount/$project/$username",
+        ];
+
+        /**
+         * Keep track of all promises so we can wait for all of them to complete.
+         * @var GuzzleHttp\Promise\Promise[]
+         */
+        $promises = [];
+
+        foreach ($endpoints as $key => $endpoint) {
+            $promise = $this->getRepository()->queryXToolsApi($endpoint, true);
+            $promises[] = $promise;
+
+            // Handle response of $promise asynchronously.
+            $promise->then(function ($response) use ($key, $endpoint) {
+                $result = (array) json_decode($response->getBody()->getContents());
+
+                $this->getRepository()
+                    ->getLog()
+                    ->debug("$key promise resolved successfully.");
+
+                if (isset($result)) {
+                    // Copy result to the class class instance. From here any subsequent
+                    // calls to the getters (e.g. getPairData()) will return these cached values.
+                    $this->{$key} = $result;
+                } else {
+                    // The API should *always* return something, so if $result is not set,
+                    // something went wrong, so we simply won't set it and the getters will in
+                    // turn re-attempt to get the data synchronously.
+                    // We'll log this to see how often it happens.
+                    $this->getRepository()
+                        ->getLog()
+                        ->error("Failed to fetch data for $endpoint via async, " .
+                            "re-attempting synchoronously.");
+                }
+            });
+        }
+
+        // Wait for all promises to complete, even if some of them fail.
+        GuzzleHttp\Promise\settle($promises)->wait();
+
+        // Everything we need now lives on the class instance, so we're done.
+        return;
+    }
+
+    /**
      * Get revision and page counts etc.
      * @return int[]
      */
-    protected function getPairData()
+    public function getPairData()
     {
-        if (! is_array($this->pairData)) {
+        if (!is_array($this->pairData)) {
             $this->pairData = $this->getRepository()
                 ->getPairData($this->project, $this->user);
         }
@@ -93,9 +165,9 @@ class EditCounter extends Model
      * Get revision dates.
      * @return int[]
      */
-    protected function getLogCounts()
+    public function getLogCounts()
     {
-        if (! is_array($this->logCounts)) {
+        if (!is_array($this->logCounts)) {
             $this->logCounts = $this->getRepository()
                 ->getLogCounts($this->project, $this->user);
         }
@@ -104,10 +176,11 @@ class EditCounter extends Model
 
     /**
      * Get block data.
-     * @param string $type Either 'set' or 'received'.
+     * @param string $type Either 'set', 'received'
+     * @param bool $blocksOnly Whether to include only blocks, and not reblocks and unblocks.
      * @return array
      */
-    protected function getBlocks($type)
+    protected function getBlocks($type, $blocksOnly = true)
     {
         if (isset($this->blocks[$type]) && is_array($this->blocks[$type])) {
             return $this->blocks[$type];
@@ -115,7 +188,15 @@ class EditCounter extends Model
         $method = "getBlocks".ucfirst($type);
         $blocks = $this->getRepository()->$method($this->project, $this->user);
         $this->blocks[$type] = $blocks;
-        return $this->blocks[$type];
+
+        // Filter out unblocks unless requested.
+        if ($blocksOnly) {
+            $blocks = array_filter($blocks, function ($block) {
+                return $block['log_action'] === 'block';
+            });
+        }
+
+        return $blocks;
     }
 
     /**
@@ -308,49 +389,117 @@ class EditCounter extends Model
     }
 
     /**
-     * Get the length of the longest block the user received.
-     * @return int|bool Number of days or false if it could not be determined.
-     *                  If the longest duration is indefinite, -1 is returned.
+     * Get the length of the longest block the user received, in seconds.
+     * @return int Number of seconds or false if it could not be determined.
+     *   If the user is blocked, the time since the block is returned. If the block is
+     *   indefinite, -1 is returned. 0 if there was never a block.
      */
-    public function getLongestBlockDays()
+    public function getLongestBlockSeconds()
     {
-        if (isset($this->longestBlockDays)) {
-            return $this->longestBlockDays;
+        if (isset($this->longestBlockSeconds)) {
+            return $this->longestBlockSeconds;
         }
 
-        $blocks = $this->getBlocks('received'); // FIXME: make sure this is only called once
-        $this->longestBlockDays = false;
+        $blocks = $this->getBlocks('received', false);
+        $this->longestBlockSeconds = false;
 
-        foreach ($blocks as $block) {
-            $timestamp = strtotime($block['log_timestamp']);
+        // If there was never a block, the longest was zero seconds.
+        if (empty($blocks)) {
+            return 0;
+        }
 
-            // First check if the string is serialized, and if so parse it to get the block duration
-            if (@unserialize($block['log_params']) !== false) {
-                $parsedParams = unserialize($block['log_params']);
-                $durationStr = $parsedParams['5::duration'];
-            } else {
-                // Old format, the duration in English + block options separated by new lines
-                $durationStr = explode("\n", $block['log_params'])[0];
-            }
+        /**
+         * Keep track of the last block so we can determine the duration
+         * if the current block in the loop is an unblock.
+         * @var int[] [
+         *              Unix timestamp,
+         *              Duration in seconds (-1 if indefinite)
+         *            ]
+         */
+        $lastBlock = [null, null];
 
-            if (in_array($durationStr, ['indefinite', 'infinity', 'infinite'])) {
-                return -1;
-            }
+        foreach ($blocks as $index => $block) {
+            list($timestamp, $duration) = $this->parseBlockLogEntry($block);
 
-            // Try block just in case there are older, unpredictable formats
-            try {
-                $expiry = strtotime($durationStr, $timestamp);
-                $duration = ($expiry - $timestamp) / (60 * 60 * 24);
-
-                if (!$duration || $duration > $this->longestBlockDays) {
-                    $this->longestBlockDays = $duration;
+            if ($block['log_action'] === 'block') {
+                // This is a new block, so first see if the duration of the last
+                // block exceeded our longest duration. -1 duration means indefinite.
+                if ($lastBlock[1] > $this->longestBlockSeconds || $lastBlock[1] === -1) {
+                    $this->longestBlockSeconds = $lastBlock[1];
                 }
-            } catch (Exception $error) {
-                // do nothing, leaving the longest block at false
+
+                // Now set this as the last block.
+                $lastBlock = [$timestamp, $duration];
+            } elseif ($block['log_action'] === 'unblock') {
+                // The last block was lifted. So the duration will be the time from when the
+                // last block was set to the time of the unblock.
+                $timeSinceLastBlock = $timestamp - $lastBlock[0];
+                if ($timeSinceLastBlock > $this->longestBlockSeconds) {
+                    $this->longestBlockSeconds = $timeSinceLastBlock;
+
+                    // Reset the last block, as it has now been accounted for.
+                    $lastBlock = null;
+                }
+            } elseif ($block['log_action'] === 'reblock' && $lastBlock[1] !== -1) {
+                // The last block was modified. So we will adjust $lastBlock to include
+                // the difference of the duration of the new reblock, and time since the last block.
+                // $lastBlock is left unchanged if its duration was indefinite.
+                $timeSinceLastBlock = $timestamp - $lastBlock[0];
+                $lastBlock[1] = $timeSinceLastBlock + $duration;
             }
         }
 
-        return $this->longestBlockDays;
+        // If the last block was indefinite, we'll return that as the longest duration.
+        if ($lastBlock[1] === -1) {
+            return -1;
+        }
+
+        // Test if the last block is still active, and if so use the expiry as the duration.
+        $lastBlockExpiry = $lastBlock[0] + $lastBlock[1];
+        if ($lastBlockExpiry > time() && $lastBlockExpiry > $this->longestBlockSeconds) {
+            $this->longestBlockSeconds = $lastBlock[1];
+        // Otherwise, test if the duration of the last block is now the longest overall.
+        } elseif ($lastBlock[1] > $this->longestBlockSeconds) {
+            $this->longestBlockSeconds = $lastBlock[1];
+        }
+
+        return $this->longestBlockSeconds;
+    }
+
+    /**
+     * Given a block log entry from the database, get the timestamp and duration in seconds.
+     * @param  mixed[] $block Block log entry as fetched via self::getBlocks()
+     * @return int[] [
+     *                 Unix timestamp,
+     *                 Duration in seconds (-1 if indefinite, null if unparsable or unblock)
+     *               ]
+     */
+    public function parseBlockLogEntry($block)
+    {
+        $timestamp = strtotime($block['log_timestamp']);
+        $duration = null;
+
+        // First check if the string is serialized, and if so parse it to get the block duration.
+        if (@unserialize($block['log_params']) !== false) {
+            $parsedParams = unserialize($block['log_params']);
+            $durationStr = isset($parsedParams['5::duration']) ? $parsedParams['5::duration'] : null;
+        } else {
+            // Old format, the duration in English + block options separated by new lines.
+            $durationStr = explode("\n", $block['log_params'])[0];
+        }
+
+        if (in_array($durationStr, ['indefinite', 'infinity', 'infinite'])) {
+            $duration = -1;
+        }
+
+        // Make sure $durationStr is valid just in case it is in an older, unpredictable format.
+        // If invalid, $duration is left as null.
+        if (strtotime($durationStr)) {
+            $expiry = strtotime($durationStr, $timestamp);
+            $duration = $expiry - $timestamp;
+        }
+
+        return [$timestamp, $duration];
     }
 
     /**
@@ -583,8 +732,12 @@ class EditCounter extends Model
      */
     public function namespaceTotals()
     {
+        if ($this->namespaceTotals) {
+            return $this->namespaceTotals;
+        }
         $counts = $this->getRepository()->getNamespaceTotals($this->project, $this->user);
         arsort($counts);
+        $this->namespaceTotals = $counts;
         return $counts;
     }
 
@@ -604,7 +757,7 @@ class EditCounter extends Model
 
     /**
      * Get the total numbers of edits per month.
-     * @param null|DateTime [$currentTime] - *USED ONLY FOR UNIT TESTING*
+     * @param null|DateTime $currentTime - *USED ONLY FOR UNIT TESTING*
      *   so we can mock the current DateTime.
      * @return mixed[] With keys 'yearLabels', 'monthLabels' and 'totals',
      *   the latter keyed by namespace, year and then month.
@@ -630,8 +783,47 @@ class EditCounter extends Model
         /** @var DateTime Keep track of the date of their first edit. */
         $firstEdit = new DateTime();
 
-        // Loop through the database results and fill in the values
-        //   for the months that we have data for.
+        list($out, $firstEdit) = $this->fillInMonthCounts($out, $totals, $firstEdit);
+
+        $dateRange = new DatePeriod(
+            $firstEdit,
+            new DateInterval('P1M'),
+            $currentTime->modify('first day of this month')
+        );
+
+        $out = $this->fillInMonthTotalsAndLabels($out, $dateRange);
+
+        // One more set of loops to sort by year/month
+        foreach (array_keys($out['totals']) as $nsId) {
+            ksort($out['totals'][$nsId]);
+
+            foreach ($out['totals'][$nsId] as &$yearData) {
+                ksort($yearData);
+            }
+        }
+
+        // Finally, sort the namespaces
+        ksort($out['totals']);
+
+        $this->monthCounts = $out;
+        return $out;
+    }
+
+    /**
+     * Loop through the database results and fill in the values
+     * for the months that we have data for.
+     * @param array $out
+     * @param string[] $totals
+     * @param DateTime $firstEdit
+     * @return array [
+     *           string[] - Modified $out filled with month stats,
+     *           DateTime - timestamp of first edit
+     *         ]
+     * Tests covered in self::monthCounts().
+     * @codeCoverageIgnore
+     */
+    private function fillInMonthCounts($out, $totals, $firstEdit)
+    {
         foreach ($totals as $total) {
             // Keep track of first edit
             $date = new DateTime($total['year'].'-'.$total['month'].'-01');
@@ -653,12 +845,19 @@ class EditCounter extends Model
             $out['totals'][$ns][$total['year']][$total['month']] = (int) $total['count'];
         }
 
-        $dateRange = new DatePeriod(
-            $firstEdit,
-            new DateInterval('P1M'),
-            $currentTime->modify('first day of this month')
-        );
+        return [$out, $firstEdit];
+    }
 
+    /**
+     * Given the output array, fill each month's totals and labels.
+     * @param array $out
+     * @param DatePeriod $dateRange From first edit to present.
+     * @return string[] - Modified $out filled with month stats.
+     * Tests covered in self::monthCounts().
+     * @codeCoverageIgnore
+     */
+    private function fillInMonthTotalsAndLabels($out, DatePeriod $dateRange)
+    {
         foreach ($dateRange as $monthObj) {
             $year = (int) $monthObj->format('Y');
             $month = (int) $monthObj->format('n');
@@ -680,19 +879,6 @@ class EditCounter extends Model
             }
         }
 
-        // One more set of loops to sort by year/month
-        foreach (array_keys($out['totals']) as $nsId) {
-            ksort($out['totals'][$nsId]);
-
-            foreach ($out['totals'][$nsId] as &$yearData) {
-                ksort($yearData);
-            }
-        }
-
-        // Finally, sort the namespaces
-        ksort($out['totals']);
-
-        $this->monthCounts = $out;
         return $out;
     }
 
@@ -705,6 +891,10 @@ class EditCounter extends Model
      */
     public function yearCounts($currentTime = null)
     {
+        if (isset($this->yearCounts)) {
+            return $this->yearCounts;
+        }
+
         $out = $this->monthCounts($currentTime);
 
         foreach ($out['totals'] as $nsId => $years) {
@@ -713,6 +903,7 @@ class EditCounter extends Model
             }
         }
 
+        $this->yearCounts = $out;
         return $out;
     }
 
@@ -768,13 +959,15 @@ class EditCounter extends Model
         if (empty($this->globalEditCounts)) {
             $this->globalEditCounts = $this->getRepository()
                 ->globalEditCounts($this->user, $this->project);
-            if ($sorted) {
-                // Sort.
-                uasort($this->globalEditCounts, function ($a, $b) {
-                    return $b['total'] - $a['total'];
-                });
-            }
         }
+
+        if ($sorted) {
+            // Sort.
+            uasort($this->globalEditCounts, function ($a, $b) {
+                return $b['total'] - $a['total'];
+            });
+        }
+
         return $this->globalEditCounts;
     }
 
@@ -822,9 +1015,9 @@ class EditCounter extends Model
      * Get average edit size, and number of large and small edits.
      * @return int[]
      */
-    protected function getEditSizeData()
+    public function getEditSizeData()
     {
-        if (! is_array($this->editSizeData)) {
+        if (!is_array($this->editSizeData)) {
             $this->editSizeData = $this->getRepository()
                 ->getEditSizeData($this->project, $this->user);
         }
