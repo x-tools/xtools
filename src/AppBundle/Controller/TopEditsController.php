@@ -82,7 +82,8 @@ class TopEditsController extends XtoolsController
     public function resultAction(Request $request, $namespace = 0, $article = '')
     {
         // Second parameter causes it return a Redirect to the index if the user has too many edits.
-        $ret = $this->validateProjectAndUser($request, 'topedits');
+        // We only want to do this when looking at the user's overall edits, not just to a specific article.
+        $ret = $this->validateProjectAndUser($request, $article !== '' ?  null : 'topedits');
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {
