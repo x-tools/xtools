@@ -156,6 +156,7 @@ class ArticleInfoTest extends WebTestCase
         $this->assertEquals(50, $this->articleInfo->anonPercentage());
         $this->assertEquals(2, $this->articleInfo->getMinorCount());
         $this->assertEquals(50, $this->articleInfo->minorPercentage());
+        $this->assertEquals(1, $this->articleInfo->getBotRevisionCount());
         $this->assertEquals(93, $this->articleInfo->getTotalDays());
         $this->assertEquals(23, (int) $this->articleInfo->averageDaysPerEdit());
         $this->assertEquals(0, (int) $this->articleInfo->editsPerDay());
@@ -188,7 +189,6 @@ class ArticleInfoTest extends WebTestCase
             ],
             $this->articleInfo->topTenEditorsByEdits()[0]
         );
-
         $this->assertEquals(
             [
                 'label' =>'Mick Jagger',
@@ -196,6 +196,20 @@ class ArticleInfoTest extends WebTestCase
                 'percentage' => 100,
             ],
             $this->articleInfo->topTenEditorsByAdded()[0]
+        );
+
+        // Top 10 counts should not include bots.
+        $this->assertFalse(
+            array_search(
+                'XtoolsBot',
+                array_column($this->articleInfo->topTenEditorsByEdits(), 'label')
+            )
+        );
+        $this->assertFalse(
+            array_search(
+                'XtoolsBot',
+                array_column($this->articleInfo->topTenEditorsByAdded(), 'label')
+            )
         );
 
         $this->assertEquals(2, $this->articleInfo->getMaxEditsPerMonth());
@@ -337,6 +351,15 @@ class ArticleInfoTest extends WebTestCase
                 'username' => '192.168.0.2',
                 'comment' => 'Undid revision 40 by [[Special:Contributions/192.168.0.1|192.168.0.1]]',
             ]),
+            new Edit($this->page, [
+                'id' => 60,
+                'timestamp' => '20161005010000',
+                'minor' => '1',
+                'length' => '30',
+                'length_change' => '35',
+                'username' => 'XtoolsBot',
+                'comment' => 'This is a bot edit',
+            ]),
         ];
 
         $prevEdits = [
@@ -352,6 +375,12 @@ class ArticleInfoTest extends WebTestCase
         $prop = $this->reflectionClass->getProperty('numRevisionsProcessed');
         $prop->setAccessible(true);
         $prop->setValue($this->articleInfo, 4);
+
+        $prop = $this->reflectionClass->getProperty('bots');
+        $prop->setAccessible(true);
+        $prop->setValue($this->articleInfo, [
+            'XtoolsBot' => ['count' => 1],
+        ]);
 
         $method = $this->reflectionClass->getMethod('updateCounts');
         $method->setAccessible(true);

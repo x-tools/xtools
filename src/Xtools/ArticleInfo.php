@@ -199,6 +199,10 @@ class ArticleInfo extends Model
     {
         $this->parseHistory();
         $this->setLogsEvents();
+
+        // Bots need to be set before setting top 10 counts.
+        $this->setBots();
+
         $this->setTopTenCounts();
     }
 
@@ -693,16 +697,21 @@ class ArticleInfo extends Model
         // Adjust addedBytes given this edit was a revert of the previous one.
         if ($prevEdits['prev'] && $prevEdits['prev']->getSize() > 0) {
             $this->addedBytes -= $prevEdits['prev']->getSize();
+
+            // Also deduct from the user's individual added byte count.
+            $username = $prevEdits['prev']->getUser()->getUsername();
+            $this->editors[$username]['added'] -= $prevEdits['prev']->getSize();
         }
 
         // @TODO: Test this against an edit war (use your sandbox).
         // Also remove as max added or deleted, if applicable.
         if ($this->maxAddition && $prevEdits['prev']->getId() === $this->maxAddition->getId()) {
+            // $this->editors[$prevEdits->getUser()->getUsername()]['sizes'] = $edit->getLength() / 1024;
             $this->maxAddition = $prevEdits['maxAddition'];
-            $prevEdits['maxAddition'] = $prevEdits['prev']; // in the event of edit wars
+            $prevEdits['maxAddition'] = $prevEdits['prev']; // In the event of edit wars.
         } elseif ($this->maxDeletion && $prevEdits['prev']->getId() === $this->maxDeletion->getId()) {
             $this->maxDeletion = $prevEdits['maxDeletion'];
-            $prevEdits['maxDeletion'] = $prevEdits['prev']; // in the event of edit wars
+            $prevEdits['maxDeletion'] = $prevEdits['prev']; // In the event of edit wars.
         }
 
         return $prevEdits;
@@ -949,10 +958,16 @@ class ArticleInfo extends Model
      */
     public function getBots()
     {
-        if (isset($this->bots)) {
-            return $this->bots;
-        }
+        return $this->bots;
+    }
 
+    /**
+     * Set info about bots that edited the page. This is done as a private setter
+     * because we need this information when computing the top 10 editors,
+     * where we don't want to include bots.
+     */
+    private function setBots()
+    {
         // Parse the botedits
         $bots = [];
         $botData = $this->getRepository()->getBotData($this->page);
@@ -969,7 +984,6 @@ class ArticleInfo extends Model
         });
 
         $this->bots = $bots;
-        return $bots;
     }
 
     /**
@@ -1016,7 +1030,7 @@ class ArticleInfo extends Model
 
             $yearEvents = $this->yearMonthCounts[$year]['events'];
 
-            // Convert log type value to i18n key
+            // Convert log type value to i18n key.
             switch ($event['log_type']) {
                 case 'protect':
                     $action = 'protections';
@@ -1027,7 +1041,7 @@ class ArticleInfo extends Model
                 case 'move':
                     $action = 'moves';
                     break;
-                // count pending-changes protections along with normal protections
+                // count pending-changes protections along with normal protections.
                 case 'stable':
                     $action = 'protections';
                     break;
@@ -1055,12 +1069,12 @@ class ArticleInfo extends Model
         $topTenEditors = [];
 
         foreach ($this->editors as $editor => $info) {
-            // Count how many users are in the top 10% by number of edits
-            if ($counter < 10) {
+            // Count how many users are in the top 10% by number of edits, excluding bots.
+            if ($counter < 10 && !in_array($editor, array_keys($this->bots))) {
                 $topTenCount += $info['all'];
                 $counter++;
 
-                // To be used in the Top Ten charts
+                // To be used in the Top Ten charts.
                 $topTenEditors[] = [
                     'label' => $editor,
                     'value' => $info['all'],
@@ -1070,22 +1084,22 @@ class ArticleInfo extends Model
                 ];
             }
 
-            // Compute the percentage of minor edits the user made
+            // Compute the percentage of minor edits the user made.
             $this->editors[$editor]['minorPercentage'] = $info['all']
                 ? ($info['minor'] / $info['all']) * 100
                 : 0;
 
             if ($info['all'] > 1) {
-                // Number of seconds/days between first and last edit
+                // Number of seconds/days between first and last edit.
                 $secs = $info['last']->getTimestamp() - $info['first']->getTimestamp();
                 $days = $secs / (60 * 60 * 24);
 
-                // Average time between edits (in days)
+                // Average time between edits (in days).
                 $this->editors[$editor]['atbe'] = $days / $info['all'];
             }
 
             if (count($info['sizes'])) {
-                // Average Total KB divided by number of stored sizes (user's edit count to this page)
+                // Average Total KB divided by number of stored sizes (usually the user's edit count to this page).
                 $this->editors[$editor]['size'] = array_sum($info['sizes']) / count($info['sizes']);
             } else {
                 $this->editors[$editor]['size'] = 0;
@@ -1094,7 +1108,7 @@ class ArticleInfo extends Model
 
         $this->topTenEditorsByEdits = $topTenEditors;
 
-        // First sort editors array by the amount of text they added
+        // First sort editors array by the amount of text they added.
         $topTenEditorsByAdded = $this->editors;
         uasort($topTenEditorsByAdded, function ($a, $b) {
             if ($a['added'] === $b['added']) {
@@ -1104,7 +1118,7 @@ class ArticleInfo extends Model
         });
 
         // Then build a new array of top 10 editors by added text,
-        //   in the data structure needed for the chart
+        // in the data structure needed for the chart.
         $this->topTenEditorsByAdded = array_map(function ($editor) {
             $added = $this->editors[$editor]['added'];
             return [
