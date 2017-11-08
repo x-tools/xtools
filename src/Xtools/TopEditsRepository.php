@@ -99,15 +99,15 @@ class TopEditsRepository extends Repository
                 ) AS pa_class"
             : ', NULL as pa_class';
 
-        $sql = "SELECT c.page_namespace, e.page_title, c.count $paSelect
+        $sql = "SELECT c.page_namespace, e.page_title, c.page_is_redirect, c.count $paSelect
                 FROM
                 (
-                    SELECT b.page_namespace, b.rev_page, b.count
+                    SELECT b.page_namespace, b.page_is_redirect, b.rev_page, b.count
                         ,@rn := if(@ns = b.page_namespace, @rn + 1, 1) AS row_number
                         ,@ns := b.page_namespace AS dummy
                     FROM
                     (
-                        SELECT page_namespace, rev_page, count(rev_page) AS count
+                        SELECT page_namespace, page_is_redirect, rev_page, count(rev_page) AS count
                         FROM $revisionTable
                         JOIN $pageTable ON page_id = rev_page
                         WHERE rev_user_text = :username

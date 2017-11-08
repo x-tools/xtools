@@ -104,10 +104,10 @@ class TopEdits extends Model
     }
 
     /**
-     * [formatTopPages description]
+     * Format the results returned from the database.
      * @param  string[] $pages As returned by TopEditsRepository::getTopEditsNamespace
      *                         or TopEditsRepository::getTopEditsAllNamespaces.
-     * @return string[] Same as input but with 'displaytitle', and 'page_title_ns'.
+     * @return string[] Same as input but with 'displaytitle' and 'page_title_ns'.
      */
     private function formatTopPages($pages)
     {

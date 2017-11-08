@@ -70,3 +70,31 @@ Get statistics about a user's usage of edit summaries.
 Get `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_'s edit summary statistics on the English Wikipedia.
 
     https://xtools.wmflabs.org/api/user/edit_summeries/en.wikipedia/Jimbo_Wales
+
+Top edits
+=========
+``GET /api/user/top_edits/{project}/{username}/{namespace}/{article}``
+
+Get the top-edited pages by a user, or get all edits made by a user to a specific page.
+
+**Parameters:**
+
+* ``project`` (**required**) - Project domain or database name.
+* ``username`` (**required**) - Account's username.
+* ``namespace`` - Namespace ID or ``all`` for all namespaces. Defaults to the mainspace. Leave this blank if you are also supplying a full page title as the ``article``.
+* ``article`` - Full page title if ``namespace`` is omitted. If ``namespace`` is blank, do not include the namespace in the page title.
+
+**Example:**
+
+Get the top edits made by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ in the mainspace.
+
+    https://xtools.wmflabs.org/api/user/top_edits/en.wikipedia/Jimbo_Wales
+
+Get the top edits made by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ in the userspace.
+
+    https://xtools.wmflabs.org/api/user/top_edits/en.wikipedia/Jimbo_Wales/0
+
+Get the top edits made by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ to the page `Talk:Naveen Jain <https://en.wikipedia.org/wiki/Talk:Naveen_Jain>`_.
+
+    https://xtools.wmflabs.org/api/user/top_edits/en.wikipedia/Jimbo_Wales//Talk:Naveen_Jain
+    https://xtools.wmflabs.org/topedits/en.wikipedia.org/Jimbo_Wales/1/Naveen_Jain
