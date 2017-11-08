@@ -211,7 +211,7 @@ class TopEditsController extends XtoolsController
      * @Route("/api/user/top_edits/{project}/{username}/{namespace}/{article}", name="UserApiTopEditsArticleUnderscored",
      *     requirements={"article"=".+", "namespace"="|\d+|all"})
      * @param Request $request
-     * @param int|all $namespace The ID of the namespace of the page, or 'all' for all namespaces.
+     * @param int|string $namespace The ID of the namespace of the page, or 'all' for all namespaces.
      * @param string $article The title of the page. A full title can be used if the $namespace is blank.
      * @return Response
      * TopEdits and its Repo cannot be stubbed here :(
