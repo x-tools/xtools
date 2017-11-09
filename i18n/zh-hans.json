@@ -287,7 +287,7 @@
 	"tool": "工具",
 	"tool-about": "关于",
 	"tool-adminscore": "管理员分数",
-	"tool-adminscore-desc": "查看用户的管理员水平究竟如何",
+	"tool-adminscore-desc": "评分表明用户对管理员权限的准备程度",
 	"tool-adminstats": "管理员状态",
 	"tool-adminstats-desc": "显示管理员操作的统计数据",
 	"tool-articleinfo": "页面历史",

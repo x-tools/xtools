@@ -287,7 +287,7 @@
 	"tool": "Werkzeug",
 	"tool-about": "Über",
 	"tool-adminscore": "Administrator-Score",
-	"tool-adminscore-desc": "Finde heraus, wie adminwürdig ein Benutzer ist.",
+	"tool-adminscore-desc": "Score, der anzeigt, ob ein Benutzer bereit für eine Adminkandidatur ist.",
 	"tool-adminstats": "Administratorstatistiken",
 	"tool-adminstats-desc": "Statistik der Admin-Aktionen",
 	"tool-articleinfo": "Seitenhistorie",
