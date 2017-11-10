@@ -92,9 +92,9 @@ Get the top edits made by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo
 
 Get the top edits made by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ in the userspace.
 
-    https://xtools.wmflabs.org/api/user/top_edits/en.wikipedia/Jimbo_Wales/0
+    https://xtools.wmflabs.org/api/user/top_edits/en.wikipedia/Jimbo_Wales/2
 
 Get the top edits made by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ to the page `Talk:Naveen Jain <https://en.wikipedia.org/wiki/Talk:Naveen_Jain>`_.
 
     https://xtools.wmflabs.org/api/user/top_edits/en.wikipedia/Jimbo_Wales//Talk:Naveen_Jain
-    https://xtools.wmflabs.org/topedits/en.wikipedia.org/Jimbo_Wales/1/Naveen_Jain
+    https://xtools.wmflabs.org/api/user/top_edits/en.wikipedia.org/Jimbo_Wales/1/Naveen_Jain
