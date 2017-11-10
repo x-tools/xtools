@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.1.17 ##
+- T179762: Don't include reverted edits with top editors in ArticleInfo.
+- Remove edit count restriction when querying for an article in TopEdits.
+- Add API for TopEdits.
+
 ## 3.1.16 ##
 - T179293: Remove references to wikidatawiki_p.wb_entity_per_page which was
   removed with T95685. Checking basic wikidata fields will be reimplemented
