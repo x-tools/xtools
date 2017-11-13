@@ -373,28 +373,11 @@ class PagesRepository extends Repository
         $wikidataId = ltrim($page->getWikidataId(), 'Q');
         $lang = $page->getProject()->getLang();
 
-        $sql = "SELECT IF(term_type = 'label', 'label', 'description') AS term, term_text
-                FROM wikidatawiki_p.wb_entity_per_page
-                JOIN wikidatawiki_p.page ON epp_page_id = page_id
-                JOIN wikidatawiki_p.wb_terms ON term_entity_id = epp_entity_id
-                    AND term_language = :lang
-                    AND term_type IN ('label', 'description')
-                WHERE epp_entity_id = :wikidataId
-
-                UNION
-
-                SELECT pl_title AS term, wb_terms.term_text
-                FROM wikidatawiki_p.pagelinks
-                JOIN wikidatawiki_p.wb_terms ON term_entity_id = SUBSTRING(pl_title, 2)
-                    AND term_entity_type = (IF(SUBSTRING(pl_title, 1, 1) = 'Q', 'item', 'property'))
-                    AND term_language = :lang
-                    AND term_type = 'label'
-                WHERE pl_namespace IN (0, 120)
-                    AND pl_from = (
-                        SELECT page_id FROM wikidatawiki_p.page
-                        WHERE page_namespace = 0
-                            AND page_title = 'Q:wikidataId'
-                    )";
+        $sql = "SELECT term_type AS term, term_text
+                FROM wikidatawiki_p.wb_terms
+                WHERE term_entity_id = :wikidataId
+                AND term_type IN ('label', 'description')
+                AND term_language = :lang";
 
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $resultQuery->bindParam(':lang', $lang);
