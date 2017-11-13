@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"Aftabuzzaman",
-			"Nemo bis"
+			"Nemo bis",
+			"Rasal Lia"
 		]
 	},
 	"about-xtools": "এই সরঞ্জামগুলি সম্পর্কে",
@@ -27,7 +28,10 @@
 	"approve": "অনুমোদন",
 	"approximate": "আনুমানিক",
 	"article": "নিবন্ধ",
+	"assessment": "মূল্যায়ন",
+	"assessments": "মূল্যায়ন",
 	"auto-edits": "(অর্ধ)স্বয়ংক্রিয় সম্পাদনা",
+	"auto-edits-request": "একটি নতুন (অর্ধ-)স্বয়ংক্রিয় সরঞ্জাম যুক্ত করার অনুরোধ",
 	"average-change-per-page": "প্রতি পাতায় গড় পরিবর্তন",
 	"average-edit-size": "গড় সম্পাদনার আকার",
 	"average-edits-per-day": "এক দিনে গড় সম্পাদনা",
