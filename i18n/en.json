@@ -299,6 +299,8 @@
 	"tool-bash-desc": "Get quotes from the IRC Quote Database",
 	"tool-blame": "Article Blamer",
 	"tool-blame-desc": "Find addition of text in a page history",
+	"tool-dc": "Deletion Counter",
+	"tool-dc-desc": "Find what processes Administrators used to delete pages",
 	"tool-ec": "Edit Counter",
 	"tool-ec-desc": "Analysis of user contributions",
 	"tool-error": "Error",
