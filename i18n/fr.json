@@ -290,7 +290,7 @@
 	"tool": "Outil",
 	"tool-about": "À propos",
 	"tool-adminscore": "Score d’administration",
-	"tool-adminscore-desc": "Déterminer si un utilisateur est digne d’être administrateur",
+	"tool-adminscore-desc": "Note indiquant si un utilisateur a la qualité à devenir administrateur",
 	"tool-adminstats": "Statistiques d’administration",
 	"tool-adminstats-desc": "Afficher les statistiques des actions d’administration",
 	"tool-articleinfo": "Historique de la page",
