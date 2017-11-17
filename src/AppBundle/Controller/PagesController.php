@@ -109,7 +109,7 @@ class PagesController extends XtoolsController
 
         foreach ($result as $row) {
             $datetime = DateTime::createFromFormat('YmdHis', $row['rev_timestamp']);
-            $datetimeKey = $datetime->format('Ymdhi');
+            $datetimeKey = $datetime->format('YmdHi');
             $datetimeHuman = $datetime->format('Y-m-d H:i');
 
             $pageData = array_merge($row, [
