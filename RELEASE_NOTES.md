@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.1.18 ##
+- T180803: Fix sorting of date column in Pages Created tool.
+- T179313: Revive checking of basic Wikidata errors in ArticleInfo.
+- Localization updates.
+
 ## 3.1.17 ##
 - T179762: Don't include reverted edits with top editors in ArticleInfo.
 - Remove edit count restriction when querying for an article in TopEdits.
