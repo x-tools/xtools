@@ -24,14 +24,13 @@ It is in operation for Wikimedia wikis and can also be installed for any MediaWi
     :maxdepth: 3
     :hidden:
 
-    pre-requisites
+    tools/index
+    api/index
     installation
     configuration
-    opt-in
-    tools/index
     development
     administration
-    api/index
+    opt-in
 
 The tools
 =========

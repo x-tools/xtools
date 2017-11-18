@@ -4,8 +4,10 @@ Administration
 
 Once you have XTools up and running, depending on how much traffic you receive, you might want to implement measures to ensure stability.
 
-Adding rate limiting
-====================
+.. _rate_limiting:
+
+Rate limiting
+=============
 
 Rate limiting can safeguard against spider crawls and bots that overload the application.
 
