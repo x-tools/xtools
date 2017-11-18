@@ -80,8 +80,10 @@ class AutomatedEditsHelper extends HelperBase
         // Default to default project (e.g. en.wikipedia.org) if wiki not configured
         if (isset($toolsByWiki[$projectDomain])) {
             $this->tools[$projectDomain] = $toolsByWiki[$projectDomain];
-        } else {
+        } elseif (isset($toolsByWiki[$this->container->getParameter('default_project')])) {
             $this->tools[$projectDomain] = $toolsByWiki[$this->container->getParameter('default_project')];
+        } else {
+            $this->tools[$projectDomain] = [];
         }
 
         // Merge wiki-specific rules into the global rules
