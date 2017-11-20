@@ -5,7 +5,8 @@
 			"Wladek92",
 			"Nemo bis",
 			"Verdy p",
-			"Framawiki"
+			"Framawiki",
+			"Urhixidur"
 		]
 	},
 	"about-xtools": "À propos de ces outils",
@@ -290,7 +291,7 @@
 	"tool": "Outil",
 	"tool-about": "À propos",
 	"tool-adminscore": "Score d’administration",
-	"tool-adminscore-desc": "Note indiquant si un utilisateur a la qualité à devenir administrateur",
+	"tool-adminscore-desc": "Note indiquant à quel point un utilisateur est prêt à devenir administrateur",
 	"tool-adminstats": "Statistiques d’administration",
 	"tool-adminstats-desc": "Afficher les statistiques des actions d’administration",
 	"tool-articleinfo": "Historique de la page",
