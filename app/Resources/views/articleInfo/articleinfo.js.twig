@@ -29,7 +29,7 @@ $(function () {
         '{{ app.request.getSchemeAndHttpHost()|raw }}' +
         '/api/page/articleinfo/' +
         mw.config.get('wgServerName') + '/' +
-        mw.config.get('wgPageName') + '?format=html' +
+        mw.config.get('wgPageName').replace(/["?%&+]/g, escape) + '?format=html' +
         '&uselang=' + mw.config.get('wgUserLanguage')
     ).done(function (result) {
         $('#xtools_result').html(result);
