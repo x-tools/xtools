@@ -20,14 +20,21 @@
                                 <td>
                                     <span class="text-success">{{ master[key].score|diff_format }}</span>
                                 </td>
+                                <td>
+                                    <span class="text-muted small">
+                                        {{ msg(key~"-desc", [master[key].value, master[key].value|number_format]) }}
+                                    </span>
+                                </td>
                             </tr>
                         {% endif %}
                     {% endfor %}
+                    </tbody>
                     <tfoot>
                         <th>{{ msg('total') }}</th>
                         <th>{{ total|num_format }}</th>
+                        <th><span class="text-muted small"><a href="http://xtoolsproject.org/en/stable/tools/adminscore.html#algorithm" target="_blank">{{ msg("how-calculated") }}</a></span></th>
                     </tfoot>
-                </tbody></table>
+                </table>
             </div>
         {% endset %}
         {{ layout.content_block('tool-adminscore', content) }}
