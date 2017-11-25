@@ -11,7 +11,7 @@
 <a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project.domain }}&amp;pages={{ page.title|e('url') }}&amp;range=latest-30">{{ data.pageviews|num_format }} {{ msg('num-pageviews', [data.pageviews]) }}</a> ({{ data.pageviews_offset }} {{ msg('num-days', [data.pageviews_offset]) }}){{ msg('comma-character') }}
 {% endif %}
 {{ msg('created-by')|lower }}: {{ wiki.userLink(data.author, project) }}
-({{ wiki.pageLinkRaw('Special:Contributions/' ~ data.author, project, data.author_editcount|num_format) }})
+(<a target="_blank" href="{{ url('ec', { 'project': project.domain, 'username': data.author }) }}">{{ data.author_editcount|num_format }}</a>)
 &middot;
 <a target="_blank" href="{{ url('articleinfo', { 'project': project.domain, 'article': page.title }) }}">{{ msg('see-full-page-stats') }}</a>
 </span>
