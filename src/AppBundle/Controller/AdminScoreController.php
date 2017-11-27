@@ -180,14 +180,12 @@ class AdminScoreController extends XtoolsController
             if ($key === 'account-age') {
                 if ($value == null) {
                     $value = 0;
-                }
-                else {
+                } else {
                     $now = new DateTime();
                     $date = new DateTime($value);
                     $diff = $date->diff($now);
                     $formula = 365 * $diff->format('%y') + 30 * $diff->format('%m') + $diff->format('%d');
                     $value = $formula - 365;
-
                 }
             }
 
