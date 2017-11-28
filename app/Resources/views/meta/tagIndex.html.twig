@@ -1,0 +1,55 @@
+{% extends "base.html.twig" %}
+{% import 'macros/forms.html.twig' as forms %}
+
+{% block body %}
+    <div class="alert alert-danger">
+        This interface makes changes to the underlying XTools Git structure.<br />
+        Do not make changes here unless you absolutely know what you're doing!
+    </div>
+
+    Before you begin, make sure any outstanding changes are committed to the repo.
+    <form class="col-lg-8 col-lg-offset-2" action="{{ path('MetaTag') }}" method="post" accept-charset="utf-8" >
+        <fieldset class="form-fieldset">
+            <div class="input-group form-row">
+                <label class="input-group-addon form-label" for="version_input">
+                    Version:
+                    <div class="glyphicon glyphicon-info-sign tooltipcss pull-right">
+                        <div class="tooltip-body">
+                            Please use major.minor.bugfix notation</span>
+                        </div>
+                    </div>
+                </label>
+                <input type="text" class="form-control"
+                       value="{{ currentVersion }}"
+                       name="version"
+                       id="version_input"
+                       required>
+            </div>
+            <div class="input-group form-row">
+                <label class="input-group-addon form-label" for="release_notes_input">
+                    Release Notes:
+                    <div class="glyphicon glyphicon-info-sign tooltipcss pull-right">
+                        <div class="tooltip-body">
+                            Use Valid Markdown</span>
+                        </div>
+                    </div>
+                </label>
+                <textarea class="form-control"
+                       name="releaseNotes"
+                       id="release_notes_input"
+                          required></textarea>
+            </div>
+            <div class="input-group form-row">
+                <label class="input-group-addon form-label" for="git_input">
+                    Do Git operations:
+                </label>
+                <input type="checkbox" class="form-control"
+                       name="git"
+                       id="git_input" />
+            </div>
+
+
+        </fieldset>
+        {{ forms.submit_btn() }}
+    </form>
+{% endblock %}
