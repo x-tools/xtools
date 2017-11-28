@@ -10,7 +10,7 @@
         {{ wiki.userLinks(user, project, xtPage) }}
 
         {% set content %}
-            <div class="col-lg-6 stat-list clearfix">
+            <div class="col-lg-12 stat-list clearfix">
                 <table class="table"><tbody>
                     {% for key in master|keys %}
                         {# Don't confuse people by showing 0 for blocks #}
@@ -20,14 +20,21 @@
                                 <td>
                                     <span class="text-success">{{ master[key].score|diff_format }}</span>
                                 </td>
+                                <td>
+                                    <span class="text-muted small">
+                                        {{ msg(key~"-desc", [master[key].value, master[key].value|number_format]) }}
+                                    </span>
+                                </td>
                             </tr>
                         {% endif %}
                     {% endfor %}
+                    </tbody>
                     <tfoot>
                         <th>{{ msg('total') }}</th>
                         <th>{{ total|num_format }}</th>
+                        <th><span class="text-muted small"><a href="http://xtoolsproject.org/en/stable/tools/adminscore.html#algorithm" target="_blank">{{ msg("how-calculated") }}</a></span></th>
                     </tfoot>
-                </tbody></table>
+                </table>
             </div>
         {% endset %}
         {{ layout.content_block('tool-adminscore', content) }}

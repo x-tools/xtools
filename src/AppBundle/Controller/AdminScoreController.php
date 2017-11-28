@@ -178,11 +178,15 @@ class AdminScoreController extends XtoolsController
             $value = $row['value'];
 
             if ($key === 'account-age') {
-                $now = new DateTime();
-                $date = new DateTime($value);
-                $diff = $date->diff($now);
-                $formula = 365 * $diff->format('%y') + 30 * $diff->format('%m') + $diff->format('%d');
-                $value = $formula - 365;
+                if ($value == null) {
+                    $value = 0;
+                } else {
+                    $now = new DateTime();
+                    $date = new DateTime($value);
+                    $diff = $date->diff($now);
+                    $formula = 365 * $diff->format('%y') + 30 * $diff->format('%m') + $diff->format('%d');
+                    $value = $formula - 365;
+                }
             }
 
             $multiplierKey = $row['source'] . '-mult';
