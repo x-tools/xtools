@@ -263,7 +263,7 @@
                     {% if page.watchers is not empty %}
                         <tr>
                             <td>{{ msg('page-watchers') }}</td>
-                            <td>{{ page.watchers is not empty }}</td>
+                            <td>{{ page.watchers|num_format }}</td>
                         </tr>
                     {% endif %}
                     {% if isWMFLabs() %}
