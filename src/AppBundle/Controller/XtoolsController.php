@@ -13,7 +13,7 @@ use Xtools\ProjectRepository;
 use Xtools\UserRepository;
 use Xtools\Project;
 use Xtools\Page;
-use Xtools\PagesRepository;
+use Xtools\PageRepository;
 
 /**
  * XtoolsController supplies a variety of methods around parsing and validing
@@ -178,7 +178,7 @@ abstract class XtoolsController extends Controller
     public function getAndValidatePage($project, $pageTitle)
     {
         $page = new Page($project, $pageTitle);
-        $pageRepo = new PagesRepository();
+        $pageRepo = new PageRepository();
         $pageRepo->setContainer($this->container);
         $page->setRepository($pageRepo);
 

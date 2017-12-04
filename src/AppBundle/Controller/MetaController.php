@@ -43,9 +43,9 @@ class MetaController extends XtoolsController
     /**
      * Display the results.
      * @Route("/meta/{start}/{end}/{legacy}", name="MetaResult")
-     * @param string $start    Start date
-     * @param string $end      End date
-     * @param string [$legacy] Non-blank value indicates to show stats for legacy XTools
+     * @param string $start   Start date
+     * @param string $end     End date
+     * @param string $legacy  Non-blank value indicates to show stats for legacy XTools
      * @return Response
      * @codeCoverageIgnore
      */

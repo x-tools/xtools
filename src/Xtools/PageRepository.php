@@ -1,6 +1,6 @@
 <?php
 /**
- * This file contains only the PagesRepository class.
+ * This file contains only the PageRepository class.
  */
 
 namespace Xtools;
@@ -10,10 +10,11 @@ use Mediawiki\Api\SimpleRequest;
 use GuzzleHttp;
 
 /**
- * A PagesRepository fetches data about Pages, either singularly or for multiple.
+ * A PageRepository fetches data about Pages, either singularly or for multiple.
+ * Despite the name, this does not have a direct correlation with the Pages tool.
  * @codeCoverageIgnore
  */
-class PagesRepository extends Repository
+class PageRepository extends Repository
 {
 
     /**

@@ -108,9 +108,9 @@ class ApiHelper extends HelperBase
      *                                    (e.g. 'categorymembers' for API:Categorymembers).
      *                                    If this is a function it is given the response data,
      *                                    and expected to return the data we want to concatentate.
-     * @param  string      [$continueKey] the key to look in the continue hash, if present
+     * @param  string      $continueKey   The key to look in the continue hash, if present
      *                                    (e.g. 'cmcontinue' for API:Categorymembers)
-     * @param  integer     [$limit]       Max number of pages to fetch
+     * @param  integer     $limit         Max number of pages to fetch
      * @return array                      Associative array with data
      */
     public function massApi($params, $project, $dataKey, $continueKey = 'continue', $limit = 5000)

@@ -42,7 +42,7 @@ class Edit extends Model
     /**
      * Edit constructor.
      * @param Page $page
-     * @param string[] $attrs Attributes, as retrieved by PagesRepository->getRevisions()
+     * @param string[] $attrs Attributes, as retrieved by PageRepository::getRevisions()
      */
     public function __construct(Page $page, $attrs)
     {
