@@ -213,7 +213,7 @@
 	"pages-created-deleted": "Páginas creadas (borradas)",
 	"pages-created-live": "Páginas creadas (activas)",
 	"pages-created-since-deleted": "$1 eliminadas hasta ahora",
-	"pages-created-tooltip": "Total de páginas creadas, incluyendo las creadas como redirección cuando se traslada una página. Consulta la documentación para más detalles.",
+	"pages-created-tooltip": "Total de páginas creadas, incluidas las creadas como redirecciones al trasladar páginas. Consulta la documentación para obtener más detalles.",
 	"pages-deleted": "Páginas borradas",
 	"pages-edited-total": "Páginas editadas (totales)",
 	"pages-moved": "Páginas trasladadas",

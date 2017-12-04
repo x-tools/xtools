@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"Nemo bis"
+			"Nemo bis",
+			"MokaAkashiyaPT"
 		]
 	},
 	"actions": "Ações",
@@ -35,6 +36,7 @@
 	"deleted": "Eliminado",
 	"deleted-edits": "Edições eliminadas",
 	"documentation": "documentação",
+	"edit-count-desc": "$2 {{PLURAL:$1|edição|edições}}",
 	"edit-summary": "Comentário",
 	"editors": "Número de editores",
 	"edits": "edições",
@@ -107,10 +109,12 @@
 	"pager-older-n": "{{PLURAL:$1|1 anterior|$1 anteriores}}",
 	"pages": "Páginas",
 	"pages-created": "Páginas criadas",
+	"pages-created-live-desc": "$2 {{PLURAL:$1|página criada|páginas criadas}}",
 	"pages-deleted": "Páginas eliminadas",
 	"pages-moved": "Páginas movidas",
 	"pageviews": "Visualizações de página",
 	"patrol": "Patrulhar",
+	"patrols-desc": "$2 {{PLURAL:$1|artigo patrulhado|artigos patrulhados}}",
 	"percentage": "Percentagem",
 	"powered-by": "Responsabilidade de $1",
 	"project": "Projeto",
@@ -118,6 +122,7 @@
 	"quote-number": "Citação número #",
 	"quote-random": "Obter uma citação aleatória",
 	"quote-show-all": "Mostrar todas as citações",
+	"recent-activity-desc": "$2 {{PLURAL:$1|edição|edições}} nos últimos 720 dias",
 	"redirects": "Redirecionamentos",
 	"redirfilter-all": "Incluir redirecionamentos e não redirecionamentos",
 	"redirfilter-noredirects": "Excluir redirecionamentos",
