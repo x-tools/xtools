@@ -1,5 +1,14 @@
 # Release Notes #
 
+## 3.1.19 ##
+- T181954: Fix display of page watchers in ArticleInfo.
+- T179763: Link to documentation in Admin Score.
+- T179764: Show data along with score in Admin Score.
+- T179508: Fix checking of account age in Admin Score.
+- Use specialized escaping of page titles in articleinfo.js.
+- Fix bug with AutomatedEditsHelper affecting single-wiki installations.
+- Localization updates.
+
 ## 3.1.18 ##
 - T180803: Fix sorting of date column in Pages Created tool.
 - T179313: Revive checking of basic Wikidata errors in ArticleInfo.
