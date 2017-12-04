@@ -320,7 +320,7 @@ class ProjectRepository extends Repository
      */
     public function getPage(Project $project, $pageName)
     {
-        $pageRepo = new PagesRepository();
+        $pageRepo = new PageRepository();
         $pageRepo->setContainer($this->container);
         $page = new Page($project, $pageName);
         $page->setRepository($pageRepo);

@@ -7,7 +7,7 @@ namespace Tests\Xtools;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Xtools\Page;
-use Xtools\PagesRepository;
+use Xtools\PageRepository;
 use Xtools\Project;
 use Xtools\ProjectRepository;
 use Xtools\User;
@@ -35,7 +35,7 @@ class PageTest extends WebTestCase
     public function testTitles()
     {
         $project = new Project('TestProject');
-        $pageRepo = $this->getMock(PagesRepository::class, ['getPageInfo']);
+        $pageRepo = $this->getMock(PageRepository::class, ['getPageInfo']);
         $data = [
             [$project, 'Test_Page_1', ['title' => 'Test_Page_1']],
             [$project, 'Test_Page_2', ['title' => 'Test_Page_2', 'displaytitle' => '<em>Test</em> page 2']],
@@ -66,7 +66,7 @@ class PageTest extends WebTestCase
      */
     public function testExists()
     {
-        $pageRepo = $this->getMock(PagesRepository::class, ['getPageInfo']);
+        $pageRepo = $this->getMock(PageRepository::class, ['getPageInfo']);
         $project = new Project('TestProject');
         // Mock data (last element of each array is the return value).
         $data = [
@@ -101,7 +101,7 @@ class PageTest extends WebTestCase
                 'User',
             ]);
 
-        $pageRepo = $this->getMock(PagesRepository::class, ['getPageInfo']);
+        $pageRepo = $this->getMock(PageRepository::class, ['getPageInfo']);
         $pageRepo->expects($this->once())
             ->method('getPageInfo')
             ->willReturn([
@@ -132,7 +132,7 @@ class PageTest extends WebTestCase
      */
     public function testWikitext()
     {
-        $pageRepo = new PagesRepository();
+        $pageRepo = new PageRepository();
         $pageRepo->setContainer($this->container);
         $project = ProjectRepository::getProject('en.wikipedia.org', $this->container);
         $page = new Page($project, 'Main Page');
@@ -160,7 +160,7 @@ class PageTest extends WebTestCase
             ],
         ];
 
-        $pageRepo = $this->getMock(PagesRepository::class, ['getPageInfo', 'getWikidataItems']);
+        $pageRepo = $this->getMock(PageRepository::class, ['getPageInfo', 'getWikidataItems']);
         $pageRepo->method('getPageInfo')
             ->willReturn([
                 'pageprops' => [
@@ -176,7 +176,7 @@ class PageTest extends WebTestCase
         $this->assertArraySubset($wikidataItems, $page->getWikidataItems());
 
         // If no wikidata item...
-        $pageRepo2 = $this->getMock(PagesRepository::class, ['getPageInfo']);
+        $pageRepo2 = $this->getMock(PageRepository::class, ['getPageInfo']);
         $pageRepo2->expects($this->once())
             ->method('getPageInfo')
             ->willReturn([
@@ -193,7 +193,7 @@ class PageTest extends WebTestCase
      */
     public function testCountWikidataItems()
     {
-        $pageRepo = $this->getMock(PagesRepository::class, ['getWikidataItems']);
+        $pageRepo = $this->getMock(PageRepository::class, ['getWikidataItems']);
         $page = new Page(new Project('TestProject'), 'Test_Page');
         $pageRepo->method('getWikidataItems')
             ->with($page, true)
@@ -210,7 +210,7 @@ class PageTest extends WebTestCase
      */
     public function testUsersEdits()
     {
-        $pageRepo = $this->getMock(PagesRepository::class, ['getRevisions']);
+        $pageRepo = $this->getMock(PageRepository::class, ['getRevisions']);
         $pageRepo
             ->method('getRevisions')
             ->with()
@@ -235,7 +235,7 @@ class PageTest extends WebTestCase
      */
     public function testWikidataErrors()
     {
-        $pageRepo = $this->getMock(PagesRepository::class, ['getWikidataInfo', 'getPageInfo']);
+        $pageRepo = $this->getMock(PageRepository::class, ['getWikidataInfo', 'getPageInfo']);
 
         $pageRepo
             ->method('getWikidataInfo')
@@ -279,7 +279,7 @@ class PageTest extends WebTestCase
      */
     public function testErrors()
     {
-        $pageRepo = $this->getMock(PagesRepository::class, [
+        $pageRepo = $this->getMock(PageRepository::class, [
             'getWikidataInfo', 'getCheckWikiErrors', 'getPageInfo'
         ]);
         $checkWikiErrors = [
@@ -338,7 +338,7 @@ class PageTest extends WebTestCase
             ],
         ];
 
-        $pageRepo = $this->getMock(PagesRepository::class, ['getPageviews']);
+        $pageRepo = $this->getMock(PageRepository::class, ['getPageviews']);
         $pageRepo->method('getPageviews')->willReturn($pageviewsData);
         $page = new Page(new Project('exampleWiki'), 'Page');
         $page->setRepository($pageRepo);
@@ -356,7 +356,7 @@ class PageTest extends WebTestCase
      */
     public function testIsMainPage()
     {
-        $pageRepo = new PagesRepository();
+        $pageRepo = new PageRepository();
         $pageRepo->setContainer($this->container);
         $project = ProjectRepository::getProject('en.wikipedia.org', $this->container);
         $page = new Page($project, 'Main Page');
@@ -375,7 +375,7 @@ class PageTest extends WebTestCase
             'links_in_count' => '33300',
             'redirects_count' => '61',
         ];
-        $pageRepo = $this->getMock(PagesRepository::class, ['countLinksAndRedirects']);
+        $pageRepo = $this->getMock(PageRepository::class, ['countLinksAndRedirects']);
         $pageRepo->method('countLinksAndRedirects')->willReturn($data);
         $page = new Page(new Project('exampleWiki'), 'Page');
         $page->setRepository($pageRepo);
@@ -396,7 +396,7 @@ class PageTest extends WebTestCase
 
         $project = ProjectRepository::getProject('en.wikipedia.org', $this->container);
 
-        $pageRepo = $this->getMock(PagesRepository::class, ['getAssessments', 'getPageInfo']);
+        $pageRepo = $this->getMock(PageRepository::class, ['getAssessments', 'getPageInfo']);
         $pageRepo->method('getAssessments')
             ->with($project)
             ->willReturn([

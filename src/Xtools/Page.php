@@ -281,7 +281,7 @@ class Page extends Model
 
     /**
      * Get the statement for a single revision, so that you can iterate row by row.
-     * @see PagesRepository::getRevisionsStmt()
+     * @see PageRepository::getRevisionsStmt()
      * @param User|null $user Specify to get only revisions by the given user.
      * @param int $limit Max number of revisions to process.
      * @param int $numRevisions Number of revisions, if known. This is used solely to determine the
@@ -291,8 +291,8 @@ class Page extends Model
      */
     public function getRevisionsStmt(User $user = null, $limit = null, $numRevisions = null)
     {
-        // If we have a limit, we need to know the total number of revisions so that PagesRepo
-        // will properly set the OFFSET. See PagesRepository::getRevisionsStmt() for more info.
+        // If we have a limit, we need to know the total number of revisions so that PageRepo
+        // will properly set the OFFSET. See PageRepository::getRevisionsStmt() for more info.
         if (isset($limit) && $numRevisions === null) {
             $numRevisions = $this->getNumRevisions($user);
         }

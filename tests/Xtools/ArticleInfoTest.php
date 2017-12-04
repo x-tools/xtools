@@ -12,7 +12,7 @@ use Xtools\Edit;
 use Xtools\Project;
 use Xtools\ProjectRepository;
 use Xtools\Page;
-use Xtools\PagesRepository;
+use Xtools\PageRepository;
 use DateTime;
 use Doctrine\DBAL\Driver\PDOStatement;
 
@@ -54,11 +54,11 @@ class ArticleInfoTest extends WebTestCase
      */
     public function testNumRevisions()
     {
-        $pagesRepo = $this->getMock(PagesRepository::class);
-        $pagesRepo->expects($this->once())
+        $pageRepo = $this->getMock(PageRepository::class);
+        $pageRepo->expects($this->once())
             ->method('getNumRevisions')
             ->willReturn(10);
-        $this->page->setRepository($pagesRepo);
+        $this->page->setRepository($pageRepo);
         $this->assertEquals(10, $this->articleInfo->getNumRevisions());
         // Should be cached (will error out if repo's getNumRevisions is called again).
         $this->assertEquals(10, $this->articleInfo->getNumRevisions());
@@ -70,9 +70,9 @@ class ArticleInfoTest extends WebTestCase
      */
     public function testRevisionsProcessed($numRevisions, $assertion)
     {
-        $pagesRepo = $this->getMock(PagesRepository::class);
-        $pagesRepo->method('getNumRevisions')->willReturn($numRevisions);
-        $this->page->setRepository($pagesRepo);
+        $pageRepo = $this->getMock(PageRepository::class);
+        $pageRepo->method('getNumRevisions')->willReturn($numRevisions);
+        $this->page->setRepository($pageRepo);
         $this->assertEquals(
             $this->articleInfo->getNumRevisionsProcessed(),
             $assertion
@@ -96,11 +96,11 @@ class ArticleInfoTest extends WebTestCase
      */
     public function testTooManyRevisions()
     {
-        $pagesRepo = $this->getMock(PagesRepository::class);
-        $pagesRepo->expects($this->once())
+        $pageRepo = $this->getMock(PageRepository::class);
+        $pageRepo->expects($this->once())
             ->method('getNumRevisions')
             ->willReturn(1000000);
-        $this->page->setRepository($pagesRepo);
+        $this->page->setRepository($pageRepo);
         $this->assertTrue($this->articleInfo->tooManyRevisions());
     }
 
@@ -128,8 +128,8 @@ class ArticleInfoTest extends WebTestCase
 
     public function testLinksAndRedirects()
     {
-        $pagesRepo = $this->getMock(PagesRepository::class);
-        $pagesRepo->expects($this->once())
+        $pageRepo = $this->getMock(PageRepository::class);
+        $pageRepo->expects($this->once())
             ->method('countLinksAndRedirects')
             ->willReturn([
                 'links_ext_count' => 5,
@@ -137,7 +137,7 @@ class ArticleInfoTest extends WebTestCase
                 'links_in_count' => 10,
                 'redirects_count' => 0,
             ]);
-        $this->page->setRepository($pagesRepo);
+        $this->page->setRepository($pageRepo);
         $this->assertEquals(5, $this->articleInfo->linksExtCount());
         $this->assertEquals(3, $this->articleInfo->linksOutCount());
         $this->assertEquals(10, $this->articleInfo->linksInCount());

@@ -17,7 +17,6 @@ use FOS\RestBundle\View\View;
 use Xtools\ProjectRepository;
 use Xtools\UserRepository;
 use Xtools\Page;
-use Xtools\PagesRepository;
 use Xtools\Edit;
 use DateTime;
 
