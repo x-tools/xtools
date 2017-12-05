@@ -5,7 +5,6 @@
 
 namespace Xtools;
 
-use Symfony\Component\DependencyInjection\Container;
 use DateTime;
 
 /**

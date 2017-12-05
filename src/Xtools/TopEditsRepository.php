@@ -5,8 +5,6 @@
 
 namespace Xtools;
 
-use DateInterval;
-
 /**
  * TopEditsRepository is responsible for retrieving data from the database
  * about the top-edited pages of a user. It doesn't do any post-processing
@@ -62,10 +60,7 @@ class TopEditsRepository extends Repository
         $results = $resultQuery->fetchAll();
 
         // Cache for 10 minutes, and return.
-        $cacheItem = $this->cache->getItem($cacheKey)
-            ->set($results)
-            ->expiresAfter(new DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
+        $this->setCache($cacheKey, $results);
 
         return $results;
     }
@@ -125,10 +120,7 @@ class TopEditsRepository extends Repository
         $results = $resultQuery->fetchAll();
 
         // Cache for 10 minutes, and return.
-        $cacheItem = $this->cache->getItem($cacheKey)
-            ->set($results)
-            ->expiresAfter(new DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
+        $this->setCache($cacheKey, $results);
 
         return $results;
     }

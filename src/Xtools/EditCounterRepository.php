@@ -8,6 +8,7 @@ namespace Xtools;
 use DateInterval;
 use DateTime;
 use Mediawiki\Api\SimpleRequest;
+use Xtools\AutoEditsRepository;
 
 /**
  * An EditCounterRepository is responsible for retrieving edit count information from the
@@ -577,5 +578,18 @@ class EditCounterRepository extends Repository
 
         $this->stopwatch->stop($cacheKey);
         return $results;
+    }
+
+    /**
+     * Get the number of edits this user made using semi-automated tools.
+     * @param Project $project
+     * @param User $user
+     * @return int Result of query, see below.
+     */
+    public function countAutomatedEdits(Project $project, User $user)
+    {
+        $autoEditsRepo = new AutoEditsRepository();
+        $autoEditsRepo->setContainer($this->container);
+        return $autoEditsRepo->countAutomatedEdits($project, $user);
     }
 }

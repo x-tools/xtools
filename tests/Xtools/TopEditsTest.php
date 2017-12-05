@@ -31,7 +31,7 @@ class TopEditsTest extends PHPUnit_Framework_TestCase
     protected $user;
 
     /**
-     * Set up container, class instances and mocks.
+     * Set up class instances and mocks.
      */
     public function setUp()
     {

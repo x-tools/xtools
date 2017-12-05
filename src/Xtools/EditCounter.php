@@ -608,7 +608,10 @@ class EditCounter extends Model
         if ($this->autoEditCount) {
             return $this->autoEditCount;
         }
-        $this->autoEditCount = $this->user->countAutomatedEdits($this->project);
+        $this->autoEditCount = $this->getRepository()->countAutomatedEdits(
+            $this->project,
+            $this->user
+        );
         return $this->autoEditCount;
     }
 

@@ -17,7 +17,6 @@ use Xtools\Page;
 use Xtools\Project;
 use Xtools\ProjectRepository;
 use Xtools\User;
-use Xtools\UserRepository;
 
 /**
  * Class EditCounterController
