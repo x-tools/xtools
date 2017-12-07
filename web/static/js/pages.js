@@ -5,16 +5,16 @@ $(function () {
         return;
     }
 
-    setupToggleTable(window.countsByNamespace, window.pieChart, 'total', function (newData) {
+    setupToggleTable(window.countsByNamespace, window.pieChart, 'count', function (newData) {
         var totals = {
             count: 0,
             deleted: 0,
-            redirect: 0,
+            redirects: 0,
         };
         Object.keys(newData).forEach(function (ns) {
-            totals.count += newData[ns].total;
+            totals.count += newData[ns].count;
             totals.deleted += newData[ns].deleted;
-            totals.redirect += newData[ns].redirect;
+            totals.redirects += newData[ns].redirects;
         });
         $('.namespaces--namespaces').text(
             Object.keys(newData).length.toLocaleString() + " " +
@@ -29,8 +29,8 @@ $(function () {
             ((totals.deleted / totals.count) * 100).toFixed(1) + "%)"
         );
         $('.namespaces--redirects').text(
-            totals.redirect.toLocaleString() + " (" +
-            ((totals.redirect / totals.count) * 100).toFixed(1) + "%)"
+            totals.redirects.toLocaleString() + " (" +
+            ((totals.redirects / totals.count) * 100).toFixed(1) + "%)"
         );
     });
 });

@@ -285,7 +285,9 @@ class UserRepository extends Repository
 
         $sql = "SELECT * FROM (".
                     $this->getPagesCreatedInnerSql($project, $conditions)."
-                ) a ".(!empty($limit) ? "LIMIT $limit OFFSET $offset" : '');
+                ) a
+                ORDER BY rev_timestamp DESC
+                ".(!empty($limit) ? "LIMIT $limit OFFSET $offset" : '');
 
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $resultQuery->execute();

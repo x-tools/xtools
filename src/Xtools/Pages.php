@@ -14,7 +14,8 @@ use DateTime;
  */
 class Pages extends Model
 {
-    const RESULTS_PER_PAGE = 1000;
+    const RESULTS_LIMIT_SINGLE_NAMESPACE = 1000;
+    const RESULTS_LIMIT_ALL_NAMESPACES = 100;
 
     /** @var Project The project. */
     protected $project;
@@ -113,15 +114,19 @@ class Pages extends Model
      */
     public function prepareData()
     {
-        $data = $this->fetchPagesCreated();
-        $this->pages = $this->formatPages($data);
+        $this->pages = [];
+
+        foreach ($this->getNamespaces() as $ns) {
+            $data = $this->fetchPagesCreated($ns);
+            $this->pages[$ns] = $this->formatPages($data)[$ns];
+        }
 
         return $this->pages;
     }
 
     /**
      * The public function to get the list of all pages created by the user,
-     * (up to self::RESULTS_PER_PAGE), across all namespaces.
+     * up to self::resultsPerPage(), across all namespaces.
      * @return array
      */
     public function getResults()
@@ -133,14 +138,27 @@ class Pages extends Model
     }
 
     /**
+     * Get the total number of pages the user has created.
+     * @return int
+     */
+    public function getNumPages()
+    {
+        $total = 0;
+        foreach ($this->getCounts() as $ns => $values) {
+            $total += $values['count'];
+        }
+        return $total;
+    }
+
+    /**
      * Get the total number of pages we're showing data for.
      * @return int
      */
     public function getNumResults()
     {
         $total = 0;
-        foreach ($this->getCounts() as $ns => $values) {
-            $total += $values['count'];
+        foreach ($this->getResults() as $ns => $pages) {
+            $total += count($pages);
         }
         return $total;
     }
@@ -172,6 +190,15 @@ class Pages extends Model
     }
 
     /**
+     * Get the namespaces in which this user has created pages.
+     * @return string[] The IDs.
+     */
+    public function getNamespaces()
+    {
+        return array_keys($this->getCounts());
+    }
+
+    /**
      * Number of namespaces being reported.
      * @return int
      */
@@ -194,14 +221,29 @@ class Pages extends Model
 
         foreach ($this->countPagesCreated() as $row) {
             $counts[$row['namespace']] = [
-                'count' => $row['count'],
-                'deleted' => $row['deleted'],
-                'redirects' => $row['redirects'],
+                'count' => (int)$row['count'],
+                'deleted' => (int)$row['deleted'],
             ];
+
+            if (!in_array($this->redirects, ['noredirects', 'onlyredirects'])) {
+                $counts[$row['namespace']]['redirects'] = (int)$row['redirects'];
+            }
         }
 
         $this->countsByNamespace = $counts;
         return $this->countsByNamespace;
+    }
+
+    /**
+     * Number of results to show, depending on the namespace.
+     * @return int
+     */
+    public function resultsPerPage()
+    {
+        if ($this->namespace === 'all') {
+            return self::RESULTS_LIMIT_ALL_NAMESPACES;
+        }
+        return self::RESULTS_LIMIT_SINGLE_NAMESPACE;
     }
 
     /**
@@ -218,32 +260,20 @@ class Pages extends Model
 
     /**
      * Run the query to get pages created by the user with options.
+     * This is ran independently for each namespace if $this->namespace is 'all'.
+     * @param string $namespace Namespace ID.
      * @return array
      */
-    private function fetchPagesCreated()
+    private function fetchPagesCreated($namespace)
     {
         return $this->user->getRepository()->getPagesCreated(
             $this->project,
             $this->user,
-            $this->namespace,
-            $this->redirects
-            // $this->resultsPerPage(),
-            // $this->offset * $this->resultsPerPage()
+            $namespace,
+            $this->redirects,
+            $this->resultsPerPage(),
+            $this->offset * $this->resultsPerPage()
         );
-    }
-
-    /**
-     * Number of results to show, depending on the namespace.
-     * FIXME: This is a temporary measure. Ultimately we want UserRepository::getPagesCreated()
-     * to apply the limit to each individual namespace it collects pages for.
-     * @return int
-     */
-    private function resultsPerPage()
-    {
-        if ($this->namespace === 'all') {
-            return 0;
-        }
-        return self::RESULTS_PER_PAGE;
     }
 
     /**
@@ -272,8 +302,11 @@ class Pages extends Model
         $results = [];
 
         foreach ($pages as $row) {
+            // if (!isset($results[$row['namespace']])) {
+            //     $results[$row['namespace']] = [];
+            // }
+
             $datetime = DateTime::createFromFormat('YmdHis', $row['rev_timestamp']);
-            $datetimeKey = $datetime->format('YmdHi');
             $datetimeHuman = $datetime->format('Y-m-d H:i');
 
             $pageData = array_merge($row, [
@@ -286,14 +319,14 @@ class Pages extends Model
                 $pageData['badge'] = $this->project->getAssessmentBadgeURL($pageData['pa_class']);
             }
 
-            $results[$row['namespace']][$datetimeKey][] = $pageData;
+            $results[$row['namespace']][] = $pageData;
         }
 
-        ksort($results);
+        // ksort($results);
 
-        foreach (array_keys($results) as $key) {
-            krsort($results[$key]);
-        }
+        // foreach (array_keys($results) as $key) {
+        //     krsort($results[$key]);
+        // }
 
         return $results;
     }
