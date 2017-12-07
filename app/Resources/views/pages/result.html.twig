@@ -46,7 +46,7 @@
                 </tbody></table>
             </div>
             <div style="clear:both"></div>
-            {% if pages.numResults == 0 %}
+            {% if pages.getNumPages == 0 %}
                 <div class="alert alert-info">
                     {{ msg('no-result', [user.username]) }}
                 </div>
@@ -105,17 +105,17 @@
                                 {{ msg('num-namespaces', [pages.numNamespaces]) }}
                             </th>
                             <th class="namespaces--pages">
-                                {{ pages.numResults|num_format }}
+                                {{ pages.getNumPages|num_format }}
                             </th>
                             {% if 'redirects' in summaryColumns and 'pages' in summaryColumns %}
                                 <th class="namespaces--redirects">
                                     {{ pages.numRedirects|num_format }}
-                                    ({{ pages.numRedirects|percent_format(pages.numResults) }})
+                                    ({{ pages.numRedirects|percent_format(pages.getNumPages) }})
                                 </th>
                             {% endif %}
                             <th class="namespaces--deleted">
                                 {{ pages.numDeleted|num_format }}
-                                ({{ pages.numDeleted|percent_format(pages.numResults) }})
+                                ({{ pages.numDeleted|percent_format(pages.getNumPages) }})
                             </th>
                         </tfoot>
                     {% endif %}
@@ -129,13 +129,13 @@
         {% endset %}
         {{ layout.content_block('summary', content) }}
 
-        {% for key in pages.results|keys %}
+        {% for ns in pages.results|keys %}
             {% set content %}
-                <table class="table table-bordered table-hover table-striped top-editors-table">
+                <table class="table table-bordered table-hover table-striped pages-table">
                     <thead><tr>
                         <th>#</th>
                         {% set columns = ['page-title', 'date', 'original-size', 'current-size'] %}
-                        {% if key == '0' and pages.hasPageAssessments %}
+                        {% if ns == '0' and pages.hasPageAssessments %}
                             {% set columns = columns|merge(['assessment']) %}
                         {% endif %}
                         {% for thKey in columns %}
@@ -151,84 +151,117 @@
                     <tbody>
                         {% set index = 0 %}
                         {% set maxRows = 100 %}
-                        {% for date,pageList in pages.results[key] if not(multiNamspace) or (index < maxRows and multiNamspace) %}
-                            {% for page in pageList if not(multiNamspace) or (index < maxRows and multiNamspace) %}
-                                {% set index = index + 1 %}
-                                {% if key == 0 %}
-                                    {% set pagename = page.page_title %}
-                                {% else %}
-                                    {% set pagename = project.namespaces[key] ~ ":" ~ page.page_title %}
-                                {% endif %}
-                                <tr>
-                                    <td>{{ index }}</td>
-                                    <td class="sort-entry--page-title" data-value="{{ pagename }}">
-                                        {% if page.page_is_redirect %}
-                                            {{ wiki.pageLinkRaw(pagename, project, pagename, 'redirect=no') }}
-                                            <small class="text-muted">&middot; ({{ msg('redirect') }})</small>
-                                        {% else %}
-                                            {{ wiki.pageLinkRaw(pagename, project) }}
-                                        {% endif %}
-                                        {% if page.type == 'arc' %}
-                                            <small class="text-danger">&middot; ({{ msg('deleted') }})</small>
-                                        {% endif %}
-                                    </td>
-                                    <td class="sort-entry--date" data-value="{{ date }}">
-                                        {% if page.type == 'arc' %}
-                                            {{ wiki.pageLinkRaw('Special:Undelete/' ~ pagename, project, page.human_time, 'timestamp=' ~ page.raw_time) }}
-                                        {% else %}
-                                            {{ wiki.permaLinkRaw(page.rev_id, project, page.human_time) }}
-                                        {% endif %}
-                                    </td>
-                                    <td class="sort-entry--original-size" data-value="{{ page.rev_len }}">
-                                        {{ page.rev_len|num_format }}
-                                    </td>
-                                    <td class="sort-entry--current-size" data-value="{{ page.page_len }}">
-                                        {{ page.page_len|num_format }}
-                                    </td>
-                                    {% if key == '0' and pages.hasPageAssessments %}
-                                        <td class="sort-entry--assessment" data-value="{{ page.pa_class ? page.pa_class : 'Unknown' }}">
-                                            {% if page.badge is defined %}
-                                            <img alt="{{ page.pa_class }}" src="{{ page.badge }}" class="assessment-badge" />
-                                            {% endif %}
-                                            {{ page.pa_class ? page.pa_class : msg('unknown') }}
-                                        </td>
+                        {% for page in pages.results[ns] if not(multiNamspace) or (index < maxRows and multiNamspace) %}
+                            {% set index = index + 1 %}
+                            {% if ns == 0 %}
+                                {% set pagename = page.page_title %}
+                            {% else %}
+                                {% set pagename = project.namespaces[ns] ~ ":" ~ page.page_title %}
+                            {% endif %}
+                            <tr>
+                                <td>{{ index }}</td>
+                                <td class="sort-entry--page-title" data-value="{{ pagename }}">
+                                    {% if page.page_is_redirect %}
+                                        {{ wiki.pageLinkRaw(pagename, project, pagename, 'redirect=no') }}
+                                        <small class="text-muted">&middot; ({{ msg('redirect') }})</small>
+                                    {% else %}
+                                        {{ wiki.pageLinkRaw(pagename, project) }}
                                     {% endif %}
-                                    <td>
-                                        {{ wiki.pageLogLinkRaw(pagename, project) }}
-                                        &middot;
-                                        {{ wiki.pageHistLinkRaw(pagename, project) }}
-                                        {% if enabled('articleinfo') %}
-                                            &middot;
-                                            <a href="{{ path('articleinfo', { 'project': project.domain, 'article': pagename }) }}">{{ msg('tool-articleinfo') }}</a>
+                                    {% if page.type == 'arc' %}
+                                        <small class="text-danger">&middot; ({{ msg('deleted') }})</small>
+                                    {% endif %}
+                                </td>
+                                <td class="sort-entry--date" data-value="{{ page.raw_time }}">
+                                    {% if page.type == 'arc' %}
+                                        {{ wiki.pageLinkRaw('Special:Undelete/' ~ pagename, project, page.human_time, 'timestamp=' ~ page.raw_time) }}
+                                    {% else %}
+                                        {{ wiki.permaLinkRaw(page.rev_id, project, page.human_time) }}
+                                    {% endif %}
+                                </td>
+                                <td class="sort-entry--original-size" data-value="{{ page.rev_len }}">
+                                    {{ page.rev_len|num_format }}
+                                </td>
+                                <td class="sort-entry--current-size" data-value="{{ page.page_len }}">
+                                    {{ page.page_len|num_format }}
+                                </td>
+                                {% if ns == '0' and pages.hasPageAssessments %}
+                                    <td class="sort-entry--assessment" data-value="{{ page.pa_class ? page.pa_class : 'Unknown' }}">
+                                        {% if page.badge is defined %}
+                                        <img alt="{{ page.pa_class }}" src="{{ page.badge }}" class="assessment-badge" />
                                         {% endif %}
-                                        {% if enabled('topedits') %}
-                                            &middot;
-                                            <a href="{{ path('topedits', { 'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'page': page.page_title }) }}">{{ msg('tool-topedits') }}</a>
-                                        {% endif %}
-                                        {% if isWMFLabs() %}
-                                            &middot;
-                                            <a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project.domain }}&amp;pages={{ pagename|e('url') }}">
-                                                {{ msg('pageviews') }}
-                                            </a>
-                                        {% endif %}
+                                        {{ page.pa_class ? page.pa_class : msg('unknown') }}
                                     </td>
-                                </tr>
-                            {% endfor %}
+                                {% endif %}
+                                <td>
+                                    {{ wiki.pageLogLinkRaw(pagename, project) }}
+                                    &middot;
+                                    {{ wiki.pageHistLinkRaw(pagename, project) }}
+                                    {% if enabled('articleinfo') %}
+                                        &middot;
+                                        <a href="{{ path('articleinfo', { 'project': project.domain, 'article': pagename }) }}">{{ msg('tool-articleinfo') }}</a>
+                                    {% endif %}
+                                    {% if enabled('topedits') %}
+                                        &middot;
+                                        <a href="{{ path('topedits', { 'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'page': page.page_title }) }}">{{ msg('tool-topedits') }}</a>
+                                    {% endif %}
+                                    {% if isWMFLabs() %}
+                                        &middot;
+                                        <a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project.domain }}&amp;pages={{ pagename|e('url') }}">
+                                            {{ msg('pageviews') }}
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
                         {% endfor %}
-                        {% if pages.counts[key].count > maxRows and multiNamspace %}
+                        {% if pages.counts[ns].count > maxRows and multiNamspace %}
                             <tr class="show-more-row">
                                 <td></td>
                                 <td colspan=6>
-                                    <a href="{{ path('pages', { 'project': project.domain, 'username': user.username, 'namespace': key, 'redirects': pages.redirects }) }}">
-                                        {{ pages.counts[key].count - maxRows }} {{ msg('num-others', [pages.counts[key].count - maxRows]) }}
+                                    <a href="{{ path('pages', { 'project': project.domain, 'username': user.username, 'namespace': ns, 'redirects': pages.redirects }) }}">
+                                        {{ pages.counts[ns].count - maxRows }} {{ msg('num-others', [pages.counts[ns].count - maxRows]) }}
                                     </a>
                                 </td>
                             </tr>
                         {% endif %}
                     </tbody>
                 </table>
+
+                {##### PAGINATION #####}
+                {% if not(multiNamspace) %}
+                    {% set numPages = (pages.getNumPages / pages.resultsPerPage)|round(0, 'ceil') %}
+                    {% set hasPrev = pages.offset - 1 >= 0 %}
+                    {% set hasNext = pages.offset + 1 < numPages %}
+                    {% set pathVars = {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects} %}
+
+                    <nav aria-label="...">
+                        <ul class="pagination xt-pagination">
+                            <li{% if not(hasPrev) %} class="disabled"{% endif %}>
+                                {% if hasPrev %}
+                                    <a href="{{ path('pages', pathVars|merge({'offset': pages.offset - 1})) }}" aria-label="Previous">
+                                {% endif %}
+                                <span aria-hidden="true">&laquo;</span>
+                                {% if hasPrev %}</a>{% endif %}
+                            </li>
+                            {% for page in 1..numPages %}
+                                {% set active = pages.offset == loop.index0 %}
+                                <li{% if active %} class="active"{% endif %}>
+                                    <a href="{{ path('pages', pathVars|merge({'offset': loop.index0})) }}">
+                                        {{ page }} {% if active %}<span class="sr-only">(current)</span>{% endif %}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                            <li{% if not(hasNext) %} class="disabled"{% endif %}>
+                                {% if hasNext %}
+                                    <a href="{{ path('pages', pathVars|merge({'offset': pages.offset + 1})) }}" aria-label="Next">
+                                {% endif %}
+                                <span aria-hidden="true">&raquo;</span>
+                                {% if hasNext %}</a>{% endif %}
+                            </li>
+                        </ul>
+                    </nav>
+                {% endif %}
             {% endset %}
-            {{ layout.content_block(nsName(key, project.namespaces), content, null, key, true) }}
+            {{ layout.content_block(nsName(ns, project.namespaces), content, null, ns, true) }}
         {% endfor %}
 
         <div class="text-muted times-in-utc" style="clear:both">

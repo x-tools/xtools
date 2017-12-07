@@ -84,7 +84,6 @@ class PagesTest extends PHPUnit_Framework_TestCase
         $results = $pr->getResults();
 
         $this->assertEquals([0, 1], array_keys($results));
-        $this->assertEquals(['201605190000', '201601010000'], array_keys($results[0]));
         $this->assertEquals([
             'namespace' => '0',
             'type' => 'arc',
@@ -96,23 +95,15 @@ class PagesTest extends PHPUnit_Framework_TestCase
             'raw_time' => '20160519000000',
             'human_time' => '2016-05-19 00:00',
             'badge' => '',
-        ], $results[0]['201605190000'][0]);
+        ], $results[0][0]);
     }
 
     public function setPagesResults()
     {
-        $this->userRepo->expects($this->once())
+        $this->userRepo->expects($this->exactly(2))
             ->method('getPagesCreated')
             ->willReturn([
                 [
-                    'namespace' => '0',
-                    'type' => 'rev',
-                    'page_title' => 'Foo_bar',
-                    'page_is_redirect' => '0',
-                    'rev_timestamp' => '20160101000000',
-                    'pa_class' => 'FA',
-                    'pa_importance' => '',
-                ], [
                     'namespace' => '1',
                     'type' => 'rev',
                     'page_title' => 'Gooogle',
@@ -127,6 +118,14 @@ class PagesTest extends PHPUnit_Framework_TestCase
                     'page_is_redirect' => '0',
                     'rev_timestamp' => '20160519000000',
                     'pa_class' => '',
+                    'pa_importance' => '',
+                ], [
+                    'namespace' => '0',
+                    'type' => 'rev',
+                    'page_title' => 'Foo_bar',
+                    'page_is_redirect' => '0',
+                    'rev_timestamp' => '20160101000000',
+                    'pa_class' => 'FA',
                     'pa_importance' => '',
                 ],
             ]);

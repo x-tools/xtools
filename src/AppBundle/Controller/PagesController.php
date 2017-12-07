@@ -8,9 +8,10 @@ namespace AppBundle\Controller;
 use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Xtools\ProjectRepository;
 use Xtools\UserRepository;
 use Xtools\Pages;
@@ -130,5 +131,114 @@ class PagesController extends XtoolsController
         $summaryColumns[] = 'deleted';
 
         return $summaryColumns;
+    }
+
+    /************************ API endpoints ************************/
+
+    /**
+     * Get a count of the number of pages created by a user,
+     * including the number that have been deleted and are redirects.
+     * @Route("/api/pages_count/{project}/{username}/{namespace}/{redirects}", name="PagesApiCount",
+     *     requirements={"namespace"="|\d+|all"})
+     * @param Request $request
+     * @param int|string $namespace The ID of the namespace of the page, or 'all' for all namespaces.
+     * @param string     $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
+     * @return Response
+     * @codeCoverageIgnore
+     */
+    public function countPagesApiAction(Request $request, $namespace = 0, $redirects = 'noredirects')
+    {
+        $ret = $this->validateProjectAndUser($request);
+        if ($ret instanceof RedirectResponse) {
+            return $ret;
+        } else {
+            list($project, $user) = $ret;
+        }
+
+        $pages = new Pages(
+            $project,
+            $user,
+            $namespace,
+            $redirects
+        );
+
+        $response = new JsonResponse();
+        $response->setEncodingOptions(JSON_NUMERIC_CHECK);
+        $response->setStatusCode(Response::HTTP_OK);
+
+        $counts = $pages->getCounts();
+
+        if ($namespace !== 'all' && isset($counts[$namespace])) {
+            $counts = $counts[$namespace];
+        }
+
+        $ret = [
+            'project' => $project->getDomain(),
+            'username' => $user->getUsername(),
+            'namespace' => $namespace,
+            'redirects' => $redirects,
+            'counts' => $counts,
+        ];
+
+        $response->setData($ret);
+
+        return $response;
+    }
+
+    /**
+     * Get the pages created by by a user.
+     * @Route("/api/pages/{project}/{username}/{namespace}/{redirects}/{offset}", name="PagesApi",
+     *     requirements={"namespace"="|\d+|all"})
+     * @param Request $request
+     * @param int|string $namespace The ID of the namespace of the page, or 'all' for all namespaces.
+     * @param string     $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
+     * @param int        $offset Which page of results to show.
+     * @return Response
+     * @codeCoverageIgnore
+     */
+    public function getPagesApiAction(Request $request, $namespace = 0, $redirects = 'noredirects', $offset = 0)
+    {
+        // Second parameter causes it return a Redirect to the index if the user has too many edits.
+        $ret = $this->validateProjectAndUser($request, 'pages');
+        if ($ret instanceof RedirectResponse) {
+            return $ret;
+        } else {
+            list($project, $user) = $ret;
+        }
+
+        $pages = new Pages(
+            $project,
+            $user,
+            $namespace,
+            $redirects,
+            $offset
+        );
+
+        $response = new JsonResponse();
+        $response->setEncodingOptions(JSON_NUMERIC_CHECK);
+        $response->setStatusCode(Response::HTTP_OK);
+
+        $pagesList = $pages->getResults();
+
+        if ($namespace !== 'all' && isset($pagesList[$namespace])) {
+            $pagesList = $pagesList[$namespace];
+        }
+
+        $ret = [
+            'project' => $project->getDomain(),
+            'username' => $user->getUsername(),
+            'namespace' => $namespace,
+            'redirects' => $redirects,
+        ];
+
+        if ($pages->getNumResults() === $pages->resultsPerPage()) {
+            $ret['continue'] = $offset + 1;
+        }
+
+        $ret['pages'] = $pagesList;
+
+        $response->setData($ret);
+
+        return $response;
     }
 }

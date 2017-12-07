@@ -206,6 +206,7 @@ abstract class XtoolsController extends Controller
             'redirects',
             'start',
             'end',
+            'offset',
 
             // Legacy parameters.
             'user',
