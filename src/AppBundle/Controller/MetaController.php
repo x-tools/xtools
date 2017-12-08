@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use DateTime;
 use Symfony\Component\HttpFoundation\Response;
+use Doctrine\DBAL\Connection;
 
 /**
  * This controller serves everything for the Meta tool.
@@ -53,14 +54,35 @@ class MetaController extends XtoolsController
     {
         $db = $legacy ? 'toolsdb' : 'default';
         $table = $legacy ? 's51187__metadata.xtools_timeline' : 'usage_timeline';
-
         $client = $this->container
             ->get('doctrine')
             ->getManager($db)
             ->getConnection();
 
+        $toolUsage = $this->getToolUsageStats($client, $table, $start, $end);
+        $apiUsage = $this->getApiUsageStats($client, $start, $end);
+
+        return $this->render('meta/result.html.twig', [
+            'xtPage' => 'meta',
+            'start' => $start,
+            'end' => $end,
+            'toolUsage' => $toolUsage,
+            'apiUsage' => $apiUsage,
+        ]);
+    }
+
+    /**
+     * Get usage statistics of the core tools.
+     * @param  Connection $client
+     * @param  string     $table Table to query.
+     * @param  string     $start Start date.
+     * @param  string     $end End date.
+     * @return array
+     */
+    private function getToolUsageStats(Connection $client, $table, $start, $end)
+    {
         $query = $client->prepare("SELECT * FROM $table
-                                 WHERE date >= :start AND date <= :end");
+                                   WHERE date >= :start AND date <= :end");
         $query->bindParam('start', $start);
         $query->bindParam('end', $end);
         $query->execute();
@@ -99,16 +121,69 @@ class MetaController extends XtoolsController
         }
         arsort($totals);
 
-        return $this->render('meta/result.html.twig', [
-            'xtPage' => 'meta',
-            'start' => $start,
-            'end' => $end,
-            'data' => $data,
+        return [
             'totals' => $totals,
             'grandSum' => $grandSum,
             'dateLabels' => $dateLabels,
             'timeline' => $timeline,
-        ]);
+        ];
+    }
+
+    /**
+     * Get usage statistics of the API.
+     * @param  Connection $client
+     * @param  string     $start Start date.
+     * @param  string     $end End date.
+     * @return array
+     */
+    private function getApiUsageStats(Connection $client, $start, $end)
+    {
+        $query = $client->prepare("SELECT * FROM usage_api_timeline
+                                   WHERE date >= :start AND date <= :end");
+        $query->bindParam('start', $start);
+        $query->bindParam('end', $end);
+        $query->execute();
+
+        $data = $query->fetchAll();
+
+        // Create array of totals, along with formatted timeline data as needed by Chart.js
+        $totals = [];
+        $dateLabels = [];
+        $timeline = [];
+        $startObj = new DateTime($start);
+        $endObj = new DateTime($end);
+        $numDays = (int) $endObj->diff($startObj)->format("%a");
+        $grandSum = 0;
+
+        // Generate array of date labels
+        for ($dateObj = new DateTime($start); $dateObj <= $endObj; $dateObj->modify('+1 day')) {
+            $dateLabels[] = $dateObj->format('Y-m-d');
+        }
+
+        foreach ($data as $entry) {
+            if (!isset($totals[$entry['endpoint']])) {
+                $totals[$entry['endpoint']] = (int) $entry['count'];
+
+                // Create arrays for each endpoint, filled with zeros for each date in the timeline
+                $timeline[$entry['endpoint']] = array_fill(0, $numDays, 0);
+            } else {
+                $totals[$entry['endpoint']] += (int) $entry['count'];
+            }
+
+            $date = new DateTime($entry['date']);
+            $dateIndex = (int) $date->diff($startObj)->format("%a");
+            $timeline[$entry['endpoint']][$dateIndex] = (int) $entry['count'];
+
+            $grandSum += $entry['count'];
+        }
+        arsort($totals);
+
+        return [
+            'totals' => $totals,
+            'grandSum' => $grandSum,
+            'dateLabels' => $dateLabels,
+            'timeline' => $timeline,
+        ];
     }
 
     /**
