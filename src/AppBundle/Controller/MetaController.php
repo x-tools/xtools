@@ -115,7 +115,7 @@ class MetaController extends XtoolsController
      * Record usage of a particular XTools tool. This is called automatically
      *   in base.html.twig via JavaScript so that it is done asynchronously
      * @Route("/meta/usage/{tool}/{project}/{token}")
-     * @param  $request Request
+     * @param  Request $request
      * @param  string $tool    Internal name of tool
      * @param  string $project Project domain such as en.wikipedia.org
      * @param  string $token   Unique token for this request, so we don't have people

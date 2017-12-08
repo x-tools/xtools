@@ -176,6 +176,8 @@ class AutomatedEditsController extends XtoolsController
         $end = '',
         $tools = ''
     ) {
+        $this->recordApiUsage('user/automated_editcount');
+
         list($project, $user) = $this->validateProjectAndUser($request);
 
         $res = [
@@ -234,6 +236,8 @@ class AutomatedEditsController extends XtoolsController
         $end = '',
         $offset = 0
     ) {
+        $this->recordApiUsage('user/nonautomated_edits');
+
         // Second parameter causes it return a Redirect to the index if the user has too many edits.
         // We only want to do this when looking at the user's overall edits, not just to a specific article.
         list($project, $user) = $this->validateProjectAndUser($request);

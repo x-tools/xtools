@@ -148,6 +148,8 @@ class PagesController extends XtoolsController
      */
     public function countPagesApiAction(Request $request, $namespace = 0, $redirects = 'noredirects')
     {
+        $this->recordApiUsage('user/pages_count');
+
         $ret = $this->validateProjectAndUser($request);
         if ($ret instanceof RedirectResponse) {
             return $ret;
@@ -198,6 +200,8 @@ class PagesController extends XtoolsController
      */
     public function getPagesApiAction(Request $request, $namespace = 0, $redirects = 'noredirects', $offset = 0)
     {
+        $this->recordApiUsage('user/pages');
+
         // Second parameter causes it return a Redirect to the index if the user has too many edits.
         $ret = $this->validateProjectAndUser($request, 'pages');
         if ($ret instanceof RedirectResponse) {

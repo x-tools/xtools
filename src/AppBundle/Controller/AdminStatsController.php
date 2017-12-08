@@ -150,6 +150,8 @@ class AdminStatsController extends XtoolsController
      */
     public function adminsGroupsApiAction($project)
     {
+        $this->recordApiUsage('project/admins_groups');
+
         $ret = $this->setUpAdminStats($project);
         if ($ret instanceof RedirectResponse) {
             // FIXME: needs to render as JSON, fetching the message from the FlashBag.
@@ -174,6 +176,8 @@ class AdminStatsController extends XtoolsController
      */
     public function adminStatsApiAction($project, $days = 30)
     {
+        $this->recordApiUsage('project/adminstats');
+
         // Maximum 30 days.
         $days = min((int) $days, 30);
         $start = date('Y-m-d', strtotime("-$days days"));

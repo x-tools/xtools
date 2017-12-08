@@ -6,6 +6,24 @@ User API
 
 API endpoints related to a user.
 
+Simple edit count
+=================
+``GET /api/user/simple_editcount/{project}/{username}``
+
+For the given account, get the user ID, live and deleted edit count,
+local user groups and global user groups.
+
+**Parameters:**
+
+* ``project`` (**required**) - Project domain or database name.
+* ``username`` (**required**) - Account's username.
+
+**Example:**
+
+Get basic statistics about `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ on the English Wikipedia.
+
+    https://xtools.wmflabs.org/api/user/simple_editcount/en.wikipedia/Jimbo_Wales
+
 Number of pages created
 =======================
 ``GET /api/user/pages_count/{project}/{username}/{namespace}/{redirects}``

@@ -319,4 +319,34 @@ abstract class XtoolsController extends Controller
 
         return $params;
     }
+
+    /**
+     * Record usage of an API endpoint.
+     * @param  string $endpoint
+     * @codeCoverageIgnore
+     */
+    public function recordApiUsage($endpoint)
+    {
+        $conn = $this->container->get('doctrine')
+            ->getManager('default')
+            ->getConnection();
+        $date =  date('Y-m-d');
+
+        // Increment count in timeline
+        $existsSql = "SELECT 1 FROM usage_api_timeline
+                      WHERE date = '$date'
+                      AND endpoint = '$endpoint'";
+
+        if (count($conn->query($existsSql)->fetchAll()) === 0) {
+            $createSql = "INSERT INTO usage_api_timeline
+                          VALUES(NULL, '$date', '$endpoint', 1)";
+            $conn->query($createSql);
+        } else {
+            $updateSql = "UPDATE usage_api_timeline
+                          SET count = count + 1
+                          WHERE endpoint = '$endpoint'
+                          AND date = '$date'";
+            $conn->query($updateSql);
+        }
+    }
 }

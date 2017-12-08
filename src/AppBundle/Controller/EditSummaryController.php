@@ -116,6 +116,8 @@ class EditSummaryController extends XtoolsController
      */
     public function editSummariesApiAction(Request $request, $namespace = 0)
     {
+        $this->recordApiUsage('user/edit_summaries');
+
         $ret = $this->validateProjectAndUser($request);
         if ($ret instanceof RedirectResponse) {
             // FIXME: needs to render as JSON, fetching the message from the FlashBag.

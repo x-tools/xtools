@@ -18,33 +18,29 @@
                     </tr>
                     <tr>
                         <td>{{ msg('user-id') }}</td>
-                        <td>{{ id }}</td>
+                        <td>{{ sec.userId }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('user-groups') }}</td>
-                        <td>{{ groups }}</td>
+                        <td>{{ sec.userGroups|join(', ') }}</td>
                     </tr>
-                    {% if globalGroups is defined and globalGroups|length > 0 %}
+                    {% if sec.globalUserGroups|length > 0 %}
                         <tr>
                             <td>{{ msg('global-user-groups') }}</td>
-                            <td>
-                                {% for group in globalGroups %}
-                                    {{ group }}
-                                {% endfor %}
-                            </td>
+                            <td>{{ sec.globalUserGroups|join(', ') }}</td>
                         </tr>
                     {% endif %}
                     <tr>
                         <td>{{ msg('total') }}</td>
-                        <td>{{ rev|num_format }}</td>
+                        <td>{{ sec.totalEditCount|num_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('live-edits') }}</td>
-                        <td>{{ live|num_format }}</td>
+                        <td>{{ sec.liveEditCount|num_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('deleted-edits') }}</td>
-                        <td>{{ arch|num_format }}</td>
+                        <td>{{ sec.deletedEditCount|num_format }}</td>
                     </tr>
                 </table>
             </div>
