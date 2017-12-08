@@ -218,7 +218,7 @@
                                 <td></td>
                                 <td colspan=6>
                                     <a href="{{ path('pages', { 'project': project.domain, 'username': user.username, 'namespace': ns, 'redirects': pages.redirects }) }}">
-                                        {{ pages.counts[ns].count - maxRows }} {{ msg('num-others', [pages.counts[ns].count - maxRows]) }}
+                                        {{ (pages.counts[ns].count - maxRows)|number_format }} {{ msg('num-others', [pages.counts[ns].count - maxRows]) }}
                                     </a>
                                 </td>
                             </tr>
