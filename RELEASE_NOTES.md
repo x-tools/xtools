@@ -1,5 +1,11 @@
 # Release Notes #
 
+## 3.1.20 ##
+- T177677: Paginate results in the Pages Created tool.
+- Add API endpoint for Pages Created.
+- Major refactoring and code cleanup.
+- Localization updates.
+
 ## 3.1.19 ##
 - T181954: Fix display of page watchers in ArticleInfo.
 - T179763: Link to documentation in Admin Score.
