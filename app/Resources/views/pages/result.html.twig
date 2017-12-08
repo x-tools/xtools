@@ -227,8 +227,8 @@
                 </table>
 
                 {##### PAGINATION #####}
-                {% if not(multiNamspace) %}
-                    {% set numPages = (pages.getNumPages / pages.resultsPerPage)|round(0, 'ceil') %}
+                {% set numPages = (pages.getNumPages / pages.resultsPerPage)|round(0, 'ceil') %}
+                {% if not(multiNamspace) and numPages > 1 %}
                     {% set hasPrev = pages.offset - 1 >= 0 %}
                     {% set hasNext = pages.offset + 1 < numPages %}
                     {% set pathVars = {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects} %}
