@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.1.21 ##
+- Usage tracking of API.
+
 ## 3.1.20 ##
 - T177677: Paginate results in the Pages Created tool.
 - Add API endpoint for Pages Created.
