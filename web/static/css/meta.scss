@@ -1,0 +1,8 @@
+@import 'mixins.scss';
+
+.meta {
+    #usage_chart,
+    #api_usage_chart {
+        max-width: 1000px;
+    }
+}

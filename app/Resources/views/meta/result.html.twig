@@ -29,24 +29,24 @@
                 </tbody></table>
             </div>
             <div style="clear:both"></div>
-            <table class="table table-bordered table-hover table-striped top-editors-table toggle-table">
+            <table class="table table-bordered table-hover table-striped tool-usage-table toggle-table">
                 <thead><tr>
                     <th>
                         <span class="sort-link sort-link--tool" data-column="tool">
-                            {{ msg('tool') | capitalize_first }}
+                            {{ msg('tool')|capitalize_first }}
                             <span class="glyphicon glyphicon-sort"></span>
                         </span>
                     </th>
                     <th>
                         <span class="sort-link sort-link--count" data-column="count">
-                            {{ msg('count') | capitalize_first }}
+                            {{ msg('count')|capitalize_first }}
                             <span class="glyphicon glyphicon-sort"></span>
                         </span>
                     </th>
                 </tr></thead>
                 <tbody>
                     {% set total = 0 %}
-                    {% for tool, count in totals %}
+                    {% for tool, count in toolUsage.totals %}
                         <tr>
                             <td class="sort-entry--tool" data-value="{{ tool }}">
                                 <span class="tools-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ tool }}">
@@ -64,21 +64,21 @@
                 <tfoot>
                     <tr>
                         <th class="tools--tools">
-                            {{ totals | length }}
-                            {{ msg('num-tools', [totals | length]) }}
+                            {{ toolUsage.totals|length }}
+                            {{ msg('num-tools', [toolUsage.totals|length]) }}
                         </th>
                         <th class="tools--count">
-                            {{ grandSum|num_format }}
+                            {{ toolUsage.grandSum|num_format }}
                         </th>
                     </tr>
                 </tfoot>
             </table>
             {% set totalChartData = [] %}
-            {% for tool, count in totals %}
-                {% set totalChartData = totalChartData | merge([{
+            {% for tool, count in toolUsage.totals %}
+                {% set totalChartData = totalChartData|merge([{
                     label: msg('tool-'~tool),
                     value: count,
-                    percentage: (count / grandSum) * 100,
+                    percentage: (count / toolUsage.grandSum) * 100,
                 }]) %}
             {% endfor %}
             {{ chart.pie_chart('totals_chart', totalChartData, false, 'toggle-table--chart') }}
@@ -90,13 +90,13 @@
                 <canvas id="usage_chart"></canvas>
             </div>
         {% endset %}
-        {{ layout.content_block('timeline', content) }}
+        {{ layout.content_block('Timeline', content, '', null, true) }}
 
-        {% set toolNames = totals | keys %}
+        {% set toolNames = toolUsage.totals|keys %}
 
         <script>
             // Attempt to fine-tune the pointer detection spacing based on how cluttered the chart is
-            var numTicks = {{ dateLabels | length | raw }};
+            var numTicks = {{ toolUsage.dateLabels|length|raw }};
             if (numTicks > 50) {
                 Chart.defaults.global.elements.point.hitRadius = 3;
             } else if (numTicks > 30) {
@@ -109,7 +109,7 @@
 
             var datasets = [];
             {% for tool in toolNames %}
-                var data = {{ timeline[tool] | json_encode | raw }};
+                var data = {{ toolUsage.timeline[tool]|json_encode|raw }};
                 datasets.push({
                     backgroundColor: 'rgba(0,0,0,0)',
                     borderColor: '{{ chartColor(loop.index0) }}',
@@ -127,10 +127,13 @@
             window.lineChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: {{ dateLabels | json_encode | raw }},
+                    labels: {{ toolUsage.dateLabels|json_encode|raw }},
                     datasets: datasets,
                 },
                 options: {
+                    legend: {
+                        display: false,
+                    },
                     scales: {
                         yAxes: [{
                             ticks: {
@@ -156,7 +159,7 @@
 
             // for the pie chart created with chart.pie_chart()
             $(document).ready(function () {
-                window.setupToggleTable({{ totals | json_encode | raw }}, window.totals_chart, null, function (newData) {
+                window.setupToggleTable({{ toolUsage.totals|json_encode|raw }}, window.totals_chart, null, function (newData) {
                     var total = Object.keys(newData).reduce(function (sum, key) {
                         return sum + parseInt(newData[key], 10);
                     }, 0);
@@ -167,6 +170,150 @@
                     );
                     $('.tools--count').text(total.toLocaleString());
                 });
+            });
+        </script>
+
+        {######## FOR THE API STATS ########}
+
+        {% set content %}
+             <div class="col-lg-6 stat-list clearfix">
+                <table class="table"><tbody>
+                    <tr>
+                        <td>{{ msg('start') }}</td>
+                        <td>{{ start }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('end') }}</td>
+                        <td>{{ end }}</td>
+                    </tr>
+                </tbody></table>
+            </div>
+            <div style="clear:both"></div>
+            <table class="table table-bordered table-hover table-striped api-usage-table toggle-table">
+                <thead><tr>
+                    <th>
+                        <span class="sort-link sort-link--endpoint" data-column="endpoint">
+                            Endpoint
+                            <span class="glyphicon glyphicon-sort"></span>
+                        </span>
+                    </th>
+                    <th>
+                        <span class="sort-link sort-link--count" data-column="count">
+                            {{ msg('count')|capitalize_first }}
+                            <span class="glyphicon glyphicon-sort"></span>
+                        </span>
+                    </th>
+                </tr></thead>
+                <tbody>
+                    {% set total = 0 %}
+                    {% for endpoint, count in apiUsage.totals %}
+                        <tr>
+                            <td class="sort-entry--endpoint" data-value="{{ endpoint }}">
+                                <span class="endpoints-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ endpoint }}">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                    <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
+                                </span>
+                                {{ endpoint }}
+                            </td>
+                            <td class="sort-entry--count" data-value="{{ count }}">
+                                {{ count|num_format }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th class="endpoints--endpoints">
+                            {{ apiUsage.totals|length }} endpoints
+                        </th>
+                        <th class="endpoints--count">
+                            {{ apiUsage.grandSum|num_format }}
+                        </th>
+                    </tr>
+                </tfoot>
+            </table>
+            {% set apiTotalChartData = [] %}
+            {% for endpoint, count in apiUsage.totals %}
+                {% set apiTotalChartData = apiTotalChartData|merge([{
+                    label: endpoint,
+                    value: count,
+                    percentage: (count / apiUsage.grandSum) * 100,
+                }]) %}
+            {% endfor %}
+            {{ chart.pie_chart('api_totals_chart', apiTotalChartData, false, 'toggle-table--chart') }}
+        {% endset %}
+        {{ layout.content_block('API Summary', content, '', null, true) }}
+
+        {% set content %}
+            <div class="chart-container">
+                <canvas id="api_usage_chart"></canvas>
+            </div>
+        {% endset %}
+        {{ layout.content_block('API Timeline', content, '', null, true) }}
+
+        {% set endpointNames = apiUsage.totals|keys %}
+
+        <script>
+            // Attempt to fine-tune the pointer detection spacing based on how cluttered the chart is
+            var numTicks = {{ apiUsage.dateLabels|length|raw }};
+            if (numTicks > 50) {
+                Chart.defaults.global.elements.point.hitRadius = 3;
+            } else if (numTicks > 30) {
+                Chart.defaults.global.elements.point.hitRadius = 5;
+            } else if (numTicks > 20) {
+                Chart.defaults.global.elements.point.hitRadius = 10;
+            } else {
+                Chart.defaults.global.elements.point.hitRadius = 30;
+            }
+
+            var datasets = [];
+            {% for endpoint in endpointNames %}
+                var data = {{ apiUsage.timeline[endpoint]|json_encode|raw }};
+                datasets.push({
+                    backgroundColor: 'rgba(0,0,0,0)',
+                    borderColor: '{{ chartColor(loop.index0) }}',
+                    borderWidth: 2,
+                    color: '{{ chartColor(loop.index0) }}',
+                    data: data,
+                    label: "{{ endpoint }}",
+                    lineTension: 0,
+                    pointBackgroundColor: '{{ chartColor(loop.index0) }}',
+                    pointHoverRadius: 5,
+                });
+            {% endfor %}
+
+            var ctx = document.getElementById('api_usage_chart');
+            window.apiLineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {{ apiUsage.dateLabels|json_encode|raw }},
+                    datasets: datasets,
+                },
+                options: {
+                    legend: {
+                        display: false,
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    },
+                    tooltips: {
+                        mode: 'x-axis',
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                var endpointName = datasets[tooltipItem.datasetIndex].label;
+                                return endpointName + ': ' + (new Number(tooltipItem.yLabel)).toLocaleString();
+                            }
+                        },
+                        bodyFontSize: 14,
+                        bodySpacing: 7,
+                        caretSize: 0,
+                        titleFontSize: 14
+                    }
+                }
             });
         </script>
     </div>
