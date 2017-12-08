@@ -6,6 +6,29 @@ User API
 
 API endpoints related to a user.
 
+Number of pages created
+=======================
+``GET /api/user/pages_count/{project}/{username}/{namespace}/{redirects}``
+
+Get the number of pages created by the user in the given namespace.
+
+**Parameters:**
+
+* ``project`` (**required**) - Project domain or database name.
+* ``username`` (**required**) - Account's username.
+* ``namespace`` - Namespace ID or ``all`` for all namespaces.
+* ``redirects`` - One of 'noredirects' (default), 'onlyredirects' or 'all' for both.
+
+**Example:**
+
+Get the number of mainspace, non-redirect pages created by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ on the English Wikipedia.
+
+    https://xtools.wmflabs.org/api/user/pages_count/en.wikipedia/Jimbo_Wales
+
+Get the number of article talk pages created by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ that are redirects.
+
+    https://xtools.wmflabs.org/api/user/pages_count/en.wikipedia/Jimbo_Wales/1/onlyredirects
+
 Automated edit counter
 ======================
 ``GET /api/user/automated_editcount/{project}/{username}/{namespace}/{start}/{end}/{offset}/{tools}``
