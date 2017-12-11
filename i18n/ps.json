@@ -7,6 +7,7 @@
 	"about-xtools": "ددغه غوره توبونو په اړه",
 	"accepted-formats": "منل شوی فارمټونه",
 	"account-age": "د گڼون عمر",
+	"account-age-desc": "$2 {{PLURAL:$1|ورځ|ورځې}} دمخه",
 	"accounts": "گڼونونه",
 	"accounts-created": "جوړ شوی گڼونونه",
 	"actions": "کړنې",
@@ -275,7 +276,7 @@
 	"wiki": "ويکي",
 	"wikiproject": "ويکي پروژه",
 	"with-summary": "د لنډيز سره",
-	"xtools-slogan": "ستاسو د معلوماتو لوږه کول",
+	"xtools-slogan": "ستاسو د ويکي معلوماتو راټولونکي",
 	"xtools-title": "ایکس وسیلې",
 	"year": "کال",
 	"year-counts": "د کال شمېری"
