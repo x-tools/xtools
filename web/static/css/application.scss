@@ -492,7 +492,7 @@ input.form-control.show-loader {
 .diff-pos {
     color: $diff-pos;
 
-    &:before {
+    &::before {
         color: $diff-pos;
         content: '+';
     }

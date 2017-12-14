@@ -115,6 +115,12 @@
     {{ extLink(url, msg('log'), label) }}
 {% endspaceless %}{% endmacro %}
 
+{% macro logLink(project, logId, label = null) %}{% spaceless %}
+    {% from _self import extLink as extLink %}
+    {% from _self import pageUrlRaw as pageUrlRaw %}
+    {{ extLink(pageUrlRaw('Special:Redirect/logid/' ~ logId, project), logId, label) }}
+{% endspaceless %}{% endmacro %}
+
 {% macro userGroupLink(group, project, label = null) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {{ extLink(

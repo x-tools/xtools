@@ -11,7 +11,11 @@
         {{ wiki.userLinks(user, project, xtPage) }}
 
         <div class="text-center xt-toc">
-            {% set sections = ['general-stats', 'namespace-totals', 'year-counts', 'month-counts', 'timecard', 'top-edited-pages', 'latest-global-edits'] %}
+            {% set sections = ['general-stats', 'namespace-totals', 'year-counts', 'month-counts', 'timecard', 'top-edited-pages'] %}
+            {% if ec.rightsChanges|length > 0 %}
+                {% set sections = sections|merge(['rights-changes']) %}
+            {% endif %}
+            {% set sections = sections|merge(['latest-global-edits']) %}
 
             {% for section in sections %}
                 <span>
@@ -88,6 +92,21 @@
             <a href="{{ path('TopEditsResults', {project:project.domain, username:user.username, namespace:'all'})}}">{{ msg('top-edited-pages') }}</a>
         {% endset %}
         {{ layout.content_block(headerLink, content, '', 'top-edited-pages', true) }}
+
+        {% if ec.rightsChanges|length > 0 %}
+            {% set content %}
+                {% include 'editCounter/rights_changes.html.twig' with {
+                    'is_sub_request': true,
+                    'project': project,
+                    'user': user,
+                    'ec': ec
+                } %}
+            {% endset %}
+            {% set headerLink %}
+                <a href="{{ path('EditCounterRightsChanges', {project:project.domain, username:user.username})}}">{{ msg('rights-changes') }}</a>
+            {% endset %}
+            {{ layout.content_block(headerLink, content, '', 'rights-changes', true) }}
+        {% endif %}
 
         {% set content %}
             <div id="latestglobal-container" data-username="{{ user.username }}" data-project="{{ project.domain }}">

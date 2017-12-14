@@ -282,6 +282,31 @@ class EditCounterController extends XtoolsController
     }
 
     /**
+     * Display the user rights changes section.
+     * @Route("/ec-rightschanges/{project}/{username}", name="EditCounterRightsChanges")
+     * @param Request $request
+     * @return Response
+     * @codeCoverageIgnore
+     */
+    public function rightschangesAction(Request $request)
+    {
+        $ret = $this->setUpEditCounter($request);
+        if ($ret instanceof RedirectResponse) {
+            return $ret;
+        }
+
+        $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
+        return $this->render('editCounter/rights_changes.html.twig', [
+            'xtTitle' => $this->user->getUsername(),
+            'xtPage' => 'ec',
+            'is_sub_request' => $isSubRequest,
+            'user' => $this->user,
+            'project' => $this->project,
+            'ec' => $this->editCounter,
+        ]);
+    }
+
+    /**
      * Display the latest global edits section.
      * @Route("/ec-latestglobal/{project}/{username}", name="EditCounterLatestGlobal")
      * @param Request $request The HTTP request.

@@ -11,6 +11,7 @@ use DatePeriod;
 use DateInterval;
 use GuzzleHttp;
 use GuzzleHttp\Promise\Promise;
+use Xtools\Edit;
 
 /**
  * An EditCounter provides statistics about a user's edits on a project.
@@ -41,6 +42,9 @@ class EditCounter extends Model
 
     /** @var mixed[] Total numbers of edits per year */
     protected $yearCounts;
+
+    /** @var string[] Rights changes, keyed by timestamp then 'added' and 'removed'. */
+    protected $rightsChanges;
 
     /** @var int[] Keys are project DB names. */
     protected $globalEditCounts;
@@ -197,6 +201,39 @@ class EditCounter extends Model
         }
 
         return $blocks;
+    }
+
+    /**
+     * Get user rights changes of the given user.
+     * @param Project $project
+     * @param User $user
+     * @return string[] Keyed by timestamp then 'added' and 'removed'.
+     */
+    public function getRightsChanges()
+    {
+        if (isset($this->rightsChanges)) {
+            return $this->rightsChanges;
+        }
+
+        $this->rightsChanges = [];
+        $logData = $this->getRepository()
+            ->getRightsChanges($this->project, $this->user);
+
+        foreach ($logData as $row) {
+            $unserialized = unserialize($row['log_params']);
+            $old = $unserialized['4::oldgroups'];
+            $new = $unserialized['5::newgroups'];
+
+            $this->rightsChanges[$row['log_timestamp']] = [
+                'logId' => $row['log_id'],
+                'admin' => $row['log_user_text'],
+                'comment' => Edit::wikifyString($row['log_comment'], $this->project),
+                'added' => array_diff($new, $old),
+                'removed' => array_diff($old, $new),
+            ];
+        }
+
+        return $this->rightsChanges;
     }
 
     /**
@@ -887,7 +924,7 @@ class EditCounter extends Model
 
     /**
      * Get the total numbers of edits per year.
-     * @param null|DateTime [$currentTime] - *USED ONLY FOR UNIT TESTING*
+     * @param null|DateTime $currentTime - *USED ONLY FOR UNIT TESTING*
      *   so we can mock the current DateTime.
      * @return mixed[] With keys 'yearLabels' and 'totals', the latter
      *   keyed by namespace then year.

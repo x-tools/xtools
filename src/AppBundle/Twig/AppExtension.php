@@ -586,7 +586,7 @@ class AppExtension extends Extension
             );
         }
 
-        if (is_string($datetime)) {
+        if (is_string($datetime) || is_int($datetime)) {
             $datetime = new DateTime($datetime);
         }
 

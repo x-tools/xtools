@@ -224,6 +224,27 @@ class EditCounterRepository extends Repository
     }
 
     /**
+     * Get user rights changes of the given user.
+     * @param Project $project
+     * @param User $user
+     * @return array
+     */
+    public function getRightsChanges(Project $project, User $user)
+    {
+        $loggingTable = $this->getTableName($project->getDatabaseName(), 'logging', 'logindex');
+        $sql = "SELECT log_id, log_timestamp, log_user_text, log_comment, log_params FROM $loggingTable
+                WHERE log_type = 'rights'
+                AND log_namespace = 2
+                AND log_title = :username
+                ORDER BY log_timestamp ASC";
+        $resultQuery = $this->getProjectsConnection()->prepare($sql);
+        $username = str_replace(' ', '_', $user->getUsername());
+        $resultQuery->bindParam('username', $username);
+        $resultQuery->execute();
+        return $resultQuery->fetchAll();
+    }
+
+    /**
      * Get a user's total edit count on all projects.
      * @see EditCounterRepository::globalEditCountsFromCentralAuth()
      * @see EditCounterRepository::globalEditCountsFromDatabases()
