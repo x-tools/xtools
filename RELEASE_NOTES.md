@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.1.22 ##
+- T182997: Set query limit on ArticleInfo API.
+- Localization updates.
+
 ## 3.1.21 ##
 - Usage tracking of API.
 
