@@ -204,6 +204,7 @@ abstract class XtoolsController extends Controller
             'namespace',
             'article',
             'redirects',
+            'deleted',
             'start',
             'end',
             'offset',

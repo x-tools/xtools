@@ -29,6 +29,9 @@ class Pages extends Model
     /** @var string One of 'noredirects', 'onlyredirects' or blank for both. */
     protected $redirects;
 
+    /** @var string One of 'both', 'live' or 'deleted' */
+    protected $deleted;
+
     /** @var int Pagination offset. */
     protected $offset;
 
@@ -43,23 +46,26 @@ class Pages extends Model
 
     /**
      * Pages constructor.
-     * @param Project    $project
-     * @param User       $user
+     * @param Project $project
+     * @param User $user
      * @param string|int $namespace Namespace ID or 'all'.
-     * @param string     $redirects One of 'noredirects', 'onlyredirects' or blank for both.
-     * @param int        $offset    Pagination offset.
+     * @param string $redirects One of 'noredirects', 'onlyredirects' or blank for both.
+     * @param string $deleted One of 'live', 'deleted' or 'both'.
+     * @param int $offset Pagination offset.
      */
     public function __construct(
         Project $project,
         User $user,
         $namespace = 0,
         $redirects = 'noredirects',
+        $deleted = 'both',
         $offset = 0
     ) {
         $this->project = $project;
         $this->user = $user;
         $this->namespace = $namespace === 'all' ? 'all' : (string)$namespace;
         $this->redirects = $redirects;
+        $this->deleted = $deleted;
         $this->offset = $offset;
     }
 
@@ -97,6 +103,15 @@ class Pages extends Model
     public function getRedirects()
     {
         return $this->redirects;
+    }
+
+    /**
+     * The deleted pages option associated with this Page instance.
+     * @return string
+     */
+    public function getDeleted()
+    {
+        return $this->deleted;
     }
 
     /**
@@ -223,11 +238,8 @@ class Pages extends Model
             $counts[$row['namespace']] = [
                 'count' => (int)$row['count'],
                 'deleted' => (int)$row['deleted'],
+                'redirects' => (int)$row['redirects']
             ];
-
-            if (!in_array($this->redirects, ['noredirects', 'onlyredirects'])) {
-                $counts[$row['namespace']]['redirects'] = (int)$row['redirects'];
-            }
         }
 
         $this->countsByNamespace = $counts;
@@ -271,6 +283,7 @@ class Pages extends Model
             $this->user,
             $namespace,
             $this->redirects,
+            $this->deleted,
             $this->resultsPerPage(),
             $this->offset * $this->resultsPerPage()
         );
@@ -287,7 +300,8 @@ class Pages extends Model
             $this->project,
             $this->user,
             $this->namespace,
-            $this->redirects
+            $this->redirects,
+            $this->deleted
         );
     }
 

@@ -109,6 +109,19 @@
 </div>
 {% endmacro %}
 
+{% macro deleted_pages_select(value) %}
+<div class="input-group">
+    <span class="input-group-addon form-label">{{ msg('deleted-pages') }}</span>
+    <select class="form-control" name="deleted">
+        {% for type in ['both', 'live', 'deleted'] %}
+            <option value="{{ type }}"{% if value == type %} selected="selected"{% endif %}>
+                {{ msg('delpagesfilter-' ~ type) }}
+            </option>
+        {% endfor %}
+    </select>
+    </div>
+{% endmacro %}
+
 {% macro submit_btn() %}
 <button class="btn btn-large btn-primary form-submit">{{ msg('submit') }}</button>
 {% endmacro %}
