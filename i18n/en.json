@@ -89,6 +89,7 @@
 	"edits-last-year": "Edits in the past 365 days",
 	"edits-with-summaries": "Edits with summaries",
 	"end": "Ending date",
+	"error-articlinfo-api": "Unable to fetch revision data.",
 	"error-report": "Please feel free to report this error on $1 (requires a Wikimedia account).",
 	"error-server-message": "The server said: $1",
 	"error-title": "A fatal error has occurred within XTools.",
