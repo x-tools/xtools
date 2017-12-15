@@ -1,17 +1,23 @@
 {% import 'macros/wiki.html.twig' as wiki %}
 <span style="line-height:20px">
 <a target="_blank" href="{{ url('homepage') }}"><img src='https://upload.wikimedia.org/wikipedia/commons/e/ed/XTools_logo_%28icon%29.png' style="height:16px !important; vertical-align:-4px"/></a>
-{{ msg('num-revisions-since', [data.revisions|num_format, data.revisions, "<a target='_blank' href='" ~ wiki.pageUrlRaw('Special:PermaLink/' ~ data.created_rev_id, project) ~ "'>" ~ data.created_at ~ "</a>"]) }}
-<span style="color:#A2A9B1">(<a href="{{ wiki.pageUrlRaw('Special:Diff/' ~ data.last_edit_id, project) }}" style="color:#A2A9B1">+{{ formatDuration(data.secs_since_last_edit) }}</a>)</span>{{ msg('comma-character') }}
-{{ data.editors|num_format }} {{ msg('num-editors', [data.editors]) }}{{ msg('comma-character') }}
-{% if data.watchers > 0 %}
+{% if data.error is defined %}
+{{ msg('error-articlinfo-api') }}
+{% else -%}
+    {{ msg('num-revisions-since', [data.revisions|num_format, data.revisions, "<a target='_blank' href='" ~ wiki.pageUrlRaw('Special:PermaLink/' ~ data.created_rev_id, project) ~ "'>" ~ data.created_at ~ "</a>"]) }}
+    <span style="color:#A2A9B1">(<a href="{{ wiki.pageUrlRaw('Special:Diff/' ~ data.last_edit_id, project) }}" style="color:#A2A9B1">+{{ formatDuration(data.secs_since_last_edit) }}</a>)</span>{{ msg('comma-character') }}
+    {{ data.editors|num_format }} {{ msg('num-editors', [data.editors]) }}{{ msg('comma-character') }}
+{% endif %}
+{% if data.watchers > 0 -%}
 {{ data.watchers|num_format }} {{ msg('num-watchers', [data.watchers]) }}{{ msg('comma-character') }}
 {% endif %}
-{% if isWMFLabs() %}
-<a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project.domain }}&amp;pages={{ page.title|e('url') }}&amp;range=latest-30">{{ data.pageviews|num_format }} {{ msg('num-pageviews', [data.pageviews]) }}</a> ({{ data.pageviews_offset }} {{ msg('num-days', [data.pageviews_offset]) }}){{ msg('comma-character') }}
+{%- if isWMFLabs() -%}
+<a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project.domain }}&amp;pages={{ page.title|e('url') }}&amp;range=latest-30">{{ data.pageviews|num_format }} {{ msg('num-pageviews', [data.pageviews]) }}</a> ({{ data.pageviews_offset }} {{ msg('num-days', [data.pageviews_offset]) }}){% endif -%}
+{% if data.error is not defined -%}
+    {{ msg('comma-character') }}
+    {{ msg('created-by')|lower }}: {{ wiki.userLink(data.author, project) }}
+    (<a target="_blank" href="{{ url('ec', { 'project': project.domain, 'username': data.author }) }}">{{ data.author_editcount|num_format }}</a>)
 {% endif %}
-{{ msg('created-by')|lower }}: {{ wiki.userLink(data.author, project) }}
-(<a target="_blank" href="{{ url('ec', { 'project': project.domain, 'username': data.author }) }}">{{ data.author_editcount|num_format }}</a>)
-&middot;
+ &middot;
 <a target="_blank" href="{{ url('articleinfo', { 'project': project.domain, 'article': page.title }) }}">{{ msg('see-full-page-stats') }}</a>
 </span>

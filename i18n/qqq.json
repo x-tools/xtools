@@ -89,6 +89,7 @@
 	"edits-last-year": "Label for the number of edits in the past year for an article. This message should be as short as possible.",
 	"edits-with-summaries": "Edits with provided edit summary line",
 	"end": "Label for the input field to enter an end date of a date range.\n{{Identical|End date}}",
+	"error-articlinfo-api": "Error shown when the ArticleInfo API was unable to fetch any data about the revisions to the page.",
 	"error-report": "Message explaining how to report an error. $1 is a link to Phabricator.",
 	"error-server-message": "Error message. $1 is the message given by the server.",
 	"error-title": "Title for the error page.",

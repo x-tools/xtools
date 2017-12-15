@@ -15,6 +15,8 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Xtools\ProjectRepository;
 use Xtools\ArticleInfo;
+use Xtools\Project;
+use Xtools\Page;
 use DateTime;
 use Xtools\ArticleInfoRepository;
 
@@ -214,41 +216,44 @@ class ArticleInfoController extends XtoolsController
             );
         }
 
-        $info = $page->getBasicEditingInfo();
-        $creationDateTime = DateTime::createFromFormat('YmdHis', $info['created_at']);
-        $modifiedDateTime = DateTime::createFromFormat('YmdHis', $info['modified_at']);
-        $secsSinceLastEdit = (new DateTime)->getTimestamp() - $modifiedDateTime->getTimestamp();
-
         $data = [
-            'revisions' => (int) $info['num_edits'],
-            'editors' => (int) $info['num_editors'],
-            'author' => $info['author'],
-            'author_editcount' => (int) $info['author_editcount'],
-            'created_at' => $creationDateTime->format('Y-m-d'),
-            'created_rev_id' => $info['created_rev_id'],
-            'modified_at' => $modifiedDateTime->format('Y-m-d H:i'),
-            'secs_since_last_edit' => $secsSinceLastEdit,
-            'last_edit_id' => (int) $info['modified_rev_id'],
+            'project' => $project->getDomain(),
+            'page' => $page->getTitle(),
             'watchers' => (int) $page->getWatchers(),
             'pageviews' => $page->getLastPageviews($pageviewsOffset),
             'pageviews_offset' => $pageviewsOffset,
         ];
 
-        if ($request->query->get('format') === 'html') {
-            $response = $this->render('articleInfo/api.html.twig', [
-                'data' => $data,
-                'project' => $project,
-                'page' => $page,
+        try {
+            $info = $page->getBasicEditingInfo();
+        } catch (\Doctrine\DBAL\Exception\DriverException $e) {
+            /**
+             * The query most likely exceeded the maximum query time,
+             * so we'll abort and give only info retrived by the API.
+             */
+            $data['error'] = 'Unable to fetch revision data. The query may have timed out.';
+        }
+
+        if (isset($info)) {
+            $creationDateTime = DateTime::createFromFormat('YmdHis', $info['created_at']);
+            $modifiedDateTime = DateTime::createFromFormat('YmdHis', $info['modified_at']);
+            $secsSinceLastEdit = (new DateTime)->getTimestamp() - $modifiedDateTime->getTimestamp();
+
+            $data = array_merge($data, [
+                'revisions' => (int) $info['num_edits'],
+                'editors' => (int) $info['num_editors'],
+                'author' => $info['author'],
+                'author_editcount' => (int) $info['author_editcount'],
+                'created_at' => $creationDateTime->format('Y-m-d'),
+                'created_rev_id' => $info['created_rev_id'],
+                'modified_at' => $modifiedDateTime->format('Y-m-d H:i'),
+                'secs_since_last_edit' => $secsSinceLastEdit,
+                'last_edit_id' => (int) $info['modified_rev_id'],
             ]);
+        }
 
-            // All /api routes by default respond with a JSON content type.
-            $response->headers->set('Content-Type', 'text/html');
-
-            // This endpoint is hit constantly and user could be browsing the same page over
-            // and over (popular noticeboard, for instance), so offload brief caching to browser.
-            $response->setClientTtl(350);
-
-            return $response;
+        if ($request->query->get('format') === 'html') {
+            return $this->getApiHtmlResponse($project, $page, $data);
         }
 
         $body = array_merge([
@@ -260,5 +265,30 @@ class ArticleInfoController extends XtoolsController
             $body,
             Response::HTTP_OK
         );
+    }
+
+    /**
+     * Get the Response for the HTML output of the ArticleInfo API action.
+     * @param  Project  $project
+     * @param  Page     $page
+     * @param  string[] $data The pre-fetched data.
+     * @return Response
+     */
+    private function getApiHtmlResponse(Project $project, Page $page, $data)
+    {
+        $response = $this->render('articleInfo/api.html.twig', [
+            'data' => $data,
+            'project' => $project,
+            'page' => $page,
+        ]);
+
+        // All /api routes by default respond with a JSON content type.
+        $response->headers->set('Content-Type', 'text/html');
+
+        // This endpoint is hit constantly and user could be browsing the same page over
+        // and over (popular noticeboard, for instance), so offload brief caching to browser.
+        $response->setClientTtl(350);
+
+        return $response;
     }
 }
