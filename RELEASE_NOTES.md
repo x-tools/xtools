@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.1.23 ##
+- T172003: Add option to filter deleted pages to Pages Created tool.
+
 ## 3.1.22 ##
 - T182997: Set query limit on ArticleInfo API.
 - Localization updates.
