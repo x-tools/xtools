@@ -190,14 +190,16 @@ class UserRepository extends Repository
      * @param Project $project
      * @param User $user
      * @param string|int $namespace Namespace ID or 'all'.
-     * @param string $redirects     One of 'noredirects', 'onlyredirects' or blank for both.
+     * @param string $redirects One of 'noredirects', 'onlyredirects' or blank for both.
+     * @param string $deleted One of 'both', 'live' and 'deleted'.
      * @return string[] Result of query, see below. Includes live and deleted pages.
      */
     public function countPagesCreated(
         Project $project,
         User $user,
         $namespace,
-        $redirects
+        $redirects,
+        $deleted
     ) {
         $cacheKey = $this->getCacheKey(func_get_args(), 'num_user_pages_created');
         if ($this->cache->hasItem($cacheKey)) {
@@ -212,7 +214,7 @@ class UserRepository extends Repository
         ];
         $conditions = array_merge(
             $conditions,
-            $this->getNamespaceAndRedirectConditions($namespace, $redirects),
+            $this->getNamespaceRedirectAndDeletedPagesConditions($namespace, $redirects),
             $this->getUserConditions($project, $user)
         );
 
@@ -221,9 +223,9 @@ class UserRepository extends Repository
                     SUM(CASE WHEN type = 'arc' THEN 1 ELSE 0 END) AS deleted,
                     SUM(page_is_redirect) AS redirects
                 FROM (".
-                    $this->getPagesCreatedInnerSql($project, $conditions)."
-                ) a
-                GROUP BY namespace";
+                    $this->getPagesCreatedInnerSql($project, $conditions, $deleted)."
+                ) a ".
+                "GROUP BY namespace";
 
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $resultQuery->execute();
@@ -240,9 +242,10 @@ class UserRepository extends Repository
      * @param Project $project
      * @param User $user
      * @param string|int $namespace Namespace ID or 'all'.
-     * @param string $redirects     One of 'noredirects', 'onlyredirects' or blank for both.
-     * @param int|null $limit       Number of results to return, or blank to return all.
-     * @param int $offset           Number of pages past the initial dataset. Used for pagination.
+     * @param string $redirects One of 'noredirects', 'onlyredirects' or blank for both.
+     * @param string $deleted One of 'both', 'live' or 'deleted'.
+     * @param int|null $limit Number of results to return, or blank to return all.
+     * @param int $offset Number of pages past the initial dataset. Used for pagination.
      * @return string[] Result of query, see below. Includes live and deleted pages.
      */
     public function getPagesCreated(
@@ -250,6 +253,7 @@ class UserRepository extends Repository
         User $user,
         $namespace,
         $redirects,
+        $deleted,
         $limit = 1000,
         $offset = 0
     ) {
@@ -268,7 +272,7 @@ class UserRepository extends Repository
 
         $conditions = array_merge(
             $conditions,
-            $this->getNamespaceAndRedirectConditions($namespace, $redirects),
+            $this->getNamespaceRedirectAndDeletedPagesConditions($namespace, $redirects),
             $this->getUserConditions($project, $user)
         );
 
@@ -284,9 +288,9 @@ class UserRepository extends Repository
         }
 
         $sql = "SELECT * FROM (".
-                    $this->getPagesCreatedInnerSql($project, $conditions)."
-                ) a
-                ORDER BY rev_timestamp DESC
+                    $this->getPagesCreatedInnerSql($project, $conditions, $deleted)."
+                ) a ".
+                "ORDER BY rev_timestamp DESC
                 ".(!empty($limit) ? "LIMIT $limit OFFSET $offset" : '');
 
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
@@ -304,15 +308,15 @@ class UserRepository extends Repository
      * Get SQL fragments for the namespace and redirects,
      * to be used in self::getPagesCreatedInnerSql().
      * @param  string|int $namespace Namespace ID or 'all'.
-     * @param  string $redirects     One of 'noredirects', 'onlyredirects' or blank for both.
+     * @param  string $redirects One of 'noredirects', 'onlyredirects' or blank for both.
      * @return string[] With keys 'namespaceRev', 'namespaceArc' and 'redirects'
      */
-    private function getNamespaceAndRedirectConditions($namespace, $redirects)
+    private function getNamespaceRedirectAndDeletedPagesConditions($namespace, $redirects)
     {
         $conditions = [
             'namespaceArc' => '',
             'namespaceRev' => '',
-            'redirects' => '',
+            'redirects' => ''
         ];
 
         if ($namespace !== 'all') {
@@ -356,22 +360,22 @@ class UserRepository extends Repository
 
     /**
      * Inner SQL for getting or counting pages created by the user.
-     * @param  Project  $project
+     * @param  Project $project
      * @param  string[] $conditions Conditions for the SQL, must include 'paSelects',
      *     'paSelectsArchive', 'paJoin', 'whereRev', 'whereArc', 'namespaceRev', 'namespaceArc',
      *     'redirects' and 'revPageGroupBy'.
+     * @param  string $deleted One of 'live', 'deleted' or 'both'.
      * @return string Raw SQL.
      */
-    private function getPagesCreatedInnerSql(Project $project, $conditions)
+    private function getPagesCreatedInnerSql(Project $project, $conditions, $deleted)
     {
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
         $archiveTable = $project->getTableName('archive');
         $logTable = $project->getTableName('logging', 'logindex');
 
-        return "
-            (
-                SELECT DISTINCT page_namespace AS namespace, 'rev' AS type, page_title AS page_title,
+        $revisionsSelect = "
+            SELECT DISTINCT page_namespace AS namespace, 'rev' AS type, page_title AS page_title,
                     page_len, page_is_redirect, rev_timestamp AS rev_timestamp,
                     rev_user, rev_user_text AS username, rev_len, rev_id ".$conditions['paSelects']."
                 FROM $pageTable
@@ -381,27 +385,30 @@ class UserRepository extends Repository
                     AND rev_parent_id = '0'".
                     $conditions['namespaceRev'].
                     $conditions['redirects'].
-                $conditions['revPageGroupBy']."
-            )
+                $conditions['revPageGroupBy'];
 
-            UNION
+        $archiveSelect = "
+            SELECT ar_namespace AS namespace, 'arc' AS type, ar_title AS page_title,
+                        0 AS page_len, '0' AS page_is_redirect, MIN(ar_timestamp) AS rev_timestamp,
+                        ar_user AS rev_user, ar_user_text AS username, ar_len AS rev_len,
+                        ar_rev_id AS rev_id ".$conditions['paSelectsArchive']."
+                    FROM $archiveTable
+                    LEFT JOIN $logTable ON log_namespace = ar_namespace AND log_title = ar_title
+                        AND log_user = ar_user AND (log_action = 'move' OR log_action = 'move_redir')
+                        AND log_type = 'move'
+                    WHERE ".$conditions['whereArc']."
+                        AND ar_parent_id = '0' ".
+                        $conditions['namespaceArc']."
+                        AND log_action IS NULL
+                    GROUP BY ar_namespace, ar_title";
 
-            (
-                SELECT ar_namespace AS namespace, 'arc' AS type, ar_title AS page_title,
-                    0 AS page_len, '0' AS page_is_redirect, MIN(ar_timestamp) AS rev_timestamp,
-                    ar_user AS rev_user, ar_user_text AS username, ar_len AS rev_len,
-                    ar_rev_id AS rev_id ".$conditions['paSelectsArchive']."
-                FROM $archiveTable
-                LEFT JOIN $logTable ON log_namespace = ar_namespace AND log_title = ar_title
-                    AND log_user = ar_user AND (log_action = 'move' OR log_action = 'move_redir')
-                    AND log_type = 'move'
-                WHERE ".$conditions['whereArc']."
-                    AND ar_parent_id = '0' ".
-                    $conditions['namespaceArc']."
-                    AND log_action IS NULL
-                GROUP BY ar_namespace, ar_title
-            )
-        ";
+        if ($deleted == 'live') {
+            return $revisionsSelect;
+        } elseif ($deleted == 'deleted') {
+            return $archiveSelect;
+        }
+
+        return "($revisionsSelect) UNION ($archiveSelect)";
     }
 
     /**

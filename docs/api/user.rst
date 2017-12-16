@@ -26,7 +26,7 @@ Get basic statistics about `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimb
 
 Number of pages created
 =======================
-``GET /api/user/pages_count/{project}/{username}/{namespace}/{redirects}``
+``GET /api/user/pages_count/{project}/{username}/{namespace}/{redirects}/{deleted}``
 
 Get the number of pages created by the user in the given namespace.
 
@@ -36,6 +36,7 @@ Get the number of pages created by the user in the given namespace.
 * ``username`` (**required**) - Account's username.
 * ``namespace`` - Namespace ID or ``all`` for all namespaces.
 * ``redirects`` - One of 'noredirects' (default), 'onlyredirects' or 'all' for both.
+* ``deleted`` - One of 'live', 'deleted' or 'both' (default).
 
 **Example:**
 
@@ -49,7 +50,7 @@ Get the number of article talk pages created by `Jimbo Wales <https://en.wikiped
 
 Pages created
 =============
-``GET /api/user/pages/{project}/{username}/{namespace}/{redirects}/{offset}``
+``GET /api/user/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{offset}``
 
 Get the pages created by the user in the given namespace.
 
@@ -59,6 +60,7 @@ Get the pages created by the user in the given namespace.
 * ``username`` (**required**) - Account's username.
 * ``namespace`` - Namespace ID or ``all`` for all namespaces.
 * ``redirects`` - One of 'noredirects' (default), 'onlyredirects' or 'all' for both.
+* ``deleted`` - One of 'live', 'deleted' or 'both' (default).
 * ``offset`` - Which page of results to show. If there is more than one page of results, ``continue`` is returned, with the subsequent page number as the value.
 
 **Example:**

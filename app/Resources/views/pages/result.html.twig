@@ -43,6 +43,10 @@
                         <td>{{ msg('redirects') }}</td>
                         <td>{{ msg('redirfilter-' ~ pages.redirects) }}</td>
                     </tr>
+                    <tr>
+                        <td>{{ msg('deleted-pages') }}</td>
+                        <td>{{ msg('delpagesfilter-' ~ pages.deleted) }}</td>
+                    </tr>
                 </tbody></table>
             </div>
             <div style="clear:both"></div>
@@ -83,17 +87,19 @@
                                 </td>
                             {% endif %}
                             {% if pages.redirects != 'noredirects' %}
-                                <td class="sort-entry--redirects" data-value="{{ value.redirect }}">
-                                    {{ value.redirect|num_format }}
+                                <td class="sort-entry--redirects" data-value="{{ value.redirects }}">
+                                    {{ value.redirects|num_format }}
                                     {% if pages.redirects != 'onlyredirects' %}
-                                        ({{ value.redirect|percent_format(value.count) }})
+                                        ({{ value.redirects|percent_format(value.count) }})
                                     {% endif %}
                                 </td>
                             {% endif %}
-                            <td class="sort-entry--deleted" data-value="{{ value.deleted }}">
-                                {{ value.deleted|num_format }}
-                                ({{ value.deleted|percent_format(value.count) }})
-                            </td>
+                            {% if pages.deleted == 'both' %}
+                                <td class="sort-entry--deleted" data-value="{{ value.deleted }}">
+                                    {{ value.deleted|num_format }}
+                                    ({{ value.deleted|percent_format(value.count) }})
+                                </td>
+                            {% endif %}
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -113,10 +119,12 @@
                                     ({{ pages.numRedirects|percent_format(pages.getNumPages) }})
                                 </th>
                             {% endif %}
-                            <th class="namespaces--deleted">
-                                {{ pages.numDeleted|num_format }}
-                                ({{ pages.numDeleted|percent_format(pages.getNumPages) }})
-                            </th>
+                            {% if pages.deleted == 'both' %}
+                                <th class="namespaces--deleted">
+                                    {{ pages.numDeleted|num_format }}
+                                    ({{ pages.numDeleted|percent_format(pages.getNumPages) }})
+                                </th>
+                            {% endif %}
                         </tfoot>
                     {% endif %}
                 </table>
