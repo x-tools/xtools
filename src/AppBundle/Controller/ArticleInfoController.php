@@ -200,15 +200,15 @@ class ArticleInfoController extends XtoolsController
         /** @var integer Number of days to query for pageviews */
         $pageviewsOffset = 30;
 
-        $project = ProjectRepository::getProject($project, $this->container);
-        if (!$project->exists()) {
+        $projectData = ProjectRepository::getProject($project, $this->container);
+        if (!$projectData->exists()) {
             return new JsonResponse(
                 ['error' => "$project is not a valid project"],
                 Response::HTTP_NOT_FOUND
             );
         }
 
-        $page = $this->getAndValidatePage($project, $article);
+        $page = $this->getAndValidatePage($projectData, $article);
         if ($page instanceof RedirectResponse) {
             return new JsonResponse(
                 ['error' => "$article was not found"],
@@ -217,7 +217,7 @@ class ArticleInfoController extends XtoolsController
         }
 
         $data = [
-            'project' => $project->getDomain(),
+            'project' => $projectData->getDomain(),
             'page' => $page->getTitle(),
             'watchers' => (int) $page->getWatchers(),
             'pageviews' => $page->getLastPageviews($pageviewsOffset),
@@ -253,11 +253,11 @@ class ArticleInfoController extends XtoolsController
         }
 
         if ($request->query->get('format') === 'html') {
-            return $this->getApiHtmlResponse($project, $page, $data);
+            return $this->getApiHtmlResponse($projectData, $page, $data);
         }
 
         $body = array_merge([
-            'project' => $project->getDomain(),
+            'project' => $projectData->getDomain(),
             'page' => $page->getTitle(),
         ], $data);
 
