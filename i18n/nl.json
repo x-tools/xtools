@@ -3,14 +3,18 @@
 		"authors": [
 			"Mainframe98",
 			"Sjoerddebruin",
-			"Nemo bis"
+			"Nemo bis",
+			"Woodcutterty"
 		]
 	},
 	"about-xtools": "Over deze hulpmiddelen",
 	"accepted-formats": "Geaccepteerde indelingen",
 	"account-age": "Accountleeftijd",
+	"account-age-desc": "$2 {{PLURAL:$1|dag|dagen}} oud",
 	"accounts": "Accounts",
+	"accounts-created": "Accounts aangemaakt",
 	"actions": "Handelingen",
+	"actions-as-admin": "Moderatorhandelingen",
 	"added": "Toegevoegd",
 	"added-bytes": "Toegevoegd (bytes)",
 	"all": "alle",

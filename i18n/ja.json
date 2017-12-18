@@ -4,7 +4,8 @@
 			"Nemo bis",
 			"Otokoume",
 			"おはぐろ蜻蛉",
-			"Kkairri"
+			"Kkairri",
+			"Yusuke1109"
 		]
 	},
 	"accepted-formats": "受け入れられる形式",
@@ -53,6 +54,9 @@
 	"delete": "削除",
 	"deleted": "削除済",
 	"deleted-edits": "削除された編集",
+	"deleted-pages": "ページを削除",
+	"delpagesfilter-deleted": "削除されたページのみを含める",
+	"delpagesfilter-live": "削除されたページを除外する",
 	"documentation": "説明書",
 	"edit-count": "編集回数",
 	"edit-count-desc": "$2回{{PLURAL:$1|編集}}されました",
@@ -66,6 +70,7 @@
 	"edits-last-year": "過去 365 日間の編集",
 	"edits-with-summaries": "要約欄に記入した編集",
 	"end": "終了日",
+	"error-articlinfo-api": "版情報を取得できませんでした。",
 	"events": "イベント",
 	"executed": "実行時間 $1 秒。",
 	"file": "ファイル",

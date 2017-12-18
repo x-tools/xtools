@@ -4,7 +4,8 @@
 			"Ykhwong",
 			"CYAN",
 			"Nemo bis",
-			"Revi"
+			"Revi",
+			"Ellif"
 		]
 	},
 	"about-xtools": "이 도구 정보",
@@ -58,6 +59,10 @@
 	"delete": "삭제",
 	"deleted": "삭제됨",
 	"deleted-edits": "삭제된 편집",
+	"deleted-pages": "삭제된 페이지",
+	"delpagesfilter-both": "존재하는 문서와 삭제된 문서 포함",
+	"delpagesfilter-deleted": "삭제된 페이지만 포함",
+	"delpagesfilter-live": "삭제된 페이지를 제외",
 	"diff": "차이",
 	"documentation": "설명서",
 	"duplicate-vote": "중복 투표",
@@ -76,6 +81,7 @@
 	"edits-last-year": "일 년 내 편집",
 	"edits-with-summaries": "편집 요약이 있는 편집",
 	"end": "종료일",
+	"error-articlinfo-api": "판 데이터를 가져올 수 없습니다.",
 	"error-report": "$1에 이 오류를 보고해 주십시오. (위키미디어 계정 필요)",
 	"error-server-message": "서버 응답: $1",
 	"error-title": "XTools에 치명적인 오류가 발생했습니다.",
