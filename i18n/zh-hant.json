@@ -3,7 +3,8 @@
 		"authors": [
 			"Kly",
 			"Nemo bis",
-			"Liuxinyu970226"
+			"Liuxinyu970226",
+			"A2093064"
 		]
 	},
 	"about-xtools": "關於這些工具",
@@ -104,7 +105,7 @@
 	"file": "檔案",
 	"files": "檔案",
 	"files-uploaded": "已上傳檔案",
-	"files-uploaded-commons": "已上傳檔案（共用資源）",
+	"files-uploaded-commons": "已上傳檔案（共享資源）",
 	"first-edit": "首次編輯",
 	"former-bot": "舊機器人",
 	"friday": "星期五",
@@ -164,7 +165,7 @@
 	"max-text-deleted": "最大文字刪除量",
 	"memory-usage": "佔用了 $1 {{PLURAL:$2|百萬位元組}}記憶體來執行。",
 	"minor": "小",
-	"minor-edits": "鏡像編輯數",
+	"minor-edits": "小修改",
 	"minor-edits-percentage": "小修改 %",
 	"minor-edits-with-summaries": "帶有摘要的小修改",
 	"monday": "星期一",

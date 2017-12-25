@@ -4,7 +4,8 @@
 			"Anamdas",
 			"Sachinkatiyar",
 			"Nemo bis",
-			"Jayprakash12345"
+			"Jayprakash12345",
+			"Rajatkatiyar10"
 		]
 	},
 	"accounts": "खाते",
@@ -41,6 +42,10 @@
 	"delete": "हटाया",
 	"deleted": "हटाया",
 	"deleted-edits": "हटाये गये सम्पादन",
+	"deleted-pages": "हटाए गए पृष्ठ",
+	"delpagesfilter-both": "लाइव और हटाए गए पृष्ठों को शामिल करें",
+	"delpagesfilter-deleted": "केवल हटाए गए पृष्ठों को शामिल करें",
+	"delpagesfilter-live": "हटाए गए पृष्ठों को हटाएं",
 	"documentation": "प्रलेखन",
 	"edit-summary": "टिप्पणी",
 	"editors": "संपादक",
@@ -51,6 +56,7 @@
 	"edits-last-year": "पिछले ३६५ दिन में सम्पादन",
 	"edits-with-summaries": "सारांश सहित सम्पादन",
 	"end": "समाप्ति तिथि",
+	"error-articlinfo-api": "संसोधित डाटा लाने में असमर्थ|",
 	"events": "घटनायें",
 	"executed": "$1 सेकिण्डों में निष्पादित",
 	"file": "चित्र",
