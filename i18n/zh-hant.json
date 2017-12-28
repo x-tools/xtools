@@ -306,7 +306,7 @@
 	"too-many-revisions": "此頁面已超過 $1 {{PLURAL:$2|修訂|修訂}}。僅顯示最後 $1 筆資料。。",
 	"tool": "工具",
 	"tool-about": "關於",
-	"tool-adminscore": "管理員積分",
+	"tool-adminscore": "管理積分",
 	"tool-adminscore-desc": "積分顯示出使用者在管理上的用心程度",
 	"tool-adminstats": "管理員狀態",
 	"tool-adminstats-desc": "顯示管理行為統計",
