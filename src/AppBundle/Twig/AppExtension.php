@@ -544,7 +544,8 @@ class AppExtension extends Extension
             new \Twig_SimpleFilter('percent_format', [ $this, 'percentFormat' ]),
             new \Twig_SimpleFilter('diff_format', [ $this, 'diffFormat' ], [ 'is_safe' => [ 'html' ] ]),
             new \Twig_SimpleFilter('num_format', [$this, 'numberFormat']),
-            new \Twig_SimpleFilter('date_format', [$this, 'dateFormat']),
+            new \Twig_SimpleFilter('date_format', [$this, 'dateFormatStd']),
+            new \Twig_SimpleFilter('date_localize', [$this, 'dateFormat']),
         ];
     }
 
@@ -591,6 +592,20 @@ class AppExtension extends Extension
         }
 
         return $this->dateFormatter->format($datetime);
+    }
+
+    /**
+     * Format the given date to ISO 8601.
+     * @param  string|DateTime $datetime
+     * @return string
+     */
+    public function dateFormatStd($datetime)
+    {
+        if (is_string($datetime) || is_int($datetime)) {
+            $datetime = new DateTime($datetime);
+        }
+
+        return $datetime->format('Y-m-d H:i');
     }
 
     /**

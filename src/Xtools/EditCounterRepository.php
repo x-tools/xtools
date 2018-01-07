@@ -236,7 +236,7 @@ class EditCounterRepository extends Repository
                 WHERE log_type = 'rights'
                 AND log_namespace = 2
                 AND log_title = :username
-                ORDER BY log_timestamp ASC";
+                ORDER BY log_timestamp DESC";
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $username = str_replace(' ', '_', $user->getUsername());
         $resultQuery->bindParam('username', $username);
