@@ -385,7 +385,7 @@
                             {% endif %}
                             &middot;
                             {% if enabled('topedits') %}
-                                <a href="{{ path('topedits', { 'project': project.domain, 'username': editor, 'namespace': page.namespace, 'article': page.title }) }}">{{ msg('tool-topedits') }}</a>
+                                <a href="{{ path('topedits', { 'project': project.domain, 'username': editor, 'namespace': page.namespace, 'article': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
                             {% endif %}
                         </td>
                         <td class="sort-entry--edits" data-value="{{ stats.all }}">

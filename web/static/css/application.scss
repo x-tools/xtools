@@ -21,6 +21,10 @@ body {
     }
 }
 
+.strong {
+    font-weight: bold;
+}
+
 #wrapper {
     background: white;
     border-radius: 5px;
@@ -253,9 +257,22 @@ $tooltip-shadow: #ccc;
     }
 }
 .xt-alert {
-    padding: 5px;
-    margin: 5px;
+    padding: 15px;
+    margin: 0;
     text-align: center;
+
+    &.alert-dismissable {
+        padding-right: 35px;
+    }
+
+    &:not(:first-child) {
+        margin-top: 10px;
+    }
+
+    .close {
+        opacity: 0.8;
+        top: -3px;
+    }
 }
 .panel-primary > .panel-heading a {
     color: white;

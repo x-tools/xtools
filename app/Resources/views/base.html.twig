@@ -1,3 +1,5 @@
+{% import 'macros/layout.html.twig' as layout %}
+
 <!DOCTYPE html>
 <html lang="{{ lang() }}"{% if isRTL() %} dir="rtl"{% endif %}>
 <head>
@@ -142,28 +144,23 @@
 
 <div class="site-notice">
     {% if noticeDisplay is defined and noticeDisplay == true %}
-        <p class='alert {% if noticeStyle is defined %}alert-{{ noticeStyle }}{% else %}alert-danger{% endif %} xt-alert'>
-            {% if noticeText is defined %}{{ msgPrintExists(noticeText) }}
-            {% else %}No notice has been defined but the notice has been turned on. Poke a maintainer to fix this.
-            {% endif %}
-        </p>
+        {{ layout.alert(noticeStyle, noticeText) }}
     {% endif %}
 
     {% if app.session.flashBag.peekAll %}
         {% for level, messages in app.session.flashBag.all %}
             {% set level = level == 'notice' ? 'danger' : level %}
-            <p class="alert alert-{{ level }} xt-alert">
-                {{ msgPrintExists(messages[0]) }}
-            </p>
+            {{ layout.alert(level, messages[0]) }}
         {% endfor %}
     {% endif %}
 
-    {# {% set replagValue = replag() %}
-    {% if replagValue > getReplagThreshold() %}
-        <p class="alert alert-warning xt-alert">
-            {{ msgPrintExists('high-replag', [formatDuration(replagValue)]) }}
-        </p>
-    {% endif %} #}
+    {# Show replag on result pages, if applicable #}
+    {% if xtTitle is defined %}
+        {% set replagValue = replag() %}
+        {% if replagValue > getReplagThreshold() %}
+            {{ layout.alert('warning', 'high-replag', [formatDuration(replagValue)]) }}
+        {% endif %}
+    {% endif %}
 </div>
 
 <div id="wrapper">
