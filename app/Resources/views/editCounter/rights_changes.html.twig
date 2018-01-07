@@ -1,0 +1,72 @@
+{% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
+{% import 'macros/wiki.html.twig' as wiki %}
+
+{% block body %}
+
+{% if not is_sub_request %}
+    <div class="panel panel-primary">
+        <header class="panel-heading">
+            <div class="text-center xt-heading-top">
+                <a class="back-to-search" href="{{ path('ec') }}">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                    {{ msg('back') }}
+                </a>
+                {{ wiki.userLink(user, project) }}
+                <small> &bull; {{ project.title }} </small>
+            </div>
+        </header>
+        <div class="panel-body xt-panel-body">
+            <section class="panel panel-default clearfix">
+                <header class="panel-heading col-lg-12">
+                    <h4>{{ msg('rights-changes') }}</h4>
+                </header>
+                <div class="panel-body col-lg-12">
+{% endif %}
+
+{% if ec.rightsChanges|length > 0 %}
+    <table class="table table-bordered table-hover table-striped rightschanges-table">
+        <thead>
+            {% for key in ['date', 'rights', 'admin', 'summary'] %}
+                <th>
+                    <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
+                        {{ msg(key) | capitalize_first }}
+                        <span class="glyphicon glyphicon-sort"></span>
+                    </span>
+                </th>
+            {% endfor %}
+        </thead>
+        <tbody>
+            {% for timestamp, change in ec.rightsChanges %}
+                <tr>
+                    <td class="sort-entry--date" data-value="{{ timestamp }}">
+                        {{ wiki.logLink(project, change.logId, timestamp|date_format) }}
+                    </td>
+                    <td>
+                        {% for right in change.added %}
+                            <div class="diff-pos">{{ right }}</div>
+                        {% endfor %}
+                        {% for right in change.removed %}
+                            <div class="diff-neg">-{{ right }}</div>
+                        {% endfor %}
+                    </td>
+                    <td class="sort-entry--admin" data-value="{{ change.admin }}">
+                        {{ wiki.userLink(change.admin, project) }}
+                    </td>
+                    <td>
+                        {{ change.comment|raw }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="alert alert-info">
+        {{ msg('no-result', [user.username]) }}
+    </div>
+{% endif %}
+
+{% if not is_sub_request %}
+    </div></section></div></div>
+{% endif %}
+
+{% endblock %}

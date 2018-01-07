@@ -206,19 +206,45 @@ class Edit extends Model
      */
     public function getWikifiedComment($useUnnormalizedPageTitle = false)
     {
-        $summary = htmlspecialchars($this->getSummary(), ENT_NOQUOTES);
+        return self::wikifyString(
+            $this->getSummary(),
+            $this->getProject(),
+            $this->page,
+            $useUnnormalizedPageTitle
+        );
+    }
+
+    /**
+     * Public static method to wikify a summary, can be used on any arbitrary string.
+     * Does NOT support section links unless you specify a page.
+     * @param string $summary
+     * @param Project $project
+     * @param Page $page
+     * @param bool $useUnnormalizedPageTitle Use the unnormalized page title to avoid
+     *   an API call. This should be used only if you fetched the page title via other
+     *   means (SQL query), and is not from user input alone.
+     * @static
+     * @return string
+     */
+    public static function wikifyString(
+        $summary,
+        Project $project,
+        Page $page = null,
+        $useUnnormalizedPageTitle = false
+    ) {
+        $summary = htmlspecialchars($summary, ENT_NOQUOTES);
         $sectionMatch = null;
         $isSection = preg_match_all("/^\/\* (.*?) \*\//", $summary, $sectionMatch);
 
-        if ($isSection) {
-            $pageUrl = $this->getProject()->getUrl(false) . str_replace(
+        if ($isSection && isset($page)) {
+            $pageUrl = $project->getUrl(false) . str_replace(
                 '$1',
-                $this->getPage()->getTitle($useUnnormalizedPageTitle),
-                $this->getProject()->getArticlePath()
+                $page->getTitle($useUnnormalizedPageTitle),
+                $project->getArticlePath()
             );
             $sectionTitle = $sectionMatch[1][0];
 
-            // Must have underscores for the link to properly go to the section
+            // Must have underscores for the link to properly go to the section.
             $sectionTitleLink = htmlspecialchars(str_replace(' ', '_', $sectionTitle));
 
             $sectionWikitext = "<a target='_blank' href='$pageUrl#$sectionTitleLink'>&rarr;</a>" .
@@ -235,11 +261,11 @@ class Edit extends Model
                 isset($wikiLinkParts[1]) ? $wikiLinkParts[1] : $wikiLinkPath
             );
 
-            // Use normalized page title (underscored, capitalized)
-            $pageUrl = $this->getProject()->getUrl(false) . str_replace(
+            // Use normalized page title (underscored, capitalized).
+            $pageUrl = $project->getUrl(false) . str_replace(
                 '$1',
                 ucfirst(str_replace(' ', '_', $wikiLinkPath)),
-                $this->getProject()->getArticlePath()
+                $project->getArticlePath()
             );
 
             $link = "<a target='_blank' href='$pageUrl'>$wikiLinkText</a>";
