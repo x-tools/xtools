@@ -77,7 +77,7 @@ class AutomatedEditsController extends XtoolsController
      *     requirements={
      *         "start" = "|\d{4}-\d{2}-\d{2}",
      *         "end" = "|\d{4}-\d{2}-\d{2}",
-     *         "namespace" = "|all|\d"
+     *         "namespace" = "|all|\d+"
      *     }
      * )
      * @param Request $request The HTTP request.

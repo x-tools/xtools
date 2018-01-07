@@ -217,6 +217,9 @@ parameters:
         XFDCloser:
             regex: '\[\[WP:XFDC\|XFDcloser'
             link: User:Evad37/XFDcloser.js
+        Rater:
+            regex: '\[\[User:Evad37/rater.js'
+            link: User:Evad37/rater.js
     commons.wikimedia.org:
         UploadWizard:
             regex: '^User created page with UploadWizard$'
