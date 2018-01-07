@@ -76,9 +76,9 @@ class ArticleInfoControllerTest extends WebTestCase
 
         $this->assertEquals(
             [
-                'project', 'page', 'revisions', 'editors', 'author', 'author_editcount',
-                'created_at', 'created_rev_id', 'modified_at', 'secs_since_last_edit',
-                'last_edit_id', 'watchers', 'pageviews', 'pageviews_offset',
+                'project', 'page', 'watchers', 'pageviews', 'pageviews_offset',
+                'revisions', 'editors', 'author', 'author_editcount', 'created_at',
+                'created_rev_id', 'modified_at', 'secs_since_last_edit', 'last_edit_id'
             ],
             array_keys($data)
         );

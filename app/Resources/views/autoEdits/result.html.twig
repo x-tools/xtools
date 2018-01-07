@@ -92,85 +92,93 @@
             {% endset %}
         {% else %}
             {% set content %}
-                <table class="table table-bordered table-hover table-striped tools-table toggle-table">
-                    <thead>
-                    {% for key in ['tool', 'count', 'percent-of-tools', 'percent-of-edit-count'] %}
-                        <th>
-                            <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                                {{ msg(key)|capitalize_first }}
-                                <span class="glyphicon glyphicon-sort"></span>
-                            </span>
-                        </th>
-                    {% endfor %}
-                    </thead>
-                    <tbody>
-                    {% for tool, values in toolCounts %}
-                        <tr>
-                            <td class="sort-entry--tool linked" data-value="{{ tool }}">
-                                <span class="tools-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ tool }}">
-                                    <span class="glyphicon glyphicon-remove"></span>
-                                    <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
+                {% if toolCounts|length > 0 %}
+                    <table class="table table-bordered table-hover table-striped tools-table toggle-table">
+                        <thead>
+                        {% for key in ['tool', 'count', 'percent-of-tools', 'percent-of-edit-count'] %}
+                            <th>
+                                <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
+                                    {{ msg(key)|capitalize_first }}
+                                    <span class="glyphicon glyphicon-sort"></span>
                                 </span>
-                                {{ wiki.pageLinkRaw(values.link, project, tool) }}
-                            </td>
-                            <td class="sort-entry--count" data-value="{{ values.count }}">
-                                {{ values.count|num_format }}
-                            </td>
-                            <td class="sort-entry--percent-of-tools" data-value="{{ values.count }}">
-                                {{ values.count|percent_format(toolsTotal) }}
-                            </td>
-                            <td class="sort-entry--percent-of-edit-count" data-value="{{ values.count }}">
-                                {{ values.count|percent_format(editCount) }}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                    <tfoot>
-                        <th class="tools--tools">
-                            {{ toolCounts|length|num_format }}
-                            {{ msg('num-tools', [toolCounts|length]) }}
-                        </th>
-                        <th class="tools--count">
-                            {{ toolsTotal|num_format }}
-                        </th>
-                        <th colspan=2></th>
-                    </tfoot>
-                </table>
+                            </th>
+                        {% endfor %}
+                        </thead>
+                        <tbody>
+                        {% for tool, values in toolCounts %}
+                            <tr>
+                                <td class="sort-entry--tool linked" data-value="{{ tool }}">
+                                    <span class="tools-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ tool }}">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                        <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
+                                    </span>
+                                    {{ wiki.pageLinkRaw(values.link, project, tool) }}
+                                </td>
+                                <td class="sort-entry--count" data-value="{{ values.count }}">
+                                    {{ values.count|num_format }}
+                                </td>
+                                <td class="sort-entry--percent-of-tools" data-value="{{ values.count }}">
+                                    {{ values.count|percent_format(toolsTotal) }}
+                                </td>
+                                <td class="sort-entry--percent-of-edit-count" data-value="{{ values.count }}">
+                                    {{ values.count|percent_format(editCount) }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <th class="tools--tools">
+                                {{ toolCounts|length|num_format }}
+                                {{ msg('num-tools', [toolCounts|length]) }}
+                            </th>
+                            <th class="tools--count">
+                                {{ toolsTotal|num_format }}
+                            </th>
+                            <th colspan=2></th>
+                        </tfoot>
+                    </table>
 
-                <div class="chart-wrapper tools-chart-wrapper toggle-table--chart">
-                    <canvas id="tool_chart" width="400" height="400"></canvas>
-                </div>
+                    {% if toolCounts|length > 1 %}
+                        <div class="chart-wrapper tools-chart-wrapper toggle-table--chart">
+                            <canvas id="tool_chart" width="400" height="400"></canvas>
+                        </div>
 
-                {% set colors = [] %}
-                {% for i in 0..(toolCounts|length) %}
-                    {% set colors = colors|merge([chartColor(i)]) %}
-                {% endfor %}
+                        {% set colors = [] %}
+                        {% for i in 0..(toolCounts|length) %}
+                            {% set colors = colors|merge([chartColor(i)]) %}
+                        {% endfor %}
 
-                <script>
-                    window.toolsChart = new Chart($('#tool_chart'), {
-                        type: 'pie',
-                        data: {
-                            labels: {{ toolCounts|keys|json_encode()|raw }},
-                            datasets: [{
-                                data: [
-                                    {% for tool, values in toolCounts %}
-                                        {{ values.count }}{% if not loop.last %},{% endif %}
-                                    {% endfor %}
-                                ],
-                                backgroundColor: {{ colors|json_encode()|raw }},
-                                borderColor: {{ colors|json_encode()|raw }},
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            aspectRatio: 1,
-                            legend: {
-                              display: false,
-                            }
-                        }
-                    });
-                    window.countsByTool = {{ toolCounts|json_encode()|raw }};
-                </script>
+                        <script>
+                            window.toolsChart = new Chart($('#tool_chart'), {
+                                type: 'pie',
+                                data: {
+                                    labels: {{ toolCounts|keys|json_encode()|raw }},
+                                    datasets: [{
+                                        data: [
+                                            {% for tool, values in toolCounts %}
+                                                {{ values.count }}{% if not loop.last %},{% endif %}
+                                            {% endfor %}
+                                        ],
+                                        backgroundColor: {{ colors|json_encode()|raw }},
+                                        borderColor: {{ colors|json_encode()|raw }},
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    aspectRatio: 1,
+                                    legend: {
+                                      display: false,
+                                    }
+                                }
+                            });
+                            window.countsByTool = {{ toolCounts|json_encode()|raw }};
+                        </script>
+                    {% endif %}
+                {% else %}
+                    <div class="alert alert-info">
+                        {{ msg('no-contribs') }}
+                    </div>
+                {% endif %}
                 <p style="clear:both">
                     <a target="_blank" href="https://phabricator.wikimedia.org/maniphest/task/create/?title=Request to add tool to AutoEdits&amp;projects=XTools&amp;description=Project: {{ project.domain }}%0A%0AName of tool:%0A%0ALinks to example edits:%0A%0ALink to the tool's documentation or homepage:">
                         {{ msg('auto-edits-request') }}

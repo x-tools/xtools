@@ -103,6 +103,26 @@ class AutomatedEditsTest extends WebTestCase
             ]],
             $tools
         );
+
+        $this->assertContains('Undo', array_keys($tools));
+    }
+
+    /**
+     * Test that regex is properly concatenated when merging rules.
+     */
+    public function testRegexConcat()
+    {
+        $tools = $this->aeh->getTools('ar.wikipedia.org');
+
+        $this->assertArraySubset(
+            ['HotCat' => [
+                'regex' => 'باستخدام \[\[ويكيبيديا:المصناف الفوري|using ' .
+                    '\[\[(WP:HOTCAT|WP:HC|Help:Gadget-HotCat)\|HotCat|' .
+                    'Gadget-Hotcat(?:check)?\.js\|Script',
+                'link' => 'ويكيبيديا:المصناف الفوري',
+            ]],
+            $tools
+        );
     }
 
     /**
