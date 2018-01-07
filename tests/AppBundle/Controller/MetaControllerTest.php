@@ -45,7 +45,7 @@ class MetaControllerTest extends WebTestCase
         }
 
         // Should redirect since we have supplied all necessary parameters.
-        $crawler = $this->client->request('GET', '/meta/2017-10-01/2017-10-10');
+        $crawler = $this->client->request('GET', '/meta?start=2017-10-01&end=2017-10-10');
         $this->assertEquals(302, $this->client->getResponse()->getStatusCode());
     }
 }

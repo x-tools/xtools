@@ -20,10 +20,12 @@ parameters:
 
     # These tools work on multiple wikis. These should probably include tags
     #   as the regex may not apply to non-English wikis.
-    # You can also set wiki-specific values that will get merged into the global one.
+    # You can also set wiki-specific regex that will get merged into the global regex.
+    # Other local values such as link, tag and revert are overriden, not merged into the global value.
     # See 'Hugge' under 'global' and 'en.wikipedia.org' for an example.
     global:
         Generic rollback:
+            tag: mw-rollback
             regex: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) edits by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\] \(\[\[User talk:.*?\|talk\]\]\) to last (version|revision) by .*'
             link: Special:MyLanguage/Project:Rollback
             revert: true
@@ -261,3 +263,10 @@ parameters:
         RotateLink:
             regex: '\(\[\[Help:RotateLink\|Script'
             link: Help:RotateLink
+    ar.wikipedia.org:
+        AutoWikiBrowser:
+            regex: 'Project:أوب'
+            link: ويكيبيديا:أوتوويكي_براوزر
+        HotCat:
+            regex: 'باستخدام \[\[ويكيبيديا:المصناف الفوري'
+            link: ويكيبيديا:المصناف الفوري

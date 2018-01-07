@@ -86,13 +86,47 @@ class AutomatedEditsHelper extends HelperBase
             $this->tools[$projectDomain] = [];
         }
 
-        // Merge wiki-specific rules into the global rules
-        $this->tools[$projectDomain] = array_merge_recursive(
-            $toolsByWiki['global'],
-            $this->tools[$projectDomain]
+        // Override global rules with wiki-specific rules.
+        $this->tools[$projectDomain] = $this->mergeValues(
+            $this->tools[$projectDomain],
+            $toolsByWiki['global']
         );
 
         return $this->tools[$projectDomain];
+    }
+
+    /**
+     * Merges the given rule sets, giving priority to the wiki-specific set.
+     * Regex is concatenated, not overridden.
+     * @param array $localValues  The rule set for the local wiki.
+     * @param array $globalValues The global rule set.
+     */
+    private function mergeValues($localValues, $globalValues)
+    {
+        // Initial set, including just the global values.
+        $tools = $globalValues;
+
+        // Loop through local values and override/merge as necessary.
+        foreach ($localValues as $tool => $values) {
+            $newValues = $values;
+
+            if (isset($globalValues[$tool])) {
+                // Order within array_merge is important, so that local values get priority.
+                $newValues = array_merge($globalValues[$tool], $values);
+            }
+
+            // Regex should be merged, not overridden.
+            if (isset($values['regex']) && isset($globalValues[$tool]['regex'])) {
+                $newValues['regex'] = implode('|', [
+                    $values['regex'],
+                    $globalValues[$tool]['regex']
+                ]);
+            }
+
+            $tools[$tool] = $newValues;
+        }
+
+        return $tools;
     }
 
     /**
