@@ -232,7 +232,14 @@ class EditCounterRepository extends Repository
     public function getRightsChanges(Project $project, User $user)
     {
         $loggingTable = $this->getTableName($project->getDatabaseName(), 'logging', 'logindex');
-        $sql = "SELECT log_id, log_timestamp, log_user_text, log_comment, log_params FROM $loggingTable
+        $userTable = $this->getTableName($project->getDatabaseName(), 'user');
+        $sql = "SELECT log_id, log_timestamp, log_comment, log_params, log_action,
+                    IF(log_user_text != '', log_user_text, (
+                        SELECT user_name
+                        FROM $userTable
+                        WHERE user_id = log_user
+                    )) AS log_user_text
+                FROM $loggingTable
                 WHERE log_type = 'rights'
                 AND log_namespace = 2
                 AND log_title = :username

@@ -503,4 +503,102 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
             ]
         ];
     }
+
+    /**
+     * User rights changes.
+     */
+    public function testUserRightsChanges()
+    {
+        $this->editCounterRepo->expects($this->once())
+            ->method('getRightsChanges')
+            ->willReturn([[
+                    'log_id' => '210221',
+                    'log_timestamp' => '20180108132810',
+                    'log_comment' => '',
+                    'log_params' => 'a:4:{s:12:"4::oldgroups";a:6:{i:0;s:10:"bureaucrat";i:1;s:9:' .
+                        '"filemover";i:2;s:6:"import";i:3;s:14:"ipblock-exempt";i:4;s:5:"sysop";i:5;' .
+                        's:14:"templateeditor";}s:12:"5::newgroups";a:5:{i:0;s:10:"bureaucrat";i:1;s:9:' .
+                        '"filemover";i:2;s:6:"import";i:3;s:14:"ipblock-exempt";i:4;s:5:"sysop";}s:11:' .
+                        '"oldmetadata";a:6:{i:0;a:1:{s:6:"expiry";N;}i:1;a:1:{s:6:"expiry";s:14:"' .
+                        '20180108132858";}i:2;a:1:{s:6:"expiry";N;}i:3;a:1:{s:6:"expiry";s:14:"20180108132858"' .
+                        ';}i:4;a:1:{s:6:"expiry";N;}i:5;a:1:{s:6:"expiry";N;}}s:11:"newmetadata";a:5:{i:0;' .
+                        'a:1:{s:6:"expiry";N;}i:1;a:1:{s:6:"expiry";s:14:"20180108132858";}i:2;a:1:{s:6:' .
+                        '"expiry";N;}i:3;a:1:{s:6:"expiry";s:14:"20180108132858";}i:4;a:1:{s:6:"expiry";N;}}}',
+                    'log_action' => 'rights',
+                    'log_user_text' => 'MusikAnimal',
+                ], [
+                    'log_id' => '210220',
+                    'log_timestamp' => '20180108132758',
+                    'log_comment' => '',
+                    'log_params' => 'a:4:{s:12:"4::oldgroups";a:3:{i:0;s:10:"bureaucrat";i:1;s:6:"import";' .
+                        'i:2;s:5:"sysop";}s:12:"5::newgroups";a:6:{i:0;s:10:"bureaucrat";i:1;s:6:"import";' .
+                        'i:2;s:5:"sysop";i:3;s:14:"ipblock-exempt";i:4;s:9:"filemover";i:5;s:14:"templateeditor";}' .
+                        's:11:"oldmetadata";a:3:{i:0;a:1:{s:6:"expiry";N;}i:1;a:1:{s:6:"expiry";N;}i:2;a:1:' .
+                        '{s:6:"expiry";N;}}s:11:"newmetadata";a:6:{i:0;a:1:{s:6:"expiry";N;}i:1;a:1:{s:6:' .
+                        '"expiry";N;}i:2;a:1:{s:6:"expiry";N;}i:3;a:1:{s:6:"expiry";s:14:"20180108132858";}' .
+                        'i:4;a:1:{s:6:"expiry";s:14:"20180108132858";}i:5;a:1:{s:6:"expiry";N;}}}',
+                    'log_action' => 'rights',
+                    'log_user_text' => 'MusikAnimal',
+                ], [
+                    'log_id' => '155321',
+                    'log_timestamp' => '20150716002614',
+                    'log_comment' => 'Per user request.',
+                    'log_params' => 'a:2:{s:12:"4::oldgroups";a:3:{i:0;s:8:"reviewer";i:1;s:10:"rollbacker"' .
+                        ';i:2;s:5:"sysop";}s:12:"5::newgroups";a:3:{i:0;s:8:"reviewer";i:1;s:5:"sysop";i:2;' .
+                        's:10:"bureaucrat";}}',
+                    'log_action' => 'rights',
+                    'log_user_text' => 'Cyberpower678',
+                ], [
+                    'log_id' => '140643',
+                    'log_timestamp' => '20141222034127',
+                    'log_comment' => 'per request',
+                    'log_params' => "\nsysop",
+                    'log_action' => 'rights',
+                    'log_user_text' => 'Snowolf',
+                ]
+            ]);
+
+        $this->assertEquals([
+            20180108132858 => [
+                'logId' => '210220',
+                'admin' => 'MusikAnimal',
+                'comment' => null,
+                'added' => [],
+                'removed' => ['ipblock-exempt', 'filemover'],
+                'automatic' => true,
+            ],
+            20180108132810 => [
+                'logId' => '210221',
+                'admin' => 'MusikAnimal',
+                'comment' => '',
+                'added' => [],
+                'removed' => ['templateeditor'],
+                'automatic' => false,
+            ],
+            20180108132758 => [
+                'logId' => '210220',
+                'admin' => 'MusikAnimal',
+                'comment' => '',
+                'added' => ['ipblock-exempt', 'filemover', 'templateeditor'],
+                'removed' => [],
+                'automatic' => false,
+            ],
+            20150716002614 => [
+                'logId' => '155321',
+                'admin' => 'Cyberpower678',
+                'comment' => 'Per user request.',
+                'added' => ['bureaucrat'],
+                'removed' => ['rollbacker'],
+                'automatic' => false,
+            ],
+            20141222034127 => [
+                'logId' => '140643',
+                'admin' => 'Snowolf',
+                'comment' => 'per request',
+                'added' => ['sysop'],
+                'removed' => [],
+                'automatic' => false,
+            ],
+        ], $this->editCounter->getRightsChanges());
+    }
 }
