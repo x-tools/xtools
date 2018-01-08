@@ -5,7 +5,8 @@
 			"Macofe",
 			"Nemo bis",
 			"MarcoAurelio",
-			"RicardoSGZ"
+			"RicardoSGZ",
+			"2axterix2"
 		]
 	},
 	"about-xtools": "Acerca de estas herramientas",
@@ -17,6 +18,7 @@
 	"actions-as-admin": "Acciones administrativas",
 	"added": "Adiciones",
 	"added-bytes": "Añadidos (bytes)",
+	"admin": "Administrador",
 	"admins-without-action": "Administradores inactivos",
 	"afd": "Artículos para su eliminación",
 	"aiv": "Intervención de administrador contra vandalismo",
@@ -270,6 +272,7 @@
 	"rfx-tally": "Contador",
 	"rfx-total-votes": "!Votos totales",
 	"rights": "Derechos",
+	"rights-changes": "Cambios de privilegios",
 	"rpp": "Solicitudes de protección de páginas",
 	"saturday": "Sábado",
 	"see-full-edit-counts": "Ver los valores completos en el Contador de ediciones",
