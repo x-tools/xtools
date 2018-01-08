@@ -220,20 +220,71 @@ class EditCounter extends Model
             ->getRightsChanges($this->project, $this->user);
 
         foreach ($logData as $row) {
-            $unserialized = unserialize($row['log_params']);
-            $old = $unserialized['4::oldgroups'];
-            $new = $unserialized['5::newgroups'];
+            try {
+                $unserialized = unserialize($row['log_params']);
+                $old = $unserialized['4::oldgroups'];
+                $new = $unserialized['5::newgroups'];
+                $added = array_diff($new, $old);
+                $removed = array_diff($old, $new);
+
+                $this->setAutoRemovals($row, $unserialized, $added);
+            } catch (Exception $e) {
+                // This is the old school format the most likely contains
+                // the list of rights additions in as a comma-separated list.
+                list($old, $new) = explode("\n", $row['log_params']);
+                $old = array_filter(array_map('trim', explode(',', $old)));
+                $new = array_filter(array_map('trim', explode(',', $new)));
+                $added = array_diff($new, $old);
+                $removed = array_diff($old, $new);
+            }
 
             $this->rightsChanges[$row['log_timestamp']] = [
                 'logId' => $row['log_id'],
                 'admin' => $row['log_user_text'],
                 'comment' => Edit::wikifyString($row['log_comment'], $this->project),
-                'added' => array_diff($new, $old),
-                'removed' => array_diff($old, $new),
+                'added' => array_values($added),
+                'removed' => array_values($removed),
+                'automatic' => $row['log_action'] === 'autopromote'
             ];
         }
 
+        krsort($this->rightsChanges);
+
         return $this->rightsChanges;
+    }
+
+    /**
+     * Check the given log entry for rights changes that are set to automatically expire,
+     * and add entries to $this->rightsChanges accordingly.
+     * @param array $row Log entry row from database.
+     * @param array $params Unserialized log params.
+     * @param string[] $added List of added user rights.
+     */
+    private function setAutoRemovals($row, $params, $added)
+    {
+        foreach ($added as $index => $entry) {
+            if (!isset($params['newmetadata'][$index]) ||
+                !array_key_exists('expiry', $params['newmetadata'][$index]) ||
+                empty($params['newmetadata'][$index]['expiry'])
+            ) {
+                continue;
+            }
+
+            $expiry = $params['newmetadata'][$index]['expiry'];
+
+            if (isset($this->rightsChanges[$expiry])) {
+                $this->rightsChanges[$expiry]['removed'][] = $entry;
+            } else {
+                $this->rightsChanges[$expiry] = [
+                    'logId' => $row['log_id'],
+                    'admin' => $row['log_user_text'],
+                    'comment' => null,
+                    'added' => [],
+                    'removed' => [$entry],
+                    'automatic' => true,
+                ];
+            }
+        }
     }
 
     /**

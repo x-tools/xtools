@@ -41,19 +41,23 @@
                     <td class="sort-entry--date" data-value="{{ timestamp }}">
                         {{ wiki.logLink(project, change.logId, timestamp|date_format) }}
                     </td>
-                    <td>
+                    <td class="sort-entry--rights" data-value="{{ change.added|length + change.removed|length }}">
                         {% for right in change.added %}
-                            <div class="diff-pos">{{ right }}</div>
+                            <div class="diff-pos">{{ right|trim }}</div>
                         {% endfor %}
                         {% for right in change.removed %}
-                            <div class="diff-neg">-{{ right }}</div>
+                            <div class="diff-neg">-{{ right|trim }}</div>
                         {% endfor %}
                     </td>
                     <td class="sort-entry--admin" data-value="{{ change.admin }}">
                         {{ wiki.userLink(change.admin, project) }}
                     </td>
-                    <td>
-                        {{ change.comment|raw }}
+                    <td class="sort-entry--summary" data-value="{{ change.comment }}">
+                        {% if change.automatic %}
+                            <i class="text-muted">{{ msg('automatic') }}</i>
+                        {% else %}
+                            {{ change.comment|raw }}
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}
