@@ -1,5 +1,14 @@
 # Release Notes #
 
+## 3.1.24 ##
+- Add section to Edit Counter that lists legible user rights changes.
+- Add new MediaWiki tags for rollback and undo to AutoEdits.
+- T183757: Improve AutoEdits for ar.wikipedia.
+- Add Evad37's rater.js to AutoEdits.
+- Fix link to TopEdits from within EditCounter.
+- Make site notices more prominent.
+- Localization updates.
+
 ## 3.1.23 ##
 - T172003: Add option to filter deleted pages to Pages Created tool.
 
