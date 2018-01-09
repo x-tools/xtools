@@ -220,15 +220,15 @@ class EditCounter extends Model
             ->getRightsChanges($this->project, $this->user);
 
         foreach ($logData as $row) {
-            try {
-                $unserialized = unserialize($row['log_params']);
+            $unserialized = @unserialize($row['log_params']);
+            if ($unserialized !== false) {
                 $old = $unserialized['4::oldgroups'];
                 $new = $unserialized['5::newgroups'];
                 $added = array_diff($new, $old);
                 $removed = array_diff($old, $new);
 
                 $this->setAutoRemovals($row, $unserialized, $added);
-            } catch (Exception $e) {
+            } else {
                 // This is the old school format the most likely contains
                 // the list of rights additions in as a comma-separated list.
                 list($old, $new) = explode("\n", $row['log_params']);
