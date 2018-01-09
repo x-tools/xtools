@@ -1,17 +1,29 @@
 filter:
-  excluded_paths:
-    - var/*
-    - 'app/*'
-    - 'tests/*'
-    - 'bin/*'
-    - 'vendor/*'
-    - 'web/bootstrap/*'
-    - 'web/chartjs/*'
-    - 'web/static/js/vendor/*'
-    - '*.min.js'
+    excluded_paths:
+        - var/*
+        - 'app/*'
+        - 'tests/*'
+        - 'bin/*'
+        - 'vendor/*'
+        - 'web/bootstrap/*'
+        - 'web/chartjs/*'
+        - 'web/static/js/vendor/*'
+        - '*.min.js'
 build:
+    project_setup:
+        before:
+            - composer self-update
+            - wget https://github.com/phpDocumentor/phpDocumentor2/releases/download/v2.9.0/phpDocumentor.phar
     tests:
         override:
+            -
+                command: composer validate
+            -
+                command: ./vendor/bin/phpcs -s . --ignore=/home/scrutinizer/build/node_modules
+            -
+                command: php phpDocumentor.phar -d src -t docs/api --template="checkstyle"
+            -
+                command: ( [[ -z $(grep "error" docs/api/checkstyle.xml) ]] )
             -
                 command: './vendor/bin/phpunit --coverage-clover=coverage.xml'
                 coverage:
