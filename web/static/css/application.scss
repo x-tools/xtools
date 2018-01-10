@@ -218,6 +218,17 @@ $tooltip-shadow: #ccc;
         text-decoration: none;
     }
 }
+.date-range {
+    @include center('vertical');
+    right: 0;
+    font-size: 70%;
+
+    @media (max-width: $bootstrap-sm) {
+        position: relative;
+        top: 0;
+        transform: none;
+    }
+}
 .xt-toc {
     background: white;
     font-size: 110%;

@@ -6,6 +6,8 @@
         <fieldset class="form-fieldset">
             {{ forms.wiki_input(project) }}
             {{ forms.page_input(true, project) }}
+            {{ forms.date_input('start', false) }}
+            {{ forms.date_input('end', false) }}
         </fieldset>
         {{ forms.submit_btn }}
     </form>

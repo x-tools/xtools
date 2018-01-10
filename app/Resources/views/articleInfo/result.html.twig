@@ -16,6 +16,17 @@
                 &bull;
                 {{ project.domain }}
             </small>
+            {% if ai.hasDateRange %}
+                <span class="date-range">
+                    {% if ai.endDate == false %}
+                        {{ msg('date-from', [ai.startDate|date('Y-m-d')]) }}
+                    {% elseif ai.startDate == false %}
+                        {{ msg('date-to', [ai.endDate|date('Y-m-d')]) }}
+                    {% else %}
+                        {{ msg('date-range', [ai.startDate|date('Y-m-d'), ai.endDate|date('Y-m-d')]) }}
+                    {% endif %}
+                </span>
+            {% endif %}
         </div>
     </header>
 
@@ -26,7 +37,11 @@
             {{ wiki.pageLogLink(page) }}
             {% if isWMFLabs() %}
                 &middot;
-                {{ wiki.pageviewsLinks(page) }}
+                {{ wiki.pageviewsLinks(
+                    page,
+                    ai.startDate is not null ? ai.startDate|date('Y-m-d') : null,
+                    ai.endDate is not null ? ai.endDate|date('Y-m-d') : null
+                ) }}
                 {% if page.wikidataId is defined %}
                     &middot;
                     {{ wiki.extLink('https://tools.wmflabs.org/reasonator/?q=' ~ page.wikidataId, 'Resonator (Wikidata)') }}
@@ -39,10 +54,10 @@
             {% if ai.automatedCount > 0 %}
                 {% set sections = sections|merge(['auto-edits']) %}
             {% endif %}
-            {% if ai.assessments and not (page.isMainPage) %}
+            {% if not (ai.hasDateRange) and ai.assessments %}
                 {% set sections = sections|merge(['assessments']) %}
             {% endif %}
-            {% if ai.numBugs > 0 %}
+            {% if not (ai.hasDateRange) and ai.numBugs > 0 %}
                 {% set sections = sections|merge(['bugs']) %}
             {% endif %}
 
@@ -75,7 +90,7 @@
                     {% endif %}
                     <tr>
                         <td>{{ msg('page-size') }}</td>
-                        <td>{{ page.length|num_format }} {{ msg('num-bytes', [page.length]) }}</td>
+                        <td>{{ ai.length|num_format }} {{ msg('num-bytes', [ai.length]) }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('total-edits') }}</td>
@@ -92,7 +107,7 @@
                         </td>
                         <td>{{ ai.numEditors|num_format }}</td>
                     </tr>
-                    {% if ai.assessments and not (page.isMainPage) %}
+                    {% if not (ai.hasDateRange) and ai.assessments and not (page.isMainPage) %}
                         <tr>
                             <td>
                                 <a class="rm-inline-margin" href="#assessments">{{ msg('assessment') }}</a>
@@ -169,22 +184,24 @@
                         <td>{{ msg('average-edits-per-year') }}</td>
                         <td>{{ ai.editsPerYear|num_format(1) }}</td>
                     </tr>
-                    <tr>
-                        <td>{{ msg('edits-last-day') }}</td>
-                        <td>{{ ai.countHistory.day|num_format }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ msg('edits-last-week') }}</td>
-                        <td>{{ ai.countHistory.week|num_format }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ msg('edits-last-month') }}</td>
-                        <td>{{ ai.countHistory.month|num_format }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ msg('edits-last-year') }}</td>
-                        <td>{{ ai.countHistory.year|num_format }}</td>
-                    </tr>
+                    {% if not (ai.hasDateRange) %}
+                        <tr>
+                            <td>{{ msg('edits-last-day') }}</td>
+                            <td>{{ ai.countHistory.day|num_format }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('edits-last-week') }}</td>
+                            <td>{{ ai.countHistory.week|num_format }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('edits-last-month') }}</td>
+                            <td>{{ ai.countHistory.month|num_format }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('edits-last-year') }}</td>
+                            <td>{{ ai.countHistory.year|num_format }}</td>
+                        </tr>
+                    {% endif %}
                     <tr>
                         <td>{{ msg('top-ten-count') }}</td>
                         <td>
@@ -252,30 +269,32 @@
                             {{ wiki.pageRedirectsLink(page, ai.redirectsCount|num_format) }}
                         </td>
                     </tr>
-                    <tr>
-                        <td>{{ msg('links-out') }}</td>
-                        <td>{{ ai.linksOutCount|num_format }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ msg('links-external') }}</td>
-                        <td>{{ ai.linksExtCount|num_format }}</td>
-                    </tr>
-                    {% if page.watchers is not empty %}
+                    {% if not (ai.hasDateRange) %}
                         <tr>
-                            <td>{{ msg('page-watchers') }}</td>
-                            <td>{{ page.watchers|num_format }}</td>
+                            <td>{{ msg('links-out') }}</td>
+                            <td>{{ ai.linksOutCount|num_format }}</td>
                         </tr>
+                        <tr>
+                            <td>{{ msg('links-external') }}</td>
+                            <td>{{ ai.linksExtCount|num_format }}</td>
+                        </tr>
+                        {% if page.watchers is not empty %}
+                            <tr>
+                                <td>{{ msg('page-watchers') }}</td>
+                                <td>{{ page.watchers|num_format }}</td>
+                            </tr>
+                        {% endif %}
                     {% endif %}
                     {% if isWMFLabs() %}
                     <tr>
-                        <td>{{ msg('pageviews') }} (60 {{ msg('num-days', [60]) }})</td>
+                        <td>{{ msg('pageviews') }}{% if not (ai.hasDateRange) %} (60 {{ msg('num-days', [60]) }}){% endif %}</td>
                         <td>
                             {{ wiki.pageviewsLink(page, ai.pageviews(pageviewsOffset)|num_format, 'range=latest-' ~ pageviewsOffset) }}
                         </td>
                     </tr>
                     {% endif %}
 
-                    {% if ai.numBugs > 0 %}
+                    {% if not (ai.hasDateRange) and ai.numBugs > 0 %}
                     <tr>
                         <td class="stat-list--new-group"><a href='#bugs'>{{ msg('bugs') }}</a></td>
                         <td class="stat-list--new-group">{{ ai.numBugs }}</td>
@@ -753,7 +772,7 @@
         {% endif %}
 
         {# ======================== ASSESSMENTS ======================== #}
-        {% if ai.assessments and not (page.isMainPage) %}
+        {% if not (ai.hasDateRange) and ai.assessments and not (page.isMainPage) %}
         {% set content %}
             <table class="table table-bordered table-hover table-striped assessments-table">
                 <thead><tr>
@@ -792,7 +811,7 @@
         {% endif %}
 
         {# ======================== BUGS ======================== #}
-        {% if ai.numBugs > 0 %}
+        {% if not (ai.hasDateRange) and ai.numBugs > 0 %}
         {% set content %}
             <table class="table table-bordered table-hover table-striped bugs-table">
                 <thead><tr>

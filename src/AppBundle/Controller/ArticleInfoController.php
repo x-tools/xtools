@@ -120,15 +120,38 @@ class ArticleInfoController extends XtoolsController
     }
 
     /**
-     * Display the results.
-     * @Route("/articleinfo/{project}/{article}", name="ArticleInfoResult", requirements={"article"=".+"})
-     * @param Request $request The HTTP request.
-     * @param string $article
+     * Display the results in given date range.
+     * @Route(
+     *    "/articleinfo/{project}/{article}/{start}/{end}", name="ArticleInfoResult",
+     *     requirements={
+     *         "article"=".+",
+     *         "start"="|\d{4}-\d{2}-\d{2}",
+     *         "end"="|\d{4}-\d{2}-\d{2}",
+     *     }
+     * )
+     * @param Request $request
+     * @param $article
+     * @param null|string $start
+     * @param null|string $end
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction(Request $request, $article)
+    public function resultAction(Request $request, $article, $start = null, $end = null)
     {
+        // This is some complicated stuff here. We pass $start and $end to method signature
+        // for router regex parser to parse `article` with those parameters and then
+        // manually retrieve what we want. It's done this way because programmatical way
+        // is much easier (or maybe even only existing) solution for that.
+
+        // Does path have `start` and `end` parameters (even empty ones)?
+        if (1 === preg_match('/(.+?)\/(|\d{4}-\d{2}-\d{2})\/(|\d{4}-\d{2}-\d{2})$/', $article, $matches)) {
+            $article = $matches[1];
+            $start = $matches[2];
+            $end = $matches[3];
+        }
+
+        list($start, $end) = $this->getUTCFromDateParams($start, $end, false);
+
         // In this case only the project is validated.
         $ret = $this->validateProjectAndUser($request);
         if ($ret instanceof RedirectResponse) {
@@ -142,9 +165,18 @@ class ArticleInfoController extends XtoolsController
             return $page;
         }
 
+        if (!$this->isDateRangeValid($page, $start, $end)) {
+            $this->addFlash('notice', ['date-range-outside-revisions']);
+
+            return $this->redirectToRoute('ArticleInfoResult', [
+                'project' => $request->get('project'),
+                'article' => $article
+            ]);
+        }
+
         $articleInfoRepo = new ArticleInfoRepository();
         $articleInfoRepo->setContainer($this->container);
-        $articleInfo = new ArticleInfo($page, $this->container);
+        $articleInfo = new ArticleInfo($page, $this->container, $start, $end);
         $articleInfo->setRepository($articleInfoRepo);
 
         $articleInfo->prepareData();
@@ -180,6 +212,18 @@ class ArticleInfoController extends XtoolsController
         }
 
         return $response;
+    }
+
+    /**
+     * Check if there were any revisions of given page in given date range.
+     * @param Page $page
+     * @param false|int $start
+     * @param false|int $end
+     * @return bool
+     */
+    private function isDateRangeValid(Page $page, $start, $end)
+    {
+        return $page->getNumRevisions(null, $start, $end) > 0;
     }
 
     /************************ API endpoints ************************/

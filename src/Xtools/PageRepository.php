@@ -101,9 +101,11 @@ class PageRepository extends Repository
      * Get revisions of a single page.
      * @param Page $page The page.
      * @param User|null $user Specify to get only revisions by the given user.
+     * @param false|int $start
+     * @param false|int $end
      * @return string[] Each member with keys: id, timestamp, length-
      */
-    public function getRevisions(Page $page, User $user = null)
+    public function getRevisions(Page $page, User $user = null, $start = false, $end = false)
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'page_revisions');
         if ($this->cache->hasItem($cacheKey)) {
@@ -112,7 +114,7 @@ class PageRepository extends Repository
 
         $this->stopwatch->start($cacheKey, 'XTools');
 
-        $stmt = $this->getRevisionsStmt($page, $user);
+        $stmt = $this->getRevisionsStmt($page, $user, null, null, $start, $end);
         $result = $stmt->fetchAll();
 
         // Cache for 10 minutes, and return.
@@ -133,10 +135,18 @@ class PageRepository extends Repository
      * @param int $numRevisions Number of revisions, if known. This is used solely to determine the
      *   OFFSET if we are given a $limit (see below). If $limit is set and $numRevisions is not set,
      *   a separate query is ran to get the nuber of revisions.
+     * @param false|int $start
+     * @param false|int $end
      * @return Doctrine\DBAL\Driver\PDOStatement
      */
-    public function getRevisionsStmt(Page $page, User $user = null, $limit = null, $numRevisions = null)
-    {
+    public function getRevisionsStmt(
+        Page $page,
+        User $user = null,
+        $limit = null,
+        $numRevisions = null,
+        $start = false,
+        $end = false
+    ) {
         $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
         $userClause = $user ? "revs.rev_user_text in (:username) AND " : "";
 
@@ -150,6 +160,8 @@ class PageRepository extends Repository
             $limitClause = "LIMIT $offset, $limit";
         }
 
+        $datesConditions = $this->createDatesConditions($start, $end, 'revs.');
+
         $sql = "SELECT
                     revs.rev_id AS id,
                     revs.rev_timestamp AS timestamp,
@@ -161,7 +173,7 @@ class PageRepository extends Repository
                     revs.rev_comment AS comment
                 FROM $revTable AS revs
                 LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-                WHERE $userClause revs.rev_page = :pageid
+                WHERE $userClause revs.rev_page = :pageid $datesConditions
                 ORDER BY revs.rev_timestamp ASC
                 $limitClause";
 
@@ -178,9 +190,11 @@ class PageRepository extends Repository
      * Get a count of the number of revisions of a single page
      * @param Page $page The page.
      * @param User|null $user Specify to only count revisions by the given user.
+     * @param false|int $start
+     * @param false|int $end
      * @return int
      */
-    public function getNumRevisions(Page $page, User $user = null)
+    public function getNumRevisions(Page $page, User $user = null, $start = false, $end = false)
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'page_numrevisions');
         if ($this->cache->hasItem($cacheKey)) {
@@ -190,9 +204,11 @@ class PageRepository extends Repository
         $revTable = $page->getProject()->getTableName('revision');
         $userClause = $user ? "rev_user_text in (:username) AND " : "";
 
+        $datesConditions = $this->createDatesConditions($start, $end);
+
         $sql = "SELECT COUNT(*)
                 FROM $revTable
-                WHERE $userClause rev_page = :pageid";
+                WHERE $userClause rev_page = :pageid $datesConditions";
         $params = ['pageid' => $page->getId()];
         if ($user) {
             $params['username'] = $user->getUsername();

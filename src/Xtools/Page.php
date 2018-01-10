@@ -222,13 +222,15 @@ class Page extends Model
     /**
      * Get the number of revisions the page has.
      * @param User $user Optionally limit to those of this user.
+     * @param false|int $start
+     * @param false|int $end
      * @return int
      */
-    public function getNumRevisions(User $user = null)
+    public function getNumRevisions(User $user = null, $start = false, $end = false)
     {
         // If a user is given, we will not cache the result via instance variable.
         if ($user !== null) {
-            return (int) $this->getRepository()->getNumRevisions($this, $user);
+            return (int) $this->getRepository()->getNumRevisions($this, $user, $start, $end);
         }
 
         // Return cached value, if present.
@@ -241,7 +243,7 @@ class Page extends Model
             $this->numRevisions = count($this->revisions);
         } else {
             // Otherwise do a COUNT in the event fetching all revisions is not desired.
-            $this->numRevisions = (int) $this->getRepository()->getNumRevisions($this);
+            $this->numRevisions = (int) $this->getRepository()->getNumRevisions($this, null, $start, $end);
         }
 
         return $this->numRevisions;
@@ -250,15 +252,17 @@ class Page extends Model
     /**
      * Get all edits made to this page.
      * @param User|null $user Specify to get only revisions by the given user.
+     * @param false|int $start
+     * @param false|int $end
      * @return array
      */
-    public function getRevisions(User $user = null)
+    public function getRevisions(User $user = null, $start = false, $end = false)
     {
         if ($this->revisions) {
             return $this->revisions;
         }
 
-        $this->revisions = $this->getRepository()->getRevisions($this, $user);
+        $this->revisions = $this->getRepository()->getRevisions($this, $user, $start, $end);
 
         return $this->revisions;
     }
@@ -287,16 +291,23 @@ class Page extends Model
      * @param int $numRevisions Number of revisions, if known. This is used solely to determine the
      *   OFFSET if we are given a $limit. If $limit is set and $numRevisions is not set, a
      *   separate query is ran to get the nuber of revisions.
+     * @param false|int $start
+     * @param false|int $end
      * @return Doctrine\DBAL\Driver\PDOStatement
      */
-    public function getRevisionsStmt(User $user = null, $limit = null, $numRevisions = null)
-    {
+    public function getRevisionsStmt(
+        User $user = null,
+        $limit = null,
+        $numRevisions = null,
+        $start = false,
+        $end = false
+    ) {
         // If we have a limit, we need to know the total number of revisions so that PageRepo
         // will properly set the OFFSET. See PageRepository::getRevisionsStmt() for more info.
         if (isset($limit) && $numRevisions === null) {
-            $numRevisions = $this->getNumRevisions($user);
+            $numRevisions = $this->getNumRevisions($user, $start, $end);
         }
-        return $this->getRepository()->getRevisionsStmt($this, $user, $limit, $numRevisions);
+        return $this->getRepository()->getRevisionsStmt($this, $user, $limit, $numRevisions, $start, $end);
     }
 
     /**
@@ -518,7 +529,7 @@ class Page extends Model
      * Get the sum of pageviews for the given page and timeframe.
      * @param string|DateTime $start In the format YYYYMMDD
      * @param string|DateTime $end In the format YYYYMMDD
-     * @return string[]
+     * @return int
      */
     public function getPageviews($start, $end)
     {
