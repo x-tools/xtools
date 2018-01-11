@@ -6,7 +6,8 @@
 			"Nemo bis",
 			"MarcoAurelio",
 			"RicardoSGZ",
-			"2axterix2"
+			"2axterix2",
+			"La Mantis"
 		]
 	},
 	"about-xtools": "Acerca de estas herramientas",
@@ -36,6 +37,7 @@
 	"assessments": "Evaluaciones",
 	"auto-edits": "Ediciones (semi)automatizadas",
 	"auto-edits-request": "Solicita que se añada una nueva herramienta (semi-)automatizada",
+	"automatic": "Automático",
 	"average-change-per-page": "Cambio promedio por página",
 	"average-edit-size": "Tamaño promedio de edición",
 	"average-edits-per-day": "Ediciones promedio por día",
