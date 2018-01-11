@@ -59,7 +59,8 @@
         "phpunit/phpunit": "^4.8",
         "symfony/phpunit-bridge": "^3.0",
         "squizlabs/php_codesniffer": "^2.0",
-        "jakub-onderka/php-parallel-lint": "^0.9"
+        "jakub-onderka/php-parallel-lint": "^0.9",
+        "mediawiki/minus-x": "0.3.0"
     },
     "scripts": {
         "node_scripts": [
@@ -87,7 +88,11 @@
             "./vendor/bin/phpcs -s .",
             "{ [[ ! -f 'phpDocumentor.phar' ]] && curl -L https://github.com/phpDocumentor/phpDocumentor2/releases/download/v2.9.0/phpDocumentor.phar --output phpDocumentor.phar; } || true",
             "php phpDocumentor.phar -d src -t docs/api --template='checkstyle' --ansi && ( [[ -z $(grep 'error' docs/api/checkstyle.xml) ]] )",
-            "./vendor/bin/phpunit tests"
+            "./vendor/bin/phpunit tests",
+            "./vendor/bin/minus-x check ."
+        ],
+        "fix": [
+            "./vendor/bin/minus-x fix ."
         ]
     },
     "extra": {
