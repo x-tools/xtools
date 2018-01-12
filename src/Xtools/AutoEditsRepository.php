@@ -100,7 +100,7 @@ class AutoEditsRepository extends UserRepository
         }
         $this->stopwatch->start($cacheKey, 'XTools');
 
-        list($condBegin, $condEnd) = $this->getRevTimestampConditions($start, $end);
+        list($condBegin, $condEnd) = $this->getRevTimestampConditions($start, $end, 'revs.');
 
         // Get the combined regex and tags for the tools
         list($regex, $tags) = $this->getToolRegexAndTags($project->getDomain());

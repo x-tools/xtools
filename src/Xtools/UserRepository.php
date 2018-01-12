@@ -491,18 +491,20 @@ class UserRepository extends Repository
      * the given start and end parameters exist.
      * @param  string $start
      * @param  string $end
+     * @param string $tableAlias Alias of table FOLLOWED BY DOT.
+     * @todo FIXME: merge with Repository::createDatesConditions
      * @return string[] Clauses for start and end timestamps.
      */
-    protected function getRevTimestampConditions($start, $end)
+    protected function getRevTimestampConditions($start, $end, $tableAlias = '')
     {
         $condBegin = '';
         $condEnd = '';
 
         if (!empty($start)) {
-            $condBegin = 'AND rev_timestamp >= :start ';
+            $condBegin = "AND {$tableAlias}rev_timestamp >= :start ";
         }
         if (!empty($end)) {
-            $condEnd = 'AND rev_timestamp <= :end ';
+            $condEnd = "AND {$tableAlias}rev_timestamp <= :end ";
         }
 
         return [$condBegin, $condEnd];

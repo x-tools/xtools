@@ -82,7 +82,7 @@ class ArticleInfoRepository extends Repository
         $url = "https://api.wikiwho.net/$projectLang/api/v1.0.0-beta/rev_content/" .
             "$title/?o_rev_id=false&editor=true&token_id=false&out=false&in=false";
 
-        $res = $client->request('GET', $url);
+        $res = $client->request('GET', $url, ['http_errors' => false]);
         return json_decode($res->getBody()->getContents(), true);
     }
 

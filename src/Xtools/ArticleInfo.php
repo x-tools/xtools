@@ -1276,6 +1276,14 @@ class ArticleInfo extends Model
 
         // TODO: check for failures. Should have a success:true
         $ret = $this->getRepository()->getTextshares($this->page);
+
+        // If revision can't be found, return error message.
+        if (!isset($ret['revisions'][0])) {
+            return [
+                'error' => isset($ret['Error']) ? $ret['Error'] : 'Unknown'
+            ];
+        }
+
         $revId = array_keys($ret['revisions'][0])[0];
         $tokens = $ret['revisions'][0][$revId]['tokens'];
 
