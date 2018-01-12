@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.1.26 ##
+- Fix rendering of Authorship template in ArticleInfo.
+- Don't show Authorship in ArticleInfo if dates have been provided.
+
 ## 3.1.25 ##
 - T181694: Add date range options to ArticleInfo.
 - T176912: Add authorship attribution statistics (aka textshares)
