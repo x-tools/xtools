@@ -264,6 +264,8 @@ parameters:
             regex: '\(\[\[Help:RotateLink\|Script'
             link: Help:RotateLink
     ar.wikipedia.org:
+        Generic rollback:
+            regex: 'استرجاع تعديلات.*حتى آخر نسخة بواسطة'
         AutoWikiBrowser:
             regex: 'Project:أوب'
             link: ويكيبيديا:أوتوويكي_براوزر
