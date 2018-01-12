@@ -55,7 +55,7 @@ parameters:
             link: meta:Special:MyLanguage/Global renamers
         Page move:
             regex: 'moved page \[\[(?!.*?WP:AFCH)|moved \[\[.*?\]\] to \[\['
-            link: Special:MyLanguage/Project:Move
+            link: mw:Special:MyLanguage/Help:Moving a page
         Popups:
             regex: 'Wikipedia:Tools\/Navigation_popups|popups'
             link: w:en:Project:Popups
@@ -266,6 +266,10 @@ parameters:
     ar.wikipedia.org:
         Generic rollback:
             regex: 'استرجاع تعديلات.*حتى آخر نسخة بواسطة'
+        Undo:
+            regex: 'الرجوع عن التعديل \d+ بواسطة'
+        Page move:
+            regex: 'نقل.*?صفحة \[\[.*?إلى \[\['
         AutoWikiBrowser:
             regex: 'Project:أوب'
             link: ويكيبيديا:أوتوويكي_براوزر
