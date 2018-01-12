@@ -21,6 +21,12 @@ class ArticleInfo extends Model
     /** @var Page The page. */
     protected $page;
 
+    /** @var false|int From what date to obtain records. */
+    protected $startDate;
+
+    /** @var false|int To what date to obtain records. */
+    protected $endDate;
+
     /** @var int Number of revisions that belong to the page. */
     protected $numRevisions;
 
@@ -120,11 +126,42 @@ class ArticleInfo extends Model
      * ArticleInfo constructor.
      * @param Page $page The page to process.
      * @param Container $container The DI container.
+     * @param false|int $start From what date to obtain records.
+     * @param false|int $end To what date to obtain records.
      */
-    public function __construct(Page $page, Container $container)
+    public function __construct(Page $page, Container $container, $start = false, $end = false)
     {
         $this->page = $page;
         $this->container = $container;
+        $this->startDate = $start;
+        $this->endDate = $end;
+    }
+
+    /**
+     * Get date opening date range.
+     * @return false|int
+     */
+    public function getStartDate()
+    {
+        return $this->startDate;
+    }
+
+    /**
+     * Get date closing date range.
+     * @return false|int
+     */
+    public function getEndDate()
+    {
+        return $this->endDate;
+    }
+
+    /**
+     * Has date range?
+     * @return bool
+     */
+    public function hasDateRange()
+    {
+        return $this->startDate !== false || $this->endDate !== false;
     }
 
     /**
@@ -144,7 +181,7 @@ class ArticleInfo extends Model
     public function getNumRevisions()
     {
         if (!isset($this->numRevisions)) {
-            $this->numRevisions = $this->page->getNumRevisions();
+            $this->numRevisions = $this->page->getNumRevisions(null, $this->startDate, $this->endDate);
         }
         return $this->numRevisions;
     }
@@ -241,6 +278,19 @@ class ArticleInfo extends Model
     }
 
     /**
+     * Returns length of the page.
+     * @return int
+     */
+    public function getLength()
+    {
+        if ($this->hasDateRange()) {
+            return $this->lastEdit->getLength();
+        }
+
+        return $this->page->getLength();
+    }
+
+    /**
      * Get the average number of days between edits to the page.
      * @return double
      */
@@ -334,7 +384,58 @@ class ArticleInfo extends Model
      */
     public function getPageviews($latest)
     {
-        return $this->page->getLastPageviews($latest);
+        if (false === $this->startDate && false === $this->endDate) {
+            return $this->page->getLastPageviews($latest);
+        }
+
+        list($start, $end) = $this->translateDatesToYYYYMMDD($this->startDate, $this->endDate);
+        list($start, $end) = $this->applyDatesDefaults($start, $end);
+
+        return $this->page->getPageviews($start, $end);
+    }
+
+    /**
+     * "Translate" dates to YYYYMMDD format.
+     *
+     * @param false|string $start
+     * @param false|string $end
+     * @return array
+     */
+    private function translateDatesToYYYYMMDD($start, $end)
+    {
+        if (false !== $start) {
+            $start = date('Ymd', $start);
+        }
+        if (false !== $end) {
+            $end = date('Ymd', $end);
+        }
+
+        return [$start, $end];
+    }
+
+    /**
+     * Apply defaults, that is $defaultDays days back for $start and current date for $end.
+     *
+     * @param false|string $start
+     * @param false|string $end
+     * @return array
+     */
+    private function applyDatesDefaults($start, $end)
+    {
+        if (false === $start && false === $end) {
+            // [false, false] basically
+            return [$start, $end];
+        }
+
+        if (false === $start) {
+            // Remember, YYYYMMDD format.
+            $start = date('Ymd', 0);
+        }
+        if (false === $end) {
+            $end = date('Ymd', time());
+        }
+
+        return [$start, $end];
     }
 
     /**
@@ -586,7 +687,13 @@ class ArticleInfo extends Model
         }
 
         // Third parameter is ignored if $limit is null.
-        $revStmt = $this->page->getRevisionsStmt(null, $limit, $this->getNumRevisions());
+        $revStmt = $this->page->getRevisionsStmt(
+            null,
+            $limit,
+            $this->getNumRevisions(),
+            $this->startDate,
+            $this->endDate
+        );
         $revCount = 0;
 
         /**
@@ -853,6 +960,12 @@ class ArticleInfo extends Model
         for ($i = 1; $i <= 12; $i++) {
             $timeObj = mktime(0, 0, 0, $i, 1, $editYear);
 
+            $date = $editYear . sprintf('%02d', $i) . '01';
+            if (false !== $this->startDate && $date < date('Ymd', $this->startDate)
+                || false !== $this->endDate && $date > date('Ymd', $this->endDate)) {
+                continue;
+            }
+
             // Don't show zeros for months before the first edit or after the current month.
             if ($timeObj < $firstEditTime || $timeObj > strtotime('last day of this month')) {
                 continue;
@@ -970,7 +1083,7 @@ class ArticleInfo extends Model
     {
         // Parse the botedits
         $bots = [];
-        $botData = $this->getRepository()->getBotData($this->page);
+        $botData = $this->getRepository()->getBotData($this->page, $this->startDate, $this->endDate);
         while ($bot = $botData->fetch()) {
             $bots[$bot['username']] = [
                 'count' => (int) $bot['count'],
@@ -1018,7 +1131,11 @@ class ArticleInfo extends Model
      */
     private function setLogsEvents()
     {
-        $logData = $this->getRepository()->getLogEvents($this->page);
+        $logData = $this->getRepository()->getLogEvents(
+            $this->page,
+            $this->startDate,
+            $this->endDate
+        );
 
         foreach ($logData as $event) {
             $time = strtotime($event['timestamp']);

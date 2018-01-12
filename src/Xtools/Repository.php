@@ -288,4 +288,29 @@ abstract class Repository
             ->expiresAfter(new DateInterval($duration));
         $this->cache->save($cacheItem);
     }
+
+    /**
+     * Creates WHERE conditions with date range to be put in query.
+     *
+     * @param false|int $start
+     * @param false|int $end
+     * @param string $tableAlias Alias of table FOLLOWED BY DOT.
+     * @param string $field
+     * @return string
+     */
+    public function createDatesConditions($start, $end, $tableAlias = '', $field = 'rev_timestamp')
+    {
+        $datesConditions = '';
+        if (false !== $start) {
+            // Convert to YYYYMMDDHHMMSS. *who in the world thought of having time in BLOB of this format ;-;*
+            $start = date('Ymd', $start) . '000000';
+            $datesConditions .= " AND {$tableAlias}{$field} > '$start'";
+        }
+        if (false !== $end) {
+            $end = date('Ymd', $end) . '000000';
+            $datesConditions .= " AND {$tableAlias}{$field} < '$end'";
+        }
+
+        return $datesConditions;
+    }
 }

@@ -217,16 +217,16 @@
     {{ extLink(url, msg('pageviews'), label) }}
 {% endspaceless %}{% endmacro %}
 
-{% macro pageviewsLinks(page) %}{% spaceless %}
+{% macro pageviewsLinks(page, start = null, end = null) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {{ extLink(
-        'https://tools.wmflabs.org/pageviews?project=' ~ page.project.domain ~ '&pages=' ~ page.title,
+        'https://tools.wmflabs.org/pageviews?project=' ~ page.project.domain ~ '&pages=' ~ page.title ~ '&start=' ~ start ~ '&end=' ~ end,
         msg('pageviews')
     )}} ({{ extLink(
-        'https://tools.wmflabs.org/langviews?project=' ~ page.project.domain ~ '&page=' ~ page.title,
+        'https://tools.wmflabs.org/langviews?project=' ~ page.project.domain ~ '&page=' ~ page.title ~ '&start=' ~ start ~ '&end=' ~ end,
         msg('all-languages')
     )}} &middot; {{ extLink(
-        'https://tools.wmflabs.org/redirectviews?project=' ~ page.project.domain ~ '&page=' ~ page.title,
+        'https://tools.wmflabs.org/redirectviews?project=' ~ page.project.domain ~ '&page=' ~ page.title ~ '&start=' ~ start ~ '&end=' ~ end,
         msg('redirects')
     )}})
 {% endspaceless %}{% endmacro %}
