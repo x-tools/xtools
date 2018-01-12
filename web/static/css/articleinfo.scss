@@ -90,6 +90,10 @@
         min-width: 400px;
         white-space: pre-wrap;
     }
+
+    .authorship-desc {
+        margin-bottom: 20px;
+    }
 }
 
 @media (max-width: $bootstrap-sm) {

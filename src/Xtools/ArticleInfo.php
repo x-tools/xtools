@@ -15,6 +15,15 @@ use DateTime;
  */
 class ArticleInfo extends Model
 {
+    /** @const string[] Domain names of wikis supported by WikiWho. */
+    const TEXTSHARE_WIKIS = [
+        'en.wikipedia.org',
+        'de.wikipedia.org',
+        'eu.wikipedia.org',
+        'tr.wikipedia.org',
+        'es.wikipedia.org',
+    ];
+
     /** @var Container The application's DI container. */
     protected $container;
 
@@ -121,6 +130,9 @@ class ArticleInfo extends Model
 
     /** @var string[] List of wikidata and Checkwiki errors. */
     protected $bugs;
+
+    /** @var array List of editors and the percentage of the current content that they authored. */
+    protected $textshares;
 
     /**
      * ArticleInfo constructor.
@@ -1248,5 +1260,121 @@ class ArticleInfo extends Model
         }, array_keys(array_slice($topTenEditorsByAdded, 0, 10)));
 
         $this->topTenCount = $topTenCount;
+    }
+
+    /**
+     * Get authorship attribution from the WikiWho API.
+     * @see https://f-squared.org/wikiwho/
+     * @param  int $limit Max number of results.
+     * @return array
+     */
+    public function getTextshares($limit = null)
+    {
+        if (isset($this->textshares)) {
+            return $this->textshares;
+        }
+
+        // TODO: check for failures. Should have a success:true
+        $ret = $this->getRepository()->getTextshares($this->page);
+        $revId = array_keys($ret['revisions'][0])[0];
+        $tokens = $ret['revisions'][0][$revId]['tokens'];
+
+        list($counts, $totalCount, $userIds) = $this->countTokens($tokens);
+        $usernameMap = $this->getUsernameMap($userIds);
+
+        if ($limit !== null) {
+            $countsToProcess = array_slice($counts, 0, $limit, true);
+        } else {
+            $countsToProcess = $counts;
+        }
+
+        $textshares = [];
+
+        // Loop through once more, creating an array with the user names (or IP address)
+        // as the key, and the count and percentage as the value.
+        foreach ($countsToProcess as $editor => $count) {
+            if (isset($usernameMap[$editor])) {
+                $index = $usernameMap[$editor];
+            } else {
+                $index = $editor;
+            }
+            $textshares[$index] = [
+                'count' => $count,
+                'percentage' => round(100 * ($count / $totalCount), 1)
+            ];
+        }
+
+        $this->textshares = [
+            'list' => $textshares,
+            'totalAuthors' => count($counts),
+            'totalCount' => $totalCount,
+        ];
+
+        return $this->textshares;
+    }
+
+    /**
+     * Get a map of user IDs to usernames, given the IDs.
+     * @param  int[] $userIds
+     * @return array IDs as keys, usernames as values.
+     */
+    private function getUsernameMap($userIds)
+    {
+        $userIdsNames = $this->getRepository()->getUsernamesFromIds(
+            $this->page->getProject(),
+            $userIds
+        );
+
+        $usernameMap = [];
+        foreach ($userIdsNames as $userIdName) {
+            $usernameMap[$userIdName['user_id']] = $userIdName['user_name'];
+        }
+
+        return $usernameMap;
+    }
+
+    /**
+     * Get counts of token lengths for each author. Used in self::getTextshares()
+     * @param  array $tokens
+     * @return array [counts by user, total count, IDs of accounts]
+     */
+    private function countTokens($tokens)
+    {
+        $counts = [];
+        $userIds = [];
+        $totalCount = 0;
+
+        // Loop through the tokens, keeping totals (token length) for each author.
+        foreach ($tokens as $token) {
+            $editor = $token['editor'];
+
+            // IPs are prefixed with '0|', otherwise it's the user ID.
+            if (substr($editor, 0, 2) === '0|') {
+                $editor = substr($editor, 2);
+            } else {
+                $userIds[] = $editor;
+            }
+
+            if (!isset($counts[$editor])) {
+                $counts[$editor] = 0;
+            }
+
+            $counts[$editor] += strlen($token['str']);
+            $totalCount += strlen($token['str']);
+        }
+
+        // Sort authors by count.
+        arsort($counts);
+
+        return [$counts, $totalCount, $userIds];
+    }
+
+    /**
+     * Get a list of wikis supported by WikiWho.
+     * @return string[]
+     */
+    public function getTextshareWikis()
+    {
+        return self::TEXTSHARE_WIKIS;
     }
 }

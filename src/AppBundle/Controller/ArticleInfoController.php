@@ -226,6 +226,53 @@ class ArticleInfoController extends XtoolsController
         return $page->getNumRevisions(null, $start, $end) > 0;
     }
 
+    /**
+     * Get textshares information about the article.
+     * @Route(
+     *     "/articleinfo-authorship/{project}/{article}",
+     *     name="ArticleInfoAuthorshipResult",
+     *     requirements={"article"=".+"}
+     * )
+     * @param Request $request The HTTP request.
+     * @param string $article
+     * @return Response
+     * @codeCoverageIgnore
+     */
+    public function textsharesResultAction(Request $request, $article)
+    {
+        // In this case only the project is validated.
+        $ret = $this->validateProjectAndUser($request);
+        if ($ret instanceof RedirectResponse) {
+            return $ret;
+        } else {
+            $project = $ret[0];
+        }
+
+        $page = $this->getAndValidatePage($project, $article);
+        if ($page instanceof RedirectResponse) {
+            return $page;
+        }
+
+        $articleInfoRepo = new ArticleInfoRepository();
+        $articleInfoRepo->setContainer($this->container);
+        $articleInfo = new ArticleInfo($page, $this->container);
+        $articleInfo->setRepository($articleInfoRepo);
+
+        $isSubRequest = $request->get('htmlonly')
+            || $this->get('request_stack')->getParentRequest() !== null;
+
+        $limit = $isSubRequest ? 10 : null;
+
+        return $this->render('articleinfo/textshares.html.twig', [
+            'xtPage' => 'articleinfo',
+            'xtTitle' => $page->getTitle(),
+            'project' => $project,
+            'page' => $page,
+            'textshares' => $articleInfo->getTextshares($limit),
+            'is_sub_request' => $isSubRequest,
+        ]);
+    }
+
     /************************ API endpoints ************************/
 
     /**

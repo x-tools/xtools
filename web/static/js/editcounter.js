@@ -136,6 +136,7 @@ function loadLatestGlobal()
             timeout: 30000
         }).done(function (data) {
             $latestGlobalContainer.replaceWith(data);
+            setupColumnSorting();
         }).fail(function (_xhr, _status, message) {
             $latestGlobalContainer.replaceWith(
                 $.i18n('api-error', 'Global contributions API: <code>' + message + '</code>')
