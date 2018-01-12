@@ -51,7 +51,7 @@
 
         <div class="text-center xt-toc">
             {% set sections = ['general-stats', 'top-editors'] %}
-            {% if page.namespace == 0 and project.domain in ai.textshareWikis %}
+            {% if not (ai.hasDateRange) and page.namespace == 0 and project.domain in ai.textshareWikis %}
                 {% set sections = sections|merge(['authorship']) %}
             {% endif %}
             {% set sections = sections|merge(['year-counts', 'month-counts']) %}
@@ -512,7 +512,7 @@
         {{ layout.content_block('top-editors', content, msg('top-editors-desc')) }}
 
         {# ======================== TEXTSHARES / AUTHORSHIP ======================== #}
-        {% if page.namespace == 0 and project.domain in ai.textshareWikis %}
+        {% if not (ai.hasDateRange) and page.namespace == 0 and project.domain in ai.textshareWikis %}
             {% set content %}
                 <div class="textshares-container" data-project="{{ project.domain }}" data-article="{{ page.title }}">
                     <em class="non-auto-edits-loading text-muted">{{ msg('loading') }}...</em>

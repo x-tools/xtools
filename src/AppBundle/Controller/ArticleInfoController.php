@@ -263,7 +263,7 @@ class ArticleInfoController extends XtoolsController
 
         $limit = $isSubRequest ? 10 : null;
 
-        return $this->render('articleinfo/textshares.html.twig', [
+        return $this->render('articleInfo/textshares.html.twig', [
             'xtPage' => 'articleinfo',
             'xtTitle' => $page->getTitle(),
             'project' => $project,

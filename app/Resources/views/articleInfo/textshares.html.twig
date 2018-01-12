@@ -38,7 +38,7 @@
 
 <p class="authorship-desc">{{ msg('authorship-desc') }}</p>
 
-{% if textshares.error %}
+{% if textshares.error is defined %}
     <div class="alert alert-danger">
         <p>
             {{ msg('api-error', ['Wikiwho API'] ) }}:
