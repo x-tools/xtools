@@ -1,5 +1,17 @@
 # Release Notes #
 
+## 3.1.25 ##
+- T181694: Add date range options to ArticleInfo.
+- T176912: Add authorship attribution statistics (aka textshares)
+  to ArticleInfo, powered by Wikiwho https://api.wikiwho.net/.
+- T184809: Improve rollback, undo and page move detection in the
+  AutoEdits tool for ar.wikipedia.
+- Better detecting of auto-expiring rights and old formats, for
+  the "Rights changes" feature of the Edit Counter.
+- T184600: Add 'minus-x' library to fix permissions of repo files.
+- Composer task to run full test suite ('composer test').
+- Localization updates.
+
 ## 3.1.24 ##
 - Add section to Edit Counter that lists legible user rights changes.
 - Add new MediaWiki tags for rollback and undo to AutoEdits.
