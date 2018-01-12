@@ -16,15 +16,9 @@ env:
 install:
   - composer install
   - 'sed -i "s/app.is_labs: .*/app.is_labs: $IS_LABS/" app/config/parameters.yml'
-  - wget https://github.com/phpDocumentor/phpDocumentor2/releases/download/v2.9.0/phpDocumentor.phar
 
 script:
-  - composer validate
-  - ./vendor/bin/parallel-lint --exclude vendor .
-  - ./vendor/bin/phpunit --coverage-clover=coverage.xml
-  - ./vendor/bin/phpcs -s .
-  - php phpDocumentor.phar -d src -t docs/api --template="checkstyle"
-  - ( ! grep --quiet "error" docs/api/checkstyle.xml )
+  - composer test
 
 sudo: false
 
