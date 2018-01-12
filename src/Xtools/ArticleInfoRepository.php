@@ -5,6 +5,8 @@
 
 namespace Xtools;
 
+use GuzzleHttp;
+
 /**
  * ArticleInfoRepository is responsible for retrieving data about a single
  * article on a given wiki.
@@ -60,6 +62,44 @@ class ArticleInfoRepository extends Repository
         $title = str_replace(' ', '_', $page->getTitle());
         $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $resultQuery->bindParam(':title', $title);
+        $resultQuery->execute();
+        return $resultQuery->fetchAll();
+    }
+
+    /**
+     * Query the WikiWho service to get authorship percentages.
+     * @see https://api.wikiwho.net/
+     * @param Page $page
+     * @return array[] Response from WikiWho.
+     */
+    public function getTextshares(Page $page)
+    {
+        $title = rawurlencode(str_replace(' ', '_', $page->getTitle()));
+        $client = new GuzzleHttp\Client();
+
+        $projectLang = $page->getProject()->getLang();
+
+        $url = "https://api.wikiwho.net/$projectLang/api/v1.0.0-beta/rev_content/" .
+            "$title/?o_rev_id=false&editor=true&token_id=false&out=false&in=false";
+
+        $res = $client->request('GET', $url);
+        return json_decode($res->getBody()->getContents(), true);
+    }
+
+    /**
+     * Get a map of user IDs/usernames given the user IDs.
+     * @param  Project $project
+     * @param  int[]   $userIds
+     * @return array
+     */
+    public function getUsernamesFromIds(Project $project, $userIds)
+    {
+        $userTable = $project->getTableName('user');
+        $userIds = implode(',', $userIds);
+        $sql = "SELECT user_id, user_name
+                FROM $userTable
+                WHERE user_id IN ($userIds)";
+        $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $resultQuery->execute();
         return $resultQuery->fetchAll();
     }

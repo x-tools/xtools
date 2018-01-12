@@ -1,0 +1,129 @@
+{% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
+{% import 'macros/wiki.html.twig' as wiki %}
+
+{% block body %}
+
+{% if not is_sub_request %}
+    {% set description_link %}
+        {% set wikiwhoLink %}
+            <a target='_blank' href='https://f-squared.org/wikiwho/'>Wikiwho</a>
+        {% endset %}
+        {{ msg('powered-by', [wikiwhoLink]) }}
+    {% endset %}
+
+    <div class="panel panel-primary">
+        <header class="panel-heading">
+            <div class="text-center xt-heading-top">
+                <a class="back-to-search" href="{{ path('articleinfo') }}">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                    {{ msg('back') }}
+                </a>
+                {{ wiki.pageLink(page) }}
+                <small>
+                    &bull;
+                    {{ project.domain }}
+                </small>
+            </div>
+        </header>
+        <div class="panel-body xt-panel-body">
+            <section class="panel panel-default clearfix">
+                <header class="panel-heading col-lg-12">
+                    <h4>
+                        {{ msg('authorship') }}
+                        <span class='pull-right text-muted xt-panel-description'>{{ description_link }}</span>
+                    </h4>
+                </header>
+                <div class="panel-body col-lg-12">
+{% endif %}
+
+<p class="authorship-desc">{{ msg('authorship-desc') }}</p>
+
+<table class="table table-bordered table-hover table-striped textshares-table toggle-table">
+    <thead>
+    {% for key in ['username', 'characters', 'percentage'] %}
+        <th>
+            <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
+                {{ msg(key)|capitalize_first }}
+                <span class="glyphicon glyphicon-sort"></span>
+            </span>
+        </th>
+    {% endfor %}
+    </thead>
+    <tbody>
+        {% set totalPercentage = 0 %}
+        {% set totalCount = 0 %}
+        {% for username, values in textshares.list %}
+            {% set totalPercentage = totalPercentage + values.percentage %}
+            {% set totalCount = totalCount + values.count %}
+            <tr>
+                <td class="sort-entry--username" data-value="{{ username }}">
+                    <span class="textshares-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ username }}">
+                        <span class="glyphicon glyphicon-remove"></span>
+                        <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
+                    </span>
+                    {{ wiki.userLink(username, project) }}
+                </td>
+                <td class="sort-entry--characters" data-value="{{ values.count }}">
+                    {{ values.count|num_format }}
+                </td>
+                <td class="sort-entry--percentage" data-value="{{ values.percentage }}">
+                    {{ values.percentage|percent_format }}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+    {% if textshares.totalAuthors > 10 and is_sub_request == true %}
+        <tfoot><tr>
+            <td>
+                <a href="{{ path('ArticleInfoAuthorshipResult', {project:project.domain, article:page.title})}}">
+                    {{ (textshares.totalAuthors - 10)|num_format }}
+                    {{ msg('num-others', [textshares.totalAuthors - 10]) }}
+                </a>
+            </td>
+            <td>
+                {{ (textshares.totalCount - totalCount)|num_format }}
+            </td>
+            <td>
+                {{ (100 - totalPercentage)|percent_format }}
+            </td>
+        </tr></td>
+    {% endif %}
+</table>
+<div class="chart-wrapper textshares-chart-wrapper toggle-table--chart">
+    <canvas id="textshares_chart" width="400" height="400"></canvas>
+</div>
+{% set colors = [] %}
+{% for i in 0..(textshares.list|length) %}
+    {% set colors = colors|merge([chartColor(i)]) %}
+{% endfor %}
+<script>
+    window.textsharesChart = new Chart($('#textshares_chart'), {
+        type: 'pie',
+        data: {
+            labels: {{ textshares.list|keys|json_encode()|raw }},
+            datasets: [{
+                data: [
+                    {% for username, values in textshares.list %}
+                        {{ values.percentage }}{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: {{ colors|json_encode()|raw }},
+                borderColor: {{ colors|json_encode()|raw }},
+                borderWidth: 1
+            }]
+        },
+        options: {
+            aspectRatio: 1,
+            legend: {
+              display: false,
+            }
+        }
+    });
+    window.textshares = {{ textshares.list|json_encode()|raw }};
+</script>
+
+{% if not is_sub_request %}
+    </div></section></div></div>
+{% endif %}
+
+{% endblock %}

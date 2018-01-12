@@ -198,8 +198,7 @@
      * Data type is automatically determined, with support for integer,
      *   floats, and strings, including date strings (e.g. "2016-01-01 12:59")
      */
-    function setupColumnSorting()
-    {
+    window.setupColumnSorting = function () {
         $('.sort-link').on('click', function () {
             sortDirection = sortColumn === $(this).data('column') ? -sortDirection : 1;
 
@@ -282,6 +281,7 @@
                 $tocClone.addClass('bold');
             });
         };
+        window.setupTocListeners = setupTocListeners;
 
         // clone the TOC and add position:fixed
         var createTocClone = function () {

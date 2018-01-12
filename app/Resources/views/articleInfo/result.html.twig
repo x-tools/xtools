@@ -50,7 +50,11 @@
         </p>
 
         <div class="text-center xt-toc">
-            {% set sections = ['general-stats', 'top-editors', 'year-counts', 'month-counts'] %}
+            {% set sections = ['general-stats', 'top-editors'] %}
+            {% if page.namespace == 0 and project.domain in ai.textshareWikis %}
+                {% set sections = sections|merge(['authorship']) %}
+            {% endif %}
+            {% set sections = sections|merge(['year-counts', 'month-counts']) %}
             {% if ai.automatedCount > 0 %}
                 {% set sections = sections|merge(['auto-edits']) %}
             {% endif %}
@@ -505,7 +509,26 @@
             </table>
             {% endif %}
         {% endset %}
-        {{ layout.content_block('top-editors', content) }}
+        {{ layout.content_block('top-editors', content, msg('top-editors-desc')) }}
+
+        {# ======================== TEXTSHARES / AUTHORSHIP ======================== #}
+        {% if page.namespace == 0 and project.domain in ai.textshareWikis %}
+            {% set content %}
+                <div class="textshares-container" data-project="{{ project.domain }}" data-article="{{ page.title }}">
+                    <em class="non-auto-edits-loading text-muted">{{ msg('loading') }}...</em>
+                </div>
+            {% endset %}
+            {% set headerLink %}
+                <a href="{{ path('ArticleInfoAuthorshipResult', {project:project.domain, article:page.title})}}">{{ msg('authorship') }}</a>
+            {% endset %}
+            {% set description_link %}
+                {% set wikiwhoLink %}
+                    <a target='_blank' href='https://f-squared.org/wikiwho/'>Wikiwho</a>
+                {% endset %}
+                {{ msg('powered-by', [wikiwhoLink]) }}
+            {% endset %}
+            {{ layout.content_block(headerLink, content, description_link, 'authorship', true) }}
+        {% endif %}
 
         {# ======================== YEAR COUNTS ======================== #}
         {% set content %}

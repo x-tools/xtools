@@ -137,7 +137,9 @@ Tests
 
 Tests are located in the ``tests/`` directory, and match the ``src/`` directory structure. They are built with `PHPUnit <https://phpunit.de/>`_. Repositories only handle fetching data and do not need to be tested. Controllers also interact with the database, and while tests are most welcomed for these, they will not run on the continuous integration server (Travis and Scrutinizer) due to limitations.
 
-Use ``./vendor/bin/phpunit tests/`` to run the tests.
+There are also tests for linting, phpDoc blocks, and file permissions.
+
+Use ``composer test`` to run the full suite, or ``./vendor/bin/phpunit tests/`` to run just the unit tests.
 
 Writing the docs
 ================
