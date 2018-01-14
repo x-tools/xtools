@@ -185,4 +185,33 @@ class AppExtensionTest extends WebTestCase
         $this->assertTrue($this->appExtension->isUserAnon('2605:E000:855A:4B00:3035:523D:F7E9:8F82'));
         $this->assertFalse($this->appExtension->isUserAnon('192.0.blah.1'));
     }
+
+    /**
+     * Formatting dates as ISO 8601.
+     */
+    public function testDateFormatStd()
+    {
+        $this->assertEquals(
+            '2017-01-23 00:00',
+            $this->appExtension->dateFormatStd('2017-01-23')
+        );
+        $this->assertEquals(
+            '2017-01-23 00:00',
+            $this->appExtension->dateFormatStd(new DateTime('2017-01-23'))
+        );
+    }
+
+    /**
+     * Building URL query string from array.
+     */
+    public function testBuildQuery()
+    {
+        $this->assertEquals(
+            'foo=1&bar=2',
+            $this->appExtension->buildQuery([
+                'foo' => 1,
+                'bar' => 2
+            ])
+        );
+    }
 }

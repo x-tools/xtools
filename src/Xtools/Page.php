@@ -5,6 +5,8 @@
 
 namespace Xtools;
 
+use DateTime;
+
 /**
  * A Page is a single wiki page in one project.
  */
@@ -48,6 +50,7 @@ class Page extends Model
      * Use of md5 ensures the cache key does not contain reserved characters.
      * @see Repository::getCacheKey()
      * @return string
+     * @codeCoverageIgnore
      */
     public function getCacheKey()
     {
@@ -169,6 +172,21 @@ class Page extends Model
     {
         $info = $this->getPageInfo();
         return isset($info['watchers']) ? $info['watchers'] : null;
+    }
+
+    /**
+     * Get the HTML content of the body of the page.
+     * @param DateTime|int $target If a DateTime object, the
+     *   revision at that time will be returned. If an integer, it is
+     *   assumed to be the actual revision ID.
+     * @return string
+     */
+    public function getHTMLContent($target = null)
+    {
+        if (is_a($target, 'DateTime')) {
+            $target = $this->getRepository()->getRevisionIdAtDate($this, $target);
+        }
+        return $this->getRepository()->getHTMLContent($this, $target);
     }
 
     /**

@@ -15,6 +15,7 @@ use Xtools\Page;
 use Xtools\PageRepository;
 use DateTime;
 use Doctrine\DBAL\Driver\PDOStatement;
+use GuzzleHttp;
 
 /**
  * Tests for ArticleInfo.
@@ -40,7 +41,7 @@ class ArticleInfoTest extends WebTestCase
     {
         $client = static::createClient();
         $this->container = $client->getContainer();
-        $this->project = new Project('TestProject');
+        $this->project = new Project('en.wikipedia.org');
         $this->page = new Page($this->project, 'Test page');
         $this->articleInfo = new ArticleInfo($this->page, $this->container);
 
@@ -169,6 +170,10 @@ class ArticleInfoTest extends WebTestCase
         $this->assertEquals(100, $this->articleInfo->topTenPercentage());
         $this->assertEquals(4, $this->articleInfo->getTopTenCount());
 
+        $this->assertEquals(
+            $edits[0]->getId(),
+            $this->articleInfo->getFirstEdit()->getId()
+        );
         $this->assertEquals(
             $edits[3]->getId(),
             $this->articleInfo->getLastEdit()->getId()
@@ -351,15 +356,6 @@ class ArticleInfoTest extends WebTestCase
                 'username' => '192.168.0.2',
                 'comment' => 'Undid revision 40 by [[Special:Contributions/192.168.0.1|192.168.0.1]]',
             ]),
-            new Edit($this->page, [
-                'id' => 60,
-                'timestamp' => '20161005010000',
-                'minor' => '1',
-                'length' => '30',
-                'length_change' => '35',
-                'username' => 'XtoolsBot',
-                'comment' => 'This is a bot edit',
-            ]),
         ];
 
         $prevEdits = [
@@ -450,5 +446,77 @@ class ArticleInfoTest extends WebTestCase
             ],
             $this->articleInfo->getTextshares(2)
         );
+    }
+
+    /**
+     * Test prose stats parser.
+     */
+    public function testProseStats()
+    {
+        // We'll use a live page to better test the prose stats parser.
+        $client = new GuzzleHttp\Client();
+        $ret = $client->request('GET', 'https://en.wikipedia.org/wiki/Hanksy?oldid=747629772')
+            ->getBody()
+            ->getContents();
+        $pageRepo = $this->getMock(PageRepository::class);
+        $pageRepo->expects($this->once())
+            ->method('getHTMLContent')
+            ->willReturn($ret);
+        $this->page->setRepository($pageRepo);
+
+        $this->assertEquals([
+            'characters' => 1541,
+            'words' => 263,
+            'references' => 13,
+            'unique_references' => 12,
+            'sections' => 1,
+        ], $this->articleInfo->getProseStats());
+    }
+
+    /**
+     * Various methods involving start/end dates.
+     */
+    public function testWithDates()
+    {
+        $this->setupData();
+
+        $prop = $this->reflectionClass->getProperty('startDate');
+        $prop->setAccessible(true);
+        $prop->setValue($this->articleInfo, 1467324000);
+
+        $prop = $this->reflectionClass->getProperty('endDate');
+        $prop->setAccessible(true);
+        $prop->setValue($this->articleInfo, 1476482400);
+
+        $this->assertTrue($this->articleInfo->hasDateRange());
+        $this->assertEquals(1467324000, $this->articleInfo->getStartDate());
+        $this->assertEquals(1476482400, $this->articleInfo->getEndDate());
+        $this->assertEquals([
+            'start' => '2016-06-30',
+            'end' => '2016-10-14',
+        ], $this->articleInfo->getDateParams());
+
+        // Uses length of last edit because there is a date range.
+        $this->assertEquals(25, $this->articleInfo->getLength());
+    }
+
+    /**
+     * Transclusion counts.
+     */
+    public function testTransclusionData()
+    {
+        $articleInfoRepo = $this->getMock(ArticleInfoRepository::class);
+        $articleInfoRepo->expects($this->once())
+            ->method('getTransclusionData')
+            ->willReturn([
+                'categories' => 3,
+                'templates' => 5,
+                'files' => 2,
+            ]);
+        $this->articleInfo->setRepository($articleInfoRepo);
+
+        $this->assertEquals(3, $this->articleInfo->getNumCategories());
+        $this->assertEquals(5, $this->articleInfo->getNumTemplates());
+        $this->assertEquals(2, $this->articleInfo->getNumFiles());
     }
 }

@@ -5,6 +5,7 @@
 
 namespace Xtools;
 
+use DateTime;
 use DateInterval;
 use Mediawiki\Api\SimpleRequest;
 use GuzzleHttp;
@@ -512,10 +513,14 @@ class PageRepository extends Repository
         $client = new GuzzleHttp\Client();
 
         if ($start instanceof DateTime) {
-            $start = $start->format('YYYYMMDD');
+            $start = $start->format('Ymd');
+        } else {
+            $start = (new DateTime($start))->format('Ymd');
         }
         if ($end instanceof DateTime) {
-            $end = $end->format('YYYYMMDD');
+            $end = $end->format('Ymd');
+        } else {
+            $end = (new DateTime($end))->format('Ymd');
         }
 
         $project = $page->getProject()->getDomain();
@@ -525,5 +530,42 @@ class PageRepository extends Repository
 
         $res = $client->request('GET', $url);
         return json_decode($res->getBody()->getContents(), true);
+    }
+
+    /**
+     * Get the full HTML content of the the page.
+     * @param  Page $page
+     * @param  int $revId What revision to query for.
+     * @return string
+     */
+    public function getHTMLContent(Page $page, $revId = null)
+    {
+        $client = new GuzzleHttp\Client();
+        $url = $page->getUrl();
+        if ($revId !== null) {
+            $url .= "?oldid=$revId";
+        }
+        return $client->request('GET', $url)
+            ->getBody()
+            ->getContents();
+    }
+
+    /**
+     * Get the ID of the revision of a page at the time of the given DateTime.
+     * @param  Page     $page
+     * @param  DateTime $date
+     * @return int
+     */
+    public function getRevisionIdAtDate(Page $page, DateTime $date)
+    {
+        $revisionTable = $page->getProject()->getTableName('revision');
+        $pageId = $page->getId();
+        $datestamp = $date->format('YmdHis');
+        $sql = "SELECT MAX(rev_id)
+                FROM $revisionTable
+                WHERE rev_timestamp <= $datestamp
+                AND rev_page = $pageId LIMIT 1;";
+        $resultQuery = $this->getProjectsConnection()->query($sql);
+        return (int)$resultQuery->fetchColumn();
     }
 }

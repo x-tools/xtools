@@ -103,4 +103,37 @@ class ArticleInfoRepository extends Repository
         $resultQuery->execute();
         return $resultQuery->fetchAll();
     }
+
+    /**
+     * Get the number of categories, templates, and files that are on the page.
+     * @param  Page $page
+     * @return array With keys 'categories', 'templates' and 'files'.
+     */
+    public function getTransclusionData(Page $page)
+    {
+        $categorylinksTable = $page->getProject()->getTableName('categorylinks');
+        $templatelinksTable = $page->getProject()->getTableName('templatelinks');
+        $imagelinksTable = $page->getProject()->getTableName('imagelinks');
+        $pageId = $page->getId();
+        $sql = "(
+                    SELECT 'categories' AS `key`, COUNT(*) AS val
+                    FROM $categorylinksTable
+                    WHERE cl_from = $pageId
+                ) UNION (
+                    SELECT 'templates' AS `key`, COUNT(*) AS val
+                    FROM $templatelinksTable
+                    WHERE tl_from = $pageId
+                ) UNION (
+                    SELECT 'files' AS `key`, COUNT(*) AS val
+                    FROM $imagelinksTable
+                    WHERE il_from = $pageId
+                )";
+        $resultQuery = $this->getProjectsConnection()->query($sql);
+        $transclusionCounts = [];
+        while ($result = $resultQuery->fetch()) {
+            $transclusionCounts[$result['key']] = $result['val'];
+        }
+
+        return $transclusionCounts;
+    }
 }

@@ -22,7 +22,7 @@ class EditCounterRepository extends Repository
      * Get data about revisions, pages, etc.
      * @param Project $project The project.
      * @param User $user The user.
-     * @returns string[] With keys: 'deleted', 'live', 'total', 'first', 'last', '24h', '7d', '30d',
+     * @return string[] With keys: 'deleted', 'live', 'total', 'first', 'last', '24h', '7d', '30d',
      * '365d', 'small', 'large', 'with_comments', and 'minor_edits', ...
      */
     public function getPairData(Project $project, User $user)

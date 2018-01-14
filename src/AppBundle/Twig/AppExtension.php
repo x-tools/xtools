@@ -75,6 +75,7 @@ class AppExtension extends Extension
             new \Twig_SimpleFunction('nsName', [$this, 'nsName']),
             new \Twig_SimpleFunction('formatDuration', [$this, 'formatDuration']),
             new \Twig_SimpleFunction('numberFormat', [$this, 'numberFormat']),
+            new \Twig_SimpleFunction('buildQuery', [$this, 'buildQuery']),
         ];
     }
 
@@ -738,5 +739,15 @@ class AppExtension extends Extension
         }
 
         return [$val, $key];
+    }
+
+    /**
+     * Build URL query string from given params.
+     * @param  array $params
+     * @return string
+     */
+    public function buildQuery($params)
+    {
+        return is_array($params) ? http_build_query($params) : '';
     }
 }
