@@ -1,5 +1,11 @@
 # Release Notes #
 
+## 3.1.27 ##
+- Add prose, category, template and file statistics to ArticleInfo.
+- UI refresh of the general stats section of ArticleInfo.
+- Bug fixes in ArticleInfo when date ranges are provided.
+- Some code refactoring and improved test coverage.
+
 ## 3.1.26 ##
 - Fix rendering of Authorship template in ArticleInfo.
 - Don't show Authorship in ArticleInfo if dates have been provided.
