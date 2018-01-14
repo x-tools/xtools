@@ -382,4 +382,49 @@ class ArticleInfoController extends XtoolsController
 
         return $response;
     }
+
+    /**
+     * Get prose statistics for the given article.
+     * @Route("/api/page/prose/{project}/{article}", requirements={"article"=".+"})
+     * @param Request $request The HTTP request.
+     * @param string $article
+     * @return JsonResponse
+     * @codeCoverageIgnore
+     */
+    public function proseStatsApiAction(Request $request, $article)
+    {
+        // In this case only the project is validated.
+        $ret = $this->validateProjectAndUser($request);
+        if ($ret instanceof RedirectResponse) {
+            return $ret;
+        } else {
+            $project = $ret[0];
+        }
+
+        $page = $this->getAndValidatePage($project, $article);
+        if ($page instanceof RedirectResponse) {
+            return new JsonResponse(
+                ['error' => "$article was not found"],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $articleInfoRepo = new ArticleInfoRepository();
+        $articleInfoRepo->setContainer($this->container);
+        $articleInfo = new ArticleInfo($page, $this->container);
+        $articleInfo->setRepository($articleInfoRepo);
+
+        $ret = array_merge(
+            [
+                'project' => $project->getDomain(),
+                'page' => $page->getTitle(),
+            ],
+            $articleInfo->getProseStats()
+        );
+
+        return new JsonResponse(
+            $ret,
+            Response::HTTP_OK
+        );
+    }
 }

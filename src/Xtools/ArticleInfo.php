@@ -6,6 +6,7 @@
 namespace Xtools;
 
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DomCrawler\Crawler;
 use DateTime;
 
 /**
@@ -134,6 +135,9 @@ class ArticleInfo extends Model
     /** @var array List of editors and the percentage of the current content that they authored. */
     protected $textshares;
 
+    /** @var array Number of categories, templates and files on the page. */
+    protected $transclusionData;
+
     /**
      * ArticleInfo constructor.
      * @param Page $page The page to process.
@@ -174,6 +178,33 @@ class ArticleInfo extends Model
     public function hasDateRange()
     {
         return $this->startDate !== false || $this->endDate !== false;
+    }
+
+    /**
+     * Return the start/end date values as associative array,
+     * with YYYY-MM-DD as the date format. This is used mainly as
+     * a helper to pass to the pageviews Twig macros.
+     * @return array
+     */
+    public function getDateParams()
+    {
+        if (!$this->hasDateRange()) {
+            return [];
+        }
+
+        $ret = [
+            'start' => $this->firstEdit->getTimestamp()->format('Y-m-d'),
+            'end' => $this->lastEdit->getTimestamp()->format('Y-m-d'),
+        ];
+
+        if ($this->startDate !== false) {
+            $ret['start'] = date('Y-m-d', $this->startDate);
+        }
+        if ($this->endDate !== false) {
+            $ret['end'] = date('Y-m-d', $this->endDate);
+        }
+
+        return $ret;
     }
 
     /**
@@ -391,63 +422,19 @@ class ArticleInfo extends Model
 
     /**
      * Get the number of times the page has been viewed in the given timeframe.
+     * If the ArticleInfo instance has a date range, it is used instead of the
+     * value of the $latest parameter.
      * @param  int $latest Last N days.
      * @return int
      */
     public function getPageviews($latest)
     {
-        if (false === $this->startDate && false === $this->endDate) {
+        if (!$this->hasDateRange()) {
             return $this->page->getLastPageviews($latest);
         }
 
-        list($start, $end) = $this->translateDatesToYYYYMMDD($this->startDate, $this->endDate);
-        list($start, $end) = $this->applyDatesDefaults($start, $end);
-
-        return $this->page->getPageviews($start, $end);
-    }
-
-    /**
-     * "Translate" dates to YYYYMMDD format.
-     *
-     * @param false|string $start
-     * @param false|string $end
-     * @return array
-     */
-    private function translateDatesToYYYYMMDD($start, $end)
-    {
-        if (false !== $start) {
-            $start = date('Ymd', $start);
-        }
-        if (false !== $end) {
-            $end = date('Ymd', $end);
-        }
-
-        return [$start, $end];
-    }
-
-    /**
-     * Apply defaults, that is $defaultDays days back for $start and current date for $end.
-     *
-     * @param false|string $start
-     * @param false|string $end
-     * @return array
-     */
-    private function applyDatesDefaults($start, $end)
-    {
-        if (false === $start && false === $end) {
-            // [false, false] basically
-            return [$start, $end];
-        }
-
-        if (false === $start) {
-            // Remember, YYYYMMDD format.
-            $start = date('Ymd', 0);
-        }
-        if (false === $end) {
-            $end = date('Ymd', time());
-        }
-
-        return [$start, $end];
+        $daterange = $this->getDateParams();
+        return $this->page->getPageviews($daterange['start'], $daterange['end']);
     }
 
     /**
@@ -1380,9 +1367,103 @@ class ArticleInfo extends Model
     /**
      * Get a list of wikis supported by WikiWho.
      * @return string[]
+     * @codeCoverageIgnore
      */
     public function getTextshareWikis()
     {
         return self::TEXTSHARE_WIKIS;
+    }
+
+    /**
+     * Get prose and reference information.
+     * @return array With keys 'characters', 'words', 'references', 'unique_references'
+     */
+    public function getProseStats()
+    {
+        $datetime = $this->endDate !== false ? new DateTime('@'.$this->endDate) : null;
+        $html = $this->page->getHTMLContent($datetime);
+
+        $crawler = new Crawler($html);
+
+        list($chars, $words) = $this->countCharsAndWords($crawler, '#mw-content-text p');
+
+        $refs = $crawler->filter('#mw-content-text .reference');
+        $refContent = [];
+        $refs->each(function ($ref) use (&$refContent) {
+            $refContent[] = $ref->text();
+        });
+        $uniqueRefs = count(array_unique($refContent));
+
+        $sections = count($crawler->filter('#mw-content-text .mw-headline'));
+
+        return [
+            'characters' => $chars,
+            'words' => $words,
+            'references' => $refs->count(),
+            'unique_references' => $uniqueRefs,
+            'sections' => $sections,
+        ];
+    }
+
+    /**
+     * Count the number of characters and words of the plain text
+     * within the DOM element matched by the given selector.
+     * @param  Crawler $crawler
+     * @param  string $selector HTML selector.
+     * @return array [num chars, num words]
+     */
+    private function countCharsAndWords($crawler, $selector)
+    {
+        $totalChars = 0;
+        $totalWords = 0;
+        $paragraphs = $crawler->filter($selector);
+        $paragraphs->each(function ($node) use (&$totalChars, &$totalWords) {
+            $text = preg_replace('/\[\d+\]/', '', trim($node->text()));
+            $totalChars += strlen($text);
+            $totalWords += count(explode(' ', $text));
+        });
+
+        return [$totalChars, $totalWords];
+    }
+
+    /**
+     * Fetch transclusion data (categories, templates and files)
+     * that are on the page.
+     * @return array With keys 'categories', 'templates' and 'files'.
+     */
+    private function getTransclusionData()
+    {
+        if (!is_array($this->transclusionData)) {
+            $this->transclusionData = $this->getRepository()
+                ->getTransclusionData($this->page);
+        }
+        return $this->transclusionData;
+    }
+
+    /**
+     * Get the number of categories that are on the page.
+     * @return int
+     */
+    public function getNumCategories()
+    {
+        return $this->getTransclusionData()['categories'];
+    }
+
+    /**
+     * Get the number of templates that are on the page.
+     * @return int
+     */
+    public function getNumTemplates()
+    {
+        return $this->getTransclusionData()['templates'];
+    }
+
+    /**
+     * Get the number of files that are on the page.
+     * @return int
+     */
+    public function getNumFiles()
+    {
+        return $this->getTransclusionData()['files'];
     }
 }

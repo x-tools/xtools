@@ -208,25 +208,26 @@
     {{ extLink(url, label) }}
 {% endspaceless %}{% endmacro %}
 
-{% macro pageviewsLink(page, label = null, opts = null) %}{% spaceless %}
+{% macro pageviewsLink(page, label = null, params = null) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {% set url = 'https://tools.wmflabs.org/pageviews?project=' ~ page.project.domain ~ '&pages=' ~ page.title %}
-    {% if opts is not empty %}
-        {% set url = url ~ '&' ~ opts %}
+    {% if params is not empty %}
+        {% set url = url ~ '&' ~ buildQuery(params) %}
     {% endif %}
     {{ extLink(url, msg('pageviews'), label) }}
 {% endspaceless %}{% endmacro %}
 
-{% macro pageviewsLinks(page, start = null, end = null) %}{% spaceless %}
+{% macro pageviewsLinks(page, params = null) %}{% spaceless %}
     {% from _self import extLink as extLink %}
+    {% set queryString = params is not empty ? '&' ~ buildQuery(params) : '' %}
     {{ extLink(
-        'https://tools.wmflabs.org/pageviews?project=' ~ page.project.domain ~ '&pages=' ~ page.title ~ '&start=' ~ start ~ '&end=' ~ end,
+        'https://tools.wmflabs.org/pageviews?project=' ~ page.project.domain ~ '&pages=' ~ page.title ~ queryString,
         msg('pageviews')
     )}} ({{ extLink(
-        'https://tools.wmflabs.org/langviews?project=' ~ page.project.domain ~ '&page=' ~ page.title ~ '&start=' ~ start ~ '&end=' ~ end,
+        'https://tools.wmflabs.org/langviews?project=' ~ page.project.domain ~ '&page=' ~ page.title ~ queryString,
         msg('all-languages')
     )}} &middot; {{ extLink(
-        'https://tools.wmflabs.org/redirectviews?project=' ~ page.project.domain ~ '&page=' ~ page.title ~ '&start=' ~ start ~ '&end=' ~ end,
+        'https://tools.wmflabs.org/redirectviews?project=' ~ page.project.domain ~ '&page=' ~ page.title ~ queryString,
         msg('redirects')
     )}})
 {% endspaceless %}{% endmacro %}

@@ -11,7 +11,11 @@
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {{ msg('back') }}
             </a>
-            {{ wiki.pageLink(page) }}
+            {% if ai.hasDateRange %}
+                {{ wiki.pageLinkRaw('Special:PermaLink/' ~ ai.lastEdit.id, project, page.title) }}
+            {% else %}
+                {{ wiki.pageLink(page) }}
+            {% endif %}
             <small>
                 &bull;
                 {{ project.domain }}
@@ -37,11 +41,7 @@
             {{ wiki.pageLogLink(page) }}
             {% if isWMFLabs() %}
                 &middot;
-                {{ wiki.pageviewsLinks(
-                    page,
-                    ai.startDate is not null ? ai.startDate|date('Y-m-d') : null,
-                    ai.endDate is not null ? ai.endDate|date('Y-m-d') : null
-                ) }}
+                {{ wiki.pageviewsLinks(page, ai.dateParams) }}
                 {% if page.wikidataId is defined %}
                     &middot;
                     {{ wiki.extLink('https://tools.wmflabs.org/reasonator/?q=' ~ page.wikidataId, 'Resonator (Wikidata)') }}
@@ -74,7 +74,7 @@
 
         {# ======================== GENERAL STATS ======================== #}
         {% set content %}
-            <div class="col-lg-6 stat-list clearfix">
+            <div class="col-lg-5 col-lg-offset-1 stat-list clearfix">
                 <table class="table"><tbody>
                     <tr>
                         <td>ID</td>
@@ -129,10 +129,40 @@
                             </td>
                         </tr>
                     {% endif %}
+                    {% if not (ai.hasDateRange) and ai.numBugs > 0 %}
+                        <tr>
+                            <td><a href='#bugs'>{{ msg('bugs') }}</a></td>
+                            <td>{{ ai.numBugs }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if not (ai.hasDateRange) and page.watchers is not empty %}
+                        <tr>
+                            <td>{{ msg('page-watchers') }}</td>
+                            <td>{{ page.watchers|num_format }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if isWMFLabs() %}
+                        <tr>
+                            <td>{{ msg('pageviews') }}{% if not (ai.hasDateRange) %} (60 {{ msg('num-days', [60]) }}){% endif %}</td>
+                            <td>
+                                {{
+                                    wiki.pageviewsLink(
+                                        page,
+                                        ai.pageviews(pageviewsOffset)|num_format,
+                                        ai.hasDateRange ? ai.dateParams : {'range': 'latest-' ~ pageviewsOffset}
+                                    )
+                                }}
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody></table>
+            </div>
 
+            <div class="col-lg-6 stat-list clearfix">
+                <table class="table"><tbody>
                     <tr>
-                        <td class="stat-list--new-group">{{ msg('minor-edits') }}</td>
-                        <td class="stat-list--new-group">
+                        <td>{{ msg('minor-edits') }}</td>
+                        <td>
                             {{ ai.minorCount|num_format }}
                             &middot;
                             ({{ ai.minorCount|percent_format(ai.numRevisionsProcessed) }})
@@ -168,59 +198,10 @@
                         <td>{{ msg('reverted-edits') }}</td>
                         <td>{{ ai.revertCount|num_format }}</td>
                     </tr>
+
                     <tr>
-                        <td>{{ msg('average-time-bw-edits') }}</td>
-                        <td>{{ ai.averageDaysPerEdit }} {{ msg('num-days', [ai.averageDaysPerEdit]) }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ msg('average-edits-per-user') }}</td>
-                        <td>{{ ai.editsPerEditor|num_format(1) }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ msg('average-edits-per-day') }}</td>
-                        <td>{{ ai.editsPerDay }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ msg('average-edits-per-month') }}</td>
-                        <td>{{ ai.editsPerMonth|num_format(1) }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ msg('average-edits-per-year') }}</td>
-                        <td>{{ ai.editsPerYear|num_format(1) }}</td>
-                    </tr>
-                    {% if not (ai.hasDateRange) %}
-                        <tr>
-                            <td>{{ msg('edits-last-day') }}</td>
-                            <td>{{ ai.countHistory.day|num_format }}</td>
-                        </tr>
-                        <tr>
-                            <td>{{ msg('edits-last-week') }}</td>
-                            <td>{{ ai.countHistory.week|num_format }}</td>
-                        </tr>
-                        <tr>
-                            <td>{{ msg('edits-last-month') }}</td>
-                            <td>{{ ai.countHistory.month|num_format }}</td>
-                        </tr>
-                        <tr>
-                            <td>{{ msg('edits-last-year') }}</td>
-                            <td>{{ ai.countHistory.year|num_format }}</td>
-                        </tr>
-                    {% endif %}
-                    <tr>
-                        <td>{{ msg('top-ten-count') }}</td>
-                        <td>
-                            {{ ai.topTenCount|num_format }}
-                            &middot;
-                            ({{ ai.topTenCount|percent_format(ai.numRevisionsProcessed) }})
-                        </td>
-                    </tr>
-                </tbody></table>
-            </div>
-            <div class="col-lg-6 stat-list clearfix">
-                <table class="table"><tbody>
-                    <tr>
-                        <td>{{ msg('first-edit') }}</td>
-                        <td>
+                        <td class="stat-list--new-group">{{ msg('first-edit') }}</td>
+                        <td class="stat-list--new-group">
                             {{ wiki.diffLink(ai.firstEdit, ai.firstEdit.timestamp) }}
                             &bull;
                             {{ wiki.userLink(ai.firstEdit.user, project) }}
@@ -260,52 +241,141 @@
                             </td>
                         </tr>
                     {% endif %}
-
-                    <tr>
-                        <td class="stat-list--new-group">{{ msg('links-in') }}</td>
-                        <td class="stat-list--new-group">
-                            {{ wiki.pageLinksInLink(page, ai.linksInCount|num_format) }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>{{ msg('redirects') }}</td>
-                        <td>
-                            {{ wiki.pageRedirectsLink(page, ai.redirectsCount|num_format) }}
-                        </td>
-                    </tr>
-                    {% if not (ai.hasDateRange) %}
-                        <tr>
-                            <td>{{ msg('links-out') }}</td>
-                            <td>{{ ai.linksOutCount|num_format }}</td>
-                        </tr>
-                        <tr>
-                            <td>{{ msg('links-external') }}</td>
-                            <td>{{ ai.linksExtCount|num_format }}</td>
-                        </tr>
-                        {% if page.watchers is not empty %}
-                            <tr>
-                                <td>{{ msg('page-watchers') }}</td>
-                                <td>{{ page.watchers|num_format }}</td>
-                            </tr>
-                        {% endif %}
-                    {% endif %}
-                    {% if isWMFLabs() %}
-                    <tr>
-                        <td>{{ msg('pageviews') }}{% if not (ai.hasDateRange) %} (60 {{ msg('num-days', [60]) }}){% endif %}</td>
-                        <td>
-                            {{ wiki.pageviewsLink(page, ai.pageviews(pageviewsOffset)|num_format, 'range=latest-' ~ pageviewsOffset) }}
-                        </td>
-                    </tr>
-                    {% endif %}
-
-                    {% if not (ai.hasDateRange) and ai.numBugs > 0 %}
-                    <tr>
-                        <td class="stat-list--new-group"><a href='#bugs'>{{ msg('bugs') }}</a></td>
-                        <td class="stat-list--new-group">{{ ai.numBugs }}</td>
-                    </tr>
-                    {% endif %}
                 </tbody></table>
             </div>
+
+            {# -------------- EDITS -------------- #}
+            <div class="col-lg-4 stat-list clearfix">
+                <table class="table">
+                    <tbody class="stat-list--group">
+                        <tr>
+                            <td colspan="2" class="text-muted">{{ msg('edits') }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('average-time-bw-edits') }}</td>
+                            <td>{{ ai.averageDaysPerEdit }} {{ msg('num-days', [ai.averageDaysPerEdit]) }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('average-edits-per-user') }}</td>
+                            <td>{{ ai.editsPerEditor|num_format(1) }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('average-edits-per-day') }}</td>
+                            <td>{{ ai.editsPerDay }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('average-edits-per-month') }}</td>
+                            <td>{{ ai.editsPerMonth|num_format(1) }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('average-edits-per-year') }}</td>
+                            <td>{{ ai.editsPerYear|num_format(1) }}</td>
+                        </tr>
+                        {% if not (ai.hasDateRange) %}
+                            <tr>
+                                <td class="stat-list--new-group">{{ msg('edits-last-day') }}</td>
+                                <td class="stat-list--new-group">{{ ai.countHistory.day|num_format }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ msg('edits-last-week') }}</td>
+                                <td>{{ ai.countHistory.week|num_format }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ msg('edits-last-month') }}</td>
+                                <td>{{ ai.countHistory.month|num_format }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ msg('edits-last-year') }}</td>
+                                <td>{{ ai.countHistory.year|num_format }}</td>
+                            </tr>
+                        {% endif %}
+                        <tr>
+                            <td class="stat-list--new-group">{{ msg('top-ten-count') }}</td>
+                            <td class="stat-list--new-group">
+                                {{ ai.topTenCount|num_format }}
+                                &middot;
+                                ({{ ai.topTenCount|percent_format(ai.numRevisionsProcessed) }})
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            {# -------------- LINKS -------------- #}
+            <div class="col-lg-4 col-lg-offset-1 stat-list clearfix">
+                <table class="table">
+                    <tbody class="stat-list--group">
+                        <tr>
+                            <td colspan="2" class="text-muted">{{ msg('links') }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('links-in') }}</td>
+                            <td>
+                                {{ wiki.pageLinksInLink(page, ai.linksInCount|num_format) }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('redirects') }}</td>
+                            <td>
+                                {{ wiki.pageRedirectsLink(page, ai.redirectsCount|num_format) }}
+                            </td>
+                        </tr>
+                        {% if not (ai.hasDateRange) %}
+                            <tr>
+                                <td>{{ msg('links-out') }}</td>
+                                <td>{{ ai.linksOutCount|num_format }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ msg('links-external') }}</td>
+                                <td>{{ ai.linksExtCount|num_format }}</td>
+                            </tr>
+                            <tr>
+                                <td class="stat-list--new-group">{{ msg('categories') }}</td>
+                                <td class="stat-list--new-group">{{ ai.numCategories|num_format }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ msg('files') }}</td>
+                                <td>{{ ai.numFiles|num_format }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ msg('templates') }}</td>
+                                <td>{{ ai.numTemplates|num_format }}</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            {# -------------- PROSE -------------- #}
+            <div class="col-lg-3 stat-list clearfix">
+                <table class="table">
+                    <tbody class="stat-list--group">
+                        <tr>
+                            <td colspan="2" class="text-muted">{{ msg('prose') }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('characters') }}</td>
+                            <td>{{ ai.proseStats.characters|num_format }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('words') }}</td>
+                            <td>{{ ai.proseStats.words|num_format }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('sections') }}</td>
+                            <td>{{ ai.proseStats.sections|num_format }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('references') }}</td>
+                            <td>{{ ai.proseStats.references|num_format }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('unique-references') }}</td>
+                            <td>{{ ai.proseStats.unique_references|num_format }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            {# -------------- CHARTS -------------- #}
             <div class="basic-info-charts clearfix">
                 {{
                     chart.pie_chart('users_ips',
