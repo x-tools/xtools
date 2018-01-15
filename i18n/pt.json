@@ -3,7 +3,8 @@
 		"authors": [
 			"Nemo bis",
 			"MokaAkashiyaPT",
-			"Athena in Wonderland"
+			"Athena in Wonderland",
+			"Hamilton Abreu"
 		]
 	},
 	"about-xtools": "Sobre estas ferramentas",
@@ -34,6 +35,8 @@
 	"article": "Artigo",
 	"assessment": "Avaliação",
 	"assessments": "Avaliações",
+	"authorship": "Autoria",
+	"authorship-desc": "Atribuição da autoria da atual versão do artigo, medida pela contagem de caracteres, excluindo os espaços.",
 	"auto-edits": "Edições (semi-)automáticas",
 	"auto-edits-request": "Solicitar que uma ferramenta (semi)automática seja acrescentada",
 	"automatic": "Automático",
@@ -60,6 +63,7 @@
 	"bottom-ninety": "Inferior a 90%",
 	"bugs": "Erros",
 	"bytes": "bytes",
+	"characters": "Caracteres",
 	"considered-usernames": "Nomes de utilizador(a) considerados",
 	"count": "Contagem",
 	"created-by": "Criada por",
@@ -67,6 +71,10 @@
 	"current-size": "Tamanho atual",
 	"data-limit": "Dados limitados $2 {{PLURAL:$1|à última edição|às últimas edições}}",
 	"date": "Data",
+	"date-from": "De: $1",
+	"date-to": "A: $1",
+	"date-range": "$1 - $2",
+	"date-range-outside-revisions": "Não foi possível localizar nenhuma revisão no intervalo de datas especificado.",
 	"delete": "Eliminar",
 	"deleted": "Eliminado",
 	"deleted-edits": "Edições eliminadas",
@@ -338,6 +346,7 @@
 	"tool-topedits-desc": "Obter número de edições por utilizador, por domínio ou edições por página",
 	"top-edited-pages": "Páginas mais editadas",
 	"top-editors": "Maior número de editores",
+	"top-editors-desc": "As estatísticas do editor sobre o histórico do artigo.",
 	"top-projects-edit-counts": "Contagem de edições globais",
 	"top-ten-by-edits": "Os 10 primeiros por edições",
 	"top-ten-by-text": "Os 10 primeiros por texto acrescentado",

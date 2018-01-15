@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"Nemo bis"
+			"Nemo bis",
+			"Kareyac"
 		]
 	},
 	"actions": "Գործողություն",
@@ -28,6 +29,7 @@
 	"considered-usernames": "Հաշվառվող օգտագործողների անունները",
 	"created-by": "Ստեղծող",
 	"date": "Ամսաթիվը",
+	"date-from": "$1-ից",
 	"delete": "Ջնջել",
 	"deleted": "Հեռացվել է",
 	"deleted-edits": "Ջնջված խմբագրումները",

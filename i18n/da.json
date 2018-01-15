@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"Nemo bis",
-			"Joedalton"
+			"Joedalton",
+			"Jorn Ari"
 		]
 	},
 	"about-xtools": "Om disse værktøjer",
@@ -15,6 +16,7 @@
 	"actions-as-admin": "Administratorhandlinger",
 	"added": "Tilføjet",
 	"added-bytes": "Tilføjet (byte)",
+	"admin": "Admin",
 	"admins-without-action": "Administratorer uden handlinger",
 	"afd": "Artikler til sletning",
 	"afd-desc": "$2 {{PLURAL:$1|redigering|redigeringer}} til artikler foreslået til sletning",
@@ -32,8 +34,10 @@
 	"article": "Artikel",
 	"assessment": "Vurdering",
 	"assessments": "Vurderinger",
+	"authorship": "Forfatterskab",
 	"auto-edits": "(Semi-)automatiske redigeringer",
 	"auto-edits-request": "Bed om at et nyt (halv)automatisk værktøj tilføjes",
+	"automatic": "Automatisk",
 	"average-change-per-page": "Gennemsnitlig ændring per side",
 	"average-edit-size": "Gennemsnitlig redigeringsstørrelse",
 	"average-edits-per-day": "Gennemsnitligt antal redigeringer pr. dag",
@@ -57,6 +61,7 @@
 	"bottom-ninety": "Nederste 90%",
 	"bugs": "Fejl",
 	"bytes": "bytes",
+	"characters": "Tegn",
 	"considered-usernames": "Overvejede brugernavne",
 	"count": "Antal",
 	"created-by": "Oprettet af",
@@ -64,6 +69,10 @@
 	"current-size": "Nuværende størrelse",
 	"data-limit": "Data begrænset til de seneste $2 {{PLURAL:$1|redigering|redigeringer}}",
 	"date": "Dato",
+	"date-from": "Fra: $1",
+	"date-to": "Til: $1",
+	"date-range": "$1 - $2",
+	"date-range-outside-revisions": "Ingen revisioner fundet for det angivne datointerval",
 	"delete": "Slet",
 	"deleted": "Slettet",
 	"deleted-edits": "Slettede redigeringer",
@@ -274,6 +283,7 @@
 	"rfx-tally": "Optælling",
 	"rfx-total-votes": "!Stemmer i alt",
 	"rights": "Rettigheder",
+	"rights-changes": "Rettighedsændringer",
 	"rpp": "Anmod om sidebeskyttelse",
 	"rpp-desc": "$2 {{PLURAL:$1|redigering|redigeringer}} til anmodninger om sidebeskyttelse",
 	"saturday": "Lørdag",
