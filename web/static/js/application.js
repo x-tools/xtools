@@ -295,7 +295,7 @@
         };
 
         // build object containing offsets of each section
-        var buildSectionOffsets = function () {
+        window.buildSectionOffsets = function () {
             $.each($toc.find('a'), function (index, tocMember) {
                 var id = $(tocMember).data('section');
                 sectionOffset[id] = $('#' + id).offset().top;

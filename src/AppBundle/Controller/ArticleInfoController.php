@@ -393,6 +393,8 @@ class ArticleInfoController extends XtoolsController
      */
     public function proseStatsApiAction(Request $request, $article)
     {
+        $this->recordApiUsage('page/prose');
+
         // In this case only the project is validated.
         $ret = $this->validateProjectAndUser($request);
         if ($ret instanceof RedirectResponse) {

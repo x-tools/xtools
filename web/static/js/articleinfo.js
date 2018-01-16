@@ -25,6 +25,7 @@ $(function () {
             timeout: 30000
         }).done(function (data) {
             $textsharesContainer.replaceWith(data);
+            buildSectionOffsets();
             setupTocListeners();
             setupColumnSorting();
             setupToggleTable();

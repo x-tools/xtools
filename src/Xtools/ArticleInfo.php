@@ -172,6 +172,22 @@ class ArticleInfo extends Model
     }
 
     /**
+     * Get the day of last date we should show in the month/year sections,
+     * based on $this->endDate or the current date.
+     * @return int As Unix timestamp.
+     */
+    private function getLastDay()
+    {
+        if ($this->endDate !== false) {
+            return (new DateTime('@'.$this->endDate))
+                ->modify('last day of this month')
+                ->getTimestamp();
+        } else {
+            return strtotime('last day of this month');
+        }
+    }
+
+    /**
      * Has date range?
      * @return bool
      */
@@ -959,14 +975,8 @@ class ArticleInfo extends Model
         for ($i = 1; $i <= 12; $i++) {
             $timeObj = mktime(0, 0, 0, $i, 1, $editYear);
 
-            $date = $editYear . sprintf('%02d', $i) . '01';
-            if (false !== $this->startDate && $date < date('Ymd', $this->startDate)
-                || false !== $this->endDate && $date > date('Ymd', $this->endDate)) {
-                continue;
-            }
-
             // Don't show zeros for months before the first edit or after the current month.
-            if ($timeObj < $firstEditTime || $timeObj > strtotime('last day of this month')) {
+            if ($timeObj < $firstEditTime || $timeObj > $this->getLastDay()) {
                 continue;
             }
 
