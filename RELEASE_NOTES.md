@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.1.28 ##
+- AutoEdits: Better support for ar.wikipedia.
+- ArticleInfo: Fix floating nav after authorship stats load.
+- Localization updates.
+
 ## 3.1.27 ##
 - Add prose, category, template and file statistics to ArticleInfo.
 - UI refresh of the general stats section of ArticleInfo.
