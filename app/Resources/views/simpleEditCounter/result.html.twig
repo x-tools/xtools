@@ -12,9 +12,27 @@
         {% set content %}
             <div class="col-lg-12 stat-list clearfix">
                 <table class="table">
+                    {% if sec.namespace != 'all' or sec.namespace == '' %}
+                        <tr>
+                            <td>{{ msg('namespace') }}</td>
+                            <td>{{ nsName(sec.namespace, project.namespaces) }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if sec.start %}
+                        <tr>
+                            <td>{{ msg('start') }}</td>
+                            <td>{{ sec.start|date('Y-m-d') }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if sec.end %}
+                        <tr>
+                            <td>{{ msg('end') }}</td>
+                            <td>{{ sec.end|date('Y-m-d') }}</td>
+                        </tr>
+                    {% endif %}
                     <tr>
-                        <td>{{ msg('username') }}</td>
-                        <td>{{ wiki.userLink(user, project) }}</td>
+                        <td class="stat-list--new-group">{{ msg('username') }}</td>
+                        <td class="stat-list--new-group">{{ wiki.userLink(user, project) }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('user-id') }}</td>

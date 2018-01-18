@@ -161,7 +161,7 @@ class PageRepository extends Repository
             $limitClause = "LIMIT $offset, $limit";
         }
 
-        $datesConditions = $this->createDatesConditions($start, $end, 'revs.');
+        $datesConditions = $this->getDateConditions($start, $end, 'revs.');
 
         $sql = "SELECT
                     revs.rev_id AS id,
@@ -206,7 +206,7 @@ class PageRepository extends Repository
         $revTable = $page->getProject()->getTableName('revision');
         $userClause = $user ? "rev_user_text in (:username) AND " : "";
 
-        $datesConditions = $this->createDatesConditions($start, $end);
+        $datesConditions = $this->getDateConditions($start, $end);
 
         $sql = "SELECT COUNT(*)
                 FROM $revTable

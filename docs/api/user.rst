@@ -17,12 +17,20 @@ local user groups and global user groups.
 
 * ``project`` (**required**) - Project domain or database name.
 * ``username`` (**required**) - Account's username.
+* ``namespace`` - Namespace ID or ``all`` for all namespaces.
+* ``start`` - Start date in the format ``YYYY-MM-DD``.
+* ``end`` - End date in the format ``YYYY-MM-DD``.
 
 **Example:**
 
 Get basic statistics about `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ on the English Wikipedia.
 
     https://xtools.wmflabs.org/api/user/simple_editcount/en.wikipedia/Jimbo_Wales
+
+Get basic statistics about `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_, but only during
+the year of 2014 and within the mainspace.
+
+    https://xtools.wmflabs.org/api/user/simple_editcount/en.wikipedia/Jimbo_Wales/0/2014-01-01/2014-12-31
 
 Number of pages created
 =======================

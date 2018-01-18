@@ -298,7 +298,7 @@ abstract class Repository
      * @param string $field
      * @return string
      */
-    public function createDatesConditions($start, $end, $tableAlias = '', $field = 'rev_timestamp')
+    public function getDateConditions($start, $end, $tableAlias = '', $field = 'rev_timestamp')
     {
         $datesConditions = '';
         if (false !== $start) {
@@ -307,7 +307,7 @@ abstract class Repository
             $datesConditions .= " AND {$tableAlias}{$field} > '$start'";
         }
         if (false !== $end) {
-            $end = date('Ymd', $end) . '000000';
+            $end = date('Ymd', $end) . '235959';
             $datesConditions .= " AND {$tableAlias}{$field} < '$end'";
         }
 

@@ -64,13 +64,13 @@
     </label>
     <select class="form-control namespace-selector" name="namespace" id="namespace_select">
         {% if allOption %}
-            <option value="all" {% if value is same as('all') %}selected="selected"{% endif %}>
+            <option value="all" {% if value == 'all' %}selected="selected"{% endif %}>
                 {{ msg('all') | capitalize_first }}
             </option>
         {% endif %}
         {% for id, name in project.namespaces %}
             {# (value + 0) typecasts into an integer #}
-            <option value="{{ id }}" {% if (value + 0) is same as(id) %}selected="selected"{% endif %}>
+            <option value="{{ id }}" {% if value != 'all' and (value + 0) == id %}selected="selected"{% endif %}>
                 {% if id == 0 %}
                     {{ msg('mainspace') }}
                 {% else %}

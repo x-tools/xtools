@@ -9,8 +9,8 @@ use Symfony\Component\DependencyInjection\Container;
 
 /**
  * A SimpleEditCounter provides basic edit count stats about a user.
- * This class is too 'simple' to bother with tests, and we'd need to move
- * the single query to a repo class just so we could mock it.
+ * This class is too 'simple' to bother with tests, we just get
+ * the results of the query and return it.
  * @codeCoverageIgnore
  */
 class SimpleEditCounter extends Model
@@ -23,6 +23,15 @@ class SimpleEditCounter extends Model
 
     /** @var User The user. */
     protected $user;
+
+    /** @var string|int Which namespace we are querying for. */
+    protected $namespace;
+
+    /** @var false|int Start date as Unix timestamp. */
+    protected $start;
+
+    /** @var false|int End date as Unix timestamp. */
+    protected $end;
 
     /** @var array The Simple Edit Counter results. */
     protected $data = [
@@ -38,12 +47,24 @@ class SimpleEditCounter extends Model
      * @param Container $container The DI container.
      * @param Project   $project
      * @param User      $user
+     * @param string    $namespace Namespace ID or 'all'.
+     * @param false|int $start As Unix timestamp.
+     * @param false|int $end As Unix timestamp.
      */
-    public function __construct(Container $container, Project $project, User $user)
-    {
+    public function __construct(
+        Container $container,
+        Project $project,
+        User $user,
+        $namespace = 'all',
+        $start = false,
+        $end = false
+    ) {
         $this->container = $container;
         $this->project = $project;
         $this->user = $user;
+        $this->namespace = $namespace == '' ? 0 : $namespace;
+        $this->start = $start;
+        $this->end = $end;
     }
 
     /**
@@ -52,7 +73,13 @@ class SimpleEditCounter extends Model
      */
     public function prepareData()
     {
-        $results = $this->fetchData();
+        $results = $this->getRepository()->fetchData(
+            $this->project,
+            $this->user,
+            $this->namespace,
+            $this->start,
+            $this->end
+        );
 
         // Iterate over the results, putting them in the right variables
         foreach ($results as $row) {
@@ -78,45 +105,39 @@ class SimpleEditCounter extends Model
     }
 
     /**
-     * Run the query against the database.
-     * @return string[]
+     * Get the namespace set on the class instance.
+     * @return int|string Namespace ID or 'all' for all namespaces.
      */
-    private function fetchData()
+    public function getNamespace()
     {
-        $userTable = $this->project->getTableName('user');
-        $archiveTable = $this->project->getTableName('archive');
-        $revisionTable = $this->project->getTableName('revision');
-        $userGroupsTable = $this->project->getTableName('user_groups');
+        return $this->namespace;
+    }
 
-        /** @var Connection $conn */
-        $conn = $this->container->get('doctrine')->getManager('replicas')->getConnection();
+    /**
+     * Get date opening date range.
+     * @return false|int
+     */
+    public function getStart()
+    {
+        return $this->start;
+    }
 
-        // Prepare the query and execute
-        $resultQuery = $conn->prepare("
-            SELECT 'id' AS source, user_id as value
-                FROM $userTable
-                WHERE user_name = :username
-            UNION
-            SELECT 'arch' AS source, COUNT(*) AS value
-                FROM $archiveTable
-                WHERE ar_user_text = :username
-            UNION
-            SELECT 'rev' AS source, COUNT(*) AS value
-                FROM $revisionTable
-                WHERE rev_user_text = :username
-            UNION
-            SELECT 'groups' AS source, ug_group AS value
-                FROM $userGroupsTable
-                JOIN $userTable ON user_id = ug_user
-                WHERE user_name = :username
-        ");
+    /**
+     * Get date closing date range.
+     * @return false|int
+     */
+    public function getEnd()
+    {
+        return $this->end;
+    }
 
-        $username = $this->user->getUsername();
-        $resultQuery->bindParam('username', $username);
-        $resultQuery->execute();
-
-        // Fetch the result data
-        return $resultQuery->fetchAll();
+    /**
+     * Has date range?
+     * @return bool
+     */
+    public function hasDateRange()
+    {
+        return $this->start !== false || $this->end !== false;
     }
 
     /**

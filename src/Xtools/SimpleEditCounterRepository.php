@@ -1,0 +1,71 @@
+<?php
+/**
+ * This file contains only the SimpleEditCounterRepository class.
+ */
+
+namespace Xtools;
+
+/**
+ * SimpleEditCounterRepository is responsible for retrieving data
+ * from the database for the Simple Edit Counter tool.
+ * @codeCoverageIgnore
+ */
+class SimpleEditCounterRepository extends Repository
+{
+    /**
+     * Execute and return results of the query used for the Simple Edit Counter.
+     * @param  Project $project
+     * @param  User $user
+     * @param  int|string $namespace Namespace ID or 'all' for all namespaces.
+     * @param  int $start Unix timestamp.
+     * @param  int $end Unix timestamp.
+     * @return string[] Counts, each row with keys 'source' and 'value'.
+     */
+    public function fetchData(Project $project, User $user, $namespace = 'all', $start = null, $end = null)
+    {
+        $userTable = $project->getTableName('user');
+        $pageTable = $project->getTableName('page');
+        $archiveTable = $project->getTableName('archive');
+        $revisionTable = $project->getTableName('revision');
+        $userGroupsTable = $project->getTableName('user_groups');
+
+        $arDateConditions = $this->getDateConditions($start, $end, null, 'ar_timestamp');
+        $revDateConditions = $this->getDateConditions($start, $end);
+
+        $revNamespaceJoinSql = $namespace === 'all' ? '' : "JOIN $pageTable ON rev_page = page_id";
+        $revNamespaceWhereSql = $namespace === 'all' ? '' : "AND page_namespace = $namespace";
+        $arNamespaceWhereSql = $namespace === 'all' ? '' : "AND ar_namespace = $namespace";
+
+        // Prepare the query and execute
+        $resultQuery = $this->getProjectsConnection()->prepare("
+            SELECT 'id' AS source, user_id as value
+                FROM $userTable
+                WHERE user_name = :username
+            UNION
+            SELECT 'arch' AS source, COUNT(*) AS value
+                FROM $archiveTable
+                WHERE ar_user_text = :username
+                $arNamespaceWhereSql
+                $arDateConditions
+            UNION
+            SELECT 'rev' AS source, COUNT(*) AS value
+                FROM $revisionTable
+                $revNamespaceJoinSql
+                WHERE rev_user_text = :username
+                $revNamespaceWhereSql
+                $revDateConditions
+            UNION
+            SELECT 'groups' AS source, ug_group AS value
+                FROM $userGroupsTable
+                JOIN $userTable ON user_id = ug_user
+                WHERE user_name = :username
+        ");
+
+        $username = $user->getUsername();
+        $resultQuery->bindParam('username', $username);
+        $resultQuery->execute();
+
+        // Fetch the result data
+        return $resultQuery->fetchAll();
+    }
+}

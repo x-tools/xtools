@@ -492,7 +492,7 @@ class UserRepository extends Repository
      * @param  string $start
      * @param  string $end
      * @param string $tableAlias Alias of table FOLLOWED BY DOT.
-     * @todo FIXME: merge with Repository::createDatesConditions
+     * @todo FIXME: merge with Repository::getDateConditions
      * @return string[] Clauses for start and end timestamps.
      */
     protected function getRevTimestampConditions($start, $end, $tableAlias = '')

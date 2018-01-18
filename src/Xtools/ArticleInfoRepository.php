@@ -26,7 +26,7 @@ class ArticleInfoRepository extends Repository
         $userGroupsTable = $project->getTableName('user_groups');
         $userFormerGroupsTable = $project->getTableName('user_former_groups');
 
-        $datesConditions = $this->createDatesConditions($start, $end);
+        $datesConditions = $this->getDateConditions($start, $end);
 
         $sql = "SELECT COUNT(rev_user_text) AS count, rev_user_text AS username, ug_group AS current
                 FROM " . $project->getTableName('revision') . "
@@ -52,7 +52,7 @@ class ArticleInfoRepository extends Repository
     {
         $loggingTable = $page->getProject()->getTableName('logging', 'logindex');
 
-        $datesConditions = $this->createDatesConditions($start, $end, '', 'log_timestamp');
+        $datesConditions = $this->getDateConditions($start, $end, '', 'log_timestamp');
 
         $sql = "SELECT log_action, log_type, log_timestamp AS 'timestamp'
                 FROM $loggingTable

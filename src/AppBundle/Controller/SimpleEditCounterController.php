@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Xtools\SimpleEditCounter;
+use Xtools\SimpleEditCounterRepository;
 
 /**
  * This controller handles the Simple Edit Counter tool.
@@ -58,17 +59,33 @@ class SimpleEditCounterController extends XtoolsController
             'xtSubtitle' => 'tool-sc-desc',
             'xtPage' => 'sc',
             'project' => $params['project'],
+
+            // Defaults that will get overriden if in $params.
+            'namespace' => 'all',
+            'start' => '',
+            'end' => '',
         ]);
     }
 
     /**
      * Display the
-     * @Route("/sc/{project}/{username}", name="SimpleEditCounterResult")
+     * @Route(
+     *     "/sc/{project}/{username}/{namespace}/{start}/{end}",
+     *     name="SimpleEditCounterResult",
+     *     requirements={
+     *         "start" = "|\d{4}-\d{2}-\d{2}",
+     *         "end" = "|\d{4}-\d{2}-\d{2}",
+     *         "namespace" = "|all|\d+"
+     *     }
+     * )
      * @param Request $request The HTTP request.
+     * @param int|string $namespace Namespace ID or 'all' for all namespaces.
+     * @param null|string $start
+     * @param null|string $end
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction(Request $request)
+    public function resultAction(Request $request, $namespace = 'all', $start = false, $end = false)
     {
         $ret = $this->validateProjectAndUser($request);
         if ($ret instanceof RedirectResponse) {
@@ -77,7 +94,13 @@ class SimpleEditCounterController extends XtoolsController
             list($project, $user) = $ret;
         }
 
-        $sec = new SimpleEditCounter($this->container, $project, $user);
+        // 'false' means the dates are optional and returned as 'false' if empty.
+        list($start, $end) = $this->getUTCFromDateParams($start, $end, false);
+
+        $sec = new SimpleEditCounter($this->container, $project, $user, $namespace, $start, $end);
+        $secRepo = new SimpleEditCounterRepository();
+        $secRepo->setContainer($this->container);
+        $sec->setRepository($secRepo);
         $sec->prepareData();
 
         // Assign the values and display the template
@@ -94,13 +117,28 @@ class SimpleEditCounterController extends XtoolsController
 
     /**
      * API endpoint for the Simple Edit Counter.
-     * @Route("/api/user/simple_editcount/{project}/{username}", name="SimpleEditCounterApi")
+     * @Route(
+     *     "/api/user/simple_editcount/{project}/{username}/{namespace}/{start}/{end}",
+     *     name="SimpleEditCounterApi",
+     *     requirements={
+     *         "start" = "|\d{4}-\d{2}-\d{2}",
+     *         "end" = "|\d{4}-\d{2}-\d{2}",
+     *         "namespace" = "|all|\d+"
+     *     }
+     * )
      * @param Request $request
+     * @param int|string $namespace Namespace ID or 'all' for all namespaces.
+     * @param null|string $start
+     * @param null|string $end
      * @return Response
      * @codeCoverageIgnore
      */
-    public function simpleEditCounterApiAction(Request $request)
-    {
+    public function simpleEditCounterApiAction(
+        Request $request,
+        $namespace = 'all',
+        $start = false,
+        $end = false
+    ) {
         $this->recordApiUsage('user/simple_editcount');
 
         // Here we do want to impose the max edit count restriction. Even though the
@@ -112,12 +150,34 @@ class SimpleEditCounterController extends XtoolsController
             list($project, $user) = $ret;
         }
 
-        $sec = new SimpleEditCounter($this->container, $project, $user);
+        // 'false' means the dates are optional and returned as 'false' if empty.
+        list($start, $end) = $this->getUTCFromDateParams($start, $end, false);
+
+        $sec = new SimpleEditCounter($this->container, $project, $user, $namespace, $start, $end);
+        $secRepo = new SimpleEditCounterRepository();
+        $secRepo->setContainer($this->container);
+        $sec->setRepository($secRepo);
         $sec->prepareData();
+
+        $ret = [
+            'username' => $user->getUsername(),
+        ];
+
+        if ($namespace !== 'all') {
+            $ret['namespace'] = $namespace;
+        }
+        if ($start !== false) {
+            $ret['start'] = date('Y-m-d', $start);
+        }
+        if ($end !== false) {
+            $ret['end'] = date('Y-m-d', $end);
+        }
+
+        $ret = array_merge($ret, $sec->getData());
 
         $response = new JsonResponse();
         $response->setEncodingOptions(JSON_NUMERIC_CHECK);
-        $response->setData($sec->getData());
+        $response->setData($ret);
         return $response;
     }
 }
