@@ -39,6 +39,9 @@ class Edit extends Model
     /** @var string The edit summary */
     protected $comment;
 
+    /** @var string The SHA-1 of the wikitext as of the revision. */
+    protected $sha;
+
     /**
      * Edit constructor.
      * @param Page $page
@@ -67,6 +70,12 @@ class Edit extends Model
 
         $this->user = new User($attrs['username']);
         $this->comment = $attrs['comment'];
+
+        if (isset($attrs['rev_sha1']) || isset($attrs['sha'])) {
+            $this->sha = isset($attrs['rev_sha1'])
+                ? $attrs['rev_sha1']
+                : $attrs['sha'];
+        }
     }
 
     /**
@@ -195,6 +204,15 @@ class Edit extends Model
     public function getSummary()
     {
         return $this->getComment();
+    }
+
+    /**
+     * Get the SHA-1 of the revision.
+     * @return string
+     */
+    public function getSha()
+    {
+        return $this->sha;
     }
 
     /**

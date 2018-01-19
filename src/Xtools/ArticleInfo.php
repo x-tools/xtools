@@ -719,6 +719,10 @@ class ArticleInfo extends Model
             // The previous Edit, used to discount content that was reverted.
             'prev' => null,
 
+            // The SHA-1 of the edit *before* the previous edit. Used for more
+            // accruate revert detection.
+            'prevSha' => null,
+
             // The last edit deemed to be the max addition of content. This is kept track of
             // in case we find out the next edit was reverted (and was also a max edit),
             // in which case we'll want to discount it and use this one instead.
@@ -759,7 +763,7 @@ class ArticleInfo extends Model
     /**
      * Update various counts based on the current edit.
      * @param  Edit   $edit
-     * @param  Edit[] $prevEdits With 'prev', 'maxAddition' and 'maxDeletion'
+     * @param  Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'
      * @return Edit[] Updated version of $prevEdits.
      */
     private function updateCounts(Edit $edit, $prevEdits)
@@ -784,6 +788,12 @@ class ArticleInfo extends Model
 
         // Now that we've updated all the counts, we can reset
         // the prev and last edits, which are used for tracking.
+        // But first, let's copy over the SHA of the actual previous edit
+        // and put it in our $prevEdits['prev'], so that we'll know
+        // that content added after $prevEdit['prev'] was reverted.
+        if ($prevEdits['prev'] !== null) {
+            $prevEdits['prevSha'] = $prevEdits['prev']->getSha();
+        }
         $prevEdits['prev'] = $edit;
         $this->lastEdit = $edit;
 
@@ -793,13 +803,13 @@ class ArticleInfo extends Model
     /**
      * Update various figures about content sizes based on the given edit.
      * @param  Edit   $edit
-     * @param  Edit[] $prevEdits With 'prev', 'maxAddition' and 'maxDeletion'
+     * @param  Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
      * @return Edit[] Updated version of $prevEdits.
      */
     private function updateContentSizes(Edit $edit, $prevEdits)
     {
         // Check if it was a revert
-        if ($edit->isRevert($this->container)) {
+        if ($this->isRevert($prevEdits, $edit)) {
             return $this->updateContentSizesRevert($prevEdits);
         } else {
             return $this->updateContentSizesNonRevert($edit, $prevEdits);
@@ -807,9 +817,20 @@ class ArticleInfo extends Model
     }
 
     /**
+     * Is the given Edit a revert?
+     * @param  Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
+     * @param  Edit $edit
+     * @return bool
+     */
+    private function isRevert($prevEdits, $edit)
+    {
+        return $edit->getSha() === $prevEdits['prevSha'] || $edit->isRevert($this->container);
+    }
+
+    /**
      * Updates the figures on content sizes assuming the given edit was a revert of the previous one.
      * In such a case, we don't want to treat the previous edit as legit content addition or removal.
-     * @param  Edit[] $prevEdits With 'prev', 'maxAddition' and 'maxDeletion'.
+     * @param  Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
      * @return Edit[] Updated version of $prevEdits, for tracking.
      */
     private function updateContentSizesRevert($prevEdits)
@@ -843,7 +864,7 @@ class ArticleInfo extends Model
      * Updates the figures on content sizes assuming the given edit
      * was NOT a revert of the previous edit.
      * @param  Edit   $edit
-     * @param  Edit[] $prevEdits With 'prev', 'maxAddition' and 'maxDeletion'.
+     * @param  Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
      * @return Edit[] Updated version of $prevEdits, for tracking.
      */
     private function updateContentSizesNonRevert(Edit $edit, $prevEdits)
@@ -881,7 +902,7 @@ class ArticleInfo extends Model
      * @see T148857 for more information.
      * @todo Remove once T101631 is resolved.
      * @param  Edit   $edit
-     * @param  Edit[] $prevEdits With 'prev', 'maxAddition' and 'maxDeletion'.
+     * @param  Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
      * @return Edit[] Updated version of $prevEdits, for tracking.
      */
     private function getEditSize(Edit $edit, $prevEdits)
