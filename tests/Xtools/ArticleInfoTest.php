@@ -220,7 +220,7 @@ class ArticleInfoTest extends WebTestCase
         $this->assertEquals(2, $this->articleInfo->getMaxEditsPerMonth());
 
         $this->assertContains(
-            'Undo',
+            'AutoWikiBrowser',
             array_keys($this->articleInfo->getTools())
         );
     }
@@ -328,6 +328,7 @@ class ArticleInfoTest extends WebTestCase
                 'length_change' => '30',
                 'username' => 'Mick Jagger',
                 'comment' => 'Foo bar',
+                'rev_sha1' => 'aaaaaa',
             ]),
             new Edit($this->page, [
                 'id' => 32,
@@ -337,6 +338,7 @@ class ArticleInfoTest extends WebTestCase
                 'length_change' => '-5',
                 'username' => 'Mick Jagger',
                 'comment' => 'Blah',
+                'rev_sha1' => 'bbbbbb',
             ]),
             new Edit($this->page, [
                 'id' => 40,
@@ -345,7 +347,8 @@ class ArticleInfoTest extends WebTestCase
                 'length' => '15',
                 'length_change' => '-10',
                 'username' => '192.168.0.1',
-                'comment' => 'Weeee',
+                'comment' => 'Weeee using ([[WP:AWB|AWB]])',
+                'rev_sha1' => 'cccccc',
             ]),
             new Edit($this->page, [
                 'id' => 50,
@@ -354,12 +357,14 @@ class ArticleInfoTest extends WebTestCase
                 'length' => '25',
                 'length_change' => '10',
                 'username' => '192.168.0.2',
-                'comment' => 'Undid revision 40 by [[Special:Contributions/192.168.0.1|192.168.0.1]]',
+                'comment' => 'I undo your edit cuz it bad',
+                'rev_sha1' => 'bbbbbb',
             ]),
         ];
 
         $prevEdits = [
             'prev' => null,
+            'prevSha' => null,
             'maxAddition' => null,
             'maxDeletion' => null,
         ];
