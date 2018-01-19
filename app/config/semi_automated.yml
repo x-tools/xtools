@@ -32,7 +32,8 @@ parameters:
         Undo:
             regex: '^(Undid|Undo) revision \d+ by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\]'
             link: Special:MyLanguage/Project:Undo
-            revert: true
+            # This is not considered a revert because you can undo
+            # any arbitrary revision, not just the previous one.
         Huggle:
             regex: '\(\[\[WP:HG'
             tag: huggle

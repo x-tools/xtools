@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 {% import 'macros/layout.html.twig' as layout %}
 {% import 'macros/wiki.html.twig' as wiki %}
+{% import 'macros/pieChart.html.twig' as chart %}
 
 {% block body %}
 <div class="panel panel-primary">
@@ -22,72 +23,155 @@
 
     <div class="panel-body xt-panel-body">
         {% set content %}
-        <div class="col-lg-6 stat-list clearfix">
-            <table class="table">
-                <tr>
-                    <td>{{ msg('article') }}</td>
-                    <td>
-                        <span class="display-title">
-                            {{ wiki.pageLink(page, page.displaytitle|raw) }}
-                        </span>
-                        <small>({{ wiki.pageLogLink(page) }}
-                        &middot; <a href="{{ path('ArticleInfoResult', {project:project.domain, article:page.title}) }}">{{ msg('tool-articleinfo') }}</a>)</small>
-                    </td>
-                </tr>
-                <tr>
-                    <td>{{ msg('user') }}</td>
-                    <td>
-                        {{ wiki.userLink(user, project) }}
-                        <small>(<a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool-ec') }}</a>)</small>
-                    </td>
-                </tr>
-                <tr>
-                    <td>{{ msg('count') }}</td>
-                    <td>{{ revision_count|num_format }}</td>
-                </tr>
-                <tr>
-                    <td>{{ msg('added') }}</td>
-                    <td>{{ total_added|diff_format }}</td>
-                </tr>
-                <tr>
-                    <td>{{ msg('deleted') }}</td>
-                    <td>{{ total_removed|diff_format }}</td>
-                </tr>
-            </table>
-        </div>
+            {% if te.numTopEdits == 0 %}
+                <div class="alert alert-info">
+                    {{ msg('no-contribs') }}
+                </div>
+            {% else %}
+                <div class="col-lg-6 stat-list clearfix">
+                    <table class="table">
+                        <tr>
+                            <td>{{ msg('article') }}</td>
+                            <td>
+                                <span class="display-title">
+                                    {{ wiki.pageLink(page, page.displaytitle|raw) }}
+                                </span>
+                                <small>({{ wiki.pageLogLink(page) }}
+                                &middot; <a href="{{ path('ArticleInfoResult', {project:project.domain, article:page.title}) }}">{{ msg('tool-articleinfo') }}</a>)</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('user') }}</td>
+                            <td>
+                                {{ wiki.userLink(user, project) }}
+                                <small>(<a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool-ec') }}</a>)</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="stat-list--new-group">{{ msg('total-edits') }}</td>
+                            <td class="stat-list--new-group">{{ te.numTopEdits|num_format }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('minor-edits') }}</td>
+                            <td>
+                                {{ te.totalMinor }}
+                                ({{ te.totalMinor|percent_format(te.numTopEdits) }})
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('auto-edits') }}</td>
+                            <td>
+                                {{ te.totalAutomated }}
+                                ({{ te.totalAutomated|percent_format(te.numTopEdits) }})
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="color-icon" style="background:#fcf8e3"></span>{{ msg('reverted-edits') }}<sup>1</sup></td>
+                            <td>
+                                {{ te.totalReverted }}
+                                ({{ te.totalReverted|percent_format(te.numTopEdits) }})
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>atbe<sup>2</sup></td>
+                            <td>{{ te.atbe|round(1) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="stat-list--new-group">{{ msg('added-bytes') }}<sup>3</sup></td>
+                            <td class="stat-list--new-group">{{ te.totalAdded|diff_format }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('deleted-bytes') }}</td>
+                            <td>{{ te.totalRemoved|diff_format }}</td>
+                        </tr>
+                    </table>
+                </div>
 
-        <table class="table table-bordered table-hover table-striped top-editors-table">
-            <thead><tr>
-                {% for key in ['date', 'links', 'size', 'edit-summary'] %}
-                    <th>
-                        <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
-                            {{ msg(key)|capitalize_first }}
-                            {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
-                        </span>
-                    </th>
-                {% endfor %}
-            </tr></thead>
+                <div class="basic-info-charts clearfix">
+                    {{
+                        chart.pie_chart('minor_edis',
+                            [{
+                                label: msg('minor-edits'),
+                                value: te.totalMinor,
+                                percentage: (te.totalMinor / te.numTopEdits) * 100
+                            },
+                            {
+                                label: msg('major-edits'),
+                                value: te.numTopEdits - te.totalMinor,
+                                percentage: 100 - ((te.totalMinor / te.numTopEdits) * 100)
+                            }]
+                        )
+                    }}
+                    {{
+                        chart.pie_chart('auto_edis',
+                            [{
+                                label: msg('auto-edits'),
+                                value: te.totalAutomated,
+                                percentage: (te.totalAutomated / te.numTopEdits) * 100
+                            },
+                            {
+                                label: msg('manual-edits'),
+                                value: te.numTopEdits - te.totalAutomated,
+                                percentage: 100 - ((te.totalAutomated / te.numTopEdits) * 100)
+                            }]
+                        )
+                    }}
+                    {{
+                        chart.pie_chart('reverted_edis',
+                            [{
+                                label: msg('reverted-edits'),
+                                value: te.totalReverted,
+                                percentage: (te.totalReverted / te.numTopEdits) * 100
+                            },
+                            {
+                                label: msg('unreverted-edits'),
+                                value: te.numTopEdits - te.totalReverted,
+                                percentage: 100 - ((te.totalReverted / te.numTopEdits) * 100)
+                            }]
+                        )
+                    }}
+                </div>
 
-            {% for rev in revisions|reverse %}
-            <tr>
-                <td class="sort-entry--date" data-value="{{ rev.timestamp|date('U') }}">
-                    {{ wiki.permaLink(rev) }}
-                </td>
-                <td>
-                    {{ wiki.diffLink(rev) }}
-                    &middot;
-                    {% set offset = date(rev.year ~ '-' ~ rev.month ~ '-01')|date('Ymt') ~ '235959' %}
-                    {{ wiki.pageHistLink(page, msg('history'), offset) }}
-                </td>
-                <td class="sort-entry--size" data-value="{{ rev.size }}">
-                    {{ rev.size|diff_format }}
-                </td>
-                <td class="sort-entry--summary" data-value="{{ rev.comment }}">
-                    {{ rev.wikifiedSummary|raw }}
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
+                <div class="footnotes" style="clear:both">
+                    <sup>1</sup> {{ msg('reverted-desc') }}
+                    <br/><sup>2</sup> {{ msg('average-time-bw-edits') }}
+                    <br/><sup>3</sup> {{ msg('text-added-description') }}
+                </div>
+
+                <table class="table table-bordered table-hover table-striped top-editors-table">
+                    <thead><tr>
+                        {% for key in ['date', 'links', 'size', 'edit-summary'] %}
+                            <th>
+                                <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
+                                    {{ msg(key)|capitalize_first }}
+                                    {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
+                                </span>
+                            </th>
+                        {% endfor %}
+                    </tr></thead>
+
+                    {% for rev in te.topEdits %}
+                    <tr{% if rev.reverted %} class="bg-warning"{% endif %}>
+                        <td class="sort-entry--date" data-value="{{ rev.timestamp|date('U') }}">
+                            {{ wiki.permaLink(rev) }}
+                        </td>
+                        <td>
+                            {{ wiki.diffLink(rev) }}
+                            &middot;
+                            {% set offset = date(rev.year ~ '-' ~ rev.month ~ '-01')|date('Ymt') ~ '235959' %}
+                            {{ wiki.pageHistLink(page, msg('history'), offset) }}
+                        </td>
+                        <td class="sort-entry--size" data-value="{{ rev.size }}">
+                            {{ rev.size|diff_format }}
+                        </td>
+                        <td class="sort-entry--edit-summary" data-value="{{ rev.comment }}">
+                            {% if rev.reverted %}<i class="text-info">({{ msg('reverted')|lower }})</i>&nbsp;{% endif %}
+                            {{ rev.wikifiedSummary|raw }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
         {% endset %}
         {{ layout.content_block('topedits-article', content, msg('topedits-article-desc'), null, false, false) }}
 

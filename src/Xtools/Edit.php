@@ -42,6 +42,9 @@ class Edit extends Model
     /** @var string The SHA-1 of the wikitext as of the revision. */
     protected $sha;
 
+    /** @var bool Whether this edit was later reverted. */
+    protected $reverted;
+
     /**
      * Edit constructor.
      * @param Page $page
@@ -76,6 +79,11 @@ class Edit extends Model
                 ? $attrs['rev_sha1']
                 : $attrs['sha'];
         }
+
+        // This can be passed in to save as a property on the Edit instance.
+        // Note that the Edit class knows nothing about it's value, and
+        // is not capable of detecting whether the given edit was reverted.
+        $this->reverted = isset($attrs['reverted']) ? (bool)$attrs['reverted'] : null;
     }
 
     /**
@@ -213,6 +221,16 @@ class Edit extends Model
     public function getSha()
     {
         return $this->sha;
+    }
+
+    /**
+     * Was this edit reported as having been reverted?
+     * The value for this is merely passed in from precomputed data.
+     * @return bool
+     */
+    public function isReverted()
+    {
+        return $this->reverted;
     }
 
     /**
