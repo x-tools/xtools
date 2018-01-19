@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.1.30 ##
+- Fix issue in TopEdits where the most recent edit was counted twice.
+
 ## 3.1.29 ##
 - T179996, T179762: Use rev_sha1 for better revert detection in
   ArticleInfo and TopEdits.
