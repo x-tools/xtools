@@ -104,7 +104,7 @@ class PageRepository extends Repository
      * @param User|null $user Specify to get only revisions by the given user.
      * @param false|int $start
      * @param false|int $end
-     * @return string[] Each member with keys: id, timestamp, length-
+     * @return string[] Each member with keys: id, timestamp, length.
      */
     public function getRevisions(Page $page, User $user = null, $start = false, $end = false)
     {
@@ -149,7 +149,7 @@ class PageRepository extends Repository
         $end = false
     ) {
         $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
-        $userClause = $user ? "revs.rev_user_text in (:username) AND " : "";
+        $userClause = $user ? "revs.rev_user_text = :username AND " : "";
 
         // This sorts ascending by rev_timestamp because ArticleInfo must start with the oldest
         // revision and work its way forward for proper processing. Consequently, if we want to do
@@ -204,7 +204,7 @@ class PageRepository extends Repository
         }
 
         $revTable = $page->getProject()->getTableName('revision');
-        $userClause = $user ? "rev_user_text in (:username) AND " : "";
+        $userClause = $user ? "rev_user_text = :username AND " : "";
 
         $datesConditions = $this->getDateConditions($start, $end);
 

@@ -1,0 +1,21 @@
+@import 'mixins.scss';
+
+.topedits {
+    .color-icon {
+        margin-right: 3px;
+    }
+
+    #reverted_edis_legend .legend-body div:first-of-type .legend-label::after {
+        content: '1';
+        font-size: 80%;
+        vertical-align: 4px;
+    }
+
+    .footnotes {
+        margin: 20px 0;
+    }
+
+    .bg-warning {
+        background: #fcf8e3 !important;
+    }
+}

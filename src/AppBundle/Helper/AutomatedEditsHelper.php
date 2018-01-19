@@ -150,7 +150,7 @@ class AutomatedEditsHelper extends HelperBase
             }
         );
 
-        // If 'revert' is set to `true`, the use 'regex' as the regular expression,
+        // If 'revert' is set to `true`, then use 'regex' as the regular expression,
         //  otherwise 'revert' is assumed to be the regex string.
         $this->revertTools[$projectDomain] = array_map(function ($revertTool) {
             return [

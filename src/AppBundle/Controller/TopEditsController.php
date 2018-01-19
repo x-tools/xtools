@@ -132,10 +132,12 @@ class TopEditsController extends XtoolsController
          */
         $limit = $isSubRequest ? 10 : null;
 
-        $topEdits = new TopEdits($project, $user, $namespace, $limit);
+        $topEdits = new TopEdits($project, $user, null, $namespace, $limit);
         $topEditsRepo = new TopEditsRepository();
         $topEditsRepo->setContainer($this->container);
         $topEdits->setRepository($topEditsRepo);
+
+        $topEdits->prepareData();
 
         return $this->render('topedits/result_namespace.html.twig', [
             'xtPage' => 'topedits',
@@ -168,21 +170,13 @@ class TopEditsController extends XtoolsController
             return $page;
         }
 
-        // Get all revisions of this page by this user.
-        $revisionsData = $page->getRevisions($user);
+        // FIXME: add pagination.
+        $topEdits = new TopEdits($project, $user, $page);
+        $topEditsRepo = new TopEditsRepository();
+        $topEditsRepo->setContainer($this->container);
+        $topEdits->setRepository($topEditsRepo);
 
-        // Loop through all revisions and format dates, find totals, etc.
-        $totalAdded = 0;
-        $totalRemoved = 0;
-        $revisions = [];
-        foreach ($revisionsData as $revision) {
-            if ($revision['length_change'] > 0) {
-                $totalAdded += $revision['length_change'];
-            } else {
-                $totalRemoved += $revision['length_change'];
-            }
-            $revisions[] = new Edit($page, $revision);
-        }
+        $topEdits->prepareData();
 
         // Send all to the template.
         return $this->render('topedits/result_article.html.twig', [
@@ -191,10 +185,7 @@ class TopEditsController extends XtoolsController
             'project' => $project,
             'user' => $user,
             'page' => $page,
-            'total_added' => $totalAdded,
-            'total_removed' => $totalRemoved,
-            'revisions' => $revisions,
-            'revision_count' => count($revisions),
+            'te' => $topEdits,
         ]);
     }
 
@@ -245,7 +236,7 @@ class TopEditsController extends XtoolsController
         $response->setEncodingOptions(JSON_NUMERIC_CHECK);
 
         if ($article === '') {
-            $data = $topEdits->getTopEdits();
+            $data = $topEdits->getTopEditsNamespace();
 
             if (is_numeric($namespace)) {
                 $data = $data[$namespace];
