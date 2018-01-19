@@ -1,5 +1,14 @@
 # Release Notes #
 
+## 3.1.29 ##
+- T179996, T179762: Use rev_sha1 for better revert detection in
+  ArticleInfo and TopEdits.
+- T179995: Rework single-page variant of TopEdits, with more information,
+  visualizations, and using rev_sha1 for revert detection.
+- Add namespace and date range options to Simple Edit Counter.
+- Fix JavaScript column sorting.
+- Localization updates.
+
 ## 3.1.28 ##
 - AutoEdits: Better support for ar.wikipedia.
 - ArticleInfo: Fix floating nav after authorship stats load.
