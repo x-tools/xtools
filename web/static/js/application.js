@@ -1,6 +1,5 @@
 (function () {
-    var sortDirection, sortColumn, $tocClone, tocHeight, sectionOffset = {},
-        toggleTableData, apiPath, lastProject;
+    var $tocClone, tocHeight, sectionOffset = {}, apiPath, lastProject;
 
     // Load translations with 'en.json' as a fallback
     var messagesToLoad = {};
@@ -111,6 +110,8 @@
      *                                   item, and the third is the index of the item.
      */
     window.setupToggleTable = function (dataSource, chartObj, valueKey, updateCallback) {
+        var toggleTableData;
+
         $('.toggle-table').on('click', '.toggle-table--toggle', function () {
             if (!toggleTableData) {
                 // must be cloned
@@ -199,6 +200,8 @@
      *   floats, and strings, including date strings (e.g. "2016-01-01 12:59")
      */
     window.setupColumnSorting = function () {
+        var sortDirection, sortColumn;
+
         $('.sort-link').on('click', function () {
             sortDirection = sortColumn === $(this).data('column') ? -sortDirection : 1;
 
