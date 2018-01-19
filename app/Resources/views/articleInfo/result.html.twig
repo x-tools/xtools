@@ -473,12 +473,12 @@
                             {{ wiki.userLink(editor, project) }}
                         </td>
                         <td>
-                            {% if enabled('ec') %}
-                                <a href="{{ path('ec', { 'project': project.domain, 'username': editor }) }}">{{ msg('tool-ec') }}</a>
-                            {% endif %}
-                            &middot;
                             {% if enabled('topedits') %}
                                 <a href="{{ path('topedits', { 'project': project.domain, 'username': editor, 'namespace': page.namespace, 'article': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
+                            {% endif %}
+                            &middot;
+                            {% if enabled('ec') %}
+                                <a href="{{ path('ec', { 'project': project.domain, 'username': editor }) }}">{{ msg('tool-ec') }}</a>
                             {% endif %}
                         </td>
                         <td class="sort-entry--edits" data-value="{{ stats.all }}">

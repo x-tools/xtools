@@ -48,11 +48,11 @@
 {% else %}
     <table class="table table-bordered table-hover table-striped textshares-table toggle-table">
         <thead>
-        {% for key in ['username', 'characters', 'percentage'] %}
+        {% for key in ['rank', 'username', 'links', 'characters', 'percentage'] %}
             <th>
-                <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
+                <span{% if key != 'links' %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
                     {{ msg(key)|capitalize_first }}
-                    <span class="glyphicon glyphicon-sort"></span>
+                    {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
                 </span>
             </th>
         {% endfor %}
@@ -64,12 +64,22 @@
                 {% set totalPercentage = totalPercentage + values.percentage %}
                 {% set totalCount = totalCount + values.count %}
                 <tr>
+                    <td class="sort-entry--rank" data-value="{{ loop.index }}">{{ loop.index }}</td>
                     <td class="sort-entry--username" data-value="{{ username }}">
                         <span class="textshares-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ username }}">
                             <span class="glyphicon glyphicon-remove"></span>
                             <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
                         </span>
                         {{ wiki.userLink(username, project) }}
+                    </td>
+                    <td>
+                        {% if enabled('topedits') %}
+                            <a href="{{ path('topedits', { 'project': project.domain, 'username': username, 'namespace': page.namespace, 'article': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
+                        {% endif %}
+                        &middot;
+                        {% if enabled('ec') %}
+                            <a href="{{ path('ec', { 'project': project.domain, 'username': username }) }}">{{ msg('tool-ec') }}</a>
+                        {% endif %}
                     </td>
                     <td class="sort-entry--characters" data-value="{{ values.count }}">
                         {{ values.count|num_format }}
@@ -81,13 +91,15 @@
             {% endfor %}
         </tbody>
         {% if textshares.totalAuthors > 10 and is_sub_request == true %}
-            <tfoot><tr>
+            <tfoot><tr class="show-more-row">
+                <td></td>
                 <td>
                     <a href="{{ path('ArticleInfoAuthorshipResult', {project:project.domain, article:page.title})}}">
                         {{ (textshares.totalAuthors - 10)|num_format }}
                         {{ msg('num-others', [textshares.totalAuthors - 10]) }}
                     </a>
                 </td>
+                <td></td>
                 <td>
                     {{ (textshares.totalCount - totalCount)|num_format }}
                 </td>
