@@ -156,7 +156,7 @@ class TopEditsRepository extends Repository
 
         // Now we need to get the most recent revision, since the childrevs stuff excludes it.
         $lastRev = $this->queryTopEditsPage($page, $user, false);
-        if ($lastRev[0]['id'] !== end($results)['id']) {
+        if ($lastRev[0]['id'] !== $results[0]['id']) {
             $results = array_merge($lastRev, $results);
         }
 
