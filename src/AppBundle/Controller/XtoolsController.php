@@ -229,7 +229,7 @@ abstract class XtoolsController extends Controller
 
             // Only store if value is given ('namespace' or 'username' could be '0').
             if ($value !== null && $value !== '') {
-                $params[$param] = urldecode($value);
+                $params[$param] = rawurldecode($value);
             }
         }
 
