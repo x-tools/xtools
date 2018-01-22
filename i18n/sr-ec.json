@@ -5,7 +5,8 @@
 			"Prevodim",
 			"Милан Јелисавчић",
 			"Acamicamacaraca",
-			"Zoranzoki21"
+			"Zoranzoki21",
+			"Milicevic01"
 		]
 	},
 	"about-xtools": "О овим алатима",
@@ -38,7 +39,7 @@
 	"assessments": "Процене квалитета",
 	"authorship": "Ауторство",
 	"authorship-desc": "Ауторство приписује тренутну верзију чланка, мерену бројем знакова, искључујући размаке.",
-	"auto-edits": "(Полу)аутоматизоване измене",
+	"auto-edits": "Полуаутоматске измене",
 	"auto-edits-request": "Захтеви да се нови (полу)аутоматизовани алат дода",
 	"automatic": "Аутоматски",
 	"average-change-per-page": "Просечнo измена по страници",
@@ -82,7 +83,7 @@
 	"deleted": "Обрисано",
 	"deleted-edits": "Обрисане измене",
 	"deleted-pages": "Обрисане странице",
-	"delpagesfilter-both": "Лајв и обрисане странице",
+	"delpagesfilter-both": "Постојеће и обрисане странице",
 	"delpagesfilter-deleted": "Обрисане странице",
 	"delpagesfilter-live": "Немој обухватити обрисане странице",
 	"diff": "Разл",
@@ -181,7 +182,7 @@
 	"minor-edits-with-summaries": "Мање измене са описом",
 	"monday": "Понедељак",
 	"month": "Месец",
-	"month-counts": "Статистика за месеце",
+	"month-counts": "По месецима",
 	"more": "Више",
 	"multiple-users-allowed": "Вишеструк унос за кориснике дозвољен (раздвојити усправним цртама)",
 	"name": "Назив",
@@ -395,5 +396,5 @@
 	"xtools-slogan": "Утолите глад за подацима",
 	"xtools-title": "XTools",
 	"year": "Година",
-	"year-counts": "Година бројања"
+	"year-counts": "По годинама"
 }

@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"Metalhead64",
-			"Nemo bis"
+			"Nemo bis",
+			"Johanna Strodt (WMDE)"
 		]
 	},
 	"about-xtools": "Über diese Werkzeuge",
@@ -34,7 +35,7 @@
 	"assessment": "Bewertung",
 	"assessments": "Bewertungen",
 	"authorship": "Autorenschaft",
-	"authorship-desc": "Die Autorennennung der aktuellen Version des Artikels, gemessen an der Zeichenanzahl, ausschließlich Leerzeichen.",
+	"authorship-desc": "Die Anteile an der aktuellen Version des Artikels, gemessen an der Zeichenanzahl, ausschließlich Leerzeichen.",
 	"auto-edits": "(Halb-)automatische Bearbeitungen",
 	"auto-edits-request": "Anfrage zum Hinzufügen eines neuen (halb-)automatischen Werkzeugs",
 	"automatic": "Automatisch",
@@ -77,6 +78,7 @@
 	"date-range-outside-revisions": "Für den angegebenen Datumsbereich wurden keine Versionen gefunden",
 	"delete": "Löschungen",
 	"deleted": "Gelöscht",
+	"deleted-bytes": "Gelöscht (Bytes)",
 	"deleted-edits": "Gelöschte Bearbeitungen",
 	"deleted-pages": "Gelöschte Seiten",
 	"delpagesfilter-both": "Vorhandene und gelöschte Seiten anzeigen",
@@ -169,6 +171,7 @@
 	"major-contributors": "Autoren mit großen Beiträgen",
 	"major-edits": "Normale Bearb.",
 	"major-edits-with-summaries": "Große Bearbeitungen mit Zusammenfassungen",
+	"manual-edits": "Manuelle Bearbeitungen",
 	"max-text-added": "Max. hinzugefügter Text",
 	"max-text-deleted": "Max. gelöschter Text",
 	"memory-usage": "Speicherverbrauch: {{PLURAL:$2|Ein|$1}} Megabyte.",
@@ -278,6 +281,8 @@
 	"result": "Ergebnis",
 	"result-by-name": "Ergebnis nach IP/Name",
 	"result-by-time": "Ergebnis nach Zeit",
+	"reverted": "Zurückgesetzt",
+	"reverted-desc": "Zurückgesetzte Bearbeitungen sind solche, die mit der unmittelbar darauffolgenden Bearbeitung zurückgesetzt wurden.",
 	"reverted-edits": "Revertierte Bearbeitungen",
 	"revision-delete": "Versionslöschung",
 	"rfx-bureaucrat": "Es können auch Bürokratenkandidaturen-Seiten analysiert werden",
@@ -371,6 +376,7 @@
 	"unique-references": "Eindeutige Einzelnachweise",
 	"unknown": "Unbekannt",
 	"unprotect": "Freigaben",
+	"unreverted-edits": "Nicht zurückgesetzte Bearbeitungen",
 	"user": "User",
 	"user-groups": "Benutzergruppen",
 	"user-id": "Benutzer-ID",

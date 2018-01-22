@@ -171,7 +171,7 @@
 	"num-moves": "{{PLURAL:$1|گواستنەوە}}",
 	"num-namespaces": "{{PLURAL:$1|بۆشایی ناو}}",
 	"num-others": "{{PLURAL:$1|ھی تر}}",
-	"num-pageviews": "{{PLURAL:$1|بینینەکانی پەڕە}}",
+	"num-pageviews": "{{PLURAL:$1|بینین}}",
 	"num-protections": "{{PLURAL:$1|پاراستنەکان}}",
 	"num-revisions": "{{PLURAL:$1|پیاچوونەوە|پیاچوونەوە}}",
 	"num-revisions-since": "$1 {{PLURAL:$2|بەسەرداچوونەوە|بەسەرداچوونەوە}} لە $3وە",

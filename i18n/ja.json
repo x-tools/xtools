@@ -5,7 +5,8 @@
 			"Otokoume",
 			"おはぐろ蜻蛉",
 			"Kkairri",
-			"Yusuke1109"
+			"Yusuke1109",
+			"S2KTS"
 		]
 	},
 	"accepted-formats": "受け入れられる形式",
@@ -57,6 +58,7 @@
 	"date": "日付",
 	"delete": "削除",
 	"deleted": "削除済",
+	"deleted-bytes": "削除 (バイト)",
 	"deleted-edits": "削除された編集",
 	"deleted-pages": "ページを削除",
 	"delpagesfilter-deleted": "削除されたページのみを含める",
