@@ -128,7 +128,7 @@ class AppExtension extends Extension
                 'domain' => 'xtools'
             ],
             [
-                'variables' => $vars
+                'variables' => is_array($vars) ? $vars : []
             ]
         ));
     }
@@ -161,6 +161,7 @@ class AppExtension extends Extension
      */
     public function intuitionMessage($message = "", $vars = [])
     {
+        $vars = is_array($vars) ? $vars : [];
         return $this->getIntuition()->msg($message, [ "domain" => "xtools", "variables" => $vars ]);
     }
 

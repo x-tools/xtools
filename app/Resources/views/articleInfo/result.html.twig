@@ -551,12 +551,12 @@
                             {% endif %}
                         </td>
                         <td>
-                            {% if enabled('ec') %}
-                                <a href="{{ path('ec', { 'project': project.domain, 'user': bot }) }}">{{ msg('tool-ec') }}</a>
-                            {% endif %}
-                            &middot;
                             {% if enabled('topedits') %}
                                 <a href="{{ path('topedits', { 'project': project.domain, 'user': bot, 'namespace': page.namespace, 'article': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
+                            {% endif %}
+                            &middot;
+                            {% if enabled('ec') %}
+                                <a href="{{ path('ec', { 'project': project.domain, 'user': bot }) }}">{{ msg('tool-ec') }}</a>
                             {% endif %}
                         </td>
                         <td class="sort-entry--edits" data-value="{{ botData.count }}">{{ botData.count }}</td>
