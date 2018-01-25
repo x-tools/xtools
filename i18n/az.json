@@ -278,5 +278,12 @@
 	"result": "Nəticə",
 	"result-by-name": "Ada / IP-yə görə nəticə",
 	"result-by-time": "Vaxta görə nəticə",
-	"reverted": "Qaytarıldı"
+	"reverted": "Qaytarıldı",
+	"reverted-desc": "Dəyişikliklər dərhal aşağıdakı redaktə ilə qaytarılmışdır",
+	"reverted-edits": "Geri qaytarılmış redaktələr",
+	"revision-delete": "Təftişi silin",
+	"rfx-bureaucrat": "Bu vasitə bürokratlıq səhifələrinin sorğularını təhlil edə bilər",
+	"rfx-duplicates": "Dublikat",
+	"rfx-intro": "Bu alət səsləri təhlil edir və təkrar səs verənləri müəyyən edir:",
+	"rfx-page": "RfX səhifəsi"
 }
