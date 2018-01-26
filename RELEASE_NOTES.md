@@ -1,5 +1,11 @@
 # Release Notes #
 
+## 3.1.31 ##
+- T185411: Fix decoding of URL parameters.
+- T185744: Fix counting of bot edits in ArticleInfo.
+- T185675: Add support for four enwiki tools to AutoEdits.
+- Localization updates.
+
 ## 3.1.30 ##
 - Fix issue in TopEdits where the most recent edit was counted twice.
 
