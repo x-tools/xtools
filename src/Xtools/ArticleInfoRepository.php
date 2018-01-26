@@ -28,7 +28,7 @@ class ArticleInfoRepository extends Repository
 
         $datesConditions = $this->getDateConditions($start, $end);
 
-        $sql = "SELECT COUNT(rev_user_text) AS count, rev_user_text AS username, ug_group AS current
+        $sql = "SELECT COUNT(DISTINCT(rev_id)) AS count, rev_user_text AS username, ug_group AS current
                 FROM " . $project->getTableName('revision') . "
                 LEFT JOIN $userGroupsTable ON rev_user = ug_user
                 LEFT JOIN $userFormerGroupsTable ON rev_user = ufg_user
