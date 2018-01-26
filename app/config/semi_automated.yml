@@ -224,7 +224,7 @@ parameters:
             regex: '\[\[User:(Evad37\/rater.js|Kephir\/gadgets\/rater)'
             link: User:Evad37/rater.js
         revdel:
-            regex: 'using \[\[User:Primefac/revdel'
+            regex: 'using \[\[User:Primefac\/revdel'
             link: User:Primefac/revdel
         draft-sorter:
             regex: '\(draft-sorter\.js\)'
