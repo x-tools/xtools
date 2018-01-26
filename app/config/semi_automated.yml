@@ -208,7 +208,7 @@ parameters:
         For the Common Good:
             regex: 'WP:FTCG\|FtCG'
             link: Project:FTCG
-        User:Technical13/Scripts/OrphanStatus.js:
+        OrphanStatus:
             regex: '\[\[User:Technical_13\/Scripts\/OrphanStatus\|'
             link: User:Technical13/Scripts/OrphanStatus.js
         The Wikipedia Adventure:
@@ -223,6 +223,18 @@ parameters:
         Rater:
             regex: '\[\[User:(Evad37\/rater.js|Kephir\/gadgets\/rater)'
             link: User:Evad37/rater.js
+        revdel:
+            regex: 'using \[\[User:Primefac/revdel'
+            link: User:Primefac/revdel
+        draft-sorter:
+            regex: '\(draft-sorter\.js\)'
+            link: User:Enterprisey/draft-sorter
+        Xunlink:
+            regex: '\(\[\[User:Evad37\/Xunlink'
+            link: User:Evad37/Xunlink
+        MoveToDraft:
+            regex: '\[\[User:Evad37\/MoveToDraft\.js\|via script'
+            link: User:Evad37/MoveToDraft
     commons.wikimedia.org:
         UploadWizard:
             regex: '^User created page with UploadWizard$'
