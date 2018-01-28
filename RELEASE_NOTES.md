@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.1.32 ##
+- T185850: Temporarily allow + as spaces, again.
+
 ## 3.1.31 ##
 - T185411: Fix decoding of URL parameters.
 - T185744: Fix counting of bot edits in ArticleInfo.
