@@ -5,7 +5,8 @@
 			"Sachinkatiyar",
 			"Nemo bis",
 			"Jayprakash12345",
-			"Rajatkatiyar10"
+			"Rajatkatiyar10",
+			"Nitin1485"
 		]
 	},
 	"accounts": "खाते",
@@ -88,6 +89,7 @@
 	"logout": "सत्रान्त",
 	"mainspace": "मुख्य",
 	"major-edits": "प्रधान",
+	"manual-edits": "मानवीय संपादन",
 	"max-text-added": "अधिकतम पाठ जोड़ा गया",
 	"max-text-deleted": "अधिकतम पाठ हटाया गया",
 	"memory-usage": "$1 मेघाबाइट मेमोरी निष्पादित की गई।",
@@ -149,6 +151,7 @@
 	"result": "परिणाम",
 	"result-by-name": "नाम/आई॰पी॰ अनुसार परिणाम",
 	"result-by-time": "समयानुसार परिणाम",
+	"reverted": "पुनर्स्थापित",
 	"reverted-edits": "प्रत्यावर्तित सम्पादन",
 	"revision-delete": "अवतरण हटाना",
 	"rfx-bureaucrat": "यह उपकरण प्रशासन पद के अधिकार पृष्ठों के लिए अनुरोध का विश्लेषण भी करता है",

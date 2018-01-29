@@ -346,6 +346,7 @@
 	"tool-topedits-desc": "Obtener las ediciones de un usuario, ya sea el Top ediciones por espacio de nombres o ediciones por página",
 	"top-edited-pages": "Páginas más editadas",
 	"top-editors": "Editores principales",
+	"top-editors-desc": "Estadísticas de editor relativas al historial del artículo.",
 	"top-projects-edit-counts": "Conteos de ediciones globales",
 	"top-ten-by-edits": "Primeras 10 por ediciones",
 	"top-ten-by-text": "Primeras 10 de adición de texto",

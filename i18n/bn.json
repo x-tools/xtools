@@ -70,6 +70,7 @@
 	"date-range": "$1 - $2",
 	"delete": "অপসারণ",
 	"deleted": "অপসারিত",
+	"deleted-bytes": "অপসারিত (বাইট)",
 	"deleted-edits": "অপসারিত সম্পাদনা",
 	"deleted-pages": "অপসারিত পাতা",
 	"diff": "পার্থক্য",
