@@ -1,4 +1,5 @@
 {% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
+{% import 'macros/layout.html.twig' as layout %}
 {% import 'macros/wiki.html.twig' as wiki %}
 {% import 'macros/pieChart.html.twig' as chart %}
 
@@ -19,7 +20,12 @@
         <div class="panel-body xt-panel-body">
             <section class="panel panel-default clearfix">
                 <header class="panel-heading col-lg-12">
-                    <h4>{{ msg('general-stats') }}</h4>
+                    <h4>
+                        {{ msg('general-stats') }}
+                        <span class='pull-right text-muted xt-panel-description'>
+                            {{ layout.downloadLink('EditCounterGeneralStats', {project:project.domain, username:user.username}, ['wikitext']) }}
+                        </span>
+                    </h4>
                 </header>
                 <div class="panel-body col-lg-12">
 {% endif %}
@@ -40,7 +46,7 @@
         </tr>
         {% if user.globalGroups(project) %}
             <tr>
-                <td>{{ msg("global-user-groups") }}</td>
+                <td>{{ msg('global-user-groups') }}</td>
                 <td>
                     {% for group in user.globalGroups(project) %}
                         {{ group }}{% if not loop.last %}, {% endif %}
@@ -123,7 +129,7 @@
             </tr>
             <tr>
                 <td>{{ msg('average-per-page') }}</td>
-                <td>{{ ec.averageRevisionsPerPage }}</td>
+                <td>{{ ec.averageRevisionsPerPage|num_format }}</td>
             </tr>
             <tr>
                 <td>{% spaceless %}

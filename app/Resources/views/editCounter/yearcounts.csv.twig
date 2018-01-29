@@ -1,0 +1,7 @@
+{{ msg('namespace') }},{% for year in ec.yearCounts.yearLabels %}
+{{ year }}{% if not loop.last %},{% endif %}
+{% endfor %}
+
+{% for nsId,namespaceData in ec.yearCounts.totals %}
+{{ nsName(nsId, project.namespaces) }},{{ namespaceData|join(',') }}
+{% endfor %}

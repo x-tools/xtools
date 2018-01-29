@@ -221,6 +221,21 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
 
         // Labels for the years
         $this->assertEquals(['2016', '2017'], $monthCounts['yearLabels']);
+
+        $monthTotals = $this->editCounter->monthTotals(new DateTime('2017-04-30 23:59:59'));
+        $this->assertEquals(
+            [
+                '2016-12' => 10,
+                '2017-01' => 0,
+                '2017-02' => 50,
+                '2017-03' => 20,
+                '2017-04' => 0,
+            ],
+            $monthTotals
+        );
+
+        $yearTotals = $this->editCounter->yearTotals(new DateTime('2017-04-30 23:59:59'));
+        $this->assertEquals(['2016' => 10, '2017' => 70], $yearTotals);
     }
 
     /**

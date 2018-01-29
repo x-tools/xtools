@@ -350,4 +350,35 @@ abstract class XtoolsController extends Controller
             $conn->query($updateSql);
         }
     }
+
+    /**
+     * Get the rendered template for the requested format.
+     * @param  Request $request
+     * @param  string  $templatePath Path to template without format,
+     *   such as '/editCounter/latest_global'.
+     * @param  array   $ret Data that should be passed to the views.
+     * @return array
+     * @codeCoverageIgnore
+     */
+    public function getFormattedReponse(Request $request, $templatePath, $ret)
+    {
+        $format = $request->query->get('format', 'html');
+        if ($format == '') {
+            // The default above doesn't work when the 'format' parameter is blank.
+            $format = 'html';
+        }
+
+        $formatMap = [
+            'wikitext' => 'text/plain',
+            'csv' => 'text/csv',
+            'json' => 'application/json',
+        ];
+
+        $response = $this->render("$templatePath.$format.twig", $ret);
+
+        $contentType = isset($formatMap[$format]) ? $formatMap[$format] : 'text/html';
+        $response->headers->set('Content-Type', $contentType);
+
+        return $response;
+    }
 }

@@ -1,0 +1,6 @@
+{{ msg('month') }},{{ msg('count') }}
+{% for nsId in ec.monthCounts.totals|keys %}
+{% for month,total in ec.monthTotals %}
+{{ month }},{{ total }}
+{% endfor %}
+{% endfor %}

@@ -6,9 +6,9 @@
     {% endspaceless %}
 {% endmacro %}
 
-{% macro pageUrlRaw(pageTitle, project) %}{% spaceless %}
+{% macro pageUrlRaw(pageTitle, project, queryParams = null) %}{% spaceless %}
     {% set articlePath = project.articlePath|replace({'$1': (pageTitle|replace({' ': '_'})|e('url'))}) %}
-    {{ (project.url|trim('/')) ~ articlePath }}
+    {{ (project.url|trim('/')) ~ articlePath ~ (queryParams is not empty ? '?' ~ queryParams : '') }}
 {% endspaceless %}{% endmacro %}
 
 {% macro pageLink(page, label = null) %}{% spaceless %}

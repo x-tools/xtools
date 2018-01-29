@@ -1,0 +1,22 @@
+{### FIXME: don't show if they haven't opted in ###}
+
+{% import 'macros/wiki.html.twig' as wiki %}
+{% if not is_sub_request %}
+== [[User:{{ user.username }}]] ==
+
+{% set link %}[{{ url('EditCounterMonthCounts', {'username': user.username, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
+{{ msg('xtools-advert', [link, date()|date('Y-m-d H:i')]) }}
+{% endif %}
+
+=== {{ msg('month-counts') }} ===
+
+{| class="wikitable sortable"
+! {{ msg('month') }}
+! {{ msg('count') }}
+|-
+{% for month,total in ec.monthTotals %}
+| {{ month }}
+| {{ total }}
+|-
+{% endfor %}
+|}

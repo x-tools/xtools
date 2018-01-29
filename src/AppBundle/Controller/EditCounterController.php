@@ -163,14 +163,17 @@ class EditCounterController extends XtoolsController
         }
 
         $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
-        return $this->render('editCounter/general_stats.html.twig', [
+        $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
-        ]);
+        ];
+
+        // Output the relevant format template.
+        return $this->getFormattedReponse($request, 'editCounter/general_stats', $ret);
     }
 
     /**
@@ -188,14 +191,17 @@ class EditCounterController extends XtoolsController
         }
 
         $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
-        return $this->render('editCounter/namespace_totals.html.twig', [
+        $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
-        ]);
+        ];
+
+        // Output the relevant format template.
+        return $this->getFormattedReponse($request, 'editCounter/namespace_totals', $ret);
     }
 
     /**
@@ -242,14 +248,17 @@ class EditCounterController extends XtoolsController
         }
 
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
-        return $this->render('editCounter/yearcounts.html.twig', [
+        $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
-        ]);
+        ];
+
+        // Output the relevant format template.
+        return $this->getFormattedReponse($request, 'editCounter/yearcounts', $ret);
     }
 
     /**
@@ -270,7 +279,7 @@ class EditCounterController extends XtoolsController
         $optedInPage = $this->project
             ->getRepository()
             ->getPage($this->project, $this->project->userOptInPage($this->user));
-        return $this->render('editCounter/monthcounts.html.twig', [
+        $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
@@ -278,7 +287,10 @@ class EditCounterController extends XtoolsController
             'project' => $this->project,
             'ec' => $this->editCounter,
             'opted_in_page' => $optedInPage,
-        ]);
+        ];
+
+        // Output the relevant format template.
+        return $this->getFormattedReponse($request, 'editCounter/monthcounts', $ret);
     }
 
     /**

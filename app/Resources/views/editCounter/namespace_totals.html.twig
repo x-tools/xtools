@@ -18,7 +18,12 @@
         <div class="panel-body xt-panel-body">
             <section class="panel panel-default clearfix">
                 <header class="panel-heading col-lg-12">
-                    <h4>{{ msg('namespace-totals') }}</h4>
+                    <h4>
+                        {{ msg('namespace-totals') }}
+                        <span class='pull-right text-muted xt-panel-description'>
+                            {{ layout.downloadLink('EditCounterNamespaceTotals', {project:project.domain, username:user.username}, ['wikitext', 'csv']) }}
+                        </span>
+                    </h4>
                 </header>
                 <div class="panel-body col-lg-12">
 {% endif %}
@@ -47,7 +52,7 @@
                     {{ nsName(nsId, project.namespaces) }}
                 </td>
                 <td class="sort-entry--count" data-value="{{ value }}">
-                    {{ value|num_format }}
+                    <a href="{{ path('TopEditsResults', {project:project.domain, username:user.username, namespace:nsId}) }}">{{ value|num_format }}</a>
                     ({{ value|percent_format(ec.countLiveRevisions) }})
                 </td>
             </tr>

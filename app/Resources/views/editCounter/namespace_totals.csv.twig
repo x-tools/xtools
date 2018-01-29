@@ -1,0 +1,9 @@
+{% for key in ['rank', 'namespace', 'count'] %}
+{{ msg(key)|capitalize_first }}{% if not loop.last %},{% endif %}
+{% endfor %}
+
+{% set availableNamespaces = [] %}
+{% for nsId, value in ec.namespaceTotals %}
+{% set availableNamespaces = availableNamespaces|merge([nsId]) %}
+{{ loop.index }},{{ nsName(nsId, project.namespaces) }},{{ value }}
+{% endfor %}

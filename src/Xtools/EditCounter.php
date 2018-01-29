@@ -974,6 +974,30 @@ class EditCounter extends Model
     }
 
     /**
+     * Get total edits for each month. Used in wikitext export.
+     * @param  null|DateTime $currentTime *USED ONLY FOR UNIT TESTING*
+     * @return array With the months as the keys, counts as the values.
+     */
+    public function monthTotals($currentTime = null)
+    {
+        $months = [];
+
+        foreach ($this->monthCounts($currentTime)['totals'] as $nsId => $nsData) {
+            foreach ($nsData as $year => $monthData) {
+                foreach ($monthData as $month => $count) {
+                    $monthLabel = $year.'-'.sprintf('%02d', $month);
+                    if (!isset($months[$monthLabel])) {
+                        $months[$monthLabel] = 0;
+                    }
+                    $months[$monthLabel] += $count;
+                }
+            }
+        }
+
+        return $months;
+    }
+
+    /**
      * Get the total numbers of edits per year.
      * @param null|DateTime $currentTime - *USED ONLY FOR UNIT TESTING*
      *   so we can mock the current DateTime.
@@ -996,6 +1020,27 @@ class EditCounter extends Model
 
         $this->yearCounts = $out;
         return $out;
+    }
+
+    /**
+     * Get total edits for each year. Used in wikitext export.
+     * @param  null|DateTime $currentTime *USED ONLY FOR UNIT TESTING*
+     * @return array With the years as the keys, counts as the values.
+     */
+    public function yearTotals($currentTime = null)
+    {
+        $years = [];
+
+        foreach ($this->yearCounts($currentTime)['totals'] as $nsId => $nsData) {
+            foreach ($nsData as $year => $count) {
+                if (!isset($years[$year])) {
+                    $years[$year] = 0;
+                }
+                $years[$year] += $count;
+            }
+        }
+
+        return $years;
     }
 
     /**

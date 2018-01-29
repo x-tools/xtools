@@ -3,6 +3,8 @@
 	"all-languages": "Tote le linguas",
 	"api-error": "Error al consultar $1",
 	"bot": "Robot",
+	"csv": "CSV",
+	"download-label": "Discargar",
 	"help-translate": "Adjutar a traducer",
 	"history": "Historia",
 	"page-title": "Titulo del pagina",

@@ -31,9 +31,12 @@
             })) }}
         {% endset %}
         {% set headerLink %}
-            <a href="{{ path('EditCounterGeneralStats', {project:project.domain, username:user.username})}}">{{ msg("general-stats") }}</a>
+            <a href="{{ path('EditCounterGeneralStats', {project:project.domain, username:user.username})}}">{{ msg('general-stats') }}</a>
         {% endset %}
-        {{ layout.content_block(headerLink, content, '', 'general-stats', true) }}
+        {% set downloadLink %}
+            {{ layout.downloadLink('EditCounterGeneralStats', {project:project.domain, username:user.username}, ['wikitext']) }}
+        {% endset %}
+        {{ layout.content_block(headerLink, content, downloadLink, 'general-stats', true) }}
 
         {% set content %}
             {{ render(path('EditCounterNamespaceTotals', {
@@ -44,7 +47,10 @@
         {% set headerLink %}
             <a href="{{ path('EditCounterNamespaceTotals', {project:project.domain, username:user.username})}}">{{ msg('namespace-totals') }}</a>
         {% endset %}
-        {{ layout.content_block(headerLink, content, '', 'namespace-totals', true) }}
+        {% set downloadLink %}
+            {{ layout.downloadLink('EditCounterNamespaceTotals', {project:project.domain, username:user.username}, ['wikitext', 'csv']) }}
+        {% endset %}
+        {{ layout.content_block(headerLink, content, downloadLink, 'namespace-totals', true) }}
 
         {% set content %}
             {{ render(path('EditCounterYearCounts', {
@@ -55,7 +61,10 @@
         {% set headerLink %}
             <a href="{{ path('EditCounterYearCounts', {project:project.domain, username:user.username})}}">{{ msg('year-counts') }}</a>
         {% endset %}
-        {{ layout.content_block(headerLink, content, '', 'year-counts', true) }}
+        {% set downloadLink %}
+            {{ layout.downloadLink('EditCounterYearCounts', {project:project.domain, username:user.username}, ['wikitext', 'csv']) }}
+        {% endset %}
+        {{ layout.content_block(headerLink, content, downloadLink, 'year-counts', true) }}
 
         {% set content %}
             {{ render(path('EditCounterMonthCounts', {
@@ -68,7 +77,10 @@
                 {{ msg('month-counts') }}
             </a>
         {% endset %}
-        {{ layout.content_block(headerLink, content, '', 'month-counts', true) }}
+        {% set downloadLink %}
+            {{ layout.downloadLink('EditCounterMonthCounts', {project:project.domain, username:user.username}, ['wikitext', 'csv']) }}
+        {% endset %}
+        {{ layout.content_block(headerLink, content, downloadLink, 'month-counts', true) }}
 
         {% set content %}
             {{ render(path('EditCounterTimecard', {

@@ -678,6 +678,10 @@ input.form-control.show-loader {
     margin-top: 15px;
 }
 
+.download-dropdown {
+    bottom: 5px;
+}
+
 @media (min-width: $bootstrap-lg) {
     .xt-panel-body table {
         width: auto;

@@ -1,0 +1,226 @@
+{% import 'macros/wiki.html.twig' as wiki %}
+{% if not is_sub_request %}
+== [[User:{{ user.username }}]] ==
+
+{% set link %}[{{ url('EditCounterGeneralStats', {'username': user.username, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
+{{ msg('xtools-advert', [link, date()|date('Y-m-d H:i')]) }}
+{% endif %}
+
+=== {{ msg('general-stats') }} ===
+
+{| class="wikitable sortable"
+| {{ msg('user-id') }}
+| {{ user.id(project) }}
+|-
+| {{ msg('user-groups') }}
+| {% for group in user.groups(project) %}{{ group }}{% if not loop.last %}, {% endif %}{% endfor %}
+
+{% if user.globalGroups(project) %}
+|-
+| {{ msg('global-user-groups') }}
+| {% for group in user.globalGroups(project) %}{{ group }}{% if not loop.last %}, {% endif %}{% endfor %}
+
+{% endif %}
+|-
+| {{ msg('is-admin') }}
+| {% if user.isAdmin(project) %}1{% else %}0{% endif %}
+
+|-
+| {{ msg('first-edit') }}
+| {% if ec.datetimeFirstRevision %}{{ ec.datetimeFirstRevision|date('Y-m-d H:i') }}{% endif %}
+
+|-
+| {{ msg('latest-edit') }}
+| {% if ec.datetimeLastRevision %}{{ ec.datetimeLastRevision|date('Y-m-d H:i') }}{% endif %}
+
+|-
+| {{ msg('live-edits') }}
+| [[Special:Contributions/{{user.username}}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ec.countLiveRevisions}}}}]] {% if ec.countAllRevisions %}({{ ((ec.countLiveRevisions / ec.countAllRevisions) * 100)|percent_format }}){% endif %}
+
+|-
+| {{ msg('deleted-edits') }}
+| [[Special:DeletedContributions/{{user.username}}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ec.countDeletedRevisions}}}}]] {% if ec.countAllRevisions %}({{ ((ec.countDeletedRevisions / ec.countAllRevisions) * 100)|percent_format }}){% endif %}
+
+|-
+| {{ msg('total-edits') }}
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countAllRevisions }}}}
+|-
+| {{ msg('last-day') }}
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countRevisionsInLast('day') }}}}
+|-
+| {{ msg('last-week') }}
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countRevisionsInLast('week') }}}}
+|-
+| {{ msg('last-month') }}
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countRevisionsInLast('month') }}}}
+|-
+| {{ msg('last-year') }}
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countRevisionsInLast('year') }}}}
+|-
+| {{ msg('average-edits-per-day', [msg('days', [1])]) }}
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.averageRevisionsPerDay|round(1) }}}} ({% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.days }}}} {{ msg('num-days', [ec.days]) }})
+|-
+| {{ msg('average-edit-size') }}*
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.averageEditSize|round(1) }}}} {{ msg('num-bytes', [ec.averageEditSize]) }}
+|-
+|}
+
+{# ======================== PAGES ======================== #}
+=== {{ msg('pages') }} ===
+
+{| class="wikitable sortable"
+| {{ msg('pages-edited-total') }}
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countAllPagesEdited}}}}
+|-
+| {{ msg('average-per-page') }}
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.averageRevisionsPerPage }}}}
+|-
+| {{ msg('pages-created') }}
+| [{{ url('PagesResult', {project:project.domain, username:user.username, namespace:'all', redirects:'noredirects'}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesCreated }}}}] ({{ msg('pages-created-since-deleted', [ec.countPagesCreatedDeleted]) }})
+|-
+| {{ msg('pages-moved') }}
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesMoved }}}}
+|-
+| {{ msg('pages-deleted') }}
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesDeleted|num_format }}}}
+|-
+|}
+
+{# ======================== FILES ======================== #}
+=== {{ msg('files') }} ===
+
+{| class="wikitable sortable"
+| {{ msg('files-uploaded') }}
+| [[Special:ListFiles/{{ user.username }}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countFilesUploaded }}}}]]
+
+{% if isWMFLabs() %}
+|-
+| {{ msg('files-uploaded-commons') }}
+| [https://commons.wikimedia.org/wiki/Special:ListFiles/{{ user.username|e('url') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countFilesUploadedCommons }}}}]
+{% endif %}
+|-
+|}
+
+{# ======================== EDITS ======================== #}
+=== {{ msg('edits') }} ({{ msg('live')|lower }}) ===
+
+{| class="wikitable sortable"
+| {{ msg('auto-edits') }}
+| {% if enabled('autoedits') %}[{{ url('autoeditsResult', {project:project.domain, username:user.username, namespace:'all'}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countAutomatedEdits }}}}]{% else %}{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countAutomatedEdits }}}}{% endif %}
+{% if ec.countLiveRevisions %} ({{ ((ec.countAutomatedEdits / ec.countLiveRevisions) * 100)|percent_format }})
+{% endif %}
+|-
+| {{ msg('edits-with-summaries') }}
+| {% if enabled('es') %}[{{ url('EditSummaryResult', {project:project.domain, username:user.username, namespace:'all'}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countRevisionsWithComments }}}}]{% else %}{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countRevisionsWithComments }}}}{% endif %}{% if ec.countLiveRevisions %} ({{ ((ec.countRevisionsWithComments / ec.countLiveRevisions) * 100)|percent_format }})
+{% endif %}
+|-
+| {{ msg('minor-edits') }}
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countMinorRevisions }}}}{% if ec.countLiveRevisions %} ({{ ((ec.countMinorRevisions / ec.countLiveRevisions) * 100)|percent_format }})
+{% endif %}
+|-
+| {{ msg('small-edits') }}*
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countSmallEdits }}}}{% if ec.countLast5000 %} ({{ ((ec.countSmallEdits / ec.countLast5000) * 100)|percent_format }})
+{% endif %}
+|-
+| {{ msg('large-edits') }}*
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countLargeEdits }}}}{% if ec.countLast5000 %} ({{ ((ec.countLargeEdits / ec.countLast5000) * 100)|percent_format }})
+{% endif %}
+|-
+|}
+
+{# ======================== ACTIONS ======================== #}
+=== {{ msg('actions') }} ===
+
+{| class="wikitable sortable"
+| {{ msg('thank') }}
+| [[Special:Log/thanks/{{ user.username }}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.thanks }}}}]]
+|-
+| {{ msg('approve') }}
+| [[Special:Log/review/{{ user.username }}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.approvals }}}}]]
+|-
+| {{ msg('patrol') }}
+| [[Special:Log/patrol/{{ user.username }}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.patrols }}}}]]
+|-
+| {{ msg('accounts-created') }}
+| [[Special:Log/newusers/{{ user.username }}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.accountsCreated }}}}]]
+|-
+|}
+
+{% if user.isAdmin(project) %}
+==== {{ msg('actions-as-admin') }} ====
+
+{| class="wikitable sortable"
+|-
+| {{ msg('block') }}
+| [{{ wiki.pageUrlRaw('Special:Log/block/' ~ user.username, project, 'subtype=block') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countBlocksSet }}}}]
+|-
+| {{ msg('reblock') }}
+| [{{ wiki.pageUrlRaw('Special:Log/block/' ~ user.username, project, 'subtype=reblock') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countReblocksSet }}}}]
+|-
+| {{ msg('unblock') }}
+| [{{ wiki.pageUrlRaw('Special:Log/block/' ~ user.username, project, 'subtype=unblock') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countUnblocksSet }}}}]
+|-
+| {{ msg('protect') }}
+| [{{ wiki.pageUrlRaw('Special:Log/protect/' ~ user.username, project, 'subtype=protect') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesProtected }}}}]
+|-
+| {{ msg('reprotect') }}
+| [{{ wiki.pageUrlRaw('Special:Log/protect/' ~ user.username, project, 'subtype=modify') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesReprotected }}}}]
+|-
+| {{ msg('unprotect') }}
+| [{{ wiki.pageUrlRaw('Special:Log/protect/' ~ user.username, project, 'subtype=unprotect') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesUnprotected }}}}]
+|-
+| {{ msg('delete') }}
+| [{{ wiki.pageUrlRaw('Special:Log/delete/' ~ user.username, project, 'subtype=delete') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesDeleted }}}}]
+|-
+| {{ msg('revision-delete') }}
+| [{{ wiki.pageUrlRaw('Special:Log/delete/' ~ user.username, project, 'subtype=revision') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countEditsDeleted }}}}]
+|-
+| {{ msg('restore') }}
+| [{{ wiki.pageUrlRaw('Special:Log/delete/' ~ user.username, project, 'subtype=restore') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesRestored }}}}]
+|-
+| {{ msg('rights') }}
+| [{{ wiki.pageUrlRaw('Special:Log/rights/' ~ user.username, project) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countRightsModified }}}}]
+|-
+| {{ msg('import') }}
+| [{{ wiki.pageUrlRaw('Special:Log/import/' ~ user.username, project) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesImported }}}}]
+|-
+|}
+
+{% endif %}{# ======================== BLOCKS ======================== #}
+=== {{ msg('re-blocks') }} ===
+
+{| class="wikitable sortable"
+| {{ msg('block-longest') }}
+| {% if ec.longestBlockSeconds == -1 %}&#x221e; {# infinity #}{% elseif ec.longestBlockSeconds == false %}&ndash;{% else %}{{ formatDuration(ec.longestBlockSeconds) }}{% endif %}
+
+|-
+| {{ msg('block-current') }}
+| {% if user.isBlocked(project) %}[[Special:BlockList/{{ user.username }}|{% spaceless %}
+    {% if user.getBlockExpiry(project) == 'infinity' %}&#x221e;{# infinity #}{% else %}
+        {{ user.getBlockExpiry(project)|date('Y-m-d H:i') }}
+    {% endif %}]]
+{% endspaceless %}
+
+{% else %}&ndash;
+{% endif %}
+|-
+|}
+
+{# ======================== GLOBAL EDITS ======================== #}
+=== {{ msg('top-projects-edit-counts') ~ ' (' ~ msg('approximate')|lower ~ ')' }} ===
+
+{| class="wikitable sortable"
+|-
+{% set topN = 10 %}
+{% for topProj in ec.globalEditCountsTopN(topN) %}{% spaceless %}
+| {% if topProj.project.databaseName == project.databaseName %}&#9658;{% endif %}
+{# use project.domain instead of title due to limited space available in the interface #}
+[{{ wiki.pageUrlRaw('Special:Contributions/'~user.username, topProj.project) }} {{ topProj.project.domain }}]
+| [{{ url('TopEditsResults', {project:topProj.project.domain, username:user.username}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ topProj.total }}}}]
+{% endspaceless %}
+
+|-
+{% endfor %}
+|}
+
+<nowiki>*</nowiki> {{ msg('data-limit', [5000, 5000|num_format]) }}
