@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.1.33 ##
+- T185411: Restore raw URL encoding. Instead incoming links that use
+  the path parameter should encode the values accordingly.
+
 ## 3.1.32 ##
 - T185850: Temporarily allow + as spaces, again.
 
