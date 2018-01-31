@@ -48,7 +48,7 @@ class EditSummaryController extends XtoolsController
         $params = $this->parseQueryParams($request);
 
         // If we've got a project, user, and namespace, redirect to results.
-        if (isset($params['project']) && isset($params['username']) && isset($params['namespace'])) {
+        if (isset($params['project']) && isset($params['username'])) {
             return $this->redirectToRoute('EditSummaryResult', $params);
         }
 
