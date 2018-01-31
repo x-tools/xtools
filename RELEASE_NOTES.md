@@ -1,5 +1,11 @@
 # Release Notes #
 
+## 3.1.34 ##
+- Add wikitext and CSV download options to the Edit Counter.
+- T186111: Fix redirect in AdminScore if user is not found.
+- Make namespace optional in Edit Summary tool.
+- Localization updates.
+
 ## 3.1.33 ##
 - T185411: Restore raw URL encoding. Instead incoming links that use
   the path parameter should encode the values accordingly.
