@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"V.narsikar"
+			"V.narsikar",
+			"Bhatakati aatma"
 		]
 	},
 	"about-xtools": "या साधनांबद्दल",
@@ -66,9 +67,9 @@
 	"data-limit": "डाटा मागील $2 {{PLURAL:$1|संपादनापुरता|संपादनांपुरता}}च मर्यादित",
 	"date": "दिनांक",
 	"date-from": "पासून:$1",
-	"date-to": "प्रति:$1",
 	"date-range": "$1 - $2",
 	"date-range-outside-revisions": "दिलेल्या दिनांकांदरम्यानच्या काहीच आवृत्त्या सापडल्या नाहीत",
+	"date-to": "प्रति:$1",
 	"delete": "वगळा",
 	"deleted": "वगळले",
 	"deleted-edits": "वगळलेली संपादने",
@@ -94,7 +95,7 @@
 	"edits-last-week": "मागील ७ दिवसांतील संपादने",
 	"edits-last-year": "मागील ३६५ दिवसांतील संपादने",
 	"edits-with-summaries": "सारांशासहित संपादने",
-	"end": "समाप्ती दिनांक",
+	"end": "समाप्ति दिनांक",
 	"error-articlinfo-api": "आवृत्ती डाटा पुरवू शकलो नाही.",
 	"error-report": "कृपया $1 वर या त्रुटीचा अहवाल देण्यास मनमोकळे असा (विकिमीडिया खाते आवश्यक)",
 	"error-server-message": "विदागार म्हणाले:$1",

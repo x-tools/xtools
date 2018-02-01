@@ -3,7 +3,8 @@
 		"authors": [
 			"EukeneFL",
 			"Mikel Ibaiba",
-			"Sator"
+			"Sator",
+			"Theklan"
 		]
 	},
 	"about-xtools": "Erremienta hauei buruz",
@@ -394,8 +395,10 @@
 	"wednesday": "Asteazkena",
 	"wiki": "Wiki",
 	"wikiproject": "WikiProiektua",
+	"wikitext": "Wikitestua",
 	"with-summary": "Laburpenarekin",
 	"words": "Hitzak",
+	"xtools-advert": "$1 $2(e)n erabiliz sortua",
 	"xtools-slogan": "Zure datuen gosea elikatzen",
 	"xtools-title": "XTools",
 	"year": "Urtea",

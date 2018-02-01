@@ -4,7 +4,8 @@
 			"Dvorapa",
 			"Marek Pavlica",
 			"Nemo bis",
-			"Draceane"
+			"Draceane",
+			"Ilimanaq29"
 		]
 	},
 	"about-xtools": "O nástrojích",
@@ -247,6 +248,8 @@
 	"username": "Uživatelské jméno",
 	"view-source": "Zobrazit zdrojový kód",
 	"wiki": "Wiki",
+	"wikitext": "Wikitext",
 	"with-summary": "bez shrnutí",
+	"xtools-advert": "Generováno s použitím $1 na $2",
 	"xtools-title": "Nástroje X!"
 }
