@@ -5,7 +5,7 @@
 
 namespace AppBundle\EventSubscriber;
 
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -52,7 +52,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
     /**
      * Check if the current user has exceeded the configured usage limitations.
      * @param FilterControllerEvent $event The event.
-     * @throws AccessDeniedHttpException If rate limits have been exceeded.
+     * @throws TooManyRequestsHttpException If rate limits have been exceeded.
      */
     public function onKernelController(FilterControllerEvent $event)
     {
@@ -148,7 +148,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
             "\t<User agent>: " . $request->headers->get('User-Agent')
         );
 
-        throw new AccessDeniedHttpException("Possible spider crawl detected. " .
+        throw new TooManyRequestsHttpException(600, "Possible spider crawl detected. " .
             'If you are human, you are making too many requests during a short period of time. ' .
             "Please wait $this->rateDuration minutes before reloading this tool. You can then " .
             'login to prevent this from happening again.');
