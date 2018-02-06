@@ -1,5 +1,17 @@
 # Release Notes #
 
+## 3.1.35 ##
+- Add more wikitext export options to the Edit Counter, including
+  an option to in the form to get the entire results as wikitext.
+- Fix a bug in TopEdits where it errored out if the page has only
+  one edit by the requested user.
+- Only accept valid parameters in the Pages tool, and hide columns
+  that are irrelevant based on options (e.g. redirects when showing
+  only deleted pages).
+- Update AutoEdits regex for Arabic Wikipedia.
+- Use 429 response code when throwing rate limiting error.
+- Localization updates.
+
 ## 3.1.34 ##
 - Add wikitext and CSV download options to the Edit Counter.
 - T186111: Fix redirect in AdminScore if user is not found.
