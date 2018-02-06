@@ -298,5 +298,5 @@ parameters:
         WPCleaner:
             link: ويكيبيديا:وب_كلينر
         Rater:
-            regex: '\[\[:User:FShbib\/المقيم'
+            regex: '\[\[(:User:FShbib\/المقيم|ويكيبيديا:المقيم)'
             link: مستخدم:FShbib/المقيم
