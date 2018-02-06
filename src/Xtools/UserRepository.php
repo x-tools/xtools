@@ -376,31 +376,31 @@ class UserRepository extends Repository
 
         $revisionsSelect = "
             SELECT DISTINCT page_namespace AS namespace, 'rev' AS type, page_title AS page_title,
-                    page_len, page_is_redirect, rev_timestamp AS rev_timestamp,
-                    rev_user, rev_user_text AS username, rev_len, rev_id ".$conditions['paSelects']."
-                FROM $pageTable
-                JOIN $revisionTable ON page_id = rev_page ".
-                $conditions['paJoin']."
-                WHERE ".$conditions['whereRev']."
-                    AND rev_parent_id = '0'".
-                    $conditions['namespaceRev'].
-                    $conditions['redirects'].
-                $conditions['revPageGroupBy'];
+                page_len, page_is_redirect, rev_timestamp AS rev_timestamp,
+                rev_user, rev_user_text AS username, rev_len, rev_id ".$conditions['paSelects']."
+            FROM $pageTable
+            JOIN $revisionTable ON page_id = rev_page ".
+            $conditions['paJoin']."
+            WHERE ".$conditions['whereRev']."
+                AND rev_parent_id = '0'".
+                $conditions['namespaceRev'].
+                $conditions['redirects'].
+            $conditions['revPageGroupBy'];
 
         $archiveSelect = "
             SELECT ar_namespace AS namespace, 'arc' AS type, ar_title AS page_title,
-                        0 AS page_len, '0' AS page_is_redirect, MIN(ar_timestamp) AS rev_timestamp,
-                        ar_user AS rev_user, ar_user_text AS username, ar_len AS rev_len,
-                        ar_rev_id AS rev_id ".$conditions['paSelectsArchive']."
-                    FROM $archiveTable
-                    LEFT JOIN $logTable ON log_namespace = ar_namespace AND log_title = ar_title
-                        AND log_user = ar_user AND (log_action = 'move' OR log_action = 'move_redir')
-                        AND log_type = 'move'
-                    WHERE ".$conditions['whereArc']."
-                        AND ar_parent_id = '0' ".
-                        $conditions['namespaceArc']."
-                        AND log_action IS NULL
-                    GROUP BY ar_namespace, ar_title";
+                NULL AS page_len, '0' AS page_is_redirect, MIN(ar_timestamp) AS rev_timestamp,
+                ar_user AS rev_user, ar_user_text AS username, ar_len AS rev_len,
+                ar_rev_id AS rev_id ".$conditions['paSelectsArchive']."
+            FROM $archiveTable
+            LEFT JOIN $logTable ON log_namespace = ar_namespace AND log_title = ar_title
+                AND log_user = ar_user AND (log_action = 'move' OR log_action = 'move_redir')
+                AND log_type = 'move'
+            WHERE ".$conditions['whereArc']."
+                AND ar_parent_id = '0' ".
+                $conditions['namespaceArc']."
+                AND log_action IS NULL
+            GROUP BY ar_namespace, ar_title";
 
         if ($deleted == 'live') {
             return $revisionsSelect;

@@ -185,6 +185,7 @@
 	"month-counts": "Section heading for the section showing data for each individual month.",
 	"more": "Link to get more results\n{{Identical|More}}",
 	"multiple-users-allowed": "Tooltip message explaining that multiple users can be entered into the form.",
+	"na": "Abbreviation for 'not applicable', indicating a value does not apply, such as the 'current size' of a deleted article. This message should be brief.",
 	"name": "General term for 'name'.\n{{Identical|Name}}",
 	"namespace": "wiki namespace\n{{Identical|Namespace}}",
 	"namespace-totals": "Edits summarized by Namespace.",

@@ -50,7 +50,7 @@ class Pages extends Model
      * @param User $user
      * @param string|int $namespace Namespace ID or 'all'.
      * @param string $redirects One of 'noredirects', 'onlyredirects' or blank for both.
-     * @param string $deleted One of 'live', 'deleted' or 'both'.
+     * @param string $deleted One of 'live', 'deleted' or blank for both.
      * @param int $offset Pagination offset.
      */
     public function __construct(
@@ -64,7 +64,7 @@ class Pages extends Model
         $this->project = $project;
         $this->user = $user;
         $this->namespace = $namespace === 'all' ? 'all' : (string)$namespace;
-        $this->redirects = $redirects;
+        $this->redirects = $redirects ?: 'noredirects';
         $this->deleted = $deleted;
         $this->offset = $offset;
     }
@@ -316,10 +316,6 @@ class Pages extends Model
         $results = [];
 
         foreach ($pages as $row) {
-            // if (!isset($results[$row['namespace']])) {
-            //     $results[$row['namespace']] = [];
-            // }
-
             $datetime = DateTime::createFromFormat('YmdHis', $row['rev_timestamp']);
             $datetimeHuman = $datetime->format('Y-m-d H:i');
 
@@ -335,12 +331,6 @@ class Pages extends Model
 
             $results[$row['namespace']][] = $pageData;
         }
-
-        // ksort($results);
-
-        // foreach (array_keys($results) as $key) {
-        //     krsort($results[$key]);
-        // }
 
         return $results;
     }

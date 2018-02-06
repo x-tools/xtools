@@ -191,6 +191,7 @@
 	"namespace-totals": "Namespace Totals",
 	"namespaces": "Namespaces",
 	"namespaces-desc": "$2 {{PLURAL:$1|edit|edits}} to the article space",
+	"na": "N/A",
 	"neutral": "Neutral",
 	"next": "Next",
 	"no-contribs": "No contributions found",

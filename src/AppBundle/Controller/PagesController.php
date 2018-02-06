@@ -70,7 +70,15 @@ class PagesController extends XtoolsController
 
     /**
      * Display the results.
-     * @Route("/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{offset}", name="PagesResult")
+     * @Route(
+     *     "/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{offset}", name="PagesResult",
+     *     requirements={
+     *         "namespace" = "|all|\d+",
+     *         "redirects" = "|noredirects|onlyredirects",
+     *         "deleted" = "|live|deleted|both",
+     *         "offset" = "|\d+"
+     *     }
+     * )
      * @param Request $request
      * @param string|int $namespace The ID of the namespace, or 'all' for all namespaces.
      * @param string $redirects Whether to follow redirects or not.
@@ -90,11 +98,23 @@ class PagesController extends XtoolsController
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {
-            list($projectData, $user) = $ret;
+            list($project, $user) = $ret;
+        }
+
+        // Set defaults for 'deleted' and redirect if it is invalid.
+        if (!in_array($deleted, ['both', 'live', 'deleted'])) {
+            return $this->redirectToRoute('PagesResult', [
+                'project' => $project->getDomain(),
+                'username' => $user->getUsername(),
+                'namespace' => $namespace,
+                'redirects' => $redirects,
+                'deleted' => 'both',
+                'offset' => $offset,
+            ]);
         }
 
         $pages = new Pages(
-            $projectData,
+            $project,
             $user,
             $namespace,
             $redirects,
@@ -107,27 +127,30 @@ class PagesController extends XtoolsController
         return $this->render('pages/result.html.twig', [
             'xtPage' => 'pages',
             'xtTitle' => $user->getUsername(),
-            'project' => $projectData,
+            'project' => $project,
             'user' => $user,
-            'summaryColumns' => $this->getSummaryColumns($redirects, $deleted),
+            'summaryColumns' => $this->getSummaryColumns($pages),
             'pages' => $pages,
+            'namespace' => $namespace,
         ]);
     }
 
     /**
      * What columns to show in namespace totals table.
-     * @param  string $redirects One of 'noredirects', 'onlyredirects' or blank for both.
-     * @param  string $deleted One of 'live', 'deleted' or 'both'.
+     * @param  Pages $pages The Pages instance.
      * @return string[]
      * @codeCoverageIgnore
      */
-    protected function getSummaryColumns($redirects, $deleted)
+    protected function getSummaryColumns(Pages $pages)
     {
         $summaryColumns = ['namespace'];
-        if ($redirects == 'onlyredirects') {
-            // Don't show redundant pages column if only getting data on redirects.
+        if ($pages->getDeleted() === 'deleted') {
+            // Showing only deleted pages shows only the pages column, as redirects are non-applicable.
+            $summaryColumns[] = 'pages';
+        } elseif ($pages->getRedirects() == 'onlyredirects') {
+            // Don't show redundant pages column if only getting data on redirects or deleted pages.
             $summaryColumns[] = 'redirects';
-        } elseif ($redirects == 'noredirects') {
+        } elseif ($pages->getRedirects() == 'noredirects') {
             // Don't show redundant redirects column if only getting data on non-redirects.
             $summaryColumns[] = 'pages';
         } else {
@@ -137,7 +160,7 @@ class PagesController extends XtoolsController
         }
 
         // Show deleted column only when both deleted and live pages are visible.
-        if ($deleted == 'both') {
+        if ($pages->getDeleted() === 'both') {
             $summaryColumns[] = 'deleted';
         }
 
