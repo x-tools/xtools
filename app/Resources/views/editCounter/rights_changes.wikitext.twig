@@ -1,0 +1,38 @@
+{% import 'macros/wiki.html.twig' as wiki %}
+{% if not is_sub_request %}
+== [[User:{{ user.username }}]] ==
+
+{% set link %}[{{ url('EditCounterRightsChanges', {'username': user.username, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
+{{ msg('xtools-advert', [link, date()|date('Y-m-d H:i')]) }}
+
+{% endif %}
+=== {{ msg('rights-changes') }} ===
+
+{% if ec.rightsChanges|length > 0 %}
+{| class="wikitable sortable"
+|-
+{% for key in ['date', 'rights', 'admin', 'summary'] %}
+! {{ msg(key)|capitalize_first }}
+{% endfor %}
+{% for timestamp, change in ec.rightsChanges %}
+|-
+| style="white-space: nowrap;" | [[Special:Redirect/logid/{{ change.logId }}|{{ timestamp|date_format }}]]
+| {% for right in change.added %}
+<span style="color:#006400">+{{ right|trim }}</span>{% if not loop.last %}, {% endif %}
+{% endfor %}{% if change.added|length > 0 and change.removed|length > 0 %}
+
+{% endif %}
+{% for right in change.removed %}
+<span style="color:#8B0000">-{{ right|trim }}</span>{% if not loop.last %}, {% endif %}
+{% endfor %}
+
+| <span class="plainlinks">[{% verbatim %}{{{% endverbatim %}fullurl:User:{{ change.admin }}}} {{ change.admin }}]</span>
+| {% if change.automatic %}''{{ msg('automatic') }}''
+{% else %}
+{{ change.comment }}
+{% endif %}
+{% endfor %}
+|}
+{% else %}
+{{ msg('no-result', [user.username]) }}
+{% endif %}

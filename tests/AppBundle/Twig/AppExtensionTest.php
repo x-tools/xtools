@@ -13,6 +13,8 @@ use AppBundle\Twig\AppExtension;
 use AppBundle\Twig\Extension;
 use DateTime;
 use Xtools\User;
+use Xtools\Project;
+use Xtools\ProjectRepository;
 
 /**
  * Tests for the AppExtension class.
@@ -212,6 +214,34 @@ class AppExtensionTest extends WebTestCase
                 'foo' => 1,
                 'bar' => 2
             ])
+        );
+    }
+
+    /**
+     * Wikifying a string.
+     */
+    public function testWikify()
+    {
+        $project = new Project('TestProject');
+        $projectRepo = $this->getMock(ProjectRepository::class);
+        $projectRepo->method('getOne')
+            ->willReturn([
+                'url' => 'https://test.example.org',
+                'dbName' => 'test_wiki',
+                'lang' => 'en',
+            ]);
+        $projectRepo->method('getMetadata')
+            ->willReturn([
+                'general' => [
+                    'articlePath' => '/wiki/$1',
+                ],
+            ]);
+        $project->setRepository($projectRepo);
+        $summary = '<script>alert("XSS baby")</script> [[test page]]';
+        $this->assertEquals(
+            "&lt;script&gt;alert(\"XSS baby\")&lt;/script&gt; " .
+                "<a target='_blank' href='https://test.example.org/wiki/Test_page'>test page</a>",
+            $this->appExtension->wikify($summary, $project)
         );
     }
 }

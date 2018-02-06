@@ -18,7 +18,12 @@
         <div class="panel-body xt-panel-body">
             <section class="panel panel-default clearfix">
                 <header class="panel-heading col-lg-12">
-                    <h4>{{ msg('timecard') }}</h4>
+                    <h4>
+                        {{ msg('timecard') }}
+                        <span class='pull-right text-muted xt-panel-description'>
+                            {{ layout.downloadLink('EditCounterTimecard', {project:project.domain, username:user.username}, ['wikitext']) }}
+                        </span>
+                    </h4>
                 </header>
                 <div class="panel-body col-lg-12">
 {% endif %}

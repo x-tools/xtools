@@ -418,6 +418,10 @@ section > .panel-body {
 
 .form-fieldset {
     margin-bottom: 15px;
+
+    .checkbox {
+        margin-bottom: 0;
+    }
 }
 
 .form-submit {
@@ -680,6 +684,10 @@ input.form-control.show-loader {
 
 .download-dropdown {
     bottom: 5px;
+
+    .glyphicon-download-alt {
+        top: 2px;
+    }
 }
 
 @media (min-width: $bootstrap-lg) {

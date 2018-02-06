@@ -6,6 +6,13 @@
         <fieldset class="form-fieldset">
             {{ forms.wiki_input(project) }}
             {{ forms.user_input(true, false, project) }}
+
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="format" value="wikitext">
+                    {{ msg('view-wikitext') }}
+                </label>
+            </div>
         </fieldset>
         {{ forms.submit_btn }}
     </form>

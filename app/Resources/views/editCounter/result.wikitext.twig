@@ -1,0 +1,36 @@
+== [[User:{{ user.username }}]] ==
+
+{% set link %}[{{ url('EditCounter', {'username': user.username, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
+{{ msg('xtools-advert', [link, date()|date('Y-m-d H:i')]) }}
+{{ render(path('EditCounterGeneralStats', {
+    'username': user.username,
+    'project': project.domain,
+    'format': 'wikitext'
+})) }}{{ render(path('EditCounterNamespaceTotals', {
+    'username': user.username,
+    'project': project.domain,
+    'format': 'wikitext'
+})) }}{{ render(path('EditCounterYearCounts', {
+    'username': user.username,
+    'project': project.domain,
+    'format': 'wikitext'
+})) }}{{ render(path('EditCounterMonthCounts', {
+    'username': user.username,
+    'project': project.domain,
+    'format': 'wikitext'
+})) }}{{ render(path('EditCounterTimecard', {
+    'username': user.username,
+    'project': project.domain,
+    'format': 'wikitext'
+})) }}{{ render(path('TopEditsResults', {
+    'username': user.username,
+    'project': project.domain,
+    'namespace': 'all',
+    'format': 'wikitext'
+})) }}{% if ec.rightsChanges|length > 0 %}{{ render(path('EditCounterRightsChanges', {
+    'username': user.username,
+    'project': project.domain,
+    'format': 'wikitext'
+})) }}{% endif %}
+
+{{ msg('times-in-utc') }}

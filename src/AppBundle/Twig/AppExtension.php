@@ -7,6 +7,8 @@ namespace AppBundle\Twig;
 
 use Xtools\ProjectRepository;
 use Xtools\User;
+use Xtools\Edit;
+use Xtools\Project;
 use NumberFormatter;
 use IntlDateFormatter;
 use DateTime;
@@ -548,6 +550,7 @@ class AppExtension extends Extension
             new \Twig_SimpleFilter('num_format', [$this, 'numberFormat']),
             new \Twig_SimpleFilter('date_format', [$this, 'dateFormatStd']),
             new \Twig_SimpleFilter('date_localize', [$this, 'dateFormat']),
+            new \Twig_SimpleFilter('wikify', [$this, 'wikify']),
         ];
     }
 
@@ -608,6 +611,17 @@ class AppExtension extends Extension
         }
 
         return $datetime->format('Y-m-d H:i');
+    }
+
+    /**
+     * Convert raw wikitext to HTML-formatted string.
+     * @param string $str
+     * @param Project $project
+     * @return string
+     */
+    public function wikify($str, Project $project)
+    {
+        return Edit::wikifyString($str, $project);
     }
 
     /**

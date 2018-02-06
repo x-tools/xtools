@@ -401,10 +401,9 @@
                         {{- wiki.pageLinkRaw('Special:Contributions/'~user.username, topProj.project, topProj.project.domain) -}}
                     </td>
                     <td>
-                        <a href="{{ path('TopEditsResults', {project:topProj.project.domain, username:user.username}) }}">
+                        <a href="{{ path('TopEditsResults', {project:topProj.project.domain, username:user.username, namespace:'all'}) }}">
                             {{ topProj.total|num_format }}
                         </a>
-                        {# <small class="text-muted">@TODO days</small> #}
                     </td>
                 </tr>
             {% endfor %}
