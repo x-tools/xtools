@@ -1,6 +1,7 @@
-{### FIXME: don't show if they haven't opted in ###}
-
 {% import 'macros/wiki.html.twig' as wiki %}
+{% if not(project.userHasOptedIn(user)) %}
+    {{ msg('not-opted-in', [ wiki.pageLink(opted_in_page) ]) }}
+{% else %}
 {% if not is_sub_request %}
 == [[User:{{ user.username }}]] ==
 
@@ -16,7 +17,9 @@
 |-
 {% for month,total in ec.monthTotals %}
 | {{ month }}
-| {{ total }}
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ total }}}}
 |-
 {% endfor %}
 |}
+
+{% endif %}

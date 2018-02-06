@@ -42,7 +42,7 @@
         <thead><tr>
             <th>
                 <span class="sort-link sort-link--edits" data-column="edits">
-                    {{ msg('edits') | capitalize_first }}
+                    {{ msg('edits')|capitalize_first }}
                     <span class="glyphicon glyphicon-sort"></span>
                 </span>
             </th>
@@ -73,7 +73,7 @@
                 </td>
                 {% if showPageAssessment %}
                     <td class="sort-entry--assessment" data-value="{{ page.pa_class ? page.pa_class : 'Unknown' }}">
-                        {% set badge = project.assessmentBadgeURL(page.pa_class)%}
+                        {% set badge = project.assessmentBadgeURL(page.pa_class) %}
                         {% if badge is defined %}
                             <img alt="{{ page.pa_class }}" src="{{ badge }}" class="assessment-badge" />
                         {% endif %}
@@ -105,8 +105,8 @@
     {% if is_sub_request %}
         <h4 class="xt-show-hide--parent">
             {{ nsName(ns, project.namespaces) }}
-            <small class='xt-show'>[{{ msg('show') | lower }}]</small>
-            <small class='xt-hide'>[{{ msg('hide') | lower }}]</small>
+            <small class='xt-show'>[{{ msg('show')|lower }}]</small>
+            <small class='xt-hide'>[{{ msg('hide')|lower }}]</small>
         </h4>
     {% endif %}
 

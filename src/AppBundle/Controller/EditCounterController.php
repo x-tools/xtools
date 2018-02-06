@@ -134,18 +134,16 @@ class EditCounterController extends XtoolsController
             $this->editCounter->prepareData($this->container);
         }
 
-        // FIXME: is this needed? It shouldn't ever be a subrequest here in the resultAction.
-        $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
-
-        return $this->render('editCounter/result.html.twig', [
+        $ret = [
             'xtTitle' => $this->user->getUsername() . ' - ' . $this->project->getTitle(),
             'xtPage' => 'ec',
-            'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
-            'is_sub_request' => $isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
-        ]);
+        ];
+
+        // Output the relevant format template.
+        return $this->getFormattedReponse($request, 'editCounter/result', $ret);
     }
 
     /**
@@ -222,7 +220,8 @@ class EditCounterController extends XtoolsController
         $optedInPage = $this->project
             ->getRepository()
             ->getPage($this->project, $this->project->userOptInPage($this->user));
-        return $this->render('editCounter/timecard.html.twig', [
+
+        $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
@@ -230,7 +229,10 @@ class EditCounterController extends XtoolsController
             'project' => $this->project,
             'ec' => $this->editCounter,
             'opted_in_page' => $optedInPage,
-        ]);
+        ];
+
+        // Output the relevant format template.
+        return $this->getFormattedReponse($request, 'editCounter/timecard', $ret);
     }
 
     /**
@@ -308,14 +310,17 @@ class EditCounterController extends XtoolsController
         }
 
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
-        return $this->render('editCounter/rights_changes.html.twig', [
+        $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
-        ]);
+        ];
+
+        // Output the relevant format template.
+        return $this->getFormattedReponse($request, 'editCounter/rights_changes', $ret);
     }
 
     /**

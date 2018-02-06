@@ -390,6 +390,7 @@
 	"username-or-ip": "Tooltip for username input, indicating a username, IPv4 or IPv6 may be entered.",
 	"version": "Message that indicates the version of XTools. $1 is the version, which is not numerical.",
 	"view-source": "Link to source code.",
+	"view-wikitext": "Option in form to show results as wikitext, rather than the normal XTools interface.",
 	"vote-msg": "$1 is the username, $2 is the number, $3 is the name of vote page e.g.: Requests for adminship",
 	"web-chat": "Text for link to the XTools IRC channel. This message should be short or abbreviated.",
 	"wednesday": "{{Identical|Wednesday}}",

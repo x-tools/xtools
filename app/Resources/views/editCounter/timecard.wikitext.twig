@@ -1,0 +1,41 @@
+{% import 'macros/wiki.html.twig' as wiki %}
+{% if not(project.userHasOptedIn(user)) %}
+    {{ msg('not-opted-in', [ wiki.pageLink(opted_in_page) ]) }}
+{% else %}
+{% if not is_sub_request %}
+== [[User:{{ user.username }}]] ==
+
+{% set link %}[{{ url('EditCounterTimecard', {'username': user.username, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
+{{ msg('xtools-advert', [link, date()|date('Y-m-d H:i')]) }}
+
+{% endif %}
+=== {{ msg('timecard') }} ===
+{# MySQL uses ODBC standard, treating the first day (1) as Sunday #}
+{% set days = {
+    1: msg('sunday'),
+    2: msg('monday'),
+    3: msg('tuesday'),
+    4: msg('wednesday'),
+    5: msg('thursday'),
+    6: msg('friday'),
+    7: msg('saturday')
+}%}
+
+{| class="wikitable"
+!
+{% for period in 0..11 %}
+! {{ period * 2 }}:00
+{% endfor %}
+|-
+{% for day in 1..7 %}
+! {{ days[day] }}
+{% for item in ec.timeCard if item.y == day and item.x != 24 %}
+| style="text-align:center; background:rgba(50, 102, 36, {{ (item.value / 100)|round(1) }})" |{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ item.value }}}}
+{% endfor %}
+|-
+{% endfor %}
+|}
+
+{{ msg('times-in-utc') }}
+
+{% endif %}

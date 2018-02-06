@@ -241,7 +241,7 @@ class EditCounter extends Model
             $this->rightsChanges[$row['log_timestamp']] = [
                 'logId' => $row['log_id'],
                 'admin' => $row['log_user_text'],
-                'comment' => Edit::wikifyString($row['log_comment'], $this->project),
+                'comment' => $row['log_comment'],
                 'added' => array_values($added),
                 'removed' => array_values($removed),
                 'automatic' => $row['log_action'] === 'autopromote'
@@ -842,8 +842,39 @@ class EditCounter extends Model
             return $this->timeCardData;
         }
         $totals = $this->getRepository()->getTimeCard($this->project, $this->user);
-        $this->timeCardData = $totals;
-        return $totals;
+
+        // Scale the radii: get the max, then scale each radius.
+        // This looks inefficient, but there's a max of 72 elements in this array.
+        $max = 0;
+        foreach ($totals as $total) {
+            $max = max($max, $total['value']);
+        }
+        foreach ($totals as &$total) {
+            $total['value'] = round($total['value'] / $max * 100);
+        }
+
+        // Fill in zeros for timeslots that have no values.
+        $sortedTotals = [];
+        $index = 0;
+        $sortedIndex = 0;
+        foreach (range(1, 7) as $day) {
+            foreach (range(0, 24, 2) as $hour) {
+                if (isset($totals[$index]) && (int)$totals[$index]['x'] === $hour) {
+                    $sortedTotals[$sortedIndex] = $totals[$index];
+                    $index++;
+                } else {
+                    $sortedTotals[$sortedIndex] = [
+                        'y' => $day,
+                        'x' => $hour,
+                        'value' => 0,
+                    ];
+                }
+                $sortedIndex++;
+            }
+        }
+
+        $this->timeCardData = $sortedTotals;
+        return $sortedTotals;
     }
 
     /**

@@ -139,7 +139,7 @@ class TopEditsController extends XtoolsController
 
         $topEdits->prepareData();
 
-        return $this->render('topedits/result_namespace.html.twig', [
+        $ret = [
             'xtPage' => 'topedits',
             'xtTitle' => $user->getUsername(),
             'project' => $project,
@@ -147,7 +147,10 @@ class TopEditsController extends XtoolsController
             'namespace' => $namespace,
             'te' => $topEdits,
             'is_sub_request' => $isSubRequest,
-        ]);
+        ];
+
+        // Output the relevant format template.
+        return $this->getFormattedReponse($request, 'topedits/result_namespace', $ret);
     }
 
     /**

@@ -18,7 +18,12 @@
         <div class="panel-body xt-panel-body">
             <section class="panel panel-default clearfix">
                 <header class="panel-heading col-lg-12">
-                    <h4>{{ msg('rights-changes') }}</h4>
+                    <h4>
+                        {{ msg('rights-changes') }}
+                        <span class='pull-right text-muted xt-panel-description'>
+                            {{ layout.downloadLink('EditCounterRightsChanges', {project:project.domain, username:user.username}, ['wikitext']) }}
+                        </span>
+                    </h4>
                 </header>
                 <div class="panel-body col-lg-12">
 {% endif %}
@@ -29,7 +34,7 @@
             {% for key in ['date', 'rights', 'admin', 'summary'] %}
                 <th>
                     <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                        {{ msg(key) | capitalize_first }}
+                        {{ msg(key)|capitalize_first }}
                         <span class="glyphicon glyphicon-sort"></span>
                     </span>
                 </th>
@@ -56,7 +61,7 @@
                         {% if change.automatic %}
                             <i class="text-muted">{{ msg('automatic') }}</i>
                         {% else %}
-                            {{ change.comment|raw }}
+                            {{ change.comment|wikify(project)|raw }}
                         {% endif %}
                     </td>
                 </tr>

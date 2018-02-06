@@ -544,15 +544,7 @@ class EditCounterRepository extends Repository
         $resultQuery->bindParam(":username", $username);
         $resultQuery->execute();
         $totals = $resultQuery->fetchAll();
-        // Scale the radii: get the max, then scale each radius.
-        // This looks inefficient, but there's a max of 72 elements in this array.
-        $max = 0;
-        foreach ($totals as $total) {
-            $max = max($max, $total['value']);
-        }
-        foreach ($totals as &$total) {
-            $total['value'] = round($total['value'] / $max * 100);
-        }
+
         $cacheItem = $this->cache->getItem($cacheKey);
         $cacheItem->expiresAfter(new DateInterval('PT10M'));
         $cacheItem->set($totals);
