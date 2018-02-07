@@ -231,11 +231,18 @@ class EditCounter extends Model
             } else {
                 // This is the old school format the most likely contains
                 // the list of rights additions in as a comma-separated list.
-                list($old, $new) = explode("\n", $row['log_params']);
-                $old = array_filter(array_map('trim', explode(',', $old)));
-                $new = array_filter(array_map('trim', explode(',', $new)));
-                $added = array_diff($new, $old);
-                $removed = array_diff($old, $new);
+                try {
+                    list($old, $new) = explode("\n", $row['log_params']);
+                    $old = array_filter(array_map('trim', explode(',', $old)));
+                    $new = array_filter(array_map('trim', explode(',', $new)));
+                    $added = array_diff($new, $old);
+                    $removed = array_diff($old, $new);
+                } catch (Exception $e) {
+                    // Really really old school format that may be missing metadata
+                    // altogether. Here we'll just leave $added and $removed blank.
+                    $added = [];
+                    $removed = [];
+                }
             }
 
             $this->rightsChanges[$row['log_timestamp']] = [
