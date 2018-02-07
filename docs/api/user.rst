@@ -44,7 +44,7 @@ Get the number of pages created by the user in the given namespace.
 * ``username`` (**required**) - Account's username.
 * ``namespace`` - Namespace ID or ``all`` for all namespaces.
 * ``redirects`` - One of 'noredirects' (default), 'onlyredirects' or 'all' for both.
-* ``deleted`` - One of 'live', 'deleted' or 'both' (default).
+* ``deleted`` - One of 'live', 'deleted' or 'all' (default).
 
 **Example:**
 
@@ -68,7 +68,7 @@ Get the pages created by the user in the given namespace.
 * ``username`` (**required**) - Account's username.
 * ``namespace`` - Namespace ID or ``all`` for all namespaces.
 * ``redirects`` - One of 'noredirects' (default), 'onlyredirects' or 'all' for both.
-* ``deleted`` - One of 'live', 'deleted' or 'both' (default).
+* ``deleted`` - One of 'live', 'deleted' or 'all' (default).
 * ``offset`` - Which page of results to show. If there is more than one page of results, ``continue`` is returned, with the subsequent page number as the value.
 
 **Example:**
