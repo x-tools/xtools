@@ -84,7 +84,7 @@
 	"deleted-bytes": "تم حذف (بايت)",
 	"deleted-edits": "التعديلات المحذوفة",
 	"deleted-pages": "الصفحات المحذوفة",
-	"delpagesfilter-both": "تضمين الصفحات الحية والمحذوفة",
+	"delpagesfilter-all": "تضمين الصفحات الحية والمحذوفة",
 	"delpagesfilter-deleted": "تضمين الصفحات المحذوفة فقط",
 	"delpagesfilter-live": "استبعاد الصفحات المحذوفة",
 	"diff": "فرق",

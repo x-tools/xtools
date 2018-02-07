@@ -83,23 +83,29 @@
 
                                 <a href="#{{ key }}" >{{ nsName(key, project.namespaces) }}</a>
                             </td>
-                            {% if pages.redirects != 'onlyredirects' %}
+                            {% if pages.redirects != 'onlyredirects' and pages.deleted != 'deleted' %}
                                 <td class="sort-entry--pages" data-value="{{ value.count }}">
                                     {{ value.count|num_format }}
                                 </td>
                             {% endif %}
                             {% if pages.redirects != 'noredirects' and pages.deleted != 'deleted' %}
                                 <td class="sort-entry--redirects" data-value="{{ value.redirects }}">
-                                    {{ value.redirects|num_format }}
-                                    {% if pages.redirects != 'onlyredirects' %}
+                                    {% if pages.redirects == 'onlyredirects' %}
+                                        {{ value.redirects|num_format }}
+                                    {% else %}
+                                        <a href="{{ path('PagesResult', {project: project.domain, username: user.username, namespace: key, redirects: 'onlyredirects', deleted: pages.deleted}) }}">{{ value.redirects|num_format }}</a>
                                         ({{ value.redirects|percent_format(value.count) }})
                                     {% endif %}
                                 </td>
                             {% endif %}
-                            {% if pages.deleted == 'both' %}
+                            {% if pages.deleted == 'all' or pages.deleted == 'deleted' %}
                                 <td class="sort-entry--deleted" data-value="{{ value.deleted }}">
-                                    <a href="{{ path('PagesResult', {project: project.domain, username: user.username, namespace: namespace, redirects: '', deleted: 'deleted'}) }}">{{ value.deleted|num_format }}</a>
-                                    ({{ value.deleted|percent_format(value.count) }})
+                                    {% if pages.deleted == 'deleted' %}
+                                        {{ value.deleted|num_format }}
+                                    {% else %}
+                                        <a href="{{ path('PagesResult', {project: project.domain, username: user.username, namespace: key, redirects: '', deleted: 'deleted'}) }}">{{ value.deleted|num_format }}</a>
+                                        ({{ value.deleted|percent_format(value.count) }})
+                                    {% endif %}
                                 </td>
                             {% endif %}
                         </tr>
@@ -121,7 +127,7 @@
                                     ({{ pages.numRedirects|percent_format(pages.getNumPages) }})
                                 </th>
                             {% endif %}
-                            {% if pages.deleted == 'both' %}
+                            {% if pages.deleted == 'all' %}
                                 <th class="namespaces--deleted">
                                     {{ pages.numDeleted|num_format }}
                                     ({{ pages.numDeleted|percent_format(pages.getNumPages) }})
@@ -163,7 +169,7 @@
                     </tr></thead>
                     <tbody>
                         {% set index = 0 %}
-                        {% set maxRows = 100 %}
+                        {% set maxRows = 50 %}
                         {% for page in pages.results[ns] if not(multiNamspace) or (index < maxRows and multiNamspace) %}
                             {% set index = index + 1 %}
                             {% if ns == 0 %}

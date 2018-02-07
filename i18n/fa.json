@@ -76,7 +76,7 @@
 	"deleted": "حذف شد",
 	"deleted-edits": "ویرایش‌های حذف‌شده",
 	"deleted-pages": "صفحات حذف‌شده",
-	"delpagesfilter-both": "هم صفحه‌های موجود و هم حذف‌شده در نظر گرفته شوند",
+	"delpagesfilter-all": "هم صفحه‌های موجود و هم حذف‌شده در نظر گرفته شوند",
 	"delpagesfilter-deleted": "فقط صفحات حذف‌شده در نظر گرفته شوند",
 	"delpagesfilter-live": "صفحات حذف‌شده در نظر گرفته نشوند",
 	"diff": "تفاوت",

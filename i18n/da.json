@@ -81,7 +81,7 @@
 	"deleted-bytes": "Slettet (byte)",
 	"deleted-edits": "Slettede redigeringer",
 	"deleted-pages": "Slettede sider",
-	"delpagesfilter-both": "Inkluder live og slettede sider",
+	"delpagesfilter-all": "Inkluder live og slettede sider",
 	"delpagesfilter-deleted": "Inkluder kun slettede sider",
 	"delpagesfilter-live": "Ekskluder slettede sider",
 	"diff": "Forskel",

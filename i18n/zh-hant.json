@@ -83,7 +83,7 @@
 	"deleted-bytes": "刪除（位元組）",
 	"deleted-edits": "已刪除編輯數",
 	"deleted-pages": "已刪除頁面",
-	"delpagesfilter-both": "包含可見與已刪除頁面",
+	"delpagesfilter-all": "包含可見與已刪除頁面",
 	"delpagesfilter-deleted": "僅包含已刪除頁面",
 	"delpagesfilter-live": "不包含已刪除頁面",
 	"diff": "差異",

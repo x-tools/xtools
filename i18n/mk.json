@@ -81,7 +81,7 @@
 	"deleted-bytes": "Избришано (бајти)",
 	"deleted-edits": "Избришани уредувања",
 	"deleted-pages": "Избришани страници",
-	"delpagesfilter-both": "Вклучи тековни и избришани страници",
+	"delpagesfilter-all": "Вклучи тековни и избришани страници",
 	"delpagesfilter-deleted": "Само избришани страници",
 	"delpagesfilter-live": "Изземи избришани страници",
 	"diff": "Разл",

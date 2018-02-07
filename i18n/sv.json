@@ -82,7 +82,7 @@
 	"deleted-bytes": "Raderad (byte)",
 	"deleted-edits": "Raderade redigeringar",
 	"deleted-pages": "Raderade sidor",
-	"delpagesfilter-both": "Inkludera befintliga och raderade sidor",
+	"delpagesfilter-all": "Inkludera befintliga och raderade sidor",
 	"delpagesfilter-deleted": "Inkludera endast raderade sidor",
 	"delpagesfilter-live": "Exkludera raderade sidor",
 	"diff": "Skillnad",

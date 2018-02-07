@@ -82,7 +82,7 @@
 	"deleted-bytes": "Ezabatuta (bytes)",
 	"deleted-edits": "Ezabatutako aldaketak",
 	"deleted-pages": "Ezabatutako orriak",
-	"delpagesfilter-both": "Sartu zuzeneko eta ezabatutako orriak",
+	"delpagesfilter-all": "Sartu zuzeneko eta ezabatutako orriak",
 	"delpagesfilter-deleted": "Ezabatutako orrialdeak soilik sartu",
 	"delpagesfilter-live": "Kendu ezabatutako orriak",
 	"diff": "Ezb",

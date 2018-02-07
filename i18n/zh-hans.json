@@ -82,7 +82,7 @@
 	"deleted-bytes": "已删除（字节）",
 	"deleted-edits": "已删除的编辑",
 	"deleted-pages": "已删除页面",
-	"delpagesfilter-both": "包括存在与已删除的页面",
+	"delpagesfilter-all": "包括存在与已删除的页面",
 	"delpagesfilter-deleted": "只包括已删除页面",
 	"delpagesfilter-live": "排除已删除页面",
 	"diff": "差异",

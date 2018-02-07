@@ -76,7 +76,7 @@
 	"deleted-bytes": "Pašalinta (baitų)",
 	"deleted-edits": "Atšaukti pakeitimai",
 	"deleted-pages": "Ištrinti puslapiai",
-	"delpagesfilter-both": "Įtraukti esamus ir ištrintus puslapius",
+	"delpagesfilter-all": "Įtraukti esamus ir ištrintus puslapius",
 	"delpagesfilter-deleted": "Įtraukti tik ištrintus puslapius",
 	"delpagesfilter-live": "Neįtraukti ištrintų puslapių",
 	"diff": "Skirt",

@@ -113,7 +113,7 @@
 <div class="input-group">
     <span class="input-group-addon form-label">{{ msg('deleted-pages') }}</span>
     <select class="form-control" name="deleted">
-        {% for type in ['both', 'live', 'deleted'] %}
+        {% for type in ['all', 'live', 'deleted'] %}
             <option value="{{ type }}"{% if value == type %} selected="selected"{% endif %}>
                 {{ msg('delpagesfilter-' ~ type) }}
             </option>

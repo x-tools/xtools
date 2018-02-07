@@ -78,7 +78,7 @@
 	"deleted-bytes": "Silindi (baytlarla)",
 	"deleted-edits": "Silinmiş redaktələr",
 	"deleted-pages": "Silinmiş səhifələr",
-	"delpagesfilter-both": "Canlı və silinmiş səhifələri daxil edin",
+	"delpagesfilter-all": "Canlı və silinmiş səhifələri daxil edin",
 	"delpagesfilter-deleted": "Yalnız silinmiş səhifələri daxil edin",
 	"delpagesfilter-live": "Silinmiş səhifələri istisna et",
 	"diff": "Fərq",

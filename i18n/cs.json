@@ -61,7 +61,7 @@
 	"deleted": "Odstraněno",
 	"deleted-edits": "Smazaných editací",
 	"deleted-pages": "Smazané stránky",
-	"delpagesfilter-both": "Obsahuje smazané i nesmazané stránky",
+	"delpagesfilter-all": "Obsahuje smazané i nesmazané stránky",
 	"delpagesfilter-deleted": "Obsahuje pouze smazané stránky",
 	"delpagesfilter-live": "Neobsahuje smazané stránky",
 	"diff": "Rozdíl",

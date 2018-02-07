@@ -86,7 +86,7 @@
 	"deleted-bytes": "Supprimé (octets)",
 	"deleted-edits": "Modifications supprimées",
 	"deleted-pages": "Pages supprimées",
-	"delpagesfilter-both": "Inclure les pages actives et les pages supprimées",
+	"delpagesfilter-all": "Inclure les pages actives et les pages supprimées",
 	"delpagesfilter-deleted": "N'inclure seulement que les pages supprimées",
 	"delpagesfilter-live": "Exclure les pages supprimées",
 	"diff": "Différence",

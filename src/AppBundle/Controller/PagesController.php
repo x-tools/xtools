@@ -64,7 +64,7 @@ class PagesController extends XtoolsController
             // Defaults that will get overriden if in $params.
             'namespace' => 0,
             'redirects' => 'noredirects',
-            'deleted' => 'both'
+            'deleted' => 'all'
         ], $params));
     }
 
@@ -74,15 +74,15 @@ class PagesController extends XtoolsController
      *     "/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{offset}", name="PagesResult",
      *     requirements={
      *         "namespace" = "|all|\d+",
-     *         "redirects" = "|noredirects|onlyredirects",
-     *         "deleted" = "|live|deleted|both",
+     *         "redirects" = "|all|noredirects|onlyredirects",
+     *         "deleted" = "|all|live|deleted",
      *         "offset" = "|\d+"
      *     }
      * )
      * @param Request $request
      * @param string|int $namespace The ID of the namespace, or 'all' for all namespaces.
-     * @param string $redirects Whether to follow redirects or not.
-     * @param string $deleted Whether to include deleted pages or not.
+     * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
+     * @param string $deleted One of 'live', 'deleted' or 'all' for both.
      * @param int $offset Which page of results to show, when the results are so large they are paginated.
      * @return RedirectResponse|Response
      * @codeCoverageIgnore
@@ -91,7 +91,7 @@ class PagesController extends XtoolsController
         Request $request,
         $namespace = '0',
         $redirects = 'noredirects',
-        $deleted = 'both',
+        $deleted = 'all',
         $offset = 0
     ) {
         $ret = $this->validateProjectAndUser($request, 'pages');
@@ -99,18 +99,6 @@ class PagesController extends XtoolsController
             return $ret;
         } else {
             list($project, $user) = $ret;
-        }
-
-        // Set defaults for 'deleted' and redirect if it is invalid.
-        if (!in_array($deleted, ['both', 'live', 'deleted'])) {
-            return $this->redirectToRoute('PagesResult', [
-                'project' => $project->getDomain(),
-                'username' => $user->getUsername(),
-                'namespace' => $namespace,
-                'redirects' => $redirects,
-                'deleted' => 'both',
-                'offset' => $offset,
-            ]);
         }
 
         $pages = new Pages(
@@ -145,8 +133,8 @@ class PagesController extends XtoolsController
     {
         $summaryColumns = ['namespace'];
         if ($pages->getDeleted() === 'deleted') {
-            // Showing only deleted pages shows only the pages column, as redirects are non-applicable.
-            $summaryColumns[] = 'pages';
+            // Showing only deleted pages shows only the deleted column, as redirects are non-applicable.
+            $summaryColumns[] = 'deleted';
         } elseif ($pages->getRedirects() == 'onlyredirects') {
             // Don't show redundant pages column if only getting data on redirects or deleted pages.
             $summaryColumns[] = 'redirects';
@@ -160,7 +148,7 @@ class PagesController extends XtoolsController
         }
 
         // Show deleted column only when both deleted and live pages are visible.
-        if ($pages->getDeleted() === 'both') {
+        if ($pages->getDeleted() === 'all') {
             $summaryColumns[] = 'deleted';
         }
 
@@ -177,11 +165,11 @@ class PagesController extends XtoolsController
      * @param Request $request
      * @param int|string $namespace The ID of the namespace of the page, or 'all' for all namespaces.
      * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
-     * @param string $deleted One of 'live', 'deleted' or 'both'.
+     * @param string $deleted One of 'live', 'deleted' or 'all' for both.
      * @return Response
      * @codeCoverageIgnore
      */
-    public function countPagesApiAction(Request $request, $namespace = 0, $redirects = 'noredirects', $deleted = 'both')
+    public function countPagesApiAction(Request $request, $namespace = 0, $redirects = 'noredirects', $deleted = 'all')
     {
         $this->recordApiUsage('user/pages_count');
 
@@ -231,7 +219,7 @@ class PagesController extends XtoolsController
      * @param Request $request
      * @param int|string $namespace The ID of the namespace of the page, or 'all' for all namespaces.
      * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
-     * @param string $deleted One of 'live', 'deleted' or 'both'.
+     * @param string $deleted One of 'live', 'deleted' or blank for both.
      * @param int $offset Which page of results to show.
      * @return Response
      * @codeCoverageIgnore
@@ -240,7 +228,7 @@ class PagesController extends XtoolsController
         Request $request,
         $namespace = 0,
         $redirects = 'noredirects',
-        $deleted = 'both',
+        $deleted = 'all',
         $offset = 0
     ) {
         $this->recordApiUsage('user/pages');
