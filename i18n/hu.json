@@ -69,7 +69,7 @@
 	"deleted": "törölt",
 	"deleted-edits": "törölt szerkesztések",
 	"deleted-pages": "törölt oldalak",
-	"delpagesfilter-both": "beleértve az élő és törölt oldalakat is",
+	"delpagesfilter-all": "beleértve az élő és törölt oldalakat is",
 	"delpagesfilter-deleted": "Csak a törölt oldalakat tartalmazza",
 	"delpagesfilter-live": "A törölt oldalak nélkül",
 	"diff": "Diff",

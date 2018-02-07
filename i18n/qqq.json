@@ -83,7 +83,7 @@
 	"deleted-bytes": "Label for the number of bytes that were removed from an article.",
 	"deleted-edits": "Deleted edits of a user",
 	"deleted-pages": "Filter for page's deletion state",
-	"delpagesfilter-both": "Filter to show both deleted and live pages",
+	"delpagesfilter-all": "Filter to show both deleted and live pages",
 	"delpagesfilter-deleted": "Filter to show deleted pages",
 	"delpagesfilter-live": "Filter to show live pages",
 	"diff": "Link to a MediaWiki diff on a wiki\n{{Identical|Diff}}",

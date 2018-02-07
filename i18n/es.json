@@ -81,7 +81,7 @@
 	"deleted-bytes": "Eliminado (bytes)",
 	"deleted-edits": "Ediciones borradas",
 	"deleted-pages": "Páginas borradas",
-	"delpagesfilter-both": "Incluir páginas publicadas y borradas",
+	"delpagesfilter-all": "Incluir páginas publicadas y borradas",
 	"delpagesfilter-deleted": "Incluir solo páginas borradas",
 	"delpagesfilter-live": "Excluir páginas borradas",
 	"diff": "Diferencias",

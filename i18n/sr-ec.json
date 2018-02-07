@@ -85,7 +85,7 @@
 	"deleted-bytes": "Обрисано (бајтова)",
 	"deleted-edits": "Обрисане измене",
 	"deleted-pages": "Обрисане странице",
-	"delpagesfilter-both": "Постојеће и обрисане странице",
+	"delpagesfilter-all": "Постојеће и обрисане странице",
 	"delpagesfilter-deleted": "Обрисане странице",
 	"delpagesfilter-live": "Немој обухватити обрисане странице",
 	"diff": "Разл",

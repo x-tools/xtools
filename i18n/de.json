@@ -82,7 +82,7 @@
 	"deleted-bytes": "Gelöscht (Bytes)",
 	"deleted-edits": "Gelöschte Bearbeitungen",
 	"deleted-pages": "Gelöschte Seiten",
-	"delpagesfilter-both": "Vorhandene und gelöschte Seiten anzeigen",
+	"delpagesfilter-all": "Vorhandene und gelöschte Seiten anzeigen",
 	"delpagesfilter-deleted": "Nur gelöschte Seiten anzeigen",
 	"delpagesfilter-live": "Gelöschte Seiten ausschließen",
 	"diff": "Unterschied",

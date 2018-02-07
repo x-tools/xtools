@@ -70,7 +70,7 @@
 	"deleted-bytes": "삭제됨 (바이트)",
 	"deleted-edits": "삭제된 편집",
 	"deleted-pages": "삭제된 페이지",
-	"delpagesfilter-both": "존재하는 문서와 삭제된 문서 포함",
+	"delpagesfilter-all": "존재하는 문서와 삭제된 문서 포함",
 	"delpagesfilter-deleted": "삭제된 페이지만 포함",
 	"delpagesfilter-live": "삭제된 페이지를 제외",
 	"diff": "차이",

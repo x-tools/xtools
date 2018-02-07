@@ -191,7 +191,7 @@ class UserRepository extends Repository
      * @param User $user
      * @param string|int $namespace Namespace ID or 'all'.
      * @param string $redirects One of 'noredirects', 'onlyredirects' or blank for both.
-     * @param string $deleted One of 'both', 'live' and 'deleted'.
+     * @param string $deleted One of 'live', 'deleted' or blank for both.
      * @return string[] Result of query, see below. Includes live and deleted pages.
      */
     public function countPagesCreated(
@@ -243,7 +243,7 @@ class UserRepository extends Repository
      * @param User $user
      * @param string|int $namespace Namespace ID or 'all'.
      * @param string $redirects One of 'noredirects', 'onlyredirects' or blank for both.
-     * @param string $deleted One of 'both', 'live' or 'deleted'.
+     * @param string $deleted One of 'live', 'deleted' or blank for both.
      * @param int|null $limit Number of results to return, or blank to return all.
      * @param int $offset Number of pages past the initial dataset. Used for pagination.
      * @return string[] Result of query, see below. Includes live and deleted pages.
@@ -364,7 +364,7 @@ class UserRepository extends Repository
      * @param  string[] $conditions Conditions for the SQL, must include 'paSelects',
      *     'paSelectsArchive', 'paJoin', 'whereRev', 'whereArc', 'namespaceRev', 'namespaceArc',
      *     'redirects' and 'revPageGroupBy'.
-     * @param  string $deleted One of 'live', 'deleted' or 'both'.
+     * @param  string $deleted One of 'live', 'deleted' or blank for both.
      * @return string Raw SQL.
      */
     private function getPagesCreatedInnerSql(Project $project, $conditions, $deleted)

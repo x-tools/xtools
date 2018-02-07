@@ -26,10 +26,10 @@ class Pages extends Model
     /** @var string Which namespace we are querying for. */
     protected $namespace;
 
-    /** @var string One of 'noredirects', 'onlyredirects' or blank for both. */
+    /** @var string One of 'noredirects', 'onlyredirects' or 'all' for both. */
     protected $redirects;
 
-    /** @var string One of 'both', 'live' or 'deleted' */
+    /** @var string One of 'live', 'deleted' or 'all' for both. */
     protected $deleted;
 
     /** @var int Pagination offset. */
@@ -49,8 +49,8 @@ class Pages extends Model
      * @param Project $project
      * @param User $user
      * @param string|int $namespace Namespace ID or 'all'.
-     * @param string $redirects One of 'noredirects', 'onlyredirects' or blank for both.
-     * @param string $deleted One of 'live', 'deleted' or blank for both.
+     * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
+     * @param string $deleted One of 'live', 'deleted' or 'all' for both.
      * @param int $offset Pagination offset.
      */
     public function __construct(
@@ -58,14 +58,14 @@ class Pages extends Model
         User $user,
         $namespace = 0,
         $redirects = 'noredirects',
-        $deleted = 'both',
+        $deleted = 'all',
         $offset = 0
     ) {
         $this->project = $project;
         $this->user = $user;
         $this->namespace = $namespace === 'all' ? 'all' : (string)$namespace;
         $this->redirects = $redirects ?: 'noredirects';
-        $this->deleted = $deleted;
+        $this->deleted = $deleted ?: 'all';
         $this->offset = $offset;
     }
 
