@@ -7,19 +7,18 @@ namespace AppBundle\Controller;
 
 use Doctrine\DBAL\Connection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Xtools\EditSummary;
+use Xtools\EditSummaryRepository;
 
 /**
  * This controller handles the Simple Edit Counter tool.
  */
 class EditSummaryController extends XtoolsController
 {
-
     /**
      * Get the tool's shortname.
      * @return string
@@ -87,7 +86,11 @@ class EditSummaryController extends XtoolsController
         }
 
         // Instantiate an EditSummary, treating the past 150 edits as 'recent'.
-        $editSummary = new EditSummary($project, $user, $namespace, 150, $this->container);
+        $editSummary = new EditSummary($project, $user, $namespace, 150);
+        $editSummaryRepo = new EditSummaryRepository();
+        $editSummaryRepo->setContainer($this->container);
+        $editSummary->setRepository($editSummaryRepo);
+
         $editSummary->prepareData();
 
         // Assign the values and display the template

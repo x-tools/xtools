@@ -288,9 +288,6 @@ class ArticleInfoController extends XtoolsController
      */
     public function articleInfoApiAction(Request $request, $project, $article)
     {
-        /** @var integer Number of days to query for pageviews */
-        $pageviewsOffset = 30;
-
         $projectData = ProjectRepository::getProject($project, $this->container);
         if (!$projectData->exists()) {
             return new JsonResponse(
@@ -307,8 +304,37 @@ class ArticleInfoController extends XtoolsController
             );
         }
 
-        $data = [
+        $data = $this->getArticleInfoApiData($projectData, $page);
+
+        if ($request->query->get('format') === 'html') {
+            return $this->getApiHtmlResponse($projectData, $page, $data);
+        }
+
+        $body = array_merge([
             'project' => $projectData->getDomain(),
+            'page' => $page->getTitle(),
+        ], $data);
+
+        return new JsonResponse(
+            $body,
+            Response::HTTP_OK
+        );
+    }
+
+    /**
+     * Generate the data structure that will used in the ArticleInfo API response.
+     * @param  Project $project
+     * @param  Page    $page
+     * @return array
+     * @codeCoverageIgnore
+     */
+    private function getArticleInfoApiData(Project $project, Page $page)
+    {
+        /** @var integer Number of days to query for pageviews */
+        $pageviewsOffset = 30;
+
+        $data = [
+            'project' => $project->getDomain(),
             'page' => $page->getTitle(),
             'watchers' => (int) $page->getWatchers(),
             'pageviews' => $page->getLastPageviews($pageviewsOffset),
@@ -323,6 +349,9 @@ class ArticleInfoController extends XtoolsController
              * so we'll abort and give only info retrived by the API.
              */
             $data['error'] = 'Unable to fetch revision data. The query may have timed out.';
+        } catch (\Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException $e) {
+            // No more open database connections.
+            $data['error'] = 'Unable to fetch revision data. Please try again later.';
         }
 
         if (isset($info)) {
@@ -343,19 +372,7 @@ class ArticleInfoController extends XtoolsController
             ]);
         }
 
-        if ($request->query->get('format') === 'html') {
-            return $this->getApiHtmlResponse($projectData, $page, $data);
-        }
-
-        $body = array_merge([
-            'project' => $projectData->getDomain(),
-            'page' => $page->getTitle(),
-        ], $data);
-
-        return new JsonResponse(
-            $body,
-            Response::HTTP_OK
-        );
+        return $data;
     }
 
     /**
@@ -364,6 +381,7 @@ class ArticleInfoController extends XtoolsController
      * @param  Page     $page
      * @param  string[] $data The pre-fetched data.
      * @return Response
+     * @codeCoverageIgnore
      */
     private function getApiHtmlResponse(Project $project, Page $page, $data)
     {

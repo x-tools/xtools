@@ -5,8 +5,6 @@
 
 namespace Xtools;
 
-use DateInterval;
-use DateTime;
 use Mediawiki\Api\SimpleRequest;
 use Xtools\AutoEditsRepository;
 
@@ -17,7 +15,6 @@ use Xtools\AutoEditsRepository;
  */
 class EditCounterRepository extends Repository
 {
-
     /**
      * Get data about revisions, pages, etc.
      * @param Project $project The project.
@@ -36,8 +33,7 @@ class EditCounterRepository extends Repository
         // Prepare the queries and execute them.
         $archiveTable = $this->getTableName($project->getDatabaseName(), 'archive');
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $queries = "
-
+        $sql = "
             -- Revision counts.
             (SELECT 'deleted' AS `key`, COUNT(ar_id) AS val FROM $archiveTable
                 WHERE ar_user = :userId
@@ -90,22 +86,15 @@ class EditCounterRepository extends Repository
                 WHERE ar_user = :userId AND ar_parent_id = 0
             )
         ";
-        $resultQuery = $this->getProjectsConnection()->prepare($queries);
-        $userId = $user->getId($project);
-        $resultQuery->bindParam("userId", $userId);
-        $resultQuery->execute();
+
+        $resultQuery = $this->executeProjectsQuery($sql, ['userId' => $user->getId($project)]);
         $revisionCounts = [];
         while ($result = $resultQuery->fetch()) {
             $revisionCounts[$result['key']] = $result['val'];
         }
 
-        // Cache for 10 minutes, and return.
-        $cacheItem = $this->cache->getItem($cacheKey)
-                ->set($revisionCounts)
-                ->expiresAfter(new DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
-
-        return $revisionCounts;
+        // Cache and return.
+        return $this->setCache($cacheKey, $revisionCounts);
     }
 
     /**
@@ -131,11 +120,11 @@ class EditCounterRepository extends Repository
             WHERE log_user = :userId
             GROUP BY log_type, log_action
         )";
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $userId = $user->getId($project);
-        $resultQuery->bindParam('userId', $userId);
-        $resultQuery->execute();
-        $results = $resultQuery->fetchAll();
+
+        $results = $this->executeProjectsQuery($sql, [
+            'userId' => $user->getId($project)
+        ])->fetchAll();
+
         $logCounts = array_combine(
             array_map(function ($e) {
                 return $e['source'];
@@ -183,21 +172,14 @@ class EditCounterRepository extends Repository
             if ($userId) {
                 $sql = "SELECT COUNT(log_id) FROM commonswiki_p.logging_userindex
                     WHERE log_type = 'upload' AND log_action = 'upload' AND log_user = :userId";
-                $resultQuery = $this->getProjectsConnection()->prepare($sql);
-                $resultQuery->bindParam('userId', $userId);
-                $resultQuery->execute();
+                $resultQuery = $this->executeProjectsQuery($sql, ['userId' => $userId]);
                 $logCounts['files_uploaded_commons'] = $resultQuery->fetchColumn();
             }
         }
 
-        // Cache for 10 minutes, and return.
-        $cacheItem = $this->cache->getItem($cacheKey)
-            ->set($logCounts)
-            ->expiresAfter(new DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
+        // Cache and return.
         $this->stopwatch->stop($cacheKey);
-
-        return $logCounts;
+        return $this->setCache($cacheKey, $logCounts);
     }
 
     /**
@@ -216,11 +198,11 @@ class EditCounterRepository extends Repository
                 AND log_title = :username
                 AND log_namespace = 2
                 ORDER BY log_timestamp ASC";
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $username = str_replace(' ', '_', $user->getUsername());
-        $resultQuery->bindParam('username', $username);
-        $resultQuery->execute();
-        return $resultQuery->fetchAll();
+
+        return $this->executeProjectsQuery($sql, [
+            'username' => $username
+        ])->fetchAll();
     }
 
     /**
@@ -244,11 +226,11 @@ class EditCounterRepository extends Repository
                 AND log_namespace = 2
                 AND log_title = :username
                 ORDER BY log_timestamp DESC";
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
         $username = str_replace(' ', '_', $user->getUsername());
-        $resultQuery->bindParam('username', $username);
-        $resultQuery->execute();
-        return $resultQuery->fetchAll();
+
+        return $this->executeProjectsQuery($sql, [
+            'username' => $username
+        ])->fetchAll();
     }
 
     /**
@@ -322,14 +304,9 @@ class EditCounterRepository extends Repository
             ];
         }
 
-        // Cache for 10 minutes, and return.
-        $cacheItem = $this->cache->getItem($cacheKey)
-            ->set($out)
-            ->expiresAfter(new DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
+        // Cache and return.
         $this->stopwatch->stop($cacheKey);
-
-        return $out;
+        return $this->setCache($cacheKey, $out);
     }
 
     /**
@@ -345,14 +322,14 @@ class EditCounterRepository extends Repository
         $stopwatchName = 'globalRevisionCounts.'.$user->getUsername();
         $allProjects = $project->getRepository()->getAll();
         $topEditCounts = [];
-        $username = $user->getUsername();
         foreach ($allProjects as $projectMeta) {
             $revisionTableName = $this->getTableName($projectMeta['dbName'], 'revision');
-            $sql = "SELECT COUNT(rev_id) FROM $revisionTableName WHERE rev_user_text=:username";
-            $stmt = $this->getProjectsConnection()->prepare($sql);
-            $stmt->bindParam('username', $username);
-            $stmt->execute();
-            $total = (int)$stmt->fetchColumn();
+            $sql = "SELECT COUNT(rev_id) FROM $revisionTableName WHERE rev_user_text = :username";
+
+            $resultQuery = $this->executeProjectsQuery($sql, [
+                'username' => $user->getUsername()
+            ]);
+            $total = (int)$resultQuery->fetchColumn();
             $topEditCounts[] = [
                 'dbName' => $projectMeta['dbName'],
                 'total' => $total,
@@ -377,8 +354,6 @@ class EditCounterRepository extends Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $userId = $user->getId($project);
-
         // Query.
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
         $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
@@ -386,10 +361,11 @@ class EditCounterRepository extends Repository
             FROM $pageTable p JOIN $revisionTable r ON (r.rev_page = p.page_id)
             WHERE r.rev_user = :id
             GROUP BY page_namespace";
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $resultQuery->bindParam(":id", $userId);
-        $resultQuery->execute();
-        $results = $resultQuery->fetchAll();
+
+        $results = $this->executeProjectsQuery($sql, [
+            'id' => $user->getId($project),
+        ])->fetchAll();
+
         $namespaceTotals = array_combine(array_map(function ($e) {
             return $e['page_namespace'];
         }, $results), array_map(function ($e) {
@@ -397,12 +373,8 @@ class EditCounterRepository extends Repository
         }, $results));
 
         // Cache and return.
-        $cacheItem = $this->cache->getItem($cacheKey);
-        $cacheItem->set($namespaceTotals);
-        $cacheItem->expiresAfter(new DateInterval('PT15M'));
-        $this->cache->save($cacheItem);
         $this->stopwatch->stop($cacheKey);
-        return $namespaceTotals;
+        return $this->setCache($cacheKey, $namespaceTotals);
     }
 
     /**
@@ -422,7 +394,6 @@ class EditCounterRepository extends Repository
         }
 
         // Assemble queries.
-        $username = $user->getUsername();
         $queries = [];
         foreach ($projects as $project) {
             $revisionTable = $project->getTableName('revision');
@@ -452,19 +423,14 @@ class EditCounterRepository extends Repository
             $queries[] = $sql;
         }
         $sql = "(\n" . join("\n) UNION (\n", $queries) . ")\n";
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $resultQuery->bindParam(":username", $username);
-        $resultQuery->execute();
-        $revisions = $resultQuery->fetchAll();
 
-        // Cache this.
-        $cacheItem = $this->cache->getItem($cacheKey);
-        $cacheItem->set($revisions);
-        $cacheItem->expiresAfter(new DateInterval('PT15M'));
-        $this->cache->save($cacheItem);
+        $revisions = $this->executeProjectsQuery($sql, [
+            'username' => $user->getUsername(),
+        ])->fetchAll();
 
+        // Cache and return.
         $this->stopwatch->stop($cacheKey);
-        return $revisions;
+        return $this->setCache($cacheKey, $revisions);
     }
 
     /**
@@ -489,7 +455,6 @@ class EditCounterRepository extends Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $username = $user->getUsername();
         $revisionTable = $project->getTableName('revision');
         $pageTable = $project->getTableName('page');
         $sql =
@@ -501,18 +466,14 @@ class EditCounterRepository extends Repository
             .  " FROM $revisionTable JOIN $pageTable ON (rev_page = page_id)"
             . " WHERE rev_user_text = :username"
             . " GROUP BY YEAR(rev_timestamp), MONTH(rev_timestamp), page_namespace";
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $resultQuery->bindParam(":username", $username);
-        $resultQuery->execute();
-        $totals = $resultQuery->fetchAll();
 
-        $cacheItem = $this->cache->getItem($cacheKey);
-        $cacheItem->expiresAfter(new DateInterval('PT10M'));
-        $cacheItem->set($totals);
-        $this->cache->save($cacheItem);
+        $totals = $this->executeProjectsQuery($sql, [
+            'username' => $user->getUsername(),
+        ])->fetchAll();
 
+        // Cache and return.
         $this->stopwatch->stop($cacheKey);
-        return $totals;
+        return $this->setCache($cacheKey, $totals);
     }
 
     /**
@@ -529,7 +490,6 @@ class EditCounterRepository extends Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $username = $user->getUsername();
         $hourInterval = 2;
         $xCalc = "ROUND(HOUR(rev_timestamp)/$hourInterval) * $hourInterval";
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
@@ -540,18 +500,14 @@ class EditCounterRepository extends Repository
             . " FROM $revisionTable"
             . " WHERE rev_user_text = :username"
             . " GROUP BY DAYOFWEEK(rev_timestamp), $xCalc ";
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $resultQuery->bindParam(":username", $username);
-        $resultQuery->execute();
-        $totals = $resultQuery->fetchAll();
 
-        $cacheItem = $this->cache->getItem($cacheKey);
-        $cacheItem->expiresAfter(new DateInterval('PT10M'));
-        $cacheItem->set($totals);
-        $this->cache->save($cacheItem);
+        $totals = $this->executeProjectsQuery($sql, [
+            'username' => $user->getUsername(),
+        ])->fetchAll();
 
+        // Cache and return.
         $this->stopwatch->stop($cacheKey);
-        return $totals;
+        return $this->setCache($cacheKey, $totals);
     }
 
     /**
@@ -573,7 +529,6 @@ class EditCounterRepository extends Repository
 
         // Prepare the queries and execute them.
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $userId = $user->getId($project);
         $sql = "SELECT AVG(sizes.size) AS average_size,
                 COUNT(CASE WHEN sizes.size < 20 THEN 1 END) AS small_edits,
                 COUNT(CASE WHEN sizes.size > 1000 THEN 1 END) AS large_edits
@@ -585,19 +540,14 @@ class EditCounterRepository extends Repository
                     ORDER BY revs.rev_timestamp DESC
                     LIMIT 5000
                 ) sizes";
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $resultQuery->bindParam('userId', $userId);
-        $resultQuery->execute();
-        $results = $resultQuery->fetchAll()[0];
 
-        // Cache for 10 minutes.
-        $cacheItem = $this->cache->getItem($cacheKey);
-        $cacheItem->set($results);
-        $cacheItem->expiresAfter(new DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
+        $results = $this->executeProjectsQuery($sql, [
+            'userId' => $user->getId($project),
+        ])->fetch();
 
+        // Cache and return.
         $this->stopwatch->stop($cacheKey);
-        return $results;
+        return $this->setCache($cacheKey, $results);
     }
 
     /**

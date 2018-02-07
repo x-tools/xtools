@@ -64,17 +64,13 @@ class TopEditsRepository extends Repository
                 GROUP BY page_namespace, page_title
                 ORDER BY count DESC
                 LIMIT $limit";
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $username = $user->getUsername();
-        $resultQuery->bindParam('username', $username);
-        $resultQuery->bindParam('namespace', $namespace);
-        $resultQuery->execute();
-        $results = $resultQuery->fetchAll();
+        $result = $this->executeProjectsQuery($sql, [
+            'username' => $user->getUsername(),
+            'namespace' => $namespace,
+        ])->fetchAll();
 
-        // Cache for 10 minutes, and return.
-        $this->setCache($cacheKey, $results);
-
-        return $results;
+        // Cache and return.
+        return $this->setCache($cacheKey, $result);
     }
 
     /**
@@ -125,16 +121,12 @@ class TopEditsRepository extends Repository
                 ) AS c
                 JOIN $pageTable e ON e.page_id = c.rev_page
                 WHERE c.row_number < $limit";
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $username = $user->getUsername();
-        $resultQuery->bindParam('username', $username);
-        $resultQuery->execute();
-        $results = $resultQuery->fetchAll();
+        $result = $this->executeProjectsQuery($sql, [
+            'username' => $user->getUsername(),
+        ])->fetchAll();
 
-        // Cache for 10 minutes, and return.
-        $this->setCache($cacheKey, $results);
-
-        return $results;
+        // Cache and return.
+        return $this->setCache($cacheKey, $result);
     }
 
     /**
@@ -160,10 +152,8 @@ class TopEditsRepository extends Repository
             $results = array_merge($lastRev, $results);
         }
 
-        // Cache for 10 minutes, and return.
-        $this->setCache($cacheKey, $results);
-
-        return $results;
+        // Cache and return.
+        return $this->setCache($cacheKey, $results);
     }
 
     /**
@@ -212,13 +202,10 @@ class TopEditsRepository extends Repository
                 ORDER BY revs.rev_timestamp DESC
                 $childLimit";
 
-        $conn = $this->getProjectsConnection();
-        $resultQuery = $conn->executeQuery($sql, [
+        return $this->executeProjectsQuery($sql, [
             'pageid' => $page->getId(),
             'username' => $user->getUsername(),
-        ]);
-
-        return $resultQuery->fetchAll();
+        ])->fetchAll();
     }
 
     /**

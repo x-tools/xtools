@@ -67,11 +67,9 @@ class AutoEditsRepository extends UserRepository
         $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end);
         $result = (int) $resultQuery->fetchColumn();
 
-        // Cache for 10 minutes, and return.
-        $this->setCache($cacheKey, $result);
+        // Cache and return.
         $this->stopwatch->stop($cacheKey);
-
-        return $result;
+        return $this->setCache($cacheKey, $result);
     }
 
     /**
@@ -138,11 +136,9 @@ class AutoEditsRepository extends UserRepository
         $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end);
         $result = $resultQuery->fetchAll();
 
-        // Cache for 10 minutes, and return.
-        $this->setCache($cacheKey, $result);
+        // Cache and return.
         $this->stopwatch->stop($cacheKey);
-
-        return $result;
+        return $this->setCache($cacheKey, $result);
     }
 
     /**
@@ -198,11 +194,9 @@ class AutoEditsRepository extends UserRepository
             return $b['count'] - $a['count'];
         });
 
-        // Cache for 10 minutes, and return.
-        $this->setCache($cacheKey, $results);
+        // Cache and return.
         $this->stopwatch->stop($cacheKey);
-
-        return $results;
+        return $this->setCache($cacheKey, $results);
     }
 
     /**

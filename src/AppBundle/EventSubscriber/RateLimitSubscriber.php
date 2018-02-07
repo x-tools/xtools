@@ -148,9 +148,6 @@ class RateLimitSubscriber implements EventSubscriberInterface
             "\t<User agent>: " . $request->headers->get('User-Agent')
         );
 
-        throw new TooManyRequestsHttpException(600, "Possible spider crawl detected. " .
-            'If you are human, you are making too many requests during a short period of time. ' .
-            "Please wait $this->rateDuration minutes before reloading this tool. You can then " .
-            'login to prevent this from happening again.');
+        throw new TooManyRequestsHttpException(600, 'error-rate-limit', null, $this->rateDuration);
     }
 }

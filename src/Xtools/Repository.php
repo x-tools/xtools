@@ -6,12 +6,15 @@
 namespace Xtools;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception\DriverException;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mediawiki\Api\MediawikiApi;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use GuzzleHttp\Promise\Promise;
 use DateInterval;
 
@@ -279,6 +282,7 @@ abstract class Repository
      * @param string $cacheKey
      * @param mixed  $value
      * @param string $duration Valid DateInterval string.
+     * @return mixed The given $value.
      */
     public function setCache($cacheKey, $value, $duration = 'PT10M')
     {
@@ -287,6 +291,7 @@ abstract class Repository
             ->set($value)
             ->expiresAfter(new DateInterval($duration));
         $this->cache->save($cacheItem);
+        return $value;
     }
 
     /**
@@ -312,5 +317,52 @@ abstract class Repository
         }
 
         return $datesConditions;
+    }
+
+    /**
+     * Execute a query using the projects connection, handling certain Exceptions.
+     * @param  string $sql
+     * @param  array  $params Parameters to bound to the prepared query.
+     * @return \Doctrine\DBAL\Driver\Statement
+     * @codeCoverageIgnore
+     */
+    public function executeProjectsQuery($sql, $params = [])
+    {
+        try {
+            return $this->getProjectsConnection()->executeQuery($sql, $params);
+        } catch (DriverException $e) {
+            return $this->handleDriverError($e);
+        }
+    }
+
+    /**
+     * Execute a query using the projects connection, handling certain Exceptions.
+     * @param  QueryBuilder $qb
+     * @return \Doctrine\DBAL\Driver\Statement
+     * @codeCoverageIgnore
+     */
+    public function executeQueryBuilder(QueryBuilder $qb)
+    {
+        try {
+            return $qb->execute();
+        } catch (DriverException $e) {
+            return $this->handleDriverError($e);
+        }
+    }
+
+    /**
+     * Special handling of some DriverExceptions, otherwise original Exception is thrown.
+     * @param DriverException $e
+     * @throws ServiceUnavailableHttpException
+     * @throws DriverException
+     * @codeCoverageIgnore
+     */
+    private function handleDriverError(DriverException $e)
+    {
+        if ($e->getErrorCode() === 1226) {
+            throw new ServiceUnavailableHttpException(30, 'error-service-overload', null, 503);
+        } else {
+            throw $e;
+        }
     }
 }

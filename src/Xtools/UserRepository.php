@@ -5,7 +5,6 @@
 
 namespace Xtools;
 
-use Exception;
 use Mediawiki\Api\SimpleRequest;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -46,14 +45,11 @@ class UserRepository extends Repository
 
         $userTable = $this->getTableName($databaseName, 'user');
         $sql = "SELECT user_id FROM $userTable WHERE user_name = :username LIMIT 1";
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $resultQuery->bindParam('username', $username);
-        $resultQuery->execute();
+        $resultQuery = $this->executeProjectsQuery($sql, ['username' => $username]);
         $userId = (int)$resultQuery->fetchColumn();
 
-        // Cache for 10 minutes and return.
-        $this->setCache($cacheKey, $userId);
-        return $userId;
+        // Cache and return.
+        return $this->setCache($cacheKey, $userId);
     }
 
     /**
@@ -71,14 +67,11 @@ class UserRepository extends Repository
 
         $userTable = $this->getTableName($databaseName, 'user');
         $sql = "SELECT user_registration FROM $userTable WHERE user_name = :username LIMIT 1";
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $resultQuery->bindParam('username', $username);
-        $resultQuery->execute();
+        $resultQuery = $this->executeProjectsQuery($sql, ['username' => $username]);
         $registrationDate = $resultQuery->fetchColumn();
 
         // Cache and return.
-        $this->setCache($cacheKey, $registrationDate);
-        return $registrationDate;
+        return $this->setCache($cacheKey, $registrationDate);
     }
 
     /**
@@ -91,9 +84,7 @@ class UserRepository extends Repository
     {
         $userTable = $this->getTableName($databaseName, 'user');
         $sql = "SELECT user_editcount FROM $userTable WHERE user_name = :username LIMIT 1";
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $resultQuery->bindParam('username', $username);
-        $resultQuery->execute();
+        $resultQuery = $this->executeProjectsQuery($sql, ['username' => $username]);
         return $resultQuery->fetchColumn();
     }
 
@@ -125,11 +116,9 @@ class UserRepository extends Repository
             $result = $res['query']['users'][0]['groups'];
         }
 
-        // Cache for 10 minutes, and return.
-        $this->setCache($cacheKey, $result);
+        // Cache and return.
         $this->stopwatch->stop($cacheKey);
-
-        return $result;
+        return $this->setCache($cacheKey, $result);
     }
 
     /**
@@ -169,19 +158,17 @@ class UserRepository extends Repository
      * Search the ipblocks table to see if the user is currently blocked
      * and return the expiry if they are.
      * @param $databaseName The database to query.
-     * @param $userid The ID of the user to search for.
+     * @param $userId The ID of the user to search for.
      * @return bool|string Expiry of active block or false
      */
-    public function getBlockExpiry($databaseName, $userid)
+    public function getBlockExpiry($databaseName, $userId)
     {
         $ipblocksTable = $this->getTableName($databaseName, 'ipblocks');
         $sql = "SELECT ipb_expiry
                 FROM $ipblocksTable
-                WHERE ipb_user = :userid
+                WHERE ipb_user = :userId
                 LIMIT 1";
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $resultQuery->bindParam('userid', $userid);
-        $resultQuery->execute();
+        $resultQuery = $this->executeProjectsQuery($sql, ['userId' => $userId]);
         return $resultQuery->fetchColumn();
     }
 
@@ -227,14 +214,10 @@ class UserRepository extends Repository
                 ) a ".
                 "GROUP BY namespace";
 
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $resultQuery->execute();
-        $result = $resultQuery->fetchAll();
+        $result = $this->executeProjectsQuery($sql)->fetchAll();
 
-        // Cache for 10 minutes, and return.
-        $this->setCache($cacheKey, $result);
-
-        return $result;
+        // Cache and return.
+        return $this->setCache($cacheKey, $result);
     }
 
     /**
@@ -293,15 +276,11 @@ class UserRepository extends Repository
                 "ORDER BY rev_timestamp DESC
                 ".(!empty($limit) ? "LIMIT $limit OFFSET $offset" : '');
 
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $resultQuery->execute();
-        $result = $resultQuery->fetchAll();
+        $result = $this->executeProjectsQuery($sql)->fetchAll();
 
-        // Cache for 10 minutes, and return.
-        $this->setCache($cacheKey, $result);
+        // Cache and return.
         $this->stopwatch->stop($cacheKey);
-
-        return $result;
+        return $this->setCache($cacheKey, $result);
     }
 
     /**
@@ -441,10 +420,8 @@ class UserRepository extends Repository
         $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end);
         $result = $resultQuery->fetchColumn();
 
-        // Cache for 10 minutes, and return.
-        $this->setCache($cacheKey, $result);
-
-        return $result;
+        // Cache and return.
+        return $this->setCache($cacheKey, $result);
     }
 
     /**
@@ -521,24 +498,20 @@ class UserRepository extends Repository
      */
     protected function executeQuery($sql, User $user, $namespace = 'all', $start = '', $end = '')
     {
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $username = $user->getUsername();
-        $resultQuery->bindParam('username', $username);
+        $params = [
+            'username' => $user->getUsername(),
+        ];
 
         if (!empty($start)) {
-            $start = date('Ymd000000', strtotime($start));
-            $resultQuery->bindParam('start', $start);
+            $params['start'] = date('Ymd000000', strtotime($start));
         }
         if (!empty($end)) {
-            $end = date('Ymd235959', strtotime($end));
-            $resultQuery->bindParam('end', $end);
+            $params['end'] = date('Ymd235959', strtotime($end));
         }
         if ($namespace !== 'all') {
-            $resultQuery->bindParam('namespace', $namespace);
+            $params['namespace'] = $namespace;
         }
 
-        $resultQuery->execute();
-
-        return $resultQuery;
+        return $this->executeProjectsQuery($sql, $params);
     }
 }

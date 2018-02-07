@@ -5,7 +5,6 @@
 
 namespace Xtools;
 
-use DateInterval;
 use Mediawiki\Api\MediawikiApi;
 use Mediawiki\Api\SimpleRequest;
 
@@ -87,16 +86,10 @@ class AdminStatsRepository extends Repository
                 )
                 ORDER BY 'total' DESC";
 
-        $results = $this->getProjectsConnection()->query($sql)->fetchAll();
+        $results = $this->executeProjectsQuery($sql)->fetchAll();
 
-        // Cache for 10 minutes.
-        $cacheItem = $this->cache
-            ->getItem($cacheKey)
-            ->set($results)
-            ->expiresAfter(new DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
-
-        return $results;
+        // Cache and return.
+        return $this->setCache($cacheKey, $results);
     }
 
     /**
@@ -135,13 +128,7 @@ class AdminStatsRepository extends Repository
             }
         }
 
-        // Cache for a week.
-        $cacheItem = $this->cache
-            ->getItem($cacheKey)
-            ->set($userGroups)
-            ->expiresAfter(new DateInterval('P7D'));
-        $this->cache->save($cacheItem);
-
-        return $userGroups;
+        // Cache for a week and return.
+        return $this->setCache($cacheKey, $userGroups, 'P7D');
     }
 }

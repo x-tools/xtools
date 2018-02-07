@@ -17,14 +17,20 @@
         </div>
 
         {% if exception is defined and attribute(exception, 'message') is defined %}
-            {%  set message = attribute(exception, 'message') %}
+            {% set message = attribute(exception, 'message') %}
         {% else %}
             {% set message = 'unknown' %}
         {% endif %}
 
         <p>{{ msg('error-title') }}</p>
 
-        <p>{{ msg('error-server-message', ['<code>' ~ msgPrintExists(message) ~ '</code>']) }}</p>
+        <p>
+            {% if msgExists(message, [exception.code]) %}
+                <strong>{{ msg(message, [exception.code]) }}</strong>
+            {% else %}
+                {{ msg('error-server-message', ['<code>' ~ message ~ '</code>']) }}
+            {% endif %}
+        </p>
 
         <p>
             {% set phabLink %}

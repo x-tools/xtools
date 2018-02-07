@@ -111,18 +111,18 @@ class ProjectRepository extends Repository
         // Otherwise, fetch all from the database.
         $wikiQuery = $this->getMetaConnection()->createQueryBuilder();
         $wikiQuery->select(['dbname AS dbName', 'url', 'lang'])->from('wiki');
-        $projects = $wikiQuery->execute()->fetchAll();
+        $projects = $this->executeQueryBuilder($wikiQuery)->fetchAll();
         $projectsMetadata = [];
         foreach ($projects as $project) {
             $projectsMetadata[$project['dbName']] = $project;
         }
 
-        // Cache and return.
-        $cacheItem = $this->cache->getItem($this->cacheKeyAllProjects);
-        $cacheItem->set($projectsMetadata);
-        $cacheItem->expiresAfter(new \DateInterval('P1D'));
-        $this->cache->save($cacheItem);
-        return $projectsMetadata;
+        // Cache for one day and return.
+        return $this->setCache(
+            $this->cacheKeyAllProjects,
+            $projectsMetadata,
+            'P1D'
+        );
     }
 
     /**
@@ -176,17 +176,13 @@ class ProjectRepository extends Repository
             ->setParameter('projectUrl2', "https://$project.org")
             ->setParameter('projectUrl3', "https://www.$project")
             ->setParameter('projectUrl4', "https://www.$project.org");
-        $wikiStatement = $wikiQuery->execute();
+        $wikiStatement = $this->executeQueryBuilder($wikiQuery);
 
         // Fetch and cache the wiki data.
         $basicInfo = $wikiStatement->fetch();
 
-        $cacheItem = $this->cache->getItem($cacheKey);
-        $cacheItem->set($basicInfo)
-            ->expiresAfter(new \DateInterval('PT1H'));
-        $this->cache->save($cacheItem);
-
-        return $basicInfo;
+        // Cache for one hour and return.
+        return $this->setCache($cacheKey, $basicInfo, 'PT1H');
     }
 
     /**
@@ -278,12 +274,8 @@ class ProjectRepository extends Repository
             }
         }
 
-        $cacheItem = $this->cache->getItem($cacheKey);
-        $cacheItem->set($this->metadata)
-            ->expiresAfter(new \DateInterval('PT1H'));
-        $this->cache->save($cacheItem);
-
-        return $this->metadata;
+        // Cache for one hour and return.
+        return $this->setCache($cacheKey, $this->metadata, 'PT1H');
     }
 
     /**
@@ -336,7 +328,6 @@ class ProjectRepository extends Repository
      */
     public function pageHasContent(Project $project, $namespaceId, $pageTitle)
     {
-        $conn = $this->getProjectsConnection();
         $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
         $query = "SELECT page_id "
              . " FROM $pageTable "
@@ -346,7 +337,7 @@ class ProjectRepository extends Repository
             'ns' => $namespaceId,
             'title' => str_replace(' ', '_', $pageTitle),
         ];
-        $pages = $conn->executeQuery($query, $params)->fetchAll();
+        $pages = $this->executeProjectsQuery($query, $params)->fetchAll();
         return count($pages) > 0;
     }
 
@@ -377,14 +368,10 @@ class ProjectRepository extends Repository
                 $groups,
                 \Doctrine\DBAL\Connection::PARAM_STR_ARRAY
             );
-        $admins = $query->execute()->fetchAll();
+        $admins = $this->executeQueryBuilder($query)->fetchAll();
 
-        $cacheItem = $this->cache->getItem($cacheKey);
-        $cacheItem->set($admins)
-            ->expiresAfter(new \DateInterval('PT1H'));
-        $this->cache->save($cacheItem);
-
-        return $admins;
+        // Cache for one hour and return.
+        return $this->setCache($cacheKey, $admins, 'PT1H');
     }
 
     /**
