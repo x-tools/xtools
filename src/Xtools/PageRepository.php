@@ -240,8 +240,7 @@ class PageRepository extends Repository
          * wait to see the result. We'll utilize the max_statement_time variable to set
          * a maximum query time of 60 seconds.
          */
-        $sql = "SET max_statement_time = 60;";
-        $this->executeProjectsQuery($sql);
+        $this->setQueryTimeout(60);
 
         $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
         $userTable = $this->getTableName($page->getProject()->getDatabaseName(), 'user');

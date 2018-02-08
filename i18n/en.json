@@ -111,6 +111,7 @@
 	"error-report": "Please feel free to report this error on $1 (requires a Wikimedia account).",
 	"error-server-message": "The server said: $1",
 	"error-service-overload": "XTools is currently overloaded servicing other requests. Please try again in a few minutes.",
+	"error-query-timeout": "The requested information took too long to process (timeout $1 {{PLURAL:$1|second|seconds}}).",
 	"error-title": "A fatal error has occurred within XTools.",
 	"events": "Events",
 	"executed": "Executed in $1 {{PLURAL:$2|second|seconds}}.",
