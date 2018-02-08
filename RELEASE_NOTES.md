@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.1.37 ##
+- Fix setting of shorter query timeout for ArticleInfo API.
+- Handle some exceptions that are frequently thrown in production.
+
 ## 3.1.36 ##
 - Major refactor of how queries are ran, adding a max query time
   so that they automatically time out (default 10 minutes).
