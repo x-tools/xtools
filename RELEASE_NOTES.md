@@ -1,5 +1,13 @@
 # Release Notes #
 
+## 3.1.36 ##
+- Major refactor of how queries are ran, adding a max query time
+  so that they automatically time out (default 10 minutes).
+- Fix some issues with parameter handling in the Pages Created tool,
+  and only show what columns are relevant based on chosen options.
+- Various other refactoring, bug fixes and improved test coverage.
+- Localization updates.
+
 ## 3.1.35 ##
 - Add more wikitext export options to the Edit Counter, including
   an option to in the form to get the entire results as wikitext.
