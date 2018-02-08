@@ -258,9 +258,11 @@
 	"username-or-ip": "利用者名かIPv4・IPv6のIPアドレス",
 	"version": "バージョン $1",
 	"view-source": "ソースを閲覧",
+	"view-wikitext": "ウィキテキストとして表示",
 	"vote-msg": "$1 は $2 件の $3 ページを編集しました!",
 	"wednesday": "水曜日",
 	"wiki": "ウィキ",
+	"wikitext": "ウィキテキスト",
 	"with-summary": "要約あり",
 	"year": "年",
 	"year-counts": "年別の集計"
