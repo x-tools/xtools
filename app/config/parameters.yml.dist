@@ -56,6 +56,8 @@ parameters:
     app.multithread: 0
     app.base_path: https://xtools.example.org
 
+    app.query_timeout: 900
+
     app.max_page_revisions: 50000
     app.max_user_edits: 350000
 

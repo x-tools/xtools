@@ -111,6 +111,7 @@
 	"error-report": "Message explaining how to report an error. $1 is a link to Phabricator.",
 	"error-server-message": "Error message. $1 is the message given by the server.",
 	"error-service-overload": "Error message shown when too many people are using XTools.",
+	"error-query-timeout": "Error message shown when XTools timed out. $1 is the timeout value in seconds.",
 	"error-title": "Title for the error page.",
 	"events": "Events that have a log entry\n{{Identical|Event}}",
 	"executed": "Execution time. $1 is the formatted number of seconds, and $2 is the unformatted number for use with PLURAL.",
