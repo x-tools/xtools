@@ -343,18 +343,18 @@ class ArticleInfoController extends XtoolsController
 
         try {
             $info = $page->getBasicEditingInfo();
-        } catch (\Doctrine\DBAL\Exception\DriverException $e) {
+        } catch (\Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException $e) {
+            // No more open database connections.
+            $data['error'] = 'Unable to fetch revision data. Please try again later.';
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
             /**
              * The query most likely exceeded the maximum query time,
              * so we'll abort and give only info retrived by the API.
              */
             $data['error'] = 'Unable to fetch revision data. The query may have timed out.';
-        } catch (\Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException $e) {
-            // No more open database connections.
-            $data['error'] = 'Unable to fetch revision data. Please try again later.';
         }
 
-        if (isset($info)) {
+        if ($info != false) {
             $creationDateTime = DateTime::createFromFormat('YmdHis', $info['created_at']);
             $modifiedDateTime = DateTime::createFromFormat('YmdHis', $info['modified_at']);
             $secsSinceLastEdit = (new DateTime)->getTimestamp() - $modifiedDateTime->getTimestamp();

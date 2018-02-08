@@ -233,15 +233,6 @@ class PageRepository extends Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        /**
-         * This query can sometimes take too long to run for pages with tens of thousands
-         * of revisions. This query is used by the ArticleInfo gadget, which shows basic
-         * data in real-time, so if it takes too long than the user probably didn't even
-         * wait to see the result. We'll utilize the max_statement_time variable to set
-         * a maximum query time of 60 seconds.
-         */
-        $this->setQueryTimeout(60);
-
         $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
         $userTable = $this->getTableName($page->getProject()->getDatabaseName(), 'user');
         $pageTable = $this->getTableName($page->getProject()->getDatabaseName(), 'page');
@@ -285,7 +276,16 @@ class PageRepository extends Repository
         // Get current time so we can compare timestamps
         // and decide whether or to cache the result.
         $time1 = time();
-        $result = $this->executeProjectsQuery($sql, $params)->fetch();
+
+        /**
+         * This query can sometimes take too long to run for pages with tens of thousands
+         * of revisions. This query is used by the ArticleInfo gadget, which shows basic
+         * data in real-time, so if it takes too long than the user probably didn't even
+         * wait to see the result. We'll pass 60 as the last parameter to executeProjectsQuery,
+         * which will set the max_statement_time to 60 seconds.
+         */
+        $result = $this->executeProjectsQuery($sql, $params, 60)->fetch();
+
         $time2 = time();
 
         // If it took over 5 seconds, cache the result for 20 minutes.
