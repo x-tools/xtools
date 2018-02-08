@@ -137,7 +137,6 @@
 	"image-attribution-text-3": "Eskuliburuaren lerrokatzea $1(e)k eskatutako logotipoaren barruan.",
 	"import": "Inportatu",
 	"importance": "Garrantzia",
-	"interrupted": "Sentitzen dugu, baina baliabideak aurreztearren, bot batek automatikoki geldiarazi du bilaketa hau, $1 segundo baino gehiago iraun duelako.",
 	"invalid-date": "Balio gabeko data",
 	"invalid-project": "$1 ez da baliozko proiektua",
 	"invalid-project-cant-use": "$1 ez dago konfiguratura erremienta hau erabiltzeko",

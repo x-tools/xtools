@@ -139,7 +139,6 @@
 	"image-attribution-text-3": "Schraubenschlüsselanpassung innerhalb des Logos angefordert von $1.",
 	"import": "Importe",
 	"importance": "Wichtigkeit",
-	"interrupted": "Uups, um die System-Ressourcen zu schonen, hat ein Bot die Abfrage terminiert, weil sie länger als $1 Sekunden gedauert hat.",
 	"invalid-date": "Ungültiges Datum.",
 	"invalid-project": "$1 ist kein gültiges Projekt",
 	"invalid-project-cant-use": "$1 ist nicht zur Verwendung dieses Werkzeugs konfiguriert",

@@ -121,7 +121,6 @@
 	"image-attribution-text-1": "XTools 로고는 $1 님이 제공해 주셨습니다.",
 	"import": "가져오기",
 	"importance": "중요도",
-	"interrupted": "죄송합니다, 하지만 자원을 절약하기 위해 봇이 $1초보다 오래 걸리는 쿼리를 자동으로 삭제했습니다.",
 	"invalid-date": "잘못된 날짜",
 	"invalid-project": "$1은(는) 올바른 프로젝트가 아닙니다",
 	"invalid-project-cant-use": "$1은(는) 이 도구 사용을 위해 구성되지 않았습니다",

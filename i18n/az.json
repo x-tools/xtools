@@ -133,7 +133,6 @@
 	"image-attribution-text-3": "Lövhə daxilində açar lövhəsi $1 tərəfindən tələb olundu.",
 	"import": "İdxal",
 	"importance": "Əhəmiyyəti",
-	"interrupted": "Üzr istəyirik, lakin resursları saxlamaq üçün bir bot bu sorğuyu avtomatik olaraq $1 saniyədən daha uzun müddətə məhv etmişdir.",
 	"invalid-date": "Yanlış tarix",
 	"invalid-project": "$1 cari bir layihə deyil",
 	"invalid-project-cant-use": "$1 bu aləti istifadə etmək üçün konfiqurasiya edilmədi",

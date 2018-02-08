@@ -117,7 +117,6 @@
 	"image-attribution-text-3": "Justering av skiftenøkkelen i logo forespurt av $1.",
 	"import": "Import",
 	"importance": "Viktighet",
-	"interrupted": "Beklager, spørringen tok mer enn $1 sekunder, og har derfor blitt avbrutt av en bot for å spare ressurser.",
 	"invalid-date": "Ugyldig dato",
 	"invalid-project": "$1 er ikke et gyldig prosjekt",
 	"invalid-project-cant-use": "$1 er ikke konfigurert til å bruke dette verktøyet.",

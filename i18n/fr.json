@@ -141,7 +141,6 @@
 	"image-attribution-text-3": "Alignement de la clé à molette avec le logo demandée par $1.",
 	"import": "Importer",
 	"importance": "Importance",
-	"interrupted": "Désolé, mais afin de préserver les ressources, un robot a tué automatiquement cette requête qui a duré plus de $1 secondes.",
 	"invalid-date": "Date non valide",
 	"invalid-project": "$1 n’est pas un projet valide",
 	"invalid-project-cant-use": "$1 n’est pas configuré pour utiliser cet outil",

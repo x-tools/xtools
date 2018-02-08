@@ -137,7 +137,6 @@
 	"image-attribution-text-3": "Justering av skiftenyckeln i logotypen föreslogs av $1.",
 	"import": "Import",
 	"importance": "Betydelse",
-	"interrupted": "Förlåt, men för att spara resurser har en bot automatiskt avslutat denna förfrågning eftersom den var längre än $1 sekunder.",
 	"invalid-date": "Ogiltigt datum",
 	"invalid-project": "$1 är inte ett giltigt projekt",
 	"invalid-project-cant-use": "$1 är inte konfigurerad för användning av detta verktyg",

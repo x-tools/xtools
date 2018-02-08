@@ -49,7 +49,6 @@
 	"hide": "隐藏",
 	"high-replag": "注意：复制延迟过高，$1以内的更新可能无法显示。",
 	"import": "导入",
-	"interrupted": "很抱歉，但为了节省资源，机器人自动终止了这个超过$1秒的查询。",
 	"invalid-date": "无效日期",
 	"invalid-type": "无效的类型选择",
 	"ip-edits": "IP编辑数",

@@ -123,7 +123,6 @@
 	"image-attribution-text-3": "Csavarkulcs illesztés a(z) $1 által kért logóban.",
 	"import": "Import",
 	"importance": "Fontosság",
-	"interrupted": "Elnézést, de az erőforrások megőrzése érdekében a bot automatikusan leállította a $1 másodpercet meghaladó lekérdezést.",
 	"invalid-date": "Érvénytelen dátum",
 	"invalid-project": "A(z) $1 nem egy érvényes projekt.",
 	"invalid-project-cant-use": "$1 nincs beállítva, hogy használja ezt az eszközt",

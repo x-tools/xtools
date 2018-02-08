@@ -137,7 +137,6 @@
 	"image-attribution-text-3": "标志中的扳手校准请求自$1。",
 	"import": "导入",
 	"importance": "重要度",
-	"interrupted": "很抱歉，但为了节省资源，机器人自动终止了这个超过$1秒的查询。",
 	"invalid-date": "无效日期",
 	"invalid-project": "$1不是有效的项目",
 	"invalid-project-cant-use": "$1未配置使用该工具",

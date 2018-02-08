@@ -136,7 +136,6 @@
 	"image-attribution-text-3": "Wrenchjustering i logo anmodt af $1.",
 	"import": "Importer",
 	"importance": "Vigtighed",
-	"interrupted": "Beklager, men for at spare på ressourcerne, så har en robot dræbt denne forespørgsel, der har varet længere end $1 sekunder.",
 	"invalid-date": "Ugyldig dato",
 	"invalid-project": "$1 er ikke et gyldigt projekt",
 	"invalid-project-cant-use": "$1 er ikke konfigureret til at bruge dette værktøj",

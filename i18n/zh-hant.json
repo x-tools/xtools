@@ -138,7 +138,6 @@
 	"image-attribution-text-3": "標誌內的扳手圖案校准請求自 $1。",
 	"import": "匯入",
 	"importance": "重要性",
-	"interrupted": "很抱歉，但為了節省資源，機器人自動中斷了這個超過 $1 秒的查詢。",
 	"invalid-date": "無效日期",
 	"invalid-project": "$1 不是有效的專案",
 	"invalid-project-cant-use": "$1沒有被設置用在此工具",

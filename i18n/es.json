@@ -135,7 +135,6 @@
 	"image-attribution-text-3": "Alineación de llave inglesa dentro del logotipo pedido por $1.",
 	"import": "Importar",
 	"importance": "Importancia",
-	"interrupted": "Lo sentimos, pero con el fin de ahorrar recursos, un bot automáticamente ha matado esta consulta por ser más larga de $1 segundos.",
 	"invalid-date": "Fecha no válida",
 	"invalid-project": "$1 no es un proyecto válido",
 	"invalid-project-cant-use": "$1 no está configurado para utilizar esta herramienta",

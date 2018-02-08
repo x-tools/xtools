@@ -108,7 +108,6 @@
 	"image-attribution-text-3": "Alinierea cheii în cadrul logoului cerută de $1.",
 	"import": "Importări",
 	"importance": "Importanță",
-	"interrupted": "Ne pare rău, dar, pentru a face economie de resurse, un robot a terminat forțat această interogare, fiindcă deja a durat mai mult de $1 {{PLURAL:$1|secundă|secunde|de secunde}}.",
 	"invalid-date": "Dată invalidă",
 	"invalid-project": "$1 nu este un proiect valid",
 	"invalid-project-cant-use": "$1 nu este configurat să folosească această unealtă",
