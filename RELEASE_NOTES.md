@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.1.38 ##
+- In ArticleInfo, handle an issue with the WikiWho API where the
+  usernames are blank.
+
 ## 3.1.37 ##
 - Fix setting of shorter query timeout for ArticleInfo API.
 - Handle some exceptions that are frequently thrown in production.
