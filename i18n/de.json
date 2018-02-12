@@ -107,6 +107,7 @@
 	"edits-with-summaries": "Zusammenfassúng verwendet",
 	"end": "Enddatum",
 	"error-articlinfo-api": "Die Versionsdaten konnten nicht abgerufen werden.",
+	"error-query-timeout": "Leider benötigen die angeforderten Informationen zu lang für eine Verarbeitung (Zeitüberschreitung {{PLURAL:$1|eine Sekunde|$1 Sekunden}}). Um Ressourcen zu sparen, wurde die Abfrage automatisch abgebrochen.",
 	"error-rate-limit": "Es wurde möglicherweise ein Spidercrawler entdeckt. Falls du ein Mensch bist, hast du zu viele Anfragen in einer kurzen Zeitperiode durchgeführt. Bitte warte {{PLURAL:$1|eine Minute|$1 Minuten}}, bevor du dieses Werkzeug neu lädst. Du kannst dich dann anmelden, um ein erneutes Auftreten dieser Fehlermeldung zu verhindern.",
 	"error-report": "Zögere bitte nicht, diesen Fehler auf $1 zu melden (erfordert ein Wikimedia-Benutzerkonto).",
 	"error-server-message": "Der Server sagte: $1",

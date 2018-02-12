@@ -5,7 +5,8 @@
 			"Marek Pavlica",
 			"Nemo bis",
 			"Draceane",
-			"Ilimanaq29"
+			"Ilimanaq29",
+			"Matěj Suchánek"
 		]
 	},
 	"about-xtools": "O nástrojích",
@@ -83,7 +84,10 @@
 	"edits-with-summaries": "Editací se shrnutím",
 	"end": "Koncové datum",
 	"error-articlinfo-api": "Nepodařilo se načíst data revize.",
+	"error-query-timeout": "Omlouváme se, ale požadovek příliš dlouho neodpovídal (jeho načtení trvalo více než $1 {{PLURAL:$1|sekundu|sekundy|sekund}}). V zájmu zachování zdrojů byl požadavek automaticky zrušen.",
+	"error-rate-limit": "Zjištěny možné pokusy o hack robotem. Pokud jste člověk, vytváříte příliš mnoho příkazů během krátké časové doby. Počkejte prosím $1 {{PLURAL:$1|minutu|minuty|minut}} před znovunačtením tohoto nástroje. Poté se můžete přihlásit, čímž tomuto příště zabráníte.",
 	"error-server-message": "Odpověď serveru: $1",
+	"error-service-overload": "XTools je momentálně příliš zatížen mnoha jinými požadavky. Počkejte prosím několik minut a poté zkuste znovu.",
 	"events": "Události",
 	"executed": "Provedeno za $1 {{PLURAL:$2|sekundu|sekundy|sekund}}.",
 	"explanation": "Vysvětlení",
