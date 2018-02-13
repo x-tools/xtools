@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.1.39 ##
+- T187100: Fix issue with routing 'redirects' parameter in the
+  Pages Created tool.
+- Localization updates.
+
 ## 3.1.38 ##
 - In ArticleInfo, handle an issue with the WikiWho API where the
   usernames are blank.
