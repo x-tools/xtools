@@ -69,7 +69,6 @@ class AppExtension extends Extension
             new \Twig_SimpleFunction('loadStylesheetsFromCDN', [ $this, 'loadStylesheetsFromCDN' ]),
             new \Twig_SimpleFunction('isWMFLabs', [ $this, 'isWMFLabs' ]),
             new \Twig_SimpleFunction('replag', [ $this, 'replag' ]),
-            new \Twig_SimpleFunction('link', [ $this, 'link' ]),
             new \Twig_SimpleFunction('quote', [ $this, 'quote' ]),
             new \Twig_SimpleFunction('bugReportURL', [ $this, 'bugReportURL' ]),
             new \Twig_SimpleFunction('logged_in_user', [$this, 'functionLoggedInUser']),

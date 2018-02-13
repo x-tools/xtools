@@ -74,7 +74,7 @@ class PagesController extends XtoolsController
      *     "/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{offset}", name="PagesResult",
      *     requirements={
      *         "namespace" = "|all|\d+",
-     *         "redirects" = "|all|noredirects|onlyredirects",
+     *         "redirects" = ".*",
      *         "deleted" = "|all|live|deleted",
      *         "offset" = "|\d+"
      *     }
@@ -99,6 +99,22 @@ class PagesController extends XtoolsController
             return $ret;
         } else {
             list($project, $user) = $ret;
+        }
+
+        // Check for legacy values for 'redirects', and redirect
+        // back with correct values if need be. This could be refactored
+        // out to XtoolsController, but this is the only tool in the suite
+        // that deals with redirects, so we'll keep it confined here.
+        $validRedirectValues = ['', 'noredirects', 'onlyredirects', 'all'];
+        if ($redirects === 'none' || !in_array($redirects, $validRedirectValues)) {
+            return $this->redirectToRoute('PagesResult', [
+                'project' => $project->getDomain(),
+                'username' => $user->getUsername(),
+                'namespace' => $namespace,
+                'redirects' => 'noredirects',
+                'deleted' => $deleted,
+                'offset' => $offset,
+            ]);
         }
 
         $pages = new Pages(
