@@ -159,6 +159,7 @@
 	"num-hours": "{{PLURAL: $1|час|часа|часов}}",
 	"num-minutes": "{{PLURAL: $1|минута|минуты|минут}}",
 	"num-months": "{{PLURAL:$1|месяц|$1 месяцев|$1 месяца}}",
+	"num-namespaces": "{{PLURAL:$1|пространство имён|пространства имён|пространств имён}}",
 	"num-protections": "{{PLURAL:$1|защита|защиты|защит}}",
 	"num-revisions": "{{PLURAL:$1|версия|версий|версии}}",
 	"num-revisions-processed": "$1 обработано",

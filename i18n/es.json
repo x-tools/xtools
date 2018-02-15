@@ -7,12 +7,14 @@
 			"MarcoAurelio",
 			"RicardoSGZ",
 			"2axterix2",
-			"La Mantis"
+			"La Mantis",
+			"Ivanhercaz"
 		]
 	},
 	"about-xtools": "Acerca de estas herramientas",
 	"accepted-formats": "Formatos aceptados",
 	"account-age": "Edad de la cuenta",
+	"account-age-desc": "Hace $2 {{PLURAL:$1|día|días}}",
 	"accounts": "Cuentas",
 	"accounts-created": "Cuentas creadas",
 	"actions": "Acciones",

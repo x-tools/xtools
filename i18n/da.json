@@ -106,6 +106,7 @@
 	"edits-with-summaries": "Redigeringer med redigeringsbeskrivelse",
 	"end": "Slutdato",
 	"error-articlinfo-api": "Kunne ikke hente revisionsdata.",
+	"error-query-timeout": "Beklager, informationen tog for lang tid at behandle (tidsudløb $1 {{PLURAL:$1|sekund|sekunder}}). For at kunne spare på ressourcerne blev forespørgslen automatisk stoppet.",
 	"error-rate-limit": "Mulig spider crawl registreret. Hvis du er et menneske, så laver du for mange forespørgsler indenfor en kort tidsperiode. Vent venligst $1{{PLURAL:$1|minut|minutter}} før værktøjet læses ind igen. Du kan så logge ind for at forhindre, at dette sker igen.",
 	"error-report": "Rapporter venligst denne fejl på $1 (kræver en Wikimediakonto).",
 	"error-server-message": "Serveren sagde: $1",
