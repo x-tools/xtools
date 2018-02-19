@@ -849,7 +849,6 @@ class ArticleInfo extends Model
         // @TODO: Test this against an edit war (use your sandbox).
         // Also remove as max added or deleted, if applicable.
         if ($this->maxAddition && $prevEdits['prev']->getId() === $this->maxAddition->getId()) {
-            // $this->editors[$prevEdits->getUser()->getUsername()]['sizes'] = $edit->getLength() / 1024;
             $this->maxAddition = $prevEdits['maxAddition'];
             $prevEdits['maxAddition'] = $prevEdits['prev']; // In the event of edit wars.
         } elseif ($this->maxDeletion && $prevEdits['prev']->getId() === $this->maxDeletion->getId()) {
@@ -1054,7 +1053,6 @@ class ArticleInfo extends Model
                 'last' => null,
                 'atbe' => null,
                 'added' => 0,
-                'sizes' => [],
             ];
         }
 
@@ -1062,9 +1060,6 @@ class ArticleInfo extends Model
         $this->editors[$username]['all']++;
         $this->editors[$username]['last'] = $edit->getTimestamp();
         $this->editors[$username]['lastId'] = $edit->getId();
-
-        // Store number of KB added with this edit
-        $this->editors[$username]['sizes'][] = $edit->getLength() / 1024;
 
         // Increment minor counts for this user
         if ($edit->isMinor()) {
@@ -1243,13 +1238,6 @@ class ArticleInfo extends Model
 
                 // Average time between edits (in days).
                 $this->editors[$editor]['atbe'] = $days / $info['all'];
-            }
-
-            if (count($info['sizes'])) {
-                // Average Total KB divided by number of stored sizes (usually the user's edit count to this page).
-                $this->editors[$editor]['size'] = array_sum($info['sizes']) / count($info['sizes']);
-            } else {
-                $this->editors[$editor]['size'] = 0;
             }
         }
 

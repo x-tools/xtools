@@ -189,6 +189,11 @@ class ArticleInfoController extends XtoolsController
             $this->addFlash('notice', ['too-many-revisions', number_format($maxRevisions), $maxRevisions]);
         }
 
+        // For when there is very old data (2001 era) which may cause miscalculations.
+        if ($articleInfo->getFirstEdit()->getYear() < 2003) {
+            $this->addFlash('warning', ['old-page-notice']);
+        }
+
         $ret = [
             'xtPage' => 'articleinfo',
             'xtTitle' => $page->getTitle(),

@@ -229,6 +229,7 @@
 	"num-watchers": "{{PLURAL:$1|watcher|watchers}}",
 	"num-weeks": "{{PLURAL:$1|week|weeks}}",
 	"num-years": "{{PLURAL:$1|year|years}}",
+	"old-page-notice": "This page is very old. Some data may be inaccurate due to how revisions were stored in the early days of MediaWiki.",
 	"oppose": "Oppose",
 	"optional": "Optional",
 	"original-size": "Original size",

@@ -228,6 +228,7 @@
 	"num-watchers": "Conditional PLURAL form of 'watchers'. $1 is the number.\n{{Identical|Watcher}}",
 	"num-weeks": "Conditional PLURAL form of 'weeks'. $1 is the number.\n{{Identical|Week}}",
 	"num-years": "Conditional PLURAL form of 'years'. $1 is the number.\n{{Identical|Year}}",
+	"old-page-notice": "Notice shown when viewing data on a very old page, where the calculations could be inaccurate.",
 	"oppose": "Exact term for oppose on vote pages\n{{Identical|Oppose}}",
 	"optional": "General term for 'optional', such as a form field.\n{{Identical|Optional}}",
 	"original-size": "Label for the original size of a page.",
