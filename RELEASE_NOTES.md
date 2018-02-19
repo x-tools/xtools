@@ -1,5 +1,14 @@
 # Release Notes #
 
+## 3.1.40 ##
+- T178055: Improved screen reader support on the Edit Counter.
+- Edit Counter rights changes now looks for local changes that
+  were made on Meta, and also includes global rights changes.
+- Auto-link raw URLs in edit summaries.
+- Show notice that data could be inaccurate when viewing
+  ArticleInfo on a very old page.
+- Localization updates.
+
 ## 3.1.39 ##
 - T187100: Fix issue with routing 'redirects' parameter in the
   Pages Created tool.
