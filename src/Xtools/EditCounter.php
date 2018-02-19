@@ -46,6 +46,9 @@ class EditCounter extends Model
     /** @var string[] Rights changes, keyed by timestamp then 'added' and 'removed'. */
     protected $rightsChanges;
 
+    /** @var string[] Global rights changes, keyed by timestamp then 'added' and 'removed'. */
+    protected $globalRightsChanges;
+
     /** @var int[] Keys are project DB names. */
     protected $globalEditCounts;
 
@@ -215,9 +218,42 @@ class EditCounter extends Model
             return $this->rightsChanges;
         }
 
-        $this->rightsChanges = [];
         $logData = $this->getRepository()
             ->getRightsChanges($this->project, $this->user);
+
+        $this->rightsChanges = $this->processRightsChanges($logData);
+
+        return $this->rightsChanges;
+    }
+
+    /**
+     * Get global user rights changes of the given user.
+     * @param Project $project
+     * @param User $user
+     * @return string[] Keyed by timestamp then 'added' and 'removed'.
+     */
+    public function getGlobalRightsChanges()
+    {
+        if (isset($this->globalRightsChanges)) {
+            return $this->globalRightsChanges;
+        }
+
+        $logData = $this->getRepository()
+            ->getGlobalRightsChanges($this->project, $this->user);
+
+        $this->globalRightsChanges = $this->processRightsChanges($logData);
+
+        return $this->globalRightsChanges;
+    }
+
+    /**
+     * Process the given rights changes, sorting an putting in a human-readable format.
+     * @param  array $logData As fetched with EditCounterRepository::getRightsChanges.
+     * @return array
+     */
+    private function processRightsChanges($logData)
+    {
+        $rightsChanges = [];
 
         foreach ($logData as $row) {
             $unserialized = @unserialize($row['log_params']);
@@ -227,7 +263,7 @@ class EditCounter extends Model
                 $added = array_diff($new, $old);
                 $removed = array_diff($old, $new);
 
-                $this->setAutoRemovals($row, $unserialized, $added);
+                $rightsChanges = $this->setAutoRemovals($rightsChanges, $row, $unserialized, $added);
             } else {
                 // This is the old school format the most likely contains
                 // the list of rights additions in as a comma-separated list.
@@ -245,29 +281,40 @@ class EditCounter extends Model
                 }
             }
 
-            $this->rightsChanges[$row['log_timestamp']] = [
+            // Remove '(none)'.
+            if (in_array('(none)', $added)) {
+                array_splice($added, array_search('(none)', $added), 1);
+            }
+            if (in_array('(none)', $removed)) {
+                array_splice($removed, array_search('(none)', $removed), 1);
+            }
+
+            $rightsChanges[$row['log_timestamp']] = [
                 'logId' => $row['log_id'],
                 'admin' => $row['log_user_text'],
                 'comment' => $row['log_comment'],
                 'added' => array_values($added),
                 'removed' => array_values($removed),
-                'automatic' => $row['log_action'] === 'autopromote'
+                'automatic' => $row['log_action'] === 'autopromote',
+                'type' => $row['type'],
             ];
         }
 
-        krsort($this->rightsChanges);
+        krsort($rightsChanges);
 
-        return $this->rightsChanges;
+        return $rightsChanges;
     }
 
     /**
      * Check the given log entry for rights changes that are set to automatically expire,
-     * and add entries to $this->rightsChanges accordingly.
+     * and add entries to $rightsChanges accordingly.
+     * @param array $rightsChanges
      * @param array $row Log entry row from database.
      * @param array $params Unserialized log params.
      * @param string[] $added List of added user rights.
+     * @return array Modified $rightsChanges.
      */
-    private function setAutoRemovals($row, $params, $added)
+    private function setAutoRemovals($rightsChanges, $row, $params, $added)
     {
         foreach ($added as $index => $entry) {
             if (!isset($params['newmetadata'][$index]) ||
@@ -279,19 +326,22 @@ class EditCounter extends Model
 
             $expiry = $params['newmetadata'][$index]['expiry'];
 
-            if (isset($this->rightsChanges[$expiry])) {
-                $this->rightsChanges[$expiry]['removed'][] = $entry;
+            if (isset($rightsChanges[$expiry]) && !in_array($entry, $rightsChanges[$expiry]['removed'])) {
+                $rightsChanges[$expiry]['removed'][] = $entry;
             } else {
-                $this->rightsChanges[$expiry] = [
+                $rightsChanges[$expiry] = [
                     'logId' => $row['log_id'],
                     'admin' => $row['log_user_text'],
                     'comment' => null,
                     'added' => [],
                     'removed' => [$entry],
                     'automatic' => true,
+                    'type' => $row['type'],
                 ];
             }
         }
+
+        return $rightsChanges;
     }
 
     /**
