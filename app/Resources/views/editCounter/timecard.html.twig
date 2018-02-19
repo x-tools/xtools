@@ -34,6 +34,37 @@
 </div>
 {% else %}
 
+<div class="sr-only">
+    {% set days = {
+        1: msg('sunday'),
+        2: msg('monday'),
+        3: msg('tuesday'),
+        4: msg('wednesday'),
+        5: msg('thursday'),
+        6: msg('friday'),
+        7: msg('saturday')
+    }%}
+
+    <table>
+        <thead>
+            <th></th>
+            {% for period in 0..11 %}
+                <th>{{ period * 2 }}:00</th>
+            {% endfor %}
+        </thead>
+        <tbody>
+            {% for day in 1..7 %}
+                <tr>
+                    <th>{{ days[day] }}</th>
+                    {% for item in ec.timeCard if item.y == day and item.x != 24 %}
+                        <td>{{ item.value }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 <canvas id="timecard-bubble-chart"></canvas>
 
 <script type="text/javascript">
