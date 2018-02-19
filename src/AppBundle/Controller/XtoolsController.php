@@ -19,6 +19,7 @@ use Xtools\PageRepository;
  * XtoolsController supplies a variety of methods around parsing and validing
  * parameters, and initializing Project/User instances. These are used in
  * other controllers in the AppBundle\Controller namespace.
+ * @abstract
  */
 abstract class XtoolsController extends Controller
 {
@@ -324,7 +325,7 @@ abstract class XtoolsController extends Controller
 
     /**
      * Record usage of an API endpoint.
-     * @param  string $endpoint
+     * @param string $endpoint
      * @codeCoverageIgnore
      */
     public function recordApiUsage($endpoint)
@@ -357,7 +358,7 @@ abstract class XtoolsController extends Controller
      * @param  Request $request
      * @param  string  $templatePath Path to template without format,
      *   such as '/editCounter/latest_global'.
-     * @param  array   $ret Data that should be passed to the views.
+     * @param  array   $ret Data that should be passed to the view.
      * @return array
      * @codeCoverageIgnore
      */

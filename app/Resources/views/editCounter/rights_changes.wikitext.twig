@@ -1,4 +1,3 @@
-{% import 'macros/wiki.html.twig' as wiki %}
 {% if not is_sub_request %}
 == [[User:{{ user.username }}]] ==
 
@@ -9,30 +8,14 @@
 === {{ msg('rights-changes') }} ===
 
 {% if ec.rightsChanges|length > 0 %}
-{| class="wikitable sortable"
-|-
-{% for key in ['date', 'rights', 'admin', 'summary'] %}
-! {{ msg(key)|capitalize_first }}
-{% endfor %}
-{% for timestamp, change in ec.rightsChanges %}
-|-
-| style="white-space: nowrap;" | [[Special:Redirect/logid/{{ change.logId }}|{{ timestamp|date_format }}]]
-| {% for right in change.added %}
-<span style="color:#006400">+{{ right|trim }}</span>{% if not loop.last %}, {% endif %}
-{% endfor %}{% if change.added|length > 0 and change.removed|length > 0 %}
+{% include 'editCounter/rights_changes_table.wikitext.twig' with {'rightsChanges': ec.rightsChanges} %}
 
-{% endif %}
-{% for right in change.removed %}
-<span style="color:#8B0000">-{{ right|trim }}</span>{% if not loop.last %}, {% endif %}
-{% endfor %}
+{% if ec.globalRightsChanges|length > 0 %}
+==== {{ msg('global-rights-changes') }} ====
 
-| <span class="plainlinks">[{% verbatim %}{{{% endverbatim %}fullurl:User:{{ change.admin }}}} {{ change.admin }}]</span>
-| {% if change.automatic %}''{{ msg('automatic') }}''
-{% else %}
-{{ change.comment }}
+{% include 'editCounter/rights_changes_table.wikitext.twig' with {'rightsChanges': ec.globalRightsChanges} %}
 {% endif %}
-{% endfor %}
-|}
+
 {% else %}
 {{ msg('no-result', [user.username]) }}
 {% endif %}

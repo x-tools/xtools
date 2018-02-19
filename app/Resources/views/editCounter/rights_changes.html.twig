@@ -16,6 +16,7 @@
             </div>
         </header>
         <div class="panel-body xt-panel-body">
+            {{ wiki.userLinks(user, project) }}
             <section class="panel panel-default clearfix">
                 <header class="panel-heading col-lg-12">
                     <h4>
@@ -29,48 +30,21 @@
 {% endif %}
 
 {% if ec.rightsChanges|length > 0 %}
-    <table class="table table-bordered table-hover table-striped rightschanges-table">
-        <thead>
-            {% for key in ['date', 'rights', 'admin', 'summary'] %}
-                <th>
-                    <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                        {{ msg(key)|capitalize_first }}
-                        <span class="glyphicon glyphicon-sort"></span>
-                    </span>
-                </th>
-            {% endfor %}
-        </thead>
-        <tbody>
-            {% for timestamp, change in ec.rightsChanges %}
-                <tr>
-                    <td class="sort-entry--date" data-value="{{ timestamp }}">
-                        {{ wiki.logLink(project, change.logId, timestamp|date_format) }}
-                    </td>
-                    <td class="sort-entry--rights" data-value="{{ change.added|length + change.removed|length }}">
-                        {% for right in change.added %}
-                            <div class="diff-pos">{{ right|trim }}</div>
-                        {% endfor %}
-                        {% for right in change.removed %}
-                            <div class="diff-neg">-{{ right|trim }}</div>
-                        {% endfor %}
-                    </td>
-                    <td class="sort-entry--admin" data-value="{{ change.admin }}">
-                        {{ wiki.userLink(change.admin, project) }}
-                    </td>
-                    <td class="sort-entry--summary" data-value="{{ change.comment }}">
-                        {% if change.automatic %}
-                            <i class="text-muted">{{ msg('automatic') }}</i>
-                        {% else %}
-                            {{ change.comment|wikify(project)|raw }}
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    {% include 'editCounter/rights_changes_table.html.twig' with {'rightsChanges': ec.rightsChanges} %}
 {% else %}
     <div class="alert alert-info">
         {{ msg('no-result', [user.username]) }}
+    </div>
+{% endif %}
+
+{% if ec.globalRightsChanges|length > 0 %}
+    <h4 class="xt-show-hide--parent">
+        {{ msg('global-rights-changes') }}
+        <small class='xt-show'>[{{ msg('show')|lower }}]</small>
+        <small class='xt-hide'>[{{ msg('hide')|lower }}]</small>
+    </h4>
+    <div class="xt-show-hide--target">
+        {% include 'editCounter/rights_changes_table.html.twig' with {'rightsChanges': ec.globalRightsChanges} %}
     </div>
 {% endif %}
 

@@ -232,25 +232,25 @@
     )}})
 {% endspaceless %}{% endmacro %}
 
-{% macro userLinks(user, project, tool) %}{% spaceless %}
+{% macro userLinks(user, project, tool = '') %}{% spaceless %}
     {% import _self as wiki %}
     <p class="text-center xt-heading-subtitle">
         {% if tool == 'ec' %}
             {{ wiki.userLogLink(user, project) }}
         {% else %}
-            {{ wiki.blockLogLink(user.username, project) }}
             {% if enabled('ec') %}
-                &middot;
                 <a href="{{ path('EditCounterResult', {'project':project.domain, 'username':user.username}) }}">{{ msg('tool-ec') }}</a>
+                &middot;
             {% endif %}
+            {{ wiki.blockLogLink(user.username, project) }}
+        {% endif %}
+        {% if not(isSingleWiki()) %}
+            &middot;
+            {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, msg('sul-info')) }}
         {% endif %}
         &middot;
         {% if isWMFLabs() %}
             {{ wiki.gucLink(user.username) }}
-            &middot;
-        {% endif %}
-        {% if not(isSingleWiki()) %}
-            {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, msg('sul-info')) }}
             &middot;
         {% endif %}
         {% if isWMFLabs() %}

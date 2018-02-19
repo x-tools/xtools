@@ -127,6 +127,7 @@
 	"general-stats": "Section header of section showing general statistics about a page or user.",
 	"global-contribs": "Link to the Global Contributions tool.",
 	"global-other-sites-edit-count": "Label for the number of edits a user made to a projects other than specific projects that are listed.\n{{Identical|Other project}}",
+	"global-rights-changes": "Heading for section listing the changes to a user's global rights over time.",
 	"global-total-edit-count": "Label for the number of edits a user made to all projects.\n{{Identical|All projects}}",
 	"global-user-groups": "Label for list of global user groups a user belongs to.",
 	"help-translate": "Link to translation page on translatewiki, to encourage the user to help translate",

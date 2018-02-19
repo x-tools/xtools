@@ -111,7 +111,7 @@
         {% endset %}
         {{ layout.content_block(headerLink, content, downloadLink, 'top-edited-pages', true) }}
 
-        {% if ec.rightsChanges|length > 0 %}
+        {% if ec.rightsChanges|length > 0 or ec.globalRightsChanges|length > 0 %}
             {% set content %}
                 {% include 'editCounter/rights_changes.html.twig' with {
                     'is_sub_request': true,

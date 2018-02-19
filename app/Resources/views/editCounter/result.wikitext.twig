@@ -27,7 +27,7 @@
     'project': project.domain,
     'namespace': 'all',
     'format': 'wikitext'
-})) }}{% if ec.rightsChanges|length > 0 %}{{ render(path('EditCounterRightsChanges', {
+})) }}{% if ec.rightsChanges|length > 0 or ec.globalRightsChanges|length > 0 %}{{ render(path('EditCounterRightsChanges', {
     'username': user.username,
     'project': project.domain,
     'format': 'wikitext'

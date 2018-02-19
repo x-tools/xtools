@@ -268,7 +268,15 @@ class Edit extends Model
         Page $page = null,
         $useUnnormalizedPageTitle = false
     ) {
-        $summary = htmlspecialchars($summary, ENT_NOQUOTES);
+        $summary = htmlspecialchars(html_entity_decode($summary), ENT_NOQUOTES);
+
+        // First link raw URLs. Courtesy of https://stackoverflow.com/a/11641499/604142
+        $summary = preg_replace(
+            '%\b(([\w-]+://?|www[.])[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|/)))%s',
+            '<a target="_blank" href="$1">$1</a>',
+            $summary
+        );
+
         $sectionMatch = null;
         $isSection = preg_match_all("/^\/\* (.*?) \*\//", $summary, $sectionMatch);
 
