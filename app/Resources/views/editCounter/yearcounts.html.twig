@@ -28,51 +28,57 @@
                 <div class="panel-body col-lg-12">
 {% endif %}
 
-<div class="sr-only">
-    {% for year,total in ec.yearTotals %}
-        <div>{{ year }} &mdash; {{ total|num_format }}</div>
-    {% endfor %}
-</div>
-
-{# Set height of chart based on how many years (horizontal rows) are being reported. #}
-<div style="position:relative; height:{{ (25 * ec.yearCounts.yearLabels|length) + 30 }}px">
-    <canvas id="yearcounts-canvas"></canvas>
-</div>
-<script type="text/javascript">
-    $(function() {
-        /** @type {Array} To be passed into Chart.js */
-        var datasets = [];
-
-        /** @type {Array} The labels for the y-axis. */
-        var labels = {{ ec.monthCounts.yearLabels|json_encode|raw }};
-
-        /** @type {Number} Max value of the year totals */
-        var maxTotal = 0;
-
-        // Format data for use in charts.
-        {% for nsId,namespaceData in ec.yearCounts.totals %}
-            var dataset = {
-                label: "{{ nsName(nsId, project.namespaces) }}",
-                backgroundColor: "{{ color(nsId) }}",
-                data: [],
-            };
-
-            {% for year,yearData in namespaceData %}
-                dataset.data.push({{ yearData }});
-
-                // Determine maximum value for the totals. This is needed
-                //   so that we know how much spacing to add in the labels.
-                if ({{ yearData }} > maxTotal) {
-                    maxTotal = {{ yearData }};
-                }
-            {%- endfor -%}
-
-            datasets.push(dataset);
+{% if ec.yearTotals|length > 0 %}
+    <div class="sr-only">
+        {% for year,total in ec.yearTotals %}
+            <div>{{ year }} &mdash; {{ total|num_format }}</div>
         {% endfor %}
+    </div>
 
-        window.setupMonthYearChart('year', datasets, labels, maxTotal);
-    });
-</script>
+    {# Set height of chart based on how many years (horizontal rows) are being reported. #}
+    <div style="position:relative; height:{{ (25 * ec.yearCounts.yearLabels|length) + 30 }}px">
+        <canvas id="yearcounts-canvas"></canvas>
+    </div>
+    <script type="text/javascript">
+        $(function() {
+            /** @type {Array} To be passed into Chart.js */
+            var datasets = [];
+
+            /** @type {Array} The labels for the y-axis. */
+            var labels = {{ ec.monthCounts.yearLabels|json_encode|raw }};
+
+            /** @type {Number} Max value of the year totals */
+            var maxTotal = 0;
+
+            // Format data for use in charts.
+            {% for nsId,namespaceData in ec.yearCounts.totals %}
+                var dataset = {
+                    label: "{{ nsName(nsId, project.namespaces) }}",
+                    backgroundColor: "{{ color(nsId) }}",
+                    data: [],
+                };
+
+                {% for year,yearData in namespaceData %}
+                    dataset.data.push({{ yearData }});
+
+                    // Determine maximum value for the totals. This is needed
+                    //   so that we know how much spacing to add in the labels.
+                    if ({{ yearData }} > maxTotal) {
+                        maxTotal = {{ yearData }};
+                    }
+                {%- endfor -%}
+
+                datasets.push(dataset);
+            {% endfor %}
+
+            window.setupMonthYearChart('year', datasets, labels, maxTotal);
+        });
+    </script>
+{% else %}
+    <div class="alert alert-info">
+        {{ msg('no-contribs') }}
+    </div>
+{% endif %}
 
 {% if not is_sub_request %}
     </div></section></div></div>

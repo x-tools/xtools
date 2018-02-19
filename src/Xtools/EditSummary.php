@@ -181,12 +181,19 @@ class EditSummary extends Model
     {
         // Do our database work in the Repository, passing in reference
         // to $this->processRow so we can do post-processing here.
-        $this->data = $this->getRepository()->prepareData(
+        $ret = $this->getRepository()->prepareData(
             $this->project,
             $this->user,
             $this->namespace,
             [$this, 'processRow']
         );
+
+        // We want to keep all the default zero values if there are no contributions.
+        if (count($ret) > 0) {
+            $this->data = $ret;
+        }
+
+        return $ret;
     }
 
     /**

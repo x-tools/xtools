@@ -23,54 +23,60 @@
                 <div class="panel-body col-lg-12">
 {% endif %}
 
-<table class="table table-bordered table-hover table-striped latest-global-table">
-    <thead><tr>
-        {% for key in ['date', 'project', 'links', 'page-title', 'size', 'edit-summary'] %}
-            <th>
-                <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
-                    {% if key == 'average-time-bw-edits' %}
-                        atbe<sup>1</sup>
-                    {% else %}
-                        {{ msg(key)|capitalize_first }}
-                    {% endif %}
-                    {% if key == 'added_bytes' %}
-                        <sup class="rm-inline-margin-left">2</sup>
-                    {% endif %}
-                    {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
-                </span>
-            </th>
+{% if ec.globalEdits(40)|length > 0 %}
+    <table class="table table-bordered table-hover table-striped latest-global-table">
+        <thead><tr>
+            {% for key in ['date', 'project', 'links', 'page-title', 'size', 'edit-summary'] %}
+                <th>
+                    <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
+                        {% if key == 'average-time-bw-edits' %}
+                            atbe<sup>1</sup>
+                        {% else %}
+                            {{ msg(key)|capitalize_first }}
+                        {% endif %}
+                        {% if key == 'added_bytes' %}
+                            <sup class="rm-inline-margin-left">2</sup>
+                        {% endif %}
+                        {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
+                    </span>
+                </th>
+            {% endfor %}
+        </tr></thead>
+        <tbody>
+        {% for edit in ec.globalEdits(40) %}
+            <tr>
+                <td class="sort-entry--date" data-value="{{ edit.timestamp.format('U') }}">
+                    {{ wiki.permaLink(edit) }}
+                </td>
+                <td class="sort-entry--project" data-value="{{ edit.project.domain }}">
+                    {# Use project.domain here instead of title to preserve limited space in the interface #}
+                    <a href="{{ edit.project.url }}">{{ edit.project.domain }}</a>
+                </td>
+                <td>
+                    {{ wiki.diffLink(edit) }}
+                    &middot;
+                    {{ wiki.userLogLink(user, edit.project) }}
+                    &middot;
+                    <a href="{{ path('TopEditsResults', {project:edit.project.databaseName, username:user.username, namespace:edit.page.namespace, article:edit.page.titleWithoutNamespace}) }}">{{ msg('tool-topedits') }}</a>
+                </td>
+                <td class="sort-entry--page-title display-title" data-value="{{ edit.page.title }}">
+                    {{ wiki.pageLink(edit.page, edit.page.displayTitle) }}
+                </td>
+                <td class="sort-entry--size" data-value="{{ edit.lengthChange }}">
+                    {{ edit.lengthChange|diff_format }}
+                </td>
+                <td class="sort-entry--summary" data-value="{{ edit.comment }}">
+                    {{ edit.wikifiedComment|raw }}
+                </td>
+            </tr>
         {% endfor %}
-    </tr></thead>
-    <tbody>
-    {% for edit in ec.globalEdits(40) %}
-        <tr>
-            <td class="sort-entry--date" data-value="{{ edit.timestamp.format('U') }}">
-                {{ wiki.permaLink(edit) }}
-            </td>
-            <td class="sort-entry--project" data-value="{{ edit.project.domain }}">
-                {# Use project.domain here instead of title to preserve limited space in the interface #}
-                <a href="{{ edit.project.url }}">{{ edit.project.domain }}</a>
-            </td>
-            <td>
-                {{ wiki.diffLink(edit) }}
-                &middot;
-                {{ wiki.userLogLink(user, edit.project) }}
-                &middot;
-                <a href="{{ path('TopEditsResults', {project:edit.project.databaseName, username:user.username, namespace:edit.page.namespace, article:edit.page.titleWithoutNamespace}) }}">{{ msg('tool-topedits') }}</a>
-            </td>
-            <td class="sort-entry--page-title display-title" data-value="{{ edit.page.title }}">
-                {{ wiki.pageLink(edit.page, edit.page.displayTitle) }}
-            </td>
-            <td class="sort-entry--size" data-value="{{ edit.lengthChange }}">
-                {{ edit.lengthChange|diff_format }}
-            </td>
-            <td class="sort-entry--summary" data-value="{{ edit.comment }}">
-                {{ edit.wikifiedComment|raw }}
-            </td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+        </tbody>
+    </table>
+{% else %}
+    <div class="alert alert-info">
+        {{ msg('no-contribs') }}
+    </div>
+{% endif %}
 
 {% if not is_sub_request %}
     </div></section>

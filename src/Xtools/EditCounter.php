@@ -55,14 +55,17 @@ class EditCounter extends Model
     /** @var array Block data, with keys 'set' and 'received'. */
     protected $blocks;
 
-    /** @var integer[] Array keys are namespace IDs, values are the edit counts */
+    /** @var integer[] Array keys are namespace IDs, values are the edit counts. */
     protected $namespaceTotals;
 
-    /** @var int Number of semi-automated edits */
+    /** @var int Number of semi-automated edits. */
     protected $autoEditCount;
 
-    /** @var string[] Data needed for time card chart */
+    /** @var string[] Data needed for time card chart. */
     protected $timeCardData;
+
+    /** @var array Most recent revisions across all projects. */
+    protected $globalEdits;
 
     /**
      * Revision size data, with keys 'average_size', 'large_edits' and 'small_edits'.
@@ -1202,6 +1205,10 @@ class EditCounter extends Model
      */
     public function globalEdits($max)
     {
+        if (is_array($this->globalEdits)) {
+            return $this->globalEdits;
+        }
+
         // Collect all projects with any edits.
         $projects = [];
         foreach ($this->globalEditCounts() as $editCount) {
@@ -1210,6 +1217,10 @@ class EditCounter extends Model
                 continue;
             }
             $projects[$editCount['project']->getDatabaseName()] = $editCount['project'];
+        }
+
+        if (count($projects) === 0) {
+            return [];
         }
 
         // Get all revisions for those projects.
@@ -1231,8 +1242,9 @@ class EditCounter extends Model
 
         // Sort and prune, before adding more.
         krsort($globalEdits);
-        $globalEdits = array_slice($globalEdits, 0, $max);
-        return $globalEdits;
+        $this->globalEdits = array_slice($globalEdits, 0, $max);
+
+        return $this->globalEdits;
     }
 
     /**

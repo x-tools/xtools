@@ -291,7 +291,8 @@ $tooltip-shadow: #ccc;
 section > .panel-body {
     overflow-x: scroll;
 }
-.panel-body .table:only-child {
+.panel-body .table:only-child,
+.panel-body .alert:last-child {
     margin-bottom: 0;
 }
 .xt-panel-body {
