@@ -230,7 +230,7 @@ class TopEditsController extends XtoolsController
         }
 
         $limit = $article === '' ? 100 : 1000;
-        $topEdits = new TopEdits($project, $user, $namespace, $limit);
+        $topEdits = new TopEdits($project, $user, null, $namespace, $limit);
         $topEditsRepo = new TopEditsRepository();
         $topEditsRepo->setContainer($this->container);
         $topEdits->setRepository($topEditsRepo);
@@ -239,29 +239,28 @@ class TopEditsController extends XtoolsController
         $response->setEncodingOptions(JSON_NUMERIC_CHECK);
 
         if ($article === '') {
-            $data = $topEdits->getTopEditsNamespace();
-
-            if (is_numeric($namespace)) {
-                $data = $data[$namespace];
-            }
+            // Do format the results.
+            $topEdits->prepareData();
         } else {
             $namespaces = $project->getNamespaces();
             $fullPageName = is_numeric($namespace) ? $namespaces[$namespace].':'.$article : $article;
 
             $page = $this->getAndValidatePage($project, $fullPageName);
             if (is_a($page, 'Symfony\Component\HttpFoundation\RedirectResponse')) {
-                $data = [
+                $response->setData([
                     'error' => 'Page "'.$article.'" does not exist.',
-                ];
+                ]);
                 $response->setStatusCode(Response::HTTP_NOT_FOUND);
-            } else {
-                // Database sorts by timestamp ascending, and here we want it descending.
-                $data = array_reverse($page->getRevisions($user));
-                $response->setStatusCode(Response::HTTP_OK);
+                return $response;
             }
+
+            $topEdits->setPage($page);
+            $topEdits->prepareData(false);
         }
 
-        $response->setData($data);
+        $response->setData($topEdits->getTopEdits());
+        $response->setStatusCode(Response::HTTP_OK);
+
         return $response;
     }
 }
