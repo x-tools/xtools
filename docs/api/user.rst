@@ -130,7 +130,7 @@ Get the newest non-automated mainspace contributions made by `Jimbo Wales <https
 
 Edit summaries
 ==============
-``GET /api/user/edit_summeries/{project}/{username}/{namespace}``
+``GET /api/user/edit_summaries/{project}/{username}/{namespace}``
 
 Get statistics about a user's usage of edit summaries.
 
@@ -144,7 +144,7 @@ Get statistics about a user's usage of edit summaries.
 
 Get `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_'s edit summary statistics on the English Wikipedia.
 
-    https://xtools.wmflabs.org/api/user/edit_summeries/en.wikipedia/Jimbo_Wales
+    https://xtools.wmflabs.org/api/user/edit_summaries/en.wikipedia/Jimbo_Wales
 
 Top edits
 =========

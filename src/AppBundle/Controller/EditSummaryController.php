@@ -131,6 +131,9 @@ class EditSummaryController extends XtoolsController
 
         // Instantiate an EditSummary, treating the past 150 edits as 'recent'.
         $editSummary = new EditSummary($project, $user, $namespace, 150, $this->container);
+        $editSummaryRepo = new EditSummaryRepository();
+        $editSummaryRepo->setContainer($this->container);
+        $editSummary->setRepository($editSummaryRepo);
         $editSummary->prepareData();
 
         return new JsonResponse(
