@@ -142,6 +142,11 @@ class EditCounterController extends XtoolsController
             'ec' => $this->editCounter,
         ];
 
+        // Used when querying for global rights changes.
+        if ((bool)$this->container->hasParameter('app.is_labs')) {
+            $ret['metaProject'] = ProjectRepository::getProject('metawiki', $this->container);
+        }
+
         // Output the relevant format template.
         return $this->getFormattedReponse($request, 'editCounter/result', $ret);
     }
