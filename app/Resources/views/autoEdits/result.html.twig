@@ -26,7 +26,7 @@
 
         {% set content %}
             <div class="panel-body stat-list clearfix" id="summary">
-                <table class="table autoedits-table">
+                <table class="table autoedits-table pull-left">
                     {% if hasStartDate %}
                         <tr>
                             <td>{{ msg('start') }}</td>
@@ -61,20 +61,22 @@
                     </tr>
                 </table>
                 {% if editCount > 0 %}
-                    {{
-                        chart.pie_chart('auto_edits',
-                            [{
-                                label: msg('non-auto-edits'),
-                                value: editCount - autoCount,
-                                percentage: 100 - autoPct
-                            },
-                            {
-                                label: msg('auto-edits'),
-                                value: autoCount,
-                                percentage: autoPct
-                            }]
-                        )
-                    }}
+                    <div class="pull-left">
+                        {{
+                            chart.pie_chart('auto_edits',
+                                [{
+                                    label: msg('non-auto-edits'),
+                                    value: editCount - autoCount,
+                                    percentage: 100 - autoPct
+                                },
+                                {
+                                    label: msg('auto-edits'),
+                                    value: autoCount,
+                                    percentage: autoPct
+                                }]
+                            )
+                        }}
+                    </div>
                 {% endif %}
             </div>
 
