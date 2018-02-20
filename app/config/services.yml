@@ -13,13 +13,6 @@ services:
 #        class: AppBundle\Directory\ClassName
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
 
-    # controllers are imported separately to make sure they're public
-    # and have a tag that allows actions to type-hint services
-    AppBundle\Controller\:
-        resource: '../../src/AppBundle/Controller'
-        public: true
-        tags: ['controller.service_arguments']
-
     disabled_tool_subscriber:
         class: AppBundle\EventSubscriber\DisabledToolSubscriber
         arguments: ['@service_container']

@@ -7,6 +7,7 @@ namespace AppBundle\Controller;
 
 use Doctrine\DBAL\Connection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -30,22 +31,28 @@ class EditSummaryController extends XtoolsController
 
     /**
      * The Edit Summary search form.
+     *
+     * @param Request $request The HTTP request.
+     *
      * @Route("/editsummary",           name="es")
      * @Route("/editsummary",           name="EditSummary")
      * @Route("/editsummary/",          name="EditSummarySlash")
      * @Route("/editsummary/index.php", name="EditSummaryIndexPhp")
      * @Route("/editsummary/{project}", name="EditSummaryProject")
+     *
      * @return Response
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
+        $params = $this->parseQueryParams($request);
+
         // If we've got a project, user, and namespace, redirect to results.
-        if (isset($this->params['project']) && isset($this->params['username'])) {
-            return $this->redirectToRoute('EditSummaryResult', $this->params);
+        if (isset($params['project']) && isset($params['username'])) {
+            return $this->redirectToRoute('EditSummaryResult', $params);
         }
 
         // Convert the given project (or default project) into a Project instance.
-        $this->params['project'] = $this->getProjectFromQuery($this->params);
+        $params['project'] = $this->getProjectFromQuery($params);
 
         // Show the form.
         return $this->render('editSummary/index.html.twig', array_merge([
@@ -53,21 +60,25 @@ class EditSummaryController extends XtoolsController
             'xtSubtitle' => 'tool-es-desc',
             'xtPage' => 'es',
 
-            // Defaults that will get overriden if in $this->params.
+            // Defaults that will get overriden if in $params.
             'namespace' => 0,
-        ], $this->params));
+        ], $params));
     }
 
     /**
      * Display the Edit Summary results
-     * @Route("/editsummary/{project}/{username}/{namespace}", name="EditSummaryResult")
+     *
+     * @param Request $request The HTTP request.
      * @param string $namespace Namespace ID or 'all' for all namespaces.
+     *
+     * @Route("/editsummary/{project}/{username}/{namespace}", name="EditSummaryResult")
+     *
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction($namespace = 0)
+    public function resultAction(Request $request, $namespace = 0)
     {
-        $ret = $this->validateProjectAndUser('es');
+        $ret = $this->validateProjectAndUser($request, 'es');
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {
@@ -101,15 +112,16 @@ class EditSummaryController extends XtoolsController
     /**
      * Get basic stats on the edit summary usage of a user.
      * @Route("/api/user/edit_summaries/{project}/{username}/{namespace}", name="UserApiEditSummaries")
+     * @param Request $request The HTTP request.
      * @param string $namespace Namespace ID or 'all' for all namespaces.
      * @return Response
      * @codeCoverageIgnore
      */
-    public function editSummariesApiAction($namespace = 0)
+    public function editSummariesApiAction(Request $request, $namespace = 0)
     {
         $this->recordApiUsage('user/edit_summaries');
 
-        $ret = $this->validateProjectAndUser();
+        $ret = $this->validateProjectAndUser($request);
         if ($ret instanceof RedirectResponse) {
             // FIXME: needs to render as JSON, fetching the message from the FlashBag.
             return $ret;

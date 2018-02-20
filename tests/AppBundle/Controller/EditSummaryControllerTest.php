@@ -28,6 +28,8 @@ class EditSummaryControllerTest extends WebTestCase
     {
         $this->client = static::createClient();
         $this->container = $this->client->getContainer();
+        $this->controller = new EditSummaryController();
+        $this->controller->setContainer($this->container);
     }
 
     /**

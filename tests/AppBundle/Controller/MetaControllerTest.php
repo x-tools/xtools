@@ -28,6 +28,8 @@ class MetaControllerTest extends WebTestCase
     {
         $this->client = static::createClient();
         $this->container = $this->client->getContainer();
+        $this->controller = new MetaController();
+        $this->controller->setContainer($this->container);
     }
 
     /**

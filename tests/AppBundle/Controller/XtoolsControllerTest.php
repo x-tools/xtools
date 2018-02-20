@@ -7,7 +7,6 @@ namespace Tests\AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use AppBundle\Controller\SimpleEditCounterController;
 use Xtools\Project;
 use Xtools\ProjectRepository;
@@ -36,27 +35,10 @@ class XtoolsControllerTest extends WebTestCase
         $this->client = static::createClient();
         $this->container = $this->client->getContainer();
 
-        // Inidial dummy request to make the constructor happy.
-        $request = new Request([
-            '_controller' => 'AppBundle\Controller\SimpleEditCounterController::indexAction',
-            'project' => 'en.wikipedia.org',
-            'username' => 'Jimbo Wales',
-            'namespace' => '0',
-            'article' => 'Test page',
-            'start' => '2016-01-01',
-            'end' => '2017-01-01',
-        ]);
-
-        $mockStack = $this->getMock(RequestStack::class);
-        $mockStack->method('getCurrentRequest')
-            ->willReturn($request);
-
         // SimpleEditCounterController used solely for testing, since we
         // can't instantiate the abstract class XtoolsController.
-        $this->controller = new SimpleEditCounterController($mockStack, $this->container);
+        $this->controller = new SimpleEditCounterController();
         $this->controller->setContainer($this->container);
-
-        $this->reflectionClass = new \ReflectionClass($this->controller);
     }
 
     /**
@@ -71,11 +53,6 @@ class XtoolsControllerTest extends WebTestCase
         }
 
         $request = new Request($params);
-
-        $prop = $this->reflectionClass->getProperty('request');
-        $prop->setAccessible(true);
-        $prop->setValue($this->controller, $request);
-
         $result = $this->controller->parseQueryParams($request);
         $this->assertEquals($expected, $result);
     }
@@ -221,16 +198,12 @@ class XtoolsControllerTest extends WebTestCase
             return;
         }
 
-        $prop = $this->reflectionClass->getProperty('request');
-        $prop->setAccessible(true);
-
         $request = new Request([
             'project' => 'fr.wikibooks.org',
             'username' => 'MusikAnimal',
             'namespace' => '0',
         ]);
-        $prop->setValue($this->controller, $request);
-        list($project, $user) = $this->controller->validateProjectAndUser();
+        list($project, $user) = $this->controller->validateProjectAndUser($request);
         $this->assertEquals('fr.wikibooks.org', $project->getDomain());
         $this->assertEquals('MusikAnimal', $user->getUsername());
 
@@ -238,16 +211,14 @@ class XtoolsControllerTest extends WebTestCase
             'project' => 'fr.wikibooks.org',
             'username' => 'Not a real user 8723849237',
         ]);
-        $prop->setValue($this->controller, $request);
-        $ret = $this->controller->validateProjectAndUser();
+        $ret = $this->controller->validateProjectAndUser($request);
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $ret);
 
         $request = new Request([
             'project' => 'invalid.project.org',
             'username' => 'MusikAnimal',
         ]);
-        $prop->setValue($this->controller, $request);
-        $ret = $this->controller->validateProjectAndUser();
+        $ret = $this->controller->validateProjectAndUser($request);
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $ret);
 
         // Too high of an edit count.
@@ -255,8 +226,7 @@ class XtoolsControllerTest extends WebTestCase
             'project' => 'en.wikipedia.org',
             'username' => 'Materialscientist',
         ]);
-        $prop->setValue($this->controller, $request);
-        $ret = $this->controller->validateProjectAndUser('homepage');
+        $ret = $this->controller->validateProjectAndUser($request, 'homepage');
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $ret);
     }
 
@@ -272,11 +242,6 @@ class XtoolsControllerTest extends WebTestCase
             'article' => 'Foo',
             'redirects' => ''
         ]);
-
-        $prop = $this->reflectionClass->getProperty('request');
-        $prop->setAccessible(true);
-        $prop->setValue($this->controller, $request);
-
         $this->assertEquals([
             'project' => 'enwiki',
             'username' => 'Test user',

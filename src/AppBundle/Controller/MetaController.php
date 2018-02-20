@@ -7,6 +7,7 @@ namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use DateTime;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\DBAL\Connection;
@@ -22,12 +23,15 @@ class MetaController extends XtoolsController
      * @Route("/meta", name="Meta")
      * @Route("/meta/", name="MetaSlash")
      * @Route("/meta/index.php", name="MetaIndexPhp")
+     * @param Request $request
      * @return Response
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
-        if (isset($this->params['start']) && isset($this->params['end'])) {
-            return $this->redirectToRoute('MetaResult', $this->params);
+        $params = $this->parseQueryParams($request);
+
+        if (isset($params['start']) && isset($params['end'])) {
+            return $this->redirectToRoute('MetaResult', $params);
         }
 
         return $this->render('meta/index.html.twig', [
@@ -188,6 +192,7 @@ class MetaController extends XtoolsController
      * Record usage of a particular XTools tool. This is called automatically
      *   in base.html.twig via JavaScript so that it is done asynchronously
      * @Route("/meta/usage/{tool}/{project}/{token}")
+     * @param  Request $request
      * @param  string $tool    Internal name of tool
      * @param  string $project Project domain such as en.wikipedia.org
      * @param  string $token   Unique token for this request, so we don't have people
@@ -195,14 +200,14 @@ class MetaController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function recordUsage($tool, $project, $token)
+    public function recordUsage(Request $request, $tool, $project, $token)
     {
         // Ready the response object.
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
 
         // Validate method and token.
-        if ($this->request->getMethod() !== 'PUT' || !$this->isCsrfTokenValid('intention', $token)) {
+        if ($request->getMethod() !== 'PUT' || !$this->isCsrfTokenValid('intention', $token)) {
             $response->setStatusCode(Response::HTTP_FORBIDDEN);
             $response->setContent(json_encode([
                 'error' => 'This endpoint is for internal use only.'

@@ -7,6 +7,7 @@ namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -39,43 +40,47 @@ class TopEditsController extends XtoolsController
      * @Route("/topedits/", name="topEditsSlash")
      * @Route("/topedits/index.php", name="TopEditsIndex")
      * @Route("/topedits/{project}", name="TopEditsProject")
+     * @param Request $request
      * @return Response
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
+        $params = $this->parseQueryParams($request);
+
         // Redirect if at minimum project and username are provided.
-        if (isset($this->params['project']) && isset($this->params['username'])) {
-            return $this->redirectToRoute('TopEditsResults', $this->params);
+        if (isset($params['project']) && isset($params['username'])) {
+            return $this->redirectToRoute('TopEditsResults', $params);
         }
 
         // Convert the given project (or default project) into a Project instance.
-        $this->params['project'] = $this->getProjectFromQuery($this->params);
+        $params['project'] = $this->getProjectFromQuery($params);
 
         return $this->render('topedits/index.html.twig', array_merge([
             'xtPageTitle' => 'tool-topedits',
             'xtSubtitle' => 'tool-topedits-desc',
             'xtPage' => 'topedits',
 
-            // Defaults that will get overriden if in $this->params.
+            // Defaults that will get overriden if in $params.
             'namespace' => 0,
             'article' => '',
-        ], $this->params));
+        ], $params));
     }
 
     /**
      * Display the results.
      * @Route("/topedits/{project}/{username}/{namespace}/{article}", name="TopEditsResults",
      *     requirements={"article"=".+"})
+     * @param Request $request The HTTP request.
      * @param int $namespace
      * @param string $article
      * @return RedirectResponse|Response
      * @codeCoverageIgnore
      */
-    public function resultAction($namespace = 0, $article = '')
+    public function resultAction(Request $request, $namespace = 0, $article = '')
     {
         // Second parameter causes it return a Redirect to the index if the user has too many edits.
         // We only want to do this when looking at the user's overall edits, not just to a specific article.
-        $ret = $this->validateProjectAndUser($article !== '' ?  null : 'topedits');
+        $ret = $this->validateProjectAndUser($request, $article !== '' ?  null : 'topedits');
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {
@@ -83,7 +88,7 @@ class TopEditsController extends XtoolsController
         }
 
         if ($article === '') {
-            return $this->namespaceTopEdits($user, $projectData, $namespace);
+            return $this->namespaceTopEdits($request, $user, $projectData, $namespace);
         } else {
             return $this->singlePageTopEdits($user, $projectData, $namespace, $article);
         }
@@ -91,15 +96,16 @@ class TopEditsController extends XtoolsController
 
     /**
      * List top edits by this user for all pages in a particular namespace.
+     * @param Request $request The HTTP request.
      * @param User $user The User.
      * @param Project $project The project.
      * @param integer|string $namespace The namespace ID or 'all'
      * @return \Symfony\Component\HttpFoundation\Response
      * @codeCoverageIgnore
      */
-    public function namespaceTopEdits(User $user, Project $project, $namespace)
+    public function namespaceTopEdits(Request $request, User $user, Project $project, $namespace)
     {
-        $isSubRequest = $this->request->get('htmlonly')
+        $isSubRequest = $request->get('htmlonly')
             || $this->container->get('request_stack')->getParentRequest() !== null;
 
         // Make sure they've opted in to see this data.
@@ -144,7 +150,7 @@ class TopEditsController extends XtoolsController
         ];
 
         // Output the relevant format template.
-        return $this->getFormattedReponse('topedits/result_namespace', $ret);
+        return $this->getFormattedReponse($request, 'topedits/result_namespace', $ret);
     }
 
     /**
@@ -194,19 +200,20 @@ class TopEditsController extends XtoolsController
      *     requirements={"article"=".+", "namespace"="|\d+|all"})
      * @Route("/api/user/top_edits/{project}/{username}/{namespace}/{article}", name="UserApiTopEditsArticleUnderscored",
      *     requirements={"article"=".+", "namespace"="|\d+|all"})
+     * @param Request $request
      * @param int|string $namespace The ID of the namespace of the page, or 'all' for all namespaces.
      * @param string $article The title of the page. A full title can be used if the $namespace is blank.
      * @return Response
      * TopEdits and its Repo cannot be stubbed here :(
      * @codeCoverageIgnore
      */
-    public function topEditsUserApiAction($namespace = 0, $article = '')
+    public function topEditsUserApiAction(Request $request, $namespace = 0, $article = '')
     {
         $this->recordApiUsage('user/topedits');
 
         // Second parameter causes it return a Redirect to the index if the user has too many edits.
         // We only want to do this when looking at the user's overall edits, not just to a specific article.
-        $ret = $this->validateProjectAndUser($article !== '' ?  null : 'topedits');
+        $ret = $this->validateProjectAndUser($request, $article !== '' ?  null : 'topedits');
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {

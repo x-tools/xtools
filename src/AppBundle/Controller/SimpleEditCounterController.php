@@ -8,6 +8,7 @@ namespace AppBundle\Controller;
 use Doctrine\DBAL\Connection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -37,24 +38,27 @@ class SimpleEditCounterController extends XtoolsController
      * @Route("/sc/", name="SimpleEditCounterSlash")
      * @Route("/sc/index.php", name="SimpleEditCounterIndexPhp")
      * @Route("/sc/{project}", name="SimpleEditCounterProject")
+     * @param Request $request The HTTP request.
      * @return Response
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
+        $params = $this->parseQueryParams($request);
+
         // Redirect if project and username are given.
-        if (isset($this->params['project']) && isset($this->params['username'])) {
-            return $this->redirectToRoute('SimpleEditCounterResult', $this->params);
+        if (isset($params['project']) && isset($params['username'])) {
+            return $this->redirectToRoute('SimpleEditCounterResult', $params);
         }
 
         // Convert the given project (or default project) into a Project instance.
-        $this->params['project'] = $this->getProjectFromQuery($this->params);
+        $params['project'] = $this->getProjectFromQuery($params);
 
         // Show the form.
         return $this->render('simpleEditCounter/index.html.twig', [
             'xtPageTitle' => 'tool-sc',
             'xtSubtitle' => 'tool-sc-desc',
             'xtPage' => 'sc',
-            'project' => $this->params['project'],
+            'project' => $params['project'],
 
             // Defaults that will get overriden if in $params.
             'namespace' => 'all',
@@ -74,15 +78,16 @@ class SimpleEditCounterController extends XtoolsController
      *         "namespace" = "|all|\d+"
      *     }
      * )
+     * @param Request $request The HTTP request.
      * @param int|string $namespace Namespace ID or 'all' for all namespaces.
      * @param null|string $start
      * @param null|string $end
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction($namespace = 'all', $start = false, $end = false)
+    public function resultAction(Request $request, $namespace = 'all', $start = false, $end = false)
     {
-        $ret = $this->validateProjectAndUser();
+        $ret = $this->validateProjectAndUser($request);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {
@@ -121,6 +126,7 @@ class SimpleEditCounterController extends XtoolsController
      *         "namespace" = "|all|\d+"
      *     }
      * )
+     * @param Request $request
      * @param int|string $namespace Namespace ID or 'all' for all namespaces.
      * @param null|string $start
      * @param null|string $end
@@ -128,6 +134,7 @@ class SimpleEditCounterController extends XtoolsController
      * @codeCoverageIgnore
      */
     public function simpleEditCounterApiAction(
+        Request $request,
         $namespace = 'all',
         $start = false,
         $end = false
@@ -136,7 +143,7 @@ class SimpleEditCounterController extends XtoolsController
 
         // Here we do want to impose the max edit count restriction. Even though the
         // query is very 'simple', it can still run too slow for an API.
-        $ret = $this->validateProjectAndUser('sc');
+        $ret = $this->validateProjectAndUser($request, 'sc');
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {
