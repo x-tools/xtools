@@ -49,7 +49,9 @@
         <thead>
             <th></th>
             {% for period in 0..11 %}
-                <th>{{ period * 2 }}:00</th>
+                <th>
+                    <time>{{ period * 2 }}:00</time>
+                </th>
             {% endfor %}
         </thead>
         <tbody>

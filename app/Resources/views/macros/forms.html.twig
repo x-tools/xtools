@@ -2,8 +2,8 @@
 <div class="input-group{% if isSingleWiki() %} hidden{% endif %} form-row">
     <label class="input-group-addon form-label" for="project_input">
         {{ msg('project') }}
-        <div class="glyphicon glyphicon-info-sign tooltipcss pull-right">
-            <div class="tooltip-body">
+        <div class="glyphicon glyphicon-info-sign tooltipcss pull-right" role="dialog" aria-labelledby="accepted-formats-desc">
+            <div class="tooltip-body" id="accepted-formats-desc">
                 <strong>{{ msg('accepted-formats') }}:</strong>
                 <code>enwiki</code>, <code>en.wikipedia</code>,
                 <span class="text-nowrap"><code>en.wikipedia.org</code></span>
@@ -37,8 +37,8 @@
     <label class="input-group-addon form-label" for="user_input">
         {{ msg('username') }}
         {% if multiple or noip == false %}
-            <div class="glyphicon glyphicon-info-sign tooltipcss pull-right">
-                <div class="tooltip-body">
+            <div class="glyphicon glyphicon-info-sign tooltipcss pull-right" role="dialog" aria-labelledby="user-format-desc">
+                <div class="tooltip-body" id="user-format-desc">
                     {% if multiple %}
                         <strong>{{ msg('multiple-users-allowed') }}:</strong>
                         <br>e.g. <code>UserX|UserY|UserZ</code>

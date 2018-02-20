@@ -35,87 +35,93 @@
     </div>
 {% else %}
 
-{% for ns, pages in te.topEdits %}
-    {% set showPageAssessment = ns == 0 and project.hasPageAssessments %}
-    {% set content %}
-    <table class="table table-bordered table-hover table-striped topedits-namespace-table xt-show-hide--target">
-        <thead><tr>
-            <th>
-                <span class="sort-link sort-link--edits" data-column="edits">
-                    {{ msg('edits')|capitalize_first }}
-                    <span class="glyphicon glyphicon-sort"></span>
-                </span>
-            </th>
-            <th>
-                <span class="sort-link sort-link--page" data-column="page">
-                    {{ msg('page-title') }}
-                    <span class="glyphicon glyphicon-sort"></span>
-                </span>
-            </th>
-            {% if showPageAssessment %}
+{% if te.topEdits|length > 0 %}
+    {% for ns, pages in te.topEdits %}
+        {% set showPageAssessment = ns == 0 and project.hasPageAssessments %}
+        {% set content %}
+        <table class="table table-bordered table-hover table-striped topedits-namespace-table xt-show-hide--target">
+            <thead><tr>
                 <th>
-                    <span class="sort-link sort-link--assessment" data-column="assessment">
-                        {{ msg('assessment') }}
+                    <span class="sort-link sort-link--edits" data-column="edits">
+                        {{ msg('edits')|capitalize_first }}
                         <span class="glyphicon glyphicon-sort"></span>
                     </span>
                 </th>
-            {% endif %}
-            <th>{{ msg('links') }}</th>
-        </tr></thead>
-        <tbody>
-            {% for page in pages %}
-            <tr>
-                <td class="sort-entry--edits" data-value="{{ page.count }}">
-                    {{ page.count|num_format }}
-                </td>
-                <td class="sort-entry--page display-title" data-value="{{ page.page_title_ns }}">
-                    {{ wiki.pageLinkRaw(page.page_title_ns, project, page.displaytitle) }}
-                </td>
+                <th>
+                    <span class="sort-link sort-link--page" data-column="page">
+                        {{ msg('page-title') }}
+                        <span class="glyphicon glyphicon-sort"></span>
+                    </span>
+                </th>
                 {% if showPageAssessment %}
-                    <td class="sort-entry--assessment" data-value="{{ page.pa_class ? page.pa_class : 'Unknown' }}">
-                        {% set badge = project.assessmentBadgeURL(page.pa_class) %}
-                        {% if badge is defined %}
-                            <img alt="{{ page.pa_class }}" src="{{ badge }}" class="assessment-badge" />
-                        {% endif %}
-                        {{ page.pa_class ? page.pa_class : msg('unknown') }}
-                    </td>
+                    <th>
+                        <span class="sort-link sort-link--assessment" data-column="assessment">
+                            {{ msg('assessment') }}
+                            <span class="glyphicon glyphicon-sort"></span>
+                        </span>
+                    </th>
                 {% endif %}
-                <td>
-                    {{ wiki.pageLogLinkRaw(page.page_title_ns, project) }}
-                    &middot;
-                    <a href="{{ path('ArticleInfoResult', {project:project.domain, article:page.page_title_ns}) }}">{{ msg('tool-articleinfo') }}</a>
-                    &middot;
-                    <a href="{{ path('TopEditsResults', {project:project.domain, username:user.username, namespace:page.page_namespace, article:page.page_title}) }}" >{{ msg('tool-topedits') }}</a>
-                </td>
-            </tr>
-            {% endfor %}
-            {% if pages|length >= 10 and te.topEdits|length > 1 %}
+                <th>{{ msg('links') }}</th>
+            </tr></thead>
+            <tbody>
+                {% for page in pages %}
                 <tr>
-                    <td colspan={{ showPageAssessment ? 4 : 3 }}>
-                        <a href="{{ path('TopEditsResults', {project:project.domain, username:user.username, namespace:ns, article:''}) }}">
-                            {{ msg('more') }}&hellip;
-                        </a>
+                    <td class="sort-entry--edits" data-value="{{ page.count }}">
+                        {{ page.count|num_format }}
+                    </td>
+                    <td class="sort-entry--page display-title" data-value="{{ page.page_title_ns }}">
+                        {{ wiki.pageLinkRaw(page.page_title_ns, project, page.displaytitle) }}
+                    </td>
+                    {% if showPageAssessment %}
+                        <td class="sort-entry--assessment" data-value="{{ page.pa_class ? page.pa_class : 'Unknown' }}">
+                            {% set badge = project.assessmentBadgeURL(page.pa_class) %}
+                            {% if badge is defined %}
+                                <img alt="{{ page.pa_class }}" src="{{ badge }}" class="assessment-badge" />
+                            {% endif %}
+                            {{ page.pa_class ? page.pa_class : msg('unknown') }}
+                        </td>
+                    {% endif %}
+                    <td>
+                        {{ wiki.pageLogLinkRaw(page.page_title_ns, project) }}
+                        &middot;
+                        <a href="{{ path('ArticleInfoResult', {project:project.domain, article:page.page_title_ns}) }}">{{ msg('tool-articleinfo') }}</a>
+                        &middot;
+                        <a href="{{ path('TopEditsResults', {project:project.domain, username:user.username, namespace:page.page_namespace, article:page.page_title}) }}" >{{ msg('tool-topedits') }}</a>
                     </td>
                 </tr>
-            {% endif %}
-        </tbody>
-    </table>
-    {% endset %}
+                {% endfor %}
+                {% if pages|length >= 10 and te.topEdits|length > 1 %}
+                    <tr>
+                        <td colspan={{ showPageAssessment ? 4 : 3 }}>
+                            <a href="{{ path('TopEditsResults', {project:project.domain, username:user.username, namespace:ns, article:''}) }}">
+                                {{ msg('more') }}&hellip;
+                            </a>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+        {% endset %}
 
-    {% if is_sub_request %}
-        <h4 class="xt-show-hide--parent">
-            {{ nsName(ns, project.namespaces) }}
-            <small class='xt-show'>[{{ msg('show')|lower }}]</small>
-            <small class='xt-hide'>[{{ msg('hide')|lower }}]</small>
-        </h4>
-    {% endif %}
+        {% if is_sub_request %}
+            <h4 class="xt-show-hide--parent">
+                {{ nsName(ns, project.namespaces) }}
+                <small class='xt-show'>[{{ msg('show')|lower }}]</small>
+                <small class='xt-hide'>[{{ msg('hide')|lower }}]</small>
+            </h4>
+        {% endif %}
 
-    {% if is_sub_request %}
-        {{ content }}
-    {% else %}
-        {{ layout.content_block(nsName(ns, project.namespaces), content, '', ns, true, te.topEdits|length > 1) }}
-    {% endif %}
-{% endfor %}
+        {% if is_sub_request %}
+            {{ content }}
+        {% else %}
+            {{ layout.content_block(nsName(ns, project.namespaces), content, '', ns, true, te.topEdits|length > 1) }}
+        {% endif %}
+    {% endfor %}
+{% else %}
+    <div class="alert alert-info">
+        {{ msg('no-contribs') }}
+    </div>
+{% endif %}
 
 {% endif %}
 
