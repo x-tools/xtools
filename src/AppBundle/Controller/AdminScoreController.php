@@ -7,7 +7,6 @@ namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -16,11 +15,10 @@ use Xtools\ProjectRepository;
 use Xtools\UserRepository;
 
 /**
- * The AdminScoreController serves the search form and results page of the AdminScore tool
+ * The AdminScoreController serves the search form and results page of the AdminScore tool.
  */
 class AdminScoreController extends XtoolsController
 {
-
     /**
      * Get the tool's shortname.
      * @return string
@@ -39,41 +37,37 @@ class AdminScoreController extends XtoolsController
      * @Route("/adminscore/index.php", name="AdminScoreIndexPhp")
      * @Route("/scottywong tools/adminscore.php", name="AdminScoreLegacy")
      * @Route("/adminscore/{project}", name="AdminScoreProject")
-     * @param Request $request The HTTP request.
      * @return Response
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
-        $params = $this->parseQueryParams($request);
-
         // Redirect if we have a project and user.
-        if (isset($params['project']) && isset($params['username'])) {
-            return $this->redirectToRoute('AdminScoreResult', $params);
+        if (isset($this->params['project']) && isset($this->params['username'])) {
+            return $this->redirectToRoute('AdminScoreResult', $this->params);
         }
 
         // Convert the given project (or default project) into a Project instance.
-        $params['project'] = $this->getProjectFromQuery($params);
+        $this->params['project'] = $this->getProjectFromQuery($this->params);
 
         return $this->render('adminscore/index.html.twig', [
             'xtPage' => 'adminscore',
             'xtPageTitle' => 'tool-adminscore',
             'xtSubtitle' => 'tool-adminscore-desc',
-            'project' => $params['project'],
+            'project' => $this->params['project'],
         ]);
     }
 
     /**
      * Display the AdminScore results.
      * @Route("/adminscore/{project}/{username}", name="AdminScoreResult")
-     * @param Request $request The HTTP request.
      * @return Response
      * @todo Move SQL to a model.
      * @codeCoverageIgnore
      */
-    public function resultAction(Request $request)
+    public function resultAction()
     {
         // Second parameter causes it return a Redirect to the index if the user has too many edits.
-        $ret = $this->validateProjectAndUser($request, 'adminscore');
+        $ret = $this->validateProjectAndUser('adminscore');
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {

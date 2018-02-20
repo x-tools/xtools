@@ -28,8 +28,6 @@ class SimpleEditCounterControllerTest extends WebTestCase
     {
         $this->client = static::createClient();
         $this->container = $this->client->getContainer();
-        $this->controller = new SimpleEditCounterController();
-        $this->controller->setContainer($this->container);
     }
 
     /**

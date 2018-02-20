@@ -89,7 +89,7 @@ class DefaultController extends XtoolsController
     public function loginAction()
     {
         try {
-            list( $next, $token ) = $this->getOauthClient()->initiate();
+            list($next, $token) = $this->getOauthClient()->initiate();
         } catch (Exception $oauthException) {
             throw $oauthException;
             // @TODO Make this work.

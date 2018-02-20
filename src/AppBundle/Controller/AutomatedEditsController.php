@@ -7,7 +7,6 @@ namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -43,31 +42,28 @@ class AutomatedEditsController extends XtoolsController
      * @Route("/autoedits/index.php", name="autoeditsIndexPhp")
      * @Route("/automatededits/index.php", name="autoeditsLongIndexPhp")
      * @Route("/autoedits/{project}", name="autoeditsProject")
-     * @param Request $request The HTTP request.
      * @return Response
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
-        $params = $this->parseQueryParams($request);
-
         // Redirect if at minimum project and username are provided.
-        if (isset($params['project']) && isset($params['username'])) {
-            return $this->redirectToRoute('autoeditsResult', $params);
+        if (isset($this->params['project']) && isset($this->params['username'])) {
+            return $this->redirectToRoute('autoeditsResult', $this->params);
         }
 
         // Convert the given project (or default project) into a Project instance.
-        $params['project'] = $this->getProjectFromQuery($params);
+        $this->params['project'] = $this->getProjectFromQuery($this->params);
 
         return $this->render('autoEdits/index.html.twig', array_merge([
             'xtPageTitle' => 'tool-autoedits',
             'xtSubtitle' => 'tool-autoedits-desc',
             'xtPage' => 'autoedits',
 
-            // Defaults that will get overriden if in $params.
+            // Defaults that will get overriden if in $this->params.
             'namespace' => 0,
             'start' => '',
             'end' => '',
-        ], $params));
+        ], $this->params));
     }
 
     /**
@@ -80,17 +76,16 @@ class AutomatedEditsController extends XtoolsController
      *         "namespace" = "|all|\d+"
      *     }
      * )
-     * @param Request $request The HTTP request.
      * @param int|string $namespace
      * @param null|string $start
      * @param null|string $end
      * @return RedirectResponse|Response
      * @codeCoverageIgnore
      */
-    public function resultAction(Request $request, $namespace = 0, $start = null, $end = null)
+    public function resultAction($namespace = 0, $start = null, $end = null)
     {
         // Will redirect back to index if the user has too high of an edit count.
-        $ret = $this->validateProjectAndUser($request, 'autoedits');
+        $ret = $this->validateProjectAndUser('autoedits');
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {
@@ -161,7 +156,6 @@ class AutomatedEditsController extends XtoolsController
      *   "/api/user/automated_editcount/{project}/{username}/{namespace}/{start}/{end}/{tools}",
      *   requirements={"start" = "|\d{4}-\d{2}-\d{2}", "end" = "|\d{4}-\d{2}-\d{2}"}
      * )
-     * @param Request $request The HTTP request.
      * @param int|string $namespace ID of the namespace, or 'all' for all namespaces
      * @param string $start In the format YYYY-MM-DD
      * @param string $end In the format YYYY-MM-DD
@@ -170,7 +164,6 @@ class AutomatedEditsController extends XtoolsController
      * @codeCoverageIgnore
      */
     public function automatedEditCountApiAction(
-        Request $request,
         $namespace = 'all',
         $start = '',
         $end = '',
@@ -178,7 +171,7 @@ class AutomatedEditsController extends XtoolsController
     ) {
         $this->recordApiUsage('user/automated_editcount');
 
-        list($project, $user) = $this->validateProjectAndUser($request);
+        list($project, $user) = $this->validateProjectAndUser();
 
         $res = [
             'project' => $project->getDomain(),
@@ -221,7 +214,6 @@ class AutomatedEditsController extends XtoolsController
      *       "offset" = "\d*"
      *   }
      * )
-     * @param Request $request The HTTP request.
      * @param int|string $namespace ID of the namespace, or 'all' for all namespaces
      * @param string $start In the format YYYY-MM-DD
      * @param string $end In the format YYYY-MM-DD
@@ -230,7 +222,6 @@ class AutomatedEditsController extends XtoolsController
      * @codeCoverageIgnore
      */
     public function nonAutomatedEditsApiAction(
-        Request $request,
         $namespace = 0,
         $start = '',
         $end = '',
@@ -240,11 +231,11 @@ class AutomatedEditsController extends XtoolsController
 
         // Second parameter causes it return a Redirect to the index if the user has too many edits.
         // We only want to do this when looking at the user's overall edits, not just to a specific article.
-        list($project, $user) = $this->validateProjectAndUser($request);
+        list($project, $user) = $this->validateProjectAndUser();
 
         // Reject if they've made too many edits.
         if ($user->hasTooManyEdits($project)) {
-            if ($request->query->get('format') !== 'html') {
+            if ($this->request->query->get('format') !== 'html') {
                 return new JsonResponse(
                     [
                         'error' => 'Unable to show any data. User has made over ' .
@@ -264,7 +255,7 @@ class AutomatedEditsController extends XtoolsController
             $edits = $autoEdits->getNonautomatedEdits($offset);
         }
 
-        if ($request->query->get('format') === 'html') {
+        if ($this->request->query->get('format') === 'html') {
             if ($edits) {
                 $edits = array_map(function ($attrs) use ($project, $user) {
                     $page = $project->getRepository()

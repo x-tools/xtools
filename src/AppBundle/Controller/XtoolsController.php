@@ -7,8 +7,10 @@
 namespace AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Xtools\ProjectRepository;
 use Xtools\UserRepository;
 use Xtools\Project;
@@ -23,17 +25,61 @@ use Xtools\PageRepository;
  */
 abstract class XtoolsController extends Controller
 {
+    /** @var Request The request object. */
+    protected $request;
+
+    /** @var ContainerInterface Symfony's container interface. */
+    protected $container;
+
+    /** @var string[] Params and their values, parsed from the Request. */
+    protected $params;
+
+    /** @var bool Whether this is a subrequest (e.g. called from Twig). */
+    protected $isSubRequest;
+
+    /** @var string Name of the action that is being executed. */
+    private $actionName;
+
+    /**
+     * Constructor for the abstract XtoolsController.
+     * @param RequestStack $requestStack
+     * @param ContainerInterface $container
+     */
+    public function __construct(RequestStack $requestStack, ContainerInterface $container)
+    {
+        $this->request = $requestStack->getCurrentRequest();
+        $this->container = $container;
+
+        if (null !== $this->request) {
+            $this->actionName = $this->getActionName();
+            $this->isSubRequest = $this->request->get('htmlonly') || $this->actionName === 'result';
+            $this->processParams();
+        }
+    }
+
+    /**
+     * Shared method call across all controller actions to process parameters
+     * and set class properties accordingly.
+     */
+    private function processParams()
+    {
+        if ($this->actionName === 'index') {
+            $this->params = $this->parseQueryParams();
+        } else {
+            $this->params = $this->getParams();
+        }
+    }
+
     /**
      * Given the request object, parse out common parameters. These include the
      * 'project', 'username', 'namespace' and 'article', along with their legacy
      * counterparts (e.g. 'lang' and 'wiki').
-     * @param  Request $request
      * @return string[] Normalized parameters (no legacy params).
      */
-    public function parseQueryParams(Request $request)
+    public function parseQueryParams()
     {
         /** @var string[] Each parameter and value that was detected. */
-        $params = $this->getParams($request);
+        $params = $this->getParams();
 
         // Covert any legacy parameters, if present.
         $params = $this->convertLegacyParams($params);
@@ -78,14 +124,13 @@ abstract class XtoolsController extends Controller
      * If the project and username in the given params hash are valid, Project and User instances
      * are returned. User validation only occurs if 'username' is in the params.
      * Otherwise a redirect is returned that goes back to the index page.
-     * @param Request $request The HTTP request.
      * @param string $tooHighEditCountAction If the requested user has more than the configured
      *   max edit count, they will be redirect to this route, passing in available params.
      * @return RedirectResponse|array Array contains [Project|null, User|null]
      */
-    public function validateProjectAndUser(Request $request, $tooHighEditCountAction = null)
+    public function validateProjectAndUser($tooHighEditCountAction = null)
     {
-        $params = $this->getParams($request);
+        $params = $this->getParams();
 
         $projectData = $this->validateProject($params);
         if ($projectData instanceof RedirectResponse) {
@@ -194,10 +239,9 @@ abstract class XtoolsController extends Controller
 
     /**
      * Get all standardized parameters from the Request, either via URL query string or routing.
-     * @param Request $request
      * @return string[]
      */
-    public function getParams(Request $request)
+    public function getParams()
     {
         $paramsToCheck = [
             'project',
@@ -227,7 +271,7 @@ abstract class XtoolsController extends Controller
 
         foreach ($paramsToCheck as $param) {
             // Pull in either from URL query string or route.
-            $value = $request->query->get($param) ?: $request->get($param);
+            $value = $this->request->query->get($param) ?: $this->request->get($param);
 
             // Only store if value is given ('namespace' or 'username' could be '0').
             if ($value !== null && $value !== '') {
@@ -355,16 +399,15 @@ abstract class XtoolsController extends Controller
 
     /**
      * Get the rendered template for the requested format.
-     * @param  Request $request
      * @param  string  $templatePath Path to template without format,
      *   such as '/editCounter/latest_global'.
-     * @param  array   $ret Data that should be passed to the view.
+     * @param  array $ret Data that should be passed to the view.
      * @return array
      * @codeCoverageIgnore
      */
-    public function getFormattedReponse(Request $request, $templatePath, $ret)
+    public function getFormattedReponse($templatePath, $ret)
     {
-        $format = $request->query->get('format', 'html');
+        $format = $this->request->query->get('format', 'html');
         if ($format == '') {
             // The default above doesn't work when the 'format' parameter is blank.
             $format = 'html';
@@ -382,5 +425,20 @@ abstract class XtoolsController extends Controller
         $response->headers->set('Content-Type', $contentType);
 
         return $response;
+    }
+
+    /**
+     * Get current action name.
+     * @return string
+     * There is no request stack in unit tests.
+     * @codeCoverageIgnore
+     */
+    private function getActionName()
+    {
+        $pattern = "#::([a-zA-Z]*)Action#";
+        $matches = [];
+        preg_match($pattern, $this->request->get('_controller'), $matches);
+
+        return $matches[1];
     }
 }

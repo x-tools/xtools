@@ -28,8 +28,6 @@ class ArticleInfoControllerTest extends WebTestCase
     {
         $this->client = static::createClient();
         $this->container = $this->client->getContainer();
-        $this->controller = new ArticleInfoController();
-        $this->controller->setContainer($this->container);
     }
 
     /**

@@ -36,16 +36,18 @@ class PagesControllerTest extends WebTestCase
         $crawler = $client->request('GET', '/pages');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
-        if ($this->container->getParameter('app.is_labs') && !$this->container->getParameter('app.single_wiki')) {
-            $crawler = $client->request('GET', '/pages/de.wikipedia.org');
-            $this->assertEquals(200, $client->getResponse()->getStatusCode());
-
-            // should populate project input field
-            $this->assertEquals('de.wikipedia.org', $crawler->filter('#project_input')->attr('value'));
-
-            // assert that the namespaces were correctly loaded from API
-            $namespaceOptions = $crawler->filter('#namespace_select option');
-            $this->assertEquals('Diskussion', trim($namespaceOptions->eq(2)->text())); // Talk in German
+        if (!$this->container->getParameter('app.is_labs')) {
+            return;
         }
+
+        $crawler = $client->request('GET', '/pages/de.wikipedia.org');
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+
+        // should populate project input field
+        $this->assertEquals('de.wikipedia.org', $crawler->filter('#project_input')->attr('value'));
+
+        // assert that the namespaces were correctly loaded from API
+        $namespaceOptions = $crawler->filter('#namespace_select option');
+        $this->assertEquals('Diskussion', trim($namespaceOptions->eq(2)->text())); // Talk in German
     }
 }

@@ -7,7 +7,6 @@ namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -42,45 +41,39 @@ class ArticleInfoController extends XtoolsController
      * @Route("/articleinfo/", name="articleInfoSlash")
      * @Route("/articleinfo/index.php", name="articleInfoIndexPhp")
      * @Route("/articleinfo/{project}", name="ArticleInfoProject")
-     * @param Request $request The HTTP request.
      * @return Response
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
-        $params = $this->parseQueryParams($request);
-
-        if (isset($params['project']) && isset($params['article'])) {
-            return $this->redirectToRoute('ArticleInfoResult', $params);
+        if (isset($this->params['project']) && isset($this->params['article'])) {
+            return $this->redirectToRoute('ArticleInfoResult', $this->params);
         }
 
         // Convert the given project (or default project) into a Project instance.
-        $params['project'] = $this->getProjectFromQuery($params);
+        $this->params['project'] = $this->getProjectFromQuery($this->params);
 
         return $this->render('articleInfo/index.html.twig', [
             'xtPage' => 'articleinfo',
             'xtPageTitle' => 'tool-articleinfo',
             'xtSubtitle' => 'tool-articleinfo-desc',
-            'project' => $params['project'],
+            'project' => $this->params['project'],
         ]);
     }
 
     /**
      * Generate ArticleInfo gadget script for use on-wiki. This automatically points the
      * script to this installation's API. Pass ?uglify=1 to uglify the code.
-     *
      * @Route("/articleinfo-gadget.js", name="ArticleInfoGadget")
      * @link https://www.mediawiki.org/wiki/XTools#ArticleInfo_gadget
-     *
-     * @param Request $request The HTTP request
      * @return Response
      * @codeCoverageIgnore
      */
-    public function gadgetAction(Request $request)
+    public function gadgetAction()
     {
         $rendered = $this->renderView('articleInfo/articleinfo.js.twig');
 
         // SUPER hacky, but it works and is safe.
-        if ($request->query->get('uglify') != '') {
+        if ($this->request->query->get('uglify') != '') {
             // $ and " need to be escaped.
             $rendered = str_replace('$', '\$', trim($rendered));
             $rendered = str_replace('"', '\"', trim($rendered));
@@ -129,14 +122,13 @@ class ArticleInfoController extends XtoolsController
      *         "end"="|\d{4}-\d{2}-\d{2}",
      *     }
      * )
-     * @param Request $request
      * @param $article
      * @param null|string $start
      * @param null|string $end
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction(Request $request, $article, $start = null, $end = null)
+    public function resultAction($article, $start = null, $end = null)
     {
         // This is some complicated stuff here. We pass $start and $end to method signature
         // for router regex parser to parse `article` with those parameters and then
@@ -153,7 +145,7 @@ class ArticleInfoController extends XtoolsController
         list($start, $end) = $this->getUTCFromDateParams($start, $end, false);
 
         // In this case only the project is validated.
-        $ret = $this->validateProjectAndUser($request);
+        $ret = $this->validateProjectAndUser();
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {
@@ -169,7 +161,7 @@ class ArticleInfoController extends XtoolsController
             $this->addFlash('notice', ['date-range-outside-revisions']);
 
             return $this->redirectToRoute('ArticleInfoResult', [
-                'project' => $request->get('project'),
+                'project' => $this->request->get('project'),
                 'article' => $article
             ]);
         }
@@ -198,15 +190,15 @@ class ArticleInfoController extends XtoolsController
             'xtPage' => 'articleinfo',
             'xtTitle' => $page->getTitle(),
             'project' => $project,
-            'editorlimit' => $request->query->get('editorlimit', 20),
-            'botlimit' => $request->query->get('botlimit', 10),
+            'editorlimit' => $this->request->query->get('editorlimit', 20),
+            'botlimit' => $this->request->query->get('botlimit', 10),
             'pageviewsOffset' => 60,
             'ai' => $articleInfo,
             'page' => $page,
         ];
 
         // Output the relevant format template.
-        $format = $request->query->get('format', 'html');
+        $format = $this->request->query->get('format', 'html');
         if ($format == '') {
             // The default above doesn't work when the 'format' parameter is blank.
             $format = 'html';
@@ -238,15 +230,14 @@ class ArticleInfoController extends XtoolsController
      *     name="ArticleInfoAuthorshipResult",
      *     requirements={"article"=".+"}
      * )
-     * @param Request $request The HTTP request.
      * @param string $article
      * @return Response
      * @codeCoverageIgnore
      */
-    public function textsharesResultAction(Request $request, $article)
+    public function textsharesResultAction($article)
     {
         // In this case only the project is validated.
-        $ret = $this->validateProjectAndUser($request);
+        $ret = $this->validateProjectAndUser();
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {
@@ -263,10 +254,7 @@ class ArticleInfoController extends XtoolsController
         $articleInfo = new ArticleInfo($page, $this->container);
         $articleInfo->setRepository($articleInfoRepo);
 
-        $isSubRequest = $request->get('htmlonly')
-            || $this->get('request_stack')->getParentRequest() !== null;
-
-        $limit = $isSubRequest ? 10 : null;
+        $limit = $this->isSubRequest ? 10 : null;
 
         return $this->render('articleInfo/textshares.html.twig', [
             'xtPage' => 'articleinfo',
@@ -274,7 +262,7 @@ class ArticleInfoController extends XtoolsController
             'project' => $project,
             'page' => $page,
             'textshares' => $articleInfo->getTextshares($limit),
-            'is_sub_request' => $isSubRequest,
+            'is_sub_request' => $this->isSubRequest,
         ]);
     }
 
@@ -284,14 +272,13 @@ class ArticleInfoController extends XtoolsController
      * Get basic info on a given article.
      * @Route("/api/articleinfo/{project}/{article}", requirements={"article"=".+"})
      * @Route("/api/page/articleinfo/{project}/{article}", requirements={"article"=".+"})
-     * @param Request $request The HTTP request.
      * @param string $project
      * @param string $article
      * @return View
      * See ArticleInfoControllerTest::testArticleInfoApi()
      * @codeCoverageIgnore
      */
-    public function articleInfoApiAction(Request $request, $project, $article)
+    public function articleInfoApiAction($project, $article)
     {
         $projectData = ProjectRepository::getProject($project, $this->container);
         if (!$projectData->exists()) {
@@ -311,7 +298,7 @@ class ArticleInfoController extends XtoolsController
 
         $data = $this->getArticleInfoApiData($projectData, $page);
 
-        if ($request->query->get('format') === 'html') {
+        if ($this->request->query->get('format') === 'html') {
             return $this->getApiHtmlResponse($projectData, $page, $data);
         }
 
@@ -409,17 +396,16 @@ class ArticleInfoController extends XtoolsController
     /**
      * Get prose statistics for the given article.
      * @Route("/api/page/prose/{project}/{article}", requirements={"article"=".+"})
-     * @param Request $request The HTTP request.
      * @param string $article
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function proseStatsApiAction(Request $request, $article)
+    public function proseStatsApiAction($article)
     {
         $this->recordApiUsage('page/prose');
 
         // In this case only the project is validated.
-        $ret = $this->validateProjectAndUser($request);
+        $ret = $this->validateProjectAndUser();
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {

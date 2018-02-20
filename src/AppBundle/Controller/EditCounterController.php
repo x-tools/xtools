@@ -7,7 +7,6 @@ namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -46,16 +45,15 @@ class EditCounterController extends XtoolsController
     /**
      * Every action in this controller (other than 'index') calls this first.
      * If a response is returned, the calling action is expected to return it.
-     * @param Request $request
      * @param string $key API key, as given in the reuqest. Omit this for actions
      *   that are public (only /api/ec actions should pass this in).
      * @return null|RedirectResponse
      */
-    protected function setUpEditCounter(Request $request, $key = null)
+    protected function setUpEditCounter($key = null)
     {
         // Return the EditCounter if we already have one.
         if ($this->editCounter instanceof EditCounter) {
-            return;
+            return null;
         }
 
         // Validate key if attempted to make internal API request.
@@ -64,7 +62,7 @@ class EditCounterController extends XtoolsController
         }
 
         // Will redirect to Simple Edit Counter if they have too many edits.
-        $ret = $this->validateProjectAndUser($request, 'SimpleEditCounterResult');
+        $ret = $this->validateProjectAndUser('SimpleEditCounterResult');
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {
@@ -87,42 +85,35 @@ class EditCounterController extends XtoolsController
      * @Route("/ec/", name="EditCounterSlash")
      * @Route("/ec/index.php", name="EditCounterIndexPhp")
      * @Route("/ec/{project}", name="EditCounterProject")
-     *
-     * @param Request $request
      * @return RedirectResponse|Response
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
-        $params = $this->parseQueryParams($request);
-
-        if (isset($params['project']) && isset($params['username'])) {
-            return $this->redirectToRoute('EditCounterResult', $params);
+        if (isset($this->params['project']) && isset($this->params['username'])) {
+            return $this->redirectToRoute('EditCounterResult', $this->params);
         }
 
         // Convert the given project (or default project) into a Project instance.
-        $params['project'] = $this->getProjectFromQuery($params);
+        $this->params['project'] = $this->getProjectFromQuery($this->params);
 
         // Otherwise fall through.
         return $this->render('editCounter/index.html.twig', [
             'xtPageTitle' => 'tool-ec',
             'xtSubtitle' => 'tool-ec-desc',
             'xtPage' => 'ec',
-            'project' => $params['project'],
+            'project' => $this->params['project'],
         ]);
     }
 
     /**
      * Display all results.
      * @Route("/ec/{project}/{username}", name="EditCounterResult")
-     * @param Request $request
-     * @param string $project
-     * @param string $username
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction(Request $request, $project, $username)
+    public function resultAction()
     {
-        $ret = $this->setUpEditCounter($request);
+        $ret = $this->setUpEditCounter();
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
@@ -148,80 +139,74 @@ class EditCounterController extends XtoolsController
         }
 
         // Output the relevant format template.
-        return $this->getFormattedReponse($request, 'editCounter/result', $ret);
+        return $this->getFormattedReponse('editCounter/result', $ret);
     }
 
     /**
      * Display the general statistics section.
      * @Route("/ec-generalstats/{project}/{username}", name="EditCounterGeneralStats")
-     * @param Request $request
      * @return Response
      * @codeCoverageIgnore
      */
-    public function generalStatsAction(Request $request)
+    public function generalStatsAction()
     {
-        $ret = $this->setUpEditCounter($request);
+        $ret = $this->setUpEditCounter();
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
 
-        $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
         $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
-            'is_sub_request' => $isSubRequest,
+            'is_sub_request' => $this->isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
         ];
 
         // Output the relevant format template.
-        return $this->getFormattedReponse($request, 'editCounter/general_stats', $ret);
+        return $this->getFormattedReponse('editCounter/general_stats', $ret);
     }
 
     /**
      * Display the namespace totals section.
      * @Route("/ec-namespacetotals/{project}/{username}", name="EditCounterNamespaceTotals")
-     * @param Request $request
      * @return Response
      * @codeCoverageIgnore
      */
-    public function namespaceTotalsAction(Request $request)
+    public function namespaceTotalsAction()
     {
-        $ret = $this->setUpEditCounter($request);
+        $ret = $this->setUpEditCounter();
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
 
-        $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
         $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
-            'is_sub_request' => $isSubRequest,
+            'is_sub_request' => $this->isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
         ];
 
         // Output the relevant format template.
-        return $this->getFormattedReponse($request, 'editCounter/namespace_totals', $ret);
+        return $this->getFormattedReponse('editCounter/namespace_totals', $ret);
     }
 
     /**
      * Display the timecard section.
      * @Route("/ec-timecard/{project}/{username}", name="EditCounterTimecard")
-     * @param Request $request
      * @return Response
      * @codeCoverageIgnore
      */
-    public function timecardAction(Request $request)
+    public function timecardAction()
     {
-        $ret = $this->setUpEditCounter($request);
+        $ret = $this->setUpEditCounter();
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
 
-        $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
         $optedInPage = $this->project
             ->getRepository()
             ->getPage($this->project, $this->project->userOptInPage($this->user));
@@ -229,7 +214,7 @@ class EditCounterController extends XtoolsController
         $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
-            'is_sub_request' => $isSubRequest,
+            'is_sub_request' => $this->isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
@@ -237,59 +222,55 @@ class EditCounterController extends XtoolsController
         ];
 
         // Output the relevant format template.
-        return $this->getFormattedReponse($request, 'editCounter/timecard', $ret);
+        return $this->getFormattedReponse('editCounter/timecard', $ret);
     }
 
     /**
      * Display the year counts section.
      * @Route("/ec-yearcounts/{project}/{username}", name="EditCounterYearCounts")
-     * @param Request $request
      * @return Response
      * @codeCoverageIgnore
      */
-    public function yearcountsAction(Request $request)
+    public function yearcountsAction()
     {
-        $ret = $this->setUpEditCounter($request);
+        $ret = $this->setUpEditCounter();
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
 
-        $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
-            'is_sub_request' => $isSubRequest,
+            'is_sub_request' => $this->isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
         ];
 
         // Output the relevant format template.
-        return $this->getFormattedReponse($request, 'editCounter/yearcounts', $ret);
+        return $this->getFormattedReponse('editCounter/yearcounts', $ret);
     }
 
     /**
      * Display the month counts section.
      * @Route("/ec-monthcounts/{project}/{username}", name="EditCounterMonthCounts")
-     * @param Request $request
      * @return Response
      * @codeCoverageIgnore
      */
-    public function monthcountsAction(Request $request)
+    public function monthcountsAction()
     {
-        $ret = $this->setUpEditCounter($request);
+        $ret = $this->setUpEditCounter();
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
 
-        $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         $optedInPage = $this->project
             ->getRepository()
             ->getPage($this->project, $this->project->userOptInPage($this->user));
         $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
-            'is_sub_request' => $isSubRequest,
+            'is_sub_request' => $this->isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
@@ -297,28 +278,26 @@ class EditCounterController extends XtoolsController
         ];
 
         // Output the relevant format template.
-        return $this->getFormattedReponse($request, 'editCounter/monthcounts', $ret);
+        return $this->getFormattedReponse('editCounter/monthcounts', $ret);
     }
 
     /**
      * Display the user rights changes section.
      * @Route("/ec-rightschanges/{project}/{username}", name="EditCounterRightsChanges")
-     * @param Request $request
      * @return Response
      * @codeCoverageIgnore
      */
-    public function rightschangesAction(Request $request)
+    public function rightschangesAction()
     {
-        $ret = $this->setUpEditCounter($request);
+        $ret = $this->setUpEditCounter();
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
 
-        $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
-            'is_sub_request' => $isSubRequest,
+            'is_sub_request' => $this->isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
@@ -329,29 +308,26 @@ class EditCounterController extends XtoolsController
         }
 
         // Output the relevant format template.
-        return $this->getFormattedReponse($request, 'editCounter/rights_changes', $ret);
+        return $this->getFormattedReponse('editCounter/rights_changes', $ret);
     }
 
     /**
      * Display the latest global edits section.
      * @Route("/ec-latestglobal/{project}/{username}", name="EditCounterLatestGlobal")
-     * @param Request $request The HTTP request.
      * @return Response
      * @codeCoverageIgnore
      */
-    public function latestglobalAction(Request $request)
+    public function latestglobalAction()
     {
-        $ret = $this->setUpEditCounter($request);
+        $ret = $this->setUpEditCounter();
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
 
-        $isSubRequest = $request->get('htmlonly')
-                        || $this->container->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/latest_global.html.twig', [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
-            'is_sub_request' => $isSubRequest,
+            'is_sub_request' => $this->isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
@@ -369,14 +345,13 @@ class EditCounterController extends XtoolsController
     /**
      * Get (most) of the general statistics as JSON.
      * @Route("/api/ec/pairdata/{project}/{username}/{key}", name="EditCounterApiPairData")
-     * @param Request $request
      * @param string $key API key.
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function pairDataApiAction(Request $request, $key)
+    public function pairDataApiAction($key)
     {
-        $ret = $this->setUpEditCounter($request, $key);
+        $ret = $this->setUpEditCounter($key);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
@@ -390,14 +365,13 @@ class EditCounterController extends XtoolsController
     /**
      * Get various log counts for the user as JSON.
      * @Route("/api/ec/logcounts/{project}/{username}/{key}", name="EditCounterApiLogCounts")
-     * @param Request $request
      * @param string $key API key.
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function logCountsApiAction(Request $request, $key)
+    public function logCountsApiAction($key)
     {
-        $ret = $this->setUpEditCounter($request, $key);
+        $ret = $this->setUpEditCounter($key);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
@@ -411,14 +385,13 @@ class EditCounterController extends XtoolsController
     /**
      * Get edit sizes for the user as JSON.
      * @Route("/api/ec/editsizes/{project}/{username}/{key}", name="EditCounterApiEditSizes")
-     * @param Request $request
      * @param string $key API key.
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function editSizesApiAction(Request $request, $key)
+    public function editSizesApiAction($key)
     {
-        $ret = $this->setUpEditCounter($request, $key);
+        $ret = $this->setUpEditCounter($key);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
@@ -432,14 +405,13 @@ class EditCounterController extends XtoolsController
     /**
      * Get the namespace totals for the user as JSON.
      * @Route("/api/ec/namespacetotals/{project}/{username}/{key}", name="EditCounterApiNamespaceTotals")
-     * @param Request $request
      * @param string $key API key.
      * @return Response
      * @codeCoverageIgnore
      */
-    public function namespaceTotalsApiAction(Request $request, $key)
+    public function namespaceTotalsApiAction($key)
     {
-        $ret = $this->setUpEditCounter($request, $key);
+        $ret = $this->setUpEditCounter($key);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
@@ -453,14 +425,13 @@ class EditCounterController extends XtoolsController
     /**
      * Display or fetch the month counts for the user.
      * @Route("/api/ec/monthcounts/{project}/{username}/{key}", name="EditCounterApiMonthCounts")
-     * @param Request $request
      * @param string $key API key.
      * @return Response
      * @codeCoverageIgnore
      */
-    public function monthcountsApiAction(Request $request, $key)
+    public function monthcountsApiAction($key)
     {
-        $ret = $this->setUpEditCounter($request, $key);
+        $ret = $this->setUpEditCounter($key);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }

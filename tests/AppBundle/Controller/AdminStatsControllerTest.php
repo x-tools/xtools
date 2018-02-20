@@ -44,23 +44,22 @@ class AdminStatsControllerTest extends WebTestCase
      */
     public function testSetupAdminStats()
     {
-        $controller = new AdminStatsController();
-        $controller->setContainer($this->container);
-
         // For now...
         if (!$this->container->getParameter('app.is_labs') || $this->container->getParameter('app.single_wiki')) {
             return;
         }
 
-        $ret = $controller->setUpAdminStats('invalid.wiki.org', '2017-01-01', '2017-03-01');
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $ret);
+        $crawler = $this->client->request('GET', '/adminstats/invalid.wiki.org');
+        $this->assertEquals(302, $this->client->getResponse()->getStatusCode());
 
-        $controller2 = new AdminStatsController();
-        $controller2->setContainer($this->container);
+        $crawler = $this->client->request('GET', '/adminstats/frwiki/2017-01-01/2017-01-10');
+        $statList = $crawler->filter('.stat-list')->text();
+        $this->assertContains('2017-01-01', $statList);
+        $this->assertContains('2017-01-10', $statList);
 
-        $adminStats = $controller2->setUpAdminStats('frwiki', '2017-01-01', '2017-03-01');
-        $this->assertInstanceOf('Xtools\AdminStats', $adminStats);
-        $this->assertEquals('2017-01-01', $adminStats->getStart());
-        $this->assertEquals('2017-03-01', $adminStats->getEnd());
+        $this->assertCount(
+            170,
+            $crawler->filter('.top-editors-table tbody tr')
+        );
     }
 }

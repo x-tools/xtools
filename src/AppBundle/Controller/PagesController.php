@@ -8,7 +8,6 @@ namespace AppBundle\Controller;
 use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -40,20 +39,17 @@ class PagesController extends XtoolsController
      * @Route("/pages/", name="PagesSlash")
      * @Route("/pages/index.php", name="PagesIndexPhp")
      * @Route("/pages/{project}", name="PagesProject")
-     * @param Request $request
      * @return Response
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
-        $params = $this->parseQueryParams($request);
-
         // Redirect if at minimum project and username are given.
-        if (isset($params['project']) && isset($params['username'])) {
-            return $this->redirectToRoute('PagesResult', $params);
+        if (isset($this->params['project']) && isset($this->params['username'])) {
+            return $this->redirectToRoute('PagesResult', $this->params);
         }
 
         // Convert the given project (or default project) into a Project instance.
-        $params['project'] = $this->getProjectFromQuery($params);
+        $this->params['project'] = $this->getProjectFromQuery($this->params);
 
         // Otherwise fall through.
         return $this->render('pages/index.html.twig', array_merge([
@@ -61,11 +57,11 @@ class PagesController extends XtoolsController
             'xtSubtitle' => 'tool-pages-desc',
             'xtPage' => 'pages',
 
-            // Defaults that will get overriden if in $params.
+            // Defaults that will get overriden if in $this->params.
             'namespace' => 0,
             'redirects' => 'noredirects',
             'deleted' => 'all'
-        ], $params));
+        ], $this->params));
     }
 
     /**
@@ -79,7 +75,6 @@ class PagesController extends XtoolsController
      *         "offset" = "|\d+"
      *     }
      * )
-     * @param Request $request
      * @param string|int $namespace The ID of the namespace, or 'all' for all namespaces.
      * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
      * @param string $deleted One of 'live', 'deleted' or 'all' for both.
@@ -88,13 +83,12 @@ class PagesController extends XtoolsController
      * @codeCoverageIgnore
      */
     public function resultAction(
-        Request $request,
         $namespace = '0',
         $redirects = 'noredirects',
         $deleted = 'all',
         $offset = 0
     ) {
-        $ret = $this->validateProjectAndUser($request, 'pages');
+        $ret = $this->validateProjectAndUser('pages');
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {
@@ -178,18 +172,17 @@ class PagesController extends XtoolsController
      * including the number that have been deleted and are redirects.
      * @Route("/api/user/pages_count/{project}/{username}/{namespace}/{redirects}/{deleted}", name="PagesApiCount",
      *     requirements={"namespace"="|\d+|all"})
-     * @param Request $request
      * @param int|string $namespace The ID of the namespace of the page, or 'all' for all namespaces.
      * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
      * @param string $deleted One of 'live', 'deleted' or 'all' for both.
      * @return Response
      * @codeCoverageIgnore
      */
-    public function countPagesApiAction(Request $request, $namespace = 0, $redirects = 'noredirects', $deleted = 'all')
+    public function countPagesApiAction($namespace = 0, $redirects = 'noredirects', $deleted = 'all')
     {
         $this->recordApiUsage('user/pages_count');
 
-        $ret = $this->validateProjectAndUser($request);
+        $ret = $this->validateProjectAndUser();
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {
@@ -232,7 +225,6 @@ class PagesController extends XtoolsController
      * Get the pages created by by a user.
      * @Route("/api/user/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{offset}", name="PagesApi",
      *     requirements={"namespace"="|\d+|all"})
-     * @param Request $request
      * @param int|string $namespace The ID of the namespace of the page, or 'all' for all namespaces.
      * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
      * @param string $deleted One of 'live', 'deleted' or blank for both.
@@ -241,7 +233,6 @@ class PagesController extends XtoolsController
      * @codeCoverageIgnore
      */
     public function getPagesApiAction(
-        Request $request,
         $namespace = 0,
         $redirects = 'noredirects',
         $deleted = 'all',
@@ -250,7 +241,7 @@ class PagesController extends XtoolsController
         $this->recordApiUsage('user/pages');
 
         // Second parameter causes it return a Redirect to the index if the user has too many edits.
-        $ret = $this->validateProjectAndUser($request, 'pages');
+        $ret = $this->validateProjectAndUser('pages');
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {
