@@ -1,5 +1,11 @@
 # Release Notes #
 
+## 3.1.41 ##
+- Handle exception thrown in production when user has no edits.
+- Fix broken TopEdits API endpoint.
+- Fix broken EditSummary API endpoint.
+- Minor styling fixes.
+
 ## 3.1.40 ##
 - T178055: Improved screen reader support on the Edit Counter.
 - Edit Counter rights changes now looks for local changes that
