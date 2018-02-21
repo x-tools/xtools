@@ -10,7 +10,6 @@
 			"Oupsa"
 		]
 	},
-	"about-xtools": "À propos de ces outils",
 	"accepted-formats": "Formats acceptés",
 	"account-age": "Âge du compte",
 	"account-age-desc": "depuis $2 {{PLURAL:$1|jour|jours}}",
@@ -121,6 +120,7 @@
 	"executed": "Exécuté en $1 {{PLURAL:$2|seconde|secondes}}.",
 	"explanation": "Explication",
 	"export-wikitext": "Exporter le wikitexte",
+	"feedback": "Avis",
 	"file": "Fichier",
 	"files": "Fichiers",
 	"files-uploaded": "Fichiers téléversés",

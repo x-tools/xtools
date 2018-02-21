@@ -8,7 +8,6 @@
 			"Alifakoor"
 		]
 	},
-	"about-xtools": "دربارهٔ این ابزارها",
 	"accepted-formats": "قالب‌های پذیرفته‌شده",
 	"account-age": "عمر حساب",
 	"account-age-desc": "$2 {{PLURAL:$1|روز|روز}} قدمت",
@@ -108,6 +107,7 @@
 	"executed": "استخراج در $1 {{PLURAL:$2|ثانیه|ثانیه}}.",
 	"explanation": "توضیح",
 	"export-wikitext": "برون‌ریزی ویکی‌متن",
+	"feedback": "بازخورد",
 	"file": "پرونده",
 	"files": "پرونده‌ها",
 	"files-uploaded": "پرونده‌های بارگزاری‌شده",

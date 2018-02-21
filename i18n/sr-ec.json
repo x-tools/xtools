@@ -9,7 +9,6 @@
 			"Milicevic01"
 		]
 	},
-	"about-xtools": "О алаткама",
 	"accepted-formats": "Прихваћени формати",
 	"account-age": "Старост налога",
 	"account-age-desc": "пре $2 {{PLURAL:$1|дан|дана}}",
@@ -119,6 +118,7 @@
 	"executed": "Извршено за $1 {{PLURAL:$2|секунд|секундe|секунди}}.",
 	"explanation": "Објашњење",
 	"export-wikitext": "Извези викитекст",
+	"feedback": "Повратне информације",
 	"file": "Датотека",
 	"files": "Датотеке",
 	"files-uploaded": "Отпремљене датотеке",

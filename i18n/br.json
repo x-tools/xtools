@@ -5,7 +5,6 @@
 			"Gwenn-Ael"
 		]
 	},
-	"about-xtools": "Diwar-benn ar binvioù-se",
 	"accepted-formats": "Furmadoù degemeret",
 	"account-age": "Oad ar gont",
 	"account-age-desc": "$2{{PLURAL:$1|deiz|deiz}}",
@@ -59,6 +58,7 @@
 	"edit-summary-recent-minor": "$1 kemm bihan diwezhañ gant diverradenn",
 	"editors": "Aozerien",
 	"edits": "Kemmoù",
+	"feedback": "Sonjoù",
 	"file": "Restr",
 	"files": "Restroù",
 	"files-uploaded": "Restroù pellgarget",

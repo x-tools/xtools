@@ -6,7 +6,6 @@
 			"Jorn Ari"
 		]
 	},
-	"about-xtools": "Om disse værktøjer",
 	"accepted-formats": "Godkendte formater",
 	"account-age": "Kontoalder",
 	"account-age-desc": "$2 {{PLURAL:$1|dag|dage}} siden",
@@ -116,6 +115,7 @@
 	"executed": "Udført på $1 {{PLURAL:$2|sekund|sekunder}}.",
 	"explanation": "Forklaring",
 	"export-wikitext": "Eksporter wikitekst",
+	"feedback": "Tilbagemelding",
 	"file": "Fil",
 	"files": "Filer",
 	"files-uploaded": "Uploadede filer",

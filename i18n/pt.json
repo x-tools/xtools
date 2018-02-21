@@ -7,7 +7,6 @@
 			"Hamilton Abreu"
 		]
 	},
-	"about-xtools": "Sobre estas ferramentas",
 	"accepted-formats": "Formatos aceites",
 	"account-age": "Idade da conta",
 	"account-age-desc": "há $2 {{PLURAL:$1|dia|dias}}",
@@ -117,6 +116,7 @@
 	"executed": "Executado em $1 {{PLURAL:$2|segundo|segundos}}.",
 	"explanation": "Explicação",
 	"export-wikitext": "Exportar notação wiki",
+	"feedback": "Opinião",
 	"file": "Ficheiro",
 	"files": "Ficheiros",
 	"files-uploaded": "Ficheiros carregados",

@@ -8,7 +8,6 @@
 			"Nike"
 		]
 	},
-	"about-xtools": "Text for the link to the about page",
 	"accepted-formats": "Text shown in the tooltip that lists the accepted formats for entering a project, username, etc.",
 	"account-age": "Label for the age of an account",
 	"account-age-desc": "Further description for afd.  $1 is the unformatted number, $2 is a formatted number",
@@ -29,6 +28,7 @@
 	"all-languages": "A link to show the article in the multilingual pageviews tool. This appears in the 'info tiles' on Pageviews Analysis\n{{Identical|All languages}}",
 	"all-namespaces": "Label for the option to show data for all namespaces.",
 	"all-quotes": "Label for the button to show all quotes in the Bash Quote tool.",
+	"api": "{{Optional}}\nText for link to the API documentation.\n{{Identical|API}}",
 	"api-error": "Generic error message for when something went wrong while querying an API. $1 is the name of the API. This message is followed by the error returned by the API.",
 	"approve": "Name of a MediaWiki log action, used as header of a row in the table of log action counts for a user.\n{{Identical|Approve}}",
 	"approximate": "Indicate the values are possibly inaccurate.\n{{Identical|Approximate}}",
@@ -117,6 +117,7 @@
 	"executed": "Execution time. $1 is the formatted number of seconds, and $2 is the unformatted number for use with PLURAL.",
 	"explanation": "Column heading in the Bugs table, explaining how to fix the bug.\n{{Identical|Explanation}}",
 	"export-wikitext": "Link text that appears above a table, for exporing wikitext relating to the table.",
+	"feedback": "Link to feedback in header\n{{Identical|Feedback}}",
 	"file": "label for file\n{{Identical|File}}",
 	"files": "Heading for section showing stats about files.\n{{Identical|File}}",
 	"files-uploaded": "Label for the number of files a user has uploaded.",

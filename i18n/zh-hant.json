@@ -7,7 +7,6 @@
 			"A2093064"
 		]
 	},
-	"about-xtools": "關於這些工具",
 	"accepted-formats": "接受格式",
 	"account-age": "帳號年齡",
 	"account-age-desc": "$2 {{PLURAL:$1|天|天}}久",
@@ -118,6 +117,7 @@
 	"executed": "執行時間 $1 {{PLURAL:$2|秒}}。",
 	"explanation": "解釋",
 	"export-wikitext": "匯出 wiki 文字",
+	"feedback": "意見回饋",
 	"file": "檔案",
 	"files": "檔案",
 	"files-uploaded": "已上傳檔案",

@@ -5,7 +5,6 @@
 			"Nemo bis"
 		]
 	},
-	"about-xtools": "Sobre estas ferramentas",
 	"accepted-formats": "Formatos aceptados",
 	"account-age": "Idade da conta",
 	"accounts": "Contas",
@@ -89,6 +88,7 @@
 	"executed": "Executado en $1 {{PLURAL:$2|segundo|segundos}}.",
 	"explanation": "Explicación",
 	"export-wikitext": "Exportar o wikitexto",
+	"feedback": "Comentarios",
 	"file": "Ficheiro",
 	"files": "Ficheiros",
 	"files-uploaded": "Ficheiros cargados",

@@ -5,7 +5,6 @@
 			"Tothasze"
 		]
 	},
-	"about-xtools": "Ezekről az eszközökről",
 	"accepted-formats": "Elfogadott formátumok",
 	"account-age": "Fiók kora",
 	"account-age-desc": "$2 {{PLURAL:$1|day|napok}} old",
@@ -101,6 +100,7 @@
 	"executed": "Végrehajtva $1 {{PLURAL:$2|second|másodperc}} alatt.",
 	"explanation": "Magyarázat",
 	"export-wikitext": "Wikiszöveg export",
+	"feedback": "Visszajelzés",
 	"file": "Fájl",
 	"files": "Fájlok",
 	"files-uploaded": "Feltöltött fájlok",

@@ -76,6 +76,7 @@
 	"events": "Eventi",
 	"executed": "Eseguito in $1 {{PLURAL:$2|secondo|secondi}}.",
 	"explanation": "Spiegazione",
+	"feedback": "Commenti",
 	"file": "File",
 	"files": "File",
 	"files-uploaded": "File caricati",

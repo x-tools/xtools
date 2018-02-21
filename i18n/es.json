@@ -11,7 +11,6 @@
 			"Ivanhercaz"
 		]
 	},
-	"about-xtools": "Acerca de estas herramientas",
 	"accepted-formats": "Formatos aceptados",
 	"account-age": "Edad de la cuenta",
 	"account-age-desc": "Hace $2 {{PLURAL:$1|día|días}}",
@@ -114,6 +113,7 @@
 	"executed": "Ejecutado en $1 {{PLURAL:$2|segundo|segundos}}.",
 	"explanation": "Explicación",
 	"export-wikitext": "Exportar wikitexto",
+	"feedback": "Comentarios",
 	"file": "Archivo",
 	"files": "Archivos",
 	"files-uploaded": "Archivos cargados",

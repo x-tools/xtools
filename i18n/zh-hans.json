@@ -6,7 +6,6 @@
 			"Muhebbet"
 		]
 	},
-	"about-xtools": "关于这些工具",
 	"accepted-formats": "接受的格式",
 	"account-age": "账户年限",
 	"account-age-desc": "$2{{PLURAL:$1|天}}",
@@ -117,6 +116,7 @@
 	"executed": "执行耗时$1{{PLURAL:$2|秒}}。",
 	"explanation": "解释",
 	"export-wikitext": "导出wiki文本",
+	"feedback": "反馈",
 	"file": "文件",
 	"files": "文件",
 	"files-uploaded": "文件上传数",

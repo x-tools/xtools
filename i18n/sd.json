@@ -5,7 +5,6 @@
 			"Mehtab ahmed"
 		]
 	},
-	"about-xtools": "هنن اوزارن بابت",
 	"accepted-formats": "قبول ڪيل نمونا (Accepted formats)",
 	"account-age": "کاتي جي ڄمار (Account age)",
 	"account-age-desc": "$2 {{PLURAL:$1|ڏينھُن|ڏينھَن}} پراڻو",
@@ -85,6 +84,7 @@
 	"end": "پڄاڻيءَ جي تاريخ",
 	"events": "خاص موقعا",
 	"explanation": "سمجهاڻي",
+	"feedback": "اوهان جي راءِ",
 	"file": "فائيل",
 	"files": "فائيلَ",
 	"files-uploaded": "فائيل چاڙهيو ويو",

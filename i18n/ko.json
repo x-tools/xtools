@@ -8,7 +8,6 @@
 			"Ellif"
 		]
 	},
-	"about-xtools": "이 도구 정보",
 	"accepted-formats": "허용되는 형식",
 	"account-age": "계정 나이",
 	"account-age-desc": "$2{{PLURAL:$1|일}} 전",
@@ -101,6 +100,7 @@
 	"executed": "$1{{PLURAL:$2|초}} 전에 실행됨.",
 	"explanation": "설명",
 	"export-wikitext": "위키텍스트 내보내기",
+	"feedback": "피드백",
 	"file": "파일",
 	"files": "파일",
 	"files-uploaded": "업로드한 파일",

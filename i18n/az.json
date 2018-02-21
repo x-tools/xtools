@@ -4,7 +4,6 @@
 			"Neriman2003"
 		]
 	},
-	"about-xtools": "Bu alətlər haqqında",
 	"accepted-formats": "Qəbul formatları",
 	"account-age": "Hesab yaşı",
 	"account-age-desc": "$2 {{PLURAL:$1|gün|günlər}} köhnə",
@@ -110,6 +109,7 @@
 	"executed": "$1 {{PLURAL:$2|saniyə|saniyələr}} ilə icra edilib.",
 	"explanation": "izahat",
 	"export-wikitext": "Vikikitaba ixrac edin",
+	"feedback": "Rəy",
 	"file": "Fayl",
 	"files": "Fayllar",
 	"files-uploaded": "Yüklənmiş fayllar",

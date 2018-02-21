@@ -9,7 +9,6 @@
 			"Matěj Suchánek"
 		]
 	},
-	"about-xtools": "O nástrojích",
 	"account-age": "Stáří účtu",
 	"account-age-desc": "$1 {{PLURAL:$1|den|dny|dní}}",
 	"accounts": "Účty",
@@ -91,6 +90,7 @@
 	"events": "Události",
 	"executed": "Provedeno za $1 {{PLURAL:$2|sekundu|sekundy|sekund}}.",
 	"explanation": "Vysvětlení",
+	"feedback": "Zpětná vazba",
 	"file": "Soubor",
 	"files": "Soubory",
 	"files-uploaded": "Nahraných souborů",

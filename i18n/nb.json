@@ -5,7 +5,6 @@
 			"Nemo bis"
 		]
 	},
-	"about-xtools": "Om disse verktøyene",
 	"accepted-formats": "Godkjente formater",
 	"account-age": "Kontoalder",
 	"account-age-desc": "$2 {{PLURAL:$1|dag|dager}} gammel",
@@ -94,6 +93,7 @@
 	"executed": "Utført på $1 {{PLURAL:$2|sekund|sekunder}}.",
 	"explanation": "Forklaring",
 	"export-wikitext": "Eksporter wikitekst",
+	"feedback": "Tilbakemelding",
 	"file": "Fil",
 	"files": "Filer",
 	"files-uploaded": "Filer lastet opp",

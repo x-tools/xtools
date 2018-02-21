@@ -46,6 +46,7 @@
 	"end": "Päättymispäivä",
 	"events": "Tapahtumat",
 	"executed": "Suoritettu $1 {{PLURAL:$2|sekunnissa}}.",
+	"feedback": "Palaute",
 	"file": "Tiedosto",
 	"files-uploaded": "Tiedostoja ladattu",
 	"first-edit": "Ensimmäinen muokkaus",

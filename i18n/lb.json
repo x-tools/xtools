@@ -5,7 +5,6 @@
 			"Nemo bis"
 		]
 	},
-	"about-xtools": "Iwwer dës Geschirkëscht",
 	"accepted-formats": "Akzeptéiert Formater",
 	"account-age": "Alter vum Benotzerkont",
 	"account-age-desc": "$2 {{PLURAL:$1|Dag|Deeg}} al",
@@ -94,6 +93,7 @@
 	"executed": "A(n) $1 {{PLURAL:$2|Sekonn|Sekonnen}} ausgeféiert.",
 	"explanation": "Erklärung",
 	"export-wikitext": "Wikitext exportéieren",
+	"feedback": "Feedback",
 	"file": "Fichier",
 	"files": "Fichieren",
 	"files-uploaded": "Eropgeluede Fichieren",

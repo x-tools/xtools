@@ -6,7 +6,6 @@
 			"Johanna Strodt (WMDE)"
 		]
 	},
-	"about-xtools": "Über diese Werkzeuge",
 	"accepted-formats": "Akzeptierte Formate",
 	"account-age": "Alter des Benutzerkontos",
 	"account-age-desc": "{{PLURAL:$1|Ein Tag|$2 Tage}} alt",
@@ -117,6 +116,7 @@
 	"executed": "In {{PLURAL:$2|einer Sekunde|$1 Sekunden}} ausgeführt.",
 	"explanation": "Erklärung",
 	"export-wikitext": "Wikitext exportieren",
+	"feedback": "Rückmeldung",
 	"file": "Datei",
 	"files": "Dateien",
 	"files-uploaded": "Hochgeladene Dateien",

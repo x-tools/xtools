@@ -4,7 +4,6 @@
 			"Nikosgranturismogt"
 		]
 	},
-	"about-xtools": "Σχετικά με αυτά τα εργαλεία",
 	"accepted-formats": "Επιτρεπόμενες μορφές",
 	"account-age": "Ηλικία λογαριασμού",
 	"account-age-desc": "$2 {{PLURAL:$1|μέρα|μέρες}} πριν",
@@ -114,6 +113,7 @@
 	"executed": "Εκτελέστηκε σε $1 {{PLURAL:$2|δευτερόλεπτο|δευτερόλεπτα}}.",
 	"explanation": "εξήγηση",
 	"export-wikitext": "Εξαγωγή βικικειμένου",
+	"feedback": "Ανατροφοδότηση",
 	"file": "Αρχείο",
 	"files": "Αρχεία",
 	"files-uploaded": "Αρχεία επιφορτωμένα",

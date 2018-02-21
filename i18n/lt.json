@@ -6,7 +6,6 @@
 			"Tomasdd"
 		]
 	},
-	"about-xtools": "Apie šį puslapį",
 	"accepted-formats": "Tinkami formatai",
 	"account-age": "Paskyros amžius",
 	"account-age-desc": "Sukurta prieš $2 {{PLURAL:$1|dieną|dienas|dienų}}",
@@ -110,6 +109,7 @@
 	"executed": "Įkelta per $1 {{PLURAL:$2|sekundę|sekundes|sekundžių}}.",
 	"explanation": "Paaiškinimas",
 	"export-wikitext": "Rodyti vikitekstą",
+	"feedback": "Atsiliepimai",
 	"file": "Rinkmena",
 	"files": "Rinkmenos",
 	"files-uploaded": "Įkelti failai",

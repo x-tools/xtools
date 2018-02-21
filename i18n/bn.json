@@ -6,7 +6,6 @@
 			"Rasal Lia"
 		]
 	},
-	"about-xtools": "এই সরঞ্জামগুলি সম্পর্কে",
 	"accepted-formats": "গ্রহণকৃত বিন্যাস",
 	"account-age": "অ্যাকাউন্টের বয়স",
 	"account-age-desc": "$2 {{PLURAL:$1|দিনের}} পুরনো",
@@ -106,6 +105,7 @@
 	"executed": "$1 {{PLURAL:$2|সেকেন্ডে}} নিষ্পন্ন।",
 	"explanation": "ব্যাখ্যা",
 	"export-wikitext": "উইকিপাঠ রপ্তানি করুন",
+	"feedback": "প্রতিক্রিয়া",
 	"file": "চিত্র",
 	"files": "ফাইল",
 	"files-uploaded": "চিত্র আপলোড করেছে",

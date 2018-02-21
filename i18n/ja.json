@@ -85,6 +85,7 @@
 	"executed": "実行時間 $1 秒。",
 	"explanation": "説明",
 	"export-wikitext": "ウィキテキストを出力する",
+	"feedback": "フィードバック",
 	"file": "ファイル",
 	"files": "ファイル",
 	"files-uploaded": "ローカル・アップロードしたファイル数",

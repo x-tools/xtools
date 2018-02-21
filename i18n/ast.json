@@ -5,7 +5,6 @@
 			"Nemo bis"
 		]
 	},
-	"about-xtools": "Tocante a estes ferramientes",
 	"accepted-formats": "Formatos aceutaos",
 	"account-age": "Antigüedá de la cuenta",
 	"account-age-desc": "tien $2 {{PLURAL:$1|día|díes}}",
@@ -115,6 +114,7 @@
 	"executed": "Executao en $1 {{PLURAL:$2|segundu|segundos}}.",
 	"explanation": "Esplicación",
 	"export-wikitext": "Esportar testu wiki",
+	"feedback": "La to opinión",
 	"file": "Ficheru",
 	"files": "Ficheros",
 	"files-uploaded": "Ficheros xubíos",

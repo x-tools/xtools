@@ -7,7 +7,6 @@
 			"Woodcutterty"
 		]
 	},
-	"about-xtools": "Over deze hulpmiddelen",
 	"accepted-formats": "Geaccepteerde indelingen",
 	"account-age": "Accountleeftijd",
 	"account-age-desc": "$2 {{PLURAL:$1|dag|dagen}} oud",
@@ -77,6 +76,7 @@
 	"executed": "Uitgevoerd in $1 {{PLURAL:$2|seconde|seconden}}.",
 	"explanation": "Uitleg",
 	"export-wikitext": "Wikitekst exporteren",
+	"feedback": "Terugkoppeling",
 	"file": "Bestand",
 	"files": "Bestanden",
 	"files-uploaded": "Bestanden geupload",

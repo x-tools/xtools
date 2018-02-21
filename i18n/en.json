@@ -6,7 +6,6 @@
 			"Framawiki"
 		]
 	},
-	"about-xtools": "About these tools",
 	"accepted-formats": "Accepted formats",
 	"account-age": "Account age",
 	"account-age-desc": "$2 {{PLURAL:$1|day|days}} old",
@@ -28,6 +27,7 @@
 	"all-languages": "All languages",
 	"all-namespaces": "All namespaces",
 	"all-quotes": "All quotes",
+	"api": "API",
 	"api-error": "Error querying $1",
 	"approve": "Approve",
 	"approximate": "Approximate",
@@ -117,6 +117,7 @@
 	"executed": "Executed in $1 {{PLURAL:$2|second|seconds}}.",
 	"explanation": "Explanation",
 	"export-wikitext": "Export wikitext",
+	"feedback": "Feedback",
 	"file": "File",
 	"files": "Files",
 	"files-uploaded": "Files uploaded",

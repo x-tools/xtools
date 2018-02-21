@@ -9,7 +9,6 @@
 			"Ankam"
 		]
 	},
-	"about-xtools": "O narzędziu",
 	"accepted-formats": "Akceptowane formaty",
 	"accounts": "Konta",
 	"accounts-created": "Utworzonych kont",
@@ -76,6 +75,7 @@
 	"events": "Rejestry",
 	"executed": "Wykonano w $1 {{PLURAL:$2|sekundę|sekundy|sekund}}.",
 	"explanation": "Wyjaśnienie",
+	"feedback": "Opinie",
 	"file": "Plik",
 	"files": "Pliki",
 	"files-uploaded": "Przesłane pliki",
