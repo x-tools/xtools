@@ -30,7 +30,7 @@ parameters:
             link: Special:MyLanguage/Project:Rollback
             revert: true
         Undo:
-            regex: '^(Undid|Undo) revision \d+ by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\]'
+            regex: '^(Undid|Undo|\[\[WP:UNDO\|Undid\]\]) revision \d+ by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\]'
             link: Special:MyLanguage/Project:Undo
             # This is not considered a revert because you can undo
             # any arbitrary revision, not just the previous one.
@@ -91,7 +91,7 @@ parameters:
             regex: 'WP:(AFCH|AFCHRW)'
             link: Project:AFCH
         AutoWikiBrowser:
-            regex: '(Wikipedia|WP|Project):AWB'
+            regex: '(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
             link: Project:AutoWikiBrowser
         reFill:
             regex: 'User:Zhaofeng Li\/Reflinks|WP:REFILL'
