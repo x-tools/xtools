@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.1.42 ##
+- T178055: More support for screen readers.
+- Add 'Feedback' link in footer, shorten links.
+- Better AWB and Undo detection in AutoEdits.
+
 ## 3.1.41 ##
 - Handle exception thrown in production when user has no edits.
 - Fix broken TopEdits API endpoint.
