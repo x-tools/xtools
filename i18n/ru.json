@@ -8,7 +8,9 @@
 			"Edible Melon",
 			"Kareyac",
 			"Gehhrr",
-			"Smigles"
+			"Smigles",
+			"Mouse21",
+			"Movses"
 		]
 	},
 	"accepted-formats": "Допустимые форматы",
@@ -21,6 +23,7 @@
 	"added": "Добавлено",
 	"added-bytes": "Добавлено (байт)",
 	"admin": "Админ",
+	"admins-without-action": "Неактивные администраторы",
 	"afd": "Статьи для удаления",
 	"all": "все",
 	"all-approximate": "Все данные приблизительные.",
@@ -28,6 +31,7 @@
 	"all-languages": "Все языки",
 	"all-namespaces": "Все пространства имён",
 	"all-quotes": "Все цитаты",
+	"api": "API",
 	"api-error": "Произошла ошибка во время обработки $1",
 	"approve": "Патрулирование",
 	"approximate": "приблизительно",
@@ -60,6 +64,7 @@
 	"count": "Количество",
 	"created-by": "Создатель",
 	"csv": "CSV",
+	"current-admins": "Текущие администраторы",
 	"current-size": "Текущий размер",
 	"date": "Дата",
 	"date-from": "От: $1",
@@ -291,6 +296,7 @@
 	"username-or-ip": "Имя участники или IPv4-адрес или IPv6-адрес",
 	"version": "Версия $1",
 	"view-source": "Просмотр исходного кода",
+	"view-wikitext": "Просмотреть как викитекст",
 	"vote-msg": "$1 отредактировал $2 $3 страниц!",
 	"wednesday": "Среда",
 	"wiki": "Вики",

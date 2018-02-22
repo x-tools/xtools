@@ -2,11 +2,13 @@
 	"@metadata": {
 		"authors": [
 			"Nemo bis",
-			"Piramidion"
+			"Piramidion",
+			"Movses"
 		]
 	},
 	"accepted-formats": "Прийнятні формати",
 	"account-age": "Вік облікового запису",
+	"account-age-desc": "$2 {{PLURAL:$1|день|дні|днів}} тому",
 	"accounts": "Облікові записи",
 	"accounts-created": "Створено облікових записів",
 	"actions": "Дії",
@@ -52,6 +54,8 @@
 	"bottom-ninety": "Інші 90%",
 	"bugs": "Баґи",
 	"bytes": "байт",
+	"categories": "Категорії",
+	"characters": "Символи",
 	"considered-usernames": "Враховані імена користувачів",
 	"count": "Кількість",
 	"created-by": "Створено",
@@ -60,8 +64,10 @@
 	"current-size": "Поточний розмір",
 	"data-limit": "Дані обмежені до $2 {{PLURAL:$1|останнього редагування|останніх редагувань}}",
 	"date": "Дата",
+	"date-range": "$1 – $2",
 	"delete": "Вилучення",
 	"deleted": "Вилучено",
+	"deleted-bytes": "Вилучено (байт)",
 	"deleted-edits": "Вилучено редагувань",
 	"diff": "Різниця",
 	"documentation": "Документація",
@@ -258,6 +264,7 @@
 	"rfx-tally": "Підрахунок",
 	"rfx-total-votes": "Всього голосів",
 	"rights": "Права",
+	"rights-changes": "Зміни прав користувачів",
 	"rpp": "Запити на захист сторінки",
 	"saturday": "Субота",
 	"see-full-edit-counts": "Див. повні значення в лічильнику редагувань",
@@ -342,6 +349,7 @@
 	"user-is-not-admin": "Цей користувач не є адміном",
 	"user-not-found": "Запитуваний користувач не існує",
 	"user-page": "Сторінка користувача",
+	"user-page-desc": "Розмір сторінки користувача — $2 {{PLURAL:$1|байт|байта|байти}}",
 	"username": "Ім'я користувача",
 	"username-or-ip": "Ім'я користувача, або IPv4, або IPv6",
 	"version": "Версія $1",
@@ -352,6 +360,7 @@
 	"wiki": "Вікі",
 	"wikiproject": "Вікіпроект",
 	"with-summary": "із описом змін",
+	"words": "Слова",
 	"xtools-slogan": "Вгамовуємо Ваш інформаційний голод",
 	"xtools-title": "X!'s tools",
 	"year": "Рік",
