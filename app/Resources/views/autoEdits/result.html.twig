@@ -13,7 +13,7 @@
         <h3 class="text-center">{{ msg('tool-autoedits') }}</h3>
 
         {# Show TOC when the user has a ton of automated tools, making the page hard to navigate #}
-        {% if toolCounts|length > 15 %}
+        {% if toolCounts|length > 2 %}
             <div class="text-center xt-toc">
                 {% set sections = ['summary', 'auto-edits', 'non-auto-edits'] %}
                 {% for section in sections %}
@@ -25,7 +25,7 @@
         {% endif %}
 
         {% set content %}
-            <div class="panel-body stat-list clearfix" id="summary">
+            <div class="panel-body stat-list autoedits-stat-list clearfix" id="summary">
                 <table class="table autoedits-table pull-left">
                     {% if hasStartDate %}
                         <tr>
@@ -73,7 +73,10 @@
                                     label: msg('auto-edits'),
                                     value: autoCount,
                                     percentage: autoPct
-                                }]
+                                }],
+                                false,
+                                'autoedits-summary-chart',
+                                140
                             )
                         }}
                     </div>
@@ -141,8 +144,15 @@
                     </table>
 
                     {% if toolCounts|length > 1 %}
+                        {##
+                         # Set the size of the chart to be relative to the number of tools.
+                         # Otherwise it may get too big and hog up the real estate.
+                         # 37 is the heigh of one row.
+                         ##}
+                        {% set maxHeight = min(400, (toolCounts|length + 2) * 37) %}
+                        {% set height = max(150, maxHeight) %}
                         <div class="chart-wrapper tools-chart-wrapper toggle-table--chart">
-                            <canvas id="tool_chart" width="400" height="400"></canvas>
+                            <canvas id="tool_chart" width="{{ height }}" height="{{ height }}"></canvas>
                         </div>
 
                         {% set colors = [] %}
