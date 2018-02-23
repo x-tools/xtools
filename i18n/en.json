@@ -339,7 +339,7 @@
 	"tool-articleinfo": "Page History",
 	"tool-articleinfo-desc": "Get various statistics about the history of a page",
 	"tool-autoedits": "Automated Edits",
-	"tool-autoedits-desc": "Automated edits with known tools",
+	"tool-autoedits-desc": "Analysis of semi-automated and non-automated contributions.",
 	"tool-bash": "Random Quote",
 	"tool-bash-desc": "Get quotes from the IRC Quote Database",
 	"tool-blame": "Article Blamer",
