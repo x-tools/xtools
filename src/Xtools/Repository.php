@@ -80,6 +80,44 @@ abstract class Repository
     }
 
     /**
+     * Is XTools connecting to MMF Labs?
+     * @return boolean
+     * @codeCoverageIgnore
+     */
+    public function isLabs()
+    {
+        return (bool)$this->container->getParameter('app.is_labs');
+    }
+
+    /**
+     * Get various metadata about the current tool being used, which will
+     * be used in logging for diagnosting any issues.
+     * @return array
+     *
+     * There is no request stack in the tests.
+     * @codeCoverageIgnore
+     */
+    protected function getCurrentRequestMetadata()
+    {
+        $request = $this->container->get('request_stack')->getCurrentRequest();
+
+        if (null === $request) {
+            return;
+        }
+
+        $requestTime = microtime(true) - $request->server->get('REQUEST_TIME_FLOAT');
+
+        return [
+            'requestTime' => round($requestTime, 2),
+            'path' => $request->getPathInfo(),
+        ];
+    }
+
+    /***************
+     * CONNECTIONS *
+     ***************/
+
+    /**
      * Get the database connection for the 'meta' database.
      * @return Connection
      * @codeCoverageIgnore
@@ -122,7 +160,7 @@ abstract class Repository
         if (!$this->toolsConnection instanceof Connection) {
             $this->toolsConnection = $this->container
                 ->get('doctrine')
-                ->getManager("toolsdb")
+                ->getManager('toolsdb')
                 ->getConnection();
         }
         return $this->toolsConnection;
@@ -145,15 +183,9 @@ abstract class Repository
         return $api;
     }
 
-    /**
-     * Is XTools connecting to MMF Labs?
-     * @return boolean
-     * @codeCoverageIgnore
-     */
-    public function isLabs()
-    {
-        return (bool)$this->container->getParameter('app.is_labs');
-    }
+    /*****************
+     * QUERY HELPERS *
+     *****************/
 
     /**
      * Make a request to the XTools API, optionally doing so asynchronously via Guzzle.
@@ -198,7 +230,7 @@ abstract class Repository
         // $tableExtension in order to generate the new table name
         if ($this->isLabs() && $tableExtension !== null) {
             $mapped = true;
-            $tableName = $tableName . '_' . $tableExtension;
+            $tableName = $tableName.'_'.$tableExtension;
         } elseif ($this->container->hasParameter("app.table.$tableName")) {
             // Use the table specified in the table mapping configuration, if present.
             $mapped = true;
@@ -313,11 +345,11 @@ abstract class Repository
         $datesConditions = '';
         if (false !== $start) {
             // Convert to YYYYMMDDHHMMSS. *who in the world thought of having time in BLOB of this format ;-;*
-            $start = date('Ymd', $start) . '000000';
+            $start = date('Ymd', $start).'000000';
             $datesConditions .= " AND {$tableAlias}{$field} > '$start'";
         }
         if (false !== $end) {
-            $end = date('Ymd', $end) . '235959';
+            $end = date('Ymd', $end).'235959';
             $datesConditions .= " AND {$tableAlias}{$field} < '$end'";
         }
 
@@ -377,12 +409,26 @@ abstract class Repository
         }
 
         if ($e->getErrorCode() === 1226) {
+            $this->logErrorData('MAX CONNECTIONS');
             throw new ServiceUnavailableHttpException(30, 'error-service-overload', null, 503);
         } elseif ($e->getErrorCode() === 1969) {
+            $this->logErrorData('QUERY TIMEOUT');
             throw new HttpException(504, 'error-query-timeout', null, [], $timeout);
         } else {
             throw $e;
         }
+    }
+
+    /**
+     * Log error containing the given error code, along with the request path and request time.
+     * @param string $error
+     */
+    private function logErrorData($error)
+    {
+        $metadata = $this->getCurrentRequestMetadata();
+        $this->getLog()->error(
+            '>>> '.$metadata['path'].' ('.$error.' after '.$metadata['requestTime'].')'
+        );
     }
 
     /**
