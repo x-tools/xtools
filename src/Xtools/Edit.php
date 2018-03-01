@@ -367,7 +367,7 @@ class Edit extends Model
     public function isRevert(Container $container)
     {
         $automatedEditsHelper = $container->get('app.automated_edits_helper');
-        return $automatedEditsHelper->isRevert($this->comment, $this->getProject()->getDomain());
+        return $automatedEditsHelper->isRevert($this->comment, $this->getProject());
     }
 
     /**
@@ -378,7 +378,7 @@ class Edit extends Model
     public function getTool(Container $container)
     {
         $automatedEditsHelper = $container->get('app.automated_edits_helper');
-        return $automatedEditsHelper->getTool($this->comment, $this->getProject()->getDomain());
+        return $automatedEditsHelper->getTool($this->comment, $this->getProject());
     }
 
     /**

@@ -261,7 +261,7 @@ class TopEdits extends Model
             // Check if the edit was reverted based on the edit summary of the following edit.
             // If so, update $revision so that when an Edit is instantiated, it will
             // have the 'reverted' option set.
-            if ($aeh->isRevert($revision['parent_comment'], $this->project->getDomain())) {
+            if ($aeh->isRevert($revision['parent_comment'], $this->project)) {
                 $revision['reverted'] = 1;
             }
 

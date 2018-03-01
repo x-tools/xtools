@@ -7,6 +7,8 @@ namespace AppBundle\Helper;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+use Xtools\Project;
+
 /**
  * Helper class for fetching semi-automated definitions.
  */
@@ -64,66 +66,74 @@ class AutomatedEditsHelper extends HelperBase
      * Get list of automated tools and their associated info for the
      *   given project. This defaults to the 'default_project' if
      *   entries for the given project are not found.
-     * @param  string $projectDomain Such as en.wikipedia.org
+     * @param  Project $project
      * @return string[] Each tool with the tool name as the key,
      *   and 'link', 'regex' and/or 'tag' as the subarray keys.
      */
-    public function getTools($projectDomain)
+    public function getTools(Project $project)
     {
+        $projectDomain = $project->getDomain();
+
         if (isset($this->tools[$projectDomain])) {
             return $this->tools[$projectDomain];
         }
 
         // Load the semi-automated edit types.
-        $toolsByWiki = $this->container->getParameter('automated_tools');
+        $tools = $this->container->getParameter('automated_tools');
 
         // Default to default project (e.g. en.wikipedia.org) if wiki not configured
-        if (isset($toolsByWiki[$projectDomain])) {
-            $this->tools[$projectDomain] = $toolsByWiki[$projectDomain];
-        } elseif (isset($toolsByWiki[$this->container->getParameter('default_project')])) {
-            $this->tools[$projectDomain] = $toolsByWiki[$this->container->getParameter('default_project')];
+        if (isset($tools[$projectDomain])) {
+            $localRules = $tools[$projectDomain];
+        } elseif (isset($tools[$this->container->getParameter('default_project')])) {
+            $localRules = $tools[$this->container->getParameter('default_project')];
         } else {
-            $this->tools[$projectDomain] = [];
+            $localRules = [];
         }
 
-        // Override global rules with wiki-specific rules.
-        $this->tools[$projectDomain] = $this->mergeValues(
-            $this->tools[$projectDomain],
-            $toolsByWiki['global']
+        $langRules = isset($tools[$project->getLang()])
+            ? $tools[$project->getLang()]
+            : [];
+
+        // Per-wiki rules have priority, followed by language-specific and global.
+        $globalWithLangRules = $this->mergeRules($tools['global'], $langRules);
+        $this->tools[$projectDomain] = $this->mergeRules(
+            $globalWithLangRules,
+            $localRules
         );
 
         return $this->tools[$projectDomain];
     }
 
     /**
-     * Merges the given rule sets, giving priority to the wiki-specific set.
+     * Merges the given rule sets, giving priority to the local set.
      * Regex is concatenated, not overridden.
-     * @param array $localValues  The rule set for the local wiki.
-     * @param array $globalValues The global rule set.
+     * @param array $globalRules The global rule set.
+     * @param array $localRules The rule set for the local wiki.
+     * @return array Merged rules.
      */
-    private function mergeValues($localValues, $globalValues)
+    private function mergeRules($globalRules, $localRules)
     {
-        // Initial set, including just the global values.
-        $tools = $globalValues;
+        // Initial set, including just the global rules.
+        $tools = $globalRules;
 
-        // Loop through local values and override/merge as necessary.
-        foreach ($localValues as $tool => $values) {
-            $newValues = $values;
+        // Loop through local rules and override/merge as necessary.
+        foreach ($localRules as $tool => $rules) {
+            $newRules = $rules;
 
-            if (isset($globalValues[$tool])) {
-                // Order within array_merge is important, so that local values get priority.
-                $newValues = array_merge($globalValues[$tool], $values);
+            if (isset($globalRules[$tool])) {
+                // Order within array_merge is important, so that local rules get priority.
+                $newRules = array_merge($globalRules[$tool], $rules);
             }
 
             // Regex should be merged, not overridden.
-            if (isset($values['regex']) && isset($globalValues[$tool]['regex'])) {
-                $newValues['regex'] = implode('|', [
-                    $values['regex'],
-                    $globalValues[$tool]['regex']
+            if (isset($rules['regex']) && isset($globalRules[$tool]['regex'])) {
+                $newRules['regex'] = implode('|', [
+                    $rules['regex'],
+                    $globalRules[$tool]['regex']
                 ]);
             }
 
-            $tools[$tool] = $newValues;
+            $tools[$tool] = $newRules;
         }
 
         return $tools;
@@ -133,18 +143,20 @@ class AutomatedEditsHelper extends HelperBase
      * Get only tools that are used to revert edits.
      * Revert detection happens only by testing against a regular expression,
      *   and not by checking tags.
-     * @param  string $projectDomain Such as en.wikipedia.org
+     * @param  Project $project
      * @return string[] Each tool with the tool name as the key,
      *   and 'link' and 'regex' as the subarray keys.
      */
-    public function getRevertTools($projectDomain)
+    public function getRevertTools(Project $project)
     {
+        $projectDomain = $project->getDomain();
+
         if (isset($this->revertTools[$projectDomain])) {
             return $this->revertTools[$projectDomain];
         }
 
         $revertEntries = array_filter(
-            $this->getTools($projectDomain),
+            $this->getTools($project),
             function ($tool) {
                 return isset($tool['revert']);
             }
@@ -155,7 +167,7 @@ class AutomatedEditsHelper extends HelperBase
         $this->revertTools[$projectDomain] = array_map(function ($revertTool) {
             return [
                 'link' => $revertTool['link'],
-                'regex' => $revertTool['revert'] === true ? $revertTool['regex'] : $revertTool['revert']
+                'regex' => $revertTool['revert'] === true ? $revertTool['regex'] : $revertTool['revert'],
             ];
         }, $revertEntries);
 
@@ -166,12 +178,12 @@ class AutomatedEditsHelper extends HelperBase
      * Was the edit a revert, based on the edit summary?
      * This only works for tools defined with regular expressions, not tags.
      * @param  string $summary Edit summary
-     * @param  string $projectDomain Such as en.wikipedia.org
+     * @param  Project $project
      * @return bool
      */
-    public function isRevert($summary, $projectDomain)
+    public function isRevert($summary, Project $project)
     {
-        foreach ($this->getRevertTools($projectDomain) as $tool => $values) {
+        foreach ($this->getRevertTools($project) as $tool => $values) {
             if (preg_match('/'.$values['regex'].'/', $summary)) {
                 return true;
             }

@@ -117,7 +117,7 @@
                                         <span class="glyphicon glyphicon-remove"></span>
                                         <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
                                     </span>
-                                    {{ wiki.pageLinkRaw(values.link, project, tool) }}
+                                    {{ wiki.pageLinkRaw(values.link, project, values.label) }}
                                 </td>
                                 <td class="sort-entry--count" data-value="{{ values.count }}">
                                     {{ values.count|num_format }}
@@ -192,7 +192,7 @@
                     </div>
                 {% endif %}
                 <p style="clear:both">
-                    <a target="_blank" href="https://phabricator.wikimedia.org/maniphest/task/create/?title=Request to add tool to AutoEdits&amp;projects=XTools&amp;description=Project: {{ project.domain }}%0A%0AName of tool:%0A%0ALinks to example edits:%0A%0ALink to the tool's documentation or homepage:">
+                    <a target="_blank" href="https://phabricator.wikimedia.org/maniphest/task/create/?title=Request to add tool to AutoEdits&amp;projects=XTools&amp;description=Project: {{ project.domain }}%0A%0A{{ msg('auto-edits-request-name') }}:%0A%0A{{ msg('auto-edits-request-examples') }}:%0A%0A{{ msg('auto-edits-request-doc') }}:">
                         {{ msg('auto-edits-request') }}
                         <span class="glyphicon glyphicon-new-window"></span>
                     </a>

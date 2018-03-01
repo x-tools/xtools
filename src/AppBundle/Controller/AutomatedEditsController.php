@@ -156,6 +156,21 @@ class AutomatedEditsController extends XtoolsController
     /************************ API endpoints ************************/
 
     /**
+     * Get a list of the automated tools and their regex/tags/etc.
+     * @Route("/api/user/automated_tools/{project}")
+     * @param string $project The project domain or database name.
+     * @return JsonResponse
+     * @codeCoverageIgnore
+     */
+    public function automatedToolsApiAction($project)
+    {
+        $this->recordApiUsage('user/automated_tools');
+        $project = $this->validateProject($project);
+        $aeh = $this->container->get('app.automated_edits_helper');
+        return new JsonResponse($aeh->getTools($project->getDomain()));
+    }
+
+    /**
      * Count the number of automated edits the given user has made.
      * @Route(
      *   "/api/user/automated_editcount/{project}/{username}/{namespace}/{start}/{end}/{tools}",
