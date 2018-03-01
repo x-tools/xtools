@@ -35,7 +35,7 @@ class AutoEditsRepository extends UserRepository
         list($condBegin, $condEnd) = $this->getRevTimestampConditions($start, $end);
 
         // Get the combined regex and tags for the tools
-        list($regex, $tags) = $this->getToolRegexAndTags($project->getDomain());
+        list($regex, $tags) = $this->getToolRegexAndTags($project);
 
         list($pageJoin, $condNamespace) = $this->getPageAndNamespaceSql($project, $namespace);
 
@@ -101,7 +101,7 @@ class AutoEditsRepository extends UserRepository
         list($condBegin, $condEnd) = $this->getRevTimestampConditions($start, $end, 'revs.');
 
         // Get the combined regex and tags for the tools
-        list($regex, $tags) = $this->getToolRegexAndTags($project->getDomain());
+        list($regex, $tags) = $this->getToolRegexAndTags($project);
 
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
@@ -173,7 +173,7 @@ class AutoEditsRepository extends UserRepository
         $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end);
 
         $automatedEditsHelper = $this->container->get('app.automated_edits_helper');
-        $tools = $automatedEditsHelper->getTools($project->getDomain());
+        $tools = $automatedEditsHelper->getTools($project);
 
         // handling results
         $results = [];
@@ -184,6 +184,9 @@ class AutoEditsRepository extends UserRepository
             if ($row['count'] > 0) {
                 $results[$tool] = [
                     'link' => $tools[$tool]['link'],
+                    'label' => isset($tools[$tool]['label'])
+                        ? $tools[$tool]['label']
+                        : $tool,
                     'count' => $row['count'],
                 ];
             }
@@ -214,7 +217,7 @@ class AutoEditsRepository extends UserRepository
 
         // Load the semi-automated edit types.
         $automatedEditsHelper = $this->container->get('app.automated_edits_helper');
-        $tools = $automatedEditsHelper->getTools($project->getDomain());
+        $tools = $automatedEditsHelper->getTools($project);
 
         // Create a collection of queries that we're going to run.
         $queries = [];
@@ -289,15 +292,15 @@ class AutoEditsRepository extends UserRepository
     /**
      * Get the combined regex and tags for all semi-automated tools,
      *   ready to be used in a query.
-     * @param string $projectDomain Such as en.wikipedia.org
+     * @param Project $project
      * @return string[] In the format:
      *    ['combined|regex', 'combined,tags']
      */
-    private function getToolRegexAndTags($projectDomain)
+    private function getToolRegexAndTags(Project $project)
     {
         $conn = $this->getProjectsConnection();
         $automatedEditsHelper = $this->container->get('app.automated_edits_helper');
-        $tools = $automatedEditsHelper->getTools($projectDomain);
+        $tools = $automatedEditsHelper->getTools($project);
         $regexes = [];
         $tags = [];
 

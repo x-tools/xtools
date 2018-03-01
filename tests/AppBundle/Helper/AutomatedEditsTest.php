@@ -8,6 +8,8 @@ namespace Tests\AppBundle\Helper;
 use AppBundle\Helper\AutomatedEditsHelper;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
+use Xtools\Project;
+use Xtools\ProjectRepository;
 
 /**
  * Tests of the AutomatedEditsHelper class.
@@ -20,6 +22,9 @@ class AutomatedEditsTest extends WebTestCase
 
     /** @var AutomatedEditsHelper The API Helper object to test. */
     protected $aeh;
+
+    /** @var Project The project against which we are testing. */
+    protected $project;
 
     /**
      * Set up the AutomatedEditsHelper object for testing.
@@ -37,7 +42,8 @@ class AutomatedEditsTest extends WebTestCase
      */
     public function testTools()
     {
-        $tools = $this->aeh->getTools('en.wikipedia.org');
+        $this->setProject();
+        $tools = $this->aeh->getTools($this->project);
 
         $this->assertArraySubset(
             [
@@ -57,6 +63,7 @@ class AutomatedEditsTest extends WebTestCase
      */
     public function testTool()
     {
+        $this->setProject();
         $this->assertArraySubset(
             [
                 'name' => 'Huggle',
@@ -67,7 +74,7 @@ class AutomatedEditsTest extends WebTestCase
             ],
             $this->aeh->getTool(
                 'Level 2 warning re. [[Barack Obama]] ([[WP:HG|HG]]) (3.2.0)',
-                'en.wikipedia.org'
+                $this->project
             )
         );
     }
@@ -77,13 +84,14 @@ class AutomatedEditsTest extends WebTestCase
      */
     public function testIsAutomated()
     {
+        $this->setProject();
         $this->assertTrue($this->aeh->isAutomated(
             'Level 2 warning re. [[Barack Obama]] ([[WP:HG|HG]]) (3.2.0)',
-            'en.wikipedia.org'
+            $this->project
         ));
         $this->assertFalse($this->aeh->isAutomated(
             'You should try [[WP:Huggle]]',
-            'en.wikipedia.org'
+            $this->project
         ));
     }
 
@@ -92,7 +100,8 @@ class AutomatedEditsTest extends WebTestCase
      */
     public function testRevertTools()
     {
-        $tools = $this->aeh->getTools('en.wikipedia.org');
+        $this->setProject();
+        $tools = $this->aeh->getTools($this->project);
 
         $this->assertArraySubset(
             ['Huggle' => [
@@ -112,16 +121,27 @@ class AutomatedEditsTest extends WebTestCase
      */
     public function testRegexConcat()
     {
-        $tools = $this->aeh->getTools('ar.wikipedia.org');
+        $projectRepo = $this->getMock(ProjectRepository::class);
+        $projectRepo->expects($this->once())
+            ->method('getOne')
+            ->willReturn([
+                'url' => 'https://ar.wikipedia.org',
+                'dbName' => 'arwiki',
+                'lang' => 'ar',
+            ]);
+        $project = new Project('ar.wikipedia.org');
+        $project->setRepository($projectRepo);
+
+        $tools = $this->aeh->getTools($project);
 
         $this->assertArraySubset(
             ['HotCat' => [
-                'regex' => 'باستخدام \[\[ويكيبيديا:المصناف الفوري|using ' .
-                    '\[\[(WP:HOTCAT|WP:HC|Help:Gadget-HotCat)\|HotCat|' .
-                    'Gadget-Hotcat(?:check)?\.js\|Script',
+                'regex' => 'باستخدام \[\[ويكيبيديا:المصناف الفوري|\|HotCat\]\]' .
+                    '|Gadget-Hotcat(?:check)?\.js\|Script|\]\] via HotCat',
                 'link' => 'ويكيبيديا:المصناف الفوري',
+                'label' => 'المصناف الفوري',
             ]],
-            $tools
+            $this->aeh->getTools($project)
         );
     }
 
@@ -130,13 +150,32 @@ class AutomatedEditsTest extends WebTestCase
      */
     public function testIsRevert()
     {
+        $this->setProject();
         $this->assertTrue($this->aeh->isRevert(
             'Reverted edits by Mogultalk (talk) ([[WP:HG|HG]]) (3.2.0)',
-            'en.wikipedia.org'
+            $this->project
         ));
         $this->assertFalse($this->aeh->isRevert(
             'You should have reverted this edit using [[WP:HG|Huggle]]',
-            'en.wikipedia.org'
+            $this->project
         ));
+    }
+
+    /**
+     * Set the Project. This is done here because we don't want to use
+     * en.wikipedia for self::testRegexConcat().
+     */
+    private function setProject()
+    {
+        $projectRepo = $this->getMock(ProjectRepository::class);
+        $projectRepo->expects($this->once())
+            ->method('getOne')
+            ->willReturn([
+                'url' => 'https://en.wikipedia.org',
+                'dbName' => 'enwiki',
+                'lang' => 'en',
+            ]);
+        $this->project = new Project('en.wikipedia.org');
+        $this->project->setRepository($projectRepo);
     }
 }
