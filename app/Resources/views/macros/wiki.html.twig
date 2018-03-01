@@ -38,7 +38,7 @@
     {{ extLink(url, msg('history'), label) }}
 {% endspaceless %}{% endmacro %}
 
-{% macro pageHistLinkRaw(pageTitle, project, label = null, offset = null, limit = null) %}{% spaceless %}
+{% macro pageHistLinkRaw(pageTitle, project, label = null, offset = null, limit = null, rawUrl = false) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {% from _self import pageUrlRaw as pageUrlRaw %}
     {% set pageUrl = pageUrlRaw(pageTitle, project) %}
@@ -49,7 +49,16 @@
     {% if limit is not empty %}
         {% set url = url ~ '&limit=' ~ limit %}
     {% endif %}
-    {{ extLink(url, msg('history'), label) }}
+    {% if rawUrl %}
+        {{ url }}
+    {% else %}
+        {{ extLink(url, msg('history'), label) }}
+    {% endif %}
+{% endspaceless %}{% endmacro %}
+
+{% macro pageHistUrlRaw(pageTitle, project, offset = null, limit = null) %}{% spaceless %}
+    {% from _self import pageHistLinkRaw as pageHistLinkRaw %}
+    {{ pageHistLinkRaw(pageTitle, project, null, offset, limit, true) }}
 {% endspaceless %}{% endmacro %}
 
 {% macro pageInfoLink(page, label = null) %}{% spaceless %}
@@ -140,14 +149,23 @@
     {{ extLink(url, msg('log'), label) }}
 {% endspaceless %}{% endmacro %}
 
-{% macro pageLogLinkRaw(pageTitle, project, label = null, type = null) %}{% spaceless %}
+{% macro pageLogLinkRaw(pageTitle, project, label = null, type = null, rawUrl = false) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {% set articlePath = project.articlePath|replace({'$1': ('Special:Log'|replace({' ': '_'}))}) %}
     {% set url = (project.url|trim('/')) ~ articlePath ~ '?page=' ~ pageTitle|replace({' ': '_'})|e('url') %}
     {% if type is not empty %}
         {% set url = url ~ '&type=' ~ type %}
     {% endif %}
-    {{ extLink(url, msg('log'), label) }}
+    {% if rawUrl %}
+        {{ url }}
+    {% else %}
+        {{ extLink(url, msg('log'), label) }}
+    {% endif %}
+{% endspaceless %}{% endmacro %}
+
+{% macro pageLogUrlRaw(pageTitle, project, type = null) %}{% spaceless %}
+    {% from _self import pageLogLinkRaw as pageLogLinkRaw %}
+    {{ pageLogLinkRaw(pageTitle, project, null, type, true) }}
 {% endspaceless %}{% endmacro %}
 
 {# `label` may be a DateTime object, in which case the formatted timestamp will be shown #}

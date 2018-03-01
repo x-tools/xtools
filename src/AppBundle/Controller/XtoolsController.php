@@ -373,6 +373,7 @@ abstract class XtoolsController extends Controller
         $formatMap = [
             'wikitext' => 'text/plain',
             'csv' => 'text/csv',
+            'tsv' => 'text/tab-separated-values',
             'json' => 'application/json',
         ];
 

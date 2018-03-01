@@ -63,7 +63,7 @@
     </p>
 {% endmacro %}
 
-{% macro downloadLink(path, params, types = ['wikitext', 'csv', 'json', 'png']) %}
+{% macro downloadLink(path, params, types = ['wikitext', 'csv', 'json', 'png'], customOptions) %}
     <div class="btn-group download-dropdown dropdown">
         <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="glyphicon glyphicon-download-alt"></span>
@@ -76,6 +76,9 @@
                     <a target="_blank" class="download-link download-{{ type|lower }}" href="{{ path(path, params|merge({format: type})) }}">{{ msg(type) }}</a>
                 </li>
             {% endfor %}
+            {% if customOptions is defined %}
+                {{ customOptions }}
+            {% endif %}
         </ul>
     </div>
 {% endmacro %}
