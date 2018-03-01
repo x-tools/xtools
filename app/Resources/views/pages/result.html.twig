@@ -143,7 +143,15 @@
                 {% endif %}
             {% endif %}
         {% endset %}
-        {{ layout.content_block('summary', content) }}
+        {% set jsonLink %}
+            <li>
+                <a target="_blank" class="download-link download-json" href="{{ path('PagesApi', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted}) }}">{{ msg('json') }}</a>
+            </li>
+        {% endset %}
+        {% set downloadLink %}
+            {{ layout.downloadLink('PagesResult', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted}, ['wikitext', 'csv', 'tsv'], jsonLink) }}
+        {% endset %}
+        {{ layout.content_block('summary', content, downloadLink) }}
 
         {% for ns in pages.results|keys %}
             {% set content %}
@@ -230,12 +238,12 @@
                                             &middot;
                                             <a href="{{ path('topedits', { 'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'page': page.page_title }) }}">{{ msg('tool-topedits') }}</a>
                                         {% endif %}
-                                    {% endif %}
-                                    {% if isWMFLabs() %}
-                                        &middot;
-                                        <a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project.domain }}&amp;pages={{ pagename|e('url') }}">
-                                            {{ msg('pageviews') }}
-                                        </a>
+                                        {% if isWMFLabs() %}
+                                            &middot;
+                                            <a target="_blank" href="https://tools.wmflabs.org/pageviews?project={{ project.domain }}&amp;pages={{ pagename|e('url') }}">
+                                                {{ msg('pageviews') }}
+                                            </a>
+                                        {% endif %}
                                     {% endif %}
                                 </td>
                             </tr>
@@ -243,7 +251,7 @@
                         {% if pages.counts[ns].count > maxRows and multiNamspace %}
                             <tr class="show-more-row">
                                 <td></td>
-                                <td colspan=6>
+                                <td colspan={{ columns|length + 1 }}>
                                     <a href="{{ path('pages', { 'project': project.domain, 'username': user.username, 'namespace': ns, 'redirects': pages.redirects }) }}">
                                         {{ (pages.counts[ns].count - maxRows)|number_format }} {{ msg('num-others', [pages.counts[ns].count - maxRows]) }}
                                     </a>

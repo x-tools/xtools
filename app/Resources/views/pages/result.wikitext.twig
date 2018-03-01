@@ -1,0 +1,63 @@
+{% import 'macros/wiki.html.twig' as wiki %}
+== [[User:{{ user.username }}]] ==
+
+{% set multiNamspace = pages.counts|length > 1 %}
+{% set link %}[{{ url('PagesResult', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted}) }} {{ msg('xtools-title') }}]{% endset %}
+{{ msg('xtools-advert', [link, date()|date('Y-m-d H:i')]) }}
+{% if pages.getNumPages == 0 %}
+{{ msg('no-result', [user.username]) }}
+{% else %}
+{% for ns in pages.results|keys %}
+
+=== {{ nsName(ns, project.namespaces) }} ===
+
+{| class="wikitable sortable"
+! #
+{% set columns = ['page-title', 'date', 'original-size'] %}
+{% if pages.deleted != 'deleted' %}
+{% set columns = columns|merge(['current-size']) %}
+{% endif %}
+{% if ns == '0' and pages.hasPageAssessments and pages.deleted != 'deleted' %}
+{% set columns = columns|merge(['assessment']) %}
+{% endif %}
+{% for thKey in columns %}
+! {{ msg(thKey)|capitalize_first }}
+{% endfor %}
+! {{ msg('links') }}
+{% set index = 0 %}
+{% set maxRows = 20 %}
+{% for page in pages.results[ns] if not(multiNamspace) or (index < maxRows and multiNamspace) %}
+{% set index = index + 1 %}
+{% if ns == 0 %}
+{% set pagename = page.page_title %}
+{% else %}
+{% set pagename = project.namespaces[ns] ~ ":" ~ page.page_title %}
+{% endif %}
+|-
+| {{ index }}
+| {% if page.page_is_redirect %}[{{ wiki.pageUrlRaw(pagename, project, 'redirect=no') }} {{ pagename }}] &middot; ({{ msg('redirect') }}){% else %}[[:{{ pagename }}]]{% endif %}{% if page.type == 'arc' %} &middot; ({{ msg('deleted') }}){% endif %}
+
+| {% if page.type == 'arc' %}[{{ wiki.pageUrlRaw('Special:Undelete/' ~ pagename, project, 'timestamp=' ~ page.raw_time) }} {{ page.human_time }}]{% else %}[[Special:PermaLink/{{ page.rev_id }}|{{ page.human_time }}]]{% endif %}
+
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ page.rev_len }}}}
+{% if pages.deleted != 'deleted' %}
+| {% if page.page_len is null %}{{ msg('na') }}{% else %}{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ page.page_len }}}}{% endif %}
+
+{% if ns == '0' and pages.hasPageAssessments %}
+{% set badge = project.assessmentBadgeURL(page.pa_class, true) -%}
+| {% if badge is defined %}
+[[File:{{ badge }}|20px]] {{ page.pa_class ? page.pa_class : msg('unknown') }}
+{% endif %}
+{% endif %}
+{% endif %}
+| [{{ wiki.pageLogUrlRaw(pagename, project) }} {{ msg('log') }}]{% if page.type == 'rev' %} &middot; [{{ wiki.pageHistUrlRaw(pagename, project) }} {{ msg('history') }}]{% if enabled('articleinfo') %} &middot; [{{ url('articleinfo', {'project': project.domain, 'article': pagename}) }} {{ msg('tool-articleinfo') }}]{% endif %}{% if enabled('topedits') %} &middot; [{{ url('topedits', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'page': page.page_title}) }} {{ msg('tool-topedits') }}]{% endif %}{% if isWMFLabs() %} &middot; [https://tools.wmflabs.org/pageviews?project={{ project.domain }}&amp;pages={{ pagename|e('url') }} {{ msg('pageviews') }}]{% endif %}{% endif %}
+
+{% endfor %}
+{% if pages.counts[ns].count > maxRows and multiNamspace %}
+|-
+|
+| colspan={{ columns|length + 1 }} | [{{ url('pages', {'project': project.domain, 'username': user.username, 'namespace': ns, 'redirects': pages.redirects}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ (pages.counts[ns].count - maxRows) }}}} {{ msg('num-others', [pages.counts[ns].count - maxRows]) }}]
+{% endif %}
+|}
+{% endfor %}
+{% endif %}

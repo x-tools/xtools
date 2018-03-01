@@ -125,14 +125,16 @@ class Pages extends Model
 
     /**
      * Fetch and prepare the pages created by the user.
+     * @param bool $all Whether to get *all* results. This should only be used for
+     *     export options. HTTP and JSON should paginate.
      * @codeCoverageIgnore
      */
-    public function prepareData()
+    public function prepareData($all = false)
     {
         $this->pages = [];
 
         foreach ($this->getNamespaces() as $ns) {
-            $data = $this->fetchPagesCreated($ns);
+            $data = $this->fetchPagesCreated($ns, $all);
             $this->pages[$ns] = $this->formatPages($data)[$ns];
         }
 
@@ -142,12 +144,14 @@ class Pages extends Model
     /**
      * The public function to get the list of all pages created by the user,
      * up to self::resultsPerPage(), across all namespaces.
+     * @param bool $all Whether to get *all* results. This should only be used for
+     *     export options. HTTP and JSON should paginate.
      * @return array
      */
-    public function getResults()
+    public function getResults($all = false)
     {
         if ($this->pages === null) {
-            $this->prepareData();
+            $this->prepareData($all);
         }
         return $this->pages;
     }
@@ -248,10 +252,15 @@ class Pages extends Model
 
     /**
      * Number of results to show, depending on the namespace.
+     * @param bool $all Whether to get *all* results. This should only be used for
+     *     export options. HTTP and JSON should paginate.
      * @return int
      */
-    public function resultsPerPage()
+    public function resultsPerPage($all = false)
     {
+        if ($all === true) {
+            return false;
+        }
         if ($this->namespace === 'all') {
             return self::RESULTS_LIMIT_ALL_NAMESPACES;
         }
@@ -274,9 +283,11 @@ class Pages extends Model
      * Run the query to get pages created by the user with options.
      * This is ran independently for each namespace if $this->namespace is 'all'.
      * @param string $namespace Namespace ID.
+     * @param bool $all Whether to get *all* results. This should only be used for
+     *     export options. HTTP and JSON should paginate.
      * @return array
      */
-    private function fetchPagesCreated($namespace)
+    private function fetchPagesCreated($namespace, $all = false)
     {
         return $this->user->getRepository()->getPagesCreated(
             $this->project,
@@ -284,7 +295,7 @@ class Pages extends Model
             $namespace,
             $this->redirects,
             $this->deleted,
-            $this->resultsPerPage(),
+            $this->resultsPerPage($all),
             $this->offset * $this->resultsPerPage()
         );
     }

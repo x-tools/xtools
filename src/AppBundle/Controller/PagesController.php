@@ -6,15 +6,18 @@
 namespace AppBundle\Controller;
 
 use DateTime;
+use GuzzleHttp;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Xtools\ProjectRepository;
 use Xtools\UserRepository;
 use Xtools\Pages;
+use Xtools\Project;
 
 /**
  * This controller serves the Pages tool.
@@ -127,8 +130,7 @@ class PagesController extends XtoolsController
         );
         $pages->prepareData();
 
-        // Assign the values and display the template
-        return $this->render('pages/result.html.twig', [
+        $ret = [
             'xtPage' => 'pages',
             'xtTitle' => $user->getUsername(),
             'project' => $project,
@@ -136,7 +138,14 @@ class PagesController extends XtoolsController
             'summaryColumns' => $this->getSummaryColumns($pages),
             'pages' => $pages,
             'namespace' => $namespace,
-        ]);
+        ];
+
+        if ($request->query->get('format') === 'pagepile') {
+            return $this->getPagepileResult($project, $pages);
+        }
+
+        // Output the relevant format template.
+        return $this->getFormattedReponse($request, 'pages/result', $ret);
     }
 
     /**
@@ -169,6 +178,74 @@ class PagesController extends XtoolsController
         }
 
         return $summaryColumns;
+    }
+
+    /**
+     * Create a PagePile for the given pages, and get a Redirect to that PagePile.
+     * @param Project $project
+     * @param Pages $pages
+     * @return Redirect
+     * @throws HttpException
+     * @see https://tools.wmflabs.org/pagepile/
+     */
+    private function getPagepileResult(Project $project, Pages $pages)
+    {
+        $namespaces = $project->getNamespaces();
+        $pageTitles = [];
+
+        foreach ($pages->getResults() as $ns => $pagesData) {
+            foreach ($pagesData as $page) {
+                if ((int)$page['namespace'] === 0) {
+                    $pageTitles[] = $page['page_title'];
+                } else {
+                    $pageTitles[] = $namespaces[$page['namespace']].':'.$page['page_title'];
+                }
+            }
+        }
+
+        $pileId = $this->createPagePile($project, $pageTitles);
+
+        return new RedirectResponse(
+            "https://tools.wmflabs.org/pagepile/api.php?id=$pileId&action=get_data&format=html&doit1"
+        );
+    }
+
+    /**
+     * Create a PagePile with the given titles.
+     * @param Project $project
+     * @param string[] $pageTitles
+     * @return int The PagePile ID.
+     * @throws HttpException
+     * @see https://tools.wmflabs.org/pagepile/
+     */
+    private function createPagePile(Project $project, $pageTitles)
+    {
+        $client = new GuzzleHttp\Client();
+        $url = 'https://tools.wmflabs.org/pagepile/api.php';
+
+        try {
+            $res = $client->request('GET', $url, ['query' => [
+                'action' => 'create_pile_with_data',
+                'wiki' => $project->getDatabaseName(),
+                'data' => implode("\n", $pageTitles),
+            ]]);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            throw new HttpException(
+                414,
+                'error-pagepile-too-large'
+            );
+        }
+
+        $ret = json_decode($res->getBody()->getContents(), true);
+
+        if (!isset($ret['status']) || $ret['status'] !== 'OK') {
+            throw new HttpException(
+                500,
+                'Failed to create PagePile. There may be an issue with the PagePile API.'
+            );
+        }
+
+        return $ret['pile']['id'];
     }
 
     /************************ API endpoints ************************/

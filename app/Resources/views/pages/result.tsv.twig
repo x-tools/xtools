@@ -1,0 +1,22 @@
+{% set columns = ['namespace', 'page-title', 'date', 'original-size'] %}
+{% if pages.deleted != 'deleted' %}
+{% set columns = columns|merge(['current-size']) %}
+{% endif %}
+{% if pages.hasPageAssessments and pages.deleted != 'deleted' %}
+{% set columns = columns|merge(['assessment']) %}
+{% endif %}
+{% for thKey in columns %}
+{{ msg(thKey) }}{% if not loop.last %}	{% endif %}
+{% endfor %}
+
+{% for ns in pages.results|keys %}
+{% for page in pages.results[ns] %}
+{% if ns == 0 %}
+{% set pagename = page.page_title %}
+{% else %}
+{% set pagename = project.namespaces[ns] ~ ":" ~ page.page_title %}
+{% endif %}
+{{ ns }}	{{ pagename }}	{{ page.human_time }}	{{ page.rev_len }}{% if pages.deleted != 'deleted' %}	{% if page.page_len is not null %}{{ page.page_len }}{% endif %}{% endif %}{% if pages.hasPageAssessments %}	{{ page.pa_class }}{% endif %}
+
+{% endfor %}
+{% endfor %}
