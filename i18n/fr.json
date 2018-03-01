@@ -343,7 +343,7 @@
 	"tool-articleinfo": "Historique de la page",
 	"tool-articleinfo-desc": "Donne des statistiques variées à propos de l'historique d'une page",
 	"tool-autoedits": "Compteur d'éditions automatisées",
-	"tool-autoedits-desc": "Contributions automatiques avec des outils connus",
+	"tool-autoedits-desc": "Analyse des contributions semi-automatiques et non automatiques.",
 	"tool-bash": "Citation aléatoire",
 	"tool-bash-desc": "Obtenir des citations de la base de données de citations IRC",
 	"tool-blame": "Accusateur de l’article",

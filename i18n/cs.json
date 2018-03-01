@@ -226,7 +226,7 @@
 	"tool-articleinfo": "Historie stránky",
 	"tool-articleinfo-desc": "Získat různé statistiky o historii stránky",
 	"tool-autoedits": "Automatizované editace",
-	"tool-autoedits-desc": "Automatizované editace známými nástroji",
+	"tool-autoedits-desc": "Analýza poloautomatických a neautomatických příspěvku.",
 	"tool-blame-desc": "Najít přidání textu v historii stránky",
 	"tool-ec": "Počítadlo editací",
 	"tool-ec-desc": "Analýza příspěvků uživatele",

@@ -227,7 +227,7 @@
 	"tool-articleinfo": "Cronologia della pagina",
 	"tool-articleinfo-desc": "Ottieni diverse statistiche relative alla cronologia di una pagina",
 	"tool-autoedits": "Modifiche automatiche",
-	"tool-autoedits-desc": "Modifiche automatiche con strumenti conosciuti",
+	"tool-autoedits-desc": "Analisi di contributi semi-automatici e non automatici.",
 	"tool-bash": "Citazione casuale",
 	"tool-blame-desc": "Trova l'aggiunta di testo nella cronologia di una pagina",
 	"tool-ec": "Contatore modifiche",

@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"V.narsikar",
-			"Bhatakati aatma"
+			"Bhatakati aatma",
+			"Susheelkasab"
 		]
 	},
 	"accepted-formats": "स्वीकारीत प्रारूपे",
@@ -232,6 +233,7 @@
 	"tool-adminstats": "प्रबंधक सांख्यिकी",
 	"tool-articleinfo": "पानाचा इतिहास",
 	"tool-autoedits": "स्वयंचलित संपादने",
+	"tool-autoedits-desc": "अर्धेस्वयंचलित व अस्व्यंचलित योगदानाचे विश्लेषण",
 	"tool-ec": "संपादन गणक",
 	"tool-ec-desc": "सदस्य योगदानांचे पृथक्करण",
 	"tool-error": "त्रुटी",

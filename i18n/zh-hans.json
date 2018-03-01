@@ -339,7 +339,7 @@
 	"tool-articleinfo": "页面历史",
 	"tool-articleinfo-desc": "获取各种有关页面历史的统计数据",
 	"tool-autoedits": "自动化编辑",
-	"tool-autoedits-desc": "使用已知工具做出的自动化编辑",
+	"tool-autoedits-desc": "分析半自动与非自动贡献。",
 	"tool-bash": "随机引用",
 	"tool-bash-desc": "从IRC引用数据库获取引用",
 	"tool-blame": "条目责任",

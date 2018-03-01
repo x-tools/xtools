@@ -339,7 +339,7 @@
 	"tool-articleinfo": "Seitenhistorie",
 	"tool-articleinfo-desc": "Verschiedene Statistiken über Versionen",
 	"tool-autoedits": "Automatische Bearbeitungen",
-	"tool-autoedits-desc": "(Halb)-automatische Bearbeitungen mit bekannten Tools",
+	"tool-autoedits-desc": "Analyse von halbautomatisierten und nichtautomatisierten Beiträgen.",
 	"tool-bash": "Zufälliges Zitat",
 	"tool-bash-desc": "Zitate aus der IRC Zitatesammlung",
 	"tool-blame": "Article Blamer",

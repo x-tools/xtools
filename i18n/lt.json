@@ -3,7 +3,8 @@
 		"authors": [
 			"Eitvys200",
 			"Manvydasz",
-			"Tomasdd"
+			"Tomasdd",
+			"Yusuke1109"
 		]
 	},
 	"accepted-formats": "Tinkami formatai",
@@ -27,6 +28,7 @@
 	"all-languages": "Visos kalbos",
 	"all-namespaces": "Visos vardų sritys",
 	"all-quotes": "Visos citatos",
+	"api": "API",
 	"api-error": "Klaida užklausoje $1",
 	"approve": "Patvirtinimai",
 	"approximate": "Apytiksliai",
@@ -65,6 +67,7 @@
 	"considered-usernames": "Žinomi naudotojo vardai",
 	"count": "Skaičiavimas",
 	"created-by": "Sukūrė",
+	"csv": "CSV",
 	"current-admins": "Dabartiniai administratoriai",
 	"current-size": "Dabartinis dydis",
 	"data-limit": "Rodomi duomenys paskutinių $2 {{PLURAL:$1|keitimo|keitimų}}",
@@ -128,7 +131,7 @@
 	"global-user-groups": "Visuotinės vartotojo grupės",
 	"help-translate": "Padėti išversti",
 	"hide": "Slėpti",
-	"high-replag": "Įspėjimas: atkūrimo strigimas yra gan didelis, pakeitimai naujesni negu $1 gali būti nerodomi.",
+	"high-replag": "Įspėjimas: atkūrimo strigimas yra gan didelis, naujesni negu $1 pakeitimai gali būti nerodomi.",
 	"history": "Istorija",
 	"how-calculated": "Kaip šis rezultatas apskaičiuotas",
 	"image-attribution": "Vaizdo priskyrimas",
@@ -203,7 +206,7 @@
 	"num-days": "{{PLURAL:$1|diena|dienos|dienų}}",
 	"num-deletions": "{{PLURAL:$1|trynimas|trynimai|trynimų}}",
 	"num-editors": "{{PLURAL:$1|redaktorius|redaktoriai|redaktorių}}",
-	"num-hours": "{{PLURAL:$1|valanda|valandos|valandų}}",
+	"num-hours": "{{PLURAL:$1|valandos|valandų}}",
 	"num-minutes": "{{PLURAL:$1|minutė|minutės|minučių}}",
 	"num-months": "{{PLURAL:$1|mėnuo|mėnesiai|mėnesių}}",
 	"num-moves": "{{PLURAL:$1|perkėlimas|perkėlimai|perkėlimų}}",
