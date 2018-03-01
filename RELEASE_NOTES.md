@@ -1,5 +1,18 @@
 # Release Notes #
 
+## 3.1.43 ##
+- AutoEdits: allow defining rules per-language, and add some rules
+  for German and Arabic. This should add support for many more wikis.
+- AutoEdits: localize labels of the tools.
+- AutoEdits: add some wiki-specific rules for dewiki, dewiktionary,
+  and a few more for enwiki.
+- AutoEdits: New API endpoint to get a raw list of known tools used
+  on a given wiki.
+- AutoEdits: better description, and make pie chart relative to the
+  size of the number of tools to save real estate.
+- Log database-level errors for easier debugging in production.
+- Localization updates.
+
 ## 3.1.42 ##
 - T178055: More support for screen readers.
 - Add 'Feedback' link in footer, shorten links.
