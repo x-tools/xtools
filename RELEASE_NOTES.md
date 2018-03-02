@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.1.45 ##
+- T188603: Include link to export to PagePile in Pages tool.
+
 ## 3.1.44 ##
 - Pages: add export options for wikitext, CSV, TSV and JSON.
 - Pages: hover over 'deleted' text to reveal deletion summary.
