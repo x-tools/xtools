@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.1.44 ##
+- Pages: add export options for wikitext, CSV, TSV and JSON.
+- Pages: hover over 'deleted' text to reveal deletion summary.
+- T165864: Check for recreated pages in Pages tool and label them.
+
 ## 3.1.43 ##
 - AutoEdits: allow defining rules per-language, and add some rules
   for German and Arabic. This should add support for many more wikis.
