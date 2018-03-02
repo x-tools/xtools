@@ -14,9 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Xtools\ProjectRepository;
-use Xtools\UserRepository;
 use Xtools\Pages;
+use Xtools\PagesRepository;
 use Xtools\Project;
 
 /**
@@ -120,6 +119,8 @@ class PagesController extends XtoolsController
             ]);
         }
 
+        $pagesRepo = new PagesRepository();
+        $pagesRepo->setContainer($this->container);
         $pages = new Pages(
             $project,
             $user,
@@ -128,6 +129,7 @@ class PagesController extends XtoolsController
             $deleted,
             $offset
         );
+        $pages->setRepository($pagesRepo);
         $pages->prepareData();
 
         $ret = [
@@ -154,7 +156,7 @@ class PagesController extends XtoolsController
      * @return string[]
      * @codeCoverageIgnore
      */
-    protected function getSummaryColumns(Pages $pages)
+    private function getSummaryColumns(Pages $pages)
     {
         $summaryColumns = ['namespace'];
         if ($pages->getDeleted() === 'deleted') {
@@ -275,6 +277,8 @@ class PagesController extends XtoolsController
             list($project, $user) = $ret;
         }
 
+        $pagesRepo = new PagesRepository();
+        $pagesRepo->setContainer($this->container);
         $pages = new Pages(
             $project,
             $user,
@@ -282,6 +286,7 @@ class PagesController extends XtoolsController
             $redirects,
             $deleted
         );
+        $pages->setRepository($pagesRepo);
 
         $response = new JsonResponse();
         $response->setEncodingOptions(JSON_NUMERIC_CHECK);
@@ -336,6 +341,8 @@ class PagesController extends XtoolsController
             list($project, $user) = $ret;
         }
 
+        $pagesRepo = new PagesRepository();
+        $pagesRepo->setContainer($this->container);
         $pages = new Pages(
             $project,
             $user,
@@ -344,6 +351,7 @@ class PagesController extends XtoolsController
             $deleted,
             $offset
         );
+        $pages->setRepository($pagesRepo);
 
         $response = new JsonResponse();
         $response->setEncodingOptions(JSON_NUMERIC_CHECK);

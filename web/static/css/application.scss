@@ -423,6 +423,10 @@ section > .panel-body {
     .checkbox {
         margin-bottom: 0;
     }
+
+    &:nth-child(2) {
+        margin-top: -15px;
+    }
 }
 
 .form-submit {

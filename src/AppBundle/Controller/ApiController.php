@@ -86,4 +86,18 @@ class ApiController extends FOSRestController
             Response::HTTP_OK
         );
     }
+
+    /**
+     * Transform given wikitext to HTML using the XTools parser.
+     * Wikitext must be passed in as the query 'wikitext'.
+     * @Rest\Get("/api/project/parser/{project}")
+     * @param  Request $request Provided by Symfony.
+     * @param  string $project Project domain such as en.wikipedia.org
+     * @return string Safe HTML.
+     */
+    public function wikify(Request $request, $project)
+    {
+        $projectData = ProjectRepository::getProject($project, $this->container);
+        return Edit::wikifyString($request->query->get('wikitext'), $projectData);
+    }
 }
