@@ -98,7 +98,7 @@
 {% endmacro %}
 
 {% macro redirects_select(value) %}
-<div class="input-group">
+<div class="input-group form-row">
     <span class="input-group-addon form-label">{{ msg('redirects') }}</span>
     <select class="form-control" name="redirects">
         {% for type in ['noredirects', 'all', 'onlyredirects'] %}
@@ -111,7 +111,7 @@
 {% endmacro %}
 
 {% macro deleted_pages_select(value) %}
-<div class="input-group">
+<div class="input-group form-row">
     <span class="input-group-addon form-label">{{ msg('deleted-pages') }}</span>
     <select class="form-control" name="deleted">
         {% for type in ['all', 'live', 'deleted'] %}

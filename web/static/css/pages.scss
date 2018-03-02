@@ -4,4 +4,18 @@
     .panel-body h3 {
         clear: both;
     }
+
+    .panel-body h4:not(:first-child) {
+        padding-top: 10px;
+    }
+
+    .deleted-page {
+        cursor: help;
+        position: relative;
+
+        .tooltip-body {
+            left: 67%;
+            width: 300px;
+        }
+    }
 }

@@ -138,6 +138,8 @@ class Pages extends Model
             $this->pages[$ns] = $this->formatPages($data)[$ns];
         }
 
+        // $this->recreatedPages = $this->fetchRecreatedPages();
+
         return $this->pages;
     }
 
@@ -289,7 +291,7 @@ class Pages extends Model
      */
     private function fetchPagesCreated($namespace, $all = false)
     {
-        return $this->user->getRepository()->getPagesCreated(
+        return $this->getRepository()->getPagesCreated(
             $this->project,
             $this->user,
             $namespace,
@@ -307,7 +309,7 @@ class Pages extends Model
      */
     private function countPagesCreated()
     {
-        return $this->user->getRepository()->countPagesCreated(
+        return $this->getRepository()->countPagesCreated(
             $this->project,
             $this->user,
             $this->namespace,

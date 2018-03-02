@@ -10,6 +10,14 @@
             {{ forms.redirects_select(redirects) }}
             {{ forms.deleted_pages_select(deleted) }}
         </fieldset>
+        <fieldset class="form-fieldset">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="format" value="wikitext">
+                    {{ msg('view-wikitext') }}
+                </label>
+            </div>
+        </fieldset>
         {{ forms.submit_btn() }}
     </form>
 {% endblock %}
