@@ -142,7 +142,7 @@ class PagesController extends XtoolsController
             'namespace' => $namespace,
         ];
 
-        if ($request->query->get('format') === 'pagepile') {
+        if ($request->query->get('format') === 'PagePile') {
             return $this->getPagepileResult($project, $pages);
         }
 

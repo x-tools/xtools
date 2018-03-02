@@ -331,7 +331,7 @@
             </li>
         {% endset %}
         {% set downloadLink %}
-            {{ layout.downloadLink('PagesResult', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted}, ['wikitext', 'csv', 'tsv'], jsonLink) }}
+            {{ layout.downloadLink('PagesResult', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted}, ['wikitext', 'PagePile', 'csv', 'tsv'], jsonLink) }}
         {% endset %}
         {{ layout.content_block('pages-created', content, downloadLink) }}
 

@@ -73,7 +73,7 @@
         <ul class="dropdown-menu dropdown-menu-right">
             {% for type in types %}
                 <li>
-                    <a target="_blank" class="download-link download-{{ type|lower }}" href="{{ path(path, params|merge({format: type})) }}">{{ msg(type) }}</a>
+                    <a target="_blank" class="download-link download-{{ type|lower }}" href="{{ path(path, params|merge({format: type})) }}">{{ msgPrintExists(type) }}</a>
                 </li>
             {% endfor %}
             {% if customOptions is defined %}
