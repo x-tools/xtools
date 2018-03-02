@@ -30,7 +30,7 @@ and other members of the Wikimedia Foundation's [Community Tech Team](https://me
 
 ## Licence (GPL-3.0+)
 
-Copyright © 2008-2018 Cyberpower678, Hedonil, Matthewrbowker, MusikAnimal, Samwilson, Scottywong, TParis, X!.
+Copyright © 2008-2018 [XTools contributors](https://github.com/x-tools/xtools/graphs/contributors).
 
 This program is free software:
 you can redistribute it and/or modify it under the terms of the GNU General Public License
