@@ -165,7 +165,7 @@
 	"no-exist": "$1 gëtt et net",
 	"no-revisions": "Keng Versioune fonnt",
 	"no-summary": "Kee Resumé",
-	"non-auto-edits": "Net-automatiséiert Ännerungen",
+	"non-auto-contribs": "Net-automatiséiert Ännerungen",
 	"notice": "Notiz",
 	"num-blocks": "{{PLURAL:$1|Spär|Spären}}",
 	"num-bytes": "{{PLURAL:$1|Byte|Byten}}",

@@ -194,7 +194,7 @@
 	"no-revisions": "Heç bir redaktə tapılmadı",
 	"no-summary": "izahsız",
 	"non-admins-with-actions": "İdarəçi hərəkətləri ilə qeyri-adminlər",
-	"non-auto-edits": "Qeyri-avtomatlaşdırılmış redaktələr",
+	"non-auto-contribs": "Qeyri-avtomatlaşdırılmış redaktələr",
 	"not-opted-in": "Bu istifadəçi bu məlumatları göstərməyi seçməyib. XTools-a bu istifadəçi olaraq daxil olun və ya hər hansı bir məzmunla $1 yaradın. Daha ətraflı məlumat üçün sənədlərə baxın.",
 	"notice": "Bildirişlər",
 	"num-blocks": "{{PLURAL:$1|blok|bloklar}}",

@@ -129,7 +129,7 @@
 	"no-revisions": "Ei leitud ühtki redaktsiooni.",
 	"no-summary": "resümeeta",
 	"non-admins-with-actions": "Administraatoritoimingutega mitteadministraatoreid",
-	"non-auto-edits": "Mitteautomaatseid muudatusi",
+	"non-auto-contribs": "Mitteautomaatseid muudatusi",
 	"not-opted-in": "See kasutaja pole soovinud neid andmeid näidata. Palun logi rakendusse XTools selle kasutajana sisse või alusta mis tahes sisuga lehekülge $1. Lisateavet leiad dokumentatsioonist.",
 	"num-bytes": "{{PLURAL:$1|bait|baiti}}",
 	"num-days": "{{PLURAL: $1|päev|päeva}}",

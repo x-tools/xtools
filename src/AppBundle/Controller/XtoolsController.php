@@ -193,6 +193,25 @@ abstract class XtoolsController extends Controller
     }
 
     /**
+     * Get the first error message stored in the session's FlashBag.
+     * @return string
+     */
+    public function getFlashMessage()
+    {
+        $key = $this->get('session')->getFlashBag()->get('danger')[0];
+        $param = null;
+
+        if (is_array($key)) {
+            list($key, $param) = $key;
+        }
+
+        return $this->render('message.twig', [
+            'key' => $key,
+            'params' => [$param]
+        ])->getContent();
+    }
+
+    /**
      * Get all standardized parameters from the Request, either via URL query string or routing.
      * @param Request $request
      * @return string[]

@@ -106,7 +106,7 @@
 	"no-exist": "N'eus ket eus $1",
 	"no-result": "N'eus bet kavet disoc'h ebet evit : $1",
 	"no-summary": "hep diverradenn",
-	"non-auto-edits": "Kemmoù n'int ket emgefrekaet",
+	"non-auto-contribs": "Kemmoù n'int ket emgefrekaet",
 	"notice": "Kemenn",
 	"num-bytes": "{{PLURAL:$1|okted|okted}}",
 	"num-days": "{{PLURAL: $1|devezh|devezh}}",

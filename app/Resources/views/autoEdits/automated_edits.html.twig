@@ -21,8 +21,16 @@
             <section class="panel panel-default clearfix">
                 <header class="panel-heading col-lg-12">
                     <h4>
-                        {{ msg('non-auto-contribs') }}
-                        <span class='pull-right text-muted xt-panel-description'>{{ msg('non-auto-contribs-desc') }}</span>
+                        {% if ae.tool is empty %}
+                            {{ msg('tool-autoedits') }}
+                        {% else %}
+                            {% set toolData = ae.getToolCounts()[ae.tool] %}
+                            {% set toolLink %}
+                                {{ wiki.pageLinkRaw(toolData.link, project, toolData.label) }}
+                            {% endset %}
+                            {{ msg('auto-tool-edits', [toolLink]) }}
+                        {% endif %}
+                        <span class='pull-right text-muted xt-panel-description'>{{ msg('auto-contribs-desc') }}</span>
                     </h4>
                 </header>
                 <div class="panel-body col-lg-12">
@@ -33,10 +41,26 @@
                         data-start="{{ ae.start }}"
                         data-end="{{ ae.end }}"
                         data-namespace="{{ ae.namespace }}"
-                        data-target="nonautoedits">
+                        data-target="autoedits">
 {% endif %}
 
-{% if ae.nonAutomatedEdits() is iterable %}
+{% if ae.automatedEdits() is iterable %}
+    {% if ae.automatedEdits()|length > 0 %}
+        <div>
+            <form class="tool-selector-form form-inline" action="{{ path('AutoEditsContributionsResult', {project: project.domain, username:user.username, start: ae.start, end: ae.end, namespace: ae.namespace}) }}" method="get" accept-charset="utf-8">
+                <label for="toolSelector">{{ msg('auto-contribs-use-tool') }}</label>
+                <select id="toolSelector" class="form-control" name="tool">
+                    <option value="">{{ msg('all') }}</option>
+                    {% for tool in ae.getToolCounts()|keys|sort %}
+                        <option value="{{ tool }}" {% if ae.tool == tool %}selected="selected"{% endif %}>
+                            {{ tool }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-primary form-submit">{{ msg('submit') }}</button>
+            </form>
+        </div>
+    {% endif %}
     <div class="non-auto-edits-nav clearfix">
         {% if ae.offset > 0 %}
             <a href="#" class="pull-left prev-edits">
@@ -58,12 +82,12 @@
         {% endfor %}
         </thead>
         <tbody>
-            {% if ae.nonAutomatedEdits()|length == 0 %}
+            {% if ae.automatedEdits()|length == 0 %}
                 <tr>
                     <td colspan=5 class="text-center">{{ msg('no-contribs') }}</td>
                 </tr>
             {% else %}
-                {% for edit in ae.nonAutomatedEdits() %}
+                {% for edit in ae.automatedEdits() %}
                     <tr>
                         <td>{{ wiki.pageLinkRaw(edit.page.title(true), project) }}</td>
                         <td>{{ wiki.permaLink(edit) }}</td>

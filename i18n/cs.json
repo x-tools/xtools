@@ -160,7 +160,7 @@
 	"no-revisions": "Žádné revize nalezeny",
 	"no-summary": "Bez shrnutí",
 	"non-admins-with-actions": "Nesprávci se správcovskými akcemi",
-	"non-auto-edits": "Neautomatické editace",
+	"non-auto-contribs": "Neautomatické editace",
 	"notice": "Oznámení",
 	"num-bytes": "{{PLURAL:$1|bajt|bajty|bajtů}}",
 	"num-days": "{{PLURAL:$1|den|dny|dní}}",

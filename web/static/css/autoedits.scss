@@ -32,4 +32,19 @@
         margin-bottom: 0;
         padding-bottom: 0;
     }
+
+    .tool-selector-form {
+        .btn-primary {
+            vertical-align: bottom;
+        }
+
+        .form-submit {
+            margin-bottom: 0;
+        }
+    }
+
+    #toolSelector {
+        display: inline-block;
+        width: auto;
+    }
 }

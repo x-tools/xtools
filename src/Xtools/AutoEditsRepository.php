@@ -129,6 +129,79 @@ class AutoEditsRepository extends UserRepository
                 $condBegin
                 $condEnd
                 $condNamespace
+                GROUP BY revs.rev_id
+                ORDER BY revs.rev_timestamp DESC
+                LIMIT 50
+                OFFSET $offset";
+
+        $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end);
+        $result = $resultQuery->fetchAll();
+
+        // Cache and return.
+        $this->stopwatch->stop($cacheKey);
+        return $this->setCache($cacheKey, $result);
+    }
+
+    /**
+     * Get (semi-)automated contributions for the given user, and optionally for a given tool
+     * @param Project $project
+     * @param User $user
+     * @param string|int $namespace Namespace ID or 'all'
+     * @param string $start Start date in a format accepted by strtotime()
+     * @param string $end End date in a format accepted by strtotime()
+     * @param string|null $tool Only get edits made with this tool. Must match the keys in semi_automated.yml
+     * @param int $offset Used for pagination, offset results by N edits
+     * @return string[] Result of query, with columns 'page_title',
+     *   'page_namespace', 'rev_id', 'timestamp', 'minor',
+     *   'length', 'length_change', 'comment'
+     */
+    public function getAutomatedEdits(
+        Project $project,
+        User $user,
+        $namespace = 'all',
+        $start = '',
+        $end = '',
+        $tool = null,
+        $offset = 0
+    ) {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'user_autoedits');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+        $this->stopwatch->start($cacheKey, 'XTools');
+
+        list($condBegin, $condEnd) = $this->getRevTimestampConditions($start, $end, 'revs.');
+
+        // Get the combined regex and tags for the tools
+        list($regex, $tags) = $this->getToolRegexAndTags($project, $tool);
+
+        $pageTable = $project->getTableName('page');
+        $revisionTable = $project->getTableName('revision');
+        $tagTable = $project->getTableName('change_tag');
+        $condNamespace = $namespace === 'all' ? '' : 'AND page_namespace = :namespace';
+        $tagJoin = $tags != '' ? "LEFT OUTER JOIN $tagTable ON (ct_rev_id = revs.rev_id)" : '';
+        $condTag = $tags != '' ? "AND (ct_tag NOT IN ($tags) OR ct_tag IS NULL)" : '';
+        $sql = "SELECT
+                    page_title,
+                    page_namespace,
+                    revs.rev_id AS rev_id,
+                    revs.rev_timestamp AS timestamp,
+                    revs.rev_minor_edit AS minor,
+                    revs.rev_len AS length,
+                    (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
+                    revs.rev_comment AS comment
+                FROM $pageTable
+                JOIN $revisionTable AS revs ON (page_id = revs.rev_page)
+                LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+                $tagJoin
+                WHERE revs.rev_user_text = :username
+                AND revs.rev_timestamp > 0
+                AND revs.rev_comment RLIKE $regex
+                $condTag
+                $condBegin
+                $condEnd
+                $condNamespace
+                GROUP BY revs.rev_id
                 ORDER BY revs.rev_timestamp DESC
                 LIMIT 50
                 OFFSET $offset";
@@ -156,7 +229,7 @@ class AutoEditsRepository extends UserRepository
      *                      ],
      *                  ]
      */
-    public function getAutomatedCounts(
+    public function getToolCounts(
         Project $project,
         User $user,
         $namespace = 'all',
@@ -291,18 +364,23 @@ class AutoEditsRepository extends UserRepository
 
     /**
      * Get the combined regex and tags for all semi-automated tools,
-     *   ready to be used in a query.
+     * or the given tool, ready to be used in a query.
      * @param Project $project
+     * @param string|null $tool
      * @return string[] In the format:
      *    ['combined|regex', 'combined,tags']
      */
-    private function getToolRegexAndTags(Project $project)
+    private function getToolRegexAndTags(Project $project, $tool = null)
     {
         $conn = $this->getProjectsConnection();
         $automatedEditsHelper = $this->container->get('app.automated_edits_helper');
         $tools = $automatedEditsHelper->getTools($project);
         $regexes = [];
         $tags = [];
+
+        if ($tool != '') {
+            $tools = [$tools[$tool]];
+        }
 
         foreach ($tools as $tool => $values) {
             if (isset($values['regex'])) {

@@ -13,9 +13,9 @@
         <h3 class="text-center">{{ msg('tool-autoedits') }}</h3>
 
         {# Show TOC when the user has a ton of automated tools, making the page hard to navigate #}
-        {% if toolCounts|length > 2 %}
+        {% if ae.toolCounts|length > 2 %}
             <div class="text-center xt-toc">
-                {% set sections = ['summary', 'auto-edits', 'non-auto-edits'] %}
+                {% set sections = ['summary', 'auto-edits', 'non-auto-contribs'] %}
                 {% for section in sections %}
                     <span>
                         <a href="#{{ section }}" data-section="{{ section }}">{{ msg(section) }}</a>
@@ -30,49 +30,49 @@
                     {% if hasStartDate %}
                         <tr>
                             <td>{{ msg('start') }}</td>
-                            <td>{{ start|date('Y-m-d') }}</td>
+                            <td>{{ ae.start|date('Y-m-d') }}</td>
                         </tr>
                     {% endif %}
                     <tr>
                         <td>{{ msg('end') }}</td>
-                        <td class="xt-test--end-date">{{ end|date('Y-m-d') }}</td>
+                        <td class="xt-test--end-date">{{ ae.end|date('Y-m-d') }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('namespace') }}</td>
-                        <td>{{ nsName(namespace, project.namespaces) }}</td>
+                        <td>{{ nsName(ae.namespace, project.namespaces) }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('total-edits') }}</td>
-                        <td>{{ editCount|num_format }}</td>
+                        <td>{{ ae.editCount|num_format }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('auto-edits') }}</td>
                         <td>
-                            {{ autoCount|num_format }}
-                            ({{ autoPct|percent_format }})
+                            {{ ae.automatedCount|num_format }}
+                            ({{ ae.automatedPercentage|percent_format }})
                         </td>
                     </tr>
                     <tr>
-                        <td>{{ msg('non-auto-edits') }}</td>
+                        <td>{{ msg('non-auto-contribs') }}</td>
                         <td>
-                            {{ (editCount - autoCount)|num_format }}
-                            ({{ (100 - autoPct)|percent_format }})
+                            {{ (ae.editCount - ae.automatedCount)|num_format }}
+                            ({{ (100 - ae.automatedPercentage)|percent_format }})
                         </td>
                     </tr>
                 </table>
-                {% if editCount > 0 %}
+                {% if ae.editCount > 0 %}
                     <div class="pull-left">
                         {{
                             chart.pie_chart('auto_edits',
                                 [{
-                                    label: msg('non-auto-edits'),
-                                    value: editCount - autoCount,
-                                    percentage: 100 - autoPct
+                                    label: msg('non-auto-contribs'),
+                                    value: ae.editCount - ae.automatedCount,
+                                    percentage: 100 - ae.automatedPercentage
                                 },
                                 {
                                     label: msg('auto-edits'),
-                                    value: autoCount,
-                                    percentage: autoPct
+                                    value: ae.automatedCount,
+                                    percentage: ae.automatedPercentage
                                 }],
                                 false,
                                 'autoedits-summary-chart',
@@ -89,7 +89,7 @@
         {% endset %}
         {{ layout.content_block('summary', content) }}
 
-        {% if editCount == 0 %}
+        {% if ae.editCount == 0 %}
             {% set content %}
                 <div class="alert alert-info">
                     {{ msg('no-contribs') }}
@@ -97,7 +97,7 @@
             {% endset %}
         {% else %}
             {% set content %}
-                {% if toolCounts|length > 0 %}
+                {% if ae.toolCounts|length > 0 %}
                     <table class="table table-bordered table-hover table-striped tools-table toggle-table">
                         <thead>
                         {% for key in ['tool', 'count', 'percent-of-tools', 'percent-of-edit-count'] %}
@@ -110,7 +110,7 @@
                         {% endfor %}
                         </thead>
                         <tbody>
-                        {% for tool, values in toolCounts %}
+                        {% for tool, values in ae.toolCounts %}
                             <tr>
                                 <td class="sort-entry--tool linked" data-value="{{ tool }}">
                                     <span class="tools-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ tool }}">
@@ -120,43 +120,47 @@
                                     {{ wiki.pageLinkRaw(values.link, project, values.label) }}
                                 </td>
                                 <td class="sort-entry--count" data-value="{{ values.count }}">
-                                    {{ values.count|num_format }}
+                                    <a href="{{ path('AutoEditsContributionsResult', {project:project.domain, username:user.username, start: ae.start, end: ae.end, namespace: ae.namespace, tool: tool}) }}">
+                                        {{ values.count|num_format }}
+                                    </a>
                                 </td>
                                 <td class="sort-entry--percent-of-tools" data-value="{{ values.count }}">
-                                    {{ values.count|percent_format(toolsTotal) }}
+                                    {{ values.count|percent_format(ae.toolsTotal) }}
                                 </td>
                                 <td class="sort-entry--percent-of-edit-count" data-value="{{ values.count }}">
-                                    {{ values.count|percent_format(editCount) }}
+                                    {{ values.count|percent_format(ae.editCount) }}
                                 </td>
                             </tr>
                         {% endfor %}
                         </tbody>
                         <tfoot>
                             <th class="tools--tools">
-                                {{ toolCounts|length|num_format }}
-                                {{ msg('num-tools', [toolCounts|length]) }}
+                                {{ ae.toolCounts|length|num_format }}
+                                {{ msg('num-tools', [ae.toolCounts|length]) }}
                             </th>
                             <th class="tools--count">
-                                {{ toolsTotal|num_format }}
+                                <a href="{{ path('AutoEditsContributionsResult', {project:project.domain, username:user.username, start: ae.start, end: ae.end, namespace: ae.namespace}) }}">
+                                    {{ ae.toolsTotal|num_format }}
+                                </a>
                             </th>
                             <th colspan=2></th>
                         </tfoot>
                     </table>
 
-                    {% if toolCounts|length > 1 %}
+                    {% if ae.toolCounts|length > 1 %}
                         {##
                          # Set the size of the chart to be relative to the number of tools.
                          # Otherwise it may get too big and hog up the real estate.
                          # 37 is the heigh of one row.
                          ##}
-                        {% set maxHeight = min(400, (toolCounts|length + 2) * 37) %}
+                        {% set maxHeight = min(400, (ae.toolCounts|length + 2) * 37) %}
                         {% set height = max(150, maxHeight) %}
                         <div class="chart-wrapper tools-chart-wrapper toggle-table--chart">
                             <canvas id="tool_chart" width="{{ height }}" height="{{ height }}"></canvas>
                         </div>
 
                         {% set colors = [] %}
-                        {% for i in 0..(toolCounts|length) %}
+                        {% for i in 0..(ae.toolCounts|length) %}
                             {% set colors = colors|merge([chartColor(i)]) %}
                         {% endfor %}
 
@@ -164,10 +168,10 @@
                             window.toolsChart = new Chart($('#tool_chart'), {
                                 type: 'pie',
                                 data: {
-                                    labels: {{ toolCounts|keys|json_encode()|raw }},
+                                    labels: {{ ae.toolCounts|keys|json_encode()|raw }},
                                     datasets: [{
                                         data: [
-                                            {% for tool, values in toolCounts %}
+                                            {% for tool, values in ae.toolCounts %}
                                                 {{ values.count }}{% if not loop.last %},{% endif %}
                                             {% endfor %}
                                         ],
@@ -183,7 +187,7 @@
                                     }
                                 }
                             });
-                            window.countsByTool = {{ toolCounts|json_encode()|raw }};
+                            window.countsByTool = {{ ae.toolCounts|json_encode()|raw }};
                         </script>
                     {% endif %}
                 {% else %}
@@ -201,7 +205,7 @@
         {% endif %}
         {{ layout.content_block('auto-edits', content) }}
 
-        {% if editCount == 0 %}
+        {% if ae.editCount == 0 %}
             {% set content %}
                 <div class="alert alert-info">
                     {{ msg('no-contribs') }}
@@ -214,14 +218,23 @@
                     <div class="non-auto-edits-container"
                         data-project="{{ project.domain }}"
                         data-username="{{ user.username }}"
-                        data-start="{{ start }}"
-                        data-end="{{ end }}"
-                        data-namespace="{{ namespace }}">
+                        data-start="{{ ae.start }}"
+                        data-end="{{ ae.end }}"
+                        data-namespace="{{ ae.namespace }}"
+                        data-target="nonautoedits">
                     </div>
                 </div>
+                <script>
+                    $(function () {
+                        window.loadContributions();
+                    });
+                </script>
             {% endset %}
         {% endif %}
-        {{ layout.content_block('non-auto-edits', content) }}
+        {% set headerLink %}
+            <a href="{{ path('NonAutoEditsContributionsResult', {project:project.domain, username:user.username, start: ae.start, end: ae.end, namespace: ae.namespace}) }}">{{ msg('non-auto-contribs') }}</a>
+        {% endset %}
+        {{ layout.content_block(headerLink, content, null, 'non-auto-contribs', true) }}
 
         <div class="times-in-utc text-muted">
             {{ msg('times-in-utc') }}

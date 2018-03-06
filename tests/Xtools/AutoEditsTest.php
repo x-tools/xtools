@@ -5,13 +5,16 @@
 
 namespace Tests\Xtools;
 
+use DateTime;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Xtools\AutoEdits;
+use Xtools\AutoEditsRepository;
+use Xtools\Edit;
+use Xtools\Page;
 use Xtools\Project;
 use Xtools\ProjectRepository;
 use Xtools\User;
-use Xtools\AutoEdits;
-use Xtools\AutoEditsRepository;
-use DateTime;
+use Xtools\UserRepository;
 
 /**
  * Tests for the AutoEdits class.
@@ -60,57 +63,151 @@ class AutoEditsTest extends WebTestCase
     }
 
     /**
+     * The constructor.
+     */
+    public function testConstructor()
+    {
+        $autoEdits = new AutoEdits(
+            $this->project,
+            $this->user,
+            1,
+            '2017-01-01',
+            '2018-01-01',
+            'Twinkle',
+            50
+        );
+
+        $this->assertEquals(1, $autoEdits->getNamespace());
+        $this->assertEquals('2017-01-01', $autoEdits->getStart());
+        $this->assertEquals('2018-01-01', $autoEdits->getEnd());
+        $this->assertEquals('Twinkle', $autoEdits->getTool());
+        $this->assertEquals(50, $autoEdits->getOffset());
+    }
+
+    /**
      * User's non-automated edits
      */
     public function testGetNonAutomatedEdits()
     {
-        $this->aeRepo->expects($this->once())
+        $rev = [
+            'page_title' => 'Test_page',
+            'page_namespace' => '1',
+            'rev_id' => '123',
+            'timestamp' => '20170101000000',
+            'minor' => '0',
+            'length' => '5',
+            'length_change' => '-5',
+            'comment' => 'Test',
+        ];
+
+        $this->aeRepo->expects($this->exactly(2))
             ->method('getNonAutomatedEdits')
-            ->willReturn([[
-                'full_page_title' => 'Talk:Test_page',
-                'page_title' => 'Test_page',
-                'page_namespace' => '1',
-                'rev_id' => '123',
-                'timestamp' => '20170101000000',
-                'minor' => '0',
-                'length' => '5',
-                'length_change' => '-5',
-                'comment' => 'Test',
-            ]]);
+            ->willReturn([$rev]);
 
         $autoEdits = new AutoEdits($this->project, $this->user, 1);
         $autoEdits->setRepository($this->aeRepo);
 
-        $edits = $autoEdits->getNonAutomatedEdits($this->project, 1);
+        $rawEdits = $autoEdits->getNonAutomatedEdits(true);
+        $this->assertArraySubset($rev, $rawEdits[0]);
 
-        // Asserts type casting and page title normalization worked
-        $this->assertArraySubset(
-            [
-                'full_page_title' => 'Talk:Test_page',
-                'page_title' => 'Test_page',
-                'page_namespace' => 1,
-                'rev_id' => 123,
-                'timestamp' => DateTime::createFromFormat('YmdHis', '20170101000000'),
-                'minor' => false,
-                'length' => 5,
-                'length_change' => -5,
-                'comment' => 'Test',
-            ],
-            $edits[0]
+        $edit = new Edit(
+            new Page($this->project, 'Talk:Test_page'),
+            array_merge($rev, ['user' => $this->user])
         );
+        $this->assertEquals($edit, $autoEdits->getNonAutomatedEdits()[0]);
+
+        // One more time to ensure things are re-queried.
+        $this->assertEquals($edit, $autoEdits->getNonAutomatedEdits()[0]);
+    }
+
+    /**
+     * Test fetching the tools and counts.
+     */
+    public function testToolCounts()
+    {
+        $toolCounts = [
+            'Twinkle' => [
+                'link' => 'Project:Twinkle',
+                'label' => 'Twinkle',
+                'count' => '13',
+            ],
+            'HotCat' => [
+                'link' => 'Special:MyLanguage/Project:HotCat',
+                'label' => 'HotCat',
+                'count' => '5',
+            ],
+        ];
+
+        $this->aeRepo->expects($this->once())
+            ->method('getToolCounts')
+            ->willReturn($toolCounts);
+        $autoEdits = new AutoEdits($this->project, $this->user, 1);
+        $autoEdits->setRepository($this->aeRepo);
+
+        $this->assertEquals($toolCounts, $autoEdits->getToolCounts());
+        $this->assertEquals(18, $autoEdits->getToolsTotal());
+    }
+
+    /**
+     * User's (semi-)automated edits
+     */
+    public function testGetAutomatedEdits()
+    {
+        $rev = [
+            'page_title' => 'Test_page',
+            'page_namespace' => '1',
+            'rev_id' => '123',
+            'timestamp' => '20170101000000',
+            'minor' => '0',
+            'length' => '5',
+            'length_change' => '-5',
+            'comment' => 'Test ([[WP:TW|TW]])',
+        ];
+
+        $this->aeRepo->expects($this->exactly(2))
+            ->method('getAutomatedEdits')
+            ->willReturn([$rev]);
+
+        $autoEdits = new AutoEdits($this->project, $this->user, 1);
+        $autoEdits->setRepository($this->aeRepo);
+
+        $rawEdits = $autoEdits->getAutomatedEdits(true);
+        $this->assertArraySubset($rev, $rawEdits[0]);
+
+        $edit = new Edit(
+            new Page($this->project, 'Talk:Test_page'),
+            array_merge($rev, ['user' => $this->user])
+        );
+        $this->assertEquals($edit, $autoEdits->getAutomatedEdits()[0]);
+
+        // One more time to ensure things are re-queried.
+        $this->assertEquals($edit, $autoEdits->getAutomatedEdits()[0]);
     }
 
     /**
      * Counting non-automated edits.
      */
-    public function testCountAutomatedEdits()
+    public function testCounts()
     {
         $this->aeRepo->expects($this->once())
             ->method('countAutomatedEdits')
             ->willReturn('50');
+        $userRepo = $this->getMock(UserRepository::class);
+        $userRepo->expects($this->once())
+            ->method('countEdits')
+            ->willReturn(200);
+        $this->user->setRepository($userRepo);
+
         $autoEdits = new AutoEdits($this->project, $this->user, 1);
         $autoEdits->setRepository($this->aeRepo);
-        $this->assertEquals(50, $autoEdits->countAutomatedEdits());
+        $this->assertEquals(50, $autoEdits->getAutomatedCount());
+        $this->assertEquals(200, $autoEdits->getEditCount());
+        $this->assertEquals(25, $autoEdits->getAutomatedPercentage());
+
+        // Again to ensure they're not re-queried.
+        $this->assertEquals(50, $autoEdits->getAutomatedCount());
+        $this->assertEquals(200, $autoEdits->getEditCount());
+        $this->assertEquals(25, $autoEdits->getAutomatedPercentage());
     }
 
     /**
@@ -127,7 +224,7 @@ class AutoEditsTest extends WebTestCase
         $crawler = $this->client->request('GET', $url);
         $response = $this->client->getResponse();
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals($response->headers->get('content-type'), 'application/json');
+        $this->assertEquals('application/json', $response->headers->get('content-type'));
 
         $data = json_decode($response->getContent(), true);
         $toolNames = array_keys($data['automated_tools']);
@@ -158,21 +255,15 @@ class AutoEditsTest extends WebTestCase
         $crawler = $this->client->request('GET', $url);
         $response = $this->client->getResponse();
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals($response->headers->get('content-type'), 'application/json');
+        $this->assertEquals('application/json', $response->headers->get('content-type'));
 
         // This test account *should* never edit again and be safe for testing...
         $this->assertCount(1, json_decode($response->getContent(), true)['nonautomated_edits']);
-
-        // Test again for HTML
-        $crawler = $this->client->request('GET', $url . '?format=html');
-        $response = $this->client->getResponse();
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertContains('text/html', $response->headers->get('content-type'));
 
         // Test again for too many edits.
         $url = '/api/user/nonautomated_edits/en.wikipedia/Materialscientist/0';
         $crawler = $this->client->request('GET', $url);
         $response = $this->client->getResponse();
-        $this->assertEquals(403, $response->getStatusCode());
+        $this->assertEquals(500, $response->getStatusCode());
     }
 }

@@ -117,7 +117,7 @@ Get non-automated contributions for the given user, namespace and date range.
 
 * ``project`` (**required**) - Project domain or database name.
 * ``username`` (**required**) - Account's username.
-* ``namespace`` (**required**) - Namespace ID or  ``all`` for all namespaces.
+* ``namespace`` (**required**) - Namespace ID or  ``all`` for all namespaces. Defaults to ``0`` (mainspace).
 * ``start`` - Start date in the format ``YYYY-MM-DD``. Leave this and ``end`` blank to retrieve the most recent contributions.
 * ``end`` - End date in the format ``YYYY-MM-DD``. Leave this and ``start`` blank to retrieve the most recent contributions.
 * ``offset`` - Number of edits from the start date.
@@ -126,7 +126,32 @@ Get non-automated contributions for the given user, namespace and date range.
 
 Get the newest non-automated mainspace contributions made by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ on the English Wikipedia.
 
+    https://xtools.wmflabs.org/api/user/nonautomated_edits/en.wikipedia/Jimbo_Wales
     https://xtools.wmflabs.org/api/user/nonautomated_edits/en.wikipedia/Jimbo_Wales/0
+
+Automated edits
+===============
+``GET /api/user/automated_edits/{project}/{username}/{namespace}/{start}/{end}/{offset}``
+
+Get (semi-)automated contributions for the given user, namespace and date range. You can get edits only made with a specific tool by appending ``?tool=Tool name`` to the end of the URL. To get the names of the available tools, use the :ref:`Automated tools <autotools>` endpoint.
+
+**Parameters:**
+
+* ``project`` (**required**) - Project domain or database name.
+* ``username`` (**required**) - Account's username.
+* ``namespace`` (**required**) - Namespace ID or  ``all`` for all namespaces. Defaults to ``0`` (mainspace).
+* ``start`` - Start date in the format ``YYYY-MM-DD``. Leave this and ``end`` blank to retrieve the most recent contributions.
+* ``end`` - End date in the format ``YYYY-MM-DD``. Leave this and ``start`` blank to retrieve the most recent contributions.
+* ``offset`` - Number of edits from the start date.
+
+**Example:**
+
+Get the newest automated mainspace contributions made by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ on the English Wikipedia.
+
+    https://xtools.wmflabs.org/api/user/automated_edits/en.wikipedia/Jimbo_Wales
+    https://xtools.wmflabs.org/api/user/automated_edits/en.wikipedia/Jimbo_Wales/0
+
+.. _autotools:
 
 Automated tools
 ===============

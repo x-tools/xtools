@@ -50,12 +50,12 @@ class Edit extends Model
      * @param Page $page
      * @param string[] $attrs Attributes, as retrieved by PageRepository::getRevisions()
      */
-    public function __construct(Page $page, $attrs)
+    public function __construct(Page $page, array $attrs = [])
     {
         $this->page = $page;
 
         // Copy over supported attributes
-        $this->id = (int) $attrs['id'];
+        $this->id = isset($attrs['id']) ? (int)$attrs['id'] : (int)$attrs['rev_id'];
 
         // Allow DateTime or string (latter assumed to be of format YmdHis)
         if ($attrs['timestamp'] instanceof DateTime) {
@@ -71,7 +71,7 @@ class Edit extends Model
         $this->length = $attrs['length'];
         $this->lengthChange = $attrs['length_change'];
 
-        $this->user = new User($attrs['username']);
+        $this->user = isset($attrs['user']) ? $attrs['user'] : new User($attrs['username']);
         $this->comment = $attrs['comment'];
 
         if (isset($attrs['rev_sha1']) || isset($attrs['sha'])) {

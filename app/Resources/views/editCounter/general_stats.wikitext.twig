@@ -106,7 +106,7 @@
 
 {| class="wikitable sortable"
 | {{ msg('auto-edits') }}
-| {% if enabled('autoedits') %}[{{ url('autoeditsResult', {project:project.domain, username:user.username, namespace:'all'}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countAutomatedEdits }}}}]{% else %}{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countAutomatedEdits }}}}{% endif %}
+| {% if enabled('autoedits') %}[{{ url('AutoEditsResult', {project:project.domain, username:user.username, namespace:'all'}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countAutomatedEdits }}}}]{% else %}{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countAutomatedEdits }}}}{% endif %}
 {% if ec.countLiveRevisions %} ({{ ((ec.countAutomatedEdits / ec.countLiveRevisions) * 100)|percent_format }})
 {% endif %}
 |-
