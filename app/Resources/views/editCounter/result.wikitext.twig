@@ -1,6 +1,6 @@
 == [[User:{{ user.username }}]] ==
 
-{% set link %}[{{ url('EditCounter', {'username': user.username, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
+{% set link %}[{{ url('EditCounterResult', {'username': user.username, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
 {{ msg('xtools-advert', [link, date()|date('Y-m-d H:i')]) }}
 {{ render(path('EditCounterGeneralStats', {
     'username': user.username,
@@ -22,7 +22,7 @@
     'username': user.username,
     'project': project.domain,
     'format': 'wikitext'
-})) }}{{ render(path('TopEditsResults', {
+})) }}{{ render(path('TopEditsResult', {
     'username': user.username,
     'project': project.domain,
     'namespace': 'all',

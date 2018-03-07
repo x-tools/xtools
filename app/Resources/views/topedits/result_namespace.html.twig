@@ -8,7 +8,10 @@
     <div class="panel panel-primary">
         {{ layout.userHeading(user, project, xtPage) }}
         <div class="panel-body xt-panel-body" >
-            {{ wiki.userLinks(user, project, xtPage) }}
+            <a class="back-to-search" href="{{ path('EditCounterResult', {project: project.domain, username:user.username}) }}">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                {{ msg('see-full-statistics') }}
+            </a>
             <h3 class="text-center">{{ msg('topedits-per-namespace') }}</h3>
 
             {% if project.userHasOptedIn(user) and te.topEdits|length > 2 %}
@@ -86,14 +89,14 @@
                         &middot;
                         <a href="{{ path('ArticleInfoResult', {project:project.domain, article:page.page_title_ns}) }}">{{ msg('tool-articleinfo') }}</a>
                         &middot;
-                        <a href="{{ path('TopEditsResults', {project:project.domain, username:user.username, namespace:page.page_namespace, article:page.page_title}) }}" >{{ msg('tool-topedits') }}</a>
+                        <a href="{{ path('TopEditsResult', {project:project.domain, username:user.username, namespace:page.page_namespace, article:page.page_title}) }}" >{{ msg('tool-topedits') }}</a>
                     </td>
                 </tr>
                 {% endfor %}
                 {% if pages|length >= 10 and te.topEdits|length > 1 %}
                     <tr>
                         <td colspan={{ showPageAssessment ? 4 : 3 }}>
-                            <a href="{{ path('TopEditsResults', {project:project.domain, username:user.username, namespace:ns, article:''}) }}">
+                            <a href="{{ path('TopEditsResult', {project:project.domain, username:user.username, namespace:ns, article:''}) }}">
                                 {{ msg('more') }}&hellip;
                             </a>
                         </td>

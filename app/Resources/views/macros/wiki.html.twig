@@ -277,3 +277,20 @@
         {% endif %}
     </p>
 {% endspaceless %}{% endmacro %}
+
+{% macro pageLinks(page, pageviewsDateParams = {}) %}{% spaceless %}
+    {% import _self as wiki %}
+    <p class="text-center xt-heading-subtitle">
+        {{ wiki.pageHistLink(page) }}
+        &middot;
+        {{ wiki.pageLogLink(page) }}
+        {% if isWMFLabs() %}
+            &middot;
+            {{ wiki.pageviewsLinks(page, pageviewsDateParams) }}
+            {% if page.wikidataId is defined %}
+                &middot;
+                {{ wiki.extLink('https://tools.wmflabs.org/reasonator/?q=' ~ page.wikidataId, 'Resonator (Wikidata)') }}
+            {% endif %}
+        {% endif %}
+    </p>
+{% endspaceless %}{% endmacro %}

@@ -14,9 +14,9 @@
     <div class="panel panel-primary">
         <header class="panel-heading">
             <div class="text-center xt-heading-top">
-                <a class="back-to-search" href="{{ path('articleinfo') }}">
+                <a class="back-to-search" href="{{ path('ArticleInfoResult', {project: project.domain, article:page.title}) }}">
                     <span class="glyphicon glyphicon-chevron-left"></span>
-                    {{ msg('back') }}
+                    {{ msg('see-full-statistics') }}
                 </a>
                 {{ wiki.pageLink(page) }}
                 <small>
@@ -26,6 +26,8 @@
             </div>
         </header>
         <div class="panel-body xt-panel-body">
+            {{ wiki.pageLinks(page) }}
+
             <section class="panel panel-default clearfix">
                 <header class="panel-heading col-lg-12">
                     <h4>
@@ -74,11 +76,11 @@
                     </td>
                     <td>
                         {% if enabled('topedits') %}
-                            <a href="{{ path('topedits', { 'project': project.domain, 'username': username, 'namespace': page.namespace, 'article': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
+                            <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': username, 'namespace': page.namespace, 'article': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
                         {% endif %}
                         &middot;
                         {% if enabled('ec') %}
-                            <a href="{{ path('ec', { 'project': project.domain, 'username': username }) }}">{{ msg('tool-ec') }}</a>
+                            <a href="{{ path('EditCounterResult', { 'project': project.domain, 'username': username }) }}">{{ msg('tool-ec') }}</a>
                         {% endif %}
                     </td>
                     <td class="sort-entry--characters" data-value="{{ values.count }}">
@@ -109,9 +111,18 @@
             </tr></td>
         {% endif %}
     </table>
+
+    {##
+     # Set the size of the chart to be relative to the number of tools.
+     # Otherwise it may get too big and hog up the real estate.
+     # 37 is the heigh of one row.
+     ##}
+    {% set maxHeight = min(400, (textshares.list|length + 2) * 37) %}
+    {% set height = max(150, maxHeight) %}
     <div class="chart-wrapper textshares-chart-wrapper toggle-table--chart">
-        <canvas id="textshares_chart" width="400" height="400"></canvas>
+        <canvas id="textshares_chart" width="{{ height }}" height="{{ height }}"></canvas>
     </div>
+
     {% set colors = [] %}
     {% for i in 0..(textshares.list|length) %}
         {% set colors = colors|merge([chartColor(i)]) %}

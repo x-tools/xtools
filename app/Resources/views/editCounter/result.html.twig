@@ -97,17 +97,17 @@
         {{ layout.content_block(headerLink, content, downloadLink, 'timecard', true) }}
 
         {% set content %}
-            {{ render(path('TopEditsResults', {
+            {{ render(path('TopEditsResult', {
                 'username': user.username,
                 'project': project.domain,
                 'namespace': 'all'
             })) }}
         {% endset %}
         {% set headerLink %}
-            <a href="{{ path('TopEditsResults', {project:project.domain, username:user.username, namespace:'all'})}}">{{ msg('top-edited-pages') }}</a>
+            <a href="{{ path('TopEditsResult', {project:project.domain, username:user.username, namespace:'all'})}}">{{ msg('top-edited-pages') }}</a>
         {% endset %}
         {% set downloadLink %}
-            {{ layout.downloadLink('TopEditsResults', {project:project.domain, username:user.username, namespace:'all'}, ['wikitext']) }}
+            {{ layout.downloadLink('TopEditsResult', {project:project.domain, username:user.username, namespace:'all'}, ['wikitext']) }}
         {% endset %}
         {{ layout.content_block(headerLink, content, downloadLink, 'top-edited-pages', true) }}
 

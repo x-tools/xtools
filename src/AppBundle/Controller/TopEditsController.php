@@ -49,7 +49,7 @@ class TopEditsController extends XtoolsController
 
         // Redirect if at minimum project and username are provided.
         if (isset($params['project']) && isset($params['username'])) {
-            return $this->redirectToRoute('TopEditsResults', $params);
+            return $this->redirectToRoute('TopEditsResult', $params);
         }
 
         // Convert the given project (or default project) into a Project instance.
@@ -68,8 +68,9 @@ class TopEditsController extends XtoolsController
 
     /**
      * Display the results.
-     * @Route("/topedits/{project}/{username}/{namespace}/{article}", name="TopEditsResults",
-     *     requirements={"article"=".+"})
+     * @Route("/topedits/{project}/{username}/{namespace}/{article}", name="TopEditsResult",
+     *     requirements = {"article" = ".+", "namespace" = "|all|\d+"}
+     * )
      * @param Request $request The HTTP request.
      * @param int $namespace
      * @param string $article
@@ -100,7 +101,7 @@ class TopEditsController extends XtoolsController
      * @param User $user The User.
      * @param Project $project The project.
      * @param integer|string $namespace The namespace ID or 'all'
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      * @codeCoverageIgnore
      */
     public function namespaceTopEdits(Request $request, User $user, Project $project, $namespace)

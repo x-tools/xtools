@@ -474,11 +474,11 @@
                         </td>
                         <td>
                             {% if enabled('topedits') %}
-                                <a href="{{ path('topedits', { 'project': project.domain, 'username': editor, 'namespace': page.namespace, 'article': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
+                                <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': editor, 'namespace': page.namespace, 'article': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
                             {% endif %}
                             &middot;
                             {% if enabled('ec') %}
-                                <a href="{{ path('ec', { 'project': project.domain, 'username': editor }) }}">{{ msg('tool-ec') }}</a>
+                                <a href="{{ path('EditCounterResult', { 'project': project.domain, 'username': editor }) }}">{{ msg('tool-ec') }}</a>
                             {% endif %}
                         </td>
                         <td class="sort-entry--edits" data-value="{{ stats.all }}">
@@ -552,11 +552,11 @@
                         </td>
                         <td>
                             {% if enabled('topedits') %}
-                                <a href="{{ path('topedits', { 'project': project.domain, 'user': bot, 'namespace': page.namespace, 'article': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
+                                <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': bot, 'namespace': page.namespace, 'article': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
                             {% endif %}
                             &middot;
                             {% if enabled('ec') %}
-                                <a href="{{ path('ec', { 'project': project.domain, 'user': bot }) }}">{{ msg('tool-ec') }}</a>
+                                <a href="{{ path('EditCounterResult', { 'project': project.domain, 'username': bot }) }}">{{ msg('tool-ec') }}</a>
                             {% endif %}
                         </td>
                         <td class="sort-entry--edits" data-value="{{ botData.count }}">{{ botData.count }}</td>

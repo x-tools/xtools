@@ -9,7 +9,7 @@
     <div class="panel panel-primary">
         <header class="panel-heading">
             <div class="text-center xt-heading-top">
-                <a class="back-to-search" href="{{ path('ec', {project: project.domain, username:user.username}) }}">
+                <a class="back-to-search" href="{{ path('EditCounterResult', {project: project.domain, username:user.username}) }}">
                     <span class="glyphicon glyphicon-chevron-left"></span>
                     {{ msg('see-full-statistics') }}
                 </a>
@@ -186,7 +186,7 @@
                 <td>{{ msg('auto-edits') }}</td>
                 <td>
                     {% if enabled('autoedits') %}
-                        <a href="{{ path('autoedits', {project:project.domain, username:user.username, namespace:'all'}) }}">{{ ec.countAutomatedEdits|num_format }}</a>
+                        <a href="{{ path('AutoEditsResult', {project:project.domain, username:user.username, namespace:'all'}) }}">{{ ec.countAutomatedEdits|num_format }}</a>
                     {% else %}
                         {{ ec.countAutomatedEdits }}
                     {% endif %}
@@ -200,7 +200,7 @@
                 <td>{{ msg('edits-with-summaries') }}</td>
                 <td>
                     {% if enabled('es') %}
-                        <a href="{{ path('es', {project:project.domain, username:user.username, namespace:'all'}) }}">{{ ec.countRevisionsWithComments|num_format }}</a>
+                        <a href="{{ path('EditSummaryResult', {project:project.domain, username:user.username, namespace:'all'}) }}">{{ ec.countRevisionsWithComments|num_format }}</a>
                     {% else %}
                         {{ ec.countRevisionsWithComments|num_format }}
                     {% endif %}
@@ -398,12 +398,12 @@
                             <span title="{{ msg('selected') }}">&#9658;</span>
                         {% endif %}
                         {# use project.domain instead of title due to limited space available in the interface #}
-                        {{- wiki.pageLinkRaw('Special:Contributions/'~user.username, topProj.project, topProj.project.domain) -}}
-                    </td>
+                        <a href="{{ path('EditCounterResult', {project:topProj.project.domain, username:user.username}) }}">
+                            {{- topProj.project.domain -}}
+                        </a>{#-
+                    -#}</td>
                     <td>
-                        <a href="{{ path('TopEditsResults', {project:topProj.project.domain, username:user.username, namespace:'all'}) }}">
-                            {{ topProj.total|num_format }}
-                        </a>
+                        {{- wiki.pageLinkRaw('Special:Contributions/'~user.username, topProj.project, topProj.total|num_format) -}}
                     </td>
                 </tr>
             {% endfor %}
