@@ -231,7 +231,7 @@ class AutomatedEditsController extends XtoolsController
             return $ret;
         }
 
-        return $this->render('autoedits/nonautomated_edits.html.twig', $this->output);
+        return $this->render('autoEdits/nonautomated_edits.html.twig', $this->output);
     }
 
     /**
@@ -267,7 +267,7 @@ class AutomatedEditsController extends XtoolsController
             return $ret;
         }
 
-        return $this->render('autoedits/automated_edits.html.twig', $this->output);
+        return $this->render('autoEdits/automated_edits.html.twig', $this->output);
     }
 
     /************************ API endpoints ************************/

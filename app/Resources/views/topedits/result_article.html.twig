@@ -7,6 +7,10 @@
 <div class="panel panel-primary">
     <header class="panel-heading">
         <div class="text-center xt-heading-top" >
+            <a class="back-to-search" href="{{ path('topedits', {project: project.domain, username:user.username, namespace: te.namespace, article: page}) }}">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                {{ msg('see-full-statistics') }}
+            </a>
             <a class="back-to-search" href="{{ path('topedits') }}">
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {{ msg('back') }}

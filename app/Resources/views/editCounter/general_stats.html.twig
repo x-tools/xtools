@@ -9,9 +9,9 @@
     <div class="panel panel-primary">
         <header class="panel-heading">
             <div class="text-center xt-heading-top">
-                <a class="back-to-search" href="{{ path('ec') }}">
+                <a class="back-to-search" href="{{ path('ec', {project: project.domain, username:user.username}) }}">
                     <span class="glyphicon glyphicon-chevron-left"></span>
-                    {{ msg('back') }}
+                    {{ msg('see-full-statistics') }}
                 </a>
                 {{ wiki.userLink(user, project) }}
                 <small> &bull; {{ project.title }} </small>
