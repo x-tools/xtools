@@ -6,7 +6,8 @@
 			"Nemo bis",
 			"Jayprakash12345",
 			"Rajatkatiyar10",
-			"Nitin1485"
+			"Nitin1485",
+			"Smtchahal"
 		]
 	},
 	"accounts": "खाते",
@@ -22,6 +23,7 @@
 	"approximate": "लगभग",
 	"article": "लेख",
 	"auto-edits": "(अर्ध-)स्वतः सम्पादन",
+	"auto-edits-request-name": "उपकरण का नाम",
 	"average-change-per-page": "प्रति पृष्ठ औसत परिवर्तन",
 	"average-edits-per-day": "प्रतिदिन औसत सम्पादन संख्या",
 	"average-edits-per-month": "प्रति मास औसत सम्पादन",
@@ -60,6 +62,7 @@
 	"edits-with-summaries": "सारांश सहित सम्पादन",
 	"end": "समाप्ति तिथि",
 	"error-articlinfo-api": "संसोधित डाटा लाने में असमर्थ|",
+	"error-pagepile-too-large": "क्षमा करें, PagePile को निर्यात करने के लिये बहुत अधिक पृष्ठ हैं। आप या तो हाथ से PagePile बना सकते हैं, या तो विशिष्ट नामस्थान या समय सीमा तक परिणाम सेट को सीमित करने की कोशिश कर सकते हैं।",
 	"events": "घटनायें",
 	"executed": "$1 सेकिण्डों में निष्पादित",
 	"feedback": "आपके सुझाव",
@@ -144,6 +147,7 @@
 	"quote-show-all": "सभी उद्धरण दिखायें",
 	"rank": "श्रेणी",
 	"recent-activity": "हाल ही के कार्यकलाप",
+	"recreated": "फिर से बना दिया गया",
 	"redirects": "अनुप्रेषित",
 	"redirfilter-all": "अनुप्रेषण और गैर-अनुप्रेषण शामिल करें",
 	"redirfilter-noredirects": "अनुप्रेषण रहित",

@@ -110,7 +110,7 @@
 	"edits-with-summaries": "Edições com resumo",
 	"end": "Data de fim",
 	"error-articlinfo-api": "Não foi possível obter os dados de revisão.",
-	"error-pagepile-too-large": "Desculpe, existem muitas páginas para exportar para o PagePile. Pode criar manualmente um PagePile, ou tentar reduzir o conjunto de resultados, ao limitar um espaço nominal específico ou uma janela temporal.",
+	"error-pagepile-too-large": "Desculpe, há demasiadas páginas para exportar para o PagePile. Pode criar um PagePile manualmente, ou tentar reduzir o conjunto de resultados limitando-o a um espaço nominal específico ou a uma janela temporal.",
 	"error-query-timeout": "Lamentamos, a informação solicitada levou muito tempo para processar (tempo limite: $1 {{PLURAL:$1|segundo|segundos}}). Para economizar os recursos, a consulta foi automaticamente interrompida.",
 	"error-rate-limit": "Foi detetado um possível varrimento do sítio por um robô-aranha. Se é uma pessoa, está a realizar demasiados pedidos num período curto. Aguarde $1 {{PLURAL:$1|minuto|minutos}}, antes de recarregar esta ferramenta, por favor. Poderá então autenticar-se para evitar que isto aconteça novamente.",
 	"error-report": "Por favor, sinta-se livre para informar este erro em $1 (é necessário ter uma conta Wikimedia).",
