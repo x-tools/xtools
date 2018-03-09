@@ -52,7 +52,7 @@
                     <tr>
                         <td>{{ msg('edit-summary-recent-major', [es.recentEditsMajor]) }}</td>
                         <td>
-                            {{ es.recentSummariesMajor }}
+                            {{ es.recentSummariesMajor|num_format }}
                             &middot;
                             ({{ es.recentSummariesMajor|percent_format(es.recentEditsMajor) }})
                         </td>
@@ -73,7 +73,7 @@
                     <tr>
                         <td>{{ msg('edit-summary-recent-minor', [es.recentEditsMinor]) }}</td>
                         <td>
-                            {{ es.recentSummariesMinor }}
+                            {{ es.recentSummariesMinor|num_format }}
                             &middot;
                             ({{ es.recentSummariesMinor|percent_format(es.recentEditsMinor) }})
                         </td>

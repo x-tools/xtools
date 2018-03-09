@@ -21,6 +21,9 @@ class AppExtension extends Extension
     /** @var NumberFormatter Instance of NumberFormatter class, used in localizing numbers. */
     protected $numFormatter;
 
+    /** @var NumberFormatter Instance of NumberFormatter class for localizing percentages. */
+    protected $percentFormatter;
+
     /** @var IntlDateFormatter Instance of IntlDateFormatter class, used in localizing dates. */
     protected $dateFormatter;
 
@@ -566,14 +569,9 @@ class AppExtension extends Extension
             $this->numFormatter = new NumberFormatter($lang, NumberFormatter::DECIMAL);
         }
 
-        // Get separator symbols.
-        $decimal = $this->numFormatter->getSymbol(NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
-        $thousands = $this->numFormatter->getSymbol(NumberFormatter::GROUPING_SEPARATOR_SYMBOL);
+        $this->numFormatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $decimals);
 
-        $formatted = number_format($number, $decimals, $decimal, $thousands);
-
-        // Remove trailing .0's (e.g. 40.00 -> 40).
-        return preg_replace("/\\".$decimal."0+$/", '', $formatted);
+        return $this->numFormatter->format($number);
     }
 
     /**
@@ -605,6 +603,11 @@ class AppExtension extends Extension
      */
     public function dateFormatStd($datetime)
     {
+        // Allow localization for RTL languages.
+        if ($this->intuitionIsRTL()) {
+            return $this->dateFormat($datetime);
+        }
+
         if (is_string($datetime) || is_int($datetime)) {
             $datetime = new DateTime($datetime);
         }
@@ -643,13 +646,20 @@ class AppExtension extends Extension
      */
     public function percentFormat($numerator, $denominator = null, $precision = 1)
     {
-        if (!$denominator) {
-            $quotient = $numerator;
-        } else {
-            $quotient = ( $numerator / $denominator ) * 100;
+        if (!isset($this->percentFormatter)) {
+            $lang = $this->getIntuition()->getLang();
+            $this->percentFormatter = new NumberFormatter($lang, NumberFormatter::PERCENT);
         }
 
-        return $this->numberFormat($quotient, $precision) . '%';
+        $this->percentFormatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $precision);
+
+        if (!$denominator) {
+            $quotient = $numerator / 100;
+        } else {
+            $quotient = $numerator / $denominator;
+        }
+
+        return $this->percentFormatter->format($quotient);
     }
 
     /**
@@ -703,7 +713,9 @@ class AppExtension extends Extension
 
         $size = $this->numberFormat($size);
 
-        return "<span class='$class'>$size</span>";
+        return "<span class='$class'".
+            ($this->intuitionIsRTL() ? " dir='rtl'" : '').
+            ">$size</span>";
     }
 
     /**

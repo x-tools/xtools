@@ -60,11 +60,11 @@
         </tr>
         <tr>
             <td>{{ msg('first-edit') }}</td>
-            <td>{% if ec.datetimeFirstRevision %}{{ ec.datetimeFirstRevision|date('Y-m-d H:i') }}{% endif %}</td>
+            <td>{% if ec.datetimeFirstRevision %}{{ ec.datetimeFirstRevision|date_format }}{% endif %}</td>
         </tr>
         <tr>
             <td>{{ msg('latest-edit') }}</td>
-            <td>{% if ec.datetimeLastRevision %}{{ ec.datetimeLastRevision|date('Y-m-d H:i') }}{% endif %}</td>
+            <td>{% if ec.datetimeLastRevision %}{{ ec.datetimeLastRevision|date_format }}{% endif %}</td>
         </tr>
         <tr>
             <td class="stat-list--new-group">{{ msg('live-edits') }}</td>
@@ -346,7 +346,7 @@
             <tr>
                 <td>{{ msg('re-blocks') }}</td>
                 <td>
-                    {{ wiki.blockLogLink(user.username, project, ec.countBlocksReceived) }}
+                    {{ wiki.blockLogLink(user.username, project, ec.countBlocksReceived|num_format) }}
                 </td>
             </tr>
             <tr>
@@ -369,7 +369,7 @@
                             {% if user.getBlockExpiry(project) == 'infinity' %}
                                 &#x221e; {# infinity #}
                             {% else %}
-                                {{ user.getBlockExpiry(project)|date('Y-m-d H:i') }}
+                                {{ user.getBlockExpiry(project)|date_format }}
                             {% endif %}
                         {% endspaceless %}
                     {% else %}
@@ -395,7 +395,7 @@
                 <tr>
                     <td>
                         {% if topProj.project.databaseName == project.databaseName %}
-                            <span title="{{ msg('selected') }}">&#9658;</span>
+                            <span title="{{ msg('selected') }}">{% if isRTL() %}&#9668;{% else %}&#9658;{% endif %}</span>
                         {% endif %}
                         {# use project.domain instead of title due to limited space available in the interface #}
                         <a href="{{ path('EditCounterResult', {project:topProj.project.domain, username:user.username}) }}">

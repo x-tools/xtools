@@ -77,7 +77,7 @@
                     {% for key,value in as.stats %}
                         {% set username = value.user_name %}
                         <tr>
-                            <td>{{ loop.index }}.</td>
+                            <td>{{ loop.index|num_format }}</td>
                             <td class="sort-entry--username" data-value="{{ username }}">
                                 {{ wiki.userLink(username, project) }}
                             </td>

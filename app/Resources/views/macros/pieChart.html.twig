@@ -14,7 +14,7 @@
                 <div>
                     <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
                     <span class="legend-label">{{ entry.label }}</span>
-                    <span class="legend-value">
+                    <span class="legend-value" {% if isRTL() %}dir="rtl"{% endif %}>
                         &middot;
                         {{ entry.value|num_format }} ({{ entry.percentage|percent_format }})
                     </span>

@@ -62,7 +62,7 @@
         <tfoot>
             <tr>
                 <th class="namespaces--namespaces">
-                    {{ ec.namespaceTotals|length}} {{ msg('num-namespaces', [ec.namespaceTotals|length]) }}
+                    {{ ec.namespaceTotals|length|num_format }} {{ msg('num-namespaces', [ec.namespaceTotals|length]) }}
                 </th>
                 <th class="namespaces--count">
                     {{ ec.countLiveRevisions|num_format }}

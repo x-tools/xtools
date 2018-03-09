@@ -135,7 +135,8 @@
                         callback: function(value, index, values) {
                             return days[index];
                         }
-                    }
+                    },
+                    position: i18nRTL ? 'right' : 'left'
                 }],
                 xAxes: [{
                     ticks: {
@@ -143,6 +144,7 @@
                         min: 0,
                         max: 23,
                         stepSize: 2,
+                        reverse: i18nRTL,
                         callback: function(value, index, values) {
                             if (value % 2 === 0) {
                                 return value + ":00";

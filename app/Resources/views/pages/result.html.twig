@@ -200,7 +200,7 @@
                             {% set pagename = project.namespaces[ns] ~ ":" ~ page.page_title %}
                         {% endif %}
                         <tr>
-                            <td>{{ index }}</td>
+                            <td>{{ index|num_format }}</td>
                             <td class="sort-entry--page-title" data-value="{{ pagename }}">
                                 {% if page.page_is_redirect %}
                                     {{ wiki.pageLinkRaw(pagename, project, pagename, 'redirect=no') }}
@@ -225,7 +225,7 @@
                                 {% if page.type == 'arc' %}
                                     {{ wiki.pageLinkRaw('Special:Undelete/' ~ pagename, project, page.human_time, 'timestamp=' ~ page.raw_time) }}
                                 {% else %}
-                                    {{ wiki.permaLinkRaw(page.rev_id, project, page.human_time) }}
+                                    {{ wiki.permaLinkRaw(page.rev_id, project, page.human_time|date_format) }}
                                 {% endif %}
                             </td>
                             <td class="sort-entry--original-size" data-value="{{ page.rev_len }}">

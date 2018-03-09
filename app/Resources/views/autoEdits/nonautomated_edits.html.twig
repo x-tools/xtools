@@ -40,14 +40,14 @@
     <div class="non-auto-edits-nav clearfix">
         {% if ae.offset > 0 %}
             <a href="#" class="pull-left prev-edits">
-                <span class="glyphicon glyphicon-arrow-left"></span>
+                <span class="glyphicon glyphicon-arrow-{% if isRTL() %}right{% else %}left{% endif %}"></span>
                 {{ msg('pager-newer-n', [50])|capitalize_first }}
             </a>
         {% endif %}
         {% if ae.automatedEdits()|length == 50 %}
             <a href="#" class="pull-right next-edits">
                 {{ msg('pager-older-n', [50])|capitalize_first }}
-                <span class="glyphicon glyphicon-arrow-right"></span>
+                <span class="glyphicon glyphicon-arrow-{% if isRTL() %}left{% else %}right{% endif %}"></span>
             </a>
         {% endif %}
     </div>
@@ -84,14 +84,14 @@
     <div class="non-auto-edits-nav clearfix">
         {% if ae.offset > 0 %}
             <a href="#" class="pull-left prev-edits">
-                <span class="glyphicon glyphicon-arrow-left"></span>
+                <span class="glyphicon glyphicon-arrow-{% if isRTL() %}right{% else %}left{% endif %}"></span>
                 {{ msg('pager-newer-n', [50])|capitalize_first }}
             </a>
         {% endif %}
         {% if ae.automatedEdits()|length == 50 %}
             <a href="#" class="pull-right next-edits">
                 {{ msg('pager-older-n', [50])|capitalize_first }}
-                <span class="glyphicon glyphicon-arrow-right"></span>
+                <span class="glyphicon glyphicon-arrow-{% if isRTL() %}left{% else %}right{% endif %}"></span>
             </a>
         {% endif %}
     </div>

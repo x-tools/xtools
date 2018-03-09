@@ -8,10 +8,6 @@
     <div class="panel panel-primary">
         {{ layout.userHeading(user, project, xtPage) }}
         <div class="panel-body xt-panel-body" >
-            <a class="back-to-search" href="{{ path('EditCounterResult', {project: project.domain, username:user.username}) }}">
-                <span class="glyphicon glyphicon-chevron-left"></span>
-                {{ msg('see-full-statistics') }}
-            </a>
             <h3 class="text-center">{{ msg('topedits-per-namespace') }}</h3>
 
             {% if project.userHasOptedIn(user) and te.topEdits|length > 2 %}

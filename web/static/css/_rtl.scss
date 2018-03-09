@@ -23,6 +23,8 @@ body {
 }
 .nav-buttons {
     float: left !important;
+    margin-left: 8px;
+    margin-right: 0;
 }
 .navbar-toggle {
     float: right !important;
@@ -92,6 +94,12 @@ $border: 1px solid #ccc;
         border-color: transparent transparent transparent #FFFAF0;
     }
 }
+input.form-control.show-loader {
+    background: url("../images/loader.gif") no-repeat left 5px center;
+}
+.typeahead {
+  text-align: right;
+}
 
 /********** FOOTER **********/
 .app-footer {
@@ -104,7 +112,7 @@ $border: 1px solid #ccc;
     }
 }
 
-/********** TABLES **********/
+/********** TABLES / CHARTS **********/
 .table {
     th,
     td {
@@ -116,7 +124,8 @@ $border: 1px solid #ccc;
         float: right !important;
     }
 }
-.stat-list > .table td {
+.stat-list > .table td,
+.stat-list > .table th {
     &:first-child {
         text-align: left;
     }
@@ -131,28 +140,47 @@ $border: 1px solid #ccc;
         }
     }
 }
-.panel-heading {
+.panel {
     text-align: right;
+}
+.toggle-table {
+    float: right;
+}
+.toggle-table--chart {
+    float: right;
+    margin-left: 0 !important;
+    margin-right: 100px !important;
+}
+.chart-legend {
+    margin-left: 0;
+    margin-right: 15px;
+
+    .color-icon {
+        margin-left: 5px;
+        margin-right: 0;
+    }
+}
+.chart-wrapper {
+    float: right;
+    margin-left: 50px;
+    margin-right: 0;
+}
+.xt-panel-description {
+    float: left !important;
+}
+.dropdown-menu-right {
+    left: 0;
+    right: initial;
+    text-align: right;
+}
+.times-in-utc {
+    float: right;
 }
 
 /********** ARTICLEINFO **********/
 &.articleinfo {
-    .chart-wrapper {
-        float: right;
-        margin-left: 50px;
-        margin-right: 0;
-    }
     .legend-body {
         text-align: right;
-    }
-    .chart-legend {
-        margin-left: 0;
-        margin-right: 15px;
-
-        .color-icon {
-            margin-left: 5px;
-            margin-right: 0;
-        }
     }
     .sort-entry--assessment,
     .sort-entry--importance {
@@ -164,4 +192,13 @@ $border: 1px solid #ccc;
 .rm-inline-margin {
     margin-left: -4px;
     margin-right: 0;
+}
+.diff-pos {
+    &::before {
+        display: none;
+    }
+    &::after {
+        color: $diff-pos;
+        content: '+';
+    }
 }
