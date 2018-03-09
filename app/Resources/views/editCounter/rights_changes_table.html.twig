@@ -23,7 +23,7 @@
                         <div class="diff-pos">{{ right|trim }}</div>
                     {% endfor %}
                     {% for right in change.removed %}
-                        <div class="diff-neg">-{{ right|trim }}</div>
+                        <div class="diff-neg" dir="ltr">-{{ right|trim }}</div>
                     {% endfor %}
                 </td>
                 <td class="sort-entry--admin" data-value="{{ change.admin }}">

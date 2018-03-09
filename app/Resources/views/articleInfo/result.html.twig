@@ -468,7 +468,7 @@
                     {% set counter = counter + 1 %}
                     {% set editSum = editSum + stats.all %}
                     <tr>
-                        <td class="sort-entry--rank" data-value="{{ counter }}">{{ counter }}</td>
+                        <td class="sort-entry--rank" data-value="{{ counter }}">{{ counter|num_format }}</td>
                         <td class="sort-entry--username" data-value="{{ editor }}">
                             {{ wiki.userLink(editor, project) }}
                         </td>
@@ -541,7 +541,7 @@
                 {% for bot, botData in ai.bots|slice(0, botlimit) %}
                     {% set counter = counter + 1 %}
                     <tr>
-                        <td class="sort-entry--rank" data-value="{{ counter }}">{{ counter }}</td>
+                        <td class="sort-entry--rank" data-value="{{ counter }}">{{ counter|num_format }}</td>
                         <td class="sort-entry--bot" data-value="{{ bot }}">
                             {{ wiki.userLink(bot, project) }}
                             {% if not botData.current %}
@@ -559,7 +559,7 @@
                                 <a href="{{ path('EditCounterResult', { 'project': project.domain, 'username': bot }) }}">{{ msg('tool-ec') }}</a>
                             {% endif %}
                         </td>
-                        <td class="sort-entry--edits" data-value="{{ botData.count }}">{{ botData.count }}</td>
+                        <td class="sort-entry--edits" data-value="{{ botData.count }}">{{ botData.count|num_format }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>

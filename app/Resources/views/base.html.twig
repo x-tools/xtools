@@ -15,6 +15,8 @@
         i18nLang = "{{ lang() }}";
         i18nPath = "{{ asset('static/i18n/' ~ lang() ~ '.json') }}";
         i18nEnPath = "{{ asset('static/i18n/en.json') }}";
+
+        i18nRTL = {% if isRTL() %}true{% else %}false{% endif %};
     </script>
 
     {% if loadStylesheetsFromCDN() %}
@@ -44,6 +46,9 @@
             'static/css/topedits.scss'
             output='static/production/application.css' %}
         <link rel="stylesheet" href="{{ asset_url }}" />
+        {% if isRTL() %}
+            <link rel="stylesheet" type="text/css" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-rtl/3.4.0/css/bootstrap-flipped.min.css">
+        {% endif %}
         {% endstylesheets %}
         {% javascripts
             'static/js/vendor/jquery.min.js'

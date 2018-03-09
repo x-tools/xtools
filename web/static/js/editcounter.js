@@ -227,6 +227,7 @@ window.setupMonthYearChart = function (id, datasets, labels, maxTotal) {
     window.maxDigits[id] = maxTotal.toString().length
     window.chartLabels[id] = labels;
 
+    /** global: i18nRTL */
     window[id + 'countsChart'] = new Chart($('#' + id + 'counts-canvas'), {
         type: 'horizontalBar',
         data: {
@@ -262,16 +263,18 @@ window.setupMonthYearChart = function (id, datasets, labels, maxTotal) {
                     stacked: true,
                     ticks: {
                         beginAtZero: true,
+                        reverse: i18nRTL,
                         callback: function (value) {
                             if (Math.floor(value) === value) {
                                 return value.toLocaleString();
                             }
-                        }
+                        },
                     }
                 }],
                 yAxes: [{
                     stacked: true,
                     barThickness: 18,
+                    position: i18nRTL ? 'right' : 'left'
                 }]
             },
             legend: {
