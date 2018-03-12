@@ -61,8 +61,8 @@ class AdminStatsTest extends PHPUnit_Framework_TestCase
 
         $as->prepareStats();
 
-        $this->assertEquals('2017-01-01', $as->getStart());
-        $this->assertEquals('2017-03-01', $as->getEnd());
+        $this->assertEquals(1483228800, $as->getStart());
+        $this->assertEquals(1488326400, $as->getEnd());
         $this->assertEquals(59, $as->numDays());
         $this->assertEquals(3, $as->numUsers());
         $this->assertEquals(2, $as->numAdmins());

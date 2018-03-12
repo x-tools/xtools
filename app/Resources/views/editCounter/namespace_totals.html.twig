@@ -76,7 +76,7 @@
         <script>
             window.namespaces = {{ project.namespaces|json_encode()|raw }};
             window.namespaceTotals = {{ ec.namespaceTotals|json_encode()|raw }};
-            window.namespaceChart = new Chart($("#namespace-canvas"), {
+            window.namespaceChart = new Chart($('#namespace-canvas'), {
                 type: 'pie',
                 data: {
                     labels: [{% for key,value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}"{{ nsName(key, project.namespaces) }}"{% endfor %}],
@@ -93,6 +93,22 @@
                     legend: {
                         display: false,
                     },
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltip, chartData) {
+                                var value = chartData.datasets[tooltip.datasetIndex].data[tooltip.index],
+                                    total = chartData.datasets[0].data.reduce(function (accumulator, currentValue) {
+                                        return accumulator + currentValue;
+                                    }, 0),
+                                    percentage = (value / total).toLocaleString(i18nLang, {style: 'percent'});
+
+                                return value.toLocaleString(i18nLang) + ' (' + percentage + ')';
+                            },
+                            title: function (tooltip, chartData) {
+                                return chartData.labels[tooltip[0].index];
+                            }
+                        }
+                    }
                 },
             });
         </script>

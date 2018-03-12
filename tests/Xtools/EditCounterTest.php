@@ -5,18 +5,22 @@
 
 namespace Tests\Xtools;
 
+use AppBundle\Helper\I18nHelper;
+use DateTime;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Xtools\EditCounter;
 use Xtools\EditCounterRepository;
 use Xtools\Project;
 use Xtools\ProjectRepository;
 use Xtools\User;
 use Xtools\UserRepository;
-use DateTime;
 
 /**
  * Tests for the EditCounter.
  */
-class EditCounterTest extends \PHPUnit_Framework_TestCase
+class EditCounterTest extends WebTestCase
 {
     /** @var Project The project instance. */
     protected $project;
@@ -45,6 +49,12 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
         $this->user = new User('Testuser');
         $this->editCounter = new EditCounter($this->project, $this->user);
         $this->editCounter->setRepository($this->editCounterRepo);
+
+        $container = static::createClient()->getContainer();
+        $stack = new RequestStack();
+        $session = new Session();
+        $i18nHelper = new I18nHelper($container, $stack, $session);
+        $this->editCounter->setI18nHelper($i18nHelper);
     }
 
     /**

@@ -23,11 +23,11 @@
             {% if ai.hasDateRange %}
                 <span class="date-range">
                     {% if ai.endDate == false %}
-                        {{ msg('date-from', [ai.startDate|date('Y-m-d')]) }}
+                        {{ msg('date-from', [ai.startDate|date_format('yyyy-MM-dd')]) }}
                     {% elseif ai.startDate == false %}
-                        {{ msg('date-to', [ai.endDate|date('Y-m-d')]) }}
+                        {{ msg('date-to', [ai.endDate|date_format('yyyy-MM-dd')]) }}
                     {% else %}
-                        {{ msg('date-range', [ai.startDate|date('Y-m-d'), ai.endDate|date('Y-m-d')]) }}
+                        {{ msg('date-range', [ai.startDate|date_format('yyyy-MM-dd'), ai.endDate|date_format('yyyy-MM-dd')]) }}
                     {% endif %}
                 </span>
             {% endif %}
@@ -132,7 +132,7 @@
                     {% if not (ai.hasDateRange) and ai.numBugs > 0 %}
                         <tr>
                             <td><a href='#bugs'>{{ msg('bugs') }}</a></td>
-                            <td>{{ ai.numBugs }}</td>
+                            <td>{{ ai.numBugs|num_format }}</td>
                         </tr>
                     {% endif %}
                     {% if not (ai.hasDateRange) and page.watchers is not empty %}
@@ -143,7 +143,7 @@
                     {% endif %}
                     {% if isWMFLabs() %}
                         <tr>
-                            <td>{{ msg('pageviews') }}{% if not (ai.hasDateRange) %} (60 {{ msg('num-days', [60]) }}){% endif %}</td>
+                            <td>{{ msg('pageviews') }}{% if not (ai.hasDateRange) %} ({{ 60|num_format }} {{ msg('num-days', [60]) }}){% endif %}</td>
                             <td>
                                 {{
                                     wiki.pageviewsLink(
@@ -253,7 +253,7 @@
                         </tr>
                         <tr>
                             <td>{{ msg('average-time-bw-edits') }}</td>
-                            <td>{{ ai.averageDaysPerEdit }} {{ msg('num-days', [ai.averageDaysPerEdit]) }}</td>
+                            <td>{{ ai.averageDaysPerEdit|num_format(1) }} {{ msg('num-days', [ai.averageDaysPerEdit]) }}</td>
                         </tr>
                         <tr>
                             <td>{{ msg('average-edits-per-user') }}</td>
@@ -261,7 +261,7 @@
                         </tr>
                         <tr>
                             <td>{{ msg('average-edits-per-day') }}</td>
-                            <td>{{ ai.editsPerDay }}</td>
+                            <td>{{ ai.editsPerDay|num_format(1) }}</td>
                         </tr>
                         <tr>
                             <td>{{ msg('average-edits-per-month') }}</td>
@@ -648,7 +648,7 @@
                     new Chart($("#year_count"), {
                         type: 'bar',
                         data: {
-                            labels: {{ ai.yearMonthCounts|keys|json_encode()|raw }},
+                            labels: {{ ai.yearLabels|json_encode()|raw }},
                             datasets: yearDatasets,
                         },
                         options: {
@@ -661,7 +661,7 @@
                                 callbacks: {
                                     label: function(tooltipItem) {
                                         return yearDatasets[tooltipItem.datasetIndex].label + ': '
-                                            + (new Number(tooltipItem.yLabel)).toLocaleString();
+                                            + (new Number(tooltipItem.yLabel)).toLocaleString(i18nLang);
                                     }
                                 }
                             },
@@ -682,7 +682,7 @@
                                         beginAtZero: true,
                                         callback: function (value) {
                                             if (Math.floor(value) === value) {
-                                                return value.toLocaleString();
+                                                return value.toLocaleString(i18nLang);
                                             }
                                         }
                                     }
@@ -701,7 +701,7 @@
                                         beginAtZero: true,
                                         callback: function (value) {
                                             if (Math.floor(value) === value) {
-                                                return value.toLocaleString();
+                                                return value.toLocaleString(i18nLang);
                                             }
                                         }
                                     }
@@ -752,7 +752,7 @@
                 <tbody>
                 {% for year, stats in ai.yearMonthCounts %}
                     <tr>
-                        <td class="sort-entry--year" data-value="{{ year }}">{{ year }}</td>
+                        <td class="sort-entry--year" data-value="{{ year }}">{{ ai.yearLabels[loop.index0] }}</td>
                         <td class="sort-entry--edits" data-value="{{ stats.all }}">{{ stats.all|num_format }}</td>
                         <td class="sort-entry--ips" data-value="{{ stats.anon }}">{{ stats.anon }}</td>
                         {% set year_ips_percent = stats.anon|percent_format(stats.all) %}
@@ -803,15 +803,15 @@
                         {% set month_str = '%02d'|format(month) %}
                         <tr>
                             <td class="sort-entry--month" data-value="{{ year }}{{ month_str }}">
-                                {{ year }}-{{ "%02d"|format(month) }}
+                                {{ ai.monthLabels[loop.index0] }}
                             </td>
                             <td class="sort-entry--edits" data-value="{{ stats.all }}">
                                 {% if stats.all > 0 %}
                                     {# Generate link to revision history showing all edits for the given month #}
-                                    {% set offset = date(year~"-"~month_str~"-01")|date("Ymt")~"235959" %}
+                                    {% set offset = date(year ~ '-' ~ month_str ~ '-01')|date('Ymt') ~ '235959' %}
                                     {{ wiki.pageHistLink(page, stats.all|num_format, offset, stats.all) }}
                                 {% else %}
-                                    0
+                                    {{ 0|num_format }}
                                 {% endif %}
                             </td>
                             <td class="sort-entry--ips" data-value="{{ stats.anon }}">{{ stats.anon|num_format }}</td>
@@ -857,7 +857,9 @@
                         <td class="sort-entry--tool" data-value="{{ tool }}">
                             {{ wiki.pageLinkRaw(values.link, project, tool) }}
                         </td>
-                        <td class="sort-entry--edits" data-value="{{ values.count }}">{{ values.count }}</td>
+                        <td class="sort-entry--edits" data-value="{{ values.count }}">
+                            {{ values.count|num_format }}
+                        </td>
                     </tr>
                 {% endfor %}
                 </tbody>

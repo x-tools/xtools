@@ -5,17 +5,20 @@
 
 namespace Tests\Xtools;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Xtools\ArticleInfo;
-use Xtools\ArticleInfoRepository;
-use Xtools\Edit;
-use Xtools\Project;
-use Xtools\ProjectRepository;
-use Xtools\Page;
-use Xtools\PageRepository;
+use AppBundle\Helper\I18nHelper;
 use DateTime;
 use Doctrine\DBAL\Driver\PDOStatement;
 use GuzzleHttp;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Xtools\ArticleInfo;
+use Xtools\ArticleInfoRepository;
+use Xtools\Edit;
+use Xtools\Page;
+use Xtools\PageRepository;
+use Xtools\Project;
+use Xtools\ProjectRepository;
 
 /**
  * Tests for ArticleInfo.
@@ -44,6 +47,11 @@ class ArticleInfoTest extends WebTestCase
         $this->project = new Project('en.wikipedia.org');
         $this->page = new Page($this->project, 'Test page');
         $this->articleInfo = new ArticleInfo($this->page, $this->container);
+
+        $stack = new RequestStack();
+        $session = new Session();
+        $i18nHelper = new I18nHelper($this->container, $stack, $session);
+        $this->articleInfo->setI18nHelper($i18nHelper);
 
         // Don't care that private methods "shouldn't" be tested...
         // In ArticleInfo they are all super testworthy and otherwise fragile.

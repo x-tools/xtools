@@ -30,12 +30,12 @@
                     {% if hasStartDate %}
                         <tr>
                             <td>{{ msg('start') }}</td>
-                            <td>{{ ae.start|date('Y-m-d') }}</td>
+                            <td>{{ ae.start|date_format('yyyy-MM-dd') }}</td>
                         </tr>
                     {% endif %}
                     <tr>
                         <td>{{ msg('end') }}</td>
-                        <td class="xt-test--end-date">{{ ae.end|date('Y-m-d') }}</td>
+                        <td class="xt-test--end-date">{{ ae.end|date_format('yyyy-MM-dd') }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('namespace') }}</td>
@@ -184,6 +184,15 @@
                                     aspectRatio: 1,
                                     legend: {
                                       display: false,
+                                    },
+                                    tooltips: {
+                                        callbacks: {
+                                            label: function(tooltipItem, chartData) {
+                                                var label = chartData.labels[tooltipItem.index],
+                                                    value = chartData.datasets[0].data[tooltipItem.index];
+                                                return label + ': ' + value.toLocaleString(i18nLang);
+                                            }
+                                        }
                                     }
                                 }
                             });

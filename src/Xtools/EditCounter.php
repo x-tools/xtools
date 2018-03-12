@@ -5,6 +5,7 @@
 
 namespace Xtools;
 
+use AppBundle\Helper\I18nHelper;
 use DateInterval;
 use DatePeriod;
 use DateTime;
@@ -24,6 +25,9 @@ class EditCounter extends Model
 
     /** @var User The user. */
     protected $user;
+
+    /** @var I18nHelper For i18n and l10n. */
+    protected $i18n;
 
     /** @var int[] Revision and page counts etc. */
     protected $pairData;
@@ -89,6 +93,15 @@ class EditCounter extends Model
     {
         $this->project = $project;
         $this->user = $user;
+    }
+
+    /**
+     * Make the I18nHelper accessible to EditCounter.
+     * @param I18nHelper $i18n
+     */
+    public function setI18nHelper(I18nHelper $i18n)
+    {
+        $this->i18n = $i18n;
     }
 
     /**
@@ -1042,12 +1055,14 @@ class EditCounter extends Model
     {
         foreach ($dateRange as $monthObj) {
             $year = (int) $monthObj->format('Y');
+            $yearLabel = $this->i18n->dateFormat($monthObj, 'yyyy');
             $month = (int) $monthObj->format('n');
+            $monthLabel = $this->i18n->dateFormat($monthObj, 'yyyy-MM');
 
             // Fill in labels
-            $out['monthLabels'][] = $monthObj->format('Y-m');
-            if (!in_array($year, $out['yearLabels'])) {
-                $out['yearLabels'][] = $year;
+            $out['monthLabels'][] = $monthLabel;
+            if (!in_array($yearLabel, $out['yearLabels'])) {
+                $out['yearLabels'][] = $yearLabel;
             }
 
             foreach (array_keys($out['totals']) as $nsId) {

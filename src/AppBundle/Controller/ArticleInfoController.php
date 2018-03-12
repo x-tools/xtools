@@ -5,20 +5,21 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Helper\I18nHelper;
+use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Xtools\ProjectRepository;
 use Xtools\ArticleInfo;
-use Xtools\Project;
-use Xtools\Page;
-use DateTime;
 use Xtools\ArticleInfoRepository;
+use Xtools\Page;
+use Xtools\Project;
+use Xtools\ProjectRepository;
 
 /**
  * This controller serves the search form and results for the ArticleInfo tool
@@ -129,6 +130,7 @@ class ArticleInfoController extends XtoolsController
      *         "end"="|\d{4}-\d{2}-\d{2}",
      *     }
      * )
+     * @param I18nHelper $i18n
      * @param Request $request
      * @param $article
      * @param null|string $start
@@ -136,7 +138,7 @@ class ArticleInfoController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction(Request $request, $article, $start = null, $end = null)
+    public function resultAction(I18nHelper $i18n, Request $request, $article, $start = null, $end = null)
     {
         // This is some complicated stuff here. We pass $start and $end to method signature
         // for router regex parser to parse `article` with those parameters and then
@@ -178,6 +180,7 @@ class ArticleInfoController extends XtoolsController
         $articleInfoRepo->setContainer($this->container);
         $articleInfo = new ArticleInfo($page, $this->container, $start, $end);
         $articleInfo->setRepository($articleInfoRepo);
+        $articleInfo->setI18nHelper($i18n);
 
         $articleInfo->prepareData();
 

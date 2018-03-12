@@ -147,6 +147,18 @@
                 aspectRatio: 1,
                 legend: {
                   display: false,
+                },
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem, chartData) {
+                            var label = chartData.labels[tooltipItem.index],
+                                value = chartData.datasets[0].data[tooltipItem.index] / 100;
+                            return label + ': ' + value.toLocaleString(i18nLang, {
+                                style: 'percent',
+                                maximumFractionDigits: 1
+                            });
+                        }
+                    }
                 }
             }
         });

@@ -5,12 +5,13 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Helper\I18nHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Xtools\EditCounter;
 use Xtools\EditCounterRepository;
 use Xtools\Page;
@@ -77,6 +78,9 @@ class EditCounterController extends XtoolsController
         $editCounterRepo->setContainer($this->container);
         $this->editCounter = new EditCounter($this->project, $this->user);
         $this->editCounter->setRepository($editCounterRepo);
+        $this->editCounter->setI18nHelper(
+            $this->container->get('app.i18n_helper')
+        );
     }
 
     /**
