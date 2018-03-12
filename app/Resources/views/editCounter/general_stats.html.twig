@@ -1,6 +1,7 @@
 {% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
 {% import 'macros/layout.html.twig' as layout %}
 {% import 'macros/wiki.html.twig' as wiki %}
+{% import 'macros/layout.html.twig' as layout %}
 {% import 'macros/pieChart.html.twig' as chart %}
 
 {% block body %}
@@ -69,7 +70,7 @@
         <tr>
             <td class="stat-list--new-group">{{ msg('live-edits') }}</td>
             <td class="stat-list--new-group">
-                {{ wiki.pageLinkRaw('Special:Contributions/'~user.username, project, ec.countLiveRevisions|num_format) }}
+                {{ wiki.pageLinkRaw('Special:Contributions/' ~ user.username, project, ec.countLiveRevisions|num_format) }}
                 {% if ec.countAllRevisions %}
                     &middot;
                     ({{ ((ec.countLiveRevisions / ec.countAllRevisions) * 100)|percent_format }})

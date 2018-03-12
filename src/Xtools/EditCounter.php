@@ -5,10 +5,10 @@
 
 namespace Xtools;
 
+use DateInterval;
+use DatePeriod;
 use DateTime;
 use Exception;
-use DatePeriod;
-use DateInterval;
 use GuzzleHttp;
 use GuzzleHttp\Promise\Promise;
 use Xtools\Edit;

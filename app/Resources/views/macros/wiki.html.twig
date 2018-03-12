@@ -61,10 +61,10 @@
     {{ pageHistLinkRaw(pageTitle, project, null, offset, limit, true) }}
 {% endspaceless %}{% endmacro %}
 
-{% macro pageInfoLink(page, label = null) %}{% spaceless %}
+{% macro pageInfoLink(page, label = null, section = null) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {% set projectUrl = page.project.url|trim('/') %}
-    {% set url = projectUrl ~ page.project.script ~ '?action=info&title=' ~ page.title %}
+    {% set url = projectUrl ~ page.project.script ~ '?action=info&title=' ~ page.title ~ (section is not empty ? '#' ~ section : '') %}
     {{ extLink(url, msg('log'), label) }}
 {% endspaceless %}{% endmacro %}
 

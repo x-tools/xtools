@@ -5,16 +5,17 @@
 
 namespace AppBundle\Twig;
 
+use AppBundle\Helper\I18nHelper;
+use AppBundle\Twig\AppExtension;
+use AppBundle\Twig\Extension;
+use DateTime;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
-use AppBundle\Twig\AppExtension;
-use AppBundle\Twig\Extension;
-use DateTime;
-use Xtools\User;
 use Xtools\Project;
 use Xtools\ProjectRepository;
+use Xtools\User;
 
 /**
  * Tests for the AppExtension class.
@@ -36,7 +37,8 @@ class AppExtensionTest extends WebTestCase
         $this->container = $this->client->getContainer();
         $stack = new RequestStack();
         $session = new Session();
-        $this->appExtension = new AppExtension($this->container, $stack, $session);
+        $i18nHelper = new I18nHelper($this->container, $stack, $session);
+        $this->appExtension = new AppExtension($this->container, $stack, $session, $i18nHelper);
     }
 
     /**
@@ -107,21 +109,6 @@ class AppExtensionTest extends WebTestCase
     }
 
     /**
-     * Format a date.
-     */
-    public function testDateFormat()
-    {
-        $this->assertEquals(
-            '2/1/17, 11:45 PM',
-            $this->appExtension->dateFormat(new DateTime('2017-02-01 23:45:34'))
-        );
-        $this->assertEquals(
-            '8/12/15, 11:45 AM',
-            $this->appExtension->dateFormat('2015-08-12 11:45:50')
-        );
-    }
-
-    /**
      * Intution methods.
      */
     public function testIntution()
@@ -140,8 +127,8 @@ class AppExtensionTest extends WebTestCase
         $this->assertArraySubset(['es' => 'Español'], $allLangs);
 
         // Testing if the language is RTL.
-        $this->assertFalse($this->appExtension->intuitionIsRTLLang('en'));
-        $this->assertTrue($this->appExtension->intuitionIsRTLLang('ar'));
+        $this->assertFalse($this->appExtension->isRTL('en'));
+        $this->assertTrue($this->appExtension->isRTL('ar'));
     }
 
     /**
@@ -189,17 +176,17 @@ class AppExtensionTest extends WebTestCase
     }
 
     /**
-     * Formatting dates as ISO 8601.
+     * Formatting dates.
      */
-    public function testDateFormatStd()
+    public function testDateFormat()
     {
         $this->assertEquals(
             '2017-01-23 00:00',
-            $this->appExtension->dateFormatStd('2017-01-23')
+            $this->appExtension->dateFormat('2017-01-23')
         );
         $this->assertEquals(
             '2017-01-23 00:00',
-            $this->appExtension->dateFormatStd(new DateTime('2017-01-23'))
+            $this->appExtension->dateFormat(new DateTime('2017-01-23'))
         );
     }
 
