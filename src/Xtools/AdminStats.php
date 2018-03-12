@@ -256,20 +256,20 @@ class AdminStats extends Model
 
     /**
      * Get the formatted start date.
-     * @return string
+     * @return int As UTC timestamp.
      */
     public function getStart()
     {
-        return date('Y-m-d', $this->start);
+        return $this->start;
     }
 
     /**
      * Get the formatted end date.
-     * @return string
+     * @return int As UTC timestamp.
      */
     public function getEnd()
     {
-        return date('Y-m-d', $this->end);
+        return $this->end;
     }
 
     /**

@@ -238,7 +238,7 @@ class AppExtension extends Twig_Extension
     public function gitDate()
     {
         $date = new DateTime(exec('git show -s --format=%ci'));
-        return $date->format('Y-m-d');
+        return $this->dateFormat($date, 'yyyy-MM-dd');
     }
 
     /**
@@ -549,11 +549,13 @@ class AppExtension extends Twig_Extension
     /**
      * Localize the given date based on language settings.
      * @param  string|DateTime $datetime
+     * @param string $pattern Format according to this ICU date format.
+     * @see http://userguide.icu-project.org/formatparse/datetime
      * @return string
      */
-    public function dateFormat($datetime)
+    public function dateFormat($datetime, $pattern = 'yyyy-MM-dd HH:mm')
     {
-        return $this->i18n->dateFormat($datetime);
+        return $this->i18n->dateFormat($datetime, $pattern);
     }
 
     /**

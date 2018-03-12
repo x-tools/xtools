@@ -8,11 +8,12 @@ $(function () {
                 total += parseInt(newData[tool].count, 10);
             });
             var toolsCount = Object.keys(newData).length;
+            /** global: i18nLang */
             $('.tools--tools').text(
-                toolsCount.toLocaleString() + " " +
+                toolsCount.toLocaleString(i18nLang) + " " +
                 $.i18n('num-tools', toolsCount)
             );
-            $('.tools--count').text(total.toLocaleString());
+            $('.tools--count').text(total.toLocaleString(i18nLang));
         });
     }
 

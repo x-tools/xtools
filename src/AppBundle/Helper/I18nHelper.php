@@ -267,8 +267,10 @@ class I18nHelper
             );
         }
 
-        if (is_string($datetime) || is_int($datetime)) {
+        if (is_string($datetime)) {
             $datetime = new DateTime($datetime);
+        } elseif (is_int($datetime)) {
+            $datetime = DateTime::createFromFormat('U', $datetime);
         }
 
         $this->dateFormatter->setPattern($pattern);

@@ -13,9 +13,9 @@
             <a target="_blank" href="{{ project.url }}">{{ project.title }}</a>
             <small>
                 &bull;
-                {{ as.start }}
+                {{ as.start|date_format('yyyy-MM-dd') }}
                 &mdash;
-                {{ as.end }}
+                {{ as.end|date_format('yyyy-MM-dd') }}
             </small>
         </div>
     </header>
@@ -28,11 +28,14 @@
                 <table class="table"><tbody>
                     <tr>
                         <td>{{ msg('start') }}</td>
-                        <td>{{ as.start }}</td>
+                        <td>{{ as.start|date_format('yyyy-MM-dd') }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('end') }}</td>
-                        <td>{{ as.end }} ({{ as.numDays|num_format }} {{ msg('num-days', [as.numDays]) }})</td>
+                        <td>
+                            {{ as.end|date_format('yyyy-MM-dd') }}
+                            ({{ as.numDays|num_format }} {{ msg('num-days', [as.numDays]) }})
+                        </td>
                     </tr>
                     <tr>
                         <td>{{ msg('log-types') }}</td>

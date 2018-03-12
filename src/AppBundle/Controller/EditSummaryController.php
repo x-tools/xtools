@@ -5,12 +5,13 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Helper\I18nHelper;
 use Doctrine\DBAL\Connection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Xtools\EditSummary;
 use Xtools\EditSummaryRepository;
 
@@ -67,16 +68,14 @@ class EditSummaryController extends XtoolsController
 
     /**
      * Display the Edit Summary results
-     *
+     * @Route("/editsummary/{project}/{username}/{namespace}", name="EditSummaryResult")
+     * @param I18nHelper $i18n
      * @param Request $request The HTTP request.
      * @param string $namespace Namespace ID or 'all' for all namespaces.
-     *
-     * @Route("/editsummary/{project}/{username}/{namespace}", name="EditSummaryResult")
-     *
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction(Request $request, $namespace = 0)
+    public function resultAction(I18nHelper $i18n, Request $request, $namespace = 0)
     {
         $ret = $this->validateProjectAndUser($request, 'es');
         if ($ret instanceof RedirectResponse) {
@@ -90,6 +89,7 @@ class EditSummaryController extends XtoolsController
         $editSummaryRepo = new EditSummaryRepository();
         $editSummaryRepo->setContainer($this->container);
         $editSummary->setRepository($editSummaryRepo);
+        $editSummary->setI18nHelper($i18n);
 
         $editSummary->prepareData();
 

@@ -27,9 +27,13 @@ services:
         resource: '../../src/AppBundle/Controller'
         tags: ['controller.service_arguments']
 
-    # This needs to not be public, but it is, for now...
+    # These need to not be public, but they are, for now...
     app.automated_edits_helper:
         class: AppBundle\Helper\AutomatedEditsHelper
+        arguments: ['@service_container']
+        public: true
+    app.i18n_helper:
+        class: AppBundle\Helper\I18nHelper
         arguments: ['@service_container']
         public: true
 

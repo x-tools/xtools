@@ -374,8 +374,17 @@
                 options: {
                     aspectRatio: 1,
                     legend: {
-                      display: false,
-                    }
+                        display: false,
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function(tooltipItem, chartData) {
+                                var label = chartData.labels[tooltipItem.index],
+                                    value = chartData.datasets[0].data[tooltipItem.index];
+                                return label + ': ' + value.toLocaleString(i18nLang);
+                            }
+                        }
+                    },
                 }
             });
             window.countsByNamespace = {{ pages.counts|json_encode()|raw }};

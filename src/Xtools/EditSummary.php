@@ -5,6 +5,7 @@
 
 namespace Xtools;
 
+use AppBundle\Helper\I18nHelper;
 use DateTime;
 
 /**
@@ -18,6 +19,9 @@ class EditSummary extends Model
 
     /** @var User The user. */
     protected $user;
+
+    /** @var I18nHelper For i18n and l10n. */
+    protected $i18n;
 
     /** @var string|int The namespace to target. */
     protected $namespace;
@@ -61,6 +65,16 @@ class EditSummary extends Model
         $this->user = $user;
         $this->namespace = $namespace;
         $this->numEditsRecent = $numEditsRecent;
+    }
+
+    /**
+     * Make the I18nHelper accessible to EditSummary.
+     * @param I18nHelper $i18n
+     * @codeCoverageIgnore
+     */
+    public function setI18nHelper(I18nHelper $i18n)
+    {
+        $this->i18n = $i18n;
     }
 
     /**
@@ -206,7 +220,7 @@ class EditSummary extends Model
         // Extract the date out of the date field
         $timestamp = DateTime::createFromFormat('YmdHis', $row['rev_timestamp']);
 
-        $monthKey = date_format($timestamp, 'Y-m');
+        $monthKey = $this->i18n->dateFormat($timestamp, 'yyyy-MM');
 
         // Grand total for number of edits
         $this->data['total_edits']++;
