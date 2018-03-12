@@ -32,10 +32,10 @@ services:
         arguments: ["@service_container"]
         public: true
         tags:
-          - {name: api.helper}
+            - {name: api.helper}
     app.automated_edits_helper:
         class: AppBundle\Helper\AutomatedEditsHelper
         arguments: ["@service_container"]
         public: true
         tags:
-          - {name: automatededits.helper}
+            - {name: automatededits.helper}

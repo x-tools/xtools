@@ -338,7 +338,9 @@
                             </tr>
                             <tr>
                                 <td>{{ msg('templates') }}</td>
-                                <td>{{ ai.numTemplates|num_format }}</td>
+                                <td>
+                                    {{ wiki.pageInfoLink(page, ai.numTemplates|num_format, 'mw-pageinfo-templates') }}
+                                </td>
                             </tr>
                         {% endif %}
                     </tbody>
