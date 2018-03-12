@@ -6,7 +6,6 @@
 namespace Xtools;
 
 use Mediawiki\Api\MediawikiApi;
-use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * A Project is a single wiki that XTools is querying.

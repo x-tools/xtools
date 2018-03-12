@@ -216,9 +216,6 @@ class TopEditsRepository extends Repository
      */
     public function getDisplayTitles(Project $project, $titles)
     {
-        /** @var ApiHelper $apiHelper */
-        $apiHelper = $this->container->get('app.api_helper');
-
-        return $apiHelper->displayTitles($project->getDomain(), $titles);
+        return PageRepository::displayTitles($project, $titles);
     }
 }

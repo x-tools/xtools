@@ -5,6 +5,7 @@
 
 namespace Xtools;
 
+use AppBundle\Helper\AutomatedEditsHelper;
 use DateInterval;
 use Symfony\Component\Config\Definition\Exception\Exception;
 
@@ -15,6 +16,20 @@ use Symfony\Component\Config\Definition\Exception\Exception;
  */
 class AutoEditsRepository extends UserRepository
 {
+    /** @var AutomatedEditsHelper Used for fetching the tool list and filtering it. */
+    private $aeh;
+
+    /**
+     * Method to give the repository access to the AutomatedEditsHelper.
+     */
+    public function getHelper()
+    {
+        if (!isset($this->aeh)) {
+            $this->aeh = $this->container->get('app.automated_edits_helper');
+        }
+        return $this->aeh;
+    }
+
     /**
      * Get the number of edits this user made using semi-automated tools.
      * @param Project $project
@@ -245,8 +260,7 @@ class AutoEditsRepository extends UserRepository
         $sql = $this->getAutomatedCountsSql($project, $namespace, $start, $end);
         $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end);
 
-        $automatedEditsHelper = $this->container->get('app.automated_edits_helper');
-        $tools = $automatedEditsHelper->getTools($project);
+        $tools = $this->getHelper()->getTools($project);
 
         // handling results
         $results = [];
@@ -289,8 +303,7 @@ class AutoEditsRepository extends UserRepository
         list($condBegin, $condEnd) = $this->getRevTimestampConditions($start, $end);
 
         // Load the semi-automated edit types.
-        $automatedEditsHelper = $this->container->get('app.automated_edits_helper');
-        $tools = $automatedEditsHelper->getTools($project);
+        $tools = $this->getHelper()->getTools($project);
 
         // Create a collection of queries that we're going to run.
         $queries = [];
@@ -373,8 +386,7 @@ class AutoEditsRepository extends UserRepository
     private function getToolRegexAndTags(Project $project, $tool = null)
     {
         $conn = $this->getProjectsConnection();
-        $automatedEditsHelper = $this->container->get('app.automated_edits_helper');
-        $tools = $automatedEditsHelper->getTools($project);
+        $tools = $this->getHelper()->getTools($project);
         $regexes = [];
         $tags = [];
 

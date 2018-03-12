@@ -6,7 +6,7 @@
 namespace AppBundle\EventSubscriber;
 
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
-use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -20,7 +20,7 @@ use DateInterval;
 class RateLimitSubscriber implements EventSubscriberInterface
 {
 
-    /** @var Container The DI container. */
+    /** @var ContainerInterface The DI container. */
     protected $container;
 
     /** @var int Number of requests allowed in time period */
@@ -33,7 +33,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
      * Save the container for later use.
      * @param Container $container The DI container.
      */
-    public function __construct(Container $container)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }

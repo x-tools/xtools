@@ -12,7 +12,6 @@ To **report an issue**, create a ticket on [Phabricator](https://phabricator.wik
 [![release](https://img.shields.io/github/release/x-tools/xtools.svg)](https://github.com/x-tools/xtools/releases/latest)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Docs](https://readthedocs.org/projects/xtools/badge/?version=stable)](https://xtools.readthedocs.io/en/stable/?badge=stable)
-[![Dependency Status](https://www.versioneye.com/user/projects/58d352f8dcaf9e0040b1b1ba/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/58d352f8dcaf9e0040b1b1ba)
 
 [![Build Status](https://travis-ci.org/x-tools/xtools.svg?branch=master)](https://travis-ci.org/x-tools/xtools)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/x-tools/xtools/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/x-tools/xtools/?branch=master)
