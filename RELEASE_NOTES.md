@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.2.1 ##
+- Hotfix - Don't autowire I18nHelper.
+
 ## 3.2.0 ##
 - T185908: Numbers and dates localization across all tools.
 - Greatly improved the RTL interface.
