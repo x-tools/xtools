@@ -214,7 +214,8 @@
             var entries = $table.find('.sort-entry--' + sortColumn).parent();
 
             if (!entries.length) {
-                return; }
+                return;
+            }
 
             entries.sort(function (a, b) {
                 var before = $(a).find('.sort-entry--' + sortColumn).data('value'),

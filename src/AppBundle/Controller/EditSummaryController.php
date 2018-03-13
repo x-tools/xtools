@@ -69,13 +69,12 @@ class EditSummaryController extends XtoolsController
     /**
      * Display the Edit Summary results
      * @Route("/editsummary/{project}/{username}/{namespace}", name="EditSummaryResult")
-     * @param I18nHelper $i18n
      * @param Request $request The HTTP request.
      * @param string $namespace Namespace ID or 'all' for all namespaces.
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction(I18nHelper $i18n, Request $request, $namespace = 0)
+    public function resultAction(Request $request, $namespace = 0)
     {
         $ret = $this->validateProjectAndUser($request, 'es');
         if ($ret instanceof RedirectResponse) {
@@ -89,7 +88,7 @@ class EditSummaryController extends XtoolsController
         $editSummaryRepo = new EditSummaryRepository();
         $editSummaryRepo->setContainer($this->container);
         $editSummary->setRepository($editSummaryRepo);
-        $editSummary->setI18nHelper($i18n);
+        $editSummary->setI18nHelper($this->container->get('app.i18n_helper'));
 
         $editSummary->prepareData();
 
