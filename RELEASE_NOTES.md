@@ -1,5 +1,22 @@
 # Release Notes #
 
+## 3.2.0 ##
+- T185908: Numbers and dates localization across all tools.
+- Greatly improved the RTL interface.
+- Moving all i18n logic to a I18nHelper service.
+- AutoEdits: Major refactor. Moved contribution list to a dedicated
+  subrequest page.
+- AutoEdits: introducing the new 'autoedits-contributions' tool
+  to view edits using (semi-)automated tools. This includes a
+  new API endpoint: /api/user/automated_tools/{project} that gives
+  you the full list of known (semi-)automated tools on the project.
+- AutoEdits: Cleaner API error responses.
+- Add "See full statistics" links to the top of every subrequest
+  page of a tool to navigate back to the full results.
+- ArticleInfo: make size of textshares pie chart relative to the
+  number of entries in the adjacent table.
+- Localization updates.
+
 ## 3.1.45 ##
 - T188603: Include link to export to PagePile in Pages tool.
 
