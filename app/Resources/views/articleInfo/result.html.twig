@@ -798,12 +798,14 @@
                     </th>
                 </tr></thead>
                 <tbody>
+                {% set index = 0 %}
                 {% for year, yearStats in ai.yearMonthCounts %}
                     {% for month, stats in yearStats.months %}
                         {% set month_str = '%02d'|format(month) %}
                         <tr>
                             <td class="sort-entry--month" data-value="{{ year }}{{ month_str }}">
-                                {{ ai.monthLabels[loop.index0] }}
+                                {{ ai.monthLabels[index] }}
+                                {% set index = index + 1 %}
                             </td>
                             <td class="sort-entry--edits" data-value="{{ stats.all }}">
                                 {% if stats.all > 0 %}

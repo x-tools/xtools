@@ -43,9 +43,6 @@ class AutomatedEditsController extends XtoolsController
     /** @var int|string The namespace ID or 'all' for all namespaces. */
     protected $namespace;
 
-    /** @var bool Whether or not there is a start date. */
-    protected $hasStartDate;
-
     /** @var bool Whether or not this is a subrequest. */
     protected $isSubRequest;
 
@@ -122,9 +119,6 @@ class AutomatedEditsController extends XtoolsController
         // 'false' means the dates are optional and returned as 'false' if empty.
         list($this->start, $this->end) = $this->getUTCFromDateParams($start, $end, false);
 
-        // We'll want to conditionally show some things in the view if there is a start date.
-        $this->hasStartDate = $this->start > 0;
-
         // Format dates as needed by User model, if the date is present.
         if ($this->start !== false) {
             $this->start = date('Y-m-d', $this->start);
@@ -165,7 +159,6 @@ class AutomatedEditsController extends XtoolsController
             'project' => $this->project,
             'user' => $this->user,
             'ae' => $this->autoEdits,
-            'hasStartDate' => $this->hasStartDate,
             'is_sub_request' => $this->isSubRequest,
         ];
     }

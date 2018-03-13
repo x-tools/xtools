@@ -27,16 +27,18 @@
         {% set content %}
             <div class="panel-body stat-list autoedits-stat-list clearfix" id="summary">
                 <table class="table autoedits-table pull-left">
-                    {% if hasStartDate %}
+                    {% if ae.start is not empty %}
                         <tr>
                             <td>{{ msg('start') }}</td>
                             <td>{{ ae.start|date_format('yyyy-MM-dd') }}</td>
                         </tr>
                     {% endif %}
-                    <tr>
-                        <td>{{ msg('end') }}</td>
-                        <td class="xt-test--end-date">{{ ae.end|date_format('yyyy-MM-dd') }}</td>
-                    </tr>
+                    {% if ae.end is not empty %}
+                        <tr>
+                            <td>{{ msg('end') }}</td>
+                            <td class="xt-test--end-date">{{ ae.end|date_format('yyyy-MM-dd') }}</td>
+                        </tr>
+                    {% endif %}
                     <tr>
                         <td>{{ msg('namespace') }}</td>
                         <td>{{ nsName(ae.namespace, project.namespaces) }}</td>
