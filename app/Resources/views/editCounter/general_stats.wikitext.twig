@@ -3,7 +3,7 @@
 == [[User:{{ user.username }}]] ==
 
 {% set link %}[{{ url('EditCounterGeneralStats', {'username': user.username, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
-{{ msg('xtools-advert', [link, date()|date('Y-m-d H:i')]) }}
+{{ msg('xtools-advert', [link, date()|date_format]) }}
 {% endif %}
 
 === {{ msg('general-stats') }} ===
@@ -27,11 +27,11 @@
 
 |-
 | {{ msg('first-edit') }}
-| {% if ec.datetimeFirstRevision %}{{ ec.datetimeFirstRevision|date('Y-m-d H:i') }}{% endif %}
+| {% if ec.datetimeFirstRevision %}{{ ec.datetimeFirstRevision|date_format }}{% endif %}
 
 |-
 | {{ msg('latest-edit') }}
-| {% if ec.datetimeLastRevision %}{{ ec.datetimeLastRevision|date('Y-m-d H:i') }}{% endif %}
+| {% if ec.datetimeLastRevision %}{{ ec.datetimeLastRevision|date_format }}{% endif %}
 
 |-
 | {{ msg('live-edits') }}
@@ -197,7 +197,7 @@
 | {{ msg('block-current') }}
 | {% if user.isBlocked(project) %}[[Special:BlockList/{{ user.username }}|{% spaceless %}
     {% if user.getBlockExpiry(project) == 'infinity' %}&#x221e;{# infinity #}{% else %}
-        {{ user.getBlockExpiry(project)|date('Y-m-d H:i') }}
+        {{ user.getBlockExpiry(project)|date_format }}
     {% endif %}]]
 {% endspaceless %}
 

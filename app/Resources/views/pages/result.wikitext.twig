@@ -3,7 +3,7 @@
 
 {% set multiNamspace = pages.counts|length > 1 %}
 {% set link %}[{{ url('PagesResult', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted}) }} {{ msg('xtools-title') }}]{% endset %}
-{{ msg('xtools-advert', [link, date()|date('Y-m-d H:i')]) }}
+{{ msg('xtools-advert', [link, date()|date_format]) }}
 {% if pages.getNumPages == 0 %}
 {{ msg('no-result', [user.username]) }}
 {% else %}
@@ -34,10 +34,10 @@
 {% set pagename = project.namespaces[ns] ~ ":" ~ page.page_title %}
 {% endif %}
 |-
-| {{ index }}
+| {{ index|num_format }}
 | {% if page.page_is_redirect %}[{{ wiki.pageUrlRaw(pagename, project, 'redirect=no') }} {{ pagename }}] &middot; ({{ msg('redirect') }}){% else %}[[:{{ pagename }}]]{% endif %}{% if page.type == 'arc' %} &middot; ({{ msg('deleted') }}){% endif %}
 
-| {% if page.type == 'arc' %}[{{ wiki.pageUrlRaw('Special:Undelete/' ~ pagename, project, 'timestamp=' ~ page.raw_time) }} {{ page.human_time }}]{% else %}[[Special:PermaLink/{{ page.rev_id }}|{{ page.human_time }}]]{% endif %}
+| {% if page.type == 'arc' %}[{{ wiki.pageUrlRaw('Special:Undelete/' ~ pagename, project, 'timestamp=' ~ page.raw_time) }} {{ page.human_time|date_format }}]{% else %}[[Special:PermaLink/{{ page.rev_id }}|{{ page.human_time|date_format }}]]{% endif %}
 
 | {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ page.rev_len }}}}
 {% if pages.deleted != 'deleted' %}

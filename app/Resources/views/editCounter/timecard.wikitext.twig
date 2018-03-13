@@ -6,7 +6,7 @@
 == [[User:{{ user.username }}]] ==
 
 {% set link %}[{{ url('EditCounterTimecard', {'username': user.username, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
-{{ msg('xtools-advert', [link, date()|date('Y-m-d H:i')]) }}
+{{ msg('xtools-advert', [link, date()|date_format]) }}
 
 {% endif %}
 === {{ msg('timecard') }} ===
