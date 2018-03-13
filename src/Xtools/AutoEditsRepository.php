@@ -122,8 +122,8 @@ class AutoEditsRepository extends UserRepository
         $revisionTable = $project->getTableName('revision');
         $tagTable = $project->getTableName('change_tag');
         $condNamespace = $namespace === 'all' ? '' : 'AND page_namespace = :namespace';
-        $tagJoin = $tags != '' ? "LEFT OUTER JOIN $tagTable ON (ct_rev_id = revs.rev_id)" : '';
-        $condTag = $tags != '' ? "AND (ct_tag NOT IN ($tags) OR ct_tag IS NULL)" : '';
+        $condTag = $tags != '' ? "AND NOT EXISTS (SELECT 1 FROM $tagTable
+            WHERE ct_rev_id = revs.rev_id AND ct_tag IN ($tags))" : '';
         $sql = "SELECT
                     page_title,
                     page_namespace,
@@ -136,7 +136,6 @@ class AutoEditsRepository extends UserRepository
                 FROM $pageTable
                 JOIN $revisionTable AS revs ON (page_id = revs.rev_page)
                 LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-                $tagJoin
                 WHERE revs.rev_user_text = :username
                 AND revs.rev_timestamp > 0
                 AND revs.rev_comment NOT RLIKE $regex
@@ -195,7 +194,7 @@ class AutoEditsRepository extends UserRepository
         $tagTable = $project->getTableName('change_tag');
         $condNamespace = $namespace === 'all' ? '' : 'AND page_namespace = :namespace';
         $tagJoin = $tags != '' ? "LEFT OUTER JOIN $tagTable ON (ct_rev_id = revs.rev_id)" : '';
-        $condTag = $tags != '' ? "AND (ct_tag NOT IN ($tags) OR ct_tag IS NULL)" : '';
+        $condTag = $tags != '' ? "OR ct_tag IN ($tags)" : '';
         $sql = "SELECT
                     page_title,
                     page_namespace,
@@ -211,11 +210,13 @@ class AutoEditsRepository extends UserRepository
                 $tagJoin
                 WHERE revs.rev_user_text = :username
                 AND revs.rev_timestamp > 0
-                AND revs.rev_comment RLIKE $regex
-                $condTag
                 $condBegin
                 $condEnd
                 $condNamespace
+                AND (
+                    revs.rev_comment RLIKE $regex
+                    $condTag
+                )
                 GROUP BY revs.rev_id
                 ORDER BY revs.rev_timestamp DESC
                 LIMIT 50

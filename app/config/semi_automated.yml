@@ -31,10 +31,13 @@ parameters:
             link: Special:MyLanguage/Project:Rollback
             revert: true
         Undo:
+            tag: mw-undo
             regex: '^(Undid|Undo|\[\[WP:UNDO\|Undid\]\]) revision \d+ by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\]'
             link: Special:MyLanguage/Project:Undo
             # This is not considered a revert because you can undo
             # any arbitrary revision, not just the previous one.
+        Redirect:
+            tag: mw-new-redirect
         Huggle:
             regex: '\(\[\[WP:HG'
             tag: huggle
