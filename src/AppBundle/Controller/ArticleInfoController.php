@@ -130,7 +130,6 @@ class ArticleInfoController extends XtoolsController
      *         "end"="|\d{4}-\d{2}-\d{2}",
      *     }
      * )
-     * @param I18nHelper $i18n
      * @param Request $request
      * @param $article
      * @param null|string $start
@@ -138,7 +137,7 @@ class ArticleInfoController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction(I18nHelper $i18n, Request $request, $article, $start = null, $end = null)
+    public function resultAction(Request $request, $article, $start = null, $end = null)
     {
         // This is some complicated stuff here. We pass $start and $end to method signature
         // for router regex parser to parse `article` with those parameters and then
@@ -180,7 +179,7 @@ class ArticleInfoController extends XtoolsController
         $articleInfoRepo->setContainer($this->container);
         $articleInfo = new ArticleInfo($page, $this->container, $start, $end);
         $articleInfo->setRepository($articleInfoRepo);
-        $articleInfo->setI18nHelper($i18n);
+        $articleInfo->setI18nHelper($this->container->get('app.i18n_helper'));
 
         $articleInfo->prepareData();
 
