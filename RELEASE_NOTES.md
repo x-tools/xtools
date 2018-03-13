@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.2.2 ##
+- AutoEdits: Fix automated edits query for when dealing with tags,
+  and non-automated edits query for when there are multiple tags.
+
 ## 3.2.1 ##
 - Hotfix - Don't autowire I18nHelper.
 
