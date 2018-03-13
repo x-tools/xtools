@@ -252,12 +252,11 @@ class AutomatedEditsController extends XtoolsController
     /**
      * Get a list of the automated tools and their regex/tags/etc.
      * @Route("/api/user/automated_tools/{project}")
-     * @param AutomatedEditsHelper $aeh Provided by dependency injection.
      * @param string $project The project domain or database name.
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function automatedToolsApiAction(AutomatedEditsHelper $aeh, $project)
+    public function automatedToolsApiAction($project)
     {
         $this->recordApiUsage('user/automated_tools');
         $projectData = $this->validateProject($project);
@@ -271,6 +270,7 @@ class AutomatedEditsController extends XtoolsController
             );
         }
 
+        $aeh = $this->container->get('app.automated_edits_helper');
         return new JsonResponse($aeh->getTools($projectData));
     }
 
