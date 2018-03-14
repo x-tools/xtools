@@ -2,24 +2,15 @@
 
 .autoedits {
     #summary .chart-wrapper {
-        margin-left: 50px;
-        max-width: 200px;
+        max-width: 300px;
 
         canvas {
-            max-width: 200px;
+            max-width: 300px;
         }
 
         .chart-legend {
             display: none;
         }
-    }
-
-    .non-auto-edits-nav {
-        margin-bottom: 10px;
-    }
-
-    .prev-edits {
-        display: none;
     }
 
     #tool_chart {
@@ -34,6 +25,8 @@
     }
 
     .tool-selector-form {
+        margin-bottom: 20px;
+
         .btn-primary {
             vertical-align: bottom;
         }

@@ -14,7 +14,7 @@ use Xtools\ProjectRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
- * Tests of the Edit class.
+ * Tests of the AdminStats class.
  */
 class AdminStatsTest extends PHPUnit_Framework_TestCase
 {

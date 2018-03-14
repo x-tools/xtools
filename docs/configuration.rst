@@ -97,6 +97,7 @@ Selectively choose which tools to enable within XTools.
 - **enable.adminstats** - Enable "Admin Statistics" tool.
 - **enable.articleinfo** - Enable "Article Information" tool.
 - **enable.autoedits** - Enable "Automated Edits" tool.
+- **enable.categoryedits** - Enable "Category Edits" tool.
 - **enable.bash** - Enable "Quote Database" tool.
 - **enable.ec** - Enable "Edit Counter" tool.
 - **enable.es** - Enable "Edit Summaries" tool.

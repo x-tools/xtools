@@ -22,11 +22,15 @@
     </script>
 
     {% if loadStylesheetsFromCDN() %}
-        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"
-              integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-        {% stylesheets filter="scssphp"
-            'static/css/*.scss' %}
-        <link rel="stylesheet" href="{{ asset_url }}" />
+        <link rel="stylesheet" type="text/css" media="screen" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+        {% stylesheets 'static/css/*.scss'
+            filter='scssphp,cssrewrite'
+            output='static/production/application.css'
+        %}
+        <link rel="stylesheet" type="text/css" media="screen" href="{{ asset_url }}" />
+        {% if isRTL() %}
+            <link rel="stylesheet" type="text/css" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-rtl/3.4.0/css/bootstrap-flipped.min.css">
+        {% endif %}
         {% endstylesheets %}
         <script src="https://code.jquery.com/jquery-3.1.0.min.js"
                 integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
@@ -35,19 +39,13 @@
                 crossorigin="anonymous"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.0/Chart.min.js"></script>
     {% else %}
-        {% stylesheets
-            'bootstrap/css/bootstrap.min.css'
-            'static/css/application.scss'
-            'static/css/home.scss'
-            'static/css/about.scss'
-            'static/css/articleinfo.scss'
-            'static/css/autoedits.scss'
-            'static/css/editcounter.scss'
-            'static/css/pages.scss'
-            'static/css/meta.scss'
-            'static/css/topedits.scss'
-            output='static/production/application.css' %}
-        <link rel="stylesheet" href="{{ asset_url }}" />
+        <link rel="stylesheet" type="text/css" media="screen" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" media="screen" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/select2/4.0.5/css/select2.min.css">
+        {% stylesheets 'static/css/*.scss'
+            filter='scssphp,cssrewrite'
+            output='static/production/application.css'
+        %}
+        <link rel="stylesheet" type="text/css" media="screen" href="{{ asset_url }}" />
         {% if isRTL() %}
             <link rel="stylesheet" type="text/css" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-rtl/3.4.0/css/bootstrap-flipped.min.css">
         {% endif %}
@@ -62,12 +60,14 @@
             'static/js/application.js'
             'static/js/articleinfo.js'
             'static/js/autoedits.js'
+            'static/js/categoryedits.js'
             'static/js/editcounter.js'
             'static/js/pages.js'
             'static/js/topedits.js'
             filter='uglifyjs'
             output='static/production/application.js' %}
         <script src="{{ asset_url }}"></script>
+        <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/select2/4.0.5/js/select2.full.min.js"></script>
         {% endjavascripts %}
     {% endif %}
 

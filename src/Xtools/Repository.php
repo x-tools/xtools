@@ -289,7 +289,8 @@ abstract class Repository
             $cacheKey .= $this->getCacheKeyFromArg($arg);
         }
 
-        return $cacheKey;
+        // Remove reserved characters.
+        return preg_replace('/[{}()\/\@\:"]/', '', $cacheKey);
     }
 
     /**

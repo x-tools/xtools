@@ -140,6 +140,7 @@ assetic:
         scssphp:
             formatter: 'Leafo\ScssPhp\Formatter\Compressed'
             apply_to:  '\.scss$'
+        cssrewrite: ~
         uglifyjs:
             bin: '%kernel.root_dir%/Resources/node_modules/uglify-es/bin/uglifyjs'
 

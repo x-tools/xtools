@@ -225,21 +225,17 @@
         {% else %}
             {% set content %}
                 <div>
-                    <em class="non-auto-edits-loading text-muted">{{ msg('loading') }}...</em>
-                    <div class="non-auto-edits-container"
+                    <em class="contributions-loading text-muted">{{ msg('loading') }}...</em>
+                    <div class="contributions-container"
                         data-project="{{ project.domain }}"
                         data-username="{{ user.username }}"
                         data-start="{{ ae.start }}"
                         data-end="{{ ae.end }}"
                         data-namespace="{{ ae.namespace }}"
+                        data-offset="{{ ae.offset }}"
                         data-target="nonautoedits">
                     </div>
                 </div>
-                <script>
-                    $(function () {
-                        window.loadContributions();
-                    });
-                </script>
             {% endset %}
         {% endif %}
         {% set headerLink %}

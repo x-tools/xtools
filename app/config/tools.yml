@@ -6,6 +6,7 @@ parameters:
     topedits: topedits
     blame: blame
     autoedits: autoedits
+    categoryedits: categoryedits
     adminstats: adminstats
     adminscore: adminscore
     es: es

@@ -69,6 +69,7 @@ parameters:
     enable.adminstats: 1
     enable.articleinfo: 1
     enable.autoedits: 1
+    enable.categoryedits: 1
     enable.bash: 0
     enable.ec: 1
     enable.es: 1

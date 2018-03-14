@@ -183,7 +183,7 @@ class AdminStats extends Model
     /**
      * Given the data returned by AdminStatsRepository::getStats,
      * return the stats keyed by user name, adding in a key/value for user groups.
-     * @param  string[] $data As retrieved by AdminStatsRepository::getStats
+     * @param string[] $data As retrieved by AdminStatsRepository::getStats
      * @param boolean $abbreviateGroups If set, the 'groups' list will be
      *   a string with abbreivated user groups names, as opposed to an array
      *   of full-named user groups.

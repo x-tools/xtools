@@ -1,4 +1,5 @@
 @import 'mixins.scss';
+@import 'rtl.scss';
 
 html {
     height: 100%;
@@ -17,7 +18,7 @@ body {
     }
 
     &.rtl {
-        @import 'rtl.scss';
+        @include rtl();
     }
 }
 
@@ -693,6 +694,18 @@ input.form-control.show-loader {
     .glyphicon-download-alt {
         top: 2px;
     }
+}
+
+.contributions-nav {
+    margin-bottom: 10px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.contributions--prev {
+    display: none;
 }
 
 @media (min-width: $bootstrap-lg) {

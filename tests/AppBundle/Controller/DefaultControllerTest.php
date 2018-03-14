@@ -34,7 +34,7 @@ class DefaultControllerTest extends WebTestCase
         );
 
         // Make sure all active tools are listed.
-        $this->assertCount(9, $crawler->filter('.tool-list a.btn'));
+        $this->assertCount(10, $crawler->filter('.tool-list a.btn'));
     }
 
     /**
