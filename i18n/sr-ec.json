@@ -6,7 +6,8 @@
 			"Милан Јелисавчић",
 			"Acamicamacaraca",
 			"Zoranzoki21",
-			"Milicevic01"
+			"Milicevic01",
+			"BadDog"
 		]
 	},
 	"accepted-formats": "Прихваћени формати",
@@ -169,7 +170,7 @@
 	"latest-edit": "Најскорашњија измена",
 	"latest-global-edits": "Скорашње глобалне измене",
 	"latest-global-edits-desc": "Најскорашњије измене за топ 10 пројеката овог корисника у последњем месецу",
-	"limit": "Лимит",
+	"limit": "Ограничење",
 	"links": "Везе",
 	"links-external": "Спољашње везе",
 	"links-in": "Везе до ове странице",
@@ -320,7 +321,7 @@
 	"rpp-desc": "$2 {{PLURAL:$1|измена|измене|измена}} на страници Захтеви за заштиту страница",
 	"saturday": "Субота",
 	"sections": "Одељци",
-	"see-full-page-stats": "Види целу статистику странице",
+	"see-full-page-stats": "Цела статистика странице",
 	"see-full-statistics": "Види целу статистику",
 	"show": "Прикажи",
 	"size": "Величина",

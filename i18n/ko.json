@@ -5,7 +5,8 @@
 			"CYAN",
 			"Nemo bis",
 			"Revi",
-			"Ellif"
+			"Ellif",
+			"Garam"
 		]
 	},
 	"accepted-formats": "허용되는 형식",
@@ -300,7 +301,7 @@
 	"templates": "틀",
 	"text": "텍스트",
 	"text-to-serach": "검색할 텍스트",
-	"thank": "감사",
+	"thank": "감사 표현",
 	"thursday": "목요일",
 	"timecard": "타임카드",
 	"times-in-utc": "모든 시간대는 UTC입니다.",
