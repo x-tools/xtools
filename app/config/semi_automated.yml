@@ -94,11 +94,9 @@ parameters:
     ko:
         Undo:
             regex: '판 편집을 되돌림'
-            tag: mw-undo
             label: '편집 취소'
         Generic rollback:
             regex: '(의 마지막 판으로 되돌림|의 편집을 전부 되돌림)'
-            tag: mw-rollback
             label: '되돌리기'
         Page move:
             regex: '문서로 이동했습니다'
@@ -357,15 +355,15 @@ parameters:
             link: User:Evad37/MoveToDraft
     ko.wikipedia.org:
         AutoWikiBrowser:
-            regex: 'using [[위키백과:AWB|AWB]]'
+            regex: 'using \[\[위키백과:AWB\|AWB\]\]'
             link: 위키백과:AWB
             label: 오토위키브라우저
         Popups:
-            regex: '[[백:팝업|NavPop]]'
+            regex: '\[\[백:팝업\|NavPop\]\]'
             link: 백:팝업
             label: 내비게이션 팝업
         Twinkle:
-            regex: '[[위키백과:도구/트윙클|TW]]'
+            regex: '\[\[위키백과:도구\/트윙클\|TW\]\]'
             link: 위키백과:도구/트윙클
             label: 트윙클
         WikiLove:
