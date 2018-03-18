@@ -16,7 +16,7 @@
         {% for timestamp, change in rightsChanges if index < 10 or not(is_sub_request) %}
             <tr>
                 <td class="sort-entry--date" data-value="{{ timestamp }}">
-                    {{ wiki.logLink(change.type == 'local' ? project : metaProject, change.logId, timestamp|date_format) }}
+                    {{ wiki.logLink(change.type == 'local' ? project : metaProject, change.logId, timestamp|trans|date_format) }}
                 </td>
                 <td class="sort-entry--rights" data-value="{{ change.added|length + change.removed|length }}">
                     {% for right in change.added %}
