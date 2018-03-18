@@ -38,6 +38,7 @@ parameters:
             # any arbitrary revision, not just the previous one.
         Redirect:
             tag: mw-new-redirect
+            link: mw:Special:MyLanguage/Help:Redirects
         Huggle:
             regex: '\(\[\[WP:HG'
             tag: huggle
@@ -73,6 +74,9 @@ parameters:
         reFill:
             regex: 'User:Zhaofeng Li\/Reflinks|WP:REFILL|en:WP:REFILL'
             link: Project:ReFill
+        WikiLove:
+            tag: wikilove
+            link: Special:MyLanguage/Extension:WikiLove
 
     # Per-language lists. This generally only includes native MediaWiki actions.
     ar:
@@ -243,7 +247,6 @@ parameters:
             link: Project:EPH
         WikiLove:
             regex: 'new WikiLove message'
-            tag: 'wikilove'
             link: Project:WikiLove
         AutoEd:
             regex: 'using \[\[(Wikipedia|WP):AutoEd\|AutoEd'
@@ -355,7 +358,7 @@ parameters:
             link: User:Evad37/MoveToDraft
     ko.wikipedia.org:
         AutoWikiBrowser:
-            regex: 'using \[\[위키백과:AWB\|AWB\]\]'
+            regex: '위키백과:AWB\|AWB|(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
             link: 위키백과:AWB
             label: 오토위키브라우저
         Popups:
@@ -363,13 +366,13 @@ parameters:
             link: 백:팝업
             label: 내비게이션 팝업
         Twinkle:
-            regex: '\[\[위키백과:도구\/트윙클\|TW\]\]'
+            regex: '\[\[위키백과:도구\/트윙클\|TW\]\]|(Wikipedia|WP):(TW|TWINKLE|Twinkle|FRIENDLY)'
             link: 위키백과:도구/트윙클
             label: 트윙클
         WikiLove:
             regex: '새 위키사랑 글'
-            tag: 'wikilove'
-            label: '위키사랑'
+            link: 위키백과:위키사랑
+            label: 위키사랑
     pt.wikipedia.org:
         Undo:
             regex: 'Desfeita a edição \d+ de \[\['
