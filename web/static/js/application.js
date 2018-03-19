@@ -1,21 +1,11 @@
 (function () {
     var $tocClone, tocHeight, sectionOffset = {}, apiPath, lastProject;
 
-    // Load translations with 'en.json' as a fallback
-    var messagesToLoad = {};
-
     /** global: i18nLang */
-    /** global: i18nPath */
-    messagesToLoad[i18nLang] = i18nPath;
-
-    /** global: i18nEnPath */
-    if (i18nLang !== 'en') {
-        messagesToLoad.en = i18nEnPath;
-    }
-
+    /** global: i18nPaths */
     $.i18n({
         locale: i18nLang
-    }).load(messagesToLoad);
+    }).load(i18nPaths);
 
     $(document).ready(function () {
         // TODO: move these listeners to a setup function and document how to use it.

@@ -82,6 +82,7 @@ class AppExtension extends Twig_Extension
             new \Twig_SimpleFunction('msg', [$this, 'msg'], $options),
             new \Twig_SimpleFunction('lang', [$this, 'getLang'], $options),
             new \Twig_SimpleFunction('langName', [$this, 'getLangName'], $options),
+            new \Twig_SimpleFunction('fallbackLangs', [$this, 'getFallbackLangs', $options]),
             new \Twig_SimpleFunction('allLangs', [$this, 'getAllLangs']),
             new \Twig_SimpleFunction('isRTL', [$this, 'isRTL']),
             new \Twig_SimpleFunction('isRTLLang', [$this, 'isRTLLang']),
@@ -192,6 +193,16 @@ class AppExtension extends Twig_Extension
     public function getLangName()
     {
         return $this->i18n->getLangName();
+    }
+
+    /**
+     * Get the fallback languages for the current language,
+     * so we know what to load with jQuery.i18n.
+     * @return string[]
+     */
+    public function getFallbackLangs()
+    {
+        return $this->i18n->getFallbacks();
     }
 
     /**

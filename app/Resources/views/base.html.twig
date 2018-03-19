@@ -13,8 +13,10 @@
 
         {# For $.i18n, loaded in application.js #}
         i18nLang = "{{ lang() }}";
-        i18nPath = "{{ asset('static/i18n/' ~ lang() ~ '.json') }}";
-        i18nEnPath = "{{ asset('static/i18n/en.json') }}";
+        i18nPaths = {};
+        {% for lang in fallbackLangs() %}
+            i18nPaths["{{ lang }}"] = "{{ asset('static/i18n/' ~ lang ~ '.json') }}";
+        {% endfor %}
 
         i18nRTL = {% if isRTL() %}true{% else %}false{% endif %};
     </script>

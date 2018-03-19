@@ -155,6 +155,25 @@ class I18nHelper
         );
     }
 
+    /**
+     * Get the fallback languages for the current language, so we know what to
+     * load with jQuery.i18n. Languages for which no file exists are not returend.
+     * @return string[]
+     */
+    public function getFallbacks()
+    {
+        $i18nPath = $this->container->getParameter('kernel.root_dir').'/../i18n/';
+
+        $fallbacks = array_merge(
+            [$this->getLang()],
+            $this->getIntuition()->getLangFallbacks($this->getLang())
+        );
+
+        return array_filter($fallbacks, function ($lang) use ($i18nPath) {
+            return is_file($i18nPath.$lang.'.json');
+        });
+    }
+
     /******************** MESSAGE HELPERS ********************/
 
     /**
