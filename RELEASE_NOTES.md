@@ -1,5 +1,12 @@
 # Release Notes #
 
+## 3.2.3 ##
+- AutoEdits: add better support for Korean wikis, kowiki specifically.
+- EditCounter: Fix display of timestamps in rights changes section.
+- Make sure i18n language fallback files are downloaded, but only if
+  they exist.
+- Localization updates.
+
 ## 3.2.2 ##
 - AutoEdits: Fix automated edits query for when dealing with tags,
   and non-automated edits query for when there are multiple tags.
