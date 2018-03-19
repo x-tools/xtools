@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.2.4 ##
+- ArticleInfo: Improve performance of ArticleInfo API endpoint.
+
 ## 3.2.3 ##
 - AutoEdits: add better support for Korean wikis, kowiki specifically.
 - EditCounter: Fix display of timestamps in rights changes section.
