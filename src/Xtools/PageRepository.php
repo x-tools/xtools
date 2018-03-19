@@ -261,15 +261,13 @@ class PageRepository extends Repository
                         LIMIT 1
                     ) b,
                     (
-                        SELECT MAX(rev_timestamp) AS modified_at
+                        SELECT rev_timestamp AS modified_at,
+                               rev_id AS modified_rev_id
                         FROM $revTable
+                        JOIN $pageTable ON page_id = rev_page
                         WHERE rev_page = :pageid
-                    ) c,
-                    (
-                        SELECT page_latest AS modified_rev_id
-                        FROM $pageTable
-                        WHERE page_id = :pageid
-                    ) d
+                        AND rev_id = page_latest
+                    ) c
                 );";
         $params = ['pageid' => $page->getId()];
 
