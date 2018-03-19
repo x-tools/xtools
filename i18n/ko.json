@@ -231,6 +231,7 @@
 	"pages-created-deleted-desc": "삭제된 이후로 만든 {{PLURAL:$1|문서}} $2개",
 	"pages-created-live-desc": "{{PLURAL:$1|문서}} $2개를 만들었습니다",
 	"pages-deleted": "삭제된 문서",
+	"pages-deleted-hover-desc": "삭제 요약을 보려면 '$1' 텍스트를 가리키고 계십시오.",
 	"pages-edited-total": "편집한 문서 (전체)",
 	"pages-moved": "이동한 문서",
 	"pages-recreated-desc": "삭제된 일부 문서들이 이 사용자나 다른 사용자에 의해 만들어진 것 같습니다. 이것들은 '$1'으로 표시됩니다.",

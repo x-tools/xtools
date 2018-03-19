@@ -262,7 +262,7 @@
 	"pages-created-since-deleted": "$1 depuis suppression",
 	"pages-created-tooltip": "Nombre total de pages créées, y compris celles créées comme redirection en renommant une page. Voyez la documentation pour plus de détails.",
 	"pages-deleted": "Pages supprimées",
-	"pages-deleted-hover-desc": "Passer dessus le texte '$1' pour voir le résumé de la suppression.",
+	"pages-deleted-hover-desc": "Survoler le texte '$1' pour voir le résumé de la suppression.",
 	"pages-edited-total": "Pages modifiées (total)",
 	"pages-moved": "Pages renommées",
 	"pages-recreated-desc": "Certaines pages supprimées peuvent avoir été créées de nouveau, par cet utilisateur ou par un autre. Elles sont marquées comme '$1'.",
