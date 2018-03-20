@@ -187,10 +187,9 @@ class AdminScoreController extends XtoolsController
                     $diff = $date->diff($now);
                     $formula = 365 * $diff->format('%y') + 30 * $diff->format('%m') + $diff->format('%d');
                     if ($formula < 365) {
-                        $value = 0;
-                    } else {
-                        $value = $formula - 365;
+                        $multipliers["account-age-mult"] = 0;
                     }
+                    $value = $formula;
                 }
             }
 
