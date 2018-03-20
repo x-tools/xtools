@@ -6,15 +6,17 @@
 namespace AppBundle\Controller;
 
 use DateTime;
+use GuzzleHttp;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Xtools\ProjectRepository;
-use Xtools\UserRepository;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Xtools\Pages;
+use Xtools\PagesRepository;
+use Xtools\Project;
 
 /**
  * This controller serves the Pages tool.
@@ -64,17 +66,25 @@ class PagesController extends XtoolsController
             // Defaults that will get overriden if in $params.
             'namespace' => 0,
             'redirects' => 'noredirects',
-            'deleted' => 'both'
+            'deleted' => 'all'
         ], $params));
     }
 
     /**
      * Display the results.
-     * @Route("/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{offset}", name="PagesResult")
+     * @Route(
+     *     "/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{offset}", name="PagesResult",
+     *     requirements={
+     *         "namespace" = "|all|\d+",
+     *         "redirects" = "|[^/]++",
+     *         "deleted" = "|all|live|deleted",
+     *         "offset" = "|\d+"
+     *     }
+     * )
      * @param Request $request
      * @param string|int $namespace The ID of the namespace, or 'all' for all namespaces.
-     * @param string $redirects Whether to follow redirects or not.
-     * @param string $deleted Whether to include deleted pages or not.
+     * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
+     * @param string $deleted One of 'live', 'deleted' or 'all' for both.
      * @param int $offset Which page of results to show, when the results are so large they are paginated.
      * @return RedirectResponse|Response
      * @codeCoverageIgnore
@@ -83,51 +93,79 @@ class PagesController extends XtoolsController
         Request $request,
         $namespace = '0',
         $redirects = 'noredirects',
-        $deleted = 'both',
+        $deleted = 'all',
         $offset = 0
     ) {
         $ret = $this->validateProjectAndUser($request, 'pages');
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {
-            list($projectData, $user) = $ret;
+            list($project, $user) = $ret;
         }
 
+        // Check for legacy values for 'redirects', and redirect
+        // back with correct values if need be. This could be refactored
+        // out to XtoolsController, but this is the only tool in the suite
+        // that deals with redirects, so we'll keep it confined here.
+        $validRedirects = ['', 'noredirects', 'onlyredirects', 'all'];
+        if ($redirects === 'none' || !in_array($redirects, $validRedirects)) {
+            return $this->redirectToRoute('PagesResult', [
+                'project' => $project->getDomain(),
+                'username' => $user->getUsername(),
+                'namespace' => $namespace,
+                'redirects' => 'noredirects',
+                'deleted' => $deleted,
+                'offset' => $offset,
+            ]);
+        }
+
+        $pagesRepo = new PagesRepository();
+        $pagesRepo->setContainer($this->container);
         $pages = new Pages(
-            $projectData,
+            $project,
             $user,
             $namespace,
             $redirects,
             $deleted,
             $offset
         );
+        $pages->setRepository($pagesRepo);
         $pages->prepareData();
 
-        // Assign the values and display the template
-        return $this->render('pages/result.html.twig', [
+        $ret = [
             'xtPage' => 'pages',
             'xtTitle' => $user->getUsername(),
-            'project' => $projectData,
+            'project' => $project,
             'user' => $user,
-            'summaryColumns' => $this->getSummaryColumns($redirects, $deleted),
+            'summaryColumns' => $this->getSummaryColumns($pages),
             'pages' => $pages,
-        ]);
+            'namespace' => $namespace,
+        ];
+
+        if ($request->query->get('format') === 'PagePile') {
+            return $this->getPagepileResult($project, $pages);
+        }
+
+        // Output the relevant format template.
+        return $this->getFormattedReponse($request, 'pages/result', $ret);
     }
 
     /**
      * What columns to show in namespace totals table.
-     * @param  string $redirects One of 'noredirects', 'onlyredirects' or blank for both.
-     * @param  string $deleted One of 'live', 'deleted' or 'both'.
+     * @param  Pages $pages The Pages instance.
      * @return string[]
      * @codeCoverageIgnore
      */
-    protected function getSummaryColumns($redirects, $deleted)
+    private function getSummaryColumns(Pages $pages)
     {
         $summaryColumns = ['namespace'];
-        if ($redirects == 'onlyredirects') {
-            // Don't show redundant pages column if only getting data on redirects.
+        if ($pages->getDeleted() === 'deleted') {
+            // Showing only deleted pages shows only the deleted column, as redirects are non-applicable.
+            $summaryColumns[] = 'deleted';
+        } elseif ($pages->getRedirects() == 'onlyredirects') {
+            // Don't show redundant pages column if only getting data on redirects or deleted pages.
             $summaryColumns[] = 'redirects';
-        } elseif ($redirects == 'noredirects') {
+        } elseif ($pages->getRedirects() == 'noredirects') {
             // Don't show redundant redirects column if only getting data on non-redirects.
             $summaryColumns[] = 'pages';
         } else {
@@ -137,11 +175,81 @@ class PagesController extends XtoolsController
         }
 
         // Show deleted column only when both deleted and live pages are visible.
-        if ($deleted == 'both') {
+        if ($pages->getDeleted() === 'all') {
             $summaryColumns[] = 'deleted';
         }
 
         return $summaryColumns;
+    }
+
+    /**
+     * Create a PagePile for the given pages, and get a Redirect to that PagePile.
+     * @param Project $project
+     * @param Pages $pages
+     * @return RedirectResponse
+     * @throws HttpException
+     * @see https://tools.wmflabs.org/pagepile/
+     * @codeCoverageIgnore
+     */
+    private function getPagepileResult(Project $project, Pages $pages)
+    {
+        $namespaces = $project->getNamespaces();
+        $pageTitles = [];
+
+        foreach ($pages->getResults() as $ns => $pagesData) {
+            foreach ($pagesData as $page) {
+                if ((int)$page['namespace'] === 0) {
+                    $pageTitles[] = $page['page_title'];
+                } else {
+                    $pageTitles[] = $namespaces[$page['namespace']].':'.$page['page_title'];
+                }
+            }
+        }
+
+        $pileId = $this->createPagePile($project, $pageTitles);
+
+        return new RedirectResponse(
+            "https://tools.wmflabs.org/pagepile/api.php?id=$pileId&action=get_data&format=html&doit1"
+        );
+    }
+
+    /**
+     * Create a PagePile with the given titles.
+     * @param Project $project
+     * @param string[] $pageTitles
+     * @return int The PagePile ID.
+     * @throws HttpException
+     * @see https://tools.wmflabs.org/pagepile/
+     * @codeCoverageIgnore
+     */
+    private function createPagePile(Project $project, $pageTitles)
+    {
+        $client = new GuzzleHttp\Client();
+        $url = 'https://tools.wmflabs.org/pagepile/api.php';
+
+        try {
+            $res = $client->request('GET', $url, ['query' => [
+                'action' => 'create_pile_with_data',
+                'wiki' => $project->getDatabaseName(),
+                'data' => implode("\n", $pageTitles),
+            ]]);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            throw new HttpException(
+                414,
+                'error-pagepile-too-large'
+            );
+        }
+
+        $ret = json_decode($res->getBody()->getContents(), true);
+
+        if (!isset($ret['status']) || $ret['status'] !== 'OK') {
+            throw new HttpException(
+                500,
+                'Failed to create PagePile. There may be an issue with the PagePile API.'
+            );
+        }
+
+        return $ret['pile']['id'];
     }
 
     /************************ API endpoints ************************/
@@ -154,11 +262,11 @@ class PagesController extends XtoolsController
      * @param Request $request
      * @param int|string $namespace The ID of the namespace of the page, or 'all' for all namespaces.
      * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
-     * @param string $deleted One of 'live', 'deleted' or 'both'.
+     * @param string $deleted One of 'live', 'deleted' or 'all' for both.
      * @return Response
      * @codeCoverageIgnore
      */
-    public function countPagesApiAction(Request $request, $namespace = 0, $redirects = 'noredirects', $deleted = 'both')
+    public function countPagesApiAction(Request $request, $namespace = 0, $redirects = 'noredirects', $deleted = 'all')
     {
         $this->recordApiUsage('user/pages_count');
 
@@ -169,6 +277,8 @@ class PagesController extends XtoolsController
             list($project, $user) = $ret;
         }
 
+        $pagesRepo = new PagesRepository();
+        $pagesRepo->setContainer($this->container);
         $pages = new Pages(
             $project,
             $user,
@@ -176,6 +286,7 @@ class PagesController extends XtoolsController
             $redirects,
             $deleted
         );
+        $pages->setRepository($pagesRepo);
 
         $response = new JsonResponse();
         $response->setEncodingOptions(JSON_NUMERIC_CHECK);
@@ -208,7 +319,7 @@ class PagesController extends XtoolsController
      * @param Request $request
      * @param int|string $namespace The ID of the namespace of the page, or 'all' for all namespaces.
      * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
-     * @param string $deleted One of 'live', 'deleted' or 'both'.
+     * @param string $deleted One of 'live', 'deleted' or blank for both.
      * @param int $offset Which page of results to show.
      * @return Response
      * @codeCoverageIgnore
@@ -217,7 +328,7 @@ class PagesController extends XtoolsController
         Request $request,
         $namespace = 0,
         $redirects = 'noredirects',
-        $deleted = 'both',
+        $deleted = 'all',
         $offset = 0
     ) {
         $this->recordApiUsage('user/pages');
@@ -230,6 +341,8 @@ class PagesController extends XtoolsController
             list($project, $user) = $ret;
         }
 
+        $pagesRepo = new PagesRepository();
+        $pagesRepo->setContainer($this->container);
         $pages = new Pages(
             $project,
             $user,
@@ -238,6 +351,7 @@ class PagesController extends XtoolsController
             $deleted,
             $offset
         );
+        $pages->setRepository($pagesRepo);
 
         $response = new JsonResponse();
         $response->setEncodingOptions(JSON_NUMERIC_CHECK);

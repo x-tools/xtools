@@ -67,11 +67,12 @@ function toggleNamespace(newData, key)
     });
     var namespaceCount = Object.keys(newData).length;
 
+    /** global: i18nLang */
     $('.namespaces--namespaces').text(
-        namespaceCount.toLocaleString() + ' ' +
+        namespaceCount.toLocaleString(i18nLang) + ' ' +
         $.i18n('num-namespaces', namespaceCount)
     );
-    $('.namespaces--count').text(total.toLocaleString());
+    $('.namespaces--count').text(total.toLocaleString(i18nLang));
 
     // Now that we have the total, loop through once more time to update percentages.
     counts.forEach(function (count) {
@@ -80,7 +81,7 @@ function toggleNamespace(newData, key)
 
         // Update text with new value and percentage.
         $('.namespaces-table .sort-entry--count[data-value='+count+']').text(
-            count.toLocaleString() + ' (' + percentage + '%)'
+            count.toLocaleString(i18nLang) + ' (' + percentage + ')'
         );
     });
 
@@ -167,8 +168,9 @@ function getYAxisLabels(id, datasets)
         var numTabs = (window.maxDigits[id] - digitCount) * 2;
 
         // +5 for a bit of extra spacing.
+        /** global: i18nLang */
         return year + Array(numTabs + 5).join("\t") +
-            labelsAndTotals[year];
+            labelsAndTotals[year].toLocaleString(i18nLang, {useGrouping: false});
     });
 }
 
@@ -205,9 +207,8 @@ function getMonthYearTotals(id, datasets)
  */
 function getPercentage(numerator, denominator)
 {
-    return +(Math.round(
-        ((numerator / denominator) * 100) + 'e+1'
-    ) + 'e-1');
+    /** global: i18nLang */
+    return (numerator / denominator).toLocaleString(i18nLang, {style: 'percent'});
 }
 
 /**
@@ -227,6 +228,8 @@ window.setupMonthYearChart = function (id, datasets, labels, maxTotal) {
     window.maxDigits[id] = maxTotal.toString().length
     window.chartLabels[id] = labels;
 
+    /** global: i18nRTL */
+    /** global: i18nLang */
     window[id + 'countsChart'] = new Chart($('#' + id + 'counts-canvas'), {
         type: 'horizontalBar',
         data: {
@@ -246,8 +249,8 @@ window.setupMonthYearChart = function (id, datasets, labels, maxTotal) {
                             total = totals[tooltip.index],
                             percentage = getPercentage(tooltip.xLabel, total);
 
-                        return tooltip.xLabel.toLocaleString() + ' ' +
-                            '(' + percentage + '%)';
+                        return tooltip.xLabel.toLocaleString(i18nLang) + ' ' +
+                            '(' + percentage + ')';
                     },
                     title: function (tooltip) {
                         var yLabel = tooltip[0].yLabel.replace(/\t.*/, '');
@@ -262,16 +265,18 @@ window.setupMonthYearChart = function (id, datasets, labels, maxTotal) {
                     stacked: true,
                     ticks: {
                         beginAtZero: true,
+                        reverse: i18nRTL,
                         callback: function (value) {
                             if (Math.floor(value) === value) {
-                                return value.toLocaleString();
+                                return value.toLocaleString(i18nLang);
                             }
-                        }
+                        },
                     }
                 }],
                 yAxes: [{
                     stacked: true,
                     barThickness: 18,
+                    position: i18nRTL ? 'right' : 'left'
                 }]
             },
             legend: {

@@ -50,12 +50,12 @@ class Edit extends Model
      * @param Page $page
      * @param string[] $attrs Attributes, as retrieved by PageRepository::getRevisions()
      */
-    public function __construct(Page $page, $attrs)
+    public function __construct(Page $page, array $attrs = [])
     {
         $this->page = $page;
 
         // Copy over supported attributes
-        $this->id = (int) $attrs['id'];
+        $this->id = isset($attrs['id']) ? (int)$attrs['id'] : (int)$attrs['rev_id'];
 
         // Allow DateTime or string (latter assumed to be of format YmdHis)
         if ($attrs['timestamp'] instanceof DateTime) {
@@ -71,7 +71,7 @@ class Edit extends Model
         $this->length = $attrs['length'];
         $this->lengthChange = $attrs['length_change'];
 
-        $this->user = new User($attrs['username']);
+        $this->user = isset($attrs['user']) ? $attrs['user'] : new User($attrs['username']);
         $this->comment = $attrs['comment'];
 
         if (isset($attrs['rev_sha1']) || isset($attrs['sha'])) {
@@ -268,7 +268,15 @@ class Edit extends Model
         Page $page = null,
         $useUnnormalizedPageTitle = false
     ) {
-        $summary = htmlspecialchars($summary, ENT_NOQUOTES);
+        $summary = htmlspecialchars(html_entity_decode($summary), ENT_NOQUOTES);
+
+        // First link raw URLs. Courtesy of https://stackoverflow.com/a/11641499/604142
+        $summary = preg_replace(
+            '%\b(([\w-]+://?|www[.])[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|/)))%s',
+            '<a target="_blank" href="$1">$1</a>',
+            $summary
+        );
+
         $sectionMatch = null;
         $isSection = preg_match_all("/^\/\* (.*?) \*\//", $summary, $sectionMatch);
 
@@ -359,7 +367,7 @@ class Edit extends Model
     public function isRevert(Container $container)
     {
         $automatedEditsHelper = $container->get('app.automated_edits_helper');
-        return $automatedEditsHelper->isRevert($this->comment, $this->getProject()->getDomain());
+        return $automatedEditsHelper->isRevert($this->comment, $this->getProject());
     }
 
     /**
@@ -370,7 +378,7 @@ class Edit extends Model
     public function getTool(Container $container)
     {
         $automatedEditsHelper = $container->get('app.automated_edits_helper');
-        return $automatedEditsHelper->getTool($this->comment, $this->getProject()->getDomain());
+        return $automatedEditsHelper->getTool($this->comment, $this->getProject());
     }
 
     /**

@@ -2,7 +2,7 @@
 * {{ project.domain }}
 * {{ msg('total-edits') }}: {{ ai.numRevisions|num_format }}
 * {{ msg('editors') }}: {{ ai.numEditors|num_format }}
-* {{ 'now'|date('Y-m-d H:i:s') }}
+* {{ 'now'|date_format }}
 
 <sup>1</sup> {{ msg('edits') }}<br />
 <sup>2</sup> {{ msg('average-time-bw-edits') }}
@@ -21,8 +21,8 @@
 #} || {{ stats.all|num_format }} {#
 #} || {{ stats.minor|num_format }} {#
 #} || {{ stats.minor|percent_format(stats.all) }} {#
-#} || {{ stats.first|date('Y-m-d H:i') }} {#
-#} || {{ stats.last|date('Y-m-d H:i') }} {#
+#} || {{ stats.first|date_format }} {#
+#} || {{ stats.last|date_format }} {#
 #} || {{ stats.atbe|num_format(1) }} {#
 #} || {{ stats.added|num_format }}
 |-

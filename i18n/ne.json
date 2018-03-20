@@ -3,10 +3,10 @@
 		"authors": [
 			"Nirajan pant",
 			"Nemo bis",
-			"सरोज कुमार ढकाल"
+			"सरोज कुमार ढकाल",
+			"Drjpoudel"
 		]
 	},
-	"about-xtools": "यी औजारहरूको बारेमा",
 	"accepted-formats": "स्वीकृत प्रारूपहरू",
 	"account-age": "खाता आयु",
 	"account-age-desc": "$2 {{PLURAL:$1|दिन|दिनहरू}} पुरानो",
@@ -64,6 +64,7 @@
 	"edits-last-week": "७ दिन अघिसम्मको सम्पादन",
 	"edits-last-year": "३६५ दिन अघिसम्मको सम्पादन",
 	"end": "समापन मिति",
+	"feedback": "प्रतिक्रिया",
 	"file": "फाइल",
 	"files": "फाइलहरू",
 	"files-uploaded": "अपलोड गरेका फाइलहरू",
@@ -218,6 +219,7 @@
 	"username-or-ip": "प्रयोगकर्ता नाम वा IPv4 वा IPv6",
 	"version": "संस्करण $1",
 	"view-source": "स्रोत हेर्नुहोस्",
+	"view-wikitext": "विकिटेक्सको रूपमा हेर्नुहोस्",
 	"vote-msg": "$1 ले  $2 $3 पृष्ठहरू सम्पादन गर्नुभएको छ!",
 	"web-chat": "वेब च्याट",
 	"wednesday": "बुधबार",

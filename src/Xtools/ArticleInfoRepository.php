@@ -34,11 +34,8 @@ class ArticleInfoRepository extends Repository
                 LEFT JOIN $userFormerGroupsTable ON rev_user = ufg_user
                 WHERE rev_page = :pageId AND (ug_group = 'bot' OR ufg_group = 'bot') $datesConditions
                 GROUP BY rev_user_text";
-        $pageId = $page->getId();
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $resultQuery->bindParam('pageId', $pageId);
-        $resultQuery->execute();
-        return $resultQuery;
+
+        return $this->executeProjectsQuery($sql, ['pageId' => $page->getId()]);
     }
 
     /**
@@ -60,10 +57,8 @@ class ArticleInfoRepository extends Repository
                 AND log_title = :title AND log_timestamp > 1 $datesConditions
                 AND log_type IN ('delete', 'move', 'protect', 'stable')";
         $title = str_replace(' ', '_', $page->getTitle());
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $resultQuery->bindParam(':title', $title);
-        $resultQuery->execute();
-        return $resultQuery->fetchAll();
+
+        return $this->executeProjectsQuery($sql, ['title' => $title])->fetchAll();
     }
 
     /**
@@ -95,13 +90,11 @@ class ArticleInfoRepository extends Repository
     public function getUsernamesFromIds(Project $project, $userIds)
     {
         $userTable = $project->getTableName('user');
-        $userIds = implode(',', $userIds);
+        $userIds = implode(',', array_filter($userIds));
         $sql = "SELECT user_id, user_name
                 FROM $userTable
                 WHERE user_id IN ($userIds)";
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $resultQuery->execute();
-        return $resultQuery->fetchAll();
+        return $this->executeProjectsQuery($sql)->fetchAll();
     }
 
     /**
@@ -114,21 +107,20 @@ class ArticleInfoRepository extends Repository
         $categorylinksTable = $page->getProject()->getTableName('categorylinks');
         $templatelinksTable = $page->getProject()->getTableName('templatelinks');
         $imagelinksTable = $page->getProject()->getTableName('imagelinks');
-        $pageId = $page->getId();
         $sql = "(
                     SELECT 'categories' AS `key`, COUNT(*) AS val
                     FROM $categorylinksTable
-                    WHERE cl_from = $pageId
+                    WHERE cl_from = :pageId
                 ) UNION (
                     SELECT 'templates' AS `key`, COUNT(*) AS val
                     FROM $templatelinksTable
-                    WHERE tl_from = $pageId
+                    WHERE tl_from = :pageId
                 ) UNION (
                     SELECT 'files' AS `key`, COUNT(*) AS val
                     FROM $imagelinksTable
-                    WHERE il_from = $pageId
+                    WHERE il_from = :pageId
                 )";
-        $resultQuery = $this->getProjectsConnection()->query($sql);
+        $resultQuery = $this->executeProjectsQuery($sql, ['pageId' => $page->getId()]);
         $transclusionCounts = [];
         while ($result = $resultQuery->fetch()) {
             $transclusionCounts[$result['key']] = $result['val'];

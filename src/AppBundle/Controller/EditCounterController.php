@@ -5,12 +5,13 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Helper\I18nHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Xtools\EditCounter;
 use Xtools\EditCounterRepository;
 use Xtools\Page;
@@ -77,6 +78,9 @@ class EditCounterController extends XtoolsController
         $editCounterRepo->setContainer($this->container);
         $this->editCounter = new EditCounter($this->project, $this->user);
         $this->editCounter->setRepository($editCounterRepo);
+        $this->editCounter->setI18nHelper(
+            $this->container->get('app.i18n_helper')
+        );
     }
 
     /**
@@ -134,18 +138,21 @@ class EditCounterController extends XtoolsController
             $this->editCounter->prepareData($this->container);
         }
 
-        // FIXME: is this needed? It shouldn't ever be a subrequest here in the resultAction.
-        $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
-
-        return $this->render('editCounter/result.html.twig', [
+        $ret = [
             'xtTitle' => $this->user->getUsername() . ' - ' . $this->project->getTitle(),
             'xtPage' => 'ec',
-            'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
-            'is_sub_request' => $isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
-        ]);
+        ];
+
+        // Used when querying for global rights changes.
+        if ((bool)$this->container->hasParameter('app.is_labs')) {
+            $ret['metaProject'] = ProjectRepository::getProject('metawiki', $this->container);
+        }
+
+        // Output the relevant format template.
+        return $this->getFormattedReponse($request, 'editCounter/result', $ret);
     }
 
     /**
@@ -222,7 +229,8 @@ class EditCounterController extends XtoolsController
         $optedInPage = $this->project
             ->getRepository()
             ->getPage($this->project, $this->project->userOptInPage($this->user));
-        return $this->render('editCounter/timecard.html.twig', [
+
+        $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
@@ -230,7 +238,10 @@ class EditCounterController extends XtoolsController
             'project' => $this->project,
             'ec' => $this->editCounter,
             'opted_in_page' => $optedInPage,
-        ]);
+        ];
+
+        // Output the relevant format template.
+        return $this->getFormattedReponse($request, 'editCounter/timecard', $ret);
     }
 
     /**
@@ -308,14 +319,21 @@ class EditCounterController extends XtoolsController
         }
 
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
-        return $this->render('editCounter/rights_changes.html.twig', [
+        $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'ec',
             'is_sub_request' => $isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
-        ]);
+        ];
+
+        if ((bool)$this->container->hasParameter('app.is_labs')) {
+            $ret['metaProject'] = ProjectRepository::getProject('metawiki', $this->container);
+        }
+
+        // Output the relevant format template.
+        return $this->getFormattedReponse($request, 'editCounter/rights_changes', $ret);
     }
 
     /**

@@ -53,7 +53,7 @@ class TopEdits extends Model
      * @param Project $project
      * @param User $user
      * @param Page $page
-     * @param string|int Namespace ID or 'all'.
+     * @param string|int $namespace Namespace ID or 'all'.
      * @param int $limit Number of rows to fetch. This defaults to
      *   DEFAULT_LIMIT_SINGLE_NAMESPACE if $this->namespace is a single namespace (int),
      *   and DEFAULT_LIMIT_ALL_NAMESPACES if $this->namespace is 'all'.
@@ -169,24 +169,37 @@ class TopEdits extends Model
     }
 
     /**
+     * Set the Page on the TopEdits instance.
+     * @param Page $page
+     */
+    public function setPage(Page $page)
+    {
+        $this->page = $page;
+    }
+
+    /**
      * Fetch and store all the data we need to show the TopEdits view.
      * This is the public method that should be called before using
      * the getter methods.
+     * @param bool $format Whether to format the results, including stats for
+     *     number of reverts, etc. This is set to false for the API endpoint.
      */
-    public function prepareData()
+    public function prepareData($format = true)
     {
         if (isset($this->page)) {
-            $this->topEdits = $this->getTopEditsPage();
+            $this->topEdits = $this->getTopEditsPage($format);
         } else {
-            $this->topEdits = $this->getTopEditsNamespace();
+            $this->topEdits = $this->getTopEditsNamespace($format);
         }
     }
 
     /**
      * Get the top edits by a user in the given namespace, or 'all' namespaces.
+     * @param bool $format Whether to format the results, including stats for
+     *     number of reverts, etc. This is set to false for the API endpoint.
      * @return string[] Results keyed by namespace.
      */
-    private function getTopEditsNamespace()
+    private function getTopEditsNamespace($format)
     {
         if ($this->namespace === 'all') {
             $pages = $this->getRepository()->getTopEditsAllNamespaces(
@@ -203,21 +216,31 @@ class TopEdits extends Model
             );
         }
 
-        return $this->formatTopPagesNamespace($pages);
+        if ($format) {
+            return $this->formatTopPagesNamespace($pages);
+        } else {
+            return $pages;
+        }
     }
 
     /**
      * Get the top edits to the given page.
+     * @param bool $format Whether to format the results, including stats for
+     *     number of reverts, etc. This is set to false for the API endpoint.
      * @return Edit[]
      */
-    private function getTopEditsPage()
+    private function getTopEditsPage($format = true)
     {
         $revs = $this->getRepository()->getTopEditsPage(
             $this->page,
             $this->user
         );
 
-        return $this->formatTopEditsPage($revs);
+        if ($format) {
+            return $this->formatTopEditsPage($revs);
+        } else {
+            return $revs;
+        }
     }
 
     /**
@@ -238,7 +261,7 @@ class TopEdits extends Model
             // Check if the edit was reverted based on the edit summary of the following edit.
             // If so, update $revision so that when an Edit is instantiated, it will
             // have the 'reverted' option set.
-            if ($aeh->isRevert($revision['parent_comment'], $this->project->getDomain())) {
+            if ($aeh->isRevert($revision['parent_comment'], $this->project)) {
                 $revision['reverted'] = 1;
             }
 

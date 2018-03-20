@@ -1,10 +1,11 @@
 {
 	"@metadata": {
 		"authors": [
-			"V.narsikar"
+			"V.narsikar",
+			"Bhatakati aatma",
+			"Susheelkasab"
 		]
 	},
-	"about-xtools": "या साधनांबद्दल",
 	"accepted-formats": "स्वीकारीत प्रारूपे",
 	"account-age": "खात्याचे वय",
 	"account-age-desc": "$2 {{PLURAL:$1|दिवस}} जूने",
@@ -66,14 +67,14 @@
 	"data-limit": "डाटा मागील $2 {{PLURAL:$1|संपादनापुरता|संपादनांपुरता}}च मर्यादित",
 	"date": "दिनांक",
 	"date-from": "पासून:$1",
-	"date-to": "प्रति:$1",
 	"date-range": "$1 - $2",
 	"date-range-outside-revisions": "दिलेल्या दिनांकांदरम्यानच्या काहीच आवृत्त्या सापडल्या नाहीत",
+	"date-to": "प्रति:$1",
 	"delete": "वगळा",
 	"deleted": "वगळले",
 	"deleted-edits": "वगळलेली संपादने",
 	"deleted-pages": "वगळलेली पाने",
-	"delpagesfilter-both": "सजीव व वगळलेल्या पानांचा अंतर्भाव करा",
+	"delpagesfilter-all": "सजीव व वगळलेल्या पानांचा अंतर्भाव करा",
 	"delpagesfilter-deleted": "फ्क्त वगळलेली पानेच अंतर्भूत करा",
 	"delpagesfilter-live": "वगळलेली पाने वर्जित करा",
 	"diff": "फरक",
@@ -94,7 +95,7 @@
 	"edits-last-week": "मागील ७ दिवसांतील संपादने",
 	"edits-last-year": "मागील ३६५ दिवसांतील संपादने",
 	"edits-with-summaries": "सारांशासहित संपादने",
-	"end": "समाप्ती दिनांक",
+	"end": "समाप्ति दिनांक",
 	"error-articlinfo-api": "आवृत्ती डाटा पुरवू शकलो नाही.",
 	"error-report": "कृपया $1 वर या त्रुटीचा अहवाल देण्यास मनमोकळे असा (विकिमीडिया खाते आवश्यक)",
 	"error-server-message": "विदागार म्हणाले:$1",
@@ -124,7 +125,6 @@
 	"image-attribution-text-1": "XTools च्या प्रतीकचिन्हाचे (लोगो) श्रेय $1चे आहे",
 	"import": "आयात करा",
 	"importance": "महत्त्व",
-	"interrupted": "माफ करा, पण स्रोतांचे जतन करण्यास, सांगकाम्याने या पृच्छेचे हनन केले आहे कारण ती $1 सेकंदांपेक्षा जास्त कालावधीची आहे.",
 	"invalid-date": "अवैध दिनांक",
 	"invalid-project": "$1 हा वैध प्रकल्प नाही",
 	"invalid-project-cant-use": "$1 या साधनाचा वापर करण्यास रचित नाही",
@@ -218,7 +218,6 @@
 	"rights": "अधिकार",
 	"rpp": "पान संरक्षणाच्या विनंत्या",
 	"sections": "विभाग",
-	"see-full-edit-counts": "संपादन गणकात पूर्ण किंमत बघा",
 	"show": "दाखवा",
 	"size-over-time": "काळानुसार आकार",
 	"small-edits": "छोटी संपादने (<२० बाइट्स)",
@@ -233,6 +232,7 @@
 	"tool-adminstats": "प्रबंधक सांख्यिकी",
 	"tool-articleinfo": "पानाचा इतिहास",
 	"tool-autoedits": "स्वयंचलित संपादने",
+	"tool-autoedits-desc": "अर्धेस्वयंचलित व अस्व्यंचलित योगदानाचे विश्लेषण",
 	"tool-ec": "संपादन गणक",
 	"tool-ec-desc": "सदस्य योगदानांचे पृथक्करण",
 	"tool-error": "त्रुटी",

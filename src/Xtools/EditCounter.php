@@ -5,10 +5,11 @@
 
 namespace Xtools;
 
+use AppBundle\Helper\I18nHelper;
+use DateInterval;
+use DatePeriod;
 use DateTime;
 use Exception;
-use DatePeriod;
-use DateInterval;
 use GuzzleHttp;
 use GuzzleHttp\Promise\Promise;
 use Xtools\Edit;
@@ -24,6 +25,9 @@ class EditCounter extends Model
 
     /** @var User The user. */
     protected $user;
+
+    /** @var I18nHelper For i18n and l10n. */
+    protected $i18n;
 
     /** @var int[] Revision and page counts etc. */
     protected $pairData;
@@ -46,20 +50,26 @@ class EditCounter extends Model
     /** @var string[] Rights changes, keyed by timestamp then 'added' and 'removed'. */
     protected $rightsChanges;
 
+    /** @var string[] Global rights changes, keyed by timestamp then 'added' and 'removed'. */
+    protected $globalRightsChanges;
+
     /** @var int[] Keys are project DB names. */
     protected $globalEditCounts;
 
     /** @var array Block data, with keys 'set' and 'received'. */
     protected $blocks;
 
-    /** @var integer[] Array keys are namespace IDs, values are the edit counts */
+    /** @var integer[] Array keys are namespace IDs, values are the edit counts. */
     protected $namespaceTotals;
 
-    /** @var int Number of semi-automated edits */
+    /** @var int Number of semi-automated edits. */
     protected $autoEditCount;
 
-    /** @var string[] Data needed for time card chart */
+    /** @var string[] Data needed for time card chart. */
     protected $timeCardData;
+
+    /** @var array Most recent revisions across all projects. */
+    protected $globalEdits;
 
     /**
      * Revision size data, with keys 'average_size', 'large_edits' and 'small_edits'.
@@ -83,6 +93,15 @@ class EditCounter extends Model
     {
         $this->project = $project;
         $this->user = $user;
+    }
+
+    /**
+     * Make the I18nHelper accessible to EditCounter.
+     * @param I18nHelper $i18n
+     */
+    public function setI18nHelper(I18nHelper $i18n)
+    {
+        $this->i18n = $i18n;
     }
 
     /**
@@ -215,9 +234,42 @@ class EditCounter extends Model
             return $this->rightsChanges;
         }
 
-        $this->rightsChanges = [];
         $logData = $this->getRepository()
             ->getRightsChanges($this->project, $this->user);
+
+        $this->rightsChanges = $this->processRightsChanges($logData);
+
+        return $this->rightsChanges;
+    }
+
+    /**
+     * Get global user rights changes of the given user.
+     * @param Project $project
+     * @param User $user
+     * @return string[] Keyed by timestamp then 'added' and 'removed'.
+     */
+    public function getGlobalRightsChanges()
+    {
+        if (isset($this->globalRightsChanges)) {
+            return $this->globalRightsChanges;
+        }
+
+        $logData = $this->getRepository()
+            ->getGlobalRightsChanges($this->project, $this->user);
+
+        $this->globalRightsChanges = $this->processRightsChanges($logData);
+
+        return $this->globalRightsChanges;
+    }
+
+    /**
+     * Process the given rights changes, sorting an putting in a human-readable format.
+     * @param  array $logData As fetched with EditCounterRepository::getRightsChanges.
+     * @return array
+     */
+    private function processRightsChanges($logData)
+    {
+        $rightsChanges = [];
 
         foreach ($logData as $row) {
             $unserialized = @unserialize($row['log_params']);
@@ -227,40 +279,58 @@ class EditCounter extends Model
                 $added = array_diff($new, $old);
                 $removed = array_diff($old, $new);
 
-                $this->setAutoRemovals($row, $unserialized, $added);
+                $rightsChanges = $this->setAutoRemovals($rightsChanges, $row, $unserialized, $added);
             } else {
                 // This is the old school format the most likely contains
                 // the list of rights additions in as a comma-separated list.
-                list($old, $new) = explode("\n", $row['log_params']);
-                $old = array_filter(array_map('trim', explode(',', $old)));
-                $new = array_filter(array_map('trim', explode(',', $new)));
-                $added = array_diff($new, $old);
-                $removed = array_diff($old, $new);
+                try {
+                    list($old, $new) = explode("\n", $row['log_params']);
+                    $old = array_filter(array_map('trim', explode(',', $old)));
+                    $new = array_filter(array_map('trim', explode(',', $new)));
+                    $added = array_diff($new, $old);
+                    $removed = array_diff($old, $new);
+                } catch (Exception $e) {
+                    // Really really old school format that may be missing metadata
+                    // altogether. Here we'll just leave $added and $removed blank.
+                    $added = [];
+                    $removed = [];
+                }
             }
 
-            $this->rightsChanges[$row['log_timestamp']] = [
+            // Remove '(none)'.
+            if (in_array('(none)', $added)) {
+                array_splice($added, array_search('(none)', $added), 1);
+            }
+            if (in_array('(none)', $removed)) {
+                array_splice($removed, array_search('(none)', $removed), 1);
+            }
+
+            $rightsChanges[$row['log_timestamp']] = [
                 'logId' => $row['log_id'],
                 'admin' => $row['log_user_text'],
-                'comment' => Edit::wikifyString($row['log_comment'], $this->project),
+                'comment' => $row['log_comment'],
                 'added' => array_values($added),
                 'removed' => array_values($removed),
-                'automatic' => $row['log_action'] === 'autopromote'
+                'automatic' => $row['log_action'] === 'autopromote',
+                'type' => $row['type'],
             ];
         }
 
-        krsort($this->rightsChanges);
+        krsort($rightsChanges);
 
-        return $this->rightsChanges;
+        return $rightsChanges;
     }
 
     /**
      * Check the given log entry for rights changes that are set to automatically expire,
-     * and add entries to $this->rightsChanges accordingly.
+     * and add entries to $rightsChanges accordingly.
+     * @param array $rightsChanges
      * @param array $row Log entry row from database.
      * @param array $params Unserialized log params.
      * @param string[] $added List of added user rights.
+     * @return array Modified $rightsChanges.
      */
-    private function setAutoRemovals($row, $params, $added)
+    private function setAutoRemovals($rightsChanges, $row, $params, $added)
     {
         foreach ($added as $index => $entry) {
             if (!isset($params['newmetadata'][$index]) ||
@@ -272,19 +342,22 @@ class EditCounter extends Model
 
             $expiry = $params['newmetadata'][$index]['expiry'];
 
-            if (isset($this->rightsChanges[$expiry])) {
-                $this->rightsChanges[$expiry]['removed'][] = $entry;
+            if (isset($rightsChanges[$expiry]) && !in_array($entry, $rightsChanges[$expiry]['removed'])) {
+                $rightsChanges[$expiry]['removed'][] = $entry;
             } else {
-                $this->rightsChanges[$expiry] = [
+                $rightsChanges[$expiry] = [
                     'logId' => $row['log_id'],
                     'admin' => $row['log_user_text'],
                     'comment' => null,
                     'added' => [],
                     'removed' => [$entry],
                     'automatic' => true,
+                    'type' => $row['type'],
                 ];
             }
         }
+
+        return $rightsChanges;
     }
 
     /**
@@ -842,8 +915,39 @@ class EditCounter extends Model
             return $this->timeCardData;
         }
         $totals = $this->getRepository()->getTimeCard($this->project, $this->user);
-        $this->timeCardData = $totals;
-        return $totals;
+
+        // Scale the radii: get the max, then scale each radius.
+        // This looks inefficient, but there's a max of 72 elements in this array.
+        $max = 0;
+        foreach ($totals as $total) {
+            $max = max($max, $total['value']);
+        }
+        foreach ($totals as &$total) {
+            $total['value'] = round($total['value'] / $max * 100);
+        }
+
+        // Fill in zeros for timeslots that have no values.
+        $sortedTotals = [];
+        $index = 0;
+        $sortedIndex = 0;
+        foreach (range(1, 7) as $day) {
+            foreach (range(0, 24, 2) as $hour) {
+                if (isset($totals[$index]) && (int)$totals[$index]['x'] === $hour) {
+                    $sortedTotals[$sortedIndex] = $totals[$index];
+                    $index++;
+                } else {
+                    $sortedTotals[$sortedIndex] = [
+                        'y' => $day,
+                        'x' => $hour,
+                        'value' => 0,
+                    ];
+                }
+                $sortedIndex++;
+            }
+        }
+
+        $this->timeCardData = $sortedTotals;
+        return $sortedTotals;
     }
 
     /**
@@ -951,12 +1055,14 @@ class EditCounter extends Model
     {
         foreach ($dateRange as $monthObj) {
             $year = (int) $monthObj->format('Y');
+            $yearLabel = $this->i18n->dateFormat($monthObj, 'yyyy');
             $month = (int) $monthObj->format('n');
+            $monthLabel = $this->i18n->dateFormat($monthObj, 'yyyy-MM');
 
             // Fill in labels
-            $out['monthLabels'][] = $monthObj->format('Y-m');
-            if (!in_array($year, $out['yearLabels'])) {
-                $out['yearLabels'][] = $year;
+            $out['monthLabels'][] = $monthLabel;
+            if (!in_array($yearLabel, $out['yearLabels'])) {
+                $out['yearLabels'][] = $yearLabel;
             }
 
             foreach (array_keys($out['totals']) as $nsId) {
@@ -1114,6 +1220,10 @@ class EditCounter extends Model
      */
     public function globalEdits($max)
     {
+        if (is_array($this->globalEdits)) {
+            return $this->globalEdits;
+        }
+
         // Collect all projects with any edits.
         $projects = [];
         foreach ($this->globalEditCounts() as $editCount) {
@@ -1122,6 +1232,10 @@ class EditCounter extends Model
                 continue;
             }
             $projects[$editCount['project']->getDatabaseName()] = $editCount['project'];
+        }
+
+        if (count($projects) === 0) {
+            return [];
         }
 
         // Get all revisions for those projects.
@@ -1143,8 +1257,9 @@ class EditCounter extends Model
 
         // Sort and prune, before adding more.
         krsort($globalEdits);
-        $globalEdits = array_slice($globalEdits, 0, $max);
-        return $globalEdits;
+        $this->globalEdits = array_slice($globalEdits, 0, $max);
+
+        return $this->globalEdits;
     }
 
     /**

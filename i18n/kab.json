@@ -5,7 +5,6 @@
 			"Sayem AtVkm"
 		]
 	},
-	"about-xtools": "Ayen yerzan ifecka-a",
 	"accepted-formats": "Imasalen yettwaqeblen",
 	"account-age": "Awtay n umidan",
 	"accounts": "Imaḍanen",
@@ -65,6 +64,7 @@
 	"edit-summary": "Ẓreg agzul",
 	"editors": "Imaẓragen",
 	"edits": "Tiẓrigin",
+	"feedback": "Tikti",
 	"invalid-project-cant-use": "$1 ur yeswil ara akken ad iseqdec afeck-agi",
 	"num-revisions-since": "$1 {{PLURAL:$2|n uceggir|n iceggiren}} seg $3",
 	"num-years": "{{PLURAL:$1|n useggas|n iseggasen}}",

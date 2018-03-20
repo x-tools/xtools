@@ -1,5 +1,113 @@
 # Release Notes #
 
+## 3.2.4 ##
+- ArticleInfo: Improve performance of ArticleInfo API endpoint.
+
+## 3.2.3 ##
+- AutoEdits: add better support for Korean wikis, kowiki specifically.
+- EditCounter: Fix display of timestamps in rights changes section.
+- Make sure i18n language fallback files are downloaded, but only if
+  they exist.
+- Localization updates.
+
+## 3.2.2 ##
+- AutoEdits: Fix automated edits query for when dealing with tags,
+  and non-automated edits query for when there are multiple tags.
+
+## 3.2.1 ##
+- Hotfix - Don't autowire I18nHelper.
+
+## 3.2.0 ##
+- T185908: Numbers and dates localization across all tools.
+- Greatly improved the RTL interface.
+- Moving all i18n logic to a I18nHelper service.
+- AutoEdits: Major refactor. Moved contribution list to a dedicated
+  subrequest page.
+- AutoEdits: introducing the new 'autoedits-contributions' tool
+  to view edits using (semi-)automated tools. This includes a
+  new API endpoint: /api/user/automated_tools/{project} that gives
+  you the full list of known (semi-)automated tools on the project.
+- AutoEdits: Cleaner API error responses.
+- Add "See full statistics" links to the top of every subrequest
+  page of a tool to navigate back to the full results.
+- ArticleInfo: make size of textshares pie chart relative to the
+  number of entries in the adjacent table.
+- Localization updates.
+
+## 3.1.45 ##
+- T188603: Include link to export to PagePile in Pages tool.
+
+## 3.1.44 ##
+- Pages: add export options for wikitext, CSV, TSV and JSON.
+- Pages: hover over 'deleted' text to reveal deletion summary.
+- T165864: Check for recreated pages in Pages tool and label them.
+
+## 3.1.43 ##
+- AutoEdits: allow defining rules per-language, and add some rules
+  for German and Arabic. This should add support for many more wikis.
+- AutoEdits: localize labels of the tools.
+- AutoEdits: add some wiki-specific rules for dewiki, dewiktionary,
+  and a few more for enwiki.
+- AutoEdits: New API endpoint to get a raw list of known tools used
+  on a given wiki.
+- AutoEdits: better description, and make pie chart relative to the
+  size of the number of tools to save real estate.
+- Log database-level errors for easier debugging in production.
+- Localization updates.
+
+## 3.1.42 ##
+- T178055: More support for screen readers.
+- Add 'Feedback' link in footer, shorten links.
+- Better AWB and Undo detection in AutoEdits.
+
+## 3.1.41 ##
+- Handle exception thrown in production when user has no edits.
+- Fix broken TopEdits API endpoint.
+- Fix broken EditSummary API endpoint.
+- Minor styling fixes.
+
+## 3.1.40 ##
+- T178055: Improved screen reader support on the Edit Counter.
+- Edit Counter rights changes now looks for local changes that
+  were made on Meta, and also includes global rights changes.
+- Auto-link raw URLs in edit summaries.
+- Show notice that data could be inaccurate when viewing
+  ArticleInfo on a very old page.
+- Localization updates.
+
+## 3.1.39 ##
+- T187100: Fix issue with routing 'redirects' parameter in the
+  Pages Created tool.
+- Localization updates.
+
+## 3.1.38 ##
+- In ArticleInfo, handle an issue with the WikiWho API where the
+  usernames are blank.
+
+## 3.1.37 ##
+- Fix setting of shorter query timeout for ArticleInfo API.
+- Handle some exceptions that are frequently thrown in production.
+
+## 3.1.36 ##
+- Major refactor of how queries are ran, adding a max query time
+  so that they automatically time out (default 10 minutes).
+- Fix some issues with parameter handling in the Pages Created tool,
+  and only show what columns are relevant based on chosen options.
+- Various other refactoring, bug fixes and improved test coverage.
+- Localization updates.
+
+## 3.1.35 ##
+- Add more wikitext export options to the Edit Counter, including
+  an option to in the form to get the entire results as wikitext.
+- Fix a bug in TopEdits where it errored out if the page has only
+  one edit by the requested user.
+- Only accept valid parameters in the Pages tool, and hide columns
+  that are irrelevant based on options (e.g. redirects when showing
+  only deleted pages).
+- Update AutoEdits regex for Arabic Wikipedia.
+- Use 429 response code when throwing rate limiting error.
+- Localization updates.
+
 ## 3.1.34 ##
 - Add wikitext and CSV download options to the Edit Counter.
 - T186111: Fix redirect in AdminScore if user is not found.

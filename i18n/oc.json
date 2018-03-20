@@ -4,7 +4,6 @@
 			"Cedric31"
 		]
 	},
-	"about-xtools": "A prepaus d'aquestas aisinas",
 	"accepted-formats": "Formats acceptats",
 	"account-age": "Atge del compte",
 	"accounts": "Comptes",
@@ -73,6 +72,7 @@
 	"executed": "Executat en $1 {{PLURAL:$2|segonda|segondas}}.",
 	"explanation": "Explicacion",
 	"export-wikitext": "Exportar lo wikitèxte",
+	"feedback": "Vejaires",
 	"file": "Fichièr",
 	"files": "Fichièrs",
 	"files-uploaded": "Fichièrs mandats",

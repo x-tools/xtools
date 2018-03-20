@@ -202,14 +202,18 @@ class MetaController extends XtoolsController
      */
     public function recordUsage(Request $request, $tool, $project, $token)
     {
-        // Validate method and token.
-        if ($request->getMethod() !== 'PUT' || !$this->isCsrfTokenValid('intention', $token)) {
-            throw $this->createAccessDeniedException('This endpoint is for internal use only.');
-        }
-
         // Ready the response object.
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
+
+        // Validate method and token.
+        if ($request->getMethod() !== 'PUT' || !$this->isCsrfTokenValid('intention', $token)) {
+            $response->setStatusCode(Response::HTTP_FORBIDDEN);
+            $response->setContent(json_encode([
+                'error' => 'This endpoint is for internal use only.'
+            ]));
+            return $response;
+        }
 
         // Don't update counts for tools that aren't enabled
         if (!$this->container->getParameter("enable.$tool")) {

@@ -49,7 +49,7 @@ class TopEditsController extends XtoolsController
 
         // Redirect if at minimum project and username are provided.
         if (isset($params['project']) && isset($params['username'])) {
-            return $this->redirectToRoute('TopEditsResults', $params);
+            return $this->redirectToRoute('TopEditsResult', $params);
         }
 
         // Convert the given project (or default project) into a Project instance.
@@ -68,8 +68,9 @@ class TopEditsController extends XtoolsController
 
     /**
      * Display the results.
-     * @Route("/topedits/{project}/{username}/{namespace}/{article}", name="TopEditsResults",
-     *     requirements={"article"=".+"})
+     * @Route("/topedits/{project}/{username}/{namespace}/{article}", name="TopEditsResult",
+     *     requirements = {"article" = ".+", "namespace" = "|all|\d+"}
+     * )
      * @param Request $request The HTTP request.
      * @param int $namespace
      * @param string $article
@@ -100,7 +101,7 @@ class TopEditsController extends XtoolsController
      * @param User $user The User.
      * @param Project $project The project.
      * @param integer|string $namespace The namespace ID or 'all'
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      * @codeCoverageIgnore
      */
     public function namespaceTopEdits(Request $request, User $user, Project $project, $namespace)
@@ -139,7 +140,7 @@ class TopEditsController extends XtoolsController
 
         $topEdits->prepareData();
 
-        return $this->render('topedits/result_namespace.html.twig', [
+        $ret = [
             'xtPage' => 'topedits',
             'xtTitle' => $user->getUsername(),
             'project' => $project,
@@ -147,7 +148,10 @@ class TopEditsController extends XtoolsController
             'namespace' => $namespace,
             'te' => $topEdits,
             'is_sub_request' => $isSubRequest,
-        ]);
+        ];
+
+        // Output the relevant format template.
+        return $this->getFormattedReponse($request, 'topedits/result_namespace', $ret);
     }
 
     /**
@@ -227,7 +231,7 @@ class TopEditsController extends XtoolsController
         }
 
         $limit = $article === '' ? 100 : 1000;
-        $topEdits = new TopEdits($project, $user, $namespace, $limit);
+        $topEdits = new TopEdits($project, $user, null, $namespace, $limit);
         $topEditsRepo = new TopEditsRepository();
         $topEditsRepo->setContainer($this->container);
         $topEdits->setRepository($topEditsRepo);
@@ -236,29 +240,28 @@ class TopEditsController extends XtoolsController
         $response->setEncodingOptions(JSON_NUMERIC_CHECK);
 
         if ($article === '') {
-            $data = $topEdits->getTopEditsNamespace();
-
-            if (is_numeric($namespace)) {
-                $data = $data[$namespace];
-            }
+            // Do format the results.
+            $topEdits->prepareData();
         } else {
             $namespaces = $project->getNamespaces();
             $fullPageName = is_numeric($namespace) ? $namespaces[$namespace].':'.$article : $article;
 
             $page = $this->getAndValidatePage($project, $fullPageName);
             if (is_a($page, 'Symfony\Component\HttpFoundation\RedirectResponse')) {
-                $data = [
+                $response->setData([
                     'error' => 'Page "'.$article.'" does not exist.',
-                ];
+                ]);
                 $response->setStatusCode(Response::HTTP_NOT_FOUND);
-            } else {
-                // Database sorts by timestamp ascending, and here we want it descending.
-                $data = array_reverse($page->getRevisions($user));
-                $response->setStatusCode(Response::HTTP_OK);
+                return $response;
             }
+
+            $topEdits->setPage($page);
+            $topEdits->prepareData(false);
         }
 
-        $response->setData($data);
+        $response->setData($topEdits->getTopEdits());
+        $response->setStatusCode(Response::HTTP_OK);
+
         return $response;
     }
 }

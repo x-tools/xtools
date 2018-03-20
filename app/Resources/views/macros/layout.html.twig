@@ -48,7 +48,7 @@
             {{ wiki.userLink(user, project) }}
             <small>
                 &bull;
-                {{ project.title }}
+                {{ project.domain }}
             </small>
         </div>
     </header>
@@ -59,11 +59,11 @@
         <button class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
-        {{ msgPrintExists(text, textParams) }}
+        {{ msgIfExists(text, textParams) }}
     </p>
 {% endmacro %}
 
-{% macro downloadLink(path, params, types = ['wikitext', 'csv', 'json', 'png']) %}
+{% macro downloadLink(path, params, types = ['wikitext', 'csv', 'json', 'png'], customOptions) %}
     <div class="btn-group download-dropdown dropdown">
         <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="glyphicon glyphicon-download-alt"></span>
@@ -73,9 +73,12 @@
         <ul class="dropdown-menu dropdown-menu-right">
             {% for type in types %}
                 <li>
-                    <a target="_blank" class="download-link download-{{ type|lower }}" href="{{ path(path, params|merge({format: type})) }}">{{ msg(type) }}</a>
+                    <a target="_blank" class="download-link download-{{ type|lower }}" href="{{ path(path, params|merge({format: type})) }}">{{ msgIfExists(type) }}</a>
                 </li>
             {% endfor %}
+            {% if customOptions is defined %}
+                {{ customOptions }}
+            {% endif %}
         </ul>
     </div>
 {% endmacro %}

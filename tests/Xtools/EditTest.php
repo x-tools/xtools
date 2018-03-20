@@ -94,10 +94,17 @@ class EditTest extends WebTestCase
         $edit = new Edit($this->page, array_merge($this->editAttrs, [
             'comment' => '<script>alert("XSS baby")</script> [[test page]]',
         ]));
-
         $this->assertEquals(
             "&lt;script&gt;alert(\"XSS baby\")&lt;/script&gt; " .
                 "<a target='_blank' href='https://test.example.org/wiki/Test_page'>test page</a>",
+            $edit->getWikifiedSummary()
+        );
+
+        $edit = new Edit($this->page, array_merge($this->editAttrs, [
+            'comment' => 'https://google.com',
+        ]));
+        $this->assertEquals(
+            '<a target="_blank" href="https://google.com">https://google.com</a>',
             $edit->getWikifiedSummary()
         );
     }

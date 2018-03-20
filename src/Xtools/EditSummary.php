@@ -5,10 +5,8 @@
 
 namespace Xtools;
 
-use Symfony\Component\DependencyInjection\Container;
+use AppBundle\Helper\I18nHelper;
 use DateTime;
-use DateInterval;
-use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * An EditSummary provides statistics about a user's edit summary
@@ -16,14 +14,14 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class EditSummary extends Model
 {
-    /** @var Container The application's DI container. */
-    protected $container;
-
     /** @var Project The project. */
     protected $project;
 
     /** @var User The user. */
     protected $user;
+
+    /** @var I18nHelper For i18n and l10n. */
+    protected $i18n;
 
     /** @var string|int The namespace to target. */
     protected $namespace;
@@ -60,24 +58,23 @@ class EditSummary extends Model
      * @param User $user The user to process.
      * @param string $namespace Namespace ID or 'all' for all namespaces.
      * @param int $numEditsRecent Number of edits from present to consider as 'recent'.
-     * @param Container $container The DI container.
      */
-    public function __construct(
-        Project $project,
-        User $user,
-        $namespace,
-        $numEditsRecent,
-        Container $container
-    ) {
+    public function __construct(Project $project, User $user, $namespace, $numEditsRecent = 150)
+    {
         $this->project = $project;
         $this->user = $user;
         $this->namespace = $namespace;
         $this->numEditsRecent = $numEditsRecent;
-        $this->container = $container;
-        $this->conn = $this->container
-            ->get('doctrine')
-            ->getManager('replicas')
-            ->getConnection();
+    }
+
+    /**
+     * Make the I18nHelper accessible to EditSummary.
+     * @param I18nHelper $i18n
+     * @codeCoverageIgnore
+     */
+    public function setI18nHelper(I18nHelper $i18n)
+    {
+        $this->i18n = $i18n;
     }
 
     /**
@@ -196,37 +193,34 @@ class EditSummary extends Model
      */
     public function prepareData()
     {
-        // First try the cache. The 'data' property will be set
-        // if it was successfully loaded.
-        if ($this->loadFromCache()) {
-            return;
+        // Do our database work in the Repository, passing in reference
+        // to $this->processRow so we can do post-processing here.
+        $ret = $this->getRepository()->prepareData(
+            $this->project,
+            $this->user,
+            $this->namespace,
+            [$this, 'processRow']
+        );
+
+        // We want to keep all the default zero values if there are no contributions.
+        if (count($ret) > 0) {
+            $this->data = $ret;
         }
 
-        $resultQuery = $this->getSqlStatement();
-
-        while ($row = $resultQuery->fetch()) {
-            $this->processRow($row);
-        }
-
-        $cache = $this->container->get('cache.app');
-
-        // Cache for 10 minutes.
-        $cacheItem = $cache->getItem($this->getCacheKey())
-            ->set($this->data)
-            ->expiresAfter(new DateInterval('PT10M'));
-        $cache->save($cacheItem);
+        return $ret;
     }
 
     /**
      * Process a single row from the database, updating class properties with counts.
      * @param string[] $row As retrieved from the revision table.
+     * @todo Somehow allow this to be private and still be accessible in the Repository.
      */
-    private function processRow($row)
+    public function processRow($row)
     {
         // Extract the date out of the date field
         $timestamp = DateTime::createFromFormat('YmdHis', $row['rev_timestamp']);
 
-        $monthKey = date_format($timestamp, 'Y-m');
+        $monthKey = $this->i18n->dateFormat($timestamp, 'yyyy-MM');
 
         // Grand total for number of edits
         $this->data['total_edits']++;
@@ -247,38 +241,8 @@ class EditSummary extends Model
         } else {
             $this->updateMajorMinorCounts($row, 'major');
         }
-    }
 
-    /**
-     * Attempt to load data from cache, and set the 'data' class property.
-     * @return bool Whether data was successfully pulled from the cache.
-     * @codeCoverageIgnore
-     */
-    private function loadFromCache()
-    {
-        $cacheKey = $this->getCacheKey();
-
-        $cache = $this->container->get('cache.app');
-
-        if ($cache->hasItem($cacheKey)) {
-            $this->data = $cache->getItem($cacheKey)->get();
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Build cache key using helper in Repository.
-     * @return string
-     * @codeCoverageIgnore
-     */
-    private function getCacheKey()
-    {
-        return $this->project->getRepository()->getCacheKey(
-            [$this->project, $this->user, $this->namespace, $this->numEditsRecent],
-            'edit_summary_usage'
-        );
+        return $this->data;
     }
 
     /**
@@ -344,37 +308,5 @@ class EditSummary extends Model
         } else {
             $this->data['month_counts'][$monthKey][$type] = 1;
         }
-    }
-
-    /**
-     * Build and execute SQL to get edit summary usage.
-     * @return Doctrine\DBAL\Statement
-     * @codeCoverageIgnore
-     */
-    private function getSqlStatement()
-    {
-        $revisionTable = $this->project->getTableName('revision');
-        $pageTable = $this->project->getTableName('page');
-
-        $condNamespace = $this->namespace === 'all' ? '' : 'AND page_namespace = :namespace';
-        $pageJoin = $this->namespace === 'all' ? '' : "JOIN $pageTable ON rev_page = page_id";
-        $username = $this->user->getUsername();
-
-        $sql = "SELECT rev_comment, rev_timestamp, rev_minor_edit
-                FROM  $revisionTable
-    ​            $pageJoin
-                WHERE rev_user_text = :username
-                $condNamespace
-                ORDER BY rev_timestamp DESC";
-
-        $resultQuery = $this->conn->prepare($sql);
-        $resultQuery->bindParam('username', $username);
-
-        if ($this->namespace !== 'all') {
-            $resultQuery->bindParam('namespace', $this->namespace);
-        }
-
-        $resultQuery->execute();
-        return $resultQuery;
     }
 }

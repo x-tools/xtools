@@ -1,11 +1,12 @@
-{### FIXME: don't show if they haven't opted in ###}
-
 {% import 'macros/wiki.html.twig' as wiki %}
+{% if not(project.userHasOptedIn(user)) %}
+    {{ msg('not-opted-in', [ wiki.pageLink(opted_in_page) ]) }}
+{% else %}
 {% if not is_sub_request %}
 == [[User:{{ user.username }}]] ==
 
 {% set link %}[{{ url('EditCounterMonthCounts', {'username': user.username, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
-{{ msg('xtools-advert', [link, date()|date('Y-m-d H:i')]) }}
+{{ msg('xtools-advert', [link, date()|date_format]) }}
 {% endif %}
 
 === {{ msg('month-counts') }} ===
@@ -14,9 +15,12 @@
 ! {{ msg('month') }}
 ! {{ msg('count') }}
 |-
+{% set labels = ec.monthCounts.monthLabels %}
 {% for month,total in ec.monthTotals %}
-| {{ month }}
-| {{ total }}
+| {{ labels[loop.index0] }}
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ total }}}}
 |-
 {% endfor %}
 |}
+
+{% endif %}

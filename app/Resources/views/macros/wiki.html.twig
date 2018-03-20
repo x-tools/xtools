@@ -38,7 +38,7 @@
     {{ extLink(url, msg('history'), label) }}
 {% endspaceless %}{% endmacro %}
 
-{% macro pageHistLinkRaw(pageTitle, project, label = null, offset = null, limit = null) %}{% spaceless %}
+{% macro pageHistLinkRaw(pageTitle, project, label = null, offset = null, limit = null, rawUrl = false) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {% from _self import pageUrlRaw as pageUrlRaw %}
     {% set pageUrl = pageUrlRaw(pageTitle, project) %}
@@ -49,13 +49,22 @@
     {% if limit is not empty %}
         {% set url = url ~ '&limit=' ~ limit %}
     {% endif %}
-    {{ extLink(url, msg('history'), label) }}
+    {% if rawUrl %}
+        {{ url }}
+    {% else %}
+        {{ extLink(url, msg('history'), label) }}
+    {% endif %}
 {% endspaceless %}{% endmacro %}
 
-{% macro pageInfoLink(page, label = null) %}{% spaceless %}
+{% macro pageHistUrlRaw(pageTitle, project, offset = null, limit = null) %}{% spaceless %}
+    {% from _self import pageHistLinkRaw as pageHistLinkRaw %}
+    {{ pageHistLinkRaw(pageTitle, project, null, offset, limit, true) }}
+{% endspaceless %}{% endmacro %}
+
+{% macro pageInfoLink(page, label = null, section = null) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {% set projectUrl = page.project.url|trim('/') %}
-    {% set url = projectUrl ~ page.project.script ~ '?action=info&title=' ~ page.title %}
+    {% set url = projectUrl ~ page.project.script ~ '?action=info&title=' ~ page.title ~ (section is not empty ? '#' ~ section : '') %}
     {{ extLink(url, msg('log'), label) }}
 {% endspaceless %}{% endmacro %}
 
@@ -140,21 +149,30 @@
     {{ extLink(url, msg('log'), label) }}
 {% endspaceless %}{% endmacro %}
 
-{% macro pageLogLinkRaw(pageTitle, project, label = null, type = null) %}{% spaceless %}
+{% macro pageLogLinkRaw(pageTitle, project, label = null, type = null, rawUrl = false) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {% set articlePath = project.articlePath|replace({'$1': ('Special:Log'|replace({' ': '_'}))}) %}
     {% set url = (project.url|trim('/')) ~ articlePath ~ '?page=' ~ pageTitle|replace({' ': '_'})|e('url') %}
     {% if type is not empty %}
         {% set url = url ~ '&type=' ~ type %}
     {% endif %}
-    {{ extLink(url, msg('log'), label) }}
+    {% if rawUrl %}
+        {{ url }}
+    {% else %}
+        {{ extLink(url, msg('log'), label) }}
+    {% endif %}
+{% endspaceless %}{% endmacro %}
+
+{% macro pageLogUrlRaw(pageTitle, project, type = null) %}{% spaceless %}
+    {% from _self import pageLogLinkRaw as pageLogLinkRaw %}
+    {{ pageLogLinkRaw(pageTitle, project, null, type, true) }}
 {% endspaceless %}{% endmacro %}
 
 {# `label` may be a DateTime object, in which case the formatted timestamp will be shown #}
 {% macro diffLink(edit, label = null) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {% if label.timestamp is defined %}
-        {% set label = label|date('Y-m-d, H:i') %}
+        {% set label = label|date_format %}
     {% endif %}
     {{ extLink(edit.diffUrl, msg('diff'), label) }}
 {% endspaceless %}{% endmacro %}
@@ -164,7 +182,7 @@
     {% from _self import pageUrlRaw as pageUrlRaw %}
     {% set pageUrl = pageUrlRaw('Special:Diff', project) %}
     {% if label.timestamp is defined %}
-        {% set label = label|date('Y-m-d, H:i') %}
+        {% set label = label|date_format %}
     {% elseif label is null %}
         {% set label = msg('diff') %}
     {% endif %}
@@ -173,7 +191,7 @@
 
 {% macro permaLink(edit, label = null) %}{% spaceless %}
     {% from _self import extLink as extLink %}
-    {{ extLink(edit.permaUrl, edit.timestamp|date('Y-m-d, H:i'), label) }}
+    {{ extLink(edit.permaUrl, edit.timestamp|date_format, label) }}
 {% endspaceless %}{% endmacro %}
 
 {% macro permaLinkRaw(revId, project, label = null) %}{% spaceless %}
@@ -181,7 +199,7 @@
     {% set articlePath = project.articlePath|replace({'$1': ('Special:PermaLink'|replace({' ': '_'}))}) %}
     {% set url = (project.url|trim('/')) ~ articlePath ~ '/' ~ revId %}
     {% if label.setDate is defined %}
-        {% set label = label|date('Y-m-d, H:i') %}
+        {% set label = label|date_format %}
     {% endif %}
     {{ extLink(url, label) }}
 {% endspaceless %}{% endmacro %}
@@ -232,30 +250,47 @@
     )}})
 {% endspaceless %}{% endmacro %}
 
-{% macro userLinks(user, project, tool) %}{% spaceless %}
+{% macro userLinks(user, project, tool = '') %}{% spaceless %}
     {% import _self as wiki %}
     <p class="text-center xt-heading-subtitle">
         {% if tool == 'ec' %}
             {{ wiki.userLogLink(user, project) }}
         {% else %}
-            {{ wiki.blockLogLink(user.username, project) }}
             {% if enabled('ec') %}
-                &middot;
                 <a href="{{ path('EditCounterResult', {'project':project.domain, 'username':user.username}) }}">{{ msg('tool-ec') }}</a>
+                &middot;
             {% endif %}
+            {{ wiki.blockLogLink(user.username, project) }}
+        {% endif %}
+        {% if not(isSingleWiki()) %}
+            &middot;
+            {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, msg('sul-info')) }}
         {% endif %}
         &middot;
         {% if isWMFLabs() %}
             {{ wiki.gucLink(user.username) }}
             &middot;
         {% endif %}
-        {% if not(isSingleWiki()) %}
-            {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, msg('sul-info')) }}
-            &middot;
-        {% endif %}
         {% if isWMFLabs() %}
             {% set url = 'https://tools.wmflabs.org/pageviews/?project=' ~ project.domain ~ '&pages=User:' ~ user.username %}
             {{ wiki.extLink(url, msg('pageviews-userpage')) }}
+        {% endif %}
+    </p>
+{% endspaceless %}{% endmacro %}
+
+{% macro pageLinks(page, pageviewsDateParams = {}) %}{% spaceless %}
+    {% import _self as wiki %}
+    <p class="text-center xt-heading-subtitle">
+        {{ wiki.pageHistLink(page) }}
+        &middot;
+        {{ wiki.pageLogLink(page) }}
+        {% if isWMFLabs() %}
+            &middot;
+            {{ wiki.pageviewsLinks(page, pageviewsDateParams) }}
+            {% if page.wikidataId is defined %}
+                &middot;
+                {{ wiki.extLink('https://tools.wmflabs.org/reasonator/?q=' ~ page.wikidataId, 'Resonator (Wikidata)') }}
+            {% endif %}
         {% endif %}
     </p>
 {% endspaceless %}{% endmacro %}

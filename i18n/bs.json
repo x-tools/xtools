@@ -5,7 +5,6 @@
 			"Nemo bis"
 		]
 	},
-	"about-xtools": "O alatima",
 	"accepted-formats": "Prihvaćeni formati",
 	"account-age": "Starost računa",
 	"accounts": "Računi",
@@ -66,6 +65,7 @@
 	"executed": "Izvršeno za $1 {{PLURAL:$2|sekundu|sekunde|sekundi}}.",
 	"explanation": "Objašnjenje",
 	"export-wikitext": "Izvezi wikitekst",
+	"feedback": "Povratne informacije",
 	"file": "Datoteka",
 	"files": "Datoteke",
 	"files-uploaded": "Postavljeno datoteka",
@@ -159,7 +159,6 @@
 	"re-blocks": "(Ponovne) blokade",
 	"report-issue": "Prijavi problem",
 	"saturday": "Subota",
-	"see-full-edit-counts": "Potpune vrijednosti u Brojaču izmjena",
 	"see-full-page-stats": "Potpuna statistika stranice",
 	"size": "Veličina",
 	"small-edits": "Sitne izmjene (<20 bajtova)",

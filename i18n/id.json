@@ -4,7 +4,6 @@
 			"Hidayatsrf"
 		]
 	},
-	"about-xtools": "Tentang peralatan ini",
 	"accepted-formats": "Format yang diterima",
 	"account-age": "Usia akun",
 	"account-age-desc": "$2 {{PLURAL:$1|hari|hari}}",
@@ -147,7 +146,7 @@
 	"no-revisions": "Revisi tidak ditemukan",
 	"no-summary": "Tanpa ringkasan",
 	"non-admins-with-actions": "Tidak ada pengurus tanpa tindakan pengurus",
-	"non-auto-edits": "Tidak ada suntingan semi-otomatis",
+	"non-auto-contribs": "Tidak ada suntingan semi-otomatis",
 	"notice": "Peringatan",
 	"num-blocks": "{{PLURAL:$1|Blok|Blok}}",
 	"num-bytes": "{{PLURAL:$1|bita|bita}})",

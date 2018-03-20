@@ -5,9 +5,10 @@
 
 namespace Xtools;
 
+use AppBundle\Helper\I18nHelper;
+use DateTime;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DomCrawler\Crawler;
-use DateTime;
 
 /**
  * An ArticleInfo provides statistics about a page on a project. This model does not
@@ -30,6 +31,9 @@ class ArticleInfo extends Model
 
     /** @var Page The page. */
     protected $page;
+
+    /** @var I18nHelper For i18n and l10n. */
+    protected $i18n;
 
     /** @var false|int From what date to obtain records. */
     protected $startDate;
@@ -70,6 +74,12 @@ class ArticleInfo extends Model
 
     /** @var mixed[] Various counts about each individual year and month of the page's history. */
     protected $yearMonthCounts;
+
+    /** @var string[] Localized labels for the years, to be used in the 'Year counts' chart. */
+    protected $yearLabels = [];
+
+    /** @var string[] Localized labels for the months, to be used in the 'Month counts' chart. */
+    protected $monthLabels = [];
 
     /** @var Edit The first edit to the page. */
     protected $firstEdit;
@@ -151,6 +161,16 @@ class ArticleInfo extends Model
         $this->container = $container;
         $this->startDate = $start;
         $this->endDate = $end;
+    }
+
+    /**
+     * Make the I18nHelper accessible to ArticleInfo.
+     * @param I18nHelper $i18n
+     * @codeCoverageIgnore
+     */
+    public function setI18nHelper(I18nHelper $i18n)
+    {
+        $this->i18n = $i18n;
     }
 
     /**
@@ -594,6 +614,24 @@ class ArticleInfo extends Model
     }
 
     /**
+     * Get the localized labels for the 'Year counts' chart.
+     * @return string[]
+     */
+    public function getYearLabels()
+    {
+        return $this->yearLabels;
+    }
+
+    /**
+     * Get the localized labels for the 'Month counts' chart.
+     * @return string[]
+     */
+    public function getMonthLabels()
+    {
+        return $this->monthLabels;
+    }
+
+    /**
      * Get the maximum number of edits that were created across all months. This is used as a
      * comparison for the bar charts in the months section.
      * @return int
@@ -849,7 +887,6 @@ class ArticleInfo extends Model
         // @TODO: Test this against an edit war (use your sandbox).
         // Also remove as max added or deleted, if applicable.
         if ($this->maxAddition && $prevEdits['prev']->getId() === $this->maxAddition->getId()) {
-            // $this->editors[$prevEdits->getUser()->getUsername()]['sizes'] = $edit->getLength() / 1024;
             $this->maxAddition = $prevEdits['maxAddition'];
             $prevEdits['maxAddition'] = $prevEdits['prev']; // In the event of edit wars.
         } elseif ($this->maxDeletion && $prevEdits['prev']->getId() === $this->maxDeletion->getId()) {
@@ -978,6 +1015,7 @@ class ArticleInfo extends Model
      */
     private function addYearMonthCountEntry(Edit $edit)
     {
+        $this->yearLabels[] = $this->i18n->dateFormat($edit->getTimestamp(), 'yyyy');
         $editYear = $edit->getYear();
 
         // Beginning of the month at 00:00:00.
@@ -1001,6 +1039,7 @@ class ArticleInfo extends Model
                 continue;
             }
 
+            $this->monthLabels[] = $this->i18n->dateFormat($timeObj, 'yyyy-MM');
             $this->yearMonthCounts[$editYear]['months'][sprintf('%02d', $i)] = [
                 'all' => 0,
                 'minor' => 0,
@@ -1054,7 +1093,6 @@ class ArticleInfo extends Model
                 'last' => null,
                 'atbe' => null,
                 'added' => 0,
-                'sizes' => [],
             ];
         }
 
@@ -1062,9 +1100,6 @@ class ArticleInfo extends Model
         $this->editors[$username]['all']++;
         $this->editors[$username]['last'] = $edit->getTimestamp();
         $this->editors[$username]['lastId'] = $edit->getId();
-
-        // Store number of KB added with this edit
-        $this->editors[$username]['sizes'][] = $edit->getLength() / 1024;
 
         // Increment minor counts for this user
         if ($edit->isMinor()) {
@@ -1243,13 +1278,6 @@ class ArticleInfo extends Model
 
                 // Average time between edits (in days).
                 $this->editors[$editor]['atbe'] = $days / $info['all'];
-            }
-
-            if (count($info['sizes'])) {
-                // Average Total KB divided by number of stored sizes (usually the user's edit count to this page).
-                $this->editors[$editor]['size'] = array_sum($info['sizes']) / count($info['sizes']);
-            } else {
-                $this->editors[$editor]['size'] = 0;
             }
         }
 

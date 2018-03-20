@@ -5,24 +5,49 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Helper\AutomatedEditsHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Xtools\AutoEdits;
 use Xtools\AutoEditsRepository;
+use Xtools\Edit;
+use Xtools\Project;
 use Xtools\ProjectRepository;
 use Xtools\User;
 use Xtools\UserRepository;
-use Xtools\Edit;
 
 /**
  * This controller serves the AutomatedEdits tool.
  */
 class AutomatedEditsController extends XtoolsController
 {
+    /** @var AutoEdits The AutoEdits instance. */
+    protected $autoEdits;
+
+    /** @var Project The project. */
+    protected $project;
+
+    /** @var User The user. */
+    protected $user;
+
+    /** @var string The start date. */
+    protected $start;
+
+    /** @var string The end date. */
+    protected $end;
+
+    /** @var int|string The namespace ID or 'all' for all namespaces. */
+    protected $namespace;
+
+    /** @var bool Whether or not this is a subrequest. */
+    protected $isSubRequest;
+
+    /** @var array Data that is passed to the view. */
+    private $output;
 
     /**
      * Get the tool's shortname.
@@ -52,7 +77,7 @@ class AutomatedEditsController extends XtoolsController
 
         // Redirect if at minimum project and username are provided.
         if (isset($params['project']) && isset($params['username'])) {
-            return $this->redirectToRoute('autoeditsResult', $params);
+            return $this->redirectToRoute('AutoEditsResult', $params);
         }
 
         // Convert the given project (or default project) into a Project instance.
@@ -71,141 +96,228 @@ class AutomatedEditsController extends XtoolsController
     }
 
     /**
-     * Display the results.
-     * @Route(
-     *     "/autoedits/{project}/{username}/{namespace}/{start}/{end}", name="autoeditsResult",
-     *     requirements={
-     *         "start" = "|\d{4}-\d{2}-\d{2}",
-     *         "end" = "|\d{4}-\d{2}-\d{2}",
-     *         "namespace" = "|all|\d+"
-     *     }
-     * )
+     * Set defaults, and instantiate the AutoEdits model. This is called at
+     * the top of every view action.
      * @param Request $request The HTTP request.
-     * @param int|string $namespace
-     * @param null|string $start
-     * @param null|string $end
-     * @return RedirectResponse|Response
      * @codeCoverageIgnore
      */
-    public function resultAction(Request $request, $namespace = 0, $start = null, $end = null)
+    private function setupAutoEdits(Request $request)
     {
         // Will redirect back to index if the user has too high of an edit count.
         $ret = $this->validateProjectAndUser($request, 'autoedits');
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {
-            list($project, $user) = $ret;
+            list($this->project, $this->user) = $ret;
         }
+
+        $namespace = $request->get('namespace');
+        $start = $request->get('start');
+        $end = $request->get('end');
+        $offset = $request->get('offset', 0);
 
         // 'false' means the dates are optional and returned as 'false' if empty.
-        list($start, $end) = $this->getUTCFromDateParams($start, $end, false);
-
-        // We'll want to conditionally show some things in the view if there is a start date.
-        $hasStartDate = $start > 0;
+        list($this->start, $this->end) = $this->getUTCFromDateParams($start, $end, false);
 
         // Format dates as needed by User model, if the date is present.
-        if ($start !== false) {
-            $start = date('Y-m-d', $start);
+        if ($this->start !== false) {
+            $this->start = date('Y-m-d', $this->start);
         }
-        if ($end !== false) {
-            $end = date('Y-m-d', $end);
+        if ($this->end !== false) {
+            $this->end = date('Y-m-d', $this->end);
         }
 
         // Normalize default namespace.
         if ($namespace == '') {
-            $namespace = 0;
+            $this->namespace = 0;
+        } else {
+            $this->namespace = $namespace;
         }
 
-        $autoEdits = new AutoEdits($project, $user, $namespace, $start, $end);
+        // Check query param for the tool name.
+        $tool = $request->query->get('tool', null);
+
+        $this->autoEdits = new AutoEdits(
+            $this->project,
+            $this->user,
+            $this->namespace,
+            $this->start,
+            $this->end,
+            $tool,
+            $offset
+        );
         $autoEditsRepo = new AutoEditsRepository();
         $autoEditsRepo->setContainer($this->container);
-        $autoEdits->setRepository($autoEditsRepo);
+        $this->autoEdits->setRepository($autoEditsRepo);
 
-        $editCount = $user->countEdits($project, $namespace, $start, $end);
+        $this->isSubRequest = $request->get('htmlonly')
+            || $this->get('request_stack')->getParentRequest() !== null;
 
-        // Get individual counts of how many times each tool was used.
-        // This also includes a wikilink to the tool.
-        $toolCounts = $autoEdits->getAutomatedCounts();
-        $toolsTotal = array_reduce($toolCounts, function ($a, $b) {
-            return $a + $b['count'];
-        });
-
-        // Query to get combined (semi)automated using for all edits
-        //   as some automated edits overlap.
-        $autoCount = $autoEdits->countAutomatedEdits();
-
-        $ret = [
+        $this->output = [
             'xtPage' => 'autoedits',
-            'user' => $user,
-            'project' => $project,
-            'toolCounts' => $toolCounts,
-            'toolsTotal' => $toolsTotal,
-            'autoCount' => $autoCount,
-            'editCount' => $editCount,
-            'autoPct' => $editCount ? ($autoCount / $editCount) * 100 : 0,
-            'hasStartDate' => $hasStartDate,
-            'start' => $start,
-            'end' => $end,
-            'namespace' => $namespace,
+            'xtTitle' => $this->user->getUsername(),
+            'project' => $this->project,
+            'user' => $this->user,
+            'ae' => $this->autoEdits,
+            'is_sub_request' => $this->isSubRequest,
         ];
+    }
+
+    /**
+     * Display the results.
+     * @Route(
+     *     "/autoedits/{project}/{username}/{namespace}/{start}/{end}", name="AutoEditsResult",
+     *     requirements={
+     *         "namespace" = "|all|\d+",
+     *         "start" = "|\d{4}-\d{2}-\d{2}",
+     *         "end" = "|\d{4}-\d{2}-\d{2}",
+     *         "namespace" = "|all|\d+"
+     *     },
+     *     defaults={"namespace" = 0, "start" = "", "end" = ""}
+     * )
+     * @param Request $request The HTTP request.
+     * @return RedirectResponse|Response
+     * @codeCoverageIgnore
+     */
+    public function resultAction(Request $request)
+    {
+        // Will redirect back to index if the user has too high of an edit count.
+        $ret = $this->setupAutoEdits($request);
+        if ($ret instanceof RedirectResponse) {
+            return $ret;
+        }
 
         // Render the view with all variables set.
-        return $this->render('autoEdits/result.html.twig', $ret);
+        return $this->render('autoEdits/result.html.twig', $this->output);
+    }
+
+    /**
+     * Get non-automated edits for the given user.
+     * @Route(
+     *   "/nonautoedits-contributions/{project}/{username}/{namespace}/{start}/{end}/{offset}",
+     *   name="NonAutoEditsContributionsResult",
+     *   requirements={
+     *       "namespace" = "|all|\d+",
+     *       "start" = "|\d{4}-\d{2}-\d{2}",
+     *       "end" = "|\d{4}-\d{2}-\d{2}",
+     *       "offset" = "\d*"
+     *   },
+     *   defaults={"namespace" = 0, "start" = "", "end" = "", "offset" = 0}
+     * )
+     * @param Request $request The HTTP request.
+     * @return Response|RedirectResponse
+     * @codeCoverageIgnore
+     */
+    public function nonAutomatedEditsAction(Request $request)
+    {
+        // Will redirect back to index if the user has too high of an edit count.
+        $ret = $this->setupAutoEdits($request);
+        if ($ret instanceof RedirectResponse) {
+            return $ret;
+        }
+
+        return $this->render('autoEdits/nonautomated_edits.html.twig', $this->output);
+    }
+
+    /**
+     * Get automated edits for the given user using the given tool.
+     * @Route(
+     *   "/autoedits-contributions/{project}/{username}/{namespace}/{start}/{end}/{offset}",
+     *   name="AutoEditsContributionsResult",
+     *   requirements={
+     *       "namespace" = "|all|\d+",
+     *       "start" = "|\d{4}-\d{2}-\d{2}",
+     *       "end" = "|\d{4}-\d{2}-\d{2}",
+     *       "offset" = "\d*"
+     *   },
+     *   defaults={"namespace" = 0, "start" = "", "end" = "", "offset" = 0}
+     * )
+     * @param Request $request The HTTP request.
+     * @return Response|RedirectResponse
+     * @codeCoverageIgnore
+     */
+    public function automatedEditsAction(Request $request)
+    {
+        // Will redirect back to index if the user has too high of an edit count.
+        $ret = $this->setupAutoEdits($request);
+        if ($ret instanceof RedirectResponse) {
+            return $ret;
+        }
+
+        return $this->render('autoEdits/automated_edits.html.twig', $this->output);
     }
 
     /************************ API endpoints ************************/
 
     /**
+     * Get a list of the automated tools and their regex/tags/etc.
+     * @Route("/api/user/automated_tools/{project}")
+     * @param string $project The project domain or database name.
+     * @return JsonResponse
+     * @codeCoverageIgnore
+     */
+    public function automatedToolsApiAction($project)
+    {
+        $this->recordApiUsage('user/automated_tools');
+        $projectData = $this->validateProject($project);
+
+        if ($projectData instanceof RedirectResponse) {
+            return new JsonResponse(
+                [
+                    'error' => "$project is not a valid project",
+                ],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $aeh = $this->container->get('app.automated_edits_helper');
+        return new JsonResponse($aeh->getTools($projectData));
+    }
+
+    /**
      * Count the number of automated edits the given user has made.
      * @Route(
      *   "/api/user/automated_editcount/{project}/{username}/{namespace}/{start}/{end}/{tools}",
-     *   requirements={"start" = "|\d{4}-\d{2}-\d{2}", "end" = "|\d{4}-\d{2}-\d{2}"}
+     *   requirements={
+     *       "namespace" = "|all|\d+",
+     *       "start" = "|\d{4}-\d{2}-\d{2}",
+     *       "end" = "|\d{4}-\d{2}-\d{2}"
+     *   },
+     *   defaults={"namespace" = "all", "start" = "", "end" = ""}
      * )
      * @param Request $request The HTTP request.
-     * @param int|string $namespace ID of the namespace, or 'all' for all namespaces
-     * @param string $start In the format YYYY-MM-DD
-     * @param string $end In the format YYYY-MM-DD
      * @param string $tools Non-blank to show which tools were used and how many times.
      * @return Response
      * @codeCoverageIgnore
      */
-    public function automatedEditCountApiAction(
-        Request $request,
-        $namespace = 'all',
-        $start = '',
-        $end = '',
-        $tools = ''
-    ) {
+    public function automatedEditCountApiAction(Request $request, $tools = '')
+    {
         $this->recordApiUsage('user/automated_editcount');
 
-        list($project, $user) = $this->validateProjectAndUser($request);
+        $ret = $this->setupAutoEdits($request);
+        if ($ret instanceof RedirectResponse) {
+            // FIXME: Refactor JSON errors/responses, use Intuition as a service.
+            return new JsonResponse(
+                [
+                    'error' => $this->getFlashMessage(),
+                ],
+                Response::HTTP_NOT_FOUND
+            );
+        }
 
-        $res = [
-            'project' => $project->getDomain(),
-            'username' => $user->getUsername(),
-            'total_editcount' => $user->countEdits($project, $namespace, $start, $end),
-        ];
-
-        $autoEdits = new AutoEdits($project, $user, $namespace, $start, $end);
-        $autoEditsRepo = new AutoEditsRepository();
-        $autoEditsRepo->setContainer($this->container);
-        $autoEdits->setRepository($autoEditsRepo);
+        $res = $this->getJsonData();
+        $res['total_editcount'] = $this->autoEdits->getEditCount();
 
         $response = new JsonResponse();
         $response->setEncodingOptions(JSON_NUMERIC_CHECK);
 
-        if ($tools != '') {
-            $tools = $autoEdits->getAutomatedCounts();
-            $res['automated_editcount'] = 0;
-            foreach ($tools as $tool) {
-                $res['automated_editcount'] += $tool['count'];
-            }
-            $res['automated_tools'] = $tools;
-        } else {
-            $res['automated_editcount'] = $autoEdits->countAutomatedEdits();
-        }
-
+        $res['automated_editcount'] = $this->autoEdits->getAutomatedCount();
         $res['nonautomated_editcount'] = $res['total_editcount'] - $res['automated_editcount'];
+
+        if ($tools != '') {
+            $tools = $this->autoEdits->getToolCounts();
+            $res['automated_tools'] = $tools;
+        }
 
         $response->setData($res);
         return $response;
@@ -216,95 +328,127 @@ class AutomatedEditsController extends XtoolsController
      * @Route(
      *   "/api/user/nonautomated_edits/{project}/{username}/{namespace}/{start}/{end}/{offset}",
      *   requirements={
+     *       "namespace" = "|all|\d+",
      *       "start" = "|\d{4}-\d{2}-\d{2}",
      *       "end" = "|\d{4}-\d{2}-\d{2}",
      *       "offset" = "\d*"
-     *   }
+     *   },
+     *   defaults={"namespace" = 0, "start" = "", "end" = "", "offset" = 0}
      * )
      * @param Request $request The HTTP request.
-     * @param int|string $namespace ID of the namespace, or 'all' for all namespaces
-     * @param string $start In the format YYYY-MM-DD
-     * @param string $end In the format YYYY-MM-DD
-     * @param int $offset For pagination, offset results by N edits
      * @return Response
      * @codeCoverageIgnore
      */
-    public function nonAutomatedEditsApiAction(
-        Request $request,
-        $namespace = 0,
-        $start = '',
-        $end = '',
-        $offset = 0
-    ) {
+    public function nonAutomatedEditsApiAction(Request $request)
+    {
         $this->recordApiUsage('user/nonautomated_edits');
 
-        // Second parameter causes it return a Redirect to the index if the user has too many edits.
-        // We only want to do this when looking at the user's overall edits, not just to a specific article.
-        list($project, $user) = $this->validateProjectAndUser($request);
+        $ret = $this->setupAutoEdits($request);
+        if ($ret instanceof RedirectResponse) {
+            // FIXME: Refactor JSON errors/responses, use Intuition as a service.
+            return new JsonResponse(
+                [
+                    'error' => $this->getFlashMessage(),
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
 
-        // Reject if they've made too many edits.
-        if ($user->hasTooManyEdits($project)) {
-            if ($request->query->get('format') !== 'html') {
-                return new JsonResponse(
-                    [
-                        'error' => 'Unable to show any data. User has made over ' .
-                            $user->maxEdits() . ' edits.',
-                    ],
-                    Response::HTTP_FORBIDDEN
-                );
+        $ret = $this->getJsonData();
+        $ret['nonautomated_edits'] = $this->autoEdits->getNonAutomatedEdits(true);
+
+        $namespaces = $this->project->getNamespaces();
+
+        $ret['nonautomated_edits'] = array_map(function ($rev) use ($namespaces) {
+            $pageTitle = $rev['page_title'];
+            if ((int)$rev['page_namespace'] === 0) {
+                $fullPageTitle = $pageTitle;
+            } else {
+                $fullPageTitle = $namespaces[$rev['page_namespace']].":$pageTitle";
             }
 
-            $edits = [];
-        } else {
-            $autoEdits = new AutoEdits($project, $user, $namespace, $start, $end);
-            $autoEditsRepo = new AutoEditsRepository();
-            $autoEditsRepo->setContainer($this->container);
-            $autoEdits->setRepository($autoEditsRepo);
-
-            $edits = $autoEdits->getNonautomatedEdits($offset);
-        }
-
-        if ($request->query->get('format') === 'html') {
-            if ($edits) {
-                $edits = array_map(function ($attrs) use ($project, $user) {
-                    $page = $project->getRepository()
-                        ->getPage($project, $attrs['full_page_title']);
-                    $pageTitles[] = $attrs['full_page_title'];
-                    $attrs['id'] = $attrs['rev_id'];
-                    $attrs['username'] = $user->getUsername();
-                    return new Edit($page, $attrs);
-                }, $edits);
-            }
-
-            $response = $this->render('autoEdits/nonautomated_edits.html.twig', [
-                'edits' => $edits,
-                'project' => $project,
-                'maxEdits' => $user->maxEdits(),
-            ]);
-            $response->headers->set('Content-Type', 'text/html');
-            return $response;
-        }
-
-        $ret = [
-            'project' => $project->getDomain(),
-            'username' => $user->getUsername(),
-        ];
-        if ($namespace != '' && $namespace !== 'all') {
-            $ret['namespace'] = $namespace;
-        }
-        if ($start != '') {
-            $ret['start'] = $start;
-        }
-        if ($end != '') {
-            $ret['end'] = $end;
-        }
-        $ret['offset'] = $offset;
-        $ret['nonautomated_edits'] = $edits;
+            return array_merge(['full_page_title' => $fullPageTitle], $rev);
+        }, $ret['nonautomated_edits']);
 
         $response = new JsonResponse();
         $response->setEncodingOptions(JSON_NUMERIC_CHECK);
 
         $response->setData($ret);
         return $response;
+    }
+
+    /**
+     * Get (semi-)automated edits for the given user, optionally using the given tool.
+     * @Route(
+     *   "/api/user/automated_edits/{project}/{username}/{namespace}/{start}/{end}/{offset}",
+     *   requirements={
+     *       "namespace" = "|all|\d+",
+     *       "start" = "|\d{4}-\d{2}-\d{2}",
+     *       "end" = "|\d{4}-\d{2}-\d{2}",
+     *       "offset" = "\d*"
+     *   },
+     *   defaults={"namespace" = 0, "start" = "", "end" = "", "offset" = 0}
+     * )
+     * @param Request $request The HTTP request.
+     * @return Response
+     * @codeCoverageIgnore
+     */
+    public function automatedEditsApiAction(Request $request)
+    {
+        $this->recordApiUsage('user/automated_edits');
+
+        $ret = $this->setupAutoEdits($request);
+        if ($ret instanceof RedirectResponse) {
+            // FIXME: Refactor JSON errors/responses, use Intuition as a service.
+            return new JsonResponse(
+                [
+                    'error' => $this->getFlashMessage(),
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+
+        $ret = $this->getJsonData();
+        $ret['nonautomated_edits'] = $this->autoEdits->getAutomatedEdits(true);
+
+        $namespaces = $this->project->getNamespaces();
+
+        $ret['nonautomated_edits'] = array_map(function ($rev) use ($namespaces) {
+            $pageTitle = $rev['page_title'];
+            if ((int)$rev['page_namespace'] === 0) {
+                $fullPageTitle = $pageTitle;
+            } else {
+                $fullPageTitle = $namespaces[$rev['page_namespace']].":$pageTitle";
+            }
+
+            return array_merge(['full_page_title' => $fullPageTitle], $rev);
+        }, $ret['nonautomated_edits']);
+
+        $response = new JsonResponse();
+        $response->setEncodingOptions(JSON_NUMERIC_CHECK);
+
+        $response->setData($ret);
+        return $response;
+    }
+
+    /**
+     * Get data that will be used in API responses.
+     * @return array
+     * @codeCoverageIgnore
+     */
+    private function getJsonData()
+    {
+        $ret = [
+            'project' => $this->project->getDomain(),
+            'username' => $this->user->getUsername(),
+        ];
+
+        foreach (['namespace', 'start', 'end', 'offset'] as $param) {
+            if (isset($this->{$param}) && $this->{$param} != '') {
+                $ret[$param] = $this->{$param};
+            }
+        }
+
+        return $ret;
     }
 }

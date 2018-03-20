@@ -1,5 +1,6 @@
 {% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
 {% import 'macros/wiki.html.twig' as wiki %}
+{% import 'macros/layout.html.twig' as layout %}
 
 {% block body %}
 
@@ -7,9 +8,9 @@
     <div class="panel panel-primary">
         <header class="panel-heading">
             <div class="text-center xt-heading-top">
-                <a class="back-to-search" href="{{ path('ec') }}">
+                <a class="back-to-search" href="{{ path('EditCounterResult', {project: project.domain, username:user.username}) }}">
                     <span class="glyphicon glyphicon-chevron-left"></span>
-                    {{ msg('back') }}
+                    {{ msg('see-full-statistics') }}
                 </a>
                 {{ wiki.userLink(user, project) }}
                 <small> &bull; {{ project.title }} </small>
@@ -18,7 +19,12 @@
         <div class="panel-body xt-panel-body">
             <section class="panel panel-default clearfix">
                 <header class="panel-heading col-lg-12">
-                    <h4>{{ msg('timecard') }}</h4>
+                    <h4>
+                        {{ msg('timecard') }}
+                        <span class='pull-right text-muted xt-panel-description'>
+                            {{ layout.downloadLink('EditCounterTimecard', {project:project.domain, username:user.username}, ['wikitext']) }}
+                        </span>
+                    </h4>
                 </header>
                 <div class="panel-body col-lg-12">
 {% endif %}
@@ -28,6 +34,39 @@
     <p>{{ msg('not-opted-in', [ wiki.pageLink(opted_in_page) ] ) }}</p>
 </div>
 {% else %}
+
+<div class="sr-only">
+    {% set days = {
+        1: msg('sunday'),
+        2: msg('monday'),
+        3: msg('tuesday'),
+        4: msg('wednesday'),
+        5: msg('thursday'),
+        6: msg('friday'),
+        7: msg('saturday')
+    }%}
+
+    <table>
+        <thead>
+            <th></th>
+            {% for period in 0..11 %}
+                <th>
+                    <time>{{ period * 2 }}:00</time>
+                </th>
+            {% endfor %}
+        </thead>
+        <tbody>
+            {% for day in 1..7 %}
+                <tr>
+                    <th>{{ days[day] }}</th>
+                    {% for item in ec.timeCard if item.y == day and item.x != 24 %}
+                        <td>{{ item.value }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 <canvas id="timecard-bubble-chart"></canvas>
 
@@ -97,7 +136,8 @@
                         callback: function(value, index, values) {
                             return days[index];
                         }
-                    }
+                    },
+                    position: i18nRTL ? 'right' : 'left'
                 }],
                 xAxes: [{
                     ticks: {
@@ -105,6 +145,7 @@
                         min: 0,
                         max: 23,
                         stepSize: 2,
+                        reverse: i18nRTL,
                         callback: function(value, index, values) {
                             if (value % 2 === 0) {
                                 return value + ":00";

@@ -54,27 +54,27 @@
                         <tr>
                             <td>{{ msg('minor-edits') }}</td>
                             <td>
-                                {{ te.totalMinor }}
+                                {{ te.totalMinor|num_format }}
                                 ({{ te.totalMinor|percent_format(te.numTopEdits) }})
                             </td>
                         </tr>
                         <tr>
                             <td>{{ msg('auto-edits') }}</td>
                             <td>
-                                {{ te.totalAutomated }}
+                                {{ te.totalAutomated|num_format }}
                                 ({{ te.totalAutomated|percent_format(te.numTopEdits) }})
                             </td>
                         </tr>
                         <tr>
                             <td><span class="color-icon" style="background:#fcf8e3"></span>{{ msg('reverted-edits') }}<sup>1</sup></td>
                             <td>
-                                {{ te.totalReverted }}
+                                {{ te.totalReverted|num_format }}
                                 ({{ te.totalReverted|percent_format(te.numTopEdits) }})
                             </td>
                         </tr>
                         <tr>
                             <td>atbe<sup>2</sup></td>
-                            <td>{{ te.atbe|round(1) }}</td>
+                            <td>{{ te.atbe|num_format(1) }}</td>
                         </tr>
                         <tr>
                             <td class="stat-list--new-group">{{ msg('added-bytes') }}<sup>3</sup></td>

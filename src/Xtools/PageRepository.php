@@ -6,7 +6,6 @@
 namespace Xtools;
 
 use DateTime;
-use DateInterval;
 use Mediawiki\Api\SimpleRequest;
 use GuzzleHttp;
 
@@ -118,14 +117,9 @@ class PageRepository extends Repository
         $stmt = $this->getRevisionsStmt($page, $user, null, null, $start, $end);
         $result = $stmt->fetchAll();
 
-        // Cache for 10 minutes, and return.
-        $cacheItem = $this->cache->getItem($cacheKey)
-            ->set($result)
-            ->expiresAfter(new DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
+        // Cache and return.
         $this->stopwatch->stop($cacheKey);
-
-        return $result;
+        return $this->setCache($cacheKey, $result);
     }
 
     /**
@@ -184,8 +178,7 @@ class PageRepository extends Repository
             $params['username'] = $user->getUsername();
         }
 
-        $conn = $this->getProjectsConnection();
-        return $conn->executeQuery($sql, $params);
+        return $this->executeProjectsQuery($sql, $params);
     }
 
     /**
@@ -216,15 +209,10 @@ class PageRepository extends Repository
             $params['username'] = $user->getUsername();
         }
 
-        $conn = $this->getProjectsConnection();
-        $result = $conn->executeQuery($sql, $params)->fetchColumn(0);
+        $result = $this->executeProjectsQuery($sql, $params)->fetchColumn(0);
 
-        // Cache for 10 minutes, and return.
-        $cacheItem = $this->cache->getItem($cacheKey)
-            ->set($result)
-            ->expiresAfter(new DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
-        return $result;
+        // Cache and return.
+        return $this->setCache($cacheKey, $result);
     }
 
     /**
@@ -244,18 +232,6 @@ class PageRepository extends Repository
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
-
-        $conn = $this->getProjectsConnection();
-
-        /**
-         * This query can sometimes take too long to run for pages with tens of thousands
-         * of revisions. This query is used by the ArticleInfo gadget, which shows basic
-         * data in real-time, so if it takes too long than the user probably didn't even
-         * wait to see the result. We'll utilize the max_statement_time variable to set
-         * a maximum query time of 60 seconds.
-         */
-        $sql = "SET max_statement_time = 60;";
-        $conn->executeQuery($sql);
 
         $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
         $userTable = $this->getTableName($page->getProject()->getDatabaseName(), 'user');
@@ -285,30 +261,34 @@ class PageRepository extends Repository
                         LIMIT 1
                     ) b,
                     (
-                        SELECT MAX(rev_timestamp) AS modified_at
+                        SELECT rev_timestamp AS modified_at,
+                               rev_id AS modified_rev_id
                         FROM $revTable
+                        JOIN $pageTable ON page_id = rev_page
                         WHERE rev_page = :pageid
-                    ) c,
-                    (
-                        SELECT page_latest AS modified_rev_id
-                        FROM $pageTable
-                        WHERE page_id = :pageid
-                    ) d
+                        AND rev_id = page_latest
+                    ) c
                 );";
         $params = ['pageid' => $page->getId()];
 
         // Get current time so we can compare timestamps
         // and decide whether or to cache the result.
         $time1 = time();
-        $result = $conn->executeQuery($sql, $params)->fetch();
+
+        /**
+         * This query can sometimes take too long to run for pages with tens of thousands
+         * of revisions. This query is used by the ArticleInfo gadget, which shows basic
+         * data in real-time, so if it takes too long than the user probably didn't even
+         * wait to see the result. We'll pass 60 as the last parameter to executeProjectsQuery,
+         * which will set the max_statement_time to 60 seconds.
+         */
+        $result = $this->executeProjectsQuery($sql, $params, 60)->fetch();
+
         $time2 = time();
 
         // If it took over 5 seconds, cache the result for 20 minutes.
         if ($time2 - $time1 > 5) {
-            $cacheItem = $this->cache->getItem($cacheKey)
-                ->set($result)
-                ->expiresAfter(new DateInterval('PT20M'));
-            $this->cache->save($cacheItem);
+            $this->setCache($cacheKey, $result, 'PT20M');
         }
 
         return $result;
@@ -334,20 +314,15 @@ class PageRepository extends Repository
         $papTable = $this->getTableName($project->getDatabaseName(), 'page_assessments_projects');
         $pageIds = implode($pageIds, ',');
 
-        $query = "SELECT pap_project_title AS wikiproject, pa_class AS class, pa_importance AS importance
-                  FROM $paTable
-                  LEFT JOIN $papTable ON pa_project_id = pap_project_id
-                  WHERE pa_page_id IN ($pageIds)";
+        $sql = "SELECT pap_project_title AS wikiproject, pa_class AS class, pa_importance AS importance
+                FROM $paTable
+                LEFT JOIN $papTable ON pa_project_id = pap_project_id
+                WHERE pa_page_id IN ($pageIds)";
 
-        $conn = $this->getProjectsConnection();
-        $result = $conn->executeQuery($query)->fetchAll();
+        $result = $this->executeProjectsQuery($sql)->fetchAll();
 
-        // Cache for 10 minutes, and return.
-        $cacheItem = $this->cache->getItem($cacheKey)
-            ->set($result)
-            ->expiresAfter(new DateInterval('PT10M'));
-        $this->cache->save($cacheItem);
-        return $result;
+        // Cache and return.
+        return $this->setCache($cacheKey, $result);
     }
 
     /**
@@ -409,12 +384,10 @@ class PageRepository extends Repository
                 AND term_type IN ('label', 'description')
                 AND term_language = :lang";
 
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $resultQuery->bindParam(':lang', $lang);
-        $resultQuery->bindParam(':wikidataId', $wikidataId);
-        $resultQuery->execute();
-
-        return $resultQuery->fetchAll();
+        return $this->executeProjectsQuery($sql, [
+            'lang' => $lang,
+            'wikidataId' => $wikidataId,
+        ])->fetchAll();
     }
 
     /**
@@ -437,11 +410,9 @@ class PageRepository extends Repository
                 FROM wikidatawiki_p.wb_items_per_site
                 WHERE ips_item_id = :wikidataId";
 
-        $resultQuery = $this->getProjectsConnection()->prepare($sql);
-        $resultQuery->bindParam(':wikidataId', $wikidataId);
-        $resultQuery->execute();
-
-        $result = $resultQuery->fetchAll();
+        $result = $this->executeProjectsQuery($sql, [
+            'wikidataId' => $wikidataId,
+        ])->fetchAll();
 
         return $count ? (int) $result[0]['count'] : $result;
     }
@@ -476,9 +447,7 @@ class PageRepository extends Repository
             'namespace' => $page->getNamespace(),
         ];
 
-        $conn = $this->getProjectsConnection();
-        $res = $conn->executeQuery($sql, $params);
-
+        $res = $this->executeProjectsQuery($sql, $params);
         $data = [];
 
         // Transform to associative array by 'type'
@@ -567,5 +536,54 @@ class PageRepository extends Repository
                 AND rev_page = $pageId LIMIT 1;";
         $resultQuery = $this->getProjectsConnection()->query($sql);
         return (int)$resultQuery->fetchColumn();
+    }
+
+    /**
+     * Get HTML display titles of a set of pages (or the normal title if there's no display title).
+     * This will send t/50 API requests where t is the number of titles supplied.
+     * @param Project $project The project.
+     * @param string[] $pageTitles The titles to fetch.
+     * @return string[] Keys are the original supplied title, and values are the display titles.
+     * @static
+     */
+    public static function displayTitles(Project $project, $pageTitles)
+    {
+        $api = $project->getApi();
+        $displayTitles = [];
+        $numPages = count($pageTitles);
+
+        for ($n = 0; $n < $numPages; $n += 50) {
+            $titleSlice = array_slice($pageTitles, $n, 50);
+            $params = [
+                'prop' => 'info|pageprops',
+                'inprop' => 'displaytitle',
+                'titles' => join('|', $titleSlice),
+            ];
+            $query = new SimpleRequest('query', $params);
+            $result = $api->postRequest($query);
+
+            // Extract normalization info.
+            $normalized = [];
+            if (isset($result['query']['normalized'])) {
+                array_map(
+                    function ($e) use (&$normalized) {
+                        $normalized[$e['to']] = $e['from'];
+                    },
+                    $result['query']['normalized']
+                );
+            }
+
+            // Match up the normalized titles with the display titles and the original titles.
+            foreach ($result['query']['pages'] as $pageInfo) {
+                $displayTitle = isset($pageInfo['pageprops']['displaytitle'])
+                    ? $pageInfo['pageprops']['displaytitle']
+                    : $pageInfo['title'];
+                $origTitle = isset($normalized[$pageInfo['title']])
+                    ? $normalized[$pageInfo['title']] : $pageInfo['title'];
+                $displayTitles[$origTitle] = $displayTitle;
+            }
+        }
+
+        return $displayTitles;
     }
 }

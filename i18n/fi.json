@@ -46,6 +46,7 @@
 	"end": "Päättymispäivä",
 	"events": "Tapahtumat",
 	"executed": "Suoritettu $1 {{PLURAL:$2|sekunnissa}}.",
+	"feedback": "Palaute",
 	"file": "Tiedosto",
 	"files-uploaded": "Tiedostoja ladattu",
 	"first-edit": "Ensimmäinen muokkaus",
@@ -77,7 +78,7 @@
 	"namespace-totals": "Nimiavaruuksia yhteensä",
 	"no-result": "Ei tuloksia hakusanalla $1",
 	"no-summary": "ilman yhteenvetoa",
-	"non-auto-edits": "Ei-automatisoidut muokkaukset",
+	"non-auto-contribs": "Ei-automatisoidut muokkaukset",
 	"others": "muut",
 	"page-size": "Sivun koko",
 	"page-title": "Sivun otsikko",
@@ -97,7 +98,6 @@
 	"result": "Tulokset",
 	"result-by-name": "Tulokset nimen / IP:n mukaan",
 	"result-by-time": "Tulokset ajan mukaan",
-	"see-full-edit-counts": "Näytä kaikki muokkauslaskurin arvot",
 	"see-full-page-stats": "Näytä kaikki sivun tilastot",
 	"show": "näytä",
 	"size": "Koko",
@@ -123,6 +123,7 @@
 	"username": "Käyttäjänimi",
 	"view-source": "Lähdekoodi",
 	"wiki": "Wiki",
+	"wikitext": "Wikiteksti",
 	"with-summary": "yhteenvedolla",
 	"xtools-title": "X!:n työkalut"
 }

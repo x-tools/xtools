@@ -5,22 +5,20 @@
 
 namespace Tests\Xtools;
 
+use AppBundle\Helper\I18nHelper;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Xtools\EditSummary;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Xtools\Edit;
+use Xtools\EditSummary;
 use Xtools\Project;
-use Xtools\ProjectRepository;
 use Xtools\User;
-use DateTime;
 
 /**
  * Tests for EditSummary.
  */
 class EditSummaryTest extends WebTestCase
 {
-    /** @var Container The Symfony container. */
-    protected $container;
-
     /** @var EditSummary The article info instance. */
     protected $editSummary;
 
@@ -36,16 +34,14 @@ class EditSummaryTest extends WebTestCase
     public function setUp()
     {
         $client = static::createClient();
-        $this->container = $client->getContainer();
         $this->project = new Project('TestProject');
         $this->user = new User('Test user');
-        $this->editSummary = new EditSummary(
-            $this->project,
-            $this->user,
-            'all',
-            1,
-            $this->container
-        );
+        $this->editSummary = new EditSummary($this->project, $this->user, 'all', 1);
+
+        $stack = new RequestStack();
+        $session = new Session();
+        $i18nHelper = new I18nHelper($client->getContainer(), $stack, $session);
+        $this->editSummary->setI18nHelper($i18nHelper);
 
         // Don't care that private methods "shouldn't" be tested...
         // With EditSummary many are very testworthy and otherwise fragile.

@@ -6,12 +6,16 @@
 namespace Xtools;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception\DriverException;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mediawiki\Api\MediawikiApi;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use GuzzleHttp\Promise\Promise;
 use DateInterval;
 
@@ -76,6 +80,44 @@ abstract class Repository
     }
 
     /**
+     * Is XTools connecting to MMF Labs?
+     * @return boolean
+     * @codeCoverageIgnore
+     */
+    public function isLabs()
+    {
+        return (bool)$this->container->getParameter('app.is_labs');
+    }
+
+    /**
+     * Get various metadata about the current tool being used, which will
+     * be used in logging for diagnosting any issues.
+     * @return array
+     *
+     * There is no request stack in the tests.
+     * @codeCoverageIgnore
+     */
+    protected function getCurrentRequestMetadata()
+    {
+        $request = $this->container->get('request_stack')->getCurrentRequest();
+
+        if (null === $request) {
+            return;
+        }
+
+        $requestTime = microtime(true) - $request->server->get('REQUEST_TIME_FLOAT');
+
+        return [
+            'requestTime' => round($requestTime, 2),
+            'path' => $request->getPathInfo(),
+        ];
+    }
+
+    /***************
+     * CONNECTIONS *
+     ***************/
+
+    /**
      * Get the database connection for the 'meta' database.
      * @return Connection
      * @codeCoverageIgnore
@@ -118,7 +160,7 @@ abstract class Repository
         if (!$this->toolsConnection instanceof Connection) {
             $this->toolsConnection = $this->container
                 ->get('doctrine')
-                ->getManager("toolsdb")
+                ->getManager('toolsdb')
                 ->getConnection();
         }
         return $this->toolsConnection;
@@ -141,15 +183,9 @@ abstract class Repository
         return $api;
     }
 
-    /**
-     * Is XTools connecting to MMF Labs?
-     * @return boolean
-     * @codeCoverageIgnore
-     */
-    public function isLabs()
-    {
-        return (bool)$this->container->getParameter('app.is_labs');
-    }
+    /*****************
+     * QUERY HELPERS *
+     *****************/
 
     /**
      * Make a request to the XTools API, optionally doing so asynchronously via Guzzle.
@@ -194,7 +230,7 @@ abstract class Repository
         // $tableExtension in order to generate the new table name
         if ($this->isLabs() && $tableExtension !== null) {
             $mapped = true;
-            $tableName = $tableName . '_' . $tableExtension;
+            $tableName = $tableName.'_'.$tableExtension;
         } elseif ($this->container->hasParameter("app.table.$tableName")) {
             // Use the table specified in the table mapping configuration, if present.
             $mapped = true;
@@ -279,6 +315,7 @@ abstract class Repository
      * @param string $cacheKey
      * @param mixed  $value
      * @param string $duration Valid DateInterval string.
+     * @return mixed The given $value.
      */
     public function setCache($cacheKey, $value, $duration = 'PT10M')
     {
@@ -287,7 +324,12 @@ abstract class Repository
             ->set($value)
             ->expiresAfter(new DateInterval($duration));
         $this->cache->save($cacheItem);
+        return $value;
     }
+
+    /********************************
+     * DATABASE INTERACTION HELPERS *
+     ********************************/
 
     /**
      * Creates WHERE conditions with date range to be put in query.
@@ -303,14 +345,104 @@ abstract class Repository
         $datesConditions = '';
         if (false !== $start) {
             // Convert to YYYYMMDDHHMMSS. *who in the world thought of having time in BLOB of this format ;-;*
-            $start = date('Ymd', $start) . '000000';
+            $start = date('Ymd', $start).'000000';
             $datesConditions .= " AND {$tableAlias}{$field} > '$start'";
         }
         if (false !== $end) {
-            $end = date('Ymd', $end) . '235959';
+            $end = date('Ymd', $end).'235959';
             $datesConditions .= " AND {$tableAlias}{$field} < '$end'";
         }
 
         return $datesConditions;
+    }
+
+    /**
+     * Execute a query using the projects connection, handling certain Exceptions.
+     * @param string $sql
+     * @param array $params Parameters to bound to the prepared query.
+     * @param int|null $timeout Maximum statement time in seconds. null will use the
+     *   default specified by the app.query_timeout config parameter.
+     * @return \Doctrine\DBAL\Driver\Statement
+     * @codeCoverageIgnore
+     */
+    public function executeProjectsQuery($sql, $params = [], $timeout = null)
+    {
+        try {
+            $this->setQueryTimeout($timeout);
+            return $this->getProjectsConnection()->executeQuery($sql, $params);
+        } catch (DriverException $e) {
+            return $this->handleDriverError($e, $timeout);
+        }
+    }
+
+    /**
+     * Execute a query using the projects connection, handling certain Exceptions.
+     * @param QueryBuilder $qb
+     * @param int $timeout Maximum statement time in seconds. null will use the
+     *   default specified by the app.query_timeout config parameter.
+     * @return \Doctrine\DBAL\Driver\Statement
+     * @codeCoverageIgnore
+     */
+    public function executeQueryBuilder(QueryBuilder $qb, $timeout = null)
+    {
+        try {
+            $this->setQueryTimeout($timeout);
+            return $qb->execute();
+        } catch (DriverException $e) {
+            return $this->handleDriverError($e, $timeout);
+        }
+    }
+
+    /**
+     * Special handling of some DriverExceptions, otherwise original Exception is thrown.
+     * @param DriverException $e
+     * @param int $timeout Timeout value, if applicable. This is passed to the i18n message.
+     * @throws ServiceUnavailableHttpException
+     * @throws DriverException
+     * @codeCoverageIgnore
+     */
+    private function handleDriverError(DriverException $e, $timeout)
+    {
+        // If no value was passed for the $timeout, it must be the default.
+        if ($timeout === null) {
+            $timeout = $this->container->getParameter('app.query_timeout');
+        }
+
+        if ($e->getErrorCode() === 1226) {
+            $this->logErrorData('MAX CONNECTIONS');
+            throw new ServiceUnavailableHttpException(30, 'error-service-overload', null, 503);
+        } elseif ($e->getErrorCode() === 1969) {
+            $this->logErrorData('QUERY TIMEOUT');
+            throw new HttpException(504, 'error-query-timeout', null, [], $timeout);
+        } else {
+            throw $e;
+        }
+    }
+
+    /**
+     * Log error containing the given error code, along with the request path and request time.
+     * @param string $error
+     */
+    private function logErrorData($error)
+    {
+        $metadata = $this->getCurrentRequestMetadata();
+        $this->getLog()->error(
+            '>>> '.$metadata['path'].' ('.$error.' after '.$metadata['requestTime'].')'
+        );
+    }
+
+    /**
+     * Set the maximum statement time on the MySQL engine.
+     * @param int|null $timeout In seconds. null will use the default
+     *   specified by the app.query_timeout config parameter.
+     * @codeCoverageIgnore
+     */
+    public function setQueryTimeout($timeout = null)
+    {
+        if ($timeout === null) {
+            $timeout = $this->container->getParameter('app.query_timeout');
+        }
+        $sql = "SET max_statement_time = $timeout";
+        $this->getProjectsConnection()->executeQuery($sql);
     }
 }

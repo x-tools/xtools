@@ -23,6 +23,11 @@ class SimpleEditCounterRepository extends Repository
      */
     public function fetchData(Project $project, User $user, $namespace = 'all', $start = null, $end = null)
     {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'simple_editcount');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
         $userTable = $project->getTableName('user');
         $pageTable = $project->getTableName('page');
         $archiveTable = $project->getTableName('archive');
@@ -36,36 +41,31 @@ class SimpleEditCounterRepository extends Repository
         $revNamespaceWhereSql = $namespace === 'all' ? '' : "AND page_namespace = $namespace";
         $arNamespaceWhereSql = $namespace === 'all' ? '' : "AND ar_namespace = $namespace";
 
-        // Prepare the query and execute
-        $resultQuery = $this->getProjectsConnection()->prepare("
-            SELECT 'id' AS source, user_id as value
-                FROM $userTable
-                WHERE user_name = :username
-            UNION
-            SELECT 'arch' AS source, COUNT(*) AS value
-                FROM $archiveTable
-                WHERE ar_user_text = :username
-                $arNamespaceWhereSql
-                $arDateConditions
-            UNION
-            SELECT 'rev' AS source, COUNT(*) AS value
-                FROM $revisionTable
-                $revNamespaceJoinSql
-                WHERE rev_user_text = :username
-                $revNamespaceWhereSql
-                $revDateConditions
-            UNION
-            SELECT 'groups' AS source, ug_group AS value
-                FROM $userGroupsTable
-                JOIN $userTable ON user_id = ug_user
-                WHERE user_name = :username
-        ");
+        $sql = "SELECT 'id' AS source, user_id as value
+                    FROM $userTable
+                    WHERE user_name = :username
+                UNION
+                SELECT 'arch' AS source, COUNT(*) AS value
+                    FROM $archiveTable
+                    WHERE ar_user_text = :username
+                    $arNamespaceWhereSql
+                    $arDateConditions
+                UNION
+                SELECT 'rev' AS source, COUNT(*) AS value
+                    FROM $revisionTable
+                    $revNamespaceJoinSql
+                    WHERE rev_user_text = :username
+                    $revNamespaceWhereSql
+                    $revDateConditions
+                UNION
+                SELECT 'groups' AS source, ug_group AS value
+                    FROM $userGroupsTable
+                    JOIN $userTable ON user_id = ug_user
+                    WHERE user_name = :username";
 
-        $username = $user->getUsername();
-        $resultQuery->bindParam('username', $username);
-        $resultQuery->execute();
+        $result = $this->executeProjectsQuery($sql, ['username' => $user->getUsername()]);
 
-        // Fetch the result data
-        return $resultQuery->fetchAll();
+        // Cache and return.
+        return $this->setCache($cacheKey, $result);
     }
 }

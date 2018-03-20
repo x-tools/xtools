@@ -3,7 +3,7 @@
 == [[User:{{ user.username }}]] ==
 
 {% set link %}[{{ url('EditCounterYearCounts', {'username': user.username, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
-{{ msg('xtools-advert', [link, date()|date('Y-m-d H:i')]) }}
+{{ msg('xtools-advert', [link, date()|date_format]) }}
 {% endif %}
 
 === {{ msg('year-counts') }} ===
@@ -12,9 +12,10 @@
 ! {{ msg('year') }}
 ! {{ msg('count') }}
 |-
+{% set labels = ec.yearCounts.monthLabels %}
 {% for year,total in ec.yearTotals %}
-| {{ year }}
-| {{ total }}
+| {{ labels[loop.index0] }}
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ total }}}}
 |-
 {% endfor %}
 |}

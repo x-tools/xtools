@@ -6,7 +6,6 @@
 namespace Xtools;
 
 use Mediawiki\Api\MediawikiApi;
-use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * A Project is a single wiki that XTools is querying.
@@ -317,20 +316,28 @@ class Project extends Model
 
     /**
      * Get the image URL of the badge for the given page assessment
-     * @param  string $class  Valid classification for project, such as 'Start', 'GA', etc.
-     * @return string         URL to image
+     * @param string $class Valid classification for project, such as 'Start', 'GA', etc.
+     * @param bool $filenameOnly Get only the filename, not the URL.
+     * @return string URL to image
      */
-    public function getAssessmentBadgeURL($class)
+    public function getAssessmentBadgeURL($class, $filenameOnly = false)
     {
         $config = $this->getRepository()->getAssessmentsConfig($this->getDomain());
 
         if (isset($config['class'][$class])) {
-            return "https://upload.wikimedia.org/wikipedia/commons/" . $config['class'][$class]['badge'];
+            $url = "https://upload.wikimedia.org/wikipedia/commons/" . $config['class'][$class]['badge'];
         } elseif (isset($config['class']['Unknown'])) {
-            return "https://upload.wikimedia.org/wikipedia/commons/" . $config['class']['Unknown']['badge'];
+            $url = "https://upload.wikimedia.org/wikipedia/commons/" . $config['class']['Unknown']['badge'];
         } else {
-            return "";
+            $url = "";
         }
+
+        if ($filenameOnly) {
+            $parts = explode('/', $url);
+            return end($parts);
+        }
+
+        return $url;
     }
 
     /**

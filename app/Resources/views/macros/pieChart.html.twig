@@ -1,9 +1,9 @@
-{% macro pie_chart(id, data, legend = true, classes = '') %}
+{% macro pie_chart(id, data, legend = true, classes = '', size = null) %}
 {% set labels = [] %}
 {% set values = [] %}
 {% set colors = [] %}
 <div class="chart-wrapper {{ classes }}">
-    <canvas id="{{ id }}"></canvas>
+    <canvas id="{{ id }}"{% if size != null %} height="{{ size }}"{% endif %}></canvas>
     <span class="chart-legend" id="{{ id }}_legend">
         <div class="legend-body">
             {% for entry in data %}
@@ -14,7 +14,7 @@
                 <div>
                     <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
                     <span class="legend-label">{{ entry.label }}</span>
-                    <span class="legend-value">
+                    <span class="legend-value" {% if isRTL() %}dir="rtl"{% endif %}>
                         &middot;
                         {{ entry.value|num_format }} ({{ entry.percentage|percent_format }})
                     </span>
@@ -47,7 +47,7 @@
                         label: function(tooltipItem, chartInstance) {
                             var value = chartInstance.datasets[tooltipItem.datasetIndex].data[tooltipItem.index],
                                 label = chartInstance.labels[tooltipItem.index];
-                            return label + ': ' + value.toLocaleString();
+                            return label + ': ' + value.toLocaleString(i18nLang);
                         }
                     }
                 }

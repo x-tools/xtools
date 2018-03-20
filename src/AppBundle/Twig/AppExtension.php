@@ -5,22 +5,33 @@
 
 namespace AppBundle\Twig;
 
+use AppBundle\Helper\I18nHelper;
+use DateTime;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Twig_Extension;
+use Xtools\Edit;
+use Xtools\Project;
 use Xtools\ProjectRepository;
 use Xtools\User;
-use NumberFormatter;
-use IntlDateFormatter;
-use DateTime;
 
 /**
  * Twig functions and filters for XTools.
  */
-class AppExtension extends Extension
+class AppExtension extends Twig_Extension
 {
-    /** @var NumberFormatter Instance of NumberFormatter class, used in localizing numbers. */
-    protected $numFormatter;
+    /** @var ContainerInterface The application's container interface. */
+    protected $container;
 
-    /** @var IntlDateFormatter Instance of IntlDateFormatter class, used in localizing dates. */
-    protected $dateFormatter;
+    /** @var RequestStack The request stack. */
+    protected $requestStack;
+
+    /** @var SessionInterface User's current session. */
+    protected $session;
+
+    /** @var I18nHelper For i18n and l10n. */
+    protected $i18n;
 
     /** @var float Duration of the current HTTP request in seconds. */
     protected $requestTime;
@@ -34,6 +45,25 @@ class AppExtension extends Extension
         return 'app_extension';
     }
 
+    /**
+     * Constructor, with the I18nHelper through dependency injection.
+     * @param ContainerInterface $container
+     * @param RequestStack $requestStack
+     * @param SessionInterface $session
+     * @param I18nHelper $i18n
+     */
+    public function __construct(
+        ContainerInterface $container,
+        RequestStack $requestStack,
+        SessionInterface $session,
+        I18nHelper $i18n
+    ) {
+        $this->container = $container;
+        $this->requestStack = $requestStack;
+        $this->session = $session;
+        $this->i18n = $i18n;
+    }
+
     /*********************************** FUNCTIONS ***********************************/
 
     /**
@@ -44,32 +74,32 @@ class AppExtension extends Extension
     {
         $options = ['is_safe' => ['html']];
         return [
-            new \Twig_SimpleFunction('request_time', [ $this, 'requestTime' ], $options),
-            new \Twig_SimpleFunction('memory_usage', [ $this, 'requestMemory' ], $options),
-            new \Twig_SimpleFunction('year', [ $this, 'generateYear' ], $options),
-            new \Twig_SimpleFunction('msgPrintExists', [ $this, 'intuitionMessagePrintExists' ], $options),
-            new \Twig_SimpleFunction('msgExists', [ $this, 'intuitionMessageExists' ], $options),
-            new \Twig_SimpleFunction('msg', [ $this, 'intuitionMessage' ], $options),
-            new \Twig_SimpleFunction('lang', [ $this, 'getLang' ], $options),
-            new \Twig_SimpleFunction('langName', [ $this, 'getLangName' ], $options),
-            new \Twig_SimpleFunction('allLangs', [ $this, 'getAllLangs' ]),
-            new \Twig_SimpleFunction('isRTL', [ $this, 'intuitionIsRTL' ]),
-            new \Twig_SimpleFunction('isRTLLang', [ $this, 'intuitionIsRTLLang' ]),
-            new \Twig_SimpleFunction('shortHash', [ $this, 'gitShortHash' ]),
-            new \Twig_SimpleFunction('hash', [ $this, 'gitHash' ]),
-            new \Twig_SimpleFunction('releaseDate', [ $this, 'gitDate' ]),
-            new \Twig_SimpleFunction('enabled', [ $this, 'tabEnabled' ]),
-            new \Twig_SimpleFunction('tools', [ $this, 'allTools' ]),
-            new \Twig_SimpleFunction('color', [ $this, 'getColorList' ]),
-            new \Twig_SimpleFunction('chartColor', [ $this, 'chartColor' ]),
-            new \Twig_SimpleFunction('isSingleWiki', [ $this, 'isSingleWiki' ]),
-            new \Twig_SimpleFunction('getReplagThreshold', [ $this, 'getReplagThreshold' ]),
-            new \Twig_SimpleFunction('loadStylesheetsFromCDN', [ $this, 'loadStylesheetsFromCDN' ]),
-            new \Twig_SimpleFunction('isWMFLabs', [ $this, 'isWMFLabs' ]),
-            new \Twig_SimpleFunction('replag', [ $this, 'replag' ]),
-            new \Twig_SimpleFunction('link', [ $this, 'link' ]),
-            new \Twig_SimpleFunction('quote', [ $this, 'quote' ]),
-            new \Twig_SimpleFunction('bugReportURL', [ $this, 'bugReportURL' ]),
+            new \Twig_SimpleFunction('request_time', [$this, 'requestTime'], $options),
+            new \Twig_SimpleFunction('memory_usage', [$this, 'requestMemory'], $options),
+            new \Twig_SimpleFunction('year', [$this, 'generateYear'], $options),
+            new \Twig_SimpleFunction('msgIfExists', [$this, 'msgIfExists'], $options),
+            new \Twig_SimpleFunction('msgExists', [$this, 'msgExists'], $options),
+            new \Twig_SimpleFunction('msg', [$this, 'msg'], $options),
+            new \Twig_SimpleFunction('lang', [$this, 'getLang'], $options),
+            new \Twig_SimpleFunction('langName', [$this, 'getLangName'], $options),
+            new \Twig_SimpleFunction('fallbackLangs', [$this, 'getFallbackLangs', $options]),
+            new \Twig_SimpleFunction('allLangs', [$this, 'getAllLangs']),
+            new \Twig_SimpleFunction('isRTL', [$this, 'isRTL']),
+            new \Twig_SimpleFunction('isRTLLang', [$this, 'isRTLLang']),
+            new \Twig_SimpleFunction('shortHash', [$this, 'gitShortHash']),
+            new \Twig_SimpleFunction('hash', [$this, 'gitHash']),
+            new \Twig_SimpleFunction('releaseDate', [$this, 'gitDate']),
+            new \Twig_SimpleFunction('enabled', [$this, 'tabEnabled']),
+            new \Twig_SimpleFunction('tools', [$this, 'allTools']),
+            new \Twig_SimpleFunction('color', [$this, 'getColorList']),
+            new \Twig_SimpleFunction('chartColor', [$this, 'chartColor']),
+            new \Twig_SimpleFunction('isSingleWiki', [$this, 'isSingleWiki']),
+            new \Twig_SimpleFunction('getReplagThreshold', [$this, 'getReplagThreshold']),
+            new \Twig_SimpleFunction('loadStylesheetsFromCDN', [$this, 'loadStylesheetsFromCDN']),
+            new \Twig_SimpleFunction('isWMFLabs', [$this, 'isWMFLabs']),
+            new \Twig_SimpleFunction('replag', [$this, 'replag']),
+            new \Twig_SimpleFunction('quote', [$this, 'quote']),
+            new \Twig_SimpleFunction('bugReportURL', [$this, 'bugReportURL']),
             new \Twig_SimpleFunction('logged_in_user', [$this, 'functionLoggedInUser']),
             new \Twig_SimpleFunction('isUserAnon', [$this, 'isUserAnon']),
             new \Twig_SimpleFunction('nsName', [$this, 'nsName']),
@@ -88,7 +118,7 @@ class AppExtension extends Extension
     public function requestTime()
     {
         if (!isset($this->requestTime)) {
-            $this->requestTime = microtime(true) - $this->getCurrentRequest()->server->get('REQUEST_TIME_FLOAT');
+            $this->requestTime = microtime(true) - $this->getRequest()->server->get('REQUEST_TIME_FLOAT');
         }
 
         return $this->requestTime;
@@ -115,22 +145,25 @@ class AppExtension extends Extension
     }
 
     /**
+     * Get an i18n message.
+     * @param string $message
+     * @param array $vars
+     * @return mixed|null|string
+     */
+    public function msg($message = '', $vars = [])
+    {
+        return $this->i18n->msg($message, $vars);
+    }
+
+    /**
      * See if a given i18n message exists.
-     * @TODO: refactor all intuition stuff so it can be used anywhere
      * @param string $message The message.
      * @param array $vars
      * @return bool
      */
-    public function intuitionMessageExists($message = '', $vars = [])
+    public function msgExists($message = '', $vars = [])
     {
-        return $this->getIntuition()->msgExists($message, array_merge(
-            [
-                'domain' => 'xtools'
-            ],
-            [
-                'variables' => is_array($vars) ? $vars : []
-            ]
-        ));
+        return $this->i18n->msgExists($message, $vars);
     }
 
     /**
@@ -139,30 +172,9 @@ class AppExtension extends Extension
      * @param array $vars
      * @return mixed|null|string
      */
-    public function intuitionMessagePrintExists($message = "", $vars = [])
+    public function msgIfExists($message = "", $vars = [])
     {
-        if (is_array($message)) {
-            $vars = $message;
-            $message = $message[0];
-            $vars = array_slice($vars, 1);
-        }
-        if ($this->intuitionMessageExists($message, $vars)) {
-            return $this->intuitionMessage($message, $vars);
-        } else {
-            return $message;
-        }
-    }
-
-    /**
-     * Get an i18n message.
-     * @param string $message
-     * @param array $vars
-     * @return mixed|null|string
-     */
-    public function intuitionMessage($message = "", $vars = [])
-    {
-        $vars = is_array($vars) ? $vars : [];
-        return $this->getIntuition()->msg($message, [ "domain" => "xtools", "variables" => $vars ]);
+        return $this->i18n->msgIfExists($message, $vars);
     }
 
     /**
@@ -171,7 +183,7 @@ class AppExtension extends Extension
      */
     public function getLang()
     {
-        return $this->getIntuition()->getLang();
+        return $this->i18n->getLang();
     }
 
     /**
@@ -180,9 +192,17 @@ class AppExtension extends Extension
      */
     public function getLangName()
     {
-        return in_array(ucfirst($this->getIntuition()->getLangName()), $this->getAllLangs())
-            ? $this->getIntuition()->getLangName()
-            : 'English';
+        return $this->i18n->getLangName();
+    }
+
+    /**
+     * Get the fallback languages for the current language,
+     * so we know what to load with jQuery.i18n.
+     * @return string[]
+     */
+    public function getFallbackLangs()
+    {
+        return $this->i18n->getFallbacks();
     }
 
     /**
@@ -191,42 +211,17 @@ class AppExtension extends Extension
      */
     public function getAllLangs()
     {
-        $messageFiles = glob($this->container->getParameter("kernel.root_dir") . '/../i18n/*.json');
-
-        $languages = array_values(array_unique(array_map(
-            function ($filename) {
-                return basename($filename, '.json');
-            },
-            $messageFiles
-        )));
-
-        $availableLanguages = [];
-
-        foreach ($languages as $lang) {
-            $availableLanguages[$lang] = ucfirst($this->getIntuition()->getLangName($lang));
-        }
-        asort($availableLanguages);
-
-        return $availableLanguages;
+        return $this->i18n->getAllLangs();
     }
 
     /**
      * Whether the current language is right-to-left.
+     * @param string|null $lang Optionally provide a specific lanuage code.
      * @return bool
      */
-    public function intuitionIsRTL()
+    public function isRTL($lang = null)
     {
-        return $this->getIntuition()->isRTL($this->getIntuition()->getLang());
-    }
-
-    /**
-     * Whether the given language is right-to-left.
-     * @param string $lang The language code.
-     * @return bool
-     */
-    public function intuitionIsRTLLang($lang)
-    {
-        return $this->getIntuition()->isRTL($lang);
+        return $this->i18n->isRTL($lang);
     }
 
     /**
@@ -235,7 +230,7 @@ class AppExtension extends Extension
      */
     public function gitShortHash()
     {
-        return exec("git rev-parse --short HEAD");
+        return exec('git rev-parse --short HEAD');
     }
 
     /**
@@ -244,7 +239,7 @@ class AppExtension extends Extension
      */
     public function gitHash()
     {
-        return exec("git rev-parse HEAD");
+        return exec('git rev-parse HEAD');
     }
 
     /**
@@ -254,7 +249,7 @@ class AppExtension extends Extension
     public function gitDate()
     {
         $date = new DateTime(exec('git show -s --format=%ci'));
-        return $date->format('Y-m-d');
+        return $this->dateFormat($date, 'yyyy-MM-dd');
     }
 
     /**
@@ -262,7 +257,7 @@ class AppExtension extends Extension
      * @param string $tool The short name of the tool.
      * @return bool
      */
-    public function tabEnabled($tool = "index")
+    public function tabEnabled($tool = 'index')
     {
         $param = false;
         if ($this->container->hasParameter("enable.$tool")) {
@@ -278,8 +273,8 @@ class AppExtension extends Extension
     public function allTools()
     {
         $retVal = [];
-        if ($this->container->hasParameter("tools")) {
-            $retVal = $this->container->getParameter("tools");
+        if ($this->container->hasParameter('tools')) {
+            $retVal = $this->container->getParameter('tools');
         }
         return $retVal;
     }
@@ -474,7 +469,7 @@ class AppExtension extends Extension
         $retVal = 0;
 
         if ($this->isWMFLabs()) {
-            $project = $this->getCurrentRequest()->get('project');
+            $project = $this->getRequest()->get('project');
 
             if (!isset($project)) {
                 $project = 'enwiki';
@@ -542,12 +537,12 @@ class AppExtension extends Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('capitalize_first', [ $this, 'capitalizeFirst' ]),
-            new \Twig_SimpleFilter('percent_format', [ $this, 'percentFormat' ]),
-            new \Twig_SimpleFilter('diff_format', [ $this, 'diffFormat' ], [ 'is_safe' => [ 'html' ] ]),
+            new \Twig_SimpleFilter('capitalize_first', [$this, 'capitalizeFirst']),
+            new \Twig_SimpleFilter('percent_format', [$this, 'percentFormat']),
+            new \Twig_SimpleFilter('diff_format', [$this, 'diffFormat'], ['is_safe' => ['html']]),
             new \Twig_SimpleFilter('num_format', [$this, 'numberFormat']),
-            new \Twig_SimpleFilter('date_format', [$this, 'dateFormatStd']),
-            new \Twig_SimpleFilter('date_localize', [$this, 'dateFormat']),
+            new \Twig_SimpleFilter('date_format', [$this, 'dateFormat']),
+            new \Twig_SimpleFilter('wikify', [$this, 'wikify']),
         ];
     }
 
@@ -559,55 +554,30 @@ class AppExtension extends Extension
      */
     public function numberFormat($number, $decimals = 0)
     {
-        if (!isset($this->numFormatter)) {
-            $lang = $this->getIntuition()->getLang();
-            $this->numFormatter = new NumberFormatter($lang, NumberFormatter::DECIMAL);
-        }
-
-        // Get separator symbols.
-        $decimal = $this->numFormatter->getSymbol(NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
-        $thousands = $this->numFormatter->getSymbol(NumberFormatter::GROUPING_SEPARATOR_SYMBOL);
-
-        $formatted = number_format($number, $decimals, $decimal, $thousands);
-
-        // Remove trailing .0's (e.g. 40.00 -> 40).
-        return preg_replace("/\\".$decimal."0+$/", '', $formatted);
+        return $this->i18n->numberFormat($number, $decimals);
     }
 
     /**
      * Localize the given date based on language settings.
      * @param  string|DateTime $datetime
+     * @param string $pattern Format according to this ICU date format.
+     * @see http://userguide.icu-project.org/formatparse/datetime
      * @return string
      */
-    public function dateFormat($datetime)
+    public function dateFormat($datetime, $pattern = 'yyyy-MM-dd HH:mm')
     {
-        if (!isset($this->dateFormatter)) {
-            $this->dateFormatter = new IntlDateFormatter(
-                $this->getIntuition()->getLang(),
-                IntlDateFormatter::SHORT,
-                IntlDateFormatter::SHORT
-            );
-        }
-
-        if (is_string($datetime) || is_int($datetime)) {
-            $datetime = new DateTime($datetime);
-        }
-
-        return $this->dateFormatter->format($datetime);
+        return $this->i18n->dateFormat($datetime, $pattern);
     }
 
     /**
-     * Format the given date to ISO 8601.
-     * @param  string|DateTime $datetime
+     * Convert raw wikitext to HTML-formatted string.
+     * @param string $str
+     * @param Project $project
      * @return string
      */
-    public function dateFormatStd($datetime)
+    public function wikify($str, Project $project)
     {
-        if (is_string($datetime) || is_int($datetime)) {
-            $datetime = new DateTime($datetime);
-        }
-
-        return $datetime->format('Y-m-d H:i');
+        return Edit::wikifyString($str, $project);
     }
 
     /**
@@ -630,13 +600,7 @@ class AppExtension extends Extension
      */
     public function percentFormat($numerator, $denominator = null, $precision = 1)
     {
-        if (!$denominator) {
-            $quotient = $numerator;
-        } else {
-            $quotient = ( $numerator / $denominator ) * 100;
-        }
-
-        return $this->numberFormat($quotient, $precision) . '%';
+        return $this->i18n->percentFormat($numerator, $denominator, $precision);
     }
 
     /**
@@ -665,9 +629,9 @@ class AppExtension extends Extension
     public function nsName($namespace, $namespaces)
     {
         if ($namespace === 'all') {
-            return $this->getIntuition()->msg('all');
+            return $this->i18n->msg('all');
         } elseif ($namespace === '0' || $namespace === 0 || $namespace === 'Main') {
-            return $this->getIntuition()->msg('mainspace');
+            return $this->i18n->msg('mainspace');
         } else {
             return $namespaces[$namespace];
         }
@@ -676,7 +640,7 @@ class AppExtension extends Extension
     /**
      * Format a given number as a diff, colouring it green if it's postive, red if negative, gary if zero
      * @param  number $size Diff size
-     * @return string       Markup with formatted number
+     * @return string Markup with formatted number
      */
     public function diffFormat($size)
     {
@@ -690,7 +654,9 @@ class AppExtension extends Extension
 
         $size = $this->numberFormat($size);
 
-        return "<span class='$class'>$size</span>";
+        return "<span class='$class'".
+            ($this->i18n->isRTL() ? " dir='rtl'" : '').
+            ">$size</span>";
     }
 
     /**
@@ -706,7 +672,7 @@ class AppExtension extends Extension
         list($val, $key) = $this->getDurationMessageKey($seconds);
 
         if ($translate) {
-            return $this->numberFormat($val) . ' ' . $this->intuitionMessage("num-$key", [$val]);
+            return $this->numberFormat($val).' '.$this->i18n->msg("num-$key", [$val]);
         } else {
             return [$this->numberFormat($val), "num-$key"];
         }
@@ -750,5 +716,16 @@ class AppExtension extends Extension
     public function buildQuery($params)
     {
         return is_array($params) ? http_build_query($params) : '';
+    }
+
+    /**
+     * Shorthand to get the current request from the request stack.
+     * @return \Symfony\Component\HttpFoundation\Request
+     * There is no request stack in the tests.
+     * @codeCoverageIgnore
+     */
+    private function getRequest()
+    {
+        return $this->container->get('request_stack')->getCurrentRequest();
     }
 }

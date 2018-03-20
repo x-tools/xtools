@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"Nemo bis"
+			"Nemo bis",
+			"Trần Nguyễn Minh Huy"
 		]
 	},
 	"actions": "Tác vụ",
@@ -57,7 +58,6 @@
 	"high-replag": "Chú ý: Độ trễ sao chép đang cao, nên các thay đổi mới hơn $1 có thể không xuất hiện.",
 	"history": "Lịch sử",
 	"import": "Nhập",
-	"interrupted": "Rất tiếc, để tiết kiệm tài nguyên, một bot đã tự động hủy bỏ truy vấn này sau $1 giây.",
 	"invalid-date": "Ngày tháng không hợp lệ",
 	"invalid-type": "Đã chọn kiểu không hợp lệ",
 	"ip-edits": "Số sửa đổi vô danh",
@@ -90,13 +90,27 @@
 	"no-result": "Không tìm thấy kết quả cho: $1",
 	"no-revisions": "Không tìm thấy phiên bản",
 	"no-summary": "không có tóm lược",
+	"num-blocks": "{{PLURAL:$1|lần cấm}}",
+	"num-bytes": "{{PLURAL:$1|byte}}",
 	"num-days": "{{PLURAL:$1|ngày|ngày}}",
+	"num-deletions": "{{PLURAL:$1|lần xóa}}",
+	"num-editors": "{{PLURAL:$1|biên tập viên}}",
 	"num-hours": "{{PLURAL:$1|giờ|giờ}}",
 	"num-minutes": "{{PLURAL:$1|phút|phút}}",
 	"num-months": "{{PLURAL:$1|tháng|tháng}}",
+	"num-moves": "{{PLURAL:$1|di chuyển}}",
+	"num-namespaces": "{{PLURAL:$1|không gian tên}}",
+	"num-others": "{{PLURAL:$1|khác}}",
+	"num-pageviews": "{{PLURAL:$1|lượt xem trang}}",
+	"num-protections": "{{PLURAL:$1|trang khóa}}",
 	"num-revisions": "{{PLURAL:$1|Phiên bản|Phiên bản}}",
+	"num-revisions-processed": "$1 đã phân tích",
+	"num-revisions-since": "$1 {{PLURAL:$2|phiên bản}} từ $3",
 	"num-seconds": "{{PLURAL:$1|giây|giây}}",
+	"num-sitelinks": "{{PLURAL:$1|liên kết trang web}}",
+	"num-tools": "{{PLURAL:$1|công cụ}}",
 	"num-users": "{{PLURAL:$1|Người dùng|Người dùng}}",
+	"num-watchers": "{{PLURAL:$1|người theo dõi}}",
 	"num-weeks": "{{PLURAL:$1|tuần|tuần}}",
 	"num-years": "{{PLURAL:$1|năm|năm}}",
 	"oppose": "Phản đối",
@@ -133,7 +147,6 @@
 	"rfx-bureaucrat": "Công cụ này cũng có thể phân tích các trang biểu quyết chọn hành chính viên",
 	"rfx-intro": "Công cụ này phân tích các phiếu biểu quyết và nhận ra những người bỏ phiếu hơn một lần tại:",
 	"rfx-page": "Trang biểu quyết phong cấp",
-	"see-full-edit-counts": "Xem các giá trị đầy đủ trong Số lần sửa đổi",
 	"see-full-page-stats": "Xem thống kê trang đầy đủ",
 	"show": "hiện",
 	"size": "Kích thước",

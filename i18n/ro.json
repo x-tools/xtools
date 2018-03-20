@@ -5,7 +5,6 @@
 			"Adrianbblk"
 		]
 	},
-	"about-xtools": "Despre aceste unelte",
 	"accepted-formats": "Formate acceptate",
 	"account-age": "Vechimea contului",
 	"accounts": "Conturi",
@@ -108,7 +107,6 @@
 	"image-attribution-text-3": "Alinierea cheii în cadrul logoului cerută de $1.",
 	"import": "Importări",
 	"importance": "Importanță",
-	"interrupted": "Ne pare rău, dar, pentru a face economie de resurse, un robot a terminat forțat această interogare, fiindcă deja a durat mai mult de $1 {{PLURAL:$1|secundă|secunde|de secunde}}.",
 	"invalid-date": "Dată invalidă",
 	"invalid-project": "$1 nu este un proiect valid",
 	"invalid-project-cant-use": "$1 nu este configurat să folosească această unealtă",
@@ -166,7 +164,7 @@
 	"no-revisions": "Nu s-a găsit nicio revizuire",
 	"no-summary": "Fără descriere",
 	"non-admins-with-actions": "Non-admini cu acțiuni administrative",
-	"non-auto-edits": "Modificări neautomatizate",
+	"non-auto-contribs": "Modificări neautomatizate",
 	"not-opted-in": "Utilizatorul nu a optat pentru afișarea acestor date. Vă rugăm să vă autentificați ca acest utilizator la XTools sau să creați $1 cu orice conținut. Vedeți documentația pentru mai multe informații.",
 	"num-blocks": "{{PLURAL:$1|blocare|blocări|de blocări}}",
 	"num-bytes": "{{PLURAL:$1|octet|octeți|de octeți}}",
@@ -243,7 +241,6 @@
 	"rfx-total-votes": "Totalul !voturilor",
 	"rights": "Permisiuni",
 	"saturday": "sâmbătă",
-	"see-full-edit-counts": "Vedeți toate valorile în contorul de modificări",
 	"see-full-page-stats": "Vedeți statisticile complete ale paginii",
 	"show": "Arată",
 	"size": "Mărime",

@@ -16,8 +16,8 @@
 {% if data.error is not defined -%}
     {{ msg('comma-character') }}
     {{ msg('created-by')|lower }}: {{ wiki.userLink(data.author, project) }}
-    (<a target="_blank" href="{{ url('ec', { 'project': project.domain, 'username': data.author }) }}">{{ data.author_editcount|num_format }}</a>)
+    (<a target="_blank" href="{{ url('EditCounterResult', { 'project': project.domain, 'username': data.author }) }}">{{ data.author_editcount|num_format }}</a>)
 {% endif %}
  &middot;
-<a target="_blank" href="{{ url('articleinfo', { 'project': project.domain, 'article': page.title }) }}">{{ msg('see-full-page-stats') }}</a>
+<a target="_blank" href="{{ url('ArticleInfoResult', { 'project': project.domain, 'article': page.title }) }}">{{ msg('see-full-page-stats') }}</a>
 </span>

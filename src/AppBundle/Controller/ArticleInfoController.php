@@ -5,20 +5,21 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Helper\I18nHelper;
+use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Xtools\ProjectRepository;
 use Xtools\ArticleInfo;
-use Xtools\Project;
-use Xtools\Page;
-use DateTime;
 use Xtools\ArticleInfoRepository;
+use Xtools\Page;
+use Xtools\Project;
+use Xtools\ProjectRepository;
 
 /**
  * This controller serves the search form and results for the ArticleInfo tool
@@ -178,6 +179,7 @@ class ArticleInfoController extends XtoolsController
         $articleInfoRepo->setContainer($this->container);
         $articleInfo = new ArticleInfo($page, $this->container, $start, $end);
         $articleInfo->setRepository($articleInfoRepo);
+        $articleInfo->setI18nHelper($this->container->get('app.i18n_helper'));
 
         $articleInfo->prepareData();
 
@@ -187,6 +189,11 @@ class ArticleInfoController extends XtoolsController
         if ($articleInfo->tooManyRevisions()) {
             // FIXME: i18n number_format?
             $this->addFlash('notice', ['too-many-revisions', number_format($maxRevisions), $maxRevisions]);
+        }
+
+        // For when there is very old data (2001 era) which may cause miscalculations.
+        if ($articleInfo->getFirstEdit()->getYear() < 2003) {
+            $this->addFlash('warning', ['old-page-notice']);
         }
 
         $ret = [
@@ -288,9 +295,6 @@ class ArticleInfoController extends XtoolsController
      */
     public function articleInfoApiAction(Request $request, $project, $article)
     {
-        /** @var integer Number of days to query for pageviews */
-        $pageviewsOffset = 30;
-
         $projectData = ProjectRepository::getProject($project, $this->container);
         if (!$projectData->exists()) {
             return new JsonResponse(
@@ -307,41 +311,7 @@ class ArticleInfoController extends XtoolsController
             );
         }
 
-        $data = [
-            'project' => $projectData->getDomain(),
-            'page' => $page->getTitle(),
-            'watchers' => (int) $page->getWatchers(),
-            'pageviews' => $page->getLastPageviews($pageviewsOffset),
-            'pageviews_offset' => $pageviewsOffset,
-        ];
-
-        try {
-            $info = $page->getBasicEditingInfo();
-        } catch (\Doctrine\DBAL\Exception\DriverException $e) {
-            /**
-             * The query most likely exceeded the maximum query time,
-             * so we'll abort and give only info retrived by the API.
-             */
-            $data['error'] = 'Unable to fetch revision data. The query may have timed out.';
-        }
-
-        if (isset($info)) {
-            $creationDateTime = DateTime::createFromFormat('YmdHis', $info['created_at']);
-            $modifiedDateTime = DateTime::createFromFormat('YmdHis', $info['modified_at']);
-            $secsSinceLastEdit = (new DateTime)->getTimestamp() - $modifiedDateTime->getTimestamp();
-
-            $data = array_merge($data, [
-                'revisions' => (int) $info['num_edits'],
-                'editors' => (int) $info['num_editors'],
-                'author' => $info['author'],
-                'author_editcount' => (int) $info['author_editcount'],
-                'created_at' => $creationDateTime->format('Y-m-d'),
-                'created_rev_id' => $info['created_rev_id'],
-                'modified_at' => $modifiedDateTime->format('Y-m-d H:i'),
-                'secs_since_last_edit' => $secsSinceLastEdit,
-                'last_edit_id' => (int) $info['modified_rev_id'],
-            ]);
-        }
+        $data = $this->getArticleInfoApiData($projectData, $page);
 
         if ($request->query->get('format') === 'html') {
             return $this->getApiHtmlResponse($projectData, $page, $data);
@@ -359,11 +329,66 @@ class ArticleInfoController extends XtoolsController
     }
 
     /**
+     * Generate the data structure that will used in the ArticleInfo API response.
+     * @param  Project $project
+     * @param  Page    $page
+     * @return array
+     * @codeCoverageIgnore
+     */
+    private function getArticleInfoApiData(Project $project, Page $page)
+    {
+        /** @var integer Number of days to query for pageviews */
+        $pageviewsOffset = 30;
+
+        $data = [
+            'project' => $project->getDomain(),
+            'page' => $page->getTitle(),
+            'watchers' => (int) $page->getWatchers(),
+            'pageviews' => $page->getLastPageviews($pageviewsOffset),
+            'pageviews_offset' => $pageviewsOffset,
+        ];
+
+        try {
+            $info = $page->getBasicEditingInfo();
+        } catch (\Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException $e) {
+            // No more open database connections.
+            $data['error'] = 'Unable to fetch revision data. Please try again later.';
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+            /**
+             * The query most likely exceeded the maximum query time,
+             * so we'll abort and give only info retrived by the API.
+             */
+            $data['error'] = 'Unable to fetch revision data. The query may have timed out.';
+        }
+
+        if ($info != false) {
+            $creationDateTime = DateTime::createFromFormat('YmdHis', $info['created_at']);
+            $modifiedDateTime = DateTime::createFromFormat('YmdHis', $info['modified_at']);
+            $secsSinceLastEdit = (new DateTime)->getTimestamp() - $modifiedDateTime->getTimestamp();
+
+            $data = array_merge($data, [
+                'revisions' => (int) $info['num_edits'],
+                'editors' => (int) $info['num_editors'],
+                'author' => $info['author'],
+                'author_editcount' => (int) $info['author_editcount'],
+                'created_at' => $creationDateTime->format('Y-m-d'),
+                'created_rev_id' => $info['created_rev_id'],
+                'modified_at' => $modifiedDateTime->format('Y-m-d H:i'),
+                'secs_since_last_edit' => $secsSinceLastEdit,
+                'last_edit_id' => (int) $info['modified_rev_id'],
+            ]);
+        }
+
+        return $data;
+    }
+
+    /**
      * Get the Response for the HTML output of the ArticleInfo API action.
      * @param  Project  $project
      * @param  Page     $page
      * @param  string[] $data The pre-fetched data.
      * @return Response
+     * @codeCoverageIgnore
      */
     private function getApiHtmlResponse(Project $project, Page $page, $data)
     {

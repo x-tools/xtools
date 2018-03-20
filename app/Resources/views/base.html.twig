@@ -13,8 +13,12 @@
 
         {# For $.i18n, loaded in application.js #}
         i18nLang = "{{ lang() }}";
-        i18nPath = "{{ asset('static/i18n/' ~ lang() ~ '.json') }}";
-        i18nEnPath = "{{ asset('static/i18n/en.json') }}";
+        i18nPaths = {};
+        {% for lang in fallbackLangs() %}
+            i18nPaths["{{ lang }}"] = "{{ asset('static/i18n/' ~ lang ~ '.json') }}";
+        {% endfor %}
+
+        i18nRTL = {% if isRTL() %}true{% else %}false{% endif %};
     </script>
 
     {% if loadStylesheetsFromCDN() %}
@@ -44,6 +48,9 @@
             'static/css/topedits.scss'
             output='static/production/application.css' %}
         <link rel="stylesheet" href="{{ asset_url }}" />
+        {% if isRTL() %}
+            <link rel="stylesheet" type="text/css" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-rtl/3.4.0/css/bootstrap-flipped.min.css">
+        {% endif %}
         {% endstylesheets %}
         {% javascripts
             'static/js/vendor/jquery.min.js'
@@ -91,6 +98,10 @@
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right">
+                    <li>
+                        <a href="https://translatewiki.net/w/i.php?title=Special:MessageGroupStats&amp;group=xtools">{{ msg('help-translate') }}</a>
+                    </li>
+                    <li class="divider" role="separator"></li>
                     {% for key, value in allLangs() if key != 'qqq' %}
                         <li>
                             <a class="lang-link" href="{{ path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'uselang': key})) }}" data-lang="{{ key }}">{{ value|e }}</a>
@@ -208,9 +219,9 @@
                 <a href="https://github.com/x-tools/xtools/releases/tag/{{ version }}" target="_blank" title="Current XTools version">v.{{ version }}</a>
                 (<a href="https://github.com/x-tools/xtools/tree/{{ hash() }}" target="_blank" title="Current code revision">r.{{ shortHash() }}</a>)
                 &middot;
-                <a href="{{ path('aboutPage') }}">{{ msg('about-xtools') }}</a>
+                <a target="_blank" href="https://xtools.readthedocs.io/en/stable/api/index.html">{{ msg('api') }}</a>
                 &middot;
-                <a target="_blank" href="https://xtools.readthedocs.io/en/stable/api/index.html">API</a>
+                <a href="{{ path('aboutPage') }}">{{ msg('tool-about') }}</a>
                 &middot;
                 {% include 'default/_report_issue_links.html.twig' %}
             </span>

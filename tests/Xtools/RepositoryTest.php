@@ -106,4 +106,17 @@ class RepositoryTest extends WebTestCase
             $this->stub->getCacheKey('mycache')
         );
     }
+
+    /**
+     * SQL date conditions helper.
+     */
+    public function testDateConditions()
+    {
+        $start = strtotime('20170101');
+        $end = strtotime('20170201');
+        $this->assertEquals(
+            " AND alias.rev_timestamp > '20170101000000' AND alias.rev_timestamp < '20170201235959'",
+            $this->stub->getDateConditions($start, $end, 'alias.')
+        );
+    }
 }

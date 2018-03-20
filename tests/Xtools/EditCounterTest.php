@@ -5,18 +5,22 @@
 
 namespace Tests\Xtools;
 
+use AppBundle\Helper\I18nHelper;
+use DateTime;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Xtools\EditCounter;
 use Xtools\EditCounterRepository;
 use Xtools\Project;
 use Xtools\ProjectRepository;
 use Xtools\User;
 use Xtools\UserRepository;
-use DateTime;
 
 /**
  * Tests for the EditCounter.
  */
-class EditCounterTest extends \PHPUnit_Framework_TestCase
+class EditCounterTest extends WebTestCase
 {
     /** @var Project The project instance. */
     protected $project;
@@ -45,6 +49,12 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
         $this->user = new User('Testuser');
         $this->editCounter = new EditCounter($this->project, $this->user);
         $this->editCounter->setRepository($this->editCounterRepo);
+
+        $container = static::createClient()->getContainer();
+        $stack = new RequestStack();
+        $session = new Session();
+        $i18nHelper = new I18nHelper($container, $stack, $session);
+        $this->editCounter->setI18nHelper($i18nHelper);
     }
 
     /**
@@ -541,6 +551,7 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
                         '"expiry";N;}i:3;a:1:{s:6:"expiry";s:14:"20180108132858";}i:4;a:1:{s:6:"expiry";N;}}}',
                     'log_action' => 'rights',
                     'log_user_text' => 'MusikAnimal',
+                    'type' => 'local',
                 ], [
                     'log_id' => '210220',
                     'log_timestamp' => '20180108132758',
@@ -554,6 +565,7 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
                         'i:4;a:1:{s:6:"expiry";s:14:"20180108132858";}i:5;a:1:{s:6:"expiry";N;}}}',
                     'log_action' => 'rights',
                     'log_user_text' => 'MusikAnimal',
+                    'type' => 'local',
                 ], [
                     'log_id' => '155321',
                     'log_timestamp' => '20150716002614',
@@ -563,6 +575,7 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
                         's:10:"bureaucrat";}}',
                     'log_action' => 'rights',
                     'log_user_text' => 'Cyberpower678',
+                    'type' => 'meta',
                 ], [
                     'log_id' => '140643',
                     'log_timestamp' => '20141222034127',
@@ -570,7 +583,8 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
                     'log_params' => "\nsysop",
                     'log_action' => 'rights',
                     'log_user_text' => 'Snowolf',
-                ]
+                    'type' => 'meta',
+                ],
             ]);
 
         $this->assertEquals([
@@ -581,6 +595,7 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
                 'added' => [],
                 'removed' => ['ipblock-exempt', 'filemover'],
                 'automatic' => true,
+                'type' => 'local',
             ],
             20180108132810 => [
                 'logId' => '210221',
@@ -589,6 +604,7 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
                 'added' => [],
                 'removed' => ['templateeditor'],
                 'automatic' => false,
+                'type' => 'local',
             ],
             20180108132758 => [
                 'logId' => '210220',
@@ -597,6 +613,7 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
                 'added' => ['ipblock-exempt', 'filemover', 'templateeditor'],
                 'removed' => [],
                 'automatic' => false,
+                'type' => 'local',
             ],
             20150716002614 => [
                 'logId' => '155321',
@@ -605,6 +622,7 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
                 'added' => ['bureaucrat'],
                 'removed' => ['rollbacker'],
                 'automatic' => false,
+                'type' => 'meta',
             ],
             20141222034127 => [
                 'logId' => '140643',
@@ -613,7 +631,32 @@ class EditCounterTest extends \PHPUnit_Framework_TestCase
                 'added' => ['sysop'],
                 'removed' => [],
                 'automatic' => false,
+                'type' => 'meta',
             ],
         ], $this->editCounter->getRightsChanges());
+
+        $this->editCounterRepo->expects($this->once())
+            ->method('getGlobalRightsChanges')
+            ->willReturn([[
+                'log_id' => '140643',
+                'log_timestamp' => '20141222034127',
+                'log_comment' => 'per request',
+                'log_params' => "\nsysop",
+                'log_action' => 'gblrights',
+                'log_user_text' => 'Snowolf',
+                'type' => 'global',
+            ]]);
+
+        $this->assertEquals([
+            20141222034127 => [
+                'logId' => '140643',
+                'admin' => 'Snowolf',
+                'comment' => 'per request',
+                'added' => ['sysop'],
+                'removed' => [],
+                'automatic' => false,
+                'type' => 'global',
+            ],
+        ], $this->editCounter->getGlobalRightsChanges());
     }
 }

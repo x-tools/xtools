@@ -60,7 +60,7 @@ class AdminStatsControllerTest extends WebTestCase
 
         $adminStats = $controller2->setUpAdminStats('frwiki', '2017-01-01', '2017-03-01');
         $this->assertInstanceOf('Xtools\AdminStats', $adminStats);
-        $this->assertEquals('2017-01-01', $adminStats->getStart());
-        $this->assertEquals('2017-03-01', $adminStats->getEnd());
+        $this->assertEquals(1483228800, $adminStats->getStart());
+        $this->assertEquals(1488326400, $adminStats->getEnd());
     }
 }

@@ -1,0 +1,136 @@
+{% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
+{% import 'macros/wiki.html.twig' as wiki %}
+
+{% block body %}
+
+{% if not is_sub_request %}
+    <div class="panel panel-primary">
+        <header class="panel-heading">
+            <div class="text-center xt-heading-top">
+                <a class="back-to-search" href="{{ path('AutoEditsResult', {project: project.domain, username:user.username, start: ae.start, end: ae.end, namespace: ae.namespace}) }}">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                    {{ msg('see-full-statistics') }}
+                </a>
+                {{ wiki.userLink(user, project) }}
+                <small> &bull; {{ project.title }} </small>
+            </div>
+        </header>
+        <div class="panel-body xt-panel-body">
+            {{ wiki.userLinks(user, project, xtPage) }}
+
+            <section class="panel panel-default clearfix">
+                <header class="panel-heading col-lg-12">
+                    <h4>
+                        {% if ae.tool is empty %}
+                            {{ msg('tool-autoedits') }}
+                        {% else %}
+                            {% set toolData = ae.getToolCounts()[ae.tool] %}
+                            {% set toolLink %}
+                                {{ wiki.pageLinkRaw(toolData.link, project, toolData.label) }}
+                            {% endset %}
+                            {{ msg('auto-tool-edits', [toolLink]) }}
+                        {% endif %}
+                        <span class='pull-right text-muted xt-panel-description'>{{ msg('auto-contribs-desc') }}</span>
+                    </h4>
+                </header>
+                <div class="panel-body col-lg-12">
+                    <em class="non-auto-edits-loading text-muted" style="display:none">{{ msg('loading') }}...</em>
+                    <div class="non-auto-edits-container"
+                        data-project="{{ project.domain }}"
+                        data-username="{{ user.username }}"
+                        data-start="{{ ae.start }}"
+                        data-end="{{ ae.end }}"
+                        data-namespace="{{ ae.namespace }}"
+                        data-target="autoedits">
+{% endif %}
+
+{% if ae.automatedEdits() is iterable %}
+    {% if ae.automatedEdits()|length > 0 %}
+        <div>
+            <form class="tool-selector-form form-inline" action="{{ path('AutoEditsContributionsResult', {project: project.domain, username:user.username, start: ae.start, end: ae.end, namespace: ae.namespace}) }}" method="get" accept-charset="utf-8">
+                <label for="toolSelector">{{ msg('auto-contribs-use-tool') }}</label>
+                <select id="toolSelector" class="form-control" name="tool">
+                    <option value="">{{ msg('all') }}</option>
+                    {% for tool in ae.getToolCounts()|keys|sort %}
+                        <option value="{{ tool }}" {% if ae.tool == tool %}selected="selected"{% endif %}>
+                            {{ tool }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-primary form-submit">{{ msg('submit') }}</button>
+            </form>
+        </div>
+    {% endif %}
+    <div class="non-auto-edits-nav clearfix">
+        {% if ae.offset > 0 %}
+            <a href="#" class="pull-left prev-edits">
+                <span class="glyphicon glyphicon-arrow-{% if isRTL() %}right{% else %}left{% endif %}"></span>
+                {{ msg('pager-newer-n', [50])|capitalize_first }}
+            </a>
+        {% endif %}
+        {% if ae.automatedEdits()|length == 50 %}
+            <a href="#" class="pull-right next-edits">
+                {{ msg('pager-older-n', [50])|capitalize_first }}
+                <span class="glyphicon glyphicon-arrow-{% if isRTL() %}left{% else %}right{% endif %}"></span>
+            </a>
+        {% endif %}
+    </div>
+    <table class="table table-bordered table-hover table-striped contribs-table">
+        <thead>
+        {% for key in ['page-title', 'date', 'links', 'size', 'edit-summary'] %}
+            <th>{{ msg(key)|capitalize_first }}</th>
+        {% endfor %}
+        </thead>
+        <tbody>
+            {% if ae.automatedEdits()|length == 0 %}
+                <tr>
+                    <td colspan=5 class="text-center">{{ msg('no-contribs') }}</td>
+                </tr>
+            {% else %}
+                {% for edit in ae.automatedEdits() %}
+                    <tr>
+                        <td>{{ wiki.pageLinkRaw(edit.page.title(true), project) }}</td>
+                        <td>{{ wiki.permaLink(edit) }}</td>
+                        <td>
+                            {{ wiki.diffLink(edit) }}
+                            &middot;
+                            {{ wiki.pageHistLinkRaw(edit.page.title(true), project) }}
+                        </td>
+                        <td>
+                            {{ edit.size|diff_format }}
+                        </td>
+                        <td>{{ edit.wikifiedComment(true)|raw }}</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+    <div class="non-auto-edits-nav clearfix">
+        {% if ae.offset > 0 %}
+            <a href="#" class="pull-left prev-edits">
+                <span class="glyphicon glyphicon-arrow-{% if isRTL() %}right{% else %}left{% endif %}"></span>
+                {{ msg('pager-newer-n', [50])|capitalize_first }}
+            </a>
+        {% endif %}
+        {% if ae.automatedEdits()|length == 50 %}
+            <a href="#" class="pull-right next-edits">
+                {{ msg('pager-older-n', [50])|capitalize_first }}
+                <span class="glyphicon glyphicon-arrow-{% if isRTL() %}left{% else %}right{% endif %}"></span>
+            </a>
+        {% endif %}
+    </div>
+{% else %}
+    <div class="text-danger">
+        {{ msg('too-many-edits', [user.maxEdits|number_format, user.maxEdits]) }}
+    </div>
+{% endif %}
+
+{% if not is_sub_request %}
+    </div></div></section>
+    <div class="text-muted times-in-utc" style="clear:both">
+        {{ msg('times-in-utc') }}
+    </div>
+    </div></div>
+{% endif %}
+
+{% endblock %}

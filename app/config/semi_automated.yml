@@ -6,6 +6,7 @@
 #       regex: Regular expression to match against edit summary
 #       tag: Tag name for the tool, if applicable. See [[Special:Tags]] for full list
 #       link: Wiki link to tool documentation
+#       label: Text to use as the label, defaults to the tool's key. Use this for translations.
 #       revert: If the tool is used *only* to revert edits (and not also issue talk page
 #               notifications, etc.), set this to `true`. If the tool is capable of reverting
 #               edits, set 'revert' to regex that would only account for reverts.
@@ -30,10 +31,14 @@ parameters:
             link: Special:MyLanguage/Project:Rollback
             revert: true
         Undo:
-            regex: '^(Undid|Undo) revision \d+ by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\]'
+            tag: mw-undo
+            regex: '^(Undid|Undo|\[\[WP:UNDO\|Undid\]\]) revision \d+ by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\]'
             link: Special:MyLanguage/Project:Undo
             # This is not considered a revert because you can undo
             # any arbitrary revision, not just the previous one.
+        Redirect:
+            tag: mw-new-redirect
+            link: mw:Special:MyLanguage/Help:Redirects
         Huggle:
             regex: '\(\[\[WP:HG'
             tag: huggle
@@ -46,7 +51,7 @@ parameters:
             tag: 'OAuth CID: 678'
             link: Special:MyLanguage/User:InternetArchiveBot
         HotCat:
-            regex: 'using \[\[(WP:HOTCAT|WP:HC|Help:Gadget-HotCat)\|HotCat|Gadget-Hotcat(?:check)?\.js\|Script'
+            regex: '\|HotCat\]\]|Gadget-Hotcat(?:check)?\.js\|Script|\]\] via HotCat'
             link: Special:MyLanguage/Project:HotCat
         Cat-a-lot:
             regex: '\[\[Help:Cat-a-lot\|Cat-a-lot\]\]'
@@ -60,8 +65,128 @@ parameters:
         Popups:
             regex: 'Wikipedia:Tools\/Navigation_popups|popups'
             link: w:en:Project:Popups
+        Commons file rename:
+            regex: 'COM:FR\|File renamed\]\]:'
+            link: c:Special:MyLanguage/Commons:File renaming
+        Commons duplicate file:
+            regex: 'COM:Duplicate\|Duplicate'
+            link: c:Commons:Duplicate
+        reFill:
+            regex: 'User:Zhaofeng Li\/Reflinks|WP:REFILL|en:WP:REFILL'
+            link: Project:ReFill
+        WikiLove:
+            tag: wikilove
+            link: Special:MyLanguage/Extension:WikiLove
+
+    # Per-language lists. This generally only includes native MediaWiki actions.
+    ar:
+        Undo:
+            regex: 'الرجوع عن التعديل \d+ بواسطة'
+    de:
+        Undo:
+            regex: 'Änderung \d+ von \[\[.*?rückgängig gemacht'
+            label: Rückgängig
+        Generic rollback:
+            regex: 'Änderungen von \[\[.*?die letzte Version von \[\[.*?zurückgesetzt'
+            label: Zurücksetzen
+        Page move:
+            regex: 'verschob die Seite \[\[.*?nach'
+            label: Seite verschieben
+        Redirect:
+            regex: 'Weiterleitung nach \[\[.*?erstellt'
+            label: Weiterleitung
+    ko:
+        Undo:
+            regex: '판 편집을 되돌림'
+            label: '편집 취소'
+        Generic rollback:
+            regex: '(의 마지막 판으로 되돌림|의 편집을 전부 되돌림)'
+            label: '되돌리기'
+        Page move:
+            regex: '문서로 이동했습니다'
+            label: '문서 이동'
 
     # Per-wiki lists
+    ar.wikipedia.org:
+        Generic rollback:
+            regex: 'استرجاع تعديلات.*حتى آخر نسخة بواسطة'
+        Huggle:
+            regex: '\(\[\[ويكيبيديا:هغل'
+            link: ويكيبيديا:هغل
+            label: هغل
+        Page move:
+            regex: 'نقل.*?صفحة \[\[.*?إلى \[\['
+            link: ويكيبيديا:نقل_صفحة
+            label: نقل_صفحة
+        AutoWikiBrowser:
+            regex: 'Project:أوب'
+            link: ويكيبيديا:أوتوويكي_براوزر
+        HotCat:
+            regex: 'باستخدام \[\[ويكيبيديا:المصناف الفوري'
+            link: ويكيبيديا:المصناف الفوري
+            label: المصناف الفوري
+        Popups:
+            link: ويكيبيديا:المنبثقات
+            label: المنبثقات
+        WPCleaner:
+            link: ويكيبيديا:وب_كلينر
+            label: وب_كلينر
+        Rater:
+            regex: '\[\[(:User:FShbib\/المقيم|ويكيبيديا:المقيم)'
+            link: مستخدم:FShbib/المقيم
+    commons.wikimedia.org:
+        UploadWizard:
+            regex: '^User created page with UploadWizard$'
+            link: Special:MyLanguage/Commons:Upload Wizard
+        VisualFileChange:
+            regex: 'Using \[\[COM:VFC'
+            tag: VisualFileChange
+            link: Special:MyLanguage/Help:VisualFileChange.js
+        AjaxQuickDelete:
+            regex: '^(This category needs discussion|\[\[:.*?\]\] needs discussion|Starting category discussion|Nominating for deletion|\[\[:.*?\]\] has been nominated for deletion|Starting deletion request|Listing \[\[.*?\]\])$|#Autoreport by AjaxQuickDelete|^Updating redirect while processing'
+            link: Special:MyLanguage/Help:Nominate_for_deletion
+        QuickDelete:
+            regex: '^(Marking as possible copyvio because|Notification of possible copyright violation for|\[\[.*?\]\] does not have a source|Please send permission for \[\[|\]\] does not have a license)|^(File has no source|Missing permission)$'
+            link: Special:MyLanguage/Help:QuickDelete
+        POTY:
+            regex: '\[\[Help:(?:Gadget-)EnhancedPOTY.js|POTY App\]\]$'
+            link: Help:Gadget-EnhancedPOTY.js
+        Flickr2Commons:
+            regex: 'via \[\[(?:Special:MyLanguage\/)?Commons:Flickr2Commons'
+            link: Special:MyLanguage/Flickr2Commons
+        Android Commons:
+            regex: '^Uploaded using Android Commons app$'
+            link: Special:MyLanguage/Commons:Mobile_app
+        Commonsist:
+            regex: '^commonist \d\.\d'
+            link: Special:MyLanguage/Commons:Commonist
+        RenameLink:
+            regex: '^\(\[\[Help:RenameLink\|Script'
+            link: Special:MyLanguage/Help:RenameLink
+        Geograph2commons:
+            regex: 'Transferred from geograph.co.uk using'
+            link: Special:GoToInterwiki/toollabs:geograph2commons
+        SettingsManager:
+            regex: '\[\[MediaWiki:Gadget-SettingsManager.js\|SettingsManager'
+            link: MediaWiki:Gadget-SettingsManager.js
+        RotateLink:
+            regex: '\(\[\[Help:RotateLink\|Script'
+            link: Help:RotateLink
+    de.wikipedia.org:
+        Generic rollback:
+            link: Wikipedia:Zurücksetzen
+        Page move:
+            link: Hilfe:Seite verschieben
+        Redirect:
+            link: Wikipedia:Weiterleitung
+        Popups:
+            regex: 'Wikipedia:Helferlein/Navigation-Popups\|Popups'
+            link: Wikipedia:Helferlein/Navigation-Popups
+            label: Navigation-Popups
+    de.wiktionary.org:
+        Einfügen-Erweiterung:
+            regex: \[\[Hilfe:Einfügen-Erweiterung\|
+            link: Hilfe:Einfügen-Erweiterung
     en.wikipedia.org:
         Pending changes revert:
             regex: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) \d+ (\[\[Wikipedia:Pending changes\|pending\]\]|pending) edits? (to revision \d+|by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\])'
@@ -91,11 +216,8 @@ parameters:
             regex: 'WP:(AFCH|AFCHRW)'
             link: Project:AFCH
         AutoWikiBrowser:
-            regex: '(Wikipedia|WP|Project):AWB'
+            regex: '(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
             link: Project:AutoWikiBrowser
-        reFill:
-            regex: 'User:Zhaofeng Li\/Reflinks|WP:REFILL'
-            link: Project:ReFill
         Checklinks:
             regex: 'using \[\[w:WP:CHECKLINKS'
             link: Project:CHECKLINKS
@@ -125,7 +247,6 @@ parameters:
             link: Project:EPH
         WikiLove:
             regex: 'new WikiLove message'
-            tag: 'wikilove'
             link: Project:WikiLove
         AutoEd:
             regex: 'using \[\[(Wikipedia|WP):AutoEd\|AutoEd'
@@ -149,8 +270,8 @@ parameters:
             regex: '\(using \[\[User:MusikAnimal\/responseHelper\|responseHelper'
             link: User:MusikAnimal/responseHelper
         Advisor.js:
-            regex: '\(using \[\[User:Cameltrader#Advisor.js\|Advisor.js'
-            link: User:Cameltrader/Advisor
+            regex: '\(using \[\[(User:Cameltrader#Advisor.js|User:PC-XT\/Advisor)\|Advisor.js'
+            link: WP:ADVISOR
         AfD closures:
             regex: '^\[\[Wikipedia:Articles for deletion\/.*?closed as'
             link: Project:Articles for deletion
@@ -235,68 +356,29 @@ parameters:
         MoveToDraft:
             regex: '\[\[User:Evad37\/MoveToDraft\.js\|via script'
             link: User:Evad37/MoveToDraft
-    commons.wikimedia.org:
-        UploadWizard:
-            regex: '^User created page with UploadWizard$'
-            link: Special:MyLanguage/Commons:Upload Wizard
-        File rename:
-            regex: '\[\[COM:FR\|File renamed\]\]:'
-            link: Special:MyLanguage/Commons:File_renaming
-        VisualFileChange:
-            regex: 'Using \[\[COM:VFC'
-            tag: VisualFileChange
-            link: Special:MyLanguage/Help:VisualFileChange.js
-        AjaxQuickDelete:
-            regex: '^(This category needs discussion|\[\[:.*?\]\] needs discussion|Starting category discussion|Nominating for deletion|\[\[:.*?\]\] has been nominated for deletion|Starting deletion request|Listing \[\[.*?\]\])$|#Autoreport by AjaxQuickDelete|^Updating redirect while processing'
-            link: Special:MyLanguage/Help:Nominate_for_deletion
-        QuickDelete:
-            regex: '^(Marking as possible copyvio because|Notification of possible copyright violation for|\[\[.*?\]\] does not have a source|Please send permission for \[\[|\]\] does not have a license)|^(File has no source|Missing permission)$'
-            link: Special:MyLanguage/Help:QuickDelete
-        POTY:
-            regex: '\[\[Help:(?:Gadget-)EnhancedPOTY.js|POTY App\]\]$'
-            link: Help:Gadget-EnhancedPOTY.js
-        Flickr2Commons:
-            regex: 'via \[\[(?:Special:MyLanguage\/)?Commons:Flickr2Commons'
-            link: Special:MyLanguage/Flickr2Commons
-        Android Commons:
-            regex: '^Uploaded using Android Commons app$'
-            link: Special:MyLanguage/Commons:Mobile_app
-        Commonsist:
-            regex: '^commonist \d\.\d'
-            link: Special:MyLanguage/Commons:Commonist
-        RenameLink:
-            regex: '^\(\[\[Help:RenameLink\|Script'
-            link: Special:MyLanguage/Help:RenameLink
-        Geograph2commons:
-            regex: 'Transferred from geograph.co.uk using'
-            link: Special:GoToInterwiki/toollabs:geograph2commons
-        SettingsManager:
-            regex: '\[\[MediaWiki:Gadget-SettingsManager.js\|SettingsManager'
-            link: MediaWiki:Gadget-SettingsManager.js
-        RotateLink:
-            regex: '\(\[\[Help:RotateLink\|Script'
-            link: Help:RotateLink
-    ar.wikipedia.org:
-        Generic rollback:
-            regex: 'استرجاع تعديلات.*حتى آخر نسخة بواسطة'
-        Undo:
-            regex: 'الرجوع عن التعديل \d+ بواسطة'
-        Huggle:
-            regex: '\(\[\[ويكيبيديا:هغل'
-            link: ويكيبيديا:هغل
-        Page move:
-            regex: 'نقل.*?صفحة \[\[.*?إلى \[\['
-            link: ويكيبيديا:نقل_صفحة
+    ko.wikipedia.org:
         AutoWikiBrowser:
-            regex: 'Project:أوب'
-            link: ويكيبيديا:أوتوويكي_براوزر
-        HotCat:
-            regex: 'باستخدام \[\[ويكيبيديا:المصناف الفوري'
-            link: ويكيبيديا:المصناف الفوري
+            regex: '위키백과:AWB\|AWB|(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
+            link: 위키백과:AWB
+            label: 오토위키브라우저
         Popups:
-            link: ويكيبيديا:المنبثقات
-        WPCleaner:
-            link: ويكيبيديا:وب_كلينر
-        Rater:
-            regex: '\[\[:User:FShbib\/المقيم'
-            link: مستخدم:FShbib/المقيم
+            regex: '\[\[백:팝업\|NavPop\]\]'
+            link: 백:팝업
+            label: 내비게이션 팝업
+        Twinkle:
+            regex: '\[\[위키백과:도구\/트윙클\|TW\]\]|(Wikipedia|WP):(TW|TWINKLE|Twinkle|FRIENDLY)'
+            link: 위키백과:도구/트윙클
+            label: 트윙클
+        WikiLove:
+            regex: '새 위키사랑 글'
+            link: 위키백과:위키사랑
+            label: 위키사랑
+    pt.wikipedia.org:
+        Undo:
+            regex: 'Desfeita a edição \d+ de \[\['
+        FastButtons:
+            regex: '\|FastButtons\]\]'
+            link: Wikipédia:FastButtons
+        Script de ajustes:
+            regex: 'usando \[\[[Uu]ser:Luizdl/Script de ajustes.js'
+            link: User:Luizdl/Script de ajustes.js

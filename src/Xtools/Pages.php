@@ -26,10 +26,10 @@ class Pages extends Model
     /** @var string Which namespace we are querying for. */
     protected $namespace;
 
-    /** @var string One of 'noredirects', 'onlyredirects' or blank for both. */
+    /** @var string One of 'noredirects', 'onlyredirects' or 'all' for both. */
     protected $redirects;
 
-    /** @var string One of 'both', 'live' or 'deleted' */
+    /** @var string One of 'live', 'deleted' or 'all' for both. */
     protected $deleted;
 
     /** @var int Pagination offset. */
@@ -49,8 +49,8 @@ class Pages extends Model
      * @param Project $project
      * @param User $user
      * @param string|int $namespace Namespace ID or 'all'.
-     * @param string $redirects One of 'noredirects', 'onlyredirects' or blank for both.
-     * @param string $deleted One of 'live', 'deleted' or 'both'.
+     * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
+     * @param string $deleted One of 'live', 'deleted' or 'all' for both.
      * @param int $offset Pagination offset.
      */
     public function __construct(
@@ -58,14 +58,14 @@ class Pages extends Model
         User $user,
         $namespace = 0,
         $redirects = 'noredirects',
-        $deleted = 'both',
+        $deleted = 'all',
         $offset = 0
     ) {
         $this->project = $project;
         $this->user = $user;
         $this->namespace = $namespace === 'all' ? 'all' : (string)$namespace;
-        $this->redirects = $redirects;
-        $this->deleted = $deleted;
+        $this->redirects = $redirects ?: 'noredirects';
+        $this->deleted = $deleted ?: 'all';
         $this->offset = $offset;
     }
 
@@ -125,16 +125,20 @@ class Pages extends Model
 
     /**
      * Fetch and prepare the pages created by the user.
+     * @param bool $all Whether to get *all* results. This should only be used for
+     *     export options. HTTP and JSON should paginate.
      * @codeCoverageIgnore
      */
-    public function prepareData()
+    public function prepareData($all = false)
     {
         $this->pages = [];
 
         foreach ($this->getNamespaces() as $ns) {
-            $data = $this->fetchPagesCreated($ns);
+            $data = $this->fetchPagesCreated($ns, $all);
             $this->pages[$ns] = $this->formatPages($data)[$ns];
         }
+
+        // $this->recreatedPages = $this->fetchRecreatedPages();
 
         return $this->pages;
     }
@@ -142,12 +146,14 @@ class Pages extends Model
     /**
      * The public function to get the list of all pages created by the user,
      * up to self::resultsPerPage(), across all namespaces.
+     * @param bool $all Whether to get *all* results. This should only be used for
+     *     export options. HTTP and JSON should paginate.
      * @return array
      */
-    public function getResults()
+    public function getResults($all = false)
     {
         if ($this->pages === null) {
-            $this->prepareData();
+            $this->prepareData($all);
         }
         return $this->pages;
     }
@@ -248,10 +254,15 @@ class Pages extends Model
 
     /**
      * Number of results to show, depending on the namespace.
+     * @param bool $all Whether to get *all* results. This should only be used for
+     *     export options. HTTP and JSON should paginate.
      * @return int
      */
-    public function resultsPerPage()
+    public function resultsPerPage($all = false)
     {
+        if ($all === true) {
+            return false;
+        }
         if ($this->namespace === 'all') {
             return self::RESULTS_LIMIT_ALL_NAMESPACES;
         }
@@ -274,17 +285,19 @@ class Pages extends Model
      * Run the query to get pages created by the user with options.
      * This is ran independently for each namespace if $this->namespace is 'all'.
      * @param string $namespace Namespace ID.
+     * @param bool $all Whether to get *all* results. This should only be used for
+     *     export options. HTTP and JSON should paginate.
      * @return array
      */
-    private function fetchPagesCreated($namespace)
+    private function fetchPagesCreated($namespace, $all = false)
     {
-        return $this->user->getRepository()->getPagesCreated(
+        return $this->getRepository()->getPagesCreated(
             $this->project,
             $this->user,
             $namespace,
             $this->redirects,
             $this->deleted,
-            $this->resultsPerPage(),
+            $this->resultsPerPage($all),
             $this->offset * $this->resultsPerPage()
         );
     }
@@ -296,7 +309,7 @@ class Pages extends Model
      */
     private function countPagesCreated()
     {
-        return $this->user->getRepository()->countPagesCreated(
+        return $this->getRepository()->countPagesCreated(
             $this->project,
             $this->user,
             $this->namespace,
@@ -316,10 +329,6 @@ class Pages extends Model
         $results = [];
 
         foreach ($pages as $row) {
-            // if (!isset($results[$row['namespace']])) {
-            //     $results[$row['namespace']] = [];
-            // }
-
             $datetime = DateTime::createFromFormat('YmdHis', $row['rev_timestamp']);
             $datetimeHuman = $datetime->format('Y-m-d H:i');
 
@@ -335,12 +344,6 @@ class Pages extends Model
 
             $results[$row['namespace']][] = $pageData;
         }
-
-        // ksort($results);
-
-        // foreach (array_keys($results) as $key) {
-        //     krsort($results[$key]);
-        // }
 
         return $results;
     }

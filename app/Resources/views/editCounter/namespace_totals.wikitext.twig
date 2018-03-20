@@ -3,7 +3,7 @@
 == [[User:{{ user.username }}]] ==
 
 {% set link %}[{{ url('EditCounterNamespaceTotals', {'username': user.username, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
-{{ msg('xtools-advert', [link, date()|date('Y-m-d H:i')]) }}
+{{ msg('xtools-advert', [link, date()|date_format]) }}
 {% endif %}
 
 === {{ msg('namespace-totals') }} ===
@@ -19,7 +19,7 @@
 {% set availableNamespaces = availableNamespaces|merge([nsId]) %}
 | {{ loop.index }}
 | {{ nsName(nsId, project.namespaces) }}
-| [{{ url('TopEditsResults', {project:project.domain, username:user.username, namespace:nsId}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ value }}}}] ({{ value|percent_format(ec.countLiveRevisions) }})
+| [{{ url('TopEditsResult', {project:project.domain, username:user.username, namespace:nsId}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ value }}}}] ({{ value|percent_format(ec.countLiveRevisions) }})
 |-
 {% endfor %}
 !

@@ -1,6 +1,7 @@
 {% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
 {% import 'macros/layout.html.twig' as layout %}
 {% import 'macros/wiki.html.twig' as wiki %}
+{% import 'macros/layout.html.twig' as layout %}
 {% import 'macros/pieChart.html.twig' as chart %}
 
 {% block body %}
@@ -9,9 +10,9 @@
     <div class="panel panel-primary">
         <header class="panel-heading">
             <div class="text-center xt-heading-top">
-                <a class="back-to-search" href="{{ path('ec') }}">
+                <a class="back-to-search" href="{{ path('EditCounterResult', {project: project.domain, username:user.username}) }}">
                     <span class="glyphicon glyphicon-chevron-left"></span>
-                    {{ msg('back') }}
+                    {{ msg('see-full-statistics') }}
                 </a>
                 {{ wiki.userLink(user, project) }}
                 <small> &bull; {{ project.title }} </small>
@@ -60,16 +61,16 @@
         </tr>
         <tr>
             <td>{{ msg('first-edit') }}</td>
-            <td>{% if ec.datetimeFirstRevision %}{{ ec.datetimeFirstRevision|date('Y-m-d H:i') }}{% endif %}</td>
+            <td>{% if ec.datetimeFirstRevision %}{{ ec.datetimeFirstRevision|date_format }}{% endif %}</td>
         </tr>
         <tr>
             <td>{{ msg('latest-edit') }}</td>
-            <td>{% if ec.datetimeLastRevision %}{{ ec.datetimeLastRevision|date('Y-m-d H:i') }}{% endif %}</td>
+            <td>{% if ec.datetimeLastRevision %}{{ ec.datetimeLastRevision|date_format }}{% endif %}</td>
         </tr>
         <tr>
             <td class="stat-list--new-group">{{ msg('live-edits') }}</td>
             <td class="stat-list--new-group">
-                {{ wiki.pageLinkRaw('Special:Contributions/'~user.username, project, ec.countLiveRevisions|num_format) }}
+                {{ wiki.pageLinkRaw('Special:Contributions/' ~ user.username, project, ec.countLiveRevisions|num_format) }}
                 {% if ec.countAllRevisions %}
                     &middot;
                     ({{ ((ec.countLiveRevisions / ec.countAllRevisions) * 100)|percent_format }})
@@ -133,8 +134,8 @@
             </tr>
             <tr>
                 <td>{% spaceless %}
-                    <a class="glyphicon glyphicon-info-sign tooltipcss tooltipcss--pages-created" href="https://xtools.readthedocs.io/en/latest/tools/editcounter.html#general-statistics">
-                        <div class="tooltip-body">{{ msg('pages-created-tooltip') }}</div>
+                    <a class="glyphicon glyphicon-info-sign tooltipcss tooltipcss--pages-created" href="https://xtools.readthedocs.io/en/latest/tools/editcounter.html#general-statistics" role="dialog" aria-labelledby="pages-created-desc">
+                        <div id="pages-created-desc" class="tooltip-body">{{ msg('pages-created-tooltip') }}</div>
                     </a>
                     {{ msg('pages-created') }}
                 {% endspaceless %}</td>
@@ -186,7 +187,7 @@
                 <td>{{ msg('auto-edits') }}</td>
                 <td>
                     {% if enabled('autoedits') %}
-                        <a href="{{ path('autoedits', {project:project.domain, username:user.username, namespace:'all'}) }}">{{ ec.countAutomatedEdits|num_format }}</a>
+                        <a href="{{ path('AutoEditsResult', {project:project.domain, username:user.username, namespace:'all'}) }}">{{ ec.countAutomatedEdits|num_format }}</a>
                     {% else %}
                         {{ ec.countAutomatedEdits }}
                     {% endif %}
@@ -200,7 +201,7 @@
                 <td>{{ msg('edits-with-summaries') }}</td>
                 <td>
                     {% if enabled('es') %}
-                        <a href="{{ path('es', {project:project.domain, username:user.username, namespace:'all'}) }}">{{ ec.countRevisionsWithComments|num_format }}</a>
+                        <a href="{{ path('EditSummaryResult', {project:project.domain, username:user.username, namespace:'all'}) }}">{{ ec.countRevisionsWithComments|num_format }}</a>
                     {% else %}
                         {{ ec.countRevisionsWithComments|num_format }}
                     {% endif %}
@@ -346,7 +347,7 @@
             <tr>
                 <td>{{ msg('re-blocks') }}</td>
                 <td>
-                    {{ wiki.blockLogLink(user.username, project, ec.countBlocksReceived) }}
+                    {{ wiki.blockLogLink(user.username, project, ec.countBlocksReceived|num_format) }}
                 </td>
             </tr>
             <tr>
@@ -369,7 +370,7 @@
                             {% if user.getBlockExpiry(project) == 'infinity' %}
                                 &#x221e; {# infinity #}
                             {% else %}
-                                {{ user.getBlockExpiry(project)|date('Y-m-d H:i') }}
+                                {{ user.getBlockExpiry(project)|date_format }}
                             {% endif %}
                         {% endspaceless %}
                     {% else %}
@@ -395,16 +396,15 @@
                 <tr>
                     <td>
                         {% if topProj.project.databaseName == project.databaseName %}
-                            <span title="{{ msg('selected') }}">&#9658;</span>
+                            <span title="{{ msg('selected') }}">{% if isRTL() %}&#9668;{% else %}&#9658;{% endif %}</span>
                         {% endif %}
                         {# use project.domain instead of title due to limited space available in the interface #}
-                        {{- wiki.pageLinkRaw('Special:Contributions/'~user.username, topProj.project, topProj.project.domain) -}}
-                    </td>
+                        <a href="{{ path('EditCounterResult', {project:topProj.project.domain, username:user.username}) }}">
+                            {{- topProj.project.domain -}}
+                        </a>{#-
+                    -#}</td>
                     <td>
-                        <a href="{{ path('TopEditsResults', {project:topProj.project.domain, username:user.username}) }}">
-                            {{ topProj.total|num_format }}
-                        </a>
-                        {# <small class="text-muted">@TODO days</small> #}
+                        {{- wiki.pageLinkRaw('Special:Contributions/'~user.username, topProj.project, topProj.total|num_format) -}}
                     </td>
                 </tr>
             {% endfor %}

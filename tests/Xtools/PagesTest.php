@@ -7,8 +7,8 @@ namespace Tests\Xtools;
 
 use PHPUnit_Framework_TestCase;
 use Xtools\Pages;
+use Xtools\PagesRepository;
 use Xtools\User;
-use Xtools\UserRepository;
 use Xtools\Project;
 use Xtools\ProjectRepository;
 
@@ -26,8 +26,8 @@ class PagesTest extends PHPUnit_Framework_TestCase
     /** @var User The user instance. */
     protected $user;
 
-    /** @var UserRepository The user repo instance. */
-    protected $userRepo;
+    /** @var PagesRepository The user repo instance. */
+    protected $pagesRepo;
 
     /**
      * Set up container, class instances and mocks.
@@ -42,7 +42,7 @@ class PagesTest extends PHPUnit_Framework_TestCase
             ->willReturn($this->getAssessmentsConfig());
         $this->project->setRepository($this->projectRepo);
         $this->user = new User('Test user');
-        $this->userRepo = $this->getMock(UserRepository::class);
+        $this->pagesRepo = $this->getMock(PagesRepository::class);
     }
 
     /**
@@ -50,23 +50,24 @@ class PagesTest extends PHPUnit_Framework_TestCase
      */
     public function testConstructor()
     {
-        $pr = new Pages($this->project, $this->user);
-        $this->assertEquals(0, $pr->getNamespace());
-        $this->assertEquals($this->project, $pr->getProject());
-        $this->assertEquals($this->user, $pr->getUser());
-        $this->assertEquals('noredirects', $pr->getRedirects());
-        $this->assertEquals(0, $pr->getOffset());
+        $pages = new Pages($this->project, $this->user);
+        $this->assertEquals(0, $pages->getNamespace());
+        $this->assertEquals($this->project, $pages->getProject());
+        $this->assertEquals($this->user, $pages->getUser());
+        $this->assertEquals('noredirects', $pages->getRedirects());
+        $this->assertEquals(0, $pages->getOffset());
     }
 
     public function testResults()
     {
         $this->setPagesResults();
-        $pr = new Pages($this->project, $this->user, 0, '');
-        $pr->prepareData();
-        $this->assertEquals(3, $pr->getNumResults());
-        $this->assertEquals(1, $pr->getNumDeleted());
-        $this->assertEquals(1, $pr->getNumRedirects());
-        $this->assertEquals(true, $pr->hasPageAssessments());
+        $pages = new Pages($this->project, $this->user, 0, '');
+        $pages->setRepository($this->pagesRepo);
+        $pages->prepareData();
+        $this->assertEquals(3, $pages->getNumResults());
+        $this->assertEquals(1, $pages->getNumDeleted());
+        $this->assertEquals(1, $pages->getNumRedirects());
+        $this->assertEquals(true, $pages->hasPageAssessments());
 
         $this->assertEquals([
             0 => [
@@ -79,9 +80,9 @@ class PagesTest extends PHPUnit_Framework_TestCase
                 'redirects' => 1,
                 'deleted' => 0,
             ],
-        ], $pr->getCounts());
+        ], $pages->getCounts());
 
-        $results = $pr->getResults();
+        $results = $pages->getResults();
 
         $this->assertEquals([0, 1], array_keys($results));
         $this->assertEquals([
@@ -95,12 +96,13 @@ class PagesTest extends PHPUnit_Framework_TestCase
             'raw_time' => '20160519000000',
             'human_time' => '2016-05-19 00:00',
             'badge' => '',
+            'recreated' => '1',
         ], $results[0][0]);
     }
 
     public function setPagesResults()
     {
-        $this->userRepo->expects($this->exactly(2))
+        $this->pagesRepo->expects($this->exactly(2))
             ->method('getPagesCreated')
             ->willReturn([
                 [
@@ -111,6 +113,7 @@ class PagesTest extends PHPUnit_Framework_TestCase
                     'rev_timestamp' => '20160719000000',
                     'pa_class' => 'A',
                     'pa_importance' => '',
+                    'recreated' => null,
                 ], [
                     'namespace' => '0',
                     'type' => 'arc',
@@ -119,6 +122,7 @@ class PagesTest extends PHPUnit_Framework_TestCase
                     'rev_timestamp' => '20160519000000',
                     'pa_class' => '',
                     'pa_importance' => '',
+                    'recreated' => '1',
                 ], [
                     'namespace' => '0',
                     'type' => 'rev',
@@ -127,9 +131,10 @@ class PagesTest extends PHPUnit_Framework_TestCase
                     'rev_timestamp' => '20160101000000',
                     'pa_class' => 'FA',
                     'pa_importance' => '',
+                    'recreated' => null,
                 ],
             ]);
-        $this->userRepo->expects($this->once())
+        $this->pagesRepo->expects($this->once())
             ->method('countPagesCreated')
             ->willReturn([
                 [
@@ -144,7 +149,6 @@ class PagesTest extends PHPUnit_Framework_TestCase
                     'redirects' => 1,
                 ]
             ]);
-        $this->user->setRepository($this->userRepo);
     }
 
     private function getAssessmentsConfig()

@@ -19,6 +19,7 @@ use Xtools\PageRepository;
  * XtoolsController supplies a variety of methods around parsing and validing
  * parameters, and initializing Project/User instances. These are used in
  * other controllers in the AppBundle\Controller namespace.
+ * @abstract
  */
 abstract class XtoolsController extends Controller
 {
@@ -192,6 +193,25 @@ abstract class XtoolsController extends Controller
     }
 
     /**
+     * Get the first error message stored in the session's FlashBag.
+     * @return string
+     */
+    public function getFlashMessage()
+    {
+        $key = $this->get('session')->getFlashBag()->get('danger')[0];
+        $param = null;
+
+        if (is_array($key)) {
+            list($key, $param) = $key;
+        }
+
+        return $this->render('message.twig', [
+            'key' => $key,
+            'params' => [$param]
+        ])->getContent();
+    }
+
+    /**
      * Get all standardized parameters from the Request, either via URL query string or routing.
      * @param Request $request
      * @return string[]
@@ -208,6 +228,7 @@ abstract class XtoolsController extends Controller
             'start',
             'end',
             'offset',
+            'format',
 
             // Legacy parameters.
             'user',
@@ -323,7 +344,7 @@ abstract class XtoolsController extends Controller
 
     /**
      * Record usage of an API endpoint.
-     * @param  string $endpoint
+     * @param string $endpoint
      * @codeCoverageIgnore
      */
     public function recordApiUsage($endpoint)
@@ -356,7 +377,7 @@ abstract class XtoolsController extends Controller
      * @param  Request $request
      * @param  string  $templatePath Path to template without format,
      *   such as '/editCounter/latest_global'.
-     * @param  array   $ret Data that should be passed to the views.
+     * @param  array   $ret Data that should be passed to the view.
      * @return array
      * @codeCoverageIgnore
      */
@@ -371,6 +392,7 @@ abstract class XtoolsController extends Controller
         $formatMap = [
             'wikitext' => 'text/plain',
             'csv' => 'text/csv',
+            'tsv' => 'text/tab-separated-values',
             'json' => 'application/json',
         ];
 

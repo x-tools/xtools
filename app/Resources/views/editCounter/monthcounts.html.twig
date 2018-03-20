@@ -1,5 +1,6 @@
 {% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
 {% import 'macros/wiki.html.twig' as wiki %}
+{% import 'macros/layout.html.twig' as layout %}
 
 {% block body %}
 
@@ -7,9 +8,9 @@
     <div class="panel panel-primary">
         <header class="panel-heading">
             <div class="text-center xt-heading-top">
-                <a class="back-to-search" href="{{ path('ec') }}">
+                <a class="back-to-search" href="{{ path('EditCounterResult', {project: project.domain, username:user.username}) }}">
                     <span class="glyphicon glyphicon-chevron-left"></span>
-                    {{ msg('back') }}
+                    {{ msg('see-full-statistics') }}
                 </a>
                 {{ wiki.userLink(user, project) }}
                 <small> &bull; {{ project.title }} </small>
@@ -34,48 +35,71 @@
     </div>
 {% else %}
 
-{# Set height of chart based on how many months (horizontal rows) are being reported. #}
-<div style="position:relative; height:{{ (25 * ec.monthCounts.monthLabels|length) + 30 }}px">
-    <canvas id="monthcounts-canvas"></canvas>
-</div>
+{% if ec.monthTotals|length > 0 %}
+    <table class="sr-only">
+        <thead>
+            <tr>
+                <th>{{ msg('month') }}</th>
+                <th>{{ msg('count') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for month,total in ec.monthTotals %}
+                <tr>
+                    <td>{{ month }}</td>
+                    <td>{{ total|num_format }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-<script type="text/javascript">
-    $(function() {
-        /** @type {Array} To be passed into Chart.js */
-        var datasets = [];
+    {# Set height of chart based on how many months (horizontal rows) are being reported. #}
+    <div style="position:relative; height:{{ (25 * ec.monthCounts.monthLabels|length) + 30 }}px">
+        <canvas id="monthcounts-canvas"></canvas>
+    </div>
 
-        /** @type {Array} The labels for the y-axis. */
-        var labels = {{ ec.monthCounts.monthLabels|json_encode|raw }};
+    <script type="text/javascript">
+        $(function() {
+            /** @type {Array} To be passed into Chart.js */
+            var datasets = [];
 
-        /** @type {Number} Max value of the year totals */
-        var maxTotal = 0;
+            /** @type {Array} The labels for the y-axis. */
+            var labels = {{ ec.monthCounts.monthLabels|json_encode|raw }};
 
-        // Format data for use in charts.
-        {% for nsId,namespaceData in ec.monthCounts.totals %}
-            var dataset = {
-                label: "{{ nsName(nsId, project.namespaces) }}",
-                backgroundColor: "{{ color(nsId) }}",
-                data: [],
-            };
+            /** @type {Number} Max value of the year totals */
+            var maxTotal = 0;
 
-            {% for year,yearData in namespaceData %}
-                {% for month,monthData in yearData %}
-                    dataset.data.push({{ monthData }});
+            // Format data for use in charts.
+            {% for nsId,namespaceData in ec.monthCounts.totals %}
+                var dataset = {
+                    label: "{{ nsName(nsId, project.namespaces) }}",
+                    backgroundColor: "{{ color(nsId) }}",
+                    data: [],
+                };
 
-                    // Determine maximum value for the totals. This is needed
-                    //   so that we know how much spacing to add in the labels.
-                    if ({{ monthData }} > maxTotal) {
-                        maxTotal = {{ monthData }};
-                    }
-                {% endfor %}
-            {%- endfor -%}
+                {% for year,yearData in namespaceData %}
+                    {% for month,monthData in yearData %}
+                        dataset.data.push({{ monthData }});
 
-            datasets.push(dataset);
-        {% endfor %}
+                        // Determine maximum value for the totals. This is needed
+                        //   so that we know how much spacing to add in the labels.
+                        if ({{ monthData }} > maxTotal) {
+                            maxTotal = {{ monthData }};
+                        }
+                    {% endfor %}
+                {%- endfor -%}
 
-        window.setupMonthYearChart('month', datasets, labels, maxTotal);
-    });
-</script>
+                datasets.push(dataset);
+            {% endfor %}
+
+            window.setupMonthYearChart('month', datasets, labels, maxTotal);
+        });
+    </script>
+{% else %}
+    <div class="alert alert-info">
+        {{ msg('no-contribs') }}
+    </div>
+{% endif %}
 
 {% endif %}
 

@@ -44,7 +44,7 @@ Get the number of pages created by the user in the given namespace.
 * ``username`` (**required**) - Account's username.
 * ``namespace`` - Namespace ID or ``all`` for all namespaces.
 * ``redirects`` - One of 'noredirects' (default), 'onlyredirects' or 'all' for both.
-* ``deleted`` - One of 'live', 'deleted' or 'both' (default).
+* ``deleted`` - One of 'live', 'deleted' or 'all' (default).
 
 **Example:**
 
@@ -68,7 +68,7 @@ Get the pages created by the user in the given namespace.
 * ``username`` (**required**) - Account's username.
 * ``namespace`` - Namespace ID or ``all`` for all namespaces.
 * ``redirects`` - One of 'noredirects' (default), 'onlyredirects' or 'all' for both.
-* ``deleted`` - One of 'live', 'deleted' or 'both' (default).
+* ``deleted`` - One of 'live', 'deleted' or 'all' (default).
 * ``offset`` - Which page of results to show. If there is more than one page of results, ``continue`` is returned, with the subsequent page number as the value.
 
 **Example:**
@@ -117,7 +117,7 @@ Get non-automated contributions for the given user, namespace and date range.
 
 * ``project`` (**required**) - Project domain or database name.
 * ``username`` (**required**) - Account's username.
-* ``namespace`` (**required**) - Namespace ID or  ``all`` for all namespaces.
+* ``namespace`` (**required**) - Namespace ID or  ``all`` for all namespaces. Defaults to ``0`` (mainspace).
 * ``start`` - Start date in the format ``YYYY-MM-DD``. Leave this and ``end`` blank to retrieve the most recent contributions.
 * ``end`` - End date in the format ``YYYY-MM-DD``. Leave this and ``start`` blank to retrieve the most recent contributions.
 * ``offset`` - Number of edits from the start date.
@@ -126,11 +126,61 @@ Get non-automated contributions for the given user, namespace and date range.
 
 Get the newest non-automated mainspace contributions made by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ on the English Wikipedia.
 
+    https://xtools.wmflabs.org/api/user/nonautomated_edits/en.wikipedia/Jimbo_Wales
     https://xtools.wmflabs.org/api/user/nonautomated_edits/en.wikipedia/Jimbo_Wales/0
+
+Automated edits
+===============
+``GET /api/user/automated_edits/{project}/{username}/{namespace}/{start}/{end}/{offset}``
+
+Get (semi-)automated contributions for the given user, namespace and date range. You can get edits only made with a specific tool by appending ``?tool=Tool name`` to the end of the URL. To get the names of the available tools, use the :ref:`Automated tools <autotools>` endpoint.
+
+**Parameters:**
+
+* ``project`` (**required**) - Project domain or database name.
+* ``username`` (**required**) - Account's username.
+* ``namespace`` (**required**) - Namespace ID or  ``all`` for all namespaces. Defaults to ``0`` (mainspace).
+* ``start`` - Start date in the format ``YYYY-MM-DD``. Leave this and ``end`` blank to retrieve the most recent contributions.
+* ``end`` - End date in the format ``YYYY-MM-DD``. Leave this and ``start`` blank to retrieve the most recent contributions.
+* ``offset`` - Number of edits from the start date.
+
+**Example:**
+
+Get the newest automated mainspace contributions made by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ on the English Wikipedia.
+
+    https://xtools.wmflabs.org/api/user/automated_edits/en.wikipedia/Jimbo_Wales
+    https://xtools.wmflabs.org/api/user/automated_edits/en.wikipedia/Jimbo_Wales/0
+
+.. _autotools:
+
+Automated tools
+===============
+
+Get a list of the known (semi-)automated tools used on the given project.
+
+**Response format:**
+
+For each tool, the some or all of the following data is provided:
+
+* ``tag``: A `tag <https://www.mediawiki.org/wiki/Help:Tags>`_ that identifies edits made using the tool.
+* ``regex``: Regular expression that can be used against edit summaries to test if the tool was used.
+* ``link``: Path to the tool's documentation.
+* ``label``: Translation of the tool's name, if applicable and available.
+* ``revert``: Whether or not the tool is exclusively used for reverting edits.
+
+**Parameters:**
+
+* ``project`` (**required**) - Project domain or database name.
+
+**Example:**
+
+Get all the known semi-automated tools used on the English Wikipedia.
+
+    https://xtools.wmflabs.org/api/user/automated_tools/en.wikipedia.org
 
 Edit summaries
 ==============
-``GET /api/user/edit_summeries/{project}/{username}/{namespace}``
+``GET /api/user/edit_summaries/{project}/{username}/{namespace}``
 
 Get statistics about a user's usage of edit summaries.
 
@@ -144,7 +194,7 @@ Get statistics about a user's usage of edit summaries.
 
 Get `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_'s edit summary statistics on the English Wikipedia.
 
-    https://xtools.wmflabs.org/api/user/edit_summeries/en.wikipedia/Jimbo_Wales
+    https://xtools.wmflabs.org/api/user/edit_summaries/en.wikipedia/Jimbo_Wales
 
 Top edits
 =========

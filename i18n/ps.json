@@ -4,7 +4,6 @@
 			"Baloch Khan"
 		]
 	},
-	"about-xtools": "ددغه غوره توبونو په اړه",
 	"accepted-formats": "منل شوی فارمټونه",
 	"account-age": "د گڼون عمر",
 	"account-age-desc": "$2 {{PLURAL:$1|ورځ|ورځې}} دمخه",
@@ -69,12 +68,11 @@
 	"deleted": "ړنگ شو",
 	"deleted-edits": "ړنګ شوی سمونونه",
 	"deleted-pages": "ړنګ شوي مخونه",
-	"delpagesfilter-both": "د ژوندي بڼې سره او ړنګ شوي مخونه",
+	"delpagesfilter-all": "د ژوندي بڼې سره او ړنګ شوي مخونه",
 	"delpagesfilter-deleted": "يواځې ړنګ شوي پاڼې شاملې دي",
 	"delpagesfilter-live": "ړنګ شوي پاڼې خارج کړئ",
 	"diff": "توپير",
 	"documentation": "لاسوند",
-	"download": "د $1 په بڼه ښکته کول",
 	"duplicate-vote": "جعلي رای",
 	"edit": "سمول",
 	"edit-count": "د سمونونو شمېر",

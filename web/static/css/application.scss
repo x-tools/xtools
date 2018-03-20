@@ -291,7 +291,8 @@ $tooltip-shadow: #ccc;
 section > .panel-body {
     overflow-x: scroll;
 }
-.panel-body .table:only-child {
+.panel-body .table:only-child,
+.panel-body .alert:last-child {
     margin-bottom: 0;
 }
 .xt-panel-body {
@@ -418,6 +419,14 @@ section > .panel-body {
 
 .form-fieldset {
     margin-bottom: 15px;
+
+    .checkbox {
+        margin-bottom: 0;
+    }
+
+    &:nth-child(2) {
+        margin-top: -15px;
+    }
 }
 
 .form-submit {
@@ -680,6 +689,10 @@ input.form-control.show-loader {
 
 .download-dropdown {
     bottom: 5px;
+
+    .glyphicon-download-alt {
+        top: 2px;
+    }
 }
 
 @media (min-width: $bootstrap-lg) {

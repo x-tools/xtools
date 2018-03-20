@@ -1,0 +1,21 @@
+{% if not is_sub_request %}
+== [[User:{{ user.username }}]] ==
+
+{% set link %}[{{ url('EditCounterRightsChanges', {'username': user.username, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
+{{ msg('xtools-advert', [link, date()|date_format]) }}
+
+{% endif %}
+=== {{ msg('rights-changes') }} ===
+
+{% if ec.rightsChanges|length > 0 %}
+{% include 'editCounter/rights_changes_table.wikitext.twig' with {'rightsChanges': ec.rightsChanges} %}
+
+{% if ec.globalRightsChanges|length > 0 %}
+==== {{ msg('global-rights-changes') }} ====
+
+{% include 'editCounter/rights_changes_table.wikitext.twig' with {'rightsChanges': ec.globalRightsChanges} %}
+{% endif %}
+
+{% else %}
+{{ msg('no-result', [user.username]) }}
+{% endif %}

@@ -7,6 +7,14 @@
             {{ forms.wiki_input(project) }}
             {{ forms.user_input(true, false, project) }}
         </fieldset>
+        <fieldset class="form-fieldset">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="format" value="wikitext">
+                    {{ msg('view-wikitext') }}
+                </label>
+            </div>
+        </fieldset>
         {{ forms.submit_btn }}
     </form>
 {% endblock %}
