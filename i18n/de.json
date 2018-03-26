@@ -354,7 +354,7 @@
 	"tool-autoedits": "Automatische Bearbeitungen",
 	"tool-autoedits-desc": "Analyse von halbautomatisierten und nichtautomatisierten Beiträgen.",
 	"tool-bash": "Zufälliges Zitat",
-	"tool-bash-desc": "Zitate aus der IRC Zitatesammlung",
+	"tool-bash-desc": "Zitate aus der IRC-Zitatesammlung",
 	"tool-blame": "Article Blamer",
 	"tool-blame-desc": "Wann wurde ein bestimmter Text hinzugefügt",
 	"tool-ec": "Bearbeitungszähler",
@@ -421,7 +421,7 @@
 	"words": "Wörter",
 	"xtools-advert": "Erzeugt mithilfe $1 am $2",
 	"xtools-slogan": "Stille deinen Datenhunger",
-	"xtools-title": "X!'s tools",
+	"xtools-title": "XTools",
 	"year": "Jahr",
 	"year-counts": "Jahresübersicht"
 }
