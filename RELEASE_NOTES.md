@@ -1,5 +1,14 @@
 # Release Notes #
 
+## 3.2.5 ##
+- T190496: AdminStats: Make sure former admins are shown. Rework
+  query to only show users with > 1 action. Don't count log actions
+  that deleted pages via redirect, autopromotion of user rights, or
+  moving protections.
+- Allow sortable tables to re-fill the numbering of rank column.
+- T190201: AdminScore: Fix negative day value.
+- Localization updates.
+
 ## 3.2.4 ##
 - ArticleInfo: Improve performance of ArticleInfo API endpoint.
 
