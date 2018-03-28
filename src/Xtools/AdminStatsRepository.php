@@ -18,8 +18,6 @@ class AdminStatsRepository extends Repository
     const ADMIN_PERMISSIONS = [
         'block',
         'delete',
-        'deletedhistory',
-        'deletedtext',
         'deletelogentry',
         'deleterevision',
         'editinterface',
@@ -72,18 +70,9 @@ class AdminStatsRepository extends Repository
                   AND log_type IS NOT NULL
                   AND log_action IS NOT NULL
                   AND log_type IN ('block', 'delete', 'protect', 'import', 'rights')
+                  AND log_action NOT IN ('delete_redir', 'autopromote', 'move_prot')
                 GROUP BY user_name
-                HAVING 'delete' > 0 OR user_id IN (
-                    -- Make sure they were at some point were in a qualifying user group.
-                    -- This also ensures we account for users who were inactive within the time period.
-                    SELECT ug_user
-                    FROM $userGroupsTable
-                    WHERE ug_group IN ($adminGroups)
-                    UNION
-                    SELECT ufg_user
-                    FROM $ufgTable
-                    WHERE ufg_group IN ($adminGroups)
-                )
+                HAVING `total` > 0
                 ORDER BY 'total' DESC";
 
         $results = $this->executeProjectsQuery($sql)->fetchAll();

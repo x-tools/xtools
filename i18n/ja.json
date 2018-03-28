@@ -21,7 +21,6 @@
 	"added": "追加",
 	"added-bytes": "追加量 (bytes)",
 	"admin": "管理者",
-	"admins-without-action": "不活動管理者",
 	"afd": "削除依頼",
 	"afd-desc": "$2 件の削除されたページの記事への{{PLURAL:$1|編集}}",
 	"aiv": "管理者による荒らし行為への介入",

@@ -201,13 +201,13 @@
 
             sortColumn = $(this).data('column');
             var $table = $(this).parents('table');
-            var entries = $table.find('.sort-entry--' + sortColumn).parent();
+            var $entries = $table.find('.sort-entry--' + sortColumn).parent();
 
-            if (!entries.length) {
+            if (!$entries.length) {
                 return;
             }
 
-            entries.sort(function (a, b) {
+            $entries.sort(function (a, b) {
                 var before = $(a).find('.sort-entry--' + sortColumn).data('value'),
                     after = $(b).find('.sort-entry--' + sortColumn).data('value');
 
@@ -226,7 +226,14 @@
                 }
             });
 
-            $table.find('tbody').html($(entries));
+            // Re-fill the rank column, if applicable.
+            if ($('.sort-entry--rank').length > 0) {
+                $.each($entries, function (index, entry) {
+                    $(entry).find('.sort-entry--rank').text(index + 1);
+                });
+            }
+
+            $table.find('tbody').html($entries);
         });
     }
 
