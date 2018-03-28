@@ -14,7 +14,6 @@
 	"actions-as-admin": "Adminműveletek",
 	"added": "Hozzáadva",
 	"added-bytes": "Hozzáadva (bájtok)",
-	"admins-without-action": "Adminok műveletek nélkül",
 	"afd": "Törlésre jelölt cikkek",
 	"afd-desc": "$2 {{PLURAL:$1|edit|szerkesztések}} törlésre jelölt cikkek oldalai",
 	"aiv": "Admin beavatkozás a vandalizmus ellen",

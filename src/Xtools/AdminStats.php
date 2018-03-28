@@ -28,11 +28,11 @@ class AdminStats extends Model
      */
     protected $adminsAndGroups;
 
-    /** @var int Number of admins (sysops) who haven't made any actions within the time period. */
-    protected $adminsWithoutActions = 0;
+    /** @var int Number of admins who made any actions within the time period. */
+    protected $numAdminsWithActions = 0;
 
-    /** @var int Number of actual admins (sysops), not users with admin-like actions. */
-    protected $numSysops = 0;
+    /** @var string[] Usernames of proper sysops. */
+    private $admins = [];
 
     /** @var int Start of time period as UTC timestamp */
     protected $start;
@@ -101,7 +101,7 @@ class AdminStats extends Model
 
             // Keep track of actual number of sysops.
             if (in_array('sysop', $groups)) {
-                $this->numSysops++;
+                $this->admins[] = $admin;
             }
 
             foreach ($groups as $group) {
@@ -210,45 +210,14 @@ class AdminStats extends Model
             // going off of self::getAdminsAndGroups().
             if (isset($adminsAndGroups[$username])) {
                 $users[$username]['groups'] = $adminsAndGroups[$username];
-
-                // Remove from actual admin list so later we can re-populate with zeros.
-                unset($adminsAndGroups[$username]);
             } else {
                 $users[$username]['groups'] = $abbreviateGroups ? '' : [];
             }
-        }
 
-        // Push any inactive admins back to $users with zero values.
-        $users = $this->fillInactiveAdmins($users, $adminsAndGroups);
-
-        return $users;
-    }
-
-    /**
-     * Fill in inactive admins (no actions within time period), given the list of
-     * remaining $adminsAndGroups from processing within self::groupAdminStatsByUsername().
-     * @param  string[] $users As computed by self::groupAdminStatsByUsername().
-     * @param  string[] $adminsAndGroups Remaining from self::getAdminsAndGroups().
-     * @return string[]
-     * @codeCoverageIgnore
-     */
-    private function fillInactiveAdmins($users, $adminsAndGroups)
-    {
-        foreach ($adminsAndGroups as $username => $groups) {
-            $users[$username] = [
-                'user_name' => $username,
-                'delete' => 0,
-                'restore' => 0,
-                'block' => 0,
-                'unblock' => 0,
-                'protect' => 0,
-                'unprotect' => 0,
-                'rights' => 0,
-                'import' => 0,
-                'total' => 0,
-                'groups' => $groups,
-            ];
-            $this->adminsWithoutActions++;
+            // Keep track of non-admins who made admin actions.
+            if (in_array($username, $this->admins)) {
+                $this->numAdminsWithActions++;
+            }
         }
 
         return $users;
@@ -278,33 +247,24 @@ class AdminStats extends Model
      */
     public function numAdmins()
     {
-        return $this->numSysops;
+        return count($this->admins);
     }
 
     /**
-     * Get the total number of users we're reporting as having made admin actions.
-     * @return int
-     */
-    public function numUsers()
-    {
-        return count($this->adminStats);
-    }
-
-    /**
-     * Number of admins who did make actions within the time period.
+     * Number of admins who made any actions within the time period.
      * @return int
      */
     public function getNumAdminsWithActions()
     {
-        return $this->numAdmins() - $this->adminsWithoutActions;
+        return $this->numAdminsWithActions;
     }
 
     /**
-     * Number of admins who did not make any actions within the time period.
+     * Number of currently non-admins who made any actions within the time period.
      * @return int
      */
-    public function getNumAdminsWithoutActions()
+    public function getNumNonAdminsWithActions()
     {
-        return $this->adminsWithoutActions;
+        return count($this->adminStats) - $this->numAdminsWithActions;
     }
 }
