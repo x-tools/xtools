@@ -193,8 +193,8 @@ class AdminStatsController extends XtoolsController
 
         $response = [
             'project' => $this->project->getDomain(),
-            'start' => $this->adminStats->getStart(),
-            'end' => $this->adminStats->getEnd(),
+            'start' => $start,
+            'end' => $end,
             'users' => $this->adminStats->getStats(false),
         ];
 
