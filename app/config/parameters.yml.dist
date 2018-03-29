@@ -54,9 +54,6 @@ parameters:
     app.rate_limit_time: 5
     app.rate_limit_count: 10
 
-    app.multithread: 0
-    app.base_path: https://xtools.example.org
-
     app.query_timeout: 900
 
     app.max_page_revisions: 50000

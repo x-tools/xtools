@@ -38,9 +38,6 @@ abstract class Repository
     /** @var Connection The database connection to other tools' databases.  */
     private $toolsConnection;
 
-    /** @var GuzzleHttp\Client $apiConnection Connection to XTools API. */
-    private $apiConnection;
-
     /** @var CacheItemPoolInterface The cache. */
     protected $cache;
 
@@ -68,15 +65,6 @@ abstract class Repository
         $this->cache = $container->get('cache.app');
         $this->log = $container->get('logger');
         $this->stopwatch = $container->get('debug.stopwatch');
-    }
-
-    /**
-     * Get the NullLogger instance.
-     * @return NullLogger
-     */
-    public function getLog()
-    {
-        return $this->log;
     }
 
     /**
@@ -186,32 +174,6 @@ abstract class Repository
     /*****************
      * QUERY HELPERS *
      *****************/
-
-    /**
-     * Make a request to the XTools API, optionally doing so asynchronously via Guzzle.
-     * @param string $endpoint Relative path to endpoint with relevant query parameters.
-     * @param bool $async Set to true to asynchronously query and return a promise.
-     * @return GuzzleHttp\Psr7\Response|GuzzleHttp\Promise\Promise
-     */
-    public function queryXToolsApi($endpoint, $async = false)
-    {
-        if (!$this->apiConnection) {
-            $this->apiConnection = $this->container->get('guzzle.client.xtools');
-        }
-
-        $key = $this->container->getParameter('secret');
-
-        // Remove trailing slash if present.
-        $basePath = trim($this->container->getParameter('app.base_path'), '/');
-
-        $endpoint = "$basePath/api/$endpoint/$key";
-
-        if ($async) {
-            return $this->apiConnection->getAsync($endpoint);
-        } else {
-            return $this->apiConnection->get($endpoint);
-        }
-    }
 
     /**
      * Normalize and quote a table name for use in SQL.
@@ -427,7 +389,7 @@ abstract class Repository
     private function logErrorData($error)
     {
         $metadata = $this->getCurrentRequestMetadata();
-        $this->getLog()->error(
+        $this->log->error(
             '>>> '.$metadata['path'].' ('.$error.' after '.$metadata['requestTime'].')'
         );
     }
