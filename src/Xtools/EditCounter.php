@@ -10,9 +10,6 @@ use DateInterval;
 use DatePeriod;
 use DateTime;
 use Exception;
-use GuzzleHttp;
-use GuzzleHttp\Promise\Promise;
-use Xtools\Edit;
 
 /**
  * An EditCounter provides statistics about a user's edits on a project.
@@ -102,73 +99,6 @@ class EditCounter extends Model
     public function setI18nHelper(I18nHelper $i18n)
     {
         $this->i18n = $i18n;
-    }
-
-    /**
-     * This method asynchronously fetches all the expensive data, waits
-     * for each request to finish, and copies the values to the class instance.
-     * @return null
-     */
-    public function prepareData()
-    {
-        $project = $this->project->getDomain();
-        $username = $this->user->getUsername();
-
-        /**
-         * The URL of each endpoint, keyed by the name of the corresponding class-level
-         * instance variable.
-         * @var array[]
-         */
-        $endpoints = [
-            "pairData" => "ec/pairdata/$project/$username",
-            "logCounts" => "ec/logcounts/$project/$username",
-            "namespaceTotals" => "ec/namespacetotals/$project/$username",
-            "editSizeData" => "ec/editsizes/$project/$username",
-            "monthCounts" => "ec/monthcounts/$project/$username",
-            // "globalEditCounts" => "ec-globaleditcounts/$project/$username",
-            "autoEditCount" => "user/automated_editcount/$project/$username",
-        ];
-
-        /**
-         * Keep track of all promises so we can wait for all of them to complete.
-         * @var GuzzleHttp\Promise\Promise[]
-         */
-        $promises = [];
-
-        foreach ($endpoints as $key => $endpoint) {
-            $promise = $this->getRepository()->queryXToolsApi($endpoint, true);
-            $promises[] = $promise;
-
-            // Handle response of $promise asynchronously.
-            $promise->then(function ($response) use ($key, $endpoint) {
-                $result = (array) json_decode($response->getBody()->getContents());
-
-                $this->getRepository()
-                    ->getLog()
-                    ->debug("$key promise resolved successfully.");
-
-                if (isset($result)) {
-                    // Copy result to the class class instance. From here any subsequent
-                    // calls to the getters (e.g. getPairData()) will return these cached values.
-                    $this->{$key} = $result;
-                } else {
-                    // The API should *always* return something, so if $result is not set,
-                    // something went wrong, so we simply won't set it and the getters will in
-                    // turn re-attempt to get the data synchronously.
-                    // We'll log this to see how often it happens.
-                    $this->getRepository()
-                        ->getLog()
-                        ->error("Failed to fetch data for $endpoint via async, " .
-                            "re-attempting synchoronously.");
-                }
-            });
-        }
-
-        // Wait for all promises to complete, even if some of them fail.
-        GuzzleHttp\Promise\settle($promises)->wait();
-
-        // Everything we need now lives on the class instance, so we're done.
-        return;
     }
 
     /**

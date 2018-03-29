@@ -49,31 +49,6 @@ class RepositoryTest extends WebTestCase
     }
 
     /**
-     * Make sure the logger was set and is accessible.
-     */
-    public function testLogger()
-    {
-        $this->assertInstanceOf(\Symfony\Bridge\Monolog\Logger::class, $this->stub->getLog());
-    }
-
-    /**
-     * Ensure the we're able to query the XTools API, and the correct type of class is returned.
-     */
-    public function testQueryXToolsApi()
-    {
-        if (!$this->container->getParameter('app.is_labs') || !$this->container->getParameter('app.multithread')) {
-            return;
-        }
-
-        $apiObj = $this->stub->queryXToolsApi('ec/monthcounts/en.wikipedia.org/Example');
-        $this->assertInstanceOf(\GuzzleHttp\Psr7\Response::class, $apiObj);
-        $this->assertEquals(200, $apiObj->getStatusCode());
-
-        $apiObj2 = $this->stub->queryXToolsApi('ec/monthcounts/en.wikipedia.org/Example', true);
-        $this->assertInstanceOf(\GuzzleHttp\Promise\Promise::class, $apiObj2);
-    }
-
-    /**
      * Test getting a unique cache key for a given set of arguments.
      */
     public function testCacheKey()
