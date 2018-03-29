@@ -150,7 +150,10 @@ class DefaultController extends XtoolsController
         if ($this->oauthClient instanceof Client) {
             return $this->oauthClient;
         }
-        $defaultProject = ProjectRepository::getDefaultProject($this->container);
+        $defaultProject = ProjectRepository::getProject(
+            $this->getParameter('oauth_project'),
+            $this->container
+        );
         $endpoint = $defaultProject->getUrl(false)
                     . $defaultProject->getScript()
                     . '?title=Special:OAuth';

@@ -66,6 +66,7 @@ The parameters ensures paths to your wiki(s) are properly constructed, and for c
 - **wiki_url** - Full URL of the wiki, used only if ``app.single_wiki`` is set to ``true``. The title of pages are attached to the end.
 - **api_path** - The API path for the projects, usually ``/w/api.php``.
 - **default_project** - The base URL of whatever wiki you consider to be the "default". This will be the default value for the "Project" field in the forms. On the Wikimedia installation, ``en.wikipedia.org`` is used because it is the most popular wiki. For single-wiki installations, the "Project" field in the forms are hidden, but you still need to provide this value for ``default_project``.
+- **oauth_project** - Which wiki should be used for OAuth authentication. You may want this to be the same as the ``default_project``.
 - **opted_in** - A list of database names of projects that will display :ref:`restricted statistics <optin>` regardless of individual users' preferences. For developers working off of the replicas, use ``enwiki_p``.
 
 Application

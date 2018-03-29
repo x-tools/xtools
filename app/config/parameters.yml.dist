@@ -32,6 +32,7 @@ parameters:
     wiki_url:                   http://en.wikipedia.org
     api_path:                   /w/api.php
     default_project:            en.wikipedia.org
+    oauth_project:              meta.wikimedia.org
     opted_in:                   ~
 
     # A secret key that's used to generate certain security-related tokens, and as the secret for the internal API.
