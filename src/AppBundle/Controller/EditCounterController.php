@@ -77,11 +77,12 @@ class EditCounterController extends XtoolsController
         // Instantiate EditCounter.
         $editCounterRepo = new EditCounterRepository();
         $editCounterRepo->setContainer($this->container);
-        $this->editCounter = new EditCounter($this->project, $this->user);
-        $this->editCounter->setRepository($editCounterRepo);
-        $this->editCounter->setI18nHelper(
+        $this->editCounter = new EditCounter(
+            $this->project,
+            $this->user,
             $this->container->get('app.i18n_helper')
         );
+        $this->editCounter->setRepository($editCounterRepo);
     }
 
     /**

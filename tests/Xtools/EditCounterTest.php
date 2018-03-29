@@ -37,24 +37,26 @@ class EditCounterTest extends WebTestCase
     /** @var User The user instance. */
     protected $user;
 
+    /** @var I18nHelper For i18n and l10n. */
+    protected $i18n;
+
     /**
      * Set up shared mocks and class instances.
      */
     public function setUp()
     {
+        $container = static::createClient()->getContainer();
+        $stack = new RequestStack();
+        $session = new Session();
+        $this->i18n = new I18nHelper($container, $stack, $session);
+
         $this->editCounterRepo = $this->getMock(EditCounterRepository::class);
         $this->projectRepo = $this->getMock(ProjectRepository::class);
         $this->project = new Project('TestProject');
         $this->project->setRepository($this->projectRepo);
         $this->user = new User('Testuser');
-        $this->editCounter = new EditCounter($this->project, $this->user);
+        $this->editCounter = new EditCounter($this->project, $this->user, $this->i18n);
         $this->editCounter->setRepository($this->editCounterRepo);
-
-        $container = static::createClient()->getContainer();
-        $stack = new RequestStack();
-        $session = new Session();
-        $i18nHelper = new I18nHelper($container, $stack, $session);
-        $this->editCounter->setI18nHelper($i18nHelper);
     }
 
     /**
@@ -475,7 +477,7 @@ class EditCounterTest extends WebTestCase
      */
     public function testParseBlockLogEntry($logEntry, $assertion)
     {
-        $editCounter = new EditCounter($this->project, $this->user);
+        $editCounter = new EditCounter($this->project, $this->user, $this->i18n);
         $this->assertEquals(
             $editCounter->parseBlockLogEntry($logEntry),
             $assertion
@@ -659,6 +661,12 @@ class EditCounterTest extends WebTestCase
             ],
         ], $this->editCounter->getGlobalRightsChanges());
 
+        $userRepo = $this->getMock(UserRepository::class);
+        $userRepo->expects($this->once())
+            ->method('getUserRights')
+            ->wilLReturn(['sysop', 'bureaucrat']);
+        $this->user->setRepository($userRepo);
+
         // Current rights.
         $this->assertEquals(
             ['sysop', 'bureaucrat'],
@@ -670,5 +678,8 @@ class EditCounterTest extends WebTestCase
             ['rollbacker', 'templateeditor', 'ipblock-exempt', 'filemover'],
             $this->editCounter->getRightsStates()['former']
         );
+
+        // Admin status.
+        $this->assertEquals('current', $this->editCounter->getAdminStatus());
     }
 }

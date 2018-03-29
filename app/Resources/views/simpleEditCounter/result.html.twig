@@ -40,7 +40,13 @@
                     </tr>
                     <tr>
                         <td>{{ msg('user-groups') }}</td>
-                        <td>{{ sec.userGroups|join(', ') }}</td>
+                        <td>
+                            {% if sec.userGroups|length == 0 %}
+                                <em class="text-muted">{{ msg('none') }}</em>
+                            {% else %}
+                                {{ sec.userGroups|join(', ') }}
+                            {% endif %}
+                        </td>
                     </tr>
                     {% if sec.globalUserGroups|length > 0 %}
                         <tr>

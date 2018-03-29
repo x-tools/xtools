@@ -296,4 +296,26 @@ class UserRepository extends Repository
 
         return $this->executeProjectsQuery($sql, $params);
     }
+
+    /**
+     * Get a user's local user rights on the given Project.
+     * @param Project $project
+     * @param User $user
+     * @return string[]
+     */
+    public function getUserRights(Project $project, User $user)
+    {
+        $userGroupsTable = $project->getTableName('user_groups');
+        $userTable = $project->getTableName('user');
+
+        $sql = "SELECT ug_group
+                FROM $userGroupsTable
+                JOIN $userTable ON user_id = ug_user
+                WHERE user_name = :username";
+
+        $ret = $this->executeProjectsQuery($sql, [
+            'username' => $user->getUsername(),
+        ])->fetchAll(\PDO::FETCH_COLUMN);
+        return $ret;
+    }
 }

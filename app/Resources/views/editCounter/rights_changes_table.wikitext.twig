@@ -8,12 +8,12 @@
 | style="white-space: nowrap;" | {% if change.type == 'local' %}[[Special:Redirect/logid/{{ change.logId }}|{{ timestamp|trans|date_format }}]]{% else %}[https://meta.wikimedia.org/wiki/Special:Redirect/logid/{{ change.logId }} {{ timestamp|trans|date_format }}]{% endif %}
 
 | {% for right in change.added %}
-<span style="color:#006400">+{{ right|trim }}</span>{% if not loop.last %}, {% endif %}
+<span style="color:#006400">+{{ ec.rightsNames[right]|trim }}</span>{% if not loop.last %}, {% endif %}
 {% endfor %}{% if change.added|length > 0 and change.removed|length > 0 %}
 
 {% endif %}
 {% for right in change.removed %}
-<span style="color:#8B0000">-{{ right|trim }}</span>{% if not loop.last %}, {% endif %}
+<span style="color:#8B0000">-{{ ec.rightsNames[right]|trim }}</span>{% if not loop.last %}, {% endif %}
 {% endfor %}
 
 | <span class="plainlinks">[{% verbatim %}{{{% endverbatim %}fullurl:User:{{ change.admin }}}} {{ change.admin }}]</span>

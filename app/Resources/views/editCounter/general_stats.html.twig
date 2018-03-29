@@ -38,10 +38,10 @@
             <td>{{ user.id(project) }}</td>
         </tr>
         <tr>
-            <td><a target="_blank" href="{{ wiki.pageUrlRaw('Special:UserRights', project) }}?user={{ user.username }}">{{ msg('user-groups') }}</a></td>
+            <td><a href="#rights-changes">{{ msg('user-groups') }}</a></td>
             <td>
-                {% for group in user.groups(project) %}
-                    {{ group }}{% if not loop.last %}, {% endif %}
+                {% for group in ec.rightsStates.current %}
+                    {{ ec.rightsNames[group] }}{% if not loop.last %}, {% endif %}
                 {% endfor %}
             </td>
         </tr>
@@ -50,7 +50,7 @@
                 <td>{{ msg('global-user-groups') }}</td>
                 <td>
                     {% for group in user.globalGroups(project) %}
-                        {{ group }}{% if not loop.last %}, {% endif %}
+                        {{ ec.rightsNames[group] }}{% if not loop.last %}, {% endif %}
                     {% endfor %}
                 </td>
             </tr>
