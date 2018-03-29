@@ -51,6 +51,7 @@ class EditCounterController extends XtoolsController
      * @param string $key API key, as given in the reuqest. Omit this for actions
      *   that are public (only /api/ec actions should pass this in).
      * @return null|RedirectResponse
+     * @codeCoverageIgnore
      */
     protected function setUpEditCounter(Request $request, $key = null)
     {

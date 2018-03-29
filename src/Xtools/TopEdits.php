@@ -169,6 +169,15 @@ class TopEdits extends Model
     }
 
     /**
+     * Get the Page that's set on the TopEdits instance.
+     * @return Page $page
+     */
+    public function getPage()
+    {
+        return $this->page;
+    }
+
+    /**
      * Set the Page on the TopEdits instance.
      * @param Page $page
      */

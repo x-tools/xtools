@@ -51,6 +51,7 @@ class AdminStatsController extends XtoolsController
      * @param string $start
      * @param string $end
      * @return AdminStats|RedirectResponse
+     * @codeCoverageIgnore
      */
     public function setUpAdminStats($project, $start = null, $end = null)
     {
