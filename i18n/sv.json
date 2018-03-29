@@ -17,6 +17,8 @@
 	"added": "Lagt till",
 	"added-bytes": "Lade till (byte)",
 	"admin": "Admin",
+	"admin-stats-notice": "Endast användare som har gjort minst en administratörshandling inom tidsperioden visas.",
+	"admin-stats-notice2": "Vissa användare kanske är f.d. administratörer, eller är icke-administratörer, men har rättigheter att göra vissa administratörshandlingar.",
 	"afd": "Artiklar att radera",
 	"afd-desc": "$2 {{PLURAL:$1|redigering|redigeringar}} på sidor i Sidor föreslagna för radering",
 	"aiv": "Administrativ åtgärd mot vandalism",

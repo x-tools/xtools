@@ -17,6 +17,8 @@
 	"added": "Hinzugefügt",
 	"added-bytes": "Hinzugefügt (Bytes)",
 	"admin": "Administrator",
+	"admin-stats-notice": "Es werden nur Benutzer angezeigt, die in der Zeitspanne mindestens eine Administratoraktion ausgeführt haben.",
+	"admin-stats-notice2": "Einige Benutzer könnten früher Administratoren gewesen sein oder sind Nicht-Admins, die Rechte besitzen, um bestimmte Administratoraktionen auszuführen.",
 	"afd": "Artikel zur Löschung",
 	"afd-desc": "{{PLURAL:$1|Eine Bearbeitung|$2 Bearbeitungen}} an Artikeln zur Löschung",
 	"aiv": "Administratoreingriff gegen Vandalismus",

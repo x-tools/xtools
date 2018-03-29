@@ -17,6 +17,8 @@
 	"added": "Pridėta",
 	"added-bytes": "Pridėta (baitų)",
 	"admin": "Administratorius",
+	"admin-stats-notice": "Rodomi tik tie naudotojai, kurie atliko nors vieną administratoriaus veiksmą per šį laiko tarpą.",
+	"admin-stats-notice2": "Kai kurie naudotojai gali būti anksčiau buvę administratoriais, arba ne administratoriai, kurie turi administratoriaus teises.",
 	"afd": "Straipsniai siūlomi trinti",
 	"afd-desc": "$2 {{PLURAL:$1|pakeitimas|pakeitimai|pakeitimų}} straipsniuose, kurie siūlomi trinti",
 	"aiv": "Administratoriaus įsikišimas prieš vandalizmą",
