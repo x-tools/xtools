@@ -20,10 +20,10 @@
                 </td>
                 <td class="sort-entry--rights" data-value="{{ change.added|length + change.removed|length }}">
                     {% for right in change.added %}
-                        <div class="diff-pos">{{ right|trim }}</div>
+                        <div class="diff-pos">{{ ec.rightsNames[right]|trim }}</div>
                     {% endfor %}
                     {% for right in change.removed %}
-                        <div class="diff-neg" dir="ltr">-{{ right|trim }}</div>
+                        <div class="diff-neg" dir="ltr">-{{ ec.rightsNames[right]|trim }}</div>
                     {% endfor %}
                 </td>
                 <td class="sort-entry--admin" data-value="{{ change.admin }}">

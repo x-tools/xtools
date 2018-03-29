@@ -14,7 +14,7 @@ use Exception;
 /**
  * An EditCounter provides statistics about a user's edits on a project.
  */
-class EditCounter extends Model
+class EditCounter extends UserRights
 {
 
     /** @var Project The project. */
@@ -43,12 +43,6 @@ class EditCounter extends Model
 
     /** @var mixed[] Total numbers of edits per year */
     protected $yearCounts;
-
-    /** @var string[] Rights changes, keyed by timestamp then 'added' and 'removed'. */
-    protected $rightsChanges;
-
-    /** @var string[] Global rights changes, keyed by timestamp then 'added' and 'removed'. */
-    protected $globalRightsChanges;
 
     /** @var int[] Keys are project DB names. */
     protected $globalEditCounts;
@@ -85,19 +79,12 @@ class EditCounter extends Model
      * EditCounter constructor.
      * @param Project $project The base project to count edits
      * @param User $user
+     * @param I18nHelper $i18n
      */
-    public function __construct(Project $project, User $user)
+    public function __construct(Project $project, User $user, I18nHelper $i18n)
     {
         $this->project = $project;
         $this->user = $user;
-    }
-
-    /**
-     * Make the I18nHelper accessible to EditCounter.
-     * @param I18nHelper $i18n
-     */
-    public function setI18nHelper(I18nHelper $i18n)
-    {
         $this->i18n = $i18n;
     }
 
@@ -150,188 +137,6 @@ class EditCounter extends Model
         }
 
         return $blocks;
-    }
-
-    /**
-     * Get user rights changes of the given user.
-     * @param Project $project
-     * @param User $user
-     * @return string[] Keyed by timestamp then 'added' and 'removed'.
-     */
-    public function getRightsChanges()
-    {
-        if (isset($this->rightsChanges)) {
-            return $this->rightsChanges;
-        }
-
-        $logData = $this->getRepository()
-            ->getRightsChanges($this->project, $this->user);
-
-        $this->rightsChanges = $this->processRightsChanges($logData);
-
-        return $this->rightsChanges;
-    }
-
-    /**
-     * Checks the user rights log to see whether the user is an admin
-     * or used to be one.
-     * @return string|false One of false (never an admin), 'current' or 'former'.
-     */
-    public function getAdminStatus()
-    {
-        $rightsStates = $this->getRightsStates();
-
-        if (in_array('sysop', $rightsStates['current'])) {
-            return 'current';
-        } elseif (in_array('sysop', $rightsStates['former'])) {
-            return 'former';
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Get a list of the current and former rights of the user.
-     * @return array With keys 'current' and 'former'.
-     */
-    public function getRightsStates()
-    {
-        $current = [];
-        $former = [];
-
-        foreach (array_reverse($this->getRightsChanges()) as $change) {
-            $current = array_diff(
-                array_unique(array_merge($current, $change['added'])),
-                $change['removed']
-            );
-            $former = array_diff(
-                array_unique(array_merge($former, $change['removed'])),
-                $change['added']
-            );
-        }
-
-        return [
-            'current' => $current,
-            'former' => $former,
-        ];
-    }
-
-    /**
-     * Get global user rights changes of the given user.
-     * @param Project $project
-     * @param User $user
-     * @return string[] Keyed by timestamp then 'added' and 'removed'.
-     */
-    public function getGlobalRightsChanges()
-    {
-        if (isset($this->globalRightsChanges)) {
-            return $this->globalRightsChanges;
-        }
-
-        $logData = $this->getRepository()
-            ->getGlobalRightsChanges($this->project, $this->user);
-
-        $this->globalRightsChanges = $this->processRightsChanges($logData);
-
-        return $this->globalRightsChanges;
-    }
-
-    /**
-     * Process the given rights changes, sorting an putting in a human-readable format.
-     * @param  array $logData As fetched with EditCounterRepository::getRightsChanges.
-     * @return array
-     */
-    private function processRightsChanges($logData)
-    {
-        $rightsChanges = [];
-
-        foreach ($logData as $row) {
-            $unserialized = @unserialize($row['log_params']);
-            if ($unserialized !== false) {
-                $old = $unserialized['4::oldgroups'];
-                $new = $unserialized['5::newgroups'];
-                $added = array_diff($new, $old);
-                $removed = array_diff($old, $new);
-
-                $rightsChanges = $this->setAutoRemovals($rightsChanges, $row, $unserialized, $added);
-            } else {
-                // This is the old school format the most likely contains
-                // the list of rights additions in as a comma-separated list.
-                try {
-                    list($old, $new) = explode("\n", $row['log_params']);
-                    $old = array_filter(array_map('trim', explode(',', $old)));
-                    $new = array_filter(array_map('trim', explode(',', $new)));
-                    $added = array_diff($new, $old);
-                    $removed = array_diff($old, $new);
-                } catch (Exception $e) {
-                    // Really really old school format that may be missing metadata
-                    // altogether. Here we'll just leave $added and $removed blank.
-                    $added = [];
-                    $removed = [];
-                }
-            }
-
-            // Remove '(none)'.
-            if (in_array('(none)', $added)) {
-                array_splice($added, array_search('(none)', $added), 1);
-            }
-            if (in_array('(none)', $removed)) {
-                array_splice($removed, array_search('(none)', $removed), 1);
-            }
-
-            $rightsChanges[$row['log_timestamp']] = [
-                'logId' => $row['log_id'],
-                'admin' => $row['log_user_text'],
-                'comment' => $row['log_comment'],
-                'added' => array_values($added),
-                'removed' => array_values($removed),
-                'automatic' => $row['log_action'] === 'autopromote',
-                'type' => $row['type'],
-            ];
-        }
-
-        krsort($rightsChanges);
-
-        return $rightsChanges;
-    }
-
-    /**
-     * Check the given log entry for rights changes that are set to automatically expire,
-     * and add entries to $rightsChanges accordingly.
-     * @param array $rightsChanges
-     * @param array $row Log entry row from database.
-     * @param array $params Unserialized log params.
-     * @param string[] $added List of added user rights.
-     * @return array Modified $rightsChanges.
-     */
-    private function setAutoRemovals($rightsChanges, $row, $params, $added)
-    {
-        foreach ($added as $index => $entry) {
-            if (!isset($params['newmetadata'][$index]) ||
-                !array_key_exists('expiry', $params['newmetadata'][$index]) ||
-                empty($params['newmetadata'][$index]['expiry'])
-            ) {
-                continue;
-            }
-
-            $expiry = $params['newmetadata'][$index]['expiry'];
-
-            if (isset($rightsChanges[$expiry]) && !in_array($entry, $rightsChanges[$expiry]['removed'])) {
-                $rightsChanges[$expiry]['removed'][] = $entry;
-            } else {
-                $rightsChanges[$expiry] = [
-                    'logId' => $row['log_id'],
-                    'admin' => $row['log_user_text'],
-                    'comment' => null,
-                    'added' => [],
-                    'removed' => [$entry],
-                    'automatic' => true,
-                    'type' => $row['type'],
-                ];
-            }
-        }
-
-        return $rightsChanges;
     }
 
     /**

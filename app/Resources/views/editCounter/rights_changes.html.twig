@@ -26,13 +26,26 @@
                     <table class="table rights-changes-summary"><tbody>
                         {% for state in ['current', 'former'] %}
                             <tr>
-                                <td>{{ msg(state ~ '-rights') }}</td>
+                                <td>{{ msg(state ~ '-user-groups') }}</td>
                                 <td>
-                                    {% set list = ec.rightsStates[state] %}
-                                    {% if list|length  == 0 %}
+                                    {% set localList = ec.rightsStates[state] %}
+                                    {% set globalList = ec.globalRightsStates[state] %}
+                                    {% if localList|merge(globalList)|length  == 0 %}
                                         <em class="text-muted">{{ msg('none') }}</em>
                                     {% else %}
-                                        {{ ec.rightsStates[state]|join(', ') }}
+                                        {% for right in localList %}
+                                            <span class="rights-change-name">
+                                                <a target="_blank" href="{{ wiki.pageUrlRaw('Special:ListGroupRights', project) }}#{{ right }}">{{ ec.rightsNames[right] }}</a>{#-
+                                                -#}{% if not loop.last or (loop.last and globalList|length > 0) %},{% endif %}
+                                            </span>
+                                        {% endfor %}
+                                        {% for right in globalList %}
+                                            <span class="rights-change-name">
+                                                <a target="_blank" href="{{ wiki.pageUrlRaw('Special:GlobalGroupPermissions', project) }}#{{ right }}">{{ ec.rightsNames[right] }}</a>
+                                                <span class="text-muted">(global)</span>{#-
+                                                -#}{% if not loop.last %},{% endif %}
+                                            </span>
+                                        {% endfor %}
                                     {% endif %}
                                 </td>
                             </tr>

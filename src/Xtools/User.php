@@ -82,6 +82,16 @@ class User extends Model
     }
 
     /**
+     * Get a user's local user rights on the given Project.
+     * @param  Project $project
+     * @return string[]
+     */
+    public function getUserRights(Project $project)
+    {
+        return $this->getRepository()->getUserRights($project, $this);
+    }
+
+    /**
      * Get the user's (system) edit count.
      * @param Project $project
      * @return int
