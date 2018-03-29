@@ -57,7 +57,17 @@
         {% endif %}
         <tr>
             <td>{{ msg('is-admin') }}</td>
-            <td>{% if user.isAdmin(project) %}<span class="text-success">&check;{% else %}<span class="text-warning">&cross;</span>{% endif %}</td>
+            <td>
+                {% set adminStatus = ec.adminStatus %}
+                {% if adminStatus == 'current' %}
+                    <span class="text-success">&check;
+                {% elseif adminStatus == 'former' %}
+                    <span class="text-warning">&cross;</span>
+                    <em class="text-muted">({{ msg('former-admin')|lower }})</em>
+                {% else %}
+                    <span class="text-warning">&cross;</span>
+                {% endif %}
+            </td>
         </tr>
         <tr>
             <td>{{ msg('first-edit') }}</td>
@@ -277,11 +287,12 @@
             </tr>
         </tbody>
 
+        {# ======================== ADMIN ACTIONS ======================== #}
         <tbody class="stat-list--group">
             <tr>
                 <td colspan="2" class="text-muted">{{ msg('actions-as-admin') }}</td>
             </tr>
-            {% if not user.isAdmin(project) %}
+            {% if adminStatus == false %}
                 <tr>
                     <td colspan="2" class="stat-list--empty-group">{{ msg('user-is-not-admin') }}</td>
                 </tr>

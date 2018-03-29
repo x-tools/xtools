@@ -658,5 +658,17 @@ class EditCounterTest extends WebTestCase
                 'type' => 'global',
             ],
         ], $this->editCounter->getGlobalRightsChanges());
+
+        // Current rights.
+        $this->assertEquals(
+            ['sysop', 'bureaucrat'],
+            $this->editCounter->getRightsStates()['current']
+        );
+
+        // Former rights.
+        $this->assertEquals(
+            ['rollbacker', 'templateeditor', 'ipblock-exempt', 'filemover'],
+            $this->editCounter->getRightsStates()['former']
+        );
     }
 }

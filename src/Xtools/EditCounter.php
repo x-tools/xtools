@@ -243,6 +243,50 @@ class EditCounter extends Model
     }
 
     /**
+     * Checks the user rights log to see whether the user is an admin
+     * or used to be one.
+     * @return string|false One of false (never an admin), 'current' or 'former'.
+     */
+    public function getAdminStatus()
+    {
+        $rightsStates = $this->getRightsStates();
+
+        if (in_array('sysop', $rightsStates['current'])) {
+            return 'current';
+        } elseif (in_array('sysop', $rightsStates['former'])) {
+            return 'former';
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Get a list of the current and former rights of the user.
+     * @return array With keys 'current' and 'former'.
+     */
+    public function getRightsStates()
+    {
+        $current = [];
+        $former = [];
+
+        foreach (array_reverse($this->getRightsChanges()) as $change) {
+            $current = array_diff(
+                array_unique(array_merge($current, $change['added'])),
+                $change['removed']
+            );
+            $former = array_diff(
+                array_unique(array_merge($former, $change['removed'])),
+                $change['added']
+            );
+        }
+
+        return [
+            'current' => $current,
+            'former' => $former,
+        ];
+    }
+
+    /**
      * Get global user rights changes of the given user.
      * @param Project $project
      * @param User $user

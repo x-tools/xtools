@@ -3,6 +3,10 @@
 .ec {
     .stat-list .table {
         margin: 0 auto;
+
+        &.rights-changes-summary {
+            margin: 0;
+        }
     }
 
     .stat-list--empty-group {
