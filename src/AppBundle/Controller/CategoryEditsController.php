@@ -304,7 +304,7 @@ class CategoryEditsController extends XtoolsController
         $response = new JsonResponse();
         $response->setEncodingOptions(JSON_NUMERIC_CHECK);
 
-        $res['category_editcount'] = $this->categoryEdits->getCount();
+        $res['category_editcount'] = $this->categoryEdits->getCategoryEditCount();
 
         $response->setData($res);
         return $response;

@@ -223,3 +223,23 @@ Get the top edits made by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo
 
     https://xtools.wmflabs.org/api/user/top_edits/en.wikipedia/Jimbo_Wales//Talk:Naveen_Jain
     https://xtools.wmflabs.org/api/user/top_edits/en.wikipedia.org/Jimbo_Wales/1/Naveen_Jain
+
+Category edit counter
+=====================
+``GET /api/user/category_editcount/{project}/{username}/{categories}/{start}/{end}``
+
+Get the number of edits made by the given user to the given categories.
+
+**Parameters:**
+
+* ``project`` (**required**) - Project domain or database name.
+* ``username`` (**required**) - Account's username.
+* ``categories`` (**required**) - Category names separated by pipes. The namespace prefix may be omitted.
+* ``start`` - Start date in the format ``YYYY-MM-DD``. Leave this and ``end`` blank to retrieve the most recent data.
+* ``end`` - End date in the format ``YYYY-MM-DD``. Leave this and ``start`` blank to retrieve the most recent data.
+
+**Example:**
+
+Get the number of edits made by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ to `Category:Living people <https://en.wikipedia.org/wiki/Category:Living_people>`_ and `Category:Wikipedia village pump <https://en.wikipedia.org/wiki/Category:Wikipedia_village_pump>`_.
+
+    `<https://xtools.wmflabs.org/api/user/category_editcount/en.wikipedia/Jimbo_Wales/Living_people|Wikipedia_village_pump>`_
