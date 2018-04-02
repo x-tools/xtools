@@ -77,6 +77,10 @@ parameters:
         WikiLove:
             tag: wikilove
             link: Special:MyLanguage/Extension:WikiLove
+        Content translation:
+            tag: ContentTranslation
+            regex: 'Created by translating the page'
+            link: mw:Special:MyLanguage/Content translation
 
     # Per-language lists. This generally only includes native MediaWiki actions.
     ar:
@@ -105,6 +109,16 @@ parameters:
         Page move:
             regex: '문서로 이동했습니다'
             label: '문서 이동'
+    pt:
+        Page move:
+            regex: 'moveu \[\[.*?para \[\['
+            label: Movimentos de página
+        Content translation:
+            regex: 'Criado ao traduzir a página'
+            label: Tradução de Conteúdos
+        Redirect:
+            label: Redirecionamentos
+            link: Ajuda:Guia de edição/Redirecionar páginas
 
     # Per-wiki lists
     ar.wikipedia.org:
@@ -356,6 +370,8 @@ parameters:
         MoveToDraft:
             regex: '\[\[User:Evad37\/MoveToDraft\.js\|via script'
             link: User:Evad37/MoveToDraft
+        Content translation:
+            link: Wikipedia:Content translation tool
     ko.wikipedia.org:
         AutoWikiBrowser:
             regex: '위키백과:AWB\|AWB|(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
@@ -382,3 +398,15 @@ parameters:
         Script de ajustes:
             regex: 'usando \[\[[Uu]ser:Luizdl/Script de ajustes.js'
             link: User:Luizdl/Script de ajustes.js
+        Automatic Page Corrector:
+            tag: apc
+            regex: '\+correções \[\[WP:SR\|semiautomáticas'
+            link: Wikipédia:Scripts/APC
+        Popups:
+            link: Wikipédia:Software/Popups de navegação
+            label: Popups de navegação
+        Page move:
+            link: Ajuda:Guia de edição/Mover páginas
+        Generic rollback:
+            link: Wikipédia:Reversores
+            label: Reversores
