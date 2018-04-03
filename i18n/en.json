@@ -40,6 +40,8 @@
 	"auto-contribs-desc": "Browse through a user's (semi-)automated contributions.",
 	"auto-contribs-use-tool": "Show only edits using the tool:",
 	"auto-edits": "(Semi-)automated edits",
+	"auto-edits-counts-desc": "Some tool usage overlaps (e.g. rolling back to a revision that is a redirect counts as Rollback and as Redirect), so the total of edits made with each tool may differ from the $1.",
+	"auto-edits-counts-desc-grand-total": "grand total",
 	"auto-edits-request": "Request that a new (semi-)automated tool be added",
 	"auto-edits-request-doc": "Link to the tool's documentation or homepage",
 	"auto-edits-request-examples": "Links to example edits",

@@ -5,14 +5,20 @@
 #   Tool name:
 #       regex: Regular expression to match against edit summary
 #       tag: Tag name for the tool, if applicable. See [[Special:Tags]] for full list
+#       single_tag: Set to true to look for edits that *only* have this tag. This is used primarily
+#           for rollback, so that you can see true system rollback and not edits by other tools
+#           that use rollback.
 #       link: Wiki link to tool documentation
 #       label: Text to use as the label, defaults to the tool's key. Use this for translations.
 #       revert: If the tool is used *only* to revert edits (and not also issue talk page
-#               notifications, etc.), set this to `true`. If the tool is capable of reverting
-#               edits, set 'revert' to regex that would only account for reverts.
-#               See the 'Twinkle' entry for an example. The revert-only regex is necessary
-#               for ArticleInfo and elsewhere, so as to differentiate edits that added content
-#               from edits that restored content.
+#           notifications, etc.), set this to `true`. If the tool is capable of reverting
+#           edits, set 'revert' to regex that would only account for reverts.
+#           See the 'Twinkle' entry for an example. The revert-only regex is necessary
+#           for ArticleInfo and elsewhere, so as to differentiate edits that added content
+#           from edits that restored content.
+#       contribs: Set to true to include edits with the given tool in non-automated contributions.
+#           For example, we do this for ProveIt, because that tool often includes prose that was
+#           added by the user, and not entirely a semi-automated edit.
 #
 # Either 'regex' or 'tag' are required. In some cases you might want to include both,
 #   say if older versions of the tool did not add tags to the edits.
@@ -27,11 +33,16 @@ parameters:
     global:
         Generic rollback:
             tag: mw-rollback
+            single_tag: true
             regex: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) edits by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\] \(\[\[User talk:.*?\|talk\]\]\) to last (version|revision) by .*'
             link: Special:MyLanguage/Project:Rollback
             revert: true
         Undo:
             tag: mw-undo
+            single_tag: true
+            tag_excludes:
+                - mw-rollback
+                - huggle
             regex: '^(Undid|Undo|\[\[WP:UNDO\|Undid\]\]) revision \d+ by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\]'
             link: Special:MyLanguage/Project:Undo
             # This is not considered a revert because you can undo
@@ -81,6 +92,10 @@ parameters:
             tag: ContentTranslation
             regex: 'Created by translating the page'
             link: mw:Special:MyLanguage/Content translation
+        ProveIt:
+            tag: ProveIt edit
+            link: commons:Help:Gadget-ProveIt
+            contribs: true
 
     # Per-language lists. This generally only includes native MediaWiki actions.
     ar:
@@ -372,6 +387,9 @@ parameters:
             link: User:Evad37/MoveToDraft
         Content translation:
             link: Wikipedia:Content translation tool
+        ProveIt:
+            regex: 'with \[\[Wikipedia:ProveIt'
+            link: Wikipedia:ProveIt
     ko.wikipedia.org:
         AutoWikiBrowser:
             regex: '위키백과:AWB\|AWB|(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'

@@ -674,7 +674,9 @@
 
         /** global: xtBaseUrl */
         $.ajax({
-            url: xtBaseUrl + endpoint + '/' + editOffset + '?htmlonly=yes',
+            url: xtBaseUrl + endpoint + '/' + editOffset +
+                // Make sure to include any URL parameters, such as tool=Huggle (for AutoEdits).
+                '?htmlonly=yes&' + window.location.search.replace(/^\?/, ''),
             timeout: 30000
         }).done(function (data) {
             $('.contributions-container').html(data).show();

@@ -16,18 +16,35 @@ use Symfony\Component\Config\Definition\Exception\Exception;
  */
 class AutoEditsRepository extends UserRepository
 {
-    /** @var AutomatedEditsHelper Used for fetching the tool list and filtering it. */
-    private $aeh;
+    /** @var array List of automated tools, used for fetching the tool list and filtering it. */
+    private $aeTools;
 
     /**
-     * Method to give the repository access to the AutomatedEditsHelper.
+     * Method to give the repository access to the AutomatedEditsHelper
+     * and fetch the list of semi-automated tools.
+     * @param Project $project
      */
-    public function getHelper()
+    private function getTools(Project $project)
     {
-        if (!isset($this->aeh)) {
-            $this->aeh = $this->container->get('app.automated_edits_helper');
+        if (!isset($this->aeTools)) {
+            $this->aeTools = $this->container
+                ->get('app.automated_edits_helper')
+                ->getTools($project);
         }
-        return $this->aeh;
+        return $this->aeTools;
+    }
+
+    /**
+     * Is the tag for given tool intended to be counted by itself?
+     * For instance, when counting Rollback edits we don't want to also
+     * count Huggle edits (which are tagged as Rollback).
+     * @param  Project $project
+     * @param  string $tool
+     * @return bool
+     */
+    private function usesSingleTag(Project $project, $tool)
+    {
+        return isset($this->getTools($project)[$tool]['single_tag']);
     }
 
     /**
@@ -116,7 +133,7 @@ class AutoEditsRepository extends UserRepository
         list($condBegin, $condEnd) = $this->getRevTimestampConditions($start, $end, 'revs.');
 
         // Get the combined regex and tags for the tools
-        list($regex, $tags) = $this->getToolRegexAndTags($project);
+        list($regex, $tags) = $this->getToolRegexAndTags($project, true);
 
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
@@ -187,14 +204,33 @@ class AutoEditsRepository extends UserRepository
         list($condBegin, $condEnd) = $this->getRevTimestampConditions($start, $end, 'revs.');
 
         // Get the combined regex and tags for the tools
-        list($regex, $tags) = $this->getToolRegexAndTags($project, $tool);
+        list($regex, $tags) = $this->getToolRegexAndTags($project, false, $tool);
 
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
         $tagTable = $project->getTableName('change_tag');
         $condNamespace = $namespace === 'all' ? '' : 'AND page_namespace = :namespace';
         $tagJoin = $tags != '' ? "LEFT OUTER JOIN $tagTable ON (ct_rev_id = revs.rev_id)" : '';
-        $condTag = $tags != '' ? "OR ct_tag IN ($tags)" : '';
+
+        $condTag = '';
+        if ($tags != '') {
+            if ($this->usesSingleTag($project, $tool)) {
+                // Only show edits made with the tool that don't overlap with other tools.
+                // For instance, Huggle edits are also tagged as Rollback, but when viewing
+                // Rollback edits we don't want to show Huggle edits.
+                $condTag = "
+                    OR EXISTS (
+                        SELECT ct_tag, COUNT(ct_tag) AS tag_count
+                        FROM $tagTable
+                        WHERE ct_rev_id = revs.rev_id
+                        HAVING tag_count = 1 AND ct_tag = $tags
+                    )
+                ";
+            } else {
+                $condTag = "OR ct_tag IN ($tags)";
+            }
+        }
+
         $sql = "SELECT
                     page_title,
                     page_namespace,
@@ -261,7 +297,7 @@ class AutoEditsRepository extends UserRepository
         $sql = $this->getAutomatedCountsSql($project, $namespace, $start, $end);
         $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end);
 
-        $tools = $this->getHelper()->getTools($project);
+        $tools = $this->getTools($project);
 
         // handling results
         $results = [];
@@ -304,7 +340,7 @@ class AutoEditsRepository extends UserRepository
         list($condBegin, $condEnd) = $this->getRevTimestampConditions($start, $end);
 
         // Load the semi-automated edit types.
-        $tools = $this->getHelper()->getTools($project);
+        $tools = $this->getTools($project);
 
         // Create a collection of queries that we're going to run.
         $queries = [];
@@ -328,7 +364,7 @@ class AutoEditsRepository extends UserRepository
             }
 
             $queries[] .= "
-                SELECT $toolname AS toolname, COUNT(rev_id) AS count
+                SELECT $toolname AS toolname, COUNT(DISTINCT(rev_id)) AS count
                 FROM $revisionTable
                 $pageJoin
                 $tagJoin
@@ -363,13 +399,24 @@ class AutoEditsRepository extends UserRepository
             $tagJoin = "LEFT OUTER JOIN $tagTable ON ct_rev_id = rev_id";
             $tag = $conn->quote($values['tag'], \PDO::PARAM_STR);
 
-            // Append to regex clause if already present.
+            // This ensures we count only edits made with the given tool, and not other
+            // edits that incidentally have the same tag. For instance, Huggle edits
+            // are also tagged as Rollback, but we want to make them mutually exclusive.
+            $tagClause = "
+                EXISTS (
+                    SELECT ct_tag, COUNT(ct_tag) AS tag_count
+                    FROM $tagTable
+                    WHERE ct_rev_id = rev_id
+                    HAVING tag_count = 1 AND ct_tag = $tag
+                )";
+
+            // Use tags in addition to the regex clause, if already present.
             // Tags are more reliable but may not be present for edits made with
-            //   older versions of the tool, before it started adding tags.
+            // older versions of the tool, before it started adding tags.
             if ($condTool === '') {
-                $condTool = "ct_tag = $tag";
+                $condTool = $tagClause;
             } else {
-                $condTool = '(' . $condTool . " OR ct_tag = $tag)";
+                $condTool = '(' . $condTool . " OR $tagClause)";
             }
         }
 
@@ -380,14 +427,15 @@ class AutoEditsRepository extends UserRepository
      * Get the combined regex and tags for all semi-automated tools,
      * or the given tool, ready to be used in a query.
      * @param Project $project
+     * @param bool $nonAutoEdits Set to true to exclude tools with the 'contribs' flag.
      * @param string|null $tool
      * @return string[] In the format:
      *    ['combined|regex', 'combined,tags']
      */
-    private function getToolRegexAndTags(Project $project, $tool = null)
+    private function getToolRegexAndTags(Project $project, $nonAutoEdits = false, $tool = null)
     {
         $conn = $this->getProjectsConnection();
-        $tools = $this->getHelper()->getTools($project);
+        $tools = $this->getTools($project);
         $regexes = [];
         $tags = [];
 
@@ -396,6 +444,10 @@ class AutoEditsRepository extends UserRepository
         }
 
         foreach ($tools as $tool => $values) {
+            if ($nonAutoEdits && isset($values['contribs'])) {
+                continue;
+            }
+
             if (isset($values['regex'])) {
                 $regexes[] = $values['regex'];
             }

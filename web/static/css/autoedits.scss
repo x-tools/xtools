@@ -40,4 +40,14 @@
         display: inline-block;
         width: auto;
     }
+
+    .tooltipcss--tool-counts {
+        cursor: help;
+        position: relative;
+        vertical-align: -1px;
+
+        .tooltip-body {
+            min-width: 300px;
+        }
+    }
 }

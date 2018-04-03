@@ -41,6 +41,8 @@
 	"auto-contribs-desc": "Description for section listing (semi-)automated edits made by a user.",
 	"auto-contribs-use-tool": "Label for dropdown that limits results to edits made by the selected (semi-)automated tool. The dropdown is located immediately after the label.",
 	"auto-edits": "(semi-)automated edits with known tools like Huggle",
+	"auto-edits-counts-desc": "In the AutoEdits tool, this message explains how the totals of individual tools (shown in the '(semi-)automated edits' section) may be different from the total shown in the 'Summary' section. $1 is a link to the 'Summary' section with the message 'auto-edits-counts-grant-total' as the link text.",
+	"auto-edits-counts-desc-grand-total": "The text 'grand total'. This is used as the text for the link in the 'auto-edits-counts-desc' message.",
 	"auto-edits-request": "Text of for a link to request that a new (semi-)automated tool be added to XTools.",
 	"auto-edits-request-doc": "Label for field to enter in a link to a (semi-)automated tool's documentation.",
 	"auto-edits-request-examples": "Label for field to enter in links to example edits where the (semi)-automated tool was used.",
