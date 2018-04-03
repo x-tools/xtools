@@ -331,7 +331,10 @@ abstract class Repository
     public function executeProjectsQuery($sql, $params = [], $timeout = null)
     {
         try {
-            $this->setQueryTimeout($timeout);
+            $timeout = $timeout === null
+                ? $this->container->getParameter('app.query_timeout')
+                : $timeout;
+            $sql = "SET STATEMENT max_statement_time = $timeout FOR\n".$sql;
             return $this->getProjectsConnection()->executeQuery($sql, $params);
         } catch (DriverException $e) {
             return $this->handleDriverError($e, $timeout);
@@ -349,8 +352,11 @@ abstract class Repository
     public function executeQueryBuilder(QueryBuilder $qb, $timeout = null)
     {
         try {
-            $this->setQueryTimeout($timeout);
-            return $qb->execute();
+            $timeout = $timeout === null
+                ? $this->container->getParameter('app.query_timeout')
+                : $timeout;
+            $sql = "SET STATEMENT max_statement_time = $timeout FOR\n".$qb->getSQL();
+            return $qb->getConnection()->executeQuery($sql, $qb->getParameters());
         } catch (DriverException $e) {
             return $this->handleDriverError($e, $timeout);
         }
@@ -374,7 +380,7 @@ abstract class Repository
         if ($e->getErrorCode() === 1226) {
             $this->logErrorData('MAX CONNECTIONS');
             throw new ServiceUnavailableHttpException(30, 'error-service-overload', null, 503);
-        } elseif ($e->getErrorCode() === 1969) {
+        } elseif ($e->getErrorCode() === 1969 || $e->getErrorCode() === 2013) {
             $this->logErrorData('QUERY TIMEOUT');
             throw new HttpException(504, 'error-query-timeout', null, [], $timeout);
         } else {
@@ -392,20 +398,5 @@ abstract class Repository
         $this->log->error(
             '>>> '.$metadata['path'].' ('.$error.' after '.$metadata['requestTime'].')'
         );
-    }
-
-    /**
-     * Set the maximum statement time on the MySQL engine.
-     * @param int|null $timeout In seconds. null will use the default
-     *   specified by the app.query_timeout config parameter.
-     * @codeCoverageIgnore
-     */
-    public function setQueryTimeout($timeout = null)
-    {
-        if ($timeout === null) {
-            $timeout = $this->container->getParameter('app.query_timeout');
-        }
-        $sql = "SET max_statement_time = $timeout";
-        $this->getProjectsConnection()->executeQuery($sql);
     }
 }
