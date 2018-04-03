@@ -92,6 +92,7 @@ parameters:
             tag: ContentTranslation
             regex: 'Created by translating the page'
             link: mw:Special:MyLanguage/Content translation
+            contribs: true
         ProveIt:
             tag: ProveIt edit
             link: commons:Help:Gadget-ProveIt
