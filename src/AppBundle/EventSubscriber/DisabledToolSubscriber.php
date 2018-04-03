@@ -12,7 +12,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * A DisabledToolSubscriber checks to see
+ * A DisabledToolSubscriber checks to see if the current tool is disabled
+ * and will throw an exception accordingly.
  */
 class DisabledToolSubscriber implements EventSubscriberInterface
 {

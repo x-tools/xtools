@@ -38,8 +38,14 @@ services:
         public: true
     app.twig_extension:
         class: AppBundle\Twig\AppExtension
-        arguments: ["@service_container", "@request_stack", "@session"]
+        arguments: ['@service_container', '@request_stack', '@session']
         public: false
+
+    app.exception_listener:
+        class: AppBundle\EventSubscriber\ExceptionListener
+        arguemnts: ['@templating', '@logger']
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception }
 
     # add more services, or override services that need manual wiring
     # AppBundle\Service\ExampleService:

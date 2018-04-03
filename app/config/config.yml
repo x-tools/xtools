@@ -174,7 +174,7 @@ fos_rest:
             html: ['text/html']
 
 guzzle:
-    logging: true
+    logging: "%kernel.debug%"
 
     clients:
         xtools:
