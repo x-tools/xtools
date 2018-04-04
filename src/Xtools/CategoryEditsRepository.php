@@ -181,15 +181,15 @@ class CategoryEditsRepository extends Repository
     {
         if (!empty($start)) {
             $query->andWhere('revs.rev_timestamp >= :start');
-            $query->setParameter(':start', $start);
+            $query->setParameter('start', $start);
         }
         if (!empty($end)) {
             $query->andWhere('revs.rev_timestamp <= DATE_FORMAT(:end, "%Y%m%d235959")');
-            $query->setParameter(':end', $end);
+            $query->setParameter('end', $end);
         }
 
         $username = $user->getUsername();
-        $query->setParameter(':username', $username);
+        $query->setParameter('username', $username);
         $query->setParameter('categories', $categories, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
 
         return $this->executeQueryBuilder($query);

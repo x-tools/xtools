@@ -356,7 +356,7 @@ abstract class Repository
                 ? $this->container->getParameter('app.query_timeout')
                 : $timeout;
             $sql = "SET STATEMENT max_statement_time = $timeout FOR\n".$qb->getSQL();
-            return $qb->getConnection()->executeQuery($sql, $qb->getParameters());
+            return $qb->getConnection()->executeQuery($sql, $qb->getParameters(), $qb->getParameterTypes());
         } catch (DriverException $e) {
             return $this->handleDriverError($e, $timeout);
         }
