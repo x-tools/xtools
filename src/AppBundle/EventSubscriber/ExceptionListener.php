@@ -8,7 +8,6 @@ namespace AppBundle\EventSubscriber;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Templating\EngineInterface;
 use Twig_Error_Runtime;
 
@@ -24,15 +23,20 @@ class ExceptionListener
     /** @var LoggerInterface For logging the exception. */
     private $logger;
 
+    /** @var string The environment. */
+    private $environment;
+
     /**
      * Constructor for the ExecptionListener.
      * @param EngineInterface $templateEngine
      * @param LoggerInterface $logger
+     * @param string $environment
      */
-    public function __construct(EngineInterface $templateEngine, LoggerInterface $logger)
+    public function __construct(EngineInterface $templateEngine, LoggerInterface $logger, $environment = 'prod')
     {
         $this->templateEngine = $templateEngine;
         $this->logger = $logger;
+        $this->environment = $environment;
     }
 
     /**
@@ -52,6 +56,10 @@ class ExceptionListener
             return;
         }
 
+        if ($this->environment !== 'prod') {
+            throw $prevException;
+        }
+
         // Log the exception, since we're handling it and it won't automatically be logged.
         $file = explode('/', $prevException->getFile());
         $this->logger->error(
@@ -62,7 +70,7 @@ class ExceptionListener
         $response = new Response(
             $this->templateEngine->render('TwigBundle:Exception:error.html.twig', [
                 'status_code' => 500,
-                'status_text' => 'testing',
+                'status_text' => 'Internal Server Error',
                 'exception' => $prevException,
             ])
         );
