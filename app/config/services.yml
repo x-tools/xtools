@@ -43,7 +43,7 @@ services:
 
     app.exception_listener:
         class: AppBundle\EventSubscriber\ExceptionListener
-        arguemnts: ['@templating', '@logger']
+        arguments: ['@templating', '@logger', '%kernel.environment%']
         tags:
             - { name: kernel.event_listener, event: kernel.exception }
 

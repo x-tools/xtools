@@ -1,5 +1,25 @@
 # Release Notes #
 
+## 3.3.0 ##
+- T189645: New Category Edits tool to see edits made by a user to
+  one or more categories.
+- T191135: Handle Twig runtime exceptions and show original
+  exception, if present.
+- Set max_statement_time on individual database queries, and treat
+  error 2013 (lost connection to MySQL server) as query timeout.
+- T171278: EditCounter: show admin actions of former admins.
+- EditCounter: localize names of user groups, show current and
+  former user groups.
+- T191136: AutoEdits: Add APC tool for ptwiki, better pt support.
+- AutoEdits: add content translation tool and ProveIt. Use new
+  'contribs' flag to show these tools in non-automated contribs.
+- T191133: AutoEdits: improve showing of edits with tools that have
+  a tag but may share tags with other tools.
+- T180819: Use metawiki when logging in wiht OAuth.
+- Remove old, unused multithreading code.
+- TopEdits: Increase test coverage.
+- Localization updates.
+
 ## 3.2.5 ##
 - T190496: AdminStats: Make sure former admins are shown. Rework
   query to only show users with > 1 action. Don't count log actions
