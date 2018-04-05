@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"Nemo bis",
-			"Ans"
+			"Ans",
+			"Aefgh39622"
 		]
 	},
 	"actions": "การแก้ไข",
@@ -72,7 +73,7 @@
 	"links-in": "ลิงก์ไปยังหน้านี้",
 	"links-out": "ลิงก์จากหน้านี้",
 	"live-edits": "การแก้ไขอยู่",
-	"login": "เข้าสู่ระบบ",
+	"login": "ลงชื่อเข้า",
 	"logout": "ออกจากระบบ",
 	"mainspace": "บทความ",
 	"major-edits": "การแก้ไขหลัก",
