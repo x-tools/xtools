@@ -97,6 +97,8 @@
 	"download-label": "Descargar",
 	"duplicate-vote": "Voto duplicado",
 	"edit": "Editar",
+	"edits-in-categories": "Ediciones en categorías",
+	"edits-not-in-categories": "Ediciones fuera de categorías",
 	"edit-count": "Conteo de ediciones",
 	"edit-count-desc": "$2 {{PLURAL:$1|edición|ediciones}}",
 	"edit-summaries": "Resúmenes de edición",

@@ -3,7 +3,8 @@
 		"authors": [
 			"Nemo bis",
 			"Piramidion",
-			"Movses"
+			"Movses",
+			"Avatar6"
 		]
 	},
 	"accepted-formats": "Прийнятні формати",
@@ -30,6 +31,7 @@
 	"assessment": "Оцінка",
 	"assessments": "Оцінки",
 	"auto-edits": "(Напів)автоматичні редагування",
+	"auto-edits-counts-desc-grand-total": "загалом",
 	"auto-edits-request": "Подати запит на додавання нового (напів)автоматичного інструмента",
 	"average-change-per-page": "Середнє редагування на сторіку",
 	"average-edit-size": "Середній розмір редагування",
@@ -61,6 +63,7 @@
 	"csv": "CSV",
 	"current-admins": "Поточні адміни",
 	"current-size": "Поточний розмір",
+	"current-user-groups": "Поточні групи користувачів",
 	"data-limit": "Дані обмежені до $2 {{PLURAL:$1|останнього редагування|останніх редагувань}}",
 	"date": "Дата",
 	"date-range": "$1 – $2",
