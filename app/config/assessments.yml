@@ -88,3 +88,83 @@ parameters:
           color: ''
           category: 'Category:Unknown-importance articles'
           weight: 0
+    tr.wikipedia.org:
+      wikiproject_prefix: 'Vikiproje:'
+      class:
+        SM:
+          badge: 'b/bc/Featured_article_star.svg'
+          color: '#6699ff'
+          category: 'Kategori:SM-sınıf Vikiproje sayfaları'
+        KM:
+          badge: 'e/eb/Cscr-featured2.png'
+          color: '#66ff66'
+          category: 'Kategori:KM-sınıf Vikiproje sayfaları'
+        B:
+          badge: '5/5f/Symbol_b_class.svg'
+          color: '#b2ff66'
+          category: 'Kategori:Vikiproje 10K Az-önemli B-sınıf sayfalar'
+        C:
+          badge: 'e/e6/Symbol_c_class.svg'
+          color: '#ffff66'
+          category: 'Kategori:C-sınıf Vikiproje sayfaları'
+        Başlangıç:
+          badge: 'a/a4/Symbol_start_class.svg'
+          color: '#ffaa66'
+          category: 'Kategori:Başlangıç-sınıf Vikiproje sayfaları'
+        Taslak:
+          badge: 'f/f5/Symbol_stub_class.svg'
+          color: '#eb6163'
+          category: 'Kategori:Taslak-sınıf Vikiproje sayfaları'
+        SL:
+          badge: 'b/bc/Featured_article_star.svg'
+          color: '#6699ff'
+          category: 'Kategori:Vikiproje Afrika SL-sınıf sayfalar'
+        Liste:
+          badge: 'd/db/Symbol_list_class.svg'
+          color: '#aa88ff'
+          category: 'Kategori:Liste-sınıf Vikiproje sayfaları'
+        Anlam ayrımı:
+          badge: '2/2a/Symbol_dab_class.svg'
+          color: '#00fa9a'
+          category: 'Kategori:Anlam ayrımı-sınıf Vikiproje sayfaları'
+        Yönlendirme:
+          badge: '8/89/Symbol_redirect_vote2.svg'
+          color: '#c0c0c0'
+          category: 'Kategori:Yönlendirme-sınıf Vikiproje sayfaları'
+        Şablon:
+          badge: '5/5c/Symbol_template_class.svg'
+          color: '#fbceb1'
+          category: 'Kategori:Şablon-sınıf Vikiproje sayfaları'
+        Kategori:
+          badge: '4/48/Folder_Hexagonal_Icon.svg'
+          color: '#ffdb58'
+          category: 'Kategori:Kategori-sınıf Vikiproje sayfaları'
+        Dosya:
+          badge: 'e/e7/Video-x-generic.svg'
+          color: '#ddccff'
+          category: 'Kategori:Dosya-sınıf Vikiproje sayfaları'
+        Unknown:
+          badge: 'e/e0/Symbol_question.svg'
+          color: ''
+          category: 'Kategori:Değerlendirilmemiş-sınıf Vikiproje sayfaları'
+      importance:
+        En:
+          color: '#ff00ff'
+          category: 'Kategori:En-önemli Vikiproje sayfaları'
+          weight: 4
+        Çok:
+          color: '#ff88ff'
+          category: 'Kategori:Çok-önemli Vikiproje sayfaları'
+          weight: 3
+        Orta:
+          color: '#ffbbff'
+          category: 'Kategori:Orta-önemli Vikiproje sayfaları'
+          weight: 2
+        Az:
+          color: '#ffddff'
+          category: 'Kategori:Az-önemli Vikiproje sayfaları'
+          weight: 1
+        Unknown:
+          color: ''
+          category: 'Category:Unknown-importance articles'
+          weight: 0

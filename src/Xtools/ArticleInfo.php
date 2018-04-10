@@ -1303,7 +1303,7 @@ class ArticleInfo extends Model
                     100 * ($added / $this->addedBytes)
                 )
             ];
-        }, array_keys(array_slice($topTenEditorsByAdded, 0, 10)));
+        }, array_keys(array_slice($topTenEditorsByAdded, 0, 10, true)));
 
         $this->topTenCount = $topTenCount;
     }
