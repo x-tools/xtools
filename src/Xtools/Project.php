@@ -315,6 +315,15 @@ class Project extends Model
     }
 
     /**
+     * Get all the page assessment metadata for the project.
+     * @return array
+     */
+    public function getAssessmentsConfig()
+    {
+        return $this->getRepository()->getAssessmentsConfig($this->getDomain());
+    }
+
+    /**
      * Get the image URL of the badge for the given page assessment
      * @param string $class Valid classification for project, such as 'Start', 'GA', etc.
      * @param bool $filenameOnly Get only the filename, not the URL.
