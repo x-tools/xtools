@@ -454,4 +454,48 @@ class ArticleInfoController extends XtoolsController
             Response::HTTP_OK
         );
     }
+
+    /**
+     * Get the page assessments of a page, along with various related metadata.
+     * @Route("/api/page/assessments/{project}/{articles}", requirements={"article"=".+"})
+     * @param  Request $request
+     * @param  string $articles May be multiple pages separated by pipes, e.g. Foo|Bar|Baz
+     * @return JsonResponse
+     * @codeCoverageIgnore
+     */
+    public function assessments(Request $request, $articles)
+    {
+        // First validate project.
+        $ret = $this->validateProjectAndUser($request);
+        if ($ret instanceof RedirectResponse) {
+            return new JsonResponse(
+                ['error' => 'Invalid project'],
+                Response::HTTP_NOT_FOUND
+            );
+        } else {
+            $project = $ret[0];
+        }
+
+        $pageAssessments = [];
+        $pages = explode('|', $articles);
+        $out = [];
+
+        foreach ($pages as $page) {
+            $page = $this->getAndValidatePage($project, $page);
+            if ($page instanceof RedirectResponse) {
+                $out[$page->getTitle()] = false;
+            } else {
+                $assessments = $page->getAssessments();
+
+                $out[$page->getTitle()] = $request->get('classonly')
+                    ? $assessments['assessment']
+                    : $assessments;
+            }
+        }
+
+        return new JsonResponse(
+            $out,
+            Response::HTTP_OK
+        );
+    }
 }
