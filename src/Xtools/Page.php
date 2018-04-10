@@ -361,7 +361,7 @@ class Page extends Model
      */
     public function getAssessments()
     {
-        if (!$this->project->hasPageAssessments() || $this->getNamespace() !== 0) {
+        if (!$this->project->hasPageAssessments() || !in_array($this->getNamespace(), [0, 4, 6, 10, 14, 100, 108])) {
             return false;
         }
 
@@ -426,6 +426,11 @@ class Page extends Model
             }
 
             $decoratedAssessments[$assessment['wikiproject']] = $assessment;
+        }
+
+        // Don't shown 'Unknown' assessment outside of the mainspace.
+        if ($this->getNamespace() !== 0 && $overallQuality['value'] === '???') {
+            return false;
         }
 
         return [
