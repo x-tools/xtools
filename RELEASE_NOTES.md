@@ -1,5 +1,13 @@
 # Release Notes #
 
+## 3.3.1 ##
+- T184969: Add Turkish page assessments.
+- T185023: Add Arabic page assessments.
+- Show page assessments in non-mainspace, if assessment exists.
+- Add API to get page assessments config and for given articles.
+- Add Apple favicons, should reduce 404s in production logs.
+- Localization updates.
+
 ## 3.3.0 ##
 - T189645: New Category Edits tool to see edits made by a user to
   one or more categories.
