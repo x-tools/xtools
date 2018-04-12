@@ -5,14 +5,11 @@
 
 namespace Xtools;
 
-use Mediawiki\Api\MediawikiApi;
-
 /**
  * A Project is a single wiki that XTools is querying.
  */
 class Project extends Model
 {
-
     /** @var string The project name as supplied by the user. */
     protected $nameUnnormalized;
 
@@ -21,6 +18,9 @@ class Project extends Model
 
     /** @var string[] Project's 'dbName', 'url' and 'lang'. */
     protected $basicInfo;
+
+    /** @var PageAssessments Contains methods around the page assessments config for the Project. */
+    protected $pageAssessments;
 
     /**
      * Whether the user being queried for in this session
@@ -36,6 +36,31 @@ class Project extends Model
     public function __construct($nameOrUrl)
     {
         $this->nameUnnormalized = $nameOrUrl;
+        $this->pageAssessments = new PageAssessments($this);
+    }
+
+    /**
+     * Get the associated PageAssessments model.
+     * @return PageAssessments
+     */
+    public function getPageAssessments()
+    {
+        return $this->pageAssessments;
+    }
+
+    /**
+     * Whether or not this project supports page assessments,
+     * or if they exist for the given namespace.
+     * @param int $nsId Namespace ID.
+     * @return bool
+     */
+    public function hasPageAssessments($nsId = null)
+    {
+        if ($nsId !== null && (int)$nsId > 0) {
+            return $this->pageAssessments->isSupportedNamespace($nsId);
+        } else {
+            return $this->pageAssessments->isEnabled();
+        }
     }
 
     /**
@@ -132,7 +157,7 @@ class Project extends Model
     /**
      * Get a MediawikiApi object for this Project.
      *
-     * @return MediawikiApi
+     * @return \Mediawiki\Api\MediawikiApi
      */
     public function getApi()
     {
@@ -303,50 +328,6 @@ class Project extends Model
         }
 
         return false;
-    }
-
-    /**
-     * Does this project support page assessments?
-     * @return bool
-     */
-    public function hasPageAssessments()
-    {
-        return (bool) $this->getRepository()->getAssessmentsConfig($this->getDomain());
-    }
-
-    /**
-     * Get all the page assessment metadata for the project.
-     * @return array
-     */
-    public function getAssessmentsConfig()
-    {
-        return $this->getRepository()->getAssessmentsConfig($this->getDomain());
-    }
-
-    /**
-     * Get the image URL of the badge for the given page assessment
-     * @param string $class Valid classification for project, such as 'Start', 'GA', etc.
-     * @param bool $filenameOnly Get only the filename, not the URL.
-     * @return string URL to image
-     */
-    public function getAssessmentBadgeURL($class, $filenameOnly = false)
-    {
-        $config = $this->getRepository()->getAssessmentsConfig($this->getDomain());
-
-        if (isset($config['class'][$class])) {
-            $url = "https://upload.wikimedia.org/wikipedia/commons/" . $config['class'][$class]['badge'];
-        } elseif (isset($config['class']['Unknown'])) {
-            $url = "https://upload.wikimedia.org/wikipedia/commons/" . $config['class']['Unknown']['badge'];
-        } else {
-            $url = "";
-        }
-
-        if ($filenameOnly) {
-            $parts = explode('/', $url);
-            return end($parts);
-        }
-
-        return $url;
     }
 
     /**

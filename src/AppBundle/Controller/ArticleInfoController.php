@@ -463,8 +463,10 @@ class ArticleInfoController extends XtoolsController
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function assessments(Request $request, $articles)
+    public function assessmentsApiAction(Request $request, $articles)
     {
+        $this->recordApiUsage('page/assessments');
+
         // First validate project.
         $ret = $this->validateProjectAndUser($request);
         if ($ret instanceof RedirectResponse) {
@@ -485,7 +487,9 @@ class ArticleInfoController extends XtoolsController
             if ($page instanceof RedirectResponse) {
                 $out[$page->getTitle()] = false;
             } else {
-                $assessments = $page->getAssessments();
+                $assessments = $page->getProject()
+                    ->getPageAssessments()
+                    ->getAssessments($page);
 
                 $out[$page->getTitle()] = $request->get('classonly')
                     ? $assessments['assessment']

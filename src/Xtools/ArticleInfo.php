@@ -482,7 +482,10 @@ class ArticleInfo extends Model
     public function getAssessments()
     {
         if (!is_array($this->assessments)) {
-            $this->assessments = $this->page->getAssessments();
+            $this->assessments = $this->page
+                ->getProject()
+                ->getPageAssessments()
+                ->getAssessments($this->page);
         }
         return $this->assessments;
     }

@@ -120,10 +120,8 @@
                                 {% set assessment_value %}
                                     {% if ai.assessments.assessment.badge is defined %}
                                         <img alt="{{ ai.assessments.assessment.value }}" src="{{ ai.assessments.assessment.badge }}" class="assessment-badge" />
-                                        {{ ai.assessments.assessment.value }}
-                                    {% else %}
-                                        {{ ai.assessments.assessment.value }}
                                     {% endif %}
+                                    {{ ai.assessments.assessment.value|capitalize_first }}
                                 {% endset %}
                                 {{ wiki.pageLinkRaw(ai.assessments.assessment.category, project, assessment_value) }}
                             </td>
@@ -875,7 +873,11 @@
         {% set content %}
             <table class="table table-bordered table-hover table-striped assessments-table">
                 <thead><tr>
-                    {% for key in ['wikiproject', 'assessment', 'importance'] %}
+                    {% set assessmentColumns = ['wikiproject', 'assessment'] %}
+                    {% if project.pageAssessments.hasImportanceRatings %}
+                        {% set assessmentColumns = assessmentColumns|merge(['importance']) %}
+                    {% endif %}
+                    {% for key in assessmentColumns %}
                         <th>
                             <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
                                 {{ msg(key)|capitalize_first }}
@@ -888,19 +890,21 @@
                 {% for wikiproject, assessment in ai.assessments.wikiprojects %}
                     <tr>
                         <td class="sort-entry--wikiproject" data-value="{{ wikiproject }}">
-                            {{ wiki.pageLinkRaw(ai.assessments.wikiproject_prefix ~ wikiproject, project, wikiproject) }}
+                            {{ wiki.pageLinkRaw(ai.assessments.wikiproject_prefix ~ wikiproject, project, wikiproject|capitalize_first) }}
                         </td>
                         <td style="background:{{ assessment.class.color }}" class="sort-entry--assessment" data-value="{{ assessment.class.value }}">
                             {% set assessment_value %}
                                 <img alt="{{ assessment.class.value }}" src="{{ assessment.class.badge }}" class="assessment-badge" />
-                                {{ assessment.class.value }}
+                                {{ assessment.class.value|capitalize_first }}
                             {% endset %}
                             {{ wiki.pageLinkRaw(assessment.class.category, project, assessment_value) }}
                         </td>
-                        <td style="background:{{ assessment.importance.color }}" class="sort-entry--importance" data-value="{{ assessment.importance.weight }}">
-                            {% set importance_label = assessment.importance ? assessment.importance.value : '???' %}
-                            {{ wiki.pageLinkRaw(assessment.importance.category, project, importance_label) }}
-                        </td>
+                        {% if project.pageAssessments.hasImportanceRatings %}
+                            <td style="background:{{ assessment.importance.color }}" class="sort-entry--importance" data-value="{{ assessment.importance.weight }}">
+                                {% set importance_label = assessment.importance ? assessment.importance.value : '???' %}
+                                {{ wiki.pageLinkRaw(assessment.importance.category, project, importance_label) }}
+                            </td>
+                        {% endif %}
                     </tr>
                 {% endfor %}
                 </tbody>

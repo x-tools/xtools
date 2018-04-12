@@ -2,7 +2,7 @@
 {% if pages.deleted != 'deleted' %}
 {% set columns = columns|merge(['current-size']) %}
 {% endif %}
-{% if pages.hasPageAssessments and pages.deleted != 'deleted' %}
+{% if project.hasPageAssessments and pages.deleted != 'deleted' %}
 {% set columns = columns|merge(['assessment']) %}
 {% endif %}
 {% for thKey in columns %}
@@ -16,7 +16,7 @@
 {% else %}
 {% set pagename = project.namespaces[ns] ~ ":" ~ page.page_title %}
 {% endif %}
-{{ ns }}	{{ pagename }}	{{ page.human_time }}	{{ page.rev_len }}{% if pages.deleted != 'deleted' %}	{% if page.page_len is not null %}{{ page.page_len }}{% endif %}{% endif %}{% if pages.hasPageAssessments %}	{{ page.pa_class }}{% endif %}
+{{ ns }}	{{ pagename }}	{{ page.human_time }}	{{ page.rev_len }}{% if pages.deleted != 'deleted' %}	{% if page.page_len is not null %}{{ page.page_len }}{% endif %}{% endif %}{% if project.hasPageAssessments %}	{{ page.pa_class ? page.pa_class|capitalize_first : msg('unknown') }}{% endif %}
 
 {% endfor %}
 {% endfor %}

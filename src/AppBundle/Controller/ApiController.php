@@ -93,8 +93,17 @@ class ApiController extends FOSRestController
      * @param string $project The project name.
      * @return View
      */
-    public function assessments($project)
+    public function assessments($project = null)
     {
+        if ($project === null) {
+            return new View(
+                [
+                    'projects' => array_keys($this->container->getParameter('assessments')),
+                ],
+                Response::HTTP_OK
+            );
+        }
+
         $proj = ProjectRepository::getProject($project, $this->container);
 
         if (!$proj->exists()) {
@@ -109,7 +118,7 @@ class ApiController extends FOSRestController
         return new View(
             [
                 'project' => $proj->getDomain(),
-                'assessments' => $proj->getAssessmentsConfig(),
+                'assessments' => $proj->getPageAssessments()->getConfig(),
             ],
             Response::HTTP_OK
         );

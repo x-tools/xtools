@@ -131,7 +131,7 @@
                             {% endif %}
                             {% if pages.deleted == 'all' %}
                                 <th class="namespaces--deleted">
-                                    {{ pages.numDeleted|num_format }}
+                                    <a href="{{ path('PagesResult', {project: project.domain, username: user.username, namespace: pages.namespace, redirects: '', deleted: 'deleted'}) }}">{{ pages.numDeleted|num_format }}</a>
                                     ({{ pages.numDeleted|percent_format(pages.getNumPages) }})
                                 </th>
                             {% endif %}
@@ -176,7 +176,7 @@
                     {% if pages.deleted != 'deleted' %}
                         {% set columns = columns|merge(['current-size']) %}
                     {% endif %}
-                    {% if ns == '0' and pages.hasPageAssessments and pages.deleted != 'deleted' %}
+                    {% if project.hasPageAssessments(ns) and pages.deleted != 'deleted' %}
                         {% set columns = columns|merge(['assessment']) %}
                     {% endif %}
                     {% for thKey in columns %}
@@ -239,7 +239,7 @@
                                         {{ page.page_len|num_format }}
                                     {% endif %}
                                 </td>
-                                {% if ns == '0' and pages.hasPageAssessments %}
+                                {% if project.hasPageAssessments(ns) %}
                                     <td class="sort-entry--assessment" data-value="{{ page.pa_class ? page.pa_class : 'Unknown' }}">
                                         {% if page.type == 'arc' %}
                                             {{ msg('na') }}
@@ -247,7 +247,7 @@
                                             {% if page.badge is defined %}
                                             <img alt="{{ page.pa_class }}" src="{{ page.badge }}" class="assessment-badge" />
                                             {% endif %}
-                                            {{ page.pa_class ? page.pa_class : msg('unknown') }}
+                                            {{ page.pa_class ? page.pa_class|capitalize_first : msg('unknown') }}
                                         {% endif %}
                                     </td>
                                 {% endif %}

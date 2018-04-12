@@ -173,65 +173,6 @@ class ProjectTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Whether page assessments are supported for the project
-     */
-    public function testHasPageAssessments()
-    {
-        $projectRepo = $this->getMock(ProjectRepository::class);
-
-        $project = new Project('testWiki');
-        $project->setRepository($projectRepo);
-
-        // Unconfigured project
-        $this->assertEquals(false, $project->hasPageAssessments());
-
-        // Mock and re-test
-        $projectRepo
-            ->method('getAssessmentsConfig')
-            ->with()
-            ->willReturn([
-                [
-                    'wikiproject_prefix' => 'Wikipedia:WikiProject_',
-                ],
-            ]);
-
-        $this->assertEquals(true, $project->hasPageAssessments());
-    }
-
-    /**
-     * Get the URL to the assessment badge on Commons.
-     */
-    public function testAssessmentBadgeURL()
-    {
-        $projectRepo = $this->getMock(ProjectRepository::class);
-        $projectRepo->expects($this->exactly(2))
-            ->method('getAssessmentsConfig')
-            ->willReturn([
-                'class' => [
-                    'C' => [
-                        'badge' => 'e/e6/Symbol_c_class.svg',
-                    ],
-                    'Unknown' => [
-                        'badge' => 'e/e0/Symbol_question.svg',
-                    ],
-                ],
-            ]);
-        $project = new Project('testWiki');
-        $project->setRepository($projectRepo);
-
-        $this->assertEquals(
-            'https://upload.wikimedia.org/wikipedia/commons/e/e6/Symbol_c_class.svg',
-            $project->getAssessmentBadgeURL('C')
-        );
-
-        // Unknown class.
-        $this->assertEquals(
-            'https://upload.wikimedia.org/wikipedia/commons/e/e0/Symbol_question.svg',
-            $project->getAssessmentBadgeURL('D')
-        );
-    }
-
-    /**
      * Normalized, quoted table name.
      */
     public function testTableName()

@@ -38,6 +38,12 @@ class ProjectRepository extends Repository
         $project = new Project($projectIdent);
         $projectRepo = new ProjectRepository();
         $projectRepo->setContainer($container);
+
+        // The associated PageAssessmentsRepository also needs the container.
+        $paRepo = new PageAssessmentsRepository();
+        $paRepo->setContainer($container);
+        $project->getPageAssessments()->setRepository($paRepo);
+
         if ($container->getParameter('app.single_wiki')) {
             $projectRepo->setSingleBasicInfo([
                 'url' => $container->getParameter('wiki_url'),
@@ -45,6 +51,7 @@ class ProjectRepository extends Repository
             ]);
         }
         $project->setRepository($projectRepo);
+
         return $project;
     }
 
@@ -372,30 +379,5 @@ class ProjectRepository extends Repository
 
         // Cache for one hour and return.
         return $this->setCache($cacheKey, $admins, 'PT1H');
-    }
-
-    /**
-     * Get page assessments configuration for this project
-     *   and cache in static variable.
-     * @param string $projectDomain The project domain such as en.wikipedia.org
-     * @return string[]|bool As defined in config/assessments.yml,
-     *                       or false if none exists
-     */
-    public function getAssessmentsConfig($projectDomain)
-    {
-        static $assessmentsConfig = null;
-        if ($assessmentsConfig !== null) {
-            return $assessmentsConfig;
-        }
-
-        $projectsConfig = $this->container->getParameter('assessments');
-
-        if (isset($projectsConfig[$projectDomain])) {
-            $assessmentsConfig = $projectsConfig[$projectDomain];
-        } else {
-            $assessmentsConfig = false;
-        }
-
-        return $assessmentsConfig;
     }
 }

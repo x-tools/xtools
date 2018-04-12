@@ -21,7 +21,7 @@ class PageTest extends WebTestCase
     protected $container;
 
     /**
-     * Set up the ApiHelper object for testing.
+     * Set up client and set container.
      */
     public function setUp()
     {
@@ -381,56 +381,5 @@ class PageTest extends WebTestCase
         $page->setRepository($pageRepo);
 
         $this->assertEquals($data, $page->countLinksAndRedirects());
-    }
-
-    /**
-     * Page assements.
-     */
-    public function testPageAssessments()
-    {
-        $projectRepo = $this->getMock(ProjectRepository::class, ['getAssessmentsConfig']);
-        $projectRepo->method('getAssessmentsConfig')
-            ->willReturn([
-                'wikiproject_prefix' => 'Wikipedia:WikiProject_'
-            ]);
-
-        $project = ProjectRepository::getProject('en.wikipedia.org', $this->container);
-
-        $pageRepo = $this->getMock(PageRepository::class, ['getAssessments', 'getPageInfo']);
-        $pageRepo->method('getAssessments')
-            ->with($project)
-            ->willReturn([
-                [
-                    'wikiproject' => 'Military history',
-                    'class' => 'Start',
-                    'importance' => 'Low',
-                ],
-                [
-                    'wikiproject' => 'Firearms',
-                    'class' => 'C',
-                    'importance' => 'High',
-                ],
-            ]);
-        $pageRepo->method('getPageInfo')
-            ->with($project, 'Test_page')
-            ->willReturn([
-                'pageid' => 5,
-                'ns' => 0,
-            ]);
-
-        $page = new Page($project, 'Test_page');
-        $page->setRepository($pageRepo);
-
-        $assessments = $page->getAssessments();
-
-        // Picks the first assessment.
-        $this->assertEquals([
-            'value' => 'Start',
-            'color' => '#ffaa66',
-            'category' => 'Category:Start-Class articles',
-            'badge' => 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Symbol_start_class.svg',
-        ], $assessments['assessment']);
-
-        $this->assertEquals(2, count($assessments['wikiprojects']));
     }
 }
