@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"Jon Harald Søby",
-			"Nemo bis"
+			"Nemo bis",
+			"Imre Eilertsen"
 		]
 	},
 	"accepted-formats": "Godkjente formater",
@@ -54,7 +55,9 @@
 	"bottom-ninety": "Bunn 90 %",
 	"bugs": "Bugs",
 	"bytes": "bytes",
+	"category": "Kategori",
 	"considered-usernames": "Brukernavn undersøkt",
+	"contributions": "Bidrag",
 	"count": "Antall",
 	"created-by": "Opprettet av",
 	"csv": "CSV",
@@ -69,6 +72,7 @@
 	"documentation": "Dokumentasjon",
 	"duplicate-vote": "Dobbeltstemme",
 	"edit": "Rediger",
+	"edits-in-category": "Redigeringer i $1",
 	"edit-count": "Redigeringsteller",
 	"edit-count-desc": "$2 {{PLURAL:$1|redigering|redigeringer}}",
 	"edit-summaries": "Redigeringsforklaringer",
@@ -177,6 +181,7 @@
 	"no-summary": "uten redigeringsforklaring",
 	"non-admins-with-actions": "Ikke-administratorer med administratorhandlinger",
 	"non-auto-contribs": "Ikke-automatiske redigeringer",
+	"none": "Ingen",
 	"not-opted-in": "Denne brukeren har ikke valgt at disse dataene skal vises. Logg inn på XTools som denne brukeren, eller opprett $1 med valgfritt innhold. Se dokumentasjonen for mer informasjon.",
 	"notice": "Merknad",
 	"num-blocks": "{{PLURAL:$1|blokkering|blokkeringer}}",

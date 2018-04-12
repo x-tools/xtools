@@ -41,7 +41,7 @@
 	"auto-contribs-desc": "Bläddra igenom en användares (halv)automatiska bidrag.",
 	"auto-contribs-use-tool": "Visa endast redigeringar med verktyget:",
 	"auto-edits": "(Halv-)automatiska redigeringar",
-	"auto-edits-counts-desc": "Användning av vissa verktyg överlappas (d.v.s. rulla tillbaka till en sidversion som är en omdirigering räknas som en tillbakarullning och omdirigering), så totalsumman av redigeringar som görs med varje verktyg kan skilja från $1.",
+	"auto-edits-counts-desc": "Användning av vissa verktyg överlappas (d.v.s. att rulla tillbaka till en sidversion som är en omdirigering räknas som en tillbakarullning och en omdirigering), så totalsumman av redigeringar som görs med varje verktyg kan skilja från $1.",
 	"auto-edits-counts-desc-grand-total": "totalsumma",
 	"auto-edits-request": "Begär att ett nytt (halv)automatiserat verktyg läggs till",
 	"auto-edits-request-doc": "Länk till verktygets dokumentation eller hemsida",
