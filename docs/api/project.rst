@@ -61,6 +61,18 @@ Get page assessments metadata for the English Wikipedia.
     https://xtools.wmflabs.org/api/project/assessments/en.wikipedia
     https://xtools.wmflabs.org/api/project/assessments/en.wikipedia.org
 
+Available page assessments
+==========================
+``GET /api/project/assessments``
+
+Get a list of wikis that support page assessments.
+
+**Example:**
+
+Get a list of wikis that support page assessments.
+
+    https://xtools.wmflabs.org/api/project/assessments
+
 Admins and user groups
 ======================
 ``GET /api/project/admins_groups/{project}``
