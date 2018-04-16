@@ -46,7 +46,7 @@ Page assessments
 ``GET /api/project/assessments/{project}``
 
 Get page assessment metadata for the given project. This includes all the
-different quality classifications and improtance levels, along with their
+different quality classifications and importance levels, along with their
 associated colours and badges.
 
 **Parameters:**
@@ -61,15 +61,17 @@ Get page assessments metadata for the English Wikipedia.
     https://xtools.wmflabs.org/api/project/assessments/en.wikipedia
     https://xtools.wmflabs.org/api/project/assessments/en.wikipedia.org
 
-Available page assessments
-==========================
+Page assessments configuration
+==============================
 ``GET /api/project/assessments``
 
-Get a list of wikis that support page assessments.
+Get a list of wikis that support page assessments, and the configuration
+for each. This includes all the different quality classifications and
+importance levels, along with their associated colours and badges.
 
 **Example:**
 
-Get a list of wikis that support page assessments.
+Get the XTools Page Assessments configuration:
 
     https://xtools.wmflabs.org/api/project/assessments
 

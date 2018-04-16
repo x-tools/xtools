@@ -99,6 +99,7 @@ class ApiController extends FOSRestController
             return new View(
                 [
                     'projects' => array_keys($this->container->getParameter('assessments')),
+                    'config' => $this->container->getParameter('assessments'),
                 ],
                 Response::HTTP_OK
             );
