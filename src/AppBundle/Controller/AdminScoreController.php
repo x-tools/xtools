@@ -22,18 +22,17 @@ class AdminScoreController extends XtoolsController
 {
 
     /**
-     * Get the tool's shortname.
+     * Get the name of the tool's index route.
      * @return string
      * @codeCoverageIgnore
      */
-    public function getToolShortname()
+    public function getIndexRoute()
     {
-        return 'adminscore';
+        return 'AdminScore';
     }
 
     /**
      * Display the AdminScore search form.
-     * @Route("/adminscore", name="adminscore")
      * @Route("/adminscore", name="AdminScore")
      * @Route("/adminscore/", name="AdminScoreSlash")
      * @Route("/adminscore/index.php", name="AdminScoreIndexPhp")

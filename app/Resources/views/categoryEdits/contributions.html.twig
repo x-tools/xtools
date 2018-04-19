@@ -6,7 +6,11 @@
 
 {% if not is_sub_request %}
     <div class="panel panel-primary">
-        {{ layout.userHeading(user, project, 'categoryedits') }}
+        {% set args = {username: user.username, categories: ce.categoriesPiped, start: ce.start|trans, end: ce.end|trans} %}
+{#         {% if ce.start is not empty or ce.end is not empty %}
+            {% set args = args|merge({start: ce.start, end: ce.end}) %}
+        {% endif %} #}
+        {{ layout.userHeading(user, project, 'CategoryEdits', args) }}
 
         <div class="panel-body xt-panel-body">
             {{ wiki.userLinks(user, project, xtPage) }}

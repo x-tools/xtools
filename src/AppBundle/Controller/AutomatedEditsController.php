@@ -50,24 +50,25 @@ class AutomatedEditsController extends XtoolsController
     private $output;
 
     /**
-     * Get the tool's shortname.
+     * Get the name of the tool's index route.
+     * This is also the name of the associated model.
      * @return string
      * @codeCoverageIgnore
      */
-    public function getToolShortname()
+    public function getIndexRoute()
     {
-        return 'autoedits';
+        return 'AutoEdits';
     }
 
     /**
      * Display the search form.
-     * @Route("/autoedits", name="autoedits")
-     * @Route("/autoedits/", name="autoeditsSlash")
-     * @Route("/automatededits", name="autoeditsLong")
-     * @Route("/automatededits/", name="autoeditsLongSlash")
-     * @Route("/autoedits/index.php", name="autoeditsIndexPhp")
-     * @Route("/automatededits/index.php", name="autoeditsLongIndexPhp")
-     * @Route("/autoedits/{project}", name="autoeditsProject")
+     * @Route("/autoedits", name="AutoEdits")
+     * @Route("/autoedits/", name="AutoEditsSlash")
+     * @Route("/automatededits", name="AutoEditsLong")
+     * @Route("/automatededits/", name="AutoEditsLongSlash")
+     * @Route("/autoedits/index.php", name="AutoEditsIndexPhp")
+     * @Route("/automatededits/index.php", name="AutoEditsLongIndexPhp")
+     * @Route("/autoedits/{project}", name="AutoEditsProject")
      * @param Request $request The HTTP request.
      * @return Response
      */
@@ -251,7 +252,7 @@ class AutomatedEditsController extends XtoolsController
 
     /**
      * Get a list of the automated tools and their regex/tags/etc.
-     * @Route("/api/user/automated_tools/{project}")
+     * @Route("/api/user/automated_tools/{project}", name="UserApiAutoEditsTools")
      * @param string $project The project domain or database name.
      * @return JsonResponse
      * @codeCoverageIgnore
@@ -278,6 +279,7 @@ class AutomatedEditsController extends XtoolsController
      * Count the number of automated edits the given user has made.
      * @Route(
      *   "/api/user/automated_editcount/{project}/{username}/{namespace}/{start}/{end}/{tools}",
+     *   name="UserApiAutoEditsCount",
      *   requirements={
      *       "namespace" = "|all|\d+",
      *       "start" = "|\d{4}-\d{2}-\d{2}",
@@ -327,6 +329,7 @@ class AutomatedEditsController extends XtoolsController
      * Get non-automated edits for the given user.
      * @Route(
      *   "/api/user/nonautomated_edits/{project}/{username}/{namespace}/{start}/{end}/{offset}",
+     *   name="UserApiNonAutoEdits",
      *   requirements={
      *       "namespace" = "|all|\d+",
      *       "start" = "|\d{4}-\d{2}-\d{2}",
@@ -381,6 +384,7 @@ class AutomatedEditsController extends XtoolsController
      * Get (semi-)automated edits for the given user, optionally using the given tool.
      * @Route(
      *   "/api/user/automated_edits/{project}/{username}/{namespace}/{start}/{end}/{offset}",
+     *   name="UserNonAutoEdits",
      *   requirements={
      *       "namespace" = "|all|\d+",
      *       "start" = "|\d{4}-\d{2}-\d{2}",

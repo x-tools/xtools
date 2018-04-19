@@ -24,7 +24,7 @@
 | {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ page.count }}}}
 | [[:{{ page.page_title_ns|replace({'_': ' '}) }}]]
 {% if showPageAssessment %}
-| {% set badge = project.assessmentBadgeURL(page.pa_class, true) -%}
+| {% set badge = project.pageAssessments.badgeURL(page.pa_class, true) -%}
 {% if badge is defined %}
 [[File:{{ badge }}|20px]] {{ page.pa_class ? page.pa_class : msg('unknown') }}
 {% endif %}{% endif %}

@@ -26,6 +26,16 @@ class DefaultController extends XtoolsController
     protected $oauthClient;
 
     /**
+     * Required to be defined by XtoolsController, though here it is unused.
+     * @return string
+     * @codeCoverageIgnore
+     */
+    public function getIndexRoute()
+    {
+        return 'homepage';
+    }
+
+    /**
      * Display the homepage.
      * @Route("/", name="homepage")
      * @Route("/index.php", name="homepageIndexPhp")

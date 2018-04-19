@@ -9,10 +9,10 @@
 {% set firstCategory = ce.categories[0] %}
 
 <div class="panel panel-primary">
-    {{ layout.userHeading(user, project, xtPage) }}
+    {{ layout.userHeading(user, project, 'CategoryEdits') }}
 
     <div class="panel-body xt-panel-body">
-        {{ wiki.userLinks(user, project, xtPage) }}
+        {{ wiki.userLinks(user, project, 'CategoryEdits') }}
 
         <h3 class="text-center">
             {% if ce.categories|length == 1 %}

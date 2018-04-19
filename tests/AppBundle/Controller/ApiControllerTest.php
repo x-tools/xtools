@@ -102,7 +102,7 @@ class ApiControllerTest extends WebTestCase
             $response = (array)json_decode($this->client->getResponse()->getContent(), true);
             $this->assertEquals('en.wikipedia.org', $response['project']);
             $this->assertArraySubset(
-                ['FA', 'A', 'GA', 'B', 'C'],
+                ['FA', 'A', 'GA', 'bplus', 'B', 'C', 'Start'],
                 array_keys($response['assessments']['class'])
             );
         }

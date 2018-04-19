@@ -4,10 +4,10 @@
 
 {% block body %}
 <div class="panel panel-primary">
-    {{ layout.userHeading(user, project, xtPage) }}
+    {{ layout.userHeading(user, project, 'SimpleEditCounter') }}
 
     <div class="panel-body xt-panel-body">
-        {{ wiki.userLinks(user, project, xtPage) }}
+        {{ wiki.userLinks(user, project, 'SimpleEditCounter') }}
 
         {% set content %}
             <div class="col-lg-12 stat-list clearfix">
@@ -69,7 +69,7 @@
                 </table>
             </div>
         {% endset %}
-        {{ layout.content_block('tool-sc-desc', content) }}
+        {{ layout.content_block('tool-simpleeditcounter-desc', content) }}
     </div>
 </div>
 {% endblock %}

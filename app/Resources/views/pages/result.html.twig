@@ -4,10 +4,10 @@
 
 {% block body %}
 <div class="panel panel-primary">
-    {{ layout.userHeading(user, project, xtPage) }}
+    {{ layout.userHeading(user, project, 'Pages') }}
 
     <div class="panel-body xt-panel-body">
-        {{ wiki.userLinks(user, project, xtPage) }}
+        {{ wiki.userLinks(user, project, 'Pages') }}
 
         <h3 class="text-center">{{ msg('tool-pages') }}</h3>
 
@@ -263,7 +263,7 @@
                                     {% endif %}
                                     {% if enabled('topedits') %}
                                         &middot;
-                                        <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'page': page.page_title }) }}">{{ msg('tool-topedits') }}</a>
+                                        <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'article': page.page_title }) }}">{{ msg('tool-topedits') }}</a>
                                     {% endif %}
                                     {% if isWMFLabs() %}
                                         &middot;
@@ -327,7 +327,7 @@
 
         {% set jsonLink %}
             <li>
-                <a target="_blank" class="download-link download-json" href="{{ path('PagesApi', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted, 'offset': pages.offset}) }}">{{ msg('json') }}</a>
+                <a target="_blank" class="download-link download-json" href="{{ path('UserApiPagesCreated', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted, 'offset': pages.offset}) }}">{{ msg('json') }}</a>
             </li>
         {% endset %}
         {% set downloadLink %}

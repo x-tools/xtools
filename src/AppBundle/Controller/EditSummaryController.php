@@ -21,13 +21,14 @@ use Xtools\EditSummaryRepository;
 class EditSummaryController extends XtoolsController
 {
     /**
-     * Get the tool's shortname.
+     * Get the name of the tool's index route.
+     * This is also the name of the associated model.
      * @return string
      * @codeCoverageIgnore
      */
-    public function getToolShortname()
+    public function getIndexRoute()
     {
-        return 'es';
+        return 'EditSummary';
     }
 
     /**
@@ -35,7 +36,6 @@ class EditSummaryController extends XtoolsController
      *
      * @param Request $request The HTTP request.
      *
-     * @Route("/editsummary",           name="es")
      * @Route("/editsummary",           name="EditSummary")
      * @Route("/editsummary/",          name="EditSummarySlash")
      * @Route("/editsummary/index.php", name="EditSummaryIndexPhp")
@@ -57,9 +57,9 @@ class EditSummaryController extends XtoolsController
 
         // Show the form.
         return $this->render('editSummary/index.html.twig', array_merge([
-            'xtPageTitle' => 'tool-es',
-            'xtSubtitle' => 'tool-es-desc',
-            'xtPage' => 'es',
+            'xtPageTitle' => 'tool-editsummary',
+            'xtSubtitle' => 'tool-editsummary-desc',
+            'xtPage' => 'editsummary',
 
             // Defaults that will get overriden if in $params.
             'namespace' => 0,
@@ -96,7 +96,7 @@ class EditSummaryController extends XtoolsController
         return $this->render(
             'editSummary/result.html.twig',
             [
-                'xtPage' => 'es',
+                'xtPage' => 'editsummary',
                 'xtTitle' => $user->getUsername(),
                 'user' => $user,
                 'project' => $project,

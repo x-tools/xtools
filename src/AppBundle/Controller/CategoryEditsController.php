@@ -56,18 +56,19 @@ class CategoryEditsController extends XtoolsController
     private $output;
 
     /**
-     * Get the tool's shortname.
+     * Get the name of the tool's index route.
+     * This is also the name of the associated model.
      * @return string
      * @codeCoverageIgnore
      */
-    public function getToolShortname()
+    public function getIndexRoute()
     {
-        return 'categoryedits';
+        return 'CategoryEdits';
     }
 
     /**
      * Display the search form.
-     * @Route("/categoryedits", name="categoryedits")
+     * @Route("/categoryedits", name="CategoryEdits")
      * @Route("/categoryedits/", name="CategoryEditsSlash")
      * @Route("/catedits", name="CategoryEditsShort")
      * @Route("/catedits/", name="CategoryEditsShortSlash")
@@ -272,6 +273,7 @@ class CategoryEditsController extends XtoolsController
      * Count the number of category edits the given user has made.
      * @Route(
      *   "/api/user/category_editcount/{project}/{username}/{categories}/{start}/{end}",
+     *   name="UserApiCategoryEditCount",
      *   requirements={
      *       "categories" = ".+",
      *       "start" = "|\d{4}-\d{2}-\d{2}",

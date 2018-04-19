@@ -92,16 +92,16 @@ Tools
 
 Selectively choose which tools to enable within XTools.
 
-- **enable.adminscore** - Enable "Admin Score" tool.
-- **enable.adminstats** - Enable "Admin Statistics" tool.
-- **enable.articleinfo** - Enable "Article Information" tool.
-- **enable.autoedits** - Enable "Automated Edits" tool.
-- **enable.categoryedits** - Enable "Category Edits" tool.
-- **enable.bash** - Enable "Quote Database" tool.
-- **enable.ec** - Enable "Edit Counter" tool.
-- **enable.es** - Enable "Edit Summaries" tool.
-- **enable.pages** - Enable "Pages Created" tool.
-- **enable.rfx** - Enable "RfX Analysis" tool.
-- **enable.rfxvote** - Enable "RfX Vote Calculator" tool.
-- **enable.sc** - Enable "Plain, Dirty, Simple Edit Counter" tool.
-- **enable.topedits** - Enable "Top Edits" tool.
+- **enable.AdminScore** - Enable "Admin Score" tool.
+- **enable.AdminStats** - Enable "Admin Statistics" tool.
+- **enable.ArticleInfo** - Enable "Article Information" tool.
+- **enable.AutoEdits** - Enable "Automated Edits" tool.
+- **enable.CategoryEdits** - Enable "Category Edits" tool.
+- **enable.EditCounter** - Enable "Edit Counter" tool.
+- **enable.EditSummary** - Enable "Edit Summaries" tool.
+- **enable.Pages** - Enable "Pages Created" tool.
+- **enable.Quote** - Enable "Quote Database" tool.
+- **enable.RfXAnalysis** - Enable "RfX Analysis" tool.
+- **enable.RfXVoteCalculator** - Enable "RfX Vote Calculator" tool.
+- **enable.SimpleEditCounter** - Enable "Plain, Dirty, Simple Edit Counter" tool.
+- **enable.TopEdits** - Enable "Top Edits" tool.

@@ -22,23 +22,21 @@ class RfXVoteCalculatorController extends Controller
 {
 
     /**
-     * Get the tool's shortname.
-     *
+     * Get the name of the tool's index route.
      * @return string
      * @codeCoverageIgnore
      */
-    public function getToolShortname()
+    public function getIndexRoute()
     {
-        return 'rfxvote';
+        return 'RfXVoteCalculator';
     }
 
     /**
      * Renders the index page for RfXVoteCalculator
      *
-     * @Route("/rfxvote", name="rfxvote")
-     * @Route("/rfxvote/", name="rfxvoteSlash")
-     * @Route("/rfxvote/index.php", name="rfxvoteIndexPhp")
      * @Route("/rfxvote", name="RfXVoteCalculator")
+     * @Route("/rfxvote/", name="RfXVoteCalculatorSlash")
+     * @Route("/rfxvote/index.php", name="RfXVoteCalculatorIndexPhp")
      *
      * @return Response
      */
@@ -83,12 +81,9 @@ class RfXVoteCalculatorController extends Controller
 
     /**
      * Result View of RfXVoteCalculator
-     *
+     * @Route("/rfxvote/{project}/{username}", name="rfxvoteResult")
      * @param string $project  The project we're working on
      * @param string $username Username of the user we're analysing.
-     *
-     * @Route("/rfxvote/{project}/{username}", name="rfxvoteResult")
-     *
      * @return Response
      * @codeCoverageIgnore
      */
