@@ -5,7 +5,8 @@
 			"Liuxinyu970226",
 			"Wladek92",
 			"Nemo bis",
-			"Nike"
+			"Nike",
+			"Tacsipacsi"
 		]
 	},
 	"accepted-formats": "Text shown in the tooltip that lists the accepted formats for entering a project, username, etc.",
@@ -85,7 +86,7 @@
 	"current-admins": "Label for the current number of admins for a project.",
 	"current-size": "Indicates the current size of a page.\n{{Identical|Current size}}",
 	"current-user-groups": "Label for the list of user groups that a user belongs to.",
-	"data-limit": "Footnote indictaing that data only accounts for the past $1 edits the user has made. $1 is the raw number that can be used in {{PLURAL}}, and $2 is the formatted number.",
+	"data-limit": "Footnote indicating that data only accounts for the past $1 edits the user has made. $1 is the raw number that can be used in <code><nowiki>{{PLURAL}}</nowiki></code>, and $2 is the formatted number.",
 	"date": "Label for a date field\n{{Identical|Date}}",
 	"date-from": "Label for date opening dates range for revisions. Parameters:\n* $1 - date from in Y-m-d format",
 	"date-range": "Label for dates both opening and closing dates range for revisions. Parameters:\n* $1 - date from in Y-m-d format\n* $2 - date to in Y-m-d format",
