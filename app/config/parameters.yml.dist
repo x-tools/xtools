@@ -63,16 +63,16 @@ parameters:
     languageless_wikis:
 
     # Enabling or disabling of individual tools
-    enable.adminscore: 1
-    enable.adminstats: 1
-    enable.articleinfo: 1
-    enable.autoedits: 1
-    enable.categoryedits: 1
-    enable.bash: 0
-    enable.ec: 1
-    enable.es: 1
-    enable.pages: 1
-    enable.rfx: 0
-    enable.rfxvote: 0
-    enable.sc: 1
-    enable.topedits: 1
+    enable.AdminScore: 1
+    enable.AdminStats: 1
+    enable.ArticleInfo: 1
+    enable.AutoEdits: 1
+    enable.CategoryEdits: 1
+    enable.EditCounter: 1
+    enable.EditSummary: 1
+    enable.Pages: 1
+    enable.Quote: 0
+    enable.RfXAnalysis: 0
+    enable.RfXVoteCalculator: 0
+    enable.SimpleEditCounter: 1
+    enable.TopEdits: 1

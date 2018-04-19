@@ -5,10 +5,10 @@
 
 {% block body %}
 <div class="panel panel-primary">
-    {{ layout.userHeading(user, project, xtPage) }}
+    {{ layout.userHeading(user, project, 'AutoEdits') }}
 
     <div class="panel-body xt-panel-body">
-        {{ wiki.userLinks(user, project, xtPage) }}
+        {{ wiki.userLinks(user, project, 'AutoEdits') }}
 
         <h3 class="text-center">{{ msg('tool-autoedits') }}</h3>
 

@@ -5,7 +5,7 @@
 <div class="panel panel-primary">
     <header class="panel-heading">
         <div class="text-center xt-heading-top">
-            <a class="back-to-search" href="{{ path('bash') }}">
+            <a class="back-to-search" href="{{ path('Quote') }}">
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {{ msg('back') }}
             </a>
@@ -17,12 +17,12 @@
         <ul>
             {% for quote in quotes %}
                 <div>
-                    <a class="lead" href="{{ path("quoteID", {"id": loop.index0}) }}">#{{ loop.index0 }}</a>
+                    <a class="lead" href="{{ path("QuoteID", {"id": loop.index0}) }}">#{{ loop.index0 }}</a>
                     <blockquote class="inline-block">{{ quote }}</blockquote>
                 </div>
             {% endfor %}
         </ul>
-        <a class="btn btn-primary form-submit" href="{{ path('bashRandom') }}">{{ msg("quote-random") }}</a>
+        <a class="btn btn-primary form-submit" href="{{ path('QuoteRandom') }}">{{ msg("quote-random") }}</a>
     </div>
 </div>
 {% endblock %}

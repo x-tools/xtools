@@ -5,10 +5,10 @@
 {% block body %}
 
 <div class="panel panel-primary">
-    {{ layout.userHeading(user, project, xtPage) }}
+    {{ layout.userHeading(user, project, 'EditCounter') }}
 
     <div class="panel-body xt-panel-body">
-        {{ wiki.userLinks(user, project, xtPage) }}
+        {{ wiki.userLinks(user, project, 'EditCounter') }}
 
         <div class="text-center xt-toc">
             {% set sections = ['general-stats', 'namespace-totals', 'year-counts', 'month-counts', 'timecard', 'top-edited-pages'] %}

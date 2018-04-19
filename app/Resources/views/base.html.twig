@@ -4,7 +4,7 @@
 <html lang="{{ lang() }}"{% if isRTL() %} dir="rtl"{% endif %}>
 <head>
     <title>
-        {% if xtTitle is defined %}{{ xtTitle }} - {% endif %}{% if xtPage != 'home' and xtPage != '' %}{{ msg('tool-'~xtPage) }} - {% endif %}{{ msg('xtools-title') }}
+        {% if xtTitle is defined %}{{ xtTitle }} - {% endif %}{% if xtPage != 'home' and xtPage != '' %}{{ msg('tool-' ~ xtPage|lower) }} - {% endif %}{{ msg('xtools-title') }}
     </title>
 
     {# Must be before loading the individual JS files #}
@@ -74,7 +74,7 @@
     <link rel="shortcut icon" sizes="16x16 32x32 48x48 96x96 144x144" href="{{ asset('static/images/favicon.ico') }}" />
     <link rel="apple-touch-icon" sizes="16x16 32x32 48x48 96x96 144x144" href="{{ asset('static/images/apple-touch-icon.png') }}" />
     <link rel="apple-touch-icon-precomposed icon" sizes="16x16 32x32 48x48 96x96 144x144" href="{{ asset('static/images/apple-touch-icon-precomposed.png') }}" />
-    <link rel="icon" sizes="196x196" href="apple-touch-icon.png">
+    <link rel="icon" sizes="196x196" href="{{ asset('static/images/apple-touch-icon.png') }}">
 
     <meta charset="utf-8">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -143,7 +143,7 @@
             {% for tool in tools() %}
                 {% if enabled(tool) %}
                     <li class="tool-links--entry{% if xtPage is defined and xtPage==tool %} active{% endif %}">
-                        <a href="{{ path(tool) }}">{{ msg("tool-" ~ tool) }}</a>
+                        <a href="{{ path(tool) }}">{{ msg("tool-" ~ tool|lower) }}</a>
                     </li>
                 {% endif %}
             {% endfor %}

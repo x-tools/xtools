@@ -11,3 +11,4 @@ A public API is available for getting basic statistics. Below is each avaiable e
     project
     user
     page
+    quote

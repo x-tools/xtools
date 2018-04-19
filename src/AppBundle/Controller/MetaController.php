@@ -18,6 +18,16 @@ use Doctrine\DBAL\Connection;
 class MetaController extends XtoolsController
 {
     /**
+     * Get the name of the tool's index route.
+     * @return string
+     * @codeCoverageIgnore
+     */
+    public function getIndexRoute()
+    {
+        return 'Meta';
+    }
+
+    /**
      * Display the form.
      * @Route("/meta", name="meta")
      * @Route("/meta", name="Meta")

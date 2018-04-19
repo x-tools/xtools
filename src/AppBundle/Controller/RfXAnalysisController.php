@@ -22,14 +22,13 @@ class RfXAnalysisController extends Controller
 {
 
     /**
-     * Get the tool's shortname.
-     *
+     * Get the name of the tool's index route.
      * @return string
      * @codeCoverageIgnore
      */
-    public function getToolShortname()
+    public function getIndexRoute()
     {
-        return 'rfx';
+        return 'RfXAnalysis';
     }
 
     /**
@@ -39,9 +38,8 @@ class RfXAnalysisController extends Controller
      * @param string  $project Optional project.
      * @param string  $type    Optional RfX type
      *
-     * @Route("/rfx",                  name="rfxAnalysis")
-     * @Route("/rfx",                  name="rfx")
-     * @Route("/rfx/",                 name="rfxSlash")
+     * @Route("/rfx",                  name="RfXAnalysis")
+     * @Route("/rfx/",                 name="RfXAnalysisSlash")
      * @Route("/rfx/index.php",        name="rfxAnalysisIndexPhp")
      * @Route("/rfx/{project}",        name="rfxAnalysisProject")
      * @Route("/rfx/{project}/{type}", name="rfxAnalysisProjectType")
@@ -105,13 +103,10 @@ class RfXAnalysisController extends Controller
 
     /**
      * Renders the output page for the RfX Tool
-     *
+     * @Route("/rfx/{project}/{type}/{username}", name="rfxAnalysisResult")
      * @param string $project  Optional project.
      * @param string $type     Type of RfX we are processing.
      * @param string $username Username of the person we're analizing.
-     *
-     * @Route("/rfx/{project}/{type}/{username}", name="rfxAnalysisResult")
-     *
      * @return Response|RedirectResponse
      * @codeCoverageIgnore
      */

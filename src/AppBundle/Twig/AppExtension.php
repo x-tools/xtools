@@ -507,10 +507,10 @@ class AppExtension extends Twig_Extension
      */
     public function quote()
     {
-        // Don't show if bash is turned off, but always show for Labs
+        // Don't show if Quote is turned off, but always show for Labs
         // (so quote is in footer but not in nav).
         $isLabs = $this->container->getParameter('app.is_labs');
-        if (!$isLabs && !$this->container->getParameter('enable.bash')) {
+        if (!$isLabs && !$this->container->getParameter('enable.Quote')) {
             return '';
         }
         $quotes = $this->container->getParameter('quotes');

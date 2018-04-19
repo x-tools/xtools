@@ -79,12 +79,6 @@ Bash
 A collection of humourous or insightful quotations about MediaWiki.
 :ref:`Read more about Bash... <bash>`.
 
-Blame
------
-
-Find out who last changed a given part of a page. (Blame is currently not implemented.)
-:ref:`Read more about Blame... <blame>`.
-
 Pages
 -----
 

@@ -24,13 +24,14 @@ class TopEditsController extends XtoolsController
 {
 
     /**
-     * Get the tool's shortname.
+     * Get the name of the tool's index route.
+     * This is also the name of the associated model.
      * @return string
      * @codeCoverageIgnore
      */
-    public function getToolShortname()
+    public function getIndexRoute()
     {
-        return 'topedits';
+        return 'TopEdits';
     }
 
     /**

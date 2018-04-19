@@ -27,19 +27,19 @@ use Xtools\ProjectRepository;
 class ArticleInfoController extends XtoolsController
 {
     /**
-     * Get the tool's shortname.
+     * Get the name of the tool's index route.
+     * This is also the name of the associated model.
      * @return string
      * @codeCoverageIgnore
      */
-    public function getToolShortname()
+    public function getIndexRoute()
     {
-        return 'articleinfo';
+        return 'ArticleInfo';
     }
 
     /**
      * The search form.
-     * @Route("/articleinfo", name="articleinfo")
-     * @Route("/articleinfo", name="articleInfo")
+     * @Route("/articleinfo", name="ArticleInfo")
      * @Route("/articleinfo/", name="articleInfoSlash")
      * @Route("/articleinfo/index.php", name="articleInfoIndexPhp")
      * @Route("/articleinfo/{project}", name="ArticleInfoProject")
@@ -284,7 +284,11 @@ class ArticleInfoController extends XtoolsController
 
     /**
      * Get basic info on a given article.
-     * @Route("/api/articleinfo/{project}/{article}", requirements={"article"=".+"})
+     * @Route(
+     *     "/api/articleinfo/{project}/{article}",
+     *     name="ArticleInfoApiAction",
+     *     requirements={"article"=".+"}
+     * )
      * @Route("/api/page/articleinfo/{project}/{article}", requirements={"article"=".+"})
      * @param Request $request The HTTP request.
      * @param string $project
@@ -410,7 +414,11 @@ class ArticleInfoController extends XtoolsController
 
     /**
      * Get prose statistics for the given article.
-     * @Route("/api/page/prose/{project}/{article}", requirements={"article"=".+"})
+     * @Route(
+     *     "/api/page/prose/{project}/{article}",
+     *     name="PageApiProse",
+     *     requirements={"article"=".+"}
+     * )
      * @param Request $request The HTTP request.
      * @param string $article
      * @return JsonResponse
@@ -457,7 +465,11 @@ class ArticleInfoController extends XtoolsController
 
     /**
      * Get the page assessments of a page, along with various related metadata.
-     * @Route("/api/page/assessments/{project}/{articles}", requirements={"article"=".+"})
+     * @Route(
+     *     "/api/page/assessments/{project}/{articles}",
+     *     name="PageApiAssessments",
+     *     requirements={"article"=".+"}
+     * )
      * @param  Request $request
      * @param  string $articles May be multiple pages separated by pipes, e.g. Foo|Bar|Baz
      * @return JsonResponse
