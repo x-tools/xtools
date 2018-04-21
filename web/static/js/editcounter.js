@@ -19,7 +19,7 @@ window.maxDigits = {};
 
 $(function () {
     // Don't do anything if this isn't a Edit Counter page.
-    if ($("body.ec").length === 0) {
+    if ($('body.editcounter').length === 0) {
         return;
     }
 
@@ -125,7 +125,7 @@ function toggleNamespace(newData, key)
  */
 function loadLatestGlobal()
 {
-    var $latestGlobalContainer = $("#latestglobal-container");
+    var $latestGlobalContainer = $('#latestglobal-container');
 
     if ($latestGlobalContainer[0]) {
         /** global: xtBaseUrl */
