@@ -315,6 +315,62 @@ parameters:
           badge: 'e/e0/Symbol_question.svg'
           color: ''
           category: 'Category:Unranked articles'
+    hu.wikipedia.org:
+      wikiproject_prefix: 'Wikipédia:'
+      class:
+        kitüntetett: # Featured
+          badge: 'b/bc/Featured_article_star.svg'
+          color: '#6699ff'
+          category: 'Kategória:Kitüntetett besorolású szócikkek'
+        színvonalas: # A
+          badge: '2/25/Symbol_a_class.svg'
+          color: '#40E0D0'
+          category: 'Kategória:Színvonalas besorolású szócikkek'
+        teljes: # B
+          badge: 'f/f8/Symbol_b_class_(alternate).svg'
+          color: '#98FB98'
+          category: 'Kategória:Teljes besorolású szócikkek'
+        jól használható: # C
+          badge: 'e/e6/Symbol_c_class.svg'
+          color: '#FFFF8C'
+          category: 'Kategória:Jól használható besorolású szócikkek'
+        bővítendő: # ???
+          badge: '7/7f/Symbol_version_generic.svg'
+          color: '#FFE466'
+          category: 'Kategória:Bővítendő besorolású szócikkek'
+        vázlatos: # Start
+          badge: 'a/a4/Symbol_start_class.svg'
+          color: '#FFAA66'
+          category: 'Kategória:Vázlatos besorolású szócikkek'
+        születő: # Stub
+          badge: 'f/f5/Symbol_stub_class.svg'
+          color: '#FF6666'
+          category: 'Kategória:Születő besorolású szócikkek'
+        Unknown:
+          badge: 'e/e0/Symbol_question.svg'
+          color: ''
+          category: 'Kategória:Besorolatlan szócikkek'
+      importance:
+        nélkülözhetetlen: # Top
+          color: '#FF69B4'
+          category: 'Kategória:Nélkülözhetetlen szócikkek'
+          weight: 4
+        nagyon fontos: # High
+          color: '#FF88FF'
+          category: 'Kategória:Nagyon fontos szócikkek'
+          weight: 3
+        közepesen fontos: # Medium
+          color: '#FFCCFF'
+          category: 'Kategória:Közepesen fontos szócikkek'
+          weight: 2
+        kevéssé fontos: # Low
+          color: '#FFEEFF'
+          category: 'Kategória:Kevéssé fontos szócikkek'
+          weight: 1
+        Unknown:
+          color: ''
+          category: 'Kategória:Szócikkek fontosság szerint'
+          weight: 0
     fr.wikipedia.org:
       wikiproject_prefix: 'Projet:'
       class:
