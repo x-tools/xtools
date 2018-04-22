@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.3.3 ##
+- Hotfix for bug in redirecting to index page when the user has
+  too many edits.
+
 ## 3.3.2 ##
 - Make all internal route names and i18n key names consistent.
 - Refactor Page Assessments logic
