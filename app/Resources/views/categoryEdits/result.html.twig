@@ -88,13 +88,13 @@
                             chart.pie_chart('category_edits',
                                 [{
                                     label: msg('edits-in-categories'),
-                                    value: ce.editCount - ce.categoryEditCount,
-                                    percentage: 100 - ce.categoryPercentage
+                                    value: ce.categoryEditCount,
+                                    percentage: ce.categoryPercentage
                                 },
                                 {
                                     label: msg('edits-not-in-categories'),
-                                    value: ce.categoryEditCount,
-                                    percentage: ce.categoryPercentage
+                                    value: ce.editCount - ce.categoryEditCount,
+                                    percentage: 100 - ce.categoryPercentage
                                 }],
                                 false,
                                 'categoryedits-summary-chart',
