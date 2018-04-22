@@ -1,5 +1,17 @@
 # Release Notes #
 
+## 3.3.2 ##
+- Make all internal route names and i18n key names consistent.
+- Refactor Page Assessments logic
+- Add assessments configuration for en.wikivoyage, hu.wikipedia
+  and fr.wikipedia.
+- Complete en.wikipedia assessment configuration.
+- Make API endpoint to get the full assessment configuration.
+- Add API endpoint for bash quotes.
+- T192629: Pass 'offset' parameter to download links in Pages.
+- T192133: Fix pie charts in Category Edits summary section.
+- Localization updates.
+
 ## 3.3.1 ##
 - T184969: Add Turkish page assessments.
 - T185023: Add Arabic page assessments.
