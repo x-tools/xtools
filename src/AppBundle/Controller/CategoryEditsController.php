@@ -109,7 +109,7 @@ class CategoryEditsController extends XtoolsController
     private function setupCategoryEdits(Request $request)
     {
         // Will redirect back to index if the user has too high of an edit count.
-        $ret = $this->validateProjectAndUser($request, 'categoryedits');
+        $ret = $this->validateProjectAndUser($request, 'CategoryEdits');
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {

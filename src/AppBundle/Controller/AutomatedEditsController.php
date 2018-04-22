@@ -105,7 +105,7 @@ class AutomatedEditsController extends XtoolsController
     private function setupAutoEdits(Request $request)
     {
         // Will redirect back to index if the user has too high of an edit count.
-        $ret = $this->validateProjectAndUser($request, 'autoedits');
+        $ret = $this->validateProjectAndUser($request, 'AutoEdits');
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {

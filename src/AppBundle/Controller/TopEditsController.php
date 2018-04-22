@@ -82,7 +82,7 @@ class TopEditsController extends XtoolsController
     {
         // Second parameter causes it return a Redirect to the index if the user has too many edits.
         // We only want to do this when looking at the user's overall edits, not just to a specific article.
-        $ret = $this->validateProjectAndUser($request, $article !== '' ?  null : 'topedits');
+        $ret = $this->validateProjectAndUser($request, $article !== '' ?  null : 'TopEdits');
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {
@@ -215,7 +215,7 @@ class TopEditsController extends XtoolsController
 
         // Second parameter causes it return a Redirect to the index if the user has too many edits.
         // We only want to do this when looking at the user's overall edits, not just to a specific article.
-        $ret = $this->validateProjectAndUser($request, $article !== '' ?  null : 'topedits');
+        $ret = $this->validateProjectAndUser($request, $article !== '' ?  null : 'TopEdits');
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {

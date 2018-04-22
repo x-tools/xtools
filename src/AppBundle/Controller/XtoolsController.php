@@ -160,6 +160,7 @@ abstract class XtoolsController extends Controller
 
         // Reject users with a crazy high edit count.
         if ($tooHighEditCountAction && $userData->hasTooManyEdits($project)) {
+            // FIXME: i18n!!
             $this->addFlash('danger', ['too-many-edits', number_format($userData->maxEdits())]);
 
             // If redirecting to a different controller, show an informative message accordingly.

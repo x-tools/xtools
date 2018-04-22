@@ -97,7 +97,7 @@ class PagesController extends XtoolsController
         $deleted = 'all',
         $offset = 0
     ) {
-        $ret = $this->validateProjectAndUser($request, 'pages');
+        $ret = $this->validateProjectAndUser($request, 'Pages');
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {
@@ -341,7 +341,7 @@ class PagesController extends XtoolsController
         $this->recordApiUsage('user/pages');
 
         // Second parameter causes it return a Redirect to the index if the user has too many edits.
-        $ret = $this->validateProjectAndUser($request, 'pages');
+        $ret = $this->validateProjectAndUser($request, 'Pages');
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {
