@@ -80,8 +80,8 @@
                             </td>
                             <td class="sort-entry--user-groups" data-value="{{ value.groups }}">{{ value.groups }}</td>
                             <td>
-                                {% if enabled('ec') %}
-                                    <a title="{{ msg('tool-ec') }}" href="{{ path('EditCounterResult', {project: project.domain, username: username}) }}" >ec</a>
+                                {% if enabled('EditCounter') %}
+                                    <a title="{{ msg('tool-editcounter') }}" href="{{ path('EditCounterResult', {project: project.domain, username: username}) }}" >ec</a>
                                     &middot;
                                 {% endif %}
                                 {% if isWMFLabs() %}

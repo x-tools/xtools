@@ -2,8 +2,6 @@
 
 /**
  * This file contains the code that powers the AdminStats page of XTools.
- *
- * @version 1.5.1
  */
 
 namespace AppBundle\Controller;

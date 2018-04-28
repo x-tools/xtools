@@ -477,8 +477,8 @@
                                 <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': editor, 'namespace': page.namespace, 'article': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
                             {% endif %}
                             &middot;
-                            {% if enabled('ec') %}
-                                <a href="{{ path('EditCounterResult', { 'project': project.domain, 'username': editor }) }}">{{ msg('tool-ec') }}</a>
+                            {% if enabled('EditCounter') %}
+                                <a href="{{ path('EditCounterResult', { 'project': project.domain, 'username': editor }) }}">{{ msg('tool-editcounter') }}</a>
                             {% endif %}
                         </td>
                         <td class="sort-entry--edits" data-value="{{ stats.all }}">
@@ -555,8 +555,8 @@
                                 <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': bot, 'namespace': page.namespace, 'article': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
                             {% endif %}
                             &middot;
-                            {% if enabled('ec') %}
-                                <a href="{{ path('EditCounterResult', { 'project': project.domain, 'username': bot }) }}">{{ msg('tool-ec') }}</a>
+                            {% if enabled('EditCounter') %}
+                                <a href="{{ path('EditCounterResult', { 'project': project.domain, 'username': bot }) }}">{{ msg('tool-editcounter') }}</a>
                             {% endif %}
                         </td>
                         <td class="sort-entry--edits" data-value="{{ botData.count }}">{{ botData.count|num_format }}</td>

@@ -69,7 +69,6 @@
                     <td class="sort-entry--rank" data-value="{{ loop.index }}">{{ loop.index|num_format }}</td>
                     <td class="sort-entry--username" data-value="{{ username }}">
                         <span class="textshares-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ username }}">
-                            <span class="glyphicon glyphicon-remove"></span>
                             <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
                         </span>
                         {{ wiki.userLink(username, project) }}
@@ -79,8 +78,8 @@
                             <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': username, 'namespace': page.namespace, 'article': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
                         {% endif %}
                         &middot;
-                        {% if enabled('ec') %}
-                            <a href="{{ path('EditCounterResult', { 'project': project.domain, 'username': username }) }}">{{ msg('tool-ec') }}</a>
+                        {% if enabled('EditCounter') %}
+                            <a href="{{ path('EditCounterResult', { 'project': project.domain, 'username': username }) }}">{{ msg('tool-editcounter') }}</a>
                         {% endif %}
                     </td>
                     <td class="sort-entry--characters" data-value="{{ values.count }}">

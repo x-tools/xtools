@@ -253,11 +253,11 @@
 {% macro userLinks(user, project, tool = '') %}{% spaceless %}
     {% import _self as wiki %}
     <p class="text-center xt-heading-subtitle">
-        {% if tool == 'ec' %}
+        {% if tool == 'EditCounter' %}
             {{ wiki.userLogLink(user, project) }}
         {% else %}
-            {% if enabled('ec') %}
-                <a href="{{ path('EditCounterResult', {'project':project.domain, 'username':user.username}) }}">{{ msg('tool-ec') }}</a>
+            {% if enabled('EditCounter') %}
+                <a href="{{ path('EditCounterResult', {'project':project.domain, 'username':user.username}) }}">{{ msg('tool-editcounter') }}</a>
                 &middot;
             {% endif %}
             {{ wiki.blockLogLink(user.username, project) }}
