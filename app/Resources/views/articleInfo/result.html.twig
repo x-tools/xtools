@@ -502,20 +502,20 @@
                     </tr>
                 {% endfor %}
                 </tbody>
-                {% if counter < ai.numEditors %}
-                <tfoot><tr class="show-more-row">
-                    <td></td>
-                    <td>
-                        {% set expandUrl = path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'editorlimit': editorlimit * 10})) %}
-                        {% set otherEditors = ai.numEditors - counter %}
-                        <a href="{{ expandUrl }}">
-                            {{ otherEditors|num_format }} {{ msg('num-others', [otherEditors]) }}
-                        </a>
-                    </td>
-                    <td></td>
-                    <td>{{ (ai.numRevisionsProcessed - editSum)|num_format }}</td>
-                    <td colspan=6></td>
-                </tr></tfoot>
+                {% set otherEditors = ai.numEditors - ai.numBots - counter %}
+                {% if otherEditors > 0 %}
+                    <tfoot><tr class="show-more-row">
+                        <td></td>
+                        <td>
+                            {% set expandUrl = path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'editorlimit': editorlimit * 10})) %}
+                            <a href="{{ expandUrl }}">
+                                {{ otherEditors|num_format }} {{ msg('num-others', [otherEditors]) }}
+                            </a>
+                        </td>
+                        <td></td>
+                        <td>{{ (ai.numRevisionsProcessed - editSum)|num_format }}</td>
+                        <td colspan=6></td>
+                    </tr></tfoot>
                 {% endif %}
             </table>
             <div class="footnotes">
