@@ -99,7 +99,7 @@ class SimpleEditCounter extends Model
             }
         }
 
-        if (!$this->container->getParameter('app.single_wiki')) {
+        if (!$this->user->isAnon() && !$this->container->getParameter('app.single_wiki')) {
             $this->data['globalUserGroups'] = $this->user->getGlobalGroups($this->project);
         }
     }

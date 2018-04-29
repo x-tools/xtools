@@ -74,7 +74,7 @@
                         {{ wiki.userLink(username, project) }}
                     </td>
                     <td>
-                        {% if enabled('topedits') %}
+                        {% if enabled('TopEdits') %}
                             <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': username, 'namespace': page.namespace, 'article': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
                         {% endif %}
                         &middot;

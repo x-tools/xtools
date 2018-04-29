@@ -1,6 +1,6 @@
 {% import 'macros/wiki.html.twig' as wiki %}
 {% if not is_sub_request %}
-== [[User:{{ user.username }}]] ==
+== {{ wiki.userLinkWikitext(user, user.username) }} ==
 
 {% set link %}[{{ url('EditCounterGeneralStats', {'username': user.username, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
 {{ msg('xtools-advert', [link, date()|date_format]) }}
@@ -9,6 +9,7 @@
 === {{ msg('general-stats') }} ===
 
 {| class="wikitable sortable"
+{% if not(user.anon) %}
 | {{ msg('user-id') }}
 | {{ user.id(project) }}
 |-
@@ -25,6 +26,7 @@
 | {{ msg('is-admin') }}
 | {% if user.isAdmin(project) %}1{% else %}0{% endif %}
 
+{% endif %}
 |-
 | {{ msg('first-edit') }}
 | {% if ec.datetimeFirstRevision %}{{ ec.datetimeFirstRevision|date_format }}{% endif %}
@@ -92,7 +94,6 @@
 {| class="wikitable sortable"
 | {{ msg('files-uploaded') }}
 | [[Special:ListFiles/{{ user.username }}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countFilesUploaded }}}}]]
-
 {% if isWMFLabs() %}
 |-
 | {{ msg('files-uploaded-commons') }}
@@ -106,12 +107,12 @@
 
 {| class="wikitable sortable"
 | {{ msg('auto-edits') }}
-| {% if enabled('autoedits') %}[{{ url('AutoEditsResult', {project:project.domain, username:user.username, namespace:'all'}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countAutomatedEdits }}}}]{% else %}{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countAutomatedEdits }}}}{% endif %}
+| {% if enabled('AutoEdits') %}[{{ url('AutoEditsResult', {project:project.domain, username:user.username, namespace:'all'}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countAutomatedEdits }}}}]{% else %}{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countAutomatedEdits }}}}{% endif %}
 {% if ec.countLiveRevisions %} ({{ ((ec.countAutomatedEdits / ec.countLiveRevisions) * 100)|percent_format }})
 {% endif %}
 |-
 | {{ msg('edits-with-summaries') }}
-| {% if enabled('es') %}[{{ url('EditSummaryResult', {project:project.domain, username:user.username, namespace:'all'}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countRevisionsWithComments }}}}]{% else %}{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countRevisionsWithComments }}}}{% endif %}{% if ec.countLiveRevisions %} ({{ ((ec.countRevisionsWithComments / ec.countLiveRevisions) * 100)|percent_format }})
+| {% if enabled('EditSummary') %}[{{ url('EditSummaryResult', {project:project.domain, username:user.username, namespace:'all'}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countRevisionsWithComments }}}}]{% else %}{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countRevisionsWithComments }}}}{% endif %}{% if ec.countLiveRevisions %} ({{ ((ec.countRevisionsWithComments / ec.countLiveRevisions) * 100)|percent_format }})
 {% endif %}
 |-
 | {{ msg('minor-edits') }}
@@ -129,6 +130,7 @@
 |}
 
 {# ======================== ACTIONS ======================== #}
+{% if not(user.anon) %}
 === {{ msg('actions') }} ===
 
 {| class="wikitable sortable"
@@ -185,8 +187,8 @@
 | [{{ wiki.pageUrlRaw('Special:Log/import/' ~ user.username, project) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesImported }}}}]
 |-
 |}
-
-{% endif %}{# ======================== BLOCKS ======================== #}
+{% endif %}{% endif %}
+{# ======================== BLOCKS ======================== #}
 === {{ msg('re-blocks') }} ===
 
 {| class="wikitable sortable"
@@ -197,8 +199,7 @@
 | {{ msg('block-current') }}
 | {% if user.isBlocked(project) %}[[Special:BlockList/{{ user.username }}|{% spaceless %}
     {% if user.getBlockExpiry(project) == 'infinity' %}&#x221e;{# infinity #}{% else %}
-        {{ user.getBlockExpiry(project)|date_format }}
-    {% endif %}]]
+        {{ user.getBlockExpiry(project)|date_format }}{% endif %}]]
 {% endspaceless %}
 
 {% else %}&ndash;
@@ -206,6 +207,7 @@
 |-
 |}
 
+{% if not(user.anon) %}
 {# ======================== GLOBAL EDITS ======================== #}
 === {{ msg('top-projects-edit-counts') ~ ' (' ~ msg('approximate')|lower ~ ')' }} ===
 
@@ -222,5 +224,6 @@
 |-
 {% endfor %}
 |}
+{% endif %}
 
 <nowiki>*</nowiki> {{ msg('data-limit', [5000, 5000|num_format]) }}

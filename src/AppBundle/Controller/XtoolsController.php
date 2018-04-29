@@ -151,6 +151,12 @@ abstract class XtoolsController extends Controller
 
         $userData = UserRepository::getUser($params['username'], $this->container);
 
+        // Allow querying for any IP, currently with no edit count limitation...
+        // Once T188677 is resolved IPs will be affected by the EXPLAIN results.
+        if ($userData->isAnon()) {
+            return $userData;
+        }
+
         // Don't continue if the user doesn't exist.
         if (!$userData->existsOnProject($project)) {
             $this->addFlash('danger', 'user-not-found');

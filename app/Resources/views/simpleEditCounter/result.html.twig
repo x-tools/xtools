@@ -34,25 +34,27 @@
                         <td class="stat-list--new-group">{{ msg('username') }}</td>
                         <td class="stat-list--new-group">{{ wiki.userLink(user, project) }}</td>
                     </tr>
-                    <tr>
-                        <td>{{ msg('user-id') }}</td>
-                        <td>{{ sec.userId }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ msg('user-groups') }}</td>
-                        <td>
-                            {% if sec.userGroups|length == 0 %}
-                                <em class="text-muted">{{ msg('none') }}</em>
-                            {% else %}
-                                {{ sec.userGroups|join(', ') }}
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% if sec.globalUserGroups|length > 0 %}
+                    {% if not(user.anon) %}
                         <tr>
-                            <td>{{ msg('global-user-groups') }}</td>
-                            <td>{{ sec.globalUserGroups|join(', ') }}</td>
+                            <td>{{ msg('user-id') }}</td>
+                            <td>{{ sec.userId }}</td>
                         </tr>
+                        <tr>
+                            <td>{{ msg('user-groups') }}</td>
+                            <td>
+                                {% if sec.userGroups|length == 0 %}
+                                    <em class="text-muted">{{ msg('none') }}</em>
+                                {% else %}
+                                    {{ sec.userGroups|join(', ') }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% if sec.globalUserGroups|length > 0 %}
+                            <tr>
+                                <td>{{ msg('global-user-groups') }}</td>
+                                <td>{{ sec.globalUserGroups|join(', ') }}</td>
+                            </tr>
+                        {% endif %}
                     {% endif %}
                     <tr>
                         <td>{{ msg('total') }}</td>
