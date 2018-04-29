@@ -33,6 +33,11 @@ class User extends Model
     public function __construct($username)
     {
         $this->username = ucfirst(str_replace('_', ' ', trim($username)));
+
+        // IPv6 address are stored as uppercased in the database.
+        if ($this->isAnon()) {
+            $this->username = strtoupper($this->username);
+        }
     }
 
     /**
@@ -186,7 +191,7 @@ class User extends Model
 
         $expiry = $this->getRepository()->getBlockExpiry(
             $project->getDatabaseName(),
-            $this->getId($project)
+            $this->getUsername()
         );
 
         if ($expiry === 'infinity') {

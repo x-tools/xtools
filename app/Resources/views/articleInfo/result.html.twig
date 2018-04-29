@@ -473,7 +473,7 @@
                             {{ wiki.userLink(editor, project) }}
                         </td>
                         <td>
-                            {% if enabled('topedits') %}
+                            {% if enabled('TopEdits') %}
                                 <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': editor, 'namespace': page.namespace, 'article': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
                             {% endif %}
                             &middot;
@@ -551,7 +551,7 @@
                             {% endif %}
                         </td>
                         <td>
-                            {% if enabled('topedits') %}
+                            {% if enabled('TopEdits') %}
                                 <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': bot, 'namespace': page.namespace, 'article': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
                             {% endif %}
                             &middot;

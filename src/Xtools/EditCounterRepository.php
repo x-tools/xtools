@@ -32,61 +32,68 @@ class EditCounterRepository extends UserRightsRepository
         // Prepare the queries and execute them.
         $archiveTable = $this->getTableName($project->getDatabaseName(), 'archive');
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+
+        // For IPs we use rev_user_text, and for accounts rev_user which is slightly faster.
+        $revUserClause = $user->isAnon() ? 'rev_user_text = :username' : 'rev_user = :userId';
+        $arUserClause = $user->isAnon() ? 'ar_user_text = :username' : 'ar_user = :userId';
+
         $sql = "
             -- Revision counts.
             (SELECT 'deleted' AS `key`, COUNT(ar_id) AS val FROM $archiveTable
-                WHERE ar_user = :userId
+                WHERE $arUserClause
             ) UNION (
             SELECT 'live' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_user = :userId
+                WHERE $revUserClause
             ) UNION (
             SELECT 'day' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 DAY)
+                WHERE $revUserClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 DAY)
             ) UNION (
             SELECT 'week' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 WEEK)
+                WHERE $revUserClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 WEEK)
             ) UNION (
             SELECT 'month' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
+                WHERE $revUserClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
             ) UNION (
             SELECT 'year' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+                WHERE $revUserClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
             ) UNION (
             SELECT 'with_comments' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_user = :userId AND rev_comment != ''
+                WHERE $revUserClause AND rev_comment != ''
             ) UNION (
             SELECT 'minor' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_user = :userId AND rev_minor_edit = 1
+                WHERE $revUserClause AND rev_minor_edit = 1
 
             -- Dates.
             ) UNION (
             SELECT 'first' AS `key`, rev_timestamp AS `val` FROM $revisionTable
-                WHERE rev_user = :userId ORDER BY rev_timestamp ASC LIMIT 1
+                WHERE $revUserClause ORDER BY rev_timestamp ASC LIMIT 1
             ) UNION (
             SELECT 'last' AS `key`, rev_timestamp AS `date` FROM $revisionTable
-                WHERE rev_user = :userId ORDER BY rev_timestamp DESC LIMIT 1
+                WHERE $revUserClause ORDER BY rev_timestamp DESC LIMIT 1
 
             -- Page counts.
             ) UNION (
             SELECT 'edited-live' AS `key`, COUNT(DISTINCT rev_page) AS `val`
                 FROM $revisionTable
-                WHERE rev_user = :userId
+                WHERE $revUserClause
             ) UNION (
             SELECT 'edited-deleted' AS `key`, COUNT(DISTINCT ar_page_id) AS `val`
                 FROM $archiveTable
-                WHERE ar_user = :userId
+                WHERE $arUserClause
             ) UNION (
             SELECT 'created-live' AS `key`, COUNT(DISTINCT rev_page) AS `val`
                 FROM $revisionTable
-                WHERE rev_user = :userId AND rev_parent_id = 0
+                WHERE $revUserClause AND rev_parent_id = 0
             ) UNION (
             SELECT 'created-deleted' AS `key`, COUNT(DISTINCT ar_page_id) AS `val`
                 FROM $archiveTable
-                WHERE ar_user = :userId AND ar_parent_id = 0
+                WHERE $arUserClause AND ar_parent_id = 0
             )
         ";
 
-        $resultQuery = $this->executeProjectsQuery($sql, ['userId' => $user->getId($project)]);
+        $params = $user->isAnon() ? ['username' => $user->getUsername()] : ['userId' => $user->getId($project)];
+        $resultQuery = $this->executeProjectsQuery($sql, $params);
+
         $revisionCounts = [];
         while ($result = $resultQuery->fetch()) {
             $revisionCounts[$result['key']] = $result['val'];
@@ -116,12 +123,12 @@ class EditCounterRepository extends UserRightsRepository
         $sql = "
         (SELECT CONCAT(log_type, '-', log_action) AS source, COUNT(log_id) AS value
             FROM $loggingTable
-            WHERE log_user = :userId
+            WHERE log_user_text = :username
             GROUP BY log_type, log_action
         )";
 
         $results = $this->executeProjectsQuery($sql, [
-            'userId' => $user->getId($project)
+            'username' => $user->getUsername(),
         ])->fetchAll();
 
         $logCounts = array_combine(
@@ -244,6 +251,10 @@ class EditCounterRepository extends UserRightsRepository
      */
     protected function globalEditCountsFromCentralAuth(User $user, Project $project)
     {
+        if ($user->isAnon() === true) {
+            return false;
+        }
+
         // Set up cache and stopwatch.
         $cacheKey = $this->getCacheKey(func_get_args(), 'ec_globaleditcounts');
         if ($this->cache->hasItem($cacheKey)) {
@@ -290,7 +301,6 @@ class EditCounterRepository extends UserRightsRepository
     protected function globalEditCountsFromDatabases(User $user, Project $project)
     {
         $this->log->debug(__METHOD__." Getting global edit counts for ".$user->getUsername());
-        $stopwatchName = 'globalRevisionCounts.'.$user->getUsername();
         $allProjects = $project->getRepository()->getAll();
         $topEditCounts = [];
         foreach ($allProjects as $projectMeta) {
@@ -305,7 +315,6 @@ class EditCounterRepository extends UserRightsRepository
                 'dbName' => $projectMeta['dbName'],
                 'total' => $total,
             ];
-            $this->stopwatch->lap($stopwatchName);
         }
         return $topEditCounts;
     }
@@ -327,15 +336,15 @@ class EditCounterRepository extends UserRightsRepository
 
         // Query.
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+        $revUserClause = $user->isAnon() ? 'r.rev_user_text = :username' : 'r.rev_user = :userId';
         $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
         $sql = "SELECT page_namespace, COUNT(rev_id) AS total
             FROM $pageTable p JOIN $revisionTable r ON (r.rev_page = p.page_id)
-            WHERE r.rev_user = :id
+            WHERE $revUserClause
             GROUP BY page_namespace";
 
-        $results = $this->executeProjectsQuery($sql, [
-            'id' => $user->getId($project),
-        ])->fetchAll();
+        $params = $user->isAnon() ? ['username' => $user->getUsername()] : ['userId' => $user->getId($project)];
+        $results = $this->executeProjectsQuery($sql, $params)->fetchAll();
 
         $namespaceTotals = array_combine(array_map(function ($e) {
             return $e['page_namespace'];
@@ -500,6 +509,7 @@ class EditCounterRepository extends UserRightsRepository
 
         // Prepare the queries and execute them.
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+        $revUserClause = $user->isAnon() ? 'revs.rev_user_text = :username' : 'revs.rev_user = :userId';
         $sql = "SELECT AVG(sizes.size) AS average_size,
                 COUNT(CASE WHEN sizes.size < 20 THEN 1 END) AS small_edits,
                 COUNT(CASE WHEN sizes.size > 1000 THEN 1 END) AS large_edits
@@ -507,14 +517,13 @@ class EditCounterRepository extends UserRightsRepository
                     SELECT (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS size
                     FROM $revisionTable AS revs
                     LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-                    WHERE revs.rev_user = :userId
+                    WHERE $revUserClause
                     ORDER BY revs.rev_timestamp DESC
                     LIMIT 5000
                 ) sizes";
 
-        $results = $this->executeProjectsQuery($sql, [
-            'userId' => $user->getId($project),
-        ])->fetch();
+        $params = $user->isAnon() ? ['username' => $user->getUsername()] : ['userId' => $user->getId($project)];
+        $results = $this->executeProjectsQuery($sql, $params)->fetch();
 
         // Cache and return.
         $this->stopwatch->stop($cacheKey);

@@ -12,10 +12,12 @@
 
         <div class="text-center xt-toc">
             {% set sections = ['general-stats', 'namespace-totals', 'year-counts', 'month-counts', 'timecard', 'top-edited-pages'] %}
-            {% if ec.rightsChanges|length > 0 %}
-                {% set sections = sections|merge(['rights-changes']) %}
+            {% if not(user.anon) %}
+                {% if ec.rightsChanges|length > 0 %}
+                    {% set sections = sections|merge(['rights-changes']) %}
+                {% endif %}
+                {% set sections = sections|merge(['latest-global-edits']) %}
             {% endif %}
-            {% set sections = sections|merge(['latest-global-edits']) %}
 
             {% for section in sections %}
                 <span>
@@ -111,33 +113,35 @@
         {% endset %}
         {{ layout.content_block(headerLink, content, downloadLink, 'top-edited-pages', true) }}
 
-        {% if ec.rightsChanges|length > 0 or ec.globalRightsChanges|length > 0 %}
+        {% if not(user.anon) %}
+            {% if ec.rightsChanges|length > 0 or ec.globalRightsChanges|length > 0 %}
+                {% set content %}
+                    {% include 'editCounter/rights_changes.html.twig' with {
+                        'is_sub_request': true,
+                        'project': project,
+                        'user': user,
+                        'ec': ec
+                    } %}
+                {% endset %}
+                {% set headerLink %}
+                    <a href="{{ path('EditCounterRightsChanges', {project:project.domain, username:user.username})}}">{{ msg('rights-changes') }}</a>
+                {% endset %}
+                {% set downloadLink %}
+                    {{ layout.downloadLink('EditCounterRightsChanges', {project:project.domain, username:user.username}, ['wikitext']) }}
+                {% endset %}
+                {{ layout.content_block(headerLink, content, downloadLink, 'rights-changes', true) }}
+            {% endif %}
+
             {% set content %}
-                {% include 'editCounter/rights_changes.html.twig' with {
-                    'is_sub_request': true,
-                    'project': project,
-                    'user': user,
-                    'ec': ec
-                } %}
+                <div id="latestglobal-container" data-username="{{ user.username }}" data-project="{{ project.domain }}">
+                    <img src="{{ asset('static/images/loader.gif') }}" />
+                </div>
             {% endset %}
             {% set headerLink %}
-                <a href="{{ path('EditCounterRightsChanges', {project:project.domain, username:user.username})}}">{{ msg('rights-changes') }}</a>
+                <a href="{{ path('EditCounterLatestGlobal', {project:project.domain, username:user.username})}}">{{ msg('latest-global-edits') }}</a>
             {% endset %}
-            {% set downloadLink %}
-                {{ layout.downloadLink('EditCounterRightsChanges', {project:project.domain, username:user.username}, ['wikitext']) }}
-            {% endset %}
-            {{ layout.content_block(headerLink, content, downloadLink, 'rights-changes', true) }}
+            {{ layout.content_block(headerLink, content, '', 'latest-global-edits', true) }}
         {% endif %}
-
-        {% set content %}
-            <div id="latestglobal-container" data-username="{{ user.username }}" data-project="{{ project.domain }}">
-                <img src="{{ asset('static/images/loader.gif') }}" />
-            </div>
-        {% endset %}
-        {% set headerLink %}
-            <a href="{{ path('EditCounterLatestGlobal', {project:project.domain, username:user.username})}}">{{ msg('latest-global-edits') }}</a>
-        {% endset %}
-        {{ layout.content_block(headerLink, content, '', 'latest-global-edits', true) }}
 
         <div class="text-muted times-in-utc">
             {{ msg('times-in-utc') }}

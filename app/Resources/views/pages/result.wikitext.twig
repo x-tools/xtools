@@ -49,7 +49,7 @@
 {% endif %}
 {% endif %}
 {% endif %}
-| [{{ wiki.pageLogUrlRaw(pagename, project) }} {{ msg('log') }}]{% if page.type == 'rev' %} &middot; [{{ wiki.pageHistUrlRaw(pagename, project) }} {{ msg('history') }}]{% if enabled('articleinfo') %} &middot; [{{ url('ArticleInfoResult', {'project': project.domain, 'article': pagename}) }} {{ msg('tool-articleinfo') }}]{% endif %}{% if enabled('topedits') %} &middot; [{{ url('topedits', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'page': page.page_title}) }} {{ msg('tool-topedits') }}]{% endif %}{% if isWMFLabs() %} &middot; [https://tools.wmflabs.org/pageviews?project={{ project.domain }}&amp;pages={{ pagename|e('url') }} {{ msg('pageviews') }}]{% endif %}{% endif %}
+| [{{ wiki.pageLogUrlRaw(pagename, project) }} {{ msg('log') }}]{% if page.type == 'rev' %} &middot; [{{ wiki.pageHistUrlRaw(pagename, project) }} {{ msg('history') }}]{% if enabled('ArticleInfo') %} &middot; [{{ url('ArticleInfoResult', {'project': project.domain, 'article': pagename}) }} {{ msg('tool-articleinfo') }}]{% endif %}{% if enabled('TopEdits') %} &middot; [{{ url('topedits', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'page': page.page_title}) }} {{ msg('tool-topedits') }}]{% endif %}{% if isWMFLabs() %} &middot; [https://tools.wmflabs.org/pageviews?project={{ project.domain }}&amp;pages={{ pagename|e('url') }} {{ msg('pageviews') }}]{% endif %}{% endif %}
 
 {% endfor %}
 {% if pages.counts[ns].count > maxRows and multiNamspace %}

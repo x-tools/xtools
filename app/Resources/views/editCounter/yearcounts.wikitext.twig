@@ -1,6 +1,6 @@
 {% import 'macros/wiki.html.twig' as wiki %}
 {% if not is_sub_request %}
-== [[User:{{ user.username }}]] ==
+== {{ wiki.userLinkWikitext(user, user.username) }} ==
 
 {% set link %}[{{ url('EditCounterYearCounts', {'username': user.username, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
 {{ msg('xtools-advert', [link, date()|date_format]) }}
@@ -12,7 +12,7 @@
 ! {{ msg('year') }}
 ! {{ msg('count') }}
 |-
-{% set labels = ec.yearCounts.monthLabels %}
+{% set labels = ec.yearCounts.yearLabels %}
 {% for year,total in ec.yearTotals %}
 | {{ labels[loop.index0] }}
 | {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ total }}}}

@@ -72,7 +72,14 @@
         </tfoot>
     </table>
     <div class="chart-wrapper namespaces-chart-wrapper toggle-table--chart">
-        <canvas id="namespace-canvas"></canvas>
+        {##
+         # Set the size of the chart to be relative to the number of tools.
+         # Otherwise it may get too big and hog up the real estate.
+         # 37 is the heigh of one row.
+         ##}
+        {% set maxHeight = min(400, (ec.namespaceTotals|length + 2) * 37) %}
+        {% set height = max(150, maxHeight) %}
+        <canvas id="namespace-canvas" width="{{ height }}" height="{{ height }}"></canvas>
         <script>
             window.namespaces = {{ project.namespaces|json_encode()|raw }};
             window.namespaceTotals = {{ ec.namespaceTotals|json_encode()|raw }};

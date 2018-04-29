@@ -1,6 +1,6 @@
 {% import 'macros/wiki.html.twig' as wiki %}
 {% if not is_sub_request %}
-== [[User:{{ user.username }}]] ==
+== {{ wiki.userLinkWikitext(user, user.username) }} ==
 
 {% set link %}[{{ url('EditCounterNamespaceTotals', {'username': user.username, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
 {{ msg('xtools-advert', [link, date()|date_format]) }}
