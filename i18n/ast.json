@@ -39,6 +39,7 @@
 	"auto-contribs-desc": "Restola peles contribuciones (semi-)automatizaes d'un usuariu.",
 	"auto-contribs-use-tool": "Amosar solo les ediciones feches cola ferramienta:",
 	"auto-edits": "Ediciones (semi)automatizaes",
+	"auto-edits-counts-desc": "Dalgunos usos de la ferramienta superpónense (p.ex, desfacer a una revisión que ye una redireición cuenta como Desfacer y como Redireición), de manera que'l total d'ediciones feches con cada ferramienta pué ser distintu de $1.",
 	"auto-edits-counts-desc-grand-total": "gran total",
 	"auto-edits-request": "Solicitar que s'añada una nueva ferramienta (semi)automática",
 	"auto-edits-request-doc": "Enllaz a la documentación o páxina web de la ferramienta",
