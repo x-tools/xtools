@@ -284,6 +284,10 @@ parameters:
           color: '#ffeeff'
           category: 'Category:Top-importance articles'
           weight: 1
+        NA:
+          color: ''
+          category: 'Category:NA-importance articles'
+          weight: 0
         Unknown:
           color: ''
           category: 'Category:Unknown-importance articles'
