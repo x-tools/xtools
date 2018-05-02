@@ -995,9 +995,10 @@ class EditCounter extends UserRights
     /**
      * Get the most recent n revisions across all projects.
      * @param int $max The maximum number of revisions to return.
+     * @param int $offset Offset results by this number of revisions.
      * @return Edit[]
      */
-    public function globalEdits($max)
+    public function globalEdits($max, $offset = 0)
     {
         if (is_array($this->globalEdits)) {
             return $this->globalEdits;
@@ -1019,17 +1020,19 @@ class EditCounter extends UserRights
 
         // Get all revisions for those projects.
         $globalRevisionsData = $this->getRepository()
-            ->getRevisions($projects, $this->user, $max);
+            ->getRevisions($projects, $this->user, $max, $offset);
         $globalEdits = [];
         foreach ($globalRevisionsData as $revision) {
             /** @var Project $project */
             $project = $projects[$revision['project_name']];
+
             $nsName = '';
             if ($revision['page_namespace']) {
                 $nsName = $project->getNamespaces()[$revision['page_namespace']];
             }
+
             $page = $project->getRepository()
-                ->getPage($project, $nsName . ':' . $revision['page_title']);
+                ->getPage($project, $nsName.':'.$revision['page_title']);
             $edit = new Edit($page, $revision);
             $globalEdits[$edit->getTimestamp()->getTimestamp().'-'.$edit->getId()] = $edit;
         }

@@ -662,6 +662,9 @@
     /**
      * Loads configured type of contributions from the server and lists them in the DOM.
      * The navigation aids and showing/hiding of loading text is also handled here.
+     * @param {function} endpointFunc The callback that takes the params set on .contributions-container
+     *     and returns a string that is the endpoint to fetch from (without the offset appended).
+     * @param {String} apiTitle The name of the API (could be i18n key), used in error reporting.
      */
     window.loadContributions = function (endpointFunc, apiTitle) {
         setInitialEditOffset();
@@ -670,29 +673,30 @@
         $('.contributions-container').hide();
 
         var params = $('.contributions-container').data(),
-            endpoint = endpointFunc(params);
+            endpoint = endpointFunc(params),
+            pageSize = parseInt(params.pagesize, 10) || 50;
 
         /** global: xtBaseUrl */
         $.ajax({
             url: xtBaseUrl + endpoint + '/' + editOffset +
                 // Make sure to include any URL parameters, such as tool=Huggle (for AutoEdits).
-                '?htmlonly=yes&' + window.location.search.replace(/^\?/, ''),
+                '?htmlonly=yes&pagesize=' + pageSize + '&' + window.location.search.replace(/^\?/, ''),
             timeout: 30000
         }).done(function (data) {
             $('.contributions-container').html(data).show();
             $('.contributions-loading').hide();
-            setupContributionsNavListeners(endpointFunc, apiTitle);
+            setupContributionsNavListeners(endpointFunc, apiTitle, pageSize);
 
             if (editOffset > 0) {
                 $('.contributions--prev').show();
             }
-            if ($('.contributions-table tbody tr').length < 50) {
+            if ($('.contributions-table tbody tr').length < pageSize) {
                 $('.next-edits').hide();
             }
         }).fail(function (_xhr, _status, message) {
             $('.contributions-loading').hide();
             $('.contributions-container').html(
-                $.i18n('api-error', apiTitle + ' API: <code>' + message + '</code>')
+                $.i18n('api-error', $.i18n(apiTitle) + ' API: <code>' + message + '</code>')
             ).show();
         });
     }
@@ -700,18 +704,19 @@
     /**
      * Set up listeners for navigating contribution lists.
      */
-    window.setupContributionsNavListeners = function (endpointFunc, apiTitle) {
+    window.setupContributionsNavListeners = function (endpointFunc, apiTitle, pageSize) {
+        pageSize = pageSize || 50; // Assume 50 entries per page unless specified.
         setInitialEditOffset();
 
         $('.contributions--prev').one('click', function (e) {
             e.preventDefault();
-            editOffset -= 50;
+            editOffset -= pageSize;
             loadContributions(endpointFunc, apiTitle)
         });
 
         $('.contributions--next').one('click', function (e) {
             e.preventDefault();
-            editOffset += 50;
+            editOffset += pageSize;
             loadContributions(endpointFunc, apiTitle);
         });
     }

@@ -361,13 +361,14 @@ class EditCounterRepository extends UserRightsRepository
      * Get revisions by this user.
      * @param Project[] $projects The projects.
      * @param User $user The user.
-     * @param int $lim The maximum number of revisions to fetch from each project.
+     * @param int $limit The maximum number of revisions to fetch from each project.
+     * @param int $offset Offset results by this number of rows.
      * @return array|mixed
      */
-    public function getRevisions($projects, User $user, $lim = 40)
+    public function getRevisions(array $projects, User $user, $limit = 30, $offset = 0)
     {
         // Check cache.
-        $cacheKey = $this->getCacheKey('ec_globalcontribs.'.$user->getCacheKey().'.'.$lim);
+        $cacheKey = $this->getCacheKey('ec_globalcontribs.'.$user->getCacheKey().'.'.$limit.'.'.$offset);
         $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
@@ -397,12 +398,13 @@ class EditCounterRepository extends UserRightsRepository
                     LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                 WHERE revs.rev_user_text = :username
                 ORDER BY revs.rev_timestamp DESC";
-            if (is_numeric($lim)) {
-                $sql .= " LIMIT $lim";
-            }
             $queries[] = $sql;
         }
-        $sql = "(\n" . join("\n) UNION (\n", $queries) . ")\n";
+        $sql = "SELECT * FROM ((\n" . join("\n) UNION (\n", $queries) . ")) a ORDER BY timestamp DESC LIMIT $limit";
+
+        if (is_numeric($offset)) {
+            $sql .= " OFFSET $offset";
+        }
 
         $revisions = $this->executeProjectsQuery($sql, [
             'username' => $user->getUsername(),

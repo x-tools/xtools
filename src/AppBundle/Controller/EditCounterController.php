@@ -333,7 +333,18 @@ class EditCounterController extends XtoolsController
 
     /**
      * Display the latest global edits section.
-     * @Route("/ec-latestglobal/{project}/{username}", name="EditCounterLatestGlobal")
+     * @Route(
+     *     "/ec-latestglobal-contributions/{project}/{username}/{offset}",
+     *     name="EditCounterLatestGlobalContribs",
+     *     requirements={"offset" = "|\d*"},
+     *     defaults={"offset" = 0}
+     * )
+     * @Route(
+     *     "/ec-latestglobal/{project}/{username}/{offset}",
+     *     name="EditCounterLatestGlobal",
+     *     requirements={"offset" = "|\d*"},
+     *     defaults={"offset" = 0}
+     * ),
      * @param Request $request The HTTP request.
      * @return Response
      * @codeCoverageIgnore
@@ -354,6 +365,8 @@ class EditCounterController extends XtoolsController
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
+            'offset' => $request->get('offset'),
+            'pageSize' => $request->get('pagesize'),
         ]);
     }
 

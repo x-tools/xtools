@@ -133,8 +133,13 @@
             {% endif %}
 
             {% set content %}
-                <div id="latestglobal-container" data-username="{{ user.username }}" data-project="{{ project.domain }}">
-                    <img src="{{ asset('static/images/loader.gif') }}" />
+                <em class="contributions-loading text-muted">{{ msg('loading') }}...</em>
+                <div id="latestglobal-container" class="contributions-container"
+                    data-project="{{ project.domain }}"
+                    data-username="{{ user.username }}"
+                    data-offset="0"
+                    data-target="ec-latestglobal"
+                    data-pagesize="30">
                 </div>
             {% endset %}
             {% set headerLink %}
