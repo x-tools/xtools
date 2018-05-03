@@ -1,11 +1,19 @@
 {
 	"@metadata": {
 		"authors": [
-			"Nemo bis"
+			"Nemo bis",
+			"Praveenp"
 		]
 	},
+	"account-age": "അംഗത്വത്തിന്റെ പ്രായം",
+	"account-age-desc": "{{PLURAL:$2|ഒരു ദിവസം|$2 ദിവസം}} പഴയത്",
+	"accounts": "അംഗത്വങ്ങൾ",
+	"accounts-created": "അംഗത്വം സൃഷ്ടിച്ചിരിക്കുന്നു",
 	"actions": "പ്രവൃത്തികൾ",
-	"added": "കൂട്ടിച്ചേർത്തു",
+	"actions-as-admin": "കാര്യനിർവാഹക പ്രവൃത്തികൾ",
+	"added": "ചേർത്തവ",
+	"added-bytes": "ചേർത്തവ (ബൈറ്റുകൾ)",
+	"admin": "കാര്യനിർവാഹക(ൻ)",
 	"all": "എല്ലാം",
 	"all-edits": "എല്ലാ തിരുത്തുകളും",
 	"approve": "അംഗീകാരം",
