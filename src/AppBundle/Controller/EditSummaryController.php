@@ -76,7 +76,7 @@ class EditSummaryController extends XtoolsController
      */
     public function resultAction(Request $request, $namespace = 0)
     {
-        $ret = $this->validateProjectAndUser($request, 'es');
+        $ret = $this->validateProjectAndUser($request, 'EditSummary');
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {
