@@ -1,5 +1,13 @@
 # Release Notes #
 
+## 3.3.4 ##
+- T191943: Add support for IPs across all applicable tools.
+- T191942: Fix ArticleInfo bug, unique editors are overcounted.
+- T192846: Add JWB to enwiki AutoEdits configuration.
+- Add NA-level importance to enwiki assessments configuration.
+- Fix links to Edit Counter following recent refactor.
+- Localization updates.
+
 ## 3.3.3 ##
 - Hotfix for bug in redirecting to index page when the user has
   too many edits.
