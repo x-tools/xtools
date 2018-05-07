@@ -6,6 +6,7 @@
 			"Hedda"
 		]
 	},
+	"accepted-formats": "Kabul edilen formatlar",
 	"account-age": "Hesap yaşı",
 	"account-age-desc": "$2 {{PLURAL:$1|gün|günler}} yaşında",
 	"accounts": "Hesaplar",
@@ -15,6 +16,9 @@
 	"added": "Eklendi",
 	"added-bytes": "Eklendi (bayt)",
 	"admin": "Hizmetli",
+	"admin-stats-notice": "Yalnızca, en az bir yönetici eylemi gerçekleştiren kullanıcılar zaman aralığında gösterilir.",
+	"admin-stats-notice2": "Bazı kullanıcılar eski yönetici veya yönetici olmayan olabilir ancak belirli yönetici işlemleri yapma haklarına sahiptir..",
+	"afd": "Silinen maddeler",
 	"all": "hepsi",
 	"all-edits": "Tüm düzenlemeler",
 	"all-languages": "Tüm diller",
