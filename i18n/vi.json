@@ -178,7 +178,7 @@
 	"text-to-serach": "Văn bản để tìm kiếm",
 	"thank": "Cảm ơn",
 	"timecard": "Thời biểu",
-	"too-many-revisions": "Bài này được sửa đổi hơn 50.000 lần. Dữ liệu từ 50.000 sửa đổi đầu tiên được hiển thị bên dưới.",
+	"too-many-revisions": "Trang này đã có hơn $1 {{PLURAL:$2|sửa đổi|sửa đổi}}. Chỉ có dữ liệu sửa đổi $1 lần cuối cùng được hiển thị.",
 	"tool-adminstats": "Thống kê BQV",
 	"tool-adminstats-desc": "Xem thống kê về tác vụ bảo quản viên",
 	"tool-articleinfo": "Lịch sử trang",
