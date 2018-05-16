@@ -48,16 +48,16 @@
             <tr>
                 <td><a href="#rights-changes">{{ msg('user-groups') }}</a></td>
                 <td>
-                    {% for group in ec.rightsStates.current %}
+                    {% for group in ec.rightsStates.local.current %}
                         {{ ec.rightsNames[group] }}{% if not loop.last %}, {% endif %}
                     {% endfor %}
                 </td>
             </tr>
-            {% if user.globalGroups(project) %}
+            {% if ec.rightsStates.global.current %}
                 <tr>
                     <td>{{ msg('global-user-groups') }}</td>
                     <td>
-                        {% for group in user.globalGroups(project) %}
+                        {% for group in ec.rightsStates.global.current %}
                             {{ ec.rightsNames[group] }}{% if not loop.last %}, {% endif %}
                         {% endfor %}
                     </td>

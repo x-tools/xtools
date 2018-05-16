@@ -16,14 +16,18 @@
         {% for timestamp, change in rightsChanges if index < 10 or not(is_sub_request) %}
             <tr>
                 <td class="sort-entry--date" data-value="{{ timestamp }}">
-                    {{ wiki.logLink(change.type == 'local' ? project : metaProject, change.logId, timestamp|trans|date_format) }}
+                    {% if change.logId is not empty %}
+                        {{ wiki.logLink(change.type == 'local' ? project : metaProject, change.logId, timestamp|trans|date_format) }}
+                    {% else %}
+                        {{ timestamp|trans|date_format }}
+                    {% endif %}
                 </td>
                 <td class="sort-entry--rights" data-value="{{ change.added|length + change.removed|length }}">
                     {% for right in change.added %}
-                        <div class="diff-pos">{{ ec.rightsNames[right]|trim }}</div>
+                        <div class="diff-pos">{{ ec.rightsName(right)|trim }}</div>
                     {% endfor %}
                     {% for right in change.removed %}
-                        <div class="diff-neg" dir="ltr">-{{ ec.rightsNames[right]|trim }}</div>
+                        <div class="diff-neg" dir="ltr">-{{ ec.rightsName(right)|trim }}</div>
                     {% endfor %}
                 </td>
                 <td class="sort-entry--admin" data-value="{{ change.admin }}">

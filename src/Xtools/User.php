@@ -102,6 +102,16 @@ class User extends Model
     }
 
     /**
+     * Get a list of this user's global rights.
+     * @param Project $project A project to query; if not provided, the default will be used.
+     * @return string[]
+     */
+    public function getGlobalUserRights(Project $project = null)
+    {
+        return $this->getRepository()->getGlobalUserRights($this->getUsername(), $project);
+    }
+
+    /**
      * Get the user's (system) edit count.
      * @param Project $project
      * @return int
@@ -131,28 +141,6 @@ class User extends Model
     }
 
     /**
-     * Get a list of this user's groups on the given project.
-     * @param Project $project The project.
-     * @return string[]
-     */
-    public function getGroups(Project $project)
-    {
-        $groupsData = $this->getRepository()->getGroups($project, $this->getUsername());
-        $groups = preg_grep('/\*/', $groupsData, PREG_GREP_INVERT);
-        sort($groups);
-        return $groups;
-    }
-
-    /**
-     * Get a list of this user's groups on all projects.
-     * @param Project $project A project to query; if not provided, the default will be used.
-     */
-    public function getGlobalGroups(Project $project = null)
-    {
-        return $this->getRepository()->getGlobalGroups($this->getUsername(), $project);
-    }
-
-    /**
      * Does this user exist on the given project.
      * @param Project $project
      * @return bool
@@ -170,7 +158,7 @@ class User extends Model
      */
     public function isAdmin(Project $project)
     {
-        return (false !== array_search('sysop', $this->getGroups($project)));
+        return (false !== array_search('sysop', $this->getUserRights($project)));
     }
 
     /**
