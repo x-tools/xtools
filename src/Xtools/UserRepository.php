@@ -93,74 +93,9 @@ class UserRepository extends Repository
         $userTable = $this->getTableName($databaseName, 'user');
         $sql = "SELECT user_editcount FROM $userTable WHERE user_name = :username LIMIT 1";
         $resultQuery = $this->executeProjectsQuery($sql, ['username' => $username]);
+
         $editCount = $resultQuery->fetchColumn();
         return $editCount;
-    }
-
-    /**
-     * Get group names of the given user.
-     * @param Project $project The project.
-     * @param string $username The username.
-     * @return string[]
-     */
-    public function getGroups(Project $project, $username)
-    {
-        // Use md5 to ensure the key does not contain reserved characters.
-        $cacheKey = $this->getCacheKey(func_get_args(), 'user_groups');
-        if ($this->cache->hasItem($cacheKey)) {
-            return $this->cache->getItem($cacheKey)->get();
-        }
-
-        $this->stopwatch->start($cacheKey, 'XTools');
-        $api = $this->getMediawikiApi($project);
-        $params = [
-            'list' => 'users',
-            'ususers' => $username,
-            'usprop' => 'groups'
-        ];
-        $query = new SimpleRequest('query', $params);
-        $result = [];
-        $res = $api->getRequest($query);
-        if (isset($res['batchcomplete']) && isset($res['query']['users'][0]['groups'])) {
-            $result = $res['query']['users'][0]['groups'];
-        }
-
-        // Cache and return.
-        $this->stopwatch->stop($cacheKey);
-        return $this->setCache($cacheKey, $result);
-    }
-
-    /**
-     * Get a user's global group membership (starting at XTools' default project if none is
-     * provided). This requires the CentralAuth extension to be installed.
-     * @link https://www.mediawiki.org/wiki/Extension:CentralAuth
-     * @param string $username The username.
-     * @param Project $project The project to query.
-     * @return string[]
-     */
-    public function getGlobalGroups($username, Project $project = null)
-    {
-        // Get the default project if not provided.
-        if (!$project instanceof Project) {
-            $project = ProjectRepository::getDefaultProject($this->container);
-        }
-
-        // Create the API query.
-        $api = $this->getMediawikiApi($project);
-        $params = [
-            'meta' => 'globaluserinfo',
-            'guiuser' => $username,
-            'guiprop' => 'groups'
-        ];
-        $query = new SimpleRequest('query', $params);
-
-        // Get the result.
-        $res = $api->getRequest($query);
-        $result = [];
-        if (isset($res['batchcomplete']) && isset($res['query']['globaluserinfo']['groups'])) {
-            $result = $res['query']['globaluserinfo']['groups'];
-        }
-        return $result;
     }
 
     /**
@@ -314,6 +249,11 @@ class UserRepository extends Repository
      */
     public function getUserRights(Project $project, User $user)
     {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'user_rights');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
         $userGroupsTable = $project->getTableName('user_groups');
         $userTable = $project->getTableName('user');
 
@@ -325,6 +265,48 @@ class UserRepository extends Repository
         $ret = $this->executeProjectsQuery($sql, [
             'username' => $user->getUsername(),
         ])->fetchAll(\PDO::FETCH_COLUMN);
-        return $ret;
+
+        // Cache and return.
+        return $this->setCache($cacheKey, $ret);
+    }
+
+    /**
+     * Get a user's global group membership (starting at XTools' default project if none is
+     * provided). This requires the CentralAuth extension to be installed.
+     * @link https://www.mediawiki.org/wiki/Extension:CentralAuth
+     * @param string $username The username.
+     * @param Project $project The project to query.
+     * @return string[]
+     */
+    public function getGlobalUserRights($username, Project $project = null)
+    {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'user_global_groups');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        // Get the default project if not provided.
+        if (!$project instanceof Project) {
+            $project = ProjectRepository::getDefaultProject($this->container);
+        }
+
+        // Create the API query.
+        $api = $this->getMediawikiApi($project);
+        $params = [
+            'meta' => 'globaluserinfo',
+            'guiuser' => $username,
+            'guiprop' => 'groups'
+        ];
+        $query = new SimpleRequest('query', $params);
+
+        // Get the result.
+        $res = $api->getRequest($query);
+        $result = [];
+        if (isset($res['batchcomplete']) && isset($res['query']['globaluserinfo']['groups'])) {
+            $result = $res['query']['globaluserinfo']['groups'];
+        }
+
+        // Cache and return.
+        return $this->setCache($cacheKey, $result);
     }
 }

@@ -665,18 +665,21 @@ class EditCounterTest extends WebTestCase
         $userRepo->expects($this->once())
             ->method('getUserRights')
             ->wilLReturn(['sysop', 'bureaucrat']);
+        $userRepo->expects($this->once())
+            ->method('getGlobalUserRights')
+            ->wilLReturn(['sysop']);
         $this->user->setRepository($userRepo);
 
         // Current rights.
         $this->assertEquals(
             ['sysop', 'bureaucrat'],
-            $this->editCounter->getRightsStates()['current']
+            $this->editCounter->getRightsStates()['local']['current']
         );
 
         // Former rights.
         $this->assertEquals(
-            ['rollbacker', 'templateeditor', 'ipblock-exempt', 'filemover'],
-            $this->editCounter->getRightsStates()['former']
+            ['ipblock-exempt', 'filemover', 'templateeditor', 'rollbacker'],
+            $this->editCounter->getRightsStates()['local']['former']
         );
 
         // Admin status.

@@ -67,7 +67,7 @@ class UserTest extends PHPUnit_Framework_TestCase
     {
         $userRepo = $this->getMock(UserRepository::class);
         $userRepo->expects($this->once())
-            ->method('getGroups')
+            ->method('getUserRights')
             ->willReturn($groups);
         $user = new User($username);
         $user->setRepository($userRepo);

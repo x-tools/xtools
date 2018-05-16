@@ -5,6 +5,7 @@
 
 namespace Xtools;
 
+use GuzzleHttp;
 use Mediawiki\Api\SimpleRequest;
 
 /**
@@ -60,6 +61,11 @@ class UserRightsRepository extends Repository
      */
     private function queryRightsChanges(Project $project, User $user, $type = 'local')
     {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_rightschanges');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
         $dbName = $project->getDatabaseName();
 
         // Global rights and Meta-changed rights should use a Meta Project.
@@ -95,46 +101,202 @@ class UserRightsRepository extends Repository
                 AND log_title IN (:username, :username2)
                 ORDER BY log_timestamp DESC";
 
-        return $this->executeProjectsQuery($sql, [
+        $ret = $this->executeProjectsQuery($sql, [
             'username' => $username,
             'username2' => $usernameLower,
         ])->fetchAll();
+
+        // Cache and return.
+        return $this->setCache($cacheKey, $ret);
     }
 
     /**
-     * Get the localized names for the user groups, fetched from on-wiki system messages.
+     * Get the localized names for all user groups on given Project (and global),
+     * fetched from on-wiki system messages.
      * @param Project $project
-     * @param string[] $rights Database values for the rights we want the names of.
      * @param string $lang Language code to pass in.
      * @return string[] Localized names keyed by database value.
      */
-    public function getRightsNames(Project $project, $rights, $lang)
+    public function getRightsNames(Project $project, $lang)
     {
-        $rightsPaths = array_map(function ($right) {
-            return "Group-$right-member";
-        }, $rights);
-
-        $params = [
-            'action' => 'query',
-            'meta' => 'allmessages',
-            'ammessages' => implode('|', $rightsPaths),
-            'amlang' => $lang,
-            'amenableparser' => 1,
-            'formatversion' => 2,
-        ];
-        $api = $this->getMediawikiApi($project);
-        $query = new SimpleRequest('query', $params);
-        $result = $api->getRequest($query);
-
-        $allmessages = $result['query']['allmessages'];
-
-        $localized = [];
-
-        foreach ($allmessages as $msg) {
-            $normalized = preg_replace('/^group-|-member$/', '', $msg['normalizedname']);
-            $localized[$normalized] = $msg['content'];
+        $cacheKey = $this->getCacheKey(func_get_args(), 'project_rights_names');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
         }
 
-        return $localized;
+        $rightsPaths = array_map(function ($right) {
+            return "Group-$right-member";
+        }, $this->getRawRightsNames($project));
+
+        $rightsNames = [];
+
+        for ($i = 0; $i < count($rightsPaths); $i += 50) {
+            $rightsSlice = array_slice($rightsPaths, $i, 50);
+            $params = [
+                'action' => 'query',
+                'meta' => 'allmessages',
+                'ammessages' => implode('|', $rightsSlice),
+                'amlang' => $lang,
+                'amenableparser' => 1,
+                'formatversion' => 2,
+            ];
+            $api = $this->getMediawikiApi($project);
+            $query = new SimpleRequest('query', $params);
+            $result = $api->getRequest($query)['query']['allmessages'];
+
+            foreach ($result as $msg) {
+                $normalized = preg_replace('/^group-|-member$/', '', $msg['normalizedname']);
+                $rightsNames[$normalized] = isset($msg['content']) ? $msg['content'] : $normalized;
+            }
+        }
+
+        // Cache for one day and return.
+        return $this->setCache($cacheKey, $rightsNames, 'P1D');
+    }
+
+    /**
+     * Get the names of all the possible local and global user groups.
+     * @param Project $project
+     * @return string[]
+     */
+    private function getRawRightsNames(Project $project)
+    {
+        $ugTable = $project->getTableName('user_groups');
+        $ufgTable = $project->getTableName('user_former_groups');
+        $sql = "SELECT DISTINCT(ug_group)
+                FROM $ugTable
+                UNION
+                SELECT DISTINCT(ufg_group)
+                FROM $ufgTable";
+        if ($this->isLabs()) {
+            $sql .= "UNION SELECT DISTINCT(gug_group)
+                     FROM centralauth_p.global_user_groups";
+        }
+
+        $groups = $this->executeProjectsQuery($sql)->fetchAll(\PDO::FETCH_COLUMN, 0);
+
+        // WMF installations have a special 'autoconfirmed' user group.
+        if ($this->isLabs()) {
+            $groups[] = 'autoconfirmed';
+        }
+
+        return array_unique($groups);
+    }
+
+    /**
+     * Get the threshold values to become autoconfirmed for the given Project.
+     * Yes, eval is bad, but here we're validating only mathematical expressions are ran.
+     * @param Project $project
+     * @return array With keys 'wgAutoConfirmAge' and 'wgAutoConfirmCount'.
+     */
+    public function getAutoconfirmedAgeAndCount(Project $project)
+    {
+        if (!$this->isLabs()) {
+            return null;
+        }
+
+        // Set up cache.
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_rightschanges_autoconfirmed');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $client = new GuzzleHttp\Client();
+        $url = 'https://noc.wikimedia.org/conf/InitialiseSettings.php.txt';
+
+        $contents = $client->request('GET', $url)
+            ->getBody()
+            ->getContents();
+
+        $dbname = $project->getDatabaseName();
+        $out = [];
+
+        foreach (['wgAutoConfirmAge', 'wgAutoConfirmCount'] as $type) {
+            // Extract the text of the file that contains the rules we're looking for.
+            $typeRegex = "/\'$type.*?\]/s";
+            $matches = [];
+            if (1 === preg_match($typeRegex, $contents, $matches)) {
+                $group = $matches[0];
+
+                // Find the autoconfirmed expression for the $type and $dbname.
+                $matches = [];
+                $regex = "/\'$dbname\'\s*\=\>\s*([\d\*\s]+)/s";
+                if (1 === preg_match($regex, $group, $matches)) {
+                    $out[$type] = (int)eval('return('.$matches[1].');');
+                    continue;
+                }
+
+                // Find the autoconfirmed expression for the 'default' and $dbname.
+                $matches = [];
+                $regex = "/\'default\'\s*\=\>\s*([\d\*\s]+)/s";
+                if (1 === preg_match($regex, $group, $matches)) {
+                    $out[$type] = (int)eval('return('.$matches[1].');');
+                    continue;
+                }
+            } else {
+                return null;
+            }
+        }
+
+        // Cache for one day and return.
+        return $this->setCache($cacheKey, $out, 'P1D');
+    }
+
+    /**
+     * Get the timestamp of the nth edit made by the given user.
+     * @param Project $project
+     * @param User $user
+     * @param string $acDate Date in YYYYMMDDHHSS format.
+     * @param int $edits Offset of rows to look for (edit threshold for autoconfirmed).
+     * @return string Timestamp in YYYYMMDDHHSS format.
+     */
+    public function getNthEditTimestamp(Project $project, User $user, $acDate, $edits)
+    {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_rightschanges_nthtimestamp');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $revisionTable = $project->getTableName('revision');
+        $sql = "SELECT rev_timestamp
+                FROM $revisionTable
+                WHERE rev_user = :userId
+                AND rev_timestamp >= $acDate
+                LIMIT 1 OFFSET ".($edits - 1);
+
+        $ret = $this->executeProjectsQuery($sql, [
+            'userId' => $user->getId($project),
+        ])->fetchColumn();
+
+        // Cache and return.
+        return $this->setCache($cacheKey, $ret);
+    }
+
+    /**
+     * Get the number of edits the user has made as of the given timestamp.
+     * @param Project $project
+     * @param User $user
+     * @param string $timestamp In YYYYMMDDHHSS format.
+     * @return int
+     */
+    public function getNumEditsByTimestamp(Project $project, User $user, $timestamp)
+    {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_rightschanges_editstimestamp');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $revisionTable = $project->getTableName('revision');
+        $sql = "SELECT COUNT(rev_id)
+                FROM $revisionTable
+                WHERE rev_user = :userId
+                AND rev_timestamp <= $timestamp";
+
+        $ret = (int)$this->executeProjectsQuery($sql, [
+            'userId' => $user->getId($project),
+        ])->fetchColumn();
+
+        // Cache and return.
+        return $this->setCache($cacheKey, $ret);
     }
 }

@@ -68,7 +68,7 @@ abstract class Repository
     }
 
     /**
-     * Is XTools connecting to MMF Labs?
+     * Is XTools connecting to WMF Labs?
      * @return boolean
      * @codeCoverageIgnore
      */
