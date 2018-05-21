@@ -6,7 +6,7 @@
 		]
 	},
 	"account-age": "അംഗത്വത്തിന്റെ പ്രായം",
-	"account-age-desc": "{{PLURAL:$2|ഒരു ദിവസം|$2 ദിവസം}} പഴയത്",
+	"account-age-desc": "{{PLURAL:$1|ഒരു ദിവസം|$2 ദിവസം}} പഴയത്",
 	"accounts": "അംഗത്വങ്ങൾ",
 	"accounts-created": "അംഗത്വം സൃഷ്ടിച്ചിരിക്കുന്നു",
 	"actions": "പ്രവൃത്തികൾ",
