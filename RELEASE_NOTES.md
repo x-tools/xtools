@@ -1,5 +1,11 @@
 # Release Notes #
 
+## 3.3.5 ##
+- T190956: Allow browsing through latest global edits.
+- T195000: Fix querying of Wikidata errors.
+- Update link to WikiWho service.
+- Localization updates.
+
 ## 3.3.4 ##
 - T191943: Add support for IPs across all applicable tools.
 - T191942: Fix ArticleInfo bug, unique editors are overcounted.
