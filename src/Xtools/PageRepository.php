@@ -344,12 +344,12 @@ class PageRepository extends Repository
             return [];
         }
 
-        $wikidataId = ltrim($page->getWikidataId(), 'Q');
+        $wikidataId = 'Q'.ltrim($page->getWikidataId(), 'Q');
         $lang = $page->getProject()->getLang();
 
         $sql = "SELECT term_type AS term, term_text
                 FROM wikidatawiki_p.wb_terms
-                WHERE term_entity_id = :wikidataId
+                WHERE term_full_entity_id = :wikidataId
                 AND term_type IN ('label', 'description')
                 AND term_language = :lang";
 
