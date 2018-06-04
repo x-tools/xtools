@@ -3,7 +3,8 @@
 		"authors": [
 			"Liuxinyu970226",
 			"Nemo bis",
-			"Muhebbet"
+			"Muhebbet",
+			"WhitePhosphorus"
 		]
 	},
 	"accepted-formats": "接受的格式",
@@ -359,7 +360,7 @@
 	"tool": "工具",
 	"tool-about": "关于",
 	"tool-adminscore": "管理员分数",
-	"tool-adminscore-desc": "评分表明用户对管理员权限的准备程度",
+	"tool-adminscore-desc": "评分表明用户对管理员权限的投入程度",
 	"tool-adminstats": "管理员状态",
 	"tool-adminstats-desc": "显示管理员操作的统计数据",
 	"tool-articleinfo": "页面历史",
