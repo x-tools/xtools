@@ -38,6 +38,13 @@
                 <td>{{ msg('user-id') }}</td>
                 <td>{{ user.id(project) }}</td>
             </tr>
+            {% set regDate = user.registrationDate(project) %}
+            {% if regDate is not empty %}
+                <tr>
+                    <td>{{ msg('registration-date') }}</td>
+                    <td>{{ regDate|date_format }}</td>
+                </tr>
+            {% endif %}
             <tr>
                 <td><a href="#rights-changes">{{ msg('user-groups') }}</a></td>
                 <td>

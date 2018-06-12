@@ -352,6 +352,8 @@ class ArticleInfoController extends XtoolsController
             'pageviews_offset' => $pageviewsOffset,
         ];
 
+        $info = false;
+
         try {
             $info = $page->getBasicEditingInfo();
         } catch (\Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException $e) {

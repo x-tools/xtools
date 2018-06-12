@@ -31,25 +31,27 @@ class UserRepository extends Repository
     }
 
     /**
-     * Get the user's ID.
+     * Get the user's ID and registration date.
      * @param string $databaseName The database to query.
      * @param string $username The username to find.
-     * @return int
+     * @return array [int ID, string|null registration date].
      */
-    public function getId($databaseName, $username)
+    public function getIdAndRegistration($databaseName, $username)
     {
-        $cacheKey = $this->getCacheKey(func_get_args(), 'user_id');
+        $cacheKey = $this->getCacheKey(func_get_args(), 'user_id_reg');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
         $userTable = $this->getTableName($databaseName, 'user');
-        $sql = "SELECT user_id FROM $userTable WHERE user_name = :username LIMIT 1";
+        $sql = "SELECT user_id AS userId, user_registration AS regDate
+                FROM $userTable
+                WHERE user_name = :username
+                LIMIT 1";
         $resultQuery = $this->executeProjectsQuery($sql, ['username' => $username]);
-        $userId = (int)$resultQuery->fetchColumn();
 
         // Cache and return.
-        return $this->setCache($cacheKey, $userId);
+        return $this->setCache($cacheKey, $resultQuery->fetch());
     }
 
     /**
@@ -82,10 +84,17 @@ class UserRepository extends Repository
      */
     public function getEditCount($databaseName, $username)
     {
+        // Quick cache of edit count, valid on for the same request.
+        static $editCount = null;
+        if ($editCount !== null) {
+            return $editCount;
+        }
+
         $userTable = $this->getTableName($databaseName, 'user');
         $sql = "SELECT user_editcount FROM $userTable WHERE user_name = :username LIMIT 1";
         $resultQuery = $this->executeProjectsQuery($sql, ['username' => $username]);
-        return $resultQuery->fetchColumn();
+        $editCount = $resultQuery->fetchColumn();
+        return $editCount;
     }
 
     /**
