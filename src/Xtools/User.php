@@ -68,7 +68,12 @@ class User extends Model
      */
     public function getId(Project $project)
     {
-        return $this->getRepository()->getId($project->getDatabaseName(), $this->getUsername());
+        $ret = $this->getRepository()->getIdAndRegistration(
+            $project->getDatabaseName(),
+            $this->getUsername()
+        );
+
+        return (int)$ret['userId'];
     }
 
     /**
@@ -78,12 +83,12 @@ class User extends Model
      */
     public function getRegistrationDate(Project $project)
     {
-        $registrationDate = $this->getRepository()->getRegistrationDate(
+        $ret = $this->getRepository()->getIdAndRegistration(
             $project->getDatabaseName(),
             $this->getUsername()
         );
 
-        return DateTime::createFromFormat('YmdHis', $registrationDate);
+        return DateTime::createFromFormat('YmdHis', $ret['regDate']);
     }
 
     /**

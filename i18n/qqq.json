@@ -309,6 +309,7 @@
 	"redirfilter-noredirects": "Form option to exclude any redirect pages from the results.",
 	"redirfilter-onlyredirects": "Form option to show only redirect pages in the results.",
 	"references": "Label for the number of references that are in an article.\n{{Identical|Reference}}",
+	"registration-date": "Label for a user's registration date.",
 	"report-issue": "Link to report an issue or bug with XTools",
 	"reprotect": "Name of the MediaWiki log action 'protect', but describes a value that is only re-protections.\n{{Identical|Reprotect}}",
 	"restore": "Name of a MediaWiki log action, used as header of a row in the table of log action counts for a user\n{{Identical|Restore}}",

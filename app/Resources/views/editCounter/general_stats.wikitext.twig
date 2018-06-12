@@ -12,6 +12,12 @@
 {% if not(user.anon) %}
 | {{ msg('user-id') }}
 | {{ user.id(project) }}
+{% set regDate = user.registrationDate(project) %}
+{% if regDate is not empty %}
+|-
+| {{ msg('registration-date') }}
+| {{ regDate|date_format }}
+{% endif %}
 |-
 | {{ msg('user-groups') }}
 | {% for group in user.groups(project) %}{{ group }}{% if not loop.last %}, {% endif %}{% endfor %}

@@ -24,6 +24,13 @@
             {% set content %}
                 <div class="col-lg-12 stat-list clearfix">
                     <table class="table rights-changes-summary"><tbody>
+                        {% set regDate = user.registrationDate(project) %}
+                        {% if regDate is not empty %}
+                            <tr>
+                                <td>{{ msg('registration-date') }}</td>
+                                <td>{{ regDate|date_format }}</td>
+                            </tr>
+                        {% endif %}
                         {% for state in ['current', 'former'] %}
                             <tr>
                                 <td>{{ msg(state ~ '-user-groups') }}</td>
