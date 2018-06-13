@@ -78,14 +78,31 @@
                 </td>
             </tr>
         {% endif %}
-        <tr>
-            <td>{{ msg('first-edit') }}</td>
-            <td>{% if ec.datetimeFirstRevision %}{{ ec.datetimeFirstRevision|date_format }}{% endif %}</td>
-        </tr>
-        <tr>
-            <td>{{ msg('latest-edit') }}</td>
-            <td>{% if ec.datetimeLastRevision %}{{ ec.datetimeLastRevision|date_format }}{% endif %}</td>
-        </tr>
+        {% if ec.firstAndLatestActions.rev_first is defined %}
+            <tr>
+                <td>{{ msg('first-edit') }}</td>
+                <td>
+                    {% set firstEdit = ec.firstAndLatestActions.rev_first %}
+                    {{ wiki.diffLinkRaw(firstEdit.id, project, firstEdit.timestamp|date_format) }}
+                </td>
+            </tr>
+            <tr>
+                <td>{{ msg('latest-edit') }}</td>
+                <td>
+                    {% set lastEdit = ec.firstAndLatestActions.rev_latest %}
+                    {{ wiki.diffLinkRaw(lastEdit.id, project, lastEdit.timestamp|date_format) }}
+                </td>
+            </tr>
+        {% endif %}
+        {% if ec.firstAndLatestActions.log_latest is defined %}
+            <tr>
+                <td>{{ msg('latest-action') }}</td>
+                <td>
+                    {% set latestAction = ec.firstAndLatestActions.log_latest %}
+                    {{ wiki.pageLinkRaw('Special:Log', project, latestAction.timestamp|date_format, 'logid=' ~ latestAction.id ~ '&type=' ~ latestAction.type) }}
+                </td>
+            </tr>
+        {% endif %}
         <tr>
             <td class="stat-list--new-group">{{ msg('live-edits') }}</td>
             <td class="stat-list--new-group">

@@ -18,7 +18,7 @@ class EditCounterRepository extends UserRightsRepository
      * Get data about revisions, pages, etc.
      * @param Project $project The project.
      * @param User $user The user.
-     * @return string[] With keys: 'deleted', 'live', 'total', 'first', 'last', '24h', '7d', '30d',
+     * @return string[] With keys: 'deleted', 'live', 'total', '24h', '7d', '30d',
      * '365d', 'small', 'large', 'with_comments', and 'minor_edits', ...
      */
     public function getPairData(Project $project, User $user)
@@ -62,14 +62,6 @@ class EditCounterRepository extends UserRightsRepository
             ) UNION (
             SELECT 'minor' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
                 WHERE $revUserClause AND rev_minor_edit = 1
-
-            -- Dates.
-            ) UNION (
-            SELECT 'first' AS `key`, rev_timestamp AS `val` FROM $revisionTable
-                WHERE $revUserClause ORDER BY rev_timestamp ASC LIMIT 1
-            ) UNION (
-            SELECT 'last' AS `key`, rev_timestamp AS `date` FROM $revisionTable
-                WHERE $revUserClause ORDER BY rev_timestamp DESC LIMIT 1
 
             -- Page counts.
             ) UNION (
@@ -186,6 +178,54 @@ class EditCounterRepository extends UserRightsRepository
         // Cache and return.
         $this->stopwatch->stop($cacheKey);
         return $this->setCache($cacheKey, $logCounts);
+    }
+
+    /**
+     * Get the IDs and timestamps of the latest edit and logged action by the given user.
+     * @param Project $project
+     * @param User $user
+     * @return string[] With keys 'rev_first', 'rev_latest', 'log_latest'.
+     */
+    public function getFirstAndLatestActions(Project $project, User $user)
+    {
+        $loggingTable = $project->getTableName('logging', 'userindex');
+        $revisionTable = $project->getTableName('revision');
+
+        $sql = "(
+                    SELECT 'rev_first' AS `key`, rev_id AS `id`,
+                        rev_timestamp AS `timestamp`, NULL as `type`
+                    FROM $revisionTable
+                    WHERE rev_user_text = :username
+                    ORDER BY rev_timestamp ASC LIMIT 1
+                ) UNION (
+                    SELECT 'rev_latest' AS `key`, rev_id AS `id`,
+                        rev_timestamp AS `timestamp`, NULL as `type`
+                    FROM $revisionTable
+                    WHERE rev_user_text = :username
+                    ORDER BY rev_timestamp DESC LIMIT 1
+                ) UNION (
+                    SELECT 'log_latest' AS `key`, log_id AS `id`,
+                        log_timestamp AS `timestamp`, log_type AS `type`
+                    FROM $loggingTable
+                    WHERE log_user_text = :username
+                    ORDER BY log_timestamp DESC LIMIT 1
+                )";
+
+        $username = $user->getUsername();
+        $resultQuery = $this->executeProjectsQuery($sql, [
+            'username' => $username,
+        ]);
+
+        $actions = [];
+        while ($result = $resultQuery->fetch()) {
+            $actions[$result['key']] = [
+                'id' => $result['id'],
+                'timestamp' => $result['timestamp'],
+                'type' => $result['type'],
+            ];
+        }
+
+        return $actions;
     }
 
     /**

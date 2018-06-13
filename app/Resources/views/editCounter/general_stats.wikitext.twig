@@ -20,26 +20,28 @@
 {% endif %}
 |-
 | {{ msg('user-groups') }}
-| {% for group in user.groups(project) %}{{ group }}{% if not loop.last %}, {% endif %}{% endfor %}
+| {% for group in ec.rightsStates.local.current %}{{ ec.rightsNames[group] }}{% if not loop.last %}, {% endif %}{% endfor %}
 
-{% if user.globalGroups(project) %}
+{% if ec.rightsStates.global.current %}
 |-
 | {{ msg('global-user-groups') }}
-| {% for group in user.globalGroups(project) %}{{ group }}{% if not loop.last %}, {% endif %}{% endfor %}
+| {% for group in ec.rightsStates.global.current %}{{ ec.rightsNames[group] }}{% if not loop.last %}, {% endif %}{% endfor %}
 
 {% endif %}
 |-
 | {{ msg('is-admin') }}
 | {% if user.isAdmin(project) %}1{% else %}0{% endif %}
-
 {% endif %}
-|-
-| {{ msg('first-edit') }}
-| {% if ec.datetimeFirstRevision %}{{ ec.datetimeFirstRevision|date_format }}{% endif %}
+{% if ec.firstAndLatestActions.rev_first is defined %}
 
 |-
-| {{ msg('latest-edit') }}
-| {% if ec.datetimeLastRevision %}{{ ec.datetimeLastRevision|date_format }}{% endif %}
+| {{ msg('first-edit') }}{% set firstEdit = ec.firstAndLatestActions.rev_first %}
+
+| [[Special:Diff/{{ firstEdit.id }}|{{ firstEdit.timestamp|date_format }}]]
+|-
+| {{ msg('latest-edit') }}{% set lastEdit = ec.firstAndLatestActions.rev_latest %}
+
+| [[Special:Diff/{{ lastEdit.id }}|{{ lastEdit.timestamp|date_format }}]]{% endif %}
 
 |-
 | {{ msg('live-edits') }}
