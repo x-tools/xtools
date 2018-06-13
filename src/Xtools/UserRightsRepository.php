@@ -173,7 +173,7 @@ class UserRightsRepository extends Repository
                      FROM centralauth_p.global_user_groups";
         }
 
-        $groups = $this->executeProjectsQuery($sql)->fetchAll(\PDO::FETCH_COLUMN, 0);
+        $groups = $this->executeProjectsQuery($sql)->fetchAll(\PDO::FETCH_COLUMN);
 
         // WMF installations have a special 'autoconfirmed' user group.
         if ($this->isLabs()) {

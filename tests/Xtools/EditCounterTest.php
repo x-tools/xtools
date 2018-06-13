@@ -81,45 +81,44 @@ class EditCounterTest extends WebTestCase
     }
 
     /**
-     * A first and last date, and number of days between.
+     * A first and last actions, and number of days between.
      */
-    public function testDates()
+    public function testFirstLastActions()
     {
-        $this->editCounterRepo->expects($this->once())->method('getPairData')->willReturn([
-                'first' => '20170510100000',
-                'last' => '20170515150000',
+        $this->editCounterRepo->expects($this->once())->method('getFirstAndLatestActions')->willReturn([
+                'rev_first' => [
+                    'id' => 123,
+                    'timestamp' => '20170510100000',
+                    'type' => null,
+                ],
+                'rev_latest' => [
+                    'id' => 321,
+                    'timestamp' => '20170515150000',
+                    'type' => null,
+                ],
+                'log_latest' => [
+                    'id' => 456,
+                    'timestamp' => '20170510150000',
+                    'type' => 'thanks',
+                ],
             ]);
         $this->assertEquals(
-            new \DateTime('2017-05-10 10:00'),
-            $this->editCounter->datetimeFirstRevision()
+            [
+                'id' => 123,
+                'timestamp' => '20170510100000',
+                'type' => null,
+            ],
+            $this->editCounter->getFirstAndLatestActions()['rev_first']
         );
         $this->assertEquals(
-            new \DateTime('2017-05-15 15:00'),
-            $this->editCounter->datetimeLastRevision()
+            [
+                'id' => 321,
+                'timestamp' => '20170515150000',
+                'type' => null,
+            ],
+            $this->editCounter->getFirstAndLatestActions()['rev_latest']
         );
         $this->assertEquals(5, $this->editCounter->getDays());
-    }
-
-    /**
-     * Only one edit means the dates will be the same.
-     */
-    public function testDatesWithOneRevision()
-    {
-        $this->editCounterRepo->expects($this->once())
-            ->method('getPairData')
-            ->willReturn([
-                'first' => '20170510110000',
-                'last' => '20170510110000',
-            ]);
-        $this->assertEquals(
-            new \DateTime('2017-05-10 11:00'),
-            $this->editCounter->datetimeFirstRevision()
-        );
-        $this->assertEquals(
-            new \DateTime('2017-05-10 11:00'),
-            $this->editCounter->datetimeLastRevision()
-        );
-        $this->assertEquals(1, $this->editCounter->getDays());
     }
 
     /**

@@ -175,6 +175,7 @@
 	"last-month": "Label for number of edits a user made in the past month. This message should be brief.",
 	"last-week": "Label for number of edits a user made in the past week. This message should be brief.",
 	"last-year": "Label for number of edits a user made in the past year. This message should be brief.",
+	"latest-action": "The latest action a user made as shown in the public logs at Special:Log.",
 	"latest-edit": "Latest edit of a user",
 	"latest-global-edits": "Title for the list of recent edits a user made across all projects.",
 	"latest-global-edits-desc": "Description for the list of recent edits a user made across all projects.",

@@ -157,7 +157,7 @@ class UserRights extends Model
      */
     public function getGlobalRightsStates()
     {
-        return $this->getRightsStates['global'];
+        return $this->getRightsStates()['global'];
     }
 
     /**

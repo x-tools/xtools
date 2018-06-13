@@ -29,8 +29,8 @@ class EditCounter extends UserRights
     /** @var int[] Revision and page counts etc. */
     protected $pairData;
 
-    /** @var string[] The start and end dates of revisions. */
-    protected $revisionDates;
+    /** @var string[] The IDs and timestamps of first/latest edit and logged action. */
+    protected $firstAndLatestActions;
 
     /** @var int[] The total page counts. */
     protected $pageCounts;
@@ -112,6 +112,22 @@ class EditCounter extends UserRights
                 ->getLogCounts($this->project, $this->user);
         }
         return $this->logCounts;
+    }
+
+    /**
+     * Get the IDs and timestamps of the latest edit and logged action.
+     * @return string[] With keys 'rev_first', 'rev_latest', 'log_latest',
+     *   each with 'id' and 'timestamp'.
+     */
+    public function getFirstAndLatestActions()
+    {
+        if (!isset($this->firstAndLatestActions)) {
+            $this->firstAndLatestActions = $this->getRepository()->getFirstAndLatestActions(
+                $this->project,
+                $this->user
+            );
+        }
+        return $this->firstAndLatestActions;
     }
 
     /**
@@ -567,38 +583,25 @@ class EditCounter extends UserRights
     }
 
     /**
-     * Get the date and time of the user's first edit.
-     * @return DateTime|bool The time of the first revision, or false.
-     */
-    public function datetimeFirstRevision()
-    {
-        $revDates = $this->getPairData();
-        return isset($revDates['first']) ? new DateTime($revDates['first']) : false;
-    }
-
-    /**
-     * Get the date and time of the user's first edit.
-     * @return DateTime|bool The time of the last revision, or false.
-     */
-    public function datetimeLastRevision()
-    {
-        $revDates = $this->getPairData();
-        return isset($revDates['last']) ? new DateTime($revDates['last']) : false;
-    }
-
-    /**
      * Get the number of days between the first and last edits.
      * If there's only one edit, this is counted as one day.
      * @return int
      */
     public function getDays()
     {
-        $first = $this->datetimeFirstRevision();
-        $last = $this->datetimeLastRevision();
-        if ($first === false || $last === false) {
+        $first = isset($this->getFirstAndLatestActions()['rev_first']['timestamp'])
+            ? new DateTime($this->getFirstAndLatestActions()['rev_first']['timestamp'])
+            : false;
+        $latest = isset($this->getFirstAndLatestActions()['rev_latest']['timestamp'])
+            ? new DateTime($this->getFirstAndLatestActions()['rev_latest']['timestamp'])
+            : false;
+
+        if ($first === false || $latest === false) {
             return 0;
         }
-        $days = $last->diff($first)->days;
+
+        $days = $latest->diff($first)->days;
+
         return $days > 0 ? $days : 1;
     }
 
