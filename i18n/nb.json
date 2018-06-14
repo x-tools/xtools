@@ -3,7 +3,8 @@
 		"authors": [
 			"Jon Harald Søby",
 			"Nemo bis",
-			"Imre Eilertsen"
+			"Imre Eilertsen",
+			"Citadell"
 		]
 	},
 	"accepted-formats": "Godkjente formater",
@@ -257,6 +258,7 @@
 	"redirfilter-all": "Inkluder både omdirigeringer og vanlige sider",
 	"redirfilter-noredirects": "Utelat omdirigeringer",
 	"redirfilter-onlyredirects": "Inkluder kun omdirigeringer",
+	"registration-date": "Registreringsdato",
 	"report-issue": "Rapporter et problem",
 	"reprotect": "Gjenbeskyttelse",
 	"restore": "Gjenoppretting",

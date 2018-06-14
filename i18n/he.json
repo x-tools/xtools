@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"Nemo bis",
-			"YaronSh"
+			"YaronSh",
+			"Guycn2"
 		]
 	},
 	"accepted-formats": "תבניות מקובלות",
@@ -93,6 +94,7 @@
 	"last-month": "עריכות ב־30 הימים האחרונות",
 	"last-week": "עריכות ב־7 הימים האחרונות",
 	"last-year": "עריכות ב־365 הימים האחרונים",
+	"latest-action": "הפעולה האחרונה ביומן",
 	"latest-edit": "עריכה אחרונה",
 	"limit": "מגבלה",
 	"links": "קישורים",
@@ -164,6 +166,7 @@
 	"redirfilter-noredirects": "לא לכלול הפניות",
 	"redirfilter-onlyredirects": "לכלול רק הפניות",
 	"references": "מקורות",
+	"registration-date": "תאריך הרשמה",
 	"report-issue": "דיווח בעיה",
 	"restore": "שחזור מחיקה",
 	"result": "תוצאה",
