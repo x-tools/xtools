@@ -1,5 +1,12 @@
 # Release Notes #
 
+## 3.3.6 ##
+- T189286: Show time of autoconfirmed promotion in Edit Counter.
+- T197005: Show latest logged action in Edit Counter, and link to
+  the log entry. Also link to first/latest edits.
+- Show registration date in the Edit Counter.
+- Localization updates.
+
 ## 3.3.5 ##
 - T190956: Allow browsing through latest global edits.
 - T195000: Fix querying of Wikidata errors.
