@@ -242,7 +242,7 @@
 	"num-minutes": "{{PLURAL:$1|分|分}}",
 	"num-months": "{{PLURAL:$1|月|月}}",
 	"num-moves": "{{PLURAL:$1|移動|移動}}",
-	"num-namespaces": "{{PLURAL:$1|命名空間|命名空間}}",
+	"num-namespaces": "{{PLURAL:$1|命名空間}}",
 	"num-others": "{{PLURAL:$1|其它|其它}}",
 	"num-pageviews": "{{PLURAL:$1|頁面瀏覽數|頁面瀏覽數}}",
 	"num-protections": "{{PLURAL:$1|保護|保護}}",

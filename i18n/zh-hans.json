@@ -176,6 +176,7 @@
 	"last-month": "最近30天编辑数",
 	"last-week": "最近7天编辑数",
 	"last-year": "最近365天编辑数",
+	"latest-action": "最新载入日志的操作",
 	"latest-edit": "最新编辑",
 	"latest-global-edits": "最新全域编辑",
 	"latest-global-edits-desc": "该用户最经常编辑的10个项目中，过去一个月以来的最新编辑",
