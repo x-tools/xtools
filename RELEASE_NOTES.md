@@ -1,5 +1,11 @@
 # Release Notes #
 
+## 3.3.7 ##
+- ArticleInfo: Include assessment in API endpoint.
+- ArticleInfo: Show assessment in gadget, if available.
+- ArticleInfo: Add 'links' API endpoint.
+- Localization updates.
+
 ## 3.3.6 ##
 - T189286: Show time of autoconfirmed promotion in Edit Counter.
 - T197005: Show latest logged action in Edit Counter, and link to
