@@ -18,6 +18,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Xtools\ArticleInfo;
 use Xtools\ArticleInfoRepository;
 use Xtools\Page;
+use Xtools\PageAssessments;
 use Xtools\Project;
 use Xtools\ProjectRepository;
 
@@ -372,6 +373,10 @@ class ArticleInfoController extends XtoolsController
             $modifiedDateTime = DateTime::createFromFormat('YmdHis', $info['modified_at']);
             $secsSinceLastEdit = (new DateTime)->getTimestamp() - $modifiedDateTime->getTimestamp();
 
+            $assessment = $page->getProject()
+                ->getPageAssessments()
+                ->getAssessment($page);
+
             $data = array_merge($data, [
                 'revisions' => (int) $info['num_edits'],
                 'editors' => (int) $info['num_editors'],
@@ -382,6 +387,7 @@ class ArticleInfoController extends XtoolsController
                 'modified_at' => $modifiedDateTime->format('Y-m-d H:i'),
                 'secs_since_last_edit' => $secsSinceLastEdit,
                 'last_edit_id' => (int) $info['modified_rev_id'],
+                'assessment' => $assessment,
             ]);
         }
 

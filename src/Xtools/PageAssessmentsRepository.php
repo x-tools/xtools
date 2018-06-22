@@ -31,9 +31,10 @@ class PageAssessmentsRepository extends Repository
     /**
      * Get assessment data for the given pages
      * @param Page $page
+     * @param bool $first Fetch only the first result, not for each WikiProject.
      * @return string[] Assessment data as retrieved from the database.
      */
-    public function getAssessments(Page $page)
+    public function getAssessments(Page $page, $first = false)
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'page_assessments');
         if ($this->cache->hasItem($cacheKey)) {
@@ -48,6 +49,10 @@ class PageAssessmentsRepository extends Repository
                 FROM $paTable
                 LEFT JOIN $papTable ON pa_project_id = pap_project_id
                 WHERE pa_page_id = $pageId";
+
+        if ($first) {
+            $sql .= "\nLIMIT 1";
+        }
 
         $result = $this->executeProjectsQuery($sql)->fetchAll();
 
