@@ -40,6 +40,23 @@ Get prose statistics of `Albert Einstein <https://en.wikipedia.org/wiki/Albert_E
 
     https://xtools.wmflabs.org/api/page/prose/en.wikipedia.org/Albert_Einstein
 
+Links
+=====
+``GET /api/page/links/{project}/{article}``
+
+Get the number of in and outgoing links and redirects to the given page.
+
+**Parameters:**
+
+* ``project`` (**required**) - Project domain or database name.
+* ``article`` (**required**) - Full page title.
+
+**Example:**
+
+Get links statistics of `Albert Einstein <https://en.wikipedia.org/wiki/Albert_Einstein>`_.
+
+    https://xtools.wmflabs.org/api/page/links/en.wikipedia.org/Albert_Einstein
+
 Assessments
 ===========
 ``GET /api/page/assessments/{project}/{articles}``

@@ -191,7 +191,7 @@ abstract class XtoolsController extends Controller
      * @param  string $pageTitle
      * @return Page|RedirectResponse Page or redirect back to index if page doesn't exist.
      */
-    public function getAndValidatePage($project, $pageTitle)
+    public function getAndValidatePage(Project $project, $pageTitle)
     {
         $page = new Page($project, $pageTitle);
         $pageRepo = new PageRepository();
