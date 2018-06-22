@@ -35,13 +35,14 @@ class EditCounterController extends XtoolsController
     protected $editCounter;
 
     /**
-     * Get the tool's shortname.
+     * Get the name of the tool's index route.
+     * This is also the name of the associated model.
      * @return string
      * @codeCoverageIgnore
      */
-    public function getToolShortname()
+    public function getIndexRoute()
     {
-        return 'ec';
+        return 'EditCounter';
     }
 
     /**
@@ -51,6 +52,7 @@ class EditCounterController extends XtoolsController
      * @param string $key API key, as given in the reuqest. Omit this for actions
      *   that are public (only /api/ec actions should pass this in).
      * @return null|RedirectResponse
+     * @codeCoverageIgnore
      */
     protected function setUpEditCounter(Request $request, $key = null)
     {
@@ -76,17 +78,17 @@ class EditCounterController extends XtoolsController
         // Instantiate EditCounter.
         $editCounterRepo = new EditCounterRepository();
         $editCounterRepo->setContainer($this->container);
-        $this->editCounter = new EditCounter($this->project, $this->user);
-        $this->editCounter->setRepository($editCounterRepo);
-        $this->editCounter->setI18nHelper(
+        $this->editCounter = new EditCounter(
+            $this->project,
+            $this->user,
             $this->container->get('app.i18n_helper')
         );
+        $this->editCounter->setRepository($editCounterRepo);
     }
 
     /**
      * The initial GET request that displays the search form.
      *
-     * @Route("/ec", name="ec")
      * @Route("/ec", name="EditCounter")
      * @Route("/ec/", name="EditCounterSlash")
      * @Route("/ec/index.php", name="EditCounterIndexPhp")
@@ -108,9 +110,9 @@ class EditCounterController extends XtoolsController
 
         // Otherwise fall through.
         return $this->render('editCounter/index.html.twig', [
-            'xtPageTitle' => 'tool-ec',
-            'xtSubtitle' => 'tool-ec-desc',
-            'xtPage' => 'ec',
+            'xtPageTitle' => 'tool-editcounter',
+            'xtSubtitle' => 'tool-editcounter-desc',
+            'xtPage' => 'editcounter',
             'project' => $params['project'],
         ]);
     }
@@ -131,16 +133,9 @@ class EditCounterController extends XtoolsController
             return $ret;
         }
 
-        // Asynchronously collect some of the data that will be shown.
-        // If multithreading is turned off, the normal getters in the views will
-        // collect the necessary data synchronously.
-        if ($this->container->getParameter('app.multithread')) {
-            $this->editCounter->prepareData($this->container);
-        }
-
         $ret = [
             'xtTitle' => $this->user->getUsername() . ' - ' . $this->project->getTitle(),
-            'xtPage' => 'ec',
+            'xtPage' => 'editcounter',
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
@@ -172,7 +167,7 @@ class EditCounterController extends XtoolsController
         $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
         $ret = [
             'xtTitle' => $this->user->getUsername(),
-            'xtPage' => 'ec',
+            'xtPage' => 'editcounter',
             'is_sub_request' => $isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
@@ -200,7 +195,7 @@ class EditCounterController extends XtoolsController
         $isSubRequest = $this->get('request_stack')->getParentRequest() !== null;
         $ret = [
             'xtTitle' => $this->user->getUsername(),
-            'xtPage' => 'ec',
+            'xtPage' => 'editcounter',
             'is_sub_request' => $isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
@@ -232,7 +227,7 @@ class EditCounterController extends XtoolsController
 
         $ret = [
             'xtTitle' => $this->user->getUsername(),
-            'xtPage' => 'ec',
+            'xtPage' => 'editcounter',
             'is_sub_request' => $isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
@@ -261,7 +256,7 @@ class EditCounterController extends XtoolsController
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         $ret = [
             'xtTitle' => $this->user->getUsername(),
-            'xtPage' => 'ec',
+            'xtPage' => 'editcounter',
             'is_sub_request' => $isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
@@ -292,7 +287,7 @@ class EditCounterController extends XtoolsController
             ->getPage($this->project, $this->project->userOptInPage($this->user));
         $ret = [
             'xtTitle' => $this->user->getUsername(),
-            'xtPage' => 'ec',
+            'xtPage' => 'editcounter',
             'is_sub_request' => $isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
@@ -321,7 +316,7 @@ class EditCounterController extends XtoolsController
         $isSubRequest = $this->container->get('request_stack')->getParentRequest() !== null;
         $ret = [
             'xtTitle' => $this->user->getUsername(),
-            'xtPage' => 'ec',
+            'xtPage' => 'editcounter',
             'is_sub_request' => $isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
@@ -338,7 +333,18 @@ class EditCounterController extends XtoolsController
 
     /**
      * Display the latest global edits section.
-     * @Route("/ec-latestglobal/{project}/{username}", name="EditCounterLatestGlobal")
+     * @Route(
+     *     "/ec-latestglobal-contributions/{project}/{username}/{offset}",
+     *     name="EditCounterLatestGlobalContribs",
+     *     requirements={"offset" = "|\d*"},
+     *     defaults={"offset" = 0}
+     * )
+     * @Route(
+     *     "/ec-latestglobal/{project}/{username}/{offset}",
+     *     name="EditCounterLatestGlobal",
+     *     requirements={"offset" = "|\d*"},
+     *     defaults={"offset" = 0}
+     * ),
      * @param Request $request The HTTP request.
      * @return Response
      * @codeCoverageIgnore
@@ -354,11 +360,13 @@ class EditCounterController extends XtoolsController
                         || $this->container->get('request_stack')->getParentRequest() !== null;
         return $this->render('editCounter/latest_global.html.twig', [
             'xtTitle' => $this->user->getUsername(),
-            'xtPage' => 'ec',
+            'xtPage' => 'editcounter',
             'is_sub_request' => $isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
+            'offset' => $request->get('offset'),
+            'pageSize' => $request->get('pagesize'),
         ]);
     }
 

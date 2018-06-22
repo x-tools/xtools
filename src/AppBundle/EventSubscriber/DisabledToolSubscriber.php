@@ -12,7 +12,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * A DisabledToolSubscriber checks to see
+ * A DisabledToolSubscriber checks to see if the current tool is disabled
+ * and will throw an exception accordingly.
  */
 class DisabledToolSubscriber implements EventSubscriberInterface
 {
@@ -48,8 +49,8 @@ class DisabledToolSubscriber implements EventSubscriberInterface
     public function onKernelController(FilterControllerEvent $event)
     {
         $controller = $event->getController();
-        if (method_exists($controller[0], 'getToolShortname')) {
-            $tool = $controller[0]->getToolShortname();
+        if (method_exists($controller[0], 'getIndexRoute')) {
+            $tool = strtolower($controller[0]->getIndexRoute());
             if (!$this->container->getParameter("enable.$tool")) {
                 throw new NotFoundHttpException('This tool is disabled');
             }

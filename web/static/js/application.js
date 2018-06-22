@@ -1,5 +1,5 @@
 (function () {
-    var $tocClone, tocHeight, sectionOffset = {}, apiPath, lastProject;
+    var $tocClone, tocHeight, sectionOffset = {}, apiPath, lastProject, editOffset;
 
     /** global: i18nLang */
     /** global: i18nPaths */
@@ -87,12 +87,11 @@
      *         });
      *     </script>
      *
-     * @param  {Object}   dataSource     Object of data that makes up the chart
-     * @param  {Chart}    chartObj       Reference to the pie chart associated with the .toggle-table
-     * @param  {String}   [valueKey]     The name of the key within entries of dataSource,
-     *                                   where the value is what's shown in the chart.
-     *                                   If omitted or null, `dataSource` is assumed to be of the structure:
-     *                                   { 'a' => 123, 'b' => 456 }
+     * @param  {Object}      dataSource  Object of data that makes up the chart
+     * @param  {Chart}       chartObj    Reference to the pie chart associated with the .toggle-table
+     * @param  {String|null} [valueKey]  The name of the key within entries of dataSource, where the value is
+     *                                   what's shown in the chart. If omitted or null, `dataSource` is assumed
+     *                                   to be of the structure: { 'a' => 123, 'b' => 456 }
      * @param  {Function} updateCallback Callback to update the .toggle-table totals. `toggleTableData`
      *                                   is passed in which contains the new data, you just need to
      *                                   format it (maybe need to use i18n, update multiple cells, etc.).
@@ -114,7 +113,9 @@
             // must use .attr instead of .prop as sorting script will clone DOM elements
             if ($(this).attr('data-disabled') === 'true') {
                 toggleTableData[key] = dataSource[key];
-                var oldValue = parseInt(valueKey ? toggleTableData[key][valueKey] : toggleTableData[key], 10);
+                var oldValue = (
+                    parseInt(valueKey ? toggleTableData[key][valueKey] : toggleTableData[key], 10)
+                );
                 chartObj.data.datasets[0].data[index] = oldValue;
                 $(this).attr('data-disabled', 'false');
             } else {
@@ -201,13 +202,13 @@
 
             sortColumn = $(this).data('column');
             var $table = $(this).parents('table');
-            var entries = $table.find('.sort-entry--' + sortColumn).parent();
+            var $entries = $table.find('.sort-entry--' + sortColumn).parent();
 
-            if (!entries.length) {
+            if (!$entries.length) {
                 return;
             }
 
-            entries.sort(function (a, b) {
+            $entries.sort(function (a, b) {
                 var before = $(a).find('.sort-entry--' + sortColumn).data('value'),
                     after = $(b).find('.sort-entry--' + sortColumn).data('value');
 
@@ -226,7 +227,14 @@
                 }
             });
 
-            $table.find('tbody').html($(entries));
+            // Re-fill the rank column, if applicable.
+            if ($('.sort-entry--rank').length > 0) {
+                $.each($entries, function (index, entry) {
+                    $(entry).find('.sort-entry--rank').text(index + 1);
+                });
+            }
+
+            $table.find('tbody').html($entries);
         });
     }
 
@@ -640,4 +648,76 @@
         }
     }
 
+    /**
+     * Set the initial offset for contributions lists, based on what was
+     * supplied in the contributions container.
+     */
+    function setInitialEditOffset()
+    {
+        if (editOffset === undefined) {
+            editOffset = parseInt($('.contributions-container').data('offset'), 10);
+        }
+    }
+
+    /**
+     * Loads configured type of contributions from the server and lists them in the DOM.
+     * The navigation aids and showing/hiding of loading text is also handled here.
+     * @param {function} endpointFunc The callback that takes the params set on .contributions-container
+     *     and returns a string that is the endpoint to fetch from (without the offset appended).
+     * @param {String} apiTitle The name of the API (could be i18n key), used in error reporting.
+     */
+    window.loadContributions = function (endpointFunc, apiTitle) {
+        setInitialEditOffset();
+
+        $('.contributions-loading').show();
+        $('.contributions-container').hide();
+
+        var params = $('.contributions-container').data(),
+            endpoint = endpointFunc(params),
+            pageSize = parseInt(params.pagesize, 10) || 50;
+
+        /** global: xtBaseUrl */
+        $.ajax({
+            url: xtBaseUrl + endpoint + '/' + editOffset +
+                // Make sure to include any URL parameters, such as tool=Huggle (for AutoEdits).
+                '?htmlonly=yes&pagesize=' + pageSize + '&' + window.location.search.replace(/^\?/, ''),
+            timeout: 30000
+        }).done(function (data) {
+            $('.contributions-container').html(data).show();
+            $('.contributions-loading').hide();
+            setupContributionsNavListeners(endpointFunc, apiTitle, pageSize);
+
+            if (editOffset > 0) {
+                $('.contributions--prev').show();
+            }
+            if ($('.contributions-table tbody tr').length < pageSize) {
+                $('.next-edits').hide();
+            }
+        }).fail(function (_xhr, _status, message) {
+            $('.contributions-loading').hide();
+            $('.contributions-container').html(
+                $.i18n('api-error', $.i18n(apiTitle) + ' API: <code>' + message + '</code>')
+            ).show();
+        });
+    }
+
+    /**
+     * Set up listeners for navigating contribution lists.
+     */
+    window.setupContributionsNavListeners = function (endpointFunc, apiTitle, pageSize) {
+        pageSize = pageSize || 50; // Assume 50 entries per page unless specified.
+        setInitialEditOffset();
+
+        $('.contributions--prev').one('click', function (e) {
+            e.preventDefault();
+            editOffset -= pageSize;
+            loadContributions(endpointFunc, apiTitle)
+        });
+
+        $('.contributions--next').one('click', function (e) {
+            e.preventDefault();
+            editOffset += pageSize;
+            loadContributions(endpointFunc, apiTitle);
+        });
+    }
 })();

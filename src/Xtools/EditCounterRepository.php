@@ -12,13 +12,13 @@ use Mediawiki\Api\SimpleRequest;
  * databases and API. It doesn't do any post-processing of that information.
  * @codeCoverageIgnore
  */
-class EditCounterRepository extends Repository
+class EditCounterRepository extends UserRightsRepository
 {
     /**
      * Get data about revisions, pages, etc.
      * @param Project $project The project.
      * @param User $user The user.
-     * @return string[] With keys: 'deleted', 'live', 'total', 'first', 'last', '24h', '7d', '30d',
+     * @return string[] With keys: 'deleted', 'live', 'total', '24h', '7d', '30d',
      * '365d', 'small', 'large', 'with_comments', and 'minor_edits', ...
      */
     public function getPairData(Project $project, User $user)
@@ -32,61 +32,60 @@ class EditCounterRepository extends Repository
         // Prepare the queries and execute them.
         $archiveTable = $this->getTableName($project->getDatabaseName(), 'archive');
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+
+        // For IPs we use rev_user_text, and for accounts rev_user which is slightly faster.
+        $revUserClause = $user->isAnon() ? 'rev_user_text = :username' : 'rev_user = :userId';
+        $arUserClause = $user->isAnon() ? 'ar_user_text = :username' : 'ar_user = :userId';
+
         $sql = "
             -- Revision counts.
             (SELECT 'deleted' AS `key`, COUNT(ar_id) AS val FROM $archiveTable
-                WHERE ar_user = :userId
+                WHERE $arUserClause
             ) UNION (
             SELECT 'live' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_user = :userId
+                WHERE $revUserClause
             ) UNION (
             SELECT 'day' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 DAY)
+                WHERE $revUserClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 DAY)
             ) UNION (
             SELECT 'week' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 WEEK)
+                WHERE $revUserClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 WEEK)
             ) UNION (
             SELECT 'month' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
+                WHERE $revUserClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
             ) UNION (
             SELECT 'year' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_user = :userId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+                WHERE $revUserClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
             ) UNION (
             SELECT 'with_comments' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_user = :userId AND rev_comment != ''
+                WHERE $revUserClause AND rev_comment != ''
             ) UNION (
             SELECT 'minor' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_user = :userId AND rev_minor_edit = 1
-
-            -- Dates.
-            ) UNION (
-            SELECT 'first' AS `key`, rev_timestamp AS `val` FROM $revisionTable
-                WHERE rev_user = :userId ORDER BY rev_timestamp ASC LIMIT 1
-            ) UNION (
-            SELECT 'last' AS `key`, rev_timestamp AS `date` FROM $revisionTable
-                WHERE rev_user = :userId ORDER BY rev_timestamp DESC LIMIT 1
+                WHERE $revUserClause AND rev_minor_edit = 1
 
             -- Page counts.
             ) UNION (
             SELECT 'edited-live' AS `key`, COUNT(DISTINCT rev_page) AS `val`
                 FROM $revisionTable
-                WHERE rev_user = :userId
+                WHERE $revUserClause
             ) UNION (
             SELECT 'edited-deleted' AS `key`, COUNT(DISTINCT ar_page_id) AS `val`
                 FROM $archiveTable
-                WHERE ar_user = :userId
+                WHERE $arUserClause
             ) UNION (
             SELECT 'created-live' AS `key`, COUNT(DISTINCT rev_page) AS `val`
                 FROM $revisionTable
-                WHERE rev_user = :userId AND rev_parent_id = 0
+                WHERE $revUserClause AND rev_parent_id = 0
             ) UNION (
             SELECT 'created-deleted' AS `key`, COUNT(DISTINCT ar_page_id) AS `val`
                 FROM $archiveTable
-                WHERE ar_user = :userId AND ar_parent_id = 0
+                WHERE $arUserClause AND ar_parent_id = 0
             )
         ";
 
-        $resultQuery = $this->executeProjectsQuery($sql, ['userId' => $user->getId($project)]);
+        $params = $user->isAnon() ? ['username' => $user->getUsername()] : ['userId' => $user->getId($project)];
+        $resultQuery = $this->executeProjectsQuery($sql, $params);
+
         $revisionCounts = [];
         while ($result = $resultQuery->fetch()) {
             $revisionCounts[$result['key']] = $result['val'];
@@ -116,12 +115,12 @@ class EditCounterRepository extends Repository
         $sql = "
         (SELECT CONCAT(log_type, '-', log_action) AS source, COUNT(log_id) AS value
             FROM $loggingTable
-            WHERE log_user = :userId
+            WHERE log_user_text = :username
             GROUP BY log_type, log_action
         )";
 
         $results = $this->executeProjectsQuery($sql, [
-            'userId' => $user->getId($project)
+            'username' => $user->getUsername(),
         ])->fetchAll();
 
         $logCounts = array_combine(
@@ -182,6 +181,54 @@ class EditCounterRepository extends Repository
     }
 
     /**
+     * Get the IDs and timestamps of the latest edit and logged action by the given user.
+     * @param Project $project
+     * @param User $user
+     * @return string[] With keys 'rev_first', 'rev_latest', 'log_latest'.
+     */
+    public function getFirstAndLatestActions(Project $project, User $user)
+    {
+        $loggingTable = $project->getTableName('logging', 'userindex');
+        $revisionTable = $project->getTableName('revision');
+
+        $sql = "(
+                    SELECT 'rev_first' AS `key`, rev_id AS `id`,
+                        rev_timestamp AS `timestamp`, NULL as `type`
+                    FROM $revisionTable
+                    WHERE rev_user_text = :username
+                    ORDER BY rev_timestamp ASC LIMIT 1
+                ) UNION (
+                    SELECT 'rev_latest' AS `key`, rev_id AS `id`,
+                        rev_timestamp AS `timestamp`, NULL as `type`
+                    FROM $revisionTable
+                    WHERE rev_user_text = :username
+                    ORDER BY rev_timestamp DESC LIMIT 1
+                ) UNION (
+                    SELECT 'log_latest' AS `key`, log_id AS `id`,
+                        log_timestamp AS `timestamp`, log_type AS `type`
+                    FROM $loggingTable
+                    WHERE log_user_text = :username
+                    ORDER BY log_timestamp DESC LIMIT 1
+                )";
+
+        $username = $user->getUsername();
+        $resultQuery = $this->executeProjectsQuery($sql, [
+            'username' => $username,
+        ]);
+
+        $actions = [];
+        while ($result = $resultQuery->fetch()) {
+            $actions[$result['key']] = [
+                'id' => $result['id'],
+                'timestamp' => $result['timestamp'],
+                'type' => $result['type'],
+            ];
+        }
+
+        return $actions;
+    }
+
+    /**
      * Get data for all blocks set on the given user.
      * @param Project $project
      * @param User $user
@@ -198,88 +245,6 @@ class EditCounterRepository extends Repository
                 AND log_namespace = 2
                 ORDER BY log_timestamp ASC";
         $username = str_replace(' ', '_', $user->getUsername());
-
-        return $this->executeProjectsQuery($sql, [
-            'username' => $username
-        ])->fetchAll();
-    }
-
-    /**
-     * Get user rights changes of the given user, including those made on Meta.
-     * @param Project $project
-     * @param User $user
-     * @return array
-     */
-    public function getRightsChanges(Project $project, User $user)
-    {
-        $changes = $this->queryRightsChanges($project, $user);
-
-        if ((bool)$this->container->hasParameter('app.is_labs')) {
-            $changes = array_merge(
-                $changes,
-                $this->queryRightsChanges($project, $user, 'meta')
-            );
-        }
-
-        return $changes;
-    }
-
-    /**
-     * Get global user rights changes of the given user.
-     * @param Project $project Global rights are always on Meta, so this
-     *     Project instance is re-used if it is already Meta, otherwise
-     *     a new Project instance is created.
-     * @param User $user
-     * @return array
-     */
-    public function getGlobalRightsChanges(Project $project, User $user)
-    {
-        return $this->queryRightsChanges($project, $user, 'global');
-    }
-
-    /**
-     * User rights changes for given project, optionally fetched from Meta.
-     * @param Project $project Global rights and Meta-changed rights will
-     *     automatically use the Meta Project. This Project instance is re-used
-     *     if it is already Meta, otherwise a new Project instance is created.
-     * @param User $user
-     * @param string $type One of 'local' - query the local rights log,
-     *     'meta' - query for username@dbname for local rights changes made on Meta, or
-     *     'global' - query for global rights changes.
-     * @return array
-     */
-    private function queryRightsChanges(Project $project, User $user, $type = 'local')
-    {
-        $dbName = $project->getDatabaseName();
-
-        // Global rights and Meta-changed rights should use a Meta Project.
-        if ($type !== 'local') {
-            $dbName = 'metawiki';
-        }
-
-        $loggingTable = $this->getTableName($dbName, 'logging', 'logindex');
-        $userTable = $this->getTableName($dbName, 'user');
-        $username = str_replace(' ', '_', $user->getUsername());
-
-        if ($type === 'meta') {
-            // Reference the original Project.
-            $username = $username.'@'.$project->getDatabaseName();
-        }
-
-        $logType = $type == 'global' ? 'gblrights' : 'rights';
-
-        $sql = "SELECT log_id, log_timestamp, log_comment, log_params, log_action,
-                    IF(log_user_text != '', log_user_text, (
-                        SELECT user_name
-                        FROM $userTable
-                        WHERE user_id = log_user
-                    )) AS log_user_text,
-                    '$type' AS type
-                FROM $loggingTable
-                WHERE log_type = '$logType'
-                AND log_namespace = 2
-                AND log_title = :username
-                ORDER BY log_timestamp DESC";
 
         return $this->executeProjectsQuery($sql, [
             'username' => $username
@@ -326,6 +291,10 @@ class EditCounterRepository extends Repository
      */
     protected function globalEditCountsFromCentralAuth(User $user, Project $project)
     {
+        if ($user->isAnon() === true) {
+            return false;
+        }
+
         // Set up cache and stopwatch.
         $cacheKey = $this->getCacheKey(func_get_args(), 'ec_globaleditcounts');
         if ($this->cache->hasItem($cacheKey)) {
@@ -372,7 +341,6 @@ class EditCounterRepository extends Repository
     protected function globalEditCountsFromDatabases(User $user, Project $project)
     {
         $this->log->debug(__METHOD__." Getting global edit counts for ".$user->getUsername());
-        $stopwatchName = 'globalRevisionCounts.'.$user->getUsername();
         $allProjects = $project->getRepository()->getAll();
         $topEditCounts = [];
         foreach ($allProjects as $projectMeta) {
@@ -387,7 +355,6 @@ class EditCounterRepository extends Repository
                 'dbName' => $projectMeta['dbName'],
                 'total' => $total,
             ];
-            $this->stopwatch->lap($stopwatchName);
         }
         return $topEditCounts;
     }
@@ -409,15 +376,15 @@ class EditCounterRepository extends Repository
 
         // Query.
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+        $revUserClause = $user->isAnon() ? 'r.rev_user_text = :username' : 'r.rev_user = :userId';
         $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
         $sql = "SELECT page_namespace, COUNT(rev_id) AS total
             FROM $pageTable p JOIN $revisionTable r ON (r.rev_page = p.page_id)
-            WHERE r.rev_user = :id
+            WHERE $revUserClause
             GROUP BY page_namespace";
 
-        $results = $this->executeProjectsQuery($sql, [
-            'id' => $user->getId($project),
-        ])->fetchAll();
+        $params = $user->isAnon() ? ['username' => $user->getUsername()] : ['userId' => $user->getId($project)];
+        $results = $this->executeProjectsQuery($sql, $params)->fetchAll();
 
         $namespaceTotals = array_combine(array_map(function ($e) {
             return $e['page_namespace'];
@@ -434,13 +401,14 @@ class EditCounterRepository extends Repository
      * Get revisions by this user.
      * @param Project[] $projects The projects.
      * @param User $user The user.
-     * @param int $lim The maximum number of revisions to fetch from each project.
+     * @param int $limit The maximum number of revisions to fetch from each project.
+     * @param int $offset Offset results by this number of rows.
      * @return array|mixed
      */
-    public function getRevisions($projects, User $user, $lim = 40)
+    public function getRevisions(array $projects, User $user, $limit = 30, $offset = 0)
     {
         // Check cache.
-        $cacheKey = $this->getCacheKey('ec_globalcontribs.'.$user->getCacheKey().'.'.$lim);
+        $cacheKey = $this->getCacheKey('ec_globalcontribs.'.$user->getCacheKey().'.'.$limit.'.'.$offset);
         $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
@@ -470,12 +438,13 @@ class EditCounterRepository extends Repository
                     LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                 WHERE revs.rev_user_text = :username
                 ORDER BY revs.rev_timestamp DESC";
-            if (is_numeric($lim)) {
-                $sql .= " LIMIT $lim";
-            }
             $queries[] = $sql;
         }
-        $sql = "(\n" . join("\n) UNION (\n", $queries) . ")\n";
+        $sql = "SELECT * FROM ((\n" . join("\n) UNION (\n", $queries) . ")) a ORDER BY timestamp DESC LIMIT $limit";
+
+        if (is_numeric($offset)) {
+            $sql .= " OFFSET $offset";
+        }
 
         $revisions = $this->executeProjectsQuery($sql, [
             'username' => $user->getUsername(),
@@ -582,6 +551,7 @@ class EditCounterRepository extends Repository
 
         // Prepare the queries and execute them.
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+        $revUserClause = $user->isAnon() ? 'revs.rev_user_text = :username' : 'revs.rev_user = :userId';
         $sql = "SELECT AVG(sizes.size) AS average_size,
                 COUNT(CASE WHEN sizes.size < 20 THEN 1 END) AS small_edits,
                 COUNT(CASE WHEN sizes.size > 1000 THEN 1 END) AS large_edits
@@ -589,14 +559,13 @@ class EditCounterRepository extends Repository
                     SELECT (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS size
                     FROM $revisionTable AS revs
                     LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-                    WHERE revs.rev_user = :userId
+                    WHERE $revUserClause
                     ORDER BY revs.rev_timestamp DESC
                     LIMIT 5000
                 ) sizes";
 
-        $results = $this->executeProjectsQuery($sql, [
-            'userId' => $user->getId($project),
-        ])->fetch();
+        $params = $user->isAnon() ? ['username' => $user->getUsername()] : ['userId' => $user->getId($project)];
+        $results = $this->executeProjectsQuery($sql, $params)->fetch();
 
         // Cache and return.
         $this->stopwatch->stop($cacheKey);

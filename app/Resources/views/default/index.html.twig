@@ -9,9 +9,9 @@
         {% for tool in tools() %}
             {% if enabled(tool) %}
                 <a class="btn btn-default" href="{{ path(tool) }}">
-                    <span class="tool-name">{{ msg("tool-" ~ tool) }}</span>
+                    <span class="tool-name">{{ msg("tool-" ~ tool|lower) }}</span>
                     &mdash;
-                    {{ msg("tool-" ~ tool ~ "-desc") }}
+                    {{ msg("tool-" ~ tool|lower ~ "-desc") }}
                 </a>
             {% endif %}
         {% endfor %}

@@ -33,6 +33,11 @@ class User extends Model
     public function __construct($username)
     {
         $this->username = ucfirst(str_replace('_', ' ', trim($username)));
+
+        // IPv6 address are stored as uppercased in the database.
+        if ($this->isAnon()) {
+            $this->username = strtoupper($this->username);
+        }
     }
 
     /**
@@ -63,7 +68,12 @@ class User extends Model
      */
     public function getId(Project $project)
     {
-        return $this->getRepository()->getId($project->getDatabaseName(), $this->getUsername());
+        $ret = $this->getRepository()->getIdAndRegistration(
+            $project->getDatabaseName(),
+            $this->getUsername()
+        );
+
+        return (int)$ret['userId'];
     }
 
     /**
@@ -73,12 +83,32 @@ class User extends Model
      */
     public function getRegistrationDate(Project $project)
     {
-        $registrationDate = $this->getRepository()->getRegistrationDate(
+        $ret = $this->getRepository()->getIdAndRegistration(
             $project->getDatabaseName(),
             $this->getUsername()
         );
 
-        return DateTime::createFromFormat('YmdHis', $registrationDate);
+        return DateTime::createFromFormat('YmdHis', $ret['regDate']);
+    }
+
+    /**
+     * Get a user's local user rights on the given Project.
+     * @param  Project $project
+     * @return string[]
+     */
+    public function getUserRights(Project $project)
+    {
+        return $this->getRepository()->getUserRights($project, $this);
+    }
+
+    /**
+     * Get a list of this user's global rights.
+     * @param Project $project A project to query; if not provided, the default will be used.
+     * @return string[]
+     */
+    public function getGlobalUserRights(Project $project = null)
+    {
+        return $this->getRepository()->getGlobalUserRights($this->getUsername(), $project);
     }
 
     /**
@@ -111,28 +141,6 @@ class User extends Model
     }
 
     /**
-     * Get a list of this user's groups on the given project.
-     * @param Project $project The project.
-     * @return string[]
-     */
-    public function getGroups(Project $project)
-    {
-        $groupsData = $this->getRepository()->getGroups($project, $this->getUsername());
-        $groups = preg_grep('/\*/', $groupsData, PREG_GREP_INVERT);
-        sort($groups);
-        return $groups;
-    }
-
-    /**
-     * Get a list of this user's groups on all projects.
-     * @param Project $project A project to query; if not provided, the default will be used.
-     */
-    public function getGlobalGroups(Project $project = null)
-    {
-        return $this->getRepository()->getGlobalGroups($this->getUsername(), $project);
-    }
-
-    /**
      * Does this user exist on the given project.
      * @param Project $project
      * @return bool
@@ -150,7 +158,7 @@ class User extends Model
      */
     public function isAdmin(Project $project)
     {
-        return (false !== array_search('sysop', $this->getGroups($project)));
+        return (false !== array_search('sysop', $this->getUserRights($project)));
     }
 
     /**
@@ -176,7 +184,7 @@ class User extends Model
 
         $expiry = $this->getRepository()->getBlockExpiry(
             $project->getDatabaseName(),
-            $this->getId($project)
+            $this->getUsername()
         );
 
         if ($expiry === 'infinity') {

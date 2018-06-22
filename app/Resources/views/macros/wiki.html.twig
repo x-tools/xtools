@@ -100,6 +100,23 @@
 {% endspaceless %}{% endmacro %}
 
 {# `user` can be of type `User` or string (username) #}
+{# If the user is logged out, the link will point to Special:Contributions, otherwise their userpage #}
+{% macro userLinkWikitext(user, label = null) %}{% spaceless %}
+    {% from _self import extLink as extLink %}
+    {% if user.username is defined %}
+        {% set username = user.username %}
+    {% else %}
+        {% set username = user %}
+    {% endif %}
+    {% if isUserAnon(username) %}
+        {% set path = '[[Special:Contributions/' ~ username|replace({' ': '_'}) %}
+    {% else %}
+        {% set path = '[[User:' ~ username|replace({' ': '_'}) %}
+    {% endif %}
+    {{ path ~ (label is not empty ? '|' ~ label : '') ~ ']]' }}
+{% endspaceless %}{% endmacro %}
+
+{# `user` can be of type `User` or string (username) #}
 {% macro userLogLink(user, project, label = null, type = null, subtype = null, target = null) %}{% spaceless %}
     {% from _self import extLink as extLink %}
     {% set username = null %}
@@ -253,25 +270,25 @@
 {% macro userLinks(user, project, tool = '') %}{% spaceless %}
     {% import _self as wiki %}
     <p class="text-center xt-heading-subtitle">
-        {% if tool == 'ec' %}
+        {% if tool == 'EditCounter' %}
             {{ wiki.userLogLink(user, project) }}
         {% else %}
-            {% if enabled('ec') %}
-                <a href="{{ path('EditCounterResult', {'project':project.domain, 'username':user.username}) }}">{{ msg('tool-ec') }}</a>
+            {% if enabled('EditCounter') %}
+                <a href="{{ path('EditCounterResult', {'project':project.domain, 'username':user.username}) }}">{{ msg('tool-editcounter') }}</a>
                 &middot;
             {% endif %}
             {{ wiki.blockLogLink(user.username, project) }}
         {% endif %}
-        {% if not(isSingleWiki()) %}
+        {% if not(isSingleWiki()) and not(user.anon) %}
             &middot;
             {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, msg('sul-info')) }}
         {% endif %}
-        &middot;
         {% if isWMFLabs() %}
-            {{ wiki.gucLink(user.username) }}
             &middot;
+            {{ wiki.gucLink(user.username) }}
         {% endif %}
-        {% if isWMFLabs() %}
+        {% if isWMFLabs() and not(user.anon) %}
+            &middot;
             {% set url = 'https://tools.wmflabs.org/pageviews/?project=' ~ project.domain ~ '&pages=User:' ~ user.username %}
             {{ wiki.extLink(url, msg('pageviews-userpage')) }}
         {% endif %}

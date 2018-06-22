@@ -5,10 +5,10 @@
 
 {% block body %}
 <div class="panel panel-primary">
-    {{ layout.userHeading(user, project, xtPage) }}
+    {{ layout.userHeading(user, project, 'AutoEdits') }}
 
     <div class="panel-body xt-panel-body">
-        {{ wiki.userLinks(user, project, xtPage) }}
+        {{ wiki.userLinks(user, project, 'AutoEdits') }}
 
         <h3 class="text-center">{{ msg('tool-autoedits') }}</h3>
 
@@ -141,9 +141,15 @@
                                 {{ msg('num-tools', [ae.toolCounts|length]) }}
                             </th>
                             <th class="tools--count">
-                                <a href="{{ path('AutoEditsContributionsResult', {project:project.domain, username:user.username, start: ae.start, end: ae.end, namespace: ae.namespace}) }}">
-                                    {{ ae.toolsTotal|num_format }}
-                                </a>
+                                <a href="{{ path('AutoEditsContributionsResult', {project:project.domain, username:user.username, start: ae.start, end: ae.end, namespace: ae.namespace}) }}">{{ ae.toolsTotal|num_format }}</a>
+                                {% spaceless %}
+                                    <span class="glyphicon glyphicon-info-sign tooltipcss tooltipcss--tool-counts" role="dialog" aria-labelledby="auto-edits-tools-desc">
+                                        <div id="auto-edits-tools-desc" class="tooltip-body">
+                                            {% set summaryLink = "<a href='#summary'>" ~ msg('auto-edits-counts-desc-grand-total') ~ "</a>" %}
+                                            {{ msg('auto-edits-counts-desc', [summaryLink]) }}
+                                        </div>
+                                    </span>
+                                {% endspaceless %}
                             </th>
                             <th colspan=2></th>
                         </tfoot>
@@ -225,21 +231,17 @@
         {% else %}
             {% set content %}
                 <div>
-                    <em class="non-auto-edits-loading text-muted">{{ msg('loading') }}...</em>
-                    <div class="non-auto-edits-container"
+                    <em class="contributions-loading text-muted">{{ msg('loading') }}...</em>
+                    <div class="contributions-container"
                         data-project="{{ project.domain }}"
                         data-username="{{ user.username }}"
                         data-start="{{ ae.start }}"
                         data-end="{{ ae.end }}"
                         data-namespace="{{ ae.namespace }}"
+                        data-offset="{{ ae.offset }}"
                         data-target="nonautoedits">
                     </div>
                 </div>
-                <script>
-                    $(function () {
-                        window.loadContributions();
-                    });
-                </script>
             {% endset %}
         {% endif %}
         {% set headerLink %}

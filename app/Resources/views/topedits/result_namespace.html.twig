@@ -37,7 +37,7 @@
 
 {% if te.topEdits|length > 0 %}
     {% for ns, pages in te.topEdits %}
-        {% set showPageAssessment = ns == 0 and project.hasPageAssessments %}
+        {% set showPageAssessment = project.hasPageAssessments(ns) %}
         {% set content %}
         <table class="table table-bordered table-hover table-striped topedits-namespace-table xt-show-hide--target">
             <thead><tr>
@@ -74,7 +74,7 @@
                     </td>
                     {% if showPageAssessment %}
                         <td class="sort-entry--assessment" data-value="{{ page.pa_class ? page.pa_class : 'Unknown' }}">
-                            {% set badge = project.assessmentBadgeURL(page.pa_class) %}
+                            {% set badge = project.pageAssessments.badgeURL(page.pa_class) %}
                             {% if badge is defined %}
                                 <img alt="{{ page.pa_class }}" src="{{ badge }}" class="assessment-badge" />
                             {% endif %}

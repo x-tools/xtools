@@ -7,7 +7,7 @@
 <div class="panel panel-primary">
     <header class="panel-heading">
         <div class="text-center xt-heading-top">
-            <a class="back-to-search" href="{{ path('articleinfo') }}">
+            <a class="back-to-search" href="{{ path('ArticleInfo') }}">
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {{ msg('back') }}
             </a>
@@ -120,10 +120,8 @@
                                 {% set assessment_value %}
                                     {% if ai.assessments.assessment.badge is defined %}
                                         <img alt="{{ ai.assessments.assessment.value }}" src="{{ ai.assessments.assessment.badge }}" class="assessment-badge" />
-                                        {{ ai.assessments.assessment.value }}
-                                    {% else %}
-                                        {{ ai.assessments.assessment.value }}
                                     {% endif %}
+                                    {{ ai.assessments.assessment.value|capitalize_first }}
                                 {% endset %}
                                 {{ wiki.pageLinkRaw(ai.assessments.assessment.category, project, assessment_value) }}
                             </td>
@@ -475,12 +473,12 @@
                             {{ wiki.userLink(editor, project) }}
                         </td>
                         <td>
-                            {% if enabled('topedits') %}
+                            {% if enabled('TopEdits') %}
                                 <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': editor, 'namespace': page.namespace, 'article': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
                             {% endif %}
                             &middot;
-                            {% if enabled('ec') %}
-                                <a href="{{ path('EditCounterResult', { 'project': project.domain, 'username': editor }) }}">{{ msg('tool-ec') }}</a>
+                            {% if enabled('EditCounter') %}
+                                <a href="{{ path('EditCounterResult', { 'project': project.domain, 'username': editor }) }}">{{ msg('tool-editcounter') }}</a>
                             {% endif %}
                         </td>
                         <td class="sort-entry--edits" data-value="{{ stats.all }}">
@@ -504,20 +502,20 @@
                     </tr>
                 {% endfor %}
                 </tbody>
-                {% if counter < ai.numEditors %}
-                <tfoot><tr class="show-more-row">
-                    <td></td>
-                    <td>
-                        {% set expandUrl = path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'editorlimit': editorlimit * 10})) %}
-                        {% set otherEditors = ai.numEditors - counter %}
-                        <a href="{{ expandUrl }}">
-                            {{ otherEditors|num_format }} {{ msg('num-others', [otherEditors]) }}
-                        </a>
-                    </td>
-                    <td></td>
-                    <td>{{ (ai.numRevisionsProcessed - editSum)|num_format }}</td>
-                    <td colspan=6></td>
-                </tr></tfoot>
+                {% set otherEditors = ai.numEditors - ai.numBots - counter %}
+                {% if otherEditors > 0 %}
+                    <tfoot><tr class="show-more-row">
+                        <td></td>
+                        <td>
+                            {% set expandUrl = path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'editorlimit': editorlimit * 10})) %}
+                            <a href="{{ expandUrl }}">
+                                {{ otherEditors|num_format }} {{ msg('num-others', [otherEditors]) }}
+                            </a>
+                        </td>
+                        <td></td>
+                        <td>{{ (ai.numRevisionsProcessed - editSum)|num_format }}</td>
+                        <td colspan=6></td>
+                    </tr></tfoot>
                 {% endif %}
             </table>
             <div class="footnotes">
@@ -553,12 +551,12 @@
                             {% endif %}
                         </td>
                         <td>
-                            {% if enabled('topedits') %}
+                            {% if enabled('TopEdits') %}
                                 <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': bot, 'namespace': page.namespace, 'article': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
                             {% endif %}
                             &middot;
-                            {% if enabled('ec') %}
-                                <a href="{{ path('EditCounterResult', { 'project': project.domain, 'username': bot }) }}">{{ msg('tool-ec') }}</a>
+                            {% if enabled('EditCounter') %}
+                                <a href="{{ path('EditCounterResult', { 'project': project.domain, 'username': bot }) }}">{{ msg('tool-editcounter') }}</a>
                             {% endif %}
                         </td>
                         <td class="sort-entry--edits" data-value="{{ botData.count }}">{{ botData.count|num_format }}</td>
@@ -587,7 +585,7 @@
         {% if not (ai.hasDateRange) and page.namespace == 0 and project.domain in ai.textshareWikis %}
             {% set content %}
                 <div class="textshares-container" data-project="{{ project.domain }}" data-article="{{ page.title }}">
-                    <em class="non-auto-edits-loading text-muted">{{ msg('loading') }}...</em>
+                    <em class="text-muted">{{ msg('loading') }}...</em>
                 </div>
             {% endset %}
             {% set headerLink %}
@@ -595,7 +593,7 @@
             {% endset %}
             {% set description_link %}
                 {% set wikiwhoLink %}
-                    <a target='_blank' href='https://f-squared.org/wikiwho/'>Wikiwho</a>
+                    <a target='_blank' href='https://www.wikiwho.net/'>Wikiwho</a>
                 {% endset %}
                 {{ msg('powered-by', [wikiwhoLink]) }}
             {% endset %}
@@ -875,7 +873,11 @@
         {% set content %}
             <table class="table table-bordered table-hover table-striped assessments-table">
                 <thead><tr>
-                    {% for key in ['wikiproject', 'assessment', 'importance'] %}
+                    {% set assessmentColumns = ['wikiproject', 'assessment'] %}
+                    {% if project.pageAssessments.hasImportanceRatings %}
+                        {% set assessmentColumns = assessmentColumns|merge(['importance']) %}
+                    {% endif %}
+                    {% for key in assessmentColumns %}
                         <th>
                             <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
                                 {{ msg(key)|capitalize_first }}
@@ -888,19 +890,21 @@
                 {% for wikiproject, assessment in ai.assessments.wikiprojects %}
                     <tr>
                         <td class="sort-entry--wikiproject" data-value="{{ wikiproject }}">
-                            {{ wiki.pageLinkRaw(ai.assessments.wikiproject_prefix ~ wikiproject, project, wikiproject) }}
+                            {{ wiki.pageLinkRaw(ai.assessments.wikiproject_prefix ~ wikiproject, project, wikiproject|capitalize_first) }}
                         </td>
                         <td style="background:{{ assessment.class.color }}" class="sort-entry--assessment" data-value="{{ assessment.class.value }}">
                             {% set assessment_value %}
                                 <img alt="{{ assessment.class.value }}" src="{{ assessment.class.badge }}" class="assessment-badge" />
-                                {{ assessment.class.value }}
+                                {{ assessment.class.value|capitalize_first }}
                             {% endset %}
                             {{ wiki.pageLinkRaw(assessment.class.category, project, assessment_value) }}
                         </td>
-                        <td style="background:{{ assessment.importance.color }}" class="sort-entry--importance" data-value="{{ assessment.importance.weight }}">
-                            {% set importance_label = assessment.importance ? assessment.importance.value : '???' %}
-                            {{ wiki.pageLinkRaw(assessment.importance.category, project, importance_label) }}
-                        </td>
+                        {% if project.pageAssessments.hasImportanceRatings %}
+                            <td style="background:{{ assessment.importance.color }}" class="sort-entry--importance" data-value="{{ assessment.importance.weight }}">
+                                {% set importance_label = assessment.importance ? assessment.importance.value : '???' %}
+                                {{ wiki.pageLinkRaw(assessment.importance.category, project, importance_label) }}
+                            </td>
+                        {% endif %}
                     </tr>
                 {% endfor %}
                 </tbody>

@@ -91,7 +91,7 @@ class AutoEditsTest extends WebTestCase
     {
         $rev = [
             'page_title' => 'Test_page',
-            'page_namespace' => '1',
+            'page_namespace' => '0',
             'rev_id' => '123',
             'timestamp' => '20170101000000',
             'minor' => '0',
@@ -111,7 +111,7 @@ class AutoEditsTest extends WebTestCase
         $this->assertArraySubset($rev, $rawEdits[0]);
 
         $edit = new Edit(
-            new Page($this->project, 'Talk:Test_page'),
+            new Page($this->project, 'Test_page'),
             array_merge($rev, ['user' => $this->user])
         );
         $this->assertEquals($edit, $autoEdits->getNonAutomatedEdits()[0]);

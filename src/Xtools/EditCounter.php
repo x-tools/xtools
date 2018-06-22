@@ -10,14 +10,11 @@ use DateInterval;
 use DatePeriod;
 use DateTime;
 use Exception;
-use GuzzleHttp;
-use GuzzleHttp\Promise\Promise;
-use Xtools\Edit;
 
 /**
  * An EditCounter provides statistics about a user's edits on a project.
  */
-class EditCounter extends Model
+class EditCounter extends UserRights
 {
 
     /** @var Project The project. */
@@ -32,8 +29,8 @@ class EditCounter extends Model
     /** @var int[] Revision and page counts etc. */
     protected $pairData;
 
-    /** @var string[] The start and end dates of revisions. */
-    protected $revisionDates;
+    /** @var string[] The IDs and timestamps of first/latest edit and logged action. */
+    protected $firstAndLatestActions;
 
     /** @var int[] The total page counts. */
     protected $pageCounts;
@@ -46,12 +43,6 @@ class EditCounter extends Model
 
     /** @var mixed[] Total numbers of edits per year */
     protected $yearCounts;
-
-    /** @var string[] Rights changes, keyed by timestamp then 'added' and 'removed'. */
-    protected $rightsChanges;
-
-    /** @var string[] Global rights changes, keyed by timestamp then 'added' and 'removed'. */
-    protected $globalRightsChanges;
 
     /** @var int[] Keys are project DB names. */
     protected $globalEditCounts;
@@ -88,87 +79,13 @@ class EditCounter extends Model
      * EditCounter constructor.
      * @param Project $project The base project to count edits
      * @param User $user
+     * @param I18nHelper $i18n
      */
-    public function __construct(Project $project, User $user)
+    public function __construct(Project $project, User $user, I18nHelper $i18n)
     {
         $this->project = $project;
         $this->user = $user;
-    }
-
-    /**
-     * Make the I18nHelper accessible to EditCounter.
-     * @param I18nHelper $i18n
-     */
-    public function setI18nHelper(I18nHelper $i18n)
-    {
         $this->i18n = $i18n;
-    }
-
-    /**
-     * This method asynchronously fetches all the expensive data, waits
-     * for each request to finish, and copies the values to the class instance.
-     * @return null
-     */
-    public function prepareData()
-    {
-        $project = $this->project->getDomain();
-        $username = $this->user->getUsername();
-
-        /**
-         * The URL of each endpoint, keyed by the name of the corresponding class-level
-         * instance variable.
-         * @var array[]
-         */
-        $endpoints = [
-            "pairData" => "ec/pairdata/$project/$username",
-            "logCounts" => "ec/logcounts/$project/$username",
-            "namespaceTotals" => "ec/namespacetotals/$project/$username",
-            "editSizeData" => "ec/editsizes/$project/$username",
-            "monthCounts" => "ec/monthcounts/$project/$username",
-            // "globalEditCounts" => "ec-globaleditcounts/$project/$username",
-            "autoEditCount" => "user/automated_editcount/$project/$username",
-        ];
-
-        /**
-         * Keep track of all promises so we can wait for all of them to complete.
-         * @var GuzzleHttp\Promise\Promise[]
-         */
-        $promises = [];
-
-        foreach ($endpoints as $key => $endpoint) {
-            $promise = $this->getRepository()->queryXToolsApi($endpoint, true);
-            $promises[] = $promise;
-
-            // Handle response of $promise asynchronously.
-            $promise->then(function ($response) use ($key, $endpoint) {
-                $result = (array) json_decode($response->getBody()->getContents());
-
-                $this->getRepository()
-                    ->getLog()
-                    ->debug("$key promise resolved successfully.");
-
-                if (isset($result)) {
-                    // Copy result to the class class instance. From here any subsequent
-                    // calls to the getters (e.g. getPairData()) will return these cached values.
-                    $this->{$key} = $result;
-                } else {
-                    // The API should *always* return something, so if $result is not set,
-                    // something went wrong, so we simply won't set it and the getters will in
-                    // turn re-attempt to get the data synchronously.
-                    // We'll log this to see how often it happens.
-                    $this->getRepository()
-                        ->getLog()
-                        ->error("Failed to fetch data for $endpoint via async, " .
-                            "re-attempting synchoronously.");
-                }
-            });
-        }
-
-        // Wait for all promises to complete, even if some of them fail.
-        GuzzleHttp\Promise\settle($promises)->wait();
-
-        // Everything we need now lives on the class instance, so we're done.
-        return;
     }
 
     /**
@@ -198,6 +115,22 @@ class EditCounter extends Model
     }
 
     /**
+     * Get the IDs and timestamps of the latest edit and logged action.
+     * @return string[] With keys 'rev_first', 'rev_latest', 'log_latest',
+     *   each with 'id' and 'timestamp'.
+     */
+    public function getFirstAndLatestActions()
+    {
+        if (!isset($this->firstAndLatestActions)) {
+            $this->firstAndLatestActions = $this->getRepository()->getFirstAndLatestActions(
+                $this->project,
+                $this->user
+            );
+        }
+        return $this->firstAndLatestActions;
+    }
+
+    /**
      * Get block data.
      * @param string $type Either 'set', 'received'
      * @param bool $blocksOnly Whether to include only blocks, and not reblocks and unblocks.
@@ -220,144 +153,6 @@ class EditCounter extends Model
         }
 
         return $blocks;
-    }
-
-    /**
-     * Get user rights changes of the given user.
-     * @param Project $project
-     * @param User $user
-     * @return string[] Keyed by timestamp then 'added' and 'removed'.
-     */
-    public function getRightsChanges()
-    {
-        if (isset($this->rightsChanges)) {
-            return $this->rightsChanges;
-        }
-
-        $logData = $this->getRepository()
-            ->getRightsChanges($this->project, $this->user);
-
-        $this->rightsChanges = $this->processRightsChanges($logData);
-
-        return $this->rightsChanges;
-    }
-
-    /**
-     * Get global user rights changes of the given user.
-     * @param Project $project
-     * @param User $user
-     * @return string[] Keyed by timestamp then 'added' and 'removed'.
-     */
-    public function getGlobalRightsChanges()
-    {
-        if (isset($this->globalRightsChanges)) {
-            return $this->globalRightsChanges;
-        }
-
-        $logData = $this->getRepository()
-            ->getGlobalRightsChanges($this->project, $this->user);
-
-        $this->globalRightsChanges = $this->processRightsChanges($logData);
-
-        return $this->globalRightsChanges;
-    }
-
-    /**
-     * Process the given rights changes, sorting an putting in a human-readable format.
-     * @param  array $logData As fetched with EditCounterRepository::getRightsChanges.
-     * @return array
-     */
-    private function processRightsChanges($logData)
-    {
-        $rightsChanges = [];
-
-        foreach ($logData as $row) {
-            $unserialized = @unserialize($row['log_params']);
-            if ($unserialized !== false) {
-                $old = $unserialized['4::oldgroups'];
-                $new = $unserialized['5::newgroups'];
-                $added = array_diff($new, $old);
-                $removed = array_diff($old, $new);
-
-                $rightsChanges = $this->setAutoRemovals($rightsChanges, $row, $unserialized, $added);
-            } else {
-                // This is the old school format the most likely contains
-                // the list of rights additions in as a comma-separated list.
-                try {
-                    list($old, $new) = explode("\n", $row['log_params']);
-                    $old = array_filter(array_map('trim', explode(',', $old)));
-                    $new = array_filter(array_map('trim', explode(',', $new)));
-                    $added = array_diff($new, $old);
-                    $removed = array_diff($old, $new);
-                } catch (Exception $e) {
-                    // Really really old school format that may be missing metadata
-                    // altogether. Here we'll just leave $added and $removed blank.
-                    $added = [];
-                    $removed = [];
-                }
-            }
-
-            // Remove '(none)'.
-            if (in_array('(none)', $added)) {
-                array_splice($added, array_search('(none)', $added), 1);
-            }
-            if (in_array('(none)', $removed)) {
-                array_splice($removed, array_search('(none)', $removed), 1);
-            }
-
-            $rightsChanges[$row['log_timestamp']] = [
-                'logId' => $row['log_id'],
-                'admin' => $row['log_user_text'],
-                'comment' => $row['log_comment'],
-                'added' => array_values($added),
-                'removed' => array_values($removed),
-                'automatic' => $row['log_action'] === 'autopromote',
-                'type' => $row['type'],
-            ];
-        }
-
-        krsort($rightsChanges);
-
-        return $rightsChanges;
-    }
-
-    /**
-     * Check the given log entry for rights changes that are set to automatically expire,
-     * and add entries to $rightsChanges accordingly.
-     * @param array $rightsChanges
-     * @param array $row Log entry row from database.
-     * @param array $params Unserialized log params.
-     * @param string[] $added List of added user rights.
-     * @return array Modified $rightsChanges.
-     */
-    private function setAutoRemovals($rightsChanges, $row, $params, $added)
-    {
-        foreach ($added as $index => $entry) {
-            if (!isset($params['newmetadata'][$index]) ||
-                !array_key_exists('expiry', $params['newmetadata'][$index]) ||
-                empty($params['newmetadata'][$index]['expiry'])
-            ) {
-                continue;
-            }
-
-            $expiry = $params['newmetadata'][$index]['expiry'];
-
-            if (isset($rightsChanges[$expiry]) && !in_array($entry, $rightsChanges[$expiry]['removed'])) {
-                $rightsChanges[$expiry]['removed'][] = $entry;
-            } else {
-                $rightsChanges[$expiry] = [
-                    'logId' => $row['log_id'],
-                    'admin' => $row['log_user_text'],
-                    'comment' => null,
-                    'added' => [],
-                    'removed' => [$entry],
-                    'automatic' => true,
-                    'type' => $row['type'],
-                ];
-            }
-        }
-
-        return $rightsChanges;
     }
 
     /**
@@ -788,38 +583,25 @@ class EditCounter extends Model
     }
 
     /**
-     * Get the date and time of the user's first edit.
-     * @return DateTime|bool The time of the first revision, or false.
-     */
-    public function datetimeFirstRevision()
-    {
-        $revDates = $this->getPairData();
-        return isset($revDates['first']) ? new DateTime($revDates['first']) : false;
-    }
-
-    /**
-     * Get the date and time of the user's first edit.
-     * @return DateTime|bool The time of the last revision, or false.
-     */
-    public function datetimeLastRevision()
-    {
-        $revDates = $this->getPairData();
-        return isset($revDates['last']) ? new DateTime($revDates['last']) : false;
-    }
-
-    /**
      * Get the number of days between the first and last edits.
      * If there's only one edit, this is counted as one day.
      * @return int
      */
     public function getDays()
     {
-        $first = $this->datetimeFirstRevision();
-        $last = $this->datetimeLastRevision();
-        if ($first === false || $last === false) {
+        $first = isset($this->getFirstAndLatestActions()['rev_first']['timestamp'])
+            ? new DateTime($this->getFirstAndLatestActions()['rev_first']['timestamp'])
+            : false;
+        $latest = isset($this->getFirstAndLatestActions()['rev_latest']['timestamp'])
+            ? new DateTime($this->getFirstAndLatestActions()['rev_latest']['timestamp'])
+            : false;
+
+        if ($first === false || $latest === false) {
             return 0;
         }
-        $days = $last->diff($first)->days;
+
+        $days = $latest->diff($first)->days;
+
         return $days > 0 ? $days : 1;
     }
 
@@ -1216,9 +998,10 @@ class EditCounter extends Model
     /**
      * Get the most recent n revisions across all projects.
      * @param int $max The maximum number of revisions to return.
+     * @param int $offset Offset results by this number of revisions.
      * @return Edit[]
      */
-    public function globalEdits($max)
+    public function globalEdits($max, $offset = 0)
     {
         if (is_array($this->globalEdits)) {
             return $this->globalEdits;
@@ -1240,17 +1023,19 @@ class EditCounter extends Model
 
         // Get all revisions for those projects.
         $globalRevisionsData = $this->getRepository()
-            ->getRevisions($projects, $this->user, $max);
+            ->getRevisions($projects, $this->user, $max, $offset);
         $globalEdits = [];
         foreach ($globalRevisionsData as $revision) {
             /** @var Project $project */
             $project = $projects[$revision['project_name']];
+
             $nsName = '';
             if ($revision['page_namespace']) {
                 $nsName = $project->getNamespaces()[$revision['page_namespace']];
             }
+
             $page = $project->getRepository()
-                ->getPage($project, $nsName . ':' . $revision['page_title']);
+                ->getPage($project, $nsName.':'.$revision['page_title']);
             $edit = new Edit($page, $revision);
             $globalEdits[$edit->getTimestamp()->getTimestamp().'-'.$edit->getId()] = $edit;
         }

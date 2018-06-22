@@ -295,37 +295,6 @@ class PageRepository extends Repository
     }
 
     /**
-     * Get assessment data for the given pages
-     * @param Project   $project The project to which the pages belong.
-     * @param  int[]    $pageIds Page IDs
-     * @return string[] Assessment data as retrieved from the database.
-     */
-    public function getAssessments(Project $project, $pageIds)
-    {
-        $cacheKey = $this->getCacheKey(func_get_args(), 'page_assessments');
-        if ($this->cache->hasItem($cacheKey)) {
-            return $this->cache->getItem($cacheKey)->get();
-        }
-
-        if (!$project->hasPageAssessments()) {
-            return [];
-        }
-        $paTable = $this->getTableName($project->getDatabaseName(), 'page_assessments');
-        $papTable = $this->getTableName($project->getDatabaseName(), 'page_assessments_projects');
-        $pageIds = implode($pageIds, ',');
-
-        $sql = "SELECT pap_project_title AS wikiproject, pa_class AS class, pa_importance AS importance
-                FROM $paTable
-                LEFT JOIN $papTable ON pa_project_id = pap_project_id
-                WHERE pa_page_id IN ($pageIds)";
-
-        $result = $this->executeProjectsQuery($sql)->fetchAll();
-
-        // Cache and return.
-        return $this->setCache($cacheKey, $result);
-    }
-
-    /**
      * Get any CheckWiki errors of a single page
      * @param Page $page
      * @return array Results from query
@@ -375,12 +344,12 @@ class PageRepository extends Repository
             return [];
         }
 
-        $wikidataId = ltrim($page->getWikidataId(), 'Q');
+        $wikidataId = 'Q'.ltrim($page->getWikidataId(), 'Q');
         $lang = $page->getProject()->getLang();
 
         $sql = "SELECT term_type AS term, term_text
                 FROM wikidatawiki_p.wb_terms
-                WHERE term_entity_id = :wikidataId
+                WHERE term_full_entity_id = :wikidataId
                 AND term_type IN ('label', 'description')
                 AND term_language = :lang";
 

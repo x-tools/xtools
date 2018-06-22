@@ -5,10 +5,12 @@
 
 namespace AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Component\Routing\Exception\InvalidParameterException;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Exception\InvalidParameterException;
 
 /**
  * A quick note: This tool is referred to as "bash" in much of the legacy code base.  As such,
@@ -17,17 +19,17 @@ use Symfony\Component\HttpFoundation\Request;
  * This tool is intentionally disabled in the WMF installation.
  * @codeCoverageIgnore
  */
-class QuoteController extends Controller
+class QuoteController extends XtoolsController
 {
 
     /**
-     * Get the tool's shortname.
+     * Get the name of the tool's index route.
      * @return string
      * @codeCoverageIgnore
      */
-    public function getToolShortname()
+    public function getIndexRoute()
     {
-        return 'bash';
+        return 'Quote';
     }
 
     /**
@@ -37,9 +39,9 @@ class QuoteController extends Controller
      *
      * @param \Symfony\Component\HttpFoundation\Request $request Given by Symfony
      *
-     * @Route("/bash",  name="bash")
-     * @Route("/quote", name="quote")
-     * @Route("/bash/base.php", name="bashBase")
+     * @Route("/bash",  name="Bash")
+     * @Route("/quote", name="Quote")
+     * @Route("/bash/base.php", name="BashBase")
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction(Request $request)
@@ -69,8 +71,8 @@ class QuoteController extends Controller
      * Method for rendering a random quote.
      * This should redirect to the /quote/{id} path below
      *
-     * @Route("/quote/random", name="quoteRandom")
-     * @Route("/bash/random",  name="bashRandom")
+     * @Route("/quote/random", name="QuoteRandom")
+     * @Route("/bash/random",  name="BashRandom")
      *
      * @return RedirectResponse
      */
@@ -92,8 +94,8 @@ class QuoteController extends Controller
     /**
      * Method to show all quotes.
      *
-     * @Route("/quote/all", name="quoteAll")
-     * @Route("/bash/all",  name="bashAll")
+     * @Route("/quote/all", name="QuoteAll")
+     * @Route("/bash/all",  name="BashAll")
      *
      * @return Response
      */
@@ -127,8 +129,8 @@ class QuoteController extends Controller
      *
      * @param int $id ID of the quote
      *
-     * @Route("/quote/{id}", name="quoteID")
-     * @Route("/bash/{id}",  name="bashID")
+     * @Route("/quote/{id}", name="QuoteID")
+     * @Route("/bash/{id}",  name="BashID")
      *
      * @return Response
      */
@@ -167,5 +169,95 @@ class QuoteController extends Controller
                 "id" => $id,
             ]
         );
+    }
+
+    /************************ API endpoints ************************/
+
+    /**
+     * Get random quote.
+     * @Route("/api/quote/random", name="QuoteApiRandom")
+     * @return Response
+     * @codeCoverageIgnore
+     */
+    public function randomQuoteApiAction()
+    {
+        $this->recordApiUsage('quote/random');
+
+        // Don't show if bash is turned off, but always show for Labs
+        // (so quote is in footer but not in nav).
+        $isLabs = $this->container->getParameter('app.is_labs');
+        if (!$isLabs && !$this->container->getParameter('enable.bash')) {
+            return '';
+        }
+        $quotes = $this->container->getParameter('quotes');
+        $id = array_rand($quotes);
+
+        return new JsonResponse(
+            [$id => $quotes[$id]],
+            Response::HTTP_OK
+        );
+    }
+
+    /**
+     * Get all quotes.
+     * @Route("/api/quote/all", name="QuoteApiAll")
+     * @return Response
+     * @codeCoverageIgnore
+     */
+    public function allQuotesApiAction()
+    {
+        $this->recordApiUsage('quote/all');
+
+        // Don't show if bash is turned off, but always show for Labs
+        // (so quote is in footer but not in nav).
+        $isLabs = $this->container->getParameter('app.is_labs');
+        if (!$isLabs && !$this->container->getParameter('enable.bash')) {
+            return '';
+        }
+        $quotes = $this->container->getParameter('quotes');
+        $numberedQuotes = [];
+
+        // Number the quotes, since they somehow have significance.
+        foreach ($quotes as $index => $quote) {
+            $numberedQuotes[(string)$index + 1] = $quote;
+        }
+
+        return new JsonResponse($numberedQuotes, Response::HTTP_OK);
+    }
+
+    /**
+     * Get the quote with the given ID.
+     * @Route("/api/quote/{id}", name="QuoteApiQuote", requirements={"id"="\d+"})
+     * @param int $id
+     * @return Response
+     * @codeCoverageIgnore
+     */
+    public function singleQuotesApiAction($id)
+    {
+        $this->recordApiUsage('quote/id');
+
+        // Don't show if bash is turned off, but always show for Labs
+        // (so quote is in footer but not in nav).
+        $isLabs = $this->container->getParameter('app.is_labs');
+        if (!$isLabs && !$this->container->getParameter('enable.bash')) {
+            return '';
+        }
+        $quotes = $this->container->getParameter('quotes');
+
+        if (!isset($quotes[$id])) {
+            return new JsonResponse(
+                [
+                    'error' => [
+                        'code' => Response::HTTP_NOT_FOUND,
+                        'message' => 'No quote found with ID '.$id,
+                    ]
+                ],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+
+        return new JsonResponse([
+            $id => $quotes[$id]
+        ], Response::HTTP_OK);
     }
 }

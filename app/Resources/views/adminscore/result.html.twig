@@ -4,10 +4,10 @@
 
 {% block body %}
 <div class="panel panel-primary">
-    {{ layout.userHeading(user, project, xtPage) }}
+    {{ layout.userHeading(user, project, 'AdminScore') }}
 
     <div class="panel-body xt-panel-body">
-        {{ wiki.userLinks(user, project, xtPage) }}
+        {{ wiki.userLinks(user, project, 'AdminScore') }}
 
         {% set content %}
             <div class="col-lg-12 stat-list clearfix">

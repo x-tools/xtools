@@ -1,5 +1,85 @@
 # Release Notes #
 
+## 3.3.7 ##
+- ArticleInfo: Include assessment in API endpoint.
+- ArticleInfo: Show assessment in gadget, if available.
+- ArticleInfo: Add 'links' API endpoint.
+- Localization updates.
+
+## 3.3.6 ##
+- T189286: Show time of autoconfirmed promotion in Edit Counter.
+- T197005: Show latest logged action in Edit Counter, and link to
+  the log entry. Also link to first/latest edits.
+- Show registration date in the Edit Counter.
+- Localization updates.
+
+## 3.3.5 ##
+- T190956: Allow browsing through latest global edits.
+- T195000: Fix querying of Wikidata errors.
+- Update link to WikiWho service.
+- Localization updates.
+
+## 3.3.4 ##
+- T191943: Add support for IPs across all applicable tools.
+- T191942: Fix ArticleInfo bug, unique editors are overcounted.
+- T192846: Add JWB to enwiki AutoEdits configuration.
+- Add NA-level importance to enwiki assessments configuration.
+- Fix links to Edit Counter following recent refactor.
+- Localization updates.
+
+## 3.3.3 ##
+- Hotfix for bug in redirecting to index page when the user has
+  too many edits.
+
+## 3.3.2 ##
+- Make all internal route names and i18n key names consistent.
+- Refactor Page Assessments logic
+- Add assessments configuration for en.wikivoyage, hu.wikipedia
+  and fr.wikipedia.
+- Complete en.wikipedia assessment configuration.
+- Make API endpoint to get the full assessment configuration.
+- Add API endpoint for bash quotes.
+- T192629: Pass 'offset' parameter to download links in Pages.
+- T192133: Fix pie charts in Category Edits summary section.
+- Localization updates.
+
+## 3.3.1 ##
+- T184969: Add Turkish page assessments.
+- T185023: Add Arabic page assessments.
+- Show page assessments in non-mainspace, if assessment exists.
+- Add API to get page assessments config and for given articles.
+- Add Apple favicons, should reduce 404s in production logs.
+- Localization updates.
+
+## 3.3.0 ##
+- T189645: New Category Edits tool to see edits made by a user to
+  one or more categories.
+- T191135: Handle Twig runtime exceptions and show original
+  exception, if present.
+- Set max_statement_time on individual database queries, and treat
+  error 2013 (lost connection to MySQL server) as query timeout.
+- T171278: EditCounter: show admin actions of former admins.
+- EditCounter: localize names of user groups, show current and
+  former user groups.
+- T191136: AutoEdits: Add APC tool for ptwiki, better pt support.
+- AutoEdits: add content translation tool and ProveIt. Use new
+  'contribs' flag to show these tools in non-automated contribs.
+- T191133: AutoEdits: improve showing of edits with tools that have
+  a tag but may share tags with other tools.
+- T180819: Use metawiki when logging in wiht OAuth.
+- Remove old, unused multithreading code.
+- TopEdits: Increase test coverage.
+- Localization updates.
+
+## 3.2.5 ##
+- T190496: AdminStats: Make sure former admins are shown. Rework
+  query to only show users with > 1 action. Don't count log actions
+  that deleted pages via redirect, autopromotion of user rights, or
+  moving protections.
+- Allow sortable tables to re-fill the numbering of rank column.
+- T190201: AdminScore: Fix negative day value.
+- Localization updates.
+
 ## 3.2.4 ##
 - ArticleInfo: Improve performance of ArticleInfo API endpoint.
 

@@ -23,7 +23,7 @@
                     <small class='xt-hide'>[{{ msg('hide') | lower }}]</small>
                 {% endif %}
                 {% if description is defined %}
-                    <span class='pull-right text-muted xt-panel-description'>{{ description }}</span>
+                    <span class='pull-right text-muted xt-panel-description'>{{ msgIfExists(description) }}</span>
                 {% endif %}
             </h4>
         </header>
@@ -36,14 +36,20 @@
  # @param User user
  # @param Project project
  # @param string tool The current tool that is being used.
+ # @param array Arguments to pass in with the Back link. If this is set,
+ #   the link text will say 'See full statistics' instead of 'Back'.
  #}
-{% macro userHeading(user, project, tool) %}
+{% macro userHeading(user, project, tool, args = {}) %}
     {% import 'macros/wiki.html.twig' as wiki %}
     <header class="panel-heading">
         <div class="text-center xt-heading-top">
-            <a class="back-to-search" href="{{ path(tool) }}">
+            <a class="back-to-search" href="{{ path(tool ~ (args is not empty ? 'Result' : ''), {'project': project.domain}|merge(args)) }}">
                 <span class="glyphicon glyphicon-chevron-left"></span>
-                {{ msg('back') }}
+                {% if args is not empty %}
+                    {{ msg('see-full-statistics') }}
+                {% else %}
+                    {{ msg('back') }}
+                {% endif %}
             </a>
             {{ wiki.userLink(user, project) }}
             <small>
@@ -81,4 +87,63 @@
             {% endif %}
         </ul>
     </div>
+{% endmacro %}
+
+{% macro contributionsNav(offset, length, pageSize = 50) %}
+    <div class="contributions-nav clearfix">
+        {% if offset > 0 %}
+            <a href="#" class="pull-left contributions--prev">
+                <span class="glyphicon glyphicon-arrow-{% if isRTL() %}right{% else %}left{% endif %}"></span>
+                {{ msg('pager-newer-n', [pageSize])|capitalize_first }}
+            </a>
+        {% endif %}
+        {% if length == pageSize %}
+            <a href="#" class="pull-right contributions--next">
+                {{ msg('pager-older-n', [pageSize])|capitalize_first }}
+                <span class="glyphicon glyphicon-arrow-{% if isRTL() %}left{% else %}right{% endif %}"></span>
+            </a>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro contributions(project, revs, offset, pageSize = 50) %}
+    {% from _self import contributionsNav as contributionsNav %}
+    {% import 'macros/wiki.html.twig' as wiki %}
+
+    {% if revs|length == 0 %}
+        <div class="alert alert-info">
+            {{ msg('no-contribs') }}
+        </div>
+    {% else %}
+        {{ contributionsNav(offset, revs|length, pageSize) }}
+        <table class="table table-bordered table-hover table-striped contributions-table">
+            <thead>
+                {% for key in ['page-title', 'date', 'links', 'size', 'edit-summary'] %}
+                    <th>{{ msg(key)|capitalize_first }}</th>
+                {% endfor %}
+            </thead>
+            <tbody>
+                {% for edit in revs %}
+                    <tr>
+                        <td>{{ wiki.pageLinkRaw(edit.page.title(true), project) }}</td>
+                        <td>{{ wiki.permaLink(edit) }}</td>
+                        <td>
+                            {{ wiki.diffLink(edit) }}
+                            &middot;
+                            {{ wiki.pageHistLinkRaw(edit.page.title(true), project) }}
+                            {% if enabled('TopEdits') %}
+                            &middot;
+                            <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': edit.user.username, 'namespace': '', 'article': edit.page.title(true) }) }}">{{ msg('tool-topedits') }}</a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ edit.size|diff_format }}
+                        </td>
+                        <td>{{ edit.wikifiedComment(true)|raw }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {{ contributionsNav(offset, revs|length, pageSize) }}
+    {% endif %}
 {% endmacro %}

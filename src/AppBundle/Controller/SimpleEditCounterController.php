@@ -22,18 +22,18 @@ class SimpleEditCounterController extends XtoolsController
 {
 
     /**
-     * Get the tool's shortname.
+     * Get the name of the tool's index route.
+     * This is also the name of the associated model.
      * @return string
      * @codeCoverageIgnore
      */
-    public function getToolShortname()
+    public function getIndexRoute()
     {
-        return 'sc';
+        return 'SimpleEditCounter';
     }
 
     /**
      * The Simple Edit Counter search form.
-     * @Route("/sc", name="sc")
      * @Route("/sc", name="SimpleEditCounter")
      * @Route("/sc/", name="SimpleEditCounterSlash")
      * @Route("/sc/index.php", name="SimpleEditCounterIndexPhp")
@@ -55,9 +55,9 @@ class SimpleEditCounterController extends XtoolsController
 
         // Show the form.
         return $this->render('simpleEditCounter/index.html.twig', [
-            'xtPageTitle' => 'tool-sc',
-            'xtSubtitle' => 'tool-sc-desc',
-            'xtPage' => 'sc',
+            'xtPageTitle' => 'tool-simpleeditcounter',
+            'xtSubtitle' => 'tool-simpleeditcounter-desc',
+            'xtPage' => 'simpleeditcounter',
             'project' => $params['project'],
 
             // Defaults that will get overriden if in $params.
@@ -105,7 +105,7 @@ class SimpleEditCounterController extends XtoolsController
 
         // Assign the values and display the template
         return $this->render('simpleEditCounter/result.html.twig', [
-            'xtPage' => 'sc',
+            'xtPage' => 'simpleeditcounter',
             'xtTitle' => $user->getUsername(),
             'user' => $user,
             'project' => $project,

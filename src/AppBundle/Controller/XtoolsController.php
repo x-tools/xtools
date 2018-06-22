@@ -24,6 +24,13 @@ use Xtools\PageRepository;
 abstract class XtoolsController extends Controller
 {
     /**
+     * Require the tool's index route (intial form) be defined here. This should also
+     * be the name of the associated model, if present.
+     * @return string
+     */
+    abstract protected function getIndexRoute();
+
+    /**
      * Given the request object, parse out common parameters. These include the
      * 'project', 'username', 'namespace' and 'article', along with their legacy
      * counterparts (e.g. 'lang' and 'wiki').
@@ -121,7 +128,8 @@ abstract class XtoolsController extends Controller
         if (!$projectData->exists()) {
             $this->addFlash('danger', ['invalid-project', $params['project']]);
             unset($params['project']); // Remove invalid parameter.
-            return $this->redirectToRoute($this->getToolShortname(), $params);
+
+            return $this->redirectToRoute($this->getIndexRoute(), $params);
         }
 
         return $projectData;
@@ -143,19 +151,26 @@ abstract class XtoolsController extends Controller
 
         $userData = UserRepository::getUser($params['username'], $this->container);
 
+        // Allow querying for any IP, currently with no edit count limitation...
+        // Once T188677 is resolved IPs will be affected by the EXPLAIN results.
+        if ($userData->isAnon()) {
+            return $userData;
+        }
+
         // Don't continue if the user doesn't exist.
         if (!$userData->existsOnProject($project)) {
             $this->addFlash('danger', 'user-not-found');
             unset($params['username']);
-            return $this->redirectToRoute($this->getToolShortname(), $params);
+            return $this->redirectToRoute($this->getIndexRoute(), $params);
         }
 
         // Reject users with a crazy high edit count.
         if ($tooHighEditCountAction && $userData->hasTooManyEdits($project)) {
+            // FIXME: i18n!!
             $this->addFlash('danger', ['too-many-edits', number_format($userData->maxEdits())]);
 
             // If redirecting to a different controller, show an informative message accordingly.
-            if ($tooHighEditCountAction !== $this->getToolShortname()) {
+            if ($tooHighEditCountAction !== $this->getIndexRoute()) {
                 // FIXME: This is currently only done for Edit Counter, redirecting to Simple Edit Counter,
                 // so this bit is hardcoded. We need to instead give the i18n key of the route.
                 $this->addFlash('info', ['too-many-edits-redir', 'Simple Counter']);
@@ -176,7 +191,7 @@ abstract class XtoolsController extends Controller
      * @param  string $pageTitle
      * @return Page|RedirectResponse Page or redirect back to index if page doesn't exist.
      */
-    public function getAndValidatePage($project, $pageTitle)
+    public function getAndValidatePage(Project $project, $pageTitle)
     {
         $page = new Page($project, $pageTitle);
         $pageRepo = new PageRepository();
@@ -186,7 +201,7 @@ abstract class XtoolsController extends Controller
         if (!$page->exists()) {
             // Redirect if the page doesn't exist.
             $this->addFlash('notice', ['no-result', $pageTitle]);
-            return $this->redirectToRoute($this->getToolShortname());
+            return $this->redirectToRoute($this->getIndexRoute());
         }
 
         return $page;
@@ -223,6 +238,7 @@ abstract class XtoolsController extends Controller
             'username',
             'namespace',
             'article',
+            'categories',
             'redirects',
             'deleted',
             'start',

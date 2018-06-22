@@ -50,7 +50,7 @@ class AutoEdits extends Model
     protected $toolsTotal;
 
     /**
-     * Constructor for the AutoEdit class.
+     * Constructor for the AutoEdits class.
      * @param Project $project
      * @param User $user
      * @param int|string $namespace Namespace ID or 'all'

@@ -37,24 +37,26 @@ class EditCounterTest extends WebTestCase
     /** @var User The user instance. */
     protected $user;
 
+    /** @var I18nHelper For i18n and l10n. */
+    protected $i18n;
+
     /**
      * Set up shared mocks and class instances.
      */
     public function setUp()
     {
+        $container = static::createClient()->getContainer();
+        $stack = new RequestStack();
+        $session = new Session();
+        $this->i18n = new I18nHelper($container, $stack, $session);
+
         $this->editCounterRepo = $this->getMock(EditCounterRepository::class);
         $this->projectRepo = $this->getMock(ProjectRepository::class);
         $this->project = new Project('TestProject');
         $this->project->setRepository($this->projectRepo);
         $this->user = new User('Testuser');
-        $this->editCounter = new EditCounter($this->project, $this->user);
+        $this->editCounter = new EditCounter($this->project, $this->user, $this->i18n);
         $this->editCounter->setRepository($this->editCounterRepo);
-
-        $container = static::createClient()->getContainer();
-        $stack = new RequestStack();
-        $session = new Session();
-        $i18nHelper = new I18nHelper($container, $stack, $session);
-        $this->editCounter->setI18nHelper($i18nHelper);
     }
 
     /**
@@ -79,45 +81,44 @@ class EditCounterTest extends WebTestCase
     }
 
     /**
-     * A first and last date, and number of days between.
+     * A first and last actions, and number of days between.
      */
-    public function testDates()
+    public function testFirstLastActions()
     {
-        $this->editCounterRepo->expects($this->once())->method('getPairData')->willReturn([
-                'first' => '20170510100000',
-                'last' => '20170515150000',
+        $this->editCounterRepo->expects($this->once())->method('getFirstAndLatestActions')->willReturn([
+                'rev_first' => [
+                    'id' => 123,
+                    'timestamp' => '20170510100000',
+                    'type' => null,
+                ],
+                'rev_latest' => [
+                    'id' => 321,
+                    'timestamp' => '20170515150000',
+                    'type' => null,
+                ],
+                'log_latest' => [
+                    'id' => 456,
+                    'timestamp' => '20170510150000',
+                    'type' => 'thanks',
+                ],
             ]);
         $this->assertEquals(
-            new \DateTime('2017-05-10 10:00'),
-            $this->editCounter->datetimeFirstRevision()
+            [
+                'id' => 123,
+                'timestamp' => '20170510100000',
+                'type' => null,
+            ],
+            $this->editCounter->getFirstAndLatestActions()['rev_first']
         );
         $this->assertEquals(
-            new \DateTime('2017-05-15 15:00'),
-            $this->editCounter->datetimeLastRevision()
+            [
+                'id' => 321,
+                'timestamp' => '20170515150000',
+                'type' => null,
+            ],
+            $this->editCounter->getFirstAndLatestActions()['rev_latest']
         );
         $this->assertEquals(5, $this->editCounter->getDays());
-    }
-
-    /**
-     * Only one edit means the dates will be the same.
-     */
-    public function testDatesWithOneRevision()
-    {
-        $this->editCounterRepo->expects($this->once())
-            ->method('getPairData')
-            ->willReturn([
-                'first' => '20170510110000',
-                'last' => '20170510110000',
-            ]);
-        $this->assertEquals(
-            new \DateTime('2017-05-10 11:00'),
-            $this->editCounter->datetimeFirstRevision()
-        );
-        $this->assertEquals(
-            new \DateTime('2017-05-10 11:00'),
-            $this->editCounter->datetimeLastRevision()
-        );
-        $this->assertEquals(1, $this->editCounter->getDays());
     }
 
     /**
@@ -475,7 +476,7 @@ class EditCounterTest extends WebTestCase
      */
     public function testParseBlockLogEntry($logEntry, $assertion)
     {
-        $editCounter = new EditCounter($this->project, $this->user);
+        $editCounter = new EditCounter($this->project, $this->user, $this->i18n);
         $this->assertEquals(
             $editCounter->parseBlockLogEntry($logEntry),
             $assertion
@@ -658,5 +659,29 @@ class EditCounterTest extends WebTestCase
                 'type' => 'global',
             ],
         ], $this->editCounter->getGlobalRightsChanges());
+
+        $userRepo = $this->getMock(UserRepository::class);
+        $userRepo->expects($this->once())
+            ->method('getUserRights')
+            ->wilLReturn(['sysop', 'bureaucrat']);
+        $userRepo->expects($this->once())
+            ->method('getGlobalUserRights')
+            ->wilLReturn(['sysop']);
+        $this->user->setRepository($userRepo);
+
+        // Current rights.
+        $this->assertEquals(
+            ['sysop', 'bureaucrat'],
+            $this->editCounter->getRightsStates()['local']['current']
+        );
+
+        // Former rights.
+        $this->assertEquals(
+            ['ipblock-exempt', 'filemover', 'templateeditor', 'rollbacker'],
+            $this->editCounter->getRightsStates()['local']['former']
+        );
+
+        // Admin status.
+        $this->assertEquals('current', $this->editCounter->getAdminStatus());
     }
 }

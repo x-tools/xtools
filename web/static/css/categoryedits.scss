@@ -1,0 +1,36 @@
+@import 'mixins.scss';
+
+.categoryedits {
+    .toggle-table--chart {
+        margin-left: 50px;
+    }
+
+    #category_chart {
+        height: auto;
+        width: auto;
+        display: none;
+    }
+
+    // Select2 overrides
+    .select2-selection--multiple {
+        border-color: $bootstrap-border-gray !important;
+        border-radius: 0;
+    }
+
+    .select2-selection__rendered,
+    .select2-results__option {
+        padding-left: 12px !important;
+    }
+
+    .select2-results__message {
+        display: none;
+    }
+
+    .select2-results__option--highlighted {
+        background: #3379b7 !important;
+    }
+
+    .loading-results {
+        display: none;
+    }
+}

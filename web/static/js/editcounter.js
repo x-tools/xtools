@@ -19,7 +19,7 @@ window.maxDigits = {};
 
 $(function () {
     // Don't do anything if this isn't a Edit Counter page.
-    if ($("body.ec").length === 0) {
+    if ($('body.editcounter').length === 0) {
         return;
     }
 
@@ -125,25 +125,14 @@ function toggleNamespace(newData, key)
  */
 function loadLatestGlobal()
 {
-    var $latestGlobalContainer = $("#latestglobal-container");
-
-    if ($latestGlobalContainer[0]) {
-        /** global: xtBaseUrl */
-        var url = xtBaseUrl + 'ec-latestglobal/'
-            + $latestGlobalContainer.data('project') + '/'
-            + $latestGlobalContainer.data('username') + '?htmlonly=yes';
-        $.ajax({
-            url: url,
-            timeout: 30000
-        }).done(function (data) {
-            $latestGlobalContainer.replaceWith(data);
-            setupColumnSorting();
-        }).fail(function (_xhr, _status, message) {
-            $latestGlobalContainer.replaceWith(
-                $.i18n('api-error', 'Global contributions API: <code>' + message + '</code>')
-            );
-        });
-    }
+    // Load the contributions browser, or set up the listeners if it is already present.
+    var initFunc = $('.contributions-table').length ? 'setupContributionsNavListeners' : 'loadContributions';
+    window[initFunc](
+        function (params) {
+            return params.target + '-contributions/' + params.project + '/' + params.username;
+        },
+        'latest-global-edits'
+    );
 }
 
 /**

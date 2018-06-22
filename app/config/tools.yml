@@ -1,15 +1,16 @@
 parameters:
   tools:
-    ec: ec
-    articleinfo: articleinfo
-    pages: pages
-    topedits: topedits
-    blame: blame
-    autoedits: autoedits
-    adminstats: adminstats
-    adminscore: adminscore
-    es: es
-    rfx: rfx
-    rfxvote: rfxvote
-    bash: bash
-    sc: sc
+    # This is the order they will appear in the interface.
+    - EditCounter
+    - ArticleInfo
+    - Pages
+    - TopEdits
+    - AutoEdits
+    - CategoryEdits
+    - AdminStats
+    - AdminScore
+    - EditSummary
+    - RfX
+    - RfXVote
+    - Quote
+    - SimpleEditCounter

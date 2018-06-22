@@ -32,6 +32,7 @@ parameters:
     wiki_url:                   http://en.wikipedia.org
     api_path:                   /w/api.php
     default_project:            en.wikipedia.org
+    oauth_project:              meta.wikimedia.org
     opted_in:                   ~
 
     # A secret key that's used to generate certain security-related tokens, and as the secret for the internal API.
@@ -53,9 +54,6 @@ parameters:
     app.rate_limit_time: 5
     app.rate_limit_count: 10
 
-    app.multithread: 0
-    app.base_path: https://xtools.example.org
-
     app.query_timeout: 900
 
     app.max_page_revisions: 50000
@@ -65,15 +63,16 @@ parameters:
     languageless_wikis:
 
     # Enabling or disabling of individual tools
-    enable.adminscore: 1
-    enable.adminstats: 1
-    enable.articleinfo: 1
-    enable.autoedits: 1
-    enable.bash: 0
-    enable.ec: 1
-    enable.es: 1
-    enable.pages: 1
-    enable.rfx: 0
-    enable.rfxvote: 0
-    enable.sc: 1
-    enable.topedits: 1
+    enable.AdminScore: 1
+    enable.AdminStats: 1
+    enable.ArticleInfo: 1
+    enable.AutoEdits: 1
+    enable.CategoryEdits: 1
+    enable.EditCounter: 1
+    enable.EditSummary: 1
+    enable.Pages: 1
+    enable.Quote: 0
+    enable.RfXAnalysis: 0
+    enable.RfXVoteCalculator: 0
+    enable.SimpleEditCounter: 1
+    enable.TopEdits: 1

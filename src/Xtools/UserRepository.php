@@ -31,25 +31,27 @@ class UserRepository extends Repository
     }
 
     /**
-     * Get the user's ID.
+     * Get the user's ID and registration date.
      * @param string $databaseName The database to query.
      * @param string $username The username to find.
-     * @return int
+     * @return array [int ID, string|null registration date].
      */
-    public function getId($databaseName, $username)
+    public function getIdAndRegistration($databaseName, $username)
     {
-        $cacheKey = $this->getCacheKey(func_get_args(), 'user_id');
+        $cacheKey = $this->getCacheKey(func_get_args(), 'user_id_reg');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
         $userTable = $this->getTableName($databaseName, 'user');
-        $sql = "SELECT user_id FROM $userTable WHERE user_name = :username LIMIT 1";
+        $sql = "SELECT user_id AS userId, user_registration AS regDate
+                FROM $userTable
+                WHERE user_name = :username
+                LIMIT 1";
         $resultQuery = $this->executeProjectsQuery($sql, ['username' => $username]);
-        $userId = (int)$resultQuery->fetchColumn();
 
         // Cache and return.
-        return $this->setCache($cacheKey, $userId);
+        return $this->setCache($cacheKey, $resultQuery->fetch());
     }
 
     /**
@@ -82,93 +84,35 @@ class UserRepository extends Repository
      */
     public function getEditCount($databaseName, $username)
     {
+        // Quick cache of edit count, valid on for the same request.
+        static $editCount = null;
+        if ($editCount !== null) {
+            return $editCount;
+        }
+
         $userTable = $this->getTableName($databaseName, 'user');
         $sql = "SELECT user_editcount FROM $userTable WHERE user_name = :username LIMIT 1";
         $resultQuery = $this->executeProjectsQuery($sql, ['username' => $username]);
-        return $resultQuery->fetchColumn();
-    }
 
-    /**
-     * Get group names of the given user.
-     * @param Project $project The project.
-     * @param string $username The username.
-     * @return string[]
-     */
-    public function getGroups(Project $project, $username)
-    {
-        // Use md5 to ensure the key does not contain reserved characters.
-        $cacheKey = $this->getCacheKey(func_get_args(), 'user_groups');
-        if ($this->cache->hasItem($cacheKey)) {
-            return $this->cache->getItem($cacheKey)->get();
-        }
-
-        $this->stopwatch->start($cacheKey, 'XTools');
-        $api = $this->getMediawikiApi($project);
-        $params = [
-            'list' => 'users',
-            'ususers' => $username,
-            'usprop' => 'groups'
-        ];
-        $query = new SimpleRequest('query', $params);
-        $result = [];
-        $res = $api->getRequest($query);
-        if (isset($res['batchcomplete']) && isset($res['query']['users'][0]['groups'])) {
-            $result = $res['query']['users'][0]['groups'];
-        }
-
-        // Cache and return.
-        $this->stopwatch->stop($cacheKey);
-        return $this->setCache($cacheKey, $result);
-    }
-
-    /**
-     * Get a user's global group membership (starting at XTools' default project if none is
-     * provided). This requires the CentralAuth extension to be installed.
-     * @link https://www.mediawiki.org/wiki/Extension:CentralAuth
-     * @param string $username The username.
-     * @param Project $project The project to query.
-     * @return string[]
-     */
-    public function getGlobalGroups($username, Project $project = null)
-    {
-        // Get the default project if not provided.
-        if (!$project instanceof Project) {
-            $project = ProjectRepository::getDefaultProject($this->container);
-        }
-
-        // Create the API query.
-        $api = $this->getMediawikiApi($project);
-        $params = [
-            'meta' => 'globaluserinfo',
-            'guiuser' => $username,
-            'guiprop' => 'groups'
-        ];
-        $query = new SimpleRequest('query', $params);
-
-        // Get the result.
-        $res = $api->getRequest($query);
-        $result = [];
-        if (isset($res['batchcomplete']) && isset($res['query']['globaluserinfo']['groups'])) {
-            $result = $res['query']['globaluserinfo']['groups'];
-        }
-        return $result;
+        $editCount = $resultQuery->fetchColumn();
+        return $editCount;
     }
 
     /**
      * Search the ipblocks table to see if the user is currently blocked
      * and return the expiry if they are.
      * @param $databaseName The database to query.
-     * @param $userId The ID of the user to search for.
+     * @param $username The username of the user to search for.
      * @return bool|string Expiry of active block or false
      */
-    public function getBlockExpiry($databaseName, $userId)
+    public function getBlockExpiry($databaseName, $username)
     {
-        $ipblocksTable = $this->getTableName($databaseName, 'ipblocks');
+        $ipblocksTable = $this->getTableName($databaseName, 'ipblocks', 'ipindex');
         $sql = "SELECT ipb_expiry
                 FROM $ipblocksTable
-                WHERE ipb_user = :userId
+                WHERE ipb_address = :username
                 LIMIT 1";
-        $resultQuery = $this->executeProjectsQuery($sql, ['userId' => $userId]);
+        $resultQuery = $this->executeProjectsQuery($sql, ['username' => $username]);
         return $resultQuery->fetchColumn();
     }
 
@@ -295,5 +239,74 @@ class UserRepository extends Repository
         }
 
         return $this->executeProjectsQuery($sql, $params);
+    }
+
+    /**
+     * Get a user's local user rights on the given Project.
+     * @param Project $project
+     * @param User $user
+     * @return string[]
+     */
+    public function getUserRights(Project $project, User $user)
+    {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'user_rights');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $userGroupsTable = $project->getTableName('user_groups');
+        $userTable = $project->getTableName('user');
+
+        $sql = "SELECT ug_group
+                FROM $userGroupsTable
+                JOIN $userTable ON user_id = ug_user
+                WHERE user_name = :username";
+
+        $ret = $this->executeProjectsQuery($sql, [
+            'username' => $user->getUsername(),
+        ])->fetchAll(\PDO::FETCH_COLUMN);
+
+        // Cache and return.
+        return $this->setCache($cacheKey, $ret);
+    }
+
+    /**
+     * Get a user's global group membership (starting at XTools' default project if none is
+     * provided). This requires the CentralAuth extension to be installed.
+     * @link https://www.mediawiki.org/wiki/Extension:CentralAuth
+     * @param string $username The username.
+     * @param Project $project The project to query.
+     * @return string[]
+     */
+    public function getGlobalUserRights($username, Project $project = null)
+    {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'user_global_groups');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        // Get the default project if not provided.
+        if (!$project instanceof Project) {
+            $project = ProjectRepository::getDefaultProject($this->container);
+        }
+
+        // Create the API query.
+        $api = $this->getMediawikiApi($project);
+        $params = [
+            'meta' => 'globaluserinfo',
+            'guiuser' => $username,
+            'guiprop' => 'groups'
+        ];
+        $query = new SimpleRequest('query', $params);
+
+        // Get the result.
+        $res = $api->getRequest($query);
+        $result = [];
+        if (isset($res['batchcomplete']) && isset($res['query']['globaluserinfo']['groups'])) {
+            $result = $res['query']['globaluserinfo']['groups'];
+        }
+
+        // Cache and return.
+        return $this->setCache($cacheKey, $result);
     }
 }

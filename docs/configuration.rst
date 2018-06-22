@@ -66,6 +66,7 @@ The parameters ensures paths to your wiki(s) are properly constructed, and for c
 - **wiki_url** - Full URL of the wiki, used only if ``app.single_wiki`` is set to ``true``. The title of pages are attached to the end.
 - **api_path** - The API path for the projects, usually ``/w/api.php``.
 - **default_project** - The base URL of whatever wiki you consider to be the "default". This will be the default value for the "Project" field in the forms. On the Wikimedia installation, ``en.wikipedia.org`` is used because it is the most popular wiki. For single-wiki installations, the "Project" field in the forms are hidden, but you still need to provide this value for ``default_project``.
+- **oauth_project** - Which wiki should be used for OAuth authentication. You may want this to be the same as the ``default_project``.
 - **opted_in** - A list of database names of projects that will display :ref:`restricted statistics <optin>` regardless of individual users' preferences. For developers working off of the replicas, use ``enwiki_p``.
 
 Application
@@ -82,8 +83,6 @@ Application
 - **app.query_timeout** Maximum allowed time for queries to run. This is to ensure database quota is not exceeded.
 - **app.rate_limit_time** - Used for :ref:`rate limiting <rate_limiting>`. This parameter is the number of minutes during which ``app.rate_limit_count`` requests from the same user are allowed. Set this to ``0`` to disable rate limiting.
 - **app.rate_limit_count** - Number of requests from the same user that are allowed during the time frame specified by ``app.rate_limit_time``. Set this to ``0`` to disable rate limiting.
-- **app.multithread** Set to 1 to speed up the Edit Counter and other tools by making multiple asynchronous queries. This requires a multithreaded server (such as Apache), so you should set this to ``0`` if you are using the default Symfony server in your development environment. It may also be possible to forward all requests to ``/api`` to a dedicated API server. See the :ref:`administration <offload_api>` section for more. You must also set the ``app.base_path`` parameter for multithreading to work.
-- **app.base_path** The base URL of your XTools installation, including the protocol. This parameter is required if ``app.multithread`` is turned on.
 - **app.max_page_revisions** - Set a maximum number of revisions to process for pages. This is to safeguard against unnecessarily consuming too many resources for queries that will most surely timeout. Set this to `0` to disable all limitations.
 - **app.max_user_edits** - Querying a user that has more edits than this will be rejected. This is to safeguard against unnecessarily consuming too many resources for queries that will most surely timeout. Set this to `0` to disable all limitations.
 - **languageless_wikis** - This should be left blank for any non-WMF installation. This is used only to convert legacy XTools URL parameters to the modern equivalents, listing any wikis where there is no specific language associated with it. "meta.wikimedia.org" is intentionally not included. Developers may also leave this value blank.
@@ -93,15 +92,16 @@ Tools
 
 Selectively choose which tools to enable within XTools.
 
-- **enable.adminscore** - Enable "Admin Score" tool.
-- **enable.adminstats** - Enable "Admin Statistics" tool.
-- **enable.articleinfo** - Enable "Article Information" tool.
-- **enable.autoedits** - Enable "Automated Edits" tool.
-- **enable.bash** - Enable "Quote Database" tool.
-- **enable.ec** - Enable "Edit Counter" tool.
-- **enable.es** - Enable "Edit Summaries" tool.
-- **enable.pages** - Enable "Pages Created" tool.
-- **enable.rfx** - Enable "RfX Analysis" tool.
-- **enable.rfxvote** - Enable "RfX Vote Calculator" tool.
-- **enable.sc** - Enable "Plain, Dirty, Simple Edit Counter" tool.
-- **enable.topedits** - Enable "Top Edits" tool.
+- **enable.AdminScore** - Enable "Admin Score" tool.
+- **enable.AdminStats** - Enable "Admin Statistics" tool.
+- **enable.ArticleInfo** - Enable "Article Information" tool.
+- **enable.AutoEdits** - Enable "Automated Edits" tool.
+- **enable.CategoryEdits** - Enable "Category Edits" tool.
+- **enable.EditCounter** - Enable "Edit Counter" tool.
+- **enable.EditSummary** - Enable "Edit Summaries" tool.
+- **enable.Pages** - Enable "Pages Created" tool.
+- **enable.Quote** - Enable "Quote Database" tool.
+- **enable.RfXAnalysis** - Enable "RfX Analysis" tool.
+- **enable.RfXVoteCalculator** - Enable "RfX Vote Calculator" tool.
+- **enable.SimpleEditCounter** - Enable "Plain, Dirty, Simple Edit Counter" tool.
+- **enable.TopEdits** - Enable "Top Edits" tool.

@@ -10,6 +10,7 @@ use GuzzleHttp;
 /**
  * ArticleInfoRepository is responsible for retrieving data about a single
  * article on a given wiki.
+ * @codeCoverageIgnore
  */
 class ArticleInfoRepository extends Repository
 {

@@ -1,0 +1,246 @@
+{% extends 'base.html.twig' %}
+{% import 'macros/layout.html.twig' as layout %}
+{% import 'macros/pieChart.html.twig' as chart %}
+{% import 'macros/wiki.html.twig' as wiki %}
+
+{% block body %}
+
+{# name of first category #}
+{% set firstCategory = ce.categories[0] %}
+
+<div class="panel panel-primary">
+    {{ layout.userHeading(user, project, 'CategoryEdits') }}
+
+    <div class="panel-body xt-panel-body">
+        {{ wiki.userLinks(user, project, 'CategoryEdits') }}
+
+        <h3 class="text-center">
+            {% if ce.categories|length == 1 %}
+                {{ wiki.pageLinkRaw(nsName(14, project.namespaces) ~ ':' ~ firstCategory, project) }}
+            {% else %}
+                {{ msg('tool-categoryedits') }}
+            {% endif %}
+        </h3>
+
+        {# Show TOC when the user has a ton of automated tools, making the page hard to navigate #}
+        {% if ce.categories|length > 2 %}
+            <div class="text-center xt-toc">
+                {% set sections = ['summary', 'contributions'] %}
+                {% for section in sections %}
+                    <span>
+                        <a href="#{{ section }}" data-section="{{ section }}">{{ msg(section) }}</a>
+                    </span>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {# ======================== SUMMARY ======================== #}
+
+        {% set content %}
+            <div class="stat-list categories-stat-list clearfix" id="summary">
+                <table class="table categories-table pull-left">
+                    <tr>
+                        {% if ce.categories|length == 1 %}
+                            <td>{{ msg('category') }}</td>
+                            <td>
+                                {{ wiki.pageLinkRaw(nsName(14, project.namespaces) ~ ':' ~ firstCategory, project, firstCategory|replace({'_': ' '})) }}
+                            </td>
+                        {% else %}
+                            <td>{{ msg('categories') }}</td>
+                            <td>{{ ce.categories|length|num_format }}</td>
+                        {% endif %}
+                    </tr>
+                    {% if ce.start is not empty %}
+                        <tr>
+                            <td>{{ msg('start') }}</td>
+                            <td>{{ ce.start|date_format('yyyy-MM-dd') }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if ce.end is not empty %}
+                        <tr>
+                            <td>{{ msg('end') }}</td>
+                            <td class="xt-test--end-date">{{ ce.end|date_format('yyyy-MM-dd') }}</td>
+                        </tr>
+                    {% endif %}
+
+                    <tr>
+                        <td>{{ msg('total-edits') }}</td>
+                        <td>{{ ce.editCount|num_format }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('edits-in-categories') }}</td>
+                        <td>
+                            {{ ce.categoryEditCount|num_format }}
+                            ({{ ce.categoryPercentage|percent_format }})
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('edits-not-in-categories') }}</td>
+                        <td>
+                            {{ max(ce.editCount - ce.categoryEditCount, 0)|num_format }}
+                            ({{ (100 - ce.categoryPercentage)|percent_format }})
+                        </td>
+                    </tr>
+                </table>
+                {% if ce.editCount > 0 %}
+                    <div class="pull-left">
+                        {{
+                            chart.pie_chart('category_edits',
+                                [{
+                                    label: msg('edits-in-categories'),
+                                    value: ce.categoryEditCount,
+                                    percentage: ce.categoryPercentage
+                                },
+                                {
+                                    label: msg('edits-not-in-categories'),
+                                    value: ce.editCount - ce.categoryEditCount,
+                                    percentage: 100 - ce.categoryPercentage
+                                }],
+                                false,
+                                'categoryedits-summary-chart',
+                                140
+                            )
+                        }}
+                    </div>
+                {% endif %}
+            </div>
+
+            {# ======================== CATEGORY COUNTS ======================== #}
+
+            {% if ce.categories|length > 1 %}
+                <table class="table table-bordered table-hover table-striped tools-table toggle-table">
+                    <thead>
+                    {% for key in ['category', 'count', 'percent-of-edit-count'] %}
+                        <th>
+                            <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
+                                {{ msg(key)|capitalize_first }}
+                                <span class="glyphicon glyphicon-sort"></span>
+                            </span>
+                        </th>
+                    {% endfor %}
+                    </thead>
+                    <tbody>
+                    {% for category, count in ce.categoryCounts %}
+                        <tr>
+                            <td class="sort-entry--category linked" data-value="{{ category }}">
+                                <span class="tools-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ category }}">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                    <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
+                                </span>
+                                {## REFACTOR: add method to CategoryEdits that incldues namespaces ##}
+                                {{ wiki.pageLinkRaw(nsName(14, project.namespaces) ~ ':' ~ category, project, category|replace({'_': ' '})) }}
+                            </td>
+                            <td class="sort-entry--count" data-value="{{ count }}">
+                                <a href="{{ path('CategoryEditsResult', {project:project.domain, username:user.username, categories: category, start: ce.start, end: ce.end}) }}">
+                                    {{ count|num_format }}
+                                </a>
+                            </td>
+                            <td class="sort-entry--percent-of-edit-count" data-value="{{ count }}">
+                                {{ count|percent_format(ce.editCount) }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <th class="category--category">
+                            {{ ce.categoryCounts|length|num_format }}
+                            {{ msg('num-categories', [ce.categoryCounts|length]) }}
+                        </th>
+                        <th class="category--count">
+                            {{ ce.categoryEditCount|num_format }}
+                        </th>
+                        <th colspan=2></th>
+                    </tfoot>
+                </table>
+
+                {##
+                 # Set the size of the chart to be relative to the number of tools.
+                 # Otherwise it may get too big and hog up the real estate.
+                 # 37 is the heigh of one row.
+                 ##}
+                {% set maxHeight = min(300, (ce.categoryCounts|length + 2) * 37) %}
+                {% set height = max(200, maxHeight) %}
+                {# width gets + 100 to give a little breathing room for the tooltips #}
+                {% set width = max(200, height) + 100 %}
+                <div class="chart-wrapper category-chart-wrapper toggle-table--chart">
+                    <canvas id="category_chart" width="{{ width }}" height="{{ height }}"></canvas>
+                </div>
+
+                {% set colors = [] %}
+                {% for i in 0..(ce.categoryCounts|length) %}
+                    {% set colors = colors|merge([chartColor(i)]) %}
+                {% endfor %}
+
+                <script>
+                    window.categoryChart = new Chart($('#category_chart'), {
+                        type: 'pie',
+                        data: {
+                            labels: {{ ce.categoriesNormalized|json_encode()|raw }},
+                            datasets: [{
+                                data: [
+                                    {% for _category, count in ce.categoryCounts %}
+                                        {{ count }}{% if not loop.last %},{% endif %}
+                                    {% endfor %}
+                                ],
+                                backgroundColor: {{ colors|json_encode()|raw }},
+                                borderColor: {{ colors|json_encode()|raw }},
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            aspectRatio: 1,
+                            legend: {
+                              display: false,
+                            },
+                            tooltips: {
+                                callbacks: {
+                                    label: function(tooltipItem, chartData) {
+                                        var label = chartData.labels[tooltipItem.index],
+                                            value = chartData.datasets[0].data[tooltipItem.index];
+                                        return label + ': ' + value.toLocaleString(i18nLang);
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    window.countsByCategory = {{ ce.categoryCounts|json_encode()|raw }};
+                </script>
+            {% endif %}
+
+            <div class="footnotes text-muted" style="clear:both">
+                {{ msg('all-approximate') }}
+            </div>
+        {% endset %}
+        {{ layout.content_block('summary', content, 'tool-categoryedits-desc') }}
+
+        {# ======================== CATEGORY CONTRIBUTIONS ======================== #}
+
+        {% if ce.editCount == 0 %}
+            {% set content %}
+                <div class="alert alert-info">
+                    {{ msg('no-contribs') }}
+                </div>
+            {% endset %}
+        {% else %}
+            {% set content %}
+                <div>
+                    <em class="contributions-loading text-muted">{{ msg('loading') }}...</em>
+                    <div class="contributions-container"
+                        data-project="{{ project.domain }}"
+                        data-username="{{ user.username }}"
+                        data-categories="{{ ce.categoriesPiped }}"
+                        data-start="{{ ce.start }}"
+                        data-end="{{ ce.end }}"
+                        data-offset="{{ ce.offset }}">
+                    </div>
+                </div>
+            {% endset %}
+        {% endif %}
+        {{ layout.content_block('contributions', content, null, 'contributions') }}
+
+        <div class="times-in-utc text-muted">
+            {{ msg('times-in-utc') }}
+        </div>
+    </div>
+</div>
+{% endblock %}

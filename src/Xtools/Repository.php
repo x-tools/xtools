@@ -38,9 +38,6 @@ abstract class Repository
     /** @var Connection The database connection to other tools' databases.  */
     private $toolsConnection;
 
-    /** @var GuzzleHttp\Client $apiConnection Connection to XTools API. */
-    private $apiConnection;
-
     /** @var CacheItemPoolInterface The cache. */
     protected $cache;
 
@@ -71,16 +68,7 @@ abstract class Repository
     }
 
     /**
-     * Get the NullLogger instance.
-     * @return NullLogger
-     */
-    public function getLog()
-    {
-        return $this->log;
-    }
-
-    /**
-     * Is XTools connecting to MMF Labs?
+     * Is XTools connecting to WMF Labs?
      * @return boolean
      * @codeCoverageIgnore
      */
@@ -188,32 +176,6 @@ abstract class Repository
      *****************/
 
     /**
-     * Make a request to the XTools API, optionally doing so asynchronously via Guzzle.
-     * @param string $endpoint Relative path to endpoint with relevant query parameters.
-     * @param bool $async Set to true to asynchronously query and return a promise.
-     * @return GuzzleHttp\Psr7\Response|GuzzleHttp\Promise\Promise
-     */
-    public function queryXToolsApi($endpoint, $async = false)
-    {
-        if (!$this->apiConnection) {
-            $this->apiConnection = $this->container->get('guzzle.client.xtools');
-        }
-
-        $key = $this->container->getParameter('secret');
-
-        // Remove trailing slash if present.
-        $basePath = trim($this->container->getParameter('app.base_path'), '/');
-
-        $endpoint = "$basePath/api/$endpoint/$key";
-
-        if ($async) {
-            return $this->apiConnection->getAsync($endpoint);
-        } else {
-            return $this->apiConnection->get($endpoint);
-        }
-    }
-
-    /**
      * Normalize and quote a table name for use in SQL.
      *
      * @param string $databaseName
@@ -289,7 +251,8 @@ abstract class Repository
             $cacheKey .= $this->getCacheKeyFromArg($arg);
         }
 
-        return $cacheKey;
+        // Remove reserved characters.
+        return preg_replace('/[{}()\/\@\:"]/', '', $cacheKey);
     }
 
     /**
@@ -368,7 +331,10 @@ abstract class Repository
     public function executeProjectsQuery($sql, $params = [], $timeout = null)
     {
         try {
-            $this->setQueryTimeout($timeout);
+            $timeout = $timeout === null
+                ? $this->container->getParameter('app.query_timeout')
+                : $timeout;
+            $sql = "SET STATEMENT max_statement_time = $timeout FOR\n".$sql;
             return $this->getProjectsConnection()->executeQuery($sql, $params);
         } catch (DriverException $e) {
             return $this->handleDriverError($e, $timeout);
@@ -386,8 +352,11 @@ abstract class Repository
     public function executeQueryBuilder(QueryBuilder $qb, $timeout = null)
     {
         try {
-            $this->setQueryTimeout($timeout);
-            return $qb->execute();
+            $timeout = $timeout === null
+                ? $this->container->getParameter('app.query_timeout')
+                : $timeout;
+            $sql = "SET STATEMENT max_statement_time = $timeout FOR\n".$qb->getSQL();
+            return $qb->getConnection()->executeQuery($sql, $qb->getParameters(), $qb->getParameterTypes());
         } catch (DriverException $e) {
             return $this->handleDriverError($e, $timeout);
         }
@@ -411,7 +380,7 @@ abstract class Repository
         if ($e->getErrorCode() === 1226) {
             $this->logErrorData('MAX CONNECTIONS');
             throw new ServiceUnavailableHttpException(30, 'error-service-overload', null, 503);
-        } elseif ($e->getErrorCode() === 1969) {
+        } elseif ($e->getErrorCode() === 1969 || $e->getErrorCode() === 2013) {
             $this->logErrorData('QUERY TIMEOUT');
             throw new HttpException(504, 'error-query-timeout', null, [], $timeout);
         } else {
@@ -426,23 +395,8 @@ abstract class Repository
     private function logErrorData($error)
     {
         $metadata = $this->getCurrentRequestMetadata();
-        $this->getLog()->error(
+        $this->log->error(
             '>>> '.$metadata['path'].' ('.$error.' after '.$metadata['requestTime'].')'
         );
-    }
-
-    /**
-     * Set the maximum statement time on the MySQL engine.
-     * @param int|null $timeout In seconds. null will use the default
-     *   specified by the app.query_timeout config parameter.
-     * @codeCoverageIgnore
-     */
-    public function setQueryTimeout($timeout = null)
-    {
-        if ($timeout === null) {
-            $timeout = $this->container->getParameter('app.query_timeout');
-        }
-        $sql = "SET max_statement_time = $timeout";
-        $this->getProjectsConnection()->executeQuery($sql);
     }
 }

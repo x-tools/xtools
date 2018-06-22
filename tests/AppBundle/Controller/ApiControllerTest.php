@@ -81,4 +81,30 @@ class ApiControllerTest extends WebTestCase
             $this->assertEquals('Utilisateur', array_values($namespaces)[2]); // User in French
         }
     }
+
+    /**
+     * Test page assessments.
+     */
+    public function testAssessments()
+    {
+        // Test 404 (for single-wiki setups, that wiki's namespaces are always returned).
+        $crawler = $this->client->request('GET', '/api/project/assessments/wiki.that.doesnt.exist.org');
+        if ($this->isSingle) {
+            $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        } else {
+            $this->assertEquals(404, $this->client->getResponse()->getStatusCode());
+        }
+
+        if ($this->container->getParameter('app.is_labs')) {
+            $crawler = $this->client->request('GET', '/api/project/assessments/en.wikipedia.org');
+            $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+
+            $response = (array)json_decode($this->client->getResponse()->getContent(), true);
+            $this->assertEquals('en.wikipedia.org', $response['project']);
+            $this->assertArraySubset(
+                ['FA', 'A', 'GA', 'bplus', 'B', 'C', 'Start'],
+                array_keys($response['assessments']['class'])
+            );
+        }
+    }
 }

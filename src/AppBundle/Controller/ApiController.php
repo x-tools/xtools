@@ -88,6 +88,44 @@ class ApiController extends FOSRestController
     }
 
     /**
+     * Get assessment data for a given project.
+     * @Rest\Get("/api/project/assessments/{project}")
+     * @param string $project The project name.
+     * @return View
+     */
+    public function assessments($project = null)
+    {
+        if ($project === null) {
+            return new View(
+                [
+                    'projects' => array_keys($this->container->getParameter('assessments')),
+                    'config' => $this->container->getParameter('assessments'),
+                ],
+                Response::HTTP_OK
+            );
+        }
+
+        $proj = ProjectRepository::getProject($project, $this->container);
+
+        if (!$proj->exists()) {
+            return new View(
+                [
+                    'error' => "$project is not a valid project",
+                ],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+
+        return new View(
+            [
+                'project' => $proj->getDomain(),
+                'assessments' => $proj->getPageAssessments()->getConfig(),
+            ],
+            Response::HTTP_OK
+        );
+    }
+
+    /**
      * Transform given wikitext to HTML using the XTools parser.
      * Wikitext must be passed in as the query 'wikitext'.
      * @Rest\Get("/api/project/parser/{project}")

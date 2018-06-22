@@ -1,8 +1,12 @@
 @import 'mixins.scss';
 
-.ec {
+.editcounter {
     .stat-list .table {
         margin: 0 auto;
+
+        &.rights-changes-summary {
+            margin: 0;
+        }
     }
 
     .stat-list--empty-group {
@@ -17,6 +21,11 @@
     #yearcounts-canvas,
     #monthcounts-canvas {
         max-width: 1000px;
+    }
+
+    #namespace-canvas {
+        height: auto;
+        width: auto;
     }
 
     .top-project-edit-counts td {

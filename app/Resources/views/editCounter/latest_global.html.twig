@@ -1,5 +1,6 @@
 {% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
 {% import 'macros/wiki.html.twig' as wiki %}
+{% import 'macros/layout.html.twig' as layout %}
 
 {% block body %}
 
@@ -16,34 +17,43 @@
             </div>
         </header>
         <div class="panel-body xt-panel-body">
+            {{ wiki.userLinks(user, project, xtPage) }}
+
             <section class="panel panel-default clearfix">
                 <header class="panel-heading col-lg-12">
-                    <h4>{{ msg('latest-global-edits') }}</h4>
+                    <h4>
+                        {{ msg('latest-global-edits') }}
+                    </h4>
                 </header>
                 <div class="panel-body col-lg-12">
+                    <em class="contributions-loading text-muted" style="display:none">{{ msg('loading') }}...</em>
+                    <div class="contributions-container"
+                        data-project="{{ project.domain }}"
+                        data-username="{{ user.username }}"
+                        data-offset="0"
+                        data-target="ec-latestglobal"
+                        data-pagesize="50">
 {% endif %}
 
-{% if ec.globalEdits(40)|length > 0 %}
-    <table class="table table-bordered table-hover table-striped latest-global-table">
+{% set pageSize = pageSize is not empty ? pageSize : 50 %}
+{% set globalEdits = ec.globalEdits(pageSize, offset) %}
+{% if globalEdits|length > 0 %}
+    {{ layout.contributionsNav(offset, globalEdits|length, pageSize) }}
+    <table class="table table-bordered table-hover table-striped contributions-table">
         <thead><tr>
             {% for key in ['date', 'project', 'links', 'page-title', 'size', 'edit-summary'] %}
                 <th>
-                    <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
-                        {% if key == 'average-time-bw-edits' %}
-                            atbe<sup>1</sup>
-                        {% else %}
-                            {{ msg(key)|capitalize_first }}
+                    <span{% if key != 'links' %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
+                        {{ msg(key)|capitalize_first }}
+                        {% if key != 'links' %}
+                            <span class="glyphicon glyphicon-sort"></span>
                         {% endif %}
-                        {% if key == 'added_bytes' %}
-                            <sup class="rm-inline-margin-left">2</sup>
-                        {% endif %}
-                        {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
                     </span>
                 </th>
             {% endfor %}
         </tr></thead>
         <tbody>
-        {% for edit in ec.globalEdits(40) %}
+        {% for edit in globalEdits %}
             <tr>
                 <td class="sort-entry--date" data-value="{{ edit.timestamp.format('U') }}">
                     {{ wiki.permaLink(edit) }}
@@ -54,8 +64,6 @@
                 </td>
                 <td>
                     {{ wiki.diffLink(edit) }}
-                    &middot;
-                    {{ wiki.userLogLink(user, edit.project) }}
                     &middot;
                     <a href="{{ path('TopEditsResult', {project:edit.project.databaseName, username:user.username, namespace:edit.page.namespace, article:edit.page.titleWithoutNamespace}) }}">{{ msg('tool-topedits') }}</a>
                 </td>
@@ -72,6 +80,7 @@
         {% endfor %}
         </tbody>
     </table>
+    {{ layout.contributionsNav(offset, globalEdits|length, pageSize) }}
 {% else %}
     <div class="alert alert-info">
         {{ msg('no-contribs') }}
@@ -79,7 +88,7 @@
 {% endif %}
 
 {% if not is_sub_request %}
-    </div></section>
+    </div></div></section>
     <div class="text-muted times-in-utc" style="clear:both">
         {{ msg('times-in-utc') }}
     </div>

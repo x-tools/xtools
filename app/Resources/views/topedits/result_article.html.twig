@@ -44,7 +44,9 @@
                             <td>{{ msg('user') }}</td>
                             <td>
                                 {{ wiki.userLink(user, project) }}
-                                <small>(<a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool-ec') }}</a>)</small>
+                                {% if enabled('EditCounter') %}
+                                    <small>(<a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool-editcounter') }}</a>)</small>
+                                {% endif %}
                             </td>
                         </tr>
                         <tr>

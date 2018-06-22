@@ -18,6 +18,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Xtools\ArticleInfo;
 use Xtools\ArticleInfoRepository;
 use Xtools\Page;
+use Xtools\PageAssessments;
 use Xtools\Project;
 use Xtools\ProjectRepository;
 
@@ -27,19 +28,19 @@ use Xtools\ProjectRepository;
 class ArticleInfoController extends XtoolsController
 {
     /**
-     * Get the tool's shortname.
+     * Get the name of the tool's index route.
+     * This is also the name of the associated model.
      * @return string
      * @codeCoverageIgnore
      */
-    public function getToolShortname()
+    public function getIndexRoute()
     {
-        return 'articleinfo';
+        return 'ArticleInfo';
     }
 
     /**
      * The search form.
-     * @Route("/articleinfo", name="articleinfo")
-     * @Route("/articleinfo", name="articleInfo")
+     * @Route("/articleinfo", name="ArticleInfo")
      * @Route("/articleinfo/", name="articleInfoSlash")
      * @Route("/articleinfo/index.php", name="articleInfoIndexPhp")
      * @Route("/articleinfo/{project}", name="ArticleInfoProject")
@@ -284,7 +285,11 @@ class ArticleInfoController extends XtoolsController
 
     /**
      * Get basic info on a given article.
-     * @Route("/api/articleinfo/{project}/{article}", requirements={"article"=".+"})
+     * @Route(
+     *     "/api/articleinfo/{project}/{article}",
+     *     name="ArticleInfoApiAction",
+     *     requirements={"article"=".+"}
+     * )
      * @Route("/api/page/articleinfo/{project}/{article}", requirements={"article"=".+"})
      * @param Request $request The HTTP request.
      * @param string $project
@@ -348,6 +353,8 @@ class ArticleInfoController extends XtoolsController
             'pageviews_offset' => $pageviewsOffset,
         ];
 
+        $info = false;
+
         try {
             $info = $page->getBasicEditingInfo();
         } catch (\Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException $e) {
@@ -366,6 +373,10 @@ class ArticleInfoController extends XtoolsController
             $modifiedDateTime = DateTime::createFromFormat('YmdHis', $info['modified_at']);
             $secsSinceLastEdit = (new DateTime)->getTimestamp() - $modifiedDateTime->getTimestamp();
 
+            $assessment = $page->getProject()
+                ->getPageAssessments()
+                ->getAssessment($page);
+
             $data = array_merge($data, [
                 'revisions' => (int) $info['num_edits'],
                 'editors' => (int) $info['num_editors'],
@@ -376,6 +387,7 @@ class ArticleInfoController extends XtoolsController
                 'modified_at' => $modifiedDateTime->format('Y-m-d H:i'),
                 'secs_since_last_edit' => $secsSinceLastEdit,
                 'last_edit_id' => (int) $info['modified_rev_id'],
+                'assessment' => $assessment,
             ]);
         }
 
@@ -410,7 +422,11 @@ class ArticleInfoController extends XtoolsController
 
     /**
      * Get prose statistics for the given article.
-     * @Route("/api/page/prose/{project}/{article}", requirements={"article"=".+"})
+     * @Route(
+     *     "/api/page/prose/{project}/{article}",
+     *     name="PageApiProse",
+     *     requirements={"article"=".+"}
+     * )
      * @param Request $request The HTTP request.
      * @param string $article
      * @return JsonResponse
@@ -453,5 +469,94 @@ class ArticleInfoController extends XtoolsController
             $ret,
             Response::HTTP_OK
         );
+    }
+
+    /**
+     * Get the page assessments of a page, along with various related metadata.
+     * @Route(
+     *     "/api/page/assessments/{project}/{articles}",
+     *     name="PageApiAssessments",
+     *     requirements={"article"=".+"}
+     * )
+     * @param  Request $request
+     * @param  string $articles May be multiple pages separated by pipes, e.g. Foo|Bar|Baz
+     * @return JsonResponse
+     * @codeCoverageIgnore
+     */
+    public function assessmentsApiAction(Request $request, $articles)
+    {
+        $this->recordApiUsage('page/assessments');
+
+        // First validate project.
+        $ret = $this->validateProjectAndUser($request);
+        if ($ret instanceof RedirectResponse) {
+            return new JsonResponse(
+                ['error' => 'Invalid project'],
+                Response::HTTP_NOT_FOUND
+            );
+        } else {
+            $project = $ret[0];
+        }
+
+        $pages = explode('|', $articles);
+        $out = [];
+
+        foreach ($pages as $page) {
+            $page = $this->getAndValidatePage($project, $page);
+            if ($page instanceof RedirectResponse) {
+                $out[$page->getTitle()] = false;
+            } else {
+                $assessments = $page->getProject()
+                    ->getPageAssessments()
+                    ->getAssessments($page);
+
+                $out[$page->getTitle()] = $request->get('classonly')
+                    ? $assessments['assessment']
+                    : $assessments;
+            }
+        }
+
+        return new JsonResponse(
+            $out,
+            Response::HTTP_OK
+        );
+    }
+
+    /**
+     * Get number of in and outgoing links and redirects to the given page.
+     * @Route(
+     *     "/api/page/links/{project}/{article}",
+     *     name="PageApiLinks",
+     *     requirements={"article"=".+"}
+     * )
+     * @param Request $request The HTTP request.
+     * @param string $article
+     * @return JsonResponse
+     * @codeCoverageIgnore
+     */
+    public function linksApiAction(Request $request, $article)
+    {
+        $this->recordApiUsage('page/links');
+
+        // First validate project.
+        $ret = $this->validateProjectAndUser($request);
+        if ($ret instanceof RedirectResponse) {
+            return new JsonResponse(
+                ['error' => 'Invalid project'],
+                Response::HTTP_NOT_FOUND
+            );
+        } else {
+            $project = $ret[0];
+        }
+
+        $page = $this->getAndValidatePage($project, $article);
+
+        $response = new JsonResponse(
+            $page->countLinksAndRedirects(),
+            Response::HTTP_OK
+        );
+        $response->setEncodingOptions(JSON_NUMERIC_CHECK);
+
+        return $response;
     }
 }

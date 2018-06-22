@@ -51,7 +51,7 @@ class TopEditsTest extends WebTestCase
     }
 
     /**
-     * Test the basic functionality of Edit.
+     * Test the basic functionality of TopEdits.
      */
     public function testBasic()
     {
@@ -74,6 +74,10 @@ class TopEditsTest extends WebTestCase
         $te4 = new TopEdits($this->project, $this->user, null, 'all', 3);
         $this->assertEquals('all', $te4->getNamespace());
         $this->assertEquals(3, $te4->getLimit());
+
+        $page = new Page($this->project, 'Test page');
+        $te->setPage($page);
+        $this->assertEquals($page, $te->getPage());
     }
 
     /**

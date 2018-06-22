@@ -1,0 +1,47 @@
+{% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
+{% import 'macros/wiki.html.twig' as wiki %}
+{% import 'macros/layout.html.twig' as layout %}
+
+{% block body %}
+
+{% if not is_sub_request %}
+    <div class="panel panel-primary">
+        {% set args = {username: user.username, categories: ce.categoriesPiped, start: ce.start|trans, end: ce.end|trans} %}
+        {{ layout.userHeading(user, project, 'CategoryEdits', args) }}
+
+        <div class="panel-body xt-panel-body">
+            {{ wiki.userLinks(user, project, xtPage) }}
+
+            <section class="panel panel-default clearfix">
+                <header class="panel-heading col-lg-12">
+                    <h4>
+                        {% if ce.categories()|length == 1 %}
+                            {{ wiki.pageLinkRaw(nsName(14, project.namespaces) ~ ':' ~ ce.categoriesPiped, project) }}
+                        {% else %}
+                            {{ msg('contributions') }}
+                        {% endif %}
+                        <span class='pull-right text-muted xt-panel-description'>{{ msg('tool-categoryedits-desc') }}</span>
+                    </h4>
+                </header>
+                <div class="panel-body col-lg-12">
+                    <em class="category-contribs-loading contributions-loading text-muted" style="display:none">{{ msg('loading') }}...</em>
+                    <div class="category-contribs-container contributions-container"
+                        data-project="{{ project.domain }}"
+                        data-username="{{ user.username }}"
+                        data-categories="{{ ce.categoriesPiped }}"
+                        data-start="{{ ce.start }}"
+                        data-end="{{ ce.end }}"
+                        data-offset="{{ ce.offset }}">
+{% endif %}
+
+{{ layout.contributions(project, ce.categoryEdits(), ce.offset) }}
+
+{% if not is_sub_request %}
+    </div></div></section>
+    <div class="text-muted times-in-utc" style="clear:both">
+        {{ msg('times-in-utc') }}
+    </div>
+    </div></div>
+{% endif %}
+
+{% endblock %}

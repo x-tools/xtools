@@ -17,7 +17,7 @@
 {% if pages.deleted != 'deleted' %}
 {% set columns = columns|merge(['current-size']) %}
 {% endif %}
-{% if ns == '0' and pages.hasPageAssessments and pages.deleted != 'deleted' %}
+{% if project.hasPageAssessments(ns) and pages.deleted != 'deleted' %}
 {% set columns = columns|merge(['assessment']) %}
 {% endif %}
 {% for thKey in columns %}
@@ -43,14 +43,13 @@
 {% if pages.deleted != 'deleted' %}
 | {% if page.page_len is null %}{{ msg('na') }}{% else %}{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ page.page_len }}}}{% endif %}
 
-{% if ns == '0' and pages.hasPageAssessments %}
-{% set badge = project.assessmentBadgeURL(page.pa_class, true) -%}
-| {% if badge is defined %}
-[[File:{{ badge }}|20px]] {{ page.pa_class ? page.pa_class : msg('unknown') }}
+{% if project.hasPageAssessments(ns) %}
+| {% if page.badgeFile is defined %}
+[[File:{{ page.badgeFile }}|20px]] {{ page.pa_class ? page.pa_class : msg('unknown') }}
 {% endif %}
 {% endif %}
 {% endif %}
-| [{{ wiki.pageLogUrlRaw(pagename, project) }} {{ msg('log') }}]{% if page.type == 'rev' %} &middot; [{{ wiki.pageHistUrlRaw(pagename, project) }} {{ msg('history') }}]{% if enabled('articleinfo') %} &middot; [{{ url('ArticleInfoResult', {'project': project.domain, 'article': pagename}) }} {{ msg('tool-articleinfo') }}]{% endif %}{% if enabled('topedits') %} &middot; [{{ url('topedits', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'page': page.page_title}) }} {{ msg('tool-topedits') }}]{% endif %}{% if isWMFLabs() %} &middot; [https://tools.wmflabs.org/pageviews?project={{ project.domain }}&amp;pages={{ pagename|e('url') }} {{ msg('pageviews') }}]{% endif %}{% endif %}
+| [{{ wiki.pageLogUrlRaw(pagename, project) }} {{ msg('log') }}]{% if page.type == 'rev' %} &middot; [{{ wiki.pageHistUrlRaw(pagename, project) }} {{ msg('history') }}]{% if enabled('ArticleInfo') %} &middot; [{{ url('ArticleInfoResult', {'project': project.domain, 'article': pagename}) }} {{ msg('tool-articleinfo') }}]{% endif %}{% if enabled('TopEdits') %} &middot; [{{ url('topedits', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'page': page.page_title}) }} {{ msg('tool-topedits') }}]{% endif %}{% if isWMFLabs() %} &middot; [https://tools.wmflabs.org/pageviews?project={{ project.domain }}&amp;pages={{ pagename|e('url') }} {{ msg('pageviews') }}]{% endif %}{% endif %}
 
 {% endfor %}
 {% if pages.counts[ns].count > maxRows and multiNamspace %}

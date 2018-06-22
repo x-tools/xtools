@@ -1,5 +1,133 @@
 parameters:
   assessments:
+    ar.wikipedia.org:
+      wikiproject_prefix: 'ويكيبيديا:مشروع ويكي '
+      class:
+        م.مخ: # Featured
+          badge: 'b/b4/Symbol_star_gold.svg'
+          color: '#6699ff'
+          category: 'تصنيف:مقالات ذات صنف م.مخ'
+        أ: # A
+          badge: '2/25/Symbol_a_class.svg'
+          color: '#66ffff'
+          category: 'تصنيف:مقالات ذات صنف أ'
+        م.ج: # GA
+          badge: '9/9d/Symbol_star_silver.svg'
+          color: '#66ff66'
+          category: 'تصنيف:مقالات ذات صنف م.ج'
+        ب+: # B+
+          badge: '2/2c/Symbol_bplus_class.svg'
+          color: '#66ff66'
+          category: 'تصنيف:مقالات ذات صنف ب+'
+        ب: # B
+          badge: '5/5f/Symbol_b_class.svg'
+          color: '#b2ff66'
+          category: 'تصنيف:مقالات ذات صنف ب'
+        ج: # C
+          badge: 'e/e6/Symbol_c_class.svg'
+          color: '#ffff66'
+          category: 'تصنيف:مقالات ذات صنف ج'
+        بداية: # Start
+          badge: 'a/a4/Symbol_start_class.svg'
+          color: '#ffaa66'
+          category: 'تصنيف:مقالات ذات صنف بداية'
+        بذرة: # Stub
+          badge: 'f/f5/Symbol_stub_class.svg'
+          color: '#ff6666'
+          category: 'تصنيف:مقالات ذات صنف بذرة'
+        ق.مخ: # FL
+          badge: 'b/bc/Featured_article_star.svg'
+          color: '#6699ff'
+          category: 'تصنيف:مقالات ذات صنف ق.مخ'
+        قائمة: # List
+          badge: 'd/db/Symbol_list_class.svg'
+          color: '#aa88ff'
+          category: 'تصنيف:مقالات ذات صنف قائمة'
+        ب.قائمة: # B-List
+          badge: 'd/db/Symbol_list_class.svg'
+          color: '#ff6666'
+          category: 'تصنيف:مقالات ذات صنف ب.قائمة'
+        م.ف.م: # M.F. ???
+          badge: 'd/d5/Desacuerdo-Artículo bueno-blue.svg'
+          color: '#ccaaff'
+          category: 'تصنيف:مقالات ذات صنف م.ف.م'
+        حالية: # Current
+          badge: '5/54/Symbol_wait.svg'
+          color: '#d870ff'
+          category: 'تصنيف:مقالات ذات صنف حالية'
+        مستقبلية: # Future
+          badge: '0/04/Symbol_wait_alternative.svg'
+          color: '#8a95c9'
+          category: 'تصنيف:مقالات ذات صنف مستقبلية'
+        تصنيف: # Category
+          badge: '9/96/Symbol_category_class.svg'
+          color: '#ffdb58'
+          category: 'تصنيف:مقالات ذات صنف تصنيف'
+        توضيح: # Disambig
+          badge: '2/2a/Symbol_dab_class.svg'
+          color: '#00fa9a'
+          category: 'تصنيف:مقالات ذات صنف توضيح'
+        و.مخ: # Featured file
+          badge: 'b/bc/Featured_article_star.svg'
+          color: '#6699ff'
+          category: 'تصنيف:مقالات ذات صنف و.مخ'
+        ملف: # File
+          badge: '9/9c/Symbol_file_class.svg'
+          color: '#ddccff'
+          category: 'تصنيف:مقالات ذات صنف ملف'
+        دمج: # Merge
+          badge: 'b/b0/Symbol_merge_vote.svg'
+          color: '#add8e6'
+          category: 'تصنيف:مقالات ذات صنف دمج'
+        بوابة: # Portal
+          badge: 'e/e2/Symbol_portal_class.svg'
+          color: '#cc8899'
+          category: 'تصنيف:مقالات ذات صنف بوابة'
+        مشروع: # WikiProject
+          badge: '7/72/Symbol_project_class.svg'
+          color: '#c0c090'
+          category: 'تصنيف:مقالات ذات صنف مشروع'
+        تحويلة: # Deferred
+          badge: '4/48/Symbol_deferred_class.svg'
+          color: '#c0c0c0'
+          category: 'تصنيف:مقالات أغنية الجليد والنار ذات صنف تحويلة'
+        قالب: # Template
+          badge: '5/5c/Symbol_template_class.svg'
+          color: '#fbceb1'
+          category: 'تصنيف:مقالات ذات صنف قالب'
+        غير مقالية: # Uncategorized ???
+          badge: '1/11/Symbol_question_vote.svg'
+          color: '#f5f5f5'
+          category: 'تصنيف:مقالات ذات صنف غير مقالية'
+        Unknown:
+          badge: 'e/e0/Symbol_question.svg'
+          color: ''
+          category: 'تصنيف:مقالات غير مقيمة'
+      importance:
+        فائقة: # High
+          color: '#ff00ff'
+          category: 'تصنيف:مقالات فائقة الأهمية'
+          weight: 5
+        عالية: # Top
+          color: '#ff88ff'
+          category: 'تصنيف:مقالات عالية الأهمية'
+          weight: 4
+        متوسطة: # Medium
+          color: '#ffbbff'
+          category: 'تصنيف:مقالات متوسطة الأهمية'
+          weight: 3
+        قليلة: # Low
+          color: '#ffddff'
+          category: 'تصنيف:مقالات قليلة الأهمية'
+          weight: 2
+        غير مطبقة: # Lowest
+          color: '#f5f5f5'
+          category: 'تصنيف:مقالات غير مطبقة الأهمية'
+          weight: 1
+        Unknown:
+          color: ''
+          category: 'تصنيف:مقالات غير معروفة الأهمية'
+          weight: 0
     en.wikipedia.org:
       wikiproject_prefix: 'Wikipedia:WikiProject '
       class:
@@ -15,6 +143,10 @@ parameters:
           badge: '9/94/Symbol_support_vote.svg'
           color: '#66ff66'
           category: 'Category:GA-Class articles'
+        bplus:
+          badge: '2/2c/Symbol_bplus_class.svg'
+          color: '#66ff66'
+          category: 'Category:Bplus-Class articles'
         B:
           badge: '5/5f/Symbol_b_class.svg'
           color: '#b2ff66'
@@ -35,6 +167,18 @@ parameters:
           badge: 'e/e7/Cscr-featured.svg'
           color: '#6699ff'
           category: 'Category:FL-Class articles'
+        AL:
+          badge: '2/25/Symbol_a_class.svg'
+          color: '#66ffff'
+          category: 'Category:AL-Class articles'
+        BL:
+          badge: 'd/db/Symbol_list_class.svg'
+          color: '#b2ff66'
+          category: 'Category:BL-Class articles'
+        CL:
+          badge: 'd/db/Symbol_list_class.svg'
+          color: '#ffff66'
+          category: 'Category:CL-Class articles'
         List:
           badge: 'd/db/Symbol_list_class.svg'
           color: '#aa88ff'
@@ -43,10 +187,18 @@ parameters:
           badge: '2/2a/Symbol_dab_class.svg'
           color: '#00fa9a'
           category: 'Category:Disambig-Class articles'
+        SIA:
+          badge: '2/2a/Symbol_dab_class.svg'
+          color: '#00fa9a'
+          category: 'Category:SIA-Class articles'
         Redirect:
           badge: 'a/a2/Symbol_redirect_class.svg'
           color: '#c0c0c0'
           category: 'Category:Redirect-Class articles'
+        Project:
+          badge: '7/72/Symbol_project_class.svg'
+          color: '#c0c090'
+          category: 'Category:Project-Class articles'
         Book:
           badge: '4/4d/Symbol_book_class.svg'
           color: '#98FF98'
@@ -59,6 +211,54 @@ parameters:
           badge: '9/96/Symbol_category_class.svg'
           color: '#ffdb58'
           category: 'Category:Category-Class articles'
+        Portal:
+          badge: 'e/e2/Symbol_portal_class.svg'
+          color: '#cc8899'
+          category: 'Category:Portal-Class articles'
+        FM:
+          badge: 'b/bc/Featured_article_star.svg'
+          color: '#6699ff'
+          category: 'Category:FM-Class articles'
+        File:
+          badge: '9/9c/Symbol_file_class.svg'
+          color: '#ddccff'
+          category: 'Category:File-Class articles'
+        Draft:
+          badge: '0/09/Symbol_draft_class.svg'
+          color: '#d98159'
+          category: 'Category:Draft-Class articles'
+        Future:
+          badge: '0/04/Symbol_wait_alternative.svg'
+          color: '#8a95c9'
+          category: 'Category:Future-Class articles'
+        Current:
+          badge: '5/54/Symbol_wait.svg'
+          color: '#d870ff'
+          category: 'Category:Current-Class articles'
+        Deferred:
+          badge: '4/48/Symbol_deferred_class.svg'
+          color: '#999999'
+          category: 'Category:Deferred-Class articles'
+        User:
+          badge: '1/13/Symbol_user_class.svg'
+          color: '#b5b546'
+          category: 'Category:User-Class articles'
+        FT: # Featured topic
+          badge: 'b/b4/Symbol_star_gold.svg'
+          color: '#6699ff'
+          category: 'Category:FT-Class articles'
+        Needed:
+          badge: '6/63/Symbol_needed_class.svg'
+          color: '#dcdcdc'
+          category: 'Category:Needed-Class articles'
+        Merge:
+          badge: 'b/b0/Symbol_merge_vote.svg'
+          color: '#add8e6'
+          category: 'Category:Merge-Class articles'
+        NA:
+          badge: '1/11/Symbol_question_vote.svg'
+          color: '#f5f5f5'
+          category: 'Category:NA-Class articles'
         Unknown:
           badge: 'e/e0/Symbol_question.svg'
           color: ''
@@ -83,6 +283,237 @@ parameters:
         Bottom:
           color: '#ffeeff'
           category: 'Category:Top-importance articles'
+          weight: 1
+        NA:
+          color: ''
+          category: 'Category:NA-importance articles'
+          weight: 0
+        Unknown:
+          color: ''
+          category: 'Category:Unknown-importance articles'
+          weight: 0
+    en.wikivoyage.org:
+      wikiproject_prefix: ''
+      class:
+        star:
+          badge: 'b/b4/Symbol_star_gold.svg'
+          color: '#98E698'
+          category: 'Category:Star articles'
+        guide:
+          badge: '9/94/Symbol_support_vote.svg'
+          color: '#C1FDC1'
+          category: 'Category:Guide articles'
+        usable:
+          badge: 'd/d0/Symbol_keep_vote.svg'
+          color: '#FFFF66'
+          category: 'Category:Usable articles'
+        outline:
+          badge: 'c/c8/Start-icon.svg'
+          color: '#FFC966'
+          category: 'Category:Outline articles'
+        stub:
+          badge: 'f/f3/Symbol_plain_grey.svg'
+          color: '#ff4500'
+          category: 'Category:Stub articles'
+        Unknown:
+          badge: 'e/e0/Symbol_question.svg'
+          color: ''
+          category: 'Category:Unranked articles'
+    hu.wikipedia.org:
+      wikiproject_prefix: 'Wikipédia:'
+      class:
+        kitüntetett: # Featured
+          badge: 'b/bc/Featured_article_star.svg'
+          color: '#6699ff'
+          category: 'Kategória:Kitüntetett besorolású szócikkek'
+        színvonalas: # A
+          badge: '2/25/Symbol_a_class.svg'
+          color: '#40E0D0'
+          category: 'Kategória:Színvonalas besorolású szócikkek'
+        teljes: # B
+          badge: 'f/f8/Symbol_b_class_(alternate).svg'
+          color: '#98FB98'
+          category: 'Kategória:Teljes besorolású szócikkek'
+        jól használható: # C
+          badge: 'e/e6/Symbol_c_class.svg'
+          color: '#FFFF8C'
+          category: 'Kategória:Jól használható besorolású szócikkek'
+        bővítendő: # ???
+          badge: '7/7f/Symbol_version_generic.svg'
+          color: '#FFE466'
+          category: 'Kategória:Bővítendő besorolású szócikkek'
+        vázlatos: # Start
+          badge: 'a/a4/Symbol_start_class.svg'
+          color: '#FFAA66'
+          category: 'Kategória:Vázlatos besorolású szócikkek'
+        születő: # Stub
+          badge: 'f/f5/Symbol_stub_class.svg'
+          color: '#FF6666'
+          category: 'Kategória:Születő besorolású szócikkek'
+        Unknown:
+          badge: 'e/e0/Symbol_question.svg'
+          color: ''
+          category: 'Kategória:Besorolatlan szócikkek'
+      importance:
+        nélkülözhetetlen: # Top
+          color: '#FF69B4'
+          category: 'Kategória:Nélkülözhetetlen szócikkek'
+          weight: 4
+        nagyon fontos: # High
+          color: '#FF88FF'
+          category: 'Kategória:Nagyon fontos szócikkek'
+          weight: 3
+        közepesen fontos: # Medium
+          color: '#FFCCFF'
+          category: 'Kategória:Közepesen fontos szócikkek'
+          weight: 2
+        kevéssé fontos: # Low
+          color: '#FFEEFF'
+          category: 'Kategória:Kevéssé fontos szócikkek'
+          weight: 1
+        Unknown:
+          color: ''
+          category: 'Kategória:Szócikkek fontosság szerint'
+          weight: 0
+    fr.wikipedia.org:
+      wikiproject_prefix: 'Projet:'
+      class:
+        AdQ: # Featured
+          badge: '6/66/Fairytale_bookmark_gold.svg'
+          color: '#6699ff'
+          category: "Catégorie:Article d'avancement AdQ"
+        BA: # GA
+          badge: 'd/da/Fairytale_bookmark_silverstar.svg'
+          color: '#66ff66'
+          category: "Catégorie:Article d'avancement BA"
+        A:
+          badge: '2/25/Symbol_a_class.svg'
+          color: '#66ffff'
+          category: "Catégorie:Article d'avancement A"
+        B:
+          badge: '5/5f/Symbol_b_class.svg'
+          color: '#ffff66'
+          category: "Catégorie:Article d'avancement B"
+        BD: # Start
+          badge: 'a/a4/Symbol_start_class.svg'
+          color: '#ffaa66'
+          category: "Catégorie:Article d'avancement B"
+        ébauche: # Stub
+          badge: 'f/f5/Symbol_stub_class.svg'
+          color: '#ff6666'
+          category: "Catégorie:Article d'avancement ébauche"
+        homonymie: # Disambig
+          badge: '2/2a/Symbol_dab_class.svg'
+          color: '#66ff66'
+          category: "Catégorie:Article d'avancement homonymie"
+        inconnu: # Unknown
+          badge: 'e/e0/Symbol_question.svg'
+          color: ''
+          category: "Catégorie:Article d'avancement inconnu"
+        Unknown:
+          badge: 'e/e0/Symbol_question.svg'
+          color: ''
+          category: "Catégorie:Article d'avancement inconnu"
+      importance:
+        maximum:
+          color: '#FF00FF'
+          category: "Catégorie:Article d'importance maximum"
+          weight: 4
+        élevée:
+          color: '#ff88ff'
+          category: "Catégorie:Article d'importance élevée"
+          weight: 3
+        moyenne:
+          color: '#ffccff'
+          category: "Catégorie:Article d'importance moyenne"
+          weight: 2
+        faible:
+          color: '#ffeeff'
+          category: "Catégorie:Article d'importance faible"
+          weight: 1
+        inconnue:
+          color: ''
+          category: "Catégorie:Article d'importance inconnue"
+          weight: 0
+        Unknown:
+          color: ''
+          category: "Catégorie:Article d'importance inconnue"
+          weight: 0
+    tr.wikipedia.org:
+      wikiproject_prefix: 'Vikiproje:'
+      class:
+        SM: # Featured
+          badge: 'b/bc/Featured_article_star.svg'
+          color: '#6699ff'
+          category: 'Kategori:SM-sınıf Vikiproje sayfaları'
+        KM: # GA
+          badge: 'e/eb/Cscr-featured2.png'
+          color: '#66ff66'
+          category: 'Kategori:KM-sınıf Vikiproje sayfaları'
+        B: # B
+          badge: '5/5f/Symbol_b_class.svg'
+          color: '#b2ff66'
+          category: 'Kategori:Vikiproje 10K Az-önemli B-sınıf sayfalar'
+        C: # C
+          badge: 'e/e6/Symbol_c_class.svg'
+          color: '#ffff66'
+          category: 'Kategori:C-sınıf Vikiproje sayfaları'
+        Başlangıç: # Start
+          badge: 'a/a4/Symbol_start_class.svg'
+          color: '#ffaa66'
+          category: 'Kategori:Başlangıç-sınıf Vikiproje sayfaları'
+        Taslak: # Stub
+          badge: 'f/f5/Symbol_stub_class.svg'
+          color: '#eb6163'
+          category: 'Kategori:Taslak-sınıf Vikiproje sayfaları'
+        SL: # Featured list
+          badge: 'b/bc/Featured_article_star.svg'
+          color: '#6699ff'
+          category: 'Kategori:Vikiproje Afrika SL-sınıf sayfalar'
+        Liste: # List
+          badge: 'd/db/Symbol_list_class.svg'
+          color: '#aa88ff'
+          category: 'Kategori:Liste-sınıf Vikiproje sayfaları'
+        Anlam ayrımı: # Disambig
+          badge: '2/2a/Symbol_dab_class.svg'
+          color: '#00fa9a'
+          category: 'Kategori:Anlam ayrımı-sınıf Vikiproje sayfaları'
+        Yönlendirme: # Redirect
+          badge: '8/89/Symbol_redirect_vote2.svg'
+          color: '#c0c0c0'
+          category: 'Kategori:Yönlendirme-sınıf Vikiproje sayfaları'
+        Şablon: # Template
+          badge: '5/5c/Symbol_template_class.svg'
+          color: '#fbceb1'
+          category: 'Kategori:Şablon-sınıf Vikiproje sayfaları'
+        Kategori: # Category
+          badge: '4/48/Folder_Hexagonal_Icon.svg'
+          color: '#ffdb58'
+          category: 'Kategori:Kategori-sınıf Vikiproje sayfaları'
+        Dosya: # File
+          badge: 'e/e7/Video-x-generic.svg'
+          color: '#ddccff'
+          category: 'Kategori:Dosya-sınıf Vikiproje sayfaları'
+        Unknown:
+          badge: 'e/e0/Symbol_question.svg'
+          color: ''
+          category: 'Kategori:Değerlendirilmemiş-sınıf Vikiproje sayfaları'
+      importance:
+        En:
+          color: '#ff00ff'
+          category: 'Kategori:En-önemli Vikiproje sayfaları'
+          weight: 4
+        Çok:
+          color: '#ff88ff'
+          category: 'Kategori:Çok-önemli Vikiproje sayfaları'
+          weight: 3
+        Orta:
+          color: '#ffbbff'
+          category: 'Kategori:Orta-önemli Vikiproje sayfaları'
+          weight: 2
+        Az:
+          color: '#ffddff'
+          category: 'Kategori:Az-önemli Vikiproje sayfaları'
           weight: 1
         Unknown:
           color: ''

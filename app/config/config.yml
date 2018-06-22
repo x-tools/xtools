@@ -42,7 +42,7 @@ framework:
     fragments:       ~
     http_method_override: true
     assets:
-        version: '22'
+        version: '26'
         version_format: '%%s?v=%%s'
     cache:
         app: "cache.adapter.%cache.adapter%"
@@ -140,6 +140,7 @@ assetic:
         scssphp:
             formatter: 'Leafo\ScssPhp\Formatter\Compressed'
             apply_to:  '\.scss$'
+        cssrewrite: ~
         uglifyjs:
             bin: '%kernel.root_dir%/Resources/node_modules/uglify-es/bin/uglifyjs'
 
@@ -173,7 +174,7 @@ fos_rest:
             html: ['text/html']
 
 guzzle:
-    logging: true
+    logging: "%kernel.debug%"
 
     clients:
         xtools:

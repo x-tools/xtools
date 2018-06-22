@@ -4,10 +4,10 @@
 
 {% block body %}
 <div class="panel panel-primary">
-    {{ layout.userHeading(user, project, xtPage) }}
+    {{ layout.userHeading(user, project, 'SimpleEditCounter') }}
 
     <div class="panel-body xt-panel-body">
-        {{ wiki.userLinks(user, project, xtPage) }}
+        {{ wiki.userLinks(user, project, 'SimpleEditCounter') }}
 
         {% set content %}
             <div class="col-lg-12 stat-list clearfix">
@@ -34,19 +34,27 @@
                         <td class="stat-list--new-group">{{ msg('username') }}</td>
                         <td class="stat-list--new-group">{{ wiki.userLink(user, project) }}</td>
                     </tr>
-                    <tr>
-                        <td>{{ msg('user-id') }}</td>
-                        <td>{{ sec.userId }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ msg('user-groups') }}</td>
-                        <td>{{ sec.userGroups|join(', ') }}</td>
-                    </tr>
-                    {% if sec.globalUserGroups|length > 0 %}
+                    {% if not(user.anon) %}
                         <tr>
-                            <td>{{ msg('global-user-groups') }}</td>
-                            <td>{{ sec.globalUserGroups|join(', ') }}</td>
+                            <td>{{ msg('user-id') }}</td>
+                            <td>{{ sec.userId }}</td>
                         </tr>
+                        <tr>
+                            <td>{{ msg('user-groups') }}</td>
+                            <td>
+                                {% if sec.userGroups|length == 0 %}
+                                    <em class="text-muted">{{ msg('none') }}</em>
+                                {% else %}
+                                    {{ sec.userGroups|join(', ') }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% if sec.globalUserGroups|length > 0 %}
+                            <tr>
+                                <td>{{ msg('global-user-groups') }}</td>
+                                <td>{{ sec.globalUserGroups|join(', ') }}</td>
+                            </tr>
+                        {% endif %}
                     {% endif %}
                     <tr>
                         <td>{{ msg('total') }}</td>
@@ -63,7 +71,7 @@
                 </table>
             </div>
         {% endset %}
-        {{ layout.content_block('tool-sc-desc', content) }}
+        {{ layout.content_block('tool-simpleeditcounter-desc', content) }}
     </div>
 </div>
 {% endblock %}

@@ -6,6 +6,7 @@
 namespace Tests\Xtools;
 
 use PHPUnit_Framework_TestCase;
+use Xtools\PageAssessments;
 use Xtools\Pages;
 use Xtools\PagesRepository;
 use Xtools\User;
@@ -34,12 +35,17 @@ class PagesTest extends PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->project = new Project('test.project.org');
+        $this->project = $this->getMock(Project::class, [], ['test.wikipedia.org']);
+        // $this->project = new Project('test.project.org');
+        $paRepo = $this->getMock(PageAssessments::class, ['getConfig'], [$this->project]);
+        $paRepo->method('getConfig')
+            ->willReturn($this->getAssessmentsConfig());
+        $this->project->method('getPageAssessments')
+            ->willReturn($paRepo);
+
         $this->projectRepo = $this->getMock(ProjectRepository::class);
         $this->projectRepo->method('getMetadata')
             ->willReturn(['namespaces' => [0 => 'Main', 3 => 'User_talk']]);
-        $this->projectRepo->method('getAssessmentsConfig')
-            ->willReturn($this->getAssessmentsConfig());
         $this->project->setRepository($this->projectRepo);
         $this->user = new User('Test user');
         $this->pagesRepo = $this->getMock(PagesRepository::class);
@@ -67,7 +73,6 @@ class PagesTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(3, $pages->getNumResults());
         $this->assertEquals(1, $pages->getNumDeleted());
         $this->assertEquals(1, $pages->getNumRedirects());
-        $this->assertEquals(true, $pages->hasPageAssessments());
 
         $this->assertEquals([
             0 => [
@@ -95,7 +100,6 @@ class PagesTest extends PHPUnit_Framework_TestCase
             'pa_importance' => '',
             'raw_time' => '20160519000000',
             'human_time' => '2016-05-19 00:00',
-            'badge' => '',
             'recreated' => '1',
         ], $results[0][0]);
     }

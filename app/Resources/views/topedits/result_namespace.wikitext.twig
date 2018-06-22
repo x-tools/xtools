@@ -1,6 +1,6 @@
 {% import 'macros/wiki.html.twig' as wiki %}
 {% if not is_sub_request %}
-== [[User:{{ user.username }}]] ==
+== {{ wiki.userLinkWikitext(user, user.username) }} ==
 
 {% set link %}[{{ url('TopEditsResult', {'username': user.username, 'project': project.domain, 'namespace': 'all'}) }} {{ msg('xtools-title') }}]{% endset %}
 {{ msg('xtools-advert', [link, date()|date('Y-m-d H:i')]) }}
@@ -24,7 +24,7 @@
 | {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ page.count }}}}
 | [[:{{ page.page_title_ns|replace({'_': ' '}) }}]]
 {% if showPageAssessment %}
-| {% set badge = project.assessmentBadgeURL(page.pa_class, true) -%}
+| {% set badge = project.pageAssessments.badgeURL(page.pa_class, true) -%}
 {% if badge is defined %}
 [[File:{{ badge }}|20px]] {{ page.pa_class ? page.pa_class : msg('unknown') }}
 {% endif %}{% endif %}

@@ -6,7 +6,7 @@
 <div class="panel panel-primary">
     <header class="panel-heading">
         <div class="text-center xt-heading-top">
-            <a class="back-to-search" href="{{ path('adminstats') }}">
+            <a class="back-to-search" href="{{ path('AdminStats') }}">
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {{ msg('back') }}
             </a>
@@ -46,15 +46,8 @@
                         <td>{{ wiki.userGroupLink('sysop', project, as.numAdmins|num_format) }}</td>
                     </tr>
                     <tr>
-                        <td>{{ msg('admins-without-action') }}</td>
-                        <td>
-                            {{ as.numAdminsWithoutActions|num_format }}
-                            ({{ as.numAdminsWithoutActions|percent_format(as.numAdmins) }})
-                        </td>
-                    </tr>
-                    <tr>
                         <td>{{ msg('non-admins-with-actions') }}</td>
-                        <td>{{ (as.numUsers - as.numAdmins)|num_format }}</td>
+                        <td>{{ as.numNonAdminsWithActions|num_format }}</td>
                     </tr>
                 </tbody></table>
             </div>
@@ -64,6 +57,7 @@
         <div style="clear:both"></div>
 
         {% set content %}
+            <p>{{ msg('admin-stats-notice') }} {{ msg('admin-stats-notice2') }}</p>
             <table class="table table-bordered table-hover table-striped top-editors-table table-sticky-header">
                 <thead><tr>
                     <th>#</th>
@@ -80,14 +74,14 @@
                     {% for key,value in as.stats %}
                         {% set username = value.user_name %}
                         <tr>
-                            <td>{{ loop.index|num_format }}</td>
+                            <td class="sort-entry--rank">{{ loop.index|num_format }}</td>
                             <td class="sort-entry--username" data-value="{{ username }}">
                                 {{ wiki.userLink(username, project) }}
                             </td>
                             <td class="sort-entry--user-groups" data-value="{{ value.groups }}">{{ value.groups }}</td>
                             <td>
-                                {% if enabled('ec') %}
-                                    <a title="{{ msg('tool-ec') }}" href="{{ path('EditCounterResult', {project: project.domain, username: username}) }}" >ec</a>
+                                {% if enabled('EditCounter') %}
+                                    <a title="{{ msg('tool-editcounter') }}" href="{{ path('EditCounterResult', {project: project.domain, username: username}) }}" >ec</a>
                                     &middot;
                                 {% endif %}
                                 {% if isWMFLabs() %}

@@ -482,7 +482,10 @@ class ArticleInfo extends Model
     public function getAssessments()
     {
         if (!is_array($this->assessments)) {
-            $this->assessments = $this->page->getAssessments();
+            $this->assessments = $this->page
+                ->getProject()
+                ->getPageAssessments()
+                ->getAssessments($this->page);
         }
         return $this->assessments;
     }
@@ -1303,7 +1306,7 @@ class ArticleInfo extends Model
                     100 * ($added / $this->addedBytes)
                 )
             ];
-        }, array_keys(array_slice($topTenEditorsByAdded, 0, 10)));
+        }, array_keys(array_slice($topTenEditorsByAdded, 0, 10, true)));
 
         $this->topTenCount = $topTenCount;
     }

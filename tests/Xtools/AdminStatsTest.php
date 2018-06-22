@@ -14,7 +14,7 @@ use Xtools\ProjectRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
- * Tests of the Edit class.
+ * Tests of the AdminStats class.
  */
 class AdminStatsTest extends PHPUnit_Framework_TestCase
 {
@@ -37,7 +37,6 @@ class AdminStatsTest extends PHPUnit_Framework_TestCase
             ->willReturn([
                 'Bob' => ['sysop', 'checkuser'],
                 'Sarah' => ['epcoordinator'],
-                'Julie' => ['sysop'],
             ]);
 
         $this->asRepo = $this->getMock(AdminStatsRepository::class);
@@ -64,10 +63,8 @@ class AdminStatsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1483228800, $as->getStart());
         $this->assertEquals(1488326400, $as->getEnd());
         $this->assertEquals(59, $as->numDays());
-        $this->assertEquals(3, $as->numUsers());
-        $this->assertEquals(2, $as->numAdmins());
-        $this->assertEquals(1, $as->getNumAdminsWithActions());
-        $this->assertEquals(1, $as->getNumAdminsWithoutActions());
+        $this->assertEquals(1, $as->numAdmins());
+        $this->assertEquals(1, $as->getNumNonAdminsWithActions());
     }
 
     /**
@@ -85,7 +82,6 @@ class AdminStatsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 'Bob' => ['sysop', 'checkuser'],
-                'Julie' => ['sysop'],
                 'Sarah' => ['epcoordinator'],
             ],
             $as->getAdminsAndGroups(false)
@@ -95,7 +91,6 @@ class AdminStatsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 'Bob' => 'A/CU',
-                'Julie' => 'A',
                 'Sarah' => '',
             ],
             $as->getAdminsAndGroups()
@@ -120,10 +115,6 @@ class AdminStatsTest extends PHPUnit_Framework_TestCase
                 'Bob' => array_merge(
                     $this->adminStatsFactory()[0],
                     ['groups' => 'A/CU']
-                ),
-                'Julie' => array_merge(
-                    $this->adminStatsFactory()[1],
-                    ['groups' => 'A']
                 ),
                 'Sarah' => array_merge(
                     $this->adminStatsFactory()[1], // empty results
@@ -156,8 +147,8 @@ class AdminStatsTest extends PHPUnit_Framework_TestCase
                 'total' => 20,
             ],
             [
-                'user_name' => 'Julie',
-                'delete' => 0,
+                'user_name' => 'Sarah',
+                'delete' => 1,
                 'restore' => 0,
                 'block' => 0,
                 'unblock' => 0,

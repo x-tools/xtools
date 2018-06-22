@@ -41,9 +41,6 @@ class Pages extends Model
     /** @var array Number of redirects/pages that were created/deleted, broken down by namespace. */
     protected $countsByNamespace;
 
-    /** @var bool Whether or not the Project supports page assessments. */
-    protected $hasPageAssessments;
-
     /**
      * Pages constructor.
      * @param Project $project
@@ -270,18 +267,6 @@ class Pages extends Model
     }
 
     /**
-     * Whether or not the results include page assessments.
-     * @return bool
-     */
-    public function hasPageAssessments()
-    {
-        if ($this->hasPageAssessments === null) {
-            $this->hasPageAssessments = $this->project->hasPageAssessments();
-        }
-        return $this->hasPageAssessments;
-    }
-
-    /**
      * Run the query to get pages created by the user with options.
      * This is ran independently for each namespace if $this->namespace is 'all'.
      * @param string $namespace Namespace ID.
@@ -338,8 +323,13 @@ class Pages extends Model
                 'page_title' => str_replace('_', ' ', $row['page_title'])
             ]);
 
-            if ($this->hasPageAssessments()) {
-                $pageData['badge'] = $this->project->getAssessmentBadgeURL($pageData['pa_class']);
+            if ($this->project->hasPageAssessments()) {
+                $pageData['badge'] = $this->project
+                    ->getPageAssessments()
+                    ->getBadgeURL($pageData['pa_class']);
+                $pageData['badgeFile'] = $this->project
+                    ->getPageAssessments()
+                    ->getBadgeURL($pageData['pa_class'], true);
             }
 
             $results[$row['namespace']][] = $pageData;

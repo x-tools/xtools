@@ -38,8 +38,11 @@ class UserTest extends PHPUnit_Framework_TestCase
         // Set up stub user and project repositories.
         $userRepo = $this->getMock(UserRepository::class);
         $userRepo->expects($this->once())
-            ->method('getId')
-            ->willReturn(12);
+            ->method('getIdAndRegistration')
+            ->willReturn([
+                'userId' => 12,
+                'regDate' => '20170101000000',
+            ]);
         $projectRepo = $this->getMock(ProjectRepository::class);
         $projectRepo->expects($this->once())
             ->method('getOne')
@@ -64,7 +67,7 @@ class UserTest extends PHPUnit_Framework_TestCase
     {
         $userRepo = $this->getMock(UserRepository::class);
         $userRepo->expects($this->once())
-            ->method('getGroups')
+            ->method('getUserRights')
             ->willReturn($groups);
         $user = new User($username);
         $user->setRepository($userRepo);
@@ -128,8 +131,11 @@ class UserTest extends PHPUnit_Framework_TestCase
     {
         $userRepo = $this->getMock(UserRepository::class);
         $userRepo->expects($this->once())
-            ->method('getRegistrationDate')
-            ->willReturn('20170101000000');
+            ->method('getIdAndRegistration')
+            ->willReturn([
+                'userId' => 12,
+                'regDate' => '20170101000000',
+            ]);
         $user = new User('TestUser');
         $user->setRepository($userRepo);
 
