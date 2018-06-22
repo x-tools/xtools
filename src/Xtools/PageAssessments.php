@@ -99,6 +99,28 @@ class PageAssessments extends Model
     }
 
     /**
+     * Get the single overall assessment of the given page.
+     * @param Page $page
+     * @return string[] With keys 'value' and 'badge'.
+     * @todo Add option to get ORES prediction.
+     */
+    public function getAssessment(Page $page)
+    {
+        if (!$this->isEnabled() || !$this->isSupportedNamespace($page->getNamespace())) {
+            return false;
+        }
+
+        $data = $this->getRepository()->getAssessments($page, true);
+
+        if (isset($data[0])) {
+            return $this->getClassFromAssessment($data[0]);
+        }
+
+        // 'Unknown' class.
+        return $this->getClassFromAssessment(['class' => '']);
+    }
+
+    /**
      * Get assessments for the given Page.
      * @param Page $page
      * @return string[]|false `false` if unsupported, or array in the format of:
@@ -113,6 +135,7 @@ class PageAssessments extends Model
      *             ],
      *             'wikiproject_prefix' => 'Wikipedia:WikiProject_',
      *         ]
+     * @todo Add option to get ORES prediction.
      */
     public function getAssessments(Page $page)
     {
