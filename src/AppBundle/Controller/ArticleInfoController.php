@@ -498,7 +498,6 @@ class ArticleInfoController extends XtoolsController
             $project = $ret[0];
         }
 
-        $pageAssessments = [];
         $pages = explode('|', $articles);
         $out = [];
 
@@ -521,5 +520,43 @@ class ArticleInfoController extends XtoolsController
             $out,
             Response::HTTP_OK
         );
+    }
+
+    /**
+     * Get number of in and outgoing links and redirects to the given page.
+     * @Route(
+     *     "/api/page/links/{project}/{article}",
+     *     name="PageApiLinks",
+     *     requirements={"article"=".+"}
+     * )
+     * @param Request $request The HTTP request.
+     * @param string $article
+     * @return JsonResponse
+     * @codeCoverageIgnore
+     */
+    public function linksApiAction(Request $request, $article)
+    {
+        $this->recordApiUsage('page/links');
+
+        // First validate project.
+        $ret = $this->validateProjectAndUser($request);
+        if ($ret instanceof RedirectResponse) {
+            return new JsonResponse(
+                ['error' => 'Invalid project'],
+                Response::HTTP_NOT_FOUND
+            );
+        } else {
+            $project = $ret[0];
+        }
+
+        $page = $this->getAndValidatePage($project, $article);
+
+        $response = new JsonResponse(
+            $page->countLinksAndRedirects(),
+            Response::HTTP_OK
+        );
+        $response->setEncodingOptions(JSON_NUMERIC_CHECK);
+
+        return $response;
     }
 }
