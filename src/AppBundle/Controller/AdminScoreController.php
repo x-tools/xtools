@@ -177,6 +177,8 @@ class AdminScoreController extends XtoolsController
             $key = $row['source'];
             $value = $row['value'];
 
+            $value = str_replace("\x00", "", $value);
+
             if ($key === 'account-age') {
                 if ($value == null) {
                     $value = 0;
