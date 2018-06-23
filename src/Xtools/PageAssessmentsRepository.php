@@ -51,7 +51,7 @@ class PageAssessmentsRepository extends Repository
                 WHERE pa_page_id = $pageId";
 
         if ($first) {
-            $sql .= "\nLIMIT 1";
+            $sql .= "\nAND pa_class != '' LIMIT 1";
         }
 
         $result = $this->executeProjectsQuery($sql)->fetchAll();
