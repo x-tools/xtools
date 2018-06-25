@@ -177,6 +177,11 @@ class AdminScoreController extends XtoolsController
             $key = $row['source'];
             $value = $row['value'];
 
+            // WMF Replica databases are returning binary control characters
+            // This is specifically shown with WikiData.
+            // More details: T197165
+            $value = str_replace("\x00", "", $value);
+
             if ($key === 'account-age') {
                 if ($value == null) {
                     $value = 0;
