@@ -28,6 +28,7 @@ The projects' databases:
 The 'meta' database:
 
 - **database_meta_name** - Database name for the server with the ``wiki`` table (this is not required if ``app.single_wiki`` is set). If connecting to the WMF replicas, the value should be ``meta_p``.
+- **database_meta_table** - Name of the ``wiki`` table.  Defaults to ``wiki``.
 
 For WMF installations, you should also specify credentials for the ``tools-db`` database server, which contains data from other tools (e.g. checkwiki_):
 
