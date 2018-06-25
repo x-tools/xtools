@@ -7,7 +7,8 @@
 			"Acamicamacaraca",
 			"Zoranzoki21",
 			"Milicevic01",
-			"BadDog"
+			"BadDog",
+			"Сербијана"
 		]
 	},
 	"accepted-formats": "Прихваћени формати",
@@ -179,6 +180,7 @@
 	"last-month": "Измена у последњих 30 дана",
 	"last-week": "Измена у последњих 7 дана",
 	"last-year": "Измена у последњих 365 дана",
+	"latest-action": "Последња забележена радња",
 	"latest-edit": "Најскорашњија измена",
 	"latest-global-edits": "Скорашње глобалне измене",
 	"latest-global-edits-desc": "Најскорашњије измене за топ 10 пројеката овог корисника у последњем месецу",

@@ -3,7 +3,8 @@
 		"authors": [
 			"Nemo bis",
 			"Trần Nguyễn Minh Huy",
-			"Phjtieudoc"
+			"Phjtieudoc",
+			"Minh Nguyen"
 		]
 	},
 	"accepted-formats": "Định dạng được chấp nhận",
@@ -18,7 +19,7 @@
 	"admin": "Bảo quản viên",
 	"admin-stats-notice": "Chỉ thành viên đã làm ít nhất một tác vụ bảo quản viên trong mốc thời gian được hiển thị.",
 	"admin-stats-notice2": "Một vài thành viên trước đây là BQV, hoặc không phải BQV nhưng có quyền sử dụng tác vụ BQV",
-	"afd": "Bài viết bị xoá",
+	"afd": "Bài viết bị xóa",
 	"all": "Tất cả",
 	"all-edits": "Tất cả các sửa đổi",
 	"all-languages": "Tất cả các ngôn ngữ",
