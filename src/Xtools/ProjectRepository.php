@@ -117,8 +117,7 @@ class ProjectRepository extends Repository
 
         if ($this->container->hasParameter("database_meta_table")) {
             $table = $this->container->getParameter("database_meta_table");
-        }
-        else {
+        } else {
             $table = "wiki";
         }
 
@@ -175,8 +174,7 @@ class ProjectRepository extends Repository
 
         if ($this->container->hasParameter("database_meta_table")) {
             $table = $this->container->getParameter("database_meta_table");
-        }
-        else {
+        } else {
             $table = "wiki";
         }
 
