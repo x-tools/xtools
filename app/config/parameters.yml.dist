@@ -13,6 +13,7 @@ parameters:
     database_replica_user:      root
     database_replica_password:  ~
     database_meta_name:         meta_p
+    database_meta_table:        wiki
     database_toolsdb_host: 127.0.0.1
     database_toolsdb_port: null
     database_toolsdb_name: null

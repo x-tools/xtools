@@ -115,9 +115,15 @@ class ProjectRepository extends Repository
             return $this->cache->getItem($this->cacheKeyAllProjects)->get();
         }
 
+        if ($this->container->hasParameter("database_meta_table")) {
+            $table = $this->container->getParameter("database_meta_table");
+        } else {
+            $table = "wiki";
+        }
+
         // Otherwise, fetch all from the database.
         $wikiQuery = $this->getMetaConnection()->createQueryBuilder();
-        $wikiQuery->select(['dbname AS dbName', 'url', 'lang'])->from('wiki');
+        $wikiQuery->select(['dbname AS dbName', 'url', 'lang'])->from($table);
         $projects = $this->executeQueryBuilder($wikiQuery)->fetchAll();
         $projectsMetadata = [];
         foreach ($projects as $project) {
@@ -166,10 +172,16 @@ class ProjectRepository extends Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
+        if ($this->container->hasParameter("database_meta_table")) {
+            $table = $this->container->getParameter("database_meta_table");
+        } else {
+            $table = "wiki";
+        }
+
         // Otherwise, fetch the project's metadata from the meta.wiki table.
         $wikiQuery = $this->getMetaConnection()->createQueryBuilder();
         $wikiQuery->select(['dbname AS dbName', 'url', 'lang'])
-            ->from('wiki')
+            ->from($table)
             ->where($wikiQuery->expr()->eq('dbname', ':project'))
             // The meta database will have the project's URL stored as https://en.wikipedia.org
             // so we need to query for it accordingly, trying different variations the user
