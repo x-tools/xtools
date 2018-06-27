@@ -5,16 +5,13 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Helper\I18nHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Xtools\EditCounter;
 use Xtools\EditCounterRepository;
-use Xtools\Page;
 use Xtools\Project;
 use Xtools\ProjectRepository;
 use Xtools\User;
@@ -49,16 +46,17 @@ class EditCounterController extends XtoolsController
      * Every action in this controller (other than 'index') calls this first.
      * If a response is returned, the calling action is expected to return it.
      * @param Request $request
-     * @param string $key API key, as given in the reuqest. Omit this for actions
+     * @param string $key API key, as given in the request. Omit this for actions
      *   that are public (only /api/ec actions should pass this in).
-     * @return null|RedirectResponse
+     * @param bool $tooHighEditCount Whether to redirect if the user has too high of an edit count.
+     * @return RedirectResponse|null
      * @codeCoverageIgnore
      */
-    protected function setUpEditCounter(Request $request, $key = null)
+    protected function setUpEditCounter(Request $request, $key = null, $tooHighEditCount = true)
     {
         // Return the EditCounter if we already have one.
         if ($this->editCounter instanceof EditCounter) {
-            return;
+            return null;
         }
 
         // Validate key if attempted to make internal API request.
@@ -67,7 +65,7 @@ class EditCounterController extends XtoolsController
         }
 
         // Will redirect to Simple Edit Counter if they have too many edits.
-        $ret = $this->validateProjectAndUser($request, 'SimpleEditCounterResult');
+        $ret = $this->validateProjectAndUser($request, $tooHighEditCount ? 'SimpleEditCounterResult' : null);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {
@@ -147,7 +145,7 @@ class EditCounterController extends XtoolsController
         }
 
         // Output the relevant format template.
-        return $this->getFormattedReponse($request, 'editCounter/result', $ret);
+        return $this->getFormattedResponse($request, 'editCounter/result', $ret);
     }
 
     /**
@@ -175,7 +173,7 @@ class EditCounterController extends XtoolsController
         ];
 
         // Output the relevant format template.
-        return $this->getFormattedReponse($request, 'editCounter/general_stats', $ret);
+        return $this->getFormattedResponse($request, 'editCounter/general_stats', $ret);
     }
 
     /**
@@ -203,7 +201,7 @@ class EditCounterController extends XtoolsController
         ];
 
         // Output the relevant format template.
-        return $this->getFormattedReponse($request, 'editCounter/namespace_totals', $ret);
+        return $this->getFormattedResponse($request, 'editCounter/namespace_totals', $ret);
     }
 
     /**
@@ -236,7 +234,7 @@ class EditCounterController extends XtoolsController
         ];
 
         // Output the relevant format template.
-        return $this->getFormattedReponse($request, 'editCounter/timecard', $ret);
+        return $this->getFormattedResponse($request, 'editCounter/timecard', $ret);
     }
 
     /**
@@ -264,7 +262,7 @@ class EditCounterController extends XtoolsController
         ];
 
         // Output the relevant format template.
-        return $this->getFormattedReponse($request, 'editCounter/yearcounts', $ret);
+        return $this->getFormattedResponse($request, 'editCounter/yearcounts', $ret);
     }
 
     /**
@@ -296,7 +294,7 @@ class EditCounterController extends XtoolsController
         ];
 
         // Output the relevant format template.
-        return $this->getFormattedReponse($request, 'editCounter/monthcounts', $ret);
+        return $this->getFormattedResponse($request, 'editCounter/monthcounts', $ret);
     }
 
     /**
@@ -308,7 +306,7 @@ class EditCounterController extends XtoolsController
      */
     public function rightschangesAction(Request $request)
     {
-        $ret = $this->setUpEditCounter($request);
+        $ret = $this->setUpEditCounter($request, null, false);
         if ($ret instanceof RedirectResponse) {
             return $ret;
         }
@@ -328,7 +326,7 @@ class EditCounterController extends XtoolsController
         }
 
         // Output the relevant format template.
-        return $this->getFormattedReponse($request, 'editCounter/rights_changes', $ret);
+        return $this->getFormattedResponse($request, 'editCounter/rights_changes', $ret);
     }
 
     /**
@@ -383,7 +381,7 @@ class EditCounterController extends XtoolsController
      * @Route("/api/ec/pairdata/{project}/{username}/{key}", name="EditCounterApiPairData")
      * @param Request $request
      * @param string $key API key.
-     * @return JsonResponse
+     * @return JsonResponse|RedirectResponse
      * @codeCoverageIgnore
      */
     public function pairDataApiAction(Request $request, $key)
@@ -404,7 +402,7 @@ class EditCounterController extends XtoolsController
      * @Route("/api/ec/logcounts/{project}/{username}/{key}", name="EditCounterApiLogCounts")
      * @param Request $request
      * @param string $key API key.
-     * @return JsonResponse
+     * @return JsonResponse|RedirectResponse
      * @codeCoverageIgnore
      */
     public function logCountsApiAction(Request $request, $key)
@@ -425,7 +423,7 @@ class EditCounterController extends XtoolsController
      * @Route("/api/ec/editsizes/{project}/{username}/{key}", name="EditCounterApiEditSizes")
      * @param Request $request
      * @param string $key API key.
-     * @return JsonResponse
+     * @return JsonResponse|RedirectResponse
      * @codeCoverageIgnore
      */
     public function editSizesApiAction(Request $request, $key)
@@ -446,7 +444,7 @@ class EditCounterController extends XtoolsController
      * @Route("/api/ec/namespacetotals/{project}/{username}/{key}", name="EditCounterApiNamespaceTotals")
      * @param Request $request
      * @param string $key API key.
-     * @return Response
+     * @return Response|RedirectResponse
      * @codeCoverageIgnore
      */
     public function namespaceTotalsApiAction(Request $request, $key)
