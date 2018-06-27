@@ -152,7 +152,7 @@ class TopEditsController extends XtoolsController
         ];
 
         // Output the relevant format template.
-        return $this->getFormattedReponse($request, 'topedits/result_namespace', $ret);
+        return $this->getFormattedResponse($request, 'topedits/result_namespace', $ret);
     }
 
     /**

@@ -246,11 +246,11 @@ class UserRightsRepository extends Repository
      * Get the timestamp of the nth edit made by the given user.
      * @param Project $project
      * @param User $user
-     * @param string $acDate Date in YYYYMMDDHHSS format.
+     * @param string $offset Date to start at, in YYYYMMDDHHSS format.
      * @param int $edits Offset of rows to look for (edit threshold for autoconfirmed).
      * @return string Timestamp in YYYYMMDDHHSS format.
      */
-    public function getNthEditTimestamp(Project $project, User $user, $acDate, $edits)
+    public function getNthEditTimestamp(Project $project, User $user, $offset, $edits)
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'ec_rightschanges_nthtimestamp');
         if ($this->cache->hasItem($cacheKey)) {
@@ -261,7 +261,7 @@ class UserRightsRepository extends Repository
         $sql = "SELECT rev_timestamp
                 FROM $revisionTable
                 WHERE rev_user = :userId
-                AND rev_timestamp >= $acDate
+                AND rev_timestamp >= $offset
                 LIMIT 1 OFFSET ".($edits - 1);
 
         $ret = $this->executeProjectsQuery($sql, [

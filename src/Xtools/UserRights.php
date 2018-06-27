@@ -5,10 +5,7 @@
 
 namespace Xtools;
 
-use AppBundle\Helper\I18nHelper;
 use DateInterval;
-use DatePeriod;
-use DateTime;
 use Exception;
 
 /**
@@ -162,8 +159,6 @@ class UserRights extends Model
 
     /**
      * Get global user rights changes of the given user.
-     * @param Project $project
-     * @param User $user
      * @return string[] Keyed by timestamp then 'added' and 'removed'.
      */
     public function getGlobalRightsChanges()
@@ -332,7 +327,11 @@ class UserRights extends Model
             return false;
         }
 
-        $acDate = $registrationDate->add(DateInterval::createFromDateString(
+        $regDateImmutable = new \DateTimeImmutable(
+            $registrationDate->format('YmdHis')
+        );
+
+        $acDate = $regDateImmutable->add(DateInterval::createFromDateString(
             $thresholds['wgAutoConfirmAge'].' seconds'
         ))->format('YmdHis');
 
@@ -353,7 +352,7 @@ class UserRights extends Model
         $acTimestamp = $this->getRepository()->getNthEditTimestamp(
             $this->project,
             $this->user,
-            $acDate,
+            $registrationDate->format('YmdHis'),
             $thresholds['wgAutoConfirmCount']
         );
 

@@ -115,7 +115,7 @@ abstract class XtoolsController extends Controller
      * Validate the given project, returning a Project if it is valid or false otherwise.
      * @param string|string[] $params Project domain or database name, or params hash as
      *   retrieved by self::getParams().
-     * @return Project|false
+     * @return Project|RedirectResponse|false
      */
     public function validateProject($params)
     {
@@ -141,7 +141,7 @@ abstract class XtoolsController extends Controller
      * @param Project $project Project to get check against.
      * @param string $tooHighEditCountAction If the requested user has more than the configured
      *   max edit count, they will be redirect to this route, passing in available params.
-     * @return RedirectResponse|User
+     * @return RedirectResponse|\Xtools\User
      */
     public function validateUser($params, Project $project, $tooHighEditCountAction = null)
     {
@@ -390,14 +390,14 @@ abstract class XtoolsController extends Controller
 
     /**
      * Get the rendered template for the requested format.
-     * @param  Request $request
-     * @param  string  $templatePath Path to template without format,
+     * @param Request $request
+     * @param string $templatePath Path to template without format,
      *   such as '/editCounter/latest_global'.
-     * @param  array   $ret Data that should be passed to the view.
-     * @return array
+     * @param array $ret Data that should be passed to the view.
+     * @return \Symfony\Component\HttpFoundation\Response
      * @codeCoverageIgnore
      */
-    public function getFormattedReponse(Request $request, $templatePath, $ret)
+    public function getFormattedResponse(Request $request, $templatePath, $ret)
     {
         $format = $request->query->get('format', 'html');
         if ($format == '') {
