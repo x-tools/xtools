@@ -609,21 +609,21 @@
                         label: "{{ msg('all-edits') }}",
                         backgroundColor: "{{ chartColor(0) }}",
                         data: [],
-                        yAxisID: 'edits',
+                        yAxisID: 'edits'
                     },
                     {
                         type: 'bar',
                         label: "{{ msg('minor-edits') }}",
                         backgroundColor: "{{ chartColor(1) }}",
                         data: [],
-                        yAxisID: 'edits',
+                        yAxisID: 'edits'
                     },
                     {
                         type: 'bar',
                         label: "{{ msg('ip-edits') }}",
                         backgroundColor: "{{ chartColor(2) }}",
                         data: [],
-                        yAxisID: 'edits',
+                        yAxisID: 'edits'
                     },
                     {
                         type: 'line',
@@ -632,7 +632,7 @@
                         backgroundColor: "{{ chartColor(3) }}",
                         fill: false,
                         data: [],
-                        yAxisID: 'size',
+                        yAxisID: 'size'
                     }];
 
                     // restructure data the way Chart.js wants it
@@ -714,7 +714,7 @@
                     <div class="canvas-wrapper">
                         <canvas id="year_count" height="400" width="800"></canvas>
                     </div>
-                    <span class="chart-legend" id="year_count_legend">
+                    <div class="chart-legend" id="year_count_legend">
                         <div class="legend-body">
                             <div>
                                 <span class="color-icon" style="background:{{ chartColor(0) }}"></span>
@@ -733,7 +733,7 @@
                                 <span class="legend-label">{{ msg('size') }}</span>
                             </div>
                         </div>
-                    </span>
+                    </div>
                 </div>
             </div>
             <table class="table table-bordered table-hover table-striped">

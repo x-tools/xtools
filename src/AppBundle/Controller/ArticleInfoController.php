@@ -291,7 +291,7 @@ class ArticleInfoController extends XtoolsController
      * @param Request $request The HTTP request.
      * @param string $project
      * @param string $article
-     * @return Response
+     * @return Response|JsonResponse
      * See ArticleInfoControllerTest::testArticleInfoApi()
      * @codeCoverageIgnore
      */
@@ -360,7 +360,7 @@ class ArticleInfoController extends XtoolsController
         } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
             /**
              * The query most likely exceeded the maximum query time,
-             * so we'll abort and give only info retrived by the API.
+             * so we'll abort and give only info retrieved by the API.
              */
             $data['error'] = 'Unable to fetch revision data. The query may have timed out.';
         }

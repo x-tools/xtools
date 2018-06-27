@@ -715,7 +715,7 @@ class ArticleInfo extends Model
     /**
      * Get the number of external, incoming and outgoing links, along with
      * the number of redirects to the page.
-     * @return array
+     * @return int[]
      * @codeCoverageIgnore
      */
     private function getLinksAndRedirects()
@@ -760,7 +760,7 @@ class ArticleInfo extends Model
             'prev' => null,
 
             // The SHA-1 of the edit *before* the previous edit. Used for more
-            // accruate revert detection.
+            // accurate revert detection.
             'prevSha' => null,
 
             // The last edit deemed to be the max addition of content. This is kept track of
@@ -842,8 +842,8 @@ class ArticleInfo extends Model
 
     /**
      * Update various figures about content sizes based on the given edit.
-     * @param  Edit   $edit
-     * @param  Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
+     * @param Edit $edit
+     * @param Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
      * @return Edit[] Updated version of $prevEdits.
      */
     private function updateContentSizes(Edit $edit, $prevEdits)
@@ -858,8 +858,8 @@ class ArticleInfo extends Model
 
     /**
      * Is the given Edit a revert?
-     * @param  Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
-     * @param  Edit $edit
+     * @param Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
+     * @param Edit $edit
      * @return bool
      */
     private function isRevert($prevEdits, $edit)
@@ -870,7 +870,7 @@ class ArticleInfo extends Model
     /**
      * Updates the figures on content sizes assuming the given edit was a revert of the previous one.
      * In such a case, we don't want to treat the previous edit as legit content addition or removal.
-     * @param  Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
+     * @param Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
      * @return Edit[] Updated version of $prevEdits, for tracking.
      */
     private function updateContentSizesRevert($prevEdits)
@@ -902,8 +902,8 @@ class ArticleInfo extends Model
     /**
      * Updates the figures on content sizes assuming the given edit
      * was NOT a revert of the previous edit.
-     * @param  Edit   $edit
-     * @param  Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
+     * @param Edit $edit
+     * @param Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
      * @return Edit[] Updated version of $prevEdits, for tracking.
      */
     private function updateContentSizesNonRevert(Edit $edit, $prevEdits)

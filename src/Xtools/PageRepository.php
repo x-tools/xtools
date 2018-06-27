@@ -129,7 +129,7 @@ class PageRepository extends Repository
      * @param int $limit Max number of revisions to process.
      * @param int $numRevisions Number of revisions, if known. This is used solely to determine the
      *   OFFSET if we are given a $limit (see below). If $limit is set and $numRevisions is not set,
-     *   a separate query is ran to get the nuber of revisions.
+     *   a separate query is ran to get the number of revisions.
      * @param false|int $start
      * @param false|int $end
      * @return \Doctrine\DBAL\Driver\PDOStatement
@@ -444,7 +444,7 @@ class PageRepository extends Repository
 
     /**
      * Get page views for the given page and timeframe.
-     * @FIXME use Symfony Guzzle package.
+     * @fixme use Symfony Guzzle package.
      * @param Page $page
      * @param string|DateTime $start In the format YYYYMMDD
      * @param string|DateTime $end In the format YYYYMMDD
@@ -477,8 +477,8 @@ class PageRepository extends Repository
 
     /**
      * Get the full HTML content of the the page.
-     * @param  Page $page
-     * @param  int $revId What revision to query for.
+     * @param Page $page
+     * @param int $revId What revision to query for.
      * @return string
      */
     public function getHTMLContent(Page $page, $revId = null)
@@ -495,8 +495,8 @@ class PageRepository extends Repository
 
     /**
      * Get the ID of the revision of a page at the time of the given DateTime.
-     * @param  Page     $page
-     * @param  DateTime $date
+     * @param Page $page
+     * @param DateTime $date
      * @return int
      */
     public function getRevisionIdAtDate(Page $page, DateTime $date)

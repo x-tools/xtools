@@ -6,8 +6,7 @@
 namespace AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\CssSelector\Exception\InternalErrorException;
-use Symfony\Component\Debug\Exception\ContextErrorException;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Xtools\ProjectRepository;
@@ -37,7 +36,6 @@ class RfXVoteCalculatorController extends Controller
      * @Route("/rfxvote", name="RfXVoteCalculator")
      * @Route("/rfxvote/", name="RfXVoteCalculatorSlash")
      * @Route("/rfxvote/index.php", name="RfXVoteCalculatorIndexPhp")
-     *
      * @return Response
      */
     public function indexAction()

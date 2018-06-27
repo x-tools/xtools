@@ -226,8 +226,8 @@ class I18nHelper
 
     /**
      * Format a number based on language settings.
-     * @param  int|float $number
-     * @param  int $decimals Number of decimals to format to.
+     * @param int|float $number
+     * @param int $decimals Number of decimals to format to.
      * @return string
      */
     public function numberFormat($number, $decimals = 0)
@@ -244,10 +244,10 @@ class I18nHelper
 
     /**
      * Format a given number or fraction as a percentage.
-     * @param  number  $numerator   Numerator or single fraction if denominator is ommitted.
-     * @param  number  $denominator Denominator.
-     * @param  integer $precision   Number of decimal places to show.
-     * @return string               Formatted percentage.
+     * @param number $numerator Numerator or single fraction if denominator is ommitted.
+     * @param number $denominator Denominator.
+     * @param integer $precision Number of decimal places to show.
+     * @return string Formatted percentage.
      */
     public function percentFormat($numerator, $denominator = null, $precision = 1)
     {

@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Xtools\EditCounter;
 use Xtools\EditCounterRepository;
 use Xtools\Project;
@@ -50,7 +51,7 @@ class EditCounterController extends XtoolsController
      *   that are public (only /api/ec actions should pass this in).
      * @param bool $tooHighEditCount Whether to redirect if the user has too high of an edit count.
      * @return RedirectResponse|null
-     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException If accessing internal endpoint.
+     * @throws AccessDeniedException If attempting to access internal endpoint.
      * @codeCoverageIgnore
      */
     protected function setUpEditCounter(Request $request, $key = null, $tooHighEditCount = true)

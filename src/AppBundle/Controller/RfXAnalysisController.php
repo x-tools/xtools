@@ -7,8 +7,9 @@ namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Xtools\ProjectRepository;
 use Xtools\Page;
 use Xtools\PageRepository;
@@ -35,13 +36,13 @@ class RfXAnalysisController extends Controller
      * Renders the index page for the RfX Tool
      *
      * @param Request $request Given by Symfony
-     * @param string  $project Optional project.
-     * @param string  $type    Optional RfX type
+     * @param string $project Optional project.
+     * @param string $type Optional RfX type
      *
-     * @Route("/rfx",                  name="RfXAnalysis")
-     * @Route("/rfx/",                 name="RfXAnalysisSlash")
-     * @Route("/rfx/index.php",        name="rfxAnalysisIndexPhp")
-     * @Route("/rfx/{project}",        name="rfxAnalysisProject")
+     * @Route("/rfx", name="RfXAnalysis")
+     * @Route("/rfx/", name="RfXAnalysisSlash")
+     * @Route("/rfx/index.php", name="rfxAnalysisIndexPhp")
+     * @Route("/rfx/{project}", name="rfxAnalysisProject")
      * @Route("/rfx/{project}/{type}", name="rfxAnalysisProjectType")
      *
      * @return Response|RedirectResponse

@@ -5,20 +5,13 @@
 
 namespace AppBundle\Controller;
 
-use Exception;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Debug\Exception\FatalErrorException;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
 use Xtools\ProjectRepository;
-use Xtools\UserRepository;
-use Xtools\Page;
 use Xtools\Edit;
-use DateTime;
 
 /**
  * Serves the external API of XTools.

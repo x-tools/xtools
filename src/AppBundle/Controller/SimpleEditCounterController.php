@@ -5,9 +5,7 @@
 
 namespace AppBundle\Controller;
 
-use Doctrine\DBAL\Connection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -128,8 +126,8 @@ class SimpleEditCounterController extends XtoolsController
      * )
      * @param Request $request
      * @param int|string $namespace Namespace ID or 'all' for all namespaces.
-     * @param null|string $start
-     * @param null|string $end
+     * @param bool|string $start
+     * @param bool|string $end
      * @return Response
      * @codeCoverageIgnore
      */

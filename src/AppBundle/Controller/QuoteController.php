@@ -6,8 +6,8 @@
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
@@ -70,10 +70,8 @@ class QuoteController extends XtoolsController
     /**
      * Method for rendering a random quote.
      * This should redirect to the /quote/{id} path below
-     *
      * @Route("/quote/random", name="QuoteRandom")
      * @Route("/bash/random",  name="BashRandom")
-     *
      * @return RedirectResponse
      */
     public function randomQuoteAction()
@@ -93,10 +91,8 @@ class QuoteController extends XtoolsController
 
     /**
      * Method to show all quotes.
-     *
      * @Route("/quote/all", name="QuoteAll")
      * @Route("/bash/all",  name="BashAll")
-     *
      * @return Response
      */
     public function quoteAllAction()
@@ -128,10 +124,8 @@ class QuoteController extends XtoolsController
      * Method to render a single quote.
      *
      * @param int $id ID of the quote
-     *
      * @Route("/quote/{id}", name="QuoteID")
      * @Route("/bash/{id}",  name="BashID")
-     *
      * @return Response
      */
     public function quoteAction($id)
@@ -229,7 +223,7 @@ class QuoteController extends XtoolsController
      * Get the quote with the given ID.
      * @Route("/api/quote/{id}", name="QuoteApiQuote", requirements={"id"="\d+"})
      * @param int $id
-     * @return Response
+     * @return Response|string
      * @codeCoverageIgnore
      */
     public function singleQuotesApiAction($id)

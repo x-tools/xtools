@@ -5,9 +5,6 @@
 
 namespace Xtools;
 
-use Symfony\Component\DependencyInjection\Container;
-use DateTime;
-
 /**
  * AdminStats returns information about users with administrative
  * rights on a given wiki.
@@ -168,7 +165,7 @@ class AdminStats extends Model
     /**
      * Get the master array of statistics for each qualifying user.
      * @param boolean $abbreviateGroups If set, the 'groups' list will be
-     *   a string with abbreivated user groups names, as opposed to an array
+     *   a string with abbreviated user groups names, as opposed to an array
      *   of full-named user groups.
      * @return string[]
      */
@@ -185,7 +182,7 @@ class AdminStats extends Model
      * return the stats keyed by user name, adding in a key/value for user groups.
      * @param string[] $data As retrieved by AdminStatsRepository::getStats
      * @param boolean $abbreviateGroups If set, the 'groups' list will be
-     *   a string with abbreivated user groups names, as opposed to an array
+     *   a string with abbreviated user groups names, as opposed to an array
      *   of full-named user groups.
      * @return string[] Stats keyed by user name.
      * Functionality covered in test for self::getStats().

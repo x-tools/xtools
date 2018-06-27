@@ -81,7 +81,7 @@ abstract class Repository
 
     /**
      * Get various metadata about the current tool being used, which will
-     * be used in logging for diagnosting any issues.
+     * be used in logging for diagnosing any issues.
      * @return array|null
      *
      * There is no request stack in the tests.
@@ -261,7 +261,7 @@ abstract class Repository
 
     /**
      * Get a cache-friendly string given an argument.
-     * @param  mixed $arg
+     * @param mixed $arg
      * @return string
      */
     private function getCacheKeyFromArg($arg)
@@ -280,7 +280,7 @@ abstract class Repository
     /**
      * Set the cache with given options.
      * @param string $cacheKey
-     * @param mixed  $value
+     * @param mixed $value
      * @param string $duration Valid DateInterval string.
      * @return mixed The given $value.
      */

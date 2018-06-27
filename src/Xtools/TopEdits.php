@@ -5,8 +5,6 @@
 
 namespace Xtools;
 
-use DateTime;
-
 /**
  * TopEdits returns the top-edited pages by a user.
  */
@@ -255,7 +253,7 @@ class TopEdits extends Model
     /**
      * Format the results for top edits to a single page. This method also computes
      * totals for added/removed text, automated and reverted edits.
-     * @param  string[] $revs As returned by TopEditsRepository::getTopEditsPage.
+     * @param array[] $revs As returned by TopEditsRepository::getTopEditsPage.
      * @return Edit[]
      */
     private function formatTopEditsPage($revs)
@@ -316,8 +314,8 @@ class TopEdits extends Model
 
     /**
      * Format the results returned from the database.
-     * @param  string[] $pages As returned by TopEditsRepository::getTopEditsNamespace
-     *                         or TopEditsRepository::getTopEditsAllNamespaces.
+     * @param array $pages As returned by TopEditsRepository::getTopEditsNamespace
+     *   or TopEditsRepository::getTopEditsAllNamespaces.
      * @return string[] Same as input but with 'displaytitle' and 'page_title_ns'.
      */
     private function formatTopPagesNamespace($pages)
@@ -350,7 +348,7 @@ class TopEdits extends Model
 
     /**
      * Get the display titles of the given pages.
-     * @param  string[] $topPages As returned by $this->getRepository()->getTopEdits()
+     * @param string[] $topPages As returned by $this->getRepository()->getTopEdits()
      * @return string[] Keys are the original supplied titles, and values are the display titles.
      */
     private function getDisplayTitles($topPages)

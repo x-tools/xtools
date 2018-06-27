@@ -59,7 +59,7 @@ class Page extends Model
 
     /**
      * Get basic information about this page from the repository.
-     * @return \string[]
+     * @return string[]
      */
     protected function getPageInfo()
     {
@@ -311,7 +311,7 @@ class Page extends Model
      *   separate query is ran to get the nuber of revisions.
      * @param false|int $start
      * @param false|int $end
-     * @return Doctrine\DBAL\Driver\PDOStatement
+     * @return \Doctrine\DBAL\Driver\PDOStatement
      */
     public function getRevisionsStmt(
         User $user = null,

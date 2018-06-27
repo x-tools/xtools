@@ -27,7 +27,7 @@ class ExceptionListener
     private $environment;
 
     /**
-     * Constructor for the ExecptionListener.
+     * Constructor for the ExceptionListener.
      * @param EngineInterface $templateEngine
      * @param LoggerInterface $logger
      * @param string $environment
@@ -43,6 +43,7 @@ class ExceptionListener
      * Capture the exception, check if it's a Twig error and if so
      * throw the previous exception, which should be more meaningful.
      * @param GetResponseForExceptionEvent $event
+     * @throws \Exception
      */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {

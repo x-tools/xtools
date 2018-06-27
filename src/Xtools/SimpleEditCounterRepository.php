@@ -14,11 +14,11 @@ class SimpleEditCounterRepository extends Repository
 {
     /**
      * Execute and return results of the query used for the Simple Edit Counter.
-     * @param  Project $project
-     * @param  User $user
-     * @param  int|string $namespace Namespace ID or 'all' for all namespaces.
-     * @param  int $start Unix timestamp.
-     * @param  int $end Unix timestamp.
+     * @param Project $project
+     * @param User $user
+     * @param int|string $namespace Namespace ID or 'all' for all namespaces.
+     * @param int $start Unix timestamp.
+     * @param int $end Unix timestamp.
      * @return string[] Counts, each row with keys 'source' and 'value'.
      */
     public function fetchData(Project $project, User $user, $namespace = 'all', $start = null, $end = null)

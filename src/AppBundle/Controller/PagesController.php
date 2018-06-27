@@ -5,10 +5,8 @@
 
 namespace AppBundle\Controller;
 
-use DateTime;
 use GuzzleHttp;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -153,7 +151,7 @@ class PagesController extends XtoolsController
 
     /**
      * What columns to show in namespace totals table.
-     * @param  Pages $pages The Pages instance.
+     * @param Pages $pages The Pages instance.
      * @return string[]
      * @codeCoverageIgnore
      */
@@ -219,7 +217,7 @@ class PagesController extends XtoolsController
      * @param Project $project
      * @param string[] $pageTitles
      * @return int The PagePile ID.
-     * @throws HttpException
+     * @throws GuzzleHttp\Exception\GuzzleException
      * @see https://tools.wmflabs.org/pagepile/
      * @codeCoverageIgnore
      */
@@ -234,7 +232,7 @@ class PagesController extends XtoolsController
                 'wiki' => $project->getDatabaseName(),
                 'data' => implode("\n", $pageTitles),
             ]]);
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
+        } catch (GuzzleHttp\Exception\ClientException $e) {
             throw new HttpException(
                 414,
                 'error-pagepile-too-large'

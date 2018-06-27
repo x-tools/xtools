@@ -5,7 +5,6 @@
 
 namespace Xtools;
 
-use Mediawiki\Api\MediawikiApi;
 use Mediawiki\Api\SimpleRequest;
 
 /**
@@ -32,9 +31,9 @@ class AdminStatsRepository extends Repository
 
     /**
      * Core function to get statistics about users who have admin-like permissions.
-     * @param  Project $project
-     * @param  string  $start SQL-ready format.
-     * @param  string  $end
+     * @param Project $project
+     * @param string $start SQL-ready format.
+     * @param string $end
      * @return string[] with keys 'user_name', 'user_id', 'delete', 'restore', 'block',
      *   'unblock', 'protect', 'unprotect', 'rights', 'import', and 'total'.
      */
@@ -77,7 +76,7 @@ class AdminStatsRepository extends Repository
 
     /**
      * Get all user groups with admin-like permissions.
-     * @param  Project $project
+     * @param Project $project
      * @return array Each entry contains 'name' (user group) and 'rights' (the permissions).
      */
     public function getAdminGroups(Project $project)
