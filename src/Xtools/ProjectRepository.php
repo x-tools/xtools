@@ -362,8 +362,8 @@ class ProjectRepository extends Repository
 
     /**
      * Get a list of users who are in one of the given user groups.
-     * @param  Project $project
-     * @param  string[] List of user groups to look for.
+     * @param Project $project
+     * @param string[] List of user groups to look for.
      * @return string[] with keys 'user_name' and 'ug_group'
      */
     public function getUsersInGroups(Project $project, $groups)

@@ -9,7 +9,6 @@ use AppBundle\Helper\I18nHelper;
 use DateInterval;
 use DatePeriod;
 use DateTime;
-use Exception;
 
 /**
  * An EditCounter provides statistics about a user's edits on a project.

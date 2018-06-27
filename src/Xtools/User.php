@@ -34,7 +34,7 @@ class User extends Model
     {
         $this->username = ucfirst(str_replace('_', ' ', trim($username)));
 
-        // IPv6 address are stored as uppercased in the database.
+        // IPv6 address are stored as uppercase in the database.
         if ($this->isAnon()) {
             $this->username = strtoupper($this->username);
         }
@@ -93,7 +93,7 @@ class User extends Model
 
     /**
      * Get a user's local user rights on the given Project.
-     * @param  Project $project
+     * @param Project $project
      * @return string[]
      */
     public function getUserRights(Project $project)

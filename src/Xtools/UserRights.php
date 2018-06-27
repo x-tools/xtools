@@ -205,7 +205,7 @@ class UserRights extends Model
 
     /**
      * Process the given rights changes, sorting an putting in a human-readable format.
-     * @param  array $logData As fetched with EditCounterRepository::getRightsChanges.
+     * @param array $logData As fetched with EditCounterRepository::getRightsChanges.
      * @return array
      */
     private function processRightsChanges($logData)

@@ -7,6 +7,7 @@ namespace Xtools;
 
 use AppBundle\Helper\I18nHelper;
 use DateTime;
+use Doctrine\DBAL\Connection;
 
 /**
  * An EditSummary provides statistics about a user's edit summary
@@ -213,6 +214,7 @@ class EditSummary extends Model
     /**
      * Process a single row from the database, updating class properties with counts.
      * @param string[] $row As retrieved from the revision table.
+     * @return string[]
      * @todo Somehow allow this to be private and still be accessible in the Repository.
      */
     public function processRow($row)
@@ -274,7 +276,7 @@ class EditSummary extends Model
 
     /**
      * Was the given row in `revision` marked as a minor edit?
-     * @param  string[] $row As retrieved from the revision table.
+     * @param string[] $row As retrieved from the revision table.
      * @return boolean
      */
     private function isMinor($row)
@@ -285,7 +287,7 @@ class EditSummary extends Model
     /**
      * Taking into account automated edit summaries, does the given
      * row in `revision` have a user-supplied edit summary?
-     * @param  string[] $row As retrieved from the revision table.
+     * @param string[] $row As retrieved from the revision table.
      * @return boolean
      */
     private function hasSummary($row)
@@ -297,8 +299,8 @@ class EditSummary extends Model
     /**
      * Check and see if the month is set for given $monthKey and $type.
      * If it is, increment it, otherwise set it to 1.
-     * @param  string $monthKey In the form 'YYYY-MM'.
-     * @param  string $type     Either 'total' or 'summaries'.
+     * @param string $monthKey In the form 'YYYY-MM'.
+     * @param string $type     Either 'total' or 'summaries'.
      * @codeCoverageIgnore
      */
     private function updateMonthCounts($monthKey, $type)

@@ -5,20 +5,15 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Helper\AutomatedEditsHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Xtools\AutoEdits;
 use Xtools\AutoEditsRepository;
-use Xtools\Edit;
 use Xtools\Project;
-use Xtools\ProjectRepository;
 use Xtools\User;
-use Xtools\UserRepository;
 
 /**
  * This controller serves the AutomatedEdits tool.
@@ -100,6 +95,7 @@ class AutomatedEditsController extends XtoolsController
      * Set defaults, and instantiate the AutoEdits model. This is called at
      * the top of every view action.
      * @param Request $request The HTTP request.
+     * @return RedirectResponse|null
      * @codeCoverageIgnore
      */
     private function setupAutoEdits(Request $request)

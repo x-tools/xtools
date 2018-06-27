@@ -127,8 +127,8 @@ class PagesRepository extends Repository
     /**
      * Get SQL fragments for the namespace and redirects,
      * to be used in self::getPagesCreatedInnerSql().
-     * @param  string|int $namespace Namespace ID or 'all'.
-     * @param  string $redirects One of 'noredirects', 'onlyredirects' or blank for both.
+     * @param string|int $namespace Namespace ID or 'all'.
+     * @param string $redirects One of 'noredirects', 'onlyredirects' or blank for both.
      * @return string[] With keys 'namespaceRev', 'namespaceArc' and 'redirects'
      */
     private function getNamespaceRedirectAndDeletedPagesConditions($namespace, $redirects)
@@ -156,8 +156,8 @@ class PagesRepository extends Repository
     /**
      * Get SQL fragments for rev_user or rev_user_text, depending on if the user is logged out.
      * Used in self::getPagesCreatedInnerSql().
-     * @param  Project $project
-     * @param  User $user
+     * @param Project $project
+     * @param User $user
      * @return string[] Keys 'whereRev' and 'whereArc'.
      */
     private function getUserConditions(Project $project, User $user)
@@ -180,8 +180,8 @@ class PagesRepository extends Repository
 
     /**
      * Inner SQL for getting or counting pages created by the user.
-     * @param  Project $project
-     * @param  string[] $conditions Conditions for the SQL, must include 'paSelects',
+     * @param Project $project
+     * @param string[] $conditions Conditions for the SQL, must include 'paSelects',
      *     'paSelectsArchive', 'paJoin', 'whereRev', 'whereArc', 'namespaceRev', 'namespaceArc',
      *     'redirects' and 'revPageGroupBy'.
      * @param  string $deleted One of 'live', 'deleted' or blank for both.

@@ -6,7 +6,6 @@
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use DateTime;
 use Symfony\Component\HttpFoundation\Response;
@@ -54,9 +53,9 @@ class MetaController extends XtoolsController
     /**
      * Display the results.
      * @Route("/meta/{start}/{end}/{legacy}", name="MetaResult")
-     * @param string $start   Start date
-     * @param string $end     End date
-     * @param string $legacy  Non-blank value indicates to show stats for legacy XTools
+     * @param string $start Start date
+     * @param string $end End date
+     * @param bool $legacy Non-blank value indicates to show stats for legacy XTools
      * @return Response
      * @codeCoverageIgnore
      */
@@ -83,10 +82,10 @@ class MetaController extends XtoolsController
 
     /**
      * Get usage statistics of the core tools.
-     * @param  Connection $client
-     * @param  string     $table Table to query.
-     * @param  string     $start Start date.
-     * @param  string     $end End date.
+     * @param Connection $client
+     * @param string $table Table to query.
+     * @param string $start Start date.
+     * @param string $end End date.
      * @return array
      * @codeCoverageIgnore
      */
@@ -142,9 +141,9 @@ class MetaController extends XtoolsController
 
     /**
      * Get usage statistics of the API.
-     * @param  Connection $client
-     * @param  string     $start Start date.
-     * @param  string     $end End date.
+     * @param Connection $client
+     * @param string $start Start date.
+     * @param string $end End date.
      * @return array
      * @codeCoverageIgnore
      */
@@ -200,13 +199,12 @@ class MetaController extends XtoolsController
 
     /**
      * Record usage of a particular XTools tool. This is called automatically
-     *   in base.html.twig via JavaScript so that it is done asynchronously
+     *   in base.html.twig via JavaScript so that it is done asynchronously.
      * @Route("/meta/usage/{tool}/{project}/{token}")
-     * @param  Request $request
-     * @param  string $tool    Internal name of tool
-     * @param  string $project Project domain such as en.wikipedia.org
-     * @param  string $token   Unique token for this request, so we don't have people
-     *                         meddling with these statistics
+     * @param Request $request
+     * @param string $tool Internal name of tool.
+     * @param string $project Project domain such as en.wikipedia.org
+     * @param string $token Unique token for this request, so we don't have people meddling with these statistics.
      * @return Response
      * @codeCoverageIgnore
      */

@@ -4,7 +4,7 @@
 {% set colors = [] %}
 <div class="chart-wrapper {{ classes }}">
     <canvas id="{{ id }}"{% if size != null %} height="{{ size }}"{% endif %}></canvas>
-    <span class="chart-legend" id="{{ id }}_legend">
+    <div class="chart-legend" id="{{ id }}_legend">
         <div class="legend-body">
             {% for entry in data %}
                 {% set labels = labels | merge([entry.label]) %}
@@ -22,7 +22,7 @@
                 {% endif %}
             {% endfor %}
         </div>
-    </span>
+    </div>
 </div>
 <script type="text/javascript">
     $(function() {
@@ -33,14 +33,14 @@
                 datasets: [{
                     data: {{ values | json_encode() | raw }},
                     backgroundColor: {{ colors | json_encode() | raw }},
-                    hoverBackgroundColor: {{ colors | json_encode() | raw }},
-                }],
+                    hoverBackgroundColor: {{ colors | json_encode() | raw }}
+                }]
             },
             options: {
                 responsive: false,
                 aspectRatio: 1,
                 legend: {
-                    display: false,
+                    display: false
                 },
                 tooltips: {
                     callbacks: {
@@ -51,7 +51,7 @@
                         }
                     }
                 }
-            },
+            }
         });
     });
 </script>

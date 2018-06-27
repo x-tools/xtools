@@ -68,7 +68,7 @@
                 <td>
                     {% set adminStatus = ec.adminStatus %}
                     {% if adminStatus == 'current' %}
-                        <span class="text-success">&check;
+                        <span class="text-success">&check;</span>
                     {% elseif adminStatus == 'former' %}
                         <span class="text-warning">&cross;</span>
                         <em class="text-muted">({{ msg('former-admin')|lower }})</em>
@@ -411,7 +411,7 @@
                             {% else %}
                                 {{ user.getBlockExpiry(project)|date_format }}
                             {% endif %}
-                        {% endspaceless %}
+                        {% endspaceless %}</a>
                     {% else %}
                         &ndash;
                     {% endif %}

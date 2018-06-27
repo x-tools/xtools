@@ -160,9 +160,9 @@ class TopEditsRepository extends Repository
      * The actual query to get the top edits by the user to the page.
      * Because of the way the main query works, we aren't given the most recent revision,
      * so we have to call this twice, once with $childRevs set to true and once with false.
-     * @param  Page    $page
-     * @param  User    $user
-     * @param  boolean $childRevs Whether to include child revisions.
+     * @param Page $page
+     * @param User $user
+     * @param boolean $childRevs Whether to include child revisions.
      * @return string[] Each row with keys 'id', 'timestamp', 'minor', 'length',
      *   'length_change', 'reverted', 'user_id', 'username', 'comment', 'parent_comment'
      */
@@ -211,7 +211,7 @@ class TopEditsRepository extends Repository
     /**
      * Get the display titles of the given pages.
      * @param Project $project
-     * @param  string[] $titles List of page titles.
+     * @param string[] $titles List of page titles.
      * @return string[] Keys are the original supplied titles, and values are the display titles.
      */
     public function getDisplayTitles(Project $project, $titles)

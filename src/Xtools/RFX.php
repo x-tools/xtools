@@ -49,7 +49,7 @@ class RFX
     protected function findSig($input, &$matches)
     {
         //Supports User: and User talk: wikilinks, {{fullurl}},
-        // unsubsted {{unsigned}}, unsubsted {{unsigned2}},
+        // unsubstituted {{unsigned}}, unsubstituted {{unsigned2}},
         // anything that looks like a custom sig template
         // TODO: Cross-wiki this sucker
         $regexp
@@ -80,8 +80,6 @@ class RFX
      * @param array  $sectionArray Section names that we're looking for
      * @param string $rawWikiText  The text of the page we're parsing
      * @param string $dateRegexp   Valid Regular Expression for the end date
-     *
-     * @return null
      */
     private function setUp($sectionArray, $rawWikiText, $dateRegexp)
     {

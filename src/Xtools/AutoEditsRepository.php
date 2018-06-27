@@ -5,8 +5,6 @@
 
 namespace Xtools;
 
-use AppBundle\Helper\AutomatedEditsHelper;
-use DateInterval;
 use Symfony\Component\Config\Definition\Exception\Exception;
 
 /**
@@ -23,6 +21,7 @@ class AutoEditsRepository extends UserRepository
      * Method to give the repository access to the AutomatedEditsHelper
      * and fetch the list of semi-automated tools.
      * @param Project $project
+     * @return array
      */
     private function getTools(Project $project)
     {

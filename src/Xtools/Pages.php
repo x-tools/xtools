@@ -5,8 +5,6 @@
 
 namespace Xtools;
 
-use Xtools\Project;
-use Xtools\User;
 use DateTime;
 
 /**
@@ -306,7 +304,7 @@ class Pages extends Model
     /**
      * Format the data, adding humanized timestamps, page titles, assessment badges,
      * and sorting by namespace and then timestamp.
-     * @param  array $pages As returned by self::fetchPagesCreated()
+     * @param array $pages As returned by self::fetchPagesCreated()
      * @return array
      */
     private function formatPages($pages)

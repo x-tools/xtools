@@ -33,8 +33,8 @@ class AutomatedEditsHelper extends HelperBase
     /**
      * Get the tool that matched the given edit summary.
      * This only works for tools defined with regular expressions, not tags.
-     * @param  string $summary Edit summary
-     * @param  Project $project
+     * @param string $summary Edit summary
+     * @param Project $project
      * @return string|bool Tool entry including key for 'name', or false if nothing was found
      */
     public function getTool($summary, Project $project)
@@ -53,8 +53,8 @@ class AutomatedEditsHelper extends HelperBase
     /**
      * Was the edit (semi-)automated, based on the edit summary?
      * This only works for tools defined with regular expressions, not tags.
-     * @param  string $summary Edit summary
-     * @param  Project $project
+     * @param string $summary Edit summary
+     * @param Project $project
      * @return bool
      */
     public function isAutomated($summary, Project $project)
@@ -66,7 +66,7 @@ class AutomatedEditsHelper extends HelperBase
      * Get list of automated tools and their associated info for the
      *   given project. This defaults to the 'default_project' if
      *   entries for the given project are not found.
-     * @param  Project $project
+     * @param Project $project
      * @return string[] Each tool with the tool name as the key,
      *   and 'link', 'regex' and/or 'tag' as the subarray keys.
      */
@@ -143,7 +143,7 @@ class AutomatedEditsHelper extends HelperBase
      * Get only tools that are used to revert edits.
      * Revert detection happens only by testing against a regular expression,
      *   and not by checking tags.
-     * @param  Project $project
+     * @param Project $project
      * @return string[] Each tool with the tool name as the key,
      *   and 'link' and 'regex' as the subarray keys.
      */
@@ -177,8 +177,8 @@ class AutomatedEditsHelper extends HelperBase
     /**
      * Was the edit a revert, based on the edit summary?
      * This only works for tools defined with regular expressions, not tags.
-     * @param  string $summary Edit summary
-     * @param  Project $project
+     * @param string $summary Edit summary
+     * @param Project $project
      * @return bool
      */
     public function isRevert($summary, Project $project)

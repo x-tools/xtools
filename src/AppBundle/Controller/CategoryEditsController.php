@@ -5,20 +5,15 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Helper\AutomatedEditsHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Xtools\CategoryEdits;
 use Xtools\CategoryEditsRepository;
-use Xtools\Edit;
 use Xtools\Project;
-use Xtools\ProjectRepository;
 use Xtools\User;
-use Xtools\UserRepository;
 
 /**
  * This controller serves the Category Edits tool.
@@ -104,6 +99,7 @@ class CategoryEditsController extends XtoolsController
      * Set defaults, and instantiate the CategoryEdits model. This is called at
      * the top of every view action.
      * @param Request $request The HTTP request.
+     * @return RedirectResponse|null
      * @codeCoverageIgnore
      */
     private function setupCategoryEdits(Request $request)
@@ -150,7 +146,7 @@ class CategoryEditsController extends XtoolsController
     /**
      * Go through the categories, start, end, and offset parameters
      * and normalize values, and set them on class properties.
-     * @param  Request $request
+     * @param Request $request
      * @return null|RedirectResponse Redirect if categoires were normalized.
      * @codeCoverageIgnore
      */

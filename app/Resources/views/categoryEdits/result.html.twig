@@ -127,7 +127,7 @@
                                     <span class="glyphicon glyphicon-remove"></span>
                                     <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
                                 </span>
-                                {## REFACTOR: add method to CategoryEdits that incldues namespaces ##}
+                                {## REFACTOR: add method to CategoryEdits that incldues namespaces #}
                                 {{ wiki.pageLinkRaw(nsName(14, project.namespaces) ~ ':' ~ category, project, category|replace({'_': ' '})) }}
                             </td>
                             <td class="sort-entry--count" data-value="{{ count }}">
@@ -157,7 +157,7 @@
                  # Set the size of the chart to be relative to the number of tools.
                  # Otherwise it may get too big and hog up the real estate.
                  # 37 is the heigh of one row.
-                 ##}
+                 #}
                 {% set maxHeight = min(300, (ce.categoryCounts|length + 2) * 37) %}
                 {% set height = max(200, maxHeight) %}
                 {# width gets + 100 to give a little breathing room for the tooltips #}
@@ -190,7 +190,7 @@
                         options: {
                             aspectRatio: 1,
                             legend: {
-                              display: false,
+                              display: false
                             },
                             tooltips: {
                                 callbacks: {

@@ -5,8 +5,6 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Helper\I18nHelper;
-use Doctrine\DBAL\Connection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -70,7 +68,7 @@ class EditSummaryController extends XtoolsController
      * Display the Edit Summary results
      * @Route("/editsummary/{project}/{username}/{namespace}", name="EditSummaryResult")
      * @param Request $request The HTTP request.
-     * @param string $namespace Namespace ID or 'all' for all namespaces.
+     * @param string|int $namespace Namespace ID or 'all' for all namespaces.
      * @return Response
      * @codeCoverageIgnore
      */
@@ -112,7 +110,7 @@ class EditSummaryController extends XtoolsController
      * Get basic stats on the edit summary usage of a user.
      * @Route("/api/user/edit_summaries/{project}/{username}/{namespace}", name="UserApiEditSummaries")
      * @param Request $request The HTTP request.
-     * @param string $namespace Namespace ID or 'all' for all namespaces.
+     * @param string|int $namespace Namespace ID or 'all' for all namespaces.
      * @return Response
      * @codeCoverageIgnore
      */
@@ -129,7 +127,7 @@ class EditSummaryController extends XtoolsController
         }
 
         // Instantiate an EditSummary, treating the past 150 edits as 'recent'.
-        $editSummary = new EditSummary($project, $user, $namespace, 150, $this->container);
+        $editSummary = new EditSummary($project, $user, $namespace, 150);
         $editSummaryRepo = new EditSummaryRepository();
         $editSummaryRepo->setContainer($this->container);
         $editSummary->setRepository($editSummaryRepo);

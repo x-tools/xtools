@@ -119,7 +119,7 @@
                     label: "{{ msg('tool-'~tool) }}",
                     lineTension: 0,
                     pointBackgroundColor: '{{ chartColor(loop.index0) }}',
-                    pointHoverRadius: 5,
+                    pointHoverRadius: 5
                 });
             {% endfor %}
 
@@ -128,11 +128,11 @@
                 type: 'line',
                 data: {
                     labels: {{ toolUsage.dateLabels|json_encode|raw }},
-                    datasets: datasets,
+                    datasets: datasets
                 },
                 options: {
                     legend: {
-                        display: false,
+                        display: false
                     },
                     scales: {
                         yAxes: [{
@@ -173,7 +173,7 @@
             });
         </script>
 
-        {######## FOR THE API STATS ########}
+        {######## FOR THE API STATS #########}
 
         {% set content %}
              <div class="col-lg-6 stat-list clearfix">
@@ -278,7 +278,7 @@
                     label: "{{ endpoint }}",
                     lineTension: 0,
                     pointBackgroundColor: '{{ chartColor(loop.index0) }}',
-                    pointHoverRadius: 5,
+                    pointHoverRadius: 5
                 });
             {% endfor %}
 
@@ -287,11 +287,11 @@
                 type: 'line',
                 data: {
                     labels: {{ apiUsage.dateLabels|json_encode|raw }},
-                    datasets: datasets,
+                    datasets: datasets
                 },
                 options: {
                     legend: {
-                        display: false,
+                        display: false
                     },
                     scales: {
                         yAxes: [{

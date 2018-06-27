@@ -18,7 +18,7 @@ class EditSummaryRepository extends Repository
      * @param Project $project The project we're working with.
      * @param User $user The user to process.
      * @param string|int $namespace Namespace ID or 'all' for all namespaces.
-     * @return \Doctrine\DBAL\Statement
+     * @return \Doctrine\DBAL\Driver\Statement
      */
     public function getRevisions(Project $project, User $user, $namespace)
     {

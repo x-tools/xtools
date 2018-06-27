@@ -237,7 +237,7 @@ class AutoEdits extends Model
 
     /**
      * Transform database rows into Edit objects.
-     * @param  string[] $revs
+     * @param string[] $revs
      * @return Edit[]
      */
     private function getEditsFromRevs(array $revs)
@@ -254,13 +254,12 @@ class AutoEdits extends Model
     /**
      * Get a Page object given a revision row.
      * @param array $rev Revision as retrieved from the database.
-     * @return Page[]
+     * @return Page
      */
     private function getPageFromRev(array $rev)
     {
         $namespaces = $this->project->getNamespaces();
         $pageTitle = $rev['page_title'];
-        $fullPageTitle = '';
 
         if ((int)$rev['page_namespace'] === 0) {
             $fullPageTitle = $pageTitle;

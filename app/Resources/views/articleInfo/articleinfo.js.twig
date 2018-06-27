@@ -12,16 +12,17 @@ $(function () {
     }
 
     var markup = "<div id='xtools' style='font-size:84%; line-height:1.2em;" +
-        "width:auto;'><span id='xtools_result'>.</span></div>";
+        "width:auto;'><span id='xtools_result'>.</span></div>",
+        $result = $('#xtools_result');
     $(markup).insertBefore('#contentSub');
 
     var loadinganimation = window.setInterval(function () {
-        if ($('#xtools_result').html() === '.&nbsp;&nbsp;') {
-            $('#xtools_result').html('&nbsp;.&nbsp;');
-        } else if ($('#xtools_result').html() === '&nbsp;.&nbsp;') {
-            $('#xtools_result').html('&nbsp;&nbsp;.');
+        if ($result.html() === '.&nbsp;&nbsp;') {
+            $result.html('&nbsp;.&nbsp;');
+        } else if ($result.html() === '&nbsp;.&nbsp;') {
+            $result.html('&nbsp;&nbsp;.');
         } else {
-            $('#xtools_result').html('.&nbsp;&nbsp;');
+            $result.html('.&nbsp;&nbsp;');
         }
     }, 300);
 
@@ -32,7 +33,7 @@ $(function () {
         mw.config.get('wgPageName').replace(/["?%&+]/g, escape) + '?format=html' +
         '&uselang=' + mw.config.get('wgUserLanguage')
     ).done(function (result) {
-        $('#xtools_result').html(result);
+        $result.html(result);
         clearInterval(loadinganimation);
     });
 });

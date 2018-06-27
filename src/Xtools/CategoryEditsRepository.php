@@ -6,8 +6,6 @@
 namespace Xtools;
 
 use AppBundle\Helper\AutomatedEditsHelper;
-use DateInterval;
-use Symfony\Component\Config\Definition\Exception\Exception;
 
 /**
  * CategoryEditsRepository is responsible for retrieving data from the database
@@ -71,11 +69,11 @@ class CategoryEditsRepository extends Repository
 
     /**
      * Get number of edits within each individual category.
-     * @param  Project $project
-     * @param  User    $user
-     * @param  array   $categories
-     * @param  string  $start
-     * @param  string  $end
+     * @param Project $project
+     * @param User $user
+     * @param array $categories
+     * @param string $start
+     * @param string $end
      * @return string[] With categories as keys, counts as values.
      */
     public function getCategoryCounts(

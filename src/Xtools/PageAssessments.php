@@ -183,7 +183,7 @@ class PageAssessments extends Model
     /**
      * Get the class attributes for the given class value,
      * as fetched from the config.
-     * @param  string $classValue Such as 'FA', 'GA', 'Start', etc.
+     * @param string $classValue Such as 'FA', 'GA', 'Start', etc.
      * @return string[] Attributes as fetched from the XTools assessments config.
      */
     private function getClassAttrs($classValue)
@@ -197,7 +197,7 @@ class PageAssessments extends Model
      *   'color' (as hex RGB),
      *   'badge' (full URL to assessment badge),
      *   'category' (wiki path to related class category).
-     * @param  array $assessment
+     * @param array $assessment
      * @return array Decorated class assessment.
      */
     private function getClassFromAssessment($assessment)

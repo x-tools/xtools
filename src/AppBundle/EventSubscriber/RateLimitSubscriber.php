@@ -10,8 +10,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Psr\Cache\CacheItemPoolInterface;
-use Psr\Log\LoggerInterface;
 use DateInterval;
 
 /**
@@ -31,7 +29,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
 
     /**
      * Save the container for later use.
-     * @param Container $container The DI container.
+     * @param ContainerInterface $container The DI container.
      */
     public function __construct(ContainerInterface $container)
     {
@@ -52,7 +50,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
     /**
      * Check if the current user has exceeded the configured usage limitations.
      * @param FilterControllerEvent $event The event.
-     * @throws TooManyRequestsHttpException If rate limits have been exceeded.
+     * @throws TooManyRequestsHttpException|\Exception If rate limits have been exceeded.
      */
     public function onKernelController(FilterControllerEvent $event)
     {
@@ -136,6 +134,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
      * Throw exception for denied access due to spider crawl or hitting usage limits.
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @param string $logComment Comment to include with the log entry.
+     * @throws TooManyRequestsHttpException
      * @todo i18n
      */
     private function denyAccess(\Symfony\Component\HttpFoundation\Request $request, $logComment = '')

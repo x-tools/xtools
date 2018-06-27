@@ -30,7 +30,7 @@
         </div>
         {% endif %}
 
-        {################## SUMMARY SECTION ##################}
+        {################## SUMMARY SECTION ###################}
 
         {% set content %}
             <div class="col-lg-6 stat-list clearfix">
@@ -147,7 +147,7 @@
         {% endset %}
         {{ layout.content_block('summary', content) }}
 
-        {################## LIST OF PAGES ##################}
+        {################## LIST OF PAGES ###################}
 
         {% set content %}
 
@@ -380,7 +380,7 @@
                 options: {
                     aspectRatio: 1,
                     legend: {
-                        display: false,
+                        display: false
                     },
                     tooltips: {
                         callbacks: {
@@ -390,7 +390,7 @@
                                 return label + ': ' + value.toLocaleString(i18nLang);
                             }
                         }
-                    },
+                    }
                 }
             });
             window.countsByNamespace = {{ pages.counts|json_encode()|raw }};

@@ -123,6 +123,7 @@ class UserRepository extends Repository
      * @param int|string $namespace Namespace ID or 'all' for all namespaces
      * @param string $start Start date in a format accepted by strtotime()
      * @param string $end End date in a format accepted by strtotime()
+     * @return int
      */
     public function countEdits(Project $project, User $user, $namespace = 'all', $start = '', $end = '')
     {
@@ -172,8 +173,8 @@ class UserRepository extends Repository
 
     /**
      * Get SQL clauses for joining on `page` and restricting to a namespace.
-     * @param  Project $project
-     * @param  int|string $namespace Namespace ID or 'all' for all namespaces.
+     * @param Project $project
+     * @param int|string $namespace Namespace ID or 'all' for all namespaces.
      * @return array [page join clause, page namespace clause]
      */
     protected function getPageAndNamespaceSql(Project $project, $namespace)
@@ -192,8 +193,8 @@ class UserRepository extends Repository
     /**
      * Get SQL clauses for rev_timestamp, based on whether values for
      * the given start and end parameters exist.
-     * @param  string $start
-     * @param  string $end
+     * @param string $start
+     * @param string $end
      * @param string $tableAlias Alias of table FOLLOWED BY DOT.
      * @todo FIXME: merge with Repository::getDateConditions
      * @return string[] Clauses for start and end timestamps.
@@ -215,11 +216,11 @@ class UserRepository extends Repository
 
     /**
      * Prepare the given SQL, bind the given parameters, and execute the Doctrine Statement.
-     * @param  string $sql
-     * @param  User   $user
-     * @param  string $namespace
-     * @param  string $start
-     * @param  string $end
+     * @param string $sql
+     * @param User   $user
+     * @param string $namespace
+     * @param string $start
+     * @param string $end
      * @return \Doctrine\DBAL\Statement
      */
     protected function executeQuery($sql, User $user, $namespace = 'all', $start = '', $end = '')

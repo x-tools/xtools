@@ -107,7 +107,7 @@
                 <td>
                     {{ (100 - totalPercentage)|percent_format }}
                 </td>
-            </tr></td>
+            </tr></tfoot>
         {% endif %}
     </table>
 
@@ -115,7 +115,7 @@
      # Set the size of the chart to be relative to the number of tools.
      # Otherwise it may get too big and hog up the real estate.
      # 37 is the heigh of one row.
-     ##}
+     #}
     {% set maxHeight = min(400, (textshares.list|length + 2) * 37) %}
     {% set height = max(150, maxHeight) %}
     <div class="chart-wrapper textshares-chart-wrapper toggle-table--chart">
@@ -145,7 +145,7 @@
             options: {
                 aspectRatio: 1,
                 legend: {
-                  display: false,
+                  display: false
                 },
                 tooltips: {
                     callbacks: {
