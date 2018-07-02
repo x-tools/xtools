@@ -253,7 +253,7 @@
 	"num-seconds": "{{PLURAL:$1|秒|秒}}",
 	"num-sitelinks": "{{PLURAL:$1|網站連結|網站連結}}",
 	"num-tools": "{{PLURAL:$1|工具|工具}}",
-	"num-users": "{{PLURAL:$1|用戶|用戶}}",
+	"num-users": "{{PLURAL:$1|使用者|使用者}}",
 	"num-watchers": "{{PLURAL:$1|監視者|監視者}}",
 	"num-weeks": "{{PLURAL:$1|週|週}}",
 	"num-years": "{{PLURAL:$1|年|年}}",
