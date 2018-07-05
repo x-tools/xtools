@@ -50,7 +50,7 @@ class EditCounterController extends XtoolsController
      *   that are public (only /api/ec actions should pass this in).
      * @param bool $tooHighEditCount Whether to redirect if the user has too high of an edit count.
      * @return RedirectResponse|null
-     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException If attempting to access internal endpoint.
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException If accessing internal endpoint.
      * @codeCoverageIgnore
      */
     protected function setUpEditCounter(Request $request, $key = null, $tooHighEditCount = true)
