@@ -6,6 +6,7 @@
 namespace Xtools;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mediawiki\Api\MediawikiApi;
@@ -13,10 +14,11 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
-use GuzzleHttp\Promise\Promise;
 use DateInterval;
 
 /**
@@ -57,7 +59,7 @@ abstract class Repository
 
     /**
      * Set the DI container.
-     * @param Container $container
+     * @param Container|ContainerInterface $container
      */
     public function setContainer(Container $container)
     {
@@ -80,17 +82,18 @@ abstract class Repository
     /**
      * Get various metadata about the current tool being used, which will
      * be used in logging for diagnosting any issues.
-     * @return array
+     * @return array|null
      *
      * There is no request stack in the tests.
      * @codeCoverageIgnore
      */
     protected function getCurrentRequestMetadata()
     {
+        /** @var Request $request */
         $request = $this->container->get('request_stack')->getCurrentRequest();
 
         if (null === $request) {
-            return;
+            return null;
         }
 
         $requestTime = microtime(true) - $request->server->get('REQUEST_TIME_FLOAT');
@@ -181,6 +184,7 @@ abstract class Repository
      * @param string $databaseName
      * @param string $tableName
      * @param string|null $tableExtension Optional table extension, which will only get used if we're on labs.
+     *   If null, table extensions are added as defined in table_map.yml. If a blank string, no extension is added.
      * @return string Fully-qualified and quoted table name.
      */
     public function getTableName($databaseName, $tableName, $tableExtension = null)
@@ -192,7 +196,7 @@ abstract class Repository
         // $tableExtension in order to generate the new table name
         if ($this->isLabs() && $tableExtension !== null) {
             $mapped = true;
-            $tableName = $tableName.'_'.$tableExtension;
+            $tableName = $tableName.($tableExtension === '' ? '' : '_'.$tableExtension);
         } elseif ($this->container->hasParameter("app.table.$tableName")) {
             // Use the table specified in the table mapping configuration, if present.
             $mapped = true;
@@ -326,6 +330,8 @@ abstract class Repository
      * @param int|null $timeout Maximum statement time in seconds. null will use the
      *   default specified by the app.query_timeout config parameter.
      * @return \Doctrine\DBAL\Driver\Statement
+     * @throws DriverException
+     * @throws DBALException
      * @codeCoverageIgnore
      */
     public function executeProjectsQuery($sql, $params = [], $timeout = null)
@@ -337,7 +343,7 @@ abstract class Repository
             $sql = "SET STATEMENT max_statement_time = $timeout FOR\n".$sql;
             return $this->getProjectsConnection()->executeQuery($sql, $params);
         } catch (DriverException $e) {
-            return $this->handleDriverError($e, $timeout);
+            $this->handleDriverError($e, $timeout);
         }
     }
 
@@ -347,6 +353,8 @@ abstract class Repository
      * @param int $timeout Maximum statement time in seconds. null will use the
      *   default specified by the app.query_timeout config parameter.
      * @return \Doctrine\DBAL\Driver\Statement
+     * @throws DriverException
+     * @throws DBALException
      * @codeCoverageIgnore
      */
     public function executeQueryBuilder(QueryBuilder $qb, $timeout = null)
@@ -358,7 +366,7 @@ abstract class Repository
             $sql = "SET STATEMENT max_statement_time = $timeout FOR\n".$qb->getSQL();
             return $qb->getConnection()->executeQuery($sql, $qb->getParameters(), $qb->getParameterTypes());
         } catch (DriverException $e) {
-            return $this->handleDriverError($e, $timeout);
+            $this->handleDriverError($e, $timeout);
         }
     }
 

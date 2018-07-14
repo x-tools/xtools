@@ -647,7 +647,7 @@ class ArticleInfo extends Model
     /**
      * Get a list of (semi-)automated tools that were used to edit the page, including
      * the number of times they were used, and a link to the tool's homepage.
-     * @return mixed[]
+     * @return string[]
      */
     public function getTools()
     {
@@ -715,7 +715,7 @@ class ArticleInfo extends Model
     /**
      * Get the number of external, incoming and outgoing links, along with
      * the number of redirects to the page.
-     * @return int
+     * @return array
      * @codeCoverageIgnore
      */
     private function getLinksAndRedirects()
@@ -728,7 +728,6 @@ class ArticleInfo extends Model
 
     /**
      * Parse the revision history, collecting our core statistics.
-     * @return mixed[] Associative "master" array of metadata about the page.
      *
      * Untestable because it relies on getting a PDO statement. All the important
      * logic lives in other methods which are tested.
@@ -941,9 +940,9 @@ class ArticleInfo extends Model
      * This happens when the edit follows other edits that were revision-deleted.
      * @see T148857 for more information.
      * @todo Remove once T101631 is resolved.
-     * @param  Edit   $edit
-     * @param  Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
-     * @return Edit[] Updated version of $prevEdits, for tracking.
+     * @param Edit $edit
+     * @param Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
+     * @return int
      */
     private function getEditSize(Edit $edit, $prevEdits)
     {
@@ -1149,7 +1148,7 @@ class ArticleInfo extends Model
      */
     private function setBots()
     {
-        // Parse the botedits
+        // Parse the bot edits.
         $bots = [];
         $botData = $this->getRepository()->getBotData($this->page, $this->startDate, $this->endDate);
         while ($bot = $botData->fetch()) {
@@ -1246,7 +1245,6 @@ class ArticleInfo extends Model
      * Set statistics about the top 10 editors by added text and number of edits.
      * This is ran *after* parseHistory() since we need the grand totals first.
      * Various stats are also set for each editor in $this->editors to be used in the charts.
-     * @return integer Number of edits
      */
     private function setTopTenCounts()
     {
@@ -1314,7 +1312,7 @@ class ArticleInfo extends Model
     /**
      * Get authorship attribution from the WikiWho API.
      * @see https://f-squared.org/wikiwho/
-     * @param  int $limit Max number of results.
+     * @param int $limit Max number of results.
      * @return array
      */
     public function getTextshares($limit = null)
@@ -1372,7 +1370,7 @@ class ArticleInfo extends Model
 
     /**
      * Get a map of user IDs to usernames, given the IDs.
-     * @param  int[] $userIds
+     * @param int[] $userIds
      * @return array IDs as keys, usernames as values.
      */
     private function getUsernameMap($userIds)
@@ -1392,7 +1390,7 @@ class ArticleInfo extends Model
 
     /**
      * Get counts of token lengths for each author. Used in self::getTextshares()
-     * @param  array $tokens
+     * @param array $tokens
      * @return array [counts by user, total count, IDs of accounts]
      */
     private function countTokens($tokens)
@@ -1470,8 +1468,8 @@ class ArticleInfo extends Model
     /**
      * Count the number of characters and words of the plain text
      * within the DOM element matched by the given selector.
-     * @param  Crawler $crawler
-     * @param  string $selector HTML selector.
+     * @param Crawler $crawler
+     * @param string $selector HTML selector.
      * @return array [num chars, num words]
      */
     private function countCharsAndWords($crawler, $selector)

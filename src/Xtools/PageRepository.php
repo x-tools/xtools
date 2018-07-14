@@ -132,7 +132,7 @@ class PageRepository extends Repository
      *   a separate query is ran to get the nuber of revisions.
      * @param false|int $start
      * @param false|int $end
-     * @return Doctrine\DBAL\Driver\PDOStatement
+     * @return \Doctrine\DBAL\Driver\PDOStatement
      */
     public function getRevisionsStmt(
         Page $page,
@@ -196,7 +196,11 @@ class PageRepository extends Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $revTable = $page->getProject()->getTableName('revision');
+        // In this case revision is faster than revision_userindex if we're not querying by user.
+        $revTable = $page->getProject()->getTableName(
+            'revision',
+            $user && $this->isLabs() ? '_userindex' : ''
+        );
         $userClause = $user ? "rev_user_text = :username AND " : "";
 
         $datesConditions = $this->getDateConditions($start, $end);
@@ -244,10 +248,11 @@ class PageRepository extends Repository
                 ) AS author_editcount
                 FROM (
                     (
-                        SELECT COUNT(*) AS num_edits,
-                               COUNT(DISTINCT(rev_user_text)) AS num_editors
+                        SELECT COUNT(rev_id) AS num_edits,
+                            COUNT(DISTINCT(rev_user)) AS num_editors
                         FROM $revTable
                         WHERE rev_page = :pageid
+                        AND rev_timestamp > 0 # Use rev_timestamp index
                     ) a,
                     (
                         # With really old pages, the rev_timestamp may need to be sorted ASC,

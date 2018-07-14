@@ -5,10 +5,8 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Helper\I18nHelper;
 use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +16,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Xtools\ArticleInfo;
 use Xtools\ArticleInfoRepository;
 use Xtools\Page;
-use Xtools\PageAssessments;
 use Xtools\Project;
 use Xtools\ProjectRepository;
 
@@ -294,7 +291,7 @@ class ArticleInfoController extends XtoolsController
      * @param Request $request The HTTP request.
      * @param string $project
      * @param string $article
-     * @return View
+     * @return Response
      * See ArticleInfoControllerTest::testArticleInfoApi()
      * @codeCoverageIgnore
      */
@@ -335,8 +332,8 @@ class ArticleInfoController extends XtoolsController
 
     /**
      * Generate the data structure that will used in the ArticleInfo API response.
-     * @param  Project $project
-     * @param  Page    $page
+     * @param Project $project
+     * @param Page $page
      * @return array
      * @codeCoverageIgnore
      */
@@ -396,9 +393,9 @@ class ArticleInfoController extends XtoolsController
 
     /**
      * Get the Response for the HTML output of the ArticleInfo API action.
-     * @param  Project  $project
-     * @param  Page     $page
-     * @param  string[] $data The pre-fetched data.
+     * @param Project $project
+     * @param Page $page
+     * @param string[] $data The pre-fetched data.
      * @return Response
      * @codeCoverageIgnore
      */
@@ -429,7 +426,7 @@ class ArticleInfoController extends XtoolsController
      * )
      * @param Request $request The HTTP request.
      * @param string $article
-     * @return JsonResponse
+     * @return JsonResponse|RedirectResponse
      * @codeCoverageIgnore
      */
     public function proseStatsApiAction(Request $request, $article)
@@ -478,8 +475,8 @@ class ArticleInfoController extends XtoolsController
      *     name="PageApiAssessments",
      *     requirements={"article"=".+"}
      * )
-     * @param  Request $request
-     * @param  string $articles May be multiple pages separated by pipes, e.g. Foo|Bar|Baz
+     * @param Request $request
+     * @param string $articles May be multiple pages separated by pipes, e.g. Foo|Bar|Baz
      * @return JsonResponse
      * @codeCoverageIgnore
      */
