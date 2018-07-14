@@ -249,7 +249,7 @@ class PageRepository extends Repository
                 FROM (
                     (
                         SELECT COUNT(rev_id) AS num_edits,
-                            COUNT(DISTINCT(rev_user)) AS num_editors
+                            COUNT(DISTINCT(rev_user_text)) AS num_editors
                         FROM $revTable
                         WHERE rev_page = :pageid
                         AND rev_timestamp > 0 # Use rev_timestamp index

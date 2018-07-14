@@ -36,3 +36,4 @@
 i18n_helper.js
 phpDocumentor.phar
 coverage.xml
+.web-server-pid
