@@ -546,7 +546,7 @@ class ArticleInfo extends Model
 
     /**
      * Get the top editors to the page by edit count.
-     * @param int $limit Maximum 1,000.
+     * @param int $limit Default 20, maximum 1,000.
      * @param bool $noBots Set to non-false to exclude bots from the result.
      * @return array
      */
@@ -562,7 +562,7 @@ class ArticleInfo extends Model
             $this->page,
             $this->startDate,
             $this->endDate,
-            max($limit, 1000),
+            min($limit, 1000),
             $noBots
         );
 
