@@ -155,7 +155,7 @@ class PageRepository extends Repository
             $limitClause = "LIMIT $offset, $limit";
         }
 
-        $datesConditions = $this->getDateConditions($start, $end, 'revs.');
+        $dateConditions = $this->getDateConditions($start, $end, 'revs.');
 
         $sql = "SELECT
                     revs.rev_id AS id,
@@ -169,7 +169,7 @@ class PageRepository extends Repository
                     revs.rev_sha1 AS sha
                 FROM $revTable AS revs
                 LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-                WHERE $userClause revs.rev_page = :pageid $datesConditions
+                WHERE $userClause revs.rev_page = :pageid $dateConditions
                 ORDER BY revs.rev_timestamp ASC
                 $limitClause";
 
@@ -203,11 +203,11 @@ class PageRepository extends Repository
         );
         $userClause = $user ? "rev_user_text = :username AND " : "";
 
-        $datesConditions = $this->getDateConditions($start, $end);
+        $dateConditions = $this->getDateConditions($start, $end);
 
         $sql = "SELECT COUNT(*)
                 FROM $revTable
-                WHERE $userClause rev_page = :pageid $datesConditions";
+                WHERE $userClause rev_page = :pageid $dateConditions";
         $params = ['pageid' => $page->getId()];
         if ($user) {
             $params['username'] = $user->getUsername();
