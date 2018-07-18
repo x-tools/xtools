@@ -330,8 +330,8 @@ abstract class Repository
      * @param int|null $timeout Maximum statement time in seconds. null will use the
      *   default specified by the app.query_timeout config parameter.
      * @return \Doctrine\DBAL\Driver\Statement
+     * @throws HttpException
      * @throws DriverException
-     * @throws DBALException
      * @codeCoverageIgnore
      */
     public function executeProjectsQuery($sql, $params = [], $timeout = null)
@@ -353,8 +353,8 @@ abstract class Repository
      * @param int $timeout Maximum statement time in seconds. null will use the
      *   default specified by the app.query_timeout config parameter.
      * @return \Doctrine\DBAL\Driver\Statement
+     * @throws HttpException
      * @throws DriverException
-     * @throws DBALException
      * @codeCoverageIgnore
      */
     public function executeQueryBuilder(QueryBuilder $qb, $timeout = null)
@@ -374,7 +374,7 @@ abstract class Repository
      * Special handling of some DriverExceptions, otherwise original Exception is thrown.
      * @param DriverException $e
      * @param int $timeout Timeout value, if applicable. This is passed to the i18n message.
-     * @throws ServiceUnavailableHttpException
+     * @throws HttpException
      * @throws DriverException
      * @codeCoverageIgnore
      */

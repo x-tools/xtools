@@ -137,19 +137,7 @@ class ArticleInfoController extends XtoolsController
      */
     public function resultAction(Request $request, $article, $start = null, $end = null)
     {
-        // This is some complicated stuff here. We pass $start and $end to method signature
-        // for router regex parser to parse `article` with those parameters and then
-        // manually retrieve what we want. It's done this way because programmatical way
-        // is much easier (or maybe even only existing) solution for that.
-
-        // Does path have `start` and `end` parameters (even empty ones)?
-        if (1 === preg_match('/(.+?)\/(|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?$/', $article, $matches)) {
-            $article = $matches[1];
-            $start = $matches[2];
-            $end = isset($matches[3]) ? $matches[3] : null;
-        }
-
-        list($start, $end) = $this->getUTCFromDateParams($start, $end, false);
+        list($article, $start, $end) = $this->extractDatesFromParams($article, $start, $end);
 
         // In this case only the project is validated.
         $ret = $this->validateProjectAndUser($request);
@@ -438,6 +426,7 @@ class ArticleInfoController extends XtoolsController
         if ($ret instanceof RedirectResponse) {
             return $ret;
         } else {
+            /** @var Project $project */
             $project = $ret[0];
         }
 
@@ -555,5 +544,103 @@ class ArticleInfoController extends XtoolsController
         $response->setEncodingOptions(JSON_NUMERIC_CHECK);
 
         return $response;
+    }
+
+    /**
+     * Get the top editors to a page.
+     * @Route(
+     *     "/api/page/top_editors/{project}/{article}/{start}/{end}/{limit}", name="PageApiTopEditors",
+     *     requirements={
+     *         "article"=".+",
+     *         "start"="|\d{4}-\d{2}-\d{2}",
+     *         "end"="|\d{4}-\d{2}-\d{2}",
+     *         "limit"="|\d+"
+     *     }
+     * )
+     * @param Request $request
+     * @param $article
+     * @param null|string $start
+     * @param null|string $end
+     * @param $limit
+     * @return JsonResponse
+     * @codeCoverageIgnore
+     */
+    public function topEditorsApiAction(Request $request, $article, $start = null, $end = null, $limit = 20)
+    {
+        $this->recordApiUsage('page/topeditors');
+
+        list($article, $start, $end) = $this->extractDatesFromParams($article, $start, $end);
+
+        // First validate project.
+        $ret = $this->validateProjectAndUser($request);
+        if ($ret instanceof RedirectResponse) {
+            return new JsonResponse(
+                ['error' => 'Invalid project'],
+                Response::HTTP_NOT_FOUND
+            );
+        } else {
+            /** @var Project $project */
+            $project = $ret[0];
+        }
+
+        $page = $this->getAndValidatePage($project, $article);
+
+        $articleInfoRepo = new ArticleInfoRepository();
+        $articleInfoRepo->setContainer($this->container);
+        $articleInfo = new ArticleInfo($page, $this->container, $start, $end);
+        $articleInfo->setRepository($articleInfoRepo);
+
+        $topEditors = $articleInfo->getTopEditorsByEditCount(
+            $limit,
+            $request->query->get('nobots') != ''
+        );
+
+        $ret = [
+            'project' => $project->getDomain(),
+            'page' => $page->getTitle(),
+        ];
+
+        if ($start !== false) {
+            $ret['start'] = date('Y-m-d', $start);
+        }
+        if ($end !== false) {
+            $ret['end'] = date('Y-m-d', $end);
+        }
+
+        $ret['top_editors'] = $topEditors;
+
+        $response = new JsonResponse($ret, Response::HTTP_OK);
+        $response->setEncodingOptions(JSON_NUMERIC_CHECK);
+
+        return $response;
+    }
+
+    /**
+     * Parse the given article, start, and end parameters. This is needed because it's possible
+     * that the article parameter could contain /YYYY-MM-DD.
+     * @param $article
+     * @param $start
+     * @param $end
+     * @return array
+     * @codeCoverageIgnore
+     */
+    private function extractDatesFromParams($article, $start, $end)
+    {
+        // This is some complicated stuff here. We pass $start and $end to method signature
+        // for router regex parser to parse `article` with those parameters and then
+        // manually retrieve what we want. It's done this way because programmatic way
+        // is much easier (or maybe even only existing) solution for that.
+
+        // Does path have `start` and `end` parameters (even empty ones)?
+        if (1 === preg_match('/(.+?)\/(|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?$/', $article, $matches)) {
+            $article = $matches[1];
+            $start = $matches[2];
+            $end = isset($matches[3]) ? $matches[3] : null;
+        }
+
+        return array_merge(
+            [$article],
+            $this->getUTCFromDateParams($start, $end, false)
+        );
     }
 }

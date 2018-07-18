@@ -84,8 +84,8 @@ class ArticleInfoRepository extends Repository
 
     /**
      * Get a map of user IDs/usernames given the user IDs.
-     * @param  Project $project
-     * @param  int[]   $userIds
+     * @param Project $project
+     * @param int[]   $userIds
      * @return array
      */
     public function getUsernamesFromIds(Project $project, $userIds)
@@ -100,7 +100,7 @@ class ArticleInfoRepository extends Repository
 
     /**
      * Get the number of categories, templates, and files that are on the page.
-     * @param  Page $page
+     * @param Page $page
      * @return array With keys 'categories', 'templates' and 'files'.
      */
     public function getTransclusionData(Page $page)
@@ -128,5 +128,51 @@ class ArticleInfoRepository extends Repository
         }
 
         return $transclusionCounts;
+    }
+
+    /**
+     * Get the top editors to the page by edit count.
+     * @param Page $page
+     * @param bool $start
+     * @param bool $end
+     * @param int $limit
+     * @param bool $noBots
+     * @return array
+     */
+    public function getTopEditorsByEditCount(Page $page, $start = false, $end = false, $limit = 20, $noBots = false)
+    {
+        $project = $page->getProject();
+        // Faster to use revision instead of revision_userindex in this case.
+        $revTable = $project->getTableName('revision', '');
+
+        $dateConditions = $this->getDateConditions($start, $end);
+
+        $sql = "SELECT rev_user_text AS username,
+                    COUNT(rev_id) AS count,
+                    SUM(rev_minor_edit) AS minor,
+                    MIN(rev_timestamp) AS first_timestamp,
+                    MIN(rev_id) AS first_revid,
+                    MAX(rev_timestamp) AS latest_timestamp,
+                    MAX(rev_id) AS latest_revid
+                FROM $revTable
+                WHERE rev_page = :pageId $dateConditions";
+
+        if ($noBots) {
+            $userGroupsTable = $project->getTableName('user_groups');
+            $sql .= "AND NOT EXISTS (
+                         SELECT 1
+                         FROM $userGroupsTable
+                         WHERE ug_user = rev_user
+                         AND ug_group = 'bot'
+                     )";
+        }
+
+        $sql .= "GROUP BY rev_user_text
+                 ORDER BY count DESC
+                 LIMIT $limit";
+
+        return $this->executeProjectsQuery($sql, [
+            'pageId' => $page->getId()
+        ])->fetchAll();
     }
 }

@@ -545,6 +545,50 @@ class ArticleInfo extends Model
     }
 
     /**
+     * Get the top editors to the page by edit count.
+     * @param int $limit Maximum 1,000.
+     * @param bool $noBots Set to non-false to exclude bots from the result.
+     * @return array
+     */
+    public function getTopEditorsByEditCount($limit = 20, $noBots = false)
+    {
+        // Quick cache, valid only for the same request.
+        static $topEditors = null;
+        if ($topEditors !== null) {
+            return $topEditors;
+        }
+
+        $rows = $this->getRepository()->getTopEditorsByEditCount(
+            $this->page,
+            $this->startDate,
+            $this->endDate,
+            max($limit, 1000),
+            $noBots
+        );
+
+        $topEditors = [];
+        $rank = 0;
+        foreach ($rows as $row) {
+            $topEditors[] = [
+                'rank' => ++$rank,
+                'username' => $row['username'],
+                'count' => $row['count'],
+                'minor' => $row['minor'],
+                'first_edit' => [
+                    'id' => $row['first_revid'],
+                    'timestamp' => $row['first_timestamp'],
+                ],
+                'latest_edit' => [
+                    'id' => $row['latest_revid'],
+                    'timestamp' => $row['latest_timestamp'],
+                ],
+            ];
+        }
+
+        return $topEditors;
+    }
+
+    /**
      * Get the first edit to the page.
      * @return Edit
      */
