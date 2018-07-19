@@ -1,5 +1,14 @@
 # Release Notes #
 
+## 3.3.8 ##
+- T199922: Don't attribute autopromotions to user in user rights log.
+- ArticleInfo: performance improvements to basic info and
+  rev count queries.
+- EditCounter: Remove edit count threshold for ec-rightschanges action.
+- ArticleInfo: Add new Top Editors API endpoint.
+- Allow the wiki table to be configured by parameter.
+- Localization updates.
+
 ## 3.3.7 ##
 - ArticleInfo: Include assessment in API endpoint.
 - ArticleInfo: Show assessment in gadget, if available.
