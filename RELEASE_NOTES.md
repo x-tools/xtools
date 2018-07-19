@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.3.9 ##
+- ArticleInfo: Add documentation for new top_editors API endpoint.
+  Some bug fixes around handling of request parameters.
+
 ## 3.3.8 ##
 - T199922: Don't attribute autopromotions to user in user rights log.
 - ArticleInfo: performance improvements to basic info and
