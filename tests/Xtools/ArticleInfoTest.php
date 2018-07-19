@@ -6,10 +6,9 @@
 namespace Tests\Xtools;
 
 use AppBundle\Helper\I18nHelper;
-use DateTime;
-use Doctrine\DBAL\Driver\PDOStatement;
 use GuzzleHttp;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Xtools\ArticleInfo;
@@ -36,6 +35,9 @@ class ArticleInfoTest extends WebTestCase
 
     /** @var Project The project instance. */
     protected $project;
+
+    /** @var \ReflectionClass Hack to test private methods. */
+    private $reflectionClass;
 
     /**
      * Set up shared mocks and class instances.
@@ -68,21 +70,23 @@ class ArticleInfoTest extends WebTestCase
             ->method('getNumRevisions')
             ->willReturn(10);
         $this->page->setRepository($pageRepo);
-        $this->assertEquals(10, $this->articleInfo->getNumRevisions());
+        static::assertEquals(10, $this->articleInfo->getNumRevisions());
         // Should be cached (will error out if repo's getNumRevisions is called again).
-        $this->assertEquals(10, $this->articleInfo->getNumRevisions());
+        static::assertEquals(10, $this->articleInfo->getNumRevisions());
     }
 
     /**
      * Number of revisions processed, based on app.max_page_revisions
      * @dataProvider revisionsProcessedProvider
+     * @param int $numRevisions
+     * @param int $assertion
      */
     public function testRevisionsProcessed($numRevisions, $assertion)
     {
         $pageRepo = $this->getMock(PageRepository::class);
         $pageRepo->method('getNumRevisions')->willReturn($numRevisions);
         $this->page->setRepository($pageRepo);
-        $this->assertEquals(
+        static::assertEquals(
             $this->articleInfo->getNumRevisionsProcessed(),
             $assertion
         );
@@ -110,7 +114,7 @@ class ArticleInfoTest extends WebTestCase
             ->method('getNumRevisions')
             ->willReturn(1000000);
         $this->page->setRepository($pageRepo);
-        $this->assertTrue($this->articleInfo->tooManyRevisions());
+        static::assertTrue($this->articleInfo->tooManyRevisions());
     }
 
     /**
@@ -129,7 +133,7 @@ class ArticleInfoTest extends WebTestCase
             ],
         ];
 
-        $this->assertEquals(
+        static::assertEquals(
             15,
             $this->articleInfo->getBotRevisionCount($bots)
         );
@@ -147,10 +151,10 @@ class ArticleInfoTest extends WebTestCase
                 'redirects_count' => 0,
             ]);
         $this->page->setRepository($pageRepo);
-        $this->assertEquals(5, $this->articleInfo->linksExtCount());
-        $this->assertEquals(3, $this->articleInfo->linksOutCount());
-        $this->assertEquals(10, $this->articleInfo->linksInCount());
-        $this->assertEquals(0, $this->articleInfo->redirectsCount());
+        static::assertEquals(5, $this->articleInfo->linksExtCount());
+        static::assertEquals(3, $this->articleInfo->linksOutCount());
+        static::assertEquals(10, $this->articleInfo->linksInCount());
+        static::assertEquals(0, $this->articleInfo->redirectsCount());
     }
 
     /**
@@ -160,41 +164,41 @@ class ArticleInfoTest extends WebTestCase
     {
         $edits = $this->setupData();
 
-        $this->assertEquals(3, $this->articleInfo->getNumEditors());
-        $this->assertEquals(2, $this->articleInfo->getAnonCount());
-        $this->assertEquals(50, $this->articleInfo->anonPercentage());
-        $this->assertEquals(2, $this->articleInfo->getMinorCount());
-        $this->assertEquals(50, $this->articleInfo->minorPercentage());
-        $this->assertEquals(1, $this->articleInfo->getBotRevisionCount());
-        $this->assertEquals(93, $this->articleInfo->getTotalDays());
-        $this->assertEquals(23, (int) $this->articleInfo->averageDaysPerEdit());
-        $this->assertEquals(0, (int) $this->articleInfo->editsPerDay());
-        $this->assertEquals(1.3, $this->articleInfo->editsPerMonth());
-        $this->assertEquals(4, $this->articleInfo->editsPerYear());
-        $this->assertEquals(1.3, $this->articleInfo->editsPerEditor());
-        $this->assertEquals(1, $this->articleInfo->getAutomatedCount());
-        $this->assertEquals(1, $this->articleInfo->getRevertCount());
+        static::assertEquals(3, $this->articleInfo->getNumEditors());
+        static::assertEquals(2, $this->articleInfo->getAnonCount());
+        static::assertEquals(50, $this->articleInfo->anonPercentage());
+        static::assertEquals(2, $this->articleInfo->getMinorCount());
+        static::assertEquals(50, $this->articleInfo->minorPercentage());
+        static::assertEquals(1, $this->articleInfo->getBotRevisionCount());
+        static::assertEquals(93, $this->articleInfo->getTotalDays());
+        static::assertEquals(23, (int) $this->articleInfo->averageDaysPerEdit());
+        static::assertEquals(0, (int) $this->articleInfo->editsPerDay());
+        static::assertEquals(1.3, $this->articleInfo->editsPerMonth());
+        static::assertEquals(4, $this->articleInfo->editsPerYear());
+        static::assertEquals(1.3, $this->articleInfo->editsPerEditor());
+        static::assertEquals(1, $this->articleInfo->getAutomatedCount());
+        static::assertEquals(1, $this->articleInfo->getRevertCount());
 
-        $this->assertEquals(100, $this->articleInfo->topTenPercentage());
-        $this->assertEquals(4, $this->articleInfo->getTopTenCount());
+        static::assertEquals(100, $this->articleInfo->topTenPercentage());
+        static::assertEquals(4, $this->articleInfo->getTopTenCount());
 
-        $this->assertEquals(
+        static::assertEquals(
             $edits[0]->getId(),
             $this->articleInfo->getFirstEdit()->getId()
         );
-        $this->assertEquals(
+        static::assertEquals(
             $edits[3]->getId(),
             $this->articleInfo->getLastEdit()->getId()
         );
 
-        $this->assertEquals(1, $this->articleInfo->getMaxAddition()->getId());
-        $this->assertEquals(32, $this->articleInfo->getMaxDeletion()->getId());
+        static::assertEquals(1, $this->articleInfo->getMaxAddition()->getId());
+        static::assertEquals(32, $this->articleInfo->getMaxDeletion()->getId());
 
-        $this->assertEquals(
+        static::assertEquals(
             ['Mick Jagger', '192.168.0.1', '192.168.0.2'],
             array_keys($this->articleInfo->getEditors())
         );
-        $this->assertEquals(
+        static::assertEquals(
             [
                 'label' =>'Mick Jagger',
                 'value' => 2,
@@ -202,7 +206,7 @@ class ArticleInfoTest extends WebTestCase
             ],
             $this->articleInfo->topTenEditorsByEdits()[0]
         );
-        $this->assertEquals(
+        static::assertEquals(
             [
                 'label' =>'Mick Jagger',
                 'value' => 30,
@@ -212,22 +216,22 @@ class ArticleInfoTest extends WebTestCase
         );
 
         // Top 10 counts should not include bots.
-        $this->assertFalse(
+        static::assertFalse(
             array_search(
                 'XtoolsBot',
                 array_column($this->articleInfo->topTenEditorsByEdits(), 'label')
             )
         );
-        $this->assertFalse(
+        static::assertFalse(
             array_search(
                 'XtoolsBot',
                 array_column($this->articleInfo->topTenEditorsByAdded(), 'label')
             )
         );
 
-        $this->assertEquals(2, $this->articleInfo->getMaxEditsPerMonth());
+        static::assertEquals(2, $this->articleInfo->getMaxEditsPerMonth());
 
-        $this->assertContains(
+        static::assertContains(
             'AutoWikiBrowser',
             array_keys($this->articleInfo->getTools())
         );
@@ -238,12 +242,12 @@ class ArticleInfoTest extends WebTestCase
      */
     public function testMonthYearCounts()
     {
-        $edits = $this->setupData();
+        $this->setupData();
 
         $yearMonthCounts = $this->articleInfo->getYearMonthCounts();
 
-        $this->assertEquals([2016], array_keys($yearMonthCounts));
-        $this->assertArraySubset([
+        static::assertEquals([2016], array_keys($yearMonthCounts));
+        static::assertArraySubset([
             'all' => 4,
             'minor' => 2,
             'anon' => 2,
@@ -251,19 +255,19 @@ class ArticleInfoTest extends WebTestCase
             'size' => 25,
         ], $yearMonthCounts[2016]);
 
-        $this->assertEquals(
+        static::assertEquals(
             ['07', '08', '09', '10', '11', '12'],
             array_keys($yearMonthCounts[2016]['months'])
         );
 
         // Just test a few, not every month.
-        $this->assertArraySubset([
+        static::assertArraySubset([
             'all' => 1,
             'minor' => 0,
             'anon' => 0,
             'automated' => 0,
         ], $yearMonthCounts[2016]['months']['07']);
-        $this->assertArraySubset([
+        static::assertArraySubset([
             'all' => 2,
             'minor' => 1,
             'anon' => 2,
@@ -301,7 +305,7 @@ class ArticleInfoTest extends WebTestCase
         $yearMonthCounts = $this->articleInfo->getYearMonthCounts();
 
         // Just test a few, not every month.
-        $this->assertEquals([
+        static::assertEquals([
             'protections' => 1,
             'deletions' => 1,
         ], $yearMonthCounts[2016]['events']);
@@ -317,7 +321,7 @@ class ArticleInfoTest extends WebTestCase
      */
     private function setupData()
     {
-        // ArticleInfo::udpateToolCounts relies on there being entries in
+        // ArticleInfo::updateToolCounts relies on there being entries in
         // semi_automated.yml for the project the edits were made on.
         $projectRepo = $this->getMock(ProjectRepository::class);
         $projectRepo->expects($this->once())
@@ -396,7 +400,7 @@ class ArticleInfoTest extends WebTestCase
         $prevEdits = $method->invoke($this->articleInfo, $edits[0], $prevEdits);
         $prevEdits = $method->invoke($this->articleInfo, $edits[1], $prevEdits);
         $prevEdits = $method->invoke($this->articleInfo, $edits[2], $prevEdits);
-        $prevEdits = $method->invoke($this->articleInfo, $edits[3], $prevEdits);
+        $method->invoke($this->articleInfo, $edits[3], $prevEdits);
 
         $method = $this->reflectionClass->getMethod('setTopTenCounts');
         $method->setAccessible(true);
@@ -442,7 +446,7 @@ class ArticleInfoTest extends WebTestCase
             ]);
         $this->articleInfo->setRepository($articleInfoRepo);
 
-        $this->assertEquals(
+        static::assertEquals(
             [
                 'list' => [
                     'Mr. Rogers' => [
@@ -477,7 +481,7 @@ class ArticleInfoTest extends WebTestCase
             ->willReturn($ret);
         $this->page->setRepository($pageRepo);
 
-        $this->assertEquals([
+        static::assertEquals([
             'characters' => 1541,
             'words' => 263,
             'references' => 13,
@@ -495,22 +499,22 @@ class ArticleInfoTest extends WebTestCase
 
         $prop = $this->reflectionClass->getProperty('startDate');
         $prop->setAccessible(true);
-        $prop->setValue($this->articleInfo, 1467324000);
+        $prop->setValue($this->articleInfo, strtotime('2016-06-30'));
 
         $prop = $this->reflectionClass->getProperty('endDate');
         $prop->setAccessible(true);
-        $prop->setValue($this->articleInfo, 1476482400);
+        $prop->setValue($this->articleInfo, strtotime('2016-10-14'));
 
-        $this->assertTrue($this->articleInfo->hasDateRange());
-        $this->assertEquals(1467324000, $this->articleInfo->getStartDate());
-        $this->assertEquals(1476482400, $this->articleInfo->getEndDate());
-        $this->assertEquals([
+        static::assertTrue($this->articleInfo->hasDateRange());
+        static::assertEquals('2016-06-30', $this->articleInfo->getStartDate());
+        static::assertEquals('2016-10-14', $this->articleInfo->getEndDate());
+        static::assertEquals([
             'start' => '2016-06-30',
             'end' => '2016-10-14',
         ], $this->articleInfo->getDateParams());
 
         // Uses length of last edit because there is a date range.
-        $this->assertEquals(25, $this->articleInfo->getLength());
+        static::assertEquals(25, $this->articleInfo->getLength());
     }
 
     /**
@@ -528,8 +532,8 @@ class ArticleInfoTest extends WebTestCase
             ]);
         $this->articleInfo->setRepository($articleInfoRepo);
 
-        $this->assertEquals(3, $this->articleInfo->getNumCategories());
-        $this->assertEquals(5, $this->articleInfo->getNumTemplates());
-        $this->assertEquals(2, $this->articleInfo->getNumFiles());
+        static::assertEquals(3, $this->articleInfo->getNumCategories());
+        static::assertEquals(5, $this->articleInfo->getNumTemplates());
+        static::assertEquals(2, $this->articleInfo->getNumFiles());
     }
 }

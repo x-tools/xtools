@@ -7,7 +7,8 @@ namespace AppBundle\Controller;
 
 use GuzzleHttp;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,8 +22,6 @@ use Xtools\Project;
  */
 class PagesController extends XtoolsController
 {
-    const RESULTS_PER_PAGE = 1000;
-
     /**
      * Get the name of the tool's index route.
      * This is also the name of the associated model.
@@ -35,25 +34,35 @@ class PagesController extends XtoolsController
     }
 
     /**
+     * PagesController constructor.
+     * @param RequestStack $requestStack
+     * @param ContainerInterface $container
+     */
+    public function __construct(RequestStack $requestStack, ContainerInterface $container)
+    {
+        // Causes the tool to redirect to the index page if the user has too high of an edit count.
+        $this->tooHighEditCountAction = $this->getIndexRoute();
+
+        // The countPagesApi action is exempt from the edit count limitation.
+        $this->tooHighEditCountActionBlacklist = ['countPagesApi'];
+
+        parent::__construct($requestStack, $container);
+    }
+
+    /**
      * Display the form.
      * @Route("/pages", name="Pages")
      * @Route("/pages/", name="PagesSlash")
      * @Route("/pages/index.php", name="PagesIndexPhp")
      * @Route("/pages/{project}", name="PagesProject")
-     * @param Request $request
      * @return Response
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
-        $params = $this->parseQueryParams($request);
-
         // Redirect if at minimum project and username are given.
-        if (isset($params['project']) && isset($params['username'])) {
-            return $this->redirectToRoute('PagesResult', $params);
+        if (isset($this->params['project']) && isset($this->params['username'])) {
+            return $this->redirectToRoute('PagesResult', $this->params);
         }
-
-        // Convert the given project (or default project) into a Project instance.
-        $params['project'] = $this->getProjectFromQuery($params);
 
         // Otherwise fall through.
         return $this->render('pages/index.html.twig', array_merge([
@@ -61,11 +70,12 @@ class PagesController extends XtoolsController
             'xtSubtitle' => 'tool-pages-desc',
             'xtPage' => 'pages',
 
-            // Defaults that will get overriden if in $params.
+            // Defaults that will get overridden if in $params.
+            'username' => '',
             'namespace' => 0,
             'redirects' => 'noredirects',
-            'deleted' => 'all'
-        ], $params));
+            'deleted' => 'all',
+        ], $this->params, ['project' => $this->project]));
     }
 
     /**
@@ -74,34 +84,23 @@ class PagesController extends XtoolsController
      *     "/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{offset}",
      *     name="PagesResult",
      *     requirements={
-     *         "namespace" = "|all|\d+",
-     *         "redirects" = "|[^/]++",
-     *         "deleted" = "|all|live|deleted",
-     *         "offset" = "|\d+"
+     *         "namespace"="|all|\d+",
+     *         "redirects"="|[^/]+",
+     *         "deleted"="|all|live|deleted",
+     *         "offset"="|\d+"
+     *     },
+     *     defaults={
+     *         "namespace"=0,
+     *         "offset"=0,
      *     }
      * )
-     * @param Request $request
-     * @param string|int $namespace The ID of the namespace, or 'all' for all namespaces.
      * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
      * @param string $deleted One of 'live', 'deleted' or 'all' for both.
-     * @param int $offset Which page of results to show, when the results are so large they are paginated.
      * @return RedirectResponse|Response
      * @codeCoverageIgnore
      */
-    public function resultAction(
-        Request $request,
-        $namespace = '0',
-        $redirects = 'noredirects',
-        $deleted = 'all',
-        $offset = 0
-    ) {
-        $ret = $this->validateProjectAndUser($request, 'Pages');
-        if ($ret instanceof RedirectResponse) {
-            return $ret;
-        } else {
-            list($project, $user) = $ret;
-        }
-
+    public function resultAction($redirects = 'noredirects', $deleted = 'all')
+    {
         // Check for legacy values for 'redirects', and redirect
         // back with correct values if need be. This could be refactored
         // out to XtoolsController, but this is the only tool in the suite
@@ -109,44 +108,44 @@ class PagesController extends XtoolsController
         $validRedirects = ['', 'noredirects', 'onlyredirects', 'all'];
         if ($redirects === 'none' || !in_array($redirects, $validRedirects)) {
             return $this->redirectToRoute('PagesResult', [
-                'project' => $project->getDomain(),
-                'username' => $user->getUsername(),
-                'namespace' => $namespace,
+                'project' => $this->project->getDomain(),
+                'username' => $this->user->getUsername(),
+                'namespace' => $this->namespace,
                 'redirects' => 'noredirects',
                 'deleted' => $deleted,
-                'offset' => $offset,
+                'offset' => $this->offset,
             ]);
         }
 
         $pagesRepo = new PagesRepository();
         $pagesRepo->setContainer($this->container);
         $pages = new Pages(
-            $project,
-            $user,
-            $namespace,
+            $this->project,
+            $this->user,
+            $this->namespace,
             $redirects,
             $deleted,
-            $offset
+            $this->offset
         );
         $pages->setRepository($pagesRepo);
         $pages->prepareData();
 
         $ret = [
             'xtPage' => 'pages',
-            'xtTitle' => $user->getUsername(),
-            'project' => $project,
-            'user' => $user,
+            'xtTitle' => $this->user->getUsername(),
+            'project' => $this->project,
+            'user' => $this->user,
             'summaryColumns' => $this->getSummaryColumns($pages),
             'pages' => $pages,
-            'namespace' => $namespace,
+            'namespace' => $this->namespace,
         ];
 
-        if ($request->query->get('format') === 'PagePile') {
-            return $this->getPagepileResult($project, $pages);
+        if ($this->request->query->get('format') === 'PagePile') {
+            return $this->getPagepileResult($this->project, $pages);
         }
 
         // Output the relevant format template.
-        return $this->getFormattedResponse($request, 'pages/result', $ret);
+        return $this->getFormattedResponse($this->request, 'pages/result', $ret);
     }
 
     /**
@@ -259,59 +258,44 @@ class PagesController extends XtoolsController
      * @Route(
      *     "/api/user/pages_count/{project}/{username}/{namespace}/{redirects}/{deleted}",
      *     name="UserApiPagesCount",
-     *     requirements={"namespace"="|\d+|all"}
+     *     requirements={
+     *         "namespace"="|\d+|all",
+     *         "redirects"="|noredirects|onlyredirects|all",
+     *         "deleted"="|all|live|deleted",
+     *     },
+     *     defaults={
+     *         "namespace"=0,
+     *         "redirects"="noredirects",
+     *         "deleted"="all",
+     *     }
      * )
-     * @param Request $request
-     * @param int|string $namespace The ID of the namespace of the page, or 'all' for all namespaces.
      * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
      * @param string $deleted One of 'live', 'deleted' or 'all' for both.
-     * @return Response
+     * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function countPagesApiAction(Request $request, $namespace = 0, $redirects = 'noredirects', $deleted = 'all')
+    public function countPagesApiAction($redirects = 'noredirects', $deleted = 'all')
     {
         $this->recordApiUsage('user/pages_count');
-
-        $ret = $this->validateProjectAndUser($request);
-        if ($ret instanceof RedirectResponse) {
-            return $ret;
-        } else {
-            list($project, $user) = $ret;
-        }
 
         $pagesRepo = new PagesRepository();
         $pagesRepo->setContainer($this->container);
         $pages = new Pages(
-            $project,
-            $user,
-            $namespace,
+            $this->project,
+            $this->user,
+            $this->namespace,
             $redirects,
             $deleted
         );
         $pages->setRepository($pagesRepo);
 
-        $response = new JsonResponse();
-        $response->setEncodingOptions(JSON_NUMERIC_CHECK);
-        $response->setStatusCode(Response::HTTP_OK);
-
         $counts = $pages->getCounts();
 
-        if ($namespace !== 'all' && isset($counts[$namespace])) {
-            $counts = $counts[$namespace];
+        if ($this->namespace !== 'all' && isset($counts[$this->namespace])) {
+            $counts = $counts[$this->namespace];
         }
 
-        $ret = [
-            'project' => $project->getDomain(),
-            'username' => $user->getUsername(),
-            'namespace' => $namespace,
-            'redirects' => $redirects,
-            'deleted' => $deleted,
-            'counts' => $counts,
-        ];
-
-        $response->setData($ret);
-
-        return $response;
+        return $this->getFormattedApiResponse(['counts' => $counts]);
     }
 
     /**
@@ -319,71 +303,53 @@ class PagesController extends XtoolsController
      * @Route(
      *     "/api/user/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{offset}",
      *     name="UserApiPagesCreated",
-     *     requirements={"namespace"="|\d+|all"}
+     *     requirements={
+     *         "namespace"="|\d+|all",
+     *         "redirects"="|noredirects|onlyredirects|all",
+     *         "deleted"="|all|live|deleted",
+     *     },
+     *     defaults={
+     *         "namespace"=0,
+     *         "redirects"="noredirects",
+     *         "deleted"="all",
+     *         "offset"=0,
+     *     }
      * )
-     * @param Request $request
-     * @param int|string $namespace The ID of the namespace of the page, or 'all' for all namespaces.
      * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
      * @param string $deleted One of 'live', 'deleted' or blank for both.
-     * @param int $offset Which page of results to show.
-     * @return Response
+     * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function getPagesApiAction(
-        Request $request,
-        $namespace = 0,
-        $redirects = 'noredirects',
-        $deleted = 'all',
-        $offset = 0
-    ) {
+    public function getPagesApiAction($redirects = 'noredirects', $deleted = 'all')
+    {
         $this->recordApiUsage('user/pages');
-
-        // Second parameter causes it return a Redirect to the index if the user has too many edits.
-        $ret = $this->validateProjectAndUser($request, 'Pages');
-        if ($ret instanceof RedirectResponse) {
-            return $ret;
-        } else {
-            list($project, $user) = $ret;
-        }
 
         $pagesRepo = new PagesRepository();
         $pagesRepo->setContainer($this->container);
         $pages = new Pages(
-            $project,
-            $user,
-            $namespace,
+            $this->project,
+            $this->user,
+            $this->namespace,
             $redirects,
             $deleted,
-            $offset
+            $this->offset
         );
         $pages->setRepository($pagesRepo);
 
-        $response = new JsonResponse();
-        $response->setEncodingOptions(JSON_NUMERIC_CHECK);
-        $response->setStatusCode(Response::HTTP_OK);
-
         $pagesList = $pages->getResults();
 
-        if ($namespace !== 'all' && isset($pagesList[$namespace])) {
-            $pagesList = $pagesList[$namespace];
+        if ($this->namespace !== 'all' && isset($pagesList[$this->namespace])) {
+            $pagesList = $pagesList[$this->namespace];
         }
 
         $ret = [
-            'project' => $project->getDomain(),
-            'username' => $user->getUsername(),
-            'namespace' => $namespace,
-            'redirects' => $redirects,
-            'deleted' => $deleted
+            'pages' => $pagesList,
         ];
 
         if ($pages->getNumResults() === $pages->resultsPerPage()) {
-            $ret['continue'] = $offset + 1;
+            $ret['continue'] = $this->offset + 1;
         }
 
-        $ret['pages'] = $pagesList;
-
-        $response->setData($ret);
-
-        return $response;
+        return $this->getFormattedApiResponse($ret);
     }
 }

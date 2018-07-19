@@ -12,17 +12,17 @@
         {% set content %}
             <div class="col-lg-12 stat-list clearfix">
                 <table class="table"><tbody>
-                    {% for key in master|keys %}
+                    {% for key in as.scores|keys %}
                         {# Don't confuse people by showing 0 for blocks #}
-                        {% if not(key == 'blocks' and master[key].score == 0) %}
+                        {% if not(key == 'blocks' and as.scores[key].score == 0) %}
                             <tr>
                                 <td>{{ msg(key) }}</td>
                                 <td>
-                                    <span class="text-success">{{ master[key].score|diff_format }}</span>
+                                    <span class="text-success">{{ as.scores[key].score|diff_format }}</span>
                                 </td>
                                 <td>
                                     <span class="text-muted small">
-                                        {{ msg(key~"-desc", [master[key].value, master[key].value|num_format]) }}
+                                        {{ msg(key~"-desc", [as.scores[key].value, as.scores[key].value|num_format]) }}
                                     </span>
                                 </td>
                             </tr>
@@ -31,7 +31,7 @@
                     </tbody>
                     <tfoot>
                         <th>{{ msg('total') }}</th>
-                        <th>{{ total|num_format }}</th>
+                        <th>{{ as.total|num_format }}</th>
                         <th><span class="text-muted small"><a href="http://xtoolsproject.org/en/stable/tools/adminscore.html#algorithm" target="_blank">{{ msg("how-calculated") }}</a></span></th>
                     </tfoot>
                 </table>

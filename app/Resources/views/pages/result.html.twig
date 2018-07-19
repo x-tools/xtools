@@ -264,11 +264,11 @@
                                         {{ wiki.pageHistLinkRaw(pagename, project) }}
                                         {% if enabled('ArticleInfo') %}
                                             &middot;
-                                            <a href="{{ path('ArticleInfoResult', { 'project': project.domain, 'article': pagename }) }}">{{ msg('tool-articleinfo') }}</a>
+                                            <a href="{{ path('ArticleInfoResult', { 'project': project.domain, 'page': pagename }) }}">{{ msg('tool-articleinfo') }}</a>
                                         {% endif %}
                                         {% if enabled('TopEdits') %}
                                             &middot;
-                                            <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'article': page.page_title }) }}">{{ msg('tool-topedits') }}</a>
+                                            <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'page': page.page_title }) }}">{{ msg('tool-topedits') }}</a>
                                         {% endif %}
                                         {% if isWMFLabs() %}
                                             &middot;

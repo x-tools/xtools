@@ -174,21 +174,21 @@ class ArticleInfo extends Model
     }
 
     /**
-     * Get date opening date range.
-     * @return false|int
+     * Get date opening date range, formatted as this is used in the views.
+     * @return string Blank if no value exists.
      */
     public function getStartDate()
     {
-        return $this->startDate;
+        return $this->startDate == '' ? '' : date('Y-m-d', $this->startDate);
     }
 
     /**
-     * Get date closing date range.
-     * @return false|int
+     * Get date closing date range, formatted as this is used in the views.
+     * @return string Blank if no value exists.
      */
     public function getEndDate()
     {
-        return $this->endDate;
+        return $this->endDate == '' ? '' : date('Y-m-d', $this->endDate);
     }
 
     /**

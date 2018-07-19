@@ -119,7 +119,7 @@
 	"edits-not-in-categories": "분류에 없는 편집",
 	"edits-with-summaries": "편집 요약이 있는 편집",
 	"end": "종료일",
-	"error-articlinfo-api": "판 데이터를 가져올 수 없습니다.",
+	"error-articleinfo-api": "판 데이터를 가져올 수 없습니다.",
 	"error-pagepile-too-large": "죄송합니다. PagePile에 내보낼 문서 수가 너무 많습니다. 수동으로 PagePile을 만드시거나 결과 집합을 특정한 이름공간이나 시간대로 제한해 주십시오.",
 	"error-report": "$1에 이 오류를 보고해 주십시오. (위키미디어 계정 필요)",
 	"error-server-message": "서버 응답: $1",

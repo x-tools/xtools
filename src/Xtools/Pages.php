@@ -122,6 +122,7 @@ class Pages extends Model
      * Fetch and prepare the pages created by the user.
      * @param bool $all Whether to get *all* results. This should only be used for
      *     export options. HTTP and JSON should paginate.
+     * @return array
      * @codeCoverageIgnore
      */
     public function prepareData($all = false)
@@ -130,7 +131,9 @@ class Pages extends Model
 
         foreach ($this->getNamespaces() as $ns) {
             $data = $this->fetchPagesCreated($ns, $all);
-            $this->pages[$ns] = $this->formatPages($data)[$ns];
+            $this->pages[$ns] = count($data) > 0
+                ? $this->formatPages($data)[$ns]
+                : [];
         }
 
         // $this->recreatedPages = $this->fetchRecreatedPages();

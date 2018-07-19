@@ -6,10 +6,10 @@
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Xtools\SimpleEditCounter;
 use Xtools\SimpleEditCounterRepository;
 
@@ -31,38 +31,45 @@ class SimpleEditCounterController extends XtoolsController
     }
 
     /**
+     * SimpleEditCounterController constructor.
+     * @param RequestStack $requestStack
+     * @param ContainerInterface $container
+     */
+    public function __construct(RequestStack $requestStack, ContainerInterface $container)
+    {
+        $this->tooHighEditCountAction = $this->getIndexRoute();
+        $this->tooHighEditCountActionBlacklist = ['index', 'result'];
+
+        parent::__construct($requestStack, $container);
+    }
+
+    /**
      * The Simple Edit Counter search form.
      * @Route("/sc", name="SimpleEditCounter")
      * @Route("/sc/", name="SimpleEditCounterSlash")
      * @Route("/sc/index.php", name="SimpleEditCounterIndexPhp")
      * @Route("/sc/{project}", name="SimpleEditCounterProject")
-     * @param Request $request The HTTP request.
      * @return Response
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
-        $params = $this->parseQueryParams($request);
-
         // Redirect if project and username are given.
-        if (isset($params['project']) && isset($params['username'])) {
-            return $this->redirectToRoute('SimpleEditCounterResult', $params);
+        if (isset($this->params['project']) && isset($this->params['username'])) {
+            return $this->redirectToRoute('SimpleEditCounterResult', $this->params);
         }
 
-        // Convert the given project (or default project) into a Project instance.
-        $params['project'] = $this->getProjectFromQuery($params);
-
         // Show the form.
-        return $this->render('simpleEditCounter/index.html.twig', [
+        return $this->render('simpleEditCounter/index.html.twig', array_merge([
             'xtPageTitle' => 'tool-simpleeditcounter',
             'xtSubtitle' => 'tool-simpleeditcounter-desc',
             'xtPage' => 'simpleeditcounter',
-            'project' => $params['project'],
+            'project' => $this->project,
 
             // Defaults that will get overriden if in $params.
             'namespace' => 'all',
             'start' => '',
             'end' => '',
-        ]);
+        ], $this->params));
     }
 
     /**
@@ -73,29 +80,27 @@ class SimpleEditCounterController extends XtoolsController
      *     requirements={
      *         "start" = "|\d{4}-\d{2}-\d{2}",
      *         "end" = "|\d{4}-\d{2}-\d{2}",
-     *         "namespace" = "|all|\d+"
+     *         "namespace" = "|all|\d+",
+     *     },
+     *     defaults={
+     *         "start"=false,
+     *         "end"=false,
      *     }
      * )
-     * @param Request $request The HTTP request.
      * @param int|string $namespace Namespace ID or 'all' for all namespaces.
-     * @param null|string $start
-     * @param null|string $end
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction(Request $request, $namespace = 'all', $start = false, $end = false)
+    public function resultAction($namespace = 'all')
     {
-        $ret = $this->validateProjectAndUser($request);
-        if ($ret instanceof RedirectResponse) {
-            return $ret;
-        } else {
-            list($project, $user) = $ret;
-        }
-
-        // 'false' means the dates are optional and returned as 'false' if empty.
-        list($start, $end) = $this->getUTCFromDateParams($start, $end, false);
-
-        $sec = new SimpleEditCounter($this->container, $project, $user, $namespace, $start, $end);
+        $sec = new SimpleEditCounter(
+            $this->container,
+            $this->project,
+            $this->user,
+            $namespace,
+            $this->start,
+            $this->end
+        );
         $secRepo = new SimpleEditCounterRepository();
         $secRepo->setContainer($this->container);
         $sec->setRepository($secRepo);
@@ -104,9 +109,9 @@ class SimpleEditCounterController extends XtoolsController
         // Assign the values and display the template
         return $this->render('simpleEditCounter/result.html.twig', [
             'xtPage' => 'simpleeditcounter',
-            'xtTitle' => $user->getUsername(),
-            'user' => $user,
-            'project' => $project,
+            'xtTitle' => $this->user->getUsername(),
+            'user' => $this->user,
+            'project' => $this->project,
             'sec' => $sec,
         ]);
     }
@@ -119,56 +124,49 @@ class SimpleEditCounterController extends XtoolsController
      *     "/api/user/simple_editcount/{project}/{username}/{namespace}/{start}/{end}",
      *     name="SimpleEditCounterApi",
      *     requirements={
+     *         "username" = "(.+?)(?!(?:\/(\d+))?\/(?:\d{4}-\d{2}-\d{2})(?:\/(\d{4}-\d{2}-\d{2}))?)?$",
      *         "start" = "|\d{4}-\d{2}-\d{2}",
      *         "end" = "|\d{4}-\d{2}-\d{2}",
      *         "namespace" = "|all|\d+"
+     *     },
+     *     defaults={
+     *         "start"=false,
+     *         "end"=false,
      *     }
      * )
-     * @param Request $request
      * @param int|string $namespace Namespace ID or 'all' for all namespaces.
-     * @param bool|string $start
-     * @param bool|string $end
      * @return Response
      * @codeCoverageIgnore
      */
-    public function simpleEditCounterApiAction(
-        Request $request,
-        $namespace = 'all',
-        $start = false,
-        $end = false
-    ) {
+    public function simpleEditCounterApiAction($namespace = 'all')
+    {
         $this->recordApiUsage('user/simple_editcount');
 
-        // Here we do want to impose the max edit count restriction. Even though the
-        // query is very 'simple', it can still run too slow for an API.
-        $ret = $this->validateProjectAndUser($request, 'sc');
-        if ($ret instanceof RedirectResponse) {
-            return $ret;
-        } else {
-            list($project, $user) = $ret;
-        }
-
-        // 'false' means the dates are optional and returned as 'false' if empty.
-        list($start, $end) = $this->getUTCFromDateParams($start, $end, false);
-
-        $sec = new SimpleEditCounter($this->container, $project, $user, $namespace, $start, $end);
+        $sec = new SimpleEditCounter(
+            $this->container,
+            $this->project,
+            $this->user,
+            $namespace,
+            $this->start,
+            $this->end
+        );
         $secRepo = new SimpleEditCounterRepository();
         $secRepo->setContainer($this->container);
         $sec->setRepository($secRepo);
         $sec->prepareData();
 
         $ret = [
-            'username' => $user->getUsername(),
+            'username' => $this->user->getUsername(),
         ];
 
         if ($namespace !== 'all') {
             $ret['namespace'] = $namespace;
         }
-        if ($start !== false) {
-            $ret['start'] = date('Y-m-d', $start);
+        if ($this->start !== false) {
+            $ret['start'] = date('Y-m-d', $this->start);
         }
-        if ($end !== false) {
-            $ret['end'] = date('Y-m-d', $end);
+        if ($this->end !== false) {
+            $ret['end'] = date('Y-m-d', $this->end);
         }
 
         $ret = array_merge($ret, $sec->getData());

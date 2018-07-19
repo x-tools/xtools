@@ -122,7 +122,7 @@
 	"edits-not-in-categories": "Edits not in categories",
 	"edits-with-summaries": "Edits with summaries",
 	"end": "Ending date",
-	"error-articlinfo-api": "Unable to fetch revision data.",
+	"error-articleinfo-api": "Unable to fetch revision data.",
 	"error-pagepile-too-large": "Sorry, there are too many pages to export to PagePile. You can manually create a PagePile, or try narrowing down the result set by limiting to a specific namespace or time frame.",
 	"error-query-timeout": "Sorry, the requested information took too long to process (timeout $1 {{PLURAL:$1|second|seconds}}). In order to save resources, the query was automatically killed.",
 	"error-rate-limit": "Possible spider crawl detected. If you are human, you are making too many requests during a short period of time. Please wait $1 {{PLURAL:$1|minute|minutes}} before reloading this tool. You can then login to prevent this from happening again.",

@@ -54,25 +54,25 @@ class AutoEdits extends Model
      * @param Project $project
      * @param User $user
      * @param int|string $namespace Namespace ID or 'all'
-     * @param string $start Start date in a format accepted by strtotime()
-     * @param string $end End date in a format accepted by strtotime()
+     * @param int|false $start Start date in a format accepted by strtotime()
+     * @param int|false $end End date in a format accepted by strtotime()
      * @param string $tool The tool we're searching for when fetching (semi-)automated edits.
      * @param int $offset Used for pagination, offset results by N edits.
      */
     public function __construct(
         Project $project,
         User $user,
-        $namespace = 'all',
-        $start = '',
-        $end = '',
+        $namespace = 0,
+        $start = false,
+        $end = false,
         $tool = null,
         $offset = 0
     ) {
         $this->project = $project;
         $this->user = $user;
         $this->namespace = $namespace;
-        $this->start = $start;
-        $this->end = $end;
+        $this->start = false === $start ? '' : date('Y-m-d', $start);
+        $this->end = false === $end ? '' : date('Y-m-d', $end);
         $this->tool = $tool;
         $this->offset = $offset;
     }
@@ -206,7 +206,7 @@ class AutoEdits extends Model
 
     /**
      * Get automated contributions for this user.
-     * @param bool $raw Wether to return raw data from the database,
+     * @param bool $raw Whether to return raw data from the database,
      *   or get Edit objects.
      * @return Edit[]
      */

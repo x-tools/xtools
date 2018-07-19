@@ -6,20 +6,16 @@
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use Xtools\ProjectRepository;
 use Xtools\Page;
 use Xtools\PageRepository;
-use Xtools\UserRepository;
 use Xtools\RFX;
 
 /**
  * This controller handles the RfX Analysis tool.
  */
-class RfXAnalysisController extends Controller
+class RfXAnalysisController extends XtoolsController
 {
 
     /**
@@ -34,33 +30,28 @@ class RfXAnalysisController extends Controller
 
     /**
      * Renders the index page for the RfX Tool
-     *
-     * @param Request $request Given by Symfony
-     * @param string $project Optional project.
      * @param string $type Optional RfX type
-     *
      * @Route("/rfx", name="RfXAnalysis")
      * @Route("/rfx/", name="RfXAnalysisSlash")
      * @Route("/rfx/index.php", name="rfxAnalysisIndexPhp")
      * @Route("/rfx/{project}", name="rfxAnalysisProject")
      * @Route("/rfx/{project}/{type}", name="rfxAnalysisProjectType")
-     *
      * @return Response|RedirectResponse
      */
-    public function indexAction(Request $request, $project = null, $type = null)
+    public function indexAction()
     {
-        if ($request->get('projecttype')
-            && (strpos($request->get('projecttype'), '|') !== false)
+        if ($this->request->get('projecttype')
+            && (strpos($this->request->get('projecttype'), '|') !== false)
         ) {
-            $projectType = explode('|', $request->get('projecttype'), 2);
+            $projectType = explode('|', $this->request->get('projecttype'), 2);
             $projectQuery = $projectType[0];
             $typeQuery = $projectType[1];
         } else {
-            $projectQuery = $request->get('project');
-            $typeQuery = $request->get('type');
+            $projectQuery = $this->request->get('project');
+            $typeQuery = $this->request->get('type');
         }
 
-        $username = $request->get('username');
+        $username = $this->request->get('username');
 
         if ($projectQuery != '' && $typeQuery != '' && $username != '') {
             return $this->redirectToRoute(
@@ -105,40 +96,28 @@ class RfXAnalysisController extends Controller
     /**
      * Renders the output page for the RfX Tool
      * @Route("/rfx/{project}/{type}/{username}", name="rfxAnalysisResult")
-     * @param string $project  Optional project.
-     * @param string $type     Type of RfX we are processing.
-     * @param string $username Username of the person we're analizing.
+     * @param string $type Type of RfX we are processing.
      * @return Response|RedirectResponse
      * @codeCoverageIgnore
      */
-    public function resultAction($project, $type, $username)
+    public function resultAction($type)
     {
-        $projectData = ProjectRepository::getProject($project, $this->container);
-
-        if (!$projectData->exists()) {
-            $this->addFlash('notice', ['invalid-project', $project]);
-            return $this->redirectToRoute('rfx');
-        }
-
-        $db = $projectData->getDatabaseName();
-        $domain = $projectData->getDomain();
+        $domain = $this->project->getDomain();
 
         if ($this->getParameter('rfx')[$domain] === null) {
-            $this->addFlash('notice', ['invalid-project-cant-use', $project]);
-            return $this->redirectToRoute('rfx');
+            $this->addFlash('notice', ['invalid-project-cant-use', $this->project]);
+            return $this->redirectToRoute('RfXAnalysis');
         }
 
         // Construct the page name
         if (!isset($this->getParameter('rfx')[$domain]['pages'][$type])) {
-            $pagename = '';
+            $pageTitle= '';
         } else {
-            $pagename = $this->getParameter('rfx')[$domain]['pages'][$type];
+            $pageTitle= $this->getParameter('rfx')[$domain]['pages'][$type];
         }
 
-        $user = UserRepository::getUser($username, $this->container);
-
-        $pagename .= '/'.$user->getUsername();
-        $page = new Page($projectData, $pagename);
+        $pageTitle.= '/'.$this->user->getUsername();
+        $page = new Page($this->project, $pageTitle);
         $pageRepo = new PageRepository();
         $pageRepo->setContainer($this->container);
         $page->setRepository($pageRepo);
@@ -146,11 +125,11 @@ class RfXAnalysisController extends Controller
         $text = $page->getWikitext();
 
         if (!isset($text)) {
-            $this->addFlash('notice', ['no-result', $pagename]);
+            $this->addFlash('notice', ['no-result', $pageTitle]);
             return $this->redirectToRoute(
                 'rfxAnalysisProject',
                 [
-                    'project' => $projectData->getDatabaseName()
+                    'project' => $this->project->getDatabaseName()
                 ]
             );
         }
@@ -168,11 +147,11 @@ class RfXAnalysisController extends Controller
         $total = count($support) + count($oppose) + count($neutral);
 
         if ($total === 0) {
-            $this->addFlash('notice', ['no-result', $pagename]);
+            $this->addFlash('notice', ['no-result', $pageTitle]);
             return $this->redirectToRoute(
                 'rfxAnalysisProject',
                 [
-                    'project' => $projectData->getDatabaseName(),
+                    'project' => $this->project->getDatabaseName(),
                 ]
             );
         }
@@ -183,10 +162,10 @@ class RfXAnalysisController extends Controller
         return $this->render(
             'rfxAnalysis/result.html.twig',
             [
-                'xtTitle' => $user->getUsername(),
+                'xtTitle' => $this->user->getUsername(),
                 'xtPage' => 'rfx',
-                'project' => $projectData,
-                'user' => $user,
+                'project' => $this->project,
+                'user' => $this->user,
                 'page' => $page,
                 'type' => $type,
                 'support' => $support,

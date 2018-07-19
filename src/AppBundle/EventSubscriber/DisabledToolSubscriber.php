@@ -49,9 +49,10 @@ class DisabledToolSubscriber implements EventSubscriberInterface
     public function onKernelController(FilterControllerEvent $event)
     {
         $controller = $event->getController();
+
         if (method_exists($controller[0], 'getIndexRoute')) {
-            $tool = strtolower($controller[0]->getIndexRoute());
-            if (!$this->container->getParameter("enable.$tool")) {
+            $tool = $controller[0]->getIndexRoute();
+            if (!in_array($tool, ['homepage', 'meta']) && !$this->container->getParameter("enable.$tool")) {
                 throw new NotFoundHttpException('This tool is disabled');
             }
         }

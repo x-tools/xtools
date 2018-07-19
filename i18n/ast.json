@@ -120,7 +120,7 @@
 	"edits-not-in-categories": "Ediciones que nun tán nes categoríes",
 	"edits-with-summaries": "Ediciones con resume",
 	"end": "Data final",
-	"error-articlinfo-api": "Nun pudieron recuperase los datos de les revisiones.",
+	"error-articleinfo-api": "Nun pudieron recuperase los datos de les revisiones.",
 	"error-pagepile-too-large": "Sentímoslo, hai demasiaes páxines a esportar a PagePile. Puedes crear una PagePile manualmente, o afinar el conxuntu de resultaos llendándolu a un determináu espaciu de nomes o intervalu de tiempu.",
 	"error-query-timeout": "Sentímoslo, la información solicitada tardó demasiao en procesase (tiempu máximu $1 {{PLURAL:$1|segundu|segundos}}). P'aforrar recursos, la consulta matóse automáticamente.",
 	"error-rate-limit": "Detectóse la posible aición d'una «araña». Si yes humanu, escurque teas faciendo demasiaes solicitúes nun periodu de tiempu curtiu. Espera $1 {{PLURAL:$1|minutu|minutos}} antes de recargar esta ferramienta. Darréu puedes aniciar sesión pa prevenir qu'esto vuelva a pasar.",

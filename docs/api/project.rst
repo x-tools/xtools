@@ -75,6 +75,32 @@ Get the XTools Page Assessments configuration:
 
     https://xtools.wmflabs.org/api/project/assessments
 
+Automated tools
+===============
+``GET /api/project/automated_tools/{project}``
+
+Get a list of the known (semi-)automated tools used on the given project.
+
+**Response format:**
+
+For each tool, the some or all of the following data is provided:
+
+* ``tag``: A `tag <https://www.mediawiki.org/wiki/Help:Tags>`_ that identifies edits made using the tool.
+* ``regex``: Regular expression that can be used against edit summaries to test if the tool was used.
+* ``link``: Path to the tool's documentation.
+* ``label``: Translation of the tool's name, if applicable and available.
+* ``revert``: Whether or not the tool is exclusively used for reverting edits.
+
+**Parameters:**
+
+* ``project`` (**required**) - Project domain or database name.
+
+**Example:**
+
+Get all the known semi-automated tools used on the English Wikipedia.
+
+    https://xtools.wmflabs.org/api/project/automated_tools/en.wikipedia.org
+
 Admins and user groups
 ======================
 ``GET /api/project/admins_groups/{project}``
@@ -96,7 +122,7 @@ Get administrative users of the French Wikipedia:
 Admin statistics
 ================
 
-``GET /api/project/adminstats/{project}/{days}``
+``GET /api/project/admin_stats/{project}/{days}``
 
 Get users of the project that are capable of making 'admin actions', along with
 various stats about the actions they took. Time period is limited to one month.
@@ -111,5 +137,5 @@ various stats about the actions they took. Time period is limited to one month.
 Get various statistics about actions taken by admins of the French Wikipedia
 over the past week:
 
-    https://xtools.wmflabs.org/api/project/adminstats/frwiki/7
-    https://xtools.wmflabs.org/api/project/adminstats/fr.wikipedia.org/7
+    https://xtools.wmflabs.org/api/project/admin_stats/frwiki/7
+    https://xtools.wmflabs.org/api/project/admin_stats/fr.wikipedia.org/7

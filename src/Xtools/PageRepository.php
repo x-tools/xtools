@@ -112,13 +112,10 @@ class PageRepository extends Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $this->stopwatch->start($cacheKey, 'XTools');
-
         $stmt = $this->getRevisionsStmt($page, $user, null, null, $start, $end);
         $result = $stmt->fetchAll();
 
         // Cache and return.
-        $this->stopwatch->stop($cacheKey);
         return $this->setCache($cacheKey, $result);
     }
 

@@ -124,7 +124,7 @@ Get non-automated contributions for the given user, namespace and date range.
 
 **Example:**
 
-Get the newest non-automated mainspace contributions made by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ on the English Wikipedia.
+Get the latest non-automated mainspace contributions made by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ on the English Wikipedia.
 
     https://xtools.wmflabs.org/api/user/nonautomated_edits/en.wikipedia/Jimbo_Wales
     https://xtools.wmflabs.org/api/user/nonautomated_edits/en.wikipedia/Jimbo_Wales/0
@@ -133,7 +133,9 @@ Automated edits
 ===============
 ``GET /api/user/automated_edits/{project}/{username}/{namespace}/{start}/{end}/{offset}``
 
-Get (semi-)automated contributions for the given user, namespace and date range. You can get edits only made with a specific tool by appending ``?tool=Tool name`` to the end of the URL. To get the names of the available tools, use the :ref:`Automated tools <autotools>` endpoint.
+Get (semi-)automated contributions for the given user, namespace and date range.
+You can get edits only made with a specific tool by appending ``?tool=Tool name`` to the end of the URL.
+To get the names of the available tools, use the :ref:`Automated tools <autotools>` endpoint.
 
 **Parameters:**
 
@@ -146,15 +148,21 @@ Get (semi-)automated contributions for the given user, namespace and date range.
 
 **Example:**
 
-Get the newest automated mainspace contributions made by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ on the English Wikipedia.
+Get the latest automated mainspace contributions made by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ on the English Wikipedia.
 
     https://xtools.wmflabs.org/api/user/automated_edits/en.wikipedia/Jimbo_Wales
     https://xtools.wmflabs.org/api/user/automated_edits/en.wikipedia/Jimbo_Wales/0
+
+Get Twinkle contributions made by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ in the User talk
+namespace, leading up to the year 2011.
+
+    https://xtools.wmflabs.org/api/user/automated_edits/en.wikipedia/Jimbo_Wales/0//2011-01-01?tool=Twinkle
 
 .. _autotools:
 
 Automated tools
 ===============
+``GET /api/user/automated_tools/{project}``
 
 Get a list of the known (semi-)automated tools used on the given project.
 

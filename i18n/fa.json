@@ -108,7 +108,7 @@
 	"edits-last-year": "ویرایش در ۳۶۵ روز گذشته",
 	"edits-with-summaries": "ویرایش‌های دارای خلاصه",
 	"end": "تا تاریخ",
-	"error-articlinfo-api": "ناتوان از بارگیری اطلاعات نسخه.",
+	"error-articleinfo-api": "ناتوان از بارگیری اطلاعات نسخه.",
 	"error-report": "لطفاً این خطا را در $1 گزارش کنید(نياز به یک حساب ویکی‌مدیا دارد).",
 	"error-server-message": "پاسخ سرور: $1",
 	"error-title": "خطای مرگباری در XTools رخ داده‌است.",

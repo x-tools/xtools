@@ -43,7 +43,7 @@ class AdminStats extends Model
      * @param int $start as UTC timestamp.
      * @param int $end as UTC timestamp.
      */
-    public function __construct(Project $project, $start = null, $end = null)
+    public function __construct(Project $project, $start, $end)
     {
         $this->project = $project;
         $this->start = $start;
@@ -53,7 +53,7 @@ class AdminStats extends Model
     /**
      * Get users of the project that are capable of making 'admin actions',
      * keyed by user name with abbreviations for the user groups as the values.
-     * @param  string $abbreviate If set, the keys of the result with be a string containing
+     * @param bool $abbreviate If set, the keys of the result with be a string containing
      *   abbreviated versions of their user groups, such as 'A' instead of administrator,
      *   'CU' instead of CheckUser, etc. If $abbreviate is false, the keys of the result
      *   will be an array of the full-named user groups.

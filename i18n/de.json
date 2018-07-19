@@ -123,7 +123,7 @@
 	"edits-not-in-categories": "Bearbeitungen nicht in Kategorien",
 	"edits-with-summaries": "Zusammenfassung verwendet",
 	"end": "Enddatum",
-	"error-articlinfo-api": "Die Versionsdaten konnten nicht abgerufen werden.",
+	"error-articleinfo-api": "Die Versionsdaten konnten nicht abgerufen werden.",
 	"error-pagepile-too-large": "Es gibt leider zu viele Seiten zum Exportieren nach PagePile. Du kannst manuell eine PagePile erstellen oder versuchen, den Ergebnissatz durch die Begrenzung auf einen angegebenen Namensraum oder ein Zeitfenster einzuengen.",
 	"error-query-timeout": "Leider benötigen die angeforderten Informationen zu lang für eine Verarbeitung (Zeitüberschreitung {{PLURAL:$1|eine Sekunde|$1 Sekunden}}). Um Ressourcen zu sparen, wurde die Abfrage automatisch abgebrochen.",
 	"error-rate-limit": "Es wurde möglicherweise ein Spidercrawler entdeckt. Falls du ein Mensch bist, hast du zu viele Anfragen in einer kurzen Zeitperiode durchgeführt. Bitte warte {{PLURAL:$1|eine Minute|$1 Minuten}}, bevor du dieses Werkzeug neu lädst. Du kannst dich dann anmelden, um ein erneutes Auftreten dieser Fehlermeldung zu verhindern.",

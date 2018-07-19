@@ -122,7 +122,7 @@
 	"edits-not-in-categories": "Redigeringar utanför kategorier",
 	"edits-with-summaries": "Redigeringar med redigeringskommentar",
 	"end": "Slutdatum",
-	"error-articlinfo-api": "Kunde inte hämta sidversionsdata.",
+	"error-articleinfo-api": "Kunde inte hämta sidversionsdata.",
 	"error-pagepile-too-large": "Tyvärr, det finns för många sidor att exportera till PagePile. Du kan skapa en PagePile manuellt eller försöka reducera resultaten genom att begränsa till en specifik namnrymd eller tidsram.",
 	"error-query-timeout": "Tyvärr, den begärda informationen tog för lång tid att bearbeta (tidsgräns på $1 {{PLURAL:$1|sekund|sekunder}}). För att spara resurser stoppades förfrågan automatiskt.",
 	"error-rate-limit": "En möjlig spider crawl upptäcktes. Om du är en människa gör du för många förfrågan under en kort tidsperiod. Vänta i $1 {{PLURAL:$1|minut|minuter}} innan du startar om detta verktyg. Du kan sedan logga in för att förhindra detta från att hända igen.",

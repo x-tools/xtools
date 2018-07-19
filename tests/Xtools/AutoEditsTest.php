@@ -5,8 +5,9 @@
 
 namespace Tests\Xtools;
 
-use DateTime;
+use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DependencyInjection\Container;
 use Xtools\AutoEdits;
 use Xtools\AutoEditsRepository;
 use Xtools\Edit;
@@ -24,7 +25,7 @@ class AutoEditsTest extends WebTestCase
     /** @var Container The DI container. */
     protected $container;
 
-    /** @var Symfony\Bundle\FrameworkBundle\Client HTTP client */
+    /** @var Client HTTP client */
     protected $client;
 
     /** @var Project The project instance. */
@@ -71,17 +72,17 @@ class AutoEditsTest extends WebTestCase
             $this->project,
             $this->user,
             1,
-            '2017-01-01',
-            '2018-01-01',
+            strtotime('2017-01-01'),
+            strtotime('2018-01-01'),
             'Twinkle',
             50
         );
 
-        $this->assertEquals(1, $autoEdits->getNamespace());
-        $this->assertEquals('2017-01-01', $autoEdits->getStart());
-        $this->assertEquals('2018-01-01', $autoEdits->getEnd());
-        $this->assertEquals('Twinkle', $autoEdits->getTool());
-        $this->assertEquals(50, $autoEdits->getOffset());
+        static::assertEquals(1, $autoEdits->getNamespace());
+        static::assertEquals('2017-01-01', $autoEdits->getStart());
+        static::assertEquals('2018-01-01', $autoEdits->getEnd());
+        static::assertEquals('Twinkle', $autoEdits->getTool());
+        static::assertEquals(50, $autoEdits->getOffset());
     }
 
     /**
@@ -108,16 +109,16 @@ class AutoEditsTest extends WebTestCase
         $autoEdits->setRepository($this->aeRepo);
 
         $rawEdits = $autoEdits->getNonAutomatedEdits(true);
-        $this->assertArraySubset($rev, $rawEdits[0]);
+        static::assertArraySubset($rev, $rawEdits[0]);
 
         $edit = new Edit(
             new Page($this->project, 'Test_page'),
             array_merge($rev, ['user' => $this->user])
         );
-        $this->assertEquals($edit, $autoEdits->getNonAutomatedEdits()[0]);
+        static::assertEquals($edit, $autoEdits->getNonAutomatedEdits()[0]);
 
         // One more time to ensure things are re-queried.
-        $this->assertEquals($edit, $autoEdits->getNonAutomatedEdits()[0]);
+        static::assertEquals($edit, $autoEdits->getNonAutomatedEdits()[0]);
     }
 
     /**
@@ -144,8 +145,8 @@ class AutoEditsTest extends WebTestCase
         $autoEdits = new AutoEdits($this->project, $this->user, 1);
         $autoEdits->setRepository($this->aeRepo);
 
-        $this->assertEquals($toolCounts, $autoEdits->getToolCounts());
-        $this->assertEquals(18, $autoEdits->getToolsTotal());
+        static::assertEquals($toolCounts, $autoEdits->getToolCounts());
+        static::assertEquals(18, $autoEdits->getToolsTotal());
     }
 
     /**
@@ -172,16 +173,16 @@ class AutoEditsTest extends WebTestCase
         $autoEdits->setRepository($this->aeRepo);
 
         $rawEdits = $autoEdits->getAutomatedEdits(true);
-        $this->assertArraySubset($rev, $rawEdits[0]);
+        static::assertArraySubset($rev, $rawEdits[0]);
 
         $edit = new Edit(
             new Page($this->project, 'Talk:Test_page'),
             array_merge($rev, ['user' => $this->user])
         );
-        $this->assertEquals($edit, $autoEdits->getAutomatedEdits()[0]);
+        static::assertEquals($edit, $autoEdits->getAutomatedEdits()[0]);
 
         // One more time to ensure things are re-queried.
-        $this->assertEquals($edit, $autoEdits->getAutomatedEdits()[0]);
+        static::assertEquals($edit, $autoEdits->getAutomatedEdits()[0]);
     }
 
     /**
@@ -200,14 +201,14 @@ class AutoEditsTest extends WebTestCase
 
         $autoEdits = new AutoEdits($this->project, $this->user, 1);
         $autoEdits->setRepository($this->aeRepo);
-        $this->assertEquals(50, $autoEdits->getAutomatedCount());
-        $this->assertEquals(200, $autoEdits->getEditCount());
-        $this->assertEquals(25, $autoEdits->getAutomatedPercentage());
+        static::assertEquals(50, $autoEdits->getAutomatedCount());
+        static::assertEquals(200, $autoEdits->getEditCount());
+        static::assertEquals(25, $autoEdits->getAutomatedPercentage());
 
         // Again to ensure they're not re-queried.
-        $this->assertEquals(50, $autoEdits->getAutomatedCount());
-        $this->assertEquals(200, $autoEdits->getEditCount());
-        $this->assertEquals(25, $autoEdits->getAutomatedPercentage());
+        static::assertEquals(50, $autoEdits->getAutomatedCount());
+        static::assertEquals(200, $autoEdits->getEditCount());
+        static::assertEquals(25, $autoEdits->getAutomatedPercentage());
     }
 
     /**
@@ -216,54 +217,54 @@ class AutoEditsTest extends WebTestCase
     public function testAutomatedEditCount()
     {
         if ($this->isSingle || !$this->container->getParameter('app.is_labs')) {
-            // untestable :(
+            // Untestable :(
             return;
         }
 
         $url = '/api/user/automated_editcount/en.wikipedia/musikPuppet/all///1';
-        $crawler = $this->client->request('GET', $url);
+        $this->client->request('GET', $url);
         $response = $this->client->getResponse();
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('application/json', $response->headers->get('content-type'));
+        static::assertEquals(200, $response->getStatusCode());
+        static::assertEquals('application/json', $response->headers->get('content-type'));
 
         $data = json_decode($response->getContent(), true);
         $toolNames = array_keys($data['automated_tools']);
 
-        $this->assertEquals($data['project'], 'en.wikipedia.org');
-        $this->assertEquals($data['username'], 'MusikPuppet');
-        $this->assertGreaterThan(15, $data['automated_editcount']);
-        $this->assertGreaterThan(35, $data['nonautomated_editcount']);
-        $this->assertEquals(
+        static::assertEquals($data['project'], 'en.wikipedia.org');
+        static::assertEquals($data['username'], 'musikPuppet');
+        static::assertGreaterThan(15, $data['automated_editcount']);
+        static::assertGreaterThan(35, $data['nonautomated_editcount']);
+        static::assertEquals(
             $data['automated_editcount'] + $data['nonautomated_editcount'],
             $data['total_editcount']
         );
-        $this->assertContains('Twinkle', $toolNames);
-        $this->assertContains('Huggle', $toolNames);
+        static::assertContains('Twinkle', $toolNames);
+        static::assertContains('Huggle', $toolNames);
     }
 
-    /**
-     * Test nonautomated edits endpoint.
-     */
-    public function testNonautomatedEdits()
-    {
-        if ($this->isSingle || !$this->container->getParameter('app.is_labs')) {
-            // untestable :(
-            return;
-        }
-
-        $url = '/api/user/nonautomated_edits/en.wikipedia/ThisIsaTest/all///0';
-        $crawler = $this->client->request('GET', $url);
-        $response = $this->client->getResponse();
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('application/json', $response->headers->get('content-type'));
-
-        // This test account *should* never edit again and be safe for testing...
-        $this->assertCount(1, json_decode($response->getContent(), true)['nonautomated_edits']);
-
-        // Test again for too many edits.
-        $url = '/api/user/nonautomated_edits/en.wikipedia/Materialscientist/0';
-        $crawler = $this->client->request('GET', $url);
-        $response = $this->client->getResponse();
-        $this->assertEquals(500, $response->getStatusCode());
-    }
+//    /**
+//     * Test nonautomated edits endpoint.
+//     */
+//    public function testNonautomatedEdits()
+//    {
+//        if ($this->isSingle || !$this->container->getParameter('app.is_labs')) {
+//            // untestable :(
+//            return;
+//        }
+//
+//        $url = '/api/user/nonautomated_edits/en.wikipedia/ThisIsaTest/all///0';
+//        $crawler = $this->client->request('GET', $url);
+//        $response = $this->client->getResponse();
+//        static::assertEquals(200, $response->getStatusCode());
+//        static::assertEquals('application/json', $response->headers->get('content-type'));
+//
+//        // This test account *should* never edit again and be safe for testing...
+//        static::assertCount(1, json_decode($response->getContent(), true)['nonautomated_edits']);
+//
+//        // Test again for too many edits.
+//        $url = '/api/user/nonautomated_edits/en.wikipedia/Materialscientist/0';
+//        $this->client->request('GET', $url);
+//        $response = $this->client->getResponse();
+//        static::assertEquals(500, $response->getStatusCode());
+//    }
 }

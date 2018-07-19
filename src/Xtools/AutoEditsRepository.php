@@ -23,7 +23,7 @@ class AutoEditsRepository extends UserRepository
      * @param Project $project
      * @return array
      */
-    private function getTools(Project $project)
+    public function getTools(Project $project)
     {
         if (!isset($this->aeTools)) {
             $this->aeTools = $this->container
@@ -61,7 +61,6 @@ class AutoEditsRepository extends UserRepository
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
-        $this->stopwatch->start($cacheKey, 'XTools');
 
         list($condBegin, $condEnd) = $this->getRevTimestampConditions($start, $end);
 
@@ -99,7 +98,6 @@ class AutoEditsRepository extends UserRepository
         $result = (int) $resultQuery->fetchColumn();
 
         // Cache and return.
-        $this->stopwatch->stop($cacheKey);
         return $this->setCache($cacheKey, $result);
     }
 
@@ -127,7 +125,6 @@ class AutoEditsRepository extends UserRepository
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
-        $this->stopwatch->start($cacheKey, 'XTools');
 
         list($condBegin, $condEnd) = $this->getRevTimestampConditions($start, $end, 'revs.');
 
@@ -168,7 +165,6 @@ class AutoEditsRepository extends UserRepository
         $result = $resultQuery->fetchAll();
 
         // Cache and return.
-        $this->stopwatch->stop($cacheKey);
         return $this->setCache($cacheKey, $result);
     }
 
@@ -198,9 +194,13 @@ class AutoEditsRepository extends UserRepository
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
-        $this->stopwatch->start($cacheKey, 'XTools');
 
         list($condBegin, $condEnd) = $this->getRevTimestampConditions($start, $end, 'revs.');
+
+        // In this case there is a slight performance improvement we can make if we're not given a start date.
+        if ($condBegin == '' && $condEnd == '') {
+            $condBegin = 'AND revs.rev_timestamp > 0';
+        }
 
         // Get the combined regex and tags for the tools
         list($regex, $tags) = $this->getToolRegexAndTags($project, false, $tool);
@@ -244,7 +244,6 @@ class AutoEditsRepository extends UserRepository
                 LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                 $tagJoin
                 WHERE revs.rev_user_text = :username
-                AND revs.rev_timestamp > 0
                 $condBegin
                 $condEnd
                 $condNamespace
@@ -261,7 +260,6 @@ class AutoEditsRepository extends UserRepository
         $result = $resultQuery->fetchAll();
 
         // Cache and return.
-        $this->stopwatch->stop($cacheKey);
         return $this->setCache($cacheKey, $result);
     }
 
@@ -291,7 +289,6 @@ class AutoEditsRepository extends UserRepository
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
-        $this->stopwatch->start($cacheKey, 'XTools');
 
         $sql = $this->getAutomatedCountsSql($project, $namespace, $start, $end);
         $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end);
@@ -321,7 +318,6 @@ class AutoEditsRepository extends UserRepository
         });
 
         // Cache and return.
-        $this->stopwatch->stop($cacheKey);
         return $this->setCache($cacheKey, $results);
     }
 

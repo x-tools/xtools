@@ -119,7 +119,7 @@
 	"edits-not-in-categories": "Urejanja v nekategorijah",
 	"edits-with-summaries": "Urejanja s povzetkom",
 	"end": "Datum konca",
-	"error-articlinfo-api": "Ne moremo naložiti podatkov o redakciji.",
+	"error-articleinfo-api": "Ne moremo naložiti podatkov o redakciji.",
 	"error-query-timeout": "Se opravičujemo, zahtevana informacija je bila predolgo v obdelavi (pretek po $1 {{PLURAL:$1|sekundi|sekundah}}). Zaradi varčevanja kapacitet je bil zahtevek izničen.",
 	"error-report": "Prosimo, če želiš, lahko poročaš o napaki na $1 (potreben wikimedijin račun).",
 	"error-server-message": "Strežnik je sporočil: $1",

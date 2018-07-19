@@ -438,7 +438,7 @@
                 </div>
             </div>
             <p class="export">
-                <a href="{{ path('ArticleInfoResult', {project:project.domain, article:page.title}) }}?format=wikitext">
+                <a href="{{ path('ArticleInfoResult', {project:project.domain, page:page.title, start:ai.startDate, end:ai.endDate}) }}?format=wikitext">
                     <span class="glyphicon glyphicon-export"></span>
                     {{ msg('export-wikitext') }}
                 </a>
@@ -474,7 +474,7 @@
                         </td>
                         <td>
                             {% if enabled('TopEdits') %}
-                                <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': editor, 'namespace': page.namespace, 'article': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
+                                <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': editor, 'namespace': page.namespace, 'page': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
                             {% endif %}
                             &middot;
                             {% if enabled('EditCounter') %}
@@ -552,7 +552,7 @@
                         </td>
                         <td>
                             {% if enabled('TopEdits') %}
-                                <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': bot, 'namespace': page.namespace, 'article': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
+                                <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': bot, 'namespace': page.namespace, 'page': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
                             {% endif %}
                             &middot;
                             {% if enabled('EditCounter') %}
@@ -589,7 +589,7 @@
                 </div>
             {% endset %}
             {% set headerLink %}
-                <a href="{{ path('ArticleInfoAuthorshipResult', {project:project.domain, article:page.title})}}">{{ msg('authorship') }}</a>
+                <a href="{{ path('ArticleInfoAuthorshipResult', {project:project.domain, page:page.title})}}">{{ msg('authorship') }}</a>
             {% endset %}
             {% set description_link %}
                 {% set wikiwhoLink %}

@@ -48,7 +48,6 @@ class CategoryEditsRepository extends Repository
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
-        $this->stopwatch->start($cacheKey, 'XTools');
 
         $revisionTable = $project->getTableName('revision');
         $categorylinksTable = $project->getTableName('categorylinks');
@@ -63,7 +62,6 @@ class CategoryEditsRepository extends Repository
         $result = (int)$this->executeStmt($query, $user, $categories, $start, $end)->fetchColumn();
 
         // Cache and return.
-        $this->stopwatch->stop($cacheKey);
         return $this->setCache($cacheKey, $result);
     }
 
@@ -87,7 +85,6 @@ class CategoryEditsRepository extends Repository
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
-        $this->stopwatch->start($cacheKey, 'XTools');
 
         $revisionTable = $project->getTableName('revision');
         $categorylinksTable = $project->getTableName('categorylinks');
@@ -103,7 +100,6 @@ class CategoryEditsRepository extends Repository
         $result = $this->executeStmt($query, $user, $categories, $start, $end)->fetchAll(\PDO::FETCH_KEY_PAIR);
 
         // Cache and return.
-        $this->stopwatch->stop($cacheKey);
         return $this->setCache($cacheKey, $result);
     }
 
@@ -131,7 +127,6 @@ class CategoryEditsRepository extends Repository
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
-        $this->stopwatch->start($cacheKey, 'XTools');
 
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
@@ -162,7 +157,6 @@ class CategoryEditsRepository extends Repository
         $result = $this->executeStmt($query, $user, $categories, $start, $end)->fetchAll();
 
         // Cache and return.
-        $this->stopwatch->stop($cacheKey);
         return $this->setCache($cacheKey, $result);
     }
 

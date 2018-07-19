@@ -120,7 +120,7 @@
 	"edits-not-in-categories": "Değişiklik kategorilerde değil",
 	"edits-with-summaries": "Özet girilmiş değişiklikler",
 	"end": "Bitiş tarihi",
-	"error-articlinfo-api": "Düzeltme verileri alınamıyor.",
+	"error-articleinfo-api": "Düzeltme verileri alınamıyor.",
 	"error-pagepile-too-large": "Maalesef, PagePile'a dışa aktarılacak çok fazla sayfa var. Bir PagePile el ile oluşturabilir veya belirli bir ad alanına veya zaman çerçevesine sınırlandırarak sonuç kümesini daraltmayı deneyebilirsiniz.",
 	"feedback": "Geri bildirim",
 	"file": "Dosya",

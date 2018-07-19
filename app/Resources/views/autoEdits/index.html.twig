@@ -5,7 +5,7 @@
     <form class="col-lg-8 col-lg-offset-2" action="{{ path('AutoEdits') }}" method="get" accept-charset="utf-8">
         <fieldset class="form-fieldset">
             {{ forms.wiki_input(project) }}
-            {{ forms.user_input(true, false, project) }}
+            {{ forms.user_input(true, false, project, false, username) }}
             {{ forms.namespace_select(project, true, namespace) }}
             {{ forms.date_input('start', false, start) }}
             {{ forms.date_input('end', false, end) }}

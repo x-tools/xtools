@@ -26,13 +26,13 @@
         {{ msg('page-title') }}
     </label>
     <input type="text" class="form-control"
-           name="article" id="article_input"{% if required %} required{% endif %}
+           name="page" id="article_input"{% if required %} required{% endif %}
            {% if project is not null %}autocomplete="off" data-api="{{ project.apiUrl }}"
             value="{{ value }}"{% endif %}>
 </div>
 {% endmacro %}
 
-{% macro user_input(required = true, multiple = false, project = null, noip = false) %}
+{% macro user_input(required = true, multiple = false, project = null, noip = false, value = '') %}
 <div class="input-group form-row">
     <label class="input-group-addon form-label" for="user_input">
         {{ msg('username') }}
@@ -53,7 +53,10 @@
     </label>
     <input type="text" class="form-control" name="username"
            id="user_input"{% if required %} required{% endif %}
-           {% if project is not null %}autocomplete="off" data-api="{{ project.apiUrl }}"{% endif %}>
+           {% if project is not null %}autocomplete="off"
+               data-api="{{ project.apiUrl }}"
+               value="{{ value }}"
+           {% endif %}>
 </div>
 {% endmacro %}
 

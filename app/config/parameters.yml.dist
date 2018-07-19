@@ -71,6 +71,7 @@ parameters:
     enable.CategoryEdits: 1
     enable.EditCounter: 1
     enable.EditSummary: 1
+    enable.Meta: 1
     enable.Pages: 1
     enable.Quote: 0
     enable.RfXAnalysis: 0

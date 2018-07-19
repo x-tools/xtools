@@ -5,8 +5,8 @@
     <form class="col-lg-8 col-lg-offset-2" action="{{ path('AdminStats') }}" method="get" accept-charset="utf-8">
         <fieldset class="form-fieldset">
             {{ forms.wiki_input() }}
-            {{ forms.date_input('start') }}
-            {{ forms.date_input('end') }}
+            {{ forms.date_input('start', false, start) }}
+            {{ forms.date_input('end', false, end) }}
         </fieldset>
         {{ forms.submit_btn() }}
     </form>

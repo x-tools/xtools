@@ -122,7 +122,7 @@
 	"edits-not-in-categories": "Keitimai ne kategorijose",
 	"edits-with-summaries": "Pakeitimai su santrauka",
 	"end": "Pabaigos data",
-	"error-articlinfo-api": "Nepavyko įkelti versijos duomenų.",
+	"error-articleinfo-api": "Nepavyko įkelti versijos duomenų.",
 	"error-pagepile-too-large": "Atsiprašome, pasirinkta per daug puslapių, kuriuos reikia eksportuoti į PagePile. Galite rankiniu būdu sukurti PagePile, arba patikslinti paiešką pasirenkant vardų sritis arba laikotarpį.",
 	"error-query-timeout": "Atsiprašome, jūsų prašomai informacijai apdoroti prireikė per daug laiko ($1 {{PLURAL:$1|sekundės|sekundžių}}). Siekiant taupyti išteklius, užklausa buvo automatiškai nutraukta.",
 	"error-rate-limit": "Aptiktas galimas interneto robotas. Jei esate žmogus, tai jūs atliekate per daug užklausų per trumpą laiko tarpą. Prašome palaukti $1 {{PLURAL:$1|minutę|minutes|minučių}}, kol bus perkrautas šis įrankis. Tuomet galėsite prisijungti, jei norėsite, kad tai nepasikartotų.",

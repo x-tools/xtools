@@ -126,7 +126,7 @@
 	"edits-not-in-categories": "Modifications hors catégories",
 	"edits-with-summaries": "Modifications avec résumé",
 	"end": "Date de fin",
-	"error-articlinfo-api": "Impossible de récupérer les informations de révision.",
+	"error-articleinfo-api": "Impossible de récupérer les informations de révision.",
 	"error-pagepile-too-large": "Désolé, il y a trop de pages à exporter vers PagePile. Vous pouvez créer manuellement un PagePile, ou essayer de réduire l’ensemble des résultats en limitant à un espace de noms spécifique ou à une période.",
 	"error-query-timeout": "Désolé, l’information demandée a pris trop de temps à être traitée (délai de $1 {{PLURAL:$1|seconde|secondes}}). Afin d’économiser les ressources, la requête a été automatiquement arrêtée.",
 	"error-rate-limit": "Collecte par robot possible détectée. Si vous êtes humain, vous faites trop de requêtes pendant un court laps de temps. Veuillez attendre {{PLURAL:$1|minute|minutes}} avant de recharger cet outil. Vous pourrez alors vous connecter pour éviter cela de se reproduire.",

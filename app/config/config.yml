@@ -33,7 +33,6 @@ framework:
         engines: ['twig']
     default_locale:  "%locale%"
     trusted_hosts:   ~
-    trusted_proxies: ~
     session:
         # http://symfony.com/doc/current/reference/configuration/framework.html#handler-id
         # handler_id:  session.handler.native_file
@@ -154,24 +153,6 @@ nelmio_cors:
         max_age: 3600
         hosts: []
         origin_regex: false
-
-# FOSRest Configuration
-fos_rest:
-    zone:
-        - { path: ^/api/* }
-    body_listener: true
-    format_listener:
-        rules:
-            - { path: '^/api', priorities: ['json'], fallback_format: json, prefer_extension: false }
-    param_fetcher_listener: true
-    view:
-        view_response_listener: 'force'
-        formats:
-            json: true
-            html: true
-        mime_types:
-            json: ['application/json']
-            html: ['text/html']
 
 guzzle:
     logging: "%kernel.debug%"

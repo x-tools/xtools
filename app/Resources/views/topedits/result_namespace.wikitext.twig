@@ -28,11 +28,11 @@
 {% if badge is defined %}
 [[File:{{ badge }}|20px]] {{ page.pa_class ? page.pa_class : msg('unknown') }}
 {% endif %}{% endif %}
-| [{% verbatim %}{{{% endverbatim %}fullurl:Special:Log|page={{ page.page_title_ns|replace({' ': '_'}) }}}} {{ msg('log') }}] &middot; [{{ url('ArticleInfoResult', {project:project.domain, article:page.page_title_ns}) }} {{ msg('tool-articleinfo') }}] &middot; [{{ url('TopEditsResult', {project:project.domain, username:user.username, namespace:page.page_namespace, article:page.page_title}) }} {{ msg('tool-topedits') }}]
+| [{% verbatim %}{{{% endverbatim %}fullurl:Special:Log|page={{ page.page_title_ns|replace({' ': '_'}) }}}} {{ msg('log') }}] &middot; [{{ url('ArticleInfoResult', {project:project.domain, page:page.page_title_ns}) }} {{ msg('tool-articleinfo') }}] &middot; [{{ url('TopEditsResult', {project:project.domain, username:user.username, namespace:page.page_namespace, page:page.page_title}) }} {{ msg('tool-topedits') }}]
 {% endfor %}
 {% if pages|length >= 10 and te.topEdits|length > 1 %}
 |-
-! colspan={{ showPageAssessment ? 4 : 3 }} | [{{ url('TopEditsResult', {project:project.domain, username:user.username, namespace:ns, article:''}) }} {{ msg('more') }}&hellip;]
+! colspan={{ showPageAssessment ? 4 : 3 }} | [{{ url('TopEditsResult', {project:project.domain, username:user.username, namespace:ns, page:''}) }} {{ msg('more') }}&hellip;]
 {% endif %}
 |}
 

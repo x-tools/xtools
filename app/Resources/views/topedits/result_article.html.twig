@@ -37,7 +37,7 @@
                                     {{ wiki.pageLink(page, page.displaytitle|raw) }}
                                 </span>
                                 <small>({{ wiki.pageLogLink(page) }}
-                                &middot; <a href="{{ path('ArticleInfoResult', {project:project.domain, article:page.title}) }}">{{ msg('tool-articleinfo') }}</a>)</small>
+                                &middot; <a href="{{ path('ArticleInfoResult', {project:project.domain, page:page.title}) }}">{{ msg('tool-articleinfo') }}</a>)</small>
                             </td>
                         </tr>
                         <tr>

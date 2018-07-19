@@ -122,7 +122,7 @@
 	"edits-not-in-categories": "Aldaketarik ez kategorietan",
 	"edits-with-summaries": "Edits with summary",
 	"end": "Amaiera data",
-	"error-articlinfo-api": "Berrikusketa data ezin izan da kargatu.",
+	"error-articleinfo-api": "Berrikusketa data ezin izan da kargatu.",
 	"error-pagepile-too-large": "Barkatu, PagePile-ra esportatzeko orrialde gehiegi daude. Eskuz sor dezakezu PagePile bat, edo saia zaitez emaitza multzoa beheraka murriztea, zehaztutako espazioa edo denbora-marko espezifiko batera mugatuz.",
 	"error-query-timeout": "Sentitzen dugu, eskatutako informazioak denbora gehiegi hartu du prozesatzeko (timeout $1 {{PLURAL:$1|segundu $1|$1 segundu}}). Baliabideak aurrezteko, kontsulta automatikoki eten da.",
 	"error-rate-limit": "Armiarmen arakatze posiblea detektatu da. Gizakia bazara, eskaera gehiegi egiten ari zara epe labur batean. Itxaron $ 1 {{PLURAL:$1|minutu $1|$1minutu}} tresna hau berriro kargatu aurretik. Orduan, saioa has dezakezu, berriro gertatzea saihesteko.",

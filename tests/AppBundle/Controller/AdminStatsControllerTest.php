@@ -7,7 +7,7 @@ namespace Tests\AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
-use AppBundle\Controller\AdminStatsController;
+use Symfony\Bundle\FrameworkBundle\Client;
 
 /**
  * Integration/unit tests for the AdminStatsController.
@@ -35,32 +35,7 @@ class AdminStatsControllerTest extends WebTestCase
      */
     public function testIndex()
     {
-        $crawler = $this->client->request('GET', '/adminstats');
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
-    }
-
-    /**
-     * Test the method that sets up a AdminStats instance.
-     */
-    public function testSetupAdminStats()
-    {
-        $controller = new AdminStatsController();
-        $controller->setContainer($this->container);
-
-        // For now...
-        if (!$this->container->getParameter('app.is_labs') || $this->container->getParameter('app.single_wiki')) {
-            return;
-        }
-
-        $ret = $controller->setUpAdminStats('invalid.wiki.org', '2017-01-01', '2017-03-01');
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $ret);
-
-        $controller2 = new AdminStatsController();
-        $controller2->setContainer($this->container);
-
-        $adminStats = $controller2->setUpAdminStats('frwiki', '2017-01-01', '2017-03-01');
-        $this->assertInstanceOf('Xtools\AdminStats', $adminStats);
-        $this->assertEquals(1483228800, $adminStats->getStart());
-        $this->assertEquals(1488326400, $adminStats->getEnd());
+        $this->client->request('GET', '/adminstats');
+        static::assertEquals(200, $this->client->getResponse()->getStatusCode());
     }
 }

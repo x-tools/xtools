@@ -10,10 +10,13 @@ use MediaWiki\OAuthClient\ClientConfig;
 use MediaWiki\OAuthClient\Consumer;
 use MediaWiki\OAuthClient\Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Xtools\Edit;
 use Xtools\ProjectRepository;
 
 /**
@@ -41,9 +44,7 @@ class DefaultController extends XtoolsController
      */
     public function indexAction()
     {
-        // replace this example code with whatever you need
         return $this->render('default/index.html.twig', [
-            'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
             'xtPage' => 'home',
         ]);
     }
@@ -184,5 +185,83 @@ class DefaultController extends XtoolsController
     {
         $this->get('session')->invalidate();
         return $this->redirectToRoute('homepage');
+    }
+
+    /************************ API endpoints ************************/
+
+    /**
+     * Get domain name, URL, and API URL of the given project.
+     * @Route("/api/project/normalize/{project}", name="ProjectApiNormalize")
+     * @return JsonResponse
+     */
+    public function normalizeProjectApiAction()
+    {
+        return $this->getFormattedApiResponse([
+            'domain' => $this->project->getDomain(),
+            'url' => $this->project->getUrl(),
+            'api' => $this->project->getApiUrl(),
+            'database' => $this->project->getDatabaseName(),
+        ]);
+    }
+
+    /**
+     * Get all namespaces of the given project. This endpoint also does the same thing
+     * as the /project/normalize endpoint, returning other basic info about the project.
+     * @Route("/api/project/namespaces/{project}", name="ProjectApiNamespaces")
+     * @return JsonResponse
+     */
+    public function namespacesApiAction()
+    {
+        return $this->getFormattedApiResponse([
+            'domain' => $this->project->getDomain(),
+            'url' => $this->project->getUrl(),
+            'api' => $this->project->getApiUrl(),
+            'database' => $this->project->getDatabaseName(),
+            'namespaces' => $this->project->getNamespaces(),
+        ]);
+    }
+
+    /**
+     * Get assessment data for a given project.
+     * @Route("/api/project/assessments/{project}", name="ProjectApiAssessments")
+     * @return JsonResponse
+     */
+    public function projectAssessmentsApiAction()
+    {
+        return $this->getFormattedApiResponse([
+            'project' => $this->project->getDomain(),
+            'assessments' => $this->project->getPageAssessments()->getConfig(),
+        ]);
+    }
+
+    /**
+     * Get assessment data for all projects.
+     * @Route("/api/project/assessments", name="ApiAssessmentsConfig")
+     * @return JsonResponse
+     */
+    public function assessmentsConfigApiAction()
+    {
+        // Here there is no Project, so we don't use XtoolsController::getFormattedApiResponse().
+        $response = new JsonResponse();
+        $response->setEncodingOptions(JSON_NUMERIC_CHECK);
+        $response->setStatusCode(Response::HTTP_OK);
+        $response->setData([
+            'projects' => array_keys($this->container->getParameter('assessments')),
+            'config' => $this->container->getParameter('assessments'),
+        ]);
+
+        return $response;
+    }
+
+    /**
+     * Transform given wikitext to HTML using the XTools parser. Wikitext must be passed in as the query 'wikitext'.
+     * @Route("/api/project/parser/{project}")
+     * @return string Safe HTML.
+     */
+    public function wikify()
+    {
+        return new JsonResponse(
+            Edit::wikifyString($this->request->query->get('wikitext'), $this->project)
+        );
     }
 }
