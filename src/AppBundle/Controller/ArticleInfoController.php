@@ -633,7 +633,11 @@ class ArticleInfoController extends XtoolsController
         // is much easier (or maybe even only existing) solution for that.
 
         // Does path have `start` and `end` parameters (even empty ones)?
-        if (1 === preg_match('/(.+?)\/(|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?(?:\/(\d+))?$/', $article, $matches)) {
+        if (1 === preg_match(
+            '/(.+?)\/(|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?(?:\/(\d+))?$/',
+            $article,
+            $matches
+        )) {
             $article = $matches[1];
             $start = $matches[2];
             $end = isset($matches[3]) ? $matches[3] : null;
