@@ -567,9 +567,9 @@ class ArticleInfoController extends XtoolsController
      */
     public function topEditorsApiAction(Request $request, $article, $start = null, $end = null, $limit = 20)
     {
-        $this->recordApiUsage('page/topeditors');
+        $this->recordApiUsage('page/top_editors');
 
-        list($article, $start, $end) = $this->extractDatesFromParams($article, $start, $end);
+        list($article, $start, $end, $limit) = $this->extractDatesFromParams($article, $start, $end, $limit);
 
         // First validate project.
         $ret = $this->validateProjectAndUser($request);
@@ -618,13 +618,14 @@ class ArticleInfoController extends XtoolsController
     /**
      * Parse the given article, start, and end parameters. This is needed because it's possible
      * that the article parameter could contain /YYYY-MM-DD.
-     * @param $article
-     * @param $start
-     * @param $end
+     * @param string $article
+     * @param string $start
+     * @param string $end
+     * @param int $limit
      * @return array
      * @codeCoverageIgnore
      */
-    private function extractDatesFromParams($article, $start, $end)
+    private function extractDatesFromParams($article, $start, $end, $limit = null)
     {
         // This is some complicated stuff here. We pass $start and $end to method signature
         // for router regex parser to parse `article` with those parameters and then
@@ -632,15 +633,17 @@ class ArticleInfoController extends XtoolsController
         // is much easier (or maybe even only existing) solution for that.
 
         // Does path have `start` and `end` parameters (even empty ones)?
-        if (1 === preg_match('/(.+?)\/(|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?$/', $article, $matches)) {
+        if (1 === preg_match('/(.+?)\/(|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?(?:\/(\d+))?$/', $article, $matches)) {
             $article = $matches[1];
             $start = $matches[2];
             $end = isset($matches[3]) ? $matches[3] : null;
+            $limit = isset($matches[4]) ? $matches[4] : $limit;
         }
 
         return array_merge(
             [$article],
-            $this->getUTCFromDateParams($start, $end, false)
+            $this->getUTCFromDateParams($start, $end, false),
+            [$limit]
         );
     }
 }

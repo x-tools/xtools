@@ -57,6 +57,37 @@ Get links statistics of `Albert Einstein <https://en.wikipedia.org/wiki/Albert_E
 
     https://xtools.wmflabs.org/api/page/links/en.wikipedia.org/Albert_Einstein
 
+Top editors
+===========
+``GET /api/page/top_editors/{project}/{article}/{start}/{end}/{limit}``
+
+Get the top editors to a page by edit count. You can optionally pass in ``?nobots=1`` to
+exclude bots from the results.
+
+**Parameters:**
+
+* ``project`` (**required**) - Project domain or database name.
+* ``article`` (**required**) - Full page title.
+* ``start`` - Start date in the format ``YYYY-MM-DD``.
+* ``end`` - End date in the format ``YYYY-MM-DD``.
+* ``limit`` - Number of results to return. Default 20, maximum 1000.
+
+**Example:**
+
+Get the top editors to the English Wikipedia article
+`Albert Einstein <https://en.wikipedia.org/wiki/Albert_Einstein>`_.
+
+    `<https://xtools.wmflabs.org/api/page/top_editors/en.wikipedia/Albert_Einstein>`_
+
+Same as above, but return 50 results.
+
+    `<https://xtools.wmflabs.org/api/page/top_editors/en.wikipedia/Albert_Einstein///50>`_
+
+Get the top 50 editors in 2017 to the English Wikipedia article
+`Albert Einstein <https://en.wikipedia.org/wiki/Albert_Einstein>`_., excluding bots.
+
+    `<https://xtools.wmflabs.org/api/page/top_editors/en.wikipedia/Albert_Einstein/2017-01-01/2017-12-31/50?nobots=1>`_
+
 Assessments
 ===========
 ``GET /api/page/assessments/{project}/{articles}``
@@ -70,11 +101,11 @@ You can optionally pass in ``?classonly=1`` to get only the overall quality asse
 * ``project`` (**required**) - Project domain or database name.
 * ``article`` (**required**) - One or more full page titles, separated by pipes ``|``
 
-**Example:***
+**Example:**
 
 Get the assessment data on the English Wikipedia articles
-`Albert Einstein <https://en.wikipedia.org/wiki/Albert_Einstein>`_. and
-`Bob Dylan <https://en.wikipedia.org/wiki/Bob_Dylan>`_..
+`Albert Einstein <https://en.wikipedia.org/wiki/Albert_Einstein>`_ and
+`Bob Dylan <https://en.wikipedia.org/wiki/Bob_Dylan>`_.
 
     `<https://xtools.wmflabs.org/api/page/assessments/enwiki/Albert_Einstein|Bob_Dylan>`_
     `<https://xtools.wmflabs.org/api/page/assessments/en.wikipedia/Albert_Einstein|Bob_Dylan>`_
