@@ -15,16 +15,6 @@ use DateTime;
  */
 class EditCounter extends UserRights
 {
-
-    /** @var Project The project. */
-    protected $project;
-
-    /** @var User The user. */
-    protected $user;
-
-    /** @var I18nHelper For i18n and l10n. */
-    protected $i18n;
-
     /** @var int[] Revision and page counts etc. */
     protected $pairData;
 

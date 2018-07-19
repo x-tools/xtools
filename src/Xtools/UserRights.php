@@ -5,6 +5,7 @@
 
 namespace Xtools;
 
+use AppBundle\Helper\I18nHelper;
 use DateInterval;
 use Exception;
 
@@ -13,6 +14,9 @@ use Exception;
  */
 class UserRights extends Model
 {
+    /** @var I18nHelper For i18n and l10n. */
+    protected $i18n;
+
     /** @var string[] Rights changes, keyed by timestamp then 'added' and 'removed'. */
     protected $rightsChanges;
 
@@ -25,10 +29,14 @@ class UserRights extends Model
     /** @var array The current and former rights of the user. */
     protected $rightsStates = [];
 
+    /** @var Project The project. */
+    protected $project;
+
+    /** @var User The user. */
+    protected $user;
+
     /**
      * Get user rights changes of the given user.
-     * @param Project $project
-     * @param User $user
      * @return string[] Keyed by timestamp then 'added' and 'removed'.
      */
     public function getRightsChanges()
@@ -124,7 +132,7 @@ class UserRights extends Model
     }
 
     /**
-     * Get a list of the current trights (of given type) and the log.
+     * Get a list of the current rights (of given type) and the log.
      * @param string $type 'local' or 'global'
      * @return array [string[] current rights, array rights changes].
      */
@@ -248,7 +256,7 @@ class UserRights extends Model
 
             $rightsChanges[$row['log_timestamp']] = [
                 'logId' => $row['log_id'],
-                'admin' => $row['log_user_text'],
+                'admin' => $row['log_action'] === 'autopromote' ? null : $row['log_user_text'],
                 'comment' => $row['log_comment'],
                 'added' => array_values($added),
                 'removed' => array_values($removed),
