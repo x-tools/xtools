@@ -5,9 +5,9 @@
 
 namespace Tests\AppBundle\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
-use AppBundle\Controller\EditSummaryController;
 
 /**
  * Integration/unit tests for the ArticleInfoController.
@@ -28,8 +28,6 @@ class EditSummaryControllerTest extends WebTestCase
     {
         $this->client = static::createClient();
         $this->container = $this->client->getContainer();
-        $this->controller = new EditSummaryController();
-        $this->controller->setContainer($this->container);
     }
 
     /**
@@ -38,13 +36,13 @@ class EditSummaryControllerTest extends WebTestCase
     public function testIndex()
     {
         $crawler = $this->client->request('GET', '/editsummary/de.wikipedia');
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
         if (!$this->container->getParameter('app.is_labs') || $this->container->getParameter('app.single_wiki')) {
             return;
         }
 
         // should populate project input field
-        $this->assertEquals('de.wikipedia.org', $crawler->filter('#project_input')->attr('value'));
+        static::assertEquals('de.wikipedia.org', $crawler->filter('#project_input')->attr('value'));
     }
 }

@@ -85,7 +85,6 @@ class PagesRepository extends Repository
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
-        $this->stopwatch->start($cacheKey, 'XTools');
 
         $conditions = [
             'paSelects' => '',
@@ -120,7 +119,6 @@ class PagesRepository extends Repository
         $result = $this->executeProjectsQuery($sql)->fetchAll();
 
         // Cache and return.
-        $this->stopwatch->stop($cacheKey);
         return $this->setCache($cacheKey, $result);
     }
 

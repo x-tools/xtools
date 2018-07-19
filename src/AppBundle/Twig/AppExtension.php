@@ -37,15 +37,6 @@ class AppExtension extends Twig_Extension
     protected $requestTime;
 
     /**
-     * Get the name of this extension.
-     * @return string
-     */
-    public function getName()
-    {
-        return 'app_extension';
-    }
-
-    /**
      * Constructor, with the I18nHelper through dependency injection.
      * @param ContainerInterface $container
      * @param RequestStack $requestStack

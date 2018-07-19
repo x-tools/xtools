@@ -8,10 +8,8 @@ namespace Tests\Xtools;
 use PHPUnit_Framework_TestCase;
 use Xtools\AdminStats;
 use Xtools\AdminStatsRepository;
-use Xtools\User;
 use Xtools\Project;
 use Xtools\ProjectRepository;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
  * Tests of the AdminStats class.
@@ -53,18 +51,18 @@ class AdminStatsTest extends PHPUnit_Framework_TestCase
         // Single namespace, with defaults.
         $as = new AdminStats($this->project, $startUTC, $endUTC);
 
-        $this->asRepo->expects($this->once())
+        $this->asRepo->expects(static::once())
             ->method('getStats')
             ->willReturn($this->adminStatsFactory());
         $as->setRepository($this->asRepo);
 
         $as->prepareStats();
 
-        $this->assertEquals(1483228800, $as->getStart());
-        $this->assertEquals(1488326400, $as->getEnd());
-        $this->assertEquals(59, $as->numDays());
-        $this->assertEquals(1, $as->numAdmins());
-        $this->assertEquals(1, $as->getNumNonAdminsWithActions());
+        static::assertEquals(1483228800, $as->getStart());
+        static::assertEquals(1488326400, $as->getEnd());
+        static::assertEquals(59, $as->numDays());
+        static::assertEquals(1, $as->numAdmins());
+        static::assertEquals(1, $as->getNumNonAdminsWithActions());
     }
 
     /**
@@ -72,14 +70,14 @@ class AdminStatsTest extends PHPUnit_Framework_TestCase
      */
     public function testAdminsAndGroups()
     {
-        $as = new AdminStats($this->project);
+        $as = new AdminStats($this->project, 0, 0);
         $this->asRepo->expects($this->exactly(0))
             ->method('getStats')
             ->willReturn($this->adminStatsFactory());
         $as->setRepository($this->asRepo);
 
         // Without abbreviations.
-        $this->assertEquals(
+        static::assertEquals(
             [
                 'Bob' => ['sysop', 'checkuser'],
                 'Sarah' => ['epcoordinator'],
@@ -88,7 +86,7 @@ class AdminStatsTest extends PHPUnit_Framework_TestCase
         );
 
         // With abbreviations.
-        $this->assertEquals(
+        static::assertEquals(
             [
                 'Bob' => 'A/CU',
                 'Sarah' => '',
@@ -102,7 +100,7 @@ class AdminStatsTest extends PHPUnit_Framework_TestCase
      */
     public function testStats()
     {
-        $as = new AdminStats($this->project);
+        $as = new AdminStats($this->project, 0, 0);
         $this->asRepo->expects($this->once())
             ->method('getStats')
             ->willReturn($this->adminStatsFactory());
@@ -110,7 +108,7 @@ class AdminStatsTest extends PHPUnit_Framework_TestCase
         $ret = $as->prepareStats();
 
         // Test results.
-        $this->assertEquals(
+        static::assertEquals(
             [
                 'Bob' => array_merge(
                     $this->adminStatsFactory()[0],
@@ -125,7 +123,7 @@ class AdminStatsTest extends PHPUnit_Framework_TestCase
         );
 
         // At this point get stats should be the same.
-        $this->assertEquals($ret, $as->getStats());
+        static::assertEquals($ret, $as->getStats());
     }
 
     /**

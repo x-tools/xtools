@@ -116,7 +116,7 @@
 	"edits-not-in-categories": "Ediciones fuera de categorías",
 	"edits-with-summaries": "Ediciones con resumen",
 	"end": "Fecha de fin",
-	"error-articlinfo-api": "No se pudieron recuperar los datos sobre las revisiones.",
+	"error-articleinfo-api": "No se pudieron recuperar los datos sobre las revisiones.",
 	"error-report": "Siéntete libre de informar este error en $1 (requiere una cuenta de Wikimedia).",
 	"error-server-message": "El servidor respondió: $1",
 	"error-title": "Se ha producido un error grave en XTools.",

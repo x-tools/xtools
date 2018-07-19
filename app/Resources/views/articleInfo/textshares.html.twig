@@ -14,7 +14,7 @@
     <div class="panel panel-primary">
         <header class="panel-heading">
             <div class="text-center xt-heading-top">
-                <a class="back-to-search" href="{{ path('ArticleInfoResult', {project: project.domain, article:page.title}) }}">
+                <a class="back-to-search" href="{{ path('ArticleInfoResult', {project: project.domain, page:page.title}) }}">
                     <span class="glyphicon glyphicon-chevron-left"></span>
                     {{ msg('see-full-statistics') }}
                 </a>
@@ -75,7 +75,7 @@
                     </td>
                     <td>
                         {% if enabled('TopEdits') %}
-                            <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': username, 'namespace': page.namespace, 'article': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
+                            <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': username, 'namespace': page.namespace, 'page': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
                         {% endif %}
                         &middot;
                         {% if enabled('EditCounter') %}
@@ -95,7 +95,7 @@
             <tfoot><tr class="show-more-row">
                 <td></td>
                 <td>
-                    <a href="{{ path('ArticleInfoAuthorshipResult', {project:project.domain, article:page.title})}}">
+                    <a href="{{ path('ArticleInfoAuthorshipResult', {project:project.domain, page:page.title})}}">
                         {{ (textshares.totalAuthors - 10)|num_format }}
                         {{ msg('num-others', [textshares.totalAuthors - 10]) }}
                     </a>

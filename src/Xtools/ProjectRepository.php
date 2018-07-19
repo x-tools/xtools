@@ -153,7 +153,7 @@ class ProjectRepository extends Repository
             return $this->singleBasicInfo;
         }
 
-        // For muli-wiki setups, first check the cache.
+        // For multi-wiki setups, first check the cache.
         // First the all-projects cache, then the individual one.
         if ($this->cache->hasItem($this->cacheKeyAllProjects)) {
             foreach ($this->cache->getItem($this->cacheKeyAllProjects)->get() as $projMetadata) {

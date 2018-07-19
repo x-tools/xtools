@@ -5,6 +5,7 @@
 
 namespace Tests\AppBundle\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
 
@@ -34,8 +35,8 @@ class EditCounterControllerTest extends WebTestCase
      */
     public function testIndex()
     {
-        $crawler = $this->client->request('GET', '/ec');
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->client->request('GET', '/ec');
+        static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
         // For now...
         if (!$this->container->getParameter('app.is_labs') || $this->container->getParameter('app.single_wiki')) {
@@ -43,9 +44,9 @@ class EditCounterControllerTest extends WebTestCase
         }
 
         $crawler = $this->client->request('GET', '/ec/de.wikipedia.org');
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
         // should populate project input field
-        $this->assertEquals('de.wikipedia.org', $crawler->filter('#project_input')->attr('value'));
+        static::assertEquals('de.wikipedia.org', $crawler->filter('#project_input')->attr('value'));
     }
 }

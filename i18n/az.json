@@ -100,7 +100,7 @@
 	"edits-last-year": "Son 365 gündəki redaktələr",
 	"edits-with-summaries": "Xülasə ilə düzəlişlər",
 	"end": "Son tarix",
-	"error-articlinfo-api": "Tənzimləmə məlumatlarını əldə edə bilmir.",
+	"error-articleinfo-api": "Tənzimləmə məlumatlarını əldə edə bilmir.",
 	"error-report": "Xahiş edirik, bu səhvi $1-də bildirin (Wikimedia hesabı tələb olunur).",
 	"error-server-message": "Server deyib: $1",
 	"error-title": "XTools'ta ciddi bir səhv baş verdi.",

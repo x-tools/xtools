@@ -123,7 +123,7 @@
 	"edits-not-in-categories": "不在分类中的编辑",
 	"edits-with-summaries": "带摘要的编辑",
 	"end": "结束日期",
-	"error-articlinfo-api": "无法取得修订版本数据。",
+	"error-articleinfo-api": "无法取得修订版本数据。",
 	"error-pagepile-too-large": "对不起，要导出至页面堆的页面太多。您可以手动创建页面堆，或尝试通过限制为指定名字空间或时间范围缩小结果集。",
 	"error-query-timeout": "对不起，处理请求的信息花费了太长时间（超时$1{{PLURAL:$1|秒}}）。为了保存资源，查询已自动消灭。",
 	"error-rate-limit": "检测到疑似爬虫。如果您是人，那么您在短时间内做出了太多次请求。请等待$1{{PLURAL:$1|分钟}}再重新载入此工具。您可以登录以阻止此问题再次发生。",

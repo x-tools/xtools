@@ -84,16 +84,16 @@
                     <td>
                         {{ wiki.pageLogLinkRaw(page.page_title_ns, project) }}
                         &middot;
-                        <a href="{{ path('ArticleInfoResult', {project:project.domain, article:page.page_title_ns}) }}">{{ msg('tool-articleinfo') }}</a>
+                        <a href="{{ path('ArticleInfoResult', {project:project.domain, page:page.page_title_ns}) }}">{{ msg('tool-articleinfo') }}</a>
                         &middot;
-                        <a href="{{ path('TopEditsResult', {project:project.domain, username:user.username, namespace:page.page_namespace, article:page.page_title}) }}" >{{ msg('tool-topedits') }}</a>
+                        <a href="{{ path('TopEditsResult', {project:project.domain, username:user.username, namespace:page.page_namespace, page:page.page_title}) }}" >{{ msg('tool-topedits') }}</a>
                     </td>
                 </tr>
                 {% endfor %}
                 {% if pages|length >= 10 and te.topEdits|length > 1 %}
                     <tr>
                         <td colspan={{ showPageAssessment ? 4 : 3 }}>
-                            <a href="{{ path('TopEditsResult', {project:project.domain, username:user.username, namespace:ns, article:''}) }}">
+                            <a href="{{ path('TopEditsResult', {project:project.domain, username:user.username, namespace:ns, page:''}) }}">
                                 {{ msg('more') }}&hellip;
                             </a>
                         </td>

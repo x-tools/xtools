@@ -108,7 +108,7 @@
 	"edits-not-in-categories": "カテゴリ以外の編集",
 	"edits-with-summaries": "要約欄に記入した編集",
 	"end": "終了日",
-	"error-articlinfo-api": "版情報を取得できませんでした。",
+	"error-articleinfo-api": "版情報を取得できませんでした。",
 	"error-query-timeout": "申し訳ありませんが、リクエストされた情報の処理に時間がかかりすぎました（タイムアウト $1 {{PLURAL:$1|秒}}）。リソースを節約するために、クエリは自動的に強制終了されました。",
 	"error-report": "このエラーを$1で報告してください（ウィキメディアのアカウントが必要です）。",
 	"error-service-overload": "XToolsは現在、他のリクエストにサービスを提供しています。 数分後にもう一度お試しください。",

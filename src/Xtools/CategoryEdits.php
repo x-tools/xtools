@@ -45,16 +45,16 @@ class CategoryEdits extends Model
      * @param Project $project
      * @param User $user
      * @param array $categories
-     * @param string $start Start date in a format accepted by strtotime()
-     * @param string $end End date in a format accepted by strtotime()
+     * @param int|false $start As Unix timestamp.
+     * @param int|false $end As Unix timestamp.
      * @param int $offset Used for pagination, offset results by N edits.
      */
     public function __construct(
         Project $project,
         User $user,
         array $categories,
-        $start = '',
-        $end = '',
+        $start = false,
+        $end = false,
         $offset = 0
     ) {
         $this->project = $project;
@@ -62,8 +62,8 @@ class CategoryEdits extends Model
         $this->categories = array_map(function ($category) {
             return str_replace(' ', '_', $category);
         }, $categories);
-        $this->start = $start;
-        $this->end = $end;
+        $this->start = false === $start ? '' : date('Y-m-d', $start);
+        $this->end = false === $end ? '' : date('Y-m-d', $end);
         $this->offset = (int)$offset;
     }
 
@@ -175,8 +175,7 @@ class CategoryEdits extends Model
 
     /**
      * Get contributions made to the categories.
-     * @param bool $raw Wether to return raw data from the database,
-     *   or get Edit objects.
+     * @param bool $raw Wether to return raw data from the database, or get Edit objects.
      * @return string[]|Edit[]
      */
     public function getCategoryEdits($raw = false)
@@ -205,7 +204,7 @@ class CategoryEdits extends Model
 
     /**
      * Transform database rows into Edit objects.
-     * @param  string[] $revs
+     * @param string[] $revs
      * @return Edit[]
      */
     private function getEditsFromRevs(array $revs)
@@ -228,7 +227,6 @@ class CategoryEdits extends Model
     {
         $namespaces = $this->project->getNamespaces();
         $pageTitle = $rev['page_title'];
-        $fullPageTitle = '';
 
         if ((int)$rev['page_namespace'] === 0) {
             $fullPageTitle = $pageTitle;

@@ -6,14 +6,13 @@
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Xtools\CategoryEdits;
 use Xtools\CategoryEditsRepository;
-use Xtools\Project;
-use Xtools\User;
 
 /**
  * This controller serves the Category Edits tool.
@@ -23,29 +22,8 @@ class CategoryEditsController extends XtoolsController
     /** @var CategoryEdits The CategoryEdits instance. */
     protected $categoryEdits;
 
-    /** @var Project The project. */
-    protected $project;
-
-    /** @var User The user. */
-    protected $user;
-
     /** @var string[] The categories, with or without namespace. */
     protected $categories;
-
-    /** @var string The start date. */
-    protected $start = '';
-
-    /** @var string The end date. */
-    protected $end = '';
-
-    /** @var string The OFFSET of contributions list. */
-    protected $offset;
-
-    /** @var int|string The namespace ID or 'all' for all namespaces. */
-    protected $namespace;
-
-    /** @var bool Whether or not this is a subrequest. */
-    protected $isSubRequest;
 
     /** @var array Data that is passed to the view. */
     private $output;
@@ -62,26 +40,32 @@ class CategoryEditsController extends XtoolsController
     }
 
     /**
+     * CategoryEditsController constructor.
+     * @param RequestStack $requestStack
+     * @param ContainerInterface $container
+     */
+    public function __construct(RequestStack $requestStack, ContainerInterface $container)
+    {
+        // Will redirect back to index if the user has too high of an edit count.
+        $this->tooHighEditCountAction = $this->getIndexRoute();
+
+        parent::__construct($requestStack, $container);
+    }
+
+    /**
      * Display the search form.
      * @Route("/categoryedits", name="CategoryEdits")
      * @Route("/categoryedits/", name="CategoryEditsSlash")
-     * @Route("/catedits", name="CategoryEditsShort")
-     * @Route("/catedits/", name="CategoryEditsShortSlash")
-     * @param Request $request The HTTP request.
+     * @Route("/categoryedits/{project}", name="CategoryEditsProject")
      * @return Response
      * @codeCoverageIgnore
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
-        $params = $this->parseQueryParams($request);
-
         // Redirect if at minimum project, username and categories are provided.
-        if (isset($params['project']) && isset($params['username']) && isset($params['categories'])) {
-            return $this->redirectToRoute('CategoryEditsResult', $params);
+        if (isset($this->params['project']) && isset($this->params['username']) && isset($this->params['categories'])) {
+            return $this->redirectToRoute('CategoryEditsResult', $this->params);
         }
-
-        // Convert the given project (or default project) into a Project instance.
-        $params['project'] = $this->getProjectFromQuery($params);
 
         return $this->render('categoryEdits/index.html.twig', array_merge([
             'xtPageTitle' => 'tool-categoryedits',
@@ -92,31 +76,17 @@ class CategoryEditsController extends XtoolsController
             'namespace' => 0,
             'start' => '',
             'end' => '',
-        ], $params));
+            'username' => '',
+        ], $this->params, ['project' => $this->project]));
     }
 
     /**
-     * Set defaults, and instantiate the CategoryEdits model. This is called at
-     * the top of every view action.
-     * @param Request $request The HTTP request.
-     * @return RedirectResponse|null
+     * Set defaults, and instantiate the CategoryEdits model. This is called at the top of every view action.
      * @codeCoverageIgnore
      */
-    private function setupCategoryEdits(Request $request)
+    private function setupCategoryEdits()
     {
-        // Will redirect back to index if the user has too high of an edit count.
-        $ret = $this->validateProjectAndUser($request, 'CategoryEdits');
-        if ($ret instanceof RedirectResponse) {
-            return $ret;
-        } else {
-            list($this->project, $this->user) = $ret;
-        }
-
-        // Normalize all parameters and set class properties.
-        // A redirect is returned if we want the normalized values in the URL.
-        if ($this->normalizeAndSetParams($request) instanceof RedirectResponse) {
-            return $ret;
-        }
+        $this->extractCategories();
 
         $this->categoryEdits = new CategoryEdits(
             $this->project,
@@ -130,9 +100,6 @@ class CategoryEditsController extends XtoolsController
         $categoryEditsRepo->setContainer($this->container);
         $this->categoryEdits->setRepository($categoryEditsRepo);
 
-        $this->isSubRequest = $request->get('htmlonly')
-            || $this->get('request_stack')->getParentRequest() !== null;
-
         $this->output = [
             'xtPage' => 'categoryedits',
             'xtTitle' => $this->user->getUsername(),
@@ -144,35 +111,14 @@ class CategoryEditsController extends XtoolsController
     }
 
     /**
-     * Go through the categories, start, end, and offset parameters
-     * and normalize values, and set them on class properties.
-     * @param Request $request
-     * @return null|RedirectResponse Redirect if categoires were normalized.
+     * Go through the categories and normalize values, and set them on class properties.
+     * @return null|RedirectResponse Redirect if categories were normalized.
      * @codeCoverageIgnore
      */
-    private function normalizeAndSetParams(Request $request)
+    private function extractCategories()
     {
-        $categories = $request->get('categories');
-
-        // Defaults
-        $start = '';
-        $end = '';
-
-        // Some categories contain slashes, so we'll first make the differentiation
-        // and extract out the start, end and offset params, even if they are empty.
-        if (1 === preg_match(
-            '/(.+?)\/(|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?(?:\/(\d+))?$/',
-            $categories,
-            $matches
-        )) {
-            $categories = $matches[1];
-            $start = $matches[2];
-            $end = isset($matches[3]) ? $matches[3] : null;
-            $this->offset = isset($matches[4]) ? $matches[4] : 0;
-        }
-
-        // Split cateogries by pipe.
-        $categories = explode('|', $categories);
+        // Split categories by pipe.
+        $categories = explode('|', $this->request->get('categories'));
 
         // Loop through the given categories, stripping out the namespace.
         // If a namespace was removed, it is flagged it as normalize
@@ -189,22 +135,13 @@ class CategoryEditsController extends XtoolsController
 
         // Redirect if normalized, since we don't want the Category: prefix in the URL.
         if ($normalized) {
-            return $this->redirectToRoute($request->get('_route'), array_merge(
-                $request->attributes->get('_route_params'),
+            return $this->redirectToRoute($this->request->get('_route'), array_merge(
+                $this->request->attributes->get('_route_params'),
                 ['categories' => implode('|', $this->categories)]
             ));
         }
 
-        // 'false' means the dates are optional and returned as 'false' if empty.
-        list($this->start, $this->end) = $this->getUTCFromDateParams($start, $end, false);
-
-        // Format dates as needed by User model, if the date is present.
-        if ($this->start !== false) {
-            $this->start = date('Y-m-d', $this->start);
-        }
-        if ($this->end !== false) {
-            $this->end = date('Y-m-d', $this->end);
-        }
+        return null;
     }
 
     /**
@@ -213,23 +150,18 @@ class CategoryEditsController extends XtoolsController
      *     "/categoryedits/{project}/{username}/{categories}/{start}/{end}",
      *     name="CategoryEditsResult",
      *     requirements={
-     *         "categories" = ".+",
-     *         "start" = "|\d{4}-\d{2}-\d{2}",
-     *         "end" = "|\d{4}-\d{2}-\d{2}"
+     *         "categories"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
+     *         "start"="|\d{4}-\d{2}-\d{2}",
+     *         "end"="|\d{4}-\d{2}-\d{2}"
      *     },
-     *     defaults={"start" = "", "end" = ""}
+     *     defaults={"start" = false, "end" = false}
      * )
-     * @param Request $request The HTTP request.
-     * @return RedirectResponse|Response
+     * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction(Request $request)
+    public function resultAction()
     {
-        // Will redirect back to index if the user has too high of an edit count.
-        $ret = $this->setupCategoryEdits($request);
-        if ($ret instanceof RedirectResponse) {
-            return $ret;
-        }
+        $this->setupCategoryEdits();
 
         // Render the view with all variables set.
         return $this->render('categoryEdits/result.html.twig', $this->output);
@@ -241,24 +173,19 @@ class CategoryEditsController extends XtoolsController
      *   "/categoryedits-contributions/{project}/{username}/{categories}/{start}/{end}/{offset}",
      *   name="CategoryContributionsResult",
      *   requirements={
-     *       "categories" = ".+",
+     *       "categories" = "(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
      *       "start" = "|\d{4}-\d{2}-\d{2}",
      *       "end" = "|\d{4}-\d{2}-\d{2}",
      *       "offset" = "|\d+"
      *   },
-     *   defaults={"start" = "", "end" = "", "offset" = ""}
+     *   defaults={"start" = false, "end" = false, "offset" = 0}
      * )
-     * @param Request $request The HTTP request.
-     * @return Response|RedirectResponse
+     * @return Response
      * @codeCoverageIgnore
      */
-    public function categoryContributionsAction(Request $request)
+    public function categoryContributionsAction()
     {
-        // Will redirect back to index if the user has too high of an edit count.
-        $ret = $this->setupCategoryEdits($request);
-        if ($ret instanceof RedirectResponse) {
-            return $ret;
-        }
+        $this->setupCategoryEdits();
 
         return $this->render('categoryEdits/contributions.html.twig', $this->output);
     }
@@ -271,61 +198,26 @@ class CategoryEditsController extends XtoolsController
      *   "/api/user/category_editcount/{project}/{username}/{categories}/{start}/{end}",
      *   name="UserApiCategoryEditCount",
      *   requirements={
-     *       "categories" = ".+",
+     *       "categories" = "(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
      *       "start" = "|\d{4}-\d{2}-\d{2}",
      *       "end" = "|\d{4}-\d{2}-\d{2}"
      *   },
-     *   defaults={"start" = "", "end" = ""}
+     *   defaults={"start" = false, "end" = false}
      * )
-     * @param Request $request The HTTP request.
-     * @return Response
+     * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function categoryEditCountApiAction(Request $request)
+    public function categoryEditCountApiAction()
     {
         $this->recordApiUsage('user/category_editcount');
 
-        $ret = $this->setupCategoryEdits($request);
-        if ($ret instanceof RedirectResponse) {
-            // FIXME: Refactor JSON errors/responses, use Intuition as a service.
-            return new JsonResponse(
-                [
-                    'error' => $this->getFlashMessage(),
-                ],
-                Response::HTTP_NOT_FOUND
-            );
-        }
+        $this->setupCategoryEdits();
 
-        $res = $this->getJsonData();
-        $res['total_editcount'] = $this->categoryEdits->getEditCount();
-
-        $response = new JsonResponse();
-        $response->setEncodingOptions(JSON_NUMERIC_CHECK);
-
-        $res['category_editcount'] = $this->categoryEdits->getCategoryEditCount();
-
-        $response->setData($res);
-        return $response;
-    }
-
-    /**
-     * Get data that will be used in API responses.
-     * @return array
-     * @codeCoverageIgnore
-     */
-    private function getJsonData()
-    {
         $ret = [
-            'project' => $this->project->getDomain(),
-            'username' => $this->user->getUsername(),
+            'total_editcount' => $this->categoryEdits->getEditCount(),
+            'category_editcount' => $this->categoryEdits->getCategoryEditCount(),
         ];
 
-        foreach (['categories', 'start', 'end', 'offset'] as $param) {
-            if (isset($this->{$param}) && $this->{$param} != '') {
-                $ret[$param] = $this->{$param};
-            }
-        }
-
-        return $ret;
+        return $this->getFormattedApiResponse($ret);
     }
 }

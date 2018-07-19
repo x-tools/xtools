@@ -7,11 +7,9 @@ namespace Xtools;
 
 use AppBundle\Helper\I18nHelper;
 use DateTime;
-use Doctrine\DBAL\Connection;
 
 /**
- * An EditSummary provides statistics about a user's edit summary
- * usage over time.
+ * An EditSummary provides statistics about a user's edit summary usage over time.
  */
 class EditSummary extends Model
 {
@@ -26,9 +24,6 @@ class EditSummary extends Model
 
     /** @var string|int The namespace to target. */
     protected $namespace;
-
-    /** @var Connection $conn Connection to the replica database. */
-    protected $conn;
 
     /** @var int Number of edits from present to consider as 'recent'. */
     protected $numEditsRecent;

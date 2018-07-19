@@ -5,15 +5,14 @@
 
 namespace Tests\AppBundle\Controller;
 
+use AppBundle\Controller\XtoolsController;
+use AppBundle\Exception\XtoolsHttpException;
+use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Controller\SimpleEditCounterController;
-use Xtools\Project;
-use Xtools\ProjectRepository;
-use Xtools\User;
-use Xtools\UserRepository;
-use Xtools\Page;
-use Xtools\PageRepository;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Integration/unit tests for the abstract XtoolsController.
@@ -27,6 +26,9 @@ class XtoolsControllerTest extends WebTestCase
     /** @var Client The Symfony client */
     protected $client;
 
+    /** @var XtoolsController The controller. */
+    protected $controller;
+
     /**
      * Set up the tests.
      */
@@ -34,27 +36,39 @@ class XtoolsControllerTest extends WebTestCase
     {
         $this->client = static::createClient();
         $this->container = $this->client->getContainer();
+    }
+
+    /**
+     * Create a new controller, making a Request with the given params.
+     * @param array $params
+     * @return XtoolsController
+     */
+    private function getControllerWithRequest($params = [])
+    {
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request($params));
 
         // SimpleEditCounterController used solely for testing, since we
         // can't instantiate the abstract class XtoolsController.
-        $this->controller = new SimpleEditCounterController();
-        $this->controller->setContainer($this->container);
+        return new SimpleEditCounterController($requestStack, $this->container);
     }
 
     /**
      * Make sure all parameters are correctly parsed.
      * @dataProvider paramsProvider
+     * @param array $params
+     * @param array $expected
      */
     public function testParseQueryParams($params, $expected)
     {
-        // Untestabe on Travis :(
+        // Untestable on Travis :(
         if (!$this->container->getParameter('app.is_labs')) {
             return;
         }
 
-        $request = new Request($params);
-        $result = $this->controller->parseQueryParams($request);
-        $this->assertEquals($expected, $result);
+        $controller = $this->getControllerWithRequest($params);
+        $result = $controller->parseQueryParams();
+        static::assertEquals($expected, $result);
     }
 
     /**
@@ -70,14 +84,14 @@ class XtoolsControllerTest extends WebTestCase
                     'project' => 'en.wikipedia.org',
                     'username' => 'Jimbo Wales',
                     'namespace' => '0',
-                    'article' => 'Test page',
+                    'page' => 'Test',
                     'start' => '2016-01-01',
                     'end' => '2017-01-01',
                 ], [
                     'project' => 'en.wikipedia.org',
                     'username' => 'Jimbo Wales',
                     'namespace' => '0',
-                    'article' => 'Test page',
+                    'page' => 'Test',
                     'start' => '2016-01-01',
                     'end' => '2017-01-01',
                 ]
@@ -85,36 +99,36 @@ class XtoolsControllerTest extends WebTestCase
                 // Legacy parameters mixed with modern.
                 [
                     'project' => 'enwiki',
-                    'user' => 'Test user',
+                    'user' => 'GoldenRing',
                     'namespace' => '0',
-                    'page' => 'Test page',
+                    'article' => 'Test',
                 ], [
                     'project' => 'enwiki',
-                    'username' => 'Test user',
+                    'username' => 'GoldenRing',
                     'namespace' => '0',
-                    'article' => 'Test page',
+                    'page' => 'Test',
                 ]
             ], [
                 // Missing parameters.
                 [
                     'project' => 'en.wikipedia',
-                    'article' => 'Test_page',
+                    'page' => 'Test',
                 ], [
                     'project' => 'en.wikipedia',
-                    'article' => 'Test_page',
+                    'page' => 'Test',
                 ]
             ], [
                 // Legacy style.
                 [
                     'wiki' => 'wikipedia',
                     'lang' => 'de',
-                    'page' => 'Test page',
+                    'article' => 'Test',
                     'name' => 'Bob Dylan',
                     'begin' => '2016-01-01',
                     'end' => '2017-01-01',
                 ], [
                     'project' => 'de.wikipedia.org',
-                    'article' => 'Test page',
+                    'page' => 'Test',
                     'username' => 'Bob Dylan',
                     'start' => '2016-01-01',
                     'end' => '2017-01-01',
@@ -124,10 +138,10 @@ class XtoolsControllerTest extends WebTestCase
                 [
                     'wiki' => 'wikimedia',
                     'lang' => 'meta',
-                    'page' => 'Test page',
+                    'page' => 'Test',
                 ], [
                     'project' => 'meta.wikimedia.org',
-                    'article' => 'Test page',
+                    'page' => 'Test',
                 ]
             ], [
                 // Legacy style of the legacy style.
@@ -137,7 +151,7 @@ class XtoolsControllerTest extends WebTestCase
                     'page' => '311',
                 ], [
                     'project' => 'da.wikipedia.org',
-                    'article' => '311'
+                    'page' => '311'
                 ]
             ], [
                 // Language-neutral project.
@@ -147,7 +161,7 @@ class XtoolsControllerTest extends WebTestCase
                     'page' => 'Q12345',
                 ], [
                     'project' => 'wikidata.org',
-                    'article' => 'Q12345',
+                    'page' => 'Q12345',
                 ]
             ], [
                 // Language-neutral, ultra legacy style.
@@ -157,7 +171,7 @@ class XtoolsControllerTest extends WebTestCase
                     'page' => 'Q12345',
                 ], [
                     'project' => 'wikidata.org',
-                    'article' => 'Q12345',
+                    'page' => 'Q12345',
                 ]
             ],
         ];
@@ -168,23 +182,21 @@ class XtoolsControllerTest extends WebTestCase
      */
     public function testProjectFromQuery()
     {
-        // Untestabe on Travis :(
+        // Untestable on Travis :(
         if (!$this->container->getParameter('app.is_labs')) {
             return;
         }
 
-        $project = $this->controller->getProjectFromQuery([
-            'project' => 'de.wiktionary.org'
-        ]);
-        $this->assertEquals(
+        $controller = $this->getControllerWithRequest(['project' => 'de.wiktionary.org']);
+        static::assertEquals(
             'de.wiktionary.org',
-            $project->getDomain()
+            $controller->getProjectFromQuery()->getDomain()
         );
 
-        $project = $this->controller->getProjectFromQuery([]);
-        $this->assertEquals(
+        $controller = $this->getControllerWithRequest();
+        static::assertEquals(
             'en.wikipedia.org',
-            $project->getDomain()
+            $controller->getProjectFromQuery()->getDomain()
         );
     }
 
@@ -193,41 +205,32 @@ class XtoolsControllerTest extends WebTestCase
      */
     public function testValidateProjectAndUser()
     {
-        // Untestabe on Travis :(
+        // Untestable on Travis :(
         if (!$this->container->getParameter('app.is_labs')) {
             return;
         }
 
-        $request = new Request([
+        $controller = $this->getControllerWithRequest([
             'project' => 'fr.wikibooks.org',
             'username' => 'MusikAnimal',
             'namespace' => '0',
         ]);
-        list($project, $user) = $this->controller->validateProjectAndUser($request);
-        $this->assertEquals('fr.wikibooks.org', $project->getDomain());
-        $this->assertEquals('MusikAnimal', $user->getUsername());
 
-        $request = new Request([
-            'project' => 'fr.wikibooks.org',
-            'username' => 'Not a real user 8723849237',
-        ]);
-        $ret = $this->controller->validateProjectAndUser($request);
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $ret);
+        $project = $controller->validateProject('fr.wikibooks.org');
+        static::assertEquals('fr.wikibooks.org', $project->getDomain());
 
-        $request = new Request([
-            'project' => 'invalid.project.org',
-            'username' => 'MusikAnimal',
-        ]);
-        $ret = $this->controller->validateProjectAndUser($request);
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $ret);
+        $user = $controller->validateUser('MusikAnimal');
+        static::assertEquals('MusikAnimal', $user->getUsername());
+
+        static::setExpectedException(XtoolsHttpException::class);
+        $controller->validateUser('Not a real user 8723849237');
+
+        static::setExpectedException(XtoolsHttpException::class);
+        $controller->validateProject('invalid.project.org');
 
         // Too high of an edit count.
-        $request = new Request([
-            'project' => 'en.wikipedia.org',
-            'username' => 'Materialscientist',
-        ]);
-        $ret = $this->controller->validateProjectAndUser($request, 'homepage');
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $ret);
+        static::setExpectedException(XtoolsHttpException::class);
+        $controller->validateUser('Materialscientist');
     }
 
     /**
@@ -235,19 +238,25 @@ class XtoolsControllerTest extends WebTestCase
      */
     public function testGetParams()
     {
-        $request = new Request([
+        // Untestable on Travis :(
+        if (!$this->container->getParameter('app.is_labs')) {
+            return;
+        }
+
+        $controller = $this->getControllerWithRequest([
             'project' => 'enwiki',
-            'username' => 'Test user',
+            'username' => 'Jimbo Wales',
             'namespace' => '0',
             'article' => 'Foo',
             'redirects' => ''
         ]);
-        $this->assertEquals([
+
+        static::assertEquals([
             'project' => 'enwiki',
-            'username' => 'Test user',
+            'username' => 'Jimbo Wales',
             'namespace' => '0',
             'article' => 'Foo',
-        ], $this->controller->getParams($request));
+        ], $controller->getParams());
     }
 
     /**
@@ -255,21 +264,18 @@ class XtoolsControllerTest extends WebTestCase
      */
     public function testValidatePage()
     {
-        // Untestabe on Travis :(
+        // Untestable on Travis :(
         if (!$this->container->getParameter('app.is_labs')) {
             return;
         }
 
-        $project = ProjectRepository::getProject('enwiki', $this->container);
-        $this->assertInstanceOf(
-            'Symfony\Component\HttpFoundation\RedirectResponse',
-            $this->controller->getAndValidatePage($project, 'Test page')
-        );
+        $controller = $this->getControllerWithRequest(['project' => 'enwiki']);
+        static::setExpectedException(XtoolsHttpException::class);
+        $controller->validatePage('Test adjfaklsdjf');
 
-        $project = ProjectRepository::getProject('enwiki', $this->container);
-        $this->assertInstanceOf(
+        static::assertInstanceOf(
             'Xtools\Page',
-            $this->controller->getAndValidatePage($project, 'Bob Dylan')
+            $controller->validatePage('Bob Dylan')
         );
     }
 
@@ -278,43 +284,46 @@ class XtoolsControllerTest extends WebTestCase
      */
     public function testUTCFromDateParams()
     {
-        $this->assertEquals(
+        $controller = $this->getControllerWithRequest();
+
+        static::assertEquals(
             [1483228800, 1501545600],
-            $this->controller->getUTCFromDateParams(
+            $controller->getUTCFromDateParams(
                 '2017-01-01',
                 '2017-08-01'
             )
         );
 
-        $this->assertEquals(
+        static::assertEquals(
             [1498867200, 1501545600],
-            $this->controller->getUTCFromDateParams(
-                null,
-                '2017-08-01'
+            $controller->getUTCFromDateParams(
+                false,
+                '2017-08-01',
+                true // Use default, -1 month from end date.
             )
         );
 
-        $this->assertEquals(
+        static::assertEquals(
             [1501545600, 1504224000],
-            $this->controller->getUTCFromDateParams(
+            $controller->getUTCFromDateParams(
                 '2017-09-01',
                 '2017-08-01'
             )
         );
 
         // Without using defaults.
-        $this->assertEquals(
+        static::assertEquals(
             [false, 1501545600],
-            $this->controller->getUTCFromDateParams(
+            $controller->getUTCFromDateParams(
                 null,
                 '2017-08-01',
                 false
             )
         );
 
-        $this->assertEquals(
+        static::assertEquals(
             [1501545600, 1504224000],
-            $this->controller->getUTCFromDateParams(
+            $controller->getUTCFromDateParams(
                 '2017-09-01',
                 '2017-08-01',
                 false

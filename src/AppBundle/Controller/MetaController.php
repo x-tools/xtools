@@ -5,11 +5,11 @@
 
 namespace AppBundle\Controller;
 
+use DateTime;
+use Doctrine\DBAL\Connection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
-use DateTime;
 use Symfony\Component\HttpFoundation\Response;
-use Doctrine\DBAL\Connection;
 
 /**
  * This controller serves everything for the Meta tool.
@@ -32,15 +32,12 @@ class MetaController extends XtoolsController
      * @Route("/meta", name="Meta")
      * @Route("/meta/", name="MetaSlash")
      * @Route("/meta/index.php", name="MetaIndexPhp")
-     * @param Request $request
      * @return Response
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
-        $params = $this->parseQueryParams($request);
-
-        if (isset($params['start']) && isset($params['end'])) {
-            return $this->redirectToRoute('MetaResult', $params);
+        if (isset($this->params['start']) && isset($this->params['end'])) {
+            return $this->redirectToRoute('MetaResult', $this->params);
         }
 
         return $this->render('meta/index.html.twig', [
@@ -53,13 +50,11 @@ class MetaController extends XtoolsController
     /**
      * Display the results.
      * @Route("/meta/{start}/{end}/{legacy}", name="MetaResult")
-     * @param string $start Start date
-     * @param string $end End date
      * @param bool $legacy Non-blank value indicates to show stats for legacy XTools
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction($start, $end, $legacy = false)
+    public function resultAction($legacy = false)
     {
         $db = $legacy ? 'toolsdb' : 'default';
         $table = $legacy ? 's51187__metadata.xtools_timeline' : 'usage_timeline';
@@ -68,13 +63,13 @@ class MetaController extends XtoolsController
             ->getManager($db)
             ->getConnection();
 
-        $toolUsage = $this->getToolUsageStats($client, $table, $start, $end);
-        $apiUsage = $this->getApiUsageStats($client, $start, $end);
+        $toolUsage = $this->getToolUsageStats($client, $table);
+        $apiUsage = $this->getApiUsageStats($client);
 
         return $this->render('meta/result.html.twig', [
             'xtPage' => 'meta',
-            'start' => $start,
-            'end' => $end,
+            'start' => $this->start,
+            'end' => $this->end,
             'toolUsage' => $toolUsage,
             'apiUsage' => $apiUsage,
         ]);
@@ -84,15 +79,15 @@ class MetaController extends XtoolsController
      * Get usage statistics of the core tools.
      * @param Connection $client
      * @param string $table Table to query.
-     * @param string $start Start date.
-     * @param string $end End date.
      * @return array
      * @codeCoverageIgnore
      */
-    private function getToolUsageStats(Connection $client, $table, $start, $end)
+    private function getToolUsageStats(Connection $client, $table)
     {
         $query = $client->prepare("SELECT * FROM $table
                                    WHERE date >= :start AND date <= :end");
+        $start = date('Y-m-d', $this->start);
+        $end = date('Y-m-d', $this->end);
         $query->bindParam('start', $start);
         $query->bindParam('end', $end);
         $query->execute();
@@ -142,15 +137,15 @@ class MetaController extends XtoolsController
     /**
      * Get usage statistics of the API.
      * @param Connection $client
-     * @param string $start Start date.
-     * @param string $end End date.
      * @return array
      * @codeCoverageIgnore
      */
-    private function getApiUsageStats(Connection $client, $start, $end)
+    private function getApiUsageStats(Connection $client)
     {
         $query = $client->prepare("SELECT * FROM usage_api_timeline
                                    WHERE date >= :start AND date <= :end");
+        $start = date('Y-m-d', $this->start);
+        $end = date('Y-m-d', $this->end);
         $query->bindParam('start', $start);
         $query->bindParam('end', $end);
         $query->execute();

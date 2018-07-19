@@ -119,7 +119,7 @@
 	"edits-not-in-categories": "Úpravy nejsou v kategoriích",
 	"edits-with-summaries": "Editací se shrnutím",
 	"end": "Koncové datum",
-	"error-articlinfo-api": "Nepodařilo se načíst data revize.",
+	"error-articleinfo-api": "Nepodařilo se načíst data revize.",
 	"error-pagepile-too-large": "Omlouváme se, ale přidali jste příliš mnoho stránek k exportu na PagePile. Můžete vytvořit PagePile manuálně, nebo se pokusit zmenšit počet stránek omezením na specifický jmenný prostor nebo čas.",
 	"error-query-timeout": "Omlouváme se, ale požadovek příliš dlouho neodpovídal (jeho načtení trvalo více než $1 {{PLURAL:$1|sekundu|sekundy|sekund}}). V zájmu zachování zdrojů byl požadavek automaticky zrušen.",
 	"error-rate-limit": "Zjištěny možné pokusy o hack robotem. Pokud jste člověk, vytváříte příliš mnoho příkazů během krátké časové doby. Počkejte prosím $1 {{PLURAL:$1|minutu|minuty|minut}} před znovunačtením tohoto nástroje. Poté se můžete přihlásit, čímž tomuto příště zabráníte.",

@@ -119,7 +119,7 @@
 	"edits-not-in-categories": "Edições não em categorias",
 	"edits-with-summaries": "Edições com resumo",
 	"end": "Data final",
-	"error-articlinfo-api": "Não foi possível obter os dados de revisão.",
+	"error-articleinfo-api": "Não foi possível obter os dados de revisão.",
 	"error-pagepile-too-large": "Desculpe, existem muitas páginas para exportar para o PagePile. Você pode criar manualmente um PagePile, ou tentar reduzir o conjunto de resultados limitando-se a um espaço de nome específico ou a um intervalo de tempo.",
 	"error-query-timeout": "Lamentamos, a informação solicitada levou muito tempo para processar (tempo limite: $1 {{PLURAL:$1|segundo|segundos}}). Para economizar os recursos, a consulta foi automaticamente interrompida.",
 	"error-rate-limit": "Foi detetada uma possível monitorização de rede. Se for um humano, está a realizar muitos pedidos durante um curto período de tempo. Por favor, aguarde $1 {{PLURAL:$1|minuto|minutos}}, antes de recarregar esta ferramenta. Pode autenticar-se para evitar que isto aconteça novamente.",

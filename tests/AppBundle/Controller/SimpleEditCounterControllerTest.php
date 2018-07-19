@@ -5,9 +5,9 @@
 
 namespace Tests\AppBundle\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
-use AppBundle\Controller\SimpleEditCounterController;
 
 /**
  * Integration/unit tests for the ArticleInfoController.
@@ -28,8 +28,6 @@ class SimpleEditCounterControllerTest extends WebTestCase
     {
         $this->client = static::createClient();
         $this->container = $this->client->getContainer();
-        $this->controller = new SimpleEditCounterController();
-        $this->controller->setContainer($this->container);
     }
 
     /**
@@ -37,7 +35,7 @@ class SimpleEditCounterControllerTest extends WebTestCase
      */
     public function testIndex()
     {
-        $crawler = $this->client->request('GET', '/sc/');
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->client->request('GET', '/sc/');
+        static::assertEquals(200, $this->client->getResponse()->getStatusCode());
     }
 }

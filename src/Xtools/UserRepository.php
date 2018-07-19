@@ -191,8 +191,7 @@ class UserRepository extends Repository
     }
 
     /**
-     * Get SQL clauses for rev_timestamp, based on whether values for
-     * the given start and end parameters exist.
+     * Get SQL clauses for rev_timestamp, based on whether values for the given start and end parameters exist.
      * @param string $start
      * @param string $end
      * @param string $tableAlias Alias of table FOLLOWED BY DOT.
@@ -217,7 +216,7 @@ class UserRepository extends Repository
     /**
      * Prepare the given SQL, bind the given parameters, and execute the Doctrine Statement.
      * @param string $sql
-     * @param User   $user
+     * @param User $user
      * @param string $namespace
      * @param string $start
      * @param string $end

@@ -5,9 +5,9 @@
 
 namespace Tests\AppBundle\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
-use AppBundle\Controller\ArticleInfoController;
 
 /**
  * Integration/unit tests for the ArticleInfoController.
@@ -28,8 +28,6 @@ class ArticleInfoControllerTest extends WebTestCase
     {
         $this->client = static::createClient();
         $this->container = $this->client->getContainer();
-        $this->controller = new ArticleInfoController();
-        $this->controller->setContainer($this->container);
     }
 
     /**
@@ -38,14 +36,14 @@ class ArticleInfoControllerTest extends WebTestCase
     public function testIndex()
     {
         $crawler = $this->client->request('GET', '/articleinfo/de.wikipedia');
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
         if (!$this->container->getParameter('app.is_labs') || $this->container->getParameter('app.single_wiki')) {
             return;
         }
 
         // should populate project input field
-        $this->assertEquals('de.wikipedia.org', $crawler->filter('#project_input')->attr('value'));
+        static::assertEquals('de.wikipedia.org', $crawler->filter('#project_input')->attr('value'));
     }
 
     /**
@@ -58,27 +56,27 @@ class ArticleInfoControllerTest extends WebTestCase
             return;
         }
 
-        $crawler = $this->client->request('GET', '/api/page/articleinfo/en.wikipedia.org/Main_Page');
+        $this->client->request('GET', '/api/page/articleinfo/en.wikipedia.org/Main_Page');
 
         $response = $this->client->getResponse();
-        $this->assertEquals(200, $response->getStatusCode());
+        static::assertEquals(200, $response->getStatusCode());
 
         $data = json_decode($response->getContent(), true);
 
-        // Some basic tests that should always hold true
-        $this->assertEquals($data['project'], 'en.wikipedia.org');
-        $this->assertEquals($data['page'], 'Main Page');
-        $this->assertTrue($data['revisions'] > 4000);
-        $this->assertTrue($data['editors'] > 400);
-        $this->assertEquals($data['author'], 'TwoOneTwo');
-        $this->assertEquals($data['created_at'], '2002-01-26');
-        $this->assertEquals($data['created_rev_id'], 139992);
+        // Some basic tests that should always hold true.
+        static::assertEquals($data['project'], 'en.wikipedia.org');
+        static::assertEquals($data['page'], 'Main Page');
+        static::assertTrue($data['revisions'] > 4000);
+        static::assertTrue($data['editors'] > 400);
+        static::assertEquals($data['author'], 'TwoOneTwo');
+        static::assertEquals($data['created_at'], '2002-01-26');
+        static::assertEquals($data['created_rev_id'], 139992);
 
-        $this->assertEquals(
+        static::assertEquals(
             [
-                'project', 'page', 'watchers', 'pageviews', 'pageviews_offset',
-                'revisions', 'editors', 'author', 'author_editcount', 'created_at',
-                'created_rev_id', 'modified_at', 'secs_since_last_edit', 'last_edit_id'
+                'project', 'page', 'watchers', 'pageviews', 'pageviews_offset',  'revisions',
+                'editors', 'author', 'author_editcount', 'created_at',  'created_rev_id', 'modified_at',
+                'secs_since_last_edit', 'last_edit_id', 'assessment'
             ],
             array_keys($data)
         );

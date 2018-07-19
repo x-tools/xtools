@@ -125,7 +125,7 @@
 	"edits-not-in-categories": "不在分類的編輯數",
 	"edits-with-summaries": "帶有摘要的編輯數",
 	"end": "結束日期",
-	"error-articlinfo-api": "無法取得修訂資料內容。",
+	"error-articleinfo-api": "無法取得修訂資料內容。",
 	"error-pagepile-too-large": "很抱歉，目前有太多頁面匯出到 PagePile 上。您可以手動建立一個 PagePile，或嘗試透過特定命名空間或時間範圍的限制來減少結果集合。",
 	"error-query-timeout": "很抱歉，所請求訊息花費太長時間處理（逾時 $1 {{PLURAL:$1|\n秒|秒}}）。為了保護系統資源，已自動將查詢給刪除。",
 	"error-rate-limit": "偵測到可能是網路蜘蛛或網路爬蟲。如果您的身份只是一般普通人，那是因您在短時間內弄出太多請求。在重新載入此工具前，請先等待 $1 {{PLURAL:$1|秒|秒}}。然後您可以登入頁面來防止再次出現此情況。",

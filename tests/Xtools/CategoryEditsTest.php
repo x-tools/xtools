@@ -11,7 +11,6 @@ use Xtools\CategoryEditsRepository;
 use Xtools\Edit;
 use Xtools\Page;
 use Xtools\Project;
-use Xtools\ProjectRepository;
 use Xtools\User;
 use Xtools\UserRepository;
 
@@ -22,6 +21,9 @@ class CategoryEditsTest extends PHPUnit_Framework_TestCase
 {
     /** @var Project The project instance. */
     protected $project;
+
+    /** @var CategoryEdits The CategoryEdits instance. */
+    protected $ce;
 
     /** @var CategoryEditsRepository The AdminStats repo instance. */
     protected $ceRepo;
@@ -51,8 +53,8 @@ class CategoryEditsTest extends PHPUnit_Framework_TestCase
             $this->project,
             $this->user,
             ['Living_people', 'Musicians_from_New_York_City'],
-            '2017-01-01',
-            '2017-02-01',
+            strtotime('2017-01-01'),
+            strtotime('2017-02-01'),
             50
         );
     }
@@ -62,18 +64,18 @@ class CategoryEditsTest extends PHPUnit_Framework_TestCase
      */
     public function testBasics()
     {
-        $this->assertEquals('2017-01-01', $this->ce->getStart());
-        $this->assertEquals('2017-02-01', $this->ce->getEnd());
-        $this->assertEquals(50, $this->ce->getOffset());
-        $this->assertEquals(
+        static::assertEquals('2017-01-01', $this->ce->getStart());
+        static::assertEquals('2017-02-01', $this->ce->getEnd());
+        static::assertEquals(50, $this->ce->getOffset());
+        static::assertEquals(
             ['Living_people', 'Musicians_from_New_York_City'],
             $this->ce->getCategories()
         );
-        $this->assertEquals(
+        static::assertEquals(
             'Living_people|Musicians_from_New_York_City',
             $this->ce->getCategoriesPiped()
         );
-        $this->assertEquals(
+        static::assertEquals(
             ['Living people', 'Musicians from New York City'],
             $this->ce->getCategoriesNormalized()
         );
@@ -95,10 +97,10 @@ class CategoryEditsTest extends PHPUnit_Framework_TestCase
             ]);
         $this->ce->setRepository($this->ceRepo);
 
-        $this->assertEquals(500, $this->ce->getEditCount());
-        $this->assertEquals(200, $this->ce->getCategoryEditCount());
-        $this->assertEquals(40.0, $this->ce->getCategoryPercentage());
-        $this->assertEquals(
+        static::assertEquals(500, $this->ce->getEditCount());
+        static::assertEquals(200, $this->ce->getCategoryEditCount());
+        static::assertEquals(40.0, $this->ce->getCategoryPercentage());
+        static::assertEquals(
             ['Living_people' => 150, 'Musicians_from_New_York_City' => 50],
             $this->ce->getCategoryCounts()
         );
@@ -150,8 +152,8 @@ class CategoryEditsTest extends PHPUnit_Framework_TestCase
             ->willReturn($revs);
         $this->ce->setRepository($this->ceRepo);
 
-        $this->assertEquals($revs, $this->ce->getCategoryEdits(true));
-        $this->assertEquals($edits, $this->ce->getCategoryEdits());
+        static::assertEquals($revs, $this->ce->getCategoryEdits(true));
+        static::assertEquals($edits, $this->ce->getCategoryEdits());
 
         // Shouldn't call the repo method again (asserted by the ->exactly(2) above).
         $this->ce->getCategoryEdits();

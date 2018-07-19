@@ -108,7 +108,6 @@ class EditCounterRepository extends UserRightsRepository
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
-        $this->stopwatch->start($cacheKey, 'XTools');
 
         // Query.
         $loggingTable = $this->getTableName($project->getDatabaseName(), 'logging');
@@ -176,7 +175,6 @@ class EditCounterRepository extends UserRightsRepository
         }
 
         // Cache and return.
-        $this->stopwatch->stop($cacheKey);
         return $this->setCache($cacheKey, $logCounts);
     }
 
@@ -295,12 +293,11 @@ class EditCounterRepository extends UserRightsRepository
             return false;
         }
 
-        // Set up cache and stopwatch.
+        // Set up cache.
         $cacheKey = $this->getCacheKey(func_get_args(), 'ec_globaleditcounts');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
-        $this->stopwatch->start($cacheKey, 'XTools');
 
         $this->log->debug(__METHOD__." Getting global edit counts from for ".$user->getUsername());
 
@@ -327,7 +324,6 @@ class EditCounterRepository extends UserRightsRepository
         }
 
         // Cache and return.
-        $this->stopwatch->stop($cacheKey);
         return $this->setCache($cacheKey, $out);
     }
 
@@ -369,7 +365,6 @@ class EditCounterRepository extends UserRightsRepository
     {
         // Cache?
         $cacheKey = $this->getCacheKey(func_get_args(), 'ec_namespacetotals');
-        $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -393,7 +388,6 @@ class EditCounterRepository extends UserRightsRepository
         }, $results));
 
         // Cache and return.
-        $this->stopwatch->stop($cacheKey);
         return $this->setCache($cacheKey, $namespaceTotals);
     }
 
@@ -409,7 +403,6 @@ class EditCounterRepository extends UserRightsRepository
     {
         // Check cache.
         $cacheKey = $this->getCacheKey('ec_globalcontribs.'.$user->getCacheKey().'.'.$limit.'.'.$offset);
-        $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -451,7 +444,6 @@ class EditCounterRepository extends UserRightsRepository
         ])->fetchAll();
 
         // Cache and return.
-        $this->stopwatch->stop($cacheKey);
         return $this->setCache($cacheKey, $revisions);
     }
 
@@ -472,7 +464,6 @@ class EditCounterRepository extends UserRightsRepository
     public function getMonthCounts(Project $project, User $user)
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'ec_monthcounts');
-        $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -494,7 +485,6 @@ class EditCounterRepository extends UserRightsRepository
         ])->fetchAll();
 
         // Cache and return.
-        $this->stopwatch->stop($cacheKey);
         return $this->setCache($cacheKey, $totals);
     }
 
@@ -507,7 +497,6 @@ class EditCounterRepository extends UserRightsRepository
     public function getTimeCard(Project $project, User $user)
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'ec_timecard');
-        $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -528,7 +517,6 @@ class EditCounterRepository extends UserRightsRepository
         ])->fetchAll();
 
         // Cache and return.
-        $this->stopwatch->stop($cacheKey);
         return $this->setCache($cacheKey, $totals);
     }
 
@@ -544,7 +532,6 @@ class EditCounterRepository extends UserRightsRepository
     {
         // Set up cache.
         $cacheKey = $this->getCacheKey(func_get_args(), 'ec_editsizes');
-        $this->stopwatch->start($cacheKey, 'XTools');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
@@ -568,7 +555,6 @@ class EditCounterRepository extends UserRightsRepository
         $results = $this->executeProjectsQuery($sql, $params)->fetch();
 
         // Cache and return.
-        $this->stopwatch->stop($cacheKey);
         return $this->setCache($cacheKey, $results);
     }
 

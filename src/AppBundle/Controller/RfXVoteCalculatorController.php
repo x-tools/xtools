@@ -5,21 +5,16 @@
 
 namespace AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Xtools\ProjectRepository;
 use Xtools\PageRepository;
 use Xtools\RFX;
-use Xtools\User;
 
 /**
  * Controller for the RfX Vote Calculator.
  */
-class RfXVoteCalculatorController extends Controller
+class RfXVoteCalculatorController extends XtoolsController
 {
-
     /**
      * Get the name of the tool's index route.
      * @return string
@@ -40,31 +35,10 @@ class RfXVoteCalculatorController extends Controller
      */
     public function indexAction()
     {
-        // Grab the request object, grab the values out of it.
-        $request = Request::createFromGlobals();
-
-        $projectQuery = $request->query->get('project');
-        $username = $request->query->get('username');
-
-        if ($projectQuery != '' && $username != '') {
-            $routeParams = [ 'project' => $projectQuery, 'username' => $username ];
-            return $this->redirectToRoute(
-                'rfxvoteResult',
-                $routeParams
-            );
-        } elseif ($projectQuery != '') {
-            return $this->redirectToRoute(
-                'rfxvoteResult',
-                [
-                    'project' => $projectQuery
-                ]
-            );
+        // Redirect if at minimum project, username and categories are provided.
+        if (isset($this->params['project']) && isset($this->params['username'])) {
+            return $this->redirectToRoute('RfXVoteResult', $this->params);
         }
-
-        // Instantiate the project if we can, or use the default.
-        $project = (!empty($projectQuery))
-            ? ProjectRepository::getProject($projectQuery, $this->container)
-            : ProjectRepository::getDefaultProject($this->container);
 
         return $this->render(
             'rfxVoteCalculator/index.html.twig',
@@ -72,66 +46,57 @@ class RfXVoteCalculatorController extends Controller
                 'xtPageTitle' => 'tool-rfxvote',
                 'xtSubtitle' => 'tool-rfxvote-desc',
                 'xtPage' => 'rfxvote',
-                'project' => $project,
+                'project' => $this->project,
             ]
         );
     }
 
     /**
      * Result View of RfXVoteCalculator
-     * @Route("/rfxvote/{project}/{username}", name="rfxvoteResult")
-     * @param string $project  The project we're working on
-     * @param string $username Username of the user we're analysing.
+     * @Route("/rfxvote/{project}/{username}", name="RfXVoteResult")
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction($project, $username)
+    public function resultAction()
     {
         $conn = $this->getDoctrine()->getManager('replicas')->getConnection();
 
-        $projectData = ProjectRepository::getProject($project, $this->container);
-        $projectRepo = $projectData->getRepository();
-        $userData = new User($username);
+        $projectRepo = $this->project->getRepository();
         $pageRepo = new PageRepository();
         $pageRepo->setContainer($this->container);
 
-        $dbName = $projectData->getDatabaseName();
+        $dbName = $this->project->getDatabaseName();
 
         $rfxParam = $this->getParameter('rfx');
 
-        if (!$projectData->exists() || $rfxParam == null) {
-            $this->addFlash('notice', ['invalid-project', $project]);
-            return $this->redirectToRoute('rfxvote');
+        $namespaces = $this->project->getNamespaces();
+
+        if (!isset($rfxParam[$this->project->getDomain()])) {
+            $this->addFlash('notice', ['invalid-project-cant-use', $this->project->getDomain()]);
+            return $this->redirectToRoute('RfXVoteCalculator');
         }
 
-        $namespaces = $projectData->getNamespaces();
-
-        if (!isset($rfxParam[$projectData->getDomain()])) {
-            $this->addFlash('notice', ['invalid-project-cant-use', $project]);
-            return $this->redirectToRoute('rfxvote');
-        }
-
-        $pageTypes = $rfxParam[$projectData->getDomain()]['pages'];
-        $namespace
-            = $rfxParam[$projectData->getDomain()]['rfx_namespace'] !== null
-            ? $rfxParam[$projectData->getDomain()]['rfx_namespace'] : 4;
+        $pageTypes = $rfxParam[$this->project->getDomain()]['pages'];
+        $namespace = $rfxParam[$this->project->getDomain()]['rfx_namespace'] !== null
+            ? $rfxParam[$this->project->getDomain()]['rfx_namespace']
+            : 4;
 
         $finalData = [];
 
         // We should probably figure out a better way to do this...
         $ignoredPages = '';
 
-        if (isset($rfxParam[$projectData->getDomain()]['excluded_title'])) {
+        if (isset($rfxParam[$this->project->getDomain()]['excluded_title'])) {
             $titlesExcluded
-                = $rfxParam[$projectData->getDomain()]['excluded_title'];
+                = $rfxParam[$this->project->getDomain()]['excluded_title'];
             foreach ($titlesExcluded as $ignoredPage) {
                 $ignoredPages .= "AND p.page_title != \"$ignoredPage\"\r\n";
             }
         }
 
-        if (isset($rfxParam[$projectData->getDomain()]['excluded_regex'])) {
+        if (isset($rfxParam[$this->project->getDomain()]['excluded_regex'])) {
             $titlesExcluded
-                = $rfxParam[$projectData->getDomain()]['excluded_regex'];
+                = $rfxParam[$this->project->getDomain()]['excluded_regex'];
             foreach ($titlesExcluded as $ignoredPage) {
                 $ignoredPages .= "AND p.page_title NOT LIKE \"%$ignoredPage%\"\r\n";
             }
@@ -150,8 +115,8 @@ class RfXVoteCalculatorController extends Controller
             $type = str_replace(' ', '_', $type);
 
             $pageTable = $projectRepo->getTableName($dbName, 'page');
-            $revisionTable
-                = $projectRepo->getTableName($dbName, 'revision');
+            $revisionTable = $projectRepo->getTableName($dbName, 'revision');
+            $username = $this->user->getUsername();
 
             $sql = "SELECT DISTINCT p.page_namespace, p.page_title
                     FROM $pageTable p
@@ -179,15 +144,15 @@ class RfXVoteCalculatorController extends Controller
             $titleArray = array_chunk($titles, 20);
 
             foreach ($titleArray as $titlesWorked) {
-                $pageData = $pageRepo->getPagesWikitext($projectData, $titlesWorked);
+                $pageData = $pageRepo->getPagesWikitext($this->project, $titlesWorked);
 
                 foreach ($pageData as $title => $text) {
                     $type = str_replace('_', ' ', $type);
                     $rfx = new RFX(
                         $text,
-                        $rfxParam[$projectData->getDomain()]['sections'],
+                        $rfxParam[$this->project->getDomain()]['sections'],
                         $namespaces[2],
-                        $rfxParam[$projectData->getDomain()]['date_regexp'],
+                        $rfxParam[$this->project->getDomain()]['date_regexp'],
                         $username
                     );
                     $section = $rfx->getUserSectionFound();
@@ -230,9 +195,9 @@ class RfXVoteCalculatorController extends Controller
             'rfxVoteCalculator/result.html.twig',
             [
                 'xtPage' => 'rfxvote',
-                'xtTitle' => $username,
-                'user' => $userData,
-                'project' => $projectData,
+                'xtTitle' => $this->user->getUsername(),
+                'user' => $this->user,
+                'project' => $this->project,
                 'data'=> $finalData,
                 'totals' => $totals,
             ]

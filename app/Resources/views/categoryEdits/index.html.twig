@@ -5,7 +5,7 @@
     <form class="col-lg-8 col-lg-offset-2" action="{{ path('CategoryEdits') }}" method="get" accept-charset="utf-8" >
         <fieldset class="form-fieldset">
             {{ forms.wiki_input(project) }}
-            {{ forms.user_input(true, false, project) }}
+            {{ forms.user_input(true, false, project, false, username) }}
 
             <div class="input-group form-row">
                 <label class="input-group-addon form-label" for="category_selector">

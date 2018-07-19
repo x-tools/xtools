@@ -6,7 +6,6 @@
 namespace Xtools;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mediawiki\Api\MediawikiApi;
@@ -16,7 +15,6 @@ use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use DateInterval;
@@ -27,7 +25,6 @@ use DateInterval;
  */
 abstract class Repository
 {
-
     /** @var Container The application's DI container. */
     protected $container;
 
@@ -43,11 +40,8 @@ abstract class Repository
     /** @var CacheItemPoolInterface The cache. */
     protected $cache;
 
-    /** @var LoggerInterface The log. */
+    /** @var LoggerInterface The logger. */
     protected $log;
-
-    /** @var Stopwatch The stopwatch for time profiling. */
-    protected $stopwatch;
 
     /**
      * Create a new Repository with nothing but a null-logger.
@@ -66,7 +60,6 @@ abstract class Repository
         $this->container = $container;
         $this->cache = $container->get('cache.app');
         $this->log = $container->get('logger');
-        $this->stopwatch = $container->get('debug.stopwatch');
     }
 
     /**

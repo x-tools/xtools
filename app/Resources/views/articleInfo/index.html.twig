@@ -5,9 +5,9 @@
     <form class="col-lg-8 col-lg-offset-2" action="{{ path('ArticleInfo') }}" method="get" accept-charset="utf-8">
         <fieldset class="form-fieldset">
             {{ forms.wiki_input(project) }}
-            {{ forms.page_input(true, project) }}
-            {{ forms.date_input('start', false) }}
-            {{ forms.date_input('end', false) }}
+            {{ forms.page_input(true, project, page) }}
+            {{ forms.date_input('start', false, start) }}
+            {{ forms.date_input('end', false, end) }}
         </fieldset>
         {{ forms.submit_btn }}
     </form>

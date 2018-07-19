@@ -5,6 +5,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Exception\XtoolsHttpException;
 use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,7 +18,6 @@ use Xtools\ArticleInfo;
 use Xtools\ArticleInfoRepository;
 use Xtools\Page;
 use Xtools\Project;
-use Xtools\ProjectRepository;
 
 /**
  * This controller serves the search form and results for the ArticleInfo tool
@@ -25,8 +25,7 @@ use Xtools\ProjectRepository;
 class ArticleInfoController extends XtoolsController
 {
     /**
-     * Get the name of the tool's index route.
-     * This is also the name of the associated model.
+     * Get the name of the tool's index route. This is also the name of the associated model.
      * @return string
      * @codeCoverageIgnore
      */
@@ -41,26 +40,25 @@ class ArticleInfoController extends XtoolsController
      * @Route("/articleinfo/", name="articleInfoSlash")
      * @Route("/articleinfo/index.php", name="articleInfoIndexPhp")
      * @Route("/articleinfo/{project}", name="ArticleInfoProject")
-     * @param Request $request The HTTP request.
      * @return Response
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
-        $params = $this->parseQueryParams($request);
-
-        if (isset($params['project']) && isset($params['article'])) {
-            return $this->redirectToRoute('ArticleInfoResult', $params);
+        if (isset($this->params['project']) && isset($this->params['page'])) {
+            return $this->redirectToRoute('ArticleInfoResult', $this->params);
         }
 
-        // Convert the given project (or default project) into a Project instance.
-        $params['project'] = $this->getProjectFromQuery($params);
-
-        return $this->render('articleInfo/index.html.twig', [
+        return $this->render('articleInfo/index.html.twig', array_merge([
             'xtPage' => 'articleinfo',
             'xtPageTitle' => 'tool-articleinfo',
             'xtSubtitle' => 'tool-articleinfo-desc',
-            'project' => $params['project'],
-        ]);
+            'project' => $this->project,
+
+            // Defaults that will get overridden if in $params.
+            'start' => '',
+            'end' => '',
+            'page' => '',
+        ], $this->params, ['project' => $this->project]));
     }
 
     /**
@@ -96,7 +94,7 @@ class ArticleInfoController extends XtoolsController
             // Check for errors.
             $errorOutput = $process->getErrorOutput();
             if ($errorOutput != '') {
-                $response = new \Symfony\Component\HttpFoundation\Response(
+                $response = new Response(
                     "Error generating uglified JS. The server said:\n\n$errorOutput"
                 );
                 return $response;
@@ -113,7 +111,7 @@ class ArticleInfoController extends XtoolsController
                 "\n * Released under GPL v3 license.\n */\n" . $rendered;
         }
 
-        $response = new \Symfony\Component\HttpFoundation\Response($rendered);
+        $response = new Response($rendered);
         $response->headers->set('Content-Type', 'text/javascript');
         return $response;
     }
@@ -121,49 +119,34 @@ class ArticleInfoController extends XtoolsController
     /**
      * Display the results in given date range.
      * @Route(
-     *    "/articleinfo/{project}/{article}/{start}/{end}", name="ArticleInfoResult",
+     *    "/articleinfo/{project}/{page}/{start}/{end}", name="ArticleInfoResult",
      *     requirements={
-     *         "article"=".+",
+     *         "page"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
      *         "start"="|\d{4}-\d{2}-\d{2}",
      *         "end"="|\d{4}-\d{2}-\d{2}",
+     *     },
+     *     defaults={
+     *         "start"=false,
+     *         "end"=false,
      *     }
      * )
-     * @param Request $request
-     * @param $article
-     * @param null|string $start
-     * @param null|string $end
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction(Request $request, $article, $start = null, $end = null)
+    public function resultAction()
     {
-        list($article, $start, $end) = $this->extractDatesFromParams($article, $start, $end);
-
-        // In this case only the project is validated.
-        $ret = $this->validateProjectAndUser($request);
-        if ($ret instanceof RedirectResponse) {
-            return $ret;
-        } else {
-            $project = $ret[0];
-        }
-
-        $page = $this->getAndValidatePage($project, $article);
-        if ($page instanceof RedirectResponse) {
-            return $page;
-        }
-
-        if (!$this->isDateRangeValid($page, $start, $end)) {
+        if (!$this->isDateRangeValid($this->page, $this->start, $this->end)) {
             $this->addFlash('notice', ['date-range-outside-revisions']);
 
             return $this->redirectToRoute('ArticleInfoResult', [
-                'project' => $request->get('project'),
-                'article' => $article
+                'project' => $this->request->get('project'),
+                'page' => $this->page->getTitle(true),
             ]);
         }
 
         $articleInfoRepo = new ArticleInfoRepository();
         $articleInfoRepo->setContainer($this->container);
-        $articleInfo = new ArticleInfo($page, $this->container, $start, $end);
+        $articleInfo = new ArticleInfo($this->page, $this->container, $this->start, $this->end);
         $articleInfo->setRepository($articleInfoRepo);
         $articleInfo->setI18nHelper($this->container->get('app.i18n_helper'));
 
@@ -184,17 +167,17 @@ class ArticleInfoController extends XtoolsController
 
         $ret = [
             'xtPage' => 'articleinfo',
-            'xtTitle' => $page->getTitle(),
-            'project' => $project,
-            'editorlimit' => $request->query->get('editorlimit', 20),
-            'botlimit' => $request->query->get('botlimit', 10),
+            'xtTitle' => $this->page->getTitle(),
+            'project' => $this->project,
+            'editorlimit' => $this->request->query->get('editorlimit', 20),
+            'botlimit' => $this->request->query->get('botlimit', 10),
             'pageviewsOffset' => 60,
             'ai' => $articleInfo,
-            'page' => $page,
+            'page' => $this->page,
         ];
 
         // Output the relevant format template.
-        $format = $request->query->get('format', 'html');
+        $format = $this->request->query->get('format', 'html');
         if ($format == '') {
             // The default above doesn't work when the 'format' parameter is blank.
             $format = 'html';
@@ -222,45 +205,30 @@ class ArticleInfoController extends XtoolsController
     /**
      * Get textshares information about the article.
      * @Route(
-     *     "/articleinfo-authorship/{project}/{article}",
+     *     "/articleinfo-authorship/{project}/{page}",
      *     name="ArticleInfoAuthorshipResult",
-     *     requirements={"article"=".+"}
+     *     requirements={"page"=".+"}
      * )
-     * @param Request $request The HTTP request.
-     * @param string $article
      * @return Response
      * @codeCoverageIgnore
      */
-    public function textsharesResultAction(Request $request, $article)
+    public function textsharesResultAction()
     {
-        // In this case only the project is validated.
-        $ret = $this->validateProjectAndUser($request);
-        if ($ret instanceof RedirectResponse) {
-            return $ret;
-        } else {
-            $project = $ret[0];
-        }
-
-        $page = $this->getAndValidatePage($project, $article);
-        if ($page instanceof RedirectResponse) {
-            return $page;
-        }
-
         $articleInfoRepo = new ArticleInfoRepository();
         $articleInfoRepo->setContainer($this->container);
-        $articleInfo = new ArticleInfo($page, $this->container);
+        $articleInfo = new ArticleInfo($this->page, $this->container);
         $articleInfo->setRepository($articleInfoRepo);
 
-        $isSubRequest = $request->get('htmlonly')
+        $isSubRequest = $this->request->get('htmlonly')
             || $this->get('request_stack')->getParentRequest() !== null;
 
         $limit = $isSubRequest ? 10 : null;
 
         return $this->render('articleInfo/textshares.html.twig', [
             'xtPage' => 'articleinfo',
-            'xtTitle' => $page->getTitle(),
-            'project' => $project,
-            'page' => $page,
+            'xtTitle' => $this->page->getTitle(),
+            'project' => $this->project,
+            'page' => $this->page,
             'textshares' => $articleInfo->getTextshares($limit),
             'is_sub_request' => $isSubRequest,
         ]);
@@ -271,51 +239,24 @@ class ArticleInfoController extends XtoolsController
     /**
      * Get basic info on a given article.
      * @Route(
-     *     "/api/articleinfo/{project}/{article}",
+     *     "/api/articleinfo/{project}/{page}",
      *     name="ArticleInfoApiAction",
-     *     requirements={"article"=".+"}
+     *     requirements={"page"=".+"}
      * )
-     * @Route("/api/page/articleinfo/{project}/{article}", requirements={"article"=".+"})
-     * @param Request $request The HTTP request.
-     * @param string $project
-     * @param string $article
+     * @Route("/api/page/articleinfo/{project}/{page}", requirements={"page"=".+"})
      * @return Response|JsonResponse
      * See ArticleInfoControllerTest::testArticleInfoApi()
      * @codeCoverageIgnore
      */
-    public function articleInfoApiAction(Request $request, $project, $article)
+    public function articleInfoApiAction()
     {
-        $projectData = ProjectRepository::getProject($project, $this->container);
-        if (!$projectData->exists()) {
-            return new JsonResponse(
-                ['error' => "$project is not a valid project"],
-                Response::HTTP_NOT_FOUND
-            );
+        $data = $this->getArticleInfoApiData($this->project, $this->page);
+
+        if ($this->request->query->get('format') === 'html') {
+            return $this->getApiHtmlResponse($this->project, $this->page, $data);
         }
 
-        $page = $this->getAndValidatePage($projectData, $article);
-        if ($page instanceof RedirectResponse) {
-            return new JsonResponse(
-                ['error' => "$article was not found"],
-                Response::HTTP_NOT_FOUND
-            );
-        }
-
-        $data = $this->getArticleInfoApiData($projectData, $page);
-
-        if ($request->query->get('format') === 'html') {
-            return $this->getApiHtmlResponse($projectData, $page, $data);
-        }
-
-        $body = array_merge([
-            'project' => $projectData->getDomain(),
-            'page' => $page->getTitle(),
-        ], $data);
-
-        return new JsonResponse(
-            $body,
-            Response::HTTP_OK
-        );
+        return $this->getFormattedApiResponse($data);
     }
 
     /**
@@ -390,9 +331,9 @@ class ArticleInfoController extends XtoolsController
     private function getApiHtmlResponse(Project $project, Page $page, $data)
     {
         $response = $this->render('articleInfo/api.html.twig', [
-            'data' => $data,
             'project' => $project,
             'page' => $page,
+            'data' => $data,
         ]);
 
         // All /api routes by default respond with a JSON content type.
@@ -408,246 +349,113 @@ class ArticleInfoController extends XtoolsController
     /**
      * Get prose statistics for the given article.
      * @Route(
-     *     "/api/page/prose/{project}/{article}",
+     *     "/api/page/prose/{project}/{page}",
      *     name="PageApiProse",
-     *     requirements={"article"=".+"}
+     *     requirements={"page"=".+"}
      * )
-     * @param Request $request The HTTP request.
-     * @param string $article
-     * @return JsonResponse|RedirectResponse
-     * @codeCoverageIgnore
-     */
-    public function proseStatsApiAction(Request $request, $article)
-    {
-        $this->recordApiUsage('page/prose');
-
-        // In this case only the project is validated.
-        $ret = $this->validateProjectAndUser($request);
-        if ($ret instanceof RedirectResponse) {
-            return $ret;
-        } else {
-            /** @var Project $project */
-            $project = $ret[0];
-        }
-
-        $page = $this->getAndValidatePage($project, $article);
-        if ($page instanceof RedirectResponse) {
-            return new JsonResponse(
-                ['error' => "$article was not found"],
-                Response::HTTP_NOT_FOUND
-            );
-        }
-
-        $articleInfoRepo = new ArticleInfoRepository();
-        $articleInfoRepo->setContainer($this->container);
-        $articleInfo = new ArticleInfo($page, $this->container);
-        $articleInfo->setRepository($articleInfoRepo);
-
-        $ret = array_merge(
-            [
-                'project' => $project->getDomain(),
-                'page' => $page->getTitle(),
-            ],
-            $articleInfo->getProseStats()
-        );
-
-        return new JsonResponse(
-            $ret,
-            Response::HTTP_OK
-        );
-    }
-
-    /**
-     * Get the page assessments of a page, along with various related metadata.
-     * @Route(
-     *     "/api/page/assessments/{project}/{articles}",
-     *     name="PageApiAssessments",
-     *     requirements={"article"=".+"}
-     * )
-     * @param Request $request
-     * @param string $articles May be multiple pages separated by pipes, e.g. Foo|Bar|Baz
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function assessmentsApiAction(Request $request, $articles)
+    public function proseStatsApiAction()
+    {
+        $this->recordApiUsage('page/prose');
+
+        $articleInfoRepo = new ArticleInfoRepository();
+        $articleInfoRepo->setContainer($this->container);
+        $articleInfo = new ArticleInfo($this->page, $this->container);
+        $articleInfo->setRepository($articleInfoRepo);
+
+        return $this->getFormattedApiResponse($articleInfo->getProseStats());
+    }
+
+    /**
+     * Get the page assessments of one or more pages, along with various related metadata.
+     * @Route(
+     *     "/api/page/assessments/{project}/{pages}",
+     *     name="PageApiAssessments",
+     *     requirements={"pages"=".+"}
+     * )
+     * @param string $pages May be multiple pages separated by pipes, e.g. Foo|Bar|Baz
+     * @return JsonResponse
+     * @codeCoverageIgnore
+     */
+    public function assessmentsApiAction($pages)
     {
         $this->recordApiUsage('page/assessments');
 
-        // First validate project.
-        $ret = $this->validateProjectAndUser($request);
-        if ($ret instanceof RedirectResponse) {
-            return new JsonResponse(
-                ['error' => 'Invalid project'],
-                Response::HTTP_NOT_FOUND
-            );
-        } else {
-            $project = $ret[0];
-        }
-
-        $pages = explode('|', $articles);
+        $pages = explode('|', $pages);
         $out = [];
 
-        foreach ($pages as $page) {
-            $page = $this->getAndValidatePage($project, $page);
-            if ($page instanceof RedirectResponse) {
-                $out[$page->getTitle()] = false;
-            } else {
+        foreach ($pages as $pageTitle) {
+            try {
+                $page = $this->validatePage($pageTitle);
                 $assessments = $page->getProject()
                     ->getPageAssessments()
                     ->getAssessments($page);
 
-                $out[$page->getTitle()] = $request->get('classonly')
+                $out[$page->getTitle()] = $this->request->get('classonly')
                     ? $assessments['assessment']
                     : $assessments;
+            } catch (XtoolsHttpException $e) {
+                $out[$pageTitle] = false;
             }
         }
 
-        return new JsonResponse(
-            $out,
-            Response::HTTP_OK
-        );
+        return $this->getFormattedApiResponse($out);
     }
 
     /**
      * Get number of in and outgoing links and redirects to the given page.
      * @Route(
-     *     "/api/page/links/{project}/{article}",
+     *     "/api/page/links/{project}/{page}",
      *     name="PageApiLinks",
-     *     requirements={"article"=".+"}
+     *     requirements={"page"=".+"}
      * )
-     * @param Request $request The HTTP request.
-     * @param string $article
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function linksApiAction(Request $request, $article)
+    public function linksApiAction()
     {
         $this->recordApiUsage('page/links');
 
-        // First validate project.
-        $ret = $this->validateProjectAndUser($request);
-        if ($ret instanceof RedirectResponse) {
-            return new JsonResponse(
-                ['error' => 'Invalid project'],
-                Response::HTTP_NOT_FOUND
-            );
-        } else {
-            $project = $ret[0];
-        }
-
-        $page = $this->getAndValidatePage($project, $article);
-
-        $response = new JsonResponse(
-            $page->countLinksAndRedirects(),
-            Response::HTTP_OK
-        );
-        $response->setEncodingOptions(JSON_NUMERIC_CHECK);
-
-        return $response;
+        return $this->getFormattedApiResponse($this->page->countLinksAndRedirects());
     }
 
     /**
      * Get the top editors to a page.
      * @Route(
-     *     "/api/page/top_editors/{project}/{article}/{start}/{end}/{limit}", name="PageApiTopEditors",
+     *     "/api/page/top_editors/{project}/{page}/{start}/{end}/{limit}", name="PageApiTopEditors",
      *     requirements={
-     *         "article"=".+",
+     *         "page"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?(?:\/(\d+))?)?$",
      *         "start"="|\d{4}-\d{2}-\d{2}",
      *         "end"="|\d{4}-\d{2}-\d{2}",
      *         "limit"="|\d+"
+     *     },
+     *     defaults={
+     *         "start"=false,
+     *         "end"=false,
+     *         "limit"=20,
      *     }
      * )
-     * @param Request $request
-     * @param $article
-     * @param null|string $start
-     * @param null|string $end
-     * @param $limit
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function topEditorsApiAction(Request $request, $article, $start = null, $end = null, $limit = 20)
+    public function topEditorsApiAction()
     {
         $this->recordApiUsage('page/top_editors');
 
-        list($article, $start, $end, $limit) = $this->extractDatesFromParams($article, $start, $end, $limit);
-
-        // First validate project.
-        $ret = $this->validateProjectAndUser($request);
-        if ($ret instanceof RedirectResponse) {
-            return new JsonResponse(
-                ['error' => 'Invalid project'],
-                Response::HTTP_NOT_FOUND
-            );
-        } else {
-            /** @var Project $project */
-            $project = $ret[0];
-        }
-
-        $page = $this->getAndValidatePage($project, $article);
-
         $articleInfoRepo = new ArticleInfoRepository();
         $articleInfoRepo->setContainer($this->container);
-        $articleInfo = new ArticleInfo($page, $this->container, $start, $end);
+        $articleInfo = new ArticleInfo($this->page, $this->container, $this->start, $this->end);
         $articleInfo->setRepository($articleInfoRepo);
 
         $topEditors = $articleInfo->getTopEditorsByEditCount(
-            $limit,
-            $request->query->get('nobots') != ''
+            $this->limit,
+            $this->request->query->get('nobots') != ''
         );
 
-        $ret = [
-            'project' => $project->getDomain(),
-            'page' => $page->getTitle(),
-        ];
-
-        if ($start !== false) {
-            $ret['start'] = date('Y-m-d', $start);
-        }
-        if ($end !== false) {
-            $ret['end'] = date('Y-m-d', $end);
-        }
-
-        $ret['top_editors'] = $topEditors;
-
-        $response = new JsonResponse($ret, Response::HTTP_OK);
-        $response->setEncodingOptions(JSON_NUMERIC_CHECK);
-
-        return $response;
-    }
-
-    /**
-     * Parse the given article, start, and end parameters. This is needed because it's possible
-     * that the article parameter could contain /YYYY-MM-DD.
-     * @param string $article
-     * @param string $start
-     * @param string $end
-     * @param int $limit
-     * @return array
-     * @codeCoverageIgnore
-     */
-    private function extractDatesFromParams($article, $start, $end, $limit = null)
-    {
-        // This is some complicated stuff here. We pass $start and $end to method signature
-        // for router regex parser to parse `article` with those parameters and then
-        // manually retrieve what we want. It's done this way because programmatic way
-        // is much easier (or maybe even only existing) solution for that.
-
-        // Does path have `start` and `end` parameters (even empty ones)?
-        if (1 === preg_match(
-            '/(.+?)\/(|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?(?:\/(\d+))?$/',
-            $article,
-            $matches
-        )) {
-            $article = $matches[1];
-            $start = $matches[2];
-            $end = isset($matches[3]) ? $matches[3] : null;
-            $limit = isset($matches[4]) ? $matches[4] : $limit;
-        }
-
-        return array_merge(
-            [$article],
-            $this->getUTCFromDateParams($start, $end, false),
-            [$limit]
-        );
+        return $this->getFormattedApiResponse([
+            'top_editors' => $topEditors,
+        ]);
     }
 }
