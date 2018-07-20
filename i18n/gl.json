@@ -33,6 +33,7 @@
 	"authorship": "Autoría",
 	"auto-contribs-use-tool": "Amosar só edicións que empregaron a ferramenta:",
 	"auto-edits": "Edicións (semi)automáticas",
+	"auto-edits-counts-desc-grand-total": "gran total",
 	"auto-edits-request": "Solicitar que se engada unha nova ferramenta (semi-)automatizada",
 	"auto-edits-request-name": "Nome da ferramenta",
 	"auto-tool-edits": "$1 edicións",
