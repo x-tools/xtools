@@ -2,15 +2,20 @@
 	"@metadata": {
 		"authors": [
 			"Andreyyshore",
-			"Adrianbblk"
+			"Adrianbblk",
+			"MSClaudiu"
 		]
 	},
 	"accepted-formats": "Formate acceptate",
 	"account-age": "Vechimea contului",
+	"account-age-desc": "acum $2 {{PLURAL:$1|zi|zile}}",
 	"accounts": "Conturi",
 	"accounts-created": "Conturi create",
 	"actions": "Acțiuni",
 	"actions-as-admin": "Acțiuni administrative",
+	"added": "Adăugat",
+	"added-bytes": "Adăugat (biți)",
+	"admin": "Admin",
 	"afd": "Articole de șters",
 	"aiv": "Intervenție administrativă contra vandalismului",
 	"all": "Toate",

@@ -8,6 +8,7 @@
 	},
 	"accepted-formats": "Formatos aceptados",
 	"account-age": "Idade da conta",
+	"account-age-desc": "$2 {{PLURAL:$1|día|dias}} de antigüidade",
 	"accounts": "Contas",
 	"accounts-created": "Contas creadas",
 	"actions": "Accións",
