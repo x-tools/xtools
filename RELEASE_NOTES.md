@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.3.10 ##
+- Localization updates.
+
 ## 3.3.9 ##
 - ArticleInfo: Add documentation for new top_editors API endpoint.
   Some bug fixes around handling of request parameters.
