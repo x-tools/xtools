@@ -173,7 +173,3 @@ monolog:
             type:     stream
             path:     '%kernel.logs_dir%/rate_limit.log'
             channels: [rate_limit]
-
-services:
-    Symfony\Bundle\AsseticBundle\AsseticBundle:
-        public: true

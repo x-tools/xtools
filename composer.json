@@ -90,7 +90,7 @@
             "./vendor/bin/phpcs -s . --ignore=/home/scrutinizer/build/node_modules",
             "{ [ ! -f 'phpDocumentor.phar' ] && curl -L https://github.com/phpDocumentor/phpDocumentor2/releases/download/v2.9.0/phpDocumentor.phar --output phpDocumentor.phar; } || true",
             "php phpDocumentor.phar -d src -t docs/api --template='checkstyle' --ansi --force && ( [ -z $(grep 'error' docs/api/checkstyle.xml) ] )",
-            "./vendor/bin/phpunit tests --coverage-clover=coverage.xml",
+            "./vendor/bin/phpunit tests --coverage-clover=coverage.xml --fail-on-warning=0",
             "./vendor/bin/minus-x check ."
         ],
         "fix": [
