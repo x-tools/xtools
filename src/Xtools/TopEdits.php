@@ -10,23 +10,8 @@ namespace Xtools;
  */
 class TopEdits extends Model
 {
-    /** @var Project The project. */
-    protected $project;
-
-    /** @var User The user. */
-    protected $user;
-
-    /** @var Page The page (if applicable). */
-    protected $page;
-
     /** @var string[]|Edit[] Top edits, either to a page or across namespaces. */
     protected $topEdits = [];
-
-    /** @var int Number of rows to fetch. */
-    protected $limit;
-
-    /** @var int|string Which namespace we are querying for. */
-    protected $namespace;
 
     /** @var int Number of bytes added across all top edits. */
     protected $totalAdded = 0;
@@ -70,24 +55,6 @@ class TopEdits extends Model
                 ? self::DEFAULT_LIMIT_ALL_NAMESPACES
                 : self::DEFAULT_LIMIT_SINGLE_NAMESPACE;
         }
-    }
-
-    /**
-     * Get the limit set on number of rows to fetch.
-     * @return int
-     */
-    public function getLimit()
-    {
-        return $this->limit;
-    }
-
-    /**
-     * Get the namespace set on the instance.
-     * @return int|string Namespace ID or 'all'.
-     */
-    public function getNamespace()
-    {
-        return $this->namespace;
     }
 
     /**
@@ -164,15 +131,6 @@ class TopEdits extends Model
         $secs = $firstDateTime->getTimestamp() - $lastDateTime->getTimestamp();
         $days = $secs / (60 * 60 * 24);
         return $days / count($this->topEdits);
-    }
-
-    /**
-     * Get the Page that's set on the TopEdits instance.
-     * @return Page $page
-     */
-    public function getPage()
-    {
-        return $this->page;
     }
 
     /**

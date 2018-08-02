@@ -33,12 +33,6 @@ class AdminScore extends Model
         'user-rights-mult' => 0.75,
     ];
 
-    /** @var Project The project. */
-    protected $project;
-
-    /** @var User The user. */
-    protected $user;
-
     /** @var array The scoring results. */
     protected $scores;
 

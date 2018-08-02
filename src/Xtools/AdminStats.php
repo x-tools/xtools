@@ -11,9 +11,6 @@ namespace Xtools;
  */
 class AdminStats extends Model
 {
-    /** @var Project Project associated with this AdminStats instance. */
-    protected $project;
-
     /** @var string[] Keyed by user name, values are arrays containing actions and counts. */
     protected $adminStats;
 
@@ -30,12 +27,6 @@ class AdminStats extends Model
 
     /** @var string[] Usernames of proper sysops. */
     private $admins = [];
-
-    /** @var int Start of time period as UTC timestamp */
-    protected $start;
-
-    /** @var int End of time period as UTC timestamp */
-    protected $end;
 
     /**
      * TopEdits constructor.
@@ -218,24 +209,6 @@ class AdminStats extends Model
         }
 
         return $users;
-    }
-
-    /**
-     * Get the formatted start date.
-     * @return int As UTC timestamp.
-     */
-    public function getStart()
-    {
-        return $this->start;
-    }
-
-    /**
-     * Get the formatted end date.
-     * @return int As UTC timestamp.
-     */
-    public function getEnd()
-    {
-        return $this->end;
     }
 
     /**

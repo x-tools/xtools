@@ -7,7 +7,6 @@ namespace Tests\Xtools;
 
 use AppBundle\Helper\I18nHelper;
 use GuzzleHttp;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -22,7 +21,7 @@ use Xtools\ProjectRepository;
 /**
  * Tests for ArticleInfo.
  */
-class ArticleInfoTest extends WebTestCase
+class ArticleInfoTest extends TestAdapter
 {
     /** @var Container The Symfony container. */
     protected $container;
@@ -497,11 +496,11 @@ class ArticleInfoTest extends WebTestCase
     {
         $this->setupData();
 
-        $prop = $this->reflectionClass->getProperty('startDate');
+        $prop = $this->reflectionClass->getProperty('start');
         $prop->setAccessible(true);
         $prop->setValue($this->articleInfo, strtotime('2016-06-30'));
 
-        $prop = $this->reflectionClass->getProperty('endDate');
+        $prop = $this->reflectionClass->getProperty('end');
         $prop->setAccessible(true);
         $prop->setValue($this->articleInfo, strtotime('2016-10-14'));
 

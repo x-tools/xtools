@@ -17,7 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 /**
  * Tests of the Edit class.
  */
-class EditTest extends WebTestCase
+class EditTest extends TestAdapter
 {
     /** @var Container The DI container. */
     protected $container;

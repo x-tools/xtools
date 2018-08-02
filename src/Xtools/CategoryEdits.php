@@ -10,23 +10,8 @@ namespace Xtools;
  */
 class CategoryEdits extends Model
 {
-    /** @var Project The project. */
-    protected $project;
-
-    /** @var User The user. */
-    protected $user;
-
     /** @var string[] The categories. */
     protected $categories;
-
-    /** @var string Start date. */
-    protected $start;
-
-    /** @var string End date. */
-    protected $end;
-
-    /** @var int Number of rows to OFFSET, used for pagination. */
-    protected $offset;
 
     /** @var Edit[] The list of contributions. */
     protected $categoryEdits;
@@ -94,33 +79,6 @@ class CategoryEdits extends Model
         return array_map(function ($category) {
             return str_replace('_', ' ', $category);
         }, $this->categories);
-    }
-
-    /**
-     * Get the start date.
-     * @return string
-     */
-    public function getStart()
-    {
-        return $this->start;
-    }
-
-    /**
-     * Get the end date.
-     * @return string
-     */
-    public function getEnd()
-    {
-        return $this->end;
-    }
-
-    /**
-     * Get the offset value.
-     * @return int
-     */
-    public function getOffset()
-    {
-        return $this->offset;
     }
 
     /**

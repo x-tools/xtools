@@ -16,7 +16,7 @@ use Xtools\ProjectRepository;
 /**
  * Tests for the PageAssessments class.
  */
-class PageAssessmentsTest extends WebTestCase
+class PageAssessmentsTest extends TestAdapter
 {
     /** @var Container The Symfony container. */
     protected $container;

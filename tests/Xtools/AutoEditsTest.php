@@ -6,7 +6,6 @@
 namespace Tests\Xtools;
 
 use Symfony\Bundle\FrameworkBundle\Client;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Xtools\AutoEdits;
 use Xtools\AutoEditsRepository;
@@ -20,7 +19,7 @@ use Xtools\UserRepository;
 /**
  * Tests for the AutoEdits class.
  */
-class AutoEditsTest extends WebTestCase
+class AutoEditsTest extends TestAdapter
 {
     /** @var Container The DI container. */
     protected $container;

@@ -13,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Tests\Xtools\TestAdapter;
 use Xtools\Project;
 use Xtools\ProjectRepository;
 use Xtools\User;
@@ -20,7 +21,7 @@ use Xtools\User;
 /**
  * Tests for the AppExtension class.
  */
-class AppExtensionTest extends WebTestCase
+class AppExtensionTest extends TestAdapter
 {
     /** @var Container The Symfony container. */
     protected $container;

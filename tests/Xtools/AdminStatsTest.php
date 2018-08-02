@@ -5,7 +5,6 @@
 
 namespace Tests\Xtools;
 
-use PHPUnit_Framework_TestCase;
 use Xtools\AdminStats;
 use Xtools\AdminStatsRepository;
 use Xtools\Project;
@@ -14,7 +13,7 @@ use Xtools\ProjectRepository;
 /**
  * Tests of the AdminStats class.
  */
-class AdminStatsTest extends PHPUnit_Framework_TestCase
+class AdminStatsTest extends TestAdapter
 {
     /** @var Project The project instance. */
     protected $project;

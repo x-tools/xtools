@@ -29,12 +29,6 @@ class UserRights extends Model
     /** @var array The current and former rights of the user. */
     protected $rightsStates = [];
 
-    /** @var Project The project. */
-    protected $project;
-
-    /** @var User The user. */
-    protected $user;
-
     /**
      * Get user rights changes of the given user.
      * @return string[] Keyed by timestamp then 'added' and 'removed'.

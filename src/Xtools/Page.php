@@ -12,10 +12,6 @@ use DateTime;
  */
 class Page extends Model
 {
-
-    /** @var Project The project that this page belongs to. */
-    protected $project;
-
     /** @var string The page name as provided at instantiation. */
     protected $unnormalizedPageName;
 
@@ -65,7 +61,7 @@ class Page extends Model
     {
         if (empty($this->pageInfo)) {
             $this->pageInfo = $this->getRepository()
-                    ->getPageInfo($this->project, $this->unnormalizedPageName);
+                ->getPageInfo($this->project, $this->unnormalizedPageName);
         }
         return $this->pageInfo;
     }

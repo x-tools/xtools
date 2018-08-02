@@ -16,7 +16,7 @@ use Xtools\ProjectRepository;
 /**
  * Tests of the Pages class.
  */
-class PagesTest extends PHPUnit_Framework_TestCase
+class PagesTest extends TestAdapter
 {
     /** @var Project The project instance. */
     protected $project;
