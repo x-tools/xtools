@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"Ninjastrikers"
+			"Ninjastrikers",
+			"Dr Lotus Black"
 		]
 	},
 	"accepted-formats": "လက်ခံသော ဖောမက်များ",
@@ -74,6 +75,7 @@
 	"delpagesfilter-deleted": "ဖျက်ထားသော စာမျက်နှာများ ပါဝင်",
 	"delpagesfilter-live": "ဖျက်ထားသော စာမျက်နှာများ မပါ",
 	"diff": "ကွဲပြားမှု",
+	"documentation": "မှတ်တမ်းမှတ်ရာများ",
 	"download-label": "ဒေါင်းလုဒ်",
 	"edit": "တည်းဖြတ်",
 	"edit-count": "တည်းဖြတ် ကြိမ်ရေ",
@@ -164,6 +166,7 @@
 	"no-revisions": "တည်းဖြတ်မှုများ မတွေ့ပါ",
 	"no-summary": "အကျဉ်းချုပ် မရှိ",
 	"non-auto-contribs": "အလိုအလျောက် မဟုတ်သော တည်းဖြတ်မှုများ",
+	"none": "ဘာမှမရှိ",
 	"notice": "အသိပေးချက်",
 	"num-blocks": "{{PLURAL:$1|ပိတ်ပင်မှု|ပိတ်ပင်မှုများ}}",
 	"num-bytes": "{{PLURAL:$1|ဘိုက်|ဘိုက်}}",
@@ -176,6 +179,7 @@
 	"num-others": "{{PLURAL:$1|အခြား|အခြား}}",
 	"num-seconds": "{{PLURAL:$1|စက္ကန့်|စက္ကန့်}}",
 	"num-years": "{{PLURAL:$1|နှစ်|နှစ်}}",
+	"original-size": "မူလအရွယ်",
 	"others": "အခြား",
 	"page-size": "စာမျက်နှာ အရွယ်အစား",
 	"page-title": "စာမျက်နှာ ခေါင်းစဉ်",
@@ -190,6 +194,7 @@
 	"pages-moved": "ရွေ့ပြောင်းခဲ့သော စာမျက်နှာများ",
 	"percentage": "ရာခိုင်နှုန်း",
 	"powered-by": "$1 မှ ပံ့ပိုးထားသည်",
+	"priority": "ဦးစားပေးအဆင့်",
 	"project": "ပရောဂျက်",
 	"protect": "ကာကွယ်",
 	"rank": "အဆင့်",
