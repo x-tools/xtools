@@ -13,17 +13,8 @@ use DateTime;
  */
 class EditSummary extends Model
 {
-    /** @var Project The project. */
-    protected $project;
-
-    /** @var User The user. */
-    protected $user;
-
     /** @var I18nHelper For i18n and l10n. */
     protected $i18n;
-
-    /** @var string|int The namespace to target. */
-    protected $namespace;
 
     /** @var int Number of edits from present to consider as 'recent'. */
     protected $numEditsRecent;

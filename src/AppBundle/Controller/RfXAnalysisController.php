@@ -30,7 +30,6 @@ class RfXAnalysisController extends XtoolsController
 
     /**
      * Renders the index page for the RfX Tool
-     * @param string $type Optional RfX type
      * @Route("/rfx", name="RfXAnalysis")
      * @Route("/rfx/", name="RfXAnalysisSlash")
      * @Route("/rfx/index.php", name="rfxAnalysisIndexPhp")
@@ -156,7 +155,7 @@ class RfXAnalysisController extends XtoolsController
             );
         }
 
-        $end = $rfx->getEndDate();
+        $end = $rfx->getEnd();
 
         // replace this example code with whatever you need
         return $this->render(

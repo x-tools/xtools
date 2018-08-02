@@ -10,26 +10,8 @@ namespace Xtools;
  */
 class AutoEdits extends Model
 {
-    /** @var Project The project. */
-    protected $project;
-
-    /** @var User The user. */
-    protected $user;
-
-    /** @var int|string Which namespace we are querying for. */
-    protected $namespace;
-
-    /** @var string Start date. */
-    protected $start;
-
-    /** @var string End date. */
-    protected $end;
-
     /** @var null|string The tool we're searching for when fetching (semi-)automated edits. */
     protected $tool;
-
-    /** @var int Number of rows to OFFSET, used for pagination. */
-    protected $offset;
 
     /** @var Edit[] The list of non-automated contributions. */
     protected $nonAutomatedEdits;
@@ -78,33 +60,6 @@ class AutoEdits extends Model
     }
 
     /**
-     * Get the namespace.
-     * @return int|string
-     */
-    public function getNamespace()
-    {
-        return $this->namespace;
-    }
-
-    /**
-     * Get the start date.
-     * @return string
-     */
-    public function getStart()
-    {
-        return $this->start;
-    }
-
-    /**
-     * Get the end date.
-     * @return string
-     */
-    public function getEnd()
-    {
-        return $this->end;
-    }
-
-    /**
      * The tool we're limiting the results to when fetching
      * (semi-)automated contributions.
      * @return null|string
@@ -112,15 +67,6 @@ class AutoEdits extends Model
     public function getTool()
     {
         return $this->tool;
-    }
-
-    /**
-     * Get the offset value.
-     * @return int
-     */
-    public function getOffset()
-    {
-        return $this->offset;
     }
 
     /**

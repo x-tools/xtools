@@ -15,7 +15,7 @@ use Xtools\Edit;
 /**
  * Tests for the Repository class.
  */
-class RepositoryTest extends WebTestCase
+class RepositoryTest extends TestAdapter
 {
     /** @var Container The DI container. */
     protected $container;

@@ -13,7 +13,7 @@ use Xtools\User;
 /**
  * Tests for the Project class.
  */
-class ProjectTest extends PHPUnit_Framework_TestCase
+class ProjectTest extends TestAdapter
 {
 
     /**

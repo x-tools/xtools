@@ -182,7 +182,7 @@ class RfXVoteCalculatorController extends XtoolsController
                     $finalData[$type][$section][$title]['Neutral']
                         = sizeof($rfx->getSection('neutral'));
                     $finalData[$type][$section][$title]['Date']
-                        = $rfx->getEndDate();
+                        = $rfx->getEnd();
                     $finalData[$type][$section][$title]['name']
                         = explode('/', $title)[1];
 

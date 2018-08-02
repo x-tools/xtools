@@ -16,7 +16,6 @@ use GuzzleHttp;
  */
 class PageRepository extends Repository
 {
-
     /**
      * Get metadata about a single page from the API.
      * @param Project $project The project to which the page belongs.

@@ -16,7 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 /**
  * Tests of the TopEdits class.
  */
-class TopEditsTest extends WebTestCase
+class TopEditsTest extends TestAdapter
 {
     /** @var Project The project instance. */
     protected $project;

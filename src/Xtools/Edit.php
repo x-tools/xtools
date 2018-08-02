@@ -13,10 +13,6 @@ use DateTime;
  */
 class Edit extends Model
 {
-
-    /** @var Page the page associated with this edit */
-    protected $page;
-
     /** @var int ID of the revision */
     protected $id;
 

@@ -17,7 +17,7 @@ use Xtools\UserRepository;
 /**
  * Tests of the CategoryEdits class.
  */
-class CategoryEditsTest extends PHPUnit_Framework_TestCase
+class CategoryEditsTest extends TestAdapter
 {
     /** @var Project The project instance. */
     protected $project;

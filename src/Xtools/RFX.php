@@ -8,32 +8,19 @@ namespace Xtools;
 /**
  * This class contains information about a single RfX page.
  */
-class RFX
+class RFX extends Model
 {
-    /**
-     * @var array Data we parsed out of the page text
-     */
+    /** @var array Data we parsed out of the page text */
     private $data;
 
-    /**
-     * @var array Duplicate voters
-     */
+    /** @var array Duplicate voters */
     private $duplicates;
 
-    /**
-     * @var null|string Username of the user we're looking for.
-     */
+    /** @var null|string Username of the user we're looking for. */
     private $userLookingFor;
 
-    /**
-     * @var string Section we found the user we're looking for
-     */
+    /** @var string Section we found the user we're looking for */
     private $userSectionFound;
-
-    /**
-     * @var string Ending date of the RFX
-     */
-    private $endDate;
 
     /**
      * Attempts to find a signature in $input using the default regex.
@@ -83,7 +70,7 @@ class RFX
      */
     private function setUp($sectionArray, $rawWikiText, $dateRegexp)
     {
-        $this->data = array();
+        $this->data = [];
 
         $lines = explode("\n", $rawWikiText);
 
@@ -101,7 +88,7 @@ class RFX
                     $matches
                 )
             ) {
-                $this->endDate = $matches[1];
+                $this->end = $matches[1];
             } elseif ($lastSection != ""
                 && preg_match("/^\s*#?:.*/i", $line) === 0
             ) {
@@ -191,15 +178,5 @@ class RFX
     public function getDuplicates()
     {
         return $this->duplicates;
-    }
-
-    /**
-     * Get the End Date of the RFX
-     *
-     * @return string
-     */
-    public function getEndDate()
-    {
-        return $this->endDate;
     }
 }

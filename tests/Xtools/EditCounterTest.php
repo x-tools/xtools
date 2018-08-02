@@ -20,7 +20,7 @@ use Xtools\UserRepository;
 /**
  * Tests for the EditCounter.
  */
-class EditCounterTest extends WebTestCase
+class EditCounterTest extends TestAdapter
 {
     /** @var Project The project instance. */
     protected $project;

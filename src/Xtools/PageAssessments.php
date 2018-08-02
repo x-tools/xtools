@@ -15,9 +15,6 @@ class PageAssessments extends Model
     /** Namespaces in which there may be page assessments. */
     const SUPPORTED_NAMESPACES = [0, 4, 6, 10, 14, 100, 108, 118];
 
-    /** @var Project The Project we're dealing with. */
-    protected $project;
-
     /** @var array The assessments config. */
     protected $config;
 

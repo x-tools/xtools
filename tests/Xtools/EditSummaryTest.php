@@ -17,7 +17,7 @@ use Xtools\User;
 /**
  * Tests for EditSummary.
  */
-class EditSummaryTest extends WebTestCase
+class EditSummaryTest extends TestAdapter
 {
     /** @var EditSummary The article info instance. */
     protected $editSummary;

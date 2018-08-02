@@ -8,6 +8,7 @@ namespace Tests\AppBundle\Helper;
 use AppBundle\Helper\AutomatedEditsHelper;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
+use Tests\Xtools\TestAdapter;
 use Xtools\Project;
 use Xtools\ProjectRepository;
 
@@ -15,7 +16,7 @@ use Xtools\ProjectRepository;
  * Tests of the AutomatedEditsHelper class.
  * @group integration
  */
-class AutomatedEditsTest extends WebTestCase
+class AutomatedEditsTest extends TestAdapter
 {
     /** @var Container The DI container. */
     protected $container;

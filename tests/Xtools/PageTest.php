@@ -6,6 +6,7 @@
 namespace Tests\Xtools;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DependencyInjection\Container;
 use Xtools\Page;
 use Xtools\PageRepository;
 use Xtools\Project;
@@ -15,7 +16,7 @@ use Xtools\User;
 /**
  * Tests for the Page class.
  */
-class PageTest extends WebTestCase
+class PageTest extends TestAdapter
 {
     /** @var Container The Symfony container. */
     protected $container;
@@ -45,20 +46,20 @@ class PageTest extends WebTestCase
         // Page with no display title.
         $page = new Page($project, 'Test_Page_1');
         $page->setRepository($pageRepo);
-        $this->assertEquals('Test_Page_1', $page->getTitle());
-        $this->assertEquals('Test_Page_1', $page->getDisplayTitle());
+        static::assertEquals('Test_Page_1', $page->getTitle());
+        static::assertEquals('Test_Page_1', $page->getDisplayTitle());
 
         // Page with a display title.
         $page = new Page($project, 'Test_Page_2');
         $page->setRepository($pageRepo);
-        $this->assertEquals('Test_Page_2', $page->getTitle());
-        $this->assertEquals('<em>Test</em> page 2', $page->getDisplayTitle());
+        static::assertEquals('Test_Page_2', $page->getTitle());
+        static::assertEquals('<em>Test</em> page 2', $page->getDisplayTitle());
 
         // Getting the unnormalized title should not call getPageInfo.
         $page = new Page($project, 'talk:Test Page_3');
         $page->setRepository($pageRepo);
         $pageRepo->expects($this->never())->method('getPageInfo');
-        $this->assertEquals('talk:Test Page_3', $page->getTitle(true));
+        static::assertEquals('talk:Test Page_3', $page->getTitle(true));
     }
 
     /**
@@ -80,12 +81,12 @@ class PageTest extends WebTestCase
         // Existing page.
         $page1 = new Page($project, 'Existing_page');
         $page1->setRepository($pageRepo);
-        $this->assertTrue($page1->exists());
+        static::assertTrue($page1->exists());
 
         // Missing page.
         $page2 = new Page($project, 'Missing_page');
         $page2->setRepository($pageRepo);
-        $this->assertFalse($page2->exists());
+        static::assertFalse($page2->exists());
     }
 
     /**
@@ -117,14 +118,14 @@ class PageTest extends WebTestCase
         $page = new Page($project, 'User:Test');
         $page->setRepository($pageRepo);
 
-        $this->assertEquals(42, $page->getId());
-        $this->assertEquals('https://example.org/User:Test', $page->getUrl());
-        $this->assertEquals(5000, $page->getWatchers());
-        $this->assertEquals(300, $page->getLength());
-        $this->assertEquals(2, $page->getNamespace());
-        $this->assertEquals('User', $page->getNamespaceName());
-        $this->assertEquals('Q95', $page->getWikidataId());
-        $this->assertEquals('Test', $page->getTitleWithoutNamespace());
+        static::assertEquals(42, $page->getId());
+        static::assertEquals('https://example.org/User:Test', $page->getUrl());
+        static::assertEquals(5000, $page->getWatchers());
+        static::assertEquals(300, $page->getLength());
+        static::assertEquals(2, $page->getNamespace());
+        static::assertEquals('User', $page->getNamespaceName());
+        static::assertEquals('Q95', $page->getWikidataId());
+        static::assertEquals('Test', $page->getTitleWithoutNamespace());
     }
 
     /**
@@ -141,7 +142,7 @@ class PageTest extends WebTestCase
         // We want to do a real-world test. enwiki's Main Page does not change much,
         // and {{Main Page banner}} in particular should be there indefinitely, hopefully :)
         $content = $page->getWikitext();
-        $this->assertContains('{{Main Page banner}}', $content);
+        static::assertContains('{{Main Page banner}}', $content);
     }
 
     /**
@@ -173,7 +174,7 @@ class PageTest extends WebTestCase
         $page = new Page(new Project('TestProject'), 'Test_Page');
         $page->setRepository($pageRepo);
 
-        $this->assertArraySubset($wikidataItems, $page->getWikidataItems());
+        static::assertArraySubset($wikidataItems, $page->getWikidataItems());
 
         // If no wikidata item...
         $pageRepo2 = $this->getMock(PageRepository::class, ['getPageInfo']);
@@ -184,8 +185,8 @@ class PageTest extends WebTestCase
             ]);
         $page2 = new Page(new Project('TestProject'), 'Test_Page');
         $page2->setRepository($pageRepo2);
-        $this->assertNull($page2->getWikidataId());
-        $this->assertEquals(0, $page2->countWikidataItems());
+        static::assertNull($page2->getWikidataId());
+        static::assertEquals(0, $page2->countWikidataItems());
     }
 
     /**
@@ -200,7 +201,7 @@ class PageTest extends WebTestCase
             ->willReturn(2);
         $page->setRepository($pageRepo);
 
-        $this->assertEquals(2, $page->countWikidataItems());
+        static::assertEquals(2, $page->countWikidataItems());
     }
 
     /**
@@ -226,7 +227,7 @@ class PageTest extends WebTestCase
         $page = new Page(new Project('exampleWiki'), 'Page');
         $page->setRepository($pageRepo);
         $user = new User('Testuser');
-        //$this->assertCount(3, $page->getRevisions($user)->getCount());
+        //static::assertCount(3, $page->getRevisions($user)->getCount());
     }
 
     /**
@@ -261,14 +262,14 @@ class PageTest extends WebTestCase
 
         $wikidataErrors = $page->getWikidataErrors();
 
-        $this->assertArraySubset(
+        static::assertArraySubset(
             [
                 'prio' => 3,
                 'name' => 'Wikidata',
             ],
             $wikidataErrors[0]
         );
-        $this->assertContains(
+        static::assertContains(
             'Description',
             $wikidataErrors[0]['notice']
         );
@@ -319,8 +320,8 @@ class PageTest extends WebTestCase
         $page = new Page(new Project('exampleWiki'), 'Page');
         $page->setRepository($pageRepo);
 
-        $this->assertEquals($checkWikiErrors, $page->getCheckWikiErrors());
-        $this->assertEquals(
+        static::assertEquals($checkWikiErrors, $page->getCheckWikiErrors());
+        static::assertEquals(
             array_merge($wikidataErrors, $checkWikiErrors),
             $page->getErrors()
         );
@@ -343,12 +344,12 @@ class PageTest extends WebTestCase
         $page = new Page(new Project('exampleWiki'), 'Page');
         $page->setRepository($pageRepo);
 
-        $this->assertEquals(
+        static::assertEquals(
             3500,
             $page->getPageviews('20160101', '20160201')
         );
 
-        $this->assertEquals(3500, $page->getLastPageviews(30));
+        static::assertEquals(3500, $page->getLastPageviews(30));
     }
 
     /**
@@ -361,7 +362,7 @@ class PageTest extends WebTestCase
         $project = ProjectRepository::getProject('en.wikipedia.org', $this->container);
         $page = new Page($project, 'Main Page');
         $page->setRepository($pageRepo);
-        $this->assertTrue($page->isMainPage());
+        static::assertTrue($page->isMainPage());
     }
 
     /**
@@ -380,6 +381,6 @@ class PageTest extends WebTestCase
         $page = new Page(new Project('exampleWiki'), 'Page');
         $page->setRepository($pageRepo);
 
-        $this->assertEquals($data, $page->countLinksAndRedirects());
+        static::assertEquals($data, $page->countLinksAndRedirects());
     }
 }

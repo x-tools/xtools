@@ -15,15 +15,6 @@ class Pages extends Model
     const RESULTS_LIMIT_SINGLE_NAMESPACE = 1000;
     const RESULTS_LIMIT_ALL_NAMESPACES = 100;
 
-    /** @var Project The project. */
-    protected $project;
-
-    /** @var User The user. */
-    protected $user;
-
-    /** @var string Which namespace we are querying for. */
-    protected $namespace;
-
     /** @var string One of 'noredirects', 'onlyredirects' or 'all' for both. */
     protected $redirects;
 
@@ -65,33 +56,6 @@ class Pages extends Model
     }
 
     /**
-     * The project associated with this Pages instance.
-     * @return Project
-     */
-    public function getProject()
-    {
-        return $this->project;
-    }
-
-    /**
-     * The user associated with this Pages instance.
-     * @return User
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
-
-    /**
-     * The namespace associated with this Pages instance.
-     * @return int|string
-     */
-    public function getNamespace()
-    {
-        return $this->namespace;
-    }
-
-    /**
      * The redirects option associated with this Pages instance.
      * @return string
      */
@@ -107,15 +71,6 @@ class Pages extends Model
     public function getDeleted()
     {
         return $this->deleted;
-    }
-
-    /**
-     * The pagination offset associated with this Pages instance.
-     * @return int
-     */
-    public function getOffset()
-    {
-        return $this->offset;
     }
 
     /**

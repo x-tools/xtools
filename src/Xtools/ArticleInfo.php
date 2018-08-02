@@ -29,17 +29,8 @@ class ArticleInfo extends Model
     /** @var Container The application's DI container. */
     protected $container;
 
-    /** @var Page The page. */
-    protected $page;
-
     /** @var I18nHelper For i18n and l10n. */
     protected $i18n;
-
-    /** @var false|int From what date to obtain records. */
-    protected $startDate;
-
-    /** @var false|int To what date to obtain records. */
-    protected $endDate;
 
     /** @var int Number of revisions that belong to the page. */
     protected $numRevisions;
@@ -159,8 +150,8 @@ class ArticleInfo extends Model
     {
         $this->page = $page;
         $this->container = $container;
-        $this->startDate = $start;
-        $this->endDate = $end;
+        $this->start = $start;
+        $this->end = $end;
     }
 
     /**
@@ -179,7 +170,7 @@ class ArticleInfo extends Model
      */
     public function getStartDate()
     {
-        return $this->startDate == '' ? '' : date('Y-m-d', $this->startDate);
+        return $this->start == '' ? '' : date('Y-m-d', $this->start);
     }
 
     /**
@@ -188,32 +179,23 @@ class ArticleInfo extends Model
      */
     public function getEndDate()
     {
-        return $this->endDate == '' ? '' : date('Y-m-d', $this->endDate);
+        return $this->end == '' ? '' : date('Y-m-d', $this->end);
     }
 
     /**
      * Get the day of last date we should show in the month/year sections,
-     * based on $this->endDate or the current date.
+     * based on $this->end or the current date.
      * @return int As Unix timestamp.
      */
     private function getLastDay()
     {
-        if ($this->endDate !== false) {
-            return (new DateTime('@'.$this->endDate))
+        if ($this->end !== false) {
+            return (new DateTime('@'.$this->end))
                 ->modify('last day of this month')
                 ->getTimestamp();
         } else {
             return strtotime('last day of this month');
         }
-    }
-
-    /**
-     * Has date range?
-     * @return bool
-     */
-    public function hasDateRange()
-    {
-        return $this->startDate !== false || $this->endDate !== false;
     }
 
     /**
@@ -233,24 +215,14 @@ class ArticleInfo extends Model
             'end' => $this->lastEdit->getTimestamp()->format('Y-m-d'),
         ];
 
-        if ($this->startDate !== false) {
-            $ret['start'] = date('Y-m-d', $this->startDate);
+        if ($this->start !== false) {
+            $ret['start'] = date('Y-m-d', $this->start);
         }
-        if ($this->endDate !== false) {
-            $ret['end'] = date('Y-m-d', $this->endDate);
+        if ($this->end !== false) {
+            $ret['end'] = date('Y-m-d', $this->end);
         }
 
         return $ret;
-    }
-
-    /**
-     * Shorthand to get the page's project.
-     * @return Project
-     * @codeCoverageIgnore
-     */
-    public function getProject()
-    {
-        return $this->page->getProject();
     }
 
     /**
@@ -260,7 +232,7 @@ class ArticleInfo extends Model
     public function getNumRevisions()
     {
         if (!isset($this->numRevisions)) {
-            $this->numRevisions = $this->page->getNumRevisions(null, $this->startDate, $this->endDate);
+            $this->numRevisions = $this->page->getNumRevisions(null, $this->start, $this->end);
         }
         return $this->numRevisions;
     }
@@ -560,8 +532,8 @@ class ArticleInfo extends Model
 
         $rows = $this->getRepository()->getTopEditorsByEditCount(
             $this->page,
-            $this->startDate,
-            $this->endDate,
+            $this->start,
+            $this->end,
             min($limit, 1000),
             $noBots
         );
@@ -790,8 +762,8 @@ class ArticleInfo extends Model
             null,
             $limit,
             $this->getNumRevisions(),
-            $this->startDate,
-            $this->endDate
+            $this->start,
+            $this->end
         );
         $revCount = 0;
 
@@ -1194,7 +1166,7 @@ class ArticleInfo extends Model
     {
         // Parse the bot edits.
         $bots = [];
-        $botData = $this->getRepository()->getBotData($this->page, $this->startDate, $this->endDate);
+        $botData = $this->getRepository()->getBotData($this->page, $this->start, $this->end);
         while ($bot = $botData->fetch()) {
             $bots[$bot['username']] = [
                 'count' => (int) $bot['count'],
@@ -1244,8 +1216,8 @@ class ArticleInfo extends Model
     {
         $logData = $this->getRepository()->getLogEvents(
             $this->page,
-            $this->startDate,
-            $this->endDate
+            $this->start,
+            $this->end
         );
 
         foreach ($logData as $event) {
@@ -1484,7 +1456,7 @@ class ArticleInfo extends Model
      */
     public function getProseStats()
     {
-        $datetime = $this->endDate !== false ? new DateTime('@'.$this->endDate) : null;
+        $datetime = $this->end !== false ? new DateTime('@'.$this->end) : null;
         $html = $this->page->getHTMLContent($datetime);
 
         $crawler = new Crawler($html);
