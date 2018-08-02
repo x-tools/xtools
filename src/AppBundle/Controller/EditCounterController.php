@@ -61,6 +61,12 @@ class EditCounterController extends XtoolsController
      */
     protected function setUpEditCounter($key = null)
     {
+        // Whether we're making a subrequest (the view makes a request to another action).
+        // Subrequests to the same controller do not reinstantiate a new controller, and hence
+        // this flag would not be set in XtoolsController::__construct(), so we must do it here as well.
+        $this->isSubRequest = $this->request->get('htmlonly')
+            || $this->get('request_stack')->getParentRequest() !== null;
+
         // Return the EditCounter if we already have one.
         if ($this->editCounter instanceof EditCounter) {
             return null;
