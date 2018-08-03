@@ -45,7 +45,9 @@ $(function () {
         return undefined;
     });
 
-    loadLatestGlobal();
+    if ($('.contributions-container').length) {
+        loadLatestGlobal();
+    }
 
     // Set up namespace toggle chart.
     setupToggleTable(window.namespaceTotals, window.namespaceChart, null, toggleNamespace);
@@ -54,8 +56,8 @@ $(function () {
 /**
  * Callback for setupToggleTable(). This will show/hide a given namespace from
  * all charts, and update totals and percentages.
- * @param  {Object} newData New namespaces and totals, as returned by setupToggleTable.
- * @param  {String} key     Namespace ID of the toggled namespace.
+ * @param {Object} newData New namespaces and totals, as returned by setupToggleTable.
+ * @param {String} key     Namespace ID of the toggled namespace.
  */
 function toggleNamespace(newData, key)
 {

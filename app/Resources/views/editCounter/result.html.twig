@@ -107,7 +107,7 @@
             {{ layout.content_block(headerLink, content, downloadLink, 'timecard', true) }}
         {% endif %}
 
-        {% if 'topedits' in sections %}
+        {% if 'top-edited-pages' in sections %}
             {% set content %}
                 {{ render(path('TopEditsResult', {
                     'username': user.username,
