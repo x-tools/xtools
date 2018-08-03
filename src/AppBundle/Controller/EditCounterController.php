@@ -21,8 +21,26 @@ use Xtools\ProjectRepository;
  */
 class EditCounterController extends XtoolsController
 {
+    /**
+     * Available statistic sections. These can be hand-picked on the index form so that you only get the data you
+     * want and hence speed up the tool. Keys are the i18n messages (and DOM IDs), values are the action names.
+     */
+    const AVAILABLE_SECTIONS = [
+        'general-stats' => 'EditCounterGeneralStats',
+        'namespace-totals' => 'EditCounterNamespaceTotals',
+        'year-counts' => 'EditCounterYearCounts',
+        'month-counts' => 'EditCounterMonthCounts',
+        'timecard' => 'EditCounterRightsChanges',
+        'top-edited-pages' => 'TopEditsResult',
+        'rights-changes' => 'EditCounterRightsChanges',
+        'latest-global-edits' => 'EditCounterLatestGlobalContribs',
+    ];
+
     /** @var EditCounter The edit-counter, that does all the work. */
     protected $editCounter;
+
+    /** @var string[] Which sections to show. */
+    protected $sections;
 
     /**
      * Get the name of the tool's index route. This is also the name of the associated model.
@@ -48,6 +66,11 @@ class EditCounterController extends XtoolsController
         $this->tooHighEditCountActionBlacklist = ['rightsChanges'];
 
         parent::__construct($requestStack, $container);
+
+        // Now that we have the request object, parse out the requested sections from the URL.
+        // This could be a pipe-separated string, or an array.
+        $sectionsQuery = $this->request->get('sections', array_keys(self::AVAILABLE_SECTIONS));
+        $this->sections = is_array($sectionsQuery) ? $sectionsQuery : explode('|', $sectionsQuery);
     }
 
     /**
@@ -62,7 +85,7 @@ class EditCounterController extends XtoolsController
     protected function setUpEditCounter($key = null)
     {
         // Whether we're making a subrequest (the view makes a request to another action).
-        // Subrequests to the same controller do not reinstantiate a new controller, and hence
+        // Subrequests to the same controller do not re-instantiate a new controller, and hence
         // this flag would not be set in XtoolsController::__construct(), so we must do it here as well.
         $this->isSubRequest = $this->request->get('htmlonly')
             || $this->get('request_stack')->getParentRequest() !== null;
@@ -102,7 +125,7 @@ class EditCounterController extends XtoolsController
     public function indexAction()
     {
         if (isset($this->params['project']) && isset($this->params['username'])) {
-            return $this->redirectToRoute('EditCounterResult', $this->params);
+            return $this->redirectFromSections();
         }
 
         // Otherwise fall through.
@@ -111,7 +134,27 @@ class EditCounterController extends XtoolsController
             'xtSubtitle' => 'tool-editcounter-desc',
             'xtPage' => 'editcounter',
             'project' => $this->project,
+            'sections' => $this->sections,
+            'availableSections' => array_keys(self::AVAILABLE_SECTIONS),
         ]);
+    }
+
+    /**
+     * Redirect to the appropriate action based on what sections are being requested.
+     * @return RedirectResponse
+     */
+    private function redirectFromSections()
+    {
+        if (count($this->sections) === 1) {
+            // Redirect to dedicated route.
+            return $this->redirectToRoute(self::AVAILABLE_SECTIONS[$this->sections[0]], $this->params);
+        }
+
+        // Here we want a pretty URL.
+        $sectionsParam = implode('|', $this->sections);
+        return $this->redirect(
+            $this->generateUrl('EditCounterResult', $this->params).'?sections='.$sectionsParam
+        );
     }
 
     /**
@@ -130,6 +173,7 @@ class EditCounterController extends XtoolsController
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
+            'sections' => $this->sections,
         ];
 
         // Used when querying for global rights changes.

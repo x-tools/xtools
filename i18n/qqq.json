@@ -335,6 +335,7 @@
 	"sections": "Label for the number of sections that are on a page.\n{{Identical|Section}}",
 	"see-full-page-stats": "Label for a link to full statistics on a page.",
 	"show": "Toggle visibility of section (short word)\n{{Identical|Show}}",
+	"show-sections-desc": "Tooltip for checkboxes that allow you to pick which statistics to show.",
 	"size": "Label for the size of the page.\n{{Identical|Size}}",
 	"size-over-time": "Chart label",
 	"small-edits": "Label for the number of small edits made to a page. Try to keep this message brief.",

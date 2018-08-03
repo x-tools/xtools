@@ -11,110 +11,121 @@
         {{ wiki.userLinks(user, project, 'EditCounter') }}
 
         <div class="text-center xt-toc">
-            {% set sections = ['general-stats', 'namespace-totals', 'year-counts', 'month-counts', 'timecard', 'top-edited-pages'] %}
-            {% if not(user.anon) %}
-                {% if ec.rightsChanges|length > 0 %}
-                    {% set sections = sections|merge(['rights-changes']) %}
-                {% endif %}
-                {% set sections = sections|merge(['latest-global-edits']) %}
+            {% set sectionExclude = [] %}
+            {% if user.anon %}
+                {% set sectionExclude = sectionExclude|merge(['rights-changes', 'latest-global-edits']) %}
+            {% elseif ec.rightsChanges|length == 0 %}
+                {% set sectionExclude = sectionExclude|merge(['rights-changes']) %}
             {% endif %}
 
-            {% for section in sections %}
+            {% for section in sections if not(section in sectionExclude) %}
                 <span>
                     <a href="#{{ section }}" data-section="{{ section }}">{{ msg(section) }}</a>
                 </span>
             {% endfor %}
         </div>
 
-        {% set content %}
-            {{ render(path('EditCounterGeneralStats', {
-                'username': user.username,
-                'project': project.domain
-            })) }}
-        {% endset %}
-        {% set headerLink %}
-            <a href="{{ path('EditCounterGeneralStats', {project:project.domain, username:user.username})}}">{{ msg('general-stats') }}</a>
-        {% endset %}
-        {% set downloadLink %}
-            {{ layout.downloadLink('EditCounterGeneralStats', {project:project.domain, username:user.username}, ['wikitext']) }}
-        {% endset %}
-        {{ layout.content_block(headerLink, content, downloadLink, 'general-stats', true) }}
+        {% if 'general-stats' in sections %}
+            {% set content %}
+                {{ render(path('EditCounterGeneralStats', {
+                    'username': user.username,
+                    'project': project.domain
+                })) }}
+            {% endset %}
+            {% set headerLink %}
+                <a href="{{ path('EditCounterGeneralStats', {project:project.domain, username:user.username})}}">{{ msg('general-stats') }}</a>
+            {% endset %}
+            {% set downloadLink %}
+                {{ layout.downloadLink('EditCounterGeneralStats', {project:project.domain, username:user.username}, ['wikitext']) }}
+            {% endset %}
+            {{ layout.content_block(headerLink, content, downloadLink, 'general-stats', true) }}
+        {% endif %}
 
-        {% set content %}
-            {{ render(path('EditCounterNamespaceTotals', {
-                'username': user.username,
-                'project': project.domain
-            })) }}
-        {% endset %}
-        {% set headerLink %}
-            <a href="{{ path('EditCounterNamespaceTotals', {project:project.domain, username:user.username})}}">{{ msg('namespace-totals') }}</a>
-        {% endset %}
-        {% set downloadLink %}
-            {{ layout.downloadLink('EditCounterNamespaceTotals', {project:project.domain, username:user.username}, ['wikitext', 'csv']) }}
-        {% endset %}
-        {{ layout.content_block(headerLink, content, downloadLink, 'namespace-totals', true) }}
+        {% if 'namespace-totals' in sections %}
+            {% set content %}
+                {{ render(path('EditCounterNamespaceTotals', {
+                    'username': user.username,
+                    'project': project.domain
+                })) }}
+            {% endset %}
+            {% set headerLink %}
+                <a href="{{ path('EditCounterNamespaceTotals', {project:project.domain, username:user.username})}}">{{ msg('namespace-totals') }}</a>
+            {% endset %}
+            {% set downloadLink %}
+                {{ layout.downloadLink('EditCounterNamespaceTotals', {project:project.domain, username:user.username}, ['wikitext', 'csv']) }}
+            {% endset %}
+            {{ layout.content_block(headerLink, content, downloadLink, 'namespace-totals', true) }}
+        {% endif %}
 
-        {% set content %}
-            {{ render(path('EditCounterYearCounts', {
-                'username': user.username,
-                'project': project.domain
-            })) }}
-        {% endset %}
-        {% set headerLink %}
-            <a href="{{ path('EditCounterYearCounts', {project:project.domain, username:user.username})}}">{{ msg('year-counts') }}</a>
-        {% endset %}
-        {% set downloadLink %}
-            {{ layout.downloadLink('EditCounterYearCounts', {project:project.domain, username:user.username}, ['wikitext', 'csv']) }}
-        {% endset %}
-        {{ layout.content_block(headerLink, content, downloadLink, 'year-counts', true) }}
+        {% if 'year-counts' in sections %}
+            {% set content %}
+                {{ render(path('EditCounterYearCounts', {
+                    'username': user.username,
+                    'project': project.domain
+                })) }}
+            {% endset %}
+            {% set headerLink %}
+                <a href="{{ path('EditCounterYearCounts', {project:project.domain, username:user.username})}}">{{ msg('year-counts') }}</a>
+            {% endset %}
+            {% set downloadLink %}
+                {{ layout.downloadLink('EditCounterYearCounts', {project:project.domain, username:user.username}, ['wikitext', 'csv']) }}
+            {% endset %}
+            {{ layout.content_block(headerLink, content, downloadLink, 'year-counts', true) }}
+        {% endif %}
 
-        {% set content %}
-            {{ render(path('EditCounterMonthCounts', {
-                'username': user.username,
-                'project': project.domain
-            })) }}
-        {% endset %}
-        {% set headerLink %}
-            <a href="{{ path('EditCounterMonthCounts', {project:project.domain, username:user.username})}}">
-                {{ msg('month-counts') }}
-            </a>
-        {% endset %}
-        {% set downloadLink %}
-            {{ layout.downloadLink('EditCounterMonthCounts', {project:project.domain, username:user.username}, ['wikitext', 'csv']) }}
-        {% endset %}
-        {{ layout.content_block(headerLink, content, downloadLink, 'month-counts', true) }}
+        {% if 'month-counts' in sections %}
+            {% set content %}
+                {{ render(path('EditCounterMonthCounts', {
+                    'username': user.username,
+                    'project': project.domain
+                })) }}
+            {% endset %}
+            {% set headerLink %}
+                <a href="{{ path('EditCounterMonthCounts', {project:project.domain, username:user.username})}}">
+                    {{ msg('month-counts') }}
+                </a>
+            {% endset %}
+            {% set downloadLink %}
+                {{ layout.downloadLink('EditCounterMonthCounts', {project:project.domain, username:user.username}, ['wikitext', 'csv']) }}
+            {% endset %}
+            {{ layout.content_block(headerLink, content, downloadLink, 'month-counts', true) }}
+        {% endif %}
 
-        {% set content %}
-            {{ render(path('EditCounterTimecard', {
-                'username': user.username,
-                'project': project.domain
-            })) }}
-        {% endset %}
-        {% set headerLink %}
-            <a href="{{ path('EditCounterTimecard', {project:project.domain, username:user.username})}}">{{ msg('timecard') }}</a>
-        {% endset %}
-        {% set downloadLink %}
-            {{ layout.downloadLink('EditCounterTimecard', {project:project.domain, username:user.username}, ['wikitext']) }}
-        {% endset %}
-        {{ layout.content_block(headerLink, content, downloadLink, 'timecard', true) }}
+        {% if 'timecard' in sections %}
+            {% set content %}
+                {{ render(path('EditCounterTimecard', {
+                    'username': user.username,
+                    'project': project.domain
+                })) }}
+            {% endset %}
+            {% set headerLink %}
+                <a href="{{ path('EditCounterTimecard', {project:project.domain, username:user.username})}}">{{ msg('timecard') }}</a>
+            {% endset %}
+            {% set downloadLink %}
+                {{ layout.downloadLink('EditCounterTimecard', {project:project.domain, username:user.username}, ['wikitext']) }}
+            {% endset %}
+            {{ layout.content_block(headerLink, content, downloadLink, 'timecard', true) }}
+        {% endif %}
 
-        {% set content %}
-            {{ render(path('TopEditsResult', {
-                'username': user.username,
-                'project': project.domain,
-                'namespace': 'all'
-            })) }}
-        {% endset %}
-        {% set headerLink %}
-            <a href="{{ path('TopEditsResult', {project:project.domain, username:user.username, namespace:'all'})}}">{{ msg('top-edited-pages') }}</a>
-        {% endset %}
-        {% set downloadLink %}
-            {{ layout.downloadLink('TopEditsResult', {project:project.domain, username:user.username, namespace:'all'}, ['wikitext']) }}
-        {% endset %}
-        {{ layout.content_block(headerLink, content, downloadLink, 'top-edited-pages', true) }}
+        {% if 'topedits' in sections %}
+            {% set content %}
+                {{ render(path('TopEditsResult', {
+                    'username': user.username,
+                    'project': project.domain,
+                    'namespace': 'all'
+                })) }}
+            {% endset %}
+            {% set headerLink %}
+                <a href="{{ path('TopEditsResult', {project:project.domain, username:user.username, namespace:'all'})}}">{{ msg('top-edited-pages') }}</a>
+            {% endset %}
+            {% set downloadLink %}
+                {{ layout.downloadLink('TopEditsResult', {project:project.domain, username:user.username, namespace:'all'}, ['wikitext']) }}
+            {% endset %}
+            {{ layout.content_block(headerLink, content, downloadLink, 'top-edited-pages', true) }}
+        {% endif %}
 
         {% if not(user.anon) %}
-            {% if ec.rightsChanges|length > 0 or ec.globalRightsChanges|length > 0 %}
+            {% if 'rights-changes' in sections and ec.rightsChanges|length > 0 or ec.globalRightsChanges|length > 0 %}
                 {% set content %}
                     {% include 'editCounter/rights_changes.html.twig' with {
                         'is_sub_request': true,
@@ -132,20 +143,22 @@
                 {{ layout.content_block(headerLink, content, downloadLink, 'rights-changes', true) }}
             {% endif %}
 
-            {% set content %}
-                <em class="contributions-loading text-muted">{{ msg('loading') }}...</em>
-                <div id="latestglobal-container" class="contributions-container"
-                    data-project="{{ project.domain }}"
-                    data-username="{{ user.username }}"
-                    data-offset="0"
-                    data-target="ec-latestglobal"
-                    data-pagesize="30">
-                </div>
-            {% endset %}
-            {% set headerLink %}
-                <a href="{{ path('EditCounterLatestGlobal', {project:project.domain, username:user.username})}}">{{ msg('latest-global-edits') }}</a>
-            {% endset %}
-            {{ layout.content_block(headerLink, content, '', 'latest-global-edits', true) }}
+            {% if 'latest-global-edits' in sections %}
+                {% set content %}
+                    <em class="contributions-loading text-muted">{{ msg('loading') }}...</em>
+                    <div id="latestglobal-container" class="contributions-container"
+                        data-project="{{ project.domain }}"
+                        data-username="{{ user.username }}"
+                        data-offset="0"
+                        data-target="ec-latestglobal"
+                        data-pagesize="30">
+                    </div>
+                {% endset %}
+                {% set headerLink %}
+                    <a href="{{ path('EditCounterLatestGlobal', {project:project.domain, username:user.username})}}">{{ msg('latest-global-edits') }}</a>
+                {% endset %}
+                {{ layout.content_block(headerLink, content, '', 'latest-global-edits', true) }}
+            {% endif %}
         {% endif %}
 
         <div class="text-muted times-in-utc">
