@@ -578,10 +578,15 @@ abstract class XtoolsController extends Controller
         $response->setEncodingOptions(JSON_NUMERIC_CHECK);
         $response->setStatusCode(Response::HTTP_OK);
 
+        $elapsedTime = round(
+            microtime(true) - $this->request->server->get('REQUEST_TIME_FLOAT'),
+            3
+        );
+
         $response->setData(array_merge($this->params, [
-            // In some controllers, $this->params['project'] may be overriden with a Project object.
+            // In some controllers, $this->params['project'] may be overridden with a Project object.
             'project' => $this->project->getDomain(),
-        ], $data));
+        ], $data, ['elapsed_time' => $elapsedTime]));
 
         return $response;
     }

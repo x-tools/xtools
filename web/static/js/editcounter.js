@@ -92,6 +92,11 @@ function toggleNamespace(newData, key)
         var chartObj = window[id + 'countsChart'],
             nsName = window.namespaces[key] || $.i18n('mainspace');
 
+        // Year and month sections can be selectively hidden.
+        if (!chartObj) {
+            return;
+        }
+
         // Figure out the index of the namespace we're toggling within this chart object.
         var datasetIndex;
         chartObj.data.datasets.forEach(function (dataset, i) {
