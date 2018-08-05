@@ -108,11 +108,14 @@ class DefaultControllerTest extends WebTestCase
             // from database name
             $this->client->request('GET', '/api/project/normalize/enwiki');
             $output = json_decode($this->client->getResponse()->getContent(), true);
+            // Removed elapsed_time from the output, since we don't know what the value will be.
+            unset($output['elapsed_time']);
             static::assertEquals($expectedOutput, $output);
 
             // from domain name (without .org)
-            $crawler = $this->client->request('GET', '/api/project/normalize/en.wikipedia');
+            $this->client->request('GET', '/api/project/normalize/en.wikipedia');
             $output = json_decode($this->client->getResponse()->getContent(), true);
+            unset($output['elapsed_time']);
             static::assertEquals($expectedOutput, $output);
         }
     }
