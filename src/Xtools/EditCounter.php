@@ -776,6 +776,33 @@ class EditCounter extends UserRights
     }
 
     /**
+     * Get the counts keyed by month and then namespace.
+     * Basically the opposite of self::monthCounts()['totals'].
+     * @param null|DateTime $currentTime - *USED ONLY FOR UNIT TESTING*
+     *   so we can mock the current DateTime.
+     * @return array Months as keys, values are counts keyed by namesapce.
+     * @fixme Create API for this!
+     */
+    public function monthCountsWithNamespaces($currentTime = null)
+    {
+        $countsMonthNamespace = array_fill_keys(
+            array_keys($this->monthTotals($currentTime)),
+            []
+        );
+
+        foreach ($this->monthCounts($currentTime)['totals'] as $ns => $years) {
+            foreach ($years as $year => $months) {
+                foreach ($months as $month => $count) {
+                    $monthKey = $year.'-'.sprintf('%02d', $month);
+                    $countsMonthNamespace[$monthKey][$ns] = $count;
+                }
+            }
+        }
+
+        return $countsMonthNamespace;
+    }
+
+    /**
      * Loop through the database results and fill in the values
      * for the months that we have data for.
      * @param array $out
@@ -852,7 +879,7 @@ class EditCounter extends UserRights
 
     /**
      * Get total edits for each month. Used in wikitext export.
-     * @param  null|DateTime $currentTime *USED ONLY FOR UNIT TESTING*
+     * @param null|DateTime $currentTime *USED ONLY FOR UNIT TESTING*
      * @return array With the months as the keys, counts as the values.
      */
     public function monthTotals($currentTime = null)
@@ -900,8 +927,31 @@ class EditCounter extends UserRights
     }
 
     /**
+     * Get the counts keyed by year and then namespace.
+     * Basically the opposite of self::yearCounts()['totals'].
+     * @param null|DateTime $currentTime - *USED ONLY FOR UNIT TESTING*
+     *   so we can mock the current DateTime.
+     * @return array Years as keys, values are counts keyed by namesapce.
+     */
+    public function yearCountsWithNamespaces($currentTime = null)
+    {
+        $countsYearNamespace = array_fill_keys(
+            array_keys($this->yearTotals($currentTime)),
+            []
+        );
+
+        foreach ($this->yearCounts($currentTime)['totals'] as $ns => $years) {
+            foreach ($years as $year => $count) {
+                $countsYearNamespace[$year][$ns] = $count;
+            }
+        }
+
+        return $countsYearNamespace;
+    }
+
+    /**
      * Get total edits for each year. Used in wikitext export.
-     * @param  null|DateTime $currentTime *USED ONLY FOR UNIT TESTING*
+     * @param null|DateTime $currentTime *USED ONLY FOR UNIT TESTING*
      * @return array With the years as the keys, counts as the values.
      */
     public function yearTotals($currentTime = null)

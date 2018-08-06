@@ -41,13 +41,19 @@
             <tr>
                 <th>{{ msg('month') }}</th>
                 <th>{{ msg('count') }}</th>
+                {% for ns in ec.monthCounts.totals|keys %}
+                    <th>{{ nsName(ns, project.namespaces) }}</th>
+                {% endfor %}
             </tr>
         </thead>
         <tbody>
-            {% for month,total in ec.monthTotals %}
+            {% for month,namespaces in ec.monthCountsWithNamespaces %}
                 <tr>
                     <td>{{ month }}</td>
-                    <td>{{ total|num_format }}</td>
+                    <td>{{ ec.monthTotals[month]|num_format }}</td>
+                    {% for _ns,count in namespaces %}
+                        <td>{{ count|num_format }}</td>
+                    {% endfor %}
                 </tr>
             {% endfor %}
         </tbody>

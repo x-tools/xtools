@@ -7,7 +7,6 @@ namespace Tests\Xtools;
 
 use AppBundle\Helper\I18nHelper;
 use DateTime;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Xtools\EditCounter;
@@ -72,12 +71,12 @@ class EditCounterTest extends TestAdapter
                 'with_comments' => 75,
             ]);
 
-        $this->assertEquals(100, $this->editCounter->countLiveRevisions());
-        $this->assertEquals(10, $this->editCounter->countDeletedRevisions());
-        $this->assertEquals(110, $this->editCounter->countAllRevisions());
-        $this->assertEquals(100, $this->editCounter->countLast5000());
-        $this->assertEquals(75, $this->editCounter->countRevisionsWithComments());
-        $this->assertEquals(25, $this->editCounter->countRevisionsWithoutComments());
+        static::assertEquals(100, $this->editCounter->countLiveRevisions());
+        static::assertEquals(10, $this->editCounter->countDeletedRevisions());
+        static::assertEquals(110, $this->editCounter->countAllRevisions());
+        static::assertEquals(100, $this->editCounter->countLast5000());
+        static::assertEquals(75, $this->editCounter->countRevisionsWithComments());
+        static::assertEquals(25, $this->editCounter->countRevisionsWithoutComments());
     }
 
     /**
@@ -102,7 +101,7 @@ class EditCounterTest extends TestAdapter
                     'type' => 'thanks',
                 ],
             ]);
-        $this->assertEquals(
+        static::assertEquals(
             [
                 'id' => 123,
                 'timestamp' => '20170510100000',
@@ -110,7 +109,7 @@ class EditCounterTest extends TestAdapter
             ],
             $this->editCounter->getFirstAndLatestActions()['rev_first']
         );
-        $this->assertEquals(
+        static::assertEquals(
             [
                 'id' => 321,
                 'timestamp' => '20170515150000',
@@ -118,7 +117,7 @@ class EditCounterTest extends TestAdapter
             ],
             $this->editCounter->getFirstAndLatestActions()['rev_latest']
         );
-        $this->assertEquals(5, $this->editCounter->getDays());
+        static::assertEquals(5, $this->editCounter->getDays());
     }
 
     /**
@@ -135,13 +134,13 @@ class EditCounterTest extends TestAdapter
                 'created-deleted' => '2',
             ]);
 
-        $this->assertEquals(3, $this->editCounter->countLivePagesEdited());
-        $this->assertEquals(1, $this->editCounter->countDeletedPagesEdited());
-        $this->assertEquals(4, $this->editCounter->countAllPagesEdited());
+        static::assertEquals(3, $this->editCounter->countLivePagesEdited());
+        static::assertEquals(1, $this->editCounter->countDeletedPagesEdited());
+        static::assertEquals(4, $this->editCounter->countAllPagesEdited());
 
-        $this->assertEquals(6, $this->editCounter->countCreatedPagesLive());
-        $this->assertEquals(2, $this->editCounter->countPagesCreatedDeleted());
-        $this->assertEquals(8, $this->editCounter->countPagesCreated());
+        static::assertEquals(6, $this->editCounter->countCreatedPagesLive());
+        static::assertEquals(2, $this->editCounter->countPagesCreatedDeleted());
+        static::assertEquals(8, $this->editCounter->countPagesCreated());
     }
 
     /**
@@ -160,7 +159,7 @@ class EditCounterTest extends TestAdapter
             ->method('getNamespaceTotals')
             ->willReturn($namespaceTotals);
 
-        $this->assertEquals($namespaceTotals, $this->editCounter->namespaceTotals());
+        static::assertEquals($namespaceTotals, $this->editCounter->namespaceTotals());
     }
 
     /**
@@ -168,6 +167,8 @@ class EditCounterTest extends TestAdapter
      */
     public function testMonthCounts()
     {
+        $mockTime = new DateTime('2017-04-30 23:59:59');
+
         $this->editCounterRepo->expects($this->once())
             ->method('getMonthCounts')
             ->willReturn([
@@ -194,11 +195,11 @@ class EditCounterTest extends TestAdapter
         $this->user->setRepository($userRepo);
 
         // Mock current time by passing it in (dummy parameter, so to speak).
-        $monthCounts = $this->editCounter->monthCounts(new DateTime('2017-04-30 23:59:59'));
+        $monthCounts = $this->editCounter->monthCounts($mockTime);
 
         // Make sure zeros were filled in for months with no edits,
         //   and for each namespace.
-        $this->assertArraySubset(
+        static::assertArraySubset(
             [
                 1 => 0,
                 2 => 0,
@@ -207,7 +208,7 @@ class EditCounterTest extends TestAdapter
             ],
             $monthCounts['totals'][0][2017]
         );
-        $this->assertArraySubset(
+        static::assertArraySubset(
             [
                 12 => 0,
             ],
@@ -215,26 +216,35 @@ class EditCounterTest extends TestAdapter
         );
 
         // Assert only active months are reported.
-        $this->assertEquals([12], array_keys($monthCounts['totals'][0][2016]));
-        $this->assertEquals(['01', '02', '03', '04'], array_keys($monthCounts['totals'][0][2017]));
+        static::assertEquals([12], array_keys($monthCounts['totals'][0][2016]));
+        static::assertEquals(['01', '02', '03', '04'], array_keys($monthCounts['totals'][0][2017]));
 
         // Assert that only active years are reported
-        $this->assertEquals([2016, 2017], array_keys($monthCounts['totals'][0]));
+        static::assertEquals([2016, 2017], array_keys($monthCounts['totals'][0]));
 
         // Assert that only active namespaces are reported.
-        $this->assertEquals([0, 1], array_keys($monthCounts['totals']));
+        static::assertEquals([0, 1], array_keys($monthCounts['totals']));
 
         // Labels for the months
-        $this->assertEquals(
+        static::assertEquals(
             ['2016-12', '2017-01', '2017-02', '2017-03', '2017-04'],
             $monthCounts['monthLabels']
         );
 
         // Labels for the years
-        $this->assertEquals(['2016', '2017'], $monthCounts['yearLabels']);
+        static::assertEquals(['2016', '2017'], $monthCounts['yearLabels']);
 
-        $monthTotals = $this->editCounter->monthTotals(new DateTime('2017-04-30 23:59:59'));
-        $this->assertEquals(
+        // Month counts by namespace.
+        $monthsWithNamespaces = $this->editCounter->monthCountsWithNamespaces($mockTime);
+        static::assertEquals(
+            $monthCounts['monthLabels'],
+            array_keys($monthsWithNamespaces)
+        );
+        static::assertEquals([0, 1], array_keys($monthsWithNamespaces['2017-03']));
+
+        // Month totals.
+        $monthTotals = $this->editCounter->monthTotals($mockTime);
+        static::assertEquals(
             [
                 '2016-12' => 10,
                 '2017-01' => 0,
@@ -245,8 +255,8 @@ class EditCounterTest extends TestAdapter
             $monthTotals
         );
 
-        $yearTotals = $this->editCounter->yearTotals(new DateTime('2017-04-30 23:59:59'));
-        $this->assertEquals(['2016' => 10, '2017' => 70], $yearTotals);
+        $yearTotals = $this->editCounter->yearTotals($mockTime);
+        static::assertEquals(['2016' => 10, '2017' => 70], $yearTotals);
     }
 
     /**
@@ -290,7 +300,7 @@ class EditCounterTest extends TestAdapter
 
         // Make sure zeros were filled in for months with no edits,
         //   and for each namespace.
-        $this->assertArraySubset(
+        static::assertArraySubset(
             [
                 2015 => 0,
                 2016 => 10,
@@ -298,7 +308,7 @@ class EditCounterTest extends TestAdapter
             ],
             $yearCounts['totals'][0]
         );
-        $this->assertArraySubset(
+        static::assertArraySubset(
             [
                 2015 => 5,
                 2016 => 0,
@@ -308,13 +318,13 @@ class EditCounterTest extends TestAdapter
         );
 
         // Assert that only active years are reported
-        $this->assertEquals([2015, 2016, 2017], array_keys($yearCounts['totals'][0]));
+        static::assertEquals([2015, 2016, 2017], array_keys($yearCounts['totals'][0]));
 
         // Assert that only active namespaces are reported.
-        $this->assertEquals([0, 1], array_keys($yearCounts['totals']));
+        static::assertEquals([0, 1], array_keys($yearCounts['totals']));
 
         // Labels for the years
-        $this->assertEquals(['2015', '2016', '2017'], $yearCounts['yearLabels']);
+        static::assertEquals(['2015', '2016', '2017'], $yearCounts['yearLabels']);
     }
 
     /**
@@ -337,7 +347,7 @@ class EditCounterTest extends TestAdapter
             ->willReturn($editCounts);
 
         // Get the top 2.
-        $this->assertEquals(
+        static::assertEquals(
             [
                 ['project' => $wiki1, 'total' => 50],
                 ['project' => $wiki2, 'total' => 40],
@@ -346,10 +356,10 @@ class EditCounterTest extends TestAdapter
         );
 
         // And the bottom 4.
-        $this->assertEquals(95, $this->editCounter->globalEditCountWithoutTopN(2));
+        static::assertEquals(95, $this->editCounter->globalEditCountWithoutTopN(2));
 
         // Grand total.
-        $this->assertEquals(185, $this->editCounter->globalEditCount());
+        static::assertEquals(185, $this->editCounter->globalEditCount());
     }
 
     /**
@@ -358,12 +368,11 @@ class EditCounterTest extends TestAdapter
      */
     public function testLongestBlockSeconds($blockLog, $longestDuration)
     {
-        $currentTime = time();
         $this->editCounterRepo->expects($this->once())
             ->method('getBlocksReceived')
             ->with($this->project, $this->user)
             ->willReturn($blockLog);
-        $this->assertEquals($this->editCounter->getLongestBlockSeconds(), $longestDuration);
+        static::assertEquals($this->editCounter->getLongestBlockSeconds(), $longestDuration);
     }
 
     /**
@@ -477,7 +486,7 @@ class EditCounterTest extends TestAdapter
     public function testParseBlockLogEntry($logEntry, $assertion)
     {
         $editCounter = new EditCounter($this->project, $this->user, $this->i18n);
-        $this->assertEquals(
+        static::assertEquals(
             $editCounter->parseBlockLogEntry($logEntry),
             $assertion
         );
@@ -588,7 +597,7 @@ class EditCounterTest extends TestAdapter
                 ],
             ]);
 
-        $this->assertEquals([
+        static::assertEquals([
             20180108132858 => [
                 'logId' => '210220',
                 'admin' => 'MusikAnimal',
@@ -648,7 +657,7 @@ class EditCounterTest extends TestAdapter
                 'type' => 'global',
             ]]);
 
-        $this->assertEquals([
+        static::assertEquals([
             20141222034127 => [
                 'logId' => '140643',
                 'admin' => 'Snowolf',
@@ -670,18 +679,18 @@ class EditCounterTest extends TestAdapter
         $this->user->setRepository($userRepo);
 
         // Current rights.
-        $this->assertEquals(
+        static::assertEquals(
             ['sysop', 'bureaucrat'],
             $this->editCounter->getRightsStates()['local']['current']
         );
 
         // Former rights.
-        $this->assertEquals(
+        static::assertEquals(
             ['ipblock-exempt', 'filemover', 'templateeditor', 'rollbacker'],
             $this->editCounter->getRightsStates()['local']['former']
         );
 
         // Admin status.
-        $this->assertEquals('current', $this->editCounter->getAdminStatus());
+        static::assertEquals('current', $this->editCounter->getAdminStatus());
     }
 }
