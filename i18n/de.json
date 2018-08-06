@@ -337,6 +337,7 @@
 	"see-full-page-stats": "Alle Seitenstatistiken",
 	"see-full-statistics": "Vollständige Statistiken ansehen",
 	"show": "anzeigen",
+	"show-sections-desc": "Wähle aus, welche Statistiken angezeigt werden sollen. Je mehr du auswählst, desto länger dauert das Laden.",
 	"size": "Größe",
 	"size-over-time": "Zeitverlauf der Artikelgröße",
 	"small-edits": "Kleine Bearbeitungen (< 20 Bytes)",

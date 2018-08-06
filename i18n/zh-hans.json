@@ -4,7 +4,8 @@
 			"Liuxinyu970226",
 			"Nemo bis",
 			"Muhebbet",
-			"WhitePhosphorus"
+			"WhitePhosphorus",
+			"Leiem"
 		]
 	},
 	"accepted-formats": "接受的格式",
@@ -337,6 +338,7 @@
 	"see-full-page-stats": "查看完整页面统计",
 	"see-full-statistics": "查看完整统计",
 	"show": "显示",
+	"show-sections-desc": "选择所要显示的数据。您选择的越多，加载的时间越长。",
 	"size": "大小",
 	"size-over-time": "一段时间后的大小",
 	"small-edits": "小编辑（<20字节）",

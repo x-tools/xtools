@@ -340,6 +340,7 @@
 	"see-full-page-stats": "Voir les statistiques détaillées",
 	"see-full-statistics": "Voir les statistiques complètes",
 	"show": "afficher",
+	"show-sections-desc": "Sélectionner les statistiques à afficher Plus vous en sélectionnez et plus elles prendront de temps à se charger.",
 	"size": "Taille",
 	"size-over-time": "Taille des articles dans le temps",
 	"small-edits": "Petites modifications (< 20 octets)",

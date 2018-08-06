@@ -336,6 +336,7 @@
 	"see-full-page-stats": "Se fullständig sidstatistik",
 	"see-full-statistics": "Se fullständig statistik",
 	"show": "visa",
+	"show-sections-desc": "Väljer vilken statistik att visa. Ju mer du väljer, desto längre kommer det ta att läsa in.",
 	"size": "Storlek",
 	"size-over-time": "Artikelstorlek över tid",
 	"small-edits": "Små redigeringar (under 20 byte)",

@@ -333,6 +333,7 @@
 	"see-full-page-stats": "Ver página completa de estatísticas",
 	"see-full-statistics": "Veja as estatísticas completas",
 	"show": "Exibir",
+	"show-sections-desc": "Selecione quais estatísticas mostrar. Quanto mais você selecionar, mais tempo levará para carregar.",
 	"size": "Tamanho",
 	"size-over-time": "Tamanho do artigo ao longo do tempo",
 	"small-edits": "Edições menores (<20 bytes)",

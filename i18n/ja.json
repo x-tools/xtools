@@ -8,7 +8,8 @@
 			"Yusuke1109",
 			"S2KTS",
 			"Aefgh39622",
-			"Omotecho"
+			"Omotecho",
+			"Leiem"
 		]
 	},
 	"accepted-formats": "受け入れられる形式",
@@ -192,6 +193,7 @@
 	"no-summary": "要約なし",
 	"non-admins-with-actions": "管理者操作を行った非管理者",
 	"non-auto-contribs": "自動でない編集",
+	"none": "なし",
 	"not-opted-in": "このユーザーはこのデータを表示することを選択していません。このユーザーとしてXToolsにログインするか、または任意のコンテンツで$1を作成してください。詳細については、ドキュメントを参照してください。",
 	"num-blocks": "{{PLURAL:$1|ブロック}}",
 	"num-bytes": "{{PLURAL:$1|バイト}}",
@@ -317,6 +319,7 @@
 	"user-groups": "利用者グループ",
 	"user-id": "利用者 ID",
 	"user-is-not-admin": "この利用者は管理者ではありません",
+	"user-page": "利用者ページ",
 	"username": "利用者名",
 	"username-or-ip": "利用者名かIPv4・IPv6のIPアドレス",
 	"version": "バージョン $1",

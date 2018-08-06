@@ -339,6 +339,7 @@
 	"see-full-page-stats": "檢視完整頁面統計",
 	"see-full-statistics": "檢視完整統計",
 	"show": "顯示",
+	"show-sections-desc": "選擇要顯示出的統計內容。您若選擇的越多，就會花更多的時間載入。",
 	"size": "內容大小",
 	"size-over-time": "隨時間變化",
 	"small-edits": "小修改（小於 20 位元組）",
