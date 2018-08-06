@@ -358,7 +358,7 @@ class ArticleInfoTest extends TestAdapter
                 'length' => '15',
                 'length_change' => '-10',
                 'username' => '192.168.0.1',
-                'comment' => 'Weeee using ([[WP:AWB|AWB]])',
+                'comment' => 'Weeee using [[WP:AWB|AWB]]',
                 'rev_sha1' => 'cccccc',
             ]),
             new Edit($this->page, [
