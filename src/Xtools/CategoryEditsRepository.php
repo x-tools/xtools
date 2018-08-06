@@ -90,17 +90,25 @@ class CategoryEditsRepository extends Repository
         $categorylinksTable = $project->getTableName('categorylinks');
 
         $query = $this->getProjectsConnection()->createQueryBuilder();
-        $query->select(['cl_to', 'COUNT(rev_id)'])
+        $query->select(['cl_to AS cat', 'COUNT(rev_id) AS edit_count', 'COUNT(DISTINCT(rev_page)) AS page_count'])
             ->from($revisionTable, 'revs')
             ->join('revs', $categorylinksTable, null, 'cl_from = rev_page')
             ->where('revs.rev_user_text = :username')
             ->andWhere($query->expr()->in('cl_to', ':categories'))
+            ->orderBy('edit_count', 'DESC')
             ->groupBy('cl_to');
 
-        $result = $this->executeStmt($query, $user, $categories, $start, $end)->fetchAll(\PDO::FETCH_KEY_PAIR);
+        $counts = [];
+        $stmt = $this->executeStmt($query, $user, $categories, $start, $end);
+        while ($result = $stmt->fetch()) {
+            $counts[$result['cat']] = [
+                'editCount' => (int)$result['edit_count'],
+                'pageCount' => (int)$result['page_count'],
+            ];
+        }
 
         // Cache and return.
-        return $this->setCache($cacheKey, $result);
+        return $this->setCache($cacheKey, $counts);
     }
 
     /**

@@ -132,6 +132,20 @@ class CategoryEdits extends Model
     }
 
     /**
+     * Get the number of pages edited.
+     * @return int
+     */
+    public function getCategoryPageCount()
+    {
+        $pageCount = 0;
+        foreach ($this->getCategoryCounts() as $categoryCount) {
+            $pageCount += $categoryCount['pageCount'];
+        }
+
+        return $pageCount;
+    }
+
+    /**
      * Get contributions made to the categories.
      * @param bool $raw Wether to return raw data from the database, or get Edit objects.
      * @return string[]|Edit[]
@@ -212,8 +226,6 @@ class CategoryEdits extends Model
             $this->start,
             $this->end
         );
-
-        arsort($this->categoryCounts);
 
         return $this->categoryCounts;
     }

@@ -110,7 +110,7 @@
             {% if ce.categories|length > 1 %}
                 <table class="table table-bordered table-hover table-striped tools-table toggle-table">
                     <thead>
-                    {% for key in ['category', 'count', 'percent-of-edit-count'] %}
+                    {% for key in ['category', 'count', 'percent-of-edit-count', 'pages'] %}
                         <th>
                             <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
                                 {{ msg(key)|capitalize_first }}
@@ -120,23 +120,26 @@
                     {% endfor %}
                     </thead>
                     <tbody>
-                    {% for category, count in ce.categoryCounts %}
+                    {% for category, values in ce.categoryCounts %}
                         <tr>
                             <td class="sort-entry--category linked" data-value="{{ category }}">
                                 <span class="tools-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ category }}">
                                     <span class="glyphicon glyphicon-remove"></span>
                                     <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
                                 </span>
-                                {## REFACTOR: add method to CategoryEdits that incldues namespaces #}
+                                {# REFACTOR: add method to CategoryEdits that incldues namespaces #}
                                 {{ wiki.pageLinkRaw(nsName(14, project.namespaces) ~ ':' ~ category, project, category|replace({'_': ' '})) }}
                             </td>
-                            <td class="sort-entry--count" data-value="{{ count }}">
+                            <td class="sort-entry--count" data-value="{{ values.editCount }}">
                                 <a href="{{ path('CategoryEditsResult', {project:project.domain, username:user.username, categories: category, start: ce.start, end: ce.end}) }}">
-                                    {{ count|num_format }}
+                                    {{ values.editCount|num_format }}
                                 </a>
                             </td>
-                            <td class="sort-entry--percent-of-edit-count" data-value="{{ count }}">
-                                {{ count|percent_format(ce.editCount) }}
+                            <td class="sort-entry--percent-of-edit-count" data-value="{{ values.editCount }}">
+                                {{ values.editCount|percent_format(ce.editCount) }}
+                            </td>
+                            <td class="sort-entry--pages" data-value="{{ values.pageCount }}">
+                                {{ values.pageCount }}
                             </td>
                         </tr>
                     {% endfor %}
@@ -149,7 +152,12 @@
                         <th class="category--count">
                             {{ ce.categoryEditCount|num_format }}
                         </th>
-                        <th colspan=2></th>
+                        <th class="category--percent-of-edit-count">
+                            {{ ce.categoryPercentage|percent_format }}
+                        </th>
+                        <th class="category--pages">
+                            {{ ce.categoryPageCount|num_format }}
+                        </th>
                     </tfoot>
                 </table>
 
@@ -178,8 +186,8 @@
                             labels: {{ ce.categoriesNormalized|json_encode()|raw }},
                             datasets: [{
                                 data: [
-                                    {% for _category, count in ce.categoryCounts %}
-                                        {{ count }}{% if not loop.last %},{% endif %}
+                                    {% for _category, values in ce.categoryCounts %}
+                                        {{ values.editCount }}{% if not loop.last %},{% endif %}
                                     {% endfor %}
                                 ],
                                 backgroundColor: {{ colors|json_encode()|raw }},
