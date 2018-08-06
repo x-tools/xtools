@@ -246,7 +246,7 @@ parameters:
             regex: 'WP:(AFCH|AFCHRW)'
             link: Project:AFCH
         AutoWikiBrowser:
-            regex: '(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
+            regex: 'using \[\[(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
             link: Project:AutoWikiBrowser
         Checklinks:
             regex: 'using \[\[w:WP:CHECKLINKS'
