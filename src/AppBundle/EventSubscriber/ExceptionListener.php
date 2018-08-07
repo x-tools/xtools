@@ -59,7 +59,7 @@ class ExceptionListener
         if ($exception instanceof XtoolsHttpException) {
             $response = $this->getXtoolsHttpResponse($exception);
         } elseif ($exception instanceof Twig_Error_Runtime && $prevException !== null) {
-            $response = $this->getTwigErrorReponse($prevException);
+            $response = $this->getTwigErrorResponse($prevException);
         } else {
             throw $exception;
         }
@@ -92,7 +92,7 @@ class ExceptionListener
      * @return Response
      * @throws Twig_Error_Runtime
      */
-    private function getTwigErrorReponse($exception)
+    private function getTwigErrorResponse($exception)
     {
         if ($this->environment !== 'prod') {
             throw $exception;

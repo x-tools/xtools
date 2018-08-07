@@ -105,9 +105,9 @@ abstract class XtoolsController extends Controller
 
         // Whether we're making a subrequest (the view makes a request to another action).
         $this->isSubRequest = $this->request->get('htmlonly')
-            || $this->get('request_stack')->getParentRequest() !== null;
+            || null !== $this->get('request_stack')->getParentRequest();
 
-        if ($this->controllerAction === 'index') {
+        if (false !== strpos(strtolower($this->controllerAction), 'index')) {
             $this->project = $this->getProjectFromQuery();
         } else {
             $this->setProperties();

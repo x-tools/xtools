@@ -209,6 +209,17 @@ class EditCounterController extends XtoolsController
     }
 
     /**
+     * @Route("/ec-generalstats", name="EditCounterGeneralStatsIndex")
+     * @Route("/ec-generalstats/", name="EditCounterGeneralStatsIndexSlash")
+     * @return Response
+     */
+    public function generalStatsIndexAction()
+    {
+        $this->sections = ['general-stats'];
+        return $this->indexAction();
+    }
+
+    /**
      * Display the namespace totals section.
      * @Route("/ec-namespacetotals/{project}/{username}", name="EditCounterNamespaceTotals")
      * @return Response
@@ -229,6 +240,17 @@ class EditCounterController extends XtoolsController
 
         // Output the relevant format template.
         return $this->getFormattedResponse($this->request, 'editCounter/namespace_totals', $ret);
+    }
+
+    /**
+     * @Route("/ec-namespacetotals", name="EditCounterNamespaceTotalsIndex")
+     * @Route("/ec-namespacetotals/", name="EditCounterNamespaceTotalsIndexSlash")
+     * @return Response
+     */
+    public function namespaceTotalsIndexAction()
+    {
+        $this->sections = ['namespace-totals'];
+        return $this->indexAction();
     }
 
     /**
@@ -260,6 +282,17 @@ class EditCounterController extends XtoolsController
     }
 
     /**
+     * @Route("/ec-timecard", name="EditCounterTimecardIndex")
+     * @Route("/ec-timecard/", name="EditCounterTimecardIndexSlash")
+     * @return Response
+     */
+    public function timecardIndexAction()
+    {
+        $this->sections = ['timecard'];
+        return $this->indexAction();
+    }
+
+    /**
      * Display the year counts section.
      * @Route("/ec-yearcounts/{project}/{username}", name="EditCounterYearCounts")
      * @return Response
@@ -280,6 +313,17 @@ class EditCounterController extends XtoolsController
 
         // Output the relevant format template.
         return $this->getFormattedResponse($this->request, 'editCounter/yearcounts', $ret);
+    }
+
+    /**
+     * @Route("/ec-yearcounts", name="EditCounterYearCountsIndex")
+     * @Route("/ec-yearcounts/", name="EditCounterYearCountsIndexSlash")
+     * @return Response
+     */
+    public function yearCountsIndexAction()
+    {
+        $this->sections = ['year-counts'];
+        return $this->indexAction();
     }
 
     /**
@@ -310,6 +354,17 @@ class EditCounterController extends XtoolsController
     }
 
     /**
+     * @Route("/ec-monthcounts", name="EditCounterMonthCountsIndex")
+     * @Route("/ec-monthcounts/", name="EditCounterMonthCountsIndexSlash")
+     * @return Response
+     */
+    public function monthCountsIndexAction()
+    {
+        $this->sections = ['month-counts'];
+        return $this->indexAction();
+    }
+
+    /**
      * Display the user rights changes section.
      * @Route("/ec-rightschanges/{project}/{username}", name="EditCounterRightsChanges")
      * @return Response
@@ -334,6 +389,17 @@ class EditCounterController extends XtoolsController
 
         // Output the relevant format template.
         return $this->getFormattedResponse($this->request, 'editCounter/rights_changes', $ret);
+    }
+
+    /**
+     * @Route("/ec-rightschanges", name="EditCounterRightsChangesIndex")
+     * @Route("/ec-rightschanges/", name="EditCounterRightsChangesIndexSlash")
+     * @return Response
+     */
+    public function rightsChangesIndexAction()
+    {
+        $this->sections = ['rights-changes'];
+        return $this->indexAction();
     }
 
     /**
@@ -367,6 +433,17 @@ class EditCounterController extends XtoolsController
             'offset' => $this->request->get('offset'),
             'pageSize' => $this->request->get('pagesize'),
         ]);
+    }
+
+    /**
+     * @Route("/ec-latestglobal", name="EditCounterLatestGlobalIndex")
+     * @Route("/ec-latestglobal/", name="EditCounterLatestGlobalIndexSlash")
+     * @return Response
+     */
+    public function latestGlobalIndexAction()
+    {
+        $this->sections = ['latest-global-edits'];
+        return $this->indexAction();
     }
 
 
