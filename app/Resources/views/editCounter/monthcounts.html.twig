@@ -98,7 +98,8 @@
                 datasets.push(dataset);
             {% endfor %}
 
-            window.setupMonthYearChart('month', datasets, labels, maxTotal);
+            var showLegend = {% if is_sub_request %}false{% else %}true{% endif %};
+            window.setupMonthYearChart('month', datasets, labels, maxTotal, showLegend);
         });
     </script>
 {% else %}

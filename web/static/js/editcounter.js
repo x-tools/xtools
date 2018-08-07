@@ -214,8 +214,9 @@ function getPercentage(numerator, denominator)
  * @param {Array} datasets Datasets grouped by mainspace.
  * @param {Array} labels The bare labels for the y-axis (years or months).
  * @param {Number} maxTotal Maximum value of year/month totals.
+ * @param {Boolean} showLegend Whether to show the legend above the chart.
  */
-window.setupMonthYearChart = function (id, datasets, labels, maxTotal) {
+window.setupMonthYearChart = function (id, datasets, labels, maxTotal, showLegend) {
     /** @type {Array} Labels for each namespace. */
     var namespaces = datasets.map(function (dataset) {
         return dataset.label;
@@ -276,7 +277,7 @@ window.setupMonthYearChart = function (id, datasets, labels, maxTotal) {
                 }]
             },
             legend: {
-                display: false
+                display: showLegend
             }
         }
     });
