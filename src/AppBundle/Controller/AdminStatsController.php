@@ -94,11 +94,9 @@ class AdminStatsController extends XtoolsController
 
         $this->adminStats->prepareStats();
 
-        // Render the result!
-        return $this->render('adminStats/result.html.twig', [
+        return $this->getFormattedResponse('adminStats/result', [
             'xtPage' => 'adminstats',
             'xtTitle' => $this->project->getDomain(),
-            'project' => $this->project,
             'as' => $this->adminStats,
         ]);
     }
@@ -157,16 +155,10 @@ class AdminStatsController extends XtoolsController
 
         $this->adminStats->prepareStats(false);
 
-        $response = [
-            'project' => $this->project->getDomain(),
+        return $this->getFormattedApiResponse([
             'start' => $start,
             'end' => $end,
             'users' => $this->adminStats->getStats(false),
-        ];
-
-        return new JsonResponse(
-            $response,
-            Response::HTTP_OK
-        );
+        ]);
     }
 }

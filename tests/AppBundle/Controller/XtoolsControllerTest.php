@@ -9,6 +9,7 @@ use AppBundle\Controller\XtoolsController;
 use AppBundle\Exception\XtoolsHttpException;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Controller\SimpleEditCounterController;
@@ -222,14 +223,14 @@ class XtoolsControllerTest extends WebTestCase
         $user = $controller->validateUser('MusikAnimal');
         static::assertEquals('MusikAnimal', $user->getUsername());
 
-        static::setExpectedException(XtoolsHttpException::class);
+        static::expectException(XtoolsHttpException::class);
         $controller->validateUser('Not a real user 8723849237');
 
-        static::setExpectedException(XtoolsHttpException::class);
+        static::expectException(XtoolsHttpException::class);
         $controller->validateProject('invalid.project.org');
 
         // Too high of an edit count.
-        static::setExpectedException(XtoolsHttpException::class);
+        static::expectException(XtoolsHttpException::class);
         $controller->validateUser('Materialscientist');
     }
 
@@ -270,7 +271,7 @@ class XtoolsControllerTest extends WebTestCase
         }
 
         $controller = $this->getControllerWithRequest(['project' => 'enwiki']);
-        static::setExpectedException(XtoolsHttpException::class);
+        static::expectException(XtoolsHttpException::class);
         $controller->validatePage('Test adjfaklsdjf');
 
         static::assertInstanceOf(
@@ -328,6 +329,35 @@ class XtoolsControllerTest extends WebTestCase
                 '2017-08-01',
                 false
             )
+        );
+    }
+
+    /**
+     * Test involving fetching and settings cookies.
+     */
+    public function testCookies()
+    {
+        $crawler = $this->client->request('GET', '/sc');
+        static::assertEquals(
+            $this->container->getParameter('default_project'),
+            $crawler->filter('#project_input')->attr('value')
+        );
+
+        // For now...
+        if (!$this->container->getParameter('app.is_labs')) {
+            return;
+        }
+
+        $cookie = new Cookie('XtoolsProject', 'test.wikipedia');
+        $this->client->getCookieJar()->set($cookie);
+
+        $crawler = $this->client->request('GET', '/sc');
+        static::assertEquals('test.wikipedia.org', $crawler->filter('#project_input')->attr('value'));
+
+        $this->client->request('GET', '/sc/enwiki/Example');
+        static::assertEquals(
+            'en.wikipedia.org',
+            $this->client->getResponse()->headers->getCookies()[0]->getValue()
         );
     }
 }

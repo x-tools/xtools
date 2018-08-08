@@ -6,7 +6,6 @@
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Xtools\AdminScore;
 use Xtools\AdminScoreRepository;
@@ -63,11 +62,9 @@ class AdminScoreController extends XtoolsController
         $adminScore = new AdminScore($this->project, $this->user);
         $adminScore->setRepository($adminScoreRepo);
 
-        return $this->render('adminscore/result.html.twig', [
+        return $this->getFormattedResponse('adminscore/result', [
             'xtPage' => 'adminscore',
             'xtTitle' => $this->user->getUsername(),
-            'project' => $this->project,
-            'user' => $this->user,
             'as' => $adminScore,
         ]);
     }

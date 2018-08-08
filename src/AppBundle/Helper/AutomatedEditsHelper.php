@@ -63,12 +63,10 @@ class AutomatedEditsHelper extends HelperBase
     }
 
     /**
-     * Get list of automated tools and their associated info for the
-     *   given project. This defaults to the 'default_project' if
-     *   entries for the given project are not found.
+     * Get list of automated tools and their associated info for the given project.
+     * This defaults to the 'default_project' if entries for the given project are not found.
      * @param Project $project
-     * @return string[] Each tool with the tool name as the key,
-     *   and 'link', 'regex' and/or 'tag' as the subarray keys.
+     * @return array Each tool with the tool name as the key, and 'link', 'regex' and/or 'tag' as the subarray keys.
      */
     public function getTools(Project $project)
     {
@@ -105,8 +103,7 @@ class AutomatedEditsHelper extends HelperBase
     }
 
     /**
-     * Merges the given rule sets, giving priority to the local set.
-     * Regex is concatenated, not overridden.
+     * Merges the given rule sets, giving priority to the local set. Regex is concatenated, not overridden.
      * @param array $globalRules The global rule set.
      * @param array $localRules The rule set for the local wiki.
      * @return array Merged rules.
@@ -141,8 +138,7 @@ class AutomatedEditsHelper extends HelperBase
 
     /**
      * Get only tools that are used to revert edits.
-     * Revert detection happens only by testing against a regular expression,
-     *   and not by checking tags.
+     * Revert detection happens only by testing against a regular expression, and not by checking tags.
      * @param Project $project
      * @return string[] Each tool with the tool name as the key,
      *   and 'link' and 'regex' as the subarray keys.

@@ -210,7 +210,7 @@ parameters:
         Redirect:
             link: Wikipedia:Weiterleitung
         Popups:
-            regex: 'Wikipedia:Helferlein/Navigation-Popups\|Popups'
+            regex: 'Wikipedia:Helferlein\/Navigation-Popups\|Popups'
             link: Wikipedia:Helferlein/Navigation-Popups
             label: Navigation-Popups
     de.wiktionary.org:

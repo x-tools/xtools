@@ -145,7 +145,7 @@ class PagesController extends XtoolsController
         }
 
         // Output the relevant format template.
-        return $this->getFormattedResponse($this->request, 'pages/result', $ret);
+        return $this->getFormattedResponse('pages/result', $ret);
     }
 
     /**

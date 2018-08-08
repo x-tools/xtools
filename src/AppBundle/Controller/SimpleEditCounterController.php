@@ -65,11 +65,11 @@ class SimpleEditCounterController extends XtoolsController
             'xtPage' => 'simpleeditcounter',
             'project' => $this->project,
 
-            // Defaults that will get overriden if in $params.
+            // Defaults that will get overridden if in $params.
             'namespace' => 'all',
             'start' => '',
             'end' => '',
-        ], $this->params));
+        ], $this->params, ['project' => $this->project]));
     }
 
     /**
@@ -106,12 +106,9 @@ class SimpleEditCounterController extends XtoolsController
         $sec->setRepository($secRepo);
         $sec->prepareData();
 
-        // Assign the values and display the template
-        return $this->render('simpleEditCounter/result.html.twig', [
+        return $this->getFormattedResponse('simpleEditCounter/result', [
             'xtPage' => 'simpleeditcounter',
             'xtTitle' => $this->user->getUsername(),
-            'user' => $this->user,
-            'project' => $this->project,
             'sec' => $sec,
         ]);
     }
@@ -155,25 +152,6 @@ class SimpleEditCounterController extends XtoolsController
         $sec->setRepository($secRepo);
         $sec->prepareData();
 
-        $ret = [
-            'username' => $this->user->getUsername(),
-        ];
-
-        if ($namespace !== 'all') {
-            $ret['namespace'] = $namespace;
-        }
-        if ($this->start !== false) {
-            $ret['start'] = date('Y-m-d', $this->start);
-        }
-        if ($this->end !== false) {
-            $ret['end'] = date('Y-m-d', $this->end);
-        }
-
-        $ret = array_merge($ret, $sec->getData());
-
-        $response = new JsonResponse();
-        $response->setEncodingOptions(JSON_NUMERIC_CHECK);
-        $response->setData($ret);
-        return $response;
+        return $this->getFormattedApiResponse($sec->getData());
     }
 }

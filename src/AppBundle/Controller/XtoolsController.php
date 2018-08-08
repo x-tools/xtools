@@ -8,6 +8,7 @@ namespace AppBundle\Controller;
 use AppBundle\Exception\XtoolsHttpException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -66,8 +67,18 @@ abstract class XtoolsController extends Controller
     protected $isSubRequest;
 
     /**
-     * @var string This activates the 'too high edit count' functionality. This property represents the
-     *   action that should be redirected to if the user has too high of an edit count.
+     * Stores user preferences such default project.
+     * This may get altered from the Request and updated in the Response.
+     * @var array
+     */
+    protected $cookies = [
+        'XtoolsProject' => null,
+    ];
+
+    /**
+     * This activates the 'too high edit count' functionality. This property represents the
+     * action that should be redirected to if the user has too high of an edit count.
+     * @var string
      */
     protected $tooHighEditCountAction;
 
@@ -94,6 +105,7 @@ abstract class XtoolsController extends Controller
         $this->container = $container;
         $this->params = $this->parseQueryParams();
 
+        // Parse out the name of the controller and action.
         $pattern = "#::([a-zA-Z]*)Action#";
         $matches = [];
         preg_match($pattern, $this->request->get('_controller'), $matches);
@@ -107,12 +119,69 @@ abstract class XtoolsController extends Controller
         $this->isSubRequest = $this->request->get('htmlonly')
             || null !== $this->get('request_stack')->getParentRequest();
 
+        // Load user options from cookies.
+        $this->loadCookies();
+
+        // Set the class-level properties based on params.
         if (false !== strpos(strtolower($this->controllerAction), 'index')) {
-            $this->project = $this->getProjectFromQuery();
+            // Index pages should only set the project, and no other class properties.
+            $this->setProject($this->getProjectFromQuery());
         } else {
-            $this->setProperties();
+            $this->setProperties(); // Includes the project.
         }
     }
+
+    /***********
+     * COOKIES *
+     ***********/
+
+    /**
+     * Load user preferences from the associated cookies.
+     */
+    private function loadCookies()
+    {
+        // Not done for subrequests.
+        if ($this->isSubRequest) {
+            return;
+        }
+
+        foreach (array_keys($this->cookies) as $name) {
+            $this->cookies[$name] = $this->request->cookies->get($name);
+        }
+    }
+
+    /**
+     * Set cookies on the given Response.
+     * @param Response $response
+     */
+    private function setCookies(Response &$response)
+    {
+        // Not done for subrequests.
+        if ($this->isSubRequest) {
+            return;
+        }
+
+        foreach ($this->cookies as $name => $value) {
+            $response->headers->setCookie(
+                new Cookie($name, $value)
+            );
+        }
+    }
+
+    /**
+     * Sets the project, with the domain in $this->cookies['XtoolsProject'] that will
+     * later get set on the Response headers in self::getFormattedResponse().
+     * @param Project $project
+     */
+    private function setProject(Project $project)
+    {
+        $this->project = $project;
+        $this->cookies['XtoolsProject'] = $project->getDomain();
+    }
+
+    /****************************
+     * SETTING CLASS PROPERTIES *
+     ****************************/
 
     /**
      * Normalize all common parameters used by the controllers and set class properties.
@@ -127,8 +196,14 @@ abstract class XtoolsController extends Controller
         }
 
         if (isset($this->params['project'])) {
-            $this->project = $this->validateProject($this->params['project']);
+            $this->setProject($this->validateProject($this->params['project']));
+        } elseif (null !== $this->cookies['XtoolsProject']) {
+            // Set from cookie.
+            $this->setProject(
+                $this->validateProject($this->cookies['XtoolsProject'])
+            );
         }
+
         if (isset($this->params['username'])) {
             $this->user = $this->validateUser($this->params['username']);
         }
@@ -171,6 +246,39 @@ abstract class XtoolsController extends Controller
     }
 
     /**
+     * Get a Project instance from the project string, using defaults if the given project string is invalid.
+     * @return Project
+     */
+    public function getProjectFromQuery()
+    {
+        // Set default project so we can populate the namespace selector on index pages.
+        // Defaults to project stored in cookie, otherwise project specified in parameters.yml.
+        if (isset($this->params['project'])) {
+            $project = $this->params['project'];
+        } elseif (null !== $this->cookies['XtoolsProject']) {
+            $project = $this->cookies['XtoolsProject'];
+        } else {
+            $project = $this->container->getParameter('default_project');
+        }
+
+        $projectData = ProjectRepository::getProject($project, $this->container);
+
+        // Revert back to defaults if we've established the given project was invalid.
+        if (!$projectData->exists()) {
+            $projectData = ProjectRepository::getProject(
+                $this->container->getParameter('default_project'),
+                $this->container
+            );
+        }
+
+        return $projectData;
+    }
+
+    /*************************
+     * GETTERS / VALIDATIONS *
+     *************************/
+
+    /**
      * Validate the given project, returning a Project if it is valid or false otherwise.
      * @param string $projectQuery Project domain or database name.
      * @return Project
@@ -191,54 +299,6 @@ abstract class XtoolsController extends Controller
             ['invalid-project', $this->params['project']],
             'project'
         );
-    }
-
-    /**
-     * Parse out common parameters from the request. These include the
-     * 'project', 'username', 'namespace' and 'page', along with their legacy
-     * counterparts (e.g. 'lang' and 'wiki').
-     * @return string[] Normalized parameters (no legacy params).
-     */
-    public function parseQueryParams()
-    {
-        /** @var string[] Each parameter and value that was detected. */
-        $params = $this->getParams();
-
-        // Covert any legacy parameters, if present.
-        $params = $this->convertLegacyParams($params);
-
-        // Remove blank values.
-        return array_filter($params, function ($param) {
-            // 'namespace' or 'username' could be '0'.
-            return $param !== null && $param !== '';
-        });
-    }
-
-    /**
-     * Get a Project instance from the project string, using defaults if the given project string is invalid.
-     * @return Project
-     */
-    public function getProjectFromQuery()
-    {
-        // Set default project so we can populate the namespace selector
-        // on index pages.
-        if (empty($this->params['project'])) {
-            $project = $this->container->getParameter('default_project');
-        } else {
-            $project = $this->params['project'];
-        }
-
-        $projectData = ProjectRepository::getProject($project, $this->container);
-
-        // Revert back to defaults if we've established the given project was invalid.
-        if (!$projectData->exists()) {
-            $projectData = ProjectRepository::getProject(
-                $this->container->getParameter('default_project'),
-                $this->container
-            );
-        }
-
-        return $projectData;
     }
 
     /**
@@ -376,6 +436,10 @@ abstract class XtoolsController extends Controller
         ])->getContent();
     }
 
+    /******************
+     * PARSING PARAMS *
+     ******************/
+
     /**
      * Get all standardized parameters from the Request, either via URL query string or routing.
      * @return string[]
@@ -421,6 +485,27 @@ abstract class XtoolsController extends Controller
         }
 
         return $params;
+    }
+
+    /**
+     * Parse out common parameters from the request. These include the
+     * 'project', 'username', 'namespace' and 'page', along with their legacy
+     * counterparts (e.g. 'lang' and 'wiki').
+     * @return string[] Normalized parameters (no legacy params).
+     */
+    public function parseQueryParams()
+    {
+        /** @var string[] Each parameter and value that was detected. */
+        $params = $this->getParams();
+
+        // Covert any legacy parameters, if present.
+        $params = $this->convertLegacyParams($params);
+
+        // Remove blank values.
+        return array_filter($params, function ($param) {
+            // 'namespace' or 'username' could be '0'.
+            return $param !== null && $param !== '';
+        });
     }
 
     /**
@@ -504,53 +589,32 @@ abstract class XtoolsController extends Controller
         return $params;
     }
 
-    /**
-     * Record usage of an API endpoint.
-     * @param string $endpoint
-     * @codeCoverageIgnore
-     */
-    public function recordApiUsage($endpoint)
-    {
-        /** @var \Doctrine\DBAL\Connection $conn */
-        $conn = $this->container->get('doctrine')
-            ->getManager('default')
-            ->getConnection();
-        $date =  date('Y-m-d');
-
-        // Increment count in timeline
-        $existsSql = "SELECT 1 FROM usage_api_timeline
-                      WHERE date = '$date'
-                      AND endpoint = '$endpoint'";
-
-        if (count($conn->query($existsSql)->fetchAll()) === 0) {
-            $createSql = "INSERT INTO usage_api_timeline
-                          VALUES(NULL, '$date', '$endpoint', 1)";
-            $conn->query($createSql);
-        } else {
-            $updateSql = "UPDATE usage_api_timeline
-                          SET count = count + 1
-                          WHERE endpoint = '$endpoint'
-                          AND date = '$date'";
-            $conn->query($updateSql);
-        }
-    }
+    /************************
+     * FORMATTING RESPONSES *
+     ************************/
 
     /**
-     * Get the rendered template for the requested format.
-     * @param Request $request
+     * Get the rendered template for the requested format. This method also updates the cookies.
      * @param string $templatePath Path to template without format,
      *   such as '/editCounter/latest_global'.
      * @param array $ret Data that should be passed to the view.
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      * @codeCoverageIgnore
      */
-    public function getFormattedResponse(Request $request, $templatePath, $ret)
+    public function getFormattedResponse($templatePath, array $ret)
     {
-        $format = $request->query->get('format', 'html');
+        $format = $this->request->query->get('format', 'html');
         if ($format == '') {
             // The default above doesn't work when the 'format' parameter is blank.
             $format = 'html';
         }
+
+        // Merge in common default parameters, giving $ret (from the caller) the priority.
+        $ret = array_merge([
+            'project' => $this->project,
+            'user' => $this->user,
+            'page' => $this->page,
+        ], $ret);
 
         $formatMap = [
             'wikitext' => 'text/plain',
@@ -559,7 +623,17 @@ abstract class XtoolsController extends Controller
             'json' => 'application/json',
         ];
 
-        $response = $this->render("$templatePath.$format.twig", $ret);
+        $response = new Response();
+
+        // Set cookies. Note this must be done before rendering the view, as the view may invoke subrequests.
+        $this->setCookies($response);
+
+        // If requested format does not exist, assume HTML.
+        if (false === $this->get('twig')->getLoader()->exists("$templatePath.$format.twig")) {
+            $format = 'html';
+        }
+
+        $response = $this->render("$templatePath.$format.twig", $ret, $response);
 
         $contentType = isset($formatMap[$format]) ? $formatMap[$format] : 'text/html';
         $response->headers->set('Content-Type', $contentType);
@@ -589,5 +663,40 @@ abstract class XtoolsController extends Controller
         ], $data, ['elapsed_time' => $elapsedTime]));
 
         return $response;
+    }
+
+    /*********
+     * OTHER *
+     *********/
+
+    /**
+     * Record usage of an API endpoint.
+     * @param string $endpoint
+     * @codeCoverageIgnore
+     */
+    public function recordApiUsage($endpoint)
+    {
+        /** @var \Doctrine\DBAL\Connection $conn */
+        $conn = $this->container->get('doctrine')
+            ->getManager('default')
+            ->getConnection();
+        $date =  date('Y-m-d');
+
+        // Increment count in timeline
+        $existsSql = "SELECT 1 FROM usage_api_timeline
+                      WHERE date = '$date'
+                      AND endpoint = '$endpoint'";
+
+        if (count($conn->query($existsSql)->fetchAll()) === 0) {
+            $createSql = "INSERT INTO usage_api_timeline
+                          VALUES(NULL, '$date', '$endpoint', 1)";
+            $conn->query($createSql);
+        } else {
+            $updateSql = "UPDATE usage_api_timeline
+                          SET count = count + 1
+                          WHERE endpoint = '$endpoint'
+                          AND date = '$date'";
+            $conn->query($updateSql);
+        }
     }
 }

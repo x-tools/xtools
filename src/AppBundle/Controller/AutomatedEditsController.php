@@ -119,8 +119,6 @@ class AutomatedEditsController extends XtoolsController
         $this->output = [
             'xtPage' => 'autoedits',
             'xtTitle' => $this->user->getUsername(),
-            'project' => $this->project,
-            'user' => $this->user,
             'ae' => $this->autoEdits,
             'is_sub_request' => $this->isSubRequest,
         ];
@@ -145,8 +143,7 @@ class AutomatedEditsController extends XtoolsController
         // Will redirect back to index if the user has too high of an edit count.
         $this->setupAutoEdits();
 
-        // Render the view with all variables set.
-        return $this->render('autoEdits/result.html.twig', $this->output);
+        return $this->getFormattedResponse('autoEdits/result', $this->output);
     }
 
     /**
@@ -169,7 +166,7 @@ class AutomatedEditsController extends XtoolsController
     {
         $this->setupAutoEdits();
 
-        return $this->render('autoEdits/nonautomated_edits.html.twig', $this->output);
+        return $this->getFormattedResponse('autoEdits/nonautomated_edits', $this->output);
     }
 
     /**
@@ -192,7 +189,7 @@ class AutomatedEditsController extends XtoolsController
     {
         $this->setupAutoEdits();
 
-        return $this->render('autoEdits/automated_edits.html.twig', $this->output);
+        return $this->getFormattedResponse('autoEdits/automated_edits.html.twig', $this->output);
     }
 
     /************************ API endpoints ************************/
@@ -209,7 +206,7 @@ class AutomatedEditsController extends XtoolsController
         $this->recordApiUsage('user/automated_tools');
 
         $aeh = $this->container->get('app.automated_edits_helper');
-        return new JsonResponse($aeh->getTools($this->project));
+        return $this->getFormattedApiResponse($aeh->getTools($this->project));
     }
 
     /**
