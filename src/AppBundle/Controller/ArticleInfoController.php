@@ -173,21 +173,10 @@ class ArticleInfoController extends XtoolsController
             'botlimit' => $this->request->query->get('botlimit', 10),
             'pageviewsOffset' => 60,
             'ai' => $articleInfo,
-            'page' => $this->page,
         ];
 
         // Output the relevant format template.
-        $format = $this->request->query->get('format', 'html');
-        if ($format == '') {
-            // The default above doesn't work when the 'format' parameter is blank.
-            $format = 'html';
-        }
-        $response = $this->render("articleInfo/result.$format.twig", $ret);
-        if ($format == 'wikitext') {
-            $response->headers->set('Content-Type', 'text/plain');
-        }
-
-        return $response;
+        return $this->getFormattedResponse('articleInfo/result', $ret);
     }
 
     /**
@@ -224,11 +213,9 @@ class ArticleInfoController extends XtoolsController
 
         $limit = $isSubRequest ? 10 : null;
 
-        return $this->render('articleInfo/textshares.html.twig', [
+        return $this->getFormattedResponse('articleInfo/textshares', [
             'xtPage' => 'articleinfo',
             'xtTitle' => $this->page->getTitle(),
-            'project' => $this->project,
-            'page' => $this->page,
             'textshares' => $articleInfo->getTextshares($limit),
             'is_sub_request' => $isSubRequest,
         ]);

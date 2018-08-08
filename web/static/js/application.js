@@ -404,22 +404,24 @@
      */
     function setupProjectListener()
     {
+        var $projectInput = $('#project_input');
+
         // Stop here if there is no project field
-        if (!$("#project_input")) {
+        if (!$projectInput) {
             return;
         }
 
         // If applicable, setup namespace selector with real time updates when changing projects.
         // This will also set `apiPath` so that autocompletion will query the right wiki.
-        if ($('#project_input').length && $('#namespace_select').length) {
+        if ($projectInput.length && $('#namespace_select').length) {
             setupNamespaceSelector();
         // Otherwise, if there's a user or page input field, we still need to update `apiPath`
         // for the user input autocompletion when the project is changed.
         } else if ($('#user_input')[0] || $('#article_input')[0]) {
             // keep track of last valid project
-            lastProject = $('#project_input').val();
+            lastProject = $projectInput.val();
 
-            $('#project_input').on('change', function () {
+            $projectInput.on('change', function () {
                 var newProject = this.value;
 
                 // Show the spinner.
@@ -431,10 +433,13 @@
                     apiPath = data.api;
                     lastProject = newProject;
                     setupAutocompletion();
+
+                    // Other pages may listen for this custom event.
+                    $projectInput.trigger('xtools.projectLoaded', data);
                 }).fail(
                     revertToValidProject.bind(this, newProject)
                 ).always(function () {
-                    $('#project_input').removeClass('show-loader');
+                    $projectInput.removeClass('show-loader');
                 });
             });
         }
@@ -449,7 +454,7 @@
         // keep track of last valid project
         lastProject = $('#project_input').val();
 
-        $('#project_input').on('change', function () {
+        $('#project_input').off('change').on('change', function () {
             // Disable the namespace selector and show a spinner while the data loads.
             $('#namespace_select').prop('disabled', true);
             $(this).addClass('show-loader');
@@ -463,7 +468,7 @@
                 var $allOption = $('#namespace_select option[value="all"]').eq(0).clone();
                 $("#namespace_select").html($allOption);
 
-                // Keep track of project API path for use in page title autocompletion
+                // Keep track of project API path for use in page title autocompletion.
                 apiPath = data.api;
 
                 // Add all of the new namespace options.

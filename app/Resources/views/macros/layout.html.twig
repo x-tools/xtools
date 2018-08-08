@@ -43,7 +43,7 @@
     {% import 'macros/wiki.html.twig' as wiki %}
     <header class="panel-heading">
         <div class="text-center xt-heading-top">
-            <a class="back-to-search" href="{{ path(tool ~ (args is not empty ? 'Result' : ''), {'project': project.domain}|merge(args)) }}">
+            <a class="back-to-search" href="{{ path(tool ~ (args is not empty ? 'Result' : 'Project'), {'project': project.domain}|merge(args)) }}">
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {% if args is not empty %}
                     {{ msg('see-full-statistics') }}

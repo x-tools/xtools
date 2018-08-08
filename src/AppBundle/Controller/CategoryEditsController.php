@@ -163,8 +163,7 @@ class CategoryEditsController extends XtoolsController
     {
         $this->setupCategoryEdits();
 
-        // Render the view with all variables set.
-        return $this->render('categoryEdits/result.html.twig', $this->output);
+        return $this->getFormattedResponse('categoryEdits/result', $this->output);
     }
 
     /**

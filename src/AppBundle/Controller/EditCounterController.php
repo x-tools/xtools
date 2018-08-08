@@ -7,6 +7,7 @@ namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -67,10 +68,16 @@ class EditCounterController extends XtoolsController
 
         parent::__construct($requestStack, $container);
 
-        // Now that we have the request object, parse out the requested sections from the URL.
+        // Now that we have the request object, parse out the requested sections from the URL or cookie.
         // This could be a pipe-separated string, or an array.
-        $sectionsQuery = $this->request->get('sections', array_keys(self::AVAILABLE_SECTIONS));
-        $this->sections = is_array($sectionsQuery) ? $sectionsQuery : explode('|', $sectionsQuery);
+        // $this->sections might already be set from a cookie. See self::getCookieMap().
+        if (!isset($this->sections)) {
+            $cookieValue = $this->request->cookies->get('XtoolsEditCounterOptions');
+            $sectionsQuery = isset($cookieValue)
+                ? $cookieValue
+                : $this->request->get('sections', array_keys(self::AVAILABLE_SECTIONS));
+            $this->sections = is_array($sectionsQuery) ? $sectionsQuery : explode('|', $sectionsQuery);
+        }
     }
 
     /**
@@ -148,13 +155,17 @@ class EditCounterController extends XtoolsController
         if (count($this->sections) === 1) {
             // Redirect to dedicated route.
             return $this->redirectToRoute(self::AVAILABLE_SECTIONS[$this->sections[0]], $this->params);
+        } elseif ($this->sections === array_keys(self::AVAILABLE_SECTIONS)) {
+            return $this->redirectToRoute('EditCounterResult', $this->params);
         }
 
-        // Here we want a pretty URL.
-        $sectionsParam = implode('|', $this->sections);
-        return $this->redirect(
-            $this->generateUrl('EditCounterResult', $this->params).'?sections='.$sectionsParam
-        );
+        // Add sections to the params, which $this->generalUrl() will append to the URL.
+        $this->params['sections'] = implode('|', $this->sections);
+
+        // We want a pretty URL, with pipes | instead of the encoded value %7C
+        $url = str_replace('%7C', '|', $this->generateUrl('EditCounterResult', $this->params));
+
+        return $this->redirect($url);
     }
 
     /**
@@ -181,8 +192,14 @@ class EditCounterController extends XtoolsController
             $ret['metaProject'] = ProjectRepository::getProject('metawiki', $this->container);
         }
 
-        // Output the relevant format template.
-        return $this->getFormattedResponse($this->request, 'editCounter/result', $ret);
+        $response = $this->getFormattedResponse('editCounter/result', $ret);
+
+        // Save the preferred sections in a cookie.
+        $response->headers->setCookie(
+            new Cookie('XtoolsEditCounterOptions', implode('|', $this->sections))
+        );
+
+        return $response;
     }
 
     /**
@@ -205,10 +222,11 @@ class EditCounterController extends XtoolsController
         ];
 
         // Output the relevant format template.
-        return $this->getFormattedResponse($this->request, 'editCounter/general_stats', $ret);
+        return $this->getFormattedResponse('editCounter/general_stats', $ret);
     }
 
     /**
+     * Search form for general stats.
      * @Route("/ec-generalstats", name="EditCounterGeneralStatsIndex")
      * @Route("/ec-generalstats/", name="EditCounterGeneralStatsIndexSlash")
      * @return Response
@@ -239,10 +257,11 @@ class EditCounterController extends XtoolsController
         ];
 
         // Output the relevant format template.
-        return $this->getFormattedResponse($this->request, 'editCounter/namespace_totals', $ret);
+        return $this->getFormattedResponse('editCounter/namespace_totals', $ret);
     }
 
     /**
+     * Search form for namespace totals.
      * @Route("/ec-namespacetotals", name="EditCounterNamespaceTotalsIndex")
      * @Route("/ec-namespacetotals/", name="EditCounterNamespaceTotalsIndexSlash")
      * @return Response
@@ -278,10 +297,11 @@ class EditCounterController extends XtoolsController
         ];
 
         // Output the relevant format template.
-        return $this->getFormattedResponse($this->request, 'editCounter/timecard', $ret);
+        return $this->getFormattedResponse('editCounter/timecard', $ret);
     }
 
     /**
+     * Search form for timecard.
      * @Route("/ec-timecard", name="EditCounterTimecardIndex")
      * @Route("/ec-timecard/", name="EditCounterTimecardIndexSlash")
      * @return Response
@@ -312,10 +332,11 @@ class EditCounterController extends XtoolsController
         ];
 
         // Output the relevant format template.
-        return $this->getFormattedResponse($this->request, 'editCounter/yearcounts', $ret);
+        return $this->getFormattedResponse('editCounter/yearcounts', $ret);
     }
 
     /**
+     * Search form for year counts.
      * @Route("/ec-yearcounts", name="EditCounterYearCountsIndex")
      * @Route("/ec-yearcounts/", name="EditCounterYearCountsIndexSlash")
      * @return Response
@@ -350,10 +371,11 @@ class EditCounterController extends XtoolsController
         ];
 
         // Output the relevant format template.
-        return $this->getFormattedResponse($this->request, 'editCounter/monthcounts', $ret);
+        return $this->getFormattedResponse('editCounter/monthcounts', $ret);
     }
 
     /**
+     * Search form for month counts.
      * @Route("/ec-monthcounts", name="EditCounterMonthCountsIndex")
      * @Route("/ec-monthcounts/", name="EditCounterMonthCountsIndexSlash")
      * @return Response
@@ -388,10 +410,11 @@ class EditCounterController extends XtoolsController
         }
 
         // Output the relevant format template.
-        return $this->getFormattedResponse($this->request, 'editCounter/rights_changes', $ret);
+        return $this->getFormattedResponse('editCounter/rights_changes', $ret);
     }
 
     /**
+     * Search form for rights changes.
      * @Route("/ec-rightschanges", name="EditCounterRightsChangesIndex")
      * @Route("/ec-rightschanges/", name="EditCounterRightsChangesIndexSlash")
      * @return Response
@@ -436,8 +459,13 @@ class EditCounterController extends XtoolsController
     }
 
     /**
+     * Search form for latest global edits.
+     * @Route("/ec-latestglobal-contributions", name="EditCounterLatestGlobalContribsIndex")
+     * @Route("/ec-latestglobal-contributions/", name="EditCounterLatestGlobalContribsIndexSlash")
      * @Route("/ec-latestglobal", name="EditCounterLatestGlobalIndex")
      * @Route("/ec-latestglobal/", name="EditCounterLatestGlobalIndexSlash")
+     * @Route("/ec-latestglobaledits", name="EditCounterLatestGlobalEditsIndex")
+     * @Route("/ec-latestglobaledits/", name="EditCounterLatestGlobalEditsIndexSlash")
      * @return Response
      */
     public function latestGlobalIndexAction()

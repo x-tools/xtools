@@ -49,4 +49,22 @@ class EditCounterControllerTest extends WebTestCase
         // should populate project input field
         static::assertEquals('de.wikipedia.org', $crawler->filter('#project_input')->attr('value'));
     }
+
+    /**
+     * Test that the Edit Counter index pages for the subtools are shown correctly.
+     */
+    public function testSubtoolIndexes()
+    {
+        $subtools = [
+            'general-stats', 'namespace-totals', 'year-counts', 'month-counts',
+            'timecard', 'rights-changes', 'latest-global-edits'
+        ];
+
+        foreach ($subtools as $subtool) {
+            $crawler = $this->client->request('GET', '/ec-'.str_replace('-', '', $subtool));
+            static::assertEquals(200, $this->client->getResponse()->getStatusCode());
+            static::assertEquals(1, count($crawler->filter('.checkbox input:checked')));
+            static::assertEquals($subtool, $crawler->filter('.checkbox input:checked')->attr('value'));
+        }
+    }
 }
