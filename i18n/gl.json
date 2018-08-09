@@ -3,7 +3,8 @@
 		"authors": [
 			"Elisardojm",
 			"Nemo bis",
-			"Banjo"
+			"Banjo",
+			"Maria zaos"
 		]
 	},
 	"accepted-formats": "Formatos aceptados",
@@ -83,7 +84,7 @@
 	"deleted-bytes": "Eliminado (bytes)",
 	"deleted-edits": "Edicións borradas",
 	"deleted-pages": "Páxinas eliminadas",
-	"delpagesfilter-live": "Excluir páxinas eliminadas",
+	"delpagesfilter-live": "Excluír páxinas eliminadas",
 	"diff": "Dif",
 	"documentation": "Documentación",
 	"download-label": "Descargar",

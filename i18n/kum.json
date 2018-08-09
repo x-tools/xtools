@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"ArslanX"
+			"ArslanX",
+			"Arsenekoumyk"
 		]
 	},
 	"actions": "Гьаракатлар",
@@ -74,7 +75,7 @@
 	"month-counts": "Айлы санаву",
 	"more": "Дагъы",
 	"name": "Ат",
-	"next": "Гелеген",
+	"next": "Сонггъу",
 	"none": "Бош",
 	"notice": "Билдирив",
 	"others": "Башгъалар",
