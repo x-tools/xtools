@@ -937,7 +937,7 @@
                             {% if bug.name == 'Wikidata' %}
                                 {{ bug.notice|raw }}
                             {% else %}
-                                <code>{{ bug.notice }}</code>
+                                <code>{{ bug.notice|raw }}</code>
                             {% endif %}
                         </td>
                         <td class="sort-entry--explanation" data-value="{{ bug.explanation }}">{{ bug.explanation|raw }}</td>
