@@ -4,11 +4,14 @@
 {% block body %}
 
 {% if not is_sub_request %}
-    {% set description_link %}
+    {% set descriptionLink %}
         {% set wikiwhoLink %}
             <a target='_blank' href='https://f-squared.org/wikiwho/'>Wikiwho</a>
         {% endset %}
         {{ msg('powered-by', [wikiwhoLink]) }}
+    {% endset %}
+    {% set downloadLink %}
+        {{ layout.downloadLink('ArticleInfoAuthorshipResult', {project:project.domain, page:page.title}, ['wikitext']) }}
     {% endset %}
 
     <div class="panel panel-primary">
@@ -32,7 +35,8 @@
                 <header class="panel-heading col-lg-12">
                     <h4>
                         {{ msg('authorship') }}
-                        <span class='pull-right text-muted xt-panel-description'>{{ description_link }}</span>
+                        <span class='pull-right text-muted xt-panel-description'>{{ downloadLink }}</span>
+                        <span class='pull-right text-muted xt-panel-description'>{{ descriptionLink }}</span>
                     </h4>
                 </header>
                 <div class="panel-body col-lg-12">

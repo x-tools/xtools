@@ -579,7 +579,15 @@
             </table>
             {% endif %}
         {% endset %}
-        {{ layout.content_block('top-editors', content, msg('top-editors-desc')) }}
+        {% set jsonLink %}
+            <li>
+                <a target="_blank" class="download-link download-json" href="{{ path('PageApiTopEditors', {project:project.domain, page:page.title, start:ai.startDate, end:ai.endDate}) }}">{{ msg('json') }}</a>
+            </li>
+        {% endset %}
+        {% set downloadLink %}
+            {{ layout.downloadLink('ArticleInfoResult', {project:project.domain, page:page.title, start:ai.startDate, end:ai.endDate}, ['wikitext'], jsonLink) }}
+        {% endset %}
+        {{ layout.content_block('top-editors', content, ['top-editors-desc', downloadLink]) }}
 
         {# ======================== TEXTSHARES / AUTHORSHIP ======================== #}
         {% if not (ai.hasDateRange) and page.namespace == 0 and project.domain in ai.textshareWikis %}
@@ -597,7 +605,10 @@
                 {% endset %}
                 {{ msg('powered-by', [wikiwhoLink]) }}
             {% endset %}
-            {{ layout.content_block(headerLink, content, description_link, 'authorship', true) }}
+            {% set downloadLink %}
+                {{ layout.downloadLink('ArticleInfoAuthorshipResult', {project:project.domain, page:page.title}, ['wikitext']) }}
+            {% endset %}
+            {{ layout.content_block(headerLink, content, [description_link, downloadLink], 'authorship', true) }}
         {% endif %}
 
         {# ======================== YEAR COUNTS ======================== #}

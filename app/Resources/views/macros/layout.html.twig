@@ -1,10 +1,10 @@
 {#
  # Generate a collapsible Bootstrap .panel with a heading
- # @param string title       - i18n message that is the title of the content block, shown in a header
- # @param string content     - raw content to show in the section body
- # @param string description - shown on the right in grayed text
- # @param string id          - id of the section, defaults to the title
- # @param bool   notranslate - don't translate the 'title'
+ # @param string       title       - i18n message that is the title of the content block, shown in a header
+ # @param string       content     - raw content to show in the section body
+ # @param string|array description - shown on the right in grayed text. Use array to show all in given order
+ # @param string       id          - id of the section, defaults to the title
+ # @param bool         notranslate - don't translate the 'title'
  #}
 {% macro content_block(title, content, description, id = null, notranslate = false, toggle = true) %}
     {% if id is null %}
@@ -23,7 +23,14 @@
                     <small class='xt-hide'>[{{ msg('hide') | lower }}]</small>
                 {% endif %}
                 {% if description is defined %}
-                    <span class='pull-right text-muted xt-panel-description'>{{ msgIfExists(description) }}</span>
+                    {% if description is not iterable %}
+                        {% set description = [description] %}
+                    {% endif %}
+                    {% for el in description|reverse %}
+                        <span class='pull-right text-muted xt-panel-description'>
+                            {{ msgIfExists(el) }}
+                        </span>
+                    {% endfor %}
                 {% endif %}
             </h4>
         </header>

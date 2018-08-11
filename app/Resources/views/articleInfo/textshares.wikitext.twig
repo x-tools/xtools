@@ -1,0 +1,26 @@
+{% import 'macros/wiki.html.twig' as wiki %}
+== [[{{ page.title }}]] ==
+
+{% set link %}[{{ url('ArticleInfoAuthorshipResult', {'project': project.domain, 'page': page.title}) }} {{ msg('xtools-title') }}]{% endset %}
+{{ msg('xtools-advert', [link, date()|date_format]) }}. {{ msg('powered-by', ['[https://f-squared.org/wikiwho/ WikiWho]']) }}
+
+{% if textshares.error is defined %}
+{{ msg('api-error', ['Wikiwho API'] ) }}:
+<code>{{ textshares.error }}</code>
+{% else %}
+{| class="wikitable sortable"
+{% for key in ['rank', 'username', 'links', 'characters', 'percentage'] %}
+! {{ msg(key)|capitalize_first }}
+{% endfor %}
+{% set totalPercentage = 0 %}{% set totalCount = 0 %}{% for username, values in textshares.list %}
+|-
+| {{ loop.index|num_format }}
+| {{ wiki.userLinkWikitext(username, username) }}
+| [{{ url('TopEditsResult', { 'project': project.domain, 'username': username, 'namespace': page.namespace, 'page': page.titleWithoutNamespace }) }} {{ msg('tool-topedits') }}] &middot; [{{ url('EditCounterResult', { 'project': project.domain, 'username': username }) }} {{ msg('tool-editcounter') }}]
+| {{ values.count|num_format }}
+| {{ values.percentage|percent_format }}
+{% set totalPercentage = totalPercentage + values.percentage %}{% set totalCount = totalCount + values.count %}
+{% endfor %}
+|-
+|}
+{% endif %}
