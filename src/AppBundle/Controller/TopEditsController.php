@@ -100,7 +100,7 @@ class TopEditsController extends XtoolsController
                 ->getRepository()
                 ->getPage($this->project, $this->project->userOptInPage($this->user));
 
-            return $this->getFormattedResponse('topedits/result_namespace.html.twig', [
+            return $this->getFormattedResponse('topedits/result_namespace', [
                 'xtPage' => 'topedits',
                 'xtTitle' => $this->user->getUsername(),
                 'project' => $this->project,
@@ -155,7 +155,7 @@ class TopEditsController extends XtoolsController
         $topEdits->prepareData();
 
         // Send all to the template.
-        return $this->getFormattedResponse('topedits/result_article.html.twig', [
+        return $this->getFormattedResponse('topedits/result_article', [
             'xtPage' => 'topedits',
             'xtTitle' => $this->user->getUsername() . ' - ' . $this->page->getTitle(),
             'project' => $this->project,

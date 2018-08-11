@@ -142,7 +142,7 @@
 
             {% for tool in tools() %}
                 {% if enabled(tool) %}
-                    <li class="tool-links--entry{% if xtPage is defined and xtPage == tool|lower %} active{% endif %}">
+                    <li class="tool-links--entry{% if xtPage is defined and xtPage|lower == tool|lower %} active{% endif %}">
                         <a href="{{ path(tool) }}">{{ msg("tool-" ~ tool|lower) }}</a>
                     </li>
                 {% endif %}

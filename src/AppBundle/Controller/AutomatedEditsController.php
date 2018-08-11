@@ -189,7 +189,7 @@ class AutomatedEditsController extends XtoolsController
     {
         $this->setupAutoEdits();
 
-        return $this->getFormattedResponse('autoEdits/automated_edits.html.twig', $this->output);
+        return $this->getFormattedResponse('autoEdits/automated_edits', $this->output);
     }
 
     /************************ API endpoints ************************/

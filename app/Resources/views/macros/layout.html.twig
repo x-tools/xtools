@@ -133,7 +133,7 @@
                             {{ wiki.pageHistLinkRaw(edit.page.title(true), project) }}
                             {% if enabled('TopEdits') %}
                             &middot;
-                            <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': edit.user.username, 'namespace': '', 'article': edit.page.title(true) }) }}">{{ msg('tool-topedits') }}</a>
+                            <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': edit.user.username, 'namespace': '', 'page': edit.page.title(true) }) }}">{{ msg('tool-topedits') }}</a>
                             {% endif %}
                         </td>
                         <td>

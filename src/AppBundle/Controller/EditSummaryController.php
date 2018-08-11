@@ -74,7 +74,7 @@ class EditSummaryController extends XtoolsController
         $editSummary->setI18nHelper($this->container->get('app.i18n_helper'));
         $editSummary->prepareData();
 
-        return $this->getFormattedResponse('editSummary/result.html.twig', [
+        return $this->getFormattedResponse('editSummary/result', [
             'xtPage' => 'editsummary',
             'xtTitle' => $this->user->getUsername(),
             'user' => $this->user,
