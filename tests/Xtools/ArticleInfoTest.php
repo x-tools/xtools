@@ -401,7 +401,7 @@ class ArticleInfoTest extends TestAdapter
         $prevEdits = $method->invoke($this->articleInfo, $edits[2], $prevEdits);
         $method->invoke($this->articleInfo, $edits[3], $prevEdits);
 
-        $method = $this->reflectionClass->getMethod('setTopTenCounts');
+        $method = $this->reflectionClass->getMethod('doPostPrecessing');
         $method->setAccessible(true);
         $method->invoke($this->articleInfo);
 

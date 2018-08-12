@@ -291,7 +291,7 @@ class ArticleInfo extends Model
         // Bots need to be set before setting top 10 counts.
         $this->setBots();
 
-        $this->setTopTenCounts();
+        $this->doPostPrecessing();
     }
 
     /**
@@ -1262,10 +1262,10 @@ class ArticleInfo extends Model
      * This is ran *after* parseHistory() since we need the grand totals first.
      * Various stats are also set for each editor in $this->editors to be used in the charts.
      */
-    private function setTopTenCounts()
+    private function doPostPrecessing()
     {
         $topTenCount = $counter = 0;
-        $topTenEditors = [];
+        $topTenEditorsByEdits = [];
 
         foreach ($this->editors as $editor => $info) {
             // Count how many users are in the top 10% by number of edits, excluding bots.
@@ -1274,12 +1274,9 @@ class ArticleInfo extends Model
                 $counter++;
 
                 // To be used in the Top Ten charts.
-                $topTenEditors[] = [
+                $topTenEditorsByEdits[] = [
                     'label' => $editor,
                     'value' => $info['all'],
-                    'percentage' => (
-                        100 * ($info['all'] / $this->getNumRevisionsProcessed())
-                    )
                 ];
             }
 
@@ -1298,8 +1295,23 @@ class ArticleInfo extends Model
             }
         }
 
-        $this->topTenEditorsByEdits = $topTenEditors;
+        // Loop through again and add percentages.
+        $this->topTenEditorsByEdits = array_map(function ($editor) use ($topTenCount) {
+            $editor['percentage'] = 100 * ($editor['value'] / $topTenCount);
+            return $editor;
+        }, $topTenEditorsByEdits);
 
+        $this->topTenEditorsByAdded = $this->getTopTenByAdded();
+
+        $this->topTenCount = $topTenCount;
+    }
+
+    /**
+     * Get the top ten editors by added text.
+     * @return array With keys 'label', 'value' and 'percentage', ready to be used by the pieChart Twig helper.
+     */
+    private function getTopTenByAdded()
+    {
         // First sort editors array by the amount of text they added.
         $topTenEditorsByAdded = $this->editors;
         uasort($topTenEditorsByAdded, function ($a, $b) {
@@ -1309,20 +1321,25 @@ class ArticleInfo extends Model
             return $a['added'] > $b['added'] ? -1 : 1;
         });
 
-        // Then build a new array of top 10 editors by added text,
-        // in the data structure needed for the chart.
-        $this->topTenEditorsByAdded = array_map(function ($editor) {
+        // Slice to the top 10.
+        $topTenEditorsByAdded = array_keys(array_slice($topTenEditorsByAdded, 0, 10, true));
+
+        // Get the sum of added text so that we can add in percentages.
+        $topTenTotalAdded = array_sum(array_map(function ($editor) {
+            return $this->editors[$editor]['added'];
+        }, $topTenEditorsByAdded));
+
+        // Then build a new array of top 10 editors by added text in the data structure needed for the chart.
+        return array_map(function ($editor) use ($topTenTotalAdded) {
             $added = $this->editors[$editor]['added'];
             return [
                 'label' => $editor,
                 'value' => $added,
                 'percentage' => (
-                    100 * ($added / $this->addedBytes)
+                    100 * ($added / $topTenTotalAdded)
                 )
             ];
-        }, array_keys(array_slice($topTenEditorsByAdded, 0, 10, true)));
-
-        $this->topTenCount = $topTenCount;
+        }, $topTenEditorsByAdded);
     }
 
     /**
