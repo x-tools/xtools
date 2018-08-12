@@ -206,6 +206,37 @@ class Pages extends Model
     }
 
     /**
+     * Get the number of pages the user created by assessment.
+     * @return array Keys are the assessment class, values are the counts.
+     */
+    public function getAssessmentCounts()
+    {
+        if ($this->getNumPages() > $this->resultsPerPage()) {
+            $counts = $this->getRepository()->getAssessmentCounts(
+                $this->project,
+                $this->user,
+                $this->namespace,
+                $this->redirects
+            );
+        } else {
+            $counts = [];
+            foreach ($this->pages as $nsPages) {
+                foreach ($nsPages as $page) {
+                    if (!isset($counts[$page['pa_class']])) {
+                        $counts[$page['pa_class']] = 1;
+                    } else {
+                        $counts[$page['pa_class']]++;
+                    }
+                }
+            }
+        }
+
+        arsort($counts);
+
+        return $counts;
+    }
+
+    /**
      * Number of results to show, depending on the namespace.
      * @param bool $all Whether to get *all* results. This should only be used for
      *     export options. HTTP and JSON should paginate.
@@ -244,8 +275,7 @@ class Pages extends Model
     }
 
     /**
-     * Run the query to get the number of pages created by the user
-     * with given options.
+     * Run the query to get the number of pages created by the user with given options.
      * @return array
      */
     private function countPagesCreated()

@@ -144,13 +144,39 @@
                     </div>
                 {% endif %}
 
-                {% if project.hasPageAssessments %}
+                {% if project.hasPageAssessments(pages.namespace) and pages.deleted != 'deleted' %}
                     <table class="table table-bordered table-hover table-striped">
                         <caption class="text-center">{{ msg('assessments') }}</caption>
                         <thead><tr>
-                            <th>{{ msg('assessment') }}</th>
-                            <th>{{ msg('count') }}</th>
+                            <th>
+                                <span class="sort-link sort-link--assessment" data-column="assessment">
+                                    {{ msg('assessment') }}
+                                    <span class="glyphicon glyphicon-sort"></span>
+                                </span>
+                            </th>
+                            <th>
+                                <span class="sort-link sort-link--count" data-column="count">
+                                    {{ msg('count') }}
+                                    <span class="glyphicon glyphicon-sort"></span>
+                                </span>
+                            </th>
                         </tr></thead>
+                        <tbody>
+                            {% for assessment, count in pages.assessmentCounts %}
+                                <tr>
+                                    <td class="sort-entry--assessment" data-value="{{ assessment }}">
+                                        {% set badge = project.pageAssessments.badgeURL(assessment) %}
+                                        {% if badge is defined %}
+                                            <img alt="{{ assessment }}" src="{{ badge }}" class="assessment-badge" />
+                                        {% endif %}
+                                        {{ assessment ? assessment|capitalize_first : msg('unknown') }}
+                                    </td>
+                                    <td class="sort-entry--count" data-value="{{ count }}">
+                                        {{ count|num_format }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
                     </table>
                 {% endif %}
             {% endif %}

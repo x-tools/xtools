@@ -51,7 +51,7 @@ class PagesRepository extends Repository
                     SUM(CASE WHEN type = 'arc' THEN 1 ELSE 0 END) AS deleted,
                     SUM(page_is_redirect) AS redirects
                 FROM (".
-                    $this->getPagesCreatedInnerSql($project, $conditions, $deleted)."
+                    $this->getPagesCreatedInnerSql($project, $conditions, $deleted, true)."
                 ) a ".
                 "GROUP BY namespace";
 
@@ -182,20 +182,25 @@ class PagesRepository extends Repository
      * @param string[] $conditions Conditions for the SQL, must include 'paSelects',
      *     'paSelectsArchive', 'paJoin', 'whereRev', 'whereArc', 'namespaceRev', 'namespaceArc',
      *     'redirects' and 'revPageGroupBy'.
-     * @param  string $deleted One of 'live', 'deleted' or blank for both.
+     * @param string $deleted One of 'live', 'deleted' or blank for both.
+     * @param bool $count Omit unneeded columns from the SELECT clause.
      * @return string Raw SQL.
      */
-    private function getPagesCreatedInnerSql(Project $project, $conditions, $deleted)
+    private function getPagesCreatedInnerSql(Project $project, $conditions, $deleted, $count = false)
     {
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
         $archiveTable = $project->getTableName('archive');
         $logTable = $project->getTableName('logging', 'logindex');
 
+        // Only SELECT things that are needed, based on whether or not we're doing a COUNT.
+        $revSelects = "DISTINCT page_namespace AS `namespace`, 'rev' AS `type`, page_title, page_is_redirect";
+        if (false === $count) {
+            $revSelects .= ", page_len, rev_timestamp, rev_len, rev_id, NULL AS `recreated` ";
+        }
+
         $revisionsSelect = "
-            SELECT DISTINCT page_namespace AS namespace, 'rev' AS type, page_title AS page_title,
-                page_len, page_is_redirect, rev_timestamp AS rev_timestamp, rev_user,
-                rev_user_text AS username, rev_len, rev_id, NULL AS recreated ".$conditions['paSelects']."
+            SELECT $revSelects ".$conditions['paSelects']."
             FROM $pageTable
             JOIN $revisionTable ON page_id = rev_page ".
             $conditions['paJoin']."
@@ -205,16 +210,19 @@ class PagesRepository extends Repository
                 $conditions['redirects'].
             $conditions['revPageGroupBy'];
 
-        $archiveSelect = "
-            SELECT ar_namespace AS namespace, 'arc' AS type, ar_title AS page_title,
-                NULL AS page_len, '0' AS page_is_redirect, MIN(ar_timestamp) AS rev_timestamp,
-                ar_user AS rev_user, ar_user_text AS username, ar_len AS rev_len, ar_rev_id AS rev_id,
-                EXISTS(
+        // Only SELECT things that are needed, based on whether or not we're doing a COUNT.
+        $arSelects = "ar_namespace AS `namespace`, 'arc' AS `type`, ar_title AS page_title, '0' AS page_is_redirect";
+        if (false === $count) {
+            $arSelects .= ", NULL AS page_len, MIN(ar_timestamp) AS rev_timestamp, ".
+                "ar_len AS rev_len, ar_rev_id AS rev_id, EXISTS(
                     SELECT 1 FROM $pageTable
                     WHERE page_namespace = ar_namespace
                     AND page_title = ar_title
-                ) AS recreated
-                ".$conditions['paSelectsArchive']."
+                ) AS `recreated`";
+        }
+
+        $archiveSelect = "
+            SELECT $arSelects ".$conditions['paSelectsArchive']."
             FROM $archiveTable
             LEFT JOIN $logTable ON log_namespace = ar_namespace AND log_title = ar_title
                 AND log_user = ar_user AND (log_action = 'move' OR log_action = 'move_redir')
@@ -232,5 +240,54 @@ class PagesRepository extends Repository
         }
 
         return "($revisionsSelect) UNION ($archiveSelect)";
+    }
+
+    /**
+     * Get the number of pages the user created by assessment.
+     * @param Project $project
+     * @param User $user
+     * @param $namespace
+     * @param $redirects
+     * @return array Keys are the assessment class, values are the counts.
+     */
+    public function getAssessmentCounts(Project $project, User $user, $namespace, $redirects)
+    {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'user_pages_created_assessments');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $pageTable = $project->getTableName('page');
+        $revisionTable = $project->getTableName('revision');
+        $pageAssessmentsTable = $project->getTableName('page_assessments');
+
+        $conditions = array_merge(
+            $this->getNamespaceRedirectAndDeletedPagesConditions($namespace, $redirects),
+            $this->getUserConditions($project, $user)
+        );
+
+        $sql = "SELECT pa_class AS `class`, COUNT(pa_class) AS `count` FROM (
+                    SELECT DISTINCT page_id, IFNULL(pa_class, '') AS pa_class
+                    FROM $pageTable
+                    JOIN $revisionTable ON page_id = rev_page
+                    LEFT JOIN $pageAssessmentsTable ON rev_page = pa_page_id
+                    WHERE " . $conditions['whereRev'] . "
+                    AND rev_parent_id = '0'" .
+                    $conditions['namespaceRev'] .
+                    $conditions['redirects'] . "
+                    GROUP BY page_id
+                ) a
+                GROUP BY pa_class";
+
+        $resultQuery = $this->executeProjectsQuery($sql);
+
+        $assessments = [];
+        while ($result = $resultQuery->fetch()) {
+            $class = $result['class'] == '' ? '' : $result['class'];
+            $assessments[$class] = $result['count'];
+        }
+
+        // Cache and return.
+        return $this->setCache($cacheKey, $assessments);
     }
 }
