@@ -63,7 +63,6 @@
 	"end": "Završni datum",
 	"executed": "Izvršeno za $1 {{PLURAL:$2|sekundu|sekunde|sekundi}}.",
 	"explanation": "Objašnjenje",
-	"export-wikitext": "Izvezi wikitekst",
 	"feedback": "Povratne informacije",
 	"file": "Datoteka",
 	"files": "Datoteke",

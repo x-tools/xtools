@@ -70,7 +70,6 @@
 	"end": "Lõppkuupäev",
 	"events": "Sündmused",
 	"executed": "Täidetud $1 {{PLURAL:$2|sekundiga}}.",
-	"export-wikitext": "Ekspordi vikitekst",
 	"file": "Fail",
 	"files": "Failid",
 	"files-uploaded": "Üles laaditud faile",

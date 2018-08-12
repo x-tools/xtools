@@ -134,7 +134,6 @@
 	"events": "Events that have a log entry\n{{Identical|Event}}",
 	"executed": "Execution time. $1 is the formatted number of seconds, and $2 is the unformatted number for use with PLURAL.",
 	"explanation": "Column heading in the Bugs table, explaining how to fix the bug.\n{{Identical|Explanation}}",
-	"export-wikitext": "Link text that appears above a table, for exporing wikitext relating to the table.",
 	"feedback": "Link to feedback in header\n{{Identical|Feedback}}",
 	"file": "label for file\n{{Identical|File}}",
 	"files": "Heading for section showing stats about files.\n{{Identical|File}}",

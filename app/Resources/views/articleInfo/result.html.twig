@@ -437,12 +437,6 @@
                     {{ chart.pie_chart('top_by_added', ai.topTenEditorsByAdded) }}
                 </div>
             </div>
-            <p class="export">
-                <a href="{{ path('ArticleInfoResult', {project:project.domain, page:page.title, start:ai.startDate, end:ai.endDate}) }}?format=wikitext">
-                    <span class="glyphicon glyphicon-export"></span>
-                    {{ msg('export-wikitext') }}
-                </a>
-            </p>
             <table class="table table-bordered table-hover table-striped top-editors-table">
                 <thead><tr>
                     {% for key in ['rank', 'username', 'links', 'edits', 'minor-edits', 'minor-edits-percentage', 'first-edit', 'latest-edit', 'average-time-bw-edits', 'added-bytes'] %}

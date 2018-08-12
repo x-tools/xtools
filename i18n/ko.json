@@ -128,7 +128,6 @@
 	"events": "사건",
 	"executed": "$1{{PLURAL:$2|초}} 전에 실행됨.",
 	"explanation": "설명",
-	"export-wikitext": "위키텍스트 내보내기",
 	"feedback": "피드백",
 	"file": "파일",
 	"files": "파일",

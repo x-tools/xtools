@@ -133,7 +133,6 @@
 	"events": "Events",
 	"executed": "Executed in $1 {{PLURAL:$2|second|seconds}}.",
 	"explanation": "Explanation",
-	"export-wikitext": "Export wikitext",
 	"feedback": "Feedback",
 	"file": "File",
 	"files": "Files",

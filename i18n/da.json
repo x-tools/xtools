@@ -132,7 +132,6 @@
 	"events": "Begivenheder",
 	"executed": "Udført på $1 {{PLURAL:$2|sekund|sekunder}}.",
 	"explanation": "Forklaring",
-	"export-wikitext": "Eksporter wikitekst",
 	"feedback": "Feedback",
 	"file": "Fil",
 	"files": "Filer",

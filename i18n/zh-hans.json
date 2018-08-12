@@ -135,7 +135,6 @@
 	"events": "事件",
 	"executed": "执行耗时$1{{PLURAL:$2|秒}}。",
 	"explanation": "解释",
-	"export-wikitext": "导出wiki文本",
 	"feedback": "反馈",
 	"file": "文件",
 	"files": "文件",
