@@ -3,7 +3,8 @@
 		"authors": [
 			"Nemo bis",
 			"Joedalton",
-			"Jorn Ari"
+			"Jorn Ari",
+			"Saederup92"
 		]
 	},
 	"accepted-formats": "Godkendte formater",
@@ -307,6 +308,7 @@
 	"redirfilter-noredirects": "Udelad omdirigeringer",
 	"redirfilter-onlyredirects": "Inkluder kun omdirigeringer",
 	"references": "Referencer",
+	"registration-date": "Registreringsdato",
 	"report-issue": "Rapporter et problem",
 	"reprotect": "Beskyt igen",
 	"restore": "Gendan",
