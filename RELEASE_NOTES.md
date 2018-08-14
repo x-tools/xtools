@@ -1,5 +1,34 @@
 # Release Notes #
 
+## 3.4.0 ##
+- EditCounter: allow users to choose which statistics to show.
+- EditCounter: use cookies to store user's preferred sections.
+- CategoryEdits: include number of unique pages edited.
+- T200791: (AutoEdits) refine detection of AWB edits.
+- T193481: (EditCounter) make namespace breakdown of month/year counts
+  more accessible.
+- T186433: (ArticleInfo) render CheckWiki notices as HTML.
+- EditCounter: show legend for year/month chart if viewing directly.
+- EditCounter: Add index route for subtools (/ec-rightschanges, etc.).
+- Save 'project' parameter in a cookie so it is sticky.
+- ArticleInfo: add download links for Top Editors and Authorship sections.
+  This also removes the 'Download as wikitext' link as it now lives in
+  the 'Download' dropdown.
+- Pages: Show assessment counts, and fix wikitext export.
+- Major refactoring of controllers and models.
+- Standardize API responses to always include requested parameters.
+- Automatic validation of common parameters ('project', 'user', etc.),
+  across all controller methods.
+- Rename the 'article' parameter to the more appropriate name 'page'.
+- AdminScore: refactor code to use the model/repository paradigm.
+- Better support of pre-filling field in index forms from URL parameters.
+- Update dependencies and fix Symfony deprecations.
+- Merge ApiController to DefaultController.
+- Add elapsed time to API responses.
+- Typos, code aesthetics, and other minor bux fixes.
+
+- Localization updates.
+
 ## 3.3.10 ##
 - Localization updates.
 
