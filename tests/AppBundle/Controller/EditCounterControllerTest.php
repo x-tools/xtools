@@ -52,9 +52,9 @@ class EditCounterControllerTest extends WebTestCase
     }
 
     /**
-     * Test that the Edit Counter index pages for the subtools are shown correctly.
+     * Test that the Edit Counter index pages and redirects for the subtools are correct.
      */
-    public function testSubtoolIndexes()
+    public function testSubtools()
     {
         // Cookies should not affect the index pages of subtools.
         $cookie = new Cookie('XtoolsEditCounterOptions', 'general-stats');
@@ -71,6 +71,10 @@ class EditCounterControllerTest extends WebTestCase
             static::assertEquals(1, count($crawler->filter('.checkbox input:checked')));
             static::assertEquals($subtool, $crawler->filter('.checkbox input:checked')->attr('value'));
         }
+
+        // Requesting only one subtool should redirect to the dedicated route.
+        $this->client->request('GET', '/ec/en.wikipedia/Example?sections=rights-changes');
+        static::assertTrue($this->client->getResponse()->isRedirect('/ec-rightschanges/en.wikipedia/Example'));
     }
 
     /**

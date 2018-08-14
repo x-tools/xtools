@@ -25,7 +25,7 @@
                     {% for section in availableSections %}
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" name="sections[]" value="{{ section }}"{% if section in sections %} checked="checked"{% endif %}>
+                                <input type="checkbox" class="stat-section-option" name="sections[]" value="{{ section }}"{% if section in sections %} checked="checked"{% endif %}>
                                 {{ msg(section) }}
                             </label>
                         </div>

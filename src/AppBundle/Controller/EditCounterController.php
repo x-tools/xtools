@@ -224,12 +224,17 @@ class EditCounterController extends XtoolsController
     /**
      * Display all results.
      * @Route("/ec/{project}/{username}", name="EditCounterResult")
-     * @return Response
+     * @return Response|RedirectResponse
      * @codeCoverageIgnore
      */
     public function resultAction()
     {
         $this->setUpEditCounter();
+
+        if (count($this->sections) === 1) {
+            // Redirect to dedicated route.
+            return $this->redirectToRoute(self::AVAILABLE_SECTIONS[$this->sections[0]], $this->params);
+        }
 
         $ret = [
             'xtTitle' => $this->user->getUsername() . ' - ' . $this->project->getTitle(),

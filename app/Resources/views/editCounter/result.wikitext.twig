@@ -2,32 +2,32 @@
 
 {% set link %}[{{ url('EditCounterResult', {'username': user.username, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
 {{ msg('xtools-advert', [link, date()|date_format]) }}
-{{ render(path('EditCounterGeneralStats', {
+{% if 'general-stats' in sections %}{{ render(path('EditCounterGeneralStats', {
     'username': user.username,
     'project': project.domain,
     'format': 'wikitext'
-})) }}{{ render(path('EditCounterNamespaceTotals', {
+})) }}{% endif %}{% if 'namespace-totals' in sections %}{{ render(path('EditCounterNamespaceTotals', {
     'username': user.username,
     'project': project.domain,
     'format': 'wikitext'
-})) }}{{ render(path('EditCounterYearCounts', {
+})) }}{% endif %}{% if 'year-counts' in sections %}{{ render(path('EditCounterYearCounts', {
     'username': user.username,
     'project': project.domain,
     'format': 'wikitext'
-})) }}{{ render(path('EditCounterMonthCounts', {
+})) }}{% endif %}{% if 'month-counts' in sections %}{{ render(path('EditCounterMonthCounts', {
     'username': user.username,
     'project': project.domain,
     'format': 'wikitext'
-})) }}{{ render(path('EditCounterTimecard', {
+})) }}{% endif %}{% if 'timecard' in sections %}{{ render(path('EditCounterTimecard', {
     'username': user.username,
     'project': project.domain,
     'format': 'wikitext'
-})) }}{{ render(path('TopEditsResult', {
+})) }}{% endif %}{% if 'top-edited-pages' in sections %}{{ render(path('TopEditsResult', {
     'username': user.username,
     'project': project.domain,
     'namespace': 'all',
     'format': 'wikitext'
-})) }}{% if ec.rightsChanges|length > 0 or ec.globalRightsChanges|length > 0 %}{{ render(path('EditCounterRightsChanges', {
+})) }}{% endif %}{% if 'rights-changes' in sections and not(user.anon) and ec.rightsChanges|length > 0 or ec.globalRightsChanges|length > 0 %}{{ render(path('EditCounterRightsChanges', {
     'username': user.username,
     'project': project.domain,
     'format': 'wikitext'
