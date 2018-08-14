@@ -16,6 +16,12 @@
                     </div>
                 </label>
                 <div class="form-control stat-section-selector">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" class="stat-section-all"{% if isAllSections %} checked="checked"{% endif %}>
+                            {{ msg('all') }}
+                        </label>
+                    </div>
                     {% for section in availableSections %}
                         <div class="checkbox">
                             <label>
