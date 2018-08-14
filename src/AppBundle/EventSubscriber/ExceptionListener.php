@@ -61,7 +61,7 @@ class ExceptionListener
         } elseif ($exception instanceof Twig_Error_Runtime && $prevException !== null) {
             $response = $this->getTwigErrorResponse($prevException);
         } else {
-            throw $exception;
+            return;
         }
 
         // sends the modified response object to the event
