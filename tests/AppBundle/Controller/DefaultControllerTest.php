@@ -74,7 +74,6 @@ class DefaultControllerTest extends WebTestCase
     public function testOAuthCallback()
     {
         $client = static::createClient();
-        static::setExpectedException(NotFoundHttpException::class);
         $client->request('GET', '/oauth_callback');
 
         // Callback should 404 since we didn't give it anything.
