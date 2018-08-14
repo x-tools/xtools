@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.4.1 ##
+- Fix bug in ExceptionListener where production errors werne't showing
+  the formatted production error page.
+
 ## 3.4.0 ##
 - EditCounter: allow users to choose which statistics to show.
 - EditCounter: use cookies to store user's preferred sections.
