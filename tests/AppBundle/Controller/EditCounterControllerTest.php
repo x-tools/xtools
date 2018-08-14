@@ -72,6 +72,11 @@ class EditCounterControllerTest extends WebTestCase
             static::assertEquals($subtool, $crawler->filter('.checkbox input:checked')->attr('value'));
         }
 
+        // For now...
+        if (!$this->container->getParameter('app.is_labs')) {
+            return;
+        }
+
         // Requesting only one subtool should redirect to the dedicated route.
         $this->client->request('GET', '/ec/en.wikipedia/Example?sections=rights-changes');
         static::assertTrue($this->client->getResponse()->isRedirect('/ec-rightschanges/en.wikipedia/Example'));
