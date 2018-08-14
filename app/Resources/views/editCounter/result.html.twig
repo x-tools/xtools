@@ -5,7 +5,8 @@
 {% block body %}
 
 <div class="panel panel-primary">
-    {{ layout.userHeading(user, project, 'EditCounter') }}
+    {% set params = isAllSections ? {} : {'project': project.domain, 'username': user.username} %}
+    {{ layout.userHeading(user, project, 'EditCounter', params) }}
 
     <div class="panel-body xt-panel-body">
         {{ wiki.userLinks(user, project, 'EditCounter') }}

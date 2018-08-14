@@ -67,17 +67,6 @@ class EditCounterController extends XtoolsController
         $this->tooHighEditCountActionBlacklist = ['rightsChanges'];
 
         parent::__construct($requestStack, $container);
-
-        // Now that we have the request object, parse out the requested sections from the URL or cookie.
-        // This could be a pipe-separated string, or an array.
-        // $this->sections might already be set from a cookie. See self::getCookieMap().
-        if (!isset($this->sections)) {
-            $cookieValue = $this->request->cookies->get('XtoolsEditCounterOptions');
-            $sectionsQuery = isset($cookieValue)
-                ? $cookieValue
-                : $this->request->get('sections', array_keys(self::AVAILABLE_SECTIONS));
-            $this->sections = is_array($sectionsQuery) ? $sectionsQuery : explode('|', $sectionsQuery);
-        }
     }
 
     /**
@@ -110,6 +99,9 @@ class EditCounterController extends XtoolsController
         // Will redirect to Simple Edit Counter if they have too many edits, as defined self::construct.
         $this->validateUser($this->user->getUsername());
 
+        // Store which sections of the Edit Counter they requested.
+        $this->sections = $this->getRequestedSections();
+
         // Instantiate EditCounter.
         $editCounterRepo = new EditCounterRepository();
         $editCounterRepo->setContainer($this->container);
@@ -135,6 +127,8 @@ class EditCounterController extends XtoolsController
             return $this->redirectFromSections();
         }
 
+        $this->sections = $this->getRequestedSections(true);
+
         // Otherwise fall through.
         return $this->render('editCounter/index.html.twig', [
             'xtPageTitle' => 'tool-editcounter',
@@ -142,30 +136,89 @@ class EditCounterController extends XtoolsController
             'xtPage' => 'editcounter',
             'project' => $this->project,
             'sections' => $this->sections,
-            'availableSections' => array_keys(self::AVAILABLE_SECTIONS),
+            'availableSections' => $this->getSectionNames(),
+            'isAllSections' => $this->sections === $this->getSectionNames(),
         ]);
+    }
+
+    /**
+     * Get the requested sections either from the URL, cookie, or the defaults (all sections).
+     * @param bool $useCookies Whether or not to check cookies for the preferred sections.
+     *   This option should not be true except on the index form.
+     * @return array|mixed|string[]
+     * @codeCoverageIgnore
+     */
+    private function getRequestedSections($useCookies = false)
+    {
+        // Happens from sub-tool index pages, e.g. see self::generalStatsIndexAction().
+        if (isset($this->sections)) {
+            return $this->sections;
+        }
+
+        // Query param for sections gets priority.
+        $sectionsQuery = $this->request->get('sections', '');
+
+        // If not present, try the cookie, and finally the defaults (all sections).
+        if ($useCookies && $sectionsQuery == '') {
+            $sectionsQuery = $this->request->cookies->get('XtoolsEditCounterOptions');
+        }
+
+        // Either a pipe-separated string or an array.
+        $sections = is_array($sectionsQuery) ? $sectionsQuery : explode('|', $sectionsQuery);
+
+        // Filter out any invalid section IDs.
+        $sections = array_filter($sections, function ($section) {
+            return in_array($section, $this->getSectionNames());
+        });
+
+        // Fallback for when no valid sections were requested or provided by the cookie.
+        if (count($sections) === 0) {
+            $sections = $this->getSectionNames();
+        }
+
+        return $sections;
+    }
+
+    /**
+     * Get the names of the available sections.
+     * @return string[]
+     * @codeCoverageIgnore
+     */
+    private function getSectionNames()
+    {
+        return array_keys(self::AVAILABLE_SECTIONS);
     }
 
     /**
      * Redirect to the appropriate action based on what sections are being requested.
      * @return RedirectResponse
+     * @codeCoverageIgnore
      */
     private function redirectFromSections()
     {
+        $this->sections = $this->getRequestedSections();
+
         if (count($this->sections) === 1) {
             // Redirect to dedicated route.
-            return $this->redirectToRoute(self::AVAILABLE_SECTIONS[$this->sections[0]], $this->params);
-        } elseif ($this->sections === array_keys(self::AVAILABLE_SECTIONS)) {
-            return $this->redirectToRoute('EditCounterResult', $this->params);
+            $response = $this->redirectToRoute(self::AVAILABLE_SECTIONS[$this->sections[0]], $this->params);
+        } elseif ($this->sections === $this->getSectionNames()) {
+            $response = $this->redirectToRoute('EditCounterResult', $this->params);
+        } else {
+            // Add sections to the params, which $this->generalUrl() will append to the URL.
+            $this->params['sections'] = implode('|', $this->sections);
+
+            // We want a pretty URL, with pipes | instead of the encoded value %7C
+            $url = str_replace('%7C', '|', $this->generateUrl('EditCounterResult', $this->params));
+
+            $response = $this->redirect($url);
         }
 
-        // Add sections to the params, which $this->generalUrl() will append to the URL.
-        $this->params['sections'] = implode('|', $this->sections);
+        // Save the preferred sections in a cookie.
+        $response->headers->setCookie(
+            new Cookie('XtoolsEditCounterOptions', implode('|', $this->sections))
+        );
 
-        // We want a pretty URL, with pipes | instead of the encoded value %7C
-        $url = str_replace('%7C', '|', $this->generateUrl('EditCounterResult', $this->params));
-
-        return $this->redirect($url);
+        return $response;
     }
 
     /**
@@ -185,6 +238,7 @@ class EditCounterController extends XtoolsController
             'project' => $this->project,
             'ec' => $this->editCounter,
             'sections' => $this->sections,
+            'isAllSections' => $this->sections === $this->getSectionNames(),
         ];
 
         // Used when querying for global rights changes.
@@ -193,11 +247,6 @@ class EditCounterController extends XtoolsController
         }
 
         $response = $this->getFormattedResponse('editCounter/result', $ret);
-
-        // Save the preferred sections in a cookie.
-        $response->headers->setCookie(
-            new Cookie('XtoolsEditCounterOptions', implode('|', $this->sections))
-        );
 
         return $response;
     }

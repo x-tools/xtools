@@ -7,6 +7,7 @@ namespace Tests\AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\DependencyInjection\Container;
 
 /**
@@ -55,6 +56,10 @@ class EditCounterControllerTest extends WebTestCase
      */
     public function testSubtoolIndexes()
     {
+        // Cookies should not affect the index pages of subtools.
+        $cookie = new Cookie('XtoolsEditCounterOptions', 'general-stats');
+        $this->client->getCookieJar()->set($cookie);
+
         $subtools = [
             'general-stats', 'namespace-totals', 'year-counts', 'month-counts',
             'timecard', 'rights-changes', 'latest-global-edits'
@@ -66,5 +71,39 @@ class EditCounterControllerTest extends WebTestCase
             static::assertEquals(1, count($crawler->filter('.checkbox input:checked')));
             static::assertEquals($subtool, $crawler->filter('.checkbox input:checked')->attr('value'));
         }
+    }
+
+    /**
+     * Test setting of section preferences that are stored in a cookie.
+     */
+    public function testCookies()
+    {
+        // For now...
+        if (!$this->container->getParameter('app.is_labs')) {
+            return;
+        }
+
+        $cookie = new Cookie('XtoolsEditCounterOptions', 'year-counts|rights-changes');
+        $this->client->getCookieJar()->set($cookie);
+
+        // Index page should have only the 'general stats' and 'rights changes' options checked.
+        $crawler = $this->client->request('GET', '/ec');
+        static::assertEquals(
+            ['year-counts', 'rights-changes'],
+            $crawler->filter('.checkbox input:checked')->extract(['value'])
+        );
+
+        // Fill in username and project then submit.
+        $form = $crawler->selectButton('Submit')->form();
+        $form['project'] = 'en.wikipedia';
+        $form['username'] = 'Example';
+        $this->client->submit($form);
+
+        // Make sure only the requested sections are shown.
+        static::assertEquals(302, $this->client->getResponse()->getStatusCode());
+        $crawler = $this->client->followRedirect();
+        static::assertCount(2, $crawler->filter('.xt-toc a'));
+        static::assertContains('Year counts', $crawler->filter('.xt-toc')->text());
+        static::assertContains('Rights changes', $crawler->filter('.xt-toc')->text());
     }
 }
