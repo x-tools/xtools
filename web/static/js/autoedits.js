@@ -17,13 +17,15 @@ $(function () {
         $('.tools--count').text(total.toLocaleString(i18nLang));
     });
 
-    // Load the contributions browser, or set up the listeners if it is already present.
-    var initFunc = $('.contributions-table').length ? 'setupContributionsNavListeners' : 'loadContributions';
-    window[initFunc](
-        function (params) {
-            return params.target + '-contributions/' + params.project + '/' + params.username + '/' +
-                params.namespace + '/' + params.start + '/' + params.end;
-        },
-        $('.contributions-container').data('target')
-    );
+    if ($('.contributions-container').length) {
+        // Load the contributions browser, or set up the listeners if it is already present.
+        var initFunc = $('.contributions-table').length ? 'setupContributionsNavListeners' : 'loadContributions';
+        window[initFunc](
+            function (params) {
+                return params.target + '-contributions/' + params.project + '/' + params.username + '/' +
+                    params.namespace + '/' + params.start + '/' + params.end;
+            },
+            $('.contributions-container').data('target')
+        );
+    }
 });
