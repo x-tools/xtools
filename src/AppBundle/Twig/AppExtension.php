@@ -76,7 +76,6 @@ class AppExtension extends Twig_Extension
             new \Twig_SimpleFunction('fallbackLangs', [$this, 'getFallbackLangs', $options]),
             new \Twig_SimpleFunction('allLangs', [$this, 'getAllLangs']),
             new \Twig_SimpleFunction('isRTL', [$this, 'isRTL']),
-            new \Twig_SimpleFunction('isRTLLang', [$this, 'isRTLLang']),
             new \Twig_SimpleFunction('shortHash', [$this, 'gitShortHash']),
             new \Twig_SimpleFunction('hash', [$this, 'gitHash']),
             new \Twig_SimpleFunction('releaseDate', [$this, 'gitDate']),
