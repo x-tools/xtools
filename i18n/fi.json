@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"Nike",
-			"Pyscowicz"
+			"Pyscowicz",
+			"SMAUG"
 		]
 	},
 	"account-age": "Tilin ikä",
@@ -47,7 +48,7 @@
 	"download-label": "Lataa",
 	"edit": "Muokkaa",
 	"edit-summaries": "Muokkausyhteenvedot",
-	"edit-summary": "Kommentoi",
+	"edit-summary": "Muokkausyhteenveto",
 	"editors": "Muokkaajien määrä",
 	"edits": "muokkauksia",
 	"edits-in-categories": "Muokkaukset luokissa",
@@ -79,6 +80,7 @@
 	"last-week": "Muokkauksia viimeisen 7 päivän aikana",
 	"last-year": "Muokkauksia viimeisen 365 päivän aikana",
 	"latest-edit": "Viimeisin muokkaus",
+	"links": "Linkit",
 	"links-external": "Ulkoiset linkit",
 	"links-in": "Linkkejä tälle sivulle",
 	"links-out": "Linkkejä tältä sivulta",
@@ -109,6 +111,7 @@
 	"num-hours": "{{PLURAL:$1|tunti|tuntia}}",
 	"num-minutes": "{{PLURAL:$1|minuutti|minuuttia}}",
 	"num-months": "{{PLURAL:$1|kuukausi|kuukautta}}",
+	"num-namespaces": "{{PLURAL:$1|nimiavaruus|nimiavaruutta}}",
 	"num-seconds": "{{PLURAL:$1|sekunti|sekuntia}}",
 	"num-users": "{{PLURAL:$1|käyttäjä|käyttäjää}}",
 	"num-weeks": "{{PLURAL:$1|viikko|viikkoa}}",
