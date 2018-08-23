@@ -4,7 +4,8 @@
 			"Nemo bis",
 			"Piramidion",
 			"Movses",
-			"Avatar6"
+			"Avatar6",
+			"Renessaince"
 		]
 	},
 	"accepted-formats": "Прийнятні формати",
@@ -297,7 +298,7 @@
 	"tool-adminscore-desc": "Дізнайтесь, наскільки вартісним адміном є користувач",
 	"tool-adminstats": "Статистика адміністраторів",
 	"tool-adminstats-desc": "Показати статистику адміндій",
-	"tool-articleinfo": "Істрія сторінки",
+	"tool-articleinfo": "Історія сторінки",
 	"tool-articleinfo-desc": "Отримати різноманітну статистику про сторінку",
 	"tool-autoedits": "Автоматичні редагування",
 	"tool-autoedits-desc": "Автоматичні редагування за допомогою відомих інструментів",
