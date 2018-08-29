@@ -19,14 +19,14 @@
     },
     "config": {
         "platform": {
-            "php": "5.6"
+            "php": "7.2"
         }
     },
     "require": {
-        "php": "^5.6|^7.0",
+        "php": "^7.2",
         "ext-json": "*",
         "ext-PDO": "*",
-        "symfony/symfony": "^3.0",
+        "symfony/symfony": "3.4.*",
         "twig/twig": "^1.0",
         "doctrine/orm": "^2.5",
         "doctrine/doctrine-bundle": "^1.6",
@@ -36,16 +36,12 @@
         "doctrine/annotations": "1.2.*",
         "symfony/swiftmailer-bundle": "^2.3",
         "symfony/monolog-bundle": "^3.1",
-        "sensio/distribution-bundle": "^5.0",
         "sensio/framework-extra-bundle": "^3.0",
         "incenteev/composer-parameter-handler": "^2.0",
-        "twbs/bootstrap": "^3.1",
         "Krinkle/intuition": "0.6.1",
-        "nnnick/chartjs": "2.7.0",
         "addwiki/mediawiki-api": "^0.7",
         "mediawiki/oauthclient": "^0.1",
-        "symfony/assetic-bundle": "^2.8",
-        "leafo/scssphp": "^0.6",
+        "symfony/webpack-encore-pack": "^1.0",
         "symfony/cache": "^3.2",
         "snc/redis-bundle": "^2.0",
         "predis/predis": "^1.0",
@@ -65,32 +61,20 @@
     },
     "scripts": {
         "node_scripts": [
-            "npm install --prefix app/Resources/"
+            "npm install"
         ],
         "post-install-cmd": [
             "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget",
             "@node_scripts"
         ],
         "post-update-cmd": [
             "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget",
             "@node_scripts"
         ],
         "test": [
             "composer validate --ansi",
             "./vendor/bin/parallel-lint --exclude vendor .",
             "./vendor/bin/phpcs -s . --ignore=/home/scrutinizer/build/node_modules",
-            "{ [ ! -f 'phpDocumentor.phar' ] && curl -L https://github.com/phpDocumentor/phpDocumentor2/releases/download/v2.9.0/phpDocumentor.phar --output phpDocumentor.phar; } || true",
-            "php phpDocumentor.phar -d src -t docs/api --template='checkstyle' --ansi --force && ( [ -z $(grep 'error' docs/api/checkstyle.xml) ] )",
             "./vendor/bin/phpunit tests --coverage-clover=coverage.xml",
             "./vendor/bin/minus-x check ."
         ],

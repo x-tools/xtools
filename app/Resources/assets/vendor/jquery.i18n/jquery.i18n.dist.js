@@ -1959,7 +1959,7 @@
 	}
 }(this, function() {
 
-function pluralRuleParser(rule, number) {
+window.pluralRuleParser = function(rule, number) {
 	'use strict';
 
 	/*

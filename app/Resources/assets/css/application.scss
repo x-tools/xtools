@@ -6,7 +6,7 @@ html {
 }
 
 body {
-    background: url('../images/gradient.png');
+    background: url('/images/gradient.png');
     min-height: 100%;
     position: relative;
 
@@ -469,7 +469,7 @@ section > .panel-body {
 }
 
 input.form-control.show-loader {
-    background: url("../images/loader.gif") no-repeat right 5px center;
+    background: url('/images/loader.gif') no-repeat right 5px center;
 }
 
 .stat-list {

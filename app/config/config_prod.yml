@@ -25,8 +25,3 @@ monolog:
             level: debug
         console:
             type:  console
-
-assetic:
-    node: /usr/bin/nodejs
-    bundles:
-      - AppBundle

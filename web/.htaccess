@@ -22,7 +22,7 @@ DirectoryIndex app.php
 
     # Rewrite the common favicon location to XTools' one
     # (because some user agents don't examine the 'sortcut icon' link).
-    RewriteRule favicon.ico static/images/favicon.ico [L]
+    RewriteRule favicon.ico images/favicon.ico [L]
 
     # Determine the RewriteBase automatically and set it as environment variable.
     # If you are using Apache aliases to do mass virtual hosting or installed the

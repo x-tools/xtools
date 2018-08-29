@@ -67,7 +67,6 @@ class AppExtension extends Twig_Extension
         return [
             new \Twig_SimpleFunction('request_time', [$this, 'requestTime'], $options),
             new \Twig_SimpleFunction('memory_usage', [$this, 'requestMemory'], $options),
-            new \Twig_SimpleFunction('year', [$this, 'generateYear'], $options),
             new \Twig_SimpleFunction('msgIfExists', [$this, 'msgIfExists'], $options),
             new \Twig_SimpleFunction('msgExists', [$this, 'msgExists'], $options),
             new \Twig_SimpleFunction('msg', [$this, 'msg'], $options),
@@ -85,7 +84,6 @@ class AppExtension extends Twig_Extension
             new \Twig_SimpleFunction('chartColor', [$this, 'chartColor']),
             new \Twig_SimpleFunction('isSingleWiki', [$this, 'isSingleWiki']),
             new \Twig_SimpleFunction('getReplagThreshold', [$this, 'getReplagThreshold']),
-            new \Twig_SimpleFunction('loadStylesheetsFromCDN', [$this, 'loadStylesheetsFromCDN']),
             new \Twig_SimpleFunction('isWMFLabs', [$this, 'isWMFLabs']),
             new \Twig_SimpleFunction('replag', [$this, 'replag']),
             new \Twig_SimpleFunction('quote', [$this, 'quote']),
@@ -123,15 +121,6 @@ class AppExtension extends Twig_Extension
         $mem = memory_get_usage(false);
         $div = pow(1024, 2);
         return $mem / $div;
-    }
-
-    /**
-     * Get the current year.
-     * @return string
-     */
-    public function generateYear()
-    {
-        return date('Y');
     }
 
     /**
@@ -420,19 +409,6 @@ class AppExtension extends Twig_Extension
         if ($this->container->hasParameter('app.replag_threshold')) {
             $param = $this->container->getParameter('app.replag_threshold');
         };
-        return $param;
-    }
-
-    /**
-     * Whether we should load stylesheets from external CDNs or not.
-     * @return bool
-     */
-    public function loadStylesheetsFromCDN()
-    {
-        $param = false;
-        if ($this->container->hasParameter('app.load_stylesheets_from_cdn')) {
-            $param = boolval($this->container->getParameter('app.load_stylesheets_from_cdn'));
-        }
         return $param;
     }
 

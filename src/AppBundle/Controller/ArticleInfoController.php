@@ -9,7 +9,6 @@ use AppBundle\Exception\XtoolsHttpException;
 use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Process\Process;
@@ -86,8 +85,8 @@ class ArticleInfoController extends XtoolsController
             // Uglify temporary file.
             $tmpFile = sys_get_temp_dir() . '/xtools_articleinfo_gadget.js';
             $script = "echo \"$rendered\" | tee $tmpFile >/dev/null && ";
-            $script .= $this->get('kernel')->getRootDir() .
-                "/Resources/node_modules/uglify-es/bin/uglifyjs $tmpFile --mangle " .
+            $script .= $this->get('kernel')->getProjectDir().
+                "/node_modules/uglify-es/bin/uglifyjs $tmpFile --mangle " .
                 "&& rm $tmpFile >/dev/null";
             $process = new Process($script);
             $process->run();

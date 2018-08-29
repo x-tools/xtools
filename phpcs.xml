@@ -5,12 +5,9 @@
     <exclude-pattern>vendor/</exclude-pattern>
     <exclude-pattern>var/</exclude-pattern>
     <exclude-pattern>docs/</exclude-pattern>
-    <exclude-pattern>web/config.php</exclude-pattern>
-    <exclude-pattern>web/css/</exclude-pattern>
-    <exclude-pattern>web/static/js/unserialize.jquery.1.0.2.js</exclude-pattern>
-    <exclude-pattern>web/static/js/xagent.js</exclude-pattern>
-    <exclude-pattern>web/static/production/*</exclude-pattern>
-    <exclude-pattern>app/Resources/node_modules</exclude-pattern>
+    <exclude-pattern>web/assets/</exclude-pattern>
+    <exclude-pattern>node_modules/</exclude-pattern>
+    <exclude-pattern>app/Resources/assets/vendor/</exclude-pattern>
     <exclude-pattern>*.min.js</exclude-pattern>
 
     <rule ref="Squiz.NamingConventions.ValidVariableName.MemberNotCamelCaps">

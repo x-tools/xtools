@@ -45,8 +45,6 @@ parameters:
     app.noticeStyle:   ""
     app.noticeText:    ""
 
-    app.load_stylesheets_from_cdn: 0
-
     app.single_wiki: 1
     app.is_labs: 0
 

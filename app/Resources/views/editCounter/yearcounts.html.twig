@@ -90,7 +90,7 @@
             {% endfor %}
 
             var showLegend = {% if is_sub_request %}false{% else %}true{% endif %};
-            window.setupMonthYearChart('year', datasets, labels, maxTotal, showLegend);
+            xtools.editcounter.setupMonthYearChart('year', datasets, labels, maxTotal, showLegend);
         });
     </script>
 {% else %}

@@ -32,8 +32,3 @@ monolog:
 
 #swiftmailer:
 #    delivery_address: me@example.com
-
-assetic:
-    node: /usr/local/bin/node
-    debug:          true
-    use_controller: false

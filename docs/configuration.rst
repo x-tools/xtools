@@ -77,7 +77,6 @@ Application
 - **app.noticeDisplay** - This is used to broadcast a notice at the top of XTools. Set to ``1`` to turn this feature on.
 - **app.noticeStyle** - Style of the notice banner, correlating to the `Bootstrap contextual classes <https://getbootstrap.com/docs/3.3/css/#tables-contextual-classes>`_. Available options include ``danger``, ``warning``, ``info`` and ``success``.
 - **app.noticeText** - Message shown to the user. If you provide a valid i18n message key, it will display that message instead.
-- **app.load_stylesheets_from_cdn** - Whether to load our stylesheets and scripts from a CDN. This is required if XTools is installed on a Windows server.
 - **app.single_wiki** - Point XTools to a single wiki, instead of using a meta database. This ignores ``database_meta_name`` above.
 - **app.is_labs** - Whether XTools lives on the Wikimedia Foundation Cloud Services environment. If you are developing against the WMF replicas through an SSH tunnel, set this to ``true``.
 - **app.replag_threshold** - Number of seconds to consider the replicas as "lagged", and show a warning to the user that the data may be out of date. For WMF installations, this parameter is obsolete and can be left blank, as the new replicas do not suffer from noticeable lag.

@@ -1,18 +1,17 @@
 filter:
     excluded_paths:
-        - var/*
+        - 'var/*'
         - 'app/*'
         - 'tests/*'
         - 'bin/*'
         - 'vendor/*'
-        - 'web/bootstrap/*'
-        - 'web/chartjs/*'
-        - 'web/static/js/vendor/*'
+        - 'app/Resources/assets/vendor/*'
         - '*.min.js'
 build:
     project_setup:
         before:
             - composer self-update
+            - ./node_modules/.bin/encore production
     tests:
         override:
             -
