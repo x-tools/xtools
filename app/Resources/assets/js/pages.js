@@ -1,3 +1,5 @@
+xtools.pages = {};
+
 $(function () {
     // Don't execute this code if we're not on the Pages tool
     // FIXME: find a way to automate this somehow...
@@ -7,7 +9,7 @@ $(function () {
 
     var deletionSummaries = {};
 
-    setupToggleTable(window.countsByNamespace, window.pieChart, 'count', function (newData) {
+    xtools.application.setupToggleTable(window.countsByNamespace, window.pieChart, 'count', function (newData) {
         var totals = {
             count: 0,
             deleted: 0,
@@ -41,7 +43,7 @@ $(function () {
 
         var showSummary = function (summary) {
             $(e.target).find('.tooltip-body').html(summary);
-        }
+        };
 
         if (deletionSummaries[page] !== undefined) {
             return showSummary(deletionSummaries[page]);

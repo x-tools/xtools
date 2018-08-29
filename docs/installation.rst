@@ -13,16 +13,14 @@ Prerequisites
 
 XTools requires the following to run:
 
-- A recent version of Linux or Unix (such as MacOS). Windows servers are supported, however; you must enable the ``app.load_stylesheets_from_cdn`` if you want it to look nice.
-- PHP 5.6 or newer. If you have done PHP development on your machine before, you might already have these popular libraries installed:
+- PHP 7.2 or newer, including:
 
-  - `JSON <https://secure.php.net/manual/en/json.setup.php>`_ must be enabled.
-  - `ctype <https://secure.php.net/manual/en/ctype.setup.php>`_ needs to be enabled.
   - A MySQL-like database, and PDO including the driver for the database you want to use (e.g. `PDO_MYSQL <https://secure.php.net/manual/en/ref.pdo-mysql.php>`_.
   - `cURL <https://secure.php.net/manual/en/curl.setup.php>`_ must be enabled. On some environments you may need to enable this in your php.ini file. Look for a line like ``;extension=php_curl.dll`` and uncomment it by removing the leading ``;``.
+  - Additional PHP extensions are also required, as specified in composer.json.
 
 - `Composer <https://getcomposer.org/>`_ 1.0.0+
-- `Node <https://nodejs.org/en/>`_ and `npm <https://www.npmjs.com/>`_ (tested with versions 6.2.1+ and 3.9.3+, respectively).
+- `Node <https://nodejs.org/en/>`_ and `npm <https://www.npmjs.com/>`_ (tested with versions 10.8.0+ and 6.2.0+, respectively).
 
 Instructions
 ============
@@ -31,7 +29,7 @@ Instructions
 2. Ensure that ``var/`` and all files within it (other than ``var/SymfonyRequirements.php``) are writable by the web server.
 3. Run ``composer install``. You will be prompted to enter database details and other configuration information. See :ref:`configuration` for documentation on each parameter.
 4. Create the XTools database: ``php bin/console doctrine:database:create`` and run the migrations with ``php bin/console doctrine:migrations:migrate``. This is actually only used for usage statistics (e.g. see `xtools.wmflabs.org/meta <https://xtools.wmflabs.org/meta>`_). XTools will run without it but doing so may cause silent failures, as the requests to record usage are made with AJAX.
-5. With each deployment or pull from master, you may need to dump the assets and clear the cache. Use ``php bin/console assetic:dump`` to generate the CSS and JS, and ``php bin/console cache:clear` to clear the cache. For a production environment be sure to append ``--env=prod`` to these commands. You must also clear the cache whenever you make configuration changes.
+5. With each deployment or pull from master, you may need to clear the cache. Use ``php bin/console cache:clear --no-warmup` to clear the cache. For a production environment be sure to append ``--env=prod`` to these commands. You must also clear the cache whenever you make configuration changes.
 
 In production, you may find that further server-level configuration is needed. The setup process for Wikimedia Cloud VPS (which runs on Debian Jessie) is documented on `Wikitech <https://wikitech.wikimedia.org/wiki/Tool:XTools#Production>`_. This may be of assistance when installing XTools on similar Linux distributions.
 

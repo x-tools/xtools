@@ -41,8 +41,7 @@ framework:
     fragments:       ~
     http_method_override: true
     assets:
-        version: '27'
-        version_format: '%%s?v=%%s'
+        json_manifest_path: '%kernel.project_dir%/web/assets/manifest.json'
     cache:
         app: "cache.adapter.%cache.adapter%"
         default_redis_provider: snc_redis.default
@@ -131,17 +130,6 @@ swiftmailer:
     username:  "%mailer_user%"
     password:  "%mailer_password%"
     spool:     { type: memory }
-
-assetic:
-    debug:          '%kernel.debug%'
-    use_controller: '%kernel.debug%'
-    filters:
-        scssphp:
-            formatter: 'Leafo\ScssPhp\Formatter\Compressed'
-            apply_to:  '\.scss$'
-        cssrewrite: ~
-        uglifyjs:
-            bin: '%kernel.root_dir%/Resources/node_modules/uglify-es/bin/uglifyjs'
 
 # Nelmio CORS Configuration
 nelmio_cors:

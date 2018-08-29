@@ -18,10 +18,7 @@
 !var/SymfonyRequirements.php
 /vendor/
 /web/bundles/
-/web/config.php
-/web/css/
-/web/static/production/
-~
+/node_modules/
 
 .idea/
 

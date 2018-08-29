@@ -3,11 +3,7 @@ language: php
 
 # list any PHP version you want to test against
 php:
-  # using major version aliases
-  # aliased to a recent 5.6.x version
-  - 5.6
-  # aliased to a recent 7.x version
-  - 7.0
+  - 7.2
 
 # optionally specify a list of environments, for example to test different RDBMS
 env:
@@ -23,11 +19,8 @@ script:
 sudo: false
 
 matrix:
-  # Only test both IS_LABS values on 5.5, because that's what Labs uses.
   exclude:
-    - php: 5.6
-      env: IS_LABS=1
-    - php: 7.0
+    - php: 7.2
       env: IS_LABS=1
 
 notifications:

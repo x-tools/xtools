@@ -1,10 +1,12 @@
+xtools.articleinfo = {};
+
 $(function () {
     if (!$('body.articleinfo').length) {
         return;
     }
 
     var setupToggleTable = function () {
-        window.setupToggleTable(
+        xtools.application.setupToggleTable(
             window.textshares,
             window.textsharesChart,
             'percentage',
@@ -25,9 +27,9 @@ $(function () {
             timeout: 30000
         }).done(function (data) {
             $textsharesContainer.replaceWith(data);
-            buildSectionOffsets();
-            setupTocListeners();
-            setupColumnSorting();
+            xtools.application.buildSectionOffsets();
+            xtools.application.setupTocListeners();
+            xtools.application.setupColumnSorting();
             setupToggleTable();
         }).fail(function (_xhr, _status, message) {
             $textsharesContainer.replaceWith(

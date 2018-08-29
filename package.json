@@ -1,1 +1,17 @@
-app/Resources/package.json
+{
+  "name": "XTools",
+  "description": "A suite of tools to analyze article, user and project data of MediaWiki websites",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/x-tools/xtools.git"
+  },
+  "dependencies": {
+    "@symfony/webpack-encore": "^0.20.1",
+    "node-sass": "^4.9.3",
+    "sass-loader": "^7.1.0"
+  },
+  "devDependencies": {
+    "uglify-es": "^3.0.27"
+  }
+}

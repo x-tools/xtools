@@ -1,21 +1,23 @@
+xtools.editcounter = {};
+
 /**
  * Namespaces that have been excluded from view via namespace toggle table.
  * @type {Array}
  */
-window.excludedNamespaces = [];
+xtools.editcounter.excludedNamespaces = [];
 
 /**
  * Chart labels for the month/yearcount charts.
  * @type {Object} Keys are the chart IDs, values are arrays of strings.
  */
-window.chartLabels = {};
+xtools.editcounter.chartLabels = {};
 
 /**
  * Number of digits of the max month/year total. We want to keep this consistent
  * for aesthetic reasons, even if the updated totals are fewer digits in size.
  * @type {Object} Keys are the chart IDs, values are integers.
  */
-window.maxDigits = {};
+xtools.editcounter.maxDigits = {};
 
 $(function () {
     // Don't do anything if this isn't a Edit Counter page.
@@ -28,7 +30,7 @@ $(function () {
     // Set up charts.
     $('.chart-wrapper').each(function () {
         var chartType = $(this).data('chart-type');
-        if ( chartType === undefined ) {
+        if (chartType === undefined) {
             return false;
         }
         var data = $(this).data('chart-data');
@@ -52,7 +54,7 @@ $(function () {
     }
 
     // Set up namespace toggle chart.
-    setupToggleTable(window.namespaceTotals, window.namespaceChart, null, toggleNamespace);
+    xtools.application.setupToggleTable(window.namespaceTotals, window.namespaceChart, null, toggleNamespace);
 });
 
 /**
@@ -78,7 +80,7 @@ function setupSectionListeners()
  * Callback for setupToggleTable(). This will show/hide a given namespace from
  * all charts, and update totals and percentages.
  * @param {Object} newData New namespaces and totals, as returned by setupToggleTable.
- * @param {String} key     Namespace ID of the toggled namespace.
+ * @param {String} key Namespace ID of the toggled namespace.
  */
 function toggleNamespace(newData, key)
 {
@@ -119,7 +121,7 @@ function toggleNamespace(newData, key)
         }
 
         // Figure out the index of the namespace we're toggling within this chart object.
-        var datasetIndex;
+        var datasetIndex = 0;
         chartObj.data.datasets.forEach(function (dataset, i) {
             if (dataset.label === nsName) {
                 datasetIndex = i;
@@ -132,9 +134,9 @@ function toggleNamespace(newData, key)
 
         // Add this namespace to the list of excluded namespaces.
         if (meta.hidden) {
-            window.excludedNamespaces.push(nsName);
+            xtools.editcounter.excludedNamespaces.push(nsName);
         } else {
-            window.excludedNamespaces = window.excludedNamespaces.filter(function (namespace) {
+            xtools.editcounter.excludedNamespaces = xtools.editcounter.excludedNamespaces.filter(function (namespace) {
                 return namespace !== nsName;
             });
         }
@@ -155,7 +157,7 @@ function loadLatestGlobal()
 {
     // Load the contributions browser, or set up the listeners if it is already present.
     var initFunc = $('.contributions-table').length ? 'setupContributionsNavListeners' : 'loadContributions';
-    window[initFunc](
+    xtools.application[initFunc](
         function (params) {
             return params.target + '-contributions/' + params.project + '/' + params.username;
         },
@@ -164,9 +166,8 @@ function loadLatestGlobal()
 }
 
 /**
- * Build the labels for the y-axis of the year/monthcount charts,
- * which include the year/month and the total number of edits across
- * all namespaces in that year/month.
+ * Build the labels for the y-axis of the year/monthcount charts, which include the year/month and the total number of
+ * edits across all namespaces in that year/month.
  * @param {String} id ID prefix of the chart, either 'month' or 'year'.
  * @param {Array} datasets Datasets making up the chart.
  * @return {Array} Labels for each year/month.
@@ -175,14 +176,12 @@ function getYAxisLabels(id, datasets)
 {
     var labelsAndTotals = getMonthYearTotals(id, datasets);
 
-    // Format labels with totals next to them. This is a bit hacky,
-    // but it works! We use tabs (\t) to make the labels/totals
-    // for each namespace line up perfectly.
-    // The caveat is that we can't localize the numbers because
+    // Format labels with totals next to them. This is a bit hacky, but it works! We use tabs (\t) to make the
+    // labels/totals for each namespace line up perfectly. The caveat is that we can't localize the numbers because
     // the commas are not monospaced :(
     return Object.keys(labelsAndTotals).map(function (year) {
         var digitCount = labelsAndTotals[year].toString().length;
-        var numTabs = (window.maxDigits[id] - digitCount) * 2;
+        var numTabs = (xtools.editcounter.maxDigits[id] - digitCount) * 2;
 
         // +5 for a bit of extra spacing.
         /** global: i18nLang */
@@ -201,15 +200,15 @@ function getMonthYearTotals(id, datasets)
 {
     var labelsAndTotals = {};
     datasets.forEach(function (namespace) {
-        if (window.excludedNamespaces.indexOf(namespace.label) !== -1) {
+        if (xtools.editcounter.excludedNamespaces.indexOf(namespace.label) !== -1) {
             return;
         }
 
         namespace.data.forEach(function (count, index) {
-            if (!labelsAndTotals[window.chartLabels[id][index]]) {
-                labelsAndTotals[window.chartLabels[id][index]] = 0;
+            if (!labelsAndTotals[xtools.editcounter.chartLabels[id][index]]) {
+                labelsAndTotals[xtools.editcounter.chartLabels[id][index]] = 0;
             }
-            labelsAndTotals[window.chartLabels[id][index]] += count;
+            labelsAndTotals[xtools.editcounter.chartLabels[id][index]] += count;
         });
     });
 
@@ -218,8 +217,8 @@ function getMonthYearTotals(id, datasets)
 
 /**
  * Calculate and format a percentage, rounded to the tenths place.
- * @param  {Number} numerator
- * @param  {Number} denominator
+ * @param {Number} numerator
+ * @param {Number} denominator
  * @return {Number}
  */
 function getPercentage(numerator, denominator)
@@ -237,14 +236,14 @@ function getPercentage(numerator, denominator)
  * @param {Number} maxTotal Maximum value of year/month totals.
  * @param {Boolean} showLegend Whether to show the legend above the chart.
  */
-window.setupMonthYearChart = function (id, datasets, labels, maxTotal, showLegend) {
+xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTotal, showLegend) {
     /** @type {Array} Labels for each namespace. */
     var namespaces = datasets.map(function (dataset) {
         return dataset.label;
     });
 
-    window.maxDigits[id] = maxTotal.toString().length
-    window.chartLabels[id] = labels;
+    xtools.editcounter.maxDigits[id] = maxTotal.toString().length;
+    xtools.editcounter.chartLabels[id] = labels;
 
     /** global: i18nRTL */
     /** global: i18nLang */
@@ -288,7 +287,7 @@ window.setupMonthYearChart = function (id, datasets, labels, maxTotal, showLegen
                             if (Math.floor(value) === value) {
                                 return value.toLocaleString(i18nLang);
                             }
-                        },
+                        }
                     }
                 }],
                 yAxes: [{
@@ -302,4 +301,4 @@ window.setupMonthYearChart = function (id, datasets, labels, maxTotal, showLegen
             }
         }
     });
-}
+};

@@ -1,9 +1,11 @@
+xtools.autoedits = {};
+
 $(function () {
     if (!$('body.autoedits').length) {
         return;
     }
 
-    setupToggleTable(window.countsByTool, window.toolsChart, 'count', function (newData) {
+    xtools.application.setupToggleTable(window.countsByTool, window.toolsChart, 'count', function (newData) {
         var total = 0;
         Object.keys(newData).forEach(function (tool) {
             total += parseInt(newData[tool].count, 10);
@@ -20,7 +22,7 @@ $(function () {
     if ($('.contributions-container').length) {
         // Load the contributions browser, or set up the listeners if it is already present.
         var initFunc = $('.contributions-table').length ? 'setupContributionsNavListeners' : 'loadContributions';
-        window[initFunc](
+        xtools.application[initFunc](
             function (params) {
                 return params.target + '-contributions/' + params.project + '/' + params.username + '/' +
                     params.namespace + '/' + params.start + '/' + params.end;

@@ -15,66 +15,31 @@
         i18nLang = "{{ lang() }}";
         i18nPaths = {};
         {% for lang in fallbackLangs() %}
-            i18nPaths["{{ lang }}"] = "{{ asset('static/i18n/' ~ lang ~ '.json') }}";
+            i18nPaths["{{ lang }}"] = "{{ asset('i18n/' ~ lang ~ '.json') }}";
         {% endfor %}
 
         i18nRTL = {% if isRTL() %}true{% else %}false{% endif %};
     </script>
 
-    {% if loadStylesheetsFromCDN() %}
-        <link rel="stylesheet" type="text/css" media="screen" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-        {% stylesheets 'static/css/*.scss'
-            filter='scssphp,cssrewrite'
-            output='static/production/application.css'
-        %}
-        <link rel="stylesheet" type="text/css" media="screen" href="{{ asset_url }}" />
-        {% if isRTL() %}
-            <link rel="stylesheet" type="text/css" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-rtl/3.4.0/css/bootstrap-flipped.min.css">
-        {% endif %}
-        {% endstylesheets %}
-        <script src="https://code.jquery.com/jquery-3.1.0.min.js"
-                integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-                crossorigin="anonymous"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.0/Chart.min.js"></script>
-    {% else %}
+    {% block javascripts %}
+        <script type="text/javascript" src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script type="text/javascript" src="{{ asset('assets/app.js') }}"></script>
+        <script type="text/javascript" src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/select2/4.0.5/js/select2.full.min.js"></script>
+    {% endblock %}
+    {% block stylesheets %}
         <link rel="stylesheet" type="text/css" media="screen" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" media="screen" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/select2/4.0.5/css/select2.min.css">
-        {% stylesheets 'static/css/*.scss'
-            filter='scssphp,cssrewrite'
-            output='static/production/application.css'
-        %}
-        <link rel="stylesheet" type="text/css" media="screen" href="{{ asset_url }}" />
+        <link rel="stylesheet" type="text/css" media="screen" href="{{ asset('assets/app.css') }}">
         {% if isRTL() %}
             <link rel="stylesheet" type="text/css" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-rtl/3.4.0/css/bootstrap-flipped.min.css">
         {% endif %}
-        {% endstylesheets %}
-        {% javascripts
-            'static/js/vendor/jquery.min.js'
-            'static/js/vendor/jquery.i18n/jquery.i18n.dist.js'
-            'bootstrap/js/bootstrap.min.js'
-            'static/js/vendor/bootstrap-typeahead.js'
-            'chartjs/Chart.min.js'
-            'static/js/core_extensions.js'
-            'static/js/application.js'
-            'static/js/articleinfo.js'
-            'static/js/autoedits.js'
-            'static/js/categoryedits.js'
-            'static/js/editcounter.js'
-            'static/js/pages.js'
-            'static/js/topedits.js'
-            filter='uglifyjs'
-            output='static/production/application.js' %}
-        <script src="{{ asset_url }}"></script>
-        <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/select2/4.0.5/js/select2.full.min.js"></script>
-        {% endjavascripts %}
-    {% endif %}
+    {% endblock %}
 
-    <link rel="shortcut icon" sizes="16x16 32x32 48x48 96x96 144x144" href="{{ asset('static/images/favicon.ico') }}" />
-    <link rel="apple-touch-icon" sizes="16x16 32x32 48x48 96x96 144x144" href="{{ asset('static/images/apple-touch-icon.png') }}" />
-    <link rel="apple-touch-icon-precomposed icon" sizes="16x16 32x32 48x48 96x96 144x144" href="{{ asset('static/images/apple-touch-icon-precomposed.png') }}" />
-    <link rel="icon" sizes="196x196" href="{{ asset('static/images/apple-touch-icon.png') }}">
+    <link rel="shortcut icon" sizes="16x16 32x32 48x48 96x96 144x144" href="{{ asset('images/favicon.ico') }}" />
+    <link rel="apple-touch-icon" sizes="16x16 32x32 48x48 96x96 144x144" href="{{ asset('images/apple-touch-icon.png') }}" />
+    <link rel="apple-touch-icon-precomposed icon" sizes="16x16 32x32 48x48 96x96 144x144" href="{{ asset('images/apple-touch-icon-precomposed.png') }}" />
+    <link rel="icon" sizes="196x196" href="{{ asset('images/apple-touch-icon.png') }}">
 
     <meta charset="utf-8">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -136,7 +101,7 @@
         <ol class="tool-links--nav nav navbar-nav navbar-left">
             <li>
                 <a class="home-link" href="{{ path('homepage') }}">
-                    <img src="{{ asset('static/images/logo.svg') }}" />
+                    <img src="{{ asset('images/logo.svg') }}" />
                 </a>
             </li>
 
@@ -213,7 +178,7 @@
         <div class="pull-right footer-branding">
             <a style="margin-right:5px;" href="//translatewiki.net/?setlang=en "><img height="36px" src="//upload.wikimedia.org/wikipedia/commons/5/51/Translatewiki.net_logo.svg" alt="translatewiki.net logo"/></a>
             {% if isWMFLabs() %}
-            <a href="https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS" target="_blank"><img height="40px" src="{{ asset('static/images/VPS-badge.svg') }}" alt="Powered by Wikimedia Cloud Services" /></a>
+            <a href="https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS" target="_blank"><img height="40px" src="{{ asset('images/VPS-badge.svg') }}" alt="Powered by Wikimedia Cloud Services" /></a>
             {% endif %}
         </div>
         <div class="footer-about">
@@ -239,7 +204,7 @@
     </div>
 </footer>
 <span class='hidden loader'>
-    <img src="{{ asset('static/images/loader.gif') }}" /> <span class="sr-only">{{ msg('loading') }}&hellip;</span>
+    <img src="{{ asset('images/loader.gif') }}" /> <span class="sr-only">{{ msg('loading') }}&hellip;</span>
 </span>
 {% if xtPage is defined and project.domain is defined and 'indexAction' not in app.request.attributes.get('_controller') %}
 <script>

@@ -1,5 +1,7 @@
+xtools.topedits = {};
+
 $(function () {
-    // Don't execute this code if we're not on the Pages tool
+    // Don't execute this code if we're not on the TopEdits tool.
     // FIXME: find a way to automate this somehow...
     if (!$('body.topedits').length) {
         return;
