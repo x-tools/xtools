@@ -45,7 +45,7 @@ class UserRights extends Model
         $this->rightsChanges = $this->processRightsChanges($logData);
 
         $acDate = $this->getAutoconfirmedTimestamp();
-        if ($acDate != false) {
+        if ($acDate !== false) {
             $this->rightsChanges[$acDate] = [
                 'logId' => null,
                 'admin' => null,
@@ -139,7 +139,7 @@ class UserRights extends Model
             $currentRights = $this->user->getUserRights($this->project);
             $rightsChanges = $this->getRightsChanges();
 
-            if (false != $this->getAutoconfirmedTimestamp()) {
+            if (false !== $this->getAutoconfirmedTimestamp()) {
                 $currentRights[] = 'autoconfirmed';
             }
         } else {
@@ -305,7 +305,7 @@ class UserRights extends Model
 
     /**
      * Get the timestamp of when the user became autoconfirmed.
-     * @return string YYYYMMDDHHMMSS format.
+     * @return string|false YmdHis format, or false if date is in the future or if AC status could not be determined.
      */
     private function getAutoconfirmedTimestamp()
     {
@@ -318,7 +318,7 @@ class UserRights extends Model
 
         // Happens for non-WMF installations, or if there is no autoconfirmed status.
         if (null === $thresholds) {
-            return null;
+            return false;
         }
 
         $registrationDate = $this->user->getRegistrationDate($this->project);
@@ -336,6 +336,11 @@ class UserRights extends Model
         $acDate = $regDateImmutable->add(DateInterval::createFromDateString(
             $thresholds['wgAutoConfirmAge'].' seconds'
         ))->format('YmdHis');
+
+        // If autoconfirmed date is in the future.
+        if (strtotime($acDate) > time()) {
+            return false;
+        }
 
         // First check if they already had 10 edits made as of $acDate
         $editsByAcDate = $this->getRepository()->getNumEditsByTimestamp(
