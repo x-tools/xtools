@@ -604,7 +604,7 @@ class EditCounterTest extends TestAdapter
                 'comment' => null,
                 'added' => [],
                 'removed' => ['ipblock-exempt', 'filemover'],
-                'automatic' => true,
+                'grantType' => 'automatic',
                 'type' => 'local',
             ],
             20180108132810 => [
@@ -613,7 +613,7 @@ class EditCounterTest extends TestAdapter
                 'comment' => '',
                 'added' => [],
                 'removed' => ['templateeditor'],
-                'automatic' => false,
+                'grantType' => 'manual',
                 'type' => 'local',
             ],
             20180108132758 => [
@@ -622,7 +622,7 @@ class EditCounterTest extends TestAdapter
                 'comment' => '',
                 'added' => ['ipblock-exempt', 'filemover', 'templateeditor'],
                 'removed' => [],
-                'automatic' => false,
+                'grantType' => 'manual',
                 'type' => 'local',
             ],
             20150716002614 => [
@@ -631,7 +631,7 @@ class EditCounterTest extends TestAdapter
                 'comment' => 'Per user request.',
                 'added' => ['bureaucrat'],
                 'removed' => ['rollbacker'],
-                'automatic' => false,
+                'grantType' => 'manual',
                 'type' => 'meta',
             ],
             20141222034127 => [
@@ -640,7 +640,7 @@ class EditCounterTest extends TestAdapter
                 'comment' => 'per request',
                 'added' => ['sysop'],
                 'removed' => [],
-                'automatic' => false,
+                'grantType' => 'manual',
                 'type' => 'meta',
             ],
         ], $this->editCounter->getRightsChanges());
@@ -664,7 +664,7 @@ class EditCounterTest extends TestAdapter
                 'comment' => 'per request',
                 'added' => ['sysop'],
                 'removed' => [],
-                'automatic' => false,
+                'grantType' => 'manual',
                 'type' => 'global',
             ],
         ], $this->editCounter->getGlobalRightsChanges());

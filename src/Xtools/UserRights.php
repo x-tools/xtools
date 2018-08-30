@@ -52,7 +52,7 @@ class UserRights extends Model
                 'comment' => null,
                 'added' => ['autoconfirmed'],
                 'removed' => [],
-                'automatic' => true,
+                'grantType' => strtotime($acDate) > time() ? 'pending' : 'automatic',
                 'type' => 'local',
             ];
             krsort($this->rightsChanges);
@@ -116,9 +116,13 @@ class UserRights extends Model
                 $former
             );
 
+            // Remove the current rights for good measure. Autoconfirmed is a special case -- it can never be former,
+            // but will end up in $former from the above code.
+            $former = array_diff(array_unique($former), $currentRights, ['autoconfirmed']);
+
             $this->rightsStates[$type] = [
                 'current' => $currentRights,
-                'former' => array_diff(array_unique($former), $currentRights),
+                'former' => $former,
             ];
         }
 
@@ -139,7 +143,8 @@ class UserRights extends Model
             $currentRights = $this->user->getUserRights($this->project);
             $rightsChanges = $this->getRightsChanges();
 
-            if (false !== $this->getAutoconfirmedTimestamp()) {
+            $acDate = $this->getAutoconfirmedTimestamp();
+            if (false !== $acDate && strtotime($acDate) <= time()) {
                 $currentRights[] = 'autoconfirmed';
             }
         } else {
@@ -254,7 +259,7 @@ class UserRights extends Model
                 'comment' => $row['log_comment'],
                 'added' => array_values($added),
                 'removed' => array_values($removed),
-                'automatic' => $row['log_action'] === 'autopromote',
+                'grantType' => $row['log_action'] === 'autopromote' ? 'automatic' : 'manual',
                 'type' => $row['type'],
             ];
         }
@@ -294,7 +299,7 @@ class UserRights extends Model
                     'comment' => null,
                     'added' => [],
                     'removed' => [$entry],
-                    'automatic' => true,
+                    'grantType' => strtotime($expiry) > time() ? 'pending' : 'automatic',
                     'type' => $row['type'],
                 ];
             }
@@ -336,11 +341,6 @@ class UserRights extends Model
         $acDate = $regDateImmutable->add(DateInterval::createFromDateString(
             $thresholds['wgAutoConfirmAge'].' seconds'
         ))->format('YmdHis');
-
-        // If autoconfirmed date is in the future.
-        if (strtotime($acDate) > time()) {
-            return false;
-        }
 
         // First check if they already had 10 edits made as of $acDate
         $editsByAcDate = $this->getRepository()->getNumEditsByTimestamp(

@@ -15,14 +15,14 @@
         {% set index = 0 %}
         {% for timestamp, change in rightsChanges if index < 10 or not(is_sub_request) %}
             <tr>
-                <td class="sort-entry--date" data-value="{{ timestamp }}">
+                <td class="{{ change.grantType == 'pending' ? 'pending ' : '' }}sort-entry--date" data-value="{{ timestamp }}">
                     {% if change.logId is not empty %}
                         {{ wiki.logLink(change.type == 'local' ? project : metaProject, change.logId, timestamp|trans|date_format) }}
                     {% else %}
                         {{ timestamp|trans|date_format }}
                     {% endif %}
                 </td>
-                <td class="sort-entry--rights" data-value="{{ change.added|length + change.removed|length }}">
+                <td class="{{ change.grantType == 'pending' ? 'pending ' : '' }}sort-entry--rights" data-value="{{ change.added|length + change.removed|length }}">
                     {% for right in change.added %}
                         <div class="diff-pos">{{ ec.rightsName(right)|trim }}</div>
                     {% endfor %}
@@ -30,14 +30,14 @@
                         <div class="diff-neg" dir="ltr">-{{ ec.rightsName(right)|trim }}</div>
                     {% endfor %}
                 </td>
-                <td class="sort-entry--admin" data-value="{{ change.admin }}">
+                <td class="{{ change.grantType == 'pending' ? 'pending ' : '' }}sort-entry--admin" data-value="{{ change.admin }}">
                     {{ wiki.userLink(change.admin, change.type == 'local' ? project : metaProject) }}
                 </td>
                 <td class="sort-entry--summary" data-value="{{ change.comment }}">
-                    {% if change.automatic %}
-                        <i class="text-muted">{{ msg('automatic') }}</i>
-                    {% else %}
+                    {% if change.grantType == 'manual' %}
                         {{ change.comment|wikify(change.type == 'local' ? project : metaProject)|raw }}
+                    {% else %}
+                        <i class="text-muted">{{ msg('automatic') }}</i>
                     {% endif %}
                 </td>
             </tr>
