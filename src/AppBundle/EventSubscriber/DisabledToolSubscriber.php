@@ -52,7 +52,7 @@ class DisabledToolSubscriber implements EventSubscriberInterface
 
         if (method_exists($controller[0], 'getIndexRoute')) {
             $tool = $controller[0]->getIndexRoute();
-            if (!in_array($tool, ['homepage', 'meta']) && !$this->container->getParameter("enable.$tool")) {
+            if (!in_array($tool, ['homepage', 'meta', 'Quote']) && !$this->container->getParameter("enable.$tool")) {
                 throw new NotFoundHttpException('This tool is disabled');
             }
         }
