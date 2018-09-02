@@ -1,5 +1,13 @@
 # Release Notes #
 
+## 3.4.2 ##
+- T202836: Show pending automatic rights changes in the Edit Counter,
+  and fix bug where these were being counted as the current rights.
+- AutoEdits: Fix silent JavaScript error on index page.
+- Quote: Allow production API access, but leaving the HTML tool disabled.
+- Update dependencies and various code cleanup.
+- Localization updates.
+
 ## 3.4.1 ##
 - Fix bug in ExceptionListener where production errors werne't showing
   the formatted production error page.
