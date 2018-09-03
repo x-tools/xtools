@@ -4,7 +4,8 @@
 			"Nemo bis",
 			"Joedalton",
 			"Jorn Ari",
-			"Saederup92"
+			"Saederup92",
+			"Fnielsen"
 		]
 	},
 	"accepted-formats": "Godkendte formater",
@@ -174,6 +175,7 @@
 	"last-month": "Redigeringer i de seneste 30 dage",
 	"last-week": "Redigeringer i de seneste 7 dage",
 	"last-year": "Redigeringer i de seneste 365 dage",
+	"latest-action": "Seneste loggede handling",
 	"latest-edit": "Seneste redigering",
 	"latest-global-edits": "Seneste globale redigeringer",
 	"latest-global-edits-desc": "De seneste redigering til denne brugeres top 10-projekter indenfor den seneste måned",
