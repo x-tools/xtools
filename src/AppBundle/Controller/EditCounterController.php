@@ -32,7 +32,7 @@ class EditCounterController extends XtoolsController
         'year-counts' => 'EditCounterYearCounts',
         'month-counts' => 'EditCounterMonthCounts',
         'timecard' => 'EditCounterRightsChanges',
-        'top-edited-pages' => 'TopEditsResult',
+        'top-edited-pages' => 'TopEditsResultNamespace',
         'rights-changes' => 'EditCounterRightsChanges',
         'latest-global-edits' => 'EditCounterLatestGlobalContribs',
     ];

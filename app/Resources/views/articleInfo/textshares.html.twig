@@ -79,7 +79,7 @@
                     </td>
                     <td>
                         {% if enabled('TopEdits') %}
-                            <a href="{{ path('TopEditsResult', { 'project': project.domain, 'username': username, 'namespace': page.namespace, 'page': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
+                            <a href="{{ path('TopEditsResultPage', { 'project': project.domain, 'username': username, 'namespace': page.namespace, 'page': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
                         {% endif %}
                         &middot;
                         {% if enabled('EditCounter') %}

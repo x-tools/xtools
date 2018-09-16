@@ -54,7 +54,7 @@
                         {{ nsName(nsId, project.namespaces) }}
                     </td>
                     <td class="sort-entry--count" data-value="{{ value }}">
-                        <a href="{{ path('TopEditsResult', {project:project.domain, username:user.username, namespace:nsId}) }}">{{ value|num_format }}</a>
+                        <a href="{{ path('TopEditsResultNamespace', {project:project.domain, username:user.username, namespace:nsId}) }}">{{ value|num_format }}</a>
                         ({{ value|percent_format(ec.countLiveRevisions) }})
                     </td>
                 </tr>

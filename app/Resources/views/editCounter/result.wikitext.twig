@@ -22,7 +22,7 @@
     'username': user.username,
     'project': project.domain,
     'format': 'wikitext'
-})) }}{% endif %}{% if 'top-edited-pages' in sections %}{{ render(path('TopEditsResult', {
+})) }}{% endif %}{% if 'top-edited-pages' in sections %}{{ render(path('TopEditsResultNamespace', {
     'username': user.username,
     'project': project.domain,
     'namespace': 'all',

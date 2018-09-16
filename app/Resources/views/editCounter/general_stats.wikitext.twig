@@ -226,7 +226,7 @@
 | {% if topProj.project.databaseName == project.databaseName %}&#9658;{% endif %}
 {# use project.domain instead of title due to limited space available in the interface #}
 [{{ wiki.pageUrlRaw('Special:Contributions/'~user.username, topProj.project) }} {{ topProj.project.domain }}]
-| [{{ url('TopEditsResult', {project:topProj.project.domain, username:user.username, namespace:'all'}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ topProj.total }}}}]
+| [{{ url('TopEditsResultNamespace', {project:topProj.project.domain, username:user.username, namespace:'all'}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ topProj.total }}}}]
 {% endspaceless %}
 
 |-

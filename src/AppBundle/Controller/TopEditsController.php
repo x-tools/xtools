@@ -38,6 +38,9 @@ class TopEditsController extends XtoolsController
     {
         $this->tooHighEditCountAction = $this->getIndexRoute();
 
+        // The Top Edits by page action is exempt from the edit count limitation.
+        $this->tooHighEditCountActionBlacklist = ['singlePageTopEdits'];
+
         parent::__construct($requestStack, $container);
     }
 
@@ -54,7 +57,10 @@ class TopEditsController extends XtoolsController
     {
         // Redirect if at minimum project and username are provided.
         if (isset($this->params['project']) && isset($this->params['username'])) {
-            return $this->redirectToRoute('TopEditsResult', $this->params);
+            if (empty($this->params['page'])) {
+                return $this->redirectToRoute('TopEditsResultNamespace', $this->params);
+            }
+            return $this->redirectToRoute('TopEditsResultPage', $this->params);
         }
 
         return $this->render('topedits/index.html.twig', array_merge([
@@ -70,29 +76,15 @@ class TopEditsController extends XtoolsController
     }
 
     /**
-     * Display the results.
-     * @Route("/topedits/{project}/{username}/{namespace}/{page}", name="TopEditsResult",
+     * List top edits by this user for all pages in a particular namespace.
+     * @Route("/topedits/{project}/{username}/{namespace}", name="TopEditsResultNamespace",
      *     requirements = {"page"="|.+", "namespace" = "|all|\d+"},
      *     defaults = {"page" = "", "namespace" = "all"}
      * )
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction()
-    {
-        if (empty($this->page)) {
-            return $this->namespaceTopEdits();
-        } else {
-            return $this->singlePageTopEdits();
-        }
-    }
-
-    /**
-     * List top edits by this user for all pages in a particular namespace.
-     * @return Response
-     * @codeCoverageIgnore
-     */
-    public function namespaceTopEdits()
+    public function namespaceTopEditsAction()
     {
         // Make sure they've opted in to see this data.
         if (!$this->project->userHasOptedIn($this->user)) {
@@ -141,10 +133,14 @@ class TopEditsController extends XtoolsController
 
     /**
      * List top edits by this user for a particular page.
+     * @Route("/topedits/{project}/{username}/{namespace}/{page}", name="TopEditsResultPage",
+     *     requirements = {"page"="|.+", "namespace" = "|all|\d+"},
+     *     defaults = {"page" = "", "namespace" = "all"}
+     * )
      * @return Response
      * @codeCoverageIgnore
      */
-    protected function singlePageTopEdits()
+    public function singlePageTopEditsAction()
     {
         // FIXME: add pagination.
         $topEdits = new TopEdits($this->project, $this->user, $this->page);

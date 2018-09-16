@@ -19,7 +19,7 @@
 {% set availableNamespaces = availableNamespaces|merge([nsId]) %}
 | {{ loop.index }}
 | {{ nsName(nsId, project.namespaces) }}
-| [{{ url('TopEditsResult', {project:project.domain, username:user.username, namespace:nsId}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ value }}}}] ({{ value|percent_format(ec.countLiveRevisions) }})
+| [{{ url('TopEditsResultNamespace', {project:project.domain, username:user.username, namespace:nsId}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ value }}}}] ({{ value|percent_format(ec.countLiveRevisions) }})
 |-
 {% endfor %}
 !

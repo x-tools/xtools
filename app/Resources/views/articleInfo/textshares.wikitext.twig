@@ -16,7 +16,7 @@
 |-
 | {{ loop.index|num_format }}
 | {{ wiki.userLinkWikitext(username, username) }}
-| [{{ url('TopEditsResult', { 'project': project.domain, 'username': username, 'namespace': page.namespace, 'page': page.titleWithoutNamespace }) }} {{ msg('tool-topedits') }}] &middot; [{{ url('EditCounterResult', { 'project': project.domain, 'username': username }) }} {{ msg('tool-editcounter') }}]
+| [{{ url('TopEditsResultPage', { 'project': project.domain, 'username': username, 'namespace': page.namespace, 'page': page.titleWithoutNamespace }) }} {{ msg('tool-topedits') }}] &middot; [{{ url('EditCounterResult', { 'project': project.domain, 'username': username }) }} {{ msg('tool-editcounter') }}]
 | {{ values.count|num_format }}
 | {{ values.percentage|percent_format }}
 {% set totalPercentage = totalPercentage + values.percentage %}{% set totalCount = totalCount + values.count %}

@@ -110,17 +110,17 @@
 
         {% if 'top-edited-pages' in sections %}
             {% set content %}
-                {{ render(path('TopEditsResult', {
+                {{ render(path('TopEditsResultNamespace', {
                     'username': user.username,
                     'project': project.domain,
                     'namespace': 'all'
                 })) }}
             {% endset %}
             {% set headerLink %}
-                <a href="{{ path('TopEditsResult', {project:project.domain, username:user.username, namespace:'all'})}}">{{ msg('top-edited-pages') }}</a>
+                <a href="{{ path('TopEditsResultNamespace', {project:project.domain, username:user.username, namespace:'all'})}}">{{ msg('top-edited-pages') }}</a>
             {% endset %}
             {% set downloadLink %}
-                {{ layout.downloadLink('TopEditsResult', {project:project.domain, username:user.username, namespace:'all'}, ['wikitext']) }}
+                {{ layout.downloadLink('TopEditsResultNamespace', {project:project.domain, username:user.username, namespace:'all'}, ['wikitext']) }}
             {% endset %}
             {{ layout.content_block(headerLink, content, downloadLink, 'top-edited-pages', true) }}
         {% endif %}
