@@ -273,6 +273,7 @@
 	"pages-created-tooltip": "Total of all pages created, including those created as a redirect when moving a page. See the documentation for more details.",
 	"pages-deleted": "Pages deleted",
 	"pages-deleted-hover-desc": "Hover over the '$1' text to see the deletion summary.",
+	"pages-deleted-redirects": "Deleted pages may have been redirects.",
 	"pages-edited-total": "Pages edited (total)",
 	"pages-moved": "Pages moved",
 	"pages-recreated-desc": "Some deleted pages may have been recreated by this user or a different user. These are marked as '$1'.",

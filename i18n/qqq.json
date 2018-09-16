@@ -273,6 +273,7 @@
 	"pages-created-tooltip": "Text shown when hovering on a link near the 'pages created' label to explain what is excluded.",
 	"pages-deleted": "Label for pages a user has deleted.",
 	"pages-deleted-hover-desc": "In the Pages Created tool, this text indicates that you can hover the 'deleted' labels to reveal the reason why the page was deleted. $1 is the formatted message for 'deleted', which contains HTML markup.",
+	"pages-deleted-redirects": "Disclaimer that deleted pages shown in the Pages tool might have been redirects.",
 	"pages-edited-total": "Label for number of total pages a user has edited.",
 	"pages-moved": "Label for pages a user has moved.",
 	"pages-recreated-desc": "Text explaining that some of the deleted pages listed may have been recreated. This is shown at the bottom of the Pages Created tool. $1 is the formatted message 'recreated', which contains HTML markup.",
