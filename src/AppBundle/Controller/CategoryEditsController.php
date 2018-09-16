@@ -5,6 +5,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Exception\XtoolsHttpException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -130,15 +131,18 @@ class CategoryEditsController extends XtoolsController
             if (strpos($category, $nsName) === 0 || strpos($category, 'Category:') === 0) {
                 $normalized = true;
             }
-            return ltrim(ltrim($category, $nsName.':'), 'Category:');
+            return preg_replace('/^'.$nsName.'/', '', $category);
         }, $categories);
 
         // Redirect if normalized, since we don't want the Category: prefix in the URL.
         if ($normalized) {
-            return $this->redirectToRoute($this->request->get('_route'), array_merge(
-                $this->request->attributes->get('_route_params'),
-                ['categories' => implode('|', $this->categories)]
-            ));
+            throw new XtoolsHttpException(
+                '',
+                $this->generateUrl($this->request->get('_route'), array_merge(
+                    $this->request->attributes->get('_route_params'),
+                    ['categories' => implode('|', $this->categories)]
+                ))
+            );
         }
 
         return null;

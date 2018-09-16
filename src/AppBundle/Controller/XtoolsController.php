@@ -241,7 +241,7 @@ abstract class XtoolsController extends Controller
 
         // Prepend namespace and strip out duplicates.
         $nsName = $this->project->getNamespaces()[$ns];
-        $title = $nsName.':'.ltrim($title, $nsName.':');
+        $title = $nsName.':'.preg_replace('/^'.$nsName.':/', '', $title);
         return $rawTitle ? $title : $this->validatePage($title);
     }
 
