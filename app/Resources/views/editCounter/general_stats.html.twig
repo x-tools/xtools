@@ -363,6 +363,10 @@
                         <td>{{ wiki.userLogLink(user, project, ec.countEditsDeleted|num_format, 'delete', 'revision') }}</td>
                     </tr>
                     <tr>
+                        <td>{{ msg('log-delete') }}</td>
+                        <td>{{ wiki.userLogLink(user, project, ec.countLogsDeleted|num_format, 'delete', 'event') }}</td>
+                    </tr>
+                    <tr>
                         <td>{{ msg('restore') }}</td>
                         <td>{{ wiki.userLogLink(user, project, ec.countPagesRestored|num_format, 'delete', 'restore') }}</td>
                     </tr>

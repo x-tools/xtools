@@ -188,6 +188,7 @@
 	"live-edits": "Live edits, visible edits of a user.",
 	"loading": "Shown when content is loading.\n{{Identical|Loading}}",
 	"log": "Link to the logs for a user or page.\n{{Identical|Log}}",
+	"log-delete": "Name of a MediaWiki action where the user deleted a log entry.",
 	"log-events": "Label for column of a table listing logged events that took place.",
 	"log-types": "Label listing the types of log events that the tool looks for.",
 	"login": "Label for Log in button\n{{Identical|Log in}}",

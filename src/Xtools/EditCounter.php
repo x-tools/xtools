@@ -488,6 +488,16 @@ class EditCounter extends UserRights
     }
 
     /**
+     * Get the total number of log entries deleted by the user.
+     * @return int
+     */
+    public function countLogsDeleted()
+    {
+        $revCounts = $this->getLogCounts();
+        return isset($revCounts['delete-event']) ? (int)$revCounts['delete-event'] : 0;
+    }
+
+    /**
      * Get the total number of pages restored by the user.
      * @return int
      */
