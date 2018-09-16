@@ -73,6 +73,7 @@
                     <td class="sort-entry--rank" data-value="{{ loop.index }}">{{ loop.index|num_format }}</td>
                     <td class="sort-entry--username" data-value="{{ username }}">
                         <span class="textshares-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ username }}">
+                            <span class="glyphicon glyphicon-remove"></span>
                             <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
                         </span>
                         {{ wiki.userLink(username, project) }}

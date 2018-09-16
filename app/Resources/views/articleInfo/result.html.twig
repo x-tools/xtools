@@ -518,60 +518,64 @@
             </div>
 
             {% if ai.bots is not empty %}
-            <h4>{{ msg('bot-list') }}</h4>
-            <table class="table table-bordered table-hover table-striped">
-                <thead><tr>
-                    {% for key in ['rank', 'bot', 'links', 'edits'] %}
-                        <th>
-                            <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
-                                {{ msg(key)|capitalize_first }}
-                                {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
-                            </span>
-                        </th>
+                <h4>{{ msg('bot-list') }}</h4>
+                <table class="table table-bordered table-hover table-striped">
+                    <thead><tr>
+                        {% for key in ['rank', 'bot', 'links', 'edits'] %}
+                            <th>
+                                <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
+                                    {{ msg(key)|capitalize_first }}
+                                    {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
+                                </span>
+                            </th>
+                        {% endfor %}
+                    </tr></thead>
+                    <tbody>
+                    {% set counter = 0 %}
+                    {% for bot, botData in ai.bots|slice(0, botlimit) %}
+                        {% set counter = counter + 1 %}
+                        <tr>
+                            <td class="sort-entry--rank" data-value="{{ counter }}">{{ counter|num_format }}</td>
+                            <td class="sort-entry--bot" data-value="{{ bot }}">
+                                {{ wiki.userLink(bot, project) }}
+                                {% if not botData.current %}
+                                    <i>
+                                        ({{ wiki.pageLogLinkRaw('User:'~bot, project, msg('former-bot'), 'rights') }})
+                                    </i>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if enabled('TopEdits') %}
+                                    <a href="{{ path('TopEditsResultPage', { 'project': project.domain, 'username': bot, 'namespace': page.namespace, 'page': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
+                                {% endif %}
+                                &middot;
+                                {% if enabled('EditCounter') %}
+                                    <a href="{{ path('EditCounterResult', { 'project': project.domain, 'username': bot }) }}">{{ msg('tool-editcounter') }}</a>
+                                {% endif %}
+                            </td>
+                            <td class="sort-entry--edits" data-value="{{ botData.count }}">{{ botData.count|num_format }}</td>
+                        </tr>
                     {% endfor %}
-                </tr></thead>
-                <tbody>
-                {% set counter = 0 %}
-                {% for bot, botData in ai.bots|slice(0, botlimit) %}
-                    {% set counter = counter + 1 %}
-                    <tr>
-                        <td class="sort-entry--rank" data-value="{{ counter }}">{{ counter|num_format }}</td>
-                        <td class="sort-entry--bot" data-value="{{ bot }}">
-                            {{ wiki.userLink(bot, project) }}
-                            {% if not botData.current %}
-                                <i>
-                                    ({{ wiki.pageLogLinkRaw('User:'~bot, project, msg('former-bot'), 'rights') }})
-                                </i>
-                            {% endif %}
-                        </td>
+                    </tbody>
+                    {% if counter < ai.numBots %}
+                    <tfoot><tr class="show-more-row">
+                        <td></td>
                         <td>
-                            {% if enabled('TopEdits') %}
-                                <a href="{{ path('TopEditsResultPage', { 'project': project.domain, 'username': bot, 'namespace': page.namespace, 'page': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
-                            {% endif %}
-                            &middot;
-                            {% if enabled('EditCounter') %}
-                                <a href="{{ path('EditCounterResult', { 'project': project.domain, 'username': bot }) }}">{{ msg('tool-editcounter') }}</a>
-                            {% endif %}
+                            {% set expandUrl = path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'botlimit': botlimit * 10})) %}
+                            {% set otherBots = ai.numBots - counter %}
+                            <a href="{{ expandUrl }}">
+                                {{ otherBots|num_format }} {{ msg('num-others', [otherBots]) }}
+                            </a>
                         </td>
-                        <td class="sort-entry--edits" data-value="{{ botData.count }}">{{ botData.count|num_format }}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-                {% if counter < ai.numBots %}
-                <tfoot><tr class="show-more-row">
-                    <td></td>
-                    <td>
-                        {% set expandUrl = path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'botlimit': botlimit * 10})) %}
-                        {% set otherBots = ai.numBots - counter %}
-                        <a href="{{ expandUrl }}">
-                            {{ otherBots|num_format }} {{ msg('num-others', [otherBots]) }}
-                        </a>
-                    </td>
-                    <td colspan=8></td>
-                </tr></tfoot>
-                {% endif %}
-            </table>
+                        <td colspan=8></td>
+                    </tr></tfoot>
+                    {% endif %}
+                </table>
             {% endif %}
+
+            <div class="text-muted">
+                {{ msg('all-approximate') }}
+            </div>
         {% endset %}
         {% set jsonLink %}
             <li>

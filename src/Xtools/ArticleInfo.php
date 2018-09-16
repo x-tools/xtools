@@ -11,9 +11,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DomCrawler\Crawler;
 
 /**
- * An ArticleInfo provides statistics about a page on a project. This model does not
- * have a separate Repository because it needs to use individual SQL statements to
- * traverse the page's history, saving class instance variables along the way.
+ * An ArticleInfo provides statistics about a page on a project.
  */
 class ArticleInfo extends Model
 {
@@ -199,9 +197,8 @@ class ArticleInfo extends Model
     }
 
     /**
-     * Return the start/end date values as associative array,
-     * with YYYY-MM-DD as the date format. This is used mainly as
-     * a helper to pass to the pageviews Twig macros.
+     * Return the start/end date values as associative array, with YYYY-MM-DD as the date format.
+     * This is used mainly as a helper to pass to the pageviews Twig macros.
      * @return array
      */
     public function getDateParams()
@@ -250,9 +247,8 @@ class ArticleInfo extends Model
     }
 
     /**
-     * Get the number of revisions that are actually getting processed.
-     * This goes by the app.max_page_revisions parameter, or the actual
-     * number of revisions, whichever is smaller.
+     * Get the number of revisions that are actually getting processed. This goes by the app.max_page_revisions
+     * parameter, or the actual number of revisions, whichever is smaller.
      * @return int
      */
     public function getNumRevisionsProcessed()
@@ -429,9 +425,8 @@ class ArticleInfo extends Model
     }
 
     /**
-     * Get the number of times the page has been viewed in the given timeframe.
-     * If the ArticleInfo instance has a date range, it is used instead of the
-     * value of the $latest parameter.
+     * Get the number of times the page has been viewed in the given timeframe. If the ArticleInfo instance has a
+     * date range, it is used instead of the value of the $latest parameter.
      * @param  int $latest Last N days.
      * @return int
      */
@@ -729,8 +724,7 @@ class ArticleInfo extends Model
     }
 
     /**
-     * Get the number of external, incoming and outgoing links, along with
-     * the number of redirects to the page.
+     * Get the number of external, incoming and outgoing links, along with the number of redirects to the page.
      * @return int[]
      * @codeCoverageIgnore
      */
@@ -818,8 +812,8 @@ class ArticleInfo extends Model
 
     /**
      * Update various counts based on the current edit.
-     * @param  Edit   $edit
-     * @param  Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'
+     * @param Edit $edit
+     * @param Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'
      * @return Edit[] Updated version of $prevEdits.
      */
     private function updateCounts(Edit $edit, $prevEdits)
@@ -862,10 +856,10 @@ class ArticleInfo extends Model
      * @param Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
      * @return Edit[] Updated version of $prevEdits.
      */
-    private function updateContentSizes(Edit $edit, $prevEdits)
+    private function updateContentSizes(Edit $edit, array $prevEdits)
     {
         // Check if it was a revert
-        if ($this->isRevert($prevEdits, $edit)) {
+        if ($this->isRevert($edit, $prevEdits)) {
             return $this->updateContentSizesRevert($prevEdits);
         } else {
             return $this->updateContentSizesNonRevert($edit, $prevEdits);
@@ -874,11 +868,11 @@ class ArticleInfo extends Model
 
     /**
      * Is the given Edit a revert?
-     * @param Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
      * @param Edit $edit
+     * @param Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
      * @return bool
      */
-    private function isRevert($prevEdits, $edit)
+    private function isRevert(Edit $edit, array $prevEdits)
     {
         return $edit->getSha() === $prevEdits['prevSha'] || $edit->isRevert($this->container);
     }
@@ -889,7 +883,7 @@ class ArticleInfo extends Model
      * @param Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
      * @return Edit[] Updated version of $prevEdits, for tracking.
      */
-    private function updateContentSizesRevert($prevEdits)
+    private function updateContentSizesRevert(array $prevEdits)
     {
         $this->revertCount++;
 
@@ -916,8 +910,7 @@ class ArticleInfo extends Model
     }
 
     /**
-     * Updates the figures on content sizes assuming the given edit
-     * was NOT a revert of the previous edit.
+     * Updates the figures on content sizes assuming the given edit was NOT a revert of the previous edit.
      * @param Edit $edit
      * @param Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
      * @return Edit[] Updated version of $prevEdits, for tracking.
@@ -1068,8 +1061,7 @@ class ArticleInfo extends Model
     }
 
     /**
-     * Update the counts of anon and minor edits for year, month,
-     * and user of the given edit.
+     * Update the counts of anon and minor edits for year, month, and user of the given edit.
      * @param Edit $edit
      */
     private function updateAnonMinorCounts(Edit $edit)
@@ -1149,8 +1141,7 @@ class ArticleInfo extends Model
 
     /**
      * Get info about bots that edited the page.
-     * @return mixed[] Contains the bot's username, edit count to the page,
-     *   and whether or not they are currently a bot.
+     * @return mixed[] Contains the bot's username, edit count to the page, and whether or not they are currently a bot.
      */
     public function getBots()
     {
@@ -1158,9 +1149,8 @@ class ArticleInfo extends Model
     }
 
     /**
-     * Set info about bots that edited the page. This is done as a private setter
-     * because we need this information when computing the top 10 editors,
-     * where we don't want to include bots.
+     * Set info about bots that edited the page. This is done as a private setter because we need this information
+     * when computing the top 10 editors, where we don't want to include bots.
      */
     private function setBots()
     {
@@ -1169,7 +1159,7 @@ class ArticleInfo extends Model
         $botData = $this->getRepository()->getBotData($this->page, $this->start, $this->end);
         while ($bot = $botData->fetch()) {
             $bots[$bot['username']] = [
-                'count' => (int) $bot['count'],
+                'count' => (int)$bot['count'],
                 'current' => $bot['current'] === 'bot',
             ];
         }
@@ -1184,8 +1174,7 @@ class ArticleInfo extends Model
 
     /**
      * Number of edits made to the page by current or former bots.
-     * @param string[] $bots Used only in unit tests, where we
-     *   supply mock data for the bots that will get processed.
+     * @param string[] $bots Used only in unit tests, where we supply mock data for the bots that will get processed.
      * @return int
      */
     public function getBotRevisionCount($bots = null)
@@ -1209,8 +1198,7 @@ class ArticleInfo extends Model
     }
 
     /**
-     * Query for log events during each year of the article's history,
-     *   and set the results in $this->yearMonthCounts.
+     * Query for log events during each year of the article's history, and set the results in $this->yearMonthCounts.
      */
     private function setLogsEvents()
     {
@@ -1336,8 +1324,8 @@ class ArticleInfo extends Model
                 'label' => $editor,
                 'value' => $added,
                 'percentage' => (
-                    100 * ($added / $topTenTotalAdded)
-                )
+                    100 * ($added / $this->addedBytes)
+                ),
             ];
         }, $topTenEditorsByAdded);
     }
@@ -1499,8 +1487,7 @@ class ArticleInfo extends Model
     }
 
     /**
-     * Count the number of characters and words of the plain text
-     * within the DOM element matched by the given selector.
+     * Count the number of characters and words of the plain text within the DOM element matched by the given selector.
      * @param Crawler $crawler
      * @param string $selector HTML selector.
      * @return array [num chars, num words]
@@ -1520,8 +1507,7 @@ class ArticleInfo extends Model
     }
 
     /**
-     * Fetch transclusion data (categories, templates and files)
-     * that are on the page.
+     * Fetch transclusion data (categories, templates and files) that are on the page.
      * @return array With keys 'categories', 'templates' and 'files'.
      */
     private function getTransclusionData()
