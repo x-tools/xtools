@@ -143,6 +143,10 @@ class AutomatedEditsController extends XtoolsController
         // Will redirect back to index if the user has too high of an edit count.
         $this->setupAutoEdits();
 
+        if (in_array('bot', $this->user->getUserRights($this->project))) {
+            $this->addFlash('warning', 'auto-edits-bot');
+        }
+
         return $this->getFormattedResponse('autoEdits/result', $this->output);
     }
 

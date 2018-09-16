@@ -29,7 +29,7 @@ parameters:
     #   as the regex may not apply to non-English wikis.
     # You can also set wiki-specific regex that will get merged into the global regex.
     # Other local values such as link, tag and revert are overriden, not merged into the global value.
-    # See 'Hugge' under 'global' and 'en.wikipedia.org' for an example.
+    # See 'Huggle' under 'global' and 'en.wikipedia.org' for an example.
     global:
         Generic rollback:
             tag: mw-rollback
@@ -97,6 +97,10 @@ parameters:
             tag: ProveIt edit
             link: commons:Help:Gadget-ProveIt
             contribs: true
+        AutoWikiBrowser:
+            tag: AWB
+            regex: 'using \[\[(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
+            link: Project:AutoWikiBrowser
 
     # Per-language lists. This generally only includes native MediaWiki actions.
     ar:
@@ -245,9 +249,6 @@ parameters:
         AFCH:
             regex: 'WP:(AFCH|AFCHRW)'
             link: Project:AFCH
-        AutoWikiBrowser:
-            regex: 'using \[\[(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
-            link: Project:AutoWikiBrowser
         Checklinks:
             regex: 'using \[\[w:WP:CHECKLINKS'
             link: Project:CHECKLINKS
