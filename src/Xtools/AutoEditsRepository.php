@@ -73,10 +73,13 @@ class AutoEditsRepository extends UserRepository
         $tagTable = $project->getTableName('change_tag');
         $tagJoin = '';
 
+        $params = [];
+
         // Build SQL for detecting autoedits via regex and/or tags
         $condTools = [];
         if ($regex != '') {
-            $condTools[] = "rev_comment REGEXP $regex";
+            $condTools[] = "rev_comment REGEXP :tools";
+            $params['tools'] = $regex;
         }
         if ($tags != '') {
             $tagJoin = $tags != '' ? "LEFT OUTER JOIN $tagTable ON ct_rev_id = rev_id" : '';
@@ -89,13 +92,13 @@ class AutoEditsRepository extends UserRepository
                 $pageJoin
                 $tagJoin
                 WHERE rev_user_text = :username
-                $condTool
                 $condNamespace
+                $condTool
                 $condBegin
                 $condEnd";
 
-        $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end);
-        $result = (int) $resultQuery->fetchColumn();
+        $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end, $params);
+        $result = (int)$resultQuery->fetchColumn();
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);
@@ -151,7 +154,7 @@ class AutoEditsRepository extends UserRepository
                 LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                 WHERE revs.rev_user_text = :username
                 AND revs.rev_timestamp > 0
-                AND revs.rev_comment NOT RLIKE $regex
+                AND revs.rev_comment NOT RLIKE :tools
                 $condTag
                 $condBegin
                 $condEnd
@@ -161,7 +164,7 @@ class AutoEditsRepository extends UserRepository
                 LIMIT 50
                 OFFSET $offset";
 
-        $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end);
+        $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end, ['tools' => $regex]);
         $result = $resultQuery->fetchAll();
 
         // Cache and return.
@@ -248,7 +251,7 @@ class AutoEditsRepository extends UserRepository
                 $condEnd
                 $condNamespace
                 AND (
-                    revs.rev_comment RLIKE $regex
+                    revs.rev_comment RLIKE :tools
                     $condTag
                 )
                 GROUP BY revs.rev_id
@@ -256,7 +259,7 @@ class AutoEditsRepository extends UserRepository
                 LIMIT 50
                 OFFSET $offset";
 
-        $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end);
+        $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end, ['tools' => $regex]);
         $result = $resultQuery->fetchAll();
 
         // Cache and return.
@@ -376,8 +379,8 @@ class AutoEditsRepository extends UserRepository
 
     /**
      * Get some of the inner SQL for self::getAutomatedCountsSql().
-     * @param  string $tagTable Name of the `change_tag` table.
-     * @param  string[] $values Values as defined in semi_automated.yml
+     * @param string $tagTable Name of the `change_tag` table.
+     * @param string[] $values Values as defined in semi_automated.yml
      * @return string[] [Equality clause, JOIN clause]
      */
     private function getInnerAutomatedCountsSql($tagTable, $values)
@@ -452,7 +455,7 @@ class AutoEditsRepository extends UserRepository
         }
 
         return [
-            $conn->quote(implode('|', $regexes), \PDO::PARAM_STR),
+            implode('|', $regexes),
             implode(',', $tags),
         ];
     }

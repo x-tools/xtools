@@ -220,9 +220,10 @@ class UserRepository extends Repository
      * @param string $namespace
      * @param string $start
      * @param string $end
-     * @return \Doctrine\DBAL\Statement
+     * @param array $extraParams Will get merged in the params array used for binding values.
+     * @return \Doctrine\DBAL\Driver\Statement
      */
-    protected function executeQuery($sql, User $user, $namespace = 'all', $start = '', $end = '')
+    protected function executeQuery($sql, User $user, $namespace = 'all', $start = '', $end = '', $extraParams = [])
     {
         $params = [
             'username' => $user->getUsername(),
@@ -238,7 +239,7 @@ class UserRepository extends Repository
             $params['namespace'] = $namespace;
         }
 
-        return $this->executeProjectsQuery($sql, $params);
+        return $this->executeProjectsQuery($sql, array_merge($params, $extraParams));
     }
 
     /**

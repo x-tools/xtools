@@ -6,9 +6,9 @@
 
 {% if not is_sub_request %}
     <div class="panel panel-primary">
-        {{ layout.userHeading(user, project, 'CategoryEdits') }}
+        {{ layout.userHeading(user, project, 'TopEdits') }}
         <div class="panel-body xt-panel-body">
-            {{ wiki.userLinks(user, project, 'CategoryEdits') }}
+            {{ wiki.userLinks(user, project, 'TopEdits') }}
             <h3 class="text-center">{{ msg('topedits-per-namespace') }}</h3>
 
             {% if project.userHasOptedIn(user) and te.topEdits|length > 2 %}
