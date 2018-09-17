@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.4.4 ##
+- ArticleInfo: hotfix, externallinks table is no longer accessible.
+
 ## 3.4.3 ##
 - T199765: Show up to 1,000 results when viewing a single namespace in
   TopEdits, and provide pagination.
