@@ -58,6 +58,7 @@ class CategoryEditsController extends XtoolsController
      * @Route("/categoryedits", name="CategoryEdits")
      * @Route("/categoryedits/", name="CategoryEditsSlash")
      * @Route("/categoryedits/{project}", name="CategoryEditsProject")
+     * @Route("/categoryedits/{project}/", name="CategoryEditsProjectSlash")
      * @return Response
      * @codeCoverageIgnore
      */

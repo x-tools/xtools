@@ -50,6 +50,7 @@ class TopEditsController extends XtoolsController
      * @Route("/topedits/", name="topEditsSlash")
      * @Route("/topedits/index.php", name="TopEditsIndex")
      * @Route("/topedits/{project}", name="TopEditsProject")
+     * @Route("/topedits/{project}/", name="TopEditsProjectSlash")
      * @return Response
      */
     public function indexAction()

@@ -49,6 +49,7 @@ class SimpleEditCounterController extends XtoolsController
      * @Route("/sc/", name="SimpleEditCounterSlash")
      * @Route("/sc/index.php", name="SimpleEditCounterIndexPhp")
      * @Route("/sc/{project}", name="SimpleEditCounterProject")
+     * @Route("/sc/{project}/", name="SimpleEditCounterProjectSlash")
      * @return Response
      */
     public function indexAction()

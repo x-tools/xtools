@@ -32,6 +32,7 @@ class AdminScoreController extends XtoolsController
      * @Route("/adminscore/index.php", name="AdminScoreIndexPhp")
      * @Route("/scottywong tools/adminscore.php", name="AdminScoreLegacy")
      * @Route("/adminscore/{project}", name="AdminScoreProject")
+     * @Route("/adminscore/{project}/", name="AdminScoreProjectSlash")
      * @return Response
      */
     public function indexAction()

@@ -40,6 +40,7 @@ class ArticleInfoController extends XtoolsController
      * @Route("/articleinfo/", name="articleInfoSlash")
      * @Route("/articleinfo/index.php", name="articleInfoIndexPhp")
      * @Route("/articleinfo/{project}", name="ArticleInfoProject")
+     * @Route("/articleinfo/{project}/", name="ArticleInfoProjectSlash")
      * @return Response
      */
     public function indexAction()

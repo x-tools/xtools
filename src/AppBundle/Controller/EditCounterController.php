@@ -119,6 +119,7 @@ class EditCounterController extends XtoolsController
      * @Route("/ec/", name="EditCounterSlash")
      * @Route("/ec/index.php", name="EditCounterIndexPhp")
      * @Route("/ec/{project}", name="EditCounterProject")
+     * @Route("/ec/{project}/", name="EditCounterProjectSlash")
      * @return RedirectResponse|Response
      */
     public function indexAction()

@@ -55,6 +55,7 @@ class PagesController extends XtoolsController
      * @Route("/pages/", name="PagesSlash")
      * @Route("/pages/index.php", name="PagesIndexPhp")
      * @Route("/pages/{project}", name="PagesProject")
+     * @Route("/pages/{project}/", name="PagesProjectSlash")
      * @return Response
      */
     public function indexAction()
