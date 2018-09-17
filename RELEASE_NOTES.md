@@ -1,5 +1,19 @@
 # Release Notes #
 
+## 3.4.3 ##
+- T199765: Show up to 1,000 results when viewing a single namespace in
+  TopEdits, and provide pagination.
+- TopEdits: Remove edit count restriction when view edits to single pages.
+- AutoEdits: Add tag for AWB edits. Show warning that all edits made by
+  bots may be automated.
+- T203518: Show log entry deletions under admin actions in Edit Counter.
+- T202141: Include disclaimer that deleted pages may have been redirects
+  in the Pages tool.
+- ArticleInfo: Add 'all data is approximate' disclaimer to Top Editors
+  section. Add missing X icon to toggle table in Authorship section.
+- Fix use of ltrim to remove duplicate namespace from page titles.
+- Localization updates.
+
 ## 3.4.2 ##
 - T202836: Show pending automatic rights changes in the Edit Counter,
   and fix bug where these were being counted as the current rights.
