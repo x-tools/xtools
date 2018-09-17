@@ -76,9 +76,9 @@ class TopEditsController extends XtoolsController
 
     /**
      * List top edits by this user for all pages in a particular namespace.
-     * @Route("/topedits/{project}/{username}/{namespace}/{offset}", name="TopEditsResultNamespace",
-     *     requirements = {"page"="|.+", "namespace" = "|all|\d+"},
-     *     defaults = {"page" = "", "namespace" = "all", "offset" = 0}
+     * @Route("/topedits/{project}/{username}/{namespace}", name="TopEditsResultNamespace",
+     *     requirements = {"namespace" = "|all|\d+"},
+     *     defaults = {"namespace" = "all"}
      * )
      * @return Response
      * @codeCoverageIgnore
@@ -132,8 +132,8 @@ class TopEditsController extends XtoolsController
     /**
      * List top edits by this user for a particular page.
      * @Route("/topedits/{project}/{username}/{namespace}/{page}", name="TopEditsResultPage",
-     *     requirements = {"page"="|.+", "namespace" = "|all|\d+"},
-     *     defaults = {"page" = "", "namespace" = "all"}
+     *     requirements = {"page"=".+", "namespace" = "|all|\d+"},
+     *     defaults = {"namespace" = "all"}
      * )
      * @return Response
      * @codeCoverageIgnore
