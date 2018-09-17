@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.4.5 ##
+- ArticleInfo: reverts 3.4.4 release. Issue with externallinks table has
+  been resolved.
+- TopEdits: Fix routing for per-page view.
+
 ## 3.4.4 ##
 - ArticleInfo: hotfix, externallinks table is no longer accessible.
 
