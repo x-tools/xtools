@@ -28,7 +28,7 @@ class TopEdits extends Model
     /** @var int Number of reverted top edits. */
     protected $totalReverted = 0;
 
-    const DEFAULT_LIMIT_SINGLE_NAMESPACE = 100;
+    const DEFAULT_LIMIT_SINGLE_NAMESPACE = 1000;
     const DEFAULT_LIMIT_ALL_NAMESPACES = 20;
 
     /**
@@ -37,19 +37,26 @@ class TopEdits extends Model
      * @param User $user
      * @param Page $page
      * @param string|int $namespace Namespace ID or 'all'.
-     * @param int $limit Number of rows to fetch. This defaults to
-     *   DEFAULT_LIMIT_SINGLE_NAMESPACE if $this->namespace is a single namespace (int),
-     *   and DEFAULT_LIMIT_ALL_NAMESPACES if $this->namespace is 'all'.
+     * @param int $limit Number of rows to fetch. This defaults to DEFAULT_LIMIT_SINGLE_NAMESPACE if $this->namespace
+     *   is a single namespace (int), and DEFAULT_LIMIT_ALL_NAMESPACES if $this->namespace is 'all'.
+     * @param int $offset Number of pages past the initial dataset. Used for pagination.
      */
-    public function __construct(Project $project, User $user, Page $page = null, $namespace = 0, $limit = null)
-    {
+    public function __construct(
+        Project $project,
+        User $user,
+        Page $page = null,
+        $namespace = 0,
+        $limit = null,
+        $offset = 0
+    ) {
         $this->project = $project;
         $this->user = $user;
         $this->page = $page;
         $this->namespace = $namespace === 'all' ? 'all' : (int)$namespace;
+        $this->offset = (int)$offset;
 
-        if ($limit) {
-            $this->limit = $limit;
+        if (null !== $limit) {
+            $this->limit = (int)$limit;
         } else {
             $this->limit = $this->namespace === 'all'
                 ? self::DEFAULT_LIMIT_ALL_NAMESPACES
@@ -177,7 +184,8 @@ class TopEdits extends Model
                 $this->project,
                 $this->user,
                 $this->namespace,
-                $this->limit
+                $this->limit,
+                $this->offset * $this->limit
             );
         }
 
@@ -186,6 +194,19 @@ class TopEdits extends Model
         } else {
             return $pages;
         }
+    }
+
+    /**
+     * Get the total number of pages edited in the namespace.
+     * @return int|null
+     */
+    public function getNumPagesNamespace()
+    {
+        if ($this->namespace === 'all') {
+            return null;
+        }
+
+        return (int)$this->getRepository()->countEditsNamespace($this->project, $this->user, $this->namespace);
     }
 
     /**

@@ -19,8 +19,7 @@ use Xtools\TopEditsRepository;
 class TopEditsController extends XtoolsController
 {
     /**
-     * Get the name of the tool's index route.
-     * This is also the name of the associated model.
+     * Get the name of the tool's index route. This is also the name of the associated model.
      * @return string
      * @codeCoverageIgnore
      */
@@ -77,9 +76,9 @@ class TopEditsController extends XtoolsController
 
     /**
      * List top edits by this user for all pages in a particular namespace.
-     * @Route("/topedits/{project}/{username}/{namespace}", name="TopEditsResultNamespace",
+     * @Route("/topedits/{project}/{username}/{namespace}/{offset}", name="TopEditsResultNamespace",
      *     requirements = {"page"="|.+", "namespace" = "|all|\d+"},
-     *     defaults = {"page" = "", "namespace" = "all"}
+     *     defaults = {"page" = "", "namespace" = "all", "offset" = 0}
      * )
      * @return Response
      * @codeCoverageIgnore
@@ -104,13 +103,12 @@ class TopEditsController extends XtoolsController
         }
 
         /**
-         * Max number of rows per namespace to show. `null` here will cause to
-         * use the TopEdits default.
+         * Max number of rows per namespace to show. `null` here will use the TopEdits default.
          * @var int
          */
         $limit = $this->isSubRequest ? 10 : null;
 
-        $topEdits = new TopEdits($this->project, $this->user, null, $this->namespace, $limit);
+        $topEdits = new TopEdits($this->project, $this->user, null, $this->namespace, $limit, $this->offset);
         $topEditsRepo = new TopEditsRepository();
         $topEditsRepo->setContainer($this->container);
         $topEdits->setRepository($topEditsRepo);

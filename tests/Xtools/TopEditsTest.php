@@ -58,7 +58,7 @@ class TopEditsTest extends TestAdapter
         // Single namespace, with defaults.
         $te = new TopEdits($this->project, $this->user);
         $this->assertEquals(0, $te->getNamespace());
-        $this->assertEquals(100, $te->getLimit());
+        $this->assertEquals(1000, $te->getLimit());
 
         // Single namespace, explicit configuration.
         $te2 = new TopEdits($this->project, $this->user, null, 5, 50);

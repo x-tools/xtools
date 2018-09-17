@@ -30,10 +30,11 @@ class TopEditsRepository extends Repository
      * @param User $user
      * @param int $namespace Namespace ID.
      * @param int $limit Number of edits to fetch.
+     * @param int $offset Number of results past the initial dataset. Used for pagination.
      * @return string[] page_namespace, page_title, page_is_redirect,
      *   count (number of edits), assessment (page assessment).
      */
-    public function getTopEditsNamespace(Project $project, User $user, $namespace = 0, $limit = 100)
+    public function getTopEditsNamespace(Project $project, User $user, $namespace = 0, $limit = 1000, $offset = 0)
     {
         // Set up cache.
         $cacheKey = $this->getCacheKey(func_get_args(), 'topedits_ns');
@@ -58,16 +59,50 @@ class TopEditsRepository extends Repository
 
         $sql = "SELECT page_namespace, page_title, page_is_redirect, COUNT(page_title) AS count
                     $paSelect
-                FROM $pageTable JOIN $revisionTable ON page_id = rev_page
+                FROM $pageTable
+                JOIN $revisionTable ON page_id = rev_page
                 WHERE rev_user_text = :username
                 AND page_namespace = :namespace
                 GROUP BY page_namespace, page_title
                 ORDER BY count DESC
-                LIMIT $limit";
+                LIMIT $limit
+                OFFSET $offset";
         $result = $this->executeProjectsQuery($sql, [
             'username' => $user->getUsername(),
             'namespace' => $namespace,
         ])->fetchAll();
+
+        // Cache and return.
+        return $this->setCache($cacheKey, $result);
+    }
+
+    /**
+     * Count the number of edits in the given namespace.
+     * @param Project $project
+     * @param User $user
+     * @param $namespace
+     * @return mixed
+     */
+    public function countEditsNamespace(Project $project, User $user, $namespace)
+    {
+        // Set up cache.
+        $cacheKey = $this->getCacheKey(func_get_args(), 'topedits_count_ns');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
+        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+
+        $sql = "SELECT COUNT(DISTINCT page_id) AS count
+                FROM $pageTable
+                JOIN $revisionTable ON page_id = rev_page
+                WHERE rev_user_text = :username
+                AND page_namespace = :namespace";
+        $result = $this->executeProjectsQuery($sql, [
+            'username' => $user->getUsername(),
+            'namespace' => $namespace,
+        ])->fetch()['count'];
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);

@@ -69,7 +69,7 @@ class PagesRepository extends Repository
      * @param string $redirects One of 'noredirects', 'onlyredirects' or blank for both.
      * @param string $deleted One of 'live', 'deleted' or blank for both.
      * @param int|null $limit Number of results to return, or blank to return all.
-     * @param int $offset Number of pages past the initial dataset. Used for pagination.
+     * @param int $offset Number of results past the initial dataset. Used for pagination.
      * @return string[] Result of query, see below. Includes live and deleted pages.
      */
     public function getPagesCreated(
