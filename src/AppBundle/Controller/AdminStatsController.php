@@ -130,26 +130,26 @@ class AdminStatsController extends XtoolsController
      *     "/api/project/adminstats/{project}/{days}",
      *     name="ProjectApiAdminStats",
      *     requirements={"days"="\d+"},
-     *     defaults={"days"=30}
+     *     defaults={"days"=31}
      * )
      * @Route(
      *     "/api/project/admin_stats/{project}/{days}",
      *     name="ProjectApiAdminStatsUnderscored",
      *     requirements={"days"="\d+"},
-     *     defaults={"days"=30}
+     *     defaults={"days"=31}
      * )
-     * @param int $days Number of days from present to grab data for. Maximum 30.
+     * @param int $days Number of days from present to grab data for. Maximum 31.
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function adminStatsApiAction($days = 30)
+    public function adminStatsApiAction($days = 31)
     {
         $this->recordApiUsage('project/adminstats');
 
         $this->setUpAdminStats();
 
-        // Maximum 30 days.
-        $days = min((int) $days, 30);
+        // Maximum 31 days.
+        $days = min((int) $days, 31);
         $start = date('Y-m-d', strtotime("-$days days"));
         $end = date('Y-m-d');
 
