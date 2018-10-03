@@ -395,6 +395,9 @@ parameters:
         JWB:
             regex: 'via (JWB|\[\[WP:JWB\]\])'
             link: WP:JWB
+        Snuggle:
+            regex: 'WP:Snuggle\|Sn\]\]'
+            link: Project:Snuggle
     ko.wikipedia.org:
         AutoWikiBrowser:
             regex: '위키백과:AWB\|AWB|(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
