@@ -6,7 +6,8 @@
 			"Muhebbet",
 			"WhitePhosphorus",
 			"Leiem",
-			"A2093064"
+			"A2093064",
+			"Phenolla"
 		]
 	},
 	"accepted-formats": "接受的格式",
@@ -43,6 +44,7 @@
 	"auto-contribs-desc": "浏览用户的（半）自动贡献。",
 	"auto-contribs-use-tool": "只显示使用工具的编辑：",
 	"auto-edits": "（半）自动编辑数",
+	"auto-edits-bot": "此用户是机器人，他所有的编辑可能是自动做出的。此处列出的统计信息基于使用已知工具执行的编辑。",
 	"auto-edits-counts-desc": "部分工具用法重复（例如对重定向的修订版本回退会同时记为回退和重定向），因此每个工具的编辑总数可能与$1不同。",
 	"auto-edits-counts-desc-grand-total": "总和",
 	"auto-edits-request": "请求添加新的（半）自动化工具",
@@ -277,6 +279,7 @@
 	"pages-created-tooltip": "所有创建页面的总数，这包括当移动页面时创建的重定向数。参见文档以获取更多详情。",
 	"pages-deleted": "已删除页面数",
 	"pages-deleted-hover-desc": "悬停在“$1”文本以查看删除摘要。",
+	"pages-deleted-redirects": "被删除页面有可能被重定向。",
 	"pages-edited-total": "编辑页面数（总计）",
 	"pages-moved": "移动页面数",
 	"pages-recreated-desc": "一些已删除页面可能被该用户或不同用户重建。他们会标记为“$1”。",
