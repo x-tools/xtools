@@ -38,7 +38,7 @@
         "symfony/monolog-bundle": "^3.1",
         "sensio/framework-extra-bundle": "^3.0",
         "incenteev/composer-parameter-handler": "^2.0",
-        "Krinkle/intuition": "0.6.1",
+        "Krinkle/intuition": "^1.0",
         "addwiki/mediawiki-api": "^0.7",
         "mediawiki/oauthclient": "^0.1",
         "symfony/webpack-encore-pack": "^1.0",
