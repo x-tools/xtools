@@ -1,5 +1,15 @@
 # Release Notes #
 
+## 3.5.0 ##
+- Upgrade to PHP 7.2, set as the minimum requirement.
+- Use Webpack for asset management.
+- Remove unused code, fonts, images, and other files.
+- Add project routes with slashes at the end for convenience.
+- AdminStats: set default range to 31 days instead of 30.
+- T204635: Add Snuggle for en.wikipedia to AutoEdits config.
+- T205182: Upgrade Intuition, adding some missing language labels.
+- Localization updates.
+
 ## 3.4.5 ##
 - ArticleInfo: reverts 3.4.4 release. Issue with externallinks table has
   been resolved.
