@@ -49,13 +49,14 @@
         "jms/serializer-bundle": "^1.4",
         "symfony/stopwatch": "^3.2",
         "doctrine/doctrine-migrations-bundle": "^1.0",
-        "eightpoints/guzzle-bundle": "^6.1"
+        "eightpoints/guzzle-bundle": "^6.1",
+        "slevomat/coding-standard": "^4.8"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",
         "phpunit/phpunit": "^5.3",
         "symfony/phpunit-bridge": "^3.0",
-        "squizlabs/php_codesniffer": "^2.0",
+        "squizlabs/php_codesniffer": "^3.3.0",
         "jakub-onderka/php-parallel-lint": "^0.9",
         "mediawiki/minus-x": "0.3.0"
     },

@@ -3,37 +3,20 @@
  * This file contains only the MetaControllerTest class.
  */
 
-namespace Tests\AppBundle\Controller;
+declare(strict_types = 1);
 
-use Symfony\Bundle\FrameworkBundle\Client;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\DependencyInjection\Container;
+namespace Tests\AppBundle\Controller;
 
 /**
  * Integration/unit tests for the ArticleInfoController.
  * @group integration
  */
-class MetaControllerTest extends WebTestCase
+class MetaControllerTest extends ControllerTestAdapter
 {
-    /** @var Container The DI container. */
-    protected $container;
-
-    /** @var Client The Symfony client */
-    protected $client;
-
-    /**
-     * Set up the tests.
-     */
-    public function setUp()
-    {
-        $this->client = static::createClient();
-        $this->container = $this->client->getContainer();
-    }
-
     /**
      * Test that the Meta index page displays correctly.
      */
-    public function testIndex()
+    public function testIndex(): void
     {
         $this->client->request('GET', '/meta/');
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());

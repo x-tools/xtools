@@ -3,46 +3,45 @@
  * This file contains only the EditSummaryControllerTest class.
  */
 
-namespace Tests\AppBundle\Controller;
+declare(strict_types = 1);
 
-use Symfony\Bundle\FrameworkBundle\Client;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\DependencyInjection\Container;
+namespace Tests\AppBundle\Controller;
 
 /**
  * Integration/unit tests for the ArticleInfoController.
  * @group integration
  */
-class EditSummaryControllerTest extends WebTestCase
+class EditSummaryControllerTest extends ControllerTestAdapter
 {
-    /** @var Container The DI container. */
-    protected $container;
-
-    /** @var Client The Symfony client */
-    protected $client;
-
-    /**
-     * Set up the tests.
-     */
-    public function setUp()
-    {
-        $this->client = static::createClient();
-        $this->container = $this->client->getContainer();
-    }
-
     /**
      * Test that the Edit Summaries index page displays correctly.
      */
-    public function testIndex()
+    public function testIndex(): void
     {
         $crawler = $this->client->request('GET', '/editsummary/de.wikipedia');
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
-        if (!$this->container->getParameter('app.is_labs') || $this->container->getParameter('app.single_wiki')) {
+        if (!$this->container->getParameter('app.is_labs')) {
             return;
         }
 
         // should populate project input field
         static::assertEquals('de.wikipedia.org', $crawler->filter('#project_input')->attr('value'));
+    }
+
+    /**
+     * Test all other routes return successful responses.
+     */
+    public function testRoutes(): void
+    {
+        if (!$this->container->getParameter('app.is_labs')) {
+            return;
+        }
+
+        $this->assertSuccessfulRoutes([
+            '/editsummary/en.wikipedia/Example',
+            '/editsummary/en.wikipedia/Example/1',
+            '/api/user/edit_summaries/en.wikipedia/Example/1',
+        ]);
     }
 }

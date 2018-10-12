@@ -3,12 +3,14 @@
  * This file contains only the AdminScoreController class.
  */
 
+declare(strict_types=1);
+
 namespace AppBundle\Controller;
 
+use AppBundle\Model\AdminScore;
+use AppBundle\Repository\AdminScoreRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
-use Xtools\AdminScore;
-use Xtools\AdminScoreRepository;
 
 /**
  * The AdminScoreController serves the search form and results page of the AdminScore tool.
@@ -20,7 +22,7 @@ class AdminScoreController extends XtoolsController
      * @return string
      * @codeCoverageIgnore
      */
-    public function getIndexRoute()
+    public function getIndexRoute(): string
     {
         return 'AdminScore';
     }
@@ -35,7 +37,7 @@ class AdminScoreController extends XtoolsController
      * @Route("/adminscore/{project}/", name="AdminScoreProjectSlash")
      * @return Response
      */
-    public function indexAction()
+    public function indexAction(): Response
     {
         // Redirect if we have a project and user.
         if (isset($this->params['project']) && isset($this->params['username'])) {
@@ -56,7 +58,7 @@ class AdminScoreController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction()
+    public function resultAction(): Response
     {
         $adminScoreRepo = new AdminScoreRepository();
         $adminScoreRepo->setContainer($this->container);

@@ -3,17 +3,19 @@
  * This file contains only the CategoryEditsController class.
  */
 
+declare(strict_types=1);
+
 namespace AppBundle\Controller;
 
 use AppBundle\Exception\XtoolsHttpException;
+use AppBundle\Helper\I18nHelper;
+use AppBundle\Model\CategoryEdits;
+use AppBundle\Repository\CategoryEditsRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Xtools\CategoryEdits;
-use Xtools\CategoryEditsRepository;
 
 /**
  * This controller serves the Category Edits tool.
@@ -35,7 +37,7 @@ class CategoryEditsController extends XtoolsController
      * @return string
      * @codeCoverageIgnore
      */
-    public function getIndexRoute()
+    public function getIndexRoute(): string
     {
         return 'CategoryEdits';
     }
@@ -44,13 +46,14 @@ class CategoryEditsController extends XtoolsController
      * CategoryEditsController constructor.
      * @param RequestStack $requestStack
      * @param ContainerInterface $container
+     * @param I18nHelper $i18n
      */
-    public function __construct(RequestStack $requestStack, ContainerInterface $container)
+    public function __construct(RequestStack $requestStack, ContainerInterface $container, I18nHelper $i18n)
     {
         // Will redirect back to index if the user has too high of an edit count.
         $this->tooHighEditCountAction = $this->getIndexRoute();
 
-        parent::__construct($requestStack, $container);
+        parent::__construct($requestStack, $container, $i18n);
     }
 
     /**
@@ -62,7 +65,7 @@ class CategoryEditsController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function indexAction()
+    public function indexAction(): Response
     {
         // Redirect if at minimum project, username and categories are provided.
         if (isset($this->params['project']) && isset($this->params['username']) && isset($this->params['categories'])) {
@@ -86,7 +89,7 @@ class CategoryEditsController extends XtoolsController
      * Set defaults, and instantiate the CategoryEdits model. This is called at the top of every view action.
      * @codeCoverageIgnore
      */
-    private function setupCategoryEdits()
+    private function setupCategoryEdits(): void
     {
         $this->extractCategories();
 
@@ -96,7 +99,7 @@ class CategoryEditsController extends XtoolsController
             $this->categories,
             $this->start,
             $this->end,
-            isset($this->offset) ? $this->offset : 0
+            $this->offset ?? 0
         );
         $categoryEditsRepo = new CategoryEditsRepository();
         $categoryEditsRepo->setContainer($this->container);
@@ -114,10 +117,9 @@ class CategoryEditsController extends XtoolsController
 
     /**
      * Go through the categories and normalize values, and set them on class properties.
-     * @return null|RedirectResponse Redirect if categories were normalized.
      * @codeCoverageIgnore
      */
-    private function extractCategories()
+    private function extractCategories(): void
     {
         // Split categories by pipe.
         $categories = explode('|', $this->request->get('categories'));
@@ -129,7 +131,7 @@ class CategoryEditsController extends XtoolsController
         $normalized = false;
         $nsName = $this->project->getNamespaces()[14].':';
         $this->categories = array_map(function ($category) use ($nsName, &$normalized) {
-            if (strpos($category, $nsName) === 0 || strpos($category, 'Category:') === 0) {
+            if (0 === strpos($category, $nsName) || 0 === strpos($category, 'Category:')) {
                 $normalized = true;
             }
             return preg_replace('/^'.$nsName.'/', '', $category);
@@ -145,8 +147,6 @@ class CategoryEditsController extends XtoolsController
                 ))
             );
         }
-
-        return null;
     }
 
     /**
@@ -164,7 +164,7 @@ class CategoryEditsController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction()
+    public function resultAction(): Response
     {
         $this->setupCategoryEdits();
 
@@ -187,7 +187,7 @@ class CategoryEditsController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function categoryContributionsAction()
+    public function categoryContributionsAction(): Response
     {
         $this->setupCategoryEdits();
 
@@ -211,7 +211,7 @@ class CategoryEditsController extends XtoolsController
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function categoryEditCountApiAction()
+    public function categoryEditCountApiAction(): JsonResponse
     {
         $this->recordApiUsage('user/category_editcount');
 

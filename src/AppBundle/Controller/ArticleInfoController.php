@@ -3,9 +3,16 @@
  * This file contains only the ArticleInfoController class.
  */
 
+declare(strict_types=1);
+
 namespace AppBundle\Controller;
 
 use AppBundle\Exception\XtoolsHttpException;
+use AppBundle\Helper\I18nHelper;
+use AppBundle\Model\ArticleInfo;
+use AppBundle\Model\Page;
+use AppBundle\Model\Project;
+use AppBundle\Repository\ArticleInfoRepository;
 use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -13,10 +20,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Xtools\ArticleInfo;
-use Xtools\ArticleInfoRepository;
-use Xtools\Page;
-use Xtools\Project;
 
 /**
  * This controller serves the search form and results for the ArticleInfo tool
@@ -28,7 +31,7 @@ class ArticleInfoController extends XtoolsController
      * @return string
      * @codeCoverageIgnore
      */
-    public function getIndexRoute()
+    public function getIndexRoute(): string
     {
         return 'ArticleInfo';
     }
@@ -42,7 +45,7 @@ class ArticleInfoController extends XtoolsController
      * @Route("/articleinfo/{project}/", name="ArticleInfoProjectSlash")
      * @return Response
      */
-    public function indexAction()
+    public function indexAction(): Response
     {
         if (isset($this->params['project']) && isset($this->params['page'])) {
             return $this->redirectToRoute('ArticleInfoResult', $this->params);
@@ -72,12 +75,12 @@ class ArticleInfoController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function gadgetAction(Request $request)
+    public function gadgetAction(Request $request): Response
     {
         $rendered = $this->renderView('articleInfo/articleinfo.js.twig');
 
         // SUPER hacky, but it works and is safe.
-        if ($request->query->get('uglify') != '') {
+        if ('' != $request->query->get('uglify')) {
             // $ and " need to be escaped.
             $rendered = str_replace('$', '\$', trim($rendered));
             $rendered = str_replace('"', '\"', trim($rendered));
@@ -93,7 +96,7 @@ class ArticleInfoController extends XtoolsController
 
             // Check for errors.
             $errorOutput = $process->getErrorOutput();
-            if ($errorOutput != '') {
+            if ('' != $errorOutput) {
                 $response = new Response(
                     "Error generating uglified JS. The server said:\n\n$errorOutput"
                 );
@@ -133,10 +136,10 @@ class ArticleInfoController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction()
+    public function resultAction(I18nHelper $i18n): Response
     {
         if (!$this->isDateRangeValid($this->page, $this->start, $this->end)) {
-            $this->addFlash('notice', ['date-range-outside-revisions']);
+            $this->addFlashMessage('notice', 'date-range-outside-revisions');
 
             return $this->redirectToRoute('ArticleInfoResult', [
                 'project' => $this->request->get('project'),
@@ -157,12 +160,15 @@ class ArticleInfoController extends XtoolsController
         // Show message if we hit the max revisions.
         if ($articleInfo->tooManyRevisions()) {
             // FIXME: i18n number_format?
-            $this->addFlash('notice', ['too-many-revisions', number_format($maxRevisions), $maxRevisions]);
+            $this->addFlashMessage('notice', 'too-many-revisions', [
+                $i18n->numberFormat($maxRevisions),
+                $maxRevisions,
+            ]);
         }
 
         // For when there is very old data (2001 era) which may cause miscalculations.
         if ($articleInfo->getFirstEdit()->getYear() < 2003) {
-            $this->addFlash('warning', ['old-page-notice']);
+            $this->addFlashMessage('warning', 'old-page-notice');
         }
 
         $ret = [
@@ -186,7 +192,7 @@ class ArticleInfoController extends XtoolsController
      * @param false|int $end
      * @return bool
      */
-    private function isDateRangeValid(Page $page, $start, $end)
+    private function isDateRangeValid(Page $page, $start, $end): bool
     {
         return $page->getNumRevisions(null, $start, $end) > 0;
     }
@@ -201,7 +207,7 @@ class ArticleInfoController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function textsharesResultAction()
+    public function textsharesResultAction(): Response
     {
         $articleInfoRepo = new ArticleInfoRepository();
         $articleInfoRepo->setContainer($this->container);
@@ -209,7 +215,7 @@ class ArticleInfoController extends XtoolsController
         $articleInfo->setRepository($articleInfoRepo);
 
         $isSubRequest = $this->request->get('htmlonly')
-            || $this->get('request_stack')->getParentRequest() !== null;
+            || null !== $this->get('request_stack')->getParentRequest();
 
         $limit = $isSubRequest ? 10 : null;
 
@@ -235,11 +241,11 @@ class ArticleInfoController extends XtoolsController
      * See ArticleInfoControllerTest::testArticleInfoApi()
      * @codeCoverageIgnore
      */
-    public function articleInfoApiAction()
+    public function articleInfoApiAction(): Response
     {
         $data = $this->getArticleInfoApiData($this->project, $this->page);
 
-        if ($this->request->query->get('format') === 'html') {
+        if ('html' === $this->request->query->get('format')) {
             return $this->getApiHtmlResponse($this->project, $this->page, $data);
         }
 
@@ -253,9 +259,9 @@ class ArticleInfoController extends XtoolsController
      * @return array
      * @codeCoverageIgnore
      */
-    private function getArticleInfoApiData(Project $project, Page $page)
+    private function getArticleInfoApiData(Project $project, Page $page): array
     {
-        /** @var integer Number of days to query for pageviews */
+        /** @var int $pageviewsOffset Number of days to query for pageviews */
         $pageviewsOffset = 30;
 
         $data = [
@@ -281,7 +287,7 @@ class ArticleInfoController extends XtoolsController
             $data['error'] = 'Unable to fetch revision data. The query may have timed out.';
         }
 
-        if ($info != false) {
+        if (false != $info) {
             $creationDateTime = DateTime::createFromFormat('YmdHis', $info['created_at']);
             $modifiedDateTime = DateTime::createFromFormat('YmdHis', $info['modified_at']);
             $secsSinceLastEdit = (new DateTime)->getTimestamp() - $modifiedDateTime->getTimestamp();
@@ -315,7 +321,7 @@ class ArticleInfoController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    private function getApiHtmlResponse(Project $project, Page $page, $data)
+    private function getApiHtmlResponse(Project $project, Page $page, array $data): Response
     {
         $response = $this->render('articleInfo/api.html.twig', [
             'project' => $project,
@@ -343,7 +349,7 @@ class ArticleInfoController extends XtoolsController
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function proseStatsApiAction()
+    public function proseStatsApiAction(): JsonResponse
     {
         $this->recordApiUsage('page/prose');
 
@@ -366,7 +372,7 @@ class ArticleInfoController extends XtoolsController
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function assessmentsApiAction($pages)
+    public function assessmentsApiAction(string $pages): JsonResponse
     {
         $this->recordApiUsage('page/assessments');
 
@@ -401,7 +407,7 @@ class ArticleInfoController extends XtoolsController
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function linksApiAction()
+    public function linksApiAction(): JsonResponse
     {
         $this->recordApiUsage('page/links');
 
@@ -427,7 +433,7 @@ class ArticleInfoController extends XtoolsController
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function topEditorsApiAction()
+    public function topEditorsApiAction(): JsonResponse
     {
         $this->recordApiUsage('page/top_editors');
 
@@ -437,8 +443,8 @@ class ArticleInfoController extends XtoolsController
         $articleInfo->setRepository($articleInfoRepo);
 
         $topEditors = $articleInfo->getTopEditorsByEditCount(
-            $this->limit,
-            $this->request->query->get('nobots') != ''
+            (int)$this->limit,
+            '' != $this->request->query->get('nobots')
         );
 
         return $this->getFormattedApiResponse([

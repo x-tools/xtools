@@ -3,39 +3,31 @@
  * This file contains only the SimpleEditCounterControllerTest class.
  */
 
-namespace Tests\AppBundle\Controller;
+declare(strict_types = 1);
 
-use Symfony\Bundle\FrameworkBundle\Client;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\DependencyInjection\Container;
+namespace Tests\AppBundle\Controller;
 
 /**
  * Integration/unit tests for the ArticleInfoController.
  * @group integration
  */
-class SimpleEditCounterControllerTest extends WebTestCase
+class SimpleEditCounterControllerTest extends ControllerTestAdapter
 {
-    /** @var Container The DI container. */
-    protected $container;
-
-    /** @var Client The Symfony client */
-    protected $client;
-
     /**
-     * Set up the tests.
+     * Test that all routes return successful responses.
      */
-    public function setUp()
+    public function testRoutes(): void
     {
-        $this->client = static::createClient();
-        $this->container = $this->client->getContainer();
-    }
+        if (!$this->container->getParameter('app.is_labs')) {
+            return;
+        }
 
-    /**
-     * Test that the Simple Edit Counter index page displays correctly.
-     */
-    public function testIndex()
-    {
-        $this->client->request('GET', '/sc/');
-        static::assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertSuccessfulRoutes([
+            '/sc',
+            '/sc/enwiki',
+            '/sc/en.wikipedia/Example',
+            '/sc/en.wikipedia/Example/1/2018-01-01/2018-02-01',
+            '/api/user/simple_editcount/en.wikipedia.org/Example/1/2018-01-01/2018-02-01',
+        ]);
     }
 }

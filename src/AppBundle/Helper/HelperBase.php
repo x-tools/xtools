@@ -3,11 +3,12 @@
  * This file contains only the HelperBase class.
  */
 
+declare(strict_types = 1);
+
 namespace AppBundle\Helper;
 
 use DateInterval;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * All helper classes inherit from this.
@@ -15,7 +16,7 @@ use Symfony\Component\DependencyInjection\Container;
 abstract class HelperBase
 {
 
-    /** @var Container The DI container. */
+    /** @var ContainerInterface The DI container. */
     protected $container;
 
     /**
@@ -23,9 +24,9 @@ abstract class HelperBase
      * @param string $key
      * @return string The key with a representation of the class name prefixed.
      */
-    private function getCacheKey($key)
+    private function getCacheKey(string $key): string
     {
-        return str_replace('\\', '', get_class($this)).'.'.$key;
+        return str_replace('\\', '', static::class).'.'.$key;
     }
 
     /**
@@ -33,7 +34,7 @@ abstract class HelperBase
      * @param string $key The cache key.
      * @return boolean
      */
-    protected function cacheHas($key)
+    protected function cacheHas(string $key): bool
     {
         /** @var \Symfony\Component\Cache\Adapter\AdapterInterface $cache */
         $cache = $this->container->get('cache.app');
@@ -47,7 +48,7 @@ abstract class HelperBase
      * @param string $key The cache key.
      * @return mixed|null Whatever's in the cache, or null if the key isn't present.
      */
-    protected function cacheGet($key)
+    protected function cacheGet(string $key)
     {
         /** @var \Symfony\Component\Cache\Adapter\AdapterInterface $cache */
         $cache = $this->container->get('cache.app');
@@ -64,7 +65,7 @@ abstract class HelperBase
      * @param string $value The value to cache.
      * @param string $expiresAfter A DateInterval interval specification.
      */
-    protected function cacheSave($key, $value, $expiresAfter)
+    protected function cacheSave(string $key, string $value, string $expiresAfter): void
     {
         /** @var \Symfony\Component\Cache\Adapter\AdapterInterface $cache */
         $cache = $this->container->get('cache.app');
@@ -72,20 +73,5 @@ abstract class HelperBase
         $item->set($value);
         $item->expiresAfter(new DateInterval($expiresAfter));
         $cache->save($item);
-    }
-
-    /**
-     * Log a debug message.
-     * @param string $msg The log message.
-     * @param array $context The message context.
-     */
-    protected function debug($msg, $context = [])
-    {
-        /** @var LoggerInterface */
-        $logger = $this->container->get('logger');
-        if (!$logger instanceof LoggerInterface) {
-            return;
-        }
-        $logger->debug($msg, $context);
     }
 }

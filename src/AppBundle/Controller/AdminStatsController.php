@@ -1,16 +1,17 @@
 <?php
-
 /**
  * This file contains the code that powers the AdminStats page of XTools.
  */
 
+declare(strict_types=1);
+
 namespace AppBundle\Controller;
 
+use AppBundle\Model\AdminStats;
+use AppBundle\Repository\AdminStatsRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Xtools\AdminStats;
-use Xtools\AdminStatsRepository;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * The AdminStatsController serves the search form and results page of the AdminStats tool.
@@ -25,7 +26,7 @@ class AdminStatsController extends XtoolsController
      * @return string
      * @codeCoverageIgnore
      */
-    public function getIndexRoute()
+    public function getIndexRoute(): string
     {
         return 'AdminStats';
     }
@@ -38,7 +39,7 @@ class AdminStatsController extends XtoolsController
      * @Route("/adminstats/index.php", name="AdminStatsIndexPhp")
      * @return Response
      */
-    public function indexAction()
+    public function indexAction(): Response
     {
         // Redirect if we have a project.
         if (isset($this->params['project'])) {
@@ -63,11 +64,11 @@ class AdminStatsController extends XtoolsController
      * @return AdminStats
      * @codeCoverageIgnore
      */
-    public function setUpAdminStats()
+    public function setUpAdminStats(): AdminStats
     {
         // $this->start and $this->end are already set by the parent XtoolsController, but here we want defaults,
         // so we run XtoolsController::getUTCFromDateParams() once more but with the $useDefaults flag set.
-        list($this->start, $this->end) = $this->getUTCFromDateParams($this->start, $this->end, true);
+        [$this->start, $this->end] = $this->getUTCFromDateParams($this->start, $this->end, true);
 
         $adminStatsRepo = new AdminStatsRepository();
         $adminStatsRepo->setContainer($this->container);
@@ -88,7 +89,7 @@ class AdminStatsController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction()
+    public function resultAction(): Response
     {
         $this->setUpAdminStats();
 
@@ -110,7 +111,7 @@ class AdminStatsController extends XtoolsController
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function adminsGroupsApiAction()
+    public function adminsGroupsApiAction(): JsonResponse
     {
         $this->recordApiUsage('project/admins_groups');
 
@@ -142,7 +143,7 @@ class AdminStatsController extends XtoolsController
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function adminStatsApiAction($days = 31)
+    public function adminStatsApiAction(int $days = 31): JsonResponse
     {
         $this->recordApiUsage('project/adminstats');
 

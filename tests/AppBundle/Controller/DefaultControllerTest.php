@@ -3,42 +3,32 @@
  * This file contains only the DefaultControllerTest class.
  */
 
-namespace Tests\AppBundle\Controller;
+declare(strict_types = 1);
 
-use Symfony\Bundle\FrameworkBundle\Client;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+namespace Tests\AppBundle\Controller;
 
 /**
  * Integration tests for the homepage and user authentication.
  * @group integration
  */
-class DefaultControllerTest extends WebTestCase
+class DefaultControllerTest extends ControllerTestAdapter
 {
-    /** @var Container The DI container. */
-    protected $container;
-
-    /** @var Client HTTP client */
-    protected $client;
-
     /** @var bool Whether we're testing a single-wiki setup */
     protected $isSingle;
 
     /**
-     * Create the HTTP client and get the DI container.
+     * Set whether we're testing a single wiki.
      */
-    public function setUp()
+    public function setUp(): void
     {
-        $this->client = static::createClient();
-        $this->container = $this->client->getContainer();
+        parent::setUp();
         $this->isSingle = $this->container->getParameter('app.single_wiki');
     }
 
     /**
      * Test that the homepage is served, including in multiple languages.
      */
-    public function testIndex()
+    public function testIndex(): void
     {
         $client = static::createClient();
 
@@ -61,7 +51,7 @@ class DefaultControllerTest extends WebTestCase
     /**
      * Test that the about page is served.
      */
-    public function testAbout()
+    public function testAbout(): void
     {
         $client = static::createClient();
         $client->request('GET', '/about');
@@ -71,7 +61,7 @@ class DefaultControllerTest extends WebTestCase
     /**
      * OAuth callback action.
      */
-    public function testOAuthCallback()
+    public function testOAuthCallback(): void
     {
         $client = static::createClient();
         $client->request('GET', '/oauth_callback');
@@ -83,7 +73,7 @@ class DefaultControllerTest extends WebTestCase
     /**
      * Logout action.
      */
-    public function testLogout()
+    public function testLogout(): void
     {
         $client = static::createClient();
         $client->request('GET', '/logout');
@@ -93,7 +83,7 @@ class DefaultControllerTest extends WebTestCase
     /**
      * Normalize a project name
      */
-    public function testNormalizeProject()
+    public function testNormalizeProject(): void
     {
         if (!$this->isSingle && $this->container->getParameter('app.is_labs')) {
             $expectedOutput = [
@@ -122,7 +112,7 @@ class DefaultControllerTest extends WebTestCase
     /**
      * Test that we can retrieve the namespace information.
      */
-    public function testNamespaces()
+    public function testNamespaces(): void
     {
         // Test 404 (for single-wiki setups, that wiki's namespaces are always returned).
         $this->client->request('GET', '/api/project/namespaces/wiki.that.doesnt.exist.org');
@@ -146,7 +136,7 @@ class DefaultControllerTest extends WebTestCase
     /**
      * Test page assessments.
      */
-    public function testAssessments()
+    public function testAssessments(): void
     {
         // Test 404 (for single-wiki setups, that wiki's namespaces are always returned).
         $this->client->request('GET', '/api/project/assessments/wiki.that.doesnt.exist.org');
@@ -166,6 +156,26 @@ class DefaultControllerTest extends WebTestCase
                 ['FA', 'A', 'GA', 'bplus', 'B', 'C', 'Start'],
                 array_keys($response['assessments']['class'])
             );
+
+            $this->client->request('GET', '/api/project/assessments');
+            static::assertTrue($this->client->getResponse()->isSuccessful(), "Failed: /api/project/assessments");
         }
+    }
+
+    /**
+     * Test the wikify endpoint.
+     */
+    public function testWikify(): void
+    {
+        if (!$this->container->getParameter('app.is_labs')) {
+            return;
+        }
+
+        $this->client->request('GET', '/api/project/parser/en.wikipedia.org?wikitext=[[Foo]]');
+        static::assertTrue($this->client->getResponse()->isSuccessful());
+        static::assertEquals(
+            "<a target='_blank' href='https://en.wikipedia.org/wiki/Foo'>Foo</a>",
+            json_decode($this->client->getResponse()->getContent(), true)
+        );
     }
 }

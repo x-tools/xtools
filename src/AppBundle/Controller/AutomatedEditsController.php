@@ -3,16 +3,19 @@
  * This file contains only the AutomatedEditsController class.
  */
 
+declare(strict_types=1);
+
 namespace AppBundle\Controller;
 
+use AppBundle\Helper\I18nHelper;
+use AppBundle\Model\AutoEdits;
+use AppBundle\Repository\AutoEditsRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Xtools\AutoEdits;
-use Xtools\AutoEditsRepository;
 
 /**
  * This controller serves the AutomatedEdits tool.
@@ -31,7 +34,7 @@ class AutomatedEditsController extends XtoolsController
      * @return string
      * @codeCoverageIgnore
      */
-    public function getIndexRoute()
+    public function getIndexRoute(): string
     {
         return 'AutoEdits';
     }
@@ -40,14 +43,15 @@ class AutomatedEditsController extends XtoolsController
      * AutomatedEditsController constructor.
      * @param RequestStack $requestStack
      * @param ContainerInterface $container
+     * @param I18nHelper $i18n
      */
-    public function __construct(RequestStack $requestStack, ContainerInterface $container)
+    public function __construct(RequestStack $requestStack, ContainerInterface $container, I18nHelper $i18n)
     {
         // This will cause the tool to redirect back to the index page, with an error,
         // if the user has too high of an edit count.
         $this->tooHighEditCountAction = $this->getIndexRoute();
 
-        parent::__construct($requestStack, $container);
+        parent::__construct($requestStack, $container, $i18n);
     }
 
     /**
@@ -62,7 +66,7 @@ class AutomatedEditsController extends XtoolsController
      * @Route("/autoedits/{project}/", name="AutoEditsProjectSlash")
      * @return Response
      */
-    public function indexAction()
+    public function indexAction(): Response
     {
         // Redirect if at minimum project and username are provided.
         if (isset($this->params['project']) && isset($this->params['username'])) {
@@ -86,7 +90,7 @@ class AutomatedEditsController extends XtoolsController
      * Set defaults, and instantiate the AutoEdits model. This is called at the top of every view action.
      * @codeCoverageIgnore
      */
-    private function setupAutoEdits()
+    private function setupAutoEdits(): void
     {
         $tool = $this->request->query->get('tool', null);
 
@@ -139,13 +143,13 @@ class AutomatedEditsController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction()
+    public function resultAction(): Response
     {
         // Will redirect back to index if the user has too high of an edit count.
         $this->setupAutoEdits();
 
         if (in_array('bot', $this->user->getUserRights($this->project))) {
-            $this->addFlash('warning', 'auto-edits-bot');
+            $this->addFlashMessage('warning', 'auto-edits-bot');
         }
 
         return $this->getFormattedResponse('autoEdits/result', $this->output);
@@ -167,7 +171,7 @@ class AutomatedEditsController extends XtoolsController
      * @return Response|RedirectResponse
      * @codeCoverageIgnore
      */
-    public function nonAutomatedEditsAction()
+    public function nonAutomatedEditsAction(): Response
     {
         $this->setupAutoEdits();
 
@@ -190,7 +194,7 @@ class AutomatedEditsController extends XtoolsController
      * @return Response|RedirectResponse
      * @codeCoverageIgnore
      */
-    public function automatedEditsAction()
+    public function automatedEditsAction(): Response
     {
         $this->setupAutoEdits();
 
@@ -206,7 +210,7 @@ class AutomatedEditsController extends XtoolsController
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function automatedToolsApiAction()
+    public function automatedToolsApiAction(): JsonResponse
     {
         $this->recordApiUsage('user/automated_tools');
 
@@ -230,7 +234,7 @@ class AutomatedEditsController extends XtoolsController
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function automatedEditCountApiAction($tools = '')
+    public function automatedEditCountApiAction(string $tools = ''): JsonResponse
     {
         $this->recordApiUsage('user/automated_editcount');
 
@@ -242,7 +246,7 @@ class AutomatedEditsController extends XtoolsController
         ];
         $ret['nonautomated_editcount'] = $ret['total_editcount'] - $ret['automated_editcount'];
 
-        if ($tools != '') {
+        if ('' != $tools) {
             $tools = $this->autoEdits->getToolCounts();
             $ret['automated_tools'] = $tools;
         }
@@ -266,7 +270,7 @@ class AutomatedEditsController extends XtoolsController
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function nonAutomatedEditsApiAction()
+    public function nonAutomatedEditsApiAction(): JsonResponse
     {
         $this->recordApiUsage('user/nonautomated_edits');
 
@@ -274,7 +278,11 @@ class AutomatedEditsController extends XtoolsController
 
         $ret = array_map(function ($rev) {
             return array_merge([
-                'full_page_title' => $this->getPageFromNsAndTitle($rev['page_namespace'], $rev['page_title'], true),
+                'full_page_title' => $this->getPageFromNsAndTitle(
+                    (int)$rev['page_namespace'],
+                    $rev['page_title'],
+                    true
+                ),
             ], $rev);
         }, $this->autoEdits->getNonAutomatedEdits(true));
 
@@ -297,7 +305,7 @@ class AutomatedEditsController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function automatedEditsApiAction()
+    public function automatedEditsApiAction(): Response
     {
         $this->recordApiUsage('user/automated_edits');
 
@@ -311,7 +319,11 @@ class AutomatedEditsController extends XtoolsController
 
         $ret['automated_edits'] = array_map(function ($rev) {
             return array_merge([
-                'full_page_title' => $this->getPageFromNsAndTitle($rev['page_namespace'], $rev['page_title'], true),
+                'full_page_title' => $this->getPageFromNsAndTitle(
+                    (int)$rev['page_namespace'],
+                    $rev['page_title'],
+                    true
+                ),
             ], $rev);
         }, $this->autoEdits->getAutomatedEdits(true));
 

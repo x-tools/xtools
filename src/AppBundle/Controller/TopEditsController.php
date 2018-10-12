@@ -3,15 +3,18 @@
  * This file contains only the TopEditsController class.
  */
 
+declare(strict_types=1);
+
 namespace AppBundle\Controller;
 
+use AppBundle\Helper\I18nHelper;
+use AppBundle\Model\TopEdits;
+use AppBundle\Repository\TopEditsRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Xtools\TopEdits;
-use Xtools\TopEditsRepository;
 
 /**
  * The Top Edits tool.
@@ -23,7 +26,7 @@ class TopEditsController extends XtoolsController
      * @return string
      * @codeCoverageIgnore
      */
-    public function getIndexRoute()
+    public function getIndexRoute(): string
     {
         return 'TopEdits';
     }
@@ -32,15 +35,16 @@ class TopEditsController extends XtoolsController
      * TopEditsController constructor.
      * @param RequestStack $requestStack
      * @param ContainerInterface $container
+     * @param I18nHelper $i18n
      */
-    public function __construct(RequestStack $requestStack, ContainerInterface $container)
+    public function __construct(RequestStack $requestStack, ContainerInterface $container, I18nHelper $i18n)
     {
         $this->tooHighEditCountAction = $this->getIndexRoute();
 
         // The Top Edits by page action is exempt from the edit count limitation.
         $this->tooHighEditCountActionBlacklist = ['singlePageTopEdits'];
 
-        parent::__construct($requestStack, $container);
+        parent::__construct($requestStack, $container, $i18n);
     }
 
     /**
@@ -53,7 +57,7 @@ class TopEditsController extends XtoolsController
      * @Route("/topedits/{project}/", name="TopEditsProjectSlash")
      * @return Response
      */
-    public function indexAction()
+    public function indexAction(): Response
     {
         // Redirect if at minimum project and username are provided.
         if (isset($this->params['project']) && isset($this->params['username'])) {
@@ -84,7 +88,7 @@ class TopEditsController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function namespaceTopEditsAction()
+    public function namespaceTopEditsAction(): Response
     {
         // Make sure they've opted in to see this data.
         if (!$this->project->userHasOptedIn($this->user)) {
@@ -139,7 +143,7 @@ class TopEditsController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function singlePageTopEditsAction()
+    public function singlePageTopEditsAction(): Response
     {
         // FIXME: add pagination.
         $topEdits = new TopEdits($this->project, $this->user, $this->page);
@@ -175,14 +179,14 @@ class TopEditsController extends XtoolsController
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function topEditsUserApiAction()
+    public function topEditsUserApiAction(): JsonResponse
     {
         $this->recordApiUsage('user/topedits');
 
         if (!$this->project->userHasOptedIn($this->user)) {
             return new JsonResponse(
                 [
-                    'error' => 'User:'.$this->user->getUsername().' has not opted in to detailed statistics.'
+                    'error' => 'User:'.$this->user->getUsername().' has not opted in to detailed statistics.',
                 ],
                 Response::HTTP_FORBIDDEN
             );

@@ -3,15 +3,17 @@
  * This file contains only the SimpleEditCounterController class.
  */
 
+declare(strict_types=1);
+
 namespace AppBundle\Controller;
 
+use AppBundle\Helper\I18nHelper;
+use AppBundle\Model\SimpleEditCounter;
+use AppBundle\Repository\SimpleEditCounterRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Xtools\SimpleEditCounter;
-use Xtools\SimpleEditCounterRepository;
 
 /**
  * This controller handles the Simple Edit Counter tool.
@@ -25,7 +27,7 @@ class SimpleEditCounterController extends XtoolsController
      * @return string
      * @codeCoverageIgnore
      */
-    public function getIndexRoute()
+    public function getIndexRoute(): string
     {
         return 'SimpleEditCounter';
     }
@@ -34,13 +36,14 @@ class SimpleEditCounterController extends XtoolsController
      * SimpleEditCounterController constructor.
      * @param RequestStack $requestStack
      * @param ContainerInterface $container
+     * @param I18nHelper $i18n
      */
-    public function __construct(RequestStack $requestStack, ContainerInterface $container)
+    public function __construct(RequestStack $requestStack, ContainerInterface $container, I18nHelper $i18n)
     {
         $this->tooHighEditCountAction = $this->getIndexRoute();
         $this->tooHighEditCountActionBlacklist = ['index', 'result'];
 
-        parent::__construct($requestStack, $container);
+        parent::__construct($requestStack, $container, $i18n);
     }
 
     /**
@@ -52,7 +55,7 @@ class SimpleEditCounterController extends XtoolsController
      * @Route("/sc/{project}/", name="SimpleEditCounterProjectSlash")
      * @return Response
      */
-    public function indexAction()
+    public function indexAction(): Response
     {
         // Redirect if project and username are given.
         if (isset($this->params['project']) && isset($this->params['username'])) {
@@ -74,7 +77,7 @@ class SimpleEditCounterController extends XtoolsController
     }
 
     /**
-     * Display the
+     * Display the results.
      * @Route(
      *     "/sc/{project}/{username}/{namespace}/{start}/{end}",
      *     name="SimpleEditCounterResult",
@@ -92,10 +95,9 @@ class SimpleEditCounterController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction($namespace = 'all')
+    public function resultAction($namespace = 'all'): Response
     {
         $sec = new SimpleEditCounter(
-            $this->container,
             $this->project,
             $this->user,
             $namespace,
@@ -136,12 +138,11 @@ class SimpleEditCounterController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function simpleEditCounterApiAction($namespace = 'all')
+    public function simpleEditCounterApiAction($namespace = 'all'): Response
     {
         $this->recordApiUsage('user/simple_editcount');
 
         $sec = new SimpleEditCounter(
-            $this->container,
             $this->project,
             $this->user,
             $namespace,

@@ -3,19 +3,22 @@
  * This file contains only the PagesController class.
  */
 
+declare(strict_types=1);
+
 namespace AppBundle\Controller;
 
+use AppBundle\Helper\I18nHelper;
+use AppBundle\Model\Pages;
+use AppBundle\Model\Project;
+use AppBundle\Repository\PagesRepository;
 use GuzzleHttp;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Xtools\Pages;
-use Xtools\PagesRepository;
-use Xtools\Project;
 
 /**
  * This controller serves the Pages tool.
@@ -28,7 +31,7 @@ class PagesController extends XtoolsController
      * @return string
      * @codeCoverageIgnore
      */
-    public function getIndexRoute()
+    public function getIndexRoute(): string
     {
         return 'Pages';
     }
@@ -37,8 +40,9 @@ class PagesController extends XtoolsController
      * PagesController constructor.
      * @param RequestStack $requestStack
      * @param ContainerInterface $container
+     * @param I18nHelper $i18n
      */
-    public function __construct(RequestStack $requestStack, ContainerInterface $container)
+    public function __construct(RequestStack $requestStack, ContainerInterface $container, I18nHelper $i18n)
     {
         // Causes the tool to redirect to the index page if the user has too high of an edit count.
         $this->tooHighEditCountAction = $this->getIndexRoute();
@@ -46,7 +50,7 @@ class PagesController extends XtoolsController
         // The countPagesApi action is exempt from the edit count limitation.
         $this->tooHighEditCountActionBlacklist = ['countPagesApi'];
 
-        parent::__construct($requestStack, $container);
+        parent::__construct($requestStack, $container, $i18n);
     }
 
     /**
@@ -58,7 +62,7 @@ class PagesController extends XtoolsController
      * @Route("/pages/{project}/", name="PagesProjectSlash")
      * @return Response
      */
-    public function indexAction()
+    public function indexAction(): Response
     {
         // Redirect if at minimum project and username are given.
         if (isset($this->params['project']) && isset($this->params['username'])) {
@@ -100,14 +104,14 @@ class PagesController extends XtoolsController
      * @return RedirectResponse|Response
      * @codeCoverageIgnore
      */
-    public function resultAction($redirects = 'noredirects', $deleted = 'all')
+    public function resultAction(string $redirects = 'noredirects', string $deleted = 'all')
     {
         // Check for legacy values for 'redirects', and redirect
         // back with correct values if need be. This could be refactored
         // out to XtoolsController, but this is the only tool in the suite
         // that deals with redirects, so we'll keep it confined here.
         $validRedirects = ['', 'noredirects', 'onlyredirects', 'all'];
-        if ($redirects === 'none' || !in_array($redirects, $validRedirects)) {
+        if ('none' === $redirects || !in_array($redirects, $validRedirects)) {
             return $this->redirectToRoute('PagesResult', [
                 'project' => $this->project->getDomain(),
                 'username' => $this->user->getUsername(),
@@ -141,7 +145,7 @@ class PagesController extends XtoolsController
             'namespace' => $this->namespace,
         ];
 
-        if ($this->request->query->get('format') === 'PagePile') {
+        if ('PagePile' === $this->request->query->get('format')) {
             return $this->getPagepileResult($this->project, $pages);
         }
 
@@ -155,16 +159,16 @@ class PagesController extends XtoolsController
      * @return string[]
      * @codeCoverageIgnore
      */
-    private function getSummaryColumns(Pages $pages)
+    private function getSummaryColumns(Pages $pages): array
     {
         $summaryColumns = ['namespace'];
-        if ($pages->getDeleted() === 'deleted') {
+        if ('deleted' === $pages->getDeleted()) {
             // Showing only deleted pages shows only the deleted column, as redirects are non-applicable.
             $summaryColumns[] = 'deleted';
-        } elseif ($pages->getRedirects() == 'onlyredirects') {
+        } elseif ('onlyredirects' == $pages->getRedirects()) {
             // Don't show redundant pages column if only getting data on redirects or deleted pages.
             $summaryColumns[] = 'redirects';
-        } elseif ($pages->getRedirects() == 'noredirects') {
+        } elseif ('noredirects' == $pages->getRedirects()) {
             // Don't show redundant redirects column if only getting data on non-redirects.
             $summaryColumns[] = 'pages';
         } else {
@@ -174,7 +178,7 @@ class PagesController extends XtoolsController
         }
 
         // Show deleted column only when both deleted and live pages are visible.
-        if ($pages->getDeleted() === 'all') {
+        if ('all' === $pages->getDeleted()) {
             $summaryColumns[] = 'deleted';
         }
 
@@ -190,14 +194,14 @@ class PagesController extends XtoolsController
      * @see https://tools.wmflabs.org/pagepile/
      * @codeCoverageIgnore
      */
-    private function getPagepileResult(Project $project, Pages $pages)
+    private function getPagepileResult(Project $project, Pages $pages): RedirectResponse
     {
         $namespaces = $project->getNamespaces();
         $pageTitles = [];
 
-        foreach ($pages->getResults() as $ns => $pagesData) {
+        foreach (array_values($pages->getResults()) as $pagesData) {
             foreach ($pagesData as $page) {
-                if ((int)$page['namespace'] === 0) {
+                if (0 === (int)$page['namespace']) {
                     $pageTitles[] = $page['page_title'];
                 } else {
                     $pageTitles[] = $namespaces[$page['namespace']].':'.$page['page_title'];
@@ -221,7 +225,7 @@ class PagesController extends XtoolsController
      * @see https://tools.wmflabs.org/pagepile/
      * @codeCoverageIgnore
      */
-    private function createPagePile(Project $project, $pageTitles)
+    private function createPagePile(Project $project, array $pageTitles): int
     {
         $client = new GuzzleHttp\Client();
         $url = 'https://tools.wmflabs.org/pagepile/api.php';
@@ -241,7 +245,7 @@ class PagesController extends XtoolsController
 
         $ret = json_decode($res->getBody()->getContents(), true);
 
-        if (!isset($ret['status']) || $ret['status'] !== 'OK') {
+        if (!isset($ret['status']) || 'OK' !== $ret['status']) {
             throw new HttpException(
                 500,
                 'Failed to create PagePile. There may be an issue with the PagePile API.'
@@ -275,7 +279,7 @@ class PagesController extends XtoolsController
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function countPagesApiAction($redirects = 'noredirects', $deleted = 'all')
+    public function countPagesApiAction(string $redirects = 'noredirects', string $deleted = 'all'): JsonResponse
     {
         $this->recordApiUsage('user/pages_count');
 
@@ -292,7 +296,7 @@ class PagesController extends XtoolsController
 
         $counts = $pages->getCounts();
 
-        if ($this->namespace !== 'all' && isset($counts[$this->namespace])) {
+        if ('all' !== $this->namespace && isset($counts[$this->namespace])) {
             $counts = $counts[$this->namespace];
         }
 
@@ -321,7 +325,7 @@ class PagesController extends XtoolsController
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function getPagesApiAction($redirects = 'noredirects', $deleted = 'all')
+    public function getPagesApiAction(string $redirects = 'noredirects', string $deleted = 'all'): JsonResponse
     {
         $this->recordApiUsage('user/pages');
 
@@ -339,7 +343,7 @@ class PagesController extends XtoolsController
 
         $pagesList = $pages->getResults();
 
-        if ($this->namespace !== 'all' && isset($pagesList[$this->namespace])) {
+        if ('all' !== $this->namespace && isset($pagesList[$this->namespace])) {
             $pagesList = $pagesList[$this->namespace];
         }
 

@@ -3,6 +3,8 @@
  * This file contains only the I18nHelper.
  */
 
+declare(strict_types = 1);
+
 namespace AppBundle\Helper;
 
 use DateTime;
@@ -64,7 +66,7 @@ class I18nHelper
      * @return Intuition
      * @throws \Exception If the 'i18n/en.json' file doesn't exist (as it's the default).
      */
-    public function getIntuition()
+    public function getIntuition(): Intuition
     {
         // Don't recreate the object.
         if ($this->intuition instanceof Intuition) {
@@ -80,7 +82,7 @@ class I18nHelper
         $useLang = 'en';
 
         // Current request doesn't exist in unit tests, in which case we'll fall back to English.
-        if ($this->getRequest() !== null) {
+        if (null !== $this->getRequest()) {
             $useLang = $this->getIntuitionLang();
 
             // Save the language to the session.
@@ -102,7 +104,7 @@ class I18nHelper
      * Get the current language code.
      * @return string
      */
-    public function getLang()
+    public function getLang(): string
     {
         return $this->getIntuition()->getLang();
     }
@@ -111,7 +113,7 @@ class I18nHelper
      * Get the current language name (defaults to 'English').
      * @return string
      */
-    public function getLangName()
+    public function getLangName(): string
     {
         return in_array(ucfirst($this->getIntuition()->getLangName()), $this->getAllLangs())
             ? $this->getIntuition()->getLangName()
@@ -120,9 +122,9 @@ class I18nHelper
 
     /**
      * Get all available languages in the i18n directory
-     * @return array Associative array of langKey => langName
+     * @return string[] Associative array of langKey => langName
      */
-    public function getAllLangs()
+    public function getAllLangs(): array
     {
         $messageFiles = glob($this->container->getParameter('kernel.root_dir').'/../i18n/*.json');
 
@@ -148,10 +150,10 @@ class I18nHelper
      * @param string|null $lang Optionally provide a specific lanuage code.
      * @return bool
      */
-    public function isRTL($lang = null)
+    public function isRTL(?string $lang = null): bool
     {
         return $this->getIntuition()->isRTL(
-            null === $lang ? $this->getLang() : $lang
+            $lang ?? $this->getLang()
         );
     }
 
@@ -160,7 +162,7 @@ class I18nHelper
      * load with jQuery.i18n. Languages for which no file exists are not returend.
      * @return string[]
      */
-    public function getFallbacks()
+    public function getFallbacks(): array
     {
         $i18nPath = $this->container->getParameter('kernel.root_dir').'/../i18n/';
 
@@ -179,10 +181,10 @@ class I18nHelper
     /**
      * Get an i18n message.
      * @param string $message
-     * @param array $vars
-     * @return mixed|null|string
+     * @param string[] $vars
+     * @return string|null
      */
-    public function msg($message = '', $vars = [])
+    public function msg(?string $message, array $vars = []): ?string
     {
         $vars = is_array($vars) ? $vars : [];
         return $this->getIntuition()->msg($message, ['domain' => 'xtools', 'variables' => $vars]);
@@ -191,10 +193,10 @@ class I18nHelper
     /**
      * See if a given i18n message exists.
      * @param string $message The message.
-     * @param array $vars
+     * @param string[] $vars
      * @return bool
      */
-    public function msgExists($message = '', $vars = [])
+    public function msgExists(?string $message, array $vars = []): bool
     {
         return $this->getIntuition()->msgExists($message, array_merge(
             ['domain' => 'xtools'],
@@ -205,10 +207,10 @@ class I18nHelper
     /**
      * Get an i18n message if it exists, otherwise just get the message key.
      * @param string $message
-     * @param array $vars
-     * @return mixed|null|string
+     * @param string[] $vars
+     * @return string
      */
-    public function msgIfExists($message = '', $vars = [])
+    public function msgIfExists(?string $message, array $vars = []): string
     {
         if (is_array($message)) {
             $vars = $message;
@@ -218,7 +220,7 @@ class I18nHelper
         if ($this->msgExists($message, $vars)) {
             return $this->msg($message, $vars);
         } else {
-            return $message;
+            return $message ?? '';
         }
     }
 
@@ -230,7 +232,7 @@ class I18nHelper
      * @param int $decimals Number of decimals to format to.
      * @return string
      */
-    public function numberFormat($number, $decimals = 0)
+    public function numberFormat($number, $decimals = 0): string
     {
         if (!isset($this->numFormatter)) {
             $lang = $this->getIntuition()->getLang();
@@ -244,12 +246,12 @@ class I18nHelper
 
     /**
      * Format a given number or fraction as a percentage.
-     * @param number $numerator Numerator or single fraction if denominator is ommitted.
-     * @param number $denominator Denominator.
+     * @param int|float $numerator Numerator or single fraction if denominator is omitted.
+     * @param int $denominator Denominator.
      * @param integer $precision Number of decimal places to show.
      * @return string Formatted percentage.
      */
-    public function percentFormat($numerator, $denominator = null, $precision = 1)
+    public function percentFormat($numerator, ?int $denominator = null, int $precision = 1): string
     {
         if (!isset($this->percentFormatter)) {
             $lang = $this->getIntuition()->getLang();
@@ -258,8 +260,10 @@ class I18nHelper
 
         $this->percentFormatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $precision);
 
-        if (!$denominator) {
+        if (null === $denominator) {
             $quotient = $numerator / 100;
+        } elseif (0 === $denominator) {
+            $quotient = 0;
         } else {
             $quotient = $numerator / $denominator;
         }
@@ -276,7 +280,7 @@ class I18nHelper
      * @see http://userguide.icu-project.org/formatparse/datetime
      * @return string
      */
-    public function dateFormat($datetime, $pattern = 'yyyy-MM-dd HH:mm')
+    public function dateFormat($datetime, $pattern = 'yyyy-MM-dd HH:mm'): string
     {
         if (!isset($this->dateFormatter)) {
             $this->dateFormatter = new IntlDateFormatter(
@@ -289,7 +293,7 @@ class I18nHelper
         if (is_string($datetime)) {
             $datetime = new DateTime($datetime);
         } elseif (is_int($datetime)) {
-            $datetime = DateTime::createFromFormat('U', $datetime);
+            $datetime = DateTime::createFromFormat('U', (string)$datetime);
         }
 
         $this->dateFormatter->setPattern($pattern);
@@ -303,14 +307,14 @@ class I18nHelper
      * Determine the interface language, either from the current request or session.
      * @return string
      */
-    private function getIntuitionLang()
+    private function getIntuitionLang(): string
     {
         $queryLang = $this->getRequest()->query->get('uselang');
         $sessionLang = $this->session->get('lang');
 
-        if ($queryLang !== '' && $queryLang !== null) {
+        if ('' !== $queryLang && null !== $queryLang) {
             return $queryLang;
-        } elseif ($sessionLang !== '' && $sessionLang !== null) {
+        } elseif ('' !== $sessionLang && null !== $sessionLang) {
             return $sessionLang;
         }
 
@@ -320,11 +324,11 @@ class I18nHelper
 
     /**
      * Shorthand to get the current request from the request stack.
-     * @return Request
+     * @return Request|null Null in test suite.
      * There is no request stack in the tests.
      * @codeCoverageIgnore
      */
-    private function getRequest()
+    private function getRequest(): ?Request
     {
         return $this->container->get('request_stack')->getCurrentRequest();
     }

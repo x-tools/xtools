@@ -3,8 +3,14 @@
  * This file contains only the EditCounterController class.
  */
 
+declare(strict_types=1);
+
 namespace AppBundle\Controller;
 
+use AppBundle\Helper\I18nHelper;
+use AppBundle\Model\EditCounter;
+use AppBundle\Repository\EditCounterRepository;
+use AppBundle\Repository\ProjectRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -13,9 +19,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Xtools\EditCounter;
-use Xtools\EditCounterRepository;
-use Xtools\ProjectRepository;
 
 /**
  * Class EditCounterController
@@ -26,7 +29,7 @@ class EditCounterController extends XtoolsController
      * Available statistic sections. These can be hand-picked on the index form so that you only get the data you
      * want and hence speed up the tool. Keys are the i18n messages (and DOM IDs), values are the action names.
      */
-    const AVAILABLE_SECTIONS = [
+    private const AVAILABLE_SECTIONS = [
         'general-stats' => 'EditCounterGeneralStats',
         'namespace-totals' => 'EditCounterNamespaceTotals',
         'year-counts' => 'EditCounterYearCounts',
@@ -48,7 +51,7 @@ class EditCounterController extends XtoolsController
      * @return string
      * @codeCoverageIgnore
      */
-    public function getIndexRoute()
+    public function getIndexRoute(): string
     {
         return 'EditCounter';
     }
@@ -57,8 +60,9 @@ class EditCounterController extends XtoolsController
      * EditCounterController constructor.
      * @param RequestStack $requestStack
      * @param ContainerInterface $container
+     * @param I18nHelper $i18n
      */
-    public function __construct(RequestStack $requestStack, ContainerInterface $container)
+    public function __construct(RequestStack $requestStack, ContainerInterface $container, I18nHelper $i18n)
     {
         // Causes the tool to redirect to the Simple Edit Counter if the user has too high of an edit count.
         $this->tooHighEditCountAction = 'SimpleEditCounterResult';
@@ -66,7 +70,7 @@ class EditCounterController extends XtoolsController
         // The rightsChanges action is exempt from the edit count limitation.
         $this->tooHighEditCountActionBlacklist = ['rightsChanges'];
 
-        parent::__construct($requestStack, $container);
+        parent::__construct($requestStack, $container, $i18n);
     }
 
     /**
@@ -74,20 +78,20 @@ class EditCounterController extends XtoolsController
      * If a response is returned, the calling action is expected to return it.
      * @param string $key API key, as given in the request. Omit this for actions
      *   that are public (only /api/ec actions should pass this in).
-     * @return RedirectResponse|null
+     * @return null
      * @throws AccessDeniedException If attempting to access internal endpoint.
      * @codeCoverageIgnore
      */
-    protected function setUpEditCounter($key = null)
+    protected function setUpEditCounter(?string $key = null)
     {
         // Whether we're making a subrequest (the view makes a request to another action).
         // Subrequests to the same controller do not re-instantiate a new controller, and hence
         // this flag would not be set in XtoolsController::__construct(), so we must do it here as well.
         $this->isSubRequest = $this->request->get('htmlonly')
-            || $this->get('request_stack')->getParentRequest() !== null;
+            || null !== $this->get('request_stack')->getParentRequest();
 
         // Return the EditCounter if we already have one.
-        if ($this->editCounter instanceof EditCounter) {
+        if (isset($this->editCounter)) {
             return null;
         }
 
@@ -149,7 +153,7 @@ class EditCounterController extends XtoolsController
      * @return array|mixed|string[]
      * @codeCoverageIgnore
      */
-    private function getRequestedSections($useCookies = false)
+    private function getRequestedSections(bool $useCookies = false)
     {
         // Happens from sub-tool index pages, e.g. see self::generalStatsIndexAction().
         if (isset($this->sections)) {
@@ -160,8 +164,8 @@ class EditCounterController extends XtoolsController
         $sectionsQuery = $this->request->get('sections', '');
 
         // If not present, try the cookie, and finally the defaults (all sections).
-        if ($useCookies && $sectionsQuery == '') {
-            $sectionsQuery = $this->request->cookies->get('XtoolsEditCounterOptions');
+        if ($useCookies && '' == $sectionsQuery) {
+            $sectionsQuery = $this->request->cookies->get('XtoolsEditCounterOptions', '');
         }
 
         // Either a pipe-separated string or an array.
@@ -173,7 +177,7 @@ class EditCounterController extends XtoolsController
         });
 
         // Fallback for when no valid sections were requested or provided by the cookie.
-        if (count($sections) === 0) {
+        if (0 === count($sections)) {
             $sections = $this->getSectionNames();
         }
 
@@ -185,7 +189,7 @@ class EditCounterController extends XtoolsController
      * @return string[]
      * @codeCoverageIgnore
      */
-    private function getSectionNames()
+    private function getSectionNames(): array
     {
         return array_keys(self::AVAILABLE_SECTIONS);
     }
@@ -195,11 +199,11 @@ class EditCounterController extends XtoolsController
      * @return RedirectResponse
      * @codeCoverageIgnore
      */
-    private function redirectFromSections()
+    private function redirectFromSections(): RedirectResponse
     {
         $this->sections = $this->getRequestedSections();
 
-        if (count($this->sections) === 1) {
+        if (1 === count($this->sections)) {
             // Redirect to dedicated route.
             $response = $this->redirectToRoute(self::AVAILABLE_SECTIONS[$this->sections[0]], $this->params);
         } elseif ($this->sections === $this->getSectionNames()) {
@@ -232,7 +236,7 @@ class EditCounterController extends XtoolsController
     {
         $this->setUpEditCounter();
 
-        if (count($this->sections) === 1) {
+        if (1 === count($this->sections)) {
             // Redirect to dedicated route.
             return $this->redirectToRoute(self::AVAILABLE_SECTIONS[$this->sections[0]], $this->params);
         }
@@ -263,7 +267,7 @@ class EditCounterController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function generalStatsAction()
+    public function generalStatsAction(): Response
     {
         $this->setUpEditCounter();
 
@@ -286,7 +290,7 @@ class EditCounterController extends XtoolsController
      * @Route("/ec-generalstats/", name="EditCounterGeneralStatsIndexSlash")
      * @return Response
      */
-    public function generalStatsIndexAction()
+    public function generalStatsIndexAction(): Response
     {
         $this->sections = ['general-stats'];
         return $this->indexAction();
@@ -298,7 +302,7 @@ class EditCounterController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function namespaceTotalsAction()
+    public function namespaceTotalsAction(): Response
     {
         $this->setUpEditCounter();
 
@@ -321,7 +325,7 @@ class EditCounterController extends XtoolsController
      * @Route("/ec-namespacetotals/", name="EditCounterNamespaceTotalsIndexSlash")
      * @return Response
      */
-    public function namespaceTotalsIndexAction()
+    public function namespaceTotalsIndexAction(): Response
     {
         $this->sections = ['namespace-totals'];
         return $this->indexAction();
@@ -333,7 +337,7 @@ class EditCounterController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function timecardAction()
+    public function timecardAction(): Response
     {
         $this->setUpEditCounter();
 
@@ -361,7 +365,7 @@ class EditCounterController extends XtoolsController
      * @Route("/ec-timecard/", name="EditCounterTimecardIndexSlash")
      * @return Response
      */
-    public function timecardIndexAction()
+    public function timecardIndexAction(): Response
     {
         $this->sections = ['timecard'];
         return $this->indexAction();
@@ -373,7 +377,7 @@ class EditCounterController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function yearCountsAction()
+    public function yearCountsAction(): Response
     {
         $this->setUpEditCounter();
 
@@ -396,7 +400,7 @@ class EditCounterController extends XtoolsController
      * @Route("/ec-yearcounts/", name="EditCounterYearCountsIndexSlash")
      * @return Response
      */
-    public function yearCountsIndexAction()
+    public function yearCountsIndexAction(): Response
     {
         $this->sections = ['year-counts'];
         return $this->indexAction();
@@ -408,7 +412,7 @@ class EditCounterController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function monthCountsAction()
+    public function monthCountsAction(): Response
     {
         $this->setUpEditCounter();
 
@@ -435,7 +439,7 @@ class EditCounterController extends XtoolsController
      * @Route("/ec-monthcounts/", name="EditCounterMonthCountsIndexSlash")
      * @return Response
      */
-    public function monthCountsIndexAction()
+    public function monthCountsIndexAction(): Response
     {
         $this->sections = ['month-counts'];
         return $this->indexAction();
@@ -447,7 +451,7 @@ class EditCounterController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function rightsChangesAction()
+    public function rightsChangesAction(): Response
     {
         $this->setUpEditCounter();
 
@@ -474,7 +478,7 @@ class EditCounterController extends XtoolsController
      * @Route("/ec-rightschanges/", name="EditCounterRightsChangesIndexSlash")
      * @return Response
      */
-    public function rightsChangesIndexAction()
+    public function rightsChangesIndexAction(): Response
     {
         $this->sections = ['rights-changes'];
         return $this->indexAction();
@@ -497,7 +501,7 @@ class EditCounterController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function latestGlobalAction()
+    public function latestGlobalAction(): Response
     {
         $this->setUpEditCounter();
 
@@ -523,7 +527,7 @@ class EditCounterController extends XtoolsController
      * @Route("/ec-latestglobaledits/", name="EditCounterLatestGlobalEditsIndexSlash")
      * @return Response
      */
-    public function latestGlobalIndexAction()
+    public function latestGlobalIndexAction(): Response
     {
         $this->sections = ['latest-global-edits'];
         return $this->indexAction();
@@ -531,10 +535,9 @@ class EditCounterController extends XtoolsController
 
 
     /**
-     * Below are internal API endpoints for the Edit Counter.
-     * All only respond with JSON and only to requests passing in the value
-     * of the 'secret' parameter. This should not be used in JavaScript or clientside
-     * applications, rather only used internally.
+     * Below are internal API endpoints for the Edit Counter. All only respond with JSON and only to
+     * requests passing in the value of the 'secret' parameter. This should not be used in JavaScript or
+     * client-side applications, rather only used internally.
      */
 
     /**
@@ -544,7 +547,7 @@ class EditCounterController extends XtoolsController
      * @return JsonResponse|RedirectResponse
      * @codeCoverageIgnore
      */
-    public function pairDataApiAction($key)
+    public function pairDataApiAction(string $key)
     {
         $this->setUpEditCounter($key);
 
@@ -561,7 +564,7 @@ class EditCounterController extends XtoolsController
      * @return JsonResponse|RedirectResponse
      * @codeCoverageIgnore
      */
-    public function logCountsApiAction($key)
+    public function logCountsApiAction(string $key)
     {
         $this->setUpEditCounter($key);
 
@@ -578,7 +581,7 @@ class EditCounterController extends XtoolsController
      * @return JsonResponse|RedirectResponse
      * @codeCoverageIgnore
      */
-    public function editSizesApiAction($key)
+    public function editSizesApiAction(string $key)
     {
         $this->setUpEditCounter($key);
 
@@ -595,7 +598,7 @@ class EditCounterController extends XtoolsController
      * @return Response|RedirectResponse
      * @codeCoverageIgnore
      */
-    public function namespaceTotalsApiAction($key)
+    public function namespaceTotalsApiAction(string $key)
     {
         $this->setUpEditCounter($key);
 
@@ -612,7 +615,7 @@ class EditCounterController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function monthCountsApiAction($key)
+    public function monthCountsApiAction(string $key): Response
     {
         $this->setUpEditCounter($key);
 

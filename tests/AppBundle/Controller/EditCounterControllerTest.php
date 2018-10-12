@@ -3,58 +3,57 @@
  * This file contains only the EditCounterControllerTest class.
  */
 
+declare(strict_types = 1);
+
 namespace Tests\AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Client;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
-use Symfony\Component\DependencyInjection\Container;
 
 /**
  * Integration tests for the EditCounterController.
  * @group integration
  */
-class EditCounterControllerTest extends WebTestCase
+class EditCounterControllerTest extends ControllerTestAdapter
 {
-    /** @var Container The DI container. */
-    protected $container;
-
-    /** @var Client The Symfony client */
-    protected $client;
-
     /**
-     * Set up the tests.
+     * Test that the Edit Counter index pages display correctly.
      */
-    public function setUp()
-    {
-        $this->client = static::createClient();
-        $this->container = $this->client->getContainer();
-    }
-
-    /**
-     * Test that the Edit Counter index page displays correctly.
-     */
-    public function testIndex()
+    public function testIndexPages(): void
     {
         $this->client->request('GET', '/ec');
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
         // For now...
-        if (!$this->container->getParameter('app.is_labs') || $this->container->getParameter('app.single_wiki')) {
+        if (!$this->container->getParameter('app.is_labs')) {
             return;
         }
 
         $crawler = $this->client->request('GET', '/ec/de.wikipedia.org');
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
-        // should populate project input field
+        // Should populate project input field.
         static::assertEquals('de.wikipedia.org', $crawler->filter('#project_input')->attr('value'));
+
+        $routes = [
+            '/ec-generalstats',
+            '/ec-namespacetotals',
+            '/ec-timecard',
+            '/ec-yearcounts',
+            '/ec-monthcounts',
+            '/ec-rightschanges',
+            '/ec-latestglobal',
+        ];
+
+        foreach ($routes as $route) {
+            $this->client->request('GET', $route);
+            static::assertTrue($this->client->getResponse()->isSuccessful(), "Failed: $route");
+        }
     }
 
     /**
      * Test that the Edit Counter index pages and redirects for the subtools are correct.
      */
-    public function testSubtools()
+    public function testSubtools(): void
     {
         // Cookies should not affect the index pages of subtools.
         $cookie = new Cookie('XtoolsEditCounterOptions', 'general-stats');
@@ -62,7 +61,7 @@ class EditCounterControllerTest extends WebTestCase
 
         $subtools = [
             'general-stats', 'namespace-totals', 'year-counts', 'month-counts',
-            'timecard', 'rights-changes', 'latest-global-edits'
+            'timecard', 'rights-changes', 'latest-global-edits',
         ];
 
         foreach ($subtools as $subtool) {
@@ -85,7 +84,7 @@ class EditCounterControllerTest extends WebTestCase
     /**
      * Test setting of section preferences that are stored in a cookie.
      */
-    public function testCookies()
+    public function testCookies(): void
     {
         // For now...
         if (!$this->container->getParameter('app.is_labs')) {
@@ -114,5 +113,26 @@ class EditCounterControllerTest extends WebTestCase
         static::assertCount(2, $crawler->filter('.xt-toc a'));
         static::assertContains('Year counts', $crawler->filter('.xt-toc')->text());
         static::assertContains('Rights changes', $crawler->filter('.xt-toc')->text());
+    }
+
+    /**
+     * Check that the result pages return successful responses.
+     */
+    public function testResultPages(): void
+    {
+        if (!$this->container->getParameter('app.is_labs')) {
+            return;
+        }
+
+        // Here we only need to check each sub-page, since the parent will call them individually.
+        $this->assertSuccessfulRoutes([
+            '/ec-generalstats/en.wikipedia/Example',
+            '/ec-namespacetotals/en.wikipedia/Example',
+            '/ec-timecard/en.wikipedia/Example',
+            '/ec-yearcounts/en.wikipedia/Example',
+            '/ec-monthcounts/en.wikipedia/Example',
+            '/ec-rightschanges/en.wikipedia/Example',
+            '/ec-latestglobal/en.wikipedia/Example',
+        ]);
     }
 }

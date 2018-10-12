@@ -1,4 +1,6 @@
 <?php
+declare(strict_types = 1);
+
 /**
  * This file contains only the AppExtension class.
  */
@@ -6,15 +8,16 @@
 namespace AppBundle\Twig;
 
 use AppBundle\Helper\I18nHelper;
+use AppBundle\Model\Edit;
+use AppBundle\Model\Project;
+use AppBundle\Model\User;
+use AppBundle\Repository\ProjectRepository;
 use DateTime;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Twig_Extension;
-use Xtools\Edit;
-use Xtools\Project;
-use Xtools\ProjectRepository;
-use Xtools\User;
 
 /**
  * Twig functions and filters for XTools.
@@ -59,9 +62,9 @@ class AppExtension extends Twig_Extension
 
     /**
      * Get all functions that this class provides.
-     * @return array
+     * @return \Twig_SimpleFunction[]
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         $options = ['is_safe' => ['html']];
         return [
@@ -79,7 +82,7 @@ class AppExtension extends Twig_Extension
             new \Twig_SimpleFunction('hash', [$this, 'gitHash']),
             new \Twig_SimpleFunction('releaseDate', [$this, 'gitDate']),
             new \Twig_SimpleFunction('enabled', [$this, 'tabEnabled']),
-            new \Twig_SimpleFunction('tools', [$this, 'allTools']),
+            new \Twig_SimpleFunction('tools', [$this, 'tools']),
             new \Twig_SimpleFunction('color', [$this, 'getColorList']),
             new \Twig_SimpleFunction('chartColor', [$this, 'chartColor']),
             new \Twig_SimpleFunction('isSingleWiki', [$this, 'isSingleWiki']),
@@ -88,7 +91,7 @@ class AppExtension extends Twig_Extension
             new \Twig_SimpleFunction('replag', [$this, 'replag']),
             new \Twig_SimpleFunction('quote', [$this, 'quote']),
             new \Twig_SimpleFunction('bugReportURL', [$this, 'bugReportURL']),
-            new \Twig_SimpleFunction('logged_in_user', [$this, 'functionLoggedInUser']),
+            new \Twig_SimpleFunction('logged_in_user', [$this, 'loggedInUser']),
             new \Twig_SimpleFunction('isUserAnon', [$this, 'isUserAnon']),
             new \Twig_SimpleFunction('nsName', [$this, 'nsName']),
             new \Twig_SimpleFunction('formatDuration', [$this, 'formatDuration']),
@@ -99,11 +102,11 @@ class AppExtension extends Twig_Extension
 
     /**
      * Get the duration of the current HTTP request in seconds.
-     * @return double
+     * @return float
      * Untestable since there is no request stack in the tests.
      * @codeCoverageIgnore
      */
-    public function requestTime()
+    public function requestTime(): float
     {
         if (!isset($this->requestTime)) {
             $this->requestTime = microtime(true) - $this->getRequest()->server->get('REQUEST_TIME_FLOAT');
@@ -116,7 +119,7 @@ class AppExtension extends Twig_Extension
      * Get the formatted real memory usage.
      * @return float
      */
-    public function requestMemory()
+    public function requestMemory(): float
     {
         $mem = memory_get_usage(false);
         $div = pow(1024, 2);
@@ -126,10 +129,10 @@ class AppExtension extends Twig_Extension
     /**
      * Get an i18n message.
      * @param string $message
-     * @param array $vars
-     * @return mixed|null|string
+     * @param string[] $vars
+     * @return string|null
      */
-    public function msg($message = '', $vars = [])
+    public function msg(string $message = '', array $vars = []): ?string
     {
         return $this->i18n->msg($message, $vars);
     }
@@ -137,10 +140,10 @@ class AppExtension extends Twig_Extension
     /**
      * See if a given i18n message exists.
      * @param string $message The message.
-     * @param array $vars
+     * @param string[] $vars
      * @return bool
      */
-    public function msgExists($message = '', $vars = [])
+    public function msgExists(?string $message, array $vars = []): bool
     {
         return $this->i18n->msgExists($message, $vars);
     }
@@ -148,10 +151,10 @@ class AppExtension extends Twig_Extension
     /**
      * Get an i18n message if it exists, otherwise just get the message key.
      * @param string $message
-     * @param array $vars
-     * @return mixed|null|string
+     * @param string[] $vars
+     * @return string
      */
-    public function msgIfExists($message = "", $vars = [])
+    public function msgIfExists(?string $message, array $vars = []): string
     {
         return $this->i18n->msgIfExists($message, $vars);
     }
@@ -160,7 +163,7 @@ class AppExtension extends Twig_Extension
      * Get the current language code.
      * @return string
      */
-    public function getLang()
+    public function getLang(): string
     {
         return $this->i18n->getLang();
     }
@@ -169,26 +172,25 @@ class AppExtension extends Twig_Extension
      * Get the current language name (defaults to 'English').
      * @return string
      */
-    public function getLangName()
+    public function getLangName(): string
     {
         return $this->i18n->getLangName();
     }
 
     /**
-     * Get the fallback languages for the current language,
-     * so we know what to load with jQuery.i18n.
+     * Get the fallback languages for the current language, so we know what to load with jQuery.i18n.
      * @return string[]
      */
-    public function getFallbackLangs()
+    public function getFallbackLangs(): array
     {
         return $this->i18n->getFallbacks();
     }
 
     /**
      * Get all available languages in the i18n directory
-     * @return array Associative array of langKey => langName
+     * @return string[] Associative array of langKey => langName
      */
-    public function getAllLangs()
+    public function getAllLangs(): array
     {
         return $this->i18n->getAllLangs();
     }
@@ -198,7 +200,7 @@ class AppExtension extends Twig_Extension
      * @param string|null $lang Optionally provide a specific lanuage code.
      * @return bool
      */
-    public function isRTL($lang = null)
+    public function isRTL(?string $lang = null): bool
     {
         return $this->i18n->isRTL($lang);
     }
@@ -207,7 +209,7 @@ class AppExtension extends Twig_Extension
      * Get the short hash of the currently checked-out Git commit.
      * @return string
      */
-    public function gitShortHash()
+    public function gitShortHash(): string
     {
         return exec('git rev-parse --short HEAD');
     }
@@ -216,7 +218,7 @@ class AppExtension extends Twig_Extension
      * Get the full hash of the currently checkout-out Git commit.
      * @return string
      */
-    public function gitHash()
+    public function gitHash(): string
     {
         return exec('git rev-parse HEAD');
     }
@@ -225,7 +227,7 @@ class AppExtension extends Twig_Extension
      * Get the date of the HEAD commit.
      * @return string
      */
-    public function gitDate()
+    public function gitDate(): string
     {
         $date = new DateTime(exec('git show -s --format=%ci'));
         return $this->dateFormat($date, 'yyyy-MM-dd');
@@ -236,7 +238,7 @@ class AppExtension extends Twig_Extension
      * @param string $tool The short name of the tool.
      * @return bool
      */
-    public function tabEnabled($tool = 'index')
+    public function tabEnabled(string $tool = 'index'): bool
     {
         $param = false;
         if ($this->container->hasParameter("enable.$tool")) {
@@ -249,7 +251,7 @@ class AppExtension extends Twig_Extension
      * Get a list of the short names of all tools.
      * @return string[]
      */
-    public function allTools()
+    public function tools(): array
     {
         $retVal = [];
         if ($this->container->hasParameter('tools')) {
@@ -260,8 +262,8 @@ class AppExtension extends Twig_Extension
 
     /**
      * Get a list of namespace colours (one or all).
-     * @param bool $num The NS ID to get.
-     * @return string[]|string Indexed by namespace ID.
+     * @param int|false $num The NS ID to get. False to get the full list.
+     * @return string|string[] Color or all all colors indexed by namespace ID.
      */
     public static function getColorList($num = false)
     {
@@ -353,7 +355,7 @@ class AppExtension extends Twig_Extension
             2600 => '#000000',
         ];
 
-        if ($num === false) {
+        if (false === $num) {
             return $colors;
         } elseif (isset($colors[$num])) {
             return $colors[$num];
@@ -365,10 +367,10 @@ class AppExtension extends Twig_Extension
 
     /**
      * Get color-blind friendly colors for use in charts
-     * @param  Integer $num Index of color
-     * @return String RGBA color (so you can more easily adjust the opacity)
+     * @param int $num Index of color
+     * @return string RGBA color (so you can more easily adjust the opacity)
      */
-    public function chartColor($num)
+    public function chartColor(int $num): string
     {
         $colors = [
             'rgba(171, 212, 235, 1)',
@@ -390,7 +392,7 @@ class AppExtension extends Twig_Extension
      * Whether XTools is running in single-project mode.
      * @return bool
      */
-    public function isSingleWiki()
+    public function isSingleWiki(): bool
     {
         $param = true;
         if ($this->container->hasParameter('app.single_wiki')) {
@@ -403,12 +405,12 @@ class AppExtension extends Twig_Extension
      * Get the database replication-lag threshold.
      * @return int
      */
-    public function getReplagThreshold()
+    public function getReplagThreshold(): int
     {
         $param = 30;
         if ($this->container->hasParameter('app.replag_threshold')) {
             $param = $this->container->getParameter('app.replag_threshold');
-        };
+        }
         return $param;
     }
 
@@ -416,7 +418,7 @@ class AppExtension extends Twig_Extension
      * Whether XTools is running in WMF Labs mode.
      * @return bool
      */
-    public function isWMFLabs()
+    public function isWMFLabs(): bool
     {
         $param = false;
         if ($this->container->hasParameter('app.is_labs')) {
@@ -430,7 +432,7 @@ class AppExtension extends Twig_Extension
      * @return int
      * @codeCoverageIgnore
      */
-    public function replag()
+    public function replag(): int
     {
         $retVal = 0;
 
@@ -444,18 +446,19 @@ class AppExtension extends Twig_Extension
             $dbName = ProjectRepository::getProject($project, $this->container)
                 ->getDatabaseName();
 
-            $stmt = "SELECT lag FROM `heartbeat_p`.`heartbeat` h
-            RIGHT JOIN `meta_p`.`wiki` w ON concat(h.shard, \".labsdb\")=w.slice
-            WHERE dbname LIKE :project LIMIT 1";
+            $sql = "SELECT lag FROM `heartbeat_p`.`heartbeat` h
+                    RIGHT JOIN `meta_p`.`wiki` w ON concat(h.shard, \".labsdb\")=w.slice
+                    WHERE dbname LIKE :project LIMIT 1";
 
+            /** @var Connection $conn */
             $conn = $this->container->get('doctrine')->getManager('replicas')->getConnection();
 
             // Prepare the query and execute
-            $resultQuery = $conn->prepare($stmt);
+            $resultQuery = $conn->prepare($sql);
             $resultQuery->bindParam('project', $dbName);
             $resultQuery->execute();
 
-            if ($resultQuery->errorCode() == 0) {
+            if (0 == $resultQuery->errorCode()) {
                 $results = $resultQuery->fetchAll();
 
                 if (isset($results[0]['lag'])) {
@@ -464,14 +467,14 @@ class AppExtension extends Twig_Extension
             }
         }
 
-        return $retVal;
+        return (int)$retVal;
     }
 
     /**
      * Get a random quote for the footer
      * @return string
      */
-    public function quote()
+    public function quote(): string
     {
         // Don't show if Quote is turned off, but always show for Labs
         // (so quote is in footer but not in nav).
@@ -486,21 +489,20 @@ class AppExtension extends Twig_Extension
 
     /**
      * Get the currently logged in user's details.
-     * @return string[]
+     * @return string[]|null
      */
-    public function functionLoggedInUser()
+    public function loggedInUser(): ?array
     {
         return $this->container->get('session')->get('logged_in_user');
     }
-
 
     /*********************************** FILTERS ***********************************/
 
     /**
      * Get all filters for this extension.
-     * @return array
+     * @return \Twig_SimpleFilter[]
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new \Twig_SimpleFilter('capitalize_first', [$this, 'capitalizeFirst']),
@@ -514,23 +516,23 @@ class AppExtension extends Twig_Extension
 
     /**
      * Format a number based on language settings.
-     * @param  int|float $number
-     * @param  int $decimals Number of decimals to format to.
+     * @param int|float $number
+     * @param int $decimals Number of decimals to format to.
      * @return string
      */
-    public function numberFormat($number, $decimals = 0)
+    public function numberFormat($number, $decimals = 0): string
     {
         return $this->i18n->numberFormat($number, $decimals);
     }
 
     /**
      * Localize the given date based on language settings.
-     * @param  string|DateTime $datetime
+     * @param string|DateTime $datetime
      * @param string $pattern Format according to this ICU date format.
      * @see http://userguide.icu-project.org/formatparse/datetime
      * @return string
      */
-    public function dateFormat($datetime, $pattern = 'yyyy-MM-dd HH:mm')
+    public function dateFormat($datetime, $pattern = 'yyyy-MM-dd HH:mm'): string
     {
         return $this->i18n->dateFormat($datetime, $pattern);
     }
@@ -541,7 +543,7 @@ class AppExtension extends Twig_Extension
      * @param Project $project
      * @return string
      */
-    public function wikify($str, Project $project)
+    public function wikify(string $str, Project $project): string
     {
         return Edit::wikifyString($str, $project);
     }
@@ -549,32 +551,32 @@ class AppExtension extends Twig_Extension
     /**
      * Mysteriously missing Twig helper to capitalize only the first character.
      * E.g. used for table headings for translated messages
-     * @param  string $str The string
-     * @return string      The string, capitalized
+     * @param string $str The string
+     * @return string The string, capitalized
      */
-    public function capitalizeFirst($str)
+    public function capitalizeFirst(string $str): string
     {
         return ucfirst($str);
     }
 
     /**
      * Format a given number or fraction as a percentage.
-     * @param  number  $numerator   Numerator or single fraction if denominator is ommitted.
-     * @param  number  $denominator Denominator.
-     * @param  integer $precision   Number of decimal places to show.
-     * @return string               Formatted percentage.
+     * @param int|float $numerator Numerator or single fraction if denominator is ommitted.
+     * @param int $denominator Denominator.
+     * @param integer $precision Number of decimal places to show.
+     * @return string Formatted percentage.
      */
-    public function percentFormat($numerator, $denominator = null, $precision = 1)
+    public function percentFormat($numerator, ?int $denominator = null, int $precision = 1): string
     {
         return $this->i18n->percentFormat($numerator, $denominator, $precision);
     }
 
     /**
      * Helper to return whether the given user is an anonymous (logged out) user.
-     * @param  User|string $user User object or username as a string.
+     * @param User|string $user User object or username as a string.
      * @return bool
      */
-    public function isUserAnon($user)
+    public function isUserAnon($user): bool
     {
         if ($user instanceof User) {
             $username = $user->getUsername();
@@ -586,29 +588,28 @@ class AppExtension extends Twig_Extension
     }
 
     /**
-     * Helper to properly translate a namespace name
-     * @param  int|string $namespace Namespace key as a string or ID
-     * @param  array      $namespaces List of available namespaces
-     *                                as retrieved from Project::getNamespaces
+     * Helper to properly translate a namespace name.
+     * @param int|string $namespace Namespace key as a string or ID.
+     * @param string[] $namespaces List of available namespaces as retrieved from Project::getNamespaces().
      * @return string Namespace name
      */
-    public function nsName($namespace, $namespaces)
+    public function nsName($namespace, $namespaces): string
     {
-        if ($namespace === 'all') {
+        if ('all' === $namespace) {
             return $this->i18n->msg('all');
-        } elseif ($namespace === '0' || $namespace === 0 || $namespace === 'Main') {
+        } elseif ('0' === $namespace || 0 === $namespace || 'Main' === $namespace) {
             return $this->i18n->msg('mainspace');
         } else {
-            return $namespaces[$namespace];
+            return $namespaces[$namespace] ?? $this->i18n->msg('unknown');
         }
     }
 
     /**
-     * Format a given number as a diff, colouring it green if it's postive, red if negative, gary if zero
-     * @param  number $size Diff size
+     * Format a given number as a diff, colouring it green if it's positive, red if negative, gary if zero
+     * @param int $size Diff size
      * @return string Markup with formatted number
      */
-    public function diffFormat($size)
+    public function diffFormat(int $size): string
     {
         if ($size < 0) {
             $class = 'diff-neg';
@@ -630,12 +631,12 @@ class AppExtension extends Twig_Extension
      * @param int $seconds Number of seconds.
      * @param bool $translate Used for unit testing. Set to false to return
      *   the value and i18n key, instead of the actual translation.
-     * @return string|array Examples: '30 seconds', '2 minutes', '15 hours', '500 days',
+     * @return string|mixed[] Examples: '30 seconds', '2 minutes', '15 hours', '500 days',
      *   or [30, 'num-seconds'] (etc.) if $translate is false.
      */
-    public function formatDuration($seconds, $translate = true)
+    public function formatDuration(int $seconds, bool $translate = true)
     {
-        list($val, $key) = $this->getDurationMessageKey($seconds);
+        [$val, $key] = $this->getDurationMessageKey($seconds);
 
         if ($translate) {
             return $this->numberFormat($val).' '.$this->i18n->msg("num-$key", [$val]);
@@ -646,15 +647,15 @@ class AppExtension extends Twig_Extension
 
     /**
      * Given a time duration in seconds, generate a i18n message key and value.
-     * @param  int $seconds Number of seconds.
+     * @param int $seconds Number of seconds.
      * @return array<integer|string> [int - message value, string - message key]
      */
-    private function getDurationMessageKey($seconds)
+    private function getDurationMessageKey(int $seconds)
     {
-        /** @var int Value to show in message */
+        /** @var int $val Value to show in message */
         $val = $seconds;
 
-        /** @var string Unit of time, used in the key for the i18n message */
+        /** @var string $key Unit of time, used in the key for the i18n message */
         $key = 'seconds';
 
         if ($seconds >= 86400) {
@@ -676,10 +677,10 @@ class AppExtension extends Twig_Extension
 
     /**
      * Build URL query string from given params.
-     * @param  array $params
+     * @param string[] $params
      * @return string
      */
-    public function buildQuery($params)
+    public function buildQuery(array $params): string
     {
         return is_array($params) ? http_build_query($params) : '';
     }
@@ -690,7 +691,7 @@ class AppExtension extends Twig_Extension
      * There is no request stack in the tests.
      * @codeCoverageIgnore
      */
-    private function getRequest()
+    private function getRequest(): \Symfony\Component\HttpFoundation\Request
     {
         return $this->container->get('request_stack')->getCurrentRequest();
     }

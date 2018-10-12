@@ -3,12 +3,15 @@
  * This file contains the code that powers the RfX Vote Calculator page of XTools.
  */
 
+declare(strict_types=1);
+
 namespace AppBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
+use AppBundle\Model\RFX;
+use AppBundle\Repository\PageRepository;
+use Doctrine\DBAL\Connection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Xtools\PageRepository;
-use Xtools\RFX;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Controller for the RfX Vote Calculator.
@@ -20,7 +23,7 @@ class RfXVoteCalculatorController extends XtoolsController
      * @return string
      * @codeCoverageIgnore
      */
-    public function getIndexRoute()
+    public function getIndexRoute(): string
     {
         return 'RfXVoteCalculator';
     }
@@ -33,7 +36,7 @@ class RfXVoteCalculatorController extends XtoolsController
      * @Route("/rfxvote/index.php", name="RfXVoteCalculatorIndexPhp")
      * @return Response
      */
-    public function indexAction()
+    public function indexAction(): Response
     {
         // Redirect if at minimum project, username and categories are provided.
         if (isset($this->params['project']) && isset($this->params['username'])) {
@@ -57,8 +60,9 @@ class RfXVoteCalculatorController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction()
+    public function resultAction(): Response
     {
+        /** @var Connection $conn */
         $conn = $this->getDoctrine()->getManager('replicas')->getConnection();
 
         $projectRepo = $this->project->getRepository();
@@ -72,14 +76,12 @@ class RfXVoteCalculatorController extends XtoolsController
         $namespaces = $this->project->getNamespaces();
 
         if (!isset($rfxParam[$this->project->getDomain()])) {
-            $this->addFlash('notice', ['invalid-project-cant-use', $this->project->getDomain()]);
+            $this->addFlashMessage('notice', 'invalid-project-cant-use', [$this->project->getDomain()]);
             return $this->redirectToRoute('RfXVoteCalculator');
         }
 
         $pageTypes = $rfxParam[$this->project->getDomain()]['pages'];
-        $namespace = $rfxParam[$this->project->getDomain()]['rfx_namespace'] !== null
-            ? $rfxParam[$this->project->getDomain()]['rfx_namespace']
-            : 4;
+        $namespace = $rfxParam[$this->project->getDomain()]['rfx_namespace'] ?? 4;
 
         $finalData = [];
 
@@ -157,7 +159,7 @@ class RfXVoteCalculatorController extends XtoolsController
                     );
                     $section = $rfx->getUserSectionFound();
 
-                    if ($section == '') {
+                    if ('' == $section) {
                         // Skip over ones where the user didn't !vote.
                         continue;
                     }

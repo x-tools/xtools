@@ -1,4 +1,6 @@
 <?php
+declare(strict_types = 1);
+
 /**
  * This file contains only the XtoolsHttpException class.
  */
@@ -13,7 +15,7 @@ class XtoolsHttpException extends \RuntimeException
     /** @var string What URL to redirect to. */
     protected $redirectUrl;
 
-    /** @var array The params to pass in with the URL. */
+    /** @var mixed[] The params to pass in with the URL. */
     protected $params;
 
     /** @var bool Whether the exception was thrown as part of an API request. */
@@ -23,10 +25,10 @@ class XtoolsHttpException extends \RuntimeException
      * XtoolsHttpException constructor.
      * @param string $message
      * @param string $redirectUrl
-     * @param array $params Params to pass in with the redirect URL.
+     * @param mixed[] $params Params to pass in with the redirect URL.
      * @param bool $api Whether this is thrown during an API request.
      */
-    public function __construct($message, $redirectUrl, $params = [], $api = false)
+    public function __construct(string $message, string $redirectUrl, array $params = [], bool $api = false)
     {
         $this->redirectUrl = $redirectUrl;
         $this->params = $params;
@@ -39,7 +41,7 @@ class XtoolsHttpException extends \RuntimeException
      * The URL that should be redirected to.
      * @return string
      */
-    public function getRedirectUrl()
+    public function getRedirectUrl(): string
     {
         return $this->redirectUrl;
     }
@@ -47,9 +49,9 @@ class XtoolsHttpException extends \RuntimeException
     /**
      * Get the configured parameters, which should be the same parameters parsed from the Request,
      * and passed to the $redirectUrl when handled in the ExceptionListener.
-     * @return array
+     * @return mixed[]
      */
-    public function getParams()
+    public function getParams(): array
     {
         return $this->params;
     }
@@ -58,7 +60,7 @@ class XtoolsHttpException extends \RuntimeException
      * Whether this exception was thrown as part of a request to the API.
      * @return bool
      */
-    public function isApi()
+    public function isApi(): bool
     {
         return $this->api;
     }

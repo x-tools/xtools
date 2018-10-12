@@ -3,14 +3,16 @@
  * This file contains only the RateLimitSubscriber class.
  */
 
+declare(strict_types = 1);
+
 namespace AppBundle\EventSubscriber;
 
-use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
+use DateInterval;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
-use DateInterval;
 
 /**
  * A RateLimitSubscriber checks to see if users are exceeding usage limitations.
@@ -40,7 +42,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
      * Register our interest in the kernel.controller event.
      * @return string[]
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::CONTROLLER => 'onKernelController',
@@ -52,13 +54,13 @@ class RateLimitSubscriber implements EventSubscriberInterface
      * @param FilterControllerEvent $event The event.
      * @throws TooManyRequestsHttpException|\Exception If rate limits have been exceeded.
      */
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(FilterControllerEvent $event): void
     {
         $this->rateLimit = (int) $this->container->getParameter('app.rate_limit_count');
         $this->rateDuration = (int) $this->container->getParameter('app.rate_limit_time');
 
         // Zero values indicate the rate limiting feature should be disabled.
-        if ($this->rateLimit === 0 || $this->rateDuration === 0) {
+        if (0 === $this->rateLimit || 0 === $this->rateDuration) {
             return;
         }
 
@@ -106,7 +108,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
      * Check the request against blacklisted URIs and user agents
      * @param \Symfony\Component\HttpFoundation\Request $request
      */
-    private function checkBlacklist(\Symfony\Component\HttpFoundation\Request $request)
+    private function checkBlacklist(\Symfony\Component\HttpFoundation\Request $request): void
     {
         // First check user agent and URI blacklists
         if ($this->container->hasParameter('request_blacklist')) {
@@ -114,7 +116,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
             // User agents
             if (is_array($blacklist['user_agent'])) {
                 foreach ($blacklist['user_agent'] as $ua) {
-                    if (strpos($request->headers->get('User-Agent'), $ua) !== false) {
+                    if (false !== strpos($request->headers->get('User-Agent'), $ua)) {
                         $this->denyAccess($request, "Matched blacklisted user agent `$ua`");
                     }
                 }
@@ -122,7 +124,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
             // URIs
             if (is_array($blacklist['uri'])) {
                 foreach ($blacklist['uri'] as $uri) {
-                    if (strpos($request->getRequestUri(), $uri) !== false) {
+                    if (false !== strpos($request->getRequestUri(), $uri)) {
                         $this->denyAccess($request, "Matched blacklisted URI `$uri`");
                     }
                 }
@@ -137,13 +139,13 @@ class RateLimitSubscriber implements EventSubscriberInterface
      * @throws TooManyRequestsHttpException
      * @todo i18n
      */
-    private function denyAccess(\Symfony\Component\HttpFoundation\Request $request, $logComment = '')
+    private function denyAccess(\Symfony\Component\HttpFoundation\Request $request, string $logComment = ''): void
     {
         // Log the denied request
         $logger = $this->container->get('monolog.logger.rate_limit');
         $logger->info(
             "<URI>: " . $request->getRequestUri() .
-            ($logComment != '' ? "\t<Reason>: $logComment" : '') .
+            ('' != $logComment ? "\t<Reason>: $logComment" : '') .
             "\t<User agent>: " . $request->headers->get('User-Agent')
         );
 

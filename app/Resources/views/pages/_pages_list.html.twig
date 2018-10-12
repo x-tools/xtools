@@ -51,11 +51,7 @@
                 {% set maxRows = 50 %}
                 {% for page in pages.results[ns] if not(multiNamspace) or (index < maxRows and multiNamspace) %}
                     {% set index = index + 1 %}
-                    {% if ns == 0 %}
-                        {% set pagename = page.page_title %}
-                    {% else %}
-                        {% set pagename = project.namespaces[ns] ~ ":" ~ page.page_title %}
-                    {% endif %}
+                    {% set pagename = (nsName(ns, project.namespaces) ~ ':' ~ page.page_title)|trim(':') %}
                     <tr>
                         <td>{{ index|num_format }}</td>
                         <td class="sort-entry--page-title" data-value="{{ pagename }}">
@@ -120,7 +116,7 @@
                                 {% endif %}
                                 {% if enabled('TopEdits') %}
                                     &middot;
-                                    <a href="{{ path('TopEditsResultPage', { 'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'page': page.page_title }) }}">{{ msg('tool-topedits') }}</a>
+                                    <a href="{{ path('TopEditsResultPage', { 'project': project.domain, 'username': user.username, 'namespace': ns, 'page': page.page_title }) }}">{{ msg('tool-topedits') }}</a>
                                 {% endif %}
                                 {% if isWMFLabs() %}
                                     &middot;
