@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6db76dccb44f5076b2a2294b22d81b7b",
+    "content-hash": "1392e0c46787d9cabb93632a50995a41",
     "packages": [
         {
             "name": "addwiki/mediawiki-api",

@@ -3,7 +3,7 @@ var Encore = require('@symfony/webpack-encore');
 Encore
 
     // Directory where compiled assets will be stored.
-    .setOutputPath('./web/assets/')
+    .setOutputPath('./public/assets/')
 
     // Public URL path used by the web server to access the output path.
     .setPublicPath('/assets/')
