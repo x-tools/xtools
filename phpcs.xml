@@ -5,7 +5,7 @@
     <exclude-pattern>vendor/</exclude-pattern>
     <exclude-pattern>var/</exclude-pattern>
     <exclude-pattern>docs/</exclude-pattern>
-    <exclude-pattern>web/assets/</exclude-pattern>
+    <exclude-pattern>public/assets/</exclude-pattern>
     <exclude-pattern>node_modules/</exclude-pattern>
     <exclude-pattern>app/Resources/assets/vendor/</exclude-pattern>
     <exclude-pattern>*.min.js</exclude-pattern>
