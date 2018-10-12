@@ -35,7 +35,7 @@
             {% for key in ['namespace', 'count'] %}
                 <th>
                     <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                        {{ msg(key) | capitalize_first }}
+                        {{ msg(key)|capitalize_first }}
                         <span class="glyphicon glyphicon-sort"></span>
                     </span>
                 </th>

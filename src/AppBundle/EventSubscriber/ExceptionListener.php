@@ -1,4 +1,6 @@
 <?php
+declare(strict_types = 1);
+
 /**
  * This file contains only the ExceptionListener class.
  */
@@ -35,7 +37,7 @@ class ExceptionListener
      * @param LoggerInterface $logger
      * @param string $environment
      */
-    public function __construct(EngineInterface $templateEngine, LoggerInterface $logger, $environment = 'prod')
+    public function __construct(EngineInterface $templateEngine, LoggerInterface $logger, string $environment = 'prod')
     {
         $this->templateEngine = $templateEngine;
         $this->logger = $logger;
@@ -48,17 +50,16 @@ class ExceptionListener
      * @param GetResponseForExceptionEvent $event
      * @throws \Exception
      */
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function onKernelException(GetResponseForExceptionEvent $event): void
     {
         $exception = $event->getException();
 
-        // We only care about the previous (original) exception,
-        // not the one Twig put on top of it.
+        // We only care about the previous (original) exception, not the one Twig put on top of it.
         $prevException = $exception->getPrevious();
 
         if ($exception instanceof XtoolsHttpException) {
             $response = $this->getXtoolsHttpResponse($exception);
-        } elseif ($exception instanceof Twig_Error_Runtime && $prevException !== null) {
+        } elseif ($exception instanceof Twig_Error_Runtime && null !== $prevException) {
             $response = $this->getTwigErrorResponse($prevException);
         } else {
             return;
@@ -88,13 +89,12 @@ class ExceptionListener
 
     /**
      * Handle a Twig runtime exception.
-     * @param Twig_Error_Runtime $exception
+     * @param \Exception $exception
      * @return Response
-     * @throws Twig_Error_Runtime
      */
-    private function getTwigErrorResponse($exception)
+    private function getTwigErrorResponse(\Exception $exception): Response
     {
-        if ($this->environment !== 'prod') {
+        if ('prod' !== $this->environment) {
             throw $exception;
         }
 

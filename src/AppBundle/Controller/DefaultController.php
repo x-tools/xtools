@@ -3,8 +3,12 @@
  * This file contains only the DefaultController class.
  */
 
+declare(strict_types=1);
+
 namespace AppBundle\Controller;
 
+use AppBundle\Model\Edit;
+use AppBundle\Repository\ProjectRepository;
 use MediaWiki\OAuthClient\Client;
 use MediaWiki\OAuthClient\ClientConfig;
 use MediaWiki\OAuthClient\Consumer;
@@ -16,8 +20,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Xtools\Edit;
-use Xtools\ProjectRepository;
 
 /**
  * The DefaultController handles the homepage, about pages, and user authentication.
@@ -32,7 +34,7 @@ class DefaultController extends XtoolsController
      * @return string
      * @codeCoverageIgnore
      */
-    public function getIndexRoute()
+    public function getIndexRoute(): string
     {
         return 'homepage';
     }
@@ -41,8 +43,9 @@ class DefaultController extends XtoolsController
      * Display the homepage.
      * @Route("/", name="homepage")
      * @Route("/index.php", name="homepageIndexPhp")
+     * @return Response
      */
-    public function indexAction()
+    public function indexAction(): Response
     {
         return $this->render('default/index.html.twig', [
             'xtPage' => 'home',
@@ -53,8 +56,9 @@ class DefaultController extends XtoolsController
      * Diplay XTools' about page.
      * @Route("/about", name="aboutPage")
      * @Route("/info.php", name="info")
+     * @return Response
      */
-    public function aboutAction()
+    public function aboutAction(): Response
     {
         return $this->render('default/about.html.twig', [
             'xtPage' => 'about',
@@ -64,19 +68,20 @@ class DefaultController extends XtoolsController
     /**
      * Display some configuration details, when in development mode.
      * @Route("/config", name="configPage")
+     * @return Response
      * @codeCoverageIgnore
      */
-    public function configAction()
+    public function configAction(): Response
     {
 
-        if ($this->container->getParameter('kernel.environment') !== 'dev') {
+        if ('dev' !== $this->container->getParameter('kernel.environment')) {
             throw new NotFoundHttpException();
         }
 
         $params = $this->container->getParameterBag()->all();
 
-        foreach ($params as $key => $value) {
-            if (strpos($key, 'password') !== false) {
+        foreach (array_keys($params) as $key) {
+            if (false !== strpos($key, 'password')) {
                 $params[$key] = '<REDACTED>';
             }
         }
@@ -96,10 +101,10 @@ class DefaultController extends XtoolsController
      * @return RedirectResponse
      * @throws Exception If initialization fails.
      */
-    public function loginAction()
+    public function loginAction(): RedirectResponse
     {
         try {
-            list( $next, $token ) = $this->getOauthClient()->initiate();
+            [ $next, $token ] = $this->getOauthClient()->initiate();
         } catch (Exception $oauthException) {
             throw $oauthException;
             // @TODO Make this work.
@@ -121,7 +126,7 @@ class DefaultController extends XtoolsController
      * @param Request $request The HTTP request.
      * @return RedirectResponse
      */
-    public function oauthCallbackAction(Request $request)
+    public function oauthCallbackAction(Request $request): RedirectResponse
     {
         // Give up if the required GET params don't exist.
         if (!$request->get('oauth_verifier')) {
@@ -155,7 +160,7 @@ class DefaultController extends XtoolsController
      * @return Client
      * @codeCoverageIgnore
      */
-    protected function getOauthClient()
+    protected function getOauthClient(): Client
     {
         if ($this->oauthClient instanceof Client) {
             return $this->oauthClient;
@@ -180,8 +185,9 @@ class DefaultController extends XtoolsController
     /**
      * Log out the user and return to the homepage.
      * @Route("/logout", name="logout")
+     * @return RedirectResponse
      */
-    public function logoutAction()
+    public function logoutAction(): RedirectResponse
     {
         $this->get('session')->invalidate();
         return $this->redirectToRoute('homepage');
@@ -194,7 +200,7 @@ class DefaultController extends XtoolsController
      * @Route("/api/project/normalize/{project}", name="ProjectApiNormalize")
      * @return JsonResponse
      */
-    public function normalizeProjectApiAction()
+    public function normalizeProjectApiAction(): JsonResponse
     {
         return $this->getFormattedApiResponse([
             'domain' => $this->project->getDomain(),
@@ -210,7 +216,7 @@ class DefaultController extends XtoolsController
      * @Route("/api/project/namespaces/{project}", name="ProjectApiNamespaces")
      * @return JsonResponse
      */
-    public function namespacesApiAction()
+    public function namespacesApiAction(): JsonResponse
     {
         return $this->getFormattedApiResponse([
             'domain' => $this->project->getDomain(),
@@ -226,7 +232,7 @@ class DefaultController extends XtoolsController
      * @Route("/api/project/assessments/{project}", name="ProjectApiAssessments")
      * @return JsonResponse
      */
-    public function projectAssessmentsApiAction()
+    public function projectAssessmentsApiAction(): JsonResponse
     {
         return $this->getFormattedApiResponse([
             'project' => $this->project->getDomain(),
@@ -239,7 +245,7 @@ class DefaultController extends XtoolsController
      * @Route("/api/project/assessments", name="ApiAssessmentsConfig")
      * @return JsonResponse
      */
-    public function assessmentsConfigApiAction()
+    public function assessmentsConfigApiAction(): JsonResponse
     {
         // Here there is no Project, so we don't use XtoolsController::getFormattedApiResponse().
         $response = new JsonResponse();
@@ -256,9 +262,9 @@ class DefaultController extends XtoolsController
     /**
      * Transform given wikitext to HTML using the XTools parser. Wikitext must be passed in as the query 'wikitext'.
      * @Route("/api/project/parser/{project}")
-     * @return string Safe HTML.
+     * @return JsonResponse Safe HTML.
      */
-    public function wikify()
+    public function wikify(): JsonResponse
     {
         return new JsonResponse(
             Edit::wikifyString($this->request->query->get('wikitext'), $this->project)

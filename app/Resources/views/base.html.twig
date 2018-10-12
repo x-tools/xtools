@@ -141,7 +141,7 @@
     {% if xtTitle is defined %}
         {% set replagValue = replag() %}
         {% if replagValue > getReplagThreshold() %}
-            {{ layout.alert('warning', 'high-replag', [formatDuration(replagValue)]) }}
+            {{ layout.alert('warning', msg('high-replag', [formatDuration(replagValue)])) }}
         {% endif %}
     {% endif %}
 </div>

@@ -3,37 +3,20 @@
  * This file contains only the AutomatedEditsControllerTest class.
  */
 
-namespace Tests\AppBundle\Controller;
+declare(strict_types = 1);
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Bundle\FrameworkBundle\Client;
+namespace Tests\AppBundle\Controller;
 
 /**
  * Integration tests for the Auto Edits tool.
  * @group integration
  */
-class AutomatedEditsControllerTest extends WebTestCase
+class AutomatedEditsControllerTest extends ControllerTestAdapter
 {
-    /** @var Container The DI container. */
-    protected $container;
-
-    /** @var Client The Symfony client */
-    protected $client;
-
-    /**
-     * Set up the tests.
-     */
-    public function setUp()
-    {
-        $this->client = static::createClient();
-        $this->container = $this->client->getContainer();
-    }
-
     /**
      * Test that the form can be retrieved.
      */
-    public function testIndex()
+    public function testIndex(): void
     {
         // Check basics.
         $this->client->request('GET', '/autoedits');
@@ -57,5 +40,90 @@ class AutomatedEditsControllerTest extends WebTestCase
         static::assertEquals('fr.wikipedia.org', $crawler->filter('#project_input')->attr('value'));
         static::assertEquals(5, $crawler->filter('#namespace_select option:selected')->attr('value'));
         static::assertEquals('2017-02-01', $crawler->filter('[name=start]')->attr('value'));
+    }
+
+    /**
+     * Check that the result pages return successful responses.
+     */
+    public function testResultPages(): void
+    {
+        if (!$this->container->getParameter('app.is_labs')) {
+            return;
+        }
+
+        $this->assertSuccessfulRoutes([
+            '/autoedits/en.wikipedia/Example',
+            '/autoedits/en.wikipedia/Example/1/2018-01-01/2018-02-01',
+            '/nonautoedits-contributions/en.wikipedia/Example/1/2018-01-01/2018-02-01/1',
+            '/autoedits-contributions/en.wikipedia/Example/1/2018-01-01/2018-02-01/1',
+        ]);
+    }
+
+    /**
+     * Check that the APIs return successful responses.
+     */
+    public function testApis(): void
+    {
+        if (!$this->container->getParameter('app.is_labs')) {
+            return;
+        }
+
+        // Non-automated edits endpoint is tested in self::testNonautomatedEdits().
+        $this->assertSuccessfulRoutes([
+            '/api/user/automated_tools/en.wikipedia',
+            '/api/user/automated_editcount/en.wikipedia/Example/1/2018-01-01/2018-02-01/1',
+            '/api/user/automated_edits/en.wikipedia/Example/1/2018-01-01/2018-02-01/5',
+        ]);
+    }
+
+    /**
+     * Test automated edit counter endpoint.
+     */
+    public function testAutomatedEditCount(): void
+    {
+        if (!$this->container->getParameter('app.is_labs')) {
+            // Untestable :(
+            return;
+        }
+
+        $url = '/api/user/automated_editcount/en.wikipedia/musikPuppet/all///1';
+        $this->client->request('GET', $url);
+        $response = $this->client->getResponse();
+        static::assertEquals(200, $response->getStatusCode());
+        static::assertEquals('application/json', $response->headers->get('content-type'));
+
+        $data = json_decode($response->getContent(), true);
+        $toolNames = array_keys($data['automated_tools']);
+
+        static::assertEquals($data['project'], 'en.wikipedia.org');
+        static::assertEquals($data['username'], 'musikPuppet');
+        static::assertGreaterThan(15, $data['automated_editcount']);
+        static::assertGreaterThan(35, $data['nonautomated_editcount']);
+        static::assertEquals(
+            $data['automated_editcount'] + $data['nonautomated_editcount'],
+            $data['total_editcount']
+        );
+        static::assertContains('Twinkle', $toolNames);
+        static::assertContains('Huggle', $toolNames);
+    }
+
+    /**
+     * Test nonautomated edits endpoint.
+     */
+    public function testNonautomatedEdits(): void
+    {
+        if (!$this->container->getParameter('app.is_labs')) {
+            // untestable :(
+            return;
+        }
+
+        $url = '/api/user/nonautomated_edits/en.wikipedia/ThisIsaTest/all///0';
+        $this->client->request('GET', $url);
+        $response = $this->client->getResponse();
+        static::assertEquals(200, $response->getStatusCode());
+        static::assertEquals('application/json', $response->headers->get('content-type'));
+
+        // This test account *should* never edit again and be safe for testing...
+        static::assertCount(1, json_decode($response->getContent(), true)['nonautomated_edits']);
     }
 }

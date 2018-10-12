@@ -3,14 +3,15 @@
  * This file contains tests for the AutomatedEditsHelper class.
  */
 
+declare(strict_types = 1);
+
 namespace Tests\AppBundle\Helper;
 
 use AppBundle\Helper\AutomatedEditsHelper;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\DependencyInjection\Container;
-use Tests\Xtools\TestAdapter;
-use Xtools\Project;
-use Xtools\ProjectRepository;
+use AppBundle\Model\Project;
+use AppBundle\Repository\ProjectRepository;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Tests\AppBundle\TestAdapter;
 
 /**
  * Tests of the AutomatedEditsHelper class.
@@ -18,7 +19,7 @@ use Xtools\ProjectRepository;
  */
 class AutomatedEditsTest extends TestAdapter
 {
-    /** @var Container The DI container. */
+    /** @var ContainerInterface The DI container. */
     protected $container;
 
     /** @var AutomatedEditsHelper The API Helper object to test. */
@@ -30,7 +31,7 @@ class AutomatedEditsTest extends TestAdapter
     /**
      * Set up the AutomatedEditsHelper object for testing.
      */
-    public function setUp()
+    public function setUp(): void
     {
         $client = static::createClient();
         $this->container = $client->getContainer();
@@ -41,7 +42,7 @@ class AutomatedEditsTest extends TestAdapter
     /**
      * Test that the merge of per-wiki config and global config works
      */
-    public function testTools()
+    public function testTools(): void
     {
         $this->setProject();
         $tools = $this->aeh->getTools($this->project);
@@ -62,7 +63,7 @@ class AutomatedEditsTest extends TestAdapter
     /**
      * Make sure the right tool is detected
      */
-    public function testTool()
+    public function testTool(): void
     {
         $this->setProject();
         $this->assertArraySubset(
@@ -83,7 +84,7 @@ class AutomatedEditsTest extends TestAdapter
     /**
      * Tests that given edit summary is properly asserted as a revert
      */
-    public function testIsAutomated()
+    public function testIsAutomated(): void
     {
         $this->setProject();
         $this->assertTrue($this->aeh->isAutomated(
@@ -99,7 +100,7 @@ class AutomatedEditsTest extends TestAdapter
     /**
      * Test that the revert-related tools of getTools() are properly fetched
      */
-    public function testRevertTools()
+    public function testRevertTools(): void
     {
         $this->setProject();
         $tools = $this->aeh->getTools($this->project);
@@ -120,7 +121,7 @@ class AutomatedEditsTest extends TestAdapter
     /**
      * Test that regex is properly concatenated when merging rules.
      */
-    public function testRegexConcat()
+    public function testRegexConcat(): void
     {
         $projectRepo = $this->getMock(ProjectRepository::class);
         $projectRepo->expects($this->once())
@@ -133,9 +134,7 @@ class AutomatedEditsTest extends TestAdapter
         $project = new Project('ar.wikipedia.org');
         $project->setRepository($projectRepo);
 
-        $tools = $this->aeh->getTools($project);
-
-        $this->assertArraySubset(
+        static::assertArraySubset(
             ['HotCat' => [
                 'regex' => 'باستخدام \[\[ويكيبيديا:المصناف الفوري|\|HotCat\]\]' .
                     '|Gadget-Hotcat(?:check)?\.js\|Script|\]\] via HotCat',
@@ -149,7 +148,7 @@ class AutomatedEditsTest extends TestAdapter
     /**
      * Was the edit a revert, based on the edit summary?
      */
-    public function testIsRevert()
+    public function testIsRevert(): void
     {
         $this->setProject();
         $this->assertTrue($this->aeh->isRevert(
@@ -166,7 +165,7 @@ class AutomatedEditsTest extends TestAdapter
      * Set the Project. This is done here because we don't want to use
      * en.wikipedia for self::testRegexConcat().
      */
-    private function setProject()
+    private function setProject(): void
     {
         $projectRepo = $this->getMock(ProjectRepository::class);
         $projectRepo->expects($this->once())

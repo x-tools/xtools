@@ -3,12 +3,15 @@
  * This file contains only the QuoteController class.
  */
 
+declare(strict_types=1);
+
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 
 /**
@@ -26,7 +29,7 @@ class QuoteController extends XtoolsController
      * @return string
      * @codeCoverageIgnore
      */
-    public function getIndexRoute()
+    public function getIndexRoute(): string
     {
         return 'Quote';
     }
@@ -37,13 +40,13 @@ class QuoteController extends XtoolsController
      * @Route("/bash", name="Bash")
      * @Route("/quote", name="Quote")
      * @Route("/bash/base.php", name="BashBase")
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
-    public function indexAction()
+    public function indexAction(): Response
     {
         // Check to see if the quote is a param.  If so,
         // redirect to the proper route.
-        if ($this->request->query->get('id') != '') {
+        if ('' != $this->request->query->get('id')) {
             return $this->redirectToRoute(
                 'QuoteID',
                 ['id' => $this->request->query->get('id')]
@@ -67,18 +70,18 @@ class QuoteController extends XtoolsController
      * @Route("/bash/random", name="BashRandom")
      * @return RedirectResponse
      */
-    public function randomQuoteAction()
+    public function randomQuoteAction(): RedirectResponse
     {
         // Choose a random quote by ID. If we can't find the quotes, return back to
         // the main form with a flash notice.
         try {
             $id = rand(1, sizeof($this->getParameter('quotes')));
         } catch (InvalidParameterException $e) {
-            $this->addFlash('notice', ['noquotes']);
+            $this->addFlashMessage('notice', 'noquotes');
             return $this->redirectToRoute('Quote');
         }
 
-        return $this->redirectToRoute('quoteID', ['id' => $id]);
+        return $this->redirectToRoute('QuoteID', ['id' => $id]);
     }
 
     /**
@@ -87,7 +90,7 @@ class QuoteController extends XtoolsController
      * @Route("/bash/all", name="BashAll")
      * @return Response
      */
-    public function quoteAllAction()
+    public function quoteAllAction(): Response
     {
         // Load up an array of all the quotes.
         // if we can't find the quotes, return back to  the main form with
@@ -95,7 +98,7 @@ class QuoteController extends XtoolsController
         try {
             $quotes = $this->getParameter('quotes');
         } catch (InvalidParameterException $e) {
-            $this->addFlash('notice', ['noquotes']);
+            $this->addFlashMessage('notice', 'noquotes');
             return $this->redirectToRoute('Quote');
         }
 
@@ -116,11 +119,10 @@ class QuoteController extends XtoolsController
      * @Route("/bash/{id}", name="BashID")
      * @return Response
      */
-    public function quoteAction($id)
+    public function quoteAction(int $id): Response
     {
         // Get the singular quote.
-        // if we can't find the quotes, return back to  the main form with
-        // a flash notice.
+        // If we can't find the quotes, return back to  the main form with a flash notice.
         try {
             if (isset($this->getParameter('quotes')[$id])) {
                 $text = $this->getParameter('quotes')[$id];
@@ -128,14 +130,14 @@ class QuoteController extends XtoolsController
                 throw new InvalidParameterException("Quote doesn't exist'");
             }
         } catch (InvalidParameterException $e) {
-            $this->addFlash('notice', ['noquotes']);
+            $this->addFlashMessage('notice', 'noquotes');
             return $this->redirectToRoute('Quote');
         }
 
         // If the text is undefined, that quote doesn't exist.
         // Redirect back to the main form.
         if (!isset($text)) {
-            $this->addFlash('notice', ['noquotes']);
+            $this->addFlashMessage('notice', 'noquotes');
             return $this->redirectToRoute('Quote');
         }
 
@@ -158,15 +160,11 @@ class QuoteController extends XtoolsController
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function randomQuoteApiAction()
+    public function randomQuoteApiAction(): JsonResponse
     {
-        $this->recordApiUsage('quote/random');
+        $this->validateIsEnabled();
 
-        // Don't show if bash is turned off, but always show for Labs (so quote is in footer but not in nav).
-        $isLabs = $this->container->getParameter('app.is_labs');
-        if (!$isLabs && !$this->container->getParameter('enable.bash')) {
-            return '';
-        }
+        $this->recordApiUsage('quote/random');
         $quotes = $this->container->getParameter('quotes');
         $id = array_rand($quotes);
 
@@ -182,16 +180,11 @@ class QuoteController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function allQuotesApiAction()
+    public function allQuotesApiAction(): Response
     {
-        $this->recordApiUsage('quote/all');
+        $this->validateIsEnabled();
 
-        // Don't show if bash is turned off, but always show for Labs
-        // (so quote is in footer but not in nav).
-        $isLabs = $this->container->getParameter('app.is_labs');
-        if (!$isLabs && !$this->container->getParameter('enable.bash')) {
-            return '';
-        }
+        $this->recordApiUsage('quote/all');
         $quotes = $this->container->getParameter('quotes');
         $numberedQuotes = [];
 
@@ -210,16 +203,11 @@ class QuoteController extends XtoolsController
      * @return Response|string
      * @codeCoverageIgnore
      */
-    public function singleQuotesApiAction($id)
+    public function singleQuotesApiAction(int $id)
     {
-        $this->recordApiUsage('quote/id');
+        $this->validateIsEnabled();
 
-        // Don't show if bash is turned off, but always show for Labs
-        // (so quote is in footer but not in nav).
-        $isLabs = $this->container->getParameter('app.is_labs');
-        if (!$isLabs && !$this->container->getParameter('enable.bash')) {
-            return '';
-        }
+        $this->recordApiUsage('quote/id');
         $quotes = $this->container->getParameter('quotes');
 
         if (!isset($quotes[$id])) {
@@ -228,14 +216,28 @@ class QuoteController extends XtoolsController
                     'error' => [
                         'code' => Response::HTTP_NOT_FOUND,
                         'message' => 'No quote found with ID '.$id,
-                    ]
+                    ],
                 ],
                 Response::HTTP_NOT_FOUND
             );
         }
 
         return new JsonResponse([
-            $id => $quotes[$id]
+            $id => $quotes[$id],
         ], Response::HTTP_OK);
+    }
+
+    /**
+     * Validate that the Quote tool is enabled, and throw a 404 if it is not.
+     * This is normally done by DisabledToolSubscriber but we have special logic here, because for Labs we want to
+     * show the quote in the footer but not expose the web interface.
+     * @throws NotFoundHttpException
+     */
+    private function validateIsEnabled(): void
+    {
+        $isLabs = $this->container->getParameter('app.is_labs');
+        if (!$isLabs && !$this->container->getParameter('enable.bash')) {
+            throw $this->createNotFoundException('This tool is disabled');
+        }
     }
 }

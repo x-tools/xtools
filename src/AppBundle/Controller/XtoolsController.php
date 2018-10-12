@@ -3,22 +3,25 @@
  * This file contains the abstract XtoolsController, which all other controllers will extend.
  */
 
+declare(strict_types=1);
+
 namespace AppBundle\Controller;
 
 use AppBundle\Exception\XtoolsHttpException;
+use AppBundle\Helper\I18nHelper;
+use AppBundle\Model\Page;
+use AppBundle\Model\Project;
+use AppBundle\Model\User;
+use AppBundle\Repository\PageRepository;
+use AppBundle\Repository\ProjectRepository;
+use AppBundle\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Xtools\ProjectRepository;
-use Xtools\UserRepository;
-use Xtools\Project;
-use Xtools\Page;
-use Xtools\PageRepository;
-use Xtools\User;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * XtoolsController supplies a variety of methods around parsing and validating parameters, and initializing
@@ -27,6 +30,9 @@ use Xtools\User;
  */
 abstract class XtoolsController extends Controller
 {
+    /** @var I18nHelper i18n helper. */
+    protected $i18n;
+
     /** @var Request The request object. */
     protected $request;
 
@@ -92,28 +98,30 @@ abstract class XtoolsController extends Controller
      * be the name of the associated model, if present.
      * @return string
      */
-    abstract protected function getIndexRoute();
+    abstract protected function getIndexRoute(): string;
 
     /**
      * XtoolsController constructor.
      * @param RequestStack $requestStack
      * @param ContainerInterface $container
+     * @param I18nHelper $i18n
      */
-    public function __construct(RequestStack $requestStack, ContainerInterface $container)
+    public function __construct(RequestStack $requestStack, ContainerInterface $container, I18nHelper $i18n)
     {
         $this->request = $requestStack->getCurrentRequest();
         $this->container = $container;
+        $this->i18n = $i18n;
         $this->params = $this->parseQueryParams();
 
         // Parse out the name of the controller and action.
         $pattern = "#::([a-zA-Z]*)Action#";
         $matches = [];
-        preg_match($pattern, $this->request->get('_controller'), $matches);
         // The blank string here only happens in the unit tests, where the request may not be made to an action.
-        $this->controllerAction = isset($matches[1]) ? $matches[1] : '';
+        preg_match($pattern, $this->request->get('_controller') ?? '', $matches);
+        $this->controllerAction = $matches[1] ?? '';
 
         // Whether the action is an API action.
-        $this->isApi = substr($this->controllerAction, -3) === 'Api';
+        $this->isApi = 'Api' === substr($this->controllerAction, -3);
 
         // Whether we're making a subrequest (the view makes a request to another action).
         $this->isSubRequest = $this->request->get('htmlonly')
@@ -138,7 +146,7 @@ abstract class XtoolsController extends Controller
     /**
      * Load user preferences from the associated cookies.
      */
-    private function loadCookies()
+    private function loadCookies(): void
     {
         // Not done for subrequests.
         if ($this->isSubRequest) {
@@ -154,7 +162,7 @@ abstract class XtoolsController extends Controller
      * Set cookies on the given Response.
      * @param Response $response
      */
-    private function setCookies(Response &$response)
+    private function setCookies(Response &$response): void
     {
         // Not done for subrequests.
         if ($this->isSubRequest) {
@@ -173,7 +181,7 @@ abstract class XtoolsController extends Controller
      * later get set on the Response headers in self::getFormattedResponse().
      * @param Project $project
      */
-    private function setProject(Project $project)
+    private function setProject(Project $project): void
     {
         $this->project = $project;
         $this->cookies['XtoolsProject'] = $project->getDomain();
@@ -186,12 +194,14 @@ abstract class XtoolsController extends Controller
     /**
      * Normalize all common parameters used by the controllers and set class properties.
      */
-    private function setProperties()
+    private function setProperties(): void
     {
-        // No normalization needed for these params.
-        foreach (['namespace', 'offset', 'limit'] as $param) {
+        $this->namespace = $this->params['namespace'] ?? null;
+
+        // Offset and limit need to be ints.
+        foreach (['offset', 'limit'] as $param) {
             if (isset($this->params[$param])) {
-                $this->{$param} = $this->params[$param];
+                $this->{$param} = (int)$this->params[$param];
             }
         }
 
@@ -217,30 +227,30 @@ abstract class XtoolsController extends Controller
     /**
      * Set class properties for dates, if such params were passed in.
      */
-    private function setDates()
+    private function setDates(): void
     {
-        $start = isset($this->params['start']) ? $this->params['start'] : false;
-        $end = isset($this->params['end']) ? $this->params['end'] : false;
+        $start = $this->params['start'] ?? false;
+        $end = $this->params['end'] ?? false;
         if ($start || $end) {
-            list($this->start, $this->end) = $this->getUTCFromDateParams($start, $end);
+            [$this->start, $this->end] = $this->getUTCFromDateParams($start, $end);
         }
     }
 
     /**
      * Construct a fully qualified page title given the namespace and title.
-     * @param int $ns Namespace ID.
+     * @param int|string $ns Namespace ID.
      * @param string $title Page title.
      * @param bool $rawTitle Return only the title (and not a Page).
      * @return Page|string
      */
-    protected function getPageFromNsAndTitle($ns, $title, $rawTitle = false)
+    protected function getPageFromNsAndTitle($ns, string $title, bool $rawTitle = false)
     {
-        if ((int)$ns === 0) {
+        if (0 === (int)$ns) {
             return $rawTitle ? $title : $this->validatePage($title);
         }
 
         // Prepend namespace and strip out duplicates.
-        $nsName = $this->project->getNamespaces()[$ns];
+        $nsName = $this->project->getNamespaces()[$ns] ?? $this->i18n->msg('unknown');
         $title = $nsName.':'.preg_replace('/^'.$nsName.':/', '', $title);
         return $rawTitle ? $title : $this->validatePage($title);
     }
@@ -249,7 +259,7 @@ abstract class XtoolsController extends Controller
      * Get a Project instance from the project string, using defaults if the given project string is invalid.
      * @return Project
      */
-    public function getProjectFromQuery()
+    public function getProjectFromQuery(): Project
     {
         // Set default project so we can populate the namespace selector on index pages.
         // Defaults to project stored in cookie, otherwise project specified in parameters.yml.
@@ -284,21 +294,21 @@ abstract class XtoolsController extends Controller
      * @return Project
      * @throws XtoolsHttpException
      */
-    public function validateProject($projectQuery)
+    public function validateProject(string $projectQuery): Project
     {
         /** @var Project $project */
         $project = ProjectRepository::getProject($projectQuery, $this->container);
 
-        if ($project->exists()) {
-            return $project;
+        if (!$project->exists()) {
+            $this->throwXtoolsException(
+                $this->getIndexRoute(),
+                'invalid-project',
+                [$this->params['project']],
+                'project'
+            );
         }
 
-        $this->throwXtoolsException(
-            $this->getIndexRoute(),
-            'Invalid project',
-            ['invalid-project', $this->params['project']],
-            'project'
-        );
+        return $project;
     }
 
     /**
@@ -307,7 +317,7 @@ abstract class XtoolsController extends Controller
      * @return User
      * @throws XtoolsHttpException
      */
-    public function validateUser($username)
+    public function validateUser(string $username): User
     {
         $user = UserRepository::getUser($username, $this->container);
 
@@ -321,7 +331,7 @@ abstract class XtoolsController extends Controller
 
         // Don't continue if the user doesn't exist.
         if (!$user->existsOnProject($this->project)) {
-            $this->throwXtoolsException($this->getIndexRoute(), 'User not found', 'user-not-found', 'username');
+            $this->throwXtoolsException($this->getIndexRoute(), 'user-not-found', [], 'username');
         }
 
         // Reject users with a crazy high edit count.
@@ -331,14 +341,17 @@ abstract class XtoolsController extends Controller
         ) {
             /** TODO: Somehow get this to use self::throwXtoolsException */
 
-            // FIXME: i18n!!
-            $this->addFlash('danger', ['too-many-edits', number_format($user->maxEdits())]);
+            $this->addFlashMessage('danger', 'too-many-edits', [
+                $this->i18n->numberFormat($user->maxEdits()),
+            ]);
 
             // If redirecting to a different controller, show an informative message accordingly.
             if ($this->tooHighEditCountAction !== $this->getIndexRoute()) {
                 // FIXME: This is currently only done for Edit Counter, redirecting to Simple Edit Counter,
                 // so this bit is hardcoded. We need to instead give the i18n key of the route.
-                $this->addFlash('info', ['too-many-edits-redir', 'Simple Counter']);
+                $this->addFlashMessage('info', 'too-many-edits-redir', [
+                    $this->i18n->msg('tool-simpleeditcounter'),
+                ]);
             } else {
                 // Redirecting back to index, so remove username (otherwise we'd get a redirect loop).
                 unset($this->params['username']);
@@ -361,38 +374,41 @@ abstract class XtoolsController extends Controller
      * @return Page
      * @throws XtoolsHttpException
      */
-    public function validatePage($pageTitle)
+    public function validatePage(string $pageTitle): Page
     {
         $page = new Page($this->project, $pageTitle);
         $pageRepo = new PageRepository();
         $pageRepo->setContainer($this->container);
         $page->setRepository($pageRepo);
 
-        if ($page->exists()) { // Page is valid.
-            return $page;
+        if (!$page->exists()) {
+            $this->throwXtoolsException(
+                $this->getIndexRoute(),
+                'no-result',
+                [$this->params['page'] ?? null],
+                'page'
+            );
         }
 
-        $this->throwXtoolsException(
-            $this->getIndexRoute(),
-            'Page not found',
-            isset($this->params['page']) ? ['no-result', $this->params['page']] : null,
-            'page'
-        );
+        return $page;
     }
 
     /**
      * Throw an XtoolsHttpException, which the given error message and redirects to specified action.
      * @param string $redirectAction Name of action to redirect to.
-     * @param string $message Shown in API responses (TODO: this should be i18n'd too?)
-     * @param array|string|null $flashParams
+     * @param string $message i18n key of error message. Shown in API responses.
+     *   If no message with this key exists, $message is shown as-is.
+     * @param array $messageParams
      * @param string $invalidParam This will be removed from $this->params. Omit if you don't want this to happen.
      * @throws XtoolsHttpException
      */
-    public function throwXtoolsException($redirectAction, $message, $flashParams = null, $invalidParam = null)
-    {
-        if (null !== $flashParams) {
-            $this->addFlash('danger', $flashParams);
-        }
+    public function throwXtoolsException(
+        string $redirectAction,
+        string $message,
+        array $messageParams = [],
+        ?string $invalidParam = null
+    ): void {
+        $this->addFlashMessage('danger', $message, $messageParams);
         $originalParams = $this->params;
 
         // Remove invalid parameter if it was given.
@@ -410,7 +426,7 @@ abstract class XtoolsController extends Controller
 
         // Throw exception which will redirect to $redirectAction.
         throw new XtoolsHttpException(
-            $message,
+            $this->i18n->msgIfExists($message, $messageParams),
             $this->generateUrl($redirectAction, $this->params),
             $originalParams,
             $this->isApi
@@ -421,18 +437,18 @@ abstract class XtoolsController extends Controller
      * Get the first error message stored in the session's FlashBag.
      * @return string
      */
-    public function getFlashMessage()
+    public function getFlashMessage(): string
     {
         $key = $this->get('session')->getFlashBag()->get('danger')[0];
         $param = null;
 
         if (is_array($key)) {
-            list($key, $param) = $key;
+            [$key, $param] = $key;
         }
 
         return $this->render('message.twig', [
             'key' => $key,
-            'params' => [$param]
+            'params' => [$param],
         ])->getContent();
     }
 
@@ -444,7 +460,7 @@ abstract class XtoolsController extends Controller
      * Get all standardized parameters from the Request, either via URL query string or routing.
      * @return string[]
      */
-    public function getParams()
+    public function getParams(): array
     {
         $paramsToCheck = [
             'project',
@@ -471,7 +487,7 @@ abstract class XtoolsController extends Controller
             'begin',
         ];
 
-        /** @var string[] Each parameter that was detected along with its value. */
+        /** @var string[] $params Each parameter that was detected along with its value. */
         $params = [];
 
         foreach ($paramsToCheck as $param) {
@@ -479,8 +495,8 @@ abstract class XtoolsController extends Controller
             $value = $this->request->query->get($param) ?: $this->request->get($param);
 
             // Only store if value is given ('namespace' or 'username' could be '0').
-            if ($value !== null && $value !== '') {
-                $params[$param] = rawurldecode($value);
+            if (null !== $value && '' !== $value) {
+                $params[$param] = rawurldecode((string)$value);
             }
         }
 
@@ -488,14 +504,13 @@ abstract class XtoolsController extends Controller
     }
 
     /**
-     * Parse out common parameters from the request. These include the
-     * 'project', 'username', 'namespace' and 'page', along with their legacy
-     * counterparts (e.g. 'lang' and 'wiki').
+     * Parse out common parameters from the request. These include the 'project', 'username', 'namespace' and 'page',
+     * along with their legacy counterparts (e.g. 'lang' and 'wiki').
      * @return string[] Normalized parameters (no legacy params).
      */
-    public function parseQueryParams()
+    public function parseQueryParams(): array
     {
-        /** @var string[] Each parameter and value that was detected. */
+        /** @var string[] $params Each parameter and value that was detected. */
         $params = $this->getParams();
 
         // Covert any legacy parameters, if present.
@@ -504,36 +519,36 @@ abstract class XtoolsController extends Controller
         // Remove blank values.
         return array_filter($params, function ($param) {
             // 'namespace' or 'username' could be '0'.
-            return $param !== null && $param !== '';
+            return null !== $param && '' !== $param;
         });
     }
 
     /**
      * Get UTC timestamps from given start and end string parameters. This also makes $start on month before
      * $end if not present, and makes $end the current time if not present.
-     * @param int|string $start Unix timestamp or string accepted by strtotime.
-     * @param int|string $end Unix timestamp or string accepted by strtotime.
+     * @param int|string|false $start Unix timestamp or string accepted by strtotime.
+     * @param int|string|false $end Unix timestamp or string accepted by strtotime.
      * @param bool $useDefaults Whether to use defaults if the values are blank. The start date is set to one month
      *   before the end date, and the end date is set to the present.
      * @return mixed[] Start and end date as UTC timestamps or 'false' if empty.
      */
-    public function getUTCFromDateParams($start, $end, $useDefaults = false)
+    public function getUTCFromDateParams($start, $end, $useDefaults = false): array
     {
-        $start = is_int($start) ? $start : strtotime($start);
-        $end = is_int($end) ? $end : strtotime($end);
+        $start = is_int($start) ? $start : strtotime((string)$start);
+        $end = is_int($end) ? $end : strtotime((string)$end);
 
         // Use current time if end is not present (and is required), or if it exceeds the current time.
-        if (($useDefaults && $end === false) || $end > time()) {
+        if (($useDefaults && false === $end) || $end > time()) {
             $end = time();
         }
 
         // Default to one month before end time if start is not present, as is not optional.
-        if ($useDefaults && $start === false) {
+        if ($useDefaults && false === $start) {
             $start = strtotime('-1 month', $end);
         }
 
         // Reverse if start date is after end date.
-        if ($start > $end && $start !== false && $end !== false) {
+        if ($start > $end && false !== $start && false !== $end) {
             $newEnd = $start;
             $start = $end;
             $end = $newEnd;
@@ -543,11 +558,11 @@ abstract class XtoolsController extends Controller
     }
 
     /**
-     * Given the params hash, normalize any legacy parameters to thier modern equivalent.
+     * Given the params hash, normalize any legacy parameters to their modern equivalent.
      * @param string[] $params
      * @return string[]
      */
-    private function convertLegacyParams($params)
+    private function convertLegacyParams(array $params): array
     {
         $paramMap = [
             'user' => 'username',
@@ -574,7 +589,7 @@ abstract class XtoolsController extends Controller
             // so we must remove leading periods and trailing .org's.
             $params['project'] = rtrim(ltrim($params['wiki'], '.'), '.org').'.org';
 
-            /** @var string[] Projects for which there is no specific language association. */
+            /** @var string[] $languagelessProjects Projects for which there is no specific language association. */
             $languagelessProjects = $this->container->getParameter('languageless_wikis');
 
             // Prepend language if applicable.
@@ -601,10 +616,10 @@ abstract class XtoolsController extends Controller
      * @return Response
      * @codeCoverageIgnore
      */
-    public function getFormattedResponse($templatePath, array $ret)
+    public function getFormattedResponse(string $templatePath, array $ret): Response
     {
         $format = $this->request->query->get('format', 'html');
-        if ($format == '') {
+        if ('' == $format) {
             // The default above doesn't work when the 'format' parameter is blank.
             $format = 'html';
         }
@@ -635,7 +650,7 @@ abstract class XtoolsController extends Controller
 
         $response = $this->render("$templatePath.$format.twig", $ret, $response);
 
-        $contentType = isset($formatMap[$format]) ? $formatMap[$format] : 'text/html';
+        $contentType = $formatMap[$format] ?? 'text/html';
         $response->headers->set('Content-Type', $contentType);
 
         return $response;
@@ -643,10 +658,10 @@ abstract class XtoolsController extends Controller
 
     /**
      * Return a JsonResponse object pre-supplied with the requested params.
-     * @param $data
+     * @param array $data
      * @return JsonResponse
      */
-    public function getFormattedApiResponse($data)
+    public function getFormattedApiResponse(array $data): JsonResponse
     {
         $response = new JsonResponse();
         $response->setEncodingOptions(JSON_NUMERIC_CHECK);
@@ -674,7 +689,7 @@ abstract class XtoolsController extends Controller
      * @param string $endpoint
      * @codeCoverageIgnore
      */
-    public function recordApiUsage($endpoint)
+    public function recordApiUsage(string $endpoint): void
     {
         /** @var \Doctrine\DBAL\Connection $conn */
         $conn = $this->container->get('doctrine')
@@ -687,7 +702,7 @@ abstract class XtoolsController extends Controller
                       WHERE date = '$date'
                       AND endpoint = '$endpoint'";
 
-        if (count($conn->query($existsSql)->fetchAll()) === 0) {
+        if (0 === count($conn->query($existsSql)->fetchAll())) {
             $createSql = "INSERT INTO usage_api_timeline
                           VALUES(NULL, '$date', '$endpoint', 1)";
             $conn->query($createSql);
@@ -698,5 +713,19 @@ abstract class XtoolsController extends Controller
                           AND date = '$date'";
             $conn->query($updateSql);
         }
+    }
+
+    /**
+     * Add a flash message.
+     * @param string $type
+     * @param string $key
+     * @param array $vars
+     */
+    public function addFlashMessage(string $type, string $key, array $vars = []): void
+    {
+        $this->addFlash(
+            $type,
+            $this->i18n->msg($key, $vars)
+        );
     }
 }

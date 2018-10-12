@@ -3,13 +3,15 @@
  * This file contains only the SimpleEditCounterController class.
  */
 
+declare(strict_types=1);
+
 namespace AppBundle\Controller;
 
+use AppBundle\Model\EditSummary;
+use AppBundle\Repository\EditSummaryRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Xtools\EditSummary;
-use Xtools\EditSummaryRepository;
 
 /**
  * This controller handles the Simple Edit Counter tool.
@@ -22,7 +24,7 @@ class EditSummaryController extends XtoolsController
      * @return string
      * @codeCoverageIgnore
      */
-    public function getIndexRoute()
+    public function getIndexRoute(): string
     {
         return 'EditSummary';
     }
@@ -36,7 +38,7 @@ class EditSummaryController extends XtoolsController
      * @Route("/editsummary/{project}/", name="EditSummaryProjectSlash")
      * @return Response
      */
-    public function indexAction()
+    public function indexAction(): Response
     {
         // If we've got a project, user, and namespace, redirect to results.
         if (isset($this->params['project']) && isset($this->params['username'])) {
@@ -65,7 +67,7 @@ class EditSummaryController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction()
+    public function resultAction(): Response
     {
         // Instantiate an EditSummary, treating the past 150 edits as 'recent'.
         $editSummary = new EditSummary($this->project, $this->user, $this->namespace, 150);
@@ -97,7 +99,7 @@ class EditSummaryController extends XtoolsController
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function editSummariesApiAction()
+    public function editSummariesApiAction(): JsonResponse
     {
         $this->recordApiUsage('user/edit_summaries');
 

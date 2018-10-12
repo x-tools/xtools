@@ -1,7 +1,8 @@
 <?php
+declare(strict_types = 1);
 
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use Composer\Autoload\ClassLoader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
 
 /**
  * @var ClassLoader $loader

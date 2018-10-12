@@ -3,6 +3,8 @@
  * This file contains only the DisabledToolSubscriber class.
  */
 
+declare(strict_types = 1);
+
 namespace AppBundle\EventSubscriber;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -34,7 +36,7 @@ class DisabledToolSubscriber implements EventSubscriberInterface
      * Register our interest in the kernel.controller event.
      * @return string[]
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::CONTROLLER => 'onKernelController',
@@ -46,7 +48,7 @@ class DisabledToolSubscriber implements EventSubscriberInterface
      * @param FilterControllerEvent $event The event.
      * @throws NotFoundHttpException If the tool is not enabled.
      */
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(FilterControllerEvent $event): void
     {
         $controller = $event->getController();
 

@@ -3,14 +3,16 @@
  * This file contains the code that powers the RfX Analysis page of XTools.
  */
 
+declare(strict_types=1);
+
 namespace AppBundle\Controller;
 
+use AppBundle\Model\Page;
+use AppBundle\Model\RFX;
+use AppBundle\Repository\PageRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Xtools\Page;
-use Xtools\PageRepository;
-use Xtools\RFX;
 
 /**
  * This controller handles the RfX Analysis tool.
@@ -23,7 +25,7 @@ class RfXAnalysisController extends XtoolsController
      * @return string
      * @codeCoverageIgnore
      */
-    public function getIndexRoute()
+    public function getIndexRoute(): string
     {
         return 'RfXAnalysis';
     }
@@ -40,7 +42,7 @@ class RfXAnalysisController extends XtoolsController
     public function indexAction()
     {
         if ($this->request->get('projecttype')
-            && (strpos($this->request->get('projecttype'), '|') !== false)
+            && false !== strpos($this->request->get('projecttype'), '|')
         ) {
             $projectType = explode('|', $this->request->get('projecttype'), 2);
             $projectQuery = $projectType[0];
@@ -52,21 +54,21 @@ class RfXAnalysisController extends XtoolsController
 
         $username = $this->request->get('username');
 
-        if ($projectQuery != '' && $typeQuery != '' && $username != '') {
+        if ('' != $projectQuery && '' != $typeQuery && '' != $username) {
             return $this->redirectToRoute(
                 'rfxAnalysisResult',
                 [
                     'project' => $projectQuery,
                     'type' => $typeQuery,
-                    'username' => $username
+                    'username' => $username,
                 ]
             );
-        } elseif ($projectQuery != '' && $typeQuery != '') {
+        } elseif ('' != $projectQuery && '' != $typeQuery) {
             return $this->redirectToRoute(
                 'rfxAnalysisProjectType',
                 [
                     'project' => $projectQuery,
-                    'type' => $typeQuery
+                    'type' => $typeQuery,
                 ]
             );
         }
@@ -99,12 +101,12 @@ class RfXAnalysisController extends XtoolsController
      * @return Response|RedirectResponse
      * @codeCoverageIgnore
      */
-    public function resultAction($type)
+    public function resultAction(string $type)
     {
         $domain = $this->project->getDomain();
 
-        if ($this->getParameter('rfx')[$domain] === null) {
-            $this->addFlash('notice', ['invalid-project-cant-use', $this->project]);
+        if (null === $this->getParameter('rfx')[$domain]) {
+            $this->addFlashMessage('notice', 'invalid-project-cant-use', [$this->project]);
             return $this->redirectToRoute('RfXAnalysis');
         }
 
@@ -124,11 +126,11 @@ class RfXAnalysisController extends XtoolsController
         $text = $page->getWikitext();
 
         if (!isset($text)) {
-            $this->addFlash('notice', ['no-result', $pageTitle]);
+            $this->addFlashMessage('notice', 'no-result', [$pageTitle]);
             return $this->redirectToRoute(
                 'rfxAnalysisProject',
                 [
-                    'project' => $this->project->getDatabaseName()
+                    'project' => $this->project->getDatabaseName(),
                 ]
             );
         }
@@ -145,8 +147,8 @@ class RfXAnalysisController extends XtoolsController
 
         $total = count($support) + count($oppose) + count($neutral);
 
-        if ($total === 0) {
-            $this->addFlash('notice', ['no-result', $pageTitle]);
+        if (0 === $total) {
+            $this->addFlashMessage('notice', 'no-result', [$pageTitle]);
             return $this->redirectToRoute(
                 'rfxAnalysisProject',
                 [

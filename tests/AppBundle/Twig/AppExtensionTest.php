@@ -1,38 +1,42 @@
 <?php
+declare(strict_types = 1);
+
 /**
  * This file contains only the AppExtensionTest class.
  */
 
-namespace AppBundle\Twig;
+namespace Tests\AppBundle\Twig;
 
 use AppBundle\Helper\I18nHelper;
+use AppBundle\Model\Project;
+use AppBundle\Model\User;
+use AppBundle\Repository\ProjectRepository;
 use AppBundle\Twig\AppExtension;
-use AppBundle\Twig\Extension;
 use DateTime;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Tests\Xtools\TestAdapter;
-use Xtools\Project;
-use Xtools\ProjectRepository;
-use Xtools\User;
+use Symfony\Component\HttpKernel\Client;
+use Tests\AppBundle\TestAdapter;
 
 /**
  * Tests for the AppExtension class.
  */
 class AppExtensionTest extends TestAdapter
 {
-    /** @var Container The Symfony container. */
+    /** @var ContainerInterface The Symfony container. */
     protected $container;
 
-    /** @var AppBundle\Twig\AppExtension Instance of class */
+    /** @var AppExtension Instance of class. */
     protected $appExtension;
+
+    /** @var Client HTTP client. */
+    private $client;
 
     /**
      * Set class instance.
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->client = static::createClient();
         $this->container = $this->client->getContainer();
@@ -45,7 +49,7 @@ class AppExtensionTest extends TestAdapter
     /**
      * Format number as a diff size.
      */
-    public function testDiffFormat()
+    public function testDiffFormat(): void
     {
         $this->assertEquals(
             "<span class='diff-pos'>3,000</span>",
@@ -64,7 +68,7 @@ class AppExtensionTest extends TestAdapter
     /**
      * Format number as a percentage.
      */
-    public function testPercentFormat()
+    public function testPercentFormat(): void
     {
         $this->assertEquals('45%', $this->appExtension->percentFormat(45));
         $this->assertEquals('30%', $this->appExtension->percentFormat(30, null, 3));
@@ -75,7 +79,7 @@ class AppExtensionTest extends TestAdapter
     /**
      * Format a time duration as humanized string.
      */
-    public function testFormatDuration()
+    public function testFormatDuration(): void
     {
         $this->assertEquals(
             [30, 'num-seconds'],
@@ -102,7 +106,7 @@ class AppExtensionTest extends TestAdapter
     /**
      * Format a number.
      */
-    public function testNumberFormat()
+    public function testNumberFormat(): void
     {
         $this->assertEquals('1,234', $this->appExtension->numberFormat(1234));
         $this->assertEquals('1,234.32', $this->appExtension->numberFormat(1234.316, 2));
@@ -112,7 +116,7 @@ class AppExtensionTest extends TestAdapter
     /**
      * Intution methods.
      */
-    public function testIntution()
+    public function testIntution(): void
     {
         $this->assertEquals('en', $this->appExtension->getLang());
         $this->assertEquals('English', $this->appExtension->getLangName());
@@ -135,7 +139,7 @@ class AppExtensionTest extends TestAdapter
     /**
      * Methods that fetch data about the git repository.
      */
-    public function testGitMethods()
+    public function testGitMethods(): void
     {
         // This test is mysteriously failing on Scrutinizer, but not on Travis.
         // Commenting out for now.
@@ -148,7 +152,7 @@ class AppExtensionTest extends TestAdapter
     /**
      * Capitalizing first letter.
      */
-    public function testCapitalizeFirst()
+    public function testCapitalizeFirst(): void
     {
         $this->assertEquals('Foo', $this->appExtension->capitalizeFirst('foo'));
         $this->assertEquals('Bar', $this->appExtension->capitalizeFirst('Bar'));
@@ -157,7 +161,7 @@ class AppExtensionTest extends TestAdapter
     /**
      * Getting amount of time it took to complete the request.
      */
-    public function testRequestTime()
+    public function testRequestTime(): void
     {
         $this->assertTrue(is_double($this->appExtension->requestMemory()));
     }
@@ -165,7 +169,7 @@ class AppExtensionTest extends TestAdapter
     /**
      * Is the given user logged out?
      */
-    public function testUserIsAnon()
+    public function testUserIsAnon(): void
     {
         $user = new User('68.229.186.65');
         $user2 = new User('Test user');
@@ -179,7 +183,7 @@ class AppExtensionTest extends TestAdapter
     /**
      * Formatting dates.
      */
-    public function testDateFormat()
+    public function testDateFormat(): void
     {
         $this->assertEquals(
             '2017-01-23 00:00',
@@ -194,13 +198,13 @@ class AppExtensionTest extends TestAdapter
     /**
      * Building URL query string from array.
      */
-    public function testBuildQuery()
+    public function testBuildQuery(): void
     {
         $this->assertEquals(
             'foo=1&bar=2',
             $this->appExtension->buildQuery([
                 'foo' => 1,
-                'bar' => 2
+                'bar' => 2,
             ])
         );
     }
@@ -208,7 +212,7 @@ class AppExtensionTest extends TestAdapter
     /**
      * Wikifying a string.
      */
-    public function testWikify()
+    public function testWikify(): void
     {
         $project = new Project('TestProject');
         $projectRepo = $this->getMock(ProjectRepository::class);

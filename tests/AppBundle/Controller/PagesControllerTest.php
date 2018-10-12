@@ -3,42 +3,25 @@
  * This file contains only the PagesControllerTest class.
  */
 
-namespace Tests\AppBundle\Controller;
+declare(strict_types = 1);
 
-use Symfony\Bundle\FrameworkBundle\Client;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\DependencyInjection\Container;
+namespace Tests\AppBundle\Controller;
 
 /**
  * Integration tests for the PagesController.
  * @group integration
  */
-class PagesControllerTest extends WebTestCase
+class PagesControllerTest extends ControllerTestAdapter
 {
-    /** @var Container The DI container. */
-    protected $container;
-
-    /** @var Client The Symfony client */
-    protected $client;
-
-    /**
-     * Set up the tests.
-     */
-    public function setUp()
-    {
-        $this->client = static::createClient();
-        $this->container = $this->client->getContainer();
-    }
-
     /**
      * Test that the Pages tool index page displays correctly.
      */
-    public function testIndex()
+    public function testIndex(): void
     {
         $this->client->request('GET', '/pages');
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
-        if ($this->container->getParameter('app.is_labs') && !$this->container->getParameter('app.single_wiki')) {
+        if ($this->container->getParameter('app.is_labs')) {
             $crawler = $this->client->request('GET', '/pages/de.wikipedia.org');
             static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
@@ -49,5 +32,22 @@ class PagesControllerTest extends WebTestCase
             $namespaceOptions = $crawler->filter('#namespace_select option');
             static::assertEquals('Diskussion', trim($namespaceOptions->eq(2)->text())); // Talk in German
         }
+    }
+
+    /**
+     * Test that all other routes return successful responses.
+     */
+    public function testRoutes(): void
+    {
+        if (!$this->container->getParameter('app.is_labs')) {
+            return;
+        }
+
+        $this->assertSuccessfulRoutes([
+            '/pages/en.wikipedia/Example',
+            '/pages/en.wikipedia/Example/0',
+            '/pages/en.wikipedia/Example/0/noredirects/all/5',
+            '/api/user/pages_count/en.wikipedia/Example/0/noredirects/deleted',
+        ]);
     }
 }

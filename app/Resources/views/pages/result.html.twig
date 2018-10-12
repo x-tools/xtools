@@ -73,7 +73,7 @@
                     <tbody>
                         {% for key, value in pages.counts %}
                         <tr>
-                            <td class="sort-entry--namespace linked" data-value="{{ project.namespaces[key] }}">
+                            <td class="sort-entry--namespace linked" data-value="{{ nsName(key, project.namespaces) }}">
                                 {% if multiNamspace %}
                                 <span class="namespace-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ key }}">
                                     <span class="glyphicon glyphicon-remove"></span>

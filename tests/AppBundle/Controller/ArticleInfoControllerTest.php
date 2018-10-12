@@ -3,42 +3,25 @@
  * This file contains only the ArticleInfoControllerTest class.
  */
 
-namespace Tests\AppBundle\Controller;
+declare(strict_types = 1);
 
-use Symfony\Bundle\FrameworkBundle\Client;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\DependencyInjection\Container;
+namespace Tests\AppBundle\Controller;
 
 /**
  * Integration/unit tests for the ArticleInfoController.
  * @group integration
  */
-class ArticleInfoControllerTest extends WebTestCase
+class ArticleInfoControllerTest extends ControllerTestAdapter
 {
-    /** @var Container The DI container. */
-    protected $container;
-
-    /** @var Client The Symfony client */
-    protected $client;
-
     /**
-     * Set up the tests.
+     * Test that the AdminStats index page displays correctly when given a project.
      */
-    public function setUp()
-    {
-        $this->client = static::createClient();
-        $this->container = $this->client->getContainer();
-    }
-
-    /**
-     * Test that the AdminStats index page displays correctly.
-     */
-    public function testIndex()
+    public function testProjectIndex(): void
     {
         $crawler = $this->client->request('GET', '/articleinfo/de.wikipedia');
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
-        if (!$this->container->getParameter('app.is_labs') || $this->container->getParameter('app.single_wiki')) {
+        if (!$this->container->getParameter('app.is_labs')) {
             return;
         }
 
@@ -49,10 +32,10 @@ class ArticleInfoControllerTest extends WebTestCase
     /**
      * Test the method that sets up a AdminStats instance.
      */
-    public function testArticleInfoApi()
+    public function testArticleInfoApi(): void
     {
         // For now...
-        if (!$this->container->getParameter('app.is_labs') || $this->container->getParameter('app.single_wiki')) {
+        if (!$this->container->getParameter('app.is_labs')) {
             return;
         }
 
@@ -76,9 +59,48 @@ class ArticleInfoControllerTest extends WebTestCase
             [
                 'project', 'page', 'watchers', 'pageviews', 'pageviews_offset',  'revisions',
                 'editors', 'author', 'author_editcount', 'created_at',  'created_rev_id', 'modified_at',
-                'secs_since_last_edit', 'last_edit_id', 'assessment', 'elapsed_time'
+                'secs_since_last_edit', 'last_edit_id', 'assessment', 'elapsed_time',
             ],
             array_keys($data)
         );
+    }
+
+    /**
+     * Check response codes of index and result pages.
+     */
+    public function testHtmlRoutes(): void
+    {
+        if (!$this->container->getParameter('app.is_labs')) {
+            return;
+        }
+
+        $this->assertSuccessfulRoutes([
+            '/articleinfo',
+            '/articleinfo/en.wikipedia.org/Ravine du Sud',
+            '/articleinfo/en.wikipedia.org/Ravine du Sud/2018-01-01',
+            '/articleinfo/en.wikipedia.org/Ravine du Sud/2018-01-01?format=wikitext',
+        ]);
+
+        // Should redirect because there are no revisions.
+        $this->client->request('GET', '/articleinfo/en.wikipedia.org/Ravine du Sud/'.date('Y-m-d'));
+        static::assertTrue($this->client->getResponse()->isRedirect());
+    }
+
+    /**
+     * Check response codes of other API endpoints.
+     */
+    public function testApis(): void
+    {
+        if (!$this->container->getParameter('app.is_labs')) {
+            return;
+        }
+
+        $this->assertSuccessfulRoutes([
+            '/api/page/prose/en.wikipedia/Ravine_du_Sud',
+            '/api/page/assessments/en.wikipedia/Ravine_du_Sud',
+            '/api/page/links/en.wikipedia/Ravine_du_Sud',
+            '/api/page/top_editors/en.wikipedia/Ravine_du_Sud',
+            '/api/page/top_editors/en.wikipedia/Ravine_du_Sud/2018-01-01/2018-02-01',
+        ]);
     }
 }

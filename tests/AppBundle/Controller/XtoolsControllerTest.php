@@ -3,29 +3,26 @@
  * This file contains only the XtoolsControllerTest class.
  */
 
+declare(strict_types = 1);
+
 namespace Tests\AppBundle\Controller;
 
+use AppBundle\Controller\SimpleEditCounterController;
 use AppBundle\Controller\XtoolsController;
 use AppBundle\Exception\XtoolsHttpException;
-use Symfony\Bundle\FrameworkBundle\Client;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use AppBundle\Helper\I18nHelper;
 use Symfony\Component\BrowserKit\Cookie;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
-use AppBundle\Controller\SimpleEditCounterController;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Integration/unit tests for the abstract XtoolsController.
  * @group integration
  */
-class XtoolsControllerTest extends WebTestCase
+class XtoolsControllerTest extends ControllerTestAdapter
 {
-    /** @var Container The DI container. */
-    protected $container;
-
-    /** @var Client The Symfony client */
-    protected $client;
+    /** @var I18nHelper Needed by SimpleEditCounterController. */
+    protected $i18n;
 
     /** @var XtoolsController The controller. */
     protected $controller;
@@ -33,10 +30,10 @@ class XtoolsControllerTest extends WebTestCase
     /**
      * Set up the tests.
      */
-    public function setUp()
+    public function setUp(): void
     {
-        $this->client = static::createClient();
-        $this->container = $this->client->getContainer();
+        parent::setUp();
+        $this->i18n = $this->container->get('app.i18n_helper');
     }
 
     /**
@@ -44,14 +41,14 @@ class XtoolsControllerTest extends WebTestCase
      * @param array $params
      * @return XtoolsController
      */
-    private function getControllerWithRequest($params = [])
+    private function getControllerWithRequest(array $params = []): XtoolsController
     {
         $requestStack = new RequestStack();
         $requestStack->push(new Request($params));
 
         // SimpleEditCounterController used solely for testing, since we
         // can't instantiate the abstract class XtoolsController.
-        return new SimpleEditCounterController($requestStack, $this->container);
+        return new SimpleEditCounterController($requestStack, $this->container, $this->i18n);
     }
 
     /**
@@ -60,7 +57,7 @@ class XtoolsControllerTest extends WebTestCase
      * @param array $params
      * @param array $expected
      */
-    public function testParseQueryParams($params, $expected)
+    public function testParseQueryParams(array $params, array $expected): void
     {
         // Untestable on Travis :(
         if (!$this->container->getParameter('app.is_labs')) {
@@ -76,7 +73,7 @@ class XtoolsControllerTest extends WebTestCase
      * Data for self::testRevisionsProcessed().
      * @return string[]
      */
-    public function paramsProvider()
+    public function paramsProvider(): array
     {
         return [
             [
@@ -95,7 +92,7 @@ class XtoolsControllerTest extends WebTestCase
                     'page' => 'Test',
                     'start' => '2016-01-01',
                     'end' => '2017-01-01',
-                ]
+                ],
             ], [
                 // Legacy parameters mixed with modern.
                 [
@@ -108,7 +105,7 @@ class XtoolsControllerTest extends WebTestCase
                     'username' => 'GoldenRing',
                     'namespace' => '0',
                     'page' => 'Test',
-                ]
+                ],
             ], [
                 // Missing parameters.
                 [
@@ -117,7 +114,7 @@ class XtoolsControllerTest extends WebTestCase
                 ], [
                     'project' => 'en.wikipedia',
                     'page' => 'Test',
-                ]
+                ],
             ], [
                 // Legacy style.
                 [
@@ -133,7 +130,7 @@ class XtoolsControllerTest extends WebTestCase
                     'username' => 'Bob Dylan',
                     'start' => '2016-01-01',
                     'end' => '2017-01-01',
-                ]
+                ],
             ], [
                 // Legacy style with metawiki.
                 [
@@ -143,7 +140,7 @@ class XtoolsControllerTest extends WebTestCase
                 ], [
                     'project' => 'meta.wikimedia.org',
                     'page' => 'Test',
-                ]
+                ],
             ], [
                 // Legacy style of the legacy style.
                 [
@@ -152,8 +149,8 @@ class XtoolsControllerTest extends WebTestCase
                     'page' => '311',
                 ], [
                     'project' => 'da.wikipedia.org',
-                    'page' => '311'
-                ]
+                    'page' => '311',
+                ],
             ], [
                 // Language-neutral project.
                 [
@@ -163,7 +160,7 @@ class XtoolsControllerTest extends WebTestCase
                 ], [
                     'project' => 'wikidata.org',
                     'page' => 'Q12345',
-                ]
+                ],
             ], [
                 // Language-neutral, ultra legacy style.
                 [
@@ -173,7 +170,7 @@ class XtoolsControllerTest extends WebTestCase
                 ], [
                     'project' => 'wikidata.org',
                     'page' => 'Q12345',
-                ]
+                ],
             ],
         ];
     }
@@ -181,7 +178,7 @@ class XtoolsControllerTest extends WebTestCase
     /**
      * Getting a Project from the project query string.
      */
-    public function testProjectFromQuery()
+    public function testProjectFromQuery(): void
     {
         // Untestable on Travis :(
         if (!$this->container->getParameter('app.is_labs')) {
@@ -204,7 +201,7 @@ class XtoolsControllerTest extends WebTestCase
     /**
      * Validating the project and user parameters.
      */
-    public function testValidateProjectAndUser()
+    public function testValidateProjectAndUser(): void
     {
         // Untestable on Travis :(
         if (!$this->container->getParameter('app.is_labs')) {
@@ -237,7 +234,7 @@ class XtoolsControllerTest extends WebTestCase
     /**
      * Make sure standardized params are properly parsed.
      */
-    public function testGetParams()
+    public function testGetParams(): void
     {
         // Untestable on Travis :(
         if (!$this->container->getParameter('app.is_labs')) {
@@ -249,7 +246,7 @@ class XtoolsControllerTest extends WebTestCase
             'username' => 'Jimbo Wales',
             'namespace' => '0',
             'article' => 'Foo',
-            'redirects' => ''
+            'redirects' => '',
         ]);
 
         static::assertEquals([
@@ -263,7 +260,7 @@ class XtoolsControllerTest extends WebTestCase
     /**
      * Validate a page exists on a project.
      */
-    public function testValidatePage()
+    public function testValidatePage(): void
     {
         // Untestable on Travis :(
         if (!$this->container->getParameter('app.is_labs')) {
@@ -283,7 +280,7 @@ class XtoolsControllerTest extends WebTestCase
     /**
      * Converting start/end dates into UTC timestamps.
      */
-    public function testUTCFromDateParams()
+    public function testUTCFromDateParams(): void
     {
         $controller = $this->getControllerWithRequest();
 
@@ -335,7 +332,7 @@ class XtoolsControllerTest extends WebTestCase
     /**
      * Test involving fetching and settings cookies.
      */
-    public function testCookies()
+    public function testCookies(): void
     {
         $crawler = $this->client->request('GET', '/sc');
         static::assertEquals(

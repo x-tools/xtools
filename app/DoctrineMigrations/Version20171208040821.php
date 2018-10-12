@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Application\Migrations;
 
@@ -13,7 +14,7 @@ class Version20171208040821 extends AbstractMigration
     /**
      * @param Schema $schema
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema): void
     {
         $table = $schema->createTable('usage_api_timeline');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -26,7 +27,7 @@ class Version20171208040821 extends AbstractMigration
     /**
      * @param Schema $schema
      */
-    public function down(Schema $schema)
+    public function down(Schema $schema): void
     {
         $schema->dropTable('usage_api_timeline');
     }

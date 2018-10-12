@@ -3,39 +3,44 @@
  * This file contains only the AdminStatsControllerTest class.
  */
 
-namespace Tests\AppBundle\Controller;
+declare(strict_types = 1);
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Bundle\FrameworkBundle\Client;
+namespace Tests\AppBundle\Controller;
 
 /**
  * Integration/unit tests for the AdminStatsController.
  * @group integration
  */
-class AdminStatsControllerTest extends WebTestCase
+class AdminStatsControllerTest extends ControllerTestAdapter
 {
-    /** @var Container The DI container. */
-    protected $container;
-
-    /** @var Client The Symfony client */
-    protected $client;
-
     /**
-     * Set up the tests.
+     * Check response codes of index and result pages.
      */
-    public function setUp()
+    public function testHtmlRoutes(): void
     {
-        $this->client = static::createClient();
-        $this->container = $this->client->getContainer();
+        if (!$this->container->getParameter('app.is_labs')) {
+            return;
+        }
+
+        $this->assertSuccessfulRoutes([
+            '/adminstats',
+            '/adminstats/fr.wikipedia.org',
+            '/adminstats/fr.wikipedia.org/2018-01-01/2018-01-10',
+        ]);
     }
 
     /**
-     * Test that the AdminStats index page displays correctly.
+     * Check response codes of API endpoints.
      */
-    public function testIndex()
+    public function testApis(): void
     {
-        $this->client->request('GET', '/adminstats');
-        static::assertEquals(200, $this->client->getResponse()->getStatusCode());
+        if (!$this->container->getParameter('app.is_labs')) {
+            return;
+        }
+
+        $this->assertSuccessfulRoutes([
+            '/api/project/admins_groups/fr.wikipedia',
+            '/api/project/adminstats/fr.wikipedia/3',
+        ]);
     }
 }

@@ -3,6 +3,8 @@
  * This file contains only the MetaController class.
  */
 
+declare(strict_types=1);
+
 namespace AppBundle\Controller;
 
 use DateTime;
@@ -21,7 +23,7 @@ class MetaController extends XtoolsController
      * @return string
      * @codeCoverageIgnore
      */
-    public function getIndexRoute()
+    public function getIndexRoute(): string
     {
         return 'Meta';
     }
@@ -34,7 +36,7 @@ class MetaController extends XtoolsController
      * @Route("/meta/index.php", name="MetaIndexPhp")
      * @return Response
      */
-    public function indexAction()
+    public function indexAction(): Response
     {
         if (isset($this->params['start']) && isset($this->params['end'])) {
             return $this->redirectToRoute('MetaResult', $this->params);
@@ -54,7 +56,7 @@ class MetaController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction($legacy = false)
+    public function resultAction(bool $legacy = false): Response
     {
         $db = $legacy ? 'toolsdb' : 'default';
         $table = $legacy ? 's51187__metadata.xtools_timeline' : 'usage_timeline';
@@ -82,7 +84,7 @@ class MetaController extends XtoolsController
      * @return array
      * @codeCoverageIgnore
      */
-    private function getToolUsageStats(Connection $client, $table)
+    private function getToolUsageStats(Connection $client, string $table): array
     {
         $query = $client->prepare("SELECT * FROM $table
                                    WHERE date >= :start AND date <= :end");
@@ -140,7 +142,7 @@ class MetaController extends XtoolsController
      * @return array
      * @codeCoverageIgnore
      */
-    private function getApiUsageStats(Connection $client)
+    private function getApiUsageStats(Connection $client): array
     {
         $query = $client->prepare("SELECT * FROM usage_api_timeline
                                    WHERE date >= :start AND date <= :end");
@@ -203,17 +205,17 @@ class MetaController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function recordUsage(Request $request, $tool, $project, $token)
+    public function recordUsage(Request $request, string $tool, string $project, string $token): Response
     {
         // Ready the response object.
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
 
         // Validate method and token.
-        if ($request->getMethod() !== 'PUT' || !$this->isCsrfTokenValid('intention', $token)) {
+        if ('PUT' !== $request->getMethod() || !$this->isCsrfTokenValid('intention', $token)) {
             $response->setStatusCode(Response::HTTP_FORBIDDEN);
             $response->setContent(json_encode([
-                'error' => 'This endpoint is for internal use only.'
+                'error' => 'This endpoint is for internal use only.',
             ]));
             return $response;
         }
@@ -222,7 +224,7 @@ class MetaController extends XtoolsController
         if (!$this->container->getParameter("enable.$tool")) {
             $response->setStatusCode(Response::HTTP_FORBIDDEN);
             $response->setContent(json_encode([
-                'error' => 'This tool is disabled'
+                'error' => 'This tool is disabled',
             ]));
             return $response;
         }
@@ -235,7 +237,7 @@ class MetaController extends XtoolsController
                       WHERE date = '$date'
                       AND tool = '$tool'";
 
-        if (count($conn->query($existsSql)->fetchAll()) === 0) {
+        if (0 === count($conn->query($existsSql)->fetchAll())) {
             $createSql = "INSERT INTO usage_timeline
                           VALUES(NULL, '$date', '$tool', 1)";
             $conn->query($createSql);
@@ -253,7 +255,7 @@ class MetaController extends XtoolsController
                           WHERE tool = '$tool'
                           AND project = '$project'";
 
-            if (count($conn->query($existsSql)->fetchAll()) === 0) {
+            if (0 === count($conn->query($existsSql)->fetchAll())) {
                 $createSql = "INSERT INTO usage_projects
                               VALUES(NULL, '$tool', '$project', 1)";
                 $conn->query($createSql);

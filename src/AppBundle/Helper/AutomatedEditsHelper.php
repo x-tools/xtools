@@ -3,22 +3,22 @@
  * This file contains only the AutomatedEditsHelper class.
  */
 
+declare(strict_types = 1);
+
 namespace AppBundle\Helper;
 
+use AppBundle\Model\Project;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Xtools\Project;
 
 /**
  * Helper class for fetching semi-automated definitions.
  */
 class AutomatedEditsHelper extends HelperBase
 {
-
     /** @var string[] The list of tools that are considered reverting. */
     protected $revertTools = [];
 
-    /** @var string[] The list of tool names and their regexes. */
+    /** @var string[] The list of tool names and their regexes/tags. */
     protected $tools = [];
 
     /**
@@ -35,9 +35,9 @@ class AutomatedEditsHelper extends HelperBase
      * This only works for tools defined with regular expressions, not tags.
      * @param string $summary Edit summary
      * @param Project $project
-     * @return string|bool Tool entry including key for 'name', or false if nothing was found
+     * @return string[]|false Tool entry including key for 'name', or false if nothing was found
      */
-    public function getTool($summary, Project $project)
+    public function getTool(string $summary, Project $project)
     {
         foreach ($this->getTools($project) as $tool => $values) {
             if (isset($values['regex']) && preg_match('/'.$values['regex'].'/', $summary)) {
@@ -57,7 +57,7 @@ class AutomatedEditsHelper extends HelperBase
      * @param Project $project
      * @return bool
      */
-    public function isAutomated($summary, Project $project)
+    public function isAutomated(string $summary, Project $project): bool
     {
         return (bool)$this->getTool($summary, $project);
     }
@@ -66,9 +66,9 @@ class AutomatedEditsHelper extends HelperBase
      * Get list of automated tools and their associated info for the given project.
      * This defaults to the 'default_project' if entries for the given project are not found.
      * @param Project $project
-     * @return array Each tool with the tool name as the key, and 'link', 'regex' and/or 'tag' as the subarray keys.
+     * @return string[][] Each tool with the tool name as the key and 'link', 'regex' and/or 'tag' as the subarray keys.
      */
-    public function getTools(Project $project)
+    public function getTools(Project $project): array
     {
         $projectDomain = $project->getDomain();
 
@@ -88,9 +88,7 @@ class AutomatedEditsHelper extends HelperBase
             $localRules = [];
         }
 
-        $langRules = isset($tools[$project->getLang()])
-            ? $tools[$project->getLang()]
-            : [];
+        $langRules = $tools[$project->getLang()] ?? [];
 
         // Per-wiki rules have priority, followed by language-specific and global.
         $globalWithLangRules = $this->mergeRules($tools['global'], $langRules);
@@ -104,11 +102,11 @@ class AutomatedEditsHelper extends HelperBase
 
     /**
      * Merges the given rule sets, giving priority to the local set. Regex is concatenated, not overridden.
-     * @param array $globalRules The global rule set.
-     * @param array $localRules The rule set for the local wiki.
-     * @return array Merged rules.
+     * @param string[] $globalRules The global rule set.
+     * @param string[] $localRules The rule set for the local wiki.
+     * @return string[] Merged rules.
      */
-    private function mergeRules($globalRules, $localRules)
+    private function mergeRules(array $globalRules, array $localRules): array
     {
         // Initial set, including just the global rules.
         $tools = $globalRules;
@@ -126,7 +124,7 @@ class AutomatedEditsHelper extends HelperBase
             if (isset($rules['regex']) && isset($globalRules[$tool]['regex'])) {
                 $newRules['regex'] = implode('|', [
                     $rules['regex'],
-                    $globalRules[$tool]['regex']
+                    $globalRules[$tool]['regex'],
                 ]);
             }
 
@@ -140,10 +138,10 @@ class AutomatedEditsHelper extends HelperBase
      * Get only tools that are used to revert edits.
      * Revert detection happens only by testing against a regular expression, and not by checking tags.
      * @param Project $project
-     * @return string[] Each tool with the tool name as the key,
+     * @return string[][] Each tool with the tool name as the key,
      *   and 'link' and 'regex' as the subarray keys.
      */
-    public function getRevertTools(Project $project)
+    public function getRevertTools(Project $project): array
     {
         $projectDomain = $project->getDomain();
 
@@ -163,7 +161,7 @@ class AutomatedEditsHelper extends HelperBase
         $this->revertTools[$projectDomain] = array_map(function ($revertTool) {
             return [
                 'link' => $revertTool['link'],
-                'regex' => $revertTool['revert'] === true ? $revertTool['regex'] : $revertTool['revert'],
+                'regex' => true === $revertTool['revert'] ? $revertTool['regex'] : $revertTool['revert'],
             ];
         }, $revertEntries);
 
@@ -173,14 +171,14 @@ class AutomatedEditsHelper extends HelperBase
     /**
      * Was the edit a revert, based on the edit summary?
      * This only works for tools defined with regular expressions, not tags.
-     * @param string $summary Edit summary
+     * @param string|null $summary Edit summary. Can be null for instance for suppressed edits.
      * @param Project $project
      * @return bool
      */
-    public function isRevert($summary, Project $project)
+    public function isRevert(?string $summary, Project $project): bool
     {
-        foreach ($this->getRevertTools($project) as $tool => $values) {
-            if (preg_match('/'.$values['regex'].'/', $summary)) {
+        foreach (array_values($this->getRevertTools($project)) as $values) {
+            if (preg_match('/'.$values['regex'].'/', (string)$summary)) {
                 return true;
             }
         }
