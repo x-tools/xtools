@@ -94,6 +94,7 @@ class AppExtension extends Twig_Extension
             new \Twig_SimpleFunction('logged_in_user', [$this, 'loggedInUser']),
             new \Twig_SimpleFunction('isUserAnon', [$this, 'isUserAnon']),
             new \Twig_SimpleFunction('nsName', [$this, 'nsName']),
+            new \Twig_SimpleFunction('titleWithNs', [$this, 'titleWithNs']),
             new \Twig_SimpleFunction('formatDuration', [$this, 'formatDuration']),
             new \Twig_SimpleFunction('numberFormat', [$this, 'numberFormat']),
             new \Twig_SimpleFunction('buildQuery', [$this, 'buildQuery']),
@@ -593,7 +594,7 @@ class AppExtension extends Twig_Extension
      * @param string[] $namespaces List of available namespaces as retrieved from Project::getNamespaces().
      * @return string Namespace name
      */
-    public function nsName($namespace, $namespaces): string
+    public function nsName($namespace, array $namespaces): string
     {
         if ('all' === $namespace) {
             return $this->i18n->msg('all');
@@ -602,6 +603,21 @@ class AppExtension extends Twig_Extension
         } else {
             return $namespaces[$namespace] ?? $this->i18n->msg('unknown');
         }
+    }
+
+    /**
+     * Given a page title and namespace, generate the full page title.
+     * @param string $title
+     * @param int $namespace
+     * @param array $namespaces
+     * @return string
+     */
+    public function titleWithNs(string $title, int $namespace, array $namespaces): string
+    {
+        if (0 === $namespace) {
+            return $title;
+        }
+        return $this->nsName($namespace, $namespaces).':'.$title;
     }
 
     /**

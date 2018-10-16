@@ -97,14 +97,6 @@ class TopEditsTest extends TestAdapter
                 $this->topEditsNamespaceFactory()[0],
                 $this->topEditsNamespaceFactory()[3]
             ));
-        $this->teRepo->expects($this->once())
-            ->method('getDisplayTitles')
-            ->willReturn([
-                'Foo_bar' => 'Foo bar',
-                '101st_Airborne_Division' => '101st Airborne Division',
-                'User_talk:Test_user' => 'User talk:Test user',
-                'User_talk:Jimbo_Wales' => '<i>User talk:Jimbo Wales</i>',
-            ]);
         $te->setRepository($this->teRepo);
         $te->prepareData();
 
@@ -119,7 +111,6 @@ class TopEditsTest extends TestAdapter
             'page_is_redirect' => '1',
             'count' => '24',
             'pa_class' => 'List',
-            'displaytitle' => 'Foo bar',
             'page_title_ns' => 'Foo_bar',
         ], $result[0][0]);
 
@@ -139,12 +130,6 @@ class TopEditsTest extends TestAdapter
             ->method('getTopEditsNamespace')
             ->with($this->project, $this->user, 3, 2)
             ->willReturn($this->topEditsNamespaceFactory()[3]);
-        $this->teRepo->expects($this->once())
-            ->method('getDisplayTitles')
-            ->willReturn([
-                'User_talk:Test_user' => 'User talk:Test user',
-                'User_talk:Jimbo_Wales' => '<i>User talk:Jimbo Wales</i>',
-            ]);
         $te->setRepository($this->teRepo);
         $te->prepareData();
 
@@ -157,7 +142,6 @@ class TopEditsTest extends TestAdapter
             'page_title' => 'Jimbo_Wales',
             'page_is_redirect' => '0',
             'count' => '1',
-            'displaytitle' => '<i>User talk:Jimbo Wales</i>',
             'page_title_ns' => 'User_talk:Jimbo_Wales',
         ], $result[3][1]);
     }

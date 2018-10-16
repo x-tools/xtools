@@ -57,6 +57,9 @@ class TopEditsControllerTest extends ControllerTestAdapter
             '/topedits/enwiki/Example/1/Main Page',
             '/api/user/topedits/en.wikipedia/Example/1',
             '/api/user/topedits/en.wikipedia/Example/1/Main_Page',
+
+            // Former but now nonexistent namespace.
+            '/topedits/en.wikipedia/L235/447',
         ]);
     }
 }

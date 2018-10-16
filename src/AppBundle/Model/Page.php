@@ -70,9 +70,8 @@ class Page extends Model
 
     /**
      * Get the page's title.
-     * @param bool $useUnnormalized Use the unnormalized page title to avoid an
-     *    API call. This should be used only if you fetched the page title via
-     *    other means (SQL query), and is not from user input alone.
+     * @param bool $useUnnormalized Use the unnormalized page title to avoid an API call. This should be used only if
+     *   you fetched the page title via other means (SQL query), and is not from user input alone.
      * @return string
      */
     public function getTitle(bool $useUnnormalized = false): string

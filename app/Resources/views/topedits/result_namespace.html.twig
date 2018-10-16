@@ -65,30 +65,31 @@
             </tr></thead>
             <tbody>
                 {% for page in pages %}
-                <tr>
-                    <td class="sort-entry--edits" data-value="{{ page.count }}">
-                        {{ page.count|num_format }}
-                    </td>
-                    <td class="sort-entry--page display-title" data-value="{{ page.page_title_ns }}">
-                        {{ wiki.pageLinkRaw(page.page_title_ns, project, page.displaytitle) }}
-                    </td>
-                    {% if showPageAssessment %}
-                        <td class="sort-entry--assessment" data-value="{{ page.pa_class ? page.pa_class : 'Unknown' }}">
-                            {% set badge = project.pageAssessments.badgeURL(page.pa_class) %}
-                            {% if badge is defined %}
-                                <img alt="{{ page.pa_class }}" src="{{ badge }}" class="assessment-badge" />
-                            {% endif %}
-                            {{ page.pa_class ? page.pa_class : msg('unknown') }}
+                    {% set pageTitle = titleWithNs(page.page_title, page.page_namespace, project.namespaces) %}
+                    <tr>
+                        <td class="sort-entry--edits" data-value="{{ page.count }}">
+                            {{ page.count|num_format }}
                         </td>
-                    {% endif %}
-                    <td>
-                        {{ wiki.pageLogLinkRaw(page.page_title_ns, project) }}
-                        &middot;
-                        <a href="{{ path('ArticleInfoResult', {project:project.domain, page:page.page_title_ns}) }}">{{ msg('tool-articleinfo') }}</a>
-                        &middot;
-                        <a href="{{ path('TopEditsResultPage', {project:project.domain, username:user.username, namespace:page.page_namespace, page:page.page_title}) }}" >{{ msg('tool-topedits') }}</a>
-                    </td>
-                </tr>
+                        <td class="sort-entry--page display-title" data-value="{{ pageTitle }}">
+                            {{ wiki.pageLinkRaw(pageTitle, project) }}
+                        </td>
+                        {% if showPageAssessment %}
+                            <td class="sort-entry--assessment" data-value="{{ page.pa_class ? page.pa_class : 'Unknown' }}">
+                                {% set badge = project.pageAssessments.badgeURL(page.pa_class) %}
+                                {% if badge is defined %}
+                                    <img alt="{{ page.pa_class }}" src="{{ badge }}" class="assessment-badge" />
+                                {% endif %}
+                                {{ page.pa_class ? page.pa_class : msg('unknown') }}
+                            </td>
+                        {% endif %}
+                        <td>
+                            {{ wiki.pageLogLinkRaw(pageTitle, project) }}
+                            &middot;
+                            <a href="{{ path('ArticleInfoResult', {project:project.domain, page:pageTitle}) }}">{{ msg('tool-articleinfo') }}</a>
+                            &middot;
+                            <a href="{{ path('TopEditsResultPage', {project:project.domain, username:user.username, namespace:page.page_namespace, page:page.page_title}) }}" >{{ msg('tool-topedits') }}</a>
+                        </td>
+                    </tr>
                 {% endfor %}
                 {% if pages|length >= 10 and te.topEdits|length > 1 %}
                     <tr>
@@ -108,32 +109,34 @@
             {% set hasNext = te.offset + 1 < numPages %}
             {% set pathVars = {'project': project.domain, 'username': user.username, 'namespace': te.namespace} %}
 
-            <nav aria-label="...">
-                <ul class="pagination xt-pagination">
-                    <li{% if not(hasPrev) %} class="disabled"{% endif %}>
-                        {% if hasPrev %}
-                        <a href="{{ path('TopEditsResultNamespace', pathVars|merge({'offset': te.offset - 1})) }}" aria-label="Previous">
-                            {% endif %}
-                            <span aria-hidden="true">&laquo;</span>
-                            {% if hasPrev %}</a>{% endif %}
-                    </li>
-                    {% for page in 1..numPages %}
-                        {% set active = te.offset == loop.index0 %}
-                        <li{% if active %} class="active"{% endif %}>
-                            <a href="{{ path('TopEditsResultNamespace', pathVars|merge({'offset': loop.index0})) }}">
-                                {{ page }} {% if active %}<span class="sr-only">(current)</span>{% endif %}
-                            </a>
+            {% if hasNext or hasPrev %}
+                <nav aria-label="...">
+                    <ul class="pagination xt-pagination">
+                        <li{% if not(hasPrev) %} class="disabled"{% endif %}>
+                            {% if hasPrev %}
+                            <a href="{{ path('TopEditsResultNamespace', pathVars|merge({'offset': te.offset - 1})) }}" aria-label="Previous">
+                                {% endif %}
+                                <span aria-hidden="true">&laquo;</span>
+                                {% if hasPrev %}</a>{% endif %}
                         </li>
-                    {% endfor %}
-                    <li{% if not(hasNext) %} class="disabled"{% endif %}>
-                        {% if hasNext %}
-                        <a href="{{ path('TopEditsResultNamespace', pathVars|merge({'offset': te.offset + 1})) }}" aria-label="Next">
-                            {% endif %}
-                            <span aria-hidden="true">&raquo;</span>
-                            {% if hasNext %}</a>{% endif %}
-                    </li>
-                </ul>
-            </nav>
+                        {% for page in 1..numPages %}
+                            {% set active = te.offset == loop.index0 %}
+                            <li{% if active %} class="active"{% endif %}>
+                                <a href="{{ path('TopEditsResultNamespace', pathVars|merge({'offset': loop.index0})) }}">
+                                    {{ page }} {% if active %}<span class="sr-only">(current)</span>{% endif %}
+                                </a>
+                            </li>
+                        {% endfor %}
+                        <li{% if not(hasNext) %} class="disabled"{% endif %}>
+                            {% if hasNext %}
+                            <a href="{{ path('TopEditsResultNamespace', pathVars|merge({'offset': te.offset + 1})) }}" aria-label="Next">
+                                {% endif %}
+                                <span aria-hidden="true">&raquo;</span>
+                                {% if hasNext %}</a>{% endif %}
+                        </li>
+                    </ul>
+                </nav>
+            {% endif %}
         {% endif %}
         {% endset %}
 

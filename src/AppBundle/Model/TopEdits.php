@@ -296,28 +296,27 @@ class TopEdits extends Model
     }
 
     /**
-     * Format the results returned from the database.
-     * @param array $pages As returned by TopEditsRepository::getTopEditsNamespace
-     *   or TopEditsRepository::getTopEditsAllNamespaces.
-     * @return string[] Same as input but with 'displaytitle' and 'page_title_ns'.
+     * Format the results to be keyed by namespace.
+     * @param array $pages As returned by TopEditsRepository::getTopEditsNamespace()
+     *   or TopEditsRepository::getTopEditsAllNamespaces().
+     * @return array Same results but keyed by namespace.
      */
     private function formatTopPagesNamespace(array $pages): array
     {
         /** @var string[] $topEditedPages The top edited pages, keyed by namespace ID. */
         $topEditedPages = [];
 
-        /** @var string[] $displayTitles Display titles of the pages, which need to be fetched ahead of time. */
-        $displayTitles = $this->getDisplayTitles($pages);
-
         foreach ($pages as $page) {
-            $nsId = (int) $page['page_namespace'];
-            $nsTitle = $nsId > 0 ? $this->project->getNamespaces()[$page['page_namespace']] . ':' : '';
-            $pageTitle = $nsTitle . $page['page_title'];
-            $page['displaytitle'] = $displayTitles[$pageTitle];
+            $nsId = (int)$page['page_namespace'];
 
-            // $page['page_title'] is retained without the namespace
-            //  so we can link to TopEdits for that page.
-            $page['page_title_ns'] = $pageTitle;
+            // FIXME: needs refactoring, done in PagesController::getPagepileResult() and AppExtension::titleWithNs().
+            if (0 === $nsId) {
+                $page['page_title_ns'] = $page['page_title'];
+            } else {
+                $page['page_title_ns'] = (
+                    $this->project->getNamespaces()[$page['page_namespace']] ?? ''
+                ).':'.$page['page_title'];
+            }
 
             if (isset($topEditedPages[$nsId])) {
                 $topEditedPages[$nsId][] = $page;
@@ -327,25 +326,5 @@ class TopEdits extends Model
         }
 
         return $topEditedPages;
-    }
-
-    /**
-     * Get the display titles of the given pages.
-     * @param string[] $topPages As returned by $this->getRepository()->getTopEdits()
-     * @return string[] Keys are the original supplied titles, and values are the display titles.
-     */
-    private function getDisplayTitles(array $topPages): array
-    {
-        $namespaces = $this->project->getNamespaces();
-
-        // First extract page titles including namespace.
-        $pageTitles = array_map(function ($page) use ($namespaces) {
-            // If non-mainspace, prepend namespace to the titles.
-            $ns = $page['page_namespace'];
-            $nsTitle = $ns > 0 ? $namespaces[$page['page_namespace']] . ':' : '';
-            return $nsTitle . $page['page_title'];
-        }, $topPages);
-
-        return $this->getRepository()->getDisplayTitles($this->project, $pageTitles);
     }
 }

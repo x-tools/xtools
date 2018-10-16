@@ -521,21 +521,23 @@ class PageRepository extends Repository
      * @return string[] Keys are the original supplied title, and values are the display titles.
      * @static
      */
-    public static function displayTitles(Project $project, array $pageTitles): array
+    public function displayTitles(Project $project, array $pageTitles): array
     {
-        $api = $project->getApi();
+        $client = $this->container->get('guzzle.client.xtools');
+
         $displayTitles = [];
         $numPages = count($pageTitles);
 
         for ($n = 0; $n < $numPages; $n += 50) {
             $titleSlice = array_slice($pageTitles, $n, 50);
-            $params = [
+            $res = $client->request('GET', $project->getApiUrl(), ['query' => [
+                'action' => 'query',
                 'prop' => 'info|pageprops',
                 'inprop' => 'displaytitle',
                 'titles' => join('|', $titleSlice),
-            ];
-            $query = new SimpleRequest('query', $params);
-            $result = $api->postRequest($query);
+                'format' => 'json',
+            ]]);
+            $result = json_decode($res->getBody()->getContents(), true);
 
             // Extract normalization info.
             $normalized = [];

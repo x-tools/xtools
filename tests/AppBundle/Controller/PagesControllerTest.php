@@ -47,6 +47,9 @@ class PagesControllerTest extends ControllerTestAdapter
             '/pages/en.wikipedia/Example',
             '/pages/en.wikipedia/Example/0',
             '/pages/en.wikipedia/Example/0/noredirects/all/5',
+            '/pages/en.wikipedia/Foobar/0/noredirects/all/5?format=wikitext',
+            '/pages/en.wikipedia/Foobar/0/noredirects/all/5?format=csv',
+            '/pages/en.wikipedia/Foobar/0/noredirects/all/5?format=tsv',
             '/api/user/pages_count/en.wikipedia/Example/0/noredirects/deleted',
         ]);
     }

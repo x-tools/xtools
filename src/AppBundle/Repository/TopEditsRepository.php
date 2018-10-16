@@ -252,15 +252,4 @@ class TopEditsRepository extends Repository
             'username' => $user->getUsername(),
         ])->fetchAll();
     }
-
-    /**
-     * Get the display titles of the given pages.
-     * @param Project $project
-     * @param string[] $titles List of page titles.
-     * @return string[] Keys are the original supplied titles, and values are the display titles.
-     */
-    public function getDisplayTitles(Project $project, array $titles): array
-    {
-        return PageRepository::displayTitles($project, $titles);
-    }
 }

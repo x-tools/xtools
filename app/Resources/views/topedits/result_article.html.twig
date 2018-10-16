@@ -33,9 +33,7 @@
                         <tr>
                             <td>{{ msg('article') }}</td>
                             <td>
-                                <span class="display-title">
-                                    {{ wiki.pageLink(page, page.displaytitle|raw) }}
-                                </span>
+                                {{ wiki.pageLink(page, page.title) }}
                                 <small>({{ wiki.pageLogLink(page) }}
                                 &middot; <a href="{{ path('ArticleInfoResult', {project:project.domain, page:page.title}) }}">{{ msg('tool-articleinfo') }}</a>)</small>
                             </td>

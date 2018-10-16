@@ -204,7 +204,9 @@ class PagesController extends XtoolsController
                 if (0 === (int)$page['namespace']) {
                     $pageTitles[] = $page['page_title'];
                 } else {
-                    $pageTitles[] = $namespaces[$page['namespace']].':'.$page['page_title'];
+                    $pageTitles[] = (
+                        $namespaces[$page['namespace']] ?? $this->i18n->msg('unknown')
+                    ).':'.$page['page_title'];
                 }
             }
         }

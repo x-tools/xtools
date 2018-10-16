@@ -378,12 +378,12 @@ class Edit extends Model
 
     /**
      * Was the edit (semi-)automated, based on the edit summary?
-     * @param  ContainerInterface $container [description]
+     * @param ContainerInterface $container [description]
      * @return bool
      */
     public function isAutomated(ContainerInterface $container): bool
     {
-        return (bool) $this->getTool($container);
+        return (bool)$this->getTool($container);
     }
 
     /**

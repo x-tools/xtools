@@ -56,8 +56,8 @@ class Project extends Model
      */
     public function hasPageAssessments($nsId = null): bool
     {
-        if (null !== $nsId && $nsId > 0) {
-            return $this->pageAssessments->isSupportedNamespace($nsId);
+        if (null !== $nsId && (int)$nsId > 0) {
+            return $this->pageAssessments->isSupportedNamespace((int)$nsId);
         } else {
             return $this->pageAssessments->isEnabled();
         }
