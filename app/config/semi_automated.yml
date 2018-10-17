@@ -87,7 +87,7 @@ parameters:
             link: Project:ReFill
         WikiLove:
             tag: wikilove
-            link: Special:MyLanguage/Extension:WikiLove
+            link: mw:Special:MyLanguage/Extension:WikiLove
         Content translation:
             tag: contenttranslation
             regex: 'Created by translating the page'

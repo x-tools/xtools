@@ -9,7 +9,6 @@ namespace AppBundle\Repository;
 
 use AppBundle\Model\Project;
 use AppBundle\Model\User;
-use Symfony\Component\Config\Definition\Exception\Exception;
 
 /**
  * AutoEditsRepository is responsible for retrieving data from the database
@@ -355,10 +354,10 @@ class AutoEditsRepository extends UserRepository
 
             $toolname = $conn->quote($toolname, \PDO::PARAM_STR);
 
-            // Developer error, no regex or tag provided for this tool.
+            // No regex or tag provided for this tool. This can happen for tag-only tools that are in the global
+            // configuration, but no local tag exists on the said project.
             if ('' === $condTool) {
-                throw new Exception("No regex or tag found for the tool $toolname. " .
-                    "Please verify this entry in semi_automated.yml");
+                continue;
             }
 
             $queries[] .= "
