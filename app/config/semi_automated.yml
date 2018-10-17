@@ -89,7 +89,7 @@ parameters:
             tag: wikilove
             link: Special:MyLanguage/Extension:WikiLove
         Content translation:
-            tag: ContentTranslation
+            tag: contenttranslation
             regex: 'Created by translating the page'
             link: mw:Special:MyLanguage/Content translation
             contribs: true
