@@ -69,7 +69,7 @@ class AutoEditsRepository extends UserRepository
         [$condBegin, $condEnd] = $this->getRevTimestampConditions($start, $end);
 
         // Get the combined regex and tags for the tools
-        [$regex, $tags] = $this->getToolRegexAndTags($project);
+        [$regex, $tagIds] = $this->getToolRegexAndTags($project);
 
         [$pageJoin, $condNamespace] = $this->getPageAndNamespaceSql($project, $namespace);
 
@@ -85,9 +85,9 @@ class AutoEditsRepository extends UserRepository
             $condTools[] = "rev_comment REGEXP :tools";
             $params['tools'] = $regex;
         }
-        if ('' != $tags) {
-            $tagJoin = '' != $tags ? "LEFT OUTER JOIN $tagTable ON ct_rev_id = rev_id" : '';
-            $condTools[] = "ct_tag IN ($tags)";
+        if ('' != $tagIds) {
+            $tagJoin = "LEFT OUTER JOIN $tagTable ON ct_rev_id = rev_id";
+            $condTools[] = "ct_tag_id IN ($tagIds)";
         }
         $condTool = 'AND (' . implode(' OR ', $condTools) . ')';
 
@@ -135,14 +135,14 @@ class AutoEditsRepository extends UserRepository
         [$condBegin, $condEnd] = $this->getRevTimestampConditions($start, $end, 'revs.');
 
         // Get the combined regex and tags for the tools
-        [$regex, $tags] = $this->getToolRegexAndTags($project, true);
+        [$regex, $tagIds] = $this->getToolRegexAndTags($project, true);
 
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
         $tagTable = $project->getTableName('change_tag');
         $condNamespace = 'all' === $namespace ? '' : 'AND page_namespace = :namespace';
-        $condTag = '' != $tags ? "AND NOT EXISTS (SELECT 1 FROM $tagTable
-            WHERE ct_rev_id = revs.rev_id AND ct_tag IN ($tags))" : '';
+        $condTag = '' != $tagIds ? "AND NOT EXISTS (SELECT 1 FROM $tagTable
+            WHERE ct_rev_id = revs.rev_id AND ct_tag_id IN ($tagIds))" : '';
         $sql = "SELECT
                     page_title,
                     page_namespace,
@@ -208,30 +208,30 @@ class AutoEditsRepository extends UserRepository
         }
 
         // Get the combined regex and tags for the tools
-        [$regex, $tags] = $this->getToolRegexAndTags($project, false, $tool);
+        [$regex, $tagIds] = $this->getToolRegexAndTags($project, false, $tool);
 
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
         $tagTable = $project->getTableName('change_tag');
         $condNamespace = 'all' === $namespace ? '' : 'AND page_namespace = :namespace';
-        $tagJoin = '' != $tags ? "LEFT OUTER JOIN $tagTable ON (ct_rev_id = revs.rev_id)" : '';
+        $tagJoin = '' != $tagIds ? "LEFT OUTER JOIN $tagTable ON (ct_rev_id = revs.rev_id)" : '';
 
         $condTag = '';
-        if ('' != $tags) {
+        if ('' != $tagIds) {
             if ($this->usesSingleTag($project, $tool)) {
                 // Only show edits made with the tool that don't overlap with other tools.
                 // For instance, Huggle edits are also tagged as Rollback, but when viewing
                 // Rollback edits we don't want to show Huggle edits.
                 $condTag = "
                     OR EXISTS (
-                        SELECT ct_tag, COUNT(ct_tag) AS tag_count
+                        SELECT COUNT(ct_tag_id) AS tag_count
                         FROM $tagTable
                         WHERE ct_rev_id = revs.rev_id
-                        HAVING tag_count = 1 AND ct_tag = $tags
+                        HAVING tag_count = 1 AND ct_tag_id = $tagIds
                     )
                 ";
             } else {
-                $condTag = "OR ct_tag IN ($tags)";
+                $condTag = "OR ct_tag_id IN ($tagIds)";
             }
         }
 
@@ -351,7 +351,7 @@ class AutoEditsRepository extends UserRepository
         $conn = $this->getProjectsConnection();
 
         foreach ($tools as $toolname => $values) {
-            [$condTool, $tagJoin] = $this->getInnerAutomatedCountsSql($tagTable, $values);
+            [$condTool, $tagJoin] = $this->getInnerAutomatedCountsSql($project, $tagTable, $values);
 
             $toolname = $conn->quote($toolname, \PDO::PARAM_STR);
 
@@ -379,11 +379,12 @@ class AutoEditsRepository extends UserRepository
 
     /**
      * Get some of the inner SQL for self::getAutomatedCountsSql().
+     * @param Project $project
      * @param string $tagTable Name of the `change_tag` table.
      * @param string[] $values Values as defined in semi_automated.yml
      * @return string[] [Equality clause, JOIN clause]
      */
-    private function getInnerAutomatedCountsSql(string $tagTable, array $values): array
+    private function getInnerAutomatedCountsSql(Project $project, string $tagTable, array $values): array
     {
         $conn = $this->getProjectsConnection();
         $tagJoin = '';
@@ -393,19 +394,20 @@ class AutoEditsRepository extends UserRepository
             $regex = $conn->quote($values['regex'], \PDO::PARAM_STR);
             $condTool = "rev_comment REGEXP $regex";
         }
-        if (isset($values['tag'])) {
+        if (isset($values['tag']) && isset($this->getTags($project)[$values['tag']])) {
             $tagJoin = "LEFT OUTER JOIN $tagTable ON ct_rev_id = rev_id";
-            $tag = $conn->quote($values['tag'], \PDO::PARAM_STR);
+
+            $tagId = $this->getTags($project)[$values['tag']];
 
             // This ensures we count only edits made with the given tool, and not other
             // edits that incidentally have the same tag. For instance, Huggle edits
             // are also tagged as Rollback, but we want to make them mutually exclusive.
             $tagClause = "
                 EXISTS (
-                    SELECT ct_tag, COUNT(ct_tag) AS tag_count
+                    SELECT COUNT(ct_tag_id) AS tag_count
                     FROM $tagTable
                     WHERE ct_rev_id = rev_id
-                    HAVING tag_count = 1 AND ct_tag = $tag
+                    HAVING tag_count = 1 AND ct_tag_id = $tagId
                 )";
 
             // Use tags in addition to the regex clause, if already present.
@@ -426,14 +428,14 @@ class AutoEditsRepository extends UserRepository
      * @param Project $project
      * @param bool $nonAutoEdits Set to true to exclude tools with the 'contribs' flag.
      * @param string|null $tool
-     * @return string[] In the format: ['combined|regex', 'combined,tags']
+     * @return array In the format: ['combined|regex', [1,2,3]] where the second element contains the tag IDs.
      */
     private function getToolRegexAndTags(Project $project, bool $nonAutoEdits = false, ?string $tool = null): array
     {
-        $conn = $this->getProjectsConnection();
         $tools = $this->getTools($project);
         $regexes = [];
-        $tags = [];
+        $allTagIds = $this->getTags($project);
+        $tagIds = [];
 
         if ('' != $tool) {
             $tools = [$tools[$tool]];
@@ -447,14 +449,48 @@ class AutoEditsRepository extends UserRepository
             if (isset($values['regex'])) {
                 $regexes[] = $values['regex'];
             }
-            if (isset($values['tag'])) {
-                $tags[] = $conn->quote($values['tag'], \PDO::PARAM_STR);
+            if (isset($values['tag']) && isset($allTagIds[$values['tag']])) {
+                $tagIds[] = $allTagIds[$values['tag']];
             }
         }
 
         return [
             implode('|', $regexes),
-            implode(',', $tags),
+            implode(',', $tagIds),
         ];
+    }
+
+    /**
+     * Get the IDs of tags for given Project, which are used in the IN clauses of other queries above.
+     * This join decomposition is actually faster than JOIN'ing on change_tag_def all in one query.
+     * @param Project $project
+     * @return int[]
+     */
+    public function getTags(Project $project): array
+    {
+        // Set up cache.
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ae_tag_ids');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $conn = $this->getProjectsConnection();
+
+        // Get all tag values.
+        $tags = [];
+        foreach (array_values($this->getTools($project)) as $values) {
+            if (isset($values['tag'])) {
+                $tags[] = $conn->quote($values['tag'], \PDO::PARAM_STR);
+            }
+        }
+
+        $tags = implode(',', $tags);
+        $tagDefTable = $project->getTableName('change_tag_def');
+        $sql = "SELECT ctd_name, ctd_id FROM $tagDefTable
+                WHERE ctd_name IN ($tags)";
+        $result = $this->executeProjectsQuery($sql)->fetchAll(\PDO::FETCH_KEY_PAIR);
+
+        // Cache and return.
+        return $this->setCache($cacheKey, $result);
     }
 }
