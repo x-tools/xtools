@@ -33,7 +33,7 @@ class PageAssessments extends Model
      * Get page assessments configuration for the Project and cache in static variable.
      * @return string[][][]|false As defined in config/assessments.yml, or false if none exists.
      */
-    public function getConfig(): array
+    public function getConfig()
     {
         if (!isset($this->config)) {
             return $this->config = $this->getRepository()->getConfig($this->project);

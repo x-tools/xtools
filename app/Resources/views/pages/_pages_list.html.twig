@@ -51,7 +51,7 @@
                 {% set maxRows = 50 %}
                 {% for page in pages.results[ns] if not(multiNamspace) or (index < maxRows and multiNamspace) %}
                     {% set index = index + 1 %}
-                    {% set pagename = (nsName(ns, project.namespaces) ~ ':' ~ page.page_title)|trim(':') %}
+                    {% set pagename = titleWithNs(page.page_title, ns, project.namespaces) %}
                     <tr>
                         <td>{{ index|num_format }}</td>
                         <td class="sort-entry--page-title" data-value="{{ pagename }}">

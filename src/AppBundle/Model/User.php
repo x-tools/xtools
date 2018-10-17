@@ -79,16 +79,18 @@ class User extends Model
     /**
      * Get the user's registration date on the given project.
      * @param Project $project
-     * @return DateTime|false False if no registration date was found.
+     * @return DateTime|null null if no registration date was found.
      */
-    public function getRegistrationDate(Project $project)
+    public function getRegistrationDate(Project $project): ?DateTime
     {
         $ret = $this->getRepository()->getIdAndRegistration(
             $project->getDatabaseName(),
             $this->getUsername()
         );
 
-        return DateTime::createFromFormat('YmdHis', $ret['regDate']);
+        return null !== $ret['regDate']
+            ? DateTime::createFromFormat('YmdHis', $ret['regDate'])
+            : null;
     }
 
     /**

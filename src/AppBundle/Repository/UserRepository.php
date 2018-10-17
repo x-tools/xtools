@@ -63,7 +63,7 @@ class UserRepository extends Repository
      * Get the user's registration date.
      * @param string $databaseName The database to query.
      * @param string $username The username to find.
-     * @return string|null As returned by the database.
+     * @return string|null As returned by the database. Some very old accounts may return null.
      */
     public function getRegistrationDate(string $databaseName, string $username): ?string
     {
@@ -158,9 +158,9 @@ class UserRepository extends Repository
 
     /**
      * Get information about the currently-logged in user.
-     * @return array
+     * @return array|null null if not logged in.
      */
-    public function getXtoolsUserInfo(): array
+    public function getXtoolsUserInfo(): ?array
     {
         /** @var Session $session */
         $session = $this->container->get('session');

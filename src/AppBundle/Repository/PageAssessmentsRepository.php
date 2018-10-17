@@ -25,12 +25,7 @@ class PageAssessmentsRepository extends Repository
     public function getConfig(Project $project)
     {
         $projectsConfig = $this->container->getParameter('assessments');
-
-        if (isset($projectsConfig[$project->getDomain()])) {
-            return $projectsConfig[$project->getDomain()];
-        } else {
-            return false;
-        }
+        return $projectsConfig[$project->getDomain()] ?? false;
     }
 
     /**
