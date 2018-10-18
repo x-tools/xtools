@@ -233,7 +233,7 @@ class UserRights extends Model
                 try {
                     [$old, $new] = explode("\n", $row['log_params']);
                     $old = array_filter(array_map('trim', explode(',', $old)));
-                    $new = array_filter(array_map('trim', explode(',', $new)));
+                    $new = array_filter(array_map('trim', explode(',', (string)$new)));
                     $added = array_diff($new, $old);
                     $removed = array_diff($old, $new);
                 } catch (Exception $e) {
