@@ -490,13 +490,11 @@ class AppExtension extends Twig_Extension
 
     /**
      * Get the currently logged in user's details.
-     * @return string[]|null
+     * @return string[]|object|null
      */
-    public function loggedInUser(): ?array
+    public function loggedInUser()
     {
-        return null !== $this->container->get('session')->get('logged_in_user')
-            ? (array)$this->container->get('session')->get('logged_in_user')
-            : null;
+        return $this->container->get('session')->get('logged_in_user');
     }
 
     /*********************************** FILTERS ***********************************/

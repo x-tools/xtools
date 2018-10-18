@@ -158,9 +158,9 @@ class UserRepository extends Repository
 
     /**
      * Get information about the currently-logged in user.
-     * @return array|null null if not logged in.
+     * @return array|object|null null if not logged in.
      */
-    public function getXtoolsUserInfo(): ?array
+    public function getXtoolsUserInfo()
     {
         /** @var Session $session */
         $session = $this->container->get('session');
