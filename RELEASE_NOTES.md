@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.6.4 ##
+- Production hotfix: handle newly created pages that aren't yet in the replicas
+  in the ArticleInfo API endpoint.
+
 ## 3.6.3 ##
 - Production hotfix: ensure AppExtension::loggedInUser() returns ?array
 
