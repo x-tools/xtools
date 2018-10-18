@@ -494,7 +494,9 @@ class AppExtension extends Twig_Extension
      */
     public function loggedInUser(): ?array
     {
-        return $this->container->get('session')->get('logged_in_user');
+        return null !== $this->container->get('session')->get('logged_in_user')
+            ? (array)$this->container->get('session')->get('logged_in_user')
+            : null;
     }
 
     /*********************************** FILTERS ***********************************/
