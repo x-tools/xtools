@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.6.1 ##
+- Production hotfix: only pass strings to AutomatedEditsHelper::getTool().
+
 ## 3.6.0 ##
 - T188699: Upgrade to Symfony 4.1; directory restructure and removal of unused
   bundles. Put all classes in PHP 7.2 strict mode.
