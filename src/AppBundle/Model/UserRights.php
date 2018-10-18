@@ -50,7 +50,7 @@ class UserRights extends Model
         if (false !== $acDate) {
             $this->rightsChanges[$acDate] = [
                 'logId' => null,
-                'admin' => null,
+                'performer' => null,
                 'comment' => null,
                 'added' => ['autoconfirmed'],
                 'removed' => [],
@@ -64,8 +64,7 @@ class UserRights extends Model
     }
 
     /**
-     * Checks the user rights log to see whether the user is an admin
-     * or used to be one.
+     * Checks the user rights log to see whether the user is an admin or used to be one.
      * @return string|false One of false (never an admin), 'current' or 'former'.
      */
     public function getAdminStatus()
@@ -255,7 +254,7 @@ class UserRights extends Model
 
             $rightsChanges[$row['log_timestamp']] = [
                 'logId' => $row['log_id'],
-                'admin' => 'autopromote' === $row['log_action'] ? null : $row['log_user_text'],
+                'performer' => 'autopromote' === $row['log_action'] ? null : $row['log_user_text'],
                 'comment' => $row['log_comment'],
                 'added' => array_values($added),
                 'removed' => array_values($removed),
@@ -295,7 +294,7 @@ class UserRights extends Model
             } else {
                 $rightsChanges[$expiry] = [
                     'logId' => $row['log_id'],
-                    'admin' => $row['log_user_text'],
+                    'performer' => $row['log_user_text'],
                     'comment' => null,
                     'added' => [],
                     'removed' => [$entry],

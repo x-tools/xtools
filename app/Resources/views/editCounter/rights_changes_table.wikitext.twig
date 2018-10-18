@@ -1,6 +1,6 @@
 {| class="wikitable sortable"
 |-
-{% for key in ['date', 'rights', 'admin', 'summary'] %}
+{% for key in ['date', 'rights', 'performer', 'summary'] %}
 ! {{ msg(key)|capitalize_first }}
 {% endfor %}
 {% for timestamp, change in rightsChanges %}
@@ -24,7 +24,7 @@
 <span style="color:#8B0000">-{{ ec.rightsName(right)|trim }}</span>{% if not loop.last %}, {% endif %}
 {% endfor %}
 
-|{% if change.admin is not empty %} <span class="plainlinks">[{% verbatim %}{{{% endverbatim %}fullurl:User:{{ change.admin }}}} {{ change.admin }}]</span>{% endif %}
+|{% if change.performer is not empty %} <span class="plainlinks">[{% verbatim %}{{{% endverbatim %}fullurl:User:{{ change.performer }}}} {{ change.performer }}]</span>{% endif %}
 
 | {% if change.grantType == 'manual' %}{{ change.comment }}{% else %}''{{ msg('automatic') }}''{% endif %}
 

@@ -2,7 +2,7 @@
 
 <table class="table table-bordered table-hover table-striped rightschanges-table">
     <thead>
-        {% for key in ['date', 'rights', 'admin', 'summary'] %}
+        {% for key in ['date', 'rights', 'performer', 'summary'] %}
             <th>
                 <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
                     {{ msg(key)|capitalize_first }}
@@ -30,8 +30,8 @@
                         <div class="diff-neg" dir="ltr">-{{ ec.rightsName(right)|trim }}</div>
                     {% endfor %}
                 </td>
-                <td class="{{ change.grantType == 'pending' ? 'pending ' : '' }}sort-entry--admin" data-value="{{ change.admin }}">
-                    {{ wiki.userLink(change.admin, change.type == 'local' ? project : metaProject) }}
+                <td class="{{ change.grantType == 'pending' ? 'pending ' : '' }}sort-entry--performer" data-value="{{ change.performer }}">
+                    {{ wiki.userLink(change.performer, change.type == 'local' ? project : metaProject) }}
                 </td>
                 <td class="sort-entry--summary" data-value="{{ change.comment }}">
                     {% if change.grantType == 'manual' %}
