@@ -1,5 +1,14 @@
 # Release Notes #
 
+## 3.6.0 ##
+- T188699: Upgrade to Symfony 4.1; directory restructure and removal of unused
+  bundles. Put all classes in PHP 7.2 strict mode.
+- T199839: update queries in AutoEdits to use new change tag schema
+- T205655: Change 'admin' heading in the user rights low to 'performer'.
+- Various other bug fixes and code cleanup.
+- Log fatal errors to dedicated file.
+- Localization updates.
+
 ## 3.5.0 ##
 - Upgrade to PHP 7.2, set as the minimum requirement.
 - Use Webpack for asset management.
