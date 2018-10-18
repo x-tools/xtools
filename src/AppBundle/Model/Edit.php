@@ -373,7 +373,7 @@ class Edit extends Model
     public function getTool(ContainerInterface $container)
     {
         $automatedEditsHelper = $container->get('app.automated_edits_helper');
-        return $automatedEditsHelper->getTool($this->comment, $this->getProject());
+        return $automatedEditsHelper->getTool((string)$this->comment, $this->getProject());
     }
 
     /**
