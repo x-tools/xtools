@@ -215,22 +215,21 @@ class AutoEditsRepository extends UserRepository
         $condNamespace = 'all' === $namespace ? '' : 'AND page_namespace = :namespace';
         $tagJoin = '' != $tagIds ? "LEFT OUTER JOIN $tagTable ON (ct_rev_id = revs.rev_id)" : '';
 
-        $condTag = '';
+        $condsTool = '' != $regex ? ['revs.rev_comment RLIKE :tools'] : [];
         if ('' != $tagIds) {
             if ($this->usesSingleTag($project, $tool)) {
                 // Only show edits made with the tool that don't overlap with other tools.
                 // For instance, Huggle edits are also tagged as Rollback, but when viewing
                 // Rollback edits we don't want to show Huggle edits.
-                $condTag = "
-                    OR EXISTS (
+                $condsTool[] = "
+                    EXISTS (
                         SELECT COUNT(ct_tag_id) AS tag_count
                         FROM $tagTable
                         WHERE ct_rev_id = revs.rev_id
                         HAVING tag_count = 1 AND ct_tag_id = $tagIds
-                    )
-                ";
+                    )";
             } else {
-                $condTag = "OR ct_tag_id IN ($tagIds)";
+                $condsTool[] = "ct_tag_id IN ($tagIds)";
             }
         }
 
@@ -251,10 +250,7 @@ class AutoEditsRepository extends UserRepository
                 $condBegin
                 $condEnd
                 $condNamespace
-                AND (
-                    revs.rev_comment RLIKE :tools
-                    $condTag
-                )
+                AND (".implode(' OR ', $condsTool).")
                 GROUP BY revs.rev_id
                 ORDER BY revs.rev_timestamp DESC
                 LIMIT 50
