@@ -45,8 +45,7 @@ parameters:
                 - huggle
             regex: '^(Undid|Undo|\[\[WP:UNDO\|Undid\]\]) revision \d+ by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\]'
             link: Special:MyLanguage/Project:Undo
-            # This is not considered a revert because you can undo
-            # any arbitrary revision, not just the previous one.
+            # This is not considered a revert because you can undo any arbitrary revision, not just the previous one.
         Redirect:
             tag: mw-new-redirect
             link: mw:Special:MyLanguage/Help:Redirects

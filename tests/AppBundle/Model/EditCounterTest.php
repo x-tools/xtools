@@ -617,7 +617,7 @@ class EditCounterTest extends TestAdapter
         static::assertEquals([
             20180108132858 => [
                 'logId' => '210220',
-                'admin' => 'MusikAnimal',
+                'performer' => 'MusikAnimal',
                 'comment' => null,
                 'added' => [],
                 'removed' => ['ipblock-exempt', 'filemover'],
@@ -626,7 +626,7 @@ class EditCounterTest extends TestAdapter
             ],
             20180108132810 => [
                 'logId' => '210221',
-                'admin' => 'MusikAnimal',
+                'performer' => 'MusikAnimal',
                 'comment' => '',
                 'added' => [],
                 'removed' => ['templateeditor'],
@@ -635,7 +635,7 @@ class EditCounterTest extends TestAdapter
             ],
             20180108132758 => [
                 'logId' => '210220',
-                'admin' => 'MusikAnimal',
+                'performer' => 'MusikAnimal',
                 'comment' => '',
                 'added' => ['ipblock-exempt', 'filemover', 'templateeditor'],
                 'removed' => [],
@@ -644,7 +644,7 @@ class EditCounterTest extends TestAdapter
             ],
             20150716002614 => [
                 'logId' => '155321',
-                'admin' => 'Cyberpower678',
+                'performer' => 'Cyberpower678',
                 'comment' => 'Per user request.',
                 'added' => ['bureaucrat'],
                 'removed' => ['rollbacker'],
@@ -653,7 +653,7 @@ class EditCounterTest extends TestAdapter
             ],
             20141222034127 => [
                 'logId' => '140643',
-                'admin' => 'Snowolf',
+                'performer' => 'Snowolf',
                 'comment' => 'per request',
                 'added' => ['sysop'],
                 'removed' => [],
@@ -677,7 +677,7 @@ class EditCounterTest extends TestAdapter
         static::assertEquals([
             20141222034127 => [
                 'logId' => '140643',
-                'admin' => 'Snowolf',
+                'performer' => 'Snowolf',
                 'comment' => 'per request',
                 'added' => ['sysop'],
                 'removed' => [],
