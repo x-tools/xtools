@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.6.5 ##
+- Production hotfix: Allow user session getter to return object, array or null.
+
 ## 3.6.4 ##
 - Production hotfix: handle newly created pages that aren't yet in the replicas
   in the ArticleInfo API endpoint.
