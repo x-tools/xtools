@@ -138,7 +138,7 @@ class EditCounterController extends XtoolsController
         return $this->render('editCounter/index.html.twig', [
             'xtPageTitle' => 'tool-editcounter',
             'xtSubtitle' => 'tool-editcounter-desc',
-            'xtPage' => 'editcounter',
+            'xtPage' => 'EditCounter',
             'project' => $this->project,
             'sections' => $this->sections,
             'availableSections' => $this->getSectionNames(),
@@ -243,7 +243,7 @@ class EditCounterController extends XtoolsController
 
         $ret = [
             'xtTitle' => $this->user->getUsername() . ' - ' . $this->project->getTitle(),
-            'xtPage' => 'editcounter',
+            'xtPage' => 'EditCounter',
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
@@ -273,7 +273,7 @@ class EditCounterController extends XtoolsController
 
         $ret = [
             'xtTitle' => $this->user->getUsername(),
-            'xtPage' => 'editcounter',
+            'xtPage' => 'EditCounter',
             'is_sub_request' => $this->isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
@@ -308,7 +308,7 @@ class EditCounterController extends XtoolsController
 
         $ret = [
             'xtTitle' => $this->user->getUsername(),
-            'xtPage' => 'editcounter',
+            'xtPage' => 'EditCounter',
             'is_sub_request' => $this->isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
@@ -347,7 +347,7 @@ class EditCounterController extends XtoolsController
 
         $ret = [
             'xtTitle' => $this->user->getUsername(),
-            'xtPage' => 'editcounter',
+            'xtPage' => 'EditCounter',
             'is_sub_request' => $this->isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
@@ -383,7 +383,7 @@ class EditCounterController extends XtoolsController
 
         $ret = [
             'xtTitle' => $this->user->getUsername(),
-            'xtPage' => 'editcounter',
+            'xtPage' => 'EditCounter',
             'is_sub_request' => $this->isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
@@ -421,7 +421,7 @@ class EditCounterController extends XtoolsController
             ->getPage($this->project, $this->project->userOptInPage($this->user));
         $ret = [
             'xtTitle' => $this->user->getUsername(),
-            'xtPage' => 'editcounter',
+            'xtPage' => 'EditCounter',
             'is_sub_request' => $this->isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
@@ -457,7 +457,7 @@ class EditCounterController extends XtoolsController
 
         $ret = [
             'xtTitle' => $this->user->getUsername(),
-            'xtPage' => 'editcounter',
+            'xtPage' => 'EditCounter',
             'is_sub_request' => $this->isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
@@ -507,7 +507,7 @@ class EditCounterController extends XtoolsController
 
         return $this->render('editCounter/latest_global.html.twig', [
             'xtTitle' => $this->user->getUsername(),
-            'xtPage' => 'editcounter',
+            'xtPage' => 'EditCounter',
             'is_sub_request' => $this->isSubRequest,
             'user' => $this->user,
             'project' => $this->project,

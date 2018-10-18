@@ -48,7 +48,7 @@ class RfXVoteCalculatorController extends XtoolsController
             [
                 'xtPageTitle' => 'tool-rfxvote',
                 'xtSubtitle' => 'tool-rfxvote-desc',
-                'xtPage' => 'rfxvote',
+                'xtPage' => 'RfXVoteCalculator',
                 'project' => $this->project,
             ]
         );
@@ -196,7 +196,7 @@ class RfXVoteCalculatorController extends XtoolsController
         return $this->render(
             'rfxVoteCalculator/result.html.twig',
             [
-                'xtPage' => 'rfxvote',
+                'xtPage' => 'RfXVoteCalculator',
                 'xtTitle' => $this->user->getUsername(),
                 'user' => $this->user,
                 'project' => $this->project,

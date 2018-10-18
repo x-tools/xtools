@@ -95,7 +95,7 @@ class ArticleInfoRepository extends Repository
     public function getUsernamesFromIds(Project $project, array $userIds): array
     {
         $userTable = $project->getTableName('user');
-        $userIds = implode(',', array_filter($userIds));
+        $userIds = implode(',', array_unique(array_filter($userIds)));
         $sql = "SELECT user_id, user_name
                 FROM $userTable
                 WHERE user_id IN ($userIds)";

@@ -52,7 +52,7 @@ class ArticleInfoController extends XtoolsController
         }
 
         return $this->render('articleInfo/index.html.twig', array_merge([
-            'xtPage' => 'articleinfo',
+            'xtPage' => 'ArticleInfo',
             'xtPageTitle' => 'tool-articleinfo',
             'xtSubtitle' => 'tool-articleinfo-desc',
             'project' => $this->project,
@@ -172,7 +172,7 @@ class ArticleInfoController extends XtoolsController
         }
 
         $ret = [
-            'xtPage' => 'articleinfo',
+            'xtPage' => 'ArticleInfo',
             'xtTitle' => $this->page->getTitle(),
             'project' => $this->project,
             'editorlimit' => $this->request->query->get('editorlimit', 20),
@@ -220,7 +220,7 @@ class ArticleInfoController extends XtoolsController
         $limit = $isSubRequest ? 10 : null;
 
         return $this->getFormattedResponse('articleInfo/textshares', [
-            'xtPage' => 'articleinfo',
+            'xtPage' => 'ArticleInfo',
             'xtTitle' => $this->page->getTitle(),
             'textshares' => $articleInfo->getTextshares($limit),
             'is_sub_request' => $isSubRequest,

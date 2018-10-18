@@ -70,7 +70,7 @@ class TopEditsController extends XtoolsController
         return $this->render('topedits/index.html.twig', array_merge([
             'xtPageTitle' => 'tool-topedits',
             'xtSubtitle' => 'tool-topedits-desc',
-            'xtPage' => 'topedits',
+            'xtPage' => 'TopEdits',
 
             // Defaults that will get overriden if in $params.
             'namespace' => 0,
@@ -97,7 +97,7 @@ class TopEditsController extends XtoolsController
                 ->getPage($this->project, $this->project->userOptInPage($this->user));
 
             return $this->getFormattedResponse('topedits/result_namespace', [
-                'xtPage' => 'topedits',
+                'xtPage' => 'TopEdits',
                 'xtTitle' => $this->user->getUsername(),
                 'project' => $this->project,
                 'user' => $this->user,
@@ -121,7 +121,7 @@ class TopEditsController extends XtoolsController
         $topEdits->prepareData();
 
         $ret = [
-            'xtPage' => 'topedits',
+            'xtPage' => 'TopEdits',
             'xtTitle' => $this->user->getUsername(),
             'project' => $this->project,
             'user' => $this->user,
@@ -155,7 +155,7 @@ class TopEditsController extends XtoolsController
 
         // Send all to the template.
         return $this->getFormattedResponse('topedits/result_article', [
-            'xtPage' => 'topedits',
+            'xtPage' => 'TopEdits',
             'xtTitle' => $this->user->getUsername() . ' - ' . $this->page->getTitle(),
             'project' => $this->project,
             'user' => $this->user,

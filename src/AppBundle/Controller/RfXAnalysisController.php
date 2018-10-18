@@ -87,7 +87,7 @@ class RfXAnalysisController extends XtoolsController
             [
                 'xtPageTitle' => 'tool-rfx',
                 'xtSubtitle' => 'tool-rfx-desc',
-                'xtPage' => 'rfx',
+                'xtPage' => 'RfXAnalysis',
                 'project' => $projectQuery,
                 'available' => $projectFields,
             ]
@@ -164,7 +164,7 @@ class RfXAnalysisController extends XtoolsController
             'rfxAnalysis/result.html.twig',
             [
                 'xtTitle' => $this->user->getUsername(),
-                'xtPage' => 'rfx',
+                'xtPage' => 'RfXAnalysis',
                 'project' => $this->project,
                 'user' => $this->user,
                 'page' => $page,

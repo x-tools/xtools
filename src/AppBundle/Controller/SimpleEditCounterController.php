@@ -66,7 +66,7 @@ class SimpleEditCounterController extends XtoolsController
         return $this->render('simpleEditCounter/index.html.twig', array_merge([
             'xtPageTitle' => 'tool-simpleeditcounter',
             'xtSubtitle' => 'tool-simpleeditcounter-desc',
-            'xtPage' => 'simpleeditcounter',
+            'xtPage' => 'SimpleEditCounter',
             'project' => $this->project,
 
             // Defaults that will get overridden if in $params.
@@ -110,7 +110,7 @@ class SimpleEditCounterController extends XtoolsController
         $sec->prepareData();
 
         return $this->getFormattedResponse('simpleEditCounter/result', [
-            'xtPage' => 'simpleeditcounter',
+            'xtPage' => 'SimpleEditCounter',
             'xtTitle' => $this->user->getUsername(),
             'sec' => $sec,
         ]);

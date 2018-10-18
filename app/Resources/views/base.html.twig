@@ -48,7 +48,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
-<body class="{{ xtPage }}{% if isRTL() %} rtl{% endif %}" >
+<body class="{{ xtPage|lower }}{% if isRTL() %} rtl{% endif %}" >
 <header class="navbar navbar-default navbar-top" role="navigation">
     <button class="navbar-toggle collapsed pull-left" data-toggle="collapse" data-target=".tool-links" aria-expanded="false">
       <span class="sr-only">Toggle navigation</span>

@@ -43,7 +43,7 @@ class MetaController extends XtoolsController
         }
 
         return $this->render('meta/index.html.twig', [
-            'xtPage' => 'meta',
+            'xtPage' => 'Meta',
             'xtPageTitle' => 'tool-meta',
             'xtSubtitle' => 'tool-meta-desc',
         ]);
@@ -69,7 +69,7 @@ class MetaController extends XtoolsController
         $apiUsage = $this->getApiUsageStats($client);
 
         return $this->render('meta/result.html.twig', [
-            'xtPage' => 'meta',
+            'xtPage' => 'Meta',
             'start' => $this->start,
             'end' => $this->end,
             'toolUsage' => $toolUsage,

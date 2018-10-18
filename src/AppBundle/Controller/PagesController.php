@@ -73,7 +73,7 @@ class PagesController extends XtoolsController
         return $this->render('pages/index.html.twig', array_merge([
             'xtPageTitle' => 'tool-pages',
             'xtSubtitle' => 'tool-pages-desc',
-            'xtPage' => 'pages',
+            'xtPage' => 'Pages',
 
             // Defaults that will get overridden if in $params.
             'username' => '',
@@ -136,7 +136,7 @@ class PagesController extends XtoolsController
         $pages->prepareData();
 
         $ret = [
-            'xtPage' => 'pages',
+            'xtPage' => 'Pages',
             'xtTitle' => $this->user->getUsername(),
             'project' => $this->project,
             'user' => $this->user,

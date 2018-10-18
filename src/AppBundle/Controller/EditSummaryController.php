@@ -49,7 +49,7 @@ class EditSummaryController extends XtoolsController
         return $this->render('editSummary/index.html.twig', array_merge([
             'xtPageTitle' => 'tool-editsummary',
             'xtSubtitle' => 'tool-editsummary-desc',
-            'xtPage' => 'editsummary',
+            'xtPage' => 'EditSummary',
 
             // Defaults that will get overridden if in $params.
             'username' => '',
@@ -78,7 +78,7 @@ class EditSummaryController extends XtoolsController
         $editSummary->prepareData();
 
         return $this->getFormattedResponse('editSummary/result', [
-            'xtPage' => 'editsummary',
+            'xtPage' => 'EditSummary',
             'xtTitle' => $this->user->getUsername(),
             'user' => $this->user,
             'project' => $this->project,

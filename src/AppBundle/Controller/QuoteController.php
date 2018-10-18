@@ -57,7 +57,7 @@ class QuoteController extends XtoolsController
         return $this->render(
             'quote/index.html.twig',
             [
-                'xtPage' => 'bash',
+                'xtPage' => 'Quote',
                 'xtPageTitle' => 'tool-bash',
                 'xtSubtitle' => 'tool-bash-desc',
             ]
@@ -106,7 +106,7 @@ class QuoteController extends XtoolsController
         return $this->render(
             'quote/all.html.twig',
             [
-                'xtPage' => 'bash',
+                'xtPage' => 'Quote',
                 'quotes' => $quotes,
             ]
         );
@@ -145,7 +145,7 @@ class QuoteController extends XtoolsController
         return $this->render(
             'quote/view.html.twig',
             [
-                'xtPage' => 'bash',
+                'xtPage' => 'Quote',
                 'text' => $text,
                 'id' => $id,
             ]

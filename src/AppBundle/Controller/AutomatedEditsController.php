@@ -76,7 +76,7 @@ class AutomatedEditsController extends XtoolsController
         return $this->render('autoEdits/index.html.twig', array_merge([
             'xtPageTitle' => 'tool-autoedits',
             'xtSubtitle' => 'tool-autoedits-desc',
-            'xtPage' => 'autoedits',
+            'xtPage' => 'AutoEdits',
 
             // Defaults that will get overridden if in $this->params.
             'username' => '',
@@ -122,7 +122,7 @@ class AutomatedEditsController extends XtoolsController
         $this->autoEdits->setRepository($autoEditsRepo);
 
         $this->output = [
-            'xtPage' => 'autoedits',
+            'xtPage' => 'AutoEdits',
             'xtTitle' => $this->user->getUsername(),
             'ae' => $this->autoEdits,
             'is_sub_request' => $this->isSubRequest,

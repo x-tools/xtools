@@ -45,7 +45,7 @@ class AdminScoreController extends XtoolsController
         }
 
         return $this->render('adminscore/index.html.twig', [
-            'xtPage' => 'adminscore',
+            'xtPage' => 'AdminScore',
             'xtPageTitle' => 'tool-adminscore',
             'xtSubtitle' => 'tool-adminscore-desc',
             'project' => $this->project,
@@ -66,7 +66,7 @@ class AdminScoreController extends XtoolsController
         $adminScore->setRepository($adminScoreRepo);
 
         return $this->getFormattedResponse('adminscore/result', [
-            'xtPage' => 'adminscore',
+            'xtPage' => 'AdminScore',
             'xtTitle' => $this->user->getUsername(),
             'as' => $adminScore,
         ]);

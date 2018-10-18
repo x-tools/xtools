@@ -75,7 +75,7 @@ class CategoryEditsController extends XtoolsController
         return $this->render('categoryEdits/index.html.twig', array_merge([
             'xtPageTitle' => 'tool-categoryedits',
             'xtSubtitle' => 'tool-categoryedits-desc',
-            'xtPage' => 'categoryedits',
+            'xtPage' => 'CategoryEdits',
 
             // Defaults that will get overridden if in $params.
             'namespace' => 0,
@@ -106,7 +106,7 @@ class CategoryEditsController extends XtoolsController
         $this->categoryEdits->setRepository($categoryEditsRepo);
 
         $this->output = [
-            'xtPage' => 'categoryedits',
+            'xtPage' => 'CategoryEdits',
             'xtTitle' => $this->user->getUsername(),
             'project' => $this->project,
             'user' => $this->user,

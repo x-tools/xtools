@@ -48,7 +48,7 @@ class AdminStatsController extends XtoolsController
 
         // Otherwise render form.
         return $this->render('adminStats/index.html.twig', array_merge([
-            'xtPage' => 'adminstats',
+            'xtPage' => 'AdminStats',
             'xtPageTitle' => 'tool-adminstats',
             'xtSubtitle' => 'tool-adminstats-desc',
 
@@ -96,7 +96,7 @@ class AdminStatsController extends XtoolsController
         $this->adminStats->prepareStats();
 
         return $this->getFormattedResponse('adminStats/result', [
-            'xtPage' => 'adminstats',
+            'xtPage' => 'AdminStats',
             'xtTitle' => $this->project->getDomain(),
             'as' => $this->adminStats,
         ]);
