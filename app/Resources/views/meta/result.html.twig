@@ -20,11 +20,11 @@
                 <table class="table"><tbody>
                     <tr>
                         <td>{{ msg('start') }}</td>
-                        <td>{{ start }}</td>
+                        <td>{{ start|date_format('yyyy-MM-dd') }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('end') }}</td>
-                        <td>{{ end }}</td>
+                        <td>{{ end|date_format('yyyy-MM-dd') }}</td>
                     </tr>
                 </tbody></table>
             </div>
@@ -180,11 +180,11 @@
                 <table class="table"><tbody>
                     <tr>
                         <td>{{ msg('start') }}</td>
-                        <td>{{ start }}</td>
+                        <td>{{ start|date_format('yyyy-MM-dd') }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('end') }}</td>
-                        <td>{{ end }}</td>
+                        <td>{{ end|date_format('yyyy-MM-dd') }}</td>
                     </tr>
                 </tbody></table>
             </div>

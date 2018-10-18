@@ -59,11 +59,11 @@ class PagesTest extends TestAdapter
     public function testConstructor(): void
     {
         $pages = new Pages($this->project, $this->user);
-        $this->assertEquals(0, $pages->getNamespace());
-        $this->assertEquals($this->project, $pages->getProject());
-        $this->assertEquals($this->user, $pages->getUser());
-        $this->assertEquals('noredirects', $pages->getRedirects());
-        $this->assertEquals(0, $pages->getOffset());
+        static::assertEquals(0, $pages->getNamespace());
+        static::assertEquals($this->project, $pages->getProject());
+        static::assertEquals($this->user, $pages->getUser());
+        static::assertEquals('noredirects', $pages->getRedirects());
+        static::assertEquals(0, $pages->getOffset());
     }
 
     public function testResults(): void
@@ -72,11 +72,11 @@ class PagesTest extends TestAdapter
         $pages = new Pages($this->project, $this->user, 0, '');
         $pages->setRepository($this->pagesRepo);
         $pages->prepareData();
-        $this->assertEquals(3, $pages->getNumResults());
-        $this->assertEquals(1, $pages->getNumDeleted());
-        $this->assertEquals(1, $pages->getNumRedirects());
+        static::assertEquals(3, $pages->getNumResults());
+        static::assertEquals(1, $pages->getNumDeleted());
+        static::assertEquals(1, $pages->getNumRedirects());
 
-        $this->assertEquals([
+        static::assertEquals([
             0 => [
                 'count' => 2,
                 'redirects' => 0,
@@ -91,8 +91,8 @@ class PagesTest extends TestAdapter
 
         $results = $pages->getResults();
 
-        $this->assertEquals([0, 1], array_keys($results));
-        $this->assertEquals([
+        static::assertEquals([0, 1], array_keys($results));
+        static::assertEquals([
             'namespace' => '0',
             'type' => 'arc',
             'page_title' => 'My fun page',

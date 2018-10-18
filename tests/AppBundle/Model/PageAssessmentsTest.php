@@ -54,13 +54,13 @@ class PageAssessmentsTest extends TestAdapter
         $pa = new PageAssessments($this->project);
         $pa->setRepository($this->paRepo);
 
-        $this->assertEquals(
+        static::assertEquals(
             $this->localContainer->getParameter('assessments')['en.wikipedia.org'],
             $pa->getConfig()
         );
-        $this->assertTrue($pa->isEnabled());
-        $this->assertTrue($pa->hasImportanceRatings());
-        $this->assertTrue($pa->isSupportedNamespace(6));
+        static::assertTrue($pa->isEnabled());
+        static::assertTrue($pa->hasImportanceRatings());
+        static::assertTrue($pa->isSupportedNamespace(6));
     }
 
     /**
@@ -71,12 +71,12 @@ class PageAssessmentsTest extends TestAdapter
         $pa = new PageAssessments($this->project);
         $pa->setRepository($this->paRepo);
 
-        $this->assertEquals(
+        static::assertEquals(
             'https://upload.wikimedia.org/wikipedia/commons/b/bc/Featured_article_star.svg',
             $pa->getBadgeURL('FA')
         );
 
-        $this->assertEquals(
+        static::assertEquals(
             'Featured_article_star.svg',
             $pa->getBadgeURL('FA', true)
         );
@@ -117,13 +117,13 @@ class PageAssessmentsTest extends TestAdapter
         $assessments = $pa->getAssessments($page);
 
         // Picks the first assessment.
-        $this->assertEquals([
+        static::assertEquals([
             'value' => 'Start',
             'color' => '#ffaa66',
             'category' => 'Category:Start-Class articles',
             'badge' => 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Symbol_start_class.svg',
         ], $assessments['assessment']);
 
-        $this->assertEquals(2, count($assessments['wikiprojects']));
+        static::assertEquals(2, count($assessments['wikiprojects']));
     }
 }

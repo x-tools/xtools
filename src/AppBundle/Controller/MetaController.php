@@ -221,7 +221,7 @@ class MetaController extends XtoolsController
         }
 
         // Don't update counts for tools that aren't enabled
-        if (!$this->container->getParameter("enable.$tool")) {
+        if (!$this->container->getParameter('enable.'.ucfirst($tool))) {
             $response->setStatusCode(Response::HTTP_FORBIDDEN);
             $response->setContent(json_encode([
                 'error' => 'This tool is disabled',

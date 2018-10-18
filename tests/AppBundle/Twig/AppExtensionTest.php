@@ -47,15 +47,15 @@ class AppExtensionTest extends TestAdapter
      */
     public function testDiffFormat(): void
     {
-        $this->assertEquals(
+        static::assertEquals(
             "<span class='diff-pos'>3,000</span>",
             $this->appExtension->diffFormat(3000)
         );
-        $this->assertEquals(
+        static::assertEquals(
             "<span class='diff-neg'>-20,000</span>",
             $this->appExtension->diffFormat(-20000)
         );
-        $this->assertEquals(
+        static::assertEquals(
             "<span class='diff-zero'>0</span>",
             $this->appExtension->diffFormat(0)
         );
@@ -66,10 +66,10 @@ class AppExtensionTest extends TestAdapter
      */
     public function testPercentFormat(): void
     {
-        $this->assertEquals('45%', $this->appExtension->percentFormat(45));
-        $this->assertEquals('30%', $this->appExtension->percentFormat(30, null, 3));
-        $this->assertEquals('33.33%', $this->appExtension->percentFormat(2, 6, 2));
-        $this->assertEquals('25%', $this->appExtension->percentFormat(2, 8));
+        static::assertEquals('45%', $this->appExtension->percentFormat(45));
+        static::assertEquals('30%', $this->appExtension->percentFormat(30, null, 3));
+        static::assertEquals('33.33%', $this->appExtension->percentFormat(2, 6, 2));
+        static::assertEquals('25%', $this->appExtension->percentFormat(2, 8));
     }
 
     /**
@@ -77,23 +77,23 @@ class AppExtensionTest extends TestAdapter
      */
     public function testFormatDuration(): void
     {
-        $this->assertEquals(
+        static::assertEquals(
             [30, 'num-seconds'],
             $this->appExtension->formatDuration(30, false)
         );
-        $this->assertEquals(
+        static::assertEquals(
             [1, 'num-minutes'],
             $this->appExtension->formatDuration(70, false)
         );
-        $this->assertEquals(
+        static::assertEquals(
             [50, 'num-minutes'],
             $this->appExtension->formatDuration(3000, false)
         );
-        $this->assertEquals(
+        static::assertEquals(
             [2, 'num-hours'],
             $this->appExtension->formatDuration(7500, false)
         );
-        $this->assertEquals(
+        static::assertEquals(
             [10, 'num-days'],
             $this->appExtension->formatDuration(864000, false)
         );
@@ -104,9 +104,9 @@ class AppExtensionTest extends TestAdapter
      */
     public function testNumberFormat(): void
     {
-        $this->assertEquals('1,234', $this->appExtension->numberFormat(1234));
-        $this->assertEquals('1,234.32', $this->appExtension->numberFormat(1234.316, 2));
-        $this->assertEquals('50', $this->appExtension->numberFormat(50.0000, 4));
+        static::assertEquals('1,234', $this->appExtension->numberFormat(1234));
+        static::assertEquals('1,234.32', $this->appExtension->numberFormat(1234.316, 2));
+        static::assertEquals('50', $this->appExtension->numberFormat(50.0000, 4));
     }
 
     /**
@@ -114,22 +114,22 @@ class AppExtensionTest extends TestAdapter
      */
     public function testIntution(): void
     {
-        $this->assertEquals('en', $this->appExtension->getLang());
-        $this->assertEquals('English', $this->appExtension->getLangName());
+        static::assertEquals('en', $this->appExtension->getLang());
+        static::assertEquals('English', $this->appExtension->getLangName());
 
         $allLangs = $this->appExtension->getAllLangs();
 
         // There should be a bunch.
-        $this->assertGreaterThan(20, count($allLangs));
+        static::assertGreaterThan(20, count($allLangs));
 
         // Keys should be the language codes, with name as the values.
-        $this->assertArraySubset(['en' => 'English'], $allLangs);
-        $this->assertArraySubset(['de' => 'Deutsch'], $allLangs);
-        $this->assertArraySubset(['es' => 'Español'], $allLangs);
+        static::assertArraySubset(['en' => 'English'], $allLangs);
+        static::assertArraySubset(['de' => 'Deutsch'], $allLangs);
+        static::assertArraySubset(['es' => 'Español'], $allLangs);
 
         // Testing if the language is RTL.
-        $this->assertFalse($this->appExtension->isRTL('en'));
-        $this->assertTrue($this->appExtension->isRTL('ar'));
+        static::assertFalse($this->appExtension->isRTL('en'));
+        static::assertTrue($this->appExtension->isRTL('ar'));
     }
 
     /**
@@ -139,10 +139,10 @@ class AppExtensionTest extends TestAdapter
     {
         // This test is mysteriously failing on Scrutinizer, but not on Travis.
         // Commenting out for now.
-        // $this->assertEquals(7, strlen($this->appExtension->gitShortHash()));
+        // static::assertEquals(7, strlen($this->appExtension->gitShortHash()));
 
-        $this->assertEquals(40, strlen($this->appExtension->gitHash()));
-        $this->assertRegExp('/\d{4}-\d{2}-\d{2}/', $this->appExtension->gitDate());
+        static::assertEquals(40, strlen($this->appExtension->gitHash()));
+        static::assertRegExp('/\d{4}-\d{2}-\d{2}/', $this->appExtension->gitDate());
     }
 
     /**
@@ -150,8 +150,8 @@ class AppExtensionTest extends TestAdapter
      */
     public function testCapitalizeFirst(): void
     {
-        $this->assertEquals('Foo', $this->appExtension->capitalizeFirst('foo'));
-        $this->assertEquals('Bar', $this->appExtension->capitalizeFirst('Bar'));
+        static::assertEquals('Foo', $this->appExtension->capitalizeFirst('foo'));
+        static::assertEquals('Bar', $this->appExtension->capitalizeFirst('Bar'));
     }
 
     /**
@@ -159,7 +159,7 @@ class AppExtensionTest extends TestAdapter
      */
     public function testRequestTime(): void
     {
-        $this->assertTrue(is_double($this->appExtension->requestMemory()));
+        static::assertTrue(is_double($this->appExtension->requestMemory()));
     }
 
     /**
@@ -169,11 +169,11 @@ class AppExtensionTest extends TestAdapter
     {
         $user = new User('68.229.186.65');
         $user2 = new User('Test user');
-        $this->assertTrue($this->appExtension->isUserAnon($user));
-        $this->assertFalse($this->appExtension->isUserAnon($user2));
+        static::assertTrue($this->appExtension->isUserAnon($user));
+        static::assertFalse($this->appExtension->isUserAnon($user2));
 
-        $this->assertTrue($this->appExtension->isUserAnon('2605:E000:855A:4B00:3035:523D:F7E9:8F82'));
-        $this->assertFalse($this->appExtension->isUserAnon('192.0.blah.1'));
+        static::assertTrue($this->appExtension->isUserAnon('2605:E000:855A:4B00:3035:523D:F7E9:8F82'));
+        static::assertFalse($this->appExtension->isUserAnon('192.0.blah.1'));
     }
 
     /**
@@ -181,11 +181,11 @@ class AppExtensionTest extends TestAdapter
      */
     public function testDateFormat(): void
     {
-        $this->assertEquals(
+        static::assertEquals(
             '2017-01-23 00:00',
             $this->appExtension->dateFormat('2017-01-23')
         );
-        $this->assertEquals(
+        static::assertEquals(
             '2017-01-23 00:00',
             $this->appExtension->dateFormat(new DateTime('2017-01-23'))
         );
@@ -196,7 +196,7 @@ class AppExtensionTest extends TestAdapter
      */
     public function testBuildQuery(): void
     {
-        $this->assertEquals(
+        static::assertEquals(
             'foo=1&bar=2',
             $this->appExtension->buildQuery([
                 'foo' => 1,
@@ -226,7 +226,7 @@ class AppExtensionTest extends TestAdapter
             ]);
         $project->setRepository($projectRepo);
         $summary = '<script>alert("XSS baby")</script> [[test page]]';
-        $this->assertEquals(
+        static::assertEquals(
             "&lt;script&gt;alert(\"XSS baby\")&lt;/script&gt; " .
                 "<a target='_blank' href='https://test.example.org/wiki/Test_page'>test page</a>",
             $this->appExtension->wikify($summary, $project)

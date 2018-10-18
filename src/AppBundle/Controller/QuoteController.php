@@ -236,7 +236,7 @@ class QuoteController extends XtoolsController
     private function validateIsEnabled(): void
     {
         $isLabs = $this->container->getParameter('app.is_labs');
-        if (!$isLabs && !$this->container->getParameter('enable.bash')) {
+        if (!$isLabs && !$this->container->getParameter('enable.Quote')) {
             throw $this->createNotFoundException('This tool is disabled');
         }
     }

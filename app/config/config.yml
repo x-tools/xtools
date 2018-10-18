@@ -157,14 +157,15 @@ monolog:
     handlers:
         rate_limit:
             # log all messages (since debug is the lowest level)
-            level:    info
-            type:     stream
-            path:     '%kernel.logs_dir%/rate_limit.log'
+            level: info
+            type: stream
+            path: '%kernel.logs_dir%/rate_limit.log'
             channels: [rate_limit]
         critical_log:
             type: fingers_crossed
             action_level: critical
             handler: critical_file_log
+            excluded_http_codes: [504]
         critical_file_log:
             type: stream
             path: "%kernel.logs_dir%/%kernel.environment%_critical.log"

@@ -57,19 +57,19 @@ class EditSummaryTest extends TestAdapter
         $method = $this->reflectionClass->getMethod('hasSummary');
         $method->setAccessible(true);
 
-        $this->assertFalse(
+        static::assertFalse(
             $method->invoke($this->editSummary, ['rev_comment' => ''])
         );
-        $this->assertTrue(
+        static::assertTrue(
             $method->invoke($this->editSummary, ['rev_comment' => 'Foo'])
         );
-        $this->assertFalse(
+        static::assertFalse(
             $method->invoke($this->editSummary, ['rev_comment' => '/* section title */  '])
         );
-        $this->assertTrue(
+        static::assertTrue(
             $method->invoke($this->editSummary, ['rev_comment' => ' /* section title */'])
         );
-        $this->assertTrue(
+        static::assertTrue(
             $method->invoke($this->editSummary, ['rev_comment' => '/* section title */ Foo'])
         );
     }
@@ -86,22 +86,22 @@ class EditSummaryTest extends TestAdapter
             $method->invoke($this->editSummary, $revision);
         }
 
-        $this->assertEquals(4, $this->editSummary->getTotalEdits());
-        $this->assertEquals(2, $this->editSummary->getTotalEditsMinor());
-        $this->assertEquals(2, $this->editSummary->getTotalEditsMajor());
+        static::assertEquals(4, $this->editSummary->getTotalEdits());
+        static::assertEquals(2, $this->editSummary->getTotalEditsMinor());
+        static::assertEquals(2, $this->editSummary->getTotalEditsMajor());
 
         // In self::setUp() we set the treshold for recent edits to 1.
-        $this->assertEquals(1, $this->editSummary->getRecentEditsMinor());
-        $this->assertEquals(1, $this->editSummary->getRecentEditsMajor());
+        static::assertEquals(1, $this->editSummary->getRecentEditsMinor());
+        static::assertEquals(1, $this->editSummary->getRecentEditsMajor());
 
-        $this->assertEquals(2, $this->editSummary->getTotalSummaries());
-        $this->assertEquals(1, $this->editSummary->getTotalSummariesMinor());
-        $this->assertEquals(1, $this->editSummary->getTotalSummariesMajor());
+        static::assertEquals(2, $this->editSummary->getTotalSummaries());
+        static::assertEquals(1, $this->editSummary->getTotalSummariesMinor());
+        static::assertEquals(1, $this->editSummary->getTotalSummariesMajor());
 
-        $this->assertEquals(0, $this->editSummary->getRecentSummariesMinor());
-        $this->assertEquals(1, $this->editSummary->getRecentSummariesMajor());
+        static::assertEquals(0, $this->editSummary->getRecentSummariesMinor());
+        static::assertEquals(1, $this->editSummary->getRecentSummariesMajor());
 
-        $this->assertEquals([
+        static::assertEquals([
             '2016-07' => [
                 'total' => 2,
                 'summaries' => 1,

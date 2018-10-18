@@ -43,7 +43,7 @@ class AutomatedEditsTest extends TestAdapter
         $this->setProject();
         $tools = $this->aeh->getTools($this->project);
 
-        $this->assertArraySubset(
+        static::assertArraySubset(
             [
                 'regex' => '\(\[\[WP:HG',
                 'tag' => 'huggle',
@@ -53,7 +53,7 @@ class AutomatedEditsTest extends TestAdapter
             $tools['Huggle']
         );
 
-        $this->assertEquals(1, array_count_values(array_keys($tools))['Huggle']);
+        static::assertEquals(1, array_count_values(array_keys($tools))['Huggle']);
     }
 
     /**
@@ -62,7 +62,7 @@ class AutomatedEditsTest extends TestAdapter
     public function testTool(): void
     {
         $this->setProject();
-        $this->assertArraySubset(
+        static::assertArraySubset(
             [
                 'name' => 'Huggle',
                 'regex' => '\(\[\[WP:HG',
@@ -83,11 +83,11 @@ class AutomatedEditsTest extends TestAdapter
     public function testIsAutomated(): void
     {
         $this->setProject();
-        $this->assertTrue($this->aeh->isAutomated(
+        static::assertTrue($this->aeh->isAutomated(
             'Level 2 warning re. [[Barack Obama]] ([[WP:HG|HG]]) (3.2.0)',
             $this->project
         ));
-        $this->assertFalse($this->aeh->isAutomated(
+        static::assertFalse($this->aeh->isAutomated(
             'You should try [[WP:Huggle]]',
             $this->project
         ));
@@ -101,7 +101,7 @@ class AutomatedEditsTest extends TestAdapter
         $this->setProject();
         $tools = $this->aeh->getTools($this->project);
 
-        $this->assertArraySubset(
+        static::assertArraySubset(
             ['Huggle' => [
                 'regex' => '\(\[\[WP:HG',
                 'tag' => 'huggle',
@@ -111,7 +111,7 @@ class AutomatedEditsTest extends TestAdapter
             $tools
         );
 
-        $this->assertContains('Undo', array_keys($tools));
+        static::assertContains('Undo', array_keys($tools));
     }
 
     /**
@@ -147,11 +147,11 @@ class AutomatedEditsTest extends TestAdapter
     public function testIsRevert(): void
     {
         $this->setProject();
-        $this->assertTrue($this->aeh->isRevert(
+        static::assertTrue($this->aeh->isRevert(
             'Reverted edits by Mogultalk (talk) ([[WP:HG|HG]]) (3.2.0)',
             $this->project
         ));
-        $this->assertFalse($this->aeh->isRevert(
+        static::assertFalse($this->aeh->isRevert(
             'You should have reverted this edit using [[WP:HG|Huggle]]',
             $this->project
         ));
