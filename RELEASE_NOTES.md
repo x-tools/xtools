@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.6.2 ##
+- Production hotfix: ensure AppExtension::loggedInUser() returns ?array
+
 ## 3.6.1 ##
 - Production hotfix: only pass strings to AutomatedEditsHelper::getTool().
 
