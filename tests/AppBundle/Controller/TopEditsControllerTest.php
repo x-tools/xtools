@@ -23,7 +23,7 @@ class TopEditsControllerTest extends ControllerTestAdapter
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
         // For now...
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 
@@ -47,7 +47,7 @@ class TopEditsControllerTest extends ControllerTestAdapter
      */
     public function testRoutes(): void
     {
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 

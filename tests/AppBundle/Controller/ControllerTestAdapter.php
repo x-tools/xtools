@@ -9,7 +9,6 @@ namespace Tests\AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\DependencyInjection\Container;
 
 /**
  * This class sets the container, client and provides some convenience methods.
@@ -17,9 +16,6 @@ use Symfony\Component\DependencyInjection\Container;
  */
 class ControllerTestAdapter extends WebTestCase
 {
-    /** @var Container The DI container. */
-    protected $container;
-
     /** @var Client The Symfony client */
     protected $client;
 
@@ -29,7 +25,6 @@ class ControllerTestAdapter extends WebTestCase
     public function setUp(): void
     {
         $this->client = static::createClient();
-        $this->container = $this->client->getContainer();
     }
 
     /**

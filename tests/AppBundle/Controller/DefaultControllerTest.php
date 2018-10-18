@@ -22,7 +22,7 @@ class DefaultControllerTest extends ControllerTestAdapter
     public function setUp(): void
     {
         parent::setUp();
-        $this->isSingle = $this->container->getParameter('app.single_wiki');
+        $this->isSingle = self::$container->getParameter('app.single_wiki');
     }
 
     /**
@@ -85,7 +85,7 @@ class DefaultControllerTest extends ControllerTestAdapter
      */
     public function testNormalizeProject(): void
     {
-        if (!$this->isSingle && $this->container->getParameter('app.is_labs')) {
+        if (!$this->isSingle && self::$container->getParameter('app.is_labs')) {
             $expectedOutput = [
                 'project' => 'en.wikipedia.org',
                 'domain' => 'en.wikipedia.org',
@@ -122,7 +122,7 @@ class DefaultControllerTest extends ControllerTestAdapter
             static::assertEquals(404, $this->client->getResponse()->getStatusCode());
         }
 
-        if (!$this->isSingle && $this->container->getParameter('app.is_labs')) {
+        if (!$this->isSingle && self::$container->getParameter('app.is_labs')) {
             $this->client->request('GET', '/api/project/namespaces/fr.wikipedia.org');
             static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
@@ -146,7 +146,7 @@ class DefaultControllerTest extends ControllerTestAdapter
             static::assertEquals(404, $this->client->getResponse()->getStatusCode());
         }
 
-        if ($this->container->getParameter('app.is_labs')) {
+        if (self::$container->getParameter('app.is_labs')) {
             $this->client->request('GET', '/api/project/assessments/en.wikipedia.org');
             static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
@@ -167,7 +167,7 @@ class DefaultControllerTest extends ControllerTestAdapter
      */
     public function testWikify(): void
     {
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 

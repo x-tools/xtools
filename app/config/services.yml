@@ -43,11 +43,6 @@ services:
         alias: 'monolog.logger'
         public: true
 
-    app.twig_extension:
-        class: AppBundle\Twig\AppExtension
-        arguments: ['@service_container', '@request_stack', '@session']
-        public: false
-
     app.exception_listener:
         class: AppBundle\EventSubscriber\ExceptionListener
         arguments: ['@templating', '@logger', '%kernel.environment%']

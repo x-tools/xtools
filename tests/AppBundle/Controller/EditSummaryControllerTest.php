@@ -21,7 +21,7 @@ class EditSummaryControllerTest extends ControllerTestAdapter
         $crawler = $this->client->request('GET', '/editsummary/de.wikipedia');
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 
@@ -34,7 +34,7 @@ class EditSummaryControllerTest extends ControllerTestAdapter
      */
     public function testRoutes(): void
     {
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 

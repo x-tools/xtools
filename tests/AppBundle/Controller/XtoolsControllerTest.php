@@ -33,7 +33,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
     public function setUp(): void
     {
         parent::setUp();
-        $this->i18n = $this->container->get('app.i18n_helper');
+        $this->i18n = self::$container->get('app.i18n_helper');
     }
 
     /**
@@ -48,7 +48,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
 
         // SimpleEditCounterController used solely for testing, since we
         // can't instantiate the abstract class XtoolsController.
-        return new SimpleEditCounterController($requestStack, $this->container, $this->i18n);
+        return new SimpleEditCounterController($requestStack, self::$container, $this->i18n);
     }
 
     /**
@@ -60,7 +60,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
     public function testParseQueryParams(array $params, array $expected): void
     {
         // Untestable on Travis :(
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 
@@ -181,7 +181,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
     public function testProjectFromQuery(): void
     {
         // Untestable on Travis :(
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 
@@ -204,7 +204,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
     public function testValidateProjectAndUser(): void
     {
         // Untestable on Travis :(
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 
@@ -237,7 +237,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
     public function testGetParams(): void
     {
         // Untestable on Travis :(
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 
@@ -263,7 +263,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
     public function testValidatePage(): void
     {
         // Untestable on Travis :(
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 
@@ -336,12 +336,12 @@ class XtoolsControllerTest extends ControllerTestAdapter
     {
         $crawler = $this->client->request('GET', '/sc');
         static::assertEquals(
-            $this->container->getParameter('default_project'),
+            self::$container->getParameter('default_project'),
             $crawler->filter('#project_input')->attr('value')
         );
 
         // For now...
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 

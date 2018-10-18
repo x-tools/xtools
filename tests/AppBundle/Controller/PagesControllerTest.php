@@ -21,7 +21,7 @@ class PagesControllerTest extends ControllerTestAdapter
         $this->client->request('GET', '/pages');
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
-        if ($this->container->getParameter('app.is_labs')) {
+        if (self::$container->getParameter('app.is_labs')) {
             $crawler = $this->client->request('GET', '/pages/de.wikipedia.org');
             static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
@@ -39,7 +39,7 @@ class PagesControllerTest extends ControllerTestAdapter
      */
     public function testRoutes(): void
     {
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 

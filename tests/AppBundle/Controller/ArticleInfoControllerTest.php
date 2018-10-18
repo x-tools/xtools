@@ -21,7 +21,7 @@ class ArticleInfoControllerTest extends ControllerTestAdapter
         $crawler = $this->client->request('GET', '/articleinfo/de.wikipedia');
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 
@@ -35,7 +35,7 @@ class ArticleInfoControllerTest extends ControllerTestAdapter
     public function testArticleInfoApi(): void
     {
         // For now...
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 
@@ -70,7 +70,7 @@ class ArticleInfoControllerTest extends ControllerTestAdapter
      */
     public function testHtmlRoutes(): void
     {
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 
@@ -91,7 +91,7 @@ class ArticleInfoControllerTest extends ControllerTestAdapter
      */
     public function testApis(): void
     {
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 

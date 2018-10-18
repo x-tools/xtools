@@ -1,9 +1,9 @@
 <?php
-declare(strict_types = 1);
-
 /**
  * This file contains only the AppExtensionTest class.
  */
+
+declare(strict_types = 1);
 
 namespace Tests\AppBundle\Twig;
 
@@ -13,7 +13,6 @@ use AppBundle\Model\User;
 use AppBundle\Repository\ProjectRepository;
 use AppBundle\Twig\AppExtension;
 use DateTime;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Client;
@@ -24,9 +23,6 @@ use Tests\AppBundle\TestAdapter;
  */
 class AppExtensionTest extends TestAdapter
 {
-    /** @var ContainerInterface The Symfony container. */
-    protected $container;
-
     /** @var AppExtension Instance of class. */
     protected $appExtension;
 
@@ -39,11 +35,11 @@ class AppExtensionTest extends TestAdapter
     public function setUp(): void
     {
         $this->client = static::createClient();
-        $this->container = $this->client->getContainer();
+        $container = $this->client->getContainer();
         $stack = new RequestStack();
         $session = new Session();
-        $i18nHelper = new I18nHelper($this->container, $stack, $session);
-        $this->appExtension = new AppExtension($this->container, $stack, $session, $i18nHelper);
+        $i18nHelper = new I18nHelper($container, $stack, $session);
+        $this->appExtension = new AppExtension($container, $stack, $session, $i18nHelper);
     }
 
     /**

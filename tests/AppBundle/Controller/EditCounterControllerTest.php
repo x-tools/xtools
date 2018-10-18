@@ -24,7 +24,7 @@ class EditCounterControllerTest extends ControllerTestAdapter
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
         // For now...
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 
@@ -72,7 +72,7 @@ class EditCounterControllerTest extends ControllerTestAdapter
         }
 
         // For now...
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 
@@ -87,7 +87,7 @@ class EditCounterControllerTest extends ControllerTestAdapter
     public function testCookies(): void
     {
         // For now...
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 
@@ -120,7 +120,7 @@ class EditCounterControllerTest extends ControllerTestAdapter
      */
     public function testResultPages(): void
     {
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 

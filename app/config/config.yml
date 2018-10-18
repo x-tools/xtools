@@ -142,7 +142,7 @@ nelmio_cors:
         hosts: []
         origin_regex: false
 
-guzzle:
+eight_points_guzzle:
     logging: "%kernel.debug%"
 
     clients:

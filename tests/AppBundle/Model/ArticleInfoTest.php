@@ -16,7 +16,6 @@ use AppBundle\Repository\ArticleInfoRepository;
 use AppBundle\Repository\PageRepository;
 use AppBundle\Repository\ProjectRepository;
 use GuzzleHttp;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Tests\AppBundle\TestAdapter;
@@ -26,9 +25,6 @@ use Tests\AppBundle\TestAdapter;
  */
 class ArticleInfoTest extends TestAdapter
 {
-    /** @var Container The Symfony container. */
-    protected $container;
-
     /** @var ArticleInfo The article info instance. */
     protected $articleInfo;
 
@@ -47,14 +43,14 @@ class ArticleInfoTest extends TestAdapter
     public function setUp(): void
     {
         $client = static::createClient();
-        $this->container = $client->getContainer();
+        $container = $client->getContainer();
         $this->project = new Project('en.wikipedia.org');
         $this->page = new Page($this->project, 'Test page');
-        $this->articleInfo = new ArticleInfo($this->page, $this->container);
+        $this->articleInfo = new ArticleInfo($this->page, $container);
 
         $stack = new RequestStack();
         $session = new Session();
-        $i18nHelper = new I18nHelper($this->container, $stack, $session);
+        $i18nHelper = new I18nHelper($container, $stack, $session);
         $this->articleInfo->setI18nHelper($i18nHelper);
 
         // Don't care that private methods "shouldn't" be tested...

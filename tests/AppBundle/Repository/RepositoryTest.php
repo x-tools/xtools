@@ -19,7 +19,7 @@ use Tests\AppBundle\TestAdapter;
 class RepositoryTest extends TestAdapter
 {
     /** @var ContainerInterface The DI container. */
-    protected $container;
+    protected $localContainer;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|Repository Mock of an abstract Repository class. */
     private $stub;
@@ -29,8 +29,8 @@ class RepositoryTest extends TestAdapter
         $this->stub = $this->getMockForAbstractClass('AppBundle\Repository\Repository');
 
         $client = static::createClient();
-        $this->container = $client->getContainer();
-        $this->stub->setContainer($this->container);
+        $this->localContainer = $client->getContainer();
+        $this->stub->setContainer($this->localContainer);
     }
 
     /**
@@ -38,7 +38,7 @@ class RepositoryTest extends TestAdapter
      */
     public function testGetTableName(): void
     {
-        if ($this->container->getParameter('app.is_labs')) {
+        if ($this->localContainer->getParameter('app.is_labs')) {
             // When using Labs.
             $this->assertEquals('`testwiki_p`.`page`', $this->stub->getTableName('testwiki', 'page'));
             $this->assertEquals('`testwiki_p`.`logging_userindex`', $this->stub->getTableName('testwiki', 'logging'));

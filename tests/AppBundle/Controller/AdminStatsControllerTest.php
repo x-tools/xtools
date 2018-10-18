@@ -18,7 +18,7 @@ class AdminStatsControllerTest extends ControllerTestAdapter
      */
     public function testHtmlRoutes(): void
     {
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 
@@ -34,7 +34,7 @@ class AdminStatsControllerTest extends ControllerTestAdapter
      */
     public function testApis(): void
     {
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 

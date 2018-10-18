@@ -23,7 +23,7 @@ class AutomatedEditsControllerTest extends ControllerTestAdapter
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
         // For now...
-        if (!$this->container->getParameter('app.is_labs') || $this->container->getParameter('app.single_wiki')) {
+        if (!self::$container->getParameter('app.is_labs') || self::$container->getParameter('app.single_wiki')) {
             return;
         }
 
@@ -47,7 +47,7 @@ class AutomatedEditsControllerTest extends ControllerTestAdapter
      */
     public function testResultPages(): void
     {
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 
@@ -64,7 +64,7 @@ class AutomatedEditsControllerTest extends ControllerTestAdapter
      */
     public function testApis(): void
     {
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
 
@@ -81,7 +81,7 @@ class AutomatedEditsControllerTest extends ControllerTestAdapter
      */
     public function testAutomatedEditCount(): void
     {
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             // Untestable :(
             return;
         }
@@ -112,7 +112,7 @@ class AutomatedEditsControllerTest extends ControllerTestAdapter
      */
     public function testNonautomatedEdits(): void
     {
-        if (!$this->container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_labs')) {
             // untestable :(
             return;
         }

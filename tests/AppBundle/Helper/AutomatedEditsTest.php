@@ -10,7 +10,6 @@ namespace Tests\AppBundle\Helper;
 use AppBundle\Helper\AutomatedEditsHelper;
 use AppBundle\Model\Project;
 use AppBundle\Repository\ProjectRepository;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Tests\AppBundle\TestAdapter;
 
 /**
@@ -19,9 +18,6 @@ use Tests\AppBundle\TestAdapter;
  */
 class AutomatedEditsTest extends TestAdapter
 {
-    /** @var ContainerInterface The DI container. */
-    protected $container;
-
     /** @var AutomatedEditsHelper The API Helper object to test. */
     protected $aeh;
 
@@ -34,9 +30,9 @@ class AutomatedEditsTest extends TestAdapter
     public function setUp(): void
     {
         $client = static::createClient();
-        $this->container = $client->getContainer();
-        $this->aeh = new AutomatedEditsHelper($this->container);
-        $this->cache = $this->container->get('cache.app');
+        $container = $client->getContainer();
+        $this->aeh = new AutomatedEditsHelper($container);
+        $this->cache = $container->get('cache.app');
     }
 
     /**

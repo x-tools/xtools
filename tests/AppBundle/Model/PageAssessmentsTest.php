@@ -20,8 +20,8 @@ use Tests\AppBundle\TestAdapter;
  */
 class PageAssessmentsTest extends TestAdapter
 {
-    /** @var ContainerInterface The Symfony container. */
-    protected $container;
+    /** @var ContainerInterface The Symfony localContainer ($localContainer to not override self::$container). */
+    protected $localContainer;
 
     /** @var PageAssessmentsRepository The repository for page assessments. */
     protected $paRepo;
@@ -35,11 +35,11 @@ class PageAssessmentsTest extends TestAdapter
     public function setUp(): void
     {
         $client = static::createClient();
-        $this->container = $client->getContainer();
+        $this->localContainer = $client->getContainer();
 
         $this->paRepo = $this->getMock(PageAssessmentsRepository::class, ['getConfig', 'getAssessments']);
         $this->paRepo->method('getConfig')
-            ->willReturn($this->container->getParameter('assessments')['en.wikipedia.org']);
+            ->willReturn($this->localContainer->getParameter('assessments')['en.wikipedia.org']);
 
         $this->project = $this->getMock(Project::class, [], ['testwiki']);
         $this->project->method('getPageAssessments')
@@ -55,7 +55,7 @@ class PageAssessmentsTest extends TestAdapter
         $pa->setRepository($this->paRepo);
 
         $this->assertEquals(
-            $this->container->getParameter('assessments')['en.wikipedia.org'],
+            $this->localContainer->getParameter('assessments')['en.wikipedia.org'],
             $pa->getConfig()
         );
         $this->assertTrue($pa->isEnabled());

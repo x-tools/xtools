@@ -377,7 +377,8 @@ abstract class Repository
         if (1226 === $e->getErrorCode()) {
             $this->logErrorData('MAX CONNECTIONS');
             throw new ServiceUnavailableHttpException(30, 'error-service-overload', null, 503);
-        } elseif (1969 === $e->getErrorCode() || 2013 === $e->getErrorCode()) {
+        } elseif (in_array($e->getErrorCode(), [1969, 2006, 2013])) {
+            // FIXME: Attempt to reestablish connection on 2006 error (MySQL server has gone away).
             $this->logErrorData('QUERY TIMEOUT');
             throw new HttpException(504, 'error-query-timeout', null, [], $timeout);
         } else {

@@ -19,8 +19,8 @@ use Tests\AppBundle\TestAdapter;
  */
 class PageTest extends TestAdapter
 {
-    /** @var Container The Symfony container. */
-    protected $container;
+    /** @var Container The Symfony container ($localContainer because we can't override self::$container). */
+    protected $localContainer;
 
     /**
      * Set up client and set container.
@@ -28,7 +28,7 @@ class PageTest extends TestAdapter
     public function setUp(): void
     {
         $client = static::createClient();
-        $this->container = $client->getContainer();
+        $this->localContainer = $client->getContainer();
     }
 
     /**
@@ -135,8 +135,8 @@ class PageTest extends TestAdapter
     public function testWikitext(): void
     {
         $pageRepo = new PageRepository();
-        $pageRepo->setContainer($this->container);
-        $project = ProjectRepository::getProject('en.wikipedia.org', $this->container);
+        $pageRepo->setContainer($this->localContainer);
+        $project = ProjectRepository::getProject('en.wikipedia.org', $this->localContainer);
         $page = new Page($project, 'Main Page');
         $page->setRepository($pageRepo);
 
@@ -359,8 +359,8 @@ class PageTest extends TestAdapter
     public function testIsMainPage(): void
     {
         $pageRepo = new PageRepository();
-        $pageRepo->setContainer($this->container);
-        $project = ProjectRepository::getProject('en.wikipedia.org', $this->container);
+        $pageRepo->setContainer($this->localContainer);
+        $project = ProjectRepository::getProject('en.wikipedia.org', $this->localContainer);
         $page = new Page($project, 'Main Page');
         $page->setRepository($pageRepo);
         static::assertTrue($page->isMainPage());

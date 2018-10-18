@@ -34,7 +34,7 @@ class CategoryEditsTest extends TestAdapter
     protected $user;
 
     /**
-     * Set up container, class instances and mocks.
+     * Set up class instances and mocks.
      */
     public function setUp(): void
     {

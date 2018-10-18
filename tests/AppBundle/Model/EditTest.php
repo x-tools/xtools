@@ -20,8 +20,8 @@ use Tests\AppBundle\TestAdapter;
  */
 class EditTest extends TestAdapter
 {
-    /** @var Container The DI container. */
-    protected $container;
+    /** @var Container The Symfony container ($localContainer because we can't override self::$container). */
+    protected $localContainer;
 
     /** @var Project The project instance. */
     protected $project;
@@ -32,7 +32,7 @@ class EditTest extends TestAdapter
     /** @var Page The page instance. */
     protected $page;
 
-    /** @var string[] Basic attritubes for edit factory. */
+    /** @var string[] Basic attributes for edit factory. */
     protected $editAttrs;
 
     /**
@@ -41,8 +41,7 @@ class EditTest extends TestAdapter
     public function setUp(): void
     {
         $client = static::createClient();
-        $this->container = $client->getContainer();
-
+        $this->localContainer = $client->getContainer();
         $this->project = new Project('TestProject');
         $this->projectRepo = $this->getMock(ProjectRepository::class);
         $this->projectRepo->method('getOne')
@@ -79,12 +78,12 @@ class EditTest extends TestAdapter
         $edit = new Edit($this->page, array_merge($this->editAttrs, [
             'comment' => 'Test',
         ]));
-        $this->assertEquals($this->project, $edit->getProject());
-        $this->assertInstanceOf(DateTime::class, $edit->getTimestamp());
-        $this->assertEquals($this->page, $edit->getPage());
-        $this->assertEquals('1483264800', $edit->getTimestamp()->getTimestamp());
-        $this->assertEquals(1, $edit->getId());
-        $this->assertFalse($edit->isMinor());
+        static::assertEquals($this->project, $edit->getProject());
+        static::assertInstanceOf(DateTime::class, $edit->getTimestamp());
+        static::assertEquals($this->page, $edit->getPage());
+        static::assertEquals('1483264800', $edit->getTimestamp()->getTimestamp());
+        static::assertEquals(1, $edit->getId());
+        static::assertFalse($edit->isMinor());
     }
 
     /**
@@ -95,7 +94,7 @@ class EditTest extends TestAdapter
         $edit = new Edit($this->page, array_merge($this->editAttrs, [
             'comment' => '<script>alert("XSS baby")</script> [[test page]]',
         ]));
-        $this->assertEquals(
+        static::assertEquals(
             "&lt;script&gt;alert(\"XSS baby\")&lt;/script&gt; " .
                 "<a target='_blank' href='https://test.example.org/wiki/Test_page'>test page</a>",
             $edit->getWikifiedSummary()
@@ -104,7 +103,7 @@ class EditTest extends TestAdapter
         $edit = new Edit($this->page, array_merge($this->editAttrs, [
             'comment' => 'https://google.com',
         ]));
-        $this->assertEquals(
+        static::assertEquals(
             '<a target="_blank" href="https://google.com">https://google.com</a>',
             $edit->getWikifiedSummary()
         );
@@ -119,11 +118,11 @@ class EditTest extends TestAdapter
             'comment' => 'Level 2 warning re. [[Barack Obama]] ([[WP:HG|HG]]) (3.2.0)',
         ]));
 
-        $this->assertArraySubset(
+        static::assertArraySubset(
             [
                 'name' => 'Huggle',
             ],
-            $edit->getTool($this->container)
+            $edit->getTool($this->localContainer)
         );
     }
 
@@ -136,13 +135,13 @@ class EditTest extends TestAdapter
             'comment' => 'You should have reverted this edit using [[WP:HG|Huggle]]',
         ]));
 
-        $this->assertFalse($edit->isRevert($this->container));
+        static::assertFalse($edit->isRevert($this->localContainer));
 
         $edit2 = new Edit($this->page, array_merge($this->editAttrs, [
             'comment' => 'Reverted edits by Mogultalk (talk) ([[WP:HG|HG]]) (3.2.0)',
         ]));
 
-        $this->assertTrue($edit2->isRevert($this->container));
+        static::assertTrue($edit2->isRevert($this->localContainer));
     }
 
     /**
@@ -154,13 +153,13 @@ class EditTest extends TestAdapter
             'comment' => 'You should have reverted this edit using [[WP:HG|Huggle]]',
         ]));
 
-        $this->assertFalse($edit->isAutomated($this->container));
+        static::assertFalse($edit->isAutomated($this->localContainer));
 
         $edit2 = new Edit($this->page, array_merge($this->editAttrs, [
             'comment' => 'Reverted edits by Mogultalk (talk) ([[WP:HG|HG]]) (3.2.0)',
         ]));
 
-        $this->assertTrue($edit2->isAutomated($this->container));
+        static::assertTrue($edit2->isAutomated($this->localContainer));
     }
 
     /**
@@ -169,12 +168,12 @@ class EditTest extends TestAdapter
     public function testGetters(): void
     {
         $edit = new Edit($this->page, $this->editAttrs);
-        $this->assertEquals('2017', $edit->getYear());
-        $this->assertEquals('1', $edit->getMonth());
-        $this->assertEquals(12, $edit->getLength());
-        $this->assertEquals(2, $edit->getSize());
-        $this->assertEquals(2, $edit->getLengthChange());
-        $this->assertEquals('Testuser', $edit->getUser()->getUsername());
+        static::assertEquals('2017', $edit->getYear());
+        static::assertEquals('1', $edit->getMonth());
+        static::assertEquals(12, $edit->getLength());
+        static::assertEquals(2, $edit->getSize());
+        static::assertEquals(2, $edit->getLengthChange());
+        static::assertEquals('Testuser', $edit->getUser()->getUsername());
     }
 
     /**
@@ -183,7 +182,7 @@ class EditTest extends TestAdapter
     public function testDiffUrl(): void
     {
         $edit = new Edit($this->page, $this->editAttrs);
-        $this->assertEquals(
+        static::assertEquals(
             'https://test.example.org/wiki/Special:Diff/1',
             $edit->getDiffUrl()
         );
@@ -195,7 +194,7 @@ class EditTest extends TestAdapter
     public function testPermaUrl(): void
     {
         $edit = new Edit($this->page, $this->editAttrs);
-        $this->assertEquals(
+        static::assertEquals(
             'https://test.example.org/wiki/Special:PermaLink/1',
             $edit->getPermaUrl()
         );
@@ -208,11 +207,11 @@ class EditTest extends TestAdapter
     {
         // Edit made by User:Testuser
         $edit = new Edit($this->page, $this->editAttrs);
-        $this->assertFalse($edit->isAnon());
+        static::assertFalse($edit->isAnon());
 
         $edit = new Edit($this->page, array_merge($this->editAttrs, [
             'username' => '192.168.0.1',
         ]));
-        $this->assertTrue($edit->isAnon());
+        static::assertTrue($edit->isAnon());
     }
 }
