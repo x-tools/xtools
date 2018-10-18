@@ -328,9 +328,9 @@ class Page extends Model
      * and edit count of the initial author. This is combined into one query for better performance. Caching is
      * intentionally disabled, because using the gadget, this will get hit for a different page constantly, where
      * the likelihood of cache benefiting us is slim.
-     * @return string[]
+     * @return string[]|false false if the page was not found.
      */
-    public function getBasicEditingInfo(): array
+    public function getBasicEditingInfo()
     {
         return $this->getRepository()->getBasicEditingInfo($this);
     }

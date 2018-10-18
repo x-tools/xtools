@@ -221,17 +221,14 @@ class PageRepository extends Repository
     }
 
     /**
-     * Get various basic info used in the API, including the
-     *   number of revisions, unique authors, initial author
-     *   and edit count of the initial author.
-     * This is combined into one query for better performance.
-     * Caching is only applied if it took considerable time to process,
-     *   because using the gadget, this will get hit for a different page
-     *   constantly, where the likelihood of cache benefiting us is slim.
+     * Get various basic info used in the API, including the number of revisions, unique authors, initial author
+     * and edit count of the initial author. This is combined into one query for better performance. Caching is only
+     * applied if it took considerable time to process, because using the gadget, this will get hit for a different page
+     * constantly, where the likelihood of cache benefiting us is slim.
      * @param Page $page The page.
-     * @return string[]
+     * @return string[]|false false if the page was not found.
      */
-    public function getBasicEditingInfo(Page $page): array
+    public function getBasicEditingInfo(Page $page)
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'page_basicinfo');
         if ($this->cache->hasItem($cacheKey)) {
@@ -297,7 +294,7 @@ class PageRepository extends Repository
             $this->setCache($cacheKey, $result, 'PT20M');
         }
 
-        return $result;
+        return $result ?? false;
     }
 
     /**

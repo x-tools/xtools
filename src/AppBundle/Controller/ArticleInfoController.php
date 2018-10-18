@@ -287,7 +287,7 @@ class ArticleInfoController extends XtoolsController
             $data['error'] = 'Unable to fetch revision data. The query may have timed out.';
         }
 
-        if (false != $info) {
+        if (false !== $info) {
             $creationDateTime = DateTime::createFromFormat('YmdHis', $info['created_at']);
             $modifiedDateTime = DateTime::createFromFormat('YmdHis', $info['modified_at']);
             $secsSinceLastEdit = (new DateTime)->getTimestamp() - $modifiedDateTime->getTimestamp();
