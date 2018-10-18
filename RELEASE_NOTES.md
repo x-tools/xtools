@@ -1,6 +1,6 @@
 # Release Notes #
 
-## 3.6.2 ##
+## 3.6.3 ##
 - Production hotfix: ensure AppExtension::loggedInUser() returns ?array
 
 ## 3.6.1 ##
