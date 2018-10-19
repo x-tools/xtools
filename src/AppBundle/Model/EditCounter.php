@@ -425,6 +425,9 @@ class EditCounter extends UserRights
         $timestamp = strtotime($block['log_timestamp']);
         $duration = null;
 
+        // log_params may be null, but we need to treat it like a string.
+        $block['log_params'] = (string)$block['log_params'];
+
         // First check if the string is serialized, and if so parse it to get the block duration.
         if (false !== @unserialize($block['log_params'])) {
             $parsedParams = unserialize($block['log_params']);
