@@ -70,9 +70,9 @@ class ArticleInfoRepository extends Repository
      * Query the WikiWho service to get authorship percentages.
      * @see https://api.wikiwho.net/
      * @param Page $page
-     * @return array[] Response from WikiWho.
+     * @return array[]|null Response from WikiWho. null if something went wrong.
      */
-    public function getTextshares(Page $page): array
+    public function getTextshares(Page $page): ?array
     {
         $title = rawurlencode(str_replace(' ', '_', $page->getTitle()));
         $client = new GuzzleHttp\Client();

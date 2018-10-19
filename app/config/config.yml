@@ -161,6 +161,9 @@ monolog:
             type: stream
             path: '%kernel.logs_dir%/rate_limit.log'
             channels: [rate_limit]
+        syslog_handler:
+            type: syslog
+            level: error
         critical_log:
             type: fingers_crossed
             action_level: critical
@@ -169,6 +172,3 @@ monolog:
         critical_file_log:
             type: stream
             path: "%kernel.logs_dir%/%kernel.environment%_critical.log"
-        syslog_handler:
-            type: syslog
-            level: error

@@ -197,7 +197,7 @@ class Edit extends Model
      */
     public function getComment(): string
     {
-        return $this->comment;
+        return (string)$this->comment;
     }
 
     /**

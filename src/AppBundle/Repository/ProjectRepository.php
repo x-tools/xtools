@@ -170,7 +170,7 @@ class ProjectRepository extends Repository
                 }
             }
         }
-        $cacheKey = "project.$project";
+        $cacheKey = $this->getCacheKey($project, 'project');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
