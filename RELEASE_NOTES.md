@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.6.7 ##
+- ArticleInfo: fix bug where layout Twig macro was not imported
+- EditCounter: make sure log_params are a string
+
 ## 3.6.6 ##
 - EditCounter: fix bug in rightschanges where new user groups is null 
 
