@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.6.6 ##
+- EditCounter: fix bug in rightschanges where new user groups is null 
+
 ## 3.6.5 ##
 - Production hotfix: Allow user session getter to return object, array or null.
 
