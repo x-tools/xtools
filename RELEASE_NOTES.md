@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.6.8 ##
+- Fix a few lingering production errors after being put in strict mode.
+
 ## 3.6.7 ##
 - ArticleInfo: fix bug where layout Twig macro was not imported
 - EditCounter: make sure log_params are a string
