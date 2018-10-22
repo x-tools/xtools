@@ -139,6 +139,12 @@ class DefaultController extends XtoolsController
         // Complete authentication.
         $client = $this->getOauthClient();
         $token = $session->get('oauth_request_token');
+
+        if (!is_a($token, \MediaWiki\OAuthClient\Token::class)) {
+            $this->addFlashMessage('notice', 'error-login');
+            return $this->redirectToRoute('homepage');
+        }
+
         $verifier = $request->get('oauth_verifier');
         $accessToken = $client->complete($token, $verifier);
 
