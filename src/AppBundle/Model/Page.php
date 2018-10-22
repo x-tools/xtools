@@ -57,9 +57,9 @@ class Page extends Model
 
     /**
      * Get basic information about this page from the repository.
-     * @return array
+     * @return array|null
      */
-    protected function getPageInfo(): array
+    protected function getPageInfo(): ?array
     {
         if (empty($this->pageInfo)) {
             $this->pageInfo = $this->getRepository()
@@ -193,7 +193,7 @@ class Page extends Model
     public function exists(): bool
     {
         $info = $this->getPageInfo();
-        return !isset($info['missing']) && !isset($info['invalid']);
+        return null !== $info && !isset($info['missing']) && !isset($info['invalid']) && !isset($info['interwiki']);
     }
 
     /**

@@ -25,23 +25,23 @@ class PageRepository extends Repository
      * Get metadata about a single page from the API.
      * @param Project $project The project to which the page belongs.
      * @param string $pageTitle Page title.
-     * @return string[] Array with some of the following keys: pageid, title, missing, displaytitle,
-     * url.
+     * @return string[]|null Array with some of the following keys: pageid, title, missing, displaytitle, url.
+     *   Returns null if page does not exist.
      */
-    public function getPageInfo(Project $project, string $pageTitle): array
+    public function getPageInfo(Project $project, string $pageTitle): ?array
     {
         $info = $this->getPagesInfo($project, [$pageTitle]);
-        return array_shift($info);
+        return null !== $info ? array_shift($info) : null;
     }
 
     /**
      * Get metadata about a set of pages from the API.
      * @param Project $project The project to which the pages belong.
      * @param string[] $pageTitles Array of page titles.
-     * @return string[] Array keyed by the page names, each element with some of the
-     *   following keys: pageid, title, missing, displaytitle, url.
+     * @return string[]|null Array keyed by the page names, each element with some of the following keys: pageid,
+     *   title, missing, displaytitle, url. Returns null if page does not exist.
      */
-    public function getPagesInfo(Project $project, array $pageTitles): array
+    public function getPagesInfo(Project $project, array $pageTitles): ?array
     {
         // @TODO: Also include 'extlinks' prop when we start checking for dead external links.
         $params = [
@@ -63,6 +63,8 @@ class PageRepository extends Repository
             foreach ($res['query']['pages'] as $pageInfo) {
                 $result[$pageInfo['title']] = $pageInfo;
             }
+        } else {
+            return null;
         }
         return $result;
     }
