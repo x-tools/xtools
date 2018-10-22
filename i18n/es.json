@@ -9,7 +9,8 @@
 			"2axterix2",
 			"La Mantis",
 			"Ivanhercaz",
-			"Jelou"
+			"Jelou",
+			"LittlePuppers"
 		]
 	},
 	"accepted-formats": "Formatos aceptados",
@@ -25,7 +26,7 @@
 	"admin-stats-notice2": "Algunos usuarios podrían ser exadministradores o tener permiso de realizar acciones administrativas concretas.",
 	"afd": "Artículos para su eliminación",
 	"aiv": "Intervención de administrador contra vandalismo",
-	"all": "todo",
+	"all": "Todo",
 	"all-approximate": "Todos los datos son aproximados.",
 	"all-edits": "Todas las ediciones",
 	"all-languages": "Todos los idiomas",
