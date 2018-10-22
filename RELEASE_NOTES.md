@@ -1,5 +1,12 @@
 # Release Notes #
 
+## 3.6.9 ##
+- ArticleInfo: handle scenario where there are no edits >0 bytes in size.
+- ArticleInfo: Treat interwiki redirects as a nonexistent page.
+- ArticleInfo: fix ArticleInfo::getUsernameMap() to handle empty array of IDs.
+- Handle error when given an ivalid login token.
+- Localization updates.
+
 ## 3.6.8 ##
 - Fix a few lingering production errors after being put in strict mode.
 
