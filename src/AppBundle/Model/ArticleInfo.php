@@ -1368,7 +1368,7 @@ class ArticleInfo extends Model
 
         $textshares = [];
 
-        // Loop through once more, creating an array with the user names (or IP address)
+        // Loop through once more, creating an array with the user names (or IP addresses)
         // as the key, and the count and percentage as the value.
         foreach ($countsToProcess as $editor => $count) {
             if (isset($usernameMap[$editor])) {
@@ -1398,6 +1398,10 @@ class ArticleInfo extends Model
      */
     private function getUsernameMap(array $userIds): array
     {
+        if (empty($userIds)) {
+            return [];
+        }
+
         $userIdsNames = $this->getRepository()->getUsernamesFromIds(
             $this->page->getProject(),
             $userIds
