@@ -1325,7 +1325,9 @@ class ArticleInfo extends Model
             return [
                 'label' => $editor,
                 'value' => $added,
-                'percentage' => 100 * ($added / $this->addedBytes),
+                'percentage' => 0 === $this->addedBytes
+                    ? 0
+                    : 100 * ($added / $this->addedBytes),
             ];
         }, $topTenEditorsByAdded);
     }

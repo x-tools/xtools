@@ -217,16 +217,18 @@
                             {{ ai.lastEdit.size|diff_format }}
                         </td>
                     </tr>
-                    <tr>
-                        <td>{{ msg('max-text-added') }}</td>
-                        <td>
-                            {{ wiki.diffLink(ai.maxAddition, ai.maxAddition.timestamp) }}
-                            &bull;
-                            {{ wiki.userLink(ai.maxAddition.user, project) }}
-                            &bull;
-                            {{ ai.maxAddition.size|diff_format }}
-                        </td>
-                    </tr>
+                    {% if ai.maxAddition is not null %}
+                        <tr>
+                            <td>{{ msg('max-text-added') }}</td>
+                            <td>
+                                {{ wiki.diffLink(ai.maxAddition, ai.maxAddition.timestamp) }}
+                                &bull;
+                                {{ wiki.userLink(ai.maxAddition.user, project) }}
+                                &bull;
+                                {{ ai.maxAddition.size|diff_format }}
+                            </td>
+                        </tr>
+                    {% endif %}
                     {% if ai.maxDeletion is not null %}
                         <tr>
                             <td>{{ msg('max-text-deleted') }}</td>
@@ -432,10 +434,12 @@
                     <div class="chart-title">{{ msg('top-ten-by-edits')|capitalize_first }}</div>
                     {{ chart.pie_chart('top_by_edits', ai.topTenEditorsByEdits) }}
                 </div>
-                <div class="pull-left">
-                    <div class="chart-title">{{ msg('top-ten-by-text')|capitalize_first }}</div>
-                    {{ chart.pie_chart('top_by_added', ai.topTenEditorsByAdded) }}
-                </div>
+                {% if ai.maxAddition is not null %}
+                    <div class="pull-left">
+                        <div class="chart-title">{{ msg('top-ten-by-text')|capitalize_first }}</div>
+                        {{ chart.pie_chart('top_by_added', ai.topTenEditorsByAdded) }}
+                    </div>
+                {% endif %}
             </div>
             <table class="table table-bordered table-hover table-striped top-editors-table">
                 <thead><tr>
