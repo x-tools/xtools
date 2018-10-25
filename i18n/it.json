@@ -76,6 +76,7 @@
 	"edits-last-year": "Modifiche negli ultimi 365 giorni",
 	"edits-with-summaries": "Modifiche con oggetto",
 	"end": "Data dell'ultima modifica",
+	"error-login": "Accesso fallito! Per favore, riprova.",
 	"events": "Eventi",
 	"executed": "Eseguito in $1 {{PLURAL:$2|secondo|secondi}}.",
 	"explanation": "Spiegazione",
