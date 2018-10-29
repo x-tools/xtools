@@ -244,7 +244,7 @@
 	"patrols": "Ophodnje",
 	"patrols-desc": "{{PLURAL:$1|Ophođen $2 članak|Ophođena $2 članka|Ophođeno $2 članaka}}",
 	"performer": "Suradnik",
-	"powered-by": "Pogoni $1",
+	"powered-by": "Pokreće $1",
 	"priority": "Prioritet",
 	"project": "Projekt",
 	"prose": "Sintaksa",
