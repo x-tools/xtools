@@ -38,6 +38,9 @@
 {% set pageSize = pageSize is not empty ? pageSize : 50 %}
 {% set globalEdits = ec.globalEdits(pageSize, offset) %}
 {% if globalEdits|length > 0 %}
+    <p class="text-danger" style="padding-bottom: 20px;">
+        {{ msg('edit-summaries-missing', ['<a target="_blank" href="https://phabricator.wikimedia.org/T189234">T189234</a>']) }}
+    </p>
     {{ layout.contributionsNav(offset, globalEdits|length, pageSize) }}
     <table class="table table-bordered table-hover table-striped contributions-table">
         <thead><tr>

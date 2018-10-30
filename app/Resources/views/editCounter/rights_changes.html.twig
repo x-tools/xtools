@@ -75,6 +75,9 @@
 {% endif %}
 
 {% if ec.rightsChanges|length > 0 %}
+    <p class="text-danger" style="padding-bottom: 20px;">
+        {{ msg('edit-summaries-missing', ['<a target="_blank" href="https://phabricator.wikimedia.org/T189234">T189234</a>']) }}
+    </p>
     {% include 'editCounter/rights_changes_table.html.twig' with {'rightsChanges': ec.rightsChanges} %}
 {% else %}
     <div class="alert alert-info">

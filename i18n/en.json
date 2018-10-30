@@ -107,6 +107,7 @@
 	"edit-count-desc": "$2 {{PLURAL:$1|edit|edits}}",
 	"edit-summaries": "Edit summaries",
 	"edit-summaries-desc": "$2 {{PLURAL:$1|edit summary|edit summaries}} used in the article space",
+	"edit-summaries-missing": "Edit and log summaries made after October 25, 2018 are temporarily missing due to a WMF database migration. We are working to resolve this issue as soon as possible. You can follow $1 for updates.",
 	"edit-summaries-percentage": "Edit summaries %",
 	"edit-summary": "Edit summary",
 	"edit-summary-recent-major": "Last $1 major edits with summaries",
