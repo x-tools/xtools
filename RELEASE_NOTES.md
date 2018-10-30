@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.6.10 ##
+- Add temporary notice about missing log/edit summaries.
+- Localization updates.
+
 ## 3.6.9 ##
 - ArticleInfo: handle scenario where there are no edits >0 bytes in size.
 - ArticleInfo: Treat interwiki redirects as a nonexistent page.
