@@ -234,7 +234,7 @@
                 </td>
             </tr>
             <tr>
-                <td>{{ msg('edits-with-summaries') }}**</td>
+                <td>{{ msg('edits-with-summaries') }}</td>
                 <td>
                     {% if enabled('EditSummary') %}
                         <a href="{{ path('EditSummaryResult', {project:project.domain, username:user.username, namespace:'all'}) }}">{{ ec.countRevisionsWithComments|num_format }}</a>
@@ -481,12 +481,12 @@
         {{
             chart.pie_chart('summaries',
                 [{
-                    label: msg('with-summary') ~ '**',
+                    label: msg('with-summary'),
                     value: ec.countRevisionsWithComments,
                     percentage: (ec.countRevisionsWithComments / ec.countLiveRevisions) * 100
                 },
                 {
-                    label: msg('no-summary') ~ '**',
+                    label: msg('no-summary'),
                     value: ec.countRevisionsWithoutComments,
                     percentage: 100 - ((ec.countRevisionsWithComments / ec.countLiveRevisions) * 100)
                 }]
@@ -522,8 +522,6 @@
         }}
         <div class="footnotes">
             * {{ msg('data-limit', [5000, 5000|num_format]) }}
-            <br/>
-            ** <span class="text-danger">{{ msg('edit-summaries-missing', ['<a target="_blank" href="https://phabricator.wikimedia.org/T189234">T189234</a>']) }}</span>
         </div>
     </div>
 {% endif %}

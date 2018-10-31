@@ -78,28 +78,34 @@ class UserRightsRepository extends Repository
         }
 
         $loggingTable = $this->getTableName($dbName, 'logging', 'logindex');
+        $commentTable = $this->getTableName($dbName, 'comment');
         $userTable = $this->getTableName($dbName, 'user');
         $username = str_replace(' ', '_', $user->getUsername());
 
         if ('meta' === $type) {
             // Reference the original Project.
-            $username .='@'.$project->getDatabaseName();
+            $username .= '@'.$project->getDatabaseName();
         }
 
         // Way back when it was possible to have usernames with lowercase characters.
-        // Some log entires are caught unless we look for both variations.
+        // Some log entries are caught unless we look for both variations.
         $usernameLower = lcfirst($username);
 
         $logType = 'global' == $type ? 'gblrights' : 'rights';
 
-        $sql = "SELECT log_id, log_timestamp, log_comment, log_params, log_action,
+        $sql = "SELECT log_id, log_timestamp, log_params, log_action,
                     IF(log_user_text != '', log_user_text, (
                         SELECT user_name
                         FROM $userTable
                         WHERE user_id = log_user
                     )) AS log_user_text,
+                    CASE WHEN log_comment_id = 0
+                        THEN log_comment
+                        ELSE IFNULL(comment_text, '')
+                        END AS `log_comment`,
                     '$type' AS type
                 FROM $loggingTable
+                LEFT OUTER JOIN $commentTable ON comment_id = log_comment_id
                 WHERE log_type = '$logType'
                 AND log_namespace = 2
                 AND log_title IN (:username, :username2)

@@ -203,7 +203,6 @@ class EditSummary extends Model
      * Process a single row from the database, updating class properties with counts.
      * @param string[] $row As retrieved from the revision table.
      * @return string[]
-     * @todo Somehow allow this to be private and still be accessible in the Repository.
      */
     public function processRow(array $row): array
     {
@@ -280,7 +279,7 @@ class EditSummary extends Model
      */
     private function hasSummary(array $row): bool
     {
-        $summary = preg_replace("/^\/\* (.*?) \*\/\s*/", '', $row['rev_comment']);
+        $summary = preg_replace("/^\/\* (.*?) \*\/\s*/", '', $row['comment']);
         return '' !== $summary;
     }
 

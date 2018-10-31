@@ -108,7 +108,6 @@
 	"edit-count-desc": "Further description for edit-count.  $1 is the unformatted number, $2 is a formatted number",
 	"edit-summaries": "Label for a user's edit summary usage.\n{{Identical|Edit summary}}",
 	"edit-summaries-desc": "Further description for edit-summary.  $1 is the unformatted number, $2 is a formatted number",
-	"edit-summaries-missing": "This message explains why newer edit summaries are not shown in the tool. $1 is a link to the Phabricator task, with the task number (T189234) as the label.",
 	"edit-summaries-percentage": "Label showing the percentage of edit summaries a user made.\n{{Identical|Edit summary}}",
 	"edit-summary": "'Edit summary' or 'comment' associated with an edit.\n{{Identical|Edit summary}}",
 	"edit-summary-recent-major": "Label for edit summary usage of recent major edits. $1 is the number of edits that are being checked.",

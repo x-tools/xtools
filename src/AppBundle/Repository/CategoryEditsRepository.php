@@ -143,6 +143,7 @@ class CategoryEditsRepository extends Repository
 
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
+        $commentTable = $project->getTableName('comment');
         $categorylinksTable = $project->getTableName('categorylinks');
 
         $query = $this->getProjectsConnection()->createQueryBuilder();
@@ -154,11 +155,15 @@ class CategoryEditsRepository extends Repository
                 'revs.rev_minor_edit AS minor',
                 'revs.rev_len AS length',
                 '(CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change',
-                'revs.rev_comment AS comment',
+                'CASE WHEN revs.rev_comment_id = 0
+                    THEN revs.rev_comment
+                    ELSE comment_text
+                    END AS `comment`',
             ])
             ->from($pageTable)
             ->join($pageTable, $revisionTable, 'revs', 'page_id = revs.rev_page')
             ->join('revs', $categorylinksTable, null, 'cl_from = rev_page')
+            ->leftJoin('revs', $commentTable, 'comment', 'revs.rev_comment_id = comment_id')
             ->leftJoin('revs', $revisionTable, 'parentrevs', 'revs.rev_parent_id = parentrevs.rev_id')
             ->where('revs.rev_user_text = :username')
             ->andWhere($query->expr()->in('cl_to', ':categories'))

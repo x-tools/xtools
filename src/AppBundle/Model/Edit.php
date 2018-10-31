@@ -88,16 +88,7 @@ class Edit extends Model
      */
     public function getCacheKey(): string
     {
-        return $this->id;
-    }
-
-    /**
-     * Get the page to which this edit belongs.
-     * @return Page
-     */
-    public function getPage(): Page
-    {
-        return $this->page;
+        return (string)$this->id;
     }
 
     /**

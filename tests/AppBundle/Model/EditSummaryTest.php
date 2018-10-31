@@ -58,19 +58,19 @@ class EditSummaryTest extends TestAdapter
         $method->setAccessible(true);
 
         static::assertFalse(
-            $method->invoke($this->editSummary, ['rev_comment' => ''])
+            $method->invoke($this->editSummary, ['comment' => ''])
         );
         static::assertTrue(
-            $method->invoke($this->editSummary, ['rev_comment' => 'Foo'])
+            $method->invoke($this->editSummary, ['comment' => 'Foo'])
         );
         static::assertFalse(
-            $method->invoke($this->editSummary, ['rev_comment' => '/* section title */  '])
+            $method->invoke($this->editSummary, ['comment' => '/* section title */  '])
         );
         static::assertTrue(
-            $method->invoke($this->editSummary, ['rev_comment' => ' /* section title */'])
+            $method->invoke($this->editSummary, ['comment' => ' /* section title */'])
         );
         static::assertTrue(
-            $method->invoke($this->editSummary, ['rev_comment' => '/* section title */ Foo'])
+            $method->invoke($this->editSummary, ['comment' => '/* section title */ Foo'])
         );
     }
 
@@ -125,19 +125,19 @@ class EditSummaryTest extends TestAdapter
         // Ordered by rev_timestamp DESC.
         return [
             [
-                'rev_comment' => '/* Section title */',
+                'comment' => '/* Section title */',
                 'rev_timestamp' => '20161103010000',
                 'rev_minor_edit' => '1',
             ], [
-                'rev_comment' => 'Weeee',
+                'comment' => 'Weeee',
                 'rev_timestamp' => '20161003000000',
                 'rev_minor_edit' => '0',
             ], [
-                'rev_comment' => 'This is an edit summary',
+                'comment' => 'This is an edit summary',
                 'rev_timestamp' => '20160705000000',
                 'rev_minor_edit' => '1',
             ], [
-                'rev_comment' => '',
+                'comment' => '',
                 'rev_timestamp' => '20160701101205',
                 'rev_minor_edit' => '0',
             ],

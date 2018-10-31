@@ -61,8 +61,8 @@ class EditCounterRepository extends UserRightsRepository
             SELECT 'year' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
                 WHERE $revUserClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
             ) UNION (
-            SELECT 'with_comments' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE $revUserClause AND rev_comment != ''
+            edit-summSELECT 'with_comments' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
+                WHERE $revUserClause AND (rev_comment_id > 0 OR rev_comment != '')
             ) UNION (
             SELECT 'minor' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
                 WHERE $revUserClause AND rev_minor_edit = 1
@@ -416,6 +416,7 @@ class EditCounterRepository extends UserRightsRepository
         foreach ($projects as $project) {
             $revisionTable = $project->getTableName('revision');
             $pageTable = $project->getTableName('page');
+            $commentTable = $project->getTableName('comment');
             $sql = "SELECT
                     '".$project->getDatabaseName()."' AS project_name,
                     revs.rev_id AS id,
@@ -426,15 +427,18 @@ class EditCounterRepository extends UserRightsRepository
                     revs.rev_len AS length,
                     (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
                     revs.rev_parent_id AS parent_id,
-                    revs.rev_comment AS comment,
                     revs.rev_user_text AS username,
                     page.page_title,
-                    page.page_namespace
+                    page.page_namespace,
+                    CASE WHEN revs.rev_comment_id = 0
+                        THEN revs.rev_comment
+                        ELSE comment_text
+                        END AS `comment`
                 FROM $revisionTable AS revs
                     JOIN $pageTable AS page ON (rev_page = page_id)
                     LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-                WHERE revs.rev_user_text = :username
-                ORDER BY revs.rev_timestamp DESC";
+                    LEFT OUTER JOIN $commentTable ON revs.rev_comment_id = comment_id
+                WHERE revs.rev_user_text = :username";
             $queries[] = $sql;
         }
         $sql = "SELECT * FROM ((\n" . join("\n) UNION (\n", $queries) . ")) a ORDER BY timestamp DESC LIMIT $limit";

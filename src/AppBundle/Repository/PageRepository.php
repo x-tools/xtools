@@ -146,6 +146,7 @@ class PageRepository extends Repository
         $end = false
     ): \Doctrine\DBAL\Driver\Statement {
         $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
+        $commentTable = $this->getTableName($page->getProject()->getDatabaseName(), 'comment');
         $userClause = $user ? "revs.rev_user_text = :username AND " : "";
 
         // This sorts ascending by rev_timestamp because ArticleInfo must start with the oldest
@@ -168,10 +169,14 @@ class PageRepository extends Repository
                     (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
                     revs.rev_user AS user_id,
                     revs.rev_user_text AS username,
-                    revs.rev_comment AS comment,
+                    CASE WHEN revs.rev_comment_id = 0
+                        THEN revs.rev_comment
+                        ELSE comment_text
+                        END AS `comment`,
                     revs.rev_sha1 AS sha
                 FROM $revTable AS revs
                 LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+                LEFT OUTER JOIN $commentTable ON comment_id = revs.rev_comment_id
                 WHERE $userClause revs.rev_page = :pageid $dateConditions
                 ORDER BY revs.rev_timestamp ASC
                 $limitClause";

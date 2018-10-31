@@ -214,6 +214,7 @@ class TopEditsRepository extends Repository
     private function queryTopEditsPage(Page $page, User $user, bool $childRevs = false): array
     {
         $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
+        $commentTable = $this->getTableName($page->getProject()->getDatabaseName(), 'comment');
 
         if ($childRevs) {
             $childSelect = ', (CASE WHEN childrevs.rev_sha1 = parentrevs.rev_sha1 THEN 1 ELSE 0 END) AS reverted,
@@ -236,10 +237,14 @@ class TopEditsRepository extends Repository
                     (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
                     revs.rev_user AS user_id,
                     revs.rev_user_text AS username,
-                    revs.rev_comment AS comment
+                    CASE WHEN revs.rev_comment_id = 0
+                        THEN revs.rev_comment
+                        ELSE comment_text
+                        END AS `comment`
                     $childSelect
                 FROM $revTable AS revs
                 LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+                LEFT OUTER JOIN $commentTable ON comment_id = revs.rev_comment_id
                 $childJoin
                 WHERE revs.rev_user_text = :username
                 AND revs.rev_page = :pageid

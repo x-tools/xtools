@@ -28,14 +28,21 @@ class EditSummaryRepository extends Repository
     public function getRevisions(Project $project, User $user, $namespace): \Doctrine\DBAL\Driver\Statement
     {
         $revisionTable = $project->getTableName('revision');
+        $commentTable = $project->getTableName('comment');
         $pageTable = $project->getTableName('page');
 
         $condNamespace = 'all' === $namespace ? '' : 'AND page_namespace = :namespace';
         $pageJoin = 'all' === $namespace ? '' : "JOIN $pageTable ON rev_page = page_id";
 
-        $sql = "SELECT rev_comment, rev_timestamp, rev_minor_edit
-                FROM  $revisionTable
-    ​            $pageJoin
+        $sql = "SELECT CASE WHEN rev_comment_id = 0
+                      THEN rev_comment
+                      ELSE comment_text
+                      END AS `comment`,
+                    rev_timestamp,
+                    rev_minor_edit
+                FROM $revisionTable
+                $pageJoin
+                LEFT OUTER JOIN $commentTable ON comment_id = rev_comment_id
                 WHERE rev_user_text = :username
                 $condNamespace
                 ORDER BY rev_timestamp DESC";
@@ -49,8 +56,7 @@ class EditSummaryRepository extends Repository
     }
 
     /**
-     * Loop through the revisions and tally up totals, based on callback
-     * that lives in the EditSummary model.
+     * Loop through the revisions and tally up totals, based on callback that lives in the EditSummary model.
      * @param Project $project
      * @param User $user
      * @param int|string $namespace Namespace ID or 'all' for all namespaces.

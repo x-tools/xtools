@@ -117,10 +117,6 @@
     {% from _self import contributionsNav as contributionsNav %}
     {% import 'macros/wiki.html.twig' as wiki %}
 
-    <p class="text-danger" style="padding-bottom: 20px;">
-        {{ msg('edit-summaries-missing', ['<a target="_blank" href="https://phabricator.wikimedia.org/T189234">T189234</a>']) }}
-    </p>
-
     {% if revs|length == 0 %}
         <div class="alert alert-info">
             {{ msg('no-contribs') }}

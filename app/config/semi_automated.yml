@@ -397,6 +397,9 @@ parameters:
         Snuggle:
             regex: 'WP:Snuggle\|Sn\]\]'
             link: Project:Snuggle
+        unblock-review:
+            regex: '\(\[\[User:Enterprisey\/unblock-review'
+            link: User:Enterprisey/unblock-review
     ko.wikipedia.org:
         AutoWikiBrowser:
             regex: '위키백과:AWB\|AWB|(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
