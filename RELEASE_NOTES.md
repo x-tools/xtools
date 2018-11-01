@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.6.11 ##
+- T189234: Update relevant queries to use new comment table.
+- Fix checking of previously entered project on index forms.
+
 ## 3.6.10 ##
 - Add temporary notice about missing log/edit summaries.
 - Localization updates.
