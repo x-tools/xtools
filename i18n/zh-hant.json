@@ -279,7 +279,7 @@
 	"pages-deleted": "被刪頁面數",
 	"pages-deleted-hover-desc": "停留在「$1」文字上來查看刪除摘要。",
 	"pages-deleted-redirects": "已刪除的頁面可能是重新導向。",
-	"pages-edited-total": "建立頁面數（總計）",
+	"pages-edited-total": "編輯頁面數（總計）",
 	"pages-moved": "移動頁面數",
 	"pages-recreated-desc": "一些已刪除頁面可能會被此使用者或不同使用者給重建，這些會被標記成「$1」。",
 	"pageviews": "累積頁面瀏覽次數",

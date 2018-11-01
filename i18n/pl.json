@@ -82,6 +82,7 @@
 	"edits-last-year": "Edycje w ciągu ostatnich 365 dni",
 	"edits-with-summaries": "Edycje z opisem zmian",
 	"end": "Data zakończenia",
+	"error-login": "Logowanie nieudane! Spróbuj ponownie.",
 	"error-rate-limit": "Wykryto potencjalne działanie bota indeksującego. Jeśli jesteś człowiekiem, wykonujesz zbyt wiele działań w krótkim okresie czasu. Poczekaj $1 {{PLURAL:$1|minutę|minuty|minut}}, zanim ponownie załadujesz to narzędzie. Możesz się potem zalogować, aby zapobiec takim sytuacjom w przyszłości.",
 	"error-service-overload": "XTools obsługuje obecnie zbyt wiele żądań. Spróbuj ponownie za kilka minut.",
 	"events": "Rejestry",
