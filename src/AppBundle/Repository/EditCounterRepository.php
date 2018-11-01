@@ -61,7 +61,7 @@ class EditCounterRepository extends UserRightsRepository
             SELECT 'year' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
                 WHERE $revUserClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
             ) UNION (
-            edit-summSELECT 'with_comments' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
+            SELECT 'with_comments' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
                 WHERE $revUserClause AND (rev_comment_id > 0 OR rev_comment != '')
             ) UNION (
             SELECT 'minor' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
