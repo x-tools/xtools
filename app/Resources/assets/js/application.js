@@ -510,7 +510,7 @@ function setupNamespaceSelector()
  */
 function revertToValidProject(newProject)
 {
-    $('#project_input').val(lastProject);
+    $('#project_input').val(xtools.application.vars.lastProject);
     $('.site-notice').append(
         "<div class='alert alert-warning alert-dismissible' role='alert'>" +
         $.i18n('invalid-project', "<strong>" + newProject + "</strong>") +
