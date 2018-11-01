@@ -71,7 +71,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
          * Rate limiting will not apply to these actions
          * @var array
          */
-        $actionWhitelist = ['indexAction', 'showAction', 'aboutAction'];
+        $actionWhitelist = ['indexAction', 'showAction', 'aboutAction', 'recordUsage'];
 
         // No rate limits on lightweight pages or if they are logged in.
         if (in_array($controller[1], $actionWhitelist) || $loggedIn) {
@@ -137,7 +137,6 @@ class RateLimitSubscriber implements EventSubscriberInterface
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @param string $logComment Comment to include with the log entry.
      * @throws TooManyRequestsHttpException
-     * @todo i18n
      */
     private function denyAccess(\Symfony\Component\HttpFoundation\Request $request, string $logComment = ''): void
     {
