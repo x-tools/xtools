@@ -7,7 +7,8 @@
 			"Wojtas",
 			"Woytecr",
 			"Ankam",
-			"DeRudySoulStorm"
+			"DeRudySoulStorm",
+			"Rzuwig"
 		]
 	},
 	"accepted-formats": "Akceptowane formaty",
@@ -100,6 +101,7 @@
 	"global-total-edit-count": "Wszystkie projekty",
 	"help-translate": "Pomóż w tłumaczeniu",
 	"hide": "ukryj",
+	"high-replag": "Uwaga: opóźnienie replikacji jest wysokie, zmiany nowsze niż 1 $ mogą nie być wyświetlane.",
 	"history": "Historia",
 	"import": "Import",
 	"invalid-date": "Nieprawidłowa data",
