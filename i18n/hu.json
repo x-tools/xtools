@@ -3,7 +3,8 @@
 		"authors": [
 			"Bencemac",
 			"Tothasze",
-			"Tacsipacsi"
+			"Tacsipacsi",
+			"Zizzerus"
 		]
 	},
 	"accepted-formats": "Elfogadott formátumok",
@@ -105,7 +106,7 @@
 	"edits-with-summaries": "Szerkesztések összefoglalókkal",
 	"end": "Befejezési dátum",
 	"error-articleinfo-api": "A felülvizsgált adatok lekérése nem sikerült.",
-	"error-login": "Sikertelen bejelentkezés! Kérlek próbáld újra.",
+	"error-login": "Sikertelen bejelentkezés! Kérlek, próbáld újra.",
 	"error-report": "Kérjük, jelentse be ezt a hibát: $1 (Wikimédia-fiókot igényel).",
 	"error-server-message": "A szerver mondja: $1",
 	"error-title": "Végzetes hiba történt az XTools alatt.",
