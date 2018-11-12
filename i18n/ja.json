@@ -9,7 +9,8 @@
 			"S2KTS",
 			"Aefgh39622",
 			"Omotecho",
-			"Leiem"
+			"Leiem",
+			"Marine-Blue"
 		]
 	},
 	"accepted-formats": "受け入れられる形式",
@@ -18,7 +19,7 @@
 	"accounts": "アカウント",
 	"accounts-created": "アカウントの作成",
 	"actions": "拡張機能的な操作",
-	"actions-as-admin": "管理者としての操作（現役管理者でなければ表示されません）",
+	"actions-as-admin": "管理者としての操作",
 	"added": "追加",
 	"added-bytes": "追加量 (bytes)",
 	"admin-stats-notice": "期間内に少なくとも1つの管理者の仕事を行った利用者のみが表示されます。",

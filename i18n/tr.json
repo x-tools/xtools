@@ -293,6 +293,7 @@
 	"recreated": "Tekrar oluşturuldu",
 	"redirect": "Yönlendir",
 	"redirects": "Yönlendirmeler",
+	"redirfilter-all": "Yönlendirmeleri ve yönlendirme olmayanları dâhil et",
 	"redirfilter-noredirects": "Yönlendirmeleri hariç tut",
 	"redirfilter-onlyredirects": "Yalnızca yönlendirmeleri dahil et",
 	"references": "Kaynakça",
