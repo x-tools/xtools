@@ -225,8 +225,40 @@ class UserRights extends Model
                 $new = $unserialized['5::newgroups'];
                 $added = array_diff($new, $old);
                 $removed = array_diff($old, $new);
+                $oldMetadata = $unserialized['oldmetadata'] ?? null;
+                $newMetadata = $unserialized['newmetadata'] ?? null;
 
-                $rightsChanges = $this->setAutoRemovals($rightsChanges, $row, $unserialized, $added);
+                // Check for changes only to expiry. If such exists, treat it as added. Various issets are safeguards.
+                if (empty($added) && empty($removed) && isset($oldMetadata) && isset($newMetadata)) {
+                    foreach ($old as $index => $right) {
+                        $oldExpiry = $oldMetadata[$index]['expiry'] ?? null;
+                        $newExpiry = $newMetadata[$index]['expiry'] ?? null;
+
+                        // Check if an expiry was added, removed, or modified.
+                        if ((null !== $oldExpiry && null === $newExpiry) ||
+                            (null === $oldExpiry && null !== $newExpiry) ||
+                            (null !== $oldExpiry && null !== $newExpiry)
+                        ) {
+                            $added[$index] = $right;
+
+                            // Remove the last auto-removal(s), which must exist.
+                            foreach (array_reverse($rightsChanges, true) as $timestamp => $change) {
+                                if (in_array($right, $change['removed']) && !in_array($right, $change['added']) &&
+                                    'automatic' === $change['grantType']
+                                ) {
+                                    unset($rightsChanges[$timestamp]);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // If a right was removed, remove any previously pending auto-removals.
+                if (count($removed) > 0) {
+                    $this->unsetAutoRemoval($rightsChanges, $removed);
+                }
+
+                $this->setAutoRemovals($rightsChanges, $row, $unserialized, $added);
             } else {
                 // This is the old school format the most likely contains
                 // the list of rights additions as a comma-separated list.
@@ -275,11 +307,11 @@ class UserRights extends Model
      * @param array $row Log entry row from database.
      * @param array $params Unserialized log params.
      * @param string[] $added List of added user rights.
-     * @return array Modified $rightsChanges.
      */
-    private function setAutoRemovals(array $rightsChanges, array $row, array $params, array $added): array
+    private function setAutoRemovals(array &$rightsChanges, array $row, array $params, array $added): void
     {
         foreach ($added as $index => $entry) {
+            // Skip if no expiry was set.
             if (!isset($params['newmetadata'][$index]) ||
                 !array_key_exists('expiry', $params['newmetadata'][$index]) ||
                 empty($params['newmetadata'][$index]['expiry'])
@@ -290,8 +322,10 @@ class UserRights extends Model
             $expiry = $params['newmetadata'][$index]['expiry'];
 
             if (isset($rightsChanges[$expiry]) && !in_array($entry, $rightsChanges[$expiry]['removed'])) {
+                // Temporary right expired.
                 $rightsChanges[$expiry]['removed'][] = $entry;
             } else {
+                // Temporary right was added.
                 $rightsChanges[$expiry] = [
                     'logId' => $row['log_id'],
                     'performer' => $row['log_user_text'],
@@ -304,7 +338,20 @@ class UserRights extends Model
             }
         }
 
-        return $rightsChanges;
+        // Resort because the auto-removal timestamp could be before other rights changes.
+        ksort($rightsChanges);
+    }
+
+    private function unsetAutoRemoval(array &$rightsChanges, array $removed): void
+    {
+        foreach ($rightsChanges as $timestamp => $change) {
+            if ('pending' === $change['grantType']) {
+                $rightsChanges[$timestamp]['removed'] = array_diff($rightsChanges[$timestamp]['removed'], $removed);
+                if (empty($rightsChanges[$timestamp]['removed'])) {
+                    unset($rightsChanges[$timestamp]);
+                }
+            }
+        }
     }
 
     /**
