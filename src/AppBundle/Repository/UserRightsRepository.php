@@ -65,11 +65,6 @@ class UserRightsRepository extends Repository
      */
     private function queryRightsChanges(Project $project, User $user, string $type = 'local'): array
     {
-        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_rightschanges');
-        if ($this->cache->hasItem($cacheKey)) {
-            return $this->cache->getItem($cacheKey)->get();
-        }
-
         $dbName = $project->getDatabaseName();
 
         // Global rights and Meta-changed rights should use a Meta Project.
@@ -108,16 +103,12 @@ class UserRightsRepository extends Repository
                 LEFT OUTER JOIN $commentTable ON comment_id = log_comment_id
                 WHERE log_type = '$logType'
                 AND log_namespace = 2
-                AND log_title IN (:username, :username2)
-                ORDER BY log_timestamp DESC";
+                AND log_title IN (:username, :username2)";
 
-        $ret = $this->executeProjectsQuery($sql, [
+        return $this->executeProjectsQuery($sql, [
             'username' => $username,
             'username2' => $usernameLower,
         ])->fetchAll();
-
-        // Cache and return.
-        return $this->setCache($cacheKey, $ret);
     }
 
     /**

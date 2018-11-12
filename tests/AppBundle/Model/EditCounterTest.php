@@ -555,6 +555,20 @@ class EditCounterTest extends TestAdapter
         $this->editCounterRepo->expects(static::once())
             ->method('getRightsChanges')
             ->willReturn([[
+                    // Added: interface-admin, temporary.
+                    'log_id' => '92769185',
+                    'log_timestamp' => '20180826173045',
+                    'log_params' => 'a:4:{s:12:"4::oldgroups";a:3:{i:0;s:11:"abusefilter";i:1;s:9:"checkuser";i:2;s:5:'.
+                        '"sysop";}s:12:"5::newgroups";a:4:{i:0;s:11:"abusefilter";i:1;s:9:"checkuser";i:2;s:5:"sysop";'.
+                        'i:3;s:15:"interface-admin";}s:11:"oldmetadata";a:3:{i:0;a:1:{s:6:"expiry";N;}i:1;a:1:{s:6:"'.
+                        'expiry";N;}i:2;a:1:{s:6:"expiry";N;}}s:11:"newmetadata";a:4:{i:0;a:1:{s:6:"expiry";N;}i:1;a:1'.
+                        ':{s:6:"expiry";N;}i:2;a:1:{s:6:"expiry";N;}i:3;a:1:{s:6:"expiry";s:14:"20181025000000";}}}',
+                    'log_action' => 'rights',
+                    'log_user_text' => 'Worm That Turned',
+                    'log_comment' => 'per [[Special:Diff/856641107]]',
+                    'type' => 'local',
+                ], [
+                    // Removed: ipblock-exempt, filemover.
                     'log_id' => '210221',
                     'log_timestamp' => '20180108132810',
                     'log_comment' => '',
@@ -571,6 +585,7 @@ class EditCounterTest extends TestAdapter
                     'log_user_text' => 'MusikAnimal',
                     'type' => 'local',
                 ], [
+                    // Added: ipblock-exempt, filemover, templateeditor.
                     'log_id' => '210220',
                     'log_timestamp' => '20180108132758',
                     'log_comment' => '',
@@ -585,6 +600,7 @@ class EditCounterTest extends TestAdapter
                     'log_user_text' => 'MusikAnimal',
                     'type' => 'local',
                 ], [
+                    // Added: bureaucrat; Removed: rollbacker.
                     'log_id' => '155321',
                     'log_timestamp' => '20150716002614',
                     'log_comment' => 'Per user request.',
@@ -595,6 +611,7 @@ class EditCounterTest extends TestAdapter
                     'log_user_text' => 'Cyberpower678',
                     'type' => 'meta',
                 ], [
+                    // Old-school log entry, adds sysop.
                     'log_id' => '140643',
                     'log_timestamp' => '20141222034127',
                     'log_comment' => 'per request',
@@ -615,6 +632,24 @@ class EditCounterTest extends TestAdapter
         $this->user->setRepository($userRepo);
 
         static::assertEquals([
+            20181025000000 => [
+                'logId' => '92769185',
+                'performer' => 'Worm That Turned',
+                'comment' => null,
+                'added' => [],
+                'removed' => ['interface-admin'],
+                'grantType' => 'automatic',
+                'type' => 'local',
+            ],
+            20180826173045 => [
+                'logId' => '92769185',
+                'performer' => 'Worm That Turned',
+                'comment' => 'per [[Special:Diff/856641107]]',
+                'added' => ['interface-admin'],
+                'removed' => [],
+                'grantType' => 'manual',
+                'type' => 'local',
+            ],
             20180108132858 => [
                 'logId' => '210220',
                 'performer' => 'MusikAnimal',
@@ -704,7 +739,7 @@ class EditCounterTest extends TestAdapter
 
         // Former rights.
         static::assertEquals(
-            ['ipblock-exempt', 'filemover', 'templateeditor', 'rollbacker'],
+            ['interface-admin', 'ipblock-exempt', 'filemover', 'templateeditor', 'rollbacker'],
             $this->editCounter->getRightsStates()['local']['former']
         );
 
