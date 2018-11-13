@@ -73,6 +73,17 @@
 | {{ msg('average-edit-size') }}*
 | {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.averageEditSize|round(1) }}}} {{ msg('num-bytes', [ec.averageEditSize]) }}
 |-
+| {{ msg('minor-edits') }}
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countMinorRevisions }}}}{% if ec.countLiveRevisions %} ({{ ((ec.countMinorRevisions / ec.countLiveRevisions) * 100)|percent_format }})
+{% endif %}
+|-
+| {{ msg('small-edits') }}*
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countSmallEdits }}}}{% if ec.countLast5000 %} ({{ ((ec.countSmallEdits / ec.countLast5000) * 100)|percent_format }})
+{% endif %}
+|-
+| {{ msg('large-edits') }}*
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countLargeEdits }}}}{% if ec.countLast5000 %} ({{ ((ec.countLargeEdits / ec.countLast5000) * 100)|percent_format }})
+{% endif %}
 |}
 
 {# ======================== PAGES ======================== #}
@@ -106,33 +117,6 @@
 |-
 | {{ msg('files-uploaded-commons') }}
 | [https://commons.wikimedia.org/wiki/Special:ListFiles/{{ user.username|e('url') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countFilesUploadedCommons }}}}]
-{% endif %}
-|-
-|}
-
-{# ======================== EDITS ======================== #}
-=== {{ msg('edits') }} ({{ msg('live')|lower }}) ===
-
-{| class="wikitable sortable"
-| {{ msg('auto-edits') }}
-| {% if enabled('AutoEdits') %}[{{ url('AutoEditsResult', {project:project.domain, username:user.username, namespace:'all'}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countAutomatedEdits }}}}]{% else %}{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countAutomatedEdits }}}}{% endif %}
-{% if ec.countLiveRevisions %} ({{ ((ec.countAutomatedEdits / ec.countLiveRevisions) * 100)|percent_format }})
-{% endif %}
-|-
-| {{ msg('edits-with-summaries') }}
-| {% if enabled('EditSummary') %}[{{ url('EditSummaryResult', {project:project.domain, username:user.username, namespace:'all'}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countRevisionsWithComments }}}}]{% else %}{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countRevisionsWithComments }}}}{% endif %}{% if ec.countLiveRevisions %} ({{ ((ec.countRevisionsWithComments / ec.countLiveRevisions) * 100)|percent_format }})
-{% endif %}
-|-
-| {{ msg('minor-edits') }}
-| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countMinorRevisions }}}}{% if ec.countLiveRevisions %} ({{ ((ec.countMinorRevisions / ec.countLiveRevisions) * 100)|percent_format }})
-{% endif %}
-|-
-| {{ msg('small-edits') }}*
-| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countSmallEdits }}}}{% if ec.countLast5000 %} ({{ ((ec.countSmallEdits / ec.countLast5000) * 100)|percent_format }})
-{% endif %}
-|-
-| {{ msg('large-edits') }}*
-| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countLargeEdits }}}}{% if ec.countLast5000 %} ({{ ((ec.countLargeEdits / ec.countLast5000) * 100)|percent_format }})
 {% endif %}
 |-
 |}

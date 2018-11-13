@@ -83,8 +83,6 @@ class EditCounterTest extends TestAdapter
         static::assertEquals(10, $this->editCounter->countDeletedRevisions());
         static::assertEquals(110, $this->editCounter->countAllRevisions());
         static::assertEquals(100, $this->editCounter->countLast5000());
-        static::assertEquals(75, $this->editCounter->countRevisionsWithComments());
-        static::assertEquals(25, $this->editCounter->countRevisionsWithoutComments());
     }
 
     /**

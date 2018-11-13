@@ -218,8 +218,10 @@ class TopEditsRepository extends Repository
 
         if ($childRevs) {
             $childSelect = ', (CASE WHEN childrevs.rev_sha1 = parentrevs.rev_sha1 THEN 1 ELSE 0 END) AS reverted,
-                    childrevs.rev_comment AS parent_comment';
-            $childJoin = "LEFT JOIN $revTable AS childrevs ON (revs.rev_id = childrevs.rev_parent_id)";
+                childcomments.comment_text AS parent_comment';
+            $childJoin = "LEFT JOIN $revTable AS childrevs ON (revs.rev_id = childrevs.rev_parent_id)
+                LEFT OUTER JOIN $commentTable AS childcomments
+                ON (childrevs.rev_comment_id = childcomments.comment_id)";
             $childWhere = 'AND childrevs.rev_page = :pageid';
             $childLimit = '';
         } else {
@@ -237,14 +239,11 @@ class TopEditsRepository extends Repository
                     (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
                     revs.rev_user AS user_id,
                     revs.rev_user_text AS username,
-                    CASE WHEN revs.rev_comment_id = 0
-                        THEN revs.rev_comment
-                        ELSE comment_text
-                        END AS `comment`
+                    comments.comment_text AS `comment`
                     $childSelect
                 FROM $revTable AS revs
                 LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-                LEFT OUTER JOIN $commentTable ON comment_id = revs.rev_comment_id
+                LEFT OUTER JOIN $commentTable AS comments ON (revs.rev_comment_id = comments.comment_id)
                 $childJoin
                 WHERE revs.rev_user_text = :username
                 AND revs.rev_page = :pageid

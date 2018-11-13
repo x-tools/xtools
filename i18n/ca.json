@@ -1,6 +1,7 @@
 {
 	"all": "Tot",
 	"api-error": "Error consultar $1",
+	"basic-information": "Informació bàsica",
 	"bot": "Bot",
 	"documentation": "Documentació",
 	"download-label": "Descarrega",
@@ -9,6 +10,7 @@
 	"last-month": "Edicions als darrers 30 dies",
 	"last-week": "Edicions als darrers 7 dies",
 	"last-year": "Edicions en els darrers 365 dies",
+	"other": "Altres",
 	"page-title": "Títol de pàgina",
 	"pager-newer-n": "{{PLURAL:$1|1 posterior|$1 posteriors}}",
 	"pager-older-n": "{{PLURAL:$1|anterior|$1 anteriors}}",

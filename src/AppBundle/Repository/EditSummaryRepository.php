@@ -34,12 +34,7 @@ class EditSummaryRepository extends Repository
         $condNamespace = 'all' === $namespace ? '' : 'AND page_namespace = :namespace';
         $pageJoin = 'all' === $namespace ? '' : "JOIN $pageTable ON rev_page = page_id";
 
-        $sql = "SELECT CASE WHEN rev_comment_id = 0
-                      THEN rev_comment
-                      ELSE comment_text
-                      END AS `comment`,
-                    rev_timestamp,
-                    rev_minor_edit
+        $sql = "SELECT comment_text AS `comment`, rev_timestamp, rev_minor_edit
                 FROM $revisionTable
                 $pageJoin
                 LEFT OUTER JOIN $commentTable ON comment_id = rev_comment_id
