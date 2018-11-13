@@ -1,5 +1,15 @@
 # Release Notes #
 
+## 3.6.12 ##
+- T189234: Use new comment table for fetching edit/log summaries.
+- EditCounter: Remove edit summary and semi-automated stats, instead
+  providing links to the dedicated tools. This is for performance reasons.
+- EditCounter: Move 'Edits' section of General Stats to the top-right.
+- EditCounter: invalidate auto-removals of rights when expiry changed.
+- EditCounter: handle scenario where user rights log entry was deleted.
+- Whitelist MetaController::recordUsage from rate limiting.
+- Localization updates.
+
 ## 3.6.11 ##
 - T189234: Update relevant queries to use new comment table.
 - Fix checking of previously entered project on index forms.
