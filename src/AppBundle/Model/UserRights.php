@@ -219,7 +219,13 @@ class UserRights extends Model
         $rightsChanges = [];
 
         foreach ($logData as $row) {
+            // Can happen if the log entry has been deleted.
+            if (!isset($row['log_params']) || null === $row['log_params']) {
+                continue;
+            }
+
             $unserialized = @unserialize($row['log_params']);
+
             if (false !== $unserialized) {
                 $old = $unserialized['4::oldgroups'];
                 $new = $unserialized['5::newgroups'];
