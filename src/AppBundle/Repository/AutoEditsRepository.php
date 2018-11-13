@@ -73,7 +73,9 @@ class AutoEditsRepository extends UserRepository
         [$pageJoin, $condNamespace] = $this->getPageAndNamespaceSql($project, $namespace);
 
         $revisionTable = $project->getTableName('revision');
+        $commentTable = $project->getTableName('comment');
         $tagTable = $project->getTableName('change_tag');
+        $commentJoin = '';
         $tagJoin = '';
 
         $params = [];
@@ -81,7 +83,8 @@ class AutoEditsRepository extends UserRepository
         // Build SQL for detecting autoedits via regex and/or tags
         $condTools = [];
         if ('' != $regex) {
-            $condTools[] = "rev_comment REGEXP :tools";
+            $commentJoin = "LEFT OUTER JOIN $commentTable ON rev_comment_id = comment_id";
+            $condTools[] = "comment_text REGEXP :tools";
             $params['tools'] = $regex;
         }
         if ('' != $tagIds) {
@@ -93,6 +96,7 @@ class AutoEditsRepository extends UserRepository
         $sql = "SELECT COUNT(DISTINCT(rev_id))
                 FROM $revisionTable
                 $pageJoin
+                $commentJoin
                 $tagJoin
                 WHERE rev_user_text = :username
                 $condNamespace
@@ -138,6 +142,7 @@ class AutoEditsRepository extends UserRepository
 
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
+        $commentTable = $project->getTableName('comment');
         $tagTable = $project->getTableName('change_tag');
         $condNamespace = 'all' === $namespace ? '' : 'AND page_namespace = :namespace';
         $condTag = '' != $tagIds ? "AND NOT EXISTS (SELECT 1 FROM $tagTable
@@ -150,13 +155,14 @@ class AutoEditsRepository extends UserRepository
                     revs.rev_minor_edit AS minor,
                     revs.rev_len AS length,
                     (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
-                    revs.rev_comment AS comment
+                    comment_text AS comment
                 FROM $pageTable
                 JOIN $revisionTable AS revs ON (page_id = revs.rev_page)
                 LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+                LEFT OUTER JOIN $commentTable ON (revs.rev_comment_id = comment_id)
                 WHERE revs.rev_user_text = :username
                 AND revs.rev_timestamp > 0
-                AND revs.rev_comment NOT RLIKE :tools
+                AND comment_text NOT RLIKE :tools
                 $condTag
                 $condBegin
                 $condEnd
@@ -211,12 +217,18 @@ class AutoEditsRepository extends UserRepository
 
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
+        $commentTable = $project->getTableName('comment');
         $tagTable = $project->getTableName('change_tag');
         $condNamespace = 'all' === $namespace ? '' : 'AND page_namespace = :namespace';
-        $tagJoin = '' != $tagIds ? "LEFT OUTER JOIN $tagTable ON (ct_rev_id = revs.rev_id)" : '';
+        $tagJoin = '';
+        $condsTool = [];
 
-        $condsTool = '' != $regex ? ['revs.rev_comment RLIKE :tools'] : [];
+        if ('' != $regex) {
+            $condsTool[] = 'comment_text RLIKE :tools';
+        }
+
         if ('' != $tagIds) {
+            $tagJoin = "LEFT OUTER JOIN $tagTable ON (ct_rev_id = revs.rev_id)";
             if ($this->usesSingleTag($project, $tool)) {
                 // Only show edits made with the tool that don't overlap with other tools.
                 // For instance, Huggle edits are also tagged as Rollback, but when viewing
@@ -241,10 +253,11 @@ class AutoEditsRepository extends UserRepository
                     revs.rev_minor_edit AS minor,
                     revs.rev_len AS length,
                     (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
-                    revs.rev_comment AS comment
+                    comment_text AS comment
                 FROM $pageTable
                 JOIN $revisionTable AS revs ON (page_id = revs.rev_page)
                 LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+                LEFT OUTER JOIN $commentTable ON (revs.rev_comment_id = comment_id)
                 $tagJoin
                 WHERE revs.rev_user_text = :username
                 $condBegin
@@ -339,14 +352,13 @@ class AutoEditsRepository extends UserRepository
         $queries = [];
 
         $revisionTable = $project->getTableName('revision');
-        $tagTable = $project->getTableName('change_tag');
 
         [$pageJoin, $condNamespace] = $this->getPageAndNamespaceSql($project, $namespace);
 
         $conn = $this->getProjectsConnection();
 
         foreach ($tools as $toolname => $values) {
-            [$condTool, $tagJoin] = $this->getInnerAutomatedCountsSql($project, $tagTable, $values);
+            [$condTool, $commentJoin, $tagJoin] = $this->getInnerAutomatedCountsSql($project, $values);
 
             $toolname = $conn->quote($toolname, \PDO::PARAM_STR);
 
@@ -360,6 +372,7 @@ class AutoEditsRepository extends UserRepository
                 SELECT $toolname AS toolname, COUNT(DISTINCT(rev_id)) AS count
                 FROM $revisionTable
                 $pageJoin
+                $commentJoin
                 $tagJoin
                 WHERE rev_user_text = :username
                 AND $condTool
@@ -375,21 +388,24 @@ class AutoEditsRepository extends UserRepository
     /**
      * Get some of the inner SQL for self::getAutomatedCountsSql().
      * @param Project $project
-     * @param string $tagTable Name of the `change_tag` table.
      * @param string[] $values Values as defined in semi_automated.yml
      * @return string[] [Equality clause, JOIN clause]
      */
-    private function getInnerAutomatedCountsSql(Project $project, string $tagTable, array $values): array
+    private function getInnerAutomatedCountsSql(Project $project, array $values): array
     {
         $conn = $this->getProjectsConnection();
+        $commentJoin = '';
         $tagJoin = '';
         $condTool = '';
 
         if (isset($values['regex'])) {
+            $commentTable = $project->getTableName('comment');
+            $commentJoin = "LEFT OUTER JOIN $commentTable ON rev_comment_id = comment_id";
             $regex = $conn->quote($values['regex'], \PDO::PARAM_STR);
-            $condTool = "rev_comment REGEXP $regex";
+            $condTool = "comment_text REGEXP $regex";
         }
         if (isset($values['tag']) && isset($this->getTags($project)[$values['tag']])) {
+            $tagTable = $project->getTableName('change_tag');
             $tagJoin = "LEFT OUTER JOIN $tagTable ON ct_rev_id = rev_id";
 
             $tagId = $this->getTags($project)[$values['tag']];
@@ -415,7 +431,7 @@ class AutoEditsRepository extends UserRepository
             }
         }
 
-        return [$condTool, $tagJoin];
+        return [$condTool, $commentJoin, $tagJoin];
     }
 
     /**

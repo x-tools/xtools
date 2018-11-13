@@ -34,8 +34,8 @@ class EditCounterRepository extends UserRightsRepository
         }
 
         // Prepare the queries and execute them.
-        $archiveTable = $this->getTableName($project->getDatabaseName(), 'archive');
-        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+        $archiveTable = $project->getTableName('archive');
+        $revisionTable = $project->getTableName('revision');
 
         // For IPs we use rev_user_text, and for accounts rev_user which is slightly faster.
         $revUserClause = $user->isAnon() ? 'rev_user_text = :username' : 'rev_user = :userId';
@@ -60,9 +60,6 @@ class EditCounterRepository extends UserRightsRepository
             ) UNION (
             SELECT 'year' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
                 WHERE $revUserClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
-            ) UNION (
-            SELECT 'with_comments' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE $revUserClause AND (rev_comment_id > 0 OR rev_comment != '')
             ) UNION (
             SELECT 'minor' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
                 WHERE $revUserClause AND rev_minor_edit = 1
@@ -430,10 +427,7 @@ class EditCounterRepository extends UserRightsRepository
                     revs.rev_user_text AS username,
                     page.page_title,
                     page.page_namespace,
-                    CASE WHEN revs.rev_comment_id = 0
-                        THEN revs.rev_comment
-                        ELSE comment_text
-                        END AS `comment`
+                    comment_text AS `comment`
                 FROM $revisionTable AS revs
                     JOIN $pageTable AS page ON (rev_page = page_id)
                     LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)

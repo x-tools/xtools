@@ -169,10 +169,7 @@ class PageRepository extends Repository
                     (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
                     revs.rev_user AS user_id,
                     revs.rev_user_text AS username,
-                    CASE WHEN revs.rev_comment_id = 0
-                        THEN revs.rev_comment
-                        ELSE comment_text
-                        END AS `comment`,
+                    comment_text AS `comment`,
                     revs.rev_sha1 AS sha
                 FROM $revTable AS revs
                 LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)

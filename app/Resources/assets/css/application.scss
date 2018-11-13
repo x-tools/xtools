@@ -491,7 +491,7 @@ input.form-control.show-loader {
     padding-top: 0;
     white-space: normal;
 
-    &:first-child {
+    &:first-child:not(.stat-list--footer) {
         font-weight: bold;
         text-align: right;
         white-space: nowrap;

@@ -118,7 +118,7 @@ class EditSummaryTest extends TestAdapter
 
     /**
      * Get test revisions.
-     * @return string[] Rows with keys 'rev_comment', 'rev_timestamp' and 'rev_minor_edit'.
+     * @return string[] Rows with keys 'comment', 'rev_timestamp' and 'rev_minor_edit'.
      */
     private function getRevisions(): array
     {

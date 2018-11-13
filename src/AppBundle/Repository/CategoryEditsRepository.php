@@ -155,10 +155,7 @@ class CategoryEditsRepository extends Repository
                 'revs.rev_minor_edit AS minor',
                 'revs.rev_len AS length',
                 '(CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change',
-                'CASE WHEN revs.rev_comment_id = 0
-                    THEN revs.rev_comment
-                    ELSE comment_text
-                    END AS `comment`',
+                'comment_text AS `comment`',
             ])
             ->from($pageTable)
             ->join($pageTable, $revisionTable, 'revs', 'page_id = revs.rev_page')

@@ -32,7 +32,10 @@
 {% endif %}
 
 <div class="col-lg-6 stat-list clearfix">
-    <table class="table"><tbody>
+    <table class="table"><tbody class="stat-list--group">
+        <tr>
+            <td colspan="2" class="text-muted">{{ msg('basic-information') }}</td>
+        </tr>
         {% if not(user.anon) %}
             <tr>
                 <td>{{ msg('user-id') }}</td>
@@ -129,8 +132,16 @@
         </tr>
     </tbody></table>
 </div>
+
+{# ======================== EDITS ======================== #}
 <div class="col-lg-6 stat-list clearfix">
-    <table class="table"><tbody>
+    <table class="table"><tbody class="stat-list--group">
+        <tr>
+            <td colspan="2" class="text-muted">{% spaceless %}
+                    {{ msg('edits') }}
+                    ({{ msg('live')|lower }})
+                {% endspaceless %}</td>
+        </tr>
         <tr><td>{{ msg('last-day') }}</td><td>{{ ec.countRevisionsInLast('day')|num_format }}</td></tr>
         <tr><td>{{ msg('last-week') }}</td><td>{{ ec.countRevisionsInLast('week')|num_format }}</td></tr>
         <tr><td>{{ msg('last-month') }}</td><td>{{ ec.countRevisionsInLast('month')|num_format }}</td></tr>
@@ -148,10 +159,91 @@
             <td>{{ msg('average-edit-size') }}*</td>
             <td>{{ ec.averageEditSize|num_format(1) }} {{ msg('num-bytes', [ec.averageEditSize]) }}</td>
         </tr>
+        <tr>
+            <td>{{ msg('minor-edits') }}</td>
+            <td>
+                {{ ec.countMinorRevisions|num_format }}
+                {% if ec.countLiveRevisions %}
+                    &middot;
+                    ({{ ((ec.countMinorRevisions / ec.countLiveRevisions) * 100)|percent_format }})
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td>{{ msg('small-edits') }}*</td>
+            <td>
+                {{ ec.countSmallEdits|num_format }}
+                {% if ec.countLast5000 %}
+                    &middot;
+                    ({{ ((ec.countSmallEdits / ec.countLast5000) * 100)|percent_format }})
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td>{{ msg('large-edits') }}*</td>
+            <td>
+                {{ ec.countLargeEdits|num_format }}
+                {% if ec.countLast5000 %}
+                    &middot;
+                    ({{ ((ec.countLargeEdits / ec.countLast5000) * 100)|percent_format }})
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" class="text-muted text-center stat-list--new-group stat-list--footer">
+                <strong>{{ msg('other') }}:</strong>
+                <a target="_blank" href="{{ path('EditSummaryResult', {project:project.domain, username:user.username}) }}">{{ msg('tool-editsummary') }}</a>
+                &middot;
+                <a target="_blank" href="{{ path('AutoEditsResult', {project:project.domain, username:user.username}) }}">{{ msg('tool-autoedits') }}</a>
+            </td>
+        </tr>
     </tbody></table>
 </div>
 
 <hr style="clear:both" />
+
+{% set blockStats %}
+    {# ======================== BLOCKS ======================== #}
+    <tbody class="stat-list--group">
+        <tr>
+            <td colspan="2" class="text-muted">{{ msg('blocks') }}</td>
+        </tr>
+        <tr>
+            <td>{{ msg('re-blocks') }}</td>
+            <td>
+                {{ wiki.blockLogLink(user.username, project, ec.countBlocksReceived|num_format) }}
+            </td>
+        </tr>
+        <tr>
+            <td>{{ msg('block-longest') }}</td>
+            <td>
+                {% if ec.longestBlockSeconds == -1 %}
+                    &#x221e; {# infinity #}
+                {% elseif ec.longestBlockSeconds == false %}
+                    &ndash;
+                {% else %}
+                    {{ formatDuration(ec.longestBlockSeconds) }}
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td>{{ msg('block-current') }}</td>
+            <td>
+                {% if user.isBlocked(project) %}
+                    <a href="{{ wiki.pageUrlRaw('Special:BlockList', project)~'?wpTarget='~user.username }}">{% spaceless %}
+                            {% if user.getBlockExpiry(project) == 'infinity' %}
+                                &#x221e; {# infinity #}
+                            {% else %}
+                                {{ user.getBlockExpiry(project)|date_format }}
+                            {% endif %}
+                        {% endspaceless %}</a>
+                {% else %}
+                    &ndash;
+                {% endif %}
+            </td>
+        </tr>
+    </tbody>
+{% endset %}
 
 <div class="col-lg-4 stat-list clearfix">
     <table class="table">
@@ -211,73 +303,10 @@
             {% endif %}
         </tbody>
 
-        {# ======================== EDITS ======================== #}
-        <tbody class="stat-list--group">
-            <tr>
-                <td colspan="2" class="text-muted">{% spaceless %}
-                    {{ msg('edits') }}
-                    ({{ msg('live')|lower }})
-                {% endspaceless %}</td>
-            </tr>
-            <tr>
-                <td>{{ msg('auto-edits') }}</td>
-                <td>
-                    {% if enabled('AutoEdits') %}
-                        <a href="{{ path('AutoEditsResult', {project:project.domain, username:user.username, namespace:'all'}) }}">{{ ec.countAutomatedEdits|num_format }}</a>
-                    {% else %}
-                        {{ ec.countAutomatedEdits }}
-                    {% endif %}
-                    {% if ec.countLiveRevisions %}
-                        &middot;
-                        ({{ ((ec.countAutomatedEdits / ec.countLiveRevisions) * 100)|percent_format }})
-                    {% endif %}
-                </td>
-            </tr>
-            <tr>
-                <td>{{ msg('edits-with-summaries') }}</td>
-                <td>
-                    {% if enabled('EditSummary') %}
-                        <a href="{{ path('EditSummaryResult', {project:project.domain, username:user.username, namespace:'all'}) }}">{{ ec.countRevisionsWithComments|num_format }}</a>
-                    {% else %}
-                        {{ ec.countRevisionsWithComments|num_format }}
-                    {% endif %}
-                    {% if ec.countLiveRevisions %}
-                        &middot;
-                        ({{ ((ec.countRevisionsWithComments / ec.countLiveRevisions) * 100)|percent_format }})
-                    {% endif %}
-                </td>
-            </tr>
-            <tr>
-                <td>{{ msg('minor-edits') }}</td>
-                <td>
-                    {{ ec.countMinorRevisions|num_format }}
-                    {% if ec.countLiveRevisions %}
-                        &middot;
-                        ({{ ((ec.countMinorRevisions / ec.countLiveRevisions) * 100)|percent_format }})
-                    {% endif %}
-                </td>
-            </tr>
-            <tr>
-                <td>{{ msg('small-edits') }}*</td>
-                <td>
-                    {{ ec.countSmallEdits|num_format }}
-                    {% if ec.countLast5000 %}
-                        &middot;
-                        ({{ ((ec.countSmallEdits / ec.countLast5000) * 100)|percent_format }})
-                    {% endif %}
-                </td>
-            </tr>
-            <tr>
-                <td>{{ msg('large-edits') }}*</td>
-                <td>
-                    {{ ec.countLargeEdits|num_format }}
-                    {% if ec.countLast5000 %}
-                        &middot;
-                        ({{ ((ec.countLargeEdits / ec.countLast5000) * 100)|percent_format }})
-                    {% endif %}
-                </td>
-            </tr>
-        </tbody>
+        {# Show the block stats here if they are an admin, since the middle column would become very tall. #}
+        {% if adminStatus %}
+            {{ blockStats }}
+        {% endif %}
     </table>
 </div>
 <div class="col-lg-4 stat-list clearfix">
@@ -315,15 +344,11 @@
             </tbody>
 
             {# ======================== ADMIN ACTIONS ======================== #}
-            <tbody class="stat-list--group">
-                <tr>
-                    <td colspan="2" class="text-muted">{{ msg('actions-as-admin') }}</td>
-                </tr>
-                {% if adminStatus == false %}
+            {% if adminStatus %}
+                <tbody class="stat-list--group">
                     <tr>
-                        <td colspan="2" class="stat-list--empty-group">{{ msg('user-is-not-admin') }}</td>
+                        <td colspan="2" class="text-muted">{{ msg('actions-as-admin') }}</td>
                     </tr>
-                {% else %}
                     <tr>
                         <td>{{ msg('block') }}</td>
                         <td>
@@ -378,50 +403,11 @@
                         <td>{{ msg('import') }}</td>
                         <td>{{ wiki.userLogLink(user, project, ec.countPagesImported|num_format, 'import') }}</td>
                     </tr>
-                {% endif %}
-            </tbody>
+                </tbody>
+            {% else %}
+                {{ blockStats }}
+            {% endif %}
         {% endif %}
-
-        {# ======================== BLOCKS ======================== #}
-        <tbody class="stat-list--group">
-            <tr>
-                <td colspan="2" class="text-muted">{{ msg('blocks') }}</td>
-            </tr>
-            <tr>
-                <td>{{ msg('re-blocks') }}</td>
-                <td>
-                    {{ wiki.blockLogLink(user.username, project, ec.countBlocksReceived|num_format) }}
-                </td>
-            </tr>
-            <tr>
-                <td>{{ msg('block-longest') }}</td>
-                <td>
-                    {% if ec.longestBlockSeconds == -1 %}
-                        &#x221e; {# infinity #}
-                    {% elseif ec.longestBlockSeconds == false %}
-                        &ndash;
-                    {% else %}
-                        {{ formatDuration(ec.longestBlockSeconds) }}
-                    {% endif %}
-                </td>
-            </tr>
-            <tr>
-                <td>{{ msg('block-current') }}</td>
-                <td>
-                    {% if user.isBlocked(project) %}
-                        <a href="{{ wiki.pageUrlRaw('Special:BlockList', project)~'?wpTarget='~user.username }}">{% spaceless %}
-                            {% if user.getBlockExpiry(project) == 'infinity' %}
-                                &#x221e; {# infinity #}
-                            {% else %}
-                                {{ user.getBlockExpiry(project)|date_format }}
-                            {% endif %}
-                        {% endspaceless %}</a>
-                    {% else %}
-                        &ndash;
-                    {% endif %}
-                </td>
-            </tr>
-        </tbody>
     </table>
 </div>
 
@@ -479,16 +465,16 @@
 {% if ec.countLiveRevisions %}
     <div class="basic-info-charts col-lg-12 clearfix">
         {{
-            chart.pie_chart('summaries',
+            chart.pie_chart('deleted_edits',
                 [{
-                    label: msg('with-summary'),
-                    value: ec.countRevisionsWithComments,
-                    percentage: (ec.countRevisionsWithComments / ec.countLiveRevisions) * 100
+                    label: msg('live-edits'),
+                    value: ec.countAllRevisions,
+                    percentage: ((ec.countLiveRevisions / ec.countAllRevisions) * 100)
                 },
                 {
-                    label: msg('no-summary'),
-                    value: ec.countRevisionsWithoutComments,
-                    percentage: 100 - ((ec.countRevisionsWithComments / ec.countLiveRevisions) * 100)
+                    label: msg('deleted-edits'),
+                    value: ec.countDeletedRevisions,
+                    percentage: ((ec.countDeletedRevisions / ec.countAllRevisions) * 100)
                 }]
             )
         }}

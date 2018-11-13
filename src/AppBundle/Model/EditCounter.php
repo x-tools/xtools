@@ -175,25 +175,6 @@ class EditCounter extends UserRights
     }
 
     /**
-     * Get the total number of live revisions with comments.
-     * @return int
-     */
-    public function countRevisionsWithComments(): int
-    {
-        $revCounts = $this->getPairData();
-        return isset($revCounts['with_comments']) ? (int)$revCounts['with_comments'] : 0;
-    }
-
-    /**
-     * Get the total number of live revisions without comments.
-     * @return int
-     */
-    public function countRevisionsWithoutComments(): int
-    {
-        return $this->countLiveRevisions() - $this->countRevisionsWithComments();
-    }
-
-    /**
      * Get the total number of revisions marked as 'minor' by the user.
      * @return int
      */
