@@ -68,7 +68,7 @@ class AdminStats extends Model
         /** @var array $admins Keys are the usernames, values are their user groups. */
         $admins = $this->project->getUsersInGroups($adminGroups);
 
-        if (false === $abbreviate) {
+        if (false === $abbreviate || 0 === count($admins)) {
             return $admins;
         }
 
@@ -83,6 +83,7 @@ class AdminStats extends Model
             'steward' => 'S',
             'checkuser' => 'CU',
             'oversight' => 'OS',
+            'interface-admin' => 'IA',
             'bot' => 'Bot',
         ];
 
