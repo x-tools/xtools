@@ -48,7 +48,7 @@ class AdminStatsRepository extends Repository
         }
 
         $userTable = $project->getTableName('user');
-        $loggingTable = $project->getTableName('logging', 'userindex');
+        $loggingTable = $project->getTableName('logging', 'logindex');
 
         $sql = "SELECT user_name, user_id,
                     SUM(IF( (log_type = 'delete'  AND log_action != 'restore'),1,0)) AS 'delete',
