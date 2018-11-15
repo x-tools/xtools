@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"Lokesha kunchadka"
+			"Lokesha kunchadka",
+			"Ravi Mundkur"
 		]
 	},
 	"accepted-formats": "ಸ್ವೀಕರಣೊತ ಸ್ವರೂಪೊ",
@@ -56,6 +57,7 @@
 	"average-time-bw-edits": "ಸರಾಸರಿ ಸಂಪಾದನೆತ್ತ ನಡುಟ್ಟ್ ಇಪ್ಪುನ ಸಮಯೊ",
 	"average-time-bw-edits-abbr": "\nಆಕ್ಟ್ಯೂಬ್",
 	"back": "ಪಿರ",
+	"basic-information": "ಮೂಲ ಮಾಹಿತಿ",
 	"block": "ನಿರ್ಬಂದೊ",
 	"block-current": "ಇತ್ತೆತಾ ನಿರ್ಬಂದೊ",
 	"block-log": "ತಡೆ ಆತಿನ ಸದಸ್ಯೆರ್ನ ದಾಕಲೆ",
@@ -243,6 +245,7 @@
 	"oppose": "ವಿರೋದ",
 	"optional": "ಐಚಿಕೊ",
 	"original-size": "ನಿಜಾವಾಯಿನ ಗಾತ್ರೊ.",
+	"other": "ಬೇತೆ",
 	"others": "ಇತರೊ",
 	"page-size": "ಪುಟತೊ ಗಾತ್ರ",
 	"page-title": "ಪುಟೊದ ಪುದರ್",
