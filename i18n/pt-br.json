@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"Eduardo Addad de Oliveira"
+			"Eduardo Addad de Oliveira",
+			"He7d3r"
 		]
 	},
 	"accepted-formats": "Formatos aceites",
@@ -44,7 +45,7 @@
 	"auto-edits-request-doc": "Link para a documentação ou página inicial da ferramenta",
 	"auto-edits-request-examples": "Links para edições de exemplo",
 	"auto-edits-request-name": "Nome da ferramenta",
-	"auto-tool-edits": "$1 edições",
+	"auto-tool-edits": "edições com $1",
 	"automatic": "Automático",
 	"average-change-per-page": "Média de alterações por página",
 	"average-edit-size": "Tamanho médio da edição",

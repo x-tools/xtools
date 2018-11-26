@@ -47,7 +47,7 @@
 	"auto-edits-request-doc": "Hiperligação para a documentação ou para a página principal da ferramenta",
 	"auto-edits-request-examples": "Hiperligações para as edições de exemplo",
 	"auto-edits-request-name": "Nome da ferramenta",
-	"auto-tool-edits": "$1 edições",
+	"auto-tool-edits": "Edições com $1",
 	"automatic": "Automático",
 	"average-change-per-page": "Média de alterações por página",
 	"average-edit-size": "Tamanho médio da edição",
