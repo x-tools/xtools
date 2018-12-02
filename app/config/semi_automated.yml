@@ -361,7 +361,7 @@ parameters:
             link: Project:FTCG
         OrphanStatus:
             regex: '\[\[User:Technical_13\/Scripts\/OrphanStatus\|'
-            link: User:Technical13/Scripts/OrphanStatus.js
+            link: User:Technical_13/Scripts/OrphanStatus.js
         The Wikipedia Adventure:
             regex: 'simulated automatically as part of \[\[WP:The Wikipedia Adventure\|'
             link: Project:TWA
