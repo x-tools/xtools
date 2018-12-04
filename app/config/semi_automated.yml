@@ -400,6 +400,9 @@ parameters:
         unblock-review:
             regex: '\(\[\[User:Enterprisey\/unblock-review'
             link: User:Enterprisey/unblock-review
+        stubsearch:
+            regex: '\[\[User:Danski454\/stubsearch\|a tool'
+            link: User:Danski454/stubsearch
     ko.wikipedia.org:
         AutoWikiBrowser:
             regex: '위키백과:AWB\|AWB|(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
