@@ -420,6 +420,8 @@ parameters:
     pt.wikipedia.org:
         Undo:
             regex: 'Desfeita a edição \d+ de \[\['
+            link: Ajuda:Guia de edição/Reverter edições#Botão Desfazer
+            label: 'Desfazer'
         FastButtons:
             regex: '\|FastButtons\]\]'
             link: Wikipédia:FastButtons
@@ -435,6 +437,8 @@ parameters:
             label: Popups de navegação
         Page move:
             link: Ajuda:Guia de edição/Mover páginas
+        reFill:
+            link: en:Project:ReFill
         Generic rollback:
             link: Wikipédia:Reversores
-            label: Reversores
+            label: Reversão
