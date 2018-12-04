@@ -1,5 +1,15 @@
 # Release Notes #
 
+
+## 3.6.14 ##
+- T201850: Query logging_logindex instead of userindex for performance.
+- AdminStats: Fix a bug for when there are no admins.
+- AdminStats: Indicate interface admins.
+- T210314: Add stubsearch tool to AutoEdits enwiki configuration.
+- T210938: Fix a broken tool link in AutoEdits.
+- AutoEdits: Improve pt translation and fix some links.
+- Localization updates.
+
 ## 3.6.12 ##
 - T189234: Use new comment table for fetching edit/log summaries.
 - EditCounter: Remove edit summary and semi-automated stats, instead
