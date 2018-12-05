@@ -403,6 +403,9 @@ parameters:
         stubsearch:
             regex: '\[\[User:Danski454\/stubsearch\|a tool'
             link: User:Danski454/stubsearch
+        YABBR:
+            tag: 'OAuth CID: 860'
+            link: toolforge:yabbr
     ko.wikipedia.org:
         AutoWikiBrowser:
             regex: '위키백과:AWB\|AWB|(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
