@@ -118,6 +118,8 @@ parameters:
         Redirect:
             regex: 'Weiterleitung nach \[\[.*?erstellt'
             label: Weiterleitung
+        AutoWikiBrowser:
+            regex: 'mit \[\[Project:AWB\|AWB'
     ko:
         Undo:
             regex: '판 편집을 되돌림'
