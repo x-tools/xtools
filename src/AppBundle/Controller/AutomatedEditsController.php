@@ -70,6 +70,17 @@ class AutomatedEditsController extends XtoolsController
     {
         // Redirect if at minimum project and username are provided.
         if (isset($this->params['project']) && isset($this->params['username'])) {
+            // If 'tool' param is given, redirect to corresponding action.
+            $tool = $this->request->query->get('tool');
+
+            if ('all' === $tool) {
+                return $this->redirectToRoute('AutoEditsContributionsResult', $this->params);
+            } elseif ('' != $tool && 'none' !== $tool) {
+                $this->params['tool'] = $tool;
+                return $this->redirectToRoute('AutoEditsContributionsResult', $this->params);
+            }
+
+            // Otherwise redirect to the normal result action.
             return $this->redirectToRoute('AutoEditsResult', $this->params);
         }
 
@@ -101,11 +112,10 @@ class AutomatedEditsController extends XtoolsController
         // FIXME: instead of redirecting to index page, show result page listing all tools for that project,
         //  clickable to show edits by the user, etc.
         if ($tool && !isset($autoEditsRepo->getTools($this->project)[$tool])) {
-            $docUrl = $this->generateUrl('ProjectApiAutoEditsTools', ['project' => $this->params['project']]);
             $this->throwXtoolsException(
                 $this->getIndexRoute(),
-                "No known tool with name '$tool'. For available tools, use $docUrl",
-                ['no-result', $tool],
+                'auto-edits-unknown-tool',
+                [$tool],
                 'tool'
             );
         }

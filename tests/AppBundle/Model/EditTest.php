@@ -42,12 +42,12 @@ class EditTest extends TestAdapter
     {
         $client = static::createClient();
         $this->localContainer = $client->getContainer();
-        $this->project = new Project('TestProject');
+        $this->project = new Project('en.wikipedia.org');
         $this->projectRepo = $this->getMock(ProjectRepository::class);
         $this->projectRepo->method('getOne')
             ->willReturn([
-                'url' => 'https://test.example.org',
-                'dbName' => 'test_wiki',
+                'url' => 'https://en.wikipedia.org',
+                'dbName' => 'enwiki',
                 'lang' => 'en',
             ]);
         $this->projectRepo->method('getMetadata')
@@ -96,7 +96,7 @@ class EditTest extends TestAdapter
         ]));
         static::assertEquals(
             "&lt;script&gt;alert(\"XSS baby\")&lt;/script&gt; " .
-                "<a target='_blank' href='https://test.example.org/wiki/Test_page'>test page</a>",
+                "<a target='_blank' href='https://en.wikipedia.org/wiki/Test_page'>test page</a>",
             $edit->getWikifiedSummary()
         );
 
@@ -183,7 +183,7 @@ class EditTest extends TestAdapter
     {
         $edit = new Edit($this->page, $this->editAttrs);
         static::assertEquals(
-            'https://test.example.org/wiki/Special:Diff/1',
+            'https://en.wikipedia.org/wiki/Special:Diff/1',
             $edit->getDiffUrl()
         );
     }
@@ -195,7 +195,7 @@ class EditTest extends TestAdapter
     {
         $edit = new Edit($this->page, $this->editAttrs);
         static::assertEquals(
-            'https://test.example.org/wiki/Special:PermaLink/1',
+            'https://en.wikipedia.org/wiki/Special:PermaLink/1',
             $edit->getPermaUrl()
         );
     }
