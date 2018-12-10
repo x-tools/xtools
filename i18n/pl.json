@@ -35,6 +35,7 @@
 	"authorship": "Autorstwo",
 	"auto-edits": "(Pół)automatyczne edycje",
 	"auto-edits-request-name": "Nazwa narzędzia",
+	"auto-edits-unknown-tool": "Brak znanego narzędzia o nazwie: $1",
 	"automatic": "Automatycznie",
 	"average-change-per-page": "Średnia liczba edycji na stronę",
 	"average-edit-size": "Średni rozmiar edycji",
