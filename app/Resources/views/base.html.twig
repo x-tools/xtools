@@ -127,7 +127,7 @@
 
 <div class="site-notice">
     {% if noticeDisplay is defined and noticeDisplay == true %}
-        {{ layout.alert(noticeStyle, noticeText) }}
+        {{ layout.alert(noticeStyle, noticeText, true) }}
     {% endif %}
 
     {% if app.session.flashBag.peekAll %}
