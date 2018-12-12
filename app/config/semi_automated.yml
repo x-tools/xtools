@@ -61,7 +61,7 @@ parameters:
             tag: 'OAuth CID: 678'
             link: Special:MyLanguage/User:InternetArchiveBot
         HotCat:
-            regex: '\|HotCat\]\]|Gadget-Hotcat(?:check)?\.js\|Script|\]\] via HotCat'
+            regex: '\|HotCat\]\]|Gadget-Hotcat(?:check)?\.js\|Script|\]\] via HotCat|\[\[WP:HC\|'
             link: Special:MyLanguage/Project:HotCat
         Cat-a-lot:
             regex: '\[\[Help:Cat-a-lot\|Cat-a-lot\]\]'

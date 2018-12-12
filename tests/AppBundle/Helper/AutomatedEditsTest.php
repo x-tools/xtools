@@ -133,7 +133,7 @@ class AutomatedEditsTest extends TestAdapter
         static::assertArraySubset(
             ['HotCat' => [
                 'regex' => 'باستخدام \[\[ويكيبيديا:المصناف الفوري|\|HotCat\]\]' .
-                    '|Gadget-Hotcat(?:check)?\.js\|Script|\]\] via HotCat',
+                    '|Gadget-Hotcat(?:check)?\.js\|Script|\]\] via HotCat|\[\[WP:HC\|',
                 'link' => 'ويكيبيديا:المصناف الفوري',
                 'label' => 'المصناف الفوري',
             ]],
