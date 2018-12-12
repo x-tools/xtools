@@ -1,5 +1,13 @@
 # Release Notes #
 
+## 3.6.15 ##
+- T202552: Add date filtering options to Pages tool.
+- T211172: Add YABBR to enwiki AutoEdits configuration.
+- T211137: Add regex for German use of AWB to AutoEdits.
+- AutoEdits: add option to show edits made only with given tool.
+- Remove all slash routes from code, which are automatically supported
+  in Symfony 4.
+- Localization updates.
 
 ## 3.6.14 ##
 - T201850: Query logging_logindex instead of userindex for performance.
