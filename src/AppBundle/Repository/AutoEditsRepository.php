@@ -92,19 +92,20 @@ class AutoEditsRepository extends UserRepository
             $condTools[] = "ct_tag_id IN ($tagIds)";
         }
         $condTool = 'AND (' . implode(' OR ', $condTools) . ')';
+        $userClause = $user->isAnon() ? 'rev_user_text = :username' : 'rev_user = :userId';
 
         $sql = "SELECT COUNT(DISTINCT(rev_id))
                 FROM $revisionTable
                 $pageJoin
                 $commentJoin
                 $tagJoin
-                WHERE rev_user_text = :username
+                WHERE $userClause
                 $condNamespace
                 $condTool
                 $condBegin
                 $condEnd";
 
-        $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end, $params);
+        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $start, $end, $params);
         $result = (int)$resultQuery->fetchColumn();
 
         // Cache and return.
@@ -147,6 +148,7 @@ class AutoEditsRepository extends UserRepository
         $condNamespace = 'all' === $namespace ? '' : 'AND page_namespace = :namespace';
         $condTag = '' != $tagIds ? "AND NOT EXISTS (SELECT 1 FROM $tagTable
             WHERE ct_rev_id = revs.rev_id AND ct_tag_id IN ($tagIds))" : '';
+        $userClause = $user->isAnon() ? 'rev_user_text = :username' : 'rev_user = :userId';
         $sql = "SELECT
                     page_title,
                     page_namespace,
@@ -160,7 +162,7 @@ class AutoEditsRepository extends UserRepository
                 JOIN $revisionTable AS revs ON (page_id = revs.rev_page)
                 LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                 LEFT OUTER JOIN $commentTable ON (revs.rev_comment_id = comment_id)
-                WHERE revs.rev_user_text = :username
+                WHERE revs.{$userClause}
                 AND revs.rev_timestamp > 0
                 AND comment_text NOT RLIKE :tools
                 $condTag
@@ -172,7 +174,7 @@ class AutoEditsRepository extends UserRepository
                 LIMIT 50
                 OFFSET $offset";
 
-        $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end, ['tools' => $regex]);
+        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $start, $end, ['tools' => $regex]);
         $result = $resultQuery->fetchAll();
 
         // Cache and return.
@@ -220,6 +222,7 @@ class AutoEditsRepository extends UserRepository
         $commentTable = $project->getTableName('comment');
         $tagTable = $project->getTableName('change_tag');
         $condNamespace = 'all' === $namespace ? '' : 'AND page_namespace = :namespace';
+        $userClause = $user->isAnon() ? 'rev_user_text = :username' : 'rev_user = :userId';
         $tagJoin = '';
         $condsTool = [];
 
@@ -259,7 +262,7 @@ class AutoEditsRepository extends UserRepository
                 LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                 LEFT OUTER JOIN $commentTable ON (revs.rev_comment_id = comment_id)
                 $tagJoin
-                WHERE revs.rev_user_text = :username
+                WHERE revs.{$userClause}
                 $condBegin
                 $condEnd
                 $condNamespace
@@ -269,7 +272,7 @@ class AutoEditsRepository extends UserRepository
                 LIMIT 50
                 OFFSET $offset";
 
-        $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end, ['tools' => $regex]);
+        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $start, $end, ['tools' => $regex]);
         $result = $resultQuery->fetchAll();
 
         // Cache and return.
@@ -303,8 +306,8 @@ class AutoEditsRepository extends UserRepository
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $sql = $this->getAutomatedCountsSql($project, $namespace, $start, $end);
-        $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end);
+        $sql = $this->getAutomatedCountsSql($project, $user, $namespace, $start, $end);
+        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $start, $end);
 
         $tools = $this->getTools($project);
 
@@ -336,12 +339,13 @@ class AutoEditsRepository extends UserRepository
      * Get SQL for getting counts of known automated tools used by the given user.
      * @see self::getAutomatedCounts()
      * @param Project $project
+     * @param User $user
      * @param string|int $namespace Namespace ID or 'all'.
      * @param string $start Start date in a format accepted by strtotime()
      * @param string $end End date in a format accepted by strtotime()
      * @return string The SQL.
      */
-    private function getAutomatedCountsSql(Project $project, $namespace, $start, $end): string
+    private function getAutomatedCountsSql(Project $project, User $user, $namespace, $start, $end): string
     {
         [$condBegin, $condEnd] = $this->getRevTimestampConditions($start, $end);
 
@@ -354,13 +358,14 @@ class AutoEditsRepository extends UserRepository
         $revisionTable = $project->getTableName('revision');
 
         [$pageJoin, $condNamespace] = $this->getPageAndNamespaceSql($project, $namespace);
+        $userClause = $user->isAnon() ? 'rev_user_text = :username' : 'rev_user = :userId';
 
         $conn = $this->getProjectsConnection();
 
-        foreach ($tools as $toolname => $values) {
+        foreach ($tools as $toolName => $values) {
             [$condTool, $commentJoin, $tagJoin] = $this->getInnerAutomatedCountsSql($project, $values);
 
-            $toolname = $conn->quote($toolname, \PDO::PARAM_STR);
+            $toolName = $conn->quote($toolName, \PDO::PARAM_STR);
 
             // No regex or tag provided for this tool. This can happen for tag-only tools that are in the global
             // configuration, but no local tag exists on the said project.
@@ -369,12 +374,12 @@ class AutoEditsRepository extends UserRepository
             }
 
             $queries[] .= "
-                SELECT $toolname AS toolname, COUNT(DISTINCT(rev_id)) AS count
+                SELECT $toolName AS toolname, COUNT(DISTINCT(rev_id)) AS count
                 FROM $revisionTable
                 $pageJoin
                 $commentJoin
                 $tagJoin
-                WHERE rev_user_text = :username
+                WHERE $userClause
                 AND $condTool
                 $condNamespace
                 $condBegin
