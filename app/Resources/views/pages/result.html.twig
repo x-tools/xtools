@@ -51,18 +51,6 @@
                         <td>{{ msg('deleted-pages') }}</td>
                         <td>{{ msg('delpagesfilter-' ~ pages.deleted) }}</td>
                     </tr>
-                    {% if pages.start is not empty %}
-                        <tr>
-                            <td>{{ msg('start') }}</td>
-                            <td>{{ pages.start|date_format('yyyy-MM-dd') }}</td>
-                        </tr>
-                    {% endif %}
-                    {% if pages.end is not empty %}
-                        <tr>
-                            <td>{{ msg('end') }}</td>
-                            <td class="xt-test--end-date">{{ pages.end|date_format('yyyy-MM-dd') }}</td>
-                        </tr>
-                    {% endif %}
                 </tbody></table>
             </div>
             <div style="clear:both"></div>

@@ -181,10 +181,10 @@
 
 {% set jsonLink %}
     <li>
-        <a target="_blank" class="download-link download-json" href="{{ path('UserApiPagesCreated', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted, 'start': pages.start, 'end': pages.end, 'offset': pages.offset}) }}">{{ msg('json') }}</a>
+        <a target="_blank" class="download-link download-json" href="{{ path('UserApiPagesCreated', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted, 'offset': pages.offset}) }}">{{ msg('json') }}</a>
     </li>
 {% endset %}
 {% set downloadLink %}
-    {{ layout.downloadLink('PagesResult', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted, 'start': pages.start, 'end': pages.end, 'offset': pages.offset}, ['wikitext', 'PagePile', 'csv', 'tsv'], jsonLink) }}
+    {{ layout.downloadLink('PagesResult', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted, 'offset': pages.offset}, ['wikitext', 'PagePile', 'csv', 'tsv'], jsonLink) }}
 {% endset %}
 {{ layout.content_block('pages-created', content, downloadLink) }}

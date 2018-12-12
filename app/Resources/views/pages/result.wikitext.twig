@@ -2,7 +2,7 @@
 == [[User:{{ user.username }}]] ==
 
 {% set multiNamspace = pages.counts|length > 1 %}
-{% set link %}[{{ url('PagesResult', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted, 'start': pages.start, 'end': pages.end}) }} {{ msg('xtools-title') }}]{% endset %}
+{% set link %}[{{ url('PagesResult', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted}) }} {{ msg('xtools-title') }}]{% endset %}
 {{ msg('xtools-advert', [link, date()|date_format]) }}
 {% if pages.getNumPages == 0 %}
 {{ msg('no-result', [user.username]) }}

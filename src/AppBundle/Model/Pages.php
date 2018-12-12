@@ -39,8 +39,6 @@ class Pages extends Model
      * @param string|int $namespace Namespace ID or 'all'.
      * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
      * @param string $deleted One of 'live', 'deleted' or 'all' for both.
-     * @param int|false $start Start date in a format accepted by strtotime()
-     * @param int|false $end End date in a format accepted by strtotime()
      * @param int $offset Pagination offset.
      */
     public function __construct(
@@ -49,15 +47,11 @@ class Pages extends Model
         $namespace = 0,
         $redirects = 'noredirects',
         $deleted = 'all',
-        $start = false,
-        $end = false,
         $offset = 0
     ) {
         $this->project = $project;
         $this->user = $user;
         $this->namespace = 'all' === $namespace ? 'all' : (string)$namespace;
-        $this->start = false === $start ? '' : date('Y-m-d', $start);
-        $this->end = false === $end ? '' : date('Y-m-d', $end);
         $this->redirects = $redirects ?: 'noredirects';
         $this->deleted = $deleted ?: 'all';
         $this->offset = $offset;
@@ -277,8 +271,6 @@ class Pages extends Model
             $namespace,
             $this->redirects,
             $this->deleted,
-            $this->start,
-            $this->end,
             $this->resultsPerPage($all),
             $this->offset * $this->resultsPerPage()
         );
@@ -295,9 +287,7 @@ class Pages extends Model
             $this->user,
             $this->namespace,
             $this->redirects,
-            $this->deleted,
-            $this->start,
-            $this->end
+            $this->deleted
         );
     }
 

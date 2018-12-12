@@ -27,10 +27,6 @@
         {% set content %}
             <div class="panel-body stat-list autoedits-stat-list clearfix" id="summary">
                 <table class="table autoedits-table pull-left">
-                    <tr>
-                        <td>{{ msg('namespace') }}</td>
-                        <td>{{ nsName(ae.namespace, project.namespaces) }}</td>
-                    </tr>
                     {% if ae.start is not empty %}
                         <tr>
                             <td>{{ msg('start') }}</td>
@@ -43,6 +39,10 @@
                             <td class="xt-test--end-date">{{ ae.end|date_format('yyyy-MM-dd') }}</td>
                         </tr>
                     {% endif %}
+                    <tr>
+                        <td>{{ msg('namespace') }}</td>
+                        <td>{{ nsName(ae.namespace, project.namespaces) }}</td>
+                    </tr>
                     <tr>
                         <td>{{ msg('total-edits') }}</td>
                         <td>{{ ae.editCount|num_format }}</td>

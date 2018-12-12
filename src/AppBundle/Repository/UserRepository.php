@@ -140,17 +140,16 @@ class UserRepository extends Repository
         [$condBegin, $condEnd] = $this->getRevTimestampConditions($start, $end);
         [$pageJoin, $condNamespace] = $this->getPageAndNamespaceSql($project, $namespace);
         $revisionTable = $project->getTableName('revision');
-        $userClause = $user->isAnon() ? 'rev_user_text = :username' : 'rev_user = :userId';
 
         $sql = "SELECT COUNT(rev_id)
                 FROM $revisionTable
                 $pageJoin
-                WHERE $userClause
+                WHERE rev_user_text = :username
                 $condNamespace
                 $condBegin
                 $condEnd";
 
-        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $start, $end);
+        $resultQuery = $this->executeQuery($sql, $user, $namespace, $start, $end);
         $result = (int)$resultQuery->fetchColumn();
 
         // Cache and return.
@@ -201,82 +200,45 @@ class UserRepository extends Repository
      * @param string $start
      * @param string $end
      * @param string $tableAlias Alias of table FOLLOWED BY DOT.
-     * @param bool $archive Whether to use the archive table instead of revision.
-     * @return string[] Clauses for start and end timestamps.
      * @todo FIXME: merge with Repository::getDateConditions
+     * @return string[] Clauses for start and end timestamps.
      */
-    protected function getRevTimestampConditions(
-        string $start,
-        string $end,
-        string $tableAlias = '',
-        bool $archive = false
-    ): array {
+    protected function getRevTimestampConditions(string $start, string $end, string $tableAlias = ''): array
+    {
         $condBegin = '';
         $condEnd = '';
-        $prefix = $archive ? 'ar' : 'rev';
 
         if (!empty($start)) {
-            $condBegin = "AND {$tableAlias}{$prefix}_timestamp >= :start ";
+            $condBegin = "AND {$tableAlias}rev_timestamp >= :start ";
         }
         if (!empty($end)) {
-            $condEnd = "AND {$tableAlias}{$prefix}_timestamp <= :end ";
+            $condEnd = "AND {$tableAlias}rev_timestamp <= :end ";
         }
 
         return [$condBegin, $condEnd];
     }
 
     /**
-     * Get SQL fragments for rev_user or rev_user_text, depending on if the user is logged out.
-     * Used in self::getPagesCreatedInnerSql().
-     * @param Project $project
-     * @param User $user
-     * @param bool $dateFiltering Whether the query you're working with has date filtering.
-     *   If false, a clause to check timestamp > 1 is added to force use of the timestamp index.
-     * @return string[] Keys 'whereRev' and 'whereArc'.
-     */
-    public function getUserConditions(Project $project, User $user, bool $dateFiltering = false): array
-    {
-        $userId = $user->getId($project);
-
-        if (0 == $userId) { // IP Editor or undefined username.
-            return [
-                'whereRev' => " rev_user_text = :username AND rev_user = '0' ",
-                'whereArc' => " ar_user_text = :username AND ar_user = '0' ",
-            ];
-        } else {
-            return [
-                'whereRev' => " rev_user = :userId ".($dateFiltering ? '' : "AND rev_timestamp > 1 "),
-                'whereArc' => " ar_user = :userId ".($dateFiltering ? '' : "AND ar_timestamp > 1 "),
-            ];
-        }
-    }
-
-    /**
      * Prepare the given SQL, bind the given parameters, and execute the Doctrine Statement.
      * @param string $sql
-     * @param Project $project
      * @param User $user
      * @param int|string $namespace Namespace ID or 'all' for all namespaces.
      * @param string $start
      * @param string $end
      * @param array $extraParams Will get merged in the params array used for binding values.
      * @return ResultStatement
-     * @throws \Doctrine\DBAL\Exception\DriverException
      */
     protected function executeQuery(
         string $sql,
-        Project $project,
         User $user,
         $namespace = 'all',
         string $start = '',
         string $end = '',
         array $extraParams = []
     ): ResultStatement {
-        if ($user->isAnon()) {
-            $params = ['username' => $user->getUsername()];
-        } else {
-            $params = ['userId' => $user->getId($project)];
-        }
+        $params = [
+            'username' => $user->getUsername(),
+        ];
 
         if (!empty($start)) {
             $params['start'] = date('Ymd000000', strtotime($start));

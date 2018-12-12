@@ -8,7 +8,7 @@ API endpoints related to a user.
 
 Simple edit count
 =================
-``GET /api/user/simple_editcount/{project}/{username}/{start}/{end}``
+``GET /api/user/simple_editcount/{project}/{username}``
 
 For the given account, get the user ID, live and deleted edit count,
 local user groups and global user groups.
@@ -34,7 +34,7 @@ the year of 2014 and within the mainspace.
 
 Number of pages created
 =======================
-``GET /api/user/pages_count/{project}/{username}/{namespace}/{redirects}/{deleted}/{start}/{end}``
+``GET /api/user/pages_count/{project}/{username}/{namespace}/{redirects}/{deleted}``
 
 Get the number of pages created by the user in the given namespace.
 
@@ -45,8 +45,6 @@ Get the number of pages created by the user in the given namespace.
 * ``namespace`` - Namespace ID or ``all`` for all namespaces.
 * ``redirects`` - One of 'noredirects' (default), 'onlyredirects' or 'all' for both.
 * ``deleted`` - One of 'live', 'deleted' or 'all' (default).
-* ``start`` - Start date in the format ``YYYY-MM-DD``. Leave this and ``end`` blank to retrieve the most recent data.
-* ``end`` - End date in the format ``YYYY-MM-DD``. Leave this and ``start`` blank to retrieve the most recent data.
 
 **Example:**
 
@@ -60,7 +58,7 @@ Get the number of article talk pages created by `Jimbo Wales <https://en.wikiped
 
 Pages created
 =============
-``GET /api/user/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{start}/{end}/{offset}``
+``GET /api/user/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{offset}``
 
 Get the pages created by the user in the given namespace.
 
@@ -71,8 +69,6 @@ Get the pages created by the user in the given namespace.
 * ``namespace`` - Namespace ID or ``all`` for all namespaces.
 * ``redirects`` - One of 'noredirects' (default), 'onlyredirects' or 'all' for both.
 * ``deleted`` - One of 'live', 'deleted' or 'all' (default).
-* ``start`` - Start date in the format ``YYYY-MM-DD``. Leave this and ``end`` blank to retrieve the most recent data.
-* ``end`` - End date in the format ``YYYY-MM-DD``. Leave this and ``start`` blank to retrieve the most recent data.
 * ``offset`` - Which page of results to show. If there is more than one page of results, ``continue`` is returned, with the subsequent page number as the value.
 
 **Example:**
