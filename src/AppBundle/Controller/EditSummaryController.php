@@ -32,10 +32,8 @@ class EditSummaryController extends XtoolsController
     /**
      * The Edit Summary search form.
      * @Route("/editsummary", name="EditSummary")
-     * @Route("/editsummary/", name="EditSummarySlash")
      * @Route("/editsummary/index.php", name="EditSummaryIndexPhp")
      * @Route("/editsummary/{project}", name="EditSummaryProject")
-     * @Route("/editsummary/{project}/", name="EditSummaryProjectSlash")
      * @return Response
      */
     public function indexAction(): Response

@@ -30,11 +30,9 @@ class AdminScoreController extends XtoolsController
     /**
      * Display the AdminScore search form.
      * @Route("/adminscore", name="AdminScore")
-     * @Route("/adminscore/", name="AdminScoreSlash")
      * @Route("/adminscore/index.php", name="AdminScoreIndexPhp")
      * @Route("/scottywong tools/adminscore.php", name="AdminScoreLegacy")
      * @Route("/adminscore/{project}", name="AdminScoreProject")
-     * @Route("/adminscore/{project}/", name="AdminScoreProjectSlash")
      * @return Response
      */
     public function indexAction(): Response

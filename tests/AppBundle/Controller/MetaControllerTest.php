@@ -18,7 +18,7 @@ class MetaControllerTest extends ControllerTestAdapter
      */
     public function testIndex(): void
     {
-        $this->client->request('GET', '/meta/');
+        $this->client->request('GET', '/meta');
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
         if (!self::$container->getParameter('app.is_labs')) {

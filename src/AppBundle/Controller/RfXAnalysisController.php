@@ -33,7 +33,6 @@ class RfXAnalysisController extends XtoolsController
     /**
      * Renders the index page for the RfX Tool
      * @Route("/rfx", name="RfXAnalysis")
-     * @Route("/rfx/", name="RfXAnalysisSlash")
      * @Route("/rfx/index.php", name="rfxAnalysisIndexPhp")
      * @Route("/rfx/{project}", name="rfxAnalysisProject")
      * @Route("/rfx/{project}/{type}", name="rfxAnalysisProjectType")

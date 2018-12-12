@@ -35,7 +35,7 @@ class AutomatedEditsControllerTest extends ControllerTestAdapter
         static::assertEquals('2017-01-01', $crawler->filter('[name=end]')->attr('value'));
 
         // Legacy URL params.
-        $crawler = $this->client->request('GET', '/autoedits/?project=fr.wikipedia.org&namespace=5&begin=2017-02-01');
+        $crawler = $this->client->request('GET', '/autoedits?project=fr.wikipedia.org&namespace=5&begin=2017-02-01');
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
         static::assertEquals('fr.wikipedia.org', $crawler->filter('#project_input')->attr('value'));
         static::assertEquals(5, $crawler->filter('#namespace_select option:selected')->attr('value'));

@@ -51,10 +51,8 @@ class TopEditsController extends XtoolsController
      * Display the form.
      * @Route("/topedits", name="topedits")
      * @Route("/topedits", name="TopEdits")
-     * @Route("/topedits/", name="topEditsSlash")
      * @Route("/topedits/index.php", name="TopEditsIndex")
      * @Route("/topedits/{project}", name="TopEditsProject")
-     * @Route("/topedits/{project}/", name="TopEditsProjectSlash")
      * @return Response
      */
     public function indexAction(): Response

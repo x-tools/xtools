@@ -57,13 +57,10 @@ class AutomatedEditsController extends XtoolsController
     /**
      * Display the search form.
      * @Route("/autoedits", name="AutoEdits")
-     * @Route("/autoedits/", name="AutoEditsSlash")
      * @Route("/automatededits", name="AutoEditsLong")
-     * @Route("/automatededits/", name="AutoEditsLongSlash")
      * @Route("/autoedits/index.php", name="AutoEditsIndexPhp")
      * @Route("/automatededits/index.php", name="AutoEditsLongIndexPhp")
      * @Route("/autoedits/{project}", name="AutoEditsProject")
-     * @Route("/autoedits/{project}/", name="AutoEditsProjectSlash")
      * @return Response
      */
     public function indexAction(): Response

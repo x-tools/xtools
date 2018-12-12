@@ -32,7 +32,6 @@ class RfXVoteCalculatorController extends XtoolsController
      * Renders the index page for RfXVoteCalculator
      *
      * @Route("/rfxvote", name="RfXVoteCalculator")
-     * @Route("/rfxvote/", name="RfXVoteCalculatorSlash")
      * @Route("/rfxvote/index.php", name="RfXVoteCalculatorIndexPhp")
      * @return Response
      */

@@ -49,10 +49,8 @@ class SimpleEditCounterController extends XtoolsController
     /**
      * The Simple Edit Counter search form.
      * @Route("/sc", name="SimpleEditCounter")
-     * @Route("/sc/", name="SimpleEditCounterSlash")
      * @Route("/sc/index.php", name="SimpleEditCounterIndexPhp")
      * @Route("/sc/{project}", name="SimpleEditCounterProject")
-     * @Route("/sc/{project}/", name="SimpleEditCounterProjectSlash")
      * @return Response
      */
     public function indexAction(): Response

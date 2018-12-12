@@ -56,10 +56,8 @@ class PagesController extends XtoolsController
     /**
      * Display the form.
      * @Route("/pages", name="Pages")
-     * @Route("/pages/", name="PagesSlash")
      * @Route("/pages/index.php", name="PagesIndexPhp")
      * @Route("/pages/{project}", name="PagesProject")
-     * @Route("/pages/{project}/", name="PagesProjectSlash")
      * @return Response
      */
     public function indexAction(): Response

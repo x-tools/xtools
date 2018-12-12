@@ -120,10 +120,8 @@ class EditCounterController extends XtoolsController
     /**
      * The initial GET request that displays the search form.
      * @Route("/ec", name="EditCounter")
-     * @Route("/ec/", name="EditCounterSlash")
      * @Route("/ec/index.php", name="EditCounterIndexPhp")
      * @Route("/ec/{project}", name="EditCounterProject")
-     * @Route("/ec/{project}/", name="EditCounterProjectSlash")
      * @return RedirectResponse|Response
      */
     public function indexAction()
@@ -287,7 +285,6 @@ class EditCounterController extends XtoolsController
     /**
      * Search form for general stats.
      * @Route("/ec-generalstats", name="EditCounterGeneralStatsIndex")
-     * @Route("/ec-generalstats/", name="EditCounterGeneralStatsIndexSlash")
      * @return Response
      */
     public function generalStatsIndexAction(): Response
@@ -322,7 +319,6 @@ class EditCounterController extends XtoolsController
     /**
      * Search form for namespace totals.
      * @Route("/ec-namespacetotals", name="EditCounterNamespaceTotalsIndex")
-     * @Route("/ec-namespacetotals/", name="EditCounterNamespaceTotalsIndexSlash")
      * @return Response
      */
     public function namespaceTotalsIndexAction(): Response
@@ -362,7 +358,6 @@ class EditCounterController extends XtoolsController
     /**
      * Search form for timecard.
      * @Route("/ec-timecard", name="EditCounterTimecardIndex")
-     * @Route("/ec-timecard/", name="EditCounterTimecardIndexSlash")
      * @return Response
      */
     public function timecardIndexAction(): Response
@@ -397,7 +392,6 @@ class EditCounterController extends XtoolsController
     /**
      * Search form for year counts.
      * @Route("/ec-yearcounts", name="EditCounterYearCountsIndex")
-     * @Route("/ec-yearcounts/", name="EditCounterYearCountsIndexSlash")
      * @return Response
      */
     public function yearCountsIndexAction(): Response
@@ -436,7 +430,6 @@ class EditCounterController extends XtoolsController
     /**
      * Search form for month counts.
      * @Route("/ec-monthcounts", name="EditCounterMonthCountsIndex")
-     * @Route("/ec-monthcounts/", name="EditCounterMonthCountsIndexSlash")
      * @return Response
      */
     public function monthCountsIndexAction(): Response
@@ -475,7 +468,6 @@ class EditCounterController extends XtoolsController
     /**
      * Search form for rights changes.
      * @Route("/ec-rightschanges", name="EditCounterRightsChangesIndex")
-     * @Route("/ec-rightschanges/", name="EditCounterRightsChangesIndexSlash")
      * @return Response
      */
     public function rightsChangesIndexAction(): Response
@@ -520,11 +512,8 @@ class EditCounterController extends XtoolsController
     /**
      * Search form for latest global edits.
      * @Route("/ec-latestglobal-contributions", name="EditCounterLatestGlobalContribsIndex")
-     * @Route("/ec-latestglobal-contributions/", name="EditCounterLatestGlobalContribsIndexSlash")
      * @Route("/ec-latestglobal", name="EditCounterLatestGlobalIndex")
-     * @Route("/ec-latestglobal/", name="EditCounterLatestGlobalIndexSlash")
      * @Route("/ec-latestglobaledits", name="EditCounterLatestGlobalEditsIndex")
-     * @Route("/ec-latestglobaledits/", name="EditCounterLatestGlobalEditsIndexSlash")
      * @return Response
      */
     public function latestGlobalIndexAction(): Response

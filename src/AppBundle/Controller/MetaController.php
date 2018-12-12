@@ -32,7 +32,6 @@ class MetaController extends XtoolsController
      * Display the form.
      * @Route("/meta", name="meta")
      * @Route("/meta", name="Meta")
-     * @Route("/meta/", name="MetaSlash")
      * @Route("/meta/index.php", name="MetaIndexPhp")
      * @return Response
      */
