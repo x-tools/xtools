@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.6.16 ##
+- Revert "Add date filtering options to Pages tool"
+
 ## 3.6.15 ##
 - T202552: Add date filtering options to Pages tool.
 - T211172: Add YABBR to enwiki AutoEdits configuration.
