@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.6.17 ##
+- Restore "Add date filtering options to Pages tool" with bug fixed.
+
 ## 3.6.16 ##
 - Revert "Add date filtering options to Pages tool"
 
