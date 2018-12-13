@@ -47,6 +47,8 @@
 	"auto-edits-request-doc": "도구의 설명문서 또는 홈페이지 링크",
 	"auto-edits-request-examples": "예제 편집 링크",
 	"auto-edits-request-name": "도구 이름",
+	"auto-edits-tool-filter-desc": "지정된 도구를 사용한 편집만 봅니다.",
+	"auto-edits-unknown-tool": "다음 이름으로 된 알려진 도구가 없습니다: $1",
 	"auto-tool-edits": "$1 편집",
 	"automatic": "자동",
 	"average-change-per-page": "문서별 변화 평균치",
