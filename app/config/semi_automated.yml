@@ -361,9 +361,9 @@ parameters:
         For the Common Good:
             regex: 'WP:FTCG\|FtCG'
             link: Project:FTCG
-        OrphanStatus:
-            regex: '\[\[User:Technical_13\/Scripts\/OrphanStatus\|'
-            link: User:Technical_13/Scripts/OrphanStatus.js
+        deOrphan:
+            regex: '\[\[User:Technical_13\/Scripts\/OrphanStatus\||\[\[User:DannyS712\/deOrphan\|'
+            link: User:DannyS712/deOrphan
         The Wikipedia Adventure:
             regex: 'simulated automatically as part of \[\[WP:The Wikipedia Adventure\|'
             link: Project:TWA
