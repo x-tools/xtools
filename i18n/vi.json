@@ -4,7 +4,8 @@
 			"Nemo bis",
 			"Trần Nguyễn Minh Huy",
 			"Phjtieudoc",
-			"Minh Nguyen"
+			"Minh Nguyen",
+			"Leduyquang753"
 		]
 	},
 	"accepted-formats": "Định dạng được chấp nhận",
@@ -27,6 +28,8 @@
 	"approximate": "ước lượng",
 	"article": "Bài viết",
 	"auto-edits": "Số sửa đổi (bán) tự động",
+	"auto-edits-tool-filter-desc": "Chỉ hiện các thay đổi sử dụng công cụ đã chọn.",
+	"auto-edits-unknown-tool": "Không có công cụ nào được biết đến với tên: $1",
 	"automatic": "Tự động",
 	"average-change-per-page": "Thay đổi trung bình trên một trang",
 	"average-edit-size": "Kích cỡ sửa đổi trung bình",

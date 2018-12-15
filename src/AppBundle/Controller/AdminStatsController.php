@@ -35,7 +35,6 @@ class AdminStatsController extends XtoolsController
      * Method for rendering the AdminStats Main Form.
      * This method redirects if valid parameters are found, making it a valid form endpoint as well.
      * @Route("/adminstats", name="AdminStats")
-     * @Route("/adminstats/", name="AdminStatsSlash")
      * @Route("/adminstats/index.php", name="AdminStatsIndexPhp")
      * @return Response
      */

@@ -244,6 +244,15 @@ class AutoEdits extends Model
     }
 
     /**
+     * Get a list of all available tools for the Project.
+     * @return array
+     */
+    public function getAllTools(): array
+    {
+        return $this->getRepository()->getTools($this->project);
+    }
+
+    /**
      * Get the combined number of edits made with each tool. This is calculated separately from
      * self::getAutomatedCount() because the regex can sometimes overlap, and the counts are actually different.
      * @return int

@@ -56,10 +56,8 @@ class PagesController extends XtoolsController
     /**
      * Display the form.
      * @Route("/pages", name="Pages")
-     * @Route("/pages/", name="PagesSlash")
      * @Route("/pages/index.php", name="PagesIndexPhp")
      * @Route("/pages/{project}", name="PagesProject")
-     * @Route("/pages/{project}/", name="PagesProjectSlash")
      * @return Response
      */
     public function indexAction(): Response
@@ -80,22 +78,28 @@ class PagesController extends XtoolsController
             'namespace' => 0,
             'redirects' => 'noredirects',
             'deleted' => 'all',
+            'start' => '',
+            'end' => '',
         ], $this->params, ['project' => $this->project]));
     }
 
     /**
      * Display the results.
      * @Route(
-     *     "/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{offset}",
+     *     "/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{start}/{end}/{offset}",
      *     name="PagesResult",
      *     requirements={
      *         "namespace"="|all|\d+",
      *         "redirects"="|[^/]+",
      *         "deleted"="|all|live|deleted",
-     *         "offset"="|\d+"
+     *         "start"="|\d{4}-\d{2}-\d{2}",
+     *         "end"="|\d{4}-\d{2}-\d{2}",
+     *         "offset"="|\d+",
      *     },
      *     defaults={
      *         "namespace"=0,
+     *         "start"=false,
+     *         "end"=false,
      *         "offset"=0,
      *     }
      * )
@@ -118,6 +122,8 @@ class PagesController extends XtoolsController
                 'namespace' => $this->namespace,
                 'redirects' => 'noredirects',
                 'deleted' => $deleted,
+                'start' => $this->start,
+                'end' => $this->end,
                 'offset' => $this->offset,
             ]);
         }
@@ -130,6 +136,8 @@ class PagesController extends XtoolsController
             $this->namespace,
             $redirects,
             $deleted,
+            $this->start,
+            $this->end,
             $this->offset
         );
         $pages->setRepository($pagesRepo);
@@ -263,17 +271,21 @@ class PagesController extends XtoolsController
      * Get a count of the number of pages created by a user,
      * including the number that have been deleted and are redirects.
      * @Route(
-     *     "/api/user/pages_count/{project}/{username}/{namespace}/{redirects}/{deleted}",
+     *     "/api/user/pages_count/{project}/{username}/{namespace}/{redirects}/{deleted}/{start}/{end}",
      *     name="UserApiPagesCount",
      *     requirements={
      *         "namespace"="|\d+|all",
      *         "redirects"="|noredirects|onlyredirects|all",
      *         "deleted"="|all|live|deleted",
+     *         "start"="|\d{4}-\d{2}-\d{2}",
+     *         "end"="|\d{4}-\d{2}-\d{2}",
      *     },
      *     defaults={
      *         "namespace"=0,
      *         "redirects"="noredirects",
      *         "deleted"="all",
+     *         "start"=false,
+     *         "end"=false,
      *     }
      * )
      * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
@@ -292,7 +304,9 @@ class PagesController extends XtoolsController
             $this->user,
             $this->namespace,
             $redirects,
-            $deleted
+            $deleted,
+            $this->start,
+            $this->end
         );
         $pages->setRepository($pagesRepo);
 
@@ -308,17 +322,21 @@ class PagesController extends XtoolsController
     /**
      * Get the pages created by by a user.
      * @Route(
-     *     "/api/user/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{offset}",
+     *     "/api/user/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{start}/{end}/{offset}",
      *     name="UserApiPagesCreated",
      *     requirements={
      *         "namespace"="|\d+|all",
      *         "redirects"="|noredirects|onlyredirects|all",
      *         "deleted"="|all|live|deleted",
+     *         "start"="|\d{4}-\d{2}-\d{2}",
+     *         "end"="|\d{4}-\d{2}-\d{2}",
      *     },
      *     defaults={
      *         "namespace"=0,
      *         "redirects"="noredirects",
      *         "deleted"="all",
+     *         "start"=false,
+     *         "end"=false,
      *         "offset"=0,
      *     }
      * )
@@ -339,6 +357,8 @@ class PagesController extends XtoolsController
             $this->namespace,
             $redirects,
             $deleted,
+            $this->start,
+            $this->end,
             $this->offset
         );
         $pages->setRepository($pagesRepo);

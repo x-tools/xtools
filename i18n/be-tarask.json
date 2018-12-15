@@ -45,6 +45,8 @@
 	"auto-edits-request-doc": "Спасылка на дакумэнтацыю інструмэнта ці дамашнюю старонку",
 	"auto-edits-request-examples": "Спасылкі на прыклады рэдагаваньняў",
 	"auto-edits-request-name": "Назва прылады",
+	"auto-edits-tool-filter-desc": "Паказвае толькі рэдагаваньні, зробленыя пададзеным інструмэнтам.",
+	"auto-edits-unknown-tool": "Няма інструмэнтаў з назвай: $1",
 	"auto-tool-edits": "рэдагаваньні $1",
 	"automatic": "Аўтаматычна",
 	"average-change-per-page": "Сярэдняе рэдагаваньне старонкі",

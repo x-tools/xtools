@@ -9,6 +9,18 @@
             {{ forms.namespace_select(project, true, namespace) }}
             {{ forms.date_input('start', false, start) }}
             {{ forms.date_input('end', false, end) }}
+            <div class="input-group form-row">
+                <label class="input-group-addon form-label" for="tool_selector">
+                    {{ msg('tool') }}
+                    <div class="glyphicon glyphicon-info-sign tooltipcss pull-right" role="dialog" aria-labelledby="tool-filter-desc">
+                        <div class="tooltip-body" id="tool-filter-desc">{{ msg('auto-edits-tool-filter-desc') }}</div>
+                    </div>
+                </label>
+                <select name="tool" class="form-control" id="tool_selector" required>
+                    <option value="none">{{ msg('none') }}</option>
+                    <option value="all">{{ msg('all') }}</option>
+                </select>
+            </div>
         </fieldset>
         {{ forms.submit_btn() }}
     </form>

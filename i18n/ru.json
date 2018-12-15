@@ -57,6 +57,8 @@
 	"auto-edits-request-doc": "Ссылка на документацию инструмента или его домашнюю страницу",
 	"auto-edits-request-examples": "Ссылки на примеры правок",
 	"auto-edits-request-name": "Название инструмента",
+	"auto-edits-tool-filter-desc": "Показать только правки, сделанные указанным инструментом.",
+	"auto-edits-unknown-tool": "Неизвестен инструмент под названием «$1»",
 	"auto-tool-edits": "Правки $1",
 	"automatic": "Автоматически",
 	"average-change-per-page": "Средняя правка на странице",

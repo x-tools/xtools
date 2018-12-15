@@ -45,6 +45,8 @@
 	"auto-edits-request-doc": "Link para a documentação ou página inicial da ferramenta",
 	"auto-edits-request-examples": "Links para edições de exemplo",
 	"auto-edits-request-name": "Nome da ferramenta",
+	"auto-edits-tool-filter-desc": "Mostrar apenas as edições feitas com a ferramenta em causa.",
+	"auto-edits-unknown-tool": "Não é conhecida nenhuma ferramenta com o nome: $1",
 	"auto-tool-edits": "edições com $1",
 	"automatic": "Automático",
 	"average-change-per-page": "Média de alterações por página",

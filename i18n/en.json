@@ -46,6 +46,8 @@
 	"auto-edits-request-doc": "Link to the tool's documentation or homepage",
 	"auto-edits-request-examples": "Links to example edits",
 	"auto-edits-request-name": "Name of tool",
+	"auto-edits-tool-filter-desc": "Show only edits using the given tool.",
+	"auto-edits-unknown-tool": "No known tool with the name: $1",
 	"auto-tool-edits": "$1 edits",
 	"automatic": "Automatic",
 	"average-change-per-page": "Average change per page",

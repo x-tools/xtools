@@ -34,7 +34,7 @@ parameters:
     api_path:                   /w/api.php
     default_project:            en.wikipedia.org
     oauth_project:              meta.wikimedia.org
-    opted_in:                   ~
+    opted_in:                   ['enwiki']
 
     # A secret key that's used to generate certain security-related tokens, and as the secret for the internal API.
     secret:            ThisTokenIsNotSoSecretChangeIt
@@ -59,7 +59,7 @@ parameters:
     app.max_user_edits: 350000
 
     # Ignore for any non-WMF installation. This is only meant to convert legacy parameters.
-    languageless_wikis:
+    languageless_wikis: []
 
     # Enabling or disabling of individual tools
     enable.AdminScore: 1

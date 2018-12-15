@@ -15,10 +15,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class AutomatedEditsHelper extends HelperBase
 {
-    /** @var string[] The list of tools that are considered reverting. */
+    /** @var array The list of tools that are considered reverting. */
     protected $revertTools = [];
 
-    /** @var string[] The list of tool names and their regexes/tags. */
+    /** @var array The list of tool names and their regexes/tags. */
     protected $tools = [];
 
     /**
@@ -66,7 +66,7 @@ class AutomatedEditsHelper extends HelperBase
      * Get list of automated tools and their associated info for the given project.
      * This defaults to the 'default_project' if entries for the given project are not found.
      * @param Project $project
-     * @return string[][] Each tool with the tool name as the key and 'link', 'regex' and/or 'tag' as the subarray keys.
+     * @return array Each tool with the tool name as the key and 'link', 'regex' and/or 'tag' as the subarray keys.
      */
     public function getTools(Project $project): array
     {
@@ -79,11 +79,8 @@ class AutomatedEditsHelper extends HelperBase
         // Load the semi-automated edit types.
         $tools = $this->container->getParameter('automated_tools');
 
-        // Default to default project (e.g. en.wikipedia.org) if wiki not configured
         if (isset($tools[$projectDomain])) {
             $localRules = $tools[$projectDomain];
-        } elseif (isset($tools[$this->container->getParameter('default_project')])) {
-            $localRules = $tools[$this->container->getParameter('default_project')];
         } else {
             $localRules = [];
         }
@@ -92,10 +89,16 @@ class AutomatedEditsHelper extends HelperBase
 
         // Per-wiki rules have priority, followed by language-specific and global.
         $globalWithLangRules = $this->mergeRules($tools['global'], $langRules);
+
         $this->tools[$projectDomain] = $this->mergeRules(
             $globalWithLangRules,
             $localRules
         );
+
+        // Finally, populate the 'label' with the tool name, if a label doesn't already exist.
+        array_walk($this->tools[$projectDomain], function (&$data, $tool): void {
+            $data['label'] = $data['label'] ?? $tool;
+        });
 
         return $this->tools[$projectDomain];
     }

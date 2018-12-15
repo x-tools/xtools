@@ -39,10 +39,8 @@ class ArticleInfoController extends XtoolsController
     /**
      * The search form.
      * @Route("/articleinfo", name="ArticleInfo")
-     * @Route("/articleinfo/", name="articleInfoSlash")
      * @Route("/articleinfo/index.php", name="articleInfoIndexPhp")
      * @Route("/articleinfo/{project}", name="ArticleInfoProject")
-     * @Route("/articleinfo/{project}/", name="ArticleInfoProjectSlash")
      * @return Response
      */
     public function indexAction(): Response

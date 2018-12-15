@@ -24,6 +24,8 @@
     },
     "require": {
         "php": "^7.2",
+        "ext-curl": "*",
+        "ext-intl": "*",
         "ext-json": "*",
         "ext-PDO": "*",
         "symfony/symfony": "^4.1",

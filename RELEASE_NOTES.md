@@ -1,5 +1,29 @@
 # Release Notes #
 
+## 3.6.17 ##
+- Restore "Add date filtering options to Pages tool" with bug fixed.
+
+## 3.6.16 ##
+- Revert "Add date filtering options to Pages tool"
+
+## 3.6.15 ##
+- T202552: Add date filtering options to Pages tool.
+- T211172: Add YABBR to enwiki AutoEdits configuration.
+- T211137: Add regex for German use of AWB to AutoEdits.
+- AutoEdits: add option to show edits made only with given tool.
+- Remove all slash routes from code, which are automatically supported
+  in Symfony 4.
+- Localization updates.
+
+## 3.6.14 ##
+- T201850: Query logging_logindex instead of userindex for performance.
+- AdminStats: Fix a bug for when there are no admins.
+- AdminStats: Indicate interface admins.
+- T210314: Add stubsearch tool to AutoEdits enwiki configuration.
+- T210938: Fix a broken tool link in AutoEdits.
+- AutoEdits: Improve pt translation and fix some links.
+- Localization updates.
+
 ## 3.6.12 ##
 - T189234: Use new comment table for fetching edit/log summaries.
 - EditCounter: Remove edit summary and semi-automated stats, instead

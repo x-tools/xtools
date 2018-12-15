@@ -45,6 +45,8 @@
 	"auto-edits-request-doc": "Врска до документацијата или матичната страница на алатката",
 	"auto-edits-request-examples": "Врски до примерни уредувања",
 	"auto-edits-request-name": "Назив на алатката",
+	"auto-edits-tool-filter-desc": "Прикажи само уредувања со дадената алатка.",
+	"auto-edits-unknown-tool": "Нема позната алатка наречена „$1“",
 	"auto-tool-edits": "$1 уредувања",
 	"automatic": "Автоматски",
 	"average-change-per-page": "Просечна промена по страница",

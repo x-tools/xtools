@@ -48,6 +48,8 @@
 	"auto-edits-request-doc": "رابط إلى التوثيق أو الصفحة الرئيسية للأداة",
 	"auto-edits-request-examples": "روابط لأمثلة التعديلات",
 	"auto-edits-request-name": "اسم الأداة",
+	"auto-edits-tool-filter-desc": "عرض التعديلات باستخدام الأداة المعطاة فقط.",
+	"auto-edits-unknown-tool": "لا أداة معروفة بالاسم: $1",
 	"auto-tool-edits": "تعديلات $1",
 	"automatic": "تلقائي",
 	"average-change-per-page": "متوسط التغيير في كل صفحة",

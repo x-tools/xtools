@@ -47,6 +47,8 @@
 	"auto-edits-request-doc": "Nuoroda į įrankio dokumentaciją ar pagrindinį puslapį",
 	"auto-edits-request-examples": "Nuorodos į pavyzdinius keitimus",
 	"auto-edits-request-name": "Įrankio pavadinimas",
+	"auto-edits-tool-filter-desc": "Rodomi keitimai, atlikti naudojant šį įrankį.",
+	"auto-edits-unknown-tool": "Nežinomas įrankis pavadinimu: $1",
 	"auto-tool-edits": "$1 keitimai",
 	"automatic": "Automatinis",
 	"average-change-per-page": "Vidutiniškai pakeitimų per puslapį",

@@ -21,6 +21,7 @@
 	"approximate": "approssimativo",
 	"article": "Voce",
 	"auto-edits": "Modifiche (semi-)automatiche",
+	"auto-edits-unknown-tool": "Nessuno strumento conosciuto con il nome: $1",
 	"auto-tool-edits": "$1 modifiche",
 	"automatic": "Automatico",
 	"average-change-per-page": "Media delle modifiche per pagina",

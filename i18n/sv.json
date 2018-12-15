@@ -47,6 +47,8 @@
 	"auto-edits-request-doc": "Länk till verktygets dokumentation eller hemsida",
 	"auto-edits-request-examples": "Länkar till exempel på redigeringar",
 	"auto-edits-request-name": "Verktygets namn",
+	"auto-edits-tool-filter-desc": "Visa endast redigeringar med det angivna verktyget.",
+	"auto-edits-unknown-tool": "Det finns inget känt verktyg med namnet: $1",
 	"auto-tool-edits": "$1 redigeringar",
 	"automatic": "Automatiskt",
 	"average-change-per-page": "Genomsnittlig förändring per sida",

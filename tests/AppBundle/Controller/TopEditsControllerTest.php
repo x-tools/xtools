@@ -35,7 +35,7 @@ class TopEditsControllerTest extends ControllerTestAdapter
         static::assertEquals('Test', $crawler->filter('#article_input')->attr('value'));
 
         // Legacy URL params.
-        $crawler = $this->client->request('GET', '/topedits/?namespace=5&page=Test&wiki=wikipedia&lang=fr');
+        $crawler = $this->client->request('GET', '/topedits?namespace=5&page=Test&wiki=wikipedia&lang=fr');
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
         static::assertEquals('fr.wikipedia.org', $crawler->filter('#project_input')->attr('value'));
         static::assertEquals(5, $crawler->filter('#namespace_select option:selected')->attr('value'));

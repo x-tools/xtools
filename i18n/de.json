@@ -48,6 +48,8 @@
 	"auto-edits-request-doc": "Link auf die Werkzeugdokumentation oder -Homepage",
 	"auto-edits-request-examples": "Links auf Beispielbearbeitungen",
 	"auto-edits-request-name": "Name des Werkzeugs",
+	"auto-edits-tool-filter-desc": "Nur Bearbeitungen anzeigen, die das angegebene Werkzeug verwenden.",
+	"auto-edits-unknown-tool": "Kein bekanntes Werkzeug mit dem Namen: $1",
 	"auto-tool-edits": "$1 Bearbeitungen",
 	"automatic": "Automatisch",
 	"average-change-per-page": "Durchschittliche Veränderung pro Seite",

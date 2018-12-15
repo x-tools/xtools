@@ -61,7 +61,7 @@ parameters:
             tag: 'OAuth CID: 678'
             link: Special:MyLanguage/User:InternetArchiveBot
         HotCat:
-            regex: '\|HotCat\]\]|Gadget-Hotcat(?:check)?\.js\|Script|\]\] via HotCat'
+            regex: '\|HotCat\]\]|Gadget-Hotcat(?:check)?\.js\|Script|\]\] via HotCat|\[\[WP:HC\|'
             link: Special:MyLanguage/Project:HotCat
         Cat-a-lot:
             regex: '\[\[Help:Cat-a-lot\|Cat-a-lot\]\]'
@@ -118,6 +118,8 @@ parameters:
         Redirect:
             regex: 'Weiterleitung nach \[\[.*?erstellt'
             label: Weiterleitung
+        AutoWikiBrowser:
+            regex: 'mit \[\[Project:AWB\|AWB'
     ko:
         Undo:
             regex: '판 편집을 되돌림'
@@ -359,9 +361,9 @@ parameters:
         For the Common Good:
             regex: 'WP:FTCG\|FtCG'
             link: Project:FTCG
-        OrphanStatus:
-            regex: '\[\[User:Technical_13\/Scripts\/OrphanStatus\|'
-            link: User:Technical_13/Scripts/OrphanStatus.js
+        deOrphan:
+            regex: '\[\[User:Technical_13\/Scripts\/OrphanStatus\||\[\[User:DannyS712\/deOrphan\|'
+            link: User:DannyS712/deOrphan
         The Wikipedia Adventure:
             regex: 'simulated automatically as part of \[\[WP:The Wikipedia Adventure\|'
             link: Project:TWA
@@ -400,6 +402,12 @@ parameters:
         unblock-review:
             regex: '\(\[\[User:Enterprisey\/unblock-review'
             link: User:Enterprisey/unblock-review
+        stubsearch:
+            regex: '\[\[User:Danski454\/stubsearch\|a tool'
+            link: User:Danski454/stubsearch
+        YABBR:
+            tag: 'OAuth CID: 860'
+            link: toolforge:yabbr
     ko.wikipedia.org:
         AutoWikiBrowser:
             regex: '위키백과:AWB\|AWB|(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
@@ -420,6 +428,8 @@ parameters:
     pt.wikipedia.org:
         Undo:
             regex: 'Desfeita a edição \d+ de \[\['
+            link: Ajuda:Guia de edição/Reverter edições#Botão Desfazer
+            label: 'Desfazer'
         FastButtons:
             regex: '\|FastButtons\]\]'
             link: Wikipédia:FastButtons
@@ -435,6 +445,8 @@ parameters:
             label: Popups de navegação
         Page move:
             link: Ajuda:Guia de edição/Mover páginas
+        reFill:
+            link: en:Project:ReFill
         Generic rollback:
             link: Wikipédia:Reversores
-            label: Reversores
+            label: Reversão

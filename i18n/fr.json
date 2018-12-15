@@ -52,6 +52,8 @@
 	"auto-edits-request-doc": "Lien vers la documentation ou la page d’accueil de l’outil",
 	"auto-edits-request-examples": "Liens vers les modifications exemple",
 	"auto-edits-request-name": "Nom de l’outil",
+	"auto-edits-tool-filter-desc": "Afficher seulement les modifications réalisées avec l'outil donné.",
+	"auto-edits-unknown-tool": "Pas d'outil connu ayant pour nom : $1",
 	"auto-tool-edits": "$1 modifications",
 	"automatic": "Automatique",
 	"average-change-per-page": "Nombre moyen de modifications par page",
