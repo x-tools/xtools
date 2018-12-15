@@ -235,7 +235,7 @@ parameters:
             revert: 'Reverted edits by.*?WP:HG'
         Page curation:
             regex: 'using \[\[Wikipedia:Page Curation\|Page Curation'
-            link: Project:Page curation
+            link: w:en:Wikipedia:Page_Curation/Help
         Twinkle:
             regex: '(Wikipedia|WP):(TW|TWINKLE|Twinkle|FRIENDLY)'
             link: Project:Twinkle
