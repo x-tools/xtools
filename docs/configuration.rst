@@ -46,10 +46,16 @@ OAuth is used to allow users to make unlimited requests, and to allow them to se
 
 - **oauth_key** - Oauth consumer key.
 - **oauth_secret** - Oauth consumer secret.
-- **mailer_transport** - Software for the mailer. For development installations, you can leave all the mailer configuration options blank.
-- **mailer_host** - Hostname for the mailer.
-- **mailer_user** - Username for the mailer software.
-- **mailer_password** - Password for the mailer software.
+
+Email is only used to send error reports to the maintainers. If you don't care about this (such as in development installations),
+you can use the defaults for all mailer options and no emails will be sent. Note the 'from' and 'to' emails must have valid addresses.
+
+- **mailer.transport** - Software for the mailer.
+- **mailer.host** - Hostname for the mailer.
+- **mailer.user** - Username for the mailer software.
+- **mailer.password** - Password for the mailer software.
+- **mailer.from_email** - The 'from' email.
+- **mailer.to_email** - The 'to' email.
 
 Caching
 =======
