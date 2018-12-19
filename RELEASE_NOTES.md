@@ -1,5 +1,13 @@
 # Release Notes #
 
+## 3.6.18 ##
+- Email critical errors to maintainers.
+- T212025: Add alternate tools for OneClickArchiver in AutoEdits.
+- T211172: Fix link for YABBR tool in AutoEdits.
+- T212026: Fix link for Page Curation tool in AutoEdits.
+- T211934: Add deOrphan tool to AutoEdits.
+- Localization updates.
+
 ## 3.6.17 ##
 - Restore "Add date filtering options to Pages tool" with bug fixed.
 
