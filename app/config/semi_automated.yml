@@ -271,8 +271,8 @@ parameters:
         Ohconfucius script:
             regex: '\[\[(User:Ohconfucius\/.*?|WP:MOSNUMscript)\|script'
             link: Project:MOSNUMscript
-        OneClickArchiver:
-            regex: '\[\[(User:Equazcion\/OneClickArchiver|User:Technical 13\/1CA)\|OneClickArchiver'
+        Archiving script:
+            regex: '\[\[(User:Equazcion\/OneClickArchiver|User:Technical 13\/1CA)\|OneClickArchiver|Removed \d+ threads? to \[\[|Added threads from \[\['
             link: Project:OneClickArchiver
         editProtectedHelper:
             regex: 'WP:EPH|EPH'
