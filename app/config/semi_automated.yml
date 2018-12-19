@@ -407,7 +407,7 @@ parameters:
             link: User:Danski454/stubsearch
         YABBR:
             tag: 'OAuth CID: 860'
-            link: toolforge:yabbr
+            link: User:Enterprisey/YABBR
     ko.wikipedia.org:
         AutoWikiBrowser:
             regex: '위키백과:AWB\|AWB|(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
