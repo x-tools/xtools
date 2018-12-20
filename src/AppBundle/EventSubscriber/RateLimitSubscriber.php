@@ -10,7 +10,9 @@ namespace AppBundle\EventSubscriber;
 use DateInterval;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -58,6 +60,9 @@ class RateLimitSubscriber implements EventSubscriberInterface
     {
         $this->rateLimit = (int) $this->container->getParameter('app.rate_limit_count');
         $this->rateDuration = (int) $this->container->getParameter('app.rate_limit_time');
+        $request = $event->getRequest();
+
+        $this->temporaryBlacklisting($request);
 
         // Zero values indicate the rate limiting feature should be disabled.
         if (0 === $this->rateLimit || 0 === $this->rateDuration) {
@@ -77,8 +82,6 @@ class RateLimitSubscriber implements EventSubscriberInterface
         if (in_array($controller[1], $actionWhitelist) || $loggedIn) {
             return;
         }
-
-        $request = $event->getRequest();
 
         $this->checkBlacklist($request);
 
@@ -130,6 +133,34 @@ class RateLimitSubscriber implements EventSubscriberInterface
                 }
             }
         }
+    }
+
+    /**
+     * Temporarily deny access based on some heuristics in order to stop a wave of disruptive traffic.
+     * @see https://phabricator.wikimedia.org/T211709
+     * @param Request $request
+     * @throws HttpException
+     */
+    private function temporaryBlacklisting(Request $request): void
+    {
+        $uaMatch = 1 === preg_match('/iPhone|Pixel 2|Nexus 5|SM\-G900P/', $request->headers->get('User-Agent'));
+        $reqMatch = 1 === preg_match('/articleinfo\/en\.wikipedia\.org.*?\?uselang\=(?!en)/', $request->getUri());
+
+        if (false === $uaMatch || false === $reqMatch) {
+            return;
+        }
+
+        $logger = $this->container->get('monolog.logger.rate_limit');
+        $logger->info(
+            "<URI>: ".$request->getRequestUri().' TEMPORARY BLACKLISTING'.
+            "\t<User agent>: " . $request->headers->get('User-Agent')
+        );
+
+        throw new HttpException(
+            429,
+            'Your access to XTools has been revoked due to possible abuse. '.
+                'Please contact tools.xtools@tools.wmflabs.org'
+        );
     }
 
     /**
