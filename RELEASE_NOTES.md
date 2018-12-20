@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.6.19 ##
+- Temporary user-specific throttling. This release should only be used
+  on the Wikimedia Foundation installation of XTools.
+
 ## 3.6.18 ##
 - Email critical errors to maintainers.
 - T212025: Add alternate tools for OneClickArchiver in AutoEdits.
