@@ -189,7 +189,7 @@
                 <a href="https://github.com/x-tools/xtools/releases/tag/{{ version }}" target="_blank" title="Current XTools version">v.{{ version }}</a>
                 (<a href="https://github.com/x-tools/xtools/tree/{{ hash() }}" target="_blank" title="Current code revision">r.{{ shortHash() }}</a>)
                 &middot;
-                <a target="_blank" href="https://xtools.readthedocs.io/en/stable/api/index.html">{{ msg('api') }}</a>
+                {{ layout.apiLink }}
                 &middot;
                 <a href="{{ path('aboutPage') }}">{{ msg('tool-about') }}</a>
                 &middot;

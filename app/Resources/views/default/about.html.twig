@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/layout.html.twig' as layout %}
 
 {% block body %}
 <div class="panel panel-primary">
@@ -21,7 +22,7 @@
                 &middot;
                 <a target="_blank" href="https://xtools.readthedocs.io">{{ msg('documentation') }}</a>
                 &middot;
-                <a target="_blank" href="https://xtools.readthedocs.io/en/stable/api/index.html">{{ msg('api') }}</a>
+                {{ layout.apiLink }}
                 &middot;
                 <a target="_blank" href="https://github.com/x-tools/xtools">{{ msg('view-source') }}</a>
             </h5>

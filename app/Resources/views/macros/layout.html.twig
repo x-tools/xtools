@@ -117,6 +117,10 @@
     </div>
 {% endmacro %}
 
+{% macro apiLink() %}
+    <a target="_blank" href="https://xtools.readthedocs.io/en/stable/api/index.html">{{ msg('api') }}</a>
+{% endmacro %}
+
 {% macro contributions(project, revs, offset, pageSize = 50) %}
     {% from _self import contributionsNav as contributionsNav %}
     {% import 'macros/wiki.html.twig' as wiki %}

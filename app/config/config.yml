@@ -178,6 +178,7 @@ monolog:
             path: '%kernel.logs_dir%/%kernel.environment%.log'
         mailer:
             type: deduplication
+            time: 300
             handler: swift
         swift:
             type: swift_mailer

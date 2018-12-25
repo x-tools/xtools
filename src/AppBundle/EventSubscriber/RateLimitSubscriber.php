@@ -7,6 +7,7 @@ declare(strict_types = 1);
 
 namespace AppBundle\EventSubscriber;
 
+use AppBundle\Helper\I18nHelper;
 use DateInterval;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -25,6 +26,9 @@ class RateLimitSubscriber implements EventSubscriberInterface
     /** @var ContainerInterface The DI container. */
     protected $container;
 
+    /** @var I18nHelper For i18n and l10n. */
+    protected $i18n;
+
     /** @var int Number of requests allowed in time period */
     protected $rateLimit;
 
@@ -34,10 +38,12 @@ class RateLimitSubscriber implements EventSubscriberInterface
     /**
      * Save the container for later use.
      * @param ContainerInterface $container The DI container.
+     * @param I18nHelper $i18n
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, I18nHelper $i18n)
     {
         $this->container = $container;
+        $this->i18n = $i18n;
     }
 
     /**
@@ -76,20 +82,22 @@ class RateLimitSubscriber implements EventSubscriberInterface
          * Rate limiting will not apply to these actions
          * @var array
          */
-        $actionWhitelist = ['indexAction', 'showAction', 'aboutAction', 'recordUsage'];
+        $actionWhitelist = [
+            'indexAction', 'showAction', 'aboutAction', 'recordUsage', 'loginAction', 'oauthCallbackAction',
+        ];
 
-        // No rate limits on lightweight pages or if they are logged in.
-        if (in_array($controller[1], $actionWhitelist) || $loggedIn) {
+        // No rate limits on lightweight pages, logged in users, or subrequests.
+        if (in_array($controller[1], $actionWhitelist) || $loggedIn || false === $event->isMasterRequest()) {
             return;
         }
 
         $this->checkBlacklist($request);
 
-        // Build and fetch cache key based on session ID and requested URI,
-        //   removing any reserved characters from URI.
-        $uri = preg_replace('/[^a-zA-Z0-9,\.]/', '', $request->getRequestUri());
+        // Build and fetch cache key based on session ID.
         $sessionId = $request->getSession()->getId();
-        $cacheKey = 'ratelimit.'.$sessionId.'.'.$uri;
+        $cacheKey = 'ratelimit.'.$sessionId;
+
+        /** @var \Symfony\Component\Cache\Adapter\TraceableAdapter $cache */
         $cache = $this->container->get('cache.app');
         $cacheItem = $cache->getItem($cacheKey);
 
@@ -120,7 +128,21 @@ class RateLimitSubscriber implements EventSubscriberInterface
             if (is_array($blacklist['user_agent'])) {
                 foreach ($blacklist['user_agent'] as $ua) {
                     if (false !== strpos($request->headers->get('User-Agent'), $ua)) {
-                        $this->denyAccess($request, "Matched blacklisted user agent `$ua`");
+                        $logComment = "Matched blacklisted user agent `$ua`";
+
+                        // Log the denied request
+                        $logger = $this->container->get('monolog.logger.rate_limit');
+                        $logger->info(
+                            "<URI>: " . $request->getRequestUri() .
+                            ('' != $logComment ? "\t<Reason>: $logComment" : '') .
+                            "\t<User agent>: " . $request->headers->get('User-Agent')
+                        );
+
+                        throw new HttpException(
+                            403,
+                            'Your access to XTools has been revoked due to possible abuse. '.
+                            'Please contact tools.xtools@tools.wmflabs.org'
+                        );
                     }
                 }
             }
@@ -143,10 +165,35 @@ class RateLimitSubscriber implements EventSubscriberInterface
      */
     private function temporaryBlacklisting(Request $request): void
     {
-        $uaMatch = 1 === preg_match('/iPhone|Pixel 2|Nexus 5|SM\-G900P/', $request->headers->get('User-Agent'));
-        $reqMatch = 1 === preg_match('/articleinfo\/en\.wikipedia\.org.*?\?uselang\=(?!en)/', $request->getUri());
+        $uaMatch = 1 === preg_match(
+            '/iPhone|Pixel 2|Nexus 5|SM\-G900P/',
+            (string)$request->headers->get('User-Agent')
+        );
+        $reqMatch = 1 === preg_match(
+            '/(articleinfo(?:\-authorship)?|topedits)\/en\.wikipedia\.org.*?\?uselang\=(?!en)/',
+            (string)$request->getUri()
+        );
 
-        if (false === $uaMatch || false === $reqMatch) {
+        $passed = false;
+
+        if (true === $uaMatch && true === $reqMatch) {
+            $passed = true;
+        }
+
+        $uaMatch = 1 === preg_match(
+            '/Pixel 2 Build\/OPD3\.170816\.012|Nexus 5 Build\/MRA58N|SM\-G900P Build\/LRX21T/',
+            (string)$request->headers->get('User-Agent')
+        );
+        $reqMatch = 1 === preg_match(
+            '/(articleinfo(?:\-authorship)?|topedits)\/en\.wikipedia\.org/',
+            (string)$request->getUri()
+        ) && false === strpos($request->getUri(), '?uselang=');
+
+        if (true === $uaMatch && true === $reqMatch) {
+            $passed = true;
+        }
+
+        if (false === $passed) {
             return;
         }
 
@@ -167,7 +214,6 @@ class RateLimitSubscriber implements EventSubscriberInterface
      * Throw exception for denied access due to spider crawl or hitting usage limits.
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @param string $logComment Comment to include with the log entry.
-     * @throws TooManyRequestsHttpException
      */
     private function denyAccess(\Symfony\Component\HttpFoundation\Request $request, string $logComment = ''): void
     {
@@ -179,6 +225,19 @@ class RateLimitSubscriber implements EventSubscriberInterface
             "\t<User agent>: " . $request->headers->get('User-Agent')
         );
 
-        throw new TooManyRequestsHttpException(600, 'error-rate-limit', null, $this->rateDuration);
+        $message = $this->i18n->msg('error-rate-limit', [
+            $this->rateDuration,
+            "<a href='/login'>".$this->i18n->msg('error-rate-limit-login')."</a>",
+            "<a href='https://xtools.readthedocs.io/en/stable/api' target='_blank'>" .
+                $this->i18n->msg('api') .
+            "</a>",
+        ]);
+
+        /**
+         * TODO: Find a better way to do this.
+         * 999 is a random, complete hack to tell error.html.twig file to treat these exceptions as having
+         * fully safe messages that can be display with |raw. (In this case we authored the message).
+         */
+        throw new TooManyRequestsHttpException(600, $message, null, 999);
     }
 }
