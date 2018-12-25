@@ -40,8 +40,8 @@ class DefaultControllerTest extends ControllerTestAdapter
         // Change language.
         $crawler = $client->request('GET', '/?uselang=es');
         static::assertContains(
-            'Herramientas de X!',
-            $crawler->filter('.splash-logo')->attr('alt')
+            'Saciando tu hambre de datos',
+            $crawler->filter('#content h4')->text()
         );
 
         // Make sure all active tools are listed.

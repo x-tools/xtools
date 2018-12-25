@@ -52,8 +52,8 @@ parameters:
 
     app.replag_threshold: 30
 
-    app.rate_limit_time: 5
-    app.rate_limit_count: 10
+    app.rate_limit_time: 0
+    app.rate_limit_count: 0
 
     app.query_timeout: 900
 

@@ -22,22 +22,38 @@
             {% set message = 'unknown' %}
         {% endif %}
 
-        <p>{{ msg('error-title') }}</p>
-
-        <p>
-            {% if msgExists(message, [exception.code]) %}
-                <strong>{{ msg(message, [exception.code]) }}</strong>
-            {% else %}
-                {{ msg('error-server-message', ['<code>' ~ message ~ '</code>']) }}
-            {% endif %}
-        </p>
-
-        <p>
+        {% if msgExists(message, [exception.code]) %}
+            <p><strong>{{ msg(message, [exception.code]) }}</strong></p>
+        {% elseif 999 == exception.code %}
+            {# This is a server-build message ready to be display that can safely use raw() #}
+            <p>{{ message|raw }}</p>
+        {% else %}
             {% set phabLink %}
                 <a target="_blank" href="https://phabricator.wikimedia.org/maniphest/task/create/?title=PLEASE REPLACE WITH A DESCRIPTION OF THE ERROR&amp;priority=75&amp;projects=XTools&amp;description=```{{ attribute(exception, 'file') }}: {{ attribute(exception, 'line') }} - {{ message }}```%0A%0AURL: {{app.request.uri}}%0A%0APlease provide any further details here%0A%0AXTools version: {{ version }}-{{ shortHash() }}">Phabricator</a>
             {% endset %}
-            {{ msg('error-report', [phabLink]) }}
-        </p>
+            <p>{{ msg('error-title', [phabLink]) }}</p>
+
+            {# TODO: Probably want to get rid of this completely, or at least truncate the lines of the error message which can sometimes include massive SQL queries #}
+            {# Fallback to "the server said: ..." #}
+            <p>{{ msg('error-server-message', ['<code>' ~ message ~ '</code>']) }}</p>
+        {% endif %}
+
+        <div class="text-center">
+            <img class="splash-logo splash-logo--small" style="width:200px" src="{{ asset('images/logo.svg') }}" alt="{{ msg('xtools-title') }}" />
+            <h5 class="about-subtitle">
+                {{ msg('version', [version]) }}
+                ({{ releaseDate() }})
+                &middot;
+                <a target="_blank" href="https://xtools.readthedocs.io">{{ msg('documentation') }}</a>
+                &middot;
+                {{ layout.apiLink }}
+                &middot;
+                <a target="_blank" href="https://github.com/x-tools/xtools">{{ msg('view-source') }}</a>
+            </h5>
+            <small>
+                {% include 'default/_report_issue_links.html.twig' %}
+            </small>
+        </div>
     </div>
 </div>
 {% endblock %}
