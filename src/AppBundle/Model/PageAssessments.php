@@ -234,9 +234,9 @@ class PageAssessments extends Model
      *   'weight' (integer, 0 is lowest importance),
      *   'category' (wiki path to the related importance category).
      * @param  array $assessment
-     * @return array Decorated importance assessment.
+     * @return array|null Decorated importance assessment. Null if importance could not be determined.
      */
-    private function getImportanceFromAssessment(array $assessment): array
+    private function getImportanceFromAssessment(array $assessment): ?array
     {
         $importanceValue = $assessment['importance'];
 
