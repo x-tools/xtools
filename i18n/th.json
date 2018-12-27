@@ -3,7 +3,8 @@
 		"authors": [
 			"Nemo bis",
 			"Ans",
-			"Aefgh39622"
+			"Aefgh39622",
+			"Geonuch"
 		]
 	},
 	"actions": "การแก้ไข",
@@ -120,7 +121,7 @@
 	"performer": "ผู้ดำเนินการ",
 	"powered-by": "ขับเคลื่อนโดย $1",
 	"project": "โครงการ",
-	"protect": "ล็อก",
+	"protect": "ป้องกัน",
 	"quote-number": "คำพูดหมายเลข #",
 	"quote-random": "ดูการสุ่มคำพูด",
 	"quote-show-all": "ดูคำพูดทั้งหมด",
