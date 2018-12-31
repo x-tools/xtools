@@ -8,7 +8,8 @@
 			"Rajatkatiyar10",
 			"Nitin1485",
 			"Smtchahal",
-			"J ansari"
+			"J ansari",
+			"Gopalindians"
 		]
 	},
 	"accounts": "खाते",
@@ -105,9 +106,9 @@
 	"max-text-added": "अधिकतम पाठ जोड़ा गया",
 	"max-text-deleted": "अधिकतम पाठ हटाया गया",
 	"memory-usage": "$1 मेघाबाइट मेमोरी निष्पादित की गई।",
-	"minor": "छोटा",
+	"minor": "छोटे",
 	"minor-edits": "छोटा संपादन",
-	"minor-edits-percentage": "छोटा संपादन",
+	"minor-edits-percentage": "छोटी संपादने %",
 	"minor-edits-with-summaries": "सारांशासहित छोटी संपादने",
 	"monday": "सोमवार",
 	"month": "महीना",
