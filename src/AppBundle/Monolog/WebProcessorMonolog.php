@@ -40,7 +40,8 @@ class WebProcessorMonolog
 
         if ($request) {
             $record['extra']['host'] = $request->getHost();
-            $record['extra']['url'] = $request->getUri();
+            $record['extra']['uri'] = $request->getUri();
+            $record['extra']['useragent'] = $request->headers->get('User-Agent');
 
             $session = $request->getSession();
 
