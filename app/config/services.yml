@@ -30,6 +30,12 @@ services:
         calls:
         - [setContainer, ["@service_container"]]
 
+    app.monolog.processor.web:
+        class: AppBundle\Monolog\WebProcessorMonolog
+        arguments: ['@request_stack']
+        tags:
+            - { name: monolog.processor, method: processRecord }
+
     # These need to not be public, but they are, for now...
     app.automated_edits_helper:
         class: AppBundle\Helper\AutomatedEditsHelper
