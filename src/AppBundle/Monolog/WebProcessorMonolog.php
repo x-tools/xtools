@@ -44,7 +44,7 @@ class WebProcessorMonolog
 
             $session = $request->getSession();
 
-            if (!$session->isStarted()) {
+            if (null === $session || !$session->isStarted()) {
                 return $record;
             }
 
