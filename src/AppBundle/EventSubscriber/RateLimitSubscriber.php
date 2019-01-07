@@ -127,7 +127,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
             // User agents
             if (is_array($blacklist['user_agent'])) {
                 foreach ($blacklist['user_agent'] as $ua) {
-                    if (false !== strpos($request->headers->get('User-Agent'), $ua)) {
+                    if (false !== strpos((string)$request->headers->get('User-Agent'), $ua)) {
                         $logComment = "Matched blacklisted user agent `$ua`";
 
                         // Log the denied request
