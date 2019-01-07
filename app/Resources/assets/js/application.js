@@ -687,7 +687,7 @@ xtools.application.loadContributions = function (endpointFunc, apiTitle) {
         url: xtBaseUrl + endpoint + '/' + xtools.application.vars.editOffset +
             // Make sure to include any URL parameters, such as tool=Huggle (for AutoEdits).
             '?htmlonly=yes&pagesize=' + pageSize + '&' + window.location.search.replace(/^\?/, ''),
-        timeout: 30000
+        timeout: 60000
     }).done(function (data) {
         $('.contributions-container').html(data).show();
         $('.contributions-loading').hide();
