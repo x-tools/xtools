@@ -1,5 +1,12 @@
 # Release Notes #
 
+## 3.6.21 ##
+- Show large message saying you can login to avoid rate limiting.
+- Increase timeout of loading contribs pages to 60 seconds.
+- Fix bug with checking UA in RateLimitSubscriber.
+- Update copyright year.
+- Localization updates.
+
 ## 3.6.20 ##
 - Rate limit all requests by session ID.
 - Include host, URI and UA in error reports.
