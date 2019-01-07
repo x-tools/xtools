@@ -1,5 +1,11 @@
 # Release Notes #
 
+## 3.6.20 ##
+- Rate limit all requests by session ID.
+- Include host, URI and UA in error reports.
+- ArticleInfo: fix return type that was causing critical prod errors.
+- Localization updates.
+
 ## 3.6.19 ##
 - Temporary user-specific throttling. This release should only be used
   on the Wikimedia Foundation installation of XTools.
