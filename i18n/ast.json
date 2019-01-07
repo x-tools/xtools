@@ -124,7 +124,6 @@
 	"error-pagepile-too-large": "Sentímoslo, hai demasiaes páxines a esportar a PagePile. Puedes crear una PagePile manualmente, o afinar el conxuntu de resultaos llendándolu a un determináu espaciu de nomes o intervalu de tiempu.",
 	"error-query-timeout": "Sentímoslo, la información solicitada tardó demasiao en procesase (tiempu máximu $1 {{PLURAL:$1|segundu|segundos}}). P'aforrar recursos, la consulta matóse automáticamente.",
 	"error-rate-limit": "Detectóse la posible aición d'una «araña». Si yes humanu, escurque teas faciendo demasiaes solicitúes nun periodu de tiempu curtiu. Espera $1 {{PLURAL:$1|minutu|minutos}} antes de recargar esta ferramienta. Darréu puedes aniciar sesión pa prevenir qu'esto vuelva a pasar.",
-	"error-report": "Informa sin compromisu d'esti error en $1 (rique una cuenta de Wikimedia).",
 	"error-server-message": "El sirvidor dixo: $1",
 	"error-service-overload": "XTools anguaño ta sobrecargáu dando serviciu a otres solicitúes. Tenta otra vuelta en dellos minutos.",
 	"error-title": "Hebo un error grave en XTools.",

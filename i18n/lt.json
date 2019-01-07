@@ -130,7 +130,6 @@
 	"error-pagepile-too-large": "Atsiprašome, pasirinkta per daug puslapių, kuriuos reikia eksportuoti į PagePile. Galite rankiniu būdu sukurti PagePile, arba patikslinti paiešką pasirenkant vardų sritis arba laikotarpį.",
 	"error-query-timeout": "Atsiprašome, jūsų prašomai informacijai apdoroti prireikė per daug laiko ($1 {{PLURAL:$1|sekundės|sekundžių}}). Siekiant taupyti išteklius, užklausa buvo automatiškai nutraukta.",
 	"error-rate-limit": "Aptiktas galimas interneto robotas. Jei esate žmogus, tai jūs atliekate per daug užklausų per trumpą laiko tarpą. Prašome palaukti $1 {{PLURAL:$1|minutę|minutes|minučių}}, kol bus perkrautas šis įrankis. Tuomet galėsite prisijungti, jei norėsite, kad tai nepasikartotų.",
-	"error-report": "Nedvejodami praneškite apie šią klaidą $1 (reikalinga Wikimedia paskyra).",
 	"error-server-message": "Serveris sako: $1",
 	"error-service-overload": "Šiuo metu XTools yra perkrautas aptarnaujant kitas užklausas. Prašome pabandyti dar kartą po kelių minučių.",
 	"error-title": "Naudojantis XTools įvyko lemtinga klaida.",

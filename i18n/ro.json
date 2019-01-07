@@ -122,7 +122,6 @@
 	"end": "Până la",
 	"error-articleinfo-api": "Imposibil de preluat datele de revizuire.",
 	"error-pagepile-too-large": "Ne pare rău, există prea multe pagini pentru a fi exportate în PagePile. Puteți crea manual un PagePile sau puteți încerca să micșorați rezultatul setat prin limitarea la un anumit spațiu de nume sau interval de timp.",
-	"error-report": "Vă rugăm să raportați această eroare la $1 (necesită un cont Wikimedia).",
 	"error-server-message": "Serverul a răspuns: $1",
 	"error-title": "XTools a întâlnit o eroare fatală.",
 	"events": "Evenimente",

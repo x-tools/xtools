@@ -122,7 +122,6 @@
 	"end": "Datum konca",
 	"error-articleinfo-api": "Ne moremo naložiti podatkov o redakciji.",
 	"error-query-timeout": "Se opravičujemo, zahtevana informacija je bila predolgo v obdelavi (pretek po $1 {{PLURAL:$1|sekundi|sekundah}}). Zaradi varčevanja kapacitet je bil zahtevek izničen.",
-	"error-report": "Prosimo, če želiš, lahko poročaš o napaki na $1 (potreben wikimedijin račun).",
 	"error-server-message": "Strežnik je sporočil: $1",
 	"error-service-overload": "XOrodja so trenutno preobremenjena z drugimi zahtevki. Prosimo, poskusi ponovno čez nekaj minut.",
 	"error-title": "V XOrodjih je prišlo do usodne napake.",

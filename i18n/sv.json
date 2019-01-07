@@ -130,7 +130,6 @@
 	"error-pagepile-too-large": "Tyvärr, det finns för många sidor att exportera till PagePile. Du kan skapa en PagePile manuellt eller försöka reducera resultaten genom att begränsa till en specifik namnrymd eller tidsram.",
 	"error-query-timeout": "Tyvärr, den begärda informationen tog för lång tid att bearbeta (tidsgräns på $1 {{PLURAL:$1|sekund|sekunder}}). För att spara resurser stoppades förfrågan automatiskt.",
 	"error-rate-limit": "En möjlig spider crawl upptäcktes. Om du är en människa gör du för många förfrågan under en kort tidsperiod. Vänta i $1 {{PLURAL:$1|minut|minuter}} innan du startar om detta verktyg. Du kan sedan logga in för att förhindra detta från att hända igen.",
-	"error-report": "Rapportera gärna felet här: $1 (kräver ett Wikimedia-konto)",
 	"error-server-message": "Server sade: $1",
 	"error-service-overload": "XTools är för närvarande upptagen av andra begäran. Försök igen om några minuter.",
 	"error-title": "Ett allvarligt fel har inträffat i XTools.",

@@ -121,7 +121,6 @@
 	"error-articleinfo-api": "Kunne ikke hente revisjonsdata.",
 	"error-pagepile-too-large": "Beklager, det er for mange sider å eksportere til PagePile. Du kan opprette en PagePile manuelt, eller prøve å begrense resultatsettet ved å begrense det til et visst navnerom eller en viss tidsperiode.",
 	"error-query-timeout": "Beklager, det tok for lang tid å prosessere den etterspurte informasjonen (tidsavbrudd på $1 {{PLURAL:$1|sekund|sekunder}}). For å spare på ressursene ble spørringen stoppet automatisk.",
-	"error-report": "Rapporter gjerne denne feilen på $1 (krever en Wikimedia-konto).",
 	"error-server-message": "Tjeneren sa: $1",
 	"error-service-overload": "XTools er for øyeblikket overbelastet av andre forespørsler. Prøv igjen om noen minutter.",
 	"error-title": "En kritisk feil har oppstått i XTools.",
