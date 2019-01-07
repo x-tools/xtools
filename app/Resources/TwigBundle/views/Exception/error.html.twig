@@ -38,8 +38,15 @@
             <p>{{ msg('error-server-message', ['<code>' ~ message ~ '</code>']) }}</p>
         {% endif %}
 
+        {% if status_code == 429 %}
+            <p>
+                {% set loginLink = "<a href='" ~ path('login') ~ "'>" ~ msg('error-rate-limit-login') ~ "</a>" %}
+                <h3 class="text-danger"><strong>{{ msg('error-rate-limit-login-big', [loginLink]) }}</strong></h3>
+            </p>
+        {% endif %}
+
         <div class="text-center">
-            <img class="splash-logo splash-logo--small" style="width:200px" src="{{ asset('images/logo.svg') }}" alt="{{ msg('xtools-title') }}" />
+            <img class="splash-logo splash-logo--small" style="width:150px" src="{{ asset('images/logo.svg') }}" alt="{{ msg('xtools-title') }}" />
             <h5 class="about-subtitle">
                 {{ msg('version', [version]) }}
                 ({{ releaseDate() }})
