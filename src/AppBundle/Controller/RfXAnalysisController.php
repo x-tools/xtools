@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * This controller handles the RfX Analysis tool.
+ * @codeCoverageIgnore
  */
 class RfXAnalysisController extends XtoolsController
 {

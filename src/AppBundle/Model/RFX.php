@@ -9,6 +9,7 @@ namespace AppBundle\Model;
 
 /**
  * This class contains information about a single RfX page.
+ * @codeCoverageIgnore
  */
 class RFX extends Model
 {

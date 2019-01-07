@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Controller for the RfX Vote Calculator.
+ * @codeCoverageIgnore
  */
 class RfXVoteCalculatorController extends XtoolsController
 {

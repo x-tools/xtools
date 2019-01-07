@@ -23,8 +23,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 /**
- * A repository is responsible for retrieving data from wherever it lives (databases, APIs,
- * filesystems, etc.)
+ * A repository is responsible for retrieving data from wherever it lives (databases, APIs, filesystems, etc.)
  */
 abstract class Repository
 {
