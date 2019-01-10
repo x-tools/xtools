@@ -4,7 +4,8 @@
 			"Aftabuzzaman",
 			"Nemo bis",
 			"Rasal Lia",
-			"আফতাবুজ্জামান"
+			"আফতাবুজ্জামান",
+			"Tahmid02016"
 		]
 	},
 	"accepted-formats": "গ্রহণকৃত বিন্যাস",
@@ -111,6 +112,7 @@
 	"end": "সমাপ্তির তারিখ",
 	"error-articleinfo-api": "সংশোধনের উপাত্ত আনা যাচ্ছে না।",
 	"error-login": "প্রবেশ ব্যর্থ হয়েছে! আবার চেষ্টা করুন।",
+	"error-rate-limit-login": "প্রবেশ",
 	"error-server-message": "সার্ভারটি জানিয়েছে: $1",
 	"error-title": "XTools-এ একটি মারাত্মক ত্রুটি ঘটেছে।",
 	"events": "অনুষ্ঠানসমূহ",

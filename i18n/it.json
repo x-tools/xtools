@@ -79,6 +79,7 @@
 	"edits-with-summaries": "Modifiche con oggetto",
 	"end": "Data dell'ultima modifica",
 	"error-login": "Accesso fallito! Per favore, riprova.",
+	"error-rate-limit-login": "entra",
 	"events": "Eventi",
 	"executed": "Eseguito in $1 {{PLURAL:$2|secondo|secondi}}.",
 	"explanation": "Spiegazione",

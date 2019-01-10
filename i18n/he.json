@@ -3,7 +3,8 @@
 		"authors": [
 			"Nemo bis",
 			"YaronSh",
-			"Guycn2"
+			"Guycn2",
+			"Strayblues"
 		]
 	},
 	"accepted-formats": "תבניות מקובלות",
@@ -69,6 +70,7 @@
 	"edits-last-year": "עריכות ב־365 הימים האחרונים",
 	"edits-with-summaries": "עריכות עם תקציר",
 	"end": "תאריך סיום",
+	"error-rate-limit-login": "כניסה",
 	"error-server-message": "השרת השיב: $1",
 	"events": "אירועים",
 	"executed": "זמן ביצוע בשניות: $1.",

@@ -134,6 +134,7 @@
 	"error-query-timeout": "很抱歉，所請求訊息花費太長時間處理（逾時 $1 {{PLURAL:$1|\n秒|秒}}）。為了保護系統資源，已自動將查詢給刪除。",
 	"error-rate-limit": "如果您的身份只是一般普通人，那是因您在短時間內弄出太多請求。在重新載入此工具前請先等待 $1 {{PLURAL:$1|秒|秒}}，或是$2來防止此情況再次發生。若您是網路機器人，請改用我們的$3。",
 	"error-rate-limit-login": "登入",
+	"error-rate-limit-login-big": "請以$1來避免錯誤率限制。",
 	"error-server-message": "伺服器報告：$1",
 	"error-service-overload": "XTools 目前被多個請求給導致負荷過量。請等幾分鐘後再重試。",
 	"error-title": "XTools 發生嚴重錯誤。這已被自動回報，請在方便的時候在$1上提出（需要維基媒體帳號）。",

@@ -6,7 +6,8 @@
 			"Wladek92",
 			"Nemo bis",
 			"Nike",
-			"Tacsipacsi"
+			"Tacsipacsi",
+			"McDutchie"
 		]
 	},
 	"accepted-formats": "Text shown in the tooltip that lists the accepted formats for entering a project, username, etc.",
@@ -131,7 +132,7 @@
 	"error-pagepile-too-large": "Error shown when a PagePile could not be created from the Pages Created tool. PagePile is another tool used to make lists of pages. In some cases we can't create a PagePile because there are too many pages.",
 	"error-query-timeout": "Error message shown when XTools timed out. $1 is the timeout value in seconds.",
 	"error-rate-limit": "Error shown when too many requests are made to XTools in a short period of time. $1 is the number of minutes the client must wait to reload the page. $2 is a link to Login, with the message 'error-rate-limit-login' as the link text. $3 is a link the API documentation, with 'api' as the link text.",
-	"error-rate-limit-login": "The label for a link to login, used in the 'error-rate-limit' message.\n{{Identical|Login}}",
+	"error-rate-limit-login": "The label for a link to login, the $1 in {{msg-wm|Xtools-error-rate-limit-login-big}}.\n{{Identical|Login}}",
 	"error-rate-limit-login-big": "A bigger message shown to the user when they are making too many requests in a short amount of time. $1 is a link to login with the message 'error-rate-limit-login' as the link text.",
 	"error-server-message": "Error message. $1 is the message given by the server.",
 	"error-service-overload": "Error message shown when too many people are using XTools.",
