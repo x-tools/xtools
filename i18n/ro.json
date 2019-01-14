@@ -3,7 +3,8 @@
 		"authors": [
 			"Andreyyshore",
 			"Adrianbblk",
-			"MSClaudiu"
+			"MSClaudiu",
+			"WebSourceContentRO"
 		]
 	},
 	"accepted-formats": "Formate acceptate",
@@ -38,12 +39,15 @@
 	"auto-contribs-desc": "Consultați contribuțiile (semi-) automatizate ale unui utilizator.",
 	"auto-contribs-use-tool": "Afișați numai modificările utilizând instrumentul:",
 	"auto-edits": "Modificări (semi-)automate",
-	"auto-edits-counts-desc": "Unele utilizări ale instrumentelor se suprapun (de exemplu, reluarea unei revizuiri care este o redirecționare se ia în calcul ca Rollback și redirecționare), astfel încât totalul modificărilor efectuate cu fiecare unealtă poate fi diferit de $ 1.",
+	"auto-edits-bot": "Acest utilizator este un robot. Toate editările pot fi automatizate. Statisticile afișate aici se bazează pe modificări efectuate utilizând instrumente cunoscute.",
+	"auto-edits-counts-desc": "Unele utilizări ale instrumentelor se suprapun (de exemplu, reluarea unei revizuiri care este o redirecționare se ia în calcul precum Rollback și redirecționare), astfel încât totalul modificărilor efectuate cu fiecare unealtă poate fi diferit de $1.",
 	"auto-edits-counts-desc-grand-total": "marele total",
 	"auto-edits-request": "Cereți adăugarea unei noi unelte (semi-)automate",
 	"auto-edits-request-doc": "Conectați-vă la documentația sau pagina principală a uneltei",
 	"auto-edits-request-examples": "Linkuri la editările de exemple",
 	"auto-edits-request-name": "Numele uneltei",
+	"auto-edits-tool-filter-desc": "Afișați numai modificările folosind instrumentul dat.",
+	"auto-edits-unknown-tool": "Niciun instrument cunoscut cu numele: $1",
 	"auto-tool-edits": "$1 modificări",
 	"automatic": "Automat",
 	"average-change-per-page": "Modificarea medie pe pagină",
@@ -121,7 +125,9 @@
 	"edits-with-summaries": "Modificări cu descriere",
 	"end": "Până la",
 	"error-articleinfo-api": "Imposibil de preluat datele de revizuire.",
+	"error-login": "Autentificare eșuată! Vă rugăm să încercați din nou.",
 	"error-pagepile-too-large": "Ne pare rău, există prea multe pagini pentru a fi exportate în PagePile. Puteți crea manual un PagePile sau puteți încerca să micșorați rezultatul setat prin limitarea la un anumit spațiu de nume sau interval de timp.",
+	"error-query-timeout": "Ne pare rău, informațiile solicitate au durat prea mult pentru a procesa (timp de $1 {{PLURAL:$1|second|secunde}}). Pentru a salva resursele, interogarea a fost eliminată automat.",
 	"error-server-message": "Serverul a răspuns: $1",
 	"error-title": "XTools a întâlnit o eroare fatală.",
 	"events": "Evenimente",

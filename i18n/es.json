@@ -137,6 +137,7 @@
 	"error-pagepile-too-large": "Hay demasiadas páginas para exportar a PagePile. Puedes crear manualmente un PagePile o tratar de reducir el número de resultados limitándolo a un espacio de nombres o a un período de tiempo específicos.",
 	"error-query-timeout": "La información solicitada tardó demasiado en procesarse (tiempo de espera de $1 {{PLURAL:$1|segundo|segundos}}). Para ahorrar recursos, la consulta fue automáticamente eliminada.",
 	"error-rate-limit": "Posible rastreo de red detectado. Si eres humano, estás haciendo demasiadas solicitudes durante un corto período de tiempo. Espera $1 {{PLURAL:$1|minuto|minutos}} antes de volver a cargar esta herramienta. A continuación, puedes iniciar sesión para evitar que esto vuelva a suceder.",
+	"error-rate-limit-login": "iniciar sesión",
 	"error-server-message": "El servidor respondió: $1",
 	"error-service-overload": "XTools está actualmente sobrecargado atendiendo otras solicitudes. Inténtalo de nuevo en unos minutos.",
 	"error-title": "Se ha producido un error grave en XTools.",

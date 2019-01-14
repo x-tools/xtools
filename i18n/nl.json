@@ -6,7 +6,8 @@
 			"Nemo bis",
 			"Woodcutterty",
 			"Jeroen N",
-			"Elroy"
+			"Elroy",
+			"Optilete"
 		]
 	},
 	"accepted-formats": "Geaccepteerde indelingen",
@@ -32,6 +33,7 @@
 	"article": "Artikel",
 	"assessment": "Beoordeling",
 	"assessments": "Beoordelingen",
+	"authorship": "Auteurschap",
 	"auto-contribs-use-tool": "Alleen bewerkingen weergeven met het hulpprogramma:",
 	"auto-edits": "(Half-)automatische bewerkingen",
 	"auto-edits-bot": "Deze gebruiker is een bot. Alle bewerkingen zijn mogelijk automatisch uitgevoerd. De hier getoonde statistieken zijn gebaseerd op bewerkingen die gedaan zijn met bekende tools.",
@@ -102,6 +104,7 @@
 	"edits-with-summaries": "Bewerkingen met een samenvatting",
 	"end": "Einddatum",
 	"error-rate-limit-login": "aanmelden",
+	"error-server-message": "De server zei: $1",
 	"events": "Evenementen",
 	"executed": "Uitgevoerd in $1 {{PLURAL:$2|seconde|seconden}}.",
 	"explanation": "Uitleg",
