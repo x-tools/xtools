@@ -422,7 +422,7 @@
                     </td>
                 </tr>
                 {% set topN = 10 %}
-                {% for topProj in ec.globalEditCountsTopN(topN) %}
+                {% for topProj in ec.globalEditCountsTopN(topN) if topProj.project.domain is not null %}
                     <tr>
                         <td>
                             {% if topProj.project.databaseName == project.databaseName %}
