@@ -246,7 +246,7 @@ $tooltip-shadow: #ccc;
     }
 
     .bold {
-        font-weight: 500;
+        font-weight: bold;
     }
 
     &.fixed {
@@ -290,7 +290,7 @@ $tooltip-shadow: #ccc;
     color: white;
 }
 section > .panel-body {
-    overflow-x: scroll;
+    overflow-x: auto;
 }
 .panel-body .table:only-child,
 .panel-body .alert:last-child {
