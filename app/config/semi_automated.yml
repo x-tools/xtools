@@ -308,8 +308,8 @@ parameters:
             regex: '^\[\[Wikipedia:Articles for deletion\/.*?closed as'
             link: Project:Articles for deletion
         Sagittarius:
-            regex: '\(\[\[User:Kephir\/gadgets\/sagittarius\|'
-            link: User:Kephir/gadgets/sagittarius
+            regex: '\(\[\[User:Kephir\/gadgets\/sagittarius\||\(\[\[User:Sam Sailor\/Scripts\/Sagittarius\+\|'
+            link: User:Sam Sailor/Scripts/Sagittarius+
         Redirect:
             regex: '\[\[WP:AES\|←\]\]Redirected page to \[\[.*?\]\]'
             link: Project:Redirect
