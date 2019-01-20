@@ -356,8 +356,8 @@ parameters:
             regex: '\(\[\[WP:DFY\|DFY\]\]\)'
             link: Project:DFY
         AFC/R HS:
-            regex: 'Using \[\[User:PhantomTech\/scripts\/AFCRHS.js\|AFC\/R HS'
-            link: User:PhantomTech/scripts/AFCRHS.js
+            regex: 'Using \[\[User:PhantomTech\/scripts\/AFCRHS.js|\(\[\[User:Enterprisey\/AFCRHS'
+            link: User:Enterprisey/AFCRHS
         For the Common Good:
             regex: 'WP:FTCG\|FtCG'
             link: Project:FTCG
