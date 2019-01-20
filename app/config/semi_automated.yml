@@ -82,7 +82,7 @@ parameters:
             regex: 'COM:Duplicate\|Duplicate'
             link: c:Commons:Duplicate
         reFill:
-            regex: 'User:Zhaofeng Li\/Reflinks|WP:REFILL|en:WP:REFILL'
+            regex: 'User:Zhaofeng Li\/Reflinks|WP:REFILL|en:WP:REFILL|with reFill 2'
             link: Project:ReFill
         WikiLove:
             tag: wikilove
