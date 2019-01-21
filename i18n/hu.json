@@ -346,7 +346,7 @@
 	"tool-error": "Hiba",
 	"tool-meta": "Használati statisztika",
 	"tool-pages": "Laplétrehozások",
-	"tool-pages-desc": "Olyan oldalakat hozhat létre, amelyeket egy felhasználó hoz létre",
+	"tool-pages-desc": "Egy felhasználó által létrehozott oldalak lekérdezése",
 	"tool-rfx": "RfX elemzés",
 	"tool-rfxvote": "RfX szavazás",
 	"tool-simpleeditcounter": "Egyszerű számláló",
