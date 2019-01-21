@@ -46,22 +46,20 @@
                         data-target="autoedits">
 {% endif %}
 
-{% if ae.getToolCounts()|length > 0 %}
-    <div>
-        <form class="tool-selector-form form-inline" action="{{ path('AutoEditsContributionsResult', {project: project.domain, username:user.username, start: ae.start, end: ae.end, namespace: ae.namespace}) }}" method="get" accept-charset="utf-8">
-            <label for="toolSelector">{{ msg('auto-contribs-use-tool') }}</label>
-            <select id="toolSelector" class="form-control" name="tool">
-                <option value="">{{ msg('all') }}</option>
-                {% for tool in ae.getToolCounts()|keys|sort %}
-                    <option value="{{ tool }}" {% if ae.tool == tool %}selected="selected"{% endif %}>
-                        {{ tool }}
-                    </option>
-                {% endfor %}
-            </select>
-            <button type="submit" class="btn btn-primary form-submit">{{ msg('submit') }}</button>
-        </form>
-    </div>
-{% endif %}
+<div>
+    <form class="tool-selector-form form-inline" action="{{ path('AutoEditsContributionsResult', {project: project.domain, username:user.username, start: ae.start, end: ae.end, namespace: ae.namespace}) }}" method="get" accept-charset="utf-8">
+        <label for="toolSelector">{{ msg('auto-contribs-use-tool') }}</label>
+        <select id="toolSelector" class="form-control" name="tool">
+            <option value="">{{ msg('all') }}</option>
+            {% for tool in ae.allTools()|keys %}
+                <option value="{{ tool }}" {% if ae.tool == tool %}selected="selected"{% endif %}>
+                    {{ tool }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary form-submit">{{ msg('submit') }}</button>
+    </form>
+</div>
 {{ layout.contributions(project, ae.automatedEdits(), ae.offset) }}
 
 {% if not is_sub_request %}

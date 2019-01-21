@@ -23,7 +23,7 @@ $(function () {
                     '<option value="none">' + $.i18n('none') + '</option>' +
                     '<option value="all">' + $.i18n('all') + '</option>'
                 );
-                Object.keys(tools).sort().forEach(function (tool) {
+                Object.keys(tools).forEach(function (tool) {
                     $('#tool_selector').append(
                         '<option value="' + tool + '">' + (tools[tool].label || tool) + '</option>'
                     );
