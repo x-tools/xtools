@@ -100,6 +100,8 @@ class AutomatedEditsHelper extends HelperBase
             $data['label'] = $data['label'] ?? $tool;
         });
 
+        uksort($this->tools[$projectDomain], 'strcasecmp');
+
         return $this->tools[$projectDomain];
     }
 
