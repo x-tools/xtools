@@ -82,7 +82,7 @@ parameters:
             regex: 'COM:Duplicate\|Duplicate'
             link: c:Commons:Duplicate
         reFill:
-            regex: 'User:Zhaofeng Li\/Reflinks|WP:REFILL|en:WP:REFILL'
+            regex: 'User:Zhaofeng Li\/Reflinks|WP:REFILL|en:WP:REFILL|with reFill 2'
             link: Project:ReFill
         WikiLove:
             tag: wikilove
@@ -308,8 +308,8 @@ parameters:
             regex: '^\[\[Wikipedia:Articles for deletion\/.*?closed as'
             link: Project:Articles for deletion
         Sagittarius:
-            regex: '\(\[\[User:Kephir\/gadgets\/sagittarius\|'
-            link: User:Kephir/gadgets/sagittarius
+            regex: '\(\[\[User:Kephir\/gadgets\/sagittarius\||\(\[\[User:Sam Sailor\/Scripts\/Sagittarius\+\|'
+            link: User:Sam Sailor/Scripts/Sagittarius+
         Redirect:
             regex: '\[\[WP:AES\|←\]\]Redirected page to \[\[.*?\]\]'
             link: Project:Redirect
@@ -356,8 +356,8 @@ parameters:
             regex: '\(\[\[WP:DFY\|DFY\]\]\)'
             link: Project:DFY
         AFC/R HS:
-            regex: 'Using \[\[User:PhantomTech\/scripts\/AFCRHS.js\|AFC\/R HS'
-            link: User:PhantomTech/scripts/AFCRHS.js
+            regex: 'Using \[\[User:PhantomTech\/scripts\/AFCRHS.js|\(\[\[User:Enterprisey\/AFCRHS'
+            link: User:Enterprisey/AFCRHS
         For the Common Good:
             regex: 'WP:FTCG\|FtCG'
             link: Project:FTCG
