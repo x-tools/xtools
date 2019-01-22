@@ -332,8 +332,8 @@ parameters:
             regex: '\[\[w:en:WP:RLR\|You can help!'
             link: en:WP:RLR
         Script Installer:
-            regex: '\[\[User:Equazcion\/ScriptInstaller\|Script Installer'
-            link: User:Equazcion/ScriptInstaller
+            regex: '\[\[User:Equazcion\/ScriptInstaller\|Script Installer|\(\[\[User:Enterprisey\/script-installer\|script-installer\]\]\)'
+            link: User:Enterprisey/script-installer
         findargdups:
             regex: '\[\[:en:User:Frietjes\/findargdups'
             link: User:Frietjes/findargdups
