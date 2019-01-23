@@ -408,9 +408,9 @@ parameters:
         YABBR:
             tag: 'OAuth CID: 860'
             link: User:Enterprisey/YABBR
-        Wikiplus:
-            regex: 'Edit via Wikiplus'
-            link: Wikipedia:WIKIPLUS
+        Short description:
+            regex: '\(\[\[User:Galobtter\/Shortdesc helper\|Shortdesc helper\]\]\)'
+            link: User:Galobtter/Shortdesc helper
     ko.wikipedia.org:
         AutoWikiBrowser:
             regex: '위키백과:AWB\|AWB|(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
