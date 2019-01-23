@@ -99,7 +99,7 @@
 	"edits-last-year": "Son 365 gündəki redaktələr",
 	"edits-with-summaries": "Xülasə ilə düzəlişlər",
 	"end": "Son tarix",
-	"error-articleinfo-api": "Tənzimləmə məlumatlarını əldə edə bilmir.",
+	"error-articleinfo-api": "Statistika əldə edilə bilmir.",
 	"error-server-message": "Server deyib: $1",
 	"error-title": "XTools'ta ciddi bir səhv baş verdi.",
 	"events": "Hadisələr",
@@ -206,9 +206,9 @@
 	"num-others": "{{PLURAL:$1|digər|digərləri}}",
 	"num-pageviews": "{{PLURAL:$1|səhifə görüntüsü|səhifə görüntüləri}}",
 	"num-protections": "{{PLURAL:$1|müdafiə|müdafiələr}}",
-	"num-revisions": "{{PLURAL:$1|təftiş|təftişlər}}",
+	"num-revisions": "{{PLURAL:$1|redaktə|redaktələr}}",
 	"num-revisions-processed": "$1 işlənmişdir",
-	"num-revisions-since": "$1 {{PLURAL:$2|təftiş|təftişlər}} $3-dən",
+	"num-revisions-since": "$3 tarixindən $1 {{PLURAL:$2|redaktə}}",
 	"num-seconds": "{{PLURAL:$1|saniyə|saniyələr}}",
 	"num-sitelinks": "{{PLURAL:$1|sayt keçidləri|sayt keçidləri}}",
 	"num-tools": "{{PLURAL:$1|alət|alətlər}}",
@@ -279,9 +279,10 @@
 	"reverted": "Qaytarıldı",
 	"reverted-desc": "Dəyişikliklər dərhal aşağıdakı redaktə ilə qaytarılmışdır",
 	"reverted-edits": "Geri qaytarılmış redaktələr",
-	"revision-delete": "Təftişi silin",
+	"revision-delete": "Redaktəni silin",
 	"rfx-bureaucrat": "Bu vasitə bürokratlıq səhifələrinin sorğularını təhlil edə bilər",
 	"rfx-duplicates": "Dublikat",
 	"rfx-intro": "Bu alət səsləri təhlil edir və təkrar səs verənləri müəyyən edir:",
-	"rfx-page": "RfX səhifəsi"
+	"rfx-page": "RfX səhifəsi",
+	"see-full-page-stats": "Səhifənin bütün statistikasına bax"
 }

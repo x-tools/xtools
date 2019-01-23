@@ -4,7 +4,8 @@
 			"Nirajan pant",
 			"Nemo bis",
 			"सरोज कुमार ढकाल",
-			"Drjpoudel"
+			"Drjpoudel",
+			"पर्वत सुबेदी"
 		]
 	},
 	"accepted-formats": "स्वीकृत प्रारूपहरू",
@@ -84,6 +85,7 @@
 	"edits-last-week": "७ दिन अघिसम्मको सम्पादन",
 	"edits-last-year": "३६५ दिन अघिसम्मको सम्पादन",
 	"end": "समापन मिति",
+	"error-rate-limit-login": "प्रवेश",
 	"feedback": "प्रतिक्रिया",
 	"file": "फाइल",
 	"files": "फाइलहरू",

@@ -1,5 +1,16 @@
 # Release Notes #
 
+## 3.6.22 ##
+- T214137: Add Enterprisey's AFCRHS to AutoEdits configuration.
+- T212984: Add Sagittarius fork to AutoEdits configuration.
+- T213789: Add reFill 2 to reFill AutoEdits configuration.
+- AutoEdits: Use full list of tools on AutoEdits contribs pages.
+- EditCounter: Skip over wikis missing from replicas in Global edit counts.
+- ArticleInfo: fix prod error thrown when checking Main Page.
+- Minor improvements to cross-browser support.
+- Fix double logging of errors in production.
+- Localization updates.
+
 ## 3.6.21 ##
 - Show large message saying you can login to avoid rate limiting.
 - Increase timeout of loading contribs pages to 60 seconds.

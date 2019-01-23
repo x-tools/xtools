@@ -15,6 +15,9 @@ build:
     tests:
         override:
             -
+                # Make sure nothing's changed in Git, which would indicate asset changes were not committed.
+                command: git status | grep 'nothing to commit, working tree clean'
+            -
                 command: composer test
                 coverage:
                     file: 'coverage.xml'
