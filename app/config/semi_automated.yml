@@ -408,6 +408,9 @@ parameters:
         YABBR:
             tag: 'OAuth CID: 860'
             link: User:Enterprisey/YABBR
+        Reply link:
+            regex: '\(\[\[w:en:User:Enterprisey\/reply-link\|reply-link\]\]\)'
+            link: User:Enterprisey/reply-link
     ko.wikipedia.org:
         AutoWikiBrowser:
             regex: '위키백과:AWB\|AWB|(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
