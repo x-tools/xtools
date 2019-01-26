@@ -409,7 +409,7 @@ parameters:
             tag: 'OAuth CID: 860'
             link: User:Enterprisey/YABBR
         effp-helper:
-            regex: '\(\[\[User:Suffusion of Yellow\/effp-helper\.js\|effp-helper\]\]\)'
+            regex: '\(\[\[User:Suffusion of Yellow\/effp-helper(\.js)?\|effp-helper\]\]\)'
             link: User:Suffusion of Yellow/effp-helper
     ko.wikipedia.org:
         AutoWikiBrowser:
