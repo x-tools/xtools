@@ -4,10 +4,12 @@
 			"Beta16",
 			"Greis",
 			"Nemo bis",
-			"Samuele2002"
+			"Samuele2002",
+			"Wim b"
 		]
 	},
 	"accepted-formats": "Formati accettati",
+	"account-age-desc": "Vecchio di $2 {{PLURAL:$1|giorno|giorni}}",
 	"actions": "Azioni",
 	"added": "Aggiunto",
 	"all": "tutti",
@@ -68,6 +70,7 @@
 	"duplicate-vote": "Voto duplicato",
 	"edit": "Modifica",
 	"edit-count-desc": "$2 {{PLURAL:$1|modifica|modifiche}}",
+	"edit-summaries-desc": "$2 {{PLURAL:$1|campo oggetto usato|campi oggetto usati}} nel namespace principale",
 	"edit-summary": "Commento",
 	"editors": "Numero di utenti",
 	"edits": "Modifiche",
@@ -171,6 +174,7 @@
 	"pages": "Pagine",
 	"pages-created": "Pagine create",
 	"pages-created-deleted": "Pagine create (cancellate)",
+	"pages-created-deleted-desc": "$2 {{PLURAL:$1|una pagina creata che è stata eliminata|pagine create che sono state eliminate}}",
 	"pages-created-live-desc": "$2 {{PLURAL:$1|pagina creata|pagine create}}",
 	"pages-deleted": "Pagine cancellate",
 	"pages-edited-total": "Pagine modificate (totale)",
