@@ -174,7 +174,7 @@
 	"pages": "Pagine",
 	"pages-created": "Pagine create",
 	"pages-created-deleted": "Pagine create (cancellate)",
-	"pages-created-deleted-desc": "$2 {{PLURAL:$1|una pagina creata che è stata eliminata|pagine create che sono state eliminate}}",
+	"pages-created-deleted-desc": "$2 {{PLURAL:$1|pagina creata che è stata cancellata|pagine create che sono state cancellate}}",
 	"pages-created-live-desc": "$2 {{PLURAL:$1|pagina creata|pagine create}}",
 	"pages-deleted": "Pagine cancellate",
 	"pages-edited-total": "Pagine modificate (totale)",

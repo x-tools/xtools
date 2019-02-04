@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"Bjankuloski06",
-			"Nemo bis"
+			"Nemo bis",
+			"Vlad5250"
 		]
 	},
 	"accepted-formats": "Прифатени формати",
@@ -26,7 +27,7 @@
 	"all-languages": "Сите јазици",
 	"all-namespaces": "Сите именски простори",
 	"all-quotes": "Сите мисли",
-	"api": "Извршник",
+	"api": "API",
 	"api-error": "Се јави проблем при побарувањето од $1.",
 	"approve": "Одобрување",
 	"approximate": "приближно",
