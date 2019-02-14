@@ -2,10 +2,11 @@
 	"@metadata": {
 		"authors": [
 			"Eduardo Addad de Oliveira",
-			"He7d3r"
+			"He7d3r",
+			"Tks4Fish"
 		]
 	},
-	"accepted-formats": "Formatos aceites",
+	"accepted-formats": "Formatos aceitos",
 	"account-age": "Idade da conta",
 	"account-age-desc": "há $2 {{PLURAL:$1|dia|dias}}",
 	"accounts": "Contas",
@@ -14,7 +15,7 @@
 	"actions-as-admin": "Ações dos administradores",
 	"added": "Adicionado",
 	"added-bytes": "Acrescentado(s) (bytes)",
-	"admin-stats-notice": "Somente usuários que fizeram pelo menos uma ação do administrador no período de tempo são exibidos.",
+	"admin-stats-notice": "Somente usuários que fizeram pelo menos uma ação administrativa no período de tempo são exibidos.",
 	"admin-stats-notice2": "Alguns usuários podem ser antigos administradores ou não serem administradores, mas têm direitos para realizar determinadas ações administrativas.",
 	"afd": "Artigos para eliminar",
 	"afd-desc": "$2 {{PLURAL:$1|edição|edições}} dos artigos para as páginas para eliminar",

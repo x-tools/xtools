@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"HairyFotr",
-			"Janezdrilc"
+			"Janezdrilc",
+			"Yerpo"
 		]
 	},
 	"accepted-formats": "Dovoljeni formati",
@@ -44,6 +45,8 @@
 	"auto-edits-request-doc": "Povezava do dokumentacijske strani ali domače strani orodja",
 	"auto-edits-request-examples": "Povezave do prikaznih urejanj",
 	"auto-edits-request-name": "Ime orodja",
+	"auto-edits-tool-filter-desc": "Prikaži samo urejanja, narejena z določenim orodjem.",
+	"auto-edits-unknown-tool": "Ni znanega orodja z imenom: $1",
 	"auto-tool-edits": "Urejanja orodja $1",
 	"automatic": "Samodejno",
 	"average-change-per-page": "Povprečna sprememba na stran",
@@ -121,10 +124,13 @@
 	"edits-with-summaries": "Urejanja s povzetkom",
 	"end": "Datum konca",
 	"error-articleinfo-api": "Ne moremo naložiti podatkov o redakciji.",
+	"error-login": "Prijava je spodletela. Poskusi ponovno.",
 	"error-query-timeout": "Se opravičujemo, zahtevana informacija je bila predolgo v obdelavi (pretek po $1 {{PLURAL:$1|sekundi|sekundah}}). Zaradi varčevanja kapacitet je bil zahtevek izničen.",
+	"error-rate-limit": "Če si človek, podajaš preveč zahtevkov zapovrstjo. Počakaj $1 {{PLURAL:$1|minuto|minuti|minute|minut}} pred ponovno naložitvijo orodja, ali $2, da do tega več ne pride. Če si robot, uporabi raje naš $3.",
+	"error-rate-limit-login": "se prijavi",
 	"error-server-message": "Strežnik je sporočil: $1",
 	"error-service-overload": "XOrodja so trenutno preobremenjena z drugimi zahtevki. Prosimo, poskusi ponovno čez nekaj minut.",
-	"error-title": "V XOrodjih je prišlo do usodne napake.",
+	"error-title": "V XOrodjih je prišlo do usodne napake. Ta je bila samodejno sporočena, lahko pa podaš tudi prijavo na $1 (zahteva Wikimedijin račun).",
 	"events": "Dogodki",
 	"executed": "Izvedeno v $1 {{PLURAL:$2|sekundi|sekundah}}.",
 	"explanation": "Razlaga",
@@ -305,7 +311,7 @@
 	"redirect": "Preusmeritev",
 	"redirects": "Preusmeritve",
 	"redirfilter-all": "Vključuje preusmeritve in nepreusmeritve",
-	"redirfilter-noredirects": "Nevključuje preusmeritev",
+	"redirfilter-noredirects": "Ne vključuje preusmeritev",
 	"redirfilter-onlyredirects": "Samo preusmeritve",
 	"references": "Sklici",
 	"registration-date": "Datum registracije",
