@@ -109,7 +109,7 @@ class TopEditsController extends XtoolsController
          * Max number of rows per namespace to show. `null` here will use the TopEdits default.
          * @var int
          */
-        $limit = $this->isSubRequest ? 10 : null;
+        $limit = $this->isSubRequest ? 10 : $this->limit;
 
         $topEdits = new TopEdits($this->project, $this->user, null, $this->namespace, $limit, $this->offset);
         $topEditsRepo = new TopEditsRepository();
