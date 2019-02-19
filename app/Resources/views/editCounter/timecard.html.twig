@@ -13,7 +13,7 @@
                     {{ msg('see-full-statistics') }}
                 </a>
                 {{ wiki.userLink(user, project) }}
-                <small> &bull; {{ project.title }} </small>
+                <small> &bull; {{ project.domain }} </small>
             </div>
         </header>
         <div class="panel-body xt-panel-body">
@@ -51,7 +51,7 @@
             <th></th>
             {% for period in 0..11 %}
                 <th>
-                    <time>{{ period * 2 }}:00</time>
+                    <time>{{ (period * 2 ~ ':' ~ 00)|date_format('HH:mm') }}</time>
                 </th>
             {% endfor %}
         </thead>
@@ -146,7 +146,7 @@
                         max: 23,
                         stepSize: 2,
                         reverse: i18nRTL,
-                        callback: function(value, index, values) {
+                        callback: function(value) {
                             if (value % 2 === 0) {
                                 return value + ":00";
                             }

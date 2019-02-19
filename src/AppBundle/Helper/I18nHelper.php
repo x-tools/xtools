@@ -235,7 +235,7 @@ class I18nHelper
     public function numberFormat($number, $decimals = 0): string
     {
         if (!isset($this->numFormatter)) {
-            $lang = $this->getIntuition()->getLang();
+            $lang = $this->getNumberFormatterLang();
             $this->numFormatter = new NumberFormatter($lang, NumberFormatter::DECIMAL);
         }
 
@@ -254,7 +254,7 @@ class I18nHelper
     public function percentFormat($numerator, ?int $denominator = null, int $precision = 1): string
     {
         if (!isset($this->percentFormatter)) {
-            $lang = $this->getIntuition()->getLang();
+            $lang = $this->getNumberFormatterLang();
             $this->percentFormatter = new NumberFormatter($lang, NumberFormatter::PERCENT);
         }
 
@@ -284,7 +284,7 @@ class I18nHelper
     {
         if (!isset($this->dateFormatter)) {
             $this->dateFormatter = new IntlDateFormatter(
-                $this->getIntuition()->getLang(),
+                $this->getNumberFormatterLang(),
                 IntlDateFormatter::SHORT,
                 IntlDateFormatter::SHORT
             );
@@ -302,6 +302,17 @@ class I18nHelper
     }
 
     /********************* PRIVATE MEHTODS *********************/
+
+    /**
+     * TODO: Remove this when the fallbacks start working on their own. Production for some reason
+     *   doesn't seem to know about ckb, though it has the same version of PHP and ext-intl as my local...
+     * @see T213503
+     * @return string
+     */
+    private function getNumberFormatterLang(): string
+    {
+        return 'ckb' === $this->getIntuition()->getLang() ? 'ar' : $this->getIntuition()->getLang();
+    }
 
     /**
      * Determine the interface language, either from the current request or session.

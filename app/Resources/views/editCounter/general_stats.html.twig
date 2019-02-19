@@ -39,7 +39,7 @@
         {% if not(user.anon) %}
             <tr>
                 <td>{{ msg('user-id') }}</td>
-                <td>{{ user.id(project) }}</td>
+                <td>{{ user.id(project)|num_format }}</td>
             </tr>
             {% set regDate = user.registrationDate(project) %}
             {% if regDate is not empty %}
@@ -481,12 +481,12 @@
         {{
             chart.pie_chart('small_edits',
                 [{
-                    label: '< 20 ' ~ msg('num-bytes', [20]) ~ '*',
+                    label: '< ' ~ 20|num_format ~ ' ' ~ msg('num-bytes', [20]) ~ '*',
                     value: ec.countSmallEdits,
                     percentage: ((ec.countSmallEdits / ec.countLast5000) * 100)
                 },
                 {
-                    label: '≥ 20 ' ~ msg('num-bytes', [20]) ~ '*',
+                    label: '≥ ' ~ 20|num_format ~ ' ' ~ msg('num-bytes', [20]) ~ '*',
                     value: ec.countLast5000 - ec.countSmallEdits,
                     percentage: 100 - ((ec.countSmallEdits / ec.countLast5000) * 100)
                 }]
@@ -495,12 +495,12 @@
         {{
             chart.pie_chart('large_edits',
                 [{
-                    label: '< 1000 ' ~ msg('num-bytes', [1000]) ~ '*',
+                    label: '< ' ~ 1000|num_format ~ ' ' ~ msg('num-bytes', [1000]) ~ '*',
                     value: ec.countLast5000 - ec.countLargeEdits,
                     percentage: 100 - ((ec.countLargeEdits / ec.countLast5000) * 100)
                 },
                 {
-                    label: '≥ 1000 ' ~ msg('num-bytes', [1000]) ~ '*',
+                    label: '≥ ' ~ 1000|num_format ~ ' ' ~ msg('num-bytes', [1000]) ~ '*',
                     value: ec.countLargeEdits,
                     percentage: ((ec.countLargeEdits / ec.countLast5000) * 100)
                 }]
