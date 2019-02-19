@@ -57,6 +57,7 @@ $(function () {
                 letitle: $(this).data('page'),
                 lestart: $(this).data('datetime').toString().slice(0, -2),
                 letype: 'delete',
+                leaction: 'delete/delete',
                 lelimit: 1,
                 format: 'json'
             },
