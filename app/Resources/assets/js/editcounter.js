@@ -25,7 +25,7 @@ $(function () {
         return;
     }
 
-    setupSectionListeners();
+    xtools.application.setupMultiSelectListeners();
 
     // Set up charts.
     $('.chart-wrapper').each(function () {
@@ -56,25 +56,6 @@ $(function () {
     // Set up namespace toggle chart.
     xtools.application.setupToggleTable(window.namespaceTotals, window.namespaceChart, null, toggleNamespace);
 });
-
-/**
- * Handles the section inputs on the index page.
- */
-function setupSectionListeners()
-{
-    var $sectionInputs = $('.stat-section-option');
-    $sectionInputs.on('change', function () {
-        // If all sections are selected, select the 'All' checkbox, and vice versa.
-        $('.stat-section-all').prop(
-            'checked',
-            $('.stat-section-option:checked').length === $sectionInputs.length
-        );
-    });
-    // Uncheck/check all when the 'All' checkbox is modified.
-    $('.stat-section-all').on('click', function () {
-        $sectionInputs.prop('checked', $(this).prop('checked'));
-    });
-}
 
 /**
  * Callback for setupToggleTable(). This will show/hide a given namespace from

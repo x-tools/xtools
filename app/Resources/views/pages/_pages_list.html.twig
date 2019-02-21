@@ -39,7 +39,7 @@
                     {% for thKey in columns %}
                         <th>
                                 <span class="sort-link sort-link--{{ thKey }}" data-column="{{ thKey }}">
-                                    {{ msg(thKey)|capitalize_first }}
+                                    {{ msg(thKey)|ucfirst }}
                                     <span class="glyphicon glyphicon-sort"></span>
                                 </span>
                         </th>
@@ -100,7 +100,7 @@
                                         {% if page.badge is defined %}
                                             <img alt="{{ page.pa_class }}" src="{{ page.badge }}" class="assessment-badge" />
                                         {% endif %}
-                                        {{ page.pa_class ? page.pa_class|capitalize_first : msg('unknown') }}
+                                        {{ page.pa_class ? page.pa_class|ucfirst : msg('unknown') }}
                                     {% endif %}
                                 </td>
                             {% endif %}

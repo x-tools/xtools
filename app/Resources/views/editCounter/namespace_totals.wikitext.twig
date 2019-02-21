@@ -11,7 +11,7 @@
 {| class="wikitable sortable"
 |-
 {% for key in ['rank', 'namespace', 'count'] %}
-! {{ msg(key)|capitalize_first }}
+! {{ msg(key)|ucfirst }}
 {% endfor %}
 |-
 {% set availableNamespaces = [] %}

@@ -76,7 +76,7 @@
                         {% for key in summaryColumns %}
                             <th>
                                 <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                                    {{ msg(key)|capitalize_first }}
+                                    {{ msg(key)|ucfirst }}
                                     <span class="glyphicon glyphicon-sort"></span>
                                 </span>
                             </th>
@@ -181,7 +181,7 @@
                                         {% if badge is defined %}
                                             <img alt="{{ assessment }}" src="{{ badge }}" class="assessment-badge" />
                                         {% endif %}
-                                        {{ assessment ? assessment|capitalize_first : msg('unknown') }}
+                                        {{ assessment ? assessment|ucfirst : msg('unknown') }}
                                     </td>
                                     <td class="sort-entry--count" data-value="{{ count }}">
                                         {{ count|num_format }}

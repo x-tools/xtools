@@ -1,5 +1,5 @@
 {% for key in ['rank', 'namespace', 'count'] %}
-{{ msg(key)|capitalize_first }}{% if not loop.last %},{% endif %}
+{{ msg(key)|ucfirst }}{% if not loop.last %},{% endif %}
 {% endfor %}
 
 {% set availableNamespaces = [] %}

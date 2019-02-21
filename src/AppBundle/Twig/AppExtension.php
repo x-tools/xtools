@@ -506,7 +506,7 @@ class AppExtension extends Twig_Extension
     public function getFilters(): array
     {
         return [
-            new \Twig_SimpleFilter('capitalize_first', [$this, 'capitalizeFirst']),
+            new \Twig_SimpleFilter('ucfirst', [$this, 'capitalizeFirst']),
             new \Twig_SimpleFilter('percent_format', [$this, 'percentFormat']),
             new \Twig_SimpleFilter('diff_format', [$this, 'diffFormat'], ['is_safe' => ['html']]),
             new \Twig_SimpleFilter('num_format', [$this, 'numberFormat']),

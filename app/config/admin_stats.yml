@@ -1,0 +1,102 @@
+# This config specifies which user groups are available in the Admin Stats tool,
+# and which permissions (columns in the view) should be counted.
+#
+# Format:
+#   group_name: (corresponds to i18n key; message should be singular)
+#       permissions: (tells us what users should be in the group, based on the permissions)
+#           - permission (see Special:ListGroupRights)
+#       action_name: (i18n key; order is the order the columns will appear in the view)
+#           - log_type/log_action (as used in the database, see https://www.mediawiki.org/wiki/Manual:Log_actions)
+#
+# Note that the routes for any new groups must be configured in AdminStatsController.
+#
+parameters:
+    admin_stats:
+        admin:
+            permissions:
+                - abusefilter-modify
+                - block
+                - delete
+                - deletelogentry
+                - deleterevision
+                - editinterface
+                - globalblock
+                - hideuser
+                - protect
+                - stablesettings
+                - suppressionlog
+                - suppressrevision
+                - undelete
+                - userrights
+            delete:
+                - delete/delete
+            revision-delete:
+                - delete/revision
+            log-delete:
+                - delete/event
+            restore:
+                - delete/restore
+            re-block:
+                - block/block
+                - block/reblock
+            unblock:
+                - block/unblock
+            re-protect:
+                - protect/protect
+                - protect/modify
+                - stable/config
+                - stable/modify
+            unprotect:
+                - project/unprotect
+            rights:
+                - rights/rights
+            merge:
+                - merge/merge
+            import:
+                - import/import
+                - import/upload
+            abusefilter:
+                - abusefilter/modify
+                - abusefilter/create
+
+        patroller:
+            permissions:
+                - patrol
+                - review
+            patrol:
+                - patrol/patrol
+                - pagetriage-curation/reviewed
+            pc-accept:
+                - review/approve
+            pc-reject:
+                - review/unapprove
+
+        steward:
+            permissions:
+                - centralauth-rename
+                - globalblock
+                - globalgroupmembership
+                - globalgrouppermissions
+                - userrights-interwiki
+            # TODO: Could be used for non-WMF installations, but otherwise only global-rename applies these days.
+            #rename:
+            #    - renameuser/renameuser
+
+            global-block:
+                - gblblock/gblock
+                - gblblock/modify
+
+            global-unblock:
+                - gblblock/gunblock
+
+            global-rename:
+                - gblrename/rename
+
+            global-rights:
+                - gblrights/usergroups
+                - gblrights/groupprms
+
+            wiki-set-change:
+                - gblrights/setchange
+                - gblrights/setnewtype
+                - gblrights/setrename

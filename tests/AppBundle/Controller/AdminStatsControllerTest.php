@@ -26,6 +26,7 @@ class AdminStatsControllerTest extends ControllerTestAdapter
             '/adminstats',
             '/adminstats/fr.wikipedia.org',
             '/adminstats/fr.wikipedia.org/2018-01-01/2018-01-10',
+            '/stewardstats/meta.wikimedia.org/2018-01-01/2018-01-10?actions=global-rights',
         ]);
     }
 

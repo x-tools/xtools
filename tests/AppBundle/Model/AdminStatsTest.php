@@ -114,11 +114,11 @@ class AdminStatsTest extends TestAdapter
             [
                 'Bob' => array_merge(
                     $this->adminStatsFactory()[0],
-                    ['groups' => 'A/CU']
+                    ['user-groups' => 'A/CU']
                 ),
                 'Sarah' => array_merge(
                     $this->adminStatsFactory()[1], // empty results
-                    ['user_name' => 'Sarah', 'groups' => '']
+                    ['username' => 'Sarah', 'user-groups' => '']
                 ),
             ],
             $ret
@@ -135,7 +135,7 @@ class AdminStatsTest extends TestAdapter
     {
         return [
             [
-                'user_name' => 'Bob',
+                'username' => 'Bob',
                 'delete' => 5,
                 'restore' => 3,
                 'block' => 0,
@@ -147,7 +147,7 @@ class AdminStatsTest extends TestAdapter
                 'total' => 20,
             ],
             [
-                'user_name' => 'Sarah',
+                'username' => 'Sarah',
                 'delete' => 1,
                 'restore' => 0,
                 'block' => 0,

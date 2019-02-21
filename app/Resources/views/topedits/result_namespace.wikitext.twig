@@ -13,7 +13,7 @@
 
 {% set showPageAssessment = ns == 0 and project.hasPageAssessments %}
 {| class="wikitable sortable"
-! {{ msg('edits')|capitalize_first }}
+! {{ msg('edits')|ucfirst }}
 ! {{ msg('page-title') }}
 {% if showPageAssessment %}
 ! {{ msg('assessment') }}

@@ -70,7 +70,7 @@
     <select class="form-control namespace-selector" name="namespace" id="namespace_select">
         {% if allOption %}
             <option value="all" {% if value == 'all' %}selected="selected"{% endif %}>
-                {{ msg('all') | capitalize_first }}
+                {{ msg('all') | ucfirst }}
             </option>
         {% endif %}
         {% for id, name in project.namespaces %}

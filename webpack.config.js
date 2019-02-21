@@ -23,6 +23,7 @@ Encore
         './app/Resources/assets/vendor/bootstrap-typeahead.js',
         './app/Resources/assets/js/core_extensions.js',
         './app/Resources/assets/js/application.js',
+        './app/Resources/assets/js/adminstats.js',
         './app/Resources/assets/js/articleinfo.js',
         './app/Resources/assets/js/autoedits.js',
         './app/Resources/assets/js/categoryedits.js',

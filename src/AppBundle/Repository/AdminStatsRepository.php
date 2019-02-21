@@ -17,30 +17,16 @@ use Mediawiki\Api\SimpleRequest;
  */
 class AdminStatsRepository extends Repository
 {
-    protected const ADMIN_PERMISSIONS = [
-        'block',
-        'delete',
-        'deletelogentry',
-        'deleterevision',
-        'editinterface',
-        'globalblock',
-        'hideuser',
-        'protect',
-        'suppressionlog',
-        'suppressrevision',
-        'undelete',
-        'userrights',
-    ];
-
     /**
      * Core function to get statistics about users who have admin-like permissions.
      * @param Project $project
      * @param string $start SQL-ready format.
      * @param string $end
-     * @return string[][] with keys 'user_name', 'user_id', 'delete', 'restore', 'block',
-     *   'unblock', 'protect', 'unprotect', 'rights', 'import', and 'total'.
+     * @param string $group Which 'group' we're querying for, as configured in admin_stats.yml
+     * @param string[]|null $actions Which log actions to query for.
+     * @return string[][] with key for each action type (specified in admin_stats.yml), including 'total'.
      */
-    public function getStats(Project $project, string $start, string $end): array
+    public function getStats(Project $project, string $start, string $end, string $group, ?array $actions = null): array
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'adminstats');
         if ($this->cache->hasItem($cacheKey)) {
@@ -49,24 +35,18 @@ class AdminStatsRepository extends Repository
 
         $userTable = $project->getTableName('user');
         $loggingTable = $project->getTableName('logging', 'logindex');
+        [$countSql, $types, $actions] = $this->getLogSqlParts($group, $actions);
 
-        $sql = "SELECT user_name, user_id,
-                    SUM(IF( (log_type = 'delete'  AND log_action != 'restore'),1,0)) AS 'delete',
-                    SUM(IF( (log_type = 'delete'  AND log_action  = 'restore'),1,0)) AS 'restore',
-                    SUM(IF( (log_type = 'block'   AND log_action != 'unblock'),1,0)) AS 'block',
-                    SUM(IF( (log_type = 'block'   AND log_action  = 'unblock'),1,0)) AS 'unblock',
-                    SUM(IF( (log_type = 'protect' AND log_action != 'unprotect'),1,0)) AS 'protect',
-                    SUM(IF( (log_type = 'protect' AND log_action  = 'unprotect'),1,0)) AS 'unprotect',
-                    SUM(IF( log_type  = 'rights',1,0)) AS 'rights',
-                    SUM(IF( log_type  = 'import',1,0)) AS 'import',
-                    SUM(IF( log_type != '',1,0)) AS 'total'
+        $sql = "SELECT user_name AS `username`,
+                    $countSql
+                    SUM(IF(log_type != '' AND log_action != '', 1, 0)) AS `total`
                 FROM $loggingTable
                 JOIN $userTable ON user_id = log_user
                 WHERE log_timestamp > '$start' AND log_timestamp <= '$end'
                   AND log_type IS NOT NULL
                   AND log_action IS NOT NULL
-                  AND log_type IN ('block', 'delete', 'protect', 'import', 'rights')
-                  AND log_action NOT IN ('delete_redir', 'autopromote', 'move_prot')
+                  AND log_type IN ($types)
+                  AND log_action IN ($actions)
                 GROUP BY user_name
                 HAVING `total` > 0
                 ORDER BY 'total' DESC";
@@ -78,29 +58,69 @@ class AdminStatsRepository extends Repository
     }
 
     /**
+     * Get the SQL to query for the given actions and group.
+     * @param string $group
+     * @param string[]|null $requestedActions
+     * @return string[]
+     */
+    private function getLogSqlParts(string $group, ?array $requestedActions = null): array
+    {
+        $config = $this->container->getParameter('admin_stats')[$group];
+
+        // 'permissions' is only used for self::getAdminGroups()
+        unset($config['permissions']);
+
+        $countSql = '';
+        $types = [];
+        $actions = [];
+
+        foreach ($config as $key => $logTypeActions) {
+            if (is_array($requestedActions) && !in_array($key, $requestedActions)) {
+                continue;
+            }
+
+            $keyTypes = [];
+            $keyActions = [];
+
+            foreach ($logTypeActions as $entry) {
+                [$type, $action] = explode('/', $entry);
+                $types[] = $keyTypes[] = $this->getProjectsConnection()->quote($type, \PDO::PARAM_STR);
+                $actions[] = $keyActions[] = $this->getProjectsConnection()->quote($action, \PDO::PARAM_STR);
+            }
+
+            $keyTypes = implode(',', array_unique($keyTypes));
+            $keyActions = implode(',', array_unique($keyActions));
+
+            $countSql .= "SUM(IF((log_type IN ($keyTypes) AND log_action IN ($keyActions)), 1, 0)) AS `$key`,\n";
+        }
+
+        return [$countSql, implode(',', array_unique($types)), implode(',', array_unique($actions))];
+    }
+
+    /**
      * Get all user groups with admin-like permissions.
      * @param Project $project
+     * @param string $group Which 'group' we're querying for, as configured in admin_stats.yml
      * @return array Each entry contains 'name' (user group) and 'rights' (the permissions).
      */
-    public function getAdminGroups(Project $project): array
+    public function getAdminGroups(Project $project, string $group): array
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'admingroups');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
+        $permissions = $this->container->getParameter('admin_stats')[$group]['permissions'];
         $userGroups = [];
 
-        $params = [
+        $api = $this->getMediawikiApi($project);
+        $query = new SimpleRequest('query', [
             'meta' => 'siteinfo',
             'siprop' => 'usergroups',
-        ];
-        $api = $this->getMediawikiApi($project);
-        $query = new SimpleRequest('query', $params);
+        ]);
         $res = $api->getRequest($query);
 
-        // If there isn't a usergroups hash than let it error out...
-        // Something else must have gone horribly wrong.
+        // If there isn't a user groups hash than let it error out... Something else must have gone horribly wrong.
         foreach ($res['query']['usergroups'] as $userGroup) {
             // If they are able to add and remove user groups,
             // we'll treat them as having the 'userrights' permission.
@@ -108,7 +128,7 @@ class AdminStatsRepository extends Repository
                 array_push($userGroup['rights'], 'userrights');
             }
 
-            if (count(array_intersect($userGroup['rights'], self::ADMIN_PERMISSIONS)) > 0) {
+            if (count(array_intersect($userGroup['rights'], $permissions)) > 0) {
                 $userGroups[] = $userGroup['name'];
             }
         }

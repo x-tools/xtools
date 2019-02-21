@@ -13,7 +13,8 @@ namespace AppBundle\Model;
  */
 class AdminStats extends Model
 {
-    /** @var string[] Keyed by user name, values are arrays containing actions and counts. */
+
+    /** @var string[][] Keyed by user name, values are arrays containing actions and counts. */
     protected $adminStats;
 
     /**
@@ -30,17 +31,41 @@ class AdminStats extends Model
     /** @var string[] Usernames of proper sysops. */
     private $admins = [];
 
+    /** @var string Group that we're getting stats for (admin, patrollers, stewards, etc.). See admin_stats.yml */
+    private $group;
+
+    /** @var string[] Which actions to show ('block', 'protect', etc.) */
+    private $actions;
+
     /**
-     * TopEdits constructor.
+     * AdminStats constructor.
      * @param Project $project
      * @param int $start as UTC timestamp.
      * @param int $end as UTC timestamp.
+     * @param string $group Which user group to get stats for. Refer to admin_stats.yml for possible values.
+     * @param string[]|null $actions Which actions to query for ('block', 'protect', etc.). Null for all actions.
      */
-    public function __construct(Project $project, int $start, int $end)
-    {
+    public function __construct(
+        Project $project,
+        int $start,
+        int $end,
+        string $group = 'admin',
+        ?array $actions = null
+    ) {
         $this->project = $project;
         $this->start = $start;
         $this->end = $end;
+        $this->group = $group;
+        $this->actions = $actions;
+    }
+
+    /**
+     * Get the group for this AdminStats.
+     * @return string
+     */
+    public function getGroup(): string
+    {
+        return $this->group;
     }
 
     /**
@@ -63,7 +88,7 @@ class AdminStats extends Model
          * Each user group that is considered capable of making 'admin actions'.
          * @var string[]
          */
-        $adminGroups = $this->getRepository()->getAdminGroups($this->project);
+        $adminGroups = $this->getRepository()->getAdminGroups($this->project, $this->group);
 
         /** @var array $admins Keys are the usernames, values are their user groups. */
         $admins = $this->project->getUsersInGroups($adminGroups);
@@ -111,19 +136,10 @@ class AdminStats extends Model
     }
 
     /**
-     * The number of days we're spanning between the start and end date.
-     * @return int
-     */
-    public function numDays(): int
-    {
-        return (int)(($this->end - $this->start) / 60 / 60 / 24);
-    }
-
-    /**
      * Get the array of statistics for each qualifying user. This may be called ahead of self::getStats() so certain
      * class-level properties will be supplied (such as self::numUsers(), which is called in the view before iterating
      * over the master array of statistics).
-     * @param boolean $abbreviateGroups If set, the 'groups' list will be a string with abbreivated user groups names,
+     * @param bool $abbreviateGroups If set, the 'user-groups' list will be a string with abbreivated user groups names,
      *   as opposed to an array of full-named user groups.
      * @return string[]
      */
@@ -137,7 +153,7 @@ class AdminStats extends Model
         $startDb = date('Ymd000000', $this->start);
         $endDb = date('Ymd235959', $this->end);
 
-        $stats = $this->getRepository()->getStats($this->project, $startDb, $endDb);
+        $stats = $this->getRepository()->getStats($this->project, $startDb, $endDb, $this->group, $this->actions);
 
         // Group by username.
         $stats = $this->groupAdminStatsByUsername($stats, $abbreviateGroups);
@@ -155,8 +171,17 @@ class AdminStats extends Model
     }
 
     /**
+     * The number of days we're spanning between the start and end date.
+     * @return int
+     */
+    public function numDays(): int
+    {
+        return (int)(($this->end - $this->start) / 60 / 60 / 24);
+    }
+
+    /**
      * Get the master array of statistics for each qualifying user.
-     * @param boolean $abbreviateGroups If set, the 'groups' list will be a string with abbreviated user groups names,
+     * @param bool $abbreviateGroups If set, the 'user-groups' list will be a string with abbreviated user groups names,
      *   as opposed to an array of full-named user groups.
      * @return string[]
      */
@@ -169,10 +194,21 @@ class AdminStats extends Model
     }
 
     /**
+     * Get the actions that are shown as columns in the view.
+     * @return string[] Each the i18n key of the action.
+     */
+    public function getActions(): array
+    {
+        return count($this->getStats()) > 0
+            ? array_diff(array_keys(array_values($this->getStats())[0]), ['username', 'user-groups', 'total'])
+            : [];
+    }
+
+    /**
      * Given the data returned by AdminStatsRepository::getStats, return the stats keyed by user name,
      * adding in a key/value for user groups.
      * @param string[][] $data As retrieved by AdminStatsRepository::getStats
-     * @param boolean $abbreviateGroups If set, the 'groups' list will be a string with abbreviated user groups names,
+     * @param bool $abbreviateGroups If set, the 'user-groups' list will be a string with abbreviated user groups names,
      *   as opposed to an array of full-named user groups.
      * @return string[] Stats keyed by user name.
      * Functionality covered in test for self::getStats().
@@ -184,21 +220,21 @@ class AdminStats extends Model
         $users = [];
 
         foreach ($data as $datum) {
-            $username = $datum['user_name'];
+            $username = $datum['username'];
 
             // Push to array containing all users with admin actions.
             // We also want numerical values to be integers.
             $users[$username] = array_map('intval', $datum);
 
             // Push back username which was casted to an integer.
-            $users[$username]['user_name'] = $username;
+            $users[$username]['username'] = $username;
 
-            // Set the 'groups' property with the user groups they belong to (if any),
+            // Set the 'user-groups' property with the user groups they belong to (if any),
             // going off of self::getAdminsAndGroups().
             if (isset($adminsAndGroups[$username])) {
-                $users[$username]['groups'] = $adminsAndGroups[$username];
+                $users[$username]['user-groups'] = $adminsAndGroups[$username];
             } else {
-                $users[$username]['groups'] = $abbreviateGroups ? '' : [];
+                $users[$username]['user-groups'] = $abbreviateGroups ? '' : [];
             }
 
             // Keep track of non-admins who made admin actions.

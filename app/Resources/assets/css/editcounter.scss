@@ -50,17 +50,6 @@
         }
     }
 
-    .stat-section-selector {
-        height: auto;
-
-        .checkbox {
-            display: inline-block;
-            float: left;
-            margin-top: 3px;
-            width: calc(100% / 3);
-        }
-    }
-
     .pending {
         opacity: 0.5;
     }

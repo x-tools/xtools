@@ -105,7 +105,7 @@
                         {% for key in ['tool', 'count', 'percent-of-tools', 'percent-of-edit-count'] %}
                             <th>
                                 <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                                    {{ msg(key)|capitalize_first }}
+                                    {{ msg(key)|ucfirst }}
                                     <span class="glyphicon glyphicon-sort"></span>
                                 </span>
                             </th>
