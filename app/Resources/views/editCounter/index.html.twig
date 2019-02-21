@@ -15,21 +15,23 @@
                         </div>
                     </div>
                 </label>
-                <div class="form-control stat-section-selector">
+                <div class="form-control multi-select">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" class="stat-section-all"{% if isAllSections %} checked="checked"{% endif %}>
+                            <input type="checkbox" class="multi-select--all"{% if isAllSections %} checked="checked"{% endif %}>
                             {{ msg('all') }}
                         </label>
                     </div>
-                    {% for section in availableSections %}
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox" class="stat-section-option" name="sections[]" value="{{ section }}"{% if section in sections %} checked="checked"{% endif %}>
-                                {{ msg(section) }}
-                            </label>
-                        </div>
-                    {% endfor %}
+                    <div class="multi-select--body">
+                        {% for section in availableSections %}
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" class="multi-select--option" name="sections[]" value="{{ section }}"{% if section in sections %} checked="checked"{% endif %}>
+                                    {{ msg(section) }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         </fieldset>

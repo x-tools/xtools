@@ -709,6 +709,17 @@ input.form-control.show-loader {
     display: none;
 }
 
+.multi-select {
+    height: auto;
+
+    .checkbox {
+        display: inline-block;
+        float: left;
+        margin-top: 3px;
+        width: calc(100% / 3);
+    }
+}
+
 @media (min-width: $bootstrap-lg) {
     .xt-panel-body table {
         width: auto;

@@ -6,7 +6,7 @@
 <div class="panel panel-primary">
     <header class="panel-heading">
         <div class="text-center xt-heading-top">
-            <a class="back-to-search" href="{{ path('AdminStats') }}">
+            <a class="back-to-search" href="{{ path(as.group|ucfirst ~ 'Stats') }}">
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {{ msg('back') }}
             </a>
@@ -21,7 +21,7 @@
     </header>
 
     <div class="panel-body xt-panel-body">
-        <h3 class="text-center">{{ msg('tool-adminstats') }}</h3>
+        <h3 class="text-center">{{ msg('tool-' ~ as.group ~ 'stats') }}</h3>
 
         {% set content %}
             <div class="col-lg-12 stat-list">
@@ -39,11 +39,17 @@
                     </tr>
                     <tr>
                         <td>{{ msg('log-types') }}</td>
-                        <td>delete, block, protect, import, rights</td>
+                        <td>
+                            {% for action in as.actions %}
+                                {{ msg(action)|lower }}{% if not loop.last %},{% endif %}
+                            {% endfor %}
+                        </td>
                     </tr>
                     <tr>
-                        <td>{{ msg('current-admins') }}</td>
-                        <td>{{ wiki.userGroupLink('sysop', project, as.numAdmins|num_format) }}</td>
+                        <td>{{ msg('current-' ~ as.group ~ 's') }}</td>
+                        <td>
+                            {{ wiki.userGroupLink('sysop', project, as.numAdmins|num_format) }}
+                        </td>
                     </tr>
                     <tr>
                         <td>{{ msg('non-admins-with-actions') }}</td>
@@ -61,24 +67,32 @@
             <table class="table table-bordered table-hover table-striped top-editors-table table-sticky-header">
                 <thead><tr>
                     <th>#</th>
-                    {% for key in ['username', 'user-groups', 'links', 'total', 'delete', 'restore', 're-block', 'unblock', 're-protect', 'unprotect', 'import', 'rights'] %}
+                    {% for key in ['username', 'user-groups', 'links', 'total'] %}
                         <th>
                             <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
-                                {{ msg(key)|capitalize_first }}
+                                {{ msg(key)|ucfirst }}
                                 {% if key != 'links' %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
+                            </span>
+                        </th>
+                    {% endfor %}
+                    {% for key in as.actions %}
+                        <th>
+                            <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
+                                {{ msg(key)|ucfirst }}
+                                <span class="glyphicon glyphicon-sort"></span>
                             </span>
                         </th>
                     {% endfor %}
                 </tr></thead>
                 <tbody>
-                    {% for key,value in as.stats %}
-                        {% set username = value.user_name %}
+                    {% for user in as.stats %}
+                        {% set username = user.username %}
                         <tr>
                             <td class="sort-entry--rank">{{ loop.index|num_format }}</td>
                             <td class="sort-entry--username" data-value="{{ username }}">
                                 {{ wiki.userLink(username, project) }}
                             </td>
-                            <td class="sort-entry--user-groups" data-value="{{ value.groups }}">{{ value.groups }}</td>
+                            <td class="sort-entry--user-groups" data-value="{{ user['user-groups'] }}">{{ user['user-groups'] }}</td>
                             <td>
                                 {% if enabled('EditCounter') %}
                                     <a title="{{ msg('tool-editcounter') }}" href="{{ path('EditCounterResult', {project: project.domain, username: username}) }}" >ec</a>
@@ -90,15 +104,10 @@
                                 {% endif %}
                                 {{ wiki.userLogLink(username, project, msg('log')|lower) }}
                             </td>
-                            <td class="sort-entry--total" data-value="{{ value.total }}">{{ value.total|num_format }}</td>
-                            <td class="sort-entry--delete" data-value="{{ value.delete }}">{{ value.delete|num_format }}</td>
-                            <td class="sort-entry--restore" data-value="{{ value.restore }}">{{ value.restore|num_format }}</td>
-                            <td class="sort-entry--re-block" data-value="{{ value.block }}">{{ value.block|num_format }}</td>
-                            <td class="sort-entry--unblock" data-value="{{ value.unblock }}">{{ value.unblock|num_format }}</td>
-                            <td class="sort-entry--re-protect" data-value="{{ value.protect }}">{{ value.protect|num_format }}</td>
-                            <td class="sort-entry--unprotect" data-value="{{ value.unprotect }}">{{ value.unprotect|num_format }}</td>
-                            <td class="sort-entry--import" data-value="{{ value.import }}">{{ value.import|num_format }}</td>
-                            <td class="sort-entry--rights" data-value="{{ value.rights }}">{{ value.rights|num_format }}</td>
+                            <td class="sort-entry--total" data-value="{{ user.total }}">{{ user.total|num_format }}</td>
+                            {% for action in as.actions %}
+                                <td class="sort-entry--{{ action }}" data-value="{{ user[action] }}">{{ user[action]|num_format }}</td>
+                            {% endfor %}
                         </tr>
                     {% endfor %}
                 </tbody>

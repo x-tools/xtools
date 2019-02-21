@@ -121,7 +121,7 @@
                                     {% if ai.assessments.assessment.badge is defined %}
                                         <img alt="{{ ai.assessments.assessment.value }}" src="{{ ai.assessments.assessment.badge }}" class="assessment-badge" />
                                     {% endif %}
-                                    {{ ai.assessments.assessment.value|capitalize_first }}
+                                    {{ ai.assessments.assessment.value|ucfirst }}
                                 {% endset %}
                                 {{ wiki.pageLinkRaw(ai.assessments.assessment.category, project, assessment_value) }}
                             </td>
@@ -431,12 +431,12 @@
         {% set content %}
             <div class="top-editors-charts clearfix">
                 <div class="pull-left">
-                    <div class="chart-title">{{ msg('top-ten-by-edits')|capitalize_first }}</div>
+                    <div class="chart-title">{{ msg('top-ten-by-edits')|ucfirst }}</div>
                     {{ chart.pie_chart('top_by_edits', ai.topTenEditorsByEdits) }}
                 </div>
                 {% if ai.maxAddition is not null %}
                     <div class="pull-left">
-                        <div class="chart-title">{{ msg('top-ten-by-text')|capitalize_first }}</div>
+                        <div class="chart-title">{{ msg('top-ten-by-text')|ucfirst }}</div>
                         {{ chart.pie_chart('top_by_added', ai.topTenEditorsByAdded) }}
                     </div>
                 {% endif %}
@@ -449,7 +449,7 @@
                                 {% if key == 'average-time-bw-edits' %}
                                     atbe<sup>1</sup>
                                 {% else %}
-                                    {{ msg(key)|capitalize_first }}
+                                    {{ msg(key)|ucfirst }}
                                 {% endif %}
                                 {% if key == 'added-bytes' %}
                                     <sup class="rm-inline-margin-left">2</sup>
@@ -528,7 +528,7 @@
                         {% for key in ['rank', 'bot', 'links', 'edits'] %}
                             <th>
                                 <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
-                                    {{ msg(key)|capitalize_first }}
+                                    {{ msg(key)|ucfirst }}
                                     {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
                                 </span>
                             </th>
@@ -754,7 +754,7 @@
                     {% for key in ['year', 'edits', 'ips', 'ips-percentage', 'minor-edits', 'minor-edits-percentage', 'log-events'] %}
                         <th>
                             <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                                {{ msg(key)|capitalize_first }}
+                                {{ msg(key)|ucfirst }}
                                 <span class="glyphicon glyphicon-sort"></span>
                             </span>
                         </th>
@@ -792,7 +792,7 @@
                     {% for key in ['month', 'edits', 'ips', 'ips-percentage', 'minor-edits', 'minor-edits-percentage'] %}
                         <th>
                             <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                                {{ msg(key)|capitalize_first }}
+                                {{ msg(key)|ucfirst }}
                                 <span class="glyphicon glyphicon-sort"></span>
                             </span>
                         </th>
@@ -858,7 +858,7 @@
                     {% for key in ['tool', 'edits'] %}
                         <th>
                             <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                                {{ msg(key)|capitalize_first }}
+                                {{ msg(key)|ucfirst }}
                                 <span class="glyphicon glyphicon-sort"></span>
                             </span>
                         </th>
@@ -893,7 +893,7 @@
                     {% for key in assessmentColumns %}
                         <th>
                             <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                                {{ msg(key)|capitalize_first }}
+                                {{ msg(key)|ucfirst }}
                                 <span class="glyphicon glyphicon-sort"></span>
                             </span>
                         </th>
@@ -903,12 +903,12 @@
                 {% for wikiproject, assessment in ai.assessments.wikiprojects %}
                     <tr>
                         <td class="sort-entry--wikiproject" data-value="{{ wikiproject }}">
-                            {{ wiki.pageLinkRaw(ai.assessments.wikiproject_prefix ~ wikiproject, project, wikiproject|capitalize_first) }}
+                            {{ wiki.pageLinkRaw(ai.assessments.wikiproject_prefix ~ wikiproject, project, wikiproject|ucfirst) }}
                         </td>
                         <td style="background:{{ assessment.class.color }}" class="sort-entry--assessment" data-value="{{ assessment.class.value }}">
                             {% set assessment_value %}
                                 <img alt="{{ assessment.class.value }}" src="{{ assessment.class.badge }}" class="assessment-badge" />
-                                {{ assessment.class.value|capitalize_first }}
+                                {{ assessment.class.value|ucfirst }}
                             {% endset %}
                             {{ wiki.pageLinkRaw(assessment.class.category, project, assessment_value) }}
                         </td>
@@ -934,12 +934,12 @@
                     {% for key in ['priority', 'name', 'notice', 'explanation'] %}
                         <th>
                             <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                                {{ msg(key)|capitalize_first }}
+                                {{ msg(key)|ucfirst }}
                                 <span class="glyphicon glyphicon-sort"></span>
                             </span>
                         </th>
                     {% endfor %}
-                    <th>{{ msg('edit')|capitalize_first }}</th>
+                    <th>{{ msg('edit')|ucfirst }}</th>
                 </tr></thead>
                 <tbody>
                 {% for bug in ai.bugs %}

@@ -21,7 +21,7 @@
 {% set columns = columns|merge(['assessment']) %}
 {% endif %}
 {% for thKey in columns %}
-! {{ msg(thKey)|capitalize_first }}
+! {{ msg(thKey)|ucfirst }}
 {% endfor %}
 ! {{ msg('links') }}
 {% set index = 0 %}

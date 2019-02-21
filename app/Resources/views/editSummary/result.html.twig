@@ -123,7 +123,7 @@
                         {% for key in ['month', 'total-edits', 'edit-summaries', 'edit-summaries-percentage'] %}
                             <th>
                                 <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                                    {{ msg(key)|capitalize_first }}
+                                    {{ msg(key)|ucfirst }}
                                     <span class="glyphicon glyphicon-sort"></span>
                                 </span>
                             </th>

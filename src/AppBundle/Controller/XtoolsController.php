@@ -468,6 +468,7 @@ abstract class XtoolsController extends Controller
             'namespace',
             'page',
             'categories',
+            'group',
             'redirects',
             'deleted',
             'start',

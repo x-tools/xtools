@@ -143,7 +143,7 @@
                         {% for key in ['date', 'links', 'size', 'edit-summary'] %}
                             <th>
                                 <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
-                                    {{ msg(key)|capitalize_first }}
+                                    {{ msg(key)|ucfirst }}
                                     {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
                                 </span>
                             </th>

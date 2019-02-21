@@ -726,3 +726,21 @@ xtools.application.setupContributionsNavListeners = function (endpointFunc, apiT
         xtools.application.loadContributions(endpointFunc, apiTitle);
     });
 };
+
+/**
+ * Handles the multi-select inputs on some index pages.
+ */
+xtools.application.setupMultiSelectListeners = function () {
+    var $inputs = $('.multi-select--body:not(.hidden) .multi-select--option');
+    $inputs.on('change', function () {
+        // If all sections are selected, select the 'All' checkbox, and vice versa.
+        $('.multi-select--all').prop(
+            'checked',
+            $('.multi-select--body:not(.hidden) .multi-select--option:checked').length === $inputs.length
+        );
+    });
+    // Uncheck/check all when the 'All' checkbox is modified.
+    $('.multi-select--all').on('click', function () {
+        $inputs.prop('checked', $(this).prop('checked'));
+    });
+}

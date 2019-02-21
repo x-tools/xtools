@@ -152,9 +152,9 @@
     <div class="col-lg-8 col-lg-offset-2">
         {% if xtPageTitle is defined %}
             <h2 class="xt-page-title">
-                {{ msg(xtPageTitle) }}
+                <span class="xt-page-title--title">{{ msg(xtPageTitle) }}</span>
                 {% if xtSubtitle is defined %}
-                    <small>{{ msg(xtSubtitle) }}</small>
+                    <small class="xt-page-title--desc">{{ msg(xtSubtitle) }}</small>
                 {% endif %}
             </h2>
         {% endif %}

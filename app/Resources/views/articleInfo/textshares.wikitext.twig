@@ -10,7 +10,7 @@
 {% else %}
 {| class="wikitable sortable"
 {% for key in ['rank', 'username', 'links', 'characters', 'percentage'] %}
-! {{ msg(key)|capitalize_first }}
+! {{ msg(key)|ucfirst }}
 {% endfor %}
 {% set totalPercentage = 0 %}{% set totalCount = 0 %}{% for username, values in textshares.list %}
 |-

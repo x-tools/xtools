@@ -1,7 +1,7 @@
 {| class="wikitable sortable"
 |-
 {% for key in ['date', 'rights', 'performer', 'summary'] %}
-! {{ msg(key)|capitalize_first }}
+! {{ msg(key)|ucfirst }}
 {% endfor %}
 {% for timestamp, change in rightsChanges %}
 |-
