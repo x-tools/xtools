@@ -408,6 +408,9 @@ parameters:
         YABBR:
             tag: 'OAuth CID: 860'
             link: User:Enterprisey/YABBR
+        CatAlot:
+            regex: '\(CatAlot\)'
+            link: c:Help:Cat-a-lot
     ko.wikipedia.org:
         AutoWikiBrowser:
             regex: '위키백과:AWB\|AWB|(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
