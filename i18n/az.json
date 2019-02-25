@@ -1,12 +1,13 @@
 {
 	"@metadata": {
 		"authors": [
-			"Neriman2003"
+			"Neriman2003",
+			"Wertuose"
 		]
 	},
 	"accepted-formats": "Qəbul formatları",
 	"account-age": "Hesab yaşı",
-	"account-age-desc": "$2 {{PLURAL:$1|gün|günlər}} köhnə",
+	"account-age-desc": "$2 {{PLURAL:$1|gün}} yaşında",
 	"accounts": "Hesablar",
 	"accounts-created": "Hesablar yaradılıb",
 	"actions": "Fəaliyyətlər",
@@ -195,16 +196,16 @@
 	"notice": "Bildirişlər",
 	"num-blocks": "{{PLURAL:$1|blok|bloklar}}",
 	"num-bytes": "{{PLURAL:$1|bayt|baytlar}}",
-	"num-days": "{{PLURAL:$1|gün|günlər}}",
+	"num-days": "{{PLURAL: $1|gün|gün}}",
 	"num-deletions": "{{PLURAL:$1|silinmə|silinmələr}}",
-	"num-editors": "{{PLURAL:$1|redaktor|redaktorlar}}",
+	"num-editors": "{{PLURAL:$1|redaktor}}",
 	"num-hours": "{{PLURAL:$1|saat|saatlar}}",
 	"num-minutes": "{{PLURAL:$1|dəqiqə|dəqiqələr}}",
 	"num-months": "{{PLURAL:$1|ay|aylar}}",
-	"num-moves": "{{PLURAL:$1|hərəkət|hərəkətlər}}",
+	"num-moves": "{{PLURAL:$1|addəyişmə}}",
 	"num-namespaces": "{{PLURAL:$1|adlar fəzası|adlar fəzaları}}",
 	"num-others": "{{PLURAL:$1|digər|digərləri}}",
-	"num-pageviews": "{{PLURAL:$1|səhifə görüntüsü|səhifə görüntüləri}}",
+	"num-pageviews": "{{PLURAL:$1|səhifəyə baxış}}",
 	"num-protections": "{{PLURAL:$1|müdafiə|müdafiələr}}",
 	"num-revisions": "{{PLURAL:$1|redaktə|redaktələr}}",
 	"num-revisions-processed": "$1 işlənmişdir",
@@ -212,8 +213,8 @@
 	"num-seconds": "{{PLURAL:$1|saniyə|saniyələr}}",
 	"num-sitelinks": "{{PLURAL:$1|sayt keçidləri|sayt keçidləri}}",
 	"num-tools": "{{PLURAL:$1|alət|alətlər}}",
-	"num-users": "{{PLURAL:$1|istifadəçi|istifadəçilər}}",
-	"num-watchers": "{{PLURAL:$1|izləyici|izləyicilər}}",
+	"num-users": "{{PLURAL:$1|istifadəçi}}",
+	"num-watchers": "{{PLURAL:$1|izləyici}}",
 	"num-weeks": "{{PLURAL: $1|həftə|həftələr}}",
 	"num-years": "{{PLURAL:$1|il|illər}}",
 	"oppose": "Əleyhinə",
