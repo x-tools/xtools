@@ -9,9 +9,9 @@ namespace AppBundle\Controller;
 
 use AppBundle\Model\EditSummary;
 use AppBundle\Repository\EditSummaryRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * This controller handles the Simple Edit Counter tool.

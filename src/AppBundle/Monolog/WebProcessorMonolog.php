@@ -38,7 +38,7 @@ class WebProcessorMonolog
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if ($request) {
+        if ($request && $request->hasSession()) {
             $record['extra']['host'] = $request->getHost();
             $record['extra']['uri'] = $request->getUri();
             $record['extra']['useragent'] = $request->headers->get('User-Agent');

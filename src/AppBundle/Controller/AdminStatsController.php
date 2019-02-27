@@ -9,9 +9,9 @@ namespace AppBundle\Controller;
 
 use AppBundle\Model\AdminStats;
 use AppBundle\Repository\AdminStatsRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * The AdminStatsController serves the search form and results page of the AdminStats tool.

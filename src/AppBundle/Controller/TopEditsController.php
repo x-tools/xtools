@@ -10,11 +10,11 @@ namespace AppBundle\Controller;
 use AppBundle\Helper\I18nHelper;
 use AppBundle\Model\TopEdits;
 use AppBundle\Repository\TopEditsRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * The Top Edits tool.

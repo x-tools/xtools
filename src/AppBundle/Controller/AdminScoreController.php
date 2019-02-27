@@ -9,8 +9,8 @@ namespace AppBundle\Controller;
 
 use AppBundle\Model\AdminScore;
 use AppBundle\Repository\AdminScoreRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * The AdminScoreController serves the search form and results page of the AdminScore tool.
