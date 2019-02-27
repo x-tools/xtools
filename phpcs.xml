@@ -5,12 +5,12 @@
     <exclude-pattern>vendor/</exclude-pattern>
     <exclude-pattern>public/</exclude-pattern>
     <exclude-pattern>html/</exclude-pattern>
-    <exclude-pattern>app/DoctrineMigrations/</exclude-pattern>
+    <exclude-pattern>src/DoctrineMigrations/</exclude-pattern>
     <exclude-pattern>var/</exclude-pattern>
     <exclude-pattern>docs/</exclude-pattern>
     <exclude-pattern>public/assets/</exclude-pattern>
     <exclude-pattern>node_modules/</exclude-pattern>
-    <exclude-pattern>app/Resources/assets/vendor/</exclude-pattern>
+    <exclude-pattern>assets/vendor/</exclude-pattern>
     <exclude-pattern>*.min.js</exclude-pattern>
 
     <!-- Slevomat standards; see https://github.com/slevomat/coding-standard -->
