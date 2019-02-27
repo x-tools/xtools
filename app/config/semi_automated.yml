@@ -409,7 +409,7 @@ parameters:
             tag: 'OAuth CID: 860'
             link: User:Enterprisey/YABBR
         CatAlot:
-            regex: '\(CatAlot\)'
+            regex: '\(CatAlot\)|\[\[c:Help:Cat-a-lot\|Cat-a-lot\]\]'
             link: c:Help:Cat-a-lot
     ko.wikipedia.org:
         AutoWikiBrowser:
