@@ -15,7 +15,6 @@ security:
 
         main:
             anonymous: ~
-            logout_on_user_change: true
             # activate different ways to authenticate
 
             # http_basic: ~

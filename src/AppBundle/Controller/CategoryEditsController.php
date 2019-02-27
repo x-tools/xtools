@@ -11,11 +11,11 @@ use AppBundle\Exception\XtoolsHttpException;
 use AppBundle\Helper\I18nHelper;
 use AppBundle\Model\CategoryEdits;
 use AppBundle\Repository\CategoryEditsRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * This controller serves the Category Edits tool.

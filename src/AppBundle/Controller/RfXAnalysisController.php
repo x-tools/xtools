@@ -10,9 +10,9 @@ namespace AppBundle\Controller;
 use AppBundle\Model\Page;
 use AppBundle\Model\RFX;
 use AppBundle\Repository\PageRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * This controller handles the RfX Analysis tool.

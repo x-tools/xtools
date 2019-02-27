@@ -9,9 +9,9 @@ namespace AppBundle\Controller;
 
 use DateTime;
 use Doctrine\DBAL\Connection;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * This controller serves everything for the Meta tool.

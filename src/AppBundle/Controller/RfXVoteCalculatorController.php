@@ -10,8 +10,8 @@ namespace AppBundle\Controller;
 use AppBundle\Model\RFX;
 use AppBundle\Repository\PageRepository;
 use Doctrine\DBAL\Connection;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Controller for the RfX Vote Calculator.

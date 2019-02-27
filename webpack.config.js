@@ -18,35 +18,36 @@ Encore
      * and one CSS file (e.g. app.css) if you JavaScript imports CSS.
      */
     .addEntry('app', [
-        './app/Resources/assets/vendor/jquery.i18n/jquery.i18n.dist.js',
-        './app/Resources/assets/vendor/Chart.min.js',
-        './app/Resources/assets/vendor/bootstrap-typeahead.js',
-        './app/Resources/assets/js/core_extensions.js',
-        './app/Resources/assets/js/application.js',
-        './app/Resources/assets/js/adminstats.js',
-        './app/Resources/assets/js/articleinfo.js',
-        './app/Resources/assets/js/autoedits.js',
-        './app/Resources/assets/js/categoryedits.js',
-        './app/Resources/assets/js/editcounter.js',
-        './app/Resources/assets/js/pages.js',
-        './app/Resources/assets/js/topedits.js',
-        './app/Resources/assets/css/_mixins.scss',
-        './app/Resources/assets/css/_rtl.scss',
-        './app/Resources/assets/css/application.scss',
-        './app/Resources/assets/css/about.scss',
-        './app/Resources/assets/css/articleinfo.scss',
-        './app/Resources/assets/css/autoedits.scss',
-        './app/Resources/assets/css/categoryedits.scss',
-        './app/Resources/assets/css/editcounter.scss',
-        './app/Resources/assets/css/home.scss',
-        './app/Resources/assets/css/meta.scss',
-        './app/Resources/assets/css/pages.scss',
-        './app/Resources/assets/css/topedits.scss'
+        './assets/vendor/jquery.i18n/jquery.i18n.dist.js',
+        './assets/vendor/Chart.min.js',
+        './assets/vendor/bootstrap-typeahead.js',
+        './assets/js/core_extensions.js',
+        './assets/js/application.js',
+        './assets/js/adminstats.js',
+        './assets/js/articleinfo.js',
+        './assets/js/autoedits.js',
+        './assets/js/categoryedits.js',
+        './assets/js/editcounter.js',
+        './assets/js/pages.js',
+        './assets/js/topedits.js',
+        './assets/css/_mixins.scss',
+        './assets/css/_rtl.scss',
+        './assets/css/application.scss',
+        './assets/css/about.scss',
+        './assets/css/articleinfo.scss',
+        './assets/css/autoedits.scss',
+        './assets/css/categoryedits.scss',
+        './assets/css/editcounter.scss',
+        './assets/css/home.scss',
+        './assets/css/meta.scss',
+        './assets/css/pages.scss',
+        './assets/css/topedits.scss'
     ])
 
     // Other options.
     .enableSassLoader()
     .cleanupOutputBeforeBuild()
+    .disableSingleRuntimeChunk()
     .enableSourceMaps(!Encore.isProduction())
     .enableVersioning(Encore.isProduction())
 ;
