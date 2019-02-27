@@ -96,8 +96,8 @@
         <exclude-pattern>app/AppKernel.php</exclude-pattern>
     </rule>
     <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
-        <exclude-pattern>app/AppKernel.php</exclude-pattern>
-        <exclude-pattern>app/AppCache.php</exclude-pattern>
+        <exclude-pattern>src/AppKernel.php</exclude-pattern>
+        <exclude-pattern>src/AppCache.php</exclude-pattern>
     </rule>
 
 </ruleset>
