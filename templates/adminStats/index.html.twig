@@ -35,7 +35,7 @@
                     </div>
                     {% for actionGroup, groupActions in actionsConfig %}
                         <div class="multi-select--body action-selector action-selector--{{ actionGroup }}{% if group != actionGroup %} hidden{% endif %}">
-                            {% for action in groupActions|keys if action != 'permissions' %}
+                            {% for action in groupActions|keys if action != 'permissions' and action != 'user_group' %}
                                 <div class="checkbox">
                                     <label>
                                         <input type="checkbox" class="multi-select--option" name="actions[]" value="{{ action }}"{% if action in actions or group != actionGroup %} checked="checked"{% endif %}>

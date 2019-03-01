@@ -127,6 +127,7 @@ class AdminStatsController extends XtoolsController
     {
         $actionsConfig = $this->container->getParameter('admin_stats');
         unset($actionsConfig[$group]['permissions']);
+        unset($actionsConfig[$group]['user_group']);
         $actions = array_keys($actionsConfig[$group]);
         return $actions;
     }
@@ -197,6 +198,7 @@ class AdminStatsController extends XtoolsController
      * Get users of the project that are capable of making 'admin actions',
      * keyed by user name with a list of the relevant user groups as the values.
      * @Route("/api/project/admins_groups/{project}", name="ProjectApiAdminsGroups")
+     * @Route("/api/project/users_groups/{project}/{group}")
      * @return JsonResponse
      * @codeCoverageIgnore
      */
@@ -207,7 +209,7 @@ class AdminStatsController extends XtoolsController
         $this->setUpAdminStats();
 
         return new JsonResponse(
-            $this->adminStats->getAdminsAndGroups(false),
+            $this->adminStats->getUsersAndGroups(false),
             Response::HTTP_OK
         );
     }

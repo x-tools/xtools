@@ -3,6 +3,7 @@
 #
 # Format:
 #   group_name: (corresponds to i18n key; message should be singular)
+#       user_group: The user group that most closely resembles the 'group'. See Special:ListGroupRights.
 #       permissions: (tells us what users should be in the group, based on the permissions)
 #           - permission (see Special:ListGroupRights)
 #       action_name: (i18n key; order is the order the columns will appear in the view)
@@ -13,6 +14,7 @@
 parameters:
     admin_stats:
         admin:
+            user_group: sysop
             permissions:
                 - abusefilter-modify
                 - block
@@ -60,6 +62,7 @@ parameters:
                 - abusefilter/create
 
         patroller:
+            user_group: patroller
             permissions:
                 - patrol
                 - review
@@ -72,6 +75,7 @@ parameters:
                 - review/unapprove
 
         steward:
+            user_group: steward
             permissions:
                 - centralauth-rename
                 - globalblock

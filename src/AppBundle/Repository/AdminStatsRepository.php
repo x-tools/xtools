@@ -67,8 +67,9 @@ class AdminStatsRepository extends Repository
     {
         $config = $this->container->getParameter('admin_stats')[$group];
 
-        // 'permissions' is only used for self::getAdminGroups()
+        // 'permissions' and 'user_group' are only used for self::getAdminGroups()
         unset($config['permissions']);
+        unset($config['user_group']);
 
         $countSql = '';
         $types = [];
@@ -98,12 +99,22 @@ class AdminStatsRepository extends Repository
     }
 
     /**
-     * Get all user groups with admin-like permissions.
+     * Get the user_group from the config given the 'group'.
+     * @param string $group
+     * @return string
+     */
+    public function getRelevantUserGroup(string $group): string
+    {
+        return $this->container->getParameter('admin_stats')[$group]['user_group'];
+    }
+
+    /**
+     * Get all user groups with permissions applicable to the given 'group'.
      * @param Project $project
      * @param string $group Which 'group' we're querying for, as configured in admin_stats.yml
      * @return array Each entry contains 'name' (user group) and 'rights' (the permissions).
      */
-    public function getAdminGroups(Project $project, string $group): array
+    public function getUserGroups(Project $project, string $group): array
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'admingroups');
         if ($this->cache->hasItem($cacheKey)) {

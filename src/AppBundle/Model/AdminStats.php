@@ -23,13 +23,13 @@ class AdminStats extends Model
      * user groups, separated by slashes.
      * @var string[]|string
      */
-    protected $adminsAndGroups;
+    protected $usersAndGroups;
 
-    /** @var int Number of admins who made any actions within the time period. */
-    protected $numAdminsWithActions = 0;
+    /** @var int Number of users in the relevant group who made any actions within the time period. */
+    protected $numWithActions = 0;
 
-    /** @var string[] Usernames of proper sysops. */
-    private $admins = [];
+    /** @var string[] Usernames of users who are in the relevant user group (sysop for admins, etc.). */
+    private $usersInGroup = [];
 
     /** @var string Group that we're getting stats for (admin, patrollers, stewards, etc.). See admin_stats.yml */
     private $group;
@@ -69,70 +69,18 @@ class AdminStats extends Model
     }
 
     /**
-     * Get users of the project that are capable of making 'admin actions',
-     * keyed by user name with abbreviations for the user groups as the values.
-     * @param bool $abbreviate If set, the keys of the result with be a string containing
-     *   abbreviated versions of their user groups, such as 'A' instead of administrator,
-     *   'CU' instead of CheckUser, etc. If $abbreviate is false, the keys of the result
-     *   will be an array of the full-named user groups.
-     * @see Project::getAdmins()
-     * @return string[][]
+     * Get the user_group from the config given the 'group'.
+     * @return string
      */
-    public function getAdminsAndGroups(bool $abbreviate = true): array
+    public function getRelevantUserGroup(): string
     {
-        if ($this->adminsAndGroups) {
-            return $this->adminsAndGroups;
+        // Quick cache, valid only for the same request.
+        static $relevantUserGroup = '';
+        if ('' !== $relevantUserGroup) {
+            return $relevantUserGroup;
         }
 
-        /**
-         * Each user group that is considered capable of making 'admin actions'.
-         * @var string[]
-         */
-        $adminGroups = $this->getRepository()->getAdminGroups($this->project, $this->group);
-
-        /** @var array $admins Keys are the usernames, values are their user groups. */
-        $admins = $this->project->getUsersInGroups($adminGroups);
-
-        if (false === $abbreviate || 0 === count($admins)) {
-            return $admins;
-        }
-
-        /**
-         * Keys are the database-stored names, values are the abbreviations.
-         * FIXME: i18n this somehow.
-         * @var string[]
-         */
-        $userGroupAbbrMap = [
-            'sysop' => 'A',
-            'bureaucrat' => 'B',
-            'steward' => 'S',
-            'checkuser' => 'CU',
-            'oversight' => 'OS',
-            'interface-admin' => 'IA',
-            'bot' => 'Bot',
-        ];
-
-        foreach ($admins as $admin => $groups) {
-            $abbrGroups = [];
-
-            // Keep track of actual number of sysops.
-            if (in_array('sysop', $groups)) {
-                $this->admins[] = $admin;
-            }
-
-            foreach ($groups as $group) {
-                if (isset($userGroupAbbrMap[$group])) {
-                    $abbrGroups[] = $userGroupAbbrMap[$group];
-                }
-            }
-
-            // Make 'A' (admin) come before 'CU' (CheckUser), etc.
-            sort($abbrGroups);
-
-            $this->adminsAndGroups[$admin] = implode('/', $abbrGroups);
-        }
-
-        return $this->adminsAndGroups;
+        return $relevantUserGroup = $this->getRepository()->getRelevantUserGroup($this->group);
     }
 
     /**
@@ -156,7 +104,7 @@ class AdminStats extends Model
         $stats = $this->getRepository()->getStats($this->project, $startDb, $endDb, $this->group, $this->actions);
 
         // Group by username.
-        $stats = $this->groupAdminStatsByUsername($stats, $abbreviateGroups);
+        $stats = $this->groupStatsByUsername($stats, $abbreviateGroups);
 
         // Resort, as for some reason the SQL isn't doing this properly.
         uasort($stats, function ($a, $b) {
@@ -168,6 +116,73 @@ class AdminStats extends Model
 
         $this->adminStats = $stats;
         return $this->adminStats;
+    }
+
+    /**
+     * Get users of the project that are capable of making the relevant actions,
+     * keyed by user name with abbreviations for the user groups as the values.
+     * @param bool $abbreviate If set, the keys of the result with be a string containing
+     *   abbreviated versions of their user groups, such as 'A' instead of administrator,
+     *   'CU' instead of CheckUser, etc. If $abbreviate is false, the keys of the result
+     *   will be an array of the full-named user groups.
+     * @return string[][]
+     */
+    public function getUsersAndGroups(bool $abbreviate = true): array
+    {
+        if ($this->usersAndGroups) {
+            return $this->usersAndGroups;
+        }
+
+        /**
+         * Each user group that is considered capable of making 'admin actions'.
+         * @var string[]
+         */
+        $adminGroups = $this->getRepository()->getUserGroups($this->project, $this->group);
+
+        /** @var array $usersAndGroups Keys are the usernames, values are their user groups. */
+        $usersAndGroups = $this->project->getUsersInGroups($adminGroups);
+
+        if (false === $abbreviate || 0 === count($usersAndGroups)) {
+            return $usersAndGroups;
+        }
+
+        /**
+         * Keys are the database-stored names, values are the abbreviations.
+         * FIXME: i18n this somehow.
+         * @var string[]
+         */
+        $userGroupAbbrMap = [
+            'sysop' => 'A',
+            'bureaucrat' => 'B',
+            'steward' => 'S',
+            'checkuser' => 'CU',
+            'oversight' => 'OS',
+            'interface-admin' => 'IA',
+            'bot' => 'Bot',
+            'global-renamer' => 'GR',
+        ];
+
+        foreach ($usersAndGroups as $user => $groups) {
+            $abbrGroups = [];
+
+            // Keep track of actual number of sysops.
+            if (in_array($this->getRelevantUserGroup(), $groups)) {
+                $this->usersInGroup[] = $user;
+            }
+
+            foreach ($groups as $group) {
+                if (isset($userGroupAbbrMap[$group])) {
+                    $abbrGroups[] = $userGroupAbbrMap[$group];
+                }
+            }
+
+            // Make 'A' (admin) come before 'CU' (CheckUser), etc.
+            sort($abbrGroups);
+
+            $this->usersAndGroups[$user] = implode('/', $abbrGroups);
+        }
+
+        return $this->usersAndGroups;
     }
 
     /**
@@ -214,9 +229,9 @@ class AdminStats extends Model
      * Functionality covered in test for self::getStats().
      * @codeCoverageIgnore
      */
-    private function groupAdminStatsByUsername(array $data, bool $abbreviateGroups = true): array
+    private function groupStatsByUsername(array $data, bool $abbreviateGroups = true): array
     {
-        $adminsAndGroups = $this->getAdminsAndGroups($abbreviateGroups);
+        $usersAndGroups = $this->getUsersAndGroups($abbreviateGroups);
         $users = [];
 
         foreach ($data as $datum) {
@@ -230,16 +245,16 @@ class AdminStats extends Model
             $users[$username]['username'] = $username;
 
             // Set the 'user-groups' property with the user groups they belong to (if any),
-            // going off of self::getAdminsAndGroups().
-            if (isset($adminsAndGroups[$username])) {
-                $users[$username]['user-groups'] = $adminsAndGroups[$username];
+            // going off of self::getUsersAndGroups().
+            if (isset($usersAndGroups[$username])) {
+                $users[$username]['user-groups'] = $usersAndGroups[$username];
             } else {
                 $users[$username]['user-groups'] = $abbreviateGroups ? '' : [];
             }
 
             // Keep track of non-admins who made admin actions.
-            if (in_array($username, $this->admins)) {
-                $this->numAdminsWithActions++;
+            if (in_array($username, $this->usersInGroup)) {
+                $this->numWithActions++;
             }
         }
 
@@ -247,29 +262,29 @@ class AdminStats extends Model
     }
 
     /**
-     * Get the total number of admins (users currently with qualifying permissions).
+     * Get the total number of users in the relevant user group.
      * @return int
      */
-    public function numAdmins(): int
+    public function getNumInRelevantUserGroup(): int
     {
-        return count($this->admins);
+        return count($this->usersInGroup);
     }
 
     /**
-     * Number of admins who made any actions within the time period.
+     * Number of users who made any relevant actions within the time period.
      * @return int
      */
-    public function getNumAdminsWithActions(): int
+    public function getNumWithActions(): int
     {
-        return $this->numAdminsWithActions;
+        return $this->numWithActions;
     }
 
     /**
-     * Number of currently non-admins who made any actions within the time period.
+     * Number of currently users who made any actions within the time period who are not in the relevant user group.
      * @return int
      */
-    public function getNumNonAdminsWithActions(): int
+    public function getNumWithActionsNotInGroup(): int
     {
-        return count($this->adminStats) - $this->numAdminsWithActions;
+        return count($this->adminStats) - $this->numWithActions;
     }
 }

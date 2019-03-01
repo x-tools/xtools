@@ -45,16 +45,19 @@
                             {% endfor %}
                         </td>
                     </tr>
-                    <tr>
-                        <td>{{ msg('current-' ~ as.group ~ 's') }}</td>
-                        <td>
-                            {{ wiki.userGroupLink('sysop', project, as.numAdmins|num_format) }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>{{ msg('non-admins-with-actions') }}</td>
-                        <td>{{ as.numNonAdminsWithActions|num_format }}</td>
-                    </tr>
+                    {# The value is 0 on wikis that don't have the relevant user group, so this information is not applicable. #}
+                    {% if as.numInRelevantUserGroup > 0 %}
+                        <tr>
+                            <td>{{ msg('current-' ~ as.group ~ 's') }}</td>
+                            <td>
+                                {{ wiki.userGroupLink(as.relevantUserGroup, project, as.numInRelevantUserGroup|num_format) }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('non-' ~ as.group ~ 's-with-actions') }}</td>
+                            <td>{{ as.numWithActionsNotInGroup|num_format }}</td>
+                        </tr>
+                    {% endif %}
                 </tbody></table>
             </div>
         {% endset %}
@@ -63,7 +66,7 @@
         <div style="clear:both"></div>
 
         {% set content %}
-            <p>{{ msg('admin-stats-notice') }} {{ msg('admin-stats-notice2') }}</p>
+            <p>{{ msg(as.group ~ '-stats-notice') }} {{ msg(as.group ~ '-stats-notice2') }}</p>
             <table class="table table-bordered table-hover table-striped top-editors-table table-sticky-header">
                 <thead><tr>
                     <th>#</th>

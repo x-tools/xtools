@@ -5,7 +5,7 @@ filter:
         - 'tests/*'
         - 'bin/*'
         - 'vendor/*'
-        - 'app/Resources/assets/vendor/*'
+        - 'assets/vendor/*'
         - '*.min.js'
 build:
     project_setup:
