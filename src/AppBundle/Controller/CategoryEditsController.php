@@ -80,6 +80,7 @@ class CategoryEditsController extends XtoolsController
             'start' => '',
             'end' => '',
             'username' => '',
+            'categories' => '',
         ], $this->params, ['project' => $this->project]));
     }
 

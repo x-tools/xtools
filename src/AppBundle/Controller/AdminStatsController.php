@@ -36,18 +36,8 @@ class AdminStatsController extends XtoolsController
      * This method redirects if valid parameters are found, making it a valid form endpoint as well.
      * @Route(
      *     "/{group}stats", name="AdminStats",
-     *     requirements={"group"="admin"},
+     *     requirements={"group"="admin|patroller|steward"},
      *     defaults={"group"="admin"}
-     * )
-     * @Route(
-     *     "/{group}stats", name="PatrollerStats",
-     *     requirements={"group"="patroller"},
-     *     defaults={"group"="patroller"}
-     * )
-     * @Route(
-     *     "/{group}stats", name="StewardStats",
-     *     requirements={"group"="steward"},
-     *     defaults={"group"="steward"}
      * )
      * @return Response
      */
@@ -58,7 +48,7 @@ class AdminStatsController extends XtoolsController
         // Redirect if we have a project.
         if (isset($this->params['project'])) {
             // We want pretty URLs.
-            $route = $this->generateUrl(ucfirst($this->params['group']).'StatsResult', $this->params);
+            $route = $this->generateUrl('AdminStatsResult', $this->params);
             $url = str_replace('%7C', '|', $route);
             return $this->redirect($url);
         }
@@ -163,18 +153,8 @@ class AdminStatsController extends XtoolsController
      * Method for rendering the AdminStats results.
      * @Route(
      *     "/{group}stats/{project}/{start}/{end}", name="AdminStatsResult",
-     *     requirements={"start"="|\d{4}-\d{2}-\d{2}", "end"="|\d{4}-\d{2}-\d{2}", "group"="admin"},
+     *     requirements={"start"="|\d{4}-\d{2}-\d{2}", "end"="|\d{4}-\d{2}-\d{2}", "group"="admin|patroller|steward"},
      *     defaults={"start"=false, "end"=false, "group"="admin"}
-     * )
-     * @Route(
-     *     "/{group}stats/{project}/{start}/{end}", name="PatrollerStatsResult",
-     *     requirements={"start"="|\d{4}-\d{2}-\d{2}", "end"="|\d{4}-\d{2}-\d{2}", "group"="patroller"},
-     *     defaults={"start"=false, "end"=false, "group"="patroller"}
-     * )
-     * @Route(
-     *     "/{group}stats/{project}/{start}/{end}", name="StewardStatsResult",
-     *     requirements={"start"="|\d{4}-\d{2}-\d{2}", "end"="|\d{4}-\d{2}-\d{2}", "group"="steward"},
-     *     defaults={"start"=false, "end"=false, "group"="steward"}
      * )
      * @return Response
      * @codeCoverageIgnore
@@ -220,15 +200,15 @@ class AdminStatsController extends XtoolsController
      * to one month.
      * @Route(
      *     "/api/project/adminstats/{project}/{days}",
-     *     name="ProjectApiAdminStats",
+     *     name="ProjectApiAdminStatsLegacy",
      *     requirements={"days"="\d+"},
      *     defaults={"days"=31}
      * )
      * @Route(
-     *     "/api/project/admin_stats/{project}/{days}",
-     *     name="ProjectApiAdminStatsUnderscored",
-     *     requirements={"days"="\d+"},
-     *     defaults={"days"=31}
+     *     "/api/project/{group}_stats/{project}/{days}",
+     *     name="ProjectApiAdminStats",
+     *     requirements={"days"="\d+", "group"="admin|patroller|steward"},
+     *     defaults={"days"=31, "group"="admin"}
      * )
      * @param int $days Number of days from present to grab data for. Maximum 31.
      * @return JsonResponse

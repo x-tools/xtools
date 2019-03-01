@@ -673,6 +673,13 @@ abstract class XtoolsController extends Controller
             3
         );
 
+        // Any pipe-separated values should be returned as an array.
+        foreach ($this->params as $param => $value) {
+            if (false !== strpos($value, '|')) {
+                $this->params[$param] = explode('|', $value);
+            }
+        }
+
         $response->setData(array_merge($this->params, [
             // In some controllers, $this->params['project'] may be overridden with a Project object.
             'project' => $this->project->getDomain(),

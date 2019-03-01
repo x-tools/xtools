@@ -11,7 +11,7 @@
                 <label class="input-group-addon form-label" for="category_selector">
                     {{ msg('categories') }}
                 </label>
-                <input type="hidden" name="categories" id="category_input" />
+                <input type="hidden" name="categories" id="category_input" value="{{ categories }}" />
                 <select class="form-control"
                     id="category_selector"
                     data-api="{{ project.apiUrl }}"
