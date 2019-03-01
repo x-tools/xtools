@@ -1,7 +1,6 @@
-/app/config/table_map.yml
-/app/config/parameters.yml
-/app/config/labs_overrides.yml
-/app/config/request_blacklist.yml
+/config/table_map.yml
+/config/parameters.yml
+/config/request_blacklist.yml
 /app/Resources/node_modules
 /build/
 /phpunit.xml
