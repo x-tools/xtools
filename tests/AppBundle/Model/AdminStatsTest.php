@@ -56,8 +56,7 @@ class AdminStatsTest extends TestAdapter
         $this->asRepo->expects(static::once())
             ->method('getStats')
             ->willReturn($this->adminStatsFactory());
-        $this->asRepo->expects(static::once())
-            ->method('getRelevantUserGroup')
+        $this->asRepo->method('getRelevantUserGroup')
             ->willReturn('sysop');
         $as->setRepository($this->asRepo);
 
