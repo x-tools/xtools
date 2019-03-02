@@ -220,7 +220,8 @@ class MetaController extends XtoolsController
         }
 
         // Don't update counts for tools that aren't enabled
-        if (!$this->container->getParameter('enable.'.ucfirst($tool))) {
+        $configKey = 'enable.'.ucfirst($tool);
+        if (!$this->container->hasParameter($configKey) || !$this->container->getParameter($configKey)) {
             $response->setStatusCode(Response::HTTP_FORBIDDEN);
             $response->setContent(json_encode([
                 'error' => 'This tool is disabled',
@@ -228,43 +229,30 @@ class MetaController extends XtoolsController
             return $response;
         }
 
+        /** @var Connection $conn */
         $conn = $this->container->get('doctrine')->getManager('default')->getConnection();
         $date =  date('Y-m-d');
 
-        // Increment count in timeline
-        $existsSql = "SELECT 1 FROM usage_timeline
-                      WHERE date = '$date'
-                      AND tool = '$tool'";
+        // Tool name needs to be lowercase.
+        $tool = strtolower($tool);
 
-        if (0 === count($conn->query($existsSql)->fetchAll())) {
-            $createSql = "INSERT INTO usage_timeline
-                          VALUES(NULL, '$date', '$tool', 1)";
-            $conn->query($createSql);
-        } else {
-            $updateSql = "UPDATE usage_timeline
-                          SET count = count + 1
-                          WHERE tool = '$tool'
-                          AND date = '$date'";
-            $conn->query($updateSql);
-        }
+        $sql = "INSERT INTO usage_timeline
+                      VALUES(NULL, :date, :tool, 1)
+                      ON DUPLICATE KEY UPDATE `count` = `count` + 1";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam('date', $date);
+        $stmt->bindParam('tool', $tool);
+        $stmt->execute();
 
         // Update per-project usage, if applicable
         if (!$this->container->getParameter('app.single_wiki')) {
-            $existsSql = "SELECT 1 FROM usage_projects
-                          WHERE tool = '$tool'
-                          AND project = '$project'";
-
-            if (0 === count($conn->query($existsSql)->fetchAll())) {
-                $createSql = "INSERT INTO usage_projects
-                              VALUES(NULL, '$tool', '$project', 1)";
-                $conn->query($createSql);
-            } else {
-                $updateSql = "UPDATE usage_projects
-                              SET count = count + 1
-                              WHERE tool = '$tool'
-                              AND project = '$project'";
-                $conn->query($updateSql);
-            }
+            $sql = "INSERT INTO usage_projects
+                    VALUES(NULL, :tool, :project, 1)
+                    ON DUPLICATE KEY UPDATE `count` = `count` + 1";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam('tool', $tool);
+            $stmt->bindParam('project', $project);
+            $stmt->execute();
         }
 
         $response->setStatusCode(Response::HTTP_NO_CONTENT);
