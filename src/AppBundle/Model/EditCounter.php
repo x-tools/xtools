@@ -1060,6 +1060,11 @@ class EditCounter extends UserRights
             /** @var Project $project */
             $project = $projects[$revision['project_name']];
 
+            // Can happen if the project is given from CentralAuth API but the database is not being replicated.
+            if (null === $project) {
+                continue;
+            }
+
             $nsName = '';
             if ($revision['page_namespace']) {
                 $nsName = $project->getNamespaces()[$revision['page_namespace']];
