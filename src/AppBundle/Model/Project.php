@@ -89,9 +89,9 @@ class Project extends Model
 
     /**
      * Get full metadata about the project. See ProjectRepository::getMetadata() for more information.
-     * @return array
+     * @return array|null null if project not found.
      */
-    protected function getMetadata(): array
+    protected function getMetadata(): ?array
     {
         if (empty($this->metadata)) {
             $url = $this->getBasicInfo()['url'];
