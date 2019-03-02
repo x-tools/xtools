@@ -516,6 +516,12 @@ class EditCounter extends UserRights
         return $import + $interwiki + $upload;
     }
 
+    public function countAbuseFilterchanges(): int
+    {
+        $logCounts = $this->getLogCounts();
+        return isset($logCounts['abusefilter-modify']) ? (int)$logCounts['abusefilter-modify'] : 0;
+    }
+
     /**
      * Get the average number of edits per page (including deleted revisions and pages).
      * @return float
