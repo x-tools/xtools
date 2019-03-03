@@ -64,7 +64,7 @@ parameters:
             regex: '\|HotCat\]\]|Gadget-Hotcat(?:check)?\.js\|Script|\]\] via HotCat|\[\[WP:HC\|'
             link: Special:MyLanguage/Project:HotCat
         Cat-a-lot:
-            regex: '\[\[Help:Cat-a-lot\|Cat-a-lot\]\]'
+            regex: '\[\[Help:Cat-a-lot\|Cat-a-lot\]\]|\(CatAlot\)|\[\[c:Help:Cat-a-lot\|Cat-a-lot\]\]'
             link: commons:Cat-a-lot
         Global rename:
             regex: 'Automatically moved page while renaming the user'
@@ -408,9 +408,6 @@ parameters:
         YABBR:
             tag: 'OAuth CID: 860'
             link: User:Enterprisey/YABBR
-        CatAlot:
-            regex: '\(CatAlot\)|\[\[c:Help:Cat-a-lot\|Cat-a-lot\]\]'
-            link: c:Help:Cat-a-lot
     ko.wikipedia.org:
         AutoWikiBrowser:
             regex: '위키백과:AWB\|AWB|(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
