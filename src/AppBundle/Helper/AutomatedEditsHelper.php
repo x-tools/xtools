@@ -98,6 +98,13 @@ class AutomatedEditsHelper extends HelperBase
         // Finally, populate the 'label' with the tool name, if a label doesn't already exist.
         array_walk($this->tools[$projectDomain], function (&$data, $tool): void {
             $data['label'] = $data['label'] ?? $tool;
+
+            // 'namespaces' should be an array of ints.
+            $data['namespaces'] = $data['namespaces'] ?? [];
+            if (isset($data['namespace'])) {
+                $data['namespaces'][] = $data['namespace'];
+                unset($data['namespace']);
+            }
         });
 
         uksort($this->tools[$projectDomain], 'strcasecmp');

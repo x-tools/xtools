@@ -19,6 +19,9 @@
 #       contribs: Set to true to include edits with the given tool in non-automated contributions.
 #           For example, we do this for ProveIt, because that tool often includes prose that was
 #           added by the user, and not entirely a semi-automated edit.
+#       namespaces: The namespace IDs of where the tool is used. This is used to speed up the queries.
+#           Omit if you want to include all namespaces.
+#       talk_namespaces: set to only target talk namespaces.
 #
 # Either 'regex' or 'tag' are required. In some cases you might want to include both,
 #   say if older versions of the tool did not add tags to the edits.
@@ -69,6 +72,7 @@ parameters:
         Global rename:
             regex: 'Automatically moved page while renaming the user'
             link: meta:Special:MyLanguage/Global renamers
+            namespaces: [2, 3]
         Page move:
             regex: 'moved page \[\[(?!.*?WP:AFCH)|moved \[\[.*?\]\] to \[\['
             link: mw:Special:MyLanguage/Help:Moving a page
@@ -92,10 +96,12 @@ parameters:
             regex: 'Created by translating the page'
             link: mw:Special:MyLanguage/Content translation
             contribs: true
+            namespaces: [0, 2, 118]
         ProveIt:
             tag: ProveIt edit
             link: commons:Help:Gadget-ProveIt
             contribs: true
+            namespaces: [0, 2, 118]
         AutoWikiBrowser:
             tag: AWB
             regex: 'using \[\[(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
@@ -169,10 +175,12 @@ parameters:
         Rater:
             regex: '\[\[(:User:FShbib\/المقيم|ويكيبيديا:المقيم)'
             link: مستخدم:FShbib/المقيم
+            talk_namespaces: true
     commons.wikimedia.org:
         UploadWizard:
             regex: '^User created page with UploadWizard$'
             link: Special:MyLanguage/Commons:Upload Wizard
+            namespaces: [6]
         VisualFileChange:
             regex: 'Using \[\[COM:VFC'
             tag: VisualFileChange
@@ -183,24 +191,30 @@ parameters:
         QuickDelete:
             regex: '^(Marking as possible copyvio because|Notification of possible copyright violation for|\[\[.*?\]\] does not have a source|Please send permission for \[\[|\]\] does not have a license)|^(File has no source|Missing permission)$'
             link: Special:MyLanguage/Help:QuickDelete
+            namespaces: [3, 6]
         POTY:
             regex: '\[\[Help:(?:Gadget-)EnhancedPOTY.js|POTY App\]\]$'
             link: Help:Gadget-EnhancedPOTY.js
+            namespaces: [4]
         Flickr2Commons:
             regex: 'via \[\[(?:Special:MyLanguage\/)?Commons:Flickr2Commons'
-            link: Special:MyLanguage/Flickr2Commons
+            link: Special:MyLanguage/Commons:Flickr2Commons
+            namespaces: [6]
         Android Commons:
             regex: '^Uploaded using Android Commons app$'
             link: Special:MyLanguage/Commons:Mobile_app
+            namespaces: [6]
         Commonsist:
             regex: '^commonist \d\.\d'
             link: Special:MyLanguage/Commons:Commonist
+            namespaces: [6]
         RenameLink:
             regex: '^\(\[\[Help:RenameLink\|Script'
             link: Special:MyLanguage/Help:RenameLink
         Geograph2commons:
             regex: 'Transferred from geograph.co.uk using'
             link: Special:GoToInterwiki/toollabs:geograph2commons
+            namespaces: [6]
         SettingsManager:
             regex: '\[\[MediaWiki:Gadget-SettingsManager.js\|SettingsManager'
             link: MediaWiki:Gadget-SettingsManager.js
@@ -227,6 +241,7 @@ parameters:
             regex: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) \d+ (\[\[Wikipedia:Pending changes\|pending\]\]|pending) edits? (to revision \d+|by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\])'
             link: Project:Pending changes
             revert: true
+            namespaces: [0]
         Bot revert:
             regex: '^Reverting possible (vandalism|test edit).*by.*\(Bot|BOT( EDIT)?\)$|^BOT (- )?(Reverted edits? by|rv)|^vandalism from \[\[.*?\(\d+\) - reverted'
             link: Project:Bots
@@ -236,6 +251,7 @@ parameters:
         Page curation:
             regex: 'using \[\[Wikipedia:Page Curation\|Page Curation'
             link: w:en:Wikipedia:Page_Curation/Help
+            namespaces: [0, 2, 3]
         Twinkle:
             regex: '(Wikipedia|WP):(TW|TWINKLE|Twinkle|FRIENDLY)'
             link: Project:Twinkle
@@ -250,6 +266,7 @@ parameters:
         AFCH:
             regex: 'WP:(AFCH|AFCHRW)'
             link: Project:AFCH
+            namespaces: [0, 2, 4, 5, 118]
         Checklinks:
             regex: 'using \[\[w:WP:CHECKLINKS'
             link: Project:CHECKLINKS
@@ -265,12 +282,14 @@ parameters:
         WikiPatroller:
             regex: 'User:Jfmantis\/WikiPatroller'
             link: User:Jfmantis/WikiPatroller
+            namespaces: [0, 3]
         delsort:
-            regex: 'Wikipedia:WP:FWDS|WP:FWDS|User:APerson\/delsort\|delsort.js|User:Enterprisey\/delsort\|assisted'
+            regex: '(Wikipedia:WP):FWDS|User:APerson\/delsort\|delsort.js|User:Enterprisey\/delsort\|assisted'
             link: WP:DELSORT
         Ohconfucius script:
             regex: '\[\[(User:Ohconfucius\/.*?|WP:MOSNUMscript)\|script'
             link: Project:MOSNUMscript
+            namespaces: [0, 2, 118]
         Archiving script:
             regex: '\[\[(User:Equazcion\/OneClickArchiver|User:Technical 13\/1CA)\|OneClickArchiver|Removed \d+ threads? to \[\[|Added threads from \[\['
             link: Project:OneClickArchiver
@@ -280,12 +299,14 @@ parameters:
         WikiLove:
             regex: 'new WikiLove message'
             link: Project:WikiLove
+            namespaces: [3]
         AutoEd:
             regex: 'using \[\[(Wikipedia|WP):AutoEd\|AutoEd'
             link: Project:AutoEd
         Mike's Wiki Tool:
             regex: User:MichaelBillington\/MWT\|MWT|Mike's Wiki Tool
             link: Project:Mike's Wiki Tool
+            namespaces: [0]
         Global replace:
             regex: '\(\[\[c:GR\|GR\]\]\) '
             link: commons:Commons:File renaming/Global replace
@@ -295,18 +316,17 @@ parameters:
         CSD Helper:
             regex: '\(\[\[User:Ale_jrb\/Scripts\|CSDH'
             link: Project:CSDH
-        Find link:
-            regex: 'using \[\[User:Edward\/Find link\|Find link'
-            link: User:Edward/Find link
         responseHelper:
             regex: '\(using \[\[User:MusikAnimal\/responseHelper\|responseHelper'
             link: User:MusikAnimal/responseHelper
+            namespaces: [4]
         Advisor.js:
             regex: '\(using \[\[(User:Cameltrader#Advisor.js|User:PC-XT\/Advisor)\|Advisor.js'
             link: WP:ADVISOR
         AfD closures:
             regex: '^\[\[Wikipedia:Articles for deletion\/.*?closed as'
             link: Project:Articles for deletion
+            namespaces: [0, 4]
         Sagittarius:
             regex: '\(\[\[User:Kephir\/gadgets\/sagittarius\||\(\[\[User:Sam Sailor\/Scripts\/Sagittarius\+\|'
             link: User:Sam Sailor/Scripts/Sagittarius+
@@ -319,9 +339,11 @@ parameters:
         SPI Helper:
             regex: '^(Archiving case (to|from)|Adding sockpuppetry (tag|block notice) per) \[\[Wikipedia:Sockpuppet investigations'
             link: User:Timotheus Canens/spihelper.js
-        User:Doug/closetfd.js:
+            namespaces: [2, 3, 4]
+        closetfd.js:
             regex: '\(using \[\[User:Doug\/closetfd.js'
             link: User:Doug/closetfd.js
+            namespaces: [4]
         autoFormatter:
             regex: 'using (\[\[:meta:User:TMg\/autoFormatter|autoFormatter)'
             link: meta:User:TMg/autoFormatter
@@ -334,65 +356,81 @@ parameters:
         Script Installer:
             regex: '\[\[User:Equazcion\/ScriptInstaller\|Script Installer'
             link: User:Equazcion/ScriptInstaller
+            namespaces: [2]
         findargdups:
             regex: '\[\[:en:User:Frietjes\/findargdups'
             link: User:Frietjes/findargdups
         closemfd.js:
             regex: '\(using \[\[User:Doug\/closemfd.js'
             link: User:Doug/closemfd.js
+            namespaces: [4]
         DisamAssist:
             regex: 'using \[\[User:Qwertyytrewqqwerty\/DisamAssist'
             link: User:Qwertyytrewqqwerty/DisamAssist
+            namespaces: [0, 6, 10, 14, 100, 108]
         Vada:
             regex: '\(\[\[WP:Vada\]\]\)'
             link: Project:Vada
         stubtagtab.js:
             regex: 'using \[\[User:MC10\/stubtagtab.js'
             link: User:MC10/stubtagtab.js
+            namespaces: [0]
         AutoSpell:
             regex: 'User:Symplectic_Map\/AutoSpell\|Script-assisted'
             link: User:Symplectic_Map/AutoSpell
+            namespaces: [0]
         Draftify:
             regex: '\(\[\[WP:DFY\|DFY\]\]\)'
             link: Project:DFY
+            namespaces: [2, 3]
         AFC/R HS:
-            regex: 'Using \[\[User:PhantomTech\/scripts\/AFCRHS.js|\(\[\[User:Enterprisey\/AFCRHS'
+            regex: 'Using \[\[User:PhantomTech\/scripts\/AFCRHS\.js|\(\[\[User:Enterprisey\/AFCRHS'
             link: User:Enterprisey/AFCRHS
+            namespaces: [0, 2]
         For the Common Good:
             regex: 'WP:FTCG\|FtCG'
             link: Project:FTCG
         deOrphan:
             regex: '\[\[User:Technical_13\/Scripts\/OrphanStatus\||\[\[User:DannyS712\/deOrphan\|'
             link: User:DannyS712/deOrphan
+            namespaces: [0]
         The Wikipedia Adventure:
             regex: 'simulated automatically as part of \[\[WP:The Wikipedia Adventure\|'
             link: Project:TWA
+            namespaces: [2]
         OABot:
             tag: 'OAuth CID: 817'
             link: Project:OABOT
+            namespaces: [0, 2]
         XFDCloser:
             regex: '\[\[WP:XFDC\|XFDcloser'
             link: User:Evad37/XFDcloser.js
+            namespaces: [0, 4]
         Rater:
             regex: '\[\[User:(Evad37\/rater.js|Kephir\/gadgets\/rater)'
             link: User:Evad37/rater.js
+            talk_namespaces: true
         revdel:
-            regex: 'using \[\[User:Primefac\/revdel'
-            link: User:Primefac/revdel
+            regex: 'using \[\[User:Primefac\/revdel|User:Enterprisey\/cv-revdel\|'
+            link: User:Enterprisey/cv-revdel
         draft-sorter:
             regex: '\(draft-sorter\.js\)'
             link: User:Enterprisey/draft-sorter
+            namespaces: [119]
         Xunlink:
             regex: '\(\[\[User:Evad37\/Xunlink'
             link: User:Evad37/Xunlink
+            namespaces: [0, 10, 100, 118]
         MoveToDraft:
             regex: '\[\[User:Evad37\/MoveToDraft\.js\|via script'
             link: User:Evad37/MoveToDraft
+            namespaces: [0, 118]
         Content translation:
             link: Wikipedia:Content translation tool
         ProveIt:
             regex: 'with \[\[Wikipedia:ProveIt'
             link: Wikipedia:ProveIt
+            namespaces: [0, 2, 118]
         JWB:
             regex: 'via (JWB|\[\[WP:JWB\]\])'
             link: WP:JWB
@@ -402,12 +440,15 @@ parameters:
         unblock-review:
             regex: '\(\[\[User:Enterprisey\/unblock-review'
             link: User:Enterprisey/unblock-review
+            namespaces: [3]
         stubsearch:
             regex: '\[\[User:Danski454\/stubsearch\|a tool'
             link: User:Danski454/stubsearch
+            namespaces: [0, 4]
         YABBR:
             tag: 'OAuth CID: 860'
             link: User:Enterprisey/YABBR
+            namespaces: [0]
     ko.wikipedia.org:
         AutoWikiBrowser:
             regex: '위키백과:AWB\|AWB|(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
@@ -425,6 +466,7 @@ parameters:
             regex: '새 위키사랑 글'
             link: 위키백과:위키사랑
             label: 위키사랑
+            namespaces: [3]
     pt.wikipedia.org:
         Undo:
             regex: 'Desfeita a edição \d+ de \[\['
