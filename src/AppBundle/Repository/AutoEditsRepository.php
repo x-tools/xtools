@@ -21,25 +21,37 @@ class AutoEditsRepository extends UserRepository
     private $aeTools;
 
     /**
-     * Method to give the repository access to the AutomatedEditsHelper
-     * and fetch the list of semi-automated tools.
+     * Method to give the repository access to the AutomatedEditsHelper and fetch the list of semi-automated tools.
      * @param Project $project
+     * @param int|string $namespace Namespace ID or 'all'.
      * @return array
      */
-    public function getTools(Project $project): array
+    public function getTools(Project $project, $namespace = 'all'): array
     {
         if (!isset($this->aeTools)) {
             $this->aeTools = $this->container
                 ->get('app.automated_edits_helper')
                 ->getTools($project);
         }
+
+        if ('all' !== $namespace) {
+            // Limit by namespace.
+            return array_filter($this->aeTools, function (array $tool) use ($namespace) {
+                return empty($tool['namespaces']) ||
+                    in_array((int)$namespace, $tool['namespaces']) ||
+                    (
+                        1 === $namespace % 2 &&
+                        isset($tool['talk_namespaces'])
+                    );
+            });
+        }
+
         return $this->aeTools;
     }
 
     /**
-     * Is the tag for given tool intended to be counted by itself?
-     * For instance, when counting Rollback edits we don't want to also
-     * count Huggle edits (which are tagged as Rollback).
+     * Is the tag for given tool intended to be counted by itself? For instance,
+     * when counting Rollback edits we don't want to also count Huggle edits (which are tagged as Rollback).
      * @param Project $project
      * @param string|null $tool
      * @return bool
@@ -68,7 +80,7 @@ class AutoEditsRepository extends UserRepository
         [$condBegin, $condEnd] = $this->getRevTimestampConditions($start, $end);
 
         // Get the combined regex and tags for the tools
-        [$regex, $tagIds] = $this->getToolRegexAndTags($project);
+        [$regex, $tagIds] = $this->getToolRegexAndTags($project, false, null, $namespace);
 
         [$pageJoin, $condNamespace] = $this->getPageAndNamespaceSql($project, $namespace);
 
@@ -139,7 +151,7 @@ class AutoEditsRepository extends UserRepository
         [$condBegin, $condEnd] = $this->getRevTimestampConditions($start, $end, 'revs.');
 
         // Get the combined regex and tags for the tools
-        [$regex, $tagIds] = $this->getToolRegexAndTags($project, true);
+        [$regex, $tagIds] = $this->getToolRegexAndTags($project, false, null, $namespace);
 
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
@@ -309,7 +321,7 @@ class AutoEditsRepository extends UserRepository
         $sql = $this->getAutomatedCountsSql($project, $user, $namespace, $start, $end);
         $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $start, $end);
 
-        $tools = $this->getTools($project);
+        $tools = $this->getTools($project, $namespace);
 
         // handling results
         $results = [];
@@ -350,7 +362,7 @@ class AutoEditsRepository extends UserRepository
         [$condBegin, $condEnd] = $this->getRevTimestampConditions($start, $end);
 
         // Load the semi-automated edit types.
-        $tools = $this->getTools($project);
+        $tools = $this->getTools($project, $namespace);
 
         // Create a collection of queries that we're going to run.
         $queries = [];
@@ -444,10 +456,15 @@ class AutoEditsRepository extends UserRepository
      * @param Project $project
      * @param bool $nonAutoEdits Set to true to exclude tools with the 'contribs' flag.
      * @param string|null $tool
+     * @param int|string|null $namespace Tools only used in given namespace ID, or 'all' for all namespaces.
      * @return array In the format: ['combined|regex', [1,2,3]] where the second element contains the tag IDs.
      */
-    private function getToolRegexAndTags(Project $project, bool $nonAutoEdits = false, ?string $tool = null): array
-    {
+    private function getToolRegexAndTags(
+        Project $project,
+        bool $nonAutoEdits = false,
+        ?string $tool = null,
+        $namespace = null
+    ): array {
         $tools = $this->getTools($project);
         $regexes = [];
         $allTagIds = $this->getTags($project);
@@ -459,6 +476,13 @@ class AutoEditsRepository extends UserRepository
 
         foreach (array_values($tools) as $values) {
             if ($nonAutoEdits && isset($values['contribs'])) {
+                continue;
+            }
+
+            if (is_numeric($namespace) &&
+                !empty($values['namespaces']) &&
+                !in_array((int)$namespace, $values['namespaces'])
+            ) {
                 continue;
             }
 
