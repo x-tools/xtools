@@ -2,7 +2,7 @@
 # and which permissions (columns in the view) should be counted.
 #
 # Format:
-#   group_name: (corresponds to i18n key; message should be singular)
+#   type_name: (corresponds to i18n key; message should be singular in English)
 #       user_group: The user group that most closely resembles the 'group'. See Special:ListGroupRights.
 #       permissions: (tells us what users should be in the group, based on the permissions)
 #           - permission (see Special:ListGroupRights)

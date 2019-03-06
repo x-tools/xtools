@@ -7,8 +7,10 @@ declare(strict_types=1);
 
 namespace AppBundle\Controller;
 
+use AppBundle\Helper\I18nHelper;
 use AppBundle\Model\AdminStats;
 use AppBundle\Repository\AdminStatsRepository;
+use AppBundle\Repository\UserRightsRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -156,19 +158,27 @@ class AdminStatsController extends XtoolsController
      *     requirements={"start"="|\d{4}-\d{2}-\d{2}", "end"="|\d{4}-\d{2}-\d{2}", "group"="admin|patroller|steward"},
      *     defaults={"start"=false, "end"=false, "group"="admin"}
      * )
+     * @param I18nHelper $i18n
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction(): Response
+    public function resultAction(I18nHelper $i18n): Response
     {
         $this->setUpAdminStats();
 
         $this->adminStats->prepareStats();
 
+        // For the HTML view, we want the localized name of the user groups.
+        // These are in the 'title' attribute of the icons for each user group.
+        $userRightsRepo = new UserRightsRepository();
+        $userRightsRepo->setContainer($this->container);
+        $rightsNames = $userRightsRepo->getRightsNames($this->project, $i18n->getLang());
+
         return $this->getFormattedResponse('adminStats/result', [
             'xtPage' => lcfirst($this->params['group']).'Stats',
             'xtTitle' => $this->project->getDomain(),
             'as' => $this->adminStats,
+            'rightsNames' => $rightsNames,
         ]);
     }
 
@@ -189,7 +199,7 @@ class AdminStatsController extends XtoolsController
         $this->setUpAdminStats();
 
         return new JsonResponse(
-            $this->adminStats->getUsersAndGroups(false),
+            $this->adminStats->getUsersAndGroups(),
             Response::HTTP_OK
         );
     }
@@ -225,12 +235,12 @@ class AdminStatsController extends XtoolsController
         $start = date('Y-m-d', strtotime("-$days days"));
         $end = date('Y-m-d');
 
-        $this->adminStats->prepareStats(false);
+        $this->adminStats->prepareStats();
 
         return $this->getFormattedApiResponse([
             'start' => $start,
             'end' => $end,
-            'users' => $this->adminStats->getStats(false),
+            'users' => $this->adminStats->getStats(),
         ]);
     }
 }

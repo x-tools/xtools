@@ -6,7 +6,7 @@
 <div class="panel panel-primary">
     <header class="panel-heading">
         <div class="text-center xt-heading-top">
-            <a class="back-to-search" href="{{ path('AdminStats', {'group': as.group}) }}">
+            <a class="back-to-search" href="{{ path('AdminStats', {'group': as.type}) }}">
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {{ msg('back') }}
             </a>
@@ -21,7 +21,7 @@
     </header>
 
     <div class="panel-body xt-panel-body">
-        <h3 class="text-center">{{ msg('tool-' ~ as.group ~ 'stats') }}</h3>
+        <h3 class="text-center">{{ msg('tool-' ~ as.type ~ 'stats') }}</h3>
 
         {% set content %}
             <div class="col-lg-12 stat-list">
@@ -48,13 +48,13 @@
                     {# The value is 0 on wikis that don't have the relevant user group, so this information is not applicable. #}
                     {% if as.numInRelevantUserGroup > 0 %}
                         <tr>
-                            <td>{{ msg('current-' ~ as.group ~ 's') }}</td>
+                            <td>{{ msg('current-' ~ as.type ~ 's') }}</td>
                             <td>
                                 {{ wiki.userGroupLink(as.relevantUserGroup, project, as.numInRelevantUserGroup|num_format) }}
                             </td>
                         </tr>
                         <tr>
-                            <td>{{ msg('non-' ~ as.group ~ 's-with-actions') }}</td>
+                            <td>{{ msg('non-' ~ as.type ~ 's-with-actions') }}</td>
                             <td>{{ as.numWithActionsNotInGroup|num_format }}</td>
                         </tr>
                     {% endif %}
@@ -66,7 +66,7 @@
         <div style="clear:both"></div>
 
         {% set content %}
-            <p>{{ msg(as.group ~ '-stats-notice') }} {{ msg(as.group ~ '-stats-notice2') }}</p>
+            <p>{{ msg(as.type ~ '-stats-notice') }} {{ msg(as.type ~ '-stats-notice2') }}</p>
             <table class="table table-bordered table-hover table-striped top-editors-table table-sticky-header">
                 <thead><tr>
                     <th>#</th>
@@ -95,7 +95,11 @@
                             <td class="sort-entry--username" data-value="{{ username }}">
                                 {{ wiki.userLink(username, project) }}
                             </td>
-                            <td class="sort-entry--user-groups" data-value="{{ user['user-groups'] }}">{{ user['user-groups'] }}</td>
+                            <td class="sort-entry--user-groups" data-value="{{ user['user-groups']|join(',') }}">
+                                {% for group, url in as.userGroupIcons if group in user['user-groups'] %}
+                                    <img src="{{ url }}" title="{{ rightsNames[group]|ucfirst }}" alt="{{ rightsNames[group] }}" />
+                                {% endfor %}
+                            </td>
                             <td>
                                 {% if enabled('EditCounter') %}
                                     <a title="{{ msg('tool-editcounter') }}" href="{{ path('EditCounterResult', {project: project.domain, username: username}) }}" >ec</a>

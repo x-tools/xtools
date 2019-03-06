@@ -80,20 +80,10 @@ class AdminStatsTest extends TestAdapter
             ->willReturn($this->adminStatsFactory());
         $as->setRepository($this->asRepo);
 
-        // Without abbreviations.
         static::assertEquals(
             [
                 'Bob' => ['sysop', 'checkuser'],
                 'Sarah' => ['epcoordinator'],
-            ],
-            $as->getUsersAndGroups(false)
-        );
-
-        // With abbreviations.
-        static::assertEquals(
-            [
-                'Bob' => 'A/CU',
-                'Sarah' => '',
             ],
             $as->getUsersAndGroups()
         );
@@ -116,11 +106,11 @@ class AdminStatsTest extends TestAdapter
             [
                 'Bob' => array_merge(
                     $this->adminStatsFactory()[0],
-                    ['user-groups' => 'A/CU']
+                    ['user-groups' => ['sysop', 'checkuser']]
                 ),
                 'Sarah' => array_merge(
                     $this->adminStatsFactory()[1], // empty results
-                    ['username' => 'Sarah', 'user-groups' => '']
+                    ['username' => 'Sarah', 'user-groups' => ['epcoordinator']]
                 ),
             ],
             $ret

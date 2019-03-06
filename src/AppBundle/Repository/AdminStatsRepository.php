@@ -18,15 +18,24 @@ use Mediawiki\Api\SimpleRequest;
 class AdminStatsRepository extends Repository
 {
     /**
-     * Core function to get statistics about users who have admin-like permissions.
+     * Get the URLs of the icons for the user groups.
+     * @return string[] System user group name as the key, URL to image as the value.
+     */
+    public function getUserGroupIcons(): array
+    {
+        return $this->container->getParameter('user_group_icons');
+    }
+
+    /**
+     * Core function to get statistics about users who have admin/patroller/steward-like permissions.
      * @param Project $project
      * @param string $start SQL-ready format.
      * @param string $end
-     * @param string $group Which 'group' we're querying for, as configured in admin_stats.yml
+     * @param string $type Which 'type' we're querying for, as configured in admin_stats.yml
      * @param string[]|null $actions Which log actions to query for.
      * @return string[][] with key for each action type (specified in admin_stats.yml), including 'total'.
      */
-    public function getStats(Project $project, string $start, string $end, string $group, ?array $actions = null): array
+    public function getStats(Project $project, string $start, string $end, string $type, ?array $actions = null): array
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'adminstats');
         if ($this->cache->hasItem($cacheKey)) {
@@ -35,7 +44,7 @@ class AdminStatsRepository extends Repository
 
         $userTable = $project->getTableName('user');
         $loggingTable = $project->getTableName('logging', 'logindex');
-        [$countSql, $types, $actions] = $this->getLogSqlParts($group, $actions);
+        [$countSql, $types, $actions] = $this->getLogSqlParts($type, $actions);
 
         $sql = "SELECT user_name AS `username`,
                     $countSql
@@ -58,21 +67,21 @@ class AdminStatsRepository extends Repository
     }
 
     /**
-     * Get the SQL to query for the given actions and group.
-     * @param string $group
+     * Get the SQL to query for the given type and actions.
+     * @param string $type
      * @param string[]|null $requestedActions
      * @return string[]
      */
-    private function getLogSqlParts(string $group, ?array $requestedActions = null): array
+    private function getLogSqlParts(string $type, ?array $requestedActions = null): array
     {
-        $config = $this->container->getParameter('admin_stats')[$group];
+        $config = $this->container->getParameter('admin_stats')[$type];
 
         // 'permissions' and 'user_group' are only used for self::getAdminGroups()
         unset($config['permissions']);
         unset($config['user_group']);
 
         $countSql = '';
-        $types = [];
+        $logTypes = [];
         $actions = [];
 
         foreach ($config as $key => $logTypeActions) {
@@ -84,9 +93,9 @@ class AdminStatsRepository extends Repository
             $keyActions = [];
 
             foreach ($logTypeActions as $entry) {
-                [$type, $action] = explode('/', $entry);
-                $types[] = $keyTypes[] = $this->getProjectsConnection()->quote($type, \PDO::PARAM_STR);
-                $actions[] = $keyActions[] = $this->getProjectsConnection()->quote($action, \PDO::PARAM_STR);
+                [$logType, $logAction] = explode('/', $entry);
+                $logTypes[] = $keyTypes[] = $this->getProjectsConnection()->quote($logType, \PDO::PARAM_STR);
+                $actions[] = $keyActions[] = $this->getProjectsConnection()->quote($logAction, \PDO::PARAM_STR);
             }
 
             $keyTypes = implode(',', array_unique($keyTypes));
@@ -95,33 +104,33 @@ class AdminStatsRepository extends Repository
             $countSql .= "SUM(IF((log_type IN ($keyTypes) AND log_action IN ($keyActions)), 1, 0)) AS `$key`,\n";
         }
 
-        return [$countSql, implode(',', array_unique($types)), implode(',', array_unique($actions))];
+        return [$countSql, implode(',', array_unique($logTypes)), implode(',', array_unique($actions))];
     }
 
     /**
-     * Get the user_group from the config given the 'group'.
-     * @param string $group
+     * Get the user_group from the config given the 'type'.
+     * @param string $type
      * @return string
      */
-    public function getRelevantUserGroup(string $group): string
+    public function getRelevantUserGroup(string $type): string
     {
-        return $this->container->getParameter('admin_stats')[$group]['user_group'];
+        return $this->container->getParameter('admin_stats')[$type]['user_group'];
     }
 
     /**
      * Get all user groups with permissions applicable to the given 'group'.
      * @param Project $project
-     * @param string $group Which 'group' we're querying for, as configured in admin_stats.yml
+     * @param string $type Which 'type' we're querying for, as configured in admin_stats.yml
      * @return array Each entry contains 'name' (user group) and 'rights' (the permissions).
      */
-    public function getUserGroups(Project $project, string $group): array
+    public function getUserGroups(Project $project, string $type): array
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'admingroups');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $permissions = $this->container->getParameter('admin_stats')[$group]['permissions'];
+        $permissions = $this->container->getParameter('admin_stats')[$type]['permissions'];
         $userGroups = [];
 
         $api = $this->getMediawikiApi($project);
