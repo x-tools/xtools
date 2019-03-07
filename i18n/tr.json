@@ -5,7 +5,8 @@
 			"Chansey",
 			"Hedda",
 			"TmY e12",
-			"Dual"
+			"Dual",
+			"Wertuose"
 		]
 	},
 	"accepted-formats": "Kabul edilen formatlar",
@@ -229,7 +230,7 @@
 	"num-days": "{{PLURAL: $1|gün|gün}}",
 	"num-deletions": "{{PLURAL:$1|silme|silme}}",
 	"num-editors": "\n{{PLURAL:$1|editör|editör}}",
-	"num-hours": "{{PLURAL: $1|hour|saat}}",
+	"num-hours": "{{PLURAL: $1|saat|saat}}",
 	"num-minutes": "{{PLURAL: $1|minute|dakika}}",
 	"num-months": "{{PLURAL: $1|month|ay}}",
 	"num-moves": "{{PLURAL:$1|taşıma|taşıma}}",
