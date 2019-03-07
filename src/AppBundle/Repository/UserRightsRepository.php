@@ -94,10 +94,7 @@ class UserRightsRepository extends Repository
                         FROM $userTable
                         WHERE user_id = log_user
                     )) AS log_user_text,
-                    CASE WHEN log_comment_id = 0
-                        THEN log_comment
-                        ELSE IFNULL(comment_text, '')
-                        END AS `log_comment`,
+                    IFNULL(comment_text, '') AS `log_comment`,
                     '$type' AS type
                 FROM $loggingTable
                 LEFT OUTER JOIN $commentTable ON comment_id = log_comment_id
