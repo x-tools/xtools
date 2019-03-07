@@ -37,14 +37,14 @@ class AdminStats extends Model
      * @param int $start as UTC timestamp.
      * @param int $end as UTC timestamp.
      * @param string $group Which user group to get stats for. Refer to admin_stats.yml for possible values.
-     * @param string[]|null $actions Which actions to query for ('block', 'protect', etc.). Null for all actions.
+     * @param string[] $actions Which actions to query for ('block', 'protect', etc.). Null for all actions.
      */
     public function __construct(
         Project $project,
         int $start,
         int $end,
-        string $group = 'admin',
-        ?array $actions = null
+        string $group,
+        array $actions
     ) {
         $this->project = $project;
         $this->start = $start;

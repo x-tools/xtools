@@ -307,6 +307,7 @@
 	"patrols-desc": "$2 {{PLURAL:$1|article|articles}} patrolled",
 	"pc-accept": "Pending change accept",
 	"pc-reject": "Pending change reject",
+	"page-curation": "Page curation",
 	"percent-of-edit-count": "% of edit count",
 	"percent-of-tools": "% of tools",
 	"percentage": "Percentage",

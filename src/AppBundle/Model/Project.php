@@ -232,6 +232,21 @@ class Project extends Model
     }
 
     /**
+     * List of extensions that are installed on the wiki.
+     * @return string[]
+     */
+    public function getInstalledExtensions(): array
+    {
+        // Quick cache, valid only for the same request.
+        static $installedExtensions = null;
+        if (is_array($installedExtensions)) {
+            return $installedExtensions;
+        }
+
+        return $installedExtensions = $this->getRepository()->getInstalledExtensions($this);
+    }
+
+    /**
      * Get a list of users who are in one of the given user groups.
      * @param string[] User groups to search for.
      * @return string[] User groups keyed by user name.

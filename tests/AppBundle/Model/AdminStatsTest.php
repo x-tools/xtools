@@ -51,7 +51,7 @@ class AdminStatsTest extends TestAdapter
         $endUTC = strtotime('2017-03-01');
 
         // Single namespace, with defaults.
-        $as = new AdminStats($this->project, $startUTC, $endUTC);
+        $as = new AdminStats($this->project, $startUTC, $endUTC, 'admin', []);
 
         $this->asRepo->expects(static::once())
             ->method('getStats')
@@ -74,7 +74,7 @@ class AdminStatsTest extends TestAdapter
      */
     public function testAdminsAndGroups(): void
     {
-        $as = new AdminStats($this->project, 0, 0);
+        $as = new AdminStats($this->project, 0, 0, 'admin', []);
         $this->asRepo->expects($this->exactly(0))
             ->method('getStats')
             ->willReturn($this->adminStatsFactory());
@@ -94,7 +94,7 @@ class AdminStatsTest extends TestAdapter
      */
     public function testStats(): void
     {
-        $as = new AdminStats($this->project, 0, 0);
+        $as = new AdminStats($this->project, 0, 0, 'admin', []);
         $this->asRepo->expects($this->once())
             ->method('getStats')
             ->willReturn($this->adminStatsFactory());

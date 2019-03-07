@@ -55,7 +55,9 @@ class AdminStatsController extends XtoolsController
             return $this->redirect($url);
         }
 
-        $actionsConfig = $this->container->getParameter('admin_stats');
+        $adminStatsRepo = new AdminStatsRepository();
+        $adminStatsRepo->setContainer($this->container);
+        $actionsConfig = $adminStatsRepo->getConfig($this->project);
         $group = $this->params['group'];
         $xtPage = lcfirst($group).'Stats';
 
@@ -118,10 +120,7 @@ class AdminStatsController extends XtoolsController
     private function getActionNames(string $group): array
     {
         $actionsConfig = $this->container->getParameter('admin_stats');
-        unset($actionsConfig[$group]['permissions']);
-        unset($actionsConfig[$group]['user_group']);
-        $actions = array_keys($actionsConfig[$group]);
-        return $actions;
+        return array_keys($actionsConfig[$group]['actions']);
     }
 
     /**

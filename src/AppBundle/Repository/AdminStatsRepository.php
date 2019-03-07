@@ -32,10 +32,10 @@ class AdminStatsRepository extends Repository
      * @param string $start SQL-ready format.
      * @param string $end
      * @param string $type Which 'type' we're querying for, as configured in admin_stats.yml
-     * @param string[]|null $actions Which log actions to query for.
+     * @param string[] $actions Which log actions to query for.
      * @return string[][] with key for each action type (specified in admin_stats.yml), including 'total'.
      */
-    public function getStats(Project $project, string $start, string $end, string $type, ?array $actions = null): array
+    public function getStats(Project $project, string $start, string $end, string $type, array $actions = []): array
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'adminstats');
         if ($this->cache->hasItem($cacheKey)) {
@@ -44,23 +44,24 @@ class AdminStatsRepository extends Repository
 
         $userTable = $project->getTableName('user');
         $loggingTable = $project->getTableName('logging', 'logindex');
-        [$countSql, $types, $actions] = $this->getLogSqlParts($type, $actions);
+        [$countSql, $types, $actions] = $this->getLogSqlParts($project, $type, $actions);
 
         $sql = "SELECT user_name AS `username`,
                     $countSql
                     SUM(IF(log_type != '' AND log_action != '', 1, 0)) AS `total`
                 FROM $loggingTable
                 JOIN $userTable ON user_id = log_user
-                WHERE log_timestamp > '$start' AND log_timestamp <= '$end'
-                  AND log_type IS NOT NULL
-                  AND log_action IS NOT NULL
+                WHERE log_timestamp BETWEEN :start AND :end
                   AND log_type IN ($types)
                   AND log_action IN ($actions)
                 GROUP BY user_name
                 HAVING `total` > 0
                 ORDER BY 'total' DESC";
 
-        $results = $this->executeProjectsQuery($sql)->fetchAll();
+        $results = $this->executeProjectsQuery($sql, [
+            'start' => $start,
+            'end' => $end,
+        ])->fetchAll();
 
         // Cache and return.
         return $this->setCache($cacheKey, $results);
@@ -68,23 +69,20 @@ class AdminStatsRepository extends Repository
 
     /**
      * Get the SQL to query for the given type and actions.
+     * @param Project $project
      * @param string $type
-     * @param string[]|null $requestedActions
+     * @param string[] $requestedActions
      * @return string[]
      */
-    private function getLogSqlParts(string $type, ?array $requestedActions = null): array
+    private function getLogSqlParts(Project $project, string $type, array $requestedActions = []): array
     {
-        $config = $this->container->getParameter('admin_stats')[$type];
-
-        // 'permissions' and 'user_group' are only used for self::getAdminGroups()
-        unset($config['permissions']);
-        unset($config['user_group']);
+        $config = $this->getConfig($project)[$type];
 
         $countSql = '';
         $logTypes = [];
-        $actions = [];
+        $logActions = [];
 
-        foreach ($config as $key => $logTypeActions) {
+        foreach ($config['actions'] as $key => $logTypeActions) {
             if (is_array($requestedActions) && !in_array($key, $requestedActions)) {
                 continue;
             }
@@ -92,10 +90,13 @@ class AdminStatsRepository extends Repository
             $keyTypes = [];
             $keyActions = [];
 
+            /** @var string|array $entry String matching 'log_type/log_action' or a configuration array. */
             foreach ($logTypeActions as $entry) {
+                // admin_stats.yml gives us the log type and action as a string in the format of "type/action".
                 [$logType, $logAction] = explode('/', $entry);
+
                 $logTypes[] = $keyTypes[] = $this->getProjectsConnection()->quote($logType, \PDO::PARAM_STR);
-                $actions[] = $keyActions[] = $this->getProjectsConnection()->quote($logAction, \PDO::PARAM_STR);
+                $logActions[] = $keyActions[] = $this->getProjectsConnection()->quote($logAction, \PDO::PARAM_STR);
             }
 
             $keyTypes = implode(',', array_unique($keyTypes));
@@ -104,7 +105,34 @@ class AdminStatsRepository extends Repository
             $countSql .= "SUM(IF((log_type IN ($keyTypes) AND log_action IN ($keyActions)), 1, 0)) AS `$key`,\n";
         }
 
-        return [$countSql, implode(',', array_unique($logTypes)), implode(',', array_unique($actions))];
+        return [$countSql, implode(',', array_unique($logTypes)), implode(',', array_unique($logActions))];
+    }
+
+    /**
+     * Get the configuration for the given Project. This respects extensions installed on the wiki.
+     * @param Project $project
+     * @return array
+     */
+    public function getConfig(Project $project): array
+    {
+        $config = $this->container->getParameter('admin_stats');
+        $extensions = $project->getInstalledExtensions();
+
+        foreach ($config as $type => $values) {
+            foreach ($values['actions'] as $permission => $actions) {
+                $requiredExtension = $actions[0]['extension'] ?? '';
+                if ('' !== $requiredExtension) {
+                    unset($config[$type]['actions'][$permission][0]);
+
+                    if (!in_array($requiredExtension, $extensions)) {
+                        unset($config[$type]['actions'][$permission]);
+                        continue;
+                    }
+                }
+            }
+        }
+
+        return $config;
     }
 
     /**

@@ -9,6 +9,7 @@ namespace AppBundle\Repository;
 
 use AppBundle\Model\Page;
 use AppBundle\Model\Project;
+use GuzzleHttp\Client;
 use Mediawiki\Api\MediawikiApi;
 use Mediawiki\Api\SimpleRequest;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -214,7 +215,7 @@ class ProjectRepository extends Repository
      * @return array|null With 'dbName', 'url', 'lang', 'general' and 'namespaces' keys.
      *   'general' contains: 'wikiName', 'articlePath', 'scriptPath', 'script',
      *   'timezone', and 'timezoneOffset'; 'namespaces' contains all namespace
-     *   names, keyed by their IDs.  If this function returns null, the API call
+     *   names, keyed by their IDs. If this function returns null, the API call
      *   failed.
      */
     public function getMetadata(string $projectUrl): ?array
@@ -358,6 +359,28 @@ class ProjectRepository extends Repository
         ];
         $pages = $this->executeProjectsQuery($query, $params)->fetchAll();
         return count($pages) > 0;
+    }
+
+    /**
+     * Get a list of the extensions installed on the wiki.
+     * @param Project $project
+     * @return string[]
+     */
+    public function getInstalledExtensions(Project $project): array
+    {
+        $client = new Client();
+
+        $res = json_decode($client->request('GET', $project->getApiUrl(), ['query' => [
+            'action' => 'query',
+            'meta' => 'siteinfo',
+            'siprop' => 'extensions',
+            'format' => 'json',
+        ]])->getBody()->getContents(), true);
+
+        $extensions = $res['query']['extensions'] ?? [];
+        return array_map(function ($extension) {
+            return $extension['name'];
+        }, $extensions);
     }
 
     /**
