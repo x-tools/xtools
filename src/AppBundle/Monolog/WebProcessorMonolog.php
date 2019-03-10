@@ -45,6 +45,11 @@ class WebProcessorMonolog
 
             $session = $request->getSession();
 
+            // Necessary to combat abuse.
+            if (null !== $session->get('logged_in_user')) {
+                $record['extra']['username'] = $session->get('logged_in_user');
+            }
+
             if (null === $session || !$session->isStarted()) {
                 return $record;
             }

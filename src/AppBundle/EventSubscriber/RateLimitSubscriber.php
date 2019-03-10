@@ -11,7 +11,6 @@ use AppBundle\Helper\I18nHelper;
 use DateInterval;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
@@ -67,8 +66,6 @@ class RateLimitSubscriber implements EventSubscriberInterface
         $this->rateLimit = (int) $this->container->getParameter('app.rate_limit_count');
         $this->rateDuration = (int) $this->container->getParameter('app.rate_limit_time');
         $request = $event->getRequest();
-
-        $this->temporaryBlacklisting($request);
 
         // Zero values indicate the rate limiting feature should be disabled.
         if (0 === $this->rateLimit || 0 === $this->rateDuration) {
@@ -155,59 +152,6 @@ class RateLimitSubscriber implements EventSubscriberInterface
                 }
             }
         }
-    }
-
-    /**
-     * Temporarily deny access based on some heuristics in order to stop a wave of disruptive traffic.
-     * @see https://phabricator.wikimedia.org/T211709
-     * @param Request $request
-     * @throws HttpException
-     */
-    private function temporaryBlacklisting(Request $request): void
-    {
-        $uaMatch = 1 === preg_match(
-            '/iPhone|Pixel 2|Nexus 5|SM\-G900P/',
-            (string)$request->headers->get('User-Agent')
-        );
-        $reqMatch = 1 === preg_match(
-            '/(articleinfo(?:\-authorship)?|topedits)\/en\.wikipedia\.org.*?\?uselang\=(?!en)/',
-            (string)$request->getUri()
-        );
-
-        $passed = false;
-
-        if (true === $uaMatch && true === $reqMatch) {
-            $passed = true;
-        }
-
-        $uaMatch = 1 === preg_match(
-            '/Pixel 2 Build\/OPD3\.170816\.012|Nexus 5 Build\/MRA58N|SM\-G900P Build\/LRX21T/',
-            (string)$request->headers->get('User-Agent')
-        );
-        $reqMatch = 1 === preg_match(
-            '/(articleinfo(?:\-authorship)?|topedits)\/en\.wikipedia\.org/',
-            (string)$request->getUri()
-        ) && false === strpos($request->getUri(), '?uselang=');
-
-        if (true === $uaMatch && true === $reqMatch) {
-            $passed = true;
-        }
-
-        if (false === $passed) {
-            return;
-        }
-
-        $logger = $this->container->get('monolog.logger.rate_limit');
-        $logger->info(
-            "<URI>: ".$request->getRequestUri().' TEMPORARY BLACKLISTING'.
-            "\t<User agent>: " . $request->headers->get('User-Agent')
-        );
-
-        throw new HttpException(
-            429,
-            'Your access to XTools has been revoked due to possible abuse. '.
-                'Please contact tools.xtools@tools.wmflabs.org'
-        );
     }
 
     /**
