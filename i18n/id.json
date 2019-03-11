@@ -3,7 +3,8 @@
 		"authors": [
 			"Hidayatsrf",
 			"William Surya Permana",
-			"Rachmat04"
+			"Rachmat04",
+			"Pebaryan"
 		]
 	},
 	"abusefilter": "Filter penyalahgunaan",
@@ -306,6 +307,7 @@
 	"patrols-desc": "$2 {{PLURAL:$1|artikel|artikel}} dipatroli",
 	"pc-accept": "Terima perubahan tertunda",
 	"pc-reject": "Tolak perubahan tertunda",
+	"page-curation": "Kurasi halaman",
 	"percent-of-edit-count": "% dari jumlah suntingan",
 	"percent-of-tools": "% dari perkakas",
 	"percentage": "Persentase",

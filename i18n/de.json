@@ -309,6 +309,7 @@
 	"patrols-desc": "{{PLURAL:$1|Ein|$2}} Artikel kontrolliert",
 	"pc-accept": "Ausstehende Änderung akzeptieren",
 	"pc-reject": "Ausstehende Änderung ablehnen",
+	"page-curation": "Seitenkuratierung",
 	"percent-of-edit-count": "% des Bearbeitungszählers",
 	"percent-of-tools": "% der Werkzeuge",
 	"percentage": "Prozentsatz",

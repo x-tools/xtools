@@ -309,6 +309,7 @@
 	"patrols-desc": "تمت مراجعة $2 {{PLURAL:$1مقالة|مقالات}}",
 	"pc-accept": "قبول التغيير المعلق",
 	"pc-reject": "رفض التغيير المعلق",
+	"page-curation": "معالجة الصفحة",
 	"percent-of-edit-count": "% من عدد التعديلات",
 	"percent-of-tools": "% من الأدوات",
 	"percentage": "النسبة المئوية",

@@ -4,7 +4,8 @@
 			"Jon Harald Søby",
 			"Nemo bis",
 			"Imre Eilertsen",
-			"Citadell"
+			"Citadell",
+			"Kingu"
 		]
 	},
 	"accepted-formats": "Godkjente formater",
@@ -16,6 +17,7 @@
 	"actions-as-admin": "Administratorhandlinger",
 	"added": "Lagt til",
 	"added-bytes": "La til (byte)",
+	"admins": "Administratorer",
 	"admin-stats-notice": "Bare brukere som har utført minst én adminhandling i tidsperioden vises.",
 	"admin-stats-notice2": "Noen brukere er kanskje tidligere administratorer, eller ikke-administratorer som har rettighetene til å utføre visse administratorhandlinger.",
 	"afd": "Artikler som vurderes slettet",
@@ -143,6 +145,7 @@
 	"global-rights-changes": "Globale rettighetsendringer",
 	"global-total-edit-count": "Alle prosjekter",
 	"global-user-groups": "Globale brukergrupper",
+	"group": "Gruppe",
 	"help-translate": "Hjelp til med oversetting",
 	"hide": "skjul",
 	"high-replag": "Merk: Replikasjonsforsinkelsen er høy, endringer nyere enn $1 blir antakelig ikke vist.",
