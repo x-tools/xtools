@@ -284,48 +284,54 @@ class XtoolsControllerTest extends ControllerTestAdapter
     {
         $controller = $this->getControllerWithRequest();
 
+        // Both dates given, and are valid.
         static::assertEquals(
-            [1483228800, 1501545600],
-            $controller->getUTCFromDateParams(
-                '2017-01-01',
-                '2017-08-01'
-            )
+            [strtotime('2017-01-01'), strtotime('2017-08-01')],
+            $controller->getUTCFromDateParams('2017-01-01', '2017-08-01')
         );
 
+        // End date exceeds current date.
+        [$start, $end] = $controller->getUTCFromDateParams('2017-01-01', '2050-08-01');
+        static::assertEquals(strtotime('2017-01-01'), $start);
+        static::assertEquals(date('Y-m-d', time()), date('Y-m-d', $end));
+
+        // Start date is after end date.
         static::assertEquals(
-            [1498867200, 1501545600],
-            $controller->getUTCFromDateParams(
-                false,
-                '2017-08-01',
-                true // Use default, -1 month from end date.
-            )
+            [strtotime('2017-08-01'), strtotime('2017-09-01')],
+            $controller->getUTCFromDateParams('2017-09-01', '2017-08-01')
         );
 
+        // Start date is empty, should become false.
         static::assertEquals(
-            [1501545600, 1504224000],
-            $controller->getUTCFromDateParams(
-                '2017-09-01',
-                '2017-08-01'
-            )
+            [false, strtotime('2017-08-01')],
+            $controller->getUTCFromDateParams(null, '2017-08-01')
         );
 
-        // Without using defaults.
+        // Both dates empty. End date should become today.
         static::assertEquals(
-            [false, 1501545600],
-            $controller->getUTCFromDateParams(
-                null,
-                '2017-08-01',
-                false
-            )
+            [false, strtotime('today midnight')],
+            $controller->getUTCFromDateParams(null, null)
         );
 
+        // XtoolsController::getUTCFromDateParams() will now enforce a maximum date span of 5 days.
+        $controller->maxDays = 5;
+
+        // Both dates given, exceeding max days, so start date should be end date - max days.
         static::assertEquals(
-            [1501545600, 1504224000],
-            $controller->getUTCFromDateParams(
-                '2017-09-01',
-                '2017-08-01',
-                false
-            )
+            [strtotime('2017-08-05'), strtotime('2017-08-10')],
+            $controller->getUTCFromDateParams('2017-08-01', '2017-08-10')
+        );
+
+        // Only end date given, start should also be end date - max days.
+        static::assertEquals(
+            [strtotime('2017-08-05'), strtotime('2017-08-10')],
+            $controller->getUTCFromDateParams(false, '2017-08-10')
+        );
+
+        // Start date after end date, exceeding max days.
+        static::assertEquals(
+            [strtotime('2017-08-05'), strtotime('2017-08-10')],
+            $controller->getUTCFromDateParams('2017-08-10', '2017-07-01')
         );
     }
 

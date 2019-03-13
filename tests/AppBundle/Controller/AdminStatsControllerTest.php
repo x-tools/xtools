@@ -25,7 +25,7 @@ class AdminStatsControllerTest extends ControllerTestAdapter
         $this->assertSuccessfulRoutes([
             '/adminstats',
             '/adminstats/fr.wikipedia.org',
-            '/adminstats/fr.wikipedia.org/2018-01-01/2018-01-10',
+            '/adminstats/fr.wikipedia.org//2018-01-10',
             '/stewardstats/meta.wikimedia.org/2018-01-01/2018-01-10?actions=global-rights',
         ]);
     }
@@ -42,6 +42,7 @@ class AdminStatsControllerTest extends ControllerTestAdapter
         $this->assertSuccessfulRoutes([
             '/api/project/admins_groups/fr.wikipedia',
             '/api/project/adminstats/fr.wikipedia/3',
+            '/api/project/admin_stats/frwiki/2019-01-01',
         ]);
     }
 }

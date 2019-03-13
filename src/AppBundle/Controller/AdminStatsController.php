@@ -11,7 +11,9 @@ use AppBundle\Helper\I18nHelper;
 use AppBundle\Model\AdminStats;
 use AppBundle\Repository\AdminStatsRepository;
 use AppBundle\Repository\UserRightsRepository;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -23,6 +25,10 @@ class AdminStatsController extends XtoolsController
     /** @var AdminStats The admin stats instance that does all the work. */
     protected $adminStats;
 
+    public const DEFAULT_DAYS = 31;
+    public const MAX_DAYS_UI = 365;
+    public const MAX_DAYS_API = 31;
+
     /**
      * Get the name of the tool's index route. This is also the name of the associated model.
      * @return string
@@ -31,6 +37,22 @@ class AdminStatsController extends XtoolsController
     public function getIndexRoute(): string
     {
         return 'AdminStats';
+    }
+
+    /**
+     * AdminStatsController constructor.
+     * @param RequestStack $requestStack
+     * @param ContainerInterface $container
+     * @param I18nHelper $i18n
+     */
+    public function __construct(RequestStack $requestStack, ContainerInterface $container, I18nHelper $i18n)
+    {
+        // Set the max length for the date range. Value is smaller for API requests.
+        $isApi = '/api/' === substr($requestStack->getCurrentRequest()->getPathInfo(), 0, 5);
+        $this->maxDays = $isApi ? self::MAX_DAYS_API : self::MAX_DAYS_UI;
+        $this->defaultDays = self::DEFAULT_DAYS;
+
+        parent::__construct($requestStack, $container, $i18n);
     }
 
     /**
@@ -125,22 +147,18 @@ class AdminStatsController extends XtoolsController
 
     /**
      * Every action in this controller (other than 'index') calls this first.
-     * If a response is returned, the calling action is expected to return it.
      * @return AdminStats
      * @codeCoverageIgnore
      */
     public function setUpAdminStats(): AdminStats
     {
-        // $this->start and $this->end are already set by the parent XtoolsController, but here we want defaults,
-        // so we run XtoolsController::getUTCFromDateParams() once more but with the $useDefaults flag set.
-        [$this->start, $this->end] = $this->getUTCFromDateParams($this->start, $this->end, true);
-
         $adminStatsRepo = new AdminStatsRepository();
         $adminStatsRepo->setContainer($this->container);
+
         $this->adminStats = new AdminStats(
             $this->project,
-            $this->start,
-            $this->end,
+            (int)$this->start,
+            (int)$this->end,
             $this->params['group'] ?? 'admin',
             $this->getAndSetRequestedActions()
         );
@@ -204,9 +222,31 @@ class AdminStatsController extends XtoolsController
     }
 
     /**
-     * Get users of the project that are capable of making 'admin actions',
-     * along with various stats about which actions they took. Time period is limited
-     * to one month.
+     * Same as adminStatsApiAction except it accepts dates.
+     * @Route(
+     *     "/api/project/{group}_stats/{project}/{start}/{end}",
+     *     name="ProjectApiAdminStatsDates",
+     *     requirements={"start"="|\d{4}-\d{2}-\d{2}", "end"="|\d{4}-\d{2}-\d{2}", "group"="admin|patroller|steward"},
+     *     defaults={"start"=false, "end"=false, "group"="admin"}
+     * )
+     * @return JsonResponse
+     * @codeCoverageIgnore
+     */
+    public function adminStatsDatesApiAction(): JsonResponse
+    {
+        $this->recordApiUsage('project/adminstats');
+
+        $this->setUpAdminStats();
+        $this->adminStats->prepareStats();
+
+        return $this->getFormattedApiResponse([
+            'users' => $this->adminStats->getStats(),
+        ]);
+    }
+
+    /**
+     * Get users of the project that are capable of making 'admin actions', along with various stats
+     * about which actions they took. Time period is limited to one month.
      * @Route(
      *     "/api/project/adminstats/{project}/{days}",
      *     name="ProjectApiAdminStatsLegacy",
@@ -214,31 +254,39 @@ class AdminStatsController extends XtoolsController
      *     defaults={"days"=31}
      * )
      * @Route(
-     *     "/api/project/{group}_stats/{project}/{days}",
+     *     "/api/project/admin_stats/{project}/{days}",
      *     name="ProjectApiAdminStats",
-     *     requirements={"days"="\d+", "group"="admin|patroller|steward"},
-     *     defaults={"days"=31, "group"="admin"}
+     *     requirements={"days"="\d+"},
+     *     defaults={"days"=31}
      * )
      * @param int $days Number of days from present to grab data for. Maximum 31.
      * @return JsonResponse
+     * @deprecated Use adminStatsDatesApiAction().
+     * @todo Remove this endpoint.
      * @codeCoverageIgnore
      */
     public function adminStatsApiAction(int $days = 31): JsonResponse
     {
         $this->recordApiUsage('project/adminstats');
 
+        // $this->start and $this->end are normally set by the parent XtoolsController, but here we're going off of
+        // the relative $days parameter. So we run XtoolsController::getUTCFromDateParams() once more.
+        $end = time();
+        $start = strtotime("-$days days", time());
+        [$this->start, $this->end] = $this->getUTCFromDateParams($start, $end);
+
         $this->setUpAdminStats();
-
-        // Maximum 31 days.
-        $days = min((int) $days, 31);
-        $start = date('Y-m-d', strtotime("-$days days"));
-        $end = date('Y-m-d');
-
         $this->adminStats->prepareStats();
 
+        $this->addFlash('warning', 'This endpoint is deprecated and will be removed in the future. '.
+            'Use /api/project/admin_stats/{project}/{start}/{end} instead. '.
+            'See https://xtools.readthedocs.io/en/stable/api/project.html#admin-statistics for documentation.');
+
         return $this->getFormattedApiResponse([
-            'start' => $start,
-            'end' => $end,
+            // Start/end must be explicitly provided because $this->params['start'] and ['end'] are empty.
+            'start' => date('Y-m-d', $start),
+            'end' => date('Y-m-d', $end),
+
             'users' => $this->adminStats->getStats(),
         ]);
     }

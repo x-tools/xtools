@@ -15,6 +15,7 @@ use AppBundle\Model\User;
 use AppBundle\Repository\PageRepository;
 use AppBundle\Repository\ProjectRepository;
 use AppBundle\Repository\UserRepository;
+use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -59,6 +60,23 @@ abstract class XtoolsController extends Controller
 
     /** @var int|false End date parsed from the Request. */
     protected $end = false;
+
+    /**
+     * Default days from current day, to use as the start date if none was provided.
+     * If this is null and $maxDays is non-null, the latter will be used as the default.
+     * Is public visibility evil here? I don't think so.
+     * @var int|null
+     */
+    public $defaultDays = null;
+
+    /**
+     * Maximum number of days allowed for the given date range.
+     * Set this in the controller's constructor to enforce the given date range to be within this range.
+     * This will be used as the default date span unless $defaultDays is defined.
+     * @see XtoolsController::getUTCFromDateParams()
+     * @var int|null
+     */
+    public $maxDays = null;
 
     /** @var int|string Namespace parsed from the Request, ID as int or 'all' for all namespaces. */
     protected $namespace;
@@ -231,8 +249,12 @@ abstract class XtoolsController extends Controller
     {
         $start = $this->params['start'] ?? false;
         $end = $this->params['end'] ?? false;
-        if ($start || $end) {
+        if ($start || $end || null !== $this->maxDays) {
             [$this->start, $this->end] = $this->getUTCFromDateParams($start, $end);
+
+            // Set $this->params accordingly too, so that for instance API responses will include it.
+            $this->params['start'] = is_int($this->start) ? date('Y-m-d', $this->start) : false;
+            $this->params['end'] = is_int($this->end) ? date('Y-m-d', $this->end) : false;
         }
     }
 
@@ -525,37 +547,61 @@ abstract class XtoolsController extends Controller
     }
 
     /**
-     * Get UTC timestamps from given start and end string parameters. This also makes $start on month before
+     * Get UTC timestamps from given start and end string parameters. This also makes $start $maxDays before
      * $end if not present, and makes $end the current time if not present.
+     * The date range will not exceed $this->maxDays days, if this public class property is set.
      * @param int|string|false $start Unix timestamp or string accepted by strtotime.
      * @param int|string|false $end Unix timestamp or string accepted by strtotime.
-     * @param bool $useDefaults Whether to use defaults if the values are blank. The start date is set to one month
-     *   before the end date, and the end date is set to the present.
-     * @return mixed[] Start and end date as UTC timestamps or 'false' if empty.
+     * @return int[] Start and end date as UTC timestamps.
      */
-    public function getUTCFromDateParams($start, $end, $useDefaults = false): array
+    public function getUTCFromDateParams($start, $end): array
     {
-        $start = is_int($start) ? $start : strtotime((string)$start);
-        $end = is_int($end) ? $end : strtotime((string)$end);
+        $today = strtotime('today midnight');
 
-        // Use current time if end is not present (and is required), or if it exceeds the current time.
-        if (($useDefaults && false === $end) || $end > time()) {
-            $end = time();
+        // start time should not be in the future.
+        $startTime = min(
+            is_int($start) ? $start : strtotime((string)$start),
+            $today
+        );
+
+        // end time defaults to now, and will not be in the future.
+        $endTime = min(
+            (is_int($end) ? $end : strtotime((string)$end)) ?: $today,
+            $today
+        );
+
+        // Default to $this->defaultDays or $this->maxDays before end time if start is not present.
+        $daysOffset = $this->defaultDays ?? $this->maxDays;
+        if (false === $start && is_int($daysOffset)) {
+            $startTime = strtotime("-$daysOffset days", $endTime);
         }
 
-        // Default to one month before end time if start is not present, as is not optional.
-        if ($useDefaults && false === $start) {
-            $start = strtotime('-1 month', $end);
+        // Default to $this->defaultDays or $this->maxDays after start time if end is not present.
+        if (false === $end && is_int($daysOffset)) {
+            $endTime = min(
+                strtotime("+$daysOffset days", $startTime),
+                $today
+            );
         }
 
         // Reverse if start date is after end date.
-        if ($start > $end && false !== $start && false !== $end) {
-            $newEnd = $start;
-            $start = $end;
-            $end = $newEnd;
+        if ($startTime > $endTime && false !== $startTime && false !== $end) {
+            $newEndTime = $startTime;
+            $startTime = $endTime;
+            $endTime = $newEndTime;
         }
 
-        return [$start, $end];
+        // Finally, don't let the date range exceed $this->maxDays.
+        $startObj = DateTime::createFromFormat('U', (string)$startTime);
+        $endObj = DateTime::createFromFormat('U', (string)$endTime);
+        if (is_int($this->maxDays) && $startObj->diff($endObj)->days > $this->maxDays) {
+            // Show warnings that the date range was truncated.
+            $this->addFlashMessage('warning', 'date-range-too-wide', [$this->maxDays]);
+
+            $startTime = strtotime("-$this->maxDays days", $endTime);
+        }
+
+        return [$startTime, $endTime];
     }
 
     /**
@@ -680,10 +726,19 @@ abstract class XtoolsController extends Controller
             }
         }
 
-        $response->setData(array_merge($this->params, [
+        $ret = array_merge($this->params, [
             // In some controllers, $this->params['project'] may be overridden with a Project object.
             'project' => $this->project->getDomain(),
-        ], $data, ['elapsed_time' => $elapsedTime]));
+        ], $data, ['elapsed_time' => $elapsedTime]);
+
+        // Merge in flash messages, putting them at the top.
+        $flashes = $this->get('session')->getFlashBag()->peekAll();
+        $ret = array_merge($flashes, $ret);
+
+        // Flashes now can be cleared after merging into the response.
+        $this->get('session')->getFlashBag()->clear();
+
+        $response->setData($ret);
 
         return $response;
     }

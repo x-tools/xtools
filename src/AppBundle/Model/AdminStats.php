@@ -89,16 +89,13 @@ class AdminStats extends Model
             return $this->adminStats;
         }
 
-        // UTC to YYYYMMDDHHMMSS.
-        $startDb = date('Ymd000000', $this->start);
-        $endDb = date('Ymd235959', $this->end);
-
-        $stats = $this->getRepository()->getStats($this->project, $startDb, $endDb, $this->type, $this->actions);
+        $stats = $this->getRepository()
+            ->getStats($this->project, $this->start, $this->end, $this->type, $this->actions);
 
         // Group by username.
         $stats = $this->groupStatsByUsername($stats);
 
-        // Resort, as for some reason the SQL isn't doing this properly.
+        // Resort, as for some reason the SQL doesn't do this properly.
         uasort($stats, function ($a, $b) {
             if ($a['total'] === $b['total']) {
                 return 0;
@@ -137,6 +134,10 @@ class AdminStats extends Model
         return $this->usersAndGroups;
     }
 
+    /**
+     * Get all user groups with permissions applicable to the $this->group.
+     * @return array Each entry contains 'name' (user group) and 'rights' (the permissions).
+     */
     public function getUserGroupIcons(): array
     {
         // Quick cache, valid only for the same request.

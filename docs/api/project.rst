@@ -119,23 +119,96 @@ Get administrative users of the French Wikipedia:
     https://xtools.wmflabs.org/api/project/admins_groups/frwiki
     https://xtools.wmflabs.org/api/project/admins_groups/fr.wikipedia.org
 
+.. _admin_statistics:
+
 Admin statistics
 ================
 
-``GET /api/project/admin_stats/{project}/{days}``
+``GET /api/project/admin_stats/{project}/{start}/{end}``
 
 Get users of the project that are capable of making 'admin actions', along with
-various stats about the actions they took. Time period is limited to one month.
+counts of the actions they took. Time period is limited to one month.
 
 **Parameters:**
 
 * ``project`` (**required**) - Project domain or database name.
-* ``days`` - Number of days before present to fetch data for (default 30, maximum 30).
+* ``start`` - Start date in the format ``YYYY-MM-DD``. Defaults to 31 days before ``end``.
+* ``end`` - End date in the format ``YYYY-MM-DD``. Defaults to current day (UTC).
+
+The date range is limited to a 31 day period. If you need a wider range of data, you must make
+the the individual requests (synchronously), and do the math in your application.
+
+**Query string parameters**
+
+Optional `query string <https://en.wikipedia.org/wiki/Query_string>`_ parameters to
+further filter results.
+
+* ``actions`` - A pipe-separated list of 'actions' you want to query for. Defaults to all
+  available actions. Query only for the actions you care about to get faster results.
+  Available actions include:
+    * ``delete``
+    * ``revision-delete``
+    * ``log-delete``
+    * ``restore``
+    * ``re-block``
+    * ``unblock``
+    * ``re-protect``
+    * ``unprotect``
+    * ``rights``
+    * ``merge``
+    * ``import``
+    * ``abusefilter``
+
+If you are interested in exactly which permissions are used in the queries, please review
+the `YAML configuration <https://github.com/x-tools/xtools/blob/master/config/admin_stats.yml>`_.
 
 **Example:**
 
-Get various statistics about actions taken by admins of the French Wikipedia
-over the past week:
+Get 're-block', 'unblock' and 'abusefilter' statistics for every active admin on the French Wikipedia:
 
-    https://xtools.wmflabs.org/api/project/admin_stats/frwiki/7
+    https://xtools.wmflabs.org/api/project/admin_stats/frwiki
     https://xtools.wmflabs.org/api/project/admin_stats/fr.wikipedia.org/7
+
+Get statistics about all actions taken by Spanish Wikipedia admins in January 2019:
+
+    https://xtools.wmflabs.org/api/project/admin_stats/es.wikipedia/2019-01-01
+    https://xtools.wmflabs.org/api/project/admin_stats/es.wikipedia/2019-01-01/2019-01
+    https://xtools.wmflabs.org/api/project/admin_stats/es.wikipedia.org//2019-01
+
+Patroller statistics
+====================
+
+``GET /api/project/patroller_stats/{project}/{start}/{end}``
+
+Same as :ref:`Admin statistics <admin_statistics>`, except with these ``actions``:
+
+* ``patrol``
+* ``page-curation``
+* ``pc-accept``
+* ``pc-reject``
+
+**Example:**
+
+Get 'patrol' and 'page-curation' statistics for relevant users on
+the English Wikipedia over the 31 days:
+
+    https://xtools.wmflabs.org/api/project/patroller_stats/en.wikipedia
+
+Stewards statistics
+===================
+
+``GET /api/project/steward_stats/{project}/{start}/{end}``
+
+Same as :ref:`Admin statistics <admin_statistics>`, except with these ``actions``:
+
+* ``global-block``
+* ``global-unblock``
+* ``global-rename``
+* ``global-rights``
+* ``wiki-set-change``
+
+**Example:**
+
+Get statistics on stewards who have made global blocks and rights changes in January 2019:
+
+    https://xtools.wmflabs.org/api/project/steward_stats/en.wikipedia/2019-01-01/2019-01-31

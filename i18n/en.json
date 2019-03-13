@@ -96,6 +96,7 @@
 	"date-from": "From: $1",
 	"date-range": "$1 - $2",
 	"date-range-outside-revisions": "No revisions found for the given date range",
+	"date-range-too-wide": "The requested date range exceeded the maximum of $1 {{PLURAL:$1|day|days}} and was truncated.",
 	"date-to": "To: $1",
 	"delete": "Delete",
 	"deleted": "Deleted",

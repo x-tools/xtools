@@ -24,6 +24,7 @@ class ControllerTestAdapter extends WebTestCase
      */
     public function setUp(): void
     {
+        date_default_timezone_set('UTC');
         $this->client = static::createClient();
     }
 

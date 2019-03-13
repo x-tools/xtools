@@ -29,13 +29,13 @@ class AdminStatsRepository extends Repository
     /**
      * Core function to get statistics about users who have admin/patroller/steward-like permissions.
      * @param Project $project
-     * @param string $start SQL-ready format.
-     * @param string $end
+     * @param int $start UTC timestamp.
+     * @param int $end UTC timestamp.
      * @param string $type Which 'type' we're querying for, as configured in admin_stats.yml
      * @param string[] $actions Which log actions to query for.
      * @return string[][] with key for each action type (specified in admin_stats.yml), including 'total'.
      */
-    public function getStats(Project $project, string $start, string $end, string $type, array $actions = []): array
+    public function getStats(Project $project, int $start, int $end, string $type, array $actions = []): array
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'adminstats');
         if ($this->cache->hasItem($cacheKey)) {
@@ -45,23 +45,20 @@ class AdminStatsRepository extends Repository
         $userTable = $project->getTableName('user');
         $loggingTable = $project->getTableName('logging', 'logindex');
         [$countSql, $types, $actions] = $this->getLogSqlParts($project, $type, $actions);
+        $dateConditions = $this->getDateConditions($start, $end, "logging_logindex.", 'log_timestamp');
 
         $sql = "SELECT user_name AS `username`,
                     $countSql
                     SUM(IF(log_type != '' AND log_action != '', 1, 0)) AS `total`
                 FROM $loggingTable
                 JOIN $userTable ON user_id = log_user
-                WHERE log_timestamp BETWEEN :start AND :end
-                  AND log_type IN ($types)
-                  AND log_action IN ($actions)
+                WHERE log_type IN ($types)
+                    AND log_action IN ($actions)
+                    $dateConditions
                 GROUP BY user_name
-                HAVING `total` > 0
-                ORDER BY 'total' DESC";
+                HAVING `total` > 0";
 
-        $results = $this->executeProjectsQuery($sql, [
-            'start' => $start,
-            'end' => $end,
-        ])->fetchAll();
+        $results = $this->executeProjectsQuery($sql)->fetchAll();
 
         // Cache and return.
         return $this->setCache($cacheKey, $results);
