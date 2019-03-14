@@ -288,6 +288,7 @@
 	"patrollers": "점검자",
 	"patrols": "점검",
 	"patrols-desc": "점검한 {{PLURAL:$1|문서}} $2개",
+	"page-curation": "문서 큐레이션",
 	"percent-of-edit-count": "편집 횟수 중 %",
 	"percent-of-tools": "도구 중 %",
 	"percentage": "퍼센트",
