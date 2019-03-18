@@ -58,7 +58,8 @@
         "symfony/phpunit-bridge": "^3.0",
         "squizlabs/php_codesniffer": "^3.3.0",
         "jakub-onderka/php-parallel-lint": "^0.9",
-        "mediawiki/minus-x": "^0.3.2"
+        "mediawiki/minus-x": "^0.3.2",
+        "theofidry/psysh-bundle": "^3.5"
     },
     "scripts": {
         "node_scripts": [

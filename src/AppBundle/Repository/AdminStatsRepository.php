@@ -8,6 +8,7 @@ declare(strict_types = 1);
 namespace AppBundle\Repository;
 
 use AppBundle\Model\Project;
+use Mediawiki\Api\MediawikiApi;
 use Mediawiki\Api\SimpleRequest;
 
 /**
@@ -159,14 +160,28 @@ class AdminStatsRepository extends Repository
         $userGroups = [];
 
         $api = $this->getMediawikiApi($project);
-        $query = new SimpleRequest('query', [
+        $res = $api->getRequest(new SimpleRequest('query', [
             'meta' => 'siteinfo',
             'siprop' => 'usergroups',
-        ]);
-        $res = $api->getRequest($query);
+            'list' => 'globalgroups',
+            'ggpprop' => 'rights',
+        ]))['query'];
 
-        // If there isn't a user groups hash than let it error out... Something else must have gone horribly wrong.
-        foreach ($res['query']['usergroups'] as $userGroup) {
+        /** @var string[] $groupsProcessed Keeps track of which groups have been processed. */
+//        $groupsProcessed = [];
+//
+//        dump(array_intersect_uassoc($res['globalgroups'], $res['globalgroups'], function ($a, $b) {
+//
+//        }));
+
+        // Loop through each, ignoring any 'usergroups' for which there is also a 'globalgroup'.
+        foreach (array_merge($res['usergroups'], $res['globalgroups']) as $userGroup) {
+            if (in_array($userGroup['name'], $userGroups)) {
+                continue;
+            }
+
+//            dump($userGroup['name']);
+//            dump($userGroup['rights']);
             // If they are able to add and remove user groups,
             // we'll treat them as having the 'userrights' permission.
             if (isset($userGroup['add']) || isset($userGroup['remove'])) {
@@ -178,7 +193,37 @@ class AdminStatsRepository extends Repository
             }
         }
 
+        dump($userGroups);
+
         // Cache for a week and return.
         return $this->setCache($cacheKey, $userGroups, 'P7D');
+    }
+
+    /**
+     * Get each group and its rights for the given Project -- including global rights.
+     * @param Project $project
+     * @return array Each with keys 'name' and 'rights'.
+     */
+    private function getGroupRights(Project $project): array
+    {
+        $api = $this->getMediawikiApi($project);
+        $query = new SimpleRequest('query', [
+            'meta' => 'siteinfo',
+            'siprop' => 'usergroups',
+            'list' => 'globalgroups',
+            'ggpprop' => 'rights',
+        ]);
+        $res = $api->getRequest($query);
+
+        // Merge in usergroups and globalgroups and make them unique by 'name'.
+        // If either hash is missing from the response let it error out, as something has gone horribly wrong.
+        $groupRights = [];
+        foreach (array_merge($res['query']['usergroups'], $res['query']['globalgroups']) as $userGroup) {
+            if (!isset($groupRights[$userGroup['name']])) {
+                $groupRights[] = $userGroup;
+            }
+        }
+
+        return $groupRights;
     }
 }
