@@ -102,6 +102,7 @@
 	"date-from": "Depuis : $1",
 	"date-range": "$1 - $2",
 	"date-range-outside-revisions": "Pas de version trouvée dans l'intervalle de dates donné",
+	"date-range-too-wide": "La plage de date demandée dépasse le maximum de $1 {{PLURAL:$1|jour|jours}} et a été tronquée.",
 	"date-to": "Jusqu'au : $1",
 	"delete": "Suppressions",
 	"deleted": "Supprimé",

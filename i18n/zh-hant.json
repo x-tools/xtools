@@ -99,6 +99,7 @@
 	"date-from": "開始：$1",
 	"date-range": "$1 - $2",
 	"date-range-outside-revisions": "所給予的日期範圍未發現修訂",
+	"date-range-too-wide": "所請求資料範圍超出最大範圍 $1 {{PLURAL:$1|天}}且被中斷掉。",
 	"date-to": "結束：$1",
 	"delete": "刪除",
 	"deleted": "已刪除",
