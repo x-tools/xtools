@@ -387,9 +387,10 @@ class ProjectRepository extends Repository
      * Get a list of users who are in one of the given user groups.
      * @param Project $project
      * @param string[] List of user groups to look for.
+     * @param string[] List of global groups to look for.
      * @return string[] with keys 'user_name' and 'ug_group'
      */
-    public function getUsersInGroups(Project $project, array $groups): array
+    public function getUsersInGroups(Project $project, array $groups, array $globalGroups = []): array
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'project_useringroups');
         if ($this->cache->hasItem($cacheKey)) {
@@ -399,20 +400,40 @@ class ProjectRepository extends Repository
         $userTable = $project->getTableName('user');
         $userGroupsTable = $project->getTableName('user_groups');
 
-        $query = $this->getProjectsConnection()->createQueryBuilder();
-        $query->select(['user_name', 'ug_group'])
+        $rqb = $this->getProjectsConnection()->createQueryBuilder();
+        $rqb->select(['user_name', 'ug_group AS user_group'])
             ->from($userTable)
-            ->join($userTable, $userGroupsTable, null, 'ug_user = user_id')
-            ->where($query->expr()->in('ug_group', ':groups'))
-            ->groupBy('user_name, ug_group')
+            ->join($userTable, $userGroupsTable, 'user_groups', 'ug_user = user_id')
+            ->where($rqb->expr()->in('ug_group', ':groups'))
+            ->groupBy('user_name, user_group')
             ->setParameter(
                 'groups',
                 $groups,
                 \Doctrine\DBAL\Connection::PARAM_STR_ARRAY
             );
-        $admins = $this->executeQueryBuilder($query)->fetchAll();
+        $users = $this->executeQueryBuilder($rqb)->fetchAll();
 
-        // Cache for one hour and return.
-        return $this->setCache($cacheKey, $admins, 'PT1H');
+        if (count($globalGroups) > 0 && $this->isLabs()) {
+            dump("HERE");
+            $rqb->select(['gu_name AS user_name', 'gug_group AS user_group'])
+                ->from('centralauth_p.global_user_groups', 'gug')
+                ->join('gug', 'centralauth_p.globaluser', null, 'gug_user = gu_id')
+                ->where($rqb->expr()->in('gug_group', ':globalGroups'))
+                ->groupBy('user_name', 'user_group')
+                ->setParameter(
+                    'globalGroups',
+                    $globalGroups,
+                    \Doctrine\DBAL\Connection::PARAM_STR_ARRAY
+                );
+            $ret = $this->executeQueryBuilder($rqb)->fetchAll();
+            dump($ret);
+            $users = array_merge($users, $ret);
+            dump($users);
+        }
+
+        dump($users);
+
+        // Cache for 12 hours and return.
+        return $this->setCache($cacheKey, $users, 'PT12H');
     }
 }

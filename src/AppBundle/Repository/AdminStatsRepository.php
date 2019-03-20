@@ -147,7 +147,7 @@ class AdminStatsRepository extends Repository
      * Get all user groups with permissions applicable to the given 'group'.
      * @param Project $project
      * @param string $type Which 'type' we're querying for, as configured in admin_stats.yml
-     * @return array Each entry contains 'name' (user group) and 'rights' (the permissions).
+     * @return array Keys are 'local' and 'global', each an array of user groups with keys 'name' and 'rights'.
      */
     public function getUserGroups(Project $project, string $type): array
     {
@@ -157,7 +157,6 @@ class AdminStatsRepository extends Repository
         }
 
         $permissions = $this->container->getParameter('admin_stats')[$type]['permissions'];
-        $userGroups = [];
 
         $api = $this->getMediawikiApi($project);
         $res = $api->getRequest(new SimpleRequest('query', [
@@ -167,25 +166,21 @@ class AdminStatsRepository extends Repository
             'ggpprop' => 'rights',
         ]))['query'];
 
-        /** @var string[] $groupsProcessed Keeps track of which groups have been processed. */
-//        $groupsProcessed = [];
-//
-//        dump(array_intersect_uassoc($res['globalgroups'], $res['globalgroups'], function ($a, $b) {
-//
-//        }));
+        $userGroups = [
+            'local' => $this->getUserGroupByLocality($res, $permissions),
+            'global' => $this->getUserGroupByLocality($res, $permissions, true),
+        ];
 
-        // Loop through each, ignoring any 'usergroups' for which there is also a 'globalgroup'.
-        foreach (array_merge($res['usergroups'], $res['globalgroups']) as $userGroup) {
-            if (in_array($userGroup['name'], $userGroups)) {
-                continue;
-            }
+        // Cache for a week and return.
+        return $this->setCache($cacheKey, $userGroups, 'P7D');
+    }
 
-//            dump($userGroup['name']);
-//            dump($userGroup['rights']);
-            // If they are able to add and remove user groups,
-            // we'll treat them as having the 'userrights' permission.
+    private function getUserGroupByLocality(array $res, array $permissions, bool $global = false): array
+    {
+        foreach (($global ? $res['globalgroups'] : $res['usergroups']) as $userGroup) {
+            // If they are able to add and remove user groups, we'll treat them as having the 'userrights' permission.
             if (isset($userGroup['add']) || isset($userGroup['remove'])) {
-                array_push($userGroup['rights'], 'userrights');
+                $userGroup['rights'][] = 'userrights';
             }
 
             if (count(array_intersect($userGroup['rights'], $permissions)) > 0) {
@@ -193,37 +188,6 @@ class AdminStatsRepository extends Repository
             }
         }
 
-        dump($userGroups);
-
-        // Cache for a week and return.
-        return $this->setCache($cacheKey, $userGroups, 'P7D');
-    }
-
-    /**
-     * Get each group and its rights for the given Project -- including global rights.
-     * @param Project $project
-     * @return array Each with keys 'name' and 'rights'.
-     */
-    private function getGroupRights(Project $project): array
-    {
-        $api = $this->getMediawikiApi($project);
-        $query = new SimpleRequest('query', [
-            'meta' => 'siteinfo',
-            'siprop' => 'usergroups',
-            'list' => 'globalgroups',
-            'ggpprop' => 'rights',
-        ]);
-        $res = $api->getRequest($query);
-
-        // Merge in usergroups and globalgroups and make them unique by 'name'.
-        // If either hash is missing from the response let it error out, as something has gone horribly wrong.
-        $groupRights = [];
-        foreach (array_merge($res['query']['usergroups'], $res['query']['globalgroups']) as $userGroup) {
-            if (!isset($groupRights[$userGroup['name']])) {
-                $groupRights[] = $userGroup;
-            }
-        }
-
-        return $groupRights;
+        return $userGroups;
     }
 }
