@@ -98,6 +98,7 @@
 	"date-from": "Vom: $1",
 	"date-range": "$1 bis $2",
 	"date-range-outside-revisions": "Für den angegebenen Datumsbereich wurden keine Versionen gefunden",
+	"date-range-too-wide": "Der angeforderte Datumsbereich überschritt das Maximum von {{PLURAL:$1|einem Tag|$1 Tagen}} und wurde gekürzt.",
 	"date-to": "Bis: $1",
 	"delete": "Löschungen",
 	"deleted": "Gelöscht",

@@ -82,6 +82,7 @@
 	"date": "日付",
 	"date-range": "$1 - $2",
 	"date-range-outside-revisions": "指定した日付範囲に版が見つかりませんでした",
+	"date-range-too-wide": "ご希望の日取りは上限の $1{{PLURAL:$1|日}}を超過したため短縮されました。",
 	"delete": "削除",
 	"deleted": "削除済",
 	"deleted-bytes": "削除 (バイト)",

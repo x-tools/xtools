@@ -95,6 +95,7 @@
 	"date-from": "De: $1",
 	"date-range": "$1 - $2",
 	"date-range-outside-revisions": "Não foi possível localizar nenhuma revisão no intervalo de datas especificado.",
+	"date-range-too-wide": "O intervalo de datas solicitado excedeu o máximo de $1 {{PLURAL:$1|dia|dias}} e foi truncado.",
 	"date-to": "A: $1",
 	"delete": "Deletar",
 	"deleted": "Eliminado",
