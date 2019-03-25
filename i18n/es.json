@@ -12,7 +12,8 @@
 			"Jelou",
 			"LittlePuppers",
 			"Dgstranz",
-			"Tiberius1701"
+			"Tiberius1701",
+			"DannyS712"
 		]
 	},
 	"abusefilter": "Filtro antiabusos",
@@ -163,6 +164,7 @@
 	"global-contribs": "Contribuciones globales del usuario",
 	"global-other-sites-edit-count": "Otros proyectos",
 	"global-rename": "Cambio de nombre global",
+	"global-rights": "Registro de permisos globales",
 	"global-rights-changes": "Cambios en los derechos globales",
 	"global-total-edit-count": "Todos los proyectos",
 	"global-unblock": "Desbloqueo global",
