@@ -8,6 +8,7 @@
 			"Fnielsen"
 		]
 	},
+	"abusefilter": "Misbrugsfilter",
 	"accepted-formats": "Godkendte formater",
 	"account-age": "Kontoalder",
 	"account-age-desc": "$2 {{PLURAL:$1|dag|dage}} siden",

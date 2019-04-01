@@ -9,7 +9,8 @@
 			"Urhixidur",
 			"Oupsa",
 			"The RedBurn",
-			"Niridya"
+			"Niridya",
+			"Ltrlg"
 		]
 	},
 	"abusefilter": "AbuseFilter",
@@ -444,7 +445,7 @@
 	"total": "Total",
 	"total-edits": "Total des contributions",
 	"total-revisions": "Total des révisions",
-	"translation-credits": "Traductions proposées par $1, $2 et $3.",
+	"translation-credits": "Traductions propulsées par $1, $2 et $3.",
 	"tsv": "TSV",
 	"tuesday": "Mardi",
 	"type": "Type",
