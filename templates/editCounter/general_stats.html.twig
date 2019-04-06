@@ -474,7 +474,7 @@
             chart.pie_chart('deleted_edits',
                 [{
                     label: msg('live-edits'),
-                    value: ec.countAllRevisions,
+                    value: ec.countLiveRevisions,
                     percentage: ((ec.countLiveRevisions / ec.countAllRevisions) * 100)
                 },
                 {
