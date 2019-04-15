@@ -1,10 +1,10 @@
 parameters:
     user_group_icons:
-        sysop: https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Mop.svg/20px-Mop.svg.png
-        bureaucrat: https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Human-preferences-desktop.svg/20px-Human-preferences-desktop.svg.png
-        steward: https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Wikimedia_Community_Logo.svg/20px-Wikimedia_Community_Logo.svg.png
-        checkuser: https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Gnome-searchtool.svg/20px-Gnome-searchtool.svg.png
-        oversight: https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Oversight_logo.png/20px-Oversight_logo.png
-        interface-admin: https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Pliers_with_yellow_handles_(rotated).svg/20px-Pliers_with_yellow_handles_(rotated).svg.png
-        bot: https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Crystal_Clear_action_run.png/20px-Crystal_Clear_action_run.png
-        global-renamer: https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Global_renamer-logo.svg/20px-Global_renamer-logo.svg.png
+        sysop: https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Mop.svg/18px-Mop.svg.png
+        bureaucrat: https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Human-preferences-desktop.svg/18px-Human-preferences-desktop.svg.png
+        steward: https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Wikimedia_Community_Logo.svg/18px-Wikimedia_Community_Logo.svg.png
+        checkuser: https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Gnome-searchtool.svg/18px-Gnome-searchtool.svg.png
+        oversight: https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Oversight_logo.png/18px-Oversight_logo.png
+        interface-admin: https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Pliers_with_yellow_handles_(rotated).svg/18px-Pliers_with_yellow_handles_(rotated).svg.png
+        bot: https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Crystal_Clear_action_run.png/18px-Crystal_Clear_action_run.png
+        global-renamer: https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Global_renamer-logo.svg/18px-Global_renamer-logo.svg.png

@@ -97,7 +97,7 @@
                             </td>
                             <td class="sort-entry--user-groups" data-value="{{ user['user-groups']|join(',') }}">
                                 {% for group, url in as.userGroupIcons if group in user['user-groups'] %}
-                                    <img src="{{ url }}" title="{{ rightsNames[group]|ucfirst }}" alt="{{ rightsNames[group] }}" />
+                                    <img class="user-group-icon" src="{{ url }}" title="{{ rightsNames[group]|ucfirst }}" alt="{{ rightsNames[group] }}" />
                                 {% endfor %}
                             </td>
                             <td>
