@@ -1,5 +1,23 @@
 # Release Notes #
 
+## 3.7.0 ##
+- Update to Symfony 4.2, fix deprecations, rework directory structure.
+- T171992, T185274: Add new "Patroller Stats" and "Steward Stats" tools,
+  integrated with Admin Stats, with form to selectively choose log actions.
+- AdminStats: use icons to indicate user groups.
+- T193888: Indicate stewards in Admin Stats.
+- T205652: Allow any start/end date for the Admin Stats API (max one month).
+- T213449: Include AbuseFilter changes in Admin Stats.
+- T218390: Fix live/deleted pie chart in Edit Counter.
+- T212985: Add namespace definitions to AutoEdits config to speed up queries.
+- T214733: Fix deletion summary in Pages Created tool.
+- T213503: Localize numerals of Kurdish language.
+- EditCounter: skip projects that aren't available on the replicas.
+- TopEdits: Allow 'limit' URL parameter in per-namespace results.
+- Remove temporary rate limiting code.
+- Various code cleanup, fixing deprecations, and refactoring.
+- Localization updates.
+
 ## 3.6.22 ##
 - T214137: Add Enterprisey's AFCRHS to AutoEdits configuration.
 - T212984: Add Sagittarius fork to AutoEdits configuration.
