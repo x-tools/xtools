@@ -40,6 +40,11 @@ class AdminStatsTest extends TestAdapter
             ]);
 
         $this->asRepo = $this->getMock(AdminStatsRepository::class);
+
+        // This logic is tested with integration tests.
+        // Here we just stub empty arrays so AdminStats won't error outl.
+        $this->asRepo->method('getUserGroups')
+            ->willReturn(['local' => [], 'global' => []]);
     }
 
     /**

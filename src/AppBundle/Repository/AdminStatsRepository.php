@@ -146,7 +146,7 @@ class AdminStatsRepository extends Repository
      * Get all user groups with permissions applicable to the given 'group'.
      * @param Project $project
      * @param string $type Which 'type' we're querying for, as configured in admin_stats.yml
-     * @return array Each entry contains 'name' (user group) and 'rights' (the permissions).
+     * @return array Keys are 'local' and 'global', each an array of user groups with keys 'name' and 'rights'.
      */
     public function getUserGroups(Project $project, string $type): array
     {
@@ -156,29 +156,45 @@ class AdminStatsRepository extends Repository
         }
 
         $permissions = $this->container->getParameter('admin_stats')[$type]['permissions'];
-        $userGroups = [];
 
         $api = $this->getMediawikiApi($project);
-        $query = new SimpleRequest('query', [
+        $res = $api->getRequest(new SimpleRequest('query', [
             'meta' => 'siteinfo',
             'siprop' => 'usergroups',
-        ]);
-        $res = $api->getRequest($query);
+            'list' => 'globalgroups',
+            'ggpprop' => 'rights',
+        ]))['query'];
 
-        // If there isn't a user groups hash than let it error out... Something else must have gone horribly wrong.
-        foreach ($res['query']['usergroups'] as $userGroup) {
-            // If they are able to add and remove user groups,
-            // we'll treat them as having the 'userrights' permission.
+        $userGroups = [
+            'local' => $this->getUserGroupByLocality($res, $permissions),
+            'global' => $this->getUserGroupByLocality($res, $permissions, true),
+        ];
+
+        // Cache for a week and return.
+        return $this->setCache($cacheKey, $userGroups, 'P7D');
+    }
+
+    /**
+     * Parse user groups API response, returning groups that have any of the given permissions.
+     * @param string[][] $res API response.
+     * @param string[] $permissions Permissions to look for.
+     * @param bool $global Return global user groups instead of local.
+     */
+    private function getUserGroupByLocality(array $res, array $permissions, bool $global = false): array
+    {
+        $userGroups = [];
+
+        foreach (($global ? $res['globalgroups'] : $res['usergroups']) as $userGroup) {
+            // If they are able to add and remove user groups, we'll treat them as having the 'userrights' permission.
             if (isset($userGroup['add']) || isset($userGroup['remove'])) {
                 array_push($userGroup['rights'], 'userrights');
+                $userGroup['rights'][] = 'userrights';
             }
-
             if (count(array_intersect($userGroup['rights'], $permissions)) > 0) {
                 $userGroups[] = $userGroup['name'];
             }
         }
 
-        // Cache for a week and return.
-        return $this->setCache($cacheKey, $userGroups, 'P7D');
+        return $userGroups;
     }
 }
