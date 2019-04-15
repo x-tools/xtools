@@ -47,7 +47,7 @@ class WebProcessorMonolog
 
             // Necessary to combat abuse.
             if (null !== $session->get('logged_in_user')) {
-                $record['extra']['username'] = $session->get('logged_in_user');
+                $record['extra']['username'] = $session->get('logged_in_user')->username;
             }
 
             if (null === $session || !$session->isStarted()) {
