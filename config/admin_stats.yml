@@ -52,7 +52,7 @@ parameters:
                     - stable/config
                     - stable/modify
                 unprotect:
-                    - project/unprotect
+                    - protect/unprotect
                 rights:
                     - rights/rights
                 merge:
