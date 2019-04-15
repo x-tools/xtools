@@ -142,14 +142,14 @@
                             </th>
                             <th class="tools--count">
                                 <a href="{{ path('AutoEditsContributionsResult', {project:project.domain, username:user.username, start: ae.start, end: ae.end, namespace: ae.namespace}) }}">{{ ae.toolsTotal|num_format }}</a>
-                                {% spaceless %}
+                                {% filter spaceless %}
                                     <div class="glyphicon glyphicon-info-sign tooltipcss tooltipcss--tool-counts" role="dialog" aria-labelledby="auto-edits-tools-desc">
                                         <div id="auto-edits-tools-desc" class="tooltip-body">
                                             {% set summaryLink = "<a href='#summary'>" ~ msg('auto-edits-counts-desc-grand-total') ~ "</a>" %}
                                             {{ msg('auto-edits-counts-desc', [summaryLink]) }}
                                         </div>
                                     </div>
-                                {% endspaceless %}
+                                {% endfilter %}
                             </th>
                             <th colspan=2></th>
                         </tfoot>

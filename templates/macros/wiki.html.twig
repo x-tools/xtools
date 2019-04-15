@@ -1,22 +1,22 @@
-{% macro extLink(url, label, overrideLabel) %}{% spaceless %}
+{% macro extLink(url, label, overrideLabel) %}{% filter spaceless %}
     {% if overrideLabel is not empty %}
         {% set label = overrideLabel %}
     {% endif %}
     <a href='{{ url }}' target='_blank'>{{ label|raw }}</a>
-    {% endspaceless %}
+    {% endfilter %}
 {% endmacro %}
 
-{% macro pageUrlRaw(pageTitle, project, queryParams = null) %}{% spaceless %}
+{% macro pageUrlRaw(pageTitle, project, queryParams = null) %}{% filter spaceless %}
     {% set articlePath = project.articlePath|replace({'$1': (pageTitle|replace({' ': '_'})|e('url'))}) %}
     {{ (project.url|trim('/')) ~ articlePath ~ (queryParams is not empty ? '?' ~ queryParams : '') }}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro pageLink(page, label = null) %}{% spaceless %}
+{% macro pageLink(page, label = null) %}{% filter spaceless %}
     {% from _self import extLink as extLink %}
     {{ extLink(page.url, page.title, label) }}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro pageLinkRaw(pageTitle, project, label = null, queryString) %}{% spaceless %}
+{% macro pageLinkRaw(pageTitle, project, label = null, queryString) %}{% filter spaceless %}
     {% from _self import extLink as extLink %}
     {% from _self import pageUrlRaw as pageUrlRaw %}
     {% set url = pageUrlRaw(pageTitle, project) %}
@@ -24,9 +24,9 @@
         {% set url = url ~ '?' ~ queryString %}
     {% endif %}
     {{ extLink(url, pageTitle|replace({'_': ' '}), label) }}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro pageHistLink(page, label = null, offset = null, limit = null) %}{% spaceless %}
+{% macro pageHistLink(page, label = null, offset = null, limit = null) %}{% filter spaceless %}
     {% from _self import extLink as extLink %}
     {% set url = page.url ~ '?action=history' %}
     {% if offset is not empty %}
@@ -36,9 +36,9 @@
         {% set url = url ~ '&limit=' ~ limit %}
     {% endif %}
     {{ extLink(url, msg('history'), label) }}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro pageHistLinkRaw(pageTitle, project, label = null, offset = null, limit = null, rawUrl = false) %}{% spaceless %}
+{% macro pageHistLinkRaw(pageTitle, project, label = null, offset = null, limit = null, rawUrl = false) %}{% filter spaceless %}
     {% from _self import extLink as extLink %}
     {% from _self import pageUrlRaw as pageUrlRaw %}
     {% set pageUrl = pageUrlRaw(pageTitle, project) %}
@@ -54,37 +54,37 @@
     {% else %}
         {{ extLink(url, msg('history'), label) }}
     {% endif %}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro pageHistUrlRaw(pageTitle, project, offset = null, limit = null) %}{% spaceless %}
+{% macro pageHistUrlRaw(pageTitle, project, offset = null, limit = null) %}{% filter spaceless %}
     {% from _self import pageHistLinkRaw as pageHistLinkRaw %}
     {{ pageHistLinkRaw(pageTitle, project, null, offset, limit, true) }}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro pageInfoLink(page, label = null, section = null) %}{% spaceless %}
+{% macro pageInfoLink(page, label = null, section = null) %}{% filter spaceless %}
     {% from _self import extLink as extLink %}
     {% set projectUrl = page.project.url|trim('/') %}
     {% set url = projectUrl ~ page.project.script ~ '?action=info&title=' ~ page.title ~ (section is not empty ? '#' ~ section : '') %}
     {{ extLink(url, msg('log'), label) }}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro pageLinksInLink(page, label = null) %}{% spaceless %}
+{% macro pageLinksInLink(page, label = null) %}{% filter spaceless %}
     {% from _self import extLink as extLink %}
     {% set projectUrl = page.project.url|trim('/') %}
     {% set url = projectUrl ~ page.project.script ~ '?title=Special:WhatLinksHere/' ~ page.title ~ '&hidetrans=1' %}
     {{ extLink(url, msg('links-in'), label) }}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro pageRedirectsLink(page, label = null) %}{% spaceless %}
+{% macro pageRedirectsLink(page, label = null) %}{% filter spaceless %}
     {% from _self import extLink as extLink %}
     {% set projectUrl = page.project.url|trim('/') %}
     {% set url = projectUrl ~ page.project.script ~ '?title=Special:WhatLinksHere/' ~ page.title ~ '&hidetrans=1&hidelinks=1' %}
     {{ extLink(url, msg('redirects'), label) }}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
 {# `user` can be of type `User` or string (username) #}
 {# If the user is logged out, the link will point to Special:Contributions, otherwise their userpage #}
-{% macro userLink(user, project, label = null) %}{% spaceless %}
+{% macro userLink(user, project, label = null) %}{% filter spaceless %}
     {% from _self import extLink as extLink %}
     {% if user.username is defined %}
         {% set username = user.username %}
@@ -97,11 +97,11 @@
         {% set path = project.articlePath|replace({'$1': 'User:' ~ username|replace({' ': '_'})}) %}
     {% endif %}
     {{ extLink((project.url|trim('/')) ~ path, username, label) }}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
 {# `user` can be of type `User` or string (username) #}
 {# If the user is logged out, the link will point to Special:Contributions, otherwise their userpage #}
-{% macro userLinkWikitext(user, label = null) %}{% spaceless %}
+{% macro userLinkWikitext(user, label = null) %}{% filter spaceless %}
     {% from _self import extLink as extLink %}
     {% if user.username is defined %}
         {% set username = user.username %}
@@ -114,10 +114,10 @@
         {% set path = '[[User:' ~ username|replace({' ': '_'}) %}
     {% endif %}
     {{ path ~ (label is not empty ? '|' ~ label : '') ~ ']]' }}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
 {# `user` can be of type `User` or string (username) #}
-{% macro userLogLink(user, project, label = null, type = null, subtype = null, target = null) %}{% spaceless %}
+{% macro userLogLink(user, project, label = null, type = null, subtype = null, target = null) %}{% filter spaceless %}
     {% from _self import extLink as extLink %}
     {% set username = null %}
     {% if user.username is defined %}
@@ -139,24 +139,24 @@
         {% set url = url ~ '&page=' ~ target|replace({' ': '_'}) %}
     {% endif %}
     {{ extLink(url, msg('log'), label) }}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro logLink(project, logId, label = null) %}{% spaceless %}
+{% macro logLink(project, logId, label = null) %}{% filter spaceless %}
     {% from _self import extLink as extLink %}
     {% from _self import pageUrlRaw as pageUrlRaw %}
     {{ extLink(pageUrlRaw('Special:Redirect/logid/' ~ logId, project), logId, label) }}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro userGroupLink(group, project, label = null) %}{% spaceless %}
+{% macro userGroupLink(group, project, label = null) %}{% filter spaceless %}
     {% from _self import extLink as extLink %}
     {{ extLink(
         (project.url|trim('/')) ~ project.script ~ '?title=Special:ListUsers&creationSort=1&group=' ~ group,
         group,
         label
     )}}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro pageLogLink(page, label = null, type = null) %}{% spaceless %}
+{% macro pageLogLink(page, label = null, type = null) %}{% filter spaceless %}
     {% from _self import extLink as extLink %}
     {% set articlePath = page.project.articlePath|replace({'$1': ('Special:Log'|replace({' ': '_'}))}) %}
     {% set url = (page.project.url|trim('/')) ~ articlePath ~ '?page=' ~ page.title|replace({' ': '_'}) %}
@@ -164,9 +164,9 @@
         {% set url = url ~ '&type=' ~ type %}
     {% endif %}
     {{ extLink(url, msg('log'), label) }}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro pageLogLinkRaw(pageTitle, project, label = null, type = null, rawUrl = false) %}{% spaceless %}
+{% macro pageLogLinkRaw(pageTitle, project, label = null, type = null, rawUrl = false) %}{% filter spaceless %}
     {% from _self import extLink as extLink %}
     {% set articlePath = project.articlePath|replace({'$1': ('Special:Log'|replace({' ': '_'}))}) %}
     {% set url = (project.url|trim('/')) ~ articlePath ~ '?page=' ~ pageTitle|replace({' ': '_'})|e('url') %}
@@ -178,23 +178,23 @@
     {% else %}
         {{ extLink(url, msg('log'), label) }}
     {% endif %}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro pageLogUrlRaw(pageTitle, project, type = null) %}{% spaceless %}
+{% macro pageLogUrlRaw(pageTitle, project, type = null) %}{% filter spaceless %}
     {% from _self import pageLogLinkRaw as pageLogLinkRaw %}
     {{ pageLogLinkRaw(pageTitle, project, null, type, true) }}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
 {# `label` may be a DateTime object, in which case the formatted timestamp will be shown #}
-{% macro diffLink(edit, label = null) %}{% spaceless %}
+{% macro diffLink(edit, label = null) %}{% filter spaceless %}
     {% from _self import extLink as extLink %}
     {% if label.timestamp is defined %}
         {% set label = label|date_format %}
     {% endif %}
     {{ extLink(edit.diffUrl, msg('diff'), label) }}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro diffLinkRaw(revId, project, label = null) %}{% spaceless %}
+{% macro diffLinkRaw(revId, project, label = null) %}{% filter spaceless %}
     {% from _self import extLink as extLink %}
     {% from _self import pageUrlRaw as pageUrlRaw %}
     {% set pageUrl = pageUrlRaw('Special:Diff', project) %}
@@ -204,14 +204,14 @@
         {% set label = msg('diff') %}
     {% endif %}
     {{ extLink(pageUrl ~ '/' ~ revId, label) }}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro permaLink(edit, label = null) %}{% spaceless %}
+{% macro permaLink(edit, label = null) %}{% filter spaceless %}
     {% from _self import extLink as extLink %}
     {{ extLink(edit.permaUrl, edit.timestamp|date_format, label) }}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro permaLinkRaw(revId, project, label = null) %}{% spaceless %}
+{% macro permaLinkRaw(revId, project, label = null) %}{% filter spaceless %}
     {% from _self import extLink as extLink %}
     {% set articlePath = project.articlePath|replace({'$1': ('Special:PermaLink'|replace({' ': '_'}))}) %}
     {% set url = (project.url|trim('/')) ~ articlePath ~ '/' ~ revId %}
@@ -219,40 +219,40 @@
         {% set label = label|date_format %}
     {% endif %}
     {{ extLink(url, label) }}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro editLink(page, label = null) %}{% spaceless %}
+{% macro editLink(page, label = null) %}{% filter spaceless %}
     {% from _self import extLink as extLink %}
     {{ extLink(page.url ~ '?action=edit', msg('edit'), label) }}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro blockLogLink(username, project, label = null) %}{% spaceless %}
+{% macro blockLogLink(username, project, label = null) %}{% filter spaceless %}
     {% from _self import pageLogLinkRaw as pageLogLinkRaw %}
     {% if label is null %}
         {% set label = msg('block-log') %}
     {% endif %}
     {{ pageLogLinkRaw('User:' ~ username, project, label, 'block') }}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro gucLink(username, label = null) %}{% spaceless %}
+{% macro gucLink(username, label = null) %}{% filter spaceless %}
     {% from _self import extLink as extLink %}
     {% set url = 'https://tools.wmflabs.org/guc/?user=' ~ username|e('url') %}
     {% if label is null %}
         {% set label = msg('global-contribs') %}
     {% endif %}
     {{ extLink(url, label) }}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro pageviewsLink(page, label = null, params = null) %}{% spaceless %}
+{% macro pageviewsLink(page, label = null, params = null) %}{% filter spaceless %}
     {% from _self import extLink as extLink %}
     {% set url = 'https://tools.wmflabs.org/pageviews?project=' ~ page.project.domain ~ '&pages=' ~ page.title %}
     {% if params is not empty %}
         {% set url = url ~ '&' ~ buildQuery(params) %}
     {% endif %}
     {{ extLink(url, msg('pageviews'), label) }}
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro pageviewsLinks(page, params = null) %}{% spaceless %}
+{% macro pageviewsLinks(page, params = null) %}{% filter spaceless %}
     {% from _self import extLink as extLink %}
     {% set queryString = params is not empty ? '&' ~ buildQuery(params) : '' %}
     {{ extLink(
@@ -265,9 +265,9 @@
         'https://tools.wmflabs.org/redirectviews?project=' ~ page.project.domain ~ '&page=' ~ page.title ~ queryString,
         msg('redirects')
     )}})
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro userLinks(user, project, tool = '') %}{% spaceless %}
+{% macro userLinks(user, project, tool = '') %}{% filter spaceless %}
     {% import _self as wiki %}
     <p class="text-center xt-heading-subtitle">
         {% if tool == 'EditCounter' %}
@@ -293,9 +293,9 @@
             {{ wiki.extLink(url, msg('pageviews-userpage')) }}
         {% endif %}
     </p>
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}
 
-{% macro pageLinks(page, pageviewsDateParams = {}) %}{% spaceless %}
+{% macro pageLinks(page, pageviewsDateParams = {}) %}{% filter spaceless %}
     {% import _self as wiki %}
     <p class="text-center xt-heading-subtitle">
         {{ wiki.pageHistLink(page) }}
@@ -310,4 +310,4 @@
             {% endif %}
         {% endif %}
     </p>
-{% endspaceless %}{% endmacro %}
+{% endfilter %}{% endmacro %}

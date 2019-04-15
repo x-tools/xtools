@@ -189,10 +189,10 @@
 
 |-
 | {{ msg('block-current') }}
-| {% if user.isBlocked(project) %}[[Special:BlockList/{{ user.username }}|{% spaceless %}
+| {% if user.isBlocked(project) %}[[Special:BlockList/{{ user.username }}|{% filter spaceless %}
     {% if user.getBlockExpiry(project) == 'infinity' %}&#x221e;{# infinity #}{% else %}
         {{ user.getBlockExpiry(project)|date_format }}{% endif %}]]
-{% endspaceless %}
+{% endfilter %}
 
 {% else %}&ndash;
 {% endif %}
@@ -206,12 +206,12 @@
 {| class="wikitable sortable"
 |-
 {% set topN = 10 %}
-{% for topProj in ec.globalEditCountsTopN(topN) %}{% spaceless %}
+{% for topProj in ec.globalEditCountsTopN(topN) %}{% filter spaceless %}
 | {% if topProj.project.databaseName == project.databaseName %}&#9658;{% endif %}
 {# use project.domain instead of title due to limited space available in the interface #}
 [{{ wiki.pageUrlRaw('Special:Contributions/'~user.username, topProj.project) }} {{ topProj.project.domain }}]
 | [{{ url('TopEditsResultNamespace', {project:topProj.project.domain, username:user.username, namespace:'all'}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ topProj.total }}}}]
-{% endspaceless %}
+{% endfilter %}
 
 |-
 {% endfor %}

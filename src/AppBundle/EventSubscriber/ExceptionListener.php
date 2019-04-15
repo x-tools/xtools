@@ -14,7 +14,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\Templating\EngineInterface;
-use Twig_Error_Runtime;
 
 /**
  * A ExceptionListener ensures Twig exceptions are properly
@@ -59,7 +58,7 @@ class ExceptionListener
 
         if ($exception instanceof XtoolsHttpException) {
             $response = $this->getXtoolsHttpResponse($exception);
-        } elseif ($exception instanceof Twig_Error_Runtime && null !== $prevException) {
+        } elseif ($exception instanceof \Twig\Error\RuntimeError && null !== $prevException) {
             $response = $this->getTwigErrorResponse($prevException);
         } else {
             return;

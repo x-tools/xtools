@@ -137,10 +137,10 @@
 <div class="col-lg-6 stat-list clearfix">
     <table class="table"><tbody class="stat-list--group">
         <tr>
-            <td colspan="2" class="text-muted">{% spaceless %}
+            <td colspan="2" class="text-muted">{% filter spaceless %}
                     {{ msg('edits') }}
                     ({{ msg('live')|lower }})
-                {% endspaceless %}</td>
+                {% endfilter %}</td>
         </tr>
         <tr><td>{{ msg('last-day') }}</td><td>{{ ec.countRevisionsInLast('day')|num_format }}</td></tr>
         <tr><td>{{ msg('last-week') }}</td><td>{{ ec.countRevisionsInLast('week')|num_format }}</td></tr>
@@ -230,13 +230,13 @@
             <td>{{ msg('block-current') }}</td>
             <td>
                 {% if user.isBlocked(project) %}
-                    <a href="{{ wiki.pageUrlRaw('Special:BlockList', project)~'?wpTarget='~user.username }}">{% spaceless %}
+                    <a href="{{ wiki.pageUrlRaw('Special:BlockList', project)~'?wpTarget='~user.username }}">{% filter spaceless %}
                             {% if user.getBlockExpiry(project) == 'infinity' %}
                                 &#x221e; {# infinity #}
                             {% else %}
                                 {{ user.getBlockExpiry(project)|date_format }}
                             {% endif %}
-                        {% endspaceless %}</a>
+                        {% endfilter %}</a>
                 {% else %}
                     &ndash;
                 {% endif %}
@@ -261,12 +261,12 @@
                 <td>{{ ec.averageRevisionsPerPage|num_format }}</td>
             </tr>
             <tr>
-                <td>{% spaceless %}
+                <td>{% filter spaceless %}
                     <a class="glyphicon glyphicon-info-sign tooltipcss tooltipcss--pages-created" href="https://xtools.readthedocs.io/en/latest/tools/editcounter.html#general-statistics" role="dialog" aria-labelledby="pages-created-desc">
                         <div id="pages-created-desc" class="tooltip-body">{{ msg('pages-created-tooltip') }}</div>
                     </a>
                     {{ msg('pages-created') }}
-                {% endspaceless %}</td>
+                {% endfilter %}</td>
                 <td>
                     <a href="{{ path('PagesResult', {project:project.domain, username:user.username, namespace:'all', redirects:'noredirects'}) }}">{{ ec.countPagesCreated|num_format }}</a>
                     <span class="text-muted">({{ msg('pages-created-since-deleted', [ec.countPagesCreatedDeleted|num_format]) }})</span>

@@ -17,12 +17,14 @@ use Doctrine\DBAL\Connection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Twig_Extension;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 /**
  * Twig functions and filters for XTools.
  */
-class AppExtension extends Twig_Extension
+class AppExtension extends AbstractExtension
 {
     /** @var ContainerInterface The application's container interface. */
     protected $container;
@@ -62,42 +64,42 @@ class AppExtension extends Twig_Extension
 
     /**
      * Get all functions that this class provides.
-     * @return \Twig_SimpleFunction[]
+     * @return TwigFunction[]
      */
     public function getFunctions(): array
     {
         $options = ['is_safe' => ['html']];
         return [
-            new \Twig_SimpleFunction('request_time', [$this, 'requestTime'], $options),
-            new \Twig_SimpleFunction('memory_usage', [$this, 'requestMemory'], $options),
-            new \Twig_SimpleFunction('msgIfExists', [$this, 'msgIfExists'], $options),
-            new \Twig_SimpleFunction('msgExists', [$this, 'msgExists'], $options),
-            new \Twig_SimpleFunction('msg', [$this, 'msg'], $options),
-            new \Twig_SimpleFunction('lang', [$this, 'getLang'], $options),
-            new \Twig_SimpleFunction('langName', [$this, 'getLangName'], $options),
-            new \Twig_SimpleFunction('fallbackLangs', [$this, 'getFallbackLangs', $options]),
-            new \Twig_SimpleFunction('allLangs', [$this, 'getAllLangs']),
-            new \Twig_SimpleFunction('isRTL', [$this, 'isRTL']),
-            new \Twig_SimpleFunction('shortHash', [$this, 'gitShortHash']),
-            new \Twig_SimpleFunction('hash', [$this, 'gitHash']),
-            new \Twig_SimpleFunction('releaseDate', [$this, 'gitDate']),
-            new \Twig_SimpleFunction('enabled', [$this, 'tabEnabled']),
-            new \Twig_SimpleFunction('tools', [$this, 'tools']),
-            new \Twig_SimpleFunction('color', [$this, 'getColorList']),
-            new \Twig_SimpleFunction('chartColor', [$this, 'chartColor']),
-            new \Twig_SimpleFunction('isSingleWiki', [$this, 'isSingleWiki']),
-            new \Twig_SimpleFunction('getReplagThreshold', [$this, 'getReplagThreshold']),
-            new \Twig_SimpleFunction('isWMFLabs', [$this, 'isWMFLabs']),
-            new \Twig_SimpleFunction('replag', [$this, 'replag']),
-            new \Twig_SimpleFunction('quote', [$this, 'quote']),
-            new \Twig_SimpleFunction('bugReportURL', [$this, 'bugReportURL']),
-            new \Twig_SimpleFunction('logged_in_user', [$this, 'loggedInUser']),
-            new \Twig_SimpleFunction('isUserAnon', [$this, 'isUserAnon']),
-            new \Twig_SimpleFunction('nsName', [$this, 'nsName']),
-            new \Twig_SimpleFunction('titleWithNs', [$this, 'titleWithNs']),
-            new \Twig_SimpleFunction('formatDuration', [$this, 'formatDuration']),
-            new \Twig_SimpleFunction('numberFormat', [$this, 'numberFormat']),
-            new \Twig_SimpleFunction('buildQuery', [$this, 'buildQuery']),
+            new TwigFunction('request_time', [$this, 'requestTime'], $options),
+            new TwigFunction('memory_usage', [$this, 'requestMemory'], $options),
+            new TwigFunction('msgIfExists', [$this, 'msgIfExists'], $options),
+            new TwigFunction('msgExists', [$this, 'msgExists'], $options),
+            new TwigFunction('msg', [$this, 'msg'], $options),
+            new TwigFunction('lang', [$this, 'getLang'], $options),
+            new TwigFunction('langName', [$this, 'getLangName'], $options),
+            new TwigFunction('fallbackLangs', [$this, 'getFallbackLangs', $options]),
+            new TwigFunction('allLangs', [$this, 'getAllLangs']),
+            new TwigFunction('isRTL', [$this, 'isRTL']),
+            new TwigFunction('shortHash', [$this, 'gitShortHash']),
+            new TwigFunction('hash', [$this, 'gitHash']),
+            new TwigFunction('releaseDate', [$this, 'gitDate']),
+            new TwigFunction('enabled', [$this, 'tabEnabled']),
+            new TwigFunction('tools', [$this, 'tools']),
+            new TwigFunction('color', [$this, 'getColorList']),
+            new TwigFunction('chartColor', [$this, 'chartColor']),
+            new TwigFunction('isSingleWiki', [$this, 'isSingleWiki']),
+            new TwigFunction('getReplagThreshold', [$this, 'getReplagThreshold']),
+            new TwigFunction('isWMFLabs', [$this, 'isWMFLabs']),
+            new TwigFunction('replag', [$this, 'replag']),
+            new TwigFunction('quote', [$this, 'quote']),
+            new TwigFunction('bugReportURL', [$this, 'bugReportURL']),
+            new TwigFunction('logged_in_user', [$this, 'loggedInUser']),
+            new TwigFunction('isUserAnon', [$this, 'isUserAnon']),
+            new TwigFunction('nsName', [$this, 'nsName']),
+            new TwigFunction('titleWithNs', [$this, 'titleWithNs']),
+            new TwigFunction('formatDuration', [$this, 'formatDuration']),
+            new TwigFunction('numberFormat', [$this, 'numberFormat']),
+            new TwigFunction('buildQuery', [$this, 'buildQuery']),
         ];
     }
 
@@ -501,17 +503,17 @@ class AppExtension extends Twig_Extension
 
     /**
      * Get all filters for this extension.
-     * @return \Twig_SimpleFilter[]
+     * @return TwigFilter[]
      */
     public function getFilters(): array
     {
         return [
-            new \Twig_SimpleFilter('ucfirst', [$this, 'capitalizeFirst']),
-            new \Twig_SimpleFilter('percent_format', [$this, 'percentFormat']),
-            new \Twig_SimpleFilter('diff_format', [$this, 'diffFormat'], ['is_safe' => ['html']]),
-            new \Twig_SimpleFilter('num_format', [$this, 'numberFormat']),
-            new \Twig_SimpleFilter('date_format', [$this, 'dateFormat']),
-            new \Twig_SimpleFilter('wikify', [$this, 'wikify']),
+            new TwigFilter('ucfirst', [$this, 'capitalizeFirst']),
+            new TwigFilter('percent_format', [$this, 'percentFormat']),
+            new TwigFilter('diff_format', [$this, 'diffFormat'], ['is_safe' => ['html']]),
+            new TwigFilter('num_format', [$this, 'numberFormat']),
+            new TwigFilter('date_format', [$this, 'dateFormat']),
+            new TwigFilter('wikify', [$this, 'wikify']),
         ];
     }
 
