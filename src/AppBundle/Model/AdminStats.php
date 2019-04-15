@@ -119,12 +119,12 @@ class AdminStats extends Model
         }
 
         /**
-         * Each user group that is considered capable of making the relevant actions for $this->group.
+         * All the user groups that are considered capable of making the relevant actions for $this->group.
          * @var string[]
          */
         $groupUserGroups = $this->getRepository()->getUserGroups($this->project, $this->type);
 
-        $this->usersAndGroups = $this->project->getUsersInGroups($groupUserGroups);
+        $this->usersAndGroups = $this->project->getUsersInGroups($groupUserGroups['local'], $groupUserGroups['global']);
 
         // Populate $this->usersInGroup with users who are in the relevant user group for $this->group.
         $this->usersInGroup = array_keys(array_filter($this->usersAndGroups, function ($groups) {

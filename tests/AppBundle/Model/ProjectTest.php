@@ -208,12 +208,12 @@ class ProjectTest extends TestAdapter
         $projectRepo->expects(static::once())
             ->method('getUsersInGroups')
             ->willReturn([
-                ['user_name' => 'Bob', 'ug_group' => 'sysop'],
-                ['user_name' => 'Bob', 'ug_group' => 'checkuser'],
-                ['user_name' => 'Julie', 'ug_group' => 'sysop'],
-                ['user_name' => 'Herald', 'ug_group' => 'oversight'],
-                ['user_name' => 'Isosceles', 'ug_group' => 'oversight'],
-                ['user_name' => 'Isosceles', 'ug_group' => 'sysop'],
+                ['user_name' => 'Bob', 'user_group' => 'sysop'],
+                ['user_name' => 'Bob', 'user_group' => 'checkuser'],
+                ['user_name' => 'Julie', 'user_group' => 'sysop'],
+                ['user_name' => 'Herald', 'user_group' => 'oversight'],
+                ['user_name' => 'Isosceles', 'user_group' => 'oversight'],
+                ['user_name' => 'Isosceles', 'user_group' => 'sysop'],
             ]);
         $project = new Project('testWiki');
         $project->setRepository($projectRepo);
@@ -224,7 +224,7 @@ class ProjectTest extends TestAdapter
                 'Herald' => ['oversight'],
                 'Isosceles' => ['oversight', 'sysop'],
             ],
-            $project->getUsersInGroups(['sysop', 'oversight'])
+            $project->getUsersInGroups(['sysop', 'checkuser'], [])
         );
     }
 }

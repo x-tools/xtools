@@ -248,19 +248,20 @@ class Project extends Model
 
     /**
      * Get a list of users who are in one of the given user groups.
-     * @param string[] User groups to search for.
+     * @param string[] $groups User groups to search for.
+     * @param string[] $globalGroups Global groups to search for.
      * @return string[] User groups keyed by user name.
      */
-    public function getUsersInGroups(array $groups): array
+    public function getUsersInGroups(array $groups, array $globalGroups): array
     {
         $users = [];
-        $usersAndGroups = $this->getRepository()->getUsersInGroups($this, $groups);
+        $usersAndGroups = $this->getRepository()->getUsersInGroups($this, $groups, $globalGroups);
         foreach ($usersAndGroups as $userAndGroup) {
             $username = $userAndGroup['user_name'];
             if (isset($users[$username])) {
-                array_push($users[$username], $userAndGroup['ug_group']);
+                $users[$username][] = $userAndGroup['user_group'];
             } else {
-                $users[$username] = [$userAndGroup['ug_group']];
+                $users[$username] = [$userAndGroup['user_group']];
             }
         }
         return $users;
