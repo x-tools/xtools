@@ -166,8 +166,14 @@ class AdminStatsRepository extends Repository
         ]))['query'];
 
         $userGroups = [
-            'local' => $this->getUserGroupByLocality($res, $permissions),
-            'global' => $this->getUserGroupByLocality($res, $permissions, true),
+            'local' => array_unique(array_merge(
+                $this->getUserGroupByLocality($res, $permissions),
+                $this->container->getParameter('admin_stats')[$type]['extra_user_groups']
+            )),
+            'global' => array_unique(array_merge(
+                $this->getUserGroupByLocality($res, $permissions, true),
+                $this->container->getParameter('admin_stats')[$type]['extra_user_groups']
+            )),
         ];
 
         // Cache for a week and return.
@@ -176,9 +182,10 @@ class AdminStatsRepository extends Repository
 
     /**
      * Parse user groups API response, returning groups that have any of the given permissions.
-     * @param string[][] $res API response.
+     * @param array[] $res API response.
      * @param string[] $permissions Permissions to look for.
      * @param bool $global Return global user groups instead of local.
+     * @return array[]
      */
     private function getUserGroupByLocality(array $res, array $permissions, bool $global = false): array
     {
