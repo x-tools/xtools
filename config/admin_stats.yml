@@ -17,6 +17,7 @@ parameters:
     admin_stats:
         admin:
             user_group: sysop
+            extra_user_groups: ['bot', 'checkuser']
             permissions:
                 - abusefilter-modify
                 - block
@@ -67,6 +68,7 @@ parameters:
 
         patroller:
             user_group: patroller
+            extra_user_groups: ['bot']
             permissions:
                 - patrol
                 - review
@@ -85,6 +87,7 @@ parameters:
 
         steward:
             user_group: steward
+            extra_user_groups: ['bot']
             permissions:
                 - centralauth-rename
                 - globalblock
