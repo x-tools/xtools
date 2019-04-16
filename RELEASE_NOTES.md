@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.7.1 ##
+- T213119: Indicate CheckUsers, bots and AbuseFilter managers in AdminStats.
+- T193888: Indicate global sysops in Admin Stats.
+- Fix translation error in bg.json causing fatal runtime Twig exception.
+
 ## 3.7.0 ##
 - Update to Symfony 4.2, fix deprecations, rework directory structure.
 - T171992, T185274: Add new "Patroller Stats" and "Steward Stats" tools,
