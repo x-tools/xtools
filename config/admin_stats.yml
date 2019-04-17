@@ -98,8 +98,11 @@ parameters:
                 # TODO: Could be used for non-WMF installations, but otherwise only global-rename applies these days.
                 #rename:
                 #    - renameuser/renameuser
+                global-account-un-lock:
+                    - globalauth/setstatus
                 global-block:
                     - gblblock/gblock
+                    - gblblock/gblock2
                     - gblblock/modify
                 global-unblock:
                     - gblblock/gunblock
