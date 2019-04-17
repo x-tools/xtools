@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.7.2 ##
+- AdminStats: Add account locks to Steward Stats config.
+- AdminStats: Include gblock2 log action as part of global blocks
+  in Steward Stats.
+
 ## 3.7.1 ##
 - T213119: Indicate CheckUsers, bots and AbuseFilter managers in AdminStats.
 - T193888: Indicate global sysops in Admin Stats.
