@@ -4,7 +4,7 @@
 {% block body %}
     <form class="col-lg-8 col-lg-offset-2" action="{{ path('meta') }}" method="get" accept-charset="utf-8" >
         <fieldset class="form-fieldset">
-            {{ forms.date_input('start', true, '2017-07-10') }}
+            {{ forms.date_input('start', true, '2019-04-17') }}
             {{ forms.date_input('end', true, 'now'|date('Y-m-d')) }}
         </fieldset>
         {{ forms.submit_btn() }}
