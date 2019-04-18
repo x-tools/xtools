@@ -455,7 +455,8 @@ parameters:
         Reply link:
             regex: '\(\[\[w:en:User:Enterprisey\/reply-link\|reply-link\]\]\)'
             link: User:Enterprisey/reply-link
-            talk_namespaces: true
+            talk_namespaces: true,
+            contribs: true
         Short description:
             regex: '\(\[\[User:Galobtter\/Shortdesc helper\|Shortdesc helper\]\]\)'
             link: User:Galobtter/Shortdesc helper
