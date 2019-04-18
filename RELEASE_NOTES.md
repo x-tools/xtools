@@ -1,5 +1,16 @@
 # Release Notes #
 
+## 3.7.3 ##
+- ArticleInfo: fix first/latest edit datestamps.
+- EditCounter: fix Timecard section definition.
+- T221352: Add RequestDeletion to wikidata AutoEdits config.
+- T212927: Add Script Installer to enwiki AutoEdits config.
+- T213019: Add Shortdesc helper to enwiki AutoEdits config.
+- T212925: Add reply-link to enwiki AutoEdits config.
+- T214005: Add effp-helper to enwiki AutoEdits config.
+- T217091: Improve Cat-a-Lot config in AutoEdits.
+- Fix formatting of copyright year in footer.
+
 ## 3.7.2 ##
 - AdminStats: Add account locks to Steward Stats config.
 - AdminStats: Include gblock2 log action as part of global blocks
