@@ -67,7 +67,7 @@ parameters:
             regex: '\|HotCat\]\]|Gadget-Hotcat(?:check)?\.js\|Script|\]\] via HotCat|\[\[WP:HC\|'
             link: Special:MyLanguage/Project:HotCat
         Cat-a-lot:
-            regex: '\[\[Help:Cat-a-lot\|Cat-a-lot\]\]'
+            regex: 'Help:Cat-a-lot\|Cat-a-lot\]\]|\(CatAlot\)'
             link: commons:Cat-a-lot
         Global rename:
             regex: 'Automatically moved page while renaming the user'
@@ -354,8 +354,8 @@ parameters:
             regex: '\[\[w:en:WP:RLR\|You can help!'
             link: en:WP:RLR
         Script Installer:
-            regex: '\[\[User:Equazcion\/ScriptInstaller\|Script Installer'
-            link: User:Equazcion/ScriptInstaller
+            regex: '\[\[User:Equazcion\/ScriptInstaller\|Script Installer|\(\[\[User:Enterprisey\/script-installer\|script-installer\]\]\)'
+            link: User:Enterprisey/script-installer
             namespaces: [2]
         findargdups:
             regex: '\[\[:en:User:Frietjes\/findargdups'
@@ -448,6 +448,18 @@ parameters:
         YABBR:
             tag: 'OAuth CID: 860'
             link: User:Enterprisey/YABBR
+            namespaces: [0]
+        effp-helper:
+            regex: '\(\[\[User:Suffusion of Yellow\/effp-helper(\.js)?\|effp-helper\]\]\)'
+            link: User:Suffusion of Yellow/effp-helper
+        Reply link:
+            regex: '\(\[\[w:en:User:Enterprisey\/reply-link\|reply-link\]\]\)'
+            link: User:Enterprisey/reply-link
+            talk_namespaces: true,
+            contribs: true
+        Short description:
+            regex: '\(\[\[User:Galobtter\/Shortdesc helper\|Shortdesc helper\]\]\)'
+            link: User:Galobtter/Shortdesc helper
             namespaces: [0]
     ko.wikipedia.org:
         AutoWikiBrowser:
