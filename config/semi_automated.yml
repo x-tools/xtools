@@ -67,7 +67,7 @@ parameters:
             regex: '\|HotCat\]\]|Gadget-Hotcat(?:check)?\.js\|Script|\]\] via HotCat|\[\[WP:HC\|'
             link: Special:MyLanguage/Project:HotCat
         Cat-a-lot:
-            regex: '\[\[Help:Cat-a-lot\|Cat-a-lot\]\]|\(CatAlot\)|\[\[c:Help:Cat-a-lot\|Cat-a-lot\]\]'
+            regex: 'Help:Cat-a-lot\|Cat-a-lot\]\]|\(CatAlot\)'
             link: commons:Cat-a-lot
         Global rename:
             regex: 'Automatically moved page while renaming the user'
@@ -452,12 +452,11 @@ parameters:
         effp-helper:
             regex: '\(\[\[User:Suffusion of Yellow\/effp-helper(\.js)?\|effp-helper\]\]\)'
             link: User:Suffusion of Yellow/effp-helper
-            namespaces: [0]
-      Reply link:
+        Reply link:
             regex: '\(\[\[w:en:User:Enterprisey\/reply-link\|reply-link\]\]\)'
             link: User:Enterprisey/reply-link
             talk_namespaces: true
-      Short description:
+        Short description:
             regex: '\(\[\[User:Galobtter\/Shortdesc helper\|Shortdesc helper\]\]\)'
             link: User:Galobtter/Shortdesc helper
             namespaces: [0]
