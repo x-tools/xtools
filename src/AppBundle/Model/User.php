@@ -15,14 +15,8 @@ use Exception;
  */
 class User extends Model
 {
-    /** @var int The user's ID. */
-    protected $id;
-
     /** @var string The user's username. */
     protected $username;
-
-    /** @var DateTime|bool Expiry of the current block of the user. */
-    protected $blockExpiry;
 
     /** @var int Quick cache of edit counts, keyed by project domain. */
     protected $editCounts = [];
@@ -77,6 +71,21 @@ class User extends Model
     }
 
     /**
+     * Get the user's actor ID on the given project.
+     * @param Project $project
+     * @return int
+     */
+    public function getActorId(Project $project): int
+    {
+        $ret = $this->getRepository()->getActorId(
+            $project->getDatabaseName(),
+            $this->getUsername()
+        );
+
+        return (int)$ret['actorId'];
+    }
+
+    /**
      * Get the user's registration date on the given project.
      * @param Project $project
      * @return DateTime|null null if no registration date was found.
@@ -105,7 +114,7 @@ class User extends Model
 
     /**
      * Get a list of this user's global rights.
-     * @param Project $project A project to query; if not provided, the default will be used.
+     * @param Project|null $project A project to query; if not provided, the default will be used.
      * @return string[]
      */
     public function getGlobalUserRights(?Project $project = null): array
@@ -125,7 +134,7 @@ class User extends Model
             return $this->editCounts[$domain];
         }
 
-        $this->editCounts[$domain] = (int) $this->getRepository()->getEditCount(
+        $this->editCounts[$domain] = (int)$this->getRepository()->getEditCount(
             $project->getDatabaseName(),
             $this->getUsername()
         );
@@ -149,8 +158,7 @@ class User extends Model
      */
     public function existsOnProject(Project $project): bool
     {
-        $id = $this->getId($project);
-        return $id > 0;
+        return $this->getId($project) > 0;
     }
 
     /**
@@ -169,7 +177,7 @@ class User extends Model
      */
     public function isAnon(): bool
     {
-        return (bool) filter_var($this->username, FILTER_VALIDATE_IP);
+        return (bool)filter_var($this->username, FILTER_VALIDATE_IP);
     }
 
     /**
@@ -179,24 +187,18 @@ class User extends Model
      */
     public function getBlockExpiry(Project $project)
     {
-        if (isset($this->blockExpiry)) {
-            return $this->blockExpiry;
-        }
-
         $expiry = $this->getRepository()->getBlockExpiry(
             $project->getDatabaseName(),
             $this->getUsername()
         );
 
         if ('infinity' === $expiry) {
-            $this->blockExpiry = true;
+            return true;
         } elseif (false === $expiry) {
-            $this->blockExpiry = false;
+            return false;
         } else {
-            $this->blockExpiry = new DateTime($expiry);
+            return new DateTime($expiry);
         }
-
-        return $this->blockExpiry;
     }
 
     /**
