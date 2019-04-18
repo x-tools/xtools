@@ -34,7 +34,7 @@ class EditCounterController extends XtoolsController
         'namespace-totals' => 'EditCounterNamespaceTotals',
         'year-counts' => 'EditCounterYearCounts',
         'month-counts' => 'EditCounterMonthCounts',
-        'timecard' => 'EditCounterRightsChanges',
+        'timecard' => 'EditCounterTimecard',
         'top-edited-pages' => 'TopEditsResultNamespace',
         'rights-changes' => 'EditCounterRightsChanges',
         'latest-global-edits' => 'EditCounterLatestGlobalContribs',
