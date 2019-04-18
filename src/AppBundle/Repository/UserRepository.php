@@ -39,7 +39,7 @@ class UserRepository extends Repository
      * Get the user's ID and registration date.
      * @param string $databaseName The database to query.
      * @param string $username The username to find.
-     * @return array|false With keys 'userId' and 'regDate'. false if user not found.
+     * @return array|false With keys 'userId' and regDate'. false if user not found.
      */
     public function getIdAndRegistration(string $databaseName, string $username)
     {
@@ -60,34 +60,33 @@ class UserRepository extends Repository
     }
 
     /**
-     * Get the user's registration date.
-     * @param string $databaseName The database to query.
-     * @param string $username The username to find.
-     * @return string|null As returned by the database. Some very old accounts may return null.
+     * Get the user's actor ID.
+     * @param string $databaseName
+     * @param string $username
+     * @return int|null
      */
-    public function getRegistrationDate(string $databaseName, string $username): ?string
+    public function getActorId(string $databaseName, string $username): int
     {
-        $cacheKey = $this->getCacheKey(func_get_args(), 'user_registration');
-        if ($this->cache->hasItem($cacheKey)) {
-            return $this->cache->getItem($cacheKey)->get();
-        }
+        $cacheKey = $this->getCacheKey(func_get_args(), 'user_actor_id');
+        $actorTable = $this->getTableName($databaseName, 'actor');
 
-        $userTable = $this->getTableName($databaseName, 'user');
-        $sql = "SELECT user_registration FROM $userTable WHERE user_name = :username LIMIT 1";
+        $sql = "SELECT actor_id
+                FROM $actorTable
+                WHERE actor_name = :username
+                LIMIT 1";
         $resultQuery = $this->executeProjectsQuery($sql, ['username' => $username]);
-        $registrationDate = $resultQuery->fetchColumn();
 
         // Cache and return.
-        return $this->setCache($cacheKey, $registrationDate);
+        return (int)$this->setCache($cacheKey, $resultQuery->fetch());
     }
 
     /**
      * Get the user's (system) edit count.
      * @param string $databaseName The database to query.
      * @param string $username The username to find.
-     * @return string|null As returned by the database.
+     * @return string|false As returned by the database.
      */
-    public function getEditCount(string $databaseName, string $username): ?string
+    public function getEditCount(string $databaseName, string $username)
     {
         // Quick cache of edit count, valid on for the same request.
         static $editCount = null;
@@ -99,13 +98,11 @@ class UserRepository extends Repository
         $sql = "SELECT user_editcount FROM $userTable WHERE user_name = :username LIMIT 1";
         $resultQuery = $this->executeProjectsQuery($sql, ['username' => $username]);
 
-        $editCount = $resultQuery->fetchColumn();
-        return $editCount;
+        return $resultQuery->fetchColumn();
     }
 
     /**
-     * Search the ipblocks table to see if the user is currently blocked
-     * and return the expiry if they are.
+     * Search the ipblocks table to see if the user is currently blocked and return the expiry if they are.
      * @param string $databaseName The database to query.
      * @param string $username The username of the user to search for.
      * @return bool|string Expiry of active block or false
