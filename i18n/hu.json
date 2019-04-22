@@ -39,6 +39,8 @@
 	"article": "szócikk",
 	"assessment": "Értékelés",
 	"assessments": "Értékelések",
+	"auto-contribs-desc": "Egy szerkesztő (fél)automata  közreműködéseinek megtekintése.",
+	"auto-contribs-use-tool": "Csak a következő eszközzel végzet szerkesztések megjelenítése:",
 	"auto-edits": "(fél-)automata szerkesztések",
 	"auto-edits-request": "Kérjen egy új (fél-)automatizált eszközt",
 	"auto-edits-request-doc": "Az eszköz kezdőlapjára vagy dokumentációjára mutató link",
