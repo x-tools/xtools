@@ -508,3 +508,6 @@ parameters:
         RequestDeletion:
             regex: '\[\[MediaWiki talk:Gadget-RequestDeletion\.js\|RD\]\]'
             link: MediaWiki talk:Gadget-RequestDeletion.js
+        QuickStatements:
+            regex: '#quickstatements'
+            link: Help:QuickStatements
