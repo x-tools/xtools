@@ -1368,6 +1368,11 @@ class ArticleInfo extends Model
 
         $textshares = [];
 
+        // Used to get the character count and percentage of the remaining N editors, after the top $limit.
+        $percentageSum = 0;
+        $countSum = 0;
+        $numEditors = 0;
+
         // Loop through once more, creating an array with the user names (or IP addresses)
         // as the key, and the count and percentage as the value.
         foreach ($countsToProcess as $editor => $count) {
@@ -1376,9 +1381,19 @@ class ArticleInfo extends Model
             } else {
                 $index = $editor;
             }
+
+            $percentage = round(100 * ($count / $totalCount), 1);
+
+            // If we are showing > 10 editors in the table, we still only want the top 10 for the chart.
+            if ($numEditors < 10) {
+                $percentageSum += $percentage;
+                $countSum += $count;
+                $numEditors++;
+            }
+
             $textshares[$index] = [
                 'count' => $count,
-                'percentage' => round(100 * ($count / $totalCount), 1),
+                'percentage' => $percentage,
             ];
         }
 
@@ -1387,6 +1402,15 @@ class ArticleInfo extends Model
             'totalAuthors' => count($counts),
             'totalCount' => $totalCount,
         ];
+
+        // Record character count and percentage for the remaining editors.
+        if ($percentageSum < 100) {
+            $this->textshares['others'] = [
+                'count' => $totalCount - $countSum,
+                'percentage' => round(100 - $percentageSum, 1),
+                'numEditors' => count($counts) - $numEditors,
+            ];
+        }
 
         return $this->textshares;
     }

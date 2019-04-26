@@ -214,13 +214,13 @@ class ArticleInfoController extends XtoolsController
 
         $isSubRequest = $this->request->get('htmlonly')
             || null !== $this->get('request_stack')->getParentRequest();
-
-        $limit = $isSubRequest ? 10 : null;
+        $limit = $isSubRequest ? 10 : ($this->limit ?? 500);
 
         return $this->getFormattedResponse('articleInfo/textshares', [
             'xtPage' => 'ArticleInfo',
             'xtTitle' => $this->page->getTitle(),
             'textshares' => $articleInfo->getTextshares($limit),
+            'limit' => $limit,
             'is_sub_request' => $isSubRequest,
         ]);
     }

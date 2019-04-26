@@ -53,7 +53,7 @@
         </p>
     </div>
 {% else %}
-    <table class="table table-bordered table-hover table-striped textshares-table toggle-table">
+    <table class="table table-bordered table-hover table-striped textshares-table pull-left">
         <thead>
         {% for key in ['rank', 'username', 'links', 'characters', 'percentage'] %}
             <th>
@@ -65,6 +65,7 @@
         {% endfor %}
         </thead>
         <tbody>
+            {## Computed #}
             {% set totalPercentage = 0 %}
             {% set totalCount = 0 %}
             {% for username, values in textshares.list %}
@@ -74,8 +75,7 @@
                     <td class="sort-entry--rank" data-value="{{ loop.index }}">{{ loop.index|num_format }}</td>
                     <td class="sort-entry--username" data-value="{{ username }}">
                         <span class="textshares-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ username }}">
-                            <span class="glyphicon glyphicon-remove"></span>
-                            <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
+                            <span class="color-icon" style="background:{{ chartColor(min(10, loop.index0)) }}"></span>
                         </span>
                         {{ wiki.userLink(username, project) }}
                     </td>
@@ -97,21 +97,24 @@
                 </tr>
             {% endfor %}
         </tbody>
-        {% if textshares.totalAuthors > 10 and is_sub_request == true %}
+        {% if textshares.others is defined and is_sub_request %}
             <tfoot><tr class="show-more-row">
                 <td></td>
                 <td>
+                    <span class="textshares-toggle toggle-table--toggle" data-index="{{ textshares.list|length }}" data-key="others">
+                        <span class="color-icon" style="background:{{ chartColor(textshares.list|length) }}"></span>
+                    </span>
                     <a href="{{ path('ArticleInfoAuthorshipResult', {project:project.domain, page:page.title})}}">
-                        {{ (textshares.totalAuthors - 10)|num_format }}
-                        {{ msg('num-others', [textshares.totalAuthors - 10]) }}
+                        {{ textshares.others.numEditors|num_format }}
+                        {{ msg('num-others', [textshares.others.numEditors]) }}
                     </a>
                 </td>
                 <td></td>
                 <td>
-                    {{ (textshares.totalCount - totalCount)|num_format }}
+                    {{ textshares.others.count|num_format }}
                 </td>
                 <td>
-                    {{ (100 - totalPercentage)|percent_format }}
+                    {{ textshares.others.percentage|percent_format }}
                 </td>
             </tr></tfoot>
         {% endif %}
@@ -128,20 +131,28 @@
         <canvas id="textshares_chart" width="{{ height }}" height="{{ height }}"></canvas>
     </div>
 
+    {## Get all 11 colours, though we might not use all of them. #}
     {% set colors = [] %}
-    {% for i in 0..(textshares.list|length) %}
+    {% for i in 0..10 %}
         {% set colors = colors|merge([chartColor(i)]) %}
     {% endfor %}
+
+    {% set labels = textshares.list|keys|slice(0, 10) %}
+    {% if textshares.others is defined %}
+        {% set labels = labels|merge([textshares.others.numEditors ~ ' ' ~ msg('num-others', [textshares.others.numEditors])]) %}
+    {% endif %}
+
     <script>
         window.textsharesChart = new Chart($('#textshares_chart'), {
             type: 'pie',
             data: {
-                labels: {{ textshares.list|keys|json_encode()|raw }},
+                labels: {{ labels|json_encode()|raw }},
                 datasets: [{
                     data: [
-                        {% for username, values in textshares.list %}
+                        {% for username, values in textshares.list|slice(0, 10) %}
                             {{ values.percentage }}{% if not loop.last %},{% endif %}
                         {% endfor %}
+                        {% if textshares.others is defined %},{{ textshares.others.percentage }}{% endif %}
                     ],
                     backgroundColor: {{ colors|json_encode()|raw }},
                     borderColor: {{ colors|json_encode()|raw }},
