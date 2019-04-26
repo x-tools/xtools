@@ -412,6 +412,7 @@ class ArticleInfoTest extends TestAdapter
      */
     public function testTextshares(): void
     {
+        /** @var ArticleInfoRepository $articleInfoRepo */
         $articleInfoRepo = $this->getMock(ArticleInfoRepository::class);
         $articleInfoRepo->expects($this->once())
             ->method('getTextshares')
@@ -458,6 +459,11 @@ class ArticleInfoTest extends TestAdapter
                 ],
                 'totalAuthors' => 3,
                 'totalCount' => 16,
+                'others' => [
+                    'count' => 3,
+                    'percentage' => 18.7,
+                    'numEditors' => 1,
+                ],
             ],
             $this->articleInfo->getTextshares(2)
         );

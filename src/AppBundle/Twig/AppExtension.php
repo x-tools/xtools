@@ -385,6 +385,7 @@ class AppExtension extends AbstractExtension
             'rgba(141, 211, 199, 1)',
             'rgba(252, 205, 229, 1)',
             'rgba(255, 247, 161, 1)',
+            'rgba(252, 146, 114, 1)',
             'rgba(217, 217, 217, 1)',
         ];
 
