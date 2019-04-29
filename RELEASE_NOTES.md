@@ -1,5 +1,12 @@
 # Release Notes #
 
+## 3.7.4 ##
+- T221727: add QuickStatements to wikidata AutoEdits config.
+- T222049: Fix links to AbuseFilter log in Edit Counter.
+- ArticleInfo: add 'n others' slice to authorship chart, adjust colours,
+  and limit subrequest view to 500 results.
+- Localization updates.
+
 ## 3.7.3 ##
 - ArticleInfo: fix first/latest edit datestamps.
 - EditCounter: fix Timecard section definition.
