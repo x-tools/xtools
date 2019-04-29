@@ -178,7 +178,13 @@
 | {{ msg('import') }}
 | [{{ wiki.pageUrlRaw('Special:Log/import/' ~ user.username, project) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesImported }}}}]
 |-
+{% if isWMFLabs() %}
+| {{ msg('abusefilter') }}
+| [{{ wiki.pageUrlRaw('Special:Log/abusefilter/' ~ user.username, project) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countAbuseFilterChanges }}}}]
+|-
+{% endif %}
 |}
+
 {% endif %}{% endif %}
 {# ======================== BLOCKS ======================== #}
 === {{ msg('re-blocks') }} ===

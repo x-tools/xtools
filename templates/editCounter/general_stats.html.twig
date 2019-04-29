@@ -406,7 +406,7 @@
                     {% if isWMFLabs() %}
                         <tr>
                             <td>{{ msg('abusefilter') }}</td>
-                            <td>{{ wiki.userLogLink(user, project, ec.countAbuseFilterChanges) }}</td>
+                            <td>{{ wiki.userLogLink(user, project, ec.countAbuseFilterChanges, 'abusefilter') }}</td>
                         </tr>
                     {% endif %}
                 </tbody>
