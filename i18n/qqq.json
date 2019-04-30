@@ -462,7 +462,7 @@
 	"view-source": "Link to source code.",
 	"view-wikitext": "Option in form to show results as wikitext, rather than the normal XTools interface.",
 	"vote-msg": "$1 is the username, $2 is the number, $3 is the name of vote page e.g.: Requests for adminship",
-	"web-chat": "Text for link to the XTools IRC channel. This message should be short or abbreviated.",
+	"web-chat": "Text for link to the XTools IRC channel.",
 	"wednesday": "{{Identical|Wednesday}}",
 	"wiki": "Short label for Wiki\n{{Identical|Wiki}}",
 	"wikiproject": "{{Identical|WikiProject}}",
