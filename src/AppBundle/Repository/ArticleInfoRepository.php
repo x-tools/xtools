@@ -137,16 +137,16 @@ class ArticleInfoRepository extends Repository
     /**
      * Get the top editors to the page by edit count.
      * @param Page $page
-     * @param bool $start
-     * @param bool $end
+     * @param false|int|string $start
+     * @param false|int|string $end
      * @param int $limit
      * @param bool $noBots
      * @return array
      */
     public function getTopEditorsByEditCount(
         Page $page,
-        bool $start = false,
-        bool $end = false,
+        $start = false,
+        $end = false,
         int $limit = 20,
         bool $noBots = false
     ): array {
