@@ -498,6 +498,7 @@ abstract class XtoolsController extends Controller
             'offset',
             'limit',
             'format',
+            'tool',
 
             // Legacy parameters.
             'user',
@@ -721,7 +722,7 @@ abstract class XtoolsController extends Controller
 
         // Any pipe-separated values should be returned as an array.
         foreach ($this->params as $param => $value) {
-            if (false !== strpos($value, '|')) {
+            if (is_string($value) && false !== strpos($value, '|')) {
                 $this->params[$param] = explode('|', $value);
             }
         }
