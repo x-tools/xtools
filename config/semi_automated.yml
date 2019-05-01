@@ -461,6 +461,10 @@ parameters:
             regex: '\(\[\[User:Galobtter\/Shortdesc helper\|Shortdesc helper\]\]\)'
             link: User:Galobtter/Shortdesc helper
             namespaces: [0]
+        undo-last-edit:
+            regex: '\(\[\[User:Enterprisey\/undo-last-edit\.js\|undo-last-edit\]\]\)'
+            link: User:Enterprisey/undo-last-edit
+            revert: true
     ko.wikipedia.org:
         AutoWikiBrowser:
             regex: '위키백과:AWB\|AWB|(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
