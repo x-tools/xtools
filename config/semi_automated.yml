@@ -461,7 +461,7 @@ parameters:
             regex: '\(\[\[User:Galobtter\/Shortdesc helper\|Shortdesc helper\]\]\)'
             link: User:Galobtter/Shortdesc helper
             namespaces: [0]
-        Undo-last-edit:
+        undo-last-edit:
             regex; '\(\[\[User:Enterprisey\/undo-last-edit\.js\|undo-last-edit\]\]\)'
             link: User:Enterprisey/undo-last-edit
     ko.wikipedia.org:
