@@ -9,6 +9,7 @@ namespace AppBundle\Repository;
 
 use AppBundle\Model\Page;
 use AppBundle\Model\Project;
+use Doctrine\DBAL\Driver\Statement;
 use GuzzleHttp;
 
 /**
@@ -23,9 +24,9 @@ class ArticleInfoRepository extends Repository
      * @param Page $page
      * @param false|int $start
      * @param false|int $end
-     * @return \Doctrine\DBAL\Driver\Statement resolving with keys 'count', 'username' and 'current'.
+     * @return Statement resolving with keys 'count', 'username' and 'current'.
      */
-    public function getBotData(Page $page, $start, $end): \Doctrine\DBAL\Driver\Statement
+    public function getBotData(Page $page, $start, $end): Statement
     {
         $project = $page->getProject();
         $userGroupsTable = $project->getTableName('user_groups');
@@ -137,8 +138,8 @@ class ArticleInfoRepository extends Repository
     /**
      * Get the top editors to the page by edit count.
      * @param Page $page
-     * @param false|int|string $start
-     * @param false|int|string $end
+     * @param false|int $start
+     * @param false|int $end
      * @param int $limit
      * @param bool $noBots
      * @return array

@@ -46,7 +46,7 @@ class ArticleInfo extends Model
      * so as to preserve memory.
      * @var mixed[]
      */
-    protected $editors;
+    protected $editors = [];
 
     /** @var mixed[] The top 10 editors to the page by number of edits. */
     protected $topTenEditorsByEdits;
