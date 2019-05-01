@@ -132,7 +132,7 @@ parameters:
       wikiproject_prefix: 'Wikipedia:WikiProject '
       class:
         FA:
-          badge: '2/23/Symbol_star_FA.svg'
+          badge: 'b/bc/Featured_article_star.svg'
           color: '#6699ff'
           category: 'Category:FA-Class articles'
         A:
@@ -164,7 +164,7 @@ parameters:
           color: '#ff6666'
           category: 'Category:Stub-Class articles'
         FL:
-          badge: '2/23/Symbol_star_FA.svg'
+          badge: 'b/bc/Featured_article_star.svg'
           color: '#6699ff'
           category: 'Category:FL-Class articles'
         AL:
