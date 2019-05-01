@@ -134,6 +134,7 @@
 	"edits-with-summaries": "Edits with provided edit summary line",
 	"end": "Label for the input field to enter an end date of a date range.\n{{Identical|End date}}",
 	"error-articleinfo-api": "Error shown when the ArticleInfo API was unable to fetch any data about the revisions to the page.",
+	"error-automation": "Error shown when client-side scripts attempt to scrape XTools. This message tells them to use the API. $1 is a link to the API documentation.",
 	"error-login": "Error shown when logging in failed.",
 	"error-pagepile-too-large": "Error shown when a PagePile could not be created from the Pages Created tool. PagePile is another tool used to make lists of pages. In some cases we can't create a PagePile because there are too many pages.",
 	"error-query-timeout": "Error message shown when XTools timed out. $1 is the timeout value in seconds.",

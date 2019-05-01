@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * XtoolsController supplies a variety of methods around parsing and validating parameters, and initializing
@@ -145,6 +146,9 @@ abstract class XtoolsController extends Controller
         $this->isSubRequest = $this->request->get('htmlonly')
             || null !== $this->get('request_stack')->getParentRequest();
 
+        // Disallow AJAX (unless it's an API or subrequest).
+        $this->checkIfAjax();
+
         // Load user options from cookies.
         $this->loadCookies();
 
@@ -154,6 +158,19 @@ abstract class XtoolsController extends Controller
             $this->setProject($this->getProjectFromQuery());
         } else {
             $this->setProperties(); // Includes the project.
+        }
+    }
+
+    /**
+     * Check if the request is AJAX, and disallow it unless they're using the API or if it's a subrequest.
+     */
+    private function checkIfAjax(): void
+    {
+        if ($this->request->isXmlHttpRequest() && !$this->isApi && !$this->isSubRequest) {
+            throw new HttpException(
+                403,
+                $this->i18n->msg('error-automation', ['https://xtools.readthedocs.io/en/stable/api/'])
+            );
         }
     }
 
