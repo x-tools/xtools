@@ -1,5 +1,11 @@
 # Release Notes #
 
+## 3.7.5 ##
+- AutoEdits: Fix exception sometimes thrown when querying APIs.
+- ArticleInfo: Updates and fixes to enwiki's assessment icons.
+- ArticleInfo: Fix exception thrown when processing large number of revisions.
+- Change 'WebChat' link text to 'connect' for clarity.
+
 ## 3.7.4 ##
 - T221727: add QuickStatements to wikidata AutoEdits config.
 - T222049: Fix links to AbuseFilter log in Edit Counter.
