@@ -132,7 +132,7 @@ parameters:
       wikiproject_prefix: 'Wikipedia:WikiProject '
       class:
         FA:
-          badge: 'b/bc/Featured_article_star.svg'
+          badge: '2/23/Symbol_star_FA.svg'
           color: '#6699ff'
           category: 'Category:FA-Class articles'
         A:
@@ -144,8 +144,8 @@ parameters:
           color: '#66ff66'
           category: 'Category:GA-Class articles'
         bplus:
-          badge: '2/2c/Symbol_bplus_class.svg'
-          color: '#66ff66'
+          badge: '5/5f/Symbol_b_class.svg'
+          color: '#b2ff66'
           category: 'Category:Bplus-Class articles'
         B:
           badge: '5/5f/Symbol_b_class.svg'
@@ -164,7 +164,7 @@ parameters:
           color: '#ff6666'
           category: 'Category:Stub-Class articles'
         FL:
-          badge: 'e/e7/Cscr-featured.svg'
+          badge: '2/23/Symbol_star_FA.svg'
           color: '#6699ff'
           category: 'Category:FL-Class articles'
         AL:
@@ -188,8 +188,8 @@ parameters:
           color: '#00fa9a'
           category: 'Category:Disambig-Class articles'
         SIA:
-          badge: '2/2a/Symbol_dab_class.svg'
-          color: '#00fa9a'
+          badge: '9/92/Symbol_sia_class.svg'
+          color: '#ccaaff'
           category: 'Category:SIA-Class articles'
         Redirect:
           badge: 'a/a2/Symbol_redirect_class.svg'
@@ -216,7 +216,7 @@ parameters:
           color: '#cc8899'
           category: 'Category:Portal-Class articles'
         FM:
-          badge: 'b/bc/Featured_article_star.svg'
+          badge: '2/23/Symbol_star_FA.svg'
           color: '#6699ff'
           category: 'Category:FM-Class articles'
         File:
@@ -228,11 +228,11 @@ parameters:
           color: '#d98159'
           category: 'Category:Draft-Class articles'
         Future:
-          badge: '0/04/Symbol_wait_alternative.svg'
+          badge: '6/6b/Symbol_future_class.svg'
           color: '#8a95c9'
           category: 'Category:Future-Class articles'
         Current:
-          badge: '5/54/Symbol_wait.svg'
+          badge: '2/2f/Symbol_current_class.svg'
           color: '#d870ff'
           category: 'Category:Current-Class articles'
         Deferred:
@@ -256,7 +256,7 @@ parameters:
           color: '#add8e6'
           category: 'Category:Merge-Class articles'
         NA:
-          badge: '1/11/Symbol_question_vote.svg'
+          badge: '6/6a/Symbol_na_class.svg'
           color: '#f5f5f5'
           category: 'Category:NA-Class articles'
         Unknown:
