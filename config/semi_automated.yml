@@ -91,6 +91,7 @@ parameters:
         WikiLove:
             tag: wikilove
             link: mw:Special:MyLanguage/Extension:WikiLove
+            namespaces: [3]
         Content translation:
             tag: contenttranslation
             regex: 'Created by translating the page'
