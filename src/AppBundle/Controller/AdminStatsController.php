@@ -9,7 +9,9 @@ namespace AppBundle\Controller;
 
 use AppBundle\Helper\I18nHelper;
 use AppBundle\Model\AdminStats;
+use AppBundle\Model\Project;
 use AppBundle\Repository\AdminStatsRepository;
+use AppBundle\Repository\ProjectRepository;
 use AppBundle\Repository\UserRightsRepository;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -93,12 +95,30 @@ class AdminStatsController extends XtoolsController
             'start' => '',
             'end' => '',
             'group' => 'admin',
-        ], $this->params, ['project' => $this->project]);
+        ], $this->params);
+        $params['project'] = $this->normalizeProject($params['group']);
 
         $params['isAllActions'] = $params['actions'] === implode('|', $this->getActionNames($params['group']));
 
         // Otherwise render form.
         return $this->render('adminStats/index.html.twig', $params);
+    }
+
+    /**
+     * Normalize the Project to be Meta if viewing Steward Stats.
+     * @param string $group
+     * @return Project
+     */
+    private function normalizeProject(string $group): Project
+    {
+        if ('meta.wikimedia.org' !== $this->project->getDomain() &&
+            'steward' === $group &&
+            $this->getParameter('app.is_labs')
+        ) {
+            $this->project = ProjectRepository::getProject('meta.wikimedia.org', $this->container);
+        }
+
+        return $this->project;
     }
 
     /**
@@ -154,12 +174,13 @@ class AdminStatsController extends XtoolsController
     {
         $adminStatsRepo = new AdminStatsRepository();
         $adminStatsRepo->setContainer($this->container);
+        $group = $this->params['group'] ?? 'admin';
 
         $this->adminStats = new AdminStats(
-            $this->project,
+            $this->normalizeProject($group),
             (int)$this->start,
             (int)$this->end,
-            $this->params['group'] ?? 'admin',
+            $group ?? 'admin',
             $this->getAndSetRequestedActions()
         );
         $this->adminStats->setRepository($adminStatsRepo);
