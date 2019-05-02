@@ -179,7 +179,7 @@ parameters:
         WPCleaner:
             link: ويكيبيديا:وب_كلينر
             label: وب_كلينر
-        de.wikipedia.org:
+    de.wikipedia.org:
         Generic rollback:
             link: Wikipedia:Zurücksetzen
         Page move:
