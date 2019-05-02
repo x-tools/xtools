@@ -8,6 +8,10 @@ API endpoints related to a single page.
 
 Article info
 ============
+
+.. seealso:: The `pageviews <https://wikimedia.org/api/rest_v1/#/Pageviews%20data>`_ and
+    `edits data <https://wikimedia.org/api/rest_v1/#/Edits%20data>`_ REST APIs.
+
 ``GET /api/page/articleinfo/{project}/{article}/{format}``
 
 Get basic information about the history of a page.

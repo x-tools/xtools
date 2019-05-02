@@ -8,6 +8,9 @@ API endpoints related to a user.
 
 Simple edit count
 =================
+
+.. seealso:: The MediaWiki `Userinfo API <https://www.mediawiki.org/wiki/API:Userinfo>`_.
+
 ``GET /api/user/simple_editcount/{project}/{username}/{start}/{end}``
 
 For the given account, get the user ID, live and deleted edit count,

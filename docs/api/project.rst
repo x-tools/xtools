@@ -103,6 +103,9 @@ Get all the known semi-automated tools used on the English Wikipedia.
 
 Admins and user groups
 ======================
+
+.. seealso:: The MediaWiki `Allusers API <https://www.mediawiki.org/wiki/API:Allusers>`_.
+
 ``GET /api/project/admins_groups/{project}``
 
 Get a list of users who are admins, bureaucrats, CheckUsers, Oversighters, or
@@ -201,6 +204,7 @@ Stewards statistics
 
 Same as :ref:`Admin statistics <admin_statistics>`, except with these ``actions``:
 
+* ``global-account-un-lock`` (global locks and unlocks)
 * ``global-block``
 * ``global-unblock``
 * ``global-rename``
