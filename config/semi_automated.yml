@@ -34,12 +34,63 @@ parameters:
     # Other local values such as link, tag and revert are overriden, not merged into the global value.
     # See 'Huggle' under 'global' and 'en.wikipedia.org' for an example.
     global:
+        AutoWikiBrowser:
+            tag: AWB
+            regex: 'using \[\[(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
+            link: Project:AutoWikiBrowser
+        Cat-a-lot:
+            regex: 'Help:Cat-a-lot\|Cat-a-lot\]\]|\(CatAlot\)'
+            link: commons:Cat-a-lot
+        Commons duplicate file:
+            regex: 'COM:Duplicate\|Duplicate'
+            link: c:Commons:Duplicate
+        Commons file rename:
+            regex: 'COM:FR\|File renamed\]\]:'
+            link: c:Special:MyLanguage/Commons:File renaming
+        Content translation:
+            tag: contenttranslation
+            regex: 'Created by translating the page'
+            link: mw:Special:MyLanguage/Content translation
+            contribs: true
+            namespaces: [0, 2, 118]
         Generic rollback:
             tag: mw-rollback
             single_tag: true
             regex: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) edits by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\] \(\[\[User talk:.*?\|talk\]\]\) to last (version|revision) by .*'
             link: Special:MyLanguage/Project:Rollback
             revert: true
+        Global rename:
+            regex: 'Automatically moved page while renaming the user'
+            link: meta:Special:MyLanguage/Global renamers
+            namespaces: [2, 3]
+        HotCat:
+            regex: '\|HotCat\]\]|Gadget-Hotcat(?:check)?\.js\|Script|\]\] via HotCat|\[\[WP:HC\|'
+            link: Special:MyLanguage/Project:HotCat
+        Huggle:
+            regex: '\(\[\[WP:HG'
+            tag: huggle
+            link: w:en:Wikipedia:Huggle
+        IABot:
+            tag: 'OAuth CID: 678'
+            link: Special:MyLanguage/User:InternetArchiveBot
+            namespaces: [0, 2, 118]
+        Page move:
+            regex: 'moved page \[\[(?!.*?WP:AFCH)|moved \[\[.*?\]\] to \[\['
+            link: mw:Special:MyLanguage/Help:Moving a page
+        Popups:
+            regex: 'Wikipedia:Tools\/Navigation_popups|popups'
+            link: w:en:Project:Popups
+        ProveIt:
+            tag: ProveIt edit
+            link: commons:Help:Gadget-ProveIt
+            contribs: true
+            namespaces: [0, 2, 118]
+        Redirect:
+            tag: mw-new-redirect
+            link: mw:Special:MyLanguage/Help:Redirects
+        reFill:
+            regex: 'User:Zhaofeng Li\/Reflinks|WP:REFILL|en:WP:REFILL|with reFill 2'
+            link: Project:ReFill
         Undo:
             tag: mw-undo
             single_tag: true
@@ -49,66 +100,16 @@ parameters:
             regex: '^(Undid|Undo|\[\[WP:UNDO\|Undid\]\]) revision \d+ by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\]'
             link: Special:MyLanguage/Project:Undo
             # This is not considered a revert because you can undo any arbitrary revision, not just the previous one.
-        Redirect:
-            tag: mw-new-redirect
-            link: mw:Special:MyLanguage/Help:Redirects
-        Huggle:
-            regex: '\(\[\[WP:HG'
-            tag: huggle
-            link: w:en:Wikipedia:Huggle
-        WPCleaner:
-            regex: 'WP:CLEANER|WPCleaner\]\]|\[\[\Wikipedia:DPL|\[\[WP:WCW\]\] project \('
-            tag: WPCleaner
-            link: Special:MyLanguage/Project:WPCleaner
-        IABot:
-            tag: 'OAuth CID: 678'
-            link: Special:MyLanguage/User:InternetArchiveBot
-            namespaces: [0, 2, 118]
-        HotCat:
-            regex: '\|HotCat\]\]|Gadget-Hotcat(?:check)?\.js\|Script|\]\] via HotCat|\[\[WP:HC\|'
-            link: Special:MyLanguage/Project:HotCat
-        Cat-a-lot:
-            regex: 'Help:Cat-a-lot\|Cat-a-lot\]\]|\(CatAlot\)'
-            link: commons:Cat-a-lot
-        Global rename:
-            regex: 'Automatically moved page while renaming the user'
-            link: meta:Special:MyLanguage/Global renamers
-            namespaces: [2, 3]
-        Page move:
-            regex: 'moved page \[\[(?!.*?WP:AFCH)|moved \[\[.*?\]\] to \[\['
-            link: mw:Special:MyLanguage/Help:Moving a page
-        Popups:
-            regex: 'Wikipedia:Tools\/Navigation_popups|popups'
-            link: w:en:Project:Popups
-        Commons file rename:
-            regex: 'COM:FR\|File renamed\]\]:'
-            link: c:Special:MyLanguage/Commons:File renaming
-        Commons duplicate file:
-            regex: 'COM:Duplicate\|Duplicate'
-            link: c:Commons:Duplicate
-        reFill:
-            regex: 'User:Zhaofeng Li\/Reflinks|WP:REFILL|en:WP:REFILL|with reFill 2'
-            link: Project:ReFill
         WikiLove:
             tag: wikilove
             link: mw:Special:MyLanguage/Extension:WikiLove
             namespaces: [3]
-        Content translation:
-            tag: contenttranslation
-            regex: 'Created by translating the page'
-            link: mw:Special:MyLanguage/Content translation
-            contribs: true
-            namespaces: [0, 2, 118]
-        ProveIt:
-            tag: ProveIt edit
-            link: commons:Help:Gadget-ProveIt
-            contribs: true
-            namespaces: [0, 2, 118]
-        AutoWikiBrowser:
-            tag: AWB
-            regex: 'using \[\[(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
-            link: Project:AutoWikiBrowser
-
+        WPCleaner:
+            regex: 'WP:CLEANER|WPCleaner\]\]|\[\[\Wikipedia:DPL|\[\[WP:WCW\]\] project \('
+            tag: WPCleaner
+            link: Special:MyLanguage/Project:WPCleaner
+        
+        
     # Per-language lists. This generally only includes native MediaWiki actions.
     ar:
         Undo:
