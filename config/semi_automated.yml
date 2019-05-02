@@ -447,7 +447,7 @@ parameters:
         stubsearch:
             regex: '\[\[User:Danski454\/stubsearch\|a tool'
             link: User:Danski454/stubsearch
-            namespaces: [0, 4]
+            namespaces: [0]
         YABBR:
             tag: 'OAuth CID: 860'
             link: User:Enterprisey/YABBR
