@@ -8,7 +8,8 @@
 			"Nike",
 			"Tacsipacsi",
 			"McDutchie",
-			"Pierpao"
+			"Pierpao",
+			"Robby"
 		]
 	},
 	"abusefilter": "Name of for [[Special:AbuseFilter]]. Used to indicate how many changes a user made to AbuseFilters.",
@@ -463,7 +464,7 @@
 	"view-source": "Link to source code.",
 	"view-wikitext": "Option in form to show results as wikitext, rather than the normal XTools interface.",
 	"vote-msg": "$1 is the username, $2 is the number, $3 is the name of vote page e.g.: Requests for adminship",
-	"web-chat": "Text for link to the XTools IRC channel.",
+	"web-chat": "Text for link to the XTools IRC channel.\n{{Identical|Connect}}",
 	"wednesday": "{{Identical|Wednesday}}",
 	"wiki": "Short label for Wiki\n{{Identical|Wiki}}",
 	"wikiproject": "{{Identical|WikiProject}}",

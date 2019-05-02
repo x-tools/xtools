@@ -7,7 +7,8 @@
 			"TmY e12",
 			"Dual",
 			"Wertuose",
-			"Ömer faruk çakmak"
+			"Ömer faruk çakmak",
+			"Mirzali"
 		]
 	},
 	"abusefilter": "Kötüye Kullanım Süzgeci",
@@ -131,6 +132,7 @@
 	"edits-with-summaries": "Özet girilmiş değişiklikler",
 	"end": "Bitiş tarihi",
 	"error-articleinfo-api": "Düzeltme verileri alınamıyor.",
+	"error-automation": "XTools kullanıcı arayüzünü kazımak için otomasyon kullanılmasına izin verilmez. Lütfen bunun yerine kapsamlı API'mızı kullanın: $1",
 	"error-login": "Giriş başarısız! Lütfen tekrar deneyin.",
 	"error-pagepile-too-large": "Maalesef, PagePile'a dışa aktarılacak çok fazla sayfa var. Bir PagePile el ile oluşturabilir veya belirli bir ad alanına veya zaman çerçevesine sınırlandırarak sonuç kümesini daraltmayı deneyebilirsiniz.",
 	"error-query-timeout": "$1 saniye zaman aşımı",
@@ -420,7 +422,7 @@
 	"view-source": "Kaynağı gör",
 	"view-wikitext": "Wikitext olarak görüntüle",
 	"vote-msg": "$2 $3 sayfalarını $1 düzenledi.",
-	"web-chat": "WebSohbet",
+	"web-chat": "Bağlan",
 	"wednesday": "Çarşamba",
 	"wiki": "Viki",
 	"wikiproject": "VikiProje",

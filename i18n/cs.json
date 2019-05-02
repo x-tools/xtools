@@ -9,7 +9,8 @@
 			"Matěj Suchánek",
 			"Spotter",
 			"Patriccck",
-			"LubosV"
+			"LubosV",
+			"Ján Kepler"
 		]
 	},
 	"accepted-formats": "Přijatelné formáty",
@@ -389,7 +390,7 @@
 	"view-source": "Zobrazit zdrojový kód",
 	"view-wikitext": "Zobrazit jako wikitext",
 	"vote-msg": "$1 editoval $2 $3 stránek!",
-	"web-chat": "Webový chat",
+	"web-chat": "Připojit",
 	"wednesday": "Středa",
 	"wiki": "Wiki",
 	"wikiproject": "WikiProjekt",
