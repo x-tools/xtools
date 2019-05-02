@@ -240,6 +240,24 @@ parameters:
             regex: \[\[Hilfe:Einfügen-Erweiterung\|
             link: Hilfe:Einfügen-Erweiterung
     en.wikipedia.org:
+        # Global tools
+        Content translation:
+            link: Wikipedia:Content translation tool
+        Huggle:
+            revert: 'Reverted edits by.*?WP:HG'
+        ProveIt:
+            regex: 'with \[\[Wikipedia:ProveIt'
+            link: Wikipedia:ProveIt
+            namespaces: [0, 2, 118]
+        Redirect:
+            regex: '\[\[WP:AES\|←\]\]Redirected page to \[\[.*?\]\]'
+            link: Project:Redirect
+        WikiLove:
+            regex: 'new WikiLove message'
+            link: Project:WikiLove
+            namespaces: [3]
+
+        # Local tools
         Admin actions:
             regex: '^(Protected|Changed protection).*?\[[Ee]dit=|^Removed protection from|^Configured pending changes.*?\[[Aa]uto-accept|^Reset pending changes settings'
             link: Project:Administrators
@@ -289,8 +307,6 @@ parameters:
             regex: '\(using \[\[User:Doug\/closetfd.js'
             link: User:Doug/closetfd.js
             namespaces: [4]
-        Content translation:
-            link: Wikipedia:Content translation tool
         CSD Helper:
             regex: '\(\[\[User:Ale_jrb\/Scripts\|CSDH'
             link: Project:CSDH
@@ -340,8 +356,6 @@ parameters:
         Global replace:
             regex: '\(\[\[c:GR\|GR\]\]\) '
             link: commons:Commons:File renaming/Global replace
-        Huggle: # This gets merged into the global Huggle definition (the revert regex here is enwiki-specific)
-            revert: 'Reverted edits by.*?WP:HG'
         Igloo:
             regex: 'Wikipedia:Igloo'
             link: w:en:Wikipedia:Igloo
@@ -373,17 +387,10 @@ parameters:
             link: Project:Pending changes
             revert: true
             namespaces: [0]
-        ProveIt:
-            regex: 'with \[\[Wikipedia:ProveIt'
-            link: Wikipedia:ProveIt
-            namespaces: [0, 2, 118]
         Rater:
             regex: '\[\[User:(Evad37\/rater.js|Kephir\/gadgets\/rater)'
             link: User:Evad37/rater.js
             talk_namespaces: true
-        Redirect:
-            regex: '\[\[WP:AES\|←\]\]Redirected page to \[\[.*?\]\]'
-            link: Project:Redirect
         Red Link Recovery Live:
             regex: '\[\[w:en:WP:RLR\|You can help!'
             link: en:WP:RLR
@@ -451,10 +458,6 @@ parameters:
         Vada:
             regex: '\(\[\[WP:Vada\]\]\)'
             link: Project:Vada
-        WikiLove:
-            regex: 'new WikiLove message'
-            link: Project:WikiLove
-            namespaces: [3]
         WikiPatroller:
             regex: 'User:Jfmantis\/WikiPatroller'
             link: User:Jfmantis/WikiPatroller
