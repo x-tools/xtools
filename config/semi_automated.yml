@@ -393,6 +393,7 @@ parameters:
         For the Common Good:
             regex: 'WP:FTCG\|FtCG'
             link: Project:FTCG
+            namespaces: [6]
         deOrphan:
             regex: '\[\[User:Technical_13\/Scripts\/OrphanStatus\||\[\[User:DannyS712\/deOrphan\|'
             link: User:DannyS712/deOrphan
