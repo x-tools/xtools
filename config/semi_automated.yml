@@ -63,6 +63,7 @@ parameters:
         IABot:
             tag: 'OAuth CID: 678'
             link: Special:MyLanguage/User:InternetArchiveBot
+            namespaces: [0, 2, 118]
         HotCat:
             regex: '\|HotCat\]\]|Gadget-Hotcat(?:check)?\.js\|Script|\]\] via HotCat|\[\[WP:HC\|'
             link: Special:MyLanguage/Project:HotCat
@@ -91,6 +92,7 @@ parameters:
         WikiLove:
             tag: wikilove
             link: mw:Special:MyLanguage/Extension:WikiLove
+            namespaces: [3]
         Content translation:
             tag: contenttranslation
             regex: 'Created by translating the page'
@@ -286,6 +288,7 @@ parameters:
         delsort:
             regex: '(Wikipedia:WP):FWDS|User:APerson\/delsort\|delsort.js|User:Enterprisey\/delsort\|assisted'
             link: WP:DELSORT
+            namespaces: [4]
         Ohconfucius script:
             regex: '\[\[(User:Ohconfucius\/.*?|WP:MOSNUMscript)\|script'
             link: Project:MOSNUMscript
@@ -296,6 +299,7 @@ parameters:
         editProtectedHelper:
             regex: 'WP:EPH|EPH'
             link: Project:EPH
+            talk_namespaces: true
         WikiLove:
             regex: 'new WikiLove message'
             link: Project:WikiLove
@@ -390,6 +394,7 @@ parameters:
         For the Common Good:
             regex: 'WP:FTCG\|FtCG'
             link: Project:FTCG
+            namespaces: [6]
         deOrphan:
             regex: '\[\[User:Technical_13\/Scripts\/OrphanStatus\||\[\[User:DannyS712\/deOrphan\|'
             link: User:DannyS712/deOrphan
@@ -405,7 +410,6 @@ parameters:
         XFDCloser:
             regex: '\[\[WP:XFDC\|XFDcloser'
             link: User:Evad37/XFDcloser.js
-            namespaces: [0, 4]
         Rater:
             regex: '\[\[User:(Evad37\/rater.js|Kephir\/gadgets\/rater)'
             link: User:Evad37/rater.js
@@ -444,7 +448,7 @@ parameters:
         stubsearch:
             regex: '\[\[User:Danski454\/stubsearch\|a tool'
             link: User:Danski454/stubsearch
-            namespaces: [0, 4]
+            namespaces: [0]
         YABBR:
             tag: 'OAuth CID: 860'
             link: User:Enterprisey/YABBR
