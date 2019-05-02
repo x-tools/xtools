@@ -63,6 +63,7 @@ parameters:
         IABot:
             tag: 'OAuth CID: 678'
             link: Special:MyLanguage/User:InternetArchiveBot
+            namespaces: [0, 2, 118]
         HotCat:
             regex: '\|HotCat\]\]|Gadget-Hotcat(?:check)?\.js\|Script|\]\] via HotCat|\[\[WP:HC\|'
             link: Special:MyLanguage/Project:HotCat
