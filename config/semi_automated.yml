@@ -115,9 +115,8 @@ parameters:
         Undo:
             regex: 'الرجوع عن التعديل \d+ بواسطة'
     de:
-        Undo:
-            regex: 'Änderung \d+ von \[\[.*?rückgängig gemacht'
-            label: Rückgängig
+        AutoWikiBrowser:
+            regex: 'mit \[\[Project:AWB\|AWB'
         Generic rollback:
             regex: 'Änderungen von \[\[.*?die letzte Version von \[\[.*?zurückgesetzt'
             label: Zurücksetzen
@@ -127,25 +126,26 @@ parameters:
         Redirect:
             regex: 'Weiterleitung nach \[\[.*?erstellt'
             label: Weiterleitung
-        AutoWikiBrowser:
-            regex: 'mit \[\[Project:AWB\|AWB'
-    ko:
         Undo:
-            regex: '판 편집을 되돌림'
-            label: '편집 취소'
+            regex: 'Änderung \d+ von \[\[.*?rückgängig gemacht'
+            label: Rückgängig
+    ko:
         Generic rollback:
             regex: '(의 마지막 판으로 되돌림|의 편집을 전부 되돌림)'
             label: '되돌리기'
         Page move:
             regex: '문서로 이동했습니다'
             label: '문서 이동'
+        Undo:
+            regex: '판 편집을 되돌림'
+            label: '편집 취소'
     pt:
-        Page move:
-            regex: 'moveu \[\[.*?para \[\['
-            label: Movimentos de página
         Content translation:
             regex: 'Criado ao traduzir a página'
             label: Tradução de Conteúdos
+        Page move:
+            regex: 'moveu \[\[.*?para \[\['
+            label: Movimentos de página
         Redirect:
             label: Redirecionamentos
             link: Ajuda:Guia de edição/Redirecionar páginas
