@@ -179,52 +179,7 @@ parameters:
         WPCleaner:
             link: ويكيبيديا:وب_كلينر
             label: وب_كلينر
-    commons.wikimedia.org:
-        AjaxQuickDelete:
-            regex: '^(This category needs discussion|\[\[:.*?\]\] needs discussion|Starting category discussion|Nominating for deletion|\[\[:.*?\]\] has been nominated for deletion|Starting deletion request|Listing \[\[.*?\]\])$|#Autoreport by AjaxQuickDelete|^Updating redirect while processing'
-            link: Special:MyLanguage/Help:Nominate_for_deletion
-        Android Commons:
-            regex: '^Uploaded using Android Commons app$'
-            link: Special:MyLanguage/Commons:Mobile_app
-            namespaces: [6]
-        Commonsist:
-            regex: '^commonist \d\.\d'
-            link: Special:MyLanguage/Commons:Commonist
-            namespaces: [6]
-        Flickr2Commons:
-            regex: 'via \[\[(?:Special:MyLanguage\/)?Commons:Flickr2Commons'
-            link: Special:MyLanguage/Commons:Flickr2Commons
-            namespaces: [6]
-        Geograph2commons:
-            regex: 'Transferred from geograph.co.uk using'
-            link: Special:GoToInterwiki/toollabs:geograph2commons
-            namespaces: [6]
-        POTY:
-            regex: '\[\[Help:(?:Gadget-)EnhancedPOTY.js|POTY App\]\]$'
-            link: Help:Gadget-EnhancedPOTY.js
-            namespaces: [4]
-        QuickDelete:
-            regex: '^(Marking as possible copyvio because|Notification of possible copyright violation for|\[\[.*?\]\] does not have a source|Please send permission for \[\[|\]\] does not have a license)|^(File has no source|Missing permission)$'
-            link: Special:MyLanguage/Help:QuickDelete
-            namespaces: [3, 6]
-        RenameLink:
-            regex: '^\(\[\[Help:RenameLink\|Script'
-            link: Special:MyLanguage/Help:RenameLink
-        RotateLink:
-            regex: '\(\[\[Help:RotateLink\|Script'
-            link: Help:RotateLink
-        SettingsManager:
-            regex: '\[\[MediaWiki:Gadget-SettingsManager.js\|SettingsManager'
-            link: MediaWiki:Gadget-SettingsManager.js
-        UploadWizard:
-            regex: '^User created page with UploadWizard$'
-            link: Special:MyLanguage/Commons:Upload Wizard
-            namespaces: [6]
-        VisualFileChange:
-            regex: 'Using \[\[COM:VFC'
-            tag: VisualFileChange
-            link: Special:MyLanguage/Help:VisualFileChange.js
-    de.wikipedia.org:
+        de.wikipedia.org:
         Generic rollback:
             link: Wikipedia:Zurücksetzen
         Page move:
@@ -516,6 +471,8 @@ parameters:
             regex: 'Desfeita a edição \d+ de \[\['
             link: Ajuda:Guia de edição/Reverter edições#Botão Desfazer
             label: 'Desfazer'
+
+    # Non-wikipedia sites
     www.wikidata.org:
         QuickStatements:
             regex: '#quickstatements'
@@ -523,3 +480,49 @@ parameters:
         RequestDeletion:
             regex: '\[\[MediaWiki talk:Gadget-RequestDeletion\.js\|RD\]\]'
             link: MediaWiki talk:Gadget-RequestDeletion.js
+    commons.wikimedia.org:
+        AjaxQuickDelete:
+            regex: '^(This category needs discussion|\[\[:.*?\]\] needs discussion|Starting category discussion|Nominating for deletion|\[\[:.*?\]\] has been nominated for deletion|Starting deletion request|Listing \[\[.*?\]\])$|#Autoreport by AjaxQuickDelete|^Updating redirect while processing'
+            link: Special:MyLanguage/Help:Nominate_for_deletion
+        Android Commons:
+            regex: '^Uploaded using Android Commons app$'
+            link: Special:MyLanguage/Commons:Mobile_app
+            namespaces: [6]
+        Commonsist:
+            regex: '^commonist \d\.\d'
+            link: Special:MyLanguage/Commons:Commonist
+            namespaces: [6]
+        Flickr2Commons:
+            regex: 'via \[\[(?:Special:MyLanguage\/)?Commons:Flickr2Commons'
+            link: Special:MyLanguage/Commons:Flickr2Commons
+            namespaces: [6]
+        Geograph2commons:
+            regex: 'Transferred from geograph.co.uk using'
+            link: Special:GoToInterwiki/toollabs:geograph2commons
+            namespaces: [6]
+        POTY:
+            regex: '\[\[Help:(?:Gadget-)EnhancedPOTY.js|POTY App\]\]$'
+            link: Help:Gadget-EnhancedPOTY.js
+            namespaces: [4]
+        QuickDelete:
+            regex: '^(Marking as possible copyvio because|Notification of possible copyright violation for|\[\[.*?\]\] does not have a source|Please send permission for \[\[|\]\] does not have a license)|^(File has no source|Missing permission)$'
+            link: Special:MyLanguage/Help:QuickDelete
+            namespaces: [3, 6]
+        RenameLink:
+            regex: '^\(\[\[Help:RenameLink\|Script'
+            link: Special:MyLanguage/Help:RenameLink
+        RotateLink:
+            regex: '\(\[\[Help:RotateLink\|Script'
+            link: Help:RotateLink
+        SettingsManager:
+            regex: '\[\[MediaWiki:Gadget-SettingsManager.js\|SettingsManager'
+            link: MediaWiki:Gadget-SettingsManager.js
+        UploadWizard:
+            regex: '^User created page with UploadWizard$'
+            link: Special:MyLanguage/Commons:Upload Wizard
+            namespaces: [6]
+        VisualFileChange:
+            regex: 'Using \[\[COM:VFC'
+            tag: VisualFileChange
+            link: Special:MyLanguage/Help:VisualFileChange.js
+
