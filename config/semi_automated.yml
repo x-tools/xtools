@@ -409,7 +409,6 @@ parameters:
         XFDCloser:
             regex: '\[\[WP:XFDC\|XFDcloser'
             link: User:Evad37/XFDcloser.js
-            namespaces: [0, 4]
         Rater:
             regex: '\[\[User:(Evad37\/rater.js|Kephir\/gadgets\/rater)'
             link: User:Evad37/rater.js
