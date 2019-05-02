@@ -298,6 +298,7 @@ parameters:
         editProtectedHelper:
             regex: 'WP:EPH|EPH'
             link: Project:EPH
+            talk_namespaces: true
         WikiLove:
             regex: 'new WikiLove message'
             link: Project:WikiLove
