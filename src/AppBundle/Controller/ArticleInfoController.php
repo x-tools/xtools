@@ -196,7 +196,25 @@ class ArticleInfoController extends XtoolsController
     }
 
     /**
-     * Get textshares information about the article.
+     * Wrapper for ArticleInfoAuthorshipResult action to allow you to pass in the page via query string.
+     * If no page title is given, it redirects to ArticleInfo (index page).
+     * @Route(
+     *     "/articleinfo-authorship/{project}",
+     *     name="ArticleInfoAuthorshipIndex"
+     * )
+     * @return Response
+     */
+    public function textsharesIndexAction(): Response
+    {
+        if (isset($this->params['page'])) {
+            return $this->redirectToRoute('ArticleInfoAuthorshipResult', $this->params);
+        }
+
+        return $this->redirectToRoute('ArticleInfo', $this->params);
+    }
+
+    /**
+     * Get authorship (aka textshares) information about the article.
      * @Route(
      *     "/articleinfo-authorship/{project}/{page}",
      *     name="ArticleInfoAuthorshipResult",
