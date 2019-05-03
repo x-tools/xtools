@@ -1,5 +1,14 @@
 # Release Notes #
 
+## 3.7.6 ##
+- Disallow scraping XTools with JavaScript, informing the client to use the API
+- AdminStats: Only allow meta.wikimedia for Steward Stats
+- ArticleInfo: Make authorship route accept page title as query string
+- T222323: Optimize AutoEdits by specifying applicable namespaces for some tools
+- T222134: Add undo-last-edit to enwiki AutoEdits config
+- Updates to API documentation.
+- Localization updates
+
 ## 3.7.5 ##
 - AutoEdits: Fix exception sometimes thrown when querying APIs.
 - ArticleInfo: Updates and fixes to enwiki's assessment icons.

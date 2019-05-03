@@ -2,5 +2,5 @@
 # The release process is documented at https://xtools.readthedocs.io/en/latest/development.html#releases
 
 parameters:
-  app.version: 3.7.5
+  app.version: 3.7.6
 
