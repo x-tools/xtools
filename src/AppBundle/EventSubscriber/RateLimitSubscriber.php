@@ -11,8 +11,9 @@ use AppBundle\Helper\I18nHelper;
 use DateInterval;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -59,13 +60,14 @@ class RateLimitSubscriber implements EventSubscriberInterface
     /**
      * Check if the current user has exceeded the configured usage limitations.
      * @param FilterControllerEvent $event The event.
-     * @throws TooManyRequestsHttpException|\Exception If rate limits have been exceeded.
      */
     public function onKernelController(FilterControllerEvent $event): void
     {
         $this->rateLimit = (int) $this->container->getParameter('app.rate_limit_count');
         $this->rateDuration = (int) $this->container->getParameter('app.rate_limit_time');
         $request = $event->getRequest();
+
+        $this->checkBlacklist($request);
 
         // Zero values indicate the rate limiting feature should be disabled.
         if (0 === $this->rateLimit || 0 === $this->rateDuration) {
@@ -88,8 +90,6 @@ class RateLimitSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->checkBlacklist($request);
-
         // Build and fetch cache key based on session ID.
         $sessionId = $request->getSession()->getId();
         $cacheKey = 'ratelimit.'.$sessionId;
@@ -103,7 +103,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
 
         // Check if limit has been exceeded, and if so, throw an error.
         if ($count > $this->rateLimit) {
-            $this->denyAccess($request, 'Exceeded rate limitation');
+            $this->denyAccess('Exceeded rate limitation');
         }
 
         // Reset the clock on every request.
@@ -114,60 +114,65 @@ class RateLimitSubscriber implements EventSubscriberInterface
 
     /**
      * Check the request against blacklisted URIs and user agents
-     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param Request $request
      */
-    private function checkBlacklist(\Symfony\Component\HttpFoundation\Request $request): void
+    private function checkBlacklist(Request $request): void
     {
         // First check user agent and URI blacklists
-        if ($this->container->hasParameter('request_blacklist')) {
-            $blacklist = $this->container->getParameter('request_blacklist');
-            // User agents
-            if (is_array($blacklist['user_agent'])) {
-                foreach ($blacklist['user_agent'] as $ua) {
-                    if (false !== strpos((string)$request->headers->get('User-Agent'), $ua)) {
-                        $logComment = "Matched blacklisted user agent `$ua`";
+        if (!$this->container->hasParameter('request_blacklist')) {
+            return;
+        }
 
-                        // Log the denied request
-                        $logger = $this->container->get('monolog.logger.rate_limit');
-                        $logger->info(
-                            "<URI>: " . $request->getRequestUri() .
-                            ('' != $logComment ? "\t<Reason>: $logComment" : '') .
-                            "\t<User agent>: " . $request->headers->get('User-Agent')
-                        );
+        $blacklist = $this->container->getParameter('request_blacklist');
+        $ua = (string)$request->headers->get('User-Agent');
+        $referer = (string)$request->headers->get('referer');
+        $uri = $request->getRequestUri();
 
-                        throw new HttpException(
-                            403,
-                            'Your access to XTools has been revoked due to possible abuse. '.
-                            'Please contact tools.xtools@tools.wmflabs.org'
-                        );
-                    }
-                }
+        foreach ($blacklist as $name => $item) {
+            $match = false;
+
+            if (isset($item['user_agent'])) {
+                $match = $item['user_agent'] === $ua;
             }
-            // URIs
-            if (is_array($blacklist['uri'])) {
-                foreach ($blacklist['uri'] as $uri) {
-                    if (false !== strpos($request->getRequestUri(), $uri)) {
-                        $this->denyAccess($request, "Matched blacklisted URI `$uri`");
-                    }
-                }
+            if (isset($item['user_agent_pattern'])) {
+                $match = 1 === preg_match('/'.$item['user_agent_pattern'].'/', $ua);
+            }
+            if (isset($item['referer'])) {
+                $match = $item['referer'] === $referer;
+            }
+            if (isset($item['referer_pattern'])) {
+                $match = 1 === preg_match('/'.$item['referer_pattern'].'/', $referer);
+            }
+            if (isset($item['uri'])) {
+                $match = $item['uri'] === $uri;
+            }
+            if (isset($item['uri_pattern'])) {
+                $match = 1 === preg_match('/'.$item['uri_pattern'].'/', $uri);
+            }
+
+            if ($match) {
+                $this->denyAccess("Matched blacklist entry `$name`", true);
             }
         }
     }
 
     /**
      * Throw exception for denied access due to spider crawl or hitting usage limits.
-     * @param \Symfony\Component\HttpFoundation\Request $request
      * @param string $logComment Comment to include with the log entry.
+     * @param bool $blacklist Changes the messaging to say access was denied due to abuse, rather than rate limiting.
+     * @throws TooManyRequestsHttpException
+     * @throws AccessDeniedHttpException
      */
-    private function denyAccess(\Symfony\Component\HttpFoundation\Request $request, string $logComment = ''): void
+    private function denyAccess(string $logComment, bool $blacklist = false): void
     {
         // Log the denied request
-        $logger = $this->container->get('monolog.logger.rate_limit');
-        $logger->info(
-            "<URI>: " . $request->getRequestUri() .
-            ('' != $logComment ? "\t<Reason>: $logComment" : '') .
-            "\t<User agent>: " . $request->headers->get('User-Agent')
-        );
+        $logger = $this->container->get($blacklist ? 'monolog.logger.blacklist' : 'monolog.logger.rate_limit');
+        $logger->info($logComment);
+
+        if ($blacklist) {
+            $message = $this->i18n->msg('error-denied', ['tools.xtools@tools.wmflabs.org']);
+            throw new AccessDeniedHttpException($message, null, 999);
+        }
 
         $message = $this->i18n->msg('error-rate-limit', [
             $this->rateDuration,

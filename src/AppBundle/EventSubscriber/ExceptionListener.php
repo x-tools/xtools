@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Templating\EngineInterface;
 
 /**
@@ -60,6 +61,15 @@ class ExceptionListener
             $response = $this->getXtoolsHttpResponse($exception);
         } elseif ($exception instanceof \Twig\Error\RuntimeError && null !== $prevException) {
             $response = $this->getTwigErrorResponse($prevException);
+        } elseif ($exception instanceof AccessDeniedHttpException) {
+            // FIXME: For some reason the automatic error page rendering doesn't work for 403 responses...
+            $response = new Response(
+                $this->templateEngine->render('bundles/TwigBundle/Exception/error.html.twig', [
+                    'status_code' => $exception->getStatusCode(),
+                    'status_text' => 'Forbidden',
+                    'exception' => $exception,
+                ])
+            );
         } else {
             return;
         }
@@ -90,6 +100,7 @@ class ExceptionListener
      * Handle a Twig runtime exception.
      * @param \Exception $exception
      * @return Response
+     * @throws \Exception
      */
     private function getTwigErrorResponse(\Exception $exception): Response
     {
@@ -105,7 +116,7 @@ class ExceptionListener
         );
 
         return new Response(
-            $this->templateEngine->render('TwigBundle:Exception:error.html.twig', [
+            $this->templateEngine->render('bundles/TwigBundle/Exception/error.html.twig', [
                 'status_code' => 500,
                 'status_text' => 'Internal Server Error',
                 'exception' => $exception,

@@ -132,6 +132,7 @@
 	"end": "Ending date",
 	"error-articleinfo-api": "Unable to fetch revision data.",
 	"error-automation": "Using automation to scrape the XTools user interface is not allowed. Please use our comprehensive API instead: $1",
+	"error-denied": "Your access to XTools has been blocked due to apparent abuse or disruptive automation. Please contact $1",
 	"error-login": "Login failed! Please try again.",
 	"error-pagepile-too-large": "Sorry, there are too many pages to export to PagePile. You can manually create a PagePile, or try narrowing down the result set by limiting to a specific namespace or time frame.",
 	"error-query-timeout": "Sorry, the requested information took too long to process (timeout $1 {{PLURAL:$1|second|seconds}}). In order to save resources, the query was automatically killed.",
