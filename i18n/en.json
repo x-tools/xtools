@@ -309,7 +309,7 @@
 	"patrols": "Patrols",
 	"patrols-desc": "$2 {{PLURAL:$1|article|articles}} patrolled",
 	"pc-accept": "Pending change accept",
-	"pc-reject": "Pending change reject",
+	"pc-reject": "Pending change unaccept",
 	"page-curation": "Page curation",
 	"percent-of-edit-count": "% of edit count",
 	"percent-of-tools": "% of tools",
