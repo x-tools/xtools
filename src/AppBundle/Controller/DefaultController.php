@@ -270,7 +270,7 @@ class DefaultController extends XtoolsController
      * @Route("/api/project/parser/{project}")
      * @return JsonResponse Safe HTML.
      */
-    public function wikify(): JsonResponse
+    public function wikifyApiAction(): JsonResponse
     {
         return new JsonResponse(
             Edit::wikifyString($this->request->query->get('wikitext'), $this->project)

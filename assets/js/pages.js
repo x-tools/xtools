@@ -39,7 +39,8 @@ $(function () {
     });
 
     $('.deleted-page').on('mouseover', function (e) {
-        var page = $(this).data('page');
+        var page = $(this).data('page'),
+            startTime = $(this).data('datetime').toString().slice(0, -2);
 
         var showSummary = function (summary) {
             $(e.target).find('.tooltip-body').html(summary);
@@ -49,24 +50,33 @@ $(function () {
             return showSummary(deletionSummaries[page]);
         }
 
-        $.ajax({
-            url: wikiApi,
-            data: {
-                action: 'query',
-                list: 'logevents',
-                letitle: $(this).data('page'),
-                lestart: $(this).data('datetime').toString().slice(0, -2),
-                letype: 'delete',
-                leaction: 'delete/delete',
-                lelimit: 1,
-                format: 'json'
-            },
-            dataType: 'jsonp'
-        }).done(function (resp) {
-            var event = resp.query.logevents[0];
+        var logEventsQuery = function (action) {
+            return $.ajax({
+                url: wikiApi,
+                data: {
+                    action: 'query',
+                    list: 'logevents',
+                    letitle: page,
+                    lestart: startTime,
+                    letype: 'delete',
+                    leaction: action || 'delete/delete',
+                    lelimit: 1,
+                    format: 'json'
+                },
+                dataType: 'jsonp'
+            })
+        };
 
-            // Show parsed wikitext.
-            $.ajax({
+        var showParserApiFailure = function () {
+            return showSummary("<span class='text-danger'>" + $.i18n('api-error', 'Parser API') + "</span>");
+        };
+
+        var showLoggingApiFailure = function () {
+            return showSummary("<span class='text-danger'>" + $.i18n('api-error', 'Logging API') + "</span>");
+        };
+
+        var showParsedWikitext = function (event) {
+            return $.ajax({
                 url: xtBaseUrl + 'api/project/parser/' + wikiDomain + '?wikitext=' + encodeURIComponent(event.comment)
             }).done(function (markup) {
                 // Get timestamp in YYYY-MM-DD HH:MM format.
@@ -81,11 +91,26 @@ $(function () {
 
                 deletionSummaries[page] = summary;
                 showSummary(summary);
-            }).fail(function () {
-                showSummary("<span class='text-danger'>" + $.i18n('api-error', 'Parser API') + "</span>");
-            });
-        }).fail(function () {
-            showSummary("<span class='text-danger'>" + $.i18n('api-error', 'Logging API') + "</span>");
-        });
+            }).fail(showParserApiFailure);
+        };
+
+        logEventsQuery().done(function (resp) {
+            var event = resp.query.logevents[0];
+
+            if (!event) {
+                // Try again but look for redirect deletions.
+                return logEventsQuery('delete/delete_redir').done(function (resp) {
+                    event = resp.query.logevents[0];
+
+                    if (!event) {
+                        return showParserApiFailure();
+                    }
+
+                    showParsedWikitext(event);
+                }).fail(showLoggingApiFailure);
+            }
+
+            showParsedWikitext(event);
+        }).fail(showLoggingApiFailure);
     });
 });

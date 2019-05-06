@@ -204,7 +204,7 @@ class MetaController extends XtoolsController
      * @return Response
      * @codeCoverageIgnore
      */
-    public function recordUsage(Request $request, string $tool, string $project, string $token): Response
+    public function recordUsageAction(Request $request, string $tool, string $project, string $token): Response
     {
         // Ready the response object.
         $response = new Response();

@@ -76,17 +76,18 @@ class RateLimitSubscriber implements EventSubscriberInterface
 
         $controller = $event->getController();
         $loggedIn = (bool) $this->container->get('session')->get('logged_in_user');
+        $isApi = substr($controller[1], -3);
 
         /**
          * Rate limiting will not apply to these actions
          * @var array
          */
         $actionWhitelist = [
-            'indexAction', 'showAction', 'aboutAction', 'recordUsage', 'loginAction', 'oauthCallbackAction',
+            'indexAction', 'showAction', 'aboutAction', 'recordUsageAction', 'loginAction', 'oauthCallbackAction',
         ];
 
-        // No rate limits on lightweight pages, logged in users, or subrequests.
-        if (in_array($controller[1], $actionWhitelist) || $loggedIn || false === $event->isMasterRequest()) {
+        // No rate limits on lightweight pages, logged in users, subrequests or API requests.
+        if (in_array($controller[1], $actionWhitelist) || $loggedIn || false === $event->isMasterRequest() || $isApi) {
             return;
         }
 

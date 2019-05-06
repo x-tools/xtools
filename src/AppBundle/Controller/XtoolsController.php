@@ -140,7 +140,7 @@ abstract class XtoolsController extends Controller
         $this->controllerAction = $matches[1] ?? '';
 
         // Whether the action is an API action.
-        $this->isApi = 'Api' === substr($this->controllerAction, -3);
+        $this->isApi = 'Api' === substr($this->controllerAction, -3) || 'recordUsage' === $this->controllerAction;
 
         // Whether we're making a subrequest (the view makes a request to another action).
         $this->isSubRequest = $this->request->get('htmlonly')
