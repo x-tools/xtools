@@ -9,7 +9,8 @@
 			"Tacsipacsi",
 			"McDutchie",
 			"Pierpao",
-			"Robby"
+			"Robby",
+			"A2093064"
 		]
 	},
 	"abusefilter": "Name of for [[Special:AbuseFilter]]. Used to indicate how many changes a user made to AbuseFilters.",
@@ -35,7 +36,7 @@
 	"all-namespaces": "Label for the option to show data for all namespaces.",
 	"all-quotes": "Label for the button to show all quotes in the Bash Quote tool.",
 	"api": "{{Optional}}\nText for link to the API documentation.\n{{Identical|API}}",
-	"api-error": "Generic error message for when something went wrong while querying an API. $1 is the name of the API. This message is followed by the error returned by the API.",
+	"api-error": "Generic error message for when something went wrong while querying an API. $1 is the name of the API. This message is followed by the error returned by the API.\n\nFor example: Latest global edits API: <code>timeout</code>",
 	"approve": "Name of a MediaWiki log action, used as header of a row in the table of log action counts for a user.\n{{Identical|Approve}}",
 	"approximate": "Indicate the values are possibly inaccurate.\n{{Identical|Approximate}}",
 	"article": "Label for a wiki page in the main namespace.\n{{Identical|Article}}",

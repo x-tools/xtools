@@ -8,7 +8,8 @@
 			"Jeroen N",
 			"Elroy",
 			"Optilete",
-			"Romaine"
+			"Romaine",
+			"Rots61"
 		]
 	},
 	"abusefilter": "Misbruikfilter",
@@ -335,6 +336,7 @@
 	"username-or-ip": "Gebruikersnaam of IPv4 of IPv6 adres",
 	"view-source": "Brontekst bekijken",
 	"vote-msg": "$1 heeft $2 $3 pagina's bewerkt!",
+	"web-chat": "Verbonden",
 	"wednesday": "Woensdag",
 	"wiki": "Wiki",
 	"with-summary": "met samenvatting",
