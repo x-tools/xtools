@@ -130,7 +130,7 @@
 | [[Special:Log/thanks/{{ user.username }}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.thanks }}}}]]
 |-
 | {{ msg('approve') }}
-| [[Special:Log/review/{{ user.username }}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.approvals }}}}]]
+| [{{ wiki.pageUrlRaw('Special:Log/review/' ~ user.username, project, '&subtype=accept') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.approvals }}}}]
 |-
 | {{ msg('patrol') }}
 | [[Special:Log/patrol/{{ user.username }}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.patrols }}}}]]
