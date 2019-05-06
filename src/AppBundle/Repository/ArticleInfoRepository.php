@@ -28,6 +28,11 @@ class ArticleInfoRepository extends Repository
      */
     public function getBotData(Page $page, $start, $end): Statement
     {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'page_botdata');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
         $project = $page->getProject();
         $userGroupsTable = $project->getTableName('user_groups');
         $userFormerGroupsTable = $project->getTableName('user_former_groups');
@@ -41,7 +46,8 @@ class ArticleInfoRepository extends Repository
                 WHERE rev_page = :pageId AND (ug_group = 'bot' OR ufg_group = 'bot') $datesConditions
                 GROUP BY rev_user_text";
 
-        return $this->executeProjectsQuery($sql, ['pageId' => $page->getId()]);
+        $result = $this->executeProjectsQuery($sql, ['pageId' => $page->getId()]);
+        return $this->setCache($cacheKey, $result);
     }
 
     /**
@@ -53,6 +59,10 @@ class ArticleInfoRepository extends Repository
      */
     public function getLogEvents(Page $page, $start, $end): array
     {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'page_logevents');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
         $loggingTable = $page->getProject()->getTableName('logging', 'logindex');
 
         $datesConditions = $this->getDateConditions($start, $end, '', 'log_timestamp');
@@ -64,7 +74,8 @@ class ArticleInfoRepository extends Repository
                 AND log_type IN ('delete', 'move', 'protect', 'stable')";
         $title = str_replace(' ', '_', $page->getTitle());
 
-        return $this->executeProjectsQuery($sql, ['title' => $title])->fetchAll();
+        $result = $this->executeProjectsQuery($sql, ['title' => $title])->fetchAll();
+        return $this->setCache($cacheKey, $result);
     }
 
     /**
@@ -117,6 +128,11 @@ class ArticleInfoRepository extends Repository
      */
     public function getTransclusionData(Page $page): array
     {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'page_transclusions');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
         $categorylinksTable = $page->getProject()->getTableName('categorylinks');
         $templatelinksTable = $page->getProject()->getTableName('templatelinks');
         $imagelinksTable = $page->getProject()->getTableName('imagelinks');
@@ -135,11 +151,12 @@ class ArticleInfoRepository extends Repository
                 )";
         $resultQuery = $this->executeProjectsQuery($sql, ['pageId' => $page->getId()]);
         $transclusionCounts = [];
+
         while ($result = $resultQuery->fetch()) {
             $transclusionCounts[$result['key']] = (int)$result['val'];
         }
 
-        return $transclusionCounts;
+        return $this->setCache($cacheKey, $transclusionCounts);
     }
 
     /**
@@ -158,6 +175,11 @@ class ArticleInfoRepository extends Repository
         int $limit = 20,
         bool $noBots = false
     ): array {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'page_topeditors');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
         $project = $page->getProject();
         // Faster to use revision instead of revision_userindex in this case.
         $revTable = $project->getTableName('revision', '');
@@ -188,8 +210,10 @@ class ArticleInfoRepository extends Repository
                  ORDER BY count DESC
                  LIMIT $limit";
 
-        return $this->executeProjectsQuery($sql, [
+        $result = $this->executeProjectsQuery($sql, [
             'pageId' => $page->getId(),
         ])->fetchAll();
+
+        return $this->setCache($cacheKey, $result);
     }
 }
