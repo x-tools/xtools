@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.7.7 ##
+- Improve request blacklist functionality, allowing combination of user agent,
+  referer and URI.
+- Allow AJAX on wikify and recordUsage API endpoints.
+
 ## 3.7.6 ##
 - Disallow scraping XTools with JavaScript, informing the client to use the API
 - AdminStats: Only allow meta.wikimedia for Steward Stats
