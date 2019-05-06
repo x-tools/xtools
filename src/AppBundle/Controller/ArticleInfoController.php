@@ -225,6 +225,9 @@ class ArticleInfoController extends XtoolsController
      */
     public function textsharesResultAction(): Response
     {
+        // This action sometimes requires more memory. 256M should be safe.
+        ini_set('memory_limit', '256M');
+
         $articleInfoRepo = new ArticleInfoRepository();
         $articleInfoRepo->setContainer($this->container);
         $articleInfo = new ArticleInfo($this->page, $this->container);

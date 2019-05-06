@@ -75,6 +75,11 @@ class ArticleInfoRepository extends Repository
      */
     public function getTextshares(Page $page): ?array
     {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'page_authorship');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
         $title = rawurlencode(str_replace(' ', '_', $page->getTitle()));
         $client = new GuzzleHttp\Client();
 
@@ -84,7 +89,9 @@ class ArticleInfoRepository extends Repository
             "$title/?o_rev_id=false&editor=true&token_id=false&out=false&in=false";
 
         $res = $client->request('GET', $url, ['http_errors' => false]);
-        return json_decode($res->getBody()->getContents(), true);
+
+        // Cache and return.
+        return $this->setCache($cacheKey, json_decode($res->getBody()->getContents(), true));
     }
 
     /**
