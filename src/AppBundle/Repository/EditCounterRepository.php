@@ -156,6 +156,7 @@ class EditCounterRepository extends UserRightsRepository
             'upload-upload',
             'upload-overwrite',
             'abusefilter-modify',
+            'merge-merge',
         ];
         foreach ($requiredCounts as $req) {
             if (!isset($logCounts[$req])) {

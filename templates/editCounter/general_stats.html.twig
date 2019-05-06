@@ -400,6 +400,10 @@
                         <td>{{ wiki.userLogLink(user, project, ec.countRightsModified|num_format, 'rights') }}</td>
                     </tr>
                     <tr>
+                        <td>{{ msg('merge') }}</td>
+                        <td>{{ wiki.userLogLink(user, project, ec.merges|num_format, 'merge') }}</td>
+                    </tr>
+                    <tr>
                         <td>{{ msg('import') }}</td>
                         <td>{{ wiki.userLogLink(user, project, ec.countPagesImported|num_format, 'import') }}</td>
                     </tr>

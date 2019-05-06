@@ -175,6 +175,9 @@
 | {{ msg('rights') }}
 | [{{ wiki.pageUrlRaw('Special:Log/rights/' ~ user.username, project) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countRightsModified }}}}]
 |-
+| {{ msg('merge') }}
+| [{{ wiki.pageUrlRaw('Special:Log/merge/' ~ user.username, project) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.merges }}}}]
+|-
 | {{ msg('import') }}
 | [{{ wiki.pageUrlRaw('Special:Log/import/' ~ user.username, project) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesImported }}}}]
 |-

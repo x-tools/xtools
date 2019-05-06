@@ -664,6 +664,16 @@ class EditCounter extends UserRights
     }
 
     /**
+     * Get the number of history merges performed by the user.
+     * @return int
+     */
+    public function merges(): int
+    {
+        $logCounts = $this->getLogCounts();
+        return $logCounts['merge-merge'];
+    }
+
+    /**
      * Get the given user's total edit counts per namespace.
      * @return array Array keys are namespace IDs, values are the edit counts.
      */

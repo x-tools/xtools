@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.7.8 ##
+- Hotfix for request blacklist functionality
+- ArticleInfo: Cache queries and increase memory limit for authorship action.
+
 ## 3.7.7 ##
 - Improve request blacklist functionality, allowing combination of user agent,
   referer and URI.
