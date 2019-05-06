@@ -124,34 +124,34 @@ class RateLimitSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $blacklist = $this->container->getParameter('request_blacklist');
+        $blacklist = (array)$this->container->getParameter('request_blacklist');
         $ua = (string)$request->headers->get('User-Agent');
         $referer = (string)$request->headers->get('referer');
         $uri = $request->getRequestUri();
 
         foreach ($blacklist as $name => $item) {
-            $match = false;
+            $matches = [];
 
             if (isset($item['user_agent'])) {
-                $match = $item['user_agent'] === $ua;
+                $matches[] = $item['user_agent'] === $ua;
             }
             if (isset($item['user_agent_pattern'])) {
-                $match = 1 === preg_match('/'.$item['user_agent_pattern'].'/', $ua);
+                $matches[] = 1 === preg_match('/'.$item['user_agent_pattern'].'/', $ua);
             }
             if (isset($item['referer'])) {
-                $match = $item['referer'] === $referer;
+                $matches[] = $item['referer'] === $referer;
             }
             if (isset($item['referer_pattern'])) {
-                $match = 1 === preg_match('/'.$item['referer_pattern'].'/', $referer);
+                $matches[] = 1 === preg_match('/'.$item['referer_pattern'].'/', $referer);
             }
             if (isset($item['uri'])) {
-                $match = $item['uri'] === $uri;
+                $matches[] = $item['uri'] === $uri;
             }
             if (isset($item['uri_pattern'])) {
-                $match = 1 === preg_match('/'.$item['uri_pattern'].'/', $uri);
+                $matches[] = 1 === preg_match('/'.$item['uri_pattern'].'/', $uri);
             }
 
-            if ($match) {
+            if (count($matches) > 0 && count($matches) === count(array_filter($matches))) {
                 $this->denyAccess("Matched blacklist entry `$name`", true);
             }
         }
