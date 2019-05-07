@@ -397,7 +397,7 @@ parameters:
         The Wikipedia Adventure:
             regex: 'simulated automatically as part of \[\[WP:The Wikipedia Adventure\|'
             link: Project:TWA
-            namespaces: [2]
+            namespaces: [2, 3]
         Twinkle:
             regex: '(Wikipedia|WP):(TW|TWINKLE|Twinkle|FRIENDLY)'
             link: Project:Twinkle
