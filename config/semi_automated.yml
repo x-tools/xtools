@@ -116,7 +116,7 @@ parameters:
             regex: 'الرجوع عن التعديل \d+ بواسطة'
     arz:
         AutoWikiBrowser:
-            regex: 'عن طريق [[Project:AWB|اوب]]'
+            regex: 'عن طريق \[\[Project:AWB\|اوب\]\]'
     de:
         AutoWikiBrowser:
             regex: 'mit \[\[Project:AWB\|AWB'
