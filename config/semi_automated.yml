@@ -114,6 +114,9 @@ parameters:
     ar:
         Undo:
             regex: 'الرجوع عن التعديل \d+ بواسطة'
+    arz:
+        AutoWikiBrowser:
+            regex: 'عن طريق [[Project:AWB|اوب]]'
     de:
         AutoWikiBrowser:
             regex: 'mit \[\[Project:AWB\|AWB'
