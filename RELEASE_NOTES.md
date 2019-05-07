@@ -3,6 +3,10 @@
 ## 3.7.8 ##
 - Hotfix for request blacklist functionality
 - ArticleInfo: Cache queries and increase memory limit for authorship action.
+- T222552: Change 'approve' log to count manual approvals in Edit Counter
+- T218465: Add history merge log count to Edit Counter
+- AutoEdits: Cleanup of configuration file, expand namespace definitions
+- Localization updates
 
 ## 3.7.7 ##
 - Improve request blacklist functionality, allowing combination of user agent,
