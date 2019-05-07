@@ -114,9 +114,6 @@ parameters:
     ar:
         Undo:
             regex: 'الرجوع عن التعديل \d+ بواسطة'
-    arz:
-        AutoWikiBrowser:
-            regex: 'عن طريق \[\[Project:AWB\|اوب\]\]'
     de:
         AutoWikiBrowser:
             regex: 'mit \[\[Project:AWB\|AWB'
@@ -182,6 +179,10 @@ parameters:
         WPCleaner:
             link: ويكيبيديا:وب_كلينر
             label: وب_كلينر
+    arz.wikipedia.org:
+        AutoWikiBrowser:
+            regex: 'عن طريق \[\[Project:AWB\|اوب\]\]'
+            link: en:Wikipedia:AutoWikiBrowser
     de.wikipedia.org:
         Generic rollback:
             link: Wikipedia:Zurücksetzen
