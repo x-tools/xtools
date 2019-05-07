@@ -341,7 +341,7 @@ parameters:
             regex: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) \d+ (\[\[Wikipedia:Pending changes\|pending\]\]|pending) edits? (to revision \d+|by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\])'
             link: Project:Pending changes
             revert: true
-            namespaces: [0]
+            namespaces: [0, 4]
         Rater:
             regex: '\[\[User:(Evad37\/rater.js|Kephir\/gadgets\/rater)'
             link: User:Evad37/rater.js
