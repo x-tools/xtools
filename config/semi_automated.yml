@@ -343,6 +343,9 @@ parameters:
             regex: 'using \[\[Wikipedia:Page Curation\|Page Curation'
             link: w:en:Wikipedia:Page_Curation/Help
             namespaces: [0, 2, 3]
+        Page swap:
+            regex: '\/pageswap\|pageswap\]\]'
+            link: WP:PAGESWAP
         Pending changes revert:
             regex: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) \d+ (\[\[Wikipedia:Pending changes\|pending\]\]|pending) edits? (to revision \d+|by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\])'
             link: Project:Pending changes
