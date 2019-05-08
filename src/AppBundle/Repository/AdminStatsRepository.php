@@ -47,6 +47,11 @@ class AdminStatsRepository extends Repository
         [$countSql, $types, $actions] = $this->getLogSqlParts($project, $type, $actions);
         $dateConditions = $this->getDateConditions($start, $end, "logging_logindex.", 'log_timestamp');
 
+        if (empty($types) || empty($actions)) {
+            // Types/actions not applicable to this wiki.
+            return [];
+        }
+
         $sql = "SELECT user_name AS `username`,
                     $countSql
                     SUM(IF(log_type != '' AND log_action != '', 1, 0)) AS `total`
