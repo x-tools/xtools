@@ -311,6 +311,11 @@ class ArticleInfoController extends XtoolsController
             $modifiedDateTime = DateTime::createFromFormat('YmdHis', $info['modified_at']);
             $secsSinceLastEdit = (new DateTime)->getTimestamp() - $modifiedDateTime->getTimestamp();
 
+            // Some wikis (such foundation.wikimedia.org) may be missing the creation date.
+            $creationDateTime = false === $creationDateTime
+                ? null
+                : $creationDateTime->format('Y-m-d');
+
             $assessment = $page->getProject()
                 ->getPageAssessments()
                 ->getAssessment($page);
@@ -320,7 +325,7 @@ class ArticleInfoController extends XtoolsController
                 'editors' => (int) $info['num_editors'],
                 'author' => $info['author'],
                 'author_editcount' => (int) $info['author_editcount'],
-                'created_at' => $creationDateTime->format('Y-m-d'),
+                'created_at' => $creationDateTime,
                 'created_rev_id' => $info['created_rev_id'],
                 'modified_at' => $modifiedDateTime->format('Y-m-d H:i'),
                 'secs_since_last_edit' => $secsSinceLastEdit,
