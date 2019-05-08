@@ -315,7 +315,7 @@ parameters:
             regex: '\(\[\[c:GR\|GR\]\]\) '
             link: commons:Commons:File renaming/Global replace
         Heading editor:
-            regex: '\[\[User:The Evil IP address/hdedit\|script\]\]'
+            regex: '\[\[User:The Evil IP address\/hdedit\|script\]\]'
             link: User:The Evil IP address/hdedit
         Igloo:
             regex: 'Wikipedia:Igloo'
