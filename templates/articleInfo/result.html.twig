@@ -79,7 +79,7 @@
                     <tr>
                         <td>ID</td>
                         <td>
-                            {{ wiki.pageInfoLink(page, page.id|num_format) }}
+                            {{ wiki.pageInfoLink(page, page.id) }}
                         </td>
                     </tr>
                     {% if page.wikidataId is not empty %}
@@ -544,7 +544,7 @@
                                 {{ wiki.userLink(bot, project) }}
                                 {% if not botData.current %}
                                     <i>
-                                        ({{ wiki.pageLogLinkRaw('User:'~bot, project, msg('former-bot'), 'rights') }})
+                                        (<a href="{{ path('EditCounterRightsChanges', {project: project.domain, username: bot}) }}">{{ msg('former-bot') }}</a>)
                                     </i>
                                 {% endif %}
                             </td>

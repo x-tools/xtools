@@ -145,45 +145,52 @@ class PageRepository extends Repository
         $start = false,
         $end = false
     ): \Doctrine\DBAL\Driver\Statement {
-        $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
+        $cacheKey = $this->getCacheKey(func_get_args(), 'page_revisions');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $revTable = $this->getTableName(
+            $page->getProject()->getDatabaseName(),
+            'revision',
+            $user ? null : '' // Use 'revision' if there's no user, otherwise default to revision_userindex
+        );
         $commentTable = $this->getTableName($page->getProject()->getDatabaseName(), 'comment');
         $userClause = $user ? "revs.rev_user_text = :username AND " : "";
 
-        // This sorts ascending by rev_timestamp because ArticleInfo must start with the oldest
-        // revision and work its way forward for proper processing. Consequently, if we want to do
-        // a LIMIT we want the most recent revisions, so we also need to know the total count to
-        // supply as the OFFSET.
         $limitClause = '';
         if (intval($limit) > 0 && isset($numRevisions)) {
-            $offset = $numRevisions - $limit;
-            $limitClause = "LIMIT $offset, $limit";
+            $limitClause = "LIMIT $limit";
         }
 
         $dateConditions = $this->getDateConditions($start, $end, 'revs.');
 
-        $sql = "SELECT
-                    revs.rev_id AS id,
-                    revs.rev_timestamp AS timestamp,
-                    revs.rev_minor_edit AS minor,
-                    revs.rev_len AS length,
-                    (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
-                    revs.rev_user AS user_id,
-                    revs.rev_user_text AS username,
-                    comment_text AS `comment`,
-                    revs.rev_sha1 AS sha
-                FROM $revTable AS revs
-                LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-                LEFT OUTER JOIN $commentTable ON comment_id = revs.rev_comment_id
-                WHERE $userClause revs.rev_page = :pageid $dateConditions
-                ORDER BY revs.rev_timestamp ASC
-                $limitClause";
+        $sql = "SELECT * FROM (
+                    SELECT
+                        revs.rev_id AS id,
+                        revs.rev_timestamp AS timestamp,
+                        revs.rev_minor_edit AS minor,
+                        revs.rev_len AS length,
+                        (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
+                        revs.rev_user AS user_id,
+                        revs.rev_user_text AS username,
+                        comment_text AS `comment`,
+                        revs.rev_sha1 AS sha
+                    FROM $revTable AS revs
+                    LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+                    LEFT OUTER JOIN $commentTable ON comment_id = revs.rev_comment_id
+                    WHERE $userClause revs.rev_page = :pageid $dateConditions
+                    ORDER BY revs.rev_timestamp DESC
+                    $limitClause
+                ) a
+                ORDER BY timestamp ASC";
 
         $params = ['pageid' => $page->getId()];
         if ($user) {
             $params['username'] = $user->getUsername();
         }
 
-        return $this->executeProjectsQuery($sql, $params);
+        return $this->setCache($cacheKey, $this->executeProjectsQuery($sql, $params));
     }
 
     /**
