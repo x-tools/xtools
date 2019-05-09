@@ -9,6 +9,7 @@ namespace AppBundle\Model;
 
 use AppBundle\Helper\I18nHelper;
 use DateTime;
+use Doctrine\DBAL\Statement;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DomCrawler\Crawler;
 
@@ -894,8 +895,10 @@ class ArticleInfo extends Model
             $this->addedBytes -= $prevEdits['prev']->getSize();
 
             // Also deduct from the user's individual added byte count.
-            $username = $prevEdits['prev']->getUser()->getUsername();
-            $this->editors[$username]['added'] -= $prevEdits['prev']->getSize();
+            if ($prevEdits['prev']->getUser()) {
+                $username = $prevEdits['prev']->getUser()->getUsername();
+                $this->editors[$username]['added'] -= $prevEdits['prev']->getSize();
+            }
         }
 
         // @TODO: Test this against an edit war (use your sandbox).
@@ -924,7 +927,10 @@ class ArticleInfo extends Model
         // Edit was not a revert, so treat size > 0 as content added.
         if ($editSize > 0) {
             $this->addedBytes += $editSize;
-            $this->editors[$edit->getUser()->getUsername()]['added'] += $editSize;
+
+            if ($edit->getUser()) {
+                $this->editors[$edit->getUser()->getUsername()]['added'] += $editSize;
+            }
 
             // Keep track of edit with max addition.
             if (!$this->maxAddition || $editSize > $this->maxAddition->getSize()) {
@@ -1092,6 +1098,10 @@ class ArticleInfo extends Model
      */
     private function updateUserCounts(Edit $edit): void
     {
+        if (!$edit->getUser()) {
+            return;
+        }
+
         $username = $edit->getUser()->getUsername();
 
         // Initialize various user stats if needed.
@@ -1158,11 +1168,13 @@ class ArticleInfo extends Model
     {
         // Parse the bot edits.
         $bots = [];
+
+        /** @var Statement $botData */
         $botData = $this->getRepository()->getBotData($this->page, $this->start, $this->end);
         while ($bot = $botData->fetch()) {
             $bots[$bot['username']] = [
                 'count' => (int)$bot['count'],
-                'current' => 'bot' === $bot['current'],
+                'current' => '1' === $bot['current'],
             ];
         }
 

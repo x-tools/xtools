@@ -62,13 +62,9 @@ class Edit extends Model
         }
 
         $this->minor = '1' === $attrs['minor'];
-
-        // NOTE: Do not type cast into an integer. Null values are
-        //   our indication that the revision was revision-deleted.
         $this->length = (int)$attrs['length'];
         $this->lengthChange = (int)$attrs['length_change'];
-
-        $this->user = $attrs['user'] ?? new User($attrs['username']);
+        $this->user = $attrs['user'] ?? ($attrs['username'] ? new User($attrs['username']) : null);
         $this->comment = $attrs['comment'];
 
         if (isset($attrs['rev_sha1']) || isset($attrs['sha'])) {
@@ -175,9 +171,9 @@ class Edit extends Model
 
     /**
      * Get the user who made the edit.
-     * @return User
+     * @return User|null null can happen for instance if the username was suppressed.
      */
-    public function getUser(): User
+    public function getUser(): ?User
     {
         return $this->user;
     }
@@ -379,10 +375,10 @@ class Edit extends Model
 
     /**
      * Was the edit made by a logged out user?
-     * @return bool
+     * @return bool|null
      */
-    public function isAnon(): bool
+    public function isAnon(): ?bool
     {
-        return $this->getUser()->isAnon();
+        return $this->getUser() ? $this->getUser()->isAnon() : null;
     }
 }

@@ -34,16 +34,22 @@ class ArticleInfoRepository extends Repository
         }
 
         $project = $page->getProject();
+        $revTable = $project->getTableName('revision');
         $userGroupsTable = $project->getTableName('user_groups');
         $userFormerGroupsTable = $project->getTableName('user_former_groups');
 
         $datesConditions = $this->getDateConditions($start, $end);
 
-        $sql = "SELECT COUNT(DISTINCT(rev_id)) AS count, rev_user_text AS username, ug_group AS current
-                FROM " . $project->getTableName('revision') . "
+        $sql = "SELECT COUNT(DISTINCT(rev_id)) AS count, rev_user_text AS username, '1' AS current
+                FROM $revTable
                 LEFT JOIN $userGroupsTable ON rev_user = ug_user
+                WHERE rev_page = :pageId AND ug_group = 'bot' $datesConditions
+                GROUP BY rev_user_text
+                UNION
+                SELECT COUNT(DISTINCT(rev_id)) AS count, rev_user_text AS username, '0' AS current
+                FROM $revTable
                 LEFT JOIN $userFormerGroupsTable ON rev_user = ufg_user
-                WHERE rev_page = :pageId AND (ug_group = 'bot' OR ufg_group = 'bot') $datesConditions
+                WHERE rev_page = :pageId AND ufg_group = 'bot' $datesConditions
                 GROUP BY rev_user_text";
 
         $result = $this->executeProjectsQuery($sql, ['pageId' => $page->getId()]);
