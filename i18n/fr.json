@@ -139,7 +139,7 @@
 	"end": "Date de fin",
 	"error-articleinfo-api": "Impossible de récupérer les informations de révision.",
 	"error-automation": "L'utilisation de l'automatisation pour supprimer l'interface utilisateur des XTools n'est pas autorisée. Veuillez utiliser notre API complète à la place: $1",
-	"error-denied": "Votre accès à XTools a été bloqué du fait d’un automatisation perturbatrice ou apparemment abusive. Veuillez contacter $1",
+	"error-denied": "Votre accès à XTools a été bloqué du fait d’une automatisation perturbatrice ou apparemment abusive. Veuillez contacter $1",
 	"error-login": "Echec de connexion! Veuillez réessayer.",
 	"error-pagepile-too-large": "Désolé, il y a trop de pages à exporter vers PagePile. Vous pouvez créer manuellement un PagePile, ou essayer de réduire l’ensemble des résultats en limitant à un espace de noms spécifique ou à une période.",
 	"error-query-timeout": "Désolé, l’information demandée a pris trop de temps à être traitée (délai de $1 {{PLURAL:$1|seconde|secondes}}). Afin d’économiser les ressources, la requête a été automatiquement arrêtée.",
