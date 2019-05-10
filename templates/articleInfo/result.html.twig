@@ -436,7 +436,10 @@
                 </div>
                 {% if ai.maxAddition is not null %}
                     <div class="pull-left">
-                        <div class="chart-title">{{ msg('top-ten-by-text')|ucfirst }}</div>
+                        <div class="chart-title">
+                            {{ msg('top-ten-by-text')|ucfirst }}
+                            <span class="text-muted">({{ msg('approximate')|lower }})</span>
+                        </div>
                         {{ chart.pie_chart('top_by_added', ai.topTenEditorsByAdded) }}
                     </div>
                 {% endif %}

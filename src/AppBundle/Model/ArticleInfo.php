@@ -859,10 +859,11 @@ class ArticleInfo extends Model
      * @param Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
      * @return Edit[] Updated version of $prevEdits.
      */
-    private function updateContentSizes(Edit $edit, array $prevEdits): array
+    private function updateContentSizes(Edit &$edit, array $prevEdits): array
     {
         // Check if it was a revert
         if ($this->isRevert($edit, $prevEdits)) {
+            $edit->setReverted(true);
             return $this->updateContentSizesRevert($prevEdits);
         } else {
             return $this->updateContentSizesNonRevert($edit, $prevEdits);
@@ -891,10 +892,11 @@ class ArticleInfo extends Model
         $this->revertCount++;
 
         // Adjust addedBytes given this edit was a revert of the previous one.
-        if ($prevEdits['prev'] && $prevEdits['prev']->getSize() > 0) {
+        if ($prevEdits['prev'] && !$prevEdits['prev']->isReverted() && $prevEdits['prev']->getSize() > 0) {
             $this->addedBytes -= $prevEdits['prev']->getSize();
 
             // Also deduct from the user's individual added byte count.
+            // We don't do this if the previous edit was reverted, since that would make the net bytes zero.
             if ($prevEdits['prev']->getUser()) {
                 $username = $prevEdits['prev']->getUser()->getUsername();
                 $this->editors[$username]['added'] -= $prevEdits['prev']->getSize();

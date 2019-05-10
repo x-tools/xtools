@@ -108,8 +108,8 @@ parameters:
             regex: 'WP:CLEANER|WPCleaner\]\]|\[\[\Wikipedia:DPL|\[\[WP:WCW\]\] project \('
             tag: WPCleaner
             link: Special:MyLanguage/Project:WPCleaner
-        
-        
+
+
     # Per-language lists. This generally only includes native MediaWiki actions.
     ar:
         Undo:
@@ -401,7 +401,7 @@ parameters:
         Twinkle:
             regex: '(Wikipedia|WP):(TW|TWINKLE|Twinkle|FRIENDLY)'
             link: Project:Twinkle
-            revert: '(Reverted to revision|Reverted \d+ edits).*(WP:(TW|TWINKLE|Twinkle)|Wikipedia:Twinkle)'
+            revert: '^Reverted.*(WP:(TW|TWINKLE|Twinkle)|Wikipedia:Twinkle)'
         unblock-review:
             regex: '\(\[\[User:Enterprisey\/unblock-review'
             link: User:Enterprisey/unblock-review

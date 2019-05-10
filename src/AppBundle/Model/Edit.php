@@ -208,11 +208,20 @@ class Edit extends Model
     /**
      * Was this edit reported as having been reverted?
      * The value for this is merely passed in from precomputed data.
-     * @return bool
+     * @return bool|null
      */
-    public function isReverted(): bool
+    public function isReverted(): ?bool
     {
         return $this->reverted;
+    }
+
+    /**
+     * Set the reverted property.
+     * @param bool $revert
+     */
+    public function setReverted(bool $revert): void
+    {
+        $this->reverted = $revert;
     }
 
     /**
