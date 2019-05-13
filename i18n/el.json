@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"Nikosgranturismogt"
+			"Nikosgranturismogt",
+			"Geraki"
 		]
 	},
 	"accepted-formats": "Επιτρεπόμενες μορφές",
@@ -428,7 +429,7 @@
 	"view-source": "Προβολή κώδικα",
 	"view-wikitext": "Προβολή ως βικικείμενο",
 	"vote-msg": "Ο $1 έχει επεξεργαστεί $2 $3 σελίδες!",
-	"web-chat": "Διαδικτυακή συνομιλία",
+	"web-chat": "Σύνδεση",
 	"wednesday": "Τετάρτη",
 	"wiki": "Βίκι",
 	"wikiproject": "Εγχείρημα Wiki",
