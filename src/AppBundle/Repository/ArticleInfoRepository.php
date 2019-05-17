@@ -98,14 +98,24 @@ class ArticleInfoRepository extends Repository
         }
 
         $title = rawurlencode(str_replace(' ', '_', $page->getTitle()));
-        $client = new GuzzleHttp\Client();
-
         $projectLang = $page->getProject()->getLang();
 
         $url = "https://api.wikiwho.net/$projectLang/api/v1.0.0-beta/rev_content/" .
             "$title/?o_rev_id=false&editor=true&token_id=false&out=false&in=false";
 
-        $res = $client->request('GET', $url, ['http_errors' => false]);
+        // Ignore HTTP errors to fail gracefully.
+        $opts = ['http_errors' => false];
+
+        // Use WikiWho API credentials, if present. They are not required.
+        if ($this->container->getParameter('app.wikiwho.username')) {
+            $opts['auth'] = [
+                $this->container->getParameter('app.wikiwho.username'),
+                $this->container->getParameter('app.wikiwho.password'),
+            ];
+        }
+
+        $client = new GuzzleHttp\Client();
+        $res = $client->request('GET', $url, $opts);
 
         // Cache and return.
         return $this->setCache($cacheKey, json_decode($res->getBody()->getContents(), true));

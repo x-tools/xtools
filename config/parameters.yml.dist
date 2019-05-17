@@ -60,6 +60,10 @@ parameters:
     app.max_page_revisions: 50000
     app.max_user_edits: 350000
 
+    # Ignore except for WMF production XTools.
+    app.wikiwho.username: ~
+    app.wikiwho.password: ~
+
     # Ignore for any non-WMF installation. This is only meant to convert legacy parameters.
     languageless_wikis: []
 

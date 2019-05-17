@@ -91,6 +91,8 @@ Application
 - **app.rate_limit_count** - Number of requests from the same user that are allowed during the time frame specified by ``app.rate_limit_time``. Set this to ``0`` to disable rate limiting.
 - **app.max_page_revisions** - Set a maximum number of revisions to process for pages. This is to safeguard against unnecessarily consuming too many resources for queries that will most surely timeout. Set this to `0` to disable all limitations.
 - **app.max_user_edits** - Querying a user that has more edits than this will be rejected. This is to safeguard against unnecessarily consuming too many resources for queries that will most surely timeout. Set this to `0` to disable all limitations.
+- **app.wikiwho.username** - Used to get around rate-limiting of the WikiWho API, which is used by the Authorship feature of the ArticleInfo tool. Leave blank if you're working in a development environment, or are using a non-WMF installation of XTools.
+- **app.wikiwho.password** - Used to get around rate-limiting of the WikiWho API, which is used by the Authorship feature of the ArticleInfo tool. Leave blank if you're working in a development environment, or are using a non-WMF installation of XTools.
 - **languageless_wikis** - This should be left blank for any non-WMF installation. This is used only to convert legacy XTools URL parameters to the modern equivalents, listing any wikis where there is no specific language associated with it. "meta.wikimedia.org" is intentionally not included. Developers may also leave this value blank.
 
 Tools
