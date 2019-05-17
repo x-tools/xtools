@@ -1,5 +1,12 @@
 # Release Notes #
 
+## 3.7.9 ##
+- ArticleInfo: Major performance improvements, bug fixes and code cleanup.
+- ArticleInfo: Login to WikiWho API to get around throttling.
+- AdminStats: Fix bug for when invalid log types are requested.
+- T222920: Fix unsetting of 'all' and 'none' tool types in AutoEdits.
+- Localization updates.
+
 ## 3.7.8 ##
 - Hotfix for request blacklist functionality
 - ArticleInfo: Cache queries and increase memory limit for authorship action.
