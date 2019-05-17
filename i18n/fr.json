@@ -317,7 +317,7 @@
 	"patrols": "Patrouilles",
 	"patrols-desc": "$2 {{PLURAL:$1|article patrouillé|articles patrouillés}}",
 	"pc-accept": "Acceptation de modification en attente",
-	"pc-reject": "Rejet de modification en attente",
+	"pc-reject": "Modification en attente non-acceptée",
 	"page-curation": "Supervision de la page",
 	"percent-of-edit-count": "% du nombre de modifications",
 	"percent-of-tools": "% d'outils",
