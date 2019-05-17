@@ -71,10 +71,13 @@ class AutomatedEditsController extends XtoolsController
             $tool = $this->request->query->get('tool');
 
             if ('all' === $tool) {
+                unset($this->params['tool']);
                 return $this->redirectToRoute('AutoEditsContributionsResult', $this->params);
             } elseif ('' != $tool && 'none' !== $tool) {
                 $this->params['tool'] = $tool;
                 return $this->redirectToRoute('AutoEditsContributionsResult', $this->params);
+            } elseif ('none' === $tool) {
+                unset($this->params['tool']);
             }
 
             // Otherwise redirect to the normal result action.
