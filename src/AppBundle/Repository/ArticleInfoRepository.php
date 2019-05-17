@@ -107,7 +107,7 @@ class ArticleInfoRepository extends Repository
         $opts = ['http_errors' => false];
 
         // Use WikiWho API credentials, if present. They are not required.
-        if ($this->container->getParameter('app.wikiwho.username')) {
+        if ($this->container->hasParameter('app.wikiwho.username')) {
             $opts['auth'] = [
                 $this->container->getParameter('app.wikiwho.username'),
                 $this->container->getParameter('app.wikiwho.password'),
