@@ -56,7 +56,7 @@ parameters:
         Generic rollback:
             tag: mw-rollback
             single_tag: true
-            regex: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) edits by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\] \(\[\[User talk:.*?\|talk\]\]\) to last (version|revision) by .*'
+            regex: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) edits by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\]( \(\[\[User talk:.*?\|talk\]\]\))? to last (version|revision) by .*'
             link: Special:MyLanguage/Project:Rollback
             revert: true
         Global rename:
