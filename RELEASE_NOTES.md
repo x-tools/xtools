@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.7.10 ##
+- Hotfix for checking app.wikiwho config parameters.
+- Fix checking of controller action in RateLimitSubscriber.
+
 ## 3.7.9 ##
 - ArticleInfo: Major performance improvements, bug fixes and code cleanup.
 - ArticleInfo: Login to WikiWho API to get around throttling.
