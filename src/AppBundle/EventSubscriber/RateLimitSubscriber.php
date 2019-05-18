@@ -76,7 +76,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
 
         $controller = $event->getController();
         $loggedIn = (bool) $this->container->get('session')->get('logged_in_user');
-        $isApi = substr($controller[1], -3);
+        $isApi = 'ApiAction' === substr($controller[1], -9);
 
         /**
          * Rate limiting will not apply to these actions
