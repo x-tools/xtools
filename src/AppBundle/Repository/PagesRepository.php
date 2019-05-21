@@ -52,7 +52,7 @@ class PagesRepository extends UserRepository
         $conditions = array_merge(
             $conditions,
             $this->getNamespaceRedirectAndDeletedPagesConditions($namespace, $redirects),
-            $this->getUserConditions($project, $user, '' !== $start.$end)
+            $this->getUserConditions('' !== $start.$end)
         );
 
         $sql = "SELECT namespace,
@@ -109,7 +109,7 @@ class PagesRepository extends UserRepository
         $conditions = array_merge(
             $conditions,
             $this->getNamespaceRedirectAndDeletedPagesConditions($namespace, $redirects),
-            $this->getUserConditions($project, $user, '' !== $start.$end)
+            $this->getUserConditions('' !== $start.$end)
         );
 
         $pageAssessmentsTable = $project->getTableName('page_assessments');
@@ -274,7 +274,7 @@ class PagesRepository extends UserRepository
 
         $conditions = array_merge(
             $this->getNamespaceRedirectAndDeletedPagesConditions($namespace, $redirects),
-            $this->getUserConditions($project, $user, '' !== $start.$end)
+            $this->getUserConditions('' !== $start.$end)
         );
         [$revCondBegin, $revCondEnd] = $this->getRevTimestampConditions($start, $end);
 

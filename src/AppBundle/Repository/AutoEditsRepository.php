@@ -92,7 +92,7 @@ class AutoEditsRepository extends UserRepository
 
         $params = [];
 
-        // Build SQL for detecting autoedits via regex and/or tags
+        // Build SQL for detecting AutoEdits via regex and/or tags.
         $condTools = [];
         if ('' != $regex) {
             $commentJoin = "LEFT OUTER JOIN $commentTable ON rev_comment_id = comment_id";
@@ -104,14 +104,13 @@ class AutoEditsRepository extends UserRepository
             $condTools[] = "ct_tag_id IN ($tagIds)";
         }
         $condTool = 'AND (' . implode(' OR ', $condTools) . ')';
-        $userClause = $user->isAnon() ? 'rev_user_text = :username' : 'rev_user = :userId';
 
         $sql = "SELECT COUNT(DISTINCT(rev_id))
                 FROM $revisionTable
                 $pageJoin
                 $commentJoin
                 $tagJoin
-                WHERE $userClause
+                WHERE rev_actor = :actorId
                 $condNamespace
                 $condTool
                 $condBegin
@@ -160,7 +159,6 @@ class AutoEditsRepository extends UserRepository
         $condNamespace = 'all' === $namespace ? '' : 'AND page_namespace = :namespace';
         $condTag = '' != $tagIds ? "AND NOT EXISTS (SELECT 1 FROM $tagTable
             WHERE ct_rev_id = revs.rev_id AND ct_tag_id IN ($tagIds))" : '';
-        $userClause = $user->isAnon() ? 'rev_user_text = :username' : 'rev_user = :userId';
         $sql = "SELECT
                     page_title,
                     page_namespace,
@@ -174,7 +172,7 @@ class AutoEditsRepository extends UserRepository
                 JOIN $revisionTable AS revs ON (page_id = revs.rev_page)
                 LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                 LEFT OUTER JOIN $commentTable ON (revs.rev_comment_id = comment_id)
-                WHERE revs.{$userClause}
+                WHERE revs.rev_actor = :actorId
                 AND revs.rev_timestamp > 0
                 AND comment_text NOT RLIKE :tools
                 $condTag
@@ -234,7 +232,6 @@ class AutoEditsRepository extends UserRepository
         $commentTable = $project->getTableName('comment');
         $tagTable = $project->getTableName('change_tag');
         $condNamespace = 'all' === $namespace ? '' : 'AND page_namespace = :namespace';
-        $userClause = $user->isAnon() ? 'rev_user_text = :username' : 'rev_user = :userId';
         $tagJoin = '';
         $condsTool = [];
 
@@ -274,7 +271,7 @@ class AutoEditsRepository extends UserRepository
                 LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                 LEFT OUTER JOIN $commentTable ON (revs.rev_comment_id = comment_id)
                 $tagJoin
-                WHERE revs.{$userClause}
+                WHERE revs.rev_actor = :actorId
                 $condBegin
                 $condEnd
                 $condNamespace
@@ -368,10 +365,7 @@ class AutoEditsRepository extends UserRepository
         $queries = [];
 
         $revisionTable = $project->getTableName('revision');
-
         [$pageJoin, $condNamespace] = $this->getPageAndNamespaceSql($project, $namespace);
-        $userClause = $user->isAnon() ? 'rev_user_text = :username' : 'rev_user = :userId';
-
         $conn = $this->getProjectsConnection();
 
         foreach ($tools as $toolName => $values) {
@@ -391,7 +385,7 @@ class AutoEditsRepository extends UserRepository
                 $pageJoin
                 $commentJoin
                 $tagJoin
-                WHERE $userClause
+                WHERE rev_actor = :actorId
                 AND $condTool
                 $condNamespace
                 $condBegin
