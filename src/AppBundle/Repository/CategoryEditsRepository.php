@@ -10,7 +10,9 @@ namespace AppBundle\Repository;
 use AppBundle\Helper\AutomatedEditsHelper;
 use AppBundle\Model\Project;
 use AppBundle\Model\User;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\ResultStatement;
+use Doctrine\DBAL\Query\QueryBuilder;
 
 /**
  * CategoryEditsRepository is responsible for retrieving data from the database
@@ -61,10 +63,10 @@ class CategoryEditsRepository extends Repository
         $query->select(['COUNT(DISTINCT(revs.rev_id))'])
             ->from($revisionTable, 'revs')
             ->join('revs', $categorylinksTable, null, 'cl_from = rev_page')
-            ->where('revs.rev_user_text = :username')
+            ->where('revs.rev_actor = :actorId')
             ->andWhere($query->expr()->in('cl_to', ':categories'));
 
-        $result = (int)$this->executeStmt($query, $user, $categories, $start, $end)->fetchColumn();
+        $result = (int)$this->executeStmt($query, $project, $user, $categories, $start, $end)->fetchColumn();
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);
@@ -98,13 +100,13 @@ class CategoryEditsRepository extends Repository
         $query->select(['cl_to AS cat', 'COUNT(rev_id) AS edit_count', 'COUNT(DISTINCT(rev_page)) AS page_count'])
             ->from($revisionTable, 'revs')
             ->join('revs', $categorylinksTable, null, 'cl_from = rev_page')
-            ->where('revs.rev_user_text = :username')
+            ->where('revs.rev_actor = :actorId')
             ->andWhere($query->expr()->in('cl_to', ':categories'))
             ->orderBy('edit_count', 'DESC')
             ->groupBy('cl_to');
 
         $counts = [];
-        $stmt = $this->executeStmt($query, $user, $categories, $start, $end);
+        $stmt = $this->executeStmt($query, $project, $user, $categories, $start, $end);
         while ($result = $stmt->fetch()) {
             $counts[$result['cat']] = [
                 'editCount' => (int)$result['edit_count'],
@@ -124,8 +126,7 @@ class CategoryEditsRepository extends Repository
      * @param string $start Start date in a format accepted by strtotime()
      * @param string $end End date in a format accepted by strtotime()
      * @param int $offset Used for pagination, offset results by N edits
-     * @return string[] Result of query, with columns 'page_title',
-     *   'page_namespace', 'rev_id', 'timestamp', 'minor',
+     * @return string[] Result of query, with columns 'page_title', 'page_namespace', 'rev_id', 'timestamp', 'minor',
      *   'length', 'length_change', 'comment'
      */
     public function getCategoryEdits(
@@ -162,14 +163,14 @@ class CategoryEditsRepository extends Repository
             ->join('revs', $categorylinksTable, null, 'cl_from = rev_page')
             ->leftJoin('revs', $commentTable, 'comment', 'revs.rev_comment_id = comment_id')
             ->leftJoin('revs', $revisionTable, 'parentrevs', 'revs.rev_parent_id = parentrevs.rev_id')
-            ->where('revs.rev_user_text = :username')
+            ->where('revs.rev_actor = :actorId')
             ->andWhere($query->expr()->in('cl_to', ':categories'))
             ->groupBy('revs.rev_id')
             ->orderBy('revs.rev_timestamp', 'DESC')
             ->setMaxResults(50)
             ->setFirstResult($offset);
 
-        $result = $this->executeStmt($query, $user, $categories, $start, $end)->fetchAll();
+        $result = $this->executeStmt($query, $project, $user, $categories, $start, $end)->fetchAll();
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);
@@ -177,7 +178,8 @@ class CategoryEditsRepository extends Repository
 
     /**
      * Bind dates, username and categories then execute the query.
-     * @param \Doctrine\DBAL\Query\QueryBuilder $query
+     * @param QueryBuilder $query
+     * @param Project $project
      * @param User $user
      * @param string[] $categories
      * @param string $start Start date in a format accepted by strtotime()
@@ -185,12 +187,13 @@ class CategoryEditsRepository extends Repository
      * @return ResultStatement
      */
     private function executeStmt(
-        \Doctrine\DBAL\Query\QueryBuilder $query,
+        QueryBuilder $query,
+        Project $project,
         User $user,
         array $categories,
         string $start,
         string $end
-    ): \Doctrine\DBAL\Driver\Statement {
+    ): ResultStatement {
         if (!empty($start)) {
             $query->andWhere('revs.rev_timestamp >= :start');
             $query->setParameter('start', $start);
@@ -200,9 +203,8 @@ class CategoryEditsRepository extends Repository
             $query->setParameter('end', $end);
         }
 
-        $username = $user->getUsername();
-        $query->setParameter('username', $username);
-        $query->setParameter('categories', $categories, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
+        $query->setParameter('actorId', $user->getActorId($project));
+        $query->setParameter('categories', $categories, Connection::PARAM_STR_ARRAY);
 
         return $this->executeQueryBuilder($query);
     }

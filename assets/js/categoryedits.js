@@ -23,10 +23,12 @@ $(function () {
             );
         });
 
-        xtools.application.setupToggleTable(window.countsByCategory, window.categoryChart, null, function (newData) {
-            var total = 0;
+        xtools.application.setupToggleTable(window.countsByCategory, window.categoryChart, 'editCount', function (newData) {
+            var totalEdits = 0,
+                totalPages = 0;
             Object.keys(newData).forEach(function (category) {
-                total += parseInt(newData[category], 10);
+                totalEdits += parseInt(newData[category].editCount, 10);
+                totalPages += parseInt(newData[category].pageCount, 10);
             });
             var categoriesCount = Object.keys(newData).length;
             /** global: i18nLang */
@@ -34,7 +36,11 @@ $(function () {
                 categoriesCount.toLocaleString(i18nLang) + " " +
                 $.i18n('num-categories', categoriesCount)
             );
-            $('.category--count').text(total.toLocaleString(i18nLang));
+            $('.category--count').text(totalEdits.toLocaleString(i18nLang));
+            $('.category--percent-of-edit-count').text(
+                ((totalEdits / xtools.categoryedits.userEditCount).toLocaleString(i18nLang) * 100) + '%'
+            );
+            $('.category--pages').text(totalPages.toLocaleString(i18nLang));
         });
 
         if ($('.contributions-container').length) {

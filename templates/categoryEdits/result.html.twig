@@ -212,6 +212,7 @@
                         }
                     });
                     window.countsByCategory = {{ ce.categoryCounts|json_encode()|raw }};
+                    xtools.categoryedits.userEditCount = {{ ce.editCount }};
                 </script>
             {% endif %}
 
