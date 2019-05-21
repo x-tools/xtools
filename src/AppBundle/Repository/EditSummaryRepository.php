@@ -38,11 +38,11 @@ class EditSummaryRepository extends Repository
                 FROM $revisionTable
                 $pageJoin
                 LEFT OUTER JOIN $commentTable ON comment_id = rev_comment_id
-                WHERE rev_user_text = :username
+                WHERE rev_actor = :actorId
                 $condNamespace
                 ORDER BY rev_timestamp DESC";
 
-        $params = ['username' => $user->getUsername()];
+        $params = ['actorId' => $user->getActorId($project)];
         if ('all' !== $namespace) {
             $params['namespace'] = $namespace;
         }
