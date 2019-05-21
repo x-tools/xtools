@@ -77,12 +77,10 @@ class User extends Model
      */
     public function getActorId(Project $project): int
     {
-        $ret = $this->getRepository()->getActorId(
+        return (int)$this->getRepository()->getActorId(
             $project->getDatabaseName(),
             $this->getUsername()
         );
-
-        return (int)$ret['actorId'];
     }
 
     /**

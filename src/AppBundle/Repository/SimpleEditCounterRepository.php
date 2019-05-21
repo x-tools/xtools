@@ -52,14 +52,14 @@ class SimpleEditCounterRepository extends Repository
                 UNION
                 SELECT 'arch' AS source, COUNT(*) AS value
                     FROM $archiveTable
-                    WHERE ar_user_text = :username
+                    WHERE ar_actor = :actorId
                     $arNamespaceWhereSql
                     $arDateConditions
                 UNION
                 SELECT 'rev' AS source, COUNT(*) AS value
                     FROM $revisionTable
                     $revNamespaceJoinSql
-                    WHERE rev_user_text = :username
+                    WHERE rev_actor = :actorId
                     $revNamespaceWhereSql
                     $revDateConditions
                 UNION
@@ -68,7 +68,10 @@ class SimpleEditCounterRepository extends Repository
                     JOIN $userTable ON user_id = ug_user
                     WHERE user_name = :username";
 
-        $result = $this->executeProjectsQuery($sql, ['username' => $user->getUsername()])->fetchAll();
+        $result = $this->executeProjectsQuery($sql, [
+            'username' => $user->getUsername(),
+            'actorId' => $user->getActorId($project),
+        ])->fetchAll();
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);

@@ -77,7 +77,7 @@ class UserRepository extends Repository
         $resultQuery = $this->executeProjectsQuery($sql, ['username' => $username]);
 
         // Cache and return.
-        return (int)$this->setCache($cacheKey, $resultQuery->fetch());
+        return (int)$this->setCache($cacheKey, $resultQuery->fetchColumn());
     }
 
     /**
