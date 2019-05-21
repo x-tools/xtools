@@ -45,49 +45,49 @@ class AdminScoreRepository extends Repository
                     WHERE log_type = 'patrol'
                         AND log_action = 'patrol'
                         AND log_namespace = 0
-                        AND log_deleted = 0 AND log_user_text = :username
+                        AND log_deleted = 0 AND log_actor = :actorId
                 UNION
                 SELECT 'blocks' AS source, COUNT(*) AS value FROM $loggingTable l
-                    INNER JOIN $userTable u ON l.log_user = u.user_id
                     WHERE l.log_type = 'block' AND l.log_action = 'block'
-                    AND l.log_namespace = 2 AND l.log_deleted = 0 AND u.user_name = :username
+                    AND l.log_namespace = 2 AND l.log_deleted = 0 AND l.log_actor = :actorId
                 UNION
                 SELECT 'afd' AS source, COUNT(*) AS value FROM $revisionTable r
                   INNER JOIN $pageTable p on p.page_id = r.rev_page
                     WHERE p.page_title LIKE 'Articles_for_deletion/%'
                         AND p.page_title NOT LIKE 'Articles_for_deletion/Log/%'
-                        AND r.rev_user_text = :username
+                        AND r.rev_actor = :actorId
                 UNION
                 SELECT 'recent-activity' AS source, COUNT(*) AS value FROM $revisionTable
-                    WHERE rev_user_text = :username AND rev_timestamp > (now()-INTERVAL 730 day)
+                    WHERE rev_actor = :actorId AND rev_timestamp > (now()-INTERVAL 730 day)
                         AND rev_timestamp < now()
                 UNION
                 SELECT 'aiv' AS source, COUNT(*) AS value FROM $revisionTable r
                   INNER JOIN $pageTable p on p.page_id = r.rev_page
                     WHERE p.page_title LIKE 'Administrator_intervention_against_vandalism%'
-                        AND r.rev_user_text = :username
+                        AND r.rev_actor = :actorId
                 UNION
                 SELECT 'edit-summaries' AS source, COUNT(*) AS value
                 FROM $revisionTable JOIN $pageTable ON rev_page = page_id
-                    WHERE page_namespace = 0 AND rev_user_text = :username
+                    WHERE page_namespace = 0 AND rev_actor = :actorId
                 UNION
                 SELECT 'namespaces' AS source, count(*) AS value
                 FROM $revisionTable JOIN $pageTable ON rev_page = page_id
-                    WHERE rev_user_text = :username AND page_namespace = 0
+                    WHERE rev_actor = :actorId AND page_namespace = 0
                 UNION
                 SELECT 'pages-created-live' AS source, COUNT(*) AS value FROM $revisionTable
-                    WHERE rev_user_text = :username AND rev_parent_id = 0
+                    WHERE rev_actor = :actorId AND rev_parent_id = 0
                 UNION
                 SELECT 'pages-created-deleted' AS source, COUNT(*) AS value FROM $archiveTable
-                    WHERE ar_user_text = :username AND ar_parent_id = 0
+                    WHERE ar_actor = :actorId AND ar_parent_id = 0
                 UNION
                 SELECT 'rpp' AS source, COUNT(*) AS value FROM $revisionTable r
                   INNER JOIN $pageTable p on p.page_id = r.rev_page
                     WHERE p.page_title LIKE 'Requests_for_page_protection%'
-                        AND r.rev_user_text = :username;";
+                        AND r.rev_actor = :actorId;";
 
         return $this->executeProjectsQuery($sql, [
             'username' => $user->getUsername(),
+            'actorId' => $user->getActorId($project),
         ])->fetchAll();
     }
 }
