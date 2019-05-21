@@ -64,6 +64,10 @@ body {
     margin-right: 8px;
     position: relative;
     top: 8px;
+
+    li {
+        padding: 0 2px;
+    }
 }
 
 .navbar-nav > li > a {
