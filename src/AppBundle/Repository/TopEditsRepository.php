@@ -10,6 +10,7 @@ namespace AppBundle\Repository;
 use AppBundle\Model\Page;
 use AppBundle\Model\Project;
 use AppBundle\Model\User;
+use PDO;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -71,14 +72,14 @@ class TopEditsRepository extends Repository
                     $paSelect
                 FROM $pageTable
                 JOIN $revisionTable ON page_id = rev_page
-                WHERE rev_user_text = :username
+                WHERE rev_actor = :actorId
                 AND page_namespace = :namespace
                 GROUP BY page_namespace, page_title
                 ORDER BY count DESC
                 LIMIT $limit
                 OFFSET $offset";
         $result = $this->executeProjectsQuery($sql, [
-            'username' => $user->getUsername(),
+            'actorId' => $user->getActorId($project),
             'namespace' => $namespace,
         ])->fetchAll();
 
@@ -107,10 +108,10 @@ class TopEditsRepository extends Repository
         $sql = "SELECT COUNT(DISTINCT page_id) AS count
                 FROM $pageTable
                 JOIN $revisionTable ON page_id = rev_page
-                WHERE rev_user_text = :username
+                WHERE rev_actor = :actorId
                 AND page_namespace = :namespace";
         $result = $this->executeProjectsQuery($sql, [
-            'username' => $user->getUsername(),
+            'actorId' => $user->getActorId($project),
             'namespace' => $namespace,
         ])->fetch()['count'];
 
@@ -158,7 +159,7 @@ class TopEditsRepository extends Repository
                         SELECT page_namespace, page_is_redirect, rev_page, count(rev_page) AS count
                         FROM $revisionTable
                         JOIN $pageTable ON page_id = rev_page
-                        WHERE rev_user_text = :username
+                        WHERE rev_actor = :actorId
                         GROUP BY page_namespace, rev_page
                     ) AS b
                     JOIN (SELECT @ns := NULL, @rn := 0) AS vars
@@ -167,7 +168,7 @@ class TopEditsRepository extends Repository
                 JOIN $pageTable e ON e.page_id = c.rev_page
                 WHERE c.row_number < $limit";
         $result = $this->executeProjectsQuery($sql, [
-            'username' => $user->getUsername(),
+            'actorId' => $user->getActorId($project),
         ])->fetchAll();
 
         // Cache and return.
@@ -231,21 +232,24 @@ class TopEditsRepository extends Repository
             $childLimit = 'LIMIT 1';
         }
 
+        $userId = $this->getProjectsConnection()->quote($user->getId($page->getProject()), PDO::PARAM_STR);
+        $username = $this->getProjectsConnection()->quote($user->getUsername(), PDO::PARAM_STR);
+
         $sql = "SELECT
                     revs.rev_id AS id,
                     revs.rev_timestamp AS timestamp,
                     revs.rev_minor_edit AS minor,
                     revs.rev_len AS length,
                     (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
-                    revs.rev_user AS user_id,
-                    revs.rev_user_text AS username,
+                    $userId AS user_id,
+                    $username AS username,
                     comments.comment_text AS `comment`
                     $childSelect
                 FROM $revTable AS revs
                 LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                 LEFT OUTER JOIN $commentTable AS comments ON (revs.rev_comment_id = comments.comment_id)
                 $childJoin
-                WHERE revs.rev_user_text = :username
+                WHERE revs.rev_actor = :actorId
                 AND revs.rev_page = :pageid
                 $childWhere
                 ORDER BY revs.rev_timestamp DESC
@@ -253,7 +257,7 @@ class TopEditsRepository extends Repository
 
         return $this->executeProjectsQuery($sql, [
             'pageid' => $page->getId(),
-            'username' => $user->getUsername(),
+            'actorId' => $user->getActorId($page->getProject()),
         ])->fetchAll();
     }
 }
