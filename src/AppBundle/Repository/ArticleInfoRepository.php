@@ -37,20 +37,23 @@ class ArticleInfoRepository extends Repository
         $revTable = $project->getTableName('revision');
         $userGroupsTable = $project->getTableName('user_groups');
         $userFormerGroupsTable = $project->getTableName('user_former_groups');
+        $actorTable = $project->getTableName('actor');
 
         $datesConditions = $this->getDateConditions($start, $end);
 
         $sql = "SELECT COUNT(DISTINCT(rev_id)) AS count, rev_user_text AS username, '1' AS current
                 FROM $revTable
-                LEFT JOIN $userGroupsTable ON rev_user = ug_user
+                JOIN $actorTable ON actor_id = rev_actor
+                LEFT JOIN $userGroupsTable ON actor_user = ug_user
                 WHERE rev_page = :pageId AND ug_group = 'bot' $datesConditions
-                GROUP BY rev_user_text
+                GROUP BY actor_user
                 UNION
                 SELECT COUNT(DISTINCT(rev_id)) AS count, rev_user_text AS username, '0' AS current
                 FROM $revTable
-                LEFT JOIN $userFormerGroupsTable ON rev_user = ufg_user
+                JOIN $actorTable ON actor_id = rev_actor
+                LEFT JOIN $userFormerGroupsTable ON actor_user = ufg_user
                 WHERE rev_page = :pageId AND ufg_group = 'bot' $datesConditions
-                GROUP BY rev_user_text";
+                GROUP BY actor_user";
 
         $result = $this->executeProjectsQuery($sql, ['pageId' => $page->getId()]);
         return $this->setCache($cacheKey, $result);
@@ -199,10 +202,11 @@ class ArticleInfoRepository extends Repository
         $project = $page->getProject();
         // Faster to use revision instead of revision_userindex in this case.
         $revTable = $project->getTableName('revision', '');
+        $actorTable = $project->getTableName('actor');
 
         $dateConditions = $this->getDateConditions($start, $end);
 
-        $sql = "SELECT rev_user_text AS username,
+        $sql = "SELECT actor_name AS username,
                     COUNT(rev_id) AS count,
                     SUM(rev_minor_edit) AS minor,
                     MIN(rev_timestamp) AS first_timestamp,
@@ -210,6 +214,7 @@ class ArticleInfoRepository extends Repository
                     MAX(rev_timestamp) AS latest_timestamp,
                     MAX(rev_id) AS latest_revid
                 FROM $revTable
+                JOIN $actorTable ON rev_actor = actor_id
                 WHERE rev_page = :pageId $dateConditions";
 
         if ($noBots) {
@@ -217,12 +222,12 @@ class ArticleInfoRepository extends Repository
             $sql .= "AND NOT EXISTS (
                          SELECT 1
                          FROM $userGroupsTable
-                         WHERE ug_user = rev_user
+                         WHERE ug_user = actor_user
                          AND ug_group = 'bot'
                      )";
         }
 
-        $sql .= "GROUP BY rev_user_text
+        $sql .= "GROUP BY actor_id
                  ORDER BY count DESC
                  LIMIT $limit";
 

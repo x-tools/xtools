@@ -11,6 +11,7 @@ use AppBundle\Model\Page;
 use AppBundle\Model\Project;
 use AppBundle\Model\User;
 use DateTime;
+use Doctrine\DBAL\Driver\Statement;
 use GuzzleHttp;
 use Mediawiki\Api\SimpleRequest;
 
@@ -135,7 +136,7 @@ class PageRepository extends Repository
      *   a separate query is ran to get the number of revisions.
      * @param false|int $start
      * @param false|int $end
-     * @return \Doctrine\DBAL\Driver\Statement
+     * @return Statement
      */
     public function getRevisionsStmt(
         Page $page,
@@ -144,7 +145,7 @@ class PageRepository extends Repository
         ?int $numRevisions = null,
         $start = false,
         $end = false
-    ): \Doctrine\DBAL\Driver\Statement {
+    ): Statement {
         $cacheKey = $this->getCacheKey(func_get_args(), 'page_revisions');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
@@ -155,8 +156,9 @@ class PageRepository extends Repository
             'revision',
             $user ? null : '' // Use 'revision' if there's no user, otherwise default to revision_userindex
         );
-        $commentTable = $this->getTableName($page->getProject()->getDatabaseName(), 'comment');
-        $userClause = $user ? "revs.rev_user_text = :username AND " : "";
+        $commentTable = $page->getProject()->getTableName('comment');
+        $actorTable = $page->getProject()->getTableName('actor');
+        $userClause = $user ? "revs.rev_actor = :actorId AND " : "";
 
         $limitClause = '';
         if (intval($limit) > 0 && isset($numRevisions)) {
@@ -172,11 +174,12 @@ class PageRepository extends Repository
                         revs.rev_minor_edit AS minor,
                         revs.rev_len AS length,
                         (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
-                        revs.rev_user AS user_id,
-                        revs.rev_user_text AS username,
+                        actor_user AS user_id,
+                        actor_name AS username,
                         comment_text AS `comment`,
                         revs.rev_sha1 AS sha
                     FROM $revTable AS revs
+                    JOIN $actorTable ON revs.rev_actor = actor_id
                     LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                     LEFT OUTER JOIN $commentTable ON comment_id = revs.rev_comment_id
                     WHERE $userClause revs.rev_page = :pageid $dateConditions
@@ -213,7 +216,7 @@ class PageRepository extends Repository
             'revision',
             $user && $this->isLabs() ? '_userindex' : ''
         );
-        $userClause = $user ? "rev_user_text = :username AND " : "";
+        $userClause = $user ? "rev_actor = :actorId AND " : "";
 
         $dateConditions = $this->getDateConditions($start, $end);
 
@@ -222,7 +225,7 @@ class PageRepository extends Repository
                 WHERE $userClause rev_page = :pageid $dateConditions";
         $params = ['pageid' => $page->getId()];
         if ($user) {
-            $params['username'] = $user->getUsername();
+            $params['rev_actor'] = $user->getActorId($page->getProject());
         }
 
         $result = (int)$this->executeProjectsQuery($sql, $params)->fetchColumn(0);
@@ -246,19 +249,20 @@ class PageRepository extends Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
-        $userTable = $this->getTableName($page->getProject()->getDatabaseName(), 'user');
-        $pageTable = $this->getTableName($page->getProject()->getDatabaseName(), 'page');
+        $revTable = $page->getProject()->getTableName('revision');
+        $userTable = $page->getProject()->getTableName('user');
+        $pageTable = $page->getProject()->getTableName('page');
+        $actorTable = $page->getProject()->getTableName('actor');
 
         $sql = "SELECT *, (
-                   SELECT user_editcount
-                   FROM $userTable
-                   WHERE user_name = author
+                    SELECT user_editcount
+                    FROM $userTable
+                    WHERE user_id = author_user_id
                 ) AS author_editcount
                 FROM (
                     (
                         SELECT COUNT(rev_id) AS num_edits,
-                            COUNT(DISTINCT(rev_user_text)) AS num_editors
+                            COUNT(DISTINCT(rev_actor)) AS num_editors
                         FROM $revTable
                         WHERE rev_page = :pageid
                         AND rev_timestamp > 0 # Use rev_timestamp index
@@ -266,10 +270,12 @@ class PageRepository extends Repository
                     (
                         # With really old pages, the rev_timestamp may need to be sorted ASC,
                         #   and the lowest rev_id may not be the first revision.
-                        SELECT rev_user_text AS author,
+                        SELECT actor_name AS author,
+                               actor_user AS author_user_id,
                                rev_timestamp AS created_at,
                                rev_id AS created_rev_id
                         FROM $revTable
+                        JOIN $actorTable ON actor_id = rev_actor
                         WHERE rev_page = :pageid
                         ORDER BY rev_timestamp ASC
                         LIMIT 1
@@ -282,7 +288,7 @@ class PageRepository extends Repository
                         WHERE rev_page = :pageid
                         AND rev_id = page_latest
                     ) c
-                );";
+                )";
         $params = ['pageid' => $page->getId()];
 
         // Get current time so we can compare timestamps
