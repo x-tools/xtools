@@ -42,7 +42,7 @@ class AdminStatsRepository extends Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $userTable = $project->getTableName('user');
+        $actorTable = $project->getTableName('actor');
         $loggingTable = $project->getTableName('logging', 'logindex');
         [$countSql, $types, $actions] = $this->getLogSqlParts($project, $type, $actions);
         $dateConditions = $this->getDateConditions($start, $end, "logging_logindex.", 'log_timestamp');
@@ -52,15 +52,15 @@ class AdminStatsRepository extends Repository
             return [];
         }
 
-        $sql = "SELECT user_name AS `username`,
+        $sql = "SELECT actor_name AS `username`,
                     $countSql
                     SUM(IF(log_type != '' AND log_action != '', 1, 0)) AS `total`
                 FROM $loggingTable
-                JOIN $userTable ON user_id = log_user
+                JOIN $actorTable ON log_actor = actor_id
                 WHERE log_type IN ($types)
                     AND log_action IN ($actions)
                     $dateConditions
-                GROUP BY user_name
+                GROUP BY actor_name
                 HAVING `total` > 0";
 
         $results = $this->executeProjectsQuery($sql)->fetchAll();

@@ -24,6 +24,9 @@
 <div class="input-group form-row">
     <label class="input-group-addon form-label" for="article_input">
         {{ msg('page-title') }}
+        {% if required == false %}
+            <span class="text-muted"><small>({{ msg('optional') }})</small></span>
+        {% endif %}
     </label>
     <input type="text" class="form-control"
            name="page" id="article_input"{% if required %} required{% endif %}
