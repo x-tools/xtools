@@ -7,7 +7,8 @@
 			"Zizzerus",
 			"Balint36",
 			"Misibacsi",
-			"Pasztilla"
+			"Pasztilla",
+			"Csigabi"
 		]
 	},
 	"abusefilter": "Vandálszűrő",
@@ -257,7 +258,7 @@
 	"num-watchers": "{{PLURAL:$1|figyelő}}",
 	"num-weeks": "{{PLURAL:$1|hét}}",
 	"num-years": "{{PLURAL:$1|év}}",
-	"old-page-notice": "Ez a lap nagyon öreg. Néhány adat pontatlan lehet a változtatások MediaWiki korai időszakában való tárolási módja miatt.",
+	"old-page-notice": "Ez a lap nagyon régi. Néhány adat pontatlan lehet a változtatásoknak a MediaWiki korai időszakában való tárolási módja miatt.",
 	"oppose": "Ellenzés",
 	"optional": "Opcionális",
 	"original-size": "Eredeti méret",
