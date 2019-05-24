@@ -37,55 +37,52 @@ class EditCounterRepository extends UserRightsRepository
         $archiveTable = $project->getTableName('archive');
         $revisionTable = $project->getTableName('revision');
 
-        // For IPs we use rev_user_text, and for accounts rev_user which is slightly faster.
-        $revUserClause = $user->isAnon() ? 'rev_user_text = :username' : 'rev_user = :userId';
-        $arUserClause = $user->isAnon() ? 'ar_user_text = :username' : 'ar_user = :userId';
-
         $sql = "
             -- Revision counts.
             (SELECT 'deleted' AS `key`, COUNT(ar_id) AS val FROM $archiveTable
-                WHERE $arUserClause
+                WHERE ar_actor = :actorId
             ) UNION (
             SELECT 'live' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE $revUserClause
+                WHERE rev_actor = :actorId
             ) UNION (
             SELECT 'day' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE $revUserClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 DAY)
+                WHERE rev_actor = :actorId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 DAY)
             ) UNION (
             SELECT 'week' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE $revUserClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 WEEK)
+                WHERE rev_actor = :actorId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 WEEK)
             ) UNION (
             SELECT 'month' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE $revUserClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
+                WHERE rev_actor = :actorId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
             ) UNION (
             SELECT 'year' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE $revUserClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+                WHERE rev_actor = :actorId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
             ) UNION (
             SELECT 'minor' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE $revUserClause AND rev_minor_edit = 1
+                WHERE rev_actor = :actorId AND rev_minor_edit = 1
 
             -- Page counts.
             ) UNION (
             SELECT 'edited-live' AS `key`, COUNT(DISTINCT rev_page) AS `val`
                 FROM $revisionTable
-                WHERE $revUserClause
+                WHERE rev_actor = :actorId
             ) UNION (
             SELECT 'edited-deleted' AS `key`, COUNT(DISTINCT ar_page_id) AS `val`
                 FROM $archiveTable
-                WHERE $arUserClause
+                WHERE ar_actor = :actorId
             ) UNION (
             SELECT 'created-live' AS `key`, COUNT(DISTINCT rev_page) AS `val`
                 FROM $revisionTable
-                WHERE $revUserClause AND rev_parent_id = 0
+                WHERE rev_actor = :actorId AND rev_parent_id = 0
             ) UNION (
             SELECT 'created-deleted' AS `key`, COUNT(DISTINCT ar_page_id) AS `val`
                 FROM $archiveTable
-                WHERE $arUserClause AND ar_parent_id = 0
+                WHERE ar_actor = :actorId AND ar_parent_id = 0
             )
         ";
 
-        $params = $user->isAnon() ? ['username' => $user->getUsername()] : ['userId' => $user->getId($project)];
-        $resultQuery = $this->executeProjectsQuery($sql, $params);
+        $resultQuery = $this->executeProjectsQuery($sql, [
+            'actorId' => $user->getActorId($project),
+        ]);
 
         $revisionCounts = [];
         while ($result = $resultQuery->fetch()) {
@@ -115,12 +112,12 @@ class EditCounterRepository extends UserRightsRepository
         $sql = "
         (SELECT CONCAT(log_type, '-', log_action) AS source, COUNT(log_id) AS value
             FROM $loggingTable
-            WHERE log_user_text = :username
+            WHERE log_actor = :actorId
             GROUP BY log_type, log_action
         )";
 
         $results = $this->executeProjectsQuery($sql, [
-            'username' => $user->getUsername(),
+            'actorId' => $user->getActorId($project),
         ])->fetchAll();
 
         $logCounts = array_combine(
@@ -166,15 +163,16 @@ class EditCounterRepository extends UserRightsRepository
 
         // Add Commons upload count, if applicable.
         $logCounts['files_uploaded_commons'] = 0;
-        if ($this->isLabs()) {
-            $commons = ProjectRepository::getProject('commonswiki', $this->container);
-            $userId = $user->getId($commons);
-            if ($userId) {
-                $sql = "SELECT COUNT(log_id) FROM commonswiki_p.logging_userindex
-                    WHERE log_type = 'upload' AND log_action = 'upload' AND log_user = :userId";
-                $resultQuery = $this->executeProjectsQuery($sql, ['userId' => $userId]);
-                $logCounts['files_uploaded_commons'] = (int)$resultQuery->fetchColumn();
-            }
+        if ($this->isLabs() && !$user->isAnon()) {
+            $sql = "SELECT COUNT(log_id)
+                    FROM commonswiki_p.logging_userindex
+                    JOIN commonswiki_p.actor ON actor_id = log_actor
+                    WHERE log_type = 'upload' AND log_action = 'upload'
+                        AND actor_name = :username";
+            $resultQuery = $this->executeProjectsQuery($sql, [
+                'username' => $user->getUsername(),
+            ]);
+            $logCounts['files_uploaded_commons'] = (int)$resultQuery->fetchColumn();
         }
 
         // Cache and return.
@@ -196,25 +194,24 @@ class EditCounterRepository extends UserRightsRepository
                     SELECT 'rev_first' AS `key`, rev_id AS `id`,
                         rev_timestamp AS `timestamp`, NULL as `type`
                     FROM $revisionTable
-                    WHERE rev_user_text = :username
-                    ORDER BY rev_timestamp ASC LIMIT 1
+                    WHERE rev_actor = :actorId
+                    LIMIT 1
                 ) UNION (
                     SELECT 'rev_latest' AS `key`, rev_id AS `id`,
                         rev_timestamp AS `timestamp`, NULL as `type`
                     FROM $revisionTable
-                    WHERE rev_user_text = :username
+                    WHERE rev_actor = :actorId
                     ORDER BY rev_timestamp DESC LIMIT 1
                 ) UNION (
                     SELECT 'log_latest' AS `key`, log_id AS `id`,
                         log_timestamp AS `timestamp`, log_type AS `type`
                     FROM $loggingTable
-                    WHERE log_user_text = :username
+                    WHERE log_actor = :actorId
                     ORDER BY log_timestamp DESC LIMIT 1
                 )";
 
-        $username = $user->getUsername();
         $resultQuery = $this->executeProjectsQuery($sql, [
-            'username' => $username,
+            'actorId' => $user->getActorId($project),
         ]);
 
         $actions = [];
@@ -344,10 +341,10 @@ class EditCounterRepository extends UserRightsRepository
         $topEditCounts = [];
         foreach ($allProjects as $projectMeta) {
             $revisionTableName = $this->getTableName($projectMeta['dbName'], 'revision');
-            $sql = "SELECT COUNT(rev_id) FROM $revisionTableName WHERE rev_user_text = :username";
+            $sql = "SELECT COUNT(rev_id) FROM $revisionTableName WHERE rev_actor = :actorId";
 
             $resultQuery = $this->executeProjectsQuery($sql, [
-                'username' => $user->getUsername(),
+                'actorId' => $user->getActorId($project),
             ]);
             $total = (int)$resultQuery->fetchColumn();
             $topEditCounts[] = [
@@ -374,15 +371,15 @@ class EditCounterRepository extends UserRightsRepository
 
         // Query.
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $revUserClause = $user->isAnon() ? 'r.rev_user_text = :username' : 'r.rev_user = :userId';
         $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
         $sql = "SELECT page_namespace, COUNT(rev_id) AS total
             FROM $pageTable p JOIN $revisionTable r ON (r.rev_page = p.page_id)
-            WHERE $revUserClause
+            WHERE r.rev_actor = :actorId
             GROUP BY page_namespace";
 
-        $params = $user->isAnon() ? ['username' => $user->getUsername()] : ['userId' => $user->getId($project)];
-        $results = $this->executeProjectsQuery($sql, $params)->fetchAll();
+        $results = $this->executeProjectsQuery($sql, [
+            'actorId' => $user->getActorId($project),
+        ])->fetchAll();
 
         $namespaceTotals = array_combine(array_map(function ($e) {
             return $e['page_namespace'];
@@ -410,12 +407,15 @@ class EditCounterRepository extends UserRightsRepository
             return $this->cache->getItem($cacheKey)->get();
         }
 
+        $username = $this->getProjectsConnection()->quote($user->getUsername(), \PDO::PARAM_STR);
+
         // Assemble queries.
         $queries = [];
         foreach ($projects as $project) {
             $revisionTable = $project->getTableName('revision');
             $pageTable = $project->getTableName('page');
             $commentTable = $project->getTableName('comment');
+            $actorId = $user->getActorId($project);
             $sql = "SELECT
                     '".$project->getDatabaseName()."' AS project_name,
                     revs.rev_id AS id,
@@ -426,7 +426,7 @@ class EditCounterRepository extends UserRightsRepository
                     revs.rev_len AS length,
                     (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
                     revs.rev_parent_id AS parent_id,
-                    revs.rev_user_text AS username,
+                    $username AS username,
                     page.page_title,
                     page.page_namespace,
                     comment_text AS `comment`
@@ -434,7 +434,7 @@ class EditCounterRepository extends UserRightsRepository
                     JOIN $pageTable AS page ON (rev_page = page_id)
                     LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                     LEFT OUTER JOIN $commentTable ON revs.rev_comment_id = comment_id
-                WHERE revs.rev_user_text = :username";
+                WHERE revs.rev_actor = $actorId";
             $queries[] = $sql;
         }
         $sql = "SELECT * FROM ((\n" . join("\n) UNION (\n", $queries) . ")) a ORDER BY timestamp DESC LIMIT $limit";
@@ -443,9 +443,7 @@ class EditCounterRepository extends UserRightsRepository
             $sql .= " OFFSET $offset";
         }
 
-        $revisions = $this->executeProjectsQuery($sql, [
-            'username' => $user->getUsername(),
-        ])->fetchAll();
+        $revisions = $this->executeProjectsQuery($sql)->fetchAll();
 
         // Cache and return.
         return $this->setCache($cacheKey, $revisions);
@@ -481,11 +479,11 @@ class EditCounterRepository extends UserRightsRepository
             . "     page_namespace,"
             . "     COUNT(rev_id) AS `count` "
             .  " FROM $revisionTable JOIN $pageTable ON (rev_page = page_id)"
-            . " WHERE rev_user_text = :username"
+            . " WHERE rev_actor = :actorId"
             . " GROUP BY YEAR(rev_timestamp), MONTH(rev_timestamp), page_namespace";
 
         $totals = $this->executeProjectsQuery($sql, [
-            'username' => $user->getUsername(),
+            'actorId' => $user->getActorId($project),
         ])->fetchAll();
 
         // Cache and return.
@@ -513,11 +511,11 @@ class EditCounterRepository extends UserRightsRepository
             . "     $xCalc AS `x`, "
             . "     COUNT(rev_id) AS `value` "
             . " FROM $revisionTable"
-            . " WHERE rev_user_text = :username"
+            . " WHERE rev_actor = :actorId"
             . " GROUP BY DAYOFWEEK(rev_timestamp), $xCalc ";
 
         $totals = $this->executeProjectsQuery($sql, [
-            'username' => $user->getUsername(),
+            'actorId' => $user->getActorId($project),
         ])->fetchAll();
 
         // Cache and return.
@@ -541,8 +539,7 @@ class EditCounterRepository extends UserRightsRepository
         }
 
         // Prepare the queries and execute them.
-        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $revUserClause = $user->isAnon() ? 'revs.rev_user_text = :username' : 'revs.rev_user = :userId';
+        $revisionTable = $project->getTableName('revision');
         $sql = "SELECT AVG(sizes.size) AS average_size,
                 COUNT(CASE WHEN sizes.size < 20 THEN 1 END) AS small_edits,
                 COUNT(CASE WHEN sizes.size > 1000 THEN 1 END) AS large_edits
@@ -550,13 +547,13 @@ class EditCounterRepository extends UserRightsRepository
                     SELECT (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS size
                     FROM $revisionTable AS revs
                     LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-                    WHERE $revUserClause
+                    WHERE revs.rev_actor = :actorId
                     ORDER BY revs.rev_timestamp DESC
                     LIMIT 5000
                 ) sizes";
-
-        $params = $user->isAnon() ? ['username' => $user->getUsername()] : ['userId' => $user->getId($project)];
-        $results = $this->executeProjectsQuery($sql, $params)->fetch();
+        $results = $this->executeProjectsQuery($sql, [
+            'actorId' => $user->getActorId($project),
+        ])->fetch();
 
         // Cache and return.
         return $this->setCache($cacheKey, $results);

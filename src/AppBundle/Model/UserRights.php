@@ -292,7 +292,7 @@ class UserRights extends Model
 
             $rightsChanges[$row['log_timestamp']] = [
                 'logId' => $row['log_id'],
-                'performer' => 'autopromote' === $row['log_action'] ? null : $row['log_user_text'],
+                'performer' => 'autopromote' === $row['log_action'] ? null : $row['performer'],
                 'comment' => $row['log_comment'],
                 'added' => array_values($added),
                 'removed' => array_values($removed),
@@ -334,7 +334,7 @@ class UserRights extends Model
                 // Temporary right was added.
                 $rightsChanges[$expiry] = [
                     'logId' => $row['log_id'],
-                    'performer' => $row['log_user_text'],
+                    'performer' => $row['performer'],
                     'comment' => null,
                     'added' => [],
                     'removed' => [$entry],

@@ -74,7 +74,7 @@ class UserRightsRepository extends Repository
 
         $loggingTable = $this->getTableName($dbName, 'logging', 'logindex');
         $commentTable = $this->getTableName($dbName, 'comment');
-        $userTable = $this->getTableName($dbName, 'user');
+        $actorTable = $this->getTableName($dbName, 'actor');
         $username = str_replace(' ', '_', $user->getUsername());
 
         if ('meta' === $type) {
@@ -88,15 +88,10 @@ class UserRightsRepository extends Repository
 
         $logType = 'global' == $type ? 'gblrights' : 'rights';
 
-        $sql = "SELECT log_id, log_timestamp, log_params, log_action,
-                    IF(log_user_text != '', log_user_text, (
-                        SELECT user_name
-                        FROM $userTable
-                        WHERE user_id = log_user
-                    )) AS log_user_text,
-                    IFNULL(comment_text, '') AS `log_comment`,
-                    '$type' AS type
+        $sql = "SELECT log_id, log_timestamp, log_params, log_action, actor_name AS `performer`,
+                    IFNULL(comment_text, '') AS `log_comment`, '$type' AS type
                 FROM $loggingTable
+                JOIN $actorTable ON log_actor = actor_id
                 LEFT OUTER JOIN $commentTable ON comment_id = log_comment_id
                 WHERE log_type = '$logType'
                 AND log_namespace = 2
@@ -258,12 +253,12 @@ class UserRightsRepository extends Repository
         $revisionTable = $project->getTableName('revision');
         $sql = "SELECT rev_timestamp
                 FROM $revisionTable
-                WHERE rev_user = :userId
+                WHERE rev_actor = :actorId
                 AND rev_timestamp >= $offset
                 LIMIT 1 OFFSET ".($edits - 1);
 
         $ret = $this->executeProjectsQuery($sql, [
-            'userId' => $user->getId($project),
+            'actorId' => $user->getActorId($project),
         ])->fetchColumn();
 
         // Cache and return.
@@ -287,11 +282,11 @@ class UserRightsRepository extends Repository
         $revisionTable = $project->getTableName('revision');
         $sql = "SELECT COUNT(rev_id)
                 FROM $revisionTable
-                WHERE rev_user = :userId
+                WHERE rev_actor = :actorId
                 AND rev_timestamp <= $timestamp";
 
         $ret = (int)$this->executeProjectsQuery($sql, [
-            'userId' => $user->getId($project),
+            'actorId' => $user->getActorId($project),
         ])->fetchColumn();
 
         // Cache and return.
