@@ -562,7 +562,7 @@ class EditCounterTest extends TestAdapter
                         'expiry";N;}i:2;a:1:{s:6:"expiry";N;}}s:11:"newmetadata";a:4:{i:0;a:1:{s:6:"expiry";N;}i:1;a:1'.
                         ':{s:6:"expiry";N;}i:2;a:1:{s:6:"expiry";N;}i:3;a:1:{s:6:"expiry";s:14:"20181025000000";}}}',
                     'log_action' => 'rights',
-                    'log_user_text' => 'Worm That Turned',
+                    'performer' => 'Worm That Turned',
                     'log_comment' => 'per [[Special:Diff/856641107]]',
                     'type' => 'local',
                 ], [
@@ -580,7 +580,7 @@ class EditCounterTest extends TestAdapter
                         'a:1:{s:6:"expiry";N;}i:1;a:1:{s:6:"expiry";s:14:"20180108132858";}i:2;a:1:{s:6:' .
                         '"expiry";N;}i:3;a:1:{s:6:"expiry";s:14:"20180108132858";}i:4;a:1:{s:6:"expiry";N;}}}',
                     'log_action' => 'rights',
-                    'log_user_text' => 'MusikAnimal',
+                    'performer' => 'MusikAnimal',
                     'type' => 'local',
                 ], [
                     // Added: ipblock-exempt, filemover, templateeditor.
@@ -595,7 +595,7 @@ class EditCounterTest extends TestAdapter
                         '"expiry";N;}i:2;a:1:{s:6:"expiry";N;}i:3;a:1:{s:6:"expiry";s:14:"20180108132858";}' .
                         'i:4;a:1:{s:6:"expiry";s:14:"20180108132858";}i:5;a:1:{s:6:"expiry";N;}}}',
                     'log_action' => 'rights',
-                    'log_user_text' => 'MusikAnimal',
+                    'performer' => 'MusikAnimal',
                     'type' => 'local',
                 ], [
                     // Added: bureaucrat; Removed: rollbacker.
@@ -606,7 +606,7 @@ class EditCounterTest extends TestAdapter
                         ';i:2;s:5:"sysop";}s:12:"5::newgroups";a:3:{i:0;s:8:"reviewer";i:1;s:5:"sysop";i:2;' .
                         's:10:"bureaucrat";}}',
                     'log_action' => 'rights',
-                    'log_user_text' => 'Cyberpower678',
+                    'performer' => 'Cyberpower678',
                     'type' => 'meta',
                 ], [
                     // Old-school log entry, adds sysop.
@@ -615,7 +615,7 @@ class EditCounterTest extends TestAdapter
                     'log_comment' => 'per request',
                     'log_params' => "\nsysop",
                     'log_action' => 'rights',
-                    'log_user_text' => 'Snowolf',
+                    'performer' => 'Snowolf',
                     'type' => 'meta',
                 ],
             ]);
@@ -703,7 +703,7 @@ class EditCounterTest extends TestAdapter
                 'log_comment' => 'per request',
                 'log_params' => "\nsysop",
                 'log_action' => 'gblrights',
-                'log_user_text' => 'Snowolf',
+                'performer' => 'Snowolf',
                 'type' => 'global',
             ]]);
 

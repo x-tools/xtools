@@ -41,14 +41,14 @@ class ArticleInfoRepository extends Repository
 
         $datesConditions = $this->getDateConditions($start, $end);
 
-        $sql = "SELECT COUNT(DISTINCT(rev_id)) AS count, rev_user_text AS username, '1' AS current
+        $sql = "SELECT COUNT(DISTINCT(rev_id)) AS count, actor_name AS username, '1' AS current
                 FROM $revTable
                 JOIN $actorTable ON actor_id = rev_actor
                 LEFT JOIN $userGroupsTable ON actor_user = ug_user
                 WHERE rev_page = :pageId AND ug_group = 'bot' $datesConditions
                 GROUP BY actor_user
                 UNION
-                SELECT COUNT(DISTINCT(rev_id)) AS count, rev_user_text AS username, '0' AS current
+                SELECT COUNT(DISTINCT(rev_id)) AS count, actor_name AS username, '0' AS current
                 FROM $revTable
                 JOIN $actorTable ON actor_id = rev_actor
                 LEFT JOIN $userFormerGroupsTable ON actor_user = ufg_user

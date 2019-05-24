@@ -226,7 +226,7 @@ class PagesRepository extends UserRepository
             SELECT $arSelects ".$conditions['paSelectsArchive']."
             FROM $archiveTable
             LEFT JOIN $logTable ON log_namespace = ar_namespace AND log_title = ar_title
-                AND log_user = ar_user AND (log_action = 'move' OR log_action = 'move_redir')
+                AND log_actor = ar_actor AND (log_action = 'move' OR log_action = 'move_redir')
                 AND log_type = 'move'
             WHERE ".$conditions['whereArc']."
                 AND ar_parent_id = '0' ".
