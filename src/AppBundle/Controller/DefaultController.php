@@ -273,7 +273,7 @@ class DefaultController extends XtoolsController
     public function wikifyApiAction(): JsonResponse
     {
         return new JsonResponse(
-            Edit::wikifyString($this->request->query->get('wikitext'), $this->project)
+            Edit::wikifyString($this->request->query->get('wikitext', ''), $this->project)
         );
     }
 }
