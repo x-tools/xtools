@@ -370,6 +370,7 @@
 	"see-full-page-stats": "Label for a link to full statistics on a page.",
 	"show": "Toggle visibility of section (short word)\n{{Identical|Show}}",
 	"show-sections-desc": "Tooltip for checkboxes that allow you to pick which statistics to show.",
+	"simple-counter-limited-results": "Warning message shown when running the Simple Edit Counter on a user that has a very high edit count, and only limited results are returned.",
 	"size": "Label for the size of the page.\n{{Identical|Size}}",
 	"size-over-time": "Chart label",
 	"small-edits": "Label for the number of small edits made to a page. Try to keep this message brief.",

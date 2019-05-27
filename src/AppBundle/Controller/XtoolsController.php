@@ -380,18 +380,22 @@ abstract class XtoolsController extends Controller
         ) {
             /** TODO: Somehow get this to use self::throwXtoolsException */
 
-            $this->addFlashMessage('danger', 'too-many-edits', [
-                $this->i18n->numberFormat($user->maxEdits()),
-            ]);
-
             // If redirecting to a different controller, show an informative message accordingly.
             if ($this->tooHighEditCountAction !== $this->getIndexRoute()) {
                 // FIXME: This is currently only done for Edit Counter, redirecting to Simple Edit Counter,
-                // so this bit is hardcoded. We need to instead give the i18n key of the route.
-                $this->addFlashMessage('info', 'too-many-edits-redir', [
+                //   so this bit is hardcoded. We need to instead give the i18n key of the route.
+                $redirMsg = $this->i18n->msg('too-many-edits-redir', [
                     $this->i18n->msg('tool-simpleeditcounter'),
                 ]);
+                $msg = $this->i18n->msg('too-many-edits', [
+                    $this->i18n->numberFormat($user->maxEdits()),
+                ]).'. '.$redirMsg;
+                $this->addFlashMessage('danger', $msg);
             } else {
+                $this->addFlashMessage('danger', 'too-many-edits', [
+                    $this->i18n->numberFormat($user->maxEdits()),
+                ]);
+
                 // Redirecting back to index, so remove username (otherwise we'd get a redirect loop).
                 unset($this->params['username']);
             }
@@ -799,14 +803,14 @@ abstract class XtoolsController extends Controller
     /**
      * Add a flash message.
      * @param string $type
-     * @param string $key
+     * @param string $key i18n key or raw message.
      * @param array $vars
      */
     public function addFlashMessage(string $type, string $key, array $vars = []): void
     {
         $this->addFlash(
             $type,
-            $this->i18n->msg($key, $vars)
+            $this->i18n->msgExists($key, $vars) ? $this->i18n->msg($key, $vars) : $key
         );
     }
 }

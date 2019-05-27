@@ -367,6 +367,7 @@
 	"see-full-statistics": "See full statistics",
 	"show": "Show",
 	"show-sections-desc": "Select which statistics to show. The more you select, the longer it will take to load.",
+	"simple-counter-limited-results": "This user has made a substantially high number of edits. Showing limited results.",
 	"size": "Size",
 	"size-over-time": "Size over time",
 	"small-edits": "Small edits (<20 bytes)",

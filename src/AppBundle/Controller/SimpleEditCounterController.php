@@ -7,11 +7,8 @@ declare(strict_types=1);
 
 namespace AppBundle\Controller;
 
-use AppBundle\Helper\I18nHelper;
 use AppBundle\Model\SimpleEditCounter;
 use AppBundle\Repository\SimpleEditCounterRepository;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -30,20 +27,6 @@ class SimpleEditCounterController extends XtoolsController
     public function getIndexRoute(): string
     {
         return 'SimpleEditCounter';
-    }
-
-    /**
-     * SimpleEditCounterController constructor.
-     * @param RequestStack $requestStack
-     * @param ContainerInterface $container
-     * @param I18nHelper $i18n
-     */
-    public function __construct(RequestStack $requestStack, ContainerInterface $container, I18nHelper $i18n)
-    {
-        $this->tooHighEditCountAction = $this->getIndexRoute();
-        $this->tooHighEditCountActionBlacklist = ['index', 'result'];
-
-        parent::__construct($requestStack, $container, $i18n);
     }
 
     /**
@@ -74,6 +57,27 @@ class SimpleEditCounterController extends XtoolsController
         ], $this->params, ['project' => $this->project]));
     }
 
+    private function prepareSimpleEditCounter(): SimpleEditCounter
+    {
+        $sec = new SimpleEditCounter(
+            $this->project,
+            $this->user,
+            $this->namespace,
+            $this->start,
+            $this->end
+        );
+        $secRepo = new SimpleEditCounterRepository();
+        $secRepo->setContainer($this->container);
+        $sec->setRepository($secRepo);
+        $sec->prepareData();
+
+        if ($sec->isLimited()) {
+            $this->addFlash('warning', $this->i18n->msg('simple-counter-limited-results'));
+        }
+
+        return $sec;
+    }
+
     /**
      * Display the results.
      * @Route(
@@ -87,25 +91,15 @@ class SimpleEditCounterController extends XtoolsController
      *     defaults={
      *         "start"=false,
      *         "end"=false,
+     *         "namespace"="all",
      *     }
      * )
-     * @param int|string $namespace Namespace ID or 'all' for all namespaces.
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction($namespace = 'all'): Response
+    public function resultAction(): Response
     {
-        $sec = new SimpleEditCounter(
-            $this->project,
-            $this->user,
-            $namespace,
-            $this->start,
-            $this->end
-        );
-        $secRepo = new SimpleEditCounterRepository();
-        $secRepo->setContainer($this->container);
-        $sec->setRepository($secRepo);
-        $sec->prepareData();
+        $sec = $this->prepareSimpleEditCounter();
 
         return $this->getFormattedResponse('simpleEditCounter/result', [
             'xtPage' => 'SimpleEditCounter',
@@ -130,28 +124,15 @@ class SimpleEditCounterController extends XtoolsController
      *     defaults={
      *         "start"=false,
      *         "end"=false,
+     *         "namespace"="all",
      *     }
      * )
-     * @param int|string $namespace Namespace ID or 'all' for all namespaces.
      * @return Response
      * @codeCoverageIgnore
      */
-    public function simpleEditCounterApiAction($namespace = 'all'): Response
+    public function simpleEditCounterApiAction(): Response
     {
-        $this->recordApiUsage('user/simple_editcount');
-
-        $sec = new SimpleEditCounter(
-            $this->project,
-            $this->user,
-            $namespace,
-            $this->start,
-            $this->end
-        );
-        $secRepo = new SimpleEditCounterRepository();
-        $secRepo->setContainer($this->container);
-        $sec->setRepository($secRepo);
-        $sec->prepareData();
-
+        $sec = $this->prepareSimpleEditCounter();
         return $this->getFormattedApiResponse($sec->getData());
     }
 }

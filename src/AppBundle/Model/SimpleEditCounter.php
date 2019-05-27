@@ -9,12 +9,14 @@ namespace AppBundle\Model;
 
 /**
  * A SimpleEditCounter provides basic edit count stats about a user.
- * This class is too 'simple' to bother with tests, we just get
- * the results of the query and return it.
+ * This class is too 'simple' to bother with tests, we just get the results of the query and return them.
  * @codeCoverageIgnore
  */
 class SimpleEditCounter extends Model
 {
+    /** @var bool Whether only limited results are given (due to high edit count). */
+    private $limited = false;
+
     /** @var array The Simple Edit Counter results. */
     protected $data = [
         'userId' => null,
@@ -23,6 +25,9 @@ class SimpleEditCounter extends Model
         'userGroups' => [],
         'globalUserGroups' => [],
     ];
+
+    /** @var int If the user has more than this many edits, only the approximate system edit count will be used. */
+    public const MAX_EDIT_COUNT = 500000;
 
     /**
      * Constructor for the SimpleEditCounter class.
@@ -36,9 +41,17 @@ class SimpleEditCounter extends Model
     {
         $this->project = $project;
         $this->user = $user;
-        $this->namespace = '' == $namespace ? 0 : $namespace;
-        $this->start = $start;
-        $this->end = $end;
+
+        if ($this->user->getEditCount($this->project) > self::MAX_EDIT_COUNT) {
+            $this->limited = true;
+            $this->namespace = 'all';
+            $this->start = false;
+            $this->end = false;
+        } else {
+            $this->namespace = '' == $namespace ? 0 : $namespace;
+            $this->start = $start;
+            $this->end = $end;
+        }
     }
 
     /**
@@ -46,6 +59,25 @@ class SimpleEditCounter extends Model
      * then set class properties with the values.
      */
     public function prepareData(): void
+    {
+        if ($this->limited) {
+            $this->data = [
+                'userId' => $this->user->getId($this->project),
+                'totalEditCount' => $this->user->getEditCount($this->project),
+                'userGroups' => $this->user->getUserRights($this->project),
+                'approximate' => true,
+                'namespace' => 'all',
+            ];
+        } else {
+            $this->prepareFullData();
+        }
+
+        if (!$this->user->isAnon()) {
+            $this->data['globalUserGroups'] = $this->user->getGlobalUserRights($this->project);
+        }
+    }
+
+    private function prepareFullData(): void
     {
         $results = $this->getRepository()->fetchData(
             $this->project,
@@ -71,10 +103,6 @@ class SimpleEditCounter extends Model
                     $this->data['userGroups'][] = $row['value'];
                     break;
             }
-        }
-
-        if (!$this->user->isAnon()) {
-            $this->data['globalUserGroups'] = $this->user->getGlobalUserRights($this->project);
         }
     }
 
@@ -120,7 +148,7 @@ class SimpleEditCounter extends Model
      */
     public function getTotalEditCount(): int
     {
-        return $this->data['deletedEditCount'] + $this->data['liveEditCount'];
+        return $this->data['totalEditCount'] ?? $this->data['deletedEditCount'] + $this->data['liveEditCount'];
     }
 
     /**
@@ -139,5 +167,14 @@ class SimpleEditCounter extends Model
     public function getGlobalUserGroups(): array
     {
         return $this->data['globalUserGroups'];
+    }
+
+    /**
+     * Whether or not only limited, approximate data is provided.
+     * @return bool
+     */
+    public function isLimited(): bool
+    {
+        return $this->limited;
     }
 }

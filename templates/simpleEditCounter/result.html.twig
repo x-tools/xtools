@@ -57,17 +57,19 @@
                         {% endif %}
                     {% endif %}
                     <tr>
-                        <td>{{ msg('total') }}</td>
+                        <td>{{ msg('total') }}{% if sec.limited %} ({{ msg('approximate')|lower }}){% endif %}</td>
                         <td>{{ sec.totalEditCount|num_format }}</td>
                     </tr>
-                    <tr>
-                        <td>{{ msg('live-edits') }}</td>
-                        <td>{{ sec.liveEditCount|num_format }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ msg('deleted-edits') }}</td>
-                        <td>{{ sec.deletedEditCount|num_format }}</td>
-                    </tr>
+                    {% if not(sec.limited) %}
+                        <tr>
+                            <td>{{ msg('live-edits') }}</td>
+                            <td>{{ sec.liveEditCount|num_format }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('deleted-edits') }}</td>
+                            <td>{{ sec.deletedEditCount|num_format }}</td>
+                        </tr>
+                    {% endif %}
                 </table>
             </div>
         {% endset %}
