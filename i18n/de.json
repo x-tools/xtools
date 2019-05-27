@@ -5,7 +5,8 @@
 			"Nemo bis",
 			"Johanna Strodt (WMDE)",
 			"CarstenG",
-			"MGChecker"
+			"MGChecker",
+			"Mirzali"
 		]
 	},
 	"abusefilter": "Bearbeitungsfilter",
@@ -369,6 +370,7 @@
 	"see-full-statistics": "Vollständige Statistiken ansehen",
 	"show": "anzeigen",
 	"show-sections-desc": "Wähle aus, welche Statistiken angezeigt werden sollen. Je mehr du auswählst, desto länger dauert das Laden.",
+	"simple-counter-limited-results": "Dieser Benutzer hat eine beträchtliche Anzahl von Bearbeitungen vorgenommen. Es werden begrenzte Ergebnisse angezeigt.",
 	"size": "Größe",
 	"size-over-time": "Zeitverlauf der Artikelgröße",
 	"small-edits": "Kleine Bearbeitungen (< 20 Bytes)",

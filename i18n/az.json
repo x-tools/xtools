@@ -5,6 +5,7 @@
 			"Wertuose"
 		]
 	},
+	"abusefilter": "AbuseFilter",
 	"accepted-formats": "Qəbul formatları",
 	"account-age": "Hesab yaşı",
 	"account-age-desc": "$2 {{PLURAL:$1|gün}} yaşında",
@@ -14,6 +15,9 @@
 	"actions-as-admin": "Admin fəaliyyətləri",
 	"added": "Əlavə olundu",
 	"added-bytes": "Əlavə olundu (baytlar)",
+	"admins": "İdarəçilər",
+	"admin-stats-notice": "Yalnız bir müddətdə ən azı bir idarəçi fəaliyyəti göstərən istifadəçilər göstərilir.",
+	"admin-stats-notice2": "Bəzi istifadəçilər köhnə idarəçi ola bilərlər və ya idarəçi olmaya bilərlər, lakin müəyyən idarəçi hərəkətləri etmək hüquqları var.",
 	"afd": "Silinmək üçün məqalələr",
 	"afd-desc": "$2 {{PLURAL:$1|redaktə|düzəlişlər}} silinmə səhifələrindəki məqalələrə",
 	"aiv": "Vandalizmə qarşı idarəçi müdaxiləsi",
@@ -24,6 +28,7 @@
 	"all-languages": "Bütün dillər",
 	"all-namespaces": "Bütün ad bölgələri",
 	"all-quotes": "Bütün qiymətlər",
+	"api": "API",
 	"api-error": "$1-i sorğulayan səhv",
 	"approve": "Təsdiqləmək",
 	"approximate": "təxminən",

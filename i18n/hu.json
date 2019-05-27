@@ -96,6 +96,7 @@
 	"date-to": "Eddig: $1",
 	"delete": "törlés",
 	"deleted": "törölt",
+	"deleted-bytes": "Törölt byte",
 	"deleted-edits": "Törölt szerkesztések",
 	"deleted-pages": "Törölt oldalak",
 	"delpagesfilter-all": "beleértve az élő és törölt oldalakat is",
