@@ -7,7 +7,7 @@
             {{ msg('no-result', [user.username]) }}
         </div>
     {% else %}
-        {% if pages.numDeleted > 0 %}
+        {% if (pages.deleted == 'all' or pages.deleted == 'deleted') and pages.numDeleted > 0 %}
             <script>
                 var wikiDomain = "{{ project.domain }}",
                     wikiApi = "{{ project.apiUrl }}";
