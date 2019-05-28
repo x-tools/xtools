@@ -689,6 +689,16 @@ class EditCounter extends UserRights
     }
 
     /**
+     * Get the total number of live edits by summing the namespace totals.
+     * This is used in the view for namespace totals so we don't unnecessarily run the self::getPairData() query.
+     * @return int
+     */
+    public function liveRevisionsFromNamespaces(): int
+    {
+        return array_sum($this->namespaceTotals());
+    }
+
+    /**
      * Get a summary of the times of day and the days of the week that the user has edited.
      * @return string[]
      */

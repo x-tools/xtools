@@ -55,7 +55,7 @@
                     </td>
                     <td class="sort-entry--count" data-value="{{ value }}">
                         <a href="{{ path('TopEditsResultNamespace', {project:project.domain, username:user.username, namespace:nsId}) }}">{{ value|num_format }}</a>
-                        ({{ value|percent_format(ec.countLiveRevisions) }})
+                        ({{ value|percent_format(ec.liveRevisionsFromNamespaces) }})
                     </td>
                 </tr>
             {% endfor %}
@@ -66,7 +66,7 @@
                     {{ ec.namespaceTotals|length|num_format }} {{ msg('num-namespaces', [ec.namespaceTotals|length]) }}
                 </th>
                 <th class="namespaces--count">
-                    {{ ec.countLiveRevisions|num_format }}
+                    {{ ec.liveRevisionsFromNamespaces|num_format }}
                 </th>
             </tr>
         </tfoot>
