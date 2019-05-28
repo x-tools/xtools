@@ -157,6 +157,9 @@ class ProjectRepository extends Repository
             return $this->singleBasicInfo;
         }
 
+        // Remove _p suffix.
+        $project = rtrim($project, '_p');
+
         // For multi-wiki setups, first check the cache.
         // First the all-projects cache, then the individual one.
         if ($this->cache->hasItem($this->cacheKeyAllProjects)) {
