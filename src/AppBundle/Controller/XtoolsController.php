@@ -722,7 +722,25 @@ abstract class XtoolsController extends Controller
         $contentType = $formatMap[$format] ?? 'text/html';
         $response->headers->set('Content-Type', $contentType);
 
+        if (in_array($format, ['csv', 'tsv'])) {
+            $filename = $this->getFilenameForRequest();
+            $response->headers->set(
+                'Content-Disposition',
+                "attachment; filename=\"{$filename}.$format\""
+            );
+        }
+
         return $response;
+    }
+
+    /**
+     * Returns given filename from the current Request, with problematic characters filtered out.
+     * @return string
+     */
+    private function getFilenameForRequest(): string
+    {
+        $filename = trim($this->request->getPathInfo(), '/');
+        return trim(preg_replace('/[-\/\\:;*?|<>%#"]+/', '-', $filename));
     }
 
     /**
