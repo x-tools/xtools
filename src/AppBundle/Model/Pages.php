@@ -204,9 +204,13 @@ class Pages extends Model
         foreach ($this->countPagesCreated() as $row) {
             $counts[$row['namespace']] = [
                 'count' => (int)$row['count'],
-                'deleted' => (int)$row['deleted'],
-                'redirects' => (int)$row['redirects'],
             ];
+            if ('live' !== $this->deleted) {
+                $counts[$row['namespace']]['deleted'] = (int)$row['deleted'];
+            }
+            if ('noredirects' !== $this->redirects) {
+                $counts[$row['namespace']]['redirects'] = (int)$row['redirects'];
+            }
         }
 
         $this->countsByNamespace = $counts;

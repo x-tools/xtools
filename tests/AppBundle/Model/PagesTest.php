@@ -69,7 +69,7 @@ class PagesTest extends TestAdapter
     public function testResults(): void
     {
         $this->setPagesResults();
-        $pages = new Pages($this->project, $this->user, 0, '');
+        $pages = new Pages($this->project, $this->user, 0, 'both');
         $pages->setRepository($this->pagesRepo);
         $pages->prepareData();
         static::assertEquals(3, $pages->getNumResults());
