@@ -637,7 +637,7 @@ abstract class XtoolsController extends Controller
 
         // Default to $this->defaultDays or $this->maxDays before end time if start is not present.
         $daysOffset = $this->defaultDays ?? $this->maxDays;
-        if (false === $start && is_int($daysOffset)) {
+        if (false === $startTime && is_int($daysOffset)) {
             $startTime = strtotime("-$daysOffset days", $endTime);
         }
 
