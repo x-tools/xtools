@@ -133,6 +133,23 @@ class SimpleEditCounterController extends XtoolsController
     public function simpleEditCounterApiAction(): Response
     {
         $sec = $this->prepareSimpleEditCounter();
-        return $this->getFormattedApiResponse($sec->getData());
+
+        $this->addFlash('warning', 'Camel-cased keys will be removed in the near future. '.
+            'Use the underscored variants, e.g. user_id instead of userId, etc.');
+
+        $ret = $sec->getData();
+
+        // FIXME: remove deprecated keys
+        $ret['userId'] = $ret['user_id'];
+        if (isset($ret['deleted_edit_count'])) {
+            $ret['deletedEditCount'] = $ret['deleted_edit_count'];
+        }
+        if (isset($ret['live_edit_count'])) {
+            $ret['liveEditCount'] = $ret['live_edit_count'];
+        }
+        $ret['userGroups'] = $ret['user_groups'];
+        $ret['globalUserGroups'] = $ret['global_user_groups'];
+
+        return $this->getFormattedApiResponse($ret);
     }
 }

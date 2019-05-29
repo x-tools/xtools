@@ -19,11 +19,11 @@ class SimpleEditCounter extends Model
 
     /** @var array The Simple Edit Counter results. */
     protected $data = [
-        'userId' => null,
-        'deletedEditCount' => 0,
-        'liveEditCount' => 0,
-        'userGroups' => [],
-        'globalUserGroups' => [],
+        'user_id' => null,
+        'deleted_edit_count' => 0,
+        'live_edit_count' => 0,
+        'user_groups' => [],
+        'global_user_groups' => [],
     ];
 
     /** @var int If the user has more than this many edits, only the approximate system edit count will be used. */
@@ -62,9 +62,9 @@ class SimpleEditCounter extends Model
     {
         if ($this->limited) {
             $this->data = [
-                'userId' => $this->user->getId($this->project),
-                'totalEditCount' => $this->user->getEditCount($this->project),
-                'userGroups' => $this->user->getUserRights($this->project),
+                'user_id' => $this->user->getId($this->project),
+                'total_edit_count' => $this->user->getEditCount($this->project),
+                'user_groups' => $this->user->getUserRights($this->project),
                 'approximate' => true,
                 'namespace' => 'all',
             ];
@@ -73,7 +73,7 @@ class SimpleEditCounter extends Model
         }
 
         if (!$this->user->isAnon()) {
-            $this->data['globalUserGroups'] = $this->user->getGlobalUserRights($this->project);
+            $this->data['global_user_groups'] = $this->user->getGlobalUserRights($this->project);
         }
     }
 
@@ -91,16 +91,16 @@ class SimpleEditCounter extends Model
         foreach ($results as $row) {
             switch ($row['source']) {
                 case 'id':
-                    $this->data['userId'] = (int)$row['value'];
+                    $this->data['user_id'] = (int)$row['value'];
                     break;
                 case 'arch':
-                    $this->data['deletedEditCount'] = (int)$row['value'];
+                    $this->data['deleted_edit_count'] = (int)$row['value'];
                     break;
                 case 'rev':
-                    $this->data['liveEditCount'] = (int)$row['value'];
+                    $this->data['live_edit_count'] = (int)$row['value'];
                     break;
                 case 'groups':
-                    $this->data['userGroups'][] = $row['value'];
+                    $this->data['user_groups'][] = $row['value'];
                     break;
             }
         }
@@ -121,7 +121,7 @@ class SimpleEditCounter extends Model
      */
     public function getUserId(): int
     {
-        return $this->data['userId'];
+        return $this->data['user_id'];
     }
 
     /**
@@ -130,7 +130,7 @@ class SimpleEditCounter extends Model
      */
     public function getDeletedEditCount(): int
     {
-        return $this->data['deletedEditCount'];
+        return $this->data['deleted_edit_count'];
     }
 
     /**
@@ -139,7 +139,7 @@ class SimpleEditCounter extends Model
      */
     public function getLiveEditCount(): int
     {
-        return $this->data['liveEditCount'];
+        return $this->data['live_edit_count'];
     }
 
     /**
@@ -148,7 +148,7 @@ class SimpleEditCounter extends Model
      */
     public function getTotalEditCount(): int
     {
-        return $this->data['totalEditCount'] ?? $this->data['deletedEditCount'] + $this->data['liveEditCount'];
+        return $this->data['total_edit_count'] ?? $this->data['deleted_edit_count'] + $this->data['live_edit_count'];
     }
 
     /**
@@ -157,7 +157,7 @@ class SimpleEditCounter extends Model
      */
     public function getUserGroups(): array
     {
-        return $this->data['userGroups'];
+        return $this->data['user_groups'];
     }
 
     /**
@@ -166,7 +166,7 @@ class SimpleEditCounter extends Model
      */
     public function getGlobalUserGroups(): array
     {
-        return $this->data['globalUserGroups'];
+        return $this->data['global_user_groups'];
     }
 
     /**
