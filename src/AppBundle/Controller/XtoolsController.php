@@ -400,6 +400,12 @@ abstract class XtoolsController extends Controller
                 unset($this->params['username']);
             }
 
+            // Clear flash bag for API responses, since they get intercepted in ExceptionListener
+            // and would otherwise be shown in subsequent requests.
+            if ($this->isApi) {
+                $this->get('session')->getFlashBag()->clear();
+            }
+
             throw new XtoolsHttpException(
                 'User has made too many edits! Maximum '.$user->maxEdits(),
                 $this->generateUrl($this->tooHighEditCountAction, $this->params),
