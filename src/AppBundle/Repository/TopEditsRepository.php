@@ -235,24 +235,26 @@ class TopEditsRepository extends Repository
         $userId = $this->getProjectsConnection()->quote($user->getId($page->getProject()), PDO::PARAM_STR);
         $username = $this->getProjectsConnection()->quote($user->getUsername(), PDO::PARAM_STR);
 
-        $sql = "SELECT
-                    revs.rev_id AS id,
-                    revs.rev_timestamp AS timestamp,
-                    revs.rev_minor_edit AS minor,
-                    revs.rev_len AS length,
-                    (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
-                    $userId AS user_id,
-                    $username AS username,
-                    comments.comment_text AS `comment`
-                    $childSelect
-                FROM $revTable AS revs
-                LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-                LEFT OUTER JOIN $commentTable AS comments ON (revs.rev_comment_id = comments.comment_id)
-                $childJoin
-                WHERE revs.rev_actor = :actorId
-                AND revs.rev_page = :pageid
-                $childWhere
-                ORDER BY revs.rev_timestamp DESC
+        $sql = "SELECT * FROM (
+                    SELECT
+                        revs.rev_id AS id,
+                        revs.rev_timestamp AS timestamp,
+                        revs.rev_minor_edit AS minor,
+                        revs.rev_len AS length,
+                        (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
+                        $userId AS user_id,
+                        $username AS username,
+                        comments.comment_text AS `comment`
+                        $childSelect
+                    FROM $revTable AS revs
+                    LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+                    LEFT OUTER JOIN $commentTable AS comments ON (revs.rev_comment_id = comments.comment_id)
+                    $childJoin
+                    WHERE revs.rev_actor = :actorId
+                    AND revs.rev_page = :pageid
+                    $childWhere
+                ) a
+                ORDER BY timestamp DESC
                 $childLimit";
 
         return $this->executeProjectsQuery($sql, [

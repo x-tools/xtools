@@ -190,7 +190,7 @@ class PageRepository extends Repository
 
         $params = ['pageid' => $page->getId()];
         if ($user) {
-            $params['username'] = $user->getUsername();
+            $params['actorId'] = $user->getActorId($page->getProject());
         }
 
         return $this->setCache($cacheKey, $this->executeProjectsQuery($sql, $params));
