@@ -25,7 +25,7 @@ class AdminStats extends Model
     /** @var string[] Usernames of users who are in the relevant user group (sysop for admins, etc.). */
     private $usersInGroup = [];
 
-    /** @var string Type that we're getting stats for (admin, patrollers, stewards, etc.). See admin_stats.yml */
+    /** @var string Type that we're getting stats for (admin, patroller, steward, etc.). See admin_stats.yml */
     private $type;
 
     /** @var string[] Which actions to show ('block', 'protect', etc.) */
