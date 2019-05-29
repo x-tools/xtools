@@ -29,7 +29,7 @@
 |-
 {% for day in 1..7 %}
 ! {{ days[day] }}
-{% for item in ec.timeCard if item.y == day and item.x != 24 %}
+{% for item in ec.timeCard if item.day_of_week == day and item.hour != 24 %}
 | style="text-align:center; background:rgba(50, 102, 36, {{ (item.value / 100)|round(1) }})" |{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ item.value }}}}
 {% endfor %}
 |-

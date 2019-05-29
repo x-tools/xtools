@@ -507,8 +507,8 @@ class EditCounterRepository extends UserRightsRepository
         $xCalc = "ROUND(HOUR(rev_timestamp)/$hourInterval) * $hourInterval";
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
         $sql = "SELECT "
-            . "     DAYOFWEEK(rev_timestamp) AS `y`, "
-            . "     $xCalc AS `x`, "
+            . "     DAYOFWEEK(rev_timestamp) AS `day_of_week`, "
+            . "     $xCalc AS `hour`, "
             . "     COUNT(rev_id) AS `value` "
             . " FROM $revisionTable"
             . " WHERE rev_actor = :actorId"

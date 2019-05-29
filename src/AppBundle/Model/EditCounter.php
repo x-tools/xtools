@@ -725,13 +725,13 @@ class EditCounter extends UserRights
         $sortedIndex = 0;
         foreach (range(1, 7) as $day) {
             foreach (range(0, 24, 2) as $hour) {
-                if (isset($totals[$index]) && (int)$totals[$index]['x'] === $hour) {
+                if (isset($totals[$index]) && (int)$totals[$index]['hour'] === $hour) {
                     $sortedTotals[$sortedIndex] = $totals[$index];
                     $index++;
                 } else {
                     $sortedTotals[$sortedIndex] = [
-                        'y' => $day,
-                        'x' => $hour,
+                        'day_of_week' => $day,
+                        'hour' => $hour,
                         'value' => 0,
                     ];
                 }

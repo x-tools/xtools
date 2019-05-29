@@ -59,7 +59,7 @@
             {% for day in 1..7 %}
                 <tr>
                     <th>{{ days[day] }}</th>
-                    {% for item in ec.timeCard if item.y == day and item.x != 24 %}
+                    {% for item in ec.timeCard if item.day_of_week == day and item.hour != 24 %}
                         <td>{{ item.value }}</td>
                     {% endfor %}
                 </tr>
@@ -97,13 +97,14 @@
      # fool-proof but it does help.
      #}
     {% set maxMidnight = 0 %}
-    {% for data in ec.timeCard if data.x != 24 %}
-        {% if data.x == 0 and data.value > maxMidnight %}
+    {% for data in ec.timeCard if data.hour != 24 %}
+        {% if data.hour == 0 and data.value > maxMidnight %}
             {% set maxMidnight = maxMidnight + data.value %}
         {% endif %}
-        {% set datasetIndex = data.y - 1 %}
+        {% set datasetIndex = data.day_of_week - 1 %}
         var entry = {{ data|json_encode|raw }};
-        entry.y = Math.abs(8 - entry.y);
+        entry.x = entry.hour;
+        entry.y = Math.abs(8 - entry.day_of_week);
         timeCardDatasets[{{ datasetIndex }}].data.push(entry);
     {% endfor %}
 
