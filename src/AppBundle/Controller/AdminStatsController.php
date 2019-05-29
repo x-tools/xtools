@@ -236,10 +236,13 @@ class AdminStatsController extends XtoolsController
 
         $this->setUpAdminStats();
 
-        return new JsonResponse(
-            $this->adminStats->getUsersAndGroups(),
-            Response::HTTP_OK
-        );
+        unset($this->params['actions']);
+        unset($this->params['start']);
+        unset($this->params['end']);
+
+        return $this->getFormattedApiResponse([
+            'users_and_groups' => $this->adminStats->getUsersAndGroups(),
+        ]);
     }
 
     /**
