@@ -108,8 +108,7 @@ Admins and user groups
 
 ``GET /api/project/admins_groups/{project}``
 
-Get a list of users who are admins, bureaucrats, CheckUsers, Oversighters, or
-stewards of the project and list which of these user groups they belong to.
+Get a list of users who are capable of making admin-like actions, and the relevant user groups they are in.
 
 **Parameters:**
 
@@ -138,10 +137,10 @@ counts of the actions they took. Time period is limited to one month.
 * ``start`` - Start date in the format ``YYYY-MM-DD``. Defaults to 31 days before ``end``.
 * ``end`` - End date in the format ``YYYY-MM-DD``. Defaults to current day (UTC).
 
-The date range is limited to a 31 day period. If you need a wider range of data, you must make
-the the individual requests (synchronously), and do the math in your application.
+The date range defaults to the past 31 days, and is limited to a 31-day period. If you need a wider range of data,
+you must make the the individual requests (synchronously), and do the math in your application.
 
-**Query string parameters**
+**Query string parameters:**
 
 Optional `query string <https://en.wikipedia.org/wiki/Query_string>`_ parameters to
 further filter results.
@@ -167,16 +166,13 @@ the `YAML configuration <https://github.com/x-tools/xtools/blob/master/config/ad
 
 **Example:**
 
-Get 're-block', 'unblock' and 'abusefilter' statistics for every active admin on the French Wikipedia:
+Get 're-block' and 'abusefilter' statistics for every active admin on the French Wikipedia:
 
-    https://xtools.wmflabs.org/api/project/admin_stats/frwiki
-    https://xtools.wmflabs.org/api/project/admin_stats/fr.wikipedia.org/7
+    `<https://xtools.wmflabs.org/api/project/admin_stats/fr.wikipedia?actions=re-block|abusefilter>`_
 
-Get statistics about all actions taken by Spanish Wikipedia admins in January 2019:
+Get statistics about all relevant actions taken by Spanish Wikipedia admins in January 2019:
 
-    https://xtools.wmflabs.org/api/project/admin_stats/es.wikipedia/2019-01-01
-    https://xtools.wmflabs.org/api/project/admin_stats/es.wikipedia/2019-01-01/2019-01
-    https://xtools.wmflabs.org/api/project/admin_stats/es.wikipedia.org//2019-01
+    https://xtools.wmflabs.org/api/project/admin_stats/es.wikipedia/2019-01-01/2019-01-31
 
 Patroller statistics
 ====================

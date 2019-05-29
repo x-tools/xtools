@@ -6,6 +6,10 @@ User API
 
 API endpoints related to a user.
 
+.. note::
+    To ensure performance and stability, most endpoints will return an error if the user has made an exceptionally
+    high number of edits.
+
 Simple edit count
 =================
 
@@ -13,8 +17,7 @@ Simple edit count
 
 ``GET /api/user/simple_editcount/{project}/{username}/{start}/{end}``
 
-For the given account, get the user ID, live and deleted edit count,
-local user groups and global user groups.
+For the given account, get the user ID, live and deleted edit count, local user groups and global user groups.
 
 **Parameters:**
 
@@ -23,6 +26,12 @@ local user groups and global user groups.
 * ``namespace`` - Namespace ID or ``all`` for all namespaces.
 * ``start`` - Start date in the format ``YYYY-MM-DD``.
 * ``end`` - End date in the format ``YYYY-MM-DD``.
+
+**Response notes:**
+
+The Simple Edit Count endpoint will return `limited` data if the user has a very high edit count. In this case the
+``namespace``, ``start`` and ``end`` parameters are ignored, and only the approximate system edit count is returned.
+Look for ``approximate`` as one of the keys in the response body.
 
 **Example:**
 
