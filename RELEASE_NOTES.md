@@ -1,5 +1,21 @@
 # Release Notes #
 
+## 3.8.0 ##
+- T223667: Implement actor storage, with minor refactoring to Repositories.
+- EditCounter: Add APIs for log counts, namespace totals, month counts, and
+  timecard.
+- EditCounter: Remove obsolete internal API endpoints.
+- EditCounter: Speed up loading of the Namespace Totals sub-tool.
+- Pages: Don't include null values type-casted to zero in API responses.
+- SimpleEditCounter: Show system edit count for users with > 50000 edits.
+- SimpleEditCounter: Deprecate camelCased keys of API response.
+- AdminStats: remove deprecated adminstats/{project}/{days} API endpoint.
+- Fix exception thrown when giving wiki parser a null value.
+- Prettify filenames for CSV and TSV exports.
+- Various frontend fixes and tweaks.
+- Expand API documentation and fix errors.
+- Localization updates.
+
 ## 3.7.10 ##
 - Hotfix for checking app.wikiwho config parameters.
 - Fix checking of controller action in RateLimitSubscriber.
