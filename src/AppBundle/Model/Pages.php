@@ -329,7 +329,7 @@ class Pages extends Model
                 $pageData['badge'] = $this->project
                     ->getPageAssessments()
                     ->getBadgeURL($pageData['pa_class']);
-                $pageData['badgeFile'] = $this->project
+                $pageData['badge_file'] = $this->project
                     ->getPageAssessments()
                     ->getBadgeURL($pageData['pa_class'], true);
             }

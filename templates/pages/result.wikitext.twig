@@ -40,8 +40,8 @@
 | {% if page.page_len is null %}{{ msg('na') }}{% else %}{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ page.page_len }}}}{% endif %}
 
 {% if project.hasPageAssessments(ns) %}
-| {% if page.badgeFile is defined %}
-[[File:{{ page.badgeFile }}|20px]] {{ page.pa_class ? page.pa_class : msg('unknown') }}
+| {% if page.badge_file is defined %}
+[[File:{{ page.badge_file }}|20px]] {{ page.pa_class ? page.pa_class : msg('unknown') }}
 {% endif %}
 {% endif %}
 {% endif %}
