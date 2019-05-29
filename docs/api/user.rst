@@ -17,12 +17,12 @@ Simple edit count
 
 ``GET /api/user/simple_editcount/{project}/{username}/{start}/{end}``
 
-For the given account, get the user ID, live and deleted edit count, local user groups and global user groups.
+For the given user, get the user ID, live and deleted edit count, local user groups and global user groups.
 
 **Parameters:**
 
 * ``project`` (**required**) - Project domain or database name.
-* ``username`` (**required**) - Account's username.
+* ``username`` (**required**) - Username or IP address.
 * ``namespace`` - Namespace ID or ``all`` for all namespaces.
 * ``start`` - Start date in the format ``YYYY-MM-DD``.
 * ``end`` - End date in the format ``YYYY-MM-DD``.
@@ -53,7 +53,7 @@ Get the number of pages created by the user in the given namespace.
 **Parameters:**
 
 * ``project`` (**required**) - Project domain or database name.
-* ``username`` (**required**) - Account's username.
+* ``username`` (**required**) - Username or IP address.
 * ``namespace`` - Namespace ID or ``all`` for all namespaces.
 * ``redirects`` - One of 'noredirects' (default), 'onlyredirects' or 'all' for both.
 * ``deleted`` - One of 'live', 'deleted' or 'all' (default).
@@ -79,7 +79,7 @@ Get the pages created by the user in the given namespace.
 **Parameters:**
 
 * ``project`` (**required**) - Project domain or database name.
-* ``username`` (**required**) - Account's username.
+* ``username`` (**required**) - Username or IP address.
 * ``namespace`` - Namespace ID or ``all`` for all namespaces.
 * ``redirects`` - One of 'noredirects' (default), 'onlyredirects' or 'all' for both.
 * ``deleted`` - One of 'live', 'deleted' or 'all' (default).
@@ -107,7 +107,7 @@ You can optionally pass in ``?tools=1`` to get individual counts of each (semi-)
 **Parameters:**
 
 * ``project`` (**required**) - Project domain or database name.
-* ``username`` (**required**) - Account's username.
+* ``username`` (**required**) - Username or IP address.
 * ``namespace`` - Namespace ID or ``all`` for all namespaces.
 * ``start`` - Start date in the format ``YYYY-MM-DD``. Leave this and ``end`` blank to retrieve the most recent data.
 * ``end`` - End date in the format ``YYYY-MM-DD``. Leave this and ``start`` blank to retrieve the most recent data.
@@ -132,7 +132,7 @@ Get non-automated contributions for the given user, namespace and date range.
 **Parameters:**
 
 * ``project`` (**required**) - Project domain or database name.
-* ``username`` (**required**) - Account's username.
+* ``username`` (**required**) - Username or IP address.
 * ``namespace`` (**required**) - Namespace ID or  ``all`` for all namespaces. Defaults to ``0`` (mainspace).
 * ``start`` - Start date in the format ``YYYY-MM-DD``. Leave this and ``end`` blank to retrieve the most recent contributions.
 * ``end`` - End date in the format ``YYYY-MM-DD``. Leave this and ``start`` blank to retrieve the most recent contributions.
@@ -156,7 +156,7 @@ To get the names of the available tools, use the :ref:`Automated tools <autotool
 **Parameters:**
 
 * ``project`` (**required**) - Project domain or database name.
-* ``username`` (**required**) - Account's username.
+* ``username`` (**required**) - Username or IP address.
 * ``namespace`` (**required**) - Namespace ID or  ``all`` for all namespaces. Defaults to ``0`` (mainspace).
 * ``start`` - Start date in the format ``YYYY-MM-DD``. Leave this and ``end`` blank to retrieve the most recent contributions.
 * ``end`` - End date in the format ``YYYY-MM-DD``. Leave this and ``start`` blank to retrieve the most recent contributions.
@@ -211,7 +211,7 @@ Get statistics about a user's usage of edit summaries.
 **Parameters:**
 
 * ``project`` (**required**) - Project domain or database name.
-* ``username`` (**required**) - Account's username.
+* ``username`` (**required**) - Username or IP address.
 * ``namespace`` - Namespace ID or ``all`` for all namespaces.
 
 **Example:**
@@ -229,7 +229,7 @@ Get the top-edited pages by a user, or get all edits made by a user to a specifi
 **Parameters:**
 
 * ``project`` (**required**) - Project domain or database name.
-* ``username`` (**required**) - Account's username.
+* ``username`` (**required**) - Username or IP address.
 * ``namespace`` - Namespace ID or ``all`` for all namespaces. Defaults to the mainspace. Leave this blank if you are also supplying a full page title as the ``article``.
 * ``article`` - Full page title if ``namespace`` is omitted. If ``namespace`` is blank, do not include the namespace in the page title.
 
@@ -257,7 +257,7 @@ Get the number of edits made by the given user to the given categories.
 **Parameters:**
 
 * ``project`` (**required**) - Project domain or database name.
-* ``username`` (**required**) - Account's username.
+* ``username`` (**required**) - Username or IP address.
 * ``categories`` (**required**) - Category names separated by pipes. The namespace prefix may be omitted.
 * ``start`` - Start date in the format ``YYYY-MM-DD``. Leave this and ``end`` blank to retrieve the most recent data.
 * ``end`` - End date in the format ``YYYY-MM-DD``. Leave this and ``start`` blank to retrieve the most recent data.
@@ -267,3 +267,75 @@ Get the number of edits made by the given user to the given categories.
 Get the number of edits made by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ to `Category:Living people <https://en.wikipedia.org/wiki/Category:Living_people>`_ and `Category:Wikipedia village pump <https://en.wikipedia.org/wiki/Category:Wikipedia_village_pump>`_.
 
     `<https://xtools.wmflabs.org/api/user/category_editcount/en.wikipedia/Jimbo_Wales/Living_people|Wikipedia_village_pump>`_
+
+Log counts
+==========
+``GET /api/user/log_counts/{project}/{username}``
+
+Get various counts of logged actions made by the user.
+
+**Parameters:**
+
+* ``project`` (**required**) - Project domain or database name.
+* ``username`` (**required**) - Username or IP address.
+
+**Example:**
+
+Get log counts by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ on the English Wikipedia.
+
+    https://xtools.wmflabs.org/api/user/log_counts/en.wikipedia/Jimbo_Wales
+
+Namespace totals
+================
+``GET /api/user/namespace_totals/{project}/{username}``
+
+Get the counts of edits made to each namespace. Only namespaces for which the user has made at least one edit are
+returned.
+
+**Parameters:**
+
+* ``project`` (**required**) - Project domain or database name.
+* ``username`` (**required**) - Username or IP address.
+
+**Example:**
+
+Get namespace totals for `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ on the English Wikipedia.
+
+    https://xtools.wmflabs.org/api/user/namespace_totals/enwiki/Jimbo_Wales
+
+Month counts
+============
+``GET /api/user/month_counts/{project}/{username}``
+
+Get the counts of edits made by a user, grouped by namespace then year and month.
+
+**Parameters:**
+
+* ``project`` (**required**) - Project domain or database name.
+* ``username`` (**required**) - Username or IP address.
+
+**Example:**
+
+Get monthly edit count distribution for `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ on the
+English Wikipedia.
+
+    https://xtools.wmflabs.org/api/user/month_counts/enwiki/Jimbo_Wales
+
+Time Card
+=========
+``GET /api/user/timecard/{project}/{username}``
+
+Get the relative distribution of edits made by a user based on hour of day and day of week. The returned values are
+a percentage of edits made relative to the other hours and days of the week. Hence the maximum value is 100 and this
+would represent that time and day that the user is most active.
+
+**Parameters:**
+
+* ``project`` (**required**) - Project domain or database name.
+* ``username`` (**required**) - Username or IP address.
+
+**Example:**
+
+Get time card data for `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ on the English Wikipedia.
+
+    https://xtools.wmflabs.org/api/user/timecard/en.wikipedia.org/Jimbo_Wales

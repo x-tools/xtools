@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace AppBundle\Controller;
 
+use AppBundle\Exception\XtoolsHttpException;
 use AppBundle\Helper\I18nHelper;
 use AppBundle\Model\EditCounter;
 use AppBundle\Repository\EditCounterRepository;
@@ -70,19 +71,20 @@ class EditCounterController extends XtoolsController
         // The rightsChanges action is exempt from the edit count limitation.
         $this->tooHighEditCountActionBlacklist = ['rightsChanges'];
 
+        $this->restrictedActions = ['monthCountsApi', 'timecardApi'];
+
         parent::__construct($requestStack, $container, $i18n);
     }
 
     /**
      * Every action in this controller (other than 'index') calls this first.
      * If a response is returned, the calling action is expected to return it.
-     * @param string $key API key, as given in the request. Omit this for actions
-     *   that are public (only /api/ec actions should pass this in).
      * @return null
      * @throws AccessDeniedException If attempting to access internal endpoint.
+     * @throws XtoolsHttpException If an API request to restricted endpoint when user has not opted in.
      * @codeCoverageIgnore
      */
-    protected function setUpEditCounter(?string $key = null)
+    protected function setUpEditCounter()
     {
         // Whether we're making a subrequest (the view makes a request to another action).
         // Subrequests to the same controller do not re-instantiate a new controller, and hence
@@ -93,11 +95,6 @@ class EditCounterController extends XtoolsController
         // Return the EditCounter if we already have one.
         if (isset($this->editCounter)) {
             return null;
-        }
-
-        // Validate key if attempted to make internal API request.
-        if ($key && (string)$key !== (string)$this->container->getParameter('secret')) {
-            throw $this->createAccessDeniedException('This endpoint is for internal use only.');
         }
 
         // Will redirect to Simple Edit Counter if they have too many edits, as defined self::construct.
@@ -337,10 +334,6 @@ class EditCounterController extends XtoolsController
     {
         $this->setUpEditCounter();
 
-        $optedInPage = $this->project
-            ->getRepository()
-            ->getPage($this->project, $this->project->userOptInPage($this->user));
-
         $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'EditCounter',
@@ -348,7 +341,7 @@ class EditCounterController extends XtoolsController
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
-            'opted_in_page' => $optedInPage,
+            'opted_in_page' => $this->getOptedInPage(),
         ];
 
         // Output the relevant format template.
@@ -410,9 +403,6 @@ class EditCounterController extends XtoolsController
     {
         $this->setUpEditCounter();
 
-        $optedInPage = $this->project
-            ->getRepository()
-            ->getPage($this->project, $this->project->userOptInPage($this->user));
         $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'EditCounter',
@@ -420,7 +410,7 @@ class EditCounterController extends XtoolsController
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
-            'opted_in_page' => $optedInPage,
+            'opted_in_page' => $this->getOptedInPage(),
         ];
 
         // Output the relevant format template.
@@ -522,95 +512,68 @@ class EditCounterController extends XtoolsController
         return $this->indexAction();
     }
 
-
-    /**
-     * Below are internal API endpoints for the Edit Counter. All only respond with JSON and only to
-     * requests passing in the value of the 'secret' parameter. This should not be used in JavaScript or
-     * client-side applications, rather only used internally.
-     */
-
-    /**
-     * Get (most) of the general statistics as JSON.
-     * @Route("/api/ec/pairdata/{project}/{username}/{key}", name="EditCounterApiPairData")
-     * @param string $key API key.
-     * @return JsonResponse|RedirectResponse
-     * @codeCoverageIgnore
-     */
-    public function pairDataApiAction(string $key)
-    {
-        $this->setUpEditCounter($key);
-
-        return new JsonResponse(
-            $this->editCounter->getPairData(),
-            Response::HTTP_OK
-        );
-    }
+    /************************ API endpoints ************************/
 
     /**
      * Get various log counts for the user as JSON.
-     * @Route("/api/ec/logcounts/{project}/{username}/{key}", name="EditCounterApiLogCounts")
-     * @param string $key API key.
-     * @return JsonResponse|RedirectResponse
+     * @Route("/api/user/log_counts/{project}/{username}", name="UserApiLogCounts")
+     * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function logCountsApiAction(string $key)
+    public function logCountsApiAction(): JsonResponse
     {
-        $this->setUpEditCounter($key);
+        $this->setUpEditCounter();
 
-        return new JsonResponse(
-            $this->editCounter->getLogCounts(),
-            Response::HTTP_OK
-        );
-    }
-
-    /**
-     * Get edit sizes for the user as JSON.
-     * @Route("/api/ec/editsizes/{project}/{username}/{key}", name="EditCounterApiEditSizes")
-     * @param string $key API key.
-     * @return JsonResponse|RedirectResponse
-     * @codeCoverageIgnore
-     */
-    public function editSizesApiAction(string $key)
-    {
-        $this->setUpEditCounter($key);
-
-        return new JsonResponse(
-            $this->editCounter->getEditSizeData(),
-            Response::HTTP_OK
-        );
+        return $this->getFormattedApiResponse([
+            'log_counts' => $this->editCounter->getLogCounts(),
+        ]);
     }
 
     /**
      * Get the namespace totals for the user as JSON.
-     * @Route("/api/ec/namespacetotals/{project}/{username}/{key}", name="EditCounterApiNamespaceTotals")
-     * @param string $key API key.
-     * @return Response|RedirectResponse
+     * @Route("/api/user/namespace_totals/{project}/{username}", name="UserApiNamespaceTotals")
+     * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function namespaceTotalsApiAction(string $key)
+    public function namespaceTotalsApiAction(): JsonResponse
     {
-        $this->setUpEditCounter($key);
+        $this->setUpEditCounter();
 
-        return new JsonResponse(
-            $this->editCounter->namespaceTotals(),
-            Response::HTTP_OK
-        );
+        return $this->getFormattedApiResponse([
+            'namespace_totals' => $this->editCounter->namespaceTotals(),
+        ]);
     }
 
     /**
-     * Display or fetch the month counts for the user.
-     * @Route("/api/ec/monthcounts/{project}/{username}/{key}", name="EditCounterApiMonthCounts")
-     * @param string $key API key.
-     * @return Response
+     * Get the month counts for the user as JSON.
+     * @Route("/api/user/month_counts/{project}/{username}", name="UserApiMonthCounts")
+     * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function monthCountsApiAction(string $key): Response
+    public function monthCountsApiAction(): JsonResponse
     {
-        $this->setUpEditCounter($key);
+        $this->setUpEditCounter();
 
-        return new JsonResponse(
-            $this->editCounter->monthCounts(),
-            Response::HTTP_OK
-        );
+        $ret = $this->editCounter->monthCounts();
+
+        // Remove labels that are only needed by Twig views, and not consumers of the API.
+        unset($ret['yearLabels']);
+        unset($ret['monthLabels']);
+
+        return $this->getFormattedApiResponse($ret);
+    }
+
+    /**
+     * Get the timecard data as JSON.
+     * @Route("/api/user/timecard/{project}/{username}", name="UserApiTimeCard")
+     * @return JsonResponse
+     */
+    public function timecardApiAction(): JsonResponse
+    {
+        $this->setUpEditCounter();
+
+        return $this->getFormattedApiResponse([
+            'timecard' => $this->editCounter->timeCard(),
+        ]);
     }
 }

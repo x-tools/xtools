@@ -44,6 +44,8 @@ class TopEditsController extends XtoolsController
         // The Top Edits by page action is exempt from the edit count limitation.
         $this->tooHighEditCountActionBlacklist = ['singlePageTopEdits'];
 
+        $this->restrictedActions = ['topEditsUserApi'];
+
         parent::__construct($requestStack, $container, $i18n);
     }
 

@@ -135,4 +135,21 @@ class EditCounterControllerTest extends ControllerTestAdapter
             '/ec-latestglobal/en.wikipedia/Example',
         ]);
     }
+
+    /**
+     * Test that API endpoints return a successful response.
+     */
+    public function testApis(): void
+    {
+        if (!self::$container->getParameter('app.is_labs')) {
+            return;
+        }
+
+        $this->assertSuccessfulRoutes([
+            '/api/user/log_counts/enwiki/Example',
+            '/api/user/namespace_totals/enwiki/Example',
+            '/api/user/month_counts/enwiki/Example',
+            '/api/user/timecard/enwiki/Example',
+        ]);
+    }
 }

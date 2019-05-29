@@ -107,10 +107,15 @@ abstract class XtoolsController extends Controller
      */
     protected $tooHighEditCountAction;
 
-    /**
-     * @var array Actions that are exempt from edit count limitations.
-     */
+    /** @var array Actions that are exempt from edit count limitations. */
     protected $tooHighEditCountActionBlacklist = [];
+
+    /**
+     * Actions that require the target user to opt in to the restricted statistics.
+     * @see https://xtools.readthedocs.io/en/stable/opt-in.html
+     * @var string[]
+     */
+    protected $restrictedActions = [];
 
     /**
      * Require the tool's index route (initial form) be defined here. This should also
@@ -159,6 +164,9 @@ abstract class XtoolsController extends Controller
         } else {
             $this->setProperties(); // Includes the project.
         }
+
+        // Check if the request is to a restricted API endpoint, where the target user has to opt-in to statistics.
+        $this->checkRestrictedApiEndpoint();
     }
 
     /**
@@ -172,6 +180,35 @@ abstract class XtoolsController extends Controller
                 $this->i18n->msg('error-automation', ['https://xtools.readthedocs.io/en/stable/api/'])
             );
         }
+    }
+
+    /**
+     * Check if the request is to a restricted API endpoint, and throw an exception if the target user hasn't opted-in.
+     * @throws XtoolsHttpException
+     */
+    private function checkRestrictedApiEndpoint(): void
+    {
+        $restrictedAction = in_array($this->controllerAction, $this->restrictedActions);
+
+        if ($this->isApi && $restrictedAction && !$this->project->userHasOptedIn($this->user)) {
+            throw new XtoolsHttpException(
+                $this->i18n->msg('not-opted-in', [$this->getOptedInPage()->getTitle()]),
+                '',
+                $this->params,
+                true
+            );
+        }
+    }
+
+    /**
+     * Get the path to the opt-in page for restricted statistics.
+     * @return Page
+     */
+    protected function getOptedInPage(): Page
+    {
+        return $this->project
+            ->getRepository()
+            ->getPage($this->project, $this->project->userOptInPage($this->user));
     }
 
     /***********
