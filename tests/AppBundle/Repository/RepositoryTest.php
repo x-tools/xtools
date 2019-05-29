@@ -91,7 +91,7 @@ class RepositoryTest extends TestAdapter
         $start = strtotime('20170101');
         $end = strtotime('20170201');
         static::assertEquals(
-            " AND alias.rev_timestamp > '20170101000000' AND alias.rev_timestamp < '20170201235959'",
+            " AND alias.rev_timestamp >= '20170101000000' AND alias.rev_timestamp <= '20170201235959'",
             $this->stub->getDateConditions($start, $end, 'alias.')
         );
     }
