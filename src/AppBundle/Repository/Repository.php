@@ -304,11 +304,11 @@ abstract class Repository
         if (false !== $start) {
             // Convert to YYYYMMDDHHMMSS. *who in the world thought of having time in BLOB of this format ;-;*
             $start = date('Ymd', $start).'000000';
-            $datesConditions .= " AND {$tableAlias}{$field} > '$start'";
+            $datesConditions .= " AND {$tableAlias}{$field} >= '$start'";
         }
         if (false !== $end) {
             $end = date('Ymd', $end).'235959';
-            $datesConditions .= " AND {$tableAlias}{$field} < '$end'";
+            $datesConditions .= " AND {$tableAlias}{$field} <= '$end'";
         }
 
         return $datesConditions;
