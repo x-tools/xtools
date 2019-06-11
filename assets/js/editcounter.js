@@ -137,7 +137,8 @@ function toggleNamespace(newData, key)
 function loadLatestGlobal()
 {
     // Load the contributions browser, or set up the listeners if it is already present.
-    var initFunc = $('.contributions-table').length ? 'setupContributionsNavListeners' : 'loadContributions';
+    const initFunc = $('.contributions-table').length ? 'setupContributionsNavListeners' : 'loadContributions';
+
     xtools.application[initFunc](
         function (params) {
             return params.target + '-contributions/' + params.project + '/' + params.username;
