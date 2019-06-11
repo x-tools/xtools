@@ -250,7 +250,7 @@ class EditCounterRepository extends UserRightsRepository
     }
 
     /**
-     * Get a user's total edit count on all projects.
+     * Get a user's edit count for each project.
      * @see EditCounterRepository::globalEditCountsFromCentralAuth()
      * @see EditCounterRepository::globalEditCountsFromDatabases()
      * @param User $user The user.
@@ -329,10 +329,10 @@ class EditCounterRepository extends UserRightsRepository
 
     /**
      * Get total edit counts from all projects for this user.
-     * @see EditCounterRepository::globalEditCountsFromCentralAuth()
      * @param User $user The user.
      * @param Project $project The project to start from.
      * @return mixed[] Elements are arrays with 'dbName' (string), and 'total' (int).
+     * @see EditCounterRepository::globalEditCountsFromCentralAuth()
      */
     protected function globalEditCountsFromDatabases(User $user, Project $project): array
     {
@@ -341,10 +341,15 @@ class EditCounterRepository extends UserRightsRepository
         $topEditCounts = [];
         foreach ($allProjects as $projectMeta) {
             $revisionTableName = $this->getTableName($projectMeta['dbName'], 'revision');
-            $sql = "SELECT COUNT(rev_id) FROM $revisionTableName WHERE rev_actor = :actorId";
+            $actorTable = $this->getTableName($projectMeta['dbName'], 'actor', 'revision');
+
+            $sql = "SELECT COUNT(rev_id)
+                FROM $revisionTableName
+                JOIN $actorTable ON rev_actor = actor_id
+                WHERE actor_name = :actor";
 
             $resultQuery = $this->executeProjectsQuery($sql, [
-                'actorId' => $user->getActorId($project),
+                'actor' => $user->getUsername(),
             ]);
             $total = (int)$resultQuery->fetchColumn();
             $topEditCounts[] = [
@@ -353,6 +358,55 @@ class EditCounterRepository extends UserRightsRepository
             ];
         }
         return $topEditCounts;
+    }
+
+    /**
+     * Needed because we can't cache objects (Project in this case).
+     * @see self::getProjectsWikiEdits()
+     * @param string[] $databases
+     * @return mixed[] Keys are database names, values are Project objects.
+     */
+    private function formatProjectsWikiEdits(array $databases): array
+    {
+        $projects = [];
+        foreach ($databases as $database) {
+            $projects[$database] = ProjectRepository::getProject($database, $this->container);
+        }
+        return $projects;
+    }
+
+    /**
+     * Get Projects that the user has made at least one edit on.
+     * @param User $user
+     * @return mixed[] Keys are database names, values are Projects.
+     */
+    public function getProjectsWithEdits(User $user): array
+    {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_projects_with_edits');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->formatProjectsWikiEdits($this->cache->getItem($cacheKey)->get());
+        }
+
+        $projectRepo = new ProjectRepository();
+        $projectRepo->setContainer($this->container);
+        $allProjects = $projectRepo->getAll();
+        $databases = [];
+
+        foreach ($allProjects as $projectMeta) {
+            $actorTable = $this->getTableName($projectMeta['dbName'], 'actor', 'revision');
+            $sql = "SELECT 1 FROM $actorTable WHERE actor_name = :actor";
+
+            $resultQuery = $this->executeProjectsQuery($sql, [
+                'actor' => $user->getUsername(),
+            ]);
+            if ($resultQuery->fetch()) {
+                $databases[] = $projectMeta['dbName'];
+            }
+        }
+
+        $projects = $this->setCache($cacheKey, $databases);
+
+        return $this->formatProjectsWikiEdits($projects);
     }
 
     /**
@@ -392,7 +446,7 @@ class EditCounterRepository extends UserRightsRepository
     }
 
     /**
-     * Get revisions by this user.
+     * Get revisions by this user across the given Projects.
      * @param Project[] $projects The projects.
      * @param User $user The user.
      * @param int $limit The maximum number of revisions to fetch from each project.
@@ -414,7 +468,7 @@ class EditCounterRepository extends UserRightsRepository
         foreach ($projects as $project) {
             $revisionTable = $project->getTableName('revision');
             $pageTable = $project->getTableName('page');
-            $commentTable = $project->getTableName('comment');
+            $commentTable = $project->getTableName('comment', 'revision');
             $actorId = $user->getActorId($project);
             $sql = "SELECT
                     '".$project->getDatabaseName()."' AS project_name,

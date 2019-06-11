@@ -61,7 +61,8 @@ class RepositoryTest extends TestAdapter
 
         // Given explicit cache prefix.
         static::assertEquals(
-            'cachePrefix.enwiki.f475a8ac7f25e162bba0eb1b4b245027.a84e19e5268bf01623c8a130883df668.123',
+            'cachePrefix.enwiki.f475a8ac7f25e162bba0eb1b4b245027.'.
+                'a84e19e5268bf01623c8a130883df668.202cb962ac59075b964b07152d234b70',
             $this->stub->getCacheKey(
                 [$project, $user, '20170101', '', null, [1, 2, 3]],
                 'cachePrefix'

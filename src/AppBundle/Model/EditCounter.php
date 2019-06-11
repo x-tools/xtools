@@ -1054,6 +1054,27 @@ class EditCounter extends UserRights
     }
 
     /**
+     * Get Projects on which the user has made at least one edit.
+     * @return Project[]
+     */
+    private function getProjectsWithEdits(): array
+    {
+        if ($this->user->isAnon()) {
+            return $this->getRepository()->getProjectsWithEdits($this->user);
+        }
+
+        // Registered accounts; for these we go by globalEditCounts() which uses CentralAuth.
+        $projects = [];
+        $globalCounts = array_column(array_filter($this->globalEditCounts(), function ($row) {
+            return $row['total'] > 0;
+        }), 'project');
+        foreach ($globalCounts as $globalCount) {
+            $projects[$globalCount->getDatabaseName()] = $globalCount;
+        }
+        return $projects;
+    }
+
+    /**
      * Get the most recent n revisions across all projects.
      * @param int $max The maximum number of revisions to return.
      * @param int $offset Offset results by this number of revisions.
@@ -1065,16 +1086,8 @@ class EditCounter extends UserRights
             return $this->globalEdits;
         }
 
-        // Collect all projects with any edits.
-        $projects = [];
-        foreach ($this->globalEditCounts() as $editCount) {
-            // Don't query revisions if there aren't any.
-            if (0 == $editCount['total']) {
-                continue;
-            }
-            $projects[$editCount['project']->getDatabaseName()] = $editCount['project'];
-        }
-
+        // Get projects with edits.
+        $projects = $this->getProjectsWithEdits();
         if (0 === count($projects)) {
             return [];
         }
@@ -1098,7 +1111,7 @@ class EditCounter extends UserRights
             }
 
             $page = $project->getRepository()
-                ->getPage($project, $nsName.':'.$revision['page_title']);
+                ->getPage($project, ltrim($nsName.':'.$revision['page_title'], ':'));
             $edit = new Edit($page, $revision);
             $globalEdits[$edit->getTimestamp()->getTimestamp().'-'.$edit->getId()] = $edit;
         }
