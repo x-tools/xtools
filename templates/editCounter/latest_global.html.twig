@@ -65,16 +65,16 @@
                 <td>
                     {{ wiki.diffLink(edit) }}
                     &middot;
-                    <a href="{{ path('TopEditsResultPage', {project:edit.project.databaseName, username:user.username, namespace:edit.page.namespace, page:edit.page.titleWithoutNamespace}) }}">{{ msg('tool-topedits') }}</a>
+                    <a href="{{ path('TopEditsResultPage', {project:edit.project.domain, username:user.username, namespace:'', page:edit.page.title(true)}) }}">{{ msg('tool-topedits') }}</a>
                 </td>
-                <td class="sort-entry--page-title display-title" data-value="{{ edit.page.title }}">
-                    {{ wiki.pageLink(edit.page, edit.page.title) }}
+                <td class="sort-entry--page-title display-title" data-value="{{ edit.page.title(true) }}">
+                    {{ wiki.pageLinkRaw(edit.page.title(true), project) }}
                 </td>
                 <td class="sort-entry--size" data-value="{{ edit.lengthChange }}">
                     {{ edit.lengthChange|diff_format }}
                 </td>
                 <td class="sort-entry--summary" data-value="{{ edit.comment }}">
-                    {{ edit.wikifiedComment|raw }}
+                    {{ edit.wikifiedComment(true)|raw }}
                 </td>
             </tr>
         {% endfor %}
