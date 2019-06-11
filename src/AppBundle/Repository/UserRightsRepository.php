@@ -73,8 +73,8 @@ class UserRightsRepository extends Repository
         }
 
         $loggingTable = $this->getTableName($dbName, 'logging', 'logindex');
-        $commentTable = $this->getTableName($dbName, 'comment');
-        $actorTable = $this->getTableName($dbName, 'actor');
+        $commentTable = $this->getTableName($dbName, 'comment', 'logging');
+        $actorTable = $this->getTableName($dbName, 'actor', 'logging');
         $username = str_replace(' ', '_', $user->getUsername());
 
         if ('meta' === $type) {

@@ -85,7 +85,7 @@ class AutoEditsRepository extends UserRepository
         [$pageJoin, $condNamespace] = $this->getPageAndNamespaceSql($project, $namespace);
 
         $revisionTable = $project->getTableName('revision');
-        $commentTable = $project->getTableName('comment');
+        $commentTable = $project->getTableName('comment', 'revision');
         $tagTable = $project->getTableName('change_tag');
         $commentJoin = '';
         $tagJoin = '';
@@ -154,7 +154,7 @@ class AutoEditsRepository extends UserRepository
 
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
-        $commentTable = $project->getTableName('comment');
+        $commentTable = $project->getTableName('comment', 'revision');
         $tagTable = $project->getTableName('change_tag');
         $condNamespace = 'all' === $namespace ? '' : 'AND page_namespace = :namespace';
         $condTag = '' != $tagIds ? "AND NOT EXISTS (SELECT 1 FROM $tagTable
@@ -229,7 +229,7 @@ class AutoEditsRepository extends UserRepository
 
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
-        $commentTable = $project->getTableName('comment');
+        $commentTable = $project->getTableName('comment', 'revision');
         $tagTable = $project->getTableName('change_tag');
         $condNamespace = 'all' === $namespace ? '' : 'AND page_namespace = :namespace';
         $tagJoin = '';
@@ -410,7 +410,7 @@ class AutoEditsRepository extends UserRepository
         $condTool = '';
 
         if (isset($values['regex'])) {
-            $commentTable = $project->getTableName('comment');
+            $commentTable = $project->getTableName('comment', 'revision');
             $commentJoin = "LEFT OUTER JOIN $commentTable ON rev_comment_id = comment_id";
             $regex = $conn->quote($values['regex'], \PDO::PARAM_STR);
             $condTool = "comment_text REGEXP $regex";
