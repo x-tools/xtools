@@ -324,6 +324,16 @@ class Page extends Model
     }
 
     /**
+     * Get the revision ID that immediately precedes the given date.
+     * @param DateTime $date
+     * @return int|null Null if none found.
+     */
+    public function getRevisionIdAtDate(DateTime $date): ?int
+    {
+        return $this->getRepository()->getRevisionIdAtDate($this, $date);
+    }
+
+    /**
      * Get various basic info used in the API, including the number of revisions, unique authors, initial author
      * and edit count of the initial author. This is combined into one query for better performance. Caching is
      * intentionally disabled, because using the gadget, this will get hit for a different page constantly, where

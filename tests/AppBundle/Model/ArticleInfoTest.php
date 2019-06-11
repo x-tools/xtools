@@ -408,68 +408,6 @@ class ArticleInfoTest extends TestAdapter
     }
 
     /**
-     * Textshare stats from WhoColor API.
-     */
-    public function testTextshares(): void
-    {
-        /** @var ArticleInfoRepository $articleInfoRepo */
-        $articleInfoRepo = $this->getMock(ArticleInfoRepository::class);
-        $articleInfoRepo->expects($this->once())
-            ->method('getTextshares')
-            ->willReturn([
-                'revisions' => [[
-                    '123' => [
-                        'tokens' => [
-                            [
-                                'editor' => '1',
-                                'str' => 'Foo',
-                            ], [
-                                'editor' => '0|192.168.0.1',
-                                'str' => 'Bar',
-                            ], [
-                                'editor' => '0|192.168.0.1',
-                                'str' => 'Baz',
-                            ], [
-                                'editor' => '2',
-                                'str' => 'Foo bar',
-                            ],
-                        ],
-                    ],
-                ]],
-            ]);
-        $articleInfoRepo->expects($this->once())
-            ->method('getUsernamesFromIds')
-            ->willReturn([
-                ['user_id' => 1, 'user_name' => 'Mick Jagger'],
-                ['user_id' => 2, 'user_name' => 'Mr. Rogers'],
-            ]);
-        $this->articleInfo->setRepository($articleInfoRepo);
-
-        static::assertEquals(
-            [
-                'list' => [
-                    'Mr. Rogers' => [
-                        'count' => 7,
-                        'percentage' => 43.8,
-                    ],
-                    '192.168.0.1' => [
-                        'count' => 6,
-                        'percentage' => 37.5,
-                    ],
-                ],
-                'totalAuthors' => 3,
-                'totalCount' => 16,
-                'others' => [
-                    'count' => 3,
-                    'percentage' => 18.7,
-                    'numEditors' => 1,
-                ],
-            ],
-            $this->articleInfo->getTextshares(2)
-        );
-    }
-
-    /**
      * Test prose stats parser.
      */
     public function testProseStats(): void

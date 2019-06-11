@@ -51,8 +51,8 @@
 
         <div class="text-center xt-toc">
             {% set sections = ['general-stats', 'top-editors'] %}
-            {% if not (ai.hasDateRange) and page.namespace == 0 and project.domain in ai.textshareWikis %}
-                {% set sections = sections|merge(['authorship']) %}
+            {% if showAuthorship %}
+                {% set sections = sections|merge(['tool-authorship']) %}
             {% endif %}
             {% set sections = sections|merge(['year-counts', 'month-counts']) %}
             {% if ai.automatedCount > 0 %}
@@ -594,15 +594,18 @@
         {% endset %}
         {{ layout.content_block('top-editors', content, ['top-editors-desc', downloadLink]) }}
 
-        {# ======================== TEXTSHARES / AUTHORSHIP ======================== #}
-        {% if not (ai.hasDateRange) and page.namespace == 0 and project.domain in ai.textshareWikis %}
+        {# ======================== AUTHORSHIP ======================== #}
+        {% if showAuthorship %}
+            <script>
+                xtools.articleinfo.endDate = {% if ai.end %}"{{ ai.endDate }}"{% else %}null{% endif %};
+            </script>
             {% set content %}
                 <div class="textshares-container" data-project="{{ project.domain }}" data-article="{{ page.title }}">
                     <em class="text-muted">{{ msg('loading') }}...</em>
                 </div>
             {% endset %}
             {% set headerLink %}
-                <a href="{{ path('ArticleInfoAuthorshipResult', {project:project.domain, page:page.title})}}">{{ msg('authorship') }}</a>
+                <a href="{{ path('AuthorshipResult', {project:project.domain, page:page.title, target:ai.endDate})}}">{{ msg('tool-authorship') }}</a>
             {% endset %}
             {% set description_link %}
                 {% set wikiwhoLink %}
@@ -611,9 +614,9 @@
                 {{ msg('powered-by', [wikiwhoLink]) }}
             {% endset %}
             {% set downloadLink %}
-                {{ layout.downloadLink('ArticleInfoAuthorshipResult', {project:project.domain, page:page.title}, ['wikitext']) }}
+                {{ layout.downloadLink('AuthorshipResult', {project:project.domain, page:page.title, target:ai.endDate}, ['wikitext']) }}
             {% endset %}
-            {{ layout.content_block(headerLink, content, [description_link, downloadLink], 'authorship', true) }}
+            {{ layout.content_block(headerLink, content, [description_link, downloadLink], 'tool-authorship', true) }}
         {% endif %}
 
         {# ======================== YEAR COUNTS ======================== #}

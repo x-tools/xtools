@@ -61,9 +61,19 @@ class AdminStatsController extends XtoolsController
      * Method for rendering the AdminStats Main Form.
      * This method redirects if valid parameters are found, making it a valid form endpoint as well.
      * @Route(
-     *     "/{group}stats", name="AdminStats",
+     *     "/adminstats", name="AdminStats",
      *     requirements={"group"="admin|patroller|steward"},
      *     defaults={"group"="admin"}
+     * )
+     * @Route(
+     *     "/patrollerstats", name="PatrollerStats",
+     *     requirements={"group"="admin|patroller|steward"},
+     *     defaults={"group"="patroller"}
+     * )
+     * @Route(
+     *     "/stewardstats", name="StewardStats",
+     *     requirements={"group"="admin|patroller|steward"},
+     *     defaults={"group"="steward"}
      * )
      * @return Response
      */

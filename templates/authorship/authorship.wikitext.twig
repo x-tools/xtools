@@ -1,18 +1,18 @@
 {% import 'macros/wiki.html.twig' as wiki %}
 == [[{{ page.title }}]] ==
 
-{% set link %}[{{ url('ArticleInfoAuthorshipResult', {'project': project.domain, 'page': page.title}) }} {{ msg('xtools-title') }}]{% endset %}
+{% set link %}[{{ url('Authorship', {'project': project.domain, 'page': page.title}) }} {{ msg('xtools-title') }}]{% endset %}
 {{ msg('xtools-advert', [link, date()|date_format]) }}. {{ msg('powered-by', ['[https://f-squared.org/wikiwho/ WikiWho]']) }}
 
-{% if textshares.error is defined %}
+{% if authorship.error is not null %}
 {{ msg('api-error', ['Wikiwho API'] ) }}:
-<code>{{ textshares.error }}</code>
+<code>{{ authorship.error }}</code>
 {% else %}
 {| class="wikitable sortable"
 {% for key in ['rank', 'username', 'links', 'characters', 'percentage'] %}
 ! {{ msg(key)|ucfirst }}
 {% endfor %}
-{% set totalPercentage = 0 %}{% set totalCount = 0 %}{% for username, values in textshares.list %}
+{% set totalPercentage = 0 %}{% set totalCount = 0 %}{% for username, values in authorship.list %}
 |-
 | {{ loop.index|num_format }}
 | {{ wiki.userLinkWikitext(username, username) }}
