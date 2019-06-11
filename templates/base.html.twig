@@ -49,6 +49,8 @@
 </head>
 
 <body class="{{ xtPage|lower }}{% if isRTL() %} rtl{% endif %}" >
+{# Link to a page that throws a 500, with "possible spider detected." #}
+<a class="hidden-link" href="/foo" style="visibility: hidden;"></a>
 <header class="navbar navbar-default navbar-top" role="navigation">
     <button class="navbar-toggle collapsed pull-left" data-toggle="collapse" data-target=".tool-links" aria-expanded="false">
       <span class="sr-only">Toggle navigation</span>

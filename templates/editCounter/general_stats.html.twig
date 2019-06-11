@@ -304,7 +304,7 @@
         </tbody>
 
         {# Show the block stats here if they are an admin, since the middle column would become very tall. #}
-        {% if adminStatus %}
+        {% if not(user.isAnon) and adminStatus %}
             {{ blockStats }}
         {% endif %}
     </table>
