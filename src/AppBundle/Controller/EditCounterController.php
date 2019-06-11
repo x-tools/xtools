@@ -480,6 +480,12 @@ class EditCounterController extends XtoolsController
      *     requirements={"offset" = "|\d*"},
      *     defaults={"offset" = 0}
      * ),
+     * @Route(
+     *     "/global-contribs/{username}/{offset}",
+     *     name="EditCounterGlobalContribs",
+     *     requirements={"offset" = "|\d*"},
+     *     defaults={"offset" = 0}
+     * ),
      * @return Response
      * @codeCoverageIgnore
      */
