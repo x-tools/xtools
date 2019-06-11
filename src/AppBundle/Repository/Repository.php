@@ -262,7 +262,7 @@ abstract class Repository
             return '.'.$arg->getCacheKey();
         } elseif (is_array($arg)) {
             // Assumed to be an array of objects that can be parsed into a string.
-            return '.'.join('', $arg);
+            return '.'.md5(implode('', $arg));
         } else {
             // Assumed to be a string, number or boolean.
             return '.'.md5((string)$arg);
