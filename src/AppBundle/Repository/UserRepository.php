@@ -68,6 +68,10 @@ class UserRepository extends Repository
     public function getActorId(string $databaseName, string $username): int
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_actor_id');
+        if ($this->cache->hasItem($cacheKey)) {
+            return (int)$this->cache->getItem($cacheKey)->get();
+        }
+
         $actorTable = $this->getTableName($databaseName, 'actor');
 
         $sql = "SELECT actor_id
@@ -88,17 +92,16 @@ class UserRepository extends Repository
      */
     public function getEditCount(string $databaseName, string $username)
     {
-        // Quick cache of edit count, valid on for the same request.
-        static $editCount = null;
-        if (null !== $editCount) {
-            return $editCount;
+        $cacheKey = $this->getCacheKey(func_get_args(), 'user_edit_count');
+        if ($this->cache->hasItem($cacheKey)) {
+            return (int)$this->cache->getItem($cacheKey)->get();
         }
 
         $userTable = $this->getTableName($databaseName, 'user');
         $sql = "SELECT user_editcount FROM $userTable WHERE user_name = :username LIMIT 1";
         $resultQuery = $this->executeProjectsQuery($sql, ['username' => $username]);
 
-        return $resultQuery->fetchColumn();
+        return (int)$this->setCache($cacheKey, $resultQuery->fetchColumn());
     }
 
     /**
