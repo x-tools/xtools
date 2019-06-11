@@ -1,5 +1,14 @@
 # Release Notes #
 
+## 3.8.1 ##
+- EditCounter: Fix global edits subtool, add new /global-contribs route.
+- EditCounter: other performance improvements to global edits.
+- TopEdits: Improve performance of per-page query.
+- Use new specialized sub-views for comment and actor tables.
+- Fix bug where exception is thrown when start date is invalid.
+- T225058: Fix counting of pending changes approval in Edit Counter.
+- Localization updates.
+
 ## 3.8.0 ##
 - T223667: Implement actor storage, with minor refactoring to Repositories.
 - EditCounter: Add APIs for log counts, namespace totals, month counts, and
