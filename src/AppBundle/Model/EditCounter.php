@@ -633,8 +633,7 @@ class EditCounter extends UserRights
     public function approvals(): int
     {
         $logCounts = $this->getLogCounts();
-        $total = $logCounts['review-approve'] +
-            (!empty($logCounts['review-approve']) ? $logCounts['review-approve'] : 0) +
+        $total = (!empty($logCounts['review-approve']) ? $logCounts['review-approve'] : 0) +
             (!empty($logCounts['review-approve2']) ? $logCounts['review-approve2'] : 0) +
             (!empty($logCounts['review-approve-i']) ? $logCounts['review-approve-i'] : 0) +
             (!empty($logCounts['review-approve2-i']) ? $logCounts['review2-approve-i'] : 0);
