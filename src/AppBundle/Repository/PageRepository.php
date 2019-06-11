@@ -44,16 +44,12 @@ class PageRepository extends Repository
      */
     public function getPagesInfo(Project $project, array $pageTitles): ?array
     {
-        // @TODO: Also include 'extlinks' prop when we start checking for dead external links.
         $params = [
             'prop' => 'info|pageprops',
             'inprop' => 'protection|talkid|watched|watchers|notificationtimestamp|subjectid|url|readable|displaytitle',
             'converttitles' => '',
-            // 'ellimit' => 20,
-            // 'elexpandurl' => '',
             'titles' => join('|', $pageTitles),
             'formatversion' => 2,
-            // 'pageids' => $pageIds // FIXME: allow page IDs
         ];
 
         $query = new SimpleRequest('query', $params);
