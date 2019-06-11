@@ -10,6 +10,7 @@ namespace AppBundle\Controller;
 use AppBundle\Exception\XtoolsHttpException;
 use AppBundle\Helper\I18nHelper;
 use AppBundle\Model\ArticleInfo;
+use AppBundle\Model\Authorship;
 use AppBundle\Model\Page;
 use AppBundle\Model\Project;
 use AppBundle\Repository\ArticleInfoRepository;
@@ -139,9 +140,8 @@ class ArticleInfoController extends XtoolsController
         if (!$this->isDateRangeValid($this->page, $this->start, $this->end)) {
             $this->addFlashMessage('notice', 'date-range-outside-revisions');
 
-            return $this->redirectToRoute('ArticleInfoResult', [
+            return $this->redirectToRoute('ArticleInfo', [
                 'project' => $this->request->get('project'),
-                'page' => $this->page->getTitle(true),
             ]);
         }
 
@@ -177,6 +177,7 @@ class ArticleInfoController extends XtoolsController
             'botlimit' => $this->request->query->get('botlimit', 10),
             'pageviewsOffset' => 60,
             'ai' => $articleInfo,
+            'showAuthorship' => Authorship::isSupportedPage($this->page),
         ];
 
         // Output the relevant format template.
@@ -193,57 +194,6 @@ class ArticleInfoController extends XtoolsController
     private function isDateRangeValid(Page $page, $start, $end): bool
     {
         return $page->getNumRevisions(null, $start, $end) > 0;
-    }
-
-    /**
-     * Wrapper for ArticleInfoAuthorshipResult action to allow you to pass in the page via query string.
-     * If no page title is given, it redirects to ArticleInfo (index page).
-     * @Route(
-     *     "/articleinfo-authorship/{project}",
-     *     name="ArticleInfoAuthorshipIndex"
-     * )
-     * @return Response
-     */
-    public function textsharesIndexAction(): Response
-    {
-        if (isset($this->params['page'])) {
-            return $this->redirectToRoute('ArticleInfoAuthorshipResult', $this->params);
-        }
-
-        return $this->redirectToRoute('ArticleInfo', $this->params);
-    }
-
-    /**
-     * Get authorship (aka textshares) information about the article.
-     * @Route(
-     *     "/articleinfo-authorship/{project}/{page}",
-     *     name="ArticleInfoAuthorshipResult",
-     *     requirements={"page"=".+"}
-     * )
-     * @return Response
-     * @codeCoverageIgnore
-     */
-    public function textsharesResultAction(): Response
-    {
-        // This action sometimes requires more memory. 256M should be safe.
-        ini_set('memory_limit', '256M');
-
-        $articleInfoRepo = new ArticleInfoRepository();
-        $articleInfoRepo->setContainer($this->container);
-        $articleInfo = new ArticleInfo($this->page, $this->container);
-        $articleInfo->setRepository($articleInfoRepo);
-
-        $isSubRequest = $this->request->get('htmlonly')
-            || null !== $this->get('request_stack')->getParentRequest();
-        $limit = $isSubRequest ? 10 : ($this->limit ?? 500);
-
-        return $this->getFormattedResponse('articleInfo/textshares', [
-            'xtPage' => 'ArticleInfo',
-            'xtTitle' => $this->page->getTitle(),
-            'textshares' => $articleInfo->getTextshares($limit),
-            'limit' => $limit,
-            'is_sub_request' => $isSubRequest,
-        ]);
     }
 
     /************************ API endpoints ************************/

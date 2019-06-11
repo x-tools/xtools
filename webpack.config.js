@@ -25,6 +25,7 @@ Encore
         './assets/js/application.js',
         './assets/js/adminstats.js',
         './assets/js/articleinfo.js',
+        './assets/js/authorship.js',
         './assets/js/autoedits.js',
         './assets/js/categoryedits.js',
         './assets/js/editcounter.js',

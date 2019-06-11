@@ -71,6 +71,7 @@ parameters:
     enable.AdminScore: 1
     enable.AdminStats: 1
     enable.ArticleInfo: 1
+    enable.Authorship: 1
     enable.AutoEdits: 1
     enable.CategoryEdits: 1
     enable.EditCounter: 1

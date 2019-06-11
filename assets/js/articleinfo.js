@@ -18,9 +18,11 @@ $(function () {
 
     if ($textsharesContainer[0]) {
         /** global: xtBaseUrl */
-        var url = xtBaseUrl + 'articleinfo-authorship/'
+        var url = xtBaseUrl + 'authorship/'
             + $textsharesContainer.data('project') + '/'
-            + $textsharesContainer.data('article') + '?htmlonly=yes';
+            + $textsharesContainer.data('article') + '/'
+            + (xtools.articleinfo.endDate ? xtools.articleinfo.endDate + '/' : '')
+            + '?htmlonly=yes';
 
         $.ajax({
             url: url,

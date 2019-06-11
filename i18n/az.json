@@ -15,9 +15,9 @@
 	"actions-as-admin": "Admin fəaliyyətləri",
 	"added": "Əlavə olundu",
 	"added-bytes": "Əlavə olundu (baytlar)",
-	"admins": "İdarəçilər",
 	"admin-stats-notice": "Yalnız bir müddətdə ən azı bir idarəçi fəaliyyəti göstərən istifadəçilər göstərilir.",
 	"admin-stats-notice2": "Bəzi istifadəçilər köhnə idarəçi ola bilərlər və ya idarəçi olmaya bilərlər, lakin müəyyən idarəçi hərəkətləri etmək hüquqları var.",
+	"admins": "İdarəçilər",
 	"afd": "Silinmək üçün məqalələr",
 	"afd-desc": "$2 {{PLURAL:$1|redaktə|düzəlişlər}} silinmə səhifələrindəki məqalələrə",
 	"aiv": "Vandalizmə qarşı idarəçi müdaxiləsi",
@@ -35,8 +35,6 @@
 	"article": "Məqalə",
 	"assessment": "Qiymətləndirilməsi",
 	"assessments": "Qiymətləndirmə",
-	"authorship": "Müəlliflik",
-	"authorship-desc": "Məqalənin mövcud versiyasını, boşluqlar istisna olmaqla, xarakter sayına görə ölçülmüş müəlliflik aidiyyəti.",
 	"auto-edits": "(yarı)avtomatik tənzimləmə",
 	"auto-edits-request": "Yeni (yarı) avtomatlaşdırılmış bir alət əlavə olunmasını tələb edin",
 	"automatic": "Avtomatik",
@@ -290,5 +288,6 @@
 	"rfx-duplicates": "Dublikat",
 	"rfx-intro": "Bu alət səsləri təhlil edir və təkrar səs verənləri müəyyən edir:",
 	"rfx-page": "RfX səhifəsi",
-	"see-full-page-stats": "Səhifənin bütün statistikasına bax"
+	"see-full-page-stats": "Səhifənin bütün statistikasına bax",
+	"tool-authorship": "Müəlliflik"
 }

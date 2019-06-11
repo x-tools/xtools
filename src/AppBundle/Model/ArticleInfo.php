@@ -18,15 +18,6 @@ use Symfony\Component\DomCrawler\Crawler;
  */
 class ArticleInfo extends Model
 {
-    /** @const string[] Domain names of wikis supported by WikiWho. */
-    public const TEXTSHARE_WIKIS = [
-        'en.wikipedia.org',
-        'de.wikipedia.org',
-        'eu.wikipedia.org',
-        'tr.wikipedia.org',
-        'es.wikipedia.org',
-    ];
-
     /** @var ContainerInterface The application's DI container. */
     protected $container;
 
@@ -133,9 +124,6 @@ class ArticleInfo extends Model
 
     /** @var string[] List of wikidata and Checkwiki errors. */
     protected $bugs;
-
-    /** @var array List of editors and the percentage of the current content that they authored. */
-    protected $textshares;
 
     /** @var array Number of categories, templates and files on the page. */
     protected $transclusionData;
@@ -1344,159 +1332,6 @@ class ArticleInfo extends Model
                     : 100 * ($added / $this->addedBytes),
             ];
         }, $topTenEditorsByAdded);
-    }
-
-    /**
-     * Get authorship attribution from the WikiWho API.
-     * @see https://f-squared.org/wikiwho/
-     * @param int $limit Max number of results.
-     * @return array
-     */
-    public function getTextshares(?int $limit = null): array
-    {
-        if (isset($this->textshares)) {
-            return $this->textshares;
-        }
-
-        // TODO: check for failures. Should have a success:true
-        $ret = $this->getRepository()->getTextshares($this->page);
-
-        // If revision can't be found, return error message.
-        if (!isset($ret['revisions'][0])) {
-            return [
-                'error' => $ret['Error'] ?? 'Unknown',
-            ];
-        }
-
-        $revId = array_keys($ret['revisions'][0])[0];
-        $tokens = $ret['revisions'][0][$revId]['tokens'];
-
-        [$counts, $totalCount, $userIds] = $this->countTokens($tokens);
-        $usernameMap = $this->getUsernameMap($userIds);
-
-        if (null !== $limit) {
-            $countsToProcess = array_slice($counts, 0, $limit, true);
-        } else {
-            $countsToProcess = $counts;
-        }
-
-        $textshares = [];
-
-        // Used to get the character count and percentage of the remaining N editors, after the top $limit.
-        $percentageSum = 0;
-        $countSum = 0;
-        $numEditors = 0;
-
-        // Loop through once more, creating an array with the user names (or IP addresses)
-        // as the key, and the count and percentage as the value.
-        foreach ($countsToProcess as $editor => $count) {
-            if (isset($usernameMap[$editor])) {
-                $index = $usernameMap[$editor];
-            } else {
-                $index = $editor;
-            }
-
-            $percentage = round(100 * ($count / $totalCount), 1);
-
-            // If we are showing > 10 editors in the table, we still only want the top 10 for the chart.
-            if ($numEditors < 10) {
-                $percentageSum += $percentage;
-                $countSum += $count;
-                $numEditors++;
-            }
-
-            $textshares[$index] = [
-                'count' => $count,
-                'percentage' => $percentage,
-            ];
-        }
-
-        $this->textshares = [
-            'list' => $textshares,
-            'totalAuthors' => count($counts),
-            'totalCount' => $totalCount,
-        ];
-
-        // Record character count and percentage for the remaining editors.
-        if ($percentageSum < 100) {
-            $this->textshares['others'] = [
-                'count' => $totalCount - $countSum,
-                'percentage' => round(100 - $percentageSum, 1),
-                'numEditors' => count($counts) - $numEditors,
-            ];
-        }
-
-        return $this->textshares;
-    }
-
-    /**
-     * Get a map of user IDs to usernames, given the IDs.
-     * @param int[] $userIds
-     * @return array IDs as keys, usernames as values.
-     */
-    private function getUsernameMap(array $userIds): array
-    {
-        if (empty($userIds)) {
-            return [];
-        }
-
-        $userIdsNames = $this->getRepository()->getUsernamesFromIds(
-            $this->page->getProject(),
-            $userIds
-        );
-
-        $usernameMap = [];
-        foreach ($userIdsNames as $userIdName) {
-            $usernameMap[$userIdName['user_id']] = $userIdName['user_name'];
-        }
-
-        return $usernameMap;
-    }
-
-    /**
-     * Get counts of token lengths for each author. Used in self::getTextshares()
-     * @param array $tokens
-     * @return array [counts by user, total count, IDs of accounts]
-     */
-    private function countTokens(array $tokens): array
-    {
-        $counts = [];
-        $userIds = [];
-        $totalCount = 0;
-
-        // Loop through the tokens, keeping totals (token length) for each author.
-        foreach ($tokens as $token) {
-            $editor = $token['editor'];
-
-            // IPs are prefixed with '0|', otherwise it's the user ID.
-            if ('0|' === substr($editor, 0, 2)) {
-                $editor = substr($editor, 2);
-            } else {
-                $userIds[] = $editor;
-            }
-
-            if (!isset($counts[$editor])) {
-                $counts[$editor] = 0;
-            }
-
-            $counts[$editor] += strlen($token['str']);
-            $totalCount += strlen($token['str']);
-        }
-
-        // Sort authors by count.
-        arsort($counts);
-
-        return [$counts, $totalCount, $userIds];
-    }
-
-    /**
-     * Get a list of wikis supported by WikiWho.
-     * @return string[]
-     * @codeCoverageIgnore
-     */
-    public function getTextshareWikis(): array
-    {
-        return self::TEXTSHARE_WIKIS;
     }
 
     /**

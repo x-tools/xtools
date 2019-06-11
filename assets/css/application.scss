@@ -777,8 +777,6 @@ input.form-control.show-loader {
 
     .xt-panel-description {
         display: block;
-        float: none !important;
-        margin-top: 5px;
     }
 
     .stat-list {
@@ -790,7 +788,7 @@ input.form-control.show-loader {
         &:first-child {
             display: block;
             padding-top: 5px;
-            text-align: left;
+            text-align: left !important;
 
             &.stat-list--new-group {
                 padding-top: 15px !important;

@@ -12,15 +12,15 @@
         {{ msg('powered-by', [wikiwhoLink]) }}
     {% endset %}
     {% set downloadLink %}
-        {{ layout.downloadLink('ArticleInfoAuthorshipResult', {project:project.domain, page:page.title}, ['wikitext']) }}
+        {{ layout.downloadLink('AuthorshipResult', {project:project.domain, page:page.title, target:authorship.target}, ['wikitext']) }}
     {% endset %}
 
     <div class="panel panel-primary">
         <header class="panel-heading">
             <div class="text-center xt-heading-top">
-                <a class="back-to-search" href="{{ path('ArticleInfoResult', {project: project.domain, page:page.title}) }}">
+                <a class="back-to-search" href="{{ path('Authorship', {project: project.domain}) }}">
                     <span class="glyphicon glyphicon-chevron-left"></span>
-                    {{ msg('see-full-statistics') }}
+                    {{ msg('back') }}
                 </a>
                 {{ wiki.pageLink(page) }}
                 <small>
@@ -32,10 +32,47 @@
         <div class="panel-body xt-panel-body">
             {{ wiki.pageLinks(page) }}
 
+            <h3 class="text-center">{{ msg('tool-authorship') }}</h3>
+            <div class="text-center text-muted">{{ msg('tool-authorship-desc') }}</div>
+
+            {% if authorship.error is null %}
+                {% set content %}
+                    <div class="col-lg-6 stat-list clearfix">
+                        <table class="table"><tbody>
+                            <tr>
+                                <td>{{ msg('article') }}</td>
+                                <td>
+                                    {{ wiki.pageLink(page) }}
+                                    (<a href="{{ path('ArticleInfoResult', {project:project.domain, page:page.title}) }}">{{ msg('tool-articleinfo') }}</a>)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>{{ msg('revision') }}</td>
+                                <td>
+                                    {{ wiki.permaLinkRaw(authorship.revision.id, project, authorship.revision.timestamp|date_format) }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>{{ msg('total-authors') }}</td>
+                                <td>{{ authorship.totalAuthors|num_format }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ msg('characters') }}</td>
+                                <td>{{ authorship.totalCount|num_format }}</td>
+                            </tr>
+                        </tbody></table>
+                    </div>
+                    <div class="text-muted times-in-utc" style="clear: both">
+                        {{ msg('times-in-utc') }}
+                    </div>
+                {% endset %}
+                {{ layout.content_block('summary', content) }}
+            {% endif %}
+
             <section class="panel panel-default clearfix">
                 <header class="panel-heading col-lg-12">
                     <h4>
-                        {{ msg('authorship') }}
+                        {{ msg('tool-authorship') }}
                         <span class='pull-right text-muted xt-panel-description'>{{ downloadLink }}</span>
                         <span class='pull-right text-muted xt-panel-description'>{{ descriptionLink }}</span>
                     </h4>
@@ -43,17 +80,18 @@
                 <div class="panel-body col-lg-12">
 {% endif %}
 
-<p class="authorship-desc">{{ msg('authorship-desc') }}</p>
-
-{% if textshares.error is defined %}
+{% if authorship.error is not null %}
     <div class="alert alert-danger">
         <p>
             {{ msg('api-error', ['Wikiwho API'] ) }}:
-            <code>{{ textshares.error }}</code>
+            <code>{{ authorship.error }}</code>
         </p>
     </div>
 {% else %}
-    <table class="table table-bordered table-hover table-striped textshares-table pull-left">
+    {% if is_sub_request %}
+        <p>{{ msg('tool-authorship-desc') }}</p>
+    {% endif %}
+    <table class="table table-bordered table-hover table-striped authorship-table pull-left">
         <thead>
         {% for key in ['rank', 'username', 'links', 'characters', 'percentage'] %}
             <th>
@@ -68,13 +106,13 @@
             {## Computed #}
             {% set totalPercentage = 0 %}
             {% set totalCount = 0 %}
-            {% for username, values in textshares.list %}
+            {% for username, values in authorship.list %}
                 {% set totalPercentage = totalPercentage + values.percentage %}
                 {% set totalCount = totalCount + values.count %}
                 <tr>
                     <td class="sort-entry--rank" data-value="{{ loop.index }}">{{ loop.index|num_format }}</td>
                     <td class="sort-entry--username" data-value="{{ username }}">
-                        <span class="textshares-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ username }}">
+                        <span class="authorship-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ username }}">
                             <span class="color-icon" style="background:{{ chartColor(min(10, loop.index0)) }}"></span>
                         </span>
                         {{ wiki.userLink(username, project) }}
@@ -97,24 +135,24 @@
                 </tr>
             {% endfor %}
         </tbody>
-        {% if textshares.others is defined and is_sub_request %}
+        {% if authorship.others is not null and is_sub_request %}
             <tfoot><tr class="show-more-row">
                 <td></td>
                 <td>
-                    <span class="textshares-toggle toggle-table--toggle" data-index="{{ textshares.list|length }}" data-key="others">
-                        <span class="color-icon" style="background:{{ chartColor(textshares.list|length) }}"></span>
+                    <span class="authorship-toggle toggle-table--toggle" data-index="{{ authorship.list|length }}" data-key="others">
+                        <span class="color-icon" style="background:{{ chartColor(authorship.list|length) }}"></span>
                     </span>
-                    <a href="{{ path('ArticleInfoAuthorshipResult', {project:project.domain, page:page.title})}}">
-                        {{ textshares.others.numEditors|num_format }}
-                        {{ msg('num-others', [textshares.others.numEditors]) }}
+                    <a href="{{ path('AuthorshipResult', {project:project.domain, page:page.title})}}">
+                        {{ authorship.others.numEditors|num_format }}
+                        {{ msg('num-others', [authorship.others.numEditors]) }}
                     </a>
                 </td>
                 <td></td>
                 <td>
-                    {{ textshares.others.count|num_format }}
+                    {{ authorship.others.count|num_format }}
                 </td>
                 <td>
-                    {{ textshares.others.percentage|percent_format }}
+                    {{ authorship.others.percentage|percent_format }}
                 </td>
             </tr></tfoot>
         {% endif %}
@@ -125,10 +163,10 @@
      # Otherwise it may get too big and hog up the real estate.
      # 37 is the heigh of one row.
      #}
-    {% set maxHeight = min(400, (textshares.list|length + 2) * 37) %}
+    {% set maxHeight = min(400, (authorship.list|length + 2) * 37) %}
     {% set height = max(150, maxHeight) %}
-    <div class="chart-wrapper textshares-chart-wrapper toggle-table--chart">
-        <canvas id="textshares_chart" width="{{ height }}" height="{{ height }}"></canvas>
+    <div class="chart-wrapper authorship-chart-wrapper toggle-table--chart">
+        <canvas id="authorship_chart" width="{{ height }}" height="{{ height }}"></canvas>
     </div>
 
     {## Get all 11 colours, though we might not use all of them. #}
@@ -137,22 +175,22 @@
         {% set colors = colors|merge([chartColor(i)]) %}
     {% endfor %}
 
-    {% set labels = textshares.list|keys|slice(0, 10) %}
-    {% if textshares.others is defined %}
-        {% set labels = labels|merge([textshares.others.numEditors ~ ' ' ~ msg('num-others', [textshares.others.numEditors])]) %}
+    {% set labels = authorship.list|keys|slice(0, 10) %}
+    {% if authorship.others is not null %}
+        {% set labels = labels|merge([authorship.others.numEditors ~ ' ' ~ msg('num-others', [authorship.others.numEditors])]) %}
     {% endif %}
 
     <script>
-        window.textsharesChart = new Chart($('#textshares_chart'), {
+        window.authorshipChart = new Chart($('#authorship_chart'), {
             type: 'pie',
             data: {
                 labels: {{ labels|json_encode()|raw }},
                 datasets: [{
                     data: [
-                        {% for username, values in textshares.list|slice(0, 10) %}
+                        {% for username, values in authorship.list|slice(0, 10) %}
                             {{ values.percentage }}{% if not loop.last %},{% endif %}
                         {% endfor %}
-                        {% if textshares.others is defined %},{{ textshares.others.percentage }}{% endif %}
+                        {% if authorship.others is not null %},{{ authorship.others.percentage }}{% endif %}
                     ],
                     backgroundColor: {{ colors|json_encode()|raw }},
                     borderColor: {{ colors|json_encode()|raw }},
@@ -178,7 +216,7 @@
                 }
             }
         });
-        window.textshares = {{ textshares.list|json_encode()|raw }};
+        window.authorship = {{ authorship.list|json_encode()|raw }};
     </script>
 {% endif %}
 
