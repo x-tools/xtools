@@ -328,7 +328,7 @@ parameters:
             link: Project:Mike's Wiki Tool
             namespaces: [0]
         MoveToDraft:
-            regex: '\[\[User:Evad37\/MoveToDraft\.js\|via script'
+            regex: '\[\[User:Evad37\/MoveToDraft\.js'
             link: User:Evad37/MoveToDraft
             namespaces: [0, 118]
         OABot:
