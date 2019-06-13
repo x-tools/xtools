@@ -392,7 +392,7 @@ parameters:
             link: User:Timotheus Canens/spihelper.js
             namespaces: [2, 3, 4]
         STiki:
-            regex: 'WP:(STiki|STIKI)'
+            regex: 'WP:ST(iki|IKI)'
             link: w:en:Wikipedia:STiki
             revert: Reverted \d+.*WP:(STiki|STIKI)
         stubsearch:
