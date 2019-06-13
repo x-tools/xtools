@@ -371,7 +371,8 @@ class ProjectRepository extends Repository
      */
     public function getInstalledExtensions(Project $project): array
     {
-        $client = new Client();
+        /** @var Client $client */
+        $client = $this->container->get('eight_points_guzzle.client.xtools');
 
         $res = json_decode($client->request('GET', $project->getApiUrl(), ['query' => [
             'action' => 'query',

@@ -231,13 +231,15 @@ class PagesController extends XtoolsController
      * @param Project $project
      * @param string[] $pageTitles
      * @return int The PagePile ID.
-     * @throws GuzzleHttp\Exception\GuzzleException
+     * @throws HttpException
      * @see https://tools.wmflabs.org/pagepile/
      * @codeCoverageIgnore
      */
     private function createPagePile(Project $project, array $pageTitles): int
     {
-        $client = new GuzzleHttp\Client();
+        /** @var GuzzleHttp\Client $client */
+        $client = $this->container->get('eight_points_guzzle.client.xtools');
+
         $url = 'https://tools.wmflabs.org/pagepile/api.php';
 
         try {

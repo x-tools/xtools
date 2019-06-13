@@ -194,7 +194,9 @@ class UserRightsRepository extends Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $client = new GuzzleHttp\Client();
+        /** @var GuzzleHttp\Client $client */
+        $client = $this->container->get('eight_points_guzzle.client.xtools');
+
         $url = 'https://noc.wikimedia.org/conf/InitialiseSettings.php.txt';
 
         $contents = $client->request('GET', $url)

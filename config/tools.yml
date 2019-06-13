@@ -3,6 +3,7 @@ parameters:
     # This is the order they will appear in the interface.
     - EditCounter
     - ArticleInfo
+    - Authorship
     - Pages
     - TopEdits
     - AutoEdits

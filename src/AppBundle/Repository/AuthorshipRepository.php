@@ -45,7 +45,9 @@ class AuthorshipRepository extends Repository
             ];
         }
 
-        $client = new GuzzleHttp\Client();
+        /** @var GuzzleHttp\Client $client */
+        $client = $this->container->get('eight_points_guzzle.client.xtools');
+
         $res = $client->request('GET', $url, $opts);
 
         // Cache and return.

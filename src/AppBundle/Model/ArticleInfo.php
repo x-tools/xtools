@@ -82,6 +82,9 @@ class ArticleInfo extends Model
     /** @var string[] Assessments of the page (see Page::getAssessments). */
     protected $assessments;
 
+    /** @var mixed[] Prose stats, with keys 'characters', 'words', 'references', 'unique_references', 'sections'. */
+    protected $proseStats;
+
     /**
      * Maximum number of edits that were created across all months. This is used as a comparison
      * for the bar charts in the months section.
@@ -1340,6 +1343,10 @@ class ArticleInfo extends Model
      */
     public function getProseStats(): array
     {
+        if (isset($this->proseStats)) {
+            return $this->proseStats;
+        }
+
         $datetime = false !== $this->end ? new DateTime('@'.$this->end) : null;
         $html = $this->page->getHTMLContent($datetime);
 
@@ -1356,13 +1363,14 @@ class ArticleInfo extends Model
 
         $sections = count($crawler->filter('#mw-content-text .mw-headline'));
 
-        return [
+        $this->proseStats = [
             'characters' => $chars,
             'words' => $words,
             'references' => $refs->count(),
             'unique_references' => $uniqueRefs,
             'sections' => $sections,
         ];
+        return $this->proseStats;
     }
 
     /**

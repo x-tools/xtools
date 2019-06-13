@@ -464,7 +464,9 @@ class PageRepository extends Repository
     public function getPageviews(Page $page, $start, $end): array
     {
         $title = rawurlencode(str_replace(' ', '_', $page->getTitle()));
-        $client = new GuzzleHttp\Client();
+
+        /** @var GuzzleHttp\Client $client */
+        $client = $this->container->get('eight_points_guzzle.client.xtools');
 
         if ($start instanceof DateTime) {
             $start = $start->format('Ymd');
@@ -494,7 +496,8 @@ class PageRepository extends Repository
      */
     public function getHTMLContent(Page $page, ?int $revId = null): string
     {
-        $client = new GuzzleHttp\Client();
+        /** @var GuzzleHttp\Client $client */
+        $client = $this->container->get('eight_points_guzzle.client.xtools');
         $url = $page->getUrl();
         if (null !== $revId) {
             $url .= "?oldid=$revId";
