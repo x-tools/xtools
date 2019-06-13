@@ -258,11 +258,11 @@ parameters:
             regex: '\[\[WP:UCB\|Assisted by Citation bot'
             link: Project:UCB
         closemfd.js:
-            regex: 'closemfd.js'
+            regex: 'closemfd\.js'
             link: User:Doug/closemfd.js
             namespaces: [4]
         closetfd.js:
-            regex: 'closetfd.js'
+            regex: 'closetfd\.js'
             link: User:Doug/closetfd.js
             namespaces: [4]
         CSD Helper:
