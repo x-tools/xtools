@@ -13,7 +13,6 @@ use AppBundle\Model\User;
 use DateTime;
 use Doctrine\DBAL\Driver\Statement;
 use GuzzleHttp;
-use Mediawiki\Api\SimpleRequest;
 
 /**
  * A PageRepository fetches data about Pages, either singularly or for multiple.
@@ -46,15 +45,13 @@ class PageRepository extends Repository
     {
         $params = [
             'prop' => 'info|pageprops',
-            'inprop' => 'protection|talkid|watched|watchers|notificationtimestamp|subjectid|url|readable|displaytitle',
+            'inprop' => 'protection|talkid|watched|watchers|notificationtimestamp|subjectid|url|displaytitle',
             'converttitles' => '',
             'titles' => join('|', $pageTitles),
             'formatversion' => 2,
         ];
 
-        $query = new SimpleRequest('query', $params);
-        $api = $this->getMediawikiApi($project);
-        $res = $api->getRequest($query);
+        $res = $this->executeApiRequest($project, $params);
         $result = [];
         if (isset($res['query']['pages'])) {
             foreach ($res['query']['pages'] as $pageInfo) {
@@ -74,16 +71,14 @@ class PageRepository extends Repository
      */
     public function getPagesWikitext(Project $project, array $pageTitles): array
     {
-        $query = new SimpleRequest('query', [
+        $params = [
             'prop' => 'revisions',
             'rvprop' => 'content',
             'titles' => join('|', $pageTitles),
             'formatversion' => 2,
-        ]);
+        ];
+        $res = $this->executeApiRequest($project, $params);
         $result = [];
-
-        $api = $this->getMediawikiApi($project);
-        $res = $api->getRequest($query);
 
         if (!isset($res['query']['pages'])) {
             return [];

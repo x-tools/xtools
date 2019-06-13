@@ -149,15 +149,6 @@ class Project extends Model
     }
 
     /**
-     * Get a MediawikiApi object for this Project.
-     * @return \Mediawiki\Api\MediawikiApi
-     */
-    public function getApi(): \Mediawiki\Api\MediawikiApi
-    {
-        return $this->getRepository()->getMediawikiApi($this);
-    }
-
-    /**
      * The base URL path of this project (that page titles are appended to).
      * For some wikis the title (apparently) may not be at the end.
      * Replace $1 with the article name.

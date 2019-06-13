@@ -9,7 +9,6 @@ namespace AppBundle\Repository;
 
 use AppBundle\Model\Project;
 use AppBundle\Model\User;
-use Mediawiki\Api\SimpleRequest;
 
 /**
  * An EditCounterRepository is responsible for retrieving edit count information from the
@@ -304,14 +303,12 @@ class EditCounterRepository extends UserRightsRepository
         // Load all projects, so it doesn't have to request metadata about each one as it goes.
         $project->getRepository()->getAll();
 
-        $api = $this->getMediawikiApi($project);
         $params = [
             'meta' => 'globaluserinfo',
             'guiprop' => 'editcount|merged',
             'guiuser' => $user->getUsername(),
         ];
-        $query = new SimpleRequest('query', $params);
-        $result = $api->getRequest($query);
+        $result = $this->executeApiRequest($project, $params);
         if (!isset($result['query']['globaluserinfo']['merged'])) {
             return [];
         }

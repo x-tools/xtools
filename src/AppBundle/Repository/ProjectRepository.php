@@ -10,8 +10,6 @@ namespace AppBundle\Repository;
 use AppBundle\Model\Page;
 use AppBundle\Model\Project;
 use GuzzleHttp\Client;
-use Mediawiki\Api\MediawikiApi;
-use Mediawiki\Api\SimpleRequest;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -240,14 +238,21 @@ class ProjectRepository extends Repository
             return $this->metadata;
         }
 
+        /** @var Client $client */
+        $client = $this->container->get('eight_points_guzzle.client.xtools');
+
         try {
-            $api = MediawikiApi::newFromPage($projectUrl);
+            $res = json_decode($client->request('GET', $projectUrl.$this->getApiPath(), [
+                'query' => [
+                    'action' => 'query',
+                    'meta' => 'siteinfo',
+                    'siprop' => 'general|namespaces',
+                    'format' => 'json',
+                ],
+            ])->getBody()->getContents(), true);
         } catch (\Exception $e) {
             return null;
         }
-
-        $params = ['meta' => 'siteinfo', 'siprop' => 'general|namespaces'];
-        $query = new SimpleRequest('query', $params);
 
         $this->metadata = [
             'general' => [],
@@ -261,8 +266,6 @@ class ProjectRepository extends Repository
             $this->metadata['url'] = $this->basicInfo['url'];
             $this->metadata['lang'] = $this->basicInfo['lang'];
         }
-
-        $res = $api->getRequest($query);
 
         if (isset($res['query']['general'])) {
             $info = $res['query']['general'];

@@ -8,7 +8,6 @@ declare(strict_types = 1);
 namespace AppBundle\Repository;
 
 use AppBundle\Model\Project;
-use Mediawiki\Api\SimpleRequest;
 
 /**
  * AdminStatsRepository is responsible for retrieving data from the database
@@ -162,13 +161,12 @@ class AdminStatsRepository extends Repository
 
         $permissions = $this->container->getParameter('admin_stats')[$type]['permissions'];
 
-        $api = $this->getMediawikiApi($project);
-        $res = $api->getRequest(new SimpleRequest('query', [
+        $res = $this->executeApiRequest($project, [
             'meta' => 'siteinfo',
             'siprop' => 'usergroups',
             'list' => 'globalgroups',
             'ggpprop' => 'rights',
-        ]))['query'];
+        ])['query'];
 
         $userGroups = [
             'local' => array_unique(array_merge(

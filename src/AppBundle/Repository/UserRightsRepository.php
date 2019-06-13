@@ -10,7 +10,6 @@ namespace AppBundle\Repository;
 use AppBundle\Model\Project;
 use AppBundle\Model\User;
 use GuzzleHttp;
-use Mediawiki\Api\SimpleRequest;
 
 /**
  * An UserRightsRepository is responsible for retrieving information around a user's
@@ -133,9 +132,7 @@ class UserRightsRepository extends Repository
                 'amenableparser' => 1,
                 'formatversion' => 2,
             ];
-            $api = $this->getMediawikiApi($project);
-            $query = new SimpleRequest('query', $params);
-            $result = $api->getRequest($query)['query']['allmessages'];
+            $result = $this->executeApiRequest($project, $params)['query']['allmessages'];
 
             foreach ($result as $msg) {
                 $normalized = preg_replace('/^group-|-member$/', '', $msg['normalizedname']);

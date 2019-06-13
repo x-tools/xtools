@@ -13,7 +13,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Mediawiki\Api\MediawikiApi;
+use GuzzleHttp\Client;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -151,25 +151,28 @@ abstract class Repository
         return $this->toolsConnection;
     }
 
-    /**
-     * Get the API object for the given project.
-     * @param Project $project
-     * @return MediawikiApi
-     */
-    public function getMediawikiApi(Project $project): MediawikiApi
-    {
-        $apiPath = $this->container->getParameter('api_path');
-        if ($apiPath) {
-            $api = MediawikiApi::newFromApiEndpoint($project->getUrl().$apiPath);
-        } else {
-            $api = MediawikiApi::newFromPage($project->getUrl());
-        }
-        return $api;
-    }
-
     /*****************
      * QUERY HELPERS *
      *****************/
+
+    /**
+     * Make a request to the MediaWiki API.
+     * @param Project $project
+     * @param array $params
+     * @return array
+     */
+    public function executeApiRequest(Project $project, array $params): array
+    {
+        /** @var Client $client */
+        $client = $this->container->get('eight_points_guzzle.client.xtools');
+
+        return json_decode($client->request('GET', $project->getApiUrl(), [
+            'query' => array_merge([
+                'action' => 'query',
+                'format' => 'json',
+            ], $params),
+        ])->getBody()->getContents(), true);
+    }
 
     /**
      * Normalize and quote a table name for use in SQL.

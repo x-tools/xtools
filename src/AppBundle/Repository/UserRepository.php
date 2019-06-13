@@ -10,7 +10,6 @@ namespace AppBundle\Repository;
 use AppBundle\Model\Project;
 use AppBundle\Model\User;
 use Doctrine\DBAL\Driver\ResultStatement;
-use Mediawiki\Api\SimpleRequest;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 
@@ -323,17 +322,13 @@ class UserRepository extends Repository
             $project = ProjectRepository::getDefaultProject($this->container);
         }
 
-        // Create the API query.
-        $api = $this->getMediawikiApi($project);
         $params = [
             'meta' => 'globaluserinfo',
             'guiuser' => $username,
             'guiprop' => 'groups',
         ];
-        $query = new SimpleRequest('query', $params);
 
-        // Get the result.
-        $res = $api->getRequest($query);
+        $res = $this->executeApiRequest($project, $params);
         $result = [];
         if (isset($res['batchcomplete']) && isset($res['query']['globaluserinfo']['groups'])) {
             $result = $res['query']['globaluserinfo']['groups'];
