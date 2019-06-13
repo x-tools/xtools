@@ -45,7 +45,7 @@ class DefaultControllerTest extends ControllerTestAdapter
         );
 
         // Make sure all active tools are listed.
-        static::assertCount(10, $crawler->filter('.tool-list a.btn'));
+        static::assertCount(11, $crawler->filter('.tool-list a.btn'));
     }
 
     /**
