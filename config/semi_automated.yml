@@ -114,6 +114,9 @@ parameters:
     ar:
         Undo:
             regex: 'الرجوع عن التعديل \d+ بواسطة'
+    arz:
+        AutoWikiBrowser:
+            regex: 'عن طريق \[\[Project:AWB\|اوب\]\]'
     de:
         AutoWikiBrowser:
             regex: 'mit \[\[Project:AWB\|AWB'
@@ -311,6 +314,9 @@ parameters:
         Global replace:
             regex: '\(\[\[c:GR\|GR\]\]\) '
             link: commons:Commons:File renaming/Global replace
+        Heading editor:
+            regex: '\[\[User:The Evil IP address\/hdedit\|script\]\]'
+            link: User:The Evil IP address/hdedit
         Igloo:
             regex: 'Wikipedia:Igloo'
             link: w:en:Wikipedia:Igloo
@@ -337,6 +343,9 @@ parameters:
             regex: 'using \[\[Wikipedia:Page Curation\|Page Curation'
             link: w:en:Wikipedia:Page_Curation/Help
             namespaces: [0, 2, 3]
+        Page swap:
+            regex: '\/pageswap\|pageswap\]\]'
+            link: WP:PAGESWAP
         Pending changes revert:
             regex: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) \d+ (\[\[Wikipedia:Pending changes\|pending\]\]|pending) edits? (to revision \d+|by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\])'
             link: Project:Pending changes
