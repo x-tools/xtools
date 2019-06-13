@@ -290,7 +290,7 @@ parameters:
             link: User:Qwertyytrewqqwerty/DisamAssist
             namespaces: [0, 6, 10, 14, 100, 108]
         Draftify:
-            regex: '\(\[\[WP:DFY\|DFY\]\]\)'
+            regex: 'WP:DFY\|DFY'
             link: Project:DFY
             namespaces: [2, 3]
         draft-sorter:
