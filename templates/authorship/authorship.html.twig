@@ -84,7 +84,7 @@
     <div class="alert alert-danger">
         <p>
             {{ msg('api-error', ['Wikiwho API'] ) }}:
-            <code>{{ authorship.error }}</code>
+            <code>{{ msgIfExists(authorship.error) }}</code>
         </p>
     </div>
 {% else %}

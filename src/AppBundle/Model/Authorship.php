@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace AppBundle\Model;
 
 use DateTime;
+use GuzzleHttp\Exception\RequestException;
 
 class Authorship extends Model
 {
@@ -145,8 +146,14 @@ class Authorship extends Model
             return;
         }
 
-        // TODO: check for failures. Should have a success:true
-        $ret = $this->getRepository()->getData($this->page, $this->target);
+        try {
+            $ret = $this->getRepository()->getData($this->page, $this->target);
+        } catch (RequestException $e) {
+            $this->data = [
+                'error' => 'unknown',
+            ];
+            return;
+        }
 
         // If revision can't be found, return error message.
         if (!isset($ret['revisions'][0])) {
