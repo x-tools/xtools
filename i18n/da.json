@@ -5,7 +5,8 @@
 			"Joedalton",
 			"Jorn Ari",
 			"Saederup92",
-			"Fnielsen"
+			"Fnielsen",
+			"Abijeet Patro"
 		]
 	},
 	"abusefilter": "Misbrugsfilter",
@@ -383,6 +384,7 @@
 	"tool-articleinfo": "Sidehistorik",
 	"tool-articleinfo-desc": "Få forskellige statistikker om en sides historik",
 	"tool-authorship": "Forfatterskab",
+	"tool-authorship-desc": "Forfatterskabattribution for den nuværende version af artiklen, målt efter tegnantal, eksklusiv mellemrum.",
 	"tool-autoedits": "Automatiske redigeringer",
 	"tool-autoedits-desc": "Analyse af semiautomatiske og ikkeautomatiserede bidrag.",
 	"tool-categoryedits": "Kategoriredigeringer",

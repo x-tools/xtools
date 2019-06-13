@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"Xuacu",
-			"Nemo bis"
+			"Nemo bis",
+			"Abijeet Patro"
 		]
 	},
 	"abusefilter": "Filtru antiabusos",
@@ -382,6 +383,7 @@
 	"tool-articleinfo": "Historial de páxina",
 	"tool-articleinfo-desc": "Ver delles estadístiques sobro l'historial d'una páxina",
 	"tool-authorship": "Autoría",
+	"tool-authorship-desc": "Atribución d'autoría de la versión actual del artículu, midida pol recuentu de caráuteres, sacante los espacios.",
 	"tool-autoedits": "Ed. automátiques",
 	"tool-autoedits-desc": "Analís d'ediciones semi-automatizaes y non-automatizaes.",
 	"tool-categoryedits": "Ediciones na categoría",

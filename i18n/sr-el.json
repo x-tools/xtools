@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"Zoranzoki21"
+			"Zoranzoki21",
+			"Abijeet Patro"
 		]
 	},
 	"accepted-formats": "Prihvaćeni formati",
@@ -370,6 +371,7 @@
 	"tool-articleinfo": "Istorija stranice",
 	"tool-articleinfo-desc": "razne statistike o istoriji stranice",
 	"tool-authorship": "Autorstvo",
+	"tool-authorship-desc": "Pripisivanje autorstva za trenutnu verziju članka, mereno brojem znakova (isključujući razmake).",
 	"tool-autoedits": "Automatizovane izmene",
 	"tool-autoedits-desc": "analiza poluautomatizovanih i neautomatizovanih doprinosa",
 	"tool-categoryedits": "Izmene kategorija",

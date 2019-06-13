@@ -6,7 +6,8 @@
 			"Susheelkasab",
 			"Pushkar Ekbote",
 			"Tiven2240",
-			"Sureshkhole"
+			"Sureshkhole",
+			"Abijeet Patro"
 		]
 	},
 	"accepted-formats": "स्वीकारीत प्रारूपे",
@@ -376,6 +377,7 @@
 	"tool-articleinfo": "पानाचा इतिहास",
 	"tool-articleinfo-desc": "पानाच्या इतिहासाबद्दल वेगवेगळी सांख्यिकी मिळवा",
 	"tool-authorship": "लेखक",
+	"tool-authorship-desc": "लेखाच्या सध्याच्या आवृत्तीचे लेखकवृत्त,वर्ण-मोजणी केलेले, रिकाम्या जागा वगळल्या आहेत.",
 	"tool-autoedits": "स्वयंचलित संपादने",
 	"tool-autoedits-desc": "अर्ध-स्वयंचलित व अ-स्वयंचलित योगदानांचे विश्लेषण",
 	"tool-categoryedits": "वर्ग संपादने",

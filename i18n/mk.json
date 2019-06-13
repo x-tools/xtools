@@ -3,7 +3,8 @@
 		"authors": [
 			"Bjankuloski06",
 			"Nemo bis",
-			"Vlad5250"
+			"Vlad5250",
+			"Abijeet Patro"
 		]
 	},
 	"abusefilter": "Филтер на злоупотреби",
@@ -400,6 +401,7 @@
 	"tool-articleinfo": "Историја на страница",
 	"tool-articleinfo-desc": "Разни статистики за историјата на една страница",
 	"tool-authorship": "Авторство",
+	"tool-authorship-desc": "Приписот на авторството на тековната верзија на статијата, измерен по бројот на знаци, без белини",
 	"tool-autoedits": "Автоматски уредувања",
 	"tool-autoedits-desc": "Анализа на полуавтоматски и неавтоматски придонеси.",
 	"tool-categoryedits": "Категориски уредувања",

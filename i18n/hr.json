@@ -4,7 +4,8 @@
 			"Acamicamacaraca",
 			"Bugoslav",
 			"MaGa",
-			"SpeedyGonsales"
+			"SpeedyGonsales",
+			"Abijeet Patro"
 		]
 	},
 	"abusefilter": "Filtar zloporaba",
@@ -323,6 +324,7 @@
 	"tool-articleinfo": "Povijest stranice",
 	"tool-articleinfo-desc": "Prikaz raznih statistika povijesti stranice",
 	"tool-authorship": "Autorstvo",
+	"tool-authorship-desc": "Pripisivanje autorstva za trenutačnu inačicu članka, a mjereno brojem znakova (isključujući razmake).",
 	"tool-autoedits": "Automatska uređivanja",
 	"tool-autoedits-desc": "Analiza poluautomatskih i neautomatskih doprinosa",
 	"tool-categoryedits": "Uređivanja kategorija",

@@ -5,7 +5,8 @@
 			"Mikel Ibaiba",
 			"Sator",
 			"Theklan",
-			"Xabier Armendaritz"
+			"Xabier Armendaritz",
+			"Abijeet Patro"
 		]
 	},
 	"accepted-formats": "Onarturiko formatuak",
@@ -366,6 +367,7 @@
 	"tool-articleinfo": "Orrialdearen historia",
 	"tool-articleinfo-desc": "Orrialdearen historiari buruzko estatisika batzuk lortu",
 	"tool-authorship": "Egilea",
+	"tool-authorship-desc": "Artikuluaren uneko bertsioaren egilea egotzi, karaktere kopuruaren arabera neurtuz, espazioak baztertuz.",
 	"tool-autoedits": "Aldaketa automatikoak",
 	"tool-autoedits-desc": "Ekarpen semi-automatikoen eta ez-automatikoen azterketa.",
 	"tool-categoryedits": "Kategoria aldaketak",

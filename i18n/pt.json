@@ -4,7 +4,8 @@
 			"Nemo bis",
 			"MokaAkashiyaPT",
 			"Athena in Wonderland",
-			"Hamilton Abreu"
+			"Hamilton Abreu",
+			"Abijeet Patro"
 		]
 	},
 	"abusefilter": "Filtro de abusos",
@@ -400,6 +401,7 @@
 	"tool-articleinfo": "Histórico",
 	"tool-articleinfo-desc": "Obter várias estatísticas sobre o histórico de uma página",
 	"tool-authorship": "Autoria",
+	"tool-authorship-desc": "Atribuição da autoria da atual versão do artigo, medida pela contagem de caracteres, excluindo os espaços.",
 	"tool-autoedits": "Edições automáticas",
 	"tool-autoedits-desc": "Análise das contribuições semiautomáticas e não automatizadas.",
 	"tool-categoryedits": "Edições de categorias",

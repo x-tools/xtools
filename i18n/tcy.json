@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"Lokesha kunchadka",
-			"Ravi Mundkur"
+			"Ravi Mundkur",
+			"Abijeet Patro"
 		]
 	},
 	"accepted-formats": "ಸ್ವೀಕರಣೊತ ಸ್ವರೂಪೊ",
@@ -335,5 +336,6 @@
 	"sunday": "ಐತಾರೊ",
 	"support": "ಬೆರಿಸಾಯೊ",
 	"tagged": "ಟ್ಯಾಗ್ ಮಾಲ್ಪುಲೆ.",
-	"tool-authorship": "ಕರ್ತೃತ್ವ"
+	"tool-authorship": "ಕರ್ತೃತ್ವ",
+	"tool-authorship-desc": "ಲೇಖನೊತ ಇತ್ತೆತ ಆವೃತ್ತಿತ ಕರ್ತೃತ್ವ ಗುಣಲಕ್ಷಣೊ, ಪಾತ್ರತ ಲೆಕ್ಕೊಡ್‌ತ್ ಅಳತೆ ಮಾಲ್ಪೊಲಿ, ಸ್ಥಳೊನ್ ದಿಡ್‌ತ್"
 }

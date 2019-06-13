@@ -5,7 +5,8 @@
 			"Manvydasz",
 			"Tomasdd",
 			"Yusuke1109",
-			"Naktis"
+			"Naktis",
+			"Abijeet Patro"
 		]
 	},
 	"abusefilter": "Piktnaudžiavimo filtras",
@@ -400,6 +401,7 @@
 	"tool-articleinfo": "Puslapio istorija",
 	"tool-articleinfo-desc": "Rodyti įvairią statistiką apie puslapio istoriją",
 	"tool-authorship": "Autorystė",
+	"tool-authorship-desc": "Autorystės priskyrimas dabartinei straipsnio versijai, matuojamas simbolių skaičiumi, neįtraukiant tarpų.",
 	"tool-autoedits": "Automatiniai pakeitimai",
 	"tool-autoedits-desc": "Pusiau automatinių ir neautomatinių keitimų analizė.",
 	"tool-categoryedits": "Kategorijų keitimai",

@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"Nemo bis",
-			"Pikne"
+			"Pikne",
+			"Abijeet Patro"
 		]
 	},
 	"accepted-formats": "Lubatud vormingud",
@@ -280,6 +281,7 @@
 	"tool-articleinfo": "Lehekülje ajalugu",
 	"tool-articleinfo-desc": "Arvandmed lehekülje ajaloo kohta",
 	"tool-authorship": "Autorsus",
+	"tool-authorship-desc": "Artikli praeguse versiooni autorsus märkide arvu lõikes, tühikud välja arvatud.",
 	"tool-autoedits": "Automaatmuudatused",
 	"tool-autoedits-desc": "Poolautomaatse ja mitteautomaatse kaastöö analüüs",
 	"tool-categoryedits": "Kategooriamuudatused",

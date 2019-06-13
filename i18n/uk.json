@@ -7,7 +7,8 @@
 			"Avatar6",
 			"Renessaince",
 			"Vlad5250",
-			"Gzhegozh"
+			"Gzhegozh",
+			"Abijeet Patro"
 		]
 	},
 	"abusefilter": "Фільтр редагувань",
@@ -403,6 +404,7 @@
 	"tool-articleinfo": "Історія сторінки",
 	"tool-articleinfo-desc": "Отримати різноманітну статистику про сторінку",
 	"tool-authorship": "Авторство",
+	"tool-authorship-desc": "Зазначення авторства для поточної версії статті, яке вимірюється кількістю символів без урахування пробілів.",
 	"tool-autoedits": "Автоматичні редагування",
 	"tool-autoedits-desc": "Аналіз напівавтоматичних та неавтоматичних редагувань",
 	"tool-categoryedits": "Редагування категорій",

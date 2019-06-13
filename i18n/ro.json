@@ -4,7 +4,8 @@
 			"Andreyyshore",
 			"Adrianbblk",
 			"MSClaudiu",
-			"WebSourceContentRO"
+			"WebSourceContentRO",
+			"Abijeet Patro"
 		]
 	},
 	"abusefilter": "Filtru de abuz",
@@ -394,6 +395,7 @@
 	"tool-articleinfo": "Istoric de pagină",
 	"tool-articleinfo-desc": "Obține diferite statistici despre istoricul unei pagini",
 	"tool-authorship": "Autor",
+	"tool-authorship-desc": "Atribuirea calității de autor a versiunii curente a articolului, măsurată prin numărul de caractere, excluzând spațiile.",
 	"tool-autoedits": "Modificări automate",
 	"tool-autoedits-desc": "Analiza contribuțiilor semiautomate și neautomate",
 	"tool-categoryedits": "Modificarea categoriilor",

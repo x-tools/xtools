@@ -5,7 +5,8 @@
 			"William Surya Permana",
 			"Rachmat04",
 			"Pebaryan",
-			"RaymondSutanto94"
+			"RaymondSutanto94",
+			"Abijeet Patro"
 		]
 	},
 	"abusefilter": "Filter penyalahgunaan",
@@ -396,6 +397,7 @@
 	"tool-articleinfo": "Riwayat Halaman",
 	"tool-articleinfo-desc": "Menampilkan berbagai statistik mengenai riwayat halaman",
 	"tool-authorship": "Kepemilikan",
+	"tool-authorship-desc": "Atribusi kepemilikan dari versi terkini dari suatu artikel, diukur dari jumlah karakter, tidak termasuk spasi.",
 	"tool-autoedits": "Suntingan Otomatis",
 	"tool-autoedits-desc": "Analisa untuk kontribusi semi-otomatis dan non-otomatis",
 	"tool-categoryedits": "Suntingan Kategori",

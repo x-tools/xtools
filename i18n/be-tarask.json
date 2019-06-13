@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"Red Winged Duck",
-			"Renessaince"
+			"Renessaince",
+			"Abijeet Patro"
 		]
 	},
 	"abusefilter": "Фільтар злоўжываньняў",
@@ -398,6 +399,7 @@
 	"tool-articleinfo": "Гісторыя старонкі",
 	"tool-articleinfo-desc": "Атрымаць разнастайную статыстыку пра гісторыю старонкі",
 	"tool-authorship": "Аўтарства",
+	"tool-authorship-desc": "Аўтарская атрыбуцыя цяперашняй вэрсіі артыкулу, вымераная колькасьцю сымбаляў, выключаючы пропусты.",
 	"tool-autoedits": "Аўтаматычныя рэдагаваньні",
 	"tool-autoedits-desc": "Аналіз паўаўтаматычнага і неаўтаматычнага ўнёску",
 	"tool-categoryedits": "Рэдагаваньні катэгорыяў",

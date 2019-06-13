@@ -3,7 +3,8 @@
 		"authors": [
 			"HairyFotr",
 			"Janezdrilc",
-			"Yerpo"
+			"Yerpo",
+			"Abijeet Patro"
 		]
 	},
 	"accepted-formats": "Dovoljeni formati",
@@ -373,6 +374,7 @@
 	"tool-articleinfo": "Zgodovina strani",
 	"tool-articleinfo-desc": "Prikaži različne statistične podatke o zgodovini strani",
 	"tool-authorship": "Avtorstvo",
+	"tool-authorship-desc": "Delež pri avtorstvu trenutne različice članka, šteto po številu znakov brez presledkov.",
 	"tool-autoedits": "Avtomatizirana urejanja",
 	"tool-autoedits-desc": "Analiza polavtomatskih in neavtomatskih prispevkov",
 	"tool-categoryedits": "Urejanja kategorij",

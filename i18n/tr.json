@@ -8,7 +8,8 @@
 			"Dual",
 			"Wertuose",
 			"Ömer faruk çakmak",
-			"Mirzali"
+			"Mirzali",
+			"Abijeet Patro"
 		]
 	},
 	"abusefilter": "Kötüye Kullanım Süzgeci",
@@ -376,6 +377,7 @@
 	"tool-articleinfo": "Sayfa geçmişi",
 	"tool-articleinfo-desc": "Bir sayfanın geçmişi hakkında çeşitli istatistikleri al",
 	"tool-authorship": "Yazarlık",
+	"tool-authorship-desc": "Maddenin geçerli sürümünün yazarlık atfı, karakter sayımı ile ölçülür, boşluklar hariç tutulur.",
 	"tool-autoedits": "Otomatik düzenlemeler",
 	"tool-autoedits-desc": "Yarı otomatik ve otomatik olmayan katkıların analizi",
 	"tool-categoryedits": "Kategori değişiklikleri",

@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"Neriman2003",
-			"Wertuose"
+			"Wertuose",
+			"Abijeet Patro"
 		]
 	},
 	"abusefilter": "AbuseFilter",
@@ -289,5 +290,6 @@
 	"rfx-intro": "Bu alət səsləri təhlil edir və təkrar səs verənləri müəyyən edir:",
 	"rfx-page": "RfX səhifəsi",
 	"see-full-page-stats": "Səhifənin bütün statistikasına bax",
-	"tool-authorship": "Müəlliflik"
+	"tool-authorship": "Müəlliflik",
+	"tool-authorship-desc": "Məqalənin mövcud versiyasını, boşluqlar istisna olmaqla, xarakter sayına görə ölçülmüş müəlliflik aidiyyəti."
 }

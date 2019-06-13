@@ -6,7 +6,8 @@
 			"Liuxinyu970226",
 			"A2093064",
 			"Sanmosa",
-			"LNDDYL"
+			"LNDDYL",
+			"Abijeet Patro"
 		]
 	},
 	"abusefilter": "防濫用過濾器",
@@ -403,6 +404,7 @@
 	"tool-articleinfo": "頁面歷史",
 	"tool-articleinfo-desc": "取得頁面歷史記錄的各種統計資訊",
 	"tool-authorship": "作者",
+	"tool-authorship-desc": "目前條目版本的歸屬作者，以不包含空格在內的按字元計數估量。",
 	"tool-autoedits": "自動化編輯",
 	"tool-autoedits-desc": "分析半自動與非自動的貢獻內容。",
 	"tool-categoryedits": "分類編輯數",

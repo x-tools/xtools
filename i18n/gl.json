@@ -4,7 +4,8 @@
 			"Elisardojm",
 			"Nemo bis",
 			"Banjo",
-			"Maria zaos"
+			"Maria zaos",
+			"Abijeet Patro"
 		]
 	},
 	"accepted-formats": "Formatos aceptados",
@@ -330,6 +331,7 @@
 	"tool-articleinfo": "Historial da páxina",
 	"tool-articleinfo-desc": "Obter varias estatísticas sobre o historial dunha páxina",
 	"tool-authorship": "Autoría",
+	"tool-authorship-desc": "Atribución de autoría da versión actual do artigo, medida por contaxe de caracteres, excluíndo espazos.",
 	"tool-autoedits": "Edicións automáticas",
 	"tool-autoedits-desc": "Edicións automáticas con ferramentas coñecidas",
 	"tool-editcounter": "Contador de edicións",

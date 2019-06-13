@@ -9,7 +9,8 @@
 			"Milicevic01",
 			"BadDog",
 			"Сербијана",
-			"Rancher"
+			"Rancher",
+			"Abijeet Patro"
 		]
 	},
 	"abusefilter": "Филтер злоупотреба",
@@ -402,6 +403,7 @@
 	"tool-articleinfo": "Историја странице",
 	"tool-articleinfo-desc": "разне статистике о историји странице",
 	"tool-authorship": "Ауторство",
+	"tool-authorship-desc": "Приписивање ауторства за тренутну верзију чланка, мерено бројем знакова (искључујући размаке).",
 	"tool-autoedits": "Аутоматизоване измене",
 	"tool-autoedits-desc": "анализа полуаутоматизованих и неаутоматизованих доприноса",
 	"tool-categoryedits": "Измене категорија",

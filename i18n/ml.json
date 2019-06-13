@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"Nemo bis",
-			"Praveenp"
+			"Praveenp",
+			"Abijeet Patro"
 		]
 	},
 	"abusefilter": "ദുരുപയോഗഅരിപ്പ",
@@ -341,6 +342,7 @@
 	"tool-articleinfo": "താളിന്റെ നാൾവഴി",
 	"tool-articleinfo-desc": "ഒരു താളിന്റെ നാൾവഴിയുടെ വിവിധ സ്ഥിതിവിവരക്കണക്കുകൾ",
 	"tool-authorship": "കർത്തൃത്വം",
+	"tool-authorship-desc": "ലേഖനത്തിന്റെ നിലവിലുള്ള പതിപ്പിന്റെ അക്ഷരങ്ങളുടെ എണ്ണം (സ്പേസ് ഒഴിച്ച്) കണക്കാക്കിയെടുത്ത കർത്തൃത്വ കടപ്പാട്.",
 	"tool-autoedits": "യാന്ത്രിക തിരുത്തുകൾ",
 	"tool-autoedits-desc": "അർദ്ധയാന്ത്രികവും യാന്ത്രികമല്ലാത്തതും ആയ തിരുത്തുകളുടെ വിശകലനം",
 	"tool-categoryedits": "വർഗ്ഗത്തിലെ തിരുത്തുകൾ",

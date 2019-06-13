@@ -5,7 +5,8 @@
 			"ديفيد",
 			"Nemo bis",
 			"محمد أحمد عبد الفتاح",
-			"Meno25"
+			"Meno25",
+			"Abijeet Patro"
 		]
 	},
 	"abusefilter": "مرشح الإساءة",
@@ -402,6 +403,7 @@
 	"tool-articleinfo": "تاريخ الصفحة",
 	"tool-articleinfo-desc": "الحصول على إحصاءات مختلفة حول تاريخ الصفحة",
 	"tool-authorship": "تأليف",
+	"tool-authorship-desc": "إسناد التأليف للإصدار الحالي من المقالة، مُقاسا بعدد الأحرف، باستثناء المسافات.",
 	"tool-autoedits": "التعديلات الآلية",
 	"tool-autoedits-desc": "تحليل المساهمات شبه الآلية وغير الآلية.",
 	"tool-categoryedits": "تعديلات التصنيفات",

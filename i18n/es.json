@@ -13,7 +13,8 @@
 			"LittlePuppers",
 			"Dgstranz",
 			"Tiberius1701",
-			"DannyS712"
+			"DannyS712",
+			"Abijeet Patro"
 		]
 	},
 	"abusefilter": "Filtro antiabusos",
@@ -394,6 +395,7 @@
 	"tool-articleinfo": "Historial de página",
 	"tool-articleinfo-desc": "Obtén diversas estadísticas sobre el historial de una página",
 	"tool-authorship": "Autoría",
+	"tool-authorship-desc": "Atribución de la autoría de la versión actual del artículo, medida por número de caracteres sin contar espacios.",
 	"tool-autoedits": "Ediciones automatizadas",
 	"tool-autoedits-desc": "Análisis de contribuciones semiautomatizadas y no automatizadas",
 	"tool-categoryedits": "Ediciones en categorías",

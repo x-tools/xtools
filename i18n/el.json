@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"Nikosgranturismogt",
-			"Geraki"
+			"Geraki",
+			"Abijeet Patro"
 		]
 	},
 	"accepted-formats": "Επιτρεπόμενες μορφές",
@@ -367,6 +368,7 @@
 	"tool-articleinfo": "Ιστορικό σελίδας",
 	"tool-articleinfo-desc": "Λάβετε διάφορα στατιστικά στοιχεία σχετικά με το ιστορικό της σελίδας",
 	"tool-authorship": "Συγγραφή",
+	"tool-authorship-desc": "Απόδοση συγγραφής της τρέχουσας μορφής του άρθρου, μετρημένο από τον αριθμό χαρακτήρων, εξαιρώντας τα κενά.",
 	"tool-autoedits": "Αυτοματοποιημένες επεξεργασίες",
 	"tool-autoedits-desc": "Ανάλυση των ημιαυτόματων και μη-αυτόματων επεξεργασιών.",
 	"tool-categoryedits": "Επεξεργασίες στις κατηγορίες",

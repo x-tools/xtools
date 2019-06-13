@@ -10,7 +10,8 @@
 			"Phenolla",
 			"Angrydog001",
 			"佛壁灯",
-			"科劳"
+			"科劳",
+			"Abijeet Patro"
 		]
 	},
 	"abusefilter": "滥用过滤器",
@@ -403,6 +404,7 @@
 	"tool-articleinfo": "页面历史",
 	"tool-articleinfo-desc": "获取各种有关页面历史的统计数据",
 	"tool-authorship": "作者",
+	"tool-authorship-desc": "当前条目版本的作者署名，按字符数衡量，不包括空格。",
 	"tool-autoedits": "自动化编辑",
 	"tool-autoedits-desc": "分析半自动与非自动贡献。",
 	"tool-categoryedits": "分类编辑",

@@ -3,7 +3,8 @@
 		"authors": [
 			"Dishual",
 			"Gwenn-Ael",
-			"Fulup"
+			"Fulup",
+			"Abijeet Patro"
 		]
 	},
 	"abusefilter": "AbuseFilter",
@@ -348,6 +349,7 @@
 	"tool-adminstats": "Stadegoù melestradurezh",
 	"tool-articleinfo": "Istor ar bajenn",
 	"tool-authorship": "Tadelezh",
+	"tool-authorship-desc": "Tadelezh stumm bremañ ar pennad-mañ, muzuliet gant an niver a arouezennoù, esaouennoù er-maez.",
 	"tool-autoedits": "Kemmoù emgefre",
 	"tool-categoryedits": "Kemmoù rummad",
 	"tool-editcounter": "Konter ar c'hemmoù",

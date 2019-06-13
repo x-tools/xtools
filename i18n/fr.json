@@ -10,7 +10,9 @@
 			"Oupsa",
 			"The RedBurn",
 			"Niridya",
-			"Ltrlg"
+			"Ltrlg",
+			"Abijeet Patro",
+			"VIGNERON"
 		]
 	},
 	"abusefilter": "AbuseFilter",
@@ -154,7 +156,7 @@
 	"file": "Fichier",
 	"files": "Fichiers",
 	"files-uploaded": "Fichiers téléversés",
-	"files-uploaded-commons": "Fichiers téléchargés (Communs)",
+	"files-uploaded-commons": "Fichiers téléchargés (Commons)",
 	"first-edit": "Première modification",
 	"former-admin": "Ancien administrateur",
 	"former-bot": "Ancien robot",
@@ -407,6 +409,7 @@
 	"tool-articleinfo": "Historique de la page",
 	"tool-articleinfo-desc": "Donne des statistiques variées à propos de l'historique d'une page",
 	"tool-authorship": "Paternité",
+	"tool-authorship-desc": "Paternité de la version actuelle de cet article, mesurée par nombre de caractères, espaces exclus.",
 	"tool-autoedits": "Compteur d'éditions automatisées",
 	"tool-autoedits-desc": "Analyse des contributions semi-automatiques et non automatiques.",
 	"tool-categoryedits": "Modifications de catégorie",

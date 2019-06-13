@@ -6,7 +6,8 @@
 			"Johanna Strodt (WMDE)",
 			"CarstenG",
 			"MGChecker",
-			"Mirzali"
+			"Mirzali",
+			"Abijeet Patro"
 		]
 	},
 	"abusefilter": "Bearbeitungsfilter",
@@ -403,6 +404,7 @@
 	"tool-articleinfo": "Seitenhistorie",
 	"tool-articleinfo-desc": "Verschiedene Statistiken über Versionen",
 	"tool-authorship": "Autorenschaft",
+	"tool-authorship-desc": "Die Anteile an der aktuellen Version des Artikels, gemessen an der Zeichenanzahl, ausschließlich Leerzeichen.",
 	"tool-autoedits": "Automatisierte Bearbeitungen",
 	"tool-autoedits-desc": "Analyse von halbautomatisierten und nichtautomatisierten Beiträgen.",
 	"tool-categoryedits": "Kategoriebearbeitungen",
