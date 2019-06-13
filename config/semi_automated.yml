@@ -223,7 +223,7 @@ parameters:
             regex: '\(using \[\[(User:Cameltrader#Advisor.js|User:PC-XT\/Advisor)\|Advisor.js'
             link: WP:ADVISOR
         AFCH:
-            regex: 'WP:(AFCH|AFCHRW)'
+            regex: 'WP:AFCH'
             link: Project:AFCH
             namespaces: [0, 2, 4, 5, 118]
         AFC/R HS:
