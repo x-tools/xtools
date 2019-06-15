@@ -35,7 +35,7 @@ parameters:
     wiki_url:                   http://en.wikipedia.org
     api_path:                   /w/api.php
     default_project:            en.wikipedia.org
-    oauth_project:              meta.wikimedia.org
+    central_auth_project:       meta.wikimedia.org
     opted_in:                   ['enwiki']
 
     # A secret key that's used to generate certain security-related tokens, and as the secret for the internal API.
@@ -76,6 +76,7 @@ parameters:
     enable.CategoryEdits: 1
     enable.EditCounter: 1
     enable.EditSummary: 1
+    enable.GlobalContribs: 1
     enable.Meta: 1
     enable.Pages: 1
     enable.Quote: 0

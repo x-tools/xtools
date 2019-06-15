@@ -304,12 +304,12 @@ abstract class Repository
     public function getDateConditions($start, $end, $tableAlias = '', $field = 'rev_timestamp'): string
     {
         $datesConditions = '';
-        if (false !== $start) {
+        if (false != $start) {
             // Convert to YYYYMMDDHHMMSS. *who in the world thought of having time in BLOB of this format ;-;*
             $start = date('Ymd', $start).'000000';
             $datesConditions .= " AND {$tableAlias}{$field} >= '$start'";
         }
-        if (false !== $end) {
+        if (false != $end) {
             $end = date('Ymd', $end).'235959';
             $datesConditions .= " AND {$tableAlias}{$field} <= '$end'";
         }

@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+{% import 'macros/forms.html.twig' as forms %}
+
+{% block body %}
+    <form class="col-lg-8 col-lg-offset-2" action="{{ path('GlobalContribs') }}" method="get" accept-charset="utf-8" >
+        <fieldset class="form-fieldset">
+            {{ forms.user_input() }}
+            <div class="input-group form-row">
+                <label class="input-group-addon form-label" for="namespace_select">
+                    {{ msg('namespace') }}
+                </label>
+                <select class="form-control namespace-selector" name="namespace" id="namespace_select">
+                    <option value="all" {% if namespace == 'all' %}selected="selected"{% endif %}>
+                        {{ msg('all') | ucfirst }}
+                    </option>
+                    {% for id, name in project.canonicalNamespaces if id < 16 %}
+                        <option value="{{ id }}" {% if namespace != 'all' and namespace == id %}selected="selected"{% endif %}>
+                            {% if id == 0 %}
+                                {{ msg('mainspace') }}
+                            {% else %}
+                                {{ name }}
+                            {% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            {{ forms.date_input('start', false, start) }}
+            {{ forms.date_input('end', false, end) }}
+        </fieldset>
+        {{ forms.submit_btn() }}
+    </form>
+{% endblock %}

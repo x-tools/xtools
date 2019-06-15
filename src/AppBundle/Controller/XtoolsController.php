@@ -406,7 +406,7 @@ abstract class XtoolsController extends Controller
         $originalParams = $this->params;
 
         // Don't continue if the user doesn't exist.
-        if (!$user->existsOnProject($this->project)) {
+        if ($this->project && !$user->existsOnProject($this->project)) {
             $this->throwXtoolsException($this->getIndexRoute(), 'user-not-found', [], 'username');
         }
 

@@ -294,6 +294,8 @@ class I18nHelper
             $datetime = new DateTime($datetime);
         } elseif (is_int($datetime)) {
             $datetime = DateTime::createFromFormat('U', (string)$datetime);
+        } elseif (!is_a($datetime, 'DateTime')) {
+            return ''; // Unknown format.
         }
 
         $this->dateFormatter->setPattern($pattern);

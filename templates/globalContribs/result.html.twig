@@ -1,0 +1,160 @@
+{% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
+{% import 'macros/wiki.html.twig' as wiki %}
+{% import 'macros/layout.html.twig' as layout %}
+
+{% block body %}
+
+{% if not is_sub_request %}
+    <div class="panel panel-primary">
+        <header class="panel-heading">
+            <div class="text-center xt-heading-top">
+                <a class="back-to-search" href="{{ path('GlobalContribs', {namespace: gc.namespace, start: gc.start|date_format('yyyy-MM-dd'), end: gc.end|date_format('yyyy-MM-dd')}) }}">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                    {{ msg('back') }}
+                </a>
+                {% if not(user.anon) %}
+                    {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, user.username) }}
+                {% else %}
+                    {{ user.username }}
+                {% endif %}
+            </div>
+        </header>
+        <div class="panel-body xt-panel-body">
+            <p class="text-center xt-heading-subtitle">
+                {% if user.anon %}
+                    {{ wiki.pageLogLinkRaw('User:' ~ user.username, project, msg('global-block-log'), 'gblblock') }}
+                {% else %}
+                    {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, msg('sul-info')) }}
+                    &middot;
+                    {{ wiki.pageLogLinkRaw('User:' ~ user.username ~ '@global', project, msg('global-account-log'), 'globalauth') }}
+                {% endif %}
+            </p>
+
+            <h3 class="text-center">{{ msg('tool-globalcontribs') }}</h3>
+
+            {% set content %}
+                <div class="col-lg-6 stat-list clearfix">
+                    <table class="table"><tbody>
+                        <tr>
+                            <td>{{ msg('user') }}</td>
+                            <td>{{ user.username }}</td>
+                        </tr>
+                        {% if gc.namespace != 'all' or gc.namespace == '' %}
+                            <tr>
+                                <td>{{ msg('namespace') }}</td>
+                                <td>{{ nsName(gc.namespace, project.namespaces) }}</td>
+                            </tr>
+                        {% endif %}
+                        {% if gc.start %}
+                            <tr>
+                                <td>{{ msg('start') }}</td>
+                                <td>{{ gc.start|date_format('yyyy-MM-dd') }}</td>
+                            </tr>
+                        {% endif %}
+                        {% if gc.end %}
+                            <tr>
+                                <td>{{ msg('end') }}</td>
+                                <td>{{ gc.end|date_format('yyyy-MM-dd') }}</td>
+                            </tr>
+                        {% endif %}
+                        {% if not(gc.start) and not(gc.end) %}
+                            {% if not(user.anon) %}
+                                <tr>
+                                    <td>{{ msg('global-edit-count') }}</td>
+                                    <td>{{ gc.globalEditCount|num_format }}</td>
+                                </tr>
+                            {% endif %}
+                            <tr>
+                                <td>{{ msg('projects') }}</td>
+                                <td>{{ gc.numProjectsWithEdits|num_format }}</td>
+                            </tr>
+                        {% endif %}
+                        </tbody></table>
+                </div>
+            {% endset %}
+            {{ layout.content_block('summary', content) }}
+
+            <section class="panel panel-default clearfix">
+                <header class="panel-heading col-lg-12">
+                    <h4>
+                        {{ msg('contributions') }}
+                    </h4>
+                </header>
+                <div class="panel-body col-lg-12">
+                    <em class="contributions-loading text-muted" style="display:none">{{ msg('loading') }}...</em>
+                    <div class="contributions-container"
+                        data-project="{{ project.domain }}"
+                        data-username="{{ user.username }}"
+                        data-namespace="{{ gc.namespace }}"
+                        data-start="{{ gc.start|date_format('yyyy-MM-dd') }}"
+                        data-end="{{ gc.end|date_format('yyyy-MM-dd') }}"
+                        data-offset="{{ gc.offset }}"
+                        data-target="ec-latestglobal">
+{% endif %}
+
+{% set globalEdits = gc.globalEdits(gc.offset) %}
+{% if globalEdits|length > 0 %}
+    {{ layout.contributionsNav(gc.offset, gc.globalEdits|length, gc.pageSize) }}
+    <table class="table table-bordered table-hover table-striped contributions-table">
+        <thead><tr>
+            {% for key in ['date', 'project', 'links', 'page-title', 'size', 'edit-summary'] %}
+                <th>
+                    <span{% if key != 'links' %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
+                        {{ msg(key)|ucfirst }}
+                        {% if key != 'links' %}
+                            <span class="glyphicon glyphicon-sort"></span>
+                        {% endif %}
+                    </span>
+                </th>
+            {% endfor %}
+        </tr></thead>
+        <tbody>
+        {% for edit in gc.globalEdits %}
+            <tr>
+                <td class="sort-entry--date" data-value="{{ edit.timestamp.format('U') }}">
+                    {{ wiki.permaLink(edit) }}
+                </td>
+                <td class="sort-entry--project" data-value="{{ edit.project.domain }}">
+                    {# Use project.domain here instead of title to preserve limited space in the interface #}
+                    <a href="{{ edit.project.url }}">{{ edit.project.domain }}</a>
+                </td>
+                <td>
+                    {{ wiki.diffLink(edit) }}
+                    &middot;
+                    <a href="{{ path('EditCounterResult', {project:edit.project.domain, username:user.username}) }}">{{ msg('tool-editcounter') }}</a>
+                    &middot;
+                    <a href="{{ path('TopEditsResultPage', {project:edit.project.domain, username:user.username, namespace:'', page:edit.page.title(true)}) }}">{{ msg('tool-topedits') }}</a>
+                </td>
+                <td class="sort-entry--page-title display-title" data-value="{{ edit.page.title(true) }}">
+                    {{ wiki.pageLinkRaw(edit.page.title(true), edit.project) }}
+                </td>
+                <td class="sort-entry--size" data-value="{{ edit.lengthChange }}">
+                    {{ edit.lengthChange|diff_format }}
+                </td>
+                <td class="sort-entry--summary" data-value="{{ edit.comment }}">
+                    {{ edit.wikifiedComment(true)|raw }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {{ layout.contributionsNav(gc.offset, gc.globalEdits|length, gc.pageSize) }}
+{% else %}
+    <div class="alert alert-info">
+        {{ msg('no-contribs') }}
+    </div>
+{% endif %}
+
+{% if not is_sub_request %}
+    </div></div></section>
+    <div class="text-muted times-in-utc" style="clear:both">
+        {{ msg('times-in-utc') }}
+    </div>
+    </div></div>
+{% endif %}
+
+<script>
+    xtools.globalcontribs.pageSize = {{ gc.pageSize }};
+</script>
+
+{% endblock %}

@@ -4,6 +4,7 @@ parameters:
     - EditCounter
     - ArticleInfo
     - Authorship
+    - GlobalContribs
     - Pages
     - TopEdits
     - AutoEdits

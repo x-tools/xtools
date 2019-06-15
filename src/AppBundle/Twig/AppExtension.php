@@ -531,7 +531,7 @@ class AppExtension extends AbstractExtension
 
     /**
      * Localize the given date based on language settings.
-     * @param string|DateTime $datetime
+     * @param string|int|DateTime $datetime
      * @param string $pattern Format according to this ICU date format.
      * @see http://userguide.icu-project.org/formatparse/datetime
      * @return string

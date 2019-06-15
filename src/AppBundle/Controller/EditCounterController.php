@@ -10,7 +10,9 @@ namespace AppBundle\Controller;
 use AppBundle\Exception\XtoolsHttpException;
 use AppBundle\Helper\I18nHelper;
 use AppBundle\Model\EditCounter;
+use AppBundle\Model\GlobalContribs;
 use AppBundle\Repository\EditCounterRepository;
+use AppBundle\Repository\GlobalContribsRepository;
 use AppBundle\Repository\ProjectRepository;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -38,7 +40,7 @@ class EditCounterController extends XtoolsController
         'timecard' => 'EditCounterTimecard',
         'top-edited-pages' => 'TopEditsResultNamespace',
         'rights-changes' => 'EditCounterRightsChanges',
-        'latest-global-edits' => 'EditCounterLatestGlobalContribs',
+        'latest-global-edits' => 'GlobalContribsResult',
     ];
 
     /** @var EditCounter The edit-counter, that does all the work. */
@@ -266,6 +268,11 @@ class EditCounterController extends XtoolsController
     {
         $this->setUpEditCounter();
 
+        $globalContribsRepo = new GlobalContribsRepository();
+        $globalContribsRepo->setContainer($this->container);
+        $globalContribs = new GlobalContribs($this->user);
+        $globalContribs->setRepository($globalContribsRepo);
+
         $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'EditCounter',
@@ -273,6 +280,7 @@ class EditCounterController extends XtoolsController
             'user' => $this->user,
             'project' => $this->project,
             'ec' => $this->editCounter,
+            'gc' => $globalContribs,
         ];
 
         // Output the relevant format template.
@@ -466,58 +474,6 @@ class EditCounterController extends XtoolsController
         return $this->indexAction();
     }
 
-    /**
-     * Display the latest global edits section.
-     * @Route(
-     *     "/ec-latestglobal-contributions/{project}/{username}/{offset}",
-     *     name="EditCounterLatestGlobalContribs",
-     *     requirements={"offset" = "|\d*"},
-     *     defaults={"offset" = 0}
-     * )
-     * @Route(
-     *     "/ec-latestglobal/{project}/{username}/{offset}",
-     *     name="EditCounterLatestGlobal",
-     *     requirements={"offset" = "|\d*"},
-     *     defaults={"offset" = 0}
-     * ),
-     * @Route(
-     *     "/global-contribs/{username}/{offset}",
-     *     name="EditCounterGlobalContribs",
-     *     requirements={"offset" = "|\d*"},
-     *     defaults={"offset" = 0}
-     * ),
-     * @return Response
-     * @codeCoverageIgnore
-     */
-    public function latestGlobalAction(): Response
-    {
-        $this->setUpEditCounter();
-
-        return $this->render('editCounter/latest_global.html.twig', [
-            'xtTitle' => $this->user->getUsername(),
-            'xtPage' => 'EditCounter',
-            'is_sub_request' => $this->isSubRequest,
-            'user' => $this->user,
-            'project' => $this->project,
-            'ec' => $this->editCounter,
-            'offset' => $this->request->get('offset'),
-            'pageSize' => $this->request->get('pagesize'),
-        ]);
-    }
-
-    /**
-     * Search form for latest global edits.
-     * @Route("/ec-latestglobal-contributions", name="EditCounterLatestGlobalContribsIndex")
-     * @Route("/ec-latestglobal", name="EditCounterLatestGlobalIndex")
-     * @Route("/ec-latestglobaledits", name="EditCounterLatestGlobalEditsIndex")
-     * @return Response
-     */
-    public function latestGlobalIndexAction(): Response
-    {
-        $this->sections = ['latest-global-edits'];
-        return $this->indexAction();
-    }
-
     /************************ API endpoints ************************/
 
     /**
@@ -573,6 +529,7 @@ class EditCounterController extends XtoolsController
      * Get the timecard data as JSON.
      * @Route("/api/user/timecard/{project}/{username}", name="UserApiTimeCard")
      * @return JsonResponse
+     * @codeCoverageIgnore
      */
     public function timecardApiAction(): JsonResponse
     {

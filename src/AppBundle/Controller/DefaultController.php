@@ -172,7 +172,7 @@ class DefaultController extends XtoolsController
             return $this->oauthClient;
         }
         $defaultProject = ProjectRepository::getProject(
-            $this->getParameter('oauth_project'),
+            $this->getParameter('central_auth_project'),
             $this->container
         );
         $endpoint = $defaultProject->getUrl(false)

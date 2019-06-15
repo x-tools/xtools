@@ -117,17 +117,18 @@
                         <li class="tool-links--entry">
                             <a href="{{ path('EditCounter', {sections: 'all'}) }}">{{ msg('tool-editcounter') }}</a>
                         </li>
+                        <li class="divider" role="separator"></li>
                         <li class="tool-links--entry">
                             <a href="{{ path('EditCounterGeneralStatsIndex') }}">{{ msg('general-stats') }}</a>
+                        </li>
+                        <li class="tool-links--entry">
+                            <a href="{{ path('EditCounterMonthCountsIndex') }}">{{ msg('month-counts') }}</a>
                         </li>
                         <li class="tool-links--entry">
                             <a href="{{ path('EditCounterNamespaceTotalsIndex') }}">{{ msg('namespace-totals') }}</a>
                         </li>
                         <li class="tool-links--entry">
-                            <a href="{{ path('EditCounterYearCountsIndex') }}">{{ msg('year-counts') }}</a>
-                        </li>
-                        <li class="tool-links--entry">
-                            <a href="{{ path('EditCounterMonthCountsIndex') }}">{{ msg('month-counts') }}</a>
+                            <a href="{{ path('EditCounterRightsChangesIndex') }}">{{ msg('rights-changes') }}</a>
                         </li>
                         <li class="tool-links--entry">
                             <a href="{{ path('EditCounterTimecardIndex') }}">{{ msg('timecard') }}</a>
@@ -136,30 +137,20 @@
                             <a href="{{ path('TopEdits') }}">{{ msg('top-edited-pages') }}</a>
                         </li>
                         <li class="tool-links--entry">
-                            <a href="{{ path('EditCounterRightsChangesIndex') }}">{{ msg('rights-changes') }}</a>
-                        </li>
-                    {% endif %}
-                    {% if enabled('SimpleEditCounter') %}
-                        <li class="tool-links--entry">
-                            <a href="{{ path('SimpleEditCounter') }}">{{ msg('tool-simpleeditcounter') }}</a>
+                            <a href="{{ path('EditCounterYearCountsIndex') }}">{{ msg('year-counts') }}</a>
                         </li>
                     {% endif %}
                 </ul>
             </li>
             <li role="presentation" class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {{ msg('contributions') }}
+                    {{ msg('user') }}
                     <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-                    {% if enabled('Pages') %}
+                    {% if enabled('AdminScore') %}
                         <li class="tool-links--entry">
-                            <a href="{{ path('Pages') }}">{{ msg('tool-pages') }}</a>
-                        </li>
-                    {% endif %}
-                    {% if enabled('TopEdits') %}
-                        <li class="tool-links--entry">
-                            <a href="{{ path('TopEdits') }}">{{ msg('tool-topedits') }}</a>
+                            <a href="{{ path('AdminScore') }}">{{ msg('tool-adminscore') }}</a>
                         </li>
                     {% endif %}
                     {% if enabled('AutoEdits') %}
@@ -172,9 +163,37 @@
                             <a href="{{ path('CategoryEdits') }}">{{ msg('tool-categoryedits') }}</a>
                         </li>
                     {% endif %}
+                    {% if enabled('EditCounter') %}
+                        <li class="tool-links--entry">
+                            <a href="{{ path('EditCounter') }}">{{ msg('tool-editcounter') }}</a>
+                        </li>
+                    {% endif %}
                     {% if enabled('EditSummary') %}
                         <li class="tool-links--entry">
                             <a href="{{ path('EditSummary') }}">{{ msg('tool-editsummary') }}</a>
+                        </li>
+                    {% endif %}
+                    {% if enabled('GlobalContribs') %}
+                        <li class="tool-links--entry">
+                            <a href="{{ path('GlobalContribs') }}">{{ msg('tool-globalcontribs') }}</a>
+                        </li>
+                    {% endif %}
+                    {% if enabled('Pages') %}
+                        <li class="tool-links--entry">
+                            <a href="{{ path('Pages') }}">{{ msg('tool-pages') }}</a>
+                        </li>
+                    {% endif %}
+                    <li class="tool-links--entry">
+                        <a href="{{ path('EditCounterRightsChangesIndex') }}">{{ msg('rights-changes') }}</a>
+                    </li>
+                    {% if enabled('SimpleEditCounter') %}
+                        <li class="tool-links--entry">
+                            <a href="{{ path('SimpleEditCounter') }}">{{ msg('tool-simpleeditcounter') }}</a>
+                        </li>
+                    {% endif %}
+                    {% if enabled('TopEdits') %}
+                        <li class="tool-links--entry">
+                            <a href="{{ path('TopEdits') }}">{{ msg('tool-topedits') }}</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -182,18 +201,18 @@
             {% if enabled('ArticleInfo') or enabled('Authorship') %}
                 <li role="presentation" class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        {{ msg('pages') }}
+                        {{ msg('page') }}
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        {% if enabled('ArticleInfo') %}
-                            <li>
-                                <a href="{{ path('ArticleInfo') }}">{{ msg('tool-articleinfo') }}</a>
-                            </li>
-                        {% endif %}
                         {% if enabled('Authorship') %}
                             <li>
                                 <a href="{{ path('Authorship') }}">{{ msg('tool-authorship') }}</a>
+                            </li>
+                        {% endif %}
+                        {% if enabled('ArticleInfo') %}
+                            <li>
+                                <a href="{{ path('ArticleInfo') }}">{{ msg('tool-articleinfo') }}</a>
                             </li>
                         {% endif %}
                     </ul>
@@ -202,7 +221,7 @@
             {% if enabled('AdminStats') %}
                 <li role="presentation" class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        {{ msg('tool-adminstats') }}
+                        {{ msg('project') }}
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
@@ -218,21 +237,6 @@
                     </ul>
                 </li>
             {% endif %}
-
-            <li role="presentation" class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {{ msg('other') }}
-                    <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-                    <li class="tool-links--entry">
-                        <a href="{{ path('EditCounterRightsChangesIndex') }}">{{ msg('rights-changes') }}</a>
-                    </li>
-                    <li class="tool-links--entry">
-                        <a href="{{ path('AdminScore') }}">{{ msg('tool-adminscore') }}</a>
-                    </li>
-                </ul>
-            </li>
 
             {# Populated by JS when not all entires fit in the nav #}
             <li class="tool-links--more dropdown hidden">

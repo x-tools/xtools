@@ -60,8 +60,7 @@ class EditCounterControllerTest extends ControllerTestAdapter
         $this->client->getCookieJar()->set($cookie);
 
         $subtools = [
-            'general-stats', 'namespace-totals', 'year-counts', 'month-counts',
-            'timecard', 'rights-changes', 'latest-global-edits',
+            'general-stats', 'namespace-totals', 'year-counts', 'month-counts', 'timecard', 'rights-changes',
         ];
 
         foreach ($subtools as $subtool) {

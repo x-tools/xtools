@@ -283,9 +283,9 @@
             &middot;
             {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, msg('sul-info')) }}
         {% endif %}
-        {% if isWMFLabs() %}
+        {% if tool != 'GlobalContribs' and enabled('GlobalContribs') %}
             &middot;
-            {{ wiki.gucLink(user.username) }}
+            <a href="{{ path('GlobalContribs', {'username':user.username}) }}">{{ msg('tool-globalcontribs') }}</a>
         {% endif %}
         {% if isWMFLabs() and not(user.anon) %}
             &middot;

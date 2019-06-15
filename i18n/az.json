@@ -28,6 +28,7 @@
 	"all-edits": "Bütün redaktələr",
 	"all-languages": "Bütün dillər",
 	"all-namespaces": "Bütün ad bölgələri",
+	"all-projects": "Bütün layihələr",
 	"all-quotes": "Bütün qiymətlər",
 	"api": "API",
 	"api-error": "$1-i sorğulayan səhv",
@@ -119,9 +120,7 @@
 	"former-bot": "Köhnə bot",
 	"friday": "Cümə",
 	"general-stats": "Ümumi statistika",
-	"global-contribs": "Qlobal istifadəçi fəaliyyətləri",
 	"global-other-sites-edit-count": "Digər layihələr",
-	"global-total-edit-count": "Bütün layihələr",
 	"global-user-groups": "Qlobal istifadəçi qrupları",
 	"help-translate": "Tərcüməyə kömək edin",
 	"hide": "Gizlət",
@@ -149,7 +148,6 @@
 	"last-year": "Son 365 gündəki redaktələr",
 	"latest-edit": "Son redaktə",
 	"latest-global-edits": "Son qlobal düzəlişlər",
-	"latest-global-edits-desc": "Son aylarda bu istifadəçinin ən yaxşı 10 layihəsinə ən son düzəlişlər",
 	"limit": "Sərhəd",
 	"links": "Keçidlər",
 	"links-external": "Xarici keçidlər",
@@ -291,5 +289,6 @@
 	"rfx-page": "RfX səhifəsi",
 	"see-full-page-stats": "Səhifənin bütün statistikasına bax",
 	"tool-authorship": "Müəlliflik",
-	"tool-authorship-desc": "Məqalənin mövcud versiyasını, boşluqlar istisna olmaqla, xarakter sayına görə ölçülmüş müəlliflik aidiyyəti."
+	"tool-authorship-desc": "Məqalənin mövcud versiyasını, boşluqlar istisna olmaqla, xarakter sayına görə ölçülmüş müəlliflik aidiyyəti.",
+	"tool-globalcontribs": "Qlobal istifadəçi fəaliyyətləri"
 }
