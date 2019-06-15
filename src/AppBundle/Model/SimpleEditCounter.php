@@ -33,11 +33,11 @@ class SimpleEditCounter extends Model
      * Constructor for the SimpleEditCounter class.
      * @param Project $project
      * @param User $user
-     * @param string $namespace Namespace ID or 'all'.
+     * @param string|int|null $namespace Namespace ID or 'all'.
      * @param false|int $start As Unix timestamp.
      * @param false|int $end As Unix timestamp.
      */
-    public function __construct(Project $project, User $user, string $namespace = 'all', $start = false, $end = false)
+    public function __construct(Project $project, User $user, $namespace = 'all', $start = false, $end = false)
     {
         $this->project = $project;
         $this->user = $user;

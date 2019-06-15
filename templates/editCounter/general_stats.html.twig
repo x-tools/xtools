@@ -432,7 +432,7 @@
                     </td>
                 </tr>
                 {% set topN = 10 %}
-                {% for topProj in ec.globalEditCountsTopN(topN) if topProj.project.domain is not null %}
+                {% for topProj in gc.globalEditCountsTopN(topN) if topProj.project.domain is not null %}
                     <tr>
                         <td>
                             {% if topProj.project.databaseName == project.databaseName %}
@@ -452,16 +452,18 @@
             <tfoot>
                 <tr>
                     <td>{{ msg('global-other-sites-edit-count') }}</td>
-                    <td>{{ ec.globalEditCountWithoutTopN(topN)|num_format }}</td>
+                    <td>{{ gc.globalEditCountWithoutTopN(topN)|num_format }}</td>
                 </tr>
                 <tr>
-                    <td>{{ msg('global-total-edit-count') }}</td>
+                    <td>{{ msg('all-projects') }}</td>
                     <td>
                         <strong>
                             {% if is_sub_request %}
-                                <a href="#latest-global-edits">{{ ec.globalEditCount|num_format }}</a>
+                                <a href="#latest-global-edits">{{ gc.globalEditCount|num_format }}</a>
                             {% else %}
-                                {{ ec.globalEditCount|num_format }}
+                                <a href="{{ path('GlobalContribsResult', {project:project.domain, username:user.username}) }}">
+                                    {{ gc.globalEditCount|num_format }}
+                                </a>
                             {% endif %}
                         </strong>
                         {# <small>@TODO days</small> #}

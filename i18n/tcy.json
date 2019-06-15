@@ -26,6 +26,7 @@
 	"all-edits": "ಪೂರ ಸಂಪಾದನೆಲು",
 	"all-languages": "ಮಾಂತಾ ಬಾಸೆಲೆಡ್",
 	"all-namespaces": "ಮಾಂತಾ ಪುದಾರ್‌ಲು",
+	"all-projects": "ಪೂರಾ ಯೋಜನೆಲು",
 	"all-quotes": "ಮಾಂತಾ ಉಲ್ಲೆಕೊ",
 	"api": "API",
 	"api-error": "ಪ್ರಶ್ನೆತ ದೋಷೊ$1",
@@ -146,10 +147,8 @@
 	"former-user-groups": "ದುಂಬುತ ಬಳಕೆದಾರೆನ ಗುಂಪು.",
 	"friday": "ಶುಕ್ರಾರೊ",
 	"general-stats": "ಸಾಮಾನ್ಯೊ ಅಂಕಿ-ಅಂಶೊಲು",
-	"global-contribs": "ಗ್ಲೊಬಲ್ ಬಳಕೆದಾರೆನ ಬೆಲೆ",
 	"global-other-sites-edit-count": "ಬೇತೆ ಯೋಜನೆಲೆಡ್",
 	"global-rights-changes": "ಗ್ಲೊಬಲ್ ರೈಟ್ಸ್ ಬದಲಾವಣೆಲು",
-	"global-total-edit-count": "ಪೂರಾ ಯೋಜನೆಲು",
 	"global-user-groups": "ಗ್ಲೊಬಲ್ ಬಳಕೆದಾರೆನ ಸಂಘೋಲು",
 	"help-translate": "ಅನುವಾದಗ್ ಸಹಾಯಮಲ್ಪುಲೆ",
 	"hide": "ಅಡೆಂಗಾವು.",
@@ -179,7 +178,6 @@
 	"latest-action": "ಇತ್ತೆತ ಚಟುವಟಿಕೆ",
 	"latest-edit": "ಇಂಚಿಪೋದ ಸಂಪಾದನೆ.",
 	"latest-global-edits": "ಇಂಚಿಪೋದ ಗ್ಲೊಬಲ್ ಸಂಪಾದನೆ.",
-	"latest-global-edits-desc": "ಸದ್ಯೊತ ಸಂಪಾದನೆ ಮಾಲ್ತಿನ ಟಾಪ್ ೧೦ ಯೋಜನೆಲು ಬಕ್ಕೊ ತಿಂಗೊಲು",
 	"limit": "ಮಿತಿ.",
 	"links": "ಕೊಂಡಿಲು.",
 	"links-external": "ಬಾಹ್ಯ ಸಂಪರ್ಕಲು",
@@ -337,5 +335,6 @@
 	"support": "ಬೆರಿಸಾಯೊ",
 	"tagged": "ಟ್ಯಾಗ್ ಮಾಲ್ಪುಲೆ.",
 	"tool-authorship": "ಕರ್ತೃತ್ವ",
-	"tool-authorship-desc": "ಲೇಖನೊತ ಇತ್ತೆತ ಆವೃತ್ತಿತ ಕರ್ತೃತ್ವ ಗುಣಲಕ್ಷಣೊ, ಪಾತ್ರತ ಲೆಕ್ಕೊಡ್‌ತ್ ಅಳತೆ ಮಾಲ್ಪೊಲಿ, ಸ್ಥಳೊನ್ ದಿಡ್‌ತ್"
+	"tool-authorship-desc": "ಲೇಖನೊತ ಇತ್ತೆತ ಆವೃತ್ತಿತ ಕರ್ತೃತ್ವ ಗುಣಲಕ್ಷಣೊ, ಪಾತ್ರತ ಲೆಕ್ಕೊಡ್‌ತ್ ಅಳತೆ ಮಾಲ್ಪೊಲಿ, ಸ್ಥಳೊನ್ ದಿಡ್‌ತ್",
+	"tool-globalcontribs": "ಗ್ಲೊಬಲ್ ಬಳಕೆದಾರೆನ ಬೆಲೆ"
 }

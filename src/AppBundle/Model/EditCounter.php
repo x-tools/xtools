@@ -35,9 +35,6 @@ class EditCounter extends UserRights
     /** @var mixed[] Total numbers of edits per year */
     protected $yearCounts;
 
-    /** @var int[] Keys are project DB names. */
-    protected $globalEditCounts;
-
     /** @var array Block data, with keys 'set' and 'received'. */
     protected $blocks;
 
@@ -49,9 +46,6 @@ class EditCounter extends UserRights
 
     /** @var string[] Data needed for time card chart. */
     protected $timeCardData;
-
-    /** @var array Most recent revisions across all projects. */
-    protected $globalEdits;
 
     /**
      * Revision size data, with keys 'average_size', 'large_edits' and 'small_edits'.
@@ -986,140 +980,6 @@ class EditCounter extends UserRights
         }
 
         return $years;
-    }
-
-    /**
-     * Get the total edit counts for the top n projects of this user.
-     * @param int $numProjects
-     * @return mixed[] Each element has 'total' and 'project' keys.
-     */
-    public function globalEditCountsTopN(int $numProjects = 10): array
-    {
-        // Get counts.
-        $editCounts = $this->globalEditCounts(true);
-        // Truncate, and return.
-        return array_slice($editCounts, 0, $numProjects);
-    }
-
-    /**
-     * Get the total number of edits excluding the top n.
-     * @param int $numProjects
-     * @return int
-     */
-    public function globalEditCountWithoutTopN(int $numProjects = 10): int
-    {
-        $editCounts = $this->globalEditCounts(true);
-        $bottomM = array_slice($editCounts, $numProjects);
-        $total = 0;
-        foreach ($bottomM as $editCount) {
-            $total += $editCount['total'];
-        }
-        return $total;
-    }
-
-    /**
-     * Get the grand total of all edits on all projects.
-     * @return int
-     */
-    public function globalEditCount(): int
-    {
-        $total = 0;
-        foreach ($this->globalEditCounts() as $editCount) {
-            $total += $editCount['total'];
-        }
-        return $total;
-    }
-
-    /**
-     * Get the total revision counts for all projects for this user.
-     * @param bool $sorted Whether to sort the list by total, or not.
-     * @return mixed[] Each element has 'total' and 'project' keys.
-     */
-    public function globalEditCounts(bool $sorted = false): array
-    {
-        if (empty($this->globalEditCounts)) {
-            $this->globalEditCounts = $this->getRepository()
-                ->globalEditCounts($this->user, $this->project);
-        }
-
-        if ($sorted) {
-            // Sort.
-            uasort($this->globalEditCounts, function ($a, $b) {
-                return $b['total'] - $a['total'];
-            });
-        }
-
-        return $this->globalEditCounts;
-    }
-
-    /**
-     * Get Projects on which the user has made at least one edit.
-     * @return Project[]
-     */
-    private function getProjectsWithEdits(): array
-    {
-        if ($this->user->isAnon()) {
-            return $this->getRepository()->getProjectsWithEdits($this->user);
-        }
-
-        // Registered accounts; for these we go by globalEditCounts() which uses CentralAuth.
-        $projects = [];
-        $globalCounts = array_column(array_filter($this->globalEditCounts(), function ($row) {
-            return $row['total'] > 0;
-        }), 'project');
-        foreach ($globalCounts as $globalCount) {
-            $projects[$globalCount->getDatabaseName()] = $globalCount;
-        }
-        return $projects;
-    }
-
-    /**
-     * Get the most recent n revisions across all projects.
-     * @param int $max The maximum number of revisions to return.
-     * @param int $offset Offset results by this number of revisions.
-     * @return Edit[]
-     */
-    public function globalEdits(int $max, int $offset = 0): array
-    {
-        if (is_array($this->globalEdits)) {
-            return $this->globalEdits;
-        }
-
-        // Get projects with edits.
-        $projects = $this->getProjectsWithEdits();
-        if (0 === count($projects)) {
-            return [];
-        }
-
-        // Get all revisions for those projects.
-        $globalRevisionsData = $this->getRepository()
-            ->getRevisions($projects, $this->user, $max, $offset);
-        $globalEdits = [];
-        foreach ($globalRevisionsData as $revision) {
-            /** @var Project $project */
-            $project = $projects[$revision['project_name']];
-
-            // Can happen if the project is given from CentralAuth API but the database is not being replicated.
-            if (null === $project) {
-                continue;
-            }
-
-            $nsName = '';
-            if ($revision['page_namespace']) {
-                $nsName = $project->getNamespaces()[$revision['page_namespace']];
-            }
-
-            $page = $project->getRepository()
-                ->getPage($project, ltrim($nsName.':'.$revision['page_title'], ':'));
-            $edit = new Edit($page, $revision);
-            $globalEdits[$edit->getTimestamp()->getTimestamp().'-'.$edit->getId()] = $edit;
-        }
-
-        // Sort and prune, before adding more.
-        krsort($globalEdits);
-        $this->globalEdits = array_slice($globalEdits, 0, $max);
-
-        return $this->globalEdits;
     }
 
     /**

@@ -330,41 +330,6 @@ class EditCounterTest extends TestAdapter
     }
 
     /**
-     * Get all global edit counts, or just the top N, or the overall grand total.
-     */
-    public function testGlobalEditCounts(): void
-    {
-        $wiki1 = new Project('wiki1');
-        $wiki2 = new Project('wiki2');
-        $editCounts = [
-            ['project' => new Project('wiki0'), 'total' => 30],
-            ['project' => $wiki1, 'total' => 50],
-            ['project' => $wiki2, 'total' => 40],
-            ['project' => new Project('wiki3'), 'total' => 20],
-            ['project' => new Project('wiki4'), 'total' => 10],
-            ['project' => new Project('wiki5'), 'total' => 35],
-        ];
-        $this->editCounterRepo->expects(static::once())
-            ->method('globalEditCounts')
-            ->willReturn($editCounts);
-
-        // Get the top 2.
-        static::assertEquals(
-            [
-                ['project' => $wiki1, 'total' => 50],
-                ['project' => $wiki2, 'total' => 40],
-            ],
-            $this->editCounter->globalEditCountsTopN(2)
-        );
-
-        // And the bottom 4.
-        static::assertEquals(95, $this->editCounter->globalEditCountWithoutTopN(2));
-
-        // Grand total.
-        static::assertEquals(185, $this->editCounter->globalEditCount());
-    }
-
-    /**
      * Ensure parsing of log_params properly works, based on known formats
      * @dataProvider longestBlockProvider
      * @param $blockLog

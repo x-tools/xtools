@@ -29,6 +29,7 @@ Encore
         './assets/js/autoedits.js',
         './assets/js/categoryedits.js',
         './assets/js/editcounter.js',
+        './assets/js/globalcontribs.js',
         './assets/js/pages.js',
         './assets/js/topedits.js',
         './assets/css/_mixins.scss',

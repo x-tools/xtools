@@ -257,6 +257,7 @@ class ProjectRepository extends Repository
         $this->metadata = [
             'general' => [],
             'namespaces' => [],
+            'canonicalNamespaces' => [],
         ];
 
         // Even if general info could not be fetched,
@@ -285,26 +286,41 @@ class ProjectRepository extends Repository
             ];
         }
 
-        if (isset($res['query']['namespaces'])) {
-            foreach ($res['query']['namespaces'] as $namespace) {
-                if ($namespace['id'] < 0) {
-                    continue;
-                }
-
-                if (isset($namespace['name'])) {
-                    $name = $namespace['name'];
-                } elseif (isset($namespace['*'])) {
-                    $name = $namespace['*'];
-                } else {
-                    continue;
-                }
-
-                $this->metadata['namespaces'][$namespace['id']] = $name;
-            }
-        }
+        $this->setNamespaces($res);
 
         // Cache for one hour and return.
         return $this->setCache($cacheKey, $this->metadata, 'PT1H');
+    }
+
+    /**
+     * Set the namespaces on $this->metadata.
+     * @param array $res As produced by meta=siteinfo API.
+     */
+    private function setNamespaces(array $res): void
+    {
+        if (!isset($res['query']['namespaces'])) {
+            return;
+        }
+
+        foreach ($res['query']['namespaces'] as $namespace) {
+            if ($namespace['id'] < 0) {
+                continue;
+            }
+
+            if (isset($namespace['canonical'])) {
+                $this->metadata['canonicalNamespaces'][$namespace['id']] = $namespace['canonical'];
+            }
+
+            if (isset($namespace['name'])) {
+                $name = $namespace['name'];
+            } elseif (isset($namespace['*'])) {
+                $name = $namespace['*'];
+            } else {
+                continue;
+            }
+
+            $this->metadata['namespaces'][$namespace['id']] = $name;
+        }
     }
 
     /**
