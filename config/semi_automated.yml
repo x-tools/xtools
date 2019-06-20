@@ -208,7 +208,7 @@ parameters:
             link: Wikipedia:ProveIt
             namespaces: [0, 2, 118]
         Redirect:
-            regex: '\[\[WP:AES\|←\]\]'
+            regex: 'Redirected page to \[\[.*?\]\]'
             link: Project:Redirect
         WikiLove:
             regex: 'new WikiLove message'
