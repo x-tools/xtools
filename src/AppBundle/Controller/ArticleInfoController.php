@@ -212,6 +212,8 @@ class ArticleInfoController extends XtoolsController
      */
     public function articleInfoApiAction(): Response
     {
+        $this->recordApiUsage('page/articleinfo');
+
         $data = $this->getArticleInfoApiData($this->project, $this->page);
 
         if ('html' === $this->request->query->get('format')) {
