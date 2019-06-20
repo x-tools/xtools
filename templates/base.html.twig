@@ -103,137 +103,71 @@
         <ol class="tool-links--nav nav navbar-nav navbar-left">
             <li>
                 <a class="home-link" href="{{ path('homepage') }}">
-                    <img src="{{ asset('images/logo.svg') }}" />
+                    <img src="{{ asset('images/logo.svg') }}" alt="Logo" />
                 </a>
             </li>
 
-            <li role="presentation" class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {{ msg('tool-editcounter') }}
-                    <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-                    {% if enabled('EditCounter') %}
+            {% if enabled('EditCounter') %}
+                <li role="presentation" class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{ msg('tool-editcounter') }}
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
                         <li class="tool-links--entry">
                             <a href="{{ path('EditCounter', {sections: 'all'}) }}">{{ msg('tool-editcounter') }}</a>
                         </li>
                         <li class="divider" role="separator"></li>
-                        <li class="tool-links--entry">
-                            <a href="{{ path('EditCounterGeneralStatsIndex') }}">{{ msg('general-stats') }}</a>
-                        </li>
-                        <li class="tool-links--entry">
-                            <a href="{{ path('EditCounterMonthCountsIndex') }}">{{ msg('month-counts') }}</a>
-                        </li>
-                        <li class="tool-links--entry">
-                            <a href="{{ path('EditCounterNamespaceTotalsIndex') }}">{{ msg('namespace-totals') }}</a>
-                        </li>
-                        <li class="tool-links--entry">
-                            <a href="{{ path('EditCounterRightsChangesIndex') }}">{{ msg('rights-changes') }}</a>
-                        </li>
-                        <li class="tool-links--entry">
-                            <a href="{{ path('EditCounterTimecardIndex') }}">{{ msg('timecard') }}</a>
-                        </li>
-                        <li class="tool-links--entry">
-                            <a href="{{ path('TopEdits') }}">{{ msg('top-edited-pages') }}</a>
-                        </li>
-                        <li class="tool-links--entry">
-                            <a href="{{ path('EditCounterYearCountsIndex') }}">{{ msg('year-counts') }}</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </li>
-            <li role="presentation" class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {{ msg('user') }}
-                    <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-                    {% if enabled('AdminScore') %}
-                        <li class="tool-links--entry">
-                            <a href="{{ path('AdminScore') }}">{{ msg('tool-adminscore') }}</a>
-                        </li>
-                    {% endif %}
-                    {% if enabled('AutoEdits') %}
-                        <li class="tool-links--entry">
-                            <a href="{{ path('AutoEdits') }}">{{ msg('tool-autoedits') }}</a>
-                        </li>
-                    {% endif %}
-                    {% if enabled('CategoryEdits') %}
-                        <li class="tool-links--entry">
-                            <a href="{{ path('CategoryEdits') }}">{{ msg('tool-categoryedits') }}</a>
-                        </li>
-                    {% endif %}
-                    {% if enabled('EditCounter') %}
-                        <li class="tool-links--entry">
-                            <a href="{{ path('EditCounter') }}">{{ msg('tool-editcounter') }}</a>
-                        </li>
-                    {% endif %}
-                    {% if enabled('EditSummary') %}
-                        <li class="tool-links--entry">
-                            <a href="{{ path('EditSummary') }}">{{ msg('tool-editsummary') }}</a>
-                        </li>
-                    {% endif %}
-                    {% if enabled('GlobalContribs') %}
-                        <li class="tool-links--entry">
-                            <a href="{{ path('GlobalContribs') }}">{{ msg('tool-globalcontribs') }}</a>
-                        </li>
-                    {% endif %}
-                    {% if enabled('Pages') %}
-                        <li class="tool-links--entry">
-                            <a href="{{ path('Pages') }}">{{ msg('tool-pages') }}</a>
-                        </li>
-                    {% endif %}
-                    <li class="tool-links--entry">
-                        <a href="{{ path('EditCounterRightsChangesIndex') }}">{{ msg('rights-changes') }}</a>
-                    </li>
-                    {% if enabled('SimpleEditCounter') %}
-                        <li class="tool-links--entry">
-                            <a href="{{ path('SimpleEditCounter') }}">{{ msg('tool-simpleeditcounter') }}</a>
-                        </li>
-                    {% endif %}
-                    {% if enabled('TopEdits') %}
-                        <li class="tool-links--entry">
-                            <a href="{{ path('TopEdits') }}">{{ msg('tool-topedits') }}</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </li>
-            {% if enabled('ArticleInfo') or enabled('Authorship') %}
+                        {% for tool, msg in top_nav_ec() %}
+                            <li class="tool-links--entry">
+                                <a href="{{ path(tool) }}">{{ msg }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endif %}
+            {% if top_nav_user()|length %}
+                <li role="presentation" class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{ msg('user') }}
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        {% for tool, msg in top_nav_user() %}
+                            <li class="tool-links--entry">
+                                <a href="{{ path(tool) }}">{{ msg }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endif %}
+            {% if top_nav_page()|length %}
                 <li role="presentation" class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         {{ msg('page') }}
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        {% if enabled('Authorship') %}
-                            <li>
-                                <a href="{{ path('Authorship') }}">{{ msg('tool-authorship') }}</a>
+                        {% for tool, msg in top_nav_page() %}
+                            <li class="tool-links--entry">
+                                <a href="{{ path(tool) }}">{{ msg }}</a>
                             </li>
-                        {% endif %}
-                        {% if enabled('ArticleInfo') %}
-                            <li>
-                                <a href="{{ path('ArticleInfo') }}">{{ msg('tool-articleinfo') }}</a>
-                            </li>
-                        {% endif %}
+                        {% endfor %}
                     </ul>
                 </li>
             {% endif %}
-            {% if enabled('AdminStats') %}
+            {% if top_nav_project()|length %}
                 <li role="presentation" class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         {{ msg('project') }}
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li class="tool-links--entry">
-                            <a href="{{ path('AdminStats') }}">{{ msg('tool-adminstats') }}</a>
-                        </li>
-                        <li class="tool-links--entry">
-                            <a href="{{ path('PatrollerStats') }}">{{ msg('tool-patrollerstats') }}</a>
-                        </li>
-                        <li class="tool-links--entry">
-                            <a href="{{ path('StewardStats') }}">{{ msg('tool-stewardstats') }}</a>
-                        </li>
+                        {% for tool, msg in top_nav_project() %}
+                            <li class="tool-links--entry">
+                                <a href="{{ path(tool) }}">{{ msg }}</a>
+                            </li>
+                        {% endfor %}
                     </ul>
                 </li>
             {% endif %}

@@ -65,6 +65,7 @@ class AppExtension extends AbstractExtension
     /**
      * Get all functions that this class provides.
      * @return TwigFunction[]
+     * @codeCoverageIgnore
      */
     public function getFunctions(): array
     {
@@ -83,7 +84,7 @@ class AppExtension extends AbstractExtension
             new TwigFunction('shortHash', [$this, 'gitShortHash']),
             new TwigFunction('hash', [$this, 'gitHash']),
             new TwigFunction('releaseDate', [$this, 'gitDate']),
-            new TwigFunction('enabled', [$this, 'tabEnabled']),
+            new TwigFunction('enabled', [$this, 'toolEnabled']),
             new TwigFunction('tools', [$this, 'tools']),
             new TwigFunction('color', [$this, 'getColorList']),
             new TwigFunction('chartColor', [$this, 'chartColor']),
@@ -241,7 +242,7 @@ class AppExtension extends AbstractExtension
      * @param string $tool The short name of the tool.
      * @return bool
      */
-    public function tabEnabled(string $tool = 'index'): bool
+    public function toolEnabled(string $tool = 'index'): bool
     {
         $param = false;
         if ($this->container->hasParameter("enable.$tool")) {
@@ -505,6 +506,7 @@ class AppExtension extends AbstractExtension
     /**
      * Get all filters for this extension.
      * @return TwigFilter[]
+     * @codeCoverageIgnore
      */
     public function getFilters(): array
     {
