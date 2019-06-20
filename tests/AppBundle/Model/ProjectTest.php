@@ -54,20 +54,14 @@ class ProjectTest extends TestAdapter
             ->method('getMetadata')
             ->willReturn([
                 'namespaces' => [0 => 'Main', 1 => 'Talk'],
-                'canonicalNamespaces' => [1 => 'Article_talk'],
             ]);
 
         $project = new Project('testWiki');
         $project->setRepository($projectRepo);
         static::assertCount(2, $project->getNamespaces());
-        static::assertCount(2, $project->getCanonicalNamespaces());
 
         // Tests that getMetadata was in fact called only once and cached afterwards
         static::assertEquals($project->getNamespaces()[0], 'Main');
-
-        // Canonical namespaces should include normal namespaces, if canonical variant doesn't exist.
-        static::assertEquals($project->getCanonicalNamespaces()[0], 'Main');
-        static::assertEquals($project->getCanonicalNamespaces()[1], 'Article_talk');
     }
 
     /**

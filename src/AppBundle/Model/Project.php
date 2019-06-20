@@ -213,17 +213,6 @@ class Project extends Model
     }
 
     /**
-     * Get canonical namespace names. Any namespaces that do not have a canonical form are returned with the normal
-     * namespace name, as produced by self::getNamespaces().
-     * @return array
-     */
-    public function getCanonicalNamespaces(): array
-    {
-        $metadata = $this->getMetadata();
-        return array_replace($metadata['namespaces'], $metadata['canonicalNamespaces']);
-    }
-
-    /**
      * Get the title of the Main Page.
      * @return string
      */

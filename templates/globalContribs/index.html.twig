@@ -13,10 +13,15 @@
                     <option value="all" {% if namespace == 'all' %}selected="selected"{% endif %}>
                         {{ msg('all') | ucfirst }}
                     </option>
-                    {% for id, name in project.canonicalNamespaces if id < 16 %}
+                    {% for id, name in project.namespaces if id < 16 %}
                         <option value="{{ id }}" {% if namespace != 'all' and namespace == id %}selected="selected"{% endif %}>
                             {% if id == 0 %}
                                 {{ msg('mainspace') }}
+                            {# FIXME: i18n needed. See T226072 #}
+                            {% elseif id == 4 %}
+                                Project
+                            {% elseif id == 5 %}
+                                Project talk
                             {% else %}
                                 {{ name }}
                             {% endif %}

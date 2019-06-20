@@ -257,7 +257,6 @@ class ProjectRepository extends Repository
         $this->metadata = [
             'general' => [],
             'namespaces' => [],
-            'canonicalNamespaces' => [],
         ];
 
         // Even if general info could not be fetched,
@@ -305,10 +304,6 @@ class ProjectRepository extends Repository
         foreach ($res['query']['namespaces'] as $namespace) {
             if ($namespace['id'] < 0) {
                 continue;
-            }
-
-            if (isset($namespace['canonical'])) {
-                $this->metadata['canonicalNamespaces'][$namespace['id']] = $namespace['canonical'];
             }
 
             if (isset($namespace['name'])) {
