@@ -208,7 +208,7 @@ parameters:
             link: Wikipedia:ProveIt
             namespaces: [0, 2, 118]
         Redirect:
-            regex: '\[\[WP:AES\|←\]\]Redirected page to \[\[.*?\]\]'
+            regex: '\[\[WP:AES\|←\]\]'
             link: Project:Redirect
         WikiLove:
             regex: 'new WikiLove message'
@@ -223,7 +223,7 @@ parameters:
             regex: '\(using \[\[(User:Cameltrader#Advisor.js|User:PC-XT\/Advisor)\|Advisor.js'
             link: WP:ADVISOR
         AFCH:
-            regex: 'WP:(AFCH|AFCHRW)'
+            regex: 'WP:AFCH'
             link: Project:AFCH
             namespaces: [0, 2, 4, 5, 118]
         AFC/R HS:
@@ -258,11 +258,11 @@ parameters:
             regex: '\[\[WP:UCB\|Assisted by Citation bot'
             link: Project:UCB
         closemfd.js:
-            regex: '\(using \[\[User:Doug\/closemfd.js'
+            regex: 'closemfd\.js'
             link: User:Doug/closemfd.js
             namespaces: [4]
         closetfd.js:
-            regex: '\(using \[\[User:Doug\/closetfd.js'
+            regex: 'closetfd\.js'
             link: User:Doug/closetfd.js
             namespaces: [4]
         CSD Helper:
@@ -290,7 +290,7 @@ parameters:
             link: User:Qwertyytrewqqwerty/DisamAssist
             namespaces: [0, 6, 10, 14, 100, 108]
         Draftify:
-            regex: '\(\[\[WP:DFY\|DFY\]\]\)'
+            regex: 'WP:DFY\|DFY'
             link: Project:DFY
             namespaces: [2, 3]
         draft-sorter:
@@ -328,7 +328,7 @@ parameters:
             link: Project:Mike's Wiki Tool
             namespaces: [0]
         MoveToDraft:
-            regex: '\[\[User:Evad37\/MoveToDraft\.js\|via script'
+            regex: '\[\[User:Evad37\/MoveToDraft\.js'
             link: User:Evad37/MoveToDraft
             namespaces: [0, 118]
         OABot:
@@ -392,7 +392,7 @@ parameters:
             link: User:Timotheus Canens/spihelper.js
             namespaces: [2, 3, 4]
         STiki:
-            regex: 'WP:(STiki|STIKI)'
+            regex: 'WP:ST(iki|IKI)'
             link: w:en:Wikipedia:STiki
             revert: Reverted \d+.*WP:(STiki|STIKI)
         stubsearch:
