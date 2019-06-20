@@ -519,6 +519,7 @@ parameters:
             namespaces: [3, 6]
         RenameLink:
             regex: '^\(\[\[Help:RenameLink\|Script'
+            tag: RenameLink
             link: Special:MyLanguage/Help:RenameLink
         RotateLink:
             regex: '\(\[\[Help:RotateLink\|Script'
