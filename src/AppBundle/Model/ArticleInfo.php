@@ -1319,20 +1319,20 @@ class ArticleInfo extends Model
         // Slice to the top 10.
         $topTenEditorsByAdded = array_keys(array_slice($topTenEditorsByAdded, 0, 10, true));
 
-        // // Get the sum of added text so that we can add in percentages.
-        // $topTenTotalAdded = array_sum(array_map(function ($editor) {
-        //     return $this->editors[$editor]['added'];
-        // }, $topTenEditorsByAdded));
+         // Get the sum of added text so that we can add in percentages.
+         $topTenTotalAdded = array_sum(array_map(function ($editor) {
+             return $this->editors[$editor]['added'];
+         }, $topTenEditorsByAdded));
 
         // Then build a new array of top 10 editors by added text in the data structure needed for the chart.
-        return array_map(function ($editor) {
+        return array_map(function ($editor) use ($topTenTotalAdded) {
             $added = $this->editors[$editor]['added'];
             return [
                 'label' => $editor,
                 'value' => $added,
                 'percentage' => 0 === $this->addedBytes
                     ? 0
-                    : 100 * ($added / $this->addedBytes),
+                    : 100 * ($added / $topTenTotalAdded),
             ];
         }, $topTenEditorsByAdded);
     }
