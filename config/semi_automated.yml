@@ -497,6 +497,9 @@ parameters:
             regex: '^Uploaded using Android Commons app$'
             link: Special:MyLanguage/Commons:Mobile_app
             namespaces: [6]
+        Cat-a-lot:
+            tag: Cat-a-lot
+            link: Special:MyLanguage/Help:Gadget-Cat-a-lot
         Commonsist:
             regex: '^commonist \d\.\d'
             link: Special:MyLanguage/Commons:Commonist
