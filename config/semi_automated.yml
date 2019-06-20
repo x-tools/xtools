@@ -501,6 +501,10 @@ parameters:
             regex: '^commonist \d\.\d'
             link: Special:MyLanguage/Commons:Commonist
             namespaces: [6]
+        CropTool:
+            tag: 'OAuth CID: 593'
+            link: Special:MyLanguage/Commons:CropTool
+            namespaces: [6]
         Flickr2Commons:
             regex: 'via \[\[(?:Special:MyLanguage\/)?Commons:Flickr2Commons'
             link: Special:MyLanguage/Commons:Flickr2Commons
