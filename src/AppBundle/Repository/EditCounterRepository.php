@@ -186,6 +186,11 @@ class EditCounterRepository extends UserRightsRepository
      */
     public function getFirstAndLatestActions(Project $project, User $user): array
     {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_first_latest_actions');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
         $loggingTable = $project->getTableName('logging', 'userindex');
         $revisionTable = $project->getTableName('revision');
 
@@ -222,7 +227,7 @@ class EditCounterRepository extends UserRightsRepository
             ];
         }
 
-        return $actions;
+        return $this->setCache($cacheKey, $actions);
     }
 
     /**
