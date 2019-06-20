@@ -11,7 +11,8 @@
 			"Angrydog001",
 			"佛壁灯",
 			"科劳",
-			"Abijeet Patro"
+			"Abijeet Patro",
+			"神樂坂秀吉"
 		]
 	},
 	"abusefilter": "滥用过滤器",
@@ -198,6 +199,7 @@
 	"latest-action": "最新日志操作",
 	"latest-edit": "最新编辑",
 	"latest-global-edits": "最新全域编辑",
+	"latest-revision": "最新版本",
 	"limit": "限制",
 	"links": "链接",
 	"links-external": "外部链接",
@@ -351,7 +353,9 @@
 	"reverted": "已回退",
 	"reverted-desc": "已回退编辑是被随后的编辑回退了的编辑",
 	"reverted-edits": "被回退编辑数",
+	"revision": "修订版本",
 	"revision-delete": "修订版本删除",
+	"revision-id": "修订版本编号",
 	"rfx-bureaucrat": "此工具还能分析行政员申请页",
 	"rfx-duplicates": "重复",
 	"rfx-intro": "此工具用于分析以下投票，并将重复票视为一票：",
