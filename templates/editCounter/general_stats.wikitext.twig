@@ -100,7 +100,7 @@
 | [{{ url('PagesResult', {project:project.domain, username:user.username, namespace:'all', redirects:'noredirects'}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesCreated }}}}] ({{ msg('pages-created-since-deleted', [ec.countPagesCreatedDeleted]) }})
 |-
 | {{ msg('pages-moved') }}
-| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesMoved }}}}
+| [[Special:Log/move/{{ user.username }}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesMoved }}}}]]
 |-
 | {{ msg('pages-deleted') }}
 | {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesDeleted|num_format }}}}
@@ -215,7 +215,7 @@
 {| class="wikitable sortable"
 |-
 {% set topN = 10 %}
-{% for topProj in ec.globalEditCountsTopN(topN) %}{% filter spaceless %}
+{% for topProj in gc.globalEditCountsTopN(topN) %}{% filter spaceless %}
 | {% if topProj.project.databaseName == project.databaseName %}&#9658;{% endif %}
 {# use project.domain instead of title due to limited space available in the interface #}
 [{{ wiki.pageUrlRaw('Special:Contributions/'~user.username, topProj.project) }} {{ topProj.project.domain }}]

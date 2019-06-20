@@ -273,10 +273,6 @@
                 </td>
             </tr>
             <tr>
-                <td>{{ msg('pages-moved') }}</td>
-                <td>{{ ec.countPagesMoved|num_format }}</td>
-            </tr>
-            <tr>
                 <td>{{ msg('pages-deleted') }}</td>
                 <td>{{ ec.countPagesDeleted|num_format }}</td>
             </tr>
@@ -316,6 +312,10 @@
             <tbody class="stat-list--group">
                 <tr>
                     <td colspan="2" class="text-muted">{{ msg('actions') }}</td>
+                </tr>
+                <tr>
+                    <td>{{ msg('pages-moved') }}</td>
+                    <td>{{ wiki.userLogLink(user, project, ec.countPagesMoved|num_format, 'move') }}</td>
                 </tr>
                 <tr>
                     <td>{{ msg('thank') }}</td>
@@ -461,12 +461,11 @@
                             {% if is_sub_request %}
                                 <a href="#latest-global-edits">{{ gc.globalEditCount|num_format }}</a>
                             {% else %}
-                                <a href="{{ path('GlobalContribsResult', {project:project.domain, username:user.username}) }}">
+                                <a href="{{ path('GlobalContribsResult', {username:user.username}) }}">
                                     {{ gc.globalEditCount|num_format }}
                                 </a>
                             {% endif %}
                         </strong>
-                        {# <small>@TODO days</small> #}
                     </td>
                 </tr>
             </tfoot>
