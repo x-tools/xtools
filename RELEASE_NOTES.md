@@ -1,5 +1,22 @@
 # Release Notes #
 
+## 3.9.0 ##
+- New top navigation with improved organization and links to sub-tools.
+- Move EditCounter's latest global edits to dedicated tool. Add namespace
+  and date range filters.
+- Move ArticleInfo's Authorship to dedicated tool. Add options to show
+  attribution stats given revision ID or date.
+- AutoEdits: Add more tools, fixes to existing tools, and simply regular
+  expressions to reduce the size of the SQL query.
+- ArticleInfo: make top 10 by added text chart match percentages.
+- T225389: Link and put 'Pages moved' under 'Actions' in Edit Counter.
+- Increase width of labels in forms to better accommodate translations.
+- Record usage of ArticleInfo API.
+- Handle errors when querying WikiWho API.
+- Improve caching of Edit Counter and user-related queries.
+- Various code cleanup and frontend styling tweaks.
+- Localization updates.
+
 ## 3.8.1 ##
 - EditCounter: Fix global edits subtool, add new /global-contribs route.
 - EditCounter: other performance improvements to global edits.

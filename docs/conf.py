@@ -9,8 +9,8 @@ project = u'XTools'
 
 # The release process is documented at https://xtools.readthedocs.io/en/latest/development.html#releases
 copyright = u'2008–2019, XTools contributors'
-version = '3.8'
-release = '3.8.1'
+version = '3.9'
+release = '3.9.0'
 
 # -- Options for HTML output ---------------------------------------------------
 
