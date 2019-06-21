@@ -179,6 +179,15 @@ class Edit extends Model
     }
 
     /**
+     * Set the User.
+     * @param User $user
+     */
+    public function setUser(User $user): void
+    {
+        $this->user = $user;
+    }
+
+    /**
      * Get the edit summary.
      * @return string
      */
@@ -389,5 +398,14 @@ class Edit extends Model
     public function isAnon(): ?bool
     {
         return $this->getUser() ? $this->getUser()->isAnon() : null;
+    }
+
+    /**
+     * Get HTML for the diff of this Edit.
+     * @return string Raw HTML, must be wrapped in a <table> tag.
+     */
+    public function getDiffHtml(): string
+    {
+        return $this->getRepository()->getDiffHtml($this);
     }
 }

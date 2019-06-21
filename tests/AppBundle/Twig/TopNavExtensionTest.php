@@ -75,6 +75,7 @@ class TopNavExtensionTest extends TestAdapter
     {
         static::assertEquals([
             'Authorship',
+            'Blame',
             'Page History',
         ], array_values($this->topNavExtension->topNavPage()));
     }

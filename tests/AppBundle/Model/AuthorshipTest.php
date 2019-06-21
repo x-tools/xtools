@@ -27,16 +27,16 @@ class AuthorshipTest extends TestAdapter
                         'tokens' => [
                             [
                                 'editor' => '1',
-                                'str' => 'Foo',
+                                'str' => 'foo',
                             ], [
                                 'editor' => '0|192.168.0.1',
-                                'str' => 'Bar',
+                                'str' => 'bar',
                             ], [
                                 'editor' => '0|192.168.0.1',
-                                'str' => 'Baz',
+                                'str' => 'baz',
                             ], [
                                 'editor' => '2',
-                                'str' => 'Foo bar',
+                                'str' => 'foobar',
                             ],
                         ],
                     ],
@@ -57,22 +57,22 @@ class AuthorshipTest extends TestAdapter
         static::assertEquals(
             [
                 'Mr. Rogers' => [
-                    'count' => 7,
-                    'percentage' => 43.8,
+                    'count' => 6,
+                    'percentage' => 40.0,
                 ],
                 '192.168.0.1' => [
                     'count' => 6,
-                    'percentage' => 37.5,
+                    'percentage' => 40.0,
                 ],
             ],
             $authorship->getList()
         );
 
         static::assertEquals(3, $authorship->getTotalAuthors());
-        static::assertEquals(16, $authorship->getTotalCount());
+        static::assertEquals(15, $authorship->getTotalCount());
         static::assertEquals([
             'count' => 3,
-            'percentage' => 18.7,
+            'percentage' => 20.0,
             'numEditors' => 1,
         ], $authorship->getOthers());
     }

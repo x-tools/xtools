@@ -18,9 +18,10 @@ class AuthorshipRepository extends Repository
      * @see https://api.wikiwho.net/
      * @param Page $page
      * @param int|null $revId ID of revision to target, or null for latest revision.
+     * @param bool $returnRevId Whether or not to include the relevant revision IDs with each token.
      * @return array[]|null Response from WikiWho. null if something went wrong.
      */
-    public function getData(Page $page, ?int $revId): ?array
+    public function getData(Page $page, ?int $revId, bool $returnRevId = false): ?array
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'page_authorship');
         if ($this->cache->hasItem($cacheKey)) {
@@ -29,10 +30,11 @@ class AuthorshipRepository extends Repository
 
         $title = rawurlencode(str_replace(' ', '_', $page->getTitle()));
         $projectLang = $page->getProject()->getLang();
+        $oRevId = $returnRevId ? 'true' : 'false';
 
         $url = "https://api.wikiwho.net/$projectLang/api/v1.0.0-beta/rev_content/$title"
             .($revId ? "/$revId" : '')
-            ."/?o_rev_id=false&editor=true&token_id=false&out=false&in=false";
+            ."/?o_rev_id=$oRevId&editor=true&token_id=false&out=false&in=false";
 
         // Ignore HTTP errors to fail gracefully.
         $opts = ['http_errors' => false];

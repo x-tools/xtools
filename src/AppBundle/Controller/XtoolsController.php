@@ -568,6 +568,7 @@ abstract class XtoolsController extends Controller
             'limit',
             'format',
             'tool',
+            'q',
 
             // Legacy parameters.
             'user',

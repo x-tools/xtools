@@ -1,0 +1,71 @@
+.blame {
+    .diff {
+        border: 0;
+        border-collapse: initial;
+        border-spacing: 4px;
+        margin: 0;
+        width: 100%;
+
+        td {
+            padding: 0.33em 0.5em;
+
+            div {
+                word-wrap: break-word;
+            }
+        }
+    }
+
+    .diff-lineno {
+        font-weight: bold;
+    }
+
+    .diff-marker {
+        font-size: 1.25em;
+        padding: 0.25em;
+        text-align: right;
+    }
+
+    .diff-context {
+        background: #f8f9fa;
+        border-color: #eaecf0;
+        color: #222;
+    }
+
+    .diff-deletedline {
+        border-color: #ffe49c;
+
+        .diffchange {
+            background: #feeec8;
+        }
+    }
+
+    .diff-addedline {
+        border-color: #a3d3ff;
+
+        .diffchange {
+            background: #d8ecff;
+        }
+    }
+
+    .diff-addedline,
+    .diff-deletedline,
+    .diff-context {
+        border-style: solid;
+        border-radius: 0.33em;
+        border-width: 1px 1px 1px 4px;
+        line-height: 1.6;
+        vertical-align: top;
+        white-space: pre-wrap;
+    }
+
+    .diff-addedline .diffchange,
+    .diff-deletedline .diffchange {
+        border-radius: 0.33em;
+        padding: 0.25em 0;
+    }
+
+    .diffchange {
+        //font-weight: bold;
+        text-decoration: none;
+    }
+}
