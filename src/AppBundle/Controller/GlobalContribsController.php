@@ -68,13 +68,21 @@ class GlobalContribsController extends XtoolsController
      *     "/ec-latestglobal-contributions/{project}/{username}/{offset}",
      *     name="EditCounterLatestGlobalContribs",
      *     requirements={"offset" = "|\d*"},
-     *     defaults={"offset" = 0}
+     *     defaults={
+     *         "project"="",
+     *         "namespace"="all",
+     *         "offset"=0,
+     *     }
      * )
      * @Route(
      *     "/ec-latestglobal/{project}/{username}/{offset}",
      *     name="EditCounterLatestGlobal",
      *     requirements={"offset" = "|\d*"},
-     *     defaults={"offset" = 0}
+     *     defaults={
+     *         "project"="",
+     *         "namespace"="all",
+     *         "offset"=0,
+     *     }
      * ),
      * @Route(
      *     "/globalcontribs/{username}/{namespace}/{start}/{end}/{offset}",

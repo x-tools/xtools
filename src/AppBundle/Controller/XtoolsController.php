@@ -255,6 +255,11 @@ abstract class XtoolsController extends Controller
      */
     private function setProject(Project $project): void
     {
+        // TODO: Remove after deprecated routes are retired.
+        if (false !== strpos((string)$this->request->get('_controller'), 'GlobalContribs')) {
+            return;
+        }
+
         $this->project = $project;
         $this->cookies['XtoolsProject'] = $project->getDomain();
     }
