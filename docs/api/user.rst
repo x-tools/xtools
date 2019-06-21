@@ -111,7 +111,7 @@ You can optionally pass in ``?tools=1`` to get individual counts of each (semi-)
 * ``namespace`` - Namespace ID or ``all`` for all namespaces.
 * ``start`` - Start date in the format ``YYYY-MM-DD``. Leave this and ``end`` blank to retrieve the most recent data.
 * ``end`` - End date in the format ``YYYY-MM-DD``. Leave this and ``start`` blank to retrieve the most recent data.
-* ``tools`` - Set to any non-blank value to include the tools that were used and thier counts.
+* ``tools`` - Set to any non-blank value to include the tools that were used and their counts.
 
 **Example:**
 
