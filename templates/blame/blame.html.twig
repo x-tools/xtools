@@ -1,0 +1,112 @@
+{% extends 'base.html.twig' %}
+{% import 'macros/wiki.html.twig' as wiki %}
+{% import 'macros/layout.html.twig' as layout %}
+
+{% block body %}
+
+    {% set descriptionLink %}
+        {% set wikiwhoLink %}
+            <a target='_blank' href='https://f-squared.org/wikiwho/'>Wikiwho</a>
+        {% endset %}
+        {{ msg('powered-by', [wikiwhoLink]) }}
+    {% endset %}
+
+    <div class="panel panel-primary">
+        <header class="panel-heading">
+            <div class="text-center xt-heading-top">
+                <a class="back-to-search" href="{{ path('BlameProject', {project: project.domain}) }}">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                    {{ msg('back') }}
+                </a>
+                {{ wiki.pageLink(page) }}
+                <small>
+                    &bull;
+                    {{ project.domain }}
+                </small>
+            </div>
+        </header>
+        <div class="panel-body xt-panel-body">
+            {{ wiki.pageLinks(page) }}
+
+            <h3 class="text-center">{{ msg('tool-blame') }}</h3>
+            <div class="text-center text-muted">{{ msg('tool-blame-desc') }}</div>
+
+            {% if blame.error is null %}
+                {% set content %}
+                    <div class="col-lg-6 stat-list clearfix">
+                        <table class="table"><tbody>
+                            <tr>
+                                <td>{{ msg('article') }}</td>
+                                <td>
+                                    {{ wiki.pageLink(page) }}
+                                    ({#
+                                        #}<a href="{{ path('ArticleInfoResult', {project:project.domain, page:page.title}) }}">{{ msg('tool-articleinfo') }}</a>
+                                        &middot;
+                                        <a href="{{ path('AuthorshipResult', {project:project.domain, page:page.title}) }}">{{ msg('tool-authorship') }}</a>{#
+                                     #})
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>{{ msg('query') }}</td>
+                                <td>
+                                    <em>{{ blame.query }}</em>
+                                </td>
+                            </tr>
+                        </tbody></table>
+                    </div>
+                {% endset %}
+                {{ layout.content_block('summary', content, descriptionLink) }}
+            {% endif %}
+
+            {% if blame.error is not null %}
+                <hr/>
+                <div class="alert alert-danger">
+                    {{ msg('api-error', ['Wikiwho API'] ) }}:
+                    <code>{{ msgIfExists(blame.error) }}</code>
+                </div>
+            {% elseif blame.matches is empty %}
+                <hr/>
+                <div class="alert alert-info">
+                    {{ msg('no-revisions') }}
+                </div>
+            {% else %}
+                {% for match in blame.matches %}
+                    {% set content %}
+                        <div class="col-lg-6 stat-list clearfix">
+                            <table class="table"><tbody>
+                                <tr>
+                                    <td>{{ msg('username') }}</td>
+                                    <td>{{ wiki.userLink(match.edit.user, project) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ msg('date') }}</td>
+                                    <td>{{ match.edit.timestamp|date_format }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ msg('edit-summary') }}</td>
+                                    <td>
+                                        <em class="text-muted">{{ match.edit.summary|wikify(project)|raw }}</em>
+                                    </td>
+                                </tr>
+                            </tbody></table>
+                        </div>
+                        <hr style="clear:both" />
+                        <table class="diff">
+                            {{ match.edit.diffHtml|raw }}
+                        </table>
+                    {% endset %}
+                    {{ layout.content_block(wiki.diffLink(match.edit, match.edit.timestamp|date_format), content, '', null, true) }}
+                {% endfor %}
+
+                <div class="text-muted times-in-utc" style="clear: both">
+                    {{ msg('times-in-utc') }}
+                </div>
+            {% endif %}
+        </div> {# .xt-panel-body #}
+    </div> {# .panel-primary #}
+
+    <script>
+        xtools.blame.query = "{{ blame.query }}";
+    </script>
+
+{% endblock %}

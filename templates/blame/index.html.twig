@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+{% import 'macros/forms.html.twig' as forms %}
+
+{% block body %}
+    <form class="col-lg-8 col-lg-offset-2" action="{{ path('Blame') }}" method="get" accept-charset="utf-8">
+        <fieldset class="form-fieldset">
+            <div class="input-group form-row">
+                <label class="input-group-addon form-label" for="project_input">
+                    {{ msg('project') }}
+                </label>
+                <select name="project" class="form-control" id="project_input" required>
+                    {% for domain in supportedProjects %}
+                        <option value="{{ domain }}"{% if project.domain == domain %} selected{% endif %}>{{ domain }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {{ forms.page_input(true, project, page) }}
+            <div class="input-group form-row">
+                <label class="input-group-addon form-label" for="show_selector">
+                    {{ msg('show') }}
+                </label>
+                <select name="show" class="form-control" id="show_selector" required>
+                    <option value="latest"{% if show == 'latest' %} selected{% endif %}>Latest revision</option>
+                    <option value="id"{% if show == 'id' %} selected{% endif %}>{{ msg('revision-id') }}</option>
+                    <option value="date"{% if show == 'date' %} selected{% endif %}>{{ msg('date') }}</option>
+                </select>
+            </div>
+            <div class="input-group form-row show-option show-option--id{% if show != 'id' %} hidden{% endif %}">
+                <label class="input-group-addon form-label" for="id_selector">
+                    {{ msg('revision-id') }}
+                </label>
+                <input type="number" min="0" class="form-control" name="target" id="id_selector"
+                        required {% if show != 'id' %}disabled{% endif %} value="{{ target }}" />
+            </div>
+            <div class="show-option show-option--date{% if show != 'date' %} hidden{% endif %}">
+                <div class="input-group form-row">
+                    <label class="input-group-addon form-label" for="date_input">
+                        {{ msg('date') }}
+                    </label>
+                    <input type="date" class="form-control" name="target"
+                           required {% if show != 'date' %}disabled{% endif %}
+                           value="{{ target }}" id="date_input" />
+                </div>
+            </div>
+            <div class="input-group form-row">
+                <label class="input-group-addon form-label" for="query_input">
+                    {{ msg('query') }}
+                </label>
+                <input type="text" class="form-control" name="q" id="query_input" />
+            </div>
+        </fieldset>
+        {{ forms.submit_btn }}
+        <p class="text-muted pull-right" style="padding: 6px 0">
+            {% set wikiwhoLink %}
+                <a target='_blank' href='https://f-squared.org/wikiwho/'>Wikiwho</a>
+            {% endset %}
+            {{ msg('powered-by', [wikiwhoLink]) }}
+        </p>
+    </form>
+{% endblock %}

@@ -183,6 +183,7 @@
 	"powered-by": "Palvelun mahdollistaa $1",
 	"project": "Hanke",
 	"protect": "Sivuja suojattu",
+	"query": "Kysely",
 	"rank": "Sija",
 	"recent-activity": "Viimeaikainen toiminta",
 	"recent-activity-desc": "$2 {{PLURAL:$1|muokkaus|muokkaus}} viimeisen 720 päivän aikana",

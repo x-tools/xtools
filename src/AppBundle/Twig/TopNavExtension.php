@@ -101,6 +101,7 @@ class TopNavExtension extends AppExtension
         $toolsMessages = [
             'Authorship' => 'tool-authorship',
             'ArticleInfo' => 'tool-articleinfo',
+            'Blame' => 'tool-blame',
         ];
 
         $this->topNavPage = $this->sortEntries($toolsMessages);

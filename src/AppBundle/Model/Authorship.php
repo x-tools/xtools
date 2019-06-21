@@ -137,22 +137,20 @@ class Authorship extends Model
     }
 
     /**
-     * Get authorship attribution from the WikiWho API.
-     * @see https://f-squared.org/wikiwho/
+     * Get the revision data from the WikiWho API and set $this->revision with basic info.
+     * If there are errors, they are placed in $this->errors and null will be returned.
+     * @param bool $returnRevId Whether or not to include revision IDs in the response.
+     * @return array|null null if there were errors.
      */
-    public function prepareData(): void
+    protected function getRevisionData(bool $returnRevId = false): ?array
     {
-        if (isset($this->data)) {
-            return;
-        }
-
         try {
-            $ret = $this->getRepository()->getData($this->page, $this->target);
+            $ret = $this->getRepository()->getData($this->page, $this->target, $returnRevId);
         } catch (RequestException $e) {
             $this->data = [
                 'error' => 'unknown',
             ];
-            return;
+            return null;
         }
 
         // If revision can't be found, return error message.
@@ -160,7 +158,7 @@ class Authorship extends Model
             $this->data = [
                 'error' => $ret['Error'] ?? 'Unknown',
             ];
-            return;
+            return null;
         }
 
         $revId = array_keys($ret['revisions'][0])[0];
@@ -170,6 +168,25 @@ class Authorship extends Model
             'id' => $revId,
             'timestamp' => $revisionData['time'],
         ];
+
+        return $revisionData;
+    }
+
+    /**
+     * Get authorship attribution from the WikiWho API.
+     * @see https://f-squared.org/wikiwho/
+     */
+    public function prepareData(): void
+    {
+        if (isset($this->data)) {
+            return;
+        }
+
+        // Set revision data. self::setRevisionData() returns null if there are errors.
+        $revisionData = $this->getRevisionData();
+        if (null === $revisionData) {
+            return;
+        }
 
         [$counts, $totalCount, $userIds] = $this->countTokens($revisionData['tokens']);
         $usernameMap = $this->getUsernameMap($userIds);

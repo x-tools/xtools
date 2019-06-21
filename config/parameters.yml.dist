@@ -73,6 +73,7 @@ parameters:
     enable.ArticleInfo: 1
     enable.Authorship: 1
     enable.AutoEdits: 1
+    enable.Blame: 1
     enable.CategoryEdits: 1
     enable.EditCounter: 1
     enable.EditSummary: 1
