@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.9.1 ##
+- T226299: Add legacy route to articleinfo-authorship.
+
 ## 3.9.0 ##
 - New top navigation with improved organization and links to sub-tools.
 - Move EditCounter's latest global edits to dedicated tool. Add namespace
