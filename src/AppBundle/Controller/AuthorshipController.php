@@ -64,6 +64,11 @@ class AuthorshipController extends XtoolsController
 
     /**
      * @Route(
+     *     "/articleinfo-authorship/{project}/{page}",
+     *     name="AuthorshipResultLegacy",
+     *     defaults={"target"="latest"}
+     * )
+     * @Route(
      *     "/authorship/{project}/{page}/{target}",
      *     name="AuthorshipResult",
      *     requirements={"target"="|latest|\d+|\d{4}-\d{2}-\d{2}"},
