@@ -287,6 +287,7 @@
 	"original-size": "Label for the original size of a page.",
 	"other": "The word 'other', used for general purpose.\n{{Identical|Other}}",
 	"others": "Label in chart for remaining data.\n{{Identical|Other}}",
+	"page": "{{Identical|Page}}",
 	"page-curation": "Name of the Page Curation extension. See {{msg-mw|pagetriage-pagecuration}} for possible translations.",
 	"page-size": "Label for the size of a page.\n{{Identical|Page size}}",
 	"page-title": "Label for the title of a page, or a page title form field.\n{{Identical|Page title}}",
