@@ -17,7 +17,12 @@
             {{ forms.page_input(true, project, page) }}
             <div class="input-group form-row">
                 <label class="input-group-addon form-label" for="show_selector">
-                    {{ msg('show') }}
+                    {{ msg('blame-as-of') }}
+                    <div class="glyphicon glyphicon-info-sign tooltipcss pull-right" role="dialog" aria-labelledby="as-of-desc">
+                        <div class="tooltip-body" id="as-of-desc">
+                            {{ msg('blame-as-of-desc') }}
+                        </div>
+                    </div>
                 </label>
                 <select name="show" class="form-control" id="show_selector" required>
                     <option value="latest"{% if show == 'latest' %} selected{% endif %}>Latest revision</option>
@@ -45,8 +50,13 @@
             <div class="input-group form-row">
                 <label class="input-group-addon form-label" for="query_input">
                     {{ msg('query') }}
+                    <div class="glyphicon glyphicon-info-sign tooltipcss pull-right" role="dialog" aria-labelledby="query-desc">
+                        <div class="tooltip-body" id="query-desc">
+                            {{ msg('blame-query-desc') }}
+                        </div>
+                    </div>
                 </label>
-                <input type="text" class="form-control" name="q" id="query_input" />
+                <input type="text" class="form-control" name="q" id="query_input" required />
             </div>
         </fieldset>
         {{ forms.submit_btn }}
