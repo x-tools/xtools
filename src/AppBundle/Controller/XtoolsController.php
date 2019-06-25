@@ -118,6 +118,13 @@ abstract class XtoolsController extends Controller
     protected $restrictedActions = [];
 
     /**
+     * XtoolsController::validateProject() will ensure the given project matches one of these domains,
+     * instead of any valid project.
+     * @var string[]
+     */
+    protected $supportedProjects;
+
+    /**
      * Require the tool's index route (initial form) be defined here. This should also
      * be the name of the associated model, if present.
      * @return string
@@ -379,6 +386,16 @@ abstract class XtoolsController extends Controller
     {
         /** @var Project $project */
         $project = ProjectRepository::getProject($projectQuery, $this->container);
+
+        // Check if it is an explicitly allowed project for the current tool.
+        if (isset($this->supportedProjects) && !in_array($project->getDomain(), $this->supportedProjects)) {
+            $this->throwXtoolsException(
+                $this->getIndexRoute(),
+                'error-authorship-unsupported-project',
+                [$this->params['project']],
+                'project'
+            );
+        }
 
         if (!$project->exists()) {
             $this->throwXtoolsException(

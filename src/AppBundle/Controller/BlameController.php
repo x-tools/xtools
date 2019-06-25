@@ -3,9 +3,12 @@ declare(strict_types=1);
 
 namespace AppBundle\Controller;
 
+use AppBundle\Helper\I18nHelper;
 use AppBundle\Model\Authorship;
 use AppBundle\Model\Blame;
 use AppBundle\Repository\BlameRepository;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -23,6 +26,20 @@ class BlameController extends XtoolsController
     public function getIndexRoute(): string
     {
         return 'Blame';
+    }
+
+    /**
+     * BlameController constructor.
+     * @param RequestStack $requestStack
+     * @param ContainerInterface $container
+     * @param I18nHelper $i18n
+     */
+    public function __construct(RequestStack $requestStack, ContainerInterface $container, I18nHelper $i18n)
+    {
+        // Ensures the requested project is validated against Authorship::SUPPORTED_PROJECTS, and not any valid project.
+        $this->supportedProjects = Authorship::SUPPORTED_PROJECTS;
+
+        parent::__construct($requestStack, $container, $i18n);
     }
 
     /**
@@ -77,14 +94,6 @@ class BlameController extends XtoolsController
     {
         if (0 !== $this->page->getNamespace()) {
             $this->addFlashMessage('danger', 'error-authorship-non-mainspace');
-            return $this->redirectToRoute('BlameProject', [
-                'project' => $this->project->getDomain(),
-            ]);
-        }
-        if (!in_array($this->project->getDomain(), Authorship::SUPPORTED_PROJECTS)) {
-            $this->addFlashMessage('danger', 'error-authorship-unsupported-project', [
-                $this->project->getDomain(),
-            ]);
             return $this->redirectToRoute('BlameProject', [
                 'project' => $this->project->getDomain(),
             ]);
