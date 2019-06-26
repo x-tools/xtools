@@ -46,13 +46,14 @@ class BlameController extends XtoolsController
      * The search form.
      * @Route("/blame", name="Blame")
      * @Route("/blame/{project}", name="BlameProject")
+     * @Route("/blame/{project}/{page}", name="BlameProjectPage")
      * @return Response
      */
     public function indexAction(): Response
     {
         $this->params['target'] = $this->request->query->get('target', '');
 
-        if (isset($this->params['project']) && isset($this->params['page'])) {
+        if (isset($this->params['project']) && isset($this->params['page']) && isset($this->params['q'])) {
             return $this->redirectToRoute('BlameResult', $this->params);
         }
 
