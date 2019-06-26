@@ -46,7 +46,6 @@ class BlameController extends XtoolsController
      * The search form.
      * @Route("/blame", name="Blame")
      * @Route("/blame/{project}", name="BlameProject")
-     * @Route("/blame/{project}/{page}", name="BlameProjectPage")
      * @return Response
      */
     public function indexAction(): Response
