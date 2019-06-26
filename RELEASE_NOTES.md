@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.10.1 ##
+- Blame: Revive old Blame tool, using the WikiWho service.
+- Authorship: Validate project is supported by WikiWho.
+- Localization updates. 
+
 ## 3.9.1 ##
 - T226299: Add legacy route to articleinfo-authorship.
 
