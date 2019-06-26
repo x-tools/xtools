@@ -2,7 +2,7 @@
 == [[{{ page.title }}]] ==
 
 {% set link %}[{{ url('Authorship', {'project': project.domain, 'page': page.title}) }} {{ msg('xtools-title') }}]{% endset %}
-{{ msg('xtools-advert', [link, date()|date_format]) }}. {{ msg('powered-by', ['[https://f-squared.org/wikiwho/ WikiWho]']) }}
+{{ msg('xtools-advert', [link, date()|date_format]) }}. {{ msg('powered-by', ['[https://www.f-squared.org/wikiwho/ WikiWho]']) }}
 
 {% if authorship.error is not null %}
 {{ msg('api-error', ['Wikiwho API'] ) }}:

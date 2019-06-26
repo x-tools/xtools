@@ -174,7 +174,7 @@ class Authorship extends Model
 
     /**
      * Get authorship attribution from the WikiWho API.
-     * @see https://f-squared.org/wikiwho/
+     * @see https://www.f-squared.org/wikiwho/
      */
     public function prepareData(): void
     {
