@@ -1,6 +1,9 @@
 # Release Notes #
 
 ## 3.10.1 ##
+- Blame: Require query parameter before redirecting to result page.
+
+## 3.10.0 ##
 - Blame: Revive old Blame tool, using the WikiWho service.
 - Authorship: Validate project is supported by WikiWho.
 - Localization updates. 
