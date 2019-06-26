@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.10.2 ##
+- Blame: remove BlameProjectPage route causing redirect loop.
+
 ## 3.10.1 ##
 - Blame: Require query parameter before redirecting to result page.
 
