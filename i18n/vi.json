@@ -251,6 +251,8 @@
 	"tool-articleinfo-desc": "Xem nhiều thống kê về lịch sử trang",
 	"tool-autoedits": "Sửa đổi tự động",
 	"tool-autoedits-desc": "Phân tích sửa đổi tự động và bán tự động",
+	"tool-blame": "Ai viết đấy",
+	"tool-blame-desc": "Tìm sửa đổi đưa một đoạn văn bản vào trang",
 	"tool-editcounter": "Số lần sửa đổi",
 	"tool-editcounter-desc": "Phân tích đóng góp người dùng",
 	"tool-globalcontribs": "Đóng góp toàn cục của thành viên",

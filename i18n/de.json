@@ -405,6 +405,8 @@
 	"tool-authorship-desc": "Die Anteile an der aktuellen Version des Artikels, gemessen an der Zeichenanzahl, ausschließlich Leerzeichen.",
 	"tool-autoedits": "Automatisierte Bearbeitungen",
 	"tool-autoedits-desc": "Analyse von halbautomatisierten und nichtautomatisierten Beiträgen.",
+	"tool-blame": "Article Blamer",
+	"tool-blame-desc": "Wann wurde ein bestimmter Text hinzugefügt",
 	"tool-categoryedits": "Kategoriebearbeitungen",
 	"tool-categoryedits-desc": "Analyse von Beiträgen in angegebenen Kategorien",
 	"tool-editcounter": "Bearbeitungszähler",

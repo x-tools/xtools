@@ -252,6 +252,8 @@
 	"tool-authorship": "Авторалла",
 	"tool-autoedits": "Автоматически нисдарш",
 	"tool-autoedits-desc": "Боьзаш болу гӀирсан гӀоьнца автоматически нисдарш",
+	"tool-blame": "Article blamer",
+	"tool-blame-desc": "АгӀона нисдарийн истори чохь йоза тӀетоьхна хан каро",
 	"tool-editcounter": "Нисдарш ларар",
 	"tool-editcounter-desc": "Декъашхочун къинхьегам зер",
 	"tool-globalcontribs": "Декъашхочун глобалан къинхьегам",

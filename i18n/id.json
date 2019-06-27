@@ -398,6 +398,7 @@
 	"tool-authorship-desc": "Atribusi kepemilikan dari versi terkini dari suatu artikel, diukur dari jumlah karakter, tidak termasuk spasi.",
 	"tool-autoedits": "Suntingan Otomatis",
 	"tool-autoedits-desc": "Analisa untuk kontribusi semi-otomatis dan non-otomatis",
+	"tool-blame": "Penyalah artikel",
 	"tool-categoryedits": "Suntingan Kategori",
 	"tool-categoryedits-desc": "Analisa untuk kontribusi yang dibuat pada kategori tertentu",
 	"tool-editcounter": "Pencacah Suntingan",

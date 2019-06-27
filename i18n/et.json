@@ -283,6 +283,8 @@
 	"tool-authorship-desc": "Artikli praeguse versiooni autorsus märkide arvu lõikes, tühikud välja arvatud.",
 	"tool-autoedits": "Automaatmuudatused",
 	"tool-autoedits-desc": "Poolautomaatse ja mitteautomaatse kaastöö analüüs",
+	"tool-blame": "Artikli laitja",
+	"tool-blame-desc": "Tekstitäienduse leidmine lehekülje ajaloost",
 	"tool-categoryedits": "Kategooriamuudatused",
 	"tool-categoryedits-desc": "Kindlates kategooriates tehtud muudatuste analüüs",
 	"tool-editcounter": "Muudatusloendur",

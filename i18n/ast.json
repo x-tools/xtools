@@ -3,7 +3,8 @@
 		"authors": [
 			"Xuacu",
 			"Nemo bis",
-			"Abijeet Patro"
+			"Abijeet Patro",
+			"Fitoschido"
 		]
 	},
 	"abusefilter": "Filtru antiabusos",
@@ -269,6 +270,7 @@
 	"optional": "opcional",
 	"original-size": "Tamañu orixinal",
 	"others": "otros",
+	"page": "Páxina",
 	"page-size": "Tamañu de la páxina",
 	"page-title": "Títulu de la páxina",
 	"page-watchers": "Siguidores de páx.",
@@ -302,6 +304,7 @@
 	"prev": "Ant",
 	"priority": "Prioridá",
 	"project": "Proyeutu",
+	"projects": "Proyeutos",
 	"prose": "Prosa",
 	"protect": "Protexer",
 	"quote": "Cita",
@@ -384,6 +387,8 @@
 	"tool-authorship-desc": "Atribución d'autoría de la versión actual del artículu, midida pol recuentu de caráuteres, sacante los espacios.",
 	"tool-autoedits": "Ed. automátiques",
 	"tool-autoedits-desc": "Analís d'ediciones semi-automatizaes y non-automatizaes.",
+	"tool-blame": "Autoría d'artículos",
+	"tool-blame-desc": "Alcuentra testu amestáu nel historial d'una páxina",
 	"tool-categoryedits": "Ediciones na categoría",
 	"tool-categoryedits-desc": "Analís de les collaboraciones feches en determinaes categoríes",
 	"tool-editcounter": "Contador d'ediciones",
@@ -391,7 +396,7 @@
 	"tool-editsummary": "Resumes d'edición",
 	"tool-editsummary-desc": "Analís del usu del resume d'edición",
 	"tool-error": "Error",
-	"tool-globalcontribs": "Contribuciones globales del usuariu",
+	"tool-globalcontribs": "Contribuciones globales",
 	"tool-meta": "Estadístiques d'usu",
 	"tool-meta-desc": "Ver qué XTools son les más populares a lo llargo del tiempu",
 	"tool-pages": "Páxines creaes",

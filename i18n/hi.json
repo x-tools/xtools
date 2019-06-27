@@ -297,6 +297,8 @@
 	"tool-articleinfo-desc": "पृष्ठ इतिहास से सम्बद्ध विभिन्न आँकड़े प्राप्त करें",
 	"tool-autoedits": "स्वतः सम्पादन",
 	"tool-autoedits-desc": "ज्ञात उपकरणों द्वारा स्वतः सम्पादन",
+	"tool-blame": "लेख उतरदायी",
+	"tool-blame-desc": "पृष्ठ के इतिहास में पाठ परिवर्धन खोजें",
 	"tool-categoryedits": "श्रेणी सम्पादन",
 	"tool-editcounter": "सम्पादन गणक",
 	"tool-editcounter-desc": "सदस्य योगदान का विश्लेषण",

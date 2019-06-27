@@ -364,6 +364,8 @@
 	"tool-authorship": "Forfatterskap",
 	"tool-autoedits": "Automatiserte redigeringer",
 	"tool-autoedits-desc": "Automatiserte redigeringer med kjente verktøy",
+	"tool-blame": "Hvem har skylda?",
+	"tool-blame-desc": "Søk i historikken for å finne ut når et stykke tekst ble lagt til",
 	"tool-categoryedits": "Kategoriredigeringer",
 	"tool-editcounter": "Redigeringsteller",
 	"tool-editcounter-desc": "Analyse av brukerbidrag",

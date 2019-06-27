@@ -141,6 +141,8 @@
 	"tool-articleinfo-desc": "Get various statistics aboot the heestory o a page",
 	"tool-autoedits": "Automatit eedits",
 	"tool-autoedits-desc": "Automatit eedits wi kent tuils",
+	"tool-blame": "Airticle blamer",
+	"tool-blame-desc": "Find addeetion o text in a page heestory",
 	"tool-editcounter": "Eedit Coonter",
 	"tool-editcounter-desc": "Analysis o uiser contreibutions",
 	"tool-pages": "Pages creatit",

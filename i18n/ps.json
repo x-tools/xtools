@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"Baloch Khan",
-			"Amjad Khan"
+			"Amjad Khan",
+			"عمرگل صدیقي"
 		]
 	},
 	"accepted-formats": "منل شوی فارمټونه",
@@ -245,11 +246,12 @@
 	"tool-articleinfo": "د مخ پېښليک",
 	"tool-autoedits": "اتومات سمونونه",
 	"tool-autoedits-desc": "اتومات سمونونه د پیژندل شوی  ټولز سره",
+	"tool-blame": "تنبح کول",
 	"tool-editcounter": "د سمونو شمېر",
 	"tool-editsummary": "د سمونی لنډيزونه",
 	"tool-editsummary-desc": "د سمون لنډیز کارونی شمار",
 	"tool-error": "تېروتنه",
-	"tool-globalcontribs": "د نړيوال گڼون سمونونه",
+	"tool-globalcontribs": "نړيوال گڼون سمونونه",
 	"tool-meta": "د کارونې شمار",
 	"tool-pages": "مخونه جوړ شول",
 	"tool-quote": "ناڅاپي وینا",

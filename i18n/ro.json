@@ -397,6 +397,7 @@
 	"tool-authorship-desc": "Atribuirea calității de autor a versiunii curente a articolului, măsurată prin numărul de caractere, excluzând spațiile.",
 	"tool-autoedits": "Modificări automate",
 	"tool-autoedits-desc": "Analiza contribuțiilor semiautomate și neautomate",
+	"tool-blame-desc": "Găsește momentul adăugării unei secvențe de text în istoricul paginii",
 	"tool-categoryedits": "Modificarea categoriilor",
 	"tool-categoryedits-desc": "Analiza contribuțiilor făcute la anumite categorii",
 	"tool-editcounter": "Contor de modificări",

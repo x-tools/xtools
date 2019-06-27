@@ -374,6 +374,8 @@
 	"tool-authorship": "نویسندگی",
 	"tool-autoedits": "ویرایش‌های خودکار",
 	"tool-autoedits-desc": "بررسی مشارکت‌های نیمه خودکار و غیر خودکار",
+	"tool-blame": "مقاله انتقادی",
+	"tool-blame-desc": "پیداکردن مرحلهٔ اضافه‌شدن متن در تاریخچهٔ صفحه",
 	"tool-categoryedits": "ویرایش‌های رده",
 	"tool-editcounter": "شمارندهٔ ویرایش",
 	"tool-editcounter-desc": "تجزیه و تحلیل مشارکت‌های کاربر",

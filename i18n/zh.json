@@ -134,6 +134,8 @@
 	"tool-articleinfo-desc": "获取页面的各种历史统计数据",
 	"tool-autoedits": "自动化编辑",
 	"tool-autoedits-desc": "使用已知工具的做出的自动化编辑",
+	"tool-blame": "历史文字搜索",
+	"tool-blame-desc": "搜索新增文本是在哪个历史版本中添加的",
 	"tool-editcounter": "编辑计数器",
 	"tool-editcounter-desc": "用户贡献分析",
 	"tool-pages": "页面创建",

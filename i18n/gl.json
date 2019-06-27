@@ -5,7 +5,8 @@
 			"Nemo bis",
 			"Banjo",
 			"Maria zaos",
-			"Abijeet Patro"
+			"Abijeet Patro",
+			"Fitoschido"
 		]
 	},
 	"accepted-formats": "Formatos aceptados",
@@ -332,11 +333,13 @@
 	"tool-authorship-desc": "Atribución de autoría da versión actual do artigo, medida por contaxe de caracteres, excluíndo espazos.",
 	"tool-autoedits": "Edicións automáticas",
 	"tool-autoedits-desc": "Edicións automáticas con ferramentas coñecidas",
+	"tool-blame": "Autoría dos artigos",
+	"tool-blame-desc": "Atopa o texto engadido no historial da páxina",
 	"tool-editcounter": "Contador de edicións",
 	"tool-editcounter-desc": "Análise das contribucións do usuario",
 	"tool-editsummary": "Resumos de edición",
 	"tool-error": "Erro",
-	"tool-globalcontribs": "Contribucións globais do usuario",
+	"tool-globalcontribs": "Contribucións globais",
 	"tool-meta": "Estatísticas de uso",
 	"tool-pages": "Páxinas creadas",
 	"tool-pages-desc": "Obter as páxinas que foron creadas por unha/un usuaria(o)",

@@ -338,6 +338,7 @@
 	"tool-authorship-desc": "Podíl autorství na aktuální verzi článku měřený počtem znaků bez mezer.",
 	"tool-autoedits": "Automatizované editace",
 	"tool-autoedits-desc": "Analýza poloautomatických a neautomatických příspěvku.",
+	"tool-blame-desc": "Najít přidání textu v historii stránky",
 	"tool-categoryedits": "Úpravy Kategorií",
 	"tool-editcounter": "Počítadlo editací",
 	"tool-editcounter-desc": "Analýza příspěvků uživatele",

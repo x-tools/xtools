@@ -421,6 +421,8 @@
 	"tool-authorship-desc": "Paternité de la version actuelle de cet article, mesurée par nombre de caractères, espaces exclus.",
 	"tool-autoedits": "Compteur d'éditions automatisées",
 	"tool-autoedits-desc": "Analyse des contributions semi-automatiques et non automatiques.",
+	"tool-blame": "Accusateur de l’article",
+	"tool-blame-desc": "Recherche l'ajout de texte dans l'historique d'une page",
 	"tool-categoryedits": "Modifications de catégorie",
 	"tool-categoryedits-desc": "Analyse des contributions faites à des catégories spécifiques",
 	"tool-editcounter": "Compteur de modifications",

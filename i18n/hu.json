@@ -385,6 +385,7 @@
 	"tool-articleinfo-desc": "Változatos statisztikát kaphat egy oldal történetéről",
 	"tool-autoedits": "Automatikus szerkesztések",
 	"tool-autoedits-desc": "Automatikus szerkesztések ismert eszközökkel",
+	"tool-blame-desc": "Keressen szöveget egy laptörténetben",
 	"tool-categoryedits": "Kategória szerkesztés",
 	"tool-editcounter": "Szerkesztésszámláló",
 	"tool-editcounter-desc": "Felhasználó közreműködéseinek elemzése",

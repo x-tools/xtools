@@ -393,6 +393,8 @@
 	"tool-authorship-desc": "Författartillskrivning för nuvarande versionen av artikeln, mäts av antalet tecken, exklusive blanksteg.",
 	"tool-autoedits": "Automatiserade redigeringar",
 	"tool-autoedits-desc": "Analys av halvautomatiska och icke-automatiska bidrag.",
+	"tool-blame": "Artikelnamn",
+	"tool-blame-desc": "Hitta tillägg av text i sidhistorik",
 	"tool-categoryedits": "Kategoriredigeringar",
 	"tool-categoryedits-desc": "Analys över bidrag i specifika kategorier",
 	"tool-editcounter": "Redigeringsräknare",

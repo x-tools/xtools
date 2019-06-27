@@ -289,6 +289,7 @@
 	"tool-articleinfo-desc": "ページの履歴についてさまざまな統計を取得",
 	"tool-autoedits": "自動編集",
 	"tool-autoedits-desc": "既知のツールによる半自動および手動編集の貢献の分析。",
+	"tool-blame-desc": "追加された文字列をページの履歴から見つける",
 	"tool-editcounter": "編集カウンター",
 	"tool-editcounter-desc": "利用者の投稿記録の分析",
 	"tool-editsummary": "編集の要約",

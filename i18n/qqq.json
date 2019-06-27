@@ -115,7 +115,7 @@
 	"delpagesfilter-deleted": "Filter to show deleted pages",
 	"delpagesfilter-live": "Filter to show live pages",
 	"diff": "Link to a MediaWiki diff on a wiki\n{{Identical|Diff}}",
-	"diff-empty": "Shown when viewing a diff that has no parent revision; e.g. viewing the diff of the first edit to a page.",
+	"diff-empty": "Shown when viewing a diff that has no parent revision; e.g. viewing the diff of the first edit to a page.\n{{Identical|Empty}}",
 	"documentation": "The word documentation. This is used as the text for a link to a documentation page.\n{{Identical|Documentation}}",
 	"download-label": "Label for the download buttons.\n{{Identical|Download}}",
 	"edit": "Link to edit a page\n{{Identical|Edit}}",

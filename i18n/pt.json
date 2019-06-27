@@ -5,7 +5,8 @@
 			"MokaAkashiyaPT",
 			"Athena in Wonderland",
 			"Hamilton Abreu",
-			"Abijeet Patro"
+			"Abijeet Patro",
+			"Fitoschido"
 		]
 	},
 	"abusefilter": "Filtro de abusos",
@@ -278,6 +279,7 @@
 	"original-size": "Tamanho original",
 	"other": "Outro",
 	"others": "outros",
+	"page": "Página",
 	"page-curation": "Curadoria de páginas",
 	"page-size": "Tamanho da página",
 	"page-title": "Título da página",
@@ -317,6 +319,7 @@
 	"prev": "Anterior",
 	"priority": "Prioridade",
 	"project": "Projeto",
+	"projects": "Projetos",
 	"prose": "Prosa",
 	"protect": "Proteger",
 	"quote": "Citar",
@@ -402,6 +405,8 @@
 	"tool-authorship-desc": "Atribuição da autoria da atual versão do artigo, medida pela contagem de caracteres, excluindo os espaços.",
 	"tool-autoedits": "Edições automáticas",
 	"tool-autoedits-desc": "Análise das contribuições semiautomáticas e não automatizadas.",
+	"tool-blame": "Censor de artigo",
+	"tool-blame-desc": "Encontre texto adicionar no histórico da página",
 	"tool-categoryedits": "Edições de categorias",
 	"tool-categoryedits-desc": "Análise das contribuições feitas para as categorias específicas",
 	"tool-editcounter": "Contador de Edições",
@@ -409,7 +414,7 @@
 	"tool-editsummary": "Resumos de edição",
 	"tool-editsummary-desc": "Análise da utilização dos resumos de edição",
 	"tool-error": "Erro",
-	"tool-globalcontribs": "Contribuições globais do utilizador",
+	"tool-globalcontribs": "Contribuições globais",
 	"tool-meta": "Estatísticas de utilização",
 	"tool-meta-desc": "Veja qual o XTools é mais popular com o tempo",
 	"tool-pages": "Páginas criadas",

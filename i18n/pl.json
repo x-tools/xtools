@@ -244,6 +244,7 @@
 	"tool-authorship": "Autorstwo",
 	"tool-autoedits": "Zautomatyzowane edycje",
 	"tool-autoedits-desc": "Zautomatyzowane edycje przy pomocy znanych narzędzi",
+	"tool-blame": "Article blamer",
 	"tool-categoryedits-desc": "Analiza wykonanych edycji dla określonych kategorii",
 	"tool-editcounter": "Licznik edycji",
 	"tool-editcounter-desc": "Analiza wkładu użytkownika",

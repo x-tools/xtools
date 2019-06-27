@@ -291,6 +291,8 @@
 	"tool-authorship": "Auteurschap",
 	"tool-autoedits": "Geautomatiseerde bewerkingen",
 	"tool-autoedits-desc": "Automatische bewerkingen met bekende hulpmiddelen",
+	"tool-blame": "Artikeloverzicht",
+	"tool-blame-desc": "Zoeken naar teksttoevoeging in de paginageschiedenis",
 	"tool-editcounter": "Bewerkingsteller",
 	"tool-editcounter-desc": "Gebruikersbijdragen-onderzoek",
 	"tool-editsummary": "Bewerkingssamenvattingen",

@@ -402,6 +402,8 @@
 	"tool-authorship-desc": "Autorystės priskyrimas dabartinei straipsnio versijai, matuojamas simbolių skaičiumi, neįtraukiant tarpų.",
 	"tool-autoedits": "Automatiniai pakeitimai",
 	"tool-autoedits-desc": "Pusiau automatinių ir neautomatinių keitimų analizė.",
+	"tool-blame": "Straipsnio kaltinimai",
+	"tool-blame-desc": "Rasti pridėtą tekstą puslapio istorijoje",
 	"tool-categoryedits": "Kategorijų keitimai",
 	"tool-categoryedits-desc": "Indėlio atlikto nurodytose kategorijose analizė",
 	"tool-editcounter": "Keitimų skaitiklis",

@@ -176,6 +176,8 @@
 	"tool-articleinfo-desc": "Ստանալ պատմության էջի մասին տարբեր տվյալներ",
 	"tool-autoedits": "Ավտոմատ խմբագրումներ",
 	"tool-autoedits-desc": "Ավտոմատ խմբագրումները հայտնի գործիքներով",
+	"tool-blame": "Article blamer",
+	"tool-blame-desc": "Էջի պատմության մեջ գտնել ավելացված տեքստը",
 	"tool-editcounter": "Խմբագրահաշվիչ",
 	"tool-editcounter-desc": "Մասնակցի ներդրման վերլուծություն",
 	"tool-pages": "Ստեղծված էջեր",

@@ -244,6 +244,8 @@
 	"tool-authorship": "ავტორობა",
 	"tool-autoedits": "ავტომატური რედაქტირებები",
 	"tool-autoedits-desc": "ნახევრადავტომატური და არაავტომატური წვლილის ანალიზი",
+	"tool-blame": "Article blamer",
+	"tool-blame-desc": "გვერდის ისტორიაში ტექსტის დამატების მომენტის პოვნა",
 	"tool-editcounter": "რედაქტირებების მრიცხველი",
 	"tool-editcounter-desc": "მომხმარებლის წვლილის ანალიზი",
 	"tool-error": "შეცდომა",

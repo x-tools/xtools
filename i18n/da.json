@@ -387,6 +387,8 @@
 	"tool-authorship-desc": "Forfatterskabattribution for den nuværende version af artiklen, målt efter tegnantal, eksklusiv mellemrum.",
 	"tool-autoedits": "Automatiske redigeringer",
 	"tool-autoedits-desc": "Analyse af semiautomatiske og ikkeautomatiserede bidrag.",
+	"tool-blame": "Hvem har skylden?",
+	"tool-blame-desc": "Find tilføjelse af test i sidehistorikken",
 	"tool-categoryedits": "Kategoriredigeringer",
 	"tool-categoryedits-desc": "Analyse over bidrag i specifikke kategorier",
 	"tool-editcounter": "Redigeringstæller",

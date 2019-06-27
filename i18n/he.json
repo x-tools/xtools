@@ -320,6 +320,8 @@
 	"tool-articleinfo-desc": "קבלת סטטיסטיקות שונות על ההיסטוריה של הדף",
 	"tool-autoedits": "עריכות אוטומטיות",
 	"tool-autoedits-desc": "עריכות אוטומטיות עם כלים ידועים",
+	"tool-blame": "מאשים ערכים",
+	"tool-blame-desc": "מציאה של הוספת טקסט בהיסטוריה של דף",
 	"tool-editcounter": "מונה עריכות",
 	"tool-editcounter-desc": "ניתוח תרומות משתמש",
 	"tool-editsummary": "עריכת תקצירים",
