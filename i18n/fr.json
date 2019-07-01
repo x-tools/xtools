@@ -115,6 +115,7 @@
 	"delpagesfilter-deleted": "N'inclure seulement que les pages supprimées",
 	"delpagesfilter-live": "Exclure les pages supprimées",
 	"diff": "Différence",
+	"diff-empty": "Vide",
 	"documentation": "Documentation",
 	"download-label": "Télécharger",
 	"duplicate-vote": "Vote en doublon",
