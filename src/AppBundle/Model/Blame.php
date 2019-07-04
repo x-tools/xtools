@@ -14,6 +14,9 @@ class Blame extends Authorship
     /** @var array|null Matches, keyed by revision ID, each with keys 'edit' <Edit> and 'tokens' <string[]>. */
     protected $matches;
 
+    /** @var Edit|null Target revision that is being blamed. */
+    protected $asOf;
+
     /**
      * Blame constructor.
      * @param Page $page The page to process.
@@ -46,12 +49,48 @@ class Blame extends Authorship
     }
 
     /**
+     * Get all the matches as Edits.
+     * @return Edit[]|null
+     */
+    public function getEdits(): ?array
+    {
+        return array_column($this->matches, 'edit');
+    }
+
+    /**
      * Strip out spaces, since they are not accounted for in the WikiWho API.
      * @return string
      */
     public function getTokenizedQuery(): string
     {
         return strtolower(preg_replace('/\s*/m', '', $this->query));
+    }
+
+    /**
+     * Get the first "token" of the search query. A "token" in this case is a word or group of syntax,
+     * roughly correlating to the token structure returned by the WikiWho API.
+     * @return string
+     */
+    public function getFirstQueryToken(): string
+    {
+        return strtolower(preg_split('/[\n\s]/', $this->query)[0]);
+    }
+
+    /**
+     * Get the target revision that is being blamed.
+     * @return Edit|null
+     */
+    public function getAsOf(): ?Edit
+    {
+        if (isset($this->asOf)) {
+            return $this->asOf;
+        }
+
+        $this->asOf = $this->target
+            ? $this->getRepository()->getEditFromRevId($this->page, $this->target)
+            : null;
+
+        return $this->asOf;
     }
 
     /**
@@ -89,6 +128,7 @@ class Blame extends Authorship
     }
 
     /**
+     * Find matches of search query in the given list of tokens.
      * @param array $tokens
      * @return array
      */
@@ -97,21 +137,43 @@ class Blame extends Authorship
         $matchData = [];
         $matchDataSoFar = [];
         $matchSoFar = '';
+        $firstQueryToken = $this->getFirstQueryToken();
+        $tokenizedQuery = $this->getTokenizedQuery();
 
         foreach ($tokens as $token) {
-            if (0 === strpos($this->getTokenizedQuery(), $matchSoFar.$token['str'])) {
-                $matchSoFar .= $token['str'];
+            // The previous matches plus the new token. This is basically a candidate for what may become $matchSoFar.
+            $newMatchSoFar = $matchSoFar.$token['str'];
+
+            // We first check if the first token of the query matches, because we want to allow for partial matches
+            // (e.g. for query "barbaz", the tokens ["foobar","baz"] should match).
+            if (false !== strpos($newMatchSoFar, $firstQueryToken)) {
+                // If the full query is in the new match, use it, otherwise use just the first token. This is because
+                // the full match may exist across multiple tokens, but the first match is only a partial match.
+                $newMatchSoFar = false !== strpos($newMatchSoFar, $tokenizedQuery)
+                    ? $newMatchSoFar
+                    : $firstQueryToken;
+            }
+
+            // Keep track of tokens that match. To allow partial matches,
+            // we check the query against $newMatchSoFar and vice versa.
+            if (false !== strpos($tokenizedQuery, $newMatchSoFar) ||
+                false !== strpos($newMatchSoFar, $tokenizedQuery)
+            ) {
+                $matchSoFar = $newMatchSoFar;
                 $matchDataSoFar[] = [
                     'id' => $token['o_rev_id'],
                     'editor' => $token['editor'],
                     'token' => $token['str'],
                 ];
             } elseif (!empty($matchSoFar)) {
+                // We hit a token that isn't in the query string, so start over.
                 $matchDataSoFar = [];
                 $matchSoFar = '';
             }
 
-            if ($matchSoFar === $this->getTokenizedQuery()) {
+            // A full match was found, so merge $matchDataSoFar into $matchData,
+            // and start over to see if there are more matches in the article.
+            if (false !== strpos($matchSoFar, $tokenizedQuery)) {
                 $matchData = array_merge($matchData, $matchDataSoFar);
                 $matchDataSoFar = [];
                 $matchSoFar = '';

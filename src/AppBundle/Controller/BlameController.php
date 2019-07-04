@@ -92,6 +92,11 @@ class BlameController extends XtoolsController
      */
     public function resultAction(string $target): Response
     {
+        if (!isset($this->params['q'])) {
+            return $this->redirectToRoute('BlameProject', [
+                'project' => $this->project->getDomain(),
+            ]);
+        }
         if (0 !== $this->page->getNamespace()) {
             $this->addFlashMessage('danger', 'error-authorship-non-mainspace');
             return $this->redirectToRoute('BlameProject', [
