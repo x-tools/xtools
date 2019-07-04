@@ -417,7 +417,7 @@
 	"tool-autoedits": "Automated Edits",
 	"tool-autoedits-desc": "Analysis of semi-automated and non-automated contributions",
 	"tool-blame": "Blame",
-	"tool-blame-desc": "Search the history of a page to find edits that added the given wikitext",
+	"tool-blame-desc": "Find edits that added the given wikitext",
 	"tool-categoryedits": "Category Edits",
 	"tool-categoryedits-desc": "Analysis of contributions made to specific categories",
 	"tool-editcounter": "Edit Counter",

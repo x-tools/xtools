@@ -57,7 +57,7 @@ class BlameTest extends TestAdapter
                             [
                                 'o_rev_id' => 1,
                                 'editor' => 'MusikAnimal',
-                                'str' => 'foo',
+                                'str' => 'loremfoo',
                             ], [
                                 'o_rev_id' => 1,
                                 'editor' => 'MusikAnimal',
