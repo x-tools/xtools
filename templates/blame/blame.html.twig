@@ -52,6 +52,16 @@
                                     <em>{{ blame.query }}</em>
                                 </td>
                             </tr>
+                            <tr>
+                                <td>{{ msg('blame-as-of') }}</td>
+                                <td>
+                                    {% if blame.asOf %}
+                                        {{ wiki.permaLink(blame.asOf) }}
+                                    {% else %}
+                                        {{ msg('latest-revision') }}
+                                    {% endif %}
+                                </td>
+                            </tr>
                         </tbody></table>
                     </div>
                 {% endset %}
