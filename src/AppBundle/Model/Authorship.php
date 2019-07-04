@@ -27,7 +27,7 @@ class Authorship extends Model
     protected $revision;
 
     /**
-     * ArticleInfo constructor.
+     * Authorship constructor.
      * @param Page $page The page to process.
      * @param string|null $target Either a revision ID or date in YYYY-MM-DD format. Null to use latest revision.
      * @param int $limit Max number of results.
@@ -138,7 +138,7 @@ class Authorship extends Model
 
     /**
      * Get the revision data from the WikiWho API and set $this->revision with basic info.
-     * If there are errors, they are placed in $this->errors and null will be returned.
+     * If there are errors, they are placed in $this->data['error'] and null will be returned.
      * @param bool $returnRevId Whether or not to include revision IDs in the response.
      * @return array|null null if there were errors.
      */
