@@ -1,5 +1,13 @@
 # Release Notes #
 
+## 3.10.3 ##
+- Blame: improve algorithm, allowing partial matches.
+- T177903: Show files renamed in Edit Counter.
+- T226228: Don't show file uploads/renames for Commons when Commons is
+  the requested project.
+- ArticleInfo: fix display of Authorship section.
+- Localization updates.
+
 ## 3.10.2 ##
 - Blame: remove BlameProjectPage route causing redirect loop.
 
