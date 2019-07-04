@@ -36,8 +36,11 @@ class AuthorshipRepository extends Repository
             .($revId ? "/$revId" : '')
             ."/?o_rev_id=$oRevId&editor=true&token_id=false&out=false&in=false";
 
-        // Ignore HTTP errors to fail gracefully.
-        $opts = ['http_errors' => false];
+        $opts = [
+            'http_errors' => false, // Ignore HTTP errors to fail gracefully.
+            'timeout' => 60,
+            'read_timeout' => 60,
+        ];
 
         // Use WikiWho API credentials, if present. They are not required.
         if ($this->container->hasParameter('app.wikiwho.username')) {
