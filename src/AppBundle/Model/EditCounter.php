@@ -606,8 +606,26 @@ class EditCounter extends UserRights
      */
     public function countFilesUploadedCommons(): int
     {
-        $logCounts = $this->getLogCounts();
-        return $logCounts['files_uploaded_commons'] ?: 0;
+        $fileCounts = $this->getRepository()->getFileCounts($this->project, $this->user);
+        return $fileCounts['files_uploaded_commons'] ?? 0;
+    }
+
+    /**
+     * Get the total number of files that were renamed (including those now deleted).
+     */
+    public function countFilesMoved(): int
+    {
+        $fileCounts = $this->getRepository()->getFileCounts($this->project, $this->user);
+        return $fileCounts['files_moved'] ?? 0;
+    }
+
+    /**
+     * Get the total number of files that were renamed on Commons (including those now deleted).
+     */
+    public function countFilesMovedCommons(): int
+    {
+        $fileCounts = $this->getRepository()->getFileCounts($this->project, $this->user);
+        return $fileCounts['files_moved_commons'] ?? 0;
     }
 
     /**

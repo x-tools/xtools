@@ -76,8 +76,7 @@ class EditCounterRepository extends UserRightsRepository
             SELECT 'created-deleted' AS `key`, COUNT(DISTINCT ar_page_id) AS `val`
                 FROM $archiveTable
                 WHERE ar_actor = :actorId AND ar_parent_id = 0
-            )
-        ";
+            )";
 
         $resultQuery = $this->executeProjectsQuery($sql, [
             'actorId' => $user->getActorId($project),
@@ -160,22 +159,71 @@ class EditCounterRepository extends UserRightsRepository
             }
         }
 
-        // Add Commons upload count, if applicable.
-        $logCounts['files_uploaded_commons'] = 0;
-        if ($this->isLabs() && !$user->isAnon()) {
-            $sql = "SELECT COUNT(log_id)
-                    FROM commonswiki_p.logging_userindex
-                    JOIN commonswiki_p.actor ON actor_id = log_actor
-                    WHERE log_type = 'upload' AND log_action = 'upload'
-                        AND actor_name = :username";
-            $resultQuery = $this->executeProjectsQuery($sql, [
-                'username' => $user->getUsername(),
-            ]);
-            $logCounts['files_uploaded_commons'] = (int)$resultQuery->fetchColumn();
-        }
-
         // Cache and return.
         return $this->setCache($cacheKey, $logCounts);
+    }
+
+    /**
+     * Get counts of files moved, and files moved/uploaded on Commons.
+     * Local file uploads are counted in getLogCounts() since we're querying the same rows anyway.
+     * @param Project $project
+     * @param User $user
+     * @return array
+     */
+    public function getFileCounts(Project $project, User $user): array
+    {
+        // Anons can't upload or move files.
+        if ($user->isAnon()) {
+            return [];
+        }
+
+        // Set up cache.
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_filecounts');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $loggingTable = $project->getTableName('logging');
+
+        $sqlParts = [
+            "SELECT 'files_moved' AS `key`, COUNT(log_id) AS `val`
+             FROM $loggingTable
+             WHERE log_actor = :actorId
+               AND log_type = 'move'
+               AND log_action = 'move'
+               AND log_namespace = 6",
+        ];
+
+        $bindings = ['actorId' => $user->getActorId($project)];
+
+        if ($this->isLabs() && 'commons.wikimedia.org' !== $project->getDomain()) {
+            $commonsProject = ProjectRepository::getProject('commonswiki', $this->container);
+            $loggingTableCommons = $commonsProject->getTableName('logging');
+            $sqlParts[] = "SELECT 'files_moved_commons' AS `key`, COUNT(log_id) AS `val`
+                           FROM $loggingTableCommons
+                           WHERE log_actor = :actorId2 AND log_type = 'move'
+                               AND log_action = 'move' AND log_namespace = 6";
+            $sqlParts[] = "SELECT 'files_uploaded_commons' AS `key`, COUNT(log_id) AS `val`
+                           FROM $loggingTableCommons
+                           WHERE log_actor = :actorId2 AND log_type = 'upload' AND log_action = 'upload'";
+            $bindings['actorId2'] = $user->getActorId($commonsProject);
+        }
+
+        $sql = '('.implode("\n) UNION (\n", $sqlParts).')';
+
+        $results = $this->executeProjectsQuery($sql, $bindings)->fetchAll();
+
+        $counts = array_combine(
+            array_map(function ($e) {
+                return $e['key'];
+            }, $results),
+            array_map(function ($e) {
+                return (int)$e['val'];
+            }, $results)
+        );
+
+        // Cache and return.
+        return $this->setCache($cacheKey, $counts);
     }
 
     /**

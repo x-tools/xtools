@@ -153,6 +153,8 @@
 	"feedback": "Feedback",
 	"file": "File",
 	"files": "Files",
+	"files-moved": "Files moved",
+	"files-moved-commons": "Files moved (Commons)",
 	"files-uploaded": "Files uploaded",
 	"files-uploaded-commons": "Files uploaded (Commons)",
 	"first-edit": "First edit",

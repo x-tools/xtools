@@ -286,14 +286,26 @@
             <tr>
                 <td>{{ msg('files-uploaded') }}</td>
                 <td>
-                    <a href="{{ wiki.pageUrlRaw('Special:ListFiles', project) }}/{{ user.username }}">{{ ec.countFilesUploaded|num_format }}</a>
+                    <a target="_blank" href="{{ wiki.pageUrlRaw('Special:ListFiles', project) }}/{{ user.username }}">{{ ec.countFilesUploaded|num_format }}</a>
                 </td>
             </tr>
-            {% if isWMFLabs() %}
+            <tr>
+                <td>{{ msg('files-moved') }}</td>
+                <td>
+                    {{ ec.countFilesMoved }}
+                </td>
+            </tr>
+            {% if isWMFLabs() and project.domain != 'commons.wikimedia.org' %}
                 <tr>
                     <td>{{ msg('files-uploaded-commons') }}</td>
                     <td>
-                        <a href="https://commons.wikimedia.org/wiki/Special:ListFiles/{{ user.username }}" >{{ ec.countFilesUploadedCommons|num_format }}</a>
+                        <a target="_blank" href="https://commons.wikimedia.org/wiki/Special:ListFiles/{{ user.username }}">{{ ec.countFilesUploadedCommons|num_format }}</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>{{ msg('files-moved-commons') }}</td>
+                    <td>
+                        {{ ec.countFilesMovedCommons }}
                     </td>
                 </tr>
             {% endif %}
