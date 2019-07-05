@@ -12,7 +12,8 @@
 			"Niridya",
 			"Ltrlg",
 			"Abijeet Patro",
-			"VIGNERON"
+			"VIGNERON",
+			"Derugon"
 		]
 	},
 	"abusefilter": "AbuseFilter",
@@ -72,6 +73,9 @@
 	"average-time-bw-edits-abbr": "temps moyen entre les modifications (atbe)",
 	"back": "Retour",
 	"basic-information": "Informations de base",
+	"blame-as-of": "À partir de",
+	"blame-as-of-desc": "L’utiliser pour effectuer une recherche de blâme sur des versions plus anciennes de l’article.",
+	"blame-query-desc": "La requête doit inclure le wikitext souligné.",
 	"block": "Blocages",
 	"block-current": "Blocage actuel",
 	"block-log": "Journal des blocages",
