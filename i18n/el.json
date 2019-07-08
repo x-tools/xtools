@@ -3,7 +3,8 @@
 		"authors": [
 			"Nikosgranturismogt",
 			"Geraki",
-			"Abijeet Patro"
+			"Abijeet Patro",
+			"Panos78"
 		]
 	},
 	"accepted-formats": "Επιτρεπόμενες μορφές",
@@ -370,7 +371,7 @@
 	"tool-autoedits": "Αυτοματοποιημένες επεξεργασίες",
 	"tool-autoedits-desc": "Ανάλυση των ημιαυτόματων και μη-αυτόματων επεξεργασιών.",
 	"tool-blame": "Κριτική άρθρου",
-	"tool-blame-desc": "Εύρεση προσθήκης κειμένου στο ιστορικό σελίδας",
+	"tool-blame-desc": "Εύρεση επεξεργασιών που πρόσθεσαν το δοθέν κείμενο wiki",
 	"tool-categoryedits": "Επεξεργασίες στις κατηγορίες",
 	"tool-categoryedits-desc": "Ανάλυση των συνεισφορών που έχουν γίνει σε συγκεκριμένες κατηγορίες",
 	"tool-editcounter": "Μετρητής επεξεργασιών",
