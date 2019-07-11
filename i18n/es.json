@@ -154,6 +154,8 @@
 	"feedback": "Comentarios",
 	"file": "Archivo",
 	"files": "Archivos",
+	"files-moved": "Archivos trasladados",
+	"files-moved-commons": "Archivos trasladados (Commons)",
 	"files-uploaded": "Archivos subidos",
 	"files-uploaded-commons": "Archivos subidos (Commons)",
 	"first-edit": "Primera edición",
