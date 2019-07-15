@@ -10,7 +10,8 @@
 			"McDutchie",
 			"Pierpao",
 			"Robby",
-			"A2093064"
+			"A2093064",
+			"Urhixidur"
 		]
 	},
 	"abusefilter": "Name of for [[Special:AbuseFilter]]. Used to indicate how many changes a user made to AbuseFilters.",
@@ -28,7 +29,7 @@
 	"admins": "Name for the sysop user group. Used to select which user group to show in the Admin Stats tool.\n{{Identical|Admin}}",
 	"afd": "Articles for deletion page label",
 	"aiv": "Administrator intervention against vandalism page label",
-	"aiv-desc": "Further description for aiv.  $1 is the unformatted number, $2 is a formatted number",
+	"aiv-desc": "Further description for aiv.  $1 is the unformatted number, $2 is a formatted number. It's \"edits to [Administrator Intervention against Vandalism] pages\".",
 	"all": "{{Identical|All}}",
 	"all-approximate": "Message indicating all data on the page is approximate.",
 	"all-edits": "Label for the line representing the number of total edits an article received over time.",
