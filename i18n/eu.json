@@ -6,7 +6,8 @@
 			"Sator",
 			"Theklan",
 			"Xabier Armendaritz",
-			"Abijeet Patro"
+			"Abijeet Patro",
+			"An13sa"
 		]
 	},
 	"accepted-formats": "Onarturiko formatuak",
@@ -430,7 +431,7 @@
 	"view-source": "Iturria ikusi",
 	"view-wikitext": "Wikitext gisa ikusi",
 	"vote-msg": "$1 wikilariak $3 eremuko $2 orri editatu ditu!",
-	"web-chat": "WebTxata",
+	"web-chat": "Konektatu",
 	"wednesday": "asteazkena",
 	"wiki": "Wiki",
 	"wikiproject": "WikiProiektua",
