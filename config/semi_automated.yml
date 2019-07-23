@@ -497,9 +497,16 @@ parameters:
             regex: '^Uploaded using Android Commons app$'
             link: Special:MyLanguage/Commons:Mobile_app
             namespaces: [6]
+        Cat-a-lot:
+            tag: Cat-a-lot
+            link: Special:MyLanguage/Help:Gadget-Cat-a-lot
         Commonsist:
             regex: '^commonist \d\.\d'
             link: Special:MyLanguage/Commons:Commonist
+            namespaces: [6]
+        CropTool:
+            tag: 'OAuth CID: 593'
+            link: Special:MyLanguage/Commons:CropTool
             namespaces: [6]
         Flickr2Commons:
             regex: 'via \[\[(?:Special:MyLanguage\/)?Commons:Flickr2Commons'
@@ -509,6 +516,9 @@ parameters:
             regex: 'Transferred from geograph.co.uk using'
             link: Special:GoToInterwiki/toollabs:geograph2commons
             namespaces: [6]
+        HotCat:
+            tag: HotCat
+            link: Special:MyLanguage/Help:Gadget-HotCat
         POTY:
             regex: '\[\[Help:(?:Gadget-)EnhancedPOTY.js|POTY App\]\]$'
             link: Help:Gadget-EnhancedPOTY.js
@@ -519,6 +529,7 @@ parameters:
             namespaces: [3, 6]
         RenameLink:
             regex: '^\(\[\[Help:RenameLink\|Script'
+            tag: RenameLink
             link: Special:MyLanguage/Help:RenameLink
         RotateLink:
             regex: '\(\[\[Help:RotateLink\|Script'
