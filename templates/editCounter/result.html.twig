@@ -126,7 +126,7 @@
         {% endif %}
 
         {% if not(user.anon) %}
-            {% if 'rights-changes' in sections and ec.rightsChanges|length > 0 or ec.globalRightsChanges|length > 0 %}
+            {% if 'rights-changes' in sections and (ec.rightsChanges|length > 0 or ec.globalRightsChanges|length > 0) %}
                 {% set content %}
                     {% include 'editCounter/rights_changes.html.twig' with {
                         'is_sub_request': true,
