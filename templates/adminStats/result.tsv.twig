@@ -1,0 +1,9 @@
+{% set columns = ['username', 'total']|merge(as.actions) %}
+#	{% for thKey in columns %}
+{{ msg(thKey)|ucfirst }}{% if not loop.last %}	{% endif %}
+{% endfor %}
+
+{% for user in as.stats %}
+{{ loop.index }}	{{ user.username }}	{{ user.total }}	{% for action in as.actions %}{{ user[action] }}{% if not loop.last %}	{% endif %}{% endfor %}
+
+{% endfor %}

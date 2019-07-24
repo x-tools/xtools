@@ -1,0 +1,27 @@
+{% import 'macros/wiki.html.twig' as wiki %}
+== {{ project.title }} ==
+
+{% set link %}[{{ url('AdminStatsResult', {'project': project.domain, 'start': as.start|date_format('yyyy-MM-dd'), 'end': as.end|date_format('yyyy-MM-dd'), 'group': as.type, 'actions': as.actions|join('|')}) }} {{ msg('xtools-title') }}]{% endset %}
+{{ msg('xtools-advert', [link, date()|date_format]) }}
+
+{| class="wikitable sortable"
+! #
+{% for key in ['username', 'user-groups', 'total'] %}
+! {{ msg(key) }}
+{% endfor %}
+{% for key in as.actions %}
+! {{ msg(key)|ucfirst }}
+{% endfor %}
+|-
+{% for user in as.stats %}
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ loop.index }}}}
+| [[User:{{ user.username }}|{{ user.username }}]]
+| {% for group, fileTitle in as.userGroupIcons(true) if group in user['user-groups'] %}[[File:{{ fileTitle }}|18px|alt={{ rightsNames[group] }}]]{% endfor %}
+
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ user.total }}}}
+{% for action in as.actions %}
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ user[action] }}}}
+{% endfor %}
+|-
+{% endfor %}
+|}
