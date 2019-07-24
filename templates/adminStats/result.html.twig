@@ -120,7 +120,17 @@
                 </tbody>
             </table>
         {% endset %}
-        {{ layout.content_block(as.type ~ 's', content) }}
+
+        {% set params = {'project': project.domain, 'start': as.start|date_format('yyyy-MM-dd'), 'end': as.end|date_format('yyyy-MM-dd'), 'group': as.type, 'actions': as.actions|join('|')} %}
+        {% set jsonLink %}
+            <li>
+                <a target="_blank" class="download-link download-json" href="{{ path('ProjectApiAdminStats', params) }}">{{ msg('json') }}</a>
+            </li>
+        {% endset %}
+        {% set downloadLink %}
+            {{ layout.downloadLink('AdminStatsResult', params, ['wikitext', 'csv', 'tsv'], jsonLink) }}
+        {% endset %}
+        {{ layout.content_block(as.type ~ 's', content, downloadLink) }}
     </div>
 </div>
 {% endblock %}

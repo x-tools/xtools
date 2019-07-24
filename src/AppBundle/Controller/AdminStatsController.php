@@ -256,17 +256,17 @@ class AdminStatsController extends XtoolsController
     }
 
     /**
-     * Same as adminStatsApiAction except it accepts dates.
+     * Get Admin Stats data as JSON.
      * @Route(
      *     "/api/project/{group}_stats/{project}/{start}/{end}",
-     *     name="ProjectApiAdminStatsDates",
+     *     name="ProjectApiAdminStats",
      *     requirements={"start"="|\d{4}-\d{2}-\d{2}", "end"="|\d{4}-\d{2}-\d{2}", "group"="admin|patroller|steward"},
      *     defaults={"start"=false, "end"=false, "group"="admin"}
      * )
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function adminStatsDatesApiAction(): JsonResponse
+    public function adminStatsApiAction(): JsonResponse
     {
         $this->recordApiUsage('project/adminstats');
 

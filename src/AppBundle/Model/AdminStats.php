@@ -136,17 +136,26 @@ class AdminStats extends Model
 
     /**
      * Get all user groups with permissions applicable to the $this->group.
+     * @param bool $wikiPath Whether to return the title for the on-wiki image, instead of full URL.
      * @return array Each entry contains 'name' (user group) and 'rights' (the permissions).
      */
-    public function getUserGroupIcons(): array
+    public function getUserGroupIcons(bool $wikiPath = false): array
     {
         // Quick cache, valid only for the same request.
         static $userGroupIcons = null;
         if (null !== $userGroupIcons) {
-            return $userGroupIcons;
+            $out = $userGroupIcons;
+        } else {
+            $out = $userGroupIcons = $this->getRepository()->getUserGroupIcons();
         }
-        $userGroupIcons = $this->getRepository()->getUserGroupIcons();
-        return $userGroupIcons;
+
+        if ($wikiPath) {
+            $out = array_map(function ($url) {
+                return str_replace('.svg.png', '.svg', preg_replace('/.*\/18px\-/', '', $url));
+            }, $out);
+        }
+
+        return $out;
     }
 
     /**
