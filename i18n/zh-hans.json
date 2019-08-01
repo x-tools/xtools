@@ -13,7 +13,8 @@
 			"科劳",
 			"Abijeet Patro",
 			"神樂坂秀吉",
-			"SinonJZH"
+			"SinonJZH",
+			"VulpesVulpes825"
 		]
 	},
 	"abusefilter": "滥用过滤器",
@@ -163,6 +164,8 @@
 	"feedback": "反馈",
 	"file": "文件",
 	"files": "文件",
+	"files-moved": "已移动文件",
+	"files-moved-commons": "已移动文件（维基共享资源）",
 	"files-uploaded": "文件上传数",
 	"files-uploaded-commons": "文件上传数（共享资源）",
 	"first-edit": "首次编辑",
@@ -427,7 +430,7 @@
 	"tool-autoedits": "自动化编辑",
 	"tool-autoedits-desc": "分析半自动与非自动贡献。",
 	"tool-blame": "条目责任",
-	"tool-blame-desc": "在页面历史中发现添加的文本",
+	"tool-blame-desc": "找出有添加指定 wiki 语法的编辑",
 	"tool-categoryedits": "分类编辑",
 	"tool-categoryedits-desc": "对指定分类所做贡献的分析",
 	"tool-editcounter": "编辑计数器",
