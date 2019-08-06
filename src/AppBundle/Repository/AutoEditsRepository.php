@@ -50,18 +50,6 @@ class AutoEditsRepository extends UserRepository
     }
 
     /**
-     * Is the tag for given tool intended to be counted by itself? For instance,
-     * when counting Rollback edits we don't want to also count Huggle edits (which are tagged as Rollback).
-     * @param Project $project
-     * @param string|null $tool
-     * @return bool
-     */
-    private function usesSingleTag(Project $project, ?string $tool): bool
-    {
-        return isset($this->getTools($project)[$tool]['single_tag']);
-    }
-
-    /**
      * Get the number of edits this user made using semi-automated tools.
      * @param Project $project
      * @param User $user
@@ -241,20 +229,7 @@ class AutoEditsRepository extends UserRepository
 
         if ('' != $tagIds) {
             $tagJoin = "LEFT OUTER JOIN $tagTable ON (ct_rev_id = revs.rev_id)";
-            if ($this->usesSingleTag($project, $tool)) {
-                // Only show edits made with the tool that don't overlap with other tools.
-                // For instance, Huggle edits are also tagged as Rollback, but when viewing
-                // Rollback edits we don't want to show Huggle edits.
-                $condsTool[] = "
-                    EXISTS (
-                        SELECT COUNT(ct_tag_id) AS tag_count
-                        FROM $tagTable
-                        WHERE ct_rev_id = revs.rev_id
-                        HAVING tag_count = 1 AND ct_tag_id = $tagIds
-                    )";
-            } else {
-                $condsTool[] = "ct_tag_id IN ($tagIds)";
-            }
+            $condsTool[] = "ct_tag_id IN ($tagIds)";
         }
 
         $sql = "SELECT
@@ -369,7 +344,7 @@ class AutoEditsRepository extends UserRepository
         $conn = $this->getProjectsConnection();
 
         foreach ($tools as $toolName => $values) {
-            [$condTool, $commentJoin, $tagJoin] = $this->getInnerAutomatedCountsSql($project, $values);
+            [$condTool, $commentJoin, $tagJoin] = $this->getInnerAutomatedCountsSql($project, $toolName, $values);
 
             $toolName = $conn->quote($toolName, \PDO::PARAM_STR);
 
@@ -399,10 +374,11 @@ class AutoEditsRepository extends UserRepository
     /**
      * Get some of the inner SQL for self::getAutomatedCountsSql().
      * @param Project $project
+     * @param string $toolName
      * @param string[] $values Values as defined in semi_automated.yml
      * @return string[] [Equality clause, JOIN clause]
      */
-    private function getInnerAutomatedCountsSql(Project $project, array $values): array
+    private function getInnerAutomatedCountsSql(Project $project, string $toolName, array $values): array
     {
         $conn = $this->getProjectsConnection();
         $commentJoin = '';
@@ -420,17 +396,7 @@ class AutoEditsRepository extends UserRepository
             $tagJoin = "LEFT OUTER JOIN $tagTable ON ct_rev_id = rev_id";
 
             $tagId = $this->getTags($project)[$values['tag']];
-
-            // This ensures we count only edits made with the given tool, and not other
-            // edits that incidentally have the same tag. For instance, Huggle edits
-            // are also tagged as Rollback, but we want to make them mutually exclusive.
-            $tagClause = "
-                EXISTS (
-                    SELECT COUNT(ct_tag_id) AS tag_count
-                    FROM $tagTable
-                    WHERE ct_rev_id = rev_id
-                    HAVING tag_count = 1 AND ct_tag_id = $tagId
-                )";
+            $tagClause = $this->getTagsExclusionsSql($project, $toolName, [$tagId]);
 
             // Use tags in addition to the regex clause, if already present.
             // Tags are more reliable but may not be present for edits made with
@@ -438,7 +404,7 @@ class AutoEditsRepository extends UserRepository
             if ('' === $condTool) {
                 $condTool = $tagClause;
             } else {
-                $condTool = '(' . $condTool . " OR $tagClause)";
+                $condTool = "($condTool OR $tagClause)";
             }
         }
 
@@ -451,7 +417,8 @@ class AutoEditsRepository extends UserRepository
      * @param bool $nonAutoEdits Set to true to exclude tools with the 'contribs' flag.
      * @param string|null $tool
      * @param int|string|null $namespace Tools only used in given namespace ID, or 'all' for all namespaces.
-     * @return array In the format: ['combined|regex', [1,2,3]] where the second element contains the tag IDs.
+     * @return array In the format: ['combined|regex', '1,2,3'] where the second element is a
+     *   comma-separated list of the tag IDs, ready to be used in SQL.
      */
     private function getToolRegexAndTags(
         Project $project,
@@ -498,7 +465,7 @@ class AutoEditsRepository extends UserRepository
      * Get the IDs of tags for given Project, which are used in the IN clauses of other queries above.
      * This join decomposition is actually faster than JOIN'ing on change_tag_def all in one query.
      * @param Project $project
-     * @return int[]
+     * @return int[] Keys are the tag name, values are the IDs.
      */
     public function getTags(Project $project): array
     {
@@ -526,5 +493,34 @@ class AutoEditsRepository extends UserRepository
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);
+    }
+
+    /**
+     * Generate the WHERE clause to query for the given tags, filtering out exclusions ('tag_excludes' option).
+     * For instance, Huggle edits are also tagged as Rollback, but when viewing
+     * Rollback edits we don't want to show Huggle edits.
+     * @param Project $project
+     * @param string $tool
+     * @param array $tagIds
+     * @return string
+     */
+    private function getTagsExclusionsSql(Project $project, string $tool, array $tagIds): string
+    {
+        $tagsList = implode(',', $tagIds);
+        $tagExcludes = $this->getTools($project)[$tool]['tag_excludes'] ?? [];
+        $excludesSql = '';
+
+        if ($tagExcludes && 1 === count($tagIds)) {
+            // Get tag IDs, filtering out those for which no ID exists (meaning there is no local tag for that tool).
+            $excludesList = implode(',', array_filter(array_map(function ($tagName) use ($project) {
+                return $this->getTags($project)[$tagName] ?? null;
+            }, $tagExcludes)));
+
+            if (strlen($excludesList)) {
+                $excludesSql = "AND ct_tag_id NOT IN ($excludesList)";
+            }
+        }
+
+        return "ct_tag_id IN ($tagsList) $excludesSql";
     }
 }

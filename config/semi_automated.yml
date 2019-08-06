@@ -5,9 +5,8 @@
 #   Tool name:
 #       regex: Regular expression to match against edit summary
 #       tag: Tag name for the tool, if applicable. See [[Special:Tags]] for full list
-#       single_tag: Set to true to look for edits that *only* have this tag. This is used primarily
-#           for rollback, so that you can see true system rollback and not edits by other tools
-#           that use rollback.
+#       tag_excludes: Don't count edits that also use this tag. This is used for example to
+#           hide Huggle edits when viewing Rollback edits.
 #       link: Wiki link to tool documentation
 #       label: Text to use as the label, defaults to the tool's key. Use this for translations.
 #       revert: If the tool is used *only* to revert edits (and not also issue talk page
@@ -31,7 +30,7 @@ parameters:
     # These tools work on multiple wikis. These should probably include tags
     #   as the regex may not apply to non-English wikis.
     # You can also set wiki-specific regex that will get merged into the global regex.
-    # Other local values such as link, tag and revert are overriden, not merged into the global value.
+    # Other local values such as link, tag and revert are overridden, not merged into the global value.
     # See 'Huggle' under 'global' and 'en.wikipedia.org' for an example.
     global:
         AutoWikiBrowser:
@@ -55,7 +54,8 @@ parameters:
             namespaces: [0, 2, 118]
         Generic rollback:
             tag: mw-rollback
-            single_tag: true
+            tag_excludes:
+                - huggle
             regex: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) edits by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\]( \(\[\[User talk:.*?\|talk\]\]\))? to last (version|revision) by .*'
             link: Special:MyLanguage/Project:Rollback
             revert: true
@@ -93,7 +93,6 @@ parameters:
             link: Project:ReFill
         Undo:
             tag: mw-undo
-            single_tag: true
             tag_excludes:
                 - mw-rollback
                 - huggle

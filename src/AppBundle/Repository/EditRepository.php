@@ -65,9 +65,9 @@ class EditRepository extends Repository
     /**
      * Use the Compare API to get HTML for the diff.
      * @param Edit $edit
-     * @return string Raw HTML, must be wrapped in a <table> tag.
+     * @return string|null Raw HTML, must be wrapped in a <table> tag. Null if no comparison found.
      */
-    public function getDiffHtml(Edit $edit): string
+    public function getDiffHtml(Edit $edit): ?string
     {
         $params = [
             'action' => 'compare',
@@ -76,6 +76,6 @@ class EditRepository extends Repository
         ];
 
         $res = $this->executeApiRequest($edit->getProject(), $params);
-        return $res['compare']['*'];
+        return $res['compare']['*'] ?? null;
     }
 }

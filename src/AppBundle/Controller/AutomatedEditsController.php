@@ -201,7 +201,7 @@ class AutomatedEditsController extends XtoolsController
      *   },
      *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=0}
      * )
-     * @return Response|RedirectResponse
+     * @return Response
      * @codeCoverageIgnore
      */
     public function automatedEditsAction(): Response

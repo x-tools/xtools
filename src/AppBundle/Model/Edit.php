@@ -402,9 +402,9 @@ class Edit extends Model
 
     /**
      * Get HTML for the diff of this Edit.
-     * @return string Raw HTML, must be wrapped in a <table> tag.
+     * @return string|null Raw HTML, must be wrapped in a <table> tag. Null if no comparison could be made.
      */
-    public function getDiffHtml(): string
+    public function getDiffHtml(): ?string
     {
         return $this->getRepository()->getDiffHtml($this);
     }
