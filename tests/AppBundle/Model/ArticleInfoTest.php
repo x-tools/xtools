@@ -107,6 +107,7 @@ class ArticleInfoTest extends TestAdapter
      */
     public function testTooManyRevisions(): void
     {
+        /** @var PageRepository|\PHPUnit_Framework_MockObject_MockObject $pageRepo */
         $pageRepo = $this->getMock(PageRepository::class);
         $pageRepo->expects($this->once())
             ->method('getNumRevisions')
@@ -139,6 +140,7 @@ class ArticleInfoTest extends TestAdapter
 
     public function testLinksAndRedirects(): void
     {
+        /** @var PageRepository|\PHPUnit_Framework_MockObject_MockObject $pageRepo */
         $pageRepo = $this->getMock(PageRepository::class);
         $pageRepo->expects($this->once())
             ->method('countLinksAndRedirects')
@@ -281,6 +283,7 @@ class ArticleInfoTest extends TestAdapter
     {
         $this->setupData();
 
+        /** @var ArticleInfoRepository|\PHPUnit_Framework_MockObject_MockObject $articleInfoRepo */
         $articleInfoRepo = $this->getMock(ArticleInfoRepository::class);
         $articleInfoRepo->expects($this->once())
             ->method('getLogEvents')
@@ -321,6 +324,7 @@ class ArticleInfoTest extends TestAdapter
     {
         // ArticleInfo::updateToolCounts relies on there being entries in
         // semi_automated.yml for the project the edits were made on.
+        /** @var PageRepository|\PHPUnit_Framework_MockObject_MockObject $pageRepo */
         $projectRepo = $this->getMock(ProjectRepository::class);
         $projectRepo->expects($this->once())
             ->method('getOne')

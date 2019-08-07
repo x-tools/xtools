@@ -24,7 +24,7 @@ class ArticleInfoRepository extends Repository
      * @param false|int $end
      * @return Statement resolving with keys 'count', 'username' and 'current'.
      */
-    public function getBotData(Page $page, $start, $end): Statement
+    public function getBotData(Page $page, $start, $end, $count = false): Statement
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'page_botdata');
         if ($this->cache->hasItem($cacheKey)) {
@@ -39,19 +39,27 @@ class ArticleInfoRepository extends Repository
 
         $datesConditions = $this->getDateConditions($start, $end);
 
-        $sql = "SELECT COUNT(DISTINCT(rev_id)) AS count, actor_name AS username, '1' AS current
+        if ($count) {
+            $actorSelect = '';
+            $groupBy = '';
+        } else {
+            $actorSelect = 'actor_name AS username, ';
+            $groupBy = 'GROUP BY actor_user';
+        }
+
+        $sql = "SELECT COUNT(DISTINCT(rev_id)) AS count, $actorSelect '1' AS current
                 FROM $revTable
                 JOIN $actorTable ON actor_id = rev_actor
                 LEFT JOIN $userGroupsTable ON actor_user = ug_user
                 WHERE rev_page = :pageId AND ug_group = 'bot' $datesConditions
-                GROUP BY actor_user
+                $groupBy
                 UNION
-                SELECT COUNT(DISTINCT(rev_id)) AS count, actor_name AS username, '0' AS current
+                SELECT COUNT(DISTINCT(rev_id)) AS count, $actorSelect '0' AS current
                 FROM $revTable
                 JOIN $actorTable ON actor_id = rev_actor
                 LEFT JOIN $userFormerGroupsTable ON actor_user = ufg_user
                 WHERE rev_page = :pageId AND ufg_group = 'bot' $datesConditions
-                GROUP BY actor_user";
+                $groupBy";
 
         $result = $this->executeProjectsQuery($sql, ['pageId' => $page->getId()]);
         return $this->setCache($cacheKey, $result);
@@ -181,5 +189,86 @@ class ArticleInfoRepository extends Repository
         ])->fetchAll();
 
         return $this->setCache($cacheKey, $result);
+    }
+
+    /**
+     * Get various basic info used in the API, including the number of revisions, unique authors, initial author
+     * and edit count of the initial author. This is combined into one query for better performance. Caching is only
+     * applied if it took considerable time to process, because using the gadget, this will get hit for a different page
+     * constantly, where the likelihood of cache benefiting us is slim.
+     * @param Page $page The page.
+     * @return string[]|false false if the page was not found.
+     */
+    public function getBasicEditingInfo(Page $page)
+    {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'page_basicinfo');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $revTable = $page->getProject()->getTableName('revision');
+        $userTable = $page->getProject()->getTableName('user');
+        $pageTable = $page->getProject()->getTableName('page');
+        $actorTable = $page->getProject()->getTableName('actor');
+
+        $sql = "SELECT *, (
+                    SELECT user_editcount
+                    FROM $userTable
+                    WHERE user_id = author_user_id
+                ) AS author_editcount
+                FROM (
+                    (
+                        SELECT COUNT(rev_id) AS num_edits,
+                            COUNT(DISTINCT(rev_actor)) AS num_editors,
+                            SUM(rev_minor_edit) AS minor_edits
+                        FROM $revTable
+                        WHERE rev_page = :pageid
+                        AND rev_timestamp > 0 # Use rev_timestamp index
+                    ) a,
+                    (
+                        # With really old pages, the rev_timestamp may need to be sorted ASC,
+                        #   and the lowest rev_id may not be the first revision.
+                        SELECT actor_name AS author,
+                               actor_user AS author_user_id,
+                               rev_timestamp AS created_at,
+                               rev_id AS created_rev_id
+                        FROM $revTable
+                        JOIN $actorTable ON actor_id = rev_actor
+                        WHERE rev_page = :pageid
+                        ORDER BY rev_timestamp ASC
+                        LIMIT 1
+                    ) b,
+                    (
+                        SELECT rev_timestamp AS modified_at,
+                               rev_id AS modified_rev_id
+                        FROM $revTable
+                        JOIN $pageTable ON page_id = rev_page
+                        WHERE rev_page = :pageid
+                        AND rev_id = page_latest
+                    ) c
+                )";
+        $params = ['pageid' => $page->getId()];
+
+        // Get current time so we can compare timestamps
+        // and decide whether or to cache the result.
+        $time1 = time();
+
+        /**
+         * This query can sometimes take too long to run for pages with tens of thousands
+         * of revisions. This query is used by the ArticleInfo gadget, which shows basic
+         * data in real-time, so if it takes too long than the user probably didn't even
+         * wait to see the result. We'll pass 60 as the last parameter to executeProjectsQuery,
+         * which will set the max_statement_time to 60 seconds.
+         */
+        $result = $this->executeProjectsQuery($sql, $params, 60)->fetch();
+
+        $time2 = time();
+
+        // If it took over 5 seconds, cache the result for 20 minutes.
+        if ($time2 - $time1 > 5) {
+            $this->setCache($cacheKey, $result, 'PT20M');
+        }
+
+        return $result ?? false;
     }
 }

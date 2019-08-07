@@ -14,7 +14,6 @@ use AppBundle\Model\Authorship;
 use AppBundle\Model\Page;
 use AppBundle\Model\Project;
 use AppBundle\Repository\ArticleInfoRepository;
-use DateTime;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,6 +26,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class ArticleInfoController extends XtoolsController
 {
+    /** @var ArticleInfo The ArticleInfo class that does all the work. */
+    protected $articleInfo;
+
     /**
      * Get the name of the tool's index route. This is also the name of the associated model.
      * @return string
@@ -61,6 +63,22 @@ class ArticleInfoController extends XtoolsController
             'end' => '',
             'page' => '',
         ], $this->params, ['project' => $this->project]));
+    }
+
+    /**
+     * Setup the ArticleInfo instance and its Repository.
+     */
+    private function setupArticleInfo(): void
+    {
+        if (isset($this->articleInfo)) {
+            return;
+        }
+
+        $articleInfoRepo = new ArticleInfoRepository();
+        $articleInfoRepo->setContainer($this->container);
+        $this->articleInfo = new ArticleInfo($this->page, $this->container, $this->start, $this->end);
+        $this->articleInfo->setRepository($articleInfoRepo);
+        $this->articleInfo->setI18nHelper($this->container->get('app.i18n_helper'));
     }
 
     /**
@@ -145,19 +163,13 @@ class ArticleInfoController extends XtoolsController
             ]);
         }
 
-        $articleInfoRepo = new ArticleInfoRepository();
-        $articleInfoRepo->setContainer($this->container);
-        $articleInfo = new ArticleInfo($this->page, $this->container, $this->start, $this->end);
-        $articleInfo->setRepository($articleInfoRepo);
-        $articleInfo->setI18nHelper($this->container->get('app.i18n_helper'));
-
-        $articleInfo->prepareData();
+        $this->setupArticleInfo();
+        $this->articleInfo->prepareData();
 
         $maxRevisions = $this->container->getParameter('app.max_page_revisions');
 
         // Show message if we hit the max revisions.
-        if ($articleInfo->tooManyRevisions()) {
-            // FIXME: i18n number_format?
+        if ($this->articleInfo->tooManyRevisions()) {
             $this->addFlashMessage('notice', 'too-many-revisions', [
                 $i18n->numberFormat($maxRevisions),
                 $maxRevisions,
@@ -165,7 +177,7 @@ class ArticleInfoController extends XtoolsController
         }
 
         // For when there is very old data (2001 era) which may cause miscalculations.
-        if ($articleInfo->getFirstEdit()->getYear() < 2003) {
+        if ($this->articleInfo->getFirstEdit()->getYear() < 2003) {
             $this->addFlashMessage('warning', 'old-page-notice');
         }
 
@@ -176,7 +188,7 @@ class ArticleInfoController extends XtoolsController
             'editorlimit' => $this->request->query->get('editorlimit', 20),
             'botlimit' => $this->request->query->get('botlimit', 10),
             'pageviewsOffset' => 60,
-            'ai' => $articleInfo,
+            'ai' => $this->articleInfo,
             'showAuthorship' => Authorship::isSupportedPage($this->page),
         ];
 
@@ -214,79 +226,14 @@ class ArticleInfoController extends XtoolsController
     {
         $this->recordApiUsage('page/articleinfo');
 
-        $data = $this->getArticleInfoApiData($this->project, $this->page);
+        $this->setupArticleInfo();
+        $data = $this->articleInfo->getArticleInfoApiData($this->project, $this->page);
 
         if ('html' === $this->request->query->get('format')) {
             return $this->getApiHtmlResponse($this->project, $this->page, $data);
         }
 
         return $this->getFormattedApiResponse($data);
-    }
-
-    /**
-     * Generate the data structure that will used in the ArticleInfo API response.
-     * @param Project $project
-     * @param Page $page
-     * @return array
-     * @codeCoverageIgnore
-     */
-    private function getArticleInfoApiData(Project $project, Page $page): array
-    {
-        /** @var int $pageviewsOffset Number of days to query for pageviews */
-        $pageviewsOffset = 30;
-
-        $data = [
-            'project' => $project->getDomain(),
-            'page' => $page->getTitle(),
-            'watchers' => (int) $page->getWatchers(),
-            'pageviews' => $page->getLastPageviews($pageviewsOffset),
-            'pageviews_offset' => $pageviewsOffset,
-        ];
-
-        $info = false;
-
-        try {
-            $info = $page->getBasicEditingInfo();
-        } catch (\Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException $e) {
-            // No more open database connections.
-            $data['error'] = 'Unable to fetch revision data. Please try again later.';
-        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
-            /**
-             * The query most likely exceeded the maximum query time,
-             * so we'll abort and give only info retrieved by the API.
-             */
-            $data['error'] = 'Unable to fetch revision data. The query may have timed out.';
-        }
-
-        if (false !== $info) {
-            $creationDateTime = DateTime::createFromFormat('YmdHis', $info['created_at']);
-            $modifiedDateTime = DateTime::createFromFormat('YmdHis', $info['modified_at']);
-            $secsSinceLastEdit = (new DateTime)->getTimestamp() - $modifiedDateTime->getTimestamp();
-
-            // Some wikis (such foundation.wikimedia.org) may be missing the creation date.
-            $creationDateTime = false === $creationDateTime
-                ? null
-                : $creationDateTime->format('Y-m-d');
-
-            $assessment = $page->getProject()
-                ->getPageAssessments()
-                ->getAssessment($page);
-
-            $data = array_merge($data, [
-                'revisions' => (int) $info['num_edits'],
-                'editors' => (int) $info['num_editors'],
-                'author' => $info['author'],
-                'author_editcount' => (int) $info['author_editcount'],
-                'created_at' => $creationDateTime,
-                'created_rev_id' => $info['created_rev_id'],
-                'modified_at' => $modifiedDateTime->format('Y-m-d H:i'),
-                'secs_since_last_edit' => $secsSinceLastEdit,
-                'last_edit_id' => (int) $info['modified_rev_id'],
-                'assessment' => $assessment,
-            ]);
-        }
-
-        return $data;
     }
 
     /**
@@ -329,12 +276,8 @@ class ArticleInfoController extends XtoolsController
     {
         $this->recordApiUsage('page/prose');
 
-        $articleInfoRepo = new ArticleInfoRepository();
-        $articleInfoRepo->setContainer($this->container);
-        $articleInfo = new ArticleInfo($this->page, $this->container);
-        $articleInfo->setRepository($articleInfoRepo);
-
-        return $this->getFormattedApiResponse($articleInfo->getProseStats());
+        $this->setupArticleInfo();
+        return $this->getFormattedApiResponse($this->articleInfo->getProseStats());
     }
 
     /**
@@ -386,7 +329,6 @@ class ArticleInfoController extends XtoolsController
     public function linksApiAction(): JsonResponse
     {
         $this->recordApiUsage('page/links');
-
         return $this->getFormattedApiResponse($this->page->countLinksAndRedirects());
     }
 
@@ -413,12 +355,8 @@ class ArticleInfoController extends XtoolsController
     {
         $this->recordApiUsage('page/top_editors');
 
-        $articleInfoRepo = new ArticleInfoRepository();
-        $articleInfoRepo->setContainer($this->container);
-        $articleInfo = new ArticleInfo($this->page, $this->container, $this->start, $this->end);
-        $articleInfo->setRepository($articleInfoRepo);
-
-        $topEditors = $articleInfo->getTopEditorsByEditCount(
+        $this->setupArticleInfo();
+        $topEditors = $this->articleInfo->getTopEditorsByEditCount(
             (int)$this->limit,
             '' != $this->request->query->get('nobots')
         );

@@ -9,23 +9,15 @@ namespace AppBundle\Model;
 
 use AppBundle\Helper\I18nHelper;
 use DateTime;
-use Doctrine\DBAL\Statement;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DomCrawler\Crawler;
 
 /**
  * An ArticleInfo provides statistics about a page on a project.
  */
-class ArticleInfo extends Model
+class ArticleInfo extends ArticleInfoApi
 {
-    /** @var ContainerInterface The application's DI container. */
-    protected $container;
-
     /** @var I18nHelper For i18n and l10n. */
     protected $i18n;
-
-    /** @var int Number of revisions that belong to the page. */
-    protected $numRevisions;
 
     /** @var int Maximum number of revisions to process, as configured. */
     protected $maxRevisions;
@@ -49,12 +41,6 @@ class ArticleInfo extends Model
     /** @var int Number of edits made by the top 10 editors. */
     protected $topTenCount;
 
-    /** @var mixed[] Various statistics about bots that edited the page. */
-    protected $bots;
-
-    /** @var int Number of edits made to the page by bots. */
-    protected $botRevisionCount;
-
     /** @var mixed[] Various counts about each individual year and month of the page's history. */
     protected $yearMonthCounts;
 
@@ -76,15 +62,6 @@ class ArticleInfo extends Model
     /** @var Edit Edit that made the largest deletion by number of bytes. */
     protected $maxDeletion;
 
-    /** @var int[] Number of in and outgoing links and redirects to the page. */
-    protected $linksAndRedirects;
-
-    /** @var string[] Assessments of the page (see Page::getAssessments). */
-    protected $assessments;
-
-    /** @var mixed[] Prose stats, with keys 'characters', 'words', 'references', 'unique_references', 'sections'. */
-    protected $proseStats;
-
     /**
      * Maximum number of edits that were created across all months. This is used as a comparison
      * for the bar charts in the months section.
@@ -92,7 +69,7 @@ class ArticleInfo extends Model
      */
     protected $maxEditsPerMonth;
 
-    /** @var string[] List of (semi-)automated tools that were used to edit the page. */
+    /** @var string[][] List of (semi-)automated tools that were used to edit the page. */
     protected $tools;
 
     /**
@@ -125,12 +102,6 @@ class ArticleInfo extends Model
         'year' => 0,
     ];
 
-    /** @var string[] List of wikidata and Checkwiki errors. */
-    protected $bugs;
-
-    /** @var array Number of categories, templates and files on the page. */
-    protected $transclusionData;
-
     /**
      * ArticleInfo constructor.
      * @param Page $page The page to process.
@@ -140,10 +111,7 @@ class ArticleInfo extends Model
      */
     public function __construct(Page $page, ContainerInterface $container, $start = false, $end = false)
     {
-        $this->page = $page;
-        $this->container = $container;
-        $this->start = $start;
-        $this->end = $end;
+        parent::__construct($page, $container, $start, $end);
     }
 
     /**
@@ -154,24 +122,6 @@ class ArticleInfo extends Model
     public function setI18nHelper(I18nHelper $i18n): void
     {
         $this->i18n = $i18n;
-    }
-
-    /**
-     * Get date opening date range, formatted as this is used in the views.
-     * @return string Blank if no value exists.
-     */
-    public function getStartDate(): string
-    {
-        return '' == $this->start ? '' : date('Y-m-d', $this->start);
-    }
-
-    /**
-     * Get date closing date range, formatted as this is used in the views.
-     * @return string Blank if no value exists.
-     */
-    public function getEndDate(): string
-    {
-        return '' == $this->end ? '' : date('Y-m-d', $this->end);
     }
 
     /**
@@ -214,18 +164,6 @@ class ArticleInfo extends Model
         }
 
         return $ret;
-    }
-
-    /**
-     * Get the number of revisions belonging to the page.
-     * @return int
-     */
-    public function getNumRevisions(): int
-    {
-        if (!isset($this->numRevisions)) {
-            $this->numRevisions = $this->page->getNumRevisions(null, $this->start, $this->end);
-        }
-        return $this->numRevisions;
     }
 
     /**
@@ -279,7 +217,7 @@ class ArticleInfo extends Model
         $this->setLogsEvents();
 
         // Bots need to be set before setting top 10 counts.
-        $this->setBots();
+        $this->bots = $this->getBots();
 
         $this->doPostPrecessing();
     }
@@ -291,15 +229,6 @@ class ArticleInfo extends Model
     public function getNumEditors(): int
     {
         return count($this->editors);
-    }
-
-    /**
-     * Get the number of bots that edited the page.
-     * @return int
-     */
-    public function getNumBots(): int
-    {
-        return count($this->getBots());
     }
 
     /**
@@ -419,39 +348,6 @@ class ArticleInfo extends Model
     }
 
     /**
-     * Get the number of times the page has been viewed in the given timeframe. If the ArticleInfo instance has a
-     * date range, it is used instead of the value of the $latest parameter.
-     * @param  int $latest Last N days.
-     * @return int
-     */
-    public function getPageviews(int $latest): int
-    {
-        if (!$this->hasDateRange()) {
-            return $this->page->getLastPageviews($latest);
-        }
-
-        $daterange = $this->getDateParams();
-        return $this->page->getPageviews($daterange['start'], $daterange['end']);
-    }
-
-    /**
-     * Get the page assessments of the page.
-     * @see https://www.mediawiki.org/wiki/Extension:PageAssessments
-     * @return string[]|false False if unsupported.
-     * @codeCoverageIgnore
-     */
-    public function getAssessments()
-    {
-        if (!is_array($this->assessments)) {
-            $this->assessments = $this->page
-                ->getProject()
-                ->getPageAssessments()
-                ->getAssessments($this->page);
-        }
-        return $this->assessments;
-    }
-
-    /**
      * Get the number of automated edits made to the page.
      * @return int
      */
@@ -503,50 +399,6 @@ class ArticleInfo extends Model
     public function getTopTenCount(): int
     {
         return $this->topTenCount;
-    }
-
-    /**
-     * Get the top editors to the page by edit count.
-     * @param int $limit Default 20, maximum 1,000.
-     * @param bool $noBots Set to non-false to exclude bots from the result.
-     * @return array
-     */
-    public function getTopEditorsByEditCount(int $limit = 20, bool $noBots = false): array
-    {
-        // Quick cache, valid only for the same request.
-        static $topEditors = null;
-        if (null !== $topEditors) {
-            return $topEditors;
-        }
-
-        $rows = $this->getRepository()->getTopEditorsByEditCount(
-            $this->page,
-            $this->start,
-            $this->end,
-            min($limit, 1000),
-            $noBots
-        );
-
-        $topEditors = [];
-        $rank = 0;
-        foreach ($rows as $row) {
-            $topEditors[] = [
-                'rank' => ++$rank,
-                'username' => $row['username'],
-                'count' => $row['count'],
-                'minor' => $row['minor'],
-                'first_edit' => [
-                    'id' => $row['first_revid'],
-                    'timestamp' => $row['first_timestamp'],
-                ],
-                'latest_edit' => [
-                    'id' => $row['latest_revid'],
-                    'timestamp' => $row['latest_timestamp'],
-                ],
-            ];
-        }
-
-        return $topEditors;
     }
 
     /**
@@ -657,77 +509,6 @@ class ArticleInfo extends Model
     public function getTools(): array
     {
         return $this->tools;
-    }
-
-    /**
-     * Get the list of page's wikidata and Checkwiki errors.
-     * @see Page::getErrors()
-     * @return string[]
-     */
-    public function getBugs(): array
-    {
-        if (!is_array($this->bugs)) {
-            $this->bugs = $this->page->getErrors();
-        }
-        return $this->bugs;
-    }
-
-    /**
-     * Get the number of wikidata nad CheckWiki errors.
-     * @return int
-     */
-    public function numBugs(): int
-    {
-        return count($this->getBugs());
-    }
-
-    /**
-     * Get the number of external links on the page.
-     * @return int
-     */
-    public function linksExtCount(): int
-    {
-        return $this->getLinksAndRedirects()['links_ext_count'];
-    }
-
-    /**
-     * Get the number of incoming links to the page.
-     * @return int
-     */
-    public function linksInCount(): int
-    {
-        return $this->getLinksAndRedirects()['links_in_count'];
-    }
-
-    /**
-     * Get the number of outgoing links from the page.
-     * @return int
-     */
-    public function linksOutCount(): int
-    {
-        return $this->getLinksAndRedirects()['links_out_count'];
-    }
-
-    /**
-     * Get the number of redirects to the page.
-     * @return int
-     */
-    public function redirectsCount(): int
-    {
-        return $this->getLinksAndRedirects()['redirects_count'];
-    }
-
-    /**
-     * Get the number of external, incoming and outgoing links, along with the number of redirects to the page.
-     * @return int[]
-     * @codeCoverageIgnore
-     */
-    private function getLinksAndRedirects(): array
-    {
-        if (!is_array($this->linksAndRedirects)) {
-            $this->linksAndRedirects = $this->page->countLinksAndRedirects();
-        }
-        return $this->linksAndRedirects;
     }
 
     /**
@@ -1145,66 +926,6 @@ class ArticleInfo extends Model
     }
 
     /**
-     * Get info about bots that edited the page.
-     * @return mixed[] Contains the bot's username, edit count to the page, and whether or not they are currently a bot.
-     */
-    public function getBots(): array
-    {
-        return $this->bots;
-    }
-
-    /**
-     * Set info about bots that edited the page. This is done as a private setter because we need this information
-     * when computing the top 10 editors, where we don't want to include bots.
-     */
-    private function setBots(): void
-    {
-        // Parse the bot edits.
-        $bots = [];
-
-        /** @var Statement $botData */
-        $botData = $this->getRepository()->getBotData($this->page, $this->start, $this->end);
-        while ($bot = $botData->fetch()) {
-            $bots[$bot['username']] = [
-                'count' => (int)$bot['count'],
-                'current' => '1' === $bot['current'],
-            ];
-        }
-
-        // Sort by edit count.
-        uasort($bots, function ($a, $b) {
-            return $b['count'] - $a['count'];
-        });
-
-        $this->bots = $bots;
-    }
-
-    /**
-     * Number of edits made to the page by current or former bots.
-     * @param string[] $bots Used only in unit tests, where we supply mock data for the bots that will get processed.
-     * @return int
-     */
-    public function getBotRevisionCount(?array $bots = null): int
-    {
-        if (isset($this->botRevisionCount)) {
-            return $this->botRevisionCount;
-        }
-
-        if (null === $bots) {
-            $bots = $this->getBots();
-        }
-
-        $count = 0;
-
-        foreach (array_values($bots) as $data) {
-            $count += $data['count'];
-        }
-
-        $this->botRevisionCount = $count;
-        return $count;
-    }
-
-    /**
      * Query for log events during each year of the article's history, and set the results in $this->yearMonthCounts.
      */
     private function setLogsEvents(): void
@@ -1338,98 +1059,18 @@ class ArticleInfo extends Model
     }
 
     /**
-     * Get prose and reference information.
-     * @return array With keys 'characters', 'words', 'references', 'unique_references'
+     * Get the number of times the page has been viewed in the given timeframe. If the ArticleInfo instance has a
+     * date range, it is used instead of the value of the $latest parameter.
+     * @param  int $latest Last N days.
+     * @return int
      */
-    public function getProseStats(): array
+    public function getPageviews(int $latest): int
     {
-        if (isset($this->proseStats)) {
-            return $this->proseStats;
+        if (!$this->hasDateRange()) {
+            return $this->page->getLastPageviews($latest);
         }
 
-        $datetime = false !== $this->end ? new DateTime('@'.$this->end) : null;
-        $html = $this->page->getHTMLContent($datetime);
-
-        $crawler = new Crawler($html);
-
-        [$chars, $words] = $this->countCharsAndWords($crawler, '#mw-content-text p');
-
-        $refs = $crawler->filter('#mw-content-text .reference');
-        $refContent = [];
-        $refs->each(function ($ref) use (&$refContent): void {
-            $refContent[] = $ref->text();
-        });
-        $uniqueRefs = count(array_unique($refContent));
-
-        $sections = count($crawler->filter('#mw-content-text .mw-headline'));
-
-        $this->proseStats = [
-            'characters' => $chars,
-            'words' => $words,
-            'references' => $refs->count(),
-            'unique_references' => $uniqueRefs,
-            'sections' => $sections,
-        ];
-        return $this->proseStats;
-    }
-
-    /**
-     * Count the number of characters and words of the plain text within the DOM element matched by the given selector.
-     * @param Crawler $crawler
-     * @param string $selector HTML selector.
-     * @return array [num chars, num words]
-     */
-    private function countCharsAndWords(Crawler $crawler, string $selector): array
-    {
-        $totalChars = 0;
-        $totalWords = 0;
-        $paragraphs = $crawler->filter($selector);
-        $paragraphs->each(function ($node) use (&$totalChars, &$totalWords): void {
-            $text = preg_replace('/\[\d+\]/', '', trim($node->text()));
-            $totalChars += strlen($text);
-            $totalWords += count(explode(' ', $text));
-        });
-
-        return [$totalChars, $totalWords];
-    }
-
-    /**
-     * Fetch transclusion data (categories, templates and files) that are on the page.
-     * @return array With keys 'categories', 'templates' and 'files'.
-     */
-    private function getTransclusionData(): array
-    {
-        if (!is_array($this->transclusionData)) {
-            $this->transclusionData = $this->getRepository()
-                ->getTransclusionData($this->page);
-        }
-        return $this->transclusionData;
-    }
-
-    /**
-     * Get the number of categories that are on the page.
-     * @return int
-     */
-    public function getNumCategories(): int
-    {
-        return $this->getTransclusionData()['categories'];
-    }
-
-    /**
-     * Get the number of templates that are on the page.
-     * @return int
-     */
-    public function getNumTemplates(): int
-    {
-        return $this->getTransclusionData()['templates'];
-    }
-
-    /**
-     * Get the number of files that are on the page.
-     * @return int
-     */
-    public function getNumFiles(): int
-    {
-        return $this->getTransclusionData()['files'];
+        $daterange = $this->getDateParams();
+        return $this->page->getPageviews($daterange['start'], $daterange['end']);
     }
 }

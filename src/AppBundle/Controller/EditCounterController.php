@@ -81,12 +81,11 @@ class EditCounterController extends XtoolsController
     /**
      * Every action in this controller (other than 'index') calls this first.
      * If a response is returned, the calling action is expected to return it.
-     * @return null
      * @throws AccessDeniedException If attempting to access internal endpoint.
      * @throws XtoolsHttpException If an API request to restricted endpoint when user has not opted in.
      * @codeCoverageIgnore
      */
-    protected function setUpEditCounter()
+    protected function setUpEditCounter(): void
     {
         // Whether we're making a subrequest (the view makes a request to another action).
         // Subrequests to the same controller do not re-instantiate a new controller, and hence
@@ -96,7 +95,7 @@ class EditCounterController extends XtoolsController
 
         // Return the EditCounter if we already have one.
         if (isset($this->editCounter)) {
-            return null;
+            return;
         }
 
         // Will redirect to Simple Edit Counter if they have too many edits, as defined self::construct.
