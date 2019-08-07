@@ -65,7 +65,7 @@ class TopEditsTest extends TestAdapter
         static::assertEquals(1000, $te->getLimit());
 
         // Single namespace, explicit configuration.
-        $te2 = new TopEdits($this->project, $this->user, null, 5, 50);
+        $te2 = new TopEdits($this->project, $this->user, null, 5, false, false, 50);
         static::assertEquals(5, $te2->getNamespace());
         static::assertEquals(50, $te2->getLimit());
 
@@ -75,7 +75,7 @@ class TopEditsTest extends TestAdapter
         static::assertEquals(20, $te3->getLimit());
 
         // All namespaces, explicit limit.
-        $te4 = new TopEdits($this->project, $this->user, null, 'all', 3);
+        $te4 = new TopEdits($this->project, $this->user, null, 'all', false, false, 3);
         static::assertEquals('all', $te4->getNamespace());
         static::assertEquals(3, $te4->getLimit());
 
@@ -89,10 +89,10 @@ class TopEditsTest extends TestAdapter
      */
     public function testTopEditsAllNamespaces(): void
     {
-        $te = new TopEdits($this->project, $this->user, null, 'all', 2);
+        $te = new TopEdits($this->project, $this->user, null, 'all', false, false, 2);
         $this->teRepo->expects($this->once())
             ->method('getTopEditsAllNamespaces')
-            ->with($this->project, $this->user, 2)
+            ->with($this->project, $this->user, '', '', 2)
             ->willReturn(array_merge(
                 $this->topEditsNamespaceFactory()[0],
                 $this->topEditsNamespaceFactory()[3]
@@ -125,10 +125,10 @@ class TopEditsTest extends TestAdapter
      */
     public function testTopEditsNamespace(): void
     {
-        $te = new TopEdits($this->project, $this->user, null, 3, 2);
+        $te = new TopEdits($this->project, $this->user, null, 3, false, false, 2);
         $this->teRepo->expects($this->once())
             ->method('getTopEditsNamespace')
-            ->with($this->project, $this->user, 3, 2)
+            ->with($this->project, $this->user, 3, false, false, 2)
             ->willReturn($this->topEditsNamespaceFactory()[3]);
         $te->setRepository($this->teRepo);
         $te->prepareData();

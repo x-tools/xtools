@@ -23,34 +23,49 @@
 
     <div class="panel-body xt-panel-body">
         {% set content %}
-            {% if te.numTopEdits == 0 %}
-                <div class="alert alert-info">
-                    {{ msg('no-contribs') }}
-                </div>
-            {% else %}
-                <div class="col-lg-6 stat-list clearfix">
-                    <table class="table">
+            <div class="col-lg-6 stat-list clearfix">
+                <table class="table">
+                    <tr>
+                        <td>{{ msg('article') }}</td>
+                        <td>
+                            {{ wiki.pageLink(page, page.title) }}
+                            <small>({{ wiki.pageLogLink(page) }}
+                            &middot; <a href="{{ path('ArticleInfoResult', {project:project.domain, page:page.title}) }}">{{ msg('tool-articleinfo') }}</a>)</small>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('user') }}</td>
+                        <td>
+                            {{ wiki.userLink(user, project) }}
+                            <small>(
+                                {%- if enabled('EditCounter') -%}
+                                    <a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool-editcounter') }}</a>
+                                {%- endif -%}
+                                {%- if enabled('TopEdits') -%}
+                                    &middot;
+                                    <a href="{{ path('TopEditsResultNamespace', {project:project.domain, username:user.username}) }}" >{{ msg('tool-topedits') }}</a>
+                                {%- endif -%}
+                            )</small>
+                        </td>
+                    </tr>
+                    {% if te.start is not empty %}
                         <tr>
-                            <td>{{ msg('article') }}</td>
-                            <td>
-                                {{ wiki.pageLink(page, page.title) }}
-                                <small>({{ wiki.pageLogLink(page) }}
-                                &middot; <a href="{{ path('ArticleInfoResult', {project:project.domain, page:page.title}) }}">{{ msg('tool-articleinfo') }}</a>)</small>
-                            </td>
+                            <td>{{ msg('start') }}</td>
+                            <td>{{ te.start|date_format('yyyy-MM-dd') }}</td>
                         </tr>
+                    {% endif %}
+                    {% if te.end is not empty %}
                         <tr>
-                            <td>{{ msg('user') }}</td>
-                            <td>
-                                {{ wiki.userLink(user, project) }}
-                                {% if enabled('EditCounter') %}
-                                    <small>(<a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool-editcounter') }}</a>)</small>
-                                {% endif %}
-                            </td>
+                            <td>{{ msg('end') }}</td>
+                            <td class="xt-test--end-date">{{ te.end|date_format('yyyy-MM-dd') }}</td>
                         </tr>
-                        <tr>
-                            <td class="stat-list--new-group">{{ msg('total-edits') }}</td>
-                            <td class="stat-list--new-group">{{ te.numTopEdits|num_format }}</td>
-                        </tr>
+                    {% endif %}
+                    <tr>
+                        <td class="stat-list--new-group">{{ msg('total-edits') }}</td>
+                        <td class="stat-list--new-group">{{ te.numTopEdits|num_format }}</td>
+                    </tr>
+
+                    {% if te.numTopEdits > 0 %}
                         <tr>
                             <td>{{ msg('minor-edits') }}</td>
                             <td>
@@ -84,51 +99,57 @@
                             <td>{{ msg('deleted-bytes') }}</td>
                             <td>{{ te.totalRemoved|diff_format }}</td>
                         </tr>
-                    </table>
-                </div>
+                    {% endif %}
+                </table>
+            </div>
 
+            {% if te.numTopEdits == 0 %}
+                <div style="clear:both" class="alert alert-info">
+                    {{ msg('no-contribs') }}
+                </div>
+            {% else %}
                 <div class="basic-info-charts clearfix">
                     {{
-                        chart.pie_chart('minor_edis',
-                            [{
-                                label: msg('minor-edits'),
-                                value: te.totalMinor,
-                                percentage: (te.totalMinor / te.numTopEdits) * 100
-                            },
+                    chart.pie_chart('minor_edis',
+                        [{
+                            label: msg('minor-edits'),
+                            value: te.totalMinor,
+                            percentage: (te.totalMinor / te.numTopEdits) * 100
+                        },
                             {
                                 label: msg('major-edits'),
                                 value: te.numTopEdits - te.totalMinor,
                                 percentage: 100 - ((te.totalMinor / te.numTopEdits) * 100)
                             }]
-                        )
+                    )
                     }}
                     {{
-                        chart.pie_chart('auto_edis',
-                            [{
-                                label: msg('auto-edits'),
-                                value: te.totalAutomated,
-                                percentage: (te.totalAutomated / te.numTopEdits) * 100
-                            },
+                    chart.pie_chart('auto_edis',
+                        [{
+                            label: msg('auto-edits'),
+                            value: te.totalAutomated,
+                            percentage: (te.totalAutomated / te.numTopEdits) * 100
+                        },
                             {
                                 label: msg('manual-edits'),
                                 value: te.numTopEdits - te.totalAutomated,
                                 percentage: 100 - ((te.totalAutomated / te.numTopEdits) * 100)
                             }]
-                        )
+                    )
                     }}
                     {{
-                        chart.pie_chart('reverted_edis',
-                            [{
-                                label: msg('reverted-edits'),
-                                value: te.totalReverted,
-                                percentage: (te.totalReverted / te.numTopEdits) * 100
-                            },
+                    chart.pie_chart('reverted_edis',
+                        [{
+                            label: msg('reverted-edits'),
+                            value: te.totalReverted,
+                            percentage: (te.totalReverted / te.numTopEdits) * 100
+                        },
                             {
                                 label: msg('unreverted-edits'),
                                 value: te.numTopEdits - te.totalReverted,
                                 percentage: 100 - ((te.totalReverted / te.numTopEdits) * 100)
                             }]
-                        )
+                    )
                     }}
                 </div>
 

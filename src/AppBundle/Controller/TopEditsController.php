@@ -76,14 +76,21 @@ class TopEditsController extends XtoolsController
             'namespace' => 0,
             'page' => '',
             'username' => '',
+            'start' => '',
+            'end' => '',
         ], $this->params, ['project' => $this->project]));
     }
 
     /**
      * List top edits by this user for all pages in a particular namespace.
-     * @Route("/topedits/{project}/{username}/{namespace}", name="TopEditsResultNamespace",
-     *     requirements = {"namespace" = "|all|\d+"},
-     *     defaults = {"namespace" = "all"}
+     * @Route("/topedits/{project}/{username}/{namespace}/{start}/{end}",
+     *     name="TopEditsResultNamespace",
+     *     requirements={
+     *         "namespace"="|all|\d+",
+     *         "start"="|\d{4}-\d{2}-\d{2}",
+     *         "end"="|\d{4}-\d{2}-\d{2}",
+     *     },
+     *     defaults={"namespace" = "all", "start"=false, "end"=false}
      * )
      * @return Response
      * @codeCoverageIgnore
@@ -102,6 +109,8 @@ class TopEditsController extends XtoolsController
                 'project' => $this->project,
                 'user' => $this->user,
                 'namespace' => $this->namespace,
+                'start' => $this->start,
+                'end' => $this->end,
                 'opted_in_page' => $optedInPage,
                 'is_sub_request' => $this->isSubRequest,
             ]);
@@ -113,7 +122,16 @@ class TopEditsController extends XtoolsController
          */
         $limit = $this->isSubRequest ? 10 : $this->limit;
 
-        $topEdits = new TopEdits($this->project, $this->user, null, $this->namespace, $limit, $this->offset);
+        $topEdits = new TopEdits(
+            $this->project,
+            $this->user,
+            null,
+            $this->namespace,
+            $this->start,
+            $this->end,
+            $limit,
+            $this->offset
+        );
         $topEditsRepo = new TopEditsRepository();
         $topEditsRepo->setContainer($this->container);
         $topEdits->setRepository($topEditsRepo);
@@ -136,9 +154,15 @@ class TopEditsController extends XtoolsController
 
     /**
      * List top edits by this user for a particular page.
-     * @Route("/topedits/{project}/{username}/{namespace}/{page}", name="TopEditsResultPage",
-     *     requirements = {"page"=".+", "namespace" = "|all|\d+"},
-     *     defaults = {"namespace" = "all"}
+     * @Route("/topedits/{project}/{username}/{namespace}/{page}/{start}/{end}",
+     *     name="TopEditsResultPage",
+     *     requirements={
+     *         "namespace"="|all|\d+",
+     *         "page"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
+     *         "start"="|\d{4}-\d{2}-\d{2}",
+     *         "end"="|\d{4}-\d{2}-\d{2}",
+     *     },
+     *     defaults={"namespace"="all", "start"=false, "end"=false}
      * )
      * @return Response
      * @codeCoverageIgnore
@@ -146,7 +170,7 @@ class TopEditsController extends XtoolsController
     public function singlePageTopEditsAction(): Response
     {
         // FIXME: add pagination.
-        $topEdits = new TopEdits($this->project, $this->user, $this->page);
+        $topEdits = new TopEdits($this->project, $this->user, $this->page, 'all', $this->start, $this->end);
         $topEditsRepo = new TopEditsRepository();
         $topEditsRepo->setContainer($this->container);
         $topEdits->setRepository($topEditsRepo);
@@ -168,13 +192,17 @@ class TopEditsController extends XtoolsController
 
     /**
      * Get the all edits of a user to a specific page, maximum 1000.
-     * @Route("/api/user/topedits/{project}/{username}/{namespace}/{page}", name="UserApiTopEditsArticle",
-     *     requirements = {"page"="|.+", "namespace"="|\d+|all"},
-     *     defaults={"page"="", "namespace"="all"}
+     * @Route("/api/user/topedits/{project}/{username}/{namespace}/{page}/{start}/{end}", name="UserApiTopEditsArticle",
+     *     requirements = {
+     *         "namespace"="|\d+|all",
+     *         "page"="|(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
+     *     },
+     *     defaults={"page"="", "namespace"="all", "start"=false, "end"=false}
      * )
-     * @Route("/api/user/top_edits/{project}/{username}/{namespace}/{page}", name="UserApiTopEditsArticleUnderscored",
+     * @Route("/api/user/top_edits/{project}/{username}/{namespace}/{page}/{start}/{end}",
+     *     name="UserApiTopEditsArticleUnderscored",
      *     requirements={"page"="|.+", "namespace"="|\d+|all"},
-     *     defaults={"page"="", "namespace"="all"}
+     *     defaults={"page"="", "namespace"="all", "start"=false, "end"=false}
      * )
      * @return JsonResponse
      * @codeCoverageIgnore

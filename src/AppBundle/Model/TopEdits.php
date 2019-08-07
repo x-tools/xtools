@@ -41,6 +41,8 @@ class TopEdits extends Model
      * @param User $user
      * @param Page $page
      * @param string|int $namespace Namespace ID or 'all'.
+     * @param int|false $start Start date in a format accepted by strtotime()
+     * @param int|false $end End date in a format accepted by strtotime()
      * @param int $limit Number of rows to fetch. This defaults to DEFAULT_LIMIT_SINGLE_NAMESPACE if $this->namespace
      *   is a single namespace (int), and DEFAULT_LIMIT_ALL_NAMESPACES if $this->namespace is 'all'.
      * @param int $offset Number of pages past the initial dataset. Used for pagination.
@@ -50,6 +52,8 @@ class TopEdits extends Model
         User $user,
         ?Page $page = null,
         $namespace = 0,
+        $start = false,
+        $end = false,
         $limit = null,
         $offset = 0
     ) {
@@ -57,6 +61,8 @@ class TopEdits extends Model
         $this->user = $user;
         $this->page = $page;
         $this->namespace = 'all' === $namespace ? 'all' : (int)$namespace;
+        $this->start = false === $start ? '' : date('Y-m-d', $start);
+        $this->end = false === $end ? '' : date('Y-m-d', $end);
         $this->offset = (int)$offset;
 
         if (null !== $limit) {
@@ -181,6 +187,8 @@ class TopEdits extends Model
             $pages = $this->getRepository()->getTopEditsAllNamespaces(
                 $this->project,
                 $this->user,
+                $this->start,
+                $this->end,
                 $this->limit
             );
         } else {
@@ -188,6 +196,8 @@ class TopEdits extends Model
                 $this->project,
                 $this->user,
                 $this->namespace,
+                $this->start,
+                $this->end,
                 $this->limit,
                 $this->offset * $this->limit
             );
@@ -210,7 +220,13 @@ class TopEdits extends Model
             return null;
         }
 
-        return (int)$this->getRepository()->countEditsNamespace($this->project, $this->user, $this->namespace);
+        return (int)$this->getRepository()->countEditsNamespace(
+            $this->project,
+            $this->user,
+            $this->namespace,
+            $this->start,
+            $this->end
+        );
     }
 
     /**
@@ -223,7 +239,9 @@ class TopEdits extends Model
     {
         $revs = $this->getRepository()->getTopEditsPage(
             $this->page,
-            $this->user
+            $this->user,
+            $this->start,
+            $this->end
         );
 
         if ($format) {

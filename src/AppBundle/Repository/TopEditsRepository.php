@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * of that information.
  * @codeCoverageIgnore
  */
-class TopEditsRepository extends Repository
+class TopEditsRepository extends UserRepository
 {
     /**
      * Expose the container to the TopEdits class.
@@ -35,6 +35,8 @@ class TopEditsRepository extends Repository
      * @param Project $project
      * @param User $user
      * @param int $namespace Namespace ID.
+     * @param string $start Start date in a format accepted by strtotime().
+     * @param string $end End date in a format accepted by strtotime().
      * @param int $limit Number of edits to fetch.
      * @param int $offset Number of results past the initial dataset. Used for pagination.
      * @return string[] page_namespace, page_title, page_is_redirect,
@@ -44,6 +46,8 @@ class TopEditsRepository extends Repository
         Project $project,
         User $user,
         int $namespace = 0,
+        string $start = '',
+        string $end = '',
         int $limit = 1000,
         int $offset = 0
     ): array {
@@ -53,6 +57,7 @@ class TopEditsRepository extends Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
+        [$condBegin, $condEnd] = $this->getRevTimestampConditions($start, $end);
         $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
 
@@ -74,14 +79,15 @@ class TopEditsRepository extends Repository
                 JOIN $revisionTable ON page_id = rev_page
                 WHERE rev_actor = :actorId
                 AND page_namespace = :namespace
+                $condBegin
+                $condEnd
                 GROUP BY page_namespace, page_title
                 ORDER BY count DESC
                 LIMIT $limit
                 OFFSET $offset";
-        $result = $this->executeProjectsQuery($sql, [
-            'actorId' => $user->getActorId($project),
-            'namespace' => $namespace,
-        ])->fetchAll();
+
+        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $start, $end);
+        $result = $resultQuery->fetchAll();
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);
@@ -92,9 +98,11 @@ class TopEditsRepository extends Repository
      * @param Project $project
      * @param User $user
      * @param int|string $namespace
+     * @param string $start Start date in a format accepted by strtotime().
+     * @param string $end End date in a format accepted by strtotime().
      * @return mixed
      */
-    public function countEditsNamespace(Project $project, User $user, $namespace)
+    public function countEditsNamespace(Project $project, User $user, $namespace, string $start, string $end)
     {
         // Set up cache.
         $cacheKey = $this->getCacheKey(func_get_args(), 'topedits_count_ns');
@@ -102,6 +110,7 @@ class TopEditsRepository extends Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
+        [$condBegin, $condEnd] = $this->getRevTimestampConditions($start, $end);
         $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
 
@@ -109,32 +118,40 @@ class TopEditsRepository extends Repository
                 FROM $pageTable
                 JOIN $revisionTable ON page_id = rev_page
                 WHERE rev_actor = :actorId
-                AND page_namespace = :namespace";
-        $result = $this->executeProjectsQuery($sql, [
-            'actorId' => $user->getActorId($project),
-            'namespace' => $namespace,
-        ])->fetch()['count'];
+                AND page_namespace = :namespace
+                $condBegin
+                $condEnd";
+
+        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $start, $end);
 
         // Cache and return.
-        return $this->setCache($cacheKey, $result);
+        return $this->setCache($cacheKey, $resultQuery->fetch()['count']);
     }
 
     /**
      * Get the top edits by a user across all namespaces.
      * @param Project $project
      * @param User $user
+     * @param string $start Start date in a format accepted by strtotime().
+     * @param string $end End date in a format accepted by strtotime().
      * @param int $limit Number of edits to fetch.
      * @return string[] page_namespace, page_title, page_is_redirect,
      *   count (number of edits), assessment (page assessment).
      */
-    public function getTopEditsAllNamespaces(Project $project, User $user, int $limit = 10): array
-    {
+    public function getTopEditsAllNamespaces(
+        Project $project,
+        User $user,
+        string $start,
+        string $end,
+        int $limit = 10
+    ): array {
         // Set up cache.
         $cacheKey = $this->getCacheKey(func_get_args(), 'topedits_all');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
+        [$condBegin, $condEnd] = $this->getRevTimestampConditions($start, $end);
         $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
         $hasPageAssessments = $this->isLabs() && $project->hasPageAssessments();
@@ -160,6 +177,8 @@ class TopEditsRepository extends Repository
                         FROM $revisionTable
                         JOIN $pageTable ON page_id = rev_page
                         WHERE rev_actor = :actorId
+                        $condBegin
+                        $condEnd
                         GROUP BY page_namespace, rev_page
                     ) AS b
                     JOIN (SELECT @ns := NULL, @rn := 0) AS vars
@@ -167,9 +186,8 @@ class TopEditsRepository extends Repository
                 ) AS c
                 JOIN $pageTable e ON e.page_id = c.rev_page
                 WHERE c.row_number < $limit";
-        $result = $this->executeProjectsQuery($sql, [
-            'actorId' => $user->getActorId($project),
-        ])->fetchAll();
+        $resultQuery = $this->executeQuery($sql, $project, $user, 'all', $start, $end);
+        $result = $resultQuery->fetchAll();
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);
@@ -179,10 +197,12 @@ class TopEditsRepository extends Repository
      * Get the top edits by a user to a single page.
      * @param Page $page
      * @param User $user
+     * @param string $start Start date in a format accepted by strtotime().
+     * @param string $end End date in a format accepted by strtotime().
      * @return string[] Each row with keys 'id', 'timestamp', 'minor', 'length',
      *   'length_change', 'reverted', 'user_id', 'username', 'comment', 'parent_comment'
      */
-    public function getTopEditsPage(Page $page, User $user): array
+    public function getTopEditsPage(Page $page, User $user, string $start, string $end): array
     {
         // Set up cache.
         $cacheKey = $this->getCacheKey(func_get_args(), 'topedits_page');
@@ -190,10 +210,10 @@ class TopEditsRepository extends Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $results = $this->queryTopEditsPage($page, $user, true);
+        $results = $this->queryTopEditsPage($page, $user, $start, $end, true);
 
         // Now we need to get the most recent revision, since the childrevs stuff excludes it.
-        $lastRev = $this->queryTopEditsPage($page, $user, false);
+        $lastRev = $this->queryTopEditsPage($page, $user, $start, $end, false);
         if (empty($results) || $lastRev[0]['id'] !== $results[0]['id']) {
             $results = array_merge($lastRev, $results);
         }
@@ -208,12 +228,20 @@ class TopEditsRepository extends Repository
      * so we have to call this twice, once with $childRevs set to true and once with false.
      * @param Page $page
      * @param User $user
+     * @param string $start Start date in a format accepted by strtotime().
+     * @param string $end End date in a format accepted by strtotime().
      * @param boolean $childRevs Whether to include child revisions.
      * @return array Each row with keys 'id', 'timestamp', 'minor', 'length',
      *   'length_change', 'reverted', 'user_id', 'username', 'comment', 'parent_comment'
      */
-    private function queryTopEditsPage(Page $page, User $user, bool $childRevs = false): array
-    {
+    private function queryTopEditsPage(
+        Page $page,
+        User $user,
+        string $start,
+        string $end,
+        bool $childRevs = false
+    ): array {
+        [$condBegin, $condEnd] = $this->getRevTimestampConditions($start, $end, 'revs.');
         $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
         $commentTable = $this->getTableName($page->getProject()->getDatabaseName(), 'comment');
 
@@ -251,15 +279,17 @@ class TopEditsRepository extends Repository
                     LEFT OUTER JOIN $commentTable AS comments ON (revs.rev_comment_id = comments.comment_id)
                     $childJoin
                     WHERE revs.rev_actor = :actorId
+                    $condBegin
+                    $condEnd
                     AND revs.rev_page = :pageid
                     $childWhere
                 ) a
                 ORDER BY timestamp DESC
                 $childLimit";
 
-        return $this->executeProjectsQuery($sql, [
+        $resultQuery = $this->executeQuery($sql, $page->getProject(), $user, null, $start, $end, [
             'pageid' => $page->getId(),
-            'actorId' => $user->getActorId($page->getProject()),
-        ])->fetchAll();
+        ]);
+        return $resultQuery->fetchAll();
     }
 }
