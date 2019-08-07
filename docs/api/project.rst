@@ -90,6 +90,7 @@ For each tool, the some or all of the following data is provided:
 * ``link``: Path to the tool's documentation.
 * ``label``: Translation of the tool's name, if applicable and available.
 * ``revert``: Whether or not the tool is exclusively used for reverting edits.
+* ``namespaces``: Which namespaces the tool is used in.
 
 **Parameters:**
 
