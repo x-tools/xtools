@@ -1,5 +1,14 @@
 # Release Notes #
 
+## 3.10.4 ##
+- T229387: Remove single_tag logic from AutoEdits.
+- T202552: Add date filtering options to Top Edits.
+- AdminStats: add options export as wikitext, CSV and TSV.
+- EditCounter: fix boolean logic for showing rights changes section.
+- ArticleInfo: code refactoring and cleanup.
+- AutoEdits: Expand tool definitions for Commons.
+- Localization updates.
+
 ## 3.10.3 ##
 - Blame: improve algorithm, allowing partial matches.
 - T177903: Show files renamed in Edit Counter.
