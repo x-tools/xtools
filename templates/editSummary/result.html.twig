@@ -23,11 +23,22 @@
                         <td>{{ msg('namespace') }}</td>
                         <td>{{ nsName(namespace, project.namespaces) }}</td>
                     </tr>
+                    {% if es.start is not empty %}
+                        <tr>
+                            <td>{{ msg('start') }}</td>
+                            <td>{{ es.start|date_format('yyyy-MM-dd') }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if es.end is not empty %}
+                        <tr>
+                            <td>{{ msg('end') }}</td>
+                            <td>{{ es.end|date_format('yyyy-MM-dd') }}</td>
+                        </tr>
+                    {% endif %}
                     <tr>
                         <td class="stat-list--new-group">{{ msg('live-edits') }}</td>
                         <td class="stat-list--new-group">{{ es.totalEdits|num_format }}</td>
                     </tr>
-
                     <tr>
                         <td>{{ msg('edits-with-summaries') }}</td>
                         <td>
@@ -36,7 +47,10 @@
                             ({{ es.totalSummaries|percent_format(es.totalEdits) }})
                         </td>
                     </tr>
-
+                </tbody></table>
+            </div>
+            <div class="col-lg-6 stat-list clearfix">
+                <table class="table"><tbody>
                     <tr>
                         <td class="stat-list--new-group">{{ msg('major-edits') }}</td>
                         <td class="stat-list--new-group">{{ es.totalEditsMajor|num_format }}</td>

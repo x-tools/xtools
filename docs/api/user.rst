@@ -204,7 +204,7 @@ Get all the known semi-automated tools used on the English Wikipedia.
 
 Edit summaries
 ==============
-``GET /api/user/edit_summaries/{project}/{username}/{namespace}``
+``GET /api/user/edit_summaries/{project}/{username}/{namespace}/{start}/{end}``
 
 Get statistics about a user's usage of edit summaries.
 
@@ -213,12 +213,15 @@ Get statistics about a user's usage of edit summaries.
 * ``project`` (**required**) - Project domain or database name.
 * ``username`` (**required**) - Username or IP address.
 * ``namespace`` - Namespace ID or ``all`` for all namespaces.
+* ``start`` - Start date in the format ``YYYY-MM-DD``.
+* ``end`` - End date in the format ``YYYY-MM-DD``.
 
 **Example:**
 
-Get `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_'s edit summary statistics on the English Wikipedia.
+Get `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_'s edit summary statistics
+for 2010 on the English Wikipedia.
 
-    https://xtools.wmflabs.org/api/user/edit_summaries/en.wikipedia/Jimbo_Wales
+    https://xtools.wmflabs.org/api/user/edit_summaries/en.wikipedia/Jimbo_Wales//2010-01-01/2010-12-31
 
 Top edits
 =========

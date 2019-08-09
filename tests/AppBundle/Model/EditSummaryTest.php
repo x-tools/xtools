@@ -40,7 +40,7 @@ class EditSummaryTest extends TestAdapter
         $client = static::createClient();
         $this->project = new Project('TestProject');
         $this->user = new User('Test user');
-        $this->editSummary = new EditSummary($this->project, $this->user, 'all', 1);
+        $this->editSummary = new EditSummary($this->project, $this->user, 'all', false, false, 1);
 
         $stack = new RequestStack();
         $session = new Session();

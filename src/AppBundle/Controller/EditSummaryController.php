@@ -52,15 +52,21 @@ class EditSummaryController extends XtoolsController
             // Defaults that will get overridden if in $params.
             'username' => '',
             'namespace' => 0,
+            'start' => '',
+            'end' => '',
         ], $this->params, ['project' => $this->project]));
     }
 
     /**
      * Display the Edit Summary results
      * @Route(
-     *     "/editsummary/{project}/{username}/{namespace}", name="EditSummaryResult",
-     *     requirements = {"namespace"="|\d+|all"},
-     *     defaults={"namespace"=0}
+     *     "/editsummary/{project}/{username}/{namespace}/{start}/{end}", name="EditSummaryResult",
+     *     requirements={
+     *         "namespace"="|all|\d+",
+     *         "start"="|\d{4}-\d{2}-\d{2}",
+     *         "end"="|\d{4}-\d{2}-\d{2}",
+     *     },
+     *     defaults={"namespace"="all", "start"=false, "end"=false}
      * )
      * @return Response
      * @codeCoverageIgnore
@@ -68,7 +74,14 @@ class EditSummaryController extends XtoolsController
     public function resultAction(): Response
     {
         // Instantiate an EditSummary, treating the past 150 edits as 'recent'.
-        $editSummary = new EditSummary($this->project, $this->user, $this->namespace, 150);
+        $editSummary = new EditSummary(
+            $this->project,
+            $this->user,
+            $this->namespace,
+            $this->start,
+            $this->end,
+            150
+        );
         $editSummaryRepo = new EditSummaryRepository();
         $editSummaryRepo->setContainer($this->container);
         $editSummary->setRepository($editSummaryRepo);
@@ -90,9 +103,13 @@ class EditSummaryController extends XtoolsController
     /**
      * Get basic stats on the edit summary usage of a user.
      * @Route(
-     *     "/api/user/edit_summaries/{project}/{username}/{namespace}", name="UserApiEditSummaries",
-     *     requirements = {"namespace"="|\d+|all"},
-     *     defaults={"namespace"=0}
+     *     "/api/user/edit_summaries/{project}/{username}/{namespace}/{start}/{end}", name="UserApiEditSummaries",
+     *     requirements={
+     *         "namespace"="|all|\d+",
+     *         "start"="|\d{4}-\d{2}-\d{2}",
+     *         "end"="|\d{4}-\d{2}-\d{2}",
+     *     },
+     *     defaults={"namespace"="all", "start"=false, "end"=false}
      * )
      * @return JsonResponse
      * @codeCoverageIgnore
@@ -102,7 +119,7 @@ class EditSummaryController extends XtoolsController
         $this->recordApiUsage('user/edit_summaries');
 
         // Instantiate an EditSummary, treating the past 150 edits as 'recent'.
-        $editSummary = new EditSummary($this->project, $this->user, $this->namespace, 150);
+        $editSummary = new EditSummary($this->project, $this->user, $this->namespace, $this->start, $this->end, 150);
         $editSummaryRepo = new EditSummaryRepository();
         $editSummaryRepo->setContainer($this->container);
         $editSummary->setRepository($editSummaryRepo);
