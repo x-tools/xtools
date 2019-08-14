@@ -482,6 +482,9 @@ parameters:
 
     # Non-wikipedia sites
     www.wikidata.org:
+        Sitelink auto-removal:
+            regex: 'clientsitelink-remove'
+            link: Help:Sitelinks
         QuickStatements:
             regex: '#quickstatements'
             link: Help:QuickStatements
