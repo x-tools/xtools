@@ -33,6 +33,9 @@ parameters:
     # Other local values such as link, tag and revert are overridden, not merged into the global value.
     # See 'Huggle' under 'global' and 'en.wikipedia.org' for an example.
     global:
+        Admin actions:
+            regex: '^(Protected|Changed protection).*?\[[Ee]dit=|^Removed protection from|^Configured pending changes.*?\[[Aa]uto-accept|^Reset pending changes settings'
+            link: Project:Administrators
         AutoWikiBrowser:
             tag: AWB
             regex: 'using \[\[(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
@@ -108,7 +111,6 @@ parameters:
             regex: 'WP:CLEANER|WPCleaner\]\]|\[\[\Wikipedia:DPL|\[\[WP:WCW\]\] project \('
             tag: WPCleaner
             link: Special:MyLanguage/Project:WPCleaner
-
 
     # Per-language lists. This generally only includes native MediaWiki actions.
     ar:
@@ -216,9 +218,6 @@ parameters:
             namespaces: [3]
 
         # Local tools
-        Admin actions:
-            regex: '^(Protected|Changed protection).*?\[[Ee]dit=|^Removed protection from|^Configured pending changes.*?\[[Aa]uto-accept|^Reset pending changes settings'
-            link: Project:Administrators
         Advisor.js:
             regex: '\(using \[\[(User:Cameltrader#Advisor.js|User:PC-XT\/Advisor)\|Advisor.js'
             link: WP:ADVISOR
