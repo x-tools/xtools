@@ -33,9 +33,6 @@ parameters:
     # Other local values such as link, tag and revert are overridden, not merged into the global value.
     # See 'Huggle' under 'global' and 'en.wikipedia.org' for an example.
     global:
-        Admin actions:
-            regex: '^(Protected|Changed protection).*?\[[Ee]dit=|^Removed protection from|^Configured pending changes.*?\[[Aa]uto-accept|^Reset pending changes settings'
-            link: Project:Administrators
         AutoWikiBrowser:
             tag: AWB
             regex: 'using \[\[(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
@@ -60,7 +57,6 @@ parameters:
             tag: mw-rollback
             tag_excludes:
                 - huggle
-            regex: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) edits by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\]( \(\[\[User talk:.*?\|talk\]\]\))? to last (version|revision) by .*'
             link: Special:MyLanguage/Project:Rollback
             revert: true
         Global rename:
@@ -100,7 +96,6 @@ parameters:
             tag_excludes:
                 - mw-rollback
                 - huggle
-            regex: '^(Undid|Undo|\[\[WP:UNDO\|Undid\]\]) revision \d+ by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\]'
             link: Special:MyLanguage/Project:Undo
             # This is not considered a revert because you can undo any arbitrary revision, not just the previous one.
         WikiLove:
@@ -134,6 +129,14 @@ parameters:
         Undo:
             regex: 'Änderung \d+ von \[\[.*?rückgängig gemacht'
             label: Rückgängig
+    en:
+        Admin actions:
+            regex: '^(Protected|Changed protection).*?\[[Ee]dit=|^Removed protection from|^Configured pending changes.*?\[[Aa]uto-accept|^Reset pending changes settings'
+            link: Project:Administrators
+        Generic rollback:
+            regex: '^(\[\[Help:Reverting\|Reverted\]\]|Reverted) edits by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\]( \(\[\[User talk:.*?\|talk\]\]\))? to last (version|revision) by .*'
+        Undo:
+            regex: '^(Undid|Undo|\[\[WP:UNDO\|Undid\]\]) revision \d+ by \[\[Special:(Contribs|Contributions)\/.*?\|.*?\]\]'
     ko:
         Generic rollback:
             regex: '(의 마지막 판으로 되돌림|의 편집을 전부 되돌림)'
@@ -550,4 +553,3 @@ parameters:
             regex: 'Using \[\[COM:VFC'
             tag: VisualFileChange
             link: Special:MyLanguage/Help:VisualFileChange.js
-

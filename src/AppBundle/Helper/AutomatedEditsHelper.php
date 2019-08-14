@@ -164,7 +164,7 @@ class AutomatedEditsHelper extends HelperBase
         $revertEntries = array_filter(
             $this->getTools($project),
             function ($tool) {
-                return isset($tool['revert']);
+                return isset($tool['revert']) && isset($tool['regex']);
             }
         );
 
