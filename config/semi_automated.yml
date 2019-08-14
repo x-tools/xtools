@@ -38,8 +38,9 @@ parameters:
             regex: 'using \[\[(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
             link: Project:AutoWikiBrowser
         Cat-a-lot:
-            regex: 'Help:Cat-a-lot\|Cat-a-lot\]\]|\(CatAlot\)'
-            link: commons:Cat-a-lot
+            regex: 'Help:Cat-a-lot'
+            link: commons:Special:MyLanguage/Help:Gadget-Cat-a-lot
+            tag: Cat-a-lot
         Commons duplicate file:
             regex: 'COM:Duplicate\|Duplicate'
             link: c:Commons:Duplicate
@@ -499,9 +500,6 @@ parameters:
             regex: '^Uploaded using Android Commons app$'
             link: Special:MyLanguage/Commons:Mobile_app
             namespaces: [6]
-        Cat-a-lot:
-            tag: Cat-a-lot
-            link: Special:MyLanguage/Help:Gadget-Cat-a-lot
         Commonsist:
             regex: '^commonist \d\.\d'
             link: Special:MyLanguage/Commons:Commonist
