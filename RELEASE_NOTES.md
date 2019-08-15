@@ -1,5 +1,17 @@
 # Release Notes #
 
+## 3.10.5 ##
+- T202552: Add date filtering to Edit Summary tool.
+- T226231: Make admin actions global in AutoEdits.
+- T229555: Add 'Sitelink auto-change' to AutoEdits Wikidata config.
+- T229564: Add 'Sitelink auto-removal' to AutoEdits Wikidata config.
+- T229562: Add 'AutoEdit' to AutoEdits Wikidata config.
+- T223350: Add 'Merge.js' to AutoEdits Wikidata config.
+- T229563: Fix global AutoEdits definition for Cat-a-lot.
+- EditCounter: Remove 'Global contributions' as subtool.
+- Fix long-standing typo: Resonator -> Reasonator.
+- Localization updates.
+
 ## 3.10.4 ##
 - T229387: Remove single_tag logic from AutoEdits.
 - T202552: Add date filtering options to Top Edits.
