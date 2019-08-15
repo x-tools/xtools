@@ -40,7 +40,6 @@ class EditCounterController extends XtoolsController
         'timecard' => 'EditCounterTimecard',
         'top-edited-pages' => 'TopEditsResultNamespace',
         'rights-changes' => 'EditCounterRightsChanges',
-        'latest-global-edits' => 'GlobalContribsResult',
     ];
 
     /** @var EditCounter The edit-counter, that does all the work. */
@@ -275,6 +274,7 @@ class EditCounterController extends XtoolsController
         $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'EditCounter',
+            'subtool_msg_key' => 'general-stats',
             'is_sub_request' => $this->isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
@@ -310,6 +310,7 @@ class EditCounterController extends XtoolsController
         $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'EditCounter',
+            'subtool_msg_key' => 'namespace-totals',
             'is_sub_request' => $this->isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
@@ -344,6 +345,7 @@ class EditCounterController extends XtoolsController
         $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'EditCounter',
+            'subtool_msg_key' => 'timecard',
             'is_sub_request' => $this->isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
@@ -379,6 +381,7 @@ class EditCounterController extends XtoolsController
         $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'EditCounter',
+            'subtool_msg_key' => 'year-counts',
             'is_sub_request' => $this->isSubRequest,
             'user' => $this->user,
             'project' => $this->project,
@@ -413,6 +416,7 @@ class EditCounterController extends XtoolsController
         $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'EditCounter',
+            'subtool_msg_key' => 'month-counts',
             'is_sub_request' => $this->isSubRequest,
             'user' => $this->user,
             'project' => $this->project,

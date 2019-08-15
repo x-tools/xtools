@@ -1,35 +1,14 @@
-{% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
+{% extends is_sub_request ? 'subrequest.html.twig' : 'editCounter/subtool.html.twig' %}
 {% import 'macros/layout.html.twig' as layout %}
 {% import 'macros/wiki.html.twig' as wiki %}
 {% import 'macros/layout.html.twig' as layout %}
 {% import 'macros/pieChart.html.twig' as chart %}
 
-{% block body %}
+{% block downloadLink %}
+    {{ layout.downloadLink('EditCounterGeneralStats', {project:project.domain, username:user.username}, ['wikitext']) }}
+{% endblock %}
 
-{% if not is_sub_request %}
-    <div class="panel panel-primary">
-        <header class="panel-heading">
-            <div class="text-center xt-heading-top">
-                <a class="back-to-search" href="{{ path('EditCounterResult', {project: project.domain, username:user.username}) }}">
-                    <span class="glyphicon glyphicon-chevron-left"></span>
-                    {{ msg('see-full-statistics') }}
-                </a>
-                {{ wiki.userLink(user, project) }}
-                <small> &bull; {{ project.title }} </small>
-            </div>
-        </header>
-        <div class="panel-body xt-panel-body">
-            <section class="panel panel-default clearfix">
-                <header class="panel-heading col-lg-12">
-                    <h4>
-                        {{ msg('general-stats') }}
-                        <span class='pull-right text-muted xt-panel-description'>
-                            {{ layout.downloadLink('EditCounterGeneralStats', {project:project.domain, username:user.username}, ['wikitext']) }}
-                        </span>
-                    </h4>
-                </header>
-                <div class="panel-body col-lg-12">
-{% endif %}
+{% block ecBody %}
 
 <div class="col-lg-6 stat-list clearfix">
     <table class="table"><tbody class="stat-list--group">
@@ -471,7 +450,7 @@
                     <td>
                         <strong>
                             {% if is_sub_request %}
-                                <a href="#latest-global-edits">{{ gc.globalEditCount|num_format }}</a>
+                                <a href="{{ path('GlobalContribsResult', { username: user.username }) }}">{{ gc.globalEditCount|num_format }}</a>
                             {% else %}
                                 <a href="{{ path('GlobalContribsResult', {username:user.username}) }}">
                                     {{ gc.globalEditCount|num_format }}
@@ -533,14 +512,6 @@
             * {{ msg('data-limit', [5000, 5000|num_format]) }}
         </div>
     </div>
-{% endif %}
-
-{% if not is_sub_request %}
-    </div></section>
-    <div class="text-muted times-in-utc" style="clear:both">
-        {{ msg('times-in-utc') }}
-    </div>
-    </div></div>
 {% endif %}
 
 {% endblock %}
