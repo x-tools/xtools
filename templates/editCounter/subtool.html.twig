@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+{% import 'macros/wiki.html.twig' as wiki %}
+
+{% block body %}
+<div class="panel panel-primary">
+    <header class="panel-heading">
+        <div class="text-center xt-heading-top">
+            <a class="back-to-search" href="{{ path('EditCounterResult', {project: project.domain, username:user.username}) }}">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                {{ msg('see-full-statistics') }}
+            </a>
+            {{ wiki.userLink(user, project) }}
+            <small> &bull; {{ project.domain }}</small>
+        </div>
+    </header>
+    <div class="panel-body xt-panel-body">
+        <section class="panel panel-default clearfix">
+            <header class="panel-heading col-lg-12">
+                <h4>
+                    {{ msg(subtool_msg_key) }}
+                    <span class='pull-right text-muted xt-panel-description'>
+                        {% block downloadLink %}{% endblock %}
+                    </span>
+                </h4>
+            </header>
+            <div class="panel-body col-lg-12">
+                {% block ecBody %}{% endblock %}
+            </div>
+        </section>
+
+        {% if subtool_msg_key == 'general-stats' %}
+            <div class="text-muted times-in-utc" style="clear:both">
+                {{ msg('times-in-utc') }}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -26,140 +26,20 @@
             {% endfor %}
         </div>
 
-        {% if 'general-stats' in sections %}
-            {% set content %}
-                {{ render(path('EditCounterGeneralStats', {
-                    'username': user.username,
-                    'project': project.domain
-                })) }}
-            {% endset %}
-            {% set headerLink %}
-                <a href="{{ path('EditCounterGeneralStats', {project:project.domain, username:user.username})}}">{{ msg('general-stats') }}</a>
-            {% endset %}
-            {% set downloadLink %}
-                {{ layout.downloadLink('EditCounterGeneralStats', {project:project.domain, username:user.username}, ['wikitext']) }}
-            {% endset %}
-            {{ layout.content_block(headerLink, content, downloadLink, 'general-stats', true) }}
-        {% endif %}
+        {% include 'editCounter/subtoolSection.html.twig' with {'route': 'EditCounterGeneralStats', 'i18nKey': 'general-stats'} %}
 
-        {% if 'namespace-totals' in sections %}
-            {% set content %}
-                {{ render(path('EditCounterNamespaceTotals', {
-                    'username': user.username,
-                    'project': project.domain
-                })) }}
-            {% endset %}
-            {% set headerLink %}
-                <a href="{{ path('EditCounterNamespaceTotals', {project:project.domain, username:user.username})}}">{{ msg('namespace-totals') }}</a>
-            {% endset %}
-            {% set downloadLink %}
-                {{ layout.downloadLink('EditCounterNamespaceTotals', {project:project.domain, username:user.username}, ['wikitext', 'csv']) }}
-            {% endset %}
-            {{ layout.content_block(headerLink, content, downloadLink, 'namespace-totals', true) }}
-        {% endif %}
+        {% include 'editCounter/subtoolSection.html.twig' with {'route': 'EditCounterNamespaceTotals', 'i18nKey': 'namespace-totals'} %}
 
-        {% if 'year-counts' in sections %}
-            {% set content %}
-                {{ render(path('EditCounterYearCounts', {
-                    'username': user.username,
-                    'project': project.domain
-                })) }}
-            {% endset %}
-            {% set headerLink %}
-                <a href="{{ path('EditCounterYearCounts', {project:project.domain, username:user.username})}}">{{ msg('year-counts') }}</a>
-            {% endset %}
-            {% set downloadLink %}
-                {{ layout.downloadLink('EditCounterYearCounts', {project:project.domain, username:user.username}, ['wikitext', 'csv']) }}
-            {% endset %}
-            {{ layout.content_block(headerLink, content, downloadLink, 'year-counts', true) }}
-        {% endif %}
+        {% include 'editCounter/subtoolSection.html.twig' with {'route': 'EditCounterYearCounts', 'i18nKey': 'year-counts'} %}
 
-        {% if 'month-counts' in sections %}
-            {% set content %}
-                {{ render(path('EditCounterMonthCounts', {
-                    'username': user.username,
-                    'project': project.domain
-                })) }}
-            {% endset %}
-            {% set headerLink %}
-                <a href="{{ path('EditCounterMonthCounts', {project:project.domain, username:user.username})}}">
-                    {{ msg('month-counts') }}
-                </a>
-            {% endset %}
-            {% set downloadLink %}
-                {{ layout.downloadLink('EditCounterMonthCounts', {project:project.domain, username:user.username}, ['wikitext', 'csv']) }}
-            {% endset %}
-            {{ layout.content_block(headerLink, content, downloadLink, 'month-counts', true) }}
-        {% endif %}
+        {% include 'editCounter/subtoolSection.html.twig' with {'route': 'EditCounterMonthCounts', 'i18nKey': 'month-counts'} %}
 
-        {% if 'timecard' in sections %}
-            {% set content %}
-                {{ render(path('EditCounterTimecard', {
-                    'username': user.username,
-                    'project': project.domain
-                })) }}
-            {% endset %}
-            {% set headerLink %}
-                <a href="{{ path('EditCounterTimecard', {project:project.domain, username:user.username})}}">{{ msg('timecard') }}</a>
-            {% endset %}
-            {% set downloadLink %}
-                {{ layout.downloadLink('EditCounterTimecard', {project:project.domain, username:user.username}, ['wikitext']) }}
-            {% endset %}
-            {{ layout.content_block(headerLink, content, downloadLink, 'timecard', true) }}
-        {% endif %}
+        {% include 'editCounter/subtoolSection.html.twig' with {'route': 'EditCounterTimecard', 'i18nKey': 'timecard'} %}
 
-        {% if 'top-edited-pages' in sections %}
-            {% set content %}
-                {{ render(path('TopEditsResultNamespace', {
-                    'username': user.username,
-                    'project': project.domain,
-                    'namespace': 'all'
-                })) }}
-            {% endset %}
-            {% set headerLink %}
-                <a href="{{ path('TopEditsResultNamespace', {project:project.domain, username:user.username, namespace:'all'})}}">{{ msg('top-edited-pages') }}</a>
-            {% endset %}
-            {% set downloadLink %}
-                {{ layout.downloadLink('TopEditsResultNamespace', {project:project.domain, username:user.username, namespace:'all'}, ['wikitext']) }}
-            {% endset %}
-            {{ layout.content_block(headerLink, content, downloadLink, 'top-edited-pages', true) }}
-        {% endif %}
+        {% include 'editCounter/subtoolSection.html.twig' with {'route': 'TopEditsResultNamespace', 'i18nKey': 'top-edited-pages', 'downloadFormats': ['wikitext'], 'extraParams': {'namespace': 'all'}} %}
 
-        {% if not(user.anon) %}
-            {% if 'rights-changes' in sections and (ec.rightsChanges|length > 0 or ec.globalRightsChanges|length > 0) %}
-                {% set content %}
-                    {% include 'editCounter/rights_changes.html.twig' with {
-                        'is_sub_request': true,
-                        'project': project,
-                        'user': user,
-                        'ec': ec
-                    } %}
-                {% endset %}
-                {% set headerLink %}
-                    <a href="{{ path('EditCounterRightsChanges', {project:project.domain, username:user.username})}}">{{ msg('rights-changes') }}</a>
-                {% endset %}
-                {% set downloadLink %}
-                    {{ layout.downloadLink('EditCounterRightsChanges', {project:project.domain, username:user.username}, ['wikitext']) }}
-                {% endset %}
-                {{ layout.content_block(headerLink, content, downloadLink, 'rights-changes', true) }}
-            {% endif %}
-
-            {% if 'latest-global-edits' in sections %}
-                {% set content %}
-                    <em class="contributions-loading text-muted">{{ msg('loading') }}...</em>
-                    <div id="latestglobal-container" class="contributions-container"
-                        data-project="{{ project.domain }}"
-                        data-username="{{ user.username }}"
-                        data-offset="0"
-                        data-target="ec-latestglobal"
-                        data-pagesize="30">
-                    </div>
-                {% endset %}
-                {% set headerLink %}
-                    <a href="{{ path('EditCounterLatestGlobal', {project:project.domain, username:user.username})}}">{{ msg('latest-global-edits') }}</a>
-                {% endset %}
-                {{ layout.content_block(headerLink, content, '', 'latest-global-edits', true) }}
-            {% endif %}
+        {% if not(user.anon) and 'rights-changes' in sections and (ec.rightsChanges|length > 0 or ec.globalRightsChanges|length > 0) %}
+            {% include 'editCounter/subtoolSection.html.twig' with {'route': 'EditCounterRightsChanges', 'i18nKey': 'rights-changes', 'downloadFormats': ['wikitext']} %}
         {% endif %}
 
         <div class="text-muted times-in-utc">
