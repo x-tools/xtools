@@ -488,6 +488,9 @@ parameters:
         AutoEdit:
             regex: 'Gadget-autoEdit\.js\|autoEdit'
             link: MediaWiki talk:Gadget-autoEdit.js
+        Merge.js:
+            regex: '\[\[MediaWiki:Gadget-Merge\.js\|merge\.js\]\]'
+            link: MediaWiki talk:Gadget-Merge.js
         Sitelink auto-change:
             regex: 'clientsitelink-update'
             link: Help:Sitelinks
