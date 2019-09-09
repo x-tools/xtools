@@ -28,6 +28,7 @@
 	"admin-stats-notice2": "Message shown at the top of the Admin Stats tool.",
 	"admins": "Name for the sysop user group. Used to select which user group to show in the Admin Stats tool.\n{{Identical|Admin}}",
 	"afd": "Articles for deletion page label",
+	"afd-desc": "The last part of the English message is \"[Articles for deletion] pages\", not \"Articles for [deletion pages]\".",
 	"aiv": "Administrator intervention against vandalism page label",
 	"aiv-desc": "Further description for aiv.  $1 is the unformatted number, $2 is a formatted number. It's \"edits to [Administrator Intervention against Vandalism] pages\".",
 	"all": "{{Identical|All}}",
