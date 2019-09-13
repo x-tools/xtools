@@ -9,6 +9,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Model\Edit;
 use AppBundle\Repository\ProjectRepository;
+use AppBundle\Response\EarlyJsonResponse;
 use MediaWiki\OAuthClient\Client;
 use MediaWiki\OAuthClient\ClientConfig;
 use MediaWiki\OAuthClient\Consumer;
@@ -243,7 +244,7 @@ class DefaultController extends XtoolsController
         return $this->getFormattedApiResponse([
             'project' => $this->project->getDomain(),
             'assessments' => $this->project->getPageAssessments()->getConfig(),
-        ]);
+        ], 'project/assessments');
     }
 
     /**
@@ -254,13 +255,17 @@ class DefaultController extends XtoolsController
     public function assessmentsConfigApiAction(): JsonResponse
     {
         // Here there is no Project, so we don't use XtoolsController::getFormattedApiResponse().
-        $response = new JsonResponse();
+        $response = new EarlyJsonResponse();
         $response->setEncodingOptions(JSON_NUMERIC_CHECK);
         $response->setStatusCode(Response::HTTP_OK);
         $response->setData([
             'projects' => array_keys($this->container->getParameter('assessments')),
             'config' => $this->container->getParameter('assessments'),
         ]);
+        $response->setCallbackAction(function (): void {
+            // Intentionally record this as the same endpoint as ProjectApiAssessments.
+            $this->recordApiUsage('project/assessments');
+        });
 
         return $response;
     }

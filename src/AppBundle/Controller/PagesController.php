@@ -297,8 +297,6 @@ class PagesController extends XtoolsController
      */
     public function countPagesApiAction(string $redirects = 'noredirects', string $deleted = 'all'): JsonResponse
     {
-        $this->recordApiUsage('user/pages_count');
-
         $pagesRepo = new PagesRepository();
         $pagesRepo->setContainer($this->container);
         $pages = new Pages(
@@ -318,7 +316,7 @@ class PagesController extends XtoolsController
             $counts = $counts[$this->namespace];
         }
 
-        return $this->getFormattedApiResponse(['counts' => $counts]);
+        return $this->getFormattedApiResponse(['counts' => $counts], 'user/pages_count');
     }
 
     /**
@@ -349,8 +347,6 @@ class PagesController extends XtoolsController
      */
     public function getPagesApiAction(string $redirects = 'noredirects', string $deleted = 'all'): JsonResponse
     {
-        $this->recordApiUsage('user/pages');
-
         $pagesRepo = new PagesRepository();
         $pagesRepo->setContainer($this->container);
         $pages = new Pages(
@@ -379,6 +375,6 @@ class PagesController extends XtoolsController
             $ret['continue'] = $this->offset + 1;
         }
 
-        return $this->getFormattedApiResponse($ret);
+        return $this->getFormattedApiResponse($ret, 'user/pages');
     }
 }

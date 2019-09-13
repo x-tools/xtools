@@ -222,10 +222,8 @@ class AutomatedEditsController extends XtoolsController
      */
     public function automatedToolsApiAction(): JsonResponse
     {
-        $this->recordApiUsage('user/automated_tools');
-
         $aeh = $this->container->get('app.automated_edits_helper');
-        return $this->getFormattedApiResponse($aeh->getTools($this->project));
+        return $this->getFormattedApiResponse($aeh->getTools($this->project), 'user/automated_tools');
     }
 
     /**
@@ -246,8 +244,6 @@ class AutomatedEditsController extends XtoolsController
      */
     public function automatedEditCountApiAction(string $tools = ''): JsonResponse
     {
-        $this->recordApiUsage('user/automated_editcount');
-
         $this->setupAutoEdits();
 
         $ret = [
@@ -261,7 +257,7 @@ class AutomatedEditsController extends XtoolsController
             $ret['automated_tools'] = $tools;
         }
 
-        return $this->getFormattedApiResponse($ret);
+        return $this->getFormattedApiResponse($ret, 'user/automated_editcount');
     }
 
     /**
@@ -282,8 +278,6 @@ class AutomatedEditsController extends XtoolsController
      */
     public function nonAutomatedEditsApiAction(): JsonResponse
     {
-        $this->recordApiUsage('user/nonautomated_edits');
-
         $this->setupAutoEdits();
 
         $ret = array_map(function ($rev) {
@@ -296,7 +290,7 @@ class AutomatedEditsController extends XtoolsController
             ], $rev);
         }, $this->autoEdits->getNonAutomatedEdits(true));
 
-        return $this->getFormattedApiResponse(['nonautomated_edits' => $ret]);
+        return $this->getFormattedApiResponse(['nonautomated_edits' => $ret], 'user/nonautomated_edits');
     }
 
     /**
@@ -317,8 +311,6 @@ class AutomatedEditsController extends XtoolsController
      */
     public function automatedEditsApiAction(): Response
     {
-        $this->recordApiUsage('user/automated_edits');
-
         $this->setupAutoEdits();
 
         $ret = [];
@@ -337,6 +329,6 @@ class AutomatedEditsController extends XtoolsController
             ], $rev);
         }, $this->autoEdits->getAutomatedEdits(true));
 
-        return $this->getFormattedApiResponse($ret);
+        return $this->getFormattedApiResponse($ret, 'user/automated_edits');
     }
 }

@@ -2,7 +2,10 @@
 
 declare(strict_types = 1);
 
+use AppBundle\Response\EarlyJsonResponse;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel;
 
 /**
@@ -86,5 +89,27 @@ class AppKernel extends Kernel
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load($this->getProjectDir().'/config/config_'.$this->getEnvironment().'.yml');
+    }
+
+    /**
+     * This called just before a process terminates.
+     * @param Request $request
+     * @param Response $response
+     */
+    public function terminate(Request $request, Response $response): void
+    {
+        ob_start();
+
+        // Run this stuff before the terminate events.
+        if ($response instanceof EarlyJsonResponse) {
+            $response->callTerminateCallback();
+        }
+
+        // Trigger the terminate events.
+        parent::terminate($request, $response);
+
+        //Optionally, we can output the buffer that will get cleaned to a file before discarding its contents
+        //file_put_contents('/tmp/process.log', ob_get_contents());
+        ob_end_clean();
     }
 }

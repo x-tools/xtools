@@ -224,8 +224,6 @@ class ArticleInfoController extends XtoolsController
      */
     public function articleInfoApiAction(): Response
     {
-        $this->recordApiUsage('page/articleinfo');
-
         $this->setupArticleInfo();
         $data = $this->articleInfo->getArticleInfoApiData($this->project, $this->page);
 
@@ -233,7 +231,7 @@ class ArticleInfoController extends XtoolsController
             return $this->getApiHtmlResponse($this->project, $this->page, $data);
         }
 
-        return $this->getFormattedApiResponse($data);
+        return $this->getFormattedApiResponse($data, 'page/articleinfo');
     }
 
     /**
@@ -274,10 +272,8 @@ class ArticleInfoController extends XtoolsController
      */
     public function proseStatsApiAction(): JsonResponse
     {
-        $this->recordApiUsage('page/prose');
-
         $this->setupArticleInfo();
-        return $this->getFormattedApiResponse($this->articleInfo->getProseStats());
+        return $this->getFormattedApiResponse($this->articleInfo->getProseStats(), 'page/prose');
     }
 
     /**
@@ -293,8 +289,6 @@ class ArticleInfoController extends XtoolsController
      */
     public function assessmentsApiAction(string $pages): JsonResponse
     {
-        $this->recordApiUsage('page/assessments');
-
         $pages = explode('|', $pages);
         $out = [];
 
@@ -313,7 +307,7 @@ class ArticleInfoController extends XtoolsController
             }
         }
 
-        return $this->getFormattedApiResponse($out);
+        return $this->getFormattedApiResponse($out, 'page/assessments');
     }
 
     /**
@@ -328,8 +322,7 @@ class ArticleInfoController extends XtoolsController
      */
     public function linksApiAction(): JsonResponse
     {
-        $this->recordApiUsage('page/links');
-        return $this->getFormattedApiResponse($this->page->countLinksAndRedirects());
+        return $this->getFormattedApiResponse($this->page->countLinksAndRedirects(), 'page/links');
     }
 
     /**
@@ -353,8 +346,6 @@ class ArticleInfoController extends XtoolsController
      */
     public function topEditorsApiAction(): JsonResponse
     {
-        $this->recordApiUsage('page/top_editors');
-
         $this->setupArticleInfo();
         $topEditors = $this->articleInfo->getTopEditorsByEditCount(
             (int)$this->limit,
@@ -363,6 +354,6 @@ class ArticleInfoController extends XtoolsController
 
         return $this->getFormattedApiResponse([
             'top_editors' => $topEditors,
-        ]);
+        ], 'page/top_editors');
     }
 }

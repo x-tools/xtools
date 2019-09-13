@@ -184,19 +184,28 @@ class AdminStatsController extends XtoolsController
     {
         $adminStatsRepo = new AdminStatsRepository();
         $adminStatsRepo->setContainer($this->container);
-        $group = $this->params['group'] ?? 'admin';
+        $group = $this->getGroup();
 
         $this->adminStats = new AdminStats(
             $this->normalizeProject($group),
             (int)$this->start,
             (int)$this->end,
-            $group ?? 'admin',
+            $group,
             $this->getAndSetRequestedActions()
         );
         $this->adminStats->setRepository($adminStatsRepo);
 
         // For testing purposes.
         return $this->adminStats;
+    }
+
+    /**
+     * Get the requested group (e.g. 'admin', 'patroller' or 'stewards').
+     * @return string
+     */
+    private function getGroup(): string
+    {
+        return $this->params['group'] ?? 'admin';
     }
 
     /**
@@ -242,8 +251,6 @@ class AdminStatsController extends XtoolsController
      */
     public function adminsGroupsApiAction(): JsonResponse
     {
-        $this->recordApiUsage('project/admins_groups');
-
         $this->setUpAdminStats();
 
         unset($this->params['actions']);
@@ -252,7 +259,7 @@ class AdminStatsController extends XtoolsController
 
         return $this->getFormattedApiResponse([
             'users_and_groups' => $this->adminStats->getUsersAndGroups(),
-        ]);
+        ], 'project/admins_groups');
     }
 
     /**
@@ -268,13 +275,11 @@ class AdminStatsController extends XtoolsController
      */
     public function adminStatsApiAction(): JsonResponse
     {
-        $this->recordApiUsage('project/adminstats');
-
         $this->setUpAdminStats();
         $this->adminStats->prepareStats();
 
         return $this->getFormattedApiResponse([
             'users' => $this->adminStats->getStats(),
-        ]);
+        ], 'project/'.$this->getGroup().'stats');
     }
 }

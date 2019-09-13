@@ -212,8 +212,6 @@ class CategoryEditsController extends XtoolsController
      */
     public function categoryEditCountApiAction(): JsonResponse
     {
-        $this->recordApiUsage('user/category_editcount');
-
         $this->setupCategoryEdits();
 
         $ret = [
@@ -221,6 +219,6 @@ class CategoryEditsController extends XtoolsController
             'category_editcount' => $this->categoryEdits->getCategoryEditCount(),
         ];
 
-        return $this->getFormattedApiResponse($ret);
+        return $this->getFormattedApiResponse($ret, 'user/category_editcount');
     }
 }

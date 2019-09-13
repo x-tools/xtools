@@ -491,7 +491,7 @@ class EditCounterController extends XtoolsController
 
         return $this->getFormattedApiResponse([
             'log_counts' => $this->editCounter->getLogCounts(),
-        ]);
+        ], 'user/log_counts');
     }
 
     /**
@@ -506,7 +506,7 @@ class EditCounterController extends XtoolsController
 
         return $this->getFormattedApiResponse([
             'namespace_totals' => $this->editCounter->namespaceTotals(),
-        ]);
+        ], 'user/namespace_totals');
     }
 
     /**
@@ -525,7 +525,7 @@ class EditCounterController extends XtoolsController
         unset($ret['yearLabels']);
         unset($ret['monthLabels']);
 
-        return $this->getFormattedApiResponse($ret);
+        return $this->getFormattedApiResponse($ret, 'user/month_counts');
     }
 
     /**
@@ -540,6 +540,6 @@ class EditCounterController extends XtoolsController
 
         return $this->getFormattedApiResponse([
             'timecard' => $this->editCounter->timeCard(),
-        ]);
+        ], 'user/timecard');
     }
 }

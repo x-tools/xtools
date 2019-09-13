@@ -150,6 +150,6 @@ class SimpleEditCounterController extends XtoolsController
         $ret['userGroups'] = $ret['user_groups'];
         $ret['globalUserGroups'] = $ret['global_user_groups'];
 
-        return $this->getFormattedApiResponse($ret);
+        return $this->getFormattedApiResponse($ret, 'user/simple_editcount');
     }
 }

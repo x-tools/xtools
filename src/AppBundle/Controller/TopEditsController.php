@@ -209,8 +209,6 @@ class TopEditsController extends XtoolsController
      */
     public function topEditsUserApiAction(): JsonResponse
     {
-        $this->recordApiUsage('user/topedits');
-
         if (!$this->project->userHasOptedIn($this->user)) {
             return new JsonResponse(
                 [
@@ -236,6 +234,6 @@ class TopEditsController extends XtoolsController
 
         return $this->getFormattedApiResponse([
             'top_edits' => $topEdits->getTopEdits(),
-        ]);
+        ], 'user/topedits');
     }
 }

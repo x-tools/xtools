@@ -116,8 +116,6 @@ class EditSummaryController extends XtoolsController
      */
     public function editSummariesApiAction(): JsonResponse
     {
-        $this->recordApiUsage('user/edit_summaries');
-
         // Instantiate an EditSummary, treating the past 150 edits as 'recent'.
         $editSummary = new EditSummary($this->project, $this->user, $this->namespace, $this->start, $this->end, 150);
         $editSummaryRepo = new EditSummaryRepository();
@@ -126,6 +124,6 @@ class EditSummaryController extends XtoolsController
         $editSummary->setI18nHelper($this->container->get('app.i18n_helper'));
         $editSummary->prepareData();
 
-        return $this->getFormattedApiResponse($editSummary->getData());
+        return $this->getFormattedApiResponse($editSummary->getData(), 'user/edit_summaries');
     }
 }

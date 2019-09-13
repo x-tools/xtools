@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace AppBundle\Controller;
 
+use AppBundle\Response\EarlyJsonResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -164,14 +165,10 @@ class QuoteController extends XtoolsController
     {
         $this->validateIsEnabled();
 
-        $this->recordApiUsage('quote/random');
         $quotes = $this->container->getParameter('quotes');
         $id = array_rand($quotes);
 
-        return new JsonResponse(
-            [$id => $quotes[$id]],
-            Response::HTTP_OK
-        );
+        return $this->getResponse([$id => $quotes[$id]], 'quote/random');
     }
 
     /**
@@ -184,7 +181,6 @@ class QuoteController extends XtoolsController
     {
         $this->validateIsEnabled();
 
-        $this->recordApiUsage('quote/all');
         $quotes = $this->container->getParameter('quotes');
         $numberedQuotes = [];
 
@@ -193,7 +189,7 @@ class QuoteController extends XtoolsController
             $numberedQuotes[(string)($index + 1)] = $quote;
         }
 
-        return new JsonResponse($numberedQuotes, Response::HTTP_OK);
+        return $this->getResponse($numberedQuotes, 'quote/all');
     }
 
     /**
@@ -207,7 +203,6 @@ class QuoteController extends XtoolsController
     {
         $this->validateIsEnabled();
 
-        $this->recordApiUsage('quote/id');
         $quotes = $this->container->getParameter('quotes');
 
         if (!isset($quotes[$id])) {
@@ -222,9 +217,9 @@ class QuoteController extends XtoolsController
             );
         }
 
-        return new JsonResponse([
+        return $this->getResponse([
             $id => $quotes[$id],
-        ], Response::HTTP_OK);
+        ], 'quote/id');
     }
 
     /**
@@ -239,5 +234,21 @@ class QuoteController extends XtoolsController
         if (!$isLabs && !$this->container->getParameter('enable.Quote')) {
             throw $this->createNotFoundException('This tool is disabled');
         }
+    }
+
+    /**
+     * Get an EarlyJsonResponse, recording usage for the given $endpoint.
+     * @param array $data
+     * @param string $endpoint
+     * @return EarlyJsonResponse
+     */
+    private function getResponse(array $data, string $endpoint): EarlyJsonResponse
+    {
+        $response = new EarlyJsonResponse();
+        $response->setData($data);
+        $response->setCallbackAction(function () use ($endpoint): void {
+            $this->recordApiUsage($endpoint);
+        });
+        return $response;
     }
 }

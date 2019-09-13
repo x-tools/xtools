@@ -15,6 +15,7 @@ use AppBundle\Model\User;
 use AppBundle\Repository\PageRepository;
 use AppBundle\Repository\ProjectRepository;
 use AppBundle\Repository\UserRepository;
+use AppBundle\Response\EarlyJsonResponse;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -812,11 +813,20 @@ abstract class XtoolsController extends Controller
     /**
      * Return a JsonResponse object pre-supplied with the requested params.
      * @param array $data
+     * @param string|null $endpoint Name of endpoint that is passed to self::recordUsage().
+     *   Use null to prevent recording usage of the endpoint.
      * @return JsonResponse
      */
-    public function getFormattedApiResponse(array $data): JsonResponse
+    public function getFormattedApiResponse(array $data, ?string $endpoint = null): JsonResponse
     {
-        $response = new JsonResponse();
+        // Use EarlyJsonResponse so that we run the database transactions to record usage
+        // after the response has already been returned.
+        $response = new EarlyJsonResponse();
+        $response->setCallbackAction(function () use ($endpoint): void {
+            if (null !== $endpoint) {
+                $this->recordApiUsage($endpoint);
+            }
+        });
         $response->setEncodingOptions(JSON_NUMERIC_CHECK);
         $response->setStatusCode(Response::HTTP_OK);
 
@@ -860,6 +870,11 @@ abstract class XtoolsController extends Controller
      */
     public function recordApiUsage(string $endpoint): void
     {
+        // No database transactions in the test environment.
+        if ('test' !== $this->container->getParameter('kernel.environment')) {
+            return;
+        }
+
         /** @var \Doctrine\DBAL\Connection $conn */
         $conn = $this->container->get('doctrine')
             ->getManager('default')
