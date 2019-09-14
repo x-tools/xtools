@@ -304,7 +304,6 @@
 	"pages-created-live-desc": "$2 {{PLURAL:$1|page|pages}} created",
 	"pages-created-since-deleted": "$1 since deleted",
 	"pages-created-tooltip": "Total of all pages created, including those created as a redirect when moving a page. See the documentation for more details.",
-	"pages-deleted": "Pages deleted",
 	"pages-deleted-hover-desc": "Hover over the '$1' text to see the deletion summary.",
 	"pages-deleted-redirects": "Deleted pages may have been redirects.",
 	"pages-edited-total": "Pages edited (total)",
