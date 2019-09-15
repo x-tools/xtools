@@ -133,7 +133,7 @@
 | [[Special:Log/patrol/{{ user.username }}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.patrols }}}}]]
 |-
 | {{ msg('accounts-created') }}
-| [[Special:Log/newusers/{{ user.username }}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.accountsCreated }}}}]]
+| [{{ wiki.pageUrlRaw('Special:Log/newusers/' ~ user.username, project, '&subtype=create2') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.accountsCreated }}}}]
 |-
 |}
 
