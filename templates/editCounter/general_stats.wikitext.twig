@@ -102,9 +102,6 @@
 | {{ msg('pages-moved') }}
 | [[Special:Log/move/{{ user.username }}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesMoved }}}}]]
 |-
-| {{ msg('pages-deleted') }}
-| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesDeleted|num_format }}}}
-|-
 |}
 
 {# ======================== FILES ======================== #}
