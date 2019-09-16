@@ -316,7 +316,6 @@
 	"pages-created-live-desc": "已创建$2个{{PLURAL:$1|页面}}",
 	"pages-created-since-deleted": "后有$1个删除",
 	"pages-created-tooltip": "所有创建页面的总数，这包括当移动页面时创建的重定向数。参见文档以获取更多详情。",
-	"pages-deleted": "已删除页面数",
 	"pages-deleted-hover-desc": "悬停在“$1”文本以查看删除摘要。",
 	"pages-deleted-redirects": "被删除页面有可能被重定向。",
 	"pages-edited-total": "编辑页面数（总计）",

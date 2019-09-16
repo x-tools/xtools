@@ -283,7 +283,6 @@
 	"pages-created-live-desc": "$2 {{PLURAL:$1|pajenn|pajenn}} krouet",
 	"pages-created-since-deleted": "$1 abaoe m'eo bet lamet",
 	"pages-created-tooltip": "Niver holl a bajennoù krouet, hag ivez ar re krouet evel adkas en ur adenvel ur bajenn. Gwelit an teuliadur evit gouzout hiroc'h.",
-	"pages-deleted": "Pajennoù dilamet",
 	"pages-deleted-hover-desc": "Lakait poenter al logodenn da dremen a-us an destenn  '$1' evit gwelet diverradenn an dilamadur.",
 	"pages-deleted-redirects": "Ar pajennoù lamet a c'halle bezañ adkasadennoù.",
 	"pages-edited-total": "Pajennoù kemmet (hollad)",

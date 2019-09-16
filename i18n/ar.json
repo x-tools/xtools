@@ -307,7 +307,6 @@
 	"pages-created-live-desc": "تم إنشاء $2 {{PLURAL:$1|صفحة|صفحات}}",
 	"pages-created-since-deleted": "$1 منذ المحذوفة",
 	"pages-created-tooltip": "مجموع كل الصفحات التي تم إنشاؤها، بما في ذلك تلك التي تم إنشاؤها كتحويلة عند نقل صفحة، راجع التوثيق لمزيد من التفاصيل.",
-	"pages-deleted": "الصفحات المحذوفة",
 	"pages-deleted-hover-desc": "مرر فوق النص \"$1\" للاطلاع على ملخص الحذف.",
 	"pages-deleted-redirects": "قد تكون الصفحات المحذوفة تحويلات.",
 	"pages-edited-total": "الصفحات التي تم تحريرها (الكل)",

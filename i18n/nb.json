@@ -266,7 +266,6 @@
 	"pages-created-live-desc": "$2 {{PLURAL:$1|side|sider}} opprettet",
 	"pages-created-since-deleted": "$1 senere slettet",
 	"pages-created-tooltip": "Totalen av alle sider opprettet, inkludert de som ble opprettet som omdirigering under flytting av sider. Se dokumentasjonen for flere detaljer.",
-	"pages-deleted": "Sider slettet",
 	"pages-deleted-hover-desc": "Hold musa over «$1»-teksten for å se slettesammendraget.",
 	"pages-edited-total": "Sider redigert (totalt)",
 	"pages-moved": "Sider flyttet",

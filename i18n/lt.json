@@ -293,7 +293,6 @@
 	"pages-created-live-desc": "$2 {{PLURAL:$1|sukurtas puslapis|sukurti puslapiai|sukurta puslapių}}",
 	"pages-created-since-deleted": "$1 nuo pašalinimo",
 	"pages-created-tooltip": "Iš viso sukurtų puslapių, įskaitant tuos, kurie buvo sukurti kaip nukreipiamieji pervadinant puslapį. Daugiau informacijos rasite dokumentacijoje.",
-	"pages-deleted": "Ištrinti puslapiai",
 	"pages-deleted-hover-desc": "Užveskite pelę ant užrašo „$1“, norėdami pamatyti panaikinimo priežastį.",
 	"pages-deleted-redirects": "Ištrinti puslapiai galėjo būti nukreipiamieji.",
 	"pages-edited-total": "Redaguoti puslapiai (iš viso)",

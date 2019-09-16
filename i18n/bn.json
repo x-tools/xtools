@@ -267,7 +267,6 @@
 	"pages-created-live": "তৈরিকৃত পাতা (বর্তমান)",
 	"pages-created-live-desc": "$2টি {{PLURAL:$1|পাতা}} তৈরি করেছে",
 	"pages-created-since-deleted": "অপসারণের পর থেকে $1টি",
-	"pages-deleted": "পাতা অপসারণ করেছে",
 	"pages-deleted-hover-desc": "অপসারণের সারাংশ দেখতে '$1' লেখার উপর মাউস নিন।",
 	"pages-deleted-redirects": "মুছে ফেলা পৃষ্ঠাগুলি পুনঃনির্দেশিত করা হয়ে থাকতে পারে।",
 	"pages-edited-total": "সম্পাদিত পাতা (মোট)",

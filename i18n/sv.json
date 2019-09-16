@@ -292,7 +292,6 @@
 	"pages-created-live-desc": "$2 {{PLURAL:$1|sida|sidor}} skapade",
 	"pages-created-since-deleted": "$1 nu raderade sidor",
 	"pages-created-tooltip": "Antal skapade sidor, inklusive omdirigeringar skapade vid sidflytt. Se the dokumentationen för mer information.",
-	"pages-deleted": "Sidor raderade",
 	"pages-deleted-hover-desc": "Lägg muspekaren över texten \"$1\" för att se raderingssammanfattningen.",
 	"pages-deleted-redirects": "Raderade sidor kan ha varit omdirigeringar.",
 	"pages-edited-total": "Redigerade sidor (totalt)",

@@ -257,7 +257,6 @@
 	"pages-created-live-desc": "{{PLURAL:$1|Stvorena $2 stranica|Stvorene $2 stranice|Stvoreno $2 stranica}}",
 	"pages-created-since-deleted": "od toga izbrisano $1",
 	"pages-created-tooltip": "Ukupan broj stvorenih stranica, uključujući i preusmjeravanja nastala premještanjem stranica. Za više informacija pogledajte dokumentaciju.",
-	"pages-deleted": "Izbrisano stranica",
 	"pages-deleted-hover-desc": "Da biste vidjeli sažetak brisanja, prijeđite mišem preko '$1'.",
 	"pages-edited-total": "Uređeno stranica (ukupno)",
 	"pages-moved": "Premješteno stranica",

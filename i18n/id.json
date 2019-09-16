@@ -306,7 +306,6 @@
 	"pages-created-live-desc": "$2 {{PLURAL:$1|halaman|halaman}} yang dibuat",
 	"pages-created-since-deleted": "$1 terhapus setelahnya",
 	"pages-created-tooltip": "Total semua halaman yang dibuat, termasuk halaman yang dibuat sebagai pengalihan ketika memindahkan suatu halaman. Lihat dokumentasi untuk rincian selengkapnya.",
-	"pages-deleted": "Halaman terhapus",
 	"pages-deleted-hover-desc": "Layangkan ke atas teks '$1' untuk melihat ringkasan penghapusan.",
 	"pages-deleted-redirects": "Halaman terhapus bisa berupa pengalihan.",
 	"pages-edited-total": "Halaman tersunting (total)",

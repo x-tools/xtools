@@ -206,7 +206,6 @@
 	"pages-created-live-desc": "$2 alustatud {{PLURAL:$1|lehekülg|lehekülge}}",
 	"pages-created-since-deleted": "$1 hiljem kustutatud",
 	"pages-created-tooltip": "Kõik leheküljed kokku, kaasa arvatud teisaldamisel tekkinud ümbersuunamised. Üksikasju loe dokumentatsioonist.",
-	"pages-deleted": "Kustutatud lehekülgi",
 	"pages-deleted-hover-desc": "Liigu kursoriga üle teksti \"$1\", et näha kustutamise resümeed.",
 	"pages-edited-total": "Lehekülgi muudetud (kokku)",
 	"pages-moved": "Teisaldatud lehekülgi",

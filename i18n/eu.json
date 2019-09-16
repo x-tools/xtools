@@ -269,7 +269,6 @@
 	"pages-created-live-desc": "$2 {{PLURAL:$1|orri $2|$2 orri}} sortuak",
 	"pages-created-since-deleted": "$1 ezabatu direnetik",
 	"pages-created-tooltip": "Sortutako orrialde guztien zerrenda, orrialde bat mugitzean birbideratze gisa sortu direnak barne. Ikus dokumentazioa xehetasun gehiagorako.",
-	"pages-deleted": "Ezabatutako orriak",
 	"pages-deleted-hover-desc": "Desplazatu '$1' testuan zehar ezabaketen laburpena ikusteko.",
 	"pages-edited-total": "Aldatutako orriak (guztira)",
 	"pages-moved": "Mugitutako orriak",

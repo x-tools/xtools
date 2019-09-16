@@ -237,7 +237,6 @@
 	"pages-created-live-desc": "$2 {{PLURAL:$1|səhifə|səhifələr}} yaradıldı",
 	"pages-created-since-deleted": "$1 hazırda silinmişdir",
 	"pages-created-tooltip": "Bir səhifəni yönləndirərkən, yönləndirmə olaraq yaradılan səhifələrdə daxil olmaqla, yaradılan səhifələrin hamısı. Daha çox məlumat üçün sənədlərə baxın.",
-	"pages-deleted": "Silinmiş səhifələr",
 	"pages-edited-total": "Redaktə edilən səhifələr (hamısı)",
 	"pages-moved": "Adı dəyişdirilmiş səhifələr",
 	"pageviews": "Səhifəyə baxışlar",

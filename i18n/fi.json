@@ -188,7 +188,6 @@
 	"pages-created-live": "Yhä olemassa olevia sivuja luotu",
 	"pages-created-live-desc": "$2 {{PLURAL:$1|sivu|sivua}} luotu",
 	"pages-created-since-deleted": "$1 poistettu myöhemmin",
-	"pages-deleted": "Sivuja poistettu",
 	"pages-edited-total": "Sivuja muokattu yhteensä",
 	"pages-moved": "Sivuja siirretty",
 	"pageviews": "Sivun näyttökerrat",

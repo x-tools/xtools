@@ -271,7 +271,6 @@
 	"pages-created-live-desc": "$2 {{PLURAL:$1|stranica napravljena|stranice napravljene|stranica napravljeno}}",
 	"pages-created-since-deleted": "od tada obrisano: $1",
 	"pages-created-tooltip": "Ukupan broj svih napravljenih stranica, uključujući one napravljene kao preusmerenje pri premeštanju stranice. Pogledajte dokumentaciju za više informacija.",
-	"pages-deleted": "Izbrisano stranica",
 	"pages-deleted-hover-desc": "Držite kursor iznad teksta ’$1’ da biste videli rezime brisanja.",
 	"pages-deleted-redirects": "Izbrisane stranice su možda bile preusmerenja.",
 	"pages-edited-total": "Uređeno stranica (ukupno)",

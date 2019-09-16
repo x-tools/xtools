@@ -302,7 +302,6 @@
 	"pages-created-live-desc": "$2 {{PLURAL:$1|página creada|páginas creadas}}",
 	"pages-created-since-deleted": "$1 eliminadas hasta ahora",
 	"pages-created-tooltip": "Total de páginas creadas, incluidas las creadas como redirecciones al trasladar páginas. Consulta la documentación para obtener más detalles.",
-	"pages-deleted": "Páginas borradas",
 	"pages-deleted-hover-desc": "Pasa el ratón sobre el texto «$1» para ver el resumen de borrado.",
 	"pages-deleted-redirects": "Las páginas borradas pueden haber sido redirecciones.",
 	"pages-edited-total": "Páginas editadas (totales)",

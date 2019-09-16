@@ -240,7 +240,6 @@
 	"pages-created": "דפים שנוצרו",
 	"pages-created-deleted": "דפים שנוצרו (נמחקו)",
 	"pages-created-since-deleted": "$1 נמחקו מאז",
-	"pages-deleted": "דפים שנמחקו",
 	"pages-moved": "דפים שהועברו",
 	"pages-recreated-desc": "ייתכן כי חלק מהדפים המחוקים נוצרו מחדש על ידי משתמש זה או משתמש אחר. דפים אלו מסומנים כ־'$1'.",
 	"pageviews": "הצגות דף",

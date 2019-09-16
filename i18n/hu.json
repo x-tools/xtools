@@ -286,7 +286,6 @@
 	"pages-created-live-desc": "$2 {{PLURAL:$1|lap}} létrehozva",
 	"pages-created-since-deleted": "$1 óta törölve",
 	"pages-created-tooltip": "A létrehozott oldalak száma, beleértve az átirányítással létrehozott oldalakat is, oldalmozgatásokkal. További részletek a dokumentációban találhatók.",
-	"pages-deleted": "Törölt lapok",
 	"pages-deleted-redirects": "Törölt lapok átirányításokká válhattak.",
 	"pages-edited-total": "Lapszerkesztések (összesen)",
 	"pages-moved": "Lapátirányítások",

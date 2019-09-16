@@ -275,7 +275,6 @@
 	"pages-created-live-desc": "$2 {{PLURAL:$1|صفحه|صفحه}} ساخته‌شد",
 	"pages-created-since-deleted": "$1 بعداً حذف شد",
 	"pages-created-tooltip": "تمام صفحه‌های ساخته‌شده، شامل تغيير مسیر‌های بجا مانده از انتقال. برای جزئیات بیشتر مستندات را ببینید.",
-	"pages-deleted": "صفحات حذف شده",
 	"pages-deleted-redirects": "صفحه‌های حذف‌شده ممکن است تغییر مسیر باشند.",
 	"pages-edited-total": "صفحه‌های ساخته شده (همه)",
 	"pages-moved": "صفحات منتقل شده",

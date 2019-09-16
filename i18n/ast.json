@@ -299,7 +299,6 @@
 	"pages-created-live-desc": "$2 {{PLURAL:$1|páxina creada|páxines creaes}}",
 	"pages-created-since-deleted": "$1 desaniciaes d'entoncies acá",
 	"pages-created-tooltip": "Total de páxines creaes, incluyendo les creaes como redireición al treslladar una páxina. Consulta la documentación pa más detalles.",
-	"pages-deleted": "Páxines desaniciaes",
 	"pages-deleted-hover-desc": "Pasa'l mur perriba del testu '$1' pa ver el resume del desaniciu.",
 	"pages-deleted-redirects": "Les páxines desaniciaes podríen ser redireiciones.",
 	"pages-edited-total": "Páxines editaes (total)",

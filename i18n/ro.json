@@ -287,7 +287,6 @@
 	"pages-created-live-desc": "$2 {{PLURAL:$1|pagină|pagini}} create",
 	"pages-created-since-deleted": "$1 acum șterse",
 	"pages-created-tooltip": "Totalul paginilor create, inclusiv al paginilor create ca redirecționări la mutarea altor pagini. Vedeți documentația pentru mai multe detalii.",
-	"pages-deleted": "Pagini șterse",
 	"pages-deleted-hover-desc": "Treci peste textul '$1' pentru a vedea sumarul ștergerilor.",
 	"pages-deleted-redirects": "Paginile șterse au fost redirecționate.",
 	"pages-edited-total": "Pagini șterse (total)",

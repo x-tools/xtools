@@ -286,7 +286,6 @@
 	"pages-created-live-desc": "$2 {{PLURAL:$1|side|sider}} oprettet",
 	"pages-created-since-deleted": "$1 er siden slettet",
 	"pages-created-tooltip": "Samlet antal oprettede sider, inklusive dem oprettet som en omdirigering når en side flyttes. Se dokumentation for yderligere detaljer.",
-	"pages-deleted": "Slettede sider",
 	"pages-deleted-hover-desc": "Placer musen over »$1«-teksten for at se sletningsoverblik.",
 	"pages-deleted-redirects": "Slettede sider kan have været omdirigeringer.",
 	"pages-edited-total": "Sider redigeret (i alt)",

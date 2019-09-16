@@ -224,7 +224,6 @@
 	"pages-created": "作成したページ",
 	"pages-created-live-desc": "$2件の{{PLURAL:$1|ページ}}が作成されました",
 	"pages-created-since-deleted": "削除済み: $1ページ",
-	"pages-deleted": "削除されたページ",
 	"pages-edited-total": "編集した総ページ数",
 	"pages-moved": "移動したページ",
 	"pages-recreated-desc": "削除されたページの中には、このユーザーまたは別のユーザーによって再作成されたものがあります。これらは '$1'とマークされています。",

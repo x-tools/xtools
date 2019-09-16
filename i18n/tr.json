@@ -306,7 +306,6 @@
 	"pages-created-live-desc": "$2 {{PLURAL:$1|sayfa|sayfa}} oluşturuldu",
 	"pages-created-since-deleted": "$1 silindi",
 	"pages-created-tooltip": "Bir sayfa taşınırken yönlendirme olarak oluşturulanlar dahil, oluşturulan tüm sayfaların toplamı. Daha fazla bilgi için belgelere bakın.",
-	"pages-deleted": "Silinen sayfalar",
 	"pages-edited-total": "Düzenlenen sayfa (toplam)",
 	"pages-moved": "Taşınmış sayfalar",
 	"pageviews": "sayfa gösterimleri",
