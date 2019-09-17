@@ -40,7 +40,7 @@
         "symfony/monolog-bundle": "^3.3",
         "sensio/framework-extra-bundle": "^5.0",
         "incenteev/composer-parameter-handler": "^2.0",
-        "krinkle/intuition": "^1.0",
+        "krinkle/intuition": "^2.0",
         "mediawiki/oauthclient": "^0.1",
         "symfony/webpack-encore-pack": "^1.0",
         "symfony/cache": "^4.1",

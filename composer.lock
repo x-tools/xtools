@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "46c35e83528fe41f084fe119e0d26f8a",
+    "content-hash": "72bb5848d4af12544b2d0fd6a7e34adf",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2640,16 +2640,16 @@
         },
         {
             "name": "krinkle/intuition",
-            "version": "v1.2.0",
+            "version": "v2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Krinkle/intuition.git",
-                "reference": "dee3883497dae9b7f48c6b3e4faba711367745b1"
+                "reference": "aceaaf03c2001c804f08c11456a15a8cc58d5cad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Krinkle/intuition/zipball/dee3883497dae9b7f48c6b3e4faba711367745b1",
-                "reference": "dee3883497dae9b7f48c6b3e4faba711367745b1",
+                "url": "https://api.github.com/repos/Krinkle/intuition/zipball/aceaaf03c2001c804f08c11456a15a8cc58d5cad",
+                "reference": "aceaaf03c2001c804f08c11456a15a8cc58d5cad",
                 "shasum": ""
             },
             "require": {
@@ -2664,8 +2664,7 @@
             "type": "library",
             "autoload": {
                 "files": [
-                    "src/defines.php",
-                    "src/compat.php"
+                    "src/defines.php"
                 ],
                 "psr-4": {
                     "Krinkle\\Intuition\\": "src/"
@@ -2679,7 +2678,7 @@
                 "MIT"
             ],
             "description": "Framework for localisation in PHP.",
-            "time": "2018-11-06T18:04:32+00:00"
+            "time": "2019-05-13T16:02:34+00:00"
         },
         {
             "name": "mediawiki/oauthclient",
