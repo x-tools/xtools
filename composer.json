@@ -47,7 +47,7 @@
         "snc/redis-bundle": "^2.0",
         "predis/predis": "^1.0",
         "nelmio/cors-bundle": "^1.5",
-        "jms/serializer-bundle": "^2.4",
+        "jms/serializer-bundle": "^3.4",
         "doctrine/doctrine-migrations-bundle": "^1.0",
         "eightpoints/guzzle-bundle": "^7.0",
         "slevomat/coding-standard": "^4.8"
