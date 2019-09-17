@@ -41,7 +41,7 @@
         "sensio/framework-extra-bundle": "^5.0",
         "incenteev/composer-parameter-handler": "^2.0",
         "krinkle/intuition": "^1.0",
-        "mediawiki/oauthclient": "^0.1",
+        "mediawiki/oauthclient": "^1.0",
         "symfony/webpack-encore-pack": "^1.0",
         "symfony/cache": "^4.1",
         "snc/redis-bundle": "^2.0",
