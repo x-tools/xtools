@@ -44,7 +44,7 @@
         "mediawiki/oauthclient": "^0.1",
         "symfony/webpack-encore-pack": "^1.0",
         "symfony/cache": "^4.1",
-        "snc/redis-bundle": "^2.0",
+        "snc/redis-bundle": "^3.1",
         "predis/predis": "^1.0",
         "nelmio/cors-bundle": "^1.5",
         "jms/serializer-bundle": "^3.4",
