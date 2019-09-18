@@ -42,7 +42,6 @@
         "incenteev/composer-parameter-handler": "^2.0",
         "krinkle/intuition": "^1.0",
         "mediawiki/oauthclient": "^0.1",
-        "symfony/webpack-encore-pack": "^1.0",
         "symfony/cache": "^4.1",
         "snc/redis-bundle": "^3.1",
         "predis/predis": "^1.0",
@@ -50,7 +49,8 @@
         "jms/serializer-bundle": "^3.4",
         "doctrine/doctrine-migrations-bundle": "^1.0",
         "eightpoints/guzzle-bundle": "^7.0",
-        "slevomat/coding-standard": "^4.8"
+        "slevomat/coding-standard": "^4.8",
+        "symfony/webpack-encore-bundle": "^1.6"
     },
     "require-dev": {
         "phpunit/phpunit": "^5.3",
