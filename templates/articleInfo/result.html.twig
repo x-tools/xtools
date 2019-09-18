@@ -584,13 +584,8 @@
                 {{ msg('all-approximate') }}
             </div>
         {% endset %}
-        {% set jsonLink %}
-            <li>
-                <a target="_blank" class="download-link download-json" href="{{ path('PageApiTopEditors', {project:project.domain, page:page.title, start:ai.startDate, end:ai.endDate}) }}">{{ msg('json') }}</a>
-            </li>
-        {% endset %}
         {% set downloadLink %}
-            {{ layout.downloadLink('ArticleInfoResult', {project:project.domain, page:page.title, start:ai.startDate, end:ai.endDate}, ['wikitext'], jsonLink) }}
+            {{ layout.downloadLink('ArticleInfoResult', {project:project.domain, page:page.title, start:ai.startDate, end:ai.endDate}, ['wikitext'], 'PageApiTopEditors') }}
         {% endset %}
         {{ layout.content_block('top-editors', content, ['top-editors-desc', downloadLink]) }}
 

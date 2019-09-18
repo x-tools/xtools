@@ -3,7 +3,7 @@
 {% import 'macros/layout.html.twig' as layout %}
 
 {% block downloadLink %}
-    {{ layout.downloadLink('EditCounterMonthCounts', {project:project.domain, username:user.username}, ['wikitext', 'csv']) }}
+    {{ layout.downloadLink('EditCounterMonthCounts', {project:project.domain, username:user.username}, ['wikitext', 'csv'], 'UserApiMonthCounts') }}
 {% endblock %}
 
 {% block ecBody %}

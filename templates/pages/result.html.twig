@@ -193,7 +193,10 @@
                 {% endif %}
             {% endif %}
         {% endset %}
-        {{ layout.content_block('summary', content) }}
+        {% set downloadLink %}
+            {{ layout.downloadLink('PagesResult', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted, 'start': pages.start, 'end': pages.end}, [], 'UserApiPagesCount') }}
+        {% endset %}
+        {{ layout.content_block('summary', content, downloadLink) }}
 
         {################## LIST OF PAGES ###################}
 

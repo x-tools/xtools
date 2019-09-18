@@ -73,7 +73,10 @@
                 </table>
             </div>
         {% endset %}
-        {{ layout.content_block('tool-simpleeditcounter-desc', content) }}
+        {% set downloadLink %}
+            {{ layout.downloadLink('SimpleEditCounterResult', {project: project.domain, username: user.username, namespace: sec.namespace, start: sec.start, end: sec.end}, [], 'SimpleEditCounterApi') }}
+        {% endset %}
+        {{ layout.content_block('tool-simpleeditcounter-desc', content, downloadLink) }}
     </div>
 </div>
 {% endblock %}

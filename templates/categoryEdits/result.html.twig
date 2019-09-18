@@ -220,7 +220,10 @@
                 {{ msg('all-approximate') }}
             </div>
         {% endset %}
-        {{ layout.content_block('summary', content, 'tool-categoryedits-desc') }}
+        {% set downloadLink %}
+            {{ layout.downloadLink('CategoryEditsResult', {project: project.domain, username: user.username, categories: ce.categoriesPiped, start: ce.start, end: ce.end}, [], 'UserApiCategoryEditCount') }}
+        {% endset %}
+        {{ layout.content_block('summary', content, ['tool-categoryedits-desc', downloadLink]) }}
 
         {# ======================== CATEGORY CONTRIBUTIONS ======================== #}
 
