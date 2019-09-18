@@ -49,7 +49,7 @@
         "jms/serializer-bundle": "^3.4",
         "doctrine/doctrine-migrations-bundle": "^1.0",
         "eightpoints/guzzle-bundle": "^7.0",
-        "slevomat/coding-standard": "^4.8",
+        "slevomat/coding-standard": "^5.0",
         "symfony/webpack-encore-bundle": "^1.6"
     },
     "require-dev": {
