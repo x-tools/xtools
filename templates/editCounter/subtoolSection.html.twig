@@ -14,7 +14,7 @@
         <a href="{{ path(route, {project:project.domain, username:user.username}|merge(extraParams))}}">{{ msg(i18nKey) }}</a>
     {% endset %}
     {% set downloadLink %}
-        {{ layout.downloadLink(route, {project:project.domain, username:user.username}|merge(extraParams), downloadFormats) }}
+        {{ layout.downloadLink(route, {project:project.domain, username:user.username}|merge(extraParams), downloadFormats, jsonPath is defined ? jsonPath : null) }}
     {% endset %}
     {{ layout.content_block(headerLink, content, downloadLink, i18nKey, true) }}
 {% endif %}

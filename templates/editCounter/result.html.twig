@@ -28,15 +28,15 @@
 
         {% include 'editCounter/subtoolSection.html.twig' with {'route': 'EditCounterGeneralStats', 'i18nKey': 'general-stats'} %}
 
-        {% include 'editCounter/subtoolSection.html.twig' with {'route': 'EditCounterNamespaceTotals', 'i18nKey': 'namespace-totals'} %}
+        {% include 'editCounter/subtoolSection.html.twig' with {'route': 'EditCounterNamespaceTotals', 'i18nKey': 'namespace-totals', 'jsonPath': 'UserApiNamespaceTotals'} %}
 
         {% include 'editCounter/subtoolSection.html.twig' with {'route': 'EditCounterYearCounts', 'i18nKey': 'year-counts'} %}
 
-        {% include 'editCounter/subtoolSection.html.twig' with {'route': 'EditCounterMonthCounts', 'i18nKey': 'month-counts'} %}
+        {% include 'editCounter/subtoolSection.html.twig' with {'route': 'EditCounterMonthCounts', 'i18nKey': 'month-counts', 'jsonPath': 'UserApiMonthCounts'} %}
 
-        {% include 'editCounter/subtoolSection.html.twig' with {'route': 'EditCounterTimecard', 'i18nKey': 'timecard'} %}
+        {% include 'editCounter/subtoolSection.html.twig' with {'route': 'EditCounterTimecard', 'i18nKey': 'timecard', 'jsonPath': 'UserApiTimeCard'} %}
 
-        {% include 'editCounter/subtoolSection.html.twig' with {'route': 'TopEditsResultNamespace', 'i18nKey': 'top-edited-pages', 'downloadFormats': ['wikitext'], 'extraParams': {'namespace': 'all'}} %}
+        {% include 'editCounter/subtoolSection.html.twig' with {'route': 'TopEditsResultNamespace', 'i18nKey': 'top-edited-pages', 'downloadFormats': ['wikitext'], 'extraParams': {'namespace': 'all'}, 'jsonPath': 'UserApiTopEditsArticle'} %}
 
         {% if not(user.anon) and 'rights-changes' in sections and (ec.rightsChanges|length > 0 or ec.globalRightsChanges|length > 0) %}
             {% include 'editCounter/subtoolSection.html.twig' with {'route': 'EditCounterRightsChanges', 'i18nKey': 'rights-changes', 'downloadFormats': ['wikitext']} %}

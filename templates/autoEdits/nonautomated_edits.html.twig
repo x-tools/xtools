@@ -23,7 +23,12 @@
                 <header class="panel-heading col-lg-12">
                     <h4>
                         {{ msg('non-auto-contribs') }}
-                        <span class='pull-right text-muted xt-panel-description'>{{ msg('non-auto-contribs-desc') }}</span>
+                        <span class='pull-right text-muted xt-panel-description'>
+                            {{ layout.downloadLink('UserApiNonAutoEdits', {'project': project.domain, 'username': user.username, 'namespace': ae.namespace, 'start': ae.start, 'end': ae.end}, [], 'UserApiNonAutoEdits') }}
+                        </span>
+                        <span class='pull-right text-muted xt-panel-description'>
+                            {{ msg('non-auto-contribs-desc') }}
+                        </span>
                     </h4>
                 </header>
                 <div class="panel-body col-lg-12">

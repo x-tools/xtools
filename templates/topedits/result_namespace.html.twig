@@ -151,7 +151,10 @@
         {% if is_sub_request %}
             {{ content }}
         {% else %}
-            {{ layout.content_block(nsName(ns, project.namespaces), content, '', ns, true, te.topEdits|length > 1) }}
+            {% set downloadLink %}
+                {{ layout.downloadLink('TopEditsResultNamespace', {'project': project.domain, 'username': user.username, 'namespace': te.namespace}, ['wikitext'], 'UserApiTopEditsArticleUnderscored') }}
+            {% endset %}
+            {{ layout.content_block(nsName(ns, project.namespaces), content, downloadLink, ns, true, te.topEdits|length > 1) }}
         {% endif %}
     {% endfor %}
 {% else %}

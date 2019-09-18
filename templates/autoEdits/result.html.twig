@@ -89,7 +89,10 @@
                 {{ msg('all-approximate') }}
             </div>
         {% endset %}
-        {{ layout.content_block('summary', content) }}
+        {% set downloadLink %}
+            {{ layout.downloadLink('UserApiNonAutoEdits', {'project': project.domain, 'username': user.username, 'namespace': ae.namespace, 'start': ae.start, 'end': ae.end}, [], 'UserApiAutoEditsCount') }}
+        {% endset %}
+        {{ layout.content_block('summary', content, downloadLink) }}
 
         {% if ae.editCount == 0 %}
             {% set content %}
@@ -220,7 +223,10 @@
                 </p>
             {% endset %}
         {% endif %}
-        {{ layout.content_block('auto-edits', content) }}
+        {% set downloadLink %}
+            {{ layout.downloadLink('UserApiNonAutoEdits', {'project': project.domain, 'username': user.username, 'namespace': ae.namespace, 'start': ae.start, 'end': ae.end, 'tools': '1'}, [], 'UserApiAutoEditsCount') }}
+        {% endset %}
+        {{ layout.content_block('auto-edits', content, downloadLink) }}
 
         {% if ae.editCount == 0 %}
             {% set content %}
@@ -247,7 +253,10 @@
         {% set headerLink %}
             <a href="{{ path('NonAutoEditsContributionsResult', {project:project.domain, username:user.username, start: ae.start, end: ae.end, namespace: ae.namespace}) }}">{{ msg('non-auto-contribs') }}</a>
         {% endset %}
-        {{ layout.content_block(headerLink, content, null, 'non-auto-contribs', true) }}
+        {% set downloadLink %}
+            {{ layout.downloadLink('UserApiNonAutoEdits', {'project': project.domain, 'username': user.username, 'namespace': ae.namespace, 'start': ae.start, 'end': ae.end}, [], 'UserApiNonAutoEdits') }}
+        {% endset %}
+        {{ layout.content_block(headerLink, content, downloadLink, 'non-auto-contribs', true) }}
 
         <div class="times-in-utc text-muted">
             {{ msg('times-in-utc') }}

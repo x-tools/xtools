@@ -128,7 +128,10 @@
                 </div>
             {% endif %}
         {% endset %}
-        {{ layout.content_block('summary', content) }}
+        {% set downloadLink %}
+            {{ layout.downloadLink('EditSummaryResult', {project: project.domain, username: user.username, namespace: es.namespace, start: es.start, end: es.end}, [], 'UserApiEditSummaries') }}
+        {% endset %}
+        {{ layout.content_block('summary', content, downloadLink) }}
 
         {% set content %}
             {% if es.totalEdits > 0 %}

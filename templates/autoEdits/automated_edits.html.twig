@@ -31,6 +31,9 @@
                             {% endset %}
                             {{ msg('auto-tool-edits', [toolLink]) }}
                         {% endif %}
+                        <span class='pull-right text-muted xt-panel-description'>
+                            {{ layout.downloadLink('UserApiAutoEdits', {'project': project.domain, 'username': user.username, 'namespace': ae.namespace, 'start': ae.start, 'end': ae.end, 'tool': ae.tool}, [], 'UserApiAutoEdits') }}
+                        </span>
                         <span class='pull-right text-muted xt-panel-description'>{{ msg('auto-contribs-desc') }}</span>
                     </h4>
                 </header>
