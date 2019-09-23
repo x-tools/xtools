@@ -47,7 +47,7 @@
 	"auto-edits-request": "Zatražite da se doda novo (polu)automatsko oruđe",
 	"auto-edits-request-examples": "Poveznice na primjere uređivanja",
 	"auto-edits-request-name": "Naziv alata",
-	"auto-edits-tool-filter-desc": "Prikaži samo uređivanja nastala uporabom datog alata.",
+	"auto-edits-tool-filter-desc": "Prikaži samo uređivanja nastala upotrebom danog alata.",
 	"auto-edits-unknown-tool": "Nema poznatog alata pod imenom: $1",
 	"auto-tool-edits": "Uređivanja s alatom $1",
 	"automatic": "Automatski",

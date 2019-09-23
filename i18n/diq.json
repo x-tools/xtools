@@ -86,6 +86,7 @@
 	"num-hours": "($1 {{PLURAL:$1|saete|saeti}})",
 	"num-minutes": "{{PLURAL: $1|deqa|deqeyi}}",
 	"num-months": "{{PLURAL:$1|aşme|aşmi}}",
+	"num-moves": "{{PLURAL:$1|bıkırışe|bıkırışe}}",
 	"num-namespaces": "{{PLURAL:$1|heruna nameyi|heruna nameyan}}",
 	"num-others": "{{PLURAL:$1|sewbi|ê bini}}",
 	"num-protections": "{{PLURAL:$1|şeveknayış|şeveknayışi}}",
