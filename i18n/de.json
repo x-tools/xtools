@@ -7,7 +7,8 @@
 			"CarstenG",
 			"MGChecker",
 			"Mirzali",
-			"Abijeet Patro"
+			"Abijeet Patro",
+			"Tobi 406"
 		]
 	},
 	"abusefilter": "Bearbeitungsfilter",
@@ -134,6 +135,7 @@
 	"edits-with-summaries": "Zusammenfassung verwendet",
 	"end": "Enddatum",
 	"error-articleinfo-api": "Die Versionsdaten konnten nicht abgerufen werden.",
+	"error-authorship-unsupported-project": "$1 ist kein unterstütztes Projekt.",
 	"error-automation": "Die Nutzung der Automatisierung zum Kratzen der XTools-Benutzeroberfläche ist nicht erlaubt. Verwende bitte stattdessen unsere umfassende API: $1",
 	"error-denied": "Dein Zugang zu XTools wurde aufgrund offensichtlichen Missbrauchs oder zerstörender Automation gesperrt. Kontaktiere bitte $1.",
 	"error-login": "Anmeldung fehlgeschlagen! Bitte erneut versuchen.",
