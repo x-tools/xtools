@@ -28,7 +28,7 @@
         "ext-intl": "*",
         "ext-json": "*",
         "ext-PDO": "*",
-        "symfony/symfony": "4.2.1",
+        "symfony/symfony": "4.2.7",
         "twig/twig": "^2.0",
         "doctrine/orm": "^2.5",
         "doctrine/doctrine-bundle": "^1.6",
