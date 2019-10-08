@@ -1,20 +1,26 @@
 # Release Notes #
 
+## 3.10.6 ##
+- EditCounter (T232804): Remove pages deleted from pages section.
+- Update dependencies.
+- Add links to download results as JSON, where applicable.
+- Localization updates.
+
 ## 3.10.5 ##
-- T202552: Add date filtering to Edit Summary tool.
-- T226231: Make admin actions global in AutoEdits.
-- T229555: Add 'Sitelink auto-change' to AutoEdits Wikidata config.
-- T229564: Add 'Sitelink auto-removal' to AutoEdits Wikidata config.
-- T229562: Add 'AutoEdit' to AutoEdits Wikidata config.
-- T223350: Add 'Merge.js' to AutoEdits Wikidata config.
-- T229563: Fix global AutoEdits definition for Cat-a-lot.
+- EditSummary (T202552): Add date filtering.
+- AutoEdits (T226231): Make admin actions global.
+- AutoEdits (T229555): Add 'Sitelink auto-change' to Wikidata config.
+- AutoEdits (T229564): Add 'Sitelink auto-removal' to Wikidata config.
+- AutoEdits (T229562): Add 'AutoEdit' to Wikidata config.
+- AutoEdits (T223350): Add 'Merge.js' to Wikidata config.
+- AutoEdits (T229563): Fix global definition for Cat-a-lot.
 - EditCounter: Remove 'Global contributions' as subtool.
 - Fix long-standing typo: Resonator -> Reasonator.
 - Localization updates.
 
 ## 3.10.4 ##
-- T229387: Remove single_tag logic from AutoEdits.
-- T202552: Add date filtering options to Top Edits.
+- AutoEdits (T229387): Remove single_tag logic.
+- TopEdits (T202552): Add date filtering options.
 - AdminStats: add options export as wikitext, CSV and TSV.
 - EditCounter: fix boolean logic for showing rights changes section.
 - ArticleInfo: code refactoring and cleanup.
@@ -23,9 +29,9 @@
 
 ## 3.10.3 ##
 - Blame: improve algorithm, allowing partial matches.
-- T177903: Show files renamed in Edit Counter.
-- T226228: Don't show file uploads/renames for Commons when Commons is
-  the requested project.
+- EditCounter (T177903): Show files renamed.
+- EditCounter (T226228): Don't show file uploads/renames for Commons.
+  when Commons is the requested project.
 - ArticleInfo: fix display of Authorship section.
 - Localization updates.
 
@@ -38,10 +44,10 @@
 ## 3.10.0 ##
 - Blame: Revive old Blame tool, using the WikiWho service.
 - Authorship: Validate project is supported by WikiWho.
-- Localization updates. 
+- Localization updates.
 
 ## 3.9.1 ##
-- T226299: Add legacy route to articleinfo-authorship.
+- ArticleInfo (T226299): Add legacy route to articleinfo-authorship.
 
 ## 3.9.0 ##
 - New top navigation with improved organization and links to sub-tools.
@@ -52,7 +58,7 @@
 - AutoEdits: Add more tools, fixes to existing tools, and simply regular
   expressions to reduce the size of the SQL query.
 - ArticleInfo: make top 10 by added text chart match percentages.
-- T225389: Link and put 'Pages moved' under 'Actions' in Edit Counter.
+- EditCounter (T225389): Link and put 'Pages moved' under 'Actions'.
 - Increase width of labels in forms to better accommodate translations.
 - Record usage of ArticleInfo API.
 - Handle errors when querying WikiWho API.
@@ -66,7 +72,7 @@
 - TopEdits: Improve performance of per-page query.
 - Use new specialized sub-views for comment and actor tables.
 - Fix bug where exception is thrown when start date is invalid.
-- T225058: Fix counting of pending changes approval in Edit Counter.
+- EditCounter (T225058): Fix counting of pending changes approval.
 - Localization updates.
 
 ## 3.8.0 ##
@@ -99,8 +105,8 @@
 ## 3.7.8 ##
 - Hotfix for request blacklist functionality
 - ArticleInfo: Cache queries and increase memory limit for authorship action.
-- T222552: Change 'approve' log to count manual approvals in Edit Counter
-- T218465: Add history merge log count to Edit Counter
+- EditCounter (T222552): Change 'approve' log to count manual approvals.
+- EditCounter (T218465): Add history merge log count.
 - AutoEdits: Cleanup of configuration file, expand namespace definitions
 - Localization updates
 
@@ -113,8 +119,8 @@
 - Disallow scraping XTools with JavaScript, informing the client to use the API
 - AdminStats: Only allow meta.wikimedia for Steward Stats
 - ArticleInfo: Make authorship route accept page title as query string
-- T222323: Optimize AutoEdits by specifying applicable namespaces for some tools
-- T222134: Add undo-last-edit to enwiki AutoEdits config
+- AutoEdits (T222323): Optimize by specifying applicable namespaces for some tools.
+- AutoEdits (T222134): Add undo-last-edit to enwiki config.
 - Updates to API documentation.
 - Localization updates
 
@@ -125,8 +131,8 @@
 - Change 'WebChat' link text to 'connect' for clarity.
 
 ## 3.7.4 ##
-- T221727: add QuickStatements to wikidata AutoEdits config.
-- T222049: Fix links to AbuseFilter log in Edit Counter.
+- AutoEdits (T221727): add QuickStatements to wikidata config.
+- EditCounter (T222049): Fix links to AbuseFilter log.
 - ArticleInfo: add 'n others' slice to authorship chart, adjust colours,
   and limit subrequest view to 500 results.
 - Localization updates.
