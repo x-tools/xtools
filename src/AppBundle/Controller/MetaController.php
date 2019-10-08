@@ -50,7 +50,14 @@ class MetaController extends XtoolsController
 
     /**
      * Display the results.
-     * @Route("/meta/{start}/{end}/{legacy}", name="MetaResult")
+     * @Route(
+     *     "/meta/{start}/{end}/{legacy}",
+     *     name="MetaResult",
+     *     requirements={
+     *         "start"="\d{4}-\d{2}-\d{2}",
+     *         "end"="\d{4}-\d{2}-\d{2}",
+     *     },
+     * )
      * @param bool $legacy Non-blank value indicates to show stats for legacy XTools
      * @return Response
      * @codeCoverageIgnore
