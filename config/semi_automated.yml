@@ -286,7 +286,7 @@ parameters:
             regex: 'using a \[\[User:GregU\/dashes.js\|script'
             link: User:GregU/dashes
         delsort:
-            regex: '(Wikipedia:WP):FWDS|User:APerson\/delsort\|delsort.js|User:Enterprisey\/delsort\|assisted'
+            regex: '(Wikipedia|WP):FWDS|User:APerson\/delsort\|delsort.js|User:Enterprisey\/delsort\|assisted'
             link: WP:DELSORT
             namespaces: [4]
         deOrphan:
