@@ -57,6 +57,7 @@ parameters:
             tag: mw-rollback
             tag_excludes:
                 - huggle
+                - 'OAuth CID: 1352'
             link: Special:MyLanguage/Project:Rollback
             revert: true
         Global rename:
@@ -91,11 +92,16 @@ parameters:
         reFill:
             regex: 'User:Zhaofeng Li\/Reflinks|WP:REFILL|en:WP:REFILL|with reFill 2'
             link: Project:ReFill
+        SWViewer:
+            tag: 'OAuth CID: 1352'
+            link: m:SWViewer
+            # This is not considered a revert because it can also be used to edit or tag for deletion
         Undo:
             tag: mw-undo
             tag_excludes:
                 - mw-rollback
                 - huggle
+                - 'OAuth CID: 1352'
             link: Special:MyLanguage/Project:Undo
             # This is not considered a revert because you can undo any arbitrary revision, not just the previous one.
         WikiLove:
