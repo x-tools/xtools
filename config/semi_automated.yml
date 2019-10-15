@@ -499,6 +499,10 @@ parameters:
         AutoEdit:
             regex: 'Gadget-autoEdit\.js\|autoEdit'
             link: MediaWiki talk:Gadget-autoEdit.js
+        labelLister:
+            regex: 'MediaWiki_talk:Gadget-labelLister.js\|labelLister'
+            link: MediaWiki talk:Gadget-labelLister.js
+            namespaces: [ 0, 120 ]
         Merge.js:
             regex: '\[\[MediaWiki:Gadget-Merge\.js\|merge\.js\]\]'
             link: MediaWiki talk:Gadget-Merge.js
