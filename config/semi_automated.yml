@@ -445,6 +445,11 @@ parameters:
             tag: 'OAuth CID: 860'
             link: User:Enterprisey/YABBR
             namespaces: [0]
+    fa.wikipedia.org:
+        Typo fixer:
+            label: 'ویکی‌پدیا:اشتباه‌یاب'
+            link: ویکی‌پدیا:اشتباه‌یاب
+            regex: \[\[وپ:اشتباه\|اشتباه‌یاب\]\]
     ko.wikipedia.org:
         AutoWikiBrowser:
             regex: '위키백과:AWB\|AWB|(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
