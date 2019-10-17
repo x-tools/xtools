@@ -255,6 +255,10 @@ parameters:
             regex: 'User:Symplectic_Map\/AutoSpell\|Script-assisted'
             link: User:Symplectic_Map/AutoSpell
             namespaces: [0]
+        BDCS:
+            regex: '\(\[\[User:SD0001\/BDCS\|BDCS\]\]\)'
+            link: User:SD0001/BDCS
+            namespaces: [3]
         Bot revert:
             regex: '^Reverting possible (vandalism|test edit).*by.*\(Bot|BOT( EDIT)?\)$|^BOT (- )?(Reverted edits? by|rv)|^vandalism from \[\[.*?\(\d+\) - reverted'
             link: Project:Bots
