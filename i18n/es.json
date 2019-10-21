@@ -14,7 +14,8 @@
 			"Dgstranz",
 			"Tiberius1701",
 			"DannyS712",
-			"Abijeet Patro"
+			"Abijeet Patro",
+			"Hasley"
 		]
 	},
 	"abusefilter": "Filtro antiabusos",
@@ -99,6 +100,7 @@
 	"current-admins": "Administradores actuales",
 	"current-patrollers": "Actual patrollers",
 	"current-size": "Tamaño actual",
+	"current-stewards": "Stewards actuales",
 	"current-user-groups": "Grupos de usuarios actuales",
 	"data-limit": "Datos limitados a {{PLURAL:$1|la última edición|las últimas $2 ediciones}}",
 	"date": "Fecha",
