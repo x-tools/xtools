@@ -57,6 +57,7 @@ parameters:
             tag: mw-rollback
             tag_excludes:
                 - huggle
+                - 'OAuth CID: 1352'
             link: Special:MyLanguage/Project:Rollback
             revert: true
         Global rename:
@@ -91,11 +92,16 @@ parameters:
         reFill:
             regex: 'User:Zhaofeng Li\/Reflinks|WP:REFILL|en:WP:REFILL|with reFill 2'
             link: Project:ReFill
+        SWViewer:
+            tag: 'OAuth CID: 1352'
+            link: m:SWViewer
+            # This is not considered a revert because it can also be used to edit or tag for deletion
         Undo:
             tag: mw-undo
             tag_excludes:
                 - mw-rollback
                 - huggle
+                - 'OAuth CID: 1352'
             link: Special:MyLanguage/Project:Undo
             # This is not considered a revert because you can undo any arbitrary revision, not just the previous one.
         WikiLove:
@@ -249,6 +255,10 @@ parameters:
             regex: 'User:Symplectic_Map\/AutoSpell\|Script-assisted'
             link: User:Symplectic_Map/AutoSpell
             namespaces: [0]
+        BDCS:
+            regex: '\(\[\[User:SD0001\/BDCS\|BDCS\]\]\)'
+            link: User:SD0001/BDCS
+            namespaces: [3]
         Bot revert:
             regex: '^Reverting possible (vandalism|test edit).*by.*\(Bot|BOT( EDIT)?\)$|^BOT (- )?(Reverted edits? by|rv)|^vandalism from \[\[.*?\(\d+\) - reverted'
             link: Project:Bots
@@ -280,7 +290,7 @@ parameters:
             regex: 'using a \[\[User:GregU\/dashes.js\|script'
             link: User:GregU/dashes
         delsort:
-            regex: '(Wikipedia:WP):FWDS|User:APerson\/delsort\|delsort.js|User:Enterprisey\/delsort\|assisted'
+            regex: '(Wikipedia|WP):FWDS|User:APerson\/delsort\|delsort.js|User:Enterprisey\/delsort\|assisted'
             link: WP:DELSORT
             namespaces: [4]
         deOrphan:
@@ -439,6 +449,11 @@ parameters:
             tag: 'OAuth CID: 860'
             link: User:Enterprisey/YABBR
             namespaces: [0]
+    fa.wikipedia.org:
+        Typo fixer:
+            label: 'ویکی‌پدیا:اشتباه‌یاب'
+            link: ویکی‌پدیا:اشتباه‌یاب
+            regex: \[\[وپ:اشتباه\|اشتباه‌یاب\]\]
     ko.wikipedia.org:
         AutoWikiBrowser:
             regex: '위키백과:AWB\|AWB|(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
@@ -488,6 +503,10 @@ parameters:
         AutoEdit:
             regex: 'Gadget-autoEdit\.js\|autoEdit'
             link: MediaWiki talk:Gadget-autoEdit.js
+        labelLister:
+            regex: 'MediaWiki_talk:Gadget-labelLister.js\|labelLister'
+            link: MediaWiki talk:Gadget-labelLister.js
+            namespaces: [ 0, 120 ]
         Merge.js:
             regex: '\[\[MediaWiki:Gadget-Merge\.js\|merge\.js\]\]'
             link: MediaWiki talk:Gadget-Merge.js
