@@ -1,7 +1,7 @@
-{{ msg('namespace') }},{% for year in ec.yearCounts.yearLabels %}
-{{ year }}{% if not loop.last %},{% endif %}
+{{ msg('year') }},{% for nsId in ec.yearCounts.totals|keys %}
+{{ nsName(nsId, project.namespaces) }}{% if not loop.last %},{% endif %}
 {% endfor %}
 
-{% for nsId,namespaceData in ec.yearCounts.totals %}
-{{ nsName(nsId, project.namespaces) }},{{ namespaceData|join(',') }}
+{% for year, counts in ec.yearCountsWithNamespaces %}
+{{ year }},{{ counts|join(',') }}
 {% endfor %}

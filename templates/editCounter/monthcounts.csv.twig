@@ -1,6 +1,7 @@
-{{ msg('month') }},{{ msg('count') }}
-{% for nsId in ec.monthCounts.totals|keys %}
-{% for month,total in ec.monthTotals %}
-{{ month }},{{ total }}
+{{ msg('month') }},{% for nsId in ec.monthCounts.totals|keys %}
+{{ nsName(nsId, project.namespaces) }}{% if not(loop.last) %},{% endif %}
 {% endfor %}
+
+{% for month, counts in ec.monthCountsWithNamespaces %}
+{{ month }},{{ counts|join(',') }}
 {% endfor %}

@@ -23,9 +23,6 @@ class EditCounter extends UserRights
     /** @var string[] The IDs and timestamps of first/latest edit and logged action. */
     protected $firstAndLatestActions;
 
-    /** @var int[] The total page counts. */
-    protected $pageCounts;
-
     /** @var int[] The lot totals. */
     protected $logCounts;
 
