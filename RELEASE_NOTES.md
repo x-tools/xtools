@@ -1,5 +1,15 @@
 # Release Notes #
 
+## 3.10.7 ##
+- EditCounter (T236095): Make month/year counts CSV in comprehensible format.
+- AutoEdits (T235726): Add BDCS tool to enwiki config.
+- AutoEdits (T230634): Add labelLister to wikidata config.
+- AutoEdits (T230925): Fix delsort regex to pick up FWDS tool.
+- AutoEdits (T233354): Add typo fixer tool to fawiki config.
+- AutoEdits (T233732): Add SWViewer to global config.
+- Meta: Require Y-m-d date format in routing.
+- Localization updates.
+
 ## 3.10.6 ##
 - EditCounter (T232804): Remove pages deleted from pages section.
 - Update dependencies.
