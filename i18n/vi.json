@@ -6,7 +6,8 @@
 			"Phjtieudoc",
 			"Minh Nguyen",
 			"Leduyquang753",
-			"Ioe2015"
+			"Ioe2015",
+			"Bluetpp"
 		]
 	},
 	"accepted-formats": "Định dạng được chấp nhận",
@@ -32,6 +33,7 @@
 	"approximate": "ước lượng",
 	"article": "Bài viết",
 	"auto-edits": "Số sửa đổi (bán) tự động",
+	"auto-edits-request-name": "Tên công cụ",
 	"auto-edits-tool-filter-desc": "Chỉ hiện các thay đổi sử dụng công cụ đã chọn.",
 	"auto-edits-unknown-tool": "Không có công cụ nào được biết đến với tên: $1",
 	"auto-tool-edits": "Các sửa đổi $1",
@@ -71,6 +73,7 @@
 	"date": "Ngày tháng",
 	"date-from": "Từ: $1",
 	"date-range": "$1 – $2",
+	"date-to": "Tới: $1",
 	"delete": "Xóa",
 	"deleted": "Đã xóa",
 	"deleted-bytes": "Đã xóa (byte)",
@@ -91,6 +94,7 @@
 	"edits-last-year": "Số sửa đổi trong 365 ngày qua",
 	"edits-with-summaries": "Số sửa đổi có tóm lược",
 	"end": "Ngày kết thúc",
+	"error-login": "Đăng nhập thất bại! Xin hãy thử lại.",
 	"error-rate-limit-login": "đăng nhập",
 	"events": "Sự kiện",
 	"executed": "Đã thực hiện trong $1 {{PLURAL:$2|giây|giây}}.",
@@ -140,6 +144,7 @@
 	"max-text-deleted": "Số lượng văn bản được xóa",
 	"memory-usage": "Đã lấy $1 {{PLURAL:$2|megabyte|megabytes}} bộ nhớ để thực hiện.",
 	"minor-edits": "Số sửa đổi nhỏ",
+	"minor-edits-percentage": "Sửa đổi nhỏ %",
 	"monday": "thứ Hai",
 	"month": "Tháng",
 	"month-counts": "Thống kê hàng tháng",
