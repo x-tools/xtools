@@ -354,7 +354,7 @@ parameters:
         Page curation:
             regex: 'using \[\[Wikipedia:Page Curation\|Page Curation'
             link: w:en:Wikipedia:Page_Curation/Help
-            namespaces: [0, 2, 3]
+            namespaces: [0, 1, 2, 3]
         Page swap:
             regex: '\/pageswap\|pageswap\]\]'
             link: WP:PAGESWAP
