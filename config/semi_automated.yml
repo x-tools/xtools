@@ -58,6 +58,7 @@ parameters:
             tag_excludes:
                 - huggle
                 - 'OAuth CID: 1352'
+                - STiki
             link: Special:MyLanguage/Project:Rollback
             revert: true
         Global rename:
@@ -102,6 +103,7 @@ parameters:
                 - mw-rollback
                 - huggle
                 - 'OAuth CID: 1352'
+                - STiki
             link: Special:MyLanguage/Project:Undo
             # This is not considered a revert because you can undo any arbitrary revision, not just the previous one.
         WikiLove:
@@ -354,7 +356,7 @@ parameters:
         Page curation:
             regex: 'using \[\[Wikipedia:Page Curation\|Page Curation'
             link: w:en:Wikipedia:Page_Curation/Help
-            namespaces: [0, 2, 3]
+            namespaces: [0, 1, 2, 3]
         Page swap:
             regex: '\/pageswap\|pageswap\]\]'
             link: WP:PAGESWAP
@@ -405,8 +407,10 @@ parameters:
             namespaces: [2, 3, 4]
         STiki:
             regex: 'WP:ST(iki|IKI)'
+            tag: STiki
             link: w:en:Wikipedia:STiki
             revert: Reverted \d+.*WP:(STiki|STIKI)
+            namespaces: [0, 3]
         stubsearch:
             regex: '\[\[User:Danski454\/stubsearch\|a tool'
             link: User:Danski454/stubsearch
@@ -449,6 +453,11 @@ parameters:
             tag: 'OAuth CID: 860'
             link: User:Enterprisey/YABBR
             namespaces: [0]
+    en.wikisource.org:
+        Change status:
+            link: User:DannyS712/Change_status
+            regex: \[\[User:DannyS712/Change status\|Change status\.js\]\]
+            namespaces: [104]
     fa.wikipedia.org:
         Typo fixer:
             label: 'ویکی‌پدیا:اشتباه‌یاب'
@@ -497,6 +506,10 @@ parameters:
             regex: 'Desfeita a edição \d+ de \[\['
             link: Ajuda:Guia de edição/Reverter edições#Botão Desfazer
             label: 'Desfazer'
+    simple.wikipedia.org:
+        Twinkle:
+            regex: ' \(\[\[WP:TW\|TW\]\]\)'
+            link: Wikipedia:Twinkle
 
     # Non-wikipedia sites
     www.wikidata.org:
