@@ -497,6 +497,10 @@ parameters:
             regex: 'Desfeita a edição \d+ de \[\['
             link: Ajuda:Guia de edição/Reverter edições#Botão Desfazer
             label: 'Desfazer'
+    simple.wikipedia.org:
+        Twinkle:
+            regex: ' \(\[\[WP:TW\|TW\]\]\)'
+            link: Wikipedia:Twinkle
 
     # Non-wikipedia sites
     www.wikidata.org:
