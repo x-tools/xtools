@@ -449,6 +449,10 @@ parameters:
             tag: 'OAuth CID: 860'
             link: User:Enterprisey/YABBR
             namespaces: [0]
+    en.wikisource.org:
+        Change status:
+            link: User:DannyS712/Change_status
+            regex: \[\[User:DannyS712/Change status\|Change status\.js\]\]
     fa.wikipedia.org:
         Typo fixer:
             label: 'ویکی‌پدیا:اشتباه‌یاب'
