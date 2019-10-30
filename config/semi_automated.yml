@@ -453,6 +453,7 @@ parameters:
         Change status:
             link: User:DannyS712/Change_status
             regex: \[\[User:DannyS712/Change status\|Change status\.js\]\]
+            namespaces: [104]
     fa.wikipedia.org:
         Typo fixer:
             label: 'ویکی‌پدیا:اشتباه‌یاب'
