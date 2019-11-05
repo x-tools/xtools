@@ -529,9 +529,9 @@ parameters:
             regex: 'MediaWiki_talk:Gadget-labelLister.js\|labelLister'
             link: MediaWiki talk:Gadget-labelLister.js
             namespaces: [ 0, 120 ]
-        Merge.js:
-            regex: '\[\[MediaWiki:Gadget-Merge\.js\|merge\.js\]\]'
-            link: MediaWiki talk:Gadget-Merge.js
+        Merge:
+            regex: '\[\[MediaWiki:Gadget-Merge\.js\|merge\.js\]\]|^Merged Item'
+            link: Help:Merge
         Sitelink auto-change:
             regex: 'clientsitelink-update'
             link: Help:Sitelinks
