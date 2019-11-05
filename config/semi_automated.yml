@@ -463,6 +463,10 @@ parameters:
             link: User:DannyS712/Change_status
             regex: \[\[User:DannyS712/Change status\|Change status\.js\]\]
             namespaces: [104]
+    es.wikipedia.org:
+        Replacer:
+            tag: 'OAuth CID: 498'
+            link: Usuario:Benjavalero/Replacer
     fa.wikipedia.org:
         Typo fixer:
             label: 'ویکی‌پدیا:اشتباه‌یاب'
