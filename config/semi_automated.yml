@@ -41,12 +41,9 @@ parameters:
             regex: 'Help:Cat-a-lot'
             link: commons:Special:MyLanguage/Help:Gadget-Cat-a-lot
             tag: Cat-a-lot
-        Commons duplicate file:
-            regex: 'COM:Duplicate\|Duplicate'
-            link: c:Commons:Duplicate
-        Commons file rename:
-            regex: 'COM:FR\|File renamed\]\]:'
-            link: c:Special:MyLanguage/Commons:File renaming
+        Commons global replace:
+            regex: 'COM:FR\|File renamed\]\]:|COM:Duplicate\|Duplicate|\(\[\[c:GR\|GR\]\]\)'
+            link: c:Special:MyLanguage/Commons:File renaming/Global replace
         Content translation:
             tag: contenttranslation
             regex: 'Created by translating the page'
@@ -325,9 +322,6 @@ parameters:
             regex: 'WP:FTCG\|FtCG'
             link: Project:FTCG
             namespaces: [6]
-        Global replace:
-            regex: '\(\[\[c:GR\|GR\]\]\) '
-            link: commons:Commons:File renaming/Global replace
         Heading editor:
             regex: '\[\[User:The Evil IP address\/hdedit\|script\]\]'
             link: User:The Evil IP address/hdedit
