@@ -436,6 +436,10 @@ parameters:
             regex: '\(\[\[User:Enterprisey\/undo-last-edit\.js\|undo-last-edit\]\]\)'
             link: User:Enterprisey/undo-last-edit
             revert: true
+        userRightsManager:
+            regex: 'using \[\[User:MusikAnimal\/userRightsManager\|userRightsManager\]\]'
+            link: User:MusikAnimal/userRightsManager
+            namespaces: [3, 4]
         Vada:
             regex: '\(\[\[WP:Vada\]\]\)'
             link: Project:Vada
