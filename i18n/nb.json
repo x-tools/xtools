@@ -105,7 +105,7 @@
 	"edit-count": "Redigeringsteller",
 	"edit-count-desc": "$2 {{PLURAL:$1|redigering|redigeringer}}",
 	"edit-summaries": "Redigeringsforklaringer",
-	"edit-summaries-desc": "$2 {{PLURAL:$1|redigeringssammendrag}} brukt i artikkelnavnerommet",
+	"edit-summaries-desc": "$2 {{PLURAL:$1|redigeringsforklaring|redigeringsforklaringer}} brukt i artikkelnavnerommet",
 	"edit-summaries-percentage": "Redigeringsforklaringer %",
 	"edit-summary": "Kommentar",
 	"edit-summary-recent-major": "Siste $1 større redigeringer med redigeringsforklaringer",
