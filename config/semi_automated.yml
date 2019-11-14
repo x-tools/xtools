@@ -262,6 +262,9 @@ parameters:
             regex: '^Reverting possible (vandalism|test edit).*by.*\(Bot|BOT( EDIT)?\)$|^BOT (- )?(Reverted edits? by|rv)|^vandalism from \[\[.*?\(\d+\) - reverted'
             link: Project:Bots
             revert: true
+        Capricorn:
+            regex: '\(\[\[User:Kephir\/gadgets\/sagittarius\||\(\[\[User:Sam Sailor\/Scripts\/Sagittarius\+\||\[\[User:Wugapodes\/Capricorn\|'
+            link: User:Wugapodes/Capricorn
         Checklinks:
             regex: 'using \[\[w:WP:CHECKLINKS'
             link: Project:CHECKLINKS
@@ -382,9 +385,6 @@ parameters:
         revdel:
             regex: 'using \[\[User:Primefac\/revdel|User:Enterprisey\/cv-revdel\|'
             link: User:Enterprisey/cv-revdel
-        Sagittarius:
-            regex: '\(\[\[User:Kephir\/gadgets\/sagittarius\||\(\[\[User:Sam Sailor\/Scripts\/Sagittarius\+\|'
-            link: User:Sam Sailor/Scripts/Sagittarius+
         Script Installer:
             regex: '\[\[User:Equazcion\/ScriptInstaller\|Script Installer|\(\[\[User:Enterprisey\/script-installer\|script-installer\]\]\)'
             link: User:Enterprisey/script-installer
