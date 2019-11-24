@@ -62,6 +62,9 @@ This documentation covers how to set up forwarding so that all requests to /api 
 Killing slow queries
 ====================
 
+.. note::
+    This is not necessary for installations with MySQL-like support for `max_connection_time <https://mariadb.com/kb/en/library/aborting-statements/>`_, such as the Wikimedia replicas.
+
 Some queries on users with a high edit count may take a very long time to finish or even timout. You may wish to add a query killer to ensure stability.
 
 If you are running on a Linux environment, consider using `pt-kill <https://www.percona.com/doc/percona-toolkit/LATEST/pt-kill.html>`_. A query killer daemon could be configured like so:

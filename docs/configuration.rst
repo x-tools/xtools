@@ -62,7 +62,7 @@ Caching
 
 These options are available if you wish to use a cache provider such as Redis. However, XTools will function well using only the file system for caching.
 
-- **cache.adapter** A cache adapter supported by `DoctrineCacheBundle <https://symfony.com/doc/current/bundles/DoctrineCacheBundle/reference.html>`_. `file_system` is the default and should work well.
+- **cache.adapter** A cache adapter supported by `DoctrineCacheBundle <https://symfony.com/doc/current/bundles/DoctrineCacheBundle/reference.html>`_. `file_system` is the default and should work well, but we recommend `apcu` for better performance.
 - **cache.redis_dsn** The DSN of the Redis server, if ``redis`` is used as the ``cache.adapter``. If you're not using Redis, this parameter can be ignored.
 
 Wiki configuration
@@ -73,13 +73,13 @@ The parameters ensures paths to your wiki(s) are properly constructed, and for c
 - **wiki_url** - Full URL of the wiki, used only if ``app.single_wiki`` is set to ``true``. The title of pages are attached to the end.
 - **api_path** - The API path for the projects, usually ``/w/api.php``.
 - **default_project** - The base URL of whatever wiki you consider to be the "default". This will be the default value for the "Project" field in the forms. On the Wikimedia installation, ``en.wikipedia.org`` is used because it is the most popular wiki. For single-wiki installations, the "Project" field in the forms are hidden, but you still need to provide this value for ``default_project``.
-- **central_auth_project** - Which wiki should be used for CentralAuth, and also for OAuth authentication. You may want this to be the same as the ``default_project``.
+- **central_auth_project** - Which wiki should be used for CentralAuth (if applicable), and also for OAuth authentication. You may want this to be the same as the ``default_project``.
 - **opted_in** - A list of database names of projects that will display :ref:`restricted statistics <optin>` regardless of individual users' preferences. For developers working off of the replicas, use ``enwiki_p``.
 
 Application
 ===========
 
-- **secret** - A secret key that's used to generate certain security-related tokens, and as the secret for the internal API. This can be any non-blank value. If you are using a separate API server (as explained in the :ref:`administration <offload_api>` section), this parameter must have the same value on both the app server and API server.
+- **secret** - A secret key that's used to generate certain security-related tokens, and as the secret for the internal API. This can be any non-blank value. If you are using a separate API server (as explained in the :ref:`administration <offload_api>` section), this parameter must have the same value on both the app server and API server. `nux.net/secret <http://nux.net/secret>`_ can auto-generate a secure token for you.
 - **app.noticeDisplay** - This is used to broadcast a notice at the top of XTools. Set to ``1`` to turn this feature on.
 - **app.noticeStyle** - Style of the notice banner, correlating to the `Bootstrap contextual classes <https://getbootstrap.com/docs/3.3/css/#tables-contextual-classes>`_. Available options include ``danger``, ``warning``, ``info`` and ``success``.
 - **app.noticeText** - Message shown to the user. If you provide a valid i18n message key, it will display that message instead.
@@ -103,10 +103,14 @@ Selectively choose which tools to enable within XTools.
 - **enable.AdminScore** - Enable "Admin Score" tool.
 - **enable.AdminStats** - Enable "Admin Statistics" tool.
 - **enable.ArticleInfo** - Enable "Article Information" tool.
+- **enable.Authorship** - Enable "Authorship" tool (WMF-only).
 - **enable.AutoEdits** - Enable "Automated Edits" tool.
+- **enable.Blame** - Enable "Blame" tool (WMF-only).
 - **enable.CategoryEdits** - Enable "Category Edits" tool.
 - **enable.EditCounter** - Enable "Edit Counter" tool.
 - **enable.EditSummary** - Enable "Edit Summaries" tool.
+- **enable.GlobalContribs** - Enable the "Global Contributions" tool.
+- **enable.Meta** - Enable the Meta tool, which tracks usage of the XTools installation.
 - **enable.Pages** - Enable "Pages Created" tool.
 - **enable.Quote** - Enable "Quote Database" tool.
 - **enable.RfXAnalysis** - Enable "RfX Analysis" tool.

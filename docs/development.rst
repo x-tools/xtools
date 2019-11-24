@@ -9,20 +9,18 @@ If you are only looking to contribute to XTools as a developer, it is recommende
 Overview
 ========
 
-- XTools is based on `Symfony 3 <https://symfony.com/doc/current/index.html>`_, which is a full MVC framework. We use `Twig <https://twig.symfony.com/doc/2.x/>`_ as our template engine.
+- XTools is based on `Symfony 4 <https://symfony.com>`_, which is a full MVC framework. We use `Twig <https://twig.symfony.com/doc/2.x/>`_ as our template engine.
 
 - All the PHP lives in ``src/``.
 
   - There is a single `bundle <https://symfony.com/doc/current/bundles.html>`_ called ``AppBundle``, which contains the controllers, `event listeners <https://symfony.com/doc/current/event_dispatcher.html>`_, helpers and Twig extensions.
 
-  - Models and repositories live in ``src/Xtools``. Repositories are responsible for fetching data and the models handle the logic.
+- Views live in ``templates/`` and assets ``assets/``.
 
-- Views and assets live in ``app/Resources``.
-
-  - In ``app/Resources/views``, there is a separate directory for each controller. The ``index.html.twig`` files are the form pages (`example <https://xtools.wmflabs.org/ec>`_), and ``result.html.twig`` pages are the result pages (`example <https://xtools.wmflabs.org/ec/en.wikipedia.org/Jimbo_Wales>`_). Some tools like the Edit Counter have multiple result pages.
+  - In ``templates/``, there is a separate directory for each controller. The ``index.html.twig`` files are the form pages (`example <https://xtools.wmflabs.org/ec>`_), and ``result.html.twig`` pages are the result pages (`example <https://xtools.wmflabs.org/ec/en.wikipedia.org/Jimbo_Wales>`_). Some tools like the Edit Counter have multiple result pages.
 
 - `Routes <https://symfony.com/doc/current/routing.html>`_ are configured using the ``@Route`` annotation.
-- By convention, each tool has it's own controller that handles requests, instantiates a model, sets the repository, and returns it to the view. Not all the tools follow this convention, however. Each tool is also registered within ``app/config/tools.yml``.
+- By convention, each tool has it's own controller that handles requests, instantiates a model, sets the repository, and returns it to the view. Not all the tools follow this convention, however. Each tool is also registered within ``config/tools.yml``.
 - XTools was built to work on any MediaWiki installation, but it's target wiki farm is `Wikimedia <https://www.wikimedia.org/>`_. Some features are only available on the Wikimedia installation, which is what all the ``app.is_labs`` checks are for.
 
 Running Development server
@@ -32,8 +30,8 @@ First make sure you meet the :ref:`prerequisites`, and then follow these steps:
 
 1. Clone the repository: ``git clone https://github.com/x-tools/xtools.git && cd xtools``
 2. Run ``composer install`` and answer all the prompts.
-3. Create a new local database: ``./bin/console doctrine:database:create`` (or ``d:d:c``).
-4. Run the database migrations: ``./bin/console doctrine:migrations:migrate`` (or ``d:m:m``)
+3. For internal usage stats, create a new local database: ``./bin/console doctrine:database:create`` (or ``d:d:c``) and run the database migrations: ``./bin/console doctrine:migrations:migrate`` (or ``d:m:m``).
+4. Compile assets with ``./node_modules/.bin/encore dev --watch`` (for production, use ``production`` instead of ``dev`` and without the watch flag).
 5. Launch PHP's built-in server: ``./bin/console server:run`` (or ``s:r``).
 6. Visit ``http://localhost:8000`` in your web browser.
 7. You can stop the server with ``./bin/console server:stop`` (or ``s:s``)
@@ -43,9 +41,9 @@ Test it by going to http://localhost:8000/sc and put in ``Jimbo Wales`` as the U
 After submitting you should quickly get results.
 
 The development server does not cache application or session data; any changes you make are visible after refreshing the page.
-However when you modify the ``app/config/parameters.yml`` file or other things in ``app/config``, you may need to clear the cache with ``php bin/console c:c --no-warmup``.
+However when you modify the ``config/parameters.yml`` file or other things in ``config/``, you may need to clear the cache with ``php bin/console c:c --no-warmup``.
 
-Assets can be dumped with ``php bin/console assetic:dump``, and if you're actively editing them you can continually watch for changes with ``php bin/console assetic:watch``.
+Assets are generated with `Symfony Encore <https://symfony.com/doc/current/frontend/encore/installation.html>`_.
 
 The logs are in ``var/logs/dev.log``.
 If things are acting up unexpectedly, you might try clearing the cache or restarting the server.
@@ -91,6 +89,8 @@ The replicas have `different versions of tables <https://wikitech.wikimedia.org/
 
 For the ``logging`` table, sometimes we use ``logging_userindex`` and other times ``logging_logindex`` (depending on what we're querying for). This is handled in the code via the ``getTableName()`` method in ``Repository.php``.
 
+For non-WMF installations, ignore all of the above unless your tables have different names than the `MediaWiki defaults <https://www.mediawiki.org/wiki/Manual:Database_layout>`_.
+
 Caching
 =======
 
@@ -101,17 +101,15 @@ These should be used in this pattern::
 
     public function doSomething($input)
     {
-        $cacheKey = 'something.'.$input;
-        if ($this->cacheHas($cacheKey)) {
-            return $this->cacheGet($cacheKey);
+        $cacheKey = $this->getCacheKey(func_get_args(), 'something');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
         }
-        $something = 'big query here';
-        $this->cacheSave($cacheKey, $something, 'P1D');
-        return $something;
+        $results = 'results of big query';
+        return $this->setCache($cacheKey, $results);
     }
 
-The cache key can be anything, so long as it is unique within the current class
-(the ``cache*()`` methods prepend the classname, so you don't have to).
+The cache key can be anything, so long as it is unique within the current class.
 The TTL syntax is from the DateInterval_ class (e.g. ``P1D`` is one day, ``PT1H`` is one hour).
 
 The above methods are just wrappers around a PSR-6_ implementation, intended to reduce the repetition of similar lines of code.
@@ -125,7 +123,7 @@ Style Guidelines
 ================
 
 - It's called "XTools", with two capital letters.
-- XTools conforms to `PSR2`_ coding standards; use ``./vendor/bin/phpcs -s .`` to check your code.
+- XTools conforms to `PSR2`_ and `Slevomat <https://github.com/slevomat/coding-standard>`_ coding standards; use ``./vendor/bin/phpcs -s .`` to check your code.
 - Functions and routes must begin with the tool name.
 - Version numbers follow `Semantic Versioning guidelines`_.
 

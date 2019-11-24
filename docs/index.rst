@@ -2,7 +2,7 @@
 Welcome to XTools!
 ******************
 
-XTools is a suite of statistics tools for MediaWiki wikis, users, pages, and more.
+XTools is a suite of statistics tools for MediaWiki wikis, users, pages, and more, built on the `Symfony <https://symfony.com>`_ framework.
 It is in operation for Wikimedia wikis and can also be installed for any MediaWiki installation.
 
 **Quick links:**
