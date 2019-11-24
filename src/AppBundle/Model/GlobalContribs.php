@@ -95,7 +95,7 @@ class GlobalContribs extends Model
     {
         if (empty($this->globalEditCounts)) {
             $this->globalEditCounts = $this->getRepository()
-                ->globalEditCounts($this->user, $this->project);
+                ->globalEditCounts($this->user);
         }
 
         if ($sorted) {
