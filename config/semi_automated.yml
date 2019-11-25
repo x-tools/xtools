@@ -462,7 +462,7 @@ parameters:
         DisamAssist:
             link: Usuario:Qwertyytrewqqwerty/DisamAssist
             regex: \[\[Usuario:Qwertyytrewqqwerty/DisamAssist\|DisamAssist\]\]
-            namespaces: [0]
+            namespaces: [0, 6, 10, 14, 100, 104]
     fa.wikipedia.org:
         Typo fixer:
             label: 'ویکی‌پدیا:اشتباه‌یاب'
