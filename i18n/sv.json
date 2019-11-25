@@ -6,7 +6,8 @@
 			"Nemo bis",
 			"Bengtsson96",
 			"Maol3",
-			"Abijeet Patro"
+			"Abijeet Patro",
+			"Mjälten"
 		]
 	},
 	"abusefilter": "Missbruksfilter",
@@ -148,6 +149,8 @@
 	"feedback": "Återkoppling",
 	"file": "Fil",
 	"files": "Filer",
+	"files-moved": "Filerna är flyttade",
+	"files-moved-commons": "Filerna är flyttade (Commons)",
 	"files-uploaded": "Filer som laddats upp",
 	"files-uploaded-commons": "Uppladdade filer på Commons",
 	"first-edit": "Första redigeringen",
@@ -156,6 +159,7 @@
 	"former-user-groups": "Tidigare användargrupper",
 	"friday": "Fredag",
 	"general-stats": "Generell statistik",
+	"global-account-log": "Globalkonto logg",
 	"global-block": "Global blockering",
 	"global-block-log": "Logg för globala blockeringar",
 	"global-other-sites-edit-count": "Andra projekt",
