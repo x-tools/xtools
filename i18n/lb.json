@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"Robby",
-			"Nemo bis"
+			"Nemo bis",
+			"Les Meloures"
 		]
 	},
 	"accepted-formats": "Akzeptéiert Formater",
@@ -33,7 +34,7 @@
 	"auto-edits": "(Semi-)automatesch Ännerungen",
 	"auto-edits-counts-desc-grand-total": "Gesamt-Total",
 	"auto-edits-request-examples": "Linken op Beispill-Ännerungen",
-	"auto-edits-request-name": "Numm vum Geschir",
+	"auto-edits-request-name": "Numm vum Geschier",
 	"auto-tool-edits": "$1 Ännerungen",
 	"automatic": "Automatesch",
 	"average-change-per-page": "Duerchschnëttlech Ännerung pro Säit",
@@ -300,7 +301,7 @@
 	"times-in-utc": "All Zäite bezéie sech op UTC.",
 	"too-many-edits": "De Benotzer huet ze vill Ännerungen! (Maximum $1)",
 	"too-many-revisions": "Dësen Artikel huet méi wéi $1 {{PLURAL:$2|Versioun|Versiounen}}. Donnéeë fir déi éischt $1 Versioune gi gewisen.",
-	"tool": "Geschir (Tool)",
+	"tool": "Geschier (Tool)",
 	"tool-about": "Iwwer",
 	"tool-adminscore": "Administrateur-Score",
 	"tool-adminscore-desc": "Score dee weist ob ee Benotzer prett ass fir Administrateur ass",
