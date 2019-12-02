@@ -458,6 +458,10 @@ parameters:
             regex: \[\[User:DannyS712/Change status\|Change status\.js\]\]
             namespaces: [104]
     es.wikipedia.org:
+        DisamAssist:
+            link: Usuario:Qwertyytrewqqwerty/DisamAssist
+            regex: \[\[Usuario:Qwertyytrewqqwerty/DisamAssist\|DisamAssist\]\]
+            namespaces: [0, 6, 10, 14, 100, 104]
         Replacer:
             tag: 'OAuth CID: 498'
             link: Usuario:Benjavalero/Replacer
