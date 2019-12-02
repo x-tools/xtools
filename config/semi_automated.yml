@@ -41,12 +41,9 @@ parameters:
             regex: 'Help:Cat-a-lot'
             link: commons:Special:MyLanguage/Help:Gadget-Cat-a-lot
             tag: Cat-a-lot
-        Commons duplicate file:
-            regex: 'COM:Duplicate\|Duplicate'
-            link: c:Commons:Duplicate
-        Commons file rename:
-            regex: 'COM:FR\|File renamed\]\]:'
-            link: c:Special:MyLanguage/Commons:File renaming
+        Commons global replace:
+            regex: 'COM:FR\|File renamed\]\]:|COM:Duplicate\|Duplicate|\(\[\[c:GR\|GR\]\]\)'
+            link: c:Special:MyLanguage/Commons:File renaming/Global replace
         Content translation:
             tag: contenttranslation
             regex: 'Created by translating the page'
@@ -265,6 +262,9 @@ parameters:
             regex: '^Reverting possible (vandalism|test edit).*by.*\(Bot|BOT( EDIT)?\)$|^BOT (- )?(Reverted edits? by|rv)|^vandalism from \[\[.*?\(\d+\) - reverted'
             link: Project:Bots
             revert: true
+        Capricorn:
+            regex: '\(\[\[User:Kephir\/gadgets\/sagittarius\||\(\[\[User:Sam Sailor\/Scripts\/Sagittarius\+\||\[\[User:Wugapodes\/Capricorn\|'
+            link: User:Wugapodes/Capricorn
         Checklinks:
             regex: 'using \[\[w:WP:CHECKLINKS'
             link: Project:CHECKLINKS
@@ -325,9 +325,6 @@ parameters:
             regex: 'WP:FTCG\|FtCG'
             link: Project:FTCG
             namespaces: [6]
-        Global replace:
-            regex: '\(\[\[c:GR\|GR\]\]\) '
-            link: commons:Commons:File renaming/Global replace
         Heading editor:
             regex: '\[\[User:The Evil IP address\/hdedit\|script\]\]'
             link: User:The Evil IP address/hdedit
@@ -355,8 +352,9 @@ parameters:
             namespaces: [0, 2, 118]
         Page curation:
             regex: 'using \[\[Wikipedia:Page Curation\|Page Curation'
+            tag: pagetriage
             link: w:en:Wikipedia:Page_Curation/Help
-            namespaces: [0, 1, 2, 3]
+            namespaces: [0, 1, 2, 3, 4]
         Page swap:
             regex: '\/pageswap\|pageswap\]\]'
             link: WP:PAGESWAP
@@ -387,9 +385,6 @@ parameters:
         revdel:
             regex: 'using \[\[User:Primefac\/revdel|User:Enterprisey\/cv-revdel\|'
             link: User:Enterprisey/cv-revdel
-        Sagittarius:
-            regex: '\(\[\[User:Kephir\/gadgets\/sagittarius\||\(\[\[User:Sam Sailor\/Scripts\/Sagittarius\+\|'
-            link: User:Sam Sailor/Scripts/Sagittarius+
         Script Installer:
             regex: '\[\[User:Equazcion\/ScriptInstaller\|Script Installer|\(\[\[User:Enterprisey\/script-installer\|script-installer\]\]\)'
             link: User:Enterprisey/script-installer
@@ -435,6 +430,10 @@ parameters:
             regex: '\(\[\[User:Enterprisey\/undo-last-edit\.js\|undo-last-edit\]\]\)'
             link: User:Enterprisey/undo-last-edit
             revert: true
+        userRightsManager:
+            regex: 'using \[\[User:MusikAnimal\/userRightsManager\|userRightsManager\]\]'
+            link: User:MusikAnimal/userRightsManager
+            namespaces: [3, 4]
         Vada:
             regex: '\(\[\[WP:Vada\]\]\)'
             link: Project:Vada
@@ -463,6 +462,9 @@ parameters:
             link: Usuario:Qwertyytrewqqwerty/DisamAssist
             regex: \[\[Usuario:Qwertyytrewqqwerty/DisamAssist\|DisamAssist\]\]
             namespaces: [0, 6, 10, 14, 100, 104]
+        Replacer:
+            tag: 'OAuth CID: 498'
+            link: Usuario:Benjavalero/Replacer
     fa.wikipedia.org:
         Typo fixer:
             label: 'ویکی‌پدیا:اشتباه‌یاب'
@@ -525,9 +527,9 @@ parameters:
             regex: 'MediaWiki_talk:Gadget-labelLister.js\|labelLister'
             link: MediaWiki talk:Gadget-labelLister.js
             namespaces: [ 0, 120 ]
-        Merge.js:
-            regex: '\[\[MediaWiki:Gadget-Merge\.js\|merge\.js\]\]'
-            link: MediaWiki talk:Gadget-Merge.js
+        Merge:
+            regex: '\[\[MediaWiki:Gadget-Merge\.js\|merge\.js\]\]|\/\* wbmergeitems'
+            link: Help:Merge
         Sitelink auto-change:
             regex: 'clientsitelink-update'
             link: Help:Sitelinks
