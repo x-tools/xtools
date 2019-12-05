@@ -75,7 +75,8 @@
 {% endif %}
 
 {% if ec.rightsChanges|length > 0 %}
-    {% include 'editCounter/rights_changes_table.html.twig' with {'rightsChanges': ec.rightsChanges} %}
+    {% set limit = is_sub_request ? 10 : null %}
+    {% include 'editCounter/rights_changes_table.html.twig' with {'rightsChanges': ec.rightsChanges(limit), 'remaining': ec.rightsChanges|length - limit} %}
 {% else %}
     <div class="alert alert-info">
         {{ msg('no-result', [user.username]) }}
