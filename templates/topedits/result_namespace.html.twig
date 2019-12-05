@@ -12,20 +12,7 @@
             <h3 class="text-center">{{ msg('topedits-per-namespace') }}</h3>
 
             {% if project.userHasOptedIn(user) and te.topEdits|length > 2 %}
-                <div class="text-center xt-toc">
-                    {#
-                     # To save real estate, show "Namespace (talk)" as separate links
-                     # instead of "Namespace" "Namespace talk".
-                     #}
-                    {% for ns in te.topEdits|keys if ns is even or (ns is odd and not(te.topEdits[ns - 1] is defined)) %}
-                        <span>
-                            <a href="#{{ ns }}" data-section="{{ ns }}">{{ nsName(ns, project.namespaces) }}</a>
-                            {% if te.topEdits[ns + 1] is defined %}
-                                (<a href="#{{ ns + 1 }}" data-section="{{ ns + 1 }}">{{ msg('talk')|lower }}</a>)
-                            {% endif %}
-                        </span>
-                    {% endfor %}
-                </div>
+                {{ layout.nsToc(project, te.topEdits|keys) }}
             {% endif %}
 {% endif %}
 

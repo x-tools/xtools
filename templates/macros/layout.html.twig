@@ -67,6 +67,25 @@
     </header>
 {% endmacro %}
 
+{#
+ # Builds the top floating navigation bar for namespaces. To save real estate,
+ # this shows "Namespace (talk)" as separate links instead of "Namespace" "Namespace talk".
+ # @param Project project - The relevant project.
+ # @param int[] namespaces - Namespaces that you want to be linked.
+ #}
+{% macro nsToc(project, namespaces) %}
+    <div class="text-center xt-toc">
+        {% for ns in namespaces|filter(ns => ns is even or (ns is odd and not(ns - 1 in namespaces))) %}
+            <span>
+                <a href="#{{ ns }}" data-section="{{ ns }}">{{ nsName(ns, project.namespaces) }}</a>
+                {% if ns is even and ns + 1 in namespaces %}
+                    (<a href="#{{ ns + 1 }}" data-section="{{ ns + 1 }}">{{ msg('talk')|lower }}</a>)
+                {% endif %}
+            </span>
+        {% endfor %}
+    </div>
+{% endmacro %}
+
 {% macro alert(style, message, raw = false) %}
     <p class="alert alert-{{ style }} alert-dismissable xt-alert{% if style == 'danger' %} strong{% endif %}" role="alert">
         <button class="close" data-dismiss="alert" aria-label="Close">
