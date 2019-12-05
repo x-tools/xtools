@@ -419,7 +419,7 @@
                     </td>
                 </tr>
                 {% set topN = 10 %}
-                {% for topProj in gc.globalEditCountsTopN(topN) if topProj.project.domain is not null %}
+                {% for topProj in gc.globalEditCountsTopN(topN)|filter(topProj => topProj.project.domain is not null) %}
                     <tr>
                         <td>
                             {% if topProj.project.databaseName == project.databaseName %}

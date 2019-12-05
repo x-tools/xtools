@@ -96,7 +96,7 @@
                                 {{ wiki.userLink(username, project) }}
                             </td>
                             <td class="sort-entry--user-groups" data-value="{{ user['user-groups']|length }}">
-                                {% for group, url in as.userGroupIcons if group in user['user-groups'] %}
+                                {% for group, url in as.userGroupIcons|filter(group => group in user['user-groups']) %}
                                     <img class="user-group-icon" src="{{ url }}" title="{{ rightsNames[group]|ucfirst }}" alt="{{ rightsNames[group] }}" />
                                 {% endfor %}
                             </td>

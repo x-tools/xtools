@@ -465,7 +465,8 @@
                 <tbody>
                 {% set counter = 0 %}
                 {% set editSum = 0 %}
-                {% for editor, stats in ai.editors if counter < editorlimit and not(editor in ai.bots|keys) %}
+                {% for editor in ai.humans(editorlimit) %}
+                    {% set stats = ai.editors[editor] %}
                     {% set counter = counter + 1 %}
                     {% set editSum = editSum + stats.all %}
                     <tr>
