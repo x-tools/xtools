@@ -69,16 +69,15 @@ class AppExtension extends AbstractExtension
      */
     public function getFunctions(): array
     {
-        $options = ['is_safe' => ['html']];
         return [
-            new TwigFunction('request_time', [$this, 'requestTime'], $options),
-            new TwigFunction('memory_usage', [$this, 'requestMemory'], $options),
-            new TwigFunction('msgIfExists', [$this, 'msgIfExists'], $options),
-            new TwigFunction('msgExists', [$this, 'msgExists'], $options),
-            new TwigFunction('msg', [$this, 'msg'], $options),
-            new TwigFunction('lang', [$this, 'getLang'], $options),
-            new TwigFunction('langName', [$this, 'getLangName'], $options),
-            new TwigFunction('fallbackLangs', [$this, 'getFallbackLangs', $options]),
+            new TwigFunction('request_time', [$this, 'requestTime']),
+            new TwigFunction('memory_usage', [$this, 'requestMemory']),
+            new TwigFunction('msgIfExists', [$this, 'msgIfExists'], ['is_safe' => ['html']]),
+            new TwigFunction('msgExists', [$this, 'msgExists'], ['is_safe' => ['html']]),
+            new TwigFunction('msg', [$this, 'msg'], ['is_safe' => ['html']]),
+            new TwigFunction('lang', [$this, 'getLang']),
+            new TwigFunction('langName', [$this, 'getLangName']),
+            new TwigFunction('fallbackLangs', [$this, 'getFallbackLangs']),
             new TwigFunction('allLangs', [$this, 'getAllLangs']),
             new TwigFunction('isRTL', [$this, 'isRTL']),
             new TwigFunction('shortHash', [$this, 'gitShortHash']),

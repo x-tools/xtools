@@ -1,7 +1,7 @@
 {% import 'macros/layout.html.twig' as layout %}
 
 <!DOCTYPE html>
-<html lang="{{ lang()|e }}"{% if isRTL() %} dir="rtl"{% endif %}>
+<html lang="{{ lang() }}"{% if isRTL() %} dir="rtl"{% endif %}>
 <head>
     <title>
         {% if xtTitle is defined %}{{ xtTitle }} - {% endif %}{% if xtPage != 'home' and xtPage != '' %}{{ msg('tool-' ~ xtPage|lower) }} - {% endif %}{{ msg('xtools-title') }}
