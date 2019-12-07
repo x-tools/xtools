@@ -520,8 +520,8 @@
                         <td class="sort-entry--latest-edit" data-value="{{ stats.lastId }}">
                             {{ wiki.pageLinkRaw('Special:Diff/' ~ stats.lastId, project, stats.last|date_format) }}
                         </td>
-                        <td class="sort-entry--average-time-bw-edits" data-value="{{ stats.atbe|num_format(1) }}">
-                            {{ stats.atbe|num_format(1) }}
+                        <td class="sort-entry--average-time-bw-edits" data-value="{{ stats.atbe }}">
+                            {{ stats.atbe|num_format() }}
                         </td>
                         <td class="sort-entry--added-bytes" data-value="{{ stats.added }}">
                             {{ stats.added|num_format }}
