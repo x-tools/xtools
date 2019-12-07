@@ -50,11 +50,11 @@
         </p>
 
         <div class="text-center xt-toc">
-            {% set sections = ['general-stats', 'top-editors'] %}
+            {% set sections = ['general-stats'] %}
             {% if showAuthorship %}
                 {% set sections = sections|merge(['tool-authorship']) %}
             {% endif %}
-            {% set sections = sections|merge(['year-counts', 'month-counts']) %}
+            {% set sections = sections|merge(['top-editors', 'year-counts', 'month-counts']) %}
             {% if ai.automatedCount > 0 %}
                 {% set sections = sections|merge(['auto-edits']) %}
             {% endif %}
@@ -427,6 +427,31 @@
 
         <div style="clear:both"></div>
 
+        {# ======================== AUTHORSHIP ======================== #}
+        {% if showAuthorship %}
+            <script>
+                xtools.articleinfo.endDate = {% if ai.end %}"{{ ai.endDate }}"{% else %}null{% endif %};
+            </script>
+            {% set content %}
+                <div class="textshares-container" data-project="{{ project.domain }}" data-article="{{ page.title }}">
+                    <em class="text-muted">{{ msg('loading') }}...</em>
+                </div>
+            {% endset %}
+            {% set headerLink %}
+                <a href="{{ path('AuthorshipResult', {project:project.domain, page:page.title, target:ai.endDate})}}">{{ msg('tool-authorship') }}</a>
+            {% endset %}
+            {% set description_link %}
+                {% set wikiwhoLink %}
+                    <a target='_blank' href='https://www.wikiwho.net/'>Wikiwho</a>
+                {% endset %}
+                {{ msg('powered-by', [wikiwhoLink]) }}
+            {% endset %}
+            {% set downloadLink %}
+                {{ layout.downloadLink('AuthorshipResult', {project:project.domain, page:page.title, target:ai.endDate}, ['wikitext']) }}
+            {% endset %}
+            {{ layout.content_block(headerLink, content, [description_link, downloadLink], 'tool-authorship', true) }}
+        {% endif %}
+
         {# ======================== TOP EDITORS ======================== #}
         {% set content %}
             <div class="top-editors-charts clearfix">
@@ -566,17 +591,17 @@
                     {% endfor %}
                     </tbody>
                     {% if counter < ai.numBots %}
-                    <tfoot><tr class="show-more-row">
-                        <td></td>
-                        <td>
-                            {% set expandUrl = path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'botlimit': botlimit * 10})) %}
-                            {% set otherBots = ai.numBots - counter %}
-                            <a href="{{ expandUrl }}">
-                                {{ otherBots|num_format }} {{ msg('num-others', [otherBots]) }}
-                            </a>
-                        </td>
-                        <td colspan=8></td>
-                    </tr></tfoot>
+                        <tfoot><tr class="show-more-row">
+                            <td></td>
+                            <td>
+                                {% set expandUrl = path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'botlimit': botlimit * 10})) %}
+                                {% set otherBots = ai.numBots - counter %}
+                                <a href="{{ expandUrl }}">
+                                    {{ otherBots|num_format }} {{ msg('num-others', [otherBots]) }}
+                                </a>
+                            </td>
+                            <td colspan=8></td>
+                        </tr></tfoot>
                     {% endif %}
                 </table>
             {% endif %}
@@ -589,31 +614,6 @@
             {{ layout.downloadLink('ArticleInfoResult', {project:project.domain, page:page.title, start:ai.startDate, end:ai.endDate}, ['wikitext'], 'PageApiTopEditors') }}
         {% endset %}
         {{ layout.content_block('top-editors', content, ['top-editors-desc', downloadLink]) }}
-
-        {# ======================== AUTHORSHIP ======================== #}
-        {% if showAuthorship %}
-            <script>
-                xtools.articleinfo.endDate = {% if ai.end %}"{{ ai.endDate }}"{% else %}null{% endif %};
-            </script>
-            {% set content %}
-                <div class="textshares-container" data-project="{{ project.domain }}" data-article="{{ page.title }}">
-                    <em class="text-muted">{{ msg('loading') }}...</em>
-                </div>
-            {% endset %}
-            {% set headerLink %}
-                <a href="{{ path('AuthorshipResult', {project:project.domain, page:page.title, target:ai.endDate})}}">{{ msg('tool-authorship') }}</a>
-            {% endset %}
-            {% set description_link %}
-                {% set wikiwhoLink %}
-                    <a target='_blank' href='https://www.wikiwho.net/'>Wikiwho</a>
-                {% endset %}
-                {{ msg('powered-by', [wikiwhoLink]) }}
-            {% endset %}
-            {% set downloadLink %}
-                {{ layout.downloadLink('AuthorshipResult', {project:project.domain, page:page.title, target:ai.endDate}, ['wikitext']) }}
-            {% endset %}
-            {{ layout.content_block(headerLink, content, [description_link, downloadLink], 'tool-authorship', true) }}
-        {% endif %}
 
         {# ======================== YEAR COUNTS ======================== #}
         {% set content %}
