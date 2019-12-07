@@ -1,5 +1,23 @@
 # Release Notes #
 
+## 3.10.8 ##
+- AutoEdits (T222323): Add ns:1 for enwiki page curation
+- AutoEdits (T236715): Add twinkle for simplewiki
+- AutoEdits (T236716): Add change status for enwikisource
+- AutoEdits (T236716): Restrict change status to ns 104
+- AutoEdits (T236726): Update STiki definition
+- AutoEdits (T237217): Update page curation
+- AutoEdits (T237174): Add userRightsManager for enwiki
+- AutoEdits (T237076): Add Replacer for eswiki
+- AutoEdits (T231709): Expand wikidata merge
+- AutoEdits (T236719): Combine commons global replace tools
+- AutoEdits (T237458): Update Sagittarius to Capricorn
+- AutoEdits (T237146): Add DisamAssist tool on es.wiki
+- Update PHP dependencies and fix deprecations.
+- Updates to documentation.
+- Various code refactoring and cleanup.
+- Localization updates.
+
 ## 3.10.7 ##
 - EditCounter (T236095): Make month/year counts CSV in comprehensible format.
 - AutoEdits (T235726): Add BDCS tool to enwiki config.
