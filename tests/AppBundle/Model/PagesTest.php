@@ -104,6 +104,7 @@ class PagesTest extends TestAdapter
             'human_time' => '2016-05-19 00:00',
             'recreated' => '1',
         ], $results[0][0]);
+        static::assertTrue($pages->isMultiNamespace());
     }
 
     public function setPagesResults(): void

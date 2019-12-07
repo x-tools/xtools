@@ -48,8 +48,7 @@
                 </tr></thead>
                 <tbody>
                 {% set index = 0 %}
-                {% set maxRows = 50 %}
-                {% for page in pages.results[ns] if not(multiNamspace) or (index < maxRows and multiNamspace) %}
+                {% for page in pages.results[ns] %}
                     {% set index = index + 1 %}
                     {% set pagename = titleWithNs(page.page_title, ns, project.namespaces) %}
                     <tr>
@@ -128,12 +127,12 @@
                         </td>
                     </tr>
                 {% endfor %}
-                {% if pages.counts[ns].count > maxRows and multiNamspace %}
+                {% if pages.multiNamespace and pages.counts[ns].count > pages.resultsPerPage %}
                     <tr class="show-more-row">
                         <td></td>
                         <td colspan={{ columns|length + 1 }}>
                             <a href="{{ path('PagesResult', { 'project': project.domain, 'username': user.username, 'namespace': ns, 'redirects': pages.redirects }) }}">
-                                {{ (pages.counts[ns].count - maxRows)|number_format }} {{ msg('num-others', [pages.counts[ns].count - maxRows]) }}
+                                {{ (pages.counts[ns].count - pages.resultsPerPage)|number_format }} {{ msg('num-others', [pages.counts[ns].count - pages.resultsPerPage]) }}
                             </a>
                         </td>
                     </tr>
@@ -143,7 +142,7 @@
 
             {##### PAGINATION #####}
             {% set numPages = (pages.getNumPages / pages.resultsPerPage)|round(0, 'ceil') %}
-            {% if not(multiNamspace) and numPages > 1 %}
+            {% if not(pages.multiNamespace) and numPages > 1 %}
                 {% set hasPrev = pages.offset - 1 >= 0 %}
                 {% set hasNext = pages.offset + 1 < numPages %}
                 {% set pathVars = {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects} %}

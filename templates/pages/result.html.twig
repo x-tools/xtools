@@ -11,9 +11,7 @@
 
         <h3 class="text-center">{{ msg('tool-pages') }}</h3>
 
-        {% set multiNamspace = pages.counts|length > 1 %}
-
-        {% if multiNamspace %}
+        {% if pages.multiNamespace %}
             {{ layout.nsToc(project, pages.counts|keys) }}
         {% endif %}
 
@@ -73,12 +71,12 @@
                         {% for key, value in pages.counts %}
                         <tr>
                             <td class="sort-entry--namespace linked" data-value="{{ nsName(key, project.namespaces) }}">
-                                {% if multiNamspace %}
+                                {% if pages.multiNamespace %}
                                 <span class="namespace-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ key }}">
                                     <span class="glyphicon glyphicon-remove"></span>
                                 {% endif %}
                                     <span class="color-icon" style="background:{{ color(key) }}"></span>
-                                {% if multiNamspace %}
+                                {% if pages.multiNamespace %}
                                 </span>
                                 {% endif %}
 
