@@ -15,7 +15,7 @@ use DateTime;
 class Pages extends Model
 {
     private const RESULTS_LIMIT_SINGLE_NAMESPACE = 1000;
-    private const RESULTS_LIMIT_ALL_NAMESPACES = 100;
+    private const RESULTS_LIMIT_ALL_NAMESPACES = 50;
 
     /** @var string One of 'noredirects', 'onlyredirects' or 'all' for both. */
     protected $redirects;
@@ -98,8 +98,6 @@ class Pages extends Model
                 ? $this->formatPages($data)[$ns]
                 : [];
         }
-
-        // $this->recreatedPages = $this->fetchRecreatedPages();
 
         return $this->pages;
     }
@@ -187,6 +185,15 @@ class Pages extends Model
     public function getNumNamespaces(): int
     {
         return count(array_keys($this->getCounts()));
+    }
+
+    /**
+     * Are there more than one namespace in the results?
+     * @return bool
+     */
+    public function isMultiNamespace(): bool
+    {
+        return $this->getNumNamespaces() > 1;
     }
 
     /**

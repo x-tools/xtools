@@ -13,7 +13,7 @@
     </thead>
     <tbody>
         {% set index = 0 %}
-        {% for timestamp, change in rightsChanges if index < 10 or not(is_sub_request) %}
+        {% for timestamp, change in rightsChanges %}
             <tr>
                 <td class="{{ change.grantType == 'pending' ? 'pending ' : '' }}sort-entry--date" data-value="{{ timestamp }}">
                     {% if change.logId is not empty %}
@@ -44,11 +44,11 @@
             {% set index = index + 1 %}
         {% endfor %}
     </tbody>
-    {% if rightsChanges|length > index and is_sub_request %}
+    {% if remaining > 0 and is_sub_request %}
         <tfoot><tr class="show-more-row">
             <td colspan="4">
                 <a href="{{ path('EditCounterRightsChanges', {project: project.domain, username: user.username}) }}">
-                    {{ rightsChanges|length - index }} {{ msg('num-others', [rightsChanges|length - index]) }}
+                    {{ remaining }} {{ msg('num-others', [remaining]) }}
                 </a>
             </td>
         </tr></tfoot>

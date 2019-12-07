@@ -11,23 +11,8 @@
 
         <h3 class="text-center">{{ msg('tool-pages') }}</h3>
 
-        {% set multiNamspace = pages.counts|length > 1 %}
-
-        {% if multiNamspace %}
-        <div class="text-center xt-toc">
-            {#
-             # To save real estate, show "Namespace (talk)" as separate links
-             # instead of "Namespace" "Namespace talk"
-             #}
-            {% for key, value in pages.counts if (key is even or (key is odd and not(pages.counts[key - 1] is defined))) %}
-                <span>
-                    <a href="#{{ key }}" data-section="{{ key }}">{{ nsName(key, project.namespaces) }}</a>
-                    {% if pages.counts[key + 1] is defined %}
-                        (<a href="#{{ key+1 }}" data-section="{{ key+1 }}">{{ msg('talk')|lower }}</a>)
-                    {% endif %}
-                </span>
-            {% endfor %}
-        </div>
+        {% if pages.multiNamespace %}
+            {{ layout.nsToc(project, pages.counts|keys) }}
         {% endif %}
 
         {################## SUMMARY SECTION ###################}
@@ -86,12 +71,12 @@
                         {% for key, value in pages.counts %}
                         <tr>
                             <td class="sort-entry--namespace linked" data-value="{{ nsName(key, project.namespaces) }}">
-                                {% if multiNamspace %}
+                                {% if pages.multiNamespace %}
                                 <span class="namespace-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ key }}">
                                     <span class="glyphicon glyphicon-remove"></span>
                                 {% endif %}
                                     <span class="color-icon" style="background:{{ color(key) }}"></span>
-                                {% if multiNamspace %}
+                                {% if pages.multiNamespace %}
                                 </span>
                                 {% endif %}
 

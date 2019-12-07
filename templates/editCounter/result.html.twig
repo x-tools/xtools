@@ -19,7 +19,7 @@
                 {% set sectionExclude = sectionExclude|merge(['rights-changes']) %}
             {% endif %}
 
-            {% for section in sections if not(section in sectionExclude) %}
+            {% for section in sections|filter(section => not(section in sectionExclude)) %}
                 <span>
                     <a href="#{{ section }}" data-section="{{ section }}">{{ msg(section) }}</a>
                 </span>

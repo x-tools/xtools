@@ -35,32 +35,30 @@ class UserRights extends Model
      * Get user rights changes of the given user.
      * @return string[] Keyed by timestamp then 'added' and 'removed'.
      */
-    public function getRightsChanges(): array
+    public function getRightsChanges(?int $limit = null): array
     {
-        if (isset($this->rightsChanges)) {
-            return $this->rightsChanges;
+        if (!isset($this->rightsChanges)) {
+            $logData = $this->getRepository()
+                ->getRightsChanges($this->project, $this->user);
+
+            $this->rightsChanges = $this->processRightsChanges($logData);
+
+            $acDate = $this->getAutoconfirmedTimestamp();
+            if (false !== $acDate) {
+                $this->rightsChanges[$acDate] = [
+                    'logId' => null,
+                    'performer' => null,
+                    'comment' => null,
+                    'added' => ['autoconfirmed'],
+                    'removed' => [],
+                    'grantType' => strtotime($acDate) > time() ? 'pending' : 'automatic',
+                    'type' => 'local',
+                ];
+                krsort($this->rightsChanges);
+            }
         }
 
-        $logData = $this->getRepository()
-            ->getRightsChanges($this->project, $this->user);
-
-        $this->rightsChanges = $this->processRightsChanges($logData);
-
-        $acDate = $this->getAutoconfirmedTimestamp();
-        if (false !== $acDate) {
-            $this->rightsChanges[$acDate] = [
-                'logId' => null,
-                'performer' => null,
-                'comment' => null,
-                'added' => ['autoconfirmed'],
-                'removed' => [],
-                'grantType' => strtotime($acDate) > time() ? 'pending' : 'automatic',
-                'type' => 'local',
-            ];
-            krsort($this->rightsChanges);
-        }
-
-        return $this->rightsChanges;
+        return array_slice($this->rightsChanges, 0, $limit, true);
     }
 
     /**

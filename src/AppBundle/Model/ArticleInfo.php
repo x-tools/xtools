@@ -447,6 +447,16 @@ class ArticleInfo extends ArticleInfoApi
     }
 
     /**
+     * Get usernames of human editors (not bots).
+     * @param int|null $limit
+     * @return string[]
+     */
+    public function getHumans(?int $limit = null): array
+    {
+        return array_slice(array_diff(array_keys($this->getEditors()), array_keys($this->getBots())), 0, $limit);
+    }
+
+    /**
      * Get the list of the top editors to the page (by edits), including various statistics.
      * @return mixed[]
      */

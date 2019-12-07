@@ -38,7 +38,7 @@
             {% for day in 1..7 %}
                 <tr>
                     <th>{{ days[day] }}</th>
-                    {% for item in ec.timeCard if item.day_of_week == day and item.hour != 24 %}
+                    {% for item in ec.timeCard|filter(item => item.day_of_week == day and item.hour != 24) %}
                         <td>{{ item.value }}</td>
                     {% endfor %}
                 </tr>
@@ -76,7 +76,7 @@
      # fool-proof but it does help.
      #}
     {% set maxMidnight = 0 %}
-    {% for data in ec.timeCard if data.hour != 24 %}
+    {% for data in ec.timeCard|filter(data => data.hour != 24) %}
         {% if data.hour == 0 and data.value > maxMidnight %}
             {% set maxMidnight = maxMidnight + data.value %}
         {% endif %}
