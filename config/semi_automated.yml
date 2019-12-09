@@ -390,8 +390,8 @@ parameters:
             link: User:Enterprisey/script-installer
             namespaces: [2]
         Short description:
-            regex: '\(\[\[User:Galobtter\/Shortdesc helper\|Shortdesc helper\]\]\)'
-            link: User:Galobtter/Shortdesc helper
+            regex: 'Shortdesc helper\|Shortdesc helper\]\]\)'
+            link: Wikipedia:Shortdesc helper
             namespaces: [0]
         Snuggle:
             regex: 'WP:Snuggle\|Sn\]\]'
