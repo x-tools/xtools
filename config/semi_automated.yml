@@ -364,8 +364,8 @@ parameters:
             revert: true
             namespaces: [0, 4]
         Rater:
-            regex: '\[\[User:(Evad37\/rater.js|Kephir\/gadgets\/rater)'
-            link: User:Evad37/rater.js
+            regex: '\[\[(WP:RATER|User:(Evad37\/rater.js|Kephir\/gadgets\/rater))'
+            link: WP:RATER
             talk_namespaces: true
         Red Link Recovery Live:
             regex: '\[\[w:en:WP:RLR\|You can help!'
