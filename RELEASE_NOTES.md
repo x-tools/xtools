@@ -1,5 +1,14 @@
 # Release Notes #
 
+## 3.10.9 ##
+- ArticleInfo: Put 'Authorship' section before 'Top editors'.
+- ArticleInfo (T232693): Fix sorting for 'atbe' column.
+- AutoEdits (T240096): Update short description tool.
+- AutoEdits (T240214): Update config for Rater tool.
+- AdminStats (T240090): Fix display of user group icons.
+- Security updates (T240074)
+- Localization updates.
+
 ## 3.10.8 ##
 - AutoEdits (T222323): Add ns:1 for enwiki page curation
 - AutoEdits (T236715): Add twinkle for simplewiki
