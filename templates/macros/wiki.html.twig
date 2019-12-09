@@ -2,7 +2,7 @@
     {% if overrideLabel is not empty %}
         {% set label = overrideLabel %}
     {% endif %}
-    <a href='{{ url }}' target='_blank'>{{ label|raw }}</a>
+    <a href='{{ url }}' target='_blank'>{{ label }}</a>
     {% endapply %}
 {% endmacro %}
 
