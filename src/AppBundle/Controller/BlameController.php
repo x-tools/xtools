@@ -84,7 +84,10 @@ class BlameController extends XtoolsController
      * @Route(
      *     "/blame/{project}/{page}/{target}",
      *     name="BlameResult",
-     *     requirements={"target"="|latest|\d+|\d{4}-\d{2}-\d{2}"},
+     *     requirements={
+     *         "page"="(.+?)",
+     *         "target"="|latest|\d+|\d{4}-\d{2}-\d{2}",
+     *     },
      *     defaults={"target"="latest"}
      * )
      * @param string $target
