@@ -164,7 +164,7 @@ class TopEdits extends Model
      * This is the public method that should be called before using
      * the getter methods.
      * @param bool $format Whether to format the results, including stats for
-     *     number of reverts, etc. This is set to false for the API endpoint.
+     *     number of reverts, etc. This is set to false for the API endpoints.
      */
     public function prepareData(bool $format = true): void
     {

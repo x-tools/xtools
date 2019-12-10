@@ -134,7 +134,6 @@ class TopEditsController extends XtoolsController
         $ret = [
             'xtPage' => 'TopEdits',
             'xtTitle' => $this->user->getUsername(),
-            'namespace' => $this->namespace,
             'te' => $topEdits,
             'is_sub_request' => $this->isSubRequest,
         ];
@@ -175,6 +174,7 @@ class TopEditsController extends XtoolsController
     /************************ API endpoints ************************/
 
     /**
+     * List top edits by this user for all pages in a particular namespace.
      * @Route("/api/user/top_edits/{project}/{username}/{namespace}/{start}/{end}",
      *     name="UserApiTopEditsNamespace",
      *     requirements={
@@ -192,7 +192,7 @@ class TopEditsController extends XtoolsController
         $this->recordApiUsage('user/topedits');
 
         $topEdits = $this->setUpTopEdits();
-        $topEdits->prepareData(!isset($this->page));
+        $topEdits->prepareData();
 
         return $this->getFormattedApiResponse([
             'top_edits' => $topEdits->getTopEdits(),
@@ -220,7 +220,7 @@ class TopEditsController extends XtoolsController
         $this->recordApiUsage('user/topedits');
 
         $topEdits = $this->setUpTopEdits();
-        $topEdits->prepareData(!isset($this->page));
+        $topEdits->prepareData(false);
 
         return $this->getFormattedApiResponse([
             'top_edits' => $topEdits->getTopEdits(),

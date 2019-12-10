@@ -84,6 +84,32 @@ class PagesController extends XtoolsController
     }
 
     /**
+     * Every action in this controller (other than 'index') calls this first.
+     * @return Pages
+     * @codeCoverageIgnore
+     */
+    public function setUPages(): Pages
+    {
+        $pagesRepo = new PagesRepository();
+        $pagesRepo->setContainer($this->container);
+        $pages = new Pages(
+            $this->project,
+            $this->user,
+            $this->namespace,
+            $this->redirects,
+            $this->deleted,
+            $this->start,
+            $this->end,
+            $this->offset
+        );
+        $pages->setRepository($pagesRepo);
+
+        $pages->prepareData();
+
+        return $pages;
+    }
+
+    /**
      * Display the results.
      * @Route(
      *     "/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{start}/{end}/{offset}",
@@ -117,40 +143,19 @@ class PagesController extends XtoolsController
         $validRedirects = ['', 'noredirects', 'onlyredirects', 'all'];
         if ('none' === $redirects || !in_array($redirects, $validRedirects)) {
             return $this->redirectToRoute('PagesResult', [
-                'project' => $this->project->getDomain(),
-                'username' => $this->user->getUsername(),
-                'namespace' => $this->namespace,
                 'redirects' => 'noredirects',
                 'deleted' => $deleted,
-                'start' => $this->start,
-                'end' => $this->end,
                 'offset' => $this->offset,
             ]);
         }
 
-        $pagesRepo = new PagesRepository();
-        $pagesRepo->setContainer($this->container);
-        $pages = new Pages(
-            $this->project,
-            $this->user,
-            $this->namespace,
-            $redirects,
-            $deleted,
-            $this->start,
-            $this->end,
-            $this->offset
-        );
-        $pages->setRepository($pagesRepo);
-        $pages->prepareData();
+        $pages = $this->setUPages();
 
         $ret = [
             'xtPage' => 'Pages',
             'xtTitle' => $this->user->getUsername(),
-            'project' => $this->project,
-            'user' => $this->user,
             'summaryColumns' => $this->getSummaryColumns($pages),
             'pages' => $pages,
-            'namespace' => $this->namespace,
         ];
 
         if ('PagePile' === $this->request->query->get('format')) {

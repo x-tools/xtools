@@ -91,9 +91,6 @@ class EditSummaryController extends XtoolsController
         return $this->getFormattedResponse('editSummary/result', [
             'xtPage' => 'EditSummary',
             'xtTitle' => $this->user->getUsername(),
-            'user' => $this->user,
-            'project' => $this->project,
-            'namespace' => $this->namespace,
             'es' => $editSummary,
         ]);
     }
