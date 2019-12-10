@@ -82,6 +82,31 @@ class TopEditsController extends XtoolsController
     }
 
     /**
+     * Every action in this controller (other than 'index') calls this first.
+     * @return TopEdits
+     * @codeCoverageIgnore
+     */
+    public function setUpTopEdits(): TopEdits
+    {
+        $topEdits = new TopEdits(
+            $this->project,
+            $this->user,
+            $this->page,
+            $this->namespace,
+            $this->start,
+            $this->end,
+            $this->limit,
+            $this->offset
+        );
+
+        $topEditsRepo = new TopEditsRepository();
+        $topEditsRepo->setContainer($this->container);
+        $topEdits->setRepository($topEditsRepo);
+
+        return $topEdits;
+    }
+
+    /**
      * List top edits by this user for all pages in a particular namespace.
      * @Route("/topedits/{project}/{username}/{namespace}/{start}/{end}",
      *     name="TopEditsResultNamespace",
@@ -97,52 +122,18 @@ class TopEditsController extends XtoolsController
      */
     public function namespaceTopEditsAction(): Response
     {
-        // Make sure they've opted in to see this data.
-        if (!$this->project->userHasOptedIn($this->user)) {
-            $optedInPage = $this->project
-                ->getRepository()
-                ->getPage($this->project, $this->project->userOptInPage($this->user));
-
-            return $this->getFormattedResponse('topedits/result_namespace', [
-                'xtPage' => 'TopEdits',
-                'xtTitle' => $this->user->getUsername(),
-                'project' => $this->project,
-                'user' => $this->user,
-                'namespace' => $this->namespace,
-                'start' => $this->start,
-                'end' => $this->end,
-                'opted_in_page' => $optedInPage,
-                'is_sub_request' => $this->isSubRequest,
-            ]);
-        }
-
         /**
          * Max number of rows per namespace to show. `null` here will use the TopEdits default.
          * @var int
          */
-        $limit = $this->isSubRequest ? 10 : $this->limit;
+        $this->limit = $this->isSubRequest ? 10 : $this->limit;
 
-        $topEdits = new TopEdits(
-            $this->project,
-            $this->user,
-            null,
-            $this->namespace,
-            $this->start,
-            $this->end,
-            $limit,
-            $this->offset
-        );
-        $topEditsRepo = new TopEditsRepository();
-        $topEditsRepo->setContainer($this->container);
-        $topEdits->setRepository($topEditsRepo);
-
+        $topEdits = $this->setUpTopEdits();
         $topEdits->prepareData();
 
         $ret = [
             'xtPage' => 'TopEdits',
             'xtTitle' => $this->user->getUsername(),
-            'project' => $this->project,
-            'user' => $this->user,
             'namespace' => $this->namespace,
             'te' => $topEdits,
             'is_sub_request' => $this->isSubRequest,
@@ -164,26 +155,19 @@ class TopEditsController extends XtoolsController
      *     },
      *     defaults={"namespace"="all", "start"=false, "end"=false}
      * )
+     * @fixme Add pagination.
      * @return Response
      * @codeCoverageIgnore
      */
     public function singlePageTopEditsAction(): Response
     {
-        // FIXME: add pagination.
-        $topEdits = new TopEdits($this->project, $this->user, $this->page, 'all', $this->start, $this->end);
-        $topEditsRepo = new TopEditsRepository();
-        $topEditsRepo->setContainer($this->container);
-        $topEdits->setRepository($topEditsRepo);
-
+        $topEdits = $this->setUpTopEdits();
         $topEdits->prepareData();
 
         // Send all to the template.
         return $this->getFormattedResponse('topedits/result_article', [
             'xtPage' => 'TopEdits',
             'xtTitle' => $this->user->getUsername() . ' - ' . $this->page->getTitle(),
-            'project' => $this->project,
-            'user' => $this->user,
-            'page' => $this->page,
             'te' => $topEdits,
         ]);
     }
@@ -211,28 +195,9 @@ class TopEditsController extends XtoolsController
     {
         $this->recordApiUsage('user/topedits');
 
-        if (!$this->project->userHasOptedIn($this->user)) {
-            return new JsonResponse(
-                [
-                    'error' => 'User:'.$this->user->getUsername().' has not opted in to detailed statistics.',
-                ],
-                Response::HTTP_FORBIDDEN
-            );
-        }
-
-        $limit = isset($this->page) ? 1000 : 20;
-        $topEdits = new TopEdits($this->project, $this->user, null, $this->namespace, $limit);
-        $topEditsRepo = new TopEditsRepository();
-        $topEditsRepo->setContainer($this->container);
-        $topEdits->setRepository($topEditsRepo);
-
-        if (isset($this->page)) {
-            $topEdits->setPage($this->page);
-            $topEdits->prepareData(false);
-        } else {
-            // Do format the results.
-            $topEdits->prepareData();
-        }
+        $this->limit = isset($this->page) ? 1000 : 20;
+        $topEdits = $this->setUpTopEdits();
+        $topEdits->prepareData(!isset($this->page));
 
         return $this->getFormattedApiResponse([
             'top_edits' => $topEdits->getTopEdits(),
