@@ -18,7 +18,13 @@ build:
                 # Make sure nothing's changed in Git, which would indicate asset changes were not committed.
                 command: git status | grep 'nothing to commit, working tree clean'
             -
-                command: composer test
+                command: ./vendor/bin/parallel-lint --exclude vendor .
+            -
+                command: ./vendor/bin/phpcs -s . --ignore=/home/scrutinizer/build/node_modules
+            -
+                command: ./vendor/bin/phpunit tests --coverage-clover=coverage.xml
                 coverage:
                     file: 'coverage.xml'
                     format: 'clover'
+            -
+                command: ./vendor/bin/minus-x check .
