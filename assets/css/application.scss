@@ -290,6 +290,13 @@ $tooltip-shadow: #ccc;
         top: -3px;
     }
 }
+.xt-error-alert {
+    margin-top: 20px;
+
+    &:only-child {
+        margin: 0;
+    }
+}
 .panel-primary > .panel-heading a {
     color: white;
 }
