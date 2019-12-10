@@ -6,6 +6,9 @@
 {{ msg('xtools-advert', [link, date()|date('Y-m-d H:i')]) }}
 
 {% endif %}
+{% if not(project.userHasOptedIn(user)) %}
+{{ wiki.userOptedOutWikitext(project, user) }}
+{% else %}
 === {{ msg('topedits-per-namespace') }} ===
 
 {% for ns, pages in te.topEdits %}
@@ -37,3 +40,4 @@
 |}
 
 {% endfor %}
+{% endif %}

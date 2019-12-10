@@ -17,9 +17,7 @@
 {% endif %}
 
 {% if not(project.userHasOptedIn(user)) %}
-    <div class="alert alert-info">
-        <p>{{ msg('not-opted-in', [ wiki.pageLink(opted_in_page) ]) }}</p>
-    </div>
+    {{ wiki.userOptedOut(project, user) }}
 {% else %}
 
 {% if te.topEdits|length > 0 %}

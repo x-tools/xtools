@@ -1,14 +1,14 @@
 {% import 'macros/wiki.html.twig' as wiki %}
-{% if not(project.userHasOptedIn(user)) %}
-    {{ msg('not-opted-in', [ wiki.pageLink(opted_in_page) ]) }}
-{% else %}
 {% if not is_sub_request %}
 == {{ wiki.userLinkWikitext(user, user.username) }} ==
 
 {% set link %}[{{ url('EditCounterTimecard', {'username': user.username, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
 {{ msg('xtools-advert', [link, date()|date_format]) }}
-
 {% endif %}
+
+{% if not(project.userHasOptedIn(user)) %}
+{{ wiki.userOptedOutWikitext(project, user) }}
+{% else %}
 === {{ msg('timecard') }} ===
 {# MySQL uses ODBC standard, treating the first day (1) as Sunday #}
 {% set days = {

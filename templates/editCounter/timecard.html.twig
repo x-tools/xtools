@@ -9,9 +9,7 @@
 {% block ecBody %}
 
 {% if not project.userHasOptedIn(user) %}
-<div class="alert alert-info">
-    <p>{{ msg('not-opted-in', [ wiki.pageLink(opted_in_page) ] ) }}</p>
-</div>
+    {{ wiki.userOptedOut(project, user) }}
 {% else %}
 
 <div class="sr-only">

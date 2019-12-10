@@ -9,12 +9,8 @@
 {% block ecBody %}
 
 {% if not project.userHasOptedIn(user) %}
-    <div class="alert alert-info">
-        <p>{{ msg('not-opted-in', [ wiki.pageLink(opted_in_page) ] ) }}</p>
-    </div>
-{% else %}
-
-{% if ec.monthTotals|length > 0 %}
+    {{ wiki.userOptedOut(project, user) }}
+{% elseif ec.monthTotals|length > 0 %}
     <table class="sr-only">
         <thead>
             <tr>
@@ -85,8 +81,6 @@
     <div class="alert alert-info">
         {{ msg('no-contribs') }}
     </div>
-{% endif %}
-
 {% endif %}
 
 {% endblock %}

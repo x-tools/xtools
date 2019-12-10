@@ -311,3 +311,18 @@
         {% endif %}
     </p>
 {% endapply %}{% endmacro %}
+
+{% macro userOptedOut(project, user) %}
+    {% import _self as wiki %}
+    <div class="alert alert-info">
+        {% set loginLink = '<strong>' ~ wiki.extLink(path('login'), msg('not-opted-in-login')) ~ '</strong>' %}
+        <p>{{ msg('not-opted-in', [ '<strong>' ~ wiki.pageLinkRaw(project.userOptInPage(user), project) ~ '</strong>', '<strong>' ~ wiki.extLink('https://xtools.readthedocs.io/en/stable/opt-in.html', msg('not-opted-in-link')) ~ '</strong>', loginLink ]) }}</p>
+    </div>
+{% endmacro %}
+
+{% macro userOptedOutWikitext(project, user) %}{% apply spaceless %}
+    {% set pageLink = '[[' ~ project.userOptInPage(user) ~ ']]' %}
+    {% set docLink = '[https://xtools.readthedocs.io/en/stable/opt-in.html ' ~ msg('not-opted-in-link') ~ ']' %}
+    {% set loginLink = '[' ~ url('login') ~ ' ' ~ msg('not-opted-in-login') ~ ']' %}
+    {{ msg('not-opted-in', [ pageLink, docLink, loginLink ]) }}
+{% endapply  %}{% endmacro %}

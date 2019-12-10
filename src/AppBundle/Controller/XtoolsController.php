@@ -199,7 +199,11 @@ abstract class XtoolsController extends Controller
 
         if ($this->isApi && $restrictedAction && !$this->project->userHasOptedIn($this->user)) {
             throw new XtoolsHttpException(
-                $this->i18n->msg('not-opted-in', [$this->getOptedInPage()->getTitle()]),
+                $this->i18n->msg('not-opted-in', [
+                    $this->getOptedInPage()->getTitle(),
+                    $this->i18n->msg('not-opted-in-link').' <https://xtools.readthedocs.io/en/stable/opt-in.html>',
+                    $this->i18n->msg('not-opted-in-login'),
+                ]),
                 '',
                 $this->params,
                 true
