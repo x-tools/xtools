@@ -90,7 +90,7 @@ class ExceptionListener
             return new JsonResponse(array_merge(
                 ['error' => $exception->getMessage()],
                 $exception->getParams()
-            ), Response::HTTP_NOT_FOUND);
+            ), $exception->getStatusCode());
         }
 
         return new RedirectResponse($exception->getRedirectUrl());

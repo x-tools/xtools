@@ -206,7 +206,8 @@ abstract class XtoolsController extends Controller
                 ]),
                 '',
                 $this->params,
-                true
+                true,
+                Response::HTTP_UNAUTHORIZED
             );
         }
     }

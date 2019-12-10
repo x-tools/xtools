@@ -7,6 +7,8 @@ declare(strict_types = 1);
 
 namespace Tests\AppBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Response;
+
 /**
  * Integration tests for the Top Edits tool.
  * @group integration
@@ -55,11 +57,29 @@ class TopEditsControllerTest extends ControllerTestAdapter
             '/topedits/enwiki/Example',
             '/topedits/enwiki/Example/1',
             '/topedits/enwiki/Example/1/Main Page',
-            '/api/user/topedits/en.wikipedia/Example/1',
-            '/api/user/topedits/en.wikipedia/Example/1/Main_Page',
+            '/api/user/top_edits/test.wikipedia/MusikPuppet/1',
+            '/api/user/top_edits/test.wikipedia/MusikPuppet/1/Main_Page',
 
-            // Former but now nonexistent namespace.
+            // Former but with nonexistent namespace.
             '/topedits/en.wikipedia/L235/447',
         ]);
+    }
+
+    /**
+     * Routes that should return
+     */
+    public function testNotOptedInRoutes(): void
+    {
+        if (!self::$container->getParameter('app.is_labs')) {
+            return;
+        }
+
+        $this->assertUnsuccessfulRoutes([
+            // TODO: make HTML routes return proper codes for 'user hasn't opted in' errors.
+//            '/topedits/testwiki/MusikPuppet',
+//            '/topedits/testwiki/MusikPuppet/0',
+            '/api/user/top_edits/test.wikipedia/MusikPuppet6',
+            '/api/user/top_edits/test.wikipedia/MusikPuppet6/all',
+        ], Response::HTTP_UNAUTHORIZED);
     }
 }

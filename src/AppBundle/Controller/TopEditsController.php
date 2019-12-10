@@ -44,7 +44,7 @@ class TopEditsController extends XtoolsController
         // The Top Edits by page action is exempt from the edit count limitation.
         $this->tooHighEditCountActionBlacklist = ['singlePageTopEdits'];
 
-        $this->restrictedActions = ['topEditsUserApi'];
+        $this->restrictedActions = ['namespaceTopEditsUserApi'];
 
         parent::__construct($requestStack, $container, $i18n);
     }
@@ -155,7 +155,7 @@ class TopEditsController extends XtoolsController
      *     },
      *     defaults={"namespace"="all", "start"=false, "end"=false}
      * )
-     * @fixme Add pagination.
+     * @todo Add pagination.
      * @return Response
      * @codeCoverageIgnore
      */
@@ -175,27 +175,50 @@ class TopEditsController extends XtoolsController
     /************************ API endpoints ************************/
 
     /**
-     * Get the all edits of a user to a specific page, maximum 1000.
-     * @Route("/api/user/topedits/{project}/{username}/{namespace}/{page}/{start}/{end}", name="UserApiTopEditsArticle",
-     *     requirements = {
+     * @Route("/api/user/top_edits/{project}/{username}/{namespace}/{start}/{end}",
+     *     name="UserApiTopEditsNamespace",
+     *     requirements={
      *         "namespace"="|\d+|all",
-     *         "page"="|(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
+     *         "start"="|\d{4}-\d{2}-\d{2}",
+     *         "end"="|\d{4}-\d{2}-\d{2}",
      *     },
-     *     defaults={"page"="", "namespace"="all", "start"=false, "end"=false}
-     * )
-     * @Route("/api/user/top_edits/{project}/{username}/{namespace}/{page}/{start}/{end}",
-     *     name="UserApiTopEditsArticleUnderscored",
-     *     requirements={"page"="|.+", "namespace"="|\d+|all"},
-     *     defaults={"page"="", "namespace"="all", "start"=false, "end"=false}
+     *     defaults={"namespace"="all", "start"=false, "end"=false}
      * )
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function topEditsUserApiAction(): JsonResponse
+    public function namespaceTopEditsUserApiAction(): JsonResponse
     {
         $this->recordApiUsage('user/topedits');
 
-        $this->limit = isset($this->page) ? 1000 : 20;
+        $topEdits = $this->setUpTopEdits();
+        $topEdits->prepareData(!isset($this->page));
+
+        return $this->getFormattedApiResponse([
+            'top_edits' => $topEdits->getTopEdits(),
+        ]);
+    }
+
+    /**
+     * Get the all edits of a user to a specific page, maximum 1000.
+     * @Route("/api/user/top_edits/{project}/{username}/{namespace}/{page}/{start}/{end}",
+     *     name="UserApiTopEditsPage",
+     *     requirements = {
+     *         "namespace"="|\d+|all",
+     *         "page"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
+     *         "start"="|\d{4}-\d{2}-\d{2}",
+     *         "end"="|\d{4}-\d{2}-\d{2}",
+     *     },
+     *     defaults={"namespace"="all", "start"=false, "end"=false}
+     * )
+     * @todo Add pagination.
+     * @return JsonResponse
+     * @codeCoverageIgnore
+     */
+    public function singlePageTopEditsUserApiAction(): JsonResponse
+    {
+        $this->recordApiUsage('user/topedits');
+
         $topEdits = $this->setUpTopEdits();
         $topEdits->prepareData(!isset($this->page));
 

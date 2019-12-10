@@ -39,4 +39,17 @@ class ControllerTestAdapter extends WebTestCase
             static::assertTrue($this->client->getResponse()->isSuccessful(), "Failed: $route");
         }
     }
+
+    /**
+     * Check that each given route returns a successful response.
+     * @param string[] $routes
+     * @param int|null $statusCode
+     */
+    public function assertUnsuccessfulRoutes(array $routes, ?int $statusCode = null): void
+    {
+        foreach ($routes as $route) {
+            $this->client->request('GET', $route);
+            static::assertEquals($statusCode, $this->client->getResponse()->getStatusCode(), "Failed: $route");
+        }
+    }
 }

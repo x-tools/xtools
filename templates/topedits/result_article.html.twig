@@ -195,7 +195,7 @@
             {% endif %}
         {% endset %}
         {% set downloadLink %}
-            {{ layout.downloadLink('TopEditsResultPage', {'project': project.domain, 'username': user.username, 'page': page.title, 'namespace': te.namespace}, [], 'UserApiTopEditsArticleUnderscored') }}
+            {{ layout.downloadLink('TopEditsResultPage', {'project': project.domain, 'username': user.username, 'page': page.title, 'namespace': te.namespace}, [], 'UserApiTopEditsPage') }}
         {% endset %}
         {{ layout.content_block('topedits-article', content, [msg('topedits-article-desc'), downloadLink], null, false, false) }}
 
