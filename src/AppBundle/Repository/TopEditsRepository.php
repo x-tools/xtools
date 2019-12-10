@@ -185,7 +185,7 @@ class TopEditsRepository extends UserRepository
                     ORDER BY b.page_namespace ASC, b.count DESC
                 ) AS c
                 JOIN $pageTable e ON e.page_id = c.rev_page
-                WHERE c.row_number < $limit";
+                WHERE c.row_number <= $limit";
         $resultQuery = $this->executeQuery($sql, $project, $user, 'all', $start, $end);
         $result = $resultQuery->fetchAll();
 
