@@ -260,6 +260,8 @@
 	"non-stewards-with-actions": "Non-steward dengan tindakan penatalayan",
 	"none": "Tiada",
 	"not-opted-in": "Pengguna ini tidak bersedia jika datanya ditampilkan di sini. Silakan masuk log ke XTools sebagai pengguna ini, atau buatlah $1 dengan konten apa pun. Lihat dokumentasi untuk informasi lebih lanjut.",
+	"not-opted-in-link": "dokumentasi",
+	"not-opted-in-login": "masuk log",
 	"notice": "Peringatan",
 	"num-blocks": "{{PLURAL:$1|pemblokiran|pemblokiran}}",
 	"num-bytes": "{{PLURAL:$1|bita|bita}}",

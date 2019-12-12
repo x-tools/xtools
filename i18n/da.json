@@ -241,6 +241,7 @@
 	"non-auto-contribs-desc": "Se igennem en brugers ikkeautomatiserede bidrag.",
 	"none": "Ingen",
 	"not-opted-in": "Denne bruger har ikke valgt at få disse data vist. Log ind i XTools som denne bruger, eller opret $1 med valgfrit indhold. Se dokumentationen for yderligere information.",
+	"not-opted-in-link": "dokumentation",
 	"notice": "Bemærkning",
 	"num-blocks": "{{PLURAL:$1|blokering|blokeringer}}",
 	"num-bytes": "{{PLURAL:$1|byte|byte}}",

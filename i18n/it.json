@@ -173,6 +173,8 @@
 	"no-revisions": "Non sono state trovate modifiche",
 	"no-summary": "nessun oggetto",
 	"none": "Nessuno",
+	"not-opted-in-link": "documentazione",
+	"not-opted-in-login": "entra",
 	"num-categories": "{{PLURAL:$1|categoria|categorie}}",
 	"num-days": "{{PLURAL: $1|giorno|giorni}}",
 	"num-hours": "{{PLURAL: $1|ora|ore}}",

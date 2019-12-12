@@ -245,6 +245,8 @@
 	"non-auto-contribs-desc": "사용자의 비자동화된 기여를 둘러봅니다.",
 	"non-stewards-with-actions": "사무장이 아니면서 사무장 권한이 있는 사용자",
 	"none": "없음",
+	"not-opted-in-link": "설명문서",
+	"not-opted-in-login": "로그인",
 	"notice": "알림",
 	"num-blocks": "{{PLURAL:$1|차단}}",
 	"num-bytes": "{{PLURAL:$1|바이트}}",
