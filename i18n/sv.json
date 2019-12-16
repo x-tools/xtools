@@ -7,7 +7,8 @@
 			"Bengtsson96",
 			"Maol3",
 			"Abijeet Patro",
-			"Mjälten"
+			"Mjälten",
+			"ProletariatetsBefrielseOrkester"
 		]
 	},
 	"abusefilter": "Missbruksfilter",
@@ -251,6 +252,7 @@
 	"non-stewards-with-actions": "Icke-steward med steward åtgärder",
 	"none": "Ingen",
 	"not-opted-in": "Användaren har inte valt att visa denna data. Logga in i XTools användaren, eller skapa $1 med valfritt innehåll. Se dokumentationen för ytterligare information.",
+	"not-opted-in-login": "logga in",
 	"notice": "Meddelande",
 	"num-blocks": "{{PLURAL:$1|blockering|blockeringar}}",
 	"num-bytes": "{{PLURAL:$1|byte}}",
