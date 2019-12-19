@@ -8,7 +8,8 @@
 			"MGChecker",
 			"Mirzali",
 			"Abijeet Patro",
-			"Tobi 406"
+			"Tobi 406",
+			"WikiBayer"
 		]
 	},
 	"abusefilter": "Bearbeitungsfilter",
@@ -111,6 +112,7 @@
 	"delpagesfilter-deleted": "Nur gelöschte Seiten anzeigen",
 	"delpagesfilter-live": "Gelöschte Seiten ausschließen",
 	"diff": "Unterschied",
+	"diff-empty": "Leer",
 	"documentation": "Dokumentation",
 	"download-label": "Herunterladen",
 	"duplicate-vote": "Doppelte Abstimmung",
@@ -163,6 +165,7 @@
 	"general-stats": "Allgemeine Übersicht",
 	"global-account-un-lock": "Globale Sperre/Freigabe",
 	"global-block": "Globale Sperre",
+	"global-block-log": "Globales Sperr-Logbuch",
 	"global-other-sites-edit-count": "Andere Projekte",
 	"global-rename": "Globale Umbenennung",
 	"global-rights": "Globale Rechte",

@@ -15,7 +15,8 @@
 			"Tiberius1701",
 			"DannyS712",
 			"Abijeet Patro",
-			"Hasley"
+			"Hasley",
+			"Ihojose"
 		]
 	},
 	"abusefilter": "Filtro antiabusos",
@@ -75,6 +76,9 @@
 	"average-time-bw-edits-abbr": "tmee",
 	"back": "Volver",
 	"basic-information": "Información básica",
+	"blame-as-of": "A partir de",
+	"blame-as-of-desc": "Use esto para realizar una búsqueda de culpa en versiones anteriores del artículo.",
+	"blame-query-desc": "La consulta de búsqueda debe incluir cualquier wikitexto subyacente.",
 	"block": "Bloquear",
 	"block-current": "Bloqueo actual",
 	"block-log": "Registro de bloqueos",
@@ -260,6 +264,8 @@
 	"non-auto-contribs-desc": "Explora las contribuciones no automatizadas de un usuario.",
 	"none": "Ninguno",
 	"not-opted-in": "Este usuario ha optado por no mostrar estos datos. Inicia sesión en XTools como este usuario, o crea $1 con cualquier contenido. Consulta la documentanción para más información.",
+	"not-opted-in-link": "documentación",
+	"not-opted-in-login": "Iniciar sesión",
 	"notice": "Aviso",
 	"num-blocks": "{{PLURAL:$1|bloqueo|bloqueos}}",
 	"num-bytes": "{{PLURAL:$1|byte|bytes}}",
@@ -318,6 +324,7 @@
 	"patrollers": "Patrollers",
 	"patrols": "Verificadores",
 	"patrols-desc": "$2 {{PLURAL:$1|artículo verificado|artículos verificados}}",
+	"pc-accept": "Cambio pendiente de aceptación",
 	"percent-of-edit-count": "% de recuento de ediciones",
 	"percent-of-tools": "% de herramientas",
 	"percentage": "Porcentaje",
