@@ -217,8 +217,8 @@ xtools.application.setupColumnSorting = function () {
             var before = $(a).find('.sort-entry--' + sortColumn).data('value'),
                 after = $(b).find('.sort-entry--' + sortColumn).data('value');
 
-            // test data type, assumed to be string if can't be parsed as float
-            if (!isNaN(parseFloat(before, 10))) {
+            // Cast numerical strings into floats for faster sorting.
+            if (!isNaN(before)) {
                 before = parseFloat(before, 10);
                 after = parseFloat(after, 10);
             }

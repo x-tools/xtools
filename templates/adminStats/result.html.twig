@@ -95,8 +95,9 @@
                             <td class="sort-entry--username" data-value="{{ username }}">
                                 {{ wiki.userLink(username, project) }}
                             </td>
-                            <td class="sort-entry--user-groups" data-value="{{ user['user-groups']|length }}">
-                                {% for group, url in as.userGroupIcons|filter((url, group) => group in user['user-groups']) %}
+                            {% set groups = as.userGroupIcons|filter((url, group) => group in user['user-groups']) %}
+                            <td class="sort-entry--user-groups" data-value="{{ groups|length ~ '|' ~ groups|keys|sort|join('|') }}">
+                                {% for group, url in groups %}
                                     <img class="user-group-icon" src="{{ url }}" title="{{ rightsNames[group]|ucfirst }}" alt="{{ rightsNames[group] }}" />
                                 {% endfor %}
                             </td>
