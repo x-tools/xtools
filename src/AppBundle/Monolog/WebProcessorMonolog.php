@@ -42,6 +42,7 @@ class WebProcessorMonolog
             $record['extra']['host'] = $request->getHost();
             $record['extra']['uri'] = $request->getUri();
             $record['extra']['useragent'] = $request->headers->get('User-Agent');
+            $record['extra']['referer'] = $request->headers->get('referer');
 
             $session = $request->getSession();
 
