@@ -11,7 +11,6 @@
 	"last-month": "Өткен 30 күндегі өңдемелер",
 	"last-week": "Өткен 7 күндегі өңдемелер",
 	"last-year": "Өткен 365 күндегі өңдемелер",
-	"num-kilobytes": "$1 КБ",
 	"page-title": "Бет атауы",
 	"pager-newer-n": "{{PLURAL:$1|жаңалау 1|жаңалау $1}}",
 	"pager-older-n": "{{PLURAL:$1|ескілеу 1|ескілеу $1}}",
@@ -20,6 +19,7 @@
 	"performer": "Орындаушы",
 	"project": "Жоба",
 	"report-issue": "Қате туралы хабарлау",
+	"size-kilobytes": "$1 КБ",
 	"translation-credits": "Аударма $1 және $2 арқылы жасалды.",
 	"user": "Қатысушы"
 }

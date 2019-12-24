@@ -1,6 +1,9 @@
 {
 	"basic-information": "Төп мәгълүмат",
 	"download-label": "Йөкләү",
-	"num-kilobytes": "$1 Кб",
-	"performer": "Башкаручы"
+	"performer": "Башкаручы",
+	"size-gigabytes": "$1 Гб",
+	"size-kilobytes": "$1 Кб",
+	"size-megabytes": "$1 Мб",
+	"size-terabytes": "$1 Тб"
 }

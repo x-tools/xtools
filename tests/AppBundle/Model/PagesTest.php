@@ -81,15 +81,15 @@ class PagesTest extends TestAdapter
                 'count' => 2,
                 'redirects' => 0,
                 'deleted' => 1,
-                'total_length' => 0.017,
-                'avg_length' => 0.0085,
+                'total_length' => 17,
+                'avg_length' => 8.5,
             ],
             1 => [
                 'count' => 1,
                 'redirects' => 1,
                 'deleted' => 0,
-                'total_length' => 0.01,
-                'avg_length' => 0.01,
+                'total_length' => 10,
+                'avg_length' => 10,
             ],
         ], $pages->getCounts());
 

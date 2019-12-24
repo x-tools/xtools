@@ -383,6 +383,7 @@
 	"show-sections-desc": "Esbilla qué estadístiques amosar. Cuantes más seleiciones, más tardará en cargar.",
 	"simple-counter-limited-results": "Esti usuariu tien fechu un númberu d'ediciones sustancialmente altu. Amosando resultaos parciales.",
 	"size": "Tamañu",
+	"size-gigabytes": "$1 XB",
 	"size-over-time": "Tamañu nel tiempu",
 	"small-edits": "Ediciones pequeñes (<20 bytes)",
 	"start": "Data de comienzu",

@@ -110,6 +110,18 @@ class AppExtensionTest extends TestAdapter
     }
 
     /**
+     * Format a size.
+     */
+    public function testSizeFormat(): void
+    {
+        static::assertEquals('12.01 KB', $this->appExtension->sizeFormat(12300));
+        static::assertEquals('100', $this->appExtension->sizeFormat(100));
+        static::assertEquals('0', $this->appExtension->sizeFormat(0));
+        static::assertEquals('1.12 GB', $this->appExtension->sizeFormat(1200300400));
+        static::assertEquals('1.09 TB', $this->appExtension->sizeFormat(1200300400500));
+    }
+
+    /**
      * Intution methods.
      */
     public function testIntution(): void

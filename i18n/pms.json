@@ -1,5 +1,7 @@
 {
 	"feedback": "Opinion",
-	"num-kilobytes": "$1 KByte",
-	"performer": "Esecutor"
+	"performer": "Esecutor",
+	"size-gigabytes": "$1 GByte",
+	"size-kilobytes": "$1 KByte",
+	"size-megabytes": "$1 MByte"
 }

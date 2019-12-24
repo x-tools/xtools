@@ -11,7 +11,6 @@
 	"last-month": "آخری ماہ میں ترامیم",
 	"last-week": "آخری 7 دنوں میں ترامیم",
 	"last-year": "پچھلے ایک سال/365 دنوں میں ترامیم",
-	"num-kilobytes": "$1 کلوبائٹ",
 	"page-title": "عنوان صفحہ",
 	"pager-newer-n": "{{PLURAL:$1|جدید $1}}",
 	"pager-older-n": "{{PLURAL:$1|قدیم}} $1",
@@ -20,5 +19,6 @@
 	"performer": "صارف",
 	"project": "منصوبہ",
 	"report-issue": "مسئلے کی نشاندہی کریں",
+	"size-kilobytes": "$1 کلوبائٹ",
 	"user": "صارف"
 }

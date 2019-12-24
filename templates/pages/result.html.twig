@@ -106,11 +106,11 @@
                                     {% endif %}
                                 </td>
                             {% endif %}
-                            <td class="sort-entry--length" data-value="{{ value.total_length }}">
-                                {{ msg('num-kilobytes', [value.total_length|num_format(1)]) }}
+                            <td class="sort-entry--total-page-size" data-value="{{ value.total_length }}">
+                                {{ value.total_length|size_format }}
                             </td>
-                            <td class="sort-entry--length" data-value="{{ value.avg_length }}">
-                                {{ msg('num-kilobytes', [value.avg_length|num_format(1)]) }}
+                            <td class="sort-entry--average-page-size" data-value="{{ value.avg_length }}">
+                                {{ value.avg_length|size_format }}
                             </td>
                         </tr>
                         {% endfor %}
@@ -137,6 +137,12 @@
                                     ({{ pages.numDeleted|percent_format(pages.getNumPages) }})
                                 </th>
                             {% endif %}
+                            <th class="namespaces--total-page-size">
+                                {{ pages.totalPageSize|size_format }}
+                            </th>
+                            <th class="namespaces--average-page-size">
+                                {{ pages.averagePageSize|size_format }}
+                            </th>
                         </tfoot>
                     {% endif %}
                 </table>
