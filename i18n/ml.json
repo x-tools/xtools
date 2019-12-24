@@ -239,6 +239,7 @@
 	"num-deletions": "{{PLURAL:$1|മായ്ക്കൽ|മായ്ക്കലുകൾ}}",
 	"num-editors": "{{PLURAL:$1|എഴുതിയയാൾ|എഴുത്തുകാർ}}",
 	"num-hours": "({{PLURAL:$1| മണിക്കൂർ}})",
+	"num-kilobytes": "$1 കെ.ബി.",
 	"num-minutes": "{{PLURAL:$1|മിനിറ്റ്}}",
 	"num-months": "{{PLURAL:$1|മാസം}}",
 	"num-moves": "{{PLURAL:$1|മാറ്റൽ|മാറ്റലുകൾ}}",

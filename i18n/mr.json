@@ -241,6 +241,7 @@
 	"num-deletions": "{{PLURAL:$1|वगळले|वगळलेत}}",
 	"num-editors": "{{PLURAL:$1|संपादक}}",
 	"num-hours": "{{PLURAL: $1|तास}}",
+	"num-kilobytes": "$1 कि.बा.",
 	"num-minutes": "{{PLURAL: $1|मिनिट|मिनिटे}}",
 	"num-months": "{{PLURAL:$1|महिना|महिने}}",
 	"num-moves": "{{PLURAL:$1|स्थानांतरण|स्थानांतरणे}}",

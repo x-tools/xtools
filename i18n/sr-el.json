@@ -235,6 +235,7 @@
 	"num-deletions": "{{PLURAL:$1|brisanje|brisanja}}",
 	"num-editors": "{{PLURAL:$1|urednik|urednika}}",
 	"num-hours": "{{PLURAL:$1|sat|sata|sati}}",
+	"num-kilobytes": "$1 kB",
 	"num-minutes": "{{PLURAL:$1|minut|minuta}}",
 	"num-months": "{{PLURAL:$1|mesec|meseca|meseci}}",
 	"num-moves": "{{PLURAL:$1|premeštanje|premeštanja}}",

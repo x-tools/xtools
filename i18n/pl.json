@@ -152,6 +152,7 @@
 	"num-categories": "{{PLURAL:$1|kategoria|kategorie}}",
 	"num-days": "{{PLURAL:$1|dzień|dni}}",
 	"num-hours": "{{PLURAL:$1|godzina|godzin}}",
+	"num-kilobytes": "$1&nbsp;KB",
 	"num-minutes": "{{PLURAL:$1|minuta|minuty|minut}}",
 	"num-months": "{{PLURAL: $1|miesiąc|miesięcy}}",
 	"num-namespaces": "{{PLURAL:$1|przestrzeń|przestrzenie}} nazw",

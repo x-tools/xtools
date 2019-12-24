@@ -209,8 +209,12 @@ class Pages extends Model
         $counts = [];
 
         foreach ($this->countPagesCreated() as $row) {
+            $count = (int)$row['count'];
+            $totalLength = (int)$row['total_length'] / 1000;
             $counts[$row['namespace']] = [
-                'count' => (int)$row['count'],
+                'count' => $count,
+                'total_length' => $totalLength,
+                'avg_length' => $count > 0 ? $totalLength / $count : 0,
             ];
             if ('live' !== $this->deleted) {
                 $counts[$row['namespace']]['deleted'] = (int)$row['deleted'];

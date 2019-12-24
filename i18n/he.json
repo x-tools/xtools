@@ -210,6 +210,7 @@
 	"num-deletions": "{{PLURAL:$1|מחיקה|מחיקות}}",
 	"num-editors": "{{PLURAL:$1|עורך|עורכים}}",
 	"num-hours": "{{PLURAL:$1|שעה|שעות}}",
+	"num-kilobytes": "{{PLURAL:$1|קילו־בייט אחד|$1 קילו־בייטים}}",
 	"num-minutes": "{{PLURAL:$1|דקה|דקות}}",
 	"num-months": "{{PLURAL:$1|חודש|חודשים}}",
 	"num-moves": "{{PLURAL:$1|העברה|העברות}}",

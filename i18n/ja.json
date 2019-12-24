@@ -220,6 +220,7 @@
 	"num-deletions": "{{PLURAL:$1|削除}}",
 	"num-editors": "{{PLURAL:$1|編集者}}",
 	"num-hours": "{{PLURAL: $1|時間}}",
+	"num-kilobytes": "$1キロバイト",
 	"num-minutes": "{{PLURAL: $1|分}}",
 	"num-months": "{{PLURAL: $1|月}}",
 	"num-moves": "{{PLURAL:$1|移動}}",

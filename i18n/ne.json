@@ -148,6 +148,7 @@
 	"num-bytes": "{{PLURAL:$1|बाइट|बाइटहरू}}",
 	"num-days": "{{PLURAL: $1|day|days}}",
 	"num-hours": "{{PLURAL: $1|hour|hours}}",
+	"num-kilobytes": "$1 किलोबाइटहरू",
 	"num-minutes": "{{PLURAL: $1|minute|minutes}}",
 	"num-months": "{{PLURAL: $1|month|months}}",
 	"num-seconds": "{{PLURAL: $1|second|seconds}}",

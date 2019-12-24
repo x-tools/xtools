@@ -227,6 +227,7 @@
 	"num-deletions": "{{PLURAL:$1|borrado|borrados}}",
 	"num-editors": "{{PLURAL:$1|editor|editores}}",
 	"num-hours": "{{PLURAL: $1|hora|horas}}",
+	"num-kilobytes": "$1 kB",
 	"num-minutes": "{{PLURAL: $1|minuto|minutos}}",
 	"num-months": "{{PLURAL: $1|mes|meses}}",
 	"num-moves": "{{PLURAL:$1|traslado|traslados}}",

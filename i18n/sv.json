@@ -262,6 +262,7 @@
 	"num-deletions": "{{PLURAL:$1|radering|raderingar}}",
 	"num-editors": "{{PLURAL:$1|redigerare}}",
 	"num-hours": "{{PLURAL: $1|timme|timmar}}",
+	"num-kilobytes": "$1 kbyte",
 	"num-minutes": "{{PLURAL: $1|minut|minuter}}",
 	"num-months": "{{PLURAL:$1|månad|månader}}",
 	"num-moves": "{{PLURAL:$1|flyttning|flyttningar}}",

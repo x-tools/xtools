@@ -269,6 +269,7 @@
 	"num-deletions": "{{PLURAL:$1|бришење|бришења}}",
 	"num-editors": "{{PLURAL:$1|уредник|уредници}}",
 	"num-hours": "{{PLURAL:$1|час|часа}}",
+	"num-kilobytes": "$1 КБ",
 	"num-minutes": "{{PLURAL:$1|минута|минути}}",
 	"num-months": "{{PLURAL:$1|месец|месеци}}",
 	"num-moves": "{{PLURAL:$1|преместување|преместувања}}",

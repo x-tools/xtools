@@ -205,6 +205,7 @@
 	"num-deletions": "{{PLURAL:$1|verwijdering|verwijderingen}}",
 	"num-editors": "{{PLURAL:$1|bewerker|bewerkers}}:",
 	"num-hours": "{{PLURAL: $1|uur}}",
+	"num-kilobytes": "$1 kB",
 	"num-minutes": "{{PLURAL: $1|minuut|minuten}}",
 	"num-months": "{{PLURAL: $1|maand|maanden}}",
 	"num-namespaces": "{{PLURAL:$1|naamruimte|naamruimten}}",

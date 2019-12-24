@@ -240,6 +240,7 @@
 	"num-deletions": "{{PLURAL:$1|حذف|حذف}}",
 	"num-editors": "{{PLURAL:$1|ویرایش‌کننده|ویرایش‌کننده}}",
 	"num-hours": "{{PLURAL: $1|ساعت|ساعت}}",
+	"num-kilobytes": "$1 کیلوبایت",
 	"num-minutes": "{{PLURAL: $1|دقیقه|دقیقه}}",
 	"num-months": "{{PLURAL: $1|ماه|ماه}}",
 	"num-moves": "{{PLURAL:$1|انتقال|انتقال‌}}",

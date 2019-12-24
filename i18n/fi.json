@@ -164,6 +164,7 @@
 	"num-categories": "{{PLURAL:$1|luokka|luokkaa}}",
 	"num-days": "{{PLURAL:$1|päivä|päivää}}",
 	"num-hours": "{{PLURAL:$1|tunti|tuntia}}",
+	"num-kilobytes": "$1 KiB",
 	"num-minutes": "{{PLURAL:$1|minuutti|minuuttia}}",
 	"num-months": "{{PLURAL:$1|kuukausi|kuukautta}}",
 	"num-namespaces": "{{PLURAL:$1|nimiavaruus|nimiavaruutta}}",

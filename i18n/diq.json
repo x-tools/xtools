@@ -84,6 +84,7 @@
 	"num-days": "{{PLURAL: $1|roce|roci}}",
 	"num-editors": "{{PLURAL:$1|vurnayoğ|vurnayoği}}",
 	"num-hours": "($1 {{PLURAL:$1|saete|saeti}})",
+	"num-kilobytes": "$1 KB",
 	"num-minutes": "{{PLURAL: $1|deqa|deqeyi}}",
 	"num-months": "{{PLURAL:$1|aşme|aşmi}}",
 	"num-moves": "{{PLURAL:$1|bıkırışe|bıkırışe}}",

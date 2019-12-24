@@ -180,6 +180,7 @@
 	"num-deletions": "{{PLURAL:$1|سڕینەوە}}",
 	"num-editors": "{{PLURAL:$1|دەستکاریکەر}}",
 	"num-hours": "{{PLURAL:$1|کاتژمێر}}",
+	"num-kilobytes": "$1 کیلۆبایت",
 	"num-minutes": "{{PLURAL: $1|خولەک|خولەک}}",
 	"num-months": "{{PLURAL:$1|مانگ}}",
 	"num-moves": "{{PLURAL:$1|گواستنەوە}}",

@@ -121,6 +121,7 @@
 	"num-days": "{{PLURAL:$1|dan|dana}}",
 	"num-editors": "{{PLURAL:$1|urednik|urednika}}",
 	"num-hours": "{{PLURAL:$1|sat|sata|sati}}",
+	"num-kilobytes": "$1 KB",
 	"num-minutes": "{{PLURAL:$1|minut|minute|minuta}}",
 	"num-months": "{{PLURAL:$1|mjesec|mjeseca|mjeseci}}",
 	"num-namespaces": "{{PLURAL:$1|imenski prostor|imenska prostora|imenskih prostora}}",

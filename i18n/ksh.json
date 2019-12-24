@@ -10,6 +10,7 @@
 	"last-month": "Aanzahl Änderonge en de läzde 30 Dähsch",
 	"last-week": "Aanzahl Änderonge en de läzde sibbe Dähsch",
 	"last-year": "Aanzahl Änderonge en de läzde 365 Dähsch",
+	"num-kilobytes": "$1&nbsp;KB",
 	"page-title": "Dä Sigg ier Övverschreff",
 	"pager-newer-n": "{{PLURAL:$1|aller neuerste|neuer $1}}",
 	"pager-older-n": "{{PLURAL:$1|vörrije|vörrije $1}}",

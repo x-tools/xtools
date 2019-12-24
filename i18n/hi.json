@@ -195,6 +195,7 @@
 	"num-days": "{{PLURAL: $1|दिन|दिनों}}",
 	"num-editors": "{{PLURAL:$1|संपादक|संपादकों}}",
 	"num-hours": "{{PLURAL: $1|घण्टा|घण्टों}}",
+	"num-kilobytes": "$1 KB",
 	"num-minutes": "{{PLURAL: $1|मिनट|मिनटों}}",
 	"num-months": "{{PLURAL: $1|महीना|महीने}}",
 	"num-moves": "{{PLURAL:$1|स्थानांतरण|स्थानांतरणो}}",

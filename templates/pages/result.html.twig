@@ -79,7 +79,6 @@
                                 {% if pages.multiNamespace %}
                                 </span>
                                 {% endif %}
-
                                 <a href="#{{ key }}" >{{ nsName(key, project.namespaces) }}</a>
                             </td>
                             {% if pages.redirects != 'onlyredirects' and pages.deleted != 'deleted' %}
@@ -107,6 +106,12 @@
                                     {% endif %}
                                 </td>
                             {% endif %}
+                            <td class="sort-entry--length" data-value="{{ value.total_length }}">
+                                {{ msg('num-kilobytes', [value.total_length|num_format(1)]) }}
+                            </td>
+                            <td class="sort-entry--length" data-value="{{ value.avg_length }}">
+                                {{ msg('num-kilobytes', [value.avg_length|num_format(1)]) }}
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>

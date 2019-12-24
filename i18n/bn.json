@@ -240,6 +240,7 @@
 	"num-deletions": "টি {{PLURAL:$1|অপসারণ}}",
 	"num-editors": "জন {{PLURAL:$1|সম্পাদক}}",
 	"num-hours": "{{PLURAL:$1|ঘণ্টা}}",
+	"num-kilobytes": "$1 কিলোবাইট",
 	"num-minutes": "{{PLURAL:$1|মিনিট}}",
 	"num-months": "{{PLURAL:$1|মাস}}",
 	"num-moves": "টি {{PLURAL:$1|স্থানান্তর}}",

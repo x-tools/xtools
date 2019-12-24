@@ -162,6 +162,7 @@
 	"num-deletions": "{{PLURAL:$1|წაშლა|წაშლა}}",
 	"num-editors": "{{PLURAL:$1|რედაქტორი|რედაქტორი}}",
 	"num-hours": "{{PLURAL:$1|საათი|საათი}}",
+	"num-kilobytes": "$1 კბ",
 	"num-minutes": "{{PLURAL:$1|წუთი|წუთი}}",
 	"num-months": "{{PLURAL:$1|თვე|თვე}}",
 	"num-moves": "{{PLURAL:$1|გადატანა|გადატანა}}",

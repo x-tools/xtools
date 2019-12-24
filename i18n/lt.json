@@ -256,6 +256,7 @@
 	"num-deletions": "{{PLURAL:$1|trynimas|trynimai|trynimų}}",
 	"num-editors": "{{PLURAL:$1|redaktorius|redaktoriai|redaktorių}}",
 	"num-hours": "{{PLURAL:$1|valandos|valandų}}",
+	"num-kilobytes": "$1 KiB",
 	"num-minutes": "{{PLURAL:$1|minutė|minutės|minučių}}",
 	"num-months": "{{PLURAL:$1|mėnuo|mėnesiai|mėnesių}}",
 	"num-moves": "{{PLURAL:$1|pervadinimas|pervadinimai|pervadinimų}}",

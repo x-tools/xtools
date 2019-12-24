@@ -271,6 +271,7 @@
 	"num-deletions": "{{PLURAL:$1|حذف|عمليات حذف}}",
 	"num-editors": "{{PLURAL:$1|محرر|محررين}}",
 	"num-hours": "{{PLURAL:$1|ساعة|ساعات}}",
+	"num-kilobytes": "$1 كيلوبايت",
 	"num-minutes": "{{PLURAL:$1|دقيقة|دقائق}}",
 	"num-months": "{{PLURAL:$1|شهر|شهراً}}",
 	"num-moves": "{{PLURAL:$1|نقلة|نقلات}}",

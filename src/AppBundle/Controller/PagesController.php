@@ -195,6 +195,9 @@ class PagesController extends XtoolsController
             $summaryColumns[] = 'deleted';
         }
 
+        $summaryColumns[] = 'total-page-size';
+        $summaryColumns[] = 'average-page-size';
+
         return $summaryColumns;
     }
 

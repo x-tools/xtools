@@ -66,6 +66,7 @@
 	"edits": "Tiẓrigin",
 	"feedback": "Tikti",
 	"invalid-project-cant-use": "$1 ur yeswil ara akken ad iseqdec afeck-agi",
+	"num-kilobytes": "$1 KB/KO",
 	"num-revisions-since": "$1 {{PLURAL:$2|n uceggir|n iceggiren}} seg $3",
 	"num-years": "{{PLURAL:$1|n useggas|n iseggasen}}",
 	"oppose": "Segdel",

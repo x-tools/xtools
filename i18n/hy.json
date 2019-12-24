@@ -111,6 +111,7 @@
 	"no-summary": "առաց պատճառի",
 	"num-days": "{{PLURAL:$1|օր|օրեր}}",
 	"num-hours": "{{PLURAL:$1|ժամ|ժամեր}}",
+	"num-kilobytes": "$1 ԿԲ",
 	"num-minutes": "{{PLURAL:$1|րոպե|րոպեներ}}",
 	"num-months": "{{PLURAL:$1|ամիս|ամիսներ}}",
 	"num-revisions": "{{PLURAL:$1|տարբերակ|տարբերակներ}}",

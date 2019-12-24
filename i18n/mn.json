@@ -13,6 +13,7 @@
 	"help-translate": "Орчуулганд тусална уу",
 	"history": "Түүх",
 	"namespace": "Нэрний зай",
+	"num-kilobytes": "$1 КБ",
 	"page-title": "Хуудасны гарчиг",
 	"pager-newer-n": "{{PLURAL:$1|илүү шинэ 1|илүү шинэ $1}}",
 	"pager-older-n": "{{PLURAL:$1|илүү хуучин 1|илүү хуучин $1}}",
