@@ -3,5 +3,8 @@
 	"documentation": "Dokumentasie",
 	"download-label": "Laai af",
 	"other": "Ander",
-	"performer": "Uitvoerende gebruiker"
+	"performer": "Uitvoerende gebruiker",
+	"size-gigabytes": "$1 GG",
+	"size-kilobytes": "$1 KG",
+	"size-megabytes": "$1 MG"
 }

@@ -58,7 +58,8 @@ class PagesRepository extends UserRepository
         $sql = "SELECT namespace,
                     COUNT(page_title) AS count,
                     SUM(CASE WHEN type = 'arc' THEN 1 ELSE 0 END) AS deleted,
-                    SUM(page_is_redirect) AS redirects
+                    SUM(page_is_redirect) AS redirects,
+                    SUM(length) AS total_length
                 FROM (".
                     $this->getPagesCreatedInnerSql($project, $conditions, $deleted, $start, $end, true)."
                 ) a ".
@@ -190,7 +191,8 @@ class PagesRepository extends UserRepository
         $logTable = $project->getTableName('logging', 'logindex');
 
         // Only SELECT things that are needed, based on whether or not we're doing a COUNT.
-        $revSelects = "DISTINCT page_namespace AS `namespace`, 'rev' AS `type`, page_title, page_is_redirect";
+        $revSelects = "DISTINCT page_namespace AS `namespace`, 'rev' AS `type`, page_title, "
+            . "page_is_redirect, rev_len AS length";
         if (false === $count) {
             $revSelects .= ", page_len, rev_timestamp, rev_len, rev_id, NULL AS `recreated` ";
         }
@@ -212,7 +214,8 @@ class PagesRepository extends UserRepository
             $conditions['revPageGroupBy'];
 
         // Only SELECT things that are needed, based on whether or not we're doing a COUNT.
-        $arSelects = "ar_namespace AS `namespace`, 'arc' AS `type`, ar_title AS page_title, '0' AS page_is_redirect";
+        $arSelects = "ar_namespace AS `namespace`, 'arc' AS `type`, ar_title AS page_title, "
+            . "'0' AS page_is_redirect, ar_len AS length";
         if (false === $count) {
             $arSelects .= ", NULL AS page_len, MIN(ar_timestamp) AS rev_timestamp, ".
                 "ar_len AS rev_len, ar_rev_id AS rev_id, EXISTS(

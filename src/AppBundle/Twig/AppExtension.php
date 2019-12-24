@@ -514,6 +514,7 @@ class AppExtension extends AbstractExtension
             new TwigFilter('percent_format', [$this, 'percentFormat']),
             new TwigFilter('diff_format', [$this, 'diffFormat'], ['is_safe' => ['html']]),
             new TwigFilter('num_format', [$this, 'numberFormat']),
+            new TwigFilter('size_format', [$this, 'sizeFormat']),
             new TwigFilter('date_format', [$this, 'dateFormat']),
             new TwigFilter('wikify', [$this, 'wikify']),
         ];
@@ -528,6 +529,33 @@ class AppExtension extends AbstractExtension
     public function numberFormat($number, $decimals = 0): string
     {
         return $this->i18n->numberFormat($number, $decimals);
+    }
+
+    /**
+     * Format the given size (in bytes) as KB, MB, GB, or TB.
+     * Some code courtesy of Leo, CC BY-SA 4.0
+     * @see https://stackoverflow.com/a/2510459/604142
+     * @param int $bytes
+     * @param int $precision
+     * @return string
+     */
+    public function sizeFormat(int $bytes, int $precision = 2): string
+    {
+        $base = log($bytes, 1024);
+        $suffixes = ['', 'kilobytes', 'megabytes', 'gigabytes', 'terabytes'];
+
+        $index = floor($base);
+
+        if (0 === (int)$index) {
+            return $this->numberFormat($bytes);
+        }
+
+        $sizeMessage = $this->numberFormat(
+            pow(1024, $base - floor($base)),
+            $precision
+        );
+
+        return $this->i18n->msg('size-'.$suffixes[floor($base)], [$sizeMessage]);
     }
 
     /**

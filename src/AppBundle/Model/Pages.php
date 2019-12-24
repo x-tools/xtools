@@ -197,6 +197,24 @@ class Pages extends Model
     }
 
     /**
+     * Get the sum of all page sizes, across all specified namespaces.
+     * @return int
+     */
+    public function getTotalPageSize(): int
+    {
+        return array_sum(array_column($this->getCounts(), 'total_length'));
+    }
+
+    /**
+     * Get average size across all pages.
+     * @return float
+     */
+    public function averagePageSize(): float
+    {
+        return $this->getTotalPageSize() / $this->getNumPages();
+    }
+
+    /**
      * Number of redirects/pages that were created/deleted, broken down by namespace.
      * @return array Namespace IDs as the keys, with values 'count', 'deleted' and 'redirects'.
      */
@@ -209,8 +227,12 @@ class Pages extends Model
         $counts = [];
 
         foreach ($this->countPagesCreated() as $row) {
+            $count = (int)$row['count'];
+            $totalLength = (int)$row['total_length'];
             $counts[$row['namespace']] = [
-                'count' => (int)$row['count'],
+                'count' => $count,
+                'total_length' => $totalLength,
+                'avg_length' => $count > 0 ? $totalLength / $count : 0,
             ];
             if ('live' !== $this->deleted) {
                 $counts[$row['namespace']]['deleted'] = (int)$row['deleted'];

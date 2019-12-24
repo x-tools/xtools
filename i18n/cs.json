@@ -332,6 +332,7 @@
 	"see-full-statistics": "Viz celé statistiky",
 	"show": "zobrazit",
 	"size": "Velikost",
+	"size-kilobytes": "$1 KB",
 	"size-over-time": "Velikost článku v&nbsp;průběhu času",
 	"small-edits": "Malé editace (<20 bajtů)",
 	"start": "Počáteční datum",

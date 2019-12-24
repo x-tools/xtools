@@ -238,6 +238,7 @@
 	"see-full-page-stats": "Xem thống kê trang đầy đủ",
 	"show": "hiện",
 	"size": "Kích thước",
+	"size-kilobytes": "$1 kB",
 	"size-over-time": "Kích cỡ bài viết qua thời gian",
 	"start": "Ngày bắt đầu",
 	"submit": "Gửi",

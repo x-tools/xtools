@@ -263,6 +263,7 @@
 	"see-full-page-stats": "Volledige paginastatistieken weergeven",
 	"show": "weergeven",
 	"size": "Grootte",
+	"size-kilobytes": "$1 kB",
 	"size-over-time": "Artikelgrootte na verloop van tijd",
 	"small-edits": "Kleine bewerkingen (<20 bytes)",
 	"start": "Begindatum",

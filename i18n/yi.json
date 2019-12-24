@@ -2,5 +2,6 @@
 	"basic-information": "גרונטלעכע אינפֿארמאַציע",
 	"download-label": "אַראָפלאָדן",
 	"other": "אַנדער",
-	"performer": "אויספֿירער"
+	"performer": "אויספֿירער",
+	"size-kilobytes": "{{PLURAL:$1|איין קילאבייט|$1 קילאבייטן}}"
 }

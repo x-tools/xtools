@@ -79,7 +79,6 @@
                                 {% if pages.multiNamespace %}
                                 </span>
                                 {% endif %}
-
                                 <a href="#{{ key }}" >{{ nsName(key, project.namespaces) }}</a>
                             </td>
                             {% if pages.redirects != 'onlyredirects' and pages.deleted != 'deleted' %}
@@ -107,6 +106,12 @@
                                     {% endif %}
                                 </td>
                             {% endif %}
+                            <td class="sort-entry--total-page-size" data-value="{{ value.total_length }}">
+                                {{ value.total_length|size_format }}
+                            </td>
+                            <td class="sort-entry--average-page-size" data-value="{{ value.avg_length }}">
+                                {{ value.avg_length|size_format }}
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -132,6 +137,12 @@
                                     ({{ pages.numDeleted|percent_format(pages.getNumPages) }})
                                 </th>
                             {% endif %}
+                            <th class="namespaces--total-page-size">
+                                {{ pages.totalPageSize|size_format }}
+                            </th>
+                            <th class="namespaces--average-page-size">
+                                {{ pages.averagePageSize|size_format }}
+                            </th>
                         </tfoot>
                     {% endif %}
                 </table>

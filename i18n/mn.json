@@ -23,6 +23,9 @@
 	"rank": "Зэрэглэл",
 	"report-issue": "Алдааг мэдэгдэх",
 	"size": "Хэмжээ",
+	"size-gigabytes": "$1 ГБ",
+	"size-kilobytes": "$1 КБ",
+	"size-megabytes": "$1 МБ",
 	"translation-credits": "$1 болон $2 орчуулгыг бэлтгэн гаргав.",
 	"unknown": "Тодорхойгүй",
 	"user": "Хэрэглэгч"

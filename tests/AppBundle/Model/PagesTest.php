@@ -81,11 +81,15 @@ class PagesTest extends TestAdapter
                 'count' => 2,
                 'redirects' => 0,
                 'deleted' => 1,
+                'total_length' => 17,
+                'avg_length' => 8.5,
             ],
             1 => [
                 'count' => 1,
                 'redirects' => 1,
                 'deleted' => 0,
+                'total_length' => 10,
+                'avg_length' => 10,
             ],
         ], $pages->getCounts());
 
@@ -103,6 +107,7 @@ class PagesTest extends TestAdapter
             'raw_time' => '20160519000000',
             'human_time' => '2016-05-19 00:00',
             'recreated' => '1',
+            'rev_len' => '5',
         ], $results[0][0]);
         static::assertTrue($pages->isMultiNamespace());
     }
@@ -118,6 +123,7 @@ class PagesTest extends TestAdapter
                     'page_title' => 'Gooogle',
                     'page_is_redirect' => '1',
                     'rev_timestamp' => '20160719000000',
+                    'rev_len' => 10,
                     'pa_class' => 'A',
                     'pa_importance' => '',
                     'recreated' => null,
@@ -127,6 +133,7 @@ class PagesTest extends TestAdapter
                     'page_title' => 'My_fun_page',
                     'page_is_redirect' => '0',
                     'rev_timestamp' => '20160519000000',
+                    'rev_len' => 5,
                     'pa_class' => '',
                     'pa_importance' => '',
                     'recreated' => '1',
@@ -136,6 +143,7 @@ class PagesTest extends TestAdapter
                     'page_title' => 'Foo_bar',
                     'page_is_redirect' => '0',
                     'rev_timestamp' => '20160101000000',
+                    'rev_len' => 12,
                     'pa_class' => 'FA',
                     'pa_importance' => '',
                     'recreated' => null,
@@ -149,11 +157,13 @@ class PagesTest extends TestAdapter
                     'count' => 2,
                     'deleted' => 1,
                     'redirects' => 0,
+                    'total_length' => 17,
                 ], [
                     'namespace' => 1,
                     'count' => 1,
                     'deleted' => 0,
                     'redirects' => 1,
+                    'total_length' => 10,
                 ],
             ]);
     }
