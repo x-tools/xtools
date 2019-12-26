@@ -13,7 +13,8 @@
 			"Ltrlg",
 			"Abijeet Patro",
 			"VIGNERON",
-			"Derugon"
+			"Derugon",
+			"Thibaut120094"
 		]
 	},
 	"abusefilter": "FiltreAbus",
@@ -101,7 +102,7 @@
 	"current-admins": "Administrateurs actuels",
 	"current-patrollers": "Patrouilleurs actuels",
 	"current-size": "Taille actuelle",
-	"current-stewards": "Coordinateurs actuels",
+	"current-stewards": "Stewards actuels",
 	"current-user-groups": "Groupes utilisateur actuels",
 	"data-limit": "Données limitées {{PLURAL:$1|à la|aux $2}} dernière{{PLURAL:$1||s}} modification{{PLURAL:$1||s}}",
 	"date": "Date",
