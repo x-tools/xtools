@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"Nemo bis"
+			"Nemo bis",
+			"MJL"
 		]
 	},
 	"actions": "Actions",
@@ -81,6 +82,8 @@
 	"no-result": "No matchin results foond for: $1",
 	"no-revisions": "No reveesions foond",
 	"no-summary": "no summary",
+	"not-opted-in-link": "documentation",
+	"not-opted-in-login": "login",
 	"num-days": "{{PLURAL: $1|day|days}}",
 	"num-hours": "{{PLURAL: $1|oor|oors}}",
 	"num-minutes": "{{PLURAL: $1|minute|minutes}}",
