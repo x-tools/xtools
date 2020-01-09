@@ -17,7 +17,8 @@
 			"VulpesVulpes825",
 			"予弦",
 			"Xiplus",
-			"A Retired User"
+			"A Retired User",
+			"沈澄心"
 		]
 	},
 	"abusefilter": "滥用过滤器",
@@ -271,7 +272,9 @@
 	"non-patrollers-with-actions": "进行巡查操作的非巡查员",
 	"non-stewards-with-actions": "进行监管操作的非监管员",
 	"none": "无",
-	"not-opted-in": "该用户未选择展示该数据。请以该用户身份登录XTools，或在$1创建任意内容。参见文档以获取更多信息。",
+	"not-opted-in": "该用户未选择展示该数据。请以该用户身份$3XTools，或在$1创建任意内容。参见$2以获取更多信息。",
+	"not-opted-in-link": "文档",
+	"not-opted-in-login": "登录",
 	"notice": "提示",
 	"num-blocks": "{{PLURAL:$1|封禁}}",
 	"num-bytes": "{{PLURAL:$1|字节}}",
@@ -323,7 +326,7 @@
 	"pages-edited-total": "编辑页面数（总计）",
 	"pages-moved": "移动页面数",
 	"pages-recreated-desc": "一些已删除页面可能被该用户或不同用户重建。他们会标记为“$1”。",
-	"pageviews": "页面浏览",
+	"pageviews": "页面访问量",
 	"pageviews-pages-created": "创建页面的页面浏览数",
 	"pageviews-userpage": "用户页浏览量",
 	"patrol": "巡查",
