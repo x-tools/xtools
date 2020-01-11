@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Helper class for fetching semi-automated definitions.
  */
-class AutomatedEditsHelper extends HelperBase
+class AutomatedEditsHelper
 {
     /** @var array The list of tools that are considered reverting. */
     protected $revertTools = [];

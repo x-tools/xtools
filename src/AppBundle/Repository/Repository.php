@@ -74,31 +74,6 @@ abstract class Repository
         return (bool)$this->container->getParameter('app.is_labs');
     }
 
-    /**
-     * Get various metadata about the current tool being used, which will
-     * be used in logging for diagnosing any issues.
-     * @return array|null
-     *
-     * There is no request stack in the tests.
-     * @codeCoverageIgnore
-     */
-    protected function getCurrentRequestMetadata(): ?array
-    {
-        /** @var Request $request */
-        $request = $this->container->get('request_stack')->getCurrentRequest();
-
-        if (null === $request) {
-            return null;
-        }
-
-        $requestTime = microtime(true) - $request->server->get('REQUEST_TIME_FLOAT');
-
-        return [
-            'requestTime' => round($requestTime, 2),
-            'path' => $request->getPathInfo(),
-        ];
-    }
-
     /***************
      * CONNECTIONS *
      ***************/
@@ -377,26 +352,12 @@ abstract class Repository
         }
 
         if (1226 === $e->getErrorCode()) {
-            $this->logErrorData('MAX CONNECTIONS');
             throw new ServiceUnavailableHttpException(30, 'error-service-overload', null, 503);
         } elseif (in_array($e->getErrorCode(), [1969, 2006, 2013])) {
             // FIXME: Attempt to reestablish connection on 2006 error (MySQL server has gone away).
-            $this->logErrorData('QUERY TIMEOUT');
             throw new HttpException(504, 'error-query-timeout', null, [], $timeout);
         } else {
             throw $e;
         }
-    }
-
-    /**
-     * Log error containing the given error code, along with the request path and request time.
-     * @param string $error
-     */
-    private function logErrorData(string $error): void
-    {
-        $metadata = $this->getCurrentRequestMetadata();
-        $this->log->error(
-            '>>> '.$metadata['path'].' ('.$error.' after '.$metadata['requestTime'].')'
-        );
     }
 }

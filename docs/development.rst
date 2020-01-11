@@ -94,10 +94,7 @@ For non-WMF installations, ignore all of the above unless your tables have diffe
 Caching
 =======
 
-Caching should happen in helpers, with appropriate times-to-live.
-
-Every helper should extend HelperBase, which has ``cacheHas()``, ``cacheGet()``, and ``cacheSave()`` methods.
-These should be used in this pattern::
+Caching should be done only in Repositorys, using this pattern::
 
     public function doSomething($input)
     {
@@ -109,8 +106,9 @@ These should be used in this pattern::
         return $this->setCache($cacheKey, $results);
     }
 
-The cache key can be anything, so long as it is unique within the current class.
-The TTL syntax is from the DateInterval_ class (e.g. ``P1D`` is one day, ``PT1H`` is one hour).
+The cache key can be anything, so long as it is unique to the specific method.
+A third parameter can be passed to ``setCache`` to set the TTL, using the same syntax from the DateInterval_ class
+(e.g. ``P1D`` is one day, ``PT1H`` is one hour).
 
 The above methods are just wrappers around a PSR-6_ implementation, intended to reduce the repetition of similar lines of code.
 You can, of course, retrieve the underlying CacheItemPoolInterface_ whenever you want with ``$container->get('cache.app')``.
