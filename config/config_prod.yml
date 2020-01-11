@@ -14,7 +14,7 @@ imports:
 #        query_cache_driver: apc
 
 monolog:
-    channels: ['rate_limit', 'blacklist', 'main']
+    channels: ['rate_limit', 'blacklist', 'crawler', 'main']
     handlers:
         rate_limit:
             # log all messages (since debug is the lowest level)
@@ -28,6 +28,11 @@ monolog:
             type: stream
             path: '%kernel.logs_dir%/blacklist.log'
             channels: ['blacklist']
+        crawler:
+            level: info
+            type: stream
+            path: '%kernel.logs_dir%/crawler.log'
+            channels: ['crawler']
         main:
             type: fingers_crossed
             action_level: critical
