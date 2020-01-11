@@ -142,11 +142,11 @@ class PagesController extends XtoolsController
         // that deals with redirects, so we'll keep it confined here.
         $validRedirects = ['', 'noredirects', 'onlyredirects', 'all'];
         if ('none' === $redirects || !in_array($redirects, $validRedirects)) {
-            return $this->redirectToRoute('PagesResult', [
+            return $this->redirectToRoute('PagesResult', array_merge($this->params, [
                 'redirects' => 'noredirects',
                 'deleted' => $deleted,
                 'offset' => $this->offset,
-            ]);
+            ]));
         }
 
         $pages = $this->setUPages();
