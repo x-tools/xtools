@@ -1,5 +1,16 @@
 # Release Notes #
 
+## 3.10.10 ##
+- Authorship, Blame (T240283, T208086): Allow page titles with slashes.
+- AdminStats (T241311): Fix sorting of user groups.
+- T227359: Add links to 'User has not opted in...' message.
+- TopEdits: Remove old /api/topedits endpoint, replaced with /api/top_edits.
+- Minor aesthetic fixes to alert banners.
+- Various code refactoring and cleanup.
+- Log possible web crawlers (eventually may automatically be blocked).
+- Add noindex,nofollow directives for result pages.
+- Localization updates.
+
 ## 3.10.9 ##
 - ArticleInfo: Put 'Authorship' section before 'Top editors'.
 - ArticleInfo (T232693): Fix sorting for 'atbe' column.
