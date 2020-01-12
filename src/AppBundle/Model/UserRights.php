@@ -33,6 +33,7 @@ class UserRights extends Model
 
     /**
      * Get user rights changes of the given user.
+     * @param int|null $limit
      * @return string[] Keyed by timestamp then 'added' and 'removed'.
      */
     public function getRightsChanges(?int $limit = null): array
@@ -165,20 +166,18 @@ class UserRights extends Model
 
     /**
      * Get global user rights changes of the given user.
+     * @param int|null $limit
      * @return string[] Keyed by timestamp then 'added' and 'removed'.
      */
-    public function getGlobalRightsChanges(): array
+    public function getGlobalRightsChanges(?int $limit = null): array
     {
-        if (isset($this->globalRightsChanges)) {
-            return $this->globalRightsChanges;
+        if (!isset($this->globalRightsChanges)) {
+            $logData = $this->getRepository()
+                ->getGlobalRightsChanges($this->project, $this->user);
+            $this->globalRightsChanges = $this->processRightsChanges($logData);
         }
 
-        $logData = $this->getRepository()
-            ->getGlobalRightsChanges($this->project, $this->user);
-
-        $this->globalRightsChanges = $this->processRightsChanges($logData);
-
-        return $this->globalRightsChanges;
+        return array_slice($this->globalRightsChanges, 0, $limit, true);
     }
 
     /**

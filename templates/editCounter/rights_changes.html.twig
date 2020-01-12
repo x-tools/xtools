@@ -74,8 +74,8 @@
                 <div class="panel-body col-lg-12">
 {% endif %}
 
+{% set limit = is_sub_request ? 10 : null %}
 {% if ec.rightsChanges|length > 0 %}
-    {% set limit = is_sub_request ? 10 : null %}
     {% include 'editCounter/rights_changes_table.html.twig' with {'rightsChanges': ec.rightsChanges(limit), 'remaining': ec.rightsChanges|length - limit} %}
 {% else %}
     <div class="alert alert-info">
@@ -90,7 +90,7 @@
         <small class='xt-hide'>[{{ msg('hide')|lower }}]</small>
     </h4>
     <div class="xt-show-hide--target">
-        {% include 'editCounter/rights_changes_table.html.twig' with {'rightsChanges': ec.globalRightsChanges} %}
+        {% include 'editCounter/rights_changes_table.html.twig' with {'rightsChanges': ec.globalRightsChanges(limit), 'remaining': ec.globalRightsChanges|length - limit} %}
     </div>
 {% endif %}
 

@@ -36,7 +36,7 @@
 
         {% include 'editCounter/subtoolSection.html.twig' with {'route': 'EditCounterTimecard', 'i18nKey': 'timecard', 'jsonPath': 'UserApiTimeCard'} %}
 
-        {% include 'editCounter/subtoolSection.html.twig' with {'route': 'TopEditsResultNamespace', 'i18nKey': 'top-edited-pages', 'downloadFormats': ['wikitext'], 'extraParams': {'namespace': 'all'}, 'jsonPath': 'UserApiTopEditsArticle'} %}
+        {% include 'editCounter/subtoolSection.html.twig' with {'route': 'TopEditsResultNamespace', 'i18nKey': 'top-edited-pages', 'downloadFormats': ['wikitext'], 'extraParams': {'namespace': 'all'}, 'jsonPath': 'UserApiTopEditsNamespace'} %}
 
         {% if not(user.anon) and 'rights-changes' in sections and (ec.rightsChanges|length > 0 or ec.globalRightsChanges|length > 0) %}
             {% include 'editCounter/subtoolSection.html.twig' with {'route': 'EditCounterRightsChanges', 'i18nKey': 'rights-changes', 'downloadFormats': ['wikitext']} %}

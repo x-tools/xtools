@@ -123,8 +123,8 @@ class EditCounterControllerTest extends ControllerTestAdapter
             return;
         }
 
-        // Here we only need to check each sub-page, since the parent will call them individually.
         $this->assertSuccessfulRoutes([
+            '/ec/en.wikipedia/Example',
             '/ec-generalstats/en.wikipedia/Example',
             '/ec-namespacetotals/en.wikipedia/Example',
             '/ec-timecard/en.wikipedia/Example',
