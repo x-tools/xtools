@@ -59,7 +59,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
      */
     public function testParseQueryParams(array $params, array $expected): void
     {
-        // Untestable on Travis :(
+        // Untestable in CI build :(
         if (!self::$container->getParameter('app.is_labs')) {
             return;
         }
@@ -155,20 +155,20 @@ class XtoolsControllerTest extends ControllerTestAdapter
                 // Language-neutral project.
                 [
                     'wiki' => 'wikidata',
-                    'lang' => 'fr',
+                    'lang' => 'www',
                     'page' => 'Q12345',
                 ], [
-                    'project' => 'wikidata.org',
+                    'project' => 'www.wikidata.org',
                     'page' => 'Q12345',
                 ],
             ], [
                 // Language-neutral, ultra legacy style.
                 [
                     'wikifam' => 'wikidata',
-                    'wikilang' => 'fr',
+                    'wikilang' => 'www',
                     'page' => 'Q12345',
                 ], [
-                    'project' => 'wikidata.org',
+                    'project' => 'www.wikidata.org',
                     'page' => 'Q12345',
                 ],
             ],
