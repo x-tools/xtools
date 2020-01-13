@@ -277,6 +277,7 @@
 	"num-days": "Conditional PLURAL form of 'days'. $1 is the number.\n{{Identical|Day}}",
 	"num-deletions": "Conditional PLURAL form of 'deletions'. $1 is the number.\n{{Identical|Deletion}}",
 	"num-editors": "Conditional PLURAL form of 'editors'. $1 is the number.\n{{Identical|Editor}}",
+	"num-edits": "Conditional PLURAL form of 'edits'. $1 is the number.\n{{Identical|Edit}}",
 	"num-hours": "Conditional PLURAL form of 'hours'. $1 is the number.\n{{Identical|Hour}}",
 	"num-minutes": "Conditional PLURAL form of 'minutes'. $1 is the number.\n{{Identical|Minute}}",
 	"num-months": "Conditional PLURAL form of 'months'. $1 is the number.\n{{Identical|Month}}",

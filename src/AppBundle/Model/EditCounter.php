@@ -724,7 +724,7 @@ class EditCounter extends UserRights
             $max = max($max, $total['value']);
         }
         foreach ($totals as &$total) {
-            $total['value'] = round($total['value'] / $max * 100);
+            $total['scale'] = round(($total['value'] / $max) * 20);
         }
 
         // Fill in zeros for timeslots that have no values.
@@ -732,7 +732,7 @@ class EditCounter extends UserRights
         $index = 0;
         $sortedIndex = 0;
         foreach (range(1, 7) as $day) {
-            foreach (range(0, 24, 2) as $hour) {
+            foreach (range(0, 23) as $hour) {
                 if (isset($totals[$index]) && (int)$totals[$index]['hour'] === $hour) {
                     $sortedTotals[$sortedIndex] = $totals[$index];
                     $index++;

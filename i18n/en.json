@@ -266,6 +266,7 @@
 	"num-categories": "{{PLURAL:$1|category|categories}}",
 	"num-days": "{{PLURAL:$1|day|days}}",
 	"num-deletions": "{{PLURAL:$1|deletion|deletions}}",
+	"num-edits": "{{PLURAL:$1|edit|edits}}",
 	"num-editors": "{{PLURAL:$1|editor|editors}}",
 	"num-hours": "{{PLURAL:$1|hour|hours}}",
 	"num-minutes": "{{PLURAL:$1|minute|minutes}}",

@@ -253,7 +253,7 @@ abstract class Repository
      * @param string $duration Valid DateInterval string.
      * @return mixed The given $value.
      */
-    public function setCache(string $cacheKey, $value, $duration = 'PT10M')
+    public function setCache(string $cacheKey, $value, $duration = 'PT20M')
     {
         $cacheItem = $this->cache
             ->getItem($cacheKey)

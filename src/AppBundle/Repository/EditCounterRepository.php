@@ -391,7 +391,7 @@ class EditCounterRepository extends UserRightsRepository
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $hourInterval = 2;
+        $hourInterval = 1;
         $xCalc = "ROUND(HOUR(rev_timestamp)/$hourInterval) * $hourInterval";
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
         $sql = "SELECT "
@@ -400,7 +400,7 @@ class EditCounterRepository extends UserRightsRepository
             . "     COUNT(rev_id) AS `value` "
             . " FROM $revisionTable"
             . " WHERE rev_actor = :actorId"
-            . " GROUP BY DAYOFWEEK(rev_timestamp), $xCalc ";
+            . " GROUP BY DAYOFWEEK(rev_timestamp), $xCalc";
 
         $totals = $this->executeProjectsQuery($sql, [
             'actorId' => $user->getActorId($project),
