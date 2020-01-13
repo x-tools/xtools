@@ -78,6 +78,24 @@ class Edit extends Model
     }
 
     /**
+     * Get Edits given revision rows (JOINed on the page table).
+     * @param Project $project
+     * @param User $user
+     * @param array $revs Each must contain 'page_title' and 'page_namespace'.
+     * @return Edit[]
+     */
+    public static function getEditsFromRevs(Project $project, User $user, array $revs): array
+    {
+        return array_map(function ($rev) use ($project, $user) {
+            /** @var Page $page Page object to be passed to the Edit constructor. */
+            $page = Page::newFromRev($project, $rev);
+            $rev['user'] = $user;
+
+            return new self($page, $rev);
+        }, $revs);
+    }
+
+    /**
      * Unique identifier for this Edit, to be used in cache keys.
      * @see Repository::getCacheKey()
      * @return string
@@ -298,7 +316,7 @@ class Edit extends Model
 
         $linkMatch = null;
 
-        while (preg_match_all("/\[\[:?(.*?)\]\]/", $summary, $linkMatch)) {
+        while (preg_match_all("/\[\[:?(.*?)]]/", $summary, $linkMatch)) {
             $wikiLinkParts = explode('|', $linkMatch[1][0]);
             $wikiLinkPath = htmlspecialchars($wikiLinkParts[0]);
             $wikiLinkText = htmlspecialchars(

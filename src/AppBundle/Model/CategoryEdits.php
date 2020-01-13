@@ -171,44 +171,9 @@ class CategoryEdits extends Model
             return $revs;
         }
 
-        $this->categoryEdits = $this->getEditsFromRevs($revs);
+        $this->categoryEdits = Edit::getEditsFromRevs($this->project, $this->user, $revs);
 
         return $this->categoryEdits;
-    }
-
-    /**
-     * Transform database rows into Edit objects.
-     * @param string[] $revs
-     * @return Edit[]
-     */
-    private function getEditsFromRevs(array $revs): array
-    {
-        return array_map(function ($rev) {
-            /** @var Page $page Page object to be passed to the Edit constructor. */
-            $page = $this->getPageFromRev($rev);
-            $rev['user'] = $this->user;
-
-            return new Edit($page, $rev);
-        }, $revs);
-    }
-
-    /**
-     * Get a Page object given a revision row.
-     * @param array $rev Revision as retrieved from the database.
-     * @return Page
-     */
-    private function getPageFromRev(array $rev): Page
-    {
-        $namespaces = $this->project->getNamespaces();
-        $pageTitle = $rev['page_title'];
-
-        if (0 === (int)$rev['page_namespace']) {
-            $fullPageTitle = $pageTitle;
-        } else {
-            $fullPageTitle = $namespaces[$rev['page_namespace']].":$pageTitle";
-        }
-
-        return new Page($this->project, $fullPageTitle);
     }
 
     /**

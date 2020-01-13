@@ -44,6 +44,26 @@ class Page extends Model
     }
 
     /**
+     * Get a Page instance given a revision row (JOINed on the page table).
+     * @param Project $project
+     * @param array $rev Must contain 'page_title' and 'page_namespace'.
+     * @return static
+     */
+    public static function newFromRev(Project $project, array $rev): self
+    {
+        $namespaces = $project->getNamespaces();
+        $pageTitle = $rev['page_title'];
+
+        if (0 === (int)$rev['page_namespace']) {
+            $fullPageTitle = $pageTitle;
+        } else {
+            $fullPageTitle = $namespaces[$rev['page_namespace']].":$pageTitle";
+        }
+
+        return new self($project, $fullPageTitle);
+    }
+
+    /**
      * Unique identifier for this Page, to be used in cache keys.
      * Use of md5 ensures the cache key does not contain reserved characters.
      * @see Repository::getCacheKey()
