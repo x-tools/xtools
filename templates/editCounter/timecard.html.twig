@@ -45,7 +45,7 @@
     </table>
 </div>
 
-<canvas id="timecard-bubble-chart"></canvas>
+<canvas id="timecard-bubble-chart" height="100"></canvas>
 
 <script type="text/javascript">
     // MySQL uses ODBC standard, treating the first day (1) as Sunday
@@ -85,24 +85,33 @@
         timeCardDatasets[{{ datasetIndex }}].data.push(entry);
     {% endfor %}
 
-    new Chart($("#timecard-bubble-chart"), {
+    var chart = new Chart($("#timecard-bubble-chart"), {
         type: 'bubble',
         data: {
             datasets: timeCardDatasets
         },
         options: {
+            responsive: true,
+            // maintainAspectRatio: false,
             legend: {
                 display: false
+            },
+            layout: {
+                padding: {
+                    right: 20
+                }
             },
             elements: {
                 point: {
                     radius: function(context) {
                         var index = context.dataIndex;
                         var data = context.dataset.data[index];
-                        var size = context.chart.width;
-                        var base = data.value / 100;
-                        return (size / 40) * base;
-                    }
+                        // var size = context.chart.width;
+                        // var base = data.value / 100;
+                        // return (size / 50) * base;
+                        return data.scale;
+                    },
+                    hitRadius: 8
                 }
             },
             scales: {
@@ -110,7 +119,8 @@
                     ticks: {
                         min: 0,
                         max: 8,
-                        padding: {{ maxMidnight }} * 0.4,
+                        stepSize: 1,
+                        padding: 25,
                         callback: function(value, index, values) {
                             return days[index];
                         }
@@ -122,21 +132,28 @@
                         beginAtZero: true,
                         min: 0,
                         max: 23,
-                        stepSize: 2,
+                        stepSize: 1,
                         reverse: i18nRTL,
+                        padding: 0,
                         callback: function(value) {
                             if (value % 2 === 0) {
                                 return value + ":00";
+                            } else {
+                                return '';
                             }
                         }
                     }
                 }]
             },
             tooltips: {
+                displayColors: false,
                 callbacks: {
+                    title: function(items, data) {
+                        return days[7 - items[0].yLabel + 1] + ' ' + items[0].xLabel + ':00';
+                    },
                     label: function(item) {
-                        // yLabels are reversed, and zero-indexed
-                        return days[7 - item.yLabel + 1] + ' ' + item.xLabel + ':00';
+                        var numEdits = [timeCardDatasets[item.datasetIndex].data[item.index].value];
+                        return`${numEdits} ${$.i18n('num-edits', [numEdits])}`;
                     }
                 }
             }
