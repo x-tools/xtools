@@ -47,18 +47,18 @@ class ArticleInfoRepository extends Repository
             $groupBy = 'GROUP BY actor_user';
         }
 
-        $sql = "SELECT COUNT(DISTINCT(rev_id)) AS count, $actorSelect '1' AS current
-                FROM $revTable
-                JOIN $actorTable ON actor_id = rev_actor
-                LEFT JOIN $userGroupsTable ON actor_user = ug_user
-                WHERE rev_page = :pageId AND ug_group = 'bot' $datesConditions
-                $groupBy
-                UNION
-                SELECT COUNT(DISTINCT(rev_id)) AS count, $actorSelect '0' AS current
+        $sql = "SELECT COUNT(DISTINCT(rev_id)) AS count, $actorSelect '0' AS current
                 FROM $revTable
                 JOIN $actorTable ON actor_id = rev_actor
                 LEFT JOIN $userFormerGroupsTable ON actor_user = ufg_user
                 WHERE rev_page = :pageId AND ufg_group = 'bot' $datesConditions
+                $groupBy
+                UNION
+                SELECT COUNT(DISTINCT(rev_id)) AS count, $actorSelect '1' AS current
+                FROM $revTable
+                JOIN $actorTable ON actor_id = rev_actor
+                LEFT JOIN $userGroupsTable ON actor_user = ug_user
+                WHERE rev_page = :pageId AND ug_group = 'bot' $datesConditions
                 $groupBy";
 
         $result = $this->executeProjectsQuery($sql, ['pageId' => $page->getId()]);
