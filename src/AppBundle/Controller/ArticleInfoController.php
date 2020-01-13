@@ -108,16 +108,15 @@ class ArticleInfoController extends XtoolsController
             $script .= $this->get('kernel')->getProjectDir().
                 "/node_modules/uglify-es/bin/uglifyjs $tmpFile --mangle " .
                 "&& rm $tmpFile >/dev/null";
-            $process = new Process($script);
+            $process = new Process([$script]);
             $process->run();
 
             // Check for errors.
             $errorOutput = $process->getErrorOutput();
             if ('' != $errorOutput) {
-                $response = new Response(
+                return new Response(
                     "Error generating uglified JS. The server said:\n\n$errorOutput"
                 );
-                return $response;
             }
 
             // Remove escaping.
@@ -150,6 +149,7 @@ class ArticleInfoController extends XtoolsController
      *         "end"=false,
      *     }
      * )
+     * @param I18nHelper $i18n
      * @return Response
      * @codeCoverageIgnore
      */

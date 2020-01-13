@@ -251,9 +251,7 @@ class EditCounterController extends XtoolsController
             $ret['metaProject'] = ProjectRepository::getProject('metawiki', $this->container);
         }
 
-        $response = $this->getFormattedResponse('editCounter/result', $ret);
-
-        return $response;
+        return $this->getFormattedResponse('editCounter/result', $ret);
     }
 
     /**

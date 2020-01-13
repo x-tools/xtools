@@ -21,6 +21,9 @@ class AutomatedEditsHelper
     /** @var array The list of tool names and their regexes/tags. */
     protected $tools = [];
 
+    /** @var ContainerInterface The service container. */
+    private $container;
+
     /**
      * AutomatedEditsHelper constructor.
      * @param ContainerInterface $container

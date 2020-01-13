@@ -154,7 +154,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
         $useLang = $useLangMatches[1];
 
         // Requesting a language that's different than that of the target project.
-        if (1 === preg_match("/[\=\/]$useLang.wik/", $this->uri)) {
+        if (1 === preg_match("/[=\/]$useLang.wik/", $this->uri)) {
             return;
         }
 

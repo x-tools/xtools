@@ -9,7 +9,7 @@ namespace AppBundle\EventSubscriber;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -45,10 +45,10 @@ class DisabledToolSubscriber implements EventSubscriberInterface
 
     /**
      * Check to see if the current tool is enabled.
-     * @param FilterControllerEvent $event The event.
+     * @param ControllerEvent $event The event.
      * @throws NotFoundHttpException If the tool is not enabled.
      */
-    public function onKernelController(FilterControllerEvent $event): void
+    public function onKernelController(ControllerEvent $event): void
     {
         $controller = $event->getController();
 
