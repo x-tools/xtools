@@ -1,5 +1,15 @@
 # Release Notes #
 
+## 3.10.11 ##
+- Pages: Fix production error where routing params were missing.
+- EditCounter: Fix routing to Top Edits API and the rights changes list.
+- EditCounter (T241539): Show all 24 hours in timecard and include average edits.
+- ArticleInfo (T241496): Merge current bots into former bots, not the opposite.
+- Pages (T229578): Show total and average size of all pages.
+- ArticleInfo: Make colours for minor/IP edits consistent.
+- Various code refactoring and cleanup.
+- Localization updates.
+
 ## 3.10.10 ##
 - Authorship, Blame (T240283, T208086): Allow page titles with slashes.
 - AdminStats (T241311): Fix sorting of user groups.
