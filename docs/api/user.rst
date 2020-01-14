@@ -221,7 +221,7 @@ Get statistics about a user's usage of edit summaries.
 Get `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_'s edit summary statistics
 for 2010 on the English Wikipedia.
 
-    https://xtools.wmflabs.org/api/user/edit_summaries/en.wikipedia/Jimbo_Wales//2010-01-01/2010-12-31
+    https://xtools.wmflabs.org/api/user/edit_summaries/en.wikipedia/Jimbo_Wales/all/2010-01-01/2010-12-31
 
 Top edits
 =========
