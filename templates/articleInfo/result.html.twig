@@ -804,10 +804,10 @@
                         {{ msg('edits') }}
                         &middot;
                         <span class="color-icon" style="background:rgba(178, 223, 138, 1)"></span>
-                        {{ msg('ips') }}
+                        {{ msg('minor-edits') }}
                         &middot;
                         <span class="color-icon" style="background:rgba(251, 154, 153, 1)"></span>
-                        {{ msg('minor-edits') }}
+                        {{ msg('ips') }}
                     </th>
                 </tr></thead>
                 <tbody>
@@ -839,10 +839,10 @@
                                 {# stripes are shown as figure over max edits for all months, with a max width of 400px #}
                                 {% set allEditsWidth = (stats.all / ai.maxEditsPerMonth) * 400 %}
                                 <div class="stripes" style="background:rgba(171, 212, 235, 1); width:{{ allEditsWidth }}px"></div>
-                                {% set anonEditsWidth = (stats.anon / ai.maxEditsPerMonth) * 400 %}
-                                <div class="stripes" style="background:rgba(178, 223, 138, 1); width:{{ anonEditsWidth }}px"></div>
                                 {% set minorEditsWidth = (stats.minor / ai.maxEditsPerMonth) * 400 %}
-                                <div class="stripes" style="background:rgba(251, 154, 153, 1); width:{{ minorEditsWidth }}px"></div>
+                                <div class="stripes" style="background:rgba(178, 223, 138, 1); width:{{ minorEditsWidth }}px"></div>
+                                {% set anonEditsWidth = (stats.anon / ai.maxEditsPerMonth) * 400 %}
+                                <div class="stripes" style="background:rgba(251, 154, 153, 1); width:{{ anonEditsWidth }}px"></div>
                             </td>
                         </tr>
                     {% endfor %}
