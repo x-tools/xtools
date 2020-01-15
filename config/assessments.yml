@@ -133,71 +133,71 @@ parameters:
       class:
         FA:
           badge: 'b/bc/Featured_article_star.svg'
-          color: '#6699ff'
+          color: '#9CBDFF'
           category: 'Category:FA-Class articles'
         A:
           badge: '2/25/Symbol_a_class.svg'
-          color: '#66ffff'
+          color: '#66FFFF'
           category: 'Category:A-Class articles'
         GA:
           badge: '9/94/Symbol_support_vote.svg'
-          color: '#66ff66'
+          color: '#66FF66'
           category: 'Category:GA-Class articles'
         bplus:
           badge: '5/5f/Symbol_b_class.svg'
-          color: '#b2ff66'
+          color: '#B2FF66'
           category: 'Category:Bplus-Class articles'
         B:
           badge: '5/5f/Symbol_b_class.svg'
-          color: '#b2ff66'
+          color: '#B2FF66'
           category: 'Category:B-Class articles'
         C:
           badge: 'e/e6/Symbol_c_class.svg'
-          color: '#ffff66'
+          color: '#FFFF66'
           category: 'Category:C-Class articles'
         Start:
           badge: 'a/a4/Symbol_start_class.svg'
-          color: '#ffaa66'
+          color: '#FFAA66'
           category: 'Category:Start-Class articles'
         Stub:
           badge: 'f/f5/Symbol_stub_class.svg'
-          color: '#ff6666'
+          color: '#FFA4A4'
           category: 'Category:Stub-Class articles'
         FL:
           badge: 'b/bc/Featured_article_star.svg'
-          color: '#6699ff'
+          color: '#9CBDFF'
           category: 'Category:FL-Class articles'
         AL:
           badge: '2/25/Symbol_a_class.svg'
-          color: '#66ffff'
+          color: '#66FFFF'
           category: 'Category:AL-Class articles'
         BL:
           badge: 'd/db/Symbol_list_class.svg'
-          color: '#b2ff66'
+          color: '#B2FF66'
           category: 'Category:BL-Class articles'
         CL:
           badge: 'd/db/Symbol_list_class.svg'
-          color: '#ffff66'
+          color: '#FFFF66'
           category: 'Category:CL-Class articles'
         List:
           badge: 'd/db/Symbol_list_class.svg'
-          color: '#aa88ff'
+          color: '#C7B1FF'
           category: 'Category:List-Class articles'
         Disambig:
           badge: '2/2a/Symbol_dab_class.svg'
-          color: '#00fa9a'
+          color: '#00FA9A'
           category: 'Category:Disambig-Class articles'
         SIA:
           badge: '9/92/Symbol_sia_class.svg'
-          color: '#ccaaff'
+          color: '#E9DAFF'
           category: 'Category:SIA-Class articles'
         Redirect:
           badge: 'a/a2/Symbol_redirect_class.svg'
-          color: '#c0c0c0'
+          color: '#C0C0C0'
           category: 'Category:Redirect-Class articles'
         Project:
           badge: '7/72/Symbol_project_class.svg'
-          color: '#c0c090'
+          color: '#C0C090'
           category: 'Category:Project-Class articles'
         Book:
           badge: '4/4d/Symbol_book_class.svg'
@@ -205,59 +205,59 @@ parameters:
           category: 'Category:Book-Class articles'
         Template:
           badge: '5/5c/Symbol_template_class.svg'
-          color: '#fbceb1'
+          color: '#FBCEB1'
           category: 'Category:Template-Class articles'
         Category:
           badge: '9/96/Symbol_category_class.svg'
-          color: '#ffdb58'
+          color: '#FFDB58'
           category: 'Category:Category-Class articles'
         Portal:
           badge: 'e/e2/Symbol_portal_class.svg'
-          color: '#cc8899'
+          color: '#DDB1BC'
           category: 'Category:Portal-Class articles'
         FM:
           badge: '2/23/Symbol_star_FA.svg'
-          color: '#6699ff'
+          color: '#9CBDFF'
           category: 'Category:FM-Class articles'
         File:
           badge: '9/9c/Symbol_file_class.svg'
-          color: '#ddccff'
+          color: '#DDCCFF'
           category: 'Category:File-Class articles'
         Draft:
           badge: '0/09/Symbol_draft_class.svg'
-          color: '#d98159'
+          color: '#E7B198'
           category: 'Category:Draft-Class articles'
         Future:
           badge: '6/6b/Symbol_future_class.svg'
-          color: '#8a95c9'
+          color: '#B4BBFF'
           category: 'Category:Future-Class articles'
         Current:
           badge: '2/2f/Symbol_current_class.svg'
-          color: '#d870ff'
+          color: '#E6A4FF'
           category: 'Category:Current-Class articles'
         Deferred:
           badge: '4/48/Symbol_deferred_class.svg'
-          color: '#999999'
+          color: '#D1BCAC'
           category: 'Category:Deferred-Class articles'
         User:
           badge: '1/13/Symbol_user_class.svg'
-          color: '#b5b546'
+          color: '#DDD06A'
           category: 'Category:User-Class articles'
         FT: # Featured topic
           badge: 'b/b4/Symbol_star_gold.svg'
-          color: '#6699ff'
+          color: '#9CBDFF'
           category: 'Category:FT-Class articles'
         Needed:
           badge: '6/63/Symbol_needed_class.svg'
-          color: '#dcdcdc'
+          color: '#DCDCDC'
           category: 'Category:Needed-Class articles'
         Merge:
           badge: 'b/b0/Symbol_merge_vote.svg'
-          color: '#add8e6'
+          color: '#ADD8E6'
           category: 'Category:Merge-Class articles'
         NA:
           badge: '6/6a/Symbol_na_class.svg'
-          color: '#f5f5f5'
+          color: '#F5F5F5'
           category: 'Category:NA-Class articles'
         Unknown:
           badge: 'e/e0/Symbol_question.svg'
@@ -265,27 +265,27 @@ parameters:
           category: 'Category:Unassessed articles'
       importance:
         Top:
-          color: '#ff00ff'
+          color: '#ff97ff'
           category: 'Category:Top-importance articles'
           weight: 5
         High:
-          color: '#ff88ff'
+          color: '#ffacff'
           category: 'Category:Top-importance articles'
           weight: 4
         Mid:
-          color: '#ffbbff'
+          color: '#ffc1ff'
           category: 'Category:Top-importance articles'
           weight: 3
         Low:
-          color: '#ffddff'
+          color: '#ffd6ff'
           category: 'Category:Top-importance articles'
           weight: 2
         Bottom:
-          color: '#ffeeff'
+          color: '#ffebff'
           category: 'Category:Top-importance articles'
           weight: 1
         NA:
-          color: ''
+          color: '#f5f5f5'
           category: 'Category:NA-importance articles'
           weight: 0
         Unknown:
