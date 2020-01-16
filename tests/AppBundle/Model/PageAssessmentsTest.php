@@ -119,7 +119,7 @@ class PageAssessmentsTest extends TestAdapter
         // Picks the first assessment.
         static::assertEquals([
             'value' => 'Start',
-            'color' => '#ffaa66',
+            'color' => '#FFAA66',
             'category' => 'Category:Start-Class articles',
             'badge' => 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Symbol_start_class.svg',
         ], $assessments['assessment']);
