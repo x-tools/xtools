@@ -85,10 +85,12 @@ class PagesController extends XtoolsController
 
     /**
      * Every action in this controller (other than 'index') calls this first.
+     * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
+     * @param string $deleted One of 'live', 'deleted' or 'all' for both.
      * @return Pages
      * @codeCoverageIgnore
      */
-    public function setUPages(): Pages
+    public function setUpPages(string $redirects, string $deleted): Pages
     {
         $pagesRepo = new PagesRepository();
         $pagesRepo->setContainer($this->container);
@@ -96,15 +98,13 @@ class PagesController extends XtoolsController
             $this->project,
             $this->user,
             $this->namespace,
-            $this->redirects,
-            $this->deleted,
+            $redirects,
+            $deleted,
             $this->start,
             $this->end,
             $this->offset
         );
         $pages->setRepository($pagesRepo);
-
-        $pages->prepareData();
 
         return $pages;
     }
@@ -149,7 +149,8 @@ class PagesController extends XtoolsController
             ]));
         }
 
-        $pages = $this->setUPages();
+        $pages = $this->setUpPages($redirects, $deleted);
+        $pages->prepareData();
 
         $ret = [
             'xtPage' => 'Pages',
@@ -307,19 +308,7 @@ class PagesController extends XtoolsController
     {
         $this->recordApiUsage('user/pages_count');
 
-        $pagesRepo = new PagesRepository();
-        $pagesRepo->setContainer($this->container);
-        $pages = new Pages(
-            $this->project,
-            $this->user,
-            $this->namespace,
-            $redirects,
-            $deleted,
-            $this->start,
-            $this->end
-        );
-        $pages->setRepository($pagesRepo);
-
+        $pages = $this->setUpPages($redirects, $deleted);
         $counts = $pages->getCounts();
 
         if ('all' !== $this->namespace && isset($counts[$this->namespace])) {
@@ -359,20 +348,7 @@ class PagesController extends XtoolsController
     {
         $this->recordApiUsage('user/pages');
 
-        $pagesRepo = new PagesRepository();
-        $pagesRepo->setContainer($this->container);
-        $pages = new Pages(
-            $this->project,
-            $this->user,
-            $this->namespace,
-            $redirects,
-            $deleted,
-            $this->start,
-            $this->end,
-            $this->offset
-        );
-        $pages->setRepository($pagesRepo);
-
+        $pages = $this->setUpPages($redirects, $deleted);
         $pagesList = $pages->getResults();
 
         if ('all' !== $this->namespace && isset($pagesList[$this->namespace])) {

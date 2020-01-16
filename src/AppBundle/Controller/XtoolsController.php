@@ -62,12 +62,6 @@ abstract class XtoolsController extends Controller
     /** @var int|false End date parsed from the Request. */
     protected $end = false;
 
-    /** @var string One of 'noredirects', 'onlyredirects' or 'all' for both. */
-    protected $redirects;
-
-    /** @var string One of 'live', 'deleted' or 'all' for both. */
-    protected $deleted;
-
     /**
      * Default days from current day, to use as the start date if none was provided.
      * If this is null and $maxDays is non-null, the latter will be used as the default.
@@ -778,8 +772,6 @@ abstract class XtoolsController extends Controller
             'namespace' => $this->namespace,
             'start' => $this->start,
             'end' => $this->end,
-            'redirects' => $this->redirects,
-            'deleted' => $this->deleted,
         ], $ret);
 
         $formatMap = [
