@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.10.12 ##
+- Pages (T242930): Fix handling of 'redirects' and 'deleted' parameters.
+- ArticleInfo: Sync enwiki assessment colours with w:en:Template:Class/colour
+
 ## 3.10.11 ##
 - Pages: Fix production error where routing params were missing.
 - EditCounter: Fix routing to Top Edits API and the rights changes list.
