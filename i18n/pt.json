@@ -6,7 +6,8 @@
 			"Athena in Wonderland",
 			"Hamilton Abreu",
 			"Abijeet Patro",
-			"Fitoschido"
+			"Fitoschido",
+			"Mansil alfalb"
 		]
 	},
 	"abusefilter": "Filtro de abusos",
@@ -268,6 +269,7 @@
 	"num-categories": "{{PLURAL:$1|categoria|categorias}}",
 	"num-days": "{{PLURAL: $1|dia|dias}}",
 	"num-deletions": "{{PLURAL:$1|eliminação|eliminações}}",
+	"num-edits": "{{PLURAL:$1|edição|edições}}",
 	"num-editors": "{{PLURAL:$1|editor|editores}}",
 	"num-hours": "{{PLURAL: $1|hora|horas}}",
 	"num-minutes": "{{PLURAL: $1|minuto|minutos}}",
@@ -385,7 +387,11 @@
 	"show-sections-desc": "Selecione as estatísticas a mostrar. Quantas mais selecionar, mais tempo demorará a carregar.",
 	"simple-counter-limited-results": "Este utilizador fez um número substancial de edições. A mostrar um número limitado de resultados.",
 	"size": "Tamanho",
+	"size-gigabytes": "$1 GB",
+	"size-kilobytes": "$1 KB",
+	"size-megabytes": "$1 MB",
 	"size-over-time": "Tamanho do artigo ao longo do tempo",
+	"size-terabytes": "$1 TB",
 	"small-edits": "Edições menores (<20 bytes)",
 	"start": "Data de início",
 	"steward-stats-notice": "Só são mostrados os utilizadores que realizaram pelo menos uma ação de ''steward'' no período.",
@@ -464,6 +470,7 @@
 	"total": "Total",
 	"total-authors": "Total de autores",
 	"total-edits": "Total de edições",
+	"total-page-size": "Tamanho total da página",
 	"total-revisions": "Total de revisões",
 	"translation-credits": "Traduções por $1 e $2.",
 	"tsv": "TSV",

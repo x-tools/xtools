@@ -6,7 +6,8 @@
 			"Guycn2",
 			"Strayblues",
 			"חיים",
-			"Steeve815"
+			"Steeve815",
+			"Ghsuvr"
 		]
 	},
 	"abusefilter": "מסנן ההשחתות",
@@ -355,6 +356,7 @@
 	"total": "סך הכול",
 	"total-authors": "סך־כל העורכים",
 	"total-edits": "עריכות סה\"כ",
+	"total-page-size": "גודל הדף הכולל",
 	"total-revisions": "סה\"כ גרסאות",
 	"translation-credits": "התרגומים מסופקים על־ידי $1‏, $2 ו־$3.",
 	"tsv": "TSV",

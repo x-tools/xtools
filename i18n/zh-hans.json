@@ -18,7 +18,8 @@
 			"予弦",
 			"Xiplus",
 			"A Retired User",
-			"沈澄心"
+			"沈澄心",
+			"Josephine W."
 		]
 	},
 	"abusefilter": "滥用过滤器",
@@ -398,7 +399,11 @@
 	"show-sections-desc": "选择所要显示的数据。您选择的越多，加载的时间越长。",
 	"simple-counter-limited-results": "该用户执行了大量编辑。仅显示有限结果。",
 	"size": "大小",
+	"size-gigabytes": "$1 GB",
+	"size-kilobytes": "$1 KB",
+	"size-megabytes": "$1 MB",
 	"size-over-time": "一段时间后的大小",
+	"size-terabytes": "$1 TB",
 	"small-edits": "小编辑（<20字节）",
 	"start": "开始日期",
 	"steward-stats-notice": "仅显示某一时间段内做出至少一次监管操作的用户。",
