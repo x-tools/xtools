@@ -119,6 +119,7 @@
 	"num-blocks": "{{PLURAL:$1|blokada|blokade|blokada}}",
 	"num-bytes": "{{PLURAL:$1|bajt|bajta|bajtova}}",
 	"num-days": "{{PLURAL:$1|dan|dana}}",
+	"num-edits": "{{PLURAL:$1|izmjena|izmjene|izmjena}}",
 	"num-editors": "{{PLURAL:$1|urednik|urednika}}",
 	"num-hours": "{{PLURAL:$1|sat|sata|sati}}",
 	"num-minutes": "{{PLURAL:$1|minut|minute|minuta}}",

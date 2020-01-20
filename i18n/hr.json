@@ -6,7 +6,8 @@
 			"MaGa",
 			"SpeedyGonsales",
 			"Abijeet Patro",
-			"Astrind"
+			"Astrind",
+			"Neptune, the Mystic"
 		]
 	},
 	"abusefilter": "Filtar zloporaba",
@@ -222,6 +223,7 @@
 	"num-categories": "{{PLURAL:$1|kategorija|kategorije|kategorija}}",
 	"num-days": "{{PLURAL: $1|dan|dana}}",
 	"num-deletions": "{{PLURAL:$1|brisanje|brisanja}}",
+	"num-edits": "{{PLURAL:$1|uređivanje|uređivanja}}",
 	"num-editors": "{{PLURAL:$1|suradnik|suradnika}}",
 	"num-hours": "{{PLURAL:$1|sat|sata|sati}}",
 	"num-minutes": "{{PLURAL:$1|minuta|minute|minuta}}",
@@ -309,6 +311,9 @@
 	"see-full-statistics": "Pogledaj potpune statistike",
 	"show": "Prikaži",
 	"size": "Veličina",
+	"size-gigabytes": "$1&nbsp;GB",
+	"size-megabytes": "$1&nbsp;MB",
+	"size-terabytes": "$1&nbsp;TB",
 	"small-edits": "Manja uređivanja (<20 bajtova)",
 	"start": "Početni datum",
 	"stewards": "Stjuardi",
@@ -368,6 +373,7 @@
 	"topedits-article-desc": "Sva uređivanja suradnika na stranici, po kronološkom slijedu.",
 	"total": "Ukupno",
 	"total-edits": "Ukupno uređivanja",
+	"total-page-size": "Ukupna veličina stranice",
 	"total-revisions": "Ukupno izmjena",
 	"translation-credits": "Prijevode omogućili $1 i $2.",
 	"tuesday": "Utorak",
