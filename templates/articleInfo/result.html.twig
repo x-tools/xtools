@@ -42,7 +42,7 @@
             {% if isWMFLabs() %}
                 &middot;
                 {{ wiki.pageviewsLinks(page, ai.dateParams) }}
-                {% if page.wikidataId is defined %}
+                {% if page.wikidataId is not empty %}
                     &middot;
                     {{ wiki.extLink('https://tools.wmflabs.org/reasonator/?q=' ~ page.wikidataId, 'Reasonator (Wikidata)') }}
                 {% endif %}

@@ -64,21 +64,21 @@
 {% macro pageInfoLink(page, label = null, section = null) %}{% apply spaceless %}
     {% from _self import extLink as extLink %}
     {% set projectUrl = page.project.url|trim('/') %}
-    {% set url = projectUrl ~ page.project.script ~ '?action=info&title=' ~ page.title ~ (section is not empty ? '#' ~ section : '') %}
+    {% set url = projectUrl ~ page.project.script ~ '?action=info&title=' ~ page.title|e('url') ~ (section is not empty ? '#' ~ section : '') %}
     {{ extLink(url, msg('log'), label) }}
 {% endapply %}{% endmacro %}
 
 {% macro pageLinksInLink(page, label = null) %}{% apply spaceless %}
     {% from _self import extLink as extLink %}
     {% set projectUrl = page.project.url|trim('/') %}
-    {% set url = projectUrl ~ page.project.script ~ '?title=Special:WhatLinksHere/' ~ page.title ~ '&hidetrans=1' %}
+    {% set url = projectUrl ~ page.project.script ~ '?title=Special:WhatLinksHere/' ~ page.title|e('url') ~ '&hidetrans=1' %}
     {{ extLink(url, msg('links-in'), label) }}
 {% endapply %}{% endmacro %}
 
 {% macro pageRedirectsLink(page, label = null) %}{% apply spaceless %}
     {% from _self import extLink as extLink %}
     {% set projectUrl = page.project.url|trim('/') %}
-    {% set url = projectUrl ~ page.project.script ~ '?title=Special:WhatLinksHere/' ~ page.title ~ '&hidetrans=1&hidelinks=1' %}
+    {% set url = projectUrl ~ page.project.script ~ '?title=Special:WhatLinksHere/' ~ page.title|e('url') ~ '&hidetrans=1&hidelinks=1' %}
     {{ extLink(url, msg('redirects'), label) }}
 {% endapply %}{% endmacro %}
 
@@ -127,7 +127,7 @@
     {% endif %}
     {% set url = project.url|trim('/') ~ project.script ~ '?title=Special:Log&action=view' %}
     {% if username is not empty %}
-        {% set url = url ~ '&user=' ~ username|replace({' ': '_'}) %}
+        {% set url = url ~ '&user=' ~ username|replace({' ': '_'})|e('url') %}
     {% endif %}
     {% if type is not empty %}
         {% set url = url ~ '&type=' ~ type %}
@@ -136,7 +136,7 @@
         {% set url = url ~ '&subtype=' ~ subtype %}
     {% endif %}
     {% if target is not empty %}
-        {% set url = url ~ '&page=' ~ target|replace({' ': '_'}) %}
+        {% set url = url ~ '&page=' ~ target|replace({' ': '_'})|e('url') %}
     {% endif %}
     {{ extLink(url, msg('log'), label) }}
 {% endapply %}{% endmacro %}
@@ -159,7 +159,7 @@
 {% macro pageLogLink(page, label = null, type = null) %}{% apply spaceless %}
     {% from _self import extLink as extLink %}
     {% set articlePath = page.project.articlePath|replace({'$1': ('Special:Log'|replace({' ': '_'}))}) %}
-    {% set url = (page.project.url|trim('/')) ~ articlePath ~ '?page=' ~ page.title|replace({' ': '_'}) %}
+    {% set url = (page.project.url|trim('/')) ~ articlePath ~ '?page=' ~ page.title|replace({' ': '_'})|e('url') %}
     {% if type is not empty %}
         {% set url = url ~ '&type=' ~ type %}
     {% endif %}
@@ -236,16 +236,15 @@
 
 {% macro gucLink(username, label = null) %}{% apply spaceless %}
     {% from _self import extLink as extLink %}
-    {% set url = 'https://tools.wmflabs.org/guc/?user=' ~ username|e('url') %}
     {% if label is null %}
-        {% set label = msg('global-contribs') %}
+        {% set label = msg('tool-globalcontribs') %}
     {% endif %}
-    {{ extLink(url, label) }}
+    <a href="{{ path('GlobalContribsResult', {'username':username}) }}">{{ label }}</a>
 {% endapply %}{% endmacro %}
 
 {% macro pageviewsLink(page, label = null, params = null) %}{% apply spaceless %}
     {% from _self import extLink as extLink %}
-    {% set url = 'https://tools.wmflabs.org/pageviews?project=' ~ page.project.domain ~ '&pages=' ~ page.title %}
+    {% set url = 'https://tools.wmflabs.org/pageviews?project=' ~ page.project.domain ~ '&pages=' ~ page.title|e('url') %}
     {% if params is not empty %}
         {% set url = url ~ '&' ~ buildQuery(params) %}
     {% endif %}
@@ -256,13 +255,13 @@
     {% from _self import extLink as extLink %}
     {% set queryString = params is not empty ? '&' ~ buildQuery(params) : '' %}
     {{ extLink(
-        'https://tools.wmflabs.org/pageviews?project=' ~ page.project.domain ~ '&pages=' ~ page.title ~ queryString,
+        'https://tools.wmflabs.org/pageviews?project=' ~ page.project.domain ~ '&pages=' ~ page.title|e('url') ~ queryString,
         msg('pageviews')
     )}} ({{ extLink(
-        'https://tools.wmflabs.org/langviews?project=' ~ page.project.domain ~ '&page=' ~ page.title ~ queryString,
+        'https://tools.wmflabs.org/langviews?project=' ~ page.project.domain ~ '&page=' ~ page.title|e('url') ~ queryString,
         msg('all-languages')
     )}} &middot; {{ extLink(
-        'https://tools.wmflabs.org/redirectviews?project=' ~ page.project.domain ~ '&page=' ~ page.title ~ queryString,
+        'https://tools.wmflabs.org/redirectviews?project=' ~ page.project.domain ~ '&page=' ~ page.title|e('url') ~ queryString,
         msg('redirects')
     )}})
 {% endapply %}{% endmacro %}
@@ -285,11 +284,11 @@
         {% endif %}
         {% if tool != 'GlobalContribs' and enabled('GlobalContribs') %}
             &middot;
-            <a href="{{ path('GlobalContribs', {'username':user.username}) }}">{{ msg('tool-globalcontribs') }}</a>
+            {{ wiki.gucLink(user.username) }}
         {% endif %}
         {% if isWMFLabs() and not(user.anon) %}
             &middot;
-            {% set url = 'https://tools.wmflabs.org/pageviews/?project=' ~ project.domain ~ '&pages=User:' ~ user.username %}
+            {% set url = 'https://tools.wmflabs.org/pageviews/?project=' ~ project.domain ~ '&pages=User:' ~ user.username|e('url') %}
             {{ wiki.extLink(url, msg('pageviews-userpage')) }}
         {% endif %}
     </p>
