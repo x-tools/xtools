@@ -506,8 +506,12 @@ parameters:
             label: Popups de navegação
         reFill:
             link: en:Project:ReFill
+        Reversão e avisos:
+            regex: 'com \[\[WP:RA\|'
+            link: Wikipédia:Scripts/Reversão e avisos
+            revert: '^Desfeita\(s\)'
         Script de ajustes:
-            regex: 'usando \[\[[Uu]ser:Luizdl/Script de ajustes.js'
+            regex: 'usando \[\[[Uu]ser:Luizdl\/Script de ajustes.js'
             link: User:Luizdl/Script de ajustes.js
         Undo:
             regex: 'Desfeita a edição \d+ de \[\['
@@ -520,6 +524,9 @@ parameters:
 
     # Non-wikipedia sites
     www.wikidata.org:
+        altLabels:
+            regex: '\|altLabels\]\]'
+            link: User:Joern/altLabels.js
         AutoEdit:
             regex: 'Gadget-autoEdit\.js\|autoEdit'
             link: MediaWiki talk:Gadget-autoEdit.js
@@ -530,18 +537,25 @@ parameters:
         Merge:
             regex: '\[\[MediaWiki:Gadget-Merge\.js\|merge\.js\]\]|\/\* wbmergeitems'
             link: Help:Merge
-        Sitelink auto-change:
-            regex: 'clientsitelink-update'
-            link: Help:Sitelinks
-        Sitelink auto-removal:
-            regex: 'clientsitelink-remove'
-            link: Help:Sitelinks
+        Petscan:
+            regex: '#petscan'
+            link: meta:Special:MyLanguage/PetScan
         QuickStatements:
             regex: '#quickstatements'
             link: Help:QuickStatements
         RequestDeletion:
             regex: '\[\[MediaWiki talk:Gadget-RequestDeletion\.js\|RD\]\]'
             link: MediaWiki talk:Gadget-RequestDeletion.js
+        Sitelink auto-change:
+            regex: 'clientsitelink-update'
+            link: Help:Sitelinks
+        Sitelink auto-removal:
+            regex: 'clientsitelink-remove'
+            link: Help:Sitelinks
+        The Distributed Game:
+            regex: '#wikidata-game'
+            tag: distributed-game
+            link: Wikidata:The Game
     commons.wikimedia.org:
         AjaxQuickDelete:
             regex: '^(This category needs discussion|\[\[:.*?\]\] needs discussion|Starting category discussion|Nominating for deletion|\[\[:.*?\]\] has been nominated for deletion|Starting deletion request|Listing \[\[.*?\]\])$|#Autoreport by AjaxQuickDelete|^Updating redirect while processing'
