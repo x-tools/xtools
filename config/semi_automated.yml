@@ -3,8 +3,8 @@
 # Format for individual entries:
 #
 #   Tool name:
-#       regex: Regular expression to match against edit summary
-#       tag: Tag name for the tool, if applicable. See [[Special:Tags]] for full list
+#       regex: Regular expression to match against edit summary.
+#       tags: Names of tags applied to edits made using the tool, if applicable. See [[Special:Tags]] for full list.
 #       tag_excludes: Don't count edits that also use this tag. This is used for example to
 #           hide Huggle edits when viewing Rollback edits.
 #       link: Wiki link to tool documentation
@@ -34,24 +34,24 @@ parameters:
     # See 'Huggle' under 'global' and 'en.wikipedia.org' for an example.
     global:
         AutoWikiBrowser:
-            tag: AWB
+            tags: ['AWB']
             regex: 'using \[\[(Wikipedia|WP|Project):(AWB|AutoWikiBrowser)'
             link: Project:AutoWikiBrowser
         Cat-a-lot:
             regex: 'Help:Cat-a-lot'
             link: commons:Special:MyLanguage/Help:Gadget-Cat-a-lot
-            tag: Cat-a-lot
+            tags: ['Cat-a-lot']
         Commons global replace:
             regex: 'COM:FR\|File renamed\]\]:|COM:Duplicate\|Duplicate|\(\[\[c:GR\|GR\]\]\)'
             link: c:Special:MyLanguage/Commons:File renaming/Global replace
         Content translation:
-            tag: contenttranslation
+            tags: ['contenttranslation']
             regex: 'Created by translating the page'
             link: mw:Special:MyLanguage/Content translation
             contribs: true
             namespaces: [0, 2, 118]
         Generic rollback:
-            tag: mw-rollback
+            tags: ['mw-rollback']
             tag_excludes:
                 - huggle
                 - 'OAuth CID: 1352'
@@ -67,10 +67,10 @@ parameters:
             link: Special:MyLanguage/Project:HotCat
         Huggle:
             regex: '\(\[\[WP:HG'
-            tag: huggle
+            tags: ['huggle']
             link: w:en:Wikipedia:Huggle
         IABot:
-            tag: 'OAuth CID: 678'
+            tags: ['OAuth CID: 678']
             link: Special:MyLanguage/User:InternetArchiveBot
             namespaces: [0, 2, 118]
         Page move:
@@ -80,22 +80,22 @@ parameters:
             regex: 'Wikipedia:Tools\/Navigation_popups|popups'
             link: w:en:Project:Popups
         ProveIt:
-            tag: ProveIt edit
+            tags: ['ProveIt edit']
             link: commons:Help:Gadget-ProveIt
             contribs: true
             namespaces: [0, 2, 118]
         Redirect:
-            tag: mw-new-redirect
+            tags: ['mw-new-redirect']
             link: mw:Special:MyLanguage/Help:Redirects
         reFill:
             regex: 'User:Zhaofeng Li\/Reflinks|WP:REFILL|en:WP:REFILL|with reFill 2'
             link: Project:ReFill
         SWViewer:
-            tag: 'OAuth CID: 1352'
+            tags: ['OAuth CID: 1352']
             link: m:SWViewer
             # This is not considered a revert because it can also be used to edit or tag for deletion
         Undo:
-            tag: mw-undo
+            tags: ['mw-undo']
             tag_excludes:
                 - mw-rollback
                 - huggle
@@ -104,12 +104,12 @@ parameters:
             link: Special:MyLanguage/Project:Undo
             # This is not considered a revert because you can undo any arbitrary revision, not just the previous one.
         WikiLove:
-            tag: wikilove
+            tags: ['wikilove']
             link: mw:Special:MyLanguage/Extension:WikiLove
             namespaces: [3]
         WPCleaner:
             regex: 'WP:CLEANER|WPCleaner\]\]|\[\[\Wikipedia:DPL|\[\[WP:WCW\]\] project \('
-            tag: WPCleaner
+            tags: ['WPCleaner']
             link: Special:MyLanguage/Project:WPCleaner
 
     # Per-language lists. This generally only includes native MediaWiki actions.
@@ -343,7 +343,7 @@ parameters:
             link: User:Evad37/MoveToDraft
             namespaces: [0, 118]
         OABot:
-            tag: 'OAuth CID: 817'
+            tags: ['OAuth CID: 817']
             link: Project:OABOT
             namespaces: [0, 2]
         Ohconfucius script:
@@ -352,7 +352,7 @@ parameters:
             namespaces: [0, 2, 118]
         Page curation:
             regex: 'using \[\[Wikipedia:Page Curation\|Page Curation'
-            tag: pagetriage
+            tags: ['pagetriage']
             link: w:en:Wikipedia:Page_Curation/Help
             namespaces: [0, 1, 2, 3, 4]
         Page swap:
@@ -402,7 +402,7 @@ parameters:
             namespaces: [2, 3, 4]
         STiki:
             regex: 'WP:ST(iki|IKI)'
-            tag: STiki
+            tags: ['STiki']
             link: w:en:Wikipedia:STiki
             revert: Reverted \d+.*WP:(STiki|STIKI)
             namespaces: [0, 3]
@@ -449,7 +449,7 @@ parameters:
             link: User:Evad37/Xunlink
             namespaces: [0, 10, 100, 118]
         YABBR:
-            tag: 'OAuth CID: 860'
+            tags: ['OAuth CID: 860']
             link: User:Enterprisey/YABBR
             namespaces: [0]
     en.wikisource.org:
@@ -463,7 +463,7 @@ parameters:
             regex: \[\[Usuario:Qwertyytrewqqwerty/DisamAssist\|DisamAssist\]\]
             namespaces: [0, 6, 10, 14, 100, 104]
         Replacer:
-            tag: 'OAuth CID: 498'
+            tags: ['OAuth CID: 498']
             link: Usuario:Benjavalero/Replacer
     fa.wikipedia.org:
         Typo fixer:
@@ -490,7 +490,7 @@ parameters:
             namespaces: [3]
     pt.wikipedia.org:
         Automatic Page Corrector:
-            tag: apc
+            tags: ['apc']
             regex: '\+correções \[\[WP:SR\|semiautomáticas'
             link: Wikipédia:Scripts/APC
         FastButtons:
@@ -543,6 +543,7 @@ parameters:
         QuickStatements:
             regex: '#quickstatements'
             link: Help:QuickStatements
+            tags: ['OAuth CID: 699', 'OAuth CID: 1253', 'OAuth CID: 1351']
         RequestDeletion:
             regex: '\[\[MediaWiki talk:Gadget-RequestDeletion\.js\|RD\]\]'
             link: MediaWiki talk:Gadget-RequestDeletion.js
@@ -554,7 +555,7 @@ parameters:
             link: Help:Sitelinks
         The Distributed Game:
             regex: '#wikidata-game'
-            tag: distributed-game
+            tags: ['distributed-game']
             link: Wikidata:The Game
     commons.wikimedia.org:
         AjaxQuickDelete:
@@ -569,7 +570,7 @@ parameters:
             link: Special:MyLanguage/Commons:Commonist
             namespaces: [6]
         CropTool:
-            tag: 'OAuth CID: 593'
+            tags: ['OAuth CID: 593']
             link: Special:MyLanguage/Commons:CropTool
             namespaces: [6]
         Flickr2Commons:
@@ -581,7 +582,7 @@ parameters:
             link: Special:GoToInterwiki/toollabs:geograph2commons
             namespaces: [6]
         HotCat:
-            tag: HotCat
+            tags: ['HotCat']
             link: Special:MyLanguage/Help:Gadget-HotCat
         POTY:
             regex: '\[\[Help:(?:Gadget-)EnhancedPOTY.js|POTY App\]\]$'
@@ -593,7 +594,7 @@ parameters:
             namespaces: [3, 6]
         RenameLink:
             regex: '^\(\[\[Help:RenameLink\|Script'
-            tag: RenameLink
+            tags: ['RenameLink']
             link: Special:MyLanguage/Help:RenameLink
         RotateLink:
             regex: '\(\[\[Help:RotateLink\|Script'
@@ -607,5 +608,5 @@ parameters:
             namespaces: [6]
         VisualFileChange:
             regex: 'Using \[\[COM:VFC'
-            tag: VisualFileChange
+            tags: ['VisualFileChange']
             link: Special:MyLanguage/Help:VisualFileChange.js

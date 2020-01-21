@@ -391,20 +391,22 @@ class AutoEditsRepository extends UserRepository
             $regex = $conn->quote($values['regex'], \PDO::PARAM_STR);
             $condTool = "comment_text REGEXP $regex";
         }
-        if (isset($values['tag']) && isset($this->getTags($project)[$values['tag']])) {
-            $tagTable = $project->getTableName('change_tag');
-            $tagJoin = "LEFT OUTER JOIN $tagTable ON ct_rev_id = rev_id";
+        if (isset($values['tags'])) {
+            $tagIds = $this->getTagIdsFromNames($project, $values['tags']);
 
-            $tagId = $this->getTags($project)[$values['tag']];
-            $tagClause = $this->getTagsExclusionsSql($project, $toolName, [$tagId]);
+            if ($tagIds) {
+                $tagTable = $project->getTableName('change_tag');
+                $tagJoin = "LEFT OUTER JOIN $tagTable ON ct_rev_id = rev_id";
+                $tagClause = $this->getTagsExclusionsSql($project, $toolName, $tagIds);
 
-            // Use tags in addition to the regex clause, if already present.
-            // Tags are more reliable but may not be present for edits made with
-            // older versions of the tool, before it started adding tags.
-            if ('' === $condTool) {
-                $condTool = $tagClause;
-            } else {
-                $condTool = "($condTool OR $tagClause)";
+                // Use tags in addition to the regex clause, if already present.
+                // Tags are more reliable but may not be present for edits made with
+                // older versions of the tool, before it started adding tags.
+                if ('' === $condTool) {
+                    $condTool = $tagClause;
+                } else {
+                    $condTool = "($condTool OR $tagClause)";
+                }
             }
         }
 
@@ -428,7 +430,6 @@ class AutoEditsRepository extends UserRepository
     ): array {
         $tools = $this->getTools($project);
         $regexes = [];
-        $allTagIds = $this->getTags($project);
         $tagIds = [];
 
         if ('' != $tool) {
@@ -450,8 +451,8 @@ class AutoEditsRepository extends UserRepository
             if (isset($values['regex'])) {
                 $regexes[] = $values['regex'];
             }
-            if (isset($values['tag']) && isset($allTagIds[$values['tag']])) {
-                $tagIds[] = $allTagIds[$values['tag']];
+            if (isset($values['tags'])) {
+                $tagIds = array_merge($tagIds, $this->getTagIdsFromNames($project, $values['tags']));
             }
         }
 
@@ -480,8 +481,13 @@ class AutoEditsRepository extends UserRepository
         // Get all tag values.
         $tags = [];
         foreach (array_values($this->getTools($project)) as $values) {
-            if (isset($values['tag'])) {
-                $tags[] = $conn->quote($values['tag'], \PDO::PARAM_STR);
+            if (isset($values['tags'])) {
+                $tags = array_merge(
+                    $tags,
+                    array_map(function ($tag) use ($conn) {
+                        return $conn->quote($tag, \PDO::PARAM_STR);
+                    }, $values['tags'])
+                );
             }
         }
 
@@ -522,5 +528,25 @@ class AutoEditsRepository extends UserRepository
         }
 
         return "ct_tag_id IN ($tagsList) $excludesSql";
+    }
+
+    /**
+     * Get IDs for tags given the names.
+     * @param Project $project
+     * @param array $tagNames
+     * @return array
+     */
+    private function getTagIdsFromNames(Project $project, array $tagNames): array
+    {
+        $allTagIds = $this->getTags($project);
+        $tagIds = [];
+
+        foreach ($tagNames as $tag) {
+            if (isset($allTagIds[$tag])) {
+                $tagIds[] = $allTagIds[$tag];
+            }
+        }
+
+        return $tagIds;
     }
 }

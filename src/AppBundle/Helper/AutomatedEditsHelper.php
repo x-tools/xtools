@@ -108,6 +108,13 @@ class AutomatedEditsHelper
                 $data['namespaces'][] = $data['namespace'];
                 unset($data['namespace']);
             }
+
+            // 'tags' should be an array of strings.
+            $data['tags'] = $data['tags'] ?? [];
+            if (isset($data['tag'])) {
+                $data['tags'][] = $data['tag'];
+                unset($data['tag']);
+            }
         });
 
         uksort($this->tools[$projectDomain], 'strcasecmp');

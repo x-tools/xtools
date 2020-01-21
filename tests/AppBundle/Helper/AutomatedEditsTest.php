@@ -46,7 +46,7 @@ class AutomatedEditsTest extends TestAdapter
         static::assertArraySubset(
             [
                 'regex' => '\(\[\[WP:HG',
-                'tag' => 'huggle',
+                'tags' => ['huggle'],
                 'link' => 'w:en:Wikipedia:Huggle',
                 'revert' => 'Reverted edits by.*?WP:HG',
             ],
@@ -66,7 +66,7 @@ class AutomatedEditsTest extends TestAdapter
             [
                 'name' => 'Huggle',
                 'regex' => '\(\[\[WP:HG',
-                'tag' => 'huggle',
+                'tags' => ['huggle'],
                 'link' => 'w:en:Wikipedia:Huggle',
                 'revert' => 'Reverted edits by.*?WP:HG',
             ],
@@ -104,7 +104,7 @@ class AutomatedEditsTest extends TestAdapter
         static::assertArraySubset(
             ['Huggle' => [
                 'regex' => '\(\[\[WP:HG',
-                'tag' => 'huggle',
+                'tags' => ['huggle'],
                 'link' => 'w:en:Wikipedia:Huggle',
                 'revert' => 'Reverted edits by.*?WP:HG',
             ]],
