@@ -1,5 +1,12 @@
 # Release Notes #
 
+## 3.10.13 ##
+- ArticleInfo (T243225): ensure proper encoding on links to wiki.
+- AutoEdits (T243237): Allow tool definitions to target multiple tags.
+- AutoEdits (T243142, T243182, T243153, T243145, T243147, T243141, T243140):
+  Add several tools to configuration, along with some minor cleanup.
+- Localization updates.
+
 ## 3.10.12 ##
 - Pages (T242930): Fix handling of 'redirects' and 'deleted' parameters.
 - ArticleInfo: Sync enwiki assessment colours with w:en:Template:Class/colour
