@@ -76,6 +76,13 @@ parameters:
         Page move:
             regex: 'moved page \[\[(?!.*?WP:AFCH)|moved \[\[.*?\]\] to \[\['
             link: mw:Special:MyLanguage/Help:Moving a page
+        PAWS:
+            tags:
+                - 'OAuth CID: 351'
+                - 'OAuth CID: 429'
+                - 'OAuth CID: 905'
+                - 'OAuth CID: 919'
+            link: mw:PAWS
         Popups:
             regex: 'Wikipedia:Tools\/Navigation_popups|popups'
             link: w:en:Project:Popups
