@@ -540,6 +540,9 @@ parameters:
         Petscan:
             regex: '#petscan'
             link: meta:Special:MyLanguage/PetScan
+        PLtools:
+            tags: ['OAuth CID: 168', 'OAuth CID: 408']
+            link: Special:GoToInterwiki/toolforge:pltools
         QuickStatements:
             regex: '#quickstatements'
             link: Help:QuickStatements
