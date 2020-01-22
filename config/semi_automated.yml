@@ -564,7 +564,7 @@ parameters:
             regex: 'clientsitelink-remove'
             link: Help:Sitelinks
         The Distributed Game:
-            regex: '#wikidata-game'
+            regex: '#(wikidata|distributed)-game'
             tags: ['distributed-game']
             link: Wikidata:The Game
     commons.wikimedia.org:
