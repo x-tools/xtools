@@ -583,6 +583,10 @@ parameters:
             tags: ['OAuth CID: 593']
             link: Special:MyLanguage/Commons:CropTool
             namespaces: [6]
+        FileImporter:
+            tags: ['fileimporter']
+            link: mw:Help:Extension:FileImporter
+            namespaces: [6]
         Flickr2Commons:
             tags: ['OAuth CID: 67']
             regex: 'via \[\[(?:Special:MyLanguage\/)?Commons:Flickr2Commons'
