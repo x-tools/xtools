@@ -632,3 +632,7 @@ parameters:
             regex: 'Using \[\[COM:VFC'
             tags: ['VisualFileChange']
             link: Special:MyLanguage/Help:VisualFileChange.js
+    meta.wikimedia.org:
+        EasyResolve:
+            regex: '\[\[:m:User:DannyS712\/EasyResolve'
+            link: User:DannyS712/EasyResolve
