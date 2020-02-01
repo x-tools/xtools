@@ -595,6 +595,9 @@ parameters:
         HotCat:
             tags: ['HotCat']
             link: Special:MyLanguage/Help:Gadget-HotCat
+        IA Upload:
+            tags: ['OAuth CID: 772', 'OAuth CID: 40']
+            link: wikitech:Tool:IA Upload
         POTY:
             regex: '\[\[Help:(?:Gadget-)EnhancedPOTY.js|POTY App\]\]$'
             link: Help:Gadget-EnhancedPOTY.js
