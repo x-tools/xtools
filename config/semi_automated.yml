@@ -624,6 +624,10 @@ parameters:
             regex: '^User created page with UploadWizard$'
             link: Special:MyLanguage/Commons:Upload Wizard
             namespaces: [6]
+        video2commons:
+            tags: ['OAuth CID: 394']
+            link: Special:MyLanguage/Commons:video2commons
+            namespaces: [6]
         VisualFileChange:
             regex: 'Using \[\[COM:VFC'
             tags: ['VisualFileChange']
