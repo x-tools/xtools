@@ -584,6 +584,7 @@ parameters:
             link: Special:MyLanguage/Commons:CropTool
             namespaces: [6]
         Flickr2Commons:
+            tags: ['OAuth CID: 67']
             regex: 'via \[\[(?:Special:MyLanguage\/)?Commons:Flickr2Commons'
             link: Special:MyLanguage/Commons:Flickr2Commons
             namespaces: [6]
