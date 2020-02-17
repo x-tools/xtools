@@ -180,6 +180,7 @@
 	"num-minutes": "{{PLURAL:$1|минут}}",
 	"num-months": "{{PLURAL:$1|бутт}}",
 	"num-moves": "{{PLURAL:$1|цӀерш хийцар}}",
+	"num-pageviews": "{{PLURAL:$1|агӀоне хьажар}}",
 	"num-revisions": "{{PLURAL:$1|верси|версеш}}",
 	"num-revisions-processed": "$1 кечйина",
 	"num-seconds": "{{PLURAL:$1|секунд}}",
