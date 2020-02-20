@@ -3,7 +3,8 @@
 		"authors": [
 			"Robby",
 			"Nemo bis",
-			"Les Meloures"
+			"Les Meloures",
+			"Soued031"
 		]
 	},
 	"accepted-formats": "Akzeptéiert Formater",
@@ -108,7 +109,7 @@
 	"edits-not-in-categories": "Ännerungen ausserhalb vu Kategorien",
 	"edits-with-summaries": "Ännerunge mat Resumé",
 	"end": "Schlussdatum",
-	"error-login": "Aloggen huet net funktionéiert! Probéiert w.e.g. nach eng Kéier.",
+	"error-login": "Aloggen huet net funktionéiert! Probéiert wgl. nach eng Kéier.",
 	"error-server-message": "Äntwert vum Server: $1",
 	"error-title": "Innerhalb vun XTools ass e fatale Feeler geschitt.",
 	"events": "Evenementer",
@@ -277,7 +278,7 @@
 	"rfx-page": "RfX-Säit",
 	"rights": "Rechter",
 	"rights-changes": "Ännerunge vu Benotzerrechter",
-	"rpp": "Ufro fir säit ze spären",
+	"rpp": "Ufro fir d'Säit ze spären",
 	"saturday": "Samschdeg",
 	"sections": "Abschnitter",
 	"see-full-page-stats": "Säit mat de komplette Statistike kucken",
