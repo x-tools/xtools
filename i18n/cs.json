@@ -92,7 +92,7 @@
 	"current-size": "Současná velikost",
 	"current-stewards": "Současní stevardi",
 	"current-user-groups": "Aktuální skupiny uživatele",
-	"data-limit": "Data limitována pro nejnovějších $2 {{PLURAL:$1|editaci|editací}}",
+	"data-limit": "Data omezena na {{PLURAL:$1|nejnovější editaci|nejnovější $2 editace|nejnovějších $2 editací}}",
 	"date": "Datum",
 	"date-from": "Z: $1",
 	"date-range": "$1 – $2",
