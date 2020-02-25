@@ -568,6 +568,10 @@ parameters:
             tags: ['distributed-game']
             link: Wikidata:The Game
     commons.wikimedia.org:
+        AC/DC:
+            tags: ['ACDC']
+            link: Help:Gadget-ACDC
+            namespaces: [6]
         AjaxQuickDelete:
             regex: '^(This category needs discussion|\[\[:.*?\]\] needs discussion|Starting category discussion|Nominating for deletion|\[\[:.*?\]\] has been nominated for deletion|Starting deletion request|Listing \[\[.*?\]\])$|#Autoreport by AjaxQuickDelete|^Updating redirect while processing'
             link: Special:MyLanguage/Help:Nominate_for_deletion
@@ -620,6 +624,15 @@ parameters:
         SettingsManager:
             regex: '\[\[MediaWiki:Gadget-SettingsManager.js\|SettingsManager'
             link: MediaWiki:Gadget-SettingsManager.js
+        simpleSVGcheck:
+            regex: 'User:Perhelion\/simpleSVGcheck\.js\|'
+            link: User:Perhelion/simpleSVGcheck.js
+            namespaces: [6]
+        SVGedit:
+            tags: ['rillke-mw-js-bot']
+            link: User:Rillke/SVGedit
+            namespaces: [6]
+            contribs: true
         UploadWizard:
             regex: '^User created page with UploadWizard$'
             link: Special:MyLanguage/Commons:Upload Wizard
