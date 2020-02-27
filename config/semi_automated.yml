@@ -270,7 +270,7 @@ parameters:
             link: Project:Bots
             revert: true
         Capricorn:
-            regex: '\(\[\[User:Kephir\/gadgets\/sagittarius\||\(\[\[User:Sam Sailor\/Scripts\/Sagittarius\+\||\[\[User:Wugapodes\/Capricorn\|'
+            regex: '\(\[\[User:Kephir\/gadgets\/sagittarius\||\(\[\[User:Sam Sailor\/Scripts\/Sagittarius\+\||\[\[User:Wugapodes\/Capricorn\||\[\[User:MJL\/Archer'
             link: User:Wugapodes/Capricorn
         Checklinks:
             regex: 'using \[\[w:WP:CHECKLINKS'
