@@ -544,6 +544,9 @@ parameters:
         Merge:
             regex: '\[\[MediaWiki:Gadget-Merge\.js\|merge\.js\]\]|\/\* wbmergeitems'
             link: Help:Merge
+        OpenRefine:
+            tags: ['openrefine-3.1','openrefine-3.2','openrefine-3.3','openrefine-3.4']
+            link: Wikidata:Tools/OpenRefine
         Petscan:
             regex: '#petscan'
             link: meta:Special:MyLanguage/PetScan
