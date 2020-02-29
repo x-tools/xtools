@@ -217,32 +217,34 @@ class GlobalContribsRepository extends Repository
         $queries = [];
         $projectRepo = $this->caProject->getRepository();
         foreach ($dbNames as $dbName) {
-            $revisionTable = $projectRepo->getTableName($dbName, 'revision');
-            $pageTable = $projectRepo->getTableName($dbName, 'page');
-            $commentTable = $projectRepo->getTableName($dbName, 'comment', 'revision');
-
-            $sql = "SELECT
-                    '$dbName' AS dbName,
-                    revs.rev_id AS id,
-                    revs.rev_timestamp AS timestamp,
-                    UNIX_TIMESTAMP(revs.rev_timestamp) AS unix_timestamp,
-                    revs.rev_minor_edit AS minor,
-                    revs.rev_deleted AS deleted,
-                    revs.rev_len AS length,
-                    (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
-                    revs.rev_parent_id AS parent_id,
-                    $username AS username,
-                    page.page_title,
-                    page.page_namespace,
-                    comment_text AS `comment`
-                FROM $revisionTable AS revs
-                    JOIN $pageTable AS page ON (rev_page = page_id)
-                    LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-                    LEFT OUTER JOIN $commentTable ON revs.rev_comment_id = comment_id
-                WHERE revs.rev_actor = ".$actorIds[$dbName]."
-                    $namespaceCond
-                    $revDateConditions";
-            $queries[] = $sql;
+            if ( isset( $actorIds[$dbName] ) ) {
+                $revisionTable = $projectRepo->getTableName($dbName, 'revision');
+                $pageTable = $projectRepo->getTableName($dbName, 'page');
+                $commentTable = $projectRepo->getTableName($dbName, 'comment', 'revision');
+    
+                $sql = "SELECT
+                        '$dbName' AS dbName,
+                        revs.rev_id AS id,
+                        revs.rev_timestamp AS timestamp,
+                        UNIX_TIMESTAMP(revs.rev_timestamp) AS unix_timestamp,
+                        revs.rev_minor_edit AS minor,
+                        revs.rev_deleted AS deleted,
+                        revs.rev_len AS length,
+                        (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
+                        revs.rev_parent_id AS parent_id,
+                        $username AS username,
+                        page.page_title,
+                        page.page_namespace,
+                        comment_text AS `comment`
+                    FROM $revisionTable AS revs
+                        JOIN $pageTable AS page ON (rev_page = page_id)
+                        LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+                        LEFT OUTER JOIN $commentTable ON revs.rev_comment_id = comment_id
+                    WHERE revs.rev_actor = ".$actorIds[$dbName]."
+                        $namespaceCond
+                        $revDateConditions";
+                $queries[] = $sql;
+            }
         }
         $sql = "SELECT * FROM ((\n" . join("\n) UNION (\n", $queries) . ")) a ORDER BY timestamp DESC LIMIT $limit";
 
