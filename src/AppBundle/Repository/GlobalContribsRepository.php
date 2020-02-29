@@ -217,7 +217,7 @@ class GlobalContribsRepository extends Repository
         $queries = [];
         $projectRepo = $this->caProject->getRepository();
         foreach ($dbNames as $dbName) {
-            if (isset( $actorIds[$dbName])) {
+            if (isset($actorIds[$dbName])) {
                 $revisionTable = $projectRepo->getTableName($dbName, 'revision');
                 $pageTable = $projectRepo->getTableName($dbName, 'page');
                 $commentTable = $projectRepo->getTableName($dbName, 'comment', 'revision');
