@@ -1,5 +1,18 @@
 # Release Notes #
 
+## 3.10.14 ##
+- GlobalContribs (T246522): only query when actor ID exists
+- AutoEdits (T243147): fix to 'The Distributed Game' definition
+- AutoEdits (T243640): Add tag to flickr2commons entry
+- AutoEdits (T243638): Add 'IA Upload' tool for commons.wikimedia
+- AutoEdits (T243636): Add 'FileImporter' to commons.wikimedia
+- AutoEdits (T243637): add 'video2commons' for commons.wikimedia
+- AutoEdits (T243630): add 'EasyResolve' for meta.wikimedia
+- AutoEdits (T236987): add AC/DC, simpleSVGcheck, SVGEdit for commons.wikimedia
+- AutoEdits (T245587): Add OpenRefine to www.wikidata.org
+- AutoEdits (T245708): Add regex for Archer to Capricorn config
+- Localization updates.
+
 ## 3.10.13 ##
 - ArticleInfo (T243225): ensure proper encoding on links to wiki.
 - AutoEdits (T243237): Allow tool definitions to target multiple tags.
