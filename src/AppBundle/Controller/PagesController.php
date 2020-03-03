@@ -315,7 +315,7 @@ class PagesController extends XtoolsController
             $counts = $counts[$this->namespace];
         }
 
-        return $this->getFormattedApiResponse(['counts' => $counts]);
+        return $this->getFormattedApiResponse(['counts' => (object)$counts]);
     }
 
     /**
@@ -356,7 +356,7 @@ class PagesController extends XtoolsController
         }
 
         $ret = [
-            'pages' => $pagesList,
+            'pages' => (object)$pagesList,
         ];
 
         if ($pages->getNumResults() === $pages->resultsPerPage()) {

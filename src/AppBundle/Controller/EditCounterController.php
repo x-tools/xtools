@@ -503,7 +503,7 @@ class EditCounterController extends XtoolsController
         $this->setUpEditCounter();
 
         return $this->getFormattedApiResponse([
-            'namespace_totals' => $this->editCounter->namespaceTotals(),
+            'namespace_totals' => (object)$this->editCounter->namespaceTotals(),
         ]);
     }
 

@@ -195,7 +195,7 @@ class TopEditsController extends XtoolsController
         $topEdits->prepareData();
 
         return $this->getFormattedApiResponse([
-            'top_edits' => $topEdits->getTopEdits(),
+            'top_edits' => (object)$topEdits->getTopEdits(),
         ]);
     }
 
