@@ -189,7 +189,7 @@ class GlobalContribsRepository extends Repository
      * @param string $end Start date in a format accepted by strtotime().
      * @param int $limit The maximum number of revisions to fetch from each project.
      * @param int $offset Offset results by this number of rows.
-     * @return array|mixed
+     * @return array
      */
     public function getRevisions(
         array $dbNames,
@@ -199,7 +199,7 @@ class GlobalContribsRepository extends Repository
         $end = '',
         int $limit = 30,
         int $offset = 0
-    ) {
+    ): array {
         // Check cache.
         $cacheKey = $this->getCacheKey(func_get_args(), 'gc_revisions');
         if ($this->cache->hasItem($cacheKey)) {
@@ -208,6 +208,11 @@ class GlobalContribsRepository extends Repository
 
         $username = $this->getProjectsConnection()->quote($user->getUsername(), \PDO::PARAM_STR);
         $actorIds = $this->getDbNamesAndActorIds($user, $dbNames);
+
+        if (!$actorIds) {
+            return [];
+        }
+
         $namespaceCond = 'all' === $namespace
             ? ''
             : 'AND page_namespace = '.(int)$namespace;
@@ -221,7 +226,7 @@ class GlobalContribsRepository extends Repository
                 $revisionTable = $projectRepo->getTableName($dbName, 'revision');
                 $pageTable = $projectRepo->getTableName($dbName, 'page');
                 $commentTable = $projectRepo->getTableName($dbName, 'comment', 'revision');
-    
+
                 $sql = "SELECT
                         '$dbName' AS dbName,
                         revs.rev_id AS id,
