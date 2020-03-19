@@ -3,7 +3,8 @@
 		"authors": [
 			"Neriman2003",
 			"Wertuose",
-			"Abijeet Patro"
+			"Abijeet Patro",
+			"Patriot Kur"
 		]
 	},
 	"abusefilter": "AbuseFilter",
@@ -106,6 +107,7 @@
 	"edits-with-summaries": "Xülasə ilə düzəlişlər",
 	"end": "Son tarix",
 	"error-articleinfo-api": "Statistika əldə edilə bilmir.",
+	"error-rate-limit-login": "daxil ol",
 	"error-server-message": "Server deyib: $1",
 	"error-title": "XTools'ta ciddi bir səhv baş verdi.",
 	"events": "Hadisələr",
@@ -288,6 +290,10 @@
 	"rfx-intro": "Bu alət səsləri təhlil edir və təkrar səs verənləri müəyyən edir:",
 	"rfx-page": "RfX səhifəsi",
 	"see-full-page-stats": "Səhifənin bütün statistikasına bax",
+	"size": "Həcm",
+	"size-gigabytes": "$1 GB",
+	"size-kilobytes": "$1 KB",
+	"size-megabytes": "$1 MB",
 	"tool-authorship": "Müəlliflik",
 	"tool-authorship-desc": "Məqalənin mövcud versiyasını, boşluqlar istisna olmaqla, xarakter sayına görə ölçülmüş müəlliflik aidiyyəti.",
 	"tool-globalcontribs": "Qlobal istifadəçi fəaliyyətləri"
