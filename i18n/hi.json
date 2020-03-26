@@ -12,7 +12,8 @@
 			"Gopalindians",
 			"Prong$31",
 			"Shypoetess",
-			"1997kB"
+			"1997kB",
+			"Nilesh shukla"
 		]
 	},
 	"accepted-formats": "स्वीकृत प्रारूप",
@@ -87,6 +88,7 @@
 	"delpagesfilter-deleted": "केवल हटाए गए पृष्ठों को शामिल करें",
 	"delpagesfilter-live": "हटाए गए पृष्ठों को हटाएं",
 	"diff": "अन्तर",
+	"diff-empty": "रिक्त",
 	"documentation": "प्रलेखन",
 	"download-label": "डाउनलोड",
 	"duplicate-vote": "नकली मत",
@@ -209,6 +211,7 @@
 	"original-size": "मूल आकार",
 	"other": "अन्य",
 	"others": "अन्य",
+	"page": "पृष्ठ",
 	"page-size": "पृष्ठ का आकार",
 	"page-title": "पृष्ठ शीर्षक",
 	"page-watchers": "पृष्ठ दर्शक",
