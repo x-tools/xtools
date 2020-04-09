@@ -1,19 +1,19 @@
 {
 	"@metadata": {
 		"authors": [
+			"Abijeet Patro",
 			"Acamicamacaraca",
+			"Astrind",
 			"Bugoslav",
 			"MaGa",
-			"SpeedyGonsales",
-			"Abijeet Patro",
-			"Astrind",
-			"Neptune, the Mystic"
+			"Neptune, the Mystic",
+			"SpeedyGonsales"
 		]
 	},
 	"abusefilter": "Filtar zloporaba",
 	"accepted-formats": "Prihvaćeni formati",
 	"account-age": "Starost računa",
-	"account-age-desc": "Staro $2 {{PLURAL:$1|dan|dana}}",
+	"account-age-desc": "$2 {{PLURAL:$1|dan|dana}}",
 	"accounts": "Suradnici s računom",
 	"accounts-created": "Stvoreni računi",
 	"actions": "Radnje",
@@ -224,6 +224,8 @@
 	"no-summary": "Bez sažetka",
 	"non-admins-with-actions": "Neadministratori s administratorskim radnjama",
 	"non-auto-contribs": "Neautomatska uređivanja",
+	"non-patrollers-with-actions": "Ophoditeljske radnje suradnika koji nisu ophoditelji",
+	"non-stewards-with-actions": "Stjuardske radnje suradnika koji nisu stjuardi",
 	"none": "Ništa",
 	"not-opted-in": "Ova/ovaj suradnica/suradnik nije odabrala/odabrao da se ovi podatci prikažu. Molimo Vas, $3 na XTools kao navedena/navedeni suradnica/suradnik ili stvorite $1 s bilo kojim sadržajem. Pogledajte i $2 za više informacija.",
 	"not-opted-in-link": "dokumentaciju",
@@ -267,6 +269,7 @@
 	"pages": "Stranice",
 	"pages-created": "Stvoreno stranica",
 	"pages-created-deleted": "Stvorene stranice koje su izbrisane",
+	"pages-created-deleted-desc": "$2 {{PLURAL:$1|stranica načinjena koja je otad izbrisana|stranice načinjene koje su otad izbrisane|stranica načinjeno koje su otad izbrisane}}",
 	"pages-created-live": "Stvorene stranice",
 	"pages-created-live-desc": "{{PLURAL:$1|Stvorena $2 stranica|Stvorene $2 stranice|Stvoreno $2 stranica}}",
 	"pages-created-since-deleted": "od toga izbrisano $1",
@@ -374,6 +377,7 @@
 	"tool-editsummary-desc": "Analiza uporabe sažetaka uređivanja",
 	"tool-error": "Pogreška",
 	"tool-globalcontribs": "Globalni suradnički doprinosi",
+	"tool-globalcontribs-desc": "Prikaz uređivanja suradnika na svim projektima",
 	"tool-meta": "Statistika uporabe",
 	"tool-pages": "Stvorene stranice",
 	"tool-pages-desc": "Prikaz stranica koje je započeo suradnik",
@@ -384,6 +388,7 @@
 	"tool-simpleeditcounter": "Jednostavni brojač",
 	"tool-simpleeditcounter-desc": "Brzi i jednostavni brojač uređivanja",
 	"tool-stewardstats": "Stjuardske statistike",
+	"tool-stewardstats-desc": "Prikaz statistika stjuardskih radnji",
 	"tool-topedits": "Najuređivanja",
 	"tool-topedits-desc": "Prikaz uređivanja suradnika, prikaz najuređivanja po imenskim prostorima ili po stranicama",
 	"top-edited-pages": "Najviše uređivane stranice",

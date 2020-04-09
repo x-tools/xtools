@@ -1,16 +1,16 @@
 {
 	"@metadata": {
 		"authors": [
+			"Abijeet Patro",
 			"Dishual",
-			"Gwenn-Ael",
 			"Fulup",
-			"Abijeet Patro"
+			"Gwenn-Ael"
 		]
 	},
 	"abusefilter": "AbuseFilter",
 	"accepted-formats": "Furmadoù degemeret",
 	"account-age": "Oad ar gont",
-	"account-age-desc": "$2{{PLURAL:$1|deiz|deiz}}",
+	"account-age-desc": "$2{{PLURAL:$1|deiz|deiz}} zo",
 	"accounts": "Kontoù",
 	"accounts-created": "Kontoù krouet",
 	"actions": "Oberoù",
@@ -284,7 +284,7 @@
 	"pages-created-since-deleted": "$1 abaoe m'eo bet lamet",
 	"pages-created-tooltip": "Niver holl a bajennoù krouet, hag ivez ar re krouet evel adkas en ur adenvel ur bajenn. Gwelit an teuliadur evit gouzout hiroc'h.",
 	"pages-deleted-hover-desc": "Lakait poenter al logodenn da dremen a-us an destenn  '$1' evit gwelet diverradenn an dilamadur.",
-	"pages-deleted-redirects": "Ar pajennoù lamet a c'halle bezañ adkasadennoù.",
+	"pages-deleted-redirects": "Adkasoù a c'halle bezañ ar pajennoù dilamet.",
 	"pages-edited-total": "Pajennoù kemmet (hollad)",
 	"pages-moved": "Pajennoù adanvet",
 	"pages-recreated-desc": "Pajennoù lamet zo a c'hall bezañ bet krouet en-dro, gant an implijer-mañ pe gant unan all. Merket int evel '$1\".",
@@ -319,7 +319,7 @@
 	"recreated": "Adkrouet",
 	"redirect": "Adkas",
 	"redirects": "Adkasoù",
-	"redirfilter-all": "Azlakaat an adkasadennoù hag an nann-adkasadennoù",
+	"redirfilter-all": "Lakaat an adkasoù hag ar re n'int ket ivez",
 	"redirfilter-noredirects": "Ezlakaat an adkasadennoù",
 	"redirfilter-onlyredirects": "Enlakaat nemet an adkasedennoù",
 	"references": "Daveennoù",

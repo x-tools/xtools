@@ -1,13 +1,13 @@
 {
 	"@metadata": {
 		"authors": [
-			"Nemo bis",
-			"Trần Nguyễn Minh Huy",
-			"Phjtieudoc",
-			"Minh Nguyen",
-			"Leduyquang753",
+			"Bluetpp",
 			"Ioe2015",
-			"Bluetpp"
+			"Leduyquang753",
+			"Minh Nguyen",
+			"Nemo bis",
+			"Phjtieudoc",
+			"Trần Nguyễn Minh Huy"
 		]
 	},
 	"accepted-formats": "Định dạng được chấp nhận",
@@ -94,6 +94,7 @@
 	"edits-last-year": "Số sửa đổi trong 365 ngày qua",
 	"edits-with-summaries": "Số sửa đổi có tóm lược",
 	"end": "Ngày kết thúc",
+	"error-authorship-unsupported-project": "$1 không phải là một dự án được hỗ trợ.",
 	"error-login": "Đăng nhập thất bại! Xin hãy thử lại.",
 	"error-rate-limit-login": "đăng nhập",
 	"events": "Sự kiện",
@@ -235,6 +236,7 @@
 	"rfx-page": "Trang biểu quyết phong cấp",
 	"rfx-tally": "Kiểm phiếu",
 	"rfx-total-votes": "Tổng số phiếu",
+	"sections": "Đoạn",
 	"see-full-page-stats": "Xem thống kê trang đầy đủ",
 	"show": "hiện",
 	"size": "Kích thước",
@@ -245,10 +247,12 @@
 	"summary": "Tóm tắt",
 	"support": "Ủng hộ",
 	"tagged": "đánh dấu",
+	"templates": "Bản mẫu",
 	"text": "Văn bản",
 	"text-to-serach": "Văn bản để tìm kiếm",
 	"thank": "Cảm ơn",
 	"timecard": "Thời biểu",
+	"times-in-utc": "Tất cả thời gian đều theo UTC.",
 	"too-many-revisions": "Trang này đã có hơn $1 {{PLURAL:$2|sửa đổi|sửa đổi}}. Chỉ có dữ liệu sửa đổi $1 lần cuối cùng được hiển thị.",
 	"tool-adminstats": "Thống kê BQV",
 	"tool-adminstats-desc": "Xem thống kê về tác vụ bảo quản viên",
@@ -296,6 +300,7 @@
 	"vote-msg": "$1 đã sửa đổi $2 trang $3!",
 	"wiki": "Wiki",
 	"with-summary": "có tóm lược",
+	"words": "Từ",
 	"xtools-title": "Các công cụ của X!",
 	"year-counts": "Số trong năm"
 }
