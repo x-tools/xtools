@@ -277,13 +277,14 @@ class PageRepository extends Repository
 
         $wikidataId = ltrim($page->getWikidataId(), 'Q');
         $lang = $page->getProject()->getLang();
+        $wdp = 'wikidatawiki_p';
 
         $sql = "SELECT wby_name AS term, wbx_text AS term_text
-                FROM wikidatawiki_p.wbt_item_terms
-                LEFT JOIN wbt_term_in_lang ON wbit_term_in_lang_id = wbtl_id
-                LEFT JOIN wbt_type ON wbtl_type_id = wby_id
-                LEFT JOIN wbt_text_in_lang ON wbtl_text_in_lang_id = wbxl_id
-                LEFT JOIN wbt_text ON wbxl_text_id = wbx_id
+                FROM $wdp.wbt_item_terms
+                LEFT JOIN $wdp.wbt_term_in_lang ON wbit_term_in_lang_id = wbtl_id
+                LEFT JOIN $wdp.wbt_type ON wbtl_type_id = wby_id
+                LEFT JOIN $wdp.wbt_text_in_lang ON wbtl_text_in_lang_id = wbxl_id
+                LEFT JOIN $wdp.wbt_text ON wbxl_text_id = wbx_id
                 WHERE wbit_item_id = :wikidataId
                 AND wby_name IN ('label', 'description')
                 AND wbxl_language = :lang";
