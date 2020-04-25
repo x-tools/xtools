@@ -407,6 +407,10 @@ parameters:
             regex: '^(Archiving case (to|from)|Adding sockpuppetry (tag|block notice) per) \[\[Wikipedia:Sockpuppet investigations'
             link: User:Timotheus Canens/spihelper.js
             namespaces: [2, 3, 4]
+        StubSorter:
+            regex: 'using \[\[User:SD0001\/StubSorter\|StubSorter\]\]'
+            link: User:SD0001/StubSorter
+            namespaces: [0]
         STiki:
             regex: 'WP:ST(iki|IKI)'
             tags: ['STiki']
