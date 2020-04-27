@@ -1,5 +1,12 @@
 # Release Notes #
 
+## 3.10.15 ##
+- ArticleInfo (T250951): Update query for wikidata bugs following
+  removal of the wb_terms table.
+- AutoEdits (T248077): Add 'StubSorter' to enwiki config.
+- GlobalContribs: bug fix for when user has no live edits.
+- Localization updates.
+
 ## 3.10.14 ##
 - GlobalContribs (T246522): only query when actor ID exists
 - AutoEdits (T243147): fix to 'The Distributed Game' definition
