@@ -8,8 +8,8 @@
   },
   "dependencies": {
     "@symfony/webpack-encore": "^0.27.0",
-    "node-sass": "^4.11.0",
-    "sass-loader": "^7.1.0"
+    "node-sass": "^4.14.0",
+    "sass-loader": "^7.3.1"
   },
   "devDependencies": {
     "uglify-es": "^3.0.27"
