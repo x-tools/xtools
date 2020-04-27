@@ -2,9 +2,11 @@
 	"@metadata": {
 		"authors": [
 			"1233qwer1234qwer4",
+			"3aFW",
 			"Abijeet Patro",
 			"CarstenG",
 			"Ferdinand0101",
+			"ImaCow",
 			"Johanna Strodt (WMDE)",
 			"MGChecker",
 			"Metalhead64",
@@ -308,7 +310,7 @@
 	"pages": "Seiten",
 	"pages-created": "Seiten erstellt",
 	"pages-created-deleted": "Erstellte Seiten (gelöscht)",
-	"pages-created-deleted-desc": "{{PLURAL:$1|Eine Seite wurde erstellt, seit sie gelöscht wurde.|$2 Seiten wurden erstellt, seit sie gelöscht wurden.}}",
+	"pages-created-deleted-desc": "{{PLURAL:$1|Eine Seite wurde erstellt, die inzwischen gelöscht wurde.|$2 Seiten wurden erstellt, die inzwischen gelöscht wurden.}}",
 	"pages-created-live": "Erstellte Seiten (live)",
 	"pages-created-live-desc": "{{PLURAL:$1|Eine Seite|$2 Seiten}} erstellt",
 	"pages-created-since-deleted": "$1 seit gelöscht",
@@ -470,6 +472,7 @@
 	"topedits-article-desc": "Alle Bearbeitungen an einer Seite von einem Benutzer, in chronologischer Reihenfolge.",
 	"topedits-per-namespace": "TOP-Bearbeitungen nach Namensraum",
 	"total": "Gesamt",
+	"total-authors": "Gesamtzahl der Autoren",
 	"total-edits": "Gesamte Bearbeitungen",
 	"total-page-size": "Gesamtseitengröße",
 	"total-revisions": "Gesamtzahl der Versionen",
