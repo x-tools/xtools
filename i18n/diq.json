@@ -7,6 +7,8 @@
 		]
 	},
 	"abusefilter": "Parzûnê istısmari",
+	"account-age": "Emrê hesabi",
+	"account-age-desc": "Verê $2 {{PLURAL:$1|roce|rocan}}",
 	"accounts": "Hesabi",
 	"accounts-created": "Hesabên vıraziyayi",
 	"actions": "Hereketi",
