@@ -2,6 +2,7 @@
 	"@metadata": {
 		"authors": [
 			"A2093064",
+			"Albe Albe460",
 			"Indil77",
 			"Liuxinyu970226",
 			"McDutchie",
@@ -18,7 +19,7 @@
 			"Xiplus"
 		]
 	},
-	"abusefilter": "Page title for [[Special:AbuseFilter]]. Used to indicate how many changes a user made to AbuseFilters.\n\nEtichetta per la pagina [[Special:AbuseFilter|Speciale:FiltroAbusi]]. Utilizzata per mostrare quante modifiche sono state effettuate da un utente al FiltroAbusi.",
+	"abusefilter": "Page title for [[Special:AbuseFilter]]. Used to indicate how many changes a user made to AbuseFilters.\n\nEtichetta per la pagina [[Special:AbuseFilter|Speciale:FiltroAbusi]]. Utilizzata per mostrare quanti contributi sono stati effettuati da un utente al FiltroAbusi.",
 	"accepted-formats": "Text shown in the tooltip that lists the accepted formats for entering a project, username, etc.",
 	"account-age": "Label for the age of an account",
 	"account-age-desc": "Further description for afd.  $1 is the unformatted number, $2 is a formatted number",

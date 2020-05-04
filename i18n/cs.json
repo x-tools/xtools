@@ -285,7 +285,7 @@
 	"pages-created-deleted": "Vytvořených stránek (smazaných)",
 	"pages-created-live": "Vytvořených stránek (nesmazaných)",
 	"pages-deleted-hover-desc": "Umístěte kurzor na text „$1“, abyste viděl(a) zdůvodnění smazání.",
-	"pages-deleted-redirects": "Smazané stránky mohla být přesměrování",
+	"pages-deleted-redirects": "Smazané stránky mohly být přesměrování.",
 	"pages-edited-total": "Editované stránky (celkem)",
 	"pages-moved": "Přesunutých stránek",
 	"pages-recreated-desc": "Některé smazané stránky mohly být znovu vytvořeny tímto nebo jiným uživatelem. Tyto články jsou označeny jako '$1'.",

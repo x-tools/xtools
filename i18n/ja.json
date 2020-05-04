@@ -13,7 +13,7 @@
 			"おはぐろ蜻蛉"
 		]
 	},
-	"abusefilter": "不正利用フィルター",
+	"abusefilter": "編集フィルター",
 	"accepted-formats": "受け入れられる形式",
 	"account-age": "アカウント歴",
 	"account-age-desc": "$2 {{PLURAL:$1|日}}前",
