@@ -10,10 +10,11 @@
 			"Otokoume",
 			"S2KTS",
 			"Yusuke1109",
-			"おはぐろ蜻蛉"
+			"おはぐろ蜻蛉",
+			"そらたこ"
 		]
 	},
-	"abusefilter": "編集フィルター",
+	"abusefilter": "不正利用フィルター",
 	"accepted-formats": "受け入れられる形式",
 	"account-age": "アカウント歴",
 	"account-age-desc": "$2 {{PLURAL:$1|日}}前",
