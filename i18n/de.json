@@ -313,7 +313,7 @@
 	"pages-created-deleted-desc": "{{PLURAL:$1|Eine Seite wurde erstellt, die inzwischen gelöscht wurde.|$2 Seiten wurden erstellt, die inzwischen gelöscht wurden.}}",
 	"pages-created-live": "Erstellte Seiten (live)",
 	"pages-created-live-desc": "{{PLURAL:$1|Eine Seite|$2 Seiten}} erstellt",
-	"pages-created-since-deleted": "$1 seit gelöscht",
+	"pages-created-since-deleted": "$1 seitdem gelöscht",
 	"pages-created-tooltip": "Summe aller erstellten Seiten, inklusive solcher, die als Weiterleitung beim Verschieben einer Seite erstellt wurden. Siehe die Dokumentation für weitere Einzelheiten.",
 	"pages-deleted-hover-desc": "Fahre mit der Maus über den Text „$1“, um die Löschzusammenfassung zu sehen.",
 	"pages-deleted-redirects": "Gelöschte Seiten können Weiterleitungen gewesen sein.",

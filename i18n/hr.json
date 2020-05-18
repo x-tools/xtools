@@ -127,6 +127,7 @@
 	"edits-not-in-categories": "Uređivanja koja nisu u kategorijama",
 	"edits-with-summaries": "Uređivanja sa sažetkom",
 	"end": "Završni datum",
+	"error-articleinfo-api": "Dohvaćanje podataka o izmjenama nije moguće.",
 	"error-login": "Prijava neuspješna. Molimo probajte ponovno.",
 	"error-rate-limit": "Ako ste korisnik, stvarate previše zahtjeva u kratkom vremenskom roku. Molimo da pričekate $1 {{PLURAL:$1|minutu|minute|minuta}} prije ponovnog učitavanja ovog alata ili $2 kako biste spriječili da se ovo ponovi. Ako je riječ o robotu, molimo da se umjesto toga poslužite našim $3.",
 	"error-server-message": "Odgovor poslužitelja: $1",
