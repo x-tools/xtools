@@ -9,6 +9,7 @@
 			"Omotecho",
 			"Otokoume",
 			"S2KTS",
+			"TKsdik8900",
 			"Yusuke1109",
 			"おはぐろ蜻蛉",
 			"そらたこ"
@@ -106,6 +107,7 @@
 	"edit-summaries": "編集の要約",
 	"edit-summaries-percentage": "編集の要約 %",
 	"edit-summary": "編集の要約",
+	"edit-summary-recent-major": "要約が記入された過去$1回の主な編集",
 	"editors": "編集者数",
 	"edits": "編集",
 	"edits-in-categories": "カテゴリの編集",
@@ -187,6 +189,7 @@
 	"logout": "ログアウト",
 	"mainspace": "記事",
 	"major-edits": "通常の編集",
+	"major-edits-with-summaries": "要約が記入された主な編集",
 	"manual-edits": "手動の編集",
 	"max-text-added": "テキスト追加 (最大値)",
 	"max-text-deleted": "テキスト削除 (最大値)",
