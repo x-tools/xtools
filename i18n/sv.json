@@ -3,6 +3,7 @@
 		"authors": [
 			"Abijeet Patro",
 			"Bengtsson96",
+			"JohanahoJ",
 			"Maol3",
 			"Mjälten",
 			"Nemo bis",
@@ -11,7 +12,7 @@
 			"WikiPhoenix"
 		]
 	},
-	"abusefilter": "Missbruksfilter",
+	"abusefilter": "Redigeringsfilter",
 	"accepted-formats": "Accepterade format",
 	"account-age": "Kontoålder",
 	"account-age-desc": "$2 {{PLURAL:$1|dag|dagar}} gammal",
