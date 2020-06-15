@@ -10,6 +10,7 @@
 			"Railfail536",
 			"Rzuwig",
 			"Vesihiisi",
+			"WaldiSt",
 			"Wojtas",
 			"Woytecr"
 		]
@@ -25,7 +26,9 @@
 	"added-bytes": "Dodano (bajty)",
 	"admin-stats-notice": "Wyświetlani są tylko użytkownicy, którzy wykonali co najmniej jedną akcję administratora w danym okresie.",
 	"admin-stats-notice2": "Niektórzy użytkownicy mogą być byłymi administratorami lub nie są administratorami, ale mają uprawnienia do wykonywania pewnych czynności administracyjnych.",
+	"admins": "Administratorzy",
 	"afd": "Artykuły do usunięcia",
+	"aiv": "Interwencja administratora przeciwko wandalizmowi",
 	"all": "wszystko",
 	"all-edits": "Wszystkie edycje",
 	"all-languages": "Wszystkie języki",
