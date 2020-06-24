@@ -19,11 +19,11 @@ Firstly, some basic **user information**: ID, username, and group membership
 Then, **Edit counts** are displayed for:
 
 * the last day, week, month, year, and all time (the latter also including addition counts of deleted edits);
+* average number of edits per day, and the raw average edit size (positive and negative values);
 * edits made with or without comments;
 * edits that have been deleted;
 * small (under 20 bytes) and large (over 1000 bytes) edits;
 * minor/non-minor edits (as recorded by the user); and
-* what semi-automating tools they used to edit.
 
 Also, dates of activity on the project (earliest and latest) are displayed,
 and what this duration is in days.
