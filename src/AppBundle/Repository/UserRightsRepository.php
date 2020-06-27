@@ -201,6 +201,12 @@ class UserRightsRepository extends Repository
             ->getContents();
 
         $dbname = $project->getDatabaseName();
+        if ('wikidatawiki' === $dbname) {
+            // Edge-case: 'wikidata' is an alias.
+            $dbname = 'wikidatawiki|wikidata';
+        }
+        $dbNameRegex = "/\'$dbname\'\s*\=\>\s*([\d\*\s]+)/s";
+        $defaultRegex = "/\'default\'\s*\=\>\s*([\d\*\s]+)/s";
         $out = [];
 
         foreach (['wgAutoConfirmAge', 'wgAutoConfirmCount'] as $type) {
@@ -212,16 +218,14 @@ class UserRightsRepository extends Repository
 
                 // Find the autoconfirmed expression for the $type and $dbname.
                 $matches = [];
-                $regex = "/\'$dbname\'\s*\=\>\s*([\d\*\s]+)/s";
-                if (1 === preg_match($regex, $group, $matches)) {
+                if (1 === preg_match($dbNameRegex, $group, $matches)) {
                     $out[$type] = (int)eval('return('.$matches[1].');');
                     continue;
                 }
 
                 // Find the autoconfirmed expression for the 'default' and $dbname.
                 $matches = [];
-                $regex = "/\'default\'\s*\=\>\s*([\d\*\s]+)/s";
-                if (1 === preg_match($regex, $group, $matches)) {
+                if (1 === preg_match($defaultRegex, $group, $matches)) {
                     $out[$type] = (int)eval('return('.$matches[1].');');
                     continue;
                 }
