@@ -176,6 +176,13 @@ parameters:
         Redirect:
             label: Redirecionamentos
             link: Ajuda:Guia de edição/Redirecionar páginas
+    ru:
+        Page move:
+            regex: 'переименовал страницу \[\[.*?в \[\['
+            label: Перемещение страниц
+    uk:
+        AutoWikiBrowser:
+            regex: 'за допомогою \[\[Project:AWB\|AWB'
 
     # Per-wiki lists
     ar.wikipedia.org:
@@ -382,7 +389,7 @@ parameters:
             regex: '\[\[w:en:WP:RLR\|You can help!'
             link: en:WP:RLR
         RedWarn:
-            regex: '\[\[WP:REDWARN\|\(RedWarn\)\]\]'
+            regex: '\[\[WP:REDWARN\|\(RedWarn'
             link: WP:REDWARN
         Reflinks:
             regex: '\[\[(tools:~dispenser\/view\/Reflinks|WP:REFLINKS)\|Reflinks'
