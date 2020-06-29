@@ -1,5 +1,16 @@
 # Release Notes #
 
+## 3.10.16 ##
+- UserRights (T256546): handle 'wikidata' alias when parsing InitialiseSettings
+- AutoEdits (T256167): Add ru entry for page moves
+- AutoEdits (T253566): Add uk entry for AutoWikiBrowser
+- AutoEdits (T250613): Make CropTool and JWB global
+- AutoEdits (T253275): Add RedWarn to en.wikipedia
+- AutoEdits (T255308, T250008): Add Popups and remove.js to ru.wikipedia
+- AutoEdits (T250637): Fixes to AjaxQuickDelete for commons
+- AutoEdits (T246775): Add ImageAnnotator to commons
+- Localization updates.
+
 ## 3.10.15 ##
 - ArticleInfo (T250951): Update query for wikidata bugs following
   removal of the wb_terms table.
