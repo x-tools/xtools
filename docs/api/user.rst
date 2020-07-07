@@ -328,9 +328,8 @@ Time Card
 =========
 ``GET /api/user/timecard/{project}/{username}``
 
-Get the relative distribution of edits made by a user based on hour of day and day of week. The returned values are
-a percentage of edits made relative to the other hours and days of the week. Hence the maximum value is 100 and this
-would represent that time and day that the user is most active.
+Get the raw number of edits made by a user during each hour of day and day of week. The ``scale`` meanwhile
+is a value that indicates the number of edits made relative to other hours and days of the week.
 
 **Parameters:**
 
