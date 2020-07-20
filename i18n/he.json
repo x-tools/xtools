@@ -8,6 +8,7 @@
 			"Strayblues",
 			"YaronSh",
 			"דגש חזק",
+			"חזרתי",
 			"חיים"
 		]
 	},
@@ -75,7 +76,7 @@
 	"considered-usernames": "שמות משתמש אפשריים",
 	"contributions": "תרומות",
 	"count": "סך הכול",
-	"created-by": "נוצא על־ידי",
+	"created-by": "נוצר על־ידי",
 	"csv": "CSV",
 	"current-admins": "מנהלים נוכחיים",
 	"current-patrollers": "מנטרים נוכחיים",
@@ -242,7 +243,7 @@
 	"num-protections": "{{PLURAL:$1|הגנה|הגנות}}",
 	"num-revisions": "{{PLURAL:$1|גרסה|גרסאות}}",
 	"num-revisions-processed": "$1 עובדו",
-	"num-revisions-since": "{{PLURAL:$2|גרסה אחת נמחקה|$1 גרסאות נמחקו}} מאז $3",
+	"num-revisions-since": "{{PLURAL:$2|גרסה אחת|$1 גרסאות}} מאז $3",
 	"num-seconds": "{{PLURAL:$1|שנייה|שניות}}",
 	"num-tools": "{{PLURAL:$1|כלי|כלים}}",
 	"num-users": "{{PLURAL:$1|משתמש|משתמשים}}",
