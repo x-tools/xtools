@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"01miki10",
 			"Majavah",
 			"Nike",
 			"Pyscowicz",
@@ -300,6 +301,8 @@
 	"reverted-edits": "Kumottuja muokkauksia",
 	"revision": "Versio",
 	"revision-delete": "Versioita piilotettu",
+	"rfx-duplicates": "Kaksoiskappaleet",
+	"rfx-page": "RfX-sivu",
 	"rights": "Käyttöoikeuksia muutettu",
 	"rights-changes": "Käyttöoikeuksien muutokset",
 	"saturday": "Lauantai",
@@ -360,6 +363,7 @@
 	"total-revisions": "Muokkaajien määrä",
 	"translation-credits": "Käännökset mahdollistaa $1, $2 ja $3.",
 	"tuesday": "Tiistai",
+	"type": "Tyyppi",
 	"unblock": "Estoja poistettu",
 	"unknown": "Tuntematon",
 	"unprotect": "Suojauksia poistettu",
@@ -372,7 +376,7 @@
 	"user-page": "Käyttäjäsivu",
 	"user-page-desc": "Käyttäjäsivun koko on $2 {{PLURAL:$1|tavu|tavua}}",
 	"username": "Käyttäjänimi",
-	"username-or-ip": "Käyttäjätunnus tai IPv4-osoite tai IPv6-osoite",
+	"username-or-ip": "Käyttäjänimi tai IPv4-osoite tai IPv6-osoite",
 	"version": "Versio $1",
 	"view-source": "Lähdekoodi",
 	"view-wikitext": "Näytä wikitekstinä",
@@ -383,6 +387,7 @@
 	"wikitext": "Wikiteksti",
 	"with-summary": "Yhteenvedolla",
 	"words": "Sanamäärä",
+	"xtools-advert": "Luotu käyttämällä palvelua $1 $2",
 	"xtools-slogan": "Ruokkii tiedonnälkääsi",
 	"xtools-title": "X!:n työkalut",
 	"year": "Vuosi",
