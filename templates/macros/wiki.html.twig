@@ -244,7 +244,7 @@
 
 {% macro pageviewsLink(page, label = null, params = null) %}{% apply spaceless %}
     {% from _self import extLink as extLink %}
-    {% set url = 'https://tools.wmflabs.org/pageviews?project=' ~ page.project.domain ~ '&pages=' ~ page.title|e('url') %}
+    {% set url = 'https://pageviews.toolforge.org/?project=' ~ page.project.domain ~ '&pages=' ~ page.title|e('url') %}
     {% if params is not empty %}
         {% set url = url ~ '&' ~ buildQuery(params) %}
     {% endif %}
@@ -255,13 +255,13 @@
     {% from _self import extLink as extLink %}
     {% set queryString = params is not empty ? '&' ~ buildQuery(params) : '' %}
     {{ extLink(
-        'https://tools.wmflabs.org/pageviews?project=' ~ page.project.domain ~ '&pages=' ~ page.title|e('url') ~ queryString,
+        'https://pageviews.toolforge.org/?project=' ~ page.project.domain ~ '&pages=' ~ page.title|e('url') ~ queryString,
         msg('pageviews')
     )}} ({{ extLink(
-        'https://tools.wmflabs.org/langviews?project=' ~ page.project.domain ~ '&page=' ~ page.title|e('url') ~ queryString,
+        'https://langviews.toolforge.org/?project=' ~ page.project.domain ~ '&page=' ~ page.title|e('url') ~ queryString,
         msg('all-languages')
     )}} &middot; {{ extLink(
-        'https://tools.wmflabs.org/redirectviews?project=' ~ page.project.domain ~ '&page=' ~ page.title|e('url') ~ queryString,
+        'https://redirectviews.toolforge.org/?project=' ~ page.project.domain ~ '&page=' ~ page.title|e('url') ~ queryString,
         msg('redirects')
     )}})
 {% endapply %}{% endmacro %}
@@ -305,7 +305,7 @@
             {{ wiki.pageviewsLinks(page, pageviewsDateParams) }}
             {% if page.wikidataId is defined %}
                 &middot;
-                {{ wiki.extLink('https://tools.wmflabs.org/reasonator/?q=' ~ page.wikidataId, 'Reasonator (Wikidata)') }}
+                {{ wiki.extLink('https://easonator.toolforge.org/?q=' ~ page.wikidataId, 'Reasonator (Wikidata)') }}
             {% endif %}
         {% endif %}
     </p>
