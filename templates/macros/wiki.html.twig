@@ -305,7 +305,7 @@
             {{ wiki.pageviewsLinks(page, pageviewsDateParams) }}
             {% if page.wikidataId is defined %}
                 &middot;
-                {{ wiki.extLink('https://easonator.toolforge.org/?q=' ~ page.wikidataId, 'Reasonator (Wikidata)') }}
+                {{ wiki.extLink('https://reasonator.toolforge.org/?q=' ~ page.wikidataId, 'Reasonator (Wikidata)') }}
             {% endif %}
         {% endif %}
     </p>
