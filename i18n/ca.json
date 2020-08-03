@@ -4,6 +4,7 @@
 			"Abijeet Patro",
 			"Fitoschido",
 			"Lluis tgn",
+			"Mguix",
 			"Quel.soler"
 		]
 	},
@@ -88,6 +89,7 @@
 	"diff-empty": "Buides",
 	"documentation": "Documentació",
 	"download-label": "Baixa",
+	"error-rate-limit-login": "Iniciar sessió",
 	"global-account-log": "Registre global del compte",
 	"global-account-un-lock": "Blocatge/desblocatge global",
 	"global-block-log": "Registre global de blocatges",
