@@ -8,6 +8,7 @@
 			"Quel.soler"
 		]
 	},
+	"abusefilter": "Filtre d’abusos",
 	"accepted-formats": "Formats acceptats",
 	"account-age": "Antiguitat del compte",
 	"account-age-desc": "fa $2 {{PLURAL:$1|dia|dies}}",
