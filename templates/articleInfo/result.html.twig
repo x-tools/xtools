@@ -44,7 +44,7 @@
                 {{ wiki.pageviewsLinks(page, ai.dateParams) }}
                 {% if page.wikidataId is not empty %}
                     &middot;
-                    {{ wiki.extLink('https://tools.wmflabs.org/reasonator/?q=' ~ page.wikidataId, 'Reasonator (Wikidata)') }}
+                    {{ wiki.extLink('https://reasonator.toolforge.org/?q=' ~ page.wikidataId, 'Reasonator (Wikidata)') }}
                 {% endif %}
             {% endif %}
         </p>
@@ -972,7 +972,7 @@
         {% endset %}
         {% set description_link %}
             {% set pcwLink %}
-                <a target='_blank' href='https://tools.wmflabs.org/checkwiki/'>Project Check Wikipedia</a>
+                <a target='_blank' href='https://checkwiki.toolforge.org/'>Project Check Wikipedia</a>
             {% endset %}
             {{ msg('powered-by', [pcwLink]) }}
         {% endset %}

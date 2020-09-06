@@ -134,4 +134,4 @@ Wikidata, such as the description, and _CheckWiki errors. For both, a table is s
 how to fix it. The "priority" indicates how important it is to fix the given issue according to CheckWiki, where
 1 is the highest priority. "Notice" indicates where in the wikitext the issue lies.
 
-.. _CheckWiki: https://tools.wmflabs.org/checkwiki/
+.. _CheckWiki: https://checkwiki.toolforge.org/

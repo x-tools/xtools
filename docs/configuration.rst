@@ -37,7 +37,7 @@ For WMF installations, you should also specify credentials for the ``tools-db`` 
 - **database_toolsdb_name** - Username to connect as (should be the same as ``database_replica_user``).
 - **database_toolsdb_password** - Password to use for the user (should be the same as ``database_replica_password``).
 
-.. _checkwiki: https://tools.wmflabs.org/checkwiki/
+.. _checkwiki: https://checkwiki.toolforge.org/
 
 Authentication and Email
 ========================

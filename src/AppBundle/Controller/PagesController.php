@@ -231,7 +231,7 @@ class PagesController extends XtoolsController
         $pileId = $this->createPagePile($project, $pageTitles);
 
         return new RedirectResponse(
-            "https://tools.wmflabs.org/pagepile/api.php?id=$pileId&action=get_data&format=html&doit1"
+            "https://pagepile.toolforge.org/api.php?id=$pileId&action=get_data&format=html&doit1"
         );
     }
 
@@ -241,7 +241,7 @@ class PagesController extends XtoolsController
      * @param string[] $pageTitles
      * @return int The PagePile ID.
      * @throws HttpException
-     * @see https://tools.wmflabs.org/pagepile/
+     * @see https://pagepile.toolforge.org/
      * @codeCoverageIgnore
      */
     private function createPagePile(Project $project, array $pageTitles): int
@@ -249,7 +249,7 @@ class PagesController extends XtoolsController
         /** @var GuzzleHttp\Client $client */
         $client = $this->container->get('eight_points_guzzle.client.xtools');
 
-        $url = 'https://tools.wmflabs.org/pagepile/api.php';
+        $url = 'https://pagepile.toolforge.org/api.php';
 
         try {
             $res = $client->request('GET', $url, ['query' => [
