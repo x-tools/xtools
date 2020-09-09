@@ -94,6 +94,7 @@ parameters:
                 - 'OAuth CID: 429'
                 - 'OAuth CID: 905'
                 - 'OAuth CID: 919'
+                - 'OAuth CID: 1841'
             link: mw:PAWS
         Popups:
             regex: 'Wikipedia:Tools\/Navigation_popups|popups'
