@@ -51,7 +51,12 @@ parameters:
             contribs: true
             namespaces: [0, 2, 118]
         CropTool:
-            tags: ['OAuth CID: 593']
+            tags: 
+                - 'OAuth CID: 19'
+                - 'OAuth CID: 27'
+                - 'OAuth CID: 64'
+                - 'OAuth CID: 593'
+                - 'OAuth CID: 1784'
             link: Special:MyLanguage/Commons:CropTool
             namespaces: [6]
         Generic rollback:
