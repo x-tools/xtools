@@ -614,7 +614,7 @@ parameters:
             regex: '^Uploaded using Android Commons app$'
             link: Special:MyLanguage/Commons:Mobile_app
             namespaces: [6]
-        Commonsist:
+        Commonist:
             regex: '^commonist \d\.\d'
             link: Special:MyLanguage/Commons:Commonist
             namespaces: [6]
