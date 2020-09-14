@@ -51,7 +51,7 @@ parameters:
             contribs: true
             namespaces: [0, 2, 118]
         CropTool:
-            tags: 
+            tags:
                 - 'OAuth CID: 19'
                 - 'OAuth CID: 27'
                 - 'OAuth CID: 64'
@@ -65,6 +65,7 @@ parameters:
                 - huggle
                 - 'OAuth CID: 1352'
                 - STiki
+                - twinkle
             link: Special:MyLanguage/Project:Rollback
             revert: true
         Global rename:
@@ -119,6 +120,7 @@ parameters:
             tag_excludes:
                 - mw-rollback
                 - huggle
+                - twinkle
                 - 'OAuth CID: 1352'
                 - STiki
             link: Special:MyLanguage/Project:Undo
@@ -451,6 +453,7 @@ parameters:
             namespaces: [2, 3]
         Twinkle:
             regex: '(Wikipedia|WP):(TW|TWINKLE|Twinkle|FRIENDLY)'
+            tags: ['twinkle']
             link: Project:Twinkle
             revert: '^Reverted.*(WP:(TW|TWINKLE|Twinkle)|Wikipedia:Twinkle)'
         unblock-review:
@@ -552,6 +555,10 @@ parameters:
             regex: 'Desfeita a edição \d+ de \[\['
             link: Ajuda:Guia de edição/Reverter edições#Botão Desfazer
             label: 'Desfazer'
+    ro.wikipedia.org:
+        Twinkle:
+            regex: '\(\[\[WP:TW\|TW\]\]\)'
+            link: Wikipedia:Twinkle
     ru.wikipedia.org:
         Popups:
             regex: '\[\[ВП:NavPopUp\|всплывающих окон\]\]'
@@ -564,8 +571,12 @@ parameters:
         Twinkle:
             regex: ' \(\[\[WP:TW\|TW\]\]\)'
             link: Wikipedia:Twinkle
+    zh.wikipedia.org:
+        Twinkle:
+            tag: Twinkle
+            link: Wikipedia:Twinkle
 
-    # Non-wikipedia sites
+    # Multilingual sites
     www.wikidata.org:
         altLabels:
             regex: '\|altLabels\]\]'
