@@ -5,6 +5,7 @@
 			"Adrianbblk",
 			"Andreyyshore",
 			"MSClaudiu",
+			"NGC 54",
 			"WebSourceContentRO"
 		]
 	},
@@ -417,7 +418,7 @@
 	"tool-about": "Despre",
 	"tool-adminscore": "Scor admin",
 	"tool-adminscore-desc": "Scor ce indică gradul de pregătire al unui utilizator pentru funcția de administrator",
-	"tool-adminstats": "Statistici admini",
+	"tool-adminstats": "Statistici Admini",
 	"tool-adminstats-desc": "Arată statistici despre activitatea administratorilor",
 	"tool-articleinfo": "Istoric de pagină",
 	"tool-articleinfo-desc": "Obține diferite statistici despre istoricul unei pagini",
@@ -440,7 +441,7 @@
 	"tool-meta-desc": "Vedeți care XTools au fost cele mai populare în timp",
 	"tool-pages": "Pagini create",
 	"tool-pages-desc": "Obține paginile create de un utilizator",
-	"tool-patrollerstats": "Statistici Patrulator",
+	"tool-patrollerstats": "Statistici Patrulatori",
 	"tool-patrollerstats-desc": "Arată statistici ale acțiunilor patrulatorilor",
 	"tool-quote": "Citat aleatoriu",
 	"tool-quote-desc": "Primește citate de la Baza de date IRC",

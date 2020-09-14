@@ -2,6 +2,7 @@
 	"@metadata": {
 		"authors": [
 			"Abijeet Patro",
+			"Kiran Gopi",
 			"Nemo bis",
 			"Praveenp"
 		]
@@ -398,6 +399,7 @@
 	"tool-pages": "സൃഷ്ടിച്ച താളുകൾ",
 	"tool-pages-desc": "ഒരു ഉപയോക്താവ് സൃഷ്ടിച്ച താളുകൾ",
 	"tool-patrollerstats": "റോന്തുചുറ്റലിന്റെ സ്ഥിതിവിവരക്കണക്കുകൾ",
+	"tool-patrollerstats-desc": "റോന്തുചുറ്റലിന്റെ സ്ഥിതിവിവരകണക്കുകൾ കാണിക്കുക",
 	"tool-quote": "ഒരു ഉദ്ധരണി",
 	"tool-quote-desc": "ഐ.ആർ.സി. ഉദ്ധരണി ഡേറ്റാബേസിൽ നിന്നും ഉദ്ധരണികൾ എടുക്കുക",
 	"tool-rfx": "RfX വിശകലനം",
@@ -406,6 +408,8 @@
 	"tool-rfxvote-desc": "ഒരു ഉപയോക്താവിന്റെ RfX വോട്ടിടൽ ചരിത്രത്തിന്റെ വിശകലനം",
 	"tool-simpleeditcounter": "വേഗമേറിയ ലളിതമായ തിരുത്തെണ്ണൽ സൗകര്യം",
 	"tool-simpleeditcounter-desc": "അതിവേഗ ഉപയോക്തൃസംഭാവനാ വിശകലനം",
+	"tool-stewardstats": "സ്റ്റ്യൂവാർഡ് സ്ഥിതിവിവരകണക്കുകൾ",
+	"tool-stewardstats-desc": "സ്റ്റ്യൂവാർഡ് പ്രവൃത്തികളുടെ സ്ഥിതിവിവരക്കണക്കുകൾ കാണിക്കുക",
 	"tool-topedits": "കൂടുതൽ തിരുത്തുകൾ",
 	"tool-topedits-desc": "ഉപയോക്താവിന്റെ, നാമമേഖലയിലുള്ളതോ താളുകളിലുള്ളതോ ആയ കൂടുതൽ തിരുത്തുകൾ",
 	"top-edited-pages": "കൂടുതൽ തിരുത്തിയ താളുകൾ",
@@ -450,6 +454,7 @@
 	"web-chat": "ബന്ധിപ്പിക്കുക",
 	"wednesday": "ബുധൻ",
 	"wiki": "വിക്കി",
+	"wiki-set-change": "വിക്കി ഗണങ്ങളുടെ മാറ്റം",
 	"wikiproject": "വിക്കിപദ്ധതി",
 	"wikitext": "വിക്കിഎഴുത്ത്",
 	"with-summary": "ചുരുക്കം നൽകിയവ",
