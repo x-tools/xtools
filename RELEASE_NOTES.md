@@ -1,5 +1,14 @@
 # Release Notes #
 
+## 3.10.17 ##
+- AutoEdits (T262325, T217505, T262147): Updates to Twinkle definitions
+- AutoEdits (T250615): add TranslationAdder for en.wikisource
+- AutoEdits (T261085): Fix typo Commonsist → Commonist
+- AutoEdits (T262125): Add additional PAWS tag
+- AutoEdits (T262124): Add more CropTool tags
+- Fixes to Toolforge URLs.
+- Localization updates.
+
 ## 3.10.16 ##
 - UserRights (T256546): handle 'wikidata' alias when parsing InitialiseSettings
 - AutoEdits (T256167): Add ru entry for page moves
