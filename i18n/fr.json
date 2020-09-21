@@ -18,7 +18,7 @@
 			"Wladek92"
 		]
 	},
-	"abusefilter": "FiltreAbus",
+	"abusefilter": "Filtre anti-abus",
 	"accepted-formats": "Formats acceptés",
 	"account-age": "Âge du compte",
 	"account-age-desc": "depuis $2 jour{{PLURAL:$1||s}}",
