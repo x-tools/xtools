@@ -493,7 +493,7 @@ parameters:
             namespaces: [104]
     en.wiktionary.org:
         TranslationAdder:
-            regex: '\[\[WT:EDIT'
+            regex: '\[\[WT:EDIT\|Assisted'
             link: MediaWiki talk:Gadget-TranslationAdder.js          
     es.wikipedia.org:
         DisamAssist:
