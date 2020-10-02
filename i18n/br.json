@@ -4,7 +4,8 @@
 			"Abijeet Patro",
 			"Dishual",
 			"Fulup",
-			"Gwenn-Ael"
+			"Gwenn-Ael",
+			"Iriep"
 		]
 	},
 	"abusefilter": "AbuseFilter",
@@ -136,6 +137,7 @@
 	"error-articleinfo-api": "Ne c'haller ket adtapout an titouroù adwelet.",
 	"error-authorship-non-mainspace": "Ne c'haller kaout stadegoù tadelezh nemet evit pennadoù an esaouenn anvioù pennañ",
 	"error-authorship-unsupported-project": "$1 n'eo ket ur raktres skoret.",
+	"error-automation": "Neket aotreet implijout en un doare emgefreek etrefas implijader XTools. Implijit hon API klok e-plas: $1",
 	"error-login": "C'hwitet eo ar c'hevreañ ! Klaskit en-dro.",
 	"error-pagepile-too-large": "Ho tigarez re a bajennoù zo da ezporzhiañ war-zu PagePile. Gallout a reot krouiñ ur PagePile gant an dorn, pe klask digreskiñ an hollad disoc'hoù en ur dremen gant un egorenn anvioù arbennik pe gant ur prantad.",
 	"error-query-timeout": "Ho tigarez, kemeret ez eus bet re a amzer d'ober war-dro an ditour goulennet (termen $1 eilenn). Evit espern an danvezioù eo bet paouezet ar reked en un doare emgefreek.",

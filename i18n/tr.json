@@ -141,7 +141,7 @@
 	"edits-with-summaries": "Özet girilmiş değişiklikler",
 	"end": "Bitiş tarihi",
 	"error-articleinfo-api": "Düzeltme verileri alınamıyor.",
-	"error-authorship-non-mainspace": "Yazarlık istatistikleri yalnızca ana makaleler için geçerlidir.",
+	"error-authorship-non-mainspace": "Yazarlık istatistikleri yalnızca ana maddeler için geçerlidir.",
 	"error-authorship-unsupported-project": "$1 desteklenen bir proje değil.",
 	"error-automation": "XTools kullanıcı arayüzünü kazımak için otomasyon kullanılmasına izin verilmez. Lütfen bunun yerine kapsamlı API'mızı kullanın: $1",
 	"error-denied": "XTools'a erişiminiz, açıkça suistimal veya yıkıcı otomasyon nedeniyle engellendi. Lütfen $1 ile iletişime geçin",
