@@ -112,7 +112,9 @@ class Page extends Model
         $info = $this->getPageInfo();
         $title = $info['title'] ?? $this->unnormalizedPageName;
         $nsName = $this->getNamespaceName();
-        return str_replace($nsName . ':', '', $title);
+        return $nsName
+            ? str_replace($nsName . ':', '', $title)
+            : $title;
     }
 
     /**

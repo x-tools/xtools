@@ -108,7 +108,7 @@ class PageTest extends TestAdapter
             ->method('getPageInfo')
             ->willReturn([
                 'pageid' => '42',
-                'fullurl' => 'https://example.org/User:Test',
+                'fullurl' => 'https://example.org/User:Test:123',
                 'watchers' => 5000,
                 'ns' => 2,
                 'length' => 300,
@@ -116,17 +116,17 @@ class PageTest extends TestAdapter
                     'wikibase_item' => 'Q95',
                 ],
             ]);
-        $page = new Page($project, 'User:Test');
+        $page = new Page($project, 'User:Test:123');
         $page->setRepository($pageRepo);
 
         static::assertEquals(42, $page->getId());
-        static::assertEquals('https://example.org/User:Test', $page->getUrl());
+        static::assertEquals('https://example.org/User:Test:123', $page->getUrl());
         static::assertEquals(5000, $page->getWatchers());
         static::assertEquals(300, $page->getLength());
         static::assertEquals(2, $page->getNamespace());
         static::assertEquals('User', $page->getNamespaceName());
         static::assertEquals('Q95', $page->getWikidataId());
-        static::assertEquals('Test', $page->getTitleWithoutNamespace());
+        static::assertEquals('Test:123', $page->getTitleWithoutNamespace());
     }
 
     /**
