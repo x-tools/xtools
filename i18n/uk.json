@@ -2,6 +2,7 @@
 	"@metadata": {
 		"authors": [
 			"Abijeet Patro",
+			"Andriy.v",
 			"Avatar6",
 			"Gzhegozh",
 			"Movses",
@@ -336,7 +337,7 @@
 	"powered-by": "Підтримується $1",
 	"prev": "Попер.",
 	"priority": "Пріоритет",
-	"project": "Проект",
+	"project": "Проєкт",
 	"projects": "Проекти",
 	"prose": "Проза",
 	"protect": "Захист",
