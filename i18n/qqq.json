@@ -362,7 +362,7 @@
 	"recent-activity-desc": "Further description for recent-activity.  $1 is the unformatted number, $2 is a formatted number",
 	"recreated": "Indicates that the page has been recreated after deletion. This message already appears alongside the text 'deleted'.",
 	"redirect": "Indicates that a wiki page redirects to another page (short word).\n{{Identical|Redirect}}",
-	"redirects": "Wiki pages that redirect to other pages (short word)\n{{Identical|Redirects}}",
+	"redirects": "Wiki pages that redirect to other pages (short word)\n{{Identical|Redirect}}",
 	"redirfilter-all": "Form option to show all redirect pages in the results.",
 	"redirfilter-noredirects": "Form option to exclude any redirect pages from the results.",
 	"redirfilter-onlyredirects": "Form option to show only redirect pages in the results.",
