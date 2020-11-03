@@ -356,7 +356,7 @@ class EditCounter extends UserRights
                     $this->longestBlockSeconds = $timeSinceLastBlock;
 
                     // Reset the last block, as it has now been accounted for.
-                    $lastBlock = null;
+                    $lastBlock = [null, null];
                 }
             } elseif ('reblock' === $block['log_action'] && -1 !== $lastBlock[1]) {
                 // The last block was modified. So we will adjust $lastBlock to include
