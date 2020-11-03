@@ -58,16 +58,16 @@ class User extends Model
     /**
      * Get the user's ID on the given project.
      * @param Project $project
-     * @return int
+     * @return int|null
      */
-    public function getId(Project $project): int
+    public function getId(Project $project): ?int
     {
         $ret = $this->getRepository()->getIdAndRegistration(
             $project->getDatabaseName(),
             $this->getUsername()
         );
 
-        return (int)$ret['userId'];
+        return $ret ? (int)$ret['userId'] : null;
     }
 
     /**
