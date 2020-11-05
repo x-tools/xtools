@@ -436,7 +436,7 @@
 	"tool-authorship-desc": "Attribution de paternité, mesurée en nombre de caractères, espaces exclus.",
 	"tool-autoedits": "Modifications automatisées",
 	"tool-autoedits-desc": "Analyse des contributions semi-automatiques et non automatiques.",
-	"tool-blame": "Responsabilité",
+	"tool-blame": "Blame",
 	"tool-blame-desc": "Recherche des modifications qui ont ajouté le wikitexte indiqué",
 	"tool-categoryedits": "Modifications de catégorie",
 	"tool-categoryedits-desc": "Analyse des contributions faites à des catégories spécifiques",
