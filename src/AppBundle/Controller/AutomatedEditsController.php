@@ -104,8 +104,9 @@ class AutomatedEditsController extends XtoolsController
     private function setupAutoEdits(): void
     {
         $tool = $this->request->query->get('tool', null);
+        $useSandbox = (bool)$this->request->query->get('usesandbox', false);
 
-        $autoEditsRepo = new AutoEditsRepository();
+        $autoEditsRepo = new AutoEditsRepository($useSandbox);
         $autoEditsRepo->setContainer($this->container);
 
         // Validate tool.

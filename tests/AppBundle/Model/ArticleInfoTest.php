@@ -323,7 +323,7 @@ class ArticleInfoTest extends TestAdapter
     private function setupData(): array
     {
         // ArticleInfo::updateToolCounts relies on there being entries in
-        // semi_automated.yml for the project the edits were made on.
+        // the AutoEdits config for the project the edits were made on.
         /** @var PageRepository|\PHPUnit_Framework_MockObject_MockObject $pageRepo */
         $projectRepo = $this->getMock(ProjectRepository::class);
         $projectRepo->expects($this->once())

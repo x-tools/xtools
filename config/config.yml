@@ -3,7 +3,6 @@ imports:
     - { resource: rfx_analysis.yml, ignore_errors: true }
     - { resource: security.yml }
     - { resource: services.yml }
-    - { resource: semi_automated.yml }
     - { resource: tools.yml }
     - { resource: version.yml }
     - { resource: table_map.yml, ignore_errors: true }
