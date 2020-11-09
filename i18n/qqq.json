@@ -412,7 +412,7 @@
 	"summary": "Title for statistics summary\n{{Identical|Summary}}",
 	"sunday": "{{Identical|Sunday}}",
 	"support": "Exact term for support on vote pages\n{{Identical|Support}}",
-	"tagged": "In the context that something is marked, eg. a minor edit is tagged (m)\n{{Identical|Tagged}}",
+	"tagged": "In the context that something is marked, eg. a minor edit is tagged (m)",
 	"talk": "Name of 'talk' or 'discussion' pages of a wiki. This message should be short.\n{{Identical|Talk}}",
 	"templates": "Label for the templates or number of templates that are on a page.\n{{Identical|Template}}",
 	"text": "{{Identical|Text}}",
