@@ -8,6 +8,8 @@ declare(strict_types = 1);
 namespace AppBundle\Helper;
 
 use AppBundle\Model\Project;
+use DateInterval;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -21,8 +23,11 @@ class AutomatedEditsHelper
     /** @var array The list of tool names and their regexes/tags. */
     protected $tools = [];
 
-    /** @var ContainerInterface The service container. */
+    /** @var ContainerInterface */
     private $container;
+
+    /** @var CacheItemPoolInterface */
+    protected $cache;
 
     /**
      * AutomatedEditsHelper constructor.
@@ -31,6 +36,7 @@ class AutomatedEditsHelper
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+        $this->cache = $container->get('cache.app');
     }
 
     /**
@@ -66,12 +72,41 @@ class AutomatedEditsHelper
     }
 
     /**
+     * Fetch the config from https://meta.wikimedia.org/wiki/MediaWiki:XTools-AutoEdits.json
+     * @param bool $useSandbox Use the sandbox version of the config, located at MediaWiki:XTools-AutoEdits.json/sandbox
+     * @return array
+     */
+    public function getConfig(bool $useSandbox = false): array
+    {
+        $cacheKey = 'autoedits_config';
+        if (!$useSandbox && $this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $title = 'MediaWiki:XTools-AutoEdits.json' . ($useSandbox ? '/sandbox' : '');
+        $ret = json_decode(file_get_contents(
+            "https://meta.wikimedia.org/w/index.php?action=raw&ctype=application/json&title=$title"
+        ), true);
+
+        if (!$useSandbox) {
+            $cacheItem = $this->cache
+                ->getItem($cacheKey)
+                ->set($ret)
+                ->expiresAfter(new DateInterval('PT20M'));
+            $this->cache->save($cacheItem);
+        }
+
+        return $ret;
+    }
+
+    /**
      * Get list of automated tools and their associated info for the given project.
      * This defaults to the 'default_project' if entries for the given project are not found.
      * @param Project $project
+     * @param bool $useSandbox Whether to use the /sandbox version for testing (also bypasses caching).
      * @return array Each tool with the tool name as the key and 'link', 'regex' and/or 'tag' as the subarray keys.
      */
-    public function getTools(Project $project): array
+    public function getTools(Project $project, bool $useSandbox = false): array
     {
         $projectDomain = $project->getDomain();
 
@@ -80,7 +115,7 @@ class AutomatedEditsHelper
         }
 
         // Load the semi-automated edit types.
-        $tools = $this->container->getParameter('automated_tools');
+        $tools = $this->getConfig($useSandbox);
 
         if (isset($tools[$projectDomain])) {
             $localRules = $tools[$projectDomain];

@@ -32,7 +32,6 @@ class AutomatedEditsTest extends TestAdapter
         $client = static::createClient();
         $container = $client->getContainer();
         $this->aeh = new AutomatedEditsHelper($container);
-        $this->cache = $container->get('cache.app');
     }
 
     /**

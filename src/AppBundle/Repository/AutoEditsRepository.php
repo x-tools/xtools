@@ -20,6 +20,22 @@ class AutoEditsRepository extends UserRepository
     /** @var array List of automated tools, used for fetching the tool list and filtering it. */
     private $aeTools;
 
+    /** @var bool Whether to use the /sandbox version of the config, bypassing caching. */
+    private $useSandbox;
+
+    /** @var array Process cache for tags/IDs. */
+    private $tags;
+
+    /**
+     * AutoEditsRepository constructor. Used solely to set $useSandbox (from AutomatedEditsController).
+     * @param bool $useSandbox
+     */
+    public function __construct(bool $useSandbox = false)
+    {
+        parent::__construct();
+        $this->useSandbox = $useSandbox;
+    }
+
     /**
      * Method to give the repository access to the AutomatedEditsHelper and fetch the list of semi-automated tools.
      * @param Project $project
@@ -31,7 +47,7 @@ class AutoEditsRepository extends UserRepository
         if (!isset($this->aeTools)) {
             $this->aeTools = $this->container
                 ->get('app.automated_edits_helper')
-                ->getTools($project);
+                ->getTools($project, $this->useSandbox);
         }
 
         if ('all' !== $namespace) {
@@ -50,6 +66,19 @@ class AutoEditsRepository extends UserRepository
     }
 
     /**
+     * Overrides Repository::setCache(), and will not call the parent (which sets the cache) if using the sandbox.
+     * @inheritDoc
+     */
+    public function setCache(string $cacheKey, $value, $duration = 'PT20M')
+    {
+        if ($this->useSandbox) {
+            return $value;
+        }
+
+        return parent::setCache($cacheKey, $value, $duration);
+    }
+
+    /**
      * Get the number of edits this user made using semi-automated tools.
      * @param Project $project
      * @param User $user
@@ -61,7 +90,7 @@ class AutoEditsRepository extends UserRepository
     public function countAutomatedEdits(Project $project, User $user, $namespace = 'all', $start = '', $end = ''): int
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_autoeditcount');
-        if ($this->cache->hasItem($cacheKey)) {
+        if (!$this->useSandbox && $this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
@@ -131,7 +160,7 @@ class AutoEditsRepository extends UserRepository
         int $offset = 0
     ): array {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_nonautoedits');
-        if ($this->cache->hasItem($cacheKey)) {
+        if (!$this->useSandbox && $this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
@@ -186,7 +215,7 @@ class AutoEditsRepository extends UserRepository
      * @param string|int $namespace Namespace ID or 'all'.
      * @param string $start Start date in a format accepted by strtotime().
      * @param string $end End date in a format accepted by strtotime().
-     * @param string|null $tool Only get edits made with this tool. Must match the keys in semi_automated.yml.
+     * @param string|null $tool Only get edits made with this tool. Must match the keys in the AutoEdits config.
      * @param int $offset Used for pagination, offset results by N edits.
      * @return string[] Result of query, with columns 'page_title', 'page_namespace', 'rev_id', 'timestamp', 'minor',
      *   'length', 'length_change', 'comment'.
@@ -201,7 +230,7 @@ class AutoEditsRepository extends UserRepository
         int $offset = 0
     ): array {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_autoedits');
-        if ($this->cache->hasItem($cacheKey)) {
+        if (!$this->useSandbox && $this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
@@ -278,19 +307,14 @@ class AutoEditsRepository extends UserRepository
      *                      ],
      *                  ]
      */
-    public function getToolCounts(
-        Project $project,
-        User $user,
-        $namespace = 'all',
-        $start = '',
-        $end = ''
-    ): array {
+    public function getToolCounts(Project $project, User $user, $namespace = 'all', $start = '', $end = ''): array
+    {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_autotoolcounts');
-        if ($this->cache->hasItem($cacheKey)) {
+        if (!$this->useSandbox && $this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $sql = $this->getAutomatedCountsSql($project, $user, $namespace, $start, $end);
+        $sql = $this->getAutomatedCountsSql($project, $namespace, $start, $end);
         $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $start, $end);
 
         $tools = $this->getTools($project, $namespace);
@@ -320,16 +344,15 @@ class AutoEditsRepository extends UserRepository
     }
 
     /**
-     * Get SQL for getting counts of known automated tools used by the given user.
+     * Get SQL for getting counts of known automated tools used by the user.
      * @see self::getAutomatedCounts()
      * @param Project $project
-     * @param User $user
      * @param string|int $namespace Namespace ID or 'all'.
      * @param string $start Start date in a format accepted by strtotime()
      * @param string $end End date in a format accepted by strtotime()
      * @return string The SQL.
      */
-    private function getAutomatedCountsSql(Project $project, User $user, $namespace, $start, $end): string
+    private function getAutomatedCountsSql(Project $project, $namespace, $start, $end): string
     {
         [$condBegin, $condEnd] = $this->getRevTimestampConditions($start, $end);
 
@@ -375,7 +398,7 @@ class AutoEditsRepository extends UserRepository
      * Get some of the inner SQL for self::getAutomatedCountsSql().
      * @param Project $project
      * @param string $toolName
-     * @param string[] $values Values as defined in semi_automated.yml
+     * @param string[] $values Values as defined in the AutoEdits config.
      * @return string[] [Equality clause, JOIN clause]
      */
     private function getInnerAutomatedCountsSql(Project $project, string $toolName, array $values): array
@@ -470,9 +493,14 @@ class AutoEditsRepository extends UserRepository
      */
     public function getTags(Project $project): array
     {
-        // Set up cache.
+        // Use process cache; ensures we don't needlessly re-query for tag IDs
+        // during the same request when using the ?usesandbox=1 option.
+        if (isset($this->tags)) {
+            return $this->tags;
+        }
+
         $cacheKey = $this->getCacheKey(func_get_args(), 'ae_tag_ids');
-        if ($this->cache->hasItem($cacheKey)) {
+        if (!$this->useSandbox && $this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
@@ -495,10 +523,10 @@ class AutoEditsRepository extends UserRepository
         $tagDefTable = $project->getTableName('change_tag_def');
         $sql = "SELECT ctd_name, ctd_id FROM $tagDefTable
                 WHERE ctd_name IN ($tags)";
-        $result = $this->executeProjectsQuery($sql)->fetchAll(\PDO::FETCH_KEY_PAIR);
+        $this->tags = $this->executeProjectsQuery($sql)->fetchAll(\PDO::FETCH_KEY_PAIR);
 
         // Cache and return.
-        return $this->setCache($cacheKey, $result);
+        return $this->setCache($cacheKey, $this->tags);
     }
 
     /**
