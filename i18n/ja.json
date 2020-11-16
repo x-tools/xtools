@@ -54,7 +54,6 @@
 	"auto-edits-counts-desc": "一部のツールは重複する可能性があります（例えば、リダイレクトの版に巻き戻す操作は「巻き戻し」と「リダイレクト」の両方に計上されます）。したがって、ツール別の編集の合計は$1にある数値と異なる可能性があります。",
 	"auto-edits-counts-desc-grand-total": "要約",
 	"auto-edits-request": "新しい（半）自動ツールの追加を要求する",
-	"auto-edits-request-name": "ツール",
 	"auto-edits-tool-filter-desc": "特定のツールを使用した編集のみを表示する。",
 	"auto-edits-unknown-tool": "「$1」というツールはありません",
 	"auto-tool-edits": "$1 編集",
