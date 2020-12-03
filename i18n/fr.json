@@ -3,6 +3,7 @@
 		"authors": [
 			"Abijeet Patro",
 			"Derugon",
+			"Florian COLLIN",
 			"Framawiki",
 			"Golmore",
 			"Gomoko",
@@ -75,7 +76,7 @@
 	"blame-as-of": "Depuis",
 	"blame-as-of-desc": "L’utiliser pour effectuer une recherche de blâme sur des versions plus anciennes de l’article.",
 	"blame-query-desc": "La requête doit inclure le wikitexte souligné.",
-	"block": "Blocages",
+	"block": "Blocage",
 	"block-current": "Blocage actuel",
 	"block-log": "Journal des blocages",
 	"block-longest": "Plus long blocage",
