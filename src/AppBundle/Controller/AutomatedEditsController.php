@@ -109,6 +109,12 @@ class AutomatedEditsController extends XtoolsController
         $autoEditsRepo = new AutoEditsRepository($useSandbox);
         $autoEditsRepo->setContainer($this->container);
 
+        $misconfigured = $autoEditsRepo->getInvalidTools($this->project);
+        foreach ($misconfigured as $tool) {
+            $helpLink = "https://w.wiki/ppr";
+            $this->addFlashMessage('warning', 'auto-edits-misconfiguration', [$tool, $helpLink]);
+        }
+
         // Validate tool.
         // FIXME: instead of redirecting to index page, show result page listing all tools for that project,
         //  clickable to show edits by the user, etc.
