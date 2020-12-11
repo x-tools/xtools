@@ -133,8 +133,10 @@ class AutomatedEditsHelper
             $localRules
         );
 
-        // Finally, populate the 'label' with the tool name, if a label doesn't already exist.
-        array_walk($this->tools[$projectDomain], function (&$data, $tool): void {
+        // Once last walk through for some tidying up and validation.
+        $invalid = [];
+        array_walk($this->tools[$projectDomain], function (&$data, $tool) use (&$invalid): void {
+            // Populate the 'label' with the tool name, if a label doesn't already exist.
             $data['label'] = $data['label'] ?? $tool;
 
             // 'namespaces' should be an array of ints.
@@ -150,9 +152,18 @@ class AutomatedEditsHelper
                 $data['tags'][] = $data['tag'];
                 unset($data['tag']);
             }
+
+            // If neither a tag or regex is given, it's invalid.
+            if (empty($data['tags']) && empty($data['regex'])) {
+                $invalid[] = $tool;
+            }
         });
 
         uksort($this->tools[$projectDomain], 'strcasecmp');
+
+        if ($invalid) {
+            $this->tools[$projectDomain]['invalid'] = $invalid;
+        }
 
         return $this->tools[$projectDomain];
     }

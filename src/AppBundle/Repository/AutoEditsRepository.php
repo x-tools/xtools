@@ -66,6 +66,19 @@ class AutoEditsRepository extends UserRepository
     }
 
     /**
+     * Get tools that were misconfigured, also removing them from $this->aeTools.
+     * @param Project $project
+     * @return string[] Labels for the invalid tools.
+     */
+    public function getInvalidTools(Project $project): array
+    {
+        $tools = $this->getTools($project);
+        $invalidTools = $tools['invalid'] ?? [];
+        unset($this->aeTools['invalid']);
+        return $invalidTools;
+    }
+
+    /**
      * Overrides Repository::setCache(), and will not call the parent (which sets the cache) if using the sandbox.
      * @inheritDoc
      */

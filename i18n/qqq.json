@@ -58,6 +58,7 @@
 	"auto-edits-bot": "Message shown at the top of the AutoEdits tool for users who are a bot, explaining that all edits made by the bot may be automated, even if XTools says they are not.",
 	"auto-edits-counts-desc": "In the AutoEdits tool, this message explains how the totals of individual tools (shown in the '(semi-)automated edits' section) may be different from the total shown in the 'Summary' section. $1 is a link to the 'Summary' section with the message 'auto-edits-counts-grand-total' as the link text.",
 	"auto-edits-counts-desc-grand-total": "The text 'grand total'. This is used as the text for the link in the 'auto-edits-counts-desc' message.",
+	"auto-edits-misconfiguration": "Warning shown when the AutoEdits configuration has errors. $1 is the name of the tool that is misconfigured, and $2 is a short URL to the venue where it can be fixed.",
 	"auto-edits-request": "Text of for a link to request that a new (semi-)automated tool be added to XTools.",
 	"auto-edits-tool-filter-desc": "Tooltip for dropdown in AutoEdits that lets you filter results by a given tool.",
 	"auto-edits-unknown-tool": "Error message shown when the requested tool does not exist.",
