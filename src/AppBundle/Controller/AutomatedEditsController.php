@@ -106,6 +106,11 @@ class AutomatedEditsController extends XtoolsController
         $tool = $this->request->query->get('tool', null);
         $useSandbox = (bool)$this->request->query->get('usesandbox', false);
 
+        if ($useSandbox && !$this->request->getSession()->get('logged_in_user')) {
+            $this->addFlashMessage('danger', 'auto-edits-logged-out');
+            $useSandbox = false;
+        }
+
         $autoEditsRepo = new AutoEditsRepository($useSandbox);
         $autoEditsRepo->setContainer($this->container);
 

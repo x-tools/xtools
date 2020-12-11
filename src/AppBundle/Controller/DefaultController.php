@@ -156,6 +156,9 @@ class DefaultController extends XtoolsController
         $ident = $client->identify($accessToken);
         $session->set('logged_in_user', $ident);
 
+        // Store reference to the client.
+        $session->set('oauth_client', $this->oauthClient);
+
         // Send back to homepage.
         return $this->redirectToRoute('homepage');
     }

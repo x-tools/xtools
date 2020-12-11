@@ -9,6 +9,7 @@ namespace AppBundle\Helper;
 
 use AppBundle\Model\Project;
 use DateInterval;
+use MediaWiki\OAuthClient\Client;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -83,10 +84,23 @@ class AutomatedEditsHelper
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $title = 'MediaWiki:XTools-AutoEdits.json' . ($useSandbox ? '/sandbox' : '');
-        $ret = json_decode(file_get_contents(
-            "https://meta.wikimedia.org/w/index.php?action=raw&ctype=application/json&title=$title"
-        ), true);
+        $session = $this->container->get('session');
+        $uri = 'https://meta.wikimedia.org/w/index.php?action=raw&ctype=application/json&title=' .
+            'MediaWiki:XTools-AutoEdits.json' . ($useSandbox ? '/sandbox' : '');
+
+        if ($useSandbox && $session->get('logged_in_user')) {
+            // Request via OAuth to get around server-side caching.
+            /** @var Client $client */
+            $client = $this->container->get('session')->get('oauth_client');
+            $resp = $client->makeOAuthCall(
+                $this->container->get('session')->get('oauth_access_token'),
+                $uri
+            );
+        } else {
+            $resp = file_get_contents($uri);
+        }
+
+        $ret = json_decode($resp, true);
 
         if (!$useSandbox) {
             $cacheItem = $this->cache
