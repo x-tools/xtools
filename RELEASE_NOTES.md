@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.10.18 ##
+- AutoEdits (T262631): Move configuration to on-wiki JSON page.
+- TopEdits: Fix bug with mainspace pages containing a colon in the title.
+- Localization updates.
+
 ## 3.10.17 ##
 - AutoEdits (T262325, T217505, T262147): Updates to Twinkle definitions
 - AutoEdits (T250615): add TranslationAdder for en.wikisource
