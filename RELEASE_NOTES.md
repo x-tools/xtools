@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.10.19 ##
+- AutoEdits: Make the link to request new tools go to the main talk page
+  instead of the preloaded form.
+
 ## 3.10.18 ##
 - AutoEdits (T262631): Move configuration to on-wiki JSON page.
 - TopEdits: Fix bug with mainspace pages containing a colon in the title.
