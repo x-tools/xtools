@@ -50,6 +50,7 @@
 	"auto-edits-bot": "Denna användare är en bot. Alla redigeringar kan vara automatiserade. Statistiken som visas nedan baseras på redigeringar som har gjorts med kända verktyg.",
 	"auto-edits-counts-desc": "Användning av vissa verktyg överlappas (d.v.s. att rulla tillbaka till en sidversion som är en omdirigering räknas som en tillbakarullning och en omdirigering), så totalsumman av redigeringar som görs med varje verktyg kan skilja från $1.",
 	"auto-edits-counts-desc-grand-total": "totalsumma",
+	"auto-edits-logged-out": "Du måste logga in för att använda konfigurationen för sandlådan. Produktionskonfigurationen används istället.",
 	"auto-edits-request": "Begär att ett nytt (halv)automatiserat verktyg läggs till",
 	"auto-edits-tool-filter-desc": "Visa endast redigeringar med det angivna verktyget.",
 	"auto-edits-unknown-tool": "Det finns inget känt verktyg med namnet: $1",

@@ -2,6 +2,7 @@
 	"@metadata": {
 		"authors": [
 			"Abijeet Patro",
+			"Daud I.F. Argana",
 			"Hidayatsrf",
 			"Naufal06",
 			"Pebaryan",
@@ -47,9 +48,11 @@
 	"auto-edits-bot": "Pengguna ini adalah sebuah bot. Semua suntingannya mungkin diotomatisasi. Statistik yang ditampilkan di sini dibuat berdasarkan suntingan yang dibuat menggunakan perkakas yang sudah dikenali.",
 	"auto-edits-counts-desc": "Beberapa penggunaan perkakas bertumpang tindih (misal mengembalikan ke suatu revisi yang merupakan sebuah pengalihan dihitung sebagai Rollback dan juga sebagai Redirect), jadi jumlah suntingan yang dibuat menggunakan masing-masing perkakas mungkin berbeda dari $1.",
 	"auto-edits-counts-desc-grand-total": "total akhir",
+	"auto-edits-logged-out": "Anda harus masuk log untuk menggunakan konfigurasi kotak pasir. Ini menggunakan konfigurasi produksi.",
 	"auto-edits-request": "Buat permintaan penambahan perkakas (semi-)otomatis baru",
 	"auto-edits-tool-filter-desc": "Menampilkan hanya suntingan yang menggunakan perkakas terpilih.",
 	"auto-edits-unknown-tool": "Tidak ada alat yang dikenali bernama: $1",
+	"auto-edits-misconfiguration": "Perkakas \"$1\" salah dikonfigurasi. Tolong minta bantuan pengurus di $2",
 	"auto-tool-edits": "$1 suntingan",
 	"automatic": "Otomatis",
 	"average-change-per-page": "Rata-rata perubahan per halaman",
