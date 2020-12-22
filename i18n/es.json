@@ -109,7 +109,7 @@
 	"date-from": "De: $1",
 	"date-range": "$1-$2",
 	"date-range-outside-revisions": "No se encontró ninguna revisión en el intervalo de fechas indicado",
-	"date-range-too-wide": "El rango de fechas solicitado superó el máximo de $<span translate=\"no\" class=\"notranslate\">1</span> {{PLURAL:$1|día|días}} por lo que la operación fue interrumpida.",
+	"date-range-too-wide": "El intervalo de fechas solicitado excede el valor máximo de $1 {{PLURAL:$1|día|días}}, por lo que se ha truncado.",
 	"date-to": "A: $1",
 	"delete": "Borrar",
 	"deleted": "Borrado",

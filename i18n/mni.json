@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"Afingba Mangang",
 			"Awangba Mangang"
 		]
 	},
@@ -236,6 +237,7 @@
 	"project": "ꯊꯧꯔꯥꯡ",
 	"projects": "ꯊꯧꯔꯥꯡꯁꯤꯡ",
 	"protect": "ꯉꯥꯛꯊꯣꯛꯂꯕꯥ",
+	"rank": "ꯊꯥꯛ",
 	"re-block": "(ꯑꯃꯨ)ꯊꯤꯡꯕ",
 	"re-blocks": "(ꯑꯃꯨ)ꯊꯤꯡꯂꯤꯕꯁꯤꯡ",
 	"re-protect": "(ꯑꯃꯨ)ꯉꯥꯛꯊꯣꯛꯄꯤꯕ",
@@ -263,6 +265,11 @@
 	"see-full-statistics": "ꯑꯀꯥ ꯑꯀꯨꯝ ꯄꯨꯂꯞꯇꯨ ꯌꯦꯡꯉꯎ",
 	"show": "ꯎꯨꯌꯂꯨ",
 	"size": "ꯆꯥꯎꯕꯒꯤ ꯆꯥꯡ",
+	"size-gigabytes": "ꯖꯤꯕꯤ $1",
+	"size-kilobytes": "ꯀꯦꯕꯤ $1",
+	"size-megabytes": "ꯑꯦꯝꯕꯤ $1",
+	"size-over-time": "ꯃꯇꯝ ꯂꯥꯟꯊꯣꯛꯂꯒ ꯍꯧꯕ",
+	"size-terabytes": "ꯇꯤꯕꯤ $1",
 	"start": "ꯍꯧꯕꯒꯤ ꯆꯩꯆꯠ",
 	"submit": "ꯄꯤꯁꯤꯟꯕ",
 	"summary": "ꯇꯦꯟꯇꯛꯄ ꯋꯥꯔꯦꯡ",
