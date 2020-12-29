@@ -60,7 +60,7 @@
 	"auto-edits-request": "Demande d’ajout d’un nouvel outil (semi-)automatisé",
 	"auto-edits-tool-filter-desc": "Afficher seulement les modifications réalisées avec l’outil donné.",
 	"auto-edits-unknown-tool": "Pas d’outil connu ayant pour nom : $1",
-	"auto-edits-misconfiguration": "L’outil « $1 » est mal configuré. Veuillez demander assistance à l’administrateur sur $2",
+	"auto-edits-misconfiguration": "L’outil « $1 » est mal configuré. Veuillez demander assistance à l’administrateur sur $2.",
 	"auto-tool-edits": "$1 modifications",
 	"automatic": "Automatique",
 	"average-change-per-page": "Nombre moyen de modifications par page",
