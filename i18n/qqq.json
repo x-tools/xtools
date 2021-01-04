@@ -238,7 +238,7 @@
 	"major-edits": "Label for number of non-minor edits.",
 	"major-edits-with-summaries": "Value for the number of major edits that have edit summaries.",
 	"manual-edits": "Label for number of manual edits made to an article, e.g. without the help of semi-automated tools like Huggle.",
-	"max-text-added": "Maximun text added by a user, short word or abbreviation for Max. (if possible)",
+	"max-text-added": "Maximum text added by a user, short word or abbreviation for Max. (if possible)",
 	"max-text-deleted": "Maximum text deleted by a user, short word or abbreviation for Max. (if possible)",
 	"memory-usage": "Text showing how much memory the tool took to execute. $1 is the formatted number of megabytes to display, $2 is the raw number to be used with <code><nowiki>{{PLURAL:$2|</nowiki>''one''<nowiki>|</nowiki>''others''<nowiki>}}</nowiki></code>.",
 	"merge": "Name of MediaWiki log action to merge the histories of two pages.\n{{Identical|Merge}}",
