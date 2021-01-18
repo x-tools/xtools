@@ -221,7 +221,7 @@
 	"manual-edits": "Ročna urejanja",
 	"max-text-added": "Največje dodano besedilo",
 	"max-text-deleted": "Največje izbrisano besedilo",
-	"memory-usage": "Za izvedbo uporabljenega $1 {{PLURAL:$2|megabajt|megabajta|megabajte|megabajtov}} spomina.",
+	"memory-usage": "Za izvedbo uporabljenega $1 {{PLURAL:$2|megabajt|megabajta|megabajte|megabajtov}} pomnilnika.",
 	"merge": "Združi",
 	"minor": "Manjše",
 	"minor-edits": "Manjša urejanja",
