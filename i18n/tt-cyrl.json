@@ -1,6 +1,15 @@
 {
+	"@metadata": {
+		"authors": [
+			"Ерней",
+			"Ильнар"
+		]
+	},
+	"article": "Мәкалә",
 	"basic-information": "Төп мәгълүмат",
-	"download-label": "Йөкләү",
+	"download-label": "Күчереп алу",
+	"hide": "Яшерү",
+	"none": "Һични",
 	"performer": "Башкаручы",
 	"size-gigabytes": "$1 Гб",
 	"size-kilobytes": "$1 Кб",

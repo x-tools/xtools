@@ -1,4 +1,7 @@
 {
+	"@metadata": {
+		"authors": []
+	},
 	"feedback": "Opinion",
 	"performer": "Esecutor",
 	"size-gigabytes": "$1 GByte",

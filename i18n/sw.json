@@ -1,10 +1,20 @@
 {
+	"@metadata": {
+		"authors": [
+			"Rance",
+			"Yasen igra"
+		]
+	},
 	"all": "yoyote",
 	"all-languages": "Lugha zote",
 	"api-error": "Kulikuwa na tatizo kuchukua data kutoka API",
+	"basic-information": "Taarifa za msingi",
 	"bot": "Roboti za wavuti",
 	"help-translate": "Saidia tafsiri",
 	"history": "Historia",
+	"num-days": "{{PLURAL:$1|siku}}",
+	"num-weeks": "{{PLURAL:$1|wiki}}",
+	"num-years": "{{PLURAL:$1|mwaka|miaka}}",
 	"page-title": "Jina la ukurasa",
 	"pager-newer-n": "{{PLURAL:$1|1 ya karibu zaidi|$1 ya karibu zaidi}}",
 	"pager-older-n": "{{PLURAL:$1|$1 ya zamani zaidi}}",

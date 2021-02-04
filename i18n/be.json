@@ -1,6 +1,14 @@
 {
+	"@metadata": {
+		"authors": [
+			"Artsiom91",
+			"Kareyac"
+		]
+	},
+	"admins": "Адміністратары",
 	"all": "Усё",
 	"all-languages": "Усе мовы",
+	"all-projects": "Усе праекты",
 	"api-error": "Памылка пры запыце $1",
 	"basic-information": "Асноўная інфармацыя",
 	"bot": "Бот",
@@ -14,14 +22,17 @@
 	"feedback": "Зваротная сувязь",
 	"help-translate": "Дапамажыце перакласці",
 	"history": "Гісторыя",
+	"json": "JSON",
 	"namespace": "Прастора назваў",
 	"other": "Іншае",
+	"page-size": "Памер старонкі",
 	"page-title": "Назва старонкі",
 	"pager-newer-n": "{{PLURAL:$1|1 навейшая|$1 навейшыя}}",
 	"pager-older-n": "{{PLURAL:$1|1 старэйшая|$1 старэйшыя}}",
 	"pages": "Старонкі",
 	"performer": "Выканаўца",
 	"project": "Праект",
+	"redirect": "Перасылка",
 	"report-issue": "Паведаміць аб праблеме",
 	"size": "Памер",
 	"translation-credits": "Пераклады зробленыя на сайтах $1 і $2",

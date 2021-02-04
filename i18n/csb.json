@@ -1,4 +1,10 @@
 {
+	"@metadata": {
+		"authors": [
+			"Kaszeba"
+		]
+	},
 	"feedback": "Òpinije",
-	"performer": "Chto"
+	"performer": "Chto",
+	"version": "Wersëjô $1"
 }

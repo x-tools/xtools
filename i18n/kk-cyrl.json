@@ -1,16 +1,34 @@
 {
+	"@metadata": {
+		"authors": [
+			"Arystanbek",
+			"Fontan 030"
+		]
+	},
 	"all": "Барлығы",
 	"all-languages": "Барлық тілдер",
 	"api-error": "API-ден дерек оқылудан проблем пайда болды.",
+	"article": "Мақала",
 	"bot": "Бот",
+	"categories": "Санаттар",
+	"category": "Санат",
 	"csv": "CSV",
+	"deleted": "Жойылған",
+	"deleted-pages": "Жойылған беттер",
 	"download-label": "Түсіріп алу",
+	"friday": "Жұма",
 	"help-translate": "Аударуға көмектесу",
 	"history": "Тарихы",
 	"last-day": "Өткен 24 сағаттағы өңдемелер",
 	"last-month": "Өткен 30 күндегі өңдемелер",
 	"last-week": "Өткен 7 күндегі өңдемелер",
 	"last-year": "Өткен 365 күндегі өңдемелер",
+	"login": "Кіру",
+	"logout": "Шығу",
+	"logout-msg": "$1 ретінде кіргенсіз",
+	"minor-edits": "Шағын өңдемелер",
+	"monday": "Дүйсенбі",
+	"month": "Ай",
 	"page-title": "Бет атауы",
 	"pager-newer-n": "{{PLURAL:$1|жаңалау 1|жаңалау $1}}",
 	"pager-older-n": "{{PLURAL:$1|ескілеу 1|ескілеу $1}}",
@@ -19,7 +37,17 @@
 	"performer": "Орындаушы",
 	"project": "Жоба",
 	"report-issue": "Қате туралы хабарлау",
+	"saturday": "Сенбі",
 	"size-kilobytes": "$1 КБ",
+	"sunday": "Жексенбі",
+	"thursday": "Бейсенбі",
+	"tool-adminstats": "Админ статистикалары",
+	"tool-adminstats-desc": "Админ әрекеттері статистикасын көрсету",
 	"translation-credits": "Аударма $1 және $2 арқылы жасалды.",
-	"user": "Қатысушы"
+	"tuesday": "Сейсенбі",
+	"user": "Қатысушы",
+	"wednesday": "Сәрсенбі",
+	"wiki": "Уики",
+	"wikitext": "Уикимәтін",
+	"year": "Жыл"
 }

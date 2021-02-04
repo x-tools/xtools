@@ -1,4 +1,7 @@
 {
+	"@metadata": {
+		"authors": []
+	},
 	"all": "Te katoa",
 	"all-languages": "Ngā reo katoa",
 	"api-error": "I ngā raraunga nō te API $1 e tukua ana, ka ngere:",

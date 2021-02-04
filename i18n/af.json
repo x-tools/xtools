@@ -1,10 +1,21 @@
 {
+	"@metadata": {
+		"authors": [
+			"Biggs ZA",
+			"Joris Darlington Quarshie"
+		]
+	},
 	"basic-information": "Basiese inligting",
 	"documentation": "Dokumentasie",
 	"download-label": "Laai af",
+	"num-edits": "{{PLURAL:$1|wysig|wysigings}}",
 	"other": "Ander",
 	"performer": "Uitvoerende gebruiker",
+	"rfx-duplicates": "Duplikate",
+	"rfx-total-votes": "Totaal Stemme",
 	"size-gigabytes": "$1 GG",
 	"size-kilobytes": "$1 KG",
-	"size-megabytes": "$1 MG"
+	"size-megabytes": "$1 MG",
+	"size-terabytes": "$1 TB",
+	"total-page-size": "Totale bladsygrootte"
 }

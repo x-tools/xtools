@@ -1,4 +1,10 @@
 {
+	"@metadata": {
+		"authors": [
+			"TomášPolonec"
+		]
+	},
 	"feedback": "Spätná väzba",
+	"num-revisions-since": "$1 {{PLURAL:$2|úprava|úpravy|úprav}} od $3",
 	"performer": "Pôvodca"
 }

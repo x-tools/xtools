@@ -1,7 +1,18 @@
 {
+	"@metadata": {
+		"authors": [
+			"Har-wradim",
+			"פוילישער"
+		]
+	},
+	"all": "אַלע",
 	"basic-information": "גרונטלעכע אינפֿארמאַציע",
 	"download-label": "אַראָפלאָדן",
+	"latest-action": "לעצטע אַקציע אינעם לאָגבוך",
+	"more": "נאך",
 	"other": "אַנדער",
+	"page": "בלאַט",
 	"performer": "אויספֿירער",
+	"projects": "פראיעקטן",
 	"size-kilobytes": "{{PLURAL:$1|איין קילאבייט|$1 קילאבייטן}}"
 }

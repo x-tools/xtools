@@ -1,4 +1,7 @@
 {
+	"@metadata": {
+		"authors": []
+	},
 	"all": "Tortous",
 	"api-error": "Bérlurage pour ard'minder $1",
 	"bot": "Robot",

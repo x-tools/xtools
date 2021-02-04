@@ -1,10 +1,23 @@
 {
+	"@metadata": {
+		"authors": [
+			"Karmwiki",
+			"McDutchie"
+		]
+	},
 	"all": "Totes",
 	"all-languages": "Tote le linguas",
 	"api-error": "Error al consultar $1",
 	"bot": "Robot",
+	"categories": "Categorias",
+	"characters": "Characteres",
 	"csv": "CSV",
 	"download-label": "Discargar",
+	"error-automation": "Le recolta automatisate de datos ab le interfacie usator de XTools non es permittite. Per favor, usa nostre API complete in vice de isto: $1",
+	"error-rate-limit": "Si tu es human, tu face troppo de requestas durante un curte tempore. Per favor, attende $1 {{PLURAL:$1|minuta|minutas}} ante de recargar iste instrumento, o $2 pro evitar que isto reoccurre. Si tu es un robot, usa nostre $3 in loco de iste instrumento.",
+	"error-rate-limit-login": "aperi session",
+	"error-rate-limit-login-big": "Per favor, $1 pro evitar limites de frequentia.",
+	"error-title": "Un error fatal ha occurrite in XTools. Iste error ha essite reportate automaticamente, ma non hesita de crear un carga sur $1 (require un conto Wikimedia).",
 	"help-translate": "Adjutar a traducer",
 	"history": "Historia",
 	"page-title": "Titulo del pagina",
