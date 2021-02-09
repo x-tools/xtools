@@ -29,8 +29,6 @@ framework:
     csrf_protection: ~
     validation:      { enable_annotations: true }
     #serializer:      { enable_annotations: true }
-    templating:
-        engines: ['twig']
     default_locale:  "%locale%"
     trusted_hosts:   ~
     session:
@@ -118,10 +116,11 @@ doctrine:
                 connection: toolsdb
 
 doctrine_migrations:
-    dir_name: "%kernel.project_dir%/src/DoctrineMigrations"
-    namespace: Application\Migrations
-    table_name: migration_versions
-    name: Application Migrations
+    migrations_paths:
+        'Application\Migrations': 'src/DoctrineMigrations'
+    storage:
+        table_storage:
+            table_name: migration_versions
 
 # Swiftmailer Configuration
 swiftmailer:

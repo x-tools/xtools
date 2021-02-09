@@ -51,7 +51,7 @@ services:
 
     app.exception_listener:
         class: AppBundle\EventSubscriber\ExceptionListener
-        arguments: ['@templating', '@logger', '%kernel.environment%']
+        arguments: ['@twig', '@logger', '%kernel.environment%']
         tags:
             - { name: kernel.event_listener, event: kernel.exception }
 

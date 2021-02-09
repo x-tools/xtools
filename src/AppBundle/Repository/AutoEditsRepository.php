@@ -536,6 +536,8 @@ class AutoEditsRepository extends UserRepository
         $tagDefTable = $project->getTableName('change_tag_def');
         $sql = "SELECT ctd_name, ctd_id FROM $tagDefTable
                 WHERE ctd_name IN ($tags)";
+        // FIXME: change to ->fetchAllKeyValue() when doctrine-bundle gets it.
+        // See https://github.com/doctrine/dbal/pull/4338
         $this->tags = $this->executeProjectsQuery($sql)->fetchAll(\PDO::FETCH_KEY_PAIR);
 
         // Cache and return.

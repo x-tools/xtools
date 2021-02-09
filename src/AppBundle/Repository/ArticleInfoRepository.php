@@ -26,11 +26,6 @@ class ArticleInfoRepository extends Repository
      */
     public function getBotData(Page $page, $start, $end, $count = false): Statement
     {
-        $cacheKey = $this->getCacheKey(func_get_args(), 'page_botdata');
-        if ($this->cache->hasItem($cacheKey)) {
-            return $this->cache->getItem($cacheKey)->get();
-        }
-
         $project = $page->getProject();
         $revTable = $project->getTableName('revision');
         $userGroupsTable = $project->getTableName('user_groups');
@@ -61,8 +56,7 @@ class ArticleInfoRepository extends Repository
                 WHERE rev_page = :pageId AND ug_group = 'bot' $datesConditions
                 $groupBy";
 
-        $result = $this->executeProjectsQuery($sql, ['pageId' => $page->getId()]);
-        return $this->setCache($cacheKey, $result);
+        return $this->executeProjectsQuery($sql, ['pageId' => $page->getId()]);
     }
 
     /**

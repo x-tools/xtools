@@ -195,7 +195,8 @@ class ArticleInfoApi extends Model
         $totalWords = 0;
         $paragraphs = $crawler->filter($selector);
         $paragraphs->each(function ($node) use (&$totalChars, &$totalWords): void {
-            $text = preg_replace('/\[\d+]/', '', trim($node->text()));
+            /** @var Crawler $node */
+            $text = preg_replace('/\[\d+]/', '', trim($node->text(null, true)));
             $totalChars += strlen($text);
             $totalWords += count(explode(' ', $text));
         });

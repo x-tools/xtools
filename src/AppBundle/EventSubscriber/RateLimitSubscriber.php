@@ -7,11 +7,13 @@ declare(strict_types = 1);
 
 namespace AppBundle\EventSubscriber;
 
+use AppBundle\Controller\XtoolsController;
 use AppBundle\Helper\I18nHelper;
 use DateInterval;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
@@ -76,8 +78,13 @@ class RateLimitSubscriber implements EventSubscriberInterface
      * Check if the current user has exceeded the configured usage limitations.
      * @param FilterControllerEvent $event The event.
      */
-    public function onKernelController(FilterControllerEvent $event): void
+    public function onKernelController(ControllerEvent $event): void
     {
+        $controller = $event->getController();
+        if (!$controller instanceof XtoolsController) {
+            return;
+        }
+
         $this->cache = $this->container->get('cache.app');
         $this->rateLimit = (int)$this->container->getParameter('app.rate_limit_count');
         $this->rateDuration = (int)$this->container->getParameter('app.rate_limit_time');
@@ -93,7 +100,6 @@ class RateLimitSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $controller = $event->getController();
         $loggedIn = (bool)$this->container->get('session')->get('logged_in_user');
         $isApi = 'ApiAction' === substr($controller[1], -9);
 

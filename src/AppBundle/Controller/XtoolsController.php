@@ -255,7 +255,7 @@ abstract class XtoolsController extends Controller
 
         foreach ($this->cookies as $name => $value) {
             $response->headers->setCookie(
-                new Cookie($name, $value)
+                Cookie::create($name, $value)
             );
         }
     }
