@@ -137,11 +137,6 @@ class PageRepository extends Repository
         $start = false,
         $end = false
     ): Statement {
-        $cacheKey = $this->getCacheKey(func_get_args(), 'page_revisions');
-        if ($this->cache->hasItem($cacheKey)) {
-            return $this->cache->getItem($cacheKey)->get();
-        }
-
         $revTable = $this->getTableName(
             $page->getProject()->getDatabaseName(),
             'revision',
@@ -184,7 +179,7 @@ class PageRepository extends Repository
             $params['actorId'] = $user->getActorId($page->getProject());
         }
 
-        return $this->setCache($cacheKey, $this->executeProjectsQuery($sql, $params));
+        return $this->executeProjectsQuery($sql, $params);
     }
 
     /**

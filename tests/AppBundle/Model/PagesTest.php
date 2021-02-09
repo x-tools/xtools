@@ -37,20 +37,20 @@ class PagesTest extends TestAdapter
      */
     public function setUp(): void
     {
-        $this->project = $this->getMock(Project::class, [], ['test.wikipedia.org']);
+        $this->project = $this->createMock(Project::class);
         // $this->project = new Project('test.project.org');
-        $paRepo = $this->getMock(PageAssessments::class, ['getConfig'], [$this->project]);
+        $paRepo = $this->createMock(PageAssessments::class);
         $paRepo->method('getConfig')
             ->willReturn($this->getAssessmentsConfig());
         $this->project->method('getPageAssessments')
             ->willReturn($paRepo);
 
-        $this->projectRepo = $this->getMock(ProjectRepository::class);
+        $this->projectRepo = $this->createMock(ProjectRepository::class);
         $this->projectRepo->method('getMetadata')
             ->willReturn(['namespaces' => [0 => 'Main', 3 => 'User_talk']]);
         $this->project->setRepository($this->projectRepo);
         $this->user = new User('Test user');
-        $this->pagesRepo = $this->getMock(PagesRepository::class);
+        $this->pagesRepo = $this->createMock(PagesRepository::class);
     }
 
     /**

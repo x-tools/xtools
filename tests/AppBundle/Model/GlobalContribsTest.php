@@ -9,6 +9,7 @@ use AppBundle\Model\Project;
 use AppBundle\Model\User;
 use AppBundle\Repository\GlobalContribsRepository;
 use AppBundle\Repository\ProjectRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use Tests\AppBundle\TestAdapter;
 
 class GlobalContribsTest extends TestAdapter
@@ -21,7 +22,7 @@ class GlobalContribsTest extends TestAdapter
      */
     public function setUp(): void
     {
-        $this->globalContribsRepo = $this->getMock(GlobalContribsRepository::class);
+        $this->globalContribsRepo = $this->createMock(GlobalContribsRepository::class);
     }
 
     /**
@@ -71,8 +72,8 @@ class GlobalContribsTest extends TestAdapter
         $globalContribs = new GlobalContribs($user);
         $globalContribs->setRepository($this->globalContribsRepo);
 
-        /** @var ProjectRepository $wiki1Repo */
-        $wiki1Repo = $this->getMock(ProjectRepository::class);
+        /** @var ProjectRepository|MockObject $wiki1Repo */
+        $wiki1Repo = $this->createMock(ProjectRepository::class);
         $wiki1Repo->expects(static::once())
             ->method('getMetadata')
             ->willReturn(['namespaces' => [2 => 'User']]);

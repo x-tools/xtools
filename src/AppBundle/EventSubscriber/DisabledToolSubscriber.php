@@ -7,6 +7,7 @@ declare(strict_types = 1);
 
 namespace AppBundle\EventSubscriber;
 
+use AppBundle\Controller\XtoolsController;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
@@ -52,7 +53,7 @@ class DisabledToolSubscriber implements EventSubscriberInterface
     {
         $controller = $event->getController();
 
-        if (method_exists($controller[0], 'getIndexRoute')) {
+        if ($controller instanceof XtoolsController && method_exists($controller, 'getIndexRoute')) {
             $tool = $controller[0]->getIndexRoute();
             if (!in_array($tool, ['homepage', 'meta', 'Quote']) && !$this->container->getParameter("enable.$tool")) {
                 throw new NotFoundHttpException('This tool is disabled');

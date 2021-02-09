@@ -15,6 +15,7 @@ use AppBundle\Model\User;
 use AppBundle\Repository\AutoEditsRepository;
 use AppBundle\Repository\ProjectRepository;
 use AppBundle\Repository\UserRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use Tests\AppBundle\TestAdapter;
 
 /**
@@ -25,10 +26,10 @@ class AutoEditsTest extends TestAdapter
     /** @var Project The project instance. */
     protected $project;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ProjectRepository The project repo instance. */
+    /** @var MockObject|ProjectRepository The project repo instance. */
     protected $projectRepo;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AutoEditsRepository The AutoEdits repo instance. */
+    /** @var MockObject|AutoEditsRepository The AutoEdits repo instance. */
     protected $aeRepo;
 
     /** @var User The user instance. */
@@ -48,7 +49,7 @@ class AutoEditsTest extends TestAdapter
             ]]);
         $this->project->setRepository($this->projectRepo);
         $this->user = new User('Test user');
-        $this->aeRepo = $this->getMock(AutoEditsRepository::class);
+        $this->aeRepo = $this->createMock(AutoEditsRepository::class);
     }
 
     /**
@@ -181,8 +182,8 @@ class AutoEditsTest extends TestAdapter
         $this->aeRepo->expects(static::once())
             ->method('countAutomatedEdits')
             ->willReturn('50');
-        /** @var \PHPUnit_Framework_MockObject_MockObject|UserRepository $userRepo */
-        $userRepo = $this->getMock(UserRepository::class);
+        /** @var MockObject|UserRepository $userRepo */
+        $userRepo = $this->createMock(UserRepository::class);
         $userRepo->expects(static::once())
             ->method('countEdits')
             ->willReturn(200);

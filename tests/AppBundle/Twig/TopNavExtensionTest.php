@@ -5,9 +5,9 @@ namespace Tests\AppBundle\Twig;
 
 use AppBundle\Helper\I18nHelper;
 use AppBundle\Twig\TopNavExtension;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpKernel\Client;
 use Tests\AppBundle\TestAdapter;
 
 /**
@@ -18,7 +18,7 @@ class TopNavExtensionTest extends TestAdapter
     /** @var TopNavExtension Instance of class. */
     protected $topNavExtension;
 
-    /** @var Client HTTP client. */
+    /** @var KernelBrowser HTTP client. */
     private $client;
 
     /**

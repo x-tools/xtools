@@ -32,14 +32,14 @@ class AdminStatsTest extends TestAdapter
      */
     public function setUp(): void
     {
-        $this->project = $this->getMock(Project::class, [], ['testwiki']);
+        $this->project = $this->createMock(Project::class);
         $this->project->method('getUsersInGroups')
             ->willReturn([
                 'Bob' => ['sysop', 'checkuser'],
                 'Sarah' => ['epcoordinator'],
             ]);
 
-        $this->asRepo = $this->getMock(AdminStatsRepository::class);
+        $this->asRepo = $this->createMock(AdminStatsRepository::class);
 
         // This logic is tested with integration tests.
         // Here we just stub empty arrays so AdminStats won't error outl.

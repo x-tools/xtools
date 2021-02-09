@@ -15,9 +15,7 @@ build:
     tests:
         override:
             -
-                command: ./vendor/bin/parallel-lint --exclude vendor .
-            -
-                command: ./vendor/bin/phpcs -s . --ignore=/home/scrutinizer/build/node_modules
+                command: ./vendor/bin/phpcs -s -p . --ignore=/home/scrutinizer/build/node_modules
             -
                 command: ./vendor/bin/phpunit tests --coverage-clover=coverage.xml
                 coverage:
@@ -25,3 +23,8 @@ build:
                     format: 'clover'
             -
                 command: ./vendor/bin/minus-x check .
+    nodes:
+        tests:
+            environment:
+                php:
+                    version: 7.2

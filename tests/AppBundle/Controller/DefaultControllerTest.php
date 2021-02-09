@@ -30,15 +30,13 @@ class DefaultControllerTest extends ControllerTestAdapter
      */
     public function testIndex(): void
     {
-        $client = static::createClient();
-
         // Check basics.
-        $crawler = $client->request('GET', '/');
-        static::assertEquals(200, $client->getResponse()->getStatusCode());
+        $crawler = $this->client->request('GET', '/');
+        static::assertEquals(200, $this->client->getResponse()->getStatusCode());
         static::assertContains('XTools', $crawler->filter('.splash-logo')->attr('alt'));
 
         // Change language.
-        $crawler = $client->request('GET', '/?uselang=es');
+        $crawler = $this->client->request('GET', '/?uselang=es');
         static::assertContains(
             'Saciando tu hambre de datos',
             $crawler->filter('#content h4')->text()
@@ -53,9 +51,8 @@ class DefaultControllerTest extends ControllerTestAdapter
      */
     public function testAbout(): void
     {
-        $client = static::createClient();
-        $client->request('GET', '/about');
-        static::assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->client->request('GET', '/about');
+        static::assertEquals(200, $this->client->getResponse()->getStatusCode());
     }
 
     /**
@@ -63,11 +60,10 @@ class DefaultControllerTest extends ControllerTestAdapter
      */
     public function testOAuthCallback(): void
     {
-        $client = static::createClient();
-        $client->request('GET', '/oauth_callback');
+        $this->client->request('GET', '/oauth_callback');
 
         // Callback should 404 since we didn't give it anything.
-        static::assertEquals(404, $client->getResponse()->getStatusCode());
+        static::assertEquals(404, $this->client->getResponse()->getStatusCode());
     }
 
     /**
@@ -75,9 +71,8 @@ class DefaultControllerTest extends ControllerTestAdapter
      */
     public function testLogout(): void
     {
-        $client = static::createClient();
-        $client->request('GET', '/logout');
-        static::assertEquals(302, $client->getResponse()->getStatusCode());
+        $this->client->request('GET', '/logout');
+        static::assertEquals(302, $this->client->getResponse()->getStatusCode());
     }
 
     /**

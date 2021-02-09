@@ -7,6 +7,7 @@ use AppBundle\Model\Blame;
 use AppBundle\Model\Page;
 use AppBundle\Model\Project;
 use AppBundle\Repository\BlameRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use Tests\AppBundle\TestAdapter;
 
 class BlameTest extends TestAdapter
@@ -17,7 +18,7 @@ class BlameTest extends TestAdapter
     /** @var Page */
     protected $page;
 
-    /** @var BlameRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var BlameRepository|MockObject */
     protected $blameRepo;
 
     /**
@@ -27,12 +28,12 @@ class BlameTest extends TestAdapter
     {
         $this->project = new Project('test.example.org');
         $this->page = new Page($this->project, 'Test page');
-        $this->blameRepo = $this->getMock(BlameRepository::class);
+        $this->blameRepo = $this->createMock(BlameRepository::class);
     }
 
     /**
-     * @covers Blame::getQuery
-     * @covers Blame::getTokenizedQuery
+     * @covers \AppBundle\Model\Blame::getQuery
+     * @covers \AppBundle\Model\Blame::getTokenizedQuery
      */
     public function testBasics(): void
     {
@@ -42,8 +43,8 @@ class BlameTest extends TestAdapter
     }
 
     /**
-     * @covers Blame::prepareData
-     * @covers Blame::searchTokens
+     * @covers \AppBundle\Model\Blame::prepareData
+     * @covers \AppBundle\Model\Blame::searchTokens
      */
     public function testPrepareData(): void
     {
