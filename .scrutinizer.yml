@@ -23,3 +23,8 @@ build:
                     format: 'clover'
             -
                 command: ./vendor/bin/minus-x check .
+    nodes:
+        tests:
+            environment:
+                php:
+                    version: 7.2

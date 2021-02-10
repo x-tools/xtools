@@ -14,7 +14,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -76,7 +75,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
 
     /**
      * Check if the current user has exceeded the configured usage limitations.
-     * @param FilterControllerEvent $event The event.
+     * @param ControllerEvent $event The event.
      */
     public function onKernelController(ControllerEvent $event): void
     {

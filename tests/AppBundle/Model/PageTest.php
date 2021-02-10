@@ -196,16 +196,6 @@ class PageTest extends TestAdapter
      */
     public function testCountWikidataItems(): void
     {
-        $wikidataItems = [
-            [
-                'ips_site_id' => 'enwiki',
-                'ips_site_page' => 'Google',
-            ],
-            [
-                'ips_site_id' => 'arwiki',
-                'ips_site_page' => 'جوجل',
-            ],
-        ];
         $pageRepo = $this->createMock(PageRepository::class);
         $page = new Page(new Project('TestProject'), 'Test_Page');
         $pageRepo->method('countWikidataItems')
