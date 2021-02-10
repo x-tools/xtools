@@ -9,6 +9,7 @@ namespace Tests\AppBundle\Model;
 
 use AppBundle\Model\Page;
 use AppBundle\Model\Project;
+use AppBundle\Model\User;
 use AppBundle\Repository\PageRepository;
 use AppBundle\Repository\ProjectRepository;
 use Symfony\Component\DependencyInjection\Container;
@@ -37,7 +38,7 @@ class PageTest extends TestAdapter
     public function testTitles(): void
     {
         $project = new Project('TestProject');
-        $pageRepo = $this->getMock(PageRepository::class, ['getPageInfo']);
+        $pageRepo = $this->createMock(PageRepository::class);
         $data = [
             [$project, 'Test_Page_1', ['title' => 'Test_Page_1']],
             [$project, 'Test_Page_2', ['title' => 'Test_Page_2', 'displaytitle' => '<em>Test</em> page 2']],
@@ -68,7 +69,7 @@ class PageTest extends TestAdapter
      */
     public function testExists(): void
     {
-        $pageRepo = $this->getMock(PageRepository::class, ['getPageInfo']);
+        $pageRepo = $this->createMock(PageRepository::class);
         $project = new Project('TestProject');
         // Mock data (last element of each array is the return value).
         $data = [
@@ -95,7 +96,7 @@ class PageTest extends TestAdapter
      */
     public function testBasicGetters(): void
     {
-        $project = $this->getMock(Project::class, ['getNamespaces'], ['TestProject']);
+        $project = $this->createMock(Project::class);
         $project->method('getNamespaces')
             ->willReturn([
                 '',
@@ -103,7 +104,7 @@ class PageTest extends TestAdapter
                 'User',
             ]);
 
-        $pageRepo = $this->getMock(PageRepository::class, ['getPageInfo']);
+        $pageRepo = $this->createMock(PageRepository::class);
         $pageRepo->expects($this->once())
             ->method('getPageInfo')
             ->willReturn([
@@ -162,7 +163,7 @@ class PageTest extends TestAdapter
             ],
         ];
 
-        $pageRepo = $this->getMock(PageRepository::class, ['getPageInfo', 'getWikidataItems']);
+        $pageRepo = $this->createMock(PageRepository::class);
         $pageRepo->method('getPageInfo')
             ->willReturn([
                 'pageprops' => [
@@ -178,7 +179,7 @@ class PageTest extends TestAdapter
         static::assertArraySubset($wikidataItems, $page->getWikidataItems());
 
         // If no wikidata item...
-        $pageRepo2 = $this->getMock(PageRepository::class, ['getPageInfo']);
+        $pageRepo2 = $this->createMock(PageRepository::class);
         $pageRepo2->expects($this->once())
             ->method('getPageInfo')
             ->willReturn([
@@ -195,10 +196,20 @@ class PageTest extends TestAdapter
      */
     public function testCountWikidataItems(): void
     {
-        $pageRepo = $this->getMock(PageRepository::class, ['getWikidataItems']);
+        $wikidataItems = [
+            [
+                'ips_site_id' => 'enwiki',
+                'ips_site_page' => 'Google',
+            ],
+            [
+                'ips_site_id' => 'arwiki',
+                'ips_site_page' => 'جوجل',
+            ],
+        ];
+        $pageRepo = $this->createMock(PageRepository::class);
         $page = new Page(new Project('TestProject'), 'Test_Page');
-        $pageRepo->method('getWikidataItems')
-            ->with($page, true)
+        $pageRepo->method('countWikidataItems')
+            ->with($page)
             ->willReturn(2);
         $page->setRepository($pageRepo);
 
@@ -212,7 +223,8 @@ class PageTest extends TestAdapter
      */
     public function testUsersEdits(): void
     {
-        $pageRepo = $this->getMock(PageRepository::class, ['getRevisions']);
+        $this->markTestIncomplete();
+        $pageRepo = $this->createMock(PageRepository::class);
         $pageRepo
             ->method('getRevisions')
             ->with()
@@ -227,8 +239,8 @@ class PageTest extends TestAdapter
 
         $page = new Page(new Project('exampleWiki'), 'Page');
         $page->setRepository($pageRepo);
-        //$user = new User('Testuser');
-        //static::assertCount(3, $page->getRevisions($user)->getCount());
+        $user = new User('Testuser');
+        static::assertCount(3, $page->getRevisions($user));
     }
 
     /**
@@ -237,7 +249,7 @@ class PageTest extends TestAdapter
      */
     public function testWikidataErrors(): void
     {
-        $pageRepo = $this->getMock(PageRepository::class, ['getWikidataInfo', 'getPageInfo']);
+        $pageRepo = $this->createMock(PageRepository::class);
 
         $pageRepo
             ->method('getWikidataInfo')
@@ -281,9 +293,7 @@ class PageTest extends TestAdapter
      */
     public function testErrors(): void
     {
-        $pageRepo = $this->getMock(PageRepository::class, [
-            'getWikidataInfo', 'getCheckWikiErrors', 'getPageInfo',
-        ]);
+        $pageRepo = $this->createMock(PageRepository::class);
         $checkWikiErrors = [
             [
                 'error' => '61',
@@ -340,7 +350,7 @@ class PageTest extends TestAdapter
             ],
         ];
 
-        $pageRepo = $this->getMock(PageRepository::class, ['getPageviews']);
+        $pageRepo = $this->createMock(PageRepository::class);
         $pageRepo->method('getPageviews')->willReturn($pageviewsData);
         $page = new Page(new Project('exampleWiki'), 'Page');
         $page->setRepository($pageRepo);
@@ -377,7 +387,7 @@ class PageTest extends TestAdapter
             'links_in_count' => '33300',
             'redirects_count' => '61',
         ];
-        $pageRepo = $this->getMock(PageRepository::class, ['countLinksAndRedirects']);
+        $pageRepo = $this->createMock(PageRepository::class);
         $pageRepo->method('countLinksAndRedirects')->willReturn($data);
         $page = new Page(new Project('exampleWiki'), 'Page');
         $page->setRepository($pageRepo);

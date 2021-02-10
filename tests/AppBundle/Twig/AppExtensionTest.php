@@ -223,7 +223,7 @@ class AppExtensionTest extends TestAdapter
     public function testWikify(): void
     {
         $project = new Project('TestProject');
-        $projectRepo = $this->getMock(ProjectRepository::class);
+        $projectRepo = $this->createMock(ProjectRepository::class);
         $projectRepo->method('getOne')
             ->willReturn([
                 'url' => 'https://test.example.org',

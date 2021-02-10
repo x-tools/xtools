@@ -10,6 +10,7 @@ namespace Tests\AppBundle\Model;
 use AppBundle\Model\Project;
 use AppBundle\Model\User;
 use AppBundle\Repository\ProjectRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use Tests\AppBundle\TestAdapter;
 
 /**
@@ -22,7 +23,7 @@ class ProjectTest extends TestAdapter
      */
     public function testBasicMetadata(): void
     {
-        /** @var ProjectRepository|\PHPUnit_Framework_MockObject_MockObject $projectRepo */
+        /** @var ProjectRepository|MockObject $projectRepo */
         $projectRepo = $this->getProjectRepo();
         $projectRepo->expects(static::once())
             ->method('getMetadata')
@@ -87,8 +88,8 @@ class ProjectTest extends TestAdapter
      */
     public function testExists(): void
     {
-        /** @var ProjectRepository|\PHPUnit_Framework_MockObject_MockObject $projectRepo */
-        $projectRepo = $this->getMock(ProjectRepository::class);
+        /** @var ProjectRepository|MockObject $projectRepo */
+        $projectRepo = $this->createMock(ProjectRepository::class);
         $projectRepo->expects(static::once())
             ->method('getOne')
             ->willReturn([]);
@@ -142,11 +143,11 @@ class ProjectTest extends TestAdapter
         $project = new Project($dbName);
         $globalProject = new Project('metawiki');
 
-        /** @var ProjectRepository|\PHPUnit_Framework_MockObject_MockObject $projectRepo */
-        $projectRepo = $this->getMock(ProjectRepository::class);
+        /** @var ProjectRepository|MockObject $projectRepo */
+        $projectRepo = $this->createMock(ProjectRepository::class);
 
-        /** @var ProjectRepository|\PHPUnit_Framework_MockObject_MockObject $projectRepo */
-        $globalProjectRepo = $this->getMock(ProjectRepository::class);
+        /** @var ProjectRepository|MockObject $globalProjectRepo */
+        $globalProjectRepo = $this->createMock(ProjectRepository::class);
 
         $projectRepo->expects(static::once())
             ->method('optedIn')

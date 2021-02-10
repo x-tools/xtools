@@ -38,19 +38,19 @@ class CategoryEditsTest extends TestAdapter
      */
     public function setUp(): void
     {
-        $this->project = $this->getMock(Project::class, [], ['testwiki']);
+        $this->project = $this->createMock(Project::class);
         $this->project->method('getNamespaces')
             ->willReturn([
                 0 => '',
                 1 => 'Talk',
             ]);
-        $userRepo = $this->getMock(UserRepository::class);
+        $userRepo = $this->createMock(UserRepository::class);
         $userRepo->method('countEdits')
             ->willReturn(500);
         $this->user = new User('Test user');
         $this->user->setRepository($userRepo);
 
-        $this->ceRepo = $this->getMock(CategoryEditsRepository::class);
+        $this->ceRepo = $this->createMock(CategoryEditsRepository::class);
         $this->ce = new CategoryEdits(
             $this->project,
             $this->user,

@@ -7,6 +7,7 @@ use AppBundle\Model\Authorship;
 use AppBundle\Model\Page;
 use AppBundle\Model\Project;
 use AppBundle\Repository\AuthorshipRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use Tests\AppBundle\TestAdapter;
 
 class AuthorshipTest extends TestAdapter
@@ -16,8 +17,8 @@ class AuthorshipTest extends TestAdapter
      */
     public function testAuthorship(): void
     {
-        /** @var AuthorshipRepository $authorshipRepo */
-        $authorshipRepo = $this->getMock(AuthorshipRepository::class);
+        /** @var AuthorshipRepository|MockObject $authorshipRepo */
+        $authorshipRepo = $this->createMock(AuthorshipRepository::class);
         $authorshipRepo->expects($this->once())
             ->method('getData')
             ->willReturn([

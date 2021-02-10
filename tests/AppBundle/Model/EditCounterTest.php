@@ -15,6 +15,7 @@ use AppBundle\Repository\EditCounterRepository;
 use AppBundle\Repository\ProjectRepository;
 use AppBundle\Repository\UserRepository;
 use DateTime;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Tests\AppBundle\TestAdapter;
@@ -33,7 +34,7 @@ class EditCounterTest extends TestAdapter
     /** @var EditCounter The edit counter instance. */
     protected $editCounter;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EditCounterRepository The edit counter repository instance. */
+    /** @var MockObject|EditCounterRepository The edit counter repository instance. */
     protected $editCounterRepo;
 
     /** @var User The user instance. */
@@ -52,14 +53,14 @@ class EditCounterTest extends TestAdapter
         $session = new Session();
         $this->i18n = new I18nHelper($container, $stack, $session);
 
-        $this->editCounterRepo = $this->getMock(EditCounterRepository::class);
+        $this->editCounterRepo = $this->createMock(EditCounterRepository::class);
         $this->projectRepo = $this->getProjectRepo();
         $this->project = new Project('test.example.org');
         $this->project->setRepository($this->projectRepo);
 
         $this->user = new User('Testuser');
-        /** @var \PHPUnit_Framework_MockObject_MockObject|UserRepository $userRepo */
-        $userRepo = $this->getMock(UserRepository::class);
+        /** @var MockObject|UserRepository $userRepo */
+        $userRepo = $this->createMock(UserRepository::class);
         $this->user->setRepository($userRepo);
 
         $this->editCounter = new EditCounter($this->project, $this->user, $this->i18n);
@@ -585,8 +586,8 @@ class EditCounterTest extends TestAdapter
                 ],
             ]);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|UserRepository $userRepo */
-        $userRepo = $this->getMock(UserRepository::class);
+        /** @var MockObject|UserRepository $userRepo */
+        $userRepo = $this->createMock(UserRepository::class);
         $userRepo->method('getIdAndRegistration')
             ->willReturn([
                 'userId' => 5,
@@ -684,8 +685,8 @@ class EditCounterTest extends TestAdapter
             ],
         ], $this->editCounter->getGlobalRightsChanges());
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|UserRepository $userRepo */
-        $userRepo = $this->getMock(UserRepository::class);
+        /** @var MockObject|UserRepository $userRepo */
+        $userRepo = $this->createMock(UserRepository::class);
         $userRepo->expects(static::once())
             ->method('getUserRights')
             ->willReturn(['sysop', 'bureaucrat']);

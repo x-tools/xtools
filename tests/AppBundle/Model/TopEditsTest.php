@@ -38,7 +38,7 @@ class TopEditsTest extends TestAdapter
     public function setUp(): void
     {
         $this->project = new Project('en.wikipedia.org');
-        $this->projectRepo = $this->getMock(ProjectRepository::class);
+        $this->projectRepo = $this->createMock(ProjectRepository::class);
         $this->projectRepo->method('getMetadata')
             ->willReturn(['namespaces' => [0 => 'Main', 3 => 'User_talk']]);
         $this->projectRepo->method('getOne')
@@ -49,7 +49,7 @@ class TopEditsTest extends TestAdapter
         $client = static::createClient();
         $container = $client->getContainer();
 
-        $this->teRepo = $this->getMock(TopEditsRepository::class);
+        $this->teRepo = $this->createMock(TopEditsRepository::class);
         $this->teRepo->method('getContainer')
             ->willReturn($container);
     }

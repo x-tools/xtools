@@ -16,6 +16,7 @@ use AppBundle\Repository\ArticleInfoRepository;
 use AppBundle\Repository\PageRepository;
 use AppBundle\Repository\ProjectRepository;
 use GuzzleHttp;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Tests\AppBundle\TestAdapter;
@@ -63,7 +64,7 @@ class ArticleInfoTest extends TestAdapter
      */
     public function testNumRevisions(): void
     {
-        $pageRepo = $this->getMock(PageRepository::class);
+        $pageRepo = $this->createMock(PageRepository::class);
         $pageRepo->expects($this->once())
             ->method('getNumRevisions')
             ->willReturn(10);
@@ -81,7 +82,7 @@ class ArticleInfoTest extends TestAdapter
      */
     public function testRevisionsProcessed(int $numRevisions, int $assertion): void
     {
-        $pageRepo = $this->getMock(PageRepository::class);
+        $pageRepo = $this->createMock(PageRepository::class);
         $pageRepo->method('getNumRevisions')->willReturn($numRevisions);
         $this->page->setRepository($pageRepo);
         static::assertEquals(
@@ -107,8 +108,8 @@ class ArticleInfoTest extends TestAdapter
      */
     public function testTooManyRevisions(): void
     {
-        /** @var PageRepository|\PHPUnit_Framework_MockObject_MockObject $pageRepo */
-        $pageRepo = $this->getMock(PageRepository::class);
+        /** @var PageRepository|MockObject $pageRepo */
+        $pageRepo = $this->createMock(PageRepository::class);
         $pageRepo->expects($this->once())
             ->method('getNumRevisions')
             ->willReturn(1000000);
@@ -140,8 +141,8 @@ class ArticleInfoTest extends TestAdapter
 
     public function testLinksAndRedirects(): void
     {
-        /** @var PageRepository|\PHPUnit_Framework_MockObject_MockObject $pageRepo */
-        $pageRepo = $this->getMock(PageRepository::class);
+        /** @var PageRepository|MockObject $pageRepo */
+        $pageRepo = $this->createMock(PageRepository::class);
         $pageRepo->expects($this->once())
             ->method('countLinksAndRedirects')
             ->willReturn([
@@ -283,8 +284,8 @@ class ArticleInfoTest extends TestAdapter
     {
         $this->setupData();
 
-        /** @var ArticleInfoRepository|\PHPUnit_Framework_MockObject_MockObject $articleInfoRepo */
-        $articleInfoRepo = $this->getMock(ArticleInfoRepository::class);
+        /** @var ArticleInfoRepository|MockObject $articleInfoRepo */
+        $articleInfoRepo = $this->createMock(ArticleInfoRepository::class);
         $articleInfoRepo->expects($this->once())
             ->method('getLogEvents')
             ->willReturn([
@@ -324,8 +325,8 @@ class ArticleInfoTest extends TestAdapter
     {
         // ArticleInfo::updateToolCounts relies on there being entries in
         // the AutoEdits config for the project the edits were made on.
-        /** @var PageRepository|\PHPUnit_Framework_MockObject_MockObject $pageRepo */
-        $projectRepo = $this->getMock(ProjectRepository::class);
+        /** @var PageRepository|MockObject $pageRepo */
+        $projectRepo = $this->createMock(ProjectRepository::class);
         $projectRepo->expects($this->once())
             ->method('getOne')
             ->willReturn([
@@ -421,7 +422,7 @@ class ArticleInfoTest extends TestAdapter
         $ret = $client->request('GET', 'https://en.wikipedia.org/wiki/Hanksy?oldid=747629772')
             ->getBody()
             ->getContents();
-        $pageRepo = $this->getMock(PageRepository::class);
+        $pageRepo = $this->createMock(PageRepository::class);
         $pageRepo->expects($this->once())
             ->method('getHTMLContent')
             ->willReturn($ret);
@@ -468,7 +469,7 @@ class ArticleInfoTest extends TestAdapter
      */
     public function testTransclusionData(): void
     {
-        $articleInfoRepo = $this->getMock(ArticleInfoRepository::class);
+        $articleInfoRepo = $this->createMock(ArticleInfoRepository::class);
         $articleInfoRepo->expects($this->once())
             ->method('getTransclusionData')
             ->willReturn([

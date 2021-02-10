@@ -37,11 +37,11 @@ class PageAssessmentsTest extends TestAdapter
         $client = static::createClient();
         $this->localContainer = $client->getContainer();
 
-        $this->paRepo = $this->getMock(PageAssessmentsRepository::class, ['getConfig', 'getAssessments']);
+        $this->paRepo = $this->createMock(PageAssessmentsRepository::class);
         $this->paRepo->method('getConfig')
             ->willReturn($this->localContainer->getParameter('assessments')['en.wikipedia.org']);
 
-        $this->project = $this->getMock(Project::class, [], ['testwiki']);
+        $this->project = $this->createMock(Project::class);
         $this->project->method('getPageAssessments')
             ->willReturn($this->paRepo);
     }
@@ -87,7 +87,7 @@ class PageAssessmentsTest extends TestAdapter
      */
     public function testGetAssessments(): void
     {
-        $pageRepo = $this->getMock(PageRepository::class, ['getPageInfo']);
+        $pageRepo = $this->createMock(PageRepository::class);
         $pageRepo->method('getPageInfo')->willReturn([
             'title' => 'Test Page',
             'ns' => 0,

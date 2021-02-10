@@ -43,7 +43,7 @@ class EditTest extends TestAdapter
         $client = static::createClient();
         $this->localContainer = $client->getContainer();
         $this->project = new Project('en.wikipedia.org');
-        $this->projectRepo = $this->getMock(ProjectRepository::class);
+        $this->projectRepo = $this->createMock(ProjectRepository::class);
         $this->projectRepo->method('getOne')
             ->willReturn([
                 'url' => 'https://en.wikipedia.org',

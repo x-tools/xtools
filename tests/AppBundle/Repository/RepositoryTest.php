@@ -10,6 +10,7 @@ namespace Tests\AppBundle\Repository;
 use AppBundle\Model\Project;
 use AppBundle\Model\User;
 use AppBundle\Repository\Repository;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Tests\AppBundle\TestAdapter;
 
@@ -21,7 +22,7 @@ class RepositoryTest extends TestAdapter
     /** @var ContainerInterface The DI container. */
     protected $localContainer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Repository Mock of an abstract Repository class. */
+    /** @var MockObject|Repository Mock of an abstract Repository class. */
     private $stub;
 
     protected function setUp(): void
@@ -55,7 +56,7 @@ class RepositoryTest extends TestAdapter
     public function testCacheKey(): void
     {
         // Set up example Models that we'll pass to Repository::getCacheKey().
-        $project = $this->getMock(Project::class, ['getCacheKey'], ['enwiki']);
+        $project = $this->createMock(Project::class);
         $project->method('getCacheKey')->willReturn('enwiki');
         $user = new User('Test user (WMF)');
 
