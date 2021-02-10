@@ -32,8 +32,8 @@ class BlameTest extends TestAdapter
     }
 
     /**
-     * @covers Blame::getQuery
-     * @covers Blame::getTokenizedQuery
+     * @covers \AppBundle\Model\Blame::getQuery
+     * @covers \AppBundle\Model\Blame::getTokenizedQuery
      */
     public function testBasics(): void
     {
@@ -43,8 +43,8 @@ class BlameTest extends TestAdapter
     }
 
     /**
-     * @covers Blame::prepareData
-     * @covers Blame::searchTokens
+     * @covers \AppBundle\Model\Blame::prepareData
+     * @covers \AppBundle\Model\Blame::searchTokens
      */
     public function testPrepareData(): void
     {

@@ -169,7 +169,7 @@ class EditTest extends TestAdapter
     {
         $edit = new Edit($this->page, $this->editAttrs);
         static::assertEquals('2017', $edit->getYear());
-        static::assertEquals('1', $edit->getMonth());
+        static::assertEquals('01', $edit->getMonth());
         static::assertEquals(12, $edit->getLength());
         static::assertEquals(2, $edit->getSize());
         static::assertEquals(2, $edit->getLengthChange());
