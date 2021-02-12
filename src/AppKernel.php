@@ -28,6 +28,7 @@ class AppKernel extends Kernel
     public function registerBundles()
     {
         $bundles = [
+            new Symfony\Bundle\WebServerBundle\WebServerBundle(),
             new Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle(),
             new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
             new Symfony\Bundle\SecurityBundle\SecurityBundle(),
