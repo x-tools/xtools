@@ -1,10 +1,12 @@
 {
 	"@metadata": {
 		"authors": [
-			"TomášPolonec"
+			"TomášPolonec",
+			"Vegetator"
 		]
 	},
 	"feedback": "Spätná väzba",
+	"more": "Viac",
 	"num-revisions-since": "$1 {{PLURAL:$2|úprava|úpravy|úprav}} od $3",
 	"performer": "Pôvodca"
 }
