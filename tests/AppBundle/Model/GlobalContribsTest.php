@@ -3,7 +3,6 @@ declare(strict_types = 1);
 
 namespace Tests\AppBundle\Model;
 
-use AppBundle\Model\Edit;
 use AppBundle\Model\GlobalContribs;
 use AppBundle\Model\Project;
 use AppBundle\Model\User;
@@ -111,7 +110,6 @@ class GlobalContribsTest extends TestAdapter
             ->method('getRevisions')
             ->willReturn($contribs);
 
-        /** @var Edit[] $edits */
         $edits = $globalContribs->globalEdits();
 
         static::assertCount(1, $edits);

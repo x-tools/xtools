@@ -54,8 +54,8 @@ class AutomatedEditsControllerTest extends ControllerTestAdapter
         $this->assertSuccessfulRoutes([
             '/autoedits/en.wikipedia/Example',
             '/autoedits/en.wikipedia/Example/1/2018-01-01/2018-02-01',
-            '/nonautoedits-contributions/en.wikipedia/Example/1/2018-01-01/2018-02-01/1',
-            '/autoedits-contributions/en.wikipedia/Example/1/2018-01-01/2018-02-01/1',
+            '/nonautoedits-contributions/en.wikipedia/Example/1/2018-01-01/2018-02-01/2018-01-15T12:00:00',
+            '/autoedits-contributions/en.wikipedia/Example/1/2018-01-01/2018-02-01/2018-01-15T12:00:00',
         ]);
     }
 
@@ -71,8 +71,8 @@ class AutomatedEditsControllerTest extends ControllerTestAdapter
         // Non-automated edits endpoint is tested in self::testNonautomatedEdits().
         $this->assertSuccessfulRoutes([
             '/api/user/automated_tools/en.wikipedia',
-            '/api/user/automated_editcount/en.wikipedia/Example/1/2018-01-01/2018-02-01/1',
-            '/api/user/automated_edits/en.wikipedia/Example/1/2018-01-01/2018-02-01/5',
+            '/api/user/automated_editcount/en.wikipedia/Example/1/2018-01-01/2018-02-01/2018-01-15T12:00:00',
+            '/api/user/automated_edits/en.wikipedia/Example/1/2018-01-01/2018-02-01/2018-01-15T12:00:00',
         ]);
     }
 
@@ -117,7 +117,7 @@ class AutomatedEditsControllerTest extends ControllerTestAdapter
             return;
         }
 
-        $url = '/api/user/nonautomated_edits/en.wikipedia/ThisIsaTest/all///0';
+        $url = '/api/user/nonautomated_edits/en.wikipedia/ThisIsaTest/all';
         $this->client->request('GET', $url);
         $response = $this->client->getResponse();
         static::assertEquals(200, $response->getStatusCode());

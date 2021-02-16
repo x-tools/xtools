@@ -151,7 +151,7 @@ class PageRepository extends Repository
             $limitClause = "LIMIT $limit";
         }
 
-        $dateConditions = $this->getDateConditions($start, $end, 'revs.');
+        $dateConditions = $this->getDateConditions($start, $end, false, 'revs.');
 
         $sql = "SELECT * FROM (
                     SELECT

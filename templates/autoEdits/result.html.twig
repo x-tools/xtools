@@ -34,13 +34,13 @@
                     {% if ae.start is not empty %}
                         <tr>
                             <td>{{ msg('start') }}</td>
-                            <td>{{ ae.start|date_format('yyyy-MM-dd') }}</td>
+                            <td>{{ ae.startDate }}</td>
                         </tr>
                     {% endif %}
                     {% if ae.end is not empty %}
                         <tr>
                             <td>{{ msg('end') }}</td>
-                            <td class="xt-test--end-date">{{ ae.end|date_format('yyyy-MM-dd') }}</td>
+                            <td class="xt-test--end-date">{{ ae.endDate }}</td>
                         </tr>
                     {% endif %}
                     <tr>
@@ -90,7 +90,7 @@
             </div>
         {% endset %}
         {% set downloadLink %}
-            {{ layout.downloadLink('UserApiNonAutoEdits', {'project': project.domain, 'username': user.username, 'namespace': ae.namespace, 'start': ae.start, 'end': ae.end}, [], 'UserApiAutoEditsCount') }}
+            {{ layout.downloadLink('UserApiNonAutoEdits', {'project': project.domain, 'username': user.username, 'namespace': ae.namespace, 'start': ae.startDate, 'end': ae.endDate}, [], 'UserApiAutoEditsCount') }}
         {% endset %}
         {{ layout.content_block('summary', content, downloadLink) }}
 
@@ -125,7 +125,7 @@
                                     {{ wiki.pageLinkRaw(values.link, project, values.label) }}
                                 </td>
                                 <td class="sort-entry--count" data-value="{{ values.count }}">
-                                    <a href="{{ path('AutoEditsContributionsResult', {project:project.domain, username:user.username, start: ae.start, end: ae.end, namespace: ae.namespace, tool: tool}) }}">
+                                    <a href="{{ path('AutoEditsContributionsResult', {project:project.domain, username:user.username, start: ae.startDate, end: ae.endDate, namespace: ae.namespace, tool: tool}) }}">
                                         {{ values.count|num_format }}
                                     </a>
                                 </td>
@@ -144,7 +144,7 @@
                                 {{ msg('num-tools', [ae.toolCounts|length]) }}
                             </th>
                             <th class="tools--count">
-                                <a href="{{ path('AutoEditsContributionsResult', {project:project.domain, username:user.username, start: ae.start, end: ae.end, namespace: ae.namespace}) }}">{{ ae.toolsTotal|num_format }}</a>
+                                <a href="{{ path('AutoEditsContributionsResult', {project:project.domain, username:user.username, start: ae.startDate, end: ae.endDate, namespace: ae.namespace}) }}">{{ ae.toolsTotal|num_format }}</a>
                                 {% apply spaceless %}
                                     <div class="glyphicon glyphicon-info-sign tooltipcss tooltipcss--tool-counts" role="dialog" aria-labelledby="auto-edits-tools-desc">
                                         <div id="auto-edits-tools-desc" class="tooltip-body">
@@ -224,7 +224,7 @@
             {% endset %}
         {% endif %}
         {% set downloadLink %}
-            {{ layout.downloadLink('UserApiNonAutoEdits', {'project': project.domain, 'username': user.username, 'namespace': ae.namespace, 'start': ae.start, 'end': ae.end, 'tools': '1'}, [], 'UserApiAutoEditsCount') }}
+            {{ layout.downloadLink('UserApiNonAutoEdits', {'project': project.domain, 'username': user.username, 'namespace': ae.namespace, 'start': ae.startDate, 'end': ae.endDate, 'tools': '1'}, [], 'UserApiAutoEditsCount') }}
         {% endset %}
         {{ layout.content_block('auto-edits', content, downloadLink) }}
 
@@ -241,20 +241,20 @@
                     <div class="contributions-container"
                         data-project="{{ project.domain }}"
                         data-username="{{ user.username }}"
-                        data-start="{{ ae.start }}"
-                        data-end="{{ ae.end }}"
+                        data-start="{{ ae.startDate }}"
+                        data-end="{{ ae.endDate }}"
                         data-namespace="{{ ae.namespace }}"
-                        data-offset="{{ ae.offset }}"
+                        data-offset="{{ ae.offsetISO }}"
                         data-target="nonautoedits">
                     </div>
                 </div>
             {% endset %}
         {% endif %}
         {% set headerLink %}
-            <a href="{{ path('NonAutoEditsContributionsResult', {project:project.domain, username:user.username, start: ae.start, end: ae.end, namespace: ae.namespace}) }}">{{ msg('non-auto-contribs') }}</a>
+            <a href="{{ path('NonAutoEditsContributionsResult', {project:project.domain, username:user.username, start: ae.startDate, end: ae.endDate, namespace: ae.namespace}) }}">{{ msg('non-auto-contribs') }}</a>
         {% endset %}
         {% set downloadLink %}
-            {{ layout.downloadLink('UserApiNonAutoEdits', {'project': project.domain, 'username': user.username, 'namespace': ae.namespace, 'start': ae.start, 'end': ae.end}, [], 'UserApiNonAutoEdits') }}
+            {{ layout.downloadLink('UserApiNonAutoEdits', {'project': project.domain, 'username': user.username, 'namespace': ae.namespace, 'start': ae.startDate, 'end': ae.endDate}, [], 'UserApiNonAutoEdits') }}
         {% endset %}
         {{ layout.content_block(headerLink, content, downloadLink, 'non-auto-contribs', true) }}
 

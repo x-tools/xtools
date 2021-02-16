@@ -66,8 +66,8 @@ $(function () {
         var initFunc = $('.contributions-table').length ? 'setupContributionsNavListeners' : 'loadContributions';
         xtools.application[initFunc](
             function (params) {
-                return params.target + '-contributions/' + params.project + '/' + params.username + '/' +
-                    params.namespace + '/' + params.start + '/' + params.end;
+                return `${params.target}-contributions/${params.project}/${params.username}` +
+                    `/${params.namespace}/${params.start}/${params.end}`;
             },
             $('.contributions-container').data('target')
         );

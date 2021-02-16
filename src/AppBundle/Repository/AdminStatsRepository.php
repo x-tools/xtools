@@ -45,7 +45,7 @@ class AdminStatsRepository extends Repository
         $actorTable = $project->getTableName('actor');
         $loggingTable = $project->getTableName('logging', 'logindex');
         [$countSql, $types, $actions] = $this->getLogSqlParts($project, $type, $actions);
-        $dateConditions = $this->getDateConditions($start, $end, "logging_logindex.", 'log_timestamp');
+        $dateConditions = $this->getDateConditions($start, $end, false, "logging_logindex.", 'log_timestamp');
 
         if (empty($types) || empty($actions)) {
             // Types/actions not applicable to this wiki.

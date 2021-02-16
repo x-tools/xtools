@@ -24,22 +24,22 @@ class EditSummaryRepository extends UserRepository
      * @param Project $project The project we're working with.
      * @param User $user The user to process.
      * @param string|int $namespace Namespace ID or 'all' for all namespaces.
-     * @param string $start Start date in a format accepted by strtotime().
-     * @param string $end End date in a format accepted by strtotime().
+     * @param int|false $start Start date as Unix timestamp.
+     * @param int|false $end End date as Unix timestamp.
      * @return ResultStatement
      */
     public function getRevisions(
         Project $project,
         User $user,
         $namespace,
-        string $start = '',
-        string $end = ''
+        $start = false,
+        $end = false
     ): ResultStatement {
         $revisionTable = $project->getTableName('revision');
         $commentTable = $project->getTableName('comment');
         $pageTable = $project->getTableName('page');
 
-        [$condBegin, $condEnd] = $this->getRevTimestampConditions($start, $end);
+        $revDateConditions = $this->getDateConditions($start, $end);
         $condNamespace = 'all' === $namespace ? '' : 'AND page_namespace = :namespace';
         $pageJoin = 'all' === $namespace ? '' : "JOIN $pageTable ON rev_page = page_id";
 
@@ -49,11 +49,10 @@ class EditSummaryRepository extends UserRepository
                 LEFT OUTER JOIN $commentTable ON comment_id = rev_comment_id
                 WHERE rev_actor = :actorId
                 $condNamespace
-                $condBegin
-                $condEnd
+                $revDateConditions
                 ORDER BY rev_timestamp DESC";
 
-        return $this->executeQuery($sql, $project, $user, $namespace, $start, $end);
+        return $this->executeQuery($sql, $project, $user, $namespace);
     }
 
     /**
@@ -62,8 +61,8 @@ class EditSummaryRepository extends UserRepository
      * @param Project $project
      * @param User $user
      * @param int|string $namespace Namespace ID or 'all' for all namespaces.
-     * @param string $start Start date in a format accepted by strtotime().
-     * @param string $end End date in a format accepted by strtotime().
+     * @param int|false $start Start date as Unix timestamp.
+     * @param int|false $end End date as Unix timestamp.
      * @return array The final results.
      */
     public function prepareData(
@@ -71,8 +70,8 @@ class EditSummaryRepository extends UserRepository
         Project $project,
         User $user,
         $namespace,
-        string $start = '',
-        string $end = ''
+        $start = false,
+        $end = false
     ): array {
         $cacheKey = $this->getCacheKey([$project, $user, $namespace, $start, $end], 'edit_summary_usage');
         if ($this->cache->hasItem($cacheKey)) {

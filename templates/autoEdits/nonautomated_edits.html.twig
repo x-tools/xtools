@@ -8,7 +8,7 @@
     <div class="panel panel-primary">
         <header class="panel-heading">
             <div class="text-center xt-heading-top">
-                <a class="back-to-search" href="{{ path('AutoEditsResult', {project: project.domain, username:user.username, start: ae.start, end: ae.end, namespace: ae.namespace}) }}">
+                <a class="back-to-search" href="{{ path('AutoEditsResult', {project: project.domain, username:user.username, start: ae.startDate, end: ae.endDate, namespace: ae.namespace}) }}">
                     <span class="glyphicon glyphicon-chevron-left"></span>
                     {{ msg('see-full-statistics') }}
                 </a>
@@ -24,7 +24,7 @@
                     <h4>
                         {{ msg('non-auto-contribs') }}
                         <span class='pull-right text-muted xt-panel-description'>
-                            {{ layout.downloadLink('UserApiNonAutoEdits', {'project': project.domain, 'username': user.username, 'namespace': ae.namespace, 'start': ae.start, 'end': ae.end}, [], 'UserApiNonAutoEdits') }}
+                            {{ layout.downloadLink('UserApiNonAutoEdits', {'project': project.domain, 'username': user.username, 'namespace': ae.namespace, 'start': ae.startDate, 'end': ae.endDate}, [], 'UserApiNonAutoEdits') }}
                         </span>
                         <span class='pull-right text-muted xt-panel-description'>
                             {{ msg('non-auto-contribs-desc') }}
@@ -36,10 +36,10 @@
                     <div class="contributions-container"
                         data-project="{{ project.domain }}"
                         data-username="{{ user.username }}"
-                        data-start="{{ ae.start }}"
-                        data-end="{{ ae.end }}"
+                        data-start="{{ ae.startDate }}"
+                        data-end="{{ ae.endDate }}"
                         data-namespace="{{ ae.namespace }}"
-                        data-offset="{{ ae.offset }}"
+                        data-offset="{{ ae.offsetISO }}"
                         data-target="nonautoedits">
 {% endif %}
 

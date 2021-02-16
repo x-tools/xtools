@@ -98,7 +98,7 @@ class CategoryEditsController extends XtoolsController
             $this->categories,
             $this->start,
             $this->end,
-            $this->offset ?? 0
+            $this->offset
         );
         $categoryEditsRepo = new CategoryEditsRepository();
         $categoryEditsRepo->setContainer($this->container);
@@ -176,12 +176,12 @@ class CategoryEditsController extends XtoolsController
      *   "/categoryedits-contributions/{project}/{username}/{categories}/{start}/{end}/{offset}",
      *   name="CategoryContributionsResult",
      *   requirements={
-     *       "categories" = "(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
-     *       "start" = "|\d{4}-\d{2}-\d{2}",
-     *       "end" = "|\d{4}-\d{2}-\d{2}",
-     *       "offset" = "|\d+"
+     *       "categories"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2}))?",
+     *       "start"="|\d{4}-\d{2}-\d{2}",
+     *       "end"="|\d{4}-\d{2}-\d{2}",
+     *       "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}",
      *   },
-     *   defaults={"start" = false, "end" = false, "offset" = 0}
+     *   defaults={"start"=false, "end"=false, "offset"=0}
      * )
      * @return Response
      * @codeCoverageIgnore

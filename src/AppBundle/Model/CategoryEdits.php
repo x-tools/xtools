@@ -34,7 +34,7 @@ class CategoryEdits extends Model
      * @param array $categories
      * @param int|false $start As Unix timestamp.
      * @param int|false $end As Unix timestamp.
-     * @param int $offset Used for pagination, offset results by N edits.
+     * @param int|false $offset As Unix timestamp. Used for pagination.
      */
     public function __construct(
         Project $project,
@@ -42,16 +42,16 @@ class CategoryEdits extends Model
         array $categories,
         $start = false,
         $end = false,
-        $offset = 0
+        $offset = false
     ) {
         $this->project = $project;
         $this->user = $user;
         $this->categories = array_map(function ($category) {
             return str_replace(' ', '_', $category);
         }, $categories);
-        $this->start = false === $start ? '' : date('Y-m-d', $start);
-        $this->end = false === $end ? '' : date('Y-m-d', $end);
-        $this->offset = (int)$offset;
+        $this->start = $start;
+        $this->end = $end;
+        $this->offset = $offset;
     }
 
     /**

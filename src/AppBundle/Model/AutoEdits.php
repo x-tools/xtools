@@ -38,10 +38,10 @@ class AutoEdits extends Model
      * @param Project $project
      * @param User $user
      * @param int|string $namespace Namespace ID or 'all'
-     * @param int|false $start Start date in a format accepted by strtotime()
-     * @param int|false $end End date in a format accepted by strtotime()
+     * @param false|int $start Start date as Unix timestamp.
+     * @param false|int $end End date as Unix timestamp.
      * @param string $tool The tool we're searching for when fetching (semi-)automated edits.
-     * @param int|string $offset Used for pagination, offset results by N edits.
+     * @param false|int $offset Unix timestamp. Used for pagination.
      */
     public function __construct(
         Project $project,
@@ -50,13 +50,13 @@ class AutoEdits extends Model
         $start = false,
         $end = false,
         $tool = null,
-        $offset = 0
+        $offset = false
     ) {
         $this->project = $project;
         $this->user = $user;
         $this->namespace = $namespace;
-        $this->start = false === $start ? '' : date('Y-m-d', $start);
-        $this->end = false === $end ? '' : date('Y-m-d', $end);
+        $this->start = $start;
+        $this->end = $end;
         $this->tool = $tool;
         $this->offset = $offset;
     }

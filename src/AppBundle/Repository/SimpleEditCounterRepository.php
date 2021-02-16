@@ -39,7 +39,7 @@ class SimpleEditCounterRepository extends Repository
         $revisionTable = $project->getTableName('revision');
         $userGroupsTable = $project->getTableName('user_groups');
 
-        $arDateConditions = $this->getDateConditions($start, $end, null, 'ar_timestamp');
+        $arDateConditions = $this->getDateConditions($start, $end, false, '', 'ar_timestamp');
         $revDateConditions = $this->getDateConditions($start, $end);
 
         $revNamespaceJoinSql = 'all' === $namespace ? '' : "JOIN $pageTable ON rev_page = page_id";

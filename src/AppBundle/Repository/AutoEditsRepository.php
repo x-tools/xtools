@@ -97,18 +97,23 @@ class AutoEditsRepository extends UserRepository
      * @param Project $project
      * @param User $user
      * @param string|int $namespace Namespace ID or 'all'
-     * @param string $start Start date in a format accepted by strtotime()
-     * @param string $end End date in a format accepted by strtotime()
+     * @param int|false $start Start date as Unix timestmap.
+     * @param int|false $end End date as Unix timestmap.
      * @return int Result of query, see below.
      */
-    public function countAutomatedEdits(Project $project, User $user, $namespace = 'all', $start = '', $end = ''): int
-    {
+    public function countAutomatedEdits(
+        Project $project,
+        User $user,
+        $namespace = 'all',
+        $start = false,
+        $end = false
+    ): int {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_autoeditcount');
         if (!$this->useSandbox && $this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        [$condBegin, $condEnd] = $this->getRevTimestampConditions($start, $end);
+        $revDateConditions = $this->getDateConditions($start, $end);
 
         // Get the combined regex and tags for the tools
         [$regex, $tagIds] = $this->getToolRegexAndTags($project, false, null, $namespace);
@@ -144,10 +149,9 @@ class AutoEditsRepository extends UserRepository
                 WHERE rev_actor = :actorId
                 $condNamespace
                 $condTool
-                $condBegin
-                $condEnd";
+                $revDateConditions";
 
-        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $start, $end, $params);
+        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $params);
         $result = (int)$resultQuery->fetchColumn();
 
         // Cache and return.
@@ -159,9 +163,9 @@ class AutoEditsRepository extends UserRepository
      * @param Project $project
      * @param User $user
      * @param string|int $namespace Namespace ID or 'all'.
-     * @param string $start Start date in a format accepted by strtotime().
-     * @param string $end End date in a format accepted by strtotime().
-     * @param int $offset Used for pagination, offset results by N edits.
+     * @param int|false $start Start date as Unix timestamp.
+     * @param int|false $end End date as Unix timestamp.
+     * @param int|false $offset Unix timestamp. Used for pagination.
      * @return string[] Result of query, with columns 'page_title', 'page_namespace', 'rev_id', 'timestamp', 'minor',
      *   'length', 'length_change', 'comment'.
      */
@@ -169,16 +173,16 @@ class AutoEditsRepository extends UserRepository
         Project $project,
         User $user,
         $namespace = 'all',
-        $start = '',
-        $end = '',
-        int $offset = 0
+        $start = false,
+        $end = false,
+        $offset = false
     ): array {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_nonautoedits');
         if (!$this->useSandbox && $this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        [$condBegin, $condEnd] = $this->getRevTimestampConditions($start, $end, 'revs.');
+        $revDateConditions = $this->getDateConditions($start, $end, $offset, 'revs.');
 
         // Get the combined regex and tags for the tools
         [$regex, $tagIds] = $this->getToolRegexAndTags($project, false, null, $namespace);
@@ -207,15 +211,13 @@ class AutoEditsRepository extends UserRepository
                 AND revs.rev_timestamp > 0
                 AND comment_text NOT RLIKE :tools
                 $condTag
-                $condBegin
-                $condEnd
+                $revDateConditions
                 $condNamespace
                 GROUP BY revs.rev_id
                 ORDER BY revs.rev_timestamp DESC
-                LIMIT 50
-                OFFSET $offset";
+                LIMIT 50";
 
-        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $start, $end, ['tools' => $regex]);
+        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, ['tools' => $regex]);
         $result = $resultQuery->fetchAll();
 
         // Cache and return.
@@ -227,10 +229,10 @@ class AutoEditsRepository extends UserRepository
      * @param Project $project
      * @param User $user
      * @param string|int $namespace Namespace ID or 'all'.
-     * @param string $start Start date in a format accepted by strtotime().
-     * @param string $end End date in a format accepted by strtotime().
+     * @param int|false $start Start date as Unix timestamp.
+     * @param int|false $end End date as Unix timestamp.
      * @param string|null $tool Only get edits made with this tool. Must match the keys in the AutoEdits config.
-     * @param int $offset Used for pagination, offset results by N edits.
+     * @param int|false $offset Unix timestamp. Used for pagination.
      * @return string[] Result of query, with columns 'page_title', 'page_namespace', 'rev_id', 'timestamp', 'minor',
      *   'length', 'length_change', 'comment'.
      */
@@ -238,21 +240,21 @@ class AutoEditsRepository extends UserRepository
         Project $project,
         User $user,
         $namespace = 'all',
-        $start = '',
-        $end = '',
+        $start = false,
+        $end = false,
         ?string $tool = null,
-        int $offset = 0
+        $offset = false
     ): array {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_autoedits');
         if (!$this->useSandbox && $this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        [$condBegin, $condEnd] = $this->getRevTimestampConditions($start, $end, 'revs.');
+        $revDateConditions = $this->getDateConditions($start, $end, $offset, 'revs.');
 
         // In this case there is a slight performance improvement we can make if we're not given a start date.
-        if ('' == $condBegin && '' == $condEnd) {
-            $condBegin = 'AND revs.rev_timestamp > 0';
+        if ('' === $revDateConditions) {
+            $revDateConditions = 'AND revs.rev_timestamp > 0';
         }
 
         // Get the combined regex and tags for the tools
@@ -290,16 +292,14 @@ class AutoEditsRepository extends UserRepository
                 LEFT OUTER JOIN $commentTable ON (revs.rev_comment_id = comment_id)
                 $tagJoin
                 WHERE revs.rev_actor = :actorId
-                $condBegin
-                $condEnd
+                $revDateConditions
                 $condNamespace
                 AND (".implode(' OR ', $condsTool).")
                 GROUP BY revs.rev_id
                 ORDER BY revs.rev_timestamp DESC
-                LIMIT 50
-                OFFSET $offset";
+                LIMIT 50";
 
-        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $start, $end, ['tools' => $regex]);
+        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, ['tools' => $regex]);
         $result = $resultQuery->fetchAll();
 
         // Cache and return.
@@ -311,8 +311,8 @@ class AutoEditsRepository extends UserRepository
      * @param Project $project
      * @param User $user
      * @param string|int $namespace Namespace ID or 'all'.
-     * @param string $start Start date in a format accepted by strtotime().
-     * @param string $end End date in a format accepted by strtotime().
+     * @param int|false $start Start date as Unix timestamp.
+     * @param int|false $end End date as Unix timestamp.
      * @return string[] Each tool that they used along with the count and link:
      *                  [
      *                      'Twinkle' => [
@@ -321,7 +321,7 @@ class AutoEditsRepository extends UserRepository
      *                      ],
      *                  ]
      */
-    public function getToolCounts(Project $project, User $user, $namespace = 'all', $start = '', $end = ''): array
+    public function getToolCounts(Project $project, User $user, $namespace = 'all', $start = false, $end = false): array
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_autotoolcounts');
         if (!$this->useSandbox && $this->cache->hasItem($cacheKey)) {
@@ -329,7 +329,7 @@ class AutoEditsRepository extends UserRepository
         }
 
         $sql = $this->getAutomatedCountsSql($project, $namespace, $start, $end);
-        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $start, $end);
+        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace);
 
         $tools = $this->getTools($project, $namespace);
 
@@ -362,13 +362,13 @@ class AutoEditsRepository extends UserRepository
      * @see self::getAutomatedCounts()
      * @param Project $project
      * @param string|int $namespace Namespace ID or 'all'.
-     * @param string $start Start date in a format accepted by strtotime()
-     * @param string $end End date in a format accepted by strtotime()
+     * @param int|false $start Start date as Unix timestamp.
+     * @param int|false $end End date as Unix timestamp.
      * @return string The SQL.
      */
-    private function getAutomatedCountsSql(Project $project, $namespace, $start, $end): string
+    private function getAutomatedCountsSql(Project $project, $namespace, $start = false, $end = false): string
     {
-        [$condBegin, $condEnd] = $this->getRevTimestampConditions($start, $end);
+        $revDateConditions = $this->getDateConditions($start, $end);
 
         // Load the semi-automated edit types.
         $tools = $this->getTools($project, $namespace);
@@ -400,8 +400,7 @@ class AutoEditsRepository extends UserRepository
                 WHERE rev_actor = :actorId
                 AND $condTool
                 $condNamespace
-                $condBegin
-                $condEnd";
+                $revDateConditions";
         }
 
         // Combine to one big query.

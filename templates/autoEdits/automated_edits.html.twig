@@ -8,7 +8,7 @@
     <div class="panel panel-primary">
         <header class="panel-heading">
             <div class="text-center xt-heading-top">
-                <a class="back-to-search" href="{{ path('AutoEditsResult', {project: project.domain, username:user.username, start: ae.start, end: ae.end, namespace: ae.namespace}) }}">
+                <a class="back-to-search" href="{{ path('AutoEditsResult', {project: project.domain, username:user.username, start: ae.startDate, end: ae.endDate, namespace: ae.namespace}) }}">
                     <span class="glyphicon glyphicon-chevron-left"></span>
                     {{ msg('see-full-statistics') }}
                 </a>
@@ -32,7 +32,7 @@
                             {{ msg('auto-tool-edits', [toolLink]) }}
                         {% endif %}
                         <span class='pull-right text-muted xt-panel-description'>
-                            {{ layout.downloadLink('UserApiAutoEdits', {'project': project.domain, 'username': user.username, 'namespace': ae.namespace, 'start': ae.start, 'end': ae.end, 'tool': ae.tool}, [], 'UserApiAutoEdits') }}
+                            {{ layout.downloadLink('UserApiAutoEdits', {'project': project.domain, 'username': user.username, 'namespace': ae.namespace, 'start': ae.startDate, 'end': ae.endDate, 'tool': ae.tool}, [], 'UserApiAutoEdits') }}
                         </span>
                         <span class='pull-right text-muted xt-panel-description'>{{ msg('auto-contribs-desc') }}</span>
                     </h4>
@@ -42,15 +42,15 @@
                     <div class="contributions-container"
                         data-project="{{ project.domain }}"
                         data-username="{{ user.username }}"
-                        data-start="{{ ae.start }}"
-                        data-end="{{ ae.end }}"
+                        data-start="{{ ae.startDate }}"
+                        data-end="{{ ae.endDate }}"
                         data-namespace="{{ ae.namespace }}"
-                        data-offset="{{ ae.offset }}"
+                        data-offset="{{ ae.offsetISO }}"
                         data-target="autoedits">
 {% endif %}
 
 <div>
-    <form class="tool-selector-form form-inline" action="{{ path('AutoEditsContributionsResult', {project: project.domain, username:user.username, start: ae.start, end: ae.end, namespace: ae.namespace}) }}" method="get" accept-charset="utf-8">
+    <form class="tool-selector-form form-inline" action="{{ path('AutoEditsContributionsResult', {project: project.domain, username:user.username, start: ae.startDate, end: ae.endDate, namespace: ae.namespace}) }}" method="get" accept-charset="utf-8">
         <label for="toolSelector">{{ msg('auto-contribs-use-tool') }}</label>
         <select id="toolSelector" class="form-control" name="tool">
             <option value="">{{ msg('all') }}</option>

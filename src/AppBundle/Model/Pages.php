@@ -23,9 +23,6 @@ class Pages extends Model
     /** @var string One of 'live', 'deleted' or 'all' for both. */
     protected $deleted;
 
-    /** @var int Pagination offset. */
-    protected $offset;
-
     /** @var mixed[] The list of pages including various statistics, keyed by namespace. */
     protected $pages;
 
@@ -39,9 +36,9 @@ class Pages extends Model
      * @param string|int $namespace Namespace ID or 'all'.
      * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
      * @param string $deleted One of 'live', 'deleted' or 'all' for both.
-     * @param int|false $start Start date in a format accepted by strtotime()
-     * @param int|false $end End date in a format accepted by strtotime()
-     * @param int $offset Pagination offset.
+     * @param int|false $start Start date as Unix timestamp.
+     * @param int|false $end End date as Unix timestamp.
+     * @param int|false $offset Unix timestamp. Used for pagination.
      */
     public function __construct(
         Project $project,
@@ -51,13 +48,13 @@ class Pages extends Model
         $deleted = 'all',
         $start = false,
         $end = false,
-        $offset = 0
+        $offset = false
     ) {
         $this->project = $project;
         $this->user = $user;
         $this->namespace = 'all' === $namespace ? 'all' : (string)$namespace;
-        $this->start = false === $start ? '' : date('Y-m-d', $start);
-        $this->end = false === $end ? '' : date('Y-m-d', $end);
+        $this->start = $start;
+        $this->end = $end;
         $this->redirects = $redirects ?: 'noredirects';
         $this->deleted = $deleted ?: 'all';
         $this->offset = $offset;
@@ -118,6 +115,22 @@ class Pages extends Model
     }
 
     /**
+     * Return a ISO 8601 timestamp of the last result. This is used for pagination purposes.
+     * @return string|null
+     */
+    public function getLastTimestamp(): ?string
+    {
+        if ($this->isMultiNamespace()) {
+            // No pagination in multi-namespace view.
+            return null;
+        }
+
+        $numResults = count($this->getResults()[$this->getNamespace()]);
+        $timestamp = new DateTime($this->getResults()[$this->getNamespace()][$numResults - 1]['rev_timestamp']);
+        return $timestamp->format('Y-m-d\TH:i:s');
+    }
+
+    /**
      * Get the total number of pages the user has created.
      * @return int
      */
@@ -171,7 +184,7 @@ class Pages extends Model
 
     /**
      * Get the namespaces in which this user has created pages.
-     * @return string[] The IDs.
+     * @return int[] The IDs.
      */
     public function getNamespaces(): array
     {
@@ -227,18 +240,19 @@ class Pages extends Model
         $counts = [];
 
         foreach ($this->countPagesCreated() as $row) {
+            $ns = (int)$row['namespace'];
             $count = (int)$row['count'];
             $totalLength = (int)$row['total_length'];
-            $counts[$row['namespace']] = [
+            $counts[$ns] = [
                 'count' => $count,
                 'total_length' => $totalLength,
                 'avg_length' => $count > 0 ? $totalLength / $count : 0,
             ];
             if ('live' !== $this->deleted) {
-                $counts[$row['namespace']]['deleted'] = (int)$row['deleted'];
+                $counts[$ns]['deleted'] = (int)$row['deleted'];
             }
             if ('noredirects' !== $this->redirects) {
-                $counts[$row['namespace']]['redirects'] = (int)$row['redirects'];
+                $counts[$ns]['redirects'] = (int)$row['redirects'];
             }
         }
 
@@ -313,7 +327,7 @@ class Pages extends Model
             $this->start,
             $this->end,
             $this->resultsPerPage($all),
-            $this->offset * $this->resultsPerPage()
+            $this->offset
         );
     }
 

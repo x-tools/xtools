@@ -30,7 +30,7 @@ class Authorship extends Model
      * Authorship constructor.
      * @param Page $page The page to process.
      * @param string|null $target Either a revision ID or date in YYYY-MM-DD format. Null to use latest revision.
-     * @param int $limit Max number of results.
+     * @param int|null $limit Max number of results.
      */
     public function __construct(Page $page, ?string $target = null, ?int $limit = null)
     {

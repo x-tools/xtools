@@ -26,13 +26,13 @@
                     {% if es.start is not empty %}
                         <tr>
                             <td>{{ msg('start') }}</td>
-                            <td>{{ es.start|date_format('yyyy-MM-dd') }}</td>
+                            <td>{{ es.startDate }}</td>
                         </tr>
                     {% endif %}
                     {% if es.end is not empty %}
                         <tr>
                             <td>{{ msg('end') }}</td>
-                            <td>{{ es.end|date_format('yyyy-MM-dd') }}</td>
+                            <td>{{ es.endDate }}</td>
                         </tr>
                     {% endif %}
                     <tr>
@@ -129,7 +129,7 @@
             {% endif %}
         {% endset %}
         {% set downloadLink %}
-            {{ layout.downloadLink('EditSummaryResult', {project: project.domain, username: user.username, namespace: es.namespace, start: es.start, end: es.end}, [], 'UserApiEditSummaries') }}
+            {{ layout.downloadLink('EditSummaryResult', {project: project.domain, username: user.username, namespace: es.namespace, start: es.startDate, end: es.endDate}, [], 'UserApiEditSummaries') }}
         {% endset %}
         {{ layout.content_block('summary', content, downloadLink) }}
 

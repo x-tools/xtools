@@ -66,8 +66,8 @@ class CategoryEditsTest extends TestAdapter
      */
     public function testBasics(): void
     {
-        static::assertEquals('2017-01-01', $this->ce->getStart());
-        static::assertEquals('2017-02-01', $this->ce->getEnd());
+        static::assertEquals('2017-01-01', $this->ce->getStartDate());
+        static::assertEquals('2017-02-01', $this->ce->getEndDate());
         static::assertEquals(50, $this->ce->getOffset());
         static::assertEquals(
             ['Living_people', 'Musicians_from_New_York_City'],

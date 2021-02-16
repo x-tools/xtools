@@ -224,11 +224,11 @@ class User extends Model
      * Get edit count within given timeframe and namespace
      * @param Project $project
      * @param int|string $namespace Namespace ID or 'all' for all namespaces
-     * @param string $start Start date in a format accepted by strtotime()
-     * @param string $end End date in a format accepted by strtotime()
+     * @param int|false $start Start date as Unix timestamp.
+     * @param int|false $end End date as Unix timestamp.
      * @return int
      */
-    public function countEdits(Project $project, $namespace = 'all', $start = '', $end = ''): int
+    public function countEdits(Project $project, $namespace = 'all', $start = false, $end = false): int
     {
         return (int) $this->getRepository()->countEdits($project, $this, $namespace, $start, $end);
     }

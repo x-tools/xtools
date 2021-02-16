@@ -28,12 +28,12 @@
                 <table class="table"><tbody>
                     <tr>
                         <td>{{ msg('start') }}</td>
-                        <td>{{ as.start|date_format('yyyy-MM-dd') }}</td>
+                        <td>{{ as.startDate }}</td>
                     </tr>
                     <tr>
                         <td>{{ msg('end') }}</td>
                         <td>
-                            {{ as.end|date_format('yyyy-MM-dd') }}
+                            {{ as.endDate }}
                             ({{ as.numDays|num_format }} {{ msg('num-days', [as.numDays]) }})
                         </td>
                     </tr>
@@ -122,7 +122,7 @@
             </table>
         {% endset %}
 
-        {% set params = {'project': project.domain, 'start': as.start|date_format('yyyy-MM-dd'), 'end': as.end|date_format('yyyy-MM-dd'), 'group': as.type, 'actions': as.actions|join('|')} %}
+        {% set params = {'project': project.domain, 'start': as.startDate, 'end': as.endDate, 'group': as.type, 'actions': as.actions|join('|')} %}
         {% set downloadLink %}
             {{ layout.downloadLink('AdminStatsResult', params, ['wikitext', 'csv', 'tsv'], 'ProjectApiAdminStats') }}
         {% endset %}

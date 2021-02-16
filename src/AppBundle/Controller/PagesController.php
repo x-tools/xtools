@@ -120,13 +120,13 @@ class PagesController extends XtoolsController
      *         "deleted"="|all|live|deleted",
      *         "start"="|\d{4}-\d{2}-\d{2}",
      *         "end"="|\d{4}-\d{2}-\d{2}",
-     *         "offset"="|\d+",
+     *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}",
      *     },
      *     defaults={
      *         "namespace"=0,
      *         "start"=false,
      *         "end"=false,
-     *         "offset"=0,
+     *         "offset"=false,
      *     }
      * )
      * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
@@ -329,6 +329,7 @@ class PagesController extends XtoolsController
      *         "deleted"="|all|live|deleted",
      *         "start"="|\d{4}-\d{2}-\d{2}",
      *         "end"="|\d{4}-\d{2}-\d{2}",
+     *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}",
      *     },
      *     defaults={
      *         "namespace"=0,
@@ -336,7 +337,7 @@ class PagesController extends XtoolsController
      *         "deleted"="all",
      *         "start"=false,
      *         "end"=false,
-     *         "offset"=0,
+     *         "offset"=false,
      *     }
      * )
      * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.

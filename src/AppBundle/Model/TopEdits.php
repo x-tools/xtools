@@ -41,11 +41,11 @@ class TopEdits extends Model
      * @param User $user
      * @param Page $page
      * @param string|int $namespace Namespace ID or 'all'.
-     * @param int|false $start Start date in a format accepted by strtotime()
-     * @param int|false $end End date in a format accepted by strtotime()
+     * @param int|false $start Start date as Unix timestamp.
+     * @param int|false $end End date as Unix timestamp.
      * @param int $limit Number of rows to fetch. This defaults to DEFAULT_LIMIT_SINGLE_NAMESPACE if $this->namespace
      *   is a single namespace (int), and DEFAULT_LIMIT_ALL_NAMESPACES if $this->namespace is 'all'.
-     * @param int $offset Number of pages past the initial dataset. Used for pagination.
+     * @param int|false $offset Unix timestamp. Used for pagination.
      */
     public function __construct(
         Project $project,
@@ -55,15 +55,15 @@ class TopEdits extends Model
         $start = false,
         $end = false,
         $limit = null,
-        $offset = 0
+        $offset = false
     ) {
         $this->project = $project;
         $this->user = $user;
         $this->page = $page;
         $this->namespace = 'all' === $namespace ? 'all' : (int)$namespace;
-        $this->start = false === $start ? '' : date('Y-m-d', $start);
-        $this->end = false === $end ? '' : date('Y-m-d', $end);
-        $this->offset = (int)$offset;
+        $this->start = $start;
+        $this->end = $end;
+        $this->offset = $offset;
 
         if (null !== $limit) {
             $this->limit = (int)$limit;
@@ -199,7 +199,7 @@ class TopEdits extends Model
                 $this->start,
                 $this->end,
                 $this->limit,
-                $this->offset * $this->limit
+                $this->offset
             );
         }
 

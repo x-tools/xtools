@@ -50,8 +50,8 @@ class ArticleInfoApi extends Model
      * ArticleInfoApi constructor.
      * @param Page $page The page to process.
      * @param ContainerInterface $container The DI container.
-     * @param false|int $start From what date to obtain records.
-     * @param false|int $end To what date to obtain records.
+     * @param false|int $start Start date as Unix timestmap.
+     * @param false|int $end End date as Unix timestamp.
      */
     public function __construct(Page $page, ContainerInterface $container, $start = false, $end = false)
     {
@@ -59,24 +59,6 @@ class ArticleInfoApi extends Model
         $this->container = $container;
         $this->start = $start;
         $this->end = $end;
-    }
-
-    /**
-     * Get date opening date range, formatted as this is used in the views.
-     * @return string Blank if no value exists.
-     */
-    public function getStartDate(): string
-    {
-        return '' == $this->start ? '' : date('Y-m-d', $this->start);
-    }
-
-    /**
-     * Get date closing date range, formatted as this is used in the views.
-     * @return string Blank if no value exists.
-     */
-    public function getEndDate(): string
-    {
-        return '' == $this->end ? '' : date('Y-m-d', $this->end);
     }
 
     /**
@@ -157,7 +139,7 @@ class ArticleInfoApi extends Model
             return $this->proseStats;
         }
 
-        $datetime = false !== $this->end ? new DateTime('@'.$this->end) : null;
+        $datetime = is_int($this->end) ? new DateTime("@{$this->end}") : null;
         $html = $this->page->getHTMLContent($datetime);
 
         $crawler = new Crawler($html);
