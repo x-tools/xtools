@@ -68,8 +68,8 @@ class AutoEditsTest extends TestAdapter
         );
 
         static::assertEquals(1, $autoEdits->getNamespace());
-        static::assertEquals('2017-01-01', $autoEdits->getStart());
-        static::assertEquals('2018-01-01', $autoEdits->getEnd());
+        static::assertEquals('2017-01-01', $autoEdits->getStartDate());
+        static::assertEquals('2018-01-01', $autoEdits->getEndDate());
         static::assertEquals('Twinkle', $autoEdits->getTool());
         static::assertEquals(50, $autoEdits->getOffset());
     }

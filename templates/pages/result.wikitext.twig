@@ -1,7 +1,7 @@
 {% import 'macros/wiki.html.twig' as wiki %}
 == [[User:{{ user.username }}]] ==
 
-{% set link %}[{{ url('PagesResult', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted, 'start': pages.start, 'end': pages.end}) }} {{ msg('xtools-title') }}]{% endset %}
+{% set link %}[{{ url('PagesResult', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted, 'start': pages.startDate, 'end': pages.endDate}) }} {{ msg('xtools-title') }}]{% endset %}
 {{ msg('xtools-advert', [link, date()|date_format]) }}
 {% if pages.getNumPages == 0 %}
 {{ msg('no-result', [user.username]) }}

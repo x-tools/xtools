@@ -9,6 +9,7 @@ namespace AppBundle\Model;
 
 use AppBundle\Helper\I18nHelper;
 use DateInterval;
+use DateTimeImmutable;
 use Exception;
 
 /**
@@ -383,7 +384,7 @@ class UserRights extends Model
             return false;
         }
 
-        $regDateImmutable = new \DateTimeImmutable(
+        $regDateImmutable = new DateTimeImmutable(
             $registrationDate->format('YmdHis')
         );
 

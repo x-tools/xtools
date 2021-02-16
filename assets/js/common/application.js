@@ -1,7 +1,7 @@
 xtools = {};
 xtools.application = {};
 xtools.application.vars = {
-    sectionOffset: {}
+    sectionOffset: {},
 };
 
 /** global: i18nLang */
@@ -653,79 +653,6 @@ function displayWaitingNoticeOnSubmission(undo)
         });
     }
 }
-
-/**
- * Set the initial offset for contributions lists, based on what was
- * supplied in the contributions container.
- */
-function setInitialEditOffset()
-{
-    if (xtools.application.vars.editOffset === undefined) {
-        xtools.application.vars.editOffset = parseInt($('.contributions-container').data('offset'), 10);
-    }
-}
-
-/**
- * Loads configured type of contributions from the server and lists them in the DOM.
- * The navigation aids and showing/hiding of loading text is also handled here.
- * @param {function} endpointFunc The callback that takes the params set on .contributions-container
- *     and returns a string that is the endpoint to fetch from (without the offset appended).
- * @param {String} apiTitle The name of the API (could be i18n key), used in error reporting.
- */
-xtools.application.loadContributions = function (endpointFunc, apiTitle) {
-    setInitialEditOffset();
-
-    $('.contributions-loading').show();
-    $('.contributions-container').hide();
-
-    var params = $('.contributions-container').data(),
-        endpoint = endpointFunc(params),
-        pageSize = parseInt(params.pagesize, 10) || 50;
-
-    /** global: xtBaseUrl */
-    $.ajax({
-        url: xtBaseUrl + endpoint + '/' + xtools.application.vars.editOffset +
-            // Make sure to include any URL parameters, such as tool=Huggle (for AutoEdits).
-            '?htmlonly=yes&pagesize=' + pageSize + '&' + window.location.search.replace(/^\?/, ''),
-        timeout: 60000
-    }).done(function (data) {
-        $('.contributions-container').html(data).show();
-        $('.contributions-loading').hide();
-        xtools.application.setupContributionsNavListeners(endpointFunc, apiTitle, pageSize);
-
-        if (xtools.application.vars.editOffset > 0) {
-            $('.contributions--prev').show();
-        }
-        if ($('.contributions-table tbody tr').length < pageSize) {
-            $('.next-edits').hide();
-        }
-    }).fail(function (_xhr, _status, message) {
-        $('.contributions-loading').hide();
-        $('.contributions-container').html(
-            $.i18n('api-error', $.i18n(apiTitle) + ' API: <code>' + message + '</code>')
-        ).show();
-    });
-};
-
-/**
- * Set up listeners for navigating contribution lists.
- */
-xtools.application.setupContributionsNavListeners = function (endpointFunc, apiTitle, pageSize) {
-    pageSize = pageSize || 50; // Assume 50 entries per page unless specified.
-    setInitialEditOffset();
-
-    $('.contributions--prev').one('click', function (e) {
-        e.preventDefault();
-        xtools.application.vars.editOffset -= pageSize;
-        xtools.application.loadContributions(endpointFunc, apiTitle)
-    });
-
-    $('.contributions--next').one('click', function (e) {
-        e.preventDefault();
-        xtools.application.vars.editOffset += pageSize;
-        xtools.application.loadContributions(endpointFunc, apiTitle);
-    });
-};
 
 /**
  * Handles the multi-select inputs on some index pages.

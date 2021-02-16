@@ -39,13 +39,13 @@
                     {% if pages.start is not empty %}
                         <tr>
                             <td>{{ msg('start') }}</td>
-                            <td>{{ pages.start|date_format('yyyy-MM-dd') }}</td>
+                            <td>{{ pages.startDate }}</td>
                         </tr>
                     {% endif %}
                     {% if pages.end is not empty %}
                         <tr>
                             <td>{{ msg('end') }}</td>
-                            <td class="xt-test--end-date">{{ pages.end|date_format('yyyy-MM-dd') }}</td>
+                            <td class="xt-test--end-date">{{ pages.endDate }}</td>
                         </tr>
                     {% endif %}
                 </tbody></table>
@@ -91,7 +91,7 @@
                                     {% if pages.redirects == 'onlyredirects' %}
                                         {{ value.redirects|num_format }}
                                     {% else %}
-                                        <a href="{{ path('PagesResult', {project: project.domain, username: user.username, namespace: key, redirects: 'onlyredirects', deleted: pages.deleted}) }}">{{ value.redirects|num_format }}</a>
+                                        <a href="{{ path('PagesResult', {project: project.domain, username: user.username, namespace: key, start: pages.startDate, end: pages.endDate, redirects: 'onlyredirects', deleted: pages.deleted}) }}">{{ value.redirects|num_format }}</a>
                                         ({{ value.redirects|percent_format(value.count) }})
                                     {% endif %}
                                 </td>
@@ -101,7 +101,7 @@
                                     {% if pages.deleted == 'deleted' %}
                                         {{ value.deleted|num_format }}
                                     {% else %}
-                                        <a href="{{ path('PagesResult', {project: project.domain, username: user.username, namespace: key, redirects: '', deleted: 'deleted'}) }}">{{ value.deleted|num_format }}</a>
+                                        <a href="{{ path('PagesResult', {project: project.domain, username: user.username, namespace: key, start: pages.startDate, end: pages.endDate, redirects: '', deleted: 'deleted'}) }}">{{ value.deleted|num_format }}</a>
                                         ({{ value.deleted|percent_format(value.count) }})
                                     {% endif %}
                                 </td>
@@ -133,7 +133,7 @@
                             {% endif %}
                             {% if pages.deleted == 'all' %}
                                 <th class="namespaces--deleted">
-                                    <a href="{{ path('PagesResult', {project: project.domain, username: user.username, namespace: pages.namespace, redirects: '', deleted: 'deleted'}) }}">{{ pages.numDeleted|num_format }}</a>
+                                    <a href="{{ path('PagesResult', {project: project.domain, username: user.username, namespace: pages.namespace, start: pages.startDate, end: pages.endDate, redirects: '', deleted: 'deleted'}) }}">{{ pages.numDeleted|num_format }}</a>
                                     ({{ pages.numDeleted|percent_format(pages.getNumPages) }})
                                 </th>
                             {% endif %}
@@ -190,7 +190,7 @@
             {% endif %}
         {% endset %}
         {% set downloadLink %}
-            {{ layout.downloadLink('PagesResult', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted, 'start': pages.start, 'end': pages.end}, [], 'UserApiPagesCount') }}
+            {{ layout.downloadLink('PagesResult', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted, 'start': pages.startDate, 'end': pages.endDate}, [], 'UserApiPagesCount') }}
         {% endset %}
         {{ layout.content_block('summary', content, downloadLink) }}
 

@@ -118,8 +118,8 @@ class ArticleInfo extends ArticleInfoApi
      */
     private function getLastDay(): int
     {
-        if (false !== $this->end) {
-            return (new DateTime('@'.$this->end))
+        if (is_int($this->end)) {
+            return (new DateTime("@{$this->end}"))
                 ->modify('last day of this month')
                 ->getTimestamp();
         } else {
@@ -143,10 +143,10 @@ class ArticleInfo extends ArticleInfoApi
             'end' => $this->lastEdit->getTimestamp()->format('Y-m-d'),
         ];
 
-        if (false !== $this->start) {
+        if (is_int($this->start)) {
             $ret['start'] = date('Y-m-d', $this->start);
         }
-        if (false !== $this->end) {
+        if (is_int($this->end)) {
             $ret['end'] = date('Y-m-d', $this->end);
         }
 

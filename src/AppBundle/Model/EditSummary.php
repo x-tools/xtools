@@ -46,8 +46,8 @@ class EditSummary extends Model
      * @param Project $project The project we're working with.
      * @param User $user The user to process.
      * @param int|string $namespace Namespace ID or 'all' for all namespaces.
-     * @param int|false $start Start date in a format accepted by strtotime()
-     * @param int|false $end End date in a format accepted by strtotime()
+     * @param int|false $start Start date as Unix timestamp.
+     * @param int|false $end End date as Unix timestamp.
      * @param int $numEditsRecent Number of edits from present to consider as 'recent'.
      */
     public function __construct(
@@ -61,8 +61,8 @@ class EditSummary extends Model
         $this->project = $project;
         $this->user = $user;
         $this->namespace = $namespace;
-        $this->start = false === $start ? '' : date('Y-m-d', $start);
-        $this->end = false === $end ? '' : date('Y-m-d', $end);
+        $this->start = $start;
+        $this->end = $end;
         $this->numEditsRecent = $numEditsRecent;
     }
 

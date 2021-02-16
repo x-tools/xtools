@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace AppBundle\Model;
 
+use AppBundle\Repository\GlobalContribsRepository;
+
 /**
  * A GlobalContribs provides a list of a user's edits to all projects.
  */
@@ -21,11 +23,11 @@ class GlobalContribs extends Model
      * GlobalContribs constructor.
      * @param User $user
      * @param string|int|null $namespace Namespace ID or 'all'.
-     * @param false|int|string $start As Unix timestamp.
-     * @param false|int|string $end As Unix timestamp.
-     * @param int $offset
+     * @param false|int $start As Unix timestamp.
+     * @param false|int $end As Unix timestamp.
+     * @param false|int $offset As Unix timestamp.
      */
-    public function __construct(User $user, $namespace = 'all', $start = false, $end = false, int $offset = 0)
+    public function __construct(User $user, $namespace = 'all', $start = false, $end = false, $offset = false)
     {
         $this->user = $user;
         $this->namespace = '' == $namespace ? 0 : $namespace;
@@ -114,7 +116,7 @@ class GlobalContribs extends Model
     }
 
     /**
-     * Get the most recent $this->limit revisions across all projects, offset by $this->offset.
+     * Get the most recent revisions across all projects.
      * @return Edit[]
      */
     public function globalEdits(): array
@@ -130,16 +132,17 @@ class GlobalContribs extends Model
         }
 
         // Get all revisions for those projects.
-        $globalRevisionsData = $this->getRepository()
-            ->getRevisions(
-                array_keys($projects),
-                $this->user,
-                $this->namespace,
-                $this->start,
-                $this->end,
-                self::PAGE_SIZE + 1,
-                $this->offset
-            );
+        /** @var GlobalContribsRepository $globalContribsRepo */
+        $globalContribsRepo = $this->getRepository();
+        $globalRevisionsData = $globalContribsRepo->getRevisions(
+            array_keys($projects),
+            $this->user,
+            $this->namespace,
+            $this->start,
+            $this->end,
+            self::PAGE_SIZE + 1,
+            $this->offset
+        );
         $globalEdits = [];
 
         foreach ($globalRevisionsData as $revision) {

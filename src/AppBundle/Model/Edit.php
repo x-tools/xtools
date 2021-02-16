@@ -124,6 +124,15 @@ class Edit extends Model
     }
 
     /**
+     * Get the edit's timestamp as a UTC string, as with YYYY-MM-DDTHH:MM:SS
+     * @return string
+     */
+    public function getUTCTimestamp(): string
+    {
+        return $this->getTimestamp()->format('Y-m-d\TH:i:s');
+    }
+
+    /**
      * Year the revision was made.
      * @return string
      */

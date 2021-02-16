@@ -126,18 +126,18 @@ class UserRepository extends Repository
      * @param Project $project
      * @param User $user
      * @param int|string $namespace Namespace ID or 'all' for all namespaces
-     * @param string $start Start date in a format accepted by strtotime()
-     * @param string $end End date in a format accepted by strtotime()
+     * @param int|false $start Start date as Unix timestamp.
+     * @param int|false $end End date as Unix timestamp.
      * @return int
      */
-    public function countEdits(Project $project, User $user, $namespace = 'all', $start = '', $end = ''): int
+    public function countEdits(Project $project, User $user, $namespace = 'all', $start = false, $end = false): int
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_editcount');
         if ($this->cache->hasItem($cacheKey)) {
             return (int)$this->cache->getItem($cacheKey)->get();
         }
 
-        [$condBegin, $condEnd] = $this->getRevTimestampConditions($start, $end);
+        $revDateConditions = $this->getDateConditions($start, $end);
         [$pageJoin, $condNamespace] = $this->getPageAndNamespaceSql($project, $namespace);
         $revisionTable = $project->getTableName('revision');
 
@@ -146,10 +146,9 @@ class UserRepository extends Repository
                 $pageJoin
                 WHERE rev_actor = :actorId
                 $condNamespace
-                $condBegin
-                $condEnd";
+                $revDateConditions";
 
-        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $start, $end);
+        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace);
         $result = (int)$resultQuery->fetchColumn();
 
         // Cache and return.
@@ -196,35 +195,6 @@ class UserRepository extends Repository
     }
 
     /**
-     * Get SQL clauses for rev_timestamp, based on whether values for the given start and end parameters exist.
-     * @param string $start
-     * @param string $end
-     * @param string $tableAlias Alias of table FOLLOWED BY DOT.
-     * @param bool $archive Whether to use the archive table instead of revision.
-     * @return string[] Clauses for start and end timestamps.
-     * @todo FIXME: merge with Repository::getDateConditions
-     */
-    protected function getRevTimestampConditions(
-        string $start,
-        string $end,
-        string $tableAlias = '',
-        bool $archive = false
-    ): array {
-        $condBegin = '';
-        $condEnd = '';
-        $prefix = $archive ? 'ar' : 'rev';
-
-        if (!empty($start)) {
-            $condBegin = "AND {$tableAlias}{$prefix}_timestamp >= :start ";
-        }
-        if (!empty($end)) {
-            $condEnd = "AND {$tableAlias}{$prefix}_timestamp <= :end ";
-        }
-
-        return [$condBegin, $condEnd];
-    }
-
-    /**
      * Get SQL fragments for filtering by user.
      * Used in self::getPagesCreatedInnerSql().
      * @param bool $dateFiltering Whether the query you're working with has date filtering.
@@ -244,9 +214,7 @@ class UserRepository extends Repository
      * @param string $sql
      * @param Project $project
      * @param User $user
-     * @param int|string $namespace Namespace ID or 'all' for all namespaces.
-     * @param string $start
-     * @param string $end
+     * @param int|string|null $namespace Namespace ID, or 'all'/null for all namespaces.
      * @param array $extraParams Will get merged in the params array used for binding values.
      * @return ResultStatement
      */
@@ -255,18 +223,10 @@ class UserRepository extends Repository
         Project $project,
         User $user,
         $namespace = 'all',
-        string $start = '',
-        string $end = '',
         array $extraParams = []
     ): ResultStatement {
         $params = ['actorId' => $user->getActorId($project)];
 
-        if (!empty($start)) {
-            $params['start'] = date('Ymd000000', strtotime($start));
-        }
-        if (!empty($end)) {
-            $params['end'] = date('Ymd235959', strtotime($end));
-        }
         if ('all' !== $namespace) {
             $params['namespace'] = $namespace;
         }

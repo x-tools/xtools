@@ -53,13 +53,13 @@
                     {% if ce.start is not empty %}
                         <tr>
                             <td>{{ msg('start') }}</td>
-                            <td>{{ ce.start|date_format('yyyy-MM-dd') }}</td>
+                            <td>{{ ce.startDate }}</td>
                         </tr>
                     {% endif %}
                     {% if ce.end is not empty %}
                         <tr>
                             <td>{{ msg('end') }}</td>
-                            <td class="xt-test--end-date">{{ ce.end|date_format('yyyy-MM-dd') }}</td>
+                            <td class="xt-test--end-date">{{ ce.endDate }}</td>
                         </tr>
                     {% endif %}
 
@@ -131,7 +131,7 @@
                                 {{ wiki.pageLinkRaw(nsName(14, project.namespaces) ~ ':' ~ category, project, category|replace({'_': ' '})) }}
                             </td>
                             <td class="sort-entry--count" data-value="{{ values.editCount }}">
-                                <a href="{{ path('CategoryEditsResult', {project:project.domain, username:user.username, categories: category, start: ce.start, end: ce.end}) }}">
+                                <a href="{{ path('CategoryEditsResult', {project:project.domain, username:user.username, categories: category, start: ce.startDate, end: ce.endDate}) }}">
                                     {{ values.editCount|num_format }}
                                 </a>
                             </td>
@@ -221,7 +221,7 @@
             </div>
         {% endset %}
         {% set downloadLink %}
-            {{ layout.downloadLink('CategoryEditsResult', {project: project.domain, username: user.username, categories: ce.categoriesPiped, start: ce.start, end: ce.end}, [], 'UserApiCategoryEditCount') }}
+            {{ layout.downloadLink('CategoryEditsResult', {project: project.domain, username: user.username, categories: ce.categoriesPiped, start: ce.startDate, end: ce.endDate}, [], 'UserApiCategoryEditCount') }}
         {% endset %}
         {{ layout.content_block('summary', content, ['tool-categoryedits-desc', downloadLink]) }}
 
@@ -241,9 +241,9 @@
                         data-project="{{ project.domain }}"
                         data-username="{{ user.username }}"
                         data-categories="{{ ce.categoriesPiped }}"
-                        data-start="{{ ce.start }}"
-                        data-end="{{ ce.end }}"
-                        data-offset="{{ ce.offset }}">
+                        data-start="{{ ce.startDate }}"
+                        data-end="{{ ce.endDate }}"
+                        data-offset="{{ ce.offsetISO }}">
                     </div>
                 </div>
             {% endset %}

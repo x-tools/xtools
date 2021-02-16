@@ -22,12 +22,12 @@
             </small>
             {% if ai.hasDateRange %}
                 <span class="date-range">
-                    {% if ai.endDate == false %}
-                        {{ msg('date-from', [ai.startDate|date_format('yyyy-MM-dd')]) }}
-                    {% elseif ai.startDate == false %}
-                        {{ msg('date-to', [ai.endDate|date_format('yyyy-MM-dd')]) }}
+                    {% if ai.end == false %}
+                        {{ msg('date-from', [ai.startDate]) }}
+                    {% elseif ai.start == false %}
+                        {{ msg('date-to', [ai.endDate]) }}
                     {% else %}
-                        {{ msg('date-range', [ai.startDate|date_format('yyyy-MM-dd'), ai.endDate|date_format('yyyy-MM-dd')]) }}
+                        {{ msg('date-range', [ai.startDate, ai.endDate]) }}
                     {% endif %}
                 </span>
             {% endif %}

@@ -186,9 +186,9 @@ class AutomatedEditsController extends XtoolsController
      *       "namespace"="|all|\d+",
      *       "start"="|\d{4}-\d{2}-\d{2}",
      *       "end"="|\d{4}-\d{2}-\d{2}",
-     *       "offset"="\d*"
+     *       "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}",
      *   },
-     *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=0}
+     *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=false}
      * )
      * @return Response|RedirectResponse
      * @codeCoverageIgnore
@@ -209,9 +209,9 @@ class AutomatedEditsController extends XtoolsController
      *       "namespace"="|all|\d+",
      *       "start"="|\d{4}-\d{2}-\d{2}",
      *       "end"="|\d{4}-\d{2}-\d{2}",
-     *       "offset"="\d*"
+     *       "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}",
      *   },
-     *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=0}
+     *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=false}
      * )
      * @return Response
      * @codeCoverageIgnore
@@ -285,9 +285,9 @@ class AutomatedEditsController extends XtoolsController
      *       "namespace"="|all|\d+",
      *       "start"="|\d{4}-\d{2}-\d{2}",
      *       "end"="|\d{4}-\d{2}-\d{2}",
-     *       "offset"="\d*"
+     *       "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}",
      *   },
-     *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=0}
+     *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=false}
      * )
      * @return JsonResponse
      * @codeCoverageIgnore
@@ -320,9 +320,9 @@ class AutomatedEditsController extends XtoolsController
      *       "namespace"="|all|\d+",
      *       "start"="|\d{4}-\d{2}-\d{2}",
      *       "end"="|\d{4}-\d{2}-\d{2}",
-     *       "offset"="\d*"
+     *       "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}",
      *   },
-     *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=0}
+     *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=false}
      * )
      * @return Response
      * @codeCoverageIgnore

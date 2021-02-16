@@ -139,46 +139,21 @@
                 {% endif %}
                 </tbody>
             </table>
-
-            {##### PAGINATION #####}
-            {% set numPages = (pages.getNumPages / pages.resultsPerPage)|round(0, 'ceil') %}
-            {% if not(pages.multiNamespace) and numPages > 1 %}
-                {% set hasPrev = pages.offset - 1 >= 0 %}
-                {% set hasNext = pages.offset + 1 < numPages %}
-                {% set pathVars = {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects} %}
-
-                <nav aria-label="...">
-                    <ul class="pagination xt-pagination">
-                        <li{% if not(hasPrev) %} class="disabled"{% endif %}>
-                            {% if hasPrev %}
-                            <a href="{{ path('PagesResult', pathVars|merge({'offset': pages.offset - 1})) }}" aria-label="Previous">
-                                {% endif %}
-                                <span aria-hidden="true">&laquo;</span>
-                                {% if hasPrev %}</a>{% endif %}
-                        </li>
-                        {% for page in 1..numPages %}
-                            {% set active = pages.offset == loop.index0 %}
-                            <li{% if active %} class="active"{% endif %}>
-                                <a href="{{ path('PagesResult', pathVars|merge({'offset': loop.index0})) }}">
-                                    {{ page }} {% if active %}<span class="sr-only">(current)</span>{% endif %}
-                                </a>
-                            </li>
-                        {% endfor %}
-                        <li{% if not(hasNext) %} class="disabled"{% endif %}>
-                            {% if hasNext %}
-                            <a href="{{ path('PagesResult', pathVars|merge({'offset': pages.offset + 1})) }}" aria-label="Next">
-                                {% endif %}
-                                <span aria-hidden="true">&raquo;</span>
-                                {% if hasNext %}</a>{% endif %}
-                        </li>
-                    </ul>
-                </nav>
-            {% endif %}
         {% endfor %}
+
+        {##### PAGINATION #####}
+        {% if not(pages.multiNamespace) and pages.results[pages.namespaces[0]]|length == pages.resultsPerPage %}
+            <div class="contributions-nav clearfix">
+                <a href="{{ path('PagesResult', {project: project.domain, username: user.username, namespace: pages.namespace, redirects: pages.redirects, deleted: pages.deleted, start: pages.startDate, end: pages.endDate, offset: pages.lastTimestamp}) }}" class="pull-right contributions--next">
+                    {{ msg('pager-older-n', [pages.resultsPerPage])|ucfirst }}
+                    <span class="glyphicon glyphicon-arrow-{% if isRTL() %}left{% else %}right{% endif %}"></span>
+                </a>
+            </div>
+        {% endif %}
     {% endif %}
 {% endset %}
 
 {% set downloadLink %}
-    {{ layout.downloadLink('PagesResult', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted, 'start': pages.start, 'end': pages.end, 'offset': pages.offset}, ['wikitext', 'PagePile', 'csv', 'tsv'], 'UserApiPagesCreated') }}
+    {{ layout.downloadLink('PagesResult', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted, 'start': pages.startDate, 'end': pages.endDate, 'offset': pages.offsetISO}, ['wikitext', 'PagePile', 'csv', 'tsv'], 'UserApiPagesCreated') }}
 {% endset %}
 {{ layout.content_block('pages-created', content, downloadLink) }}

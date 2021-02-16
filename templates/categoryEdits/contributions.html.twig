@@ -6,7 +6,7 @@
 
 {% if not is_sub_request %}
     <div class="panel panel-primary">
-        {% set args = {username: user.username, categories: ce.categoriesPiped, start: ce.start|trans, end: ce.end|trans} %}
+        {% set args = {username: user.username, categories: ce.categoriesPiped, start: ce.startDate, end: ce.endDate} %}
         {{ layout.userHeading(user, project, 'CategoryEdits', args) }}
 
         <div class="panel-body xt-panel-body">
@@ -29,9 +29,9 @@
                         data-project="{{ project.domain }}"
                         data-username="{{ user.username }}"
                         data-categories="{{ ce.categoriesPiped }}"
-                        data-start="{{ ce.start }}"
-                        data-end="{{ ce.end }}"
-                        data-offset="{{ ce.offset }}">
+                        data-start="{{ ce.startDate }}"
+                        data-end="{{ ce.endDate }}"
+                        data-offset="{{ ce.offsetISO }}">
 {% endif %}
 
 {{ layout.contributions(project, ce.categoryEdits(), ce.offset) }}

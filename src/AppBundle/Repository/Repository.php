@@ -325,22 +325,38 @@ abstract class Repository
 
     /**
      * Creates WHERE conditions with date range to be put in query.
-     * @param false|int $start
-     * @param false|int $end
+     * @param false|int $start Unix timestamp.
+     * @param false|int $end Unix timestamp.
+     * @param false|int $offset Unix timestamp. Used for pagination, will end up replacing $end.
      * @param string $tableAlias Alias of table FOLLOWED BY DOT.
      * @param string $field
      * @return string
      */
-    public function getDateConditions($start, $end, $tableAlias = '', $field = 'rev_timestamp'): string
-    {
+    public function getDateConditions(
+        $start,
+        $end,
+        $offset = false,
+        string $tableAlias = '',
+        string $field = 'rev_timestamp'
+    ) : string {
         $datesConditions = '';
-        if (false != $start) {
-            // Convert to YYYYMMDDHHMMSS. *who in the world thought of having time in BLOB of this format ;-;*
+
+        if (is_int($start)) {
+            // Convert to YYYYMMDDHHMMSS.
             $start = date('Ymd', $start).'000000';
             $datesConditions .= " AND {$tableAlias}{$field} >= '$start'";
         }
-        if (false != $end) {
-            $end = date('Ymd', $end).'235959';
+
+        // When we're given an $offset, it basically replaces $end, except it's also a full timestamp,
+        // and for pagination purposes we use < in the comparison instead of <= to prevent the last edit
+        // from the previous page being shown as the first on the next page. This matches MediaWiki
+        // behavior, which suggests it's not possible for two edits to be made in the same second (???).
+        // FIXME: For Global Contribs it's possible edits are made at the same second on different wikis.
+        if (is_int($offset)) {
+            $offset = date('YmdHis', $offset);
+            $datesConditions .= " AND {$tableAlias}{$field} < '$offset'";
+        } elseif (is_int($end)) {
+            $end = date('Ymd', $end) . '235959';
             $datesConditions .= " AND {$tableAlias}{$field} <= '$end'";
         }
 

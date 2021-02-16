@@ -46,10 +46,10 @@ class PagesControllerTest extends ControllerTestAdapter
         $this->assertSuccessfulRoutes([
             '/pages/en.wikipedia/Example',
             '/pages/en.wikipedia/Example/0',
-            '/pages/en.wikipedia/Example/0/noredirects/all/2018-01-01//5',
-            '/pages/en.wikipedia/Foobar/0/noredirects/all/2018-01-01//5?format=wikitext',
-            '/pages/en.wikipedia/Foobar/0/noredirects/all//2018-01-01/5?format=csv',
-            '/pages/en.wikipedia/Foobar/0/noredirects/all///5?format=tsv',
+            '/pages/en.wikipedia/Example/0/noredirects/all/2018-01-01//2018-01-15T12:00:00',
+            '/pages/en.wikipedia/Foobar/0/noredirects/all/2018-01-01//2018-01-15T12:00:00?format=wikitext',
+            '/pages/en.wikipedia/Foobar/0/noredirects/all//2018-01-01/2018-01-15T12:00:00?format=csv',
+            '/pages/en.wikipedia/Foobar/0/noredirects/all///2018-01-15T12:00:00?format=tsv',
             '/api/user/pages_count/en.wikipedia/Example/0/noredirects/deleted',
         ]);
     }

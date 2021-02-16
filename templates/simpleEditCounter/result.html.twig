@@ -21,13 +21,13 @@
                     {% if sec.start %}
                         <tr>
                             <td>{{ msg('start') }}</td>
-                            <td>{{ sec.start|date_format('yyyy-MM-dd') }}</td>
+                            <td>{{ sec.startDate }}</td>
                         </tr>
                     {% endif %}
                     {% if sec.end %}
                         <tr>
                             <td>{{ msg('end') }}</td>
-                            <td>{{ sec.end|date_format('yyyy-MM-dd') }}</td>
+                            <td>{{ sec.endDate }}</td>
                         </tr>
                     {% endif %}
                     <tr>
@@ -74,7 +74,7 @@
             </div>
         {% endset %}
         {% set downloadLink %}
-            {{ layout.downloadLink('SimpleEditCounterResult', {project: project.domain, username: user.username, namespace: sec.namespace, start: sec.start, end: sec.end}, [], 'SimpleEditCounterApi') }}
+            {{ layout.downloadLink('SimpleEditCounterResult', {project: project.domain, username: user.username, namespace: sec.namespace, start: sec.startDate, end: sec.endDate}, [], 'SimpleEditCounterApi') }}
         {% endset %}
         {{ layout.content_block('tool-simpleeditcounter-desc', content, downloadLink) }}
     </div>

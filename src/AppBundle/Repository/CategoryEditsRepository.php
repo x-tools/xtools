@@ -12,7 +12,7 @@ use AppBundle\Model\Project;
 use AppBundle\Model\User;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\ResultStatement;
-use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\ParameterType;
 
 /**
  * CategoryEditsRepository is responsible for retrieving data from the database
@@ -40,16 +40,16 @@ class CategoryEditsRepository extends Repository
      * @param Project $project
      * @param User $user
      * @param string[] $categories
-     * @param string $start Start date in a format accepted by strtotime()
-     * @param string $end End date in a format accepted by strtotime()
+     * @param int|false $start Start date as Unix timestamp.
+     * @param int|false $end End date as Unix timestamp.
      * @return int Result of query, see below.
      */
     public function countCategoryEdits(
         Project $project,
         User $user,
         array $categories,
-        string $start = '',
-        string $end = ''
+        $start = false,
+        $end = false
     ): int {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_categoryeditcount');
         if ($this->cache->hasItem($cacheKey)) {
@@ -58,15 +58,15 @@ class CategoryEditsRepository extends Repository
 
         $revisionTable = $project->getTableName('revision');
         $categorylinksTable = $project->getTableName('categorylinks');
+        $revDateConditions = $this->getDateConditions($start, $end, false, 'revs.');
 
-        $query = $this->getProjectsConnection($project)->createQueryBuilder();
-        $query->select(['COUNT(DISTINCT(revs.rev_id))'])
-            ->from($revisionTable, 'revs')
-            ->join('revs', $categorylinksTable, null, 'cl_from = rev_page')
-            ->where('revs.rev_actor = :actorId')
-            ->andWhere($query->expr()->in('cl_to', ':categories'));
-
-        $result = (int)$this->executeStmt($query, $project, $user, $categories, $start, $end)->fetchColumn();
+        $sql = "SELECT COUNT(DISTINCT revs.rev_id)
+                FROM $revisionTable revs
+                JOIN $categorylinksTable ON cl_from = rev_page
+                WHERE revs.rev_actor = ?
+                    AND cl_to IN (?)
+                    $revDateConditions";
+        $result = (int)$this->executeStmt($sql, $project, $user, $categories)->fetchColumn();
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);
@@ -77,16 +77,16 @@ class CategoryEditsRepository extends Repository
      * @param Project $project
      * @param User $user
      * @param array $categories
-     * @param string $start
-     * @param string $end
+     * @param int|false $start
+     * @param int|false $end
      * @return string[] With categories as keys, counts as values.
      */
     public function getCategoryCounts(
         Project $project,
         User $user,
         array $categories,
-        string $start = '',
-        string $end = ''
+        $start = false,
+        $end = false
     ): array {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_categorycounts');
         if ($this->cache->hasItem($cacheKey)) {
@@ -95,18 +95,19 @@ class CategoryEditsRepository extends Repository
 
         $revisionTable = $project->getTableName('revision');
         $categorylinksTable = $project->getTableName('categorylinks');
+        $revDateConditions = $this->getDateConditions($start, $end, false, 'revs.');
 
-        $query = $this->getProjectsConnection($project)->createQueryBuilder();
-        $query->select(['cl_to AS cat', 'COUNT(rev_id) AS edit_count', 'COUNT(DISTINCT(rev_page)) AS page_count'])
-            ->from($revisionTable, 'revs')
-            ->join('revs', $categorylinksTable, null, 'cl_from = rev_page')
-            ->where('revs.rev_actor = :actorId')
-            ->andWhere($query->expr()->in('cl_to', ':categories'))
-            ->orderBy('edit_count', 'DESC')
-            ->groupBy('cl_to');
+        $sql = "SELECT cl_to AS cat, COUNT(rev_id) AS edit_count, COUNT(DISTINCT rev_page) AS page_count
+                FROM $revisionTable revs
+                JOIN $categorylinksTable ON cl_from = rev_page
+                WHERE revs.rev_actor = ?
+                    AND cl_to IN (?)
+                    $revDateConditions
+                ORDER BY edit_count DESC
+                GROUP BY cl_to";
 
         $counts = [];
-        $stmt = $this->executeStmt($query, $project, $user, $categories, $start, $end);
+        $stmt = $this->executeStmt($sql, $project, $user, $categories);
         while ($result = $stmt->fetch()) {
             $counts[$result['cat']] = [
                 'editCount' => (int)$result['edit_count'],
@@ -123,9 +124,9 @@ class CategoryEditsRepository extends Repository
      * @param Project $project
      * @param User $user
      * @param string[] $categories
-     * @param string $start Start date in a format accepted by strtotime()
-     * @param string $end End date in a format accepted by strtotime()
-     * @param int $offset Used for pagination, offset results by N edits
+     * @param int|false $start Start date as Unix timestamp.
+     * @param int|false $end End date as Unix timestamp.
+     * @param false|int $offset Unix timestamp. Used for pagination.
      * @return string[] Result of query, with columns 'page_title', 'page_namespace', 'rev_id', 'timestamp', 'minor',
      *   'length', 'length_change', 'comment'
      */
@@ -133,9 +134,9 @@ class CategoryEditsRepository extends Repository
         Project $project,
         User $user,
         array $categories,
-        string $start = '',
-        string $end = '',
-        int $offset = 0
+        $start = false,
+        $end = false,
+        $offset = false
     ): array {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_categoryedits');
         if ($this->cache->hasItem($cacheKey)) {
@@ -146,31 +147,25 @@ class CategoryEditsRepository extends Repository
         $revisionTable = $project->getTableName('revision');
         $commentTable = $project->getTableName('comment');
         $categorylinksTable = $project->getTableName('categorylinks');
+        $revDateConditions = $this->getDateConditions($start, $end, $offset, 'revs.');
 
-        $query = $this->getProjectsConnection($project)->createQueryBuilder();
-        $query->select([
-                'page_title',
-                'page_namespace',
-                'revs.rev_id AS rev_id',
-                'revs.rev_timestamp AS timestamp',
-                'revs.rev_minor_edit AS minor',
-                'revs.rev_len AS length',
-                '(CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change',
-                'comment_text AS `comment`',
-            ])
-            ->from($pageTable)
-            ->join($pageTable, $revisionTable, 'revs', 'page_id = revs.rev_page')
-            ->join('revs', $categorylinksTable, null, 'cl_from = rev_page')
-            ->leftJoin('revs', $commentTable, 'comment', 'revs.rev_comment_id = comment_id')
-            ->leftJoin('revs', $revisionTable, 'parentrevs', 'revs.rev_parent_id = parentrevs.rev_id')
-            ->where('revs.rev_actor = :actorId')
-            ->andWhere($query->expr()->in('cl_to', ':categories'))
-            ->groupBy('revs.rev_id')
-            ->orderBy('revs.rev_timestamp', 'DESC')
-            ->setMaxResults(50)
-            ->setFirstResult($offset);
+        $sql = "SELECT page_title, page_namespace, revs.rev_id AS rev_id, revs.rev_timestamp AS timestamp,
+                    revs.rev_minor_edit AS minor, revs.rev_len AS length,
+                    (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
+                    comment_text AS `comment`
+                FROM $pageTable
+                JOIN $revisionTable revs ON page_id = revs.rev_page
+                JOIN $categorylinksTable ON cl_from = rev_page
+                LEFT JOIN $commentTable comment ON revs.rev_comment_id = comment_id
+                LEFT JOIN $revisionTable parentrevs ON revs.rev_parent_id = parentrevs.rev_id
+                WHERE revs.rev_actor = ?
+                    AND cl_to IN (?)
+                    $revDateConditions
+                GROUP BY revs.rev_id
+                ORDER BY revs.rev_timestamp DESC
+                LIMIT 50";
 
-        $result = $this->executeStmt($query, $project, $user, $categories, $start, $end)->fetchAll();
+        $result = $this->executeStmt($sql, $project, $user, $categories)->fetchAll();
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);
@@ -178,34 +173,25 @@ class CategoryEditsRepository extends Repository
 
     /**
      * Bind dates, username and categories then execute the query.
-     * @param QueryBuilder $query
+     * @param string $sql
      * @param Project $project
      * @param User $user
      * @param string[] $categories
-     * @param string $start Start date in a format accepted by strtotime()
-     * @param string $end End date in a format accepted by strtotime()
      * @return ResultStatement
      */
     private function executeStmt(
-        QueryBuilder $query,
+        string $sql,
         Project $project,
         User $user,
-        array $categories,
-        string $start,
-        string $end
+        array $categories
     ): ResultStatement {
-        if (!empty($start)) {
-            $query->andWhere('revs.rev_timestamp >= :start');
-            $query->setParameter('start', $start);
-        }
-        if (!empty($end)) {
-            $query->andWhere('revs.rev_timestamp <= DATE_FORMAT(:end, "%Y%m%d235959")');
-            $query->setParameter('end', $end);
-        }
-
-        $query->setParameter('actorId', $user->getActorId($project));
-        $query->setParameter('categories', $categories, Connection::PARAM_STR_ARRAY);
-
-        return $this->executeQueryBuilder($query);
+        return $this->getProjectsConnection($project)
+            ->executeQuery($sql, [
+                $user->getActorId($project),
+                $categories,
+            ], [
+                ParameterType::STRING,
+                Connection::PARAM_STR_ARRAY,
+            ]);
     }
 }

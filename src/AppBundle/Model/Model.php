@@ -35,17 +35,17 @@ abstract class Model
     /** @var int|string Which namespace we are querying for. 'all' for all namespaces. */
     protected $namespace;
 
-    /** @var false|int|string Start of time period as UTC timestamp, or YYYY-MM-DD format. */
+    /** @var false|int Start of time period as Unix timestamp. */
     protected $start;
 
-    /** @var false|int|string End of time period as UTC timestamp, or YYYY-MM-DD format. */
+    /** @var false|int End of time period as Unix timestamp. */
     protected $end;
+
+    /** @var false|int Unix timestamp to offset results which acts as a substitute for $end */
+    protected $offset;
 
     /** @var int Number of rows to fetch. */
     protected $limit;
-
-    /** @var int Number of rows to OFFSET, used for pagination. */
-    protected $offset;
 
     /**
      * Set this model's data repository.
@@ -116,6 +116,15 @@ abstract class Model
     }
 
     /**
+     * Get date opening date range, formatted as this is used in the views.
+     * @return string Blank if no value exists.
+     */
+    public function getStartDate(): string
+    {
+        return is_int($this->start) ? date('Y-m-d', $this->start) : '';
+    }
+
+    /**
      * Get date closing date range as Unix timestamp.
      * @return false|int
      */
@@ -125,12 +134,21 @@ abstract class Model
     }
 
     /**
+     * Get date closing date range, formatted as this is used in the views.
+     * @return string Blank if no value exists.
+     */
+    public function getEndDate(): string
+    {
+        return is_int($this->end) ? date('Y-m-d', $this->end) : '';
+    }
+
+    /**
      * Has date range?
      * @return bool
      */
     public function hasDateRange(): bool
     {
-        return '' != $this->start || '' != $this->end;
+        return $this->start || $this->end;
     }
 
     /**
@@ -143,11 +161,20 @@ abstract class Model
     }
 
     /**
-     * Get the number of rows to OFFSET, used for pagination.
-     * @return int
+     * Get the offset timestamp as Unix timestamp. Used for pagination.
+     * @return false|int
      */
-    public function getOffset(): int
+    public function getOffset()
     {
-        return (int)$this->offset;
+        return $this->offset;
+    }
+
+    /**
+     * Get the offset timestamp as a formatted ISO timestamp.
+     * @return null|string
+     */
+    public function getOffsetISO(): ?string
+    {
+        return is_int($this->offset) ? date('Y-m-d\TH:i:s', $this->offset) : null;
     }
 }

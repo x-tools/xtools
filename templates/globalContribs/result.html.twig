@@ -8,7 +8,7 @@
     <div class="panel panel-primary">
         <header class="panel-heading">
             <div class="text-center xt-heading-top">
-                <a class="back-to-search" href="{{ path('GlobalContribs', {namespace: gc.namespace, start: gc.start|date_format('yyyy-MM-dd'), end: gc.end|date_format('yyyy-MM-dd')}) }}">
+                <a class="back-to-search" href="{{ path('GlobalContribs', {namespace: gc.namespace, start: gc.startDate, end: gc.endDate}) }}">
                     <span class="glyphicon glyphicon-chevron-left"></span>
                     {{ msg('back') }}
                 </a>
@@ -48,13 +48,13 @@
                         {% if gc.start %}
                             <tr>
                                 <td>{{ msg('start') }}</td>
-                                <td>{{ gc.start|date_format('yyyy-MM-dd') }}</td>
+                                <td>{{ gc.startDate }}</td>
                             </tr>
                         {% endif %}
                         {% if gc.end %}
                             <tr>
                                 <td>{{ msg('end') }}</td>
-                                <td>{{ gc.end|date_format('yyyy-MM-dd') }}</td>
+                                <td>{{ gc.endDate }}</td>
                             </tr>
                         {% endif %}
                         {% if not(gc.start) and not(gc.end) %}
@@ -86,14 +86,12 @@
                         data-project="{{ project.domain }}"
                         data-username="{{ user.username }}"
                         data-namespace="{{ gc.namespace }}"
-                        data-start="{{ gc.start|date_format('yyyy-MM-dd') }}"
-                        data-end="{{ gc.end|date_format('yyyy-MM-dd') }}"
-                        data-offset="{{ gc.offset }}"
-                        data-target="ec-latestglobal">
+                        data-start="{{ gc.startDate }}"
+                        data-end="{{ gc.endDate }}"
+                        data-offset="{{ gc.offsetISO }}">
 {% endif %}
 
-{% set globalEdits = gc.globalEdits(gc.offset) %}
-{% if globalEdits|length > 0 %}
+{% if gc.globalEdits|length > 0 %}
     {{ layout.contributionsNav(gc.offset, gc.globalEdits|length, gc.pageSize) }}
     <table class="table table-bordered table-hover table-striped contributions-table">
         <thead><tr>
@@ -111,7 +109,7 @@
         <tbody>
         {% for edit in gc.globalEdits %}
             <tr>
-                <td class="sort-entry--date" data-value="{{ edit.timestamp.format('U') }}">
+                <td class="sort-entry--date contribs-row-date" data-value="{{ edit.utcTimestamp }}">
                     {{ wiki.permaLink(edit) }}
                 </td>
                 <td class="sort-entry--project" data-value="{{ edit.project.domain }}">

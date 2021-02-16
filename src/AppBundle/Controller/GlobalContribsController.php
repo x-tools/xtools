@@ -65,23 +65,19 @@ class GlobalContribsController extends XtoolsController
     /**
      * Display the latest global edits tool. First two routes are legacy.
      * @Route(
-     *     "/ec-latestglobal-contributions/{project}/{username}/{offset}",
+     *     "/ec-latestglobal-contributions/{project}/{username}",
      *     name="EditCounterLatestGlobalContribs",
-     *     requirements={"offset" = "|\d*"},
      *     defaults={
      *         "project"="",
-     *         "namespace"="all",
-     *         "offset"=0,
+     *         "namespace"="all"
      *     }
      * )
      * @Route(
-     *     "/ec-latestglobal/{project}/{username}/{offset}",
+     *     "/ec-latestglobal/{project}/{username}",
      *     name="EditCounterLatestGlobal",
-     *     requirements={"offset" = "|\d*"},
      *     defaults={
      *         "project"="",
-     *         "namespace"="all",
-     *         "offset"=0,
+     *         "namespace"="all"
      *     }
      * ),
      * @Route(
@@ -91,13 +87,13 @@ class GlobalContribsController extends XtoolsController
      *         "namespace" = "|all|\d+",
      *         "start" = "|\d*|\d{4}-\d{2}-\d{2}",
      *         "end" = "|\d{4}-\d{2}-\d{2}",
-     *         "offset" = "|\d*",
+     *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}",
      *     },
      *     defaults={
      *         "namespace"="all",
      *         "start"=false,
      *         "end"=false,
-     *         "offset" = 0,
+     *         "offset"=false,
      *     }
      * ),
      * @return Response

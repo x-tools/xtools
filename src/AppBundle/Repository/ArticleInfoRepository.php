@@ -75,7 +75,7 @@ class ArticleInfoRepository extends Repository
         }
         $loggingTable = $page->getProject()->getTableName('logging', 'logindex');
 
-        $datesConditions = $this->getDateConditions($start, $end, '', 'log_timestamp');
+        $datesConditions = $this->getDateConditions($start, $end, false, '', 'log_timestamp');
 
         $sql = "SELECT log_action, log_type, log_timestamp AS 'timestamp'
                 FROM $loggingTable

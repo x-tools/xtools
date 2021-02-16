@@ -123,7 +123,7 @@
 
 {% macro contributionsNav(offset, length, pageSize = 50) %}
     <div class="contributions-nav clearfix">
-        {% if offset > 0 %}
+        {% if offset %}
             <a href="#" class="pull-left contributions--prev">
                 <span class="glyphicon glyphicon-arrow-{% if isRTL() %}right{% else %}left{% endif %}"></span>
                 {{ msg('pager-newer-n', [pageSize])|ucfirst }}
@@ -162,7 +162,7 @@
                 {% for edit in revs %}
                     <tr>
                         <td>{{ wiki.pageLinkRaw(edit.page.title(true), project) }}</td>
-                        <td>{{ wiki.permaLink(edit) }}</td>
+                        <td class="contribs-row-date" data-value="{{ edit.utcTimestamp }}">{{ wiki.permaLink(edit) }}</td>
                         <td>
                             {{ wiki.diffLink(edit) }}
                             &middot;
