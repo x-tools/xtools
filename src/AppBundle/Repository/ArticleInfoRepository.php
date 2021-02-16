@@ -8,7 +8,7 @@ declare(strict_types = 1);
 namespace AppBundle\Repository;
 
 use AppBundle\Model\Page;
-use Doctrine\DBAL\Driver\Statement;
+use Doctrine\DBAL\Driver\ResultStatement;
 
 /**
  * ArticleInfoRepository is responsible for retrieving data about a single
@@ -22,9 +22,10 @@ class ArticleInfoRepository extends Repository
      * @param Page $page
      * @param false|int $start
      * @param false|int $end
-     * @return Statement resolving with keys 'count', 'username' and 'current'.
+     * @param bool $count
+     * @return ResultStatement resolving with keys 'count', 'username' and 'current'.
      */
-    public function getBotData(Page $page, $start, $end, $count = false): Statement
+    public function getBotData(Page $page, $start, $end, $count = false): ResultStatement
     {
         $project = $page->getProject();
         $revTable = $project->getTableName('revision');
@@ -56,7 +57,7 @@ class ArticleInfoRepository extends Repository
                 WHERE rev_page = :pageId AND ug_group = 'bot' $datesConditions
                 $groupBy";
 
-        return $this->executeProjectsQuery($sql, ['pageId' => $page->getId()]);
+        return $this->executeProjectsQuery($project, $sql, ['pageId' => $page->getId()]);
     }
 
     /**
@@ -83,7 +84,7 @@ class ArticleInfoRepository extends Repository
                 AND log_type IN ('delete', 'move', 'protect', 'stable')";
         $title = str_replace(' ', '_', $page->getTitle());
 
-        $result = $this->executeProjectsQuery($sql, ['title' => $title])->fetchAll();
+        $result = $this->executeProjectsQuery($page->getProject(), $sql, ['title' => $title])->fetchAll();
         return $this->setCache($cacheKey, $result);
     }
 
@@ -115,7 +116,7 @@ class ArticleInfoRepository extends Repository
                     FROM $imagelinksTable
                     WHERE il_from = :pageId
                 )";
-        $resultQuery = $this->executeProjectsQuery($sql, ['pageId' => $page->getId()]);
+        $resultQuery = $this->executeProjectsQuery($page->getProject(), $sql, ['pageId' => $page->getId()]);
         $transclusionCounts = [];
 
         while ($result = $resultQuery->fetch()) {
@@ -178,7 +179,7 @@ class ArticleInfoRepository extends Repository
                  ORDER BY count DESC
                  LIMIT $limit";
 
-        $result = $this->executeProjectsQuery($sql, [
+        $result = $this->executeProjectsQuery($project, $sql, [
             'pageId' => $page->getId(),
         ])->fetchAll();
 
@@ -200,10 +201,11 @@ class ArticleInfoRepository extends Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $revTable = $page->getProject()->getTableName('revision');
-        $userTable = $page->getProject()->getTableName('user');
-        $pageTable = $page->getProject()->getTableName('page');
-        $actorTable = $page->getProject()->getTableName('actor');
+        $project = $page->getProject();
+        $revTable = $project->getTableName('revision');
+        $userTable = $project->getTableName('user');
+        $pageTable = $project->getTableName('page');
+        $actorTable = $project->getTableName('actor');
 
         $sql = "SELECT *, (
                     SELECT user_editcount
@@ -254,7 +256,7 @@ class ArticleInfoRepository extends Repository
          * wait to see the result. We'll pass 60 as the last parameter to executeProjectsQuery,
          * which will set the max_statement_time to 60 seconds.
          */
-        $result = $this->executeProjectsQuery($sql, $params, 60)->fetch();
+        $result = $this->executeProjectsQuery($project, $sql, $params, 60)->fetch();
 
         $time2 = time();
 

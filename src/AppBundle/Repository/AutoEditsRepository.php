@@ -9,6 +9,7 @@ namespace AppBundle\Repository;
 
 use AppBundle\Model\Project;
 use AppBundle\Model\User;
+use PDO;
 
 /**
  * AutoEditsRepository is responsible for retrieving data from the database
@@ -377,12 +378,12 @@ class AutoEditsRepository extends UserRepository
 
         $revisionTable = $project->getTableName('revision');
         [$pageJoin, $condNamespace] = $this->getPageAndNamespaceSql($project, $namespace);
-        $conn = $this->getProjectsConnection();
+        $conn = $this->getProjectsConnection($project);
 
         foreach ($tools as $toolName => $values) {
             [$condTool, $commentJoin, $tagJoin] = $this->getInnerAutomatedCountsSql($project, $toolName, $values);
 
-            $toolName = $conn->quote($toolName, \PDO::PARAM_STR);
+            $toolName = $conn->quote($toolName, PDO::PARAM_STR);
 
             // No regex or tag provided for this tool. This can happen for tag-only tools that are in the global
             // configuration, but no local tag exists on the said project.
@@ -416,7 +417,7 @@ class AutoEditsRepository extends UserRepository
      */
     private function getInnerAutomatedCountsSql(Project $project, string $toolName, array $values): array
     {
-        $conn = $this->getProjectsConnection();
+        $conn = $this->getProjectsConnection($project);
         $commentJoin = '';
         $tagJoin = '';
         $condTool = '';
@@ -424,7 +425,7 @@ class AutoEditsRepository extends UserRepository
         if (isset($values['regex'])) {
             $commentTable = $project->getTableName('comment', 'revision');
             $commentJoin = "LEFT OUTER JOIN $commentTable ON rev_comment_id = comment_id";
-            $regex = $conn->quote($values['regex'], \PDO::PARAM_STR);
+            $regex = $conn->quote($values['regex'], PDO::PARAM_STR);
             $condTool = "comment_text REGEXP $regex";
         }
         if (isset($values['tags'])) {
@@ -517,7 +518,7 @@ class AutoEditsRepository extends UserRepository
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $conn = $this->getProjectsConnection();
+        $conn = $this->getProjectsConnection($project);
 
         // Get all tag values.
         $tags = [];
@@ -526,7 +527,7 @@ class AutoEditsRepository extends UserRepository
                 $tags = array_merge(
                     $tags,
                     array_map(function ($tag) use ($conn) {
-                        return $conn->quote($tag, \PDO::PARAM_STR);
+                        return $conn->quote($tag, PDO::PARAM_STR);
                     }, $values['tags'])
                 );
             }
@@ -538,7 +539,7 @@ class AutoEditsRepository extends UserRepository
                 WHERE ctd_name IN ($tags)";
         // FIXME: change to ->fetchAllKeyValue() when doctrine-bundle gets it.
         // See https://github.com/doctrine/dbal/pull/4338
-        $this->tags = $this->executeProjectsQuery($sql)->fetchAll(\PDO::FETCH_KEY_PAIR);
+        $this->tags = $this->executeProjectsQuery($project, $sql)->fetchAll(PDO::FETCH_KEY_PAIR);
 
         // Cache and return.
         return $this->setCache($cacheKey, $this->tags);

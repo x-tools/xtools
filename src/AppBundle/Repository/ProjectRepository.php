@@ -9,6 +9,7 @@ namespace AppBundle\Repository;
 
 use AppBundle\Model\Page;
 use AppBundle\Model\Project;
+use Exception;
 use GuzzleHttp\Client;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -86,13 +87,13 @@ class ProjectRepository extends Repository
      * For single-wiki installations, you must manually set the wiki URL and database name
      * (because there's no meta.wiki database to query).
      * @param array $metadata
-     * @throws \Exception
+     * @throws Exception
      */
     public function setSingleBasicInfo(array $metadata): void
     {
         if (!array_key_exists('url', $metadata) || !array_key_exists('dbName', $metadata)) {
             $error = "Single-wiki metadata should contain 'url', 'dbName' and 'lang' keys.";
-            throw new \Exception($error);
+            throw new Exception($error);
         }
         $this->singleBasicInfo = array_intersect_key($metadata, [
             'url' => '',
@@ -119,15 +120,15 @@ class ProjectRepository extends Repository
         }
 
         if ($this->container->hasParameter("database_meta_table")) {
-            $table = $this->container->getParameter("database_meta_table");
+            $table = $this->container->getParameter('database_meta_name') . '.' .
+                $this->container->getParameter('database_meta_table');
         } else {
-            $table = "wiki";
+            $table = "meta_p.wiki";
         }
 
         // Otherwise, fetch all from the database.
-        $wikiQuery = $this->getMetaConnection()->createQueryBuilder();
-        $wikiQuery->select(['dbname AS dbName', 'url', 'lang'])->from($table);
-        $projects = $this->executeQueryBuilder($wikiQuery)->fetchAll();
+        $sql = "SELECT dbname AS dbName, url, lang FROM $table";
+        $projects = $this->executeProjectsQuery('meta', $sql)->fetchAll();
         $projectsMetadata = [];
         foreach ($projects as $project) {
             $projectsMetadata[$project['dbName']] = $project;
@@ -178,32 +179,27 @@ class ProjectRepository extends Repository
         }
 
         if ($this->container->hasParameter("database_meta_table")) {
-            $table = $this->container->getParameter("database_meta_table");
+            $table = $this->container->getParameter('database_meta_name') . '.' .
+                $this->container->getParameter('database_meta_table');
         } else {
-            $table = "wiki";
+            $table = "meta_p.wiki";
         }
 
         // Otherwise, fetch the project's metadata from the meta.wiki table.
-        $wikiQuery = $this->getMetaConnection()->createQueryBuilder();
-        $wikiQuery->select(['dbname AS dbName', 'url', 'lang'])
-            ->from($table)
-            ->where($wikiQuery->expr()->eq('dbname', ':project'))
-            // The meta database will have the project's URL stored as https://en.wikipedia.org
-            // so we need to query for it accordingly, trying different variations the user
-            // might have inputted.
-            ->orWhere($wikiQuery->expr()->like('url', ':projectUrl'))
-            ->orWhere($wikiQuery->expr()->like('url', ':projectUrl2'))
-            ->orWhere($wikiQuery->expr()->like('url', ':projectUrl3'))
-            ->orWhere($wikiQuery->expr()->like('url', ':projectUrl4'))
-            ->setParameter('project', $project)
-            ->setParameter('projectUrl', "https://$project")
-            ->setParameter('projectUrl2', "https://$project.org")
-            ->setParameter('projectUrl3', "https://www.$project")
-            ->setParameter('projectUrl4', "https://www.$project.org");
-        $wikiStatement = $this->executeQueryBuilder($wikiQuery);
-
-        // Fetch and cache the wiki data.
-        $basicInfo = $wikiStatement->fetch();
+        $sql = "SELECT dbname AS dbName, url, lang
+                FROM $table
+                WHERE dbname = :project
+                    OR url LIKE :projectUrl
+                    OR url LIKE :projectUrl2
+                    OR url LIKE :projectUrl3
+                    OR url LIKE :projectUrl4";
+        $basicInfo = $this->executeProjectsQuery('meta', $sql, [
+            'project' => $project,
+            'projectUrl' => "https://$project",
+            'projectUrl2' => "https://$project.org",
+            'projectUrl3' => "https://www.$project",
+            'projectUrl4' => "https://www.$project.org",
+        ])->fetch();
 
         // Cache for one hour and return.
         return $this->setCache($cacheKey, $basicInfo, 'PT1H');
@@ -250,7 +246,7 @@ class ProjectRepository extends Repository
                     'format' => 'json',
                 ],
             ])->getBody()->getContents(), true);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return null;
         }
 
@@ -374,7 +370,7 @@ class ProjectRepository extends Repository
             'ns' => $namespaceId,
             'title' => str_replace(' ', '_', $pageTitle),
         ];
-        $pages = $this->executeProjectsQuery($query, $params)->fetchAll();
+        $pages = $this->executeProjectsQuery($project, $query, $params)->fetchAll();
         return count($pages) > 0;
     }
 
@@ -418,33 +414,22 @@ class ProjectRepository extends Repository
         $userTable = $project->getTableName('user');
         $userGroupsTable = $project->getTableName('user_groups');
 
-        $rqb = $this->getProjectsConnection()->createQueryBuilder();
-        $rqb->select(['user_name', 'ug_group AS user_group'])
-            ->from($userTable)
-            ->join($userTable, $userGroupsTable, 'user_groups', 'ug_user = user_id')
-            ->where($rqb->expr()->in('ug_group', ':groups'))
-            ->groupBy('user_name, user_group')
-            ->setParameter(
-                'groups',
-                $groups,
-                \Doctrine\DBAL\Connection::PARAM_STR_ARRAY
-            );
-
-        $users = $this->executeQueryBuilder($rqb)->fetchAll();
+        $sql = "SELECT user_name, ug_group AS user_group
+                FROM $userTable
+                JOIN $userGroupsTable ON ug_user = user_id
+                WHERE ug_group IN (:groups)
+                GROUP BY user_name, ug_group";
+        $users = $this->executeProjectsQuery($project, $sql, ['groups' => implode(',', $groups)])->fetchAll();
 
         if (count($globalGroups) > 0 && $this->isLabs()) {
-            $rqb = $this->getProjectsConnection()->createQueryBuilder();
-            $rqb->select(['gu_name AS user_name', 'gug_group AS user_group'])
-                ->from('centralauth_p.global_user_groups', 'gug')
-                ->join('gug', 'centralauth_p.globaluser', null, 'gug_user = gu_id')
-                ->where($rqb->expr()->in('gug_group', ':globalGroups'))
-                ->groupBy('user_name', 'user_group')
-                ->setParameter(
-                    'globalGroups',
-                    $globalGroups,
-                    \Doctrine\DBAL\Connection::PARAM_STR_ARRAY
-                );
-            $ret = $this->executeQueryBuilder($rqb)->fetchAll();
+            $sql = "SELECT gu_name AS user_name, gug_group AS user_group
+                    FROM centralauth_p.global_user_groups
+                    JOIN centralauth_p.globaluser ON gug_user = gu_id
+                    WHERE gug_group IN (:globalGroups)
+                    GROUP BY user_name, user_group";
+            $ret = $this->executeProjectsQuery('centralauth', $sql, [
+                'globalGroups' => implode(',', $globalGroups),
+            ])->fetchAll();
             $users = array_merge($users, $ret);
         }
 

@@ -11,7 +11,7 @@ use AppBundle\Model\Page;
 use AppBundle\Model\Project;
 use AppBundle\Model\User;
 use DateTime;
-use Doctrine\DBAL\Driver\Statement;
+use Doctrine\DBAL\Driver\ResultStatement;
 use GuzzleHttp;
 
 /**
@@ -127,7 +127,7 @@ class PageRepository extends Repository
      *   a separate query is ran to get the number of revisions.
      * @param false|int $start
      * @param false|int $end
-     * @return Statement
+     * @return ResultStatement
      */
     public function getRevisionsStmt(
         Page $page,
@@ -136,7 +136,7 @@ class PageRepository extends Repository
         ?int $numRevisions = null,
         $start = false,
         $end = false
-    ): Statement {
+    ): ResultStatement {
         $revTable = $this->getTableName(
             $page->getProject()->getDatabaseName(),
             'revision',
@@ -179,7 +179,7 @@ class PageRepository extends Repository
             $params['actorId'] = $user->getActorId($page->getProject());
         }
 
-        return $this->executeProjectsQuery($sql, $params);
+        return $this->executeProjectsQuery($page->getProject(), $sql, $params);
     }
 
     /**
@@ -214,7 +214,7 @@ class PageRepository extends Repository
             $params['rev_actor'] = $user->getActorId($page->getProject());
         }
 
-        $result = (int)$this->executeProjectsQuery($sql, $params)->fetchColumn(0);
+        $result = (int)$this->executeProjectsQuery($page->getProject(), $sql, $params)->fetchColumn(0);
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);
@@ -284,7 +284,7 @@ class PageRepository extends Repository
                 AND wby_name IN ('label', 'description')
                 AND wbxl_language = :lang";
 
-        return $this->executeProjectsQuery($sql, [
+        return $this->executeProjectsQuery('wikidatawiki', $sql, [
             'lang' => $lang,
             'wikidataId' => $wikidataId,
         ])->fetchAll();
@@ -310,7 +310,7 @@ class PageRepository extends Repository
                 FROM wikidatawiki_p.wb_items_per_site
                 WHERE ips_item_id = :wikidataId";
 
-        $result = $this->executeProjectsQuery($sql, [
+        $result = $this->executeProjectsQuery('wikidatawiki', $sql, [
             'wikidataId' => $wikidataId,
         ])->fetchAll();
 
@@ -347,7 +347,7 @@ class PageRepository extends Repository
             'namespace' => $page->getNamespace(),
         ];
 
-        $res = $this->executeProjectsQuery($sql, $params);
+        $res = $this->executeProjectsQuery($page->getProject(), $sql, $params);
         $data = [];
 
         // Transform to associative array by 'type'
@@ -437,7 +437,7 @@ class PageRepository extends Repository
                 FROM $revisionTable
                 WHERE rev_timestamp <= $datestamp
                 AND rev_page = $pageId LIMIT 1;";
-        $resultQuery = $this->getProjectsConnection()->query($sql);
+        $resultQuery = $this->getProjectsConnection($page->getProject())->query($sql);
         return (int)$resultQuery->fetchColumn();
     }
 
@@ -451,7 +451,7 @@ class PageRepository extends Repository
      */
     public function displayTitles(Project $project, array $pageTitles): array
     {
-        $client = $this->container->get('guzzle.client.xtools');
+        $client = $this->container->get('eight_points_guzzle.client.xtools');
 
         $displayTitles = [];
         $numPages = count($pageTitles);

@@ -241,9 +241,10 @@ class TopEditsRepository extends UserRepository
         string $end,
         bool $childRevs = false
     ): array {
+        $project = $page->getProject();
         [$condBegin, $condEnd] = $this->getRevTimestampConditions($start, $end, 'revs.');
-        $revTable = $this->getTableName($page->getProject()->getDatabaseName(), 'revision');
-        $commentTable = $this->getTableName($page->getProject()->getDatabaseName(), 'comment');
+        $revTable = $this->getTableName($project->getDatabaseName(), 'revision');
+        $commentTable = $this->getTableName($project->getDatabaseName(), 'comment');
 
         if ($childRevs) {
             $childSelect = ', (CASE WHEN childrevs.rev_sha1 = parentrevs.rev_sha1 THEN 1 ELSE 0 END) AS reverted,
@@ -260,8 +261,8 @@ class TopEditsRepository extends UserRepository
             $childLimit = 'LIMIT 1';
         }
 
-        $userId = $this->getProjectsConnection()->quote($user->getId($page->getProject()), PDO::PARAM_STR);
-        $username = $this->getProjectsConnection()->quote($user->getUsername(), PDO::PARAM_STR);
+        $userId = $this->getProjectsConnection($project)->quote($user->getId($page->getProject()), PDO::PARAM_STR);
+        $username = $this->getProjectsConnection($project)->quote($user->getUsername(), PDO::PARAM_STR);
 
         $sql = "SELECT * FROM (
                     SELECT
@@ -287,7 +288,7 @@ class TopEditsRepository extends UserRepository
                 ORDER BY timestamp DESC
                 $childLimit";
 
-        $resultQuery = $this->executeQuery($sql, $page->getProject(), $user, null, $start, $end, [
+        $resultQuery = $this->executeQuery($sql, $project, $user, null, $start, $end, [
             'pageid' => $page->getId(),
         ]);
         return $resultQuery->fetchAll();

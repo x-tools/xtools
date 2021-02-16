@@ -13,6 +13,7 @@ use MediaWiki\OAuthClient\Client;
 use MediaWiki\OAuthClient\ClientConfig;
 use MediaWiki\OAuthClient\Consumer;
 use MediaWiki\OAuthClient\Exception;
+use MediaWiki\OAuthClient\Token;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -140,7 +141,7 @@ class DefaultController extends XtoolsController
         $client = $this->getOauthClient();
         $token = $session->get('oauth_request_token');
 
-        if (!is_a($token, \MediaWiki\OAuthClient\Token::class)) {
+        if (!is_a($token, Token::class)) {
             $this->addFlashMessage('notice', 'error-login');
             return $this->redirectToRoute('homepage');
         }

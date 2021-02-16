@@ -72,6 +72,6 @@ class AuthorshipRepository extends Repository
         $sql = "SELECT user_id, user_name
                 FROM $userTable
                 WHERE user_id IN ($userIds)";
-        return $this->executeProjectsQuery($sql)->fetchAll();
+        return $this->executeProjectsQuery($project, $sql)->fetchAll();
     }
 }

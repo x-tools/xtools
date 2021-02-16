@@ -21,8 +21,8 @@ class GlobalContribs extends Model
      * GlobalContribs constructor.
      * @param User $user
      * @param string|int|null $namespace Namespace ID or 'all'.
-     * @param false|int $start As Unix timestamp.
-     * @param false|int $end As Unix timestamp.
+     * @param false|int|string $start As Unix timestamp.
+     * @param false|int|string $end As Unix timestamp.
      * @param int $offset
      */
     public function __construct(User $user, $namespace = 'all', $start = false, $end = false, int $offset = 0)

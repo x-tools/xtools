@@ -10,6 +10,7 @@ namespace AppBundle\Repository;
 use AppBundle\Model\Project;
 use AppBundle\Model\User;
 use Doctrine\DBAL\Driver\ResultStatement;
+use PDO;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 
@@ -52,7 +53,7 @@ class UserRepository extends Repository
                 FROM $userTable
                 WHERE user_name = :username
                 LIMIT 1";
-        $resultQuery = $this->executeProjectsQuery($sql, ['username' => $username]);
+        $resultQuery = $this->executeProjectsQuery($databaseName, $sql, ['username' => $username]);
 
         // Cache and return.
         return $this->setCache($cacheKey, $resultQuery->fetch());
@@ -77,7 +78,7 @@ class UserRepository extends Repository
                 FROM $actorTable
                 WHERE actor_name = :username
                 LIMIT 1";
-        $resultQuery = $this->executeProjectsQuery($sql, ['username' => $username]);
+        $resultQuery = $this->executeProjectsQuery($databaseName, $sql, ['username' => $username]);
 
         // Cache and return.
         return (int)$this->setCache($cacheKey, $resultQuery->fetchColumn());
@@ -98,7 +99,7 @@ class UserRepository extends Repository
 
         $userTable = $this->getTableName($databaseName, 'user');
         $sql = "SELECT user_editcount FROM $userTable WHERE user_name = :username LIMIT 1";
-        $resultQuery = $this->executeProjectsQuery($sql, ['username' => $username]);
+        $resultQuery = $this->executeProjectsQuery($databaseName, $sql, ['username' => $username]);
 
         return (int)$this->setCache($cacheKey, $resultQuery->fetchColumn());
     }
@@ -116,7 +117,7 @@ class UserRepository extends Repository
                 FROM $ipblocksTable
                 WHERE ipb_address = :username
                 LIMIT 1";
-        $resultQuery = $this->executeProjectsQuery($sql, ['username' => $username]);
+        $resultQuery = $this->executeProjectsQuery($databaseName, $sql, ['username' => $username]);
         return $resultQuery->fetchColumn();
     }
 
@@ -270,7 +271,7 @@ class UserRepository extends Repository
             $params['namespace'] = $namespace;
         }
 
-        return $this->executeProjectsQuery($sql, array_merge($params, $extraParams));
+        return $this->executeProjectsQuery($project, $sql, array_merge($params, $extraParams));
     }
 
     /**
@@ -294,9 +295,9 @@ class UserRepository extends Repository
                 JOIN $userTable ON user_id = ug_user
                 WHERE user_name = :username";
 
-        $ret = $this->executeProjectsQuery($sql, [
+        $ret = $this->executeProjectsQuery($project, $sql, [
             'username' => $user->getUsername(),
-        ])->fetchAll(\PDO::FETCH_COLUMN);
+        ])->fetchAll(PDO::FETCH_COLUMN);
 
         // Cache and return.
         return $this->setCache($cacheKey, $ret);
@@ -307,7 +308,7 @@ class UserRepository extends Repository
      * provided). This requires the CentralAuth extension to be installed.
      * @link https://www.mediawiki.org/wiki/Extension:CentralAuth
      * @param string $username The username.
-     * @param Project $project The project to query.
+     * @param Project|null $project The project to query.
      * @return string[]
      */
     public function getGlobalUserRights(string $username, ?Project $project = null): array

@@ -78,7 +78,7 @@ class EditCounterRepository extends UserRightsRepository
                 WHERE ar_actor = :actorId AND ar_parent_id = 0
             )";
 
-        $resultQuery = $this->executeProjectsQuery($sql, [
+        $resultQuery = $this->executeProjectsQuery($project, $sql, [
             'actorId' => $user->getActorId($project),
         ]);
 
@@ -114,7 +114,7 @@ class EditCounterRepository extends UserRightsRepository
             GROUP BY log_type, log_action
         )";
 
-        $results = $this->executeProjectsQuery($sql, [
+        $results = $this->executeProjectsQuery($project, $sql, [
             'actorId' => $user->getActorId($project),
         ])->fetchAll();
 
@@ -185,33 +185,19 @@ class EditCounterRepository extends UserRightsRepository
 
         $loggingTable = $project->getTableName('logging');
 
-        $sqlParts = [
-            "SELECT 'files_moved' AS `key`, COUNT(log_id) AS `val`
-             FROM $loggingTable
-             WHERE log_actor = :actorId
-               AND log_type = 'move'
-               AND log_action = 'move'
-               AND log_namespace = 6",
-        ];
-
-        $bindings = ['actorId' => $user->getActorId($project)];
+        $sql = "SELECT 'files_moved' AS `key`, COUNT(log_id) AS `val`
+                FROM $loggingTable
+                WHERE log_actor = :actorId
+                    AND log_type = 'move'
+                    AND log_action = 'move'
+                    AND log_namespace = 6";
+        $results = $this->executeProjectsQuery($project, $sql, [
+            'actorId' => $user->getActorId($project),
+        ])->fetchAll();
 
         if ($this->isLabs() && 'commons.wikimedia.org' !== $project->getDomain()) {
-            $commonsProject = ProjectRepository::getProject('commonswiki', $this->container);
-            $loggingTableCommons = $commonsProject->getTableName('logging');
-            $sqlParts[] = "SELECT 'files_moved_commons' AS `key`, COUNT(log_id) AS `val`
-                           FROM $loggingTableCommons
-                           WHERE log_actor = :actorId2 AND log_type = 'move'
-                               AND log_action = 'move' AND log_namespace = 6";
-            $sqlParts[] = "SELECT 'files_uploaded_commons' AS `key`, COUNT(log_id) AS `val`
-                           FROM $loggingTableCommons
-                           WHERE log_actor = :actorId2 AND log_type = 'upload' AND log_action = 'upload'";
-            $bindings['actorId2'] = $user->getActorId($commonsProject);
+            $results = array_merge($results, $this->getFileCountsCommons($user));
         }
-
-        $sql = '('.implode("\n) UNION (\n", $sqlParts).')';
-
-        $results = $this->executeProjectsQuery($sql, $bindings)->fetchAll();
 
         $counts = array_combine(
             array_map(function ($e) {
@@ -224,6 +210,28 @@ class EditCounterRepository extends UserRightsRepository
 
         // Cache and return.
         return $this->setCache($cacheKey, $counts);
+    }
+
+    /**
+     * Get count of files moved and uploaded on Commons.
+     * @param User $user
+     * @return array
+     */
+    protected function getFileCountsCommons(User $user): array
+    {
+        $commonsProject = ProjectRepository::getProject('commonswiki', $this->container);
+        $loggingTableCommons = $commonsProject->getTableName('logging');
+        $sql = "(SELECT 'files_moved_commons' AS `key`, COUNT(log_id) AS `val`
+                 FROM $loggingTableCommons
+                 WHERE log_actor = :actorId AND log_type = 'move'
+                 AND log_action = 'move' AND log_namespace = 6
+                ) UNION (
+                 SELECT 'files_uploaded_commons' AS `key`, COUNT(log_id) AS `val`
+                 FROM $loggingTableCommons
+                 WHERE log_actor = :actorId AND log_type = 'upload' AND log_action = 'upload')";
+        return $this->executeProjectsQuery($commonsProject, $sql, [
+            'actorId' => $user->getActorId($commonsProject),
+        ])->fetchAll();
     }
 
     /**
@@ -262,7 +270,7 @@ class EditCounterRepository extends UserRightsRepository
                     ORDER BY log_timestamp DESC LIMIT 1
                 )";
 
-        $resultQuery = $this->executeProjectsQuery($sql, [
+        $resultQuery = $this->executeProjectsQuery($project, $sql, [
             'actorId' => $user->getActorId($project),
         ]);
 
@@ -296,7 +304,7 @@ class EditCounterRepository extends UserRightsRepository
                 ORDER BY log_timestamp ASC";
         $username = str_replace(' ', '_', $user->getUsername());
 
-        return $this->executeProjectsQuery($sql, [
+        return $this->executeProjectsQuery($project, $sql, [
             'username' => $username,
         ])->fetchAll();
     }
@@ -323,7 +331,7 @@ class EditCounterRepository extends UserRightsRepository
             WHERE r.rev_actor = :actorId
             GROUP BY page_namespace";
 
-        $results = $this->executeProjectsQuery($sql, [
+        $results = $this->executeProjectsQuery($project, $sql, [
             'actorId' => $user->getActorId($project),
         ])->fetchAll();
 
@@ -370,7 +378,7 @@ class EditCounterRepository extends UserRightsRepository
             . " WHERE rev_actor = :actorId"
             . " GROUP BY YEAR(rev_timestamp), MONTH(rev_timestamp), page_namespace";
 
-        $totals = $this->executeProjectsQuery($sql, [
+        $totals = $this->executeProjectsQuery($project, $sql, [
             'actorId' => $user->getActorId($project),
         ])->fetchAll();
 
@@ -402,7 +410,7 @@ class EditCounterRepository extends UserRightsRepository
             . " WHERE rev_actor = :actorId"
             . " GROUP BY DAYOFWEEK(rev_timestamp), $xCalc";
 
-        $totals = $this->executeProjectsQuery($sql, [
+        $totals = $this->executeProjectsQuery($project, $sql, [
             'actorId' => $user->getActorId($project),
         ])->fetchAll();
 
@@ -439,7 +447,7 @@ class EditCounterRepository extends UserRightsRepository
                     ORDER BY revs.rev_timestamp DESC
                     LIMIT 5000
                 ) sizes";
-        $results = $this->executeProjectsQuery($sql, [
+        $results = $this->executeProjectsQuery($project, $sql, [
             'actorId' => $user->getActorId($project),
         ])->fetch();
 

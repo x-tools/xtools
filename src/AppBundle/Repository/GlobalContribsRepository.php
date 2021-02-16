@@ -5,6 +5,7 @@ namespace AppBundle\Repository;
 
 use AppBundle\Model\Project;
 use AppBundle\Model\User;
+use PDO;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -158,23 +159,27 @@ class GlobalContribsRepository extends Repository
             $dbNames = array_column($this->caProject->getRepository()->getAll(), 'dbName');
         }
 
-        $sqlParts = [];
+        $queriesBySlice = [];
 
         foreach ($dbNames as $dbName) {
+            $slice = $this->getDbList()[$dbName];
             // actor_revision table only includes users who have made at least one edit.
             $actorTable = $this->getTableName($dbName, 'actor', 'revision');
-            $sqlParts []= "SELECT '$dbName' AS `dbName`, actor_id
-                           FROM $actorTable WHERE actor_name = :actor";
+            $queriesBySlice[$slice][] = "SELECT '$dbName' AS `dbName`, actor_id " .
+                "FROM $actorTable WHERE actor_name = :actor";
         }
 
-        $sql = implode(' UNION ', $sqlParts);
-        $resultQuery = $this->executeProjectsQuery($sql, [
-            'actor' => $user->getUsername(),
-        ]);
-
         $actorIds = [];
-        while ($row = $resultQuery->fetch()) {
-            $actorIds[$row['dbName']] = (int)$row['actor_id'];
+
+        foreach ($queriesBySlice as $slice => $queries) {
+            $sql = implode(' UNION ', $queries);
+            $resultQuery = $this->executeProjectsQuery($slice, $sql, [
+                'actor' => $user->getUsername(),
+            ]);
+
+            while ($row = $resultQuery->fetch()) {
+                $actorIds[$row['dbName']] = (int)$row['actor_id'];
+            }
         }
 
         return $this->setCache($cacheKey, $actorIds);
@@ -198,7 +203,7 @@ class GlobalContribsRepository extends Repository
         $start = '',
         $end = '',
         int $limit = 30,
-        int $offset = 0
+        $offset = 0
     ): array {
         // Check cache.
         $cacheKey = $this->getCacheKey(func_get_args(), 'gc_revisions');
@@ -206,7 +211,8 @@ class GlobalContribsRepository extends Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $username = $this->getProjectsConnection()->quote($user->getUsername(), \PDO::PARAM_STR);
+        // Just need any Connection to use the ->quote() method.
+        $username = $this->getProjectsConnection('s1')->quote($user->getUsername(), PDO::PARAM_STR);
         $actorIds = $this->getDbNamesAndActorIds($user, $dbNames);
 
         if (!$actorIds) {
@@ -219,7 +225,7 @@ class GlobalContribsRepository extends Repository
         $revDateConditions = $this->getDateConditions($start, $end, 'revs.');
 
         // Assemble queries.
-        $queries = [];
+        $queriesBySlice = [];
         $projectRepo = $this->caProject->getRepository();
         foreach ($dbNames as $dbName) {
             if (isset($actorIds[$dbName])) {
@@ -227,7 +233,9 @@ class GlobalContribsRepository extends Repository
                 $pageTable = $projectRepo->getTableName($dbName, 'page');
                 $commentTable = $projectRepo->getTableName($dbName, 'comment', 'revision');
 
-                $sql = "SELECT
+                $slice = $this->getDbList()[$dbName];
+                $queriesBySlice[$slice][] = "
+                    SELECT
                         '$dbName' AS dbName,
                         revs.rev_id AS id,
                         revs.rev_timestamp AS timestamp,
@@ -248,16 +256,19 @@ class GlobalContribsRepository extends Repository
                     WHERE revs.rev_actor = ".$actorIds[$dbName]."
                         $namespaceCond
                         $revDateConditions";
-                $queries[] = $sql;
             }
         }
-        $sql = "SELECT * FROM ((\n" . join("\n) UNION (\n", $queries) . ")) a ORDER BY timestamp DESC LIMIT $limit";
 
-        if (is_numeric($offset)) {
-            $sql .= " OFFSET $offset";
+        // Re-assemble into UNIONed queries, executing as many per slice as possible.
+        $revisions = [];
+        foreach ($queriesBySlice as $slice => $queries) {
+            $sql = "SELECT * FROM ((\n" . join("\n) UNION (\n", $queries) . ")) a ORDER BY timestamp DESC LIMIT $limit";
+            if (is_numeric($offset)) {
+                $sql .= " OFFSET $offset";
+            }
+
+            $revisions = array_merge($revisions, $this->executeProjectsQuery($slice, $sql)->fetchAll());
         }
-
-        $revisions = $this->executeProjectsQuery($sql)->fetchAll();
 
         // Cache and return.
         return $this->setCache($cacheKey, $revisions);

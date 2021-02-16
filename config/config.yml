@@ -62,7 +62,6 @@ twig:
         noticeStyle:   '%app.noticeStyle%'
         noticeText:    '%app.noticeText%'
 
-
 # Doctrine Configuration
 doctrine:
     dbal:
@@ -76,22 +75,6 @@ doctrine:
                 user:     "%database_user%"
                 password: "%database_password%"
                 charset:  UTF8
-            meta:
-                driver:   pdo_mysql
-                host:     "%database_replica_host%"
-                port:     "%database_replica_port%"
-                dbname:   "%database_meta_name%"
-                user:     "%database_replica_user%"
-                password: "%database_replica_password%"
-                charset:  UTF8
-            replicas:
-                driver:   pdo_mysql
-                host:     "%database_replica_host%"
-                port:     "%database_replica_port%"
-                dbname:   "%database_replica_name%"
-                user:     "%database_replica_user%"
-                password: "%database_replica_password%"
-                charset:  UTF8
             toolsdb:
                 driver:   pdo_mysql
                 host:     "%database_toolsdb_host%"
@@ -100,6 +83,46 @@ doctrine:
                 user:     "%database_replica_user%"
                 password: "%database_replica_password%"
                 charset:  UTF8
+            toolforge_s1:
+                host:     '%database_replica_host%'
+                port:     '%database_replica_port_s1%'
+                user:     '%database_replica_user%'
+                password: '%database_replica_password%'
+            toolforge_s2:
+                host:     '%database_replica_host%'
+                port:     '%database_replica_port_s2%'
+                user:     '%database_replica_user%'
+                password: '%database_replica_password%'
+            toolforge_s3:
+                host:     '%database_replica_host%'
+                port:     '%database_replica_port_s3%'
+                user:     '%database_replica_user%'
+                password: '%database_replica_password%'
+            toolforge_s4:
+                host:     '%database_replica_host%'
+                port:     '%database_replica_port_s4%'
+                user:     '%database_replica_user%'
+                password: '%database_replica_password%'
+            toolforge_s5:
+                host:     '%database_replica_host%'
+                port:     '%database_replica_port_s5%'
+                user:     '%database_replica_user%'
+                password: '%database_replica_password%'
+            toolforge_s6:
+                host:     '%database_replica_host%'
+                port:     '%database_replica_port_s6%'
+                user:     '%database_replica_user%'
+                password: '%database_replica_password%'
+            toolforge_s7:
+                host:     '%database_replica_host%'
+                port:     '%database_replica_port_s7%'
+                user:     '%database_replica_user%'
+                password: '%database_replica_password%'
+            toolforge_s8:
+                host:     '%database_replica_host%'
+                port:     '%database_replica_port_s8%'
+                user:     '%database_replica_user%'
+                password: '%database_replica_password%'
 
     orm:
         auto_generate_proxy_classes: "%kernel.debug%"
@@ -108,10 +131,6 @@ doctrine:
         entity_managers:
             default:
                 connection: default
-            meta:
-                connection: meta
-            replicas:
-                connection: replicas
             toolsdb:
                 connection: toolsdb
 

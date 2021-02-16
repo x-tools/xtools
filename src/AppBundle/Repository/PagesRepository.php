@@ -57,10 +57,10 @@ class PagesRepository extends UserRepository
 
         $sql = "SELECT namespace,
                     COUNT(page_title) AS count,
-                    SUM(CASE WHEN type = 'arc' THEN 1 ELSE 0 END) AS deleted,
+                    SUM(IF(type = 'arc', 1, 0)) AS deleted,
                     SUM(page_is_redirect) AS redirects,
                     SUM(length) AS total_length
-                FROM (".
+                FROM (" .
                     $this->getPagesCreatedInnerSql($project, $conditions, $deleted, $start, $end, true)."
                 ) a ".
                 "GROUP BY namespace";

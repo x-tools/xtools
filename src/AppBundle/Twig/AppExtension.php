@@ -13,7 +13,6 @@ use AppBundle\Model\Project;
 use AppBundle\Model\User;
 use AppBundle\Repository\ProjectRepository;
 use DateTime;
-use Doctrine\DBAL\Connection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -438,40 +437,21 @@ class AppExtension extends AbstractExtension
      */
     public function replag(): int
     {
-        $retVal = 0;
-
-        if ($this->isWMFLabs()) {
-            $project = $this->getRequest()->get('project');
-
-            if (!isset($project)) {
-                $project = 'enwiki';
-            }
-
-            $dbName = ProjectRepository::getProject($project, $this->container)
-                ->getDatabaseName();
-
-            $sql = "SELECT lag FROM `heartbeat_p`.`heartbeat` h
-                    RIGHT JOIN `meta_p`.`wiki` w ON concat(h.shard, \".labsdb\")=w.slice
-                    WHERE dbname LIKE :project LIMIT 1";
-
-            /** @var Connection $conn */
-            $conn = $this->container->get('doctrine')->getManager('replicas')->getConnection();
-
-            // Prepare the query and execute
-            $resultQuery = $conn->prepare($sql);
-            $resultQuery->bindParam('project', $dbName);
-            $resultQuery->execute();
-
-            if (0 == $resultQuery->errorCode()) {
-                $results = $resultQuery->fetchAll();
-
-                if (isset($results[0]['lag'])) {
-                    $retVal = $results[0]['lag'];
-                }
-            }
+        if (!$this->isWMFLabs()) {
+            return 0;
         }
 
-        return (int)$retVal;
+        $projectIdent = $this->getRequest()->get('project', 'enwiki');
+        $project = ProjectRepository::getProject($projectIdent, $this->container);
+        $dbName = $project->getDatabaseName();
+
+        $sql = "SELECT lag FROM `heartbeat_p`.`heartbeat` h
+                RIGHT JOIN `meta_p`.`wiki` w ON concat(h.shard, \".labsdb\")=w.slice
+                WHERE dbname LIKE :project LIMIT 1";
+
+        return (int)$project->getRepository()->executeProjectsQuery('meta', $sql, [
+            'project' => $dbName,
+        ])->fetch();
     }
 
     /**

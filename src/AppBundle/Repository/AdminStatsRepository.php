@@ -8,6 +8,7 @@ declare(strict_types = 1);
 namespace AppBundle\Repository;
 
 use AppBundle\Model\Project;
+use PDO;
 
 /**
  * AdminStatsRepository is responsible for retrieving data from the database
@@ -62,7 +63,7 @@ class AdminStatsRepository extends Repository
                 GROUP BY actor_name
                 HAVING `total` > 0";
 
-        $results = $this->executeProjectsQuery($sql)->fetchAll();
+        $results = $this->executeProjectsQuery($project, $sql)->fetchAll();
 
         // Cache and return.
         return $this->setCache($cacheKey, $results);
@@ -78,6 +79,7 @@ class AdminStatsRepository extends Repository
     private function getLogSqlParts(Project $project, string $type, array $requestedActions = []): array
     {
         $config = $this->getConfig($project)[$type];
+        $connection = $this->getProjectsConnection($project);
 
         $countSql = '';
         $logTypes = [];
@@ -96,8 +98,8 @@ class AdminStatsRepository extends Repository
                 // admin_stats.yml gives us the log type and action as a string in the format of "type/action".
                 [$logType, $logAction] = explode('/', $entry);
 
-                $logTypes[] = $keyTypes[] = $this->getProjectsConnection()->quote($logType, \PDO::PARAM_STR);
-                $logActions[] = $keyActions[] = $this->getProjectsConnection()->quote($logAction, \PDO::PARAM_STR);
+                $logTypes[] = $keyTypes[] = $connection->quote($logType, PDO::PARAM_STR);
+                $logActions[] = $keyActions[] = $connection->quote($logAction, PDO::PARAM_STR);
             }
 
             $keyTypes = implode(',', array_unique($keyTypes));
