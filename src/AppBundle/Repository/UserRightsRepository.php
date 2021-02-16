@@ -10,6 +10,7 @@ namespace AppBundle\Repository;
 use AppBundle\Model\Project;
 use AppBundle\Model\User;
 use GuzzleHttp;
+use PDO;
 
 /**
  * An UserRightsRepository is responsible for retrieving information around a user's
@@ -96,7 +97,7 @@ class UserRightsRepository extends Repository
                 AND log_namespace = 2
                 AND log_title IN (:username, :username2)";
 
-        return $this->executeProjectsQuery($sql, [
+        return $this->executeProjectsQuery($dbName, $sql, [
             'username' => $username,
             'username2' => $usernameLower,
         ])->fetchAll();
@@ -158,16 +159,17 @@ class UserRightsRepository extends Repository
                 UNION
                 SELECT DISTINCT(ufg_group)
                 FROM $ufgTable";
-        if ($this->isLabs()) {
-            $sql .= "UNION SELECT DISTINCT(gug_group)
-                     FROM centralauth_p.global_user_groups";
-        }
 
-        $groups = $this->executeProjectsQuery($sql)->fetchAll(\PDO::FETCH_COLUMN);
+        $groups = $this->executeProjectsQuery($project, $sql)->fetchAll(PDO::FETCH_COLUMN);
 
-        // WMF installations have a special 'autoconfirmed' user group.
         if ($this->isLabs()) {
-            $groups[] = 'autoconfirmed';
+            $sql = "SELECT DISTINCT(gug_group) FROM centralauth_p.global_user_groups";
+            $groups = array_merge(
+                $groups,
+                $this->executeProjectsQuery('centralauth', $sql)->fetchAll(PDO::FETCH_COLUMN),
+                // WMF installations have a special 'autoconfirmed' user group.
+                ['autoconfirmed']
+            );
         }
 
         return array_unique($groups);
@@ -260,7 +262,7 @@ class UserRightsRepository extends Repository
                 AND rev_timestamp >= $offset
                 LIMIT 1 OFFSET ".($edits - 1);
 
-        $ret = $this->executeProjectsQuery($sql, [
+        $ret = $this->executeProjectsQuery($project, $sql, [
             'actorId' => $user->getActorId($project),
         ])->fetchColumn();
 
@@ -288,7 +290,7 @@ class UserRightsRepository extends Repository
                 WHERE rev_actor = :actorId
                 AND rev_timestamp <= $timestamp";
 
-        $ret = (int)$this->executeProjectsQuery($sql, [
+        $ret = (int)$this->executeProjectsQuery($project, $sql, [
             'actorId' => $user->getActorId($project),
         ])->fetchColumn();
 

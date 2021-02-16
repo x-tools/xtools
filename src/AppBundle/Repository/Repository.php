@@ -18,6 +18,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
@@ -32,9 +33,6 @@ abstract class Repository
     /** @var Connection The database connection to the meta database. */
     private $metaConnection;
 
-    /** @var Connection The database connection to the projects' databases. */
-    private $projectsConnection;
-
     /** @var Connection The database connection to other tools' databases.  */
     private $toolsConnection;
 
@@ -43,6 +41,9 @@ abstract class Repository
 
     /** @var LoggerInterface The logger. */
     protected $log;
+
+    /** @var string Prefix URL for where the dblists live. Will be followed by i.e. 's1.dblist' */
+    public const DBLISTS_URL = 'https://noc.wikimedia.org/conf/dblists/';
 
     /**
      * Create a new Repository with nothing but a null-logger.
@@ -85,28 +86,33 @@ abstract class Repository
     protected function getMetaConnection(): Connection
     {
         if (!$this->metaConnection instanceof Connection) {
-            $this->metaConnection = $this->container
-                ->get('doctrine')
-                ->getManager('meta')
-                ->getConnection();
+            $this->metaConnection = $this->getProjectsConnection('meta');
         }
         return $this->metaConnection;
     }
 
     /**
-     * Get the database connection for the 'projects' database.
+     * Get a database connection for the given database.
+     * @param Project|string $project Project instance, database name (i.e. 'enwiki'), or slice (i.e. 's1').
      * @return Connection
      * @codeCoverageIgnore
      */
-    protected function getProjectsConnection(): Connection
+    protected function getProjectsConnection($project): Connection
     {
-        if (!$this->projectsConnection instanceof Connection) {
-            $this->projectsConnection = $this->container
-                ->get('doctrine')
-                ->getManager('replicas')
-                ->getConnection();
+        if (is_string($project)) {
+            if (1 === preg_match('/^s\d+$/', $project)) {
+                $slice = $project;
+            } else {
+                // Assume database name. Remove _p if given.
+                $db = str_replace('_p', '', $project);
+                $slice = $this->getDbList()[$db];
+            }
+        } else {
+            $slice = $this->getDbList()[$project->getDatabaseName()];
         }
-        return $this->projectsConnection;
+
+        return $this->container->get('doctrine')
+            ->getConnection('toolforge_'.$slice);
     }
 
     /**
@@ -123,6 +129,56 @@ abstract class Repository
                 ->getConnection();
         }
         return $this->toolsConnection;
+    }
+
+    /**
+     * Fetch and concatenate all the dblists into one array.
+     * Based on ToolforgeBundle https://github.com/wikimedia/ToolforgeBundle/blob/master/Service/ReplicasClient.php
+     * License: GPL 3.0 or later
+     * @return string[] Keys are database names (i.e. 'enwiki'), values are the slices (i.e. 's1').
+     */
+    protected function getDbList(): array
+    {
+        $cacheKey = 'dblists';
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        /** @var Client $client */
+        $client = $this->container->get('eight_points_guzzle.client.xtools');
+
+        $dbList = [];
+        $exists = true;
+        $i = 0;
+
+        while ($exists) {
+            $i += 1;
+            $response = $client->request('GET', self::DBLISTS_URL."s$i.dblist", ['http_errors' => false]);
+            $exists = in_array(
+                $response->getStatusCode(),
+                [Response::HTTP_OK, Response::HTTP_NOT_MODIFIED]
+            ) && $i < 50; // Safeguard
+
+            if (!$exists) {
+                break;
+            }
+
+            $lines = explode("\n", $response->getBody()->getContents());
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if (1 !== preg_match('/^#/', $line) && '' !== $line) {
+                    // Skip comments and blank lines.
+                    $dbList[$line] = "s$i";
+                }
+            }
+        }
+
+        // Manually add the meta and centralauth databases.
+        $dbList['meta'] = 's7';
+        $dbList['centralauth'] = 's7';
+
+        // Cache for one week.
+        return $this->setCache($cacheKey, $dbList, 'P1W');
     }
 
     /*****************
@@ -293,22 +349,27 @@ abstract class Repository
 
     /**
      * Execute a query using the projects connection, handling certain Exceptions.
+     * @param Project|string $project Project instance, database name (i.e. 'enwiki'), or slice (i.e. 's1').
      * @param string $sql
      * @param array $params Parameters to bound to the prepared query.
      * @param int|null $timeout Maximum statement time in seconds. null will use the
      *   default specified by the app.query_timeout config parameter.
      * @return ResultStatement
-     * @throws HttpException
      * @throws DriverException
+     * @throws \Doctrine\DBAL\DBALException
      * @codeCoverageIgnore
      */
-    public function executeProjectsQuery(string $sql, array $params = [], ?int $timeout = null): ResultStatement
-    {
+    public function executeProjectsQuery(
+        $project,
+        string $sql,
+        array $params = [],
+        ?int $timeout = null
+    ): ResultStatement {
         try {
             $timeout = $timeout ?? $this->container->getParameter('app.query_timeout');
             $sql = "SET STATEMENT max_statement_time = $timeout FOR\n".$sql;
 
-            return $this->getProjectsConnection()->executeQuery($sql, $params);
+            return $this->getProjectsConnection($project)->executeQuery($sql, $params);
         } catch (DriverException $e) {
             $this->handleDriverError($e, $timeout);
         }
@@ -317,7 +378,7 @@ abstract class Repository
     /**
      * Execute a query using the projects connection, handling certain Exceptions.
      * @param QueryBuilder $qb
-     * @param int $timeout Maximum statement time in seconds. null will use the
+     * @param int|null $timeout Maximum statement time in seconds. null will use the
      *   default specified by the app.query_timeout config parameter.
      * @return ResultStatement
      * @throws HttpException

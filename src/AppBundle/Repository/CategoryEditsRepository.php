@@ -59,7 +59,7 @@ class CategoryEditsRepository extends Repository
         $revisionTable = $project->getTableName('revision');
         $categorylinksTable = $project->getTableName('categorylinks');
 
-        $query = $this->getProjectsConnection()->createQueryBuilder();
+        $query = $this->getProjectsConnection($project)->createQueryBuilder();
         $query->select(['COUNT(DISTINCT(revs.rev_id))'])
             ->from($revisionTable, 'revs')
             ->join('revs', $categorylinksTable, null, 'cl_from = rev_page')
@@ -96,7 +96,7 @@ class CategoryEditsRepository extends Repository
         $revisionTable = $project->getTableName('revision');
         $categorylinksTable = $project->getTableName('categorylinks');
 
-        $query = $this->getProjectsConnection()->createQueryBuilder();
+        $query = $this->getProjectsConnection($project)->createQueryBuilder();
         $query->select(['cl_to AS cat', 'COUNT(rev_id) AS edit_count', 'COUNT(DISTINCT(rev_page)) AS page_count'])
             ->from($revisionTable, 'revs')
             ->join('revs', $categorylinksTable, null, 'cl_from = rev_page')
@@ -147,7 +147,7 @@ class CategoryEditsRepository extends Repository
         $commentTable = $project->getTableName('comment');
         $categorylinksTable = $project->getTableName('categorylinks');
 
-        $query = $this->getProjectsConnection()->createQueryBuilder();
+        $query = $this->getProjectsConnection($project)->createQueryBuilder();
         $query->select([
                 'page_title',
                 'page_namespace',

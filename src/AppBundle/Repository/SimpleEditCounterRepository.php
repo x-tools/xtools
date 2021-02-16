@@ -68,7 +68,7 @@ class SimpleEditCounterRepository extends Repository
                     JOIN $userTable ON user_id = ug_user
                     WHERE user_name = :username";
 
-        $result = $this->executeProjectsQuery($sql, [
+        $result = $this->executeProjectsQuery($project, $sql, [
             'username' => $user->getUsername(),
             'actorId' => $user->getActorId($project),
         ])->fetchAll();

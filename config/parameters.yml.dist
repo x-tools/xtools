@@ -7,16 +7,21 @@ parameters:
     database_name:              symfony
     database_user:              root
     database_password:          ~
+    database_replica_name:      ~
     database_replica_host:      127.0.0.1
-    database_replica_port:      ~
-    database_replica_name:      enwiki
     database_replica_user:      root
     database_replica_password:  ~
-    database_meta_name:         meta_p
-    database_meta_table:        wiki
-    database_toolsdb_host: 127.0.0.1
-    database_toolsdb_port: null
-    database_toolsdb_name: null
+    database_replica_port_s1:   3306
+    database_replica_port_s2:   3306
+    database_replica_port_s3:   3306
+    database_replica_port_s4:   3306
+    database_replica_port_s5:   3306
+    database_replica_port_s6:   3306
+    database_replica_port_s7:   3306
+    database_replica_port_s8:   3306
+    database_toolsdb_host:      127.0.0.1
+    database_toolsdb_port:      null
+    database_toolsdb_name:      null
 
     # Oauth consumer credentials, from https://meta.wikimedia.org/wiki/Special:OAuthConsumerRegistration
     oauth_key:                  ~

@@ -85,7 +85,7 @@ class AdminScoreRepository extends Repository
                     WHERE p.page_title LIKE 'Requests_for_page_protection%'
                         AND r.rev_actor = :actorId;";
 
-        return $this->executeProjectsQuery($sql, [
+        return $this->executeProjectsQuery($project, $sql, [
             'username' => $user->getUsername(),
             'actorId' => $user->getActorId($project),
         ])->fetchAll();
