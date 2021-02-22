@@ -74,7 +74,7 @@ abstract class XtoolsController extends Controller
      * Maximum number of days allowed for the given date range.
      * Set this in the controller's constructor to enforce the given date range to be within this range.
      * This will be used as the default date span unless $defaultDays is defined.
-     * @see XtoolsController::getUTCFromDateParams()
+     * @see XtoolsController::getUnixFromDateParams()
      * @var int|null
      */
     public $maxDays = null;
@@ -321,7 +321,7 @@ abstract class XtoolsController extends Controller
         $start = $this->params['start'] ?? false;
         $end = $this->params['end'] ?? false;
         if ($start || $end || null !== $this->maxDays) {
-            [$this->start, $this->end] = $this->getUTCFromDateParams($start, $end);
+            [$this->start, $this->end] = $this->getUnixFromDateParams($start, $end);
 
             // Set $this->params accordingly too, so that for instance API responses will include it.
             $this->params['start'] = is_int($this->start) ? date('Y-m-d', $this->start) : false;
@@ -640,14 +640,14 @@ abstract class XtoolsController extends Controller
     }
 
     /**
-     * Get UTC timestamps from given start and end string parameters. This also makes $start $maxDays before
+     * Get Unix timestamps from given start and end string parameters. This also makes $start $maxDays before
      * $end if not present, and makes $end the current time if not present.
      * The date range will not exceed $this->maxDays days, if this public class property is set.
      * @param int|string|false $start Unix timestamp or string accepted by strtotime.
      * @param int|string|false $end Unix timestamp or string accepted by strtotime.
      * @return int[] Start and end date as UTC timestamps.
      */
-    public function getUTCFromDateParams($start, $end): array
+    public function getUnixFromDateParams($start, $end): array
     {
         $today = strtotime('today midnight');
 
