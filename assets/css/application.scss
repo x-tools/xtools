@@ -923,3 +923,109 @@ input.form-control.show-loader {
     //     left: 98%;
     // }
 }
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        scrollbar-color: #333 #000;
+    }
+
+    body,
+    #wrapper,
+    .panel-body,
+    .xt-toc {
+        color: #bbb;
+        background: #000;
+    }
+
+    .home-link:after,
+    [role=separator] {
+        display: none;
+    }
+
+    .form-label,
+    .dropdown-menu {
+        background: #222;
+    }
+
+    header {
+        background: #222 !important;
+        border: none !important;
+    }
+
+    h4,
+    a:hover,
+    .typeahead * {
+        color: #bbb !important;
+    }
+    .dropdown-menu a:hover {
+        background: #226 !important;
+    }
+
+    .navbar-default,
+    nav,
+    table,
+    .panel-primary,
+    .panel-default,
+    th,
+    td,
+    .stat-list--group > tr:first-child > td,
+    hr,
+    .form-label,
+    .form-control {
+        border: none !important;
+    }
+
+    tr,
+    td {
+        background: #111 !important;
+    }
+
+    .open a {
+        color: #bbb !important;
+        background: #222 !important;
+    }
+
+    .blame .diff-context {
+        color: #bbb;
+    }
+
+    del {
+        background: #955 !important;
+    }
+    ins {
+        color: #ddd;
+        background: #060 !important;
+    }
+    .diff strong {
+        color: #fff;
+    }
+
+    .btn-default,
+    .home .tool-list .btn {
+        color: #999;
+        background: #222;
+        border-color: #222;
+    }
+
+    .form-label,
+    .form-control,
+    label {
+        color: #999;
+    }
+
+    .categoryedits  * {
+        background: #000 !important;
+    }
+
+    .form-control {
+        color: #999;
+        background: #111;
+    }
+
+    .alert-info {
+        color: #999;
+        background: #012;
+        border: 0;
+    }
+
+}
