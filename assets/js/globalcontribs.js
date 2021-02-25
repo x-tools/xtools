@@ -1,7 +1,7 @@
 xtools.globalcontribs = {};
 
 $(function () {
-    // Don't do anything if this isn't a Edit Counter page.
+    // Don't do anything if this isn't a Global Contribs page.
     if ($('body.globalcontribs').length === 0) {
         return;
     }

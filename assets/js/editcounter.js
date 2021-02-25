@@ -49,10 +49,6 @@ $(function () {
         return undefined;
     });
 
-    if ($('.contributions-container').length) {
-        loadLatestGlobal();
-    }
-
     // Set up namespace toggle chart.
     xtools.application.setupToggleTable(window.namespaceTotals, window.namespaceChart, null, toggleNamespace);
 });
@@ -128,23 +124,6 @@ function toggleNamespace(newData, key)
         // Refresh chart.
         chartObj.update();
     });
-}
-
-/**
- * Load recent global edits' HTML via AJAX, to not slow down the initial page load.
- * Only load if container is present, which is missing in subroutes, e.g. ec-namespacetotals, etc.
- */
-function loadLatestGlobal()
-{
-    // Load the contributions browser, or set up the listeners if it is already present.
-    const initFunc = $('.contributions-table').length ? 'setupContributionsNavListeners' : 'loadContributions';
-
-    xtools.application[initFunc](
-        function (params) {
-            return params.target + '-contributions/' + params.project + '/' + params.username;
-        },
-        'latest-global-edits'
-    );
 }
 
 /**
