@@ -9,7 +9,6 @@ namespace AppBundle\Model;
 
 use AppBundle\Helper\I18nHelper;
 use DateTime;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * An ArticleInfo provides statistics about a page on a project.
@@ -101,18 +100,6 @@ class ArticleInfo extends ArticleInfoApi
         'month' => 0,
         'year' => 0,
     ];
-
-    /**
-     * ArticleInfo constructor.
-     * @param Page $page The page to process.
-     * @param ContainerInterface $container The DI container.
-     * @param false|int $start From what date to obtain records.
-     * @param false|int $end To what date to obtain records.
-     */
-    public function __construct(Page $page, ContainerInterface $container, $start = false, $end = false)
-    {
-        parent::__construct($page, $container, $start, $end);
-    }
 
     /**
      * Make the I18nHelper accessible to ArticleInfo.
@@ -958,6 +945,8 @@ class ArticleInfo extends ArticleInfoApi
 
             // Convert log type value to i18n key.
             switch ($event['log_type']) {
+                // count pending-changes protections along with normal protections.
+                case 'stable':
                 case 'protect':
                     $action = 'protections';
                     break;
@@ -966,10 +955,6 @@ class ArticleInfo extends ArticleInfoApi
                     break;
                 case 'move':
                     $action = 'moves';
-                    break;
-                // count pending-changes protections along with normal protections.
-                case 'stable':
-                    $action = 'protections';
                     break;
             }
 
