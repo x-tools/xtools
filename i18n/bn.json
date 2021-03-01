@@ -8,6 +8,7 @@
 			"Nemo bis",
 			"Rasal Lia",
 			"Tahmid02016",
+			"Wikitanvir",
 			"ZI Jony",
 			"আফতাবুজ্জামান"
 		]
@@ -80,7 +81,7 @@
 	"considered-usernames": "বিবেচিত ব্যবহারকারী নাম",
 	"contributions": "অবদান",
 	"count": "গণনা",
-	"created-by": "তৈরী করেছেন",
+	"created-by": "তৈরি করেছেন",
 	"csv": "সিএসভি",
 	"current-admins": "বর্তমান প্রশাসক",
 	"current-patrollers": "বর্তমান টহলদানকারীগণ",
@@ -349,7 +350,7 @@
 	"rpp-desc": "পাতা সুরক্ষা জন্য $2টি {{PLURAL:$1|সম্পাদনা}} অনুরোধ",
 	"saturday": "শনিবার",
 	"sections": "অনুচ্ছেদ",
-	"see-full-page-stats": "সম্পূর্ণ পাতা পরিসংখ্যান দেখুন",
+	"see-full-page-stats": "পাতার সম্পূর্ণ পরিসংখ্যান দেখুন",
 	"see-full-statistics": "সম্পূর্ণ পরিসংখ্যান দেখুন",
 	"show": "দেখান",
 	"show-sections-desc": "কোন পরিসংখ্যান দেখতে চান তা নির্বাচন করুন। আপনি যত বেশি নির্বাচন করবেন, লোড হতে ততবেশী সময় নিবে।",
