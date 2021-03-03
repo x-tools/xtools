@@ -214,13 +214,15 @@ xtools.application.setupColumnSorting = function () {
         }
 
         $entries.sort(function (a, b) {
-            var before = $(a).find('.sort-entry--' + sortColumn).data('value'),
-                after = $(b).find('.sort-entry--' + sortColumn).data('value');
+            var before = $(a).find('.sort-entry--' + sortColumn).data('value') || 0,
+                after = $(b).find('.sort-entry--' + sortColumn).data('value') || 0;
 
             // Cast numerical strings into floats for faster sorting.
             if (!isNaN(before)) {
-                before = parseFloat(before, 10);
-                after = parseFloat(after, 10);
+                before = parseFloat(before) || 0;
+            }
+            if (!isNaN(after)) {
+                after = parseFloat(after) || 0;
             }
 
             if (before < after) {
