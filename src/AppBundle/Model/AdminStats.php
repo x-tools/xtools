@@ -164,7 +164,7 @@ class AdminStats extends Model
      */
     public function numDays(): int
     {
-        return (int)(($this->end - $this->start) / 60 / 60 / 24);
+        return (int)(($this->end - $this->start) / 60 / 60 / 24) + 1;
     }
 
     /**
