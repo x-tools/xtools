@@ -70,7 +70,11 @@
             <table class="table table-bordered table-hover table-striped top-editors-table table-sticky-header">
                 <thead><tr>
                     <th>#</th>
-                    {% for key in ['username', 'user-groups', 'links', 'total'] %}
+                    {% set headings = ['username', 'user-groups', 'links'] %}
+                    {% if as.actions|length > 1 %}
+                        {% set headings = headings|merge(['total']) %}
+                    {% endif %}
+                    {% for key in headings %}
                         <th>
                             <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
                                 {{ msg(key)|ucfirst }}
@@ -112,7 +116,9 @@
                                 {% endif %}
                                 {{ wiki.userLogLink(username, project, msg('log')|lower) }}
                             </td>
-                            <td class="sort-entry--total" data-value="{{ user.total }}">{{ user.total|num_format }}</td>
+                            {% if as.actions|length > 1 %}
+                                <td class="sort-entry--total" data-value="{{ user.total }}">{{ user.total|num_format }}</td>
+                            {% endif %}
                             {% for action in as.actions %}
                                 <td class="sort-entry--{{ action }}" data-value="{{ user[action] }}">{{ user[action]|num_format }}</td>
                             {% endfor %}
