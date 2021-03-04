@@ -26,7 +26,7 @@
             {% endfor %}
         </div>
 
-        {% include 'editCounter/subtoolSection.html.twig' with {'route': 'EditCounterGeneralStats', 'i18nKey': 'general-stats'} %}
+        {% include 'editCounter/subtoolSection.html.twig' with {'route': 'EditCounterGeneralStats', 'i18nKey': 'general-stats', 'downloadFormats': ['wikitext']} %}
 
         {% include 'editCounter/subtoolSection.html.twig' with {'route': 'EditCounterNamespaceTotals', 'i18nKey': 'namespace-totals', 'jsonPath': 'UserApiNamespaceTotals'} %}
 
