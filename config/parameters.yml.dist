@@ -8,16 +8,23 @@ parameters:
     database_user:              root
     database_password:          ~
     database_replica_name:      ~
-    database_replica_host:      127.0.0.1
     database_replica_user:      root
     database_replica_password:  ~
+    database_replica_host_s1:   127.0.0.1
     database_replica_port_s1:   3306
+    database_replica_host_s2:   127.0.0.1
     database_replica_port_s2:   3306
+    database_replica_host_s3:   127.0.0.1
     database_replica_port_s3:   3306
+    database_replica_host_s4:   127.0.0.1
     database_replica_port_s4:   3306
+    database_replica_host_s5:   127.0.0.1
     database_replica_port_s5:   3306
+    database_replica_host_s6:   127.0.0.1
     database_replica_port_s6:   3306
+    database_replica_host_s7:   127.0.0.1
     database_replica_port_s7:   3306
+    database_replica_host_s8:   127.0.0.1
     database_replica_port_s8:   3306
     database_toolsdb_host:      127.0.0.1
     database_toolsdb_port:      null

@@ -84,42 +84,42 @@ doctrine:
                 password: "%database_replica_password%"
                 charset:  UTF8
             toolforge_s1:
-                host:     '%database_replica_host%'
+                host:     '%database_replica_host_s1%'
                 port:     '%database_replica_port_s1%'
                 user:     '%database_replica_user%'
                 password: '%database_replica_password%'
             toolforge_s2:
-                host:     '%database_replica_host%'
+                host:     '%database_replica_host_s2%'
                 port:     '%database_replica_port_s2%'
                 user:     '%database_replica_user%'
                 password: '%database_replica_password%'
             toolforge_s3:
-                host:     '%database_replica_host%'
+                host:     '%database_replica_host_s3%'
                 port:     '%database_replica_port_s3%'
                 user:     '%database_replica_user%'
                 password: '%database_replica_password%'
             toolforge_s4:
-                host:     '%database_replica_host%'
+                host:     '%database_replica_host_s4%'
                 port:     '%database_replica_port_s4%'
                 user:     '%database_replica_user%'
                 password: '%database_replica_password%'
             toolforge_s5:
-                host:     '%database_replica_host%'
+                host:     '%database_replica_host_s5%'
                 port:     '%database_replica_port_s5%'
                 user:     '%database_replica_user%'
                 password: '%database_replica_password%'
             toolforge_s6:
-                host:     '%database_replica_host%'
+                host:     '%database_replica_host_s6%'
                 port:     '%database_replica_port_s6%'
                 user:     '%database_replica_user%'
                 password: '%database_replica_password%'
             toolforge_s7:
-                host:     '%database_replica_host%'
+                host:     '%database_replica_host_s7%'
                 port:     '%database_replica_port_s7%'
                 user:     '%database_replica_user%'
                 password: '%database_replica_password%'
             toolforge_s8:
-                host:     '%database_replica_host%'
+                host:     '%database_replica_host_s8%'
                 port:     '%database_replica_port_s8%'
                 user:     '%database_replica_user%'
                 password: '%database_replica_password%'
