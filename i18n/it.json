@@ -3,6 +3,7 @@
 		"authors": [
 			"Albe Albe460",
 			"Beta16",
+			"El Bux Del Cu",
 			"Greis",
 			"Indil77",
 			"Luca.favorido",
@@ -51,6 +52,7 @@
 	"auto-edits-request": "Richiedi l'aggiunta di un nuovo strumento (semi-)automatico",
 	"auto-edits-tool-filter-desc": "Mostra solo i contributi utilizzando lo strumento indicato.",
 	"auto-edits-unknown-tool": "Nessuno strumento conosciuto con il nome: $1",
+	"auto-edits-misconfiguration": "Lo strumento \"$1\" non è configurato correttamente. Si prega di richiedere l'assistenza dell'amministratore a $2",
 	"auto-tool-edits": "$1 contributi",
 	"automatic": "Automatico",
 	"average-change-per-page": "Media dei contributi per pagina",
