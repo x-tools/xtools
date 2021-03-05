@@ -69,7 +69,7 @@ class AdminStatsTest extends TestAdapter
 
         static::assertEquals(1483228800, $as->getStart());
         static::assertEquals(1488326400, $as->getEnd());
-        static::assertEquals(59, $as->numDays());
+        static::assertEquals(60, $as->numDays());
         static::assertEquals(1, $as->getNumInRelevantUserGroup());
         static::assertEquals(1, $as->getNumWithActionsNotInGroup());
     }
