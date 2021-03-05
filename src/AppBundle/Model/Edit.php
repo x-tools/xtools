@@ -410,7 +410,7 @@ class Edit extends Model
 
     /**
      * Was the edit (semi-)automated, based on the edit summary?
-     * @param ContainerInterface $container [description]
+     * @param ContainerInterface $container
      * @return bool
      */
     public function isAutomated(ContainerInterface $container): bool

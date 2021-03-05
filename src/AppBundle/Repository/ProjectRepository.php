@@ -9,6 +9,7 @@ namespace AppBundle\Repository;
 
 use AppBundle\Model\Page;
 use AppBundle\Model\Project;
+use Doctrine\DBAL\Connection;
 use Exception;
 use GuzzleHttp\Client;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -417,20 +418,23 @@ class ProjectRepository extends Repository
         $sql = "SELECT user_name, ug_group AS user_group
                 FROM $userTable
                 JOIN $userGroupsTable ON ug_user = user_id
-                WHERE ug_group IN (:groups)
+                WHERE ug_group IN (?)
                 GROUP BY user_name, ug_group";
-        $users = $this->executeProjectsQuery($project, $sql, ['groups' => implode(',', $groups)])->fetchAll();
+        $users = $this->getProjectsConnection($project)
+            ->executeQuery($sql, [$groups], [Connection::PARAM_STR_ARRAY])
+            ->fetchAll();
 
         if (count($globalGroups) > 0 && $this->isLabs()) {
             $sql = "SELECT gu_name AS user_name, gug_group AS user_group
                     FROM centralauth_p.global_user_groups
                     JOIN centralauth_p.globaluser ON gug_user = gu_id
-                    WHERE gug_group IN (:globalGroups)
+                    WHERE gug_group IN (?)
                     GROUP BY user_name, user_group";
-            $ret = $this->executeProjectsQuery('centralauth', $sql, [
-                'globalGroups' => implode(',', $globalGroups),
-            ])->fetchAll();
-            $users = array_merge($users, $ret);
+            $globalUsers = $this->getProjectsConnection('centralauth')
+                ->executeQuery($sql, [$globalGroups], [Connection::PARAM_STR_ARRAY])
+                ->fetchAll();
+
+            $users = array_merge($users, $globalUsers);
         }
 
         // Cache for 12 hours and return.
