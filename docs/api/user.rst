@@ -85,7 +85,7 @@ Get the pages created by the user in the given namespace.
 * ``deleted`` - One of 'live', 'deleted' or 'all' (default).
 * ``start`` - Start date in the format ``YYYY-MM-DD``. Leave this and ``end`` blank to retrieve the most recent data.
 * ``end`` - End date in the format ``YYYY-MM-DD``. Leave this and ``start`` blank to retrieve the most recent data.
-* ``offset`` - Which page of results to show. If there is more than one page of results, ``continue`` is returned, with the subsequent page number as the value.
+* ``offset`` - Shows pages created before this timestamp. This is used for pagination. If there is more than one page of results, ``continue`` is returned, with the offset timestamp as the value.
 
 **Example:**
 
@@ -111,7 +111,7 @@ You can optionally pass in ``?tools=1`` to get individual counts of each (semi-)
 * ``namespace`` - Namespace ID or ``all`` for all namespaces.
 * ``start`` - Start date in the format ``YYYY-MM-DD``. Leave this and ``end`` blank to retrieve the most recent data.
 * ``end`` - End date in the format ``YYYY-MM-DD``. Leave this and ``start`` blank to retrieve the most recent data.
-* ``tools`` - Set to any non-blank value to include the tools that were used and their counts.
+* ``tools`` - Set to any truthy value to include the tools that were used and their counts.
 
 **Example:**
 
@@ -121,6 +121,7 @@ Get the number of (semi-)automated edits made by `Jimbo Wales <https://en.wikipe
 
 Get a list of the known (semi-)automated tools used by `Jimbo Wales <https://en.wikipedia.org/wiki/User:Jimbo_Wales>`_ in the mainspace on the English Wikipedia, and how many times they were used.
 
+    https://xtools.wmflabs.org/api/user/automated_editcount/en.wikipedia/Jimbo_Wales/0?tools=1
     https://xtools.wmflabs.org/api/user/automated_editcount/en.wikipedia/Jimbo_Wales/0///1
 
 Non-automated edits
@@ -136,7 +137,7 @@ Get non-automated contributions for the given user, namespace and date range.
 * ``namespace`` (**required**) - Namespace ID or  ``all`` for all namespaces. Defaults to ``0`` (mainspace).
 * ``start`` - Start date in the format ``YYYY-MM-DD``. Leave this and ``end`` blank to retrieve the most recent contributions.
 * ``end`` - End date in the format ``YYYY-MM-DD``. Leave this and ``start`` blank to retrieve the most recent contributions.
-* ``offset`` - Number of edits from the start date.
+* ``offset`` - Shows edits made before this timestamp. This is used for pagination. If you are given more than one page of results, ``continue`` is returned with the offset timestamp as the value.
 
 **Example:**
 
@@ -160,7 +161,7 @@ To get the names of the available tools, use the :ref:`Automated tools <autotool
 * ``namespace`` (**required**) - Namespace ID or  ``all`` for all namespaces. Defaults to ``0`` (mainspace).
 * ``start`` - Start date in the format ``YYYY-MM-DD``. Leave this and ``end`` blank to retrieve the most recent contributions.
 * ``end`` - End date in the format ``YYYY-MM-DD``. Leave this and ``start`` blank to retrieve the most recent contributions.
-* ``offset`` - Number of edits from the start date.
+* ``offset`` - Shows edits made before this timestamp. This is used for pagination. If you are given more than one page of results, ``continue`` is returned with the offset timestamp as the value.
 
 **Example:**
 

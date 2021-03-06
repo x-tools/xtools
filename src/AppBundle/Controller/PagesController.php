@@ -361,7 +361,7 @@ class PagesController extends XtoolsController
         ];
 
         if ($pages->getNumResults() === $pages->resultsPerPage()) {
-            $ret['continue'] = $this->offset + 1;
+            $ret['continue'] = $pages->getLastTimestamp();
         }
 
         return $this->getFormattedApiResponse($ret);

@@ -10,6 +10,7 @@ namespace AppBundle\Controller;
 use AppBundle\Helper\I18nHelper;
 use AppBundle\Model\AutoEdits;
 use AppBundle\Repository\AutoEditsRepository;
+use DateTime;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -139,7 +140,8 @@ class AutomatedEditsController extends XtoolsController
             $this->start,
             $this->end,
             $tool,
-            $this->offset
+            $this->offset,
+            $this->limit
         );
         $this->autoEdits->setRepository($autoEditsRepo);
 
@@ -250,13 +252,12 @@ class AutomatedEditsController extends XtoolsController
      *       "start"="|\d{4}-\d{2}-\d{2}",
      *       "end"="|\d{4}-\d{2}-\d{2}"
      *   },
-     *   defaults={"namespace"="all", "start"=false, "end"=false}
+     *   defaults={"namespace"="all", "start"=false, "end"=false, "tools"=false}
      * )
-     * @param string $tools Non-blank to show which tools were used and how many times.
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function automatedEditCountApiAction(string $tools = ''): JsonResponse
+    public function automatedEditCountApiAction(): JsonResponse
     {
         $this->recordApiUsage('user/automated_editcount');
 
@@ -268,7 +269,7 @@ class AutomatedEditsController extends XtoolsController
         ];
         $ret['nonautomated_editcount'] = $ret['total_editcount'] - $ret['automated_editcount'];
 
-        if ('' != $tools) {
+        if (isset($this->params['tools'])) {
             $tools = $this->autoEdits->getToolCounts();
             $ret['automated_tools'] = $tools;
         }
@@ -285,9 +286,9 @@ class AutomatedEditsController extends XtoolsController
      *       "namespace"="|all|\d+",
      *       "start"="|\d{4}-\d{2}-\d{2}",
      *       "end"="|\d{4}-\d{2}-\d{2}",
-     *       "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}",
+     *       "offset"="|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}"
      *   },
-     *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=false}
+     *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=false, "limit"=50}
      * )
      * @return JsonResponse
      * @codeCoverageIgnore
@@ -298,17 +299,13 @@ class AutomatedEditsController extends XtoolsController
 
         $this->setupAutoEdits();
 
-        $ret = array_map(function ($rev) {
-            return array_merge([
-                'full_page_title' => $this->getPageFromNsAndTitle(
-                    (int)$rev['page_namespace'],
-                    $rev['page_title'],
-                    true
-                ),
-            ], $rev);
-        }, $this->autoEdits->getNonAutomatedEdits(true));
+        $out = $this->addFullPageTitlesAndContinue(
+            'nonautomated_edits',
+            [],
+            $this->autoEdits->getNonAutomatedEdits(true)
+        );
 
-        return $this->getFormattedApiResponse(['nonautomated_edits' => $ret]);
+        return $this->getFormattedApiResponse($out);
     }
 
     /**
@@ -320,9 +317,9 @@ class AutomatedEditsController extends XtoolsController
      *       "namespace"="|all|\d+",
      *       "start"="|\d{4}-\d{2}-\d{2}",
      *       "end"="|\d{4}-\d{2}-\d{2}",
-     *       "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}",
+     *       "offset"="|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}",
      *   },
-     *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=false}
+     *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=false, "limit"=50}
      * )
      * @return Response
      * @codeCoverageIgnore
@@ -333,13 +330,32 @@ class AutomatedEditsController extends XtoolsController
 
         $this->setupAutoEdits();
 
-        $ret = [];
+        $extras = $this->autoEdits->getTool()
+            ? ['tool' => $this->autoEdits->getTool()]
+            : [];
 
-        if ($this->autoEdits->getTool()) {
-            $ret['tool'] = $this->autoEdits->getTool();
-        }
+        $out = $this->addFullPageTitlesAndContinue(
+            'automated_edits',
+            $extras,
+            $this->autoEdits->getAutomatedEdits(true)
+        );
 
-        $ret['automated_edits'] = array_map(function ($rev) {
+        return $this->getFormattedApiResponse($out);
+    }
+
+    /**
+     * Adds a 'full_page_title' key and value to each entry in $data.
+     * If there are as many entries in $data as there are $this->limit, pagination is assumed
+     *   and a 'continue' key is added to the end of the response body.
+     * @param string $type Either 'nonautomated_edits' or 'automated_edits'.
+     * @param array $out Whatever data needs to appear above the $data in the response body.
+     * @param array $data The data set itself.
+     * @return array
+     */
+    private function addFullPageTitlesAndContinue(string $type, array $out, array $data): array
+    {
+        // Add full_page_title (in addition to the existing page_title and page_namespace keys).
+        $out[$type] = array_map(function ($rev) {
             return array_merge([
                 'full_page_title' => $this->getPageFromNsAndTitle(
                     (int)$rev['page_namespace'],
@@ -347,8 +363,16 @@ class AutomatedEditsController extends XtoolsController
                     true
                 ),
             ], $rev);
-        }, $this->autoEdits->getAutomatedEdits(true));
+        }, $data);
 
-        return $this->getFormattedApiResponse($ret);
+        // Check if pagination is needed.
+        if (count($out[$type]) === $this->limit && count($out[$type]) > 0) {
+            // Use the timestamp of the last Edit as the value for the 'continue' return key,
+            //   which can be used as a value for 'offset' in order to paginate results.
+            $timestamp = array_slice($out[$type], -1, 1)[0]['timestamp'];
+            $out['continue'] = (new DateTime($timestamp))->format('Y-m-d\TH:i:s');
+        }
+
+        return $out;
     }
 }

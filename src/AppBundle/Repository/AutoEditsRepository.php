@@ -166,6 +166,7 @@ class AutoEditsRepository extends UserRepository
      * @param int|false $start Start date as Unix timestamp.
      * @param int|false $end End date as Unix timestamp.
      * @param int|false $offset Unix timestamp. Used for pagination.
+     * @param int $limit Number of results to return.
      * @return string[] Result of query, with columns 'page_title', 'page_namespace', 'rev_id', 'timestamp', 'minor',
      *   'length', 'length_change', 'comment'.
      */
@@ -175,7 +176,8 @@ class AutoEditsRepository extends UserRepository
         $namespace = 'all',
         $start = false,
         $end = false,
-        $offset = false
+        $offset = false,
+        int $limit = 50
     ): array {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_nonautoedits');
         if (!$this->useSandbox && $this->cache->hasItem($cacheKey)) {
@@ -215,7 +217,7 @@ class AutoEditsRepository extends UserRepository
                 $condNamespace
                 GROUP BY revs.rev_id
                 ORDER BY revs.rev_timestamp DESC
-                LIMIT 50";
+                LIMIT $limit";
 
         $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, ['tools' => $regex]);
         $result = $resultQuery->fetchAll();
@@ -233,6 +235,7 @@ class AutoEditsRepository extends UserRepository
      * @param int|false $end End date as Unix timestamp.
      * @param string|null $tool Only get edits made with this tool. Must match the keys in the AutoEdits config.
      * @param int|false $offset Unix timestamp. Used for pagination.
+     * @param int $limit Number of results to return.
      * @return string[] Result of query, with columns 'page_title', 'page_namespace', 'rev_id', 'timestamp', 'minor',
      *   'length', 'length_change', 'comment'.
      */
@@ -243,7 +246,8 @@ class AutoEditsRepository extends UserRepository
         $start = false,
         $end = false,
         ?string $tool = null,
-        $offset = false
+        $offset = false,
+        int $limit = 50
     ): array {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_autoedits');
         if (!$this->useSandbox && $this->cache->hasItem($cacheKey)) {
@@ -297,7 +301,7 @@ class AutoEditsRepository extends UserRepository
                 AND (".implode(' OR ', $condsTool).")
                 GROUP BY revs.rev_id
                 ORDER BY revs.rev_timestamp DESC
-                LIMIT 50";
+                LIMIT $limit";
 
         $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, ['tools' => $regex]);
         $result = $resultQuery->fetchAll();

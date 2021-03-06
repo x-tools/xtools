@@ -33,6 +33,9 @@ class AutoEdits extends Model
     /** @var int Total number of edits made with the tools. */
     protected $toolsTotal;
 
+    /** @var int Default number of results to show per page when fetching (non-)automated edits. */
+    public const RESULTS_PER_PAGE = 50;
+
     /**
      * Constructor for the AutoEdits class.
      * @param Project $project
@@ -40,8 +43,9 @@ class AutoEdits extends Model
      * @param int|string $namespace Namespace ID or 'all'
      * @param false|int $start Start date as Unix timestamp.
      * @param false|int $end End date as Unix timestamp.
-     * @param string $tool The tool we're searching for when fetching (semi-)automated edits.
+     * @param null $tool The tool we're searching for when fetching (semi-)automated edits.
      * @param false|int $offset Unix timestamp. Used for pagination.
+     * @param int|null $limit Number of results to return.
      */
     public function __construct(
         Project $project,
@@ -50,7 +54,8 @@ class AutoEdits extends Model
         $start = false,
         $end = false,
         $tool = null,
-        $offset = false
+        $offset = false,
+        ?int $limit = self::RESULTS_PER_PAGE
     ) {
         $this->project = $project;
         $this->user = $user;
@@ -59,6 +64,7 @@ class AutoEdits extends Model
         $this->end = $end;
         $this->tool = $tool;
         $this->offset = $offset;
+        $this->limit = $limit ?? self::RESULTS_PER_PAGE;
     }
 
     /**
@@ -139,7 +145,8 @@ class AutoEdits extends Model
             $this->namespace,
             $this->start,
             $this->end,
-            $this->offset
+            $this->offset,
+            $this->limit
         );
 
         if ($raw) {

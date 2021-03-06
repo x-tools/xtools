@@ -294,7 +294,9 @@ abstract class XtoolsController extends Controller
 
         // Limit need to be an int.
         if (isset($this->params['limit'])) {
-            $this->limit = (int)$this->params['limit'];
+            // Normalize.
+            $this->params['limit'] = max(0, (int)$this->params['limit']);
+            $this->limit = $this->params['limit'];
         }
 
         if (isset($this->params['project'])) {
@@ -593,6 +595,7 @@ abstract class XtoolsController extends Controller
             'limit',
             'format',
             'tool',
+            'tools',
             'q',
 
             // Legacy parameters.
