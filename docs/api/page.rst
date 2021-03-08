@@ -88,7 +88,7 @@ Same as above, but return 50 results.
     `<https://xtools.wmflabs.org/api/page/top_editors/en.wikipedia/Albert_Einstein///50>`_
 
 Get the top 50 editors in 2017 to the English Wikipedia article
-`Albert Einstein <https://en.wikipedia.org/wiki/Albert_Einstein>`_., excluding bots.
+`Albert Einstein <https://en.wikipedia.org/wiki/Albert_Einstein>`_, excluding bots.
 
     `<https://xtools.wmflabs.org/api/page/top_editors/en.wikipedia/Albert_Einstein/2017-01-01/2017-12-31/50?nobots=1>`_
 

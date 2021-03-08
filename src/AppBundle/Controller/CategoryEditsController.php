@@ -179,9 +179,9 @@ class CategoryEditsController extends XtoolsController
      *       "categories"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2}))?",
      *       "start"="|\d{4}-\d{2}-\d{2}",
      *       "end"="|\d{4}-\d{2}-\d{2}",
-     *       "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}",
+     *       "offset"="|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}",
      *   },
-     *   defaults={"start"=false, "end"=false, "offset"=0}
+     *   defaults={"start"=false, "end"=false, "offset"=false}
      * )
      * @return Response
      * @codeCoverageIgnore
