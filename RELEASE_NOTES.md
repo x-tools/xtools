@@ -1,5 +1,17 @@
 # Release Notes #
 
+## 3.11.0 ##
+- (T273988): Add support for new replicas redesign.
+- Upgrade to Symfony 4.4
+- Refactor the 'offset' parameter to accept a timestamp.
+- AutoEdits: Add pagination to the API.
+- (T257416): Fix column sorting when working with non-numeric values.
+- AdminStats (T234777): Don't show total if only one action available.
+- AdminStats (T276190): Fix number of days calculation.
+- Various code quality improvements.
+- Removed deprecated response values from SimpleEditCount API.
+- Localization updates.
+
 ## 3.10.19 ##
 - AutoEdits: Make the link to request new tools go to the main talk page
   instead of the preloaded form.

@@ -4,6 +4,12 @@
 Installation
 ############
 
+.. warning::
+    XTools was originally designed to work on any MediaWiki installation. However, after years of little to no interest
+    from third party wikis, support for anything other than the Wikimedia farm of wikis has stalled to prevent maintenance burden.
+    If your third party wiki is interested in using XTools, please contact us at `mw:Talk:XTools <https://www.mediawiki.org/wiki/Talk:XTools>`_
+    or `create a Phabricator ticket <https://phabricator.wikimedia.org/maniphest/task/edit/form/1/?projects=XTools>`_.
+
 For contributors, see :ref:`development` for additional, more detailed instructions specific to setting up a local development environment. The prerequisites listed below still apply.
 
 .. _prerequisites:
