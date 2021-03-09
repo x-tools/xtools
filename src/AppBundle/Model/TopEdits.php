@@ -32,6 +32,9 @@ class TopEdits extends Model
     /** @var int Number of reverted top edits. */
     protected $totalReverted = 0;
 
+    /** @var int Which page of results to show. */
+    protected $pagination = 0;
+
     private const DEFAULT_LIMIT_SINGLE_NAMESPACE = 1000;
     private const DEFAULT_LIMIT_ALL_NAMESPACES = 20;
 
@@ -45,7 +48,7 @@ class TopEdits extends Model
      * @param int|false $end End date as Unix timestamp.
      * @param int $limit Number of rows to fetch. This defaults to DEFAULT_LIMIT_SINGLE_NAMESPACE if $this->namespace
      *   is a single namespace (int), and DEFAULT_LIMIT_ALL_NAMESPACES if $this->namespace is 'all'.
-     * @param int|false $offset Unix timestamp. Used for pagination.
+     * @param int $pagination Which page of results to show.
      */
     public function __construct(
         Project $project,
@@ -55,7 +58,7 @@ class TopEdits extends Model
         $start = false,
         $end = false,
         $limit = null,
-        $offset = false
+        $pagination = 0
     ) {
         $this->project = $project;
         $this->user = $user;
@@ -63,7 +66,7 @@ class TopEdits extends Model
         $this->namespace = 'all' === $namespace ? 'all' : (int)$namespace;
         $this->start = $start;
         $this->end = $end;
-        $this->offset = $offset;
+        $this->pagination = (int)$pagination;
 
         if (null !== $limit) {
             $this->limit = (int)$limit;
@@ -72,6 +75,15 @@ class TopEdits extends Model
                 ? self::DEFAULT_LIMIT_ALL_NAMESPACES
                 : self::DEFAULT_LIMIT_SINGLE_NAMESPACE;
         }
+    }
+
+    /**
+     * Which page of results we're showing.
+     * @return int
+     */
+    public function getPagination(): int
+    {
+        return $this->pagination;
     }
 
     /**
@@ -199,7 +211,7 @@ class TopEdits extends Model
                 $this->start,
                 $this->end,
                 $this->limit,
-                $this->offset
+                $this->pagination
             );
         }
 

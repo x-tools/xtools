@@ -88,8 +88,8 @@
 
         {% if not(is_sub_request) and te.namespace != 'all' %}
             {% set numPages = (te.getNumPagesNamespace / te.limit)|round(0, 'ceil') %}
-            {% set hasPrev = te.offset - 1 >= 0 %}
-            {% set hasNext = te.offset + 1 < numPages %}
+            {% set hasPrev = te.pagination - 1 >= 0 %}
+            {% set hasNext = te.pagination + 1 < numPages %}
             {% set pathVars = {'project': project.domain, 'username': user.username, 'namespace': te.namespace} %}
 
             {% if hasNext or hasPrev %}
@@ -97,22 +97,22 @@
                     <ul class="pagination xt-pagination">
                         <li{% if not(hasPrev) %} class="disabled"{% endif %}>
                             {% if hasPrev %}
-                            <a href="{{ path('TopEditsResultNamespace', pathVars|merge({'offset': te.offset - 1})) }}" aria-label="Previous">
+                            <a href="{{ path('TopEditsResultNamespace', pathVars|merge({'pagination': te.pagination - 1})) }}" aria-label="Previous">
                                 {% endif %}
                                 <span aria-hidden="true">&laquo;</span>
                                 {% if hasPrev %}</a>{% endif %}
                         </li>
                         {% for page in 1..numPages %}
-                            {% set active = te.offset == loop.index0 %}
+                            {% set active = te.pagination == loop.index0 %}
                             <li{% if active %} class="active"{% endif %}>
-                                <a href="{{ path('TopEditsResultNamespace', pathVars|merge({'offset': loop.index0})) }}">
+                                <a href="{{ path('TopEditsResultNamespace', pathVars|merge({'pagination': loop.index0})) }}">
                                     {{ page }} {% if active %}<span class="sr-only">(current)</span>{% endif %}
                                 </a>
                             </li>
                         {% endfor %}
                         <li{% if not(hasNext) %} class="disabled"{% endif %}>
                             {% if hasNext %}
-                            <a href="{{ path('TopEditsResultNamespace', pathVars|merge({'offset': te.offset + 1})) }}" aria-label="Next">
+                            <a href="{{ path('TopEditsResultNamespace', pathVars|merge({'pagination': te.pagination + 1})) }}" aria-label="Next">
                                 {% endif %}
                                 <span aria-hidden="true">&raquo;</span>
                                 {% if hasNext %}</a>{% endif %}

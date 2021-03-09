@@ -38,7 +38,7 @@ class TopEditsRepository extends UserRepository
      * @param int|false $start Start date as Unix timestamp.
      * @param int|false $end End date as Unix timestamp.
      * @param int $limit Number of edits to fetch.
-     * @param int|false $offset Unix timestamp. Used for pagination.
+     * @param int $pagination Which page of results to return.
      * @return string[] page_namespace, page_title, page_is_redirect,
      *   count (number of edits), assessment (page assessment).
      */
@@ -49,7 +49,7 @@ class TopEditsRepository extends UserRepository
         $start = false,
         $end = false,
         int $limit = 1000,
-        $offset = false
+        int $pagination = 0
     ): array {
         // Set up cache.
         $cacheKey = $this->getCacheKey(func_get_args(), 'topedits_ns');
@@ -73,6 +73,7 @@ class TopEditsRepository extends UserRepository
                 ) AS pa_class"
             : '';
 
+        $offset = $pagination * $limit;
         $sql = "SELECT page_namespace, page_title, page_is_redirect, COUNT(page_title) AS count
                     $paSelect
                 FROM $pageTable
@@ -82,7 +83,8 @@ class TopEditsRepository extends UserRepository
                 $revDateConditions
                 GROUP BY page_namespace, page_title
                 ORDER BY count DESC
-                LIMIT $limit";
+                LIMIT $limit
+                OFFSET $offset";
 
         $resultQuery = $this->executeQuery($sql, $project, $user, $namespace);
         $result = $resultQuery->fetchAll();
