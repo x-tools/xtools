@@ -973,10 +973,13 @@ input.form-control.show-loader {
     th,
     td,
     .stat-list--group > tr:first-child > td,
-    hr,
+    hr {
+        border: none !important;
+    }
+
     .form-label,
     .form-control {
-        border: none !important;
+        border: 1px solid #222;
     }
 
     tr,
