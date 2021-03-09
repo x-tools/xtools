@@ -206,7 +206,7 @@ class Pages extends Model
      */
     public function isMultiNamespace(): bool
     {
-        return $this->getNumNamespaces() > 1;
+        return $this->getNumNamespaces() > 1 || ('all' === $this->getNamespace() && 1 === $this->getNumNamespaces());
     }
 
     /**
