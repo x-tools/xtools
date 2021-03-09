@@ -937,6 +937,10 @@ input.form-control.show-loader {
         background: #000;
     }
 
+    .xt-toc.fixed {
+        box-shadow: none;
+    }
+
     .home-link:after,
     [role=separator] {
         display: none;
