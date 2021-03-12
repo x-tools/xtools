@@ -258,7 +258,7 @@
 	"num-revisions": "টি {{PLURAL:$1|সংশোধন}}",
 	"num-revisions-processed": "$1টি প্রক্রিয়াকৃত",
 	"num-revisions-since": "$3-এর পর থেকে $1টি {{PLURAL:$2|সংস্করণ}}",
-	"num-seconds": "$1 {{PLURAL:$1|সেকেন্ড}}",
+	"num-seconds": "{{PLURAL:$1|সেকেন্ড}}",
 	"num-sitelinks": "টি {{PLURAL:$1|সাইটসংযোগ}}",
 	"num-tools": "টি {{PLURAL:$1|সরঞ্জাম}}",
 	"num-users": "জন {{PLURAL: $1|ব্যবহারকারী}}",
