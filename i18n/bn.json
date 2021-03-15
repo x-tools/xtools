@@ -253,7 +253,7 @@
 	"num-moves": "টি {{PLURAL:$1|স্থানান্তর}}",
 	"num-namespaces": "টি {{PLURAL:$1|নামস্থান}}",
 	"num-others": "টি {{PLURAL:$1|অন্যান্য}}",
-	"num-pageviews": "বার {{PLURAL:$1|পাতাপরিদর্শন}}",
+	"num-pageviews": "বার {{PLURAL:$1|পাতাটি পরিদর্শিত হয়েছে}}",
 	"num-protections": "টি {{PLURAL:$1|সুরক্ষা}}",
 	"num-revisions": "টি {{PLURAL:$1|সংশোধন}}",
 	"num-revisions-processed": "$1টি প্রক্রিয়াকৃত",
