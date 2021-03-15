@@ -1,5 +1,11 @@
 # Release Notes #
 
+## 3.11.1 ##
+- Pages: Fix when 'all' namespace is requested but only mainspace results exist.
+- TopEdits: Fix pagination for single namespace view.
+- Add dark mode styles for clients with `prefers-color-scheme: dark`.
+- Localization updates.
+
 ## 3.11.0 ##
 - (T273988): Add support for new replicas redesign.
 - Upgrade to Symfony 4.4
