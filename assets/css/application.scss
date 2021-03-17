@@ -1037,7 +1037,7 @@ input.form-control.show-loader {
 
     canvas {
         background: #fff;
-        filter: invert(1) hue-rotate(180deg);
+        filter: invert() hue-rotate(180deg);
     }
 
 }
