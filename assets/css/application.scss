@@ -1035,7 +1035,8 @@ input.form-control.show-loader {
         border: 0;
     }
 
-    canvas {
+    canvas,
+    .color-icon {
         background: #fff;
         filter: invert() hue-rotate(180deg);
     }
