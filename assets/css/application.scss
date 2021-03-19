@@ -1035,4 +1035,10 @@ input.form-control.show-loader {
         border: 0;
     }
 
+    canvas,
+    .color-icon {
+        background: #fff;
+        filter: invert(1) hue-rotate(180deg);
+    }
+
 }
