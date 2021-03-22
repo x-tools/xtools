@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.11.2 ##
+- Improvements to dark mode styles.
+- Localization updates.
+
 ## 3.11.1 ##
 - Pages: Fix when 'all' namespace is requested but only mainspace results exist.
 - TopEdits: Fix pagination for single namespace view.
