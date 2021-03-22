@@ -933,7 +933,7 @@ input.form-control.show-loader {
     #wrapper,
     .panel-body,
     .xt-toc {
-        color: #bbb;
+        color: #ccc;
         background: #000;
     }
 
@@ -963,6 +963,10 @@ input.form-control.show-loader {
     }
     .dropdown-menu a:hover {
         background: #226 !important;
+    }
+
+    a {
+        color: #09f;
     }
 
     .navbar-default,
