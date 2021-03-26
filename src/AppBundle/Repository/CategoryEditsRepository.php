@@ -103,8 +103,8 @@ class CategoryEditsRepository extends Repository
                 WHERE revs.rev_actor = ?
                     AND cl_to IN (?)
                     $revDateConditions
-                ORDER BY edit_count DESC
-                GROUP BY cl_to";
+                GROUP BY cl_to
+                ORDER BY edit_count DESC";
 
         $counts = [];
         $stmt = $this->executeStmt($sql, $project, $user, $categories);
