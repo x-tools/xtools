@@ -52,7 +52,7 @@ class Pages extends Model
     ) {
         $this->project = $project;
         $this->user = $user;
-        $this->namespace = 'all' === $namespace ? 'all' : (string)$namespace;
+        $this->namespace = 'all' === $namespace ? 'all' : (int)$namespace;
         $this->start = $start;
         $this->end = $end;
         $this->redirects = $redirects ?: 'noredirects';
