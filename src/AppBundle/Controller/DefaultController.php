@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -50,19 +51,6 @@ class DefaultController extends XtoolsController
     {
         return $this->render('default/index.html.twig', [
             'xtPage' => 'home',
-        ]);
-    }
-
-    /**
-     * Diplay XTools' about page.
-     * @Route("/about", name="aboutPage")
-     * @Route("/info.php", name="info")
-     * @return Response
-     */
-    public function aboutAction(): Response
-    {
-        return $this->render('default/about.html.twig', [
-            'xtPage' => 'about',
         ]);
     }
 
@@ -99,10 +87,11 @@ class DefaultController extends XtoolsController
     /**
      * Redirect to the default project (or Meta) for Oauth authentication.
      * @Route("/login", name="login")
+     * @param SessionInterface $session
      * @return RedirectResponse
      * @throws Exception If initialization fails.
      */
-    public function loginAction(): RedirectResponse
+    public function loginAction(SessionInterface $session): RedirectResponse
     {
         try {
             [ $next, $token ] = $this->getOauthClient()->initiate();
@@ -114,8 +103,6 @@ class DefaultController extends XtoolsController
         }
 
         // Save the request token to the session.
-        /** @var Session $session */
-        $session = $this->get('session');
         $session->set('oauth_request_token', $token);
         return new RedirectResponse($next);
     }
@@ -125,17 +112,15 @@ class DefaultController extends XtoolsController
      * @Route("/oauth_callback", name="oauth_callback")
      * @Route("/oauthredirector.php", name="old_oauth_callback")
      * @param Request $request The HTTP request.
+     * @param SessionInterface $session
      * @return RedirectResponse
      */
-    public function oauthCallbackAction(Request $request): RedirectResponse
+    public function oauthCallbackAction(Request $request, SessionInterface $session): RedirectResponse
     {
         // Give up if the required GET params don't exist.
         if (!$request->get('oauth_verifier')) {
             throw $this->createNotFoundException('No OAuth verifier given.');
         }
-
-        /** @var Session $session */
-        $session = $this->get('session');
 
         // Complete authentication.
         $client = $this->getOauthClient();

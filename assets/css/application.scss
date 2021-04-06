@@ -735,6 +735,13 @@ input.form-control.show-loader {
     height: 18px;
 }
 
+a.help-icon {
+    font-size: 25px;
+    position: relative;
+    text-decoration: none;
+    top: 5px;
+}
+
 @media (min-width: $bootstrap-lg) {
     .xt-panel-body table {
         width: auto;

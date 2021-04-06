@@ -37,7 +37,6 @@ Encore
         './assets/css/_mixins.scss',
         './assets/css/_rtl.scss',
         './assets/css/application.scss',
-        './assets/css/about.scss',
         './assets/css/articleinfo.scss',
         './assets/css/autoedits.scss',
         './assets/css/blame.scss',

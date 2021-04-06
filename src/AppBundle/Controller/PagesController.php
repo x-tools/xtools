@@ -208,7 +208,7 @@ class PagesController extends XtoolsController
      * @param Pages $pages
      * @return RedirectResponse
      * @throws HttpException
-     * @see https://tools.wmflabs.org/pagepile/
+     * @see https://pagepile.toolforge.org
      * @codeCoverageIgnore
      */
     private function getPagepileResult(Project $project, Pages $pages): RedirectResponse

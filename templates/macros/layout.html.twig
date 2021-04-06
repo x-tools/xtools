@@ -50,6 +50,7 @@
     {% import 'macros/wiki.html.twig' as wiki %}
     <header class="panel-heading">
         <div class="text-center xt-heading-top">
+            <a target="_blank" href="https://www.mediawiki.org/wiki/Special:MyLanguage/XTools/{{ tool }}" class="pull-right glyphicon glyphicon-question-sign plainlink help-icon"></a>
             <a class="back-to-search" href="{{ path(tool ~ (args is not empty ? 'Result' : 'Project'), {'project': project.domain}|merge(args)) }}">
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {% if args is not empty %}

@@ -214,6 +214,7 @@
     <div class="col-lg-8 col-lg-offset-2">
         {% if xtPageTitle is defined %}
             <h2 class="xt-page-title">
+                <a target="_blank" href="https://www.mediawiki.org/wiki/Special:MyLanguage/XTools/{{ xtPage }}" class="pull-right glyphicon glyphicon-question-sign plainlink help-icon"></a>
                 <span class="xt-page-title--title">{{ msg(xtPageTitle) }}</span>
                 {% if xtSubtitle is defined %}
                     <small class="xt-page-title--desc">{{ msg(xtSubtitle) }}</small>
@@ -253,21 +254,18 @@
                 &middot;
                 {{ layout.apiLink }}
                 &middot;
-                <a href="{{ path('aboutPage') }}">{{ msg('tool-about') }}</a>
+                <a target="_blank" href="https://www.mediawiki.org/wiki/XTools">{{ msg('documentation') }}</a>
                 &middot;
                 {% include 'default/_report_issue_links.html.twig' %}
             </span>
             {% set translateWikiLink = "<a href='https://translatewiki.net'>translatewiki.net</a>" %}
-            {% set intuitionLink = "<a href='https://tools.wmflabs.org/intuition/#tab-about'>Intuition</a>" %}
+            {% set intuitionLink = "<a href='https://intuition.toolforge.org/#tab-about'>Intuition</a>" %}
             {% set jqueryI18nLink = "<a href='https://github.com/wikimedia/jquery.i18n'>jQuery.i18n</a>" %}
             <div>{{ msg('translation-credits', [translateWikiLink, intuitionLink, jqueryI18nLink]) }}</div>
             <small class="footer-quote text-muted">{{ quote() }}</small>
         </div>
     </div>
 </footer>
-<span class='hidden loader'>
-    <img src="{{ asset('images/loader.gif') }}" /> <span class="sr-only">{{ msg('loading') }}&hellip;</span>
-</span>
 {% if xtPage is defined and project.domain is defined and 'indexAction' not in app.request.attributes.get('_controller') %}
 <script>
     $.ajax({
