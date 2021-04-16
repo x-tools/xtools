@@ -47,15 +47,6 @@ class DefaultControllerTest extends ControllerTestAdapter
     }
 
     /**
-     * Test that the about page is served.
-     */
-    public function testAbout(): void
-    {
-        $this->client->request('GET', '/about');
-        static::assertEquals(200, $this->client->getResponse()->getStatusCode());
-    }
-
-    /**
      * OAuth callback action.
      */
     public function testOAuthCallback(): void
