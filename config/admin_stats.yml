@@ -79,10 +79,10 @@ parameters:
                     - extension: PageTriage
                     - pagetriage-curation/reviewed
                 pc-accept:
-                    - extension: Flagged Revisions
+                    - extension: FlaggedRevs
                     - review/approve
                 pc-reject:
-                    - extension: Flagged Revisions
+                    - extension: FlaggedRevs
                     - review/unapprove
 
         steward:
