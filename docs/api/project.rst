@@ -163,7 +163,7 @@ further filter results.
     * ``abusefilter``
 
 If you are interested in exactly which permissions are used in the queries, please review
-the `YAML configuration <https://github.com/x-tools/xtools/blob/master/config/admin_stats.yml>`_.
+the `YAML configuration <https://github.com/x-tools/xtools/blob/main/config/admin_stats.yml>`_.
 
 **Example:**
 

@@ -158,7 +158,7 @@ Documentation sections use the following (standard Python) hierarchy of section 
 Releases
 ========
 
-Releases are made by tagging commits in the master branch. Before tagging a new release:
+Releases are made by tagging commits in the main branch. Before tagging a new release:
 
 * Update the version numbers in ``docs/conf.py`` and ``app/config/version.yml``.
 * Check the copyright year in ``README.md``, ``docs/conf.py``, and ``app/Resources/views/base.html.twig``.
