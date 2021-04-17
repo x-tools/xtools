@@ -86,14 +86,15 @@ class DefaultController extends XtoolsController
     /**
      * Redirect to the default project (or Meta) for Oauth authentication.
      * @Route("/login", name="login")
+     * @param Request $request
      * @param SessionInterface $session
      * @return RedirectResponse
      * @throws Exception If initialization fails.
      */
-    public function loginAction(SessionInterface $session): RedirectResponse
+    public function loginAction(Request $request, SessionInterface $session): RedirectResponse
     {
         try {
-            [ $next, $token ] = $this->getOauthClient()->initiate();
+            [ $next, $token ] = $this->getOauthClient($request)->initiate();
         } catch (Exception $oauthException) {
             throw $oauthException;
             // @TODO Make this work.
@@ -144,6 +145,11 @@ class DefaultController extends XtoolsController
         // Store reference to the client.
         $session->set('oauth_client', $this->oauthClient);
 
+        // Redirect to callback, if given.
+        if ($request->query->get('redirect')) {
+            return $this->redirect($request->query->get('redirect'));
+        }
+
         // Send back to homepage.
         return $this->redirectToRoute('homepage');
     }
@@ -151,10 +157,11 @@ class DefaultController extends XtoolsController
     /**
      * Get an OAuth client, configured to the default project.
      * (This shouldn't really be in this class, but oh well.)
+     * @param Request|null $request
      * @return Client
      * @codeCoverageIgnore
      */
-    protected function getOauthClient(): Client
+    protected function getOauthClient(?Request $request = null): Client
     {
         if ($this->oauthClient instanceof Client) {
             return $this->oauthClient;
@@ -171,8 +178,12 @@ class DefaultController extends XtoolsController
         $consumerSecret =  $this->getParameter('oauth_secret');
         $conf->setConsumer(new Consumer($consumerKey, $consumerSecret));
         $this->oauthClient = new Client($conf);
-        // Callback URL is hardcoded in the consumer registration.
-        $this->oauthClient->setCallback('oob');
+
+        // Set the callback URL if given. Used to redirect back to target page after logging in.
+        if ($request && $request->query->get('callback')) {
+            $this->oauthClient->setCallback($request->query->get('callback'));
+        }
+
         return $this->oauthClient;
     }
 

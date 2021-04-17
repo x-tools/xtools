@@ -314,7 +314,7 @@
 {% macro userOptedOut(project, user) %}
     {% import _self as wiki %}
     <div class="xt-error-alert alert alert-info">
-        {% set loginLink = '<strong>' ~ wiki.extLink(path('login'), msg('not-opted-in-login')) ~ '</strong>' %}
+        {% set loginLink = '<strong>' ~ wiki.extLink(path('login', {'callback': url('oauth_callback', {'redirect': app.request.uri}) }), msg('not-opted-in-login')) ~ '</strong>' %}
         <p>{{ msg('not-opted-in', [ '<strong>' ~ wiki.pageLinkRaw(project.userOptInPage(user), project) ~ '</strong>', '<strong>' ~ wiki.extLink('https://xtools.readthedocs.io/en/stable/opt-in.html', msg('not-opted-in-link')) ~ '</strong>', loginLink ]) }}</p>
     </div>
 {% endmacro %}
