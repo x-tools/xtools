@@ -14,8 +14,10 @@ use AppBundle\Model\User;
 use AppBundle\Repository\ProjectRepository;
 use DateTime;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -40,23 +42,29 @@ class AppExtension extends AbstractExtension
     /** @var float Duration of the current HTTP request in seconds. */
     protected $requestTime;
 
+    /** @var UrlGeneratorInterface */
+    private $urlGenerator;
+
     /**
      * Constructor, with the I18nHelper through dependency injection.
      * @param ContainerInterface $container
      * @param RequestStack $requestStack
      * @param SessionInterface $session
      * @param I18nHelper $i18n
+     * @param UrlGeneratorInterface $generator
      */
     public function __construct(
         ContainerInterface $container,
         RequestStack $requestStack,
         SessionInterface $session,
-        I18nHelper $i18n
+        I18nHelper $i18n,
+        UrlGeneratorInterface $generator
     ) {
         $this->container = $container;
         $this->requestStack = $requestStack;
         $this->session = $session;
         $this->i18n = $i18n;
+        $this->urlGenerator = $generator;
     }
 
     /*********************************** FUNCTIONS ***********************************/
@@ -99,6 +107,7 @@ class AppExtension extends AbstractExtension
             new TwigFunction('formatDuration', [$this, 'formatDuration']),
             new TwigFunction('numberFormat', [$this, 'numberFormat']),
             new TwigFunction('buildQuery', [$this, 'buildQuery']),
+            new TwigFunction('login_url', [$this, 'loginUrl']),
         ];
     }
 
@@ -478,6 +487,22 @@ class AppExtension extends AbstractExtension
     public function loggedInUser()
     {
         return $this->container->get('session')->get('logged_in_user');
+    }
+
+    /**
+     * Get a URL to the login route with parameters to redirect back to the current page after logging in.
+     * @param Request $request
+     * @return string
+     */
+    public function loginUrl(Request $request): string
+    {
+        return $this->urlGenerator->generate('login', [
+            'callback' => $this->urlGenerator->generate(
+                'oauth_callback',
+                ['redirect' => $request->getUri()],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            ),
+        ], UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     /*********************************** FILTERS ***********************************/

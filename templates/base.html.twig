@@ -94,7 +94,7 @@
                 {{ msg("logout") }}
             </a>
         {% else %}
-            <a class="btn btn-default login-btn" href="{{ path('login', {'callback': url('oauth_callback', {'redirect': app.request.uri}) }) }}">
+            <a class="btn btn-default login-btn" href="{{ login_url(app.request) }}">
                 <span class="glyphicon glyphicon-user"></span>
                 {{ msg("login") }}
             </a>
