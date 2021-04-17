@@ -80,6 +80,14 @@ class RateLimitSubscriber implements EventSubscriberInterface
     public function onKernelController(ControllerEvent $event): void
     {
         $controller = $event->getController();
+        $action = null;
+
+        // when a controller class defines multiple action methods, the controller
+        // is returned as [$controllerInstance, 'methodName']
+        if (is_array($controller)) {
+            [$controller, $action] = $controller;
+        }
+
         if (!$controller instanceof XtoolsController) {
             return;
         }
@@ -100,7 +108,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
         }
 
         $loggedIn = (bool)$this->container->get('session')->get('logged_in_user');
-        $isApi = 'ApiAction' === substr($controller[1], -9);
+        $isApi = 'ApiAction' === substr($action, -9);
 
         /**
          * Rate limiting will not apply to these actions
@@ -111,7 +119,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
         ];
 
         // No rate limits on lightweight pages, logged in users, subrequests or API requests.
-        if (in_array($controller[1], $actionWhitelist) || $loggedIn || false === $event->isMasterRequest() || $isApi) {
+        if (in_array($action, $actionWhitelist) || $loggedIn || false === $event->isMasterRequest() || $isApi) {
             return;
         }
 
