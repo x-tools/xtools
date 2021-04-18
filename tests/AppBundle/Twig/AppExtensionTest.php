@@ -16,6 +16,7 @@ use DateTime;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Client;
+use Symfony\Component\Routing\Generator\UrlGenerator;
 use Tests\AppBundle\TestAdapter;
 
 /**
@@ -39,7 +40,8 @@ class AppExtensionTest extends TestAdapter
         $stack = new RequestStack();
         $session = new Session();
         $i18nHelper = new I18nHelper($container, $stack, $session);
-        $this->appExtension = new AppExtension($container, $stack, $session, $i18nHelper);
+        $urlGenerator = $this->createMock(UrlGenerator::class);
+        $this->appExtension = new AppExtension($container, $stack, $session, $i18nHelper, $urlGenerator);
     }
 
     /**

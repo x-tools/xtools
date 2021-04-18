@@ -8,6 +8,7 @@ use AppBundle\Twig\TopNavExtension;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Routing\Generator\UrlGenerator;
 use Tests\AppBundle\TestAdapter;
 
 /**
@@ -31,7 +32,8 @@ class TopNavExtensionTest extends TestAdapter
         $stack = new RequestStack();
         $session = new Session();
         $i18nHelper = new I18nHelper($container, $stack, $session);
-        $this->topNavExtension = new TopNavExtension($container, $stack, $session, $i18nHelper);
+        $urlGenerator = $this->createMock(UrlGenerator::class);
+        $this->topNavExtension = new TopNavExtension($container, $stack, $session, $i18nHelper, $urlGenerator);
     }
 
     /**
