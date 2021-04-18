@@ -252,7 +252,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
         $message = $this->i18n->msg('error-rate-limit', [
             $this->rateDuration,
             "<a href='/login'>".$this->i18n->msg('error-rate-limit-login')."</a>",
-            "<a href='https://xtools.readthedocs.io/en/stable/api' target='_blank'>" .
+            "<a href='https://www.mediawiki.org/wiki/Special:MyLanguage/XTools/API' target='_blank'>" .
                 $this->i18n->msg('api') .
             "</a>",
         ]);

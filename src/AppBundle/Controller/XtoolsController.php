@@ -112,7 +112,7 @@ abstract class XtoolsController extends Controller
 
     /**
      * Actions that require the target user to opt in to the restricted statistics.
-     * @see https://xtools.readthedocs.io/en/stable/opt-in.html
+     * @see https://www.mediawiki.org/wiki/XTools/Edit_Counter#restricted_stats
      * @var string[]
      */
     protected $restrictedActions = [];
@@ -184,7 +184,7 @@ abstract class XtoolsController extends Controller
         if ($this->request->isXmlHttpRequest() && !$this->isApi && !$this->isSubRequest) {
             throw new HttpException(
                 403,
-                $this->i18n->msg('error-automation', ['https://xtools.readthedocs.io/en/stable/api/'])
+                $this->i18n->msg('error-automation', ['https://www.mediawiki.org/Special:MyLanguage/XTools/API'])
             );
         }
     }
@@ -201,7 +201,8 @@ abstract class XtoolsController extends Controller
             throw new XtoolsHttpException(
                 $this->i18n->msg('not-opted-in', [
                     $this->getOptedInPage()->getTitle(),
-                    $this->i18n->msg('not-opted-in-link').' <https://xtools.readthedocs.io/en/stable/opt-in.html>',
+                    $this->i18n->msg('not-opted-in-link') .
+                        ' <https://www.mediawiki.org/wiki/XTools/Edit_Counter#restricted_stats>',
                     $this->i18n->msg('not-opted-in-login'),
                 ]),
                 '',

@@ -315,13 +315,13 @@
     {% import _self as wiki %}
     <div class="xt-error-alert alert alert-info">
         {% set loginLink = '<strong>' ~ wiki.extLink(login_url(app.request), msg('not-opted-in-login')) ~ '</strong>' %}
-        <p>{{ msg('not-opted-in', [ '<strong>' ~ wiki.pageLinkRaw(project.userOptInPage(user), project) ~ '</strong>', '<strong>' ~ wiki.extLink('https://xtools.readthedocs.io/en/stable/opt-in.html', msg('not-opted-in-link')) ~ '</strong>', loginLink ]) }}</p>
+        <p>{{ msg('not-opted-in', [ '<strong>' ~ wiki.pageLinkRaw(project.userOptInPage(user), project) ~ '</strong>', '<strong>' ~ wiki.extLink('https://www.mediawiki.org/wiki/XTools/Edit_Counter#restricted_stats', msg('not-opted-in-link')) ~ '</strong>', loginLink ]) }}</p>
     </div>
 {% endmacro %}
 
 {% macro userOptedOutWikitext(project, user) %}{% apply spaceless %}
     {% set pageLink = '[[' ~ project.userOptInPage(user) ~ ']]' %}
-    {% set docLink = '[https://xtools.readthedocs.io/en/stable/opt-in.html ' ~ msg('not-opted-in-link') ~ ']' %}
+    {% set docLink = '[https://www.mediawiki.org/wiki/Special:MyLanguage/XTools/Edit_Counter#restricted_stats ' ~ msg('not-opted-in-link') ~ ']' %}
     {% set loginLink = '[' ~ url('login') ~ ' ' ~ msg('not-opted-in-login') ~ ']' %}
     {{ msg('not-opted-in', [ pageLink, docLink, loginLink ]) }}
 {% endapply  %}{% endmacro %}
