@@ -2,11 +2,23 @@
 	"@metadata": {
 		"authors": [
 			"TomášPolonec",
-			"Vegetator"
+			"Vegetator",
+			"Yardom78"
 		]
 	},
+	"abusefilter": "Filter zneužití",
+	"accepted-formats": "Akceptované formáty",
+	"account-age": "Vek účtu",
+	"account-age-desc": "$2 {{PLURAL:$1|deň|dni|dní}} starý",
+	"accounts": "Účty",
+	"accounts-created": "Vytvorené účty",
+	"actions": "Akcie",
+	"actions-as-admin": "Akcie správcu",
+	"added": "Pridané",
+	"added-bytes": "Pridané (bajtov)",
+	"admin-stats-notice": "Len používatelia, ktorí vykonali aspoň jednu správcovskú akciu počas obdobia uvedeného nižšie.",
 	"feedback": "Spätná väzba",
 	"more": "Viac",
-	"num-revisions-since": "$1 {{PLURAL:$2|úprava|úpravy|úprav}} od $3",
-	"performer": "Pôvodca"
+	"num-revisions-since": "$1 {{PLURAL:$2|revízia|revízie|revízií}} od $3",
+	"performer": "Autor"
 }
