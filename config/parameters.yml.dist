@@ -57,7 +57,7 @@ parameters:
     app.notice_style:   ""
     app.notice_text:    ""
 
-    app.single_wiki: 1
+    app.single_wiki: 0
     app.is_labs: 0
 
     app.replag_threshold: 30

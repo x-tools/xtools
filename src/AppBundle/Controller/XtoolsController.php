@@ -875,7 +875,6 @@ abstract class XtoolsController extends Controller
      */
     public function recordApiUsage(string $endpoint): void
     {
-        return;
         /** @var \Doctrine\DBAL\Connection $conn */
         $conn = $this->container->get('doctrine')
             ->getManager('default')
