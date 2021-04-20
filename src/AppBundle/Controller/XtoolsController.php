@@ -737,7 +737,7 @@ abstract class XtoolsController extends Controller
             $params['project'] = rtrim(ltrim($params['wiki'], '.'), '.org').'.org';
 
             /** @var string[] $languagelessProjects Projects for which there is no specific language association. */
-            $languagelessProjects = $this->container->getParameter('languageless_wikis');
+            $languagelessProjects = $this->container->getParameter('app.multilingual_wikis');
 
             // Prepend language if applicable.
             if (isset($params['lang']) && !in_array($params['wiki'], $languagelessProjects)) {
@@ -875,6 +875,7 @@ abstract class XtoolsController extends Controller
      */
     public function recordApiUsage(string $endpoint): void
     {
+        return;
         /** @var \Doctrine\DBAL\Connection $conn */
         $conn = $this->container->get('doctrine')
             ->getManager('default')

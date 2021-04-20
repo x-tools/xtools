@@ -7,7 +7,6 @@ parameters:
     database_name:              symfony
     database_user:              root
     database_password:          ~
-    database_replica_name:      ~
     database_replica_user:      root
     database_replica_password:  ~
     database_replica_host_s1:   127.0.0.1
@@ -28,7 +27,6 @@ parameters:
     database_replica_port_s8:   3306
     database_toolsdb_host:      127.0.0.1
     database_toolsdb_port:      null
-    database_toolsdb_name:      null
 
     # Oauth consumer credentials, from https://meta.wikimedia.org/wiki/Special:OAuthConsumerRegistration
     oauth_key:                  ~
@@ -53,11 +51,11 @@ parameters:
     # A secret key that's used to generate certain security-related tokens, and as the secret for the internal API.
     secret:            ThisTokenIsNotSoSecretChangeIt
 
-    # Code for the display of the notice.  noticeDisplay is bool, display or not. noticeStyle is one of "error,"
-    # "warning," "succeess," "info."  noticeText contains the message shown to the user.
-    app.noticeDisplay: false
-    app.noticeStyle:   ""
-    app.noticeText:    ""
+    # Code for the display of the notice. notice_display is bool, display or not. notice_style is one of "error",
+    # "warning", "succeess", "info". notice_text contains the message shown to the user.
+    app.notice_display: false
+    app.notice_style:   ""
+    app.notice_text:    ""
 
     app.single_wiki: 1
     app.is_labs: 0
@@ -77,7 +75,7 @@ parameters:
     app.wikiwho.password: ~
 
     # Ignore for any non-WMF installation. This is only meant to convert legacy parameters.
-    languageless_wikis: []
+    app.multilingual_wikis: []
 
     # Enabling or disabling of individual tools
     enable.AdminScore: 1

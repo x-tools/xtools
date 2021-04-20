@@ -1,10 +1,8 @@
 Thanks for contributing!
 ========================
 
-If you need help setting up XTools on your local machine, refer to the documentation:
-* https://xtools.readthedocs.io/en/stable/installation.html
-* https://xtools.readthedocs.io/en/stable/configuration.html
-* https://xtools.readthedocs.io/en/stable/development.html
+If you need help setting up XTools on your local machine, refer to the
+documentation at https://www.mediawiki.org/wiki/XTools/Development
 
 If you run into any trouble, ask for help at https://www.mediawiki.org/wiki/Talk:XTools or on IRC in
 the #wikimedia-xtools channel on freenode ([live chat](https://webchat.freenode.net/?channels=#wikimedia-xtools)).

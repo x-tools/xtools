@@ -188,8 +188,8 @@
 </header>
 
 <div class="site-notice">
-    {% if noticeDisplay is defined and noticeDisplay == true %}
-        {{ layout.alert(noticeStyle, noticeText, true) }}
+    {% if notice_display is defined and notice_display == true %}
+        {{ layout.alert(notice_style, notice_text, true) }}
     {% endif %}
 
     {% if app.session.flashBag.peekAll %}
@@ -246,7 +246,7 @@
         </div>
         <div class="footer-about">
             <span>
-                {# The release process is documented at https://xtools.readthedocs.io/en/latest/development.html#releases #}
+                {# The release process is documented at https://www.mediawiki.org/wiki/XTools/Development#Releases #}
                 &copy; {{ 'jan-2008'|date_format('Y') }}-{{ 'now'|date_format('Y') }}
                 &middot;
                 <a href="https://github.com/x-tools/xtools/releases/tag/{{ version }}" target="_blank" title="Current XTools version">v.{{ version }}</a>

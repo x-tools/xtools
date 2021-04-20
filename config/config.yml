@@ -57,10 +57,10 @@ twig:
     debug:            "%kernel.debug%"
     strict_variables: "%kernel.debug%"
     globals:
-        version:       '%app.version%'
-        noticeDisplay: '%app.noticeDisplay%'
-        noticeStyle:   '%app.noticeStyle%'
-        noticeText:    '%app.noticeText%'
+        version:        '%app.version%'
+        notice_display: '%app.notice_display%'
+        notice_style:   '%app.notice_style%'
+        notice_text:    '%app.notice_text%'
 
 # Doctrine Configuration
 doctrine:
@@ -79,7 +79,6 @@ doctrine:
                 driver:   pdo_mysql
                 host:     "%database_toolsdb_host%"
                 port:     "%database_toolsdb_port%"
-                dbname:   "%database_toolsdb_name%"
                 user:     "%database_replica_user%"
                 password: "%database_replica_password%"
                 charset:  UTF8
