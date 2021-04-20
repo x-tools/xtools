@@ -14,8 +14,7 @@ For pull requests
 
 Please:
 
-* Submit only one commit per pull request.
-* The first line of the commit message should be prefixed with the relevant tool name.
+* The first line of the commit message should be prefixed with the relevant tool name, where applicable.
   For example `EditCounter: count abuse filter changes`. Other tool names include `ArticleInfo`,
   `Pages`, `TopEdits`, `AutoEdits`, `CategoryEdits`, `AdminStats`, `AdminScore`, `EditSummary` and `SimpleCounter`.
 * If there is a [Phabricator task](https://phabricator.wikimedia.org/tag/xtools/) associated with the commit,
