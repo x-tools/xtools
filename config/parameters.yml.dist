@@ -42,7 +42,7 @@ parameters:
     cache.adapter: filesystem
     cache.redis_dsn: 'redis://localhost'
 
-    wiki_url:                   http://en.wikipedia.org
+    wiki_url:                   https://en.wikipedia.org
     api_path:                   /w/api.php
     default_project:            en.wikipedia.org
     central_auth_project:       meta.wikimedia.org
@@ -57,7 +57,7 @@ parameters:
     app.notice_style:   ""
     app.notice_text:    ""
 
-    app.single_wiki: 0
+    app.single_wiki: 1
     app.is_labs: 0
 
     app.replag_threshold: 30
