@@ -1,5 +1,17 @@
 # Release Notes #
 
+## 3.12.0 ##
+- Support for third-party installations officially dropped due to lack of interest.
+- (T276867) Move all documentation to https://www.mediawiki.org/wiki/XTools
+- AdminStats (T279862): fix name of 'Flagged Revisions' extension.
+- (T244799): Redirect back to previous page after logging in.
+- Fix rate limiting; now uses XFF header rather than session ID.
+- (T224382) Some improvements to session persistence.
+- Remove About page.
+- Various other minor bug fixes.
+- Bump dependencies.
+- Localization updates.
+
 ## 3.11.2 ##
 - Improvements to dark mode styles.
 - Localization updates.
