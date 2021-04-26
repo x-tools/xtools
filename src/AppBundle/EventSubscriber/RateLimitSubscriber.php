@@ -124,16 +124,22 @@ class RateLimitSubscriber implements EventSubscriberInterface
         }
 
         $this->logCrawlers();
-        $this->sessionRateLimit();
+        $this->xffRateLimit();
     }
 
     /**
      * Don't let individual users hog up all the resources.
      */
-    private function sessionRateLimit(): void
+    private function xffRateLimit(): void
     {
-        $sessionId = $this->request->getSession()->getId();
-        $cacheKey = "ratelimit.session.$sessionId";
+        $xff = $this->request->headers->get('x-forwarded-for', '');
+
+        if ('' === $xff) {
+            // Happens in local environments, or outside of Cloud Services.
+            return;
+        }
+
+        $cacheKey = "ratelimit.session.".md5($xff);
         $cacheItem = $this->cache->getItem($cacheKey);
 
         // If increment value already in cache, or start with 1.

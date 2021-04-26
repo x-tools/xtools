@@ -49,17 +49,10 @@ class WebProcessorMonolog
             // Necessary to combat abuse.
             if (null !== $session->get('logged_in_user')) {
                 $record['extra']['username'] = $session->get('logged_in_user')->username;
+            } else {
+                // Intentionally not included if we have a username, for privacy reasons.
+                $record['extra']['xff'] = $request->headers->get('x-forwarded-for', '');
             }
-
-            if (null === $session || !$session->isStarted()) {
-                return $record;
-            }
-
-            if (!$this->sessionId) {
-                $this->sessionId = substr($session->getId(), 0, 8) ?: '????????';
-            }
-
-            $record['extra']['token'] = $this->sessionId.'-'.substr(uniqid('', true), -8);
         }
 
         return $record;
