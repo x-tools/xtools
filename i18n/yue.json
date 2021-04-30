@@ -3,7 +3,8 @@
 		"authors": [
 			"Hello903hello",
 			"Moon0319",
-			"Roy17"
+			"Roy17",
+			"Sun8908"
 		]
 	},
 	"accounts-created": "開咗嘅戶口",
@@ -18,6 +19,8 @@
 	"bot": "機械人",
 	"bot-list": "機械人一覽",
 	"categories": "類",
+	"comma-character": "、",
+	"created-by": "開版者",
 	"csv": "CSV",
 	"date-range": "由$1到$2",
 	"date-to": "到：$1",
@@ -42,6 +45,10 @@
 	"files": "檔案",
 	"friday": "禮拜五",
 	"monday": "禮拜一",
+	"num-days": "{{PLURAL:$1|日|日}}",
+	"num-editors": "位{{PLURAL:$1|編輯|編輯}}",
+	"num-pageviews": "{{PLURAL:$1|版瀏覽數|版瀏覽數}}",
+	"num-revisions-since": "自 $3 以來嘅 $1 個{{PLURAL:$2|修訂|修訂}}",
 	"num-seconds": "{{PLURAL:$1|秒}}",
 	"num-weeks": "{{PLURAL:$1|個禮拜}}",
 	"num-years": "{{PLURAL:$1|年}}",
