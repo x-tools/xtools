@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.12.1 ##
+- Localization updataes.
+
 ## 3.12.0 ##
 - Support for third-party installations officially dropped due to lack of interest.
 - (T276867) Move all documentation to https://www.mediawiki.org/wiki/XTools
