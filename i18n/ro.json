@@ -311,7 +311,7 @@
 	"pageviews-userpage": "Vizualizările paginii de utilizator",
 	"patrol": "Patrulări",
 	"patroller-stats-notice": "Numai utilizatorii care au făcut cel puțin o acțiune de patrulare în perioada de timp sunt arătați.",
-	"patroller-stats-notice2": "Unii utilizatori pot fi foști patrulatori sa sunt nepatrulatori, dar au dreptul să facă anumite acțiuni de patrulare.",
+	"patroller-stats-notice2": "Unii utilizatori pot fi foști patrulatori, sau sunt nepatrulatori, dar au dreptul să facă anumite acțiuni de patrulare.",
 	"patrollers": "Patrulatori",
 	"patrols": "Patrulări",
 	"patrols-desc": "$2 {{PLURAL:$1|articole|articole}} patrulate",

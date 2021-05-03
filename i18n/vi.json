@@ -91,6 +91,7 @@
 	"current-size": "Kích thước hiện tại",
 	"current-stewards": "Tiếp viên hiện tại",
 	"current-user-groups": "Nhóm thành viên hiện tại",
+	"data-limit": "Dữ liệu giới hạn trong $2 {{PLURAL:$1|sửa đổi}} cuối.",
 	"date": "Ngày tháng",
 	"date-from": "Từ: $1",
 	"date-range": "$1 – $2",
@@ -199,7 +200,7 @@
 	"more": "Thêm nữa",
 	"name": "Tên",
 	"namespace": "Không gian tên",
-	"namespace-totals": "Tổng số theo tùy gian tên",
+	"namespace-totals": "Tổng số theo không gian tên",
 	"namespaces": "Không gian tên",
 	"neutral": "Trung lập",
 	"next": "Tiếp",
@@ -408,5 +409,5 @@
 	"words": "Từ",
 	"xtools-title": "Các công cụ của X!",
 	"year": "Năm",
-	"year-counts": "Số trong năm"
+	"year-counts": "Thống kê hàng năm"
 }
