@@ -241,6 +241,7 @@
 	"num-watchers": "{{PLURAL:$1|მაკონტროლაფარი|მაკონტროლაფარი}}",
 	"num-weeks": "{{PLURAL:$1|მარა|მარა}}",
 	"num-years": "{{PLURAL:$1|წანა|წანა}}",
+	"old-page-notice": "თე ხასჷლა ძალამ ჯვეში რე. კანკალე მუნაჩემი შილებე ჩილათირი ორდასჷნmay be inaccurate due to how revisions were stored in the early days of MediaWiki.",
 	"oppose": "აწმარინე",
 	"optional": "ვა უციო",
 	"original-size": "დაჭყაფური ზჷმა",
