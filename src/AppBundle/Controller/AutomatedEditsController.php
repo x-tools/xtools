@@ -158,6 +158,7 @@ class AutomatedEditsController extends XtoolsController
      * @Route(
      *     "/autoedits/{project}/{username}/{namespace}/{start}/{end}", name="AutoEditsResult",
      *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *         "namespace"="|all|\d+",
      *         "start"="|\d{4}-\d{2}-\d{2}",
      *         "end"="|\d{4}-\d{2}-\d{2}",
@@ -185,6 +186,7 @@ class AutomatedEditsController extends XtoolsController
      *   "/nonautoedits-contributions/{project}/{username}/{namespace}/{start}/{end}/{offset}",
      *   name="NonAutoEditsContributionsResult",
      *   requirements={
+     *       "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *       "namespace"="|all|\d+",
      *       "start"="|\d{4}-\d{2}-\d{2}",
      *       "end"="|\d{4}-\d{2}-\d{2}",
@@ -208,6 +210,7 @@ class AutomatedEditsController extends XtoolsController
      *   "/autoedits-contributions/{project}/{username}/{namespace}/{start}/{end}/{offset}",
      *   name="AutoEditsContributionsResult",
      *   requirements={
+     *       "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *       "namespace"="|all|\d+",
      *       "start"="|\d{4}-\d{2}-\d{2}",
      *       "end"="|\d{4}-\d{2}-\d{2}",
@@ -248,6 +251,7 @@ class AutomatedEditsController extends XtoolsController
      *   "/api/user/automated_editcount/{project}/{username}/{namespace}/{start}/{end}/{tools}",
      *   name="UserApiAutoEditsCount",
      *   requirements={
+     *       "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *       "namespace"="|all|\d+",
      *       "start"="|\d{4}-\d{2}-\d{2}",
      *       "end"="|\d{4}-\d{2}-\d{2}"
@@ -283,6 +287,7 @@ class AutomatedEditsController extends XtoolsController
      *   "/api/user/nonautomated_edits/{project}/{username}/{namespace}/{start}/{end}/{offset}",
      *   name="UserApiNonAutoEdits",
      *   requirements={
+     *       "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *       "namespace"="|all|\d+",
      *       "start"="|\d{4}-\d{2}-\d{2}",
      *       "end"="|\d{4}-\d{2}-\d{2}",
@@ -314,6 +319,7 @@ class AutomatedEditsController extends XtoolsController
      *   "/api/user/automated_edits/{project}/{username}/{namespace}/{start}/{end}/{offset}",
      *   name="UserApiAutoEdits",
      *   requirements={
+     *       "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *       "namespace"="|all|\d+",
      *       "start"="|\d{4}-\d{2}-\d{2}",
      *       "end"="|\d{4}-\d{2}-\d{2}",

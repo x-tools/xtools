@@ -92,6 +92,11 @@ class PagesController extends XtoolsController
      */
     public function setUpPages(string $redirects, string $deleted): Pages
     {
+        if ($this->user->isIpRange()) {
+            $this->params['username'] = $this->user->getUsername();
+            $this->throwXtoolsException($this->getIndexRoute(), 'error-ip-range-unsupported');
+        }
+
         $pagesRepo = new PagesRepository();
         $pagesRepo->setContainer($this->container);
         $pages = new Pages(
@@ -115,6 +120,7 @@ class PagesController extends XtoolsController
      *     "/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{start}/{end}/{offset}",
      *     name="PagesResult",
      *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *         "namespace"="|all|\d+",
      *         "redirects"="|[^/]+",
      *         "deleted"="|all|live|deleted",
@@ -285,6 +291,7 @@ class PagesController extends XtoolsController
      *     "/api/user/pages_count/{project}/{username}/{namespace}/{redirects}/{deleted}/{start}/{end}",
      *     name="UserApiPagesCount",
      *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *         "namespace"="|\d+|all",
      *         "redirects"="|noredirects|onlyredirects|all",
      *         "deleted"="|all|live|deleted",
@@ -324,6 +331,7 @@ class PagesController extends XtoolsController
      *     "/api/user/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{start}/{end}/{offset}",
      *     name="UserApiPagesCreated",
      *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *         "namespace"="|\d+|all",
      *         "redirects"="|noredirects|onlyredirects|all",
      *         "deleted"="|all|live|deleted",

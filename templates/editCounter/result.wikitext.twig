@@ -1,34 +1,34 @@
-== [[User:{{ user.username }}]] ==
+== [[User:{{ user.prettyUsername }}]] ==
 
-{% set link %}[{{ url('EditCounterResult', {'username': user.username, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
+{% set link %}[{{ url('EditCounterResult', {'username': user.usernameIdent, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
 {{ msg('xtools-advert', [link, date()|date_format]) }}
 {% if 'general-stats' in sections %}{{ render(path('EditCounterGeneralStats', {
-    'username': user.username,
+    'username': user.usernameIdent,
     'project': project.domain,
     'format': 'wikitext'
 })) }}{% endif %}{% if 'namespace-totals' in sections %}{{ render(path('EditCounterNamespaceTotals', {
-    'username': user.username,
+    'username': user.usernameIdent,
     'project': project.domain,
     'format': 'wikitext'
 })) }}{% endif %}{% if 'year-counts' in sections %}{{ render(path('EditCounterYearCounts', {
-    'username': user.username,
+    'username': user.usernameIdent,
     'project': project.domain,
     'format': 'wikitext'
 })) }}{% endif %}{% if 'month-counts' in sections %}{{ render(path('EditCounterMonthCounts', {
-    'username': user.username,
+    'username': user.usernameIdent,
     'project': project.domain,
     'format': 'wikitext'
 })) }}{% endif %}{% if 'timecard' in sections %}{{ render(path('EditCounterTimecard', {
-    'username': user.username,
+    'username': user.usernameIdent,
     'project': project.domain,
     'format': 'wikitext'
 })) }}{% endif %}{% if 'top-edited-pages' in sections %}{{ render(path('TopEditsResultNamespace', {
-    'username': user.username,
+    'username': user.usernameIdent,
     'project': project.domain,
     'namespace': 'all',
     'format': 'wikitext'
 })) }}{% endif %}{% if 'rights-changes' in sections and not(user.anon) and ec.rightsChanges|length > 0 or ec.globalRightsChanges|length > 0 %}{{ render(path('EditCounterRightsChanges', {
-    'username': user.username,
+    'username': user.usernameIdent,
     'project': project.domain,
     'format': 'wikitext'
 })) }}{% endif %}

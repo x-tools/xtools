@@ -154,6 +154,7 @@ class CategoryEditsController extends XtoolsController
      *     "/categoryedits/{project}/{username}/{categories}/{start}/{end}",
      *     name="CategoryEditsResult",
      *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *         "categories"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
      *         "start"="|\d{4}-\d{2}-\d{2}",
      *         "end"="|\d{4}-\d{2}-\d{2}"
@@ -176,6 +177,7 @@ class CategoryEditsController extends XtoolsController
      *   "/categoryedits-contributions/{project}/{username}/{categories}/{start}/{end}/{offset}",
      *   name="CategoryContributionsResult",
      *   requirements={
+     *       "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *       "categories"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2}))?",
      *       "start"="|\d{4}-\d{2}-\d{2}",
      *       "end"="|\d{4}-\d{2}-\d{2}",
@@ -201,6 +203,7 @@ class CategoryEditsController extends XtoolsController
      *   "/api/user/category_editcount/{project}/{username}/{categories}/{start}/{end}",
      *   name="UserApiCategoryEditCount",
      *   requirements={
+     *       "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *       "categories" = "(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
      *       "start" = "|\d{4}-\d{2}-\d{2}",
      *       "end" = "|\d{4}-\d{2}-\d{2}"

@@ -67,6 +67,9 @@ class GlobalContribsController extends XtoolsController
      * @Route(
      *     "/ec-latestglobal-contributions/{project}/{username}",
      *     name="EditCounterLatestGlobalContribs",
+     *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
+     *     },
      *     defaults={
      *         "project"="",
      *         "namespace"="all"
@@ -75,6 +78,9 @@ class GlobalContribsController extends XtoolsController
      * @Route(
      *     "/ec-latestglobal/{project}/{username}",
      *     name="EditCounterLatestGlobal",
+     *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
+     *     },
      *     defaults={
      *         "project"="",
      *         "namespace"="all"
@@ -84,6 +90,7 @@ class GlobalContribsController extends XtoolsController
      *     "/globalcontribs/{username}/{namespace}/{start}/{end}/{offset}",
      *     name="GlobalContribsResult",
      *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *         "namespace" = "|all|\d+",
      *         "start" = "|\d*|\d{4}-\d{2}-\d{2}",
      *         "end" = "|\d{4}-\d{2}-\d{2}",

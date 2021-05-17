@@ -85,7 +85,7 @@
                     <em class="contributions-loading text-muted" style="display:none">{{ msg('loading') }}...</em>
                     <div class="contributions-container"
                         data-project="{{ project.domain }}"
-                        data-username="{{ user.username }}"
+                        data-username="{{ user.usernameIdent }}"
                         data-namespace="{{ gc.namespace }}"
                         data-start="{{ gc.startDate }}"
                         data-end="{{ gc.endDate }}"
@@ -120,9 +120,9 @@
                 <td>
                     {{ wiki.diffLink(edit) }}
                     &middot;
-                    <a href="{{ path('EditCounterResult', {project:edit.project.domain, username:user.username}) }}">{{ msg('tool-editcounter') }}</a>
+                    <a href="{{ path('EditCounterResult', {project:edit.project.domain, username:user.usernameIdent}) }}">{{ msg('tool-editcounter') }}</a>
                     &middot;
-                    <a href="{{ path('TopEditsResultPage', {project:edit.project.domain, username:user.username, namespace:'', page:edit.page.title(true)}) }}">{{ msg('tool-topedits') }}</a>
+                    <a href="{{ path('TopEditsResultPage', {project:edit.project.domain, username:user.usernameIdent, namespace:'', page:edit.page.title(true)}) }}">{{ msg('tool-topedits') }}</a>
                 </td>
                 <td class="sort-entry--page-title display-title" data-value="{{ edit.page.title(true) }}">
                     {{ wiki.pageLinkRaw(edit.page.title(true), edit.project) }}

@@ -87,7 +87,7 @@
 {% macro userLink(user, project, label = null) %}{% apply spaceless %}
     {% from _self import extLink as extLink %}
     {% if user.username is defined %}
-        {% set username = user.username %}
+        {% set username = user.prettyUsername %}
     {% else %}
         {% set username = user %}
     {% endif %}
@@ -273,7 +273,7 @@
             {{ wiki.userLogLink(user, project) }}
         {% else %}
             {% if enabled('EditCounter') %}
-                <a href="{{ path('EditCounterResult', {'project':project.domain, 'username':user.username}) }}">{{ msg('tool-editcounter') }}</a>
+                <a href="{{ path('EditCounterResult', {'project':project.domain, 'username':user.usernameIdent}) }}">{{ msg('tool-editcounter') }}</a>
                 &middot;
             {% endif %}
             {{ wiki.blockLogLink(user.username, project) }}
@@ -284,7 +284,7 @@
         {% endif %}
         {% if tool != 'GlobalContribs' and enabled('GlobalContribs') %}
             &middot;
-            {{ wiki.gucLink(user.username) }}
+            {{ wiki.gucLink(user.usernameIdent) }}
         {% endif %}
         {% if isWMFLabs() and not(user.anon) %}
             &middot;

@@ -56,25 +56,34 @@
                             </tr>
                         {% endif %}
                     {% endif %}
-                    <tr>
-                        <td>{{ msg('total') }}{% if sec.limited %} ({{ msg('approximate')|lower }}){% endif %}</td>
-                        <td>{{ sec.totalEditCount|num_format }}</td>
-                    </tr>
+                    {% if not(user.ipRange) %}
+                        <tr>
+                            <td>{{ msg('total') }}{% if sec.limited %} ({{ msg('approximate')|lower }}){% endif %}</td>
+                            <td>{{ sec.totalEditCount|num_format }}</td>
+                        </tr>
+                    {% endif %}
                     {% if not(sec.limited) %}
                         <tr>
                             <td>{{ msg('live-edits') }}</td>
                             <td>{{ sec.liveEditCount|num_format }}</td>
                         </tr>
-                        <tr>
-                            <td>{{ msg('deleted-edits') }}</td>
-                            <td>{{ sec.deletedEditCount|num_format }}</td>
-                        </tr>
+                        {% if user.ipRange %}
+                            <tr>
+                                <td>{{ msg('deleted-edits') }}</td>
+                                <td class="text-muted">{{ msg('ip-range-unavailable') }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td>{{ msg('deleted-edits') }}</td>
+                                <td>{{ sec.deletedEditCount|num_format }}</td>
+                            </tr>
+                        {% endif %}
                     {% endif %}
                 </table>
             </div>
         {% endset %}
         {% set downloadLink %}
-            {{ layout.downloadLink('SimpleEditCounterResult', {project: project.domain, username: user.username, namespace: sec.namespace, start: sec.startDate, end: sec.endDate}, [], 'SimpleEditCounterApi') }}
+            {{ layout.downloadLink('SimpleEditCounterResult', {project: project.domain, username: user.usernameIdent, namespace: sec.namespace, start: sec.startDate, end: sec.endDate}, [], 'SimpleEditCounterApi') }}
         {% endset %}
         {{ layout.content_block('tool-simpleeditcounter-desc', content, downloadLink) }}
     </div>

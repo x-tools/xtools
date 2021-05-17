@@ -39,11 +39,11 @@
                             {{ wiki.userLink(user, project) }}
                             <small>(
                                 {%- if enabled('EditCounter') -%}
-                                    <a href="{{ path('EditCounterResult', {project:project.domain, username:user.username}) }}" >{{ msg('tool-editcounter') }}</a>
+                                    <a href="{{ path('EditCounterResult', {project:project.domain, username:user.usernameIdent}) }}" >{{ msg('tool-editcounter') }}</a>
                                 {%- endif -%}
                                 {%- if enabled('TopEdits') -%}
                                     &middot;
-                                    <a href="{{ path('TopEditsResultNamespace', {project:project.domain, username:user.username}) }}" >{{ msg('tool-topedits') }}</a>
+                                    <a href="{{ path('TopEditsResultNamespace', {project:project.domain, username:user.usernameIdent}) }}" >{{ msg('tool-topedits') }}</a>
                                 {%- endif -%}
                             )</small>
                         </td>
@@ -195,7 +195,7 @@
             {% endif %}
         {% endset %}
         {% set downloadLink %}
-            {{ layout.downloadLink('TopEditsResultPage', {'project': project.domain, 'username': user.username, 'page': page.title, 'namespace': te.namespace, start: te.startDate, end: te.endDate}, [], 'UserApiTopEditsPage') }}
+            {{ layout.downloadLink('TopEditsResultPage', {'project': project.domain, 'username': user.usernameIdent, 'page': page.title, 'namespace': te.namespace, start: te.startDate, end: te.endDate}, [], 'UserApiTopEditsPage') }}
         {% endset %}
         {{ layout.content_block('topedits-article', content, [msg('topedits-article-desc'), downloadLink], null, false, false) }}
 

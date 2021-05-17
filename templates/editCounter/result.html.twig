@@ -5,7 +5,7 @@
 {% block body %}
 
 <div class="panel panel-primary">
-    {% set params = isAllSections ? {} : {'project': project.domain, 'username': user.username} %}
+    {% set params = isAllSections ? {} : {'project': project.domain, 'username': user.usernameIdent} %}
     {{ layout.userHeading(user, project, 'EditCounter', params) }}
 
     <div class="panel-body xt-panel-body">

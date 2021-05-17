@@ -12,6 +12,7 @@ use AppBundle\Model\Project;
 use AppBundle\Model\User;
 use PDO;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Wikimedia\IPUtils;
 
 /**
  * TopEditsRepository is responsible for retrieving data from the database
@@ -58,11 +59,11 @@ class TopEditsRepository extends UserRepository
         }
 
         $revDateConditions = $this->getDateConditions($start, $end);
-        $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
-        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+        $pageTable = $project->getTableName('page');
+        $revisionTable = $project->getTableName('revision');
 
         $hasPageAssessments = $this->isLabs() && $project->hasPageAssessments() && 0 === $namespace;
-        $paTable = $this->getTableName($project->getDatabaseName(), 'page_assessments');
+        $paTable = $project->getTableName('page_assessments');
         $paSelect = $hasPageAssessments
             ?  ", (
                     SELECT pa_class
@@ -73,12 +74,23 @@ class TopEditsRepository extends UserRepository
                 ) AS pa_class"
             : '';
 
+        $ipcJoin = '';
+        $whereClause = 'rev_actor = :actorId';
+        $params = [];
+        if ($user->isIpRange()) {
+            $ipcTable = $project->getTableName('ip_changes');
+            $ipcJoin = "JOIN $ipcTable ON rev_id = ipc_rev_id";
+            $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
+            [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
+        }
+
         $offset = $pagination * $limit;
         $sql = "SELECT page_namespace, page_title, page_is_redirect, COUNT(page_title) AS count
                     $paSelect
                 FROM $pageTable
                 JOIN $revisionTable ON page_id = rev_page
-                WHERE rev_actor = :actorId
+                $ipcJoin
+                WHERE $whereClause
                 AND page_namespace = :namespace
                 $revDateConditions
                 GROUP BY page_namespace, page_title
@@ -86,7 +98,7 @@ class TopEditsRepository extends UserRepository
                 LIMIT $limit
                 OFFSET $offset";
 
-        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace);
+        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $params);
         $result = $resultQuery->fetchAll();
 
         // Cache and return.
@@ -111,17 +123,28 @@ class TopEditsRepository extends UserRepository
         }
 
         $revDateConditions = $this->getDateConditions($start, $end);
-        $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
-        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+        $pageTable = $project->getTableName('page');
+        $revisionTable = $project->getTableName('revision');
+
+        $ipcJoin = '';
+        $whereClause = 'rev_actor = :actorId';
+        $params = [];
+        if ($user->isIpRange()) {
+            $ipcTable = $project->getTableName('ip_changes');
+            $ipcJoin = "JOIN $ipcTable ON rev_id = ipc_rev_id";
+            $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
+            [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
+        }
 
         $sql = "SELECT COUNT(DISTINCT page_id) AS count
                 FROM $pageTable
                 JOIN $revisionTable ON page_id = rev_page
-                WHERE rev_actor = :actorId
+                $ipcJoin
+                WHERE $whereClause
                 AND page_namespace = :namespace
                 $revDateConditions";
 
-        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace);
+        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $params);
 
         // Cache and return.
         return $this->setCache($cacheKey, $resultQuery->fetch()['count']);
@@ -164,6 +187,16 @@ class TopEditsRepository extends UserRepository
                 ) AS pa_class"
             : ', NULL as pa_class';
 
+        $ipcJoin = '';
+        $whereClause = 'rev_actor = :actorId';
+        $params = [];
+        if ($user->isIpRange()) {
+            $ipcTable = $project->getTableName('ip_changes');
+            $ipcJoin = "JOIN $ipcTable ON rev_id = ipc_rev_id";
+            $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
+            [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
+        }
+
         $sql = "SELECT c.page_namespace, e.page_title, c.page_is_redirect, c.count $paSelect
                 FROM
                 (
@@ -174,8 +207,9 @@ class TopEditsRepository extends UserRepository
                     (
                         SELECT page_namespace, page_is_redirect, rev_page, count(rev_page) AS count
                         FROM $revisionTable
+                        $ipcJoin
                         JOIN $pageTable ON page_id = rev_page
-                        WHERE rev_actor = :actorId
+                        WHERE $whereClause
                         $revDateConditions
                         GROUP BY page_namespace, rev_page
                     ) AS b
@@ -184,7 +218,7 @@ class TopEditsRepository extends UserRepository
                 ) AS c
                 JOIN $pageTable e ON e.page_id = c.rev_page
                 WHERE c.row_number <= $limit";
-        $resultQuery = $this->executeQuery($sql, $project, $user, 'all');
+        $resultQuery = $this->executeQuery($sql, $project, $user, 'all', $params);
         $result = $resultQuery->fetchAll();
 
         // Cache and return.
@@ -262,6 +296,17 @@ class TopEditsRepository extends UserRepository
         $userId = $this->getProjectsConnection($project)->quote($user->getId($page->getProject()), PDO::PARAM_STR);
         $username = $this->getProjectsConnection($project)->quote($user->getUsername(), PDO::PARAM_STR);
 
+        // IP range handling.
+        $ipcJoin = '';
+        $whereClause = 'revs.rev_actor = :actorId';
+        $params = ['pageid' => $page->getId()];
+        if ($user->isIpRange()) {
+            $ipcTable = $project->getTableName('ip_changes');
+            $ipcJoin = "JOIN $ipcTable ON revs.rev_id = ipc_rev_id";
+            $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
+            [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
+        }
+
         $sql = "SELECT * FROM (
                     SELECT
                         revs.rev_id AS id,
@@ -275,9 +320,10 @@ class TopEditsRepository extends UserRepository
                         $childSelect
                     FROM $revTable AS revs
                     LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+                    $ipcJoin
                     LEFT OUTER JOIN $commentTable AS comments ON (revs.rev_comment_id = comments.comment_id)
                     $childJoin
-                    WHERE revs.rev_actor = :actorId
+                    WHERE $whereClause
                     $revDateConditions
                     AND revs.rev_page = :pageid
                     $childWhere
@@ -285,9 +331,7 @@ class TopEditsRepository extends UserRepository
                 ORDER BY timestamp DESC
                 $childLimit";
 
-        $resultQuery = $this->executeQuery($sql, $project, $user, null, [
-            'pageid' => $page->getId(),
-        ]);
+        $resultQuery = $this->executeQuery($sql, $project, $user, null, $params);
         return $resultQuery->fetchAll();
     }
 }

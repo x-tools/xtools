@@ -6,7 +6,7 @@
 
 {% if not is_sub_request %}
     <div class="panel panel-primary">
-        {% set args = {username: user.username, categories: ce.categoriesPiped, start: ce.startDate, end: ce.endDate} %}
+        {% set args = {username: user.usernameIdent, categories: ce.categoriesPiped, start: ce.startDate, end: ce.endDate} %}
         {{ layout.userHeading(user, project, 'CategoryEdits', args) }}
 
         <div class="panel-body xt-panel-body">
@@ -27,7 +27,7 @@
                     <em class="category-contribs-loading contributions-loading text-muted" style="display:none">{{ msg('loading') }}...</em>
                     <div class="category-contribs-container contributions-container"
                         data-project="{{ project.domain }}"
-                        data-username="{{ user.username }}"
+                        data-username="{{ user.usernameIdent }}"
                         data-categories="{{ ce.categoriesPiped }}"
                         data-start="{{ ce.startDate }}"
                         data-end="{{ ce.endDate }}"

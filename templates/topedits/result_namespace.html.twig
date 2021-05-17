@@ -70,14 +70,14 @@
                             &middot;
                             <a href="{{ path('ArticleInfoResult', {project:project.domain, page:pageTitle}) }}">{{ msg('tool-articleinfo') }}</a>
                             &middot;
-                            <a href="{{ path('TopEditsResultPage', {project:project.domain, username:user.username, namespace:page.page_namespace, page:page.page_title}) }}" >{{ msg('tool-topedits') }}</a>
+                            <a href="{{ path('TopEditsResultPage', {project:project.domain, username:user.usernameIdent, namespace:page.page_namespace, page:page.page_title}) }}" >{{ msg('tool-topedits') }}</a>
                         </td>
                     </tr>
                 {% endfor %}
                 {% if pages|length >= 10 and te.topEdits|length > 1 %}
                     <tr>
                         <td colspan={{ showPageAssessment ? 4 : 3 }}>
-                            <a href="{{ path('TopEditsResultNamespace', {project:project.domain, username:user.username, namespace:ns}) }}">
+                            <a href="{{ path('TopEditsResultNamespace', {project:project.domain, username:user.usernameIdent, namespace:ns}) }}">
                                 {{ msg('more') }}&hellip;
                             </a>
                         </td>
@@ -90,7 +90,7 @@
             {% set numPages = (te.getNumPagesNamespace / te.limit)|round(0, 'ceil') %}
             {% set hasPrev = te.pagination - 1 >= 0 %}
             {% set hasNext = te.pagination + 1 < numPages %}
-            {% set pathVars = {'project': project.domain, 'username': user.username, 'namespace': te.namespace} %}
+            {% set pathVars = {'project': project.domain, 'username': user.usernameIdent, 'namespace': te.namespace} %}
 
             {% if hasNext or hasPrev %}
                 <nav aria-label="...">
@@ -135,7 +135,7 @@
             {{ content }}
         {% else %}
             {% set downloadLink %}
-                {{ layout.downloadLink('TopEditsResultNamespace', {'project': project.domain, 'username': user.username, 'namespace': te.namespace}, ['wikitext'], 'UserApiTopEditsNamespace') }}
+                {{ layout.downloadLink('TopEditsResultNamespace', {'project': project.domain, 'username': user.usernameIdent, 'namespace': te.namespace}, ['wikitext'], 'UserApiTopEditsNamespace') }}
             {% endset %}
             {{ layout.content_block(nsName(ns, project.namespaces), content, downloadLink, ns, true, te.topEdits|length > 1) }}
         {% endif %}

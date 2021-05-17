@@ -131,7 +131,7 @@
                                 {{ wiki.pageLinkRaw(nsName(14, project.namespaces) ~ ':' ~ category, project, category|replace({'_': ' '})) }}
                             </td>
                             <td class="sort-entry--count" data-value="{{ values.editCount }}">
-                                <a href="{{ path('CategoryEditsResult', {project:project.domain, username:user.username, categories: category, start: ce.startDate, end: ce.endDate}) }}">
+                                <a href="{{ path('CategoryEditsResult', {project:project.domain, username:user.usernameIdent, categories: category, start: ce.startDate, end: ce.endDate}) }}">
                                     {{ values.editCount|num_format }}
                                 </a>
                             </td>
@@ -221,7 +221,7 @@
             </div>
         {% endset %}
         {% set downloadLink %}
-            {{ layout.downloadLink('CategoryEditsResult', {project: project.domain, username: user.username, categories: ce.categoriesPiped, start: ce.startDate, end: ce.endDate}, [], 'UserApiCategoryEditCount') }}
+            {{ layout.downloadLink('CategoryEditsResult', {project: project.domain, username: user.usernameIdent, categories: ce.categoriesPiped, start: ce.startDate, end: ce.endDate}, [], 'UserApiCategoryEditCount') }}
         {% endset %}
         {{ layout.content_block('summary', content, ['tool-categoryedits-desc', downloadLink]) }}
 
@@ -239,7 +239,7 @@
                     <em class="contributions-loading text-muted">{{ msg('loading') }}...</em>
                     <div class="contributions-container"
                         data-project="{{ project.domain }}"
-                        data-username="{{ user.username }}"
+                        data-username="{{ user.usernameIdent }}"
                         data-categories="{{ ce.categoriesPiped }}"
                         data-start="{{ ce.startDate }}"
                         data-end="{{ ce.endDate }}"

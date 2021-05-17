@@ -9,12 +9,19 @@ namespace AppBundle\Model;
 
 use DateTime;
 use Exception;
+use Wikimedia\IPUtils;
 
 /**
  * A User is a wiki user who has the same username across all projects in an XTools installation.
  */
 class User extends Model
 {
+    /** @var int Maximum queryable range for IPv4. */
+    public const MAX_IPV4_CIDR = 16;
+
+    /** @var int Maximum queryable range for IPv6. */
+    public const MAX_IPV6_CIDR = 32;
+
     /** @var string The user's username. */
     protected $username;
 
@@ -27,12 +34,26 @@ class User extends Model
      */
     public function __construct(string $username)
     {
+        if ('ipr-' === substr($username, 0, 4)) {
+            $username = substr($username, 4);
+        }
         $this->username = ucfirst(str_replace('_', ' ', trim($username)));
 
         // IPv6 address are stored as uppercase in the database.
         if ($this->isAnon()) {
-            $this->username = strtoupper($this->username);
+            $this->username = IPUtils::sanitizeIP($this->username);
         }
+    }
+
+    /**
+     * Unique identifier for this User, to be used in cache keys. Use of md5 ensures the cache key does not contain
+     * reserved characters. You could also use the ID, but that may require an unnecessary DB query.
+     * @see Repository::getCacheKey()
+     * @return string
+     */
+    public function getCacheKey(): string
+    {
+        return md5($this->username);
     }
 
     /**
@@ -45,14 +66,117 @@ class User extends Model
     }
 
     /**
-     * Unique identifier for this User, to be used in cache keys. Use of md5 ensures the cache key does not contain
-     * reserved characters. You could also use the ID, but that may require an unnecessary DB query.
-     * @see Repository::getCacheKey()
+     * Get a prettified username for IP addresses. For accounts, just the username is returned.
      * @return string
      */
-    public function getCacheKey(): string
+    public function getPrettyUsername(): string
     {
-        return md5($this->username);
+        if (!$this->isAnon()) {
+            return $this->username;
+        }
+        return IPUtils::prettifyIP($this->username);
+    }
+
+    /**
+     * Get the username identifier that should be used in routing. This only matters for IP ranges,
+     * which get prefixed with 'ipr-' to ensure they don't conflict with other routing params (such as namespace ID).
+     * Always use this method when linking to or generating internal routes, and use it nowhere else.
+     * @return string
+     */
+    public function getUsernameIdent(): string
+    {
+        if ($this->isIpRange()) {
+            return 'ipr-'.$this->username;
+        }
+        return $this->username;
+    }
+
+    /**
+     * Is this an IP range?
+     * @return bool
+     */
+    public function isIpRange(): bool
+    {
+        return IPUtils::isValidRange($this->username);
+    }
+
+    /**
+     * Is this an IPv6 address or range?
+     * @return bool
+     */
+    public function isIPv6(): bool
+    {
+        return IPUtils::isIPv6($this->username);
+    }
+
+    /**
+     * Get the common characters between the start and end address of an IPv4 range.
+     * This is used when running a LIKE query against actor names.
+     * @return string[]|null
+     */
+    public function getIpSubstringFromCidr(): ?string
+    {
+        if (!$this->isIpRange()) {
+            return null;
+        }
+
+        if ($this->isIPv6()) {
+            // Adapted from https://stackoverflow.com/a/10086404/604142 (CC BY-SA 3.0)
+            [$firstAddrStr, $prefixLen] = explode('/', $this->username);
+            $firstAddrBin = inet_pton($firstAddrStr);
+            $firstAddrUnpacked = unpack('H*', $firstAddrBin);
+            $firstAddrHex = reset($firstAddrUnpacked);
+            $range[0] = inet_ntop($firstAddrBin);
+            $flexBits = 128 - $prefixLen;
+            $lastAddrHex = $firstAddrHex;
+
+            $pos = 31;
+            while ($flexBits > 0) {
+                $orig = substr($lastAddrHex, $pos, 1);
+                $origVal = hexdec($orig);
+                $newVal = $origVal | (pow(2, min(4, $flexBits)) - 1);
+                $new = dechex($newVal);
+                $lastAddrHex = substr_replace($lastAddrHex, $new, $pos, 1);
+                $flexBits -= 4;
+                $pos -= 1;
+            }
+
+            $lastAddrBin = pack('H*', $lastAddrHex);
+            $range[1] = inet_ntop($lastAddrBin);
+        } else {
+            $cidr = explode('/', $this->username);
+            $range[0] = long2ip(ip2long($cidr[0]) & -1 << (32 - (int)$cidr[1]));
+            $range[1] = long2ip(ip2long($range[0]) + pow(2, (32 - (int)$cidr[1])) - 1);
+        }
+
+        // Find the leftmost common characters between the two addresses.
+        $common = '';
+        $startSplit = str_split(strtoupper($range[0]));
+        $endSplit = str_split(strtoupper($range[1]));
+        foreach ($startSplit as $index => $char) {
+            if ($endSplit[$index] === $char) {
+                $common .= $char;
+            } else {
+                break;
+            }
+        }
+
+        return $common;
+    }
+
+    /**
+     * Is this IP range outside the queryable limits?
+     * @return bool
+     */
+    public function isQueryableRange(): bool
+    {
+        if (!$this->isIpRange()) {
+            return true;
+        }
+
+        [, $bits] = IPUtils::parseCIDR($this->username);
+        $limit = $this->isIPv6() ? self::MAX_IPV6_CIDR : self::MAX_IPV4_CIDR;
+        return (int)$bits >= $limit;
     }
 
     /**
@@ -175,7 +299,7 @@ class User extends Model
      */
     public function isAnon(): bool
     {
-        return (bool)filter_var($this->username, FILTER_VALIDATE_IP);
+        return IPUtils::isIPAddress($this->username);
     }
 
     /**

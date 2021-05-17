@@ -115,7 +115,7 @@
                                 {% endif %}
                                 {% if enabled('TopEdits') %}
                                     &middot;
-                                    <a href="{{ path('TopEditsResultPage', { 'project': project.domain, 'username': user.username, 'namespace': ns, 'page': page.page_title }) }}">{{ msg('tool-topedits') }}</a>
+                                    <a href="{{ path('TopEditsResultPage', { 'project': project.domain, 'username': user.usernameIdent, 'namespace': ns, 'page': page.page_title }) }}">{{ msg('tool-topedits') }}</a>
                                 {% endif %}
                                 {% if isWMFLabs() %}
                                     &middot;
@@ -131,7 +131,7 @@
                     <tr class="show-more-row">
                         <td></td>
                         <td colspan={{ columns|length + 1 }}>
-                            <a href="{{ path('PagesResult', { 'project': project.domain, 'username': user.username, 'namespace': ns, 'redirects': pages.redirects }) }}">
+                            <a href="{{ path('PagesResult', { 'project': project.domain, 'username': user.usernameIdent, 'namespace': ns, 'redirects': pages.redirects }) }}">
                                 {{ (pages.counts[ns].count - pages.resultsPerPage)|number_format }} {{ msg('num-others', [pages.counts[ns].count - pages.resultsPerPage]) }}
                             </a>
                         </td>
@@ -144,7 +144,7 @@
         {##### PAGINATION #####}
         {% if not(pages.multiNamespace) and pages.results[pages.namespaces[0]]|length == pages.resultsPerPage %}
             <div class="contributions-nav clearfix">
-                <a href="{{ path('PagesResult', {project: project.domain, username: user.username, namespace: pages.namespace, redirects: pages.redirects, deleted: pages.deleted, start: pages.startDate, end: pages.endDate, offset: pages.lastTimestamp}) }}" class="pull-right contributions--next">
+                <a href="{{ path('PagesResult', {project: project.domain, username: user.usernameIdent, namespace: pages.namespace, redirects: pages.redirects, deleted: pages.deleted, start: pages.startDate, end: pages.endDate, offset: pages.lastTimestamp}) }}" class="pull-right contributions--next">
                     {{ msg('pager-older-n', [pages.resultsPerPage])|ucfirst }}
                     <span class="glyphicon glyphicon-arrow-{% if isRTL() %}left{% else %}right{% endif %}"></span>
                 </a>
@@ -154,6 +154,6 @@
 {% endset %}
 
 {% set downloadLink %}
-    {{ layout.downloadLink('PagesResult', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted, 'start': pages.startDate, 'end': pages.endDate, 'offset': pages.offsetISO}, ['wikitext', 'PagePile', 'csv', 'tsv'], 'UserApiPagesCreated') }}
+    {{ layout.downloadLink('PagesResult', {'project': project.domain, 'username': user.usernameIdent, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted, 'start': pages.startDate, 'end': pages.endDate, 'offset': pages.offsetISO}, ['wikitext', 'PagePile', 'csv', 'tsv'], 'UserApiPagesCreated') }}
 {% endset %}
 {{ layout.content_block('pages-created', content, downloadLink) }}

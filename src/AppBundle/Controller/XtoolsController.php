@@ -25,6 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Wikimedia\IPUtils;
 
 /**
  * XtoolsController supplies a variety of methods around parsing and validating parameters, and initializing
@@ -169,6 +170,14 @@ abstract class XtoolsController extends Controller
         if (false !== strpos(strtolower($this->controllerAction), 'index')) {
             // Index pages should only set the project, and no other class properties.
             $this->setProject($this->getProjectFromQuery());
+
+            // ...except for transforming IP ranges. Because Symfony routes are separated by slashes, we need a way to
+            // indicate a CIDR range because otherwise i.e. the path /sc/enwiki/192.168.0.0/24 could be interpreted as
+            // the Simple Edit Counter for 192.168.0.0 in the namespace with ID 24. So we prefix ranges with 'ipr-'.
+            // Further IP range handling logic is in the User class, i.e. see User::__construct, User::isIpRange.
+            if (isset($this->params['username']) && IPUtils::isValidRange($this->params['username'])) {
+                $this->params['username'] = 'ipr-'.$this->params['username'];
+            }
         } else {
             $this->setProperties(); // Includes the project.
         }
@@ -434,6 +443,11 @@ abstract class XtoolsController extends Controller
         // Allow querying for any IP, currently with no edit count limitation...
         // Once T188677 is resolved IPs will be affected by the EXPLAIN results.
         if ($user->isAnon()) {
+            // Validate CIDR limits.
+            if (!$user->isQueryableRange()) {
+                $limit = $user->isIPv6() ? User::MAX_IPV6_CIDR : User::MAX_IPV4_CIDR;
+                $this->throwXtoolsException($this->getIndexRoute(), 'ip-range-too-wide', [$limit]);
+            }
             return $user;
         }
 
@@ -835,6 +849,11 @@ abstract class XtoolsController extends Controller
         $response = new JsonResponse();
         $response->setEncodingOptions(JSON_NUMERIC_CHECK);
         $response->setStatusCode(Response::HTTP_OK);
+
+        // Normalize display of IP ranges (they are prefixed with 'ipr-' in the params).
+        if ($this->user && $this->user->isIpRange()) {
+            $this->params['username'] = $this->user->getUsername();
+        }
 
         $elapsedTime = round(
             microtime(true) - $this->request->server->get('REQUEST_TIME_FLOAT'),

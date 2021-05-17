@@ -10,6 +10,7 @@ namespace AppBundle\Repository;
 use AppBundle\Model\Project;
 use AppBundle\Model\User;
 use PDO;
+use Wikimedia\IPUtils;
 
 /**
  * AutoEditsRepository is responsible for retrieving data from the database
@@ -97,8 +98,8 @@ class AutoEditsRepository extends UserRepository
      * @param Project $project
      * @param User $user
      * @param string|int $namespace Namespace ID or 'all'
-     * @param int|false $start Start date as Unix timestmap.
-     * @param int|false $end End date as Unix timestmap.
+     * @param int|false $start Start date as Unix timestamp.
+     * @param int|false $end End date as Unix timestamp.
      * @return int Result of query, see below.
      */
     public function countAutomatedEdits(
@@ -121,12 +122,22 @@ class AutoEditsRepository extends UserRepository
         [$pageJoin, $condNamespace] = $this->getPageAndNamespaceSql($project, $namespace);
 
         $revisionTable = $project->getTableName('revision');
+        $ipcTable = $project->getTableName('ip_changes');
         $commentTable = $project->getTableName('comment', 'revision');
         $tagTable = $project->getTableName('change_tag');
         $commentJoin = '';
         $tagJoin = '';
 
         $params = [];
+
+        // IP range handling.
+        $ipcJoin = '';
+        $whereClause = 'rev_actor = :actorId';
+        if ($user->isIpRange()) {
+            $ipcJoin = "JOIN $ipcTable ON rev_id = ipc_rev_id";
+            $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
+            [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
+        }
 
         // Build SQL for detecting AutoEdits via regex and/or tags.
         $condTools = [];
@@ -143,10 +154,11 @@ class AutoEditsRepository extends UserRepository
 
         $sql = "SELECT COUNT(DISTINCT(rev_id))
                 FROM $revisionTable
+                $ipcJoin
                 $pageJoin
                 $commentJoin
                 $tagJoin
-                WHERE rev_actor = :actorId
+                WHERE $whereClause
                 $condNamespace
                 $condTool
                 $revDateConditions";
@@ -191,11 +203,24 @@ class AutoEditsRepository extends UserRepository
 
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
+        $ipcTable = $project->getTableName('ip_changes');
         $commentTable = $project->getTableName('comment', 'revision');
         $tagTable = $project->getTableName('change_tag');
+
+        // IP range handling.
+        $ipcJoin = '';
+        $whereClause = 'revs.rev_actor = :actorId';
+        $params = ['tools' => $regex];
+        if ($user->isIpRange()) {
+            $ipcJoin = "JOIN $ipcTable ON revs.rev_id = ipc_rev_id";
+            $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
+            [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
+        }
+
         $condNamespace = 'all' === $namespace ? '' : 'AND page_namespace = :namespace';
         $condTag = '' != $tagIds ? "AND NOT EXISTS (SELECT 1 FROM $tagTable
             WHERE ct_rev_id = revs.rev_id AND ct_tag_id IN ($tagIds))" : '';
+
         $sql = "SELECT
                     page_title,
                     page_namespace,
@@ -207,9 +232,10 @@ class AutoEditsRepository extends UserRepository
                     comment_text AS comment
                 FROM $pageTable
                 JOIN $revisionTable AS revs ON (page_id = revs.rev_page)
+                $ipcJoin
                 LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                 LEFT OUTER JOIN $commentTable ON (revs.rev_comment_id = comment_id)
-                WHERE revs.rev_actor = :actorId
+                WHERE $whereClause
                 AND revs.rev_timestamp > 0
                 AND comment_text NOT RLIKE :tools
                 $condTag
@@ -219,7 +245,7 @@ class AutoEditsRepository extends UserRepository
                 ORDER BY revs.rev_timestamp DESC
                 LIMIT $limit";
 
-        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, ['tools' => $regex]);
+        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $params);
         $result = $resultQuery->fetchAll();
 
         // Cache and return.
@@ -266,6 +292,7 @@ class AutoEditsRepository extends UserRepository
 
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
+        $ipcTable = $project->getTableName('ip_changes');
         $commentTable = $project->getTableName('comment', 'revision');
         $tagTable = $project->getTableName('change_tag');
         $condNamespace = 'all' === $namespace ? '' : 'AND page_namespace = :namespace';
@@ -281,6 +308,16 @@ class AutoEditsRepository extends UserRepository
             $condsTool[] = "ct_tag_id IN ($tagIds)";
         }
 
+        // IP range handling.
+        $ipcJoin = '';
+        $whereClause = 'revs.rev_actor = :actorId';
+        $params = ['tools' => $regex];
+        if ($user->isIpRange()) {
+            $ipcJoin = "JOIN $ipcTable ON rev_id = ipc_rev_id";
+            $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
+            [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
+        }
+
         $sql = "SELECT
                     page_title,
                     page_namespace,
@@ -292,10 +329,11 @@ class AutoEditsRepository extends UserRepository
                     comment_text AS comment
                 FROM $pageTable
                 JOIN $revisionTable AS revs ON (page_id = revs.rev_page)
+                $ipcJoin
                 LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                 LEFT OUTER JOIN $commentTable ON (revs.rev_comment_id = comment_id)
                 $tagJoin
-                WHERE revs.rev_actor = :actorId
+                WHERE $whereClause
                 $revDateConditions
                 $condNamespace
                 AND (".implode(' OR ', $condsTool).")
@@ -303,7 +341,7 @@ class AutoEditsRepository extends UserRepository
                 ORDER BY revs.rev_timestamp DESC
                 LIMIT $limit";
 
-        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, ['tools' => $regex]);
+        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $params);
         $result = $resultQuery->fetchAll();
 
         // Cache and return.
@@ -332,8 +370,12 @@ class AutoEditsRepository extends UserRepository
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $sql = $this->getAutomatedCountsSql($project, $namespace, $start, $end);
-        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace);
+        $sql = $this->getAutomatedCountsSql($project, $user, $namespace, $start, $end);
+        $params = [];
+        if ($user->isIpRange()) {
+            [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
+        }
+        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $params);
 
         $tools = $this->getTools($project, $namespace);
 
@@ -365,13 +407,19 @@ class AutoEditsRepository extends UserRepository
      * Get SQL for getting counts of known automated tools used by the user.
      * @see self::getAutomatedCounts()
      * @param Project $project
+     * @param User $user
      * @param string|int $namespace Namespace ID or 'all'.
      * @param int|false $start Start date as Unix timestamp.
      * @param int|false $end End date as Unix timestamp.
      * @return string The SQL.
      */
-    private function getAutomatedCountsSql(Project $project, $namespace, $start = false, $end = false): string
-    {
+    private function getAutomatedCountsSql(
+        Project $project,
+        User $user,
+        $namespace,
+        $start = false,
+        $end = false
+    ): string {
         $revDateConditions = $this->getDateConditions($start, $end);
 
         // Load the semi-automated edit types.
@@ -381,8 +429,17 @@ class AutoEditsRepository extends UserRepository
         $queries = [];
 
         $revisionTable = $project->getTableName('revision');
+        $ipcTable = $project->getTableName('ip_changes');
         [$pageJoin, $condNamespace] = $this->getPageAndNamespaceSql($project, $namespace);
         $conn = $this->getProjectsConnection($project);
+
+        // IP range handling.
+        $ipcJoin = '';
+        $whereClause = 'rev_actor = :actorId';
+        if ($user->isIpRange()) {
+            $ipcJoin = "JOIN $ipcTable ON rev_id = ipc_rev_id";
+            $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
+        }
 
         foreach ($tools as $toolName => $values) {
             [$condTool, $commentJoin, $tagJoin] = $this->getInnerAutomatedCountsSql($project, $toolName, $values);
@@ -398,10 +455,11 @@ class AutoEditsRepository extends UserRepository
             $queries[] .= "
                 SELECT $toolName AS toolname, COUNT(DISTINCT(rev_id)) AS count
                 FROM $revisionTable
+                $ipcJoin
                 $pageJoin
                 $commentJoin
                 $tagJoin
-                WHERE rev_actor = :actorId
+                WHERE $whereClause
                 AND $condTool
                 $condNamespace
                 $revDateConditions";

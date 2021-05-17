@@ -27,6 +27,7 @@ class SimpleEditCounterControllerTest extends ControllerTestAdapter
             '/sc/enwiki',
             '/sc/en.wikipedia/Example',
             '/sc/en.wikipedia/Example/1/2018-01-01/2018-02-01',
+            '/sc/en.wikipedia/ipr-174.197.128.0/1/2018-01-01/2018-02-01',
             '/api/user/simple_editcount/en.wikipedia.org/Example/1/2018-01-01/2018-02-01',
         ]);
     }

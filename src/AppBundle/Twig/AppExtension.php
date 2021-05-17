@@ -21,6 +21,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
+use Wikimedia\IPUtils;
 
 /**
  * Twig functions and filters for XTools.
@@ -622,7 +623,7 @@ class AppExtension extends AbstractExtension
             $username = $user;
         }
 
-        return (bool)filter_var($username, FILTER_VALIDATE_IP);
+        return IPUtils::isIPAddress($username);
     }
 
     /**

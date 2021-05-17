@@ -9,6 +9,7 @@ namespace AppBundle\Repository;
 
 use AppBundle\Model\Project;
 use AppBundle\Model\User;
+use Wikimedia\IPUtils;
 
 /**
  * SimpleEditCounterRepository is responsible for retrieving data
@@ -33,6 +34,31 @@ class SimpleEditCounterRepository extends Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
+        if ($user->isIpRange()) {
+            $result = $this->fetchDataIpRange($project, $user, $namespace, $start, $end);
+        } else {
+            $result = $this->fetchDataNormal($project, $user, $namespace, $start, $end);
+        }
+
+        // Cache and return.
+        return $this->setCache($cacheKey, $result);
+    }
+
+    /**
+     * @param Project $project
+     * @param User $user
+     * @param int|string $namespace
+     * @param int|false $start
+     * @param int|false $end
+     * @return string[] Counts, each row with keys 'source' and 'value'.
+     */
+    private function fetchDataNormal(
+        Project $project,
+        User $user,
+        $namespace = 'all',
+        $start = false,
+        $end = false
+    ): array {
         $userTable = $project->getTableName('user');
         $pageTable = $project->getTableName('page');
         $archiveTable = $project->getTableName('archive');
@@ -68,12 +94,48 @@ class SimpleEditCounterRepository extends Repository
                     JOIN $userTable ON user_id = ug_user
                     WHERE user_name = :username";
 
-        $result = $this->executeProjectsQuery($project, $sql, [
+        return $this->executeProjectsQuery($project, $sql, [
             'username' => $user->getUsername(),
             'actorId' => $user->getActorId($project),
         ])->fetchAll();
+    }
 
-        // Cache and return.
-        return $this->setCache($cacheKey, $result);
+    /**
+     * @param Project $project
+     * @param User $user
+     * @param int|string $namespace
+     * @param int|false $start
+     * @param int|false $end
+     * @return string[] Counts, each row with keys 'source' and 'value'.
+     */
+    private function fetchDataIpRange(
+        Project $project,
+        User $user,
+        $namespace = 'all',
+        $start = false,
+        $end = false
+    ): array {
+        $ipcTable = $project->getTableName('ip_changes');
+        $revTable = $project->getTableName('revision', '');
+        $pageTable = $project->getTableName('page');
+
+        $revDateConditions = $this->getDateConditions($start, $end, false, "$ipcTable.", 'ipc_rev_timestamp');
+        [$startHex, $endHex] = IPUtils::parseRange($user->getUsername());
+
+        $revNamespaceJoinSql = 'all' === $namespace ? '' : "JOIN $revTable ON rev_id = ipc_rev_id " .
+            "JOIN $pageTable ON rev_page = page_id";
+        $revNamespaceWhereSql = 'all' === $namespace ? '' : "AND page_namespace = $namespace";
+
+        $sql = "SELECT 'rev' AS source, COUNT(*) AS value
+                FROM $ipcTable
+                $revNamespaceJoinSql
+                WHERE ipc_hex BETWEEN :start AND :end 
+                $revDateConditions
+                $revNamespaceWhereSql";
+
+        return $this->executeProjectsQuery($project, $sql, [
+            'start' => $startHex,
+            'end' => $endHex,
+        ])->fetchAll();
     }
 }

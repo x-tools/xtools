@@ -13,6 +13,7 @@ use Doctrine\DBAL\Driver\ResultStatement;
 use PDO;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Wikimedia\IPUtils;
 
 /**
  * This class provides data for the User class.
@@ -65,8 +66,12 @@ class UserRepository extends Repository
      * @param string $username
      * @return int|null
      */
-    public function getActorId(string $databaseName, string $username): int
+    public function getActorId(string $databaseName, string $username): ?int
     {
+        if (IPUtils::isValidRange($username)) {
+            return null;
+        }
+
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_actor_id');
         if ($this->cache->hasItem($cacheKey)) {
             return (int)$this->cache->getItem($cacheKey)->get();
@@ -140,15 +145,28 @@ class UserRepository extends Repository
         $revDateConditions = $this->getDateConditions($start, $end);
         [$pageJoin, $condNamespace] = $this->getPageAndNamespaceSql($project, $namespace);
         $revisionTable = $project->getTableName('revision');
+        $params = [];
 
-        $sql = "SELECT COUNT(rev_id)
+        if ($user->isAnon()) {
+            [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
+            $ipcTable = $project->getTableName('ip_changes');
+            $sql = "SELECT COUNT(ipc_rev_id)
+                    FROM $ipcTable
+                    JOIN $revisionTable ON ipc_rev_id = rev_id
+                    $pageJoin
+                    WHERE ipc_hex BETWEEN :startIp AND :endIp
+                    $condNamespace
+                    $revDateConditions";
+        } else {
+            $sql = "SELECT COUNT(rev_id)
                 FROM $revisionTable
                 $pageJoin
                 WHERE rev_actor = :actorId
                 $condNamespace
                 $revDateConditions";
+        }
 
-        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace);
+        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $params);
         $result = (int)$resultQuery->fetchColumn();
 
         // Cache and return.
@@ -242,6 +260,10 @@ class UserRepository extends Repository
      */
     public function getUserRights(Project $project, User $user): array
     {
+        if ($user->isAnon()) {
+            return [];
+        }
+
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_rights');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();

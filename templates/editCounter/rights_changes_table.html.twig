@@ -47,7 +47,7 @@
     {% if remaining > 0 and is_sub_request %}
         <tfoot><tr class="show-more-row">
             <td colspan="4">
-                <a href="{{ path('EditCounterRightsChanges', {project: project.domain, username: user.username}) }}">
+                <a href="{{ path('EditCounterRightsChanges', {project: project.domain, username: user.usernameIdent}) }}">
                     {{ remaining }} {{ msg('num-others', [remaining]) }}
                 </a>
             </td>
