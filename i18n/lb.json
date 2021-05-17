@@ -109,7 +109,7 @@
 	"end": "Schlussdatum",
 	"error-login": "Aloggen huet net funktionéiert! Probéiert wgl. nach eng Kéier.",
 	"error-server-message": "Äntwert vum Server: $1",
-	"error-title": "Innerhalb vun XTools ass e fatale Feeler geschitt.",
+	"error-title": "Innerhalb vun XTools ass e fatale Feeler geschitt. Dëst gouf automatesch gemellt, awer et ass Iech fräigestallt fir eng Aufgab op $1 opzemaachen (e Wikimedia  Benotzerkont gëtt dofir gebraucht).",
 	"events": "Evenementer",
 	"executed": "A(n) $1 {{PLURAL:$2|Sekonn|Sekonnen}} ausgeféiert.",
 	"explanation": "Erklärung",
