@@ -8,21 +8,9 @@ filter:
         - 'assets/vendor/*'
         - '*.min.js'
 build:
-    project_setup:
-        before:
-            - composer self-update
-            - ./node_modules/.bin/encore production
     tests:
         override:
-            -
-                command: ./vendor/bin/phpcs -s -p . --ignore=/home/scrutinizer/build/node_modules
-            -
-                command: ./vendor/bin/phpunit tests --coverage-clover=coverage.xml
-                coverage:
-                    file: 'coverage.xml'
-                    format: 'clover'
-            -
-                command: ./vendor/bin/minus-x check .
+
     nodes:
         tests:
             environment:
