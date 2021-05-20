@@ -3,7 +3,7 @@
 {% import 'macros/layout.html.twig' as layout %}
 
 {% block downloadLink %}
-    {{ layout.downloadLink('EditCounterNamespaceTotals', {project:project.domain, username:user.username}, ['wikitext', 'csv'], 'UserApiNamespaceTotals') }}
+    {{ layout.downloadLink('EditCounterNamespaceTotals', {project:project.domain, username:user.usernameIdent}, ['wikitext', 'csv'], 'UserApiNamespaceTotals') }}
 {% endblock %}
 
 {% block ecBody %}
@@ -33,7 +33,7 @@
                         {{ nsName(nsId, project.namespaces) }}
                     </td>
                     <td class="sort-entry--count" data-value="{{ value }}">
-                        <a href="{{ path('TopEditsResultNamespace', {project:project.domain, username:user.username, namespace:nsId}) }}">{{ value|num_format }}</a>
+                        <a href="{{ path('TopEditsResultNamespace', {project:project.domain, username:user.usernameIdent, namespace:nsId}) }}">{{ value|num_format }}</a>
                         ({{ value|percent_format(ec.liveRevisionsFromNamespaces) }})
                     </td>
                 </tr>

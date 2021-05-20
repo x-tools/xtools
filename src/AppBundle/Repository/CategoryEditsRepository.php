@@ -13,6 +13,7 @@ use AppBundle\Model\User;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\ParameterType;
+use Wikimedia\IPUtils;
 
 /**
  * CategoryEditsRepository is responsible for retrieving data from the database
@@ -59,11 +60,20 @@ class CategoryEditsRepository extends Repository
         $revisionTable = $project->getTableName('revision');
         $categorylinksTable = $project->getTableName('categorylinks');
         $revDateConditions = $this->getDateConditions($start, $end, false, 'revs.');
+        $whereClause = 'revs.rev_actor = ?';
+        $ipcJoin = '';
+
+        if ($user->isIpRange()) {
+            $ipcTable = $project->getTableName('ip_changes');
+            $ipcJoin = "JOIN $ipcTable ON ipc_rev_id = revs.rev_id";
+            $whereClause = 'WHERE ipc_hex BETWEEN ? AND ?';
+        }
 
         $sql = "SELECT COUNT(DISTINCT revs.rev_id)
                 FROM $revisionTable revs
+                $ipcJoin
                 JOIN $categorylinksTable ON cl_from = rev_page
-                WHERE revs.rev_actor = ?
+                $whereClause
                     AND cl_to IN (?)
                     $revDateConditions";
         $result = (int)$this->executeStmt($sql, $project, $user, $categories)->fetchColumn();
@@ -96,11 +106,20 @@ class CategoryEditsRepository extends Repository
         $revisionTable = $project->getTableName('revision');
         $categorylinksTable = $project->getTableName('categorylinks');
         $revDateConditions = $this->getDateConditions($start, $end, false, 'revs.');
+        $whereClause = 'revs.rev_actor = ?';
+        $ipcJoin = '';
+
+        if ($user->isIpRange()) {
+            $ipcTable = $project->getTableName('ip_changes');
+            $ipcJoin = "JOIN $ipcTable ON ipc_rev_id = revs.rev_id";
+            $whereClause = 'WHERE ipc_hex BETWEEN ? AND ?';
+        }
 
         $sql = "SELECT cl_to AS cat, COUNT(rev_id) AS edit_count, COUNT(DISTINCT rev_page) AS page_count
                 FROM $revisionTable revs
+                $ipcJoin
                 JOIN $categorylinksTable ON cl_from = rev_page
-                WHERE revs.rev_actor = ?
+                $whereClause
                     AND cl_to IN (?)
                     $revDateConditions
                 GROUP BY cl_to
@@ -148,6 +167,14 @@ class CategoryEditsRepository extends Repository
         $commentTable = $project->getTableName('comment');
         $categorylinksTable = $project->getTableName('categorylinks');
         $revDateConditions = $this->getDateConditions($start, $end, $offset, 'revs.');
+        $whereClause = 'revs.rev_actor = ?';
+        $ipcJoin = '';
+
+        if ($user->isIpRange()) {
+            $ipcTable = $project->getTableName('ip_changes');
+            $ipcJoin = "JOIN $ipcTable ON ipc_rev_id = revs.rev_id";
+            $whereClause = 'WHERE ipc_hex BETWEEN ? AND ?';
+        }
 
         $sql = "SELECT page_title, page_namespace, revs.rev_id AS rev_id, revs.rev_timestamp AS timestamp,
                     revs.rev_minor_edit AS minor, revs.rev_len AS length,
@@ -155,10 +182,11 @@ class CategoryEditsRepository extends Repository
                     comment_text AS `comment`
                 FROM $pageTable
                 JOIN $revisionTable revs ON page_id = revs.rev_page
+                $ipcJoin
                 JOIN $categorylinksTable ON cl_from = rev_page
                 LEFT JOIN $commentTable comment ON revs.rev_comment_id = comment_id
                 LEFT JOIN $revisionTable parentrevs ON revs.rev_parent_id = parentrevs.rev_id
-                WHERE revs.rev_actor = ?
+                $whereClause
                     AND cl_to IN (?)
                     $revDateConditions
                 GROUP BY revs.rev_id
@@ -185,13 +213,30 @@ class CategoryEditsRepository extends Repository
         User $user,
         array $categories
     ): ResultStatement {
-        return $this->getProjectsConnection($project)
-            ->executeQuery($sql, [
-                $user->getActorId($project),
+        if ($user->isIpRange()) {
+            [$hexStart, $hexEnd] = IPUtils::parseRange($user->getUsername());
+            $params = [
+                $hexStart,
+                $hexEnd,
                 $categories,
-            ], [
+            ];
+            $types = [
+                ParameterType::STRING,
                 ParameterType::STRING,
                 Connection::PARAM_STR_ARRAY,
-            ]);
+            ];
+        } else {
+            $params = [
+                $user->getActorId($project),
+                $categories,
+            ];
+            $types = [
+                ParameterType::STRING,
+                Connection::PARAM_STR_ARRAY,
+            ];
+        }
+
+        return $this->getProjectsConnection($project)
+            ->executeQuery($sql, $params, $types);
     }
 }

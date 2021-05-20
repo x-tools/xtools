@@ -223,7 +223,13 @@ class EditCounterController extends XtoolsController
 
     /**
      * Display all results.
-     * @Route("/ec/{project}/{username}", name="EditCounterResult")
+     * @Route(
+     *     "/ec/{project}/{username}",
+     *     name="EditCounterResult",
+     *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
+     *     }
+     * )
      * @return Response|RedirectResponse
      * @codeCoverageIgnore
      */
@@ -256,7 +262,13 @@ class EditCounterController extends XtoolsController
 
     /**
      * Display the general statistics section.
-     * @Route("/ec-generalstats/{project}/{username}", name="EditCounterGeneralStats")
+     * @Route(
+     *     "/ec-generalstats/{project}/{username}",
+     *     name="EditCounterGeneralStats",
+     *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
+     *     }
+     * )
      * @return Response
      * @codeCoverageIgnore
      */
@@ -286,7 +298,13 @@ class EditCounterController extends XtoolsController
 
     /**
      * Search form for general stats.
-     * @Route("/ec-generalstats", name="EditCounterGeneralStatsIndex")
+     * @Route(
+     *     "/ec-generalstats",
+     *     name="EditCounterGeneralStatsIndex",
+     *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
+     *     }
+     * )
      * @return Response
      */
     public function generalStatsIndexAction(): Response
@@ -297,7 +315,13 @@ class EditCounterController extends XtoolsController
 
     /**
      * Display the namespace totals section.
-     * @Route("/ec-namespacetotals/{project}/{username}", name="EditCounterNamespaceTotals")
+     * @Route(
+     *     "/ec-namespacetotals/{project}/{username}",
+     *     name="EditCounterNamespaceTotals",
+     *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
+     *     }
+     * )
      * @return Response
      * @codeCoverageIgnore
      */
@@ -332,7 +356,13 @@ class EditCounterController extends XtoolsController
 
     /**
      * Display the timecard section.
-     * @Route("/ec-timecard/{project}/{username}", name="EditCounterTimecard")
+     * @Route(
+     *     "/ec-timecard/{project}/{username}",
+     *     name="EditCounterTimecard",
+     *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
+     *     }
+     * )
      * @return Response
      * @codeCoverageIgnore
      */
@@ -368,7 +398,13 @@ class EditCounterController extends XtoolsController
 
     /**
      * Display the year counts section.
-     * @Route("/ec-yearcounts/{project}/{username}", name="EditCounterYearCounts")
+     * @Route(
+     *     "/ec-yearcounts/{project}/{username}",
+     *     name="EditCounterYearCounts",
+     *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
+     *     }
+     * )
      * @return Response
      * @codeCoverageIgnore
      */
@@ -403,7 +439,13 @@ class EditCounterController extends XtoolsController
 
     /**
      * Display the month counts section.
-     * @Route("/ec-monthcounts/{project}/{username}", name="EditCounterMonthCounts")
+     * @Route(
+     *     "/ec-monthcounts/{project}/{username}",
+     *     name="EditCounterMonthCounts",
+     *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
+     *     }
+     * )
      * @return Response
      * @codeCoverageIgnore
      */
@@ -439,7 +481,13 @@ class EditCounterController extends XtoolsController
 
     /**
      * Display the user rights changes section.
-     * @Route("/ec-rightschanges/{project}/{username}", name="EditCounterRightsChanges")
+     * @Route(
+     *     "/ec-rightschanges/{project}/{username}",
+     *     name="EditCounterRightsChanges",
+     *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
+     *     }
+     * )
      * @return Response
      * @codeCoverageIgnore
      */
@@ -479,7 +527,13 @@ class EditCounterController extends XtoolsController
 
     /**
      * Get various log counts for the user as JSON.
-     * @Route("/api/user/log_counts/{project}/{username}", name="UserApiLogCounts")
+     * @Route(
+     *     "/api/user/log_counts/{project}/{username}",
+     *     name="UserApiLogCounts",
+     *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
+     *     }
+     * )
      * @return JsonResponse
      * @codeCoverageIgnore
      */
@@ -494,7 +548,13 @@ class EditCounterController extends XtoolsController
 
     /**
      * Get the namespace totals for the user as JSON.
-     * @Route("/api/user/namespace_totals/{project}/{username}", name="UserApiNamespaceTotals")
+     * @Route(
+     *     "/api/user/namespace_totals/{project}/{username}",
+     *     name="UserApiNamespaceTotals",
+     *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
+     *     }
+     * )
      * @return JsonResponse
      * @codeCoverageIgnore
      */
@@ -509,7 +569,13 @@ class EditCounterController extends XtoolsController
 
     /**
      * Get the month counts for the user as JSON.
-     * @Route("/api/user/month_counts/{project}/{username}", name="UserApiMonthCounts")
+     * @Route(
+     *     "/api/user/month_counts/{project}/{username}",
+     *     name="UserApiMonthCounts",
+     *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
+     *     }
+     * )
      * @return JsonResponse
      * @codeCoverageIgnore
      */
@@ -528,7 +594,13 @@ class EditCounterController extends XtoolsController
 
     /**
      * Get the timecard data as JSON.
-     * @Route("/api/user/timecard/{project}/{username}", name="UserApiTimeCard")
+     * @Route(
+     *     "/api/user/timecard/{project}/{username}",
+     *     name="UserApiTimeCard",
+     *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
+     *     }
+     * )
      * @return JsonResponse
      * @codeCoverageIgnore
      */

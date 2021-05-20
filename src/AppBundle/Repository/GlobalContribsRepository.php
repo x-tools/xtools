@@ -7,6 +7,7 @@ use AppBundle\Model\Project;
 use AppBundle\Model\User;
 use PDO;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Wikimedia\IPUtils;
 
 /**
  * A GlobalContribsRepository is responsible for retrieving information from the database for the GlobalContribs tool.
@@ -159,6 +160,14 @@ class GlobalContribsRepository extends Repository
             $dbNames = array_column($this->caProject->getRepository()->getAll(), 'dbName');
         }
 
+        if ($user->isIpRange()) {
+            $username = $user->getIpSubstringFromCidr().'%';
+            $whereClause = "actor_name LIKE :actor";
+        } else {
+            $username = $user->getUsername();
+            $whereClause = "actor_name = :actor";
+        }
+
         $queriesBySlice = [];
 
         foreach ($dbNames as $dbName) {
@@ -166,7 +175,7 @@ class GlobalContribsRepository extends Repository
             // actor_revision table only includes users who have made at least one edit.
             $actorTable = $this->getTableName($dbName, 'actor', 'revision');
             $queriesBySlice[$slice][] = "SELECT '$dbName' AS `dbName`, actor_id " .
-                "FROM $actorTable WHERE actor_name = :actor";
+                "FROM $actorTable WHERE $whereClause";
         }
 
         $actorIds = [];
@@ -174,7 +183,7 @@ class GlobalContribsRepository extends Repository
         foreach ($queriesBySlice as $slice => $queries) {
             $sql = implode(' UNION ', $queries);
             $resultQuery = $this->executeProjectsQuery($slice, $sql, [
-                'actor' => $user->getUsername(),
+                'actor' => $username,
             ]);
 
             while ($row = $resultQuery->fetch()) {
@@ -212,7 +221,19 @@ class GlobalContribsRepository extends Repository
         }
 
         // Just need any Connection to use the ->quote() method.
-        $username = $this->getProjectsConnection('s1')->quote($user->getUsername(), PDO::PARAM_STR);
+        $quoteConn = $this->getProjectsConnection('s1');
+        $username = $quoteConn->quote($user->getUsername(), PDO::PARAM_STR);
+
+        // IP range handling.
+        $startIp = '';
+        $endIp = '';
+        if ($user->isIpRange()) {
+            [$startIp, $endIp] = IPUtils::parseRange($user->getUsername());
+            $startIp = $quoteConn->quote($startIp, PDO::PARAM_STR);
+            $endIp = $quoteConn->quote($endIp, PDO::PARAM_STR);
+        }
+
+        // Fetch actor IDs (for IP ranges, it strips trailing zeros and uses a LIKE query).
         $actorIds = $this->getDbNamesAndActorIds($user, $dbNames);
 
         if (!$actorIds) {
@@ -233,6 +254,15 @@ class GlobalContribsRepository extends Repository
                 $pageTable = $projectRepo->getTableName($dbName, 'page');
                 $commentTable = $projectRepo->getTableName($dbName, 'comment', 'revision');
 
+                if ($user->isIpRange()) {
+                    $ipcTable = $projectRepo->getTableName($dbName, 'ip_changes');
+                    $ipcJoin = "JOIN $ipcTable ON revs.rev_id = ipc_rev_id";
+                    $whereClause = "ipc_hex BETWEEN $startIp AND $endIp";
+                } else {
+                    $ipcJoin = '';
+                    $whereClause = 'revs.rev_actor = '.$actorIds[$dbName];
+                }
+
                 $slice = $this->getDbList()[$dbName];
                 $queriesBySlice[$slice][] = "
                     SELECT
@@ -250,10 +280,11 @@ class GlobalContribsRepository extends Repository
                         page.page_namespace,
                         comment_text AS `comment`
                     FROM $revisionTable AS revs
+                        $ipcJoin
                         JOIN $pageTable AS page ON (rev_page = page_id)
                         LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                         LEFT OUTER JOIN $commentTable ON revs.rev_comment_id = comment_id
-                    WHERE revs.rev_actor = ".$actorIds[$dbName]."
+                    WHERE $whereClause
                         $namespaceCond
                         $revDateConditions";
             }

@@ -10,6 +10,7 @@ namespace AppBundle\Repository;
 use AppBundle\Model\Project;
 use AppBundle\Model\User;
 use Doctrine\DBAL\Driver\ResultStatement;
+use Wikimedia\IPUtils;
 
 /**
  * An EditSummaryRepository is responsible for retrieving information from the
@@ -42,17 +43,28 @@ class EditSummaryRepository extends UserRepository
         $revDateConditions = $this->getDateConditions($start, $end);
         $condNamespace = 'all' === $namespace ? '' : 'AND page_namespace = :namespace';
         $pageJoin = 'all' === $namespace ? '' : "JOIN $pageTable ON rev_page = page_id";
+        $params = [];
+        $ipcJoin = '';
+        $whereClause = 'rev_actor = :actorId';
+
+        if ($user->isIpRange()) {
+            $ipcTable = $project->getTableName('ip_changes');
+            $ipcJoin = "JOIN $ipcTable ON rev_id = ipc_rev_id";
+            $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
+            [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
+        }
 
         $sql = "SELECT comment_text AS `comment`, rev_timestamp, rev_minor_edit
                 FROM $revisionTable
+                $ipcJoin
                 $pageJoin
                 LEFT OUTER JOIN $commentTable ON comment_id = rev_comment_id
-                WHERE rev_actor = :actorId
+                WHERE $whereClause
                 $condNamespace
                 $revDateConditions
                 ORDER BY rev_timestamp DESC";
 
-        return $this->executeQuery($sql, $project, $user, $namespace);
+        return $this->executeQuery($sql, $project, $user, $namespace, $params);
     }
 
     /**

@@ -2,7 +2,7 @@
 {% if not is_sub_request %}
 == {{ wiki.userLinkWikitext(user, user.username) }} ==
 
-{% set link %}[{{ url('EditCounterGeneralStats', {'username': user.username, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
+{% set link %}[{{ url('EditCounterGeneralStats', {'username': user.usernameIdent, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
 {{ msg('xtools-advert', [link, date()|date_format]) }}
 {% endif %}
 
@@ -47,6 +47,7 @@
 | {{ msg('live-edits') }}
 | [[Special:Contributions/{{user.username}}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ec.countLiveRevisions}}}}]] {% if ec.countAllRevisions %}({{ ((ec.countLiveRevisions / ec.countAllRevisions) * 100)|percent_format }}){% endif %}
 
+{% if not(user.isIpRange) %}
 |-
 | {{ msg('deleted-edits') }}
 | [[Special:DeletedContributions/{{user.username}}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ec.countDeletedRevisions}}}}]] {% if ec.countAllRevisions %}({{ ((ec.countDeletedRevisions / ec.countAllRevisions) * 100)|percent_format }}){% endif %}
@@ -54,6 +55,7 @@
 |-
 | {{ msg('total-edits') }}
 | {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countAllRevisions }}}}
+{% endif %}
 |-
 | {{ msg('last-day') }}
 | {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countRevisionsInLast('day') }}}}
@@ -97,14 +99,14 @@
 | {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.averageRevisionsPerPage }}}}
 |-
 | {{ msg('pages-created') }}
-| [{{ url('PagesResult', {project:project.domain, username:user.username, namespace:'all', redirects:'noredirects'}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesCreated }}}}] ({{ msg('pages-created-since-deleted', [ec.countPagesCreatedDeleted]) }})
+| [{{ url('PagesResult', {project:project.domain, username:user.usernameIdent, namespace:'all', redirects:'noredirects'}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesCreated }}}}] ({{ msg('pages-created-since-deleted', [ec.countPagesCreatedDeleted]) }})
 |-
 | {{ msg('pages-moved') }}
 | [[Special:Log/move/{{ user.username }}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesMoved }}}}]]
 |-
 |}
 
-{# ======================== FILES ======================== #}
+{# ======================== FILES ======================== #}{% if not(user.isIpRange) %}
 === {{ msg('files') }} ===
 
 {| class="wikitable sortable"
@@ -117,6 +119,8 @@
 {% endif %}
 |-
 |}
+
+{% endif %}
 
 {# ======================== ACTIONS ======================== #}
 {% if not(user.anon) %}
@@ -216,7 +220,7 @@
 | {% if topProj.project.databaseName == project.databaseName %}&#9658;{% endif %}
 {# use project.domain instead of title due to limited space available in the interface #}
 [{{ wiki.pageUrlRaw('Special:Contributions/'~user.username, topProj.project) }} {{ topProj.project.domain }}]
-| [{{ url('TopEditsResultNamespace', {project:topProj.project.domain, username:user.username, namespace:'all'}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ topProj.total }}}}]
+| [{{ url('TopEditsResultNamespace', {project:topProj.project.domain, username:user.usernameIdent, namespace:'all'}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ topProj.total }}}}]
 {% endapply %}
 
 |-

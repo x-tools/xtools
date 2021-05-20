@@ -91,7 +91,7 @@
                                     {% if pages.redirects == 'onlyredirects' %}
                                         {{ value.redirects|num_format }}
                                     {% else %}
-                                        <a href="{{ path('PagesResult', {project: project.domain, username: user.username, namespace: key, start: pages.startDate, end: pages.endDate, redirects: 'onlyredirects', deleted: pages.deleted}) }}">{{ value.redirects|num_format }}</a>
+                                        <a href="{{ path('PagesResult', {project: project.domain, username: user.usernameIdent, namespace: key, start: pages.startDate, end: pages.endDate, redirects: 'onlyredirects', deleted: pages.deleted}) }}">{{ value.redirects|num_format }}</a>
                                         ({{ value.redirects|percent_format(value.count) }})
                                     {% endif %}
                                 </td>
@@ -101,7 +101,7 @@
                                     {% if pages.deleted == 'deleted' %}
                                         {{ value.deleted|num_format }}
                                     {% else %}
-                                        <a href="{{ path('PagesResult', {project: project.domain, username: user.username, namespace: key, start: pages.startDate, end: pages.endDate, redirects: '', deleted: 'deleted'}) }}">{{ value.deleted|num_format }}</a>
+                                        <a href="{{ path('PagesResult', {project: project.domain, username: user.usernameIdent, namespace: key, start: pages.startDate, end: pages.endDate, redirects: '', deleted: 'deleted'}) }}">{{ value.deleted|num_format }}</a>
                                         ({{ value.deleted|percent_format(value.count) }})
                                     {% endif %}
                                 </td>

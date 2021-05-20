@@ -8,13 +8,13 @@
 {% endif %}
 {% if i18nKey in sections %}
     {% set content %}
-        {{ render(path(route, {'username': user.username, 'project': project.domain}|merge(extraParams))) }}
+        {{ render(path(route, {'username': user.usernameIdent, 'project': project.domain}|merge(extraParams))) }}
     {% endset %}
     {% set headerLink %}
-        <a href="{{ path(route, {project:project.domain, username:user.username}|merge(extraParams))}}">{{ msg(i18nKey) }}</a>
+        <a href="{{ path(route, {project:project.domain, username:user.usernameIdent}|merge(extraParams))}}">{{ msg(i18nKey) }}</a>
     {% endset %}
     {% set downloadLink %}
-        {{ layout.downloadLink(route, {project:project.domain, username:user.username}|merge(extraParams), downloadFormats, jsonPath is defined ? jsonPath : null) }}
+        {{ layout.downloadLink(route, {project:project.domain, username:user.usernameIdent}|merge(extraParams), downloadFormats, jsonPath is defined ? jsonPath : null) }}
     {% endset %}
     {{ layout.content_block(headerLink, content, downloadLink, i18nKey, true) }}
 {% endif %}

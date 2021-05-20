@@ -2,7 +2,7 @@
 {% if not is_sub_request %}
 == {{ wiki.userLinkWikitext(user, user.username) }} ==
 
-{% set link %}[{{ url('EditCounterYearCounts', {'username': user.username, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
+{% set link %}[{{ url('EditCounterYearCounts', {'username': user.usernameIdent, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
 {{ msg('xtools-advert', [link, date()|date_format]) }}
 {% endif %}
 

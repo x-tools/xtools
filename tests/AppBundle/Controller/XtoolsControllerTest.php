@@ -363,4 +363,22 @@ class XtoolsControllerTest extends ControllerTestAdapter
             $this->client->getResponse()->headers->getCookies()[0]->getValue()
         );
     }
+
+    /**
+     * IP range handling.
+     */
+    public function testIpRangeRestriction(): void
+    {
+        // No exception.
+        $this->getControllerWithRequest([
+            'project' => 'fr.wikipedia',
+            'user' => '174.197.128.0/18',
+        ]);
+
+        static::expectException('AppBundle\Exception\XtoolsHttpException');
+        $this->getControllerWithRequest([
+            'project' => 'fr.wikipedia',
+            'user' => '174.197.128.0/1',
+        ]);
+    }
 }

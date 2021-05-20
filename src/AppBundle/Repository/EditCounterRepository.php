@@ -9,6 +9,7 @@ namespace AppBundle\Repository;
 
 use AppBundle\Model\Project;
 use AppBundle\Model\User;
+use Wikimedia\IPUtils;
 
 /**
  * An EditCounterRepository is responsible for retrieving edit count information from the
@@ -36,51 +37,71 @@ class EditCounterRepository extends UserRightsRepository
         $archiveTable = $project->getTableName('archive');
         $revisionTable = $project->getTableName('revision');
 
+        if ($user->isIpRange()) {
+            $ipcTable = $project->getTableName('ip_changes');
+            $ipcJoin = "JOIN $ipcTable ON ipc_rev_id = rev_id";
+            $whereClause = "ipc_hex BETWEEN :startIp AND :endIp";
+            $archiveQueries = '';
+            $params = [];
+            [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
+        } else {
+            $ipcJoin = '';
+            $whereClause = 'rev_actor = :actorId';
+            $params = ['actorId' => $user->getActorId($project)];
+            $archiveQueries = "
+                SELECT 'deleted' AS `key`, COUNT(ar_id) AS val FROM $archiveTable
+                    WHERE ar_actor = :actorId
+                ) UNION (
+                SELECT 'edited-deleted' AS `key`, COUNT(DISTINCT ar_page_id) AS `val` FROM $archiveTable
+                    WHERE ar_actor = :actorId
+                ) UNION (
+                SELECT 'created-deleted' AS `key`, COUNT(DISTINCT ar_page_id) AS `val` FROM $archiveTable
+                    WHERE ar_actor = :actorId AND ar_parent_id = 0
+                ) UNION (";
+        }
+
         $sql = "
+            ($archiveQueries
+
             -- Revision counts.
-            (SELECT 'deleted' AS `key`, COUNT(ar_id) AS val FROM $archiveTable
-                WHERE ar_actor = :actorId
-            ) UNION (
             SELECT 'live' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_actor = :actorId
+                $ipcJoin
+                WHERE $whereClause
             ) UNION (
             SELECT 'day' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_actor = :actorId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 DAY)
+                $ipcJoin
+                WHERE $whereClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 DAY)
             ) UNION (
             SELECT 'week' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_actor = :actorId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 WEEK)
+                $ipcJoin
+                WHERE $whereClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 WEEK)
             ) UNION (
             SELECT 'month' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_actor = :actorId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
+                $ipcJoin
+                WHERE $whereClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
             ) UNION (
             SELECT 'year' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_actor = :actorId AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+                $ipcJoin
+                WHERE $whereClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
             ) UNION (
             SELECT 'minor' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
-                WHERE rev_actor = :actorId AND rev_minor_edit = 1
+                $ipcJoin
+                WHERE $whereClause AND rev_minor_edit = 1
 
             -- Page counts.
             ) UNION (
             SELECT 'edited-live' AS `key`, COUNT(DISTINCT rev_page) AS `val`
                 FROM $revisionTable
-                WHERE rev_actor = :actorId
-            ) UNION (
-            SELECT 'edited-deleted' AS `key`, COUNT(DISTINCT ar_page_id) AS `val`
-                FROM $archiveTable
-                WHERE ar_actor = :actorId
+                $ipcJoin
+                WHERE $whereClause
             ) UNION (
             SELECT 'created-live' AS `key`, COUNT(DISTINCT rev_page) AS `val`
                 FROM $revisionTable
-                WHERE rev_actor = :actorId AND rev_parent_id = 0
-            ) UNION (
-            SELECT 'created-deleted' AS `key`, COUNT(DISTINCT ar_page_id) AS `val`
-                FROM $archiveTable
-                WHERE ar_actor = :actorId AND ar_parent_id = 0
+                $ipcJoin
+                WHERE $whereClause AND rev_parent_id = 0
             )";
 
-        $resultQuery = $this->executeProjectsQuery($project, $sql, [
-            'actorId' => $user->getActorId($project),
-        ]);
+        $resultQuery = $this->executeProjectsQuery($project, $sql, $params);
 
         $revisionCounts = [];
         while ($result = $resultQuery->fetch()) {
@@ -95,7 +116,7 @@ class EditCounterRepository extends UserRightsRepository
      * Get log totals for a user.
      * @param Project $project The project.
      * @param User $user The user.
-     * @return integer[] Keys are "<log>-<action>" strings, values are counts.
+     * @return int[] Keys are "<log>-<action>" strings, values are counts.
      */
     public function getLogCounts(Project $project, User $user): array
     {
@@ -248,31 +269,45 @@ class EditCounterRepository extends UserRightsRepository
         }
 
         $loggingTable = $project->getTableName('logging', 'userindex');
-        $revisionTable = $project->getTableName('revision');
-
-        $sql = "(
-                    SELECT 'rev_first' AS `key`, rev_id AS `id`,
-                        rev_timestamp AS `timestamp`, NULL as `type`
-                    FROM $revisionTable
-                    WHERE rev_actor = :actorId
-                    LIMIT 1
-                ) UNION (
-                    SELECT 'rev_latest' AS `key`, rev_id AS `id`,
-                        rev_timestamp AS `timestamp`, NULL as `type`
-                    FROM $revisionTable
-                    WHERE rev_actor = :actorId
-                    ORDER BY rev_timestamp DESC LIMIT 1
-                ) UNION (
-                    SELECT 'log_latest' AS `key`, log_id AS `id`,
+        if ($user->isIpRange()) {
+            $fromTable = $project->getTableName('ip_changes');
+            $idColumn = 'ipc_rev_id';
+            $timestampColumn = 'ipc_rev_timestamp';
+            $whereClause = "ipc_hex BETWEEN :startIp AND :endIp";
+            $params = [];
+            [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
+            $logQuery = '';
+        } else {
+            $fromTable = $project->getTableName('revision');
+            $idColumn = 'rev_id';
+            $timestampColumn = 'rev_timestamp';
+            $whereClause = 'rev_actor = :actorId';
+            $params = ['actorId' => $user->getActorId($project)];
+            $logQuery = "
+                SELECT 'log_latest' AS `key`, log_id AS `id`,
                         log_timestamp AS `timestamp`, log_type AS `type`
                     FROM $loggingTable
                     WHERE log_actor = :actorId
                     ORDER BY log_timestamp DESC LIMIT 1
+                ) UNION (";
+        }
+
+        $sql = "(
+                $logQuery
+                    SELECT 'rev_first' AS `key`, $idColumn AS `id`,
+                        $timestampColumn AS `timestamp`, NULL as `type`
+                    FROM $fromTable
+                    WHERE $whereClause
+                    ORDER BY $timestampColumn ASC LIMIT 1
+                ) UNION (
+                    SELECT 'rev_latest' AS `key`, $idColumn AS `id`,
+                        $timestampColumn AS `timestamp`, NULL as `type`
+                    FROM $fromTable
+                    WHERE $whereClause
+                    ORDER BY $timestampColumn DESC LIMIT 1
                 )";
 
-        $resultQuery = $this->executeProjectsQuery($project, $sql, [
-            'actorId' => $user->getActorId($project),
-        ]);
+        $resultQuery = $this->executeProjectsQuery($project, $sql, $params);
 
         $actions = [];
         while ($result = $resultQuery->fetch()) {
@@ -324,16 +359,26 @@ class EditCounterRepository extends UserRightsRepository
         }
 
         // Query.
-        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
+        $revisionTable = $project->getTableName('revision');
+        $pageTable = $project->getTableName('page');
+        $ipcJoin = '';
+        $whereClause = 'r.rev_actor = :actorId';
+        $params = ['actorId' => $user->getActorId($project)];
+
+        if ($user->isIpRange()) {
+            $ipcTable = $project->getTableName('ip_changes');
+            $ipcJoin = "JOIN $ipcTable ON ipc_rev_id = rev_id";
+            [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
+            $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
+        }
+
         $sql = "SELECT page_namespace, COUNT(rev_id) AS total
             FROM $pageTable p JOIN $revisionTable r ON (r.rev_page = p.page_id)
-            WHERE r.rev_actor = :actorId
+            $ipcJoin
+            WHERE $whereClause
             GROUP BY page_namespace";
 
-        $results = $this->executeProjectsQuery($project, $sql, [
-            'actorId' => $user->getActorId($project),
-        ])->fetchAll();
+        $results = $this->executeProjectsQuery($project, $sql, $params)->fetchAll();
 
         $namespaceTotals = array_combine(array_map(function ($e) {
             return $e['page_namespace'];
@@ -368,19 +413,28 @@ class EditCounterRepository extends UserRightsRepository
 
         $revisionTable = $project->getTableName('revision');
         $pageTable = $project->getTableName('page');
-        $sql =
-            "SELECT "
-            . "     YEAR(rev_timestamp) AS `year`,"
-            . "     MONTH(rev_timestamp) AS `month`,"
-            . "     page_namespace,"
-            . "     COUNT(rev_id) AS `count` "
-            .  " FROM $revisionTable JOIN $pageTable ON (rev_page = page_id)"
-            . " WHERE rev_actor = :actorId"
-            . " GROUP BY YEAR(rev_timestamp), MONTH(rev_timestamp), page_namespace";
+        $ipcJoin = '';
+        $whereClause = 'rev_actor = :actorId';
+        $params = ['actorId' => $user->getActorId($project)];
 
-        $totals = $this->executeProjectsQuery($project, $sql, [
-            'actorId' => $user->getActorId($project),
-        ])->fetchAll();
+        if ($user->isIpRange()) {
+            $ipcTable = $project->getTableName('ip_changes');
+            $ipcJoin = "JOIN $ipcTable ON ipc_rev_id = rev_id";
+            [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
+            $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
+        }
+
+        $sql = "
+            SELECT YEAR(rev_timestamp) AS `year`,
+                MONTH(rev_timestamp) AS `month`,
+                page_namespace,
+                COUNT(rev_id) AS `count`
+            FROM $revisionTable JOIN $pageTable ON (rev_page = page_id)
+            $ipcJoin
+            WHERE $whereClause
+            GROUP BY YEAR(rev_timestamp), MONTH(rev_timestamp), page_namespace";
+
+        $totals = $this->executeProjectsQuery($project, $sql, $params)->fetchAll();
 
         // Cache and return.
         return $this->setCache($cacheKey, $totals);
@@ -400,19 +454,30 @@ class EditCounterRepository extends UserRightsRepository
         }
 
         $hourInterval = 1;
-        $xCalc = "ROUND(HOUR(rev_timestamp)/$hourInterval) * $hourInterval";
-        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $sql = "SELECT "
-            . "     DAYOFWEEK(rev_timestamp) AS `day_of_week`, "
-            . "     $xCalc AS `hour`, "
-            . "     COUNT(rev_id) AS `value` "
-            . " FROM $revisionTable"
-            . " WHERE rev_actor = :actorId"
-            . " GROUP BY DAYOFWEEK(rev_timestamp), $xCalc";
 
-        $totals = $this->executeProjectsQuery($project, $sql, [
-            'actorId' => $user->getActorId($project),
-        ])->fetchAll();
+        if ($user->isIpRange()) {
+            $column = 'ipc_rev_timestamp';
+            $table = $project->getTableName('ip_changes');
+            [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
+            $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
+        } else {
+            $column = 'rev_timestamp';
+            $table = $project->getTableName('revision');
+            $whereClause = 'rev_actor = :actorId';
+            $params = ['actorId' => $user->getActorId($project)];
+        }
+
+        $xCalc = "ROUND(HOUR($column)/$hourInterval) * $hourInterval";
+
+        $sql = "
+            SELECT DAYOFWEEK($column) AS `day_of_week`,
+                $xCalc AS `hour`,
+                COUNT($column) AS `value`
+            FROM $table
+            WHERE $whereClause
+            GROUP BY DAYOFWEEK($column), $xCalc";
+
+        $totals = $this->executeProjectsQuery($project, $sql, $params)->fetchAll();
 
         // Cache and return.
         return $this->setCache($cacheKey, $totals);
@@ -436,20 +501,30 @@ class EditCounterRepository extends UserRightsRepository
 
         // Prepare the queries and execute them.
         $revisionTable = $project->getTableName('revision');
+        $ipcJoin = '';
+        $whereClause = 'revs.rev_actor = :actorId';
+        $params = ['actorId' => $user->getActorId($project)];
+
+        if ($user->isIpRange()) {
+            $ipcTable = $project->getTableName('ip_changes');
+            $ipcJoin = "JOIN $ipcTable ON ipc_rev_id = revs.rev_id";
+            [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
+            $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
+        }
+
         $sql = "SELECT AVG(sizes.size) AS average_size,
                 COUNT(CASE WHEN sizes.size < 20 THEN 1 END) AS small_edits,
                 COUNT(CASE WHEN sizes.size > 1000 THEN 1 END) AS large_edits
                 FROM (
                     SELECT (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS size
                     FROM $revisionTable AS revs
+                    $ipcJoin
                     LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-                    WHERE revs.rev_actor = :actorId
+                    WHERE $whereClause
                     ORDER BY revs.rev_timestamp DESC
                     LIMIT 5000
                 ) sizes";
-        $results = $this->executeProjectsQuery($project, $sql, [
-            'actorId' => $user->getActorId($project),
-        ])->fetch();
+        $results = $this->executeProjectsQuery($project, $sql, $params)->fetch();
 
         // Cache and return.
         return $this->setCache($cacheKey, $results);

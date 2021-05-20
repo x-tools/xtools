@@ -35,10 +35,10 @@
 </div>
 {% endmacro %}
 
-{% macro user_input(required = true, multiple = false, project = null, noip = false, value = '') %}
+{% macro user_input(required = true, multiple = false, project = null, noip = false, value = '', ipRanges = true) %}
 <div class="input-group form-row">
     <label class="input-group-addon form-label" for="user_input">
-        {{ msg('username') }}
+        {% if ipRanges %}{{ msg('user') }}{% else %}{{ msg('username') }}{% endif %}
         {% if multiple or noip == false %}
             <div class="glyphicon glyphicon-info-sign tooltipcss pull-right" role="dialog" aria-labelledby="user-format-desc">
                 <div class="tooltip-body" id="user-format-desc">
@@ -47,6 +47,8 @@
                         <br>e.g. <code>UserX|UserY|UserZ</code>
                     {% elseif noip %}
                         {{ msg('username') }}
+                    {% elseif ipRanges %}
+                        {{ msg('username-ip-or-cidr') }}
                     {% else %}
                         {{ msg('username-or-ip') }}
                     {% endif %}

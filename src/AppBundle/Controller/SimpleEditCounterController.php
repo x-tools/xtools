@@ -84,9 +84,10 @@ class SimpleEditCounterController extends XtoolsController
      *     "/sc/{project}/{username}/{namespace}/{start}/{end}",
      *     name="SimpleEditCounterResult",
      *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
+     *         "namespace" = "|all|\d+",
      *         "start" = "|\d{4}-\d{2}-\d{2}",
      *         "end" = "|\d{4}-\d{2}-\d{2}",
-     *         "namespace" = "|all|\d+",
      *     },
      *     defaults={
      *         "start"=false,
@@ -116,7 +117,7 @@ class SimpleEditCounterController extends XtoolsController
      *     "/api/user/simple_editcount/{project}/{username}/{namespace}/{start}/{end}",
      *     name="SimpleEditCounterApi",
      *     requirements={
-     *         "username" = "(.+?)(?!(?:\/(\d+))?\/(?:\d{4}-\d{2}-\d{2})(?:\/(\d{4}-\d{2}-\d{2}))?)?$",
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *         "start" = "|\d{4}-\d{2}-\d{2}",
      *         "end" = "|\d{4}-\d{2}-\d{2}",
      *         "namespace" = "|all|\d+"
@@ -133,6 +134,10 @@ class SimpleEditCounterController extends XtoolsController
     public function simpleEditCounterApiAction(): Response
     {
         $sec = $this->prepareSimpleEditCounter();
-        return $this->getFormattedApiResponse($sec->getData());
+        $data = $sec->getData();
+        if ($this->user->isIpRange()) {
+            unset($data['deleted_edit_count']);
+        }
+        return $this->getFormattedApiResponse($data);
     }
 }

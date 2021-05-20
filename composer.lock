@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6bc4c6d27ad64eb131817206cafe799e",
+    "content-hash": "63f735f576adb6c414712d9b30b31806",
     "packages": [
         {
             "name": "composer/package-versions-deprecated",
@@ -4646,6 +4646,212 @@
                 }
             ],
             "time": "2020-08-05T15:09:04+00:00"
+        },
+        {
+            "name": "wikimedia/at-ease",
+            "version": "v2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wikimedia/at-ease.git",
+                "reference": "013ac61929797839c80a111a3f1a4710d8248e7a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wikimedia/at-ease/zipball/013ac61929797839c80a111a3f1a4710d8248e7a",
+                "reference": "013ac61929797839c80a111a3f1a4710d8248e7a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.99"
+            },
+            "require-dev": {
+                "jakub-onderka/php-console-highlighter": "0.3.2",
+                "jakub-onderka/php-parallel-lint": "1.0.0",
+                "mediawiki/mediawiki-codesniffer": "22.0.0",
+                "mediawiki/minus-x": "0.3.1",
+                "ockcyp/covers-validator": "0.5.1 || 0.6.1",
+                "phpunit/phpunit": "4.8.36 || ^6.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Wikimedia\\AtEase\\": "src/Wikimedia/AtEase/"
+                },
+                "files": [
+                    "src/Wikimedia/Functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Tim Starling",
+                    "email": "tstarling@wikimedia.org"
+                },
+                {
+                    "name": "MediaWiki developers",
+                    "email": "wikitech-l@lists.wikimedia.org"
+                }
+            ],
+            "description": "Safe replacement to @ for suppressing warnings.",
+            "homepage": "https://www.mediawiki.org/wiki/at-ease",
+            "support": {
+                "source": "https://github.com/wikimedia/at-ease/tree/master"
+            },
+            "time": "2018-10-10T15:39:06+00:00"
+        },
+        {
+            "name": "wikimedia/base-convert",
+            "version": "v2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wikimedia/base-convert.git",
+                "reference": "b1116d1b251e51a44ef76c3a7c79561b2e058e59"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wikimedia/base-convert/zipball/b1116d1b251e51a44ef76c3a7c79561b2e058e59",
+                "reference": "b1116d1b251e51a44ef76c3a7c79561b2e058e59",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.99"
+            },
+            "require-dev": {
+                "jakub-onderka/php-console-highlighter": "0.3.2",
+                "jakub-onderka/php-parallel-lint": "1.0.0",
+                "mediawiki/mediawiki-codesniffer": "22.0.0",
+                "mediawiki/minus-x": "0.3.1",
+                "ockcyp/covers-validator": "0.5.1 || 0.6.1",
+                "phpunit/phpunit": "4.8.36 || ^6.5"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/Functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Brion Vibber",
+                    "email": "bvibber@wikimedia.org"
+                },
+                {
+                    "name": "Tyler Romeo",
+                    "email": "tylerromeo@gmail.com"
+                }
+            ],
+            "description": "Convert an arbitrarily-long string from one numeric base to another, optionally zero-padding to a minimum column width.",
+            "homepage": "https://www.mediawiki.org/wiki/base_convert",
+            "support": {
+                "source": "https://github.com/wikimedia/base-convert/tree/master"
+            },
+            "time": "2018-10-21T05:06:11+00:00"
+        },
+        {
+            "name": "wikimedia/ip-set",
+            "version": "2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wikimedia/IPSet.git",
+                "reference": "f84555041a405f0ea51c64a0c7fb5fac36e99b84"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wikimedia/IPSet/zipball/f84555041a405f0ea51c64a0c7fb5fac36e99b84",
+                "reference": "f84555041a405f0ea51c64a0c7fb5fac36e99b84",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.99",
+                "wikimedia/at-ease": "2.0.0"
+            },
+            "require-dev": {
+                "jakub-onderka/php-console-highlighter": "0.3.2",
+                "jakub-onderka/php-parallel-lint": "1.0.0",
+                "mediawiki/mediawiki-codesniffer": "26.0.0",
+                "mediawiki/minus-x": "0.3.1",
+                "ockcyp/covers-validator": "0.5.1 || 0.6.1",
+                "phpunit/phpunit": "4.8.36 || ^6.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Wikimedia\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Brandon Black",
+                    "email": "blblack@gmail.com"
+                }
+            ],
+            "description": "Efficiently match IP addresses against a set of CIDR specifications.",
+            "homepage": "https://www.mediawiki.org/wiki/IPSet",
+            "support": {
+                "source": "https://github.com/wikimedia/IPSet/tree/2.1.0"
+            },
+            "time": "2019-07-16T08:14:03+00:00"
+        },
+        {
+            "name": "wikimedia/ip-utils",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wikimedia/mediawiki-libs-IPUtils.git",
+                "reference": "c505b99c0dfab12254d64a5e064bddd13cf066ad"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wikimedia/mediawiki-libs-IPUtils/zipball/c505b99c0dfab12254d64a5e064bddd13cf066ad",
+                "reference": "c505b99c0dfab12254d64a5e064bddd13cf066ad",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.99",
+                "wikimedia/base-convert": "^2.0.0",
+                "wikimedia/ip-set": "^2.0.0"
+            },
+            "require-dev": {
+                "jakub-onderka/php-console-highlighter": "0.3.2",
+                "jakub-onderka/php-parallel-lint": "1.0.0",
+                "mediawiki/mediawiki-codesniffer": "24.0.0",
+                "mediawiki/minus-x": "0.3.1",
+                "ockcyp/covers-validator": "0.5.1 || 0.6.1",
+                "phpunit/phpunit": "4.8.36 || ^6.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Wikimedia\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "MediaWiki developers",
+                    "email": "wikitech-l@lists.wikimedia.org"
+                }
+            ],
+            "description": "Functions and constants to play with IP addresses and ranges",
+            "homepage": "https://www.mediawiki.org/wiki/IPUtils",
+            "support": {
+                "source": "https://github.com/wikimedia/mediawiki-libs-IPUtils/tree/master"
+            },
+            "time": "2019-06-25T17:43:18+00:00"
         }
     ],
     "packages-dev": [

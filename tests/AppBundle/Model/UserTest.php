@@ -204,4 +204,77 @@ class UserTest extends TestAdapter
         // User::tooManyEdits()
         static::assertTrue($user->hasTooManyEdits($project));
     }
+
+    /**
+     * IP-related functionality and methods.
+     */
+    public function testIpMethods(): void
+    {
+        $user = new User('192.168.0.0');
+        static::assertTrue($user->isAnon());
+        static::assertFalse($user->isIpRange());
+        static::assertFalse($user->isIPv6());
+        static::assertEquals('192.168.0.0', $user->getUsernameIdent());
+
+        $user = new User('74.24.52.13/20');
+        static::assertTrue($user->isAnon());
+        static::assertTrue($user->isQueryableRange());
+        static::assertEquals('ipr-74.24.52.13/20', $user->getUsernameIdent());
+
+        $user = new User('2600:387:0:80d::b0');
+        static::assertTrue($user->isAnon());
+        static::assertTrue($user->isIPv6());
+        static::assertFalse($user->isIpRange());
+        static::assertEquals('2600:387:0:80D:0:0:0:B0', $user->getUsername());
+        static::assertEquals('2600:387:0:80D:0:0:0:B0', $user->getUsernameIdent());
+
+        // Using 'ipr-' prefix, which should only apply in routing.
+        $user = new User('ipr-2001:DB8::/32');
+        static::assertTrue($user->isAnon());
+        static::assertTrue($user->isIPv6());
+        static::assertTrue($user->isIpRange());
+        static::assertTrue($user->isQueryableRange());
+        static::assertEquals('2001:DB8:0:0:0:0:0:0/32', $user->getUsername());
+        static::assertEquals('2001:db8::/32', $user->getPrettyUsername());
+        static::assertEquals('ipr-2001:DB8:0:0:0:0:0:0/32', $user->getUsernameIdent());
+
+        $user = new User('2001:db8::/31');
+        static::assertTrue($user->isIpRange());
+        static::assertFalse($user->isQueryableRange());
+
+        $user = new User('Test');
+        static::assertFalse($user->isAnon());
+        static::assertFalse($user->isIpRange());
+        static::assertEquals('Test', $user->getPrettyUsername());
+    }
+
+    /**
+     * @covers User::getIpSubstringFromCidr
+     */
+    public function testGetIpSubstringFromCidr(): void
+    {
+        $user = new User('2001:db8:abc:1400::/54');
+        static::assertEquals('2001:DB8:ABC:1', $user->getIpSubstringFromCidr());
+
+        $user = new User('174.197.128.0/18');
+        static::assertEquals('174.197.1', $user->getIpSubstringFromCidr());
+
+        $user = new User('174.197.128.0');
+        static::assertEquals(null, $user->getIpSubstringFromCidr());
+    }
+
+    /**
+     * @covers User::isQueryableRange
+     */
+    public function testIsQueryableRange(): void
+    {
+        $user = new User('2001:db8:abc:1400::/54');
+        static::assertTrue($user->isQueryableRange());
+
+        $user = new User('2001:db8:abc:1400::/5');
+        static::assertFalse($user->isQueryableRange());
+
+        $user = new User('2001:db8:abc:1400');
+        static::assertTrue($user->isQueryableRange());
+    }
 }

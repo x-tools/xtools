@@ -111,6 +111,7 @@ class TopEditsController extends XtoolsController
      * @Route("/topedits/{project}/{username}/{namespace}/{start}/{end}",
      *     name="TopEditsResultNamespace",
      *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *         "namespace"="|all|\d+",
      *         "start"="|\d{4}-\d{2}-\d{2}",
      *         "end"="|\d{4}-\d{2}-\d{2}",
@@ -147,6 +148,7 @@ class TopEditsController extends XtoolsController
      * @Route("/topedits/{project}/{username}/{namespace}/{page}/{start}/{end}",
      *     name="TopEditsResultPage",
      *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *         "namespace"="|all|\d+",
      *         "page"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
      *         "start"="|\d{4}-\d{2}-\d{2}",
@@ -178,6 +180,7 @@ class TopEditsController extends XtoolsController
      * @Route("/api/user/top_edits/{project}/{username}/{namespace}/{start}/{end}",
      *     name="UserApiTopEditsNamespace",
      *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *         "namespace"="|\d+|all",
      *         "start"="|\d{4}-\d{2}-\d{2}",
      *         "end"="|\d{4}-\d{2}-\d{2}",
@@ -204,6 +207,7 @@ class TopEditsController extends XtoolsController
      * @Route("/api/user/top_edits/{project}/{username}/{namespace}/{page}/{start}/{end}",
      *     name="UserApiTopEditsPage",
      *     requirements = {
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *         "namespace"="|\d+|all",
      *         "page"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
      *         "start"="|\d{4}-\d{2}-\d{2}",

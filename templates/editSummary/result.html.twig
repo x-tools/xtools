@@ -129,7 +129,7 @@
             {% endif %}
         {% endset %}
         {% set downloadLink %}
-            {{ layout.downloadLink('EditSummaryResult', {project: project.domain, username: user.username, namespace: es.namespace, start: es.startDate, end: es.endDate}, [], 'UserApiEditSummaries') }}
+            {{ layout.downloadLink('EditSummaryResult', {project: project.domain, username: user.usernameIdent, namespace: es.namespace, start: es.startDate, end: es.endDate}, [], 'UserApiEditSummaries') }}
         {% endset %}
         {{ layout.content_block('summary', content, downloadLink) }}
 

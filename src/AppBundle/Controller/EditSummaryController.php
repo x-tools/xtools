@@ -62,6 +62,7 @@ class EditSummaryController extends XtoolsController
      * @Route(
      *     "/editsummary/{project}/{username}/{namespace}/{start}/{end}", name="EditSummaryResult",
      *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *         "namespace"="|all|\d+",
      *         "start"="|\d{4}-\d{2}-\d{2}",
      *         "end"="|\d{4}-\d{2}-\d{2}",
@@ -102,6 +103,7 @@ class EditSummaryController extends XtoolsController
      * @Route(
      *     "/api/user/edit_summaries/{project}/{username}/{namespace}/{start}/{end}", name="UserApiEditSummaries",
      *     requirements={
+     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *         "namespace"="|all|\d+",
      *         "start"="|\d{4}-\d{2}-\d{2}",
      *         "end"="|\d{4}-\d{2}-\d{2}",
