@@ -487,6 +487,7 @@
 	"user-page-desc": "La dimensione della pagina utente è $2 {{PLURAL:$1|byte}}",
 	"username": "Nome utente",
 	"username-or-ip": "Username o IPv4 o IPv6",
+	"username-ip-or-cidr": "Nome utente, indirizzo IP o intervallo CIDR.",
 	"version": "Versione $1",
 	"view-source": "Visualizza sorgente",
 	"view-wikitext": "Visualizza come wikitesto",
