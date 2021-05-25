@@ -253,11 +253,15 @@ class GlobalContribsRepository extends Repository
                 $revisionTable = $projectRepo->getTableName($dbName, 'revision');
                 $pageTable = $projectRepo->getTableName($dbName, 'page');
                 $commentTable = $projectRepo->getTableName($dbName, 'comment', 'revision');
+                $actorTable = $projectRepo->getTableName($dbName, 'actor', 'revision');
+                $tagTable = $projectRepo->getTableName($dbName, 'change_tag');
+                $tagDefTable = $projectRepo->getTableName($dbName, 'change_tag_def');
 
                 if ($user->isIpRange()) {
                     $ipcTable = $projectRepo->getTableName($dbName, 'ip_changes');
                     $ipcJoin = "JOIN $ipcTable ON revs.rev_id = ipc_rev_id";
                     $whereClause = "ipc_hex BETWEEN $startIp AND $endIp";
+                    $username = 'actor_name';
                 } else {
                     $ipcJoin = '';
                     $whereClause = 'revs.rev_actor = '.$actorIds[$dbName];
@@ -278,10 +282,22 @@ class GlobalContribsRepository extends Repository
                         $username AS username,
                         page.page_title,
                         page.page_namespace,
-                        comment_text AS `comment`
+                        comment_text AS comment,
+                        (
+                            SELECT 1
+                            FROM $tagTable
+                            WHERE ct_rev_id = revs.rev_id
+                            AND ct_tag_id = (
+                                SELECT ctd_id
+                                FROM $tagDefTable
+                                WHERE ctd_name = 'mw-reverted'
+                            )
+                            LIMIT 1
+                        ) AS reverted
                     FROM $revisionTable AS revs
                         $ipcJoin
                         JOIN $pageTable AS page ON (rev_page = page_id)
+                        JOIN $actorTable ON (actor_id = revs.rev_actor)
                         LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                         LEFT OUTER JOIN $commentTable ON revs.rev_comment_id = comment_id
                     WHERE $whereClause

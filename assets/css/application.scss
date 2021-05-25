@@ -742,6 +742,10 @@ a.help-icon {
     top: 5px;
 }
 
+.reverted-edit {
+    background: #fcf8e3 !important;
+}
+
 @media (min-width: $bootstrap-lg) {
     .xt-panel-body table {
         width: auto;

@@ -24,6 +24,12 @@
             <p class="text-center xt-heading-subtitle">
                 {% if user.anon %}
                     {{ wiki.pageLogLinkRaw('User:' ~ user.username, project, msg('global-block-log'), 'gblblock') }}
+                    &middot;
+                    <a target="_blank" href="https://whois-referral.toolforge.org/gateway.py?lookup=true&amp;ip={{ user.prettyUsername|e('url') }}">{{ msg('whois') }}</a>
+                    &middot;
+                    <a target="_blank" href="https://ipcheck.toolforge.org/index.php?ip={{ user.prettyUsername }}">{{ msg('proxy-check') }}</a>
+                    &middot;
+                    <a target="_blank" href="https://meta.toolforge.org/stalktoy/{{ user.prettyUsername }}">Stalk toy</a>
                 {% else %}
                     {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, msg('sul-info')) }}
                     &middot;
@@ -38,7 +44,9 @@
                     <table class="table"><tbody>
                         <tr>
                             <td>{{ msg('user') }}</td>
-                            <td>{{ user.username }}</td>
+                            <td>
+                                {{ user.username }}
+                            </td>
                         </tr>
                         {% if gc.namespace != 'all' or gc.namespace == '' %}
                             <tr>
@@ -67,7 +75,9 @@
                             {% endif %}
                             <tr>
                                 <td>{{ msg('projects') }}</td>
-                                <td>{{ gc.numProjectsWithEdits|num_format }}</td>
+                                <td>
+                                    {{ gc.numProjectsWithEdits|num_format }}
+                                </td>
                             </tr>
                         {% endif %}
                         </tbody></table>
@@ -96,7 +106,12 @@
     {{ layout.contributionsNav(gc.offset, gc.globalEdits|length, gc.pageSize) }}
     <table class="table table-bordered table-hover table-striped contributions-table">
         <thead><tr>
-            {% for key in ['date', 'project', 'links', 'page-title', 'size', 'edit-summary'] %}
+            {% set columns = ['date', 'project'] %}
+            {% if user.isIpRange %}
+                {% set columns = columns|merge(['user']) %}
+            {% endif %}
+            {% set columns = columns|merge(['page-title', 'size', 'edit-summary']) %}
+            {% for key in columns %}
                 <th>
                     <span{% if key != 'links' %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
                         {{ msg(key)|ucfirst }}
@@ -109,21 +124,19 @@
         </tr></thead>
         <tbody>
         {% for edit in gc.globalEdits %}
-            <tr>
+            <tr{% if edit.isReverted %} class="reverted-edit"{% endif %}>
                 <td class="sort-entry--date contribs-row-date" data-value="{{ edit.utcTimestamp }}">
-                    {{ wiki.permaLink(edit) }}
+                    {{ wiki.diffLink(edit, edit.timestamp) }}
                 </td>
                 <td class="sort-entry--project" data-value="{{ edit.project.domain }}">
                     {# Use project.domain here instead of title to preserve limited space in the interface #}
-                    <a href="{{ edit.project.url }}">{{ edit.project.domain }}</a>
+                    <a href="{{ edit.project.url }}">{{ edit.project.domain|trim('.org') }}</a>
                 </td>
-                <td>
-                    {{ wiki.diffLink(edit) }}
-                    &middot;
-                    <a href="{{ path('EditCounterResult', {project:edit.project.domain, username:user.usernameIdent}) }}">{{ msg('tool-editcounter') }}</a>
-                    &middot;
-                    <a href="{{ path('TopEditsResultPage', {project:edit.project.domain, username:user.usernameIdent, namespace:'', page:edit.page.title(true)}) }}">{{ msg('tool-topedits') }}</a>
-                </td>
+                {% if user.isIpRange %}
+                    <td>
+                        {{ wiki.userLink(edit.user, edit.project, edit.user.prettyUsername) }}
+                    </td>
+                {% endif %}
                 <td class="sort-entry--page-title display-title" data-value="{{ edit.page.title(true) }}">
                     {{ wiki.pageLinkRaw(edit.page.title(true), edit.project) }}
                 </td>
@@ -131,6 +144,7 @@
                     {{ edit.lengthChange|diff_format }}
                 </td>
                 <td class="sort-entry--summary" data-value="{{ edit.comment }}">
+                    {% if edit.isReverted %}<i class="text-info">({{ msg('reverted')|lower }})</i>&nbsp;{% endif %}
                     {{ edit.wikifiedComment(true)|raw }}
                 </td>
             </tr>
