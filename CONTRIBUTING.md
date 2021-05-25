@@ -5,7 +5,7 @@ If you need help setting up XTools on your local machine, refer to the
 documentation at https://www.mediawiki.org/wiki/XTools/Development
 
 If you run into any trouble, ask for help at https://www.mediawiki.org/wiki/Talk:XTools or on IRC in
-the #wikimedia-xtools channel on freenode ([live chat](https://webchat.freenode.net/?channels=#wikimedia-xtools)).
+the #wikimedia-xtools channel on Libera.Chat ([live chat](https://kiwiirc.com/nextclient/irc.libera.chat/#wikimedia-xtools)).
 
 For pull requests
 -----------------
