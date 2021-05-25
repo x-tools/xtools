@@ -13,10 +13,10 @@
                     <span class="glyphicon glyphicon-chevron-left"></span>
                     {{ msg('back') }}
                 </a>
-                {% if not(user.anon) %}
-                    {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, user.username) }}
+                {% if user.anon %}
+                    {{ user.prettyUsername }}
                 {% else %}
-                    {{ user.username }}
+                    {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, user.username) }}
                 {% endif %}
             </div>
         </header>
@@ -123,6 +123,7 @@
             {% endfor %}
         </tr></thead>
         <tbody>
+        {% set substr = user.ipSubstringFromCidr %}
         {% for edit in gc.globalEdits %}
             <tr{% if edit.isReverted %} class="reverted-edit"{% endif %}>
                 <td class="sort-entry--date contribs-row-date" data-value="{{ edit.utcTimestamp }}">
@@ -133,8 +134,9 @@
                     <a href="{{ edit.project.url }}">{{ edit.project.domain|trim('.org') }}</a>
                 </td>
                 {% if user.isIpRange %}
+                    {% set username = edit.user.username|replace({(substr): '…'}) %}
                     <td>
-                        {{ wiki.userLink(edit.user, edit.project, edit.user.prettyUsername) }}
+                        {{ wiki.userLink(edit.user, edit.project, username|lower) }}
                     </td>
                 {% endif %}
                 <td class="sort-entry--page-title display-title" data-value="{{ edit.page.title(true) }}">
