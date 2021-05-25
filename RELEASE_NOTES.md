@@ -1,5 +1,12 @@
 # Release Notes #
 
+## 3.13.0 ##
+- (T279041) Add support for IP ranges (except for Pages Created tool).
+- (T235941) Support shorthand syntax for IPv6 addresses.
+- GlobalContribs: add useful external links, show IPs within ranges, and indicate
+  which edits have been reverted.
+- Localization updates.
+
 ## 3.12.1 ##
 - Localization updataes.
 
