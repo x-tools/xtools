@@ -446,7 +446,7 @@ abstract class XtoolsController extends Controller
             // Validate CIDR limits.
             if (!$user->isQueryableRange()) {
                 $limit = $user->isIPv6() ? User::MAX_IPV6_CIDR : User::MAX_IPV4_CIDR;
-                $this->throwXtoolsException($this->getIndexRoute(), 'ip-range-too-wide', [$limit]);
+                $this->throwXtoolsException($this->getIndexRoute(), 'ip-range-too-wide', [$limit], 'username');
             }
             return $user;
         }

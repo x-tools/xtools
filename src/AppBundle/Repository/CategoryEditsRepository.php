@@ -66,14 +66,14 @@ class CategoryEditsRepository extends Repository
         if ($user->isIpRange()) {
             $ipcTable = $project->getTableName('ip_changes');
             $ipcJoin = "JOIN $ipcTable ON ipc_rev_id = revs.rev_id";
-            $whereClause = 'WHERE ipc_hex BETWEEN ? AND ?';
+            $whereClause = 'ipc_hex BETWEEN ? AND ?';
         }
 
         $sql = "SELECT COUNT(DISTINCT revs.rev_id)
                 FROM $revisionTable revs
                 $ipcJoin
                 JOIN $categorylinksTable ON cl_from = rev_page
-                $whereClause
+                WHERE $whereClause
                     AND cl_to IN (?)
                     $revDateConditions";
         $result = (int)$this->executeStmt($sql, $project, $user, $categories)->fetchColumn();
@@ -112,14 +112,14 @@ class CategoryEditsRepository extends Repository
         if ($user->isIpRange()) {
             $ipcTable = $project->getTableName('ip_changes');
             $ipcJoin = "JOIN $ipcTable ON ipc_rev_id = revs.rev_id";
-            $whereClause = 'WHERE ipc_hex BETWEEN ? AND ?';
+            $whereClause = 'ipc_hex BETWEEN ? AND ?';
         }
 
         $sql = "SELECT cl_to AS cat, COUNT(rev_id) AS edit_count, COUNT(DISTINCT rev_page) AS page_count
                 FROM $revisionTable revs
                 $ipcJoin
                 JOIN $categorylinksTable ON cl_from = rev_page
-                $whereClause
+                WHERE $whereClause
                     AND cl_to IN (?)
                     $revDateConditions
                 GROUP BY cl_to
@@ -173,7 +173,7 @@ class CategoryEditsRepository extends Repository
         if ($user->isIpRange()) {
             $ipcTable = $project->getTableName('ip_changes');
             $ipcJoin = "JOIN $ipcTable ON ipc_rev_id = revs.rev_id";
-            $whereClause = 'WHERE ipc_hex BETWEEN ? AND ?';
+            $whereClause = 'ipc_hex BETWEEN ? AND ?';
         }
 
         $sql = "SELECT page_title, page_namespace, revs.rev_id AS rev_id, revs.rev_timestamp AS timestamp,
@@ -186,7 +186,7 @@ class CategoryEditsRepository extends Repository
                 JOIN $categorylinksTable ON cl_from = rev_page
                 LEFT JOIN $commentTable comment ON revs.rev_comment_id = comment_id
                 LEFT JOIN $revisionTable parentrevs ON revs.rev_parent_id = parentrevs.rev_id
-                $whereClause
+                WHERE $whereClause
                     AND cl_to IN (?)
                     $revDateConditions
                 GROUP BY revs.rev_id

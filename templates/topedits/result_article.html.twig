@@ -172,7 +172,7 @@
                     </tr></thead>
 
                     {% for rev in te.topEdits %}
-                    <tr{% if rev.reverted %} class="bg-warning"{% endif %}>
+                    <tr{% if rev.reverted %} class="reverted-edit"{% endif %}>
                         <td class="sort-entry--date" data-value="{{ rev.timestamp|date('U') }}">
                             {{ wiki.permaLink(rev) }}
                         </td>
