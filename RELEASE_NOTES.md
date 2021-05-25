@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.13.1 ##
+- GlobalContribs: cleaner display of IP addresses within ranges.
+
 ## 3.13.0 ##
 - (T279041) Add support for IP ranges (except for Pages Created tool).
 - (T235941) Support shorthand syntax for IPv6 addresses.
