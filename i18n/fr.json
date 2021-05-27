@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"Ajeje Brazorf",
 			"Derugon",
 			"Florian COLLIN",
 			"Framawiki",
@@ -505,6 +506,7 @@
 	"vote-msg": "$1 a modifié $2 pages de $3 !",
 	"web-chat": "Se connecter",
 	"wednesday": "mercredi",
+	"whois": "WHOIS",
 	"wiki": "Wiki",
 	"wiki-set-change": "Modification de l’ensemble du wiki",
 	"wikiproject": "WikiProjet",

@@ -9,6 +9,7 @@
 			"Revi",
 			"Ykhwong",
 			"YuzaTea",
+			"그냥기여자",
 			"한림"
 		]
 	},
@@ -163,6 +164,7 @@
 	"global-account-un-lock": "전역 잠금/잠금 해제",
 	"global-block": "전역 차단",
 	"global-block-log": "전역 차단 기록",
+	"global-edit-count": "전체 편집 수",
 	"global-other-sites-edit-count": "다른 프로젝트",
 	"global-rename": "전역 이름 변경",
 	"global-rights": "전역 권한",
@@ -306,6 +308,8 @@
 	"patrollers": "점검자",
 	"patrols": "점검",
 	"patrols-desc": "점검한 {{PLURAL:$1|문서}} $2개",
+	"pc-accept": "보류 중인 변경 수락",
+	"pc-reject": "보류 중인 변경 거부",
 	"percent-of-edit-count": "편집 횟수 중 %",
 	"percent-of-tools": "도구 중 %",
 	"percentage": "퍼센트",
@@ -468,6 +472,7 @@
 	"user-page-desc": "사용자 문서의 크기는 $2 {{PLURAL:$1|바이트}}입니다",
 	"username": "사용자 이름",
 	"username-or-ip": "사용자 이름 또는 IPV4 또는 IPV6",
+	"username-ip-or-cidr": "사용자 이름, IP 주소 또는 CIDR 범위:",
 	"version": "버전 $1",
 	"view-source": "원본 보기",
 	"view-wikitext": "위키텍스트로 보기",

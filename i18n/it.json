@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"Ajeje Brazorf",
 			"Albe Albe460",
 			"Beta16",
 			"El Bux Del Cu",
@@ -494,6 +495,7 @@
 	"vote-msg": "$1 ha modificato $2 pagine di $3!",
 	"web-chat": "Connetti",
 	"wednesday": "Mercoledì",
+	"whois": "WHOIS",
 	"wiki": "Wiki",
 	"wiki-set-change": "Modifiche insieme di wiki",
 	"wikiproject": "WikiProject",
