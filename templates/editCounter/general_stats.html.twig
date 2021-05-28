@@ -344,7 +344,7 @@
         {% endif %}
 
         {# ======================== ADMIN ACTIONS ======================== #}
-        {% if adminStatus is defined %}
+        {% if adminStatus is defined and adminStatus == true %}
             <tbody class="stat-list--group">
                 <tr>
                     <td colspan="2" class="text-muted">{{ msg('actions-as-admin') }}</td>
