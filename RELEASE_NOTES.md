@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.13.2 ##
+- EditCounter: Fix display of block log info and admin actions.
+- Localization updates.
+
 ## 3.13.1 ##
 - GlobalContribs: cleaner display of IP addresses within ranges.
 
