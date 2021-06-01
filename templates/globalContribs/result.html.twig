@@ -135,7 +135,7 @@
                 </td>
                 {% if user.isIpRange %}
                     {% set username = edit.user.username|replace({(substr): '…'}) %}
-                    <td>
+                    <td class="sort-entry--user" data-value="{{ username|lower }}">
                         {{ wiki.userLink(edit.user, edit.project, username|lower) }}
                     </td>
                 {% endif %}
