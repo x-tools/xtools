@@ -1,5 +1,11 @@
 # Release Notes #
 
+## 3.13.3 ##
+- AdminStats (T284070): Add content model changes
+- GlobalContribs (T284250): Fix display of project domain.
+- GlobalContribs: make the 'User' column sortable for IP ranges.
+- Localization updates.
+
 ## 3.13.2 ##
 - EditCounter: Fix display of block log info and admin actions.
 - Localization updates.
