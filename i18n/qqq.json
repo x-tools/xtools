@@ -98,6 +98,7 @@
 	"characters": "Term used to describe individual characters that make up the wikitext of an article.\n{{Identical|Character}}",
 	"comma-character": "{{Optional}}\nThe character to show separating values of a list. In most languages this is a comma.",
 	"considered-usernames": "detected usernames and known socks",
+	"contentmodel": "The term used to describe the type of page on a wiki. See [[mw:Manual:ContentHandler]] for more info. This is used to indicate how many times a user has changed the content model of a page.",
 	"contributions": "Term for edits that a users has made.",
 	"count": "General term for 'count'.\n{{Identical|Count}}",
 	"created-by": "Label for the creator of a page.",

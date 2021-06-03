@@ -33,6 +33,7 @@ parameters:
                 - suppressrevision
                 - undelete
                 - userrights
+                - editcontentmodel
             actions:
                 delete:
                     - delete/delete
@@ -65,6 +66,9 @@ parameters:
                     - extension: Abuse Filter
                     - abusefilter/modify
                     - abusefilter/create
+                contentmodel:
+                    - contentmodel/change
+                    - contentmodel/new
 
         patroller:
             user_group: patroller
