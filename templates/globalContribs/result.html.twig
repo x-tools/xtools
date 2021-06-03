@@ -131,7 +131,7 @@
                 </td>
                 <td class="sort-entry--project" data-value="{{ edit.project.domain }}">
                     {# Use project.domain here instead of title to preserve limited space in the interface #}
-                    <a href="{{ edit.project.url }}">{{ edit.project.domain|trim('.org') }}</a>
+                    <a href="{{ edit.project.url }}">{{ edit.project.domain|replace({'.org': ''}) }}</a>
                 </td>
                 {% if user.isIpRange %}
                     {% set username = edit.user.username|replace({(substr): '…'}) %}
