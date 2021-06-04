@@ -60,7 +60,7 @@ parameters:
                 merge:
                     - merge/merge
                 import:
-                    - import/import
+                    - import/interwiki
                     - import/upload
                 abusefilter:
                     - extension: Abuse Filter
