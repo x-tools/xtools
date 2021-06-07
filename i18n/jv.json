@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"Bennylin",
 			"Sumbukompor"
 		]
 	},
@@ -61,7 +62,7 @@
 	"bot-list": "Pratélan bot",
 	"bugs": "Tuma",
 	"bytes": "Bèt",
-	"categories": "Kategori",
+	"categories": "Katégori",
 	"category": "Kategori",
 	"category-search": "Golèk kategori",
 	"characters": "Karakter",

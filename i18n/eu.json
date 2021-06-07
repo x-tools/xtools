@@ -359,7 +359,7 @@
 	"tool-autoedits": "Aldaketa automatikoak",
 	"tool-autoedits-desc": "Ekarpen semi-automatikoen eta ez-automatikoen azterketa.",
 	"tool-blame": "Artikulu Blamerra",
-	"tool-blame-desc": "Orrialde bateko historian testu-gehiketa topatu",
+	"tool-blame-desc": "Emandako wikitestua duten edizioak bilatu",
 	"tool-categoryedits": "Kategoria aldaketak",
 	"tool-categoryedits-desc": "Kategoria zehatzetan egindako ekarpenei egindako analisia",
 	"tool-editcounter": "Edizio Kontagailua",
