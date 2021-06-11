@@ -96,7 +96,7 @@ class TopEditsController extends XtoolsController
             $this->start,
             $this->end,
             $this->limit,
-            $this->request->query->get('pagination', 0)
+            (int)$this->request->query->get('pagination', 0)
         );
 
         $topEditsRepo = new TopEditsRepository();

@@ -303,7 +303,7 @@ abstract class XtoolsController extends Controller
             $this->offset = strtotime($this->params['offset']);
         }
 
-        // Limit need to be an int.
+        // Limit needs to be an int.
         if (isset($this->params['limit'])) {
             // Normalize.
             $this->params['limit'] = max(0, (int)$this->params['limit']);

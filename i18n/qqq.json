@@ -373,7 +373,6 @@
 	"result-by-name": "Label for results by name or IP",
 	"result-by-time": "Label for Results by time",
 	"reverted": "Text indicating an edit was reverted.\n{{Identical|Reverted}}",
-	"reverted-desc": "Description of what it means that a edit was reverted in the TopEdits tool. It only detects surrounding edits, so the wording 'immediately following edit' is important.",
 	"reverted-edits": "Reverted edits of a user.",
 	"revision": "Label for field indicating a revision to a page.\n{{Identical|Revision}}",
 	"revision-delete": "Name of a MediaWiki log action, used as header of a row in the table of log action counts for a user.",
