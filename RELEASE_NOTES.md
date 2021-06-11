@@ -1,5 +1,12 @@
 # Release Notes #
 
+## 3.13.4 ##
+- TopEdits: show mw-reverted edits as reverted
+- Allow focusing on input elements by passing i.e. ?focus=username in
+  the URL, where 'username' is the value of the name attribute.
+- AdminStats (T284298): Fix detection of interwiki imports.
+- Localization updates.
+
 ## 3.13.3 ##
 - AdminStats (T284070): Add content model changes
 - GlobalContribs (T284250): Fix display of project domain.
