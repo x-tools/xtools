@@ -81,18 +81,18 @@
                             </td>
                         </tr>
                         <tr>
-                            <td><span class="color-icon" style="background:#fcf8e3"></span>{{ msg('reverted-edits') }}<sup>1</sup></td>
+                            <td><span class="color-icon" style="background:#fcf8e3"></span>{{ msg('reverted-edits') }}</td>
                             <td>
                                 {{ te.totalReverted|num_format }}
                                 ({{ te.totalReverted|percent_format(te.numTopEdits) }})
                             </td>
                         </tr>
                         <tr>
-                            <td>atbe<sup>2</sup></td>
+                            <td>atbe<sup>1</sup></td>
                             <td>{{ te.atbe|num_format(1) }}</td>
                         </tr>
                         <tr>
-                            <td class="stat-list--new-group">{{ msg('added-bytes') }}<sup>3</sup></td>
+                            <td class="stat-list--new-group">{{ msg('added-bytes') }}<sup>2</sup></td>
                             <td class="stat-list--new-group">{{ te.totalAdded|diff_format }}</td>
                         </tr>
                         <tr>
@@ -154,9 +154,8 @@
                 </div>
 
                 <div class="footnotes" style="clear:both">
-                    <sup>1</sup> {{ msg('reverted-desc') }}
-                    <br/><sup>2</sup> {{ msg('average-time-bw-edits') }}
-                    <br/><sup>3</sup> {{ msg('text-added-description') }} <span class="text-muted">({{ msg('approximate')|lower }})</span>
+                    <br/><sup>1</sup> {{ msg('average-time-bw-edits') }}
+                    <br/><sup>2</sup> {{ msg('text-added-description') }} <span class="text-muted">({{ msg('approximate')|lower }})</span>
                 </div>
 
                 <table class="table table-bordered table-hover table-striped top-editors-table">

@@ -43,6 +43,16 @@ $(function () {
         setupProjectListener();
         setupAutocompletion();
         displayWaitingNoticeOnSubmission();
+
+        // Allow to add focus to input elements with i.e. ?focus=username
+        if ('function' === typeof URL) {
+            const focusElement = new URL(window.location.href)
+                .searchParams
+                .get('focus');
+            if (focusElement) {
+                $(`[name=${focusElement}]`).focus();
+            }
+        }
     });
 
     // Re-init forms, workaround for issues with Safari and Firefox.

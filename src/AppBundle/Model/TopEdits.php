@@ -42,12 +42,12 @@ class TopEdits extends Model
      * TopEdits constructor.
      * @param Project $project
      * @param User $user
-     * @param Page $page
+     * @param Page|null $page
      * @param string|int $namespace Namespace ID or 'all'.
      * @param int|false $start Start date as Unix timestamp.
      * @param int|false $end End date as Unix timestamp.
-     * @param int $limit Number of rows to fetch. This defaults to DEFAULT_LIMIT_SINGLE_NAMESPACE if $this->namespace
-     *   is a single namespace (int), and DEFAULT_LIMIT_ALL_NAMESPACES if $this->namespace is 'all'.
+     * @param int|null $limit Number of rows to fetch. This defaults to DEFAULT_LIMIT_SINGLE_NAMESPACE if
+     *   $this->namespace is a single namespace (int), and DEFAULT_LIMIT_ALL_NAMESPACES if $this->namespace is 'all'.
      * @param int $pagination Which page of results to show.
      */
     public function __construct(
@@ -57,8 +57,8 @@ class TopEdits extends Model
         $namespace = 0,
         $start = false,
         $end = false,
-        $limit = null,
-        $pagination = 0
+        ?int $limit = null,
+        int $pagination = 0
     ) {
         $this->project = $project;
         $this->user = $user;
@@ -316,9 +316,9 @@ class TopEdits extends Model
         } else {
             // Length changes don't count if they were reverted.
             if ($revision['length_change'] > 0) {
-                $this->totalAdded += $revision['length_change'];
+                $this->totalAdded += (int)$revision['length_change'];
             } else {
-                $this->totalRemoved += $revision['length_change'];
+                $this->totalRemoved += (int)$revision['length_change'];
             }
         }
 

@@ -275,12 +275,30 @@ class TopEditsRepository extends UserRepository
     ): array {
         $project = $page->getProject();
         $revDateConditions = $this->getDateConditions($start, $end, false, 'revs.');
-        $revTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $commentTable = $this->getTableName($project->getDatabaseName(), 'comment');
+        $revTable = $project->getTableName('revision');
+        $commentTable = $project->getTableName('comment');
+        $tagTable = $project->getTableName('change_tag');
+        $tagDefTable = $project->getTableName('change_tag_def');
 
         if ($childRevs) {
-            $childSelect = ', (CASE WHEN childrevs.rev_sha1 = parentrevs.rev_sha1 THEN 1 ELSE 0 END) AS reverted,
-                childcomments.comment_text AS parent_comment';
+            $childSelect = ", (
+                    CASE WHEN
+                        childrevs.rev_sha1 = parentrevs.rev_sha1
+                        OR (
+                            SELECT 1
+                            FROM $tagTable
+                            WHERE ct_rev_id = revs.rev_id
+                            AND ct_tag_id = (
+                                SELECT ctd_id
+                                FROM $tagDefTable
+                                WHERE ctd_name = 'mw-reverted'
+                            )
+                        )
+                    THEN 1
+                    ELSE 0
+                    END
+                ) AS `reverted`,
+                childcomments.comment_text AS `parent_comment`";
             $childJoin = "LEFT JOIN $revTable AS childrevs ON (revs.rev_id = childrevs.rev_parent_id)
                 LEFT OUTER JOIN $commentTable AS childcomments
                 ON (childrevs.rev_comment_id = childcomments.comment_id)";
