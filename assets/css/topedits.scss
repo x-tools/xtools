@@ -9,3 +9,10 @@
         margin: 20px 0;
     }
 }
+
+@media (max-width: $bootstrap-sm) {
+    .basic-info-charts {
+        display: none;
+        margin-bottom: 0;
+    }
+}
