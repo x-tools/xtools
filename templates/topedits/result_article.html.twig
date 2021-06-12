@@ -109,48 +109,42 @@
                 </div>
             {% else %}
                 <div class="basic-info-charts clearfix">
-                    {{
-                    chart.pie_chart('minor_edis',
+                    {{ chart.pie_chart('minor_edis',
                         [{
                             label: msg('minor-edits'),
                             value: te.totalMinor,
                             percentage: (te.totalMinor / te.numTopEdits) * 100
                         },
-                            {
-                                label: msg('major-edits'),
-                                value: te.numTopEdits - te.totalMinor,
-                                percentage: 100 - ((te.totalMinor / te.numTopEdits) * 100)
-                            }]
-                    )
-                    }}
-                    {{
-                    chart.pie_chart('auto_edis',
+                        {
+                            label: msg('major-edits'),
+                            value: te.numTopEdits - te.totalMinor,
+                            percentage: 100 - ((te.totalMinor / te.numTopEdits) * 100)
+                        }]
+                    ) }}
+                    {{ chart.pie_chart('auto_edis',
                         [{
                             label: msg('auto-edits'),
                             value: te.totalAutomated,
                             percentage: (te.totalAutomated / te.numTopEdits) * 100
                         },
-                            {
-                                label: msg('manual-edits'),
-                                value: te.numTopEdits - te.totalAutomated,
-                                percentage: 100 - ((te.totalAutomated / te.numTopEdits) * 100)
-                            }]
-                    )
-                    }}
-                    {{
-                    chart.pie_chart('reverted_edis',
+                        {
+                            label: msg('manual-edits'),
+                            value: te.numTopEdits - te.totalAutomated,
+                            percentage: 100 - ((te.totalAutomated / te.numTopEdits) * 100)
+                        }]
+                    ) }}
+                    {{ chart.pie_chart('reverted_edis',
                         [{
                             label: msg('reverted-edits'),
                             value: te.totalReverted,
                             percentage: (te.totalReverted / te.numTopEdits) * 100
                         },
-                            {
-                                label: msg('unreverted-edits'),
-                                value: te.numTopEdits - te.totalReverted,
-                                percentage: 100 - ((te.totalReverted / te.numTopEdits) * 100)
-                            }]
-                    )
-                    }}
+                        {
+                            label: msg('unreverted-edits'),
+                            value: te.numTopEdits - te.totalReverted,
+                            percentage: 100 - ((te.totalReverted / te.numTopEdits) * 100)
+                        }]
+                    ) }}
                 </div>
 
                 <div class="footnotes" style="clear:both">

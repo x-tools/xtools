@@ -45,6 +45,7 @@ Encore
         './assets/css/home.scss',
         './assets/css/meta.scss',
         './assets/css/pages.scss',
+        './assets/css/responsive.scss',
         './assets/css/topedits.scss'
     ])
 
