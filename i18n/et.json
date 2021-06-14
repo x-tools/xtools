@@ -264,7 +264,6 @@
 	"result": "Tulemus",
 	"result-by-name": "Tulemused kasutaja järgi",
 	"result-by-time": "Tulemused ajalises järjestuses",
-	"reverted-desc": "Muudatus loetakse tühistatuks, kui selle tühistab vahetult järgnev muudatus.",
 	"reverted-edits": "Tühistatud muudatusi",
 	"revision-delete": "Redaktsioonide kustutamisi",
 	"revision-id": "Redaktsiooni ID",

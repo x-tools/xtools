@@ -336,7 +336,6 @@
 	"result-by-name": "名前 / IP 順の結果",
 	"result-by-time": "日時順の結果",
 	"reverted": "差し戻し",
-	"reverted-desc": "差し戻された編集は、次の版の編集で直ちに差し戻された編集を指します。",
 	"reverted-edits": "差し戻された編集",
 	"revision": "版",
 	"revision-delete": "版指定閲覧レベル変更（秘匿）",

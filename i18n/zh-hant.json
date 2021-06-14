@@ -369,7 +369,6 @@
 	"result-by-name": "按名稱 / IP 顯示結果",
 	"result-by-time": "按時間顯示結果",
 	"reverted": "已回退",
-	"reverted-desc": "已回退編輯數是指在一筆編輯完成後，立刻給回退的次數",
 	"reverted-edits": "被回退編輯數",
 	"revision": "修訂",
 	"revision-delete": "修訂刪除",

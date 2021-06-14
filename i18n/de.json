@@ -15,6 +15,7 @@
 			"Mirzali",
 			"Nemo bis",
 			"Tobi 406",
+			"Umlaut",
 			"WikiBayer"
 		]
 	},
@@ -371,7 +372,6 @@
 	"result-by-name": "Ergebnis nach IP/Name",
 	"result-by-time": "Ergebnis nach Zeit",
 	"reverted": "Zurückgesetzt",
-	"reverted-desc": "Zurückgesetzte Bearbeitungen sind solche, die mit der unmittelbar darauffolgenden Bearbeitung zurückgesetzt wurden.",
 	"reverted-edits": "Zurückgesetzte Bearbeitungen",
 	"revision": "Version",
 	"revision-delete": "Versionslöschung",
@@ -413,7 +413,7 @@
 	"talk": "Diskussion",
 	"templates": "Vorlagen",
 	"text": "Text",
-	"text-added-description": "Hinzugefügter Text ist jede positive Hinzufügung, die nicht bei der nächsten Bearbeitung zurückgesetzt wurde.",
+	"text-added-description": "Hinzugefügter Text ist jede positive Hinzufügung, die nicht zurückgesetzt wurde.",
 	"text-to-serach": "Suchtext",
 	"thank": "Dankeschön",
 	"thursday": "Donnerstag",
@@ -506,6 +506,7 @@
 	"vote-msg": "$1 hat $2 $3-Seiten bearbeitet!",
 	"web-chat": "Verbinden",
 	"wednesday": "Mittwoch",
+	"whois": "WHOIS",
 	"wiki": "Wiki",
 	"wiki-set-change": "Wikisatzänderung",
 	"wikiproject": "Wikiprojekt",

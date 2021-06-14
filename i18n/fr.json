@@ -374,7 +374,6 @@
 	"result-by-name": "Résultat par nom / adresse IP",
 	"result-by-time": "Résultat par horodatage",
 	"reverted": "Révoqué",
-	"reverted-desc": "Une modification révoquée est une version qui a été annulée dans la version qui la suit immédiatement",
 	"reverted-edits": "Modifications annulées",
 	"revision": "Version",
 	"revision-delete": "Suppression de version",
