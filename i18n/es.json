@@ -2,6 +2,7 @@
 	"@metadata": {
 		"authors": [
 			"2axterix2",
+			"Agent",
 			"DannyS712",
 			"Dgstranz",
 			"Fitoschido",
@@ -406,7 +407,7 @@
 	"talk": "Discusión",
 	"templates": "Plantillas",
 	"text": "Texto",
-	"text-added-description": "Texto añadido es cualquier adición positiva que no se revirtió en la siguiente edición",
+	"text-added-description": "Texto añadido es cualquier adición positiva que no se revirtió",
 	"text-to-serach": "Texto a buscar",
 	"thank": "Agradecer",
 	"thursday": "jueves",

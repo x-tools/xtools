@@ -53,6 +53,7 @@
 	"num-pageviews": "{{PLURAL:$1|版瀏覽數|版瀏覽數}}",
 	"num-revisions-since": "自 $3 以來嘅 $1 個{{PLURAL:$2|修訂|修訂}}",
 	"num-seconds": "{{PLURAL:$1|秒}}",
+	"num-watchers": "{{PLURAL:$1|監視者|監視者}}",
 	"num-weeks": "{{PLURAL:$1|個禮拜}}",
 	"num-years": "{{PLURAL:$1|年}}",
 	"original-size": "原本大細",

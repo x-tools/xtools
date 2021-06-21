@@ -410,7 +410,7 @@
 	"talk": "討論",
 	"templates": "模板",
 	"text": "文字",
-	"text-added-description": "添加文字是指沒被下一次編輯操作給回退的確實添加內容",
+	"text-added-description": "添加文字是指未被回退的增加內容",
 	"text-to-serach": "要搜尋的文字",
 	"thank": "感謝",
 	"thursday": "星期四",
