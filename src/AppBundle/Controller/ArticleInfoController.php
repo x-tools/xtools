@@ -108,7 +108,7 @@ class ArticleInfoController extends XtoolsController
             $script .= $this->get('kernel')->getProjectDir().
                 "/node_modules/uglify-es/bin/uglifyjs $tmpFile --mangle " .
                 "&& rm $tmpFile >/dev/null";
-            $process = new Process([$script]);
+            $process = Process::fromShellCommandline($script);
             $process->run();
 
             // Check for errors.
