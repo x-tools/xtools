@@ -776,9 +776,7 @@
                         <td class="sort-entry--minor-edits-percentage" data-value="{{ year_minor_percent }}">{{ year_minor_percent }}</td>
                         <td>
                             {% for event, count in stats.events %}
-                                <span class="comma-separated">
-                                    {{ count|num_format }} {{ msg('num-'~event, [count]) }}
-                                </span>
+                                {{ count|num_format }} {{ msg('num-'~event, [count]) }}{% if not(loop.last) %}{{ msg('comma-character') }} {% endif %}
                             {% endfor %}
                         </td>
                     </tr>

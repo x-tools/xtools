@@ -584,15 +584,6 @@ input.form-control.show-loader {
     width: 20px;
 }
 
-.comma-separated {
-    &::after {
-        content: ',';
-    }
-    &:last-child::after {
-        content: '';
-    }
-}
-
 .rm-inline-margin {
     margin-right: -4px;
 }
