@@ -281,7 +281,7 @@ class ArticleInfoApi extends Model
                 'editors' => (int) $info['num_editors'],
                 'minor_edits' => (int) $info['minor_edits'],
                 'author' => $info['author'],
-                'author_editcount' => (int) $info['author_editcount'],
+                'author_editcount' => null === $info['author_editcount'] ? null : (int) $info['author_editcount'],
                 'created_at' => $creationDateTime,
                 'created_rev_id' => $info['created_rev_id'],
                 'modified_at' => $modifiedDateTime->format('Y-m-d H:i'),

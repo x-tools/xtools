@@ -19,7 +19,8 @@
 {% if data.error is not defined and data.author is not empty -%}
     {{ msg('comma-character') }}
     {{ msg('created-by')|lower }}: {{ wiki.userLink(data.author, project) }}
-    (<a target="_blank" href="{{ url('EditCounterResult', { 'project': project.domain, 'username': data.author }) }}">{{ data.author_editcount|num_format }}</a>)
+    {# IPs have an edit count of null for performance reasons, so we simply don't show anything #}{% if data.author_editcount != null %}
+    (<a target="_blank" title="{{ msg('approximate') }}" href="{{ url('EditCounterResult', { 'project': project.domain, 'username': data.author }) }}">{{ data.author_editcount|num_format }}</a>){% endif %}
 {% endif %}
  &middot;
 <a target="_blank" href="{{ url('ArticleInfoResult', { 'project': project.domain, 'page': page.title }) }}">{{ msg('see-full-page-stats') }}</a>
