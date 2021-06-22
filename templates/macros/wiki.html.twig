@@ -96,7 +96,7 @@
     {% else %}
         {% set path = project.articlePath|replace({'$1': 'User:' ~ username|replace({' ': '_'})}) %}
     {% endif %}
-    {{ extLink((project.url|trim('/')) ~ path, username, label) }}
+    <bdi>{{ extLink((project.url|trim('/')) ~ path, username, label) }}</bdi>
 {% endapply %}{% endmacro %}
 
 {# `user` can be of type `User` or string (username) #}
