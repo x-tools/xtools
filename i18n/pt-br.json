@@ -5,6 +5,7 @@
 			"Eduardoaddad",
 			"Fitoschido",
 			"He7d3r",
+			"Isabelle Belato",
 			"Leosls",
 			"Tks4Fish"
 		]
@@ -274,7 +275,7 @@
 	"num-moves": "{{PLURAL:$1|moção|moções}}",
 	"num-namespaces": "{{PLURAL:$1|espaço nominal|espaços nominais}}",
 	"num-others": "{{PLURAL:$1|outro|outros}}",
-	"num-pageviews": "{{PLURAL:$1|página vista|páginas vistas}}",
+	"num-pageviews": "{{PLURAL:$1|visualização|visualizações}}",
 	"num-protections": "{{PLURAL:$1|proteção|proteções}}",
 	"num-revisions": "{{PLURAL: $1|Revisão|Revisões}}",
 	"num-revisions-processed": "$1 processadas",
