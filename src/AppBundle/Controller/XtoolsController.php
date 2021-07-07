@@ -613,6 +613,8 @@ abstract class XtoolsController extends Controller
             'tool',
             'tools',
             'q',
+            'include_pattern',
+            'exclude_pattern',
 
             // Legacy parameters.
             'user',

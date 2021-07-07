@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+{% import 'macros/layout.html.twig' as layout %}
+{% import 'macros/wiki.html.twig' as wiki %}
+
+{% block body %}
+<div class="panel panel-primary">
+    <header class="panel-heading">
+        <div class="text-center xt-heading-top">
+            <a target="_blank" href="https://www.mediawiki.org/wiki/Special:MyLanguage/XTools/LargestPages" class="pull-right glyphicon glyphicon-question-sign plainlink help-icon"></a>
+            <a class="back-to-search" href="{{ path('LargestPages', {'project': lp.project}) }}">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                {{ msg('back') }}
+            </a>
+            <a target="_blank" href="{{ project.url }}">{{ project.title }}</a>
+        </div>
+    </header>
+
+    <div class="panel-body xt-panel-body">
+        <h3 class="text-center">{{ msg('tool-largestpages') }}</h3>
+        {% set content %}
+            <div class="col-lg-12 stat-list">
+                <table class="table"><tbody>
+                    <tr>
+                        <td>{{ msg('project') }}</td>
+                        <td>{{ lp.project.domain }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ msg('namespace') }}</td>
+                        <td>{{ nsName(lp.namespace, lp.project.namespaces) }}</td>
+                    </tr>
+                    {% if lp.includePattern is not empty %}
+                        <tr>
+                            <td>{{ msg('pages-inclusion-pattern') }}</td>
+                            <td><code>{{ lp.includePattern }}</code></td>
+                        </tr>
+                    {% endif %}
+                    {% if lp.excludePattern is not empty %}
+                        <tr>
+                            <td>{{ msg('pages-exclusion-pattern') }}</td>
+                            <td><code>{{ lp.excludePattern }}</code></td>
+                        </tr>
+                    {% endif %}
+                    </tbody></table>
+            </div>
+        {% endset %}
+        {{ layout.content_block('summary', content) }}
+
+        {% set content %}
+            <table class="table table-bordered table-hover table-striped pages-table xt-show-hide--target">
+                <thead><tr>
+                    <th>#</th>
+                    {% for thKey in ['page-title', 'size', 'links'] %}
+                        <th>
+                            <span class="sort-link sort-link--{{ thKey }}" data-column="{{ thKey }}">
+                                {{ msg(thKey)|ucfirst }}
+                                <span class="glyphicon glyphicon-sort"></span>
+                            </span>
+                        </th>
+                    {% endfor %}
+                </tr></thead>
+                <tbody>
+                    {% for page in lp.results %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+{#                            <td class="sort-entry--assessment" data-value="{{ page.assessment }}"#}
+                            <td class="sort-entry--page-title" data-value="{{ page.title(true) }}">
+                                {{ wiki.pageLinkRaw(page.title(true), project) }}
+                            </td>
+                            <td class="sort-entry--size" data-value="{{ page.length }}">
+                                {{ page.length|num_format }}
+                            </td>
+                            <td>
+                                {{ wiki.pageHistLinkRaw(page.title(true), project) }}
+                                &middot;
+                                <a href="{{ url('ArticleInfoResult', {'project': project.domain, 'page': page.title(true)}) }}">{{ msg('tool-articleinfo') }}</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endset %}
+        {% set downloadLink %}
+            {{ layout.downloadLink('LongestPagesResult', {'project': project.domain, 'namespace': lp.namespace, 'include_pattern': lp.includePattern, 'exclude_pattern': lp.excludePattern}, [], 'ProjectApiLargestPages') }}
+        {% endset %}
+        {{ layout.content_block('tool-largestpages', content, [downloadLink], null, false, false) }}
+    </div>
+</div>
+{% endblock %}

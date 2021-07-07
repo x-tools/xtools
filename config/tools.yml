@@ -11,6 +11,7 @@ parameters:
     - AutoEdits
     - CategoryEdits
     - AdminStats
+    - LargestPages
     - AdminScore
     - EditSummary
     - RfX

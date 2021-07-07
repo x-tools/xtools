@@ -91,6 +91,7 @@ class TopNavExtensionTest extends TestAdapter
             'Admin Stats',
             'Patroller Stats',
             'Steward Stats',
+            'Largest Pages',
         ], array_values($this->topNavExtension->topNavProject()));
     }
 }

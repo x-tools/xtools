@@ -88,7 +88,7 @@ class Edit extends Model
     {
         return array_map(function ($rev) use ($project, $user) {
             /** @var Page $page Page object to be passed to the Edit constructor. */
-            $page = Page::newFromRev($project, $rev);
+            $page = Page::newFromRow($project, $rev);
             $rev['user'] = $user;
 
             return new self($page, $rev);
