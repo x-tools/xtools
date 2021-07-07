@@ -155,9 +155,21 @@
     </table>
     {{ layout.contributionsNav(gc.offset, gc.globalEdits|length, gc.pageSize) }}
 {% else %}
-    <div class="alert alert-info">
-        {{ msg('no-contribs') }}
-    </div>
+    {% if nsName(gc.namespace, project.namespaces) == msg('unknown') and gc.user.isAnon %}
+        <div class="alert alert-warning">
+            <p>{{ msg('global-contribs-ip-range-warning-1', ['<strong>' ~ gc.user.prettyUsername ~ '</strong>', '<strong>' ~ gc.namespace ~ '</strong>']) }}</p>
+            {% set ipRangeLink -%}
+                <a href="{{ path('GlobalContribsResult', {username: 'ipr-' ~ gc.user.username ~ '/' ~ gc.namespace, start: gc.startDate, end: gc.endDate}) }}">
+                    {{ gc.user.username }}/{{ gc.namespace -}}
+                </a>
+            {%- endset %}
+            <p>{{ msg('global-contribs-ip-range-warning-2', [ipRangeLink]) }}</p>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            {{ msg('no-contribs') }}
+        </div>
+    {% endif %}
 {% endif %}
 
 {% if not is_sub_request %}

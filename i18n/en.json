@@ -168,6 +168,8 @@
 	"global-account-un-lock": "Global lock/unlock",
 	"global-block": "Global block",
 	"global-block-log": "Global block log",
+	"global-contribs-ip-range-warning-1": "No contributions found for $1 in the namespace with ID $2.",
+	"global-contribs-ip-range-warning-2": "Did you mean to search for the IP range $1?",
 	"global-edit-count": "Global edit count",
 	"global-other-sites-edit-count": "Other projects",
 	"global-rename": "Global rename",
