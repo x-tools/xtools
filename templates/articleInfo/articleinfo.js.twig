@@ -1,8 +1,9 @@
 /**
  * XTools ArticleInfo gadget
  * Based on meta.wikimedia.org/wiki/User:Hedonil/XTools
- * Documentation: mediawiki.org/wiki/XTools
- * Released under GPL v3 license
+ * Documentation: mediawiki.org/wiki/XTools/ArticleInfo_gadget
+ * Released under GPL 3.0+ license
+ * For updates, please copy and paste from {{ url('ArticleInfoGadget')|raw }}
  */
 $(function () {
     if (mw.config.get('wgArticleId') === 0 || // no deleted articles, no special pages
@@ -27,8 +28,7 @@ $(function () {
     }, 300);
 
     $.get(
-        '{{ app.request.getSchemeAndHttpHost()|raw }}' +
-        '/api/page/articleinfo/' +
+        '{{ app.request.getSchemeAndHttpHost()|raw }}/api/page/articleinfo/' +
         mw.config.get('wgServerName') + '/' +
         mw.config.get('wgPageName').replace(/["?%&+]/g, escape) + '?format=html' +
         '&uselang=' + mw.config.get('wgUserLanguage')
