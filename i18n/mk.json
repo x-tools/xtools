@@ -168,6 +168,8 @@
 	"global-account-un-lock": "Глобално заклучување/отклучување",
 	"global-block": "Глобален блок",
 	"global-block-log": "Дневник на глобални блокирања",
+	"global-contribs-ip-range-warning-1": "Не пронајдов придонеси за $1 во именскиот простор со назнака $2.",
+	"global-contribs-ip-range-warning-2": "Дали сакавте да го пребарате IP-опсегот $1?",
 	"global-edit-count": "Глобален број на уредувања",
 	"global-other-sites-edit-count": "Други проекти",
 	"global-rename": "Глобално преименување",

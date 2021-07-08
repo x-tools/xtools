@@ -183,6 +183,8 @@
 	"global-account-un-lock": "Verrouillage ou déverrouillage global",
 	"global-block": "Blocage global",
 	"global-block-log": "Journal global des blocages",
+	"global-contribs-ip-range-warning-1": "Aucune contribution trouvée pour $1 dans l’espace de noms avec l’ID $2.",
+	"global-contribs-ip-range-warning-2": "Vouliez-vous dire rechercher pour la plage d’adresses IP $1 ?",
 	"global-edit-count": "Nombre global de modifications",
 	"global-other-sites-edit-count": "Autres projets",
 	"global-rename": "Renommage global",

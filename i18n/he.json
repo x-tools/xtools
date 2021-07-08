@@ -178,6 +178,8 @@
 	"global-account-un-lock": "נעילה/ביטול נעילה גלובלית",
 	"global-block": "חסימות גלובליות",
 	"global-block-log": "יומן חסימות גלובליות",
+	"global-contribs-ip-range-warning-1": "לא נמצאו תרומות של $1 במרחב שם בעל המזהה $2.",
+	"global-contribs-ip-range-warning-2": "האם התכוונת לחפש את טווח ה־IP‏ $1?",
 	"global-edit-count": "מספר עריכות גלובלי",
 	"global-other-sites-edit-count": "מיזמים אחרים",
 	"global-rename": "שינוי שם גלובלי",

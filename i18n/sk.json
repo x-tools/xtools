@@ -167,6 +167,8 @@
 	"global-account-un-lock": "Globálne zamknutie/odomknutie",
 	"global-block": "Globálne blokovanie",
 	"global-block-log": "Záznam globálnych blokovaní",
+	"global-contribs-ip-range-warning-1": "Neboli nájdené žiadne príspevky pre $1 v menných priestoroch s ID $2 .",
+	"global-contribs-ip-range-warning-2": "Chceli ste hľadať rozsah IP adries $1 ?",
 	"global-edit-count": "Globálny počet úprav",
 	"global-other-sites-edit-count": "Iné projekty",
 	"global-rename": "Globálne premenovanie",

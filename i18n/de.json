@@ -181,6 +181,8 @@
 	"global-account-un-lock": "Globale Sperre/Freigabe",
 	"global-block": "Globale Sperre",
 	"global-block-log": "Globales Sperr-Logbuch",
+	"global-contribs-ip-range-warning-1": "Keine Beiträge für $1 im Namensraum mit der ID $2 gefunden.",
+	"global-contribs-ip-range-warning-2": "Willst du nach dem IP-Bereich $1 suchen?",
 	"global-edit-count": "Anzahl der Bearbeitungen in allen Wikis",
 	"global-other-sites-edit-count": "Andere Projekte",
 	"global-rename": "Globale Umbenennung",
