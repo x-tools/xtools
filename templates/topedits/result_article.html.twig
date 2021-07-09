@@ -176,8 +176,7 @@
                         <td>
                             {{ wiki.diffLink(rev) }}
                             &middot;
-                            {% set offset = date(rev.year ~ '-' ~ rev.month ~ '-01')|date('Ymt') ~ '235959' %}
-                            {{ wiki.pageHistLink(page, msg('history'), offset) }}
+                            {{ wiki.pageHistLink(page, msg('history'), (rev.timestamp|date('U') + 1)|date('YmdHis')) }}
                         </td>
                         <td class="sort-entry--size" data-value="{{ rev.size }}">
                             {{ rev.size|diff_format }}
