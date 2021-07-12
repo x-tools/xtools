@@ -182,6 +182,7 @@
 	"global-account-un-lock": "Глобальные блокировки\\разблокировки",
 	"global-block": "Глобальная блокировка",
 	"global-block-log": "Журнал глобальных блокировок",
+	"global-contribs-ip-range-warning-1": "Не найдено вкладов для $1 в пространстве имен с идентификатором $2.",
 	"global-edit-count": "Глобальное число правок",
 	"global-other-sites-edit-count": "Другие проекты",
 	"global-rename": "Глобальное переименование",

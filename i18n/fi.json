@@ -449,6 +449,7 @@
 	"user-page-desc": "Käyttäjäsivun koko on $2 {{PLURAL:$1|tavu|tavua}}",
 	"username": "Käyttäjänimi",
 	"username-or-ip": "Käyttäjänimi tai IPv4-osoite tai IPv6-osoite",
+	"username-ip-or-cidr": "Käyttäjätunnus, IP-osoite tai CIDR-alue.",
 	"version": "Versio $1",
 	"view-source": "Lähdekoodi",
 	"view-wikitext": "Näytä wikitekstinä",
