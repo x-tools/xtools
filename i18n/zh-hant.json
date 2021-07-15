@@ -178,6 +178,8 @@
 	"global-account-un-lock": "全域封鎖/解鎖",
 	"global-block": "全域封禁",
 	"global-block-log": "全域封鎖日誌",
+	"global-contribs-ip-range-warning-1": "在 ID 為 $2 的命名空間裡找不到 $1 的貢獻。",
+	"global-contribs-ip-range-warning-2": "您是要搜尋 IP 範圍 $1 嗎？",
 	"global-edit-count": "全域編輯次數",
 	"global-other-sites-edit-count": "其它專案",
 	"global-rename": "全域重新命名",

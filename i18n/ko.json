@@ -164,6 +164,7 @@
 	"global-account-un-lock": "전역 잠금/잠금 해제",
 	"global-block": "전역 차단",
 	"global-block-log": "전역 차단 기록",
+	"global-contribs-ip-range-warning-2": "$1 IP 대역을 검색하려고 하셨습니까?",
 	"global-edit-count": "전체 편집 수",
 	"global-other-sites-edit-count": "다른 프로젝트",
 	"global-rename": "전역 이름 변경",
