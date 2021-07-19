@@ -176,6 +176,8 @@
 	"global-account-un-lock": "Küresel kilitle/kilidi aç",
 	"global-block": "Küresel engelleme",
 	"global-block-log": "Küresel engelleme günlüğü",
+	"global-contribs-ip-range-warning-1": "$2 kimliğine sahip ad alanında $1 tarafından yapılan katkı bulunamadı.",
+	"global-contribs-ip-range-warning-2": "$1 IP aralığını mı aramak istediniz?",
 	"global-edit-count": "Küresel düzenleme sayısı",
 	"global-other-sites-edit-count": "Diğer projeler",
 	"global-rename": "Küresel yeniden adlandırma",
