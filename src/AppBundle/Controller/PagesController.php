@@ -90,7 +90,7 @@ class PagesController extends XtoolsController
      * @return Pages
      * @codeCoverageIgnore
      */
-    public function setUpPages(string $redirects, string $deleted): Pages
+    protected function setUpPages(string $redirects, string $deleted): Pages
     {
         if ($this->user->isIpRange()) {
             $this->params['username'] = $this->user->getUsername();

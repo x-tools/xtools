@@ -38,10 +38,10 @@
                     {% endif %}
                     {% for thKey in columns %}
                         <th>
-                                <span class="sort-link sort-link--{{ thKey }}" data-column="{{ thKey }}">
-                                    {{ msg(thKey)|ucfirst }}
-                                    <span class="glyphicon glyphicon-sort"></span>
-                                </span>
+                            <span class="sort-link sort-link--{{ thKey }}" data-column="{{ thKey }}">
+                                {{ msg(thKey)|ucfirst }}
+                                <span class="glyphicon glyphicon-sort"></span>
+                            </span>
                         </th>
                     {% endfor %}
                     <th>{{ msg('links') }}</th>

@@ -32,6 +32,12 @@ class Page extends Model
     /** @var int Number of Wikidata sitelinks for this page. */
     protected $numWikidataItems;
 
+    /** @var string Title of the page. */
+    protected $pageTitle;
+
+    /** @var int Length of the page in bytes. */
+    protected $length;
+
     /**
      * Page constructor.
      * @param Project $project
@@ -44,23 +50,28 @@ class Page extends Model
     }
 
     /**
-     * Get a Page instance given a revision row (JOINed on the page table).
+     * Get a Page instance given a database row (either from or JOINed on the page table).
      * @param Project $project
-     * @param array $rev Must contain 'page_title' and 'page_namespace'.
+     * @param array $row Must contain 'page_title' and 'page_namespace'. May contain 'page_len'.
      * @return static
      */
-    public static function newFromRev(Project $project, array $rev): self
+    public static function newFromRow(Project $project, array $row): self
     {
-        $namespaces = $project->getNamespaces();
-        $pageTitle = $rev['page_title'];
+        $pageTitle = $row['page_title'];
 
-        if (0 === (int)$rev['page_namespace']) {
+        if (0 === (int)$row['page_namespace']) {
             $fullPageTitle = $pageTitle;
         } else {
-            $fullPageTitle = $namespaces[$rev['page_namespace']].":$pageTitle";
+            $namespaces = $project->getNamespaces();
+            $fullPageTitle = $namespaces[$row['page_namespace']].":$pageTitle";
         }
 
-        return new self($project, $fullPageTitle);
+        $page = new self($project, $fullPageTitle);
+        if (isset($row['page_len'])) {
+            $page->length = (int)$row['page_len'];
+        }
+
+        return $page;
     }
 
     /**
@@ -133,8 +144,12 @@ class Page extends Model
      */
     public function getLength(): ?int
     {
+        if (isset($this->length)) {
+            return $this->length;
+        }
         $info = $this->getPageInfo();
-        return isset($info['length']) ? (int)$info['length'] : null;
+        $this->length = isset($info['length']) ? (int)$info['length'] : null;
+        return $this->length;
     }
 
     /**
