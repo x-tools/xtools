@@ -328,7 +328,6 @@
 	"show-sections-desc": "Chọn thống kê để hiển thị. Sẽ mất nhiều thời gian hơn nếu bạn chọn nhiều.",
 	"simple-counter-limited-results": "Người dùng này đã thực hiện một số lượng sửa đổi rất lớn. Chỉ hiển thị kết quả hạn chế.",
 	"size": "Kích thước",
-	"size-gigabytes": "$1 GB",
 	"size-kilobytes": "$1 kB",
 	"size-over-time": "Kích cỡ bài viết qua thời gian",
 	"size-terabytes": "$1 TB",

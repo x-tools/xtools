@@ -257,7 +257,7 @@
 	"num-categories": "{{PLURAL:$1|رده|رده}}",
 	"num-days": "{{PLURAL: $1|روز|روز}}",
 	"num-deletions": "{{PLURAL:$1|حذف|حذف}}",
-	"num-edits": "{{PLURAL:$1|ٹگلݔنگ|ٹگلݔنگ}}",
+	"num-edits": "{{PLURAL:$1|ویرایش|ویرایش}}",
 	"num-editors": "{{PLURAL:$1|ویرایش‌کننده|ویرایش‌کننده}}",
 	"num-hours": "{{PLURAL: $1|ساعت|ساعت}}",
 	"num-minutes": "{{PLURAL: $1|دقیقه|دقیقه}}",

@@ -512,7 +512,7 @@
 	"vote-msg": "$1 is the username, $2 is the number, $3 is the name of vote page e.g.: Requests for adminship",
 	"web-chat": "Text for link to the XTools IRC channel.\n{{Identical|Connect}}",
 	"wednesday": "{{Identical|Wednesday}}",
-	"whois": "Label for link to get WHOIS information about an IP address.",
+	"whois": "{{Optional}}\n\nLabel for link to get WHOIS information about an IP address.",
 	"wiki": "Short label for Wiki\n{{Identical|Wiki}}",
 	"wiki-set-change": "Label for MediaWiki action done by stewards that changes the wiki sets. See [[meta:Special:WikiSets]] for possible translations.",
 	"wikiproject": "{{Identical|WikiProject}}",
