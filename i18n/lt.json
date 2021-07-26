@@ -379,7 +379,6 @@
 	"size-kilobytes": "$1 KiB",
 	"size-megabytes": "$1 MiB",
 	"size-over-time": "Dydis laikui bėgant",
-	"size-terabytes": "$1 TB",
 	"small-edits": "Maži pakeitimai (<20 baitų)",
 	"start": "Pradžios data",
 	"steward-stats-notice": "Rodomi tik tie vartotojai, kurie per tam tikrą laikotarpį atliko bent vieną valdytojo veiksmą.",

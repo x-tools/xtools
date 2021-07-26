@@ -392,7 +392,6 @@
 	"size-kilobytes": "$1 kbyte",
 	"size-megabytes": "$1 Mbyte",
 	"size-over-time": "Artikelstorlek över tid",
-	"size-terabytes": "$1 TB",
 	"small-edits": "Små redigeringar (under 20 byte)",
 	"start": "Startdatum",
 	"steward-stats-notice": "Endast användare som har gjort minst en stewardåtgärd inom tidsperioden visas.",

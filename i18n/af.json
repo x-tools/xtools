@@ -16,6 +16,5 @@
 	"size-gigabytes": "$1 GG",
 	"size-kilobytes": "$1 KG",
 	"size-megabytes": "$1 MG",
-	"size-terabytes": "$1 TB",
 	"total-page-size": "Totale bladsygrootte"
 }

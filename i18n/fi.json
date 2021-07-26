@@ -405,6 +405,7 @@
 	"tool-error": "Virhe",
 	"tool-globalcontribs": "Järjestelmänlaajuiset muokkaukset",
 	"tool-globalcontribs-desc": "Näytä käyttäjän muokkaukset kaikista wikiprojekteista",
+	"tool-largestpages": "Suurimmat sivut",
 	"tool-pages": "Luodut sivut",
 	"tool-pages-desc": "Näytä käyttäjän luomat sivut",
 	"tool-patrollerstats": "Partioijan tilastot",
