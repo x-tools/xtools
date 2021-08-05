@@ -3,6 +3,7 @@
 		"authors": [
 			"Fitoschido",
 			"Nemo bis",
+			"Tokvo",
 			"Xuacu"
 		]
 	},
@@ -178,6 +179,7 @@
 	"how-calculated": "Cómo se calcula esta puntuación",
 	"import": "Importar",
 	"importance": "Importancia",
+	"inclusion-pattern": "Incluir namás páxines con títulos que coincidan col patrón dau",
 	"invalid-date": "Data inválida",
 	"invalid-project": "$1 nun ye un proyectu válidu",
 	"invalid-project-cant-use": "$1 nun ta configuráu pa usar esta ferramienta",
