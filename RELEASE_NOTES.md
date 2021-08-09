@@ -1,5 +1,18 @@
 # Release Notes #
 
+## 3.14.0 ##
+- LargestPages: new tool to view the largest pages on a wiki.
+- GlobalContribs: show warning when requesting IP and unknown namespace.
+- TopEdits: change 'hist' links to link to page history starting with
+  the edit in question.
+- ArticleInfo: retire the uglified version of the gadget.
+- Bump Node dependencies.
+- EditCounter (T224654): rm extraneous spacing from lists of log actions.
+- Add <bdi> around usernames for bi-directional support.
+- ArticleInfo: hide IP edit count from API output since it's always 0.
+- TopEdits: hide charts from mobile view.
+- Localization updates.
+
 ## 3.13.4 ##
 - TopEdits: show mw-reverted edits as reverted
 - Allow focusing on input elements by passing i.e. ?focus=username in
