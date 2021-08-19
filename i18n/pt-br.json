@@ -173,6 +173,8 @@
 	"global-account-un-lock": "Bloqueio/desbloqueio global",
 	"global-block": "Bloqueio global",
 	"global-block-log": "Registro de bloqueios globais",
+	"global-contribs-ip-range-warning-1": "Nenhuma contribuição encontrada para $1 no espaço nominal com ID $2.",
+	"global-contribs-ip-range-warning-2": "Você quis procurar o intervalo IP $1?",
 	"global-edit-count": "Contagem de edição global",
 	"global-other-sites-edit-count": "Outros projetos",
 	"global-rename": "Renomeação global",
