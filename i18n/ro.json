@@ -8,7 +8,7 @@
 			"WebSourceContentRO"
 		]
 	},
-	"abusefilter": "Filtru de abuz",
+	"abusefilter": "Filtru abuz",
 	"accepted-formats": "Formate acceptate",
 	"account-age": "Vechimea contului",
 	"account-age-desc": "acum $2 {{PLURAL:$1|zi|zile}}",
@@ -67,7 +67,7 @@
 	"blame-as-of": "La data de",
 	"blame-as-of-desc": "Utilizați acest lucru pentru a efectua o căutare în versiunile mai vechi ale articolului.",
 	"blame-query-desc": "Interogarea de căutare ar trebui să includă orice wikitext ascuns.",
-	"block": "Blocat",
+	"block": "Blocare",
 	"block-current": "Blocare actuală",
 	"block-log": "Jurnal de blocări",
 	"block-longest": "Cea mai lungă blocare",
