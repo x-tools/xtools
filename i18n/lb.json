@@ -202,7 +202,7 @@
 	"num-minutes": "{{PLURAL: $1|Minutt|Minutten}}",
 	"num-months": "{{PLURAL:$1|Mount|Méint}}",
 	"num-moves": "{{PLURAL:$1|Viruleedung|Viruleedungen}}",
-	"num-namespaces": "{{PLURAL:$1|Nummraum|Nummräim}}",
+	"num-namespaces": "{{PLURAL:$1|Nummraum|Nummraim}}",
 	"num-others": "{{PLURAL:$1|Aneren|Anerer}}",
 	"num-protections": "{{PLURAL:$1|Spär|Spären}}",
 	"num-revisions": "{{PLURAL:$1|Versioun|Versiounen}}",
