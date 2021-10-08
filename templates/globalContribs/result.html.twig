@@ -14,7 +14,7 @@
                     {{ msg('back') }}
                 </a>
                 {% if user.anon %}
-                    {{ user.prettyUsername }}
+                    {{ wiki.pageLinkRaw('Special:Contributions/' ~ user.username, project, user.prettyUsername) }}
                 {% else %}
                     {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, user.username) }}
                 {% endif %}
@@ -45,7 +45,11 @@
                         <tr>
                             <td>{{ msg('user') }}</td>
                             <td>
-                                {{ user.username }}
+                                {% if user.anon %}
+                                    {{ wiki.pageLinkRaw('Special:Contributions/' ~ user.username, project, user.prettyUsername) }}
+                                {% else %}
+                                    {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, user.username) }}
+                                {% endif %}
                             </td>
                         </tr>
                         {% if gc.namespace != 'all' or gc.namespace == '' %}
