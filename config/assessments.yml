@@ -270,19 +270,19 @@ parameters:
           weight: 5
         High:
           color: '#ffacff'
-          category: 'Category:Top-importance articles'
+          category: 'Category:High-importance articles'
           weight: 4
         Mid:
           color: '#ffc1ff'
-          category: 'Category:Top-importance articles'
+          category: 'Category:Mid-importance articles'
           weight: 3
         Low:
           color: '#ffd6ff'
-          category: 'Category:Top-importance articles'
+          category: 'Category:Low-importance articles'
           weight: 2
         Bottom:
           color: '#ffebff'
-          category: 'Category:Top-importance articles'
+          category: 'Category:Bottom-importance articles'
           weight: 1
         NA:
           color: '#f5f5f5'
