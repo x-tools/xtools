@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.14.1 ##
+- GlobalContribs: link to Special:CentralAuth or Special:Contribs in header.
+- ArticleInfo: fix categories for importance levels for en.wikipedia
+- Localization updates.
+
 ## 3.14.0 ##
 - LargestPages: new tool to view the largest pages on a wiki.
 - GlobalContribs: show warning when requesting IP and unknown namespace.
