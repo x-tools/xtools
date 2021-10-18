@@ -11,6 +11,7 @@
 			"Nguyễn Mạnh An",
 			"Phjtieudoc",
 			"SongNguKaze",
+			"Thingofme",
 			"Trần Nguyễn Minh Huy"
 		]
 	},
@@ -28,6 +29,7 @@
 	"admin-stats-notice2": "Một vài thành viên trước đây là BQV, hoặc không phải BQV nhưng có quyền sử dụng tác vụ BQV",
 	"admins": "Quản trị viên",
 	"afd": "Bài viết bị xóa",
+	"afd-desc": "$2 {{PLURAL:$1|sửa đổi}} trong các trang Biểu quyết xóa bài",
 	"all": "Tất cả",
 	"all-approximate": "Tất cả dữ liệu chỉ gần đúng",
 	"all-edits": "Tất cả các sửa đổi",
@@ -413,6 +415,7 @@
 	"view-source": "Xem mã nguồn",
 	"view-wikitext": "Xem bằng wikitext",
 	"vote-msg": "$1 đã sửa đổi $2 trang $3!",
+	"web-chat": "Kết nối",
 	"wednesday": "Thứ Tư",
 	"wiki": "Wiki",
 	"wikiproject": "Tiểu dự án Wiki",
