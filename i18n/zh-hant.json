@@ -309,7 +309,7 @@
 	"page-title": "頁面標題",
 	"page-watchers": "頁面監視者",
 	"pager-newer-n": "{{PLURAL:$1|較新 $1 筆}}",
-	"pager-older-n": "{{PLURAL:$1|較舊 $1 筆}}",
+	"pager-older-n": "{{PLURAL:$1|較早 $1 筆}}",
 	"pages": "頁面",
 	"pages-created": "已建立頁面",
 	"pages-created-deleted": "建立頁面數（已刪除）",
