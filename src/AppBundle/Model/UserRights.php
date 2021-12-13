@@ -225,8 +225,8 @@ class UserRights extends Model
             $unserialized = @unserialize($row['log_params']);
 
             if (false !== $unserialized) {
-                $old = $unserialized['4::oldgroups'];
-                $new = $unserialized['5::newgroups'];
+                $old = $unserialized['4::oldgroups'] ?? $unserialized['oldGroups'];
+                $new = $unserialized['5::newgroups'] ?? $unserialized['newGroups'];
                 $added = array_diff($new, $old);
                 $removed = array_diff($old, $new);
                 $oldMetadata = $unserialized['oldmetadata'] ?? null;
