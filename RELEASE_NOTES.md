@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.14.2 ##
+- EditCounter (T297592): fix parsing of global user rights changes.
+- Localization updates.
+
 ## 3.14.1 ##
 - GlobalContribs: link to Special:CentralAuth or Special:Contribs in header.
 - ArticleInfo: fix categories for importance levels for en.wikipedia
