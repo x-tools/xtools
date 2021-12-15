@@ -125,7 +125,10 @@
                             return days[index];
                         }
                     },
-                    position: i18nRTL ? 'right' : 'left'
+                    position: i18nRTL ? 'right' : 'left',
+                    gridLines: {
+                        color: xtools.application.chartGridColor
+                    }
                 }],
                 xAxes: [{
                     ticks: {
@@ -142,6 +145,9 @@
                                 return '';
                             }
                         }
+                    },
+                    gridLines: {
+                        color: xtools.application.chartGridColor
                     }
                 }]
             },

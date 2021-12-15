@@ -249,12 +249,18 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
                                 return value.toLocaleString(i18nLang);
                             }
                         }
+                    },
+                    gridLines: {
+                        color: xtools.application.chartGridColor
                     }
                 }],
                 yAxes: [{
                     stacked: true,
                     barThickness: 18,
-                    position: i18nRTL ? 'right' : 'left'
+                    position: i18nRTL ? 'right' : 'left',
+                    gridLines: {
+                        color: xtools.application.chartGridColor
+                    }
                 }]
             },
             legend: {

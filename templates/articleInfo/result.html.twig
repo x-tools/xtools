@@ -699,6 +699,9 @@
                                                 return value.toLocaleString(i18nLang);
                                             }
                                         }
+                                    },
+                                    gridLines: {
+                                        color: xtools.application.chartGridColor
                                     }
                                 }, {
                                     id: 'size',
@@ -718,8 +721,16 @@
                                                 return value.toLocaleString(i18nLang);
                                             }
                                         }
+                                    },
+                                    gridLines: {
+                                        color: xtools.application.chartGridColor
                                     }
                                 }],
+                                xAxes: [{
+                                    gridLines: {
+                                        color: xtools.application.chartGridColor
+                                    }
+                                }]
                             },
                         },
                     });

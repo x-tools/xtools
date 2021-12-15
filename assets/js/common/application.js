@@ -3,6 +3,14 @@ xtools.application = {};
 xtools.application.vars = {
     sectionOffset: {},
 };
+xtools.application.chartGridColor = 'rgba(0, 0, 0, 0.1)';
+
+if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    Chart.defaults.global.defaultFontColor = '#AAA';
+    // Can't set a global default with our version of Chart.js, apparently,
+    // so each chart initialization must explicitly set the grid line color.
+    xtools.application.chartGridColor = '#333';
+}
 
 /** global: i18nLang */
 /** global: i18nPaths */
