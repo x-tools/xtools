@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.14.3 ##
+- Rework dark mode styles.
+
 ## 3.14.2 ##
 - EditCounter (T297592): fix parsing of global user rights changes.
 - Localization updates.
