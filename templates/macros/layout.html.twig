@@ -122,17 +122,17 @@
     </div>
 {% endmacro %}
 
-{% macro contributionsNav(offset, length, pageSize = 50) %}
+{% macro contributionsNav(offset, length, limit = 50) %}
     <div class="contributions-nav clearfix">
         {% if offset %}
             <a href="#" class="pull-left contributions--prev">
                 <span class="glyphicon glyphicon-arrow-{% if isRTL() %}right{% else %}left{% endif %}"></span>
-                {{ msg('pager-newer-n', [pageSize])|ucfirst }}
+                <span class="contributions--prev-text">{{ msg('pager-newer-n', [limit])|ucfirst }}</span>
             </a>
         {% endif %}
-        {% if length == pageSize %}
+        {% if length == limit %}
             <a href="#" class="pull-right contributions--next">
-                {{ msg('pager-older-n', [pageSize])|ucfirst }}
+                <span class="contributions--next-text">{{ msg('pager-older-n', [limit])|ucfirst }}</span>
                 <span class="glyphicon glyphicon-arrow-{% if isRTL() %}left{% else %}right{% endif %}"></span>
             </a>
         {% endif %}
@@ -143,7 +143,7 @@
     <a target="_blank" href="https://www.mediawiki.org/wiki/Special:MyLanguage/XTools/API">{{ msg('api') }}</a>
 {% endmacro %}
 
-{% macro contributions(project, revs, offset, pageSize = 50) %}
+{% macro contributions(project, revs, offset, limit = 50) %}
     {% from _self import contributionsNav as contributionsNav %}
     {% import 'macros/wiki.html.twig' as wiki %}
 
@@ -152,7 +152,7 @@
             {{ msg('no-contribs') }}
         </div>
     {% else %}
-        {{ contributionsNav(offset, revs|length, pageSize) }}
+        {{ contributionsNav(offset, revs|length, limit) }}
         <table class="table table-bordered table-hover table-striped contributions-table">
             <thead>
                 {% for key in ['page-title', 'date', 'links', 'size', 'edit-summary'] %}
@@ -181,6 +181,6 @@
                 {% endfor %}
             </tbody>
         </table>
-        {{ contributionsNav(offset, revs|length, pageSize) }}
+        {{ contributionsNav(offset, revs|length, limit) }}
     {% endif %}
 {% endmacro %}

@@ -347,14 +347,10 @@ abstract class Repository
             $datesConditions .= " AND {$tableAlias}{$field} >= '$start'";
         }
 
-        // When we're given an $offset, it basically replaces $end, except it's also a full timestamp,
-        // and for pagination purposes we use < in the comparison instead of <= to prevent the last edit
-        // from the previous page being shown as the first on the next page. This matches MediaWiki
-        // behavior, which suggests it's not possible for two edits to be made in the same second (???).
-        // FIXME: For Global Contribs it's possible edits are made at the same second on different wikis.
+        // When we're given an $offset, it basically replaces $end, except it's also a full timestamp.
         if (is_int($offset)) {
             $offset = date('YmdHis', $offset);
-            $datesConditions .= " AND {$tableAlias}{$field} < '$offset'";
+            $datesConditions .= " AND {$tableAlias}{$field} <= '$offset'";
         } elseif (is_int($end)) {
             $end = date('Ymd', $end) . '235959';
             $datesConditions .= " AND {$tableAlias}{$field} <= '$end'";

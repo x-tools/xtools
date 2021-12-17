@@ -156,14 +156,15 @@ class AutomatedEditsController extends XtoolsController
     /**
      * Display the results.
      * @Route(
-     *     "/autoedits/{project}/{username}/{namespace}/{start}/{end}", name="AutoEditsResult",
+     *     "/autoedits/{project}/{username}/{namespace}/{start}/{end}/{offset}", name="AutoEditsResult",
      *     requirements={
      *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *         "namespace"="|all|\d+",
      *         "start"="|\d{4}-\d{2}-\d{2}",
      *         "end"="|\d{4}-\d{2}-\d{2}",
+     *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}",
      *     },
-     *     defaults={"namespace"=0, "start"=false, "end"=false}
+     *     defaults={"namespace"=0, "start"=false, "end"=false, "offset"=false}
      * )
      * @return Response
      * @codeCoverageIgnore

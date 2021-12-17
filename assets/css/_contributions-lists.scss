@@ -1,0 +1,34 @@
+@import 'mixins.scss';
+
+.contributions-nav {
+  margin-bottom: 10px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.contributions-limit--wrapper {
+  @include prefix(transform, translateY(-5px));
+
+  label {
+    font-weight: normal;
+  }
+}
+
+.contributions-loading {
+  display: none;
+  float: left;
+}
+
+.contributions-container--loading {
+  opacity: 0.3;
+
+  .contributions-nav {
+    visibility: hidden;
+  }
+
+  .contributions-loading {
+    display: block;
+  }
+}

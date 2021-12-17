@@ -30,3 +30,11 @@ Array.prototype.unique = function () {
         return array.indexOf(value) === index;
     });
 };
+
+/** https://stackoverflow.com/a/3291856/604142 (CC BY-SA 4.0) */
+Object.defineProperty(String.prototype, 'capitalize', {
+    value: function () {
+        return this.charAt(0).toUpperCase() + this.slice(1);
+    },
+    enumerable: false
+});

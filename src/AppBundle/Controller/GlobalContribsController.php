@@ -3,9 +3,12 @@ declare(strict_types = 1);
 
 namespace AppBundle\Controller;
 
+use AppBundle\Helper\I18nHelper;
 use AppBundle\Model\GlobalContribs;
 use AppBundle\Repository\GlobalContribsRepository;
 use AppBundle\Repository\ProjectRepository;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -15,6 +18,19 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class GlobalContribsController extends XtoolsController
 {
+    /**
+     * Used to override properties set in XtoolsController.
+     * @param RequestStack $requestStack
+     * @param ContainerInterface $container
+     * @param I18nHelper $i18n
+     */
+    public function __construct(RequestStack $requestStack, ContainerInterface $container, I18nHelper $i18n)
+    {
+        // GlobalContribs can be very slow, especially for wide IP ranges.
+        $this->maxLimit = 500;
+        parent::__construct($requestStack, $container, $i18n);
+    }
+
     /**
      * Get the name of the tool's index route. This is also the name of the associated model.
      * @return string
@@ -110,7 +126,14 @@ class GlobalContribsController extends XtoolsController
     {
         $globalContribsRepo = new GlobalContribsRepository();
         $globalContribsRepo->setContainer($this->container);
-        $globalContribs = new GlobalContribs($this->user, $this->namespace, $this->start, $this->end, $this->offset);
+        $globalContribs = new GlobalContribs(
+            $this->user,
+            $this->namespace,
+            $this->start,
+            $this->end,
+            $this->offset,
+            $this->limit
+        );
         $globalContribs->setRepository($globalContribsRepo);
         $defaultProject = ProjectRepository::getProject(
             $this->container->getParameter('central_auth_project'),

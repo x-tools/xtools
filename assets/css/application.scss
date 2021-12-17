@@ -1,4 +1,5 @@
 @import 'mixins.scss';
+@import 'contributions-lists';
 @import 'rtl.scss';
 
 html {
@@ -697,18 +698,6 @@ input.form-control.show-loader {
     .glyphicon-download-alt {
         top: 2px;
     }
-}
-
-.contributions-nav {
-    margin-bottom: 10px;
-
-    &:last-child {
-        margin-bottom: 0;
-    }
-}
-
-.contributions--prev {
-    display: none;
 }
 
 .multi-select {

@@ -10,14 +10,14 @@ use AppBundle\Repository\GlobalContribsRepository;
  */
 class GlobalContribs extends Model
 {
+    /** @var int Number of results per page. */
+    public const PAGE_SIZE = 50;
+
     /** @var int[] Keys are project DB names. */
     protected $globalEditCounts;
 
     /** @var array Most recent revisions across all projects. */
     protected $globalEdits;
-
-    /** @var int Number of results per page. */
-    public const PAGE_SIZE = 50;
 
     /**
      * GlobalContribs constructor.
@@ -26,24 +26,22 @@ class GlobalContribs extends Model
      * @param false|int $start As Unix timestamp.
      * @param false|int $end As Unix timestamp.
      * @param false|int $offset As Unix timestamp.
+     * @param false|int $limit Number of results to return.
      */
-    public function __construct(User $user, $namespace = 'all', $start = false, $end = false, $offset = false)
-    {
+    public function __construct(
+        User $user,
+        $namespace = 'all',
+        $start = false,
+        $end = false,
+        $offset = false,
+        $limit = self::PAGE_SIZE
+    ) {
         $this->user = $user;
         $this->namespace = '' == $namespace ? 0 : $namespace;
         $this->start = $start;
         $this->end = $end;
         $this->offset = $offset;
-    }
-
-    /**
-     * Get the number of results to show per page.
-     * @return int
-     * @codeCoverageIgnore
-     */
-    public function getPageSize(): int
-    {
-        return self::PAGE_SIZE;
+        $this->limit = $limit;
     }
 
     /**
@@ -140,7 +138,7 @@ class GlobalContribs extends Model
             $this->namespace,
             $this->start,
             $this->end,
-            self::PAGE_SIZE + 1,
+            $this->limit + 1,
             $this->offset
         );
         $globalEdits = [];
@@ -160,7 +158,7 @@ class GlobalContribs extends Model
 
         // Sort and prune, before adding more.
         krsort($globalEdits);
-        $this->globalEdits = array_slice($globalEdits, 0, self::PAGE_SIZE);
+        $this->globalEdits = array_slice($globalEdits, 0, $this->limit);
 
         return $this->globalEdits;
     }

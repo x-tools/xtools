@@ -100,7 +100,7 @@ class RepositoryTest extends TestAdapter
         );
 
         static::assertEquals(
-            " AND rev_timestamp >= '20170101000000' AND rev_timestamp < '20180201235959'",
+            " AND rev_timestamp >= '20170101000000' AND rev_timestamp <= '20180201235959'",
             $this->stub->getDateConditions($start, $end, $offset)
         );
     }

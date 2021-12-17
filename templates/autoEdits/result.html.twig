@@ -1,5 +1,6 @@
 {% extends 'base.html.twig' %}
 {% import 'macros/layout.html.twig' as layout %}
+{% import 'macros/forms.html.twig' as forms %}
 {% import 'macros/pieChart.html.twig' as chart %}
 {% import 'macros/wiki.html.twig' as wiki %}
 
@@ -256,7 +257,10 @@
         {% set downloadLink %}
             {{ layout.downloadLink('UserApiNonAutoEdits', {'project': project.domain, 'username': user.usernameIdent, 'namespace': ae.namespace, 'start': ae.startDate, 'end': ae.endDate}, [], 'UserApiNonAutoEdits') }}
         {% endset %}
-        {{ layout.content_block(headerLink, content, downloadLink, 'non-auto-contribs', true) }}
+        {% set limitControl %}
+            {{ forms.contributions_limit(ae.limit) }}
+        {% endset %}
+        {{ layout.content_block(headerLink, content, [limitControl, downloadLink], 'non-auto-contribs', true) }}
 
         <div class="times-in-utc text-muted">
             {{ msg('times-in-utc') }}

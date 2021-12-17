@@ -5,13 +5,16 @@ $(function () {
         return;
     }
 
+    var $contributionsContainer = $('.contributions-container'),
+        $toolSelector = $('#tool_selector');
+
     // For the form page.
-    if ($('#tool_selector').length) {
+    if ($toolSelector.length) {
         xtools.autoedits.fetchTools = function (project) {
-            $('#tool_selector').prop('disabled', true);
+            $toolSelector.prop('disabled', true);
             $.get('/api/project/automated_tools/' + project).done(function (tools) {
                 if (tools.error) {
-                    $('#tool_selector').prop('disabled', false);
+                    $toolSelector.prop('disabled', false);
                     return; // Abort, project was invalid.
                 }
 
@@ -19,17 +22,17 @@ $(function () {
                 delete tools.project;
                 delete tools.elapsed_time;
 
-                $('#tool_selector').html(
+                $toolSelector.html(
                     '<option value="none">' + $.i18n('none') + '</option>' +
                     '<option value="all">' + $.i18n('all') + '</option>'
                 );
                 Object.keys(tools).forEach(function (tool) {
-                    $('#tool_selector').append(
+                    $toolSelector.append(
                         '<option value="' + tool + '">' + (tools[tool].label || tool) + '</option>'
                     );
                 });
 
-                $('#tool_selector').prop('disabled', false);
+                $toolSelector.prop('disabled', false);
             });
         };
 
@@ -61,7 +64,7 @@ $(function () {
         $('.tools--count').text(total.toLocaleString(i18nLang));
     });
 
-    if ($('.contributions-container').length) {
+    if ($contributionsContainer.length) {
         // Load the contributions browser, or set up the listeners if it is already present.
         var initFunc = $('.contributions-table').length ? 'setupContributionsNavListeners' : 'loadContributions';
         xtools.application[initFunc](
@@ -69,7 +72,7 @@ $(function () {
                 return `${params.target}-contributions/${params.project}/${params.username}` +
                     `/${params.namespace}/${params.start}/${params.end}`;
             },
-            $('.contributions-container').data('target')
+            $contributionsContainer.data('target')
         );
     }
 });

@@ -134,3 +134,19 @@
 {% macro submit_btn() %}
 <button class="btn btn-large btn-primary form-submit">{{ msg('submit') }}</button>
 {% endmacro %}
+
+{% macro contributions_limit(value = 50, options = [50, 100, 250, 500]) %}
+    {% if value not in options %}
+        {% set options = [value]|merge(options) %}
+    {% endif %}
+    <div class="pull-right contributions-limit--wrapper">
+        <label for="contributions_limit" class="text-muted">{{ msg('limit') }}:</label>
+        <div class="btn-group dropup">
+            <select class="form-control contributions-limit" id="contributions_limit">
+                {% for limit in options|sort %}
+                    <option {% if value == limit %}selected{% endif %}>{{ limit }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+{% endmacro %}

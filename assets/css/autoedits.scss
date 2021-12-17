@@ -36,6 +36,10 @@
         }
     }
 
+    .contributions-container--loading .tool-selector-form {
+        visibility: hidden;
+    }
+
     #toolSelector {
         display: inline-block;
         width: auto;

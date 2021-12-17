@@ -151,15 +151,16 @@ class CategoryEditsController extends XtoolsController
     /**
      * Display the results.
      * @Route(
-     *     "/categoryedits/{project}/{username}/{categories}/{start}/{end}",
+     *     "/categoryedits/{project}/{username}/{categories}/{start}/{end}/{offset}",
      *     name="CategoryEditsResult",
      *     requirements={
      *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *         "categories"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
      *         "start"="|\d{4}-\d{2}-\d{2}",
-     *         "end"="|\d{4}-\d{2}-\d{2}"
+     *         "end"="|\d{4}-\d{2}-\d{2}",
+     *         "offset"="|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}",
      *     },
-     *     defaults={"start" = false, "end" = false}
+     *     defaults={"start"=false, "end"=false, "offset"=false}
      * )
      * @return Response
      * @codeCoverageIgnore
@@ -172,7 +173,7 @@ class CategoryEditsController extends XtoolsController
     }
 
     /**
-     * Get edits my by a user to pages in given categories.
+     * Get edits by a user to pages in given categories.
      * @Route(
      *   "/categoryedits-contributions/{project}/{username}/{categories}/{start}/{end}/{offset}",
      *   name="CategoryContributionsResult",

@@ -88,7 +88,13 @@ abstract class XtoolsController extends Controller
     protected $offset = false;
 
     /** @var int Number of results to return. */
-    protected $limit;
+    protected $limit = 50;
+
+    /**
+     * Maximum number of results to show per page. Can be overridden in the child controller's constructor.
+     * @var int
+     */
+    public $maxLimit = 5000;
 
     /** @var bool Is the current request a subrequest? */
     protected $isSubRequest;
@@ -306,7 +312,7 @@ abstract class XtoolsController extends Controller
         // Limit needs to be an int.
         if (isset($this->params['limit'])) {
             // Normalize.
-            $this->params['limit'] = max(0, (int)$this->params['limit']);
+            $this->params['limit'] = min(max(1, (int)$this->params['limit']), $this->maxLimit);
             $this->limit = $this->params['limit'];
         }
 

@@ -1,5 +1,6 @@
 {% extends is_sub_request ? 'subrequest.html.twig' : 'base.html.twig' %}
 {% import 'macros/wiki.html.twig' as wiki %}
+{% import 'macros/forms.html.twig' as forms %}
 {% import 'macros/layout.html.twig' as layout %}
 
 {% block body %}
@@ -93,6 +94,7 @@
                 <header class="panel-heading col-lg-12">
                     <h4>
                         {{ msg('contributions') }}
+                        {{ forms.contributions_limit(gc.limit) }}
                     </h4>
                 </header>
                 <div class="panel-body col-lg-12">
@@ -103,11 +105,12 @@
                         data-namespace="{{ gc.namespace }}"
                         data-start="{{ gc.startDate }}"
                         data-end="{{ gc.endDate }}"
-                        data-offset="{{ gc.offsetISO }}">
+                        data-offset="{{ gc.offsetISO ? gc.offsetISO : (gc.globalEdits|first).UTCTimestamp }}"
+                        data-limit="{{ gc.limit }}">
 {% endif %}
 
 {% if gc.globalEdits|length > 0 %}
-    {{ layout.contributionsNav(gc.offset, gc.globalEdits|length, gc.pageSize) }}
+    {{ layout.contributionsNav(gc.offset, gc.globalEdits|length, gc.limit) }}
     <table class="table table-bordered table-hover table-striped contributions-table">
         <thead><tr>
             {% set columns = ['date', 'project'] %}
@@ -157,7 +160,7 @@
         {% endfor %}
         </tbody>
     </table>
-    {{ layout.contributionsNav(gc.offset, gc.globalEdits|length, gc.pageSize) }}
+    {{ layout.contributionsNav(gc.offset, gc.globalEdits|length, gc.limit) }}
 {% else %}
     {% if nsName(gc.namespace, project.namespaces) == msg('unknown') and gc.user.isAnon %}
         <div class="alert alert-warning">
@@ -185,7 +188,7 @@
 {% endif %}
 
 <script>
-    xtools.globalcontribs.pageSize = {{ gc.pageSize }};
+    xtools.globalcontribs.limit = {{ gc.limit }};
 </script>
 
 {% endblock %}
