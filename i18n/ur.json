@@ -76,6 +76,7 @@
 	"max-text-added": "زیادہ سے زیادہ متن شامل کیا",
 	"max-text-deleted": "زیادہ سے زیادہ متن حذف کیا",
 	"none": "کچھ نہیں",
+	"num-moves": "{{PLURAL:$1|منتقل|منتقل}}",
 	"page-title": "عنوان صفحہ",
 	"pager-newer-n": "{{PLURAL:$1|جدید $1}}",
 	"pager-older-n": "{{PLURAL:$1|قدیم}} $1",
