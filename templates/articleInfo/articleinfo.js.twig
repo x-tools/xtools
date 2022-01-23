@@ -12,10 +12,11 @@ $(function () {
         return;
     }
 
-    var markup = "<div id='xtools' style='font-size:84%; line-height:1.2em;" +
-        "width:auto;'><span id='xtools_result'>.</span></div>",
-        $result = $('#xtools_result');
+    var $result,
+        markup = "<div id='xtools' style='font-size:84%; line-height:1.2em;" +
+        "width:auto;'><span id='xtools_result'>.</span></div>";
     $(markup).insertBefore('#contentSub');
+    $result = $('#xtools_result');
 
     var loadinganimation = window.setInterval(function () {
         if ($result.html() === '.&nbsp;&nbsp;') {
