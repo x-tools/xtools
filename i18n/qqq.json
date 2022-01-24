@@ -2,6 +2,7 @@
 	"@metadata": {
 		"authors": [
 			"A2093064",
+			"Ajeje Brazorf",
 			"Albe Albe460",
 			"Amire80",
 			"BaRaN6161 TURK",
@@ -101,7 +102,7 @@
 	"comma-character": "{{Optional}}\nThe character to show separating values of a list. In most languages this is a comma.",
 	"considered-usernames": "detected usernames and known socks",
 	"contentmodel": "The term used to describe the type of page on a wiki. See [[mw:Manual:ContentHandler]] for more info. This is used to indicate how many times a user has changed the content model of a page.",
-	"contributions": "Term for edits that a users has made.",
+	"contributions": "Term for edits that a users has made.\n\n{{Identical|Contribution}}",
 	"count": "General term for 'count'.\n{{Identical|Count}}",
 	"created-by": "Label for the creator of a page.",
 	"csv": "{{Optional}}\nLink for CSV file. See https://en.wikipedia.org/wiki/Comma-separated_values for information on what a CSV file is.\nCSV is the name of a file format; should not be translated.",
