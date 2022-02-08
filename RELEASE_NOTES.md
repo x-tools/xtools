@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.14.4 ##
+- (T284874): Refactor pagination and limit parameter in contribs lists.
+- Authorship (T288840): switch to use new WikiWho installation.
+- Localization updates.
+
 ## 3.14.3 ##
 - Rework dark mode styles.
 
