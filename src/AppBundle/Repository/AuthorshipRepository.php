@@ -32,7 +32,7 @@ class AuthorshipRepository extends Repository
         $projectLang = $page->getProject()->getLang();
         $oRevId = $returnRevId ? 'true' : 'false';
 
-        $url = "https://api.wikiwho.net/$projectLang/api/v1.0.0-beta/rev_content/$title"
+        $url = "https://wikiwho.wmflabs.org/$projectLang/api/v1.0.0-beta/rev_content/$title"
             .($revId ? "/$revId" : '')
             ."/?o_rev_id=$oRevId&editor=true&token_id=false&out=false&in=false";
 
@@ -41,14 +41,6 @@ class AuthorshipRepository extends Repository
             'timeout' => 60,
             'read_timeout' => 60,
         ];
-
-        // Use WikiWho API credentials, if present. They are not required.
-        if ($this->container->hasParameter('app.wikiwho.username')) {
-            $opts['auth'] = [
-                $this->container->getParameter('app.wikiwho.username'),
-                $this->container->getParameter('app.wikiwho.password'),
-            ];
-        }
 
         /** @var GuzzleHttp\Client $client */
         $client = $this->container->get('eight_points_guzzle.client.xtools');
