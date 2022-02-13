@@ -26,7 +26,7 @@ class GlobalContribs extends Model
      * @param false|int $start As Unix timestamp.
      * @param false|int $end As Unix timestamp.
      * @param false|int $offset As Unix timestamp.
-     * @param false|int $limit Number of results to return.
+     * @param int|null $limit Number of results to return.
      */
     public function __construct(
         User $user,
@@ -34,14 +34,14 @@ class GlobalContribs extends Model
         $start = false,
         $end = false,
         $offset = false,
-        $limit = self::PAGE_SIZE
+        ?int $limit = null
     ) {
         $this->user = $user;
         $this->namespace = '' == $namespace ? 0 : $namespace;
         $this->start = $start;
         $this->end = $end;
         $this->offset = $offset;
-        $this->limit = $limit;
+        $this->limit = $limit ?? self::PAGE_SIZE;
     }
 
     /**

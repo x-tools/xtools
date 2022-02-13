@@ -88,7 +88,7 @@ abstract class XtoolsController extends Controller
     protected $offset = false;
 
     /** @var int Number of results to return. */
-    protected $limit = 50;
+    protected $limit;
 
     /**
      * Maximum number of results to show per page. Can be overridden in the child controller's constructor.

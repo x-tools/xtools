@@ -66,10 +66,10 @@ class TopEdits extends Model
         $this->namespace = 'all' === $namespace ? 'all' : (int)$namespace;
         $this->start = $start;
         $this->end = $end;
-        $this->pagination = (int)$pagination;
+        $this->pagination = $pagination;
 
         if (null !== $limit) {
-            $this->limit = (int)$limit;
+            $this->limit = $limit;
         } else {
             $this->limit = 'all' === $this->namespace
                 ? self::DEFAULT_LIMIT_ALL_NAMESPACES
