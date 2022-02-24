@@ -307,7 +307,7 @@
 	"patroller-stats-notice2": "Bəzi istifadəçilər keçmiş patrul ola bilərlər və ya patrul olmaya bilərlər, lakin müəyyən patrul hərəkətləri etmək hüquqları var.",
 	"patrollers": "Patrullar",
 	"patrols": "Patrullar",
-	"patrols-desc": "$2 {{PLURAL:$1|məqalə|məqalələr}} patrullandı",
+	"patrols-desc": "$2 {{PLURAL:$1|məqalə}} patrullandı",
 	"percent-of-edit-count": "redaktə sayı %",
 	"percent-of-tools": "alətlər %",
 	"percentage": "Faiz",

@@ -65,7 +65,7 @@
 	"date": "Ամսաթիվը",
 	"date-from": "$1-ից",
 	"date-range": "$1 - $2",
-	"date-to": "Մինչեւ՝ $1",
+	"date-to": "Մինչև՝ $1",
 	"delete": "Ջնջել",
 	"deleted": "Ջնջված",
 	"deleted-bytes": "Ջնջված է (բայթերով)",
