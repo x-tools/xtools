@@ -14,7 +14,8 @@
 			"דגש חזק",
 			"חזרתי",
 			"חיים",
-			"ידידיה צ' צבאן"
+			"ידידיה צ' צבאן",
+			"שוקו מוקה"
 		]
 	},
 	"abusefilter": "מסנן ההשחתות",
@@ -126,7 +127,7 @@
 	"edit": "עריכה",
 	"edit-count": "מספר העריכות",
 	"edit-count-desc": "{{PLURAL:$1|עריכה אחת|$2 עריכות}}",
-	"edit-summaries": "עריכת תקצירים",
+	"edit-summaries": "תקצירי עריכה",
 	"edit-summaries-desc": "נעשה שימוש {{PLURAL:$1|בתקציר עריכה אחד|ב־$2 תקצירי עריכה}} במרחב הערכים",
 	"edit-summaries-percentage": "אחוז שימוש בתקצירי עריכה",
 	"edit-summary": "תקציר העריכה",
@@ -443,7 +444,7 @@
 	"tool-categoryedits-desc": "ניתוח תרומות שנעשו לקטגוריות מסוימות",
 	"tool-editcounter": "מונה עריכות",
 	"tool-editcounter-desc": "ניתוח תרומות משתמש",
-	"tool-editsummary": "עריכת תקצירים",
+	"tool-editsummary": "תקצירי עריכה",
 	"tool-editsummary-desc": "ניתוח השימוש בתקצירי עריכה",
 	"tool-error": "שגיאה",
 	"tool-globalcontribs": "תרומות גלובליות",

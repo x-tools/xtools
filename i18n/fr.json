@@ -353,7 +353,7 @@
 	"projects": "Projets",
 	"prose": "Prose",
 	"protect": "Protections",
-	"proxy-check": "Vérification du proxy",
+	"proxy-check": "Vérifier s’il s’agit d’un serveur mandataire (proxy)",
 	"query": "Requête",
 	"quote": "Citation",
 	"quote-number": "Citation numéro",
