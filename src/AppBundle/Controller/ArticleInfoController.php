@@ -14,6 +14,7 @@ use AppBundle\Model\Authorship;
 use AppBundle\Model\Page;
 use AppBundle\Model\Project;
 use AppBundle\Repository\ArticleInfoRepository;
+use GuzzleHttp\Exception\ServerException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -190,7 +191,16 @@ class ArticleInfoController extends XtoolsController
         $this->recordApiUsage('page/articleinfo');
 
         $this->setupArticleInfo();
-        $data = $this->articleInfo->getArticleInfoApiData($this->project, $this->page);
+        $data = [];
+
+        try {
+            $data = $this->articleInfo->getArticleInfoApiData($this->project, $this->page);
+        } catch (ServerException $e) {
+            // The Wikimedia action API can fail for any number of reasons. To our users
+            // any ServerException means the data could not be fetched, so we capture it here
+            // to avoid the flood of automated emails when the API goes down, etc.
+            $data['error'] = $this->i18n->msg('api-error', [$this->project->getDomain()]);
+        }
 
         if ('html' === $this->request->query->get('format')) {
             return $this->getApiHtmlResponse($this->project, $this->page, $data);

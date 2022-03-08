@@ -1,5 +1,5 @@
 {% import 'macros/wiki.html.twig' as wiki %}
-<span style="line-height:20px">{% if data.assessment is not empty and data.assessment.badge is not empty and data.assessment.value != '???' %}<a target="_blank" title="{{ msg('assessment') }}: {{ data.assessment.value }}" href="{{ url('ArticleInfoResult', { 'project': project.domain, 'page': page.title }) }}"><img src="{{ data.assessment.badge }}" style="height:16px !important; vertical-align:-4px; margin-right:3px"/></a>{% else %}<a target="_blank" href="{{ url('homepage') }}"><img src="https://upload.wikimedia.org/wikipedia/commons/e/ed/XTools_logo_%28icon%29.png" style="height:16px !important; vertical-align:-4px; margin-right:3px"/></a>{% endif %}
+<span style="line-height:20px">{% if data.assessment is defined and data.assessment is not empty and data.assessment.badge is not empty and data.assessment.value != '???' %}<a target="_blank" title="{{ msg('assessment') }}: {{ data.assessment.value }}" href="{{ url('ArticleInfoResult', { 'project': project.domain, 'page': page.title }) }}"><img src="{{ data.assessment.badge }}" style="height:16px !important; vertical-align:-4px; margin-right:3px"/></a>{% else %}<a target="_blank" href="{{ url('homepage') }}"><img src="https://upload.wikimedia.org/wikipedia/commons/e/ed/XTools_logo_%28icon%29.png" style="height:16px !important; vertical-align:-4px; margin-right:3px"/></a>{% endif %}
 {% if data.error is defined or data.revisions is not defined %}
 {{ msg('error-articleinfo-api') }}
 {% else -%}
@@ -11,10 +11,10 @@
         {{ data.editors|num_format }} {{ msg('num-editors', [data.editors]) }}{{ msg('comma-character') }}
     {% endif %}
 {% endif %}
-{% if data.watchers > 0 -%}
+{% if data.watchers is defined and data.watchers > 0 -%}
 {{ data.watchers|num_format }} {{ msg('num-watchers', [data.watchers]) }}{{ msg('comma-character') }}
 {% endif %}
-{%- if isWMFLabs() -%}
+{%- if data.pageviews is defined -%}
 <a target="_blank" href="https://pageviews.toolforge.org/?project={{ project.domain }}&amp;pages={{ page.title|e('url') }}&amp;range=latest-30">{{ data.pageviews|num_format }} {{ msg('num-pageviews', [data.pageviews]) }}</a> ({{ data.pageviews_offset }} {{ msg('num-days', [data.pageviews_offset]) }}){% endif -%}
 {% if data.error is not defined and data.author is not empty -%}
     {{ msg('comma-character') }}
