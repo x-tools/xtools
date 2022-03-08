@@ -92,9 +92,9 @@
         {% set username = user %}
     {% endif %}
     {% if isUserAnon(username) %}
-        {% set path = project.articlePath|replace({'$1': 'Special:Contributions/' ~ username|replace({' ': '_'})}) %}
+        {% set path = project.articlePath|replace({'$1': 'Special:Contributions/' ~ username|replace({' ': '_'})|escape('url')}) %}
     {% else %}
-        {% set path = project.articlePath|replace({'$1': 'User:' ~ username|replace({' ': '_'})}) %}
+        {% set path = project.articlePath|replace({'$1': 'User:' ~ username|replace({' ': '_'})|escape('url')}) %}
     {% endif %}
     <bdi>{{ extLink((project.url|trim('/')) ~ path, username, label) }}</bdi>
 {% endapply %}{% endmacro %}
