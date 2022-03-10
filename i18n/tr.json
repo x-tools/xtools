@@ -289,7 +289,7 @@
 	"num-revisions": "{{PLURAL:$1|revizyon|revizyon}}",
 	"num-revisions-processed": "$1 işlendi",
 	"num-revisions-since": "$3 itibarıyla $1 {{PLURAL:$2|revizyon|revizyon}}",
-	"num-seconds": "{{PLURAL:$1|saniye|saniye}}",
+	"num-seconds": "{{PLURAL:$1|saniye}}",
 	"num-sitelinks": "{{PLURAL:$1|site bağlantı|site bağlantı}}",
 	"num-tools": "{{PLURAL:$1|araç|araç}}",
 	"num-users": "{{PLURAL:$1|kullanıcı|kullanıcı}}",

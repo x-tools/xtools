@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"FiberAhmed",
 			"Helmoony",
 			"Hhaboh162002",
 			"Hubaishan",
@@ -437,6 +438,8 @@
 	"tool-error": "خطأ",
 	"tool-globalcontribs": "مساهمات المستخدم العالمية",
 	"tool-globalcontribs-desc": "التعديلات الأخيرة لأكبر 10 مشاريع لهذا المستخدم في الشهر الماضي",
+	"tool-largestpages": "أكبر الصفحات",
+	"tool-largestpages-desc": "احصل على أكبر الصفحات في المشروع",
 	"tool-meta": "إحصاءات الاستخدام",
 	"tool-meta-desc": "معرفة أية أدوات X هي الأكثر شعبية على مر الزمن",
 	"tool-pages": "الصفحات المنشأة",
