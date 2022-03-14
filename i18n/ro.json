@@ -5,6 +5,7 @@
 			"Andreyyshore",
 			"MSClaudiu",
 			"NGC 54",
+			"Strainu",
 			"WebSourceContentRO"
 		]
 	},
@@ -494,7 +495,7 @@
 	"username-or-ip": "Nume de utilizator, IPv4 sau IPv6",
 	"username-ip-or-cidr": "Nume utilizator, adresă IP sau interval CIDR.",
 	"version": "Versiunea $1",
-	"view-source": "Sursă pagină",
+	"view-source": "Vizualizați sursa",
 	"view-wikitext": "Vezi ca wikitext",
 	"vote-msg": "$1 a modificat $2 {{PLURAL:$2|pagină|pagini|de pagini}} $3!",
 	"web-chat": "Connect",

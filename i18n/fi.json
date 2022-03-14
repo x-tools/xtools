@@ -7,6 +7,7 @@
 			"Majavah",
 			"Mediawikitranslator",
 			"Moj",
+			"Moottori",
 			"Nike",
 			"Pyscowicz",
 			"SMAUG"
@@ -414,6 +415,7 @@
 	"tool-globalcontribs": "Järjestelmänlaajuiset muokkaukset",
 	"tool-globalcontribs-desc": "Näytä käyttäjän muokkaukset kaikista wikiprojekteista",
 	"tool-largestpages": "Suurimmat sivut",
+	"tool-meta": "Käyttötilastot",
 	"tool-pages": "Luodut sivut",
 	"tool-pages-desc": "Näytä käyttäjän luomat sivut",
 	"tool-patrollerstats": "Partioijan tilastot",
@@ -442,6 +444,7 @@
 	"total-page-size": "Sivun koko yhteensä",
 	"total-revisions": "Muokkaajien määrä",
 	"translation-credits": "Käännökset mahdollistaa $1, $2 ja $3.",
+	"tsv": "TSV",
 	"tuesday": "Tiistai",
 	"type": "Tyyppi",
 	"unblock": "Estoja poistettu",
