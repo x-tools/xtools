@@ -298,7 +298,12 @@ class ArticleInfo extends ArticleInfoApi
      */
     public function editsPerEditor(): float
     {
-        return round($this->getNumRevisionsProcessed() / count($this->editors), 1);
+        if (count($this->editors) > 0) {
+            return round($this->getNumRevisionsProcessed() / count($this->editors), 1);
+        }
+
+        // To prevent division by zero error; can happen if all usernames are removed (see T303724).
+        return 0;
     }
 
     /**

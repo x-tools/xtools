@@ -148,6 +148,7 @@
 	"error-server-message": "The server said: $1",
 	"error-service-overload": "XTools is currently overloaded servicing other requests. Please try again in a few minutes.",
 	"error-title": "A fatal error has occurred within XTools. This has been automatically reported, but feel free to file a task on $1 (requires a Wikimedia account).",
+	"error-usernames-missing": "No usernames could be retrieved. As a result, some data may be inaccurate or misleading.",
 	"events": "Events",
 	"exclusion-pattern": "Don't include pages with titles that match the given pattern.",
 	"executed": "Executed in $1 {{PLURAL:$2|second|seconds}}.",

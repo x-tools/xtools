@@ -165,6 +165,7 @@
 	"error-server-message": "Error message. $1 is the message given by the server.",
 	"error-service-overload": "Error message shown when too many people are using XTools.",
 	"error-title": "Title for the error page. $1 is a link to report the error on Phabricator.",
+	"error-usernames-missing": "Warning shown when XTools was unable to retrieve usernames from the database.",
 	"events": "Events that have a log entry\n{{Identical|Event}}",
 	"exclusion-pattern": "Description for the 'Exclusion pattern' field in the Largest Pages tool.",
 	"executed": "Execution time. $1 is the formatted number of seconds, and $2 is the unformatted number for use with PLURAL.",

@@ -121,8 +121,8 @@ class PageRepository extends Repository
      * Get the statement for a single revision, so that you can iterate row by row.
      * @param Page $page The page.
      * @param User|null $user Specify to get only revisions by the given user.
-     * @param int $limit Max number of revisions to process.
-     * @param int $numRevisions Number of revisions, if known. This is used solely to determine the
+     * @param ?int $limit Max number of revisions to process.
+     * @param ?int $numRevisions Number of revisions, if known. This is used solely to determine the
      *   OFFSET if we are given a $limit (see below). If $limit is set and $numRevisions is not set,
      *   a separate query is ran to get the number of revisions.
      * @param false|int $start
@@ -165,7 +165,7 @@ class PageRepository extends Repository
                         comment_text AS `comment`,
                         revs.rev_sha1 AS sha
                     FROM $revTable AS revs
-                    JOIN $actorTable ON revs.rev_actor = actor_id
+                    LEFT JOIN $actorTable ON revs.rev_actor = actor_id
                     LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                     LEFT OUTER JOIN $commentTable ON comment_id = revs.rev_comment_id
                     WHERE $userClause revs.rev_page = :pageid $dateConditions

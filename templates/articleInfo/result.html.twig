@@ -55,7 +55,10 @@
             {% if showAuthorship %}
                 {% set sections = sections|merge(['tool-authorship']) %}
             {% endif %}
-            {% set sections = sections|merge(['top-editors', 'year-counts', 'month-counts']) %}
+            {% if ai.numEditors > 0 %}
+                {% set sections = sections|merge(['top-editors']) %}
+            {% endif %}
+            {% set sections = sections|merge(['year-counts', 'month-counts']) %}
             {% if ai.automatedCount > 0 %}
                 {% set sections = sections|merge(['auto-edits']) %}
             {% endif %}
@@ -454,111 +457,36 @@
         {% endif %}
 
         {# ======================== TOP EDITORS ======================== #}
-        {% set content %}
-            <div class="top-editors-charts clearfix">
-                <div class="pull-left">
-                    <div class="chart-title">{{ msg('top-ten-by-edits')|ucfirst }}</div>
-                    {{ chart.pie_chart('top_by_edits', ai.topTenEditorsByEdits) }}
-                </div>
-                {% if ai.maxAddition is not null %}
+        {% if ai.numEditors > 0 %}
+            {% set content %}
+                <div class="top-editors-charts clearfix">
                     <div class="pull-left">
-                        <div class="chart-title">
-                            {{ msg('top-ten-by-text')|ucfirst }}
-                            <span class="text-muted">({{ msg('approximate')|lower }})</span>
-                        </div>
-                        {{ chart.pie_chart('top_by_added', ai.topTenEditorsByAdded) }}
+                        <div class="chart-title">{{ msg('top-ten-by-edits')|ucfirst }}</div>
+                        {{ chart.pie_chart('top_by_edits', ai.topTenEditorsByEdits) }}
                     </div>
-                {% endif %}
-            </div>
-            <table class="table table-bordered table-hover table-striped top-editors-table">
-                <thead><tr>
-                    {% for key in ['rank', 'username', 'links', 'edits', 'minor-edits', 'minor-edits-percentage', 'first-edit', 'latest-edit', 'average-time-bw-edits', 'added-bytes'] %}
-                        <th>
-                            <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
-                                {% if key == 'average-time-bw-edits' %}
-                                    atbe<sup>1</sup>
-                                {% else %}
-                                    {{ msg(key)|ucfirst }}
-                                {% endif %}
-                                {% if key == 'added-bytes' %}
-                                    <sup class="rm-inline-margin-left">2</sup>
-                                {% endif %}
-                                {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
-                            </span>
-                        </th>
-                    {% endfor %}
-                </tr></thead>
-                <tbody>
-                {% set counter = 0 %}
-                {% set editSum = 0 %}
-                {% for editor in ai.humans(editorlimit) %}
-                    {% set stats = ai.editors[editor] %}
-                    {% set counter = counter + 1 %}
-                    {% set editSum = editSum + stats.all %}
-                    <tr>
-                        <td class="sort-entry--rank" data-value="{{ counter }}">{{ counter|num_format }}</td>
-                        <td class="sort-entry--username" data-value="{{ editor }}">
-                            {{ wiki.userLink(editor, project) }}
-                        </td>
-                        <td>
-                            {% if enabled('TopEdits') %}
-                                <a href="{{ path('TopEditsResultPage', { 'project': project.domain, 'username': editor, 'namespace': page.namespace, 'page': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
-                            {% endif %}
-                            &middot;
-                            {% if enabled('EditCounter') %}
-                                <a href="{{ path('EditCounterResult', { 'project': project.domain, 'username': editor }) }}">{{ msg('tool-editcounter') }}</a>
-                            {% endif %}
-                        </td>
-                        <td class="sort-entry--edits" data-value="{{ stats.all }}">
-                            {{ stats.all|num_format }}
-                        </td>
-                        <td class="sort-entry--minor-edits" data-value="{{ stats.minor }}">{{ stats.minor|num_format }}</td>
-                        {% set userMinorPercent = stats.minor|percent_format(stats.all) %}
-                        <td class="sort-entry--minor-percentage" data-value="{{ userMinorPercent }}">{{ userMinorPercent }}</td>
-                        <td class="sort-entry--first-edit" data-value="{{ stats.firstId }}">
-                            {{ wiki.pageLinkRaw('Special:Diff/' ~ stats.firstId, project, stats.first|date_format) }}
-                        </td>
-                        <td class="sort-entry--latest-edit" data-value="{{ stats.lastId }}">
-                            {{ wiki.pageLinkRaw('Special:Diff/' ~ stats.lastId, project, stats.last|date_format) }}
-                        </td>
-                        <td class="sort-entry--average-time-bw-edits" data-value="{{ stats.atbe }}">
-                            {{ stats.atbe|num_format() }}
-                        </td>
-                        <td class="sort-entry--added-bytes" data-value="{{ stats.added }}">
-                            {{ stats.added|num_format }}
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-                {% set otherEditors = ai.numEditors - ai.numBots - counter %}
-                {% if otherEditors > 0 %}
-                    <tfoot><tr class="show-more-row">
-                        <td></td>
-                        <td>
-                            {% set expandUrl = path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'editorlimit': editorlimit * 10})) %}
-                            <a href="{{ expandUrl }}">
-                                {{ otherEditors|num_format }} {{ msg('num-others', [otherEditors]) }}
-                            </a>
-                        </td>
-                        <td></td>
-                        <td>{{ (ai.numRevisionsProcessed - editSum)|num_format }}</td>
-                        <td colspan=6></td>
-                    </tr></tfoot>
-                {% endif %}
-            </table>
-            <div class="footnotes">
-                <sup>1</sup> {{ msg('average-time-bw-edits') }}
-                <br/><sup>2</sup> {{ msg('text-added-description') }}
-            </div>
-
-            {% if ai.bots is not empty %}
-                <h4>{{ msg('bot-list') }}</h4>
-                <table class="table table-bordered table-hover table-striped">
+                    {% if ai.maxAddition is not null %}
+                        <div class="pull-left">
+                            <div class="chart-title">
+                                {{ msg('top-ten-by-text')|ucfirst }}
+                                <span class="text-muted">({{ msg('approximate')|lower }})</span>
+                            </div>
+                            {{ chart.pie_chart('top_by_added', ai.topTenEditorsByAdded) }}
+                        </div>
+                    {% endif %}
+                </div>
+                <table class="table table-bordered table-hover table-striped top-editors-table">
                     <thead><tr>
-                        {% for key in ['rank', 'bot', 'links', 'edits'] %}
+                        {% for key in ['rank', 'username', 'links', 'edits', 'minor-edits', 'minor-edits-percentage', 'first-edit', 'latest-edit', 'average-time-bw-edits', 'added-bytes'] %}
                             <th>
                                 <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
-                                    {{ msg(key)|ucfirst }}
+                                    {% if key == 'average-time-bw-edits' %}
+                                        atbe<sup>1</sup>
+                                    {% else %}
+                                        {{ msg(key)|ucfirst }}
+                                    {% endif %}
+                                    {% if key == 'added-bytes' %}
+                                        <sup class="rm-inline-margin-left">2</sup>
+                                    {% endif %}
                                     {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
                                 </span>
                             </th>
@@ -566,55 +494,132 @@
                     </tr></thead>
                     <tbody>
                     {% set counter = 0 %}
-                    {% for bot, botData in ai.bots|slice(0, botlimit) %}
+                    {% set editSum = 0 %}
+                    {% for editor in ai.humans(editorlimit) %}
+                        {% set stats = ai.editors[editor] %}
                         {% set counter = counter + 1 %}
+                        {% set editSum = editSum + stats.all %}
                         <tr>
                             <td class="sort-entry--rank" data-value="{{ counter }}">{{ counter|num_format }}</td>
-                            <td class="sort-entry--bot" data-value="{{ bot }}">
-                                {{ wiki.userLink(bot, project) }}
-                                {% if not botData.current %}
-                                    <i>
-                                        (<a href="{{ path('EditCounterRightsChanges', {project: project.domain, username: bot}) }}">{{ msg('former-bot') }}</a>)
-                                    </i>
-                                {% endif %}
+                            <td class="sort-entry--username" data-value="{{ editor }}">
+                                {{ wiki.userLink(editor, project) }}
                             </td>
                             <td>
                                 {% if enabled('TopEdits') %}
-                                    <a href="{{ path('TopEditsResultPage', { 'project': project.domain, 'username': bot, 'namespace': page.namespace, 'page': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
+                                    <a href="{{ path('TopEditsResultPage', { 'project': project.domain, 'username': editor, 'namespace': page.namespace, 'page': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
                                 {% endif %}
                                 &middot;
                                 {% if enabled('EditCounter') %}
-                                    <a href="{{ path('EditCounterResult', { 'project': project.domain, 'username': bot }) }}">{{ msg('tool-editcounter') }}</a>
+                                    <a href="{{ path('EditCounterResult', { 'project': project.domain, 'username': editor }) }}">{{ msg('tool-editcounter') }}</a>
                                 {% endif %}
                             </td>
-                            <td class="sort-entry--edits" data-value="{{ botData.count }}">{{ botData.count|num_format }}</td>
+                            <td class="sort-entry--edits" data-value="{{ stats.all }}">
+                                {{ stats.all|num_format }}
+                            </td>
+                            <td class="sort-entry--minor-edits" data-value="{{ stats.minor }}">{{ stats.minor|num_format }}</td>
+                            {% set userMinorPercent = stats.minor|percent_format(stats.all) %}
+                            <td class="sort-entry--minor-percentage" data-value="{{ userMinorPercent }}">{{ userMinorPercent }}</td>
+                            <td class="sort-entry--first-edit" data-value="{{ stats.firstId }}">
+                                {{ wiki.pageLinkRaw('Special:Diff/' ~ stats.firstId, project, stats.first|date_format) }}
+                            </td>
+                            <td class="sort-entry--latest-edit" data-value="{{ stats.lastId }}">
+                                {{ wiki.pageLinkRaw('Special:Diff/' ~ stats.lastId, project, stats.last|date_format) }}
+                            </td>
+                            <td class="sort-entry--average-time-bw-edits" data-value="{{ stats.atbe }}">
+                                {{ stats.atbe|num_format() }}
+                            </td>
+                            <td class="sort-entry--added-bytes" data-value="{{ stats.added }}">
+                                {{ stats.added|num_format }}
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>
-                    {% if counter < ai.numBots %}
+                    {% set otherEditors = ai.numEditors - ai.numBots - counter %}
+                    {% if otherEditors > 0 %}
                         <tfoot><tr class="show-more-row">
                             <td></td>
                             <td>
-                                {% set expandUrl = path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'botlimit': botlimit * 10})) %}
-                                {% set otherBots = ai.numBots - counter %}
+                                {% set expandUrl = path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'editorlimit': editorlimit * 10})) %}
                                 <a href="{{ expandUrl }}">
-                                    {{ otherBots|num_format }} {{ msg('num-others', [otherBots]) }}
+                                    {{ otherEditors|num_format }} {{ msg('num-others', [otherEditors]) }}
                                 </a>
                             </td>
-                            <td colspan=8></td>
+                            <td></td>
+                            <td>{{ (ai.numRevisionsProcessed - editSum)|num_format }}</td>
+                            <td colspan=6></td>
                         </tr></tfoot>
                     {% endif %}
                 </table>
-            {% endif %}
+                <div class="footnotes">
+                    <sup>1</sup> {{ msg('average-time-bw-edits') }}
+                    <br/><sup>2</sup> {{ msg('text-added-description') }}
+                </div>
 
-            <div class="text-muted">
-                {{ msg('all-approximate') }}
-            </div>
-        {% endset %}
-        {% set downloadLink %}
-            {{ layout.downloadLink('ArticleInfoResult', {project:project.domain, page:page.title, start:ai.startDate, end:ai.endDate}, ['wikitext'], 'PageApiTopEditors') }}
-        {% endset %}
-        {{ layout.content_block('top-editors', content, ['top-editors-desc', downloadLink]) }}
+                {% if ai.bots is not empty %}
+                    <h4>{{ msg('bot-list') }}</h4>
+                    <table class="table table-bordered table-hover table-striped">
+                        <thead><tr>
+                            {% for key in ['rank', 'bot', 'links', 'edits'] %}
+                                <th>
+                                    <span{% if key != "links" %} class="sort-link sort-link--{{ key }}" data-column="{{ key }}"{% endif %}>
+                                        {{ msg(key)|ucfirst }}
+                                        {% if key != "links" %}<span class="glyphicon glyphicon-sort"></span>{% endif %}
+                                    </span>
+                                </th>
+                            {% endfor %}
+                        </tr></thead>
+                        <tbody>
+                        {% set counter = 0 %}
+                        {% for bot, botData in ai.bots|slice(0, botlimit) %}
+                            {% set counter = counter + 1 %}
+                            <tr>
+                                <td class="sort-entry--rank" data-value="{{ counter }}">{{ counter|num_format }}</td>
+                                <td class="sort-entry--bot" data-value="{{ bot }}">
+                                    {{ wiki.userLink(bot, project) }}
+                                    {% if not botData.current %}
+                                        <i>
+                                            (<a href="{{ path('EditCounterRightsChanges', {project: project.domain, username: bot}) }}">{{ msg('former-bot') }}</a>)
+                                        </i>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if enabled('TopEdits') %}
+                                        <a href="{{ path('TopEditsResultPage', { 'project': project.domain, 'username': bot, 'namespace': page.namespace, 'page': page.titleWithoutNamespace }) }}">{{ msg('tool-topedits') }}</a>
+                                    {% endif %}
+                                    &middot;
+                                    {% if enabled('EditCounter') %}
+                                        <a href="{{ path('EditCounterResult', { 'project': project.domain, 'username': bot }) }}">{{ msg('tool-editcounter') }}</a>
+                                    {% endif %}
+                                </td>
+                                <td class="sort-entry--edits" data-value="{{ botData.count }}">{{ botData.count|num_format }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        {% if counter < ai.numBots %}
+                            <tfoot><tr class="show-more-row">
+                                <td></td>
+                                <td>
+                                    {% set expandUrl = path(app.request.attributes.get('_route'), app.request.get('_route_params')|merge({'botlimit': botlimit * 10})) %}
+                                    {% set otherBots = ai.numBots - counter %}
+                                    <a href="{{ expandUrl }}">
+                                        {{ otherBots|num_format }} {{ msg('num-others', [otherBots]) }}
+                                    </a>
+                                </td>
+                                <td colspan=8></td>
+                            </tr></tfoot>
+                        {% endif %}
+                    </table>
+                {% endif %}
+
+                <div class="text-muted">
+                    {{ msg('all-approximate') }}
+                </div>
+            {% endset %}
+            {% set downloadLink %}
+                {{ layout.downloadLink('ArticleInfoResult', {project:project.domain, page:page.title, start:ai.startDate, end:ai.endDate}, ['wikitext'], 'PageApiTopEditors') }}
+            {% endset %}
+            {{ layout.content_block('top-editors', content, ['top-editors-desc', downloadLink]) }}
+        {% endif %}
 
         {# ======================== YEAR COUNTS ======================== #}
         {% set content %}
