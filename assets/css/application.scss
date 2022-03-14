@@ -226,10 +226,12 @@ $tooltip-shadow: #ccc;
 }
 .date-range {
     @include center('vertical');
-    right: 0;
+    right: 30px;
     font-size: 70%;
 
     @media (max-width: $bootstrap-sm) {
+        display: block;
+        left: 0;
         position: relative;
         top: 0;
         transform: none;
