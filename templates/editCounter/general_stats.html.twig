@@ -272,7 +272,7 @@
                 <tr>
                     <td>{{ msg('files-uploaded') }}</td>
                     <td>
-                        <a target="_blank" href="{{ wiki.pageUrlRaw('Special:ListFiles', project) }}/{{ user.username }}">{{ ec.countFilesUploaded|num_format }}</a>
+                        <a target="_blank" href="{{ wiki.pageUrlRaw('Special:Log', project, 'type=upload&subtype=upload&user=' ~ user.username|e('url')) }}">{{ ec.countFilesUploaded|num_format }}</a>
                     </td>
                 </tr>
                 <tr>
@@ -285,7 +285,7 @@
                     <tr>
                         <td>{{ msg('files-uploaded-commons') }}</td>
                         <td>
-                            <a target="_blank" href="https://commons.wikimedia.org/wiki/Special:ListFiles/{{ user.username }}">{{ ec.countFilesUploadedCommons|num_format }}</a>
+                            <a target="_blank" href="https://commons.wikimedia.org/wiki/Special:Log?type=upload&subtype=upload&user={{ user.username|e('url') }}">{{ ec.countFilesUploadedCommons|num_format }}</a>
                         </td>
                     </tr>
                     <tr>
