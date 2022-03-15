@@ -85,6 +85,14 @@
                 </td>
             </tr>
         {% endif %}
+        {% if ec.thanksReceived > 0 %}
+            <tr>
+                <td>{{ msg('thanks-received') }}</td>
+                <td>
+                    {{ wiki.pageLogLinkRaw('User:' ~ user.username, project, ec.thanksReceived|num_format, 'thanks') }}
+                </td>
+            </tr>
+        {% endif %}
         <tr>
             <td class="stat-list--new-group">{{ msg('live-edits') }}</td>
             <td class="stat-list--new-group">

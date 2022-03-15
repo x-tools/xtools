@@ -345,6 +345,32 @@ class EditCounterRepository extends UserRightsRepository
     }
 
     /**
+     * Get the number of times the user was thanked.
+     * @param Project $project
+     * @param User $user
+     * @return int
+     */
+    public function getThanksReceived(Project $project, User $user): int
+    {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'ec_thanksreceived');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $loggingTable = $project->getTableName('logging', 'logindex');
+        $sql = "SELECT COUNT(log_id)
+                FROM $loggingTable
+                WHERE log_type = 'thanks'
+                AND log_title = :username
+                AND log_namespace = 2";
+        $username = str_replace(' ', '_', $user->getUsername());
+
+        return $this->setCache($cacheKey, (int)$this->executeProjectsQuery($project, $sql, [
+            'username' => $username,
+        ])->fetchColumn());
+    }
+
+    /**
      * Get the given user's total edit counts per namespace on the given project.
      * @param Project $project The project.
      * @param User $user The user.

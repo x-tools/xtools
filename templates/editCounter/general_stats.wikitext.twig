@@ -32,7 +32,7 @@
 | {{ msg('is-admin') }}
 | {% if user.isAdmin(project) %}1{% else %}0{% endif %}
 {% endif %}
-{% if ec.firstAndLatestActions.rev_first is defined %}
+{% if ec.firstAndLatestActions.rev_first is defined %}{% set latestAction = ec.firstAndLatestActions.log_latest %}
 
 |-
 | {{ msg('first-edit') }}{% set firstEdit = ec.firstAndLatestActions.rev_first %}
@@ -41,7 +41,16 @@
 |-
 | {{ msg('latest-edit') }}{% set lastEdit = ec.firstAndLatestActions.rev_latest %}
 
-| [[Special:Diff/{{ lastEdit.id }}|{{ lastEdit.timestamp|date_format }}]]{% endif %}
+| [[Special:Diff/{{ lastEdit.id }}|{{ lastEdit.timestamp|date_format }}]]
+{% endif %}
+{% if ec.firstAndLatestActions.log_latest is defined %}
+|-
+| {{ msg('latest-action') }}
+| [[Special:Log/redirect/logid/{{ latestAction.id }}|{{ latestAction.timestamp|date_format }}]]
+{% endif %}{% if ec.thanksReceived > 0 %}
+|-
+| {{ msg('thanks-received') }}
+| [{{ wiki.pageLogLinkRaw('User:' ~ user.username, project, null, 'thanks', true) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.thanksReceived }}}}]{% endif %}
 
 |-
 | {{ msg('live-edits') }}
