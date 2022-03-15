@@ -83,7 +83,7 @@ class UserRightsRepository extends Repository
         }
 
         // Way back when it was possible to have usernames with lowercase characters.
-        // Some log entries are caught unless we look for both variations.
+        // Some log entries aren't caught unless we look for both variations.
         $usernameLower = lcfirst($username);
 
         $logType = 'global' == $type ? 'gblrights' : 'rights';

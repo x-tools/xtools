@@ -229,8 +229,8 @@ class UserRights extends Model
                 $new = $unserialized['5::newgroups'] ?? $unserialized['newGroups'];
                 $added = array_diff($new, $old);
                 $removed = array_diff($old, $new);
-                $oldMetadata = $unserialized['oldmetadata'] ?? null;
-                $newMetadata = $unserialized['newmetadata'] ?? null;
+                $oldMetadata = $unserialized['oldmetadata'] ?? $unserialized['oldMetadata'] ?? null;
+                $newMetadata = $unserialized['newmetadata'] ?? $unserialized['newMetadata'] ?? null;
 
                 // Check for changes only to expiry. If such exists, treat it as added. Various issets are safeguards.
                 if (empty($added) && empty($removed) && isset($oldMetadata) && isset($newMetadata)) {
@@ -264,7 +264,7 @@ class UserRights extends Model
 
                 $this->setAutoRemovals($rightsChanges, $row, $unserialized, $added);
             } else {
-                // This is the old school format the most likely contains
+                // This is the old school format that most likely contains
                 // the list of rights additions as a comma-separated list.
                 try {
                     [$old, $new] = explode("\n", $row['log_params']);
@@ -315,15 +315,15 @@ class UserRights extends Model
     private function setAutoRemovals(array &$rightsChanges, array $row, array $params, array $added): void
     {
         foreach ($added as $index => $entry) {
+            $newMetadata = $params['newmetadata'][$index] ?? $params['newMetadata'][$index] ?? null;
+
             // Skip if no expiry was set.
-            if (!isset($params['newmetadata'][$index]) ||
-                !array_key_exists('expiry', $params['newmetadata'][$index]) ||
-                empty($params['newmetadata'][$index]['expiry'])
+            if (null === $newMetadata || empty($newMetadata['expiry'])
             ) {
                 continue;
             }
 
-            $expiry = $params['newmetadata'][$index]['expiry'];
+            $expiry = $newMetadata['expiry'];
 
             if (isset($rightsChanges[$expiry]) && !in_array($entry, $rightsChanges[$expiry]['removed'])) {
                 // Temporary right expired.
