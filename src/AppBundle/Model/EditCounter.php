@@ -57,6 +57,9 @@ class EditCounter extends UserRights
      */
     protected $longestBlockSeconds;
 
+    /** @var int Number of times the user has been thanked. */
+    protected $thanksReceived;
+
     /**
      * EditCounter constructor.
      * @param Project $project The base project to count edits
@@ -109,6 +112,19 @@ class EditCounter extends UserRights
             );
         }
         return $this->firstAndLatestActions;
+    }
+
+    /**
+     * Get the number of times the user was thanked.
+     * @return int
+     * @codeCoverageIgnore Simply returns the result of an SQL query.
+     */
+    public function getThanksReceived(): int
+    {
+        if (!isset($this->thanksReceived)) {
+            $this->thanksReceived = $this->getRepository()->getThanksReceived($this->project, $this->user);
+        }
+        return $this->thanksReceived;
     }
 
     /**
