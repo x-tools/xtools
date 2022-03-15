@@ -145,6 +145,11 @@ class ArticleInfoController extends XtoolsController
             $this->addFlashMessage('warning', 'old-page-notice');
         }
 
+        // When all username info has been hidden (see T303724).
+        if (0 === $this->articleInfo->getNumEditors()) {
+            $this->addFlashMessage('warning', 'error-usernames-missing');
+        }
+
         $ret = [
             'xtPage' => 'ArticleInfo',
             'xtTitle' => $this->page->getTitle(),
@@ -153,7 +158,7 @@ class ArticleInfoController extends XtoolsController
             'botlimit' => $this->request->query->get('botlimit', 10),
             'pageviewsOffset' => 60,
             'ai' => $this->articleInfo,
-            'showAuthorship' => Authorship::isSupportedPage($this->page),
+            'showAuthorship' => Authorship::isSupportedPage($this->page) && $this->articleInfo->getNumEditors() > 0,
         ];
 
         // Output the relevant format template.

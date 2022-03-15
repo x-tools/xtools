@@ -8,6 +8,7 @@ declare(strict_types = 1);
 namespace AppBundle\Model;
 
 use DateTime;
+use Doctrine\DBAL\Driver\PDOStatement;
 
 /**
  * A Page is a single wiki page in one project.
@@ -337,13 +338,13 @@ class Page extends Model
      * Get the statement for a single revision, so that you can iterate row by row.
      * @see PageRepository::getRevisionsStmt()
      * @param User|null $user Specify to get only revisions by the given user.
-     * @param int $limit Max number of revisions to process.
-     * @param int $numRevisions Number of revisions, if known. This is used solely to determine the
+     * @param ?int $limit Max number of revisions to process.
+     * @param ?int $numRevisions Number of revisions, if known. This is used solely to determine the
      *   OFFSET if we are given a $limit. If $limit is set and $numRevisions is not set, a
      *   separate query is ran to get the nuber of revisions.
      * @param false|int $start
      * @param false|int $end
-     * @return \Doctrine\DBAL\Driver\PDOStatement
+     * @return PDOStatement
      */
     public function getRevisionsStmt(
         ?User $user = null,
@@ -351,7 +352,7 @@ class Page extends Model
         ?int $numRevisions = null,
         $start = false,
         $end = false
-    ): \Doctrine\DBAL\Driver\PDOStatement {
+    ): PDOStatement {
         // If we have a limit, we need to know the total number of revisions so that PageRepo
         // will properly set the OFFSET. See PageRepository::getRevisionsStmt() for more info.
         if (isset($limit) && null === $numRevisions) {
