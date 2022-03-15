@@ -532,7 +532,7 @@ class AppExtension extends AbstractExtension
      * @param int $decimals Number of decimals to format to.
      * @return string
      */
-    public function numberFormat($number, $decimals = 0): string
+    public function numberFormat($number, int $decimals = 0): string
     {
         return $this->i18n->numberFormat($number, $decimals);
     }

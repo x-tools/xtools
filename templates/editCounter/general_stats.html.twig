@@ -134,7 +134,7 @@
         <tr>
             <td>{{ msg('average-edits-per-day', [msg('days', [1])]) }}</td>
             <td>
-                {{ ec.averageRevisionsPerDay|num_format(1) }}
+                {{ ec.averageRevisionsPerDay|num_format(3) }}
                 <span class="text-muted">
                     ({{ ec.days|num_format }} {{ msg('num-days', [ec.days]) }})
                 </span>
@@ -243,7 +243,7 @@
             </tr>
             <tr>
                 <td>{{ msg('average-per-page') }}</td>
-                <td>{{ ec.averageRevisionsPerPage|num_format }}</td>
+                <td>{{ ec.averageRevisionsPerPage|num_format(3) }}</td>
             </tr>
             <tr>
                 <td>{% apply spaceless %}

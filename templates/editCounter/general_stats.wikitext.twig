@@ -70,7 +70,7 @@
 | {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countRevisionsInLast('year') }}}}
 |-
 | {{ msg('average-edits-per-day', [msg('days', [1])]) }}
-| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.averageRevisionsPerDay|round(1) }}}} ({% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.days }}}} {{ msg('num-days', [ec.days]) }})
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.averageRevisionsPerDay|round(3) }}}} ({% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.days }}}} {{ msg('num-days', [ec.days]) }})
 |-
 | {{ msg('average-edit-size') }}*
 | {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.averageEditSize|round(1) }}}} {{ msg('num-bytes', [ec.averageEditSize]) }}
@@ -96,7 +96,7 @@
 | {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countAllPagesEdited}}}}
 |-
 | {{ msg('average-per-page') }}
-| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.averageRevisionsPerPage }}}}
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.averageRevisionsPerPage|round(3) }}}}
 |-
 | {{ msg('pages-created') }}
 | [{{ url('PagesResult', {project:project.domain, username:user.usernameIdent, namespace:'all', redirects:'noredirects'}) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesCreated }}}}] ({{ msg('pages-created-since-deleted', [ec.countPagesCreatedDeleted]) }})
