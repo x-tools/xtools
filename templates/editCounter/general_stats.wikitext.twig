@@ -111,11 +111,11 @@
 
 {| class="wikitable sortable"
 | {{ msg('files-uploaded') }}
-| [[Special:ListFiles/{{ user.username }}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countFilesUploaded }}}}]]
-{% if isWMFLabs() %}
+| [{{ wiki.pageUrlRaw('Special:Log/upload/' ~ user.username, project, 'subtype=upload') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countFilesUploaded }}}}]
+{% if isWMFLabs() and project.domain != 'commons.wikimedia.org' %}
 |-
 | {{ msg('files-uploaded-commons') }}
-| [https://commons.wikimedia.org/wiki/Special:ListFiles/{{ user.username|e('url') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countFilesUploadedCommons }}}}]
+| [https://commons.wikimedia.org/wiki/Special:Log?type=upload&subtype=upload&user={{ user.username|e('url') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countFilesUploadedCommons }}}}]
 {% endif %}
 |-
 |}
