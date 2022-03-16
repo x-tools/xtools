@@ -25,6 +25,9 @@ class ArticleInfoApi extends Model
     /** @var int Number of revisions that belong to the page. */
     protected $numRevisions;
 
+    /** @var int Maximum number of revisions to process, as configured. */
+    protected $maxRevisions;
+
     /** @var mixed[] Prose stats, with keys 'characters', 'words', 'references', 'unique_references', 'sections'. */
     protected $proseStats;
 
@@ -71,6 +74,27 @@ class ArticleInfoApi extends Model
             $this->numRevisions = $this->page->getNumRevisions(null, $this->start, $this->end);
         }
         return $this->numRevisions;
+    }
+
+    /**
+     * Are there more revisions than we should process, based on the config?
+     * @return bool
+     */
+    public function tooManyRevisions(): bool
+    {
+        return $this->getMaxRevisions() > 0 && $this->getNumRevisions() > $this->getMaxRevisions();
+    }
+
+    /**
+     * Get the maximum number of revisions that we should process.
+     * @return int
+     */
+    public function getMaxRevisions(): int
+    {
+        if (!isset($this->maxRevisions)) {
+            $this->maxRevisions = (int) $this->container->getParameter('app.max_page_revisions');
+        }
+        return $this->maxRevisions;
     }
 
     /**
@@ -139,7 +163,7 @@ class ArticleInfoApi extends Model
             return $this->proseStats;
         }
 
-        $datetime = is_int($this->end) ? new DateTime("@{$this->end}") : null;
+        $datetime = is_int($this->end) ? new DateTime("@$this->end") : null;
         $html = $this->page->getHTMLContent($datetime);
 
         $crawler = new Crawler($html);
@@ -413,8 +437,8 @@ class ArticleInfoApi extends Model
     }
 
     /**
-     * Get and set $this->bots about bots that edited the page. This is done as a private setter because we need
-     * this information when computing the top 10 editors in ArticleInfo, where we don't want to include bots.
+     * Get and set $this->bots about bots that edited the page. This is done separately from the main query because
+     * we use this information when computing the top 10 editors in ArticleInfo, where we don't want to include bots.
      * @return mixed[]
      */
     public function getBots(): array
@@ -426,8 +450,10 @@ class ArticleInfoApi extends Model
         // Parse the bot edits.
         $this->bots = [];
 
+        $limit = $this->tooManyRevisions() ? $this->getMaxRevisions() : null;
+
         /** @var Statement $botData */
-        $botData = $this->getRepository()->getBotData($this->page, $this->start, $this->end);
+        $botData = $this->getRepository()->getBotData($this->page, $this->start, $this->end, $limit);
         while ($bot = $botData->fetch()) {
             $this->bots[$bot['username']] = [
                 'count' => (int)$bot['count'],

@@ -105,7 +105,7 @@
                         <td>
                             {{ ai.numRevisions|num_format }}
                             {% if ai.tooManyRevisions %}
-                                ({{ msg('num-revisions-processed', [ai.numRevisionsProcessed]) }})
+                                ({{ msg('num-revisions-processed', [ai.numRevisionsProcessed|num_format]) }})
                             {% endif %}
                         </td>
                     </tr>
@@ -115,7 +115,7 @@
                         </td>
                         <td>{{ ai.numEditors|num_format }}</td>
                     </tr>
-                    {% if not (ai.hasDateRange) and ai.assessments and not (page.isMainPage) %}
+                    {% if not (ai.hasDateRange) and ai.assessments and not(page.isMainPage) %}
                         <tr>
                             <td>
                                 <a class="rm-inline-margin" href="#assessments">{{ msg('assessment') }}</a>

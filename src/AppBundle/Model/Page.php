@@ -274,7 +274,7 @@ class Page extends Model
 
     /**
      * Get the number of revisions the page has.
-     * @param User $user Optionally limit to those of this user.
+     * @param ?User $user Optionally limit to those of this user.
      * @param false|int $start
      * @param false|int $end
      * @return int
