@@ -22,16 +22,17 @@ class ArticleInfoRepository extends Repository
      * @param Page $page
      * @param false|int $start
      * @param false|int $end
-     * @param bool $count
+     * @param ?int $limit
+     * @param bool $count Return a count rather than the full set of rows.
      * @return ResultStatement resolving with keys 'count', 'username' and 'current'.
      */
-    public function getBotData(Page $page, $start, $end, $count = false): ResultStatement
+    public function getBotData(Page $page, $start, $end, ?int $limit, bool $count = false): ResultStatement
     {
         $project = $page->getProject();
         $revTable = $project->getTableName('revision');
         $userGroupsTable = $project->getTableName('user_groups');
         $userFormerGroupsTable = $project->getTableName('user_former_groups');
-        $actorTable = $project->getTableName('actor');
+        $actorTable = $project->getTableName('actor', 'revision');
 
         $datesConditions = $this->getDateConditions($start, $end);
 
@@ -43,18 +44,35 @@ class ArticleInfoRepository extends Repository
             $groupBy = 'GROUP BY actor_user';
         }
 
-        $sql = "SELECT COUNT(DISTINCT(rev_id)) AS count, $actorSelect '0' AS current
-                FROM $revTable
+        $limitClause = '';
+        if (null !== $limit) {
+            $limitClause = "LIMIT $limit";
+        }
+
+        $sql = "SELECT COUNT(DISTINCT rev_id) AS count, $actorSelect '0' AS current
+                FROM (
+                    SELECT rev_id, rev_actor, rev_timestamp
+                    FROM $revTable
+                    WHERE rev_page = :pageId
+                    ORDER BY rev_timestamp DESC
+                    $limitClause
+                ) a
                 JOIN $actorTable ON actor_id = rev_actor
                 LEFT JOIN $userFormerGroupsTable ON actor_user = ufg_user
-                WHERE rev_page = :pageId AND ufg_group = 'bot' $datesConditions
+                WHERE ufg_group = 'bot' $datesConditions
                 $groupBy
                 UNION
-                SELECT COUNT(DISTINCT(rev_id)) AS count, $actorSelect '1' AS current
-                FROM $revTable
+                SELECT COUNT(DISTINCT rev_id) AS count, $actorSelect '1' AS current
+                FROM (
+                    SELECT rev_id, rev_actor, rev_timestamp
+                    FROM $revTable
+                    WHERE rev_page = :pageId
+                    ORDER BY rev_timestamp DESC
+                    $limitClause
+                ) a
                 JOIN $actorTable ON actor_id = rev_actor
                 LEFT JOIN $userGroupsTable ON actor_user = ug_user
-                WHERE rev_page = :pageId AND ug_group = 'bot' $datesConditions
+                WHERE ug_group = 'bot' $datesConditions
                 $groupBy";
 
         return $this->executeProjectsQuery($project, $sql, ['pageId' => $page->getId()]);

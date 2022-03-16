@@ -18,9 +18,6 @@ class ArticleInfo extends ArticleInfoApi
     /** @var I18nHelper For i18n and l10n. */
     protected $i18n;
 
-    /** @var int Maximum number of revisions to process, as configured. */
-    protected $maxRevisions;
-
     /** @var int Number of revisions that were actually processed. */
     protected $numRevisionsProcessed;
 
@@ -119,7 +116,7 @@ class ArticleInfo extends ArticleInfoApi
     private function getLastDay(): int
     {
         if (is_int($this->end)) {
-            return (new DateTime("@{$this->end}"))
+            return (new DateTime("@$this->end"))
                 ->modify('last day of this month')
                 ->getTimestamp();
         } else {
@@ -154,18 +151,6 @@ class ArticleInfo extends ArticleInfoApi
     }
 
     /**
-     * Get the maximum number of revisions that we should process.
-     * @return int
-     */
-    public function getMaxRevisions(): int
-    {
-        if (!isset($this->maxRevisions)) {
-            $this->maxRevisions = (int) $this->container->getParameter('app.max_page_revisions');
-        }
-        return $this->maxRevisions;
-    }
-
-    /**
      * Get the number of revisions that are actually getting processed. This goes by the app.max_page_revisions
      * parameter, or the actual number of revisions, whichever is smaller.
      * @return int
@@ -183,15 +168,6 @@ class ArticleInfo extends ArticleInfoApi
         }
 
         return $this->numRevisionsProcessed;
-    }
-
-    /**
-     * Are there more revisions than we should process, based on the config?
-     * @return bool
-     */
-    public function tooManyRevisions(): bool
-    {
-        return $this->getMaxRevisions() > 0 && $this->getNumRevisions() > $this->getMaxRevisions();
     }
 
     /**
@@ -522,11 +498,7 @@ class ArticleInfo extends ArticleInfoApi
      */
     private function parseHistory(): void
     {
-        if ($this->tooManyRevisions()) {
-            $limit = $this->getMaxRevisions();
-        } else {
-            $limit = null;
-        }
+        $limit = $this->tooManyRevisions() ? $this->getMaxRevisions() : null;
 
         // Third parameter is ignored if $limit is null.
         $revStmt = $this->page->getRevisionsStmt(
@@ -633,7 +605,7 @@ class ArticleInfo extends ArticleInfoApi
      * @param Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
      * @return Edit[] Updated version of $prevEdits.
      */
-    private function updateContentSizes(Edit &$edit, array $prevEdits): array
+    private function updateContentSizes(Edit $edit, array $prevEdits): array
     {
         // Check if it was a revert
         if ($this->isRevert($edit, $prevEdits)) {
@@ -794,7 +766,7 @@ class ArticleInfo extends ArticleInfoApi
         $this->yearMonthCounts[$editYear]['all']++;
         $this->yearMonthCounts[$editYear]['months'][$editMonth]['all']++;
         // This will ultimately be the size of the page by the end of the year
-        $this->yearMonthCounts[$editYear]['size'] = (int) $edit->getLength();
+        $this->yearMonthCounts[$editYear]['size'] = $edit->getLength();
 
         // Keep track of which month had the most edits
         $editsThisMonth = $this->yearMonthCounts[$editYear]['months'][$editMonth]['all'];
