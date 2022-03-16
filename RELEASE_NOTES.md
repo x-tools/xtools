@@ -1,5 +1,24 @@
 # Release Notes #
 
+## 3.15.0 ##
+- EditCounter (T284331): show number of content model changes
+  under Admin Actions.
+- EditCounter (T283542): show number of Thanks received by the user.
+- EditCounter (T270998): show 3 decimal places for average edit figures.
+- EditCounter (T299411): add support for global expiring user rights.
+- EditCounter (T290534): link to Special:Log for upload counts.
+- ArticleInfo (T303724): show warning when all usernames are missing.
+- ArticleInfo (T253464): fix bot data when revs processed is less
+  than total revs.
+- ArticleInfo: escape backlashes in gadget.
+- ArticleInfo: catch ServerException when Wikimedia API is down.
+- TopEdits (T302470): Restore pagination widget.
+- Fix dark mode styles for pagination widget.
+- T285074: Escape usernames in external links.
+- T301629: Remove default 'limit' value on contribs lists.
+- Other minor styling tweaks and code cleanup.
+- Localization udpates.
+
 ## 3.14.4 ##
 - (T284874): Refactor pagination and limit parameter in contribs lists.
 - Authorship (T288840): switch to use new WikiWho installation.
