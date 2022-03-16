@@ -273,6 +273,41 @@ $tooltip-shadow: #333;
     color: $diff-neg;
   }
 
+  /* PAGINATION */
+  .pagination > li {
+    & > a {
+      background-color: transparent;
+      border-color: $border-color-light;
+      color: $font-color;
+
+      &:hover,
+      &:focus {
+        background-color: $dropdown-background-hover-color;
+        border-color: $border-color-light;
+        color: $font-color;
+      }
+    }
+
+    &.disabled > span {
+      background-color: inherit;
+      border-color: inherit;
+      opacity: 0.5;
+    }
+
+    &.active > a {
+      background-color: $dropdown-background-hover-color;
+      border-color: $border-color-light;
+      color: $font-color;
+
+      &:hover,
+      &:focus {
+        background-color: $dropdown-background-hover-color;
+        border-color: $border-color-light;
+        color: $font-color;
+      }
+    }
+  }
+
   /* OTHER */
 
   .reverted-edit {
