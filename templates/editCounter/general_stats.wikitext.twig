@@ -196,6 +196,9 @@
 | [{{ wiki.pageUrlRaw('Special:Log/abusefilter/' ~ user.username, project) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countAbuseFilterChanges }}}}]
 |-
 {% endif %}
+| {{ msg('contentmodel') }}
+| [[Special:Log/contentmodel/{{ user.username }}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countContentModelChanges }}}}]]
+|-
 |}
 
 {% endif %}{% endif %}

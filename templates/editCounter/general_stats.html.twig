@@ -418,9 +418,13 @@
                 {% if isWMFLabs() %}
                     <tr>
                         <td>{{ msg('abusefilter') }}</td>
-                        <td>{{ wiki.userLogLink(user, project, ec.countAbuseFilterChanges, 'abusefilter') }}</td>
+                        <td>{{ wiki.userLogLink(user, project, ec.countAbuseFilterChanges|num_format, 'abusefilter') }}</td>
                     </tr>
                 {% endif %}
+                <tr>
+                    <td>{{ msg('contentmodel') }}</td>
+                    <td>{{ wiki.userLogLink(user, project, ec.countContentModelChanges|num_format, 'contentmodel') }}</td>
+                </tr>
             </tbody>
         {% else %}
             {{ blockStats }}

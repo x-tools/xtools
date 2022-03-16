@@ -523,10 +523,26 @@ class EditCounter extends UserRights
         return $import + $interwiki + $upload;
     }
 
-    public function countAbuseFilterchanges(): int
+    /**
+     * Get the number of changes the user has made to AbuseFilters.
+     * @return int
+     */
+    public function countAbuseFilterChanges(): int
     {
         $logCounts = $this->getLogCounts();
         return isset($logCounts['abusefilter-modify']) ? (int)$logCounts['abusefilter-modify'] : 0;
+    }
+
+    /**
+     * Get the number of page content model changes made by the user.
+     * @return int
+     */
+    public function countContentModelChanges(): int
+    {
+        $logCounts = $this->getLogCounts();
+        $new = isset($logCounts['contentmodel-new']) ? (int)$logCounts['contentmodel-new'] : 0;
+        $modified = isset($logCounts['contentmodel-change']) ? (int)$logCounts['contentmodel-change'] : 0;
+        return $new + $modified;
     }
 
     /**
