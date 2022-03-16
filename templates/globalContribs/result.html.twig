@@ -53,7 +53,7 @@
                                 {% endif %}
                             </td>
                         </tr>
-                        {% if gc.namespace != 'all' or gc.namespace == '' %}
+                        {% if gc.namespace is not same as('all') or gc.namespace == '' %}
                             <tr>
                                 <td>{{ msg('namespace') }}</td>
                                 <td>{{ nsName(gc.namespace, project.namespaces) }}</td>

@@ -12,7 +12,7 @@
         {% set content %}
             <div class="col-lg-12 stat-list clearfix">
                 <table class="table">
-                    {% if sec.namespace != 'all' or sec.namespace == '' %}
+                    {% if sec.namespace is not same as('all') or sec.namespace == '' %}
                         <tr>
                             <td>{{ msg('namespace') }}</td>
                             <td>{{ nsName(sec.namespace, project.namespaces) }}</td>

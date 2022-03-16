@@ -14,7 +14,7 @@
                         {{ msg('all') | ucfirst }}
                     </option>
                     {% for id, name in project.namespaces|filter(id => id < 16) %}
-                        <option value="{{ id }}" {% if namespace != 'all' and namespace == id %}selected="selected"{% endif %}>
+                        <option value="{{ id }}" {% if namespace is not same as('all') and namespace == id %}selected="selected"{% endif %}>
                             {% if id == 0 %}
                                 {{ msg('mainspace') }}
                             {# FIXME: i18n needed. See T226072 #}

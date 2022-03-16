@@ -1,5 +1,5 @@
 {% set columns = ['namespace', 'page-title', 'date', 'original-size'] %}
-{% if pages.deleted != 'deleted' %}
+{% if pages.deleted is not same as('deleted') %}
 {% set columns = columns|merge(['current-size']) %}
 {% endif %}
 {% if project.hasPageAssessments and pages.deleted != 'deleted' %}

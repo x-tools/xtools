@@ -86,7 +86,7 @@
             </tbody>
         </table>
 
-        {% if not(is_sub_request) and te.namespace != 'all' %}
+        {% if not(is_sub_request) and te.namespace is not same as('all') %}
             {% set numPages = (te.getNumPagesNamespace / te.limit)|round(0, 'ceil') %}
             {% set hasPrev = te.pagination - 1 >= 0 %}
             {% set hasNext = te.pagination + 1 < numPages %}
