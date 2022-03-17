@@ -10,7 +10,8 @@
 			"Moottori",
 			"Nike",
 			"Pyscowicz",
-			"SMAUG"
+			"SMAUG",
+			"Yupik"
 		]
 	},
 	"abusefilter": "Väärinkäyttösuodatin",
@@ -32,7 +33,7 @@
 	"all": "Kaikki",
 	"all-approximate": "Kaikki tiedot ovat arvioita.",
 	"all-edits": "Kaikki muokkaukset",
-	"all-languages": "kaikki kieliversiot",
+	"all-languages": "Kaikki kieliversiot",
 	"all-namespaces": "Kaikki nimiavaruudet",
 	"all-projects": "Kaikki hankkeet",
 	"all-quotes": "Kaikki lainaukset",
@@ -386,6 +387,7 @@
 	"text-added-description": "Lisätyksi tekstiksi lasketaan mikä tahansa lisäys, joka lisää sivun kokoa tavuina ja jota ei kumota",
 	"text-to-serach": "Etsittävä teksti",
 	"thank": "Kiitoksia",
+	"thanks-received": "Kiitos vastaanotettu",
 	"thursday": "Torstai",
 	"timecard": "Kellokortti",
 	"times-in-utc": "Kaikki ajat ovat UTC-aikaa.",
