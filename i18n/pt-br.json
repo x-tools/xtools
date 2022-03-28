@@ -7,7 +7,8 @@
 			"He7d3r",
 			"Isabelle Belato",
 			"Leosls",
-			"Tks4Fish"
+			"Tks4Fish",
+			"YuriNikolai"
 		]
 	},
 	"abusefilter": "Filtro de abuso",
@@ -152,6 +153,7 @@
 	"error-server-message": "O servidor respondeu: $1",
 	"error-service-overload": "O XTools encontra-se atualmente sobrecarregado, respondendo os outros pedidos. Por favor, tente de novo dentro de alguns minutos.",
 	"error-title": "Ocorreu um erro fatal interno do XTools. Isto foi reportado automaticamente, mas não hesite em criar uma tarefa no $1 (requer uma conta Wikimedia).",
+	"error-usernames-missing": "Nenhum nome de usuário pode ser carregado. Como resultado disso, dados poderão ser imprecisos ou enganosos.",
 	"events": "Eventos",
 	"exclusion-pattern": "Não inclua páginas com títulos que correspondem ao padrão dado.",
 	"executed": "Executado em $1 {{PLURAL:$2|segundo|segundos}}.",
@@ -411,6 +413,7 @@
 	"text-added-description": "O texto acrescentado é qualquer adição positiva que não foi desfeita",
 	"text-to-serach": "Texto para pesquisar",
 	"thank": "Obrigado",
+	"thanks-received": "Agradecimentos recebidos",
 	"thursday": "Quinta-feira",
 	"timecard": "Horário",
 	"times-in-utc": "Todas as horas estão em UTC.",

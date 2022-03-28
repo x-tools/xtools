@@ -144,6 +144,7 @@
 	"error-server-message": "서버 응답: $1",
 	"error-service-overload": "XTools가 현재 다른 요청에 대한 서비스 제공에 과부하가 걸려있습니다. 몇 분 뒤에 다시 시도해 주십시오.",
 	"error-title": "XTools에 치명적인 오류가 발생했습니다. 자동으로 보고되지만 $1에 자유롭게 일감을 신청해도 됩니다. (위키미디어 계정 필요)",
+	"error-usernames-missing": "사용자 이름을 가져오지 못했습니다. 이로 인해 일부 데이터는 정확하지 않을 수 있습니다.",
 	"events": "사건",
 	"executed": "$1{{PLURAL:$2|초}} 전에 실행됨.",
 	"explanation": "설명",
