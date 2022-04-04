@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"Mirin",
-			"Robin van der Vliet"
+			"Robin van der Vliet",
+			"StarrySky"
 		]
 	},
 	"abusefilter": "MisuzoFiltro",
@@ -15,6 +16,8 @@
 	"actions-as-admin": "Administraj agoj",
 	"added": "Aldonita",
 	"added-bytes": "Aldonita (bajtoj)",
+	"admin-stats-notice": "Nuraj uzantoj kiu faris almenaŭ unu admin ago en la tempa periodo estas montrita.",
+	"admin-stats-notice2": "Kelkaj uzantoj povas esti eksaj admins aŭ estas ne-admins sed havi rajtojn fari certan admin agoj.",
 	"admins": "Administrantoj",
 	"afd": "Forigindaj artikoloj",
 	"all": "Ĉiuj",
@@ -31,7 +34,9 @@
 	"article": "Artikolo",
 	"assessment": "Takso",
 	"assessments": "Taksoj",
+	"auto-contribs-use-tool": "Rezulto nur redaktas uzanta la ilon:",
 	"auto-edits": "(Duon-)aŭtomataj redaktoj",
+	"auto-edits-bot": "Ĉi tiu uzanto estas  bot. Ĉiuj redaktas povas esti aŭtomatigita. Statistiko montrita ĉi tie estas bazita sur redaktas farita uzanta konatajn ilojn.",
 	"auto-edits-counts-desc-grand-total": "totala sumo",
 	"auto-tool-edits": "$1 redaktoj",
 	"automatic": "Aŭtomata",
