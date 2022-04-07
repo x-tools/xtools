@@ -427,7 +427,7 @@
 	"text-added-description": "Description of what the 'added text' statistic is.",
 	"text-to-serach": "Label for form field to search for text in a page.",
 	"thank": "Name of a MediaWiki log action, used as header of a row in the table of log action counts for a user\n{{Identical|Thank}}",
-	"thanks-received": "Label for number of Thanks a user has recieved. Thanks is a MediaWiki log action.",
+	"thanks-received": "Label for number of Thanks a user has received. \"Thanks\" is a MediaWiki log action.",
 	"thursday": "{{Identical|Thursday}}",
 	"timecard": "Chart that shows the edit behaviour",
 	"times-in-utc": "Message indicating all times in XTools are in the UTC timezone.",
