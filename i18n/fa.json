@@ -9,6 +9,7 @@
 			"FarsiNevis",
 			"Fatemi127",
 			"Jeeputer",
+			"Mojtabakd",
 			"Nemo bis",
 			"Obzord",
 			"Ommmmid",
@@ -18,7 +19,7 @@
 			"Vahedi"
 		]
 	},
-	"abusefilter": "پالایهٔ خرابکاری",
+	"abusefilter": "پالایهٔ ویرایش",
 	"accepted-formats": "قالب‌های پذیرفته‌شده",
 	"account-age": "عمر حساب",
 	"account-age-desc": "$2 {{PLURAL:$1|روز|روز}} قدمت",
@@ -388,6 +389,7 @@
 	"text-added-description": "متن افزوده به ویرایشی گفته می‌شود که در ویرایش بعدیش خنثی نشده باشد",
 	"text-to-serach": "متن جستجو",
 	"thank": "سپاس",
+	"thanks-received": "تشکر دریافت شد",
 	"thursday": "پنجشنبه",
 	"timecard": "کارت زمان",
 	"times-in-utc": "تمامی زمان‌ها به ساعت جهانی است.",
