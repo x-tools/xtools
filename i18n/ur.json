@@ -3,7 +3,8 @@
 		"authors": [
 			"Abdulq",
 			"Obaid Raza",
-			"امین اکبر"
+			"امین اکبر",
+			"محمد-عثمان"
 		]
 	},
 	"accepted-formats": "منظور شدہ فارمیٹس",
@@ -85,7 +86,28 @@
 	"performer": "صارف",
 	"project": "منصوبہ",
 	"report-issue": "مسئلے کی نشاندہی کریں",
+	"rights": "حقوق",
+	"rights-changes": "حقوق میں تبدیلی",
+	"rpp": "درخواست برائے حفاظتِ صفحہ",
+	"saturday": "ہفتہ(ے)",
+	"sections": "حصص",
+	"see-full-statistics": "مکمل عدد وشمار دیکھیں",
+	"show": "دکھائیں",
+	"size": "حجم",
 	"size-kilobytes": "$1 کلوبائٹ",
+	"small-edits": "چھوٹی ترامیم(<20 بائٹس)",
+	"start": "تاریخِ ابتدا",
+	"sunday": "اتوار",
+	"support": "معاونت",
+	"talk": "تبادلۂ خیال",
+	"templates": "سانچے",
+	"text": "متن",
+	"text-to-serach": "متن تلاش کے لیے",
+	"thank": "شکریہ",
+	"thanks-received": "شرکریہ مصول",
+	"thursday": "جمعرات",
+	"timecard": "وقت کارڈ",
+	"times-in-utc": "سبھی وقت یو ٹی سی ميں ہیں۔",
 	"top-ten-by-edits": "سرفہرست 10 بلحاظ ترامیم",
 	"top-ten-by-text": "سرفہرست 10 بلحاظ شمولیت متن",
 	"user": "صارف"
