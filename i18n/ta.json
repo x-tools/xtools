@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"AntanO",
 			"Aswn",
 			"Balajijagadesh",
 			"ElangoRamanujam",
@@ -336,7 +337,7 @@
 	"tool-pages": "உருவாக்கப்பட்ட பக்கங்கள்",
 	"tool-pages-desc": "பயனரால் உருவாக்கப்பட்ட பக்கங்களினை காட்டு",
 	"tool-patrollerstats": "பேட்‌ரோலர் புள்ளிவிவரங்கள்",
-	"tool-patrollerstats-desc": "ரோந்து பணியாளாரின் நடவடிக்கைகளின் புள்ளிவிவரங்களைக் காண்பி",
+	"tool-patrollerstats-desc": "சுற்றுக்காவல் பணியாளாரின் நடவடிக்கைகளின் புள்ளிவிவரங்களைக் காண்பி",
 	"tool-stewardstats": "ஸ்டீவர்ட் புள்ளிவிவரங்கள்",
 	"tool-stewardstats-desc": "காரியதரிசன/முகமைப் பணியாளர் நடவடிக்கைகளின் புள்ளிவிவரங்களைக் காண்பி",
 	"top-edited-pages": "அதிகம் தொகுக்கப்பட்ட பக்கங்கள்",
