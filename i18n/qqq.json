@@ -161,7 +161,7 @@
 	"error-query-timeout": "Error message shown when XTools timed out. $1 is the timeout value in seconds.",
 	"error-rate-limit": "Error shown when too many requests are made to XTools in a short period of time. $1 is the number of minutes the client must wait to reload the page. $2 is a link to Login, with the message {{msg-wm|Xtools-error-rate-limit-login}} as the link text. $3 is a link the API documentation, with 'api' as the link text.",
 	"error-rate-limit-login": "{{Doc-important|Warning: lego message. This message is part of a larger sentence, so may need to be translated differently. The $1 in {{msg-wm|Xtools-error-rate-limit-login-big}} is replaced by this message and is made into a link to log in. Can probably be translated as an infinitive (\"to log in\") or a an imperative (\"log in!\").}}\n{{Identical|Login}}",
-	"error-rate-limit-login-big": "A bigger message shown to the user when they are making too many requests in a short amount of time. $1 is a link to login with the message 'error-rate-limit-login' as the link text.",
+	"error-rate-limit-login-big": "A bigger message shown to the user when they are making too many requests in a short amount of time. $1 is a link to login with the message {{msg-wm|Xtools-error-rate-limit-login}} as the link text.",
 	"error-server-message": "Error message. $1 is the message given by the server.",
 	"error-service-overload": "Error message shown when too many people are using XTools.",
 	"error-title": "Title for the error page. $1 is a link to report the error on Phabricator.",
