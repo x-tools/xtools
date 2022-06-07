@@ -94,6 +94,11 @@ class Project extends Model
     protected function getMetadata(): ?array
     {
         if (empty($this->metadata)) {
+            $info = $this->getBasicInfo();
+            if (!isset($info['url'])) {
+                // Project is probably not replicated.
+                return null;
+            }
             $url = $this->getBasicInfo()['url'];
             $this->metadata = $this->getRepository()->getMetadata($url);
         }

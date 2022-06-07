@@ -131,7 +131,7 @@
         </tr></thead>
         <tbody>
         {% set substr = user.ipSubstringFromCidr %}
-        {% for edit in gc.globalEdits %}
+        {% for edit in gc.globalEdits if edit.project.exists %}
             <tr{% if edit.isReverted %} class="reverted-edit"{% endif %}>
                 <td class="sort-entry--date contribs-row-date" data-value="{{ edit.utcTimestamp }}">
                     {{ wiki.diffLink(edit, edit.timestamp) }}
