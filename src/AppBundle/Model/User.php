@@ -37,8 +37,7 @@ class User extends Model
         if ('ipr-' === substr($username, 0, 4)) {
             $username = substr($username, 4);
         }
-        // Force UTF-8 as some very old revisions have malformed characters as the username.
-        $this->username = utf8_encode(ucfirst(str_replace('_', ' ', trim($username))));
+        $this->username = ucfirst(str_replace('_', ' ', trim($username)));
 
         // IPv6 address are stored as uppercase in the database.
         if ($this->isAnon()) {

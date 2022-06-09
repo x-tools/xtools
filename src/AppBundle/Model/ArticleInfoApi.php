@@ -304,7 +304,7 @@ class ArticleInfoApi extends Model
                 'revisions' => (int) $info['num_edits'],
                 'editors' => (int) $info['num_editors'],
                 'minor_edits' => (int) $info['minor_edits'],
-                'author' => utf8_encode($info['author']), // Some really old author names have malformed characters.
+                'author' => $info['author'],
                 'author_editcount' => null === $info['author_editcount'] ? null : (int) $info['author_editcount'],
                 'created_at' => $creationDateTime,
                 'created_rev_id' => $info['created_rev_id'],
