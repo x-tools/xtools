@@ -1,5 +1,11 @@
 # Release Notes #
 
+## 3.15.1 ##
+- ArticleInfo: fix sorting for table columns with percentages
+- ArticleInfo, User: force UTF-8 on usernames
+- GlobalContribs (T309453): fix bug with project not being replicated
+- Localization updates.
+
 ## 3.15.0 ##
 - EditCounter (T284331): show number of content model changes
   under Admin Actions.
@@ -17,7 +23,7 @@
 - T285074: Escape usernames in external links.
 - T301629: Remove default 'limit' value on contribs lists.
 - Other minor styling tweaks and code cleanup.
-- Localization udpates.
+- Localization updates.
 
 ## 3.14.4 ##
 - (T284874): Refactor pagination and limit parameter in contribs lists.
