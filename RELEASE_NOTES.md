@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.15.2 ##
+- ArticleInfo: revert forcing of UTF-8 on usernames
+
 ## 3.15.1 ##
 - ArticleInfo: fix sorting for table columns with percentages
 - ArticleInfo, User: force UTF-8 on usernames
