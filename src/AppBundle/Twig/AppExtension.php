@@ -447,21 +447,13 @@ class AppExtension extends AbstractExtension
      */
     public function replag(): int
     {
-        if (!$this->isWMFLabs()) {
-            return 0;
-        }
-
         $projectIdent = $this->getRequest()->get('project', 'enwiki');
         $project = ProjectRepository::getProject($projectIdent, $this->container);
         $dbName = $project->getDatabaseName();
-
-        $sql = "SELECT lag FROM `heartbeat_p`.`heartbeat` h
-                RIGHT JOIN `meta_p`.`wiki` w ON concat(h.shard, \".labsdb\")=w.slice
-                WHERE dbname LIKE :project LIMIT 1";
-
-        return (int)$project->getRepository()->executeProjectsQuery('meta', $sql, [
+        $sql = "SELECT lag FROM `heartbeat_p`.`heartbeat`";
+        return (int)$project->getRepository()->executeProjectsQuery($project, $sql, [
             'project' => $dbName,
-        ])->fetch();
+        ])->fetchColumn();
     }
 
     /**
