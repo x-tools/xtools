@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.15.3 ##
+- Fix querying of replication lag.
+
 ## 3.15.2 ##
 - ArticleInfo: revert forcing of UTF-8 on usernames
 
