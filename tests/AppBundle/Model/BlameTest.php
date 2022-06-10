@@ -76,6 +76,9 @@ class BlameTest extends TestAdapter
                     ],
                 ]],
             ]);
+        $this->blameRepo->expects($this->exactly(2))
+            ->method('getEditFromRevId')
+            ->willReturn($this->createMock('AppBundle\Model\Edit'));
 
         $blame = new Blame($this->page, 'Foo bar');
         $blame->setRepository($this->blameRepo);

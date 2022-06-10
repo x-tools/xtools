@@ -56,6 +56,10 @@ class EditRepository extends Repository
             $page = new Page($project, $result['page_title']);
         }
 
+        if (!$result) {
+            return null;
+        }
+
         $edit = new Edit($page, $result);
         $edit->setRepository($this);
 

@@ -31,9 +31,9 @@ class BlameRepository extends AuthorshipRepository
      * Get an Edit given the revision ID.
      * @param Page $page Given so that the Edit will point to the same instance, rather than create a new Page.
      * @param int $revId
-     * @return Edit
+     * @return Edit|null null if not found.
      */
-    public function getEditFromRevId(Page $page, int $revId): Edit
+    public function getEditFromRevId(Page $page, int $revId): ?Edit
     {
         return $this->editRepo->getEditFromRevIdForPage($page->getProject(), $revId, $page);
     }

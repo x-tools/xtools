@@ -120,10 +120,12 @@ class Blame extends Authorship
             }
 
             $edit = $this->getRepository()->getEditFromRevId($this->page, $match['id']);
-            $this->matches[$match['id']] = [
-                'edit' => $edit,
-                'tokens' => [$match['token']],
-            ];
+            if ($edit) {
+                $this->matches[$match['id']] = [
+                    'edit' => $edit,
+                    'tokens' => [$match['token']],
+                ];
+            }
         }
     }
 
