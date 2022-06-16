@@ -287,7 +287,7 @@
 	"num-watchers": "{{PLURAL:$1|pozorovateľ/ka|pozorovatelia|pozorovateľov}}",
 	"num-weeks": "{{PLURAL:$1|týždeň|týždne|týždňov}}",
 	"num-years": "{{PLURAL:$1|rok|roky|rokov}}",
-	"old-page-notice": "Táto stránka je veľmi stará. Niektoré údaje môžu byť nepresné pretože revízie boli robené v prvých dňoch existencie MédiaWiki.",
+	"old-page-notice": "Táto stránka je veľmi stará. Niektoré údaje môžu byť nepresné pretože revízie boli robené v prvých dňoch existencie MediaWiki.",
 	"oppose": "Proti",
 	"optional": "Nepovinné",
 	"original-size": "Pôvodná veľkosť",
