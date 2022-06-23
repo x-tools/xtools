@@ -3,7 +3,8 @@
 		"authors": [
 			"BRUTE",
 			"David1010",
-			"Nemo bis"
+			"Nemo bis",
+			"Გიო ოქრო"
 		]
 	},
 	"accepted-formats": "მიღებული ფორმატები",
@@ -77,7 +78,7 @@
 	"deleted-pages": "წაშლილი გვერდები",
 	"diff-empty": "ცარიელი",
 	"documentation": "დოკუმენტაცია",
-	"download-label": "გადმოწერა",
+	"download-label": "ჩამოტვირთვა",
 	"edit": "რედაქტირება",
 	"edit-count": "რედაქტირებების რაოდენობა",
 	"edit-summary": "კომენტარი",
