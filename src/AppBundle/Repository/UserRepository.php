@@ -275,7 +275,8 @@ class UserRepository extends Repository
         $sql = "SELECT ug_group
                 FROM $userGroupsTable
                 JOIN $userTable ON user_id = ug_user
-                WHERE user_name = :username";
+                WHERE user_name = :username
+                AND (ug_expiry IS NULL OR ug_expiry > CURRENT_TIMESTAMP)";
 
         $ret = $this->executeProjectsQuery($project, $sql, [
             'username' => $user->getUsername(),
