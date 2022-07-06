@@ -381,4 +381,40 @@ class XtoolsControllerTest extends ControllerTestAdapter
             'user' => '174.197.128.0/1',
         ]);
     }
+
+    /**
+     * @covers XtoolsController::addFullPageTitlesAndContinue()
+     */
+    public function testAddFullPageTitlesAndContinue(): void
+    {
+        $controller = $this->getControllerWithRequest([
+            'project' => 'test.wikipedia',
+            'limit' => 2,
+        ]);
+        $out = [ 'foo' => 'bar' ];
+        $data = [
+            [ 'page_title' => 'Test_page', 'page_namespace' => 0, 'timestamp' => '2020-01-02T12:59:59' ],
+            [ 'page_title' => 'Test_page', 'page_namespace' => 1, 'timestamp' => '2020-01-03T12:59:59' ],
+        ];
+        $newOut = $controller->addFullPageTitlesAndContinue('edits', $out, $data);
+
+        $this->assertSame([
+            'foo' => 'bar',
+            'edits' => [
+                [
+                    'full_page_title' => 'Test_page',
+                    'page_title' => 'Test_page',
+                    'page_namespace' => 0,
+                    'timestamp' => '2020-01-02T12:59:59',
+                ],
+                [
+                    'full_page_title' => 'Talk:Test_page',
+                    'page_title' => 'Test_page',
+                    'page_namespace' => 1,
+                    'timestamp' => '2020-01-03T12:59:59',
+                ],
+            ],
+            'continue' => '2020-01-03T12:59:59',
+        ], $newOut);
+    }
 }

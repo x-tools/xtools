@@ -10,6 +10,7 @@ namespace Tests\AppBundle\Model;
 use AppBundle\Model\Edit;
 use AppBundle\Model\Page;
 use AppBundle\Model\Project;
+use AppBundle\Repository\PageRepository;
 use AppBundle\Repository\ProjectRepository;
 use DateTime;
 use Symfony\Component\DependencyInjection\Container;
@@ -213,5 +214,30 @@ class EditTest extends TestAdapter
             'username' => '192.168.0.1',
         ]));
         static::assertTrue($edit->isAnon());
+    }
+
+    /**
+     * @covers Edit::getForJson()
+     */
+    public function testGetForJson(): void
+    {
+        $pageRepo = $this->createMock(PageRepository::class);
+        $this->page->setRepository($pageRepo);
+        $edit = new Edit($this->page, array_merge($this->editAttrs));
+
+        static::assertEquals(
+            [
+                'username' => 'Testuser',
+                'page_title' => 'Test_page',
+                'page_namespace' => $this->page->getNamespace(),
+                'rev_id' => 1,
+                'timestamp' => '2017-01-01T10:00:00',
+                'minor' => false,
+                'length' => 12,
+                'length_change' => 2,
+                'comment' => 'Test',
+            ],
+            $edit->getForJson(true)
+        );
     }
 }

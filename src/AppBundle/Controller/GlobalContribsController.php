@@ -4,10 +4,12 @@ declare(strict_types = 1);
 namespace AppBundle\Controller;
 
 use AppBundle\Helper\I18nHelper;
+use AppBundle\Model\Edit;
 use AppBundle\Model\GlobalContribs;
 use AppBundle\Repository\GlobalContribsRepository;
 use AppBundle\Repository\ProjectRepository;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -84,7 +86,7 @@ class GlobalContribsController extends XtoolsController
      *     "/ec-latestglobal-contributions/{project}/{username}",
      *     name="EditCounterLatestGlobalContribs",
      *     requirements={
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
+     *         "username"="(ipr-.+\/\d+[^\/])|([^\/]+)",
      *     },
      *     defaults={
      *         "project"="",
@@ -95,7 +97,7 @@ class GlobalContribsController extends XtoolsController
      *     "/ec-latestglobal/{project}/{username}",
      *     name="EditCounterLatestGlobal",
      *     requirements={
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
+     *         "username"="(ipr-.+\/\d+[^\/])|([^\/]+)",
      *     },
      *     defaults={
      *         "project"="",
@@ -106,10 +108,10 @@ class GlobalContribsController extends XtoolsController
      *     "/globalcontribs/{username}/{namespace}/{start}/{end}/{offset}",
      *     name="GlobalContribsResult",
      *     requirements={
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *         "namespace" = "|all|\d+",
-     *         "start" = "|\d*|\d{4}-\d{2}-\d{2}",
-     *         "end" = "|\d{4}-\d{2}-\d{2}",
+     *         "username"="(ipr-.+\/\d+[^\/])|([^\/]+)",
+     *         "namespace"="|all|\d+",
+     *         "start"="|\d*|\d{4}-\d{2}-\d{2}",
+     *         "end"="|\d{4}-\d{2}-\d{2}",
      *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}",
      *     },
      *     defaults={
@@ -149,5 +151,51 @@ class GlobalContribsController extends XtoolsController
             'project' => $defaultProject,
             'gc' => $globalContribs,
         ]);
+    }
+
+    /************************ API endpoints ************************/
+
+    /**
+     * Get global edits made by a user, IP or IP range.
+     * @Route(
+     *     "/api/user/globalcontribs/{username}/{namespace}/{start}/{end}/{offset}",
+     *     name="UserApiGlobalContribs",
+     *     requirements={
+     *         "username"="(ipr-.+\/\d+[^\/])|([^\/]+)",
+     *         "namespace"="|all|\d+",
+     *         "start"="|\d*|\d{4}-\d{2}-\d{2}",
+     *         "end"="|\d{4}-\d{2}-\d{2}",
+     *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}",
+     *     },
+     *     defaults={
+     *         "namespace"="all",
+     *         "start"=false,
+     *         "end"=false,
+     *         "offset"=false,
+     *         "limit"=50,
+     *     },
+     * )
+     * @return JsonResponse
+     */
+    public function resultsApiAction(): JsonResponse
+    {
+        $globalContribsRepo = new GlobalContribsRepository();
+        $globalContribsRepo->setContainer($this->container);
+        $globalContribs = new GlobalContribs($this->user, $this->namespace, $this->start, $this->end, $this->offset);
+        $globalContribs->setRepository($globalContribsRepo);
+        $defaultProject = ProjectRepository::getProject(
+            $this->container->getParameter('central_auth_project'),
+            $this->container
+        );
+        $defaultProject->getRepository()->setContainer($this->container);
+        $this->project = $defaultProject;
+
+        $results = $globalContribs->globalEdits();
+        $results = array_map(function (Edit $edit) {
+            return $edit->getForJson(true, true);
+        }, array_values($results));
+        $results = $this->addFullPageTitlesAndContinue('globalcontribs', [], $results);
+
+        return $this->getFormattedApiResponse($results);
     }
 }

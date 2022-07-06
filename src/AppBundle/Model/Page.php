@@ -19,7 +19,7 @@ class Page extends Model
     protected $unnormalizedPageName;
 
     /** @var string[] Metadata about this page. */
-    protected $pageInfo;
+    protected $pageInfo = [];
 
     /** @var string[] Revision history of this page. */
     protected $revisions;
@@ -68,6 +68,7 @@ class Page extends Model
         }
 
         $page = new self($project, $fullPageTitle);
+        $page->pageInfo['ns'] = $row['page_namespace'];
         if (isset($row['page_len'])) {
             $page->length = (int)$row['page_len'];
         }
@@ -183,6 +184,9 @@ class Page extends Model
      */
     public function getNamespace(): ?int
     {
+        if (isset($this->pageInfo['ns']) && is_numeric($this->pageInfo['ns'])) {
+            return (int)$this->pageInfo['ns'];
+        }
         $info = $this->getPageInfo();
         return isset($info['ns']) ? (int)$info['ns'] : null;
     }
