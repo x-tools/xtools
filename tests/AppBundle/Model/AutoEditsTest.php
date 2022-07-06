@@ -100,8 +100,12 @@ class AutoEditsTest extends TestAdapter
         $rawEdits = $autoEdits->getNonAutomatedEdits(true);
         static::assertArraySubset($rev, $rawEdits[0]);
 
+        $page = Page::newFromRow($this->project, [
+            'page_title' => 'Test_page',
+            'page_namespace' => 0,
+        ]);
         $edit = new Edit(
-            new Page($this->project, 'Test_page'),
+            $page,
             array_merge($rev, ['user' => $this->user])
         );
         static::assertEquals($edit, $autoEdits->getNonAutomatedEdits()[0]);
@@ -164,8 +168,12 @@ class AutoEditsTest extends TestAdapter
         $rawEdits = $autoEdits->getAutomatedEdits(true);
         static::assertArraySubset($rev, $rawEdits[0]);
 
+        $page = Page::newFromRow($this->project, [
+            'page_title' => 'Test_page',
+            'page_namespace' => 1,
+        ]);
         $edit = new Edit(
-            new Page($this->project, 'Talk:Test_page'),
+            $page,
             array_merge($rev, ['user' => $this->user])
         );
         static::assertEquals($edit, $autoEdits->getAutomatedEdits()[0]);

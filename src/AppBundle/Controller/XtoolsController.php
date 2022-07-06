@@ -892,6 +892,40 @@ abstract class XtoolsController extends Controller
         return $response;
     }
 
+    /**
+     * Used to standardized the format of API responses that contain revisions.
+     * Adds a 'full_page_title' key and value to each entry in $data.
+     * If there are as many entries in $data as there are $this->limit, pagination is assumed
+     *   and a 'continue' key is added to the end of the response body.
+     * @param string $key Key accessing the list of revisions in $data.
+     * @param array $out Whatever data needs to appear above the $data in the response body.
+     * @param array $data The data set itself.
+     * @return array
+     */
+    public function addFullPageTitlesAndContinue(string $key, array $out, array $data): array
+    {
+        // Add full_page_title (in addition to the existing page_title and page_namespace keys).
+        $out[$key] = array_map(function ($rev) {
+            return array_merge([
+                'full_page_title' => $this->getPageFromNsAndTitle(
+                    (int)$rev['page_namespace'],
+                    $rev['page_title'],
+                    true
+                ),
+            ], $rev);
+        }, $data);
+
+        // Check if pagination is needed.
+        if (count($out[$key]) === $this->limit && count($out[$key]) > 0) {
+            // Use the timestamp of the last Edit as the value for the 'continue' return key,
+            //   which can be used as a value for 'offset' in order to paginate results.
+            $timestamp = array_slice($out[$key], -1, 1)[0]['timestamp'];
+            $out['continue'] = (new DateTime($timestamp))->format('Y-m-d\TH:i:s');
+        }
+
+        return $out;
+    }
+
     /*********
      * OTHER *
      *********/

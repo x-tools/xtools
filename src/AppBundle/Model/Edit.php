@@ -435,4 +435,43 @@ class Edit extends Model
     {
         return $this->getRepository()->getDiffHtml($this);
     }
+
+    /**
+     * Formats the data as an array for use in JSON APIs.
+     * @param bool $includeUsername False for most tools such as Global Contribs, AutoEdits, etc.
+     * @return array
+     * @internal This method assumes the Edit was constructed with data already filled in from a database query.
+     */
+    public function getForJson(bool $includeUsername = false, bool $includeProject = false): array
+    {
+        $nsId = $this->getPage()->getNamespace();
+        $pageTitle = $this->getPage()->getTitle(true);
+
+        if ($nsId > 0) {
+            $nsName = $this->getProject()->getNamespaces()[$nsId];
+            $pageTitle = preg_replace("/^$nsName:/", '', $pageTitle);
+        }
+
+        $ret = [
+            'page_title' => $pageTitle,
+            'page_namespace' => $nsId,
+            'rev_id' => $this->id,
+            'timestamp' => $this->getUTCTimestamp(),
+            'minor' => $this->minor,
+            'length' => $this->length,
+            'length_change' => $this->lengthChange,
+            'comment' => $this->comment,
+        ];
+        if (null !== $this->reverted) {
+            $ret['reverted'] = $this->reverted;
+        }
+        if ($includeUsername) {
+            $ret = [ 'username' => $this->getUser()->getUsername() ] + $ret;
+        }
+        if ($includeProject) {
+            $ret = [ 'project' => $this->getProject()->getDomain() ] + $ret;
+        }
+
+        return $ret;
+    }
 }

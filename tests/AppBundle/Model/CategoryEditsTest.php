@@ -140,8 +140,14 @@ class CategoryEditsTest extends TestAdapter
         ];
 
         $pages = [
-            new Page($this->project, 'Talk:Test_page'),
-            new Page($this->project, 'Foo_bar'),
+            Page::newFromRow($this->project, [
+                'page_title' => 'Test_page',
+                'page_namespace' => 1,
+            ]),
+            Page::newFromRow($this->project, [
+                'page_title' => 'Foo_bar',
+                'page_namespace' => 0,
+            ]),
         ];
 
         $edits = [

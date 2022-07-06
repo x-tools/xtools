@@ -165,13 +165,7 @@ class GlobalContribs extends Model
 
     private function getEditFromRevision(Project $project, array $revision): Edit
     {
-        $nsName = '';
-        if ($revision['page_namespace']) {
-            $nsName = $project->getNamespaces()[$revision['page_namespace']];
-        }
-
-        $page = $project->getRepository()
-            ->getPage($project, ltrim($nsName.':'.$revision['page_title'], ':'));
+        $page = Page::newFromRow($project, $revision);
         return new Edit($page, $revision);
     }
 }
