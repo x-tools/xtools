@@ -94,6 +94,9 @@
                 <header class="panel-heading col-lg-12">
                     <h4>
                         {{ msg('contributions') }}
+                        <span class='pull-right text-muted xt-panel-description'>
+                            {{ layout.downloadLink('UserApiGlobalContribs', {'username': user.usernameIdent, 'namespace': gc.namespace, 'start': gc.startDate, 'end': gc.endDate}, [], 'UserApiGlobalContribs') }}
+                        </span>
                         {{ forms.contributions_limit(gc.limit) }}
                     </h4>
                 </header>
