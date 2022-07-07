@@ -1,5 +1,11 @@
 # Release Notes #
 
+## 3.16.0 ##
+- GlobalContribs (T294765): add API endpoint
+- UserRepository (T294765): do not report expired user rights
+- Blame: gracefully handle missing revisions
+- Localization updates.
+
 ## 3.15.3 ##
 - Fix querying of replication lag.
 
