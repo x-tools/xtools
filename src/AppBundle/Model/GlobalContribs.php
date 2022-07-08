@@ -148,7 +148,7 @@ class GlobalContribs extends Model
             $project = $projects[$revision['dbName']];
 
             // Can happen if the project is given from CentralAuth API but the database is not being replicated.
-            if (null === $project) {
+            if (null === $project || !$project->exists()) {
                 continue;
             }
 
