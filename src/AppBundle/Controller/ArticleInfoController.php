@@ -154,7 +154,7 @@ class ArticleInfoController extends XtoolsController
             'xtPage' => 'ArticleInfo',
             'xtTitle' => $this->page->getTitle(),
             'project' => $this->project,
-            'editorlimit' => $this->request->query->get('editorlimit', 20),
+            'editorlimit' => (int)$this->request->query->get('editorlimit', 20),
             'botlimit' => $this->request->query->get('botlimit', 10),
             'pageviewsOffset' => 60,
             'ai' => $this->articleInfo,
