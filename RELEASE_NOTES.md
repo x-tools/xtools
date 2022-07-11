@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.16.1 ##
+- ArticleInfo: ensure 'editorlimit' param is an integer
+- GlobalContribs: skip projects that aren't replicated
+- Localization updates.
+
 ## 3.16.0 ##
 - GlobalContribs (T294765): add API endpoint
 - UserRepository (T294765): do not report expired user rights
