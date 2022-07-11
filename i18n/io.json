@@ -219,6 +219,7 @@
 	"num-hours": "{{PLURAL:$1|horo|hori}}",
 	"num-minutes": "{{PLURAL:$1|minuto|minuti}}",
 	"num-months": "{{PLURAL:$1|monato|monati}}",
+	"num-moves": "{{PLURAL:$1|movado|movadi}}",
 	"num-namespaces": "{{PLURAL:$1|'namespace'|'namespaces'}}",
 	"num-others": "{{PLURAL:$1|altra|altri}}",
 	"num-protections": "{{PLURAL:$1|protekto|protekti}}",
