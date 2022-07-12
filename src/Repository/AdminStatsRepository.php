@@ -31,9 +31,9 @@ class AdminStatsRepository extends Repository
      * @param Project $project
      * @param int $start UTC timestamp.
      * @param int $end UTC timestamp.
-     * @param string $type Which 'type' we're querying for, as configured in admin_stats.yml
+     * @param string $type Which 'type' we're querying for, as configured in admin_stats.yaml
      * @param string[] $actions Which log actions to query for.
-     * @return string[][] with key for each action type (specified in admin_stats.yml), including 'total'.
+     * @return string[][] with key for each action type (specified in admin_stats.yaml), including 'total'.
      */
     public function getStats(Project $project, int $start, int $end, string $type, array $actions = []): array
     {
@@ -95,7 +95,7 @@ class AdminStatsRepository extends Repository
 
             /** @var string|array $entry String matching 'log_type/log_action' or a configuration array. */
             foreach ($logTypeActions as $entry) {
-                // admin_stats.yml gives us the log type and action as a string in the format of "type/action".
+                // admin_stats.yaml gives us the log type and action as a string in the format of "type/action".
                 [$logType, $logAction] = explode('/', $entry);
 
                 $logTypes[] = $keyTypes[] = $connection->quote($logType, PDO::PARAM_STR);
@@ -151,7 +151,7 @@ class AdminStatsRepository extends Repository
     /**
      * Get all user groups with permissions applicable to the given 'group'.
      * @param Project $project
-     * @param string $type Which 'type' we're querying for, as configured in admin_stats.yml
+     * @param string $type Which 'type' we're querying for, as configured in admin_stats.yaml
      * @return array Keys are 'local' and 'global', each an array of user groups with keys 'name' and 'rights'.
      */
     public function getUserGroups(Project $project, string $type): array

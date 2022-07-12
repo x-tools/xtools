@@ -1,5 +1,0 @@
-imports:
-    - { resource: config_dev.yml }
-
-swiftmailer:
-    disable_delivery: true

@@ -51,7 +51,8 @@
         "phpunit/phpunit": "^7.0",
         "symfony/phpunit-bridge": "^4.0",
         "squizlabs/php_codesniffer": "^3.3.0",
-        "mediawiki/minus-x": "^0.3.2"
+        "mediawiki/minus-x": "^0.3.2",
+        "symfony/web-server-bundle": "^4.4"
     },
     "scripts": {
         "post-install-cmd": [

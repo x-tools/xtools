@@ -138,7 +138,7 @@ class AdminStatsController extends XtoolsController
      */
     private function getAndSetRequestedActions(): array
     {
-        /** @var string $group The requested 'group'. See keys at admin_stats.yml for possible values. */
+        /** @var string $group The requested 'group'. See keys at admin_stats.yaml for possible values. */
         $group = $this->params['group'] = $this->params['group'] ?? 'admin';
 
         // Query param for sections gets priority.
@@ -165,7 +165,7 @@ class AdminStatsController extends XtoolsController
 
     /**
      * Get the names of the available sections.
-     * @param string $group Corresponds to the groups specified in admin_stats.yml
+     * @param string $group Corresponds to the groups specified in admin_stats.yaml
      * @return string[]
      * @codeCoverageIgnore
      */

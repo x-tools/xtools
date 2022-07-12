@@ -8,7 +8,7 @@ declare(strict_types = 1);
 namespace App\Model;
 
 /**
- * AdminStats returns information about users with rights defined in admin_stats.yml.
+ * AdminStats returns information about users with rights defined in admin_stats.yaml.
  */
 class AdminStats extends Model
 {
@@ -25,7 +25,7 @@ class AdminStats extends Model
     /** @var string[] Usernames of users who are in the relevant user group (sysop for admins, etc.). */
     private $usersInGroup = [];
 
-    /** @var string Type that we're getting stats for (admin, patroller, steward, etc.). See admin_stats.yml */
+    /** @var string Type that we're getting stats for (admin, patroller, steward, etc.). See admin_stats.yaml */
     private $type;
 
     /** @var string[] Which actions to show ('block', 'protect', etc.) */
@@ -36,7 +36,7 @@ class AdminStats extends Model
      * @param Project $project
      * @param int $start as UTC timestamp.
      * @param int $end as UTC timestamp.
-     * @param string $group Which user group to get stats for. Refer to admin_stats.yml for possible values.
+     * @param string $group Which user group to get stats for. Refer to admin_stats.yaml for possible values.
      * @param string[] $actions Which actions to query for ('block', 'protect', etc.). Null for all actions.
      */
     public function __construct(

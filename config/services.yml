@@ -11,7 +11,7 @@ imports:
     - { resource: assessments.yml }
     - { resource: quote.yml }
     - { resource: request_blacklist.yml, ignore_errors: true }
-    - { resource: admin_stats.yml }
+    - { resource: admin_stats.yaml }
     - { resource: user_group_icons.yml }
 
 # Put parameters here that don't need to change on each machine where the app is deployed
