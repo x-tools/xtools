@@ -31,7 +31,7 @@ class PageAssessments extends Model
 
     /**
      * Get page assessments configuration for the Project and cache in static variable.
-     * @return string[][][]|false As defined in config/assessments.yml, or false if none exists.
+     * @return string[][][]|false As defined in config/assessments.yaml, or false if none exists.
      */
     public function getConfig()
     {

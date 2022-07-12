@@ -20,7 +20,7 @@ class PageAssessmentsRepository extends Repository
     /**
      * Get page assessments configuration for the Project.
      * @param Project $project
-     * @return string[]|bool As defined in config/assessments.yml, or false if none exists.
+     * @return string[]|bool As defined in config/assessments.yaml, or false if none exists.
      */
     public function getConfig(Project $project)
     {

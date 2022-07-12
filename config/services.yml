@@ -2,17 +2,17 @@
 # http://symfony.com/doc/current/book/service_container.html
 
 imports:
-    - { resource: rfx_analysis.yml, ignore_errors: true }
-    - { resource: security.yml }
-    - { resource: tools.yml }
-    - { resource: version.yml }
+    - { resource: rfx_analysis.yaml, ignore_errors: true }
+    - { resource: security.yaml }
+    - { resource: tools.yaml }
+    - { resource: version.yaml }
     - { resource: table_map.yml, ignore_errors: true }
     - { resource: project_map.yml, ignore_errors: true }
-    - { resource: assessments.yml }
-    - { resource: quote.yml }
-    - { resource: request_blacklist.yml, ignore_errors: true }
+    - { resource: assessments.yaml }
+    - { resource: quote.yaml }
+    - { resource: request_blacklist.yaml, ignore_errors: true }
     - { resource: admin_stats.yaml }
-    - { resource: user_group_icons.yml }
+    - { resource: user_group_icons.yaml }
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
