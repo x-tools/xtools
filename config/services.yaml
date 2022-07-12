@@ -18,6 +18,11 @@ imports:
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: 'en'
+    app.single_wiki: '%env(bool:APP_SINGLE_WIKI)%'
+    app.query_timeout: '%env(int:APP_QUERY_TIMEOUT)%'
+    app.rate_limit_count: '%env(int:APP_RATE_LIMIT_COUNT)%'
+    app.rate_limit_time: '%env(int:APP_RATE_LIMIT_TIME)%'
+    app.is_labs: '%env(bool:APP_IS_WMF)%'
 
 services:
     _defaults:
