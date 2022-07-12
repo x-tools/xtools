@@ -12,6 +12,7 @@
     <exclude-pattern>node_modules/</exclude-pattern>
     <exclude-pattern>assets/vendor/</exclude-pattern>
     <exclude-pattern>*.min.js</exclude-pattern>
+    <exclude-pattern>bootstrap.php</exclude-pattern>
 
     <!-- Slevomat standards; see https://github.com/slevomat/coding-standard -->
     <config name="installed_paths" value="../../slevomat/coding-standard"/><!-- relative path from PHPCS source location -->
@@ -64,7 +65,7 @@
         <properties>
             <property name="rootNamespaces" type="array">
                 <element key="src" value="App"/>
-                <element key="tests" value="Tests"/>
+                <element key="tests" value="App\Tests"/>
             </property>
         </properties>
     </rule>
@@ -93,11 +94,10 @@
     </rule>
     <rule ref="Squiz.NamingConventions.ValidVariableName.StringNotCamelCaps"/>
     <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
-        <exclude-pattern>app/AppKernel.php</exclude-pattern>
+        <exclude-pattern>src/Kernel.php</exclude-pattern>
     </rule>
     <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
-        <exclude-pattern>src/AppKernel.php</exclude-pattern>
-        <exclude-pattern>src/AppCache.php</exclude-pattern>
+        <exclude-pattern>src/Kernel.php</exclude-pattern>
     </rule>
 
 </ruleset>
