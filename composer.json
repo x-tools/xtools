@@ -5,12 +5,8 @@
     "type": "project",
     "autoload": {
         "psr-4": {
-            "AppBundle\\": "src/AppBundle/"
-        },
-        "classmap": [
-            "src/AppKernel.php",
-            "src/AppCache.php"
-        ]
+            "App\\": "src/"
+        }
     },
     "autoload-dev": {
         "psr-4": {
@@ -37,12 +33,9 @@
         "symfony/swiftmailer-bundle": "^3.0",
         "symfony/monolog-bundle": "^3.3",
         "sensio/framework-extra-bundle": "^5.0",
-        "incenteev/composer-parameter-handler": "^2.0",
         "krinkle/intuition": "^1.0",
         "mediawiki/oauthclient": "^0.1",
         "symfony/cache": "^4.1",
-        "snc/redis-bundle": "^3.1",
-        "predis/predis": "^1.0",
         "nelmio/cors-bundle": "^1.5",
         "jms/serializer-bundle": "^3.4",
         "doctrine/doctrine-migrations-bundle": "^2.0",
@@ -50,7 +43,9 @@
         "slevomat/coding-standard": "^4.8",
         "symfony/webpack-encore-bundle": "^1.6",
         "doctrine/common": "^3.1",
-        "wikimedia/ip-utils": "^1.0"
+        "wikimedia/ip-utils": "^1.0",
+        "symfony/mailer": "^4.4",
+        "symfony/web-profiler-bundle": "^4.4"
     },
     "require-dev": {
         "phpunit/phpunit": "^7.0",

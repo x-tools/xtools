@@ -1,7 +1,6 @@
 /config/table_map.yml
 /config/parameters.yml
 /config/request_blacklist.yml
-/app/Resources/node_modules
 /build/
 /phpunit.xml
 /var/*
@@ -14,10 +13,14 @@
 !/var/sessions
 /var/sessions/*
 !var/sessions/.gitkeep
-!var/SymfonyRequirements.php
-/vendor/
-/public/bundles/
 /node_modules/
+
+###> symfony/framework-bundle ###
+/.env
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
 
 .idea/
 

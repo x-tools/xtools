@@ -25,7 +25,7 @@ if (isset($_SERVER['HTTP_CLIENT_IP'])
 $loader = require __DIR__.'/../src/autoload.php';
 Debug::enable();
 
-$kernel = new AppKernel('dev', true);
+$kernel = new Kernel('dev', true);
 $request = Request::createFromGlobals();
 $response = $kernel->handle($request);
 $response->send();

@@ -1,0 +1,10 @@
+# Nelmio CORS Configuration
+nelmio_cors:
+    defaults:
+        allow_credentials: false
+        allow_origin: ['*']
+        allow_headers: ['*']
+        allow_methods: ['GET', 'POST']
+        max_age: 3600
+        hosts: []
+        origin_regex: false

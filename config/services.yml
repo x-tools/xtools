@@ -1,5 +1,24 @@
 # Learn more about services, parameters and containers at
 # http://symfony.com/doc/current/book/service_container.html
+
+imports:
+    - { resource: rfx_analysis.yml, ignore_errors: true }
+    - { resource: security.yml }
+    - { resource: tools.yml }
+    - { resource: version.yml }
+    - { resource: table_map.yml, ignore_errors: true }
+    - { resource: project_map.yml, ignore_errors: true }
+    - { resource: assessments.yml }
+    - { resource: quote.yml }
+    - { resource: request_blacklist.yml, ignore_errors: true }
+    - { resource: admin_stats.yml }
+    - { resource: user_group_icons.yml }
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+parameters:
+    locale: 'en'
+
 services:
     _defaults:
         # automatically injects dependencies in your services
@@ -10,39 +29,39 @@ services:
         # if you need to do this, you can override this setting on individual services
         public: false
 
-    # Makes classes in src/AppBundle available to be used as services.
+    # Makes classes in src/App available to be used as services.
     # This creates a service per class whose id is the fully-qualified class name.
-    AppBundle\:
-         resource: '../src/AppBundle/*'
+    App\:
+         resource: '../src/*'
          # you can exclude directories or files
          # but if a service is unused, it's removed anyway
-         exclude: '../src/AppBundle/{Model}'
+         exclude: '../src/{Model}'
 
-    # Controllers are imported separately to make sure they're public
-    # and have a tag that allows actions to type-hint services.
-    AppBundle\Controller\:
-        resource: '../src/AppBundle/Controller'
-        public: true
+    # controllers are imported separately to make sure services can be injected
+    # as action arguments even if you don't extend any base controller class
+    App\Controller\:
+        resource: '../src/Controller'
+#        public: true
         tags: ['controller.service_arguments']
 
-    AppBundle\Repository\:
-        resource: '../src/AppBundle/Repository/*'
+    App\Repository\:
+        resource: '../src/Repository'
         calls:
         - [setContainer, ["@service_container"]]
 
     app.monolog.processor.web:
-        class: AppBundle\Monolog\WebProcessorMonolog
+        class: App\Monolog\WebProcessorMonolog
         arguments: ['@request_stack']
         tags:
             - { name: monolog.processor, method: processRecord }
 
     # These need to not be public, but they are, for now...
     app.automated_edits_helper:
-        class: AppBundle\Helper\AutomatedEditsHelper
+        class: App\Helper\AutomatedEditsHelper
         arguments: ['@service_container']
         public: true
     app.i18n_helper:
-        class: AppBundle\Helper\I18nHelper
+        class: App\Helper\I18nHelper
         arguments: ['@service_container']
         public: true
     logger:
@@ -50,12 +69,12 @@ services:
         public: true
 
     app.exception_listener:
-        class: AppBundle\EventSubscriber\ExceptionListener
+        class: App\EventSubscriber\ExceptionListener
         arguments: ['@twig', '@logger', '%kernel.environment%']
         tags:
             - { name: kernel.event_listener, event: kernel.exception }
 
     # add more services, or override services that need manual wiring
-    # AppBundle\Service\ExampleService:
+    # App\Service\ExampleService:
     #     arguments:
     #         $someArgument: 'some_value'

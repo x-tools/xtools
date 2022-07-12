@@ -63,7 +63,7 @@
     <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
         <properties>
             <property name="rootNamespaces" type="array">
-                <element key="src/AppBundle" value="AppBundle"/>
+                <element key="src" value="App"/>
                 <element key="tests" value="Tests"/>
             </property>
         </properties>

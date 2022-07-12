@@ -1,0 +1,7 @@
+framework:
+    cache:
+        # Unique name of your app: used to compute stable namespaces for cache keys.
+        prefix_seed: xtools
+
+        app: "cache.adapter.filesystem"
+        default_redis_provider: snc_redis.default
