@@ -6,8 +6,8 @@ imports:
     - { resource: security.yaml }
     - { resource: tools.yaml }
     - { resource: version.yaml }
-    - { resource: table_map.yml, ignore_errors: true }
-    - { resource: project_map.yml, ignore_errors: true }
+    - { resource: table_map.yaml, ignore_errors: true }
+    - { resource: project_map.yaml, ignore_errors: true }
     - { resource: assessments.yaml }
     - { resource: quote.yaml }
     - { resource: request_blacklist.yaml, ignore_errors: true }
@@ -35,7 +35,10 @@ services:
          resource: '../src/*'
          # you can exclude directories or files
          # but if a service is unused, it's removed anyway
-         exclude: '../src/{Model}'
+         exclude:
+            - '../src/{Model}'
+            - '../src/Kernel.php'
+            - '../src/DoctrineMigrations/'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
