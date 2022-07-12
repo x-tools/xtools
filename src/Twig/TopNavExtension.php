@@ -127,7 +127,9 @@ class TopNavExtension extends AppExtension
         $this->topNavProject = $this->sortEntries($toolsMessages, 'AdminStats');
 
         // This one should go last.
-        $this->topNavProject['LargestPages'] = $this->i18n->msg('tool-largestpages');
+        if ($this->toolEnabled('LargestPages')) {
+            $this->topNavProject['LargestPages'] = $this->i18n->msg('tool-largestpages');
+        }
 
         return $this->topNavProject;
     }
