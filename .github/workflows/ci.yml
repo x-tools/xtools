@@ -32,7 +32,7 @@ jobs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '7.2'
+        php-version: '7.3'
         extensions: curl, intl, json, pdo
         ini-values: xdebug.mode=coverage
         coverage: xdebug
