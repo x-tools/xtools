@@ -18,6 +18,7 @@ imports:
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: 'en'
+    wiki_url: '%env(WIKI_URL)%'
     api_path: '%env(API_PATH)%'
     default_project: '%env(DEFAULT_PROJECT)%'
     central_auth_project: '%env(CENTRAL_AUTH_PROJECT)%'
