@@ -1,7 +1,0 @@
-# Swiftmailer Configuration
-swiftmailer:
-    transport: "%mailer.transport%"
-    host:      "%mailer.host%"
-    username:  "%mailer.user%"
-    password:  "%mailer.password%"
-    spool:     { type: memory }

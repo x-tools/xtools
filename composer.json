@@ -30,7 +30,6 @@
         "doctrine/doctrine-bundle": "^2.2",
         "doctrine/collections": "^1.5",
         "doctrine/annotations": "^1.6",
-        "symfony/swiftmailer-bundle": "^3.0",
         "symfony/monolog-bundle": "^3.3",
         "sensio/framework-extra-bundle": "^5.0",
         "krinkle/intuition": "^1.0",

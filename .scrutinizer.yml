@@ -1,7 +1,6 @@
 filter:
     excluded_paths:
         - 'var/*'
-        - 'app/*'
         - 'tests/*'
         - 'bin/*'
         - 'vendor/*'
