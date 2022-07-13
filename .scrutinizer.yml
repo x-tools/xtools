@@ -1,6 +1,4 @@
 build:
-    environment:
-        php: 7.3
     nodes:
         analysis:
             project_setup:
