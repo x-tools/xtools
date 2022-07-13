@@ -16,6 +16,7 @@ use App\Repository\AutoEditsRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
 use App\Tests\TestAdapter;
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
@@ -23,6 +24,8 @@ use PHPUnit\Framework\MockObject\MockObject;
  */
 class AutoEditsTest extends TestAdapter
 {
+    use ArraySubsetAsserts;
+
     /** @var Project The project instance. */
     protected $project;
 
@@ -189,7 +192,7 @@ class AutoEditsTest extends TestAdapter
     {
         $this->aeRepo->expects(static::once())
             ->method('countAutomatedEdits')
-            ->willReturn('50');
+            ->willReturn(50);
         /** @var MockObject|UserRepository $userRepo */
         $userRepo = $this->createMock(UserRepository::class);
         $userRepo->expects(static::once())

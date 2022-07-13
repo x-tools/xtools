@@ -14,6 +14,7 @@ use App\Repository\ProjectRepository;
 use App\Tests\TestAdapter;
 use App\Twig\AppExtension;
 use DateTime;
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Client;
@@ -24,6 +25,8 @@ use Symfony\Component\Routing\Generator\UrlGenerator;
  */
 class AppExtensionTest extends TestAdapter
 {
+    use ArraySubsetAsserts;
+
     /** @var AppExtension Instance of class. */
     protected $appExtension;
 
@@ -156,7 +159,7 @@ class AppExtensionTest extends TestAdapter
         // static::assertEquals(7, strlen($this->appExtension->gitShortHash()));
 
         static::assertEquals(40, strlen($this->appExtension->gitHash()));
-        static::assertRegExp('/\d{4}-\d{2}-\d{2}/', $this->appExtension->gitDate());
+        static::assertMatchesRegularExpression('/\d{4}-\d{2}-\d{2}/', $this->appExtension->gitDate());
     }
 
     /**

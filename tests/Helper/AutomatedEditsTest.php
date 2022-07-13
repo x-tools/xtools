@@ -11,6 +11,7 @@ use App\Helper\AutomatedEditsHelper;
 use App\Model\Project;
 use App\Repository\ProjectRepository;
 use App\Tests\TestAdapter;
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 
 /**
  * Tests of the AutomatedEditsHelper class.
@@ -18,6 +19,8 @@ use App\Tests\TestAdapter;
  */
 class AutomatedEditsTest extends TestAdapter
 {
+    use ArraySubsetAsserts;
+
     /** @var AutomatedEditsHelper The API Helper object to test. */
     protected $aeh;
 

@@ -9,6 +9,7 @@ namespace App\Model;
 
 use DateTime;
 use Doctrine\DBAL\Driver\PDOStatement;
+use Doctrine\DBAL\Driver\ResultStatement;
 
 /**
  * A Page is a single wiki page in one project.
@@ -348,7 +349,7 @@ class Page extends Model
      *   separate query is ran to get the nuber of revisions.
      * @param false|int $start
      * @param false|int $end
-     * @return PDOStatement
+     * @return ResultStatement
      */
     public function getRevisionsStmt(
         ?User $user = null,
@@ -356,7 +357,7 @@ class Page extends Model
         ?int $numRevisions = null,
         $start = false,
         $end = false
-    ): PDOStatement {
+    ): ResultStatement {
         // If we have a limit, we need to know the total number of revisions so that PageRepo
         // will properly set the OFFSET. See PageRepository::getRevisionsStmt() for more info.
         if (isset($limit) && null === $numRevisions) {

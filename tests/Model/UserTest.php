@@ -187,7 +187,7 @@ class UserTest extends TestAdapter
             ->willReturn('123456789');
         $userRepo->expects($this->exactly(3))
             ->method('maxEdits')
-            ->willReturn('250000');
+            ->willReturn(250000);
         $user = new User('TestUser');
         $user->setRepository($userRepo);
 

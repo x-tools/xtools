@@ -16,6 +16,7 @@ use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
 use App\Tests\TestAdapter;
 use DateTime;
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -25,6 +26,8 @@ use Symfony\Component\HttpFoundation\Session\Session;
  */
 class EditCounterTest extends TestAdapter
 {
+    use ArraySubsetAsserts;
+
     /** @var Project The project instance. */
     protected $project;
 

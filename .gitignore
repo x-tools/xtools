@@ -7,9 +7,9 @@
 !/var/cache
 /var/cache/*
 !var/cache/.gitkeep
-!/var/logs
-/var/logs/*
-!var/logs/.gitkeep
+!/var/log
+/var/log/*
+!var/log/.gitkeep
 !/var/sessions
 /var/sessions/*
 !var/sessions/.gitkeep
@@ -23,16 +23,11 @@
 ###< symfony/framework-bundle ###
 
 .idea/
-
-/docs/_build
-/docs/api/phpdoc-cache-*
-/docs/api/checkstyle.xml
-/app/config/multisite.yml
 *.swp
 .DS_Store
 /mrb_prepcommit.sh
-/app/config/project_map.yml
 i18n_helper.js
 phpDocumentor.phar
 coverage.xml
 .web-server-pid
+.phpunit.result.cache

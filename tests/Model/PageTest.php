@@ -13,6 +13,7 @@ use App\Model\User;
 use App\Repository\PageRepository;
 use App\Repository\ProjectRepository;
 use App\Tests\TestAdapter;
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use Symfony\Component\DependencyInjection\Container;
 
 /**
@@ -20,6 +21,8 @@ use Symfony\Component\DependencyInjection\Container;
  */
 class PageTest extends TestAdapter
 {
+    use ArraySubsetAsserts;
+
     /** @var Container The Symfony container ($localContainer because we can't override self::$container). */
     protected $localContainer;
 
@@ -144,7 +147,7 @@ class PageTest extends TestAdapter
         // We want to do a real-world test. enwiki's Main Page does not change much,
         // and {{Main Page banner}} in particular should be there indefinitely, hopefully :)
         $content = $page->getWikitext();
-        static::assertContains('{{Main Page banner}}', $content);
+        static::assertStringContainsString('{{Main Page banner}}', $content);
     }
 
     /**
@@ -272,7 +275,7 @@ class PageTest extends TestAdapter
             ],
             $wikidataErrors[0]
         );
-        static::assertContains(
+        static::assertStringContainsString(
             'Description',
             $wikidataErrors[0]['notice']
         );

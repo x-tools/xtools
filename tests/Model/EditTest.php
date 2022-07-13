@@ -14,6 +14,7 @@ use App\Repository\PageRepository;
 use App\Repository\ProjectRepository;
 use App\Tests\TestAdapter;
 use DateTime;
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use Symfony\Component\DependencyInjection\Container;
 
 /**
@@ -21,6 +22,8 @@ use Symfony\Component\DependencyInjection\Container;
  */
 class EditTest extends TestAdapter
 {
+    use ArraySubsetAsserts;
+
     /** @var Container The Symfony container ($localContainer because we can't override self::$container). */
     protected $localContainer;
 

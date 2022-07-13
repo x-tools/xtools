@@ -38,7 +38,6 @@ class PagesTest extends TestAdapter
     public function setUp(): void
     {
         $this->project = $this->createMock(Project::class);
-        // $this->project = new Project('test.project.org');
         $paRepo = $this->createMock(PageAssessments::class);
         $paRepo->method('getConfig')
             ->willReturn($this->getAssessmentsConfig());

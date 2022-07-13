@@ -7,12 +7,16 @@ declare(strict_types = 1);
 
 namespace App\Tests\Controller;
 
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
+
 /**
  * Integration tests for the homepage and user authentication.
  * @group integration
  */
 class DefaultControllerTest extends ControllerTestAdapter
 {
+    use ArraySubsetAsserts;
+
     /** @var bool Whether we're testing a single-wiki setup */
     protected $isSingle;
 
@@ -33,11 +37,11 @@ class DefaultControllerTest extends ControllerTestAdapter
         // Check basics.
         $crawler = $this->client->request('GET', '/');
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
-        static::assertContains('XTools', $crawler->filter('.splash-logo')->attr('alt'));
+        static::assertStringContainsString('XTools', $crawler->filter('.splash-logo')->attr('alt'));
 
         // Change language.
         $crawler = $this->client->request('GET', '/?uselang=es');
-        static::assertContains(
+        static::assertStringContainsString(
             'Saciando tu hambre de datos',
             $crawler->filter('#content h4')->text()
         );

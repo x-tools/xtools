@@ -38,12 +38,11 @@ class PageAssessmentsTest extends TestAdapter
         $this->localContainer = $client->getContainer();
 
         $this->paRepo = $this->createMock(PageAssessmentsRepository::class);
-        $this->paRepo->method('getConfig')
+        $this->paRepo->expects($this->once())
+            ->method('getConfig')
             ->willReturn($this->localContainer->getParameter('assessments')['en.wikipedia.org']);
 
         $this->project = $this->createMock(Project::class);
-        $this->project->method('getPageAssessments')
-            ->willReturn($this->paRepo);
     }
 
     /**

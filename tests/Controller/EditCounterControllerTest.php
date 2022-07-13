@@ -110,8 +110,8 @@ class EditCounterControllerTest extends ControllerTestAdapter
         static::assertEquals(302, $this->client->getResponse()->getStatusCode());
         $crawler = $this->client->followRedirect();
         static::assertCount(2, $crawler->filter('.xt-toc a'));
-        static::assertContains('Year counts', $crawler->filter('.xt-toc')->text());
-        static::assertContains('Rights changes', $crawler->filter('.xt-toc')->text());
+        static::assertStringContainsString('Year counts', $crawler->filter('.xt-toc')->text());
+        static::assertStringContainsString('Rights changes', $crawler->filter('.xt-toc')->text());
     }
 
     /**

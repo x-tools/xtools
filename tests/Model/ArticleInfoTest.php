@@ -16,6 +16,7 @@ use App\Repository\ArticleInfoRepository;
 use App\Repository\PageRepository;
 use App\Repository\ProjectRepository;
 use App\Tests\TestAdapter;
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use GuzzleHttp;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -26,6 +27,8 @@ use Symfony\Component\HttpFoundation\Session\Session;
  */
 class ArticleInfoTest extends TestAdapter
 {
+    use ArraySubsetAsserts;
+
     /** @var ArticleInfo The article info instance. */
     protected $articleInfo;
 
