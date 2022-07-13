@@ -4,6 +4,9 @@ build:
             project_setup:
                 override: true
             tests:
+                environment:
+                    php:
+                        version: 7.2
                 override:
                     - php-scrutinizer-run --enable-security-analysis
 
