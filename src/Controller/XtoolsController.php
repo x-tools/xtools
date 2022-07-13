@@ -17,6 +17,7 @@ use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
 use DateTime;
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -949,18 +950,14 @@ abstract class XtoolsController extends Controller
                       AND endpoint = '$endpoint'";
 
         try {
-            if (0 === count($conn->query($existsSql)->fetchAll())) {
-                $createSql = "INSERT INTO usage_api_timeline
-                          VALUES(NULL, '$date', '$endpoint', 1)";
-                $conn->query($createSql);
-            } else {
-                $updateSql = "UPDATE usage_api_timeline
-                          SET count = count + 1
-                          WHERE endpoint = '$endpoint'
-                          AND date = '$date'";
-                $conn->query($updateSql);
-            }
-        } catch (DBALException $e) {
+            $sql = "INSERT INTO usage_api_timeline
+                    VALUES(NULL, :date, :endpoint, 1)
+                    ON DUPLICATE KEY UPDATE `count` = `count` + 1";
+            $conn->executeStatement($sql, [
+                'date' => $date,
+                'endpoint' => $endpoint,
+            ]);
+        } catch (Exception $e) {
             // Do nothing. API response should still be returned rather than erroring out.
         }
     }

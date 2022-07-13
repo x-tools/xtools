@@ -92,15 +92,12 @@ class MetaController extends XtoolsController
      */
     private function getToolUsageStats(Connection $client, string $table): array
     {
-        $query = $client->prepare("SELECT * FROM $table
-                                   WHERE date >= :start AND date <= :end");
         $start = date('Y-m-d', $this->start);
         $end = date('Y-m-d', $this->end);
-        $query->bindParam('start', $start);
-        $query->bindParam('end', $end);
-        $query->execute();
-
-        $data = $query->fetchAll();
+        $data = $client->executeQuery("SELECT * FROM $table WHERE date >= :start AND date <= :end", [
+            'start' => $start,
+            'end' => $end,
+        ])->fetchAllAssociative();
 
         // Create array of totals, along with formatted timeline data as needed by Chart.js
         $totals = [];
@@ -150,15 +147,12 @@ class MetaController extends XtoolsController
      */
     private function getApiUsageStats(Connection $client): array
     {
-        $query = $client->prepare("SELECT * FROM usage_api_timeline
-                                   WHERE date >= :start AND date <= :end");
         $start = date('Y-m-d', $this->start);
         $end = date('Y-m-d', $this->end);
-        $query->bindParam('start', $start);
-        $query->bindParam('end', $end);
-        $query->execute();
-
-        $data = $query->fetchAll();
+        $data = $client->executeQuery("SELECT * FROM usage_api_timeline WHERE date >= :start AND date <= :end", [
+            'start' => $start,
+            'end' => $end,
+        ])->fetchAllAssociative();
 
         // Create array of totals, along with formatted timeline data as needed by Chart.js
         $totals = [];
@@ -244,22 +238,22 @@ class MetaController extends XtoolsController
         $tool = strtolower($tool);
 
         $sql = "INSERT INTO usage_timeline
-                      VALUES(NULL, :date, :tool, 1)
-                      ON DUPLICATE KEY UPDATE `count` = `count` + 1";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam('date', $date);
-        $stmt->bindParam('tool', $tool);
-        $stmt->execute();
+                VALUES(NULL, :date, :tool, 1)
+                ON DUPLICATE KEY UPDATE `count` = `count` + 1";
+        $conn->executeStatement($sql, [
+            'date' => $date,
+            'tool' => $tool,
+        ]);
 
         // Update per-project usage, if applicable
         if (!$this->container->getParameter('app.single_wiki')) {
             $sql = "INSERT INTO usage_projects
                     VALUES(NULL, :tool, :project, 1)
                     ON DUPLICATE KEY UPDATE `count` = `count` + 1";
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam('tool', $tool);
-            $stmt->bindParam('project', $project);
-            $stmt->execute();
+            $conn->executeStatement($sql, [
+                'tool' => $tool,
+                'project' => $project,
+            ]);
         }
 
         $response->setStatusCode(Response::HTTP_NO_CONTENT);

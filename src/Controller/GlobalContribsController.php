@@ -179,6 +179,8 @@ class GlobalContribsController extends XtoolsController
      */
     public function resultsApiAction(): JsonResponse
     {
+        $this->recordApiUsage('user/globalcontribs');
+
         $globalContribsRepo = new GlobalContribsRepository();
         $globalContribsRepo->setContainer($this->container);
         $globalContribs = new GlobalContribs($this->user, $this->namespace, $this->start, $this->end, $this->offset);
