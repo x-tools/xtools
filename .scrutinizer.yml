@@ -1,12 +1,11 @@
 build:
+    environment:
+        php: 7.3
     nodes:
         analysis:
             project_setup:
                 override: true
             tests:
-                environment:
-                    php:
-                        version: 7.2
                 override:
                     - php-scrutinizer-run --enable-security-analysis
 
