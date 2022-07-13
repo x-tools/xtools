@@ -1,7 +1,6 @@
 build:
     environment:
         php: 7.3
-        composer: 2
     nodes:
         analysis:
             project_setup:
