@@ -1,8 +1,7 @@
 build:
     image: default-focal
     environment:
-        php:
-            - 8.1
+        php: 8.1
     nodes:
         analysis:
             project_setup:
