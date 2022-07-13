@@ -291,7 +291,7 @@ abstract class Repository
      */
     private function getCacheKeyFromArg($arg): string
     {
-        if (method_exists($arg, 'getCacheKey')) {
+        if (is_object($arg) && method_exists($arg, 'getCacheKey')) {
             return '.'.$arg->getCacheKey();
         } elseif (is_array($arg)) {
             // Assumed to be an array of objects that can be parsed into a string.
