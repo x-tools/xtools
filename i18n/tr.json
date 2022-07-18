@@ -278,7 +278,7 @@
 	"num-days": "{{PLURAL: $1|gün|gün}}",
 	"num-deletions": "{{PLURAL:$1|silme|silme}}",
 	"num-edits": "{{PLURAL:$1|düzenleme|düzenleme}}",
-	"num-editors": "{{PLURAL:$1|düzenleyici}}",
+	"num-editors": "{{PLURAL:$1|editör}}",
 	"num-hours": "{{PLURAL: $1|saat|saat}}",
 	"num-minutes": "{{PLURAL:$1|dakika|dakika}}",
 	"num-months": "{{PLURAL:$1|ay|ay}}",
