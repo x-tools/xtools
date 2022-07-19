@@ -1,35 +1,33 @@
 /config/table_map.yml
 /config/parameters.yml
 /config/request_blacklist.yml
-/app/Resources/node_modules
 /build/
 /phpunit.xml
 /var/*
 !/var/cache
 /var/cache/*
 !var/cache/.gitkeep
-!/var/logs
-/var/logs/*
-!var/logs/.gitkeep
+!/var/log
+/var/log/*
+!var/log/.gitkeep
 !/var/sessions
 /var/sessions/*
 !var/sessions/.gitkeep
-!var/SymfonyRequirements.php
-/vendor/
-/public/bundles/
 /node_modules/
 
-.idea/
+###> symfony/framework-bundle ###
+/.env
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
 
-/docs/_build
-/docs/api/phpdoc-cache-*
-/docs/api/checkstyle.xml
-/app/config/multisite.yml
+.idea/
 *.swp
 .DS_Store
 /mrb_prepcommit.sh
-/app/config/project_map.yml
 i18n_helper.js
 phpDocumentor.phar
 coverage.xml
 .web-server-pid
+.phpunit.result.cache

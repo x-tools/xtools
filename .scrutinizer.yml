@@ -1,18 +1,20 @@
+build:
+    environment:
+        php: 7.4
+    nodes:
+        analysis:
+            project_setup:
+                override: true
+            tests:
+                override:
+                    - php-scrutinizer-run --enable-security-analysis
+
 filter:
     excluded_paths:
         - 'var/*'
-        - 'app/*'
         - 'tests/*'
         - 'bin/*'
+    dependency_paths:
         - 'vendor/*'
         - 'assets/vendor/*'
         - '*.min.js'
-build:
-    tests:
-        override:
-
-    nodes:
-        tests:
-            environment:
-                php:
-                    version: 7.2

@@ -1,0 +1,9 @@
+eight_points_guzzle:
+    logging: "%kernel.debug%"
+
+    clients:
+        xtools:
+            options:
+                headers:
+                    Accept: "application/json"
+                timeout: 30

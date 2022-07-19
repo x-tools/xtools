@@ -1,0 +1,491 @@
+<?php
+/**
+ * This file contains only the PageRepository class.
+ */
+
+declare(strict_types = 1);
+
+namespace App\Repository;
+
+use App\Model\Page;
+use App\Model\Project;
+use App\Model\User;
+use DateTime;
+use Doctrine\DBAL\Driver\ResultStatement;
+use GuzzleHttp;
+
+/**
+ * A PageRepository fetches data about Pages, either singularly or for multiple.
+ * Despite the name, this does not have a direct correlation with the Pages tool.
+ * @codeCoverageIgnore
+ */
+class PageRepository extends Repository
+{
+    /**
+     * Get metadata about a single page from the API.
+     * @param Project $project The project to which the page belongs.
+     * @param string $pageTitle Page title.
+     * @return string[]|null Array with some of the following keys: pageid, title, missing, displaytitle, url.
+     *   Returns null if page does not exist.
+     */
+    public function getPageInfo(Project $project, string $pageTitle): ?array
+    {
+        $info = $this->getPagesInfo($project, [$pageTitle]);
+        return null !== $info ? array_shift($info) : null;
+    }
+
+    /**
+     * Get metadata about a set of pages from the API.
+     * @param Project $project The project to which the pages belong.
+     * @param string[] $pageTitles Array of page titles.
+     * @return string[]|null Array keyed by the page names, each element with some of the following keys: pageid,
+     *   title, missing, displaytitle, url. Returns null if page does not exist.
+     */
+    public function getPagesInfo(Project $project, array $pageTitles): ?array
+    {
+        $params = [
+            'prop' => 'info|pageprops',
+            'inprop' => 'protection|talkid|watched|watchers|notificationtimestamp|subjectid|url|displaytitle',
+            'converttitles' => '',
+            'titles' => join('|', $pageTitles),
+            'formatversion' => 2,
+        ];
+
+        $res = $this->executeApiRequest($project, $params);
+        $result = [];
+        if (isset($res['query']['pages'])) {
+            foreach ($res['query']['pages'] as $pageInfo) {
+                $result[$pageInfo['title']] = $pageInfo;
+            }
+        } else {
+            return null;
+        }
+        return $result;
+    }
+
+    /**
+     * Get the full page text of a set of pages.
+     * @param Project $project The project to which the pages belong.
+     * @param string[] $pageTitles Array of page titles.
+     * @return string[] Array keyed by the page names, with the page text as the values.
+     */
+    public function getPagesWikitext(Project $project, array $pageTitles): array
+    {
+        $params = [
+            'prop' => 'revisions',
+            'rvprop' => 'content',
+            'titles' => join('|', $pageTitles),
+            'formatversion' => 2,
+        ];
+        $res = $this->executeApiRequest($project, $params);
+        $result = [];
+
+        if (!isset($res['query']['pages'])) {
+            return [];
+        }
+
+        foreach ($res['query']['pages'] as $page) {
+            if (isset($page['revisions'][0]['content'])) {
+                $result[$page['title']] = $page['revisions'][0]['content'];
+            } else {
+                $result[$page['title']] = '';
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get revisions of a single page.
+     * @param Page $page The page.
+     * @param User|null $user Specify to get only revisions by the given user.
+     * @param false|int $start
+     * @param false|int $end
+     * @return string[] Each member with keys: id, timestamp, length.
+     */
+    public function getRevisions(Page $page, ?User $user = null, $start = false, $end = false): array
+    {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'page_revisions');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $stmt = $this->getRevisionsStmt($page, $user, null, null, $start, $end);
+        $result = $stmt->fetchAllAssociative();
+
+        // Cache and return.
+        return $this->setCache($cacheKey, $result);
+    }
+
+    /**
+     * Get the statement for a single revision, so that you can iterate row by row.
+     * @param Page $page The page.
+     * @param User|null $user Specify to get only revisions by the given user.
+     * @param ?int $limit Max number of revisions to process.
+     * @param ?int $numRevisions Number of revisions, if known. This is used solely to determine the
+     *   OFFSET if we are given a $limit (see below). If $limit is set and $numRevisions is not set,
+     *   a separate query is ran to get the number of revisions.
+     * @param false|int $start
+     * @param false|int $end
+     * @return ResultStatement
+     */
+    public function getRevisionsStmt(
+        Page $page,
+        ?User $user = null,
+        ?int $limit = null,
+        ?int $numRevisions = null,
+        $start = false,
+        $end = false
+    ): ResultStatement {
+        $revTable = $this->getTableName(
+            $page->getProject()->getDatabaseName(),
+            'revision',
+            $user ? null : '' // Use 'revision' if there's no user, otherwise default to revision_userindex
+        );
+        $commentTable = $page->getProject()->getTableName('comment');
+        $actorTable = $page->getProject()->getTableName('actor');
+        $userClause = $user ? "revs.rev_actor = :actorId AND " : "";
+
+        $limitClause = '';
+        if (intval($limit) > 0 && isset($numRevisions)) {
+            $limitClause = "LIMIT $limit";
+        }
+
+        $dateConditions = $this->getDateConditions($start, $end, false, 'revs.');
+
+        $sql = "SELECT * FROM (
+                    SELECT
+                        revs.rev_id AS id,
+                        revs.rev_timestamp AS timestamp,
+                        revs.rev_minor_edit AS minor,
+                        revs.rev_len AS length,
+                        (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
+                        actor_user AS user_id,
+                        actor_name AS username,
+                        comment_text AS `comment`,
+                        revs.rev_sha1 AS sha
+                    FROM $revTable AS revs
+                    LEFT JOIN $actorTable ON revs.rev_actor = actor_id
+                    LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+                    LEFT OUTER JOIN $commentTable ON comment_id = revs.rev_comment_id
+                    WHERE $userClause revs.rev_page = :pageid $dateConditions
+                    ORDER BY revs.rev_timestamp DESC
+                    $limitClause
+                ) a
+                ORDER BY timestamp ASC";
+
+        $params = ['pageid' => $page->getId()];
+        if ($user) {
+            $params['actorId'] = $user->getActorId($page->getProject());
+        }
+
+        return $this->executeProjectsQuery($page->getProject(), $sql, $params);
+    }
+
+    /**
+     * Get a count of the number of revisions of a single page
+     * @param Page $page The page.
+     * @param User|null $user Specify to only count revisions by the given user.
+     * @param false|int $start
+     * @param false|int $end
+     * @return int
+     */
+    public function getNumRevisions(Page $page, ?User $user = null, $start = false, $end = false): int
+    {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'page_numrevisions');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        // In this case revision is faster than revision_userindex if we're not querying by user.
+        $revTable = $page->getProject()->getTableName(
+            'revision',
+            $user && $this->isLabs() ? '_userindex' : ''
+        );
+        $userClause = $user ? "rev_actor = :actorId AND " : "";
+
+        $dateConditions = $this->getDateConditions($start, $end);
+
+        $sql = "SELECT COUNT(*)
+                FROM $revTable
+                WHERE $userClause rev_page = :pageid $dateConditions";
+        $params = ['pageid' => $page->getId()];
+        if ($user) {
+            $params['rev_actor'] = $user->getActorId($page->getProject());
+        }
+
+        $result = (int)$this->executeProjectsQuery($page->getProject(), $sql, $params)->fetchOne();
+
+        // Cache and return.
+        return $this->setCache($cacheKey, $result);
+    }
+
+    /**
+     * Get any CheckWiki errors of a single page
+     * @param Page $page
+     * @return array Results from query
+     */
+    public function getCheckWikiErrors(Page $page): array
+    {
+        // Only support mainspace on Labs installations
+        if (0 !== $page->getNamespace() || !$this->isLabs()) {
+            return [];
+        }
+
+        $sql = "SELECT error, notice, found, name_trans AS name, prio, text_trans AS explanation
+                FROM s51080__checkwiki_p.cw_error a
+                JOIN s51080__checkwiki_p.cw_overview_errors b
+                WHERE a.project = b.project
+                AND a.project = :dbName
+                AND a.title = :title
+                AND a.error = b.id
+                AND a.ok = 0";
+
+        // remove _p if present
+        $dbName = preg_replace('/_p$/', '', $page->getProject()->getDatabaseName());
+
+        // Page title without underscores (str_replace just to be sure)
+        $pageTitle = str_replace('_', ' ', $page->getTitle());
+
+        $conn = $this->getToolsConnection();
+        return $conn->executeQuery($sql, [
+            'dbName' => $dbName,
+            'title' => $pageTitle,
+        ])->fetchAllAssociative();
+    }
+
+    /**
+     * Get basic wikidata on the page: label and description.
+     * @param Page $page
+     * @return string[] In the format:
+     *    [[
+     *         'term' => string such as 'label',
+     *         'term_text' => string (value for 'label'),
+     *     ], ... ]
+     */
+    public function getWikidataInfo(Page $page): array
+    {
+        if (empty($page->getWikidataId())) {
+            return [];
+        }
+
+        $wikidataId = ltrim($page->getWikidataId(), 'Q');
+        $lang = $page->getProject()->getLang();
+        $wdp = 'wikidatawiki_p';
+
+        $sql = "SELECT wby_name AS term, wbx_text AS term_text
+                FROM $wdp.wbt_item_terms
+                JOIN $wdp.wbt_term_in_lang ON wbit_term_in_lang_id = wbtl_id
+                JOIN $wdp.wbt_type ON wbtl_type_id = wby_id
+                JOIN $wdp.wbt_text_in_lang ON wbtl_text_in_lang_id = wbxl_id
+                JOIN $wdp.wbt_text ON wbxl_text_id = wbx_id
+                WHERE wbit_item_id = :wikidataId
+                AND wby_name IN ('label', 'description')
+                AND wbxl_language = :lang";
+
+        return $this->executeProjectsQuery('wikidatawiki', $sql, [
+            'lang' => $lang,
+            'wikidataId' => $wikidataId,
+        ])->fetchAllAssociative();
+    }
+
+    /**
+     * Get or count all wikidata items for the given page,
+     *     not just languages of sister projects
+     * @param Page $page
+     * @param bool $count Set to true to get only a COUNT
+     * @return string[]|int Records as returend by the DB,
+     *                      or raw COUNT of the records.
+     */
+    public function getWikidataItems(Page $page, bool $count = false)
+    {
+        if (!$page->getWikidataId()) {
+            return $count ? 0 : [];
+        }
+
+        $wikidataId = ltrim($page->getWikidataId(), 'Q');
+
+        $sql = "SELECT " . ($count ? 'COUNT(*) AS count' : '*') . "
+                FROM wikidatawiki_p.wb_items_per_site
+                WHERE ips_item_id = :wikidataId";
+
+        $result = $this->executeProjectsQuery('wikidatawiki', $sql, [
+            'wikidataId' => $wikidataId,
+        ])->fetchAllAssociative();
+
+        return $count ? (int) $result[0]['count'] : $result;
+    }
+
+    /**
+     * Get number of in and outgoing links and redirects to the given page.
+     * @param Page $page
+     * @return string[] Counts with the keys 'links_ext_count', 'links_out_count',
+     *                  'links_in_count' and 'redirects_count'
+     */
+    public function countLinksAndRedirects(Page $page): array
+    {
+        $externalLinksTable = $this->getTableName($page->getProject()->getDatabaseName(), 'externallinks');
+        $pageLinksTable = $this->getTableName($page->getProject()->getDatabaseName(), 'pagelinks');
+        $redirectTable = $this->getTableName($page->getProject()->getDatabaseName(), 'redirect');
+
+        $sql = "SELECT COUNT(*) AS value, 'links_ext' AS type
+                FROM $externalLinksTable WHERE el_from = :id
+                UNION
+                SELECT COUNT(*) AS value, 'links_out' AS type
+                FROM $pageLinksTable WHERE pl_from = :id
+                UNION
+                SELECT COUNT(*) AS value, 'links_in' AS type
+                FROM $pageLinksTable WHERE pl_namespace = :namespace AND pl_title = :title
+                UNION
+                SELECT COUNT(*) AS value, 'redirects' AS type
+                FROM $redirectTable WHERE rd_namespace = :namespace AND rd_title = :title";
+
+        $params = [
+            'id' => $page->getId(),
+            'title' => str_replace(' ', '_', $page->getTitleWithoutNamespace()),
+            'namespace' => $page->getNamespace(),
+        ];
+
+        $res = $this->executeProjectsQuery($page->getProject(), $sql, $params);
+        $data = [];
+
+        // Transform to associative array by 'type'
+        foreach ($res as $row) {
+            $data[$row['type'] . '_count'] = (int)$row['value'];
+        }
+
+        return $data;
+    }
+
+    /**
+     * Count wikidata items for the given page, not just languages of sister projects
+     * @param Page $page
+     * @return int Number of records.
+     */
+    public function countWikidataItems(Page $page): int
+    {
+        return $this->getWikidataItems($page, true);
+    }
+
+    /**
+     * Get page views for the given page and timeframe.
+     * @fixme use Symfony Guzzle package.
+     * @param Page $page
+     * @param string|DateTime $start In the format YYYYMMDD
+     * @param string|DateTime $end In the format YYYYMMDD
+     * @return string[]
+     */
+    public function getPageviews(Page $page, $start, $end): array
+    {
+        $title = rawurlencode(str_replace(' ', '_', $page->getTitle()));
+
+        /** @var GuzzleHttp\Client $client */
+        $client = $this->container->get('eight_points_guzzle.client.xtools');
+
+        if ($start instanceof DateTime) {
+            $start = $start->format('Ymd');
+        } else {
+            $start = (new DateTime($start))->format('Ymd');
+        }
+        if ($end instanceof DateTime) {
+            $end = $end->format('Ymd');
+        } else {
+            $end = (new DateTime($end))->format('Ymd');
+        }
+
+        $project = $page->getProject()->getDomain();
+
+        $url = 'https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/' .
+            "$project/all-access/user/$title/daily/$start/$end";
+
+        $res = $client->request('GET', $url);
+        return json_decode($res->getBody()->getContents(), true);
+    }
+
+    /**
+     * Get the full HTML content of the the page.
+     * @param Page $page
+     * @param int $revId What revision to query for.
+     * @return string
+     */
+    public function getHTMLContent(Page $page, ?int $revId = null): string
+    {
+        /** @var GuzzleHttp\Client $client */
+        $client = $this->container->get('eight_points_guzzle.client.xtools');
+        $url = $page->getUrl();
+        if (null !== $revId) {
+            $url .= "?oldid=$revId";
+        }
+        return $client->request('GET', $url)
+            ->getBody()
+            ->getContents();
+    }
+
+    /**
+     * Get the ID of the revision of a page at the time of the given DateTime.
+     * @param Page $page
+     * @param DateTime $date
+     * @return int
+     */
+    public function getRevisionIdAtDate(Page $page, DateTime $date): int
+    {
+        $revisionTable = $page->getProject()->getTableName('revision');
+        $pageId = $page->getId();
+        $datestamp = $date->format('YmdHis');
+        $sql = "SELECT MAX(rev_id)
+                FROM $revisionTable
+                WHERE rev_timestamp <= $datestamp
+                AND rev_page = $pageId LIMIT 1;";
+        $resultQuery = $this->getProjectsConnection($page->getProject())
+            ->executeQuery($sql);
+        return (int)$resultQuery->fetchOne();
+    }
+
+    /**
+     * Get HTML display titles of a set of pages (or the normal title if there's no display title).
+     * This will send t/50 API requests where t is the number of titles supplied.
+     * @param Project $project The project.
+     * @param string[] $pageTitles The titles to fetch.
+     * @return string[] Keys are the original supplied title, and values are the display titles.
+     * @static
+     */
+    public function displayTitles(Project $project, array $pageTitles): array
+    {
+        $client = $this->container->get('eight_points_guzzle.client.xtools');
+
+        $displayTitles = [];
+        $numPages = count($pageTitles);
+
+        for ($n = 0; $n < $numPages; $n += 50) {
+            $titleSlice = array_slice($pageTitles, $n, 50);
+            $res = $client->request('GET', $project->getApiUrl(), ['query' => [
+                'action' => 'query',
+                'prop' => 'info|pageprops',
+                'inprop' => 'displaytitle',
+                'titles' => join('|', $titleSlice),
+                'format' => 'json',
+            ]]);
+            $result = json_decode($res->getBody()->getContents(), true);
+
+            // Extract normalization info.
+            $normalized = [];
+            if (isset($result['query']['normalized'])) {
+                array_map(
+                    function ($e) use (&$normalized): void {
+                        $normalized[$e['to']] = $e['from'];
+                    },
+                    $result['query']['normalized']
+                );
+            }
+
+            // Match up the normalized titles with the display titles and the original titles.
+            foreach ($result['query']['pages'] as $pageInfo) {
+                $displayTitle = $pageInfo['pageprops']['displaytitle'] ?? $pageInfo['title'];
+                $origTitle = $normalized[$pageInfo['title']] ?? $pageInfo['title'];
+                $displayTitles[$origTitle] = $displayTitle;
+            }
+        }
+
+        return $displayTitles;
+    }
+}

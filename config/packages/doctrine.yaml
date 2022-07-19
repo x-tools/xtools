@@ -1,0 +1,77 @@
+# Doctrine Configuration
+doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+                driver:   pdo_mysql
+                host:     "%env(DATABASE_HOST)%"
+                port:     "%env(DATABASE_PORT)%"
+                dbname:   "%env(DATABASE_NAME)%"
+                user:     "%env(DATABASE_USER)%"
+                password: "%env(DATABASE_PASSWORD)%"
+                charset:  UTF8
+            toolsdb:
+                driver:   pdo_mysql
+                host:     "%env(DATABASE_TOOLSDB_HOST)%"
+                port:     "%env(DATABASE_TOOLSDB_PORT)%"
+                user:     "%env(DATABASE_REPLICA_USER)%"
+                password: "%env(DATABASE_REPLICA_PASSWORD)%"
+                charset:  UTF8
+            toolforge_s1:
+                host:     '%env(DATABASE_REPLICA_HOST_S1)%'
+                port:     '%env(DATABASE_REPLICA_PORT_S1)%'
+                user:     '%env(DATABASE_REPLICA_USER)%'
+                password: '%env(DATABASE_REPLICA_PASSWORD)%'
+            toolforge_s2:
+                host:     '%env(DATABASE_REPLICA_HOST_S2)%'
+                port:     '%env(DATABASE_REPLICA_PORT_S2)%'
+                user:     '%env(DATABASE_REPLICA_USER)%'
+                password: '%env(DATABASE_REPLICA_PASSWORD)%'
+            toolforge_s3:
+                host:     '%env(DATABASE_REPLICA_HOST_S3)%'
+                port:     '%env(DATABASE_REPLICA_PORT_S3)%'
+                user:     '%env(DATABASE_REPLICA_USER)%'
+                password: '%env(DATABASE_REPLICA_PASSWORD)%'
+            toolforge_s4:
+                host:     '%env(DATABASE_REPLICA_HOST_S4)%'
+                port:     '%env(DATABASE_REPLICA_PORT_S4)%'
+                user:     '%env(DATABASE_REPLICA_USER)%'
+                password: '%env(DATABASE_REPLICA_PASSWORD)%'
+            toolforge_s5:
+                host:     '%env(DATABASE_REPLICA_HOST_S5)%'
+                port:     '%env(DATABASE_REPLICA_PORT_S5)%'
+                user:     '%env(DATABASE_REPLICA_USER)%'
+                password: '%env(DATABASE_REPLICA_PASSWORD)%'
+            toolforge_s6:
+                host:     '%env(DATABASE_REPLICA_HOST_S6)%'
+                port:     '%env(DATABASE_REPLICA_PORT_S6)%'
+                user:     '%env(DATABASE_REPLICA_USER)%'
+                password: '%env(DATABASE_REPLICA_PASSWORD)%'
+            toolforge_s7:
+                host:     '%env(DATABASE_REPLICA_HOST_S7)%'
+                port:     '%env(DATABASE_REPLICA_PORT_S7)%'
+                user:     '%env(DATABASE_REPLICA_USER)%'
+                password: '%env(DATABASE_REPLICA_PASSWORD)%'
+            toolforge_s8:
+                host:     '%env(DATABASE_REPLICA_HOST_S8)%'
+                port:     '%env(DATABASE_REPLICA_PORT_S8)%'
+                user:     '%env(DATABASE_REPLICA_USER)%'
+                password: '%env(DATABASE_REPLICA_PASSWORD)%'
+
+    orm:
+        auto_generate_proxy_classes: "%kernel.debug%"
+        #naming_strategy: doctrine.orm.naming_strategy.underscore
+        default_entity_manager: default
+        entity_managers:
+            default:
+                connection: default
+            toolsdb:
+                connection: toolsdb
+
+doctrine_migrations:
+    migrations_paths:
+        'Application\Migrations': 'src/DoctrineMigrations'
+    storage:
+        table_storage:
+            table_name: migration_versions

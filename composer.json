@@ -5,25 +5,21 @@
     "type": "project",
     "autoload": {
         "psr-4": {
-            "AppBundle\\": "src/AppBundle/"
-        },
-        "classmap": [
-            "src/AppKernel.php",
-            "src/AppCache.php"
-        ]
+            "App\\": "src/"
+        }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "App\\Tests\\": "tests/"
         }
     },
     "config": {
         "platform": {
-            "php": "7.2"
+            "php": "7.3"
         }
     },
     "require": {
-        "php": "^7.2",
+        "php": "^7.3",
         "ext-curl": "*",
         "ext-intl": "*",
         "ext-json": "*",
@@ -34,15 +30,11 @@
         "doctrine/doctrine-bundle": "^2.2",
         "doctrine/collections": "^1.5",
         "doctrine/annotations": "^1.6",
-        "symfony/swiftmailer-bundle": "^3.0",
         "symfony/monolog-bundle": "^3.3",
         "sensio/framework-extra-bundle": "^5.0",
-        "incenteev/composer-parameter-handler": "^2.0",
         "krinkle/intuition": "^1.0",
         "mediawiki/oauthclient": "^0.1",
         "symfony/cache": "^4.1",
-        "snc/redis-bundle": "^3.1",
-        "predis/predis": "^1.0",
         "nelmio/cors-bundle": "^1.5",
         "jms/serializer-bundle": "^3.4",
         "doctrine/doctrine-migrations-bundle": "^2.0",
@@ -50,21 +42,19 @@
         "slevomat/coding-standard": "^4.8",
         "symfony/webpack-encore-bundle": "^1.6",
         "doctrine/common": "^3.1",
-        "wikimedia/ip-utils": "^1.0"
+        "wikimedia/ip-utils": "^1.0",
+        "symfony/mailer": "^4.4",
+        "symfony/web-profiler-bundle": "^4.4"
     },
     "require-dev": {
-        "phpunit/phpunit": "^7.0",
-        "symfony/phpunit-bridge": "^4.0",
+        "phpunit/phpunit": "^9.0",
+        "symfony/phpunit-bridge": "^4.4",
         "squizlabs/php_codesniffer": "^3.3.0",
-        "mediawiki/minus-x": "^0.3.2"
+        "mediawiki/minus-x": "^0.3.2",
+        "symfony/web-server-bundle": "^4.4",
+        "dms/phpunit-arraysubset-asserts": "^0.4.0"
     },
     "scripts": {
-        "post-install-cmd": [
-            "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters"
-        ],
-        "post-update-cmd": [
-            "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters"
-        ],
         "test": [
             "./vendor/bin/phpcs -s . --ignore=/home/scrutinizer/build/node_modules",
             "./vendor/bin/phpunit tests --coverage-clover=coverage.xml",
@@ -81,9 +71,6 @@
         "symfony-var-dir": "var",
         "symfony-web-dir": "public",
         "symfony-tests-dir": "tests",
-        "symfony-assets-install": "relative",
-        "incenteev-parameters": {
-            "file": "config/parameters.yml"
-        }
+        "symfony-assets-install": "relative"
     }
 }
