@@ -16,7 +16,6 @@ use App\Repository\PageRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
 use DateTime;
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\ContainerInterface;

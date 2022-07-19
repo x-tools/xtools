@@ -10,7 +10,6 @@ namespace App\Repository;
 use App\Model\Project;
 use App\Model\User;
 use Doctrine\DBAL\Driver\ResultStatement;
-use PDO;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Wikimedia\IPUtils;

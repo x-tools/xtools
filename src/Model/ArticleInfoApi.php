@@ -6,7 +6,6 @@ namespace App\Model;
 use App\Repository\ArticleInfoRepository;
 use DateTime;
 use Doctrine\DBAL\Driver\ResultStatement;
-use Doctrine\DBAL\Statement;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
