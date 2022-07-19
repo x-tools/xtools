@@ -10,7 +10,6 @@ namespace App\Repository;
 use App\Model\Project;
 use App\Model\User;
 use GuzzleHttp;
-use PDO;
 
 /**
  * An UserRightsRepository is responsible for retrieving information around a user's
@@ -160,13 +159,13 @@ class UserRightsRepository extends Repository
                 SELECT DISTINCT(ufg_group)
                 FROM $ufgTable";
 
-        $groups = $this->executeProjectsQuery($project, $sql)->fetchAllNumeric();
+        $groups = $this->executeProjectsQuery($project, $sql)->fetchFirstColumn();
 
         if ($this->isLabs()) {
             $sql = "SELECT DISTINCT(gug_group) FROM centralauth_p.global_user_groups";
             $groups = array_merge(
                 $groups,
-                $this->executeProjectsQuery('centralauth', $sql)->fetchAllNumeric(),
+                $this->executeProjectsQuery('centralauth', $sql)->fetchFirstColumn(),
                 // WMF installations have a special 'autoconfirmed' user group.
                 ['autoconfirmed']
             );

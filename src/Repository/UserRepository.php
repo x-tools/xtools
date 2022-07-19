@@ -279,7 +279,7 @@ class UserRepository extends Repository
 
         $ret = $this->executeProjectsQuery($project, $sql, [
             'username' => $user->getUsername(),
-        ])->fetchAllNumeric();
+        ])->fetchFirstColumn();
 
         // Cache and return.
         return $this->setCache($cacheKey, $ret);

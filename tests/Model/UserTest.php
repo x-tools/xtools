@@ -159,7 +159,7 @@ class UserTest extends TestAdapter
         $userRepo = $this->createMock(UserRepository::class);
         $userRepo->expects($this->once())
             ->method('getEditCount')
-            ->willReturn('12345');
+            ->willReturn(12345);
         $user = new User('TestUser');
         $user->setRepository($userRepo);
 
@@ -184,7 +184,7 @@ class UserTest extends TestAdapter
         $userRepo = $this->createMock(UserRepository::class);
         $userRepo->expects($this->once())
             ->method('getEditCount')
-            ->willReturn('123456789');
+            ->willReturn(123456789);
         $userRepo->expects($this->exactly(3))
             ->method('maxEdits')
             ->willReturn(250000);
