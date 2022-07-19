@@ -945,10 +945,6 @@ abstract class XtoolsController extends Controller
         $date =  date('Y-m-d');
 
         // Increment count in timeline
-        $existsSql = "SELECT 1 FROM usage_api_timeline
-                      WHERE date = '$date'
-                      AND endpoint = '$endpoint'";
-
         try {
             $sql = "INSERT INTO usage_api_timeline
                     VALUES(NULL, :date, :endpoint, 1)

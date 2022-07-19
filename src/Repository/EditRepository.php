@@ -49,15 +49,16 @@ class EditRepository extends Repository
                 LEFT OUTER JOIN $commentTable ON (revs.rev_comment_id = comment_id)
                 WHERE revs.rev_id = :revId";
 
-        $result = $this->executeProjectsQuery($project, $sql, ['revId' => $revId])->fetch();
+        $result = $this->executeProjectsQuery($project, $sql, ['revId' => $revId])
+            ->fetchAssociative();
+
+        if (!$result) {
+            return null;
+        }
 
         // Create the Page instance.
         if (null === $page) {
             $page = new Page($project, $result['page_title']);
-        }
-
-        if (!$result) {
-            return null;
         }
 
         $edit = new Edit($page, $result);

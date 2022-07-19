@@ -97,7 +97,7 @@ class SimpleEditCounterRepository extends Repository
         return $this->executeProjectsQuery($project, $sql, [
             'username' => $user->getUsername(),
             'actorId' => $user->getActorId($project),
-        ])->fetchAll();
+        ])->fetchAllAssociative();
     }
 
     /**
@@ -136,6 +136,6 @@ class SimpleEditCounterRepository extends Repository
         return $this->executeProjectsQuery($project, $sql, [
             'start' => $startHex,
             'end' => $endHex,
-        ])->fetchAll();
+        ])->fetchAllAssociative();
     }
 }

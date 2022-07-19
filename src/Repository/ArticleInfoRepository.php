@@ -102,7 +102,8 @@ class ArticleInfoRepository extends Repository
                 AND log_type IN ('delete', 'move', 'protect', 'stable')";
         $title = str_replace(' ', '_', $page->getTitle());
 
-        $result = $this->executeProjectsQuery($page->getProject(), $sql, ['title' => $title])->fetchAll();
+        $result = $this->executeProjectsQuery($page->getProject(), $sql, ['title' => $title])
+            ->fetchAllAssociative();
         return $this->setCache($cacheKey, $result);
     }
 
@@ -137,7 +138,7 @@ class ArticleInfoRepository extends Repository
         $resultQuery = $this->executeProjectsQuery($page->getProject(), $sql, ['pageId' => $page->getId()]);
         $transclusionCounts = [];
 
-        while ($result = $resultQuery->fetch()) {
+        while ($result = $resultQuery->fetchAssociative()) {
             $transclusionCounts[$result['key']] = (int)$result['val'];
         }
 
@@ -199,7 +200,7 @@ class ArticleInfoRepository extends Repository
 
         $result = $this->executeProjectsQuery($project, $sql, [
             'pageId' => $page->getId(),
-        ])->fetchAll();
+        ])->fetchAllAssociative();
 
         return $this->setCache($cacheKey, $result);
     }
@@ -274,7 +275,7 @@ class ArticleInfoRepository extends Repository
          * wait to see the result. We'll pass 60 as the last parameter to executeProjectsQuery,
          * which will set the max_statement_time to 60 seconds.
          */
-        $result = $this->executeProjectsQuery($project, $sql, $params, 60)->fetch();
+        $result = $this->executeProjectsQuery($project, $sql, $params, 60)->fetchAssociative();
 
         $time2 = time();
 

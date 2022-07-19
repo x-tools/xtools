@@ -54,7 +54,7 @@ class PageAssessmentsRepository extends Repository
             $sql .= "\nAND pa_class != '' LIMIT 1";
         }
 
-        $result = $this->executeProjectsQuery($page->getProject(), $sql)->fetchAll();
+        $result = $this->executeProjectsQuery($page->getProject(), $sql)->fetchAllAssociative();
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);

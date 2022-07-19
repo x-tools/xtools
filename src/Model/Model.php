@@ -63,7 +63,7 @@ abstract class Model
      */
     public function getRepository(): Repository
     {
-        if (!$this->repository instanceof Repository) {
+        if (!isset($this->repository)) {
             $msg = sprintf('Repository for %s must be set before using.', static::class);
             throw new Exception($msg);
         }

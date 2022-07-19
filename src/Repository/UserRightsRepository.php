@@ -100,7 +100,7 @@ class UserRightsRepository extends Repository
         return $this->executeProjectsQuery($dbName, $sql, [
             'username' => $username,
             'username2' => $usernameLower,
-        ])->fetchAll();
+        ])->fetchAllAssociative();
     }
 
     /**
@@ -160,13 +160,13 @@ class UserRightsRepository extends Repository
                 SELECT DISTINCT(ufg_group)
                 FROM $ufgTable";
 
-        $groups = $this->executeProjectsQuery($project, $sql)->fetchAll(PDO::FETCH_COLUMN);
+        $groups = $this->executeProjectsQuery($project, $sql)->fetchAllNumeric();
 
         if ($this->isLabs()) {
             $sql = "SELECT DISTINCT(gug_group) FROM centralauth_p.global_user_groups";
             $groups = array_merge(
                 $groups,
-                $this->executeProjectsQuery('centralauth', $sql)->fetchAll(PDO::FETCH_COLUMN),
+                $this->executeProjectsQuery('centralauth', $sql)->fetchAllNumeric(),
                 // WMF installations have a special 'autoconfirmed' user group.
                 ['autoconfirmed']
             );
@@ -264,7 +264,7 @@ class UserRightsRepository extends Repository
 
         $ret = $this->executeProjectsQuery($project, $sql, [
             'actorId' => $user->getActorId($project),
-        ])->fetchColumn();
+        ])->fetchOne();
 
         // Cache and return.
         return $this->setCache($cacheKey, $ret);
@@ -292,7 +292,7 @@ class UserRightsRepository extends Repository
 
         $ret = (int)$this->executeProjectsQuery($project, $sql, [
             'actorId' => $user->getActorId($project),
-        ])->fetchColumn();
+        ])->fetchOne();
 
         // Cache and return.
         return $this->setCache($cacheKey, $ret);

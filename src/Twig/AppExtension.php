@@ -453,7 +453,7 @@ class AppExtension extends AbstractExtension
         $sql = "SELECT lag FROM `heartbeat_p`.`heartbeat`";
         return (int)$project->getRepository()->executeProjectsQuery($project, $sql, [
             'project' => $dbName,
-        ])->fetchColumn();
+        ])->fetchOne();
     }
 
     /**
@@ -563,7 +563,7 @@ class AppExtension extends AbstractExtension
      * @see http://userguide.icu-project.org/formatparse/datetime
      * @return string
      */
-    public function dateFormat($datetime, $pattern = 'yyyy-MM-dd HH:mm'): string
+    public function dateFormat($datetime, string $pattern = 'yyyy-MM-dd HH:mm'): string
     {
         return $this->i18n->dateFormat($datetime, $pattern);
     }

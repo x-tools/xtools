@@ -111,7 +111,7 @@ class PageRepository extends Repository
         }
 
         $stmt = $this->getRevisionsStmt($page, $user, null, null, $start, $end);
-        $result = $stmt->fetchAll();
+        $result = $stmt->fetchAllAssociative();
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);
@@ -214,7 +214,7 @@ class PageRepository extends Repository
             $params['rev_actor'] = $user->getActorId($page->getProject());
         }
 
-        $result = (int)$this->executeProjectsQuery($page->getProject(), $sql, $params)->fetchColumn(0);
+        $result = (int)$this->executeProjectsQuery($page->getProject(), $sql, $params)->fetchOne();
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);
@@ -247,12 +247,11 @@ class PageRepository extends Repository
         // Page title without underscores (str_replace just to be sure)
         $pageTitle = str_replace('_', ' ', $page->getTitle());
 
-        $resultQuery = $this->getToolsConnection()->prepare($sql);
-        $resultQuery->bindParam(':dbName', $dbName);
-        $resultQuery->bindParam(':title', $pageTitle);
-        $resultQuery->execute();
-
-        return $resultQuery->fetchAll();
+        $conn = $this->getToolsConnection();
+        return $conn->executeQuery($sql, [
+            'dbName' => $dbName,
+            'title' => $pageTitle,
+        ])->fetchAllAssociative();
     }
 
     /**
@@ -287,7 +286,7 @@ class PageRepository extends Repository
         return $this->executeProjectsQuery('wikidatawiki', $sql, [
             'lang' => $lang,
             'wikidataId' => $wikidataId,
-        ])->fetchAll();
+        ])->fetchAllAssociative();
     }
 
     /**
@@ -312,7 +311,7 @@ class PageRepository extends Repository
 
         $result = $this->executeProjectsQuery('wikidatawiki', $sql, [
             'wikidataId' => $wikidataId,
-        ])->fetchAll();
+        ])->fetchAllAssociative();
 
         return $count ? (int) $result[0]['count'] : $result;
     }
@@ -437,8 +436,9 @@ class PageRepository extends Repository
                 FROM $revisionTable
                 WHERE rev_timestamp <= $datestamp
                 AND rev_page = $pageId LIMIT 1;";
-        $resultQuery = $this->getProjectsConnection($page->getProject())->query($sql);
-        return (int)$resultQuery->fetchColumn();
+        $resultQuery = $this->getProjectsConnection($page->getProject())
+            ->executeQuery($sql);
+        return (int)$resultQuery->fetchOne();
     }
 
     /**

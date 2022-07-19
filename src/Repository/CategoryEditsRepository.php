@@ -76,7 +76,7 @@ class CategoryEditsRepository extends Repository
                 WHERE $whereClause
                     AND cl_to IN (?)
                     $revDateConditions";
-        $result = (int)$this->executeStmt($sql, $project, $user, $categories)->fetchColumn();
+        $result = (int)$this->executeStmt($sql, $project, $user, $categories)->fetchOne();
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);
@@ -127,7 +127,7 @@ class CategoryEditsRepository extends Repository
 
         $counts = [];
         $stmt = $this->executeStmt($sql, $project, $user, $categories);
-        while ($result = $stmt->fetch()) {
+        while ($result = $stmt->fetchAssociative()) {
             $counts[$result['cat']] = [
                 'editCount' => (int)$result['edit_count'],
                 'pageCount' => (int)$result['page_count'],
@@ -193,7 +193,7 @@ class CategoryEditsRepository extends Repository
                 ORDER BY revs.rev_timestamp DESC
                 LIMIT 50";
 
-        $result = $this->executeStmt($sql, $project, $user, $categories)->fetchAll();
+        $result = $this->executeStmt($sql, $project, $user, $categories)->fetchAllAssociative();
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);

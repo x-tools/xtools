@@ -99,7 +99,7 @@ class TopEditsRepository extends UserRepository
                 OFFSET $offset";
 
         $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $params);
-        $result = $resultQuery->fetchAll();
+        $result = $resultQuery->fetchAllAssociative();
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);
@@ -136,7 +136,7 @@ class TopEditsRepository extends UserRepository
             [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
         }
 
-        $sql = "SELECT COUNT(DISTINCT page_id) AS count
+        $sql = "SELECT COUNT(DISTINCT page_id)
                 FROM $pageTable
                 JOIN $revisionTable ON page_id = rev_page
                 $ipcJoin
@@ -147,7 +147,7 @@ class TopEditsRepository extends UserRepository
         $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $params);
 
         // Cache and return.
-        return $this->setCache($cacheKey, $resultQuery->fetch()['count']);
+        return $this->setCache($cacheKey, $resultQuery->fetchOne());
     }
 
     /**
@@ -219,7 +219,7 @@ class TopEditsRepository extends UserRepository
                 JOIN $pageTable e ON e.page_id = c.rev_page
                 WHERE c.row_number <= $limit";
         $resultQuery = $this->executeQuery($sql, $project, $user, 'all', $params);
-        $result = $resultQuery->fetchAll();
+        $result = $resultQuery->fetchAllAssociative();
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);
@@ -350,6 +350,6 @@ class TopEditsRepository extends UserRepository
                 $childLimit";
 
         $resultQuery = $this->executeQuery($sql, $project, $user, null, $params);
-        return $resultQuery->fetchAll();
+        return $resultQuery->fetchAllAssociative();
     }
 }

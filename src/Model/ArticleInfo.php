@@ -532,7 +532,7 @@ class ArticleInfo extends ArticleInfoApi
             'maxDeletion' => null,
         ];
 
-        while ($rev = $revStmt->fetch()) {
+        while ($rev = $revStmt->fetchAssociative()) {
             $edit = new Edit($this->page, $rev);
 
             if (0 === $revCount) {

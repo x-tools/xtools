@@ -104,7 +104,7 @@ class EditCounterRepository extends UserRightsRepository
         $resultQuery = $this->executeProjectsQuery($project, $sql, $params);
 
         $revisionCounts = [];
-        while ($result = $resultQuery->fetch()) {
+        while ($result = $resultQuery->fetchAssociative()) {
             $revisionCounts[$result['key']] = (int)$result['val'];
         }
 
@@ -137,7 +137,7 @@ class EditCounterRepository extends UserRightsRepository
 
         $results = $this->executeProjectsQuery($project, $sql, [
             'actorId' => $user->getActorId($project),
-        ])->fetchAll();
+        ])->fetchAllAssociative();
 
         $logCounts = array_combine(
             array_map(function ($e) {
@@ -216,7 +216,7 @@ class EditCounterRepository extends UserRightsRepository
                     AND log_namespace = 6";
         $results = $this->executeProjectsQuery($project, $sql, [
             'actorId' => $user->getActorId($project),
-        ])->fetchAll();
+        ])->fetchAllAssociative();
 
         if ($this->isLabs() && 'commons.wikimedia.org' !== $project->getDomain()) {
             $results = array_merge($results, $this->getFileCountsCommons($user));
@@ -254,7 +254,7 @@ class EditCounterRepository extends UserRightsRepository
                  WHERE log_actor = :actorId AND log_type = 'upload' AND log_action = 'upload')";
         return $this->executeProjectsQuery($commonsProject, $sql, [
             'actorId' => $user->getActorId($commonsProject),
-        ])->fetchAll();
+        ])->fetchAllAssociative();
     }
 
     /**
@@ -312,7 +312,7 @@ class EditCounterRepository extends UserRightsRepository
         $resultQuery = $this->executeProjectsQuery($project, $sql, $params);
 
         $actions = [];
-        while ($result = $resultQuery->fetch()) {
+        while ($result = $resultQuery->fetchAssociative()) {
             $actions[$result['key']] = [
                 'id' => $result['id'],
                 'timestamp' => $result['timestamp'],
@@ -343,7 +343,7 @@ class EditCounterRepository extends UserRightsRepository
 
         return $this->executeProjectsQuery($project, $sql, [
             'username' => $username,
-        ])->fetchAll();
+        ])->fetchAllAssociative();
     }
 
     /**
@@ -552,7 +552,7 @@ class EditCounterRepository extends UserRightsRepository
                     ORDER BY revs.rev_timestamp DESC
                     LIMIT 5000
                 ) sizes";
-        $results = $this->executeProjectsQuery($project, $sql, $params)->fetch();
+        $results = $this->executeProjectsQuery($project, $sql, $params)->fetchAssociative();
 
         // Cache and return.
         return $this->setCache($cacheKey, $results);

@@ -93,7 +93,7 @@ class EditSummaryRepository extends UserRepository
         $resultQuery = $this->getRevisions($project, $user, $namespace, $start, $end);
         $data = [];
 
-        while ($row = $resultQuery->fetch()) {
+        while ($row = $resultQuery->fetchAssociative()) {
             $data = call_user_func($processRow, $row);
         }
 

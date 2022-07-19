@@ -57,7 +57,7 @@ class UserRepository extends Repository
         $resultQuery = $this->executeProjectsQuery($databaseName, $sql, ['username' => $username]);
 
         // Cache and return.
-        return $this->setCache($cacheKey, $resultQuery->fetch());
+        return $this->setCache($cacheKey, $resultQuery->fetchAssociative());
     }
 
     /**
@@ -86,16 +86,16 @@ class UserRepository extends Repository
         $resultQuery = $this->executeProjectsQuery($databaseName, $sql, ['username' => $username]);
 
         // Cache and return.
-        return (int)$this->setCache($cacheKey, $resultQuery->fetchColumn());
+        return (int)$this->setCache($cacheKey, $resultQuery->fetchOne());
     }
 
     /**
      * Get the user's (system) edit count.
      * @param string $databaseName The database to query.
      * @param string $username The username to find.
-     * @return string|false As returned by the database.
+     * @return int As returned by the database.
      */
-    public function getEditCount(string $databaseName, string $username)
+    public function getEditCount(string $databaseName, string $username): int
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_edit_count');
         if ($this->cache->hasItem($cacheKey)) {
@@ -123,7 +123,7 @@ class UserRepository extends Repository
                 WHERE ipb_address = :username
                 LIMIT 1";
         $resultQuery = $this->executeProjectsQuery($databaseName, $sql, ['username' => $username]);
-        return $resultQuery->fetchColumn();
+        return $resultQuery->fetchOne();
     }
 
     /**
@@ -167,7 +167,7 @@ class UserRepository extends Repository
         }
 
         $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $params);
-        $result = (int)$resultQuery->fetchColumn();
+        $result = (int)$resultQuery->fetchOne();
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);
@@ -206,7 +206,7 @@ class UserRepository extends Repository
         }
 
         $pageTable = $project->getTableName('page');
-        $pageJoin = 'all' !== $namespace ? "LEFT JOIN $pageTable ON rev_page = page_id" : null;
+        $pageJoin = "LEFT JOIN $pageTable ON rev_page = page_id";
         $condNamespace = 'AND page_namespace = :namespace';
 
         return [$pageJoin, $condNamespace];
@@ -280,7 +280,7 @@ class UserRepository extends Repository
 
         $ret = $this->executeProjectsQuery($project, $sql, [
             'username' => $user->getUsername(),
-        ])->fetchAll(PDO::FETCH_COLUMN);
+        ])->fetchAllNumeric();
 
         // Cache and return.
         return $this->setCache($cacheKey, $ret);

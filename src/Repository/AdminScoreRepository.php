@@ -88,6 +88,6 @@ class AdminScoreRepository extends Repository
         return $this->executeProjectsQuery($project, $sql, [
             'username' => $user->getUsername(),
             'actorId' => $user->getActorId($project),
-        ])->fetchAll();
+        ])->fetchAllAssociative();
     }
 }

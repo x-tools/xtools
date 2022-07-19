@@ -49,6 +49,7 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Format number as a diff size.
+     * @covers AppExtension::diffFormat
      */
     public function testDiffFormat(): void
     {
@@ -68,6 +69,7 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Format number as a percentage.
+     * @covers AppExtension::percentFormat
      */
     public function testPercentFormat(): void
     {
@@ -79,6 +81,7 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Format a time duration as humanized string.
+     * @covers AppExtension::formatDuration
      */
     public function testFormatDuration(): void
     {
@@ -106,6 +109,7 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Format a number.
+     * @covers AppExtension::numberFormat
      */
     public function testNumberFormat(): void
     {
@@ -116,6 +120,7 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Format a size.
+     * @covers AppExtension::sizeFormat
      */
     public function testSizeFormat(): void
     {
@@ -127,7 +132,11 @@ class AppExtensionTest extends TestAdapter
     }
 
     /**
-     * Intution methods.
+     * Intuition methods.
+     * @covers AppExtension::getLang
+     * @covers AppExtension::getLangName
+     * @covers AppExtension::getAllLangs
+     * @covers AppExtension::isRTL
      */
     public function testIntution(): void
     {
@@ -151,6 +160,8 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Methods that fetch data about the git repository.
+     * @covers AppExtension::gitHash
+     * @covers AppExtension::gitDate
      */
     public function testGitMethods(): void
     {
@@ -164,6 +175,7 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Capitalizing first letter.
+     * @covers AppExtension::capitalizeFirst
      */
     public function testCapitalizeFirst(): void
     {
@@ -173,6 +185,7 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Getting amount of time it took to complete the request.
+     * @covers AppExtension::requestMemory
      */
     public function testRequestTime(): void
     {
@@ -181,6 +194,7 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Is the given user logged out?
+     * @covers AppExtension::isUserAnon
      */
     public function testUserIsAnon(): void
     {
@@ -195,6 +209,7 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Formatting dates.
+     * @covers AppExtension::dateFormat
      */
     public function testDateFormat(): void
     {
@@ -210,6 +225,7 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Building URL query string from array.
+     * @covers AppExtension::buildQuery
      */
     public function testBuildQuery(): void
     {
@@ -224,6 +240,7 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Wikifying a string.
+     * @covers AppExtension::wikify
      */
     public function testWikify(): void
     {

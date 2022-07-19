@@ -72,7 +72,7 @@ class LargestPagesRepository extends Repository
             'namespace' => $namespace,
             'include_pattern' => $includePattern,
             'exclude_pattern' => $excludePattern,
-        ])->fetchAll();
+        ])->fetchAllAssociative();
 
         $pageRepo = new PageRepository();
         $pageRepo->setContainer($this->container);

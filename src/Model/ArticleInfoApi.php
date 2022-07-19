@@ -5,6 +5,7 @@ namespace App\Model;
 
 use App\Repository\ArticleInfoRepository;
 use DateTime;
+use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Statement;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DomCrawler\Crawler;
@@ -452,9 +453,9 @@ class ArticleInfoApi extends Model
 
         $limit = $this->tooManyRevisions() ? $this->getMaxRevisions() : null;
 
-        /** @var Statement $botData */
+        /** @var ResultStatement $botData */
         $botData = $this->getRepository()->getBotData($this->page, $this->start, $this->end, $limit);
-        while ($bot = $botData->fetch()) {
+        while ($bot = $botData->fetchAssociative()) {
             $this->bots[$bot['username']] = [
                 'count' => (int)$bot['count'],
                 'current' => '1' === $bot['current'],

@@ -65,7 +65,8 @@ class PagesRepository extends UserRepository
                 ) a ".
                 "GROUP BY namespace";
 
-        $result = $this->executeQuery($sql, $project, $user, $namespace)->fetchAll();
+        $result = $this->executeQuery($sql, $project, $user, $namespace)
+            ->fetchAllAssociative();
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);
@@ -130,7 +131,8 @@ class PagesRepository extends UserRepository
                 "ORDER BY rev_timestamp DESC
                 ".(!empty($limit) ? "LIMIT $limit" : '');
 
-        $result = $this->executeQuery($sql, $project, $user, $namespace)->fetchAll();
+        $result = $this->executeQuery($sql, $project, $user, $namespace)
+            ->fetchAllAssociative();
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);
@@ -298,7 +300,7 @@ class PagesRepository extends UserRepository
         $resultQuery = $this->executeQuery($sql, $project, $user, $namespace);
 
         $assessments = [];
-        while ($result = $resultQuery->fetch()) {
+        while ($result = $resultQuery->fetchAssociative()) {
             $class = '' == $result['class'] ? '' : $result['class'];
             $assessments[$class] = $result['count'];
         }

@@ -411,12 +411,12 @@ abstract class Repository
     /**
      * Special handling of some DriverExceptions, otherwise original Exception is thrown.
      * @param DriverException $e
-     * @param int $timeout Timeout value, if applicable. This is passed to the i18n message.
+     * @param int|null $timeout Timeout value, if applicable. This is passed to the i18n message.
      * @throws HttpException
      * @throws DriverException
      * @codeCoverageIgnore
      */
-    private function handleDriverError(DriverException $e, int $timeout): void
+    private function handleDriverError(DriverException $e, ?int $timeout): void
     {
         // If no value was passed for the $timeout, it must be the default.
         if (null === $timeout) {

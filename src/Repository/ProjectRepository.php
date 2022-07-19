@@ -131,7 +131,8 @@ class ProjectRepository extends Repository
 
         // Otherwise, fetch all from the database.
         $sql = "SELECT dbname AS dbName, url, lang FROM $table";
-        $projects = $this->executeProjectsQuery('meta', $sql)->fetchAll();
+        $projects = $this->executeProjectsQuery('meta', $sql)
+            ->fetchAllAssociative();
         $projectsMetadata = [];
         foreach ($projects as $project) {
             $projectsMetadata[$project['dbName']] = $project;
@@ -202,7 +203,7 @@ class ProjectRepository extends Repository
             'projectUrl2' => "https://$project.org",
             'projectUrl3' => "https://www.$project",
             'projectUrl4' => "https://www.$project.org",
-        ])->fetch();
+        ])->fetchAssociative();
 
         // Cache for one hour and return.
         return $this->setCache($cacheKey, $basicInfo, 'PT1H');
@@ -373,7 +374,8 @@ class ProjectRepository extends Repository
             'ns' => $namespaceId,
             'title' => str_replace(' ', '_', $pageTitle),
         ];
-        $pages = $this->executeProjectsQuery($project, $query, $params)->fetchAll();
+        $pages = $this->executeProjectsQuery($project, $query, $params)
+            ->fetchAllAssociative();
         return count($pages) > 0;
     }
 
@@ -424,7 +426,7 @@ class ProjectRepository extends Repository
                 GROUP BY user_name, ug_group";
         $users = $this->getProjectsConnection($project)
             ->executeQuery($sql, [$groups], [Connection::PARAM_STR_ARRAY])
-            ->fetchAll();
+            ->fetchAllAssociative();
 
         if (count($globalGroups) > 0 && $this->isLabs()) {
             $sql = "SELECT gu_name AS user_name, gug_group AS user_group
@@ -434,7 +436,7 @@ class ProjectRepository extends Repository
                     GROUP BY user_name, user_group";
             $globalUsers = $this->getProjectsConnection('centralauth')
                 ->executeQuery($sql, [$globalGroups], [Connection::PARAM_STR_ARRAY])
-                ->fetchAll();
+                ->fetchAllAssociative();
 
             $users = array_merge($users, $globalUsers);
         }

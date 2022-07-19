@@ -186,7 +186,7 @@ class GlobalContribsRepository extends Repository
                 'actor' => $username,
             ]);
 
-            while ($row = $resultQuery->fetch()) {
+            while ($row = $resultQuery->fetchAssociative()) {
                 $actorIds[$row['dbName']] = (int)$row['actor_id'];
             }
         }
@@ -310,7 +310,7 @@ class GlobalContribsRepository extends Repository
         $revisions = [];
         foreach ($queriesBySlice as $slice => $queries) {
             $sql = "SELECT * FROM ((\n" . join("\n) UNION (\n", $queries) . ")) a ORDER BY timestamp DESC LIMIT $limit";
-            $revisions = array_merge($revisions, $this->executeProjectsQuery($slice, $sql)->fetchAll());
+            $revisions = array_merge($revisions, $this->executeProjectsQuery($slice, $sql)->fetchAllAssociative());
         }
 
         // If there are more than $limit results, re-sort by timestamp.

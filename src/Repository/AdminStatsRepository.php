@@ -63,7 +63,7 @@ class AdminStatsRepository extends Repository
                 GROUP BY actor_name
                 HAVING `total` > 0";
 
-        $results = $this->executeProjectsQuery($project, $sql)->fetchAll();
+        $results = $this->executeProjectsQuery($project, $sql)->fetchAllAssociative();
 
         // Cache and return.
         return $this->setCache($cacheKey, $results);

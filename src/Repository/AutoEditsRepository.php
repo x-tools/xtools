@@ -164,7 +164,7 @@ class AutoEditsRepository extends UserRepository
                 $revDateConditions";
 
         $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $params);
-        $result = (int)$resultQuery->fetchColumn();
+        $result = (int)$resultQuery->fetchOne();
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);
@@ -246,7 +246,7 @@ class AutoEditsRepository extends UserRepository
                 LIMIT $limit";
 
         $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $params);
-        $result = $resultQuery->fetchAll();
+        $result = $resultQuery->fetchAllAssociative();
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);
@@ -342,7 +342,7 @@ class AutoEditsRepository extends UserRepository
                 LIMIT $limit";
 
         $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $params);
-        $result = $resultQuery->fetchAll();
+        $result = $resultQuery->fetchAllAssociative();
 
         // Cache and return.
         return $this->setCache($cacheKey, $result);
@@ -382,7 +382,7 @@ class AutoEditsRepository extends UserRepository
         // handling results
         $results = [];
 
-        while ($row = $resultQuery->fetch()) {
+        while ($row = $resultQuery->fetchAssociative()) {
             // Only track tools that they've used at least once
             $tool = $row['toolname'];
             if ($row['count'] > 0) {
@@ -598,9 +598,7 @@ class AutoEditsRepository extends UserRepository
         $tagDefTable = $project->getTableName('change_tag_def');
         $sql = "SELECT ctd_name, ctd_id FROM $tagDefTable
                 WHERE ctd_name IN ($tags)";
-        // FIXME: change to ->fetchAllKeyValue() when doctrine-bundle gets it.
-        // See https://github.com/doctrine/dbal/pull/4338
-        $this->tags = $this->executeProjectsQuery($project, $sql)->fetchAll(PDO::FETCH_KEY_PAIR);
+        $this->tags = $this->executeProjectsQuery($project, $sql)->fetchAllKeyValue();
 
         // Cache and return.
         return $this->setCache($cacheKey, $this->tags);
