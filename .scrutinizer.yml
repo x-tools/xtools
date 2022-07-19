@@ -1,5 +1,4 @@
 build:
-    image: default-bionic
     environment:
         php: 7.3
     nodes:
@@ -19,4 +18,3 @@ filter:
         - 'vendor/*'
         - 'assets/vendor/*'
         - '*.min.js'
-
