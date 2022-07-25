@@ -273,7 +273,7 @@
 	"num-hours": "{{PLURAL:$1|ura|uri|ure|ur}}",
 	"num-minutes": "{{PLURAL:$1|minuta|minuti|minute|minut}}",
 	"num-months": "{{PLURAL:$1|mesec|meseca|meseci|mesecev}}",
-	"num-moves": "{{PLURAL:$1|preimenovanje|preimenovanji|preimenovanja|preimenovanj}}",
+	"num-moves": "{{PLURAL:$1|prestavitev|prestavitvi|prestavitve|prestavitev}}",
 	"num-namespaces": "{{PLURAL:$1|imenski prostor|imenska prostora|imenski prostori|imenskih prostorov}}",
 	"num-others": "{{PLURAL:$1|drug|druga|drugi|drugih}}",
 	"num-pageviews": "{{PLURAL:$1|ogled strani|ogleda strani|ogledi strani|ogledov strani}}",
