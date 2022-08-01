@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"Bada Kaji",
 			"Drjpoudel",
 			"Nemo bis",
 			"Nirajan pant",
@@ -106,8 +107,8 @@
 	"events": "कार्यक्रमहरू",
 	"explanation": "व्याख्या",
 	"feedback": "प्रतिक्रिया",
-	"file": "फाइल",
-	"files": "फाइलहरू",
+	"file": "चित्र",
+	"files": "चित्रहरू",
 	"files-moved": "फाइललाई सारिएकाे छ",
 	"files-moved-commons": "फाइललाई सारिएकाे छ (कमन्स)",
 	"files-uploaded": "अपलोड गरेका फाइलहरू",
