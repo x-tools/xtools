@@ -143,7 +143,7 @@
 	"error-login": "Prijava je spodletela. Poskusi ponovno.",
 	"error-pagepile-too-large": "Žal je preveč strani za izvoz v PagePile. PagePile lahko ustvarite ročno ali poskusite zmanjšati nabor rezultatov z omejitvijo na določen imenski prostor ali določeno časovno obdobje.",
 	"error-query-timeout": "Se opravičujemo, zahtevana informacija je bila predolgo v obdelavi (pretek po $1 {{PLURAL:$1|sekundi|sekundah}}). Zaradi varčevanja kapacitet je bil zahtevek izničen.",
-	"error-rate-limit": "Če si človek, podajaš preveč zahtevkov zapovrstjo. Počakaj $1 {{PLURAL:$1|minuto|minuti|minute|minut}} pred ponovno naložitvijo orodja, ali $2, da do tega več ne pride. Če si robot, uporabi raje naš $3.",
+	"error-rate-limit": "Če ste človek, podajate preveč zahtevkov zapovrstjo. Počakajte $1 {{PLURAL:$1|minuto|minuti|minute|minut}} pred ponovno naložitvijo orodja, ali $2, da se to ne ponovi. Če si robot, raje uporabi naš $3.",
 	"error-rate-limit-login": "se prijavi",
 	"error-rate-limit-login-big": "Prosim, $1 za izogib omejitvi hitrosti.",
 	"error-server-message": "Strežnik je sporočil: $1",
