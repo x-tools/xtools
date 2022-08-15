@@ -2,6 +2,7 @@
 	"@metadata": {
 		"authors": [
 			"Har-wradim",
+			"Pacha Tchernof",
 			"פוילישער"
 		]
 	},
@@ -12,6 +13,7 @@
 	"more": "נאך",
 	"other": "אַנדער",
 	"page": "בלאַט",
+	"pages": "בלעטער",
 	"performer": "אויספֿירער",
 	"projects": "פראיעקטן",
 	"size-kilobytes": "{{PLURAL:$1|איין קילאבייט|$1 קילאבייטן}}"
