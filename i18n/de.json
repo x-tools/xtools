@@ -14,6 +14,7 @@
 			"Metalhead64",
 			"Mirzali",
 			"Nemo bis",
+			"Reinhard Kraasch",
 			"Tobi 406",
 			"Umlaut",
 			"WikiBayer"
@@ -435,7 +436,7 @@
 	"tool-adminstats-desc": "Statistik der Admin-Aktionen",
 	"tool-articleinfo": "Seitenhistorie",
 	"tool-articleinfo-desc": "Verschiedene Statistiken über Versionen",
-	"tool-authorship": "Autorenschaft",
+	"tool-authorship": "Autorschaft",
 	"tool-authorship-desc": "Die Anteile an der aktuellen Version des Artikels, gemessen an der Zeichenanzahl, ausschließlich Leerzeichen.",
 	"tool-autoedits": "Automatisierte Bearbeitungen",
 	"tool-autoedits-desc": "Analyse von halbautomatisierten und nichtautomatisierten Beiträgen.",
