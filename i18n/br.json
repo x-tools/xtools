@@ -4,6 +4,7 @@
 			"Dishual",
 			"Fulup",
 			"Gwenn-Ael",
+			"Huñvreüs",
 			"Iriep"
 		]
 	},
@@ -66,7 +67,7 @@
 	"blame-query-desc": "Rankout a ra ar reked enlakaat ar wikitestenn islinennet.",
 	"block": "Blog",
 	"block-current": "Stankadenn red",
-	"block-log": "Roll ar stankadennoù",
+	"block-log": "Marilh ar stankadennoù",
 	"block-longest": "Stankadenn hirañ",
 	"blocks": "Stankadennoù",
 	"blocks-desc": "$2 {{PLURAL:$1|stankadenn|stankadenn}} meret",
