@@ -509,7 +509,7 @@
 	"user-groups": "Groupes d’utilisateurs",
 	"user-id": "ID de l’utilisateur",
 	"user-is-not-admin": "Cet utilisateur n’est pas un administrateur",
-	"user-not-found": "L’utilisateur demandé n’existe pas",
+	"user-not-found": "L’utilisateur ou l’utilisatrice demandé(e) n’existe pas.",
 	"user-page": "Page utilisateur",
 	"user-page-desc": "La taille de la page utilisateur est de $2 octet{{PLURAL:$1||s}}",
 	"username": "Nom d’utilisateur",
