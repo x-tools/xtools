@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"Bgo eiu",
 			"Saraiki"
 		]
 	},
@@ -34,6 +35,7 @@
 	"bytes": "بائٹس",
 	"categories": "ونکیاں",
 	"category": "ونکی",
+	"comma-character": "،",
 	"contributions": "ونگاراں",
 	"count": "ڳݨو",
 	"csv": "سی ایس وی",
