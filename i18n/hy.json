@@ -3,13 +3,15 @@
 		"authors": [
 			"23artashes",
 			"Aram1985",
+			"Armenoid",
 			"Kareyac",
-			"Nemo bis"
+			"Nemo bis",
+			"Սերգեյ Սաֆարյան"
 		]
 	},
 	"account-age": "Մասնակցային հաշվի տարիքը",
 	"accounts": "Հաշիվներ",
-	"accounts-created": "Հաշիվը ստեղծված է",
+	"accounts-created": "Ստեղծվել են հաշիվներ",
 	"actions": "Գործողություններ",
 	"actions-as-admin": "Ադմինական գործողություն",
 	"added": "Ավելացվել է",
@@ -87,7 +89,7 @@
 	"end": "Վերջնական ամսաթիվը",
 	"error-rate-limit-login": "մտնել",
 	"events": "Իրադարձություններ",
-	"executed": "Տվյալները ստացվել է $1 վայրկյանում:",
+	"executed": "Կատարված է $1 {{PLURAL:$2|վայրկյանում}}։",
 	"explanation": "Բացատրություն",
 	"feedback": "Հետադարձ կապ",
 	"file": "Նիշք",
@@ -183,6 +185,7 @@
 	"patrol": "Պարեկում",
 	"percentage": "Տոկոս",
 	"performer": "Կատարող",
+	"powered-by": "$1֊ի աջակցությամբ",
 	"project": "Նախագիծ",
 	"projects": "Նախագծեր",
 	"prose": "Արձակ",
@@ -251,7 +254,7 @@
 	"tool-quote-desc": "Ստանալ մեջմբերումներ IRC մեջբերումների տվյալների բազայից",
 	"tool-rfx": "RfX վերլուծություն",
 	"tool-rfx-desc": "Ադմինության / Բուրոկրատի դիմումների վերլուծություն",
-	"tool-rfxvote": "RfX քվեարկության հաշվիչ",
+	"tool-rfxvote": "RfX քվեարկություններ",
 	"tool-rfxvote-desc": "Ինչպե՞ս է քվեարկել մասնակիցը",
 	"tool-simpleeditcounter": "Արագ, խառնված, պարզապես խմբագրահաշվիչ",
 	"tool-simpleeditcounter-desc": "Մասնակցի ներդրման արագ վերլուծություն",
