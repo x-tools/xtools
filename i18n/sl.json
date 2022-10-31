@@ -135,7 +135,7 @@
 	"edits-not-in-categories": "Urejanja v nekategorijah",
 	"edits-with-summaries": "Urejanja s povzetkom",
 	"end": "Datum konca",
-	"error-articleinfo-api": "Ne moremo naložiti podatkov o redakciji.",
+	"error-articleinfo-api": "Ni mogoče naložiti podatkov o redakciji.",
 	"error-authorship-non-mainspace": "Statistični podatki o avtorstvu so na voljo samo za članke v glavnem prostoru.",
 	"error-authorship-unsupported-project": "$1 ni podprt projekt.",
 	"error-automation": "Uporaba avtomatike za strganje uporabniškega vmesnika orodja XTools ni dovoljeno. Namesto tega uporabite naš celoviti API: $1.",

@@ -20,6 +20,7 @@
 			"Tacsipacsi",
 			"Urhixidur",
 			"Verdy p",
+			"Vlad5250",
 			"Wladek92",
 			"Xiplus"
 		]
@@ -77,7 +78,7 @@
 	"average-page-size": "Label for the average page size of all the pages a user created.",
 	"average-per-page": "Label for the average edits a user has made to a list of pages.",
 	"average-time-bw-edits": "Label for the average time between edits (in number of days) by a single user.",
-	"average-time-bw-edits-abbr": "'සංස්කරණ අතර සාමාන්‍ය කාලය' සඳහා කෙටි යෙදුම.",
+	"average-time-bw-edits-abbr": "The abbreviation for 'Average Time Between Edits'.",
 	"back": "Link that brings user back to the initial form.\n{{Identical|Back}}",
 	"basic-information": "Heading in the Edit Counter tool that lists basic information about a user.\n{{Identical|Basic information}}",
 	"blame-as-of": "Label for form field for the Blame tool, which allows you to perform a search on the page 'as of' the given revision. Options would include things like 'latest revision', 'date' (where they enter the date), and a specific revision ID.",
