@@ -284,7 +284,7 @@
 	"num-revisions-processed": "$1 prikazanih",
 	"num-revisions-since": "$1 {{PLURAL:$2|redakcija|redakciji|redakcije|redakcij}} od $3",
 	"num-seconds": "{{PLURAL:$1|sekunda|sekundi|sekunde|sekund}}",
-	"num-sitelinks": "{{PLURAL:$1|povezava|povezavi|povezave|povezav}} na stran",
+	"num-sitelinks": "{{PLURAL:$1|povezava mesta|povezavi mest|povezave mest|povezav mest}}",
 	"num-tools": "{{PLURAL:$1|orodje|orodji|orodja|orodij}}",
 	"num-users": "{{PLURAL:$1|uporabnik|uporabnika|uporabniki|uporabnikov}}",
 	"num-watchers": "{{PLURAL:$1|obiskovalec|obiskovalca|obiskovalci|obiskovalcev}}",
