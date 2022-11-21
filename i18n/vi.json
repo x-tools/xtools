@@ -3,6 +3,7 @@
 		"authors": [
 			"Anewplayer",
 			"Bluetpp",
+			"CactiStaccingCrane",
 			"Ccv2020",
 			"Ioe2015",
 			"Leduyquang753",
@@ -21,8 +22,8 @@
 	},
 	"abusefilter": "Bộ lọc sai phạm",
 	"accepted-formats": "Định dạng được chấp nhận",
-	"account-age": "Tuổi đời tài khoản",
-	"account-age-desc": "$2 {{PLURAL:$1|ngày|ngày}} tuổi",
+	"account-age": "Tuổi của tài khoản",
+	"account-age-desc": "$2 {{PLURAL:$1|ngày}}",
 	"accounts": "Tài khoản",
 	"accounts-created": "Tài khoản được tạo",
 	"actions": "Tác vụ",

@@ -140,7 +140,7 @@
 	"error-authorship-unsupported-project": "$1 ni podprt projekt.",
 	"error-automation": "Uporaba avtomatike za strganje uporabniškega vmesnika orodja XTools ni dovoljeno. Namesto tega uporabite naš celoviti API: $1.",
 	"error-denied": "Vaš dostop do orodja XTools je bil zaradi očitne zlorabe ali moteče avtomatizacije blokiran. Obrnite se na $1.",
-	"error-ip-range-unsupported": "Ta funkcija ni na voljo za IP razpone. Vpiši uporabniško ime ali IP naslov.",
+	"error-ip-range-unsupported": "Ta funkcija ni na voljo za IP-razpone. Vnesite uporabniško ime ali IP-naslov.",
 	"error-login": "Prijava je spodletela! Poskusite znova.",
 	"error-pagepile-too-large": "Žal je preveč strani za izvoz v PagePile. PagePile lahko ustvarite ročno ali poskusite zmanjšati nabor zadetkov z omejitvijo na določen imenski prostor ali določeno časovno obdobje.",
 	"error-query-timeout": "Se opravičujemo, zahtevana informacija je bila predolgo v obdelavi (pretek po $1 {{PLURAL:$1|sekundi|sekundah}}). Zaradi varčevanja kapacitet je bil zahtevek izničen.",
