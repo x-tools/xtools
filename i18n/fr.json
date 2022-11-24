@@ -511,7 +511,7 @@
 	"user-is-not-admin": "Cet utilisateur n’est pas un administrateur",
 	"user-not-found": "L’utilisateur ou l’utilisatrice demandé(e) n’existe pas.",
 	"user-page": "Page utilisateur",
-	"user-page-desc": "La taille de la page utilisateur est de $2 octet{{PLURAL:$1||s}}",
+	"user-page-desc": "La taille de la page utilisateur est de $2 octet{{PLURAL:$1||s}}",
 	"username": "Nom d’utilisateur",
 	"username-or-ip": "Nom d’utilisateur ou adresse IPv4 ou IPv6",
 	"username-ip-or-cidr": "Nom d’utilisateur, adresse IP ou plage CIDR.",

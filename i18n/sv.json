@@ -153,6 +153,7 @@
 	"error-server-message": "Server sade: $1",
 	"error-service-overload": "XTools är för närvarande upptagen av andra begäran. Försök igen om några minuter.",
 	"error-title": "Ett allvarligt fel har inträffat i XTools. Detta har rapporterats automatiskt, men skapa gärna ett ärende på $1 (kräver ett Wikimedia-konto).",
+	"error-usernames-missing": "Inga användarnamn kunde hämtas. På grund av detta kan viss data vara ofullständig eller felaktig.",
 	"events": "Händelser",
 	"exclusion-pattern": "Inkludera inte sidor med titlar som följer att angivet mönster.",
 	"executed": "Utfört på $1 {{PLURAL:$2|sekund|sekunder}}.",
