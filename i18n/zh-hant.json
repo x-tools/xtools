@@ -15,6 +15,7 @@
 			"Winston Sung",
 			"Xiplus",
 			"予弦",
+			"捍粵者",
 			"神樂坂秀吉"
 		]
 	},
@@ -291,7 +292,7 @@
 	"num-pageviews": "{{PLURAL:$1|頁面瀏覽數|頁面瀏覽數}}",
 	"num-protections": "{{PLURAL:$1|保護|保護}}",
 	"num-revisions": "{{PLURAL:$1|修訂|修訂}}",
-	"num-revisions-processed": "$1 個被處理",
+	"num-revisions-processed": "已處理$1版",
 	"num-revisions-since": "自 $3 以來的 $1 個{{PLURAL:$2|修訂|修訂}}",
 	"num-seconds": "{{PLURAL:$1|秒|秒}}",
 	"num-sitelinks": "{{PLURAL:$1|個網站連結|個網站連結}}",
@@ -485,7 +486,7 @@
 	"total-edits": "總編輯數",
 	"total-page-size": "總頁面大小",
 	"total-revisions": "總修訂數",
-	"translation-credits": "使用$1、$2和$3進行翻譯。",
+	"translation-credits": "用$1、$2和$3翻譯。",
 	"tsv": "TSV",
 	"tuesday": "星期二",
 	"type": "類型",
