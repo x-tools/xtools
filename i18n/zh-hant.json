@@ -15,6 +15,7 @@
 			"Winston Sung",
 			"Xiplus",
 			"予弦",
+			"列维劳德",
 			"捍粵者",
 			"神樂坂秀吉"
 		]
@@ -278,7 +279,7 @@
 	"notice": "通知",
 	"num-blocks": "{{PLURAL:$1|封禁|封禁}}",
 	"num-bytes": "{{PLURAL:$1|位元組|位元組}}",
-	"num-categories": "{{PLURAL:$1| 個分類| 個分類}}",
+	"num-categories": "{{PLURAL:$1|個分類}}",
 	"num-days": "{{PLURAL:$1|天|天}}",
 	"num-deletions": "{{PLURAL:$1|刪除|刪除}}",
 	"num-edits": "{{PLURAL:$1|編輯數}}",
