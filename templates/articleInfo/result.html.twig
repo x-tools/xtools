@@ -414,12 +414,12 @@
                 {{
                     chart.pie_chart('top_bottom',
                         [{
-                            label: msg('top-ten-percent'),
+                            label: msg('top-ten-count'),
                             value: ai.topTenCount,
                             percentage: ai.topTenPercentage,
                         },
                         {
-                            label: msg('bottom-ninety'),
+                            label: msg('top-ten-other-editors'),
                             value: ai.numRevisionsProcessed - ai.topTenCount,
                             percentage: 100 - ai.topTenPercentage,
                         }]
