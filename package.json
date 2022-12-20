@@ -7,7 +7,7 @@
     "url": "git://github.com/x-tools/xtools.git"
   },
   "dependencies": {
-    "@symfony/webpack-encore": "^0.27.0",
+    "@symfony/webpack-encore": "^4.2.0",
     "node-sass": "^4.14.0",
     "sass-loader": "^7.3.1"
   },
