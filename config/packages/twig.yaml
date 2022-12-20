@@ -1,9 +1,10 @@
 # Twig Configuration
 twig:
-    debug:            "%kernel.debug%"
+    debug: "%kernel.debug%"
     strict_variables: "%kernel.debug%"
+    exception_controller: null
     globals:
-        version:        '%app.version%'
+        version: '%app.version%'
         notice_display: '%env(APP_NOTICE_DISPLAY)%'
-        notice_style:   '%env(APP_NOTICE_STYLE)%'
-        notice_text:    '%env(APP_NOTICE_TEXT)%'
+        notice_style: '%env(APP_NOTICE_STYLE)%'
+        notice_text: '%env(APP_NOTICE_TEXT)%'
