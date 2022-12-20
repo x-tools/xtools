@@ -134,32 +134,34 @@
         </tr></thead>
         <tbody>
         {% set substr = user.ipSubstringFromCidr %}
-        {% for edit in gc.globalEdits if edit.project.exists %}
-            <tr{% if edit.isReverted %} class="reverted-edit"{% endif %}>
-                <td class="sort-entry--date contribs-row-date" data-value="{{ edit.utcTimestamp }}">
-                    {{ wiki.diffLink(edit, edit.timestamp) }}
-                </td>
-                <td class="sort-entry--project" data-value="{{ edit.project.domain }}">
-                    {# Use project.domain here instead of title to preserve limited space in the interface #}
-                    <a href="{{ edit.project.url }}">{{ edit.project.domain|replace({'.org': ''}) }}</a>
-                </td>
-                {% if user.isIpRange %}
-                    {% set username = edit.user.username|replace({(substr): '…'}) %}
-                    <td class="sort-entry--user" data-value="{{ username|lower }}">
-                        {{ wiki.userLink(edit.user, edit.project, username|lower) }}
+        {% for edit in gc.globalEdits %}
+            {% if edit.project.exists %}
+                <tr{% if edit.isReverted %} class="reverted-edit"{% endif %}>
+                    <td class="sort-entry--date contribs-row-date" data-value="{{ edit.utcTimestamp }}">
+                        {{ wiki.diffLink(edit, edit.timestamp) }}
                     </td>
-                {% endif %}
-                <td class="sort-entry--page-title display-title" data-value="{{ edit.page.title(true) }}">
-                    {{ wiki.pageLinkRaw(edit.page.title(true), edit.project) }}
-                </td>
-                <td class="sort-entry--size" data-value="{{ edit.lengthChange }}">
-                    {{ edit.lengthChange|diff_format }}
-                </td>
-                <td class="sort-entry--summary" data-value="{{ edit.comment }}">
-                    {% if edit.isReverted %}<i class="text-info">({{ msg('reverted')|lower }})</i>&nbsp;{% endif %}
-                    {{ edit.wikifiedComment(true)|raw }}
-                </td>
-            </tr>
+                    <td class="sort-entry--project" data-value="{{ edit.project.domain }}">
+                        {# Use project.domain here instead of title to preserve limited space in the interface #}
+                        <a href="{{ edit.project.url }}">{{ edit.project.domain|replace({'.org': ''}) }}</a>
+                    </td>
+                    {% if user.isIpRange %}
+                        {% set username = edit.user.username|replace({(substr): '…'}) %}
+                        <td class="sort-entry--user" data-value="{{ username|lower }}">
+                            {{ wiki.userLink(edit.user, edit.project, username|lower) }}
+                        </td>
+                    {% endif %}
+                    <td class="sort-entry--page-title display-title" data-value="{{ edit.page.title(true) }}">
+                        {{ wiki.pageLinkRaw(edit.page.title(true), edit.project) }}
+                    </td>
+                    <td class="sort-entry--size" data-value="{{ edit.lengthChange }}">
+                        {{ edit.lengthChange|diff_format }}
+                    </td>
+                    <td class="sort-entry--summary" data-value="{{ edit.comment }}">
+                        {% if edit.isReverted %}<i class="text-info">({{ msg('reverted')|lower }})</i>&nbsp;{% endif %}
+                        {{ edit.wikifiedComment(true)|raw }}
+                    </td>
+                </tr>
+            {% endif %}
         {% endfor %}
         </tbody>
     </table>
