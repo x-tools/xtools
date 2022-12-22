@@ -3,6 +3,7 @@
 		"authors": [
 			"Aefgh39622",
 			"Afaz",
+			"Buehl",
 			"Kkairri",
 			"Leiem",
 			"Marine-Blue",
@@ -426,6 +427,7 @@
 	"top-ten-by-edits": "編集回数上位 10",
 	"top-ten-by-text": "テキスト追加上位 10",
 	"top-ten-count": "上位 10% の編集者による編集",
+	"top-ten-other-editors": "他の編集者",
 	"topedits-article-desc": "一人の利用者が行ったすべての編集を日時で並べています。",
 	"topedits-per-namespace": "名前空間別の最多編集",
 	"total": "合計",
