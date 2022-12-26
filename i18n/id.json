@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"Agam Riyandana",
 			"Daud I.F. Argana",
 			"Hidayatsrf",
 			"Naufal06",
@@ -465,7 +466,8 @@
 	"top-projects-edit-counts": "Jumlah suntingan global",
 	"top-ten-by-edits": "10 suntingan teratas",
 	"top-ten-by-text": "10 teks tertambah teratas",
-	"top-ten-count": "Suntingan oleh 10% penyunting teratas",
+	"top-ten-count": "Suntingan oleh 10 penyunting teratas",
+	"top-ten-other-editors": "Editor lainnya",
 	"topedits-article": "Suntingan artikel teratas",
 	"topedits-article-desc": "Semua suntingan yang dibuat pada suatu halaman oleh satu pengguna, berdasarkan urutan waktu.",
 	"topedits-per-namespace": "Suntingan teratas per ruang nama",

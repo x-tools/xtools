@@ -2,6 +2,7 @@
 	"@metadata": {
 		"authors": [
 			"Ерней",
+			"Ильгиз",
 			"Ильнар"
 		]
 	},
@@ -14,5 +15,7 @@
 	"size-gigabytes": "$1 Гб",
 	"size-kilobytes": "$1 Кб",
 	"size-megabytes": "$1 Мб",
-	"size-terabytes": "$1 Тб"
+	"size-terabytes": "$1 Тб",
+	"top-ten-count": "Иң яхшы 10 төзәтүче ясаган төзәтүләр",
+	"top-ten-other-editors": "Башка төзәтүчеләр"
 }
