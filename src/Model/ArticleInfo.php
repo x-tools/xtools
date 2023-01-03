@@ -1,13 +1,9 @@
 <?php
-/**
- * This file contains only the ArticleInfo class.
- */
 
 declare(strict_types = 1);
 
 namespace App\Model;
 
-use App\Helper\I18nHelper;
 use DateTime;
 
 /**
@@ -15,98 +11,85 @@ use DateTime;
  */
 class ArticleInfo extends ArticleInfoApi
 {
-    /** @var I18nHelper For i18n and l10n. */
-    protected $i18n;
-
     /** @var int Number of revisions that were actually processed. */
-    protected $numRevisionsProcessed;
+    protected int $numRevisionsProcessed;
 
     /**
      * Various statistics about editors to the page. These are not User objects
      * so as to preserve memory.
-     * @var mixed[]
+     * @var array
      */
-    protected $editors = [];
+    protected array $editors = [];
 
-    /** @var mixed[] The top 10 editors to the page by number of edits. */
-    protected $topTenEditorsByEdits;
+    /** @var array The top 10 editors to the page by number of edits. */
+    protected array $topTenEditorsByEdits;
 
-    /** @var mixed[] The top 10 editors to the page by added text. */
-    protected $topTenEditorsByAdded;
+    /** @var array The top 10 editors to the page by added text. */
+    protected array $topTenEditorsByAdded;
 
     /** @var int Number of edits made by the top 10 editors. */
-    protected $topTenCount;
+    protected int $topTenCount;
 
-    /** @var mixed[] Various counts about each individual year and month of the page's history. */
-    protected $yearMonthCounts;
+    /** @var array Various counts about each individual year and month of the page's history. */
+    protected array $yearMonthCounts;
 
     /** @var string[] Localized labels for the years, to be used in the 'Year counts' chart. */
-    protected $yearLabels = [];
+    protected array $yearLabels = [];
 
     /** @var string[] Localized labels for the months, to be used in the 'Month counts' chart. */
-    protected $monthLabels = [];
+    protected array $monthLabels = [];
 
-    /** @var Edit The first edit to the page. */
-    protected $firstEdit;
+    /** @var Edit|null The first edit to the page. */
+    protected ?Edit $firstEdit = null;
 
-    /** @var Edit The last edit to the page. */
-    protected $lastEdit;
+    /** @var Edit|null The last edit to the page. */
+    protected ?Edit $lastEdit = null;
 
-    /** @var Edit Edit that made the largest addition by number of bytes. */
-    protected $maxAddition;
+    /** @var Edit|null Edit that made the largest addition by number of bytes. */
+    protected ?Edit $maxAddition = null;
 
-    /** @var Edit Edit that made the largest deletion by number of bytes. */
-    protected $maxDeletion;
+    /** @var Edit|null Edit that made the largest deletion by number of bytes. */
+    protected ?Edit $maxDeletion = null;
 
     /**
      * Maximum number of edits that were created across all months. This is used as a comparison
      * for the bar charts in the months section.
      * @var int
      */
-    protected $maxEditsPerMonth;
+    protected int $maxEditsPerMonth = 0;
 
     /** @var string[][] List of (semi-)automated tools that were used to edit the page. */
-    protected $tools;
+    protected array $tools = [];
 
     /**
      * Total number of bytes added throughout the page's history. This is used as a comparison
      * when computing the top 10 editors by added text.
      * @var int
      */
-    protected $addedBytes = 0;
+    protected int $addedBytes = 0;
 
     /** @var int Number of days between first and last edit. */
-    protected $totalDays;
+    protected int $totalDays;
 
     /** @var int Number of minor edits to the page. */
-    protected $minorCount = 0;
+    protected int $minorCount = 0;
 
     /** @var int Number of anonymous edits to the page. */
-    protected $anonCount = 0;
+    protected int $anonCount = 0;
 
     /** @var int Number of automated edits to the page. */
-    protected $automatedCount = 0;
+    protected int $automatedCount = 0;
 
     /** @var int Number of edits to the page that were reverted with the subsequent edit. */
-    protected $revertCount = 0;
+    protected int $revertCount = 0;
 
     /** @var int[] The "edits per <time>" counts. */
-    protected $countHistory = [
+    protected array $countHistory = [
         'day' => 0,
         'week' => 0,
         'month' => 0,
         'year' => 0,
     ];
-
-    /**
-     * Make the I18nHelper accessible to ArticleInfo.
-     * @param I18nHelper $i18n
-     * @codeCoverageIgnore
-     */
-    public function setI18nHelper(I18nHelper $i18n): void
-    {
-        $this->i18n = $i18n;
-    }
 
     /**
      * Get the day of last date we should show in the month/year sections,
@@ -162,7 +145,7 @@ class ArticleInfo extends ArticleInfoApi
         }
 
         if ($this->tooManyRevisions()) {
-            $this->numRevisionsProcessed = $this->getMaxRevisions();
+            $this->numRevisionsProcessed = $this->repository->getMaxPageRevisions();
         } else {
             $this->numRevisionsProcessed = $this->getNumRevisions();
         }
@@ -407,7 +390,7 @@ class ArticleInfo extends ArticleInfoApi
 
     /**
      * Get the list of editors to the page, including various statistics.
-     * @return mixed[]
+     * @return array
      */
     public function getEditors(): array
     {
@@ -426,7 +409,7 @@ class ArticleInfo extends ArticleInfoApi
 
     /**
      * Get the list of the top editors to the page (by edits), including various statistics.
-     * @return mixed[]
+     * @return array
      */
     public function topTenEditorsByEdits(): array
     {
@@ -435,7 +418,7 @@ class ArticleInfo extends ArticleInfoApi
 
     /**
      * Get the list of the top editors to the page (by added text), including various statistics.
-     * @return mixed[]
+     * @return array
      */
     public function topTenEditorsByAdded(): array
     {
@@ -444,7 +427,7 @@ class ArticleInfo extends ArticleInfoApi
 
     /**
      * Get various counts about each individual year and month of the page's history.
-     * @return mixed[]
+     * @return array
      */
     public function getYearMonthCounts(): array
     {
@@ -498,7 +481,7 @@ class ArticleInfo extends ArticleInfoApi
      */
     private function parseHistory(): void
     {
-        $limit = $this->tooManyRevisions() ? $this->getMaxRevisions() : null;
+        $limit = $this->tooManyRevisions() ? $this->repository->getMaxPageRevisions() : null;
 
         // Third parameter is ignored if $limit is null.
         $revStmt = $this->page->getRevisionsStmt(
@@ -512,7 +495,7 @@ class ArticleInfo extends ArticleInfoApi
 
         /**
          * Data about previous edits so that we can use them as a basis for comparison.
-         * @var Edit[]
+         * @var Edit[] $prevEdits
          */
         $prevEdits = [
             // The previous Edit, used to discount content that was reverted.
@@ -533,7 +516,7 @@ class ArticleInfo extends ArticleInfoApi
         ];
 
         while ($rev = $revStmt->fetchAssociative()) {
-            $edit = new Edit($this->page, $rev);
+            $edit = $this->repository->getEdit($this->page, $rev);
 
             if (0 === $revCount) {
                 $this->firstEdit = $edit;
@@ -624,7 +607,7 @@ class ArticleInfo extends ArticleInfoApi
      */
     private function isRevert(Edit $edit, array $prevEdits): bool
     {
-        return $edit->getSha() === $prevEdits['prevSha'] || $edit->isRevert($this->container);
+        return $edit->getSha() === $prevEdits['prevSha'] || $edit->isRevert();
     }
 
     /**
@@ -638,7 +621,7 @@ class ArticleInfo extends ArticleInfoApi
         $this->revertCount++;
 
         // Adjust addedBytes given this edit was a revert of the previous one.
-        if ($prevEdits['prev'] && !$prevEdits['prev']->isReverted() && $prevEdits['prev']->getSize() > 0) {
+        if ($prevEdits['prev'] && false === $prevEdits['prev']->isReverted() && $prevEdits['prev']->getSize() > 0) {
             $this->addedBytes -= $prevEdits['prev']->getSize();
 
             // Also deduct from the user's individual added byte count.
@@ -724,9 +707,9 @@ class ArticleInfo extends ArticleInfoApi
      */
     private function updateToolCounts(Edit $edit): void
     {
-        $automatedTool = $edit->getTool($this->container);
+        $automatedTool = $edit->getTool();
 
-        if (false === $automatedTool) {
+        if (!$automatedTool) {
             // Nothing to do.
             return;
         }
@@ -904,7 +887,7 @@ class ArticleInfo extends ArticleInfoApi
      */
     private function setLogsEvents(): void
     {
-        $logData = $this->getRepository()->getLogEvents(
+        $logData = $this->repository->getLogEvents(
             $this->page,
             $this->start,
             $this->end

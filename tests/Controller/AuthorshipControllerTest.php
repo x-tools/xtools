@@ -1,10 +1,13 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace App\Tests\Controller;
 
 /**
  * Integration tests for the ArticleInfoController.
+ * @group integration
+ * @covers \App\Controller\AuthorshipController
  */
 class AuthorshipControllerTest extends ControllerTestAdapter
 {
@@ -13,7 +16,7 @@ class AuthorshipControllerTest extends ControllerTestAdapter
      */
     public function testHtmlRoutes(): void
     {
-        if (!self::$container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_wmf')) {
             return;
         }
 

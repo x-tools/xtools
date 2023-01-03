@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the SimpleEditCounterController class.
- */
 
 declare(strict_types=1);
 
@@ -19,9 +16,7 @@ class SimpleEditCounterController extends XtoolsController
 {
 
     /**
-     * Get the name of the tool's index route.
-     * This is also the name of the associated model.
-     * @return string
+     * @inheritDoc
      * @codeCoverageIgnore
      */
     public function getIndexRoute(): string
@@ -48,7 +43,6 @@ class SimpleEditCounterController extends XtoolsController
             'xtPageTitle' => 'tool-simpleeditcounter',
             'xtSubtitle' => 'tool-simpleeditcounter-desc',
             'xtPage' => 'SimpleEditCounter',
-            'project' => $this->project,
 
             // Defaults that will get overridden if in $params.
             'namespace' => 'all',
@@ -57,18 +51,16 @@ class SimpleEditCounterController extends XtoolsController
         ], $this->params, ['project' => $this->project]));
     }
 
-    private function prepareSimpleEditCounter(): SimpleEditCounter
+    private function prepareSimpleEditCounter(SimpleEditCounterRepository $simpleEditCounterRepo): SimpleEditCounter
     {
         $sec = new SimpleEditCounter(
+            $simpleEditCounterRepo,
             $this->project,
             $this->user,
             $this->namespace,
             $this->start,
             $this->end
         );
-        $secRepo = new SimpleEditCounterRepository();
-        $secRepo->setContainer($this->container);
-        $sec->setRepository($secRepo);
         $sec->prepareData();
 
         if ($sec->isLimited()) {
@@ -95,12 +87,13 @@ class SimpleEditCounterController extends XtoolsController
      *         "namespace"="all",
      *     }
      * )
+     * @param SimpleEditCounterRepository $simpleEditCounterRepo
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction(): Response
+    public function resultAction(SimpleEditCounterRepository $simpleEditCounterRepo): Response
     {
-        $sec = $this->prepareSimpleEditCounter();
+        $sec = $this->prepareSimpleEditCounter($simpleEditCounterRepo);
 
         return $this->getFormattedResponse('simpleEditCounter/result', [
             'xtPage' => 'SimpleEditCounter',
@@ -128,12 +121,13 @@ class SimpleEditCounterController extends XtoolsController
      *         "namespace"="all",
      *     }
      * )
+     * @param SimpleEditCounterRepository $simpleEditCounterRepository
      * @return Response
      * @codeCoverageIgnore
      */
-    public function simpleEditCounterApiAction(): Response
+    public function simpleEditCounterApiAction(SimpleEditCounterRepository $simpleEditCounterRepository): Response
     {
-        $sec = $this->prepareSimpleEditCounter();
+        $sec = $this->prepareSimpleEditCounter($simpleEditCounterRepository);
         $data = $sec->getData();
         if ($this->user->isIpRange()) {
             unset($data['deleted_edit_count']);

@@ -1,13 +1,11 @@
 <?php
-/**
- * This file contains only the EditCounter class.
- */
 
 declare(strict_types = 1);
 
 namespace App\Model;
 
 use App\Helper\I18nHelper;
+use App\Repository\EditCounterRepository;
 use DateInterval;
 use DatePeriod;
 use DateTime;
@@ -15,40 +13,43 @@ use DateTime;
 /**
  * An EditCounter provides statistics about a user's edits on a project.
  */
-class EditCounter extends UserRights
+class EditCounter extends Model
 {
+    protected I18nHelper $i18n;
+    protected UserRights $userRights;
+
     /** @var int[] Revision and page counts etc. */
-    protected $pairData;
+    protected array $pairData;
 
     /** @var string[] The IDs and timestamps of first/latest edit and logged action. */
-    protected $firstAndLatestActions;
+    protected array $firstAndLatestActions;
 
     /** @var int[] The lot totals. */
-    protected $logCounts;
+    protected array $logCounts;
 
-    /** @var mixed[] Total numbers of edits per month */
-    protected $monthCounts;
+    /** @var array Total numbers of edits per month */
+    protected array $monthCounts;
 
-    /** @var mixed[] Total numbers of edits per year */
-    protected $yearCounts;
+    /** @var array Total numbers of edits per year */
+    protected array $yearCounts;
 
     /** @var array Block data, with keys 'set' and 'received'. */
-    protected $blocks;
+    protected array $blocks;
 
     /** @var integer[] Array keys are namespace IDs, values are the edit counts. */
-    protected $namespaceTotals;
+    protected array $namespaceTotals;
 
     /** @var int Number of semi-automated edits. */
-    protected $autoEditCount;
+    protected int $autoEditCount;
 
     /** @var string[] Data needed for time card chart. */
-    protected $timeCardData;
+    protected array $timeCardData;
 
     /**
      * Revision size data, with keys 'average_size', 'large_edits' and 'small_edits'.
      * @var string[] As returned by the DB, unconverted to int or float
      */
-    protected $editSizeData;
+    protected array $editSizeData;
 
     /**
      * Duration of the longest block in seconds; -1 if indefinite,
@@ -58,19 +59,36 @@ class EditCounter extends UserRights
     protected $longestBlockSeconds;
 
     /** @var int Number of times the user has been thanked. */
-    protected $thanksReceived;
+    protected int $thanksReceived;
 
     /**
      * EditCounter constructor.
+     * @param EditCounterRepository $repository
+     * @param I18nHelper $i18n
+     * @param UserRights $userRights
      * @param Project $project The base project to count edits
      * @param User $user
-     * @param I18nHelper $i18n
      */
-    public function __construct(Project $project, User $user, I18nHelper $i18n)
-    {
+    public function __construct(
+        EditCounterRepository $repository,
+        I18nHelper $i18n,
+        UserRights $userRights,
+        Project $project,
+        User $user
+    ) {
+        $this->repository = $repository;
+        $this->i18n = $i18n;
+        $this->userRights = $userRights;
         $this->project = $project;
         $this->user = $user;
-        $this->i18n = $i18n;
+    }
+
+    /**
+     * @return UserRights
+     */
+    public function getUserRights(): UserRights
+    {
+        return $this->userRights;
     }
 
     /**
@@ -79,9 +97,8 @@ class EditCounter extends UserRights
      */
     public function getPairData(): array
     {
-        if (!is_array($this->pairData)) {
-            $this->pairData = $this->getRepository()
-                ->getPairData($this->project, $this->user);
+        if (!isset($this->pairData)) {
+            $this->pairData = $this->repository->getPairData($this->project, $this->user);
         }
         return $this->pairData;
     }
@@ -92,9 +109,8 @@ class EditCounter extends UserRights
      */
     public function getLogCounts(): array
     {
-        if (!is_array($this->logCounts)) {
-            $this->logCounts = $this->getRepository()
-                ->getLogCounts($this->project, $this->user);
+        if (!isset($this->logCounts)) {
+            $this->logCounts = $this->repository->getLogCounts($this->project, $this->user);
         }
         return $this->logCounts;
     }
@@ -106,7 +122,7 @@ class EditCounter extends UserRights
     public function getFirstAndLatestActions(): array
     {
         if (!isset($this->firstAndLatestActions)) {
-            $this->firstAndLatestActions = $this->getRepository()->getFirstAndLatestActions(
+            $this->firstAndLatestActions = $this->repository->getFirstAndLatestActions(
                 $this->project,
                 $this->user
             );
@@ -122,7 +138,7 @@ class EditCounter extends UserRights
     public function getThanksReceived(): int
     {
         if (!isset($this->thanksReceived)) {
-            $this->thanksReceived = $this->getRepository()->getThanksReceived($this->project, $this->user);
+            $this->thanksReceived = $this->repository->getThanksReceived($this->project, $this->user);
         }
         return $this->thanksReceived;
     }
@@ -139,7 +155,7 @@ class EditCounter extends UserRights
             return $this->blocks[$type];
         }
         $method = "getBlocks".ucfirst($type);
-        $blocks = $this->getRepository()->$method($this->project, $this->user);
+        $blocks = $this->repository->$method($this->project, $this->user);
         $this->blocks[$type] = $blocks;
 
         // Filter out unblocks unless requested.
@@ -159,7 +175,7 @@ class EditCounter extends UserRights
     public function countLiveRevisions(): int
     {
         $revCounts = $this->getPairData();
-        return isset($revCounts['live']) ? (int)$revCounts['live'] : 0;
+        return $revCounts['live'] ?? 0;
     }
 
     /**
@@ -169,7 +185,7 @@ class EditCounter extends UserRights
     public function countDeletedRevisions(): int
     {
         $revCounts = $this->getPairData();
-        return isset($revCounts['deleted']) ? (int)$revCounts['deleted'] : 0;
+        return $revCounts['deleted'] ?? 0;
     }
 
     /**
@@ -188,7 +204,7 @@ class EditCounter extends UserRights
     public function countMinorRevisions(): int
     {
         $revCounts = $this->getPairData();
-        return isset($revCounts['minor']) ? (int)$revCounts['minor'] : 0;
+        return $revCounts['minor'] ?? 0;
     }
 
     /**
@@ -198,7 +214,7 @@ class EditCounter extends UserRights
     public function countLivePagesEdited(): int
     {
         $pageCounts = $this->getPairData();
-        return isset($pageCounts['edited-live']) ? (int)$pageCounts['edited-live'] : 0;
+        return $pageCounts['edited-live'] ?? 0;
     }
 
     /**
@@ -208,7 +224,7 @@ class EditCounter extends UserRights
     public function countDeletedPagesEdited(): int
     {
         $pageCounts = $this->getPairData();
-        return isset($pageCounts['edited-deleted']) ? (int)$pageCounts['edited-deleted'] : 0;
+        return $pageCounts['edited-deleted'] ?? 0;
     }
 
     /**
@@ -237,7 +253,7 @@ class EditCounter extends UserRights
     public function countCreatedPagesLive(): int
     {
         $pageCounts = $this->getPairData();
-        return isset($pageCounts['created-live']) ? (int)$pageCounts['created-live'] : 0;
+        return $pageCounts['created-live'] ?? 0;
     }
 
     /**
@@ -247,7 +263,7 @@ class EditCounter extends UserRights
     public function countPagesCreatedDeleted(): int
     {
         $pageCounts = $this->getPairData();
-        return isset($pageCounts['created-deleted']) ? (int)$pageCounts['created-deleted'] : 0;
+        return $pageCounts['created-deleted'] ?? 0;
     }
 
     /**
@@ -257,7 +273,7 @@ class EditCounter extends UserRights
     public function countPagesDeleted(): int
     {
         $logCounts = $this->getLogCounts();
-        return isset($logCounts['delete-delete']) ? (int)$logCounts['delete-delete'] : 0;
+        return $logCounts['delete-delete'] ?? 0;
     }
 
     /**
@@ -267,7 +283,7 @@ class EditCounter extends UserRights
     public function countPagesMoved(): int
     {
         $logCounts = $this->getLogCounts();
-        return isset($logCounts['move-move']) ? (int)$logCounts['move-move'] : 0;
+        return $logCounts['move-move'] ?? 0;
     }
 
     /**
@@ -277,8 +293,7 @@ class EditCounter extends UserRights
     public function countBlocksSet(): int
     {
         $logCounts = $this->getLogCounts();
-        $reBlock = isset($logCounts['block-block']) ? (int)$logCounts['block-block'] : 0;
-        return $reBlock;
+        return $logCounts['block-block'] ?? 0;
     }
 
     /**
@@ -288,8 +303,7 @@ class EditCounter extends UserRights
     public function countReblocksSet(): int
     {
         $logCounts = $this->getLogCounts();
-        $reBlock = isset($logCounts['block-reblock']) ? (int)$logCounts['block-reblock'] : 0;
-        return $reBlock;
+        return $logCounts['block-reblock'] ?? 0;
     }
 
     /**
@@ -299,7 +313,7 @@ class EditCounter extends UserRights
     public function countUnblocksSet(): int
     {
         $logCounts = $this->getLogCounts();
-        return isset($logCounts['block-unblock']) ? (int)$logCounts['block-unblock'] : 0;
+        return $logCounts['block-unblock'] ?? 0;
     }
 
     /**
@@ -309,7 +323,7 @@ class EditCounter extends UserRights
     public function countBlocksLifted(): int
     {
         $logCounts = $this->getLogCounts();
-        return isset($logCounts['block-unblock']) ? (int)$logCounts['block-unblock'] : 0;
+        return $logCounts['block-unblock'] ?? 0;
     }
 
     /**
@@ -345,10 +359,11 @@ class EditCounter extends UserRights
         /**
          * Keep track of the last block so we can determine the duration
          * if the current block in the loop is an unblock.
-         * @var int[] [
-         *              Unix timestamp,
-         *              Duration in seconds (-1 if indefinite)
-         *            ]
+         * @var int[] $lastBlock
+         *   [
+         *     Unix timestamp,
+         *     Duration in seconds (-1 if indefinite)
+         *   ]
          */
         $lastBlock = [null, null];
 
@@ -402,7 +417,7 @@ class EditCounter extends UserRights
 
     /**
      * Given a block log entry from the database, get the timestamp and duration in seconds.
-     * @param  mixed[] $block Block log entry as fetched via self::getBlocks()
+     * @param array $block Block log entry as fetched via self::getBlocks()
      * @return int[] [
      *                 Unix timestamp,
      *                 Duration in seconds (-1 if indefinite, null if unparsable or unblock)
@@ -446,7 +461,7 @@ class EditCounter extends UserRights
     public function countPagesProtected(): int
     {
         $logCounts = $this->getLogCounts();
-        return isset($logCounts['protect-protect']) ? (int)$logCounts['protect-protect'] : 0;
+        return $logCounts['protect-protect'] ?? 0;
     }
 
     /**
@@ -456,7 +471,7 @@ class EditCounter extends UserRights
     public function countPagesReprotected(): int
     {
         $logCounts = $this->getLogCounts();
-        return isset($logCounts['protect-modify']) ? (int)$logCounts['protect-modify'] : 0;
+        return $logCounts['protect-modify'] ?? 0;
     }
 
     /**
@@ -466,7 +481,7 @@ class EditCounter extends UserRights
     public function countPagesUnprotected(): int
     {
         $logCounts = $this->getLogCounts();
-        return isset($logCounts['protect-unprotect']) ? (int)$logCounts['protect-unprotect'] : 0;
+        return $logCounts['protect-unprotect'] ?? 0;
     }
 
     /**
@@ -476,7 +491,7 @@ class EditCounter extends UserRights
     public function countEditsDeleted(): int
     {
         $logCounts = $this->getLogCounts();
-        return isset($logCounts['delete-revision']) ? (int)$logCounts['delete-revision'] : 0;
+        return $logCounts['delete-revision'] ?? 0;
     }
 
     /**
@@ -486,7 +501,7 @@ class EditCounter extends UserRights
     public function countLogsDeleted(): int
     {
         $revCounts = $this->getLogCounts();
-        return isset($revCounts['delete-event']) ? (int)$revCounts['delete-event'] : 0;
+        return $revCounts['delete-event'] ?? 0;
     }
 
     /**
@@ -496,7 +511,7 @@ class EditCounter extends UserRights
     public function countPagesRestored(): int
     {
         $logCounts = $this->getLogCounts();
-        return isset($logCounts['delete-restore']) ? (int)$logCounts['delete-restore'] : 0;
+        return $logCounts['delete-restore'] ?? 0;
     }
 
     /**
@@ -506,7 +521,7 @@ class EditCounter extends UserRights
     public function countRightsModified(): int
     {
         $logCounts = $this->getLogCounts();
-        return isset($logCounts['rights-rights']) ? (int)$logCounts['rights-rights'] : 0;
+        return $logCounts['rights-rights'] ?? 0;
     }
 
     /**
@@ -517,9 +532,9 @@ class EditCounter extends UserRights
     public function countPagesImported(): int
     {
         $logCounts = $this->getLogCounts();
-        $import = isset($logCounts['import-import']) ? (int)$logCounts['import-import'] : 0;
-        $interwiki = isset($logCounts['import-interwiki']) ? (int)$logCounts['import-interwiki'] : 0;
-        $upload = isset($logCounts['import-upload']) ? (int)$logCounts['import-upload'] : 0;
+        $import = $logCounts['import-import'] ?? 0;
+        $interwiki = $logCounts['import-interwiki'] ?? 0;
+        $upload = $logCounts['import-upload'] ?? 0;
         return $import + $interwiki + $upload;
     }
 
@@ -530,7 +545,7 @@ class EditCounter extends UserRights
     public function countAbuseFilterChanges(): int
     {
         $logCounts = $this->getLogCounts();
-        return isset($logCounts['abusefilter-modify']) ? (int)$logCounts['abusefilter-modify'] : 0;
+        return $logCounts['abusefilter-modify'] ?? 0;
     }
 
     /**
@@ -540,8 +555,8 @@ class EditCounter extends UserRights
     public function countContentModelChanges(): int
     {
         $logCounts = $this->getLogCounts();
-        $new = isset($logCounts['contentmodel-new']) ? (int)$logCounts['contentmodel-new'] : 0;
-        $modified = isset($logCounts['contentmodel-change']) ? (int)$logCounts['contentmodel-change'] : 0;
+        $new = $logCounts['contentmodel-new'] ?? 0;
+        $modified = $logCounts['contentmodel-change'] ?? 0;
         return $new + $modified;
     }
 
@@ -577,10 +592,7 @@ class EditCounter extends UserRights
         if ($this->autoEditCount) {
             return $this->autoEditCount;
         }
-        $this->autoEditCount = $this->getRepository()->countAutomatedEdits(
-            $this->project,
-            $this->user
-        );
+        $this->autoEditCount = $this->repository->countAutomatedEdits($this->project, $this->user);
         return $this->autoEditCount;
     }
 
@@ -635,7 +647,7 @@ class EditCounter extends UserRights
      */
     public function countFilesUploadedCommons(): int
     {
-        $fileCounts = $this->getRepository()->getFileCounts($this->project, $this->user);
+        $fileCounts = $this->repository->getFileCounts($this->project, $this->user);
         return $fileCounts['files_uploaded_commons'] ?? 0;
     }
 
@@ -644,7 +656,7 @@ class EditCounter extends UserRights
      */
     public function countFilesMoved(): int
     {
-        $fileCounts = $this->getRepository()->getFileCounts($this->project, $this->user);
+        $fileCounts = $this->repository->getFileCounts($this->project, $this->user);
         return $fileCounts['files_moved'] ?? 0;
     }
 
@@ -653,7 +665,7 @@ class EditCounter extends UserRights
      */
     public function countFilesMovedCommons(): int
     {
-        $fileCounts = $this->getRepository()->getFileCounts($this->project, $this->user);
+        $fileCounts = $this->repository->getFileCounts($this->project, $this->user);
         return $fileCounts['files_moved_commons'] ?? 0;
     }
 
@@ -674,11 +686,10 @@ class EditCounter extends UserRights
     public function approvals(): int
     {
         $logCounts = $this->getLogCounts();
-        $total = (!empty($logCounts['review-approve']) ? $logCounts['review-approve'] : 0) +
+        return (!empty($logCounts['review-approve']) ? $logCounts['review-approve'] : 0) +
             (!empty($logCounts['review-approve2']) ? $logCounts['review-approve2'] : 0) +
             (!empty($logCounts['review-approve-i']) ? $logCounts['review-approve-i'] : 0) +
             (!empty($logCounts['review-approve2-i']) ? $logCounts['review2-approve-i'] : 0);
-        return $total;
     }
 
     /**
@@ -719,10 +730,10 @@ class EditCounter extends UserRights
      */
     public function namespaceTotals(): array
     {
-        if ($this->namespaceTotals) {
+        if (isset($this->namespaceTotals)) {
             return $this->namespaceTotals;
         }
-        $counts = $this->getRepository()->getNamespaceTotals($this->project, $this->user);
+        $counts = $this->repository->getNamespaceTotals($this->project, $this->user);
         arsort($counts);
         $this->namespaceTotals = $counts;
         return $counts;
@@ -744,10 +755,10 @@ class EditCounter extends UserRights
      */
     public function timeCard(): array
     {
-        if ($this->timeCardData) {
+        if (isset($this->timeCardData)) {
             return $this->timeCardData;
         }
-        $totals = $this->getRepository()->getTimeCard($this->project, $this->user);
+        $totals = $this->repository->getTimeCard($this->project, $this->user);
 
         // Scale the radii: get the max, then scale each radius.
         // This looks inefficient, but there's a max of 72 elements in this array.
@@ -786,7 +797,7 @@ class EditCounter extends UserRights
     /**
      * Get the total numbers of edits per month.
      * @param null|DateTime $currentTime - *USED ONLY FOR UNIT TESTING* so we can mock the current DateTime.
-     * @return mixed[] With keys 'yearLabels', 'monthLabels' and 'totals',
+     * @return array With keys 'yearLabels', 'monthLabels' and 'totals',
      *   the latter keyed by namespace, year and then month.
      */
     public function monthCounts(?DateTime $currentTime = null): array
@@ -800,14 +811,14 @@ class EditCounter extends UserRights
             $currentTime = new DateTime('last day of this month');
         }
 
-        $totals = $this->getRepository()->getMonthCounts($this->project, $this->user);
+        $totals = $this->repository->getMonthCounts($this->project, $this->user);
         $out = [
             'yearLabels' => [],  // labels for years
             'monthLabels' => [], // labels for months
             'totals' => [], // actual totals, grouped by namespace, year and then month
         ];
 
-        /** @var DateTime $firstEdit Keep track of the date of their first edit. */
+        /** Keep track of the date of their first edit. */
         $firstEdit = new DateTime();
 
         [$out, $firstEdit] = $this->fillInMonthCounts($out, $totals, $firstEdit);
@@ -965,7 +976,7 @@ class EditCounter extends UserRights
     /**
      * Get the total numbers of edits per year.
      * @param null|DateTime $currentTime - *USED ONLY FOR UNIT TESTING* so we can mock the current DateTime.
-     * @return mixed[] With keys 'yearLabels' and 'totals', the latter keyed by namespace then year.
+     * @return array With keys 'yearLabels' and 'totals', the latter keyed by namespace then year.
      */
     public function yearCounts(?DateTime $currentTime = null): array
     {
@@ -1035,8 +1046,8 @@ class EditCounter extends UserRights
      */
     public function getEditSizeData(): array
     {
-        if (!is_array($this->editSizeData)) {
-            $this->editSizeData = $this->getRepository()
+        if (!isset($this->editSizeData)) {
+            $this->editSizeData = $this->repository
                 ->getEditSizeData($this->project, $this->user);
         }
         return $this->editSizeData;

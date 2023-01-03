@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the AutoEditsRepository class.
- */
 
 declare(strict_types = 1);
 
@@ -20,22 +17,22 @@ use Wikimedia\IPUtils;
 class AutoEditsRepository extends UserRepository
 {
     /** @var array List of automated tools, used for fetching the tool list and filtering it. */
-    private $aeTools;
+    private array $aeTools;
 
     /** @var bool Whether to use the /sandbox version of the config, bypassing caching. */
-    private $useSandbox;
+    private bool $useSandbox = false;
 
     /** @var array Process cache for tags/IDs. */
-    private $tags;
+    private array $tags;
 
     /**
-     * AutoEditsRepository constructor. Used solely to set $useSandbox (from AutomatedEditsController).
      * @param bool $useSandbox
+     * @return AutoEditsRepository
      */
-    public function __construct(bool $useSandbox = false)
+    public function setUseSandbox(bool $useSandbox): AutoEditsRepository
     {
-        parent::__construct();
         $this->useSandbox = $useSandbox;
+        return $this;
     }
 
     /**

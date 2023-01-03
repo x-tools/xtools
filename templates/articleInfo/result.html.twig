@@ -40,7 +40,7 @@
             {{ wiki.pageHistLink(page) }}
             &middot;
             {{ wiki.pageLogLink(page) }}
-            {% if isWMFLabs() %}
+            {% if isWMF() %}
                 &middot;
                 {{ wiki.pageviewsLinks(page, ai.dateParams) }}
                 {% if page.wikidataId is not empty %}
@@ -143,7 +143,7 @@
                             <td>{{ page.watchers|num_format }}</td>
                         </tr>
                     {% endif %}
-                    {% if isWMFLabs() %}
+                    {% if isWMF() %}
                         <tr>
                             <td>{{ msg('pageviews') }}{% if not (ai.hasDateRange) %} ({{ 60|num_format }} {{ msg('num-days', [60]) }}){% endif %}</td>
                             <td>

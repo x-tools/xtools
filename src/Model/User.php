@@ -1,12 +1,10 @@
 <?php
-/**
- * This file contains only the User class.
- */
 
 declare(strict_types = 1);
 
 namespace App\Model;
 
+use App\Repository\UserRepository;
 use DateTime;
 use Exception;
 use Wikimedia\IPUtils;
@@ -23,17 +21,18 @@ class User extends Model
     public const MAX_IPV6_CIDR = 32;
 
     /** @var string The user's username. */
-    protected $username;
+    protected string $username;
 
-    /** @var int Quick cache of edit counts, keyed by project domain. */
-    protected $editCounts = [];
+    /** @var int[] Quick cache of edit counts, keyed by project domain. */
+    protected array $editCounts = [];
 
     /**
      * Create a new User given a username.
      * @param string $username
      */
-    public function __construct(string $username)
+    public function __construct(UserRepository $repository, string $username)
     {
+        $this->repository = $repository;
         if ('ipr-' === substr($username, 0, 4)) {
             $username = substr($username, 4);
         }
@@ -186,7 +185,7 @@ class User extends Model
      */
     public function getId(Project $project): ?int
     {
-        $ret = $this->getRepository()->getIdAndRegistration(
+        $ret = $this->repository->getIdAndRegistration(
             $project->getDatabaseName(),
             $this->getUsername()
         );
@@ -201,7 +200,7 @@ class User extends Model
      */
     public function getActorId(Project $project): int
     {
-        return (int)$this->getRepository()->getActorId(
+        return (int)$this->repository->getActorId(
             $project->getDatabaseName(),
             $this->getUsername()
         );
@@ -214,7 +213,7 @@ class User extends Model
      */
     public function getRegistrationDate(Project $project): ?DateTime
     {
-        $ret = $this->getRepository()->getIdAndRegistration(
+        $ret = $this->repository->getIdAndRegistration(
             $project->getDatabaseName(),
             $this->getUsername()
         );
@@ -231,7 +230,7 @@ class User extends Model
      */
     public function getUserRights(Project $project): array
     {
-        return $this->getRepository()->getUserRights($project, $this);
+        return $this->repository->getUserRights($project, $this);
     }
 
     /**
@@ -241,7 +240,7 @@ class User extends Model
      */
     public function getGlobalUserRights(?Project $project = null): array
     {
-        return $this->getRepository()->getGlobalUserRights($this->getUsername(), $project);
+        return $this->repository->getGlobalUserRights($this->getUsername(), $project);
     }
 
     /**
@@ -256,7 +255,7 @@ class User extends Model
             return $this->editCounts[$domain];
         }
 
-        $this->editCounts[$domain] = (int)$this->getRepository()->getEditCount(
+        $this->editCounts[$domain] = (int)$this->repository->getEditCount(
             $project->getDatabaseName(),
             $this->getUsername()
         );
@@ -270,7 +269,7 @@ class User extends Model
      */
     public function maxEdits(): int
     {
-        return $this->getRepository()->maxEdits();
+        return $this->repository->maxEdits();
     }
 
     /**
@@ -309,7 +308,7 @@ class User extends Model
      */
     public function getBlockExpiry(Project $project)
     {
-        $expiry = $this->getRepository()->getBlockExpiry(
+        $expiry = $this->repository->getBlockExpiry(
             $project->getDatabaseName(),
             $this->getUsername()
         );
@@ -354,7 +353,7 @@ class User extends Model
      */
     public function countEdits(Project $project, $namespace = 'all', $start = false, $end = false): int
     {
-        return (int) $this->getRepository()->countEdits($project, $this, $namespace, $start, $end);
+        return (int) $this->repository->countEdits($project, $this, $namespace, $start, $end);
     }
 
     /**
@@ -364,7 +363,7 @@ class User extends Model
     public function isCurrentlyLoggedIn(): bool
     {
         try {
-            $ident = $this->getRepository()->getXtoolsUserInfo();
+            $ident = $this->repository->getXtoolsUserInfo();
         } catch (Exception $exception) {
             return false;
         }

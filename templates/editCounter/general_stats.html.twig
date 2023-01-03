@@ -30,17 +30,17 @@
             <tr>
                 <td><a href="#rights-changes">{{ msg('user-groups') }}</a></td>
                 <td>
-                    {% for group in ec.rightsStates.local.current %}
-                        {{ ec.rightsNames[group] }}{% if not loop.last %}, {% endif %}
+                    {% for group in ec.userRights.rightsStates.local.current %}
+                        {{ ec.userRights.rightsNames[group] }}{% if not loop.last %}, {% endif %}
                     {% endfor %}
                 </td>
             </tr>
-            {% if ec.rightsStates.global.current %}
+            {% if ec.userRights.rightsStates.global.current %}
                 <tr>
                     <td>{{ msg('global-user-groups') }}</td>
                     <td>
-                        {% for group in ec.rightsStates.global.current %}
-                            {{ ec.rightsNames[group] }}{% if not loop.last %}, {% endif %}
+                        {% for group in ec.userRights.rightsStates.global.current %}
+                            {{ ec.userRights.rightsNames[group] }}{% if not loop.last %}, {% endif %}
                         {% endfor %}
                     </td>
                 </tr>
@@ -48,7 +48,7 @@
             <tr>
                 <td>{{ msg('is-admin') }}</td>
                 <td>
-                    {% set adminStatus = ec.adminStatus %}
+                    {% set adminStatus = ec.userRights.adminStatus %}
                     {% if adminStatus == 'current' %}
                         <span class="text-success">&check;</span>
                     {% elseif adminStatus == 'former' %}
@@ -289,7 +289,7 @@
                         {{ ec.countFilesMoved }}
                     </td>
                 </tr>
-                {% if isWMFLabs() and project.domain != 'commons.wikimedia.org' %}
+                {% if isWMF() and project.domain != 'commons.wikimedia.org' %}
                     <tr>
                         <td>{{ msg('files-uploaded-commons') }}</td>
                         <td>
@@ -415,7 +415,7 @@
                     <td>{{ msg('import') }}</td>
                     <td>{{ wiki.userLogLink(user, project, ec.countPagesImported|num_format, 'import') }}</td>
                 </tr>
-                {% if isWMFLabs() %}
+                {% if isWMF() %}
                     <tr>
                         <td>{{ msg('abusefilter') }}</td>
                         <td>{{ wiki.userLogLink(user, project, ec.countAbuseFilterChanges|num_format, 'abusefilter') }}</td>

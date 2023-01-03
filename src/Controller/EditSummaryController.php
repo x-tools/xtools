@@ -1,12 +1,10 @@
 <?php
-/**
- * This file contains only the SimpleEditCounterController class.
- */
 
 declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Helper\I18nHelper;
 use App\Model\EditSummary;
 use App\Repository\EditSummaryRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,9 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class EditSummaryController extends XtoolsController
 {
     /**
-     * Get the name of the tool's index route.
-     * This is also the name of the associated model.
-     * @return string
+     * @inheritDoc
      * @codeCoverageIgnore
      */
     public function getIndexRoute(): string
@@ -69,24 +65,24 @@ class EditSummaryController extends XtoolsController
      *     },
      *     defaults={"namespace"="all", "start"=false, "end"=false}
      * )
+     * @param EditSummaryRepository $editSummaryRepo
+     * @param I18nHelper $i18n
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction(): Response
+    public function resultAction(EditSummaryRepository $editSummaryRepo, I18nHelper $i18n): Response
     {
         // Instantiate an EditSummary, treating the past 150 edits as 'recent'.
         $editSummary = new EditSummary(
+            $editSummaryRepo,
             $this->project,
             $this->user,
+            $i18n,
             $this->namespace,
             $this->start,
             $this->end,
             150
         );
-        $editSummaryRepo = new EditSummaryRepository();
-        $editSummaryRepo->setContainer($this->container);
-        $editSummary->setRepository($editSummaryRepo);
-        $editSummary->setI18nHelper($this->container->get('app.i18n_helper'));
         $editSummary->prepareData();
 
         return $this->getFormattedResponse('editSummary/result', [
@@ -110,19 +106,26 @@ class EditSummaryController extends XtoolsController
      *     },
      *     defaults={"namespace"="all", "start"=false, "end"=false}
      * )
+     * @param EditSummaryRepository $editSummaryRepo
+     * @param I18nHelper $i18n
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function editSummariesApiAction(): JsonResponse
+    public function editSummariesApiAction(EditSummaryRepository $editSummaryRepo, I18nHelper $i18n): JsonResponse
     {
         $this->recordApiUsage('user/edit_summaries');
 
         // Instantiate an EditSummary, treating the past 150 edits as 'recent'.
-        $editSummary = new EditSummary($this->project, $this->user, $this->namespace, $this->start, $this->end, 150);
-        $editSummaryRepo = new EditSummaryRepository();
-        $editSummaryRepo->setContainer($this->container);
-        $editSummary->setRepository($editSummaryRepo);
-        $editSummary->setI18nHelper($this->container->get('app.i18n_helper'));
+        $editSummary = new EditSummary(
+            $editSummaryRepo,
+            $this->project,
+            $this->user,
+            $i18n,
+            $this->namespace,
+            $this->start,
+            $this->end,
+            150
+        );
         $editSummary->prepareData();
 
         return $this->getFormattedApiResponse($editSummary->getData());

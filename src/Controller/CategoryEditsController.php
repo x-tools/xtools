@@ -1,19 +1,13 @@
 <?php
-/**
- * This file contains only the CategoryEditsController class.
- */
 
 declare(strict_types=1);
 
 namespace App\Controller;
 
 use App\Exception\XtoolsHttpException;
-use App\Helper\I18nHelper;
 use App\Model\CategoryEdits;
 use App\Repository\CategoryEditsRepository;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -22,19 +16,16 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class CategoryEditsController extends XtoolsController
 {
-    /** @var CategoryEdits The CategoryEdits instance. */
-    protected $categoryEdits;
+    protected CategoryEdits $categoryEdits;
 
     /** @var string[] The categories, with or without namespace. */
-    protected $categories;
+    protected array $categories;
 
     /** @var array Data that is passed to the view. */
-    private $output;
+    private array $output;
 
     /**
-     * Get the name of the tool's index route.
-     * This is also the name of the associated model.
-     * @return string
+     * @inheritDoc
      * @codeCoverageIgnore
      */
     public function getIndexRoute(): string
@@ -43,17 +34,12 @@ class CategoryEditsController extends XtoolsController
     }
 
     /**
-     * CategoryEditsController constructor.
-     * @param RequestStack $requestStack
-     * @param ContainerInterface $container
-     * @param I18nHelper $i18n
+     * @inheritDoc
+     * @codeCoverageIgnore
      */
-    public function __construct(RequestStack $requestStack, ContainerInterface $container, I18nHelper $i18n)
+    public function tooHighEditCountRoute(): string
     {
-        // Will redirect back to index if the user has too high of an edit count.
-        $this->tooHighEditCountAction = $this->getIndexRoute();
-
-        parent::__construct($requestStack, $container, $i18n);
+        return $this->getIndexRoute();
     }
 
     /**
@@ -88,11 +74,12 @@ class CategoryEditsController extends XtoolsController
      * Set defaults, and instantiate the CategoryEdits model. This is called at the top of every view action.
      * @codeCoverageIgnore
      */
-    private function setupCategoryEdits(): void
+    private function setupCategoryEdits(CategoryEditsRepository $categoryEditsRepo): void
     {
         $this->extractCategories();
 
         $this->categoryEdits = new CategoryEdits(
+            $categoryEditsRepo,
             $this->project,
             $this->user,
             $this->categories,
@@ -100,9 +87,6 @@ class CategoryEditsController extends XtoolsController
             $this->end,
             $this->offset
         );
-        $categoryEditsRepo = new CategoryEditsRepository();
-        $categoryEditsRepo->setContainer($this->container);
-        $this->categoryEdits->setRepository($categoryEditsRepo);
 
         $this->output = [
             'xtPage' => 'CategoryEdits',
@@ -162,12 +146,13 @@ class CategoryEditsController extends XtoolsController
      *     },
      *     defaults={"start"=false, "end"=false, "offset"=false}
      * )
+     * @param CategoryEditsRepository $categoryEditsRepo
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction(): Response
+    public function resultAction(CategoryEditsRepository $categoryEditsRepo): Response
     {
-        $this->setupCategoryEdits();
+        $this->setupCategoryEdits($categoryEditsRepo);
 
         return $this->getFormattedResponse('categoryEdits/result', $this->output);
     }
@@ -186,12 +171,13 @@ class CategoryEditsController extends XtoolsController
      *   },
      *   defaults={"start"=false, "end"=false, "offset"=false}
      * )
+     * @param CategoryEditsRepository $categoryEditsRepo
      * @return Response
      * @codeCoverageIgnore
      */
-    public function categoryContributionsAction(): Response
+    public function categoryContributionsAction(CategoryEditsRepository $categoryEditsRepo): Response
     {
-        $this->setupCategoryEdits();
+        $this->setupCategoryEdits($categoryEditsRepo);
 
         return $this->render('categoryEdits/contributions.html.twig', $this->output);
     }
@@ -211,14 +197,15 @@ class CategoryEditsController extends XtoolsController
      *   },
      *   defaults={"start" = false, "end" = false}
      * )
+     * @param CategoryEditsRepository $categoryEditsRepo
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function categoryEditCountApiAction(): JsonResponse
+    public function categoryEditCountApiAction(CategoryEditsRepository $categoryEditsRepo): JsonResponse
     {
         $this->recordApiUsage('user/category_editcount');
 
-        $this->setupCategoryEdits();
+        $this->setupCategoryEdits($categoryEditsRepo);
 
         $ret = [
             'total_editcount' => $this->categoryEdits->getEditCount(),

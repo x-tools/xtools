@@ -1,26 +1,38 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace App\Model;
 
+use App\Repository\EditRepository;
 use App\Repository\GlobalContribsRepository;
+use App\Repository\PageRepository;
+use App\Repository\UserRepository;
 
 /**
  * A GlobalContribs provides a list of a user's edits to all projects.
  */
 class GlobalContribs extends Model
 {
+    protected EditRepository $editRepo;
+    protected PageRepository $pageRepo;
+    protected UserRepository $userRepo;
+
     /** @var int Number of results per page. */
     public const PAGE_SIZE = 50;
 
     /** @var int[] Keys are project DB names. */
-    protected $globalEditCounts;
+    protected array $globalEditCounts;
 
     /** @var array Most recent revisions across all projects. */
-    protected $globalEdits;
+    protected array $globalEdits;
 
     /**
      * GlobalContribs constructor.
+     * @param GlobalContribsRepository $repository
+     * @param PageRepository $pageRepo
+     * @param UserRepository $userRepo
+     * @param EditRepository $editRepo
      * @param User $user
      * @param string|int|null $namespace Namespace ID or 'all'.
      * @param false|int $start As Unix timestamp.
@@ -29,6 +41,10 @@ class GlobalContribs extends Model
      * @param int|null $limit Number of results to return.
      */
     public function __construct(
+        GlobalContribsRepository $repository,
+        PageRepository $pageRepo,
+        UserRepository $userRepo,
+        EditRepository $editRepo,
         User $user,
         $namespace = 'all',
         $start = false,
@@ -36,6 +52,10 @@ class GlobalContribs extends Model
         $offset = false,
         ?int $limit = null
     ) {
+        $this->repository = $repository;
+        $this->pageRepo = $pageRepo;
+        $this->userRepo = $userRepo;
+        $this->editRepo = $editRepo;
         $this->user = $user;
         $this->namespace = '' == $namespace ? 0 : $namespace;
         $this->start = $start;
@@ -47,7 +67,7 @@ class GlobalContribs extends Model
     /**
      * Get the total edit counts for the top n projects of this user.
      * @param int $numProjects
-     * @return mixed[] Each element has 'total' and 'project' keys.
+     * @return array Each element has 'total' and 'project' keys.
      */
     public function globalEditCountsTopN(int $numProjects = 10): array
     {
@@ -89,13 +109,12 @@ class GlobalContribs extends Model
     /**
      * Get the total revision counts for all projects for this user.
      * @param bool $sorted Whether to sort the list by total, or not.
-     * @return mixed[] Each element has 'total' and 'project' keys.
+     * @return array[] Each element has 'total' and 'project' keys.
      */
     public function globalEditCounts(bool $sorted = false): array
     {
-        if (empty($this->globalEditCounts)) {
-            $this->globalEditCounts = $this->getRepository()
-                ->globalEditCounts($this->user);
+        if (!isset($this->globalEditCounts)) {
+            $this->globalEditCounts = $this->repository->globalEditCounts($this->user);
         }
 
         if ($sorted) {
@@ -110,7 +129,7 @@ class GlobalContribs extends Model
 
     public function numProjectsWithEdits(): int
     {
-        return count($this->getRepository()->getProjectsWithEdits($this->user));
+        return count($this->repository->getProjectsWithEdits($this->user));
     }
 
     /**
@@ -119,19 +138,18 @@ class GlobalContribs extends Model
      */
     public function globalEdits(): array
     {
-        if (is_array($this->globalEdits)) {
+        if (isset($this->globalEdits)) {
             return $this->globalEdits;
         }
 
         // Get projects with edits.
-        $projects = $this->getRepository()->getProjectsWithEdits($this->user);
+        $projects = $this->repository->getProjectsWithEdits($this->user);
         if (0 === count($projects)) {
             return [];
         }
 
         // Get all revisions for those projects.
-        /** @var GlobalContribsRepository $globalContribsRepo */
-        $globalContribsRepo = $this->getRepository();
+        $globalContribsRepo = $this->repository;
         $globalRevisionsData = $globalContribsRepo->getRevisions(
             array_keys($projects),
             $this->user,
@@ -144,7 +162,6 @@ class GlobalContribs extends Model
         $globalEdits = [];
 
         foreach ($globalRevisionsData as $revision) {
-            /** @var Project $project */
             $project = $projects[$revision['dbName']];
 
             // Can happen if the project is given from CentralAuth API but the database is not being replicated.
@@ -165,7 +182,7 @@ class GlobalContribs extends Model
 
     private function getEditFromRevision(Project $project, array $revision): Edit
     {
-        $page = Page::newFromRow($project, $revision);
-        return new Edit($page, $revision);
+        $page = Page::newFromRow($this->pageRepo, $project, $revision);
+        return new Edit($this->editRepo, $this->userRepo, $page, $revision);
     }
 }

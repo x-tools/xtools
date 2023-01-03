@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace App\Model;
@@ -11,13 +12,14 @@ use App\Repository\LargestPagesRepository;
 class LargestPages extends Model
 {
     /** @var string */
-    protected $includePattern;
+    protected string $includePattern;
 
     /** @var string */
-    protected $excludePattern;
+    protected string $excludePattern;
 
     /**
      * LargestPages constructor.
+     * @param LargestPagesRepository $repository
      * @param Project $project
      * @param string|int|null $namespace Namespace ID or 'all'.
      * @param string $includePattern Either regular expression (starts/ends with forward slash),
@@ -26,11 +28,13 @@ class LargestPages extends Model
      *   or a wildcard pattern with % as the wildcard symbol.
      */
     public function __construct(
+        LargestPagesRepository $repository,
         Project $project,
         $namespace = 'all',
         string $includePattern = '',
         string $excludePattern = ''
     ) {
+        $this->repository = $repository;
         $this->project = $project;
         $this->namespace = '' == $namespace ? 0 : $namespace;
         $this->includePattern = $includePattern;
@@ -61,9 +65,11 @@ class LargestPages extends Model
      */
     public function getResults(): array
     {
-        /** @var LargestPagesRepository $repo */
-        $repo = $this->getRepository();
-
-        return $repo->getData($this->project, $this->namespace, $this->includePattern, $this->excludePattern);
+        return $this->repository->getData(
+            $this->project,
+            $this->namespace,
+            $this->includePattern,
+            $this->excludePattern
+        );
     }
 }

@@ -1,11 +1,10 @@
 <?php
-/**
- * This file contains only the AdminStats class.
- */
 
 declare(strict_types = 1);
 
 namespace App\Model;
+
+use App\Repository\AdminStatsRepository;
 
 /**
  * AdminStats returns information about users with rights defined in admin_stats.yaml.
@@ -14,25 +13,26 @@ class AdminStats extends Model
 {
 
     /** @var string[][] Keyed by user name, values are arrays containing actions and counts. */
-    protected $adminStats;
+    protected array $adminStats;
 
     /** @var string[] Keys are user names, values are their user groups. */
-    protected $usersAndGroups;
+    protected array $usersAndGroups;
 
     /** @var int Number of users in the relevant group who made any actions within the time period. */
-    protected $numWithActions = 0;
+    protected int $numWithActions = 0;
 
     /** @var string[] Usernames of users who are in the relevant user group (sysop for admins, etc.). */
-    private $usersInGroup = [];
+    private array $usersInGroup = [];
 
     /** @var string Type that we're getting stats for (admin, patroller, steward, etc.). See admin_stats.yaml */
-    private $type;
+    private string $type;
 
     /** @var string[] Which actions to show ('block', 'protect', etc.) */
-    private $actions;
+    private array $actions;
 
     /**
      * AdminStats constructor.
+     * @param AdminStatsRepository $repository
      * @param Project $project
      * @param int $start as UTC timestamp.
      * @param int $end as UTC timestamp.
@@ -40,12 +40,14 @@ class AdminStats extends Model
      * @param string[] $actions Which actions to query for ('block', 'protect', etc.). Null for all actions.
      */
     public function __construct(
+        AdminStatsRepository $repository,
         Project $project,
         int $start,
         int $end,
         string $group,
         array $actions
     ) {
+        $this->repository = $repository;
         $this->project = $project;
         $this->start = $start;
         $this->end = $end;
@@ -118,10 +120,7 @@ class AdminStats extends Model
             return $this->usersAndGroups;
         }
 
-        /**
-         * All the user groups that are considered capable of making the relevant actions for $this->group.
-         * @var string[]
-         */
+        // All the user groups that are considered capable of making the relevant actions for $this->group.
         $groupUserGroups = $this->getRepository()->getUserGroups($this->project, $this->type);
 
         $this->usersAndGroups = $this->project->getUsersInGroups($groupUserGroups['local'], $groupUserGroups['global']);

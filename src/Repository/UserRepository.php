@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the UserRepository class.
- */
 
 declare(strict_types = 1);
 
@@ -10,7 +7,10 @@ namespace App\Repository;
 use App\Model\Project;
 use App\Model\User;
 use Doctrine\DBAL\Driver\ResultStatement;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use GuzzleHttp\Client;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Wikimedia\IPUtils;
 
@@ -20,19 +20,28 @@ use Wikimedia\IPUtils;
  */
 class UserRepository extends Repository
 {
+    protected ProjectRepository $projectRepo;
+
     /**
-     * Convenience method to get a new User object.
-     * @param string $username The username.
-     * @param ContainerInterface $container The DI container.
-     * @return User
+     * @param ContainerInterface $container
+     * @param CacheItemPoolInterface $cache
+     * @param Client $guzzle
+     * @param LoggerInterface $logger
+     * @param bool $isWMF
+     * @param int $queryTimeout
+     * @param ProjectRepository $projectRepo
      */
-    public static function getUser(string $username, ContainerInterface $container): User
-    {
-        $user = new User($username);
-        $userRepo = new UserRepository();
-        $userRepo->setContainer($container);
-        $user->setRepository($userRepo);
-        return $user;
+    public function __construct(
+        ContainerInterface $container,
+        CacheItemPoolInterface $cache,
+        Client $guzzle,
+        LoggerInterface $logger,
+        bool $isWMF,
+        int $queryTimeout,
+        ProjectRepository $projectRepo
+    ) {
+        $this->projectRepo = $projectRepo;
+        parent::__construct($container, $cache, $guzzle, $logger, $isWMF, $queryTimeout);
     }
 
     /**
@@ -302,7 +311,7 @@ class UserRepository extends Repository
 
         // Get the default project if not provided.
         if (!$project instanceof Project) {
-            $project = ProjectRepository::getDefaultProject($this->container);
+            $project = $this->projectRepo->getDefaultProject();
         }
 
         $params = [

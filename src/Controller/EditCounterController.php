@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the EditCounterController class.
- */
 
 declare(strict_types=1);
 
@@ -11,10 +8,17 @@ use App\Exception\XtoolsHttpException;
 use App\Helper\I18nHelper;
 use App\Model\EditCounter;
 use App\Model\GlobalContribs;
+use App\Model\UserRights;
 use App\Repository\EditCounterRepository;
+use App\Repository\EditRepository;
 use App\Repository\GlobalContribsRepository;
+use App\Repository\PageRepository;
 use App\Repository\ProjectRepository;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use App\Repository\UserRepository;
+use App\Repository\UserRightsRepository;
+use GuzzleHttp\Client;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -42,15 +46,16 @@ class EditCounterController extends XtoolsController
         'rights-changes' => 'EditCounterRightsChanges',
     ];
 
-    /** @var EditCounter The edit-counter, that does all the work. */
-    protected $editCounter;
+    protected EditCounter $editCounter;
+    protected EditCounterRepository $editCounterRepo;
+    protected UserRights $userRights;
+    protected UserRightsRepository $userRightsRepo;
 
     /** @var string[] Which sections to show. */
-    protected $sections;
+    protected array $sections;
 
     /**
-     * Get the name of the tool's index route. This is also the name of the associated model.
-     * @return string
+     * @inheritDoc
      * @codeCoverageIgnore
      */
     public function getIndexRoute(): string
@@ -62,19 +67,58 @@ class EditCounterController extends XtoolsController
      * EditCounterController constructor.
      * @param RequestStack $requestStack
      * @param ContainerInterface $container
+     * @param CacheItemPoolInterface $cache
+     * @param Client $guzzle
      * @param I18nHelper $i18n
+     * @param ProjectRepository $projectRepo
+     * @param UserRepository $userRepo
+     * @param EditCounterRepository $editCounterRepo
+     * @param UserRightsRepository $userRightsRepo
+     * @param PageRepository $pageRepo
      */
-    public function __construct(RequestStack $requestStack, ContainerInterface $container, I18nHelper $i18n)
+    public function __construct(
+        RequestStack $requestStack,
+        ContainerInterface $container,
+        CacheItemPoolInterface $cache,
+        Client $guzzle,
+        I18nHelper $i18n,
+        ProjectRepository $projectRepo,
+        UserRepository $userRepo,
+        EditCounterRepository $editCounterRepo,
+        UserRightsRepository $userRightsRepo,
+        PageRepository $pageRepo
+    ) {
+        $this->editCounterRepo = $editCounterRepo;
+        $this->userRightsRepo = $userRightsRepo;
+        parent::__construct($requestStack, $container, $cache, $guzzle, $i18n, $projectRepo, $userRepo, $pageRepo);
+    }
+
+    /**
+     * Causes the tool to redirect to the Simple Edit Counter if the user has too high of an edit count.
+     * @inheritDoc
+     * @codeCoverageIgnore
+     */
+    public function tooHighEditCountRoute(): string
     {
-        // Causes the tool to redirect to the Simple Edit Counter if the user has too high of an edit count.
-        $this->tooHighEditCountAction = 'SimpleEditCounterResult';
+        return 'SimpleEditCounterResult';
+    }
 
-        // The rightsChanges action is exempt from the edit count limitation.
-        $this->tooHighEditCountActionBlacklist = ['rightsChanges'];
+    /**
+     * @inheritDoc
+     * @codeCoverageIgnore
+     */
+    public function tooHighEditCountActionAllowlist(): array
+    {
+        return ['rightsChanges'];
+    }
 
-        $this->restrictedActions = ['monthCountsApi', 'timecardApi'];
-
-        parent::__construct($requestStack, $container, $i18n);
+    /**
+     * @inheritDoc
+     * @codeCoverageIgnore
+     */
+    public function restrictedApiActions(): array
+    {
+        return ['monthCountsApi', 'timecardApi'];
     }
 
     /**
@@ -103,15 +147,16 @@ class EditCounterController extends XtoolsController
         // Store which sections of the Edit Counter they requested.
         $this->sections = $this->getRequestedSections();
 
+        $this->userRights = new UserRights($this->userRightsRepo, $this->project, $this->user, $this->i18n);
+
         // Instantiate EditCounter.
-        $editCounterRepo = new EditCounterRepository();
-        $editCounterRepo->setContainer($this->container);
         $this->editCounter = new EditCounter(
+            $this->editCounterRepo,
+            $this->i18n,
+            $this->userRights,
             $this->project,
-            $this->user,
-            $this->container->get('app.i18n_helper')
+            $this->user
         );
-        $this->editCounter->setRepository($editCounterRepo);
     }
 
     /**
@@ -253,8 +298,8 @@ class EditCounterController extends XtoolsController
         ];
 
         // Used when querying for global rights changes.
-        if ((bool)$this->container->hasParameter('app.is_labs')) {
-            $ret['metaProject'] = ProjectRepository::getProject('metawiki', $this->container);
+        if ($this->getParameter('app.is_wmf')) {
+            $ret['metaProject'] = $this->projectRepo->getProject('metawiki');
         }
 
         return $this->getFormattedResponse('editCounter/result', $ret);
@@ -269,18 +314,24 @@ class EditCounterController extends XtoolsController
      *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
      *     }
      * )
+     * @param GlobalContribsRepository $globalContribsRepo
+     * @param EditRepository $editRepo
      * @return Response
      * @codeCoverageIgnore
      */
-    public function generalStatsAction(): Response
-    {
+    public function generalStatsAction(
+        GlobalContribsRepository $globalContribsRepo,
+        EditRepository $editRepo
+    ): Response {
         $this->setUpEditCounter();
 
-        $globalContribsRepo = new GlobalContribsRepository();
-        $globalContribsRepo->setContainer($this->container);
-        $globalContribs = new GlobalContribs($this->user);
-        $globalContribs->setRepository($globalContribsRepo);
-
+        $globalContribs = new GlobalContribs(
+            $globalContribsRepo,
+            $this->pageRepo,
+            $this->userRepo,
+            $editRepo,
+            $this->user
+        );
         $ret = [
             'xtTitle' => $this->user->getUsername(),
             'xtPage' => 'EditCounter',
@@ -504,8 +555,8 @@ class EditCounterController extends XtoolsController
             'ec' => $this->editCounter,
         ];
 
-        if ((bool)$this->container->hasParameter('app.is_labs')) {
-            $ret['metaProject'] = ProjectRepository::getProject('metawiki', $this->container);
+        if ($this->getParameter('app.is_wmf')) {
+            $ret['metaProject'] = $this->projectRepo->getProject('metawiki');
         }
 
         // Output the relevant format template.

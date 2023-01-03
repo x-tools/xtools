@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace App\Tests\Model;
@@ -7,9 +8,13 @@ use App\Model\Authorship;
 use App\Model\Page;
 use App\Model\Project;
 use App\Repository\AuthorshipRepository;
+use App\Repository\PageRepository;
 use App\Tests\TestAdapter;
 use PHPUnit\Framework\MockObject\MockObject;
 
+/**
+ * @covers \App\Model\Authorship
+ */
 class AuthorshipTest extends TestAdapter
 {
     /**
@@ -50,9 +55,9 @@ class AuthorshipTest extends TestAdapter
                 ['user_id' => 2, 'user_name' => 'Mr. Rogers'],
             ]);
         $project = new Project('test.example.org');
-        $page = new Page($project, 'Test page');
-        $authorship = new Authorship($page, null, 2);
-        $authorship->setRepository($authorshipRepo);
+        $pageRepo = $this->createMock(PageRepository::class);
+        $page = new Page($pageRepo, $project, 'Test page');
+        $authorship = new Authorship($authorshipRepo, $page, null, 2);
         $authorship->prepareData();
 
         static::assertEquals(

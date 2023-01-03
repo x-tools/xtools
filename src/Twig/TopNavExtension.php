@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace App\Twig;
@@ -11,16 +12,16 @@ use Twig\TwigFunction;
 class TopNavExtension extends AppExtension
 {
     /** @var string[] Entries for Edit Counter dropdown. */
-    protected $topNavEditCounter;
+    protected array $topNavEditCounter;
 
     /** @var string[] Entries for User dropdown. */
-    protected $topNavUser;
+    protected array $topNavUser;
 
     /** @var string[] Entries for Page dropdown. */
-    protected $topNavPage;
+    protected array $topNavPage;
 
     /** @var string[] Entries for Project dropdown. */
-    protected $topNavProject;
+    protected array $topNavProject;
 
     /**
      * Twig functions this class provides.

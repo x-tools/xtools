@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains tests for the AutomatedEditsHelper class.
- */
 
 declare(strict_types = 1);
 
@@ -16,16 +13,14 @@ use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 /**
  * Tests of the AutomatedEditsHelper class.
  * @group integration
+ * @covers \App\Helper\AutomatedEditsHelper
  */
 class AutomatedEditsTest extends TestAdapter
 {
     use ArraySubsetAsserts;
 
-    /** @var AutomatedEditsHelper The API Helper object to test. */
-    protected $aeh;
-
-    /** @var Project The project against which we are testing. */
-    protected $project;
+    protected AutomatedEditsHelper $aeh;
+    protected Project $project;
 
     /**
      * Set up the AutomatedEditsHelper object for testing.

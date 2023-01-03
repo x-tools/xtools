@@ -27,7 +27,7 @@
     'project': project.domain,
     'namespace': 'all',
     'format': 'wikitext'
-})) }}{% endif %}{% if 'rights-changes' in sections and not(user.anon) and ec.rightsChanges|length > 0 or ec.globalRightsChanges|length > 0 %}{{ render(path('EditCounterRightsChanges', {
+})) }}{% endif %}{% if 'rights-changes' in sections and not(user.anon) and ec.userRights.rightsChanges|length > 0 or ec.userRights.globalRightsChanges|length > 0 %}{{ render(path('EditCounterRightsChanges', {
     'username': user.usernameIdent,
     'project': project.domain,
     'format': 'wikitext'

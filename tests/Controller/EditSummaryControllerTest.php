@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the EditSummaryControllerTest class.
- */
 
 declare(strict_types = 1);
 
@@ -10,6 +7,7 @@ namespace App\Tests\Controller;
 /**
  * Integration/unit tests for the ArticleInfoController.
  * @group integration
+ * @covers \App\Controller\EditSummaryController
  */
 class EditSummaryControllerTest extends ControllerTestAdapter
 {
@@ -21,7 +19,7 @@ class EditSummaryControllerTest extends ControllerTestAdapter
         $crawler = $this->client->request('GET', '/editsummary/de.wikipedia');
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
-        if (!self::$container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -34,7 +32,7 @@ class EditSummaryControllerTest extends ControllerTestAdapter
      */
     public function testRoutes(): void
     {
-        if (!self::$container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_wmf')) {
             return;
         }
 

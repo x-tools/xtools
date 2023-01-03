@@ -1,14 +1,13 @@
 <?php
-/**
- * This file contains only the Page class.
- */
 
 declare(strict_types = 1);
 
 namespace App\Model;
 
+use App\Repository\PageRepository;
 use DateTime;
 use Doctrine\DBAL\Driver\ResultStatement;
+use GuzzleHttp\Exception\ClientException;
 
 /**
  * A Page is a single wiki page in one project.
@@ -16,47 +15,47 @@ use Doctrine\DBAL\Driver\ResultStatement;
 class Page extends Model
 {
     /** @var string The page name as provided at instantiation. */
-    protected $unnormalizedPageName;
+    protected string $unnormalizedPageName;
 
     /** @var string[] Metadata about this page. */
-    protected $pageInfo = [];
+    protected array $pageInfo;
 
     /** @var string[] Revision history of this page. */
-    protected $revisions;
+    protected array $revisions;
 
     /** @var int Number of revisions for this page. */
-    protected $numRevisions;
+    protected int $numRevisions;
 
     /** @var string[] List of Wikidata sitelinks for this page. */
-    protected $wikidataItems;
+    protected array $wikidataItems;
 
     /** @var int Number of Wikidata sitelinks for this page. */
-    protected $numWikidataItems;
-
-    /** @var string Title of the page. */
-    protected $pageTitle;
+    protected int $numWikidataItems;
 
     /** @var int Length of the page in bytes. */
-    protected $length;
+    protected int $length;
 
     /**
      * Page constructor.
+     * @param PageRepository $repository
      * @param Project $project
      * @param string $pageName
      */
-    public function __construct(Project $project, string $pageName)
+    public function __construct(PageRepository $repository, Project $project, string $pageName)
     {
+        $this->repository = $repository;
         $this->project = $project;
         $this->unnormalizedPageName = $pageName;
     }
 
     /**
      * Get a Page instance given a database row (either from or JOINed on the page table).
+     * @param PageRepository $repository
      * @param Project $project
      * @param array $row Must contain 'page_title' and 'page_namespace'. May contain 'page_len'.
      * @return static
      */
-    public static function newFromRow(Project $project, array $row): self
+    public static function newFromRow(PageRepository $repository, Project $project, array $row): self
     {
         $pageTitle = $row['page_title'];
 
@@ -67,7 +66,7 @@ class Page extends Model
             $fullPageTitle = $namespaces[$row['page_namespace']].":$pageTitle";
         }
 
-        $page = new self($project, $fullPageTitle);
+        $page = new self($repository, $project, $fullPageTitle);
         $page->pageInfo['ns'] = $row['page_namespace'];
         if (isset($row['page_len'])) {
             $page->length = (int)$row['page_len'];
@@ -94,9 +93,8 @@ class Page extends Model
      */
     protected function getPageInfo(): ?array
     {
-        if (empty($this->pageInfo)) {
-            $this->pageInfo = $this->getRepository()
-                ->getPageInfo($this->project, $this->unnormalizedPageName);
+        if (!isset($this->pageInfo)) {
+            $this->pageInfo = $this->repository->getPageInfo($this->project, $this->unnormalizedPageName);
         }
         return $this->pageInfo;
     }
@@ -223,9 +221,9 @@ class Page extends Model
     public function getHTMLContent($target = null): string
     {
         if (is_a($target, 'DateTime')) {
-            $target = $this->getRepository()->getRevisionIdAtDate($this, $target);
+            $target = $this->repository->getRevisionIdAtDate($this, $target);
         }
-        return $this->getRepository()->getHTMLContent($this, $target);
+        return $this->repository->getHTMLContent($this, $target);
     }
 
     /**
@@ -255,11 +253,7 @@ class Page extends Model
     public function getLang(): string
     {
         $info = $this->getPageInfo();
-        if (isset($info['pagelanguage'])) {
-            return $info['pagelanguage'];
-        } else {
-            return $this->getProject()->getLang();
-        }
+        return $info['pagelanguage'] ?? $this->getProject()->getLang();
     }
 
     /**
@@ -269,11 +263,7 @@ class Page extends Model
     public function getWikidataId(): ?string
     {
         $info = $this->getPageInfo();
-        if (isset($info['pageprops']['wikibase_item'])) {
-            return $info['pageprops']['wikibase_item'];
-        } else {
-            return null;
-        }
+        return $info['pageprops']['wikibase_item'] ?? null;
     }
 
     /**
@@ -287,20 +277,20 @@ class Page extends Model
     {
         // If a user is given, we will not cache the result via instance variable.
         if (null !== $user) {
-            return (int)$this->getRepository()->getNumRevisions($this, $user, $start, $end);
+            return $this->repository->getNumRevisions($this, $user, $start, $end);
         }
 
         // Return cached value, if present.
-        if (null !== $this->numRevisions) {
+        if (isset($this->numRevisions)) {
             return $this->numRevisions;
         }
 
         // Otherwise, return the count of all revisions if already present.
-        if (null !== $this->revisions) {
+        if (isset($this->revisions)) {
             $this->numRevisions = count($this->revisions);
         } else {
             // Otherwise do a COUNT in the event fetching all revisions is not desired.
-            $this->numRevisions = (int)$this->getRepository()->getNumRevisions($this, null, $start, $end);
+            $this->numRevisions = $this->repository->getNumRevisions($this, null, $start, $end);
         }
 
         return $this->numRevisions;
@@ -315,11 +305,11 @@ class Page extends Model
      */
     public function getRevisions(?User $user = null, $start = false, $end = false): array
     {
-        if ($this->revisions) {
+        if (isset($this->revisions)) {
             return $this->revisions;
         }
 
-        $this->revisions = $this->getRepository()->getRevisions($this, $user, $start, $end);
+        $this->revisions = $this->repository->getRevisions($this, $user, $start, $end);
 
         return $this->revisions;
     }
@@ -330,7 +320,7 @@ class Page extends Model
      */
     public function getWikitext(): ?string
     {
-        $content = $this->getRepository()->getPagesWikitext(
+        $content = $this->repository->getPagesWikitext(
             $this->getProject(),
             [ $this->getTitle() ]
         );
@@ -362,7 +352,7 @@ class Page extends Model
         if (isset($limit) && null === $numRevisions) {
             $numRevisions = $this->getNumRevisions($user, $start, $end);
         }
-        return $this->getRepository()->getRevisionsStmt($this, $user, $limit, $numRevisions, $start, $end);
+        return $this->repository->getRevisionsStmt($this, $user, $limit, $numRevisions, $start, $end);
     }
 
     /**
@@ -372,7 +362,7 @@ class Page extends Model
      */
     public function getRevisionIdAtDate(DateTime $date): ?int
     {
-        return $this->getRepository()->getRevisionIdAtDate($this, $date);
+        return $this->repository->getRevisionIdAtDate($this, $date);
     }
 
     /**
@@ -381,12 +371,12 @@ class Page extends Model
      */
     public function getCheckWikiErrors(): array
     {
-        return $this->getRepository()->getCheckWikiErrors($this);
+        return $this->repository->getCheckWikiErrors($this);
     }
 
     /**
      * Get Wikidata errors for this page
-     * @return string[] See getErrors() for format
+     * @return string[][] See getErrors() for format
      */
     public function getWikidataErrors(): array
     {
@@ -396,7 +386,7 @@ class Page extends Model
             return [];
         }
 
-        $wikidataInfo = $this->getRepository()->getWikidataInfo($this);
+        $wikidataInfo = $this->repository->getWikidataInfo($this);
 
         $terms = array_map(function ($entry) {
             return $entry['term'];
@@ -429,7 +419,7 @@ class Page extends Model
 
     /**
      * Get Wikidata and CheckWiki errors, if present
-     * @return string[] List of errors in the format:
+     * @return string[][] List of errors in the format:
      *    [[
      *         'prio' => int,
      *         'name' => string,
@@ -453,8 +443,8 @@ class Page extends Model
      */
     public function getWikidataItems(): array
     {
-        if (!is_array($this->wikidataItems)) {
-            $this->wikidataItems = $this->getRepository()->getWikidataItems($this);
+        if (!isset($this->wikidataItems)) {
+            $this->wikidataItems = $this->repository->getWikidataItems($this);
         }
         return $this->wikidataItems;
     }
@@ -465,10 +455,10 @@ class Page extends Model
      */
     public function countWikidataItems(): int
     {
-        if (is_array($this->wikidataItems)) {
+        if (isset($this->wikidataItems)) {
             $this->numWikidataItems = count($this->wikidataItems);
-        } elseif (null === $this->numWikidataItems) {
-            $this->numWikidataItems = (int)$this->getRepository()->countWikidataItems($this);
+        } elseif (!isset($this->numWikidataItems)) {
+            $this->numWikidataItems = $this->repository->countWikidataItems($this);
         }
         return $this->numWikidataItems;
     }
@@ -479,7 +469,7 @@ class Page extends Model
      */
     public function countLinksAndRedirects(): array
     {
-        return $this->getRepository()->countLinksAndRedirects($this);
+        return $this->repository->countLinksAndRedirects($this);
     }
 
     /**
@@ -491,8 +481,8 @@ class Page extends Model
     public function getPageviews($start, $end): int
     {
         try {
-            $pageviews = $this->getRepository()->getPageviews($this, $start, $end);
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $pageviews = $this->repository->getPageviews($this, $start, $end);
+        } catch (ClientException $e) {
             // 404 means zero pageviews
             return 0;
         }

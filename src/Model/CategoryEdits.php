@@ -1,11 +1,10 @@
 <?php
-/**
- * This file contains only the CategoryEdits class.
- */
 
 declare(strict_types = 1);
 
 namespace App\Model;
+
+use App\Repository\CategoryEditsRepository;
 
 /**
  * CategoryEdits returns statistics about edits made by a user to pages in given categories.
@@ -13,22 +12,23 @@ namespace App\Model;
 class CategoryEdits extends Model
 {
     /** @var string[] The categories. */
-    protected $categories;
+    protected array $categories;
 
     /** @var Edit[] The list of contributions. */
-    protected $categoryEdits;
+    protected array $categoryEdits;
 
     /** @var int Total number of edits. */
-    protected $editCount;
+    protected int $editCount;
 
     /** @var int Total number of edits within the category. */
-    protected $categoryEditCount;
+    protected int $categoryEditCount;
 
     /** @var array Counts of edits within each category, keyed by category name. */
-    protected $categoryCounts;
+    protected array $categoryCounts;
 
     /**
      * Constructor for the CategoryEdits class.
+     * @param CategoryEditsRepository $repository
      * @param Project $project
      * @param User $user
      * @param array $categories
@@ -37,6 +37,7 @@ class CategoryEdits extends Model
      * @param int|false $offset As Unix timestamp. Used for pagination.
      */
     public function __construct(
+        CategoryEditsRepository $repository,
         Project $project,
         User $user,
         array $categories,
@@ -44,6 +45,7 @@ class CategoryEdits extends Model
         $end = false,
         $offset = false
     ) {
+        $this->repository = $repository;
         $this->project = $project;
         $this->user = $user;
         $this->categories = array_map(function ($category) {
@@ -89,7 +91,7 @@ class CategoryEdits extends Model
      */
     public function getEditCount(): int
     {
-        if (!is_int($this->editCount)) {
+        if (!isset($this->editCount)) {
             $this->editCount = $this->user->countEdits(
                 $this->project,
                 'all',
@@ -107,11 +109,11 @@ class CategoryEdits extends Model
      */
     public function getCategoryEditCount(): int
     {
-        if (is_int($this->categoryEditCount)) {
+        if (isset($this->categoryEditCount)) {
             return $this->categoryEditCount;
         }
 
-        $this->categoryEditCount = (int)$this->getRepository()->countCategoryEdits(
+        $this->categoryEditCount = $this->repository->countCategoryEdits(
             $this->project,
             $this->user,
             $this->categories,
@@ -152,13 +154,13 @@ class CategoryEdits extends Model
      * @param bool $raw Wether to return raw data from the database, or get Edit objects.
      * @return string[]|Edit[]
      */
-    public function getCategoryEdits(bool $raw = false)
+    public function getCategoryEdits(bool $raw = false): array
     {
-        if (is_array($this->categoryEdits)) {
+        if (isset($this->categoryEdits)) {
             return $this->categoryEdits;
         }
 
-        $revs = $this->getRepository()->getCategoryEdits(
+        $revs = $this->repository->getCategoryEdits(
             $this->project,
             $this->user,
             $this->categories,
@@ -171,7 +173,11 @@ class CategoryEdits extends Model
             return $revs;
         }
 
-        $this->categoryEdits = Edit::getEditsFromRevs($this->project, $this->user, $revs);
+        $this->categoryEdits = $this->repository->getEditsFromRevs(
+            $this->project,
+            $this->user,
+            $revs
+        );
 
         return $this->categoryEdits;
     }
@@ -182,11 +188,11 @@ class CategoryEdits extends Model
      */
     public function getCategoryCounts(): array
     {
-        if (is_array($this->categoryCounts)) {
+        if (isset($this->categoryCounts)) {
             return $this->categoryCounts;
         }
 
-        $this->categoryCounts = $this->getRepository()->getCategoryCounts(
+        $this->categoryCounts = $this->repository->getCategoryCounts(
             $this->project,
             $this->user,
             $this->categories,

@@ -11,4 +11,4 @@ if (file_exists(dirname(__DIR__) . '/.env')) {
     $loadFile = '/.env';
 }
 
-(new Dotenv())->load(dirname(__DIR__) . $loadFile);
+(new Dotenv(false))->load(dirname(__DIR__) . $loadFile);

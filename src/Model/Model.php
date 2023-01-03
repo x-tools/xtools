@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the Model class.
- */
 
 declare(strict_types = 1);
 
@@ -20,17 +17,17 @@ abstract class Model
      * Below are the class properties. Some subclasses may not use all of these.
      */
 
-    /** @var Repository The repository for this model. */
-    private $repository;
+    /** @var Repository The corresponding repository for this model. */
+    protected Repository $repository;
 
     /** @var Project The project. */
-    protected $project;
+    protected Project $project;
 
-    /** @var User The user. */
-    protected $user;
+    /** @var User|null The user. */
+    protected ?User $user;
 
-    /** @var Page the page associated with this edit */
-    protected $page;
+    /** @var Page|null the page associated with this edit */
+    protected ?Page $page = null;
 
     /** @var int|string Which namespace we are querying for. 'all' for all namespaces. */
     protected $namespace;
@@ -44,16 +41,18 @@ abstract class Model
     /** @var false|int Unix timestamp to offset results which acts as a substitute for $end */
     protected $offset;
 
-    /** @var int Number of rows to fetch. */
-    protected $limit;
+    /** @var int|null Number of rows to fetch. */
+    protected ?int $limit = null;
 
     /**
      * Set this model's data repository.
      * @param Repository $repository
+     * @return Model
      */
-    public function setRepository(Repository $repository): void
+    public function setRepository(Repository $repository): Model
     {
         $this->repository = $repository;
+        return $this;
     }
 
     /**
@@ -64,7 +63,7 @@ abstract class Model
     public function getRepository(): Repository
     {
         if (!isset($this->repository)) {
-            $msg = sprintf('Repository for %s must be set before using.', static::class);
+            $msg = sprintf('The $repository property for class %s must be set before using.', static::class);
             throw new Exception($msg);
         }
         return $this->repository;
@@ -90,9 +89,9 @@ abstract class Model
 
     /**
      * Get the associated Page.
-     * @return Page
+     * @return Page|null
      */
-    public function getPage(): Page
+    public function getPage(): ?Page
     {
         return $this->page;
     }
@@ -153,11 +152,11 @@ abstract class Model
 
     /**
      * Get the limit set on number of rows to fetch.
-     * @return int
+     * @return int|null
      */
-    public function getLimit(): int
+    public function getLimit(): ?int
     {
-        return (int)$this->limit;
+        return $this->limit;
     }
 
     /**

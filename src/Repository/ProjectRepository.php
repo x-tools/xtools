@@ -1,18 +1,17 @@
 <?php
-/**
- * This file contains only the ProjectRepository class.
- */
 
 declare(strict_types = 1);
 
 namespace App\Repository;
 
-use App\Model\Page;
+use App\Model\PageAssessments;
 use App\Model\Project;
 use Doctrine\DBAL\Connection;
 use Exception;
 use GuzzleHttp\Client;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * This class provides data to the Project class.
@@ -20,57 +19,64 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class ProjectRepository extends Repository
 {
+    protected PageAssessmentsRepository $assessmentsRepo;
+
     /** @var array Project's 'dbName', 'url' and 'lang'. */
-    protected $basicInfo;
+    protected array $basicInfo;
 
     /** @var string[] Basic metadata if XTools is in single-wiki mode. */
-    protected $singleBasicInfo;
+    protected array $singleBasicInfo;
 
     /** @var array Full Project metadata, including $basicInfo. */
-    protected $metadata;
+    protected array $metadata;
 
     /** @var string The cache key for the 'all project' metadata. */
-    protected $cacheKeyAllProjects = 'allprojects';
+    protected string $cacheKeyAllProjects = 'allprojects';
+
+    public function __construct(
+        ContainerInterface $container,
+        CacheItemPoolInterface $cache,
+        Client $guzzle,
+        LoggerInterface $logger,
+        bool $isWMF,
+        int $queryTimeout,
+        PageAssessmentsRepository $assessmentsRepo
+    ) {
+        $this->assessmentsRepo = $assessmentsRepo;
+        parent::__construct($container, $cache, $guzzle, $logger, $isWMF, $queryTimeout);
+    }
 
     /**
      * Convenience method to get a new Project object based on a given identification string.
      * @param string $projectIdent The domain name, database name, or URL of a project.
-     * @param ContainerInterface $container Symfony's container.
      * @return Project
      */
-    public static function getProject(string $projectIdent, ContainerInterface $container): Project
+    public function getProject(string $projectIdent): Project
     {
         $project = new Project($projectIdent);
-        $projectRepo = new ProjectRepository();
-        $projectRepo->setContainer($container);
+        $project->setRepository($this);
+        $project->setPageAssessments(new PageAssessments($this->assessmentsRepo, $project));
 
-        // The associated PageAssessmentsRepository also needs the container.
-        $paRepo = new PageAssessmentsRepository();
-        $paRepo->setContainer($container);
-        $project->getPageAssessments()->setRepository($paRepo);
-
-        if ($container->getParameter('app.single_wiki')) {
-            $projectRepo->setSingleBasicInfo([
-                'url' => $container->getParameter('wiki_url'),
+        if ($this->container->getParameter('app.single_wiki')) {
+            $this->setSingleBasicInfo([
+                'url' => $this->container->getParameter('wiki_url'),
                 'dbName' => '', // Just so this will pass in CI.
-                // TODO: this will need to be restored for third party support; KEYWORD: isLabs()
+                // TODO: this will need to be restored for third party support; KEYWORD: isWMF
                 // 'dbName' => $container->getParameter('database_replica_name'),
             ]);
         }
-        $project->setRepository($projectRepo);
 
         return $project;
     }
 
     /**
      * Get the XTools default project.
-     * @param ContainerInterface $container
      * @return Project
      */
-    public static function getDefaultProject(ContainerInterface $container): Project
+    public function getDefaultProject(): Project
     {
-        $defaultProjectName = $container->getParameter('default_project');
-        return self::getProject($defaultProjectName, $container);
+        $defaultProjectName = $this->container->getParameter('default_project');
+        return $this->getProject($defaultProjectName);
     }
 
     /**
@@ -79,10 +85,10 @@ class ProjectRepository extends Repository
      */
     public function getGlobalProject(): Project
     {
-        if ($this->isLabs()) {
-            return self::getProject('metawiki', $this->container);
+        if ($this->isWMF) {
+            return $this->getProject('metawiki');
         } else {
-            return self::getDefaultProject($this->container);
+            return $this->getDefaultProject();
         }
     }
 
@@ -111,7 +117,7 @@ class ProjectRepository extends Repository
      */
     public function getAll(): array
     {
-        $this->log->debug(__METHOD__." Getting all projects' metadata");
+        $this->logger->debug(__METHOD__." Getting all projects' metadata");
         // Single wiki mode?
         if (!empty($this->singleBasicInfo)) {
             return [$this->getOne('')];
@@ -150,13 +156,13 @@ class ProjectRepository extends Repository
      * Get the 'dbName', 'url' and 'lang' of a project. This is all you need to make database queries.
      * More comprehensive metadata can be fetched with getMetadata() at the expense of an API call.
      * @param string $project A project URL, domain name, or database name.
-     * @return string[]|bool With 'dbName', 'url' and 'lang' keys; or false if not found.
+     * @return string[]|null With 'dbName', 'url' and 'lang' keys; or null if not found.
      */
-    public function getOne(string $project)
+    public function getOne(string $project): ?array
     {
-        $this->log->debug(__METHOD__." Getting metadata about $project");
+        $this->logger->debug(__METHOD__." Getting metadata about $project");
         // For single-wiki setups, every project is the same.
-        if (!empty($this->singleBasicInfo)) {
+        if (isset($this->singleBasicInfo)) {
             return $this->singleBasicInfo;
         }
 
@@ -172,7 +178,7 @@ class ProjectRepository extends Repository
                     || $projMetadata['url'] == "https://$project"
                     || $projMetadata['url'] == "https://$project.org"
                     || $projMetadata['url'] == "https://www.$project") {
-                    $this->log->debug(__METHOD__ . " Using cached data for $project");
+                    $this->logger->debug(__METHOD__ . " Using cached data for $project");
                     return $projMetadata;
                 }
             }
@@ -182,12 +188,8 @@ class ProjectRepository extends Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        if ($this->container->hasParameter("database_meta_table")) {
-            $table = $this->container->getParameter('database_meta_name') . '.' .
-                $this->container->getParameter('database_meta_table');
-        } else {
-            $table = "meta_p.wiki";
-        }
+        // TODO: make this configurable if XTools is to work on 3rd party wiki farms
+        $table = "meta_p.wiki";
 
         // Otherwise, fetch the project's metadata from the meta.wiki table.
         $sql = "SELECT dbname AS dbName, url, lang
@@ -204,6 +206,7 @@ class ProjectRepository extends Repository
             'projectUrl3' => "https://www.$project",
             'projectUrl4' => "https://www.$project.org",
         ])->fetchAssociative();
+        $basicInfo = false === $basicInfo ? null : $basicInfo;
 
         // Cache for one hour and return.
         return $this->setCache($cacheKey, $basicInfo, 'PT1H');
@@ -238,11 +241,8 @@ class ProjectRepository extends Repository
             return $this->metadata;
         }
 
-        /** @var Client $client */
-        $client = $this->container->get('eight_points_guzzle.client.xtools');
-
         try {
-            $res = json_decode($client->request('GET', $projectUrl.$this->getApiPath(), [
+            $res = json_decode($this->guzzle->request('GET', $projectUrl.$this->getApiPath(), [
                 'query' => [
                     'action' => 'query',
                     'meta' => 'siteinfo',
@@ -342,21 +342,6 @@ class ProjectRepository extends Repository
     }
 
     /**
-     * Get a page from the given Project.
-     * @param Project $project The project.
-     * @param string $pageName The name of the page.
-     * @return Page
-     */
-    public function getPage(Project $project, string $pageName): Page
-    {
-        $pageRepo = new PageRepository();
-        $pageRepo->setContainer($this->container);
-        $page = new Page($project, $pageName);
-        $page->setRepository($pageRepo);
-        return $page;
-    }
-
-    /**
      * Check to see if a page exists on this project and has some content.
      * @param Project $project The project.
      * @param int $namespaceId The page namespace ID.
@@ -386,10 +371,7 @@ class ProjectRepository extends Repository
      */
     public function getInstalledExtensions(Project $project): array
     {
-        /** @var Client $client */
-        $client = $this->container->get('eight_points_guzzle.client.xtools');
-
-        $res = json_decode($client->request('GET', $project->getApiUrl(), ['query' => [
+        $res = json_decode($this->guzzle->request('GET', $project->getApiUrl(), ['query' => [
             'action' => 'query',
             'meta' => 'siteinfo',
             'siprop' => 'extensions',
@@ -428,7 +410,7 @@ class ProjectRepository extends Repository
             ->executeQuery($sql, [$groups], [Connection::PARAM_STR_ARRAY])
             ->fetchAllAssociative();
 
-        if (count($globalGroups) > 0 && $this->isLabs()) {
+        if (count($globalGroups) > 0 && $this->isWMF) {
             $sql = "SELECT gu_name AS user_name, gug_group AS user_group
                     FROM centralauth_p.global_user_groups
                     JOIN centralauth_p.globaluser ON gug_user = gu_id

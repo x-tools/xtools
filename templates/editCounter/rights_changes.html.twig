@@ -33,22 +33,27 @@
                         {% endif %}
                         {% for state in ['current', 'former'] %}
                             <tr>
+                                {##
+                                 # The follow messages are used here:
+                                 # * current-user-groups
+                                 # * former-user-groups
+                                 #}
                                 <td>{{ msg(state ~ '-user-groups') }}</td>
                                 <td>
-                                    {% set localList = ec.rightsStates.local[state] %}
-                                    {% set globalList = ec.rightsStates.global[state] %}
+                                    {% set localList = ec.userRights.rightsStates.local[state] %}
+                                    {% set globalList = ec.userRights.rightsStates.global[state] %}
                                     {% if localList|merge(globalList)|length  == 0 %}
                                         <em class="text-muted">{{ msg('none') }}</em>
                                     {% else %}
                                         {% for right in localList %}
                                             <span class="rights-change-name">
-                                                <a target="_blank" href="{{ wiki.pageUrlRaw('Special:ListGroupRights', project) }}#{{ right }}">{{ ec.rightsName(right) }}</a>{#-
+                                                <a target="_blank" href="{{ wiki.pageUrlRaw('Special:ListGroupRights', project) }}#{{ right }}">{{ ec.userRights.rightsName(right) }}</a>{#-
                                                 -#}{% if not loop.last or (loop.last and globalList|length > 0) %},{% endif %}
                                             </span>
                                         {% endfor %}
                                         {% for right in globalList %}
                                             <span class="rights-change-name">
-                                                <a target="_blank" href="{{ wiki.pageUrlRaw('Special:GlobalGroupPermissions', project) }}#{{ right }}">{{ ec.rightsName(right) }}</a>
+                                                <a target="_blank" href="{{ wiki.pageUrlRaw('Special:GlobalGroupPermissions', project) }}#{{ right }}">{{ ec.userRights.rightsName(right) }}</a>
                                                 <span class="text-muted">(global)</span>{#-
                                                 -#}{% if not loop.last %},{% endif %}
                                             </span>
@@ -75,22 +80,22 @@
 {% endif %}
 
 {% set limit = is_sub_request ? 10 : null %}
-{% if ec.rightsChanges|length > 0 %}
-    {% include 'editCounter/rights_changes_table.html.twig' with {'rightsChanges': ec.rightsChanges(limit), 'remaining': ec.rightsChanges|length - limit} %}
+{% if ec.userRights.rightsChanges|length > 0 %}
+    {% include 'editCounter/rights_changes_table.html.twig' with {'rightsChanges': ec.userRights.rightsChanges(limit), 'remaining': ec.userRights.rightsChanges|length - limit} %}
 {% else %}
     <div class="alert alert-info">
         {{ msg('no-result', [user.username]) }}
     </div>
 {% endif %}
 
-{% if ec.globalRightsChanges|length > 0 %}
+{% if ec.userRights.globalRightsChanges|length > 0 %}
     <h4 class="xt-show-hide--parent">
         {{ msg('global-rights-changes') }}
         <small class='xt-show'>[{{ msg('show')|lower }}]</small>
         <small class='xt-hide'>[{{ msg('hide')|lower }}]</small>
     </h4>
     <div class="xt-show-hide--target">
-        {% include 'editCounter/rights_changes_table.html.twig' with {'rightsChanges': ec.globalRightsChanges(limit), 'remaining': ec.globalRightsChanges|length - limit} %}
+        {% include 'editCounter/rights_changes_table.html.twig' with {'rightsChanges': ec.userRights.globalRightsChanges(limit), 'remaining': ec.userRights.globalRightsChanges|length - limit} %}
     </div>
 {% endif %}
 

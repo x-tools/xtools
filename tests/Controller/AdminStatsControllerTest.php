@@ -1,15 +1,13 @@
 <?php
-/**
- * This file contains only the AdminStatsControllerTest class.
- */
 
 declare(strict_types = 1);
 
 namespace App\Tests\Controller;
 
 /**
- * Integration/unit tests for the AdminStatsController.
+ * Integration tests for the AdminStatsController.
  * @group integration
+ * @covers \App\Controller\AdminStatsController
  */
 class AdminStatsControllerTest extends ControllerTestAdapter
 {
@@ -18,7 +16,7 @@ class AdminStatsControllerTest extends ControllerTestAdapter
      */
     public function testHtmlRoutes(): void
     {
-        if (!self::$container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -35,7 +33,7 @@ class AdminStatsControllerTest extends ControllerTestAdapter
      */
     public function testApis(): void
     {
-        if (!self::$container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_wmf')) {
             return;
         }
 

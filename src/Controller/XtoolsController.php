@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains the abstract XtoolsController, which all other controllers will extend.
- */
 
 declare(strict_types=1);
 
@@ -17,8 +14,10 @@ use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
 use DateTime;
 use Doctrine\DBAL\Exception;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use GuzzleHttp\Client;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,54 +31,45 @@ use Wikimedia\IPUtils;
  * Project/User instances. These are used in other controllers in the App\Controller namespace.
  * @abstract
  */
-abstract class XtoolsController extends Controller
+abstract class XtoolsController extends AbstractController
 {
-    /** @var I18nHelper i18n helper. */
-    protected $i18n;
+    /** DEPENDENCIES */
+
+    protected CacheItemPoolInterface $cache;
+    protected Client $guzzle;
+    protected I18nHelper $i18n;
+    protected ProjectRepository $projectRepo;
+    protected UserRepository $userRepo;
+    protected PageRepository $pageRepo;
+
+    /** OTHER CLASS PROPERTIES */
 
     /** @var Request The request object. */
-    protected $request;
+    protected Request $request;
 
     /** @var string Name of the action within the child controller that is being executed. */
-    protected $controllerAction;
+    protected string $controllerAction;
 
     /** @var array Hash of params parsed from the Request. */
-    protected $params;
+    protected array $params;
 
     /** @var bool Whether this is a request to an API action. */
-    protected $isApi;
+    protected bool $isApi;
 
     /** @var Project Relevant Project parsed from the Request. */
-    protected $project;
+    protected Project $project;
 
-    /** @var User Relevant User parsed from the Request. */
-    protected $user;
+    /** @var User|null Relevant User parsed from the Request. */
+    protected ?User $user = null;
 
-    /** @var Page Relevant Page parsed from the Request. */
-    protected $page;
+    /** @var Page|null Relevant Page parsed from the Request. */
+    protected ?Page $page = null;
 
     /** @var int|false Start date parsed from the Request. */
     protected $start = false;
 
     /** @var int|false End date parsed from the Request. */
     protected $end = false;
-
-    /**
-     * Default days from current day, to use as the start date if none was provided.
-     * If this is null and $maxDays is non-null, the latter will be used as the default.
-     * Is public visibility evil here? I don't think so.
-     * @var int|null
-     */
-    public $defaultDays = null;
-
-    /**
-     * Maximum number of days allowed for the given date range.
-     * Set this in the controller's constructor to enforce the given date range to be within this range.
-     * This will be used as the default date span unless $defaultDays is defined.
-     * @see XtoolsController::getUnixFromDateParams()
-     * @var int|null
-     */
-    public $maxDays = null;
 
     /** @var int|string|null Namespace parsed from the Request, ID as int or 'all' for all namespaces. */
     protected $namespace;
@@ -88,49 +78,21 @@ abstract class XtoolsController extends Controller
     protected $offset = false;
 
     /** @var int Number of results to return. */
-    protected $limit;
-
-    /**
-     * Maximum number of results to show per page. Can be overridden in the child controller's constructor.
-     * @var int
-     */
-    public $maxLimit = 5000;
+    protected int $limit = 50;
 
     /** @var bool Is the current request a subrequest? */
-    protected $isSubRequest;
+    protected bool $isSubRequest;
 
     /**
      * Stores user preferences such default project.
      * This may get altered from the Request and updated in the Response.
      * @var array
      */
-    protected $cookies = [
+    protected array $cookies = [
         'XtoolsProject' => null,
     ];
 
-    /**
-     * This activates the 'too high edit count' functionality. This property represents the
-     * action that should be redirected to if the user has too high of an edit count.
-     * @var string
-     */
-    protected $tooHighEditCountAction;
-
-    /** @var array Actions that are exempt from edit count limitations. */
-    protected $tooHighEditCountActionBlacklist = [];
-
-    /**
-     * Actions that require the target user to opt in to the restricted statistics.
-     * @see https://www.mediawiki.org/wiki/XTools/Edit_Counter#restricted_stats
-     * @var string[]
-     */
-    protected $restrictedActions = [];
-
-    /**
-     * XtoolsController::validateProject() will ensure the given project matches one of these domains,
-     * instead of any valid project.
-     * @var string[]
-     */
-    protected $supportedProjects;
+    /** OVERRIDABLE METHODS */
 
     /**
      * Require the tool's index route (initial form) be defined here. This should also
@@ -140,16 +102,104 @@ abstract class XtoolsController extends Controller
     abstract protected function getIndexRoute(): string;
 
     /**
+     * Override this to activate the 'too high edit count' functionality. The return value
+     * should represent the route name that we should be redirected to if the requested user
+     * has too high of an edit count.
+     * @return string|null Name of route to redirect to.
+     */
+    protected function tooHighEditCountRoute(): ?string
+    {
+        return null;
+    }
+
+    /**
+     * Override this to specify which actions
+     * @return string[]
+     */
+    protected function tooHighEditCountActionAllowlist(): array
+    {
+        return [];
+    }
+
+    /**
+     * Override to restrict a tool's access to only the specified projects, instead of any valid project.
+     * @return string[] Domain or DB names.
+     */
+    protected function supportedProjects(): array
+    {
+        return [];
+    }
+
+    /**
+     * Override this to set which API actions for the controller require the
+     * target user to opt in to the restricted statistics.
+     * @see https://www.mediawiki.org/wiki/XTools/Edit_Counter#restricted_stats
+     * @return array
+     */
+    protected function restrictedApiActions(): array
+    {
+        return [];
+    }
+
+    /**
+     * Override to set the maximum number of days allowed for the given date range.
+     * This will be used as the default date span unless $this->defaultDays() is overridden.
+     * @see XtoolsController::getUnixFromDateParams()
+     * @return int|null
+     */
+    public function maxDays(): ?int
+    {
+        return null;
+    }
+
+    /**
+     * Override to set default days from current day, to use as the start date if none was provided.
+     * If this is null and $this->maxDays() is non-null, the latter will be used as the default.
+     * @return int|null
+     */
+    protected function defaultDays(): ?int
+    {
+        return null;
+    }
+
+    /**
+     * Override to set the maximum number of results to show per page, default 5000.
+     * @return int
+     */
+    protected function maxLimit(): int
+    {
+        return 5000;
+    }
+
+    /**
      * XtoolsController constructor.
      * @param RequestStack $requestStack
      * @param ContainerInterface $container
+     * @param CacheItemPoolInterface $cache
+     * @param Client $guzzle
      * @param I18nHelper $i18n
+     * @param ProjectRepository $projectRepo
+     * @param UserRepository $userRepo
+     * @param PageRepository $pageRepo
      */
-    public function __construct(RequestStack $requestStack, ContainerInterface $container, I18nHelper $i18n)
-    {
+    public function __construct(
+        RequestStack $requestStack,
+        ContainerInterface $container,
+        CacheItemPoolInterface $cache,
+        Client $guzzle,
+        I18nHelper $i18n,
+        ProjectRepository $projectRepo,
+        UserRepository $userRepo,
+        PageRepository $pageRepo
+    ) {
         $this->request = $requestStack->getCurrentRequest();
         $this->container = $container;
+        $this->cache = $cache;
+        $this->guzzle = $guzzle;
         $this->i18n = $i18n;
+        $this->projectRepo = $projectRepo;
+        $this->userRepo = $userRepo;
+        $this->pageRepo = $pageRepo;
         $this->params = $this->parseQueryParams();
 
         // Parse out the name of the controller and action.
@@ -211,14 +261,14 @@ abstract class XtoolsController extends Controller
      */
     private function checkRestrictedApiEndpoint(): void
     {
-        $restrictedAction = in_array($this->controllerAction, $this->restrictedActions);
+        $restrictedAction = in_array($this->controllerAction, $this->restrictedApiActions());
 
         if ($this->isApi && $restrictedAction && !$this->project->userHasOptedIn($this->user)) {
             throw new XtoolsHttpException(
                 $this->i18n->msg('not-opted-in', [
                     $this->getOptedInPage()->getTitle(),
                     $this->i18n->msg('not-opted-in-link') .
-                        ' <https://www.mediawiki.org/wiki/XTools/Edit_Counter#restricted_stats>',
+                        ' <https://www.mediawiki.org/wiki/Special:MyLanguage/XTools/Edit_Counter#restricted_stats>',
                     $this->i18n->msg('not-opted-in-login'),
                 ]),
                 '',
@@ -235,9 +285,7 @@ abstract class XtoolsController extends Controller
      */
     protected function getOptedInPage(): Page
     {
-        return $this->project
-            ->getRepository()
-            ->getPage($this->project, $this->project->userOptInPage($this->user));
+        return new Page($this->pageRepo, $this->project, $this->project->userOptInPage($this->user));
     }
 
     /***********
@@ -263,7 +311,7 @@ abstract class XtoolsController extends Controller
      * Set cookies on the given Response.
      * @param Response $response
      */
-    private function setCookies(Response &$response): void
+    private function setCookies(Response $response): void
     {
         // Not done for subrequests.
         if ($this->isSubRequest) {
@@ -312,7 +360,7 @@ abstract class XtoolsController extends Controller
         // Limit needs to be an int.
         if (isset($this->params['limit'])) {
             // Normalize.
-            $this->params['limit'] = min(max(1, (int)$this->params['limit']), $this->maxLimit);
+            $this->params['limit'] = min(max(1, (int)$this->params['limit']), $this->maxLimit());
             $this->limit = $this->params['limit'];
         }
 
@@ -342,7 +390,7 @@ abstract class XtoolsController extends Controller
     {
         $start = $this->params['start'] ?? false;
         $end = $this->params['end'] ?? false;
-        if ($start || $end || null !== $this->maxDays) {
+        if ($start || $end || null !== $this->maxDays()) {
             [$this->start, $this->end] = $this->getUnixFromDateParams($start, $end);
 
             // Set $this->params accordingly too, so that for instance API responses will include it.
@@ -383,16 +431,15 @@ abstract class XtoolsController extends Controller
         } elseif (null !== $this->cookies['XtoolsProject']) {
             $project = $this->cookies['XtoolsProject'];
         } else {
-            $project = $this->container->getParameter('default_project');
+            $project = $this->getParameter('default_project');
         }
 
-        $projectData = ProjectRepository::getProject($project, $this->container);
+        $projectData = $this->projectRepo->getProject($project);
 
         // Revert back to defaults if we've established the given project was invalid.
         if (!$projectData->exists()) {
-            $projectData = ProjectRepository::getProject(
-                $this->container->getParameter('default_project'),
-                $this->container
+            $projectData = $this->projectRepo->getProject(
+                $this->getParameter('default_project')
             );
         }
 
@@ -411,11 +458,10 @@ abstract class XtoolsController extends Controller
      */
     public function validateProject(string $projectQuery): Project
     {
-        /** @var Project $project */
-        $project = ProjectRepository::getProject($projectQuery, $this->container);
+        $project = $this->projectRepo->getProject($projectQuery);
 
         // Check if it is an explicitly allowed project for the current tool.
-        if (isset($this->supportedProjects) && !in_array($project->getDomain(), $this->supportedProjects)) {
+        if ($this->supportedProjects() && !in_array($project->getDomain(), $this->supportedProjects())) {
             $this->throwXtoolsException(
                 $this->getIndexRoute(),
                 'error-authorship-unsupported-project',
@@ -444,7 +490,7 @@ abstract class XtoolsController extends Controller
      */
     public function validateUser(string $username): User
     {
-        $user = UserRepository::getUser($username, $this->container);
+        $user = new User($this->userRepo, $username);
 
         // Allow querying for any IP, currently with no edit count limitation...
         // Once T188677 is resolved IPs will be affected by the EXPLAIN results.
@@ -460,19 +506,19 @@ abstract class XtoolsController extends Controller
         $originalParams = $this->params;
 
         // Don't continue if the user doesn't exist.
-        if ($this->project && !$user->existsOnProject($this->project)) {
+        if (isset($this->project) && !$user->existsOnProject($this->project)) {
             $this->throwXtoolsException($this->getIndexRoute(), 'user-not-found', [], 'username');
         }
 
         // Reject users with a crazy high edit count.
-        if (isset($this->tooHighEditCountAction) &&
-            !in_array($this->controllerAction, $this->tooHighEditCountActionBlacklist) &&
+        if ($this->tooHighEditCountRoute() &&
+            !in_array($this->controllerAction, $this->tooHighEditCountActionAllowlist()) &&
             $user->hasTooManyEdits($this->project)
         ) {
             /** TODO: Somehow get this to use self::throwXtoolsException */
 
             // If redirecting to a different controller, show an informative message accordingly.
-            if ($this->tooHighEditCountAction !== $this->getIndexRoute()) {
+            if ($this->tooHighEditCountRoute() !== $this->getIndexRoute()) {
                 // FIXME: This is currently only done for Edit Counter, redirecting to Simple Edit Counter,
                 //   so this bit is hardcoded. We need to instead give the i18n key of the route.
                 $redirMsg = $this->i18n->msg('too-many-edits-redir', [
@@ -498,8 +544,8 @@ abstract class XtoolsController extends Controller
             }
 
             throw new XtoolsHttpException(
-                'User has made too many edits! Maximum '.$user->maxEdits(),
-                $this->generateUrl($this->tooHighEditCountAction, $this->params),
+                $this->i18n->msg('too-many-edits', [ $user->maxEdits() ]),
+                $this->generateUrl($this->tooHighEditCountRoute(), $this->params),
                 $originalParams,
                 $this->isApi
             );
@@ -516,10 +562,7 @@ abstract class XtoolsController extends Controller
      */
     public function validatePage(string $pageTitle): Page
     {
-        $page = new Page($this->project, $pageTitle);
-        $pageRepo = new PageRepository();
-        $pageRepo->setContainer($this->container);
-        $page->setRepository($pageRepo);
+        $page = new Page($this->pageRepo, $this->project, $pageTitle);
 
         if (!$page->exists()) {
             $this->throwXtoolsException(
@@ -539,7 +582,7 @@ abstract class XtoolsController extends Controller
      * @param string $message i18n key of error message. Shown in API responses.
      *   If no message with this key exists, $message is shown as-is.
      * @param array $messageParams
-     * @param string $invalidParam This will be removed from $this->params. Omit if you don't want this to happen.
+     * @param string|null $invalidParam This will be removed from $this->params. Omit if you don't want this to happen.
      * @throws XtoolsHttpException
      */
     public function throwXtoolsException(
@@ -571,25 +614,6 @@ abstract class XtoolsController extends Controller
             $originalParams,
             $this->isApi
         );
-    }
-
-    /**
-     * Get the first error message stored in the session's FlashBag.
-     * @return string
-     */
-    public function getFlashMessage(): string
-    {
-        $key = $this->get('session')->getFlashBag()->get('danger')[0];
-        $param = null;
-
-        if (is_array($key)) {
-            [$key, $param] = $key;
-        }
-
-        return $this->render('message.twig', [
-            'key' => $key,
-            'params' => [$param],
-        ])->getContent();
     }
 
     /******************
@@ -670,9 +694,9 @@ abstract class XtoolsController extends Controller
     }
 
     /**
-     * Get Unix timestamps from given start and end string parameters. This also makes $start $maxDays before
+     * Get Unix timestamps from given start and end string parameters. This also makes $start $maxDays() before
      * $end if not present, and makes $end the current time if not present.
-     * The date range will not exceed $this->maxDays days, if this public class property is set.
+     * The date range will not exceed $this->maxDays() days, if this public class property is set.
      * @param int|string|false $start Unix timestamp or string accepted by strtotime.
      * @param int|string|false $end Unix timestamp or string accepted by strtotime.
      * @return int[] Start and end date as UTC timestamps.
@@ -693,14 +717,14 @@ abstract class XtoolsController extends Controller
             $today
         );
 
-        // Default to $this->defaultDays or $this->maxDays before end time if start is not present.
-        $daysOffset = $this->defaultDays ?? $this->maxDays;
-        if (false === $startTime && is_int($daysOffset)) {
+        // Default to $this->defaultDays() or $this->maxDays() before end time if start is not present.
+        $daysOffset = $this->defaultDays() ?? $this->maxDays();
+        if (false === $startTime && $daysOffset) {
             $startTime = strtotime("-$daysOffset days", $endTime);
         }
 
-        // Default to $this->defaultDays or $this->maxDays after start time if end is not present.
-        if (false === $end && is_int($daysOffset)) {
+        // Default to $this->defaultDays() or $this->maxDays() after start time if end is not present.
+        if (false === $end && $daysOffset) {
             $endTime = min(
                 strtotime("+$daysOffset days", $startTime),
                 $today
@@ -714,14 +738,14 @@ abstract class XtoolsController extends Controller
             $endTime = $newEndTime;
         }
 
-        // Finally, don't let the date range exceed $this->maxDays.
+        // Finally, don't let the date range exceed $this->maxDays().
         $startObj = DateTime::createFromFormat('U', (string)$startTime);
         $endObj = DateTime::createFromFormat('U', (string)$endTime);
-        if (is_int($this->maxDays) && $startObj->diff($endObj)->days > $this->maxDays) {
+        if ($this->maxDays() && $startObj->diff($endObj)->days > $this->maxDays()) {
             // Show warnings that the date range was truncated.
-            $this->addFlashMessage('warning', 'date-range-too-wide', [$this->maxDays]);
+            $this->addFlashMessage('warning', 'date-range-too-wide', [$this->maxDays()]);
 
-            $startTime = strtotime("-$this->maxDays days", $endTime);
+            $startTime = strtotime('-' . $this->maxDays() . ' days', $endTime);
         }
 
         return [$startTime, $endTime];
@@ -759,11 +783,11 @@ abstract class XtoolsController extends Controller
             // so we must remove leading periods and trailing .org's.
             $params['project'] = rtrim(ltrim($params['wiki'], '.'), '.org').'.org';
 
-            /** @var string[] $languagelessProjects Projects for which there is no specific language association. */
-            $languagelessProjects = $this->container->getParameter('app.multilingual_wikis');
+            /** @var string[] $multilingualProjects Projects for which there is no specific language association. */
+            $multilingualProjects = $this->getParameter('app.multilingual_wikis');
 
             // Prepend language if applicable.
-            if (isset($params['lang']) && !in_array($params['wiki'], $languagelessProjects)) {
+            if (isset($params['lang']) && !in_array($params['wiki'], $multilingualProjects)) {
                 $params['project'] = $params['lang'].'.'.$params['project'];
             }
 
@@ -798,7 +822,7 @@ abstract class XtoolsController extends Controller
         $ret = array_merge([
             'project' => $this->project,
             'user' => $this->user,
-            'page' => $this->page,
+            'page' => $this->page ?? null,
             'namespace' => $this->namespace,
             'start' => $this->start,
             'end' => $this->end,

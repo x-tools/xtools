@@ -1,45 +1,47 @@
 <?php
-/**
- * This file contains only the TopEdits class.
- */
 
 declare(strict_types = 1);
 
 namespace App\Model;
 
 use App\Helper\AutomatedEditsHelper;
+use App\Repository\TopEditsRepository;
 
 /**
  * TopEdits returns the top-edited pages by a user.
  */
 class TopEdits extends Model
 {
+    protected AutomatedEditsHelper $autoEditsHelper;
+
     /** @var string[]|Edit[] Top edits, either to a page or across namespaces. */
-    protected $topEdits = [];
+    protected array $topEdits = [];
 
     /** @var int Number of bytes added across all top edits. */
-    protected $totalAdded = 0;
+    protected int $totalAdded = 0;
 
     /** @var int Number of bytes removed across all top edits. */
-    protected $totalRemoved = 0;
+    protected int $totalRemoved = 0;
 
     /** @var int Number of top edits marked as minor. */
-    protected $totalMinor = 0;
+    protected int $totalMinor = 0;
 
     /** @var int Number of automated top edits. */
-    protected $totalAutomated = 0;
+    protected int $totalAutomated = 0;
 
     /** @var int Number of reverted top edits. */
-    protected $totalReverted = 0;
+    protected int $totalReverted = 0;
 
     /** @var int Which page of results to show. */
-    protected $pagination = 0;
+    protected int $pagination = 0;
 
     private const DEFAULT_LIMIT_SINGLE_NAMESPACE = 1000;
     private const DEFAULT_LIMIT_ALL_NAMESPACES = 20;
 
     /**
      * TopEdits constructor.
+     * @param TopEditsRepository $repository
+     * @param AutomatedEditsHelper $autoEditsHelper
      * @param Project $project
      * @param User $user
      * @param Page|null $page
@@ -51,6 +53,8 @@ class TopEdits extends Model
      * @param int $pagination Which page of results to show.
      */
     public function __construct(
+        TopEditsRepository $repository,
+        AutomatedEditsHelper $autoEditsHelper,
         Project $project,
         User $user,
         ?Page $page = null,
@@ -60,6 +64,8 @@ class TopEdits extends Model
         ?int $limit = null,
         int $pagination = 0
     ) {
+        $this->repository = $repository;
+        $this->autoEditsHelper = $autoEditsHelper;
         $this->project = $project;
         $this->user = $user;
         $this->page = $page;
@@ -196,7 +202,7 @@ class TopEdits extends Model
     private function getTopEditsNamespace(bool $format): array
     {
         if ('all' === $this->namespace) {
-            $pages = $this->getRepository()->getTopEditsAllNamespaces(
+            $pages = $this->repository->getTopEditsAllNamespaces(
                 $this->project,
                 $this->user,
                 $this->start,
@@ -204,7 +210,7 @@ class TopEdits extends Model
                 $this->limit
             );
         } else {
-            $pages = $this->getRepository()->getTopEditsNamespace(
+            $pages = $this->repository->getTopEditsNamespace(
                 $this->project,
                 $this->user,
                 $this->namespace,
@@ -232,7 +238,7 @@ class TopEdits extends Model
             return null;
         }
 
-        return (int)$this->getRepository()->countEditsNamespace(
+        return (int)$this->repository->countEditsNamespace(
             $this->project,
             $this->user,
             $this->namespace,
@@ -249,7 +255,7 @@ class TopEdits extends Model
      */
     private function getTopEditsPage(bool $format = true): array
     {
-        $revs = $this->getRepository()->getTopEditsPage(
+        $revs = $this->repository->getTopEditsPage(
             $this->page,
             $this->user,
             $this->start,
@@ -273,21 +279,14 @@ class TopEdits extends Model
     {
         $edits = [];
 
-        /** @var AutomatedEditsHelper $aeh */
-        $aeh = $this->getRepository()
-            ->getContainer()
-            ->get('app.automated_edits_helper');
-
         foreach ($revs as $revision) {
             // Check if the edit was reverted based on the edit summary of the following edit.
             // If so, update $revision so that when an Edit is instantiated, it will have the 'reverted' option set.
-            if ($aeh->isRevert($revision['parent_comment'], $this->project)) {
+            if ($this->autoEditsHelper->isRevert($revision['parent_comment'], $this->project)) {
                 $revision['reverted'] = 1;
             }
 
-            $edit = $this->getEditAndIncrementCounts($revision);
-
-            $edits[] = $edit;
+            $edits[] = $this->getEditAndIncrementCounts($revision);
         }
 
         return $edits;
@@ -301,9 +300,9 @@ class TopEdits extends Model
      */
     private function getEditAndIncrementCounts(array $revision): Edit
     {
-        $edit = new Edit($this->page, $revision);
+        $edit = $this->repository->getEdit($this->page, $revision);
 
-        if ($edit->isAutomated($this->getRepository()->getContainer())) {
+        if ($edit->isAutomated()) {
             $this->totalAutomated++;
         }
 

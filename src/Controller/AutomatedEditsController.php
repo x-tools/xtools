@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the AutomatedEditsController class.
- */
 
 declare(strict_types=1);
 
@@ -10,7 +7,13 @@ namespace App\Controller;
 use App\Helper\I18nHelper;
 use App\Model\AutoEdits;
 use App\Repository\AutoEditsRepository;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use App\Repository\EditRepository;
+use App\Repository\PageRepository;
+use App\Repository\ProjectRepository;
+use App\Repository\UserRepository;
+use GuzzleHttp\Client;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -22,16 +25,16 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class AutomatedEditsController extends XtoolsController
 {
-    /** @var AutoEdits The AutoEdits instance. */
-    protected $autoEdits;
+    protected AutoEdits $autoEdits;
+    protected AutoEditsRepository $autoEditsRepo;
+    protected EditRepository $editRepo;
+    protected PageRepository $pageRepo;
 
     /** @var array Data that is passed to the view. */
-    private $output;
+    private array $output;
 
     /**
-     * Get the name of the tool's index route.
-     * This is also the name of the associated model.
-     * @return string
+     * @inheritDoc
      * @codeCoverageIgnore
      */
     public function getIndexRoute(): string
@@ -39,19 +42,33 @@ class AutomatedEditsController extends XtoolsController
         return 'AutoEdits';
     }
 
-    /**
-     * AutomatedEditsController constructor.
-     * @param RequestStack $requestStack
-     * @param ContainerInterface $container
-     * @param I18nHelper $i18n
-     */
-    public function __construct(RequestStack $requestStack, ContainerInterface $container, I18nHelper $i18n)
-    {
-        // This will cause the tool to redirect back to the index page, with an error,
-        // if the user has too high of an edit count.
-        $this->tooHighEditCountAction = $this->getIndexRoute();
+    public function __construct(
+        RequestStack $requestStack,
+        ContainerInterface $container,
+        CacheItemPoolInterface $cache,
+        Client $guzzle,
+        I18nHelper $i18n,
+        ProjectRepository $projectRepo,
+        UserRepository $userRepo,
+        PageRepository $pageRepo,
+        AutoEditsRepository $autoEditsRepo,
+        EditRepository $editRepo
+    ) {
+        $this->autoEditsRepo = $autoEditsRepo;
+        $this->editRepo = $editRepo;
+        $this->pageRepo = $pageRepo;
+        parent::__construct($requestStack, $container, $cache, $guzzle, $i18n, $projectRepo, $userRepo, $pageRepo);
+    }
 
-        parent::__construct($requestStack, $container, $i18n);
+    /**
+     * This causes the tool to redirect back to the index page, with an error,
+     * if the user has too high of an edit count.
+     * @inheritDoc
+     * @codeCoverageIgnore
+     */
+    public function tooHighEditCountRoute(): string
+    {
+        return $this->getIndexRoute();
     }
 
     /**
@@ -110,11 +127,9 @@ class AutomatedEditsController extends XtoolsController
             $this->addFlashMessage('danger', 'auto-edits-logged-out');
             $useSandbox = false;
         }
+        $this->autoEditsRepo->setUseSandbox($useSandbox);
 
-        $autoEditsRepo = new AutoEditsRepository($useSandbox);
-        $autoEditsRepo->setContainer($this->container);
-
-        $misconfigured = $autoEditsRepo->getInvalidTools($this->project);
+        $misconfigured = $this->autoEditsRepo->getInvalidTools($this->project);
         $helpLink = "https://w.wiki/ppr";
         foreach ($misconfigured as $tool) {
             $this->addFlashMessage('warning', 'auto-edits-misconfiguration', [$tool, $helpLink]);
@@ -123,7 +138,7 @@ class AutomatedEditsController extends XtoolsController
         // Validate tool.
         // FIXME: instead of redirecting to index page, show result page listing all tools for that project,
         //  clickable to show edits by the user, etc.
-        if ($tool && !isset($autoEditsRepo->getTools($this->project)[$tool])) {
+        if ($tool && !isset($this->autoEditsRepo->getTools($this->project)[$tool])) {
             $this->throwXtoolsException(
                 $this->getIndexRoute(),
                 'auto-edits-unknown-tool',
@@ -133,6 +148,10 @@ class AutomatedEditsController extends XtoolsController
         }
 
         $this->autoEdits = new AutoEdits(
+            $this->autoEditsRepo,
+            $this->editRepo,
+            $this->pageRepo,
+            $this->userRepo,
             $this->project,
             $this->user,
             $this->namespace,
@@ -142,7 +161,6 @@ class AutomatedEditsController extends XtoolsController
             $this->offset,
             $this->limit
         );
-        $this->autoEdits->setRepository($autoEditsRepo);
 
         $this->output = [
             'xtPage' => 'AutoEdits',
@@ -240,9 +258,7 @@ class AutomatedEditsController extends XtoolsController
     public function automatedToolsApiAction(): JsonResponse
     {
         $this->recordApiUsage('user/automated_tools');
-
-        $aeh = $this->container->get('app.automated_edits_helper');
-        return $this->getFormattedApiResponse($aeh->getTools($this->project));
+        return $this->getFormattedApiResponse($this->autoEditsRepo->getTools($this->project));
     }
 
     /**

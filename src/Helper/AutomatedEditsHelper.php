@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the AutomatedEditsHelper class.
- */
 
 declare(strict_types = 1);
 
@@ -45,9 +42,9 @@ class AutomatedEditsHelper
      * This only works for tools defined with regular expressions, not tags.
      * @param string $summary Edit summary
      * @param Project $project
-     * @return string[]|false Tool entry including key for 'name', or false if nothing was found
+     * @return string[]|null Tool entry including key for 'name', or false if nothing was found
      */
-    public function getTool(string $summary, Project $project)
+    public function getTool(string $summary, Project $project): ?array
     {
         foreach ($this->getTools($project) as $tool => $values) {
             if (isset($values['regex']) && preg_match('/'.$values['regex'].'/', $summary)) {
@@ -57,7 +54,7 @@ class AutomatedEditsHelper
             }
         }
 
-        return false;
+        return null;
     }
 
     /**

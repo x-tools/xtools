@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the AdminScoreController class.
- */
 
 declare(strict_types=1);
 
@@ -18,8 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class AdminScoreController extends XtoolsController
 {
     /**
-     * Get the name of the tool's index route.
-     * @return string
+     * @inheritDoc
      * @codeCoverageIgnore
      */
     public function getIndexRoute(): string
@@ -53,15 +49,13 @@ class AdminScoreController extends XtoolsController
     /**
      * Display the AdminScore results.
      * @Route("/adminscore/{project}/{username}", name="AdminScoreResult")
+     * @param AdminScoreRepository $adminScoreRepo
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction(): Response
+    public function resultAction(AdminScoreRepository $adminScoreRepo): Response
     {
-        $adminScoreRepo = new AdminScoreRepository();
-        $adminScoreRepo->setContainer($this->container);
-        $adminScore = new AdminScore($this->project, $this->user);
-        $adminScore->setRepository($adminScoreRepo);
+        $adminScore = new AdminScore($adminScoreRepo, $this->project, $this->user);
 
         return $this->getFormattedResponse('adminscore/result', [
             'xtPage' => 'AdminScore',

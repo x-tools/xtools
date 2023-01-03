@@ -1,11 +1,17 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace App\Repository;
 
+use App\Helper\AutomatedEditsHelper;
 use App\Model\Edit;
 use App\Model\Page;
 use App\Model\Project;
+use GuzzleHttp\Client;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * An EditRepository fetches data about a single revision.
@@ -13,15 +19,57 @@ use App\Model\Project;
  */
 class EditRepository extends Repository
 {
+    protected AutomatedEditsHelper $autoEditsHelper;
+    protected PageRepository $pageRepo;
+
+    /**
+     * @param ContainerInterface $container
+     * @param CacheItemPoolInterface $cache
+     * @param Client $guzzle
+     * @param LoggerInterface $logger
+     * @param bool $isWMF
+     * @param int $queryTimeout
+     * @param AutomatedEditsHelper $autoEditsHelper
+     * @param PageRepository $pageRepo
+     */
+    public function __construct(
+        ContainerInterface $container,
+        CacheItemPoolInterface $cache,
+        Client $guzzle,
+        LoggerInterface $logger,
+        bool $isWMF,
+        int $queryTimeout,
+        AutomatedEditsHelper $autoEditsHelper,
+        PageRepository $pageRepo
+    ) {
+        $this->autoEditsHelper = $autoEditsHelper;
+        $this->pageRepo = $pageRepo;
+        parent::__construct($container, $cache, $guzzle, $logger, $isWMF, $queryTimeout);
+    }
+
+    /**
+     * @return AutomatedEditsHelper
+     */
+    public function getAutoEditsHelper(): AutomatedEditsHelper
+    {
+        return $this->autoEditsHelper;
+    }
+
     /**
      * Get an Edit instance given the revision ID. This does NOT set the associated User or Page.
+     * @param UserRepository $userRepo
      * @param Project $project
      * @param int $revId
      * @param Page|null $page Provide if you already know the Page, so as to point to the same instance.
+     *   This should already have the PageRepository set.
      * @return Edit|null Null if not found.
      */
-    public function getEditFromRevIdForPage(Project $project, int $revId, ?Page $page = null): ?Edit
-    {
+    public function getEditFromRevIdForPage(
+        UserRepository $userRepo,
+        Project $project,
+        int $revId,
+        ?Page $page = null
+    ): ?Edit {
         $revisionTable = $project->getTableName('revision', '');
         $commentTable = $project->getTableName('comment', 'revision');
         $actorTable = $project->getTableName('actor', 'revision');
@@ -58,13 +106,10 @@ class EditRepository extends Repository
 
         // Create the Page instance.
         if (null === $page) {
-            $page = new Page($project, $result['page_title']);
+            $page = new Page($this->pageRepo, $project, $result['page_title']);
         }
 
-        $edit = new Edit($page, $result);
-        $edit->setRepository($this);
-
-        return $edit;
+        return new Edit($this, $userRepo, $page, $result);
     }
 
     /**

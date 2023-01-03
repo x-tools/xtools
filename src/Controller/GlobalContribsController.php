@@ -1,46 +1,40 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace App\Controller;
 
-use App\Helper\I18nHelper;
 use App\Model\Edit;
 use App\Model\GlobalContribs;
+use App\Repository\EditRepository;
 use App\Repository\GlobalContribsRepository;
-use App\Repository\ProjectRepository;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * This controller serves the search form and results for the Global Contributions tool.
- * @codeCoverageIgnore
  */
 class GlobalContribsController extends XtoolsController
 {
-    /**
-     * Used to override properties set in XtoolsController.
-     * @param RequestStack $requestStack
-     * @param ContainerInterface $container
-     * @param I18nHelper $i18n
-     */
-    public function __construct(RequestStack $requestStack, ContainerInterface $container, I18nHelper $i18n)
-    {
-        // GlobalContribs can be very slow, especially for wide IP ranges.
-        $this->maxLimit = 500;
-        parent::__construct($requestStack, $container, $i18n);
-    }
 
     /**
-     * Get the name of the tool's index route. This is also the name of the associated model.
-     * @return string
+     * @inheritDoc
      * @codeCoverageIgnore
      */
     public function getIndexRoute(): string
     {
         return 'GlobalContribs';
+    }
+
+    /**
+     * GlobalContribs can be very slow, especially for wide IP ranges, so limit to max 500 results.
+     * @inheritDoc
+     * @codeCoverageIgnore
+     */
+    public function maxLimit(): int
+    {
+        return 500;
     }
 
     /**
@@ -59,12 +53,9 @@ class GlobalContribsController extends XtoolsController
         }
 
         // FIXME: Nasty hack until T226072 is resolved.
-        $project = ProjectRepository::getProject($this->i18n->getLang().'.wikipedia', $this->container);
+        $project = $this->projectRepo->getProject($this->i18n->getLang().'.wikipedia');
         if (!$project->exists()) {
-            $project = ProjectRepository::getProject(
-                $this->container->getParameter('central_auth_project'),
-                $this->container
-            );
+            $project = $this->projectRepo->getProject($this->getParameter('central_auth_project'));
         }
 
         return $this->render('globalContribs/index.html.twig', array_merge([
@@ -78,6 +69,30 @@ class GlobalContribsController extends XtoolsController
             'start' => '',
             'end' => '',
         ], $this->params));
+    }
+
+    /**
+     * @param GlobalContribsRepository $globalContribsRepo
+     * @param EditRepository $editRepo
+     * @return GlobalContribs
+     * @codeCoverageIgnore
+     */
+    public function getGlobalContribs(
+        GlobalContribsRepository $globalContribsRepo,
+        EditRepository $editRepo
+    ): GlobalContribs {
+        return new GlobalContribs(
+            $globalContribsRepo,
+            $this->pageRepo,
+            $this->userRepo,
+            $editRepo,
+            $this->user,
+            $this->namespace,
+            $this->start,
+            $this->end,
+            $this->offset,
+            $this->limit
+        );
     }
 
     /**
@@ -121,27 +136,15 @@ class GlobalContribsController extends XtoolsController
      *         "offset"=false,
      *     }
      * ),
+     * @param GlobalContribsRepository $globalContribsRepo
+     * @param EditRepository $editRepo
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultsAction(): Response
+    public function resultsAction(GlobalContribsRepository $globalContribsRepo, EditRepository $editRepo): Response
     {
-        $globalContribsRepo = new GlobalContribsRepository();
-        $globalContribsRepo->setContainer($this->container);
-        $globalContribs = new GlobalContribs(
-            $this->user,
-            $this->namespace,
-            $this->start,
-            $this->end,
-            $this->offset,
-            $this->limit
-        );
-        $globalContribs->setRepository($globalContribsRepo);
-        $defaultProject = ProjectRepository::getProject(
-            $this->container->getParameter('central_auth_project'),
-            $this->container
-        );
-        $defaultProject->getRepository()->setContainer($this->container);
+        $globalContribs = $this->getGlobalContribs($globalContribsRepo, $editRepo);
+        $defaultProject = $this->projectRepo->getProject($this->getParameter('central_auth_project'));
 
         return $this->render('globalContribs/result.html.twig', [
             'xtTitle' => $this->user->getUsername(),
@@ -175,21 +178,19 @@ class GlobalContribsController extends XtoolsController
      *         "limit"=50,
      *     },
      * )
+     * @param GlobalContribsRepository $globalContribsRepo
+     * @param EditRepository $editRepo
      * @return JsonResponse
+     * @codeCoverageIgnore
      */
-    public function resultsApiAction(): JsonResponse
-    {
+    public function resultsApiAction(
+        GlobalContribsRepository $globalContribsRepo,
+        EditRepository $editRepo
+    ): JsonResponse {
         $this->recordApiUsage('user/globalcontribs');
 
-        $globalContribsRepo = new GlobalContribsRepository();
-        $globalContribsRepo->setContainer($this->container);
-        $globalContribs = new GlobalContribs($this->user, $this->namespace, $this->start, $this->end, $this->offset);
-        $globalContribs->setRepository($globalContribsRepo);
-        $defaultProject = ProjectRepository::getProject(
-            $this->container->getParameter('central_auth_project'),
-            $this->container
-        );
-        $defaultProject->getRepository()->setContainer($this->container);
+        $globalContribs = $this->getGlobalContribs($globalContribsRepo, $editRepo);
+        $defaultProject = $this->projectRepo->getProject($this->getParameter('central_auth_project'));
         $this->project = $defaultProject;
 
         $results = $globalContribs->globalEdits();

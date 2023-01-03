@@ -1,12 +1,13 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace App\Model;
 
+use App\Helper\AutomatedEditsHelper;
+use App\Helper\I18nHelper;
 use App\Repository\ArticleInfoRepository;
 use DateTime;
-use Doctrine\DBAL\Driver\ResultStatement;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
@@ -19,47 +20,54 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
  */
 class ArticleInfoApi extends Model
 {
-    /** @var ContainerInterface The application's DI container. */
-    protected $container;
+    protected AutomatedEditsHelper $autoEditsHelper;
+    protected I18nHelper $i18n;
 
     /** @var int Number of revisions that belong to the page. */
-    protected $numRevisions;
+    protected int $numRevisions;
 
-    /** @var int Maximum number of revisions to process, as configured. */
-    protected $maxRevisions;
-
-    /** @var mixed[] Prose stats, with keys 'characters', 'words', 'references', 'unique_references', 'sections'. */
-    protected $proseStats;
+    /** @var array Prose stats, with keys 'characters', 'words', 'references', 'unique_references', 'sections'. */
+    protected array $proseStats;
 
     /** @var array Number of categories, templates and files on the page. */
-    protected $transclusionData;
+    protected array $transclusionData;
 
-    /** @var mixed[] Various statistics about bots that edited the page. */
-    protected $bots;
+    /** @var array Various statistics about bots that edited the page. */
+    protected array $bots;
 
     /** @var int Number of edits made to the page by bots. */
-    protected $botRevisionCount;
+    protected int $botRevisionCount;
 
     /** @var int[] Number of in and outgoing links and redirects to the page. */
-    protected $linksAndRedirects;
+    protected array $linksAndRedirects;
 
     /** @var string[] Assessments of the page (see Page::getAssessments). */
-    protected $assessments;
+    protected array $assessments;
 
     /** @var string[] List of Wikidata and Checkwiki errors. */
-    protected $bugs;
+    protected array $bugs;
 
     /**
      * ArticleInfoApi constructor.
+     * @param ArticleInfoRepository $repository
+     * @param I18nHelper $i18n
+     * @param AutomatedEditsHelper $autoEditsHelper
      * @param Page $page The page to process.
-     * @param ContainerInterface $container The DI container.
      * @param false|int $start Start date as Unix timestmap.
      * @param false|int $end End date as Unix timestamp.
      */
-    public function __construct(Page $page, ContainerInterface $container, $start = false, $end = false)
-    {
+    public function __construct(
+        ArticleInfoRepository $repository,
+        I18nHelper $i18n,
+        AutomatedEditsHelper $autoEditsHelper,
+        Page $page,
+        $start = false,
+        $end = false
+    ) {
+        $this->repository = $repository;
+        $this->i18n = $i18n;
+        $this->autoEditsHelper = $autoEditsHelper;
         $this->page = $page;
-        $this->container = $container;
         $this->start = $start;
         $this->end = $end;
     }
@@ -82,19 +90,8 @@ class ArticleInfoApi extends Model
      */
     public function tooManyRevisions(): bool
     {
-        return $this->getMaxRevisions() > 0 && $this->getNumRevisions() > $this->getMaxRevisions();
-    }
-
-    /**
-     * Get the maximum number of revisions that we should process.
-     * @return int
-     */
-    public function getMaxRevisions(): int
-    {
-        if (!isset($this->maxRevisions)) {
-            $this->maxRevisions = (int) $this->container->getParameter('app.max_page_revisions');
-        }
-        return $this->maxRevisions;
+        return $this->repository->getMaxPageRevisions() > 0 &&
+            $this->getNumRevisions() > $this->repository->getMaxPageRevisions();
     }
 
     /**
@@ -106,7 +103,7 @@ class ArticleInfoApi extends Model
      */
     public function getBasicEditingInfo()
     {
-        return $this->getRepository()->getBasicEditingInfo($this->page);
+        return $this->repository->getBasicEditingInfo($this->page);
     }
 
     /**
@@ -123,7 +120,7 @@ class ArticleInfoApi extends Model
             return $topEditors;
         }
 
-        $rows = $this->getRepository()->getTopEditorsByEditCount(
+        $rows = $this->repository->getTopEditorsByEditCount(
             $this->page,
             $this->start,
             $this->end,
@@ -212,13 +209,13 @@ class ArticleInfoApi extends Model
 
     /**
      * Get the page assessments of the page.
-     * @see https://www.mediawiki.org/wiki/Extension:PageAssessments
-     * @return string[]|false False if unsupported.
+     * @see https://www.mediawiki.org/wiki/Special:MyLanguage/Extension:PageAssessments
+     * @return string[]|null null if unsupported.
      * @codeCoverageIgnore
      */
-    public function getAssessments()
+    public function getAssessments(): ?array
     {
-        if (!is_array($this->assessments)) {
+        if (!isset($this->assessments)) {
             $this->assessments = $this->page
                 ->getProject()
                 ->getPageAssessments()
@@ -234,7 +231,7 @@ class ArticleInfoApi extends Model
      */
     public function getBugs(): array
     {
-        if (!is_array($this->bugs)) {
+        if (!isset($this->bugs)) {
             $this->bugs = $this->page->getErrors();
         }
         return $this->bugs;
@@ -258,7 +255,7 @@ class ArticleInfoApi extends Model
      */
     public function getArticleInfoApiData(Project $project, Page $page): array
     {
-        /** @var int $pageviewsOffset Number of days to query for pageviews */
+        /** Number of days to query for pageviews */
         $pageviewsOffset = 30;
 
         $data = [
@@ -269,12 +266,10 @@ class ArticleInfoApi extends Model
             'pageviews_offset' => $pageviewsOffset,
         ];
 
-        $info = false;
+        $info = null;
 
         try {
-            $articleInfoRepo = new ArticleInfoRepository();
-            $articleInfoRepo->setContainer($this->container);
-            $info = $articleInfoRepo->getBasicEditingInfo($page);
+            $info = $this->repository->getBasicEditingInfo($page);
         } catch (ServiceUnavailableHttpException $e) {
             // No more open database connections.
             $data['error'] = 'Unable to fetch revision data. Please try again later.';
@@ -286,7 +281,7 @@ class ArticleInfoApi extends Model
             $data['error'] = 'Unable to fetch revision data. The query may have timed out.';
         }
 
-        if (false !== $info) {
+        if ($info) {
             $creationDateTime = DateTime::createFromFormat('YmdHis', $info['created_at']);
             $modifiedDateTime = DateTime::createFromFormat('YmdHis', $info['modified_at']);
             $secsSinceLastEdit = (new DateTime)->getTimestamp() - $modifiedDateTime->getTimestamp();
@@ -363,7 +358,7 @@ class ArticleInfoApi extends Model
      */
     private function getLinksAndRedirects(): array
     {
-        if (!is_array($this->linksAndRedirects)) {
+        if (!isset($this->linksAndRedirects)) {
             $this->linksAndRedirects = $this->page->countLinksAndRedirects();
         }
         return $this->linksAndRedirects;
@@ -375,9 +370,8 @@ class ArticleInfoApi extends Model
      */
     public function getTransclusionData(): array
     {
-        if (!is_array($this->transclusionData)) {
-            $this->transclusionData = $this->getRepository()
-                ->getTransclusionData($this->page);
+        if (!isset($this->transclusionData)) {
+            $this->transclusionData = $this->repository->getTransclusionData($this->page);
         }
         return $this->transclusionData;
     }
@@ -413,7 +407,7 @@ class ArticleInfoApi extends Model
 
     /**
      * Number of edits made to the page by current or former bots.
-     * @param string[] $bots Used only in unit tests, where we supply mock data for the bots that will get processed.
+     * @param string[][] $bots Used only in unit tests, where we supply mock data for the bots that will get processed.
      * @return int
      */
     public function getBotRevisionCount(?array $bots = null): int
@@ -439,7 +433,7 @@ class ArticleInfoApi extends Model
     /**
      * Get and set $this->bots about bots that edited the page. This is done separately from the main query because
      * we use this information when computing the top 10 editors in ArticleInfo, where we don't want to include bots.
-     * @return mixed[]
+     * @return array
      */
     public function getBots(): array
     {
@@ -450,10 +444,9 @@ class ArticleInfoApi extends Model
         // Parse the bot edits.
         $this->bots = [];
 
-        $limit = $this->tooManyRevisions() ? $this->getMaxRevisions() : null;
+        $limit = $this->tooManyRevisions() ? $this->repository->getMaxPageRevisions() : null;
 
-        /** @var ResultStatement $botData */
-        $botData = $this->getRepository()->getBotData($this->page, $this->start, $this->end, $limit);
+        $botData = $this->repository->getBotData($this->page, $this->start, $this->end, $limit);
         while ($bot = $botData->fetchAssociative()) {
             $this->bots[$bot['username']] = [
                 'count' => (int)$bot['count'],

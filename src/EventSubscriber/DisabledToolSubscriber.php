@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the DisabledToolSubscriber class.
- */
 
 declare(strict_types = 1);
 
@@ -21,8 +18,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class DisabledToolSubscriber implements EventSubscriberInterface
 {
 
-    /** @var ContainerInterface The DI container. */
-    protected $container;
+    protected ContainerInterface $container;
 
     /**
      * Save the container for later use.

@@ -244,7 +244,7 @@
 
 {% macro pageviewsLink(page, label = null, params = null) %}{% apply spaceless %}
     {% from _self import extLink as extLink %}
-    {% set url = 'https://pageviews.toolforge.org/?project=' ~ page.project.domain ~ '&pages=' ~ page.title|e('url') %}
+    {% set url = 'https://pageviews.wmcloud.org/?project=' ~ page.project.domain ~ '&pages=' ~ page.title|e('url') %}
     {% if params is not empty %}
         {% set url = url ~ '&' ~ buildQuery(params) %}
     {% endif %}
@@ -255,13 +255,13 @@
     {% from _self import extLink as extLink %}
     {% set queryString = params is not empty ? '&' ~ buildQuery(params) : '' %}
     {{ extLink(
-        'https://pageviews.toolforge.org/?project=' ~ page.project.domain ~ '&pages=' ~ page.title|e('url') ~ queryString,
+        'https://pageviews.wmcloud.org/?project=' ~ page.project.domain ~ '&pages=' ~ page.title|e('url') ~ queryString,
         msg('pageviews')
     )}} ({{ extLink(
-        'https://langviews.toolforge.org/?project=' ~ page.project.domain ~ '&page=' ~ page.title|e('url') ~ queryString,
+        'https://pageviews.wmcloud.org/langviews?project=' ~ page.project.domain ~ '&page=' ~ page.title|e('url') ~ queryString,
         msg('all-languages')
     )}} &middot; {{ extLink(
-        'https://redirectviews.toolforge.org/?project=' ~ page.project.domain ~ '&page=' ~ page.title|e('url') ~ queryString,
+        'https://pageviews.wmcloud.org/redirectviews?project=' ~ page.project.domain ~ '&page=' ~ page.title|e('url') ~ queryString,
         msg('redirects')
     )}})
 {% endapply %}{% endmacro %}
@@ -286,9 +286,9 @@
             &middot;
             {{ wiki.gucLink(user.usernameIdent) }}
         {% endif %}
-        {% if isWMFLabs() and not(user.anon) %}
+        {% if isWMF() and not(user.anon) %}
             &middot;
-            {% set url = 'https://pageviews.toolforge.org/?project=' ~ project.domain ~ '&pages=User:' ~ user.username|e('url') %}
+            {% set url = 'https://pageviews.wmcloud.org/?project=' ~ project.domain ~ '&pages=User:' ~ user.username|e('url') %}
             {{ wiki.extLink(url, msg('pageviews-userpage')) }}
         {% endif %}
     </p>
@@ -300,7 +300,7 @@
         {{ wiki.pageHistLink(page) }}
         &middot;
         {{ wiki.pageLogLink(page) }}
-        {% if isWMFLabs() %}
+        {% if isWMF() %}
             &middot;
             {{ wiki.pageviewsLinks(page, pageviewsDateParams) }}
             {% if page.wikidataId is defined %}
@@ -315,7 +315,7 @@
     {% import _self as wiki %}
     <div class="xt-error-alert alert alert-info">
         {% set loginLink = '<strong>' ~ wiki.extLink(login_url(app.request), msg('not-opted-in-login')) ~ '</strong>' %}
-        <p>{{ msg('not-opted-in', [ '<strong>' ~ wiki.pageLinkRaw(project.userOptInPage(user), project) ~ '</strong>', '<strong>' ~ wiki.extLink('https://www.mediawiki.org/wiki/XTools/Edit_Counter#restricted_stats', msg('not-opted-in-link')) ~ '</strong>', loginLink ]) }}</p>
+        <p>{{ msg('not-opted-in', [ '<strong>' ~ wiki.pageLinkRaw(project.userOptInPage(user), project) ~ '</strong>', '<strong>' ~ wiki.extLink('https://www.mediawiki.org/wiki/Special:MyLanguage/XTools/Edit_Counter#restricted_stats', msg('not-opted-in-link')) ~ '</strong>', loginLink ]) }}</p>
     </div>
 {% endmacro %}
 

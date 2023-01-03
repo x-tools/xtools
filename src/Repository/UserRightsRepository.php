@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the UserRightsRepository class.
- */
 
 declare(strict_types = 1);
 
@@ -28,7 +25,7 @@ class UserRightsRepository extends Repository
     {
         $changes = $this->queryRightsChanges($project, $user);
 
-        if ((bool)$this->container->hasParameter('app.is_labs')) {
+        if ((bool)$this->container->hasParameter('app.is_wmf')) {
             $changes = array_merge(
                 $changes,
                 $this->queryRightsChanges($project, $user, 'meta')
@@ -161,7 +158,7 @@ class UserRightsRepository extends Repository
 
         $groups = $this->executeProjectsQuery($project, $sql)->fetchFirstColumn();
 
-        if ($this->isLabs()) {
+        if ($this->isWMF) {
             $sql = "SELECT DISTINCT(gug_group) FROM centralauth_p.global_user_groups";
             $groups = array_merge(
                 $groups,
@@ -182,7 +179,7 @@ class UserRightsRepository extends Repository
      */
     public function getAutoconfirmedAgeAndCount(Project $project): ?array
     {
-        if (!$this->isLabs()) {
+        if (!$this->isWMF) {
             return null;
         }
 
@@ -206,8 +203,8 @@ class UserRightsRepository extends Repository
             // Edge-case: 'wikidata' is an alias.
             $dbname = 'wikidatawiki|wikidata';
         }
-        $dbNameRegex = "/\'$dbname\'\s*\=\>\s*([\d\*\s]+)/s";
-        $defaultRegex = "/\'default\'\s*\=\>\s*([\d\*\s]+)/s";
+        $dbNameRegex = "/'$dbname'\s*=>\s*([\d*\s]+)/s";
+        $defaultRegex = "/'default'\s*=>\s*([\d*\s]+)/s";
         $out = [];
 
         foreach (['wgAutoConfirmAge', 'wgAutoConfirmCount'] as $type) {

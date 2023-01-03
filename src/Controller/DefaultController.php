@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the DefaultController class.
- */
 
 declare(strict_types=1);
 
@@ -19,7 +16,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -28,11 +24,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class DefaultController extends XtoolsController
 {
     /** @var Client The Oauth HTTP client. */
-    protected $oauthClient;
+    protected Client $oauthClient;
 
     /**
      * Required to be defined by XtoolsController, though here it is unused.
-     * @return string
+     * @inheritDoc
      * @codeCoverageIgnore
      */
     public function getIndexRoute(): string
@@ -54,47 +50,21 @@ class DefaultController extends XtoolsController
     }
 
     /**
-     * Display some configuration details, when in development mode.
-     * @Route("/config", name="configPage")
-     * @return Response
-     * @codeCoverageIgnore
-     */
-    public function configAction(): Response
-    {
-
-        if ('dev' !== $this->container->getParameter('kernel.environment')) {
-            throw new NotFoundHttpException();
-        }
-
-        $params = $this->container->getParameterBag()->all();
-
-        foreach (array_keys($params) as $key) {
-            if (false !== strpos($key, 'password')) {
-                $params[$key] = '<REDACTED>';
-            }
-        }
-
-        // replace this example code with whatever you need
-        return $this->render('default/config.html.twig', [
-            'xtTitle' => 'Config',
-            'xtPageTitle' => 'Config',
-            'xtPage' => 'index',
-            'dump' => print_r($params, true),
-        ]);
-    }
-
-    /**
      * Redirect to the default project (or Meta) for Oauth authentication.
      * @Route("/login", name="login")
      * @param Request $request
      * @param SessionInterface $session
+     * @param ProjectRepository $projectRepo
      * @return RedirectResponse
      * @throws Exception If initialization fails.
      */
-    public function loginAction(Request $request, SessionInterface $session): RedirectResponse
-    {
+    public function loginAction(
+        Request $request,
+        SessionInterface $session,
+        ProjectRepository $projectRepo
+    ): RedirectResponse {
         try {
-            [ $next, $token ] = $this->getOauthClient($request)->initiate();
+            [ $next, $token ] = $this->getOauthClient($request, $projectRepo)->initiate();
         } catch (Exception $oauthException) {
             throw $oauthException;
             // @TODO Make this work.
@@ -113,17 +83,21 @@ class DefaultController extends XtoolsController
      * @Route("/oauthredirector.php", name="old_oauth_callback")
      * @param Request $request The HTTP request.
      * @param SessionInterface $session
+     * @param ProjectRepository $projectRepo
      * @return RedirectResponse
      */
-    public function oauthCallbackAction(Request $request, SessionInterface $session): RedirectResponse
-    {
+    public function oauthCallbackAction(
+        Request $request,
+        SessionInterface $session,
+        ProjectRepository $projectRepo
+    ): RedirectResponse {
         // Give up if the required GET params don't exist.
         if (!$request->get('oauth_verifier')) {
             throw $this->createNotFoundException('No OAuth verifier given.');
         }
 
         // Complete authentication.
-        $client = $this->getOauthClient();
+        $client = $this->getOauthClient($request, $projectRepo);
         $token = $session->get('oauth_request_token');
 
         if (!is_a($token, Token::class)) {
@@ -157,18 +131,18 @@ class DefaultController extends XtoolsController
     /**
      * Get an OAuth client, configured to the default project.
      * (This shouldn't really be in this class, but oh well.)
-     * @param Request|null $request
+     * @param Request $request
+     * @param ProjectRepository $projectRepo
      * @return Client
      * @codeCoverageIgnore
      */
-    protected function getOauthClient(?Request $request = null): Client
+    protected function getOauthClient(Request $request, ProjectRepository $projectRepo): Client
     {
-        if ($this->oauthClient instanceof Client) {
+        if (isset($this->oauthClient)) {
             return $this->oauthClient;
         }
-        $defaultProject = ProjectRepository::getProject(
-            $this->getParameter('central_auth_project'),
-            $this->container
+        $defaultProject = $projectRepo->getProject(
+            $this->getParameter('central_auth_project')
         );
         $endpoint = $defaultProject->getUrl(false)
                     . $defaultProject->getScript()
@@ -180,7 +154,7 @@ class DefaultController extends XtoolsController
         $this->oauthClient = new Client($conf);
 
         // Set the callback URL if given. Used to redirect back to target page after logging in.
-        if ($request && $request->query->get('callback')) {
+        if ($request->query->get('callback')) {
             $this->oauthClient->setCallback($request->query->get('callback'));
         }
 
@@ -190,11 +164,12 @@ class DefaultController extends XtoolsController
     /**
      * Log out the user and return to the homepage.
      * @Route("/logout", name="logout")
+     * @param SessionInterface $session
      * @return RedirectResponse
      */
-    public function logoutAction(): RedirectResponse
+    public function logoutAction(SessionInterface $session): RedirectResponse
     {
-        $this->get('session')->invalidate();
+        $session->invalidate();
         return $this->redirectToRoute('homepage');
     }
 
@@ -257,8 +232,8 @@ class DefaultController extends XtoolsController
         $response->setEncodingOptions(JSON_NUMERIC_CHECK);
         $response->setStatusCode(Response::HTTP_OK);
         $response->setData([
-            'projects' => array_keys($this->container->getParameter('assessments')),
-            'config' => $this->container->getParameter('assessments'),
+            'projects' => array_keys($this->getParameter('assessments')),
+            'config' => $this->getParameter('assessments'),
         ]);
 
         return $response;

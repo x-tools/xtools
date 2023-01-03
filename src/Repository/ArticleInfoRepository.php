@@ -1,14 +1,16 @@
 <?php
-/**
- * This file contains only the ArticleInfoRepository class.
- */
 
 declare(strict_types = 1);
 
 namespace App\Repository;
 
+use App\Model\Edit;
 use App\Model\Page;
 use Doctrine\DBAL\Driver\ResultStatement;
+use GuzzleHttp\Client;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * ArticleInfoRepository is responsible for retrieving data about a single
@@ -17,6 +19,59 @@ use Doctrine\DBAL\Driver\ResultStatement;
  */
 class ArticleInfoRepository extends Repository
 {
+    protected EditRepository $editRepo;
+    protected UserRepository $userRepo;
+
+    /** @var int Maximum number of revisions to process, as configured via app.max_page_revisions */
+    protected int $maxPageRevisions;
+
+    /**
+     * @param ContainerInterface $container
+     * @param CacheItemPoolInterface $cache
+     * @param Client $guzzle
+     * @param LoggerInterface $logger
+     * @param bool $isWMF
+     * @param int $queryTimeout
+     * @param EditRepository $editRepo
+     */
+    public function __construct(
+        ContainerInterface $container,
+        CacheItemPoolInterface $cache,
+        Client $guzzle,
+        LoggerInterface $logger,
+        bool $isWMF,
+        int $queryTimeout,
+        EditRepository $editRepo,
+        UserRepository $userRepo
+    ) {
+        $this->editRepo = $editRepo;
+        $this->userRepo = $userRepo;
+        parent::__construct($container, $cache, $guzzle, $logger, $isWMF, $queryTimeout);
+    }
+
+    /**
+     * Get the performance maximum on the number of revisions to process.
+     * @return int
+     */
+    public function getMaxPageRevisions(): int
+    {
+        if (!isset($this->maxPageRevisions)) {
+            $this->maxPageRevisions = (int)$this->container->getParameter('app.max_page_revisions');
+        }
+        return $this->maxPageRevisions;
+    }
+
+    /**
+     * Factory to instantiate a new Edit for the given revision.
+     * @param Page $page
+     * @param array $revision
+     * @return Edit
+     */
+    public function getEdit(Page $page, array $revision): Edit
+    {
+        return new Edit($this->editRepo, $this->userRepo, $page, $revision);
+    }
+
     /**
      * Get the number of edits made to the page by bots or former bots.
      * @param Page $page

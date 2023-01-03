@@ -1,14 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Helper\I18nHelper;
 use App\Model\Authorship;
 use App\Model\Blame;
 use App\Repository\BlameRepository;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -19,8 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class BlameController extends XtoolsController
 {
     /**
-     * Get the name of the tool's index route. This is also the name of the associated model.
-     * @return string
+     * @inheritDoc
      * @codeCoverageIgnore
      */
     public function getIndexRoute(): string
@@ -29,17 +26,12 @@ class BlameController extends XtoolsController
     }
 
     /**
-     * BlameController constructor.
-     * @param RequestStack $requestStack
-     * @param ContainerInterface $container
-     * @param I18nHelper $i18n
+     * @inheritDoc
+     * @codeCoverageIgnore
      */
-    public function __construct(RequestStack $requestStack, ContainerInterface $container, I18nHelper $i18n)
+    public function supportedProjects(): array
     {
-        // Ensures the requested project is validated against Authorship::SUPPORTED_PROJECTS, and not any valid project.
-        $this->supportedProjects = Authorship::SUPPORTED_PROJECTS;
-
-        parent::__construct($requestStack, $container, $i18n);
+        return Authorship::SUPPORTED_PROJECTS;
     }
 
     /**
@@ -68,7 +60,6 @@ class BlameController extends XtoolsController
             'xtPage' => 'Blame',
             'xtPageTitle' => 'tool-blame',
             'xtSubtitle' => 'tool-blame-desc',
-            'project' => $this->project,
 
             // Defaults that will get overridden if in $params.
             'page' => '',
@@ -91,9 +82,10 @@ class BlameController extends XtoolsController
      *     defaults={"target"="latest"}
      * )
      * @param string $target
+     * @param BlameRepository $blameRepo
      * @return Response
      */
-    public function resultAction(string $target): Response
+    public function resultAction(string $target, BlameRepository $blameRepo): Response
     {
         if (!isset($this->params['q'])) {
             return $this->redirectToRoute('BlameProject', [
@@ -110,9 +102,7 @@ class BlameController extends XtoolsController
         // This action sometimes requires more memory. 256M should be safe.
         ini_set('memory_limit', '256M');
 
-        $blameRepo = new BlameRepository();
-        $blameRepo->setContainer($this->container);
-        $blame = new Blame($this->page, $this->params['q'], $target);
+        $blame = new Blame($blameRepo, $this->page, $this->params['q'], $target);
         $blame->setRepository($blameRepo);
         $blame->prepareData();
 

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace App\Tests\Model;
@@ -6,15 +7,21 @@ namespace App\Tests\Model;
 use App\Model\GlobalContribs;
 use App\Model\Project;
 use App\Model\User;
+use App\Repository\EditRepository;
 use App\Repository\GlobalContribsRepository;
+use App\Repository\PageRepository;
 use App\Repository\ProjectRepository;
+use App\Repository\UserRepository;
 use App\Tests\TestAdapter;
 use PHPUnit\Framework\MockObject\MockObject;
 
+/**
+ * @covers \App\Model\GlobalContribs
+ */
 class GlobalContribsTest extends TestAdapter
 {
-    /** @var GlobalContribsRepository Repository for Global Contribs tool. */
-    protected $globalContribsRepo;
+    protected GlobalContribs $globalContribs;
+    protected GlobalContribsRepository $globalContribsRepo;
 
     /**
      * Set up shared mocks and class instances.
@@ -22,6 +29,14 @@ class GlobalContribsTest extends TestAdapter
     public function setUp(): void
     {
         $this->globalContribsRepo = $this->createMock(GlobalContribsRepository::class);
+        $userRepo = $this->createMock(UserRepository::class);
+        $this->globalContribs = new GlobalContribs(
+            $this->globalContribsRepo,
+            $this->createMock(PageRepository::class),
+            $userRepo,
+            $this->createMock(EditRepository::class),
+            new User($userRepo, 'Test user')
+        );
     }
 
     /**
@@ -29,9 +44,6 @@ class GlobalContribsTest extends TestAdapter
      */
     public function testGlobalEditCounts(): void
     {
-        $user = new User('Test user');
-        $globalContribs = new GlobalContribs($user);
-        $globalContribs->setRepository($this->globalContribsRepo);
         $wiki1 = new Project('wiki1');
         $wiki2 = new Project('wiki2');
         $editCounts = [
@@ -52,14 +64,14 @@ class GlobalContribsTest extends TestAdapter
                 ['project' => $wiki1, 'total' => 50],
                 ['project' => $wiki2, 'total' => 40],
             ],
-            $globalContribs->globalEditCountsTopN(2)
+            $this->globalContribs->globalEditCountsTopN(2)
         );
 
         // And the bottom 4.
-        static::assertEquals(95, $globalContribs->globalEditCountWithoutTopN(2));
+        static::assertEquals(95, $this->globalContribs->globalEditCountWithoutTopN(2));
 
         // Grand total.
-        static::assertEquals(185, $globalContribs->globalEditCount());
+        static::assertEquals(185, $this->globalContribs->globalEditCount());
     }
 
     /**
@@ -67,10 +79,6 @@ class GlobalContribsTest extends TestAdapter
      */
     public function testGlobalEdits(): void
     {
-        $user = new User('Test user');
-        $globalContribs = new GlobalContribs($user);
-        $globalContribs->setRepository($this->globalContribsRepo);
-
         /** @var ProjectRepository|MockObject $wiki1Repo */
         $wiki1Repo = $this->createMock(ProjectRepository::class);
         $wiki1Repo->expects(static::once())
@@ -110,7 +118,7 @@ class GlobalContribsTest extends TestAdapter
             ->method('getRevisions')
             ->willReturn($contribs);
 
-        $edits = $globalContribs->globalEdits();
+        $edits = $this->globalContribs->globalEdits();
 
         static::assertCount(1, $edits);
         static::assertEquals('My user page', $edits['1514764800-1']->getComment());

@@ -1,54 +1,56 @@
 <?php
-/**
- * This file contains only the Edit class.
- */
 
 declare(strict_types = 1);
 
 namespace App\Model;
 
+use App\Repository\EditRepository;
+use App\Repository\PageRepository;
+use App\Repository\UserRepository;
 use DateTime;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * An Edit is a single edit to a page on one project.
  */
 class Edit extends Model
 {
+    protected UserRepository $userRepo;
+
     /** @var int ID of the revision */
-    protected $id;
+    protected int $id;
 
     /** @var DateTime Timestamp of the revision */
-    protected $timestamp;
+    protected DateTime $timestamp;
 
     /** @var bool Whether or not this edit was a minor edit */
-    protected $minor;
+    protected bool $minor;
 
-    /** @var int|string|null Length of the page as of this edit, in bytes */
-    protected $length;
+    /** @var int|null Length of the page as of this edit, in bytes */
+    protected ?int $length;
 
-    /** @var int|string|null The diff size of this edit */
-    protected $lengthChange;
-
-    /** @var User - User object of who made the edit */
-    protected $user;
+    /** @var int|null The diff size of this edit */
+    protected ?int $lengthChange;
 
     /** @var string The edit summary */
-    protected $comment;
+    protected string $comment;
 
     /** @var string The SHA-1 of the wikitext as of the revision. */
-    protected $sha;
+    protected string $sha;
 
-    /** @var bool Whether this edit was later reverted. */
-    protected $reverted;
+    /** @var bool|null Whether this edit was later reverted. */
+    protected ?bool $reverted;
 
     /**
      * Edit constructor.
+     * @param EditRepository $repository
+     * @param UserRepository $userRepo
      * @param Page $page
      * @param string[] $attrs Attributes, as retrieved by PageRepository::getRevisions()
      */
-    public function __construct(Page $page, array $attrs = [])
+    public function __construct(EditRepository $repository, UserRepository $userRepo, Page $page, array $attrs = [])
     {
+        $this->repository = $repository;
+        $this->userRepo = $userRepo;
         $this->page = $page;
 
         // Copy over supported attributes
@@ -61,10 +63,11 @@ class Edit extends Model
             $this->timestamp = DateTime::createFromFormat('YmdHis', $attrs['timestamp']);
         }
 
+        $this->user = $attrs['user'] ?? ($attrs['username'] ? new User($this->userRepo, $attrs['username']) : null);
+
         $this->minor = '1' === $attrs['minor'];
-        $this->length = (int)$attrs['length'];
-        $this->lengthChange = (int)$attrs['length_change'];
-        $this->user = $attrs['user'] ?? ($attrs['username'] ? new User($attrs['username']) : null);
+        $this->length = isset($attrs['length']) ? (int)$attrs['length'] : null;
+        $this->lengthChange = isset($attrs['length_change']) ? (int)$attrs['length_change'] : null;
         $this->comment = $attrs['comment'];
 
         if (isset($attrs['rev_sha1']) || isset($attrs['sha'])) {
@@ -73,25 +76,34 @@ class Edit extends Model
 
         // This can be passed in to save as a property on the Edit instance.
         // Note that the Edit class knows nothing about it's value, and
-        // is not capable of detecting whether the given edit was reverted.
+        // is not capable of detecting whether the given edit was actually reverted.
         $this->reverted = isset($attrs['reverted']) ? (bool)$attrs['reverted'] : null;
     }
 
     /**
      * Get Edits given revision rows (JOINed on the page table).
+     * @param PageRepository $pageRepo
+     * @param EditRepository $editRepo
+     * @param UserRepository $userRepo
      * @param Project $project
      * @param User $user
      * @param array $revs Each must contain 'page_title' and 'page_namespace'.
      * @return Edit[]
      */
-    public static function getEditsFromRevs(Project $project, User $user, array $revs): array
-    {
-        return array_map(function ($rev) use ($project, $user) {
-            /** @var Page $page Page object to be passed to the Edit constructor. */
-            $page = Page::newFromRow($project, $rev);
+    public static function getEditsFromRevs(
+        PageRepository $pageRepo,
+        EditRepository $editRepo,
+        UserRepository $userRepo,
+        Project $project,
+        User $user,
+        array $revs
+    ): array {
+        return array_map(function ($rev) use ($pageRepo, $editRepo, $userRepo, $project, $user) {
+            /** Page object to be passed to the Edit constructor. */
+            $page = Page::newFromRow($pageRepo, $project, $rev);
             $rev['user'] = $user;
 
-            return new self($page, $rev);
+            return new self($editRepo, $userRepo, $page, $rev);
         }, $revs);
     }
 
@@ -253,11 +265,11 @@ class Edit extends Model
 
     /**
      * Set the reverted property.
-     * @param bool $revert
+     * @param bool $reverted
      */
-    public function setReverted(bool $revert): void
+    public function setReverted(bool $reverted): void
     {
-        $this->reverted = $revert;
+        $this->reverted = $reverted;
     }
 
     /**
@@ -347,7 +359,7 @@ class Edit extends Model
     }
 
     /**
-     * Get edit summary as 'wikified' HTML markup (alias of Edit::getWikifiedSummary()).
+     * Get edit summary as 'wikified' HTML markup (alias of Edit::getWikifiedComment()).
      * @return string
      */
     public function getWikifiedSummary(): string
@@ -388,34 +400,29 @@ class Edit extends Model
 
     /**
      * Was the edit a revert, based on the edit summary?
-     * @param ContainerInterface $container The DI container.
      * @return bool
      */
-    public function isRevert(ContainerInterface $container): bool
+    public function isRevert(): bool
     {
-        $automatedEditsHelper = $container->get('app.automated_edits_helper');
-        return $automatedEditsHelper->isRevert($this->comment, $this->getProject());
+        return $this->repository->getAutoEditsHelper()->isRevert($this->comment, $this->getProject());
     }
 
     /**
      * Get the name of the tool that was used to make this edit.
-     * @param ContainerInterface $container The DI container.
-     * @return array|false The name of the tool that was used to make the edit
+     * @return array|null The name of the tool(s) that was used to make the edit.
      */
-    public function getTool(ContainerInterface $container)
+    public function getTool(): ?array
     {
-        $automatedEditsHelper = $container->get('app.automated_edits_helper');
-        return $automatedEditsHelper->getTool((string)$this->comment, $this->getProject());
+        return $this->repository->getAutoEditsHelper()->getTool($this->comment, $this->getProject());
     }
 
     /**
      * Was the edit (semi-)automated, based on the edit summary?
-     * @param ContainerInterface $container
      * @return bool
      */
-    public function isAutomated(ContainerInterface $container): bool
+    public function isAutomated(): bool
     {
-        return (bool)$this->getTool($container);
+        return (bool)$this->getTool();
     }
 
     /**
@@ -433,12 +440,13 @@ class Edit extends Model
      */
     public function getDiffHtml(): ?string
     {
-        return $this->getRepository()->getDiffHtml($this);
+        return $this->repository->getDiffHtml($this);
     }
 
     /**
      * Formats the data as an array for use in JSON APIs.
      * @param bool $includeUsername False for most tools such as Global Contribs, AutoEdits, etc.
+     * @param bool $includeProject
      * @return array
      * @internal This method assumes the Edit was constructed with data already filled in from a database query.
      */
