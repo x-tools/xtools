@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the PagesTest class.
- */
 
 declare(strict_types = 1);
 
@@ -13,24 +10,20 @@ use App\Model\Project;
 use App\Model\User;
 use App\Repository\PagesRepository;
 use App\Repository\ProjectRepository;
+use App\Repository\UserRepository;
 use App\Tests\TestAdapter;
 
 /**
  * Tests of the Pages class.
+ * @covers \App\Model\Pages
  */
 class PagesTest extends TestAdapter
 {
-    /** @var Project The project instance. */
-    protected $project;
-
-    /** @var ProjectRepository The project repo instance. */
-    protected $projectRepo;
-
-    /** @var User The user instance. */
-    protected $user;
-
-    /** @var PagesRepository The user repo instance. */
-    protected $pagesRepo;
+    protected Project $project;
+    protected ProjectRepository $projectRepo;
+    protected User $user;
+    protected UserRepository $userRepo;
+    protected PagesRepository $pagesRepo;
 
     /**
      * Set up class instances and mocks.
@@ -47,8 +40,9 @@ class PagesTest extends TestAdapter
         $this->projectRepo = $this->createMock(ProjectRepository::class);
         $this->projectRepo->method('getMetadata')
             ->willReturn(['namespaces' => [0 => 'Main', 3 => 'User_talk']]);
+        $this->userRepo = $this->createMock(UserRepository::class);
         $this->project->setRepository($this->projectRepo);
-        $this->user = new User('Test user');
+        $this->user = new User($this->userRepo, 'Test user');
         $this->pagesRepo = $this->createMock(PagesRepository::class);
     }
 
@@ -57,7 +51,7 @@ class PagesTest extends TestAdapter
      */
     public function testConstructor(): void
     {
-        $pages = new Pages($this->project, $this->user);
+        $pages = new Pages($this->pagesRepo, $this->project, $this->user);
         static::assertEquals(0, $pages->getNamespace());
         static::assertEquals($this->project, $pages->getProject());
         static::assertEquals($this->user, $pages->getUser());
@@ -68,7 +62,7 @@ class PagesTest extends TestAdapter
     public function testResults(): void
     {
         $this->setPagesResults();
-        $pages = new Pages($this->project, $this->user, 0, 'both');
+        $pages = new Pages($this->pagesRepo, $this->project, $this->user, 0, 'both');
         $pages->setRepository($this->pagesRepo);
         $pages->prepareData();
         static::assertEquals(3, $pages->getNumResults());

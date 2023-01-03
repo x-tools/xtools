@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the EditCounterRepository class.
- */
 
 declare(strict_types = 1);
 
@@ -9,6 +6,10 @@ namespace App\Repository;
 
 use App\Model\Project;
 use App\Model\User;
+use GuzzleHttp\Client;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use Wikimedia\IPUtils;
 
 /**
@@ -16,8 +17,40 @@ use Wikimedia\IPUtils;
  * databases and API. It doesn't do any post-processing of that information.
  * @codeCoverageIgnore
  */
-class EditCounterRepository extends UserRightsRepository
+class EditCounterRepository extends Repository
 {
+    protected AutoEditsRepository $autoEditsRepo;
+    protected ProjectRepository $projectRepo;
+    protected UserRightsRepository $userRightsRepo;
+
+    /**
+     * @param ContainerInterface $container
+     * @param CacheItemPoolInterface $cache
+     * @param Client $guzzle
+     * @param LoggerInterface $logger
+     * @param ProjectRepository $projectRepo
+     * @param UserRightsRepository $userRightsRepo
+     * @param AutoEditsRepository $autoEditsRepo
+     * @param bool $isWMF
+     * @param int $queryTimeout
+     */
+    public function __construct(
+        ContainerInterface $container,
+        CacheItemPoolInterface $cache,
+        Client $guzzle,
+        LoggerInterface $logger,
+        ProjectRepository $projectRepo,
+        UserRightsRepository $userRightsRepo,
+        AutoEditsRepository $autoEditsRepo,
+        bool $isWMF,
+        int $queryTimeout
+    ) {
+        $this->projectRepo = $projectRepo;
+        $this->userRightsRepo = $userRightsRepo;
+        $this->autoEditsRepo = $autoEditsRepo;
+        parent::__construct($container, $cache, $guzzle, $logger, $isWMF, $queryTimeout);
+    }
+
     /**
      * Get data about revisions, pages, etc.
      * @param Project $project The project.
@@ -218,7 +251,7 @@ class EditCounterRepository extends UserRightsRepository
             'actorId' => $user->getActorId($project),
         ])->fetchAllAssociative();
 
-        if ($this->isLabs() && 'commons.wikimedia.org' !== $project->getDomain()) {
+        if ($this->isWMF && 'commons.wikimedia.org' !== $project->getDomain()) {
             $results = array_merge($results, $this->getFileCountsCommons($user));
         }
 
@@ -242,7 +275,7 @@ class EditCounterRepository extends UserRightsRepository
      */
     protected function getFileCountsCommons(User $user): array
     {
-        $commonsProject = ProjectRepository::getProject('commonswiki', $this->container);
+        $commonsProject = $this->projectRepo->getProject('commonswiki', $this->container);
         $loggingTableCommons = $commonsProject->getTableName('logging');
         $sql = "(SELECT 'files_moved_commons' AS `key`, COUNT(log_id) AS `val`
                  FROM $loggingTableCommons
@@ -472,7 +505,7 @@ class EditCounterRepository extends UserRightsRepository
      * Get data for the timecard chart, with totals grouped by day and to the nearest two-hours.
      * @param Project $project
      * @param User $user
-     * @return string[]
+     * @return string[][]
      */
     public function getTimeCard(Project $project, User $user): array
     {
@@ -563,11 +596,10 @@ class EditCounterRepository extends UserRightsRepository
      * @param Project $project
      * @param User $user
      * @return int Result of query, see below.
+     * @deprecated Inject AutoEditsRepository and call the countAutomatedEdits directly.
      */
     public function countAutomatedEdits(Project $project, User $user): int
     {
-        $autoEditsRepo = new AutoEditsRepository();
-        $autoEditsRepo->setContainer($this->container);
-        return $autoEditsRepo->countAutomatedEdits($project, $user);
+        return $this->autoEditsRepo->countAutomatedEdits($project, $user);
     }
 }

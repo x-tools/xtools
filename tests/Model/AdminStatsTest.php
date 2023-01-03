@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the AdminStatsTest class.
- */
 
 declare(strict_types = 1);
 
@@ -15,17 +12,13 @@ use App\Tests\TestAdapter;
 
 /**
  * Tests of the AdminStats class.
+ * @covers \App\Model\AdminStats
  */
 class AdminStatsTest extends TestAdapter
 {
-    /** @var Project The project instance. */
-    protected $project;
-
-    /** @var ProjectRepository The project repo instance. */
-    protected $projectRepo;
-
-    /** @var AdminStatsRepository The AdminStats repo instance. */
-    protected $asRepo;
+    protected AdminStatsRepository $asRepo;
+    protected Project $project;
+    protected ProjectRepository $projectRepo;
 
     /**
      * Set up container, class instances and mocks.
@@ -55,15 +48,14 @@ class AdminStatsTest extends TestAdapter
         $startUTC = strtotime('2017-01-01');
         $endUTC = strtotime('2017-03-01');
 
-        // Single namespace, with defaults.
-        $as = new AdminStats($this->project, $startUTC, $endUTC, 'admin', []);
-
         $this->asRepo->expects(static::once())
             ->method('getStats')
             ->willReturn($this->adminStatsFactory());
         $this->asRepo->method('getRelevantUserGroup')
             ->willReturn('sysop');
-        $as->setRepository($this->asRepo);
+
+        // Single namespace, with defaults.
+        $as = new AdminStats($this->asRepo, $this->project, $startUTC, $endUTC, 'admin', []);
 
         $as->prepareStats();
 
@@ -79,7 +71,7 @@ class AdminStatsTest extends TestAdapter
      */
     public function testAdminsAndGroups(): void
     {
-        $as = new AdminStats($this->project, 0, 0, 'admin', []);
+        $as = new AdminStats($this->asRepo, $this->project, 0, 0, 'admin', []);
         $this->asRepo->expects($this->exactly(0))
             ->method('getStats')
             ->willReturn($this->adminStatsFactory());
@@ -99,7 +91,7 @@ class AdminStatsTest extends TestAdapter
      */
     public function testStats(): void
     {
-        $as = new AdminStats($this->project, 0, 0, 'admin', []);
+        $as = new AdminStats($this->asRepo, $this->project, 0, 0, 'admin', []);
         $this->asRepo->expects($this->once())
             ->method('getStats')
             ->willReturn($this->adminStatsFactory());

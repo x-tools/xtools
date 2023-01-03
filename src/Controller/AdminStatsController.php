@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains the code that powers the AdminStats page of XTools.
- */
 
 declare(strict_types=1);
 
@@ -11,11 +8,8 @@ use App\Helper\I18nHelper;
 use App\Model\AdminStats;
 use App\Model\Project;
 use App\Repository\AdminStatsRepository;
-use App\Repository\ProjectRepository;
 use App\Repository\UserRightsRepository;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -24,16 +18,14 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class AdminStatsController extends XtoolsController
 {
-    /** @var AdminStats The admin stats instance that does all the work. */
-    protected $adminStats;
+    protected AdminStats $adminStats;
 
     public const DEFAULT_DAYS = 31;
     public const MAX_DAYS_UI = 365;
     public const MAX_DAYS_API = 31;
 
     /**
-     * Get the name of the tool's index route. This is also the name of the associated model.
-     * @return string
+     * @inheritDoc
      * @codeCoverageIgnore
      */
     public function getIndexRoute(): string
@@ -42,19 +34,22 @@ class AdminStatsController extends XtoolsController
     }
 
     /**
-     * AdminStatsController constructor.
-     * @param RequestStack $requestStack
-     * @param ContainerInterface $container
-     * @param I18nHelper $i18n
+     * Set the max length for the date range. Value is smaller for API requests.
+     * @inheritDoc
+     * @codeCoverageIgnore
      */
-    public function __construct(RequestStack $requestStack, ContainerInterface $container, I18nHelper $i18n)
+    public function maxDays(): ?int
     {
-        // Set the max length for the date range. Value is smaller for API requests.
-        $isApi = '/api/' === substr($requestStack->getCurrentRequest()->getPathInfo(), 0, 5);
-        $this->maxDays = $isApi ? self::MAX_DAYS_API : self::MAX_DAYS_UI;
-        $this->defaultDays = self::DEFAULT_DAYS;
+        return $this->isApi ? self::MAX_DAYS_API : self::MAX_DAYS_UI;
+    }
 
-        parent::__construct($requestStack, $container, $i18n);
+    /**
+     * @inheritDoc
+     * @codeCoverageIgnore
+     */
+    public function defaultDays(): ?int
+    {
+        return self::DEFAULT_DAYS;
     }
 
     /**
@@ -75,9 +70,10 @@ class AdminStatsController extends XtoolsController
      *     requirements={"group"="admin|patroller|steward"},
      *     defaults={"group"="steward"}
      * )
+     * @param AdminStatsRepository $adminStatsRepo
      * @return Response
      */
-    public function indexAction(): Response
+    public function indexAction(AdminStatsRepository $adminStatsRepo): Response
     {
         $this->getAndSetRequestedActions();
 
@@ -89,8 +85,6 @@ class AdminStatsController extends XtoolsController
             return $this->redirect($url);
         }
 
-        $adminStatsRepo = new AdminStatsRepository();
-        $adminStatsRepo->setContainer($this->container);
         $actionsConfig = $adminStatsRepo->getConfig($this->project);
         $group = $this->params['group'];
         $xtPage = lcfirst($group).'Stats';
@@ -123,9 +117,9 @@ class AdminStatsController extends XtoolsController
     {
         if ('meta.wikimedia.org' !== $this->project->getDomain() &&
             'steward' === $group &&
-            $this->getParameter('app.is_labs')
+            $this->getParameter('app.is_wmf')
         ) {
-            $this->project = ProjectRepository::getProject('meta.wikimedia.org', $this->container);
+            $this->project = $this->projectRepo->getProject('meta.wikimedia.org');
         }
 
         return $this->project;
@@ -171,29 +165,28 @@ class AdminStatsController extends XtoolsController
      */
     private function getActionNames(string $group): array
     {
-        $actionsConfig = $this->container->getParameter('admin_stats');
+        $actionsConfig = $this->getParameter('admin_stats');
         return array_keys($actionsConfig[$group]['actions']);
     }
 
     /**
      * Every action in this controller (other than 'index') calls this first.
+     * @param AdminStatsRepository $adminStatsRepo
      * @return AdminStats
      * @codeCoverageIgnore
      */
-    public function setUpAdminStats(): AdminStats
+    public function setUpAdminStats(AdminStatsRepository $adminStatsRepo): AdminStats
     {
-        $adminStatsRepo = new AdminStatsRepository();
-        $adminStatsRepo->setContainer($this->container);
         $group = $this->params['group'] ?? 'admin';
 
         $this->adminStats = new AdminStats(
+            $adminStatsRepo,
             $this->normalizeProject($group),
             (int)$this->start,
             (int)$this->end,
             $group ?? 'admin',
             $this->getAndSetRequestedActions()
         );
-        $this->adminStats->setRepository($adminStatsRepo);
 
         // For testing purposes.
         return $this->adminStats;
@@ -206,20 +199,23 @@ class AdminStatsController extends XtoolsController
      *     requirements={"start"="|\d{4}-\d{2}-\d{2}", "end"="|\d{4}-\d{2}-\d{2}", "group"="admin|patroller|steward"},
      *     defaults={"start"=false, "end"=false, "group"="admin"}
      * )
+     * @param AdminStatsRepository $adminStatsRepo
+     * @param UserRightsRepository $userRightsRepo
      * @param I18nHelper $i18n
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction(I18nHelper $i18n): Response
-    {
-        $this->setUpAdminStats();
+    public function resultAction(
+        AdminStatsRepository $adminStatsRepo,
+        UserRightsRepository $userRightsRepo,
+        I18nHelper $i18n
+    ): Response {
+        $this->setUpAdminStats($adminStatsRepo);
 
         $this->adminStats->prepareStats();
 
         // For the HTML view, we want the localized name of the user groups.
         // These are in the 'title' attribute of the icons for each user group.
-        $userRightsRepo = new UserRightsRepository();
-        $userRightsRepo->setContainer($this->container);
         $rightsNames = $userRightsRepo->getRightsNames($this->project, $i18n->getLang());
 
         return $this->getFormattedResponse('adminStats/result', [
@@ -237,14 +233,15 @@ class AdminStatsController extends XtoolsController
      * keyed by user name with a list of the relevant user groups as the values.
      * @Route("/api/project/admins_groups/{project}", name="ProjectApiAdminsGroups")
      * @Route("/api/project/users_groups/{project}/{group}")
+     * @param AdminStatsRepository $adminStatsRepo
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function adminsGroupsApiAction(): JsonResponse
+    public function adminsGroupsApiAction(AdminStatsRepository $adminStatsRepo): JsonResponse
     {
         $this->recordApiUsage('project/admins_groups');
 
-        $this->setUpAdminStats();
+        $this->setUpAdminStats($adminStatsRepo);
 
         unset($this->params['actions']);
         unset($this->params['start']);
@@ -263,14 +260,15 @@ class AdminStatsController extends XtoolsController
      *     requirements={"start"="|\d{4}-\d{2}-\d{2}", "end"="|\d{4}-\d{2}-\d{2}", "group"="admin|patroller|steward"},
      *     defaults={"start"=false, "end"=false, "group"="admin"}
      * )
+     * @param AdminStatsRepository $adminStatsRepo
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function adminStatsApiAction(): JsonResponse
+    public function adminStatsApiAction(AdminStatsRepository $adminStatsRepo): JsonResponse
     {
         $this->recordApiUsage('project/adminstats');
 
-        $this->setUpAdminStats();
+        $this->setUpAdminStats($adminStatsRepo);
         $this->adminStats->prepareStats();
 
         return $this->getFormattedApiResponse([

@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the QuoteController class.
- */
 
 declare(strict_types=1);
 
@@ -25,8 +22,7 @@ class QuoteController extends XtoolsController
 {
 
     /**
-     * Get the name of the tool's index route.
-     * @return string
+     * @inheritDoc
      * @codeCoverageIgnore
      */
     public function getIndexRoute(): string
@@ -165,7 +161,7 @@ class QuoteController extends XtoolsController
         $this->validateIsEnabled();
 
         $this->recordApiUsage('quote/random');
-        $quotes = $this->container->getParameter('quotes');
+        $quotes = $this->getParameter('quotes');
         $id = array_rand($quotes);
 
         return new JsonResponse(
@@ -185,7 +181,7 @@ class QuoteController extends XtoolsController
         $this->validateIsEnabled();
 
         $this->recordApiUsage('quote/all');
-        $quotes = $this->container->getParameter('quotes');
+        $quotes = $this->getParameter('quotes');
         $numberedQuotes = [];
 
         // Number the quotes, since they somehow have significance.
@@ -200,15 +196,15 @@ class QuoteController extends XtoolsController
      * Get the quote with the given ID.
      * @Route("/api/quote/{id}", name="QuoteApiQuote", requirements={"id"="\d+"})
      * @param int $id
-     * @return Response|string
+     * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function singleQuotesApiAction(int $id)
+    public function singleQuotesApiAction(int $id): JsonResponse
     {
         $this->validateIsEnabled();
 
         $this->recordApiUsage('quote/id');
-        $quotes = $this->container->getParameter('quotes');
+        $quotes = $this->getParameter('quotes');
 
         if (!isset($quotes[$id])) {
             return new JsonResponse(
@@ -235,8 +231,8 @@ class QuoteController extends XtoolsController
      */
     private function validateIsEnabled(): void
     {
-        $isLabs = $this->container->getParameter('app.is_labs');
-        if (!$isLabs && !$this->container->getParameter('enable.Quote')) {
+        $isLabs = $this->getParameter('app.is_wmf');
+        if (!$isLabs && !$this->getParameter('enable.Quote')) {
             throw $this->createNotFoundException('This tool is disabled');
         }
     }

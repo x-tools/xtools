@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the ControllerTestAdapter class.
- */
 
 declare(strict_types=1);
 
@@ -59,7 +56,7 @@ class ControllerTestAdapter extends WebTestCase
      */
     public function tearDown(): void
     {
-        if (!self::$container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_wmf')) {
             $this->addToAssertionCount(1);
         }
         parent::tearDown();

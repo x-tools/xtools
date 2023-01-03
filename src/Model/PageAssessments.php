@@ -1,11 +1,10 @@
 <?php
-/**
- * This file contains only the PageAssessments class.
- */
 
 declare(strict_types = 1);
 
 namespace App\Model;
+
+use App\Repository\PageAssessmentsRepository;
 
 /**
  * A PageAssessments is responsible for handling logic around
@@ -17,26 +16,28 @@ class PageAssessments extends Model
     /** Namespaces in which there may be page assessments. */
     public const SUPPORTED_NAMESPACES = [0, 4, 6, 10, 14, 100, 108, 118];
 
-    /** @var array The assessments config. */
-    protected $config;
+    /** @var array|null The assessments config. */
+    protected ?array $config;
 
     /**
      * Create a new PageAssessments.
+     * @param PageAssessmentsRepository $repository
      * @param Project $project
      */
-    public function __construct(Project $project)
+    public function __construct(PageAssessmentsRepository $repository, Project $project)
     {
+        $this->repository = $repository;
         $this->project = $project;
     }
 
     /**
      * Get page assessments configuration for the Project and cache in static variable.
-     * @return string[][][]|false As defined in config/assessments.yaml, or false if none exists.
+     * @return string[][][]|null As defined in config/assessments.yaml, or false if none exists.
      */
-    public function getConfig()
+    public function getConfig(): ?array
     {
         if (!isset($this->config)) {
-            return $this->config = $this->getRepository()->getConfig($this->project);
+            return $this->config = $this->repository->getConfig($this->project);
         }
 
         return $this->config;
@@ -109,7 +110,7 @@ class PageAssessments extends Model
             return false;
         }
 
-        $data = $this->getRepository()->getAssessments($page, true);
+        $data = $this->repository->getAssessments($page, true);
 
         if (isset($data[0])) {
             return $this->getClassFromAssessment($data[0]);
@@ -122,7 +123,7 @@ class PageAssessments extends Model
     /**
      * Get assessments for the given Page.
      * @param Page $page
-     * @return string[]|false `false` if unsupported, or array in the format of:
+     * @return string[]|null null if unsupported, or array in the format of:
      *         [
      *             'assessment' => 'C', // overall assessment
      *             'wikiprojects' => [
@@ -136,14 +137,14 @@ class PageAssessments extends Model
      *         ]
      * @todo Add option to get ORES prediction.
      */
-    public function getAssessments(Page $page)
+    public function getAssessments(Page $page): ?array
     {
         if (!$this->isEnabled() || !$this->isSupportedNamespace($page->getNamespace())) {
-            return false;
+            return null;
         }
 
         $config = $this->getConfig();
-        $data = $this->getRepository()->getAssessments($page);
+        $data = $this->repository->getAssessments($page);
 
         // Set the default decorations for the overall quality assessment.
         // This will be replaced with the first valid class defined for any WikiProject.
@@ -167,9 +168,9 @@ class PageAssessments extends Model
             $decoratedAssessments[$assessment['wikiproject']] = $assessment;
         }
 
-        // Don't shown 'Unknown' assessment outside of the mainspace.
+        // Don't show 'Unknown' assessment outside of the mainspace.
         if (0 !== $page->getNamespace() && '???' === $overallQuality['value']) {
-            return false;
+            return null;
         }
 
         return [

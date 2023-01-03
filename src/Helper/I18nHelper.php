@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the I18nHelper.
- */
 
 declare(strict_types = 1);
 
@@ -23,26 +20,13 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class I18nHelper
 {
-    /** @var ContainerInterface The application's container interface. */
-    protected $container;
-
-    /** @var RequestStack The request stack. */
-    protected $requestStack;
-
-    /** @var SessionInterface User's current session. */
-    protected $session;
-
-    /** @var Intuition|null The i18n object. */
-    private $intuition;
-
-    /** @var NumberFormatter Instance of NumberFormatter class, used in localizing numbers. */
-    protected $numFormatter;
-
-    /** @var NumberFormatter Instance of NumberFormatter class for localizing percentages. */
-    protected $percentFormatter;
-
-    /** @var IntlDateFormatter Instance of IntlDateFormatter class, used in localizing dates. */
-    protected $dateFormatter;
+    private Intuition $intuition;
+    protected ContainerInterface $container;
+    protected IntlDateFormatter $dateFormatter;
+    protected NumberFormatter $numFormatter;
+    protected NumberFormatter $percentFormatter;
+    protected RequestStack $requestStack;
+    protected SessionInterface $session;
 
     /**
      * Constructor for the I18nHelper.
@@ -69,7 +53,7 @@ class I18nHelper
     public function getIntuition(): Intuition
     {
         // Don't recreate the object.
-        if ($this->intuition instanceof Intuition) {
+        if (isset($this->intuition)) {
             return $this->intuition;
         }
 
@@ -158,17 +142,19 @@ class I18nHelper
     }
 
     /**
-     * Get the fallback languages for the current language, so we know what to
-     * load with jQuery.i18n. Languages for which no file exists are not returend.
+     * Get the fallback languages for the current or given language, so we know what to
+     * load with jQuery.i18n. Languages for which no file exists are not returned.
+     * @param string|null $useLang
      * @return string[]
      */
-    public function getFallbacks(): array
+    public function getFallbacks(?string $useLang = null): array
     {
         $i18nPath = $this->container->getParameter('kernel.root_dir').'/../i18n/';
+        $useLang = $useLang ?? $this->getLang();
 
         $fallbacks = array_merge(
-            [$this->getLang()],
-            $this->getIntuition()->getLangFallbacks($this->getLang())
+            [$useLang],
+            $this->getIntuition()->getLangFallbacks($useLang)
         );
 
         return array_filter($fallbacks, function ($lang) use ($i18nPath) {
@@ -180,7 +166,7 @@ class I18nHelper
 
     /**
      * Get an i18n message.
-     * @param string $message
+     * @param string|null $message
      * @param string[] $vars
      * @return string|null
      */
@@ -192,7 +178,7 @@ class I18nHelper
 
     /**
      * See if a given i18n message exists.
-     * @param string $message The message.
+     * @param string|null $message The message.
      * @param string[] $vars
      * @return bool
      */
@@ -206,17 +192,12 @@ class I18nHelper
 
     /**
      * Get an i18n message if it exists, otherwise just get the message key.
-     * @param string $message
+     * @param string|null $message
      * @param string[] $vars
      * @return string
      */
     public function msgIfExists(?string $message, array $vars = []): string
     {
-        if (is_array($message)) {
-            $vars = $message;
-            $message = $message[0];
-            $vars = array_slice($vars, 1);
-        }
         if ($this->msgExists($message, $vars)) {
             return $this->msg($message, $vars);
         } else {
@@ -232,7 +213,7 @@ class I18nHelper
      * @param int $decimals Number of decimals to format to.
      * @return string
      */
-    public function numberFormat($number, $decimals = 0): string
+    public function numberFormat($number, int $decimals = 0): string
     {
         if (!isset($this->numFormatter)) {
             $lang = $this->getNumberFormatterLang();
@@ -247,7 +228,7 @@ class I18nHelper
     /**
      * Format a given number or fraction as a percentage.
      * @param int|float $numerator Numerator or single fraction if denominator is omitted.
-     * @param int $denominator Denominator.
+     * @param int|null $denominator Denominator.
      * @param integer $precision Number of decimal places to show.
      * @return string Formatted percentage.
      */
@@ -280,7 +261,7 @@ class I18nHelper
      * @see http://userguide.icu-project.org/formatparse/datetime
      * @return string
      */
-    public function dateFormat($datetime, $pattern = 'yyyy-MM-dd HH:mm'): string
+    public function dateFormat($datetime, string $pattern = 'yyyy-MM-dd HH:mm'): string
     {
         if (!isset($this->dateFormatter)) {
             $this->dateFormatter = new IntlDateFormatter(
@@ -303,7 +284,7 @@ class I18nHelper
         return $this->dateFormatter->format($datetime);
     }
 
-    /********************* PRIVATE MEHTODS *********************/
+    /********************* PRIVATE METHODS *********************/
 
     /**
      * TODO: Remove this when the fallbacks start working on their own. Production for some reason

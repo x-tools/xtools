@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the TopEditsControllerTest class.
- */
 
 declare(strict_types = 1);
 
@@ -12,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Integration tests for the Top Edits tool.
  * @group integration
+ * @covers \App\Controller\TopEditsController
  */
 class TopEditsControllerTest extends ControllerTestAdapter
 {
@@ -25,7 +23,7 @@ class TopEditsControllerTest extends ControllerTestAdapter
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
         // For now...
-        if (!self::$container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -49,7 +47,7 @@ class TopEditsControllerTest extends ControllerTestAdapter
      */
     public function testRoutes(): void
     {
-        if (!self::$container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -70,7 +68,7 @@ class TopEditsControllerTest extends ControllerTestAdapter
      */
     public function testNotOptedInRoutes(): void
     {
-        if (!self::$container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_wmf')) {
             return;
         }
 

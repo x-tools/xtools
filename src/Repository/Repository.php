@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the Repository class.
- */
 
 declare(strict_types = 1);
 
@@ -10,14 +7,14 @@ namespace App\Repository;
 use App\Model\Project;
 use DateInterval;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use GuzzleHttp\Client;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
@@ -27,8 +24,10 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
  */
 abstract class Repository
 {
-    /** @var ContainerInterface The application's DI container. */
-    protected $container;
+    protected CacheItemPoolInterface $cache;
+    protected ContainerInterface $container;
+    protected Client $guzzle;
+    protected LoggerInterface $logger;
 
     /** @var Connection The database connection to the meta database. */
     private $metaConnection;
@@ -36,42 +35,35 @@ abstract class Repository
     /** @var Connection The database connection to other tools' databases.  */
     private $toolsConnection;
 
-    /** @var CacheItemPoolInterface The cache. */
-    protected $cache;
+    /** @var bool Whether this is configured as a WMF installation. */
+    protected $isWMF;
 
-    /** @var LoggerInterface The logger. */
-    protected $log;
+    /** @var int */
+    protected $queryTimeout;
 
     /** @var string Prefix URL for where the dblists live. Will be followed by i.e. 's1.dblist' */
     public const DBLISTS_URL = 'https://noc.wikimedia.org/conf/dblists/';
 
     /**
-     * Create a new Repository with nothing but a null-logger.
-     */
-    public function __construct()
-    {
-        $this->log = new NullLogger();
-    }
-
-    /**
-     * Set the DI container.
+     * Create a new Repository.
      * @param ContainerInterface $container
+     * @param CacheItemPoolInterface $cache
+     * @param Client $guzzle
      */
-    public function setContainer(ContainerInterface $container): void
-    {
+    public function __construct(
+        ContainerInterface $container,
+        CacheItemPoolInterface $cache,
+        Client $guzzle,
+        LoggerInterface $logger,
+        bool $isWMF,
+        int $queryTimeout
+    ) {
         $this->container = $container;
-        $this->cache = $container->get('cache.app');
-        $this->log = $container->get('logger');
-    }
-
-    /**
-     * Is XTools connecting to WMF Labs?
-     * @return bool
-     * @codeCoverageIgnore
-     */
-    public function isLabs(): bool
-    {
-        return (bool)$this->container->getParameter('app.is_labs');
+        $this->cache = $cache;
+        $this->guzzle = $guzzle;
+        $this->logger = $logger;
+        $this->isWMF = $isWMF;
+        $this->queryTimeout = $queryTimeout;
     }
 
     /***************
@@ -144,16 +136,13 @@ abstract class Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        /** @var Client $client */
-        $client = $this->container->get('eight_points_guzzle.client.xtools');
-
         $dbList = [];
         $exists = true;
         $i = 0;
 
         while ($exists) {
             $i += 1;
-            $response = $client->request('GET', self::DBLISTS_URL."s$i.dblist", ['http_errors' => false]);
+            $response = $this->guzzle->request('GET', self::DBLISTS_URL."s$i.dblist", ['http_errors' => false]);
             $exists = in_array(
                 $response->getStatusCode(),
                 [Response::HTTP_OK, Response::HTTP_NOT_MODIFIED]
@@ -193,10 +182,7 @@ abstract class Repository
      */
     public function executeApiRequest(Project $project, array $params): array
     {
-        /** @var Client $client */
-        $client = $this->container->get('eight_points_guzzle.client.xtools');
-
-        return json_decode($client->request('GET', $project->getApiUrl(), [
+        return json_decode($this->guzzle->request('GET', $project->getApiUrl(), [
             'query' => array_merge([
                 'action' => 'query',
                 'format' => 'json',
@@ -219,7 +205,7 @@ abstract class Repository
         // This is a workaround for a one-to-many mapping
         // as required by Labs. We combine $tableName with
         // $tableExtension in order to generate the new table name
-        if ($this->isLabs() && null !== $tableExtension) {
+        if ($this->isWMF && null !== $tableExtension) {
             $mapped = true;
             $tableName .=('' === $tableExtension ? '' : '_'.$tableExtension);
         } elseif ($this->container->hasParameter("app.table.$tableName")) {
@@ -232,13 +218,13 @@ abstract class Repository
         // (that have some rows hidden, e.g. for revdeleted users).
         // This is a safeguard in case table mapping isn't properly set up.
         $isLoggingOrRevision = in_array($tableName, ['revision', 'logging', 'archive']);
-        if (!$mapped && $isLoggingOrRevision && $this->isLabs()) {
+        if (!$mapped && $isLoggingOrRevision && $this->isWMF) {
             $tableName .="_userindex";
         }
 
         // Figure out database name.
         // Use class variable for the database name if not set via function parameter.
-        if ($this->isLabs() && '_p' != substr($databaseName, -2)) {
+        if ($this->isWMF && '_p' != substr($databaseName, -2)) {
             // Append '_p' if this is labs.
             $databaseName .= '_p';
         }
@@ -253,11 +239,11 @@ abstract class Repository
      * Arguments that are a model should implement their own getCacheKey() that returns
      * a unique identifier for an instance of that model. See User::getCacheKey() for example.
      * @param array|mixed $args Array of arguments or a single argument.
-     * @param string $key Unique key for this function. If omitted the function name itself
+     * @param string|null $key Unique key for this function. If omitted the function name itself
      *   is used, which is determined using `debug_backtrace`.
      * @return string
      */
-    public function getCacheKey($args, $key = null): string
+    public function getCacheKey($args, ?string $key = null): string
     {
         if (null === $key) {
             $key = debug_backtrace()[1]['function'];
@@ -309,7 +295,7 @@ abstract class Repository
      * @param string $duration Valid DateInterval string.
      * @return mixed The given $value.
      */
-    public function setCache(string $cacheKey, $value, $duration = 'PT20M')
+    public function setCache(string $cacheKey, $value, string $duration = 'PT20M')
     {
         $cacheItem = $this->cache
             ->getItem($cacheKey)
@@ -368,7 +354,7 @@ abstract class Repository
      *   default specified by the app.query_timeout config parameter.
      * @return ResultStatement
      * @throws DriverException
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      * @codeCoverageIgnore
      */
     public function executeProjectsQuery(
@@ -378,7 +364,7 @@ abstract class Repository
         ?int $timeout = null
     ): ResultStatement {
         try {
-            $timeout = $timeout ?? $this->container->getParameter('app.query_timeout');
+            $timeout = $timeout ?? $this->queryTimeout;
             $sql = "SET STATEMENT max_statement_time = $timeout FOR\n".$sql;
 
             return $this->getProjectsConnection($project)->executeQuery($sql, $params);
@@ -420,7 +406,7 @@ abstract class Repository
     {
         // If no value was passed for the $timeout, it must be the default.
         if (null === $timeout) {
-            $timeout = $this->container->getParameter('app.query_timeout');
+            $timeout = $this->queryTimeout;
         }
 
         if (1226 === $e->getErrorCode()) {

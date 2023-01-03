@@ -1,44 +1,27 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace App\Controller;
 
-use App\Helper\I18nHelper;
 use App\Model\LargestPages;
 use App\Repository\LargestPagesRepository;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * This controller serves the search form and results for the Largest Pages tool.
- * @codeCoverageIgnore
  */
 class LargestPagesController extends XtoolsController
 {
     /**
-     * Get the name of the tool's index route. This is also the name of the associated model.
-     * @return string
+     * @inheritDoc
      * @codeCoverageIgnore
      */
     public function getIndexRoute(): string
     {
         return 'LargestPages';
-    }
-
-    /**
-     * LargestPagesController constructor.
-     * @param RequestStack $requestStack
-     * @param ContainerInterface $container
-     * @param I18nHelper $i18n
-     */
-    public function __construct(RequestStack $requestStack, ContainerInterface $container, I18nHelper $i18n)
-    {
-        parent::__construct($requestStack, $container, $i18n);
-        $this->params['include_pattern'] = $this->request->get('include_pattern', '');
-        $this->params['exclude_pattern'] = $this->request->get('exclude_pattern', '');
     }
 
     /**
@@ -68,13 +51,16 @@ class LargestPagesController extends XtoolsController
 
     /**
      * Instantiate a LargestPages object.
+     * @param LargestPagesRepository $largestPagesRepo
      * @return LargestPages
+     * @codeCoverageIgnore
      */
-    protected function getLargestPages(): LargestPages
+    protected function getLargestPages(LargestPagesRepository $largestPagesRepo): LargestPages
     {
-        $largestPagesRepo = new LargestPagesRepository();
-        $largestPagesRepo->setContainer($this->container);
+        $this->params['include_pattern'] = $this->request->get('include_pattern', '');
+        $this->params['exclude_pattern'] = $this->request->get('exclude_pattern', '');
         $largestPages = new LargestPages(
+            $largestPagesRepo,
             $this->project,
             $this->namespace,
             $this->params['include_pattern'],
@@ -93,15 +79,16 @@ class LargestPagesController extends XtoolsController
      *         "namespace"="all"
      *     }
      * )
+     * @param LargestPagesRepository $largestPagesRepo
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultsAction(): Response
+    public function resultsAction(LargestPagesRepository $largestPagesRepo): Response
     {
         $ret = [
             'xtPage' => 'LargestPages',
             'xtTitle' => $this->project->getDomain(),
-            'lp' => $this->getLargestPages(),
+            'lp' => $this->getLargestPages($largestPagesRepo),
         ];
 
         return $this->getFormattedResponse('largestPages/result', $ret);
@@ -118,12 +105,14 @@ class LargestPagesController extends XtoolsController
      *         "namespace"="all"
      *     }
      * )
+     * @param LargestPagesRepository $largestPagesRepo
      * @return JsonResponse
+     * @codeCoverageIgnore
      */
-    public function resultsApiAction(): JsonResponse
+    public function resultsApiAction(LargestPagesRepository $largestPagesRepo): JsonResponse
     {
         $this->recordApiUsage('project/largest_pages');
-        $lp = $this->getLargestPages();
+        $lp = $this->getLargestPages($largestPagesRepo);
 
         $pages = [];
         foreach ($lp->getResults() as $index => $page) {

@@ -1,16 +1,17 @@
 <?php
-/**
- * This file contains only the TopEditsRepository class.
- */
 
 declare(strict_types = 1);
 
 namespace App\Repository;
 
+use App\Model\Edit;
 use App\Model\Page;
 use App\Model\Project;
 use App\Model\User;
+use GuzzleHttp\Client;
 use PDO;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Wikimedia\IPUtils;
 
@@ -22,13 +23,34 @@ use Wikimedia\IPUtils;
  */
 class TopEditsRepository extends UserRepository
 {
+    protected EditRepository $editRepo;
+    protected UserRepository $userRepo;
+
+    public function __construct(
+        ContainerInterface $container,
+        CacheItemPoolInterface $cache,
+        Client $guzzle,
+        LoggerInterface $logger,
+        bool $isWMF,
+        int $queryTimeout,
+        EditRepository $editRepo,
+        UserRepository $userRepo,
+        ProjectRepository $projectRepo
+    ) {
+        $this->editRepo = $editRepo;
+        $this->userRepo = $userRepo;
+        parent::__construct($container, $cache, $guzzle, $logger, $isWMF, $queryTimeout, $projectRepo);
+    }
+
     /**
-     * Expose the container to the TopEdits class.
-     * @return ContainerInterface
+     * Factory to instantiate a new Edit for the given revision.
+     * @param Page $page
+     * @param array $revision
+     * @return Edit
      */
-    public function getContainer(): ContainerInterface
+    public function getEdit(Page $page, array $revision): Edit
     {
-        return $this->container;
+        return new Edit($this->editRepo, $this->userRepo, $page, $revision);
     }
 
     /**
@@ -62,7 +84,7 @@ class TopEditsRepository extends UserRepository
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
 
-        $hasPageAssessments = $this->isLabs() && $project->hasPageAssessments() && 0 === $namespace;
+        $hasPageAssessments = $this->isWMF && $project->hasPageAssessments() && 0 === $namespace;
         $paTable = $project->getTableName('page_assessments');
         $paSelect = $hasPageAssessments
             ?  ", (
@@ -176,7 +198,7 @@ class TopEditsRepository extends UserRepository
         $revDateConditions = $this->getDateConditions($start, $end);
         $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $hasPageAssessments = $this->isLabs() && $project->hasPageAssessments();
+        $hasPageAssessments = $this->isWMF && $project->hasPageAssessments();
         $pageAssessmentsTable = $this->getTableName($project->getDatabaseName(), 'page_assessments');
         $paSelect = $hasPageAssessments
             ?  ", (
@@ -231,7 +253,7 @@ class TopEditsRepository extends UserRepository
      * @param User $user
      * @param int|false $start Start date as Unix timestamp.
      * @param int|false $end End date as Unix timestamp.
-     * @return string[] Each row with keys 'id', 'timestamp', 'minor', 'length',
+     * @return string[][] Each row with keys 'id', 'timestamp', 'minor', 'length',
      *   'length_change', 'reverted', 'user_id', 'username', 'comment', 'parent_comment'
      */
     public function getTopEditsPage(Page $page, User $user, $start = false, $end = false): array

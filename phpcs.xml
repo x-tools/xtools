@@ -4,11 +4,8 @@
     <file>.</file>
     <exclude-pattern>vendor/</exclude-pattern>
     <exclude-pattern>public/</exclude-pattern>
-    <exclude-pattern>html/</exclude-pattern>
     <exclude-pattern>src/DoctrineMigrations/</exclude-pattern>
     <exclude-pattern>var/</exclude-pattern>
-    <exclude-pattern>docs/</exclude-pattern>
-    <exclude-pattern>public/assets/</exclude-pattern>
     <exclude-pattern>node_modules/</exclude-pattern>
     <exclude-pattern>assets/vendor/</exclude-pattern>
     <exclude-pattern>*.min.js</exclude-pattern>
@@ -16,12 +13,6 @@
 
     <!-- Slevomat standards; see https://github.com/slevomat/coding-standard -->
     <config name="installed_paths" value="../../slevomat/coding-standard"/><!-- relative path from PHPCS source location -->
-    <rule ref="SlevomatCodingStandard.TypeHints.TypeHintDeclaration">
-        <exclude name="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.UselessDocComment"/>
-        <exclude name="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingTraversableReturnTypeHintSpecification"/>
-        <exclude name="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingTraversableParameterTypeHintSpecification"/>
-        <exclude name="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingTraversablePropertyTypeHintSpecification"/>
-    </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
         <exclude name="SlevomatCodingStandard.TypeHints.DeclareStrictTypes.IncorrectWhitespaceBetweenOpenTagAndDeclare"/>
         <exclude name="SlevomatCodingStandard.TypeHints.DeclareStrictTypes.IncorrectStrictTypesFormat"/>
@@ -38,7 +29,6 @@
         </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.Namespaces.UselessAlias"/>
-    <rule ref="SlevomatCodingStandard.PHP.UselessParentheses"/>
     <rule ref="SlevomatCodingStandard.PHP.UselessSemicolon"/>
     <rule ref="SlevomatCodingStandard.Variables.DuplicateAssignmentToVariable"/>
     <rule ref="SlevomatCodingStandard.Variables.UnusedVariable"/>

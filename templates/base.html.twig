@@ -240,7 +240,7 @@
     <div class="footer-content">
         <div class="pull-right footer-branding">
             <a style="margin-right:5px;" href="//translatewiki.net/?setlang=en "><img height="36px" src="//upload.wikimedia.org/wikipedia/commons/5/51/Translatewiki.net_logo.svg" alt="translatewiki.net logo"/></a>
-            {% if isWMFLabs() %}
+            {% if isWMF() %}
             <a href="https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS" target="_blank"><img height="40px" src="{{ asset('images/VPS-badge.svg') }}" alt="Powered by Wikimedia Cloud Services" /></a>
             {% endif %}
         </div>
@@ -254,7 +254,7 @@
                 &middot;
                 {{ layout.apiLink }}
                 &middot;
-                <a target="_blank" href="https://www.mediawiki.org/wiki/XTools">{{ msg('documentation') }}</a>
+                <a target="_blank" href="https://www.mediawiki.org/wiki/Special:MyLanguage/XTools">{{ msg('documentation') }}</a>
                 &middot;
                 {% include 'default/_report_issue_links.html.twig' %}
             </span>

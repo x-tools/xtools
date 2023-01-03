@@ -1,7 +1,10 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace App\Model;
+
+use App\Repository\BlameRepository;
 
 /**
  * A Blame will search the given page for the given text and return the relevant revisions and authors.
@@ -9,24 +12,28 @@ namespace App\Model;
 class Blame extends Authorship
 {
     /** @var string Text to search for. */
-    protected $query;
+    protected string $query;
 
     /** @var array|null Matches, keyed by revision ID, each with keys 'edit' <Edit> and 'tokens' <string[]>. */
-    protected $matches;
+    protected ?array $matches;
 
     /** @var Edit|null Target revision that is being blamed. */
-    protected $asOf;
+    protected ?Edit $asOf;
 
     /**
      * Blame constructor.
+     * @param BlameRepository $repository
      * @param Page $page The page to process.
      * @param string $query Text to search for.
      * @param string|null $target Either a revision ID or date in YYYY-MM-DD format. Null to use latest revision.
      */
-    public function __construct(Page $page, string $query, ?string $target = null)
-    {
-        parent::__construct($page, $target);
-
+    public function __construct(
+        BlameRepository $repository,
+        Page $page,
+        string $query,
+        ?string $target = null
+    ) {
+        parent::__construct($repository, $page, $target);
         $this->query = $query;
     }
 
@@ -87,7 +94,7 @@ class Blame extends Authorship
         }
 
         $this->asOf = $this->target
-            ? $this->getRepository()->getEditFromRevId($this->page, $this->target)
+            ? $this->repository->getEditFromRevId($this->page, $this->target)
             : null;
 
         return $this->asOf;
@@ -119,7 +126,7 @@ class Blame extends Authorship
                 continue;
             }
 
-            $edit = $this->getRepository()->getEditFromRevId($this->page, $match['id']);
+            $edit = $this->repository->getEditFromRevId($this->page, $match['id']);
             if ($edit) {
                 $this->matches[$match['id']] = [
                     'edit' => $edit,

@@ -27,7 +27,7 @@ parameters:
     app.query_timeout: '%env(int:APP_QUERY_TIMEOUT)%'
     app.rate_limit_count: '%env(int:APP_RATE_LIMIT_COUNT)%'
     app.rate_limit_time: '%env(int:APP_RATE_LIMIT_TIME)%'
-    app.is_labs: '%env(bool:APP_IS_WMF)%'
+    app.is_wmf: '%env(bool:APP_IS_WMF)%'
     app.max_page_revisions: '%env(int:APP_MAX_PAGE_REVISIONS)%'
     app.max_user_edits: '%env(int:APP_MAX_USER_EDITS)%'
     app.multilingual_wikis: '%env(csv:APP_MULTILINGUAL_WIKIS)%'
@@ -49,6 +49,8 @@ parameters:
     enable.RfXVoteCalculator: '%env(bool:APP_ENABLE_RFXVOTECALCULATOR)%'
     enable.SimpleEditCounter: '%env(bool:APP_ENABLE_SIMPLEEDITCOUNTER)%'
     enable.TopEdits: '%env(bool:APP_ENABLE_TOPEDITS)%'
+    oauth_key: '%env(OAUTH_KEY)%'
+    oauth_secret: '%env(OAUTH_SECRET)%'
 
 services:
     _defaults:
@@ -67,7 +69,6 @@ services:
          # you can exclude directories or files
          # but if a service is unused, it's removed anyway
          exclude:
-            - '../src/{Model}'
             - '../src/Kernel.php'
             - '../src/DoctrineMigrations/'
 
@@ -75,19 +76,27 @@ services:
     # as action arguments even if you don't extend any base controller class
     App\Controller\:
         resource: '../src/Controller'
-#        public: true
         tags: ['controller.service_arguments']
 
     App\Repository\:
         resource: '../src/Repository'
-        calls:
-        - [setContainer, ["@service_container"]]
+        arguments:
+            $isWMF: '%env(bool:APP_IS_WMF)%'
+            $queryTimeout: '%app.query_timeout%'
+
+    App\Twig\:
+        resource: '../src/Twig'
+        arguments:
+            $isWMF: '%env(bool:APP_IS_WMF)%'
 
     app.monolog.processor.web:
         class: App\Monolog\WebProcessorMonolog
         arguments: ['@request_stack']
         tags:
             - { name: monolog.processor, method: processRecord }
+
+    GuzzleHttp\Client:
+        alias: 'eight_points_guzzle.client.xtools'
 
     # These need to not be public, but they are, for now...
     app.automated_edits_helper:
@@ -97,9 +106,6 @@ services:
     app.i18n_helper:
         class: App\Helper\I18nHelper
         arguments: ['@service_container']
-        public: true
-    logger:
-        alias: 'monolog.logger'
         public: true
 
     app.exception_listener:

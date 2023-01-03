@@ -1,16 +1,13 @@
 <?php
-/**
- * This file contains only the XtoolsControllerTest class.
- */
 
 declare(strict_types = 1);
 
 namespace App\Tests\Controller;
 
-use App\Controller\SimpleEditCounterController;
 use App\Controller\XtoolsController;
 use App\Exception\XtoolsHttpException;
 use App\Helper\I18nHelper;
+use ReflectionClass;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -18,14 +15,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Integration/unit tests for the abstract XtoolsController.
  * @group integration
+ * @covers \App\Controller\XtoolsController
  */
 class XtoolsControllerTest extends ControllerTestAdapter
 {
-    /** @var I18nHelper Needed by SimpleEditCounterController. */
-    protected $i18n;
-
-    /** @var XtoolsController The controller. */
-    protected $controller;
+    protected I18nHelper $i18n;
+    protected ReflectionClass $reflectionClass;
+    protected XtoolsController $controller;
 
     /**
      * Set up the tests.
@@ -38,17 +34,26 @@ class XtoolsControllerTest extends ControllerTestAdapter
 
     /**
      * Create a new controller, making a Request with the given params.
-     * @param array $params
+     * @param array $requestParams Parameters to use when instantiating the Request object.
+     * @param array $methodOverrides Keys are method names, values are what they should return.
      * @return XtoolsController
      */
-    private function getControllerWithRequest(array $params = []): XtoolsController
+    private function getControllerWithRequest(array $requestParams = [], array $methodOverrides = []): XtoolsController
     {
         $requestStack = new RequestStack();
-        $requestStack->push(new Request($params));
+        $requestStack->push(new Request($requestParams));
 
-        // SimpleEditCounterController used solely for testing, since we
-        // can't instantiate the abstract class XtoolsController.
-        return new SimpleEditCounterController($requestStack, self::$container, $this->i18n);
+        return new OverridableXtoolsController(
+            $requestStack,
+            self::$container,
+            self::$container->get('cache.app'),
+            self::$container->get('eight_points_guzzle.client.xtools'),
+            $this->i18n,
+            self::$container->get('App\Repository\ProjectRepository'),
+            self::$container->get('App\Repository\UserRepository'),
+            self::$container->get('App\Repository\PageRepository'),
+            $methodOverrides
+        );
     }
 
     /**
@@ -60,7 +65,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
     public function testParseQueryParams(array $params, array $expected): void
     {
         // Untestable in CI build :(
-        if (!self::$container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -181,7 +186,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
     public function testProjectFromQuery(): void
     {
         // Untestable on Travis :(
-        if (!self::$container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -203,8 +208,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
      */
     public function testValidateProjectAndUser(): void
     {
-        // Untestable on Travis :(
-        if (!self::$container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -221,14 +225,42 @@ class XtoolsControllerTest extends ControllerTestAdapter
         static::assertEquals('MusikAnimal', $user->getUsername());
 
         static::expectException(XtoolsHttpException::class);
+        static::expectExceptionMessage('The requested user does not exist');
         $controller->validateUser('Not a real user 8723849237');
+    }
+
+    /**
+     * Invalid projects.
+     */
+    public function testInvalidProject(): void
+    {
+        if (!self::$container->getParameter('app.is_wmf')) {
+            return;
+        }
 
         static::expectException(XtoolsHttpException::class);
-        $controller->validateProject('invalid.project.org');
+        static::expectExceptionMessage('invalid.project.og is not a valid project');
+        $this->getControllerWithRequest(['project' => 'invalid.project.og'])
+            ->validateProject('invalid.project.org');
+    }
 
-        // Too high of an edit count.
+    /**
+     * Users with too high of an edit count.
+     */
+    public function testTooHighEditCount(): void
+    {
+        if (!self::$container->getParameter('app.is_wmf')) {
+            return;
+        }
+
         static::expectException(XtoolsHttpException::class);
-        $controller->validateUser('Materialscientist');
+        static::expectExceptionMessage('User has made too many edits! (Maximum 350000)');
+        $this->getControllerWithRequest([
+            'project' => 'en.wikipedia',
+            '_controller' => 'App\Controller\DefaultController::indexAction',
+        ], [
+            'tooHighEditCountRoute' => 'homepage',
+        ])->validateUser('Materialscientist');
     }
 
     /**
@@ -237,7 +269,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
     public function testGetParams(): void
     {
         // Untestable on Travis :(
-        if (!self::$container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -262,8 +294,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
      */
     public function testValidatePage(): void
     {
-        // Untestable on Travis :(
-        if (!self::$container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -314,7 +345,9 @@ class XtoolsControllerTest extends ControllerTestAdapter
         );
 
         // XtoolsController::getUnixFromDateParams() will now enforce a maximum date span of 5 days.
-        $controller->maxDays = 5;
+        $controller = $this->getControllerWithRequest([], [
+            'maxDays' => 5,
+        ]);
 
         // Both dates given, exceeding max days, so start date should be end date - max days.
         static::assertEquals(
@@ -347,7 +380,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
         );
 
         // For now...
-        if (!self::$container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -375,16 +408,14 @@ class XtoolsControllerTest extends ControllerTestAdapter
             'user' => '174.197.128.0/18',
         ]);
 
-        static::expectException('App\Exception\XtoolsHttpException');
+        static::expectException(XtoolsHttpException::class);
+        static::expectExceptionMessage('The requested IP range is larger than the CIDR limit of /16.');
         $this->getControllerWithRequest([
             'project' => 'fr.wikipedia',
             'user' => '174.197.128.0/1',
         ]);
     }
 
-    /**
-     * @covers XtoolsController::addFullPageTitlesAndContinue()
-     */
     public function testAddFullPageTitlesAndContinue(): void
     {
         $controller = $this->getControllerWithRequest([

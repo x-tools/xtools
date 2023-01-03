@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the PageAssessmentsRepository class.
- */
 
 declare(strict_types = 1);
 
@@ -17,22 +14,27 @@ use App\Model\Project;
  */
 class PageAssessmentsRepository extends Repository
 {
+    /** @var array The assessments config. */
+    protected array $assessments;
+
     /**
      * Get page assessments configuration for the Project.
      * @param Project $project
-     * @return string[]|bool As defined in config/assessments.yaml, or false if none exists.
+     * @return string[]|null As defined in config/assessments.yaml, or null if none exists.
      */
-    public function getConfig(Project $project)
+    public function getConfig(Project $project): ?array
     {
-        $projectsConfig = $this->container->getParameter('assessments');
-        return $projectsConfig[$project->getDomain()] ?? false;
+        if (!isset($this->assessments)) {
+            $this->assessments = $this->container->getParameter('assessments');
+        }
+        return $this->assessments[$project->getDomain()] ?? null;
     }
 
     /**
      * Get assessment data for the given pages
      * @param Page $page
      * @param bool $first Fetch only the first result, not for each WikiProject.
-     * @return string[] Assessment data as retrieved from the database.
+     * @return string[][] Assessment data as retrieved from the database.
      */
     public function getAssessments(Page $page, bool $first = false): array
     {

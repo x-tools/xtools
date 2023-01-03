@@ -1,8 +1,10 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Repository\AuthorshipRepository;
 use DateTime;
 use GuzzleHttp\Exception\RequestException;
 
@@ -18,22 +20,28 @@ class Authorship extends Model
     ];
 
     /** @var int|null Target revision ID. Null for latest revision. */
-    protected $target;
+    protected ?int $target;
 
     /** @var array List of editors and the percentage of the current content that they authored. */
-    protected $data;
+    protected array $data;
 
-    /** @var mixed[] Revision that the data pertains to, with keys 'id' and 'timestamp'. */
-    protected $revision;
+    /** @var array Revision that the data pertains to, with keys 'id' and 'timestamp'. */
+    protected array $revision;
 
     /**
      * Authorship constructor.
+     * @param AuthorshipRepository $repository
      * @param Page $page The page to process.
      * @param string|null $target Either a revision ID or date in YYYY-MM-DD format. Null to use latest revision.
      * @param int|null $limit Max number of results.
      */
-    public function __construct(Page $page, ?string $target = null, ?int $limit = null)
-    {
+    public function __construct(
+        AuthorshipRepository $repository,
+        Page $page,
+        ?string $target = null,
+        ?int $limit = null
+    ) {
+        $this->repository = $repository;
         $this->page = $page;
         $this->limit = $limit;
         $this->target = $this->getTargetRevId($target);
@@ -145,7 +153,7 @@ class Authorship extends Model
     protected function getRevisionData(bool $returnRevId = false): ?array
     {
         try {
-            $ret = $this->getRepository()->getData($this->page, $this->target, $returnRevId);
+            $ret = $this->repository->getData($this->page, $this->target, $returnRevId);
         } catch (RequestException $e) {
             $this->data = [
                 'error' => 'unknown',
@@ -207,11 +215,7 @@ class Authorship extends Model
         // Loop through once more, creating an array with the user names (or IP addresses)
         // as the key, and the count and percentage as the value.
         foreach ($countsToProcess as $editor => $count) {
-            if (isset($usernameMap[$editor])) {
-                $index = $usernameMap[$editor];
-            } else {
-                $index = $editor;
-            }
+            $index = $usernameMap[$editor] ?? $editor;
 
             $percentage = round(100 * ($count / $totalCount), 1);
 
@@ -255,7 +259,7 @@ class Authorship extends Model
             return [];
         }
 
-        $userIdsNames = $this->getRepository()->getUsernamesFromIds(
+        $userIdsNames = $this->repository->getUsernamesFromIds(
             $this->page->getProject(),
             $userIds
         );

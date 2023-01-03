@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the Project class.
- */
 
 declare(strict_types = 1);
 
@@ -12,23 +9,22 @@ namespace App\Model;
  */
 class Project extends Model
 {
+    protected PageAssessments $pageAssessments;
+
     /** @var string The project name as supplied by the user. */
-    protected $nameUnnormalized;
+    protected string $nameUnnormalized;
 
-    /** @var string[] Basic metadata about the project */
-    protected $metadata;
+    /** @var string[]|null Basic metadata about the project */
+    protected ?array $metadata;
 
-    /** @var string[] Project's 'dbName', 'url' and 'lang'. */
-    protected $basicInfo;
-
-    /** @var PageAssessments Contains methods around the page assessments config for the Project. */
-    protected $pageAssessments;
+    /** @var string[]|null Project's 'dbName', 'url' and 'lang'. */
+    protected ?array $basicInfo;
 
     /**
      * Whether the user being queried for in this session has opted in to restricted statistics.
      * @var bool
      */
-    protected $userOptedIn;
+    protected bool $userOptedIn;
 
     /**
      * Create a new Project.
@@ -37,7 +33,6 @@ class Project extends Model
     public function __construct(string $nameOrUrl)
     {
         $this->nameUnnormalized = $nameOrUrl;
-        $this->pageAssessments = new PageAssessments($this);
     }
 
     /**
@@ -47,6 +42,16 @@ class Project extends Model
     public function getPageAssessments(): PageAssessments
     {
         return $this->pageAssessments;
+    }
+
+    /**
+     * @param PageAssessments $pageAssessments
+     * @return Project
+     */
+    public function setPageAssessments(PageAssessments $pageAssessments): Project
+    {
+        $this->pageAssessments = $pageAssessments;
+        return $this;
     }
 
     /**
@@ -77,12 +82,12 @@ class Project extends Model
      * Get 'dbName', 'url' and 'lang' of the project, the relevant basic info we can get from the meta database.
      * This is all you need to make database queries. More comprehensive metadata can be fetched with getMetadata()
      * at the expense of an API call, which may be cached.
-     * @return string[]|bool false if not found.
+     * @return string[]|null null if not found.
      */
-    protected function getBasicInfo()
+    protected function getBasicInfo(): ?array
     {
-        if (empty($this->basicInfo)) {
-            $this->basicInfo = $this->getRepository()->getOne($this->nameUnnormalized);
+        if (!isset($this->basicInfo)) {
+            $this->basicInfo = $this->repository->getOne($this->nameUnnormalized);
         }
         return $this->basicInfo;
     }
@@ -93,7 +98,7 @@ class Project extends Model
      */
     protected function getMetadata(): ?array
     {
-        if (empty($this->metadata)) {
+        if (!isset($this->metadata)) {
             $info = $this->getBasicInfo();
             if (!isset($info['url'])) {
                 // Project is probably not replicated.
@@ -281,7 +286,7 @@ class Project extends Model
     public function userHasOptedIn(User $user): bool
     {
         // 1. First check to see if the whole project has opted in.
-        if (!$this->userOptedIn) {
+        if (!isset($this->userOptedIn)) {
             $optedInProjects = $this->getRepository()->optedIn();
             $this->userOptedIn = in_array($this->getDatabaseName(), $optedInProjects);
         }
@@ -306,12 +311,10 @@ class Project extends Model
         // 4. Lastly, see if they've opted in globally on the default project or Meta.
         $globalPageName = $user->getUsername() . '/EditCounterGlobalOptIn.js';
         $globalProject = $this->getRepository()->getGlobalProject();
-        if ($globalProject instanceof Project) {
-            $globalExists = $globalProject->getRepository()
-                ->pageHasContent($globalProject, $userNsId, $globalPageName);
-            if ($globalExists) {
-                return true;
-            }
+        $globalExists = $globalProject->getRepository()
+            ->pageHasContent($globalProject, $userNsId, $globalPageName);
+        if ($globalExists) {
+            return true;
         }
 
         return false;

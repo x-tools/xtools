@@ -1,12 +1,16 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace App\Repository;
 
 use App\Model\Project;
 use App\Model\User;
+use GuzzleHttp\Client;
 use PDO;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use Wikimedia\IPUtils;
 
 /**
@@ -15,23 +19,26 @@ use Wikimedia\IPUtils;
  */
 class GlobalContribsRepository extends Repository
 {
+    protected ProjectRepository $projectRepo;
+
     /** @var Project CentralAuth project (meta.wikimedia for WMF installation). */
-    protected $caProject;
+    protected Project $caProject;
 
-    /**
-     * Create Project and ProjectRepository once we have the container.
-     * @param ContainerInterface $container
-     */
-    public function setContainer(ContainerInterface $container): void
-    {
-        parent::setContainer($container);
-
-        $this->caProject = ProjectRepository::getProject(
-            $this->container->getParameter('central_auth_project'),
-            $this->container
+    public function __construct(
+        ContainerInterface $container,
+        CacheItemPoolInterface $cache,
+        Client $guzzle,
+        LoggerInterface $logger,
+        bool $isWMF,
+        int $queryTimeout,
+        ProjectRepository $projectRepo
+    ) {
+        parent::__construct($container, $cache, $guzzle, $logger, $isWMF, $queryTimeout);
+        $this->caProject = new Project(
+            $this->container->getParameter('central_auth_project')
         );
-        $this->caProject->getRepository()
-            ->setContainer($this->container);
+        $this->projectRepo = $projectRepo;
+        $this->caProject->setRepository($this->projectRepo);
     }
 
     /**
@@ -56,10 +63,12 @@ class GlobalContribsRepository extends Repository
         // Compile the output.
         $out = [];
         foreach ($editCounts as $editCount) {
+            $project = new Project($editCount['dbName']);
+            $project->setRepository($this->projectRepo);
             $out[] = [
                 'dbName' => $editCount['dbName'],
                 'total' => $editCount['total'],
-                'project' => ProjectRepository::getProject($editCount['dbName'], $this->container),
+                'project' => $project,
             ];
         }
         return $out;
@@ -69,12 +78,12 @@ class GlobalContribsRepository extends Repository
      * Get a user's total edit count on one or more project.
      * Requires the CentralAuth extension to be installed on the project.
      * @param User $user The user.
-     * @return mixed[]|false Elements are arrays with 'dbName' (string), and 'total' (int). False for logged out users.
+     * @return array|null Elements are arrays with 'dbName' (string), and 'total' (int). Null for logged out users.
      */
-    protected function globalEditCountsFromCentralAuth(User $user)
+    protected function globalEditCountsFromCentralAuth(User $user): ?array
     {
         if (true === $user->isAnon()) {
-            return false;
+            return null;
         }
 
         // Set up cache.
@@ -114,7 +123,7 @@ class GlobalContribsRepository extends Repository
         $projects = [];
 
         foreach ($dbNames as $dbName) {
-            $projects[$dbName] = ProjectRepository::getProject($dbName, $this->container);
+            $projects[$dbName] = $this->projectRepo->getProject($dbName);
         }
 
         return $projects;
@@ -146,7 +155,7 @@ class GlobalContribsRepository extends Repository
      * Get projects that the user has made at least one edit on, and the associated actor ID.
      * @param User $user
      * @param string[] $dbNames Loop over these projects instead of all of them.
-     * @return mixed[] Keys are database names, values are actor IDs.
+     * @return array Keys are database names, values are actor IDs.
      */
     public function getDbNamesAndActorIds(User $user, ?array $dbNames = null): array
     {

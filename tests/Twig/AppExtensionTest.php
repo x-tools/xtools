@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the AppExtensionTest class.
- */
 
 declare(strict_types = 1);
 
@@ -11,45 +8,48 @@ use App\Helper\I18nHelper;
 use App\Model\Project;
 use App\Model\User;
 use App\Repository\ProjectRepository;
+use App\Repository\UserRepository;
 use App\Tests\TestAdapter;
 use App\Twig\AppExtension;
 use DateTime;
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpKernel\Client;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 
 /**
  * Tests for the AppExtension class.
+ * @covers \App\Twig\AppExtension
  */
 class AppExtensionTest extends TestAdapter
 {
     use ArraySubsetAsserts;
 
-    /** @var AppExtension Instance of class. */
-    protected $appExtension;
-
-    /** @var Client HTTP client. */
-    private $client;
+    protected AppExtension $appExtension;
 
     /**
      * Set class instance.
      */
     public function setUp(): void
     {
-        $this->client = static::createClient();
-        $container = $this->client->getContainer();
+        $container = static::createClient()->getContainer();
         $stack = new RequestStack();
         $session = new Session();
         $i18nHelper = new I18nHelper($container, $stack, $session);
         $urlGenerator = $this->createMock(UrlGenerator::class);
-        $this->appExtension = new AppExtension($container, $stack, $session, $i18nHelper, $urlGenerator);
+        $this->appExtension = new AppExtension(
+            $container,
+            $stack,
+            $session,
+            $i18nHelper,
+            $urlGenerator,
+            $this->createMock(ProjectRepository::class),
+            false
+        );
     }
 
     /**
      * Format number as a diff size.
-     * @covers AppExtension::diffFormat
      */
     public function testDiffFormat(): void
     {
@@ -69,7 +69,6 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Format number as a percentage.
-     * @covers AppExtension::percentFormat
      */
     public function testPercentFormat(): void
     {
@@ -81,7 +80,6 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Format a time duration as humanized string.
-     * @covers AppExtension::formatDuration
      */
     public function testFormatDuration(): void
     {
@@ -109,7 +107,6 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Format a number.
-     * @covers AppExtension::numberFormat
      */
     public function testNumberFormat(): void
     {
@@ -120,7 +117,6 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Format a size.
-     * @covers AppExtension::sizeFormat
      */
     public function testSizeFormat(): void
     {
@@ -133,10 +129,6 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Intuition methods.
-     * @covers AppExtension::getLang
-     * @covers AppExtension::getLangName
-     * @covers AppExtension::getAllLangs
-     * @covers AppExtension::isRTL
      */
     public function testIntution(): void
     {
@@ -160,8 +152,6 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Methods that fetch data about the git repository.
-     * @covers AppExtension::gitHash
-     * @covers AppExtension::gitDate
      */
     public function testGitMethods(): void
     {
@@ -175,7 +165,6 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Capitalizing first letter.
-     * @covers AppExtension::capitalizeFirst
      */
     public function testCapitalizeFirst(): void
     {
@@ -185,7 +174,6 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Getting amount of time it took to complete the request.
-     * @covers AppExtension::requestMemory
      */
     public function testRequestTime(): void
     {
@@ -194,12 +182,12 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Is the given user logged out?
-     * @covers AppExtension::isUserAnon
      */
     public function testUserIsAnon(): void
     {
-        $user = new User('68.229.186.65');
-        $user2 = new User('Test user');
+        $userRepo = $this->createMock(UserRepository::class);
+        $user = new User($userRepo, '68.229.186.65');
+        $user2 = new User($userRepo, 'Test user');
         static::assertTrue($this->appExtension->isUserAnon($user));
         static::assertFalse($this->appExtension->isUserAnon($user2));
 
@@ -209,7 +197,6 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Formatting dates.
-     * @covers AppExtension::dateFormat
      */
     public function testDateFormat(): void
     {
@@ -225,7 +212,6 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Building URL query string from array.
-     * @covers AppExtension::buildQuery
      */
     public function testBuildQuery(): void
     {
@@ -240,7 +226,6 @@ class AppExtensionTest extends TestAdapter
 
     /**
      * Wikifying a string.
-     * @covers AppExtension::wikify
      */
     public function testWikify(): void
     {

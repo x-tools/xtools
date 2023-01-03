@@ -1,9 +1,6 @@
 <?php
-declare(strict_types = 1);
 
-/**
- * This file contains only the XtoolsHttpException class.
- */
+declare(strict_types = 1);
 
 namespace App\Exception;
 
@@ -16,19 +13,19 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class XtoolsHttpException extends HttpException
 {
     /** @var string What URL to redirect to. */
-    protected $redirectUrl;
+    protected string $redirectUrl;
 
-    /** @var mixed[] The params to pass in with the URL. */
-    protected $params;
+    /** @var array The params to pass in with the URL. */
+    protected array $params;
 
     /** @var bool Whether the exception was thrown as part of an API request. */
-    protected $api;
+    protected bool $api;
 
     /**
      * XtoolsHttpException constructor.
      * @param string $message
      * @param string $redirectUrl
-     * @param mixed[] $params Params to pass in with the redirect URL.
+     * @param array $params Params to pass in with the redirect URL.
      * @param bool $api Whether this is thrown during an API request.
      * @param int $statusCode
      */
@@ -42,7 +39,6 @@ class XtoolsHttpException extends HttpException
         $this->redirectUrl = $redirectUrl;
         $this->params = $params;
         $this->api = $api;
-
         parent::__construct($statusCode, $message);
     }
 
@@ -58,7 +54,7 @@ class XtoolsHttpException extends HttpException
     /**
      * Get the configured parameters, which should be the same parameters parsed from the Request,
      * and passed to the $redirectUrl when handled in the ExceptionListener.
-     * @return mixed[]
+     * @return array
      */
     public function getParams(): array
     {

@@ -16,12 +16,12 @@
 #}{% endif %}
 
 | {% for right in change.added %}
-<span style="color:#006400">+{{ ec.rightsName(right)|trim }}</span>{% if not loop.last %}, {% endif %}
+<span style="color:#006400">+{{ ec.userRights.rightsName(right)|trim }}</span>{% if not loop.last %}, {% endif %}
 {% endfor %}{% if change.added|length > 0 and change.removed|length > 0 %}
 
 {% endif %}
 {% for right in change.removed %}
-<span style="color:#8B0000">-{{ ec.rightsName(right)|trim }}</span>{% if not loop.last %}, {% endif %}
+<span style="color:#8B0000">-{{ ec.userRights.rightsName(right)|trim }}</span>{% if not loop.last %}, {% endif %}
 {% endfor %}
 
 |{% if change.performer is not empty %} <span class="plainlinks">[{% verbatim %}{{{% endverbatim %}fullurl:User:{{ change.performer }}}} {{ change.performer }}]</span>{% endif %}

@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the PagesController class.
- */
 
 declare(strict_types=1);
 
@@ -10,8 +7,13 @@ namespace App\Controller;
 use App\Helper\I18nHelper;
 use App\Model\Pages;
 use App\Model\Project;
+use App\Repository\PageRepository;
 use App\Repository\PagesRepository;
-use GuzzleHttp;
+use App\Repository\ProjectRepository;
+use App\Repository\UserRepository;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -25,10 +27,39 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class PagesController extends XtoolsController
 {
+    protected PagesRepository $pagesRepo;
+
+    /**
+     * @param RequestStack $requestStack
+     * @param ContainerInterface $container
+     * @param CacheItemPoolInterface $cache
+     * @param Client $guzzle
+     * @param I18nHelper $i18n
+     * @param ProjectRepository $projectRepo
+     * @param UserRepository $userRepo
+     * @param PageRepository $pageRepo
+     * @param PagesRepository $pagesRepo
+     * @codeCoverageIgnore
+     */
+    public function __construct(
+        RequestStack $requestStack,
+        ContainerInterface $container,
+        CacheItemPoolInterface $cache,
+        Client $guzzle,
+        I18nHelper $i18n,
+        ProjectRepository $projectRepo,
+        UserRepository $userRepo,
+        PageRepository $pageRepo,
+        PagesRepository $pagesRepo
+    ) {
+        $this->pagesRepo = $pagesRepo;
+        parent::__construct($requestStack, $container, $cache, $guzzle, $i18n, $projectRepo, $userRepo, $pageRepo);
+    }
+
     /**
      * Get the name of the tool's index route.
      * This is also the name of the associated model.
-     * @return string
+     * @inheritDoc
      * @codeCoverageIgnore
      */
     public function getIndexRoute(): string
@@ -37,20 +68,21 @@ class PagesController extends XtoolsController
     }
 
     /**
-     * PagesController constructor.
-     * @param RequestStack $requestStack
-     * @param ContainerInterface $container
-     * @param I18nHelper $i18n
+     * @inheritDoc
+     * @codeCoverageIgnore
      */
-    public function __construct(RequestStack $requestStack, ContainerInterface $container, I18nHelper $i18n)
+    public function tooHighEditCountRoute(): string
     {
-        // Causes the tool to redirect to the index page if the user has too high of an edit count.
-        $this->tooHighEditCountAction = $this->getIndexRoute();
+        return $this->getIndexRoute();
+    }
 
-        // The countPagesApi action is exempt from the edit count limitation.
-        $this->tooHighEditCountActionBlacklist = ['countPagesApi'];
-
-        parent::__construct($requestStack, $container, $i18n);
+    /**
+     * @inheritDoc
+     * @codeCoverageIgnore
+     */
+    public function tooHighEditCountActionAllowlist(): array
+    {
+        return ['countPagesApi'];
     }
 
     /**
@@ -97,9 +129,8 @@ class PagesController extends XtoolsController
             $this->throwXtoolsException($this->getIndexRoute(), 'error-ip-range-unsupported');
         }
 
-        $pagesRepo = new PagesRepository();
-        $pagesRepo->setContainer($this->container);
-        $pages = new Pages(
+        return new Pages(
+            $this->pagesRepo,
             $this->project,
             $this->user,
             $this->namespace,
@@ -109,9 +140,6 @@ class PagesController extends XtoolsController
             $this->end,
             $this->offset
         );
-        $pages->setRepository($pagesRepo);
-
-        return $pages;
     }
 
     /**
@@ -252,18 +280,15 @@ class PagesController extends XtoolsController
      */
     private function createPagePile(Project $project, array $pageTitles): int
     {
-        /** @var GuzzleHttp\Client $client */
-        $client = $this->container->get('eight_points_guzzle.client.xtools');
-
         $url = 'https://pagepile.toolforge.org/api.php';
 
         try {
-            $res = $client->request('GET', $url, ['query' => [
+            $res = $this->guzzle->request('GET', $url, ['query' => [
                 'action' => 'create_pile_with_data',
                 'wiki' => $project->getDatabaseName(),
                 'data' => implode("\n", $pageTitles),
             ]]);
-        } catch (GuzzleHttp\Exception\ClientException $e) {
+        } catch (ClientException $e) {
             throw new HttpException(
                 414,
                 'error-pagepile-too-large'

@@ -1,16 +1,19 @@
 <?php
-/**
- * This file contains only the TopEditsController class.
- */
 
 declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Helper\AutomatedEditsHelper;
 use App\Helper\I18nHelper;
 use App\Model\TopEdits;
+use App\Repository\PageRepository;
+use App\Repository\ProjectRepository;
 use App\Repository\TopEditsRepository;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use App\Repository\UserRepository;
+use GuzzleHttp\Client;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,9 +24,11 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class TopEditsController extends XtoolsController
 {
+    protected AutomatedEditsHelper $autoEditsHelper;
+    protected TopEditsRepository $topEditsRepo;
+
     /**
-     * Get the name of the tool's index route. This is also the name of the associated model.
-     * @return string
+     * @inheritDoc
      * @codeCoverageIgnore
      */
     public function getIndexRoute(): string
@@ -35,18 +40,59 @@ class TopEditsController extends XtoolsController
      * TopEditsController constructor.
      * @param RequestStack $requestStack
      * @param ContainerInterface $container
+     * @param CacheItemPoolInterface $cache
+     * @param Client $guzzle
      * @param I18nHelper $i18n
+     * @param ProjectRepository $projectRepo
+     * @param UserRepository $userRepo
+     * @param PageRepository $pageRepo
+     * @param TopEditsRepository $topEditsRepo
+     * @param AutomatedEditsHelper $autoEditsHelper
      */
-    public function __construct(RequestStack $requestStack, ContainerInterface $container, I18nHelper $i18n)
+    public function __construct(
+        RequestStack $requestStack,
+        ContainerInterface $container,
+        CacheItemPoolInterface $cache,
+        Client $guzzle,
+        I18nHelper $i18n,
+        ProjectRepository $projectRepo,
+        UserRepository $userRepo,
+        PageRepository $pageRepo,
+        TopEditsRepository $topEditsRepo,
+        AutomatedEditsHelper $autoEditsHelper
+    ) {
+        $this->topEditsRepo = $topEditsRepo;
+        $this->autoEditsHelper = $autoEditsHelper;
+        $this->limit = 1000;
+        parent::__construct($requestStack, $container, $cache, $guzzle, $i18n, $projectRepo, $userRepo, $pageRepo);
+    }
+
+    /**
+     * @inheritDoc
+     * @codeCoverageIgnore
+     */
+    public function tooHighEditCountRoute(): string
     {
-        $this->tooHighEditCountAction = $this->getIndexRoute();
+        return $this->getIndexRoute();
+    }
 
-        // The Top Edits by page action is exempt from the edit count limitation.
-        $this->tooHighEditCountActionBlacklist = ['singlePageTopEdits'];
+    /**
+     * The Top Edits by page action is exempt from the edit count limitation.
+     * @inheritDoc
+     * @codeCoverageIgnore
+     */
+    public function tooHighEditCountActionAllowlist(): array
+    {
+        return ['singlePageTopEdits'];
+    }
 
-        $this->restrictedActions = ['namespaceTopEditsUserApi'];
-
-        parent::__construct($requestStack, $container, $i18n);
+    /**
+     * @inheritDoc
+     * @codeCoverageIgnore
+     */
+    public function restrictedApiActions(): array
+    {
+        return ['namespaceTopEditsUserApi'];
     }
 
     /**
@@ -88,7 +134,9 @@ class TopEditsController extends XtoolsController
      */
     public function setUpTopEdits(): TopEdits
     {
-        $topEdits = new TopEdits(
+        return new TopEdits(
+            $this->topEditsRepo,
+            $this->autoEditsHelper,
             $this->project,
             $this->user,
             $this->page,
@@ -98,12 +146,6 @@ class TopEditsController extends XtoolsController
             $this->limit,
             (int)$this->request->query->get('pagination', 0)
         );
-
-        $topEditsRepo = new TopEditsRepository();
-        $topEditsRepo->setContainer($this->container);
-        $topEdits->setRepository($topEditsRepo);
-
-        return $topEdits;
     }
 
     /**
@@ -123,10 +165,7 @@ class TopEditsController extends XtoolsController
      */
     public function namespaceTopEditsAction(): Response
     {
-        /**
-         * Max number of rows per namespace to show. `null` here will use the TopEdits default.
-         * @var int
-         */
+        // Max number of rows per namespace to show. `null` here will use the TopEdits default.
         $this->limit = $this->isSubRequest ? 10 : $this->limit;
 
         $topEdits = $this->setUpTopEdits();

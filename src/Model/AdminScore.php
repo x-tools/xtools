@@ -1,12 +1,10 @@
 <?php
-/**
- * This file contains only the AdminScore class.
- */
 
 declare(strict_types = 1);
 
 namespace App\Model;
 
+use App\Repository\AdminScoreRepository;
 use DateTime;
 
 /**
@@ -18,7 +16,7 @@ class AdminScore extends Model
     /**
      * @var array Multipliers (may need review). This currently is dynamic, but should be a constant.
      */
-    private $multipliers = [
+    private array $multipliers = [
         'account-age-mult' => 1.25,
         'edit-count-mult' => 1.25,
         'user-page-mult' => 0.1,
@@ -36,18 +34,20 @@ class AdminScore extends Model
     ];
 
     /** @var array The scoring results. */
-    protected $scores;
+    protected array $scores;
 
     /** @var int The total of all scores. */
-    protected $total;
+    protected int $total;
 
     /**
      * AdminScore constructor.
+     * @param AdminScoreRepository $repository
      * @param Project $project
      * @param User $user
      */
-    public function __construct(Project $project, User $user)
+    public function __construct(AdminScoreRepository $repository, Project $project, User $user)
     {
+        $this->repository = $repository;
         $this->project = $project;
         $this->user = $user;
     }
@@ -83,7 +83,7 @@ class AdminScore extends Model
      */
     public function prepareData(): void
     {
-        $data = $this->getRepository()->fetchData($this->project, $this->user);
+        $data = $this->repository->fetchData($this->project, $this->user);
         $this->total = 0;
         $this->scores = [];
 

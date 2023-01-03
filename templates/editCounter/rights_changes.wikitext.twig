@@ -8,13 +8,13 @@
 {% endif %}
 === {{ msg('rights-changes') }} ===
 
-{% if ec.rightsChanges|length > 0 %}
-{% include 'editCounter/rights_changes_table.wikitext.twig' with {'rightsChanges': ec.rightsChanges} %}
+{% if ec.userRights.rightsChanges|length > 0 %}
+{% include 'editCounter/rights_changes_table.wikitext.twig' with {'rightsChanges': ec.userRights.rightsChanges} %}
 
-{% if ec.globalRightsChanges|length > 0 %}
+{% if ec.userRights.globalRightsChanges|length > 0 %}
 ==== {{ msg('global-rights-changes') }} ====
 
-{% include 'editCounter/rights_changes_table.wikitext.twig' with {'rightsChanges': ec.globalRightsChanges} %}
+{% include 'editCounter/rights_changes_table.wikitext.twig' with {'rightsChanges': ec.userRights.globalRightsChanges} %}
 {% endif %}
 
 {% else %}

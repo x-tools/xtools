@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the CategoryEditsTest class.
- */
 
 declare(strict_types = 1);
 
@@ -13,25 +10,24 @@ use App\Model\Page;
 use App\Model\Project;
 use App\Model\User;
 use App\Repository\CategoryEditsRepository;
+use App\Repository\EditRepository;
+use App\Repository\PageRepository;
 use App\Repository\UserRepository;
 use App\Tests\TestAdapter;
 
 /**
  * Tests of the CategoryEdits class.
+ * @covers \App\Model\CategoryEdits
  */
 class CategoryEditsTest extends TestAdapter
 {
-    /** @var Project The project instance. */
-    protected $project;
-
-    /** @var CategoryEdits The CategoryEdits instance. */
-    protected $ce;
-
-    /** @var CategoryEditsRepository The AdminStats repo instance. */
-    protected $ceRepo;
-
-    /** @var User The user instance. */
-    protected $user;
+    protected CategoryEdits $ce;
+    protected CategoryEditsRepository $ceRepo;
+    protected EditRepository $editRepo;
+    protected PageRepository $pageRepo;
+    protected Project $project;
+    protected User $user;
+    protected UserRepository $userRepo;
 
     /**
      * Set up class instances and mocks.
@@ -44,14 +40,16 @@ class CategoryEditsTest extends TestAdapter
                 0 => '',
                 1 => 'Talk',
             ]);
-        $userRepo = $this->createMock(UserRepository::class);
-        $userRepo->method('countEdits')
+        $this->userRepo = $this->createMock(UserRepository::class);
+        $this->userRepo->method('countEdits')
             ->willReturn(500);
-        $this->user = new User('Test user');
-        $this->user->setRepository($userRepo);
+        $this->user = new User($this->userRepo, 'Test user');
 
         $this->ceRepo = $this->createMock(CategoryEditsRepository::class);
+        $this->editRepo = $this->createMock(EditRepository::class);
+        $this->pageRepo = $this->createMock(PageRepository::class);
         $this->ce = new CategoryEdits(
+            $this->ceRepo,
             $this->project,
             $this->user,
             ['Living_people', 'Musicians_from_New_York_City'],
@@ -140,25 +138,27 @@ class CategoryEditsTest extends TestAdapter
         ];
 
         $pages = [
-            Page::newFromRow($this->project, [
+            Page::newFromRow($this->pageRepo, $this->project, [
                 'page_title' => 'Test_page',
                 'page_namespace' => 1,
             ]),
-            Page::newFromRow($this->project, [
+            Page::newFromRow($this->pageRepo, $this->project, [
                 'page_title' => 'Foo_bar',
                 'page_namespace' => 0,
             ]),
         ];
 
         $edits = [
-            new Edit($pages[0], array_merge($revs[0], ['user' => $this->user])),
-            new Edit($pages[1], array_merge($revs[1], ['user' => $this->user])),
+            new Edit($this->editRepo, $this->userRepo, $pages[0], array_merge($revs[0], ['user' => $this->user])),
+            new Edit($this->editRepo, $this->userRepo, $pages[1], array_merge($revs[1], ['user' => $this->user])),
         ];
 
         $this->ceRepo->expects($this->exactly(2))
             ->method('getCategoryEdits')
             ->willReturn($revs);
-        $this->ce->setRepository($this->ceRepo);
+        $this->ceRepo->expects($this->once())
+            ->method('getEditsFromRevs')
+            ->willReturn($edits);
 
         static::assertEquals($revs, $this->ce->getCategoryEdits(true));
         static::assertEquals($edits, $this->ce->getCategoryEdits());

@@ -1,22 +1,26 @@
 <?php
-/**
- * This file contains only the ArticleInfoController class.
- */
 
 declare(strict_types=1);
 
 namespace App\Controller;
 
 use App\Exception\XtoolsHttpException;
+use App\Helper\AutomatedEditsHelper;
 use App\Helper\I18nHelper;
 use App\Model\ArticleInfo;
 use App\Model\Authorship;
 use App\Model\Page;
 use App\Model\Project;
 use App\Repository\ArticleInfoRepository;
+use App\Repository\PageRepository;
+use App\Repository\ProjectRepository;
+use App\Repository\UserRepository;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ServerException;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -25,17 +29,46 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class ArticleInfoController extends XtoolsController
 {
-    /** @var ArticleInfo The ArticleInfo class that does all the work. */
-    protected $articleInfo;
+    protected ArticleInfo $articleInfo;
+    protected ArticleInfoRepository $articleInfoRepo;
+    protected AutomatedEditsHelper $autoEditsHelper;
 
     /**
-     * Get the name of the tool's index route. This is also the name of the associated model.
-     * @return string
+     * @inheritDoc
      * @codeCoverageIgnore
      */
     public function getIndexRoute(): string
     {
         return 'ArticleInfo';
+    }
+
+    /**
+     * @param RequestStack $requestStack
+     * @param ContainerInterface $container
+     * @param CacheItemPoolInterface $cache
+     * @param Client $guzzle
+     * @param I18nHelper $i18n
+     * @param ProjectRepository $projectRepo
+     * @param UserRepository $userRepo
+     * @param PageRepository $pageRepo
+     * @param ArticleInfoRepository $articleInfoRepo
+     * @param AutomatedEditsHelper $autoEditsHelper
+     */
+    public function __construct(
+        RequestStack $requestStack,
+        ContainerInterface $container,
+        CacheItemPoolInterface $cache,
+        Client $guzzle,
+        I18nHelper $i18n,
+        ProjectRepository $projectRepo,
+        UserRepository $userRepo,
+        PageRepository $pageRepo,
+        ArticleInfoRepository $articleInfoRepo,
+        AutomatedEditsHelper $autoEditsHelper
+    ) {
+        $this->articleInfoRepo = $articleInfoRepo;
+        $this->autoEditsHelper = $autoEditsHelper;
+        parent::__construct($requestStack, $container, $cache, $guzzle, $i18n, $projectRepo, $userRepo, $pageRepo);
     }
 
     /**
@@ -55,7 +88,6 @@ class ArticleInfoController extends XtoolsController
             'xtPage' => 'ArticleInfo',
             'xtPageTitle' => 'tool-articleinfo',
             'xtSubtitle' => 'tool-articleinfo-desc',
-            'project' => $this->project,
 
             // Defaults that will get overridden if in $params.
             'start' => '',
@@ -73,11 +105,14 @@ class ArticleInfoController extends XtoolsController
             return;
         }
 
-        $articleInfoRepo = new ArticleInfoRepository();
-        $articleInfoRepo->setContainer($this->container);
-        $this->articleInfo = new ArticleInfo($this->page, $this->container, $this->start, $this->end);
-        $this->articleInfo->setRepository($articleInfoRepo);
-        $this->articleInfo->setI18nHelper($this->container->get('app.i18n_helper'));
+        $this->articleInfo = new ArticleInfo(
+            $this->articleInfoRepo,
+            $this->i18n,
+            $this->autoEditsHelper,
+            $this->page,
+            $this->start,
+            $this->end
+        );
     }
 
     /**
@@ -87,11 +122,10 @@ class ArticleInfoController extends XtoolsController
      * @Route("/articleinfo-gadget.js", name="ArticleInfoGadget")
      * @link https://www.mediawiki.org/wiki/XTools/ArticleInfo_gadget
      *
-     * @param Request $request The HTTP request
      * @return Response
      * @codeCoverageIgnore
      */
-    public function gadgetAction(Request $request): Response
+    public function gadgetAction(): Response
     {
         $rendered = $this->renderView('articleInfo/articleinfo.js.twig');
         $response = new Response($rendered);
@@ -113,11 +147,10 @@ class ArticleInfoController extends XtoolsController
      *         "end"=false,
      *     }
      * )
-     * @param I18nHelper $i18n
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction(I18nHelper $i18n): Response
+    public function resultAction(): Response
     {
         if (!$this->isDateRangeValid($this->page, $this->start, $this->end)) {
             $this->addFlashMessage('notice', 'date-range-outside-revisions');
@@ -130,12 +163,12 @@ class ArticleInfoController extends XtoolsController
         $this->setupArticleInfo();
         $this->articleInfo->prepareData();
 
-        $maxRevisions = $this->container->getParameter('app.max_page_revisions');
+        $maxRevisions = $this->getParameter('app.max_page_revisions');
 
         // Show message if we hit the max revisions.
         if ($this->articleInfo->tooManyRevisions()) {
             $this->addFlashMessage('notice', 'too-many-revisions', [
-                $i18n->numberFormat($maxRevisions),
+                $this->i18n->numberFormat($maxRevisions),
                 $maxRevisions,
             ]);
         }
@@ -253,7 +286,6 @@ class ArticleInfoController extends XtoolsController
     public function proseStatsApiAction(): JsonResponse
     {
         $this->recordApiUsage('page/prose');
-
         $this->setupArticleInfo();
         return $this->getFormattedApiResponse($this->articleInfo->getProseStats());
     }

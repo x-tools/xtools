@@ -1,65 +1,75 @@
 <?php
-/**
- * This file contains only the ArticleInfoTest class.
- */
 
 declare(strict_types = 1);
 
 namespace App\Tests\Model;
 
+use App\Helper\AutomatedEditsHelper;
 use App\Helper\I18nHelper;
 use App\Model\ArticleInfo;
 use App\Model\Edit;
 use App\Model\Page;
 use App\Model\Project;
 use App\Repository\ArticleInfoRepository;
+use App\Repository\EditRepository;
 use App\Repository\PageRepository;
-use App\Repository\ProjectRepository;
+use App\Repository\UserRepository;
 use App\Tests\TestAdapter;
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use GuzzleHttp;
-use PHPUnit\Framework\MockObject\MockObject;
+use ReflectionClass;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Tests for ArticleInfo.
+ * @covers \App\Model\ArticleInfo
+ * @covers \App\Model\ArticleInfoApi
  */
 class ArticleInfoTest extends TestAdapter
 {
     use ArraySubsetAsserts;
 
-    /** @var ArticleInfo The article info instance. */
-    protected $articleInfo;
+    protected ArticleInfo $articleInfo;
+    protected ArticleInfoRepository $articleInfoRepo;
+    protected EditRepository $editRepo;
+    protected Page $page;
+    protected PageRepository $pageRepo;
+    protected Project $project;
+    protected UserRepository $userRepo;
 
-    /** @var Page The page instance. */
-    protected $page;
-
-    /** @var Project The project instance. */
-    protected $project;
-
-    /** @var \ReflectionClass Hack to test private methods. */
-    private $reflectionClass;
+    /** @var ReflectionClass Hack to test private methods. */
+    private ReflectionClass $reflectionClass;
 
     /**
      * Set up shared mocks and class instances.
      */
     public function setUp(): void
     {
-        $client = static::createClient();
-        $container = $client->getContainer();
-        $this->project = new Project('en.wikipedia.org');
-        $this->page = new Page($this->project, 'Test page');
-        $this->articleInfo = new ArticleInfo($this->page, $container);
-
-        $stack = new RequestStack();
-        $session = new Session();
-        $i18nHelper = new I18nHelper($container, $stack, $session);
-        $this->articleInfo->setI18nHelper($i18nHelper);
+        static::createClient();
+        /** @var AutomatedEditsHelper $autoEditsHelper */
+        $autoEditsHelper = static::$container->get('app.automated_edits_helper');
+        $i18nHelper = new I18nHelper(static::$container, new RequestStack(), new Session());
+        $this->project = $this->getMockEnwikiProject();
+        $this->pageRepo = $this->createMock(PageRepository::class);
+        $this->page = new Page($this->pageRepo, $this->project, 'Test page');
+        $this->editRepo = $this->createMock(EditRepository::class);
+        $this->editRepo->method('getAutoEditsHelper')
+            ->willReturn($autoEditsHelper);
+        $this->userRepo = $this->createMock(UserRepository::class);
+        $this->articleInfoRepo = $this->createMock(ArticleInfoRepository::class);
+        $this->articleInfoRepo->method('getMaxPageRevisions')
+            ->willReturn(static::$container->getParameter('app.max_page_revisions'));
+        $this->articleInfo = new ArticleInfo(
+            $this->articleInfoRepo,
+            $i18nHelper,
+            $autoEditsHelper,
+            $this->page
+        );
 
         // Don't care that private methods "shouldn't" be tested...
-        // In ArticleInfo they are all super testworthy and otherwise fragile.
-        $this->reflectionClass = new \ReflectionClass($this->articleInfo);
+        // In ArticleInfo they are all super test-worthy and otherwise fragile.
+        $this->reflectionClass = new ReflectionClass($this->articleInfo);
     }
 
     /**
@@ -67,11 +77,9 @@ class ArticleInfoTest extends TestAdapter
      */
     public function testNumRevisions(): void
     {
-        $pageRepo = $this->createMock(PageRepository::class);
-        $pageRepo->expects($this->once())
+        $this->pageRepo->expects($this->once())
             ->method('getNumRevisions')
             ->willReturn(10);
-        $this->page->setRepository($pageRepo);
         static::assertEquals(10, $this->articleInfo->getNumRevisions());
         // Should be cached (will error out if repo's getNumRevisions is called again).
         static::assertEquals(10, $this->articleInfo->getNumRevisions());
@@ -85,9 +93,7 @@ class ArticleInfoTest extends TestAdapter
      */
     public function testRevisionsProcessed(int $numRevisions, int $assertion): void
     {
-        $pageRepo = $this->createMock(PageRepository::class);
-        $pageRepo->method('getNumRevisions')->willReturn($numRevisions);
-        $this->page->setRepository($pageRepo);
+        $this->pageRepo->method('getNumRevisions')->willReturn($numRevisions);
         static::assertEquals(
             $this->articleInfo->getNumRevisionsProcessed(),
             $assertion
@@ -111,12 +117,9 @@ class ArticleInfoTest extends TestAdapter
      */
     public function testTooManyRevisions(): void
     {
-        /** @var PageRepository|MockObject $pageRepo */
-        $pageRepo = $this->createMock(PageRepository::class);
-        $pageRepo->expects($this->once())
+        $this->pageRepo->expects($this->once())
             ->method('getNumRevisions')
             ->willReturn(1000000);
-        $this->page->setRepository($pageRepo);
         static::assertTrue($this->articleInfo->tooManyRevisions());
     }
 
@@ -144,9 +147,7 @@ class ArticleInfoTest extends TestAdapter
 
     public function testLinksAndRedirects(): void
     {
-        /** @var PageRepository|MockObject $pageRepo */
-        $pageRepo = $this->createMock(PageRepository::class);
-        $pageRepo->expects($this->once())
+        $this->pageRepo->expects($this->once())
             ->method('countLinksAndRedirects')
             ->willReturn([
                 'links_ext_count' => 5,
@@ -154,7 +155,7 @@ class ArticleInfoTest extends TestAdapter
                 'links_in_count' => 10,
                 'redirects_count' => 0,
             ]);
-        $this->page->setRepository($pageRepo);
+        $this->page->setRepository($this->pageRepo);
         static::assertEquals(5, $this->articleInfo->linksExtCount());
         static::assertEquals(3, $this->articleInfo->linksOutCount());
         static::assertEquals(10, $this->articleInfo->linksInCount());
@@ -287,9 +288,7 @@ class ArticleInfoTest extends TestAdapter
     {
         $this->setupData();
 
-        /** @var ArticleInfoRepository|MockObject $articleInfoRepo */
-        $articleInfoRepo = $this->createMock(ArticleInfoRepository::class);
-        $articleInfoRepo->expects($this->once())
+        $this->articleInfoRepo->expects($this->once())
             ->method('getLogEvents')
             ->willReturn([
                 [
@@ -301,7 +300,6 @@ class ArticleInfoTest extends TestAdapter
                     'timestamp' => '20160905000000',
                 ],
             ]);
-        $this->articleInfo->setRepository($articleInfoRepo);
 
         $method = $this->reflectionClass->getMethod('setLogsEvents');
         $method->setAccessible(true);
@@ -320,25 +318,14 @@ class ArticleInfoTest extends TestAdapter
      * Use ReflectionClass to set up some data and populate the class properties for testing.
      *
      * We don't care that private methods "shouldn't" be tested...
-     * In ArticleInfo the update methods are all super testworthy and otherwise fragile.
+     * In ArticleInfo the update methods are all super test-worthy and otherwise fragile.
      *
      * @return Edit[] Array of Edit objects that represent the revision history.
      */
     private function setupData(): array
     {
-        // ArticleInfo::updateToolCounts relies on there being entries in
-        // the AutoEdits config for the project the edits were made on.
-        /** @var PageRepository|MockObject $pageRepo */
-        $projectRepo = $this->createMock(ProjectRepository::class);
-        $projectRepo->expects($this->once())
-            ->method('getOne')
-            ->willReturn([
-                'url' => 'https://en.wikipedia.org',
-            ]);
-        $this->project->setRepository($projectRepo);
-
         $edits = [
-            new Edit($this->page, [
+            new Edit($this->editRepo, $this->userRepo, $this->page, [
                 'id' => 1,
                 'timestamp' => '20160701101205',
                 'minor' => '0',
@@ -348,7 +335,7 @@ class ArticleInfoTest extends TestAdapter
                 'comment' => 'Foo bar',
                 'rev_sha1' => 'aaaaaa',
             ]),
-            new Edit($this->page, [
+            new Edit($this->editRepo, $this->userRepo, $this->page, [
                 'id' => 32,
                 'timestamp' => '20160801000000',
                 'minor' => '1',
@@ -358,7 +345,7 @@ class ArticleInfoTest extends TestAdapter
                 'comment' => 'Blah',
                 'rev_sha1' => 'bbbbbb',
             ]),
-            new Edit($this->page, [
+            new Edit($this->editRepo, $this->userRepo, $this->page, [
                 'id' => 40,
                 'timestamp' => '20161003000000',
                 'minor' => '0',
@@ -368,7 +355,7 @@ class ArticleInfoTest extends TestAdapter
                 'comment' => 'Weeee using [[WP:AWB|AWB]]',
                 'rev_sha1' => 'cccccc',
             ]),
-            new Edit($this->page, [
+            new Edit($this->editRepo, $this->userRepo, $this->page, [
                 'id' => 50,
                 'timestamp' => '20161003010000',
                 'minor' => '1',
@@ -425,11 +412,10 @@ class ArticleInfoTest extends TestAdapter
         $ret = $client->request('GET', 'https://en.wikipedia.org/wiki/Hanksy?oldid=747629772')
             ->getBody()
             ->getContents();
-        $pageRepo = $this->createMock(PageRepository::class);
-        $pageRepo->expects($this->once())
+        $this->pageRepo->expects($this->once())
             ->method('getHTMLContent')
             ->willReturn($ret);
-        $this->page->setRepository($pageRepo);
+        $this->page->setRepository($this->pageRepo);
 
         static::assertEquals([
             'characters' => 1541,

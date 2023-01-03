@@ -1,11 +1,10 @@
 <?php
-/**
- * This file contains only the SimpleEditCounter class.
- */
 
 declare(strict_types = 1);
 
 namespace App\Model;
+
+use App\Repository\SimpleEditCounterRepository;
 
 /**
  * A SimpleEditCounter provides basic edit count stats about a user.
@@ -15,10 +14,10 @@ namespace App\Model;
 class SimpleEditCounter extends Model
 {
     /** @var bool Whether only limited results are given (due to high edit count). */
-    private $limited = false;
+    private bool $limited = false;
 
     /** @var array The Simple Edit Counter results. */
-    protected $data = [
+    protected array $data = [
         'user_id' => null,
         'deleted_edit_count' => 0,
         'live_edit_count' => 0,
@@ -37,8 +36,15 @@ class SimpleEditCounter extends Model
      * @param false|int $start As Unix timestamp.
      * @param false|int $end As Unix timestamp.
      */
-    public function __construct(Project $project, User $user, $namespace = 'all', $start = false, $end = false)
-    {
+    public function __construct(
+        SimpleEditCounterRepository $repository,
+        Project $project,
+        User $user,
+        $namespace = 'all',
+        $start = false,
+        $end = false
+    ) {
+        $this->repository = $repository;
         $this->project = $project;
         $this->user = $user;
 
@@ -79,7 +85,7 @@ class SimpleEditCounter extends Model
 
     private function prepareFullData(): void
     {
-        $results = $this->getRepository()->fetchData(
+        $results = $this->repository->fetchData(
             $this->project,
             $this->user,
             $this->namespace,

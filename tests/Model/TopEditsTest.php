@@ -1,36 +1,36 @@
 <?php
-/**
- * This file contains only the TopEditsTest class.
- */
 
 declare(strict_types = 1);
 
 namespace App\Tests\Model;
 
+use App\Helper\AutomatedEditsHelper;
+use App\Model\Edit;
 use App\Model\Page;
 use App\Model\Project;
 use App\Model\TopEdits;
 use App\Model\User;
+use App\Repository\EditRepository;
+use App\Repository\PageRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\TopEditsRepository;
+use App\Repository\UserRepository;
 use App\Tests\TestAdapter;
 
 /**
  * Tests of the TopEdits class.
+ * @covers \App\Model\TopEdits
  */
 class TopEditsTest extends TestAdapter
 {
-    /** @var Project The project instance. */
-    protected $project;
-
-    /** @var ProjectRepository The project repo instance. */
-    protected $projectRepo;
-
-    /** @var TopEditsRepository The TopEdits repo instance. */
-    protected $teRepo;
-
-    /** @var User The user instance. */
-    protected $user;
+    protected AutomatedEditsHelper $autoEditsHelper;
+    protected EditRepository $editRepo;
+    protected PageRepository $pageRepo;
+    protected Project $project;
+    protected ProjectRepository $projectRepo;
+    protected TopEditsRepository $teRepo;
+    protected User $user;
+    protected UserRepository $userRepo;
 
     /**
      * Set up class instances and mocks.
@@ -44,14 +44,14 @@ class TopEditsTest extends TestAdapter
         $this->projectRepo->method('getOne')
             ->willReturn(['url' => 'https://en.wikipedia.org']);
         $this->project->setRepository($this->projectRepo);
-        $this->user = new User('Test user');
-
-        $client = static::createClient();
-        $container = $client->getContainer();
-
+        $this->userRepo = $this->createMock(UserRepository::class);
+        $this->user = new User($this->userRepo, 'Test user');
+        $this->autoEditsHelper = new AutomatedEditsHelper(static::createClient()->getContainer());
         $this->teRepo = $this->createMock(TopEditsRepository::class);
-        $this->teRepo->method('getContainer')
-            ->willReturn($container);
+        $this->editRepo = $this->createMock(EditRepository::class);
+        $this->editRepo->method('getAutoEditsHelper')
+            ->willReturn($this->autoEditsHelper);
+        $this->pageRepo = $this->createMock(PageRepository::class);
     }
 
     /**
@@ -60,26 +60,26 @@ class TopEditsTest extends TestAdapter
     public function testBasic(): void
     {
         // Single namespace, with defaults.
-        $te = new TopEdits($this->project, $this->user);
+        $te = $this->getTopEdits();
         static::assertEquals(0, $te->getNamespace());
         static::assertEquals(1000, $te->getLimit());
 
         // Single namespace, explicit configuration.
-        $te2 = new TopEdits($this->project, $this->user, null, 5, false, false, 50);
-        static::assertEquals(5, $te2->getNamespace());
-        static::assertEquals(50, $te2->getLimit());
+        $te = $this->getTopEdits(null, 5, false, false, 50);
+        static::assertEquals(5, $te->getNamespace());
+        static::assertEquals(50, $te->getLimit());
 
         // All namespaces, so limit set.
-        $te3 = new TopEdits($this->project, $this->user, null, 'all');
-        static::assertEquals('all', $te3->getNamespace());
-        static::assertEquals(20, $te3->getLimit());
+        $te = $this->getTopEdits(null, 'all');
+        static::assertEquals('all', $te->getNamespace());
+        static::assertEquals(20, $te->getLimit());
 
         // All namespaces, explicit limit.
-        $te4 = new TopEdits($this->project, $this->user, null, 'all', false, false, 3);
-        static::assertEquals('all', $te4->getNamespace());
-        static::assertEquals(3, $te4->getLimit());
+        $te = $this->getTopEdits(null, 'all', false, false, 3);
+        static::assertEquals('all', $te->getNamespace());
+        static::assertEquals(3, $te->getLimit());
 
-        $page = new Page($this->project, 'Test page');
+        $page = new Page($this->pageRepo, $this->project, 'Test page');
         $te->setPage($page);
         static::assertEquals($page, $te->getPage());
     }
@@ -89,7 +89,7 @@ class TopEditsTest extends TestAdapter
      */
     public function testTopEditsAllNamespaces(): void
     {
-        $te = new TopEdits($this->project, $this->user, null, 'all', false, false, 2);
+        $te = $this->getTopEdits(null, 'all', false, false, 2);
         $this->teRepo->expects($this->once())
             ->method('getTopEditsAllNamespaces')
             ->with($this->project, $this->user, '', '', 2)
@@ -125,7 +125,7 @@ class TopEditsTest extends TestAdapter
      */
     public function testTopEditsNamespace(): void
     {
-        $te = new TopEdits($this->project, $this->user, null, 3, false, false, 2);
+        $te = $this->getTopEdits(null, 3, false, false, 2);
         $this->teRepo->expects($this->once())
             ->method('getTopEditsNamespace')
             ->with($this->project, $this->user, 3, false, false, 2)
@@ -193,24 +193,27 @@ class TopEditsTest extends TestAdapter
      */
     public function testTopEditsPage(): void
     {
-        $page = new Page($this->project, 'Test page');
-
-        $te = new TopEdits($this->project, $this->user, $page);
+        $te = $this->getTopEdits(new Page($this->pageRepo, $this->project, 'Test page'));
         $this->teRepo->expects($this->once())
             ->method('getTopEditsPage')
             ->willReturn($this->topEditsPageFactory());
-        $te->setRepository($this->teRepo);
+        // The Edit instantiation happens in the repo, so we need to mock it for each
+        // revision so that the processing in TopEdits::prepareData() is done correctly.
+        $this->teRepo->method('getEdit')
+            ->willReturnCallback(function ($page, $rev) {
+                return new Edit($this->editRepo, $this->userRepo, $page, $rev);
+            });
 
         $te->prepareData();
 
-        static::assertEquals(4, $te->getNumTopEdits());
-        static::assertEquals(100, $te->getTotalAdded());
-        static::assertEquals(-50, $te->getTotalRemoved());
-        static::assertEquals(1, $te->getTotalMinor());
-        static::assertEquals(1, $te->getTotalAutomated());
-        static::assertEquals(2, $te->getTotalReverted());
-        static::assertEquals(10, $te->getTopEdits()[1]->getId());
-        static::assertEquals(22.5, $te->getAtbe());
+        static::assertEquals(4, $te->getNumTopEdits(), 'getNumTopEdits');
+        static::assertEquals(100, $te->getTotalAdded(), 'getTotalAdded');
+        static::assertEquals(-50, $te->getTotalRemoved(), 'getTotalRemoved');
+        static::assertEquals(1, $te->getTotalMinor(), 'getTotalMinor');
+        static::assertEquals(1, $te->getTotalAutomated(), 'getTotalAutomated');
+        static::assertEquals(2, $te->getTotalReverted(), 'getTotalReverted');
+        static::assertEquals(10, $te->getTopEdits()[1]->getId(), 'ID of second mock TopEdit');
+        static::assertEquals(22.5, $te->getAtbe(), 'getAtBe');
     }
 
     /**
@@ -266,5 +269,33 @@ class TopEditsTest extends TestAdapter
                 'parent_comment' => 'I plead the Fifth',
              ],
         ];
+    }
+
+    /**
+     * @param Page|null $page
+     * @param string|int $namespace Namespace ID or 'all'.
+     * @param int|false $start Start date as Unix timestamp.
+     * @param int|false $end End date as Unix timestamp.
+     * @param int|null $limit Number of rows to fetch.
+     * @return TopEdits
+     */
+    private function getTopEdits(
+        ?Page $page = null,
+        $namespace = 0,
+        $start = false,
+        $end = false,
+        ?int $limit = null
+    ): TopEdits {
+        return new TopEdits(
+            $this->teRepo,
+            $this->autoEditsHelper,
+            $this->project,
+            $this->user,
+            $page,
+            $namespace,
+            $start,
+            $end,
+            $limit
+        );
     }
 }

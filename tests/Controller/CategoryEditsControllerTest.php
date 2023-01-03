@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the CategoryEditsControllerTest class.
- */
 
 declare(strict_types=1);
 
@@ -10,6 +7,7 @@ namespace App\Tests\Controller;
 /**
  * Integration tests for the CategoryEditsController.
  * @group integration
+ * @covers \App\Controller\CategoryEditsController
  */
 class CategoryEditsControllerTest extends ControllerTestAdapter
 {
@@ -18,7 +16,7 @@ class CategoryEditsControllerTest extends ControllerTestAdapter
      */
     public function testRoutes(): void
     {
-        if (!self::$container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_wmf')) {
             return;
         }
 

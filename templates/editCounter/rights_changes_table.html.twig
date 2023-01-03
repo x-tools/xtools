@@ -24,10 +24,10 @@
                 </td>
                 <td class="{{ change.grantType == 'pending' ? 'pending ' : '' }}sort-entry--rights" data-value="{{ change.added|length + change.removed|length }}">
                     {% for right in change.added %}
-                        <div class="diff-pos">{{ ec.rightsName(right)|trim }}</div>
+                        <div class="diff-pos">{{ ec.userRights.rightsName(right)|trim }}</div>
                     {% endfor %}
                     {% for right in change.removed %}
-                        <div class="diff-neg" dir="ltr">-{{ ec.rightsName(right)|trim }}</div>
+                        <div class="diff-neg" dir="ltr">-{{ ec.userRights.rightsName(right)|trim }}</div>
                     {% endfor %}
                 </td>
                 <td class="{{ change.grantType == 'pending' ? 'pending ' : '' }}sort-entry--performer" data-value="{{ change.performer }}">

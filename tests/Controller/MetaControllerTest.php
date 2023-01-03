@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the MetaControllerTest class.
- */
 
 declare(strict_types = 1);
 
@@ -10,6 +7,7 @@ namespace App\Tests\Controller;
 /**
  * Integration/unit tests for the ArticleInfoController.
  * @group integration
+ * @covers \App\Controller\MetaController
  */
 class MetaControllerTest extends ControllerTestAdapter
 {
@@ -21,7 +19,7 @@ class MetaControllerTest extends ControllerTestAdapter
         $this->client->request('GET', '/meta');
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
-        if (!self::$container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_wmf')) {
             return;
         }
 

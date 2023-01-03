@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the RateLimitSubscriber class.
- */
 
 declare(strict_types = 1);
 
@@ -10,7 +7,8 @@ namespace App\EventSubscriber;
 use App\Controller\XtoolsController;
 use App\Helper\I18nHelper;
 use DateInterval;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
@@ -23,43 +21,49 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class RateLimitSubscriber implements EventSubscriberInterface
 {
+    /**
+     * Rate limiting will not apply to these actions.
+     */
+    public const ACTION_ALLOWLIST = [
+        'aboutAction',
+        'indexAction',
+        'loginAction',
+        'oauthCallbackAction',
+        'recordUsageAction',
+        'showAction',
+    ];
 
-    /** @var ContainerInterface The DI container. */
-    protected $container;
-
-    /** @var I18nHelper For i18n and l10n. */
-    protected $i18n;
+    protected CacheItemPoolInterface $cache;
+    protected ContainerInterface $container;
+    protected I18nHelper $i18n;
+    protected Request $request;
 
     /** @var int Number of requests allowed in time period */
-    protected $rateLimit;
+    protected int $rateLimit;
 
     /** @var int Number of minutes during which $rateLimit requests are permitted. */
-    protected $rateDuration;
-
-    /** @var \Symfony\Component\Cache\Adapter\TraceableAdapter Cache adapter. */
-    protected $cache;
-
-    /** @var Request The Request object. */
-    protected $request;
+    protected int $rateDuration;
 
     /** @var string User agent string. */
-    protected $userAgent;
+    protected string $userAgent;
 
     /** @var string The referer string. */
-    protected $referer;
+    protected string $referer;
 
     /** @var string The URI. */
-    protected $uri;
+    protected string $uri;
 
     /**
      * Save the container for later use.
      * @param ContainerInterface $container The DI container.
      * @param I18nHelper $i18n
+     * @param CacheItemPoolInterface $cache
      */
-    public function __construct(ContainerInterface $container, I18nHelper $i18n)
+    public function __construct(ContainerInterface $container, I18nHelper $i18n, CacheItemPoolInterface $cache)
     {
         $this->container = $container;
         $this->i18n = $i18n;
+        $this->cache = $cache;
     }
 
     /**
@@ -92,7 +96,6 @@ class RateLimitSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->cache = $this->container->get('cache.app');
         $this->rateLimit = (int)$this->container->getParameter('app.rate_limit_count');
         $this->rateDuration = (int)$this->container->getParameter('app.rate_limit_time');
         $this->request = $event->getRequest();
@@ -100,7 +103,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
         $this->referer = (string)$this->request->headers->get('referer');
         $this->uri = $this->request->getRequestUri();
 
-        $this->checkBlacklist();
+        $this->checkDenylist();
 
         // Zero values indicate the rate limiting feature should be disabled.
         if (0 === $this->rateLimit || 0 === $this->rateDuration) {
@@ -110,16 +113,8 @@ class RateLimitSubscriber implements EventSubscriberInterface
         $loggedIn = (bool)$this->container->get('session')->get('logged_in_user');
         $isApi = 'ApiAction' === substr($action, -9);
 
-        /**
-         * Rate limiting will not apply to these actions
-         * @var array
-         */
-        $actionWhitelist = [
-            'indexAction', 'showAction', 'aboutAction', 'loginAction', 'recordUsageAction', 'oauthCallbackAction',
-        ];
-
         // No rate limits on lightweight pages, logged in users, subrequests or API requests.
-        if (in_array($action, $actionWhitelist) || $loggedIn || false === $event->isMasterRequest() || $isApi) {
+        if (in_array($action, self::ACTION_ALLOWLIST) || $loggedIn || false === $event->isMasterRequest() || $isApi) {
             return;
         }
 
@@ -198,18 +193,18 @@ class RateLimitSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Check the request against blacklisted URIs and user agents
+     * Check the request against denylisted URIs and user agents
      */
-    private function checkBlacklist(): void
+    private function checkDenylist(): void
     {
         // First check user agent and URI blacklists
         if (!$this->container->hasParameter('request_blacklist')) {
             return;
         }
 
-        $blacklist = (array)$this->container->getParameter('request_blacklist');
+        $denylist = (array)$this->container->getParameter('request_blacklist');
 
-        foreach ($blacklist as $name => $item) {
+        foreach ($denylist as $name => $item) {
             $matches = [];
 
             if (isset($item['user_agent'])) {
@@ -232,7 +227,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
             }
 
             if (count($matches) > 0 && count($matches) === count(array_filter($matches))) {
-                $this->denyAccess("Matched blacklist entry `$name`", true);
+                $this->denyAccess("Matched denylist entry `$name`", true);
             }
         }
     }
@@ -240,17 +235,17 @@ class RateLimitSubscriber implements EventSubscriberInterface
     /**
      * Throw exception for denied access due to spider crawl or hitting usage limits.
      * @param string $logComment Comment to include with the log entry.
-     * @param bool $blacklist Changes the messaging to say access was denied due to abuse, rather than rate limiting.
+     * @param bool $denylist Changes the messaging to say access was denied due to abuse, rather than rate limiting.
      * @throws TooManyRequestsHttpException
      * @throws AccessDeniedHttpException
      */
-    private function denyAccess(string $logComment, bool $blacklist = false): void
+    private function denyAccess(string $logComment, bool $denylist = false): void
     {
         // Log the denied request
-        $logger = $this->container->get($blacklist ? 'monolog.logger.blacklist' : 'monolog.logger.rate_limit');
+        $logger = $this->container->get($denylist ? 'monolog.logger.blacklist' : 'monolog.logger.rate_limit');
         $logger->info($logComment);
 
-        if ($blacklist) {
+        if ($denylist) {
             $message = $this->i18n->msg('error-denied', ['tools.xtools@tools.wmflabs.org']);
             throw new AccessDeniedHttpException($message, null, 999);
         }

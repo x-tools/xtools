@@ -1,18 +1,20 @@
 <?php
-/**
- * This file contains only the CategoryEditsRepository class.
- */
 
 declare(strict_types = 1);
 
 namespace App\Repository;
 
 use App\Helper\AutomatedEditsHelper;
+use App\Model\Edit;
 use App\Model\Project;
 use App\Model\User;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\ParameterType;
+use GuzzleHttp\Client;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use Wikimedia\IPUtils;
 
 /**
@@ -22,18 +24,40 @@ use Wikimedia\IPUtils;
  */
 class CategoryEditsRepository extends Repository
 {
-    /** @var AutomatedEditsHelper Used for fetching the tool list and filtering it. */
-    private $aeh;
+    protected AutomatedEditsHelper $autoEditsHelper;
+    protected EditRepository $editRepo;
+    protected PageRepository $pageRepo;
+    protected UserRepository $userRepo;
 
     /**
-     * Method to give the repository access to the AutomatedEditsHelper.
+     * @param ContainerInterface $container
+     * @param CacheItemPoolInterface $cache
+     * @param Client $guzzle
+     * @param LoggerInterface $logger
+     * @param bool $isWMF
+     * @param int $queryTimeout
+     * @param AutomatedEditsHelper $autoEditsHelper
+     * @param EditRepository $editRepo
+     * @param PageRepository $pageRepo
+     * @param UserRepository $userRepo
      */
-    public function getHelper(): AutomatedEditsHelper
-    {
-        if (!isset($this->aeh)) {
-            $this->aeh = $this->container->get('app.automated_edits_helper');
-        }
-        return $this->aeh;
+    public function __construct(
+        ContainerInterface $container,
+        CacheItemPoolInterface $cache,
+        Client $guzzle,
+        LoggerInterface $logger,
+        bool $isWMF,
+        int $queryTimeout,
+        AutomatedEditsHelper $autoEditsHelper,
+        EditRepository $editRepo,
+        PageRepository $pageRepo,
+        UserRepository $userRepo
+    ) {
+        $this->autoEditsHelper= $autoEditsHelper;
+        $this->editRepo = $editRepo;
+        $this->pageRepo = $pageRepo;
+        $this->userRepo = $userRepo;
+        parent::__construct($container, $cache, $guzzle, $logger, $isWMF, $queryTimeout);
     }
 
     /**
@@ -238,5 +262,24 @@ class CategoryEditsRepository extends Repository
 
         return $this->getProjectsConnection($project)
             ->executeQuery($sql, $params, $types);
+    }
+
+    /**
+     * Get Edits given revision rows (JOINed on the page table).
+     * @param Project $project
+     * @param User $user
+     * @param array $revs Each must contain 'page_title' and 'page_namespace'.
+     * @return Edit[]
+     */
+    public function getEditsFromRevs(Project $project, User $user, array $revs): array
+    {
+        return Edit::getEditsFromRevs(
+            $this->pageRepo,
+            $this->editRepo,
+            $this->userRepo,
+            $project,
+            $user,
+            $revs
+        );
     }
 }

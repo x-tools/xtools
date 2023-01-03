@@ -117,9 +117,9 @@
                                     &middot;
                                     <a href="{{ path('TopEditsResultPage', { 'project': project.domain, 'username': user.usernameIdent, 'namespace': ns, 'page': page.page_title }) }}">{{ msg('tool-topedits') }}</a>
                                 {% endif %}
-                                {% if isWMFLabs() %}
+                                {% if isWMF() %}
                                     &middot;
-                                    <a target="_blank" href="https://pageviews.toolforge.org/?project={{ project.domain }}&amp;pages={{ pagename|e('url') }}">
+                                    <a target="_blank" href="https://pageviews.wmcloud.org/?project={{ project.domain }}&amp;pages={{ pagename|e('url') }}">
                                         {{ msg('pageviews') }}
                                     </a>
                                 {% endif %}

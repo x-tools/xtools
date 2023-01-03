@@ -11,8 +11,6 @@
 	"num-edits": "{{PLURAL:$1|wysig|wysigings}}",
 	"other": "Ander",
 	"performer": "Uitvoerende gebruiker",
-	"rfx-duplicates": "Duplikate",
-	"rfx-total-votes": "Totaal Stemme",
 	"size-gigabytes": "$1 GG",
 	"size-kilobytes": "$1 KG",
 	"size-megabytes": "$1 MG",

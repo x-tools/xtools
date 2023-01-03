@@ -1,12 +1,10 @@
 <?php
-/**
- * This file contains only the Pages class.
- */
 
 declare(strict_types = 1);
 
 namespace App\Model;
 
+use App\Repository\PagesRepository;
 use DateTime;
 
 /**
@@ -18,19 +16,20 @@ class Pages extends Model
     private const RESULTS_LIMIT_ALL_NAMESPACES = 50;
 
     /** @var string One of 'noredirects', 'onlyredirects' or 'all' for both. */
-    protected $redirects;
+    protected string $redirects;
 
     /** @var string One of 'live', 'deleted' or 'all' for both. */
-    protected $deleted;
+    protected string $deleted;
 
-    /** @var mixed[] The list of pages including various statistics, keyed by namespace. */
-    protected $pages;
+    /** @var array The list of pages including various statistics, keyed by namespace. */
+    protected array $pages;
 
-    /** @var mixed[] Number of redirects/pages that were created/deleted, broken down by namespace. */
-    protected $countsByNamespace;
+    /** @var array Number of redirects/pages that were created/deleted, broken down by namespace. */
+    protected array $countsByNamespace;
 
     /**
      * Pages constructor.
+     * @param PagesRepository $repository
      * @param Project $project
      * @param User $user
      * @param string|int $namespace Namespace ID or 'all'.
@@ -41,15 +40,17 @@ class Pages extends Model
      * @param int|false $offset Unix timestamp. Used for pagination.
      */
     public function __construct(
+        PagesRepository $repository,
         Project $project,
         User $user,
         $namespace = 0,
-        $redirects = 'noredirects',
-        $deleted = 'all',
+        string $redirects = 'noredirects',
+        string $deleted = 'all',
         $start = false,
         $end = false,
         $offset = false
     ) {
+        $this->repository = $repository;
         $this->project = $project;
         $this->user = $user;
         $this->namespace = 'all' === $namespace ? 'all' : (int)$namespace;
@@ -108,7 +109,7 @@ class Pages extends Model
      */
     public function getResults(bool $all = false): array
     {
-        if (null === $this->pages) {
+        if (!isset($this->pages)) {
             $this->prepareData($all);
         }
         return $this->pages;
@@ -233,7 +234,7 @@ class Pages extends Model
      */
     public function getCounts(): array
     {
-        if (null !== $this->countsByNamespace) {
+        if (isset($this->countsByNamespace)) {
             return $this->countsByNamespace;
         }
 
@@ -267,7 +268,7 @@ class Pages extends Model
     public function getAssessmentCounts(): array
     {
         if ($this->getNumPages() > $this->resultsPerPage()) {
-            $counts = $this->getRepository()->getAssessmentCounts(
+            $counts = $this->repository->getAssessmentCounts(
                 $this->project,
                 $this->user,
                 $this->namespace,
@@ -318,7 +319,7 @@ class Pages extends Model
      */
     private function fetchPagesCreated(int $namespace, bool $all = false): array
     {
-        return $this->getRepository()->getPagesCreated(
+        return $this->repository->getPagesCreated(
             $this->project,
             $this->user,
             $namespace,
@@ -337,7 +338,7 @@ class Pages extends Model
      */
     private function countPagesCreated(): array
     {
-        return $this->getRepository()->countPagesCreated(
+        return $this->repository->countPagesCreated(
             $this->project,
             $this->user,
             $this->namespace,

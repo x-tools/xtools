@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the RepositoryTest class.
- */
 
 declare(strict_types = 1);
 
@@ -9,29 +6,24 @@ namespace App\Tests\Repository;
 
 use App\Model\Project;
 use App\Model\User;
-use App\Repository\Repository;
+use App\Repository\SimpleEditCounterRepository;
+use App\Repository\UserRepository;
 use App\Tests\TestAdapter;
-use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Tests for the Repository class.
+ * @covers \App\Repository\Repository
  */
 class RepositoryTest extends TestAdapter
 {
-    /** @var ContainerInterface The DI container. */
-    protected $localContainer;
-
-    /** @var MockObject|Repository Mock of an abstract Repository class. */
-    private $stub;
+    protected SimpleEditCounterRepository $repository;
+    protected UserRepository $userRepo;
 
     protected function setUp(): void
     {
-        $this->stub = $this->getMockForAbstractClass('App\Repository\Repository');
-
-        $client = static::createClient();
-        $this->localContainer = $client->getContainer();
-        $this->stub->setContainer($this->localContainer);
+        static::bootKernel();
+        $this->repository = static::$container->get(SimpleEditCounterRepository::class);
+        $this->userRepo = static::$container->get(UserRepository::class);
     }
 
     /**
@@ -39,14 +31,17 @@ class RepositoryTest extends TestAdapter
      */
     public function testGetTableName(): void
     {
-        if ($this->localContainer->getParameter('app.is_labs')) {
+        if (static::$container->getParameter('app.is_wmf')) {
             // When using Labs.
-            static::assertEquals('`testwiki_p`.`page`', $this->stub->getTableName('testwiki', 'page'));
-            static::assertEquals('`testwiki_p`.`logging_userindex`', $this->stub->getTableName('testwiki', 'logging'));
+            static::assertEquals('`testwiki_p`.`page`', $this->repository->getTableName('testwiki', 'page'));
+            static::assertEquals(
+                '`testwiki_p`.`logging_userindex`',
+                $this->repository->getTableName('testwiki', 'logging')
+            );
         } else {
             // When using wiki databases directly.
-            static::assertEquals('`testwiki`.`page`', $this->stub->getTableName('testwiki', 'page'));
-            static::assertEquals('`testwiki`.`logging`', $this->stub->getTableName('testwiki', 'logging'));
+            static::assertEquals('`testwiki`.`page`', $this->repository->getTableName('testwiki', 'page'));
+            static::assertEquals('`testwiki`.`logging`', $this->repository->getTableName('testwiki', 'logging'));
         }
     }
 
@@ -58,13 +53,13 @@ class RepositoryTest extends TestAdapter
         // Set up example Models that we'll pass to Repository::getCacheKey().
         $project = $this->createMock(Project::class);
         $project->method('getCacheKey')->willReturn('enwiki');
-        $user = new User('Test user (WMF)');
+        $user = new User($this->userRepo, 'Test user (WMF)');
 
         // Given explicit cache prefix.
         static::assertEquals(
             'cachePrefix.enwiki.f475a8ac7f25e162bba0eb1b4b245027.'.
                 'a84e19e5268bf01623c8a130883df668.202cb962ac59075b964b07152d234b70',
-            $this->stub->getCacheKey(
+            $this->repository->getCacheKey(
                 [$project, $user, '20170101', '', null, [1, 2, 3]],
                 'cachePrefix'
             )
@@ -75,13 +70,13 @@ class RepositoryTest extends TestAdapter
             // The `false` argument generates the trailing `.`
             'testCacheKey.enwiki.f475a8ac7f25e162bba0eb1b4b245027.' .
                 'a84e19e5268bf01623c8a130883df668.d41d8cd98f00b204e9800998ecf8427e',
-            $this->stub->getCacheKey([$project, $user, '20170101', '', false, null])
+            $this->repository->getCacheKey([$project, $user, '20170101', '', false, null])
         );
 
         // Single argument, no prefix.
         static::assertEquals(
             'testCacheKey.838763cbdc764f1740370a8ee1000c65',
-            $this->stub->getCacheKey('mycache')
+            $this->repository->getCacheKey('mycache')
         );
     }
 
@@ -96,12 +91,12 @@ class RepositoryTest extends TestAdapter
 
         static::assertEquals(
             " AND alias.rev_timestamp >= '20170101000000' AND alias.rev_timestamp <= '20190201235959'",
-            $this->stub->getDateConditions($start, $end, false, 'alias.')
+            $this->repository->getDateConditions($start, $end, false, 'alias.')
         );
 
         static::assertEquals(
             " AND rev_timestamp >= '20170101000000' AND rev_timestamp <= '20180201235959'",
-            $this->stub->getDateConditions($start, $end, $offset)
+            $this->repository->getDateConditions($start, $end, $offset)
         );
     }
 }

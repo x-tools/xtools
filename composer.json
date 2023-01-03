@@ -16,6 +16,9 @@
     "config": {
         "platform": {
             "php": "7.4"
+        },
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
     },
     "require": {
@@ -39,7 +42,7 @@
         "jms/serializer-bundle": "^3.4",
         "doctrine/doctrine-migrations-bundle": "^2.0",
         "eightpoints/guzzle-bundle": "^7.0",
-        "slevomat/coding-standard": "^4.8",
+        "slevomat/coding-standard": "^8.0",
         "symfony/webpack-encore-bundle": "^1.6",
         "doctrine/common": "^3.1",
         "wikimedia/ip-utils": "^1.0",

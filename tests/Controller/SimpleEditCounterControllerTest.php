@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the SimpleEditCounterControllerTest class.
- */
 
 declare(strict_types = 1);
 
@@ -10,6 +7,7 @@ namespace App\Tests\Controller;
 /**
  * Integration/unit tests for the ArticleInfoController.
  * @group integration
+ * @covers \App\Controller\SimpleEditCounterController
  */
 class SimpleEditCounterControllerTest extends ControllerTestAdapter
 {
@@ -18,7 +16,7 @@ class SimpleEditCounterControllerTest extends ControllerTestAdapter
      */
     public function testRoutes(): void
     {
-        if (!self::$container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_wmf')) {
             return;
         }
 

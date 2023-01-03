@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the PagesControllerTest class.
- */
 
 declare(strict_types = 1);
 
@@ -10,6 +7,7 @@ namespace App\Tests\Controller;
 /**
  * Integration tests for the PagesController.
  * @group integration
+ * @covers \App\Controller\PagesController
  */
 class PagesControllerTest extends ControllerTestAdapter
 {
@@ -18,20 +16,19 @@ class PagesControllerTest extends ControllerTestAdapter
      */
     public function testIndex(): void
     {
-        $this->client->request('GET', '/pages');
+        if (!self::$container->getParameter('app.is_wmf')) {
+            return;
+        }
+
+        $crawler = $this->client->request('GET', '/pages/de.wikipedia.org');
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
-        if (self::$container->getParameter('app.is_labs')) {
-            $crawler = $this->client->request('GET', '/pages/de.wikipedia.org');
-            static::assertEquals(200, $this->client->getResponse()->getStatusCode());
+        // should populate project input field
+        static::assertEquals('de.wikipedia.org', $crawler->filter('#project_input')->attr('value'));
 
-            // should populate project input field
-            static::assertEquals('de.wikipedia.org', $crawler->filter('#project_input')->attr('value'));
-
-            // assert that the namespaces were correctly loaded from API
-            $namespaceOptions = $crawler->filter('#namespace_select option');
-            static::assertEquals('Diskussion', trim($namespaceOptions->eq(2)->text())); // Talk in German
-        }
+        // assert that the namespaces were correctly loaded from API
+        $namespaceOptions = $crawler->filter('#namespace_select option');
+        static::assertEquals('Diskussion', trim($namespaceOptions->eq(2)->text())); // Talk in German
     }
 
     /**
@@ -39,7 +36,7 @@ class PagesControllerTest extends ControllerTestAdapter
      */
     public function testRoutes(): void
     {
-        if (!self::$container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_wmf')) {
             return;
         }
 

@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the AppExtension class.
- */
 
 declare(strict_types = 1);
 
@@ -28,23 +25,16 @@ use Wikimedia\IPUtils;
  */
 class AppExtension extends AbstractExtension
 {
-    /** @var ContainerInterface The application's container interface. */
-    protected $container;
-
-    /** @var RequestStack The request stack. */
-    protected $requestStack;
-
-    /** @var SessionInterface User's current session. */
-    protected $session;
-
-    /** @var I18nHelper For i18n and l10n. */
-    protected $i18n;
+    protected ContainerInterface $container;
+    protected I18nHelper $i18n;
+    protected ProjectRepository $projectRepo;
+    protected RequestStack $requestStack;
+    protected SessionInterface $session;
+    protected UrlGeneratorInterface $urlGenerator;
 
     /** @var float Duration of the current HTTP request in seconds. */
-    protected $requestTime;
-
-    /** @var UrlGeneratorInterface */
-    private $urlGenerator;
+    protected float $requestTime;
+    protected bool $isWMF;
 
     /**
      * Constructor, with the I18nHelper through dependency injection.
@@ -59,13 +49,17 @@ class AppExtension extends AbstractExtension
         RequestStack $requestStack,
         SessionInterface $session,
         I18nHelper $i18n,
-        UrlGeneratorInterface $generator
+        UrlGeneratorInterface $generator,
+        ProjectRepository $projectRepo,
+        bool $isWMF
     ) {
         $this->container = $container;
         $this->requestStack = $requestStack;
         $this->session = $session;
         $this->i18n = $i18n;
         $this->urlGenerator = $generator;
+        $this->projectRepo = $projectRepo;
+        $this->isWMF = $isWMF;
     }
 
     /*********************************** FUNCTIONS ***********************************/
@@ -97,7 +91,7 @@ class AppExtension extends AbstractExtension
             new TwigFunction('chartColor', [$this, 'chartColor']),
             new TwigFunction('isSingleWiki', [$this, 'isSingleWiki']),
             new TwigFunction('getReplagThreshold', [$this, 'getReplagThreshold']),
-            new TwigFunction('isWMFLabs', [$this, 'isWMFLabs']),
+            new TwigFunction('isWMF', [$this, 'isWMF']),
             new TwigFunction('replag', [$this, 'replag']),
             new TwigFunction('quote', [$this, 'quote']),
             new TwigFunction('bugReportURL', [$this, 'bugReportURL']),
@@ -151,7 +145,7 @@ class AppExtension extends AbstractExtension
 
     /**
      * See if a given i18n message exists.
-     * @param string $message The message.
+     * @param string|null $message The message.
      * @param string[] $vars
      * @return bool
      */
@@ -162,7 +156,7 @@ class AppExtension extends AbstractExtension
 
     /**
      * Get an i18n message if it exists, otherwise just get the message key.
-     * @param string $message
+     * @param string|null $message
      * @param string[] $vars
      * @return string
      */
@@ -273,11 +267,12 @@ class AppExtension extends AbstractExtension
     }
 
     /**
-     * Get a list of namespace colours (one or all).
-     * @param int|false $num The NS ID to get. False to get the full list.
-     * @return string|string[] Color or all all colors indexed by namespace ID.
+     * Get the color for a given namespace.
+     * @param int|null $nsId Namespace ID.
+     * @return string Hex value of the color.
+     * @codeCoverageIgnore
      */
-    public static function getColorList($num = false)
+    public function getColorList(?int $nsId = null): string
     {
         $colors = [
             0 => '#FF5555',
@@ -367,14 +362,8 @@ class AppExtension extends AbstractExtension
             2600 => '#000000',
         ];
 
-        if (false === $num) {
-            return $colors;
-        } elseif (isset($colors[$num])) {
-            return $colors[$num];
-        } else {
-            // Default to grey.
-            return '#CCC';
-        }
+        // Default to grey.
+        return $colors[$nsId] ?? '#CCC';
     }
 
     /**
@@ -409,7 +398,7 @@ class AppExtension extends AbstractExtension
     {
         $param = true;
         if ($this->container->hasParameter('app.single_wiki')) {
-            $param = boolval($this->container->getParameter('app.single_wiki'));
+            $param = (bool)$this->container->getParameter('app.single_wiki');
         }
         return $param;
     }
@@ -428,16 +417,12 @@ class AppExtension extends AbstractExtension
     }
 
     /**
-     * Whether XTools is running in WMF Labs mode.
+     * Whether XTools is running in WMF mode.
      * @return bool
      */
-    public function isWMFLabs(): bool
+    public function isWMF(): bool
     {
-        $param = false;
-        if ($this->container->hasParameter('app.is_labs')) {
-            $param = boolval($this->container->getParameter('app.is_labs'));
-        }
-        return $param;
+        return $this->isWMF;
     }
 
     /**
@@ -448,7 +433,7 @@ class AppExtension extends AbstractExtension
     public function replag(): int
     {
         $projectIdent = $this->getRequest()->get('project', 'enwiki');
-        $project = ProjectRepository::getProject($projectIdent, $this->container);
+        $project = $this->projectRepo->getProject($projectIdent);
         $dbName = $project->getDatabaseName();
         $sql = "SELECT lag FROM `heartbeat_p`.`heartbeat`";
         return (int)$project->getRepository()->executeProjectsQuery($project, $sql, [
@@ -462,10 +447,9 @@ class AppExtension extends AbstractExtension
      */
     public function quote(): string
     {
-        // Don't show if Quote is turned off, but always show for Labs
+        // Don't show if Quote is turned off, but always show for WMF
         // (so quote is in footer but not in nav).
-        $isLabs = $this->container->getParameter('app.is_labs');
-        if (!$isLabs && !$this->container->getParameter('enable.Quote')) {
+        if (!$this->isWMF && !$this->container->getParameter('enable.Quote')) {
             return '';
         }
         $quotes = $this->container->getParameter('quotes');
@@ -593,7 +577,7 @@ class AppExtension extends AbstractExtension
     /**
      * Format a given number or fraction as a percentage.
      * @param int|float $numerator Numerator or single fraction if denominator is ommitted.
-     * @param int $denominator Denominator.
+     * @param int|null $denominator Denominator.
      * @param integer $precision Number of decimal places to show.
      * @return string Formatted percentage.
      */
@@ -677,7 +661,7 @@ class AppExtension extends AbstractExtension
      * @param int $seconds Number of seconds.
      * @param bool $translate Used for unit testing. Set to false to return
      *   the value and i18n key, instead of the actual translation.
-     * @return string|mixed[] Examples: '30 seconds', '2 minutes', '15 hours', '500 days',
+     * @return string|array Examples: '30 seconds', '2 minutes', '15 hours', '500 days',
      *   or [30, 'num-seconds'] (etc.) if $translate is false.
      */
     public function formatDuration(int $seconds, bool $translate = true)
@@ -696,12 +680,12 @@ class AppExtension extends AbstractExtension
      * @param int $seconds Number of seconds.
      * @return array<integer|string> [int - message value, string - message key]
      */
-    private function getDurationMessageKey(int $seconds)
+    private function getDurationMessageKey(int $seconds): array
     {
-        /** @var int $val Value to show in message */
+        // Value to show in message
         $val = $seconds;
 
-        /** @var string $key Unit of time, used in the key for the i18n message */
+        // Unit of time, used in the key for the i18n message
         $key = 'seconds';
 
         if ($seconds >= 86400) {
@@ -723,22 +707,22 @@ class AppExtension extends AbstractExtension
 
     /**
      * Build URL query string from given params.
-     * @param string[] $params
+     * @param string[]|null $params
      * @return string
      */
-    public function buildQuery(array $params): string
+    public function buildQuery(?array $params): string
     {
-        return is_array($params) ? http_build_query($params) : '';
+        return $params ? http_build_query($params) : '';
     }
 
     /**
      * Shorthand to get the current request from the request stack.
-     * @return \Symfony\Component\HttpFoundation\Request
-     * There is no request stack in the tests.
+     * @return Request
+     * There is no request stack in the unit tests.
      * @codeCoverageIgnore
      */
-    private function getRequest(): \Symfony\Component\HttpFoundation\Request
+    private function getRequest(): Request
     {
-        return $this->container->get('request_stack')->getCurrentRequest();
+        return $this->requestStack->getCurrentRequest();
     }
 }

@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the PageRepository class.
- */
 
 declare(strict_types = 1);
 
@@ -38,7 +35,7 @@ class PageRepository extends Repository
      * Get metadata about a set of pages from the API.
      * @param Project $project The project to which the pages belong.
      * @param string[] $pageTitles Array of page titles.
-     * @return string[]|null Array keyed by the page names, each element with some of the following keys: pageid,
+     * @return array|null Array keyed by the page names, each element with some of the following keys: pageid,
      *   title, missing, displaytitle, url. Returns null if page does not exist.
      */
     public function getPagesInfo(Project $project, array $pageTitles): ?array
@@ -200,7 +197,7 @@ class PageRepository extends Repository
         // In this case revision is faster than revision_userindex if we're not querying by user.
         $revTable = $page->getProject()->getTableName(
             'revision',
-            $user && $this->isLabs() ? '_userindex' : ''
+            $user && $this->isWMF ? '_userindex' : ''
         );
         $userClause = $user ? "rev_actor = :actorId AND " : "";
 
@@ -228,7 +225,7 @@ class PageRepository extends Repository
     public function getCheckWikiErrors(Page $page): array
     {
         // Only support mainspace on Labs installations
-        if (0 !== $page->getNamespace() || !$this->isLabs()) {
+        if (0 !== $page->getNamespace() || !$this->isWMF) {
             return [];
         }
 
@@ -257,7 +254,7 @@ class PageRepository extends Repository
     /**
      * Get basic wikidata on the page: label and description.
      * @param Page $page
-     * @return string[] In the format:
+     * @return string[][] In the format:
      *    [[
      *         'term' => string such as 'label',
      *         'term_text' => string (value for 'label'),
@@ -373,7 +370,7 @@ class PageRepository extends Repository
      * @param Page $page
      * @param string|DateTime $start In the format YYYYMMDD
      * @param string|DateTime $end In the format YYYYMMDD
-     * @return string[]
+     * @return string[][][]
      */
     public function getPageviews(Page $page, $start, $end): array
     {
@@ -405,7 +402,7 @@ class PageRepository extends Repository
     /**
      * Get the full HTML content of the the page.
      * @param Page $page
-     * @param int $revId What revision to query for.
+     * @param int|null $revId What revision to query for.
      * @return string
      */
     public function getHTMLContent(Page $page, ?int $revId = null): string

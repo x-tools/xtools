@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the MetaController class.
- */
 
 declare(strict_types=1);
 
@@ -19,8 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class MetaController extends XtoolsController
 {
     /**
-     * Get the name of the tool's index route.
-     * @return string
+     * @inheritDoc
      * @codeCoverageIgnore
      */
     public function getIndexRoute(): string

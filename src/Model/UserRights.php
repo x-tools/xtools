@@ -1,13 +1,11 @@
 <?php
-/**
- * This file contains only the UserRights class.
- */
 
 declare(strict_types = 1);
 
 namespace App\Model;
 
 use App\Helper\I18nHelper;
+use App\Repository\UserRightsRepository;
 use DateInterval;
 use DateTimeImmutable;
 use Exception;
@@ -17,20 +15,31 @@ use Exception;
  */
 class UserRights extends Model
 {
-    /** @var I18nHelper For i18n and l10n. */
-    protected $i18n;
+    protected I18nHelper $i18n;
 
     /** @var string[] Rights changes, keyed by timestamp then 'added' and 'removed'. */
-    protected $rightsChanges;
+    protected array $rightsChanges;
 
     /** @var string[] Localized names of the rights. */
-    protected $rightsNames;
+    protected array $rightsNames;
 
     /** @var string[] Global rights changes (log), keyed by timestamp then 'added' and 'removed'. */
-    protected $globalRightsChanges;
+    protected array $globalRightsChanges;
 
     /** @var array The current and former rights of the user. */
-    protected $rightsStates = [];
+    protected array $rightsStates = [];
+
+    /**
+     * @param UserRightsRepository $repository
+     * @param User $user
+     */
+    public function __construct(UserRightsRepository $repository, Project $project, User $user, I18nHelper $i18n)
+    {
+        $this->repository = $repository;
+        $this->project = $project;
+        $this->user = $user;
+        $this->i18n = $i18n;
+    }
 
     /**
      * Get user rights changes of the given user.
@@ -40,8 +49,7 @@ class UserRights extends Model
     public function getRightsChanges(?int $limit = null): array
     {
         if (!isset($this->rightsChanges)) {
-            $logData = $this->getRepository()
-                ->getRightsChanges($this->project, $this->user);
+            $logData = $this->repository->getRightsChanges($this->project, $this->user);
 
             $this->rightsChanges = $this->processRightsChanges($logData);
 
@@ -173,8 +181,7 @@ class UserRights extends Model
     public function getGlobalRightsChanges(?int $limit = null): array
     {
         if (!isset($this->globalRightsChanges)) {
-            $logData = $this->getRepository()
-                ->getGlobalRightsChanges($this->project, $this->user);
+            $logData = $this->repository->getGlobalRightsChanges($this->project, $this->user);
             $this->globalRightsChanges = $this->processRightsChanges($logData);
         }
 
@@ -191,8 +198,7 @@ class UserRights extends Model
             return $this->rightsNames;
         }
 
-        $this->rightsNames = $this->getRepository()
-            ->getRightsNames($this->project, $this->i18n->getLang());
+        $this->rightsNames = $this->repository->getRightsNames($this->project, $this->i18n->getLang());
 
         return $this->rightsNames;
     }
@@ -350,7 +356,7 @@ class UserRights extends Model
     {
         foreach ($rightsChanges as $timestamp => $change) {
             if ('pending' === $change['grantType']) {
-                $rightsChanges[$timestamp]['removed'] = array_diff($rightsChanges[$timestamp]['removed'], $removed);
+                $rightsChanges[$timestamp]['removed'] = array_diff($change['removed'], $removed);
                 if (empty($rightsChanges[$timestamp]['removed'])) {
                     unset($rightsChanges[$timestamp]);
                 }
@@ -369,7 +375,7 @@ class UserRights extends Model
             return $acTimestamp;
         }
 
-        $thresholds = $this->getRepository()->getAutoconfirmedAgeAndCount($this->project);
+        $thresholds = $this->repository->getAutoconfirmedAgeAndCount($this->project);
 
         // Happens for non-WMF installations, or if there is no autoconfirmed status.
         if (null === $thresholds) {
@@ -393,7 +399,7 @@ class UserRights extends Model
         ))->format('YmdHis');
 
         // First check if they already had 10 edits made as of $acDate
-        $editsByAcDate = $this->getRepository()->getNumEditsByTimestamp(
+        $editsByAcDate = $this->repository->getNumEditsByTimestamp(
             $this->project,
             $this->user,
             $acDate
@@ -406,7 +412,7 @@ class UserRights extends Model
 
         // Now check when the nth edit was made, where n is wgAutoConfirmCount.
         // This will be false if they still haven't made 10 edits.
-        $acTimestamp = $this->getRepository()->getNthEditTimestamp(
+        $acTimestamp = $this->repository->getNthEditTimestamp(
             $this->project,
             $this->user,
             $registrationDate->format('YmdHis'),

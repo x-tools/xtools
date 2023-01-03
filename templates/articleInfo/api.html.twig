@@ -15,7 +15,7 @@
 {{ data.watchers|num_format }} {{ msg('num-watchers', [data.watchers]) }}{{ msg('comma-character') }}
 {% endif %}
 {%- if data.pageviews is defined -%}
-<a target="_blank" href="https://pageviews.toolforge.org/?project={{ project.domain }}&amp;pages={{ page.title|e('url') }}&amp;range=latest-30">{{ data.pageviews|num_format }} {{ msg('num-pageviews', [data.pageviews]) }}</a> ({{ data.pageviews_offset|num_format }} {{ msg('num-days', [data.pageviews_offset]) }}){% endif -%}
+<a target="_blank" href="https://pageviews.wmcloud.org/?project={{ project.domain }}&amp;pages={{ page.title|e('url') }}&amp;range=latest-30">{{ data.pageviews|num_format }} {{ msg('num-pageviews', [data.pageviews]) }}</a> ({{ data.pageviews_offset|num_format }} {{ msg('num-days', [data.pageviews_offset]) }}){% endif -%}
 {% if data.error is not defined and data.author is not empty -%}
     {{ msg('comma-character') }}
     {{ msg('created-by')|lower }}: {{ wiki.userLink(data.author, project) }}

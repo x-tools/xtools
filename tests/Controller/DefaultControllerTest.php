@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the DefaultControllerTest class.
- */
 
 declare(strict_types = 1);
 
@@ -12,6 +9,7 @@ use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 /**
  * Integration tests for the homepage and user authentication.
  * @group integration
+ * @covers \App\Controller\DefaultController
  */
 class DefaultControllerTest extends ControllerTestAdapter
 {
@@ -75,7 +73,7 @@ class DefaultControllerTest extends ControllerTestAdapter
      */
     public function testNormalizeProject(): void
     {
-        if (!$this->isSingle && self::$container->getParameter('app.is_labs')) {
+        if (!$this->isSingle && self::$container->getParameter('app.is_wmf')) {
             $expectedOutput = [
                 'project' => 'en.wikipedia.org',
                 'domain' => 'en.wikipedia.org',
@@ -112,7 +110,7 @@ class DefaultControllerTest extends ControllerTestAdapter
             static::assertEquals(404, $this->client->getResponse()->getStatusCode());
         }
 
-        if (!$this->isSingle && self::$container->getParameter('app.is_labs')) {
+        if (!$this->isSingle && self::$container->getParameter('app.is_wmf')) {
             $this->client->request('GET', '/api/project/namespaces/fr.wikipedia.org');
             static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
@@ -136,7 +134,7 @@ class DefaultControllerTest extends ControllerTestAdapter
             static::assertEquals(404, $this->client->getResponse()->getStatusCode());
         }
 
-        if (self::$container->getParameter('app.is_labs')) {
+        if (self::$container->getParameter('app.is_wmf')) {
             $this->client->request('GET', '/api/project/assessments/en.wikipedia.org');
             static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
@@ -157,7 +155,7 @@ class DefaultControllerTest extends ControllerTestAdapter
      */
     public function testWikify(): void
     {
-        if (!self::$container->getParameter('app.is_labs')) {
+        if (!self::$container->getParameter('app.is_wmf')) {
             return;
         }
 

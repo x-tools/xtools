@@ -1,9 +1,6 @@
 <?php
-declare(strict_types = 1);
 
-/**
- * This file contains only the ExceptionListener class.
- */
+declare(strict_types = 1);
 
 namespace App\EventSubscriber;
 
@@ -24,14 +21,11 @@ use Twig\Error\RuntimeError;
  */
 class ExceptionListener
 {
-    /** @var Environment For rendering the view. */
-    private $templateEngine;
-
-    /** @var LoggerInterface For logging the exception. */
-    private $logger;
+    protected Environment $templateEngine;
+    protected LoggerInterface $logger;
 
     /** @var string The environment. */
-    private $environment;
+    protected string $environment;
 
     /**
      * Constructor for the ExceptionListener.
@@ -50,7 +44,6 @@ class ExceptionListener
      * Capture the exception, check if it's a Twig error and if so
      * throw the previous exception, which should be more meaningful.
      * @param ExceptionEvent $event
-     * @throws \Exception
      */
     public function onKernelException(ExceptionEvent $event): void
     {
@@ -102,7 +95,7 @@ class ExceptionListener
      * Handle a Twig runtime exception.
      * @param Throwable $exception
      * @return Response
-     * @throws \Exception
+     * @throws Throwable
      */
     private function getTwigErrorResponse(Throwable $exception): Response
     {

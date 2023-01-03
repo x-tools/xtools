@@ -1,7 +1,4 @@
 <?php
-/**
- * This file contains only the AutoEditsTest class.
- */
 
 declare(strict_types = 1);
 
@@ -13,6 +10,8 @@ use App\Model\Page;
 use App\Model\Project;
 use App\Model\User;
 use App\Repository\AutoEditsRepository;
+use App\Repository\EditRepository;
+use App\Repository\PageRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
 use App\Tests\TestAdapter;
@@ -21,28 +20,29 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests for the AutoEdits class.
+ * @covers \App\Model\AutoEdits
  */
 class AutoEditsTest extends TestAdapter
 {
     use ArraySubsetAsserts;
 
-    /** @var Project The project instance. */
-    protected $project;
-
-    /** @var MockObject|ProjectRepository The project repo instance. */
-    protected $projectRepo;
-
-    /** @var MockObject|AutoEditsRepository The AutoEdits repo instance. */
-    protected $aeRepo;
-
-    /** @var User The user instance. */
-    protected $user;
+    protected AutoEditsRepository $aeRepo;
+    protected EditRepository $editRepo;
+    protected PageRepository $pageRepo;
+    protected Project $project;
+    protected ProjectRepository $projectRepo;
+    protected User $user;
+    protected UserRepository $userRepo;
 
     /**
      * Set up class instances and mocks.
      */
     public function setUp(): void
     {
+        $this->aeRepo = $this->createMock(AutoEditsRepository::class);
+        $this->pageRepo = $this->createMock(PageRepository::class);
+        $this->editRepo = $this->createMock(EditRepository::class);
+        $this->userRepo = $this->createMock(UserRepository::class);
         $this->project = new Project('test.example.org');
         $this->projectRepo = $this->getProjectRepo();
         $this->projectRepo->method('getMetadata')
@@ -51,8 +51,7 @@ class AutoEditsTest extends TestAdapter
                 '1' => 'Talk',
             ]]);
         $this->project->setRepository($this->projectRepo);
-        $this->user = new User('Test user');
-        $this->aeRepo = $this->createMock(AutoEditsRepository::class);
+        $this->user = new User($this->userRepo, 'Test user');
     }
 
     /**
@@ -60,9 +59,7 @@ class AutoEditsTest extends TestAdapter
      */
     public function testConstructor(): void
     {
-        $autoEdits = new AutoEdits(
-            $this->project,
-            $this->user,
+        $autoEdits = $this->getAutoEdits(
             1,
             strtotime('2017-01-01'),
             strtotime('2018-01-01'),
@@ -97,17 +94,17 @@ class AutoEditsTest extends TestAdapter
             ->method('getNonAutomatedEdits')
             ->willReturn([$rev]);
 
-        $autoEdits = new AutoEdits($this->project, $this->user, 1);
-        $autoEdits->setRepository($this->aeRepo);
-
+        $autoEdits = $this->getAutoEdits();
         $rawEdits = $autoEdits->getNonAutomatedEdits(true);
         static::assertArraySubset($rev, $rawEdits[0]);
 
-        $page = Page::newFromRow($this->project, [
+        $page = Page::newFromRow($this->pageRepo, $this->project, [
             'page_title' => 'Test_page',
             'page_namespace' => 0,
         ]);
         $edit = new Edit(
+            $this->editRepo,
+            $this->userRepo,
             $page,
             array_merge($rev, ['user' => $this->user])
         );
@@ -138,8 +135,7 @@ class AutoEditsTest extends TestAdapter
         $this->aeRepo->expects(static::once())
             ->method('getToolCounts')
             ->willReturn($toolCounts);
-        $autoEdits = new AutoEdits($this->project, $this->user, 1);
-        $autoEdits->setRepository($this->aeRepo);
+        $autoEdits = $this->getAutoEdits();
 
         static::assertEquals($toolCounts, $autoEdits->getToolCounts());
         static::assertEquals(18, $autoEdits->getToolsTotal());
@@ -165,17 +161,17 @@ class AutoEditsTest extends TestAdapter
             ->method('getAutomatedEdits')
             ->willReturn([$rev]);
 
-        $autoEdits = new AutoEdits($this->project, $this->user, 1);
-        $autoEdits->setRepository($this->aeRepo);
-
+        $autoEdits = $this->getAutoEdits();
         $rawEdits = $autoEdits->getAutomatedEdits(true);
         static::assertArraySubset($rev, $rawEdits[0]);
 
-        $page = Page::newFromRow($this->project, [
+        $page = Page::newFromRow($this->pageRepo, $this->project, [
             'page_title' => 'Test_page',
             'page_namespace' => 1,
         ]);
         $edit = new Edit(
+            $this->editRepo,
+            $this->userRepo,
             $page,
             array_merge($rev, ['user' => $this->user])
         );
@@ -200,7 +196,7 @@ class AutoEditsTest extends TestAdapter
             ->willReturn(200);
         $this->user->setRepository($userRepo);
 
-        $autoEdits = new AutoEdits($this->project, $this->user, 1);
+        $autoEdits = $this->getAutoEdits();
         $autoEdits->setRepository($this->aeRepo);
         static::assertEquals(50, $autoEdits->getAutomatedCount());
         static::assertEquals(200, $autoEdits->getEditCount());
@@ -210,5 +206,38 @@ class AutoEditsTest extends TestAdapter
         static::assertEquals(50, $autoEdits->getAutomatedCount());
         static::assertEquals(200, $autoEdits->getEditCount());
         static::assertEquals(25, $autoEdits->getAutomatedPercentage());
+    }
+
+    /**
+     * @param int|string $namespace Namespace ID or 'all'
+     * @param false|int $start Start date as Unix timestamp.
+     * @param false|int $end End date as Unix timestamp.
+     * @param null $tool The tool we're searching for when fetching (semi-)automated edits.
+     * @param false|int $offset Unix timestamp. Used for pagination.
+     * @param int|null $limit Number of results to return.
+     * @return AutoEdits
+     */
+    private function getAutoEdits(
+        $namespace = 1,
+        $start = false,
+        $end = false,
+        $tool = null,
+        $offset = false,
+        ?int $limit = null
+    ): AutoEdits {
+        return new AutoEdits(
+            $this->aeRepo,
+            $this->editRepo,
+            $this->pageRepo,
+            $this->userRepo,
+            $this->project,
+            $this->user,
+            $namespace,
+            $start,
+            $end,
+            $tool,
+            $offset,
+            $limit
+        );
     }
 }

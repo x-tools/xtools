@@ -20,12 +20,12 @@
 {% endif %}
 |-
 | {{ msg('user-groups') }}
-| {% for group in ec.rightsStates.local.current %}{{ ec.rightsNames[group] }}{% if not loop.last %}, {% endif %}{% endfor %}
+| {% for group in ec.userRights.rightsStates.local.current %}{{ ec.userRights.rightsNames[group] }}{% if not loop.last %}, {% endif %}{% endfor %}
 
-{% if ec.rightsStates.global.current %}
+{% if ec.userRights.rightsStates.global.current %}
 |-
 | {{ msg('global-user-groups') }}
-| {% for group in ec.rightsStates.global.current %}{{ ec.rightsNames[group] }}{% if not loop.last %}, {% endif %}{% endfor %}
+| {% for group in ec.userRights.rightsStates.global.current %}{{ ec.userRights.rightsNames[group] }}{% if not loop.last %}, {% endif %}{% endfor %}
 
 {% endif %}
 |-
@@ -121,7 +121,7 @@
 {| class="wikitable sortable"
 | {{ msg('files-uploaded') }}
 | [{{ wiki.pageUrlRaw('Special:Log/upload/' ~ user.username, project, 'subtype=upload') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countFilesUploaded }}}}]
-{% if isWMFLabs() and project.domain != 'commons.wikimedia.org' %}
+{% if isWMF() and project.domain != 'commons.wikimedia.org' %}
 |-
 | {{ msg('files-uploaded-commons') }}
 | [https://commons.wikimedia.org/wiki/Special:Log?type=upload&subtype=upload&user={{ user.username|e('url') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countFilesUploadedCommons }}}}]
@@ -191,7 +191,7 @@
 | {{ msg('import') }}
 | [{{ wiki.pageUrlRaw('Special:Log/import/' ~ user.username, project) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countPagesImported }}}}]
 |-
-{% if isWMFLabs() %}
+{% if isWMF() %}
 | {{ msg('abusefilter') }}
 | [{{ wiki.pageUrlRaw('Special:Log/abusefilter/' ~ user.username, project) }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countAbuseFilterChanges }}}}]
 |-
