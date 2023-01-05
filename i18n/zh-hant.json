@@ -285,7 +285,7 @@
 	"num-edits": "{{PLURAL:$1|編輯數}}",
 	"num-hours": "{{PLURAL:$1|小時|小時}}",
 	"num-minutes": "{{PLURAL:$1|分鐘|分鐘}}",
-	"num-months": "{{PLURAL:$1|月|月}}",
+	"num-months": "{{PLURAL:$1|個月}}",
 	"num-moves": "{{PLURAL:$1|移動|移動}}",
 	"num-namespaces": "{{PLURAL:$1|命名空間}}",
 	"num-others": "{{PLURAL:$1|其它|其它}}",
