@@ -2,6 +2,7 @@
 	"@metadata": {
 		"authors": [
 			"Arystanbek",
+			"Batyrbek.kz",
 			"Fontan 030"
 		]
 	},
@@ -16,6 +17,7 @@
 	"deleted": "Жойылған",
 	"deleted-pages": "Жойылған беттер",
 	"download-label": "Түсіріп алу",
+	"executed": "$1 {{PLURAL:$2|секундта}} орындалды.",
 	"friday": "Жұма",
 	"help-translate": "Аударуға көмектесу",
 	"history": "Тарихы",
@@ -29,6 +31,7 @@
 	"minor-edits": "Шағын өңдемелер",
 	"monday": "Дүйсенбі",
 	"month": "Ай",
+	"num-seconds": "{{PLURAL:$1|секунд}}",
 	"page-title": "Бет атауы",
 	"pager-newer-n": "{{PLURAL:$1|жаңалау 1|жаңалау $1}}",
 	"pager-older-n": "{{PLURAL:$1|ескілеу 1|ескілеу $1}}",
