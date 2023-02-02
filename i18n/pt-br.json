@@ -8,6 +8,7 @@
 			"He7d3r",
 			"Isabelle Belato",
 			"Leosls",
+			"Mello25",
 			"Tks4Fish",
 			"YuriNikolai"
 		]
@@ -470,6 +471,7 @@
 	"top-ten-by-edits": "Os 10 primeiros por edições",
 	"top-ten-by-text": "Os 10 primeiros por texto acrescentado",
 	"top-ten-count": "Edições feitas pelos 10 principais editores",
+	"top-ten-other-editors": "Outros editores",
 	"topedits-article": "Edições principais de um artigo",
 	"topedits-article-desc": "Todas as edições de um usuário realizadas numa página, em ordem cronológica.",
 	"topedits-per-namespace": "Maior número de edições por domínio",
