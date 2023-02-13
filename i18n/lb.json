@@ -4,7 +4,8 @@
 			"Les Meloures",
 			"Nemo bis",
 			"Robby",
-			"Soued031"
+			"Soued031",
+			"Volvox"
 		]
 	},
 	"accepted-formats": "Akzeptéiert Formater",
@@ -296,7 +297,7 @@
 	"text": "Text",
 	"text-to-serach": "Text fir ze sichen",
 	"thank": "Merci",
-	"thanks-received": "Merci'e kritt",
+	"thanks-received": "Mercie kritt",
 	"thursday": "Donneschdeg",
 	"times-in-utc": "All Zäite bezéie sech op UTC.",
 	"too-many-edits": "De Benotzer huet ze vill Ännerungen! (Maximum $1)",

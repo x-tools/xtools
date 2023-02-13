@@ -10,6 +10,7 @@
 			"Nemo bis",
 			"أَحمد",
 			"ديفيد",
+			"علاء",
 			"محمد أحمد عبد الفتاح"
 		]
 	},
@@ -445,7 +446,7 @@
 	"tool-editsummary": "ملخصات التعديل",
 	"tool-editsummary-desc": "تحليل استخدام ملخصات التعديل",
 	"tool-error": "خطأ",
-	"tool-globalcontribs": "مساهمات المستخدم العالمية",
+	"tool-globalcontribs": "مساهمات عالمية",
 	"tool-globalcontribs-desc": "التعديلات الأخيرة لأكبر 10 مشاريع لهذا المستخدم في الشهر الماضي",
 	"tool-largestpages": "أكبر الصفحات",
 	"tool-largestpages-desc": "احصل على أكبر الصفحات في المشروع",
