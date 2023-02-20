@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"ToJack"
+			"ToJack",
+			"Vashgird"
 		]
 	},
 	"abusefilter": "Филтри харобкориҳо",
@@ -139,7 +140,7 @@
 	"global-unblock": "Еушоданиҳои саросарӣ",
 	"global-user-groups": "Гурӯҳҳои корбарии саросарӣ",
 	"group": "Гурӯҳ",
-	"help-translate": "Кӯмак барои тарҷума",
+	"help-translate": "Кумак ба тарҷума",
 	"hide": "Пинҳон намудан",
 	"history": "Таърих",
 	"import": "Ворид шавад",
@@ -269,7 +270,7 @@
 	"submit": "Ирсол",
 	"summary": "Хулоса",
 	"sunday": "Якшанбе",
-	"support": "Кӯмак",
+	"support": "Кумак",
 	"tagged": "Бо унвон",
 	"talk": "Баҳс",
 	"templates": "Шаблонҳо",
