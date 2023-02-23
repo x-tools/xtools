@@ -225,6 +225,7 @@
 	"num-protections": "{{PLURAL:$1|protekto|protekti}}",
 	"num-revisions": "{{PLURAL:$1|revizuro|revizuri}}",
 	"num-seconds": "{{PLURAL:$1|sekundo|sekundi}}",
+	"num-tools": "{{PLURAL:$1|utensilo|utensili}}",
 	"num-users": "{{PLURAL:$1|uzero|uzeri}}",
 	"num-watchers": "{{PLURAL:$1|observero|observeri}}",
 	"num-weeks": "{{PLURAL:$1|semano|semani}}",
