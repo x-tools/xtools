@@ -2,6 +2,7 @@
 	"@metadata": {
 		"authors": [
 			"Aftabuzzaman",
+			"Aishik Rehman",
 			"Al Riaz Uddin Ripon",
 			"Greatder",
 			"Joysriramsarkar.manathetiger56",
@@ -65,8 +66,8 @@
 	"automatic": "স্বয়ংক্রিয়",
 	"average-change-per-page": "প্রতি পাতায় গড় পরিবর্তন",
 	"average-edit-size": "সম্পাদনার গড় আকার",
-	"average-edits-per-day": "দিন প্রতি গড় সম্পাদনা",
-	"average-edits-per-month": "মাস প্রতি গড় সম্পাদনা",
+	"average-edits-per-day": "দিনপ্রতি গড় সম্পাদনা",
+	"average-edits-per-month": "মাসপ্রতি গড় সম্পাদনা",
 	"average-edits-per-user": "ব্যবহাকারী প্রতি গড় সম্পাদনা",
 	"average-edits-per-year": "এক বছরে গড় সম্পাদনা",
 	"average-page-size": "পাতার গড় আকার",
