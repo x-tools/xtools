@@ -2,6 +2,7 @@
 	"@metadata": {
 		"authors": [
 			"1997kB",
+			"Abijeet Patro",
 			"Anamdas",
 			"AnupamM",
 			"Gopalindians",
@@ -132,6 +133,7 @@
 	"global-other-sites-edit-count": "अन्य परियोजनाएँ",
 	"global-rights-changes": "वैश्विक अधिकार बदलाव",
 	"global-user-groups": "वैश्विक सदस्य समूह",
+	"group": "समूह",
 	"help-translate": "अनुवाद में सहायता करें",
 	"hide": "छुपायें",
 	"high-replag": "सावधानः प्रतिकृति  अन्तराल. ऊँचा है, $1 से नए परिवर्तन हो सकता है कि ना दिखें।",
@@ -196,6 +198,7 @@
 	"non-auto-contribs": "गैर-स्वचालित संपादन",
 	"non-auto-contribs-desc": "किसी उपयोगकर्ता के गैर-स्वचालित योगदान के माध्यम से ब्राउज़ करें।",
 	"none": "कोई भी नहीं",
+	"not-opted-in-link": "प्रलेखन",
 	"notice": "सूचना",
 	"num-days": "{{PLURAL: $1|दिन|दिनों}}",
 	"num-editors": "{{PLURAL:$1|संपादक|संपादकों}}",
@@ -239,6 +242,7 @@
 	"prev": "पिछला",
 	"priority": "प्राथमिकता",
 	"project": "परियोजना",
+	"projects": "परियोजना",
 	"protect": "सुरक्षित",
 	"quote-number": "उद्धरण संख्या #",
 	"quote-random": "यादृच्छिक उद्धरण प्राप्त करें",
