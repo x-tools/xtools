@@ -7,14 +7,14 @@ namespace App\Repository;
 use App\Model\Project;
 use DateInterval;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
 use Psr\Cache\CacheItemPoolInterface;
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
@@ -25,43 +25,49 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 abstract class Repository
 {
     protected CacheItemPoolInterface $cache;
-    protected ContainerInterface $container;
     protected Client $guzzle;
     protected LoggerInterface $logger;
+    protected ManagerRegistry $managerRegistry;
+    protected ParameterBagInterface $parameterBag;
 
     /** @var Connection The database connection to the meta database. */
-    private $metaConnection;
+    private Connection $metaConnection;
 
     /** @var Connection The database connection to other tools' databases.  */
-    private $toolsConnection;
+    private Connection $toolsConnection;
 
     /** @var bool Whether this is configured as a WMF installation. */
-    protected $isWMF;
+    protected bool $isWMF;
 
     /** @var int */
-    protected $queryTimeout;
+    protected int $queryTimeout;
 
     /** @var string Prefix URL for where the dblists live. Will be followed by i.e. 's1.dblist' */
     public const DBLISTS_URL = 'https://noc.wikimedia.org/conf/dblists/';
 
     /**
      * Create a new Repository.
-     * @param ContainerInterface $container
-     * @param CacheItemPoolInterface $cache
+     * @param ManagerRegistry $managerRegistry
      * @param Client $guzzle
+     * @param LoggerInterface $logger
+     * @param ParameterBagInterface $parameterBag
+     * @param bool $isWMF
+     * @param int $queryTimeout
      */
     public function __construct(
-        ContainerInterface $container,
+        ManagerRegistry $managerRegistry,
         CacheItemPoolInterface $cache,
         Client $guzzle,
         LoggerInterface $logger,
+        ParameterBagInterface $parameterBag,
         bool $isWMF,
         int $queryTimeout
     ) {
-        $this->container = $container;
+        $this->managerRegistry = $managerRegistry;
         $this->cache = $cache;
         $this->guzzle = $guzzle;
         $this->logger = $logger;
+        $this->parameterBag = $parameterBag;
         $this->isWMF = $isWMF;
         $this->queryTimeout = $queryTimeout;
     }
@@ -77,7 +83,7 @@ abstract class Repository
      */
     protected function getMetaConnection(): Connection
     {
-        if (!$this->metaConnection instanceof Connection) {
+        if (!isset($this->metaConnection)) {
             $this->metaConnection = $this->getProjectsConnection('meta');
         }
         return $this->metaConnection;
@@ -103,8 +109,7 @@ abstract class Repository
             $slice = $this->getDbList()[$project->getDatabaseName()];
         }
 
-        return $this->container->get('doctrine')
-            ->getConnection('toolforge_'.$slice);
+        return $this->managerRegistry->getConnection('toolforge_'.$slice);
     }
 
     /**
@@ -114,11 +119,8 @@ abstract class Repository
      */
     protected function getToolsConnection(): Connection
     {
-        if (!$this->toolsConnection instanceof Connection) {
-            $this->toolsConnection = $this->container
-                ->get('doctrine')
-                ->getManager('toolsdb')
-                ->getConnection();
+        if (!isset($this->toolsConnection)) {
+            $this->toolsConnection = $this->managerRegistry->getConnection('toolsdb');
         }
         return $this->toolsConnection;
     }
@@ -208,10 +210,10 @@ abstract class Repository
         if ($this->isWMF && null !== $tableExtension) {
             $mapped = true;
             $tableName .=('' === $tableExtension ? '' : '_'.$tableExtension);
-        } elseif ($this->container->hasParameter("app.table.$tableName")) {
+        } elseif ($this->parameterBag->has("app.table.$tableName")) {
             // Use the table specified in the table mapping configuration, if present.
             $mapped = true;
-            $tableName = $this->container->getParameter("app.table.$tableName");
+            $tableName = $this->parameterBag->get("app.table.$tableName");
         }
 
         // For 'revision' and 'logging' tables (actually views) on Labs, use the indexed versions
@@ -267,7 +269,7 @@ abstract class Repository
         }
 
         // Remove reserved characters.
-        return preg_replace('/[{}()\/\@\:"]/', '', $cacheKey);
+        return preg_replace('/[{}()\/@:"]/', '', $cacheKey);
     }
 
     /**
@@ -330,16 +332,16 @@ abstract class Repository
         if (is_int($start)) {
             // Convert to YYYYMMDDHHMMSS.
             $start = date('Ymd', $start).'000000';
-            $datesConditions .= " AND {$tableAlias}{$field} >= '$start'";
+            $datesConditions .= " AND $tableAlias{$field} >= '$start'";
         }
 
         // When we're given an $offset, it basically replaces $end, except it's also a full timestamp.
         if (is_int($offset)) {
             $offset = date('YmdHis', $offset);
-            $datesConditions .= " AND {$tableAlias}{$field} <= '$offset'";
+            $datesConditions .= " AND $tableAlias{$field} <= '$offset'";
         } elseif (is_int($end)) {
             $end = date('Ymd', $end) . '235959';
-            $datesConditions .= " AND {$tableAlias}{$field} <= '$end'";
+            $datesConditions .= " AND $tableAlias{$field} <= '$end'";
         }
 
         return $datesConditions;
@@ -351,10 +353,9 @@ abstract class Repository
      * @param string $sql
      * @param array $params Parameters to bound to the prepared query.
      * @param int|null $timeout Maximum statement time in seconds. null will use the
-     *   default specified by the app.query_timeout config parameter.
+     *   default specified by the APP_QUERY_TIMEOUT env variable.
      * @return ResultStatement
      * @throws DriverException
-     * @throws DBALException
      * @codeCoverageIgnore
      */
     public function executeProjectsQuery(
@@ -377,7 +378,7 @@ abstract class Repository
      * Execute a query using the projects connection, handling certain Exceptions.
      * @param QueryBuilder $qb
      * @param int|null $timeout Maximum statement time in seconds. null will use the
-     *   default specified by the app.query_timeout config parameter.
+     *   default specified by the APP_QUERY_TIMEOUT env variable.
      * @return ResultStatement
      * @throws HttpException
      * @throws DriverException
@@ -386,7 +387,7 @@ abstract class Repository
     public function executeQueryBuilder(QueryBuilder $qb, ?int $timeout = null): ResultStatement
     {
         try {
-            $timeout = $timeout ?? $this->container->getParameter('app.query_timeout');
+            $timeout = $timeout ?? $this->queryTimeout;
             $sql = "SET STATEMENT max_statement_time = $timeout FOR\n".$qb->getSQL();
             return $qb->getConnection()->executeQuery($sql, $qb->getParameters(), $qb->getParameterTypes());
         } catch (DriverException $e) {

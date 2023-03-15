@@ -4,12 +4,9 @@ declare(strict_types = 1);
 
 namespace App\Tests\Twig;
 
-use App\Helper\I18nHelper;
 use App\Repository\ProjectRepository;
 use App\Tests\TestAdapter;
 use App\Twig\TopNavExtension;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 
 /**
@@ -25,19 +22,17 @@ class TopNavExtensionTest extends TestAdapter
      */
     public function setUp(): void
     {
-        $container = static::createClient()->getContainer();
-        $stack = new RequestStack();
-        $session = new Session();
-        $i18nHelper = new I18nHelper($container, $stack, $session);
-        $urlGenerator = $this->createMock(UrlGenerator::class);
+        static::createClient();
         $this->topNavExtension = new TopNavExtension(
-            $container,
-            $stack,
-            $session,
-            $i18nHelper,
-            $urlGenerator,
+            static::$container->get('request_stack'),
+            static::$container->get('session'),
+            static::$container->get('app.i18n_helper'),
+            $this->createMock(UrlGenerator::class),
             $this->createMock(ProjectRepository::class),
-            false
+            static::$container->get('parameter_bag'),
+            static::$container->getParameter('app.is_wmf'),
+            static::$container->getParameter('app.single_wiki'),
+            static::$container->getParameter('app.replag_threshold')
         );
     }
 

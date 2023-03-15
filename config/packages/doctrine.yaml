@@ -58,20 +58,3 @@ doctrine:
                 port:     '%env(DATABASE_REPLICA_PORT_S8)%'
                 user:     '%env(DATABASE_REPLICA_USER)%'
                 password: '%env(DATABASE_REPLICA_PASSWORD)%'
-
-    orm:
-        auto_generate_proxy_classes: "%kernel.debug%"
-        #naming_strategy: doctrine.orm.naming_strategy.underscore
-        default_entity_manager: default
-        entity_managers:
-            default:
-                connection: default
-            toolsdb:
-                connection: toolsdb
-
-doctrine_migrations:
-    migrations_paths:
-        'Application\Migrations': 'src/DoctrineMigrations'
-    storage:
-        table_storage:
-            table_name: migration_versions

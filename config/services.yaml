@@ -2,15 +2,13 @@
 # http://symfony.com/doc/current/book/service_container.html
 
 imports:
-    - { resource: rfx_analysis.yaml, ignore_errors: true }
-    - { resource: security.yaml }
     - { resource: tools.yaml }
     - { resource: version.yaml }
     - { resource: table_map.yaml, ignore_errors: true }
     - { resource: project_map.yaml, ignore_errors: true }
     - { resource: assessments.yaml }
     - { resource: quote.yaml }
-    - { resource: request_blacklist.yaml, ignore_errors: true }
+    - { resource: request_denylist.yaml, ignore_errors: true }
     - { resource: admin_stats.yaml }
     - { resource: user_group_icons.yaml }
 
@@ -19,18 +17,13 @@ imports:
 parameters:
     locale: 'en'
     wiki_url: '%env(WIKI_URL)%'
-    api_path: '%env(API_PATH)%'
     default_project: '%env(DEFAULT_PROJECT)%'
-    central_auth_project: '%env(CENTRAL_AUTH_PROJECT)%'
-    opted_in: '%env(csv:OPTED_IN)%'
     app.single_wiki: '%env(bool:APP_SINGLE_WIKI)%'
-    app.query_timeout: '%env(int:APP_QUERY_TIMEOUT)%'
-    app.rate_limit_count: '%env(int:APP_RATE_LIMIT_COUNT)%'
-    app.rate_limit_time: '%env(int:APP_RATE_LIMIT_TIME)%'
     app.is_wmf: '%env(bool:APP_IS_WMF)%'
     app.max_page_revisions: '%env(int:APP_MAX_PAGE_REVISIONS)%'
     app.max_user_edits: '%env(int:APP_MAX_USER_EDITS)%'
     app.multilingual_wikis: '%env(csv:APP_MULTILINGUAL_WIKIS)%'
+    app.replag_threshold: '%env(int:APP_REPLAG_THRESHOLD)%'
     enable.AdminScore: '%env(bool:APP_ENABLE_ADMINSCORE)%'
     enable.AdminStats: '%env(bool:APP_ENABLE_ADMINSTATS)%'
     enable.ArticleInfo: '%env(bool:APP_ENABLE_ARTICLEINFO)%'
@@ -61,6 +54,17 @@ services:
         # this means you cannot fetch services directly from the container via $container->get()
         # if you need to do this, you can override this setting on individual services
         public: false
+        bind:
+            $apiPath: '%env(API_PATH)%'
+            $centralAuthProject: '%env(CENTRAL_AUTH_PROJECT)%'
+            $defaultProject: '%env(DEFAULT_PROJECT)%'
+            $isWMF: '%env(bool:APP_IS_WMF)%'
+            $multilingualWikis: '%env(csv:APP_MULTILINGUAL_WIKIS)%'
+            $optedIn: '%env(csv:OPTED_IN)%'
+            $projectDir: '%kernel.project_dir%'
+            $singleWiki: '%env(bool:APP_SINGLE_WIKI)%'
+            $queryTimeout: '%env(APP_QUERY_TIMEOUT)%'
+            $replagThreshold: '%env(int:APP_REPLAG_THRESHOLD)%'
 
     # Makes classes in src/App available to be used as services.
     # This creates a service per class whose id is the fully-qualified class name.
@@ -70,7 +74,7 @@ services:
          # but if a service is unused, it's removed anyway
          exclude:
             - '../src/Kernel.php'
-            - '../src/DoctrineMigrations/'
+            - '../migrations/'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
@@ -80,14 +84,9 @@ services:
 
     App\Repository\:
         resource: '../src/Repository'
-        arguments:
-            $isWMF: '%env(bool:APP_IS_WMF)%'
-            $queryTimeout: '%app.query_timeout%'
 
     App\Twig\:
         resource: '../src/Twig'
-        arguments:
-            $isWMF: '%env(bool:APP_IS_WMF)%'
 
     app.monolog.processor.web:
         class: App\Monolog\WebProcessorMonolog
@@ -95,17 +94,22 @@ services:
         tags:
             - { name: monolog.processor, method: processRecord }
 
+    App\EventSubscriber\RateLimitSubscriber:
+        arguments:
+            $rateLimit: '%env(int:APP_RATE_LIMIT_COUNT)%'
+            $rateDuration: '%env(int:APP_RATE_LIMIT_TIME)%'
+
     GuzzleHttp\Client:
         alias: 'eight_points_guzzle.client.xtools'
 
     # These need to not be public, but they are, for now...
     app.automated_edits_helper:
         class: App\Helper\AutomatedEditsHelper
-        arguments: ['@service_container']
+        arguments: ['@session', '@cache.app']
         public: true
     app.i18n_helper:
         class: App\Helper\I18nHelper
-        arguments: ['@service_container']
+        arguments: ['@request_stack', '@session']
         public: true
 
     app.exception_listener:

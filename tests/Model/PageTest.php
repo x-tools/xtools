@@ -366,12 +366,13 @@ class PageTest extends TestAdapter
 
     private function getRealPageRepository(): PageRepository
     {
-        $container = static::createClient()->getContainer();
+        static::createClient();
         return new PageRepository(
-            $container,
-            $container->get('cache.app'),
-            $container->get('eight_points_guzzle.client.xtools'),
+            self::$container->get('doctrine'),
+            self::$container->get('cache.app'),
+            self::$container->get('eight_points_guzzle.client.xtools'),
             $this->createMock(LoggerInterface::class),
+            self::$container->get('parameter_bag'),
             true,
             30
         );

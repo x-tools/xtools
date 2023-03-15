@@ -8,11 +8,13 @@ use App\Model\Edit;
 use App\Model\Page;
 use App\Model\Project;
 use App\Model\User;
+use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
 use PDO;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Wikimedia\IPUtils;
 
 /**
@@ -26,20 +28,45 @@ class TopEditsRepository extends UserRepository
     protected EditRepository $editRepo;
     protected UserRepository $userRepo;
 
+    /**
+     * @param ManagerRegistry $managerRegistry
+     * @param CacheItemPoolInterface $cache
+     * @param Client $guzzle
+     * @param LoggerInterface $logger
+     * @param ParameterBagInterface $parameterBag
+     * @param bool $isWMF
+     * @param int $queryTimeout
+     * @param ProjectRepository $projectRepo
+     * @param EditRepository $editRepo
+     * @param UserRepository $userRepo
+     * @param SessionInterface $session
+     */
     public function __construct(
-        ContainerInterface $container,
+        ManagerRegistry $managerRegistry,
         CacheItemPoolInterface $cache,
         Client $guzzle,
         LoggerInterface $logger,
+        ParameterBagInterface $parameterBag,
         bool $isWMF,
         int $queryTimeout,
+        ProjectRepository $projectRepo,
         EditRepository $editRepo,
         UserRepository $userRepo,
-        ProjectRepository $projectRepo
+        SessionInterface $session
     ) {
         $this->editRepo = $editRepo;
         $this->userRepo = $userRepo;
-        parent::__construct($container, $cache, $guzzle, $logger, $isWMF, $queryTimeout, $projectRepo);
+        parent::__construct(
+            $managerRegistry,
+            $cache,
+            $guzzle,
+            $logger,
+            $parameterBag,
+            $isWMF,
+            $queryTimeout,
+            $projectRepo,
+            $session
+        );
     }
 
     /**

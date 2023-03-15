@@ -7,11 +7,12 @@ namespace App\Repository;
 use App\Model\Project;
 use App\Model\User;
 use Doctrine\DBAL\Driver\ResultStatement;
+use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
 use Psr\Cache\CacheItemPoolInterface;
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Wikimedia\IPUtils;
 
 /**
@@ -21,27 +22,33 @@ use Wikimedia\IPUtils;
 class UserRepository extends Repository
 {
     protected ProjectRepository $projectRepo;
+    protected SessionInterface $session;
 
     /**
-     * @param ContainerInterface $container
+     * @param ManagerRegistry $managerRegistry
      * @param CacheItemPoolInterface $cache
      * @param Client $guzzle
      * @param LoggerInterface $logger
+     * @param ParameterBagInterface $parameterBag
      * @param bool $isWMF
      * @param int $queryTimeout
      * @param ProjectRepository $projectRepo
+     * @param SessionInterface $session
      */
     public function __construct(
-        ContainerInterface $container,
+        ManagerRegistry $managerRegistry,
         CacheItemPoolInterface $cache,
         Client $guzzle,
         LoggerInterface $logger,
+        ParameterBagInterface $parameterBag,
         bool $isWMF,
         int $queryTimeout,
-        ProjectRepository $projectRepo
+        ProjectRepository $projectRepo,
+        SessionInterface $session
     ) {
         $this->projectRepo = $projectRepo;
-        parent::__construct($container, $cache, $guzzle, $logger, $isWMF, $queryTimeout);
+        $this->session = $session;
+        parent::__construct($managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout);
     }
 
     /**
@@ -187,9 +194,7 @@ class UserRepository extends Repository
      */
     public function getXtoolsUserInfo()
     {
-        /** @var Session $session */
-        $session = $this->container->get('session');
-        return $session->get('logged_in_user');
+        return $this->session->get('logged_in_user');
     }
 
     /**
@@ -198,7 +203,7 @@ class UserRepository extends Repository
      */
     public function maxEdits(): int
     {
-        return (int)$this->container->getParameter('app.max_user_edits');
+        return (int)$this->parameterBag->get('app.max_user_edits');
     }
 
     /**

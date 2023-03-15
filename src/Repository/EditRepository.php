@@ -8,10 +8,11 @@ use App\Helper\AutomatedEditsHelper;
 use App\Model\Edit;
 use App\Model\Page;
 use App\Model\Project;
+use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
 use Psr\Cache\CacheItemPoolInterface;
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
  * An EditRepository fetches data about a single revision.
@@ -22,21 +23,12 @@ class EditRepository extends Repository
     protected AutomatedEditsHelper $autoEditsHelper;
     protected PageRepository $pageRepo;
 
-    /**
-     * @param ContainerInterface $container
-     * @param CacheItemPoolInterface $cache
-     * @param Client $guzzle
-     * @param LoggerInterface $logger
-     * @param bool $isWMF
-     * @param int $queryTimeout
-     * @param AutomatedEditsHelper $autoEditsHelper
-     * @param PageRepository $pageRepo
-     */
     public function __construct(
-        ContainerInterface $container,
+        ManagerRegistry $managerRegistry,
         CacheItemPoolInterface $cache,
         Client $guzzle,
         LoggerInterface $logger,
+        ParameterBagInterface $parameterBag,
         bool $isWMF,
         int $queryTimeout,
         AutomatedEditsHelper $autoEditsHelper,
@@ -44,7 +36,7 @@ class EditRepository extends Repository
     ) {
         $this->autoEditsHelper = $autoEditsHelper;
         $this->pageRepo = $pageRepo;
-        parent::__construct($container, $cache, $guzzle, $logger, $isWMF, $queryTimeout);
+        parent::__construct($managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout);
     }
 
     /**

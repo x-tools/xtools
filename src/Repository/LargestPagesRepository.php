@@ -6,10 +6,11 @@ namespace App\Repository;
 
 use App\Model\Page;
 use App\Model\Project;
+use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
 use Psr\Cache\CacheItemPoolInterface;
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
  * A LargestPagesRepository is responsible for retrieving information from the database for the LargestPages tool.
@@ -20,25 +21,27 @@ class LargestPagesRepository extends Repository
     protected PageRepository $pageRepo;
 
     /**
-     * @param ContainerInterface $container
+     * @param ManagerRegistry $managerRegistry
      * @param CacheItemPoolInterface $cache
      * @param Client $guzzle
      * @param LoggerInterface $logger
+     * @param ParameterBagInterface $parameterBag
      * @param bool $isWMF
      * @param int $queryTimeout
      * @param PageRepository $pageRepo
      */
     public function __construct(
-        ContainerInterface $container,
+        ManagerRegistry $managerRegistry,
         CacheItemPoolInterface $cache,
         Client $guzzle,
         LoggerInterface $logger,
+        ParameterBagInterface $parameterBag,
         bool $isWMF,
         int $queryTimeout,
         PageRepository $pageRepo
     ) {
         $this->pageRepo = $pageRepo;
-        parent::__construct($container, $cache, $guzzle, $logger, $isWMF, $queryTimeout);
+        parent::__construct($managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout);
     }
 
     /** @var int Max rows to display. */

@@ -6,11 +6,12 @@ namespace App\Repository;
 
 use App\Model\Project;
 use App\Model\User;
+use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
 use PDO;
 use Psr\Cache\CacheItemPoolInterface;
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Wikimedia\IPUtils;
 
 /**
@@ -25,20 +26,20 @@ class GlobalContribsRepository extends Repository
     protected Project $caProject;
 
     public function __construct(
-        ContainerInterface $container,
+        ManagerRegistry $managerRegistry,
         CacheItemPoolInterface $cache,
         Client $guzzle,
         LoggerInterface $logger,
+        ParameterBagInterface $parameterBag,
         bool $isWMF,
         int $queryTimeout,
-        ProjectRepository $projectRepo
+        ProjectRepository $projectRepo,
+        string $centralAuthProject
     ) {
-        parent::__construct($container, $cache, $guzzle, $logger, $isWMF, $queryTimeout);
-        $this->caProject = new Project(
-            $this->container->getParameter('central_auth_project')
-        );
+        $this->caProject = new Project($centralAuthProject);
         $this->projectRepo = $projectRepo;
         $this->caProject->setRepository($this->projectRepo);
+        parent::__construct($managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout);
     }
 
     /**

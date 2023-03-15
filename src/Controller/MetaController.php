@@ -195,14 +195,20 @@ class MetaController extends XtoolsController
      *   in base.html.twig via JavaScript so that it is done asynchronously.
      * @Route("/meta/usage/{tool}/{project}/{token}")
      * @param Request $request
+     * @param bool $singleWiki
      * @param string $tool Internal name of tool.
      * @param string $project Project domain such as en.wikipedia.org
      * @param string $token Unique token for this request, so we don't have people meddling with these statistics.
      * @return Response
      * @codeCoverageIgnore
      */
-    public function recordUsageAction(Request $request, string $tool, string $project, string $token): Response
-    {
+    public function recordUsageAction(
+        Request $request,
+        bool $singleWiki,
+        string $tool,
+        string $project,
+        string $token
+    ): Response {
         // Ready the response object.
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
@@ -242,7 +248,7 @@ class MetaController extends XtoolsController
         ]);
 
         // Update per-project usage, if applicable
-        if (!$this->container->getParameter('app.single_wiki')) {
+        if (!$singleWiki) {
             $sql = "INSERT INTO usage_projects
                     VALUES(NULL, :tool, :project, 1)
                     ON DUPLICATE KEY UPDATE `count` = `count` + 1";

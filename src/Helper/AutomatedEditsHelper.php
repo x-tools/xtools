@@ -8,33 +8,31 @@ use App\Model\Project;
 use DateInterval;
 use MediaWiki\OAuthClient\Client;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Helper class for fetching semi-automated definitions.
  */
 class AutomatedEditsHelper
 {
+    protected CacheItemPoolInterface $cache;
+    protected SessionInterface $session;
+
     /** @var array The list of tools that are considered reverting. */
-    protected $revertTools = [];
+    protected array $revertTools = [];
 
     /** @var array The list of tool names and their regexes/tags. */
-    protected $tools = [];
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var CacheItemPoolInterface */
-    protected $cache;
+    protected array $tools = [];
 
     /**
      * AutomatedEditsHelper constructor.
-     * @param ContainerInterface $container
+     * @param SessionInterface $session
+     * @param CacheItemPoolInterface $cache
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(SessionInterface $session, CacheItemPoolInterface $cache)
     {
-        $this->container = $container;
-        $this->cache = $container->get('cache.app');
+        $this->session = $session;
+        $this->cache = $cache;
     }
 
     /**
@@ -81,16 +79,15 @@ class AutomatedEditsHelper
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $session = $this->container->get('session');
         $uri = 'https://meta.wikimedia.org/w/index.php?action=raw&ctype=application/json&title=' .
             'MediaWiki:XTools-AutoEdits.json' . ($useSandbox ? '/sandbox' : '');
 
-        if ($useSandbox && $session->get('logged_in_user')) {
+        if ($useSandbox && $this->session->get('logged_in_user')) {
             // Request via OAuth to get around server-side caching.
             /** @var Client $client */
-            $client = $this->container->get('session')->get('oauth_client');
+            $client = $this->session->get('oauth_client');
             $resp = $client->makeOAuthCall(
-                $this->container->get('session')->get('oauth_access_token'),
+                $this->session->get('oauth_access_token'),
                 $uri
             );
         } else {
@@ -112,7 +109,7 @@ class AutomatedEditsHelper
 
     /**
      * Get list of automated tools and their associated info for the given project.
-     * This defaults to the 'default_project' if entries for the given project are not found.
+     * This defaults to the DEFAULT_PROJECT if entries for the given project are not found.
      * @param Project $project
      * @param bool $useSandbox Whether to use the /sandbox version for testing (also bypasses caching).
      * @return array Each tool with the tool name as the key and 'link', 'regex' and/or 'tag' as the subarray keys.

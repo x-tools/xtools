@@ -4,20 +4,12 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Helper\I18nHelper;
 use App\Model\Pages;
 use App\Model\Project;
-use App\Repository\PageRepository;
 use App\Repository\PagesRepository;
-use App\Repository\ProjectRepository;
-use App\Repository\UserRepository;
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
-use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
@@ -27,35 +19,6 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class PagesController extends XtoolsController
 {
-    protected PagesRepository $pagesRepo;
-
-    /**
-     * @param RequestStack $requestStack
-     * @param ContainerInterface $container
-     * @param CacheItemPoolInterface $cache
-     * @param Client $guzzle
-     * @param I18nHelper $i18n
-     * @param ProjectRepository $projectRepo
-     * @param UserRepository $userRepo
-     * @param PageRepository $pageRepo
-     * @param PagesRepository $pagesRepo
-     * @codeCoverageIgnore
-     */
-    public function __construct(
-        RequestStack $requestStack,
-        ContainerInterface $container,
-        CacheItemPoolInterface $cache,
-        Client $guzzle,
-        I18nHelper $i18n,
-        ProjectRepository $projectRepo,
-        UserRepository $userRepo,
-        PageRepository $pageRepo,
-        PagesRepository $pagesRepo
-    ) {
-        $this->pagesRepo = $pagesRepo;
-        parent::__construct($requestStack, $container, $cache, $guzzle, $i18n, $projectRepo, $userRepo, $pageRepo);
-    }
-
     /**
      * Get the name of the tool's index route.
      * This is also the name of the associated model.
@@ -117,12 +80,13 @@ class PagesController extends XtoolsController
 
     /**
      * Every action in this controller (other than 'index') calls this first.
+     * @param PagesRepository $pagesRepo
      * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
      * @param string $deleted One of 'live', 'deleted' or 'all' for both.
      * @return Pages
      * @codeCoverageIgnore
      */
-    protected function setUpPages(string $redirects, string $deleted): Pages
+    protected function setUpPages(PagesRepository $pagesRepo, string $redirects, string $deleted): Pages
     {
         if ($this->user->isIpRange()) {
             $this->params['username'] = $this->user->getUsername();
@@ -130,7 +94,7 @@ class PagesController extends XtoolsController
         }
 
         return new Pages(
-            $this->pagesRepo,
+            $pagesRepo,
             $this->project,
             $this->user,
             $this->namespace,
@@ -163,13 +127,17 @@ class PagesController extends XtoolsController
      *         "offset"=false,
      *     }
      * )
+     * @param PagesRepository $pagesRepo
      * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
      * @param string $deleted One of 'live', 'deleted' or 'all' for both.
      * @return RedirectResponse|Response
      * @codeCoverageIgnore
      */
-    public function resultAction(string $redirects = 'noredirects', string $deleted = 'all')
-    {
+    public function resultAction(
+        PagesRepository $pagesRepo,
+        string $redirects = 'noredirects',
+        string $deleted = 'all'
+    ) {
         // Check for legacy values for 'redirects', and redirect
         // back with correct values if need be. This could be refactored
         // out to XtoolsController, but this is the only tool in the suite
@@ -183,7 +151,7 @@ class PagesController extends XtoolsController
             ]));
         }
 
-        $pages = $this->setUpPages($redirects, $deleted);
+        $pages = $this->setUpPages($pagesRepo, $redirects, $deleted);
         $pages->prepareData();
 
         $ret = [
@@ -331,16 +299,20 @@ class PagesController extends XtoolsController
      *         "end"=false,
      *     }
      * )
+     * @param PagesRepository $pagesRepo
      * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
      * @param string $deleted One of 'live', 'deleted' or 'all' for both.
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function countPagesApiAction(string $redirects = 'noredirects', string $deleted = 'all'): JsonResponse
-    {
+    public function countPagesApiAction(
+        PagesRepository $pagesRepo,
+        string $redirects = 'noredirects',
+        string $deleted = 'all'
+    ): JsonResponse {
         $this->recordApiUsage('user/pages_count');
 
-        $pages = $this->setUpPages($redirects, $deleted);
+        $pages = $this->setUpPages($pagesRepo, $redirects, $deleted);
         $counts = $pages->getCounts();
 
         if ('all' !== $this->namespace && isset($counts[$this->namespace])) {
@@ -373,16 +345,20 @@ class PagesController extends XtoolsController
      *         "offset"=false,
      *     }
      * )
+     * @param PagesRepository $pagesRepo
      * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
      * @param string $deleted One of 'live', 'deleted' or blank for both.
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function getPagesApiAction(string $redirects = 'noredirects', string $deleted = 'all'): JsonResponse
-    {
+    public function getPagesApiAction(
+        PagesRepository $pagesRepo,
+        string $redirects = 'noredirects',
+        string $deleted = 'all'
+    ): JsonResponse {
         $this->recordApiUsage('user/pages');
 
-        $pages = $this->setUpPages($redirects, $deleted);
+        $pages = $this->setUpPages($pagesRepo, $redirects, $deleted);
         $pagesList = $pages->getResults();
 
         if ('all' !== $this->namespace && isset($pagesList[$this->namespace])) {

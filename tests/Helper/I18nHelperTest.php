@@ -8,8 +8,6 @@ use App\Helper\I18nHelper;
 use App\Tests\TestAdapter;
 use DateTime;
 use Krinkle\Intuition\Intuition;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * @covers \App\Helper\I18nHelper
@@ -20,10 +18,7 @@ class I18nHelperTest extends TestAdapter
 
     public function setUp(): void
     {
-        $container = static::createClient()->getContainer();
-        $stack = new RequestStack();
-        $session = new Session();
-        $this->i18n = new I18nHelper($container, $stack, $session);
+        $this->i18n = static::createClient()->getContainer()->get('app.i18n_helper');
     }
 
     public function testGetters(): void

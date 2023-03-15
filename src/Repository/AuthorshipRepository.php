@@ -6,7 +6,6 @@ namespace App\Repository;
 
 use App\Model\Page;
 use App\Model\Project;
-use GuzzleHttp;
 
 /**
  * AuthorshipRepository is responsible for retrieving authorship data about a single page.
@@ -43,10 +42,7 @@ class AuthorshipRepository extends Repository
             'read_timeout' => 60,
         ];
 
-        /** @var GuzzleHttp\Client $client */
-        $client = $this->container->get('eight_points_guzzle.client.xtools');
-
-        $res = $client->request('GET', $url, $opts);
+        $res = $this->guzzle->request('GET', $url, $opts);
 
         // Cache and return.
         return $this->setCache($cacheKey, json_decode($res->getBody()->getContents(), true));

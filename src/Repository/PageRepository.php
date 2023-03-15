@@ -9,7 +9,6 @@ use App\Model\Project;
 use App\Model\User;
 use DateTime;
 use Doctrine\DBAL\Driver\ResultStatement;
-use GuzzleHttp;
 
 /**
  * A PageRepository fetches data about Pages, either singularly or for multiple.
@@ -376,9 +375,6 @@ class PageRepository extends Repository
     {
         $title = rawurlencode(str_replace(' ', '_', $page->getTitle()));
 
-        /** @var GuzzleHttp\Client $client */
-        $client = $this->container->get('eight_points_guzzle.client.xtools');
-
         if ($start instanceof DateTime) {
             $start = $start->format('Ymd');
         } else {
@@ -395,7 +391,7 @@ class PageRepository extends Repository
         $url = 'https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/' .
             "$project/all-access/user/$title/daily/$start/$end";
 
-        $res = $client->request('GET', $url);
+        $res = $this->guzzle->request('GET', $url);
         return json_decode($res->getBody()->getContents(), true);
     }
 
@@ -407,13 +403,11 @@ class PageRepository extends Repository
      */
     public function getHTMLContent(Page $page, ?int $revId = null): string
     {
-        /** @var GuzzleHttp\Client $client */
-        $client = $this->container->get('eight_points_guzzle.client.xtools');
         $url = $page->getUrl();
         if (null !== $revId) {
             $url .= "?oldid=$revId";
         }
-        return $client->request('GET', $url)
+        return $this->guzzle->request('GET', $url)
             ->getBody()
             ->getContents();
     }
@@ -448,14 +442,12 @@ class PageRepository extends Repository
      */
     public function displayTitles(Project $project, array $pageTitles): array
     {
-        $client = $this->container->get('eight_points_guzzle.client.xtools');
-
         $displayTitles = [];
         $numPages = count($pageTitles);
 
         for ($n = 0; $n < $numPages; $n += 50) {
             $titleSlice = array_slice($pageTitles, $n, 50);
-            $res = $client->request('GET', $project->getApiUrl(), ['query' => [
+            $res = $this->guzzle->request('GET', $project->getApiUrl(), ['query' => [
                 'action' => 'query',
                 'prop' => 'info|pageprops',
                 'inprop' => 'displaytitle',

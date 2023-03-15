@@ -15,8 +15,6 @@ use App\Repository\UserRepository;
 use App\Tests\TestAdapter;
 use DateTime;
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Tests for the EditCounter.
@@ -39,7 +37,7 @@ class EditCounterTest extends TestAdapter
      */
     public function setUp(): void
     {
-        $this->i18n = new I18nHelper(static::createClient()->getContainer(), new RequestStack(), new Session());
+        $this->i18n = static::createClient()->getContainer()->get('app.i18n_helper');
 
         $this->editCounterRepo = $this->createMock(EditCounterRepository::class);
         $this->projectRepo = $this->getProjectRepo();

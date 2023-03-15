@@ -5,17 +5,9 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Helper\AutomatedEditsHelper;
-use App\Helper\I18nHelper;
 use App\Model\TopEdits;
-use App\Repository\PageRepository;
-use App\Repository\ProjectRepository;
 use App\Repository\TopEditsRepository;
-use App\Repository\UserRepository;
-use GuzzleHttp\Client;
-use Psr\Cache\CacheItemPoolInterface;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -24,9 +16,6 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class TopEditsController extends XtoolsController
 {
-    protected AutomatedEditsHelper $autoEditsHelper;
-    protected TopEditsRepository $topEditsRepo;
-
     /**
      * @inheritDoc
      * @codeCoverageIgnore
@@ -34,37 +23,6 @@ class TopEditsController extends XtoolsController
     public function getIndexRoute(): string
     {
         return 'TopEdits';
-    }
-
-    /**
-     * TopEditsController constructor.
-     * @param RequestStack $requestStack
-     * @param ContainerInterface $container
-     * @param CacheItemPoolInterface $cache
-     * @param Client $guzzle
-     * @param I18nHelper $i18n
-     * @param ProjectRepository $projectRepo
-     * @param UserRepository $userRepo
-     * @param PageRepository $pageRepo
-     * @param TopEditsRepository $topEditsRepo
-     * @param AutomatedEditsHelper $autoEditsHelper
-     */
-    public function __construct(
-        RequestStack $requestStack,
-        ContainerInterface $container,
-        CacheItemPoolInterface $cache,
-        Client $guzzle,
-        I18nHelper $i18n,
-        ProjectRepository $projectRepo,
-        UserRepository $userRepo,
-        PageRepository $pageRepo,
-        TopEditsRepository $topEditsRepo,
-        AutomatedEditsHelper $autoEditsHelper
-    ) {
-        $this->topEditsRepo = $topEditsRepo;
-        $this->autoEditsHelper = $autoEditsHelper;
-        $this->limit = 1000;
-        parent::__construct($requestStack, $container, $cache, $guzzle, $i18n, $projectRepo, $userRepo, $pageRepo);
     }
 
     /**
@@ -129,14 +87,16 @@ class TopEditsController extends XtoolsController
 
     /**
      * Every action in this controller (other than 'index') calls this first.
+     * @param TopEditsRepository $topEditsRepo
+     * @param AutomatedEditsHelper $autoEditsHelper
      * @return TopEdits
      * @codeCoverageIgnore
      */
-    public function setUpTopEdits(): TopEdits
+    public function setUpTopEdits(TopEditsRepository $topEditsRepo, AutomatedEditsHelper $autoEditsHelper): TopEdits
     {
         return new TopEdits(
-            $this->topEditsRepo,
-            $this->autoEditsHelper,
+            $topEditsRepo,
+            $autoEditsHelper,
             $this->project,
             $this->user,
             $this->page,
@@ -160,15 +120,19 @@ class TopEditsController extends XtoolsController
      *     },
      *     defaults={"namespace" = "all", "start"=false, "end"=false}
      * )
+     * @param TopEditsRepository $topEditsRepo
+     * @param AutomatedEditsHelper $autoEditsHelper
      * @return Response
      * @codeCoverageIgnore
      */
-    public function namespaceTopEditsAction(): Response
-    {
+    public function namespaceTopEditsAction(
+        TopEditsRepository $topEditsRepo,
+        AutomatedEditsHelper $autoEditsHelper
+    ): Response {
         // Max number of rows per namespace to show. `null` here will use the TopEdits default.
         $this->limit = $this->isSubRequest ? 10 : $this->limit;
 
-        $topEdits = $this->setUpTopEdits();
+        $topEdits = $this->setUpTopEdits($topEditsRepo, $autoEditsHelper);
         $topEdits->prepareData();
 
         $ret = [
@@ -195,13 +159,17 @@ class TopEditsController extends XtoolsController
      *     },
      *     defaults={"namespace"="all", "start"=false, "end"=false}
      * )
-     * @todo Add pagination.
+     * @param TopEditsRepository $topEditsRepo
+     * @param AutomatedEditsHelper $autoEditsHelper
      * @return Response
      * @codeCoverageIgnore
+     * @todo Add pagination.
      */
-    public function singlePageTopEditsAction(): Response
-    {
-        $topEdits = $this->setUpTopEdits();
+    public function singlePageTopEditsAction(
+        TopEditsRepository $topEditsRepo,
+        AutomatedEditsHelper $autoEditsHelper
+    ): Response {
+        $topEdits = $this->setUpTopEdits($topEditsRepo, $autoEditsHelper);
         $topEdits->prepareData();
 
         // Send all to the template.
@@ -226,14 +194,18 @@ class TopEditsController extends XtoolsController
      *     },
      *     defaults={"namespace"="all", "start"=false, "end"=false}
      * )
+     * @param TopEditsRepository $topEditsRepo
+     * @param AutomatedEditsHelper $autoEditsHelper
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function namespaceTopEditsUserApiAction(): JsonResponse
-    {
+    public function namespaceTopEditsUserApiAction(
+        TopEditsRepository $topEditsRepo,
+        AutomatedEditsHelper $autoEditsHelper
+    ): JsonResponse {
         $this->recordApiUsage('user/topedits');
 
-        $topEdits = $this->setUpTopEdits();
+        $topEdits = $this->setUpTopEdits($topEditsRepo, $autoEditsHelper);
         $topEdits->prepareData();
 
         return $this->getFormattedApiResponse([
@@ -254,15 +226,19 @@ class TopEditsController extends XtoolsController
      *     },
      *     defaults={"namespace"="all", "start"=false, "end"=false}
      * )
-     * @todo Add pagination.
+     * @param TopEditsRepository $topEditsRepo
+     * @param AutomatedEditsHelper $autoEditsHelper
      * @return JsonResponse
      * @codeCoverageIgnore
+     * @todo Add pagination.
      */
-    public function singlePageTopEditsUserApiAction(): JsonResponse
-    {
+    public function singlePageTopEditsUserApiAction(
+        TopEditsRepository $topEditsRepo,
+        AutomatedEditsHelper $autoEditsHelper
+    ): JsonResponse {
         $this->recordApiUsage('user/topedits');
 
-        $topEdits = $this->setUpTopEdits();
+        $topEdits = $this->setUpTopEdits($topEditsRepo, $autoEditsHelper);
         $topEdits->prepareData(false);
 
         return $this->getFormattedApiResponse([

@@ -13,7 +13,9 @@ use App\Repository\PageRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
 use DateTime;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
+use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
@@ -23,6 +25,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Wikimedia\IPUtils;
 
@@ -37,10 +40,21 @@ abstract class XtoolsController extends AbstractController
 
     protected CacheItemPoolInterface $cache;
     protected Client $guzzle;
+    protected FlashBagInterface $flashBag;
     protected I18nHelper $i18n;
+    protected ManagerRegistry $managerRegistry;
     protected ProjectRepository $projectRepo;
     protected UserRepository $userRepo;
     protected PageRepository $pageRepo;
+
+    /** @var bool Whether this is a WMF installation. */
+    protected bool $isWMF;
+
+    /** @var string The configured default project. */
+    protected string $defaultProject;
+
+    /** @var string[] Which projects are considered multilingual. */
+    protected array $multilingualWikis;
 
     /** OTHER CLASS PROPERTIES */
 
@@ -173,33 +187,48 @@ abstract class XtoolsController extends AbstractController
 
     /**
      * XtoolsController constructor.
-     * @param RequestStack $requestStack
      * @param ContainerInterface $container
+     * @param RequestStack $requestStack
+     * @param ManagerRegistry $managerRegistry
      * @param CacheItemPoolInterface $cache
+     * @param FlashBagInterface $flashBag
      * @param Client $guzzle
      * @param I18nHelper $i18n
      * @param ProjectRepository $projectRepo
      * @param UserRepository $userRepo
      * @param PageRepository $pageRepo
+     * @param bool $isWMF
+     * @param string $defaultProject
+     * @param array $multilingualWikis
      */
     public function __construct(
-        RequestStack $requestStack,
         ContainerInterface $container,
+        RequestStack $requestStack,
+        ManagerRegistry $managerRegistry,
         CacheItemPoolInterface $cache,
+        FlashBagInterface $flashBag,
         Client $guzzle,
         I18nHelper $i18n,
         ProjectRepository $projectRepo,
         UserRepository $userRepo,
-        PageRepository $pageRepo
+        PageRepository $pageRepo,
+        bool $isWMF,
+        string $defaultProject,
+        array $multilingualWikis
     ) {
-        $this->request = $requestStack->getCurrentRequest();
         $this->container = $container;
+        $this->request = $requestStack->getCurrentRequest();
+        $this->managerRegistry = $managerRegistry;
         $this->cache = $cache;
+        $this->flashBag = $flashBag;
         $this->guzzle = $guzzle;
         $this->i18n = $i18n;
         $this->projectRepo = $projectRepo;
         $this->userRepo = $userRepo;
         $this->pageRepo = $pageRepo;
+        $this->isWMF = $isWMF;
+        $this->defaultProject = $defaultProject;
+        $this->multilingualWikis = $multilingualWikis;
         $this->params = $this->parseQueryParams();
 
         // Parse out the name of the controller and action.
@@ -214,7 +243,7 @@ abstract class XtoolsController extends AbstractController
 
         // Whether we're making a subrequest (the view makes a request to another action).
         $this->isSubRequest = $this->request->get('htmlonly')
-            || null !== $this->get('request_stack')->getParentRequest();
+            || null !== $requestStack->getParentRequest();
 
         // Disallow AJAX (unless it's an API or subrequest).
         $this->checkIfAjax();
@@ -431,16 +460,14 @@ abstract class XtoolsController extends AbstractController
         } elseif (null !== $this->cookies['XtoolsProject']) {
             $project = $this->cookies['XtoolsProject'];
         } else {
-            $project = $this->getParameter('default_project');
+            $project = $this->defaultProject;
         }
 
         $projectData = $this->projectRepo->getProject($project);
 
         // Revert back to defaults if we've established the given project was invalid.
         if (!$projectData->exists()) {
-            $projectData = $this->projectRepo->getProject(
-                $this->getParameter('default_project')
-            );
+            $projectData = $this->projectRepo->getProject($this->defaultProject);
         }
 
         return $projectData;
@@ -540,7 +567,7 @@ abstract class XtoolsController extends AbstractController
             // Clear flash bag for API responses, since they get intercepted in ExceptionListener
             // and would otherwise be shown in subsequent requests.
             if ($this->isApi) {
-                $this->get('session')->getFlashBag()->clear();
+                $this->flashBag->clear();
             }
 
             throw new XtoolsHttpException(
@@ -680,7 +707,6 @@ abstract class XtoolsController extends AbstractController
      */
     public function parseQueryParams(): array
     {
-        /** @var string[] $params Each parameter and value that was detected. */
         $params = $this->getParams();
 
         // Covert any legacy parameters, if present.
@@ -783,11 +809,8 @@ abstract class XtoolsController extends AbstractController
             // so we must remove leading periods and trailing .org's.
             $params['project'] = rtrim(ltrim($params['wiki'], '.'), '.org').'.org';
 
-            /** @var string[] $multilingualProjects Projects for which there is no specific language association. */
-            $multilingualProjects = $this->getParameter('app.multilingual_wikis');
-
             // Prepend language if applicable.
-            if (isset($params['lang']) && !in_array($params['wiki'], $multilingualProjects)) {
+            if (isset($params['lang']) && !in_array($params['wiki'], $this->multilingualWikis)) {
                 $params['project'] = $params['lang'].'.'.$params['project'];
             }
 
@@ -905,11 +928,11 @@ abstract class XtoolsController extends AbstractController
         ], $data, ['elapsed_time' => $elapsedTime]);
 
         // Merge in flash messages, putting them at the top.
-        $flashes = $this->get('session')->getFlashBag()->peekAll();
+        $flashes = $this->flashBag->peekAll();
         $ret = array_merge($flashes, $ret);
 
         // Flashes now can be cleared after merging into the response.
-        $this->get('session')->getFlashBag()->clear();
+        $this->flashBag->clear();
 
         $response->setData($ret);
 
@@ -961,11 +984,9 @@ abstract class XtoolsController extends AbstractController
      */
     public function recordApiUsage(string $endpoint): void
     {
-        /** @var \Doctrine\DBAL\Connection $conn */
-        $conn = $this->container->get('doctrine')
-            ->getManager('default')
-            ->getConnection();
-        $date =  date('Y-m-d');
+        /** @var Connection $conn */
+        $conn = $this->managerRegistry->getConnection('default');
+        $date = date('Y-m-d');
 
         // Increment count in timeline
         try {

@@ -1,7 +1,8 @@
 <?php
+
 declare(strict_types = 1);
 
-namespace App\DoctrineMigrations;
+namespace DoctrineMigrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
@@ -9,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-class Version20170623205224 extends AbstractMigration
+final class Version20170623205224 extends AbstractMigration
 {
     /**
      * @param Schema $schema

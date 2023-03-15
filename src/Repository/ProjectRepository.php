@@ -7,11 +7,12 @@ namespace App\Repository;
 use App\Model\PageAssessments;
 use App\Model\Project;
 use Doctrine\DBAL\Connection;
+use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use GuzzleHttp\Client;
 use Psr\Cache\CacheItemPoolInterface;
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
  * This class provides data to the Project class.
@@ -33,17 +34,52 @@ class ProjectRepository extends Repository
     /** @var string The cache key for the 'all project' metadata. */
     protected string $cacheKeyAllProjects = 'allprojects';
 
+    /** @var string The configured default project. */
+    protected string $defaultProject;
+
+    /** @var bool Whether XTools is configured to run on a single wiki or not. */
+    protected bool $singleWiki;
+
+    /** @var array Projects that have opted into showing restricted stats to everyone. */
+    protected array $optedIn;
+
+    /** @var string The project's API path. */
+    protected string $apiPath;
+
+    /**
+     * @param ManagerRegistry $managerRegistry
+     * @param CacheItemPoolInterface $cache
+     * @param Client $guzzle
+     * @param LoggerInterface $logger
+     * @param ParameterBagInterface $parameterBag
+     * @param bool $isWMF
+     * @param int $queryTimeout
+     * @param PageAssessmentsRepository $assessmentsRepo
+     * @param string $defaultProject
+     * @param bool $singleWiki
+     * @param array $optedIn
+     * @param string $apiPath
+     */
     public function __construct(
-        ContainerInterface $container,
+        ManagerRegistry $managerRegistry,
         CacheItemPoolInterface $cache,
         Client $guzzle,
         LoggerInterface $logger,
+        ParameterBagInterface $parameterBag,
         bool $isWMF,
         int $queryTimeout,
-        PageAssessmentsRepository $assessmentsRepo
+        PageAssessmentsRepository $assessmentsRepo,
+        string $defaultProject,
+        bool $singleWiki,
+        array $optedIn,
+        string $apiPath
     ) {
         $this->assessmentsRepo = $assessmentsRepo;
-        parent::__construct($container, $cache, $guzzle, $logger, $isWMF, $queryTimeout);
+        $this->defaultProject = $defaultProject;
+        $this->singleWiki = $singleWiki;
+        $this->optedIn = $optedIn;
+        $this->apiPath = $apiPath;
+        parent::__construct($managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout);
     }
 
     /**
@@ -57,12 +93,12 @@ class ProjectRepository extends Repository
         $project->setRepository($this);
         $project->setPageAssessments(new PageAssessments($this->assessmentsRepo, $project));
 
-        if ($this->container->getParameter('app.single_wiki')) {
+        if ($this->singleWiki) {
             $this->setSingleBasicInfo([
-                'url' => $this->container->getParameter('wiki_url'),
+                'url' => $this->parameterBag->get('wiki_url'),
                 'dbName' => '', // Just so this will pass in CI.
                 // TODO: this will need to be restored for third party support; KEYWORD: isWMF
-                // 'dbName' => $container->getParameter('database_replica_name'),
+                // 'dbName' => $this->parameterBag->('database_replica_name'),
             ]);
         }
 
@@ -75,8 +111,7 @@ class ProjectRepository extends Repository
      */
     public function getDefaultProject(): Project
     {
-        $defaultProjectName = $this->container->getParameter('default_project');
-        return $this->getProject($defaultProjectName);
+        return $this->getProject($this->defaultProject);
     }
 
     /**
@@ -128,9 +163,9 @@ class ProjectRepository extends Repository
             return $this->cache->getItem($this->cacheKeyAllProjects)->get();
         }
 
-        if ($this->container->hasParameter("database_meta_table")) {
-            $table = $this->container->getParameter('database_meta_name') . '.' .
-                $this->container->getParameter('database_meta_table');
+        if ($this->parameterBag->has("database_meta_table")) {
+            $table = $this->parameterBag->get('database_meta_name') . '.' .
+                $this->parameterBag->get('database_meta_table');
         } else {
             $table = "meta_p.wiki";
         }
@@ -324,12 +359,7 @@ class ProjectRepository extends Repository
      */
     public function optedIn(): array
     {
-        $optedIn = $this->container->getParameter('opted_in');
-        // In case there's just one given.
-        if (!is_array($optedIn)) {
-            $optedIn = [ $optedIn ];
-        }
-        return $optedIn;
+        return $this->optedIn;
     }
 
     /**
@@ -338,7 +368,7 @@ class ProjectRepository extends Repository
      */
     public function getApiPath(): string
     {
-        return $this->container->getParameter('api_path');
+        return $this->apiPath;
     }
 
     /**

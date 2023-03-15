@@ -25,7 +25,7 @@ class UserRightsRepository extends Repository
     {
         $changes = $this->queryRightsChanges($project, $user);
 
-        if ((bool)$this->container->hasParameter('app.is_wmf')) {
+        if ($this->isWMF) {
             $changes = array_merge(
                 $changes,
                 $this->queryRightsChanges($project, $user, 'meta')

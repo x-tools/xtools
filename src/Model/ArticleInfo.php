@@ -134,8 +134,8 @@ class ArticleInfo extends ArticleInfoApi
     }
 
     /**
-     * Get the number of revisions that are actually getting processed. This goes by the app.max_page_revisions
-     * parameter, or the actual number of revisions, whichever is smaller.
+     * Get the number of revisions that are actually getting processed. This goes by the APP_MAX_PAGE_REVISIONS
+     * env variable, or the actual number of revisions, whichever is smaller.
      * @return int
      */
     public function getNumRevisionsProcessed(): int

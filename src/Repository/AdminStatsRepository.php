@@ -20,7 +20,7 @@ class AdminStatsRepository extends Repository
      */
     public function getUserGroupIcons(): array
     {
-        return $this->container->getParameter('user_group_icons');
+        return $this->parameterBag->get('user_group_icons');
     }
 
     /**
@@ -115,7 +115,7 @@ class AdminStatsRepository extends Repository
      */
     public function getConfig(Project $project): array
     {
-        $config = $this->container->getParameter('admin_stats');
+        $config = $this->parameterBag->get('admin_stats');
         $extensions = $project->getInstalledExtensions();
 
         foreach ($config as $type => $values) {
@@ -142,7 +142,7 @@ class AdminStatsRepository extends Repository
      */
     public function getRelevantUserGroup(string $type): string
     {
-        return $this->container->getParameter('admin_stats')[$type]['user_group'];
+        return $this->parameterBag->get('admin_stats')[$type]['user_group'];
     }
 
     /**
@@ -158,7 +158,7 @@ class AdminStatsRepository extends Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $permissions = $this->container->getParameter('admin_stats')[$type]['permissions'];
+        $permissions = $this->parameterBag->get('admin_stats')[$type]['permissions'];
 
         $res = $this->executeApiRequest($project, [
             'meta' => 'siteinfo',
@@ -170,11 +170,11 @@ class AdminStatsRepository extends Repository
         $userGroups = [
             'local' => array_unique(array_merge(
                 $this->getUserGroupByLocality($res, $permissions),
-                $this->container->getParameter('admin_stats')[$type]['extra_user_groups']
+                $this->parameterBag->get('admin_stats')[$type]['extra_user_groups']
             )),
             'global' => array_unique(array_merge(
                 $this->getUserGroupByLocality($res, $permissions, true),
-                $this->container->getParameter('admin_stats')[$type]['extra_user_groups']
+                $this->parameterBag->get('admin_stats')[$type]['extra_user_groups']
             )),
         ];
 

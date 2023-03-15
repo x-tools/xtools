@@ -55,16 +55,18 @@ class DefaultController extends XtoolsController
      * @param Request $request
      * @param SessionInterface $session
      * @param ProjectRepository $projectRepo
+     * @param string $centralAuthProject
      * @return RedirectResponse
      * @throws Exception If initialization fails.
      */
     public function loginAction(
         Request $request,
         SessionInterface $session,
-        ProjectRepository $projectRepo
+        ProjectRepository $projectRepo,
+        string $centralAuthProject
     ): RedirectResponse {
         try {
-            [ $next, $token ] = $this->getOauthClient($request, $projectRepo)->initiate();
+            [ $next, $token ] = $this->getOauthClient($request, $projectRepo, $centralAuthProject)->initiate();
         } catch (Exception $oauthException) {
             throw $oauthException;
             // @TODO Make this work.
@@ -84,12 +86,14 @@ class DefaultController extends XtoolsController
      * @param Request $request The HTTP request.
      * @param SessionInterface $session
      * @param ProjectRepository $projectRepo
+     * @param string $centralAuthProject
      * @return RedirectResponse
      */
     public function oauthCallbackAction(
         Request $request,
         SessionInterface $session,
-        ProjectRepository $projectRepo
+        ProjectRepository $projectRepo,
+        string $centralAuthProject
     ): RedirectResponse {
         // Give up if the required GET params don't exist.
         if (!$request->get('oauth_verifier')) {
@@ -97,7 +101,7 @@ class DefaultController extends XtoolsController
         }
 
         // Complete authentication.
-        $client = $this->getOauthClient($request, $projectRepo);
+        $client = $this->getOauthClient($request, $projectRepo, $centralAuthProject);
         $token = $session->get('oauth_request_token');
 
         if (!is_a($token, Token::class)) {
@@ -133,17 +137,19 @@ class DefaultController extends XtoolsController
      * (This shouldn't really be in this class, but oh well.)
      * @param Request $request
      * @param ProjectRepository $projectRepo
+     * @param string $centralAuthProject
      * @return Client
      * @codeCoverageIgnore
      */
-    protected function getOauthClient(Request $request, ProjectRepository $projectRepo): Client
-    {
+    protected function getOauthClient(
+        Request $request,
+        ProjectRepository $projectRepo,
+        string $centralAuthProject
+    ): Client {
         if (isset($this->oauthClient)) {
             return $this->oauthClient;
         }
-        $defaultProject = $projectRepo->getProject(
-            $this->getParameter('central_auth_project')
-        );
+        $defaultProject = $projectRepo->getProject($centralAuthProject);
         $endpoint = $defaultProject->getUrl(false)
                     . $defaultProject->getScript()
                     . '?title=Special:OAuth';

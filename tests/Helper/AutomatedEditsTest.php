@@ -29,7 +29,10 @@ class AutomatedEditsTest extends TestAdapter
     {
         $client = static::createClient();
         $container = $client->getContainer();
-        $this->aeh = new AutomatedEditsHelper($container);
+        $this->aeh = new AutomatedEditsHelper(
+            $container->get('session'),
+            $container->get('cache.app')
+        );
     }
 
     /**

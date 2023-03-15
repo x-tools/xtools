@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 class I18nHelper
 {
     private Intuition $intuition;
+    private string $projectDir;
     protected ContainerInterface $container;
     protected IntlDateFormatter $dateFormatter;
     protected NumberFormatter $numFormatter;
@@ -30,25 +31,25 @@ class I18nHelper
 
     /**
      * Constructor for the I18nHelper.
-     * @param ContainerInterface $container
      * @param RequestStack $requestStack
      * @param SessionInterface $session
+     * @param string $projectDir
      */
     public function __construct(
-        ContainerInterface $container,
         RequestStack $requestStack,
-        SessionInterface $session
+        SessionInterface $session,
+        string $projectDir
     ) {
-        $this->container = $container;
         $this->requestStack = $requestStack;
         $this->session = $session;
+        $this->projectDir = $projectDir;
     }
 
     /**
      * Get an Intuition object, set to the current language based on the query string or session
      * of the current request.
      * @return Intuition
-     * @throws \Exception If the 'i18n/en.json' file doesn't exist (as it's the default).
+     * @throws Exception If the 'i18n/en.json' file doesn't exist (as it's the default).
      */
     public function getIntuition(): Intuition
     {
@@ -58,7 +59,7 @@ class I18nHelper
         }
 
         // Find the path, and complain if English doesn't exist.
-        $path = $this->container->getParameter('kernel.root_dir') . '/../i18n';
+        $path = $this->projectDir . '/i18n';
         if (!file_exists("$path/en.json")) {
             throw new Exception("Language directory doesn't exist: $path");
         }
@@ -110,7 +111,7 @@ class I18nHelper
      */
     public function getAllLangs(): array
     {
-        $messageFiles = glob($this->container->getParameter('kernel.root_dir').'/../i18n/*.json');
+        $messageFiles = glob($this->projectDir.'/i18n/*.json');
 
         $languages = array_values(array_unique(array_map(
             function ($filename) {
@@ -149,7 +150,7 @@ class I18nHelper
      */
     public function getFallbacks(?string $useLang = null): array
     {
-        $i18nPath = $this->container->getParameter('kernel.root_dir').'/../i18n/';
+        $i18nPath = $this->projectDir.'/i18n/';
         $useLang = $useLang ?? $this->getLang();
 
         $fallbacks = array_merge(
@@ -172,7 +173,6 @@ class I18nHelper
      */
     public function msg(?string $message, array $vars = []): ?string
     {
-        $vars = is_array($vars) ? $vars : [];
         return $this->getIntuition()->msg($message, ['domain' => 'xtools', 'variables' => $vars]);
     }
 
@@ -186,7 +186,7 @@ class I18nHelper
     {
         return $this->getIntuition()->msgExists($message, array_merge(
             ['domain' => 'xtools'],
-            ['variables' => is_array($vars) ? $vars : []]
+            ['variables' => $vars]
         ));
     }
 
@@ -324,6 +324,6 @@ class I18nHelper
      */
     private function getRequest(): ?Request
     {
-        return $this->container->get('request_stack')->getCurrentRequest();
+        return $this->requestStack->getCurrentRequest();
     }
 }

@@ -8,9 +8,11 @@ use App\Controller\XtoolsController;
 use App\Helper\I18nHelper;
 use DateInterval;
 use Psr\Cache\CacheItemPoolInterface;
-use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
@@ -34,9 +36,13 @@ class RateLimitSubscriber implements EventSubscriberInterface
     ];
 
     protected CacheItemPoolInterface $cache;
-    protected ContainerInterface $container;
     protected I18nHelper $i18n;
+    protected LoggerInterface $crawlerLogger;
+    protected LoggerInterface $denylistLogger;
+    protected LoggerInterface $rateLimitLogger;
+    protected ParameterBagInterface $parameterBag;
     protected Request $request;
+    protected SessionInterface $session;
 
     /** @var int Number of requests allowed in time period */
     protected int $rateLimit;
@@ -54,16 +60,36 @@ class RateLimitSubscriber implements EventSubscriberInterface
     protected string $uri;
 
     /**
-     * Save the container for later use.
-     * @param ContainerInterface $container The DI container.
      * @param I18nHelper $i18n
      * @param CacheItemPoolInterface $cache
+     * @param ParameterBagInterface $parameterBag
+     * @param SessionInterface $session
+     * @param LoggerInterface $crawlerLogger
+     * @param LoggerInterface $denylistLogger
+     * @param LoggerInterface $rateLimitLogger
+     * @param int $rateLimit
+     * @param int $rateDuration
      */
-    public function __construct(ContainerInterface $container, I18nHelper $i18n, CacheItemPoolInterface $cache)
-    {
-        $this->container = $container;
+    public function __construct(
+        I18nHelper $i18n,
+        CacheItemPoolInterface $cache,
+        ParameterBagInterface $parameterBag,
+        SessionInterface $session,
+        LoggerInterface $crawlerLogger,
+        LoggerInterface $denylistLogger,
+        LoggerInterface $rateLimitLogger,
+        int $rateLimit,
+        int $rateDuration
+    ) {
         $this->i18n = $i18n;
         $this->cache = $cache;
+        $this->parameterBag = $parameterBag;
+        $this->session = $session;
+        $this->crawlerLogger = $crawlerLogger;
+        $this->denylistLogger = $denylistLogger;
+        $this->rateLimitLogger = $rateLimitLogger;
+        $this->rateLimit = $rateLimit;
+        $this->rateDuration = $rateDuration;
     }
 
     /**
@@ -96,8 +122,6 @@ class RateLimitSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->rateLimit = (int)$this->container->getParameter('app.rate_limit_count');
-        $this->rateDuration = (int)$this->container->getParameter('app.rate_limit_time');
         $this->request = $event->getRequest();
         $this->userAgent = (string)$this->request->headers->get('User-Agent');
         $this->referer = (string)$this->request->headers->get('referer');
@@ -110,7 +134,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $loggedIn = (bool)$this->container->get('session')->get('logged_in_user');
+        $loggedIn = (bool)$this->session->get('logged_in_user');
         $isApi = 'ApiAction' === substr($action, -9);
 
         // No rate limits on lightweight pages, logged in users, subrequests or API requests.
@@ -134,7 +158,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $cacheKey = "ratelimit.session.".md5($xff);
+        $cacheKey = "ratelimit.session.".sha1($xff);
         $cacheItem = $this->cache->getItem($cacheKey);
 
         // If increment value already in cache, or start with 1.
@@ -174,7 +198,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
 
         // We're trying to check if everything BUT the uselang has remained unchanged.
         $cacheUri = str_replace('uselang='.$useLang, '', $this->uri);
-        $cacheKey = 'ratelimit.crawler.'.md5($this->userAgent.$cacheUri);
+        $cacheKey = 'ratelimit.crawler.'.sha1($this->userAgent.$cacheUri);
         $cacheItem = $this->cache->getItem($cacheKey);
 
         // If increment value already in cache, or start with 1.
@@ -182,8 +206,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
 
         // Check if limit has been exceeded, and if so, add a log entry.
         if ($count > 3) {
-            $logger = $this->container->get('monolog.logger.crawler');
-            $logger->info('Possible crawler detected');
+            $this->crawlerLogger->info('Possible crawler detected');
         }
 
         // Reset the clock on every request.
@@ -197,12 +220,12 @@ class RateLimitSubscriber implements EventSubscriberInterface
      */
     private function checkDenylist(): void
     {
-        // First check user agent and URI blacklists
-        if (!$this->container->hasParameter('request_blacklist')) {
+        // First check user agent and URI denylists.
+        if (!$this->parameterBag->has('request_denylist')) {
             return;
         }
 
-        $denylist = (array)$this->container->getParameter('request_blacklist');
+        $denylist = (array)$this->parameterBag->get('request_denylist');
 
         foreach ($denylist as $name => $item) {
             $matches = [];
@@ -242,7 +265,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
     private function denyAccess(string $logComment, bool $denylist = false): void
     {
         // Log the denied request
-        $logger = $this->container->get($denylist ? 'monolog.logger.blacklist' : 'monolog.logger.rate_limit');
+        $logger = $denylist ? $this->denylistLogger : $this->rateLimitLogger;
         $logger->info($logComment);
 
         if ($denylist) {

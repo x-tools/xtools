@@ -9,10 +9,12 @@ use App\Helper\I18nHelper;
 use App\Repository\PageRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 /**
  * This class can be used in unit tests where you need to override methods
@@ -25,28 +27,52 @@ class OverridableXtoolsController extends XtoolsController
     protected array $overrides = [];
 
     /**
-     * @param RequestStack $requestStack
      * @param ContainerInterface $container
+     * @param RequestStack $requestStack
+     * @param ManagerRegistry $managerRegistry
      * @param CacheItemPoolInterface $cache
+     * @param FlashBagInterface $flashBag
      * @param Client $guzzle
      * @param I18nHelper $i18n
      * @param ProjectRepository $projectRepo
      * @param UserRepository $userRepo
      * @param PageRepository $pageRepo
+     * @param bool $isWMF
+     * @param string $defaultProject
+     * @param array $multilingualWikis
      * @param string[] $overrides Keys are method names, values are what they should return.
      */
     public function __construct(
-        RequestStack $requestStack,
         ContainerInterface $container,
+        RequestStack $requestStack,
+        ManagerRegistry $managerRegistry,
         CacheItemPoolInterface $cache,
+        FlashBagInterface $flashBag,
         Client $guzzle,
         I18nHelper $i18n,
         ProjectRepository $projectRepo,
         UserRepository $userRepo,
         PageRepository $pageRepo,
+        bool $isWMF,
+        string $defaultProject,
+        array $multilingualWikis,
         array $overrides = []
     ) {
-        parent::__construct($requestStack, $container, $cache, $guzzle, $i18n, $projectRepo, $userRepo, $pageRepo);
+        parent::__construct(
+            $container,
+            $requestStack,
+            $managerRegistry,
+            $cache,
+            $flashBag,
+            $guzzle,
+            $i18n,
+            $projectRepo,
+            $userRepo,
+            $pageRepo,
+            $isWMF,
+            $defaultProject,
+            $multilingualWikis
+        );
         $this->overrides = $overrides;
     }
 

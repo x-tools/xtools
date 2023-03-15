@@ -138,13 +138,17 @@ class GlobalContribsController extends XtoolsController
      * ),
      * @param GlobalContribsRepository $globalContribsRepo
      * @param EditRepository $editRepo
+     * @param string $centralAuthProject
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultsAction(GlobalContribsRepository $globalContribsRepo, EditRepository $editRepo): Response
-    {
+    public function resultsAction(
+        GlobalContribsRepository $globalContribsRepo,
+        EditRepository $editRepo,
+        string $centralAuthProject
+    ): Response {
         $globalContribs = $this->getGlobalContribs($globalContribsRepo, $editRepo);
-        $defaultProject = $this->projectRepo->getProject($this->getParameter('central_auth_project'));
+        $defaultProject = $this->projectRepo->getProject($centralAuthProject);
 
         return $this->render('globalContribs/result.html.twig', [
             'xtTitle' => $this->user->getUsername(),
@@ -180,17 +184,19 @@ class GlobalContribsController extends XtoolsController
      * )
      * @param GlobalContribsRepository $globalContribsRepo
      * @param EditRepository $editRepo
+     * @param string $centralAuthProject
      * @return JsonResponse
      * @codeCoverageIgnore
      */
     public function resultsApiAction(
         GlobalContribsRepository $globalContribsRepo,
-        EditRepository $editRepo
+        EditRepository $editRepo,
+        string $centralAuthProject
     ): JsonResponse {
         $this->recordApiUsage('user/globalcontribs');
 
         $globalContribs = $this->getGlobalContribs($globalContribsRepo, $editRepo);
-        $defaultProject = $this->projectRepo->getProject($this->getParameter('central_auth_project'));
+        $defaultProject = $this->projectRepo->getProject($centralAuthProject);
         $this->project = $defaultProject;
 
         $results = $globalContribs->globalEdits();

@@ -11,10 +11,11 @@ use App\Model\User;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\ParameterType;
+use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
 use Psr\Cache\CacheItemPoolInterface;
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Wikimedia\IPUtils;
 
 /**
@@ -30,10 +31,11 @@ class CategoryEditsRepository extends Repository
     protected UserRepository $userRepo;
 
     /**
-     * @param ContainerInterface $container
+     * @param ManagerRegistry $managerRegistry
      * @param CacheItemPoolInterface $cache
      * @param Client $guzzle
      * @param LoggerInterface $logger
+     * @param ParameterBagInterface $parameterBag
      * @param bool $isWMF
      * @param int $queryTimeout
      * @param AutomatedEditsHelper $autoEditsHelper
@@ -42,10 +44,11 @@ class CategoryEditsRepository extends Repository
      * @param UserRepository $userRepo
      */
     public function __construct(
-        ContainerInterface $container,
+        ManagerRegistry $managerRegistry,
         CacheItemPoolInterface $cache,
         Client $guzzle,
         LoggerInterface $logger,
+        ParameterBagInterface $parameterBag,
         bool $isWMF,
         int $queryTimeout,
         AutomatedEditsHelper $autoEditsHelper,
@@ -53,11 +56,11 @@ class CategoryEditsRepository extends Repository
         PageRepository $pageRepo,
         UserRepository $userRepo
     ) {
-        $this->autoEditsHelper= $autoEditsHelper;
+        $this->autoEditsHelper = $autoEditsHelper;
         $this->editRepo = $editRepo;
         $this->pageRepo = $pageRepo;
         $this->userRepo = $userRepo;
-        parent::__construct($container, $cache, $guzzle, $logger, $isWMF, $queryTimeout);
+        parent::__construct($managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout);
     }
 
     /**

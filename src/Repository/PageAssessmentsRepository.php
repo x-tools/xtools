@@ -25,7 +25,7 @@ class PageAssessmentsRepository extends Repository
     public function getConfig(Project $project): ?array
     {
         if (!isset($this->assessments)) {
-            $this->assessments = $this->container->getParameter('assessments');
+            $this->assessments = $this->parameterBag->get('assessments');
         }
         return $this->assessments[$project->getDomain()] ?? null;
     }
@@ -43,8 +43,8 @@ class PageAssessmentsRepository extends Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $paTable = $this->getTableName($page->getProject()->getDatabaseName(), 'page_assessments');
-        $papTable = $this->getTableName($page->getProject()->getDatabaseName(), 'page_assessments_projects');
+        $paTable = $page->getProject()->getTableName('page_assessments');
+        $papTable = $page->getProject()->getTableName('page_assessments_projects');
         $pageId = $page->getId();
 
         $sql = "SELECT pap_project_title AS wikiproject, pa_class AS class, pa_importance AS importance

@@ -6,21 +6,13 @@ namespace App\Controller;
 
 use App\Exception\XtoolsHttpException;
 use App\Helper\AutomatedEditsHelper;
-use App\Helper\I18nHelper;
 use App\Model\ArticleInfo;
 use App\Model\Authorship;
 use App\Model\Page;
 use App\Model\Project;
 use App\Repository\ArticleInfoRepository;
-use App\Repository\PageRepository;
-use App\Repository\ProjectRepository;
-use App\Repository\UserRepository;
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ServerException;
-use Psr\Cache\CacheItemPoolInterface;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -30,8 +22,6 @@ use Symfony\Component\Routing\Annotation\Route;
 class ArticleInfoController extends XtoolsController
 {
     protected ArticleInfo $articleInfo;
-    protected ArticleInfoRepository $articleInfoRepo;
-    protected AutomatedEditsHelper $autoEditsHelper;
 
     /**
      * @inheritDoc
@@ -40,35 +30,6 @@ class ArticleInfoController extends XtoolsController
     public function getIndexRoute(): string
     {
         return 'ArticleInfo';
-    }
-
-    /**
-     * @param RequestStack $requestStack
-     * @param ContainerInterface $container
-     * @param CacheItemPoolInterface $cache
-     * @param Client $guzzle
-     * @param I18nHelper $i18n
-     * @param ProjectRepository $projectRepo
-     * @param UserRepository $userRepo
-     * @param PageRepository $pageRepo
-     * @param ArticleInfoRepository $articleInfoRepo
-     * @param AutomatedEditsHelper $autoEditsHelper
-     */
-    public function __construct(
-        RequestStack $requestStack,
-        ContainerInterface $container,
-        CacheItemPoolInterface $cache,
-        Client $guzzle,
-        I18nHelper $i18n,
-        ProjectRepository $projectRepo,
-        UserRepository $userRepo,
-        PageRepository $pageRepo,
-        ArticleInfoRepository $articleInfoRepo,
-        AutomatedEditsHelper $autoEditsHelper
-    ) {
-        $this->articleInfoRepo = $articleInfoRepo;
-        $this->autoEditsHelper = $autoEditsHelper;
-        parent::__construct($requestStack, $container, $cache, $guzzle, $i18n, $projectRepo, $userRepo, $pageRepo);
     }
 
     /**
@@ -98,17 +59,21 @@ class ArticleInfoController extends XtoolsController
 
     /**
      * Setup the ArticleInfo instance and its Repository.
+     * @param ArticleInfoRepository $articleInfoRepo
+     * @param AutomatedEditsHelper $autoEditsHelper
      */
-    private function setupArticleInfo(): void
-    {
+    private function setupArticleInfo(
+        ArticleInfoRepository $articleInfoRepo,
+        AutomatedEditsHelper $autoEditsHelper
+    ): void {
         if (isset($this->articleInfo)) {
             return;
         }
 
         $this->articleInfo = new ArticleInfo(
-            $this->articleInfoRepo,
+            $articleInfoRepo,
             $this->i18n,
-            $this->autoEditsHelper,
+            $autoEditsHelper,
             $this->page,
             $this->start,
             $this->end
@@ -117,7 +82,7 @@ class ArticleInfoController extends XtoolsController
 
     /**
      * Generate ArticleInfo gadget script for use on-wiki. This automatically points the
-     * script to this installation's API. Pass ?uglify=1 to uglify the code.
+     * script to this installation's API.
      *
      * @Route("/articleinfo-gadget.js", name="ArticleInfoGadget")
      * @link https://www.mediawiki.org/wiki/XTools/ArticleInfo_gadget
@@ -147,11 +112,15 @@ class ArticleInfoController extends XtoolsController
      *         "end"=false,
      *     }
      * )
+     * @param ArticleInfoRepository $articleInfoRepo
+     * @param AutomatedEditsHelper $autoEditsHelper
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction(): Response
-    {
+    public function resultAction(
+        ArticleInfoRepository $articleInfoRepo,
+        AutomatedEditsHelper $autoEditsHelper
+    ): Response {
         if (!$this->isDateRangeValid($this->page, $this->start, $this->end)) {
             $this->addFlashMessage('notice', 'date-range-outside-revisions');
 
@@ -160,7 +129,7 @@ class ArticleInfoController extends XtoolsController
             ]);
         }
 
-        $this->setupArticleInfo();
+        $this->setupArticleInfo($articleInfoRepo, $autoEditsHelper);
         $this->articleInfo->prepareData();
 
         $maxRevisions = $this->getParameter('app.max_page_revisions');
@@ -220,15 +189,19 @@ class ArticleInfoController extends XtoolsController
      *     requirements={"page"=".+"}
      * )
      * @Route("/api/page/articleinfo/{project}/{page}", requirements={"page"=".+"})
+     * @param ArticleInfoRepository $articleInfoRepo
+     * @param AutomatedEditsHelper $autoEditsHelper
      * @return Response|JsonResponse
      * See ArticleInfoControllerTest::testArticleInfoApi()
      * @codeCoverageIgnore
      */
-    public function articleInfoApiAction(): Response
-    {
+    public function articleInfoApiAction(
+        ArticleInfoRepository $articleInfoRepo,
+        AutomatedEditsHelper $autoEditsHelper
+    ): Response {
         $this->recordApiUsage('page/articleinfo');
 
-        $this->setupArticleInfo();
+        $this->setupArticleInfo($articleInfoRepo, $autoEditsHelper);
         $data = [];
 
         try {
@@ -280,13 +253,17 @@ class ArticleInfoController extends XtoolsController
      *     name="PageApiProse",
      *     requirements={"page"=".+"}
      * )
+     * @param ArticleInfoRepository $articleInfoRepo
+     * @param AutomatedEditsHelper $autoEditsHelper
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function proseStatsApiAction(): JsonResponse
-    {
+    public function proseStatsApiAction(
+        ArticleInfoRepository $articleInfoRepo,
+        AutomatedEditsHelper $autoEditsHelper
+    ): JsonResponse {
         $this->recordApiUsage('page/prose');
-        $this->setupArticleInfo();
+        $this->setupArticleInfo($articleInfoRepo, $autoEditsHelper);
         return $this->getFormattedApiResponse($this->articleInfo->getProseStats());
     }
 
@@ -358,14 +335,18 @@ class ArticleInfoController extends XtoolsController
      *         "limit"=20,
      *     }
      * )
+     * @param ArticleInfoRepository $articleInfoRepo
+     * @param AutomatedEditsHelper $autoEditsHelper
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function topEditorsApiAction(): JsonResponse
-    {
+    public function topEditorsApiAction(
+        ArticleInfoRepository $articleInfoRepo,
+        AutomatedEditsHelper $autoEditsHelper
+    ): JsonResponse {
         $this->recordApiUsage('page/top_editors');
 
-        $this->setupArticleInfo();
+        $this->setupArticleInfo($articleInfoRepo, $autoEditsHelper);
         $topEditors = $this->articleInfo->getTopEditorsByEditCount(
             (int)$this->limit,
             '' != $this->request->query->get('nobots')

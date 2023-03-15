@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace App\Tests\Twig;
 
-use App\Helper\I18nHelper;
 use App\Model\Project;
 use App\Model\User;
 use App\Repository\ProjectRepository;
@@ -32,19 +31,21 @@ class AppExtensionTest extends TestAdapter
      */
     public function setUp(): void
     {
-        $container = static::createClient()->getContainer();
+        static::createClient();
         $stack = new RequestStack();
         $session = new Session();
-        $i18nHelper = new I18nHelper($container, $stack, $session);
+        $i18nHelper = static::$container->get('app.i18n_helper');
         $urlGenerator = $this->createMock(UrlGenerator::class);
         $this->appExtension = new AppExtension(
-            $container,
             $stack,
             $session,
             $i18nHelper,
             $urlGenerator,
             $this->createMock(ProjectRepository::class),
-            false
+            static::$container->get('parameter_bag'),
+            static::$container->getParameter('app.is_wmf'),
+            static::$container->getParameter('app.single_wiki'),
+            30
         );
     }
 

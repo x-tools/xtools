@@ -10,7 +10,7 @@ use App\Model\Project;
 use App\Model\User;
 use App\Repository\ProjectRepository;
 use DateTime;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -25,41 +25,52 @@ use Wikimedia\IPUtils;
  */
 class AppExtension extends AbstractExtension
 {
-    protected ContainerInterface $container;
     protected I18nHelper $i18n;
+    protected ParameterBagInterface $parameterBag;
     protected ProjectRepository $projectRepo;
     protected RequestStack $requestStack;
     protected SessionInterface $session;
     protected UrlGeneratorInterface $urlGenerator;
 
+    protected bool $isWMF;
+    protected int $replagThreshold;
+    protected bool $singleWiki;
+
     /** @var float Duration of the current HTTP request in seconds. */
     protected float $requestTime;
-    protected bool $isWMF;
 
     /**
      * Constructor, with the I18nHelper through dependency injection.
-     * @param ContainerInterface $container
      * @param RequestStack $requestStack
      * @param SessionInterface $session
      * @param I18nHelper $i18n
      * @param UrlGeneratorInterface $generator
+     * @param ProjectRepository $projectRepo
+     * @param ParameterBagInterface $parameterBag
+     * @param bool $isWMF
+     * @param bool $singleWiki
+     * @param int $replagThreshold
      */
     public function __construct(
-        ContainerInterface $container,
         RequestStack $requestStack,
         SessionInterface $session,
         I18nHelper $i18n,
         UrlGeneratorInterface $generator,
         ProjectRepository $projectRepo,
-        bool $isWMF
+        ParameterBagInterface $parameterBag,
+        bool $isWMF,
+        bool $singleWiki,
+        int $replagThreshold
     ) {
-        $this->container = $container;
         $this->requestStack = $requestStack;
         $this->session = $session;
         $this->i18n = $i18n;
         $this->urlGenerator = $generator;
         $this->projectRepo = $projectRepo;
+        $this->parameterBag = $parameterBag;
         $this->isWMF = $isWMF;
+        $this->singleWiki = $singleWiki;
+        $this->replagThreshold = $replagThreshold;
     }
 
     /*********************************** FUNCTIONS ***********************************/
@@ -247,8 +258,8 @@ class AppExtension extends AbstractExtension
     public function toolEnabled(string $tool = 'index'): bool
     {
         $param = false;
-        if ($this->container->hasParameter("enable.$tool")) {
-            $param = boolval($this->container->getParameter("enable.$tool"));
+        if ($this->parameterBag->has("enable.$tool")) {
+            $param = (bool)$this->parameterBag->get("enable.$tool");
         }
         return $param;
     }
@@ -259,11 +270,7 @@ class AppExtension extends AbstractExtension
      */
     public function tools(): array
     {
-        $retVal = [];
-        if ($this->container->hasParameter('tools')) {
-            $retVal = $this->container->getParameter('tools');
-        }
-        return $retVal;
+        return $this->parameterBag->get('tools');
     }
 
     /**
@@ -396,11 +403,7 @@ class AppExtension extends AbstractExtension
      */
     public function isSingleWiki(): bool
     {
-        $param = true;
-        if ($this->container->hasParameter('app.single_wiki')) {
-            $param = (bool)$this->container->getParameter('app.single_wiki');
-        }
-        return $param;
+        return $this->singleWiki;
     }
 
     /**
@@ -409,11 +412,7 @@ class AppExtension extends AbstractExtension
      */
     public function getReplagThreshold(): int
     {
-        $param = 30;
-        if ($this->container->hasParameter('app.replag_threshold')) {
-            $param = $this->container->getParameter('app.replag_threshold');
-        }
-        return $param;
+        return $this->replagThreshold;
     }
 
     /**
@@ -449,10 +448,10 @@ class AppExtension extends AbstractExtension
     {
         // Don't show if Quote is turned off, but always show for WMF
         // (so quote is in footer but not in nav).
-        if (!$this->isWMF && !$this->container->getParameter('enable.Quote')) {
+        if (!$this->isWMF && !$this->parameterBag->get('enable.Quote')) {
             return '';
         }
-        $quotes = $this->container->getParameter('quotes');
+        $quotes = $this->parameterBag->get('quotes');
         $id = array_rand($quotes);
         return $quotes[$id];
     }
@@ -463,7 +462,7 @@ class AppExtension extends AbstractExtension
      */
     public function loggedInUser()
     {
-        return $this->container->get('session')->get('logged_in_user');
+        return $this->session->get('logged_in_user');
     }
 
     /**

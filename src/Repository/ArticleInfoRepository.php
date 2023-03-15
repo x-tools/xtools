@@ -7,10 +7,11 @@ namespace App\Repository;
 use App\Model\Edit;
 use App\Model\Page;
 use Doctrine\DBAL\Driver\ResultStatement;
+use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
 use Psr\Cache\CacheItemPoolInterface;
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
  * ArticleInfoRepository is responsible for retrieving data about a single
@@ -22,23 +23,26 @@ class ArticleInfoRepository extends Repository
     protected EditRepository $editRepo;
     protected UserRepository $userRepo;
 
-    /** @var int Maximum number of revisions to process, as configured via app.max_page_revisions */
+    /** @var int Maximum number of revisions to process, as configured via APP_MAX_PAGE_REVISIONS */
     protected int $maxPageRevisions;
 
     /**
-     * @param ContainerInterface $container
+     * @param ManagerRegistry $managerRegistry
      * @param CacheItemPoolInterface $cache
      * @param Client $guzzle
      * @param LoggerInterface $logger
+     * @param ParameterBagInterface $parameterBag
      * @param bool $isWMF
      * @param int $queryTimeout
      * @param EditRepository $editRepo
+     * @param UserRepository $userRepo
      */
     public function __construct(
-        ContainerInterface $container,
+        ManagerRegistry $managerRegistry,
         CacheItemPoolInterface $cache,
         Client $guzzle,
         LoggerInterface $logger,
+        ParameterBagInterface $parameterBag,
         bool $isWMF,
         int $queryTimeout,
         EditRepository $editRepo,
@@ -46,7 +50,7 @@ class ArticleInfoRepository extends Repository
     ) {
         $this->editRepo = $editRepo;
         $this->userRepo = $userRepo;
-        parent::__construct($container, $cache, $guzzle, $logger, $isWMF, $queryTimeout);
+        parent::__construct($managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout);
     }
 
     /**
@@ -56,7 +60,7 @@ class ArticleInfoRepository extends Repository
     public function getMaxPageRevisions(): int
     {
         if (!isset($this->maxPageRevisions)) {
-            $this->maxPageRevisions = (int)$this->container->getParameter('app.max_page_revisions');
+            $this->maxPageRevisions = (int)$this->parameterBag->get('app.max_page_revisions');
         }
         return $this->maxPageRevisions;
     }

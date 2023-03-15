@@ -1,5 +1,5 @@
 monolog:
-    channels: ['rate_limit', 'blacklist', 'crawler']
+    channels: ['rate_limit', 'denylist', 'crawler']
     handlers:
         main:
             type: stream
@@ -15,12 +15,12 @@ monolog:
             type: stream
             path: '%kernel.logs_dir%/rate_limit.log'
             channels: ['rate_limit']
-        blacklist:
+        denylist:
             # log all messages (since debug is the lowest level)
             level: info
             type: stream
-            path: '%kernel.logs_dir%/blacklist.log'
-            channels: ['blacklist']
+            path: '%kernel.logs_dir%/denylist.log'
+            channels: ['denylist']
         crawler:
             level: info
             type: stream

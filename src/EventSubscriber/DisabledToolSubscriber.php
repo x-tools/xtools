@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace App\EventSubscriber;
 
 use App\Controller\XtoolsController;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -18,15 +18,15 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class DisabledToolSubscriber implements EventSubscriberInterface
 {
 
-    protected ContainerInterface $container;
+    protected ParameterBagInterface $parameterBag;
 
     /**
      * Save the container for later use.
-     * @param ContainerInterface $container The DI container.
+     * @param ParameterBagInterface $parameterBag
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ParameterBagInterface $parameterBag)
     {
-        $this->container = $container;
+        $this->parameterBag = $parameterBag;
     }
 
     /**
@@ -51,7 +51,7 @@ class DisabledToolSubscriber implements EventSubscriberInterface
 
         if ($controller instanceof XtoolsController && method_exists($controller, 'getIndexRoute')) {
             $tool = $controller[0]->getIndexRoute();
-            if (!in_array($tool, ['homepage', 'meta', 'Quote']) && !$this->container->getParameter("enable.$tool")) {
+            if (!in_array($tool, ['homepage', 'meta', 'Quote']) && !$this->parameterBag->get("enable.$tool")) {
                 throw new NotFoundHttpException('This tool is disabled');
             }
         }

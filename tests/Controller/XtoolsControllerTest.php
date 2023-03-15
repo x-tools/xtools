@@ -44,14 +44,19 @@ class XtoolsControllerTest extends ControllerTestAdapter
         $requestStack->push(new Request($requestParams));
 
         return new OverridableXtoolsController(
-            $requestStack,
             self::$container,
+            $requestStack,
+            self::$container->get('doctrine'),
             self::$container->get('cache.app'),
+            self::$container->get('session')->getFlashBag(),
             self::$container->get('eight_points_guzzle.client.xtools'),
             $this->i18n,
             self::$container->get('App\Repository\ProjectRepository'),
             self::$container->get('App\Repository\UserRepository'),
             self::$container->get('App\Repository\PageRepository'),
+            self::$container->getParameter('app.is_wmf'),
+            self::$container->getParameter('default_project'),
+            self::$container->getParameter('app.multilingual_wikis'),
             $methodOverrides
         );
     }

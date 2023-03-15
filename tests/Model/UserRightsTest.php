@@ -12,8 +12,6 @@ use App\Repository\UserRepository;
 use App\Repository\UserRightsRepository;
 use App\Tests\TestAdapter;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * @covers \App\Model\UserRights
@@ -28,7 +26,7 @@ class UserRightsTest extends TestAdapter
 
     public function setUp(): void
     {
-        $this->i18n = new I18nHelper(static::createClient()->getContainer(), new RequestStack(), new Session());
+        $this->i18n = static::createClient()->getContainer()->get('app.i18n_helper');
         $project = new Project('test.example.org');
         $project->setRepository($this->getProjectRepo());
         $this->userRepo = $this->createMock(UserRepository::class);

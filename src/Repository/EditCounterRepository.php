@@ -6,10 +6,11 @@ namespace App\Repository;
 
 use App\Model\Project;
 use App\Model\User;
+use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
 use Psr\Cache\CacheItemPoolInterface;
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Wikimedia\IPUtils;
 
 /**
@@ -21,34 +22,21 @@ class EditCounterRepository extends Repository
 {
     protected AutoEditsRepository $autoEditsRepo;
     protected ProjectRepository $projectRepo;
-    protected UserRightsRepository $userRightsRepo;
 
-    /**
-     * @param ContainerInterface $container
-     * @param CacheItemPoolInterface $cache
-     * @param Client $guzzle
-     * @param LoggerInterface $logger
-     * @param ProjectRepository $projectRepo
-     * @param UserRightsRepository $userRightsRepo
-     * @param AutoEditsRepository $autoEditsRepo
-     * @param bool $isWMF
-     * @param int $queryTimeout
-     */
     public function __construct(
-        ContainerInterface $container,
+        ManagerRegistry $managerRegistry,
         CacheItemPoolInterface $cache,
         Client $guzzle,
         LoggerInterface $logger,
-        ProjectRepository $projectRepo,
-        UserRightsRepository $userRightsRepo,
-        AutoEditsRepository $autoEditsRepo,
+        ParameterBagInterface $parameterBag,
         bool $isWMF,
-        int $queryTimeout
+        int $queryTimeout,
+        ProjectRepository $projectRepo,
+        AutoEditsRepository $autoEditsRepo
     ) {
         $this->projectRepo = $projectRepo;
-        $this->userRightsRepo = $userRightsRepo;
         $this->autoEditsRepo = $autoEditsRepo;
-        parent::__construct($container, $cache, $guzzle, $logger, $isWMF, $queryTimeout);
+        parent::__construct($managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout);
     }
 
     /**
@@ -275,7 +263,7 @@ class EditCounterRepository extends Repository
      */
     protected function getFileCountsCommons(User $user): array
     {
-        $commonsProject = $this->projectRepo->getProject('commonswiki', $this->container);
+        $commonsProject = $this->projectRepo->getProject('commonswiki');
         $loggingTableCommons = $commonsProject->getTableName('logging');
         $sql = "(SELECT 'files_moved_commons' AS `key`, COUNT(log_id) AS `val`
                  FROM $loggingTableCommons

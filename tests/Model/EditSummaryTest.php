@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace App\Tests\Model;
 
-use App\Helper\I18nHelper;
 use App\Model\EditSummary;
 use App\Model\Project;
 use App\Model\User;
@@ -12,8 +11,6 @@ use App\Repository\EditSummaryRepository;
 use App\Repository\UserRepository;
 use App\Tests\TestAdapter;
 use ReflectionClass;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Tests for EditSummary.
@@ -41,7 +38,7 @@ class EditSummaryTest extends TestAdapter
             $editSummaryRepo,
             $this->project,
             $this->user,
-            new I18nHelper(static::createClient()->getContainer(), new RequestStack(), new Session()),
+            static::createClient()->getContainer()->get('app.i18n_helper'),
             'all',
             false,
             false,

@@ -4,9 +4,16 @@ declare(strict_types = 1);
 
 namespace App\Repository;
 
+use App\Helper\AutomatedEditsHelper;
 use App\Model\Project;
 use App\Model\User;
+use Doctrine\Persistence\ManagerRegistry;
+use GuzzleHttp\Client;
 use PDO;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Wikimedia\IPUtils;
 
 /**
@@ -16,6 +23,8 @@ use Wikimedia\IPUtils;
  */
 class AutoEditsRepository extends UserRepository
 {
+    protected AutomatedEditsHelper $autoEditsHelper;
+
     /** @var array List of automated tools, used for fetching the tool list and filtering it. */
     private array $aeTools;
 
@@ -24,6 +33,44 @@ class AutoEditsRepository extends UserRepository
 
     /** @var array Process cache for tags/IDs. */
     private array $tags;
+
+    /**
+     * @param ManagerRegistry $managerRegistry
+     * @param CacheItemPoolInterface $cache
+     * @param Client $guzzle
+     * @param LoggerInterface $logger
+     * @param ParameterBagInterface $parameterBag
+     * @param bool $isWMF
+     * @param int $queryTimeout
+     * @param ProjectRepository $projectRepo
+     * @param AutomatedEditsHelper $autoEditsHelper
+     * @param SessionInterface $session
+     */
+    public function __construct(
+        ManagerRegistry $managerRegistry,
+        CacheItemPoolInterface $cache,
+        Client $guzzle,
+        LoggerInterface $logger,
+        ParameterBagInterface $parameterBag,
+        bool $isWMF,
+        int $queryTimeout,
+        ProjectRepository $projectRepo,
+        AutomatedEditsHelper $autoEditsHelper,
+        SessionInterface $session
+    ) {
+        $this->autoEditsHelper = $autoEditsHelper;
+        parent::__construct(
+            $managerRegistry,
+            $cache,
+            $guzzle,
+            $logger,
+            $parameterBag,
+            $isWMF,
+            $queryTimeout,
+            $projectRepo,
+            $session
+        );
+    }
 
     /**
      * @param bool $useSandbox
@@ -44,9 +91,7 @@ class AutoEditsRepository extends UserRepository
     public function getTools(Project $project, $namespace = 'all'): array
     {
         if (!isset($this->aeTools)) {
-            $this->aeTools = $this->container
-                ->get('app.automated_edits_helper')
-                ->getTools($project, $this->useSandbox);
+            $this->aeTools = $this->autoEditsHelper->getTools($project, $this->useSandbox);
         }
 
         if ('all' !== $namespace) {

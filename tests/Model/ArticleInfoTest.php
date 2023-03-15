@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace App\Tests\Model;
 
 use App\Helper\AutomatedEditsHelper;
-use App\Helper\I18nHelper;
 use App\Model\ArticleInfo;
 use App\Model\Edit;
 use App\Model\Page;
@@ -18,8 +17,6 @@ use App\Tests\TestAdapter;
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use GuzzleHttp;
 use ReflectionClass;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Tests for ArticleInfo.
@@ -49,7 +46,7 @@ class ArticleInfoTest extends TestAdapter
         static::createClient();
         /** @var AutomatedEditsHelper $autoEditsHelper */
         $autoEditsHelper = static::$container->get('app.automated_edits_helper');
-        $i18nHelper = new I18nHelper(static::$container, new RequestStack(), new Session());
+        $i18nHelper = static::$container->get('app.i18n_helper');
         $this->project = $this->getMockEnwikiProject();
         $this->pageRepo = $this->createMock(PageRepository::class);
         $this->page = new Page($this->pageRepo, $this->project, 'Test page');
