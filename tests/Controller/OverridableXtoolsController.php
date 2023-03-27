@@ -39,7 +39,6 @@ class OverridableXtoolsController extends XtoolsController
      * @param PageRepository $pageRepo
      * @param bool $isWMF
      * @param string $defaultProject
-     * @param array $multilingualWikis
      * @param string[] $overrides Keys are method names, values are what they should return.
      */
     public function __construct(
@@ -55,7 +54,6 @@ class OverridableXtoolsController extends XtoolsController
         PageRepository $pageRepo,
         bool $isWMF,
         string $defaultProject,
-        array $multilingualWikis,
         array $overrides = []
     ) {
         parent::__construct(
@@ -70,8 +68,7 @@ class OverridableXtoolsController extends XtoolsController
             $userRepo,
             $pageRepo,
             $isWMF,
-            $defaultProject,
-            $multilingualWikis
+            $defaultProject
         );
         $this->overrides = $overrides;
     }

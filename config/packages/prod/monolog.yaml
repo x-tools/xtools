@@ -40,8 +40,8 @@ monolog:
         swift:
             type: swift_mailer
             level: critical
-            from_email: '%mailer.from_email%'
-            to_email: '%mailer.to_email%'
+            from_email: '%env(MAILER_FROM_EMAIL)%'
+            to_email: '%env(MAILER_TO_EMAIL)%'
             subject: '[XTools] Fatal error: %%message%%'
             formatter: monolog.formatter.html
             content_type: text/html

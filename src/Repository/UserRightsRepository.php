@@ -6,7 +6,6 @@ namespace App\Repository;
 
 use App\Model\Project;
 use App\Model\User;
-use GuzzleHttp;
 
 /**
  * An UserRightsRepository is responsible for retrieving information around a user's
@@ -189,12 +188,8 @@ class UserRightsRepository extends Repository
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        /** @var GuzzleHttp\Client $client */
-        $client = $this->container->get('eight_points_guzzle.client.xtools');
-
         $url = 'https://noc.wikimedia.org/conf/InitialiseSettings.php.txt';
-
-        $contents = $client->request('GET', $url)
+        $contents = $this->guzzle->request('GET', $url)
             ->getBody()
             ->getContents();
 

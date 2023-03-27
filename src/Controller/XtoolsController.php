@@ -53,9 +53,6 @@ abstract class XtoolsController extends AbstractController
     /** @var string The configured default project. */
     protected string $defaultProject;
 
-    /** @var string[] Which projects are considered multilingual. */
-    protected array $multilingualWikis;
-
     /** OTHER CLASS PROPERTIES */
 
     /** @var Request The request object. */
@@ -199,7 +196,6 @@ abstract class XtoolsController extends AbstractController
      * @param PageRepository $pageRepo
      * @param bool $isWMF
      * @param string $defaultProject
-     * @param array $multilingualWikis
      */
     public function __construct(
         ContainerInterface $container,
@@ -213,8 +209,7 @@ abstract class XtoolsController extends AbstractController
         UserRepository $userRepo,
         PageRepository $pageRepo,
         bool $isWMF,
-        string $defaultProject,
-        array $multilingualWikis
+        string $defaultProject
     ) {
         $this->container = $container;
         $this->request = $requestStack->getCurrentRequest();
@@ -228,7 +223,6 @@ abstract class XtoolsController extends AbstractController
         $this->pageRepo = $pageRepo;
         $this->isWMF = $isWMF;
         $this->defaultProject = $defaultProject;
-        $this->multilingualWikis = $multilingualWikis;
         $this->params = $this->parseQueryParams();
 
         // Parse out the name of the controller and action.
@@ -805,15 +799,9 @@ abstract class XtoolsController extends AbstractController
 
         // Separate parameters for language and wiki.
         if (isset($params['wiki']) && isset($params['lang'])) {
-            // 'wikifam' will be like '.wikipedia.org', vs just 'wikipedia',
+            // 'wikifam' may be like '.wikipedia.org', vs just 'wikipedia',
             // so we must remove leading periods and trailing .org's.
-            $params['project'] = rtrim(ltrim($params['wiki'], '.'), '.org').'.org';
-
-            // Prepend language if applicable.
-            if (isset($params['lang']) && !in_array($params['wiki'], $this->multilingualWikis)) {
-                $params['project'] = $params['lang'].'.'.$params['project'];
-            }
-
+            $params['project'] = $params['lang'].'.'.rtrim(ltrim($params['wiki'], '.'), '.org').'.org';
             unset($params['wiki']);
             unset($params['lang']);
         }

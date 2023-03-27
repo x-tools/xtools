@@ -56,7 +56,6 @@ class XtoolsControllerTest extends ControllerTestAdapter
             self::$container->get('App\Repository\PageRepository'),
             self::$container->getParameter('app.is_wmf'),
             self::$container->getParameter('default_project'),
-            self::$container->getParameter('app.multilingual_wikis'),
             $methodOverrides
         );
     }
