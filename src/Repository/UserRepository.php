@@ -12,7 +12,7 @@ use GuzzleHttp\Client;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Wikimedia\IPUtils;
 
 /**
@@ -22,7 +22,7 @@ use Wikimedia\IPUtils;
 class UserRepository extends Repository
 {
     protected ProjectRepository $projectRepo;
-    protected SessionInterface $session;
+    protected RequestStack $requestStack;
 
     /**
      * @param ManagerRegistry $managerRegistry
@@ -33,7 +33,7 @@ class UserRepository extends Repository
      * @param bool $isWMF
      * @param int $queryTimeout
      * @param ProjectRepository $projectRepo
-     * @param SessionInterface $session
+     * @param RequestStack $requestStack
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
@@ -44,10 +44,10 @@ class UserRepository extends Repository
         bool $isWMF,
         int $queryTimeout,
         ProjectRepository $projectRepo,
-        SessionInterface $session
+        RequestStack $requestStack
     ) {
         $this->projectRepo = $projectRepo;
-        $this->session = $session;
+        $this->requestStack = $requestStack;
         parent::__construct($managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout);
     }
 
@@ -194,7 +194,7 @@ class UserRepository extends Repository
      */
     public function getXtoolsUserInfo()
     {
-        return $this->session->get('logged_in_user');
+        return $this->requestStack->getSession()->get('logged_in_user');
     }
 
     /**

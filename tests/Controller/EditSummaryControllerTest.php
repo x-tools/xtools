@@ -19,7 +19,7 @@ class EditSummaryControllerTest extends ControllerTestAdapter
         $crawler = $this->client->request('GET', '/editsummary/de.wikipedia');
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -32,7 +32,7 @@ class EditSummaryControllerTest extends ControllerTestAdapter
      */
     public function testRoutes(): void
     {
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 

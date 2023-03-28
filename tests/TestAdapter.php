@@ -4,9 +4,11 @@ declare(strict_types = 1);
 
 namespace App\Tests;
 
+use App\Helper\AutomatedEditsHelper;
 use App\Model\Project;
 use App\Repository\ProjectRepository;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -14,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  */
 class TestAdapter extends WebTestCase
 {
+    use SessionHelper;
 
     /**
      * Get a mocked ProjectRepository with some dummy data.
@@ -32,6 +35,10 @@ class TestAdapter extends WebTestCase
         return $repo;
     }
 
+    /**
+     * Get a Project object for en.wikipedia.org
+     * @return Project
+     */
     protected function getMockEnwikiProject(): Project
     {
         $projectRepo = $this->createMock(ProjectRepository::class);
@@ -49,5 +56,20 @@ class TestAdapter extends WebTestCase
         $project = new Project('en.wikipedia.org');
         $project->setRepository($projectRepo);
         return $project;
+    }
+
+    /**
+     * Get an AutomatedEditsHelper with the session properly set.
+     * @param KernelBrowser|null $client
+     * @return AutomatedEditsHelper
+     */
+    protected function getAutomatedEditsHelper(?KernelBrowser $client = null): AutomatedEditsHelper
+    {
+        $client = $client ?? static::createClient();
+        $session = $this->createSession($client);
+        return new AutomatedEditsHelper(
+            $this->getRequestStack($session),
+            static::getContainer()->get('cache.app')
+        );
     }
 }

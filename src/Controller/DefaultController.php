@@ -14,8 +14,8 @@ use MediaWiki\OAuthClient\Token;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -53,7 +53,7 @@ class DefaultController extends XtoolsController
      * Redirect to the default project (or Meta) for Oauth authentication.
      * @Route("/login", name="login")
      * @param Request $request
-     * @param SessionInterface $session
+     * @param RequestStack $requestStack
      * @param ProjectRepository $projectRepo
      * @param string $centralAuthProject
      * @return RedirectResponse
@@ -61,7 +61,7 @@ class DefaultController extends XtoolsController
      */
     public function loginAction(
         Request $request,
-        SessionInterface $session,
+        RequestStack $requestStack,
         ProjectRepository $projectRepo,
         string $centralAuthProject
     ): RedirectResponse {
@@ -75,7 +75,7 @@ class DefaultController extends XtoolsController
         }
 
         // Save the request token to the session.
-        $session->set('oauth_request_token', $token);
+        $requestStack->getSession()->set('oauth_request_token', $token);
         return new RedirectResponse($next);
     }
 
@@ -83,18 +83,18 @@ class DefaultController extends XtoolsController
      * Receive authentication credentials back from the Oauth wiki.
      * @Route("/oauth_callback", name="oauth_callback")
      * @Route("/oauthredirector.php", name="old_oauth_callback")
-     * @param Request $request The HTTP request.
-     * @param SessionInterface $session
+     * @param RequestStack $requestStack
      * @param ProjectRepository $projectRepo
      * @param string $centralAuthProject
      * @return RedirectResponse
      */
     public function oauthCallbackAction(
-        Request $request,
-        SessionInterface $session,
+        RequestStack $requestStack,
         ProjectRepository $projectRepo,
         string $centralAuthProject
     ): RedirectResponse {
+        $request = $requestStack->getCurrentRequest();
+        $session = $requestStack->getSession();
         // Give up if the required GET params don't exist.
         if (!$request->get('oauth_verifier')) {
             throw $this->createNotFoundException('No OAuth verifier given.');
@@ -102,7 +102,7 @@ class DefaultController extends XtoolsController
 
         // Complete authentication.
         $client = $this->getOauthClient($request, $projectRepo, $centralAuthProject);
-        $token = $session->get('oauth_request_token');
+        $token = $requestStack->getSession()->get('oauth_request_token');
 
         if (!is_a($token, Token::class)) {
             $this->addFlashMessage('notice', 'error-login');
@@ -170,12 +170,12 @@ class DefaultController extends XtoolsController
     /**
      * Log out the user and return to the homepage.
      * @Route("/logout", name="logout")
-     * @param SessionInterface $session
+     * @param RequestStack $requestStack
      * @return RedirectResponse
      */
-    public function logoutAction(SessionInterface $session): RedirectResponse
+    public function logoutAction(RequestStack $requestStack): RedirectResponse
     {
-        $session->invalidate();
+        $requestStack->getSession()->invalidate();
         return $this->redirectToRoute('homepage');
     }
 

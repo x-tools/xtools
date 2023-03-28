@@ -27,6 +27,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Twig\Environment;
 use Wikimedia\IPUtils;
 
 /**
@@ -40,6 +41,7 @@ abstract class XtoolsController extends AbstractController
 
     protected CacheItemPoolInterface $cache;
     protected Client $guzzle;
+    protected Environment $twig;
     protected FlashBagInterface $flashBag;
     protected I18nHelper $i18n;
     protected ManagerRegistry $managerRegistry;
@@ -208,6 +210,7 @@ abstract class XtoolsController extends AbstractController
         ProjectRepository $projectRepo,
         UserRepository $userRepo,
         PageRepository $pageRepo,
+        Environment $twig,
         bool $isWMF,
         string $defaultProject
     ) {
@@ -221,6 +224,7 @@ abstract class XtoolsController extends AbstractController
         $this->projectRepo = $projectRepo;
         $this->userRepo = $userRepo;
         $this->pageRepo = $pageRepo;
+        $this->twig = $twig;
         $this->isWMF = $isWMF;
         $this->defaultProject = $defaultProject;
         $this->params = $this->parseQueryParams();
@@ -852,7 +856,7 @@ abstract class XtoolsController extends AbstractController
         $this->setCookies($response);
 
         // If requested format does not exist, assume HTML.
-        if (false === $this->get('twig')->getLoader()->exists("$templatePath.$format.twig")) {
+        if (false === $this->twig->getLoader()->exists("$templatePath.$format.twig")) {
             $format = 'html';
         }
 

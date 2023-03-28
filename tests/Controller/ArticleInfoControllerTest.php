@@ -19,7 +19,7 @@ class ArticleInfoControllerTest extends ControllerTestAdapter
         $crawler = $this->client->request('GET', '/articleinfo/de.wikipedia');
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -33,7 +33,7 @@ class ArticleInfoControllerTest extends ControllerTestAdapter
     public function testArticleInfoApi(): void
     {
         // For now...
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -68,7 +68,7 @@ class ArticleInfoControllerTest extends ControllerTestAdapter
      */
     public function testHtmlRoutes(): void
     {
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -89,7 +89,7 @@ class ArticleInfoControllerTest extends ControllerTestAdapter
      */
     public function testApis(): void
     {
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 

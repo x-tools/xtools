@@ -7,10 +7,9 @@ namespace App\Tests\Controller;
 use App\Controller\XtoolsController;
 use App\Exception\XtoolsHttpException;
 use App\Helper\I18nHelper;
+use App\Tests\SessionHelper;
 use ReflectionClass;
 use Symfony\Component\BrowserKit\Cookie;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Integration/unit tests for the abstract XtoolsController.
@@ -19,6 +18,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class XtoolsControllerTest extends ControllerTestAdapter
 {
+    use SessionHelper;
+
     protected I18nHelper $i18n;
     protected ReflectionClass $reflectionClass;
     protected XtoolsController $controller;
@@ -29,7 +30,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
     public function setUp(): void
     {
         parent::setUp();
-        $this->i18n = self::$container->get('app.i18n_helper');
+        $this->i18n = static::getContainer()->get('app.i18n_helper');
     }
 
     /**
@@ -40,22 +41,23 @@ class XtoolsControllerTest extends ControllerTestAdapter
      */
     private function getControllerWithRequest(array $requestParams = [], array $methodOverrides = []): XtoolsController
     {
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request($requestParams));
+        $session = $this->createSession($this->client);
+        $requestStack = $this->getRequestStack($session, $requestParams);
 
         return new OverridableXtoolsController(
-            self::$container,
+            static::getContainer(),
             $requestStack,
-            self::$container->get('doctrine'),
-            self::$container->get('cache.app'),
-            self::$container->get('session')->getFlashBag(),
-            self::$container->get('eight_points_guzzle.client.xtools'),
+            static::getContainer()->get('doctrine'),
+            static::getContainer()->get('cache.app'),
+            $session->getFlashBag(),
+            static::getContainer()->get('eight_points_guzzle.client.xtools'),
             $this->i18n,
-            self::$container->get('App\Repository\ProjectRepository'),
-            self::$container->get('App\Repository\UserRepository'),
-            self::$container->get('App\Repository\PageRepository'),
-            self::$container->getParameter('app.is_wmf'),
-            self::$container->getParameter('default_project'),
+            static::getContainer()->get('App\Repository\ProjectRepository'),
+            static::getContainer()->get('App\Repository\UserRepository'),
+            static::getContainer()->get('App\Repository\PageRepository'),
+            static::getContainer()->get('twig'),
+            static::getContainer()->getParameter('app.is_wmf'),
+            static::getContainer()->getParameter('default_project'),
             $methodOverrides
         );
     }
@@ -69,7 +71,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
     public function testParseQueryParams(array $params, array $expected): void
     {
         // Untestable in CI build :(
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -190,7 +192,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
     public function testProjectFromQuery(): void
     {
         // Untestable on Travis :(
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -212,7 +214,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
      */
     public function testValidateProjectAndUser(): void
     {
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -238,7 +240,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
      */
     public function testInvalidProject(): void
     {
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -253,7 +255,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
      */
     public function testTooHighEditCount(): void
     {
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -273,7 +275,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
     public function testGetParams(): void
     {
         // Untestable on Travis :(
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -298,7 +300,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
      */
     public function testValidatePage(): void
     {
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -379,12 +381,12 @@ class XtoolsControllerTest extends ControllerTestAdapter
     {
         $crawler = $this->client->request('GET', '/sc');
         static::assertEquals(
-            self::$container->getParameter('default_project'),
+            static::getContainer()->getParameter('default_project'),
             $crawler->filter('#project_input')->attr('value')
         );
 
         // For now...
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 

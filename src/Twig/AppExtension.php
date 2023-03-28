@@ -13,7 +13,6 @@ use DateTime;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -29,7 +28,6 @@ class AppExtension extends AbstractExtension
     protected ParameterBagInterface $parameterBag;
     protected ProjectRepository $projectRepo;
     protected RequestStack $requestStack;
-    protected SessionInterface $session;
     protected UrlGeneratorInterface $urlGenerator;
 
     protected bool $isWMF;
@@ -42,7 +40,6 @@ class AppExtension extends AbstractExtension
     /**
      * Constructor, with the I18nHelper through dependency injection.
      * @param RequestStack $requestStack
-     * @param SessionInterface $session
      * @param I18nHelper $i18n
      * @param UrlGeneratorInterface $generator
      * @param ProjectRepository $projectRepo
@@ -53,7 +50,6 @@ class AppExtension extends AbstractExtension
      */
     public function __construct(
         RequestStack $requestStack,
-        SessionInterface $session,
         I18nHelper $i18n,
         UrlGeneratorInterface $generator,
         ProjectRepository $projectRepo,
@@ -63,7 +59,6 @@ class AppExtension extends AbstractExtension
         int $replagThreshold
     ) {
         $this->requestStack = $requestStack;
-        $this->session = $session;
         $this->i18n = $i18n;
         $this->urlGenerator = $generator;
         $this->projectRepo = $projectRepo;
@@ -462,7 +457,7 @@ class AppExtension extends AbstractExtension
      */
     public function loggedInUser()
     {
-        return $this->session->get('logged_in_user');
+        return $this->requestStack->getSession()->get('logged_in_user');
     }
 
     /**

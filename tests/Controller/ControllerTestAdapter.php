@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * This class sets the container, client and provides some convenience methods.
@@ -13,8 +14,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  */
 class ControllerTestAdapter extends WebTestCase
 {
-    /** @var Client The Symfony client */
-    protected $client;
+    protected KernelBrowser $client;
+    protected SessionInterface $session;
 
     /**
      * Set up the container and client.
@@ -56,7 +57,7 @@ class ControllerTestAdapter extends WebTestCase
      */
     public function tearDown(): void
     {
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             $this->addToAssertionCount(1);
         }
         parent::tearDown();

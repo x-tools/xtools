@@ -16,7 +16,7 @@ class AuthorshipControllerTest extends ControllerTestAdapter
      */
     public function testHtmlRoutes(): void
     {
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 

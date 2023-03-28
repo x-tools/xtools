@@ -8,6 +8,7 @@ use App\Model\Project;
 use DateInterval;
 use MediaWiki\OAuthClient\Client;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
@@ -26,12 +27,12 @@ class AutomatedEditsHelper
 
     /**
      * AutomatedEditsHelper constructor.
-     * @param SessionInterface $session
+     * @param RequestStack $requestStack
      * @param CacheItemPoolInterface $cache
      */
-    public function __construct(SessionInterface $session, CacheItemPoolInterface $cache)
+    public function __construct(RequestStack $requestStack, CacheItemPoolInterface $cache)
     {
-        $this->session = $session;
+        $this->session = $requestStack->getSession();
         $this->cache = $cache;
     }
 

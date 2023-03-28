@@ -14,6 +14,7 @@ use PDO;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Wikimedia\IPUtils;
 
@@ -52,7 +53,7 @@ class TopEditsRepository extends UserRepository
         ProjectRepository $projectRepo,
         EditRepository $editRepo,
         UserRepository $userRepo,
-        SessionInterface $session
+        RequestStack $requestStack
     ) {
         $this->editRepo = $editRepo;
         $this->userRepo = $userRepo;
@@ -65,7 +66,7 @@ class TopEditsRepository extends UserRepository
             $isWMF,
             $queryTimeout,
             $projectRepo,
-            $session
+            $requestStack
         );
     }
 

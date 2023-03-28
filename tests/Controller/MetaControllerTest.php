@@ -19,7 +19,7 @@ class MetaControllerTest extends ControllerTestAdapter
         $this->client->request('GET', '/meta');
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 

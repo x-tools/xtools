@@ -11,10 +11,12 @@ use App\Repository\EditRepository;
 use App\Repository\PageRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
+use App\Tests\SessionHelper;
 use App\Tests\TestAdapter;
 use DateTime;
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use Psr\Container\ContainerInterface;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 /**
  * Tests of the Edit class.
@@ -23,8 +25,10 @@ use Psr\Container\ContainerInterface;
 class EditTest extends TestAdapter
 {
     use ArraySubsetAsserts;
+    use SessionHelper;
 
     protected ContainerInterface $localContainer;
+    protected KernelBrowser $client;
     protected Page $page;
     protected PageRepository $pageRepo;
     protected Project $project;
@@ -39,7 +43,9 @@ class EditTest extends TestAdapter
      */
     public function setUp(): void
     {
-        $this->localContainer = static::createClient()->getContainer();
+        $this->client = static::createClient();
+        $this->createSession($this->client);
+        $this->localContainer = $this->client->getContainer();
         $this->project = new Project('en.wikipedia.org');
         $this->projectRepo = $this->createMock(ProjectRepository::class);
         $this->projectRepo->method('getOne')
@@ -236,7 +242,7 @@ class EditTest extends TestAdapter
     {
         $editRepo = $this->createMock(EditRepository::class);
         $editRepo->method('getAutoEditsHelper')
-            ->willReturn(self::$container->get('app.automated_edits_helper'));
+            ->willReturn($this->getAutomatedEditsHelper($this->client));
         $userRepo = $this->createMock(UserRepository::class);
         return new Edit($editRepo, $userRepo, $this->page, array_merge($this->editAttrs, $attrs));
     }

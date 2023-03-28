@@ -13,7 +13,7 @@ use PDO;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Wikimedia\IPUtils;
 
 /**
@@ -44,7 +44,7 @@ class AutoEditsRepository extends UserRepository
      * @param int $queryTimeout
      * @param ProjectRepository $projectRepo
      * @param AutomatedEditsHelper $autoEditsHelper
-     * @param SessionInterface $session
+     * @param RequestStack $requestStack
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
@@ -56,7 +56,7 @@ class AutoEditsRepository extends UserRepository
         int $queryTimeout,
         ProjectRepository $projectRepo,
         AutomatedEditsHelper $autoEditsHelper,
-        SessionInterface $session
+        RequestStack $requestStack
     ) {
         $this->autoEditsHelper = $autoEditsHelper;
         parent::__construct(
@@ -68,7 +68,7 @@ class AutoEditsRepository extends UserRepository
             $isWMF,
             $queryTimeout,
             $projectRepo,
-            $session
+            $requestStack
         );
     }
 

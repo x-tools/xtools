@@ -353,7 +353,7 @@ class User extends Model
      */
     public function countEdits(Project $project, $namespace = 'all', $start = false, $end = false): int
     {
-        return (int) $this->repository->countEdits($project, $this, $namespace, $start, $end);
+        return $this->repository->countEdits($project, $this, $namespace, $start, $end);
     }
 
     /**
