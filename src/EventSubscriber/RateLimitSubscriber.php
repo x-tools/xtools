@@ -12,6 +12,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -63,7 +64,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
      * @param I18nHelper $i18n
      * @param CacheItemPoolInterface $cache
      * @param ParameterBagInterface $parameterBag
-     * @param SessionInterface $session
+     * @param RequestStack $requestStack
      * @param LoggerInterface $crawlerLogger
      * @param LoggerInterface $denylistLogger
      * @param LoggerInterface $rateLimitLogger
@@ -74,7 +75,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
         I18nHelper $i18n,
         CacheItemPoolInterface $cache,
         ParameterBagInterface $parameterBag,
-        SessionInterface $session,
+        RequestStack $requestStack,
         LoggerInterface $crawlerLogger,
         LoggerInterface $denylistLogger,
         LoggerInterface $rateLimitLogger,
@@ -84,7 +85,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
         $this->i18n = $i18n;
         $this->cache = $cache;
         $this->parameterBag = $parameterBag;
-        $this->session = $session;
+        $this->session = $requestStack->getSession();
         $this->crawlerLogger = $crawlerLogger;
         $this->denylistLogger = $denylistLogger;
         $this->rateLimitLogger = $rateLimitLogger;
@@ -138,7 +139,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
         $isApi = 'ApiAction' === substr($action, -9);
 
         // No rate limits on lightweight pages, logged in users, subrequests or API requests.
-        if (in_array($action, self::ACTION_ALLOWLIST) || $loggedIn || false === $event->isMasterRequest() || $isApi) {
+        if (in_array($action, self::ACTION_ALLOWLIST) || $loggedIn || false === $event->isMainRequest() || $isApi) {
             return;
         }
 

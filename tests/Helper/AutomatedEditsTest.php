@@ -7,6 +7,7 @@ namespace App\Tests\Helper;
 use App\Helper\AutomatedEditsHelper;
 use App\Model\Project;
 use App\Repository\ProjectRepository;
+use App\Tests\SessionHelper;
 use App\Tests\TestAdapter;
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 
@@ -18,6 +19,7 @@ use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 class AutomatedEditsTest extends TestAdapter
 {
     use ArraySubsetAsserts;
+    use SessionHelper;
 
     protected AutomatedEditsHelper $aeh;
     protected Project $project;
@@ -28,11 +30,7 @@ class AutomatedEditsTest extends TestAdapter
     public function setUp(): void
     {
         $client = static::createClient();
-        $container = $client->getContainer();
-        $this->aeh = new AutomatedEditsHelper(
-            $container->get('session'),
-            $container->get('cache.app')
-        );
+        $this->aeh = $this->getAutomatedEditsHelper($client);
     }
 
     /**

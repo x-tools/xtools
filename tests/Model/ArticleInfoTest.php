@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Tests\Model;
 
-use App\Helper\AutomatedEditsHelper;
+use App\Helper\I18nHelper;
 use App\Model\ArticleInfo;
 use App\Model\Edit;
 use App\Model\Page;
@@ -43,10 +43,9 @@ class ArticleInfoTest extends TestAdapter
      */
     public function setUp(): void
     {
-        static::createClient();
-        /** @var AutomatedEditsHelper $autoEditsHelper */
-        $autoEditsHelper = static::$container->get('app.automated_edits_helper');
-        $i18nHelper = static::$container->get('app.i18n_helper');
+        $autoEditsHelper = $this->getAutomatedEditsHelper();
+        /** @var I18nHelper $i18nHelper */
+        $i18nHelper = static::getContainer()->get('app.i18n_helper');
         $this->project = $this->getMockEnwikiProject();
         $this->pageRepo = $this->createMock(PageRepository::class);
         $this->page = new Page($this->pageRepo, $this->project, 'Test page');
@@ -56,7 +55,7 @@ class ArticleInfoTest extends TestAdapter
         $this->userRepo = $this->createMock(UserRepository::class);
         $this->articleInfoRepo = $this->createMock(ArticleInfoRepository::class);
         $this->articleInfoRepo->method('getMaxPageRevisions')
-            ->willReturn(static::$container->getParameter('app.max_page_revisions'));
+            ->willReturn(static::getContainer()->getParameter('app.max_page_revisions'));
         $this->articleInfo = new ArticleInfo(
             $this->articleInfoRepo,
             $i18nHelper,

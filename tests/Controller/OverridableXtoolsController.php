@@ -15,6 +15,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Twig\Environment;
 
 /**
  * This class can be used in unit tests where you need to override methods
@@ -37,6 +38,7 @@ class OverridableXtoolsController extends XtoolsController
      * @param ProjectRepository $projectRepo
      * @param UserRepository $userRepo
      * @param PageRepository $pageRepo
+     * @param Environment $twig
      * @param bool $isWMF
      * @param string $defaultProject
      * @param string[] $overrides Keys are method names, values are what they should return.
@@ -52,6 +54,7 @@ class OverridableXtoolsController extends XtoolsController
         ProjectRepository $projectRepo,
         UserRepository $userRepo,
         PageRepository $pageRepo,
+        Environment $twig,
         bool $isWMF,
         string $defaultProject,
         array $overrides = []
@@ -67,6 +70,7 @@ class OverridableXtoolsController extends XtoolsController
             $projectRepo,
             $userRepo,
             $pageRepo,
+            $twig,
             $isWMF,
             $defaultProject
         );

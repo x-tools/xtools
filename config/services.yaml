@@ -86,11 +86,10 @@ services:
     App\Twig\:
         resource: '../src/Twig'
 
-    app.monolog.processor.web:
-        class: App\Monolog\WebProcessorMonolog
+    App\Monolog\WebProcessorMonolog:
         arguments: ['@request_stack']
         tags:
-            - { name: monolog.processor, method: processRecord }
+            - { name: monolog.processor }
 
     App\EventSubscriber\RateLimitSubscriber:
         arguments:
@@ -103,11 +102,11 @@ services:
     # These need to not be public, but they are, for now...
     app.automated_edits_helper:
         class: App\Helper\AutomatedEditsHelper
-        arguments: ['@session', '@cache.app']
+        arguments: ['@request_stack', '@cache.app']
         public: true
     app.i18n_helper:
         class: App\Helper\I18nHelper
-        arguments: ['@request_stack', '@session']
+        arguments: ['@request_stack']
         public: true
 
     app.exception_listener:

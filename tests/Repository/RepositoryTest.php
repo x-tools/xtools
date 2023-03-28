@@ -22,8 +22,8 @@ class RepositoryTest extends TestAdapter
     protected function setUp(): void
     {
         static::bootKernel();
-        $this->repository = static::$container->get(SimpleEditCounterRepository::class);
-        $this->userRepo = static::$container->get(UserRepository::class);
+        $this->repository = static::getContainer()->get(SimpleEditCounterRepository::class);
+        $this->userRepo = static::getContainer()->get(UserRepository::class);
     }
 
     /**
@@ -31,7 +31,7 @@ class RepositoryTest extends TestAdapter
      */
     public function testGetTableName(): void
     {
-        if (static::$container->getParameter('app.is_wmf')) {
+        if (static::getContainer()->getParameter('app.is_wmf')) {
             // When using Labs.
             static::assertEquals('`testwiki_p`.`page`', $this->repository->getTableName('testwiki', 'page'));
             static::assertEquals(

@@ -12,6 +12,7 @@ use App\Model\UserRights;
 use App\Repository\EditCounterRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
+use App\Tests\SessionHelper;
 use App\Tests\TestAdapter;
 use DateTime;
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
@@ -23,6 +24,7 @@ use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 class EditCounterTest extends TestAdapter
 {
     use ArraySubsetAsserts;
+    use SessionHelper;
 
     protected EditCounter $editCounter;
     protected EditCounterRepository $editCounterRepo;
@@ -37,7 +39,11 @@ class EditCounterTest extends TestAdapter
      */
     public function setUp(): void
     {
-        $this->i18n = static::createClient()->getContainer()->get('app.i18n_helper');
+        $session = $this->createSession(static::createClient());
+        $this->i18n = new I18nHelper(
+            $this->getRequestStack($session),
+            static::getContainer()->getParameter('kernel.project_dir')
+        );
 
         $this->editCounterRepo = $this->createMock(EditCounterRepository::class);
         $this->projectRepo = $this->getProjectRepo();

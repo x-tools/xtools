@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Model\Authorship;
 use App\Repository\AuthorshipRepository;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -92,10 +93,14 @@ class AuthorshipController extends XtoolsController
      * )
      * @param string $target
      * @param AuthorshipRepository $authorshipRepo
+     * @param RequestStack $requestStack
      * @return Response
      */
-    public function resultAction(string $target, AuthorshipRepository $authorshipRepo): Response
-    {
+    public function resultAction(
+        string $target,
+        AuthorshipRepository $authorshipRepo,
+        RequestStack $requestStack
+    ): Response {
         if (0 !== $this->page->getNamespace()) {
             $this->addFlashMessage('danger', 'error-authorship-non-mainspace');
             return $this->redirectToRoute('AuthorshipProject', [
@@ -106,8 +111,7 @@ class AuthorshipController extends XtoolsController
         // This action sometimes requires more memory. 256M should be safe.
         ini_set('memory_limit', '256M');
 
-        $isSubRequest = $this->request->get('htmlonly')
-            || null !== $this->get('request_stack')->getParentRequest();
+        $isSubRequest = $this->request->get('htmlonly') || null !== $requestStack->getParentRequest();
         $limit = $isSubRequest ? 10 : ($this->limit ?? 500);
 
         $authorship = new Authorship($authorshipRepo, $this->page, $target, $limit);

@@ -12,36 +12,31 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * The I18nHelper centralizes all methods for i18n and l10n,
- * and interactions with the Intution library.
+ * and interactions with the Intuition library.
  */
 class I18nHelper
 {
-    private Intuition $intuition;
     private string $projectDir;
     protected ContainerInterface $container;
+    protected Intuition $intuition;
     protected IntlDateFormatter $dateFormatter;
     protected NumberFormatter $numFormatter;
     protected NumberFormatter $percentFormatter;
     protected RequestStack $requestStack;
-    protected SessionInterface $session;
 
     /**
      * Constructor for the I18nHelper.
      * @param RequestStack $requestStack
-     * @param SessionInterface $session
      * @param string $projectDir
      */
     public function __construct(
         RequestStack $requestStack,
-        SessionInterface $session,
         string $projectDir
     ) {
         $this->requestStack = $requestStack;
-        $this->session = $session;
         $this->projectDir = $projectDir;
     }
 
@@ -64,16 +59,12 @@ class I18nHelper
             throw new Exception("Language directory doesn't exist: $path");
         }
 
-        $useLang = 'en';
+        $useLang = $this->getIntuitionLang();
 
-        // Current request doesn't exist in unit tests, in which case we'll fall back to English.
-        if (null !== $this->getRequest()) {
-            $useLang = $this->getIntuitionLang();
-
-            // Save the language to the session.
-            if ($this->session->get('lang') !== $useLang) {
-                $this->session->set('lang', $useLang);
-            }
+        // Save the language to the session.
+        $session = $this->requestStack->getSession();
+        if ($session->get('lang') !== $useLang) {
+            $session->set('lang', $useLang);
         }
 
         // Set up Intuition, using the selected language.
@@ -132,7 +123,7 @@ class I18nHelper
 
     /**
      * Whether the current language is right-to-left.
-     * @param string|null $lang Optionally provide a specific lanuage code.
+     * @param string|null $lang Optionally provide a specific language code.
      * @return bool
      */
     public function isRTL(?string $lang = null): bool
@@ -304,7 +295,7 @@ class I18nHelper
     private function getIntuitionLang(): string
     {
         $queryLang = $this->getRequest()->query->get('uselang');
-        $sessionLang = $this->session->get('lang');
+        $sessionLang = $this->requestStack->getSession()->get('lang');
 
         if ('' !== $queryLang && null !== $queryLang) {
             return $queryLang;

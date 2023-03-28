@@ -36,9 +36,9 @@ monolog:
         mailer:
             type: deduplication
             time: 300
-            handler: swift
-        swift:
-            type: swift_mailer
+            handler: symfony_mailer
+        symfony_mailer:
+            type: symfony_mailer
             level: critical
             from_email: '%env(MAILER_FROM_EMAIL)%'
             to_email: '%env(MAILER_TO_EMAIL)%'

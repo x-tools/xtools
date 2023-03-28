@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Tests\Helper;
 
 use App\Helper\I18nHelper;
+use App\Tests\SessionHelper;
 use App\Tests\TestAdapter;
 use DateTime;
 use Krinkle\Intuition\Intuition;
@@ -14,11 +15,17 @@ use Krinkle\Intuition\Intuition;
  */
 class I18nHelperTest extends TestAdapter
 {
+    use SessionHelper;
+
     protected I18nHelper $i18n;
 
     public function setUp(): void
     {
-        $this->i18n = static::createClient()->getContainer()->get('app.i18n_helper');
+        $session = $this->createSession(static::createClient());
+        $this->i18n = new I18nHelper(
+            $this->getRequestStack($session),
+            static::getContainer()->getParameter('kernel.project_dir')
+        );
     }
 
     public function testGetters(): void

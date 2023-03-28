@@ -22,7 +22,7 @@ class EditCounterControllerTest extends ControllerTestAdapter
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
         // For now...
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -69,7 +69,7 @@ class EditCounterControllerTest extends ControllerTestAdapter
         }
 
         // For now...
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -84,7 +84,7 @@ class EditCounterControllerTest extends ControllerTestAdapter
     public function testCookies(): void
     {
         // For now...
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -117,7 +117,7 @@ class EditCounterControllerTest extends ControllerTestAdapter
      */
     public function testResultPages(): void
     {
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -138,7 +138,7 @@ class EditCounterControllerTest extends ControllerTestAdapter
      */
     public function testApis(): void
     {
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 

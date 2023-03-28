@@ -46,8 +46,7 @@ class TopEditsTest extends TestAdapter
         $this->project->setRepository($this->projectRepo);
         $this->userRepo = $this->createMock(UserRepository::class);
         $this->user = new User($this->userRepo, 'Test user');
-        $container = static::createClient()->getContainer();
-        $this->autoEditsHelper = new AutomatedEditsHelper($container->get('session'), $container->get('cache.app'));
+        $this->autoEditsHelper = $this->getAutomatedEditsHelper();
         $this->teRepo = $this->createMock(TopEditsRepository::class);
         $this->editRepo = $this->createMock(EditRepository::class);
         $this->editRepo->method('getAutoEditsHelper')

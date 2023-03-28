@@ -13,4 +13,4 @@ if (file_exists(dirname(__DIR__) . '/.env.test.local')) {
     $loadFile = '/.env.test.local';
 }
 
-(new Dotenv(false))->load(dirname(__DIR__) . $loadFile);
+((new Dotenv())->usePutenv(false))->load(dirname(__DIR__) . $loadFile);

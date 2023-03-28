@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Monolog;
 
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -11,7 +12,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class WebProcessorMonolog
 {
-    private RequestStack $requestStack;
+    protected RequestStack $requestStack;
 
     /**
      * WebProcessorMonolog constructor.
@@ -27,25 +28,29 @@ class WebProcessorMonolog
      * @param array $record
      * @return array
      */
-    public function processRecord(array $record): array
+    public function __invoke(array $record): array
     {
+        try {
+            $session = $this->requestStack->getSession();
+        } catch (SessionNotFoundException $e) {
+            return $record;
+        }
+        if (!$session->isStarted()) {
+            return $record;
+        }
+
         $request = $this->requestStack->getCurrentRequest();
+        $record['extra']['host'] = $request->getHost();
+        $record['extra']['uri'] = $request->getUri();
+        $record['extra']['useragent'] = $request->headers->get('User-Agent');
+        $record['extra']['referer'] = $request->headers->get('referer');
 
-        if ($request && $request->hasSession()) {
-            $record['extra']['host'] = $request->getHost();
-            $record['extra']['uri'] = $request->getUri();
-            $record['extra']['useragent'] = $request->headers->get('User-Agent');
-            $record['extra']['referer'] = $request->headers->get('referer');
-
-            $session = $request->getSession();
-
-            // Necessary to combat abuse.
-            if (null !== $session->get('logged_in_user')) {
-                $record['extra']['username'] = $session->get('logged_in_user')->username;
-            } else {
-                // Intentionally not included if we have a username, for privacy reasons.
-                $record['extra']['xff'] = $request->headers->get('x-forwarded-for', '');
-            }
+        // Necessary to combat abuse.
+        if (null !== $session->get('logged_in_user')) {
+            $record['extra']['username'] = $session->get('logged_in_user')->username;
+        } else {
+            // Intentionally not included if we have a username, for privacy reasons.
+            $record['extra']['xff'] = $request->headers->get('x-forwarded-for', '');
         }
 
         return $record;

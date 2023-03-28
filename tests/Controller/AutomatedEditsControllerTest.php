@@ -21,7 +21,9 @@ class AutomatedEditsControllerTest extends ControllerTestAdapter
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
         // For now...
-        if (!self::$container->getParameter('app.is_wmf') || self::$container->getParameter('app.single_wiki')) {
+        if (!static::getContainer()->getParameter('app.is_wmf') ||
+            static::getContainer()->getParameter('app.single_wiki')
+        ) {
             return;
         }
 
@@ -45,7 +47,7 @@ class AutomatedEditsControllerTest extends ControllerTestAdapter
      */
     public function testResultPages(): void
     {
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -62,7 +64,7 @@ class AutomatedEditsControllerTest extends ControllerTestAdapter
      */
     public function testApis(): void
     {
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 
@@ -79,7 +81,7 @@ class AutomatedEditsControllerTest extends ControllerTestAdapter
      */
     public function testAutomatedEditCount(): void
     {
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             // Untestable :(
             return;
         }
@@ -110,7 +112,7 @@ class AutomatedEditsControllerTest extends ControllerTestAdapter
      */
     public function testNonautomatedEdits(): void
     {
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             // untestable :(
             return;
         }

@@ -4,16 +4,16 @@ declare(strict_types = 1);
 
 namespace App\Tests\Twig;
 
+use App\Helper\I18nHelper;
 use App\Model\Project;
 use App\Model\User;
 use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
+use App\Tests\SessionHelper;
 use App\Tests\TestAdapter;
 use App\Twig\AppExtension;
 use DateTime;
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 
 /**
@@ -23,6 +23,7 @@ use Symfony\Component\Routing\Generator\UrlGenerator;
 class AppExtensionTest extends TestAdapter
 {
     use ArraySubsetAsserts;
+    use SessionHelper;
 
     protected AppExtension $appExtension;
 
@@ -31,20 +32,18 @@ class AppExtensionTest extends TestAdapter
      */
     public function setUp(): void
     {
-        static::createClient();
-        $stack = new RequestStack();
-        $session = new Session();
-        $i18nHelper = static::$container->get('app.i18n_helper');
+        $session = $this->createSession(static::createClient());
+        $requestStack = $this->getRequestStack($session);
+        $i18nHelper = new I18nHelper($requestStack, static::getContainer()->getParameter('kernel.project_dir'));
         $urlGenerator = $this->createMock(UrlGenerator::class);
         $this->appExtension = new AppExtension(
-            $stack,
-            $session,
+            $requestStack,
             $i18nHelper,
             $urlGenerator,
             $this->createMock(ProjectRepository::class),
-            static::$container->get('parameter_bag'),
-            static::$container->getParameter('app.is_wmf'),
-            static::$container->getParameter('app.single_wiki'),
+            static::getContainer()->get('parameter_bag'),
+            static::getContainer()->getParameter('app.is_wmf'),
+            static::getContainer()->getParameter('app.single_wiki'),
             30
         );
     }

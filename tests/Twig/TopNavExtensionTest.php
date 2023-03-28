@@ -4,7 +4,9 @@ declare(strict_types = 1);
 
 namespace App\Tests\Twig;
 
+use App\Helper\I18nHelper;
 use App\Repository\ProjectRepository;
+use App\Tests\SessionHelper;
 use App\Tests\TestAdapter;
 use App\Twig\TopNavExtension;
 use Symfony\Component\Routing\Generator\UrlGenerator;
@@ -15,6 +17,8 @@ use Symfony\Component\Routing\Generator\UrlGenerator;
  */
 class TopNavExtensionTest extends TestAdapter
 {
+    use SessionHelper;
+
     protected TopNavExtension $topNavExtension;
 
     /**
@@ -22,17 +26,18 @@ class TopNavExtensionTest extends TestAdapter
      */
     public function setUp(): void
     {
-        static::createClient();
+        $session = $this->createSession(static::createClient());
+        $requestStack = $this->getRequestStack($session);
+        $i18nHelper = new I18nHelper($requestStack, static::getContainer()->getParameter('kernel.project_dir'));
         $this->topNavExtension = new TopNavExtension(
-            static::$container->get('request_stack'),
-            static::$container->get('session'),
-            static::$container->get('app.i18n_helper'),
+            $requestStack,
+            $i18nHelper,
             $this->createMock(UrlGenerator::class),
             $this->createMock(ProjectRepository::class),
-            static::$container->get('parameter_bag'),
-            static::$container->getParameter('app.is_wmf'),
-            static::$container->getParameter('app.single_wiki'),
-            static::$container->getParameter('app.replag_threshold')
+            static::getContainer()->get('parameter_bag'),
+            static::getContainer()->getParameter('app.is_wmf'),
+            static::getContainer()->getParameter('app.single_wiki'),
+            static::getContainer()->getParameter('app.replag_threshold')
         );
     }
 

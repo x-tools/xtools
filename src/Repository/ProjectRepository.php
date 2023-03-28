@@ -264,7 +264,6 @@ class ProjectRepository extends Repository
             return $this->metadata;
         }
 
-        // Redis cache
         $cacheKey = $this->getCacheKey(
             // Removed non-alphanumeric characters
             preg_replace("/[^A-Za-z0-9]/", '', $projectUrl),

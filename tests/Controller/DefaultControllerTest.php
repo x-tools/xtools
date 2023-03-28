@@ -24,7 +24,7 @@ class DefaultControllerTest extends ControllerTestAdapter
     public function setUp(): void
     {
         parent::setUp();
-        $this->isSingle = self::$container->getParameter('app.single_wiki');
+        $this->isSingle = static::getContainer()->getParameter('app.single_wiki');
     }
 
     /**
@@ -73,7 +73,7 @@ class DefaultControllerTest extends ControllerTestAdapter
      */
     public function testNormalizeProject(): void
     {
-        if (!$this->isSingle && self::$container->getParameter('app.is_wmf')) {
+        if (!$this->isSingle && static::getContainer()->getParameter('app.is_wmf')) {
             $expectedOutput = [
                 'project' => 'en.wikipedia.org',
                 'domain' => 'en.wikipedia.org',
@@ -110,7 +110,7 @@ class DefaultControllerTest extends ControllerTestAdapter
             static::assertEquals(404, $this->client->getResponse()->getStatusCode());
         }
 
-        if (!$this->isSingle && self::$container->getParameter('app.is_wmf')) {
+        if (!$this->isSingle && static::getContainer()->getParameter('app.is_wmf')) {
             $this->client->request('GET', '/api/project/namespaces/fr.wikipedia.org');
             static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
@@ -134,7 +134,7 @@ class DefaultControllerTest extends ControllerTestAdapter
             static::assertEquals(404, $this->client->getResponse()->getStatusCode());
         }
 
-        if (self::$container->getParameter('app.is_wmf')) {
+        if (static::getContainer()->getParameter('app.is_wmf')) {
             $this->client->request('GET', '/api/project/assessments/en.wikipedia.org');
             static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
@@ -155,7 +155,7 @@ class DefaultControllerTest extends ControllerTestAdapter
      */
     public function testWikify(): void
     {
-        if (!self::$container->getParameter('app.is_wmf')) {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 
