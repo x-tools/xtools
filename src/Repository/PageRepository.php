@@ -403,10 +403,19 @@ class PageRepository extends Repository
      */
     public function getHTMLContent(Page $page, ?int $revId = null): string
     {
-        $url = $page->getUrl();
-        if (null !== $revId) {
-            $url .= "?oldid=$revId";
+        if ($this->isWMF) {
+            $domain = $page->getProject()->getDomain();
+            $url = "https://$domain/api/rest_v1/page/html/" . $page->getTitle();
+            if (null !== $revId) {
+                $url .= "/$revId";
+            }
+        } else {
+            $url = $page->getUrl();
+            if (null !== $revId) {
+                $url .= "?oldid=$revId";
+            }
         }
+
         return $this->guzzle->request('GET', $url)
             ->getBody()
             ->getContents();

@@ -358,6 +358,10 @@
                             <td colspan="2" class="text-muted">{{ msg('prose') }}</td>
                         </tr>
                         <tr>
+                            <td>{{ msg('bytes') }}</td>
+                            <td>{{ ai.proseStats.bytes|num_format }}</td>
+                        </tr>
+                        <tr>
                             <td>{{ msg('characters') }}</td>
                             <td>{{ ai.proseStats.characters|num_format }}</td>
                         </tr>

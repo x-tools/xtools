@@ -164,47 +164,61 @@ class ArticleInfoApi extends Model
         $html = $this->page->getHTMLContent($datetime);
 
         $crawler = new Crawler($html);
+        $refs = $crawler->filter('[typeof~="mw:Extension/ref"]');
 
-        [$chars, $words] = $this->countCharsAndWords($crawler, '#mw-content-text p');
+        [$bytes, $chars, $words] = $this->countCharsAndWords($crawler);
 
-        $refs = $crawler->filter('#mw-content-text .reference');
         $refContent = [];
         $refs->each(function ($ref) use (&$refContent): void {
             $refContent[] = $ref->text();
         });
         $uniqueRefs = count(array_unique($refContent));
 
-        $sections = count($crawler->filter('#mw-content-text .mw-headline'));
-
         $this->proseStats = [
+            'bytes' => $bytes,
             'characters' => $chars,
             'words' => $words,
             'references' => $refs->count(),
             'unique_references' => $uniqueRefs,
-            'sections' => $sections,
+            'sections' => $crawler->filter('section')->count(),
         ];
         return $this->proseStats;
     }
 
     /**
-     * Count the number of characters and words of the plain text within the DOM element matched by the given selector.
+     * Count the number of byes, characters and words of the plain text.
      * @param Crawler $crawler
-     * @param string $selector HTML selector.
-     * @return array [num chars, num words]
+     * @return array [num bytes, num chars, num words]
      */
-    private function countCharsAndWords(Crawler $crawler, string $selector): array
+    private function countCharsAndWords(Crawler $crawler): array
     {
+        $totalBytes = 0;
         $totalChars = 0;
         $totalWords = 0;
-        $paragraphs = $crawler->filter($selector);
-        $paragraphs->each(function ($node) use (&$totalChars, &$totalWords): void {
+        $paragraphs = $crawler->filter('section > p');
+
+        // Remove templates, TemplateStyles, math and reference tags.
+        $crawler->filter(implode(',', [
+            '#coordinates',
+            '[class*="emplate"]',
+            '[typeof~="mw:Extension/templatestyles"]',
+            '[typeof~="mw:Extension/math"]',
+            '[typeof~="mw:Extension/ref"]',
+        ]))->each(function (Crawler $subCrawler) {
+            foreach ($subCrawler as $subNode) {
+                $subNode->parentNode->removeChild($subNode);
+            }
+        });
+
+        $paragraphs->each(function ($node) use (&$totalBytes, &$totalChars, &$totalWords): void {
             /** @var Crawler $node */
-            $text = preg_replace('/\[\d+]/', '', trim($node->text(null, true)));
-            $totalChars += strlen($text);
+            $text = $node->text();
+            $totalBytes += strlen($text);
+            $totalChars += mb_strlen($text);
             $totalWords += count(explode(' ', $text));
         });
 
-        return [$totalChars, $totalWords];
+        return [$totalBytes, $totalChars, $totalWords];
     }
 
     /**

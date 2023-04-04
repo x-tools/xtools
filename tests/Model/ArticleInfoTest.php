@@ -405,7 +405,7 @@ class ArticleInfoTest extends TestAdapter
     {
         // We'll use a live page to better test the prose stats parser.
         $client = new GuzzleHttp\Client();
-        $ret = $client->request('GET', 'https://en.wikipedia.org/wiki/Hanksy?oldid=747629772')
+        $ret = $client->request('GET', 'https://en.wikipedia.org/api/rest_v1/page/html/Hanksy/747629772')
             ->getBody()
             ->getContents();
         $this->pageRepo->expects($this->once())
@@ -414,11 +414,12 @@ class ArticleInfoTest extends TestAdapter
         $this->page->setRepository($this->pageRepo);
 
         static::assertEquals([
-            'characters' => 1541,
-            'words' => 263,
+            'bytes' => 1539,
+            'characters' => 1539,
+            'words' => 261,
             'references' => 13,
             'unique_references' => 12,
-            'sections' => 1,
+            'sections' => 2,
         ], $this->articleInfo->getProseStats());
     }
 
