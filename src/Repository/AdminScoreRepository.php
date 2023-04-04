@@ -36,7 +36,7 @@ class AdminScoreRepository extends Repository
                     WHERE user_name = :username
                 UNION
                 SELECT 'user-page' AS source, page_len AS value FROM $pageTable
-                    WHERE page_namespace = 2 AND page_title = :username
+                    WHERE page_namespace = 2 AND page_title = REPLACE(:username, ' ', '_')
                 UNION
                 SELECT 'patrols' AS source, COUNT(*) AS value FROM $loggingTable
                     WHERE log_type = 'patrol'
