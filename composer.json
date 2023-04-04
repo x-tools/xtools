@@ -48,7 +48,8 @@
         "symfony/dotenv": "^5.4",
         "symfony/yaml": "^5.4",
         "symfony/security-csrf": "^5.4",
-        "symfony/css-selector": "^5.4"
+        "symfony/css-selector": "^5.4",
+        "symfony/dom-crawler": "^5.4"
     },
     "require-dev": {
         "symfony/phpunit-bridge": "^5.4",
