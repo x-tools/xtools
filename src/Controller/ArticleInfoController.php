@@ -264,6 +264,8 @@ class ArticleInfoController extends XtoolsController
     ): JsonResponse {
         $this->recordApiUsage('page/prose');
         $this->setupArticleInfo($articleInfoRepo, $autoEditsHelper);
+        $this->addFlash('info', 'The algorithm used by this API has recently changed. ' .
+            'See https://www.mediawiki.org/wiki/XTools/Page_History#Prose for details.');
         return $this->getFormattedApiResponse($this->articleInfo->getProseStats());
     }
 
