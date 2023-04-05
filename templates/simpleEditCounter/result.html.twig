@@ -65,7 +65,7 @@
                     {% if not(sec.limited) %}
                         <tr>
                             <td>{{ msg('live-edits') }}</td>
-                            <td>{{ sec.liveEditCount|num_format }}</td>
+                            <td>{{ wiki.pageLinkRaw('Special:Contributions/' ~ user.username, project, sec.liveEditCount|num_format) }}</td>
                         </tr>
                         {% if user.ipRange %}
                             <tr>
@@ -75,7 +75,7 @@
                         {% else %}
                             <tr>
                                 <td>{{ msg('deleted-edits') }}</td>
-                                <td>{{ sec.deletedEditCount|num_format }}</td>
+                                <td>{{ wiki.pageLinkRaw('Special:DeletedContributions/' ~ user.username, project, sec.deletedEditCount|num_format) }}</td>
                             </tr>
                         {% endif %}
                     {% endif %}
