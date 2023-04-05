@@ -61,7 +61,6 @@
     var timeCardDatasets = [];
     {% for i in 0..7 %}
         timeCardDatasets.push({
-            label: "{{ msg('total') }}",
             backgroundColor: "{{ chartColor(i) }}",
             data: []
         });
@@ -98,7 +97,7 @@
             },
             layout: {
                 padding: {
-                    right: 20
+                    right: 0
                 }
             },
             elements: {
@@ -129,6 +128,22 @@
                     gridLines: {
                         color: xtools.application.chartGridColor
                     }
+                }, {
+                    ticks: {
+                        min: 0,
+                        max: 8,
+                        stepSize: 1,
+                        padding: 25,
+                        callback: function (value, index, values) {
+                            if (index === 0 || index > 7) {
+                                return '';
+                            }
+                            return timeCardDatasets[index - 1].data.reduce(function (a, b) {
+                                return a + parseInt(b.value, 10);
+                            }, 0);
+                        }
+                    },
+                    position: i18nRTL ? 'left' : 'right'
                 }],
                 xAxes: [{
                     ticks: {
@@ -138,7 +153,7 @@
                         stepSize: 1,
                         reverse: i18nRTL,
                         padding: 0,
-                        callback: function(value) {
+                        callback: function (value) {
                             if (value % 2 === 0) {
                                 return value + ":00";
                             } else {

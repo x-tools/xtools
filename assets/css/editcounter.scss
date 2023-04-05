@@ -17,7 +17,10 @@
         }
     }
 
-    #timecard-bubble-chart,
+    #timecard-bubble-chart {
+        max-width: 1100px;
+    }
+
     #yearcounts-canvas,
     #monthcounts-canvas {
         max-width: 1000px;
