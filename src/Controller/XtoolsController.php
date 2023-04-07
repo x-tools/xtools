@@ -90,8 +90,8 @@ abstract class XtoolsController extends AbstractController
     /** @var int|false Unix timestamp. Pagination offset that substitutes for $end. */
     protected $offset = false;
 
-    /** @var int Number of results to return. */
-    protected int $limit = 50;
+    /** @var int|null Number of results to return. */
+    protected ?int $limit = 50;
 
     /** @var bool Is the current request a subrequest? */
     protected bool $isSubRequest;

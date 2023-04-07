@@ -130,7 +130,7 @@ class TopEditsController extends XtoolsController
         AutomatedEditsHelper $autoEditsHelper
     ): Response {
         // Max number of rows per namespace to show. `null` here will use the TopEdits default.
-        $this->limit = $this->isSubRequest ? 10 : $this->limit;
+        $this->limit = $this->isSubRequest ? 10 : ($this->params['limit'] ?? null);
 
         $topEdits = $this->setUpTopEdits($topEditsRepo, $autoEditsHelper);
         $topEdits->prepareData();
