@@ -84,106 +84,14 @@
         timeCardDatasets[{{ datasetIndex }}].data.push(entry);
     {% endfor %}
 
-    var chart = new Chart($("#timecard-bubble-chart"), {
-        type: 'bubble',
-        data: {
-            datasets: timeCardDatasets
-        },
-        options: {
-            responsive: true,
-            // maintainAspectRatio: false,
-            legend: {
-                display: false
-            },
-            layout: {
-                padding: {
-                    right: 0
-                }
-            },
-            elements: {
-                point: {
-                    radius: function(context) {
-                        var index = context.dataIndex;
-                        var data = context.dataset.data[index];
-                        // var size = context.chart.width;
-                        // var base = data.value / 100;
-                        // return (size / 50) * base;
-                        return data.scale;
-                    },
-                    hitRadius: 8
-                }
-            },
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        min: 0,
-                        max: 8,
-                        stepSize: 1,
-                        padding: 25,
-                        callback: function(value, index, values) {
-                            return days[index];
-                        }
-                    },
-                    position: i18nRTL ? 'right' : 'left',
-                    gridLines: {
-                        color: xtools.application.chartGridColor
-                    }
-                }, {
-                    ticks: {
-                        min: 0,
-                        max: 8,
-                        stepSize: 1,
-                        padding: 25,
-                        callback: function (value, index, values) {
-                            if (index === 0 || index > 7) {
-                                return '';
-                            }
-                            return timeCardDatasets[index - 1].data.reduce(function (a, b) {
-                                return a + parseInt(b.value, 10);
-                            }, 0);
-                        }
-                    },
-                    position: i18nRTL ? 'left' : 'right'
-                }],
-                xAxes: [{
-                    ticks: {
-                        beginAtZero: true,
-                        min: 0,
-                        max: 23,
-                        stepSize: 1,
-                        reverse: i18nRTL,
-                        padding: 0,
-                        callback: function (value) {
-                            if (value % 2 === 0) {
-                                return value + ":00";
-                            } else {
-                                return '';
-                            }
-                        }
-                    },
-                    gridLines: {
-                        color: xtools.application.chartGridColor
-                    }
-                }]
-            },
-            tooltips: {
-                displayColors: false,
-                callbacks: {
-                    title: function(items, data) {
-                        return days[7 - items[0].yLabel + 1] + ' ' + items[0].xLabel + ':00';
-                    },
-                    label: function(item) {
-                        var numEdits = [timeCardDatasets[item.datasetIndex].data[item.index].value];
-                        return`${numEdits} ${$.i18n('num-edits', [numEdits])}`;
-                    }
-                }
-            }
-        }
-    });
+    xtools.editcounter.setupTimecard(timeCardDatasets, days);
 </script>
 
-<div class="text-muted times-in-utc" style="clear:both">
-    {{ msg('times-in-utc') }}
+<div class="checkbox times-in-utc">
+    <label>
+        <input type="checkbox" data-value="utc" class="use-local-time" />
+        {{ msg('time-local') }}
+    </label>
 </div>
 
 {% endif %}

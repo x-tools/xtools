@@ -269,3 +269,131 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
         }
     });
 };
+
+/**
+ * Builds the timecard chart and adds a listener for the 'local time' option.
+ * @param {Array} timecardDatasets
+ * @param {Array} days
+ */
+xtools.editcounter.setupTimecard = function (timecardDatasets, days) {
+    var useLocalTimezone = false,
+        timezoneOffset = new Date().getTimezoneOffset() / 60;
+    window.chart = new Chart($("#timecard-bubble-chart"), {
+        type: 'bubble',
+        data: {
+            datasets: timeCardDatasets
+        },
+        options: {
+            responsive: true,
+            // maintainAspectRatio: false,
+            legend: {
+                display: false
+            },
+            layout: {
+                padding: {
+                    right: 0
+                }
+            },
+            elements: {
+                point: {
+                    radius: function (context) {
+                        var index = context.dataIndex;
+                        var data = context.dataset.data[index];
+                        // var size = context.chart.width;
+                        // var base = data.value / 100;
+                        // return (size / 50) * base;
+                        return data.scale;
+                    },
+                    hitRadius: 8
+                }
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        min: 0,
+                        max: 8,
+                        stepSize: 1,
+                        padding: 25,
+                        callback: function (value, index) {
+                            return days[index];
+                        }
+                    },
+                    position: i18nRTL ? 'right' : 'left',
+                    gridLines: {
+                        color: xtools.application.chartGridColor
+                    }
+                }, {
+                    ticks: {
+                        min: 0,
+                        max: 8,
+                        stepSize: 1,
+                        padding: 25,
+                        callback: function (value, index) {
+                            if (index === 0 || index > 7) {
+                                return '';
+                            }
+                            return timeCardDatasets[index - 1].data.reduce(function (a, b) {
+                                return a + parseInt(b.value, 10);
+                            }, 0);
+                        }
+                    },
+                    position: i18nRTL ? 'left' : 'right'
+                }],
+                xAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        min: 0,
+                        max: 23,
+                        stepSize: 1,
+                        reverse: i18nRTL,
+                        padding: 0,
+                        callback: function (value) {
+                            if (value % 2 === 0) {
+                                return value + ":00";
+                            } else {
+                                return '';
+                            }
+                        }
+                    },
+                    gridLines: {
+                        color: xtools.application.chartGridColor
+                    }
+                }]
+            },
+            tooltips: {
+                displayColors: false,
+                callbacks: {
+                    title: function (items) {
+                        return days[7 - items[0].yLabel + 1] + ' ' + items[0].xLabel + ':00';
+                    },
+                    label: function (item) {
+                        var numEdits = [timeCardDatasets[item.datasetIndex].data[item.index].value];
+                        return`${numEdits} ${$.i18n('num-edits', [numEdits])}`;
+                    }
+                }
+            }
+        }
+    });
+
+    $(function () {
+        $('.use-local-time')
+            .prop('checked', false)
+            .on('click', function () {
+                var offset = $(this).is(':checked') ? timezoneOffset : -timezoneOffset;
+                chart.data.datasets = chart.data.datasets.map(function (day) {
+                    day.data = day.data.map(function (datum) {
+                        var newHour = (parseInt(datum.hour, 10) - offset) % 24;
+                        if (newHour < 0) {
+                            newHour = 24 + newHour;
+                        }
+                        datum.hour = newHour.toString();
+                        datum.x = newHour.toString();
+                        return datum;
+                    });
+                    return day;
+                });
+                useLocalTimezone = true;
+                chart.update();
+            });
+    });
+}

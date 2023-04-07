@@ -408,6 +408,7 @@
 	"thursday": "Thursday",
 	"timecard": "Time card",
 	"times-in-utc": "All times are in UTC.",
+	"time-local": "Use local time instead of UTC",
 	"too-many-edits": "User has made too many edits! (Maximum $1)",
 	"too-many-edits-redir": "Showing $1 instead.",
 	"too-many-revisions": "This page has over $1 {{PLURAL:$2|revision|revisions}}. Only data for the last $1 are shown.",
