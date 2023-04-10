@@ -55,9 +55,13 @@
         <label for="toolSelector">{{ msg('auto-contribs-use-tool') }}</label>
         <select id="toolSelector" class="form-control" name="tool">
             <option value="">{{ msg('all') }}</option>
-            {% for tool in ae.allTools()|keys %}
+            {% for tool, attrs in ae.allTools() %}
                 <option value="{{ tool }}" {% if ae.tool == tool %}selected="selected"{% endif %}>
-                    {{ tool }}
+                    {% if attrs.label is defined %}
+                        {{ attrs.label }}
+                    {% else %}
+                        {{ tool }}
+                    {% endif %}
                 </option>
             {% endfor %}
         </select>
