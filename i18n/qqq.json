@@ -90,7 +90,7 @@
 	"block-longest": "Label for info about the longest block a user received.",
 	"blocks": "Heading for section listing stats about a user's block log.\n{{Identical|Block}}",
 	"blocks-desc": "Further description for blocks.  $1 is the unformatted number, $2 is a formatted number",
-	"bot": "Name given to automated programs that edit a wiki.\n{{Identical|Bot}}",
+	"bot": "Name given to automated programas that edit a wiki.\n{{Identical|Bot}}",
 	"bot-edits": "Label for the number of edits made by a bot to a page.",
 	"bot-list": "Heading of the table listing the top bots that edited a page.",
 	"bugs": "Labels for the section showing issues or 'bugs' a page has.\n{{Identical|Bug}}",

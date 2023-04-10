@@ -419,6 +419,7 @@
 	"thursday": "星期四",
 	"timecard": "計時卡",
 	"times-in-utc": "所有時間為 UTC 標準。",
+	"time-local": "使用當地時間取代 UTC",
 	"too-many-edits": "使用者已做出太多編輯！（最多 $1 筆）",
 	"too-many-edits-redir": "改用 $1 顯示。",
 	"too-many-revisions": "此頁面已超過 $1 {{PLURAL:$2|修訂|修訂}}。僅顯示最後 $1 筆資料。。",

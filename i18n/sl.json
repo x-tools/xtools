@@ -410,6 +410,7 @@
 	"thursday": "četrtek",
 	"timecard": "Časovna karta",
 	"times-in-utc": "Vsi časi so UTC.",
+	"time-local": "Uporabi lokalni čas namesto UTC",
 	"too-many-edits": "Uporabnik je naredil preveč urejanj! (Največ $1)",
 	"too-many-edits-redir": "Namesto tega prikazujem $1.",
 	"too-many-revisions": "Ta stran ima več kot $1 {{PLURAL:$2|redakcija|redakciji|redakcije|redakcij}}. Prikazani so samo podatkih zadnjih $1.",
