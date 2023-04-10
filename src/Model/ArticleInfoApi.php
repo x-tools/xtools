@@ -41,8 +41,8 @@ class ArticleInfoApi extends Model
     /** @var int[] Number of in and outgoing links and redirects to the page. */
     protected array $linksAndRedirects;
 
-    /** @var string[] Assessments of the page (see Page::getAssessments). */
-    protected array $assessments;
+    /** @var string[]|null Assessments of the page (see Page::getAssessments). */
+    protected ?array $assessments;
 
     /** @var string[] List of Wikidata and Checkwiki errors. */
     protected array $bugs;
