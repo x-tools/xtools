@@ -962,7 +962,7 @@ class ArticleInfo extends ArticleInfoApi
                 $days = $secs / (60 * 60 * 24);
 
                 // Average time between edits (in days).
-                $this->editors[$editor]['atbe'] = round($days / $info['all'], 1);
+                $this->editors[$editor]['atbe'] = round($days / ($info['all'] - 1), 1);
             }
         }
 
