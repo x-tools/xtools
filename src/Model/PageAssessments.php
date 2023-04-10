@@ -170,7 +170,7 @@ class PageAssessments extends Model
 
         // Don't show 'Unknown' assessment outside of the mainspace.
         if (0 !== $page->getNamespace() && '???' === $overallQuality['value']) {
-            return null;
+            return [];
         }
 
         return [
