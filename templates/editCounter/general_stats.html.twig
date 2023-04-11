@@ -50,12 +50,12 @@
                 <td>
                     {% set adminStatus = ec.userRights.adminStatus %}
                     {% if adminStatus == 'current' %}
-                        <span class="text-success">&check;</span>
+                        <img alt="{{ msg('yes') }}" title="{{ msg('yes') }}" src="https://upload.wikimedia.org/wikipedia/commons/f/f6/OOjs_UI_icon_check-constructive.svg" />
                     {% elseif adminStatus == 'former' %}
-                        <span class="text-warning">&cross;</span>
+                        <img alt="{{ msg('no') }}" title="{{ msg('no') }}" src="https://upload.wikimedia.org/wikipedia/commons/7/77/OOjs_UI_icon_close-ltr-destructive.svg" />
                         <em class="text-muted">({{ msg('former-admin')|lower }})</em>
                     {% else %}
-                        <span class="text-warning">&cross;</span>
+                        <img alt="{{ msg('no') }}" title="{{ msg('no') }}" src="https://upload.wikimedia.org/wikipedia/commons/7/77/OOjs_UI_icon_close-ltr-destructive.svg" />
                     {% endif %}
                 </td>
             </tr>

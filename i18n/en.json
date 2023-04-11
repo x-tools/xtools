@@ -247,6 +247,7 @@
 	"namespaces-desc": "$2 {{PLURAL:$1|edit|edits}} to the article space",
 	"neutral": "Neutral",
 	"next": "Next",
+	"no": "No",
 	"no-contribs": "No contributions found",
 	"no-exist": "$1 does not exist",
 	"no-result": "No matching results found for: $1",
@@ -505,5 +506,6 @@
 	"xtools-slogan": "Feeding your data hunger",
 	"xtools-title": "XTools",
 	"year": "Year",
-	"year-counts": "Year counts"
+	"year-counts": "Year counts",
+	"yes": "Yes"
 }

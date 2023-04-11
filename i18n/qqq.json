@@ -265,6 +265,7 @@
 	"namespaces-desc": "Further description for namespaces.  $1 is the unformatted number, $2 is a formatted number",
 	"neutral": "Exact term for neutral on vote pages\n{{Identical|Neutral}}",
 	"next": "Text for link that shows the next page of contributions by a user.\n{{Identical|Next}}",
+	"no": "Alt text for image indicating 'no' or 'incorrect'.\n{{Identical|No}}",
 	"no-contribs": "Error shown when a user has not contributions.",
 	"no-exist": "Error shown when a user or page does not exist. $1 is the user or page",
 	"no-result": "Error message shown when there were no matching results. $1 is the search term",
@@ -518,5 +519,6 @@
 	"xtools-slogan": "Slogan of XTools shown on the splash page.",
 	"xtools-title": "The tool's title",
 	"year": "General term for 'year'.\n{{Identical|Year}}",
-	"year-counts": "Section heading for the section showing data for each individual year."
+	"year-counts": "Section heading for the section showing data for each individual year.",
+	"yes": "Alt text for image indicating 'yes' or 'correct'.\n{{Identical|Yes}}"
 }
