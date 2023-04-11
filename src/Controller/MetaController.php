@@ -6,6 +6,9 @@ namespace App\Controller;
 
 use DateTime;
 use Doctrine\DBAL\Connection;
+use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -195,23 +198,25 @@ class MetaController extends XtoolsController
      *   in base.html.twig via JavaScript so that it is done asynchronously.
      * @Route("/meta/usage/{tool}/{project}/{token}")
      * @param Request $request
+     * @param ParameterBagInterface $parameterBag
+     * @param ManagerRegistry $managerRegistry
      * @param bool $singleWiki
      * @param string $tool Internal name of tool.
      * @param string $project Project domain such as en.wikipedia.org
      * @param string $token Unique token for this request, so we don't have people meddling with these statistics.
-     * @return Response
+     * @return JsonResponse
      * @codeCoverageIgnore
      */
     public function recordUsageAction(
         Request $request,
+        ParameterBagInterface $parameterBag,
+        ManagerRegistry $managerRegistry,
         bool $singleWiki,
         string $tool,
         string $project,
         string $token
     ): Response {
-        // Ready the response object.
-        $response = new Response();
-        $response->headers->set('Content-Type', 'application/json');
+        $response = new JsonResponse();
 
         // Validate method and token.
         if ('PUT' !== $request->getMethod() || !$this->isCsrfTokenValid('intention', $token)) {
@@ -224,7 +229,7 @@ class MetaController extends XtoolsController
 
         // Don't update counts for tools that aren't enabled
         $configKey = 'enable.'.ucfirst($tool);
-        if (!$this->container->hasParameter($configKey) || !$this->container->getParameter($configKey)) {
+        if (!$parameterBag->has($configKey) || !$parameterBag->get($configKey)) {
             $response->setStatusCode(Response::HTTP_FORBIDDEN);
             $response->setContent(json_encode([
                 'error' => 'This tool is disabled',
@@ -233,7 +238,7 @@ class MetaController extends XtoolsController
         }
 
         /** @var Connection $conn */
-        $conn = $this->container->get('doctrine')->getManager('default')->getConnection();
+        $conn = $managerRegistry->getConnection('default');
         $date =  date('Y-m-d');
 
         // Tool name needs to be lowercase.

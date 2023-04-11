@@ -270,7 +270,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
         $logger->info($logComment);
 
         if ($denylist) {
-            $message = $this->i18n->msg('error-denied', ['tools.xtools@tools.wmflabs.org']);
+            $message = $this->i18n->msg('error-denied', ['tools.xtools@toolforge.org']);
             throw new AccessDeniedHttpException($message, null, 999);
         }
 
