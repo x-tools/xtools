@@ -9,9 +9,7 @@ framework:
     trusted_proxies: '%env(TRUSTED_PROXIES)%'
     session:
         # http://symfony.com/doc/current/reference/configuration/framework.html#handler-id
-        handler_id: session.handler.native_file
-        storage_factory_id: session.storage.factory.native
-        save_path:  "%kernel.project_dir%/var/sessions/%kernel.environment%"
+        handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
         cookie_lifetime: 604800 # 1 week
     fragments:       ~
     http_method_override: true

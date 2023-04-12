@@ -99,6 +99,11 @@ services:
     GuzzleHttp\Client:
         alias: 'eight_points_guzzle.client.xtools'
 
+    Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
+        arguments:
+            - 'mysql:dbname=%env(DATABASE_NAME)%; host=%env(DATABASE_HOST)%; port=%env(DATABASE_PORT)%'
+            - { db_username: '%env(DATABASE_USER)%', db_password: '%env(DATABASE_PASSWORD)%' }
+
     # These need to not be public, but they are, for now...
     app.automated_edits_helper:
         class: App\Helper\AutomatedEditsHelper
