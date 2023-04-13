@@ -213,7 +213,7 @@ class I18nHelper
 
         $this->numFormatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $decimals);
 
-        return $this->numFormatter->format($number);
+        return $this->numFormatter->format($number ?? 0);
     }
 
     /**

@@ -68,7 +68,7 @@ class Edit extends Model
         $this->minor = '1' === $attrs['minor'];
         $this->length = isset($attrs['length']) ? (int)$attrs['length'] : null;
         $this->lengthChange = isset($attrs['length_change']) ? (int)$attrs['length_change'] : null;
-        $this->comment = $attrs['comment'];
+        $this->comment = $attrs['comment'] ?? '';
 
         if (isset($attrs['rev_sha1']) || isset($attrs['sha'])) {
             $this->sha = $attrs['rev_sha1'] ?? $attrs['sha'];
