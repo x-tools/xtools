@@ -26,11 +26,8 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-php-
 
-    - name: Install dependencies
-      run: |
-        composer install --prefer-dist --no-progress
-        npm ci
-        ./node_modules/.bin/encore production
+    - name: Install PHP dependencies
+      run: composer install --prefer-dist --no-progress
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
@@ -41,7 +38,10 @@ jobs:
         coverage: xdebug
 
     - name: Run test suite
-      run: composer run-script test
+      run: |
+        composer run-script test
+        git status
+        git status | grep "nothing to commit, working tree clean"
 
     - name: Codecov
       uses: codecov/codecov-action@v1.5.0

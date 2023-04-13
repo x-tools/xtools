@@ -1,7 +1,6 @@
 /config/table_map.yml
 /config/parameters.yml
 /config/request_denylist.yml
-/build/
 /var/*
 !/var/cache
 /var/cache/*
@@ -44,7 +43,6 @@ coverage.xml
 
 ###> symfony/webpack-encore-bundle ###
 /node_modules/
-/public/build/
 npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
