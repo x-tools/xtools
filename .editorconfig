@@ -1,0 +1,12 @@
+# https://EditorConfig.org
+
+# Unix-style newlines with a newline ending every file
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# 4 space indentation
+[*.{php,js}]
+indent_style = space
+indent_size = 4
