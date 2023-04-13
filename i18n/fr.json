@@ -264,6 +264,7 @@
 	"namespaces-desc": "$2 modification{{PLURAL:$1||s}} dans l’espace de l’article",
 	"neutral": "Neutre",
 	"next": "Suivant",
+	"no": "Non",
 	"no-contribs": "Aucune contribution trouvée",
 	"no-exist": "$1 n’existe pas",
 	"no-result": "Aucun résultat correspondant trouvé pour : $1",
@@ -522,5 +523,6 @@
 	"xtools-slogan": "Nourrir votre faim de données",
 	"xtools-title": "XTools",
 	"year": "Année",
-	"year-counts": "Compteurs annuels"
+	"year-counts": "Compteurs annuels",
+	"yes": "Oui"
 }

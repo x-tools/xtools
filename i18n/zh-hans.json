@@ -8,6 +8,7 @@
 			"Diskdance",
 			"Gerongfenh",
 			"GuoPC",
+			"Hehua",
 			"Josephine W.",
 			"Lantx",
 			"Leiem",
@@ -272,6 +273,7 @@
 	"namespaces-desc": "$2次对条目空间的{{PLURAL:$1|编辑}}",
 	"neutral": "中立",
 	"next": "下一个",
+	"no": "否",
 	"no-contribs": "未找到贡献",
 	"no-exist": "$1不存在",
 	"no-result": "未找到匹配结果：$1",
@@ -429,6 +431,7 @@
 	"thursday": "星期四",
 	"timecard": "计时卡",
 	"times-in-utc": "均采用UTC时间。",
+	"time-local": "使用当地时间取代UTC时间",
 	"too-many-edits": "用户已做出太多次编辑！（最多$1次）",
 	"too-many-edits-redir": "改为显示$1。",
 	"too-many-revisions": "此页面拥有超过$1次{{PLURAL:$2|修订}}，故只显示前$1次修订的数据。",
@@ -524,5 +527,6 @@
 	"xtools-slogan": "订阅您的数据集",
 	"xtools-title": "XTools",
 	"year": "年",
-	"year-counts": "年度统计"
+	"year-counts": "年度统计",
+	"yes": "是"
 }

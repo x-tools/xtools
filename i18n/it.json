@@ -255,6 +255,7 @@
 	"namespaces-desc": "$2 {{PLURAL:$1|modifica|modifiche}} al namespace principale",
 	"neutral": "Neutro",
 	"next": "Successivo",
+	"no": "No",
 	"no-contribs": "Nessun contributo trovato",
 	"no-exist": "$1 non esiste",
 	"no-result": "Nessuna corrispondenza trovata per: $1",
@@ -507,5 +508,6 @@
 	"xtools-slogan": "Nutri la tua fame di dati",
 	"xtools-title": "Strumenti di X!",
 	"year": "Anno",
-	"year-counts": "Conteggio annuale"
+	"year-counts": "Conteggio annuale",
+	"yes": "Sì"
 }

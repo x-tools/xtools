@@ -244,6 +244,7 @@
 	"namespaces-desc": "記事空間への$2{{PLURAL:$1|編集}}",
 	"neutral": "中立",
 	"next": "次",
+	"no": "いいえ",
 	"no-contribs": "投稿記録が見つかりません",
 	"no-exist": "$1 は存在しません",
 	"no-result": "$1に一致する結果はありません",
@@ -463,5 +464,6 @@
 	"xtools-slogan": "データに飢える者のツール",
 	"xtools-title": "XTools",
 	"year": "年",
-	"year-counts": "年別の集計"
+	"year-counts": "年別の集計",
+	"yes": "はい"
 }

@@ -250,6 +250,7 @@
 	"namespaces-desc": "$2 {{PLURAL:$1|muokkaus|muokkausta}} artikkelinimiavaruuteen",
 	"neutral": "Neutraali",
 	"next": "Seuraava",
+	"no": "Ei",
 	"no-contribs": "Muokkauksia ei löytynyt",
 	"no-exist": "$1 ei ole olemassa",
 	"no-result": "Ei tuloksia hakusanalla $1",
@@ -409,6 +410,7 @@
 	"thursday": "Torstai",
 	"timecard": "Kellokortti",
 	"times-in-utc": "Kaikki ajat ovat UTC-aikaa.",
+	"time-local": "Käytä paikallista aikaa UTC:n sijaan",
 	"too-many-edits": "Käyttäjä on tehnyt liian monta muokkausta! (enimmäismäärä $1)",
 	"too-many-edits-redir": "Näytetään $1 sen sijaan.",
 	"too-many-revisions": "Tästä sivusta on yli $1 {{PLURAL:$2|versio|versiota}}. Näytettävät tiedot perustuvat viimeiseen $1 versioon.",
@@ -503,5 +505,6 @@
 	"xtools-slogan": "Ruokkii tiedonnälkääsi",
 	"xtools-title": "XTools",
 	"year": "Vuosi",
-	"year-counts": "Vuosittaiset tilastot"
+	"year-counts": "Vuosittaiset tilastot",
+	"yes": "Kyllä"
 }

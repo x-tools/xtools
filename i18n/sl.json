@@ -249,6 +249,7 @@
 	"namespaces-desc": "$2 {{PLURAL:$1|urejanje|urejanji|urejanja|urejanj}} glavnega imenskega prostora",
 	"neutral": "Nevtralen",
 	"next": "Naprej",
+	"no": "Ne",
 	"no-contribs": "Ni najdenih prispevkov",
 	"no-exist": "$1 ne obstaja",
 	"no-result": "Ni zadetkov za: $1",
@@ -507,5 +508,6 @@
 	"xtools-slogan": "Tešimo lakoto po podatkih",
 	"xtools-title": "XOrodja",
 	"year": "Leto",
-	"year-counts": "Letna statistika"
+	"year-counts": "Letna statistika",
+	"yes": "Da"
 }

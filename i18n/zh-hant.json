@@ -262,6 +262,7 @@
 	"namespaces-desc": "在條目空間有 $2 {{PLURAL:$1|次編輯|次編輯}}",
 	"neutral": "中立",
 	"next": "下一頁",
+	"no": "否",
 	"no-contribs": "未發現貢獻",
 	"no-exist": "$1 不存在",
 	"no-result": "無符合「$1」的搜尋結果",
@@ -515,5 +516,6 @@
 	"xtools-slogan": "為您的資料採集器提供內容",
 	"xtools-title": "XTools",
 	"year": "年",
-	"year-counts": "年度統計"
+	"year-counts": "年度統計",
+	"yes": "是"
 }
