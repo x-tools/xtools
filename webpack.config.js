@@ -1,12 +1,26 @@
-var Encore = require('@symfony/webpack-encore');
+const Encore = require('@symfony/webpack-encore');
+
+// Manually configure the runtime environment if not already configured yet by the "encore" command.
+// It's useful when you use tools that rely on webpack.config.js file.
+if (!Encore.isRuntimeEnvironmentConfigured()) {
+        Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
+}
 
 Encore
-
     // Directory where compiled assets will be stored.
-    .setOutputPath('./public/assets/')
+    .setOutputPath('public/build/')
 
     // Public URL path used by the web server to access the output path.
-    .setPublicPath('/assets/')
+    .setPublicPath('/build')
+
+    // this is now needed so that your manifest.json keys are still `build/foo.js`
+    // (which is a file that's used by Symfony's `asset()` function)
+    .setManifestKeyPrefix('build')
+
+    .copyFiles({
+        from: './assets/images',
+        to: 'images/[path][name].[ext]'
+    })
 
     /*
      * ENTRY CONFIG
@@ -18,6 +32,7 @@ Encore
      * and one CSS file (e.g. app.css) if you JavaScript imports CSS.
      */
     .addEntry('app', [
+        // Scripts
         './assets/vendor/jquery.i18n/jquery.i18n.dist.js',
         './assets/vendor/Chart.min.js',
         './assets/vendor/bootstrap-typeahead.js',
@@ -34,8 +49,8 @@ Encore
         './assets/js/globalcontribs.js',
         './assets/js/pages.js',
         './assets/js/topedits.js',
-        './assets/css/_mixins.scss',
-        './assets/css/_rtl.scss',
+
+        // Stylesheets
         './assets/css/application.scss',
         './assets/css/articleinfo.scss',
         './assets/css/autoedits.scss',
@@ -49,17 +64,24 @@ Encore
         './assets/css/responsive.scss'
     ])
 
+    // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
+    .splitEntryChunks()
+
+    // will require an extra script tag for runtime.js
+    // but, you probably want this, unless you're building a single-page app
+    .enableSingleRuntimeChunk()
+
     // Other options.
     .enableSassLoader()
     .cleanupOutputBeforeBuild()
-    .disableSingleRuntimeChunk()
+    .enableBuildNotifications()
     .enableSourceMaps(!Encore.isProduction())
     .enableVersioning(Encore.isProduction())
 
     // enables @babel/preset-env polyfills
-    .configureBabel(() => {}, {
-        useBuiltIns: 'usage',
-        corejs: 3
+    .configureBabelPresetEnv((config) => {
+        config.useBuiltIns = 'usage';
+        config.corejs = 3;
     })
 ;
 

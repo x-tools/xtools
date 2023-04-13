@@ -447,9 +447,6 @@ function setupProjectListener()
         $projectInput.on('change', function () {
             var newProject = this.value;
 
-            // Show the spinner.
-            $(this).addClass('show-loader');
-
             /** global: xtBaseUrl */
             $.get(xtBaseUrl + 'api/project/normalize/' + newProject).done(function (data) {
                 // Keep track of project API path for use in page title autocompletion
@@ -461,9 +458,7 @@ function setupProjectListener()
                 $projectInput.trigger('xtools.projectLoaded', data);
             }).fail(
                 revertToValidProject.bind(this, newProject)
-            ).always(function () {
-                $projectInput.removeClass('show-loader');
-            });
+            );
         });
     }
 }
@@ -480,7 +475,6 @@ function setupNamespaceSelector()
     $('#project_input').off('change').on('change', function () {
         // Disable the namespace selector and show a spinner while the data loads.
         $('#namespace_select').prop('disabled', true);
-        $(this).addClass('show-loader');
 
         var newProject = this.value;
 
@@ -513,7 +507,6 @@ function setupNamespaceSelector()
             setupAutocompletion();
         }).fail(revertToValidProject.bind(this, newProject)).always(function () {
             $('#namespace_select').prop('disabled', false);
-            $('#project_input').removeClass('show-loader');
         });
     });
 
@@ -575,7 +568,6 @@ function setupAutocompletion()
         timeout: 200,
         triggerLength: 1,
         method: 'get',
-        loadingClass: 'show-loader',
         preDispatch: null,
         preProcess: null
     };

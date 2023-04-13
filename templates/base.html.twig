@@ -23,17 +23,17 @@
 
     {% block javascripts %}
         <script type="text/javascript" src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-        <script type="text/javascript" src="{{ asset('assets/app.js') }}"></script>
         <script type="text/javascript" src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-        <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/select2/4.0.5/js/select2.full.min.js"></script>
+        <script type="text/javascript" src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/select2/4.0.5/js/select2.full.min.js"></script>
+        {{ encore_entry_script_tags('app') }}
     {% endblock %}
     {% block stylesheets %}
         <link rel="stylesheet" type="text/css" media="screen" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" media="screen" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/select2/4.0.5/css/select2.min.css">
-        <link rel="stylesheet" type="text/css" media="screen" href="{{ asset('assets/app.css') }}">
         {% if isRTL() %}
             <link rel="stylesheet" type="text/css" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-rtl/3.4.0/css/bootstrap-flipped.min.css">
         {% endif %}
+        {{ encore_entry_link_tags('app') }}
     {% endblock %}
 
     <link rel="shortcut icon" sizes="16x16 32x32 48x48 96x96 144x144" href="{{ asset('images/favicon.ico') }}" />
@@ -106,7 +106,7 @@
         <ol class="tool-links--nav nav navbar-nav navbar-left">
             <li>
                 <a class="home-link" href="{{ path('homepage') }}">
-                    <img src="{{ asset('images/logo.svg') }}" alt="Logo" />
+                    <img src="{{ asset('/build/images/logo.svg') }}" alt="Logo" />
                 </a>
             </li>
 
@@ -241,7 +241,7 @@
         <div class="pull-right footer-branding">
             <a style="margin-right:5px;" href="//translatewiki.net/?setlang=en "><img height="36px" src="//upload.wikimedia.org/wikipedia/commons/5/51/Translatewiki.net_logo.svg" alt="translatewiki.net logo"/></a>
             {% if isWMF() %}
-            <a href="https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS" target="_blank"><img height="40px" src="{{ asset('images/VPS-badge.svg') }}" alt="Powered by Wikimedia Cloud Services" /></a>
+            <a href="https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS" target="_blank"><img height="40px" src="{{ asset('/build/images/VPS-badge.svg') }}" alt="Powered by Wikimedia Cloud Services" /></a>
             {% endif %}
         </div>
         <div class="footer-about">

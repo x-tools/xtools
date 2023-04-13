@@ -88,7 +88,7 @@
 {% endmacro %}
 
 {% macro alert(style, message, raw = false) %}
-    <p class="alert alert-{{ style }} alert-dismissable xt-alert{% if style == 'danger' %} strong{% endif %}" role="alert">
+    <p class="alert alert-{{ style }} alert-dismissible xt-alert{% if style == 'danger' %} strong{% endif %}" role="alert">
         <button class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
