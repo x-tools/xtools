@@ -39,7 +39,7 @@
         "doctrine/doctrine-migrations-bundle": "^2.0",
         "eightpoints/guzzle-bundle": "^8.0",
         "slevomat/coding-standard": "^8.0",
-        "symfony/webpack-encore-bundle": "^1.6",
+        "symfony/webpack-encore-bundle": "^1.16",
         "doctrine/common": "^3.1",
         "wikimedia/ip-utils": "^1.0",
         "symfony/mailer": "^5.4",

@@ -7,7 +7,7 @@ html {
 }
 
 body {
-    background: url('/images/gradient.png');
+    background: url('../images/gradient.png');
     min-height: 100%;
     position: relative;
 
@@ -208,8 +208,8 @@ $tooltip-shadow: #ccc;
 
 .xt-heading-top {
     font-size: 1.8em;
-    padding-bottom: 0px;
-    margin-bottom: 0px;
+    padding-bottom: 0;
+    margin-bottom: 0;
     position: relative;
 }
 .xt-heading-subtitle {
@@ -279,10 +279,6 @@ $tooltip-shadow: #ccc;
     padding: 10px;
     margin: 0;
     text-align: center;
-
-    &.alert-dismissable {
-        padding-right: 35px;
-    }
 
     &:not(:first-child) {
         margin-top: 10px;
@@ -480,10 +476,6 @@ section > .panel-body {
     background-color: transparent;
     cursor: not-allowed;
     opacity: 0.8;
-}
-
-input.form-control.show-loader {
-    background: url('/images/loader.gif') no-repeat right 5px center;
 }
 
 .stat-list {

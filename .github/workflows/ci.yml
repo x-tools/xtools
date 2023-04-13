@@ -27,7 +27,10 @@ jobs:
           ${{ runner.os }}-php-
 
     - name: Install dependencies
-      run: composer install --prefer-dist --no-progress
+      run: |
+        composer install --prefer-dist --no-progress
+        npm ci
+        ./node_modules/.bin/encore production
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
