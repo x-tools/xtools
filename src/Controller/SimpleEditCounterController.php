@@ -127,6 +127,7 @@ class SimpleEditCounterController extends XtoolsController
      */
     public function simpleEditCounterApiAction(SimpleEditCounterRepository $simpleEditCounterRepository): Response
     {
+        $this->recordApiUsage('user/simple_editcount');
         $sec = $this->prepareSimpleEditCounter($simpleEditCounterRepository);
         $data = $sec->getData();
         if ($this->user->isIpRange()) {
