@@ -1,5 +1,20 @@
 # Release Notes #
 
+## 3.17.0 ##
+- (T331939): Major refactor, upgrade to Symfony 5.4 and update all dependencies
+- (T276885): Switch to db session management so that it persists to the API server
+- ArticleInfo (T322062): Restore the count of templates used on the page
+- ArticleInfo (T330548): Improve prose size algorithm
+- ArticleInfo (T240267): Fix calculation for average time between edits
+- EditCounter (T251837): Add option to show timecard in browser's timezone
+- EditCounter (T323732): Fix message about top 10 editors
+- EditCounter: Use OOUI icons for yes/no and add alt/title attributes
+- AutoEdits (T286399): make autoedits-contributions page use localized tool names
+- (T304191): Improve display of bash quote in footer on small screens
+- AdminScore (T318027): Fix checking if user has a user page
+- Add .editorconfig file to keep IDE behaviour consistent
+- Localization updates.
+
 ## 3.16.1 ##
 - ArticleInfo: ensure 'editorlimit' param is an integer
 - GlobalContribs: skip projects that aren't replicated
@@ -523,7 +538,7 @@
 - EditCounter: make sure log_params are a string
 
 ## 3.6.6 ##
-- EditCounter: fix bug in rightschanges where new user groups is null 
+- EditCounter: fix bug in rightschanges where new user groups is null
 
 ## 3.6.5 ##
 - Production hotfix: Allow user session getter to return object, array or null.
