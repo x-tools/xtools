@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.17.2 ##
+- Edit: make the SHA property nullable; fixes a prod error
+
 ## 3.17.1 ##
 - Add unique index to usage_api_timeline
 
