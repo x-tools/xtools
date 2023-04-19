@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.17.1 ##
+- Add unique index to usage_api_timeline
+
 ## 3.17.0 ##
 - (T331939): Major refactor, upgrade to Symfony 5.4 and update all dependencies
 - (T276885): Switch to db session management so that it persists to the API server
