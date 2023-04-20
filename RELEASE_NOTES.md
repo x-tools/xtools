@@ -1,6 +1,6 @@
 # Release Notes #
 
-## 3.17.2 ##
+## 3.17.3 ##
 - Edit: make the SHA property nullable; fixes a prod error
 
 ## 3.17.1 ##
