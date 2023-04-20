@@ -405,7 +405,7 @@ class PageRepository extends Repository
     {
         if ($this->isWMF) {
             $domain = $page->getProject()->getDomain();
-            $url = "https://$domain/api/rest_v1/page/html/" . $page->getTitle();
+            $url = "https://$domain/api/rest_v1/page/html/" . urlencode(str_replace(' ', '_', $page->getTitle()));
             if (null !== $revId) {
                 $url .= "/$revId";
             }
