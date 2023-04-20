@@ -35,7 +35,7 @@ class Edit extends Model
     protected string $comment;
 
     /** @var string|null The SHA-1 of the wikitext as of the revision. */
-    protected ?string $sha;
+    protected ?string $sha = null;
 
     /** @var bool|null Whether this edit was later reverted. */
     protected ?bool $reverted;
