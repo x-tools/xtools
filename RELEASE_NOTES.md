@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.17.4 ##
+- PageRepository: percent encode page title when fetching from REST API
+
 ## 3.17.3 ##
 - Edit: make the SHA property nullable; fixes a prod error
 
