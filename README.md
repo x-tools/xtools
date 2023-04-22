@@ -24,7 +24,7 @@ originally written by [User:X!](https://en.wikipedia.org/wiki/User:X!) for the E
 
 XTools was first refactored in 2014 by [Hedonil](https://de.wikipedia.org/wiki/Benutzer:Hedonil).
 
-In 2017, it was rewritten again by [Matthewrbowker](https://en.wikipedia.org/wiki/User:Matthewrbowker),
+In 2017, it was rewritten again by [Matthewrbowker](https://en.wikipedia.org/wiki/User:Matthewrb),
 [MusikAnimal](https://en.wikipedia.org/wiki/User:MusikAnimal), [Samwilson](https://meta.wikimedia.org/wiki/User:Samwilson),
 and [others](https://github.com/x-tools/xtools/graphs/contributors). Up until version 3.12.0, XTools could
 theoretically be used on any MediaWiki installation. However official support was dropped due to lack of usage by
