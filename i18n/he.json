@@ -259,6 +259,7 @@
 	"namespaces-desc": "{{PLURAL:$1|עריכה אחת|$2 עריכות}} במרחב הערכים",
 	"neutral": "ניטרלי",
 	"next": "הבא",
+	"no": "לא",
 	"no-contribs": "לא נמצאו תרומות",
 	"no-exist": "$1 אינו קיים",
 	"no-result": "לא נמצאו תוצאות מתאימות עבור: $1",
@@ -515,5 +516,6 @@
 	"xtools-slogan": "משביעים את הרעב שלך לנתונים",
 	"xtools-title": "XTools",
 	"year": "שנה",
-	"year-counts": "ספירה לשנה"
+	"year-counts": "ספירה לשנה",
+	"yes": "כן"
 }

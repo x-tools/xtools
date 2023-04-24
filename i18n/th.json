@@ -55,6 +55,7 @@
 	"average-time-bw-edits": "เวลาเฉลี่ยระหว่างแก้ไข",
 	"basic-information": "ข้อมูลเบื้องต้น",
 	"block": "บล็อก",
+	"block-log": "ปูมการบล็อก",
 	"bot": "บอต",
 	"bot-edits": "จำนวนการแก้ไขของบอต",
 	"bugs": "ข้อผิดพลาด",
@@ -72,6 +73,8 @@
 	"delete": "ลบ",
 	"deleted": "ถูกลบ",
 	"deleted-edits": "ลบการแก้ไข",
+	"diff": "ต่าง",
+	"diff-empty": "ว่าง",
 	"documentation": "เอกสาร",
 	"download-label": "ดาวน์โหลด",
 	"edit": "แก้ไข",
@@ -144,6 +147,7 @@
 	"namespaces": "เนมสเปซ",
 	"neutral": "การเป็นกลาง",
 	"next": "ถัดไป",
+	"no": "ไม่",
 	"no-contribs": "ไม่พบการสนับสนุน",
 	"no-exist": "$1 ไม่มีอยู่",
 	"no-result": "ไม่พบผลลัพธ์ตรงที่พบ:$1",
@@ -274,9 +278,11 @@
 	"view-source": "ดูแหล่งที่มา",
 	"vote-msg": "$1 มีการแก้ไข $2 $3 หน้า!",
 	"web-chat": "เชื่อมต่อ",
+	"wednesday": "วันพุธ",
 	"wiki": "วิกิ",
 	"with-summary": "พร้อมข้อสรุป",
 	"xtools-title": "เครื่องมือ X!'s",
 	"year": "ปี",
-	"year-counts": "นับรายปี"
+	"year-counts": "นับรายปี",
+	"yes": "ใช่"
 }

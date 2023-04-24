@@ -256,6 +256,7 @@
 	"namespaces-desc": "$2 {{PLURAL:$1|düzenleme}} madde alanına",
 	"neutral": "Tarafsız",
 	"next": "Sonraki",
+	"no": "Hayır",
 	"no-contribs": "Hiçbir katkı bulunamadı",
 	"no-exist": "$1 mevcut değil",
 	"no-result": "Eşleşen sonuç bulunamadı:$1",
@@ -413,6 +414,7 @@
 	"thursday": "Perşembe",
 	"timecard": "Zaman çizelgesi",
 	"times-in-utc": "Tüm zamanlar UTC'ye göredir.",
+	"time-local": "UTC yerine yerel saati kullanın",
 	"too-many-edits": "Bu kullanıcı çok fazla değişiklik yapmış! (En fazla $1)",
 	"too-many-edits-redir": "Onun yerine $1 gösteriliyor.",
 	"too-many-revisions": "Bu maddede $1'den fazla {{PLURAL:$2|revizyon|revizyon}} mevcut. Son $1 için veriler aşağıda gösterilmektedir.",
@@ -461,7 +463,8 @@
 	"top-projects-edit-counts": "Küresel değişiklik sayısı",
 	"top-ten-by-edits": "Düzenlemeler ile ilk 10",
 	"top-ten-by-text": "Metin ekleyerek ilk 10",
-	"top-ten-count": "Düzenleyicilerin en üst %10'u tarafından yapılan düzenlemeler",
+	"top-ten-count": "En iyi 10 editör tarafından yapılan düzenlemeler",
+	"top-ten-other-editors": "Diğer editörler",
 	"topedits-article": "Bir makalenin en iyi düzenlemeleri",
 	"topedits-article-desc": "Bir sayfaya bir kullanıcı tarafından yapılan tüm düzenlemeler kronolojik sıraya göre yapılır.",
 	"topedits-per-namespace": "Her ad alanı için en iyi düzenlemeler",
@@ -507,5 +510,6 @@
 	"xtools-slogan": "Verilerinizi açlıktan besle",
 	"xtools-title": "X!'in araçları",
 	"year": "Yıl",
-	"year-counts": "Yıl sayacı"
+	"year-counts": "Yıl sayacı",
+	"yes": "Evet"
 }

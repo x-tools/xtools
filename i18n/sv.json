@@ -252,6 +252,7 @@
 	"namespaces-desc": "$2 {{PLURAL:$1|redigering|redigeringar}} i artikelrymden",
 	"neutral": "Neutral",
 	"next": "Nästa",
+	"no": "Nej",
 	"no-contribs": "Inga bidrag hittade",
 	"no-exist": "$1 finns inte",
 	"no-result": "Inga matchande resultat för: $1",
@@ -412,6 +413,7 @@
 	"thursday": "Torsdag",
 	"timecard": "Tidsöversikt",
 	"times-in-utc": "Alla tidsstämplar är i UTC.",
+	"time-local": "Använd lokal tid istället för UTC",
 	"too-many-edits": "Denna användare har gjort för många redigeringar! (Maximalt $1)",
 	"too-many-edits-redir": "Visar $1 istället.",
 	"too-many-revisions": "Denna artikel har över $1 {{PLURAL:$2|version|versioner}}. Information för de senaste $1 visas.",
@@ -460,7 +462,8 @@
 	"top-projects-edit-counts": "Antal globala redigeringar",
 	"top-ten-by-edits": "Topp tio räknat efter antal redigeringar",
 	"top-ten-by-text": "Topp tio räknat efter tillagd text",
-	"top-ten-count": "Redigeringar gjort av topp 10 % av redigerare",
+	"top-ten-count": "Redigeringar gjort av de 10 bästa redigerarna",
+	"top-ten-other-editors": "Andra redigerare",
 	"topedits-article": "Viktigaste redigeringer på en artikel",
 	"topedits-article-desc": "Alla redigeringar utförda på en sida av en användare i kronologisk ordning.",
 	"topedits-per-namespace": "Toppredigeringar per namnrymd",
@@ -506,5 +509,6 @@
 	"xtools-slogan": "Mättar din datahunger",
 	"xtools-title": "X!:s verktyg",
 	"year": "År",
-	"year-counts": "Redigeringar per år"
+	"year-counts": "Redigeringar per år",
+	"yes": "Ja"
 }

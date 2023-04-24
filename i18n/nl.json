@@ -5,6 +5,7 @@
 			"Bas dehaan",
 			"Dutchy45",
 			"Elroy",
+			"HanV",
 			"Jeroen N",
 			"Kippenvlees1",
 			"Mainframe98",
@@ -257,6 +258,7 @@
 	"namespaces-desc": "$2 {{PLURAL:$1|bewerking|bewerkingen}} in de hoofdnaamruimte",
 	"neutral": "Neutraal",
 	"next": "Volgende",
+	"no": "Nee",
 	"no-contribs": "Geen bewerkingen gevonden",
 	"no-exist": "$1 bestaat niet",
 	"no-result": "Geen resultaten gevonden voor: $1",
@@ -415,6 +417,7 @@
 	"thursday": "Donderdag",
 	"timecard": "Tijdoverzicht",
 	"times-in-utc": "Alle tijden zijn in UTC.",
+	"time-local": "Gebruik lokale tijd in plaats van UTC",
 	"too-many-edits": "Gebruiker heeft te veel wijzigingen aangebracht! (Maximaal $1)",
 	"too-many-edits-redir": "In plaats daarvan wordt $1 getoond.",
 	"too-many-revisions": "Deze pagina heeft meer dan $1 {{PLURAL:$2|versie|versies}}. Alleen gegevens voor de laatste $1 worden getoond.",
@@ -510,5 +513,6 @@
 	"xtools-slogan": "Voedt uw datahonger",
 	"xtools-title": "XTools",
 	"year": "Jaar",
-	"year-counts": "Jaaroverzicht"
+	"year-counts": "Jaaroverzicht",
+	"yes": "Ja"
 }

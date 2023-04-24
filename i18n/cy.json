@@ -147,6 +147,7 @@
 	"namespaces": "Parthau",
 	"neutral": "Niwtral",
 	"next": "Nesaf",
+	"no": "Na",
 	"no-summary": "Dim crynodeb",
 	"none": "Dim",
 	"not-opted-in-link": "dogfennaeth",
@@ -244,5 +245,6 @@
 	"with-summary": "Gyda chrynodeb",
 	"words": "Geiriau",
 	"xtools-title": "XTools",
-	"year": "Blwyddyn"
+	"year": "Blwyddyn",
+	"yes": "Ie"
 }

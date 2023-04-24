@@ -120,6 +120,7 @@
 	"namespace": "Прастора назваў",
 	"namespaces": "Прасторы назваў",
 	"next": "Далей",
+	"no": "Не",
 	"none": "Няма",
 	"not-opted-in-link": "дакументацыя",
 	"not-opted-in-login": "увайсці",
@@ -209,5 +210,6 @@
 	"words": "Слоў",
 	"xtools-title": "XTools",
 	"year": "Год",
-	"year-counts": "З улікам года"
+	"year-counts": "З улікам года",
+	"yes": "Так"
 }
