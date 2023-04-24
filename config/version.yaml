@@ -2,4 +2,4 @@
 # The release process is documented at https://www.mediawiki.org/wiki/XTools/Development#Releases
 
 parameters:
-    app.version: 3.17.5
+    app.version: 3.17.6

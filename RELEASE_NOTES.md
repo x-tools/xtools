@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.17.6 ##
+- (T335313) Ensure all charts load after the DOM is ready.
+- Fix the Meta tool.
+- Other minor changes for PHP 8 compatibility.
+
 ## 3.17.5 ##
 - EditCounter (T335211): Fix display of charts
 - EditCounter: Fix issue with average edit size not being parsed as a float
