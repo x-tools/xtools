@@ -66,11 +66,14 @@ class GlobalContribsRepository extends Repository
         foreach ($editCounts as $editCount) {
             $project = new Project($editCount['dbName']);
             $project->setRepository($this->projectRepo);
-            $out[] = [
-                'dbName' => $editCount['dbName'],
-                'total' => $editCount['total'],
-                'project' => $project,
-            ];
+            // Make sure the project exists (new projects may not yet be on db replicas).
+            if ($project->exists()) {
+                $out[] = [
+                    'dbName' => $editCount['dbName'],
+                    'total' => $editCount['total'],
+                    'project' => $project,
+                ];
+            }
         }
         return $out;
     }
