@@ -1,5 +1,13 @@
 # Release Notes #
 
+## 3.17.5 ##
+- EditCounter (T335211): Fix display of charts
+- EditCounter: Fix issue with average edit size not being parsed as a float
+- ArticleInfo, Edit: permit length property to be null
+- GlobalContribs: skip nonexistent projects from global edit counts
+- Page: make pageInfo property nullable
+- Localization updates.
+
 ## 3.17.4 ##
 - PageRepository: percent encode page title when fetching from REST API
 
