@@ -537,8 +537,7 @@ class EditCounterRepository extends Repository
      * Will cache the result for 10 minutes.
      * @param Project $project The project.
      * @param User $user The user.
-     * @return string[] Values with for keys 'average_size',
-     *                  'small_edits' and 'large_edits'
+     * @return string[] With keys 'average_size', 'small_edits' and 'large_edits'
      */
     public function getEditSizeData(Project $project, User $user): array
     {

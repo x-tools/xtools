@@ -1042,7 +1042,7 @@ class EditCounter extends Model
 
     /**
      * Get average edit size, and number of large and small edits.
-     * @return int[]
+     * @return array
      */
     public function getEditSizeData(): array
     {
@@ -1091,7 +1091,7 @@ class EditCounter extends Model
     {
         $editSizeData = $this->getEditSizeData();
         if (isset($editSizeData['average_size'])) {
-            return round($editSizeData['average_size'], 3);
+            return round((float)$editSizeData['average_size'], 3);
         } else {
             return 0;
         }
