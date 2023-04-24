@@ -195,9 +195,9 @@ class ArticleInfo extends ArticleInfoApi
 
     /**
      * Returns length of the page.
-     * @return int
+     * @return int|null
      */
-    public function getLength(): int
+    public function getLength(): ?int
     {
         if ($this->hasDateRange()) {
             return $this->lastEdit->getLength();
@@ -690,9 +690,9 @@ class ArticleInfo extends ArticleInfoApi
      * @todo Remove once T101631 is resolved.
      * @param Edit $edit
      * @param Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
-     * @return int
+     * @return int|null
      */
-    private function getEditSize(Edit $edit, array $prevEdits): int
+    private function getEditSize(Edit $edit, array $prevEdits): ?int
     {
         if ($prevEdits['prev'] && null === $prevEdits['prev']->getLength()) {
             return 0;

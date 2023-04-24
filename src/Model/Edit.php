@@ -183,18 +183,18 @@ class Edit extends Model
     /**
      * Length of the page as of this edit, in bytes.
      * @see Edit::getSize() Edit::getSize() for the size <em>change</em>.
-     * @return int
+     * @return int|null
      */
-    public function getLength(): int
+    public function getLength(): ?int
     {
         return $this->length;
     }
 
     /**
      * The diff size of this edit.
-     * @return int Signed length change in bytes.
+     * @return int|null Signed length change in bytes.
      */
-    public function getSize(): int
+    public function getSize(): ?int
     {
         return $this->lengthChange;
     }
