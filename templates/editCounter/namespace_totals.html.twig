@@ -60,42 +60,44 @@
         {% set height = max(150, maxHeight) %}
         <canvas id="namespace-canvas" width="{{ height }}" height="{{ height }}"></canvas>
         <script>
-            window.namespaces = {{ project.namespaces|json_encode()|raw }};
-            window.namespaceTotals = {{ ec.namespaceTotals|json_encode()|raw }};
-            window.namespaceChart = new Chart($('#namespace-canvas'), {
-                type: 'pie',
-                data: {
-                    labels: [{% for key,value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}"{{ nsName(key, project.namespaces) }}"{% endfor %}],
-                    datasets: [{
-                        data: [{% for value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}{{ value }}{% endfor %}],
-                        backgroundColor: [{% for key,value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}'{{ color(key) }}'{% set first = 0 %}{% endfor %}],
-                        borderColor: [{% for key,value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}'{{ color(key) }}'{% set first = 0 %}{% endfor %}],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: false,
-                    aspectRatio: 1,
-                    legend: {
-                        display: false
+            $(function () {
+                window.namespaces = {{ project.namespaces|json_encode()|raw }};
+                window.namespaceTotals = {{ ec.namespaceTotals|json_encode()|raw }};
+                window.namespaceChart = new Chart($('#namespace-canvas'), {
+                    type: 'pie',
+                    data: {
+                        labels: [{% for key,value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}"{{ nsName(key, project.namespaces) }}"{% endfor %}],
+                        datasets: [{
+                            data: [{% for value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}{{ value }}{% endfor %}],
+                            backgroundColor: [{% for key,value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}'{{ color(key) }}'{% set first = 0 %}{% endfor %}],
+                            borderColor: [{% for key,value in ec.namespaceTotals %}{% if not loop.first %},{% endif %}'{{ color(key) }}'{% set first = 0 %}{% endfor %}],
+                            borderWidth: 1
+                        }]
                     },
-                    tooltips: {
-                        callbacks: {
-                            label: function (tooltip, chartData) {
-                                var value = chartData.datasets[tooltip.datasetIndex].data[tooltip.index],
-                                    total = chartData.datasets[0].data.reduce(function (accumulator, currentValue) {
-                                        return accumulator + currentValue;
-                                    }, 0),
-                                    percentage = (value / total).toLocaleString(i18nLang, {style: 'percent'});
+                    options: {
+                        responsive: false,
+                        aspectRatio: 1,
+                        legend: {
+                            display: false
+                        },
+                        tooltips: {
+                            callbacks: {
+                                label: function (tooltip, chartData) {
+                                    var value = chartData.datasets[tooltip.datasetIndex].data[tooltip.index],
+                                        total = chartData.datasets[0].data.reduce(function (accumulator, currentValue) {
+                                            return accumulator + currentValue;
+                                        }, 0),
+                                        percentage = (value / total).toLocaleString(i18nLang, {style: 'percent'});
 
-                                return value.toLocaleString(i18nLang) + ' (' + percentage + ')';
-                            },
-                            title: function (tooltip, chartData) {
-                                return chartData.labels[tooltip[0].index];
+                                    return value.toLocaleString(i18nLang) + ' (' + percentage + ')';
+                                },
+                                title: function (tooltip, chartData) {
+                                    return chartData.labels[tooltip[0].index];
+                                }
                             }
                         }
                     }
-                }
+                });
             });
         </script>
     </div>

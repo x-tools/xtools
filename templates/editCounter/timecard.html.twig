@@ -48,43 +48,45 @@
 <canvas id="timecard-bubble-chart" height="100"></canvas>
 
 <script type="text/javascript">
-    // MySQL uses ODBC standard, treating the first day (1) as Sunday
-    var days = {
-        1: "{{ msg('sunday') }}",
-        2: "{{ msg('monday') }}",
-        3: "{{ msg('tuesday') }}",
-        4: "{{ msg('wednesday') }}",
-        5: "{{ msg('thursday') }}",
-        6: "{{ msg('friday') }}",
-        7: "{{ msg('saturday') }}"
-    };
-    var timeCardDatasets = [];
-    {% for i in 0..7 %}
-        timeCardDatasets.push({
-            backgroundColor: "{{ chartColor(i) }}",
-            data: []
-        });
-    {% endfor %}
+    $(function () {
+        // MySQL uses ODBC standard, treating the first day (1) as Sunday
+        var days = {
+            1: "{{ msg('sunday') }}",
+            2: "{{ msg('monday') }}",
+            3: "{{ msg('tuesday') }}",
+            4: "{{ msg('wednesday') }}",
+            5: "{{ msg('thursday') }}",
+            6: "{{ msg('friday') }}",
+            7: "{{ msg('saturday') }}"
+        };
+        var timeCardDatasets = [];
+        {% for i in 0..7 %}
+            timeCardDatasets.push({
+                backgroundColor: "{{ chartColor(i) }}",
+                data: []
+            });
+        {% endfor %}
 
-    {##
-     # Here we find the max value for midnight (leftmost column),
-     # which we can then use to fine-tune the offset of the bubbles
-     # to ensure they don't overlap the labels. This isn't 100%
-     # fool-proof but it does help.
-     #}
-    {% set maxMidnight = 0 %}
-    {% for data in ec.timeCard|filter(data => data.hour != 24) %}
-        {% if data.hour == 0 and data.value > maxMidnight %}
-            {% set maxMidnight = maxMidnight + data.value %}
-        {% endif %}
-        {% set datasetIndex = data.day_of_week - 1 %}
-        var entry = {{ data|json_encode|raw }};
-        entry.x = entry.hour;
-        entry.y = Math.abs(8 - entry.day_of_week);
-        timeCardDatasets[{{ datasetIndex }}].data.push(entry);
-    {% endfor %}
+        {##
+         # Here we find the max value for midnight (leftmost column),
+         # which we can then use to fine-tune the offset of the bubbles
+         # to ensure they don't overlap the labels. This isn't 100%
+         # fool-proof but it does help.
+        #}
+        {% set maxMidnight = 0 %}
+        {% for data in ec.timeCard|filter(data => data.hour != 24) %}
+            {% if data.hour == 0 and data.value > maxMidnight %}
+                {% set maxMidnight = maxMidnight + data.value %}
+            {% endif %}
+            {% set datasetIndex = data.day_of_week - 1 %}
+            var entry = {{ data|json_encode|raw }};
+            entry.x = entry.hour;
+            entry.y = Math.abs(8 - entry.day_of_week);
+            timeCardDatasets[{{ datasetIndex }}].data.push(entry);
+        {% endfor %}
 
-    xtools.editcounter.setupTimecard(timeCardDatasets, days);
+        xtools.editcounter.setupTimecard(timeCardDatasets, days);
+    });
 </script>
 
 <div class="checkbox times-in-utc">

@@ -272,10 +272,10 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
 
 /**
  * Builds the timecard chart and adds a listener for the 'local time' option.
- * @param {Array} timecardDatasets
- * @param {Array} days
+ * @param {Array} timeCardDatasets
+ * @param {Object} days
  */
-xtools.editcounter.setupTimecard = function (timecardDatasets, days) {
+xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
     var useLocalTimezone = false,
         timezoneOffset = new Date().getTimezoneOffset() / 60;
     window.chart = new Chart($("#timecard-bubble-chart"), {
