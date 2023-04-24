@@ -284,7 +284,7 @@ class EditSummary extends Model
      */
     private function hasSummary(array $row): bool
     {
-        $summary = preg_replace("/^\/\* (.*?) \*\/\s*/", '', $row['comment']);
+        $summary = preg_replace("/^\/\* (.*?) \*\/\s*/", '', $row['comment'] ?: '');
         return '' !== $summary;
     }
 

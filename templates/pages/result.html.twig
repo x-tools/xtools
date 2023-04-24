@@ -206,51 +206,53 @@
     {% if pages.namespace == 'all' %}
         {% set nsIds = pages.counts|keys %}
         <script>
-            var ctx = document.getElementById("pie_chart");
-            window.pieChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: [
-                        {% for ns in nsIds %}
+            $(function () {
+                var ctx = document.getElementById("pie_chart");
+                window.pieChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: [
+                            {% for ns in nsIds %}
                             "{{ nsName(ns, project.namespaces) }}"{% if not loop.last %},{% endif %}
-                        {% endfor %}
-                    ],
-                    datasets: [{
-                        data: [
-                            {% for value in pages.counts %}
+                            {% endfor %}
+                        ],
+                        datasets: [{
+                            data: [
+                                {% for value in pages.counts %}
                                 {% if value.count is defined %}{{ value.count }}{% else %}0{% endif %}{% if not loop.last %},{% endif %}
-                            {% endfor %}
-                        ],
-                        backgroundColor: [
-                            {% for ns in nsIds %}
+                                {% endfor %}
+                            ],
+                            backgroundColor: [
+                                {% for ns in nsIds %}
                                 '{{ color(ns) }}'{% if not loop.last %},{% endif %}
-                            {% endfor %}
-                        ],
-                        borderColor: [
-                            {% for ns in nsIds %}
+                                {% endfor %}
+                            ],
+                            borderColor: [
+                                {% for ns in nsIds %}
                                 '{{ color(ns) }}'{% if not loop.last %},{% endif %}
-                            {% endfor %}
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    aspectRatio: 1,
-                    legend: {
-                        display: false
+                                {% endfor %}
+                            ],
+                            borderWidth: 1
+                        }]
                     },
-                    tooltips: {
-                        callbacks: {
-                            label: function(tooltipItem, chartData) {
-                                var label = chartData.labels[tooltipItem.index],
-                                    value = chartData.datasets[0].data[tooltipItem.index];
-                                return label + ': ' + value.toLocaleString(i18nLang);
+                    options: {
+                        aspectRatio: 1,
+                        legend: {
+                            display: false
+                        },
+                        tooltips: {
+                            callbacks: {
+                                label: function(tooltipItem, chartData) {
+                                    var label = chartData.labels[tooltipItem.index],
+                                        value = chartData.datasets[0].data[tooltipItem.index];
+                                    return label + ': ' + value.toLocaleString(i18nLang);
+                                }
                             }
                         }
                     }
-                }
+                });
+                window.countsByNamespace = {{ pages.counts|json_encode()|raw }};
             });
-            window.countsByNamespace = {{ pages.counts|json_encode()|raw }};
         </script>
     {% endif %}
 </div>

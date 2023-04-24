@@ -182,42 +182,44 @@
     {% endif %}
 
     <script>
-        window.authorshipChart = new Chart($('#authorship_chart'), {
-            type: 'pie',
-            data: {
-                labels: {{ labels|json_encode()|raw }},
-                datasets: [{
-                    data: [
-                        {% for username, values in authorship.list|slice(0, 10) %}
+        $(function () {
+            window.authorshipChart = new Chart($('#authorship_chart'), {
+                type: 'pie',
+                data: {
+                    labels: {{ labels|json_encode()|raw }},
+                    datasets: [{
+                        data: [
+                            {% for username, values in authorship.list|slice(0, 10) %}
                             {{ values.percentage }}{% if not loop.last %},{% endif %}
-                        {% endfor %}
-                        {% if authorship.others is not null %},{{ authorship.others.percentage }}{% endif %}
-                    ],
-                    backgroundColor: {{ colors|json_encode()|raw }},
-                    borderColor: {{ colors|json_encode()|raw }},
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                aspectRatio: 1,
-                legend: {
-                  display: false
+                            {% endfor %}
+                            {% if authorship.others is not null %},{{ authorship.others.percentage }}{% endif %}
+                        ],
+                        backgroundColor: {{ colors|json_encode()|raw }},
+                        borderColor: {{ colors|json_encode()|raw }},
+                        borderWidth: 1
+                    }]
                 },
-                tooltips: {
-                    callbacks: {
-                        label: function(tooltipItem, chartData) {
-                            var label = chartData.labels[tooltipItem.index],
-                                value = chartData.datasets[0].data[tooltipItem.index] / 100;
-                            return label + ': ' + value.toLocaleString(i18nLang, {
-                                style: 'percent',
-                                maximumFractionDigits: 1
-                            });
+                options: {
+                    aspectRatio: 1,
+                    legend: {
+                        display: false
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function(tooltipItem, chartData) {
+                                var label = chartData.labels[tooltipItem.index],
+                                    value = chartData.datasets[0].data[tooltipItem.index] / 100;
+                                return label + ': ' + value.toLocaleString(i18nLang, {
+                                    style: 'percent',
+                                    maximumFractionDigits: 1
+                                });
+                            }
                         }
                     }
                 }
-            }
+            });
+            window.authorship = {{ authorship.list|json_encode()|raw }};
         });
-        window.authorship = {{ authorship.list|json_encode()|raw }};
     </script>
 {% endif %}
 

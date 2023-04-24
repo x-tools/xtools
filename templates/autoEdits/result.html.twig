@@ -177,38 +177,40 @@
                         {% endfor %}
 
                         <script>
-                            window.toolsChart = new Chart($('#tool_chart'), {
-                                type: 'pie',
-                                data: {
-                                    labels: {{ ae.toolCounts|keys|json_encode()|raw }},
-                                    datasets: [{
-                                        data: [
-                                            {% for tool, values in ae.toolCounts %}
+                            $(function () {
+                                window.toolsChart = new Chart($('#tool_chart'), {
+                                    type: 'pie',
+                                    data: {
+                                        labels: {{ ae.toolCounts|keys|json_encode()|raw }},
+                                        datasets: [{
+                                            data: [
+                                                {% for tool, values in ae.toolCounts %}
                                                 {{ values.count }}{% if not loop.last %},{% endif %}
-                                            {% endfor %}
-                                        ],
-                                        backgroundColor: {{ colors|json_encode()|raw }},
-                                        borderColor: {{ colors|json_encode()|raw }},
-                                        borderWidth: 1
-                                    }]
-                                },
-                                options: {
-                                    aspectRatio: 1,
-                                    legend: {
-                                      display: false
+                                                {% endfor %}
+                                            ],
+                                            backgroundColor: {{ colors|json_encode()|raw }},
+                                            borderColor: {{ colors|json_encode()|raw }},
+                                            borderWidth: 1
+                                        }]
                                     },
-                                    tooltips: {
-                                        callbacks: {
-                                            label: function(tooltipItem, chartData) {
-                                                var label = chartData.labels[tooltipItem.index],
-                                                    value = chartData.datasets[0].data[tooltipItem.index];
-                                                return label + ': ' + value.toLocaleString(i18nLang);
+                                    options: {
+                                        aspectRatio: 1,
+                                        legend: {
+                                            display: false
+                                        },
+                                        tooltips: {
+                                            callbacks: {
+                                                label: function(tooltipItem, chartData) {
+                                                    var label = chartData.labels[tooltipItem.index],
+                                                        value = chartData.datasets[0].data[tooltipItem.index];
+                                                    return label + ': ' + value.toLocaleString(i18nLang);
+                                                }
                                             }
                                         }
                                     }
-                                }
+                                });
+                                window.countsByTool = {{ ae.toolCounts|json_encode()|raw }};
                             });
-                            window.countsByTool = {{ ae.toolCounts|json_encode()|raw }};
                         </script>
                     {% endif %}
                 {% else %}

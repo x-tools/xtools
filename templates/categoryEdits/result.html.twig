@@ -180,39 +180,41 @@
                 {% endfor %}
 
                 <script>
-                    window.categoryChart = new Chart($('#category_chart'), {
-                        type: 'pie',
-                        data: {
-                            labels: {{ ce.categoriesNormalized|json_encode()|raw }},
-                            datasets: [{
-                                data: [
-                                    {% for _category, values in ce.categoryCounts %}
+                    $(function () {
+                        window.categoryChart = new Chart($('#category_chart'), {
+                            type: 'pie',
+                            data: {
+                                labels: {{ ce.categoriesNormalized|json_encode()|raw }},
+                                datasets: [{
+                                    data: [
+                                        {% for _category, values in ce.categoryCounts %}
                                         {{ values.editCount }}{% if not loop.last %},{% endif %}
-                                    {% endfor %}
-                                ],
-                                backgroundColor: {{ colors|json_encode()|raw }},
-                                borderColor: {{ colors|json_encode()|raw }},
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            aspectRatio: 1,
-                            legend: {
-                              display: false
+                                        {% endfor %}
+                                    ],
+                                    backgroundColor: {{ colors|json_encode()|raw }},
+                                    borderColor: {{ colors|json_encode()|raw }},
+                                    borderWidth: 1
+                                }]
                             },
-                            tooltips: {
-                                callbacks: {
-                                    label: function(tooltipItem, chartData) {
-                                        var label = chartData.labels[tooltipItem.index],
-                                            value = chartData.datasets[0].data[tooltipItem.index];
-                                        return label + ': ' + value.toLocaleString(i18nLang);
+                            options: {
+                                aspectRatio: 1,
+                                legend: {
+                                    display: false
+                                },
+                                tooltips: {
+                                    callbacks: {
+                                        label: function(tooltipItem, chartData) {
+                                            var label = chartData.labels[tooltipItem.index],
+                                                value = chartData.datasets[0].data[tooltipItem.index];
+                                            return label + ': ' + value.toLocaleString(i18nLang);
+                                        }
                                     }
                                 }
                             }
-                        }
+                        });
+                        window.countsByCategory = {{ ce.categoryCounts|json_encode()|raw }};
+                        xtools.categoryedits.userEditCount = {{ ce.editCount }};
                     });
-                    window.countsByCategory = {{ ce.categoryCounts|json_encode()|raw }};
-                    xtools.categoryedits.userEditCount = {{ ce.editCount }};
                 </script>
             {% endif %}
 

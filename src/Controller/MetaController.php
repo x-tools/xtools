@@ -57,18 +57,16 @@ class MetaController extends XtoolsController
      *         "end"="\d{4}-\d{2}-\d{2}",
      *     },
      * )
+     * @param ManagerRegistry $managerRegistry
      * @param bool $legacy Non-blank value indicates to show stats for legacy XTools
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction(bool $legacy = false): Response
+    public function resultAction(ManagerRegistry $managerRegistry, bool $legacy = false): Response
     {
         $db = $legacy ? 'toolsdb' : 'default';
         $table = $legacy ? 's51187__metadata.xtools_timeline' : 'usage_timeline';
-        $client = $this->container
-            ->get('doctrine')
-            ->getManager($db)
-            ->getConnection();
+        $client = $managerRegistry->getConnection($db);
 
         $toolUsage = $this->getToolUsageStats($client, $table);
         $apiUsage = $this->getApiUsageStats($client);
@@ -84,12 +82,12 @@ class MetaController extends XtoolsController
 
     /**
      * Get usage statistics of the core tools.
-     * @param Connection $client
+     * @param object $client
      * @param string $table Table to query.
      * @return array
      * @codeCoverageIgnore
      */
-    private function getToolUsageStats(Connection $client, string $table): array
+    private function getToolUsageStats(object $client, string $table): array
     {
         $start = date('Y-m-d', $this->start);
         $end = date('Y-m-d', $this->end);
@@ -140,11 +138,11 @@ class MetaController extends XtoolsController
 
     /**
      * Get usage statistics of the API.
-     * @param Connection $client
+     * @param object $client
      * @return array
      * @codeCoverageIgnore
      */
-    private function getApiUsageStats(Connection $client): array
+    private function getApiUsageStats(object $client): array
     {
         $start = date('Y-m-d', $this->start);
         $end = date('Y-m-d', $this->end);

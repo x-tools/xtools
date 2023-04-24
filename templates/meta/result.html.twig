@@ -95,20 +95,21 @@
         {% set toolNames = toolUsage.totals|keys %}
 
         <script>
-            // Attempt to fine-tune the pointer detection spacing based on how cluttered the chart is
-            var numTicks = {{ toolUsage.dateLabels|length|raw }};
-            if (numTicks > 50) {
-                Chart.defaults.global.elements.point.hitRadius = 3;
-            } else if (numTicks > 30) {
-                Chart.defaults.global.elements.point.hitRadius = 5;
-            } else if (numTicks > 20) {
-                Chart.defaults.global.elements.point.hitRadius = 10;
-            } else {
-                Chart.defaults.global.elements.point.hitRadius = 30;
-            }
+            $(function () {
+                // Attempt to fine-tune the pointer detection spacing based on how cluttered the chart is
+                var numTicks = {{ toolUsage.dateLabels|length|raw }};
+                if (numTicks > 50) {
+                    Chart.defaults.global.elements.point.hitRadius = 3;
+                } else if (numTicks > 30) {
+                    Chart.defaults.global.elements.point.hitRadius = 5;
+                } else if (numTicks > 20) {
+                    Chart.defaults.global.elements.point.hitRadius = 10;
+                } else {
+                    Chart.defaults.global.elements.point.hitRadius = 30;
+                }
 
-            var datasets = [];
-            {% for tool in toolNames %}
+                var datasets = [];
+                {% for tool in toolNames %}
                 var data = {{ toolUsage.timeline[tool]|json_encode|raw }};
                 datasets.push({
                     backgroundColor: 'rgba(0,0,0,0)',
@@ -121,54 +122,55 @@
                     pointBackgroundColor: '{{ chartColor(loop.index0) }}',
                     pointHoverRadius: 5
                 });
-            {% endfor %}
+                {% endfor %}
 
-            var ctx = document.getElementById('usage_chart');
-            window.lineChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: {{ toolUsage.dateLabels|json_encode|raw }},
-                    datasets: datasets
-                },
-                options: {
-                    legend: {
-                        display: false
+                var ctx = document.getElementById('usage_chart');
+                window.lineChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: {{ toolUsage.dateLabels|json_encode|raw }},
+                        datasets: datasets
                     },
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true
-                            }
-                        }]
-                    },
-                    tooltips: {
-                        mode: 'x-axis',
-                        callbacks: {
-                            label: function(tooltipItem) {
-                                var toolName = datasets[tooltipItem.datasetIndex].label;
-                                return toolName + ': ' + (new Number(tooltipItem.yLabel)).toLocaleString();
-                            }
+                    options: {
+                        legend: {
+                            display: false
                         },
-                        bodyFontSize: 14,
-                        bodySpacing: 7,
-                        caretSize: 0,
-                        titleFontSize: 14
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        },
+                        tooltips: {
+                            mode: 'x-axis',
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    var toolName = datasets[tooltipItem.datasetIndex].label;
+                                    return toolName + ': ' + (new Number(tooltipItem.yLabel)).toLocaleString();
+                                }
+                            },
+                            bodyFontSize: 14,
+                            bodySpacing: 7,
+                            caretSize: 0,
+                            titleFontSize: 14
+                        }
                     }
-                }
-            });
+                });
 
-            // for the pie chart created with chart.pie_chart()
-            $(document).ready(function () {
-                window.setupToggleTable({{ toolUsage.totals|json_encode|raw }}, window.totals_chart, null, function (newData) {
-                    var total = Object.keys(newData).reduce(function (sum, key) {
-                        return sum + parseInt(newData[key], 10);
-                    }, 0);
-                    var toolsCount = Object.keys(newData).length;
-                    $('.tools--tools').text(
-                        toolsCount.toLocaleString() + " " +
-                        $.i18n('num-tools', toolsCount)
-                    );
-                    $('.tools--count').text(total.toLocaleString());
+                // for the pie chart created with chart.pie_chart()
+                $(document).ready(function () {
+                    window.setupToggleTable({{ toolUsage.totals|json_encode|raw }}, window.totals_chart, null, function (newData) {
+                        var total = Object.keys(newData).reduce(function (sum, key) {
+                            return sum + parseInt(newData[key], 10);
+                        }, 0);
+                        var toolsCount = Object.keys(newData).length;
+                        $('.tools--tools').text(
+                            toolsCount.toLocaleString() + " " +
+                            $.i18n('num-tools', toolsCount)
+                        );
+                        $('.tools--count').text(total.toLocaleString());
+                    });
                 });
             });
         </script>
@@ -254,20 +256,21 @@
         {% set endpointNames = apiUsage.totals|keys %}
 
         <script>
-            // Attempt to fine-tune the pointer detection spacing based on how cluttered the chart is
-            var numTicks = {{ apiUsage.dateLabels|length|raw }};
-            if (numTicks > 50) {
-                Chart.defaults.global.elements.point.hitRadius = 3;
-            } else if (numTicks > 30) {
-                Chart.defaults.global.elements.point.hitRadius = 5;
-            } else if (numTicks > 20) {
-                Chart.defaults.global.elements.point.hitRadius = 10;
-            } else {
-                Chart.defaults.global.elements.point.hitRadius = 30;
-            }
+            $(function () {
+                // Attempt to fine-tune the pointer detection spacing based on how cluttered the chart is
+                var numTicks = {{ apiUsage.dateLabels|length|raw }};
+                if (numTicks > 50) {
+                    Chart.defaults.global.elements.point.hitRadius = 3;
+                } else if (numTicks > 30) {
+                    Chart.defaults.global.elements.point.hitRadius = 5;
+                } else if (numTicks > 20) {
+                    Chart.defaults.global.elements.point.hitRadius = 10;
+                } else {
+                    Chart.defaults.global.elements.point.hitRadius = 30;
+                }
 
-            var datasets = [];
-            {% for endpoint in endpointNames %}
+                var datasets = [];
+                {% for endpoint in endpointNames %}
                 var data = {{ apiUsage.timeline[endpoint]|json_encode|raw }};
                 datasets.push({
                     backgroundColor: 'rgba(0,0,0,0)',
@@ -280,40 +283,41 @@
                     pointBackgroundColor: '{{ chartColor(loop.index0) }}',
                     pointHoverRadius: 5
                 });
-            {% endfor %}
+                {% endfor %}
 
-            var ctx = document.getElementById('api_usage_chart');
-            window.apiLineChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: {{ apiUsage.dateLabels|json_encode|raw }},
-                    datasets: datasets
-                },
-                options: {
-                    legend: {
-                        display: false
+                var ctx = document.getElementById('api_usage_chart');
+                window.apiLineChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: {{ apiUsage.dateLabels|json_encode|raw }},
+                        datasets: datasets
                     },
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true
-                            }
-                        }]
-                    },
-                    tooltips: {
-                        mode: 'x-axis',
-                        callbacks: {
-                            label: function(tooltipItem) {
-                                var endpointName = datasets[tooltipItem.datasetIndex].label;
-                                return endpointName + ': ' + (new Number(tooltipItem.yLabel)).toLocaleString();
-                            }
+                    options: {
+                        legend: {
+                            display: false
                         },
-                        bodyFontSize: 14,
-                        bodySpacing: 7,
-                        caretSize: 0,
-                        titleFontSize: 14
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        },
+                        tooltips: {
+                            mode: 'x-axis',
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    var endpointName = datasets[tooltipItem.datasetIndex].label;
+                                    return endpointName + ': ' + (new Number(tooltipItem.yLabel)).toLocaleString();
+                                }
+                            },
+                            bodyFontSize: 14,
+                            bodySpacing: 7,
+                            caretSize: 0,
+                            titleFontSize: 14
+                        }
                     }
-                }
+                });
             });
         </script>
     </div>
