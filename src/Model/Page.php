@@ -17,8 +17,8 @@ class Page extends Model
     /** @var string The page name as provided at instantiation. */
     protected string $unnormalizedPageName;
 
-    /** @var string[] Metadata about this page. */
-    protected array $pageInfo;
+    /** @var string[]|null Metadata about this page. */
+    protected ?array $pageInfo;
 
     /** @var string[] Revision history of this page. */
     protected array $revisions;
