@@ -1,0 +1,444 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: XTools
+            description:
+                XTools features a rich API for much of the data available through the web interface.
+                Out of courtesy we ask you make requests synchronously – as in one full round trip – before making a
+                new request. Please leave an informative user agent in your request so we can contact you if we need to.
+
+
+                This documentation is supplemented by [on-wiki documentation](https://www.mediawiki.org/wiki/XTools/API)
+                that may contain more information on the endpoints described here. This API is not versioned.
+                Log any occurrences of the `warning` property in responses, which will announce deprecations and
+                future changes. Fatal errors are in the format specified by
+                [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807).
+
+
+                A note to researchers – You may first want to review the
+                [Action API](https://www.mediawiki.org/wiki/Special:MyLanguage/API:Main_page)
+                and [REST API](https://wikimedia.org/api/rest_v1/#/) to see if they meet your needs. They
+                will be considerably faster than XTools. If you need to do analysis on millions of pages, it may be
+                more suitable to write your own program that works off a [dump](https://dumps.wikimedia.org/).
+            version: '%env(APP_VERSION)%'
+        components:
+            parameters:
+                Project:
+                    in: path
+                    name: project
+                    required: true
+                    description: Project domain or database name.
+                    schema:
+                        type: string
+                        example: en.wikipedia.org
+                Group:
+                    in: path
+                    name: group
+                    required: true
+                    description: Which group of users to query for.
+                    schema:
+                        type: string
+                        enum:
+                            - admin
+                            - patroller
+                            - steward
+                        example: admin
+                Actions:
+                    in: query
+                    name: actions
+                    required: false
+                    description: Pipe-separated list of log actions to query for.
+                    schema:
+                        type: array
+                        items:
+                            type: string
+                        example:
+                            - delete
+                            - re-block
+                            - re-protect
+                    style: "pipeDelimited"
+                Namespace:
+                    in: path
+                    name: namespace
+                    required: true
+                    description:
+                        Namespace ID or `all` for all namespaces.
+                    schema:
+                        $ref: '#/components/schemas/Namespace'
+                Page:
+                    in: path
+                    name: page
+                    required: true
+                    description: Full page title.
+                    schema:
+                        type: string
+                        example: "Metallica"
+                PageWithoutNamespace:
+                    in: path
+                    name: page
+                    required: true
+                    description:
+                        Full page title, or title without the namespace if the `namespace` parameter is supplied.
+                Pages:
+                    in: path
+                    name: pages
+                    required: true
+                    description: Pipe-separated list of full page titles.
+                    schema:
+                        type: array
+                        items: "#/components/parameters/Page"
+                        example:
+                            - Metallica
+                            - Pantera
+                    style: "pipeDelimited"
+                Username:
+                    in: path
+                    name: username
+                    required: true
+                    description: "Username without the namespace prefix"
+                    schema:
+                        type: string
+                        example: "Jimbo Wales"
+                UsernameOrIp:
+                    in: path
+                    name: username
+                    required: true
+                    description: "Username, IP address or CIDR range."
+                    schema:
+                        type: string
+                        example: "Jimbo Wales"
+                UsernameOrSingleIp:
+                    in: path
+                    name: username
+                    required: true
+                    description: "Username or IPv4 or IPv6"
+                    schema:
+                        type: string
+                        example: "Jimbo Wales"
+                Start:
+                    in: path
+                    name: start
+                    required: true
+                    allowEmptyValue: true
+                    description:
+                        Start date in the format of `YYYY-MM-DD`
+                    schema:
+                        type: string
+                        format: date
+                        example: "2020-01-01"
+                End:
+                    in: path
+                    name: end
+                    required: true
+                    allowEmptyValue: true
+                    description:
+                        End date in the format of `YYYY-MM-DD`
+                    schema:
+                        type: string
+                        format: date
+                        example: "2020-01-31"
+                Limit:
+                    in: path
+                    name: limit
+                    required: true
+                    description:
+                        Number of results to return.
+                    schema:
+                        type: integer
+                        minimum: 1
+                        default: 20
+                        maximum: 5000
+                LimitQuery:
+                    in: query
+                    name: limit
+                    required: false
+                    description:
+                        Number of results to return.
+                    schema:
+                        type: integer
+                        minimum: 1
+                        default: 20
+                        maximum: 5000
+                Tools:
+                    in: path
+                    name: tools
+                    required: true
+                    description: Include tool counts in the response.
+                    schema:
+                        type: boolean
+                        default: false
+                Offset:
+                    in: path
+                    name: offset
+                    required: true
+                    allowEmptyValue: true
+                    description: Shows results before this timestamp.
+                    schema:
+                        type: string
+                        pattern: '|^\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}Z?$'
+                        default: ""
+                Redirects:
+                    in: path
+                    name: redirects
+                    required: true
+                    description: Whether to include or exclude redirects.
+                    schema:
+                        type: string
+                        enum:
+                            - noredirects
+                            - onlyredirects
+                            - all
+                        example: "noredirects"
+                Deleted:
+                    in: path
+                    name: deleted
+                    required: true
+                    description: Whether to include deleted pages.
+                    schema:
+                        type: string
+                        enum:
+                            - live
+                            - deleted
+                            - all
+                    example: "live"
+                Pagination:
+                    in: query
+                    name: pagination
+                    required: false
+                    description: Which page of results to show.
+                    schema:
+                        type: integer
+                        minimum: 0
+                        default: 0
+                Format:
+                    in: query
+                    name: format
+                    required: false
+                    description: Which format to get the results in.
+            schemas:
+                Namespace:
+                    type: string
+                    description: "Namespace ID or 'all' for all namespaces."
+                    pattern: 'all|\d+'
+                    example: "0"
+                    externalDocs:
+                        url: https://www.mediawiki.org/wiki/Special:MyLanguage/Help:Namespaces
+                Edit:
+                    properties:
+                        full_page_title:
+                            type: string
+                            example: Talk:Metallica
+                        page_title:
+                            type: string
+                            example: Metallica
+                        namespace:
+                            $ref: '#/components/schemas/Namespace'
+                        rev_id:
+                            type: integer
+                            example: 123
+                        timestamp:
+                            type: date-time
+                            example: 20200101125959
+                        minor:
+                            type: boolean
+                            example: 0
+                        length:
+                            type: integer
+                            description: Length of the page in bytes after this edit was made
+                            example: 1234
+                        length_change:
+                            type: integer
+                            description: Diff size
+                            example: -15
+                        comment:
+                            type: string
+                            description: Edit summary
+                            example: Example edit summary
+                        reverted:
+                            type: boolean
+                            description:
+                                Whether the edit has definitively been reverted.
+                                A `false` value or commission of the `reverted` property does not
+                                necessarily mean it wasn't reverted.
+                            example: true
+                EditWithProject:
+                    allOf:
+                        - properties:
+                            project:
+                                type: string
+                                example: en.wikipedia.org
+                        - $ref: '#/components/schemas/Edit'
+                Page:
+                    properties:
+                        namespace:
+                            $ref: '#/components/schemas/Namespace'
+                        page_title:
+                            type: string
+                            example: Metallica
+                        full_page_title:
+                            type: string
+                            description: Page title including the localized namespace.
+                            example: Talk:Metallica
+                        redirect:
+                            type: bool
+                            description: Whether the page is a [redirect](https://w.wiki/6rnW).
+                            example: false
+                        length:
+                            type: integer
+                            description: Current length of the page in bytes.
+                            example: 1234
+                        assessment:
+                            $ref: '#/components/schemas/PageAssessment'
+                PageCreation:
+                    allOf:
+                        - $ref: '#/components/schemas/Page'
+                        - properties:
+                            timestamp:
+                                type: date-time
+                                description: Timestamp of the initial revision
+                                example: 20200101125959
+                            rev_id:
+                                type: integer
+                                description: Revision ID (correlates to `archive.ar_rev_id` for deleted pages)
+                                example: 123
+                            rev_length:
+                                type: integer
+                                description: Length of the page in bytes as of the initial revision
+                                example: 100
+                            deleted:
+                                type: bool
+                                description: Indicates that the page has been deleted.
+                                example: true
+                            recreated:
+                                type: bool
+                                description: Indicates that a deleted page has since been recreated.
+                                example: true
+                PageAssessment:
+                    properties:
+                        class:
+                            type: string
+                            description: Page assessment classification level
+                            example: "FA"
+                        badge:
+                            type: string
+                            description: Full URL to the image 'badge' representing this classification level
+                            example: "https://upload.wikimedia.org/wikipedia/commons/b/bc/Featured_article_star.svg"
+                        color:
+                            type: string
+                            description: Color associated with the classification level
+                            example: "#9CBDFF"
+                        category:
+                            type: string
+                            description: Page title of the category for the classification level
+                            example: "Category:FA-Class articles"
+                    externalDocs:
+                        url: https://www.mediawiki.org/wiki/Special:MyLanguage/Extension:PageAssessments
+                PageAssessmentWikiProject:
+                    properties:
+                        wikiproject:
+                            type: string
+                            description: Name of the WikiProject
+                            example: New York City
+                        class:
+                            type: object
+                            properties:
+                                value:
+                                    $ref: '#/components/schemas/PageAssessment/properties/class'
+                                color:
+                                    $ref: '#/components/schemas/PageAssessment/properties/color'
+                                category:
+                                    $ref: '#/components/schemas/PageAssessment/properties/category'
+                                badge:
+                                    $ref: '#/components/schemas/PageAssessment/properties/badge'
+                        importance:
+                            type: object
+                            properties:
+                                value:
+                                    type: string
+                                    description: Page assessment importance level
+                                    example: "Top"
+                                color:
+                                    type: string
+                                    description: Color associated with the importance level
+                                    example: "#FF97FF"
+                                category:
+                                    type: string
+                                    description: Page title of the category for the importance level
+                                    example: "Category:Top-importance articles"
+                                weight:
+                                    type: integer
+                                    description:
+                                        Machine-readable representation of importance hierarchy.
+                                        `0` is of lowest or unknown importance, and typically (depending on the project)
+                                        `5` is of top importance.
+                AutomatedTools:
+                    type: object
+                    properties:
+                        Example tool:
+                            type: object
+                            properties:
+                                link:
+                                    type: string
+                                    description: The page title for the tool's documentation
+                                    example: Project:My_tool
+                                label:
+                                    type: string
+                                    description: Localized label
+                                    example: My tool
+                                count:
+                                    type: integer
+                                    description: Number of times the tool was used
+                                    example: 50
+                elapsed_time:
+                    type: number
+                    format: float
+                    example: 0.15
+            responses:
+                404:
+                    description:
+                        The requested user, page, or project does not exist.
+                    content:
+                        application/json:
+                            example:
+                                title: Not Found
+                                status: 404
+                                detail: The requested user does not exist
+                                project: fr.wikipedia.org
+                                username: Example
+                501:
+                    description:
+                        The requested user has made too many edits for XTools to handle.
+                        In the future, requests for such users may be permitted but require authentication.
+                    content:
+                        application/json:
+                            example:
+                                title: Not implemented
+                                status: 501
+                                detail: User has made too many edits! (Maximum 600000)
+                                username: Example
+                503:
+                    description:
+                        The XTools API is unavailable due to servicing too many other requests.
+                    content:
+                        application/json:
+                            example:
+                                title: Service Unavailable
+                                status: 503
+                                detail:
+                                    XTools is currently overloaded servicing other requests.
+                                    Please try again in a few minutes.
+                504:
+                    description:
+                        The queries ran to service the request took too long to complete and were automatically killed.
+                    content:
+                        application/json:
+                            example:
+                                title: Gateway Timeout
+                                status: 504
+                                detail:
+                                    Sorry, the requested information took too long to process (timeout 900
+                                    seconds). In order to save resources, the query was automatically killed.
+
+    areas: # to filter documented areas
+        path_patterns:
+            - ^/api(\.json$|\/)(?!project/parser)

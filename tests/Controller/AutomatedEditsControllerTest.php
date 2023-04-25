@@ -70,7 +70,7 @@ class AutomatedEditsControllerTest extends ControllerTestAdapter
 
         // Non-automated edits endpoint is tested in self::testNonautomatedEdits().
         $this->assertSuccessfulRoutes([
-            '/api/user/automated_tools/en.wikipedia',
+            '/api/project/automated_tools/en.wikipedia',
             '/api/user/automated_editcount/en.wikipedia/Example/1/2018-01-01/2018-02-01/2018-01-15T12:00:00',
             '/api/user/automated_edits/en.wikipedia/Example/1/2018-01-01/2018-02-01/2018-01-15T12:00:00',
         ]);

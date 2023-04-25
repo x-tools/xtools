@@ -52,15 +52,15 @@ class PagesRepository extends UserRepository
             $this->getUserConditions('' !== $start.$end)
         );
 
-        $sql = "SELECT namespace,
-                    COUNT(page_title) AS count,
-                    SUM(IF(type = 'arc', 1, 0)) AS deleted,
-                    SUM(page_is_redirect) AS redirects,
-                    SUM(length) AS total_length
+        $sql = "SELECT `namespace`,
+                    COUNT(page_title) AS `count`,
+                    SUM(IF(type = 'arc', 1, 0)) AS `deleted`,
+                    SUM(redirect) AS `redirects`,
+                    SUM(rev_length) AS `total_length`
                 FROM (" .
-                    $this->getPagesCreatedInnerSql($project, $conditions, $deleted, $start, $end, false, true)."
+            $this->getPagesCreatedInnerSql($project, $conditions, $redirects, $deleted, $start, $end, false, true)."
                 ) a ".
-                "GROUP BY namespace";
+                "GROUP BY `namespace`";
 
         $result = $this->executeQuery($sql, $project, $user, $namespace)
             ->fetchAllAssociative();
@@ -90,7 +90,7 @@ class PagesRepository extends UserRepository
         string $deleted,
         $start = false,
         $end = false,
-        $limit = 1000,
+        ?int $limit = 1000,
         $offset = false
     ): array {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_pages_created');
@@ -115,17 +115,16 @@ class PagesRepository extends UserRepository
 
         $hasPageAssessments = $this->isWMF && $project->hasPageAssessments();
         if ($hasPageAssessments) {
-            $conditions['paSelects'] = ', pa_class, pa_importance, pa_page_revision';
-            $conditions['paSelectsArchive'] = ', NULL AS pa_class, NULL AS pa_page_id, '.
-                'NULL AS pa_page_revision';
+            $conditions['paSelects'] = ', pa_class';
+            $conditions['paSelectsArchive'] = ', NULL AS pa_class';
             $conditions['paJoin'] = "LEFT JOIN $pageAssessmentsTable ON rev_page = pa_page_id";
             $conditions['revPageGroupBy'] = 'GROUP BY rev_page';
         }
 
         $sql = "SELECT * FROM (".
-                    $this->getPagesCreatedInnerSql($project, $conditions, $deleted, $start, $end, $offset)."
+            $this->getPagesCreatedInnerSql($project, $conditions, $redirects, $deleted, $start, $end, $offset)."
                 ) a ".
-                "ORDER BY rev_timestamp DESC
+                "ORDER BY `timestamp` DESC
                 ".(!empty($limit) ? "LIMIT $limit" : '');
 
         $result = $this->executeQuery($sql, $project, $user, $namespace)
@@ -170,6 +169,7 @@ class PagesRepository extends UserRepository
      * @param string[] $conditions Conditions for the SQL, must include 'paSelects',
      *     'paSelectsArchive', 'paJoin', 'whereRev', 'whereArc', 'namespaceRev', 'namespaceArc',
      *     'redirects' and 'revPageGroupBy'.
+     * @param string $redirects One of 'noredirects', 'onlyredirects' or blank for both.
      * @param string $deleted One of 'live', 'deleted' or blank for both.
      * @param int|false $start Start date as Unix timestamp.
      * @param int|false $end End date as Unix timestamp.
@@ -180,6 +180,7 @@ class PagesRepository extends UserRepository
     private function getPagesCreatedInnerSql(
         Project $project,
         array $conditions,
+        string $redirects,
         string $deleted,
         $start,
         $end,
@@ -193,9 +194,10 @@ class PagesRepository extends UserRepository
 
         // Only SELECT things that are needed, based on whether or not we're doing a COUNT.
         $revSelects = "DISTINCT page_namespace AS `namespace`, 'rev' AS `type`, page_title, "
-            . "page_is_redirect, rev_len AS length";
+            . "page_is_redirect AS `redirect`, rev_len AS `rev_length`";
         if (!$count) {
-            $revSelects .= ", page_len, rev_timestamp, rev_len, rev_id, NULL AS `recreated` ";
+            $revSelects .= ", page_len AS `length`, rev_timestamp AS `timestamp`, "
+                . "rev_id, NULL AS `recreated` ";
         }
 
         $revDateConditions = $this->getDateConditions($start, $end, $offset);
@@ -214,11 +216,11 @@ class PagesRepository extends UserRepository
             $conditions['revPageGroupBy'];
 
         // Only SELECT things that are needed, based on whether or not we're doing a COUNT.
-        $arSelects = "ar_namespace AS `namespace`, 'arc' AS `type`, ar_title AS page_title, "
-            . "'0' AS page_is_redirect, ar_len AS length";
-        if (false === $count) {
-            $arSelects .= ", NULL AS page_len, MIN(ar_timestamp) AS rev_timestamp, ".
-                "ar_len AS rev_len, ar_rev_id AS rev_id, EXISTS(
+        $arSelects = "ar_namespace AS `namespace`, 'arc' AS `type`, ar_title AS `page_title`, "
+            . "'0' AS `redirect`, ar_len AS `rev_length`";
+        if (!$count) {
+            $arSelects .= ", NULL AS `length`, MIN(ar_timestamp) AS `timestamp`, ".
+                "ar_rev_id AS `rev_id`, EXISTS(
                     SELECT 1 FROM $pageTable
                     WHERE page_namespace = ar_namespace
                     AND page_title = ar_title
@@ -238,9 +240,9 @@ class PagesRepository extends UserRepository
                 $arDateConditions
             GROUP BY ar_namespace, ar_title";
 
-        if ('live' == $deleted) {
+        if ('live' === $deleted || 'onlyredirects' === $redirects) {
             return $revisionsSelect;
-        } elseif ('deleted' == $deleted) {
+        } elseif ('deleted' === $deleted) {
             return $archiveSelect;
         }
 

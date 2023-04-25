@@ -148,7 +148,7 @@ class AutoEdits extends Model
 
     /**
      * Get non-automated contributions for this user.
-     * @param bool $raw Wether to return raw data from the database, or get Edit objects.
+     * @param bool $raw Whether to return raw data from the database, or get Edit objects.
      * @return string[]|Edit[]
      */
     public function getNonAutomatedEdits(bool $raw = false): array

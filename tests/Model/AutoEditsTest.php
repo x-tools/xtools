@@ -81,7 +81,7 @@ class AutoEditsTest extends TestAdapter
     {
         $rev = [
             'page_title' => 'Test_page',
-            'page_namespace' => '0',
+            'namespace' => '0',
             'rev_id' => '123',
             'timestamp' => '20170101000000',
             'minor' => '0',
@@ -100,7 +100,8 @@ class AutoEditsTest extends TestAdapter
 
         $page = Page::newFromRow($this->pageRepo, $this->project, [
             'page_title' => 'Test_page',
-            'page_namespace' => 0,
+            'namespace' => 0,
+            'length' => 5,
         ]);
         $edit = new Edit(
             $this->editRepo,
@@ -148,7 +149,7 @@ class AutoEditsTest extends TestAdapter
     {
         $rev = [
             'page_title' => 'Test_page',
-            'page_namespace' => '1',
+            'namespace' => '1',
             'rev_id' => '123',
             'timestamp' => '20170101000000',
             'minor' => '0',
@@ -167,7 +168,8 @@ class AutoEditsTest extends TestAdapter
 
         $page = Page::newFromRow($this->pageRepo, $this->project, [
             'page_title' => 'Test_page',
-            'page_namespace' => 1,
+            'namespace' => 1,
+            'length' => 5,
         ]);
         $edit = new Edit(
             $this->editRepo,

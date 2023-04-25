@@ -225,6 +225,19 @@ class AppExtensionTest extends TestAdapter
     }
 
     /**
+     * Getting a normalized page title with the namespace.
+     */
+    public function testTitleWithNs(): void
+    {
+        static::assertSame(
+            'User talk:Foo bar',
+            $this->appExtension->titleWithNs('Foo_bar', 3, [
+                3 => 'User talk',
+            ])
+        );
+    }
+
+    /**
      * Wikifying a string.
      */
     public function testWikify(): void

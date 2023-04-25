@@ -277,7 +277,7 @@ abstract class XtoolsController extends AbstractController
     {
         if ($this->request->isXmlHttpRequest() && !$this->isApi && !$this->isSubRequest) {
             throw new HttpException(
-                403,
+                Response::HTTP_FORBIDDEN,
                 $this->i18n->msg('error-automation', ['https://www.mediawiki.org/Special:MyLanguage/XTools/API'])
             );
         }
@@ -573,7 +573,8 @@ abstract class XtoolsController extends AbstractController
                 $this->i18n->msg('too-many-edits', [ $user->maxEdits() ]),
                 $this->generateUrl($this->tooHighEditCountRoute(), $this->params),
                 $originalParams,
-                $this->isApi
+                $this->isApi,
+                Response::HTTP_NOT_IMPLEMENTED
             );
         }
 
@@ -671,6 +672,7 @@ abstract class XtoolsController extends AbstractController
             'q',
             'include_pattern',
             'exclude_pattern',
+            'classonly',
 
             // Legacy parameters.
             'user',
@@ -904,22 +906,10 @@ abstract class XtoolsController extends AbstractController
             $this->params['username'] = $this->user->getUsername();
         }
 
-        $elapsedTime = round(
-            microtime(true) - $this->request->server->get('REQUEST_TIME_FLOAT'),
-            3
-        );
-
-        // Any pipe-separated values should be returned as an array.
-        foreach ($this->params as $param => $value) {
-            if (is_string($value) && false !== strpos($value, '|')) {
-                $this->params[$param] = explode('|', $value);
-            }
-        }
-
         $ret = array_merge($this->params, [
             // In some controllers, $this->params['project'] may be overridden with a Project object.
             'project' => $this->project->getDomain(),
-        ], $data, ['elapsed_time' => $elapsedTime]);
+        ], $data);
 
         // Merge in flash messages, putting them at the top.
         $flashes = $this->flashBag->peekAll();
@@ -928,9 +918,47 @@ abstract class XtoolsController extends AbstractController
         // Flashes now can be cleared after merging into the response.
         $this->flashBag->clear();
 
+        // Normalize path param values.
+        $ret = self::normalizeApiProperties($ret);
+
         $response->setData($ret);
 
         return $response;
+    }
+
+    /**
+     * Normalize the response data, adding in the elapsed_time.
+     * @param array $params
+     * @return array
+     */
+    public static function normalizeApiProperties(array $params): array
+    {
+        foreach ($params as $param => $value) {
+            if (false === $value) {
+                // False values must be empty params.
+                unset($params[$param]);
+            } elseif (is_string($value) && false !== strpos($value, '|')) {
+                // Any pipe-separated values should be returned as an array.
+                $params[$param] = explode('|', $value);
+            }
+        }
+
+        $elapsedTime = round(
+            microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'],
+            3
+        );
+        return array_merge($params, ['elapsed_time' => $elapsedTime]);
+    }
+
+    /**
+     * Parse a boolean value from the query string, treating 'false' and '0' as false.
+     * @param string $param
+     * @return bool
+     */
+    public function getBoolVal(string $param): bool
+    {
+        return isset($this->params[$param]) &&
+            !in_array($this->params[$param], ['false', '0']);
     }
 
     /**
@@ -945,11 +973,11 @@ abstract class XtoolsController extends AbstractController
      */
     public function addFullPageTitlesAndContinue(string $key, array $out, array $data): array
     {
-        // Add full_page_title (in addition to the existing page_title and page_namespace keys).
+        // Add full_page_title (in addition to the existing page_title and namespace keys).
         $out[$key] = array_map(function ($rev) {
             return array_merge([
                 'full_page_title' => $this->getPageFromNsAndTitle(
-                    (int)$rev['page_namespace'],
+                    (int)$rev['namespace'],
                     $rev['page_title'],
                     true
                 ),

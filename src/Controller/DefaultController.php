@@ -11,6 +11,7 @@ use MediaWiki\OAuthClient\ClientConfig;
 use MediaWiki\OAuthClient\Consumer;
 use MediaWiki\OAuthClient\Exception;
 use MediaWiki\OAuthClient\Token;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -183,8 +184,25 @@ class DefaultController extends XtoolsController
     /************************ API endpoints ************************/
 
     /**
-     * Get domain name, URL, and API URL of the given project.
-     * @Route("/api/project/normalize/{project}", name="ProjectApiNormalize")
+     * Get domain name, URL, API path and database name for the given project.
+     * @Route("/api/project/normalize/{project}", name="ProjectApiNormalize", methods={"GET"})
+     * @OA\Tag(name="Project API")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Response(
+     *     response=200,
+     *     description="The domain, URL, API path and database name.",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="domain", type="string", example="en.wikipedia.org"),
+     *         @OA\Property(property="url", type="string", example="https://en.wikipedia.org"),
+     *         @OA\Property(property="api", type="string", example="https://en.wikipedia.org/w/api.php"),
+     *         @OA\Property(property="database", type="string", example="enwiki"),
+     *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @return JsonResponse
      */
     public function normalizeProjectApiAction(): JsonResponse
@@ -198,9 +216,25 @@ class DefaultController extends XtoolsController
     }
 
     /**
-     * Get all namespaces of the given project. This endpoint also does the same thing
-     * as the /project/normalize endpoint, returning other basic info about the project.
-     * @Route("/api/project/namespaces/{project}", name="ProjectApiNamespaces")
+     * Get the localized names for each namespaces of the given project.
+     * @Route("/api/project/namespaces/{project}", name="ProjectApiNamespaces", methods={"GET"})
+     * @OA\Tag(name="Project API")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Response(
+     *     response=200,
+     *     description="List of localized namespaces keyed by their ID.",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="url", type="string", example="https://en.wikipedia.org"),
+     *         @OA\Property(property="api", type="string", example="https://en.wikipedia.org/w/api.php"),
+     *         @OA\Property(property="database", type="string", example="enwiki"),
+     *         @OA\Property(property="namespaces", type="object", example={"0": "", "3": "User talk"}),
+     *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @return JsonResponse
      */
     public function namespacesApiAction(): JsonResponse
@@ -215,8 +249,37 @@ class DefaultController extends XtoolsController
     }
 
     /**
-     * Get assessment data for a given project.
-     * @Route("/api/project/assessments/{project}", name="ProjectApiAssessments")
+     * Get page assessment metadata for a project.
+     * @Route("/api/project/assessments/{project}", name="ProjectApiAssessments", methods={"GET"})
+     * @OA\Tag(name="Project API")
+     * @OA\ExternalDocumentation(url="https://www.mediawiki.org/wiki/Special:MyLanguage/Extension:PageAssessments")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Response(
+     *     response=200,
+     *     description="List of classifications and importance levels, along with their associated colours and badges.",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="assessments", type="object", example={
+     *             "wikiproject_prefix": "Wikipedia:WikiProject ",
+     *             "class": {
+     *                 "FA": {
+     *                     "badge": "b/bc/Featured_article_star.svg",
+     *                     "color": "#9CBDFF",
+     *                     "category": "Category:FA-Class articles"
+     *                 }
+     *             },
+     *             "importance": {
+     *                 "Top": {
+     *                     "color": "#FF97FF",
+     *                     "category": "Category:Top-importance articles",
+     *                     "weight": 5
+     *                 }
+     *             }
+     *         }),
+     *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
      * @return JsonResponse
      */
     public function projectAssessmentsApiAction(): JsonResponse
@@ -228,8 +291,40 @@ class DefaultController extends XtoolsController
     }
 
     /**
-     * Get assessment data for all projects.
-     * @Route("/api/project/assessments", name="ApiAssessmentsConfig")
+     * Get assessment metadata for all projects.
+     * @Route("/api/project/assessments", name="ApiAssessmentsConfig", methods={"GET"})
+     * @OA\Tag(name="Project API")
+     * @OA\ExternalDocumentation(url="https://www.mediawiki.org/wiki/Special:MyLanguage/Extension:PageAssessments")
+     * @OA\Response(
+     *     response=200,
+     *     description="Page assessment metadata for all projects that have
+                <a href='https://w.wiki/6o9c'>PageAssessments</a> installed.",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="projects", type="array", @OA\Items(type="string"),
+     *              example={"en.wikipedia.org", "fr.wikipedia.org"}
+     *         ),
+     *         @OA\Property(property="config", type="object", example={
+     *             "en.wikipedia.org": {
+     *                 "wikiproject_prefix": "Wikipedia:WikiProject ",
+     *                 "class": {
+     *                     "FA": {
+     *                         "badge": "b/bc/Featured_article_star.svg",
+     *                         "color": "#9CBDFF",
+     *                         "category": "Category:FA-Class articles"
+     *                     }
+     *                 },
+     *                 "importance": {
+     *                     "Top": {
+     *                         "color": "#FF97FF",
+     *                         "category": "Category:Top-importance articles",
+     *                         "weight": 5
+     *                     }
+     *                 }
+     *             }
+     *         }),
+     *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
+     *     )
+     * )
      * @return JsonResponse
      */
     public function assessmentsConfigApiAction(): JsonResponse

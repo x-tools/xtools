@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Model\LargestPages;
 use App\Repository\LargestPagesRepository;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -97,14 +98,49 @@ class LargestPagesController extends XtoolsController
     /************************ API endpoints ************************/
 
     /**
-     * Get the largest pages on the requested project.
+     * Get the largest pages on a project.
      * @Route(
      *     "/api/project/largest_pages/{project}/{namespace}",
      *     name="ProjectApiLargestPages",
      *     defaults={
      *         "namespace"="all"
-     *     }
+     *     },
+     *     methods={"GET"}
      * )
+     * @OA\Tag(name="Project API")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/Namespace")
+     * @OA\Parameter(name="include_pattern", in="query", description="Include only titles that match this pattern.
+            Either a regular expression (starts/ends with a forward slash),
+            or a wildcard pattern with `%` as the wildcard symbol."
+     * )
+     * @OA\Parameter(name="exclude_pattern", in="query", description="Exclude titles that match this pattern.
+            Either a regular expression (starts/ends with a forward slash),
+            or a wildcard pattern with `%` as the wildcard symbol."
+     * )
+     * @OA\Response(
+     *     response=200,
+     *     description="List of largest pages for the project.",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="namespace", ref="#/components/parameters/Namespace/schema"),
+     *         @OA\Property(property="include_pattern", example="/Foo|Bar/"),
+     *         @OA\Property(property="exclude_pattern", example="%baz"),
+     *         @OA\Property(property="pages", type="array", @OA\Items(type="object"), example={{
+     *             "rank": 1,
+     *             "page_title": "Foo",
+     *             "length": 50000
+     *         }, {
+     *             "rank": 2,
+     *             "page_title": "Bar",
+     *             "length": 30000
+     *         }}),
+     *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @param LargestPagesRepository $largestPagesRepo
      * @return JsonResponse
      * @codeCoverageIgnore

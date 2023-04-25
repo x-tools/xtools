@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -152,7 +153,17 @@ class QuoteController extends XtoolsController
 
     /**
      * Get random quote.
-     * @Route("/api/quote/random", name="QuoteApiRandom")
+     * @Route("/api/quote/random", name="QuoteApiRandom", methods={"GET"})
+     * @OA\Tag(name="Quote API")
+     * @OA\Get(description="Get a random quote. The quotes are sourced from [developer quips](https://w.wiki/6rpo)
+           and [IRC quotes](https://meta.wikimedia.org/wiki/IRC/Quotes/archives).")
+     * @OA\Response(
+     *     response=200,
+     *     description="Quote keyed by ID.",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="<quote-id>", type="string")
+     *     )
+     * )
      * @return JsonResponse
      * @codeCoverageIgnore
      */
@@ -172,7 +183,17 @@ class QuoteController extends XtoolsController
 
     /**
      * Get all quotes.
-     * @Route("/api/quote/all", name="QuoteApiAll")
+     * @Route("/api/quote/all", name="QuoteApiAll", methods={"GET"})
+     * @OA\Tag(name="Quote API")
+     * @OA\Get(description="Get a list of all quotes, sourced from [developer quips](https://w.wiki/6rpo)
+           and [IRC quotes](https://meta.wikimedia.org/wiki/IRC/Quotes/archives).")
+     * @OA\Response(
+     *     response=200,
+     *     description="All quotes, keyed by ID.",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="<quote-id>", type="string")
+     *     )
+     * )
      * @return Response
      * @codeCoverageIgnore
      */
@@ -194,7 +215,17 @@ class QuoteController extends XtoolsController
 
     /**
      * Get the quote with the given ID.
-     * @Route("/api/quote/{id}", name="QuoteApiQuote", requirements={"id"="\d+"})
+     * @Route("/api/quote/{id}", name="QuoteApiQuote", requirements={"id"="\d+"}, methods={"GET"})
+     * @OA\Tag(name="Quote API")
+     * @OA\Get(description="Get a quote with the given ID.")
+     * @OA\Parameter(name="id", in="path", required="true", @OA\Schema(type="integer", minimum=0))
+     * @OA\Response(
+     *     response=200,
+     *     description="Quote keyed by ID.",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="<quote-id>", type="string")
+     *     )
+     * )
      * @param int $id
      * @return JsonResponse
      * @codeCoverageIgnore

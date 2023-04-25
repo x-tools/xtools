@@ -102,7 +102,6 @@ class PageAssessments extends Model
      * Get the single overall assessment of the given page.
      * @param Page $page
      * @return string[]|false With keys 'value' and 'badge', or false if assessments are unsupported.
-     * @todo Add option to get ORES prediction.
      */
     public function getAssessment(Page $page)
     {
@@ -125,7 +124,13 @@ class PageAssessments extends Model
      * @param Page $page
      * @return string[]|null null if unsupported, or array in the format of:
      *         [
-     *             'assessment' => 'C', // overall assessment
+     *             'assessment' => [
+     *                 // overall assessment
+     *                 'badge' => 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Featured_article_star.svg',
+     *                 'color' => '#9CBDFF',
+     *                 'category' => 'Category:FA-Class articles',
+     *                 'class' => 'FA',
+     *             ]
      *             'wikiprojects' => [
      *                 'Biography' => [
      *                     'assessment' => 'C',
@@ -146,11 +151,10 @@ class PageAssessments extends Model
         $config = $this->getConfig();
         $data = $this->repository->getAssessments($page);
 
-        // Set the default decorations for the overall quality assessment.
+        // Set the default decorations for the overall assessment.
         // This will be replaced with the first valid class defined for any WikiProject.
-        $overallQuality = $config['class']['Unknown'];
-        $overallQuality['value'] = '???';
-        $overallQuality['badge'] = $this->getBadgeURL($overallQuality['badge']);
+        $overallAssessment = array_merge(['class' => '???'], $config['class']['Unknown']);
+        $overallAssessment['badge'] = $this->getBadgeURL($overallAssessment['badge']);
 
         $decoratedAssessments = [];
 
@@ -159,8 +163,11 @@ class PageAssessments extends Model
         foreach ($data as $assessment) {
             $assessment['class'] = $this->getClassFromAssessment($assessment);
 
-            if ('???' === $overallQuality['value']) {
-                $overallQuality = $assessment['class'];
+            if ('???' === $overallAssessment['class'] && '???' !== $assessment['class']['value']) {
+                $overallAssessment['class'] = $assessment['class']['value'];
+                $overallAssessment['color'] = $assessment['class']['color'];
+                $overallAssessment['category'] = $assessment['class']['category'];
+                $overallAssessment['badge'] = $assessment['class']['badge'];
             }
 
             $assessment['importance'] = $this->getImportanceFromAssessment($assessment);
@@ -169,24 +176,23 @@ class PageAssessments extends Model
         }
 
         // Don't show 'Unknown' assessment outside of the mainspace.
-        if (0 !== $page->getNamespace() && '???' === $overallQuality['value']) {
+        if (0 !== $page->getNamespace() && '???' === $overallAssessment['value']) {
             return [];
         }
 
         return [
-            'assessment' => $overallQuality,
+            'assessment' => $overallAssessment,
             'wikiprojects' => $decoratedAssessments,
             'wikiproject_prefix' => $config['wikiproject_prefix'],
         ];
     }
 
     /**
-     * Get the class attributes for the given class value,
-     * as fetched from the config.
+     * Get the class attributes for the given class value, as fetched from the config.
      * @param string $classValue Such as 'FA', 'GA', 'Start', etc.
      * @return string[] Attributes as fetched from the XTools assessments config.
      */
-    private function getClassAttrs(string $classValue): array
+    public function getClassAttrs(string $classValue): array
     {
         return $this->getConfig()['class'][$classValue];
     }

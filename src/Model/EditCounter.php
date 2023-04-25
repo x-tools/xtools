@@ -887,7 +887,7 @@ class EditCounter extends Model
             }
 
             // Collate the counts by namespace, and then year and month.
-            $ns = $total['page_namespace'];
+            $ns = $total['namespace'];
             if (!isset($out['totals'][$ns])) {
                 $out['totals'][$ns] = [];
             }

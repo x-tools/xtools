@@ -421,16 +421,16 @@ class EditCounterRepository extends Repository
             $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
         }
 
-        $sql = "SELECT page_namespace, COUNT(rev_id) AS total
+        $sql = "SELECT page_namespace AS `namespace`, COUNT(rev_id) AS `total`
             FROM $pageTable p JOIN $revisionTable r ON (r.rev_page = p.page_id)
             $ipcJoin
             WHERE $whereClause
-            GROUP BY page_namespace";
+            GROUP BY `namespace`";
 
         $results = $this->executeProjectsQuery($project, $sql, $params)->fetchAll();
 
         $namespaceTotals = array_combine(array_map(function ($e) {
-            return $e['page_namespace'];
+            return $e['namespace'];
         }, $results), array_map(function ($e) {
             return (int)$e['total'];
         }, $results));
@@ -447,7 +447,7 @@ class EditCounterRepository extends Repository
      *                      [
      *                          'year' => <year>,
      *                          'month' => <month>,
-     *                          'page_namespace' => <namespace>,
+     *                          'namespace' => <namespace>,
      *                          'count' => <count>,
      *                      ],
      *                      ...
@@ -476,12 +476,12 @@ class EditCounterRepository extends Repository
         $sql = "
             SELECT YEAR(rev_timestamp) AS `year`,
                 MONTH(rev_timestamp) AS `month`,
-                page_namespace,
+                page_namespace AS `namespace`,
                 COUNT(rev_id) AS `count`
             FROM $revisionTable JOIN $pageTable ON (rev_page = page_id)
             $ipcJoin
             WHERE $whereClause
-            GROUP BY YEAR(rev_timestamp), MONTH(rev_timestamp), page_namespace";
+            GROUP BY YEAR(rev_timestamp), MONTH(rev_timestamp), `namespace`";
 
         $totals = $this->executeProjectsQuery($project, $sql, $params)->fetchAll();
 

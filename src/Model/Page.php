@@ -53,24 +53,24 @@ class Page extends Model
      * Get a Page instance given a database row (either from or JOINed on the page table).
      * @param PageRepository $repository
      * @param Project $project
-     * @param array $row Must contain 'page_title' and 'page_namespace'. May contain 'page_len'.
+     * @param array $row Must contain 'page_title' and 'namespace'. May contain 'length'.
      * @return static
      */
     public static function newFromRow(PageRepository $repository, Project $project, array $row): self
     {
         $pageTitle = $row['page_title'];
 
-        if (0 === (int)$row['page_namespace']) {
+        if (0 === (int)$row['namespace']) {
             $fullPageTitle = $pageTitle;
         } else {
             $namespaces = $project->getNamespaces();
-            $fullPageTitle = $namespaces[$row['page_namespace']].":$pageTitle";
+            $fullPageTitle = $namespaces[$row['namespace']].":$pageTitle";
         }
 
         $page = new self($repository, $project, $fullPageTitle);
-        $page->pageInfo['ns'] = $row['page_namespace'];
-        if (isset($row['page_len'])) {
-            $page->length = (int)$row['page_len'];
+        $page->pageInfo['ns'] = $row['namespace'];
+        if (isset($row['length'])) {
+            $page->length = (int)$row['length'];
         }
 
         return $page;

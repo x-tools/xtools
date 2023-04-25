@@ -1,5 +1,35 @@
 # Release Notes #
 
+## 3.18.0 ##
+- XTools API has been rewritten to conform to the OpenAPI Specification.
+  Changes are summarized here, but a more consumer-friendly summary can be
+  found on the wiki at https://w.wiki/6sMx
+- AdminStats: show warnings when requesting unsupported actions.
+- AdminStats: `/project/admins_groups` and `/project/users_groups` endpoints
+  have been removed. Use `/project/{group}_groups` instead.
+- ArticleInfo: `/articleinfo` endpoint removed. Use `/page/articleinfo` instead.
+- ArticleInfo: `/page/assessments/{project}/{pages}` endpoint now has results
+  nested under the `pages` property.
+- ArticleInfo: `/page/automated_edits` endpoint now returns results under the
+  `automated_tools` key instead of `auto_edits`, for consistency with other
+  similar endpoints.
+- AutoEdits: `/user/automated_tools` endpoint removed. Use `/project/automated_tools`
+  instead.
+- AutoEdits: the `/project/automated_tools` endpoint now has results nested under
+  the `tools` property.
+- Pages: the `/user/pages_count` endpoint now always groups results by namespace,
+  even if a specific namespace is provided.
+- Pages: the `/user/pages` endpoint now has a completely new response format.
+  See https://w.wiki/6sMx for details.
+- TopEdits: the `/user/top_edits` endpoint now has a completely different response
+  format. See https://w.wiki/6sMx for details.
+- XtoolsController: requests denied because the requested user made too many edits
+  now returns a 501 (Not Implemented) response code. In the future, some data will
+  be provided.
+- XtoolsController: Normalize format of all API responses.
+- ExceptionListener: all fatal exceptions now follow the format specified by
+  [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807).
+
 ## 3.17.12 ##
 - ArticleInfo: Correct the name of the `ip_edits` property in the ArticleInfo
   API response.

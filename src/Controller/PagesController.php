@@ -8,6 +8,7 @@ use App\Model\Pages;
 use App\Model\Project;
 use App\Repository\PagesRepository;
 use GuzzleHttp\Exception\ClientException;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -278,8 +279,7 @@ class PagesController extends XtoolsController
     /************************ API endpoints ************************/
 
     /**
-     * Get a count of the number of pages created by a user,
-     * including the number that have been deleted and are redirects.
+     * Count the number of pages created by a user.
      * @Route(
      *     "/api/user/pages_count/{project}/{username}/{namespace}/{redirects}/{deleted}/{start}/{end}",
      *     name="UserApiPagesCount",
@@ -297,8 +297,48 @@ class PagesController extends XtoolsController
      *         "deleted"="all",
      *         "start"=false,
      *         "end"=false,
-     *     }
+     *     },
+     *     methods={"GET"}
      * )
+     * @OA\Tag(name="User API")
+     * @OA\Get(description="Get the number of pages created by a user, keyed by namespace.")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/UsernameOrSingleIp")
+     * @OA\Parameter(ref="#/components/parameters/Namespace")
+     * @OA\Parameter(ref="#/components/parameters/Redirects")
+     * @OA\Parameter(ref="#/components/parameters/Deleted")
+     * @OA\Parameter(ref="#/components/parameters/Start")
+     * @OA\Parameter(ref="#/components/parameters/End")
+     * @OA\Response(
+     *     response=200,
+     *     description="Page counts",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="username", ref="#/components/parameters/UsernameOrSingleIp/schema"),
+     *         @OA\Property(property="namespace", ref="#/components/schemas/Namespace"),
+     *         @OA\Property(property="redirects", ref="#/components/parameters/Redirects/schema"),
+     *         @OA\Property(property="deleted", ref="#components/parameters/Deleted/schema"),
+     *         @OA\Property(property="start", ref="#components/parameters/start/schema"),
+     *         @OA\Property(property="end", ref="#components/parameters/end/schema"),
+     *         @OA\Property(property="counts", type="object", example={
+     *             "0": {
+     *                 "count": 5,
+     *                 "total_length": 500,
+     *                 "avg_length": 100
+     *             },
+     *             "2": {
+     *                 "count": 1,
+     *                 "total_length": 200,
+     *                 "avg_length": 200
+     *             }
+     *         }),
+     *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=501, ref="#/components/responses/501")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @param PagesRepository $pagesRepo
      * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
      * @param string $deleted One of 'live', 'deleted' or 'all' for both.
@@ -314,15 +354,6 @@ class PagesController extends XtoolsController
 
         $pages = $this->setUpPages($pagesRepo, $redirects, $deleted);
         $counts = $pages->getCounts();
-
-        if ('all' !== $this->namespace && isset($counts[$this->namespace])) {
-            $counts = $counts[$this->namespace];
-            $this->addFlash(
-                'warning',
-                'This API endpoint will soon always group results by namespace, even if a specific namespace ' .
-                'was provided. See https://w.wiki/6sMx for more information.'
-            );
-        }
 
         return $this->getFormattedApiResponse(['counts' => (object)$counts]);
     }
@@ -348,8 +379,43 @@ class PagesController extends XtoolsController
      *         "start"=false,
      *         "end"=false,
      *         "offset"=false,
-     *     }
+     *     },
+     *     methods={"GET"}
      * )
+     * @OA\Tag(name="User API")
+     * @OA\Get(description="Get pages created by a user, keyed by namespace.")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/UsernameOrSingleIp")
+     * @OA\Parameter(ref="#/components/parameters/Namespace")
+     * @OA\Parameter(ref="#/components/parameters/Redirects")
+     * @OA\Parameter(ref="#/components/parameters/Deleted")
+     * @OA\Parameter(ref="#/components/parameters/Start")
+     * @OA\Parameter(ref="#/components/parameters/End")
+     * @OA\Parameter(ref="#/components/parameters/Offset")
+     * @OA\Parameter(name="format", in="query",
+     *     @OA\Schema(default="json", type="string", enum={"json","wikitext","pagepile","csv","tsv"})
+     * )
+     * @OA\Response(
+     *     response=200,
+     *     description="Pages created",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="username", ref="#/components/parameters/UsernameOrSingleIp/schema"),
+     *         @OA\Property(property="namespace", ref="#/components/schemas/Namespace"),
+     *         @OA\Property(property="redirects", ref="#/components/parameters/Redirects/schema"),
+     *         @OA\Property(property="deleted", ref="#components/parameters/Deleted/schema"),
+     *         @OA\Property(property="start", ref="#components/parameters/Start/schema"),
+     *         @OA\Property(property="end", ref="#components/parameters/End/schema"),
+     *         @OA\Property(property="pages", type="object",
+     *             @OA\Property(property="namespace ID", ref="#/components/schemas/PageCreation")
+     *         ),
+     *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=501, ref="#/components/responses/501")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @param PagesRepository $pagesRepo
      * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
      * @param string $deleted One of 'live', 'deleted' or blank for both.
@@ -363,22 +429,8 @@ class PagesController extends XtoolsController
     ): JsonResponse {
         $this->recordApiUsage('user/pages');
 
-        $this->addFlash(
-            'warning',
-            'This API endpoint will soon have a different response format. ' .
-            'See https://w.wiki/6sMx for more information.'
-        );
-
         $pages = $this->setUpPages($pagesRepo, $redirects, $deleted);
-        $pagesList = $pages->getResults();
-
-        if ('all' !== $this->namespace && isset($pagesList[$this->namespace])) {
-            $pagesList = $pagesList[$this->namespace];
-        }
-
-        $ret = [
-            'pages' => (object)$pagesList,
-        ];
+        $ret = ['pages' => $pages->getResults()];
 
         if ($pages->getNumResults() === $pages->resultsPerPage()) {
             $ret['continue'] = $pages->getLastTimestamp();

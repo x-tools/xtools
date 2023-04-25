@@ -4,13 +4,18 @@ declare(strict_types = 1);
 
 namespace App\EventSubscriber;
 
+use App\Controller\XtoolsController;
 use App\Exception\XtoolsHttpException;
+use App\Helper\I18nHelper;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Serializer\Normalizer\ProblemNormalizer;
 use Throwable;
 use Twig\Environment;
 use Twig\Error\RuntimeError;
@@ -22,6 +27,8 @@ use Twig\Error\RuntimeError;
 class ExceptionListener
 {
     protected Environment $templateEngine;
+    protected FlashBagInterface $flashBag;
+    protected I18nHelper $i18n;
     protected LoggerInterface $logger;
 
     /** @var string The environment. */
@@ -31,12 +38,21 @@ class ExceptionListener
      * Constructor for the ExceptionListener.
      * @param Environment $templateEngine
      * @param LoggerInterface $logger
+     * @param FlashBagInterface $flashBag
+     * @param I18nHelper $i18n
      * @param string $environment
      */
-    public function __construct(Environment $templateEngine, LoggerInterface $logger, string $environment = 'prod')
-    {
+    public function __construct(
+        Environment $templateEngine,
+        LoggerInterface $logger,
+        FlashBagInterface $flashBag,
+        I18nHelper $i18n,
+        string $environment = 'prod'
+    ) {
         $this->templateEngine = $templateEngine;
         $this->logger = $logger;
+        $this->flashBag = $flashBag;
+        $this->i18n = $i18n;
         $this->environment = $environment;
     }
 
@@ -52,7 +68,9 @@ class ExceptionListener
         // We only care about the previous (original) exception, not the one Twig put on top of it.
         $prevException = $exception->getPrevious();
 
-        if ($exception instanceof XtoolsHttpException) {
+        $isApi = '/api/' === substr($event->getRequest()->getRequestUri(), 0, 5);
+
+        if ($exception instanceof XtoolsHttpException && !$isApi) {
             $response = $this->getXtoolsHttpResponse($exception);
         } elseif ($exception instanceof RuntimeError && null !== $prevException) {
             $response = $this->getTwigErrorResponse($prevException);
@@ -64,6 +82,17 @@ class ExceptionListener
                     'status_text' => 'Forbidden',
                     'exception' => $exception,
                 ])
+            );
+        } elseif ($isApi && 'json' === $event->getRequest()->get('format', 'json')) {
+            $normalizer = new ProblemNormalizer('prod' !== $this->environment);
+            $params = array_merge(
+                $normalizer->normalize(FlattenException::createFromThrowable($exception)),
+                $event->getRequest()->attributes->get('_route_params') ?? [],
+            );
+            $params['title'] = $params['detail'];
+            $params['detail'] = $this->i18n->msgIfExists($exception->getMessage(), [$exception->getCode()]);
+            $response = new JsonResponse(
+                XtoolsController::normalizeApiProperties($params)
             );
         } else {
             return;
@@ -82,8 +111,11 @@ class ExceptionListener
     private function getXtoolsHttpResponse(XtoolsHttpException $exception)
     {
         if ($exception->isApi()) {
+            $this->flashBag->add('error', $exception->getMessage());
+            $flashes = $this->flashBag->peekAll();
+            $this->flashBag->clear();
             return new JsonResponse(array_merge(
-                ['error' => $exception->getMessage()],
+                array_merge($flashes, FlattenException::createFromThrowable($exception)->toArray()),
                 $exception->getParams()
             ), $exception->getStatusCode());
         }

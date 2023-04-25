@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Exception\XtoolsHttpException;
 use App\Model\CategoryEdits;
 use App\Repository\CategoryEditsRepository;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -185,7 +186,7 @@ class CategoryEditsController extends XtoolsController
     /************************ API endpoints ************************/
 
     /**
-     * Count the number of category edits the given user has made.
+     * Count the number of edits a user has made in a category.
      * @Route(
      *   "/api/user/category_editcount/{project}/{username}/{categories}/{start}/{end}",
      *   name="UserApiCategoryEditCount",
@@ -195,8 +196,41 @@ class CategoryEditsController extends XtoolsController
      *       "start" = "|\d{4}-\d{2}-\d{2}",
      *       "end" = "|\d{4}-\d{2}-\d{2}"
      *   },
-     *   defaults={"start" = false, "end" = false}
+     *   defaults={"start" = false, "end" = false},
+     *   methods={"GET"}
      * )
+     * @OA\Tag(name="User API")
+     * @OA\Get(description="Count the number of edits a user has made to pages in
+            any of the given [categories](https://w.wiki/6oKx).")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/UsernameOrIp")
+     * @OA\Parameter(
+     *     name="categories",
+     *     in="path",
+     *     description="Pipe-separated list of category names, without the namespace prefix.",
+     *     style="pipeDelimited",
+     *     @OA\Schema(type="array", @OA\Items(type="string"), example={"Living people"})
+     * )
+     * @OA\Parameter(ref="#/components/parameters/Start")
+     * @OA\Parameter(ref="#/components/parameters/End")
+     * @OA\Response(
+     *     response=200,
+     *     description="Count of edits made to any of the given categories.",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="username", ref="#/components/parameters/UsernameOrIp/schema"),
+     *         @OA\Property(property="categories", type="array", @OA\Items(type="string"), example={"Living people"}),
+     *         @OA\Property(property="start", ref="#/components/parameters/Start/schema"),
+     *         @OA\Property(property="end", ref="#/components/parameters/End/schema"),
+     *         @OA\Property(property="total_editcount", type="integer"),
+     *         @OA\Property(property="category_editcount", type="integer"),
+     *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=501, ref="#/components/responses/501")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @param CategoryEditsRepository $categoryEditsRepo
      * @return JsonResponse
      * @codeCoverageIgnore

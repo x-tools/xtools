@@ -173,7 +173,7 @@ class CategoryEditsRepository extends Repository
      * @param int|false $start Start date as Unix timestamp.
      * @param int|false $end End date as Unix timestamp.
      * @param false|int $offset Unix timestamp. Used for pagination.
-     * @return string[] Result of query, with columns 'page_title', 'page_namespace', 'rev_id', 'timestamp', 'minor',
+     * @return string[] Result of query, with columns 'page_title', 'namespace', 'rev_id', 'timestamp', 'minor',
      *   'length', 'length_change', 'comment'
      */
     public function getCategoryEdits(
@@ -203,9 +203,9 @@ class CategoryEditsRepository extends Repository
             $whereClause = 'ipc_hex BETWEEN ? AND ?';
         }
 
-        $sql = "SELECT page_title, page_namespace, revs.rev_id AS rev_id, revs.rev_timestamp AS timestamp,
-                    revs.rev_minor_edit AS minor, revs.rev_len AS length,
-                    (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
+        $sql = "SELECT page_title, page_namespace AS `namespace`, revs.rev_id AS `rev_id`,
+                    revs.rev_timestamp AS `timestamp`, revs.rev_minor_edit AS `minor`, revs.rev_len AS `length`,
+                    (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS `length_change`,
                     comment_text AS `comment`
                 FROM $pageTable
                 JOIN $revisionTable revs ON page_id = revs.rev_page
@@ -271,7 +271,7 @@ class CategoryEditsRepository extends Repository
      * Get Edits given revision rows (JOINed on the page table).
      * @param Project $project
      * @param User $user
-     * @param array $revs Each must contain 'page_title' and 'page_namespace'.
+     * @param array $revs Each must contain 'page_title' and 'namespace'.
      * @return Edit[]
      */
     public function getEditsFromRevs(Project $project, User $user, array $revs): array

@@ -423,7 +423,7 @@ abstract class Repository
             throw new ServiceUnavailableHttpException(30, 'error-service-overload', null, 503);
         } elseif (in_array($e->getErrorCode(), [1969, 2006, 2013])) {
             // FIXME: Attempt to reestablish connection on 2006 error (MySQL server has gone away).
-            throw new HttpException(504, 'error-query-timeout', null, [], $timeout);
+            throw new HttpException(Response::HTTP_GATEWAY_TIMEOUT, 'error-query-timeout', null, [], $timeout);
         } else {
             throw $e;
         }

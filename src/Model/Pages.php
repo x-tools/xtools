@@ -247,7 +247,7 @@ class Pages extends Model
             $counts[$ns] = [
                 'count' => $count,
                 'total_length' => $totalLength,
-                'avg_length' => $count > 0 ? $totalLength / $count : 0,
+                'avg_length' => round($count > 0 ? $totalLength / $count : 0, 1),
             ];
             if ('live' !== $this->deleted) {
                 $counts[$ns]['deleted'] = (int)$row['deleted'];
@@ -278,10 +278,10 @@ class Pages extends Model
             $counts = [];
             foreach ($this->pages as $nsPages) {
                 foreach ($nsPages as $page) {
-                    if (!isset($counts[$page['pa_class']])) {
-                        $counts[$page['pa_class']] = 1;
+                    if (!isset($counts[$page['assessment']['class'] ?? 'Unknown'])) {
+                        $counts[$page['assessment']['class'] ?? 'Unknown'] = 1;
                     } else {
-                        $counts[$page['pa_class']]++;
+                        $counts[$page['assessment']['class'] ?? 'Unknown']++;
                     }
                 }
             }
@@ -350,7 +350,7 @@ class Pages extends Model
     }
 
     /**
-     * Format the data, adding humanized timestamps, page titles, assessment badges,
+     * Format the data, adding page titles, assessment badges,
      * and sorting by namespace and then timestamp.
      * @param array $pages As returned by self::fetchPagesCreated()
      * @return array
@@ -360,22 +360,40 @@ class Pages extends Model
         $results = [];
 
         foreach ($pages as $row) {
-            $datetime = DateTime::createFromFormat('YmdHis', $row['rev_timestamp']);
-            $datetimeHuman = $datetime->format('Y-m-d H:i');
+            $fullPageTitle = $row['namespace'] > 0
+                ? $this->project->getNamespaces()[$row['namespace']].':'.$row['page_title']
+                : $row['page_title'];
+            $pageData = [
+                'deleted' => 'arc' === $row['type'],
+                'namespace' => $row['namespace'],
+                'page_title' => $row['page_title'],
+                'full_page_title' => $fullPageTitle,
+                'redirect' => (bool)$row['redirect'],
+                'timestamp' => $row['timestamp'],
+                'rev_id' => $row['rev_id'],
+                'rev_length' => $row['rev_length'],
+                'length' => $row['length'],
+            ];
 
-            $pageData = array_merge($row, [
-                'raw_time' => $row['rev_timestamp'],
-                'human_time' => $datetimeHuman,
-                'page_title' => str_replace('_', ' ', $row['page_title']),
-            ]);
+            if ($row['recreated']) {
+                $pageData['recreated'] = (bool)$row['recreated'];
+            } else {
+                // This is always NULL for live pages, in which case 'recreated' doesn't apply.
+                unset($pageData['recreated']);
+            }
 
             if ($this->project->hasPageAssessments()) {
-                $pageData['badge'] = $this->project
+                $attrs = $this->project
                     ->getPageAssessments()
-                    ->getBadgeURL($pageData['pa_class']);
-                $pageData['badge_file'] = $this->project
-                    ->getPageAssessments()
-                    ->getBadgeURL($pageData['pa_class'], true);
+                    ->getClassAttrs($row['pa_class'] ?: 'Unknown');
+                $pageData['assessment'] = [
+                    'class' => $row['pa_class'] ?: 'Unknown',
+                    'badge' => $this->project
+                        ->getPageAssessments()
+                        ->getBadgeURL($row['pa_class'] ?: 'Unknown'),
+                    'color' => $attrs['color'],
+                    'category' => $attrs['category'],
+                ];
             }
 
             $results[$row['namespace']][] = $pageData;

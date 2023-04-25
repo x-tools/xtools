@@ -74,7 +74,7 @@ class LargestPagesRepository extends Repository
      *   or a wildcard pattern with % as the wildcard symbol.
      * @param string $excludePattern Either regular expression (starts/ends with forward slash),
      *   or a wildcard pattern with % as the wildcard symbol.
-     * @return array Results with keys 'page_namespace', 'page_title', 'page_len' and 'pa_class'
+     * @return array
      */
     public function getData(Project $project, $namespace, string $includePattern, string $excludePattern): array
     {
@@ -93,7 +93,7 @@ class LargestPagesRepository extends Repository
             $where = 'WHERE ';
         }
 
-        $sql = "SELECT page_namespace, page_title, page_len
+        $sql = "SELECT page_namespace AS `namespace`, page_title, page_len AS `length`
                 FROM $pageTable
                 $where $namespaceCond
                 $likeCond

@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Helper\AutomatedEditsHelper;
 use App\Model\TopEdits;
 use App\Repository\TopEditsRepository;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -183,7 +184,7 @@ class TopEditsController extends XtoolsController
     /************************ API endpoints ************************/
 
     /**
-     * List top edits by this user for all pages in a particular namespace.
+     * Get the most-edited pages by a user.
      * @Route("/api/user/top_edits/{project}/{username}/{namespace}/{start}/{end}",
      *     name="UserApiTopEditsNamespace",
      *     requirements={
@@ -192,8 +193,43 @@ class TopEditsController extends XtoolsController
      *         "start"="|\d{4}-\d{2}-\d{2}",
      *         "end"="|\d{4}-\d{2}-\d{2}",
      *     },
-     *     defaults={"namespace"="all", "start"=false, "end"=false}
+     *     defaults={"namespace"="all", "start"=false, "end"=false},
+     *     methods={"GET"}
      * )
+     * @OA\Tag(name="User API")
+     * @OA\Get(description="List the most-edited pages by a user in one or all namespaces.")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/UsernameOrIp")
+     * @OA\Parameter(ref="#/components/parameters/Namespace")
+     * @OA\Parameter(ref="#/components/parameters/Start")
+     * @OA\Parameter(ref="#/components/parameters/End")
+     * @OA\Parameter(ref="#/components/parameters/Pagination")
+     * @OA\Response(
+     *     response=200,
+     *     description="Most-edited pages, keyed by namespace.",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="username", ref="#/components/parameters/UsernameOrIp/schema"),
+     *         @OA\Property(property="namespace", ref="#/components/schemas/Namespace"),
+     *         @OA\Property(property="start", ref="#/components/parameters/Start/schema"),
+     *         @OA\Property(property="end", ref="#/components/parameters/End/schema"),
+     *         @OA\Property(property="top_edits", type="object",
+     *             @OA\Property(property="namespace ID",
+     *                 @OA\Property(property="namespace", ref="#/components/schemas/Namespace"),
+     *                 @OA\Property(property="page_title", ref="#/components/schemas/Page/properties/page_title"),
+     *                 @OA\Property(property="full_page_title",
+     *                     ref="#/components/schemas/Page/properties/full_page_title"),
+     *                 @OA\Property(property="redirect", ref="#/components/schemas/Page/properties/redirect"),
+     *                 @OA\Property(property="count", type="integer"),
+     *                 @OA\Property(property="assessment", ref="#/components/schemas/PageAssessment")
+     *             )
+     *         )
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=501, ref="#/components/responses/501")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @param TopEditsRepository $topEditsRepo
      * @param AutomatedEditsHelper $autoEditsHelper
      * @return JsonResponse
@@ -214,7 +250,7 @@ class TopEditsController extends XtoolsController
     }
 
     /**
-     * Get the all edits of a user to a specific page, maximum 1000.
+     * Get the all edits made by a user to a specific page.
      * @Route("/api/user/top_edits/{project}/{username}/{namespace}/{page}/{start}/{end}",
      *     name="UserApiTopEditsPage",
      *     requirements = {
@@ -224,8 +260,44 @@ class TopEditsController extends XtoolsController
      *         "start"="|\d{4}-\d{2}-\d{2}",
      *         "end"="|\d{4}-\d{2}-\d{2}",
      *     },
-     *     defaults={"namespace"="all", "start"=false, "end"=false}
+     *     defaults={"namespace"="all", "start"=false, "end"=false},
+     *     methods={"GET"}
      * )
+     * @OA\Tag(name="User API")
+     * @OA\Get(description="Get all edits made by a user to a specific page.")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/UsernameOrIp")
+     * @OA\Parameter(ref="#/components/parameters/Namespace")
+     * @OA\Parameter(ref="#/components/parameters/PageWithoutNamespace")
+     * @OA\Parameter(ref="#/components/parameters/Start")
+     * @OA\Parameter(ref="#/components/parameters/End")
+     * @OA\Parameter(ref="#/components/parameters/Pagination")
+     * @OA\Response(
+     *     response=200,
+     *     description="Edits to the page",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="username", ref="#/components/parameters/UsernameOrIp/schema"),
+     *         @OA\Property(property="namespace", ref="#/components/schemas/Namespace"),
+     *         @OA\Property(property="start", ref="#/components/parameters/Start/schema"),
+     *         @OA\Property(property="end", ref="#/components/parameters/End/schema"),
+     *         @OA\Property(property="top_edits", type="object",
+     *             @OA\Property(property="namespace ID",
+     *                 @OA\Property(property="namespace", ref="#/components/schemas/Namespace"),
+     *                 @OA\Property(property="page_title", ref="#/components/schemas/Page/properties/page_title"),
+     *                 @OA\Property(property="full_page_title",
+     *                     ref="#/components/schemas/Page/properties/full_page_title"),
+     *                 @OA\Property(property="redirect", ref="#/components/schemas/Page/properties/redirect"),
+     *                 @OA\Property(property="count", type="integer"),
+     *                 @OA\Property(property="assessment", ref="#/components/schemas/PageAssessment")
+     *             )
+     *         )
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=501, ref="#/components/responses/501")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @param TopEditsRepository $topEditsRepo
      * @param AutomatedEditsHelper $autoEditsHelper
      * @return JsonResponse
@@ -237,12 +309,6 @@ class TopEditsController extends XtoolsController
         AutomatedEditsHelper $autoEditsHelper
     ): JsonResponse {
         $this->recordApiUsage('user/topedits');
-
-        $this->addFlash(
-            'warning',
-            'This API endpoint will soon have a different response format. ' .
-            'See https://w.wiki/6sMx for more information.'
-        );
 
         $topEdits = $this->setUpTopEdits($topEditsRepo, $autoEditsHelper);
         $topEdits->prepareData(false);

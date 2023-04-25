@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Helper\I18nHelper;
 use App\Model\EditSummary;
 use App\Repository\EditSummaryRepository;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -95,7 +96,7 @@ class EditSummaryController extends XtoolsController
     /************************ API endpoints ************************/
 
     /**
-     * Get basic stats on the edit summary usage of a user.
+     * Get statistics on how many times a user has used edit summaries.
      * @Route(
      *     "/api/user/edit_summaries/{project}/{username}/{namespace}/{start}/{end}", name="UserApiEditSummaries",
      *     requirements={
@@ -104,8 +105,44 @@ class EditSummaryController extends XtoolsController
      *         "start"="|\d{4}-\d{2}-\d{2}",
      *         "end"="|\d{4}-\d{2}-\d{2}",
      *     },
-     *     defaults={"namespace"="all", "start"=false, "end"=false}
+     *     defaults={"namespace"="all", "start"=false, "end"=false},
+     *     methods={"GET"}
      * )
+     * @OA\Tag(name="User API")
+     * @OA\Get(description="Get edit summage usage statistics for the user, with a month-by-month breakdown.")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/UsernameOrIp")
+     * @OA\Parameter(ref="#/components/parameters/Namespace")
+     * @OA\Parameter(ref="#/components/parameters/Start")
+     * @OA\Parameter(ref="#/components/parameters/End")
+     * @OA\Response(
+     *     response=200,
+     *     description="Edit summary usage statistics",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="username", ref="#/components/parameters/UsernameOrIp/schema"),
+     *         @OA\Property(property="namespace", ref="#/components/schemas/Namespace"),
+     *         @OA\Property(property="start", ref="#/components/parameters/Start/schema"),
+     *         @OA\Property(property="end", ref="#/components/parameters/End/schema"),
+     *         @OA\Property(property="recent_edits_minor", type="integer",
+     *             description="Number of minor edits within the last 150 edits"),
+     *         @OA\Property(property="recent_edits_major", type="integer",
+     *             description="Number of non-minor edits within the last 150 edits"),
+     *         @OA\Property(property="total_edits_minor", type="integer",
+     *             description="Total number of minor edits"),
+     *         @OA\Property(property="total_edits_major", type="integer",
+     *             description="Total number of non-minor edits"),
+     *         @OA\Property(property="total_edits", type="integer", description="Total number of edits"),
+     *         @OA\Property(property="recent_summaries_minor", type="integer",
+     *             description="Number of minor edits with summaries within the last 150 edits"),
+     *         @OA\Property(property="recent_summaries_major", type="integer",
+     *             description="Number of non-minor edits with summaries within the last 150 edits"),
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=501, ref="#/components/responses/501")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @param EditSummaryRepository $editSummaryRepo
      * @param I18nHelper $i18n
      * @return JsonResponse

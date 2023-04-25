@@ -1,0 +1,15 @@
+{% extends '@!NelmioApiDoc/SwaggerUi/index.html.twig' %}
+
+{% block swagger_initialization %}
+    <script type="text/javascript">
+        window.onload = loadSwaggerUI({
+            deepLinking: true,
+        });
+    </script>
+{% endblock %}
+
+{% block header %}
+    <a style="text-decoration: none;" id="logo" href="/">
+        <img src="{{ asset('/build/images/logo.svg') }}" alt="Logo" />
+    </a>
+{% endblock %}

@@ -8,6 +8,7 @@ use App\Model\Edit;
 use App\Model\GlobalContribs;
 use App\Repository\EditRepository;
 use App\Repository\GlobalContribsRepository;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -182,7 +183,35 @@ class GlobalContribsController extends XtoolsController
      *         "offset"=false,
      *         "limit"=50,
      *     },
+     *     methods={"GET"}
      * )
+     * @OA\Tag(name="User API")
+     * @OA\Get(description="Get contributions made by a user, IP or IP range across all Wikimedia projects.")
+     * @OA\Parameter(ref="#/components/parameters/UsernameOrIp")
+     * @OA\Parameter(ref="#/components/parameters/Namespace")
+     * @OA\Parameter(ref="#/components/parameters/Start")
+     * @OA\Parameter(ref="#/components/parameters/End")
+     * @OA\Parameter(ref="#/components/parameters/Offset")
+     * @OA\Response(
+     *     response=200,
+     *     description="Global contributions",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", type="string", example="meta.wikimedia.org"),
+     *         @OA\Property(property="username", ref="#/components/parameters/Username/schema"),
+     *         @OA\Property(property="namespace", ref="#/components/schemas/Namespace"),
+     *         @OA\Property(property="start", ref="#/components/parameters/Start/schema"),
+     *         @OA\Property(property="end", ref="#/components/parameters/End/schema"),
+     *         @OA\Property(property="globalcontribs", type="array",
+     *             @OA\Items(ref="#/components/schemas/EditWithProject")
+     *         ),
+     *         @OA\Property(property="continue", type="date-time", example="2020-01-31T12:59:59Z"),
+     *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=501, ref="#/components/responses/501")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @param GlobalContribsRepository $globalContribsRepo
      * @param EditRepository $editRepo
      * @param string $centralAuthProject
