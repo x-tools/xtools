@@ -101,7 +101,7 @@ class Edit extends Model
      * @param UserRepository $userRepo
      * @param Project $project
      * @param User $user
-     * @param array $revs Each must contain 'page_title' and 'page_namespace'.
+     * @param array $revs Each must contain 'page_title' and 'namespace'.
      * @return Edit[]
      */
     public static function getEditsFromRevs(
@@ -326,7 +326,7 @@ class Edit extends Model
      * Does NOT support section links unless you specify a page.
      * @param string $summary
      * @param Project $project
-     * @param Page $page
+     * @param Page|null $page
      * @param bool $useUnnormalizedPageTitle Use the unnormalized page title to avoid
      *   an API call. This should be used only if you fetched the page title via other
      *   means (SQL query), and is not from user input alone.
@@ -494,7 +494,7 @@ class Edit extends Model
 
         $ret = [
             'page_title' => $pageTitle,
-            'page_namespace' => $nsId,
+            'namespace' => $nsId,
             'rev_id' => $this->id,
             'timestamp' => $this->getUTCTimestamp(),
             'minor' => $this->minor,

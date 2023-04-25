@@ -9,6 +9,7 @@ use App\Model\AdminStats;
 use App\Model\Project;
 use App\Repository\AdminStatsRepository;
 use App\Repository\UserRightsRepository;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -139,12 +140,16 @@ class AdminStatsController extends XtoolsController
         $actionsQuery = $this->request->get('actions', '');
 
         // Either a pipe-separated string or an array.
-        $actions = is_array($actionsQuery) ? $actionsQuery : explode('|', $actionsQuery);
+        $actionsRequested = is_array($actionsQuery) ? $actionsQuery : explode('|', $actionsQuery);
 
-        // Filter out any invalid section IDs.
-        $actions = array_filter($actions, function ($action) use ($group) {
+        // Filter out any invalid action names.
+        $actions = array_filter($actionsRequested, function ($action) use ($group) {
             return in_array($action, $this->getActionNames($group));
         });
+
+        foreach (array_diff($actionsRequested, $actions) as $value) {
+            $this->addFlashMessage('warning', 'error-api-param', [$value, 'actions']);
+        }
 
         // Fallback for when no valid sections were requested.
         if (0 === count($actions)) {
@@ -229,28 +234,41 @@ class AdminStatsController extends XtoolsController
     /************************ API endpoints ************************/
 
     /**
-     * Get users of the project that are capable of making 'admin actions',
-     * keyed by user name with a list of the relevant user groups as the values.
-     * @Route("/api/project/admins_groups/{project}", name="ProjectApiAdminsGroups")
-     * @Route("/api/project/users_groups/{project}/{group}")
-     * @Route("/api/project/{group}_groups/{project}",
+     * Get users of the project that are capable of making admin, patroller, or steward actions.
+     * @Route(
+     *     "/api/project/{group}_groups/{project}",
+     *     name="ProjectApiAdminsGroups",
      *     requirements={"group"="admin|patroller|steward"},
+     *     defaults={"group"="admin"},
+     *     methods={"GET"}
      * )
+     * @OA\Tag(name="Project API")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/Group")
+     * @OA\Response(
+     *     response=200,
+     *     description="List of users and their groups.",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="group", ref="#/components/parameters/Group/schema"),
+     *         @OA\Property(property="users_and_groups",
+     *             type="object",
+     *             title="username",
+     *             example={"Jimbo Wales":{"sysop", "steward"}}
+     *         ),
+     *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @param AdminStatsRepository $adminStatsRepo
      * @return JsonResponse
      * @codeCoverageIgnore
      */
     public function adminsGroupsApiAction(AdminStatsRepository $adminStatsRepo): JsonResponse
     {
-        $this->recordApiUsage('project/admins_groups');
-
-        if (0 === preg_match('/\/api\/project\/(admin|patroller|steward)_groups/', $this->request->getRequestUri())) {
-            $this->addFlash(
-                'warning',
-                'This API endpoint will soon be removed. Use /api/admin_groups, /api/patroller_groups ' .
-                'and /api/steward_groups instead. See https://w.wiki/6sMx for more information.'
-            );
-        }
+        $this->recordApiUsage('project/admin_groups');
 
         $this->setUpAdminStats($adminStatsRepo);
 
@@ -264,13 +282,46 @@ class AdminStatsController extends XtoolsController
     }
 
     /**
-     * Get Admin Stats data as JSON.
+     * Get counts of logged actions by admins, patrollers, or stewards.
      * @Route(
      *     "/api/project/{group}_stats/{project}/{start}/{end}",
      *     name="ProjectApiAdminStats",
      *     requirements={"start"="|\d{4}-\d{2}-\d{2}", "end"="|\d{4}-\d{2}-\d{2}", "group"="admin|patroller|steward"},
-     *     defaults={"start"=false, "end"=false, "group"="admin"}
+     *     defaults={"start"=false, "end"=false, "group"="admin"},
+     *     methods={"GET"}
      * )
+     * @OA\Tag(name="Project API")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/Group")
+     * @OA\Parameter(ref="#/components/parameters/Start")
+     * @OA\Parameter(ref="#/components/parameters/End")
+     * @OA\Parameter(ref="#/components/parameters/Actions")
+     * @OA\Response(
+     *     response=200,
+     *     description="List of users and counts of their logged actions.",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="group", ref="#/components/parameters/Group/schema"),
+     *         @OA\Property(property="start", ref="#/components/parameters/Start/schema"),
+     *         @OA\Property(property="end", ref="#/components/parameters/End/schema"),
+     *         @OA\Property(property="actions", ref="#/components/parameters/Actions/schema"),
+     *         @OA\Property(property="users",
+     *             type="object",
+     *             example={"Jimbo Wales":{
+     *                 "username": "Jimbo Wales",
+     *                 "delete": 10,
+     *                 "re-block": 15,
+     *                 "re-protect": 5,
+     *                 "total": 30,
+     *                 "user-groups": {"sysop"}
+     *             }}
+     *         ),
+     *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @param AdminStatsRepository $adminStatsRepo
      * @return JsonResponse
      * @codeCoverageIgnore

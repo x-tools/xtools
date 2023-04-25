@@ -115,7 +115,7 @@ class EditTest extends TestAdapter
             $userRepo,
             $this->project,
             new User($userRepo, 'Foobar'),
-            [array_merge($this->editAttrs, ['page_title' => 'Test', 'page_namespace' => 0])]
+            [array_merge($this->editAttrs, ['page_title' => 'Test', 'namespace' => 0])]
         );
         static::assertEquals(1, $edit[0]->getId());
     }
@@ -252,7 +252,7 @@ class EditTest extends TestAdapter
             [
                 'username' => 'Testuser',
                 'page_title' => 'Test_page',
-                'page_namespace' => $this->page->getNamespace(),
+                'namespace' => $this->page->getNamespace(),
                 'rev_id' => 1,
                 'timestamp' => '2017-01-01T10:00:00',
                 'minor' => false,

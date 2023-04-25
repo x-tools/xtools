@@ -11,6 +11,7 @@ use App\Repository\EditCounterRepository;
 use App\Repository\EditRepository;
 use App\Repository\GlobalContribsRepository;
 use App\Repository\UserRightsRepository;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -582,14 +583,42 @@ class EditCounterController extends XtoolsController
     /************************ API endpoints ************************/
 
     /**
-     * Get various log counts for the user as JSON.
+     * Get counts of various log actions made by the user.
      * @Route(
      *     "/api/user/log_counts/{project}/{username}",
      *     name="UserApiLogCounts",
      *     requirements={
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *     }
+     *         "username"="(ipr-.+\/\d+[^\/])|([^\/]+)",
+     *     },
+     *     methods={"GET"}
      * )
+     * @OA\Tag(name="User API")
+     * @OA\Get(description="Get counts of various logged actions made by a user. The keys of the returned `log_counts`
+           property describe the log type and log action in the form of _type-action_.
+           See also the [logevents API](https://www.mediawiki.org/wiki/Special:MyLanguage/API:Logevents).")
+     * @OA\ExternalDocumentation(url="https://www.mediawiki.org/wiki/Manual:Log_actions")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/UsernameOrIp")
+     * @OA\Response(
+     *     response=200,
+     *     description="Counts of logged actions",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="username", ref="#/components/parameters/UsernameOrIp/schema"),
+     *         @OA\Property(property="log_counts", type="object", example={
+     *             "block-block": 0,
+     *             "block-unblock": 0,
+     *             "protect-protect": 0,
+     *             "protect-unprotect": 0,
+     *             "move-move": 0,
+     *             "move-move_redir": 0
+     *         })
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=501, ref="#/components/responses/501")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @param EditCounterRepository $editCounterRepo
      * @param UserRightsRepository $userRightsRepo
      * @param RequestStack $requestStack
@@ -609,14 +638,33 @@ class EditCounterController extends XtoolsController
     }
 
     /**
-     * Get the namespace totals for the user as JSON.
+     * Get the number of edits made by the user to each namespace.
      * @Route(
      *     "/api/user/namespace_totals/{project}/{username}",
      *     name="UserApiNamespaceTotals",
      *     requirements={
      *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *     }
+     *     },
+     *     methods={"GET"}
      * )
+     * @OA\Tag(name="User API")
+     * @OA\Get(description="Get edit counts of a user broken down by [namespace](https://w.wiki/6oKq).")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/UsernameOrIp")
+     * @OA\Response(
+     *     response=200,
+     *     description="Namepsace totals",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="username", ref="#/components/parameters/UsernameOrIp/schema"),
+     *         @OA\Property(property="namespace_totals", type="object", example={"0": 50, "2": 10, "3": 100},
+     *             description="Keys are namespace IDs, values are edit counts.")
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=501, ref="#/components/responses/501")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @param EditCounterRepository $editCounterRepo
      * @param UserRightsRepository $userRightsRepo
      * @param RequestStack $requestStack
@@ -636,14 +684,38 @@ class EditCounterController extends XtoolsController
     }
 
     /**
-     * Get the month counts for the user as JSON.
+     * Get the number of edits made by the user for each month, grouped by namespace.
      * @Route(
      *     "/api/user/month_counts/{project}/{username}",
      *     name="UserApiMonthCounts",
      *     requirements={
      *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *     }
+     *     },
+     *     methods={"GET"}
      * )
+     * @OA\Tag(name="User API")
+     * @OA\Get(description="Get the number of edits a user has made grouped by namespace, year, and month.")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/UsernameOrIp")
+     * @OA\Response(
+     *     response=200,
+     *     description="Month counts",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="username", ref="#/components/parameters/UsernameOrIp/schema"),
+     *         @OA\Property(property="totals", type="object", example={
+     *             "0": {
+     *                 "2020": {"1": 40, "12": 50},
+     *                 "2021": {"1": 5, "12": 25}
+     *             },
+     *             "3": {"2022": {"1": 1, "12": 4}}
+     *         })
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=501, ref="#/components/responses/501")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @param EditCounterRepository $editCounterRepo
      * @param UserRightsRepository $userRightsRepo
      * @param RequestStack $requestStack
@@ -667,14 +739,40 @@ class EditCounterController extends XtoolsController
     }
 
     /**
-     * Get the timecard data as JSON.
+     * Get the total number of edits made by a user during each hour of day and day of week.
      * @Route(
      *     "/api/user/timecard/{project}/{username}",
      *     name="UserApiTimeCard",
      *     requirements={
      *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *     }
+     *     },
+     *     methods={"GET"}
      * )
+     * @OA\Tag(name="User API")
+     * @OA\Get(description="Get the raw number of edits made by a user during each hour of day and day of week. The
+            `scale` is a value that indicates the number of edits made relative to other hours and days of the week.")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/UsernameOrIp")
+     * @OA\Response(
+     *     response=200,
+     *     description="Timecard",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="username", ref="#/components/parameters/UsernameOrIp/schema"),
+     *         @OA\Property(property="timecard", type="array", @OA\Items(type="object"), example={
+     *             {
+     *                 "day_of_week": 1,
+     *                 "hour": 0,
+     *                 "value": 50,
+     *                 "scale": 5
+     *             }
+     *         })
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=501, ref="#/components/responses/501")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @param EditCounterRepository $editCounterRepo
      * @param UserRightsRepository $userRightsRepo
      * @param RequestStack $requestStack

@@ -90,8 +90,7 @@ class TopEditsRepository extends UserRepository
      * @param int|false $end End date as Unix timestamp.
      * @param int $limit Number of edits to fetch.
      * @param int $pagination Which page of results to return.
-     * @return string[] page_namespace, page_title, page_is_redirect,
-     *   count (number of edits), assessment (page assessment).
+     * @return string[] namespace, page_title, redirect, count (number of edits), assessment (page assessment).
      */
     public function getTopEditsNamespace(
         Project $project,
@@ -135,7 +134,8 @@ class TopEditsRepository extends UserRepository
         }
 
         $offset = $pagination * $limit;
-        $sql = "SELECT page_namespace, page_title, page_is_redirect, COUNT(page_title) AS count
+        $sql = "SELECT page_namespace AS `namespace`, page_title,
+                    page_is_redirect AS `redirect`, COUNT(page_title) AS `count`
                     $paSelect
                 FROM $pageTable
                 JOIN $revisionTable ON page_id = rev_page
@@ -207,8 +207,7 @@ class TopEditsRepository extends UserRepository
      * @param int|false $start Start date as Unix timestamp.
      * @param int|false $end End date as Unix timestamp.
      * @param int $limit Number of edits to fetch.
-     * @return string[] page_namespace, page_title, page_is_redirect,
-     *   count (number of edits), assessment (page assessment).
+     * @return string[] namespace, page_title, redirect, count (number of edits), assessment (page assessment).
      */
     public function getTopEditsAllNamespaces(
         Project $project,
@@ -247,7 +246,8 @@ class TopEditsRepository extends UserRepository
             [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
         }
 
-        $sql = "SELECT c.page_namespace, e.page_title, c.page_is_redirect, c.count $paSelect
+        $sql = "SELECT c.page_namespace AS `namespace`, e.page_title,
+                    c.page_is_redirect AS `redirect`, c.count $paSelect
                 FROM
                 (
                     SELECT b.page_namespace, b.page_is_redirect, b.rev_page, b.count
@@ -382,7 +382,6 @@ class TopEditsRepository extends UserRepository
                         revs.rev_minor_edit AS minor,
                         revs.rev_len AS length,
                         (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
-                        revs.rev_deleted AS rev_deleted,
                         $userId AS user_id,
                         $username AS username,
                         comments.comment_text AS `comment`

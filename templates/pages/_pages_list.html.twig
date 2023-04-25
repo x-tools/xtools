@@ -54,59 +54,59 @@
                     <tr>
                         <td>{{ index|num_format }}</td>
                         <td class="sort-entry--page-title" data-value="{{ pagename }}">
-                            {% if page.page_is_redirect %}
+                            {% if page.redirect %}
                                 {{ wiki.pageLinkRaw(pagename, project, pagename, 'redirect=no') }}
                                 <small class="text-muted">&middot; ({{ msg('redirect') }})</small>
                             {% else %}
                                 {{ wiki.pageLinkRaw(pagename, project) }}
                             {% endif %}
-                            {% if page.type == 'arc' %}
+                            {% if page.deleted %}
                                 &middot;
-                                <small class="text-danger deleted-page tooltipcss" data-page="{{ pagename }}" data-datetime="{{ page.raw_time }}">
+                                <small class="text-danger deleted-page tooltipcss" data-page="{{ pagename }}" data-datetime="{{ page.timestamp }}">
                                     ({{ msg('deleted') }})
                                     <div class="tooltip-body">
                                         <em class="text-muted">{{ msg('loading') }}...</em>
                                     </div>
                                 </small>
-                                {% if page.recreated %}
+                                {% if page.recreated is defined and page.recreated %}
                                     &middot; <small class="text-muted">({{ msg('recreated') }})</small>
                                 {% endif %}
                             {% endif %}
                         </td>
-                        <td class="sort-entry--date" data-value="{{ page.raw_time }}">
-                            {% if page.type == 'arc' %}
-                                {{ wiki.pageLinkRaw('Special:Undelete/' ~ pagename, project, page.human_time, 'timestamp=' ~ page.raw_time) }}
+                        <td class="sort-entry--date" data-value="{{ page.timestamp }}">
+                            {% if page.deleted %}
+                                {{ wiki.pageLinkRaw('Special:Undelete/' ~ pagename, project, page.timestamp|date_format, 'timestamp=' ~ page.timestamp) }}
                             {% else %}
-                                {{ wiki.permaLinkRaw(page.rev_id, project, page.human_time|date_format) }}
+                                {{ wiki.permaLinkRaw(page.rev_id, project, page.timestamp|date_format) }}
                             {% endif %}
                         </td>
-                        <td class="sort-entry--original-size" data-value="{{ page.rev_len }}">
-                            {{ page.rev_len|num_format }}
+                        <td class="sort-entry--original-size" data-value="{{ page.rev_length }}">
+                            {{ page.rev_length|num_format }}
                         </td>
                         {% if pages.deleted != 'deleted' %}
-                            <td class="sort-entry--current-size" data-value="{{ page.page_len }}">
-                                {% if page.page_len is null %}
+                            <td class="sort-entry--current-size" data-value="{{ page.length }}">
+                                {% if page.length is null %}
                                     {{ msg('na') }}
                                 {% else %}
-                                    {{ page.page_len|num_format }}
+                                    {{ page.length|num_format }}
                                 {% endif %}
                             </td>
-                            {% if project.hasPageAssessments(ns) %}
-                                <td class="sort-entry--assessment" data-value="{{ page.pa_class ? page.pa_class : 'Unknown' }}">
-                                    {% if page.type == 'arc' %}
+                            {% if project.hasPageAssessments(ns) and page.assessment is defined %}
+                                <td class="sort-entry--assessment" data-value="{{ page.assessment.class ? page.assessment.class : 'Unknown' }}">
+                                    {% if page.deleted %}
                                         {{ msg('na') }}
                                     {% else %}
-                                        {% if page.badge is defined %}
-                                            <img alt="{{ page.pa_class }}" src="{{ page.badge }}" class="assessment-badge" />
+                                        {% if page.assessment.badge is defined %}
+                                            <img alt="{{ page.assessment.class }}" src="{{ page.assessment.badge }}" class="assessment-badge" />
                                         {% endif %}
-                                        {{ page.pa_class ? page.pa_class|ucfirst : msg('unknown') }}
+                                        {{ page.assessment.class ? page.assessment.class|ucfirst : msg('unknown') }}
                                     {% endif %}
                                 </td>
                             {% endif %}
                         {% endif %}
                         <td>
                             {{ wiki.pageLogLinkRaw(pagename, project) }}
-                            {% if page.type == 'rev' or page.recreated == 1 %}
+                            {% if not(page.deleted) or (page.recreated is defined and page.recreated == true) %}
                                 &middot;
                                 {{ wiki.pageHistLinkRaw(pagename, project) }}
                                 {% if enabled('ArticleInfo') %}

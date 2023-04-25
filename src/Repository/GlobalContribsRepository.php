@@ -285,18 +285,17 @@ class GlobalContribsRepository extends Repository
                     SELECT
                         '$dbName' AS dbName,
                         revs.rev_id AS id,
-                        revs.rev_timestamp AS timestamp,
-                        UNIX_TIMESTAMP(revs.rev_timestamp) AS unix_timestamp,
-                        revs.rev_minor_edit AS minor,
-                        revs.rev_deleted AS deleted,
-                        revs.rev_len AS length,
-                        (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
-                        revs.rev_parent_id AS parent_id,
-                        revs.rev_deleted AS rev_deleted,
-                        $username AS username,
+                        revs.rev_timestamp AS `timestamp`,
+                        UNIX_TIMESTAMP(revs.rev_timestamp) AS `unix_timestamp`,
+                        revs.rev_minor_edit AS `minor`,
+                        revs.rev_deleted AS `deleted`,
+                        revs.rev_len AS `length`,
+                        (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS `length_change`,
+                        revs.rev_parent_id AS `parent_id`,
+                        $username AS `username`,
                         page.page_title,
-                        page.page_namespace,
-                        comment_text AS comment,
+                        page.page_namespace AS `namespace`,
+                        comment_text AS `comment`,
                         (
                             SELECT 1
                             FROM $tagTable

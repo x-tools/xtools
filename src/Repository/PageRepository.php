@@ -157,16 +157,16 @@ class PageRepository extends Repository
 
         $sql = "SELECT * FROM (
                     SELECT
-                        revs.rev_id AS id,
-                        revs.rev_timestamp AS timestamp,
-                        revs.rev_minor_edit AS minor,
-                        revs.rev_len AS length,
-                        (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
+                        revs.rev_id AS `id`,
+                        revs.rev_timestamp AS `timestamp`,
+                        revs.rev_minor_edit AS `minor`,
+                        revs.rev_len AS `length`,
+                        (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS `length_change`,
                         actor_user AS user_id,
                         actor_name AS username,
                         comment_text AS `comment`,
-                        revs.rev_sha1 AS sha,
-                        revs.rev_deleted AS rev_deleted
+                        revs.rev_sha1 AS `sha`,
+                        revs.rev_deleted AS `deleted`
                     FROM $revTable AS revs
                     LEFT JOIN $actorTable ON revs.rev_actor = actor_id
                     LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
@@ -175,7 +175,7 @@ class PageRepository extends Repository
                     ORDER BY revs.rev_timestamp DESC
                     $limitClause
                 ) a
-                ORDER BY timestamp ASC";
+                ORDER BY `timestamp` ASC";
 
         $params = ['pageid' => $page->getId()];
         if ($user) {

@@ -57,6 +57,7 @@ services:
             $apiPath: '%env(API_PATH)%'
             $centralAuthProject: '%env(CENTRAL_AUTH_PROJECT)%'
             $defaultProject: '%env(DEFAULT_PROJECT)%'
+            $environment: '%env(APP_ENV)%'
             $isWMF: '%env(bool:APP_IS_WMF)%'
             $optedIn: '%env(csv:OPTED_IN)%'
             $projectDir: '%kernel.project_dir%'
@@ -116,7 +117,6 @@ services:
 
     app.exception_listener:
         class: App\EventSubscriber\ExceptionListener
-        arguments: ['@twig', '@logger', '%kernel.environment%']
         tags:
             - { name: kernel.event_listener, event: kernel.exception }
 

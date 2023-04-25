@@ -433,8 +433,8 @@ class XtoolsControllerTest extends ControllerTestAdapter
         ]);
         $out = [ 'foo' => 'bar' ];
         $data = [
-            [ 'page_title' => 'Test_page', 'page_namespace' => 0, 'timestamp' => '2020-01-02T12:59:59' ],
-            [ 'page_title' => 'Test_page', 'page_namespace' => 1, 'timestamp' => '2020-01-03T12:59:59' ],
+            [ 'page_title' => 'Test_page', 'namespace' => 0, 'timestamp' => '2020-01-02T12:59:59' ],
+            [ 'page_title' => 'Test_page', 'namespace' => 1, 'timestamp' => '2020-01-03T12:59:59' ],
         ];
         $newOut = $controller->addFullPageTitlesAndContinue('edits', $out, $data);
 
@@ -444,13 +444,13 @@ class XtoolsControllerTest extends ControllerTestAdapter
                 [
                     'full_page_title' => 'Test_page',
                     'page_title' => 'Test_page',
-                    'page_namespace' => 0,
+                    'namespace' => 0,
                     'timestamp' => '2020-01-02T12:59:59',
                 ],
                 [
                     'full_page_title' => 'Talk:Test_page',
                     'page_title' => 'Test_page',
-                    'page_namespace' => 1,
+                    'namespace' => 1,
                     'timestamp' => '2020-01-03T12:59:59',
                 ],
             ],

@@ -144,6 +144,7 @@
 	"error-ip-range-unsupported": "Sorry, this functionality is not available for IP ranges. Please enter either a single username or IP address.",
 	"error-login": "Login failed! Please try again.",
 	"error-pagepile-too-large": "Sorry, there are too many pages to export to PagePile. You can manually create a PagePile, or try narrowing down the result set by limiting to a specific namespace or time frame.",
+	"error-param": "'$1' is not a valid value for the '$2' parameter",
 	"error-query-timeout": "Sorry, the requested information took too long to process (timeout $1 {{PLURAL:$1|second|seconds}}). In order to save resources, the query was automatically killed.",
 	"error-rate-limit": "If you are human, you are making too many requests during a short period of time. Please wait $1 {{PLURAL:$1|minute|minutes}} before reloading this tool, or $2 to prevent this from happening again. If you are a robot, please use our $3 instead.",
 	"error-rate-limit-login": "login",

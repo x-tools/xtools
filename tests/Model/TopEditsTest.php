@@ -7,6 +7,7 @@ namespace App\Tests\Model;
 use App\Helper\AutomatedEditsHelper;
 use App\Model\Edit;
 use App\Model\Page;
+use App\Model\PageAssessments;
 use App\Model\Project;
 use App\Model\TopEdits;
 use App\Model\User;
@@ -38,6 +39,7 @@ class TopEditsTest extends TestAdapter
     public function setUp(): void
     {
         $this->project = new Project('en.wikipedia.org');
+        $this->project->setPageAssessments($this->createMock(PageAssessments::class));
         $this->projectRepo = $this->createMock(ProjectRepository::class);
         $this->projectRepo->method('getMetadata')
             ->willReturn(['namespaces' => [0 => 'Main', 3 => 'User_talk']]);
@@ -106,12 +108,14 @@ class TopEditsTest extends TestAdapter
         static::assertEquals(2, count($result[0]));
         static::assertEquals(2, count($result[3]));
         static::assertEquals([
-            'page_namespace' => '0',
+            'namespace' => '0',
             'page_title' => 'Foo_bar',
-            'page_is_redirect' => '1',
+            'redirect' => '1',
             'count' => '24',
-            'pa_class' => 'List',
-            'page_title_ns' => 'Foo_bar',
+            'full_page_title' => 'Foo_bar',
+            'assessment' => [
+                'class' => 'List',
+            ],
         ], $result[0][0]);
 
         // Fetching again should use value of class property.
@@ -138,11 +142,11 @@ class TopEditsTest extends TestAdapter
         static::assertEquals(1, count($result));
         static::assertEquals(2, count($result[3]));
         static::assertEquals([
-            'page_namespace' => '3',
+            'namespace' => '3',
             'page_title' => 'Jimbo_Wales',
-            'page_is_redirect' => '0',
+            'redirect' => '0',
             'count' => '1',
-            'page_title_ns' => 'User_talk:Jimbo_Wales',
+            'full_page_title' => 'User_talk:Jimbo_Wales',
         ], $result[3][1]);
     }
 
@@ -155,34 +159,34 @@ class TopEditsTest extends TestAdapter
         return [
             0 => [
                 [
-                  'page_namespace' => '0',
+                  'namespace' => '0',
                   'page_title' => 'Foo_bar',
-                  'page_is_redirect' => '1',
+                  'redirect' => '1',
                   'count' => '24',
                   'pa_class' => 'List',
-                  'page_title_ns' => 'Foo_bar',
+                  'full_page_title' => 'Foo_bar',
                 ], [
-                  'page_namespace' => '0',
+                  'namespace' => '0',
                   'page_title' => '101st_Airborne_Division',
-                  'page_is_redirect' => '0',
+                  'redirect' => '0',
                   'count' => '18',
                   'pa_class' => 'C',
-                  'page_title_ns' => '101st_Airborne_Division',
+                  'full_page_title' => '101st_Airborne_Division',
                 ],
             ],
             3 => [
                 [
-                  'page_namespace' => '3',
+                  'namespace' => '3',
                   'page_title' => 'Test_user',
-                  'page_is_redirect' => '0',
+                  'redirect' => '0',
                   'count' => '3',
-                  'page_title_ns' => 'User_talk:Test_user',
+                  'full_page_title' => 'User_talk:Test_user',
                 ], [
-                  'page_namespace' => '3',
+                  'namespace' => '3',
                   'page_title' => 'Jimbo_Wales',
-                  'page_is_redirect' => '0',
+                  'redirect' => '0',
                   'count' => '1',
-                  'page_title_ns' => 'User_talk:Jimbo_Wales',
+                  'full_page_title' => 'User_talk:Jimbo_Wales',
                 ],
             ],
         ];

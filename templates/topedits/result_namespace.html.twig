@@ -48,7 +48,7 @@
             </tr></thead>
             <tbody>
                 {% for page in pages %}
-                    {% set pageTitle = titleWithNs(page.page_title, page.page_namespace, project.namespaces) %}
+                    {% set pageTitle = titleWithNs(page.page_title, page.namespace, project.namespaces) %}
                     <tr>
                         <td class="sort-entry--edits" data-value="{{ page.count }}">
                             {{ page.count|num_format }}
@@ -70,7 +70,7 @@
                             &middot;
                             <a href="{{ path('ArticleInfoResult', {project:project.domain, page:pageTitle}) }}">{{ msg('tool-articleinfo') }}</a>
                             &middot;
-                            <a href="{{ path('TopEditsResultPage', {project:project.domain, username:user.usernameIdent, namespace:page.page_namespace, page:page.page_title}) }}" >{{ msg('tool-topedits') }}</a>
+                            <a href="{{ path('TopEditsResultPage', {project:project.domain, username:user.usernameIdent, namespace:page.namespace, page:page.page_title}) }}" >{{ msg('tool-topedits') }}</a>
                         </td>
                     </tr>
                 {% endfor %}

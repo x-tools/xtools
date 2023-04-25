@@ -229,7 +229,7 @@ class AutoEditsRepository extends UserRepository
      * @param int|false $end End date as Unix timestamp.
      * @param int|false $offset Unix timestamp. Used for pagination.
      * @param int $limit Number of results to return.
-     * @return string[] Result of query, with columns 'page_title', 'page_namespace', 'rev_id', 'timestamp', 'minor',
+     * @return string[] Result of query, with columns 'page_title', 'namespace', 'rev_id', 'timestamp', 'minor',
      *   'length', 'length_change', 'comment'.
      */
     public function getNonAutomatedEdits(
@@ -273,13 +273,13 @@ class AutoEditsRepository extends UserRepository
 
         $sql = "SELECT
                     page_title,
-                    page_namespace,
+                    page_namespace AS `namespace`,
                     revs.rev_id AS rev_id,
-                    revs.rev_timestamp AS timestamp,
-                    revs.rev_minor_edit AS minor,
-                    revs.rev_len AS length,
-                    (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
-                    comment_text AS comment
+                    revs.rev_timestamp AS `timestamp`,
+                    revs.rev_minor_edit AS `minor`,
+                    revs.rev_len AS `length`,
+                    (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS `length_change`,
+                    comment_text AS `comment`
                 FROM $pageTable
                 JOIN $revisionTable AS revs ON (page_id = revs.rev_page)
                 $ipcJoin
@@ -312,7 +312,7 @@ class AutoEditsRepository extends UserRepository
      * @param string|null $tool Only get edits made with this tool. Must match the keys in the AutoEdits config.
      * @param int|false $offset Unix timestamp. Used for pagination.
      * @param int $limit Number of results to return.
-     * @return string[] Result of query, with columns 'page_title', 'page_namespace', 'rev_id', 'timestamp', 'minor',
+     * @return string[] Result of query, with columns 'page_title', 'namespace', 'rev_id', 'timestamp', 'minor',
      *   'length', 'length_change', 'comment'.
      */
     public function getAutomatedEdits(
@@ -370,13 +370,13 @@ class AutoEditsRepository extends UserRepository
 
         $sql = "SELECT
                     page_title,
-                    page_namespace,
-                    revs.rev_id AS rev_id,
-                    revs.rev_timestamp AS timestamp,
-                    revs.rev_minor_edit AS minor,
-                    revs.rev_len AS length,
-                    (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
-                    comment_text AS comment
+                    page_namespace AS `namespace`,
+                    revs.rev_id AS `rev_id`,
+                    revs.rev_timestamp AS `timestamp`,
+                    revs.rev_minor_edit AS `minor`,
+                    revs.rev_len AS `length`,
+                    (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS `length_change`,
+                    comment_text AS `comment`
                 FROM $pageTable
                 JOIN $revisionTable AS revs ON (page_id = revs.rev_page)
                 $ipcJoin

@@ -7,6 +7,8 @@ namespace App\Controller;
 use App\Model\AutoEdits;
 use App\Repository\AutoEditsRepository;
 use App\Repository\EditRepository;
+use DateTime;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -231,9 +233,29 @@ class AutomatedEditsController extends XtoolsController
     /************************ API endpoints ************************/
 
     /**
-     * Get a list of the automated tools and their regex/tags/etc.
-     * @Route("/api/user/automated_tools/{project}", name="UserApiAutoEditsTools")
-     * @Route("/api/project/automated_tools/{project}", name="ProjectApiAutoEditsTools")
+     * Get a list of the known automated tools for a project along with their regex/tags/etc.
+     * @Route("/api/project/automated_tools/{project}", name="ProjectApiAutoEditsTools", methods={"GET"})
+     * @OA\Tag(name="Project API")
+     * @OA\ExternalDocumentation(url="https://www.mediawiki.org/wiki/XTools/API/Project#Automated_tools")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Response(
+     *     response=200,
+     *     description="List of known (semi-)automated tools.",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="tools", type="object", example={
+     *             "My tool": {
+     *                 "regex": "\\(using My tool",
+     *                 "link": "Project:My tool",
+     *                 "label": "MyTool",
+     *                 "namespaces": {0, 2, 4},
+     *                 "tags": {"mytool"}
+     *             }
+     *         }),
+     *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
      * @param AutoEditsRepository $autoEditsRepo
      * @return JsonResponse
      * @codeCoverageIgnore
@@ -241,34 +263,55 @@ class AutomatedEditsController extends XtoolsController
     public function automatedToolsApiAction(AutoEditsRepository $autoEditsRepo): JsonResponse
     {
         $this->recordApiUsage('user/automated_tools');
-        if ('/api/user/' === substr($this->request->getRequestUri(), 0, 10)) {
-            $this->addFlash(
-                'warning',
-                'This endpoint will soon be removed. Use /api/project/automated_tools instead. ' .
-                'See https://w.wiki/6sMx for more information.'
-            );
-        }
-        $this->addFlash(
-            'warning',
-            'This API endpoint will soon have results nested under the \'tools\' property. ' .
-            'See https://w.wiki/6sMx for more information.'
+        return $this->getFormattedApiResponse(
+            ['tools' => $autoEditsRepo->getTools($this->project)],
         );
-        return $this->getFormattedApiResponse($autoEditsRepo->getTools($this->project));
     }
 
     /**
-     * Count the number of automated edits the given user has made.
+     * Get the number of automated edits a user has made.
      * @Route(
      *   "/api/user/automated_editcount/{project}/{username}/{namespace}/{start}/{end}/{tools}",
      *   name="UserApiAutoEditsCount",
      *   requirements={
-     *       "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
+     *       "username"="(ipr-.+\/\d+[^\/])|([^\/]+)",
      *       "namespace"="|all|\d+",
      *       "start"="|\d{4}-\d{2}-\d{2}",
      *       "end"="|\d{4}-\d{2}-\d{2}"
      *   },
-     *   defaults={"namespace"="all", "start"=false, "end"=false, "tools"=false}
+     *   defaults={"namespace"="all", "start"=false, "end"=false, "tools"=false},
+     *   methods={"GET"}
      * )
+     * @OA\Tag(name="User API")
+     * @OA\Get(description="Get the number of edits a user has made using
+            [known semi-automated tools](https://w.wiki/6oKQ), and optionally how many times each tool was used.")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/UsernameOrIp")
+     * @OA\Parameter(ref="#/components/parameters/Namespace")
+     * @OA\Parameter(ref="#/components/parameters/Start")
+     * @OA\Parameter(ref="#/components/parameters/End")
+     * @OA\Parameter(ref="#/components/parameters/Tools")
+     * @OA\Response(
+     *     response=200,
+     *     description="Count of edits made using [known (semi-)automated tools](https://w.wiki/6oKQ).",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="username", ref="#/components/parameters/Username/schema"),
+     *         @OA\Property(property="namespace", ref="#/components/schemas/Namespace"),
+     *         @OA\Property(property="start", ref="#/components/parameters/Start/schema"),
+     *         @OA\Property(property="end", ref="#/components/parameters/End/schema"),
+     *         @OA\Property(property="tools", ref="#/components/parameters/Tools/schema"),
+     *         @OA\Property(property="total_editcount", type="integer"),
+     *         @OA\Property(property="automated_editcount", type="integer"),
+     *         @OA\Property(property="nonautomated_editcount", type="integer"),
+     *         @OA\Property(property="automated_tools", ref="#/components/schemas/AutomatedTools"),
+     *         @OA\Property(property="elapsed_time", type="float")
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=501, ref="#/components/responses/501")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @param AutoEditsRepository $autoEditsRepo
      * @param EditRepository $editRepo
      * @return JsonResponse
@@ -288,7 +331,7 @@ class AutomatedEditsController extends XtoolsController
         ];
         $ret['nonautomated_editcount'] = $ret['total_editcount'] - $ret['automated_editcount'];
 
-        if (isset($this->params['tools'])) {
+        if ($this->getBoolVal('tools')) {
             $tools = $this->autoEdits->getToolCounts();
             $ret['automated_tools'] = $tools;
         }
@@ -297,7 +340,7 @@ class AutomatedEditsController extends XtoolsController
     }
 
     /**
-     * Get non-automated edits for the given user.
+     * Get non-automated contributions for a user.
      * @Route(
      *   "/api/user/nonautomated_edits/{project}/{username}/{namespace}/{start}/{end}/{offset}",
      *   name="UserApiNonAutoEdits",
@@ -306,10 +349,43 @@ class AutomatedEditsController extends XtoolsController
      *       "namespace"="|all|\d+",
      *       "start"="|\d{4}-\d{2}-\d{2}",
      *       "end"="|\d{4}-\d{2}-\d{2}",
-     *       "offset"="|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}"
+     *       "offset"="|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}Z?"
      *   },
-     *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=false, "limit"=50}
+     *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=false, "limit"=50},
+     *   methods={"GET"}
      * )
+     * @OA\Tag(name="User API")
+     * @OA\Get(description="Get a list of contributions a user has made without the use of any
+        [known (semi-)automated tools](https://w.wiki/6oKQ). If more results are available than the `limit`, a
+        `continue` property is returned with the value that can passed as the `offset` in another API request
+        to paginate through the results.")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/UsernameOrIp")
+     * @OA\Parameter(ref="#/components/parameters/Namespace")
+     * @OA\Parameter(ref="#/components/parameters/Start")
+     * @OA\Parameter(ref="#/components/parameters/End")
+     * @OA\Parameter(ref="#/components/parameters/Offset")
+     * @OA\Parameter(ref="#/components/parameters/LimitQuery")
+     * @OA\Response(
+     *     response=200,
+     *     description="List of contributions made without [known (semi-)automated tools](https://w.wiki/6oKQ).",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="username", ref="#/components/parameters/UsernameOrIp/schema"),
+     *         @OA\Property(property="namespace", ref="#/components/schemas/Namespace"),
+     *         @OA\Property(property="start", ref="#/components/parameters/Start/schema"),
+     *         @OA\Property(property="end", ref="#/components/parameters/End/schema"),
+     *         @OA\Property(property="offset", ref="#/components/parameters/Offset/schema"),
+     *         @OA\Property(property="limit", ref="#/components/parameters/Limit/schema"),
+     *         @OA\Property(property="nonautomated_edits", type="array", @OA\Items(ref="#/components/schemas/Edit")),
+     *         @OA\Property(property="continue", type="date-time", example="2020-01-31T12:59:59Z"),
+     *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=501, ref="#/components/responses/501")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @param AutoEditsRepository $autoEditsRepo
      * @param EditRepository $editRepo
      * @return JsonResponse
@@ -323,17 +399,17 @@ class AutomatedEditsController extends XtoolsController
 
         $this->setupAutoEdits($autoEditsRepo, $editRepo);
 
-        $out = $this->addFullPageTitlesAndContinue(
-            'nonautomated_edits',
-            [],
-            $this->autoEdits->getNonAutomatedEdits(true)
-        );
+        $results = $this->autoEdits->getNonAutomatedEdits(true);
+        $out = $this->addFullPageTitlesAndContinue('nonautomated_edits', [], $results);
+        if (count($results) === $this->limit) {
+            $out['continue'] = (new DateTime(end($results)['timestamp']))->format('Y-m-d\TH:i:s');
+        }
 
         return $this->getFormattedApiResponse($out);
     }
 
     /**
-     * Get (semi-)automated edits for the given user, optionally using the given tool.
+     * Get (semi-)automated contributions made by a user.
      * @Route(
      *   "/api/user/automated_edits/{project}/{username}/{namespace}/{start}/{end}/{offset}",
      *   name="UserApiAutoEdits",
@@ -344,8 +420,44 @@ class AutomatedEditsController extends XtoolsController
      *       "end"="|\d{4}-\d{2}-\d{2}",
      *       "offset"="|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}",
      *   },
-     *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=false, "limit"=50}
+     *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=false, "limit"=50},
+     *   methods={"GET"}
      * )
+     * @OA\Tag(name="User API")
+     * @OA\Get(description="Get a list of contributions a user has made using of any of the
+        [known (semi-)automated tools](https://w.wiki/6oKQ). If more results are available than the `limit`, a
+        `continue` property is returned with the value that can passed as the `offset` in another API request
+        to paginate through the results.")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/UsernameOrIp")
+     * @OA\Parameter(ref="#/components/parameters/Namespace")
+     * @OA\Parameter(ref="#/components/parameters/Start")
+     * @OA\Parameter(ref="#/components/parameters/End")
+     * @OA\Parameter(ref="#/components/parameters/Offset")
+     * @OA\Parameter(ref="#/components/parameters/LimitQuery")
+     * @OA\Parameter(name="tool", in="query", description="Get only contributions using this tool.
+        Use the [automated tools](#/Project%20API/get_ProjectApiAutoEditsTools) endpoint to list available tools.")
+     * @OA\Response(
+     *     response=200,
+     *     description="List of contributions made using [known (semi-)automated tools](https://w.wiki/6oKQ).",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="username", ref="#/components/parameters/UsernameOrIp/schema"),
+     *         @OA\Property(property="namespace", ref="#/components/schemas/Namespace"),
+     *         @OA\Property(property="start", ref="#/components/parameters/Start/schema"),
+     *         @OA\Property(property="end", ref="#/components/parameters/End/schema"),
+     *         @OA\Property(property="offset", ref="#/components/parameters/Offset/schema"),
+     *         @OA\Property(property="limit", ref="#/components/parameters/Limit/schema"),
+     *         @OA\Property(property="tool", type="string", example="Twinkle"),
+     *         @OA\Property(property="automated_edits", type="array", @OA\Items(ref="#/components/schemas/Edit")),
+     *         @OA\Property(property="continue", type="date-time", example="2020-01-31T12:59:59Z"),
+     *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=501, ref="#/components/responses/501")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @param AutoEditsRepository $autoEditsRepo
      * @param EditRepository $editRepo
      * @return Response
@@ -361,11 +473,11 @@ class AutomatedEditsController extends XtoolsController
             ? ['tool' => $this->autoEdits->getTool()]
             : [];
 
-        $out = $this->addFullPageTitlesAndContinue(
-            'automated_edits',
-            $extras,
-            $this->autoEdits->getAutomatedEdits(true)
-        );
+        $results = $this->autoEdits->getAutomatedEdits(true);
+        $out = $this->addFullPageTitlesAndContinue('automated_edits', $extras, $results);
+        if (count($results) === $this->limit) {
+            $out['continue'] = (new DateTime(end($results)['timestamp']))->format('Y-m-d\TH:i:s');
+        }
 
         return $this->getFormattedApiResponse($out);
     }

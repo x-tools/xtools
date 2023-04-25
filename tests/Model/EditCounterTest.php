@@ -249,19 +249,19 @@ class EditCounterTest extends TestAdapter
                 [
                     'year' => '2016',
                     'month' => '12',
-                    'page_namespace' => '0',
+                    'namespace' => '0',
                     'count' => '10',
                 ],
                 [
                     'year' => '2017',
                     'month' => '3',
-                    'page_namespace' => '0',
+                    'namespace' => '0',
                     'count' => '20',
                 ],
                 [
                     'year' => '2017',
                     'month' => '2',
-                    'page_namespace' => '1',
+                    'namespace' => '1',
                     'count' => '50',
                 ],
             ]);
@@ -342,25 +342,25 @@ class EditCounterTest extends TestAdapter
                 [
                     'year' => '2015',
                     'month' => '6',
-                    'page_namespace' => '1',
+                    'namespace' => '1',
                     'count' => '5',
                 ],
                 [
                     'year' => '2016',
                     'month' => '12',
-                    'page_namespace' => '0',
+                    'namespace' => '0',
                     'count' => '10',
                 ],
                 [
                     'year' => '2017',
                     'month' => '3',
-                    'page_namespace' => '0',
+                    'namespace' => '0',
                     'count' => '20',
                 ],
                 [
                     'year' => '2017',
                     'month' => '2',
-                    'page_namespace' => '1',
+                    'namespace' => '1',
                     'count' => '50',
                 ],
             ]);

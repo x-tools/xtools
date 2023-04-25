@@ -29,13 +29,13 @@
 {% set pageTitle = titleWithNs(page.page_title, ns, project.namespaces) %}
 |-
 | {{ index|num_format }}
-| {% if page.page_is_redirect %}[{{ wiki.pageUrlRaw(pageTitle, project, 'redirect=no') }} {{ pageTitle }}] &middot; ({{ msg('redirect') }}){% else %}[[:{{ pageTitle }}]]{% endif %}{% if page.type == 'arc' %} &middot; ({{ msg('deleted') }}){% endif %}
+| {% if page.redirect %}[{{ wiki.pageUrlRaw(pageTitle, project, 'redirect=no') }} {{ pageTitle }}] &middot; ({{ msg('redirect') }}){% else %}[[:{{ pageTitle }}]]{% endif %}{% if page.deleted %} &middot; ({{ msg('deleted') }}){% endif %}
 
-| {% if page.type == 'arc' %}[{{ wiki.pageUrlRaw('Special:Undelete/' ~ pageTitle, project, 'timestamp=' ~ page.raw_time) }} {{ page.human_time|date_format }}]{% else %}[[Special:PermaLink/{{ page.rev_id }}|{{ page.human_time|date_format }}]]{% endif %}
+| {% if page.deleted %}[{{ wiki.pageUrlRaw('Special:Undelete/' ~ pageTitle, project, 'timestamp=' ~ page.timestamp) }} {{ page.timestamp|date_format }}]{% else %}[[Special:PermaLink/{{ page.rev_id }}|{{ page.timestamp|date_format }}]]{% endif %}
 
-| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ page.rev_len }}}}
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ page.rev_length }}}}
 {% if pages.deleted != 'deleted' %}
-| {% if page.page_len is null %}{{ msg('na') }}{% else %}{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ page.page_len }}}}{% endif %}
+| {% if page.length is null %}{{ msg('na') }}{% else %}{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ page.length }}}}{% endif %}
 
 {% if project.hasPageAssessments(ns) %}
 | {% if page.badge_file is defined %}
@@ -43,7 +43,7 @@
 {% endif %}
 {% endif %}
 {% endif %}
-| [{{ wiki.pageLogUrlRaw(pageTitle, project) }} {{ msg('log') }}]{% if page.type == 'rev' %} &middot; [{{ wiki.pageHistUrlRaw(pageTitle, project) }} {{ msg('history') }}]{% if enabled('ArticleInfo') %} &middot; [{{ url('ArticleInfoResult', {'project': project.domain, 'page': pageTitle}) }} {{ msg('tool-articleinfo') }}]{% endif %}{% if enabled('TopEdits') %} &middot; [{{ url('topedits', {'project': project.domain, 'username': user.usernameIdent, 'namespace': ns, 'page': page.page_title}) }} {{ msg('tool-topedits') }}]{% endif %}{% if isWMF() %} &middot; [https://pageviews.wmcloud.org/?project={{ project.domain }}&amp;pages={{ pageTitle|e('url') }} {{ msg('pageviews') }}]{% endif %}{% endif %}
+| [{{ wiki.pageLogUrlRaw(pageTitle, project) }} {{ msg('log') }}]{% if not(page.deleted) %} &middot; [{{ wiki.pageHistUrlRaw(pageTitle, project) }} {{ msg('history') }}]{% if enabled('ArticleInfo') %} &middot; [{{ url('ArticleInfoResult', {'project': project.domain, 'page': pageTitle}) }} {{ msg('tool-articleinfo') }}]{% endif %}{% if enabled('TopEdits') %} &middot; [{{ url('topedits', {'project': project.domain, 'username': user.usernameIdent, 'namespace': ns, 'page': page.page_title}) }} {{ msg('tool-topedits') }}]{% endif %}{% if isWMF() %} &middot; [https://pageviews.wmcloud.org/?project={{ project.domain }}&amp;pages={{ pageTitle|e('url') }} {{ msg('pageviews') }}]{% endif %}{% endif %}
 
 {% endfor %}
 {% if pages.multiNamespace and pages.counts[ns].count > pages.resultsPerPage %}

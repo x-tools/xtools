@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Model\SimpleEditCounter;
 use App\Repository\SimpleEditCounterRepository;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -119,8 +120,35 @@ class SimpleEditCounterController extends XtoolsController
      *         "start"=false,
      *         "end"=false,
      *         "namespace"="all",
-     *     }
+     *     },
+     *     methods={"GET"}
      * )
+     * @OA\Tag(name="User API")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/UsernameOrIp")
+     * @OA\Parameter(ref="#/components/parameters/Namespace")
+     * @OA\Parameter(ref="#/components/parameters/Start")
+     * @OA\Parameter(ref="#/components/parameters/End")
+     * @OA\Response(
+     *     response=200,
+     *     description="Simple edit count, along with user groups and global user groups.",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="username", ref="#/components/parameters/UsernameOrIp/schema"),
+     *         @OA\Property(property="namespace", ref="#/components/parameters/Namespace/schema"),
+     *         @OA\Property(property="start", ref="#components/parameters/Start/schema"),
+     *         @OA\Property(property="end", ref="#components/parameters/End/schema"),
+     *         @OA\Property(property="user_id", type="integer"),
+     *         @OA\Property(property="live_edit_count", type="integer"),
+     *         @OA\Property(property="deleted_edit_count", type="integer"),
+     *         @OA\Property(property="user_groups", type="array", @OA\Items(type="string")),
+     *         @OA\Property(property="global_user_groups", type="array", @OA\Items(type="string")),
+     *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @param SimpleEditCounterRepository $simpleEditCounterRepository
      * @return Response
      * @codeCoverageIgnore

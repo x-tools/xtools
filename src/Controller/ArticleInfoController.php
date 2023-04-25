@@ -12,6 +12,7 @@ use App\Model\Page;
 use App\Model\Project;
 use App\Repository\ArticleInfoRepository;
 use GuzzleHttp\Exception\ServerException;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -196,13 +197,52 @@ class ArticleInfoController extends XtoolsController
     /************************ API endpoints ************************/
 
     /**
-     * Get basic info on a given article.
+     * Get basic information about a page.
      * @Route(
-     *     "/api/articleinfo/{project}/{page}",
-     *     name="ArticleInfoApiAction",
-     *     requirements={"page"=".+"}
+     *     "/api/page/articleinfo/{project}/{page}",
+     *     name="PageApiArticleInfo",
+     *     requirements={"page"=".+"},
+     *     methods={"GET"}
      * )
-     * @Route("/api/page/articleinfo/{project}/{page}", requirements={"page"=".+"})
+     * @OA\Get(description="Get basic information about the history of a page.
+            See also the [pageviews](https://w.wiki/6o9k) and [edit data](https://w.wiki/6o9m) REST APIs.")
+     * @OA\Tag(name="Page API")
+     * @OA\ExternalDocumentation(url="https://www.mediawiki.org/wiki/XTools/API/Page#Article_info")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/Page")
+     * @OA\Parameter(name="format", in="query", @OA\Schema(default="json", type="string", enum={"json","html"}))
+     * @OA\Response(
+     *     response=200,
+     *     description="Basic information about the page.",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="page", ref="#/components/parameters/Page/schema"),
+     *         @OA\Property(property="watchers", type="integer"),
+     *         @OA\Property(property="pageviews", type="integer"),
+     *         @OA\Property(property="pageviews_offset", type="integer"),
+     *         @OA\Property(property="revisions", type="integer"),
+     *         @OA\Property(property="editors", type="integer"),
+     *         @OA\Property(property="minor_edits", type="integer"),
+     *         @OA\Property(property="author", type="string", example="Jimbo Wales"),
+     *         @OA\Property(property="author_editcount", type="integer"),
+     *         @OA\Property(property="created_at", type="date"),
+     *         @OA\Property(property="created_rev_id", type="integer"),
+     *         @OA\Property(property="modified_at", type="date"),
+     *         @OA\Property(property="secs_since_last_edit", type="integer"),
+     *         @OA\Property(property="last_edit_id", type="integer"),
+     *         @OA\Property(property="assessment", type="object", example={
+     *             "value":"FA",
+     *             "color": "#9CBDFF",
+     *             "category": "Category:FA-Class articles",
+     *             "badge": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Featured_article_star.svg"
+     *         }),
+     *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
+     *     ),
+     *     @OA\XmlContent(format="text/html")
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @param ArticleInfoRepository $articleInfoRepo
      * @param AutomatedEditsHelper $autoEditsHelper
      * @return Response|JsonResponse
@@ -214,14 +254,6 @@ class ArticleInfoController extends XtoolsController
         AutomatedEditsHelper $autoEditsHelper
     ): Response {
         $this->recordApiUsage('page/articleinfo');
-
-        if ('/api/articleinfo' === substr($this->request->getRequestUri(), 0, 16)) {
-            $this->addFlash(
-                'warning',
-                'This endpoint will soon be removed. Use /api/page/articleinfo instead. ' .
-                    'See https://w.wiki/6sMx for more information.'
-            );
-        }
 
         $this->setupArticleInfo($articleInfoRepo, $autoEditsHelper);
         $data = [];
@@ -273,8 +305,31 @@ class ArticleInfoController extends XtoolsController
      * @Route(
      *     "/api/page/prose/{project}/{page}",
      *     name="PageApiProse",
-     *     requirements={"page"=".+"}
+     *     requirements={"page"=".+"},
+     *     methods={"GET"}
      * )
+     * @OA\Tag(name="Page API")
+     * @OA\ExternalDocumentation(url="https://www.mediawiki.org/wiki/XTools/Page_History#Prose")
+     * @OA\Get(description="Get statistics about the [prose](https://en.wiktionary.org/wiki/prose) (characters,
+            word count, etc.) and referencing of a page. ([more info](https://w.wiki/6oAF))")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/Page", @OA\Schema(example="Metallica"))
+     * @OA\Response(
+     *     response=200,
+     *     description="Prose stats",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="page", ref="#/components/parameters/Page/schema"),
+     *         @OA\Property(property="bytes", type="integer"),
+     *         @OA\Property(property="characters", type="integer"),
+     *         @OA\Property(property="words", type="integer"),
+     *         @OA\Property(property="references", type="integer"),
+     *         @OA\Property(property="unique_references", type="integer"),
+     *         @OA\Property(property="sections", type="integer"),
+     *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
      * @param ArticleInfoRepository $articleInfoRepo
      * @param AutomatedEditsHelper $autoEditsHelper
      * @return JsonResponse
@@ -303,8 +358,36 @@ class ArticleInfoController extends XtoolsController
      * @Route(
      *     "/api/page/assessments/{project}/{pages}",
      *     name="PageApiAssessments",
-     *     requirements={"pages"=".+"}
+     *     requirements={"pages"=".+"},
+     *     methods={"GET"}
      * )
+     * @OA\Tag(name="Page API")
+     * @OA\Get(description="Get [assessment data](https://w.wiki/6oAM) of the given pages, including the overall
+       quality classifications, along with a list of the WikiProjects and their classifications and importance levels.")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/Pages")
+     * @OA\Parameter(name="classonly", in="query", @OA\Schema(type="boolean"),
+     *     description="Return only the overall quality assessment instead of for each applicable WikiProject."
+     * )
+     * @OA\Response(
+     *     response=200,
+     *     description="Assessmnet data",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="pages", type="object",
+     *             @OA\Property(property="Page title", type="object",
+     *                 @OA\Property(property="assessment", ref="#/components/schemas/PageAssessment"),
+     *                 @OA\Property(property="wikiprojects", type="object",
+     *                     @OA\Property(property="name of WikiProject",
+     *                         ref="#/components/schemas/PageAssessmentWikiProject"
+     *                     )
+     *                 )
+     *             )
+     *         ),
+     *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
      * @param string $pages May be multiple pages separated by pipes, e.g. Foo|Bar|Baz
      * @return JsonResponse
      * @codeCoverageIgnore
@@ -313,14 +396,10 @@ class ArticleInfoController extends XtoolsController
     {
         $this->recordApiUsage('page/assessments');
 
-        $this->addFlash(
-            'warning',
-            'This API endpoint will soon have results nested under the \'pages\' property. ' .
-                'See https://w.wiki/6sMx for more information.'
-        );
-
         $pages = explode('|', $pages);
-        $out = [];
+        $out = [
+            'pages' => [],
+        ];
 
         foreach ($pages as $pageTitle) {
             try {
@@ -329,11 +408,11 @@ class ArticleInfoController extends XtoolsController
                     ->getPageAssessments()
                     ->getAssessments($page);
 
-                $out[$page->getTitle()] = $this->request->get('classonly')
+                $out['pages'][$page->getTitle()] = $this->getBoolVal('classonly')
                     ? $assessments['assessment']
                     : $assessments;
             } catch (XtoolsHttpException $e) {
-                $out[$pageTitle] = false;
+                $out['pages'][$pageTitle] = false;
             }
         }
 
@@ -341,12 +420,32 @@ class ArticleInfoController extends XtoolsController
     }
 
     /**
-     * Get number of in and outgoing links and redirects to the given page.
+     * Get number of in and outgoing links, external links, and redirects to the given page.
      * @Route(
      *     "/api/page/links/{project}/{page}",
      *     name="PageApiLinks",
-     *     requirements={"page"=".+"}
+     *     requirements={"page"=".+"},
+     *     methods={"GET"}
      * )
+     * @OA\Tag(name="Page API")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/Page")
+     * @OA\Response(
+     *     response=200,
+     *     description="Counts of in and outgoing links, external links, and redirects.",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="page", ref="#/components/parameters/Page/schema"),
+     *         @OA\Property(property="links_ext_count", type="integer"),
+     *         @OA\Property(property="links_out_count", type="integer"),
+     *         @OA\Property(property="links_in_count", type="integer"),
+     *         @OA\Property(property="redirects_count", type="integer"),
+     *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @return JsonResponse
      * @codeCoverageIgnore
      */
@@ -357,21 +456,62 @@ class ArticleInfoController extends XtoolsController
     }
 
     /**
-     * Get the top editors to a page.
+     * Get the top editors (by number of edits) of a page.
      * @Route(
      *     "/api/page/top_editors/{project}/{page}/{start}/{end}/{limit}", name="PageApiTopEditors",
      *     requirements={
      *         "page"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?(?:\/(\d+))?)?$",
      *         "start"="|\d{4}-\d{2}-\d{2}",
      *         "end"="|\d{4}-\d{2}-\d{2}",
-     *         "limit"="|\d+"
+     *         "limit"="\d+"
      *     },
      *     defaults={
      *         "start"=false,
      *         "end"=false,
      *         "limit"=20,
-     *     }
+     *     },
+     *     methods={"GET"}
      * )
+     * @OA\Tag(name="Page API")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/Page")
+     * @OA\Parameter(ref="#/components/parameters/Start")
+     * @OA\Parameter(ref="#/components/parameters/End")
+     * @OA\Parameter(ref="#/components/parameters/Limit")
+     * @OA\Parameter(name="nobots", in="query",
+     *     description="Exclude bots from the results.", @OA\Schema(type="boolean")
+     * )
+     * @OA\Response(
+     *     response=200,
+     *     description="List of the top editors, sorted by how many edits they've made to the page.",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="page", ref="#/components/parameters/Page/schema"),
+     *         @OA\Property(property="start", ref="#/components/parameters/Start/schema"),
+     *         @OA\Property(property="end", ref="#/components/parameters/End/schema"),
+     *         @OA\Property(property="limit", ref="#/components/parameters/Limit/schema"),
+     *         @OA\Property(property="top_editors", type="array", @OA\Items(type="object"), example={
+     *             {
+     *                 "rank": 1,
+     *                 "username": "Jimbo Wales",
+     *                 "count": 50,
+     *                 "minor": 15,
+     *                 "first_edit": {
+     *                     "id": 12345,
+     *                     "timestamp": 20200101125959
+     *                 },
+     *                 "last_edit": {
+     *                     "id": 54321,
+     *                     "timestamp": 20200120125959
+     *                 }
+     *             }
+     *         }),
+     *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @param ArticleInfoRepository $articleInfoRepo
      * @param AutomatedEditsHelper $autoEditsHelper
      * @return JsonResponse
@@ -386,7 +526,7 @@ class ArticleInfoController extends XtoolsController
         $this->setupArticleInfo($articleInfoRepo, $autoEditsHelper);
         $topEditors = $this->articleInfo->getTopEditorsByEditCount(
             (int)$this->limit,
-            '' != $this->request->query->get('nobots')
+            $this->getBoolVal('nobots')
         );
 
         return $this->getFormattedApiResponse([
@@ -406,8 +546,38 @@ class ArticleInfoController extends XtoolsController
      *     defaults={
      *         "start"=false,
      *         "end"=false,
-     *     }
+     *     },
+     *     methods={"GET"}
      * )
+     * @OA\Tag(name="Page API")
+     * @OA\Get(description="List bots that have edited a page, with edit counts and whether the account
+           is still in the `bot` user group.")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/Page")
+     * @OA\Parameter(ref="#/components/parameters/Start")
+     * @OA\Parameter(ref="#/components/parameters/End")
+     * @OA\Response(
+     *     response=200,
+     *     description="List of bots",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="page", ref="#/components/parameters/Page/schema"),
+     *         @OA\Property(property="start", ref="#/components/parameters/Start/schema"),
+     *         @OA\Property(property="end", ref="#/components/parameters/End/schema"),
+     *         @OA\Property(property="bots", type="object",
+     *             @OA\Property(property="Page title", type="object",
+     *                 @OA\Property(property="count", type="integer", description="Number of edits to the page."),
+     *                 @OA\Property(property="current", type="boolean",
+     *                     description="Whether the account currently has the bot flag"
+     *                 )
+     *             )
+     *         ),
+     *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @param ArticleInfoRepository $articleInfoRepo
      * @param AutomatedEditsHelper $autoEditsHelper
      * @return JsonResponse
@@ -439,8 +609,30 @@ class ArticleInfoController extends XtoolsController
      *     defaults={
      *         "start"=false,
      *         "end"=false,
-     *     }
+     *     },
+     *     methods={"GET"}
      * )
+     * @OA\Tag(name="Page API")
+     * @OA\Get(description="Get counts of the number of times known (semi-)automated tools were used to edit the page.")
+     * @OA\Parameter(ref="#/components/parameters/Project")
+     * @OA\Parameter(ref="#/components/parameters/Page")
+     * @OA\Parameter(ref="#/components/parameters/Start")
+     * @OA\Parameter(ref="#/components/parameters/End")
+     * @OA\Response(
+     *     response=200,
+     *     description="List of tools",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
+     *         @OA\Property(property="page", ref="#/components/parameters/Page/schema"),
+     *         @OA\Property(property="start", ref="#/components/parameters/Start/schema"),
+     *         @OA\Property(property="end", ref="#/components/parameters/End/schema"),
+     *         @OA\Property(property="automated_tools", ref="#/components/schemas/AutomatedTools"),
+     *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
+     *     )
+     * )
+     * @OA\Response(response=404, ref="#/components/responses/404")
+     * @OA\Response(response=503, ref="#/components/responses/503")
+     * @OA\Response(response=504, ref="#/components/responses/504")
      * @param ArticleInfoRepository $articleInfoRepo
      * @param AutomatedEditsHelper $autoEditsHelper
      * @return JsonResponse
@@ -454,7 +646,7 @@ class ArticleInfoController extends XtoolsController
 
         $this->setupArticleInfo($articleInfoRepo, $autoEditsHelper);
         return $this->getFormattedApiResponse([
-            'auto_edits' => $this->articleInfo->getAutoEditsCounts(),
+            'automated_tools' => $this->articleInfo->getAutoEditsCounts(),
         ]);
     }
 }

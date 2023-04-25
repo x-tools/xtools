@@ -8,6 +8,7 @@ use App\Model\PageAssessments;
 use App\Model\Pages;
 use App\Model\Project;
 use App\Model\User;
+use App\Repository\PageAssessmentsRepository;
 use App\Repository\PagesRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
@@ -31,17 +32,18 @@ class PagesTest extends TestAdapter
     public function setUp(): void
     {
         $this->project = $this->createMock(Project::class);
-        $paRepo = $this->createMock(PageAssessments::class);
+        $paRepo = $this->createMock(PageAssessmentsRepository::class);
         $paRepo->method('getConfig')
             ->willReturn($this->getAssessmentsConfig());
+        $pa = new PageAssessments($paRepo, $this->project);
         $this->project->method('getPageAssessments')
-            ->willReturn($paRepo);
-
-        $this->projectRepo = $this->createMock(ProjectRepository::class);
-        $this->projectRepo->method('getMetadata')
-            ->willReturn(['namespaces' => [0 => 'Main', 3 => 'User_talk']]);
+            ->willReturn($pa);
+        $this->project->method('hasPageAssessments')
+            ->with(0)
+            ->willReturn(true);
+        $this->project->method('getNamespaces')
+            ->willReturn([0 => 'Main', 1 => 'Talk', 3 => 'User_talk']);
         $this->userRepo = $this->createMock(UserRepository::class);
-        $this->project->setRepository($this->projectRepo);
         $this->user = new User($this->userRepo, 'Test user');
         $this->pagesRepo = $this->createMock(PagesRepository::class);
     }
@@ -90,18 +92,40 @@ class PagesTest extends TestAdapter
 
         static::assertEquals([0, 1], array_keys($results));
         static::assertEquals([
-            'namespace' => '0',
-            'type' => 'arc',
-            'page_title' => 'My fun page',
-            'page_is_redirect' => '0',
-            'rev_timestamp' => '20160519000000',
-            'pa_class' => '',
-            'pa_importance' => '',
-            'raw_time' => '20160519000000',
-            'human_time' => '2016-05-19 00:00',
-            'recreated' => '1',
-            'rev_len' => '5',
+            'deleted' => true,
+            'namespace' => 0,
+            'page_title' => 'My_fun_page',
+            'full_page_title' => 'My_fun_page',
+            'redirect' => false,
+            'timestamp' => '20160519000000',
+            'rev_id' => 16,
+            'rev_length' => 5,
+            'length' => null,
+            'recreated' => true,
+            'assessment' => [
+                'class' => 'Unknown',
+                'badge' => 'https://upload.wikimedia.org/wikipedia/commons/e/e0/Symbol_question.svg',
+                'color' => '',
+                'category' => 'Category:Unassessed articles',
+            ],
         ], $results[0][0]);
+        static::assertEquals([
+            'deleted' => false,
+            'namespace' => 1,
+            'page_title' => 'Google',
+            'full_page_title' => 'Talk:Google',
+            'redirect' => true,
+            'timestamp' => '20160719000000',
+            'rev_id' => 15,
+            'rev_length' => 10,
+            'length' => 50,
+            'assessment' => [
+                'class' => 'A',
+                'badge' => 'https://upload.wikimedia.org/wikipedia/commons/2/25/Symbol_a_class.svg',
+                'color' => '#66FFFF',
+                'category' => 'Category:A-Class articles',
+            ],
+        ], $results[1][0]);
         static::assertTrue($pages->isMultiNamespace());
     }
 
@@ -111,35 +135,38 @@ class PagesTest extends TestAdapter
             ->method('getPagesCreated')
             ->willReturn([
                 [
-                    'namespace' => '1',
+                    'namespace' => 1,
                     'type' => 'rev',
-                    'page_title' => 'Gooogle',
-                    'page_is_redirect' => '1',
-                    'rev_timestamp' => '20160719000000',
-                    'rev_len' => 10,
-                    'pa_class' => 'A',
-                    'pa_importance' => '',
+                    'page_title' => 'Google',
+                    'redirect' => '1',
+                    'rev_length' => 10,
+                    'length' => 50,
+                    'timestamp' => '20160719000000',
+                    'rev_id' => 15,
                     'recreated' => null,
+                    'pa_class' => 'A',
                 ], [
-                    'namespace' => '0',
+                    'namespace' => 0,
                     'type' => 'arc',
                     'page_title' => 'My_fun_page',
-                    'page_is_redirect' => '0',
-                    'rev_timestamp' => '20160519000000',
-                    'rev_len' => 5,
-                    'pa_class' => '',
-                    'pa_importance' => '',
-                    'recreated' => '1',
+                    'redirect' => '0',
+                    'rev_length' => 5,
+                    'length' => null,
+                    'timestamp' => '20160519000000',
+                    'rev_id' => 16,
+                    'recreated' => 1,
+                    'pa_class' => null,
                 ], [
-                    'namespace' => '0',
+                    'namespace' => 0,
                     'type' => 'rev',
                     'page_title' => 'Foo_bar',
-                    'page_is_redirect' => '0',
-                    'rev_timestamp' => '20160101000000',
-                    'rev_len' => 12,
-                    'pa_class' => 'FA',
-                    'pa_importance' => '',
+                    'redirect' => '0',
+                    'rev_length' => 12,
+                    'length' => 50,
+                    'timestamp' => '20160101000000',
+                    'rev_id' => 17,
                     'recreated' => null,
+                    'pa_class' => 'FA',
                 ],
             ]);
         $this->pagesRepo->expects($this->once())
@@ -168,14 +195,21 @@ class PagesTest extends TestAdapter
     private function getAssessmentsConfig(): array
     {
         return [
-            'test.project.org' => [
-                'class' => [
-                    'FA' =>  [
-                        'badge' => 'b/bc/Featured_article_star.svg',
-                    ],
-                    'A' => [
-                        'badge' => '2/25/Symbol_a_class.svg',
-                    ],
+            'class' => [
+                'FA' =>  [
+                    'badge' => 'b/bc/Featured_article_star.svg',
+                    'color' => '#9CBDFF',
+                    'category' => 'Category:FA-Class articles',
+                ],
+                'A' => [
+                    'badge' => '2/25/Symbol_a_class.svg',
+                    'color' => '#66FFFF',
+                    'category' => 'Category:A-Class articles',
+                ],
+                'Unknown' => [
+                    'badge' => 'e/e0/Symbol_question.svg',
+                    'color' => '',
+                    'category' => 'Category:Unassessed articles',
                 ],
             ],
         ];

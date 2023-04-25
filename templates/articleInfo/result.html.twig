@@ -123,9 +123,9 @@
                             <td>
                                 {% set assessment_value %}
                                     {% if ai.assessments.assessment.badge is defined %}
-                                        <img alt="{{ ai.assessments.assessment.value }}" src="{{ ai.assessments.assessment.badge }}" class="assessment-badge" />
+                                        <img alt="{{ ai.assessments.assessment.class }}" src="{{ ai.assessments.assessment.badge }}" class="assessment-badge" />
                                     {% endif %}
-                                    {{ ai.assessments.assessment.value|ucfirst }}
+                                    {{ ai.assessments.assessment.class|ucfirst }}
                                 {% endset %}
                                 {{ wiki.pageLinkRaw(ai.assessments.assessment.category, project, assessment_value) }}
                             </td>
@@ -457,7 +457,7 @@
             {% endset %}
             {% set description_link %}
                 {% set wikiwhoLink %}
-                    <a target='_blank' href='https://www.wikiwho.net/'>Wikiwho</a>
+                    <a target='_blank' href='https://www.mediawiki.org/wiki/Special:MyLanguage/WikiWho'>WikiWho</a>
                 {% endset %}
                 {{ msg('powered-by', [wikiwhoLink]) }}
             {% endset %}

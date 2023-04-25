@@ -117,7 +117,7 @@ class CategoryEditsTest extends TestAdapter
         $revs = [
             [
                 'page_title' => 'Test_page',
-                'page_namespace' => '1',
+                'namespace' => '1',
                 'rev_id' => '123',
                 'timestamp' => '20170103000000',
                 'minor' => '0',
@@ -127,7 +127,7 @@ class CategoryEditsTest extends TestAdapter
             ],
             [
                 'page_title' => 'Foo_bar',
-                'page_namespace' => '0',
+                'namespace' => '0',
                 'rev_id' => '321',
                 'timestamp' => '20170115000000',
                 'minor' => '1',
@@ -140,11 +140,11 @@ class CategoryEditsTest extends TestAdapter
         $pages = [
             Page::newFromRow($this->pageRepo, $this->project, [
                 'page_title' => 'Test_page',
-                'page_namespace' => 1,
+                'namespace' => 1,
             ]),
             Page::newFromRow($this->pageRepo, $this->project, [
                 'page_title' => 'Foo_bar',
-                'page_namespace' => 0,
+                'namespace' => 0,
             ]),
         ];
 

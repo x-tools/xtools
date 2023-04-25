@@ -105,7 +105,7 @@ class GlobalContribsTest extends TestAdapter
             'parent_id' => 0,
             'username' => 'Test user',
             'page_title' => 'Foo bar',
-            'page_namespace' => '2',
+            'namespace' => '2',
             'comment' => 'My user page',
         ]];
 

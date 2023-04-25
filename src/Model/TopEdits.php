@@ -265,7 +265,11 @@ class TopEdits extends Model
         if ($format) {
             return $this->formatTopEditsPage($revs);
         } else {
-            return $revs;
+            return array_map(function ($rev) {
+                $rev['minor'] = (bool)$rev['minor'];
+                $rev['reverted'] = (bool)$rev['reverted'];
+                return $rev;
+            }, $revs);
         }
     }
 
@@ -336,15 +340,23 @@ class TopEdits extends Model
         $topEditedPages = [];
 
         foreach ($pages as $page) {
-            $nsId = (int)$page['page_namespace'];
+            $nsId = (int)$page['namespace'];
 
             // FIXME: needs refactoring, done in PagesController::getPagepileResult() and AppExtension::titleWithNs().
             if (0 === $nsId) {
-                $page['page_title_ns'] = $page['page_title'];
+                $page['full_page_title'] = $page['page_title'];
             } else {
-                $page['page_title_ns'] = (
-                    $this->project->getNamespaces()[$page['page_namespace']] ?? ''
+                $page['full_page_title'] = (
+                    $this->project->getNamespaces()[$page['namespace']] ?? ''
                 ).':'.$page['page_title'];
+            }
+
+            if (array_key_exists('pa_class', $page)) {
+                $page['assessment'] = array_merge(
+                    ['class' => $page['pa_class'] ?: 'Unknown'],
+                    $this->project->getPageAssessments()->getClassAttrs($page['pa_class'] ?: 'Unknown')
+                );
+                unset($page['pa_class']);
             }
 
             if (isset($topEditedPages[$nsId])) {

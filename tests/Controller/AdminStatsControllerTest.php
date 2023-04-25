@@ -38,7 +38,7 @@ class AdminStatsControllerTest extends ControllerTestAdapter
         }
 
         $this->assertSuccessfulRoutes([
-            '/api/project/admins_groups/fr.wikipedia',
+            '/api/project/admin_groups/fr.wikipedia',
             '/api/project/admin_stats/frwiki/2019-01-01',
         ]);
     }

@@ -622,6 +622,7 @@ class AppExtension extends AbstractExtension
      */
     public function titleWithNs(string $title, int $namespace, array $namespaces): string
     {
+        $title = str_replace('_', ' ', $title);
         if (0 === $namespace) {
             return $title;
         }
