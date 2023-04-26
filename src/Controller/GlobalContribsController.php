@@ -43,9 +43,10 @@ class GlobalContribsController extends XtoolsController
      * @Route("/ec-latestglobal", name="EditCounterLatestGlobalIndex")
      * @Route("/ec-latestglobal-contributions", name="EditCounterLatestGlobalContribsIndex")
      * @Route("/ec-latestglobaledits", name="EditCounterLatestGlobalEditsIndex")
+     * @param string $centralAuthProject
      * @return Response
      */
-    public function indexAction(): Response
+    public function indexAction(string $centralAuthProject): Response
     {
         // Redirect if username is given.
         if (isset($this->params['username'])) {
@@ -55,7 +56,7 @@ class GlobalContribsController extends XtoolsController
         // FIXME: Nasty hack until T226072 is resolved.
         $project = $this->projectRepo->getProject($this->i18n->getLang().'.wikipedia');
         if (!$project->exists()) {
-            $project = $this->projectRepo->getProject($this->getParameter('central_auth_project'));
+            $project = $this->projectRepo->getProject($centralAuthProject);
         }
 
         return $this->render('globalContribs/index.html.twig', array_merge([

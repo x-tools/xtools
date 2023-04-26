@@ -16,7 +16,7 @@
 {% for user in as.stats %}
 | {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ loop.index }}}}
 | [[User:{{ user.username }}|{{ user.username }}]]
-| {% for group, fileTitle in as.userGroupIcons(true)|filter(group => group in user['user-groups']) %}[[File:{{ fileTitle }}|18px|alt={{ rightsNames[group] }}]]{% endfor %}
+| {% for group, fileTitle in as.userGroupIcons(true)|filter((fileTitle, group) => group in user['user-groups']) %}[[File:{{ fileTitle }}|18px|alt={{ rightsNames[group] }}]]{% endfor %}
 
 | {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ user.total }}}}
 {% for action in as.actions %}
