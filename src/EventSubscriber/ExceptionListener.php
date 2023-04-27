@@ -112,10 +112,11 @@ class ExceptionListener
 
         return new Response(
             $this->templateEngine->render('bundles/TwigBundle/Exception/error.html.twig', [
-                'status_code' => 500,
+                'status_code' => Response::HTTP_INTERNAL_SERVER_ERROR,
                 'status_text' => 'Internal Server Error',
                 'exception' => $exception,
-            ])
+            ]),
+            Response::HTTP_INTERNAL_SERVER_ERROR
         );
     }
 }
