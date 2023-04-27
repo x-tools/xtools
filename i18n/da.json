@@ -87,6 +87,7 @@
 	"current-stewards": "Nuværende forvaltere",
 	"current-user-groups": "Nuværende brugergrupper",
 	"data-limit": "Data begrænset til de seneste $2 {{PLURAL:$1|redigering|redigeringer}}",
+	"data-unavailable": "Data er ikke tilgængelige",
 	"date": "Dato",
 	"date-from": "Fra: $1",
 	"date-range": "$1 - $2",

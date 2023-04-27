@@ -84,6 +84,7 @@
 	"current-stewards": "ప్రస్తుత స్టీవార్డులు",
 	"current-user-groups": "ప్రస్తుత వాడుకరి గుంపులు",
 	"data-limit": "డేటా గత $2 {{PLURAL:$1|దిద్దుబాటు|దిద్దుబాట్లకు}} పరిమితం",
+	"data-unavailable": "డేటా లేదు",
 	"date": "తేదీ",
 	"date-from": "నుండి: $1",
 	"date-range": "$1 - $2",

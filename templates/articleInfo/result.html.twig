@@ -357,30 +357,36 @@
                         <tr>
                             <td colspan="2" class="text-muted">{{ msg('prose') }}</td>
                         </tr>
-                        <tr>
-                            <td>{{ msg('bytes') }}</td>
-                            <td>{{ ai.proseStats.bytes|num_format }}</td>
-                        </tr>
-                        <tr>
-                            <td>{{ msg('characters') }}</td>
-                            <td>{{ ai.proseStats.characters|num_format }}</td>
-                        </tr>
-                        <tr>
-                            <td>{{ msg('words') }}</td>
-                            <td>{{ ai.proseStats.words|num_format }}</td>
-                        </tr>
-                        <tr>
-                            <td>{{ msg('sections') }}</td>
-                            <td>{{ ai.proseStats.sections|num_format }}</td>
-                        </tr>
-                        <tr>
-                            <td>{{ msg('references') }}</td>
-                            <td>{{ ai.proseStats.references|num_format }}</td>
-                        </tr>
-                        <tr>
-                            <td>{{ msg('unique-references') }}</td>
-                            <td>{{ ai.proseStats.unique_references|num_format }}</td>
-                        </tr>
+                        {% if ai.proseStats == null %}
+                            <tr>
+                                <td colspan="2" class="text-muted non-label">{{ msg('data-unavailable') }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td>{{ msg('bytes') }}</td>
+                                <td>{{ ai.proseStats.bytes|num_format }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ msg('characters') }}</td>
+                                <td>{{ ai.proseStats.characters|num_format }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ msg('words') }}</td>
+                                <td>{{ ai.proseStats.words|num_format }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ msg('sections') }}</td>
+                                <td>{{ ai.proseStats.sections|num_format }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ msg('references') }}</td>
+                                <td>{{ ai.proseStats.references|num_format }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ msg('unique-references') }}</td>
+                                <td>{{ ai.proseStats.unique_references|num_format }}</td>
+                            </tr>
+                        {% endif %}
                     </tbody>
                 </table>
             </div>

@@ -83,6 +83,7 @@
 	"current-size": "Oraingo tamaina",
 	"current-user-groups": "Oraingo erabiltzaile taldeak",
 	"data-limit": "Data aurreko $2 {{PLURAL:$1|aldaketara|$2 aldaketetara}} mugatua",
+	"data-unavailable": "Datuak ez daude eskuragarri",
 	"date": "Data",
 	"date-from": "Jatorria: $1",
 	"date-range": "$1 - $2",

@@ -102,6 +102,7 @@
 	"current-stewards": "Tiếp viên đương nhiệm",
 	"current-user-groups": "Nhóm thành viên hiện tại",
 	"data-limit": "Dữ liệu giới hạn trong $2 {{PLURAL:$1|sửa đổi}} cuối.",
+	"data-unavailable": "Dữ liệu không có sẵn",
 	"date": "Ngày tháng",
 	"date-from": "Từ: $1",
 	"date-range": "$1 – $2",

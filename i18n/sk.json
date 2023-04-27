@@ -92,6 +92,7 @@
 	"current-stewards": "Súčasní dozorcovia",
 	"current-user-groups": "Súčasné používateľské skupiny",
 	"data-limit": "Údaje obmedzené na posledné $2 {{PLURAL:$1|úprava|úpravy}}",
+	"data-unavailable": "Údaje nie sú dostupné",
 	"date": "Dátum",
 	"date-from": "Od: $1",
 	"date-range": "$1 - $2",

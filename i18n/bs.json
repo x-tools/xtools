@@ -51,6 +51,7 @@
 	"csv": "CSV",
 	"current-size": "Trenutna veličina",
 	"data-limit": "Podaci su ograničeni na {{PLURAL:$1|posljednju izmjenu|posljednje $2 izmjene|posljednjih $2 izmjena}}",
+	"data-unavailable": "Podaci nisu dostupni",
 	"date": "Datum",
 	"deleted-edits": "Obrisane izmjene",
 	"diff": "Razl",

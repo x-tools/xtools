@@ -6,6 +6,7 @@
 		]
 	},
 	"basic-information": "Basiese inligting",
+	"data-unavailable": "Data nie beskikbaar nie",
 	"documentation": "Dokumentasie",
 	"download-label": "Laai af",
 	"num-edits": "{{PLURAL:$1|wysig|wysigings}}",

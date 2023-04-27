@@ -106,6 +106,7 @@
 	"current-stewards": "বর্তমান স্টুয়ার্ড",
 	"current-user-groups": "বর্তমান ব্যবহারকারী দল",
 	"data-limit": "উপাত্ত গত $2টি {{PLURAL:$1|সম্পাদনার}} উপর সীমাবদ্ধ",
+	"data-unavailable": "উপাত্ত অনুপলব্ধ",
 	"date": "তারিখ",
 	"date-from": "এই থেকে: $1",
 	"date-range": "$1 - $2",

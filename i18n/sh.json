@@ -89,6 +89,7 @@
 	"current-stewards": "Trenutni stjuardi",
 	"current-user-groups": "Trenutne korisničke grupe",
 	"data-limit": "Podaci su ograničeni na $2 {{PLURAL:$1|posljednju izmjenu|posljednje izmjene|posljednjih izmjena}}",
+	"data-unavailable": "Podaci nisu dostupni",
 	"date": "Datum",
 	"date-from": "Od: $1",
 	"date-range": "$1 - $2",

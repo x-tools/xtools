@@ -4,11 +4,13 @@ declare(strict_types = 1);
 
 namespace App\Repository;
 
+use App\Exception\BadGatewayException;
 use App\Model\Page;
 use App\Model\Project;
 use App\Model\User;
 use DateTime;
 use Doctrine\DBAL\Driver\ResultStatement;
+use GuzzleHttp\Exception\ServerException;
 
 /**
  * A PageRepository fetches data about Pages, either singularly or for multiple.
@@ -416,9 +418,13 @@ class PageRepository extends Repository
             }
         }
 
-        return $this->guzzle->request('GET', $url)
-            ->getBody()
-            ->getContents();
+        try {
+            return $this->guzzle->request('GET', $url)
+                ->getBody()
+                ->getContents();
+        } catch (ServerException $e) {
+            throw new BadGatewayException('api-error-wikimedia', $e);
+        }
     }
 
     /**

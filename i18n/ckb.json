@@ -97,6 +97,7 @@
 	"current-stewards": "بەڕێوەبەرەکانی ئێستا",
 	"current-user-groups": "گرووپی بەکارھێنەرەکانی ئێستا",
 	"data-limit": "داتاکان سنووردارن بۆ دوایین $2 {{PLURAL:$1|دەستکاری}}",
+	"data-unavailable": "زانیاریی بەردەست نییە",
 	"date": "ڕێکەوت",
 	"date-from": "لە لایەن: $1",
 	"date-range": "$1 - $2",

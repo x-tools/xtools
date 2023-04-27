@@ -97,6 +97,7 @@
 	"current-stewards": "Steward saat ini",
 	"current-user-groups": "Kelompok pengguna saat ini",
 	"data-limit": "Data dibatasi hingga $2 {{PLURAL:$1|suntingan|suntingan}} terakhir",
+	"data-unavailable": "Data tidak tersedia",
 	"date": "Tanggal",
 	"date-from": "Dari: $1",
 	"date-range": "$1 - $2",

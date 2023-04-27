@@ -87,6 +87,7 @@
 	"current-stewards": "Aktuális intézők:",
 	"current-user-groups": "Jelenlegi felhasználói csoportok",
 	"data-limit": "Az adatok korlátozva az utolsó $2 {{PLURAL:$1|szerkesztésre}}",
+	"data-unavailable": "Az adatok nem érhetők el",
 	"date": "Dátum",
 	"date-from": "Ettől: $1",
 	"date-range": "$1 – $2",

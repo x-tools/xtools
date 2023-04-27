@@ -81,6 +81,7 @@
 	"current-size": "Tamaño actual",
 	"current-user-groups": "Grupos de usuario actuais",
 	"data-limit": "Datos limitados {{PLURAL:$1|á última edición|ás últimas $2 edicións}}",
+	"data-unavailable": "Datos non dispoñíbeis",
 	"date": "Data",
 	"date-from": "De: $1",
 	"date-range": "$1 - $2",

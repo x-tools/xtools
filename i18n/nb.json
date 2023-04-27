@@ -91,6 +91,7 @@
 	"current-stewards": "Nåværende foraltere",
 	"current-user-groups": "Gjeldende brukergrupper",
 	"data-limit": "Dataene er begrenset til {{PLURAL:$1|den siste redigeringen|de siste $2 redigeringene}}.",
+	"data-unavailable": "Data utilgjengelig",
 	"date": "Dato",
 	"date-from": "Fra: $1",
 	"date-range": "$1–$2",

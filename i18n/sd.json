@@ -77,6 +77,7 @@
 	"current-admins": "هاڻوڪا منتظمَ",
 	"current-size": "ھاڻوڪي ماپ",
 	"data-limit": "گذريل $2 {{PLURAL:$1|سنوار|سنوارن}} تائين ڊيٽا محدود ٿيل",
+	"data-unavailable": "ڊيٽا غيرموجود",
 	"date": "تاريخ",
 	"date-from": "کان: $1",
 	"date-range": "$1 - $2",

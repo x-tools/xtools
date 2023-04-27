@@ -266,7 +266,12 @@ class ArticleInfoController extends XtoolsController
         $this->setupArticleInfo($articleInfoRepo, $autoEditsHelper);
         $this->addFlash('info', 'The algorithm used by this API has recently changed. ' .
             'See https://www.mediawiki.org/wiki/XTools/Page_History#Prose for details.');
-        return $this->getFormattedApiResponse($this->articleInfo->getProseStats());
+        $ret = $this->articleInfo->getProseStats();
+        if (null === $ret) {
+            $this->addFlashMessage('error', 'api-error-wikimedia');
+            $ret = [];
+        }
+        return $this->getFormattedApiResponse($ret);
     }
 
     /**

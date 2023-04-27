@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Model;
 
+use App\Exception\BadGatewayException;
 use App\Helper\AutomatedEditsHelper;
 use App\Helper\I18nHelper;
 use App\Repository\ArticleInfoRepository;
@@ -152,16 +153,22 @@ class ArticleInfoApi extends Model
 
     /**
      * Get prose and reference information.
-     * @return array With keys 'characters', 'words', 'references', 'unique_references'
+     * @return array|null With keys 'characters', 'words', 'references', 'unique_references', or null on failure.
      */
-    public function getProseStats(): array
+    public function getProseStats(): ?array
     {
         if (isset($this->proseStats)) {
             return $this->proseStats;
         }
 
         $datetime = is_int($this->end) ? new DateTime("@$this->end") : null;
-        $html = $this->page->getHTMLContent($datetime);
+
+        try {
+            $html = $this->page->getHTMLContent($datetime);
+        } catch (BadGatewayException $e) {
+            // Prose stats are non-critical, so handle the BadGatewayException gracefully in the views.
+            return null;
+        }
 
         $crawler = new Crawler($html);
         $refs = $crawler->filter('[typeof~="mw:Extension/ref"]');

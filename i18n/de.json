@@ -108,6 +108,7 @@
 	"current-stewards": "Aktuelle Stewards",
 	"current-user-groups": "Aktuelle Benutzergruppen",
 	"data-limit": "Daten auf die {{PLURAL:$1|letzte Bearbeitung|letzten $2 Bearbeitungen}} begrenzt",
+	"data-unavailable": "Daten nicht verfügbar",
 	"date": "Datum",
 	"date-from": "Vom: $1",
 	"date-range": "$1 bis $2",

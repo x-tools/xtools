@@ -73,6 +73,7 @@
 	"csv": "CSV",
 	"current-admins": "Aktualna ilość administratorów",
 	"current-size": "Aktualny rozmiar",
+	"data-unavailable": "Dane niedostępne",
 	"date": "Data",
 	"date-from": "Od: $1",
 	"date-range": "$1 – $2",

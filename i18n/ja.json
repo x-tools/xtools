@@ -104,6 +104,7 @@
 	"current-stewards": "在任中のスチュワード",
 	"current-user-groups": "現行の利用者グループ",
 	"data-limit": "データは過去$2件までの{{PLURAL:$1|編集}}による",
+	"data-unavailable": "データが見つかりませんでした",
 	"date": "日付",
 	"date-from": "$1から",
 	"date-range": "$1 - $2",

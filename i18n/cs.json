@@ -93,6 +93,7 @@
 	"current-stewards": "Současní stevardi",
 	"current-user-groups": "Aktuální skupiny uživatele",
 	"data-limit": "Data omezena na {{PLURAL:$1|nejnovější editaci|nejnovější $2 editace|nejnovějších $2 editací}}",
+	"data-unavailable": "Údaje nejsou k dispozici",
 	"date": "Datum",
 	"date-from": "Z: $1",
 	"date-range": "$1 – $2",

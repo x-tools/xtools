@@ -497,7 +497,7 @@ section > .panel-body {
     padding-top: 0;
     white-space: normal;
 
-    &:first-child:not(.stat-list--footer) {
+    &:first-child:not(.non-label, .stat-list--footer) {
         font-weight: bold;
         text-align: right;
         white-space: nowrap;

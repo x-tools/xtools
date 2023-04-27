@@ -96,6 +96,7 @@
 	"current-stewards": "Stewarzi actuali",
 	"current-user-groups": "Grupuri de utilizatori actuale",
 	"data-limit": "Date limitate la ultimele $2 {{PLURAL:$1|editare|editări|de editări}}",
+	"data-unavailable": "Informații indisponibile",
 	"date": "Dată",
 	"date-from": "De la: $1",
 	"date-range": "$1 - $2",

@@ -101,6 +101,7 @@
 	"current-stewards": "المضيفون الحاليون",
 	"current-user-groups": "مجموعات المستخدم الحالية",
 	"data-limit": "البيانات تقتصر على ال$2 {{PLURAL:$1|تعديل}} السابق",
+	"data-unavailable": "البيانات غير مُتاحة",
 	"date": "التاريخ",
 	"date-from": "من: $1",
 	"date-range": "$1 - $2",
