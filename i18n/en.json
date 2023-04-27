@@ -32,6 +32,7 @@
 	"all-quotes": "All quotes",
 	"api": "API",
 	"api-error": "Error querying $1",
+	"api-error-wikimedia": "There was an error connecting to the Wikimedia API. Try refreshing this page or try again later.",
 	"approve": "Approve",
 	"approximate": "Approximate",
 	"article": "Article",
