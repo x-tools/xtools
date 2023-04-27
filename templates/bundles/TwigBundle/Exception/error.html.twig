@@ -13,7 +13,7 @@
 
     <div class="panel-body xt-panel-body error-wrapper">
         <div class="error-mascot--wrapper pull-right">
-            <a target="_blank" title="By Lilyu (Own work) [WTFPL], via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File%3ALapinou_Furieux.svg"><img class="error-mascot" alt="Lapinou Furieux" src="{{ asset('images/error_mascot.svg') }}"/></a>
+            <a target="_blank" title="By Lilyu (Own work) [WTFPL], via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File%3ALapinou_Furieux.svg"><img class="error-mascot" alt="Lapinou Furieux" src="{{ asset('/build/images/error_mascot.svg') }}"/></a>
         </div>
 
         {% if exception is defined and attribute(exception, 'message') is defined %}
@@ -46,7 +46,7 @@
         {% endif %}
 
         <div class="text-center">
-            <img class="splash-logo splash-logo--small" style="width:150px" src="{{ asset('images/logo.svg') }}" alt="{{ msg('xtools-title') }}" />
+            <img class="splash-logo splash-logo--small" style="width:150px" src="{{ asset('/build/images/logo.svg') }}" alt="{{ msg('xtools-title') }}" />
             <h5 class="about-subtitle">
                 {{ msg('version', [version]) }}
                 ({{ releaseDate() }})
