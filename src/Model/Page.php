@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Model;
 
+use App\Exception\BadGatewayException;
 use App\Repository\PageRepository;
 use DateTime;
 use Doctrine\DBAL\Driver\ResultStatement;
@@ -476,15 +477,18 @@ class Page extends Model
      * Get the sum of pageviews for the given page and timeframe.
      * @param string|DateTime $start In the format YYYYMMDD
      * @param string|DateTime $end In the format YYYYMMDD
-     * @return int
+     * @return int|null Total pageviews or null if data is unavailable.
      */
-    public function getPageviews($start, $end): int
+    public function getPageviews($start, $end): ?int
     {
         try {
             $pageviews = $this->repository->getPageviews($this, $start, $end);
         } catch (ClientException $e) {
             // 404 means zero pageviews
             return 0;
+        } catch (BadGatewayException $e) {
+            // Upstream error, so return null so the view can customize messaging.
+            return null;
         }
 
         return array_sum(array_map(function ($item) {
@@ -494,10 +498,11 @@ class Page extends Model
 
     /**
      * Get the sum of pageviews over the last N days
-     * @param int $days Default 30
-     * @return int Number of pageviews
+     * @param int $days Default ArticleInfoApi::PAGEVIEWS_OFFSET
+     * @see ArticleInfoApi::PAGEVIEWS_OFFSET
+     * @return int|null Number of pageviews or null if data is unavailable.
      */
-    public function getLastPageviews(int $days = 30): int
+    public function getLatestPageviews(int $days = ArticleInfoApi::PAGEVIEWS_OFFSET): ?int
     {
         $start = date('Ymd', strtotime("-$days days"));
         $end = date('Ymd');

@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Tests\Model;
 
+use App\Exception\BadGatewayException;
 use App\Helper\I18nHelper;
 use App\Model\ArticleInfo;
 use App\Model\Edit;
@@ -448,6 +449,18 @@ class ArticleInfoTest extends TestAdapter
 
         // Uses length of last edit because there is a date range.
         static::assertEquals(25, $this->articleInfo->getLength());
+
+        // Pageviews with a date range.
+        $this->pageRepo->expects($this->once())
+            ->method('getPageviews')
+            ->with($this->page, '2016-06-30', '2016-10-14')
+            ->willReturn([
+                'items' => [
+                    ['views' => 1000],
+                    ['views' => 500],
+                ],
+            ]);
+        static::assertEquals(1500, $this->articleInfo->getPageviews()['count']);
     }
 
     /**
@@ -468,5 +481,39 @@ class ArticleInfoTest extends TestAdapter
         static::assertEquals(3, $this->articleInfo->getNumCategories());
         static::assertEquals(5, $this->articleInfo->getNumTemplates());
         static::assertEquals(2, $this->articleInfo->getNumFiles());
+    }
+
+    public function testPageviews(): void
+    {
+        $this->pageRepo->expects($this->once())
+            ->method('getPageviews')
+            ->willReturn([
+                'items' => [
+                    ['views' => 1000],
+                    ['views' => 500],
+                ],
+            ]);
+
+        static::assertEquals([
+            'count' => 1500,
+            'formatted' => '1,500',
+            'tooltip' => '',
+        ], $this->articleInfo->getPageviews());
+
+        static::assertEquals(ArticleInfo::PAGEVIEWS_OFFSET, $this->articleInfo->getPageviewsOffset());
+    }
+
+    public function testPageviewsFailing(): void
+    {
+        $this->pageRepo->expects($this->once())
+            ->method('getPageviews')
+            ->willThrowException($this->createMock(BadGatewayException::class));
+
+        static::assertEquals([
+            'count' => null,
+            'formatted' => 'Data unavailable',
+            'tooltip' => 'There was an error connecting to the Wikimedia API. ' .
+                'Try refreshing this page or try again later.',
+        ], $this->articleInfo->getPageviews());
     }
 }

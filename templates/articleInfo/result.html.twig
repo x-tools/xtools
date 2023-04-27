@@ -145,13 +145,14 @@
                     {% endif %}
                     {% if isWMF() %}
                         <tr>
-                            <td>{{ msg('pageviews') }}{% if not (ai.hasDateRange) %} ({{ 60|num_format }} {{ msg('num-days', [60]) }}){% endif %}</td>
+                            <td>{{ msg('pageviews') }}{% if not (ai.hasDateRange) %} ({{ ai.pageviewsOffset|num_format }} {{ msg('num-days', [ai.pageviewsOffset]) }}){% endif %}</td>
                             <td>
                                 {{
                                     wiki.pageviewsLink(
                                         page,
-                                        ai.pageviews(pageviewsOffset)|num_format,
-                                        ai.hasDateRange ? ai.dateParams : {'range': 'latest-' ~ pageviewsOffset}
+                                        ai.pageviews(pageviewsOffset).formatted,
+                                        ai.hasDateRange ? ai.dateParams : {'range': 'latest-' ~ pageviewsOffset},
+                                        ai.pageviews(pageviewsOffset).tooltip
                                     )
                                 }}
                             </td>

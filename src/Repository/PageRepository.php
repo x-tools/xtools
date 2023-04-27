@@ -10,7 +10,9 @@ use App\Model\Project;
 use App\Model\User;
 use DateTime;
 use Doctrine\DBAL\Driver\ResultStatement;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\RequestOptions;
 
 /**
  * A PageRepository fetches data about Pages, either singularly or for multiple.
@@ -372,9 +374,19 @@ class PageRepository extends Repository
      * @param string|DateTime $start In the format YYYYMMDD
      * @param string|DateTime $end In the format YYYYMMDD
      * @return string[][][]
+     * @throws BadGatewayException
      */
     public function getPageviews(Page $page, $start, $end): array
     {
+        // Pull from cache for each call during the same request.
+        // FIXME: This is fine for now as we only fetch pageviews for one page at a time,
+        //   but if that ever changes we'll need to use APCu cache or otherwise respect $page, $start and $end.
+        //   Better of course would be to move to a Symfony CachingHttpClient instead of Guzzle across the board.
+        static $pageviews;
+        if (isset($pageviews)) {
+            return $pageviews;
+        }
+
         $title = rawurlencode(str_replace(' ', '_', $page->getTitle()));
 
         if ($start instanceof DateTime) {
@@ -393,8 +405,16 @@ class PageRepository extends Repository
         $url = 'https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/' .
             "$project/all-access/user/$title/daily/$start/$end";
 
-        $res = $this->guzzle->request('GET', $url);
-        return json_decode($res->getBody()->getContents(), true);
+        try {
+            $res = $this->guzzle->request('GET', $url, [
+                // Five seconds should be plenty...
+                RequestOptions::CONNECT_TIMEOUT => 5,
+            ]);
+            $pageviews = json_decode($res->getBody()->getContents(), true);
+            return $pageviews;
+        } catch (ServerException|ConnectException $e) {
+            throw new BadGatewayException('api-error-wikimedia', $e);
+        }
     }
 
     /**

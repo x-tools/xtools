@@ -1014,18 +1014,60 @@ class ArticleInfo extends ArticleInfoApi
     }
 
     /**
-     * Get the number of times the page has been viewed in the given timeframe. If the ArticleInfo instance has a
-     * date range, it is used instead of the value of the $latest parameter.
-     * @param  int $latest Last N days.
-     * @return int
+     * Get the number of times the page has been viewed in the last ArticleInfoApi::PAGEVIEWS_OFFSET days.
+     * If the ArticleInfo instance has a date range, it is used instead of the last N days.
+     * To reduce logic in the view, this method returns an array also containing the localized string
+     * for the pageviews count, as well as the tooltip to be used on the link to the Pageviews tool.
+     * @see ArticleInfoApi::PAGEVIEWS_OFFSET
+     * @return array With keys 'count'<int>, 'formatted'<string> and 'tooltip'<string>
      */
-    public function getPageviews(int $latest): int
+    public function getPageviews(): ?array
     {
         if (!$this->hasDateRange()) {
-            return $this->page->getLastPageviews($latest);
+            $pageviews = $this->page->getLatestPageviews();
+        } else {
+            $dateRange = $this->getDateParams();
+            $pageviews = $this->page->getPageviews($dateRange['start'], $dateRange['end']);
         }
 
-        $daterange = $this->getDateParams();
-        return $this->page->getPageviews($daterange['start'], $daterange['end']);
+        return [
+            'count' => $pageviews,
+            'formatted' => $this->getPageviewsFormatted($pageviews),
+            'tooltip' => $this->getPageviewsTooltip($pageviews),
+        ];
+    }
+
+    /**
+     * Convenience method for the view to get the value of the offset constant.
+     * (Twig code like `ai.PAGEVIEWS_OFFSET` just looks odd!)
+     * @see ArticleInfoApi::PAGEVIEWS_OFFSET
+     * @return int
+     */
+    public function getPageviewsOffset(): int
+    {
+        return ArticleInfoApi::PAGEVIEWS_OFFSET;
+    }
+
+    /**
+     * Used to avoid putting too much logic in the view.
+     * @param int|null $pageviews
+     * @return string Formatted number or "Data unavailable".
+     */
+    private function getPageviewsFormatted(?int $pageviews): string
+    {
+        return null !== $pageviews
+            ? $this->i18n->numberFormat($pageviews)
+            : $this->i18n->msg('data-unavailable');
+    }
+
+    /**
+     * Another convenience method for the view. Simply checks if there's data available,
+     * and if not, provides an informative message to be used in the tooltip.
+     * @param int|null $pageviews
+     * @return string
+     */
+    private function getPageviewsTooltip(?int $pageviews): string
+    {
+        return $pageviews ? '' : $this->i18n->msg('api-error-wikimedia');
     }
 }

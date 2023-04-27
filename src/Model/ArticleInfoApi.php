@@ -14,13 +14,15 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 /**
- * An ArticleInfoApi is standalone logic for the Article Info tool. These methods perform SQL queries
+ * An ArticleInfoApi is standalone logic for the ArticleInfo tool. These methods perform SQL queries
  * or make API requests and can be called directly, without any knowledge of the child ArticleInfo class.
- * It does require that the ArticleInfoRepository be set, however.
  * @see ArticleInfo
  */
 class ArticleInfoApi extends Model
 {
+    /** @var int Number of days of recent data to show for pageviews. */
+    public const PAGEVIEWS_OFFSET = 30;
+
     protected AutomatedEditsHelper $autoEditsHelper;
     protected I18nHelper $i18n;
 
@@ -276,15 +278,12 @@ class ArticleInfoApi extends Model
      */
     public function getArticleInfoApiData(Project $project, Page $page): array
     {
-        /** Number of days to query for pageviews */
-        $pageviewsOffset = 30;
-
         $data = [
             'project' => $project->getDomain(),
             'page' => $page->getTitle(),
             'watchers' => (int) $page->getWatchers(),
-            'pageviews' => $page->getLastPageviews($pageviewsOffset),
-            'pageviews_offset' => $pageviewsOffset,
+            'pageviews' => $page->getLatestPageviews(),
+            'pageviews_offset' => self::PAGEVIEWS_OFFSET,
         ];
 
         $info = null;
