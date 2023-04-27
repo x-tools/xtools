@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Tests\Model;
 
+use App\Exception\BadGatewayException;
 use App\Model\Page;
 use App\Model\Project;
 use App\Model\User;
@@ -332,7 +333,13 @@ class PageTest extends TestAdapter
             $page->getPageviews('20160101', '20160201')
         );
 
-        static::assertEquals(3500, $page->getLastPageviews(30));
+        static::assertEquals(3500, $page->getLatestPageviews(30));
+
+        // When the API fails.
+        $this->pageRepo->expects($this->once())
+            ->method('getPageviews')
+            ->willThrowException($this->createMock(BadGatewayException::class));
+        static::assertNull($page->getPageviews('20230101', '20230131'));
     }
 
     /**

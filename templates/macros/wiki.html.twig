@@ -1,8 +1,8 @@
-{% macro extLink(url, label, overrideLabel) %}{% apply spaceless %}
+{% macro extLink(url, label, overrideLabel, tooltip = null) %}{% apply spaceless %}
     {% if overrideLabel is not empty %}
         {% set label = overrideLabel %}
     {% endif %}
-    <a href='{{ url }}' target='_blank'>{{ label }}</a>
+    <a href='{{ url }}' target='_blank'{% if tooltip is not empty %} title="{{ tooltip }}"{% endif %}>{{ label }}</a>
     {% endapply %}
 {% endmacro %}
 
@@ -242,13 +242,13 @@
     <a href="{{ path('GlobalContribsResult', {'username':username}) }}">{{ label }}</a>
 {% endapply %}{% endmacro %}
 
-{% macro pageviewsLink(page, label = null, params = null) %}{% apply spaceless %}
+{% macro pageviewsLink(page, label = null, params = null, tooltip = null) %}{% apply spaceless %}
     {% from _self import extLink as extLink %}
     {% set url = 'https://pageviews.wmcloud.org/?project=' ~ page.project.domain ~ '&pages=' ~ page.title|e('url') %}
     {% if params is not empty %}
         {% set url = url ~ '&' ~ buildQuery(params) %}
     {% endif %}
-    {{ extLink(url, msg('pageviews'), label) }}
+    {{ extLink(url, msg('pageviews'), label, tooltip) }}
 {% endapply %}{% endmacro %}
 
 {% macro pageviewsLinks(page, params = null) %}{% apply spaceless %}
