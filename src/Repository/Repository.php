@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Repository;
 
+use App\Exception\BadGatewayException;
 use App\Model\Project;
 use DateInterval;
 use Doctrine\DBAL\Connection;
@@ -12,6 +13,7 @@ use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ServerException;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -181,15 +183,20 @@ abstract class Repository
      * @param Project $project
      * @param array $params
      * @return array
+     * @throws BadGatewayException
      */
     public function executeApiRequest(Project $project, array $params): array
     {
-        return json_decode($this->guzzle->request('GET', $project->getApiUrl(), [
-            'query' => array_merge([
-                'action' => 'query',
-                'format' => 'json',
-            ], $params),
-        ])->getBody()->getContents(), true);
+        try {
+            return json_decode($this->guzzle->request('GET', $project->getApiUrl(), [
+                'query' => array_merge([
+                    'action' => 'query',
+                    'format' => 'json',
+                ], $params),
+            ])->getBody()->getContents(), true);
+        } catch (ServerException $e) {
+            throw new BadGatewayException('api-error-wikimedia', $e);
+        }
     }
 
     /**

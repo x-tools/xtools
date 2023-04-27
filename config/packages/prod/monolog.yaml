@@ -40,6 +40,7 @@ monolog:
         symfony_mailer:
             type: symfony_mailer
             level: critical
+            # excluded_http_codes: [502] # Re-enable after a round of testing in prod
             from_email: '%env(MAILER_FROM_EMAIL)%'
             to_email: '%env(MAILER_TO_EMAIL)%'
             subject: '[XTools] Fatal error: %%message%%'
