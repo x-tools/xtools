@@ -26,9 +26,7 @@
 .DS_Store
 /mrb_prepcommit.sh
 i18n_helper.js
-phpDocumentor.phar
 coverage.xml
-.web-server-pid
 
 ###> squizlabs/php_codesniffer ###
 /.phpcs-cache
