@@ -242,6 +242,7 @@
 	"namespaces-desc": "일반 이름공간에 대한 {{PLURAL:$1|편집}} $2회",
 	"neutral": "중립",
 	"next": "다음",
+	"no": "아니오",
 	"no-contribs": "기여 없음",
 	"no-exist": "$1 문서가 존재하지 않습니다",
 	"no-result": "$1에 대한 결과 없음",
@@ -396,6 +397,7 @@
 	"thursday": "목요일",
 	"timecard": "타임카드",
 	"times-in-utc": "모든 시간대는 UTC입니다.",
+	"time-local": "UTC 대신 로컬 시간 사용",
 	"too-many-edits": "사용자가 너무 많은 편집을 했습니다! (최대 $1건)",
 	"too-many-edits-redir": "대신 $1개만 표시됩니다.",
 	"too-many-revisions": "이 문서는 $1개가 넘는 {{PLURAL:$2|판}}이 있습니다. 마지막 %1개의 데이터만 표시됩니다.",
@@ -489,5 +491,6 @@
 	"xtools-slogan": "당신의 데이터 욕구를 충족시켜 드립니다",
 	"xtools-title": "X!의 도구",
 	"year": "연도",
-	"year-counts": "연단위 분석"
+	"year-counts": "연단위 분석",
+	"yes": "예"
 }
