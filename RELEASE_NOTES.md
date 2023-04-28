@@ -1,5 +1,13 @@
 # Release Notes #
 
+## 3.17.7 ##
+- Authorship: Enable for fr.wikipedia.org
+- AutoEdits (T281962): make relevant links have usesandbox=1 when in sandbox mode
+- Gracefully handle downtime of upstream services with a nicer error message.
+- ArticleInfo: fail gracefully when prose stats cannot be fetched.
+- ArticleInfo: fail gracefully if the pageviews API is down.
+- Fix paths to favicon and error page images.
+
 ## 3.17.6 ##
 - (T335313) Ensure all charts load after the DOM is ready.
 - Fix the Meta tool.
