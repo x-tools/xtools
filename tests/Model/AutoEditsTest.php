@@ -240,4 +240,21 @@ class AutoEditsTest extends TestAdapter
             $limit
         );
     }
+
+    /**
+     * Tests the sandbox functionality, bypassing the cache.
+     * @todo Find a way to actually test that it bypasses the cache!
+     */
+    public function testUseSandbox(): void
+    {
+        $this->aeRepo->expects(static::once())
+            ->method('getUseSandbox')
+            ->willReturn(true);
+        $this->aeRepo->expects(static::never())
+            ->method('setCache');
+        $autoEdits = $this->getAutoEdits();
+        $autoEdits->setRepository($this->aeRepo);
+
+        static::assertTrue($autoEdits->getUseSandbox());
+    }
 }
