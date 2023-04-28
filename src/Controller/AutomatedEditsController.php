@@ -141,6 +141,10 @@ class AutomatedEditsController extends XtoolsController
             'ae' => $this->autoEdits,
             'is_sub_request' => $this->isSubRequest,
         ];
+
+        if ($useSandbox) {
+            $this->output['usesandbox'] = 1;
+        }
     }
 
     /**

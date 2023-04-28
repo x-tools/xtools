@@ -456,7 +456,7 @@ class ArticleInfoTest extends TestAdapter
     public function testTransclusionData(): void
     {
         $articleInfoRepo = $this->createMock(ArticleInfoRepository::class);
-        $articleInfoRepo->expects($this->once())
+        $articleInfoRepo->expects(static::once())
             ->method('getTransclusionData')
             ->willReturn([
                 'categories' => 3,

@@ -271,4 +271,12 @@ class AutoEdits extends Model
 
         return $this->toolsTotal;
     }
+
+    /**
+     * @return bool
+     */
+    public function getUseSandbox(): bool
+    {
+        return $this->repository->getUseSandbox();
+    }
 }

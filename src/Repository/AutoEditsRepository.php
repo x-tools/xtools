@@ -83,6 +83,14 @@ class AutoEditsRepository extends UserRepository
     }
 
     /**
+     * @return bool
+     */
+    public function getUseSandbox(): bool
+    {
+        return $this->useSandbox;
+    }
+
+    /**
      * Method to give the repository access to the AutomatedEditsHelper and fetch the list of semi-automated tools.
      * @param Project $project
      * @param int|string $namespace Namespace ID or 'all'.

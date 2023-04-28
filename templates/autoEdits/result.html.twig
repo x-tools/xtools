@@ -126,7 +126,11 @@
                                     {{ wiki.pageLinkRaw(values.link, project, values.label) }}
                                 </td>
                                 <td class="sort-entry--count" data-value="{{ values.count }}">
-                                    <a href="{{ path('AutoEditsContributionsResult', {project:project.domain, username:user.usernameIdent, start: ae.startDate, end: ae.endDate, namespace: ae.namespace, tool: tool}) }}">
+                                    {% set params = {project:project.domain, username:user.usernameIdent, start: ae.startDate, end: ae.endDate, namespace: ae.namespace, tool: tool} %}
+                                    {% if ae.useSandbox %}
+                                        {% set params = params|merge({usesandbox: 1}) %}
+                                    {% endif %}
+                                    <a href="{{ path('AutoEditsContributionsResult', params) }}">
                                         {{ values.count|num_format }}
                                     </a>
                                 </td>
@@ -145,7 +149,11 @@
                                 {{ msg('num-tools', [ae.toolCounts|length]) }}
                             </th>
                             <th class="tools--count">
-                                <a href="{{ path('AutoEditsContributionsResult', {project:project.domain, username:user.usernameIdent, start: ae.startDate, end: ae.endDate, namespace: ae.namespace}) }}">{{ ae.toolsTotal|num_format }}</a>
+                                {% set params = {project:project.domain, username:user.usernameIdent, start: ae.startDate, end: ae.endDate, namespace: ae.namespace} %}
+                                {% if ae.useSandbox %}
+                                    {% set params = params|merge({usesandbox: 1}) %}
+                                {% endif %}
+                                <a href="{{ path('AutoEditsContributionsResult', params) }}">{{ ae.toolsTotal|num_format }}</a>
                                 {% apply spaceless %}
                                     <div class="glyphicon glyphicon-info-sign tooltipcss tooltipcss--tool-counts" role="dialog" aria-labelledby="auto-edits-tools-desc">
                                         <div id="auto-edits-tools-desc" class="tooltip-body">
