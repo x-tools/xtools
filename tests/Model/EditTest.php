@@ -7,6 +7,7 @@ namespace App\Tests\Model;
 use App\Model\Edit;
 use App\Model\Page;
 use App\Model\Project;
+use App\Model\User;
 use App\Repository\EditRepository;
 use App\Repository\PageRepository;
 use App\Repository\ProjectRepository;
@@ -76,6 +77,8 @@ class EditTest extends TestAdapter
             'length_change' => '2',
             'username' => 'Testuser',
             'comment' => 'Test',
+            'rev_sha1' => 'abcdef',
+            'reverted' => 0,
         ];
     }
 
@@ -84,13 +87,37 @@ class EditTest extends TestAdapter
      */
     public function testBasic(): void
     {
-        $edit = $this->getEditFactory(['comment' => 'Test']);
+        // Also tests that giving a DateTime works; other tests use the string variant from $this->editAttrs.
+        $edit = $this->getEditFactory(['comment' => 'Test', 'timestamp' => new DateTime('20170101100000')]);
         static::assertEquals($this->project, $edit->getProject());
         static::assertInstanceOf(DateTime::class, $edit->getTimestamp());
         static::assertEquals($this->page, $edit->getPage());
         static::assertEquals('1483264800', $edit->getTimestamp()->getTimestamp());
         static::assertEquals(1, $edit->getId());
         static::assertFalse($edit->isMinor());
+        static::assertEquals('abcdef', $edit->getSha());
+        static::assertEquals('1', $edit->getCacheKey());
+        static::assertFalse($edit->isReverted());
+    }
+
+    /**
+     * Using that static method.
+     */
+    public function testGetEditFromRevs(): void
+    {
+        $editRepo = $this->createMock(EditRepository::class);
+        $editRepo->method('getAutoEditsHelper')
+            ->willReturn($this->getAutomatedEditsHelper($this->client));
+        $userRepo = $this->createMock(UserRepository::class);
+        $edit = Edit::getEditsFromRevs(
+            $this->pageRepo,
+            $editRepo,
+            $userRepo,
+            $this->project,
+            new User($userRepo, 'Foobar'),
+            [array_merge($this->editAttrs, ['page_title' => 'Test', 'page_namespace' => 0])]
+        );
+        static::assertEquals(1, $edit[0]->getId());
     }
 
     /**
@@ -139,6 +166,9 @@ class EditTest extends TestAdapter
             'comment' => 'You should have reverted this edit using [[WP:HG|Huggle]]',
         ]);
         static::assertFalse($edit->isRevert());
+
+        $edit->setReverted(true);
+        static::assertTrue($edit->isReverted());
 
         $edit2 = $this->getEditFactory([
             'comment' => 'Reverted edits by Mogultalk (talk) ([[WP:HG|HG]]) (3.2.0)',
@@ -229,9 +259,20 @@ class EditTest extends TestAdapter
                 'length' => 12,
                 'length_change' => 2,
                 'comment' => 'Test',
+                'reverted' => false,
             ],
             $edit->getForJson(true)
         );
+    }
+
+    public function testDeleted(): void
+    {
+        $this->editAttrs['rev_deleted'] = Edit::DELETED_USER;
+        $edit = $this->getEditFactory();
+        static::assertNull($edit->getUser());
+        static::assertEquals(Edit::DELETED_USER, $edit->getDeleted());
+        static::assertTrue($edit->deletedUser());
+        static::assertFalse($edit->deletedSummary());
     }
 
     /**

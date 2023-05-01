@@ -85,18 +85,22 @@
 {# `user` can be of type `User` or string (username) #}
 {# If the user is logged out, the link will point to Special:Contributions, otherwise their userpage #}
 {% macro userLink(user, project, label = null) %}{% apply spaceless %}
-    {% from _self import extLink as extLink %}
-    {% if user.username is defined %}
-        {% set username = user.prettyUsername %}
+    {% if user == null %}
+        <i class="text-muted">{{ msg('username-removed') }}</i>
     {% else %}
-        {% set username = user %}
+        {% from _self import extLink as extLink %}
+        {% if user.username is defined %}
+            {% set username = user.prettyUsername %}
+        {% else %}
+            {% set username = user %}
+        {% endif %}
+        {% if isUserAnon(username) %}
+            {% set path = project.articlePath|replace({'$1': 'Special:Contributions/' ~ username|replace({' ': '_'})|escape('url')}) %}
+        {% else %}
+            {% set path = project.articlePath|replace({'$1': 'User:' ~ username|replace({' ': '_'})|escape('url')}) %}
+        {% endif %}
+        <bdi>{{ extLink((project.url|trim('/')) ~ path, username, label) }}</bdi>
     {% endif %}
-    {% if isUserAnon(username) %}
-        {% set path = project.articlePath|replace({'$1': 'Special:Contributions/' ~ username|replace({' ': '_'})|escape('url')}) %}
-    {% else %}
-        {% set path = project.articlePath|replace({'$1': 'User:' ~ username|replace({' ': '_'})|escape('url')}) %}
-    {% endif %}
-    <bdi>{{ extLink((project.url|trim('/')) ~ path, username, label) }}</bdi>
 {% endapply %}{% endmacro %}
 
 {# `user` can be of type `User` or string (username) #}

@@ -158,7 +158,11 @@
                     </td>
                     <td class="sort-entry--summary" data-value="{{ edit.comment }}">
                         {% if edit.isReverted %}<i class="text-info">({{ msg('reverted')|lower }})</i>&nbsp;{% endif %}
-                        {{ edit.wikifiedComment(true)|raw }}
+                        {% if edit.deletedSummary %}
+                            <i class="text-muted">{{ msg('edit-summary-removed') }}</i>
+                        {% else %}
+                            {{ edit.wikifiedComment(true)|raw }}
+                        {% endif %}
                     </td>
                 </tr>
             {% endif %}

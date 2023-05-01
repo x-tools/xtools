@@ -168,20 +168,20 @@ class ArticleInfoTest extends TestAdapter
 
         static::assertEquals(3, $this->articleInfo->getNumEditors());
         static::assertEquals(2, $this->articleInfo->getAnonCount());
-        static::assertEquals(50, $this->articleInfo->anonPercentage());
-        static::assertEquals(2, $this->articleInfo->getMinorCount());
-        static::assertEquals(50, $this->articleInfo->minorPercentage());
+        static::assertEquals(40, $this->articleInfo->anonPercentage());
+        static::assertEquals(3, $this->articleInfo->getMinorCount());
+        static::assertEquals(60, $this->articleInfo->minorPercentage());
         static::assertEquals(1, $this->articleInfo->getBotRevisionCount());
         static::assertEquals(93, $this->articleInfo->getTotalDays());
-        static::assertEquals(23, (int) $this->articleInfo->averageDaysPerEdit());
+        static::assertEquals(18, (int) $this->articleInfo->averageDaysPerEdit());
         static::assertEquals(0, (int) $this->articleInfo->editsPerDay());
-        static::assertEquals(1.3, $this->articleInfo->editsPerMonth());
-        static::assertEquals(4, $this->articleInfo->editsPerYear());
-        static::assertEquals(1.3, $this->articleInfo->editsPerEditor());
-        static::assertEquals(1, $this->articleInfo->getAutomatedCount());
+        static::assertEquals(1.6, $this->articleInfo->editsPerMonth());
+        static::assertEquals(5, $this->articleInfo->editsPerYear());
+        static::assertEquals(1.7, $this->articleInfo->editsPerEditor());
+        static::assertEquals(2, $this->articleInfo->getAutomatedCount());
         static::assertEquals(1, $this->articleInfo->getRevertCount());
 
-        static::assertEquals(100, $this->articleInfo->topTenPercentage());
+        static::assertEquals(80, $this->articleInfo->topTenPercentage());
         static::assertEquals(4, $this->articleInfo->getTopTenCount());
 
         static::assertEquals(
@@ -189,7 +189,7 @@ class ArticleInfoTest extends TestAdapter
             $this->articleInfo->getFirstEdit()->getId()
         );
         static::assertEquals(
-            $edits[3]->getId(),
+            $edits[4]->getId(),
             $this->articleInfo->getLastEdit()->getId()
         );
 
@@ -231,12 +231,14 @@ class ArticleInfoTest extends TestAdapter
             )
         );
 
-        static::assertEquals(2, $this->articleInfo->getMaxEditsPerMonth());
+        static::assertEquals(3, $this->articleInfo->getMaxEditsPerMonth());
 
         static::assertContains(
             'AutoWikiBrowser',
             array_keys($this->articleInfo->getTools())
         );
+
+        static::assertTrue($this->articleInfo->hasDeletedContent());
     }
 
     /**
@@ -250,11 +252,11 @@ class ArticleInfoTest extends TestAdapter
 
         static::assertEquals([2016], array_keys($yearMonthCounts));
         static::assertArraySubset([
-            'all' => 4,
-            'minor' => 2,
+            'all' => 5,
+            'minor' => 3,
             'anon' => 2,
-            'automated' => 1,
-            'size' => 25,
+            'automated' => 2,
+            'size' => 20,
         ], $yearMonthCounts[2016]);
 
         static::assertEquals(
@@ -270,10 +272,10 @@ class ArticleInfoTest extends TestAdapter
             'automated' => 0,
         ], $yearMonthCounts[2016]['months']['07']);
         static::assertArraySubset([
-            'all' => 2,
-            'minor' => 1,
+            'all' => 3,
+            'minor' => 2,
             'anon' => 2,
-            'automated' => 1,
+            'automated' => 2,
         ], $yearMonthCounts[2016]['months']['10']);
     }
 
@@ -362,6 +364,17 @@ class ArticleInfoTest extends TestAdapter
                 'comment' => 'I undo your edit cuz it bad',
                 'rev_sha1' => 'bbbbbb',
             ]),
+            new Edit($this->editRepo, $this->userRepo, $this->page, [
+                'id' => 60,
+                'timestamp' => '20161003020000',
+                'minor' => '1',
+                'length' => '20',
+                'length_change' => '-5',
+                'username' => 'Offensive username',
+                'comment' => 'Weeee using [[WP:AWB|AWB]]',
+                'rev_sha1' => 'ddddd',
+                'rev_deleted' => Edit::DELETED_USER,
+            ]),
         ];
 
         $prevEdits = [
@@ -377,7 +390,7 @@ class ArticleInfoTest extends TestAdapter
 
         $prop = $this->reflectionClass->getProperty('numRevisionsProcessed');
         $prop->setAccessible(true);
-        $prop->setValue($this->articleInfo, 4);
+        $prop->setValue($this->articleInfo, 5);
 
         $prop = $this->reflectionClass->getProperty('bots');
         $prop->setAccessible(true);
@@ -385,12 +398,17 @@ class ArticleInfoTest extends TestAdapter
             'XtoolsBot' => ['count' => 1],
         ]);
 
+        $prop = $this->reflectionClass->getProperty('hasDeletedContent');
+        $prop->setAccessible(true);
+        $prop->setValue($this->articleInfo, true);
+
         $method = $this->reflectionClass->getMethod('updateCounts');
         $method->setAccessible(true);
         $prevEdits = $method->invoke($this->articleInfo, $edits[0], $prevEdits);
         $prevEdits = $method->invoke($this->articleInfo, $edits[1], $prevEdits);
         $prevEdits = $method->invoke($this->articleInfo, $edits[2], $prevEdits);
-        $method->invoke($this->articleInfo, $edits[3], $prevEdits);
+        $prevEdits = $method->invoke($this->articleInfo, $edits[3], $prevEdits);
+        $method->invoke($this->articleInfo, $edits[4], $prevEdits);
 
         $method = $this->reflectionClass->getMethod('doPostPrecessing');
         $method->setAccessible(true);
@@ -448,7 +466,7 @@ class ArticleInfoTest extends TestAdapter
         ], $this->articleInfo->getDateParams());
 
         // Uses length of last edit because there is a date range.
-        static::assertEquals(25, $this->articleInfo->getLength());
+        static::assertEquals(20, $this->articleInfo->getLength());
 
         // Pageviews with a date range.
         $this->pageRepo->expects($this->once())

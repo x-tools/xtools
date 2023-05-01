@@ -14,6 +14,11 @@ use DateTime;
  */
 class Edit extends Model
 {
+    public const DELETED_TEXT = 1;
+    public const DELETED_COMMENT = 2;
+    public const DELETED_USER = 4;
+    public const DELETED_RESTRICTED = 8;
+
     protected UserRepository $userRepo;
 
     /** @var int ID of the revision */
@@ -40,6 +45,9 @@ class Edit extends Model
     /** @var bool|null Whether this edit was later reverted. */
     protected ?bool $reverted;
 
+    /** @var int Deletion status of the revision. */
+    protected int $deleted;
+
     /**
      * Edit constructor.
      * @param EditRepository $repository
@@ -63,9 +71,15 @@ class Edit extends Model
             $this->timestamp = DateTime::createFromFormat('YmdHis', $attrs['timestamp']);
         }
 
-        $this->user = $attrs['user'] ?? ($attrs['username'] ? new User($this->userRepo, $attrs['username']) : null);
+        $this->deleted = $attrs['rev_deleted'] ?? 0;
 
-        $this->minor = '1' === $attrs['minor'];
+        if (($this->deleted & self::DELETED_USER) || ($this->deleted & self::DELETED_RESTRICTED)) {
+            $this->user = null;
+        } else {
+            $this->user = $attrs['user'] ?? ($attrs['username'] ? new User($this->userRepo, $attrs['username']) : null);
+        }
+
+        $this->minor = 1 === (int)$attrs['minor'];
         $this->length = isset($attrs['length']) ? (int)$attrs['length'] : null;
         $this->lengthChange = isset($attrs['length_change']) ? (int)$attrs['length_change'] : null;
         $this->comment = $attrs['comment'] ?? '';
@@ -218,15 +232,6 @@ class Edit extends Model
     }
 
     /**
-     * Set the User.
-     * @param User $user
-     */
-    public function setUser(User $user): void
-    {
-        $this->user = $user;
-    }
-
-    /**
      * Get the edit summary.
      * @return string
      */
@@ -270,6 +275,33 @@ class Edit extends Model
     public function setReverted(bool $reverted): void
     {
         $this->reverted = $reverted;
+    }
+
+    /**
+     * Get deletion status of the revision.
+     * @return int
+     */
+    public function getDeleted(): int
+    {
+        return $this->deleted;
+    }
+
+    /**
+     * Was the username deleted from public view?
+     * @return bool
+     */
+    public function deletedUser(): bool
+    {
+        return ($this->deleted & self::DELETED_USER) > 0;
+    }
+
+    /**
+     * Was the edit summary deleted from public view?
+     * @return bool
+     */
+    public function deletedSummary(): bool
+    {
+        return ($this->deleted & self::DELETED_COMMENT) > 0;
     }
 
     /**

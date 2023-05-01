@@ -382,6 +382,7 @@ class TopEditsRepository extends UserRepository
                         revs.rev_minor_edit AS minor,
                         revs.rev_len AS length,
                         (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
+                        revs.rev_deleted AS rev_deleted,
                         $userId AS user_id,
                         $username AS username,
                         comments.comment_text AS `comment`
