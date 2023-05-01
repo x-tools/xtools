@@ -132,6 +132,7 @@ abstract class Repository
      * Based on ToolforgeBundle https://github.com/wikimedia/ToolforgeBundle/blob/master/Service/ReplicasClient.php
      * License: GPL 3.0 or later
      * @return string[] Keys are database names (i.e. 'enwiki'), values are the slices (i.e. 's1').
+     * @codeCoverageIgnore
      */
     protected function getDbList(): array
     {
@@ -195,7 +196,7 @@ abstract class Repository
                 ], $params),
             ])->getBody()->getContents(), true);
         } catch (ServerException $e) {
-            throw new BadGatewayException('api-error-wikimedia', $e);
+            throw new BadGatewayException('api-error-wikimedia', ['Wikimedia'], $e);
         }
     }
 

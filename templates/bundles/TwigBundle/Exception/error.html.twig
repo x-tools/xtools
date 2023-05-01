@@ -22,14 +22,14 @@
             {% set message = 'unknown' %}
         {% endif %}
 
-        {% if msgExists(message, [exception.code]) %}
+        {% if exception.class == 'BadGatewayException' %}
+            {# We ignore 502s as we can't fix them, so there's no need to add a link to report it as a bug. #}
+            <p>{{ msg(message, [exception.msgParams]) }}</p>
+        {% elseif msgExists(message, [exception.code]) %}
             <p><strong>{{ msg(message, [exception.code]) }}</strong></p>
         {% elseif exception.code == 999 %}
             {# This is a server-built message ready to be displayed that can safely use raw() #}
             <p>{{ message|raw }}</p>
-        {% elseif status_code == 502 %}
-            {# We ignore 502s as we can't fix them, so there's no need to add a link to report it as a bug. #}
-            <p>{{ message }}</p>
         {% else %}
             {% set phabLink %}
                 <a target="_blank" href="https://phabricator.wikimedia.org/maniphest/task/create/?title=PLEASE REPLACE WITH A DESCRIPTION OF THE ERROR&amp;priority=75&amp;projects=XTools&amp;description=```{{ attribute(exception, 'file') }}: {{ attribute(exception, 'line') }} - {{ message }}```%0A%0AURL: {{app.request.uri}}%0A%0APlease provide any further details here%0A%0AXTools version: {{ version }}-{{ shortHash() }}">Phabricator</a>

@@ -889,13 +889,14 @@ abstract class XtoolsController extends AbstractController
     /**
      * Return a JsonResponse object pre-supplied with the requested params.
      * @param array $data
+     * @param int $responseCode
      * @return JsonResponse
      */
-    public function getFormattedApiResponse(array $data): JsonResponse
+    public function getFormattedApiResponse(array $data, int $responseCode = Response::HTTP_OK): JsonResponse
     {
         $response = new JsonResponse();
         $response->setEncodingOptions(JSON_NUMERIC_CHECK);
-        $response->setStatusCode(Response::HTTP_OK);
+        $response->setStatusCode($responseCode);
 
         // Normalize display of IP ranges (they are prefixed with 'ipr-' in the params).
         if ($this->user && $this->user->isIpRange()) {

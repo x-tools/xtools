@@ -14,8 +14,24 @@ use Throwable;
  */
 class BadGatewayException extends HttpException
 {
-    public function __construct(string $msgKey, Throwable $e)
+    protected array $msgParams;
+
+    /**
+     * @param string $msgKey i18n key
+     * @param array $msgParams Params for i18n message, if applicable.
+     * @param Throwable|null $e
+     */
+    public function __construct(string $msgKey, array $msgParams = [], ?Throwable $e = null)
     {
+        $this->msgParams = $msgParams;
         parent::__construct(Response::HTTP_BAD_GATEWAY, $msgKey, $e);
+    }
+
+    /**
+     * @return array
+     */
+    public function getMsgParams(): array
+    {
+        return $this->msgParams;
     }
 }

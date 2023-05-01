@@ -10,9 +10,11 @@ use App\Model\Project;
 use App\Model\User;
 use DateTime;
 use Doctrine\DBAL\Driver\ResultStatement;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\RequestOptions;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * A PageRepository fetches data about Pages, either singularly or for multiple.
@@ -414,7 +416,7 @@ class PageRepository extends Repository
             $pageviews = json_decode($res->getBody()->getContents(), true);
             return $pageviews;
         } catch (ServerException|ConnectException $e) {
-            throw new BadGatewayException('api-error-wikimedia', $e);
+            throw new BadGatewayException('api-error-wikimedia', ['Pageviews'], $e);
         }
     }
 
@@ -423,6 +425,7 @@ class PageRepository extends Repository
      * @param Page $page
      * @param int|null $revId What revision to query for.
      * @return string
+     * @throws BadGatewayException
      */
     public function getHTMLContent(Page $page, ?int $revId = null): string
     {
@@ -444,7 +447,13 @@ class PageRepository extends Repository
                 ->getBody()
                 ->getContents();
         } catch (ServerException $e) {
-            throw new BadGatewayException('api-error-wikimedia', $e);
+            throw new BadGatewayException('api-error-wikimedia', ['Wikimedia REST'], $e);
+        } catch (ClientException $e) {
+            if ($page->exists() && Response::HTTP_NOT_FOUND === $e->getCode()) {
+                // Sometimes the REST API throws 404s when the page does in fact exist.
+                throw new BadGatewayException('api-error-wikimedia', ['Wikimedia REST'], $e);
+            }
+            throw $e;
         }
     }
 

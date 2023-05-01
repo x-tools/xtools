@@ -8,8 +8,10 @@ use App\Controller\XtoolsController;
 use App\Exception\XtoolsHttpException;
 use App\Helper\I18nHelper;
 use App\Tests\SessionHelper;
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use ReflectionClass;
 use Symfony\Component\BrowserKit\Cookie;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Integration/unit tests for the abstract XtoolsController.
@@ -18,6 +20,7 @@ use Symfony\Component\BrowserKit\Cookie;
  */
 class XtoolsControllerTest extends ControllerTestAdapter
 {
+    use ArraySubsetAsserts;
     use SessionHelper;
 
     protected I18nHelper $i18n;
@@ -453,5 +456,25 @@ class XtoolsControllerTest extends ControllerTestAdapter
             ],
             'continue' => '2020-01-03T12:59:59',
         ], $newOut);
+    }
+
+    public function testFormattedApiResponse(): void
+    {
+        $controller = $this->getControllerWithRequest([
+            'project' => 'en.wikipedia',
+            'categories' => 'Foo|Bar|Baz',
+        ]);
+        $controller->addFlashMessage('warning', 'You had better watch yourself!');
+        $response = json_decode(
+            $controller->getFormattedApiResponse(['data' => ['test' => 5]], Response::HTTP_BAD_GATEWAY)->getContent(),
+            true
+        );
+        static::assertArraySubset([
+            'warning' => ['You had better watch yourself!'],
+            'project' => 'en.wikipedia.org',
+            'categories' => ['Foo', 'Bar', 'Baz'],
+            'data' => ['test' => 5],
+        ], $response);
+        static::assertGreaterThan(0, $response['elapsed_time']);
     }
 }

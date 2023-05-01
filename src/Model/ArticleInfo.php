@@ -1076,7 +1076,7 @@ class ArticleInfo extends ArticleInfoApi
      */
     private function getPageviewsTooltip(?int $pageviews): string
     {
-        return $pageviews ? '' : $this->i18n->msg('api-error-wikimedia');
+        return $pageviews ? '' : $this->i18n->msg('api-error-wikimedia', ['Pageviews']);
     }
 
     /**

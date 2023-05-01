@@ -264,6 +264,7 @@ class ArticleInfoController extends XtoolsController
         ArticleInfoRepository $articleInfoRepo,
         AutomatedEditsHelper $autoEditsHelper
     ): JsonResponse {
+        $responseCode = Response::HTTP_OK;
         $this->recordApiUsage('page/prose');
         $this->setupArticleInfo($articleInfoRepo, $autoEditsHelper);
         $this->addFlash('info', 'The algorithm used by this API has recently changed. ' .
@@ -271,9 +272,10 @@ class ArticleInfoController extends XtoolsController
         $ret = $this->articleInfo->getProseStats();
         if (null === $ret) {
             $this->addFlashMessage('error', 'api-error-wikimedia');
+            $responseCode = Response::HTTP_BAD_GATEWAY;
             $ret = [];
         }
-        return $this->getFormattedApiResponse($ret);
+        return $this->getFormattedApiResponse($ret, $responseCode);
     }
 
     /**

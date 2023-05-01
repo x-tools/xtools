@@ -4,8 +4,11 @@ declare(strict_types = 1);
 
 namespace App\Repository;
 
+use App\Exception\BadGatewayException;
 use App\Model\Page;
 use App\Model\Project;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\ServerException;
 
 /**
  * AuthorshipRepository is responsible for retrieving authorship data about a single page.
@@ -42,7 +45,11 @@ class AuthorshipRepository extends Repository
             'read_timeout' => 60,
         ];
 
-        $res = $this->guzzle->request('GET', $url, $opts);
+        try {
+            $res = $this->guzzle->request('GET', $url, $opts);
+        } catch (ServerException|ConnectException $e) {
+            throw new BadGatewayException('api-error-wikimedia', ['WikiWho'], $e);
+        }
 
         // Cache and return.
         return $this->setCache($cacheKey, json_decode($res->getBody()->getContents(), true));

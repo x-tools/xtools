@@ -7,6 +7,7 @@ namespace App\Tests\Model;
 use App\Exception\BadGatewayException;
 use App\Helper\I18nHelper;
 use App\Model\ArticleInfo;
+use App\Model\ArticleInfoApi;
 use App\Model\Edit;
 use App\Model\Page;
 use App\Model\Project;
@@ -231,6 +232,8 @@ class ArticleInfoTest extends TestAdapter
             )
         );
 
+        static::assertEquals(['Mick Jagger'], $this->articleInfo->getHumans(1));
+
         static::assertEquals(3, $this->articleInfo->getMaxEditsPerMonth());
 
         static::assertContains(
@@ -251,6 +254,7 @@ class ArticleInfoTest extends TestAdapter
         $yearMonthCounts = $this->articleInfo->getYearMonthCounts();
 
         static::assertEquals([2016], array_keys($yearMonthCounts));
+        static::assertEquals(['2016'], $this->articleInfo->getYearLabels());
         static::assertArraySubset([
             'all' => 5,
             'minor' => 3,
@@ -262,6 +266,10 @@ class ArticleInfoTest extends TestAdapter
         static::assertEquals(
             ['07', '08', '09', '10', '11', '12'],
             array_keys($yearMonthCounts[2016]['months'])
+        );
+        static::assertEquals(
+            ['2016-07', '2016-08', '2016-09', '2016-10', '2016-11', '2016-12'],
+            $this->articleInfo->getMonthLabels()
         );
 
         // Just test a few, not every month.
@@ -298,6 +306,10 @@ class ArticleInfoTest extends TestAdapter
                     'log_type' => 'delete',
                     'timestamp' => '20160905000000',
                 ],
+                [
+                    'log_type' => 'move',
+                    'timestamp' => '20161005000000',
+                ],
             ]);
 
         $method = $this->reflectionClass->getMethod('setLogsEvents');
@@ -310,6 +322,7 @@ class ArticleInfoTest extends TestAdapter
         static::assertEquals([
             'protections' => 1,
             'deletions' => 1,
+            'moves' => 1,
         ], $yearMonthCounts[2016]['events']);
     }
 
@@ -518,7 +531,7 @@ class ArticleInfoTest extends TestAdapter
             'tooltip' => '',
         ], $this->articleInfo->getPageviews());
 
-        static::assertEquals(ArticleInfo::PAGEVIEWS_OFFSET, $this->articleInfo->getPageviewsOffset());
+        static::assertEquals(ArticleInfoApi::PAGEVIEWS_OFFSET, $this->articleInfo->getPageviewsOffset());
     }
 
     public function testPageviewsFailing(): void
@@ -530,7 +543,7 @@ class ArticleInfoTest extends TestAdapter
         static::assertEquals([
             'count' => null,
             'formatted' => 'Data unavailable',
-            'tooltip' => 'There was an error connecting to the Wikimedia API. ' .
+            'tooltip' => 'There was an error connecting to the Pageviews API. ' .
                 'Try refreshing this page or try again later.',
         ], $this->articleInfo->getPageviews());
     }
