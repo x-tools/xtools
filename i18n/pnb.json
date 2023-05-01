@@ -1,3 +1,22 @@
 {
-	"data-unavailable": "ڈیٹا دستیاب نئیں اے"
+	"@metadata": {
+		"authors": [
+			"Bgo eiu"
+		]
+	},
+	"comma-character": "،",
+	"data-unavailable": "ڈیٹا دستیاب نئیں اے",
+	"total": "کُل",
+	"tsv": "ٹی ایس وی",
+	"tuesday": "منگل",
+	"type": "قسم",
+	"user": "ورتنوالا",
+	"user-id": "ورٹونکار دا آئی ڈی",
+	"view-source": "سروت ویکھو",
+	"wiki": "وِکی",
+	"wikiproject": "وِکی پرہجیکٹ",
+	"wikitext": "وکی ٹکسٹ",
+	"words": "شبد",
+	"xtools-title": "ایکس ٹول",
+	"year": "سال"
 }

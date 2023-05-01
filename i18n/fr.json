@@ -49,6 +49,7 @@
 	"all-quotes": "Toutes les citations",
 	"api": "API",
 	"api-error": "Erreur lors de la requête $1",
+	"api-error-wikimedia": "Une erreur s’est produite lors de la connexion à l’API de Wikimédia. Essayez de rafraîchir cette page ou essayez à nouveau ultérieurement.",
 	"approve": "Approbation",
 	"approximate": "Approximatif",
 	"article": "Article",

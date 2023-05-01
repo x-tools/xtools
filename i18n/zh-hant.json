@@ -47,6 +47,7 @@
 	"all-quotes": "所有引述",
 	"api": "API",
 	"api-error": "查詢時出現錯誤：$1",
+	"api-error-wikimedia": "連接維基媒體 API 時發生錯誤。請重整頁面或稍後再試。",
 	"approve": "核准",
 	"approximate": "大致估計",
 	"article": "條目",

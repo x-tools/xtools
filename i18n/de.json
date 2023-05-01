@@ -47,6 +47,7 @@
 	"all-quotes": "Alle Zitate",
 	"api": "API",
 	"api-error": "Fehler beim Abruf der $1",
+	"api-error-wikimedia": "Beim Verbinden mit der Wikimedia-API ist ein Fehler aufgetreten. Versuche diese Seite zu aktualisieren oder versuche es später noch einmal.",
 	"approve": "Sichtung",
 	"approximate": "etwa",
 	"article": "Artikel",
@@ -263,6 +264,7 @@
 	"namespaces-desc": "{{PLURAL:$1|Eine Bearbeitung|$2 Bearbeitungen}} im Artikelnamensraum",
 	"neutral": "Enthaltung",
 	"next": "Nächste",
+	"no": "Nein",
 	"no-contribs": "Keine Beiträge gefunden",
 	"no-exist": "$1 ist nicht vorhanden",
 	"no-result": "Kein Suchergebnis für: $1",
@@ -418,6 +420,7 @@
 	"thank": "Dankeschön",
 	"thanks-received": "Dank erhalten",
 	"thursday": "Donnerstag",
+	"time-local": "Verwendung der Ortszeit anstelle von UTC",
 	"timecard": "Zeitkarte",
 	"times-in-utc": "Alle Zeitangaben in UTC.",
 	"too-many-edits": "Der Benutzer hat zu viele Bearbeitungen! (Maximal $1)",
@@ -515,5 +518,6 @@
 	"xtools-slogan": "Stille deinen Datenhunger",
 	"xtools-title": "XTools",
 	"year": "Jahr",
-	"year-counts": "Jahresübersicht"
+	"year-counts": "Jahresübersicht",
+	"yes": "Ja"
 }

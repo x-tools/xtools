@@ -34,6 +34,7 @@
 	"all-quotes": "Vsi navedki",
 	"api": "API",
 	"api-error": "Napaka pri zahtevku $1",
+	"api-error-wikimedia": "Pri povezovanju z API-jem Wikimedie je prišlo do napake. Poskusite osvežiti to stran ali poskusite znova pozneje.",
 	"approve": "Potrditev",
 	"approximate": "Približno",
 	"article": "Članek",

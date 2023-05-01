@@ -105,7 +105,7 @@
 	"current-stewards": "דיילים נוכחיים",
 	"current-user-groups": "קבוצות משתמשים נוכחיות",
 	"data-limit": "הנתונים הוגבלו {{PLURAL:$1|לעריכה האחרונה|ל־$2 העריכות האחרונות}}",
-	"data-unavailable": "נתונים לא זמינים",
+	"data-unavailable": "הנתונים אינם זמינים",
 	"date": "תאריך",
 	"date-from": "מ־: $1",
 	"date-range": "$1 - $2",

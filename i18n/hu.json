@@ -4,6 +4,7 @@
 			"Balint36",
 			"Bencemac",
 			"Csigabi",
+			"Hanna Tardos",
 			"Misibacsi",
 			"Pasztilla",
 			"Tacsipacsi",
@@ -36,6 +37,7 @@
 	"all-projects": "Minden projekt",
 	"all-quotes": "összes idézet",
 	"api-error": "Hiba a lekérdezésben $1",
+	"api-error-wikimedia": "Nem sikerült kapcsolatot létesíteni a Wikimedia API-val. Frissítsd az oldalt, és próbáld újra!",
 	"approve": "Jóváhagy",
 	"approximate": "Hozzávetőlegesen",
 	"article": "szócikk",
@@ -226,6 +228,7 @@
 	"namespaces-desc": "$2 {{PLURAL:$1|szerkesztés}} a szócikknévtérben",
 	"neutral": "Semleges",
 	"next": "Következő",
+	"no": "Nem",
 	"no-contribs": "Nem található közreműködés",
 	"no-exist": "$1 nem létezik",
 	"no-result": "Nincs találat a következőre: $1",
@@ -443,5 +446,6 @@
 	"xtools-slogan": "Adatéhséged csillapítására",
 	"xtools-title": "XTools",
 	"year": "Év",
-	"year-counts": "Évszámláló"
+	"year-counts": "Évszámláló",
+	"yes": "Igen"
 }

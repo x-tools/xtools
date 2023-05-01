@@ -1,3 +1,43 @@
 {
+	"@metadata": {
+		"authors": [
+			"El Bux Del Cu",
+			"Salvemm el lombard"
+		]
+	},
+	"abusefilter": "FilterAbus",
+	"accepted-formats": "Formad acetad",
+	"account-age": "Etaa de l'account",
+	"account-age-desc": "Vegg de $2 {{PLURAL:$1|dì}}",
+	"accounts": "Account",
+	"accounts-created": "Account cread",
+	"actions": "Azion",
+	"actions-as-admin": "Ativitaa aministrativ",
+	"added": "Jontad",
+	"added-bytes": "Jontad (bait)",
+	"admin-stats-notice": "Son mostrad domà i account qe i g'han fait almanc un'azion aminitrativa long el period de temp specifegad",
+	"admin-stats-notice2": "Quai account i poderia vesser vegg aministrador, opura vesser-l miga anca se autorizad a far specifeg azion aminitrative",
+	"admins": "Aministrador",
+	"afd": "Articol da scancelar",
+	"afd-desc": "$2 {{PLURAL:$1|modifega|modifege}} a i articol per le pajine de scancelazion",
+	"aiv": "intervent de l'aministrador contra el vandalizazion",
+	"aiv-desc": "$2 {{PLURAL:$1|modifega|modifege}} a le pajine intervent de l'aministrador contra comportaments de vandalizazion",
+	"all": "Tuts",
+	"all-approximate": "Tuts i dats son abbozzad",
+	"all-edits": "Tute le modifege",
+	"all-languages": "Tute le lengue",
+	"all-namespaces": "Tuts i namespaces",
+	"all-projects": "Tuts i projets",
+	"all-quotes": "Tute le citazion",
+	"api": "API",
+	"api-error": "Error querying $1",
+	"approve": "Aprova",
+	"approximate": "Aprosimativ",
+	"article": "Articol",
+	"assessment": "Valutazion",
+	"assessments": "Valutazion",
+	"auto-contribs-desc": "Varda i contribuid (semi-)automateg de un account",
+	"auto-contribs-use-tool": "Varda domà i contribuid cont el strument",
+	"auto-edits": "Modifege (semi-)automateg",
 	"data-unavailable": "Dati minga disponibil"
 }
