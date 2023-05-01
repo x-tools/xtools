@@ -18,6 +18,7 @@ class Authorship extends Model
         'eu.wikipedia.org',
         'it.wikipedia.org',
         'fr.wikipedia.org',
+        'hu.wikipedia.org',
         'tr.wikipedia.org',
     ];
 
