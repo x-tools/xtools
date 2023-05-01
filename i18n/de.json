@@ -128,7 +128,6 @@
 	"diff-empty": "Leer",
 	"documentation": "Dokumentation",
 	"download-label": "Herunterladen",
-	"duplicate-vote": "Doppelte Abstimmung",
 	"edit": "Bearbeiten",
 	"edit-count": "Bearbeitungszähler",
 	"edit-count-desc": "{{PLURAL:$1|Eine Bearbeitung|$2 Bearbeitungen}}",

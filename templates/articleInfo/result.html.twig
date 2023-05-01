@@ -803,6 +803,12 @@
                         <td class="sort-entry--minor-edits-percentage" data-value="{{ year_minor_percent|trim('%') }}">{{ year_minor_percent }}</td>
                         <td>
                             {% for event, count in stats.events %}
+                                {##
+                                 # The following messages are used here:
+                                 # * num-protections
+                                 # * num-deletions
+                                 # * num-moves
+                                 #}
                                 {{ count|num_format }} {{ msg('num-'~event, [count]) }}{% if not(loop.last) %}{{ msg('comma-character') }} {% endif %}
                             {% endfor %}
                         </td>

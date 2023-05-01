@@ -115,7 +115,6 @@
 	"diff-empty": "비었음",
 	"documentation": "설명서",
 	"download-label": "다운로드",
-	"duplicate-vote": "중복 투표",
 	"edit": "편집",
 	"edit-count": "편집 수",
 	"edit-count-desc": "{{PLURAL:$1|편집}} $2회",

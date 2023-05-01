@@ -118,7 +118,6 @@
 	"diff-empty": "Празно",
 	"documentation": "Документација",
 	"download-label": "Преузми",
-	"duplicate-vote": "Дуплирани глас",
 	"edit": "Уреди",
 	"edit-count": "Број измена",
 	"edit-count-desc": "$2 {{PLURAL:$1|измена|измене|измена}}",

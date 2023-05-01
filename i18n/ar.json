@@ -120,7 +120,6 @@
 	"diff-empty": "فارغ",
 	"documentation": "التوثيق",
 	"download-label": "تنزيل",
-	"duplicate-vote": "تصويت مكرر",
 	"edit": "عدل",
 	"edit-count": "عدد التعديلات",
 	"edit-count-desc": "$2 {{PLURAL:$1|تعديل|تعديلات}}",

@@ -129,7 +129,6 @@
 	"diff-empty": "Vacío",
 	"documentation": "Documentación",
 	"download-label": "Descargar",
-	"duplicate-vote": "Voto duplicado",
 	"edit": "Editar",
 	"edit-count": "Recuento de ediciones",
 	"edit-count-desc": "$2 {{PLURAL:$1|edición|ediciones}}",

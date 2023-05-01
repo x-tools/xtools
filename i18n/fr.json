@@ -130,7 +130,6 @@
 	"diff-empty": "Vide",
 	"documentation": "Documentation",
 	"download-label": "Télécharger",
-	"duplicate-vote": "Vote en doublon",
 	"edit": "Modifier",
 	"edit-count": "Nombre de modifications",
 	"edit-count-desc": "$2 modification{{PLURAL:$1||s}}",

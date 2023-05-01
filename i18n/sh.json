@@ -108,7 +108,6 @@
 	"diff-empty": "Prazno",
 	"documentation": "Dokumentacija",
 	"download-label": "Preuzmi",
-	"duplicate-vote": "Duplirani glas",
 	"edit": "Uredi",
 	"edit-count": "Broj izmjena",
 	"edit-count-desc": "$2 {{PLURAL:$1|izmjena|izmjene|izmjena}}",

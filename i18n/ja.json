@@ -123,7 +123,6 @@
 	"diff-empty": "白紙",
 	"documentation": "説明書",
 	"download-label": "ダウンロード",
-	"duplicate-vote": "重複投票",
 	"edit": "編集",
 	"edit-count": "編集回数",
 	"edit-count-desc": "$2回{{PLURAL:$1|編集}}",

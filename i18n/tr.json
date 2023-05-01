@@ -121,7 +121,6 @@
 	"diff-empty": "Boş",
 	"documentation": "Belgelendirme",
 	"download-label": "İndir",
-	"duplicate-vote": "Yinelenen oy",
 	"edit": "Düzenle",
 	"edit-count": "Değişiklik sayısı",
 	"edit-count-desc": "$2 {{PLURAL:$1|düzenleme|düzenleme}}",

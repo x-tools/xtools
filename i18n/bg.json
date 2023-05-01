@@ -104,7 +104,6 @@
 	"diff": "Разлика",
 	"documentation": "Документация",
 	"download-label": "Изтегляне",
-	"duplicate-vote": "Дублирано гласуване",
 	"edit": "Редактиране",
 	"edit-count": "Брой редакции",
 	"edit-count-desc": "$2 {{PLURAL:$1|редакция|редакции}}",

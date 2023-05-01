@@ -120,7 +120,6 @@
 	"diff-empty": "Vuoto",
 	"documentation": "Documentazione",
 	"download-label": "Scarica",
-	"duplicate-vote": "Voto duplicato",
 	"edit": "Modifica",
 	"edit-count": "Conteggio dei contributi",
 	"edit-count-desc": "$2 {{PLURAL:$1|contributo|contributi}}",

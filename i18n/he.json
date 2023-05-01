@@ -124,7 +124,6 @@
 	"diff-empty": "ריק",
 	"documentation": "תיעוד",
 	"download-label": "הורדה",
-	"duplicate-vote": "הצבעה כפולה",
 	"edit": "עריכה",
 	"edit-count": "מספר העריכות",
 	"edit-count-desc": "{{PLURAL:$1|עריכה אחת|$2 עריכות}}",

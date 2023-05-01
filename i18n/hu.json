@@ -107,7 +107,6 @@
 	"diff-empty": "Üres",
 	"documentation": "dokumentációt",
 	"download-label": "Letöltés",
-	"duplicate-vote": "Duplikált szavazat",
 	"edit": "Szerkesztés",
 	"edit-count": "Szerkesztések száma",
 	"edit-count-desc": "$2 {{PLURAL:$1|szerkesztés}}",
