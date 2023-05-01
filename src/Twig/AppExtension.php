@@ -662,6 +662,10 @@ class AppExtension extends AbstractExtension
     {
         [$val, $key] = $this->getDurationMessageKey($seconds);
 
+        // The following messages are used here:
+        // * num-days
+        // * num-hours
+        // * num-minutes
         if ($translate) {
             return $this->numberFormat($val).' '.$this->i18n->msg("num-$key", [$val]);
         } else {

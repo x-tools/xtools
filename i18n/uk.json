@@ -122,7 +122,6 @@
 	"diff-empty": "Порожньо",
 	"documentation": "Документація",
 	"download-label": "Завантажити",
-	"duplicate-vote": "Дублікат голосу",
 	"edit": "Редагувати",
 	"edit-count": "Лічильник редагувань",
 	"edit-count-desc": "$2 {{PLURAL:$1|редагування|редагування|редагувань}}",

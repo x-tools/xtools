@@ -113,7 +113,6 @@
 	"diff-empty": "Empty",
 	"documentation": "Documentation",
 	"download-label": "Download",
-	"duplicate-vote": "Duplicate vote",
 	"edit": "Edit",
 	"edit-count": "Edit count",
 	"edit-count-desc": "$2 {{PLURAL:$1|edit|edits}}",

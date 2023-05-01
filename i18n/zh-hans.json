@@ -138,7 +138,6 @@
 	"diff-empty": "空",
 	"documentation": "文档",
 	"download-label": "下载",
-	"duplicate-vote": "重复投票",
 	"edit": "编辑",
 	"edit-count": "编辑数",
 	"edit-count-desc": "$2次{{PLURAL:$1|编辑}}",

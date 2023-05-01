@@ -105,7 +105,6 @@
 	"diff-empty": "Tom",
 	"documentation": "Dokumentation",
 	"download-label": "Hent",
-	"duplicate-vote": "Dupliker stemme",
 	"edit": "Rediger",
 	"edit-count": "Redigeringsantal",
 	"edit-count-desc": "$2 {{PLURAL:$1|redigering|redigeringer}}",

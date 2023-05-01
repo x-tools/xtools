@@ -128,7 +128,6 @@
 	"diff-empty": "Пусто",
 	"documentation": "Документация",
 	"download-label": "Скачать",
-	"duplicate-vote": "Дублируемое голосование",
 	"edit": "Править",
 	"edit-count": "Число правок",
 	"edit-count-desc": "$2 {{PLURAL:$1|правка|правки|правок}}",

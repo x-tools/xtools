@@ -104,7 +104,6 @@
 	"diff-empty": "Κενό",
 	"documentation": "Τεκμηρίωση",
 	"download-label": "Λήψη",
-	"duplicate-vote": "Διπλότυπη ψήφος",
 	"edit": "Επεξεργασία",
 	"edit-count": "Καταμέτρηση επεξεργασιών",
 	"edit-count-desc": "$2 {{PLURAL:$1|επεξεργασία|επεξεργασίες}}",

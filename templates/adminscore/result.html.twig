@@ -16,12 +16,44 @@
                         {# Don't confuse people by showing 0 for blocks #}
                         {% if not(key == 'blocks' and as.scores[key].score == 0) %}
                             <tr>
+                                {##
+                                 # The following messages are used here:
+                                 # * account-age
+                                 # * edit-count
+                                 # * user-page
+                                 # * patrols
+                                 # * blocks
+                                 # * afd
+                                 # * recent-acitivity
+                                 # * aiv
+                                 # * edit-summaries
+                                 # * namespaces
+                                 # * pages-created-live
+                                 # * pages-created-deleted
+                                 # * rpp
+                                #}
                                 <td>{{ msg(key) }}</td>
                                 <td>
                                     <span class="text-success">{{ as.scores[key].score|diff_format }}</span>
                                 </td>
                                 <td>
                                     <span class="text-muted small">
+                                        {##
+                                         # The following messages are used here:
+                                         # * account-age-desc
+                                         # * edit-count-desc
+                                         # * user-page-desc
+                                         # * patrols-desc
+                                         # * blocks-desc
+                                         # * afd-desc
+                                         # * recent-acitivity-desc
+                                         # * aiv-desc
+                                         # * edit-summaries-desc
+                                         # * namespaces-desc
+                                         # * pages-created-live-desc
+                                         # * pages-created-deleted-desc
+                                         # * rpp-desc
+                                         #}
                                         {{ msg(key~"-desc", [as.scores[key].value, as.scores[key].value|num_format]) }}
                                     </span>
                                 </td>

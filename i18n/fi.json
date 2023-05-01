@@ -118,7 +118,6 @@
 	"diff-empty": "Tyhjä",
 	"documentation": "Dokumentaatio",
 	"download-label": "Lataa",
-	"duplicate-vote": "Tuplaääni",
 	"edit": "Muokkaa",
 	"edit-count": "Muokkausmäärä",
 	"edit-count-desc": "$2 {{PLURAL:$1|muokkaus|muokkausta}}",
