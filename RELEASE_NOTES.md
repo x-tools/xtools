@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.17.9 ##
+- Edit: fix bug where 'rev_deleted' may be a string and not an integer.
+
 ## 3.17.8 ##
 - Authorship: Enable for hu.wikipedia.org and it.wikipedia.org
 - Indicate when information has been revision-deleted or suppressed.
