@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.17.8 ##
+- Authorship: Enable for hu.wikipedia.org and it.wikipedia.org
+- Indicate when information has been revision-deleted or suppressed.
+- Translation updates.
+
 ## 3.17.7 ##
 - Authorship: Enable for fr.wikipedia.org
 - AutoEdits (T281962): make relevant links have usesandbox=1 when in sandbox mode
