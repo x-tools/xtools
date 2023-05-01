@@ -71,7 +71,7 @@ class Edit extends Model
             $this->timestamp = DateTime::createFromFormat('YmdHis', $attrs['timestamp']);
         }
 
-        $this->deleted = $attrs['rev_deleted'] ?? 0;
+        $this->deleted = (int)($attrs['rev_deleted'] ?? 0);
 
         if (($this->deleted & self::DELETED_USER) || ($this->deleted & self::DELETED_RESTRICTED)) {
             $this->user = null;
