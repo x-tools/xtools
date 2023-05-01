@@ -183,7 +183,11 @@
                         </td>
                         <td class="sort-entry--edit-summary" data-value="{{ rev.comment }}">
                             {% if rev.reverted %}<i class="text-info">({{ msg('reverted')|lower }})</i>&nbsp;{% endif %}
-                            {{ rev.wikifiedSummary|raw }}
+                            {% if rev.deletedSummary %}
+                                <i class="text-muted">{{ msg('edit-summary-removed') }}</i>
+                            {% else %}
+                                {{ rev.wikifiedSummary|raw }}
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}

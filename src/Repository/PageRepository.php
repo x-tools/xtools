@@ -163,7 +163,8 @@ class PageRepository extends Repository
                         actor_user AS user_id,
                         actor_name AS username,
                         comment_text AS `comment`,
-                        revs.rev_sha1 AS sha
+                        revs.rev_sha1 AS sha,
+                        revs.rev_deleted AS rev_deleted
                     FROM $revTable AS revs
                     LEFT JOIN $actorTable ON revs.rev_actor = actor_id
                     LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)

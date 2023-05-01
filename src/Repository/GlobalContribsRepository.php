@@ -292,6 +292,7 @@ class GlobalContribsRepository extends Repository
                         revs.rev_len AS length,
                         (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
                         revs.rev_parent_id AS parent_id,
+                        revs.rev_deleted AS rev_deleted,
                         $username AS username,
                         page.page_title,
                         page.page_namespace,

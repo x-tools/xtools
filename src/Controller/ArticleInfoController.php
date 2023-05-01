@@ -150,6 +150,8 @@ class ArticleInfoController extends XtoolsController
         // When all username info has been hidden (see T303724).
         if (0 === $this->articleInfo->getNumEditors()) {
             $this->addFlashMessage('warning', 'error-usernames-missing');
+        } elseif ($this->articleInfo->hasDeletedContent()) {
+            $this->addFlashMessage('warning', 'error-deleted-data');
         }
 
         $ret = [

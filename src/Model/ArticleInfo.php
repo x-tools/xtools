@@ -91,6 +91,9 @@ class ArticleInfo extends ArticleInfoApi
         'year' => 0,
     ];
 
+    /** @var bool Whether there was deleted content that could effect accuracy of the stats. */
+    protected bool $hasDeletedContent = false;
+
     /**
      * Get the day of last date we should show in the month/year sections,
      * based on $this->end or the current date.
@@ -516,7 +519,12 @@ class ArticleInfo extends ArticleInfoApi
         ];
 
         while ($rev = $revStmt->fetchAssociative()) {
+            /** @var Edit $edit */
             $edit = $this->repository->getEdit($this->page, $rev);
+
+            if (!$this->hasDeletedContent && 0 !== $edit->getDeleted()) {
+                $this->hasDeletedContent = true;
+            }
 
             if (0 === $revCount) {
                 $this->firstEdit = $edit;
@@ -1069,5 +1077,14 @@ class ArticleInfo extends ArticleInfoApi
     private function getPageviewsTooltip(?int $pageviews): string
     {
         return $pageviews ? '' : $this->i18n->msg('api-error-wikimedia');
+    }
+
+    /**
+     * Whether there was any data removed from public view, which could throw off accuracy of the stats.
+     * @return bool
+     */
+    public function hasDeletedContent(): bool
+    {
+        return $this->hasDeletedContent;
     }
 }
