@@ -61,6 +61,7 @@ class ArticleInfoController extends XtoolsController
      * Setup the ArticleInfo instance and its Repository.
      * @param ArticleInfoRepository $articleInfoRepo
      * @param AutomatedEditsHelper $autoEditsHelper
+     * @codeCoverageIgnore
      */
     private function setupArticleInfo(
         ArticleInfoRepository $articleInfoRepo,

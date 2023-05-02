@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * WebProcessorMonolog extends information included in error reporting.
+ * @codeCoverageIgnore
  */
 class WebProcessorMonolog
 {

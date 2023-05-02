@@ -58,6 +58,7 @@ class DefaultController extends XtoolsController
      * @param string $centralAuthProject
      * @return RedirectResponse
      * @throws Exception If initialization fails.
+     * @codeCoverageIgnore
      */
     public function loginAction(
         Request $request,
