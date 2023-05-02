@@ -317,16 +317,6 @@ class EditCounter extends Model
     }
 
     /**
-     * Get the total number of blocks that have been lifted (i.e. unblocks) by this user.
-     * @return int
-     */
-    public function countBlocksLifted(): int
-    {
-        $logCounts = $this->getLogCounts();
-        return $logCounts['block-unblock'] ?? 0;
-    }
-
-    /**
      * Get the total number of times the user has been blocked.
      * @return int
      */
@@ -689,7 +679,7 @@ class EditCounter extends Model
         return (!empty($logCounts['review-approve']) ? $logCounts['review-approve'] : 0) +
             (!empty($logCounts['review-approve2']) ? $logCounts['review-approve2'] : 0) +
             (!empty($logCounts['review-approve-i']) ? $logCounts['review-approve-i'] : 0) +
-            (!empty($logCounts['review-approve2-i']) ? $logCounts['review2-approve-i'] : 0);
+            (!empty($logCounts['review-approve2-i']) ? $logCounts['review-approve2-i'] : 0);
     }
 
     /**

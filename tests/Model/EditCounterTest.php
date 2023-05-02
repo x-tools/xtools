@@ -64,6 +64,70 @@ class EditCounterTest extends TestAdapter
     }
 
     /**
+     * Log counts and associated getters.
+     */
+    public function testLogCounts(): void
+    {
+        static::assertInstanceOf(UserRights::class, $this->editCounter->getUserRights());
+        $this->editCounterRepo->expects(static::once())
+            ->method('getLogCounts')
+            ->willReturn([
+                'delete-delete' => 0,
+                'move-move' => 1,
+                'block-block' => 2,
+                'block-reblock' => 3,
+                'block-unblock' => 4,
+                // intentionally does not include 'protect-protect'
+                'protect-modify' => 5,
+                'protect-unprotect' => 6,
+                'delete-revision' => 7,
+                'upload-upload' => 8,
+                // intentionally does not include 'delete-event'
+                'rights-rights' => 9,
+                'abusefilter-modify' => 10,
+                'thanks-thank' => 11,
+                'patrol-patrol' => 12,
+                'merge-merge' => 13,
+                // Imports should add up to 6
+                'import-import' => 1,
+                'import-interwiki' => 2,
+                'import-upload' => 3,
+                // Content model changes, sum 3
+                'contentmodel-new' => 1,
+                'contentmodel-change' => 2,
+                // Review approvals, sum 10
+                'review-approve' => 1,
+                'review-approve2' => 2,
+                'review-approve-i' => 3,
+                'review-approve2-i' => 4,
+                // Account creation, sum 3
+                'newusers-create2' => 1,
+                'newusers-byemail' => 2,
+            ]);
+        static::assertEquals(0, $this->editCounter->getLogCounts()['delete-delete']);
+        static::assertEquals(0, $this->editCounter->countPagesDeleted());
+        static::assertEquals(1, $this->editCounter->countPagesMoved());
+        static::assertEquals(2, $this->editCounter->countBlocksSet());
+        static::assertEquals(3, $this->editCounter->countReblocksSet());
+        static::assertEquals(4, $this->editCounter->countUnblocksSet());
+        static::assertEquals(0, $this->editCounter->countPagesProtected());
+        static::assertEquals(5, $this->editCounter->countPagesReprotected());
+        static::assertEquals(6, $this->editCounter->countPagesUnprotected());
+        static::assertEquals(7, $this->editCounter->countEditsDeleted());
+        static::assertEquals(8, $this->editCounter->countFilesUploaded());
+        static::assertEquals(0, $this->editCounter->countLogsDeleted());
+        static::assertEquals(9, $this->editCounter->countRightsModified());
+        static::assertEquals(10, $this->editCounter->countAbuseFilterChanges());
+        static::assertEquals(11, $this->editCounter->thanks());
+        static::assertEquals(12, $this->editCounter->patrols());
+        static::assertEquals(13, $this->editCounter->merges());
+        static::assertEquals(6, $this->editCounter->countPagesImported());
+        static::assertEquals(3, $this->editCounter->countContentModelChanges());
+        static::assertEquals(10, $this->editCounter->approvals());
+        static::assertEquals(3, $this->editCounter->accountsCreated());
+    }
+
+    /**
      * Get counts of revisions: deleted, not-deleted, total, and edit summary usage.
      */
     public function testLiveAndDeletedEdits(): void
@@ -74,12 +138,18 @@ class EditCounterTest extends TestAdapter
                 'deleted' => 10,
                 'live' => 100,
                 'with_comments' => 75,
+                'minor' => 5,
+                'day' => 10,
+                'week' => 15,
             ]);
 
         static::assertEquals(100, $this->editCounter->countLiveRevisions());
         static::assertEquals(10, $this->editCounter->countDeletedRevisions());
         static::assertEquals(110, $this->editCounter->countAllRevisions());
         static::assertEquals(100, $this->editCounter->countLast5000());
+        static::assertEquals(5, $this->editCounter->countMinorRevisions());
+        static::assertEquals(10, $this->editCounter->countRevisionsInLast('day'));
+        static::assertEquals(15, $this->editCounter->countRevisionsInLast('week'));
     }
 
     /**
@@ -163,6 +233,7 @@ class EditCounterTest extends TestAdapter
             ->willReturn($namespaceTotals);
 
         static::assertEquals($namespaceTotals, $this->editCounter->namespaceTotals());
+        static::assertEquals(30, $this->editCounter->liveRevisionsFromNamespaces());
     }
 
     /**
