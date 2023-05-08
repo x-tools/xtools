@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"Coring",
 			"Edible Melon",
 			"Evs",
 			"Facenapalm",
@@ -505,6 +506,7 @@
 	"username": "Имя участника",
 	"username-ip-or-cidr": "Имя участника, IP-адрес или CIDR-диапазон.",
 	"username-or-ip": "Имя участника, IPv4-адрес или IPv6-адрес",
+	"username-removed": "(имя пользователя удалено)",
 	"version": "Версия $1",
 	"view-source": "Просмотр исходного кода",
 	"view-wikitext": "Просмотреть как викитекст",
