@@ -464,6 +464,7 @@
 	"user-page-desc": "Størrelsen på brukersiden er $2 {{PLURAL:$1|byte}}",
 	"username": "Brukernavn",
 	"username-or-ip": "Brukernavn eller IPv4 eller IPv6",
+	"username-removed": "(brukernavn fjernet)",
 	"version": "Versjon $1",
 	"view-source": "Vis kilde",
 	"view-wikitext": "Vis som wikitekst",

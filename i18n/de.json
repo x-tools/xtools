@@ -47,7 +47,7 @@
 	"all-quotes": "Alle Zitate",
 	"api": "API",
 	"api-error": "Fehler beim Abruf der $1",
-	"api-error-wikimedia": "Beim Verbinden mit der Wikimedia-API ist ein Fehler aufgetreten. Versuche diese Seite zu aktualisieren oder versuche es später noch einmal.",
+	"api-error-wikimedia": "Es ist ein Fehler beim Verbinden mit der $1 API aufgetreten. Versuchen Sie, diese Seite zu aktualisieren oder versuchen Sie es später noch einmal.",
 	"approve": "Sichtung",
 	"approximate": "etwa",
 	"article": "Artikel",
