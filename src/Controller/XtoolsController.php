@@ -28,6 +28,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Twig\Environment;
+use Twig\Markup;
 use Wikimedia\IPUtils;
 
 /**
@@ -998,14 +999,16 @@ abstract class XtoolsController extends AbstractController
     /**
      * Add a flash message.
      * @param string $type
-     * @param string $key i18n key or raw message.
+     * @param string|Markup $key i18n key or raw message.
      * @param array $vars
      */
-    public function addFlashMessage(string $type, string $key, array $vars = []): void
+    public function addFlashMessage(string $type, $key, array $vars = []): void
     {
-        $this->addFlash(
-            $type,
-            $this->i18n->msgExists($key, $vars) ? $this->i18n->msg($key, $vars) : $key
-        );
+        if ($key instanceof Markup || !$this->i18n->msgExists($key, $vars)) {
+            $msg = $key;
+        } else {
+            $msg = $this->i18n->msg($key, $vars);
+        }
+        $this->addFlash($type, $msg);
     }
 }

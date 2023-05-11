@@ -15,6 +15,7 @@ use GuzzleHttp\Exception\ServerException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Twig\Markup;
 
 /**
  * This controller serves the search form and results for the ArticleInfo tool
@@ -151,8 +152,18 @@ class ArticleInfoController extends XtoolsController
         // When all username info has been hidden (see T303724).
         if (0 === $this->articleInfo->getNumEditors()) {
             $this->addFlashMessage('warning', 'error-usernames-missing');
-        } elseif ($this->articleInfo->hasDeletedContent()) {
-            $this->addFlashMessage('warning', 'error-deleted-data');
+        } elseif ($this->articleInfo->numDeletedRevisions()) {
+            $link = new Markup(
+                $this->renderView('flashes/deleted_data.html.twig', [
+                    'numRevs' => $this->articleInfo->numDeletedRevisions(),
+                ]),
+                'UTF-8'
+            );
+            $this->addFlashMessage(
+                'warning',
+                $link,
+                [$this->articleInfo->numDeletedRevisions(), $link]
+            );
         }
 
         $ret = [

@@ -13,6 +13,7 @@ use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ServerException;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
@@ -195,7 +196,7 @@ abstract class Repository
                     'format' => 'json',
                 ], $params),
             ])->getBody()->getContents(), true);
-        } catch (ServerException $e) {
+        } catch (ServerException|ConnectException $e) {
             throw new BadGatewayException('api-error-wikimedia', ['Wikimedia'], $e);
         }
     }

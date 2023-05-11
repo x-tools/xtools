@@ -241,7 +241,7 @@ class ArticleInfoTest extends TestAdapter
             array_keys($this->articleInfo->getTools())
         );
 
-        static::assertTrue($this->articleInfo->hasDeletedContent());
+        static::assertEquals(1, $this->articleInfo->numDeletedRevisions());
     }
 
     /**
@@ -411,9 +411,9 @@ class ArticleInfoTest extends TestAdapter
             'XtoolsBot' => ['count' => 1],
         ]);
 
-        $prop = $this->reflectionClass->getProperty('hasDeletedContent');
+        $prop = $this->reflectionClass->getProperty('numDeletedRevisions');
         $prop->setAccessible(true);
-        $prop->setValue($this->articleInfo, true);
+        $prop->setValue($this->articleInfo, 1);
 
         $method = $this->reflectionClass->getMethod('updateCounts');
         $method->setAccessible(true);

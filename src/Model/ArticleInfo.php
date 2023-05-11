@@ -91,8 +91,8 @@ class ArticleInfo extends ArticleInfoApi
         'year' => 0,
     ];
 
-    /** @var bool Whether there was deleted content that could effect accuracy of the stats. */
-    protected bool $hasDeletedContent = false;
+    /** @var int Number of revisions with deleted information that could effect accuracy of the stats. */
+    protected int $numDeletedRevisions = 0;
 
     /**
      * Get the day of last date we should show in the month/year sections,
@@ -522,8 +522,8 @@ class ArticleInfo extends ArticleInfoApi
             /** @var Edit $edit */
             $edit = $this->repository->getEdit($this->page, $rev);
 
-            if (!$this->hasDeletedContent && 0 !== $edit->getDeleted()) {
-                $this->hasDeletedContent = true;
+            if (0 !== $edit->getDeleted()) {
+                $this->numDeletedRevisions++;
             }
 
             if (0 === $revCount) {
@@ -1080,11 +1080,11 @@ class ArticleInfo extends ArticleInfoApi
     }
 
     /**
-     * Whether there was any data removed from public view, which could throw off accuracy of the stats.
-     * @return bool
+     * Number of revisions with deleted information that could effect accuracy of the stats.
+     * @return int
      */
-    public function hasDeletedContent(): bool
+    public function numDeletedRevisions(): int
     {
-        return $this->hasDeletedContent;
+        return $this->numDeletedRevisions;
     }
 }
