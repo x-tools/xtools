@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\EventSubscriber;
 
 use App\Controller\XtoolsController;
+use App\Exception\XtoolsTooManyRequestsHttpException;
 use App\Helper\I18nHelper;
 use DateInterval;
 use Psr\Cache\CacheItemPoolInterface;
@@ -18,9 +19,11 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Twig\Environment;
+use Twig\Markup;
 
 /**
- * A RateLimitSubscriber checks to see if users are exceeding usage limitations.
+ * A RateLimitSubscriber checks to see if users (or bots) are exceeding usage limitations.
  */
 class RateLimitSubscriber implements EventSubscriberInterface
 {
@@ -37,6 +40,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
     ];
 
     protected CacheItemPoolInterface $cache;
+    protected Environment $twig;
     protected I18nHelper $i18n;
     protected LoggerInterface $crawlerLogger;
     protected LoggerInterface $denylistLogger;
@@ -68,6 +72,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
      * @param LoggerInterface $crawlerLogger
      * @param LoggerInterface $denylistLogger
      * @param LoggerInterface $rateLimitLogger
+     * @param Environment $twig
      * @param int $rateLimit
      * @param int $rateDuration
      */
@@ -79,6 +84,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
         LoggerInterface $crawlerLogger,
         LoggerInterface $denylistLogger,
         LoggerInterface $rateLimitLogger,
+        Environment $twig,
         int $rateLimit,
         int $rateDuration
     ) {
@@ -86,6 +92,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
         $this->cache = $cache;
         $this->parameterBag = $parameterBag;
         $this->session = $requestStack->getSession();
+        $this->twig = $twig;
         $this->crawlerLogger = $crawlerLogger;
         $this->denylistLogger = $denylistLogger;
         $this->rateLimitLogger = $rateLimitLogger;
@@ -265,8 +272,8 @@ class RateLimitSubscriber implements EventSubscriberInterface
      * Throw exception for denied access due to spider crawl or hitting usage limits.
      * @param string $logComment Comment to include with the log entry.
      * @param bool $denylist Changes the messaging to say access was denied due to abuse, rather than rate limiting.
-     * @throws TooManyRequestsHttpException
      * @throws AccessDeniedHttpException
+     * @throws XtoolsTooManyRequestsHttpException
      */
     private function denyAccess(string $logComment, bool $denylist = false): void
     {
@@ -276,22 +283,16 @@ class RateLimitSubscriber implements EventSubscriberInterface
 
         if ($denylist) {
             $message = $this->i18n->msg('error-denied', ['tools.xtools@toolforge.org']);
-            throw new AccessDeniedHttpException($message, null, 999);
+            throw new AccessDeniedHttpException($message);
         }
 
-        $message = $this->i18n->msg('error-rate-limit', [
-            $this->rateDuration,
-            "<a href='/login'>".$this->i18n->msg('error-rate-limit-login')."</a>",
-            "<a href='https://www.mediawiki.org/wiki/Special:MyLanguage/XTools/API' target='_blank'>" .
-                $this->i18n->msg('api') .
-            "</a>",
-        ]);
+        $markup = new Markup(
+            $this->twig->render('flashes/error_rate_limit.html.twig', [
+                'rateDuration' => $this->rateDuration,
+            ]),
+            'UTF-8'
+        );
 
-        /**
-         * TODO: Find a better way to do this.
-         * 999 is a random, complete hack to tell error.html.twig file to treat these exceptions as having
-         * fully safe messages that can be display with |raw. (In this case we authored the message).
-         */
-        throw new TooManyRequestsHttpException(600, $message, null, 999);
+        throw new XtoolsTooManyRequestsHttpException($markup, $this->rateDuration);
     }
 }

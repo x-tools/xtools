@@ -1,0 +1,10 @@
+{%- set loginLink -%}
+    <a href="{{ path('login') }}">{{ msg('error-rate-limit-login') }}</a>
+{%- endset -%}
+{%- set apiLink -%}
+    <a href='https://www.mediawiki.org/wiki/Special:MyLanguage/XTools/API' target='_blank'>{{ msg('api') }}</a>
+{%- endset -%}
+{{- msg('error-rate-limit', [rateDuration, loginLink, apiLink]) -}}
+<p>
+{% set loginLink = "<a href='" ~ login_url(app.request) ~ "'>" ~ msg('error-rate-limit-login') ~ "</a>" %}
+<h3 class="text-danger"><strong>{{ msg('error-rate-limit-login-big', [loginLink]) }}</strong></h3>
