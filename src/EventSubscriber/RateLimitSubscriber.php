@@ -214,6 +214,11 @@ class RateLimitSubscriber implements EventSubscriberInterface
         $cacheItem->set($count)
             ->expiresAfter(new DateInterval('PT1M'));
         $this->cache->save($cacheItem);
+
+        // If we're got a lot of hits, let's go ahead and assume it's a crawler and give a 429.
+        if ($count > 10) {
+            $this->denyAccess('Web crawler detected');
+        }
     }
 
     /**
