@@ -12,13 +12,19 @@ class Authorship extends Model
 {
     /** @const string[] Domain names of wikis supported by WikiWho. */
     public const SUPPORTED_PROJECTS = [
+        'ar.wikipedia.org',
         'de.wikipedia.org',
         'en.wikipedia.org',
         'es.wikipedia.org',
         'eu.wikipedia.org',
-        'it.wikipedia.org',
         'fr.wikipedia.org',
         'hu.wikipedia.org',
+        'id.wikipedia.org',
+        'it.wikipedia.org',
+        'ja.wikipedia.org',
+        'nl.wikipedia.org',
+        'pl.wikipedia.org',
+        'pt.wikipedia.org',
         'tr.wikipedia.org',
     ];
 
