@@ -11,6 +11,7 @@ framework:
         # http://symfony.com/doc/current/reference/configuration/framework.html#handler-id
         handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
         cookie_lifetime: 604800 # 1 week
+        gc_divisor: 500 # Try to see if this reduces lock timeouts; see https://github.com/symfony/symfony/issues/20619
     fragments:       ~
     http_method_override: true
     php_errors:
