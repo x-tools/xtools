@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"Adriendelucca",
 			"Dishual",
 			"Fulup",
 			"Gwenn-Ael",
@@ -464,6 +465,7 @@
 	"user-page-desc": "$2 {{PLURAL:$1|okted|okted}} eo ment ar bajenn implijer.",
 	"username": "Anv implijer",
 	"username-or-ip": "Anv implijer pe IPv4 pe IPv6",
+	"username-removed": "(anv implijer diverket)",
 	"version": "Stumm $1",
 	"view-source": "Gwelet an tarzh",
 	"view-wikitext": "Diskwel evel wikitestenn",
