@@ -138,7 +138,7 @@
 	"error-authorship-non-mainspace": "Authorship statistics are only available for mainspace articles.",
 	"error-authorship-unsupported-project": "$1 is not a supported project.",
 	"error-automation": "Using automation to scrape the XTools user interface is not allowed. Please use our comprehensive API instead: $1",
-	"error-deleted-data-msg": "$1 {{PLURAL:$1|revision|revisions}} of this page {{PLURAL:$1|has|have}} information that has been $2. As a result, some data may be inaccurate or misleading.",
+	"error-deleted-data-msg": "$1 {{PLURAL:$1|revision|revisions}} of this page {{PLURAL:$1|contains|contain}} information that {{PLURAL:$1|has|have}} been $2. As a result, some data may be inaccurate or misleading.",
 	"error-deleted-data-link": "removed from public view",
 	"error-denied": "Your access to XTools has been blocked due to apparent abuse or disruptive automation. Please contact $1",
 	"error-ip-range-unsupported": "Sorry, this functionality is not available for IP ranges. Please enter either a single username or IP address.",
