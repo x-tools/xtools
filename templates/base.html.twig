@@ -22,14 +22,9 @@
     </script>
 
     {% block javascripts %}
-        <script type="text/javascript" src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-        <script type="text/javascript" src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-        <script type="text/javascript" src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/select2/4.0.5/js/select2.full.min.js"></script>
         {{ encore_entry_script_tags('app') }}
     {% endblock %}
     {% block stylesheets %}
-        <link rel="stylesheet" type="text/css" media="screen" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" media="screen" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/select2/4.0.5/css/select2.min.css">
         {% if isRTL() %}
             <link rel="stylesheet" type="text/css" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-rtl/3.4.0/css/bootstrap-flipped.min.css">
         {% endif %}
@@ -268,9 +263,11 @@
 </footer>
 {% if xtPage is defined and project.domain is defined and 'indexAction' not in app.request.attributes.get('_controller') %}
 <script>
-    $.ajax({
-        url: "{{ path('homepage') }}meta/usage/{{ xtPage }}/{{ project.domain }}/{{ csrf_token('intention') }}",
-        method: 'PUT'
+    document.addEventListener('DOMContentLoaded', function () {
+        $.ajax({
+            url: "{{ path('homepage') }}meta/usage/{{ xtPage }}/{{ project.domain }}/{{ csrf_token('intention') }}",
+            method: 'PUT'
+        });
     });
 </script>
 {% endif %}

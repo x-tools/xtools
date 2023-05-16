@@ -17,9 +17,17 @@ Encore
     // (which is a file that's used by Symfony's `asset()` function)
     .setManifestKeyPrefix('build')
 
+    // Set up global variables.
+    .autoProvidejQuery()
+
     .copyFiles({
         from: './assets/images',
         to: 'images/[path][name].[ext]'
+    })
+
+    .copyFiles({
+        from: './assets/fonts',
+        to: 'fonts/[path][name].[ext]'
     })
 
     /*
@@ -33,8 +41,11 @@ Encore
      */
     .addEntry('app', [
         // Scripts
+        './node_modules/jquery/dist/jquery.js',
+        './node_modules/bootstrap/dist/js/bootstrap.js',
+        './node_modules/select2/dist/js/select2.js',
+        './node_modules/chart.js/dist/Chart.js',
         './assets/vendor/jquery.i18n/jquery.i18n.dist.js',
-        './assets/vendor/Chart.min.js',
         './assets/vendor/bootstrap-typeahead.js',
         './assets/js/common/core_extensions.js',
         './assets/js/common/application.js',
@@ -51,6 +62,8 @@ Encore
         './assets/js/topedits.js',
 
         // Stylesheets
+        './node_modules/bootstrap/dist/css/bootstrap.css',
+        './node_modules/select2/dist/css/select2.css',
         './assets/css/application.scss',
         './assets/css/articleinfo.scss',
         './assets/css/autoedits.scss',

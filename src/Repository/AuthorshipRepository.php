@@ -18,7 +18,7 @@ class AuthorshipRepository extends Repository
 {
     /**
      * Query the WikiWho service to get authorship percentages.
-     * @see https://api.wikiwho.net/
+     * @see https://www.mediawiki.org/wiki/WikiWho
      * @param Page $page
      * @param int|null $revId ID of revision to target, or null for latest revision.
      * @param bool $returnRevId Whether or not to include the relevant revision IDs with each token.

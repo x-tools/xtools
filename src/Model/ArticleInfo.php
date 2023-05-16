@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace App\Model;
 
+use App\Repository\Repository;
+use App\Traits\Chart;
 use DateTime;
 
 /**
@@ -11,6 +13,8 @@ use DateTime;
  */
 class ArticleInfo extends ArticleInfoApi
 {
+    use Chart;
+
     /** @var int Number of revisions that were actually processed. */
     protected int $numRevisionsProcessed;
 
@@ -435,6 +439,55 @@ class ArticleInfo extends ArticleInfoApi
     public function getYearMonthCounts(): array
     {
         return $this->yearMonthCounts;
+    }
+
+    /**
+     * This is used for Chart.js.
+     * @return array
+     */
+    public function getYearMonthDatasets(): array
+    {
+        $datasets = [
+            [
+                'type' => 'bar',
+                'label' => $this->i18n->msg('all-edits'),
+                'backgroundColor' => Chart::getChartColor(0),
+                'data' => [],
+                'yAxisID' => 'edits',
+            ],
+            [
+                'type' => 'bar',
+                'label' => $this->i18n->msg('minor-edits'),
+                'backgroundColor' => Chart::getChartColor(1),
+                'data' => [],
+                'yAxisID' => 'edits',
+            ],
+            [
+                'type' => 'bar',
+                'label' => $this->i18n->msg('ip-edits'),
+                'backgroundColor' => Chart::getChartColor(2),
+                'data' => [],
+                'yAxisID' => 'edits',
+            ],
+            [
+                'type' => 'line',
+                'label' => $this->i18n->msg('size'),
+                'borderColor' => Chart::getChartColor(3),
+                'backgroundColor' => Chart::getChartColor(3),
+                'fill' => false,
+                'data' => [],
+                'yAxisID' => 'size',
+            ],
+        ];
+
+        foreach ($this->getYearMonthCounts() as $counts) {
+            $datasets[0]['data'][] = $counts['all'];
+            $datasets[1]['data'][] = $counts['minor'];
+            $datasets[2]['data'][] = $counts['anon'];
+            $datasets[3]['data'][] = $counts['size'];
+        }
+
+        return $datasets;
     }
 
     /**

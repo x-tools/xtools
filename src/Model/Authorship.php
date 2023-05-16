@@ -98,6 +98,18 @@ class Authorship extends Model
     }
 
     /**
+     * Get the list of authors with what percentage of the article they authored.
+     * Used by the charts in the view.
+     * @return array
+     */
+    public function getPercentages(): array
+    {
+        return array_map(function ($_author, $values) {
+            return $values['percentage'];
+        }, $this->getList());
+    }
+
+    /**
      * Get error thrown when preparing the data, or null if no error occurred.
      * @return string|null
      */

@@ -6,6 +6,7 @@ namespace App\Tests\Repository;
 
 use App\Model\Project;
 use App\Model\User;
+use App\Repository\Repository;
 use App\Repository\SimpleEditCounterRepository;
 use App\Repository\UserRepository;
 use App\Tests\TestAdapter;

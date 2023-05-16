@@ -5,7 +5,7 @@ $(function () {
         return;
     }
 
-    var setupToggleTable = function () {
+    const setupToggleTable = function () {
         xtools.application.setupToggleTable(
             window.textshares,
             window.textsharesChart,
@@ -14,14 +14,14 @@ $(function () {
         );
     };
 
-    var $textsharesContainer = $('.textshares-container');
+    const $textsharesContainer = $('.textshares-container');
 
     if ($textsharesContainer[0]) {
         /** global: xtBaseUrl */
-        var url = xtBaseUrl + 'authorship/'
+        let url = xtBaseUrl + 'authorship/'
             + $textsharesContainer.data('project') + '/'
             + $textsharesContainer.data('article') + '/'
-            + (xtools.articleinfo.endDate ? xtools.articleinfo.endDate + '/' : '');
+            + ($textsharesContainer.data('end-date') ? $textsharesContainer.data('end-date') + '/' : '');
         // Remove extraneous forward slash that would cause a 301 redirect, and request over HTTP instead of HTTPS.
         url = `${url.replace(/\/$/, '')}?htmlonly=yes`;
 
@@ -42,4 +42,77 @@ $(function () {
     } else if ($('.textshares-table').length) {
         setupToggleTable();
     }
+
+    // Setup the charts.
+    const $chart = $('#year_count'),
+        datasets = $chart.data('datasets');
+    new Chart($chart, {
+        type: 'bar',
+        data: {
+            labels: $chart.data('year-labels'),
+            datasets,
+        },
+        options: {
+            responsive: true,
+            legend: {
+                display: false,
+            },
+            tooltips: {
+                mode: 'label',
+                callbacks: {
+                    label: function (tooltipItem) {
+                        return datasets[tooltipItem.datasetIndex].label + ': '
+                            + (Number(tooltipItem.yLabel)).toLocaleString(i18nLang);
+                    }
+                }
+            },
+            barValueSpacing: 20,
+            scales: {
+                yAxes: [{
+                    id: 'edits',
+                    type: 'linear',
+                    position: 'left',
+                    scaleLabel: {
+                        display: true,
+                        labelString: $.i18n('edits').capitalize(),
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        callback: function (value) {
+                            if (Math.floor(value) === value) {
+                                return value.toLocaleString(i18nLang);
+                            }
+                        }
+                    },
+                    gridLines: {
+                        color: xtools.application.chartGridColor
+                    }
+                }, {
+                    id: 'size',
+                    type: 'linear',
+                    position: 'right',
+                    scaleLabel: {
+                        display: true,
+                        labelString: $.i18n('size').capitalize(),
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        callback: function (value) {
+                            if (Math.floor(value) === value) {
+                                return value.toLocaleString(i18nLang);
+                            }
+                        }
+                    },
+                    gridLines: {
+                        color: xtools.application.chartGridColor
+                    }
+                }],
+                xAxes: [{
+                    gridLines: {
+                        color: xtools.application.chartGridColor
+                    }
+                }]
+            },
+        },
+    });
 });

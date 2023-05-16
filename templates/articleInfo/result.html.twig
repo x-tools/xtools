@@ -444,11 +444,8 @@
 
         {# ======================== AUTHORSHIP ======================== #}
         {% if showAuthorship %}
-            <script>
-                xtools.articleinfo.endDate = {% if ai.end %}"{{ ai.endDate }}"{% else %}null{% endif %};
-            </script>
             {% set content %}
-                <div class="textshares-container" data-project="{{ project.domain }}" data-article="{{ page.title }}">
+                <div class="textshares-container" data-project="{{ project.domain }}" data-article="{{ page.title }}" data-end-date="{{ ai.endDate ? null }}">
                     <em class="text-muted">{{ msg('loading') }}...</em>
                 </div>
             {% endset %}
@@ -457,7 +454,7 @@
             {% endset %}
             {% set description_link %}
                 {% set wikiwhoLink %}
-                    <a target='_blank' href='https://www.wikiwho.net/'>Wikiwho</a>
+                    <a target='_blank' href='https://www.mediawiki.org/wiki/Special:MyLanguage/WikiWho'>WikiWho</a>
                 {% endset %}
                 {{ msg('powered-by', [wikiwhoLink]) }}
             {% endset %}
@@ -634,128 +631,10 @@
 
         {# ======================== YEAR COUNTS ======================== #}
         {% set content %}
-            <script>
-                $(function() {
-                    var yearDatasets = [{
-                        type: 'bar',
-                        label: "{{ msg('all-edits') }}",
-                        backgroundColor: "{{ chartColor(0) }}",
-                        data: [],
-                        yAxisID: 'edits'
-                    },
-                    {
-                        type: 'bar',
-                        label: "{{ msg('minor-edits') }}",
-                        backgroundColor: "{{ chartColor(1) }}",
-                        data: [],
-                        yAxisID: 'edits'
-                    },
-                    {
-                        type: 'bar',
-                        label: "{{ msg('ip-edits') }}",
-                        backgroundColor: "{{ chartColor(2) }}",
-                        data: [],
-                        yAxisID: 'edits'
-                    },
-                    {
-                        type: 'line',
-                        label: "{{ msg('size') }}",
-                        borderColor: "{{ chartColor(3) }}",
-                        backgroundColor: "{{ chartColor(3) }}",
-                        fill: false,
-                        data: [],
-                        yAxisID: 'size'
-                    }];
-
-                    // restructure data the way Chart.js wants it
-                    {% for year in ai.yearMonthCounts|keys %}
-                        yearDatasets[0].data.push({{ ai.yearMonthCounts[year].all }});
-                        yearDatasets[1].data.push({{ ai.yearMonthCounts[year].minor }});
-                        yearDatasets[2].data.push({{ ai.yearMonthCounts[year].anon }});
-                        yearDatasets[3].data.push({{ ai.yearMonthCounts[year].size }});
-                    {% endfor %}
-
-                    new Chart($("#year_count"), {
-                        type: 'bar',
-                        data: {
-                            labels: {{ ai.yearLabels|json_encode()|raw }},
-                            datasets: yearDatasets,
-                        },
-                        options: {
-                            responsive: true,
-                            legend: {
-                                display: false,
-                            },
-                            tooltips: {
-                                mode: 'label',
-                                callbacks: {
-                                    label: function(tooltipItem) {
-                                        return yearDatasets[tooltipItem.datasetIndex].label + ': '
-                                            + (new Number(tooltipItem.yLabel)).toLocaleString(i18nLang);
-                                    }
-                                }
-                            },
-                            barValueSpacing: 20,
-                            scales: {
-                                yAxes: [{
-                                    id: 'edits',
-                                    type: 'linear',
-                                    position: 'left',
-                                    gridLines:{
-                                        display: false
-                                    },
-                                    scaleLabel: {
-                                        display: true,
-                                        labelString: "{{ msg('edits') }}"
-                                    },
-                                    ticks: {
-                                        beginAtZero: true,
-                                        callback: function (value) {
-                                            if (Math.floor(value) === value) {
-                                                return value.toLocaleString(i18nLang);
-                                            }
-                                        }
-                                    },
-                                    gridLines: {
-                                        color: xtools.application.chartGridColor
-                                    }
-                                }, {
-                                    id: 'size',
-                                    type: 'linear',
-                                    position: 'right',
-                                    gridLines:{
-                                        display: false
-                                    },
-                                    scaleLabel: {
-                                        display: true,
-                                        labelString: "{{ msg('size') }}"
-                                    },
-                                    ticks: {
-                                        beginAtZero: true,
-                                        callback: function (value) {
-                                            if (Math.floor(value) === value) {
-                                                return value.toLocaleString(i18nLang);
-                                            }
-                                        }
-                                    },
-                                    gridLines: {
-                                        color: xtools.application.chartGridColor
-                                    }
-                                }],
-                                xAxes: [{
-                                    gridLines: {
-                                        color: xtools.application.chartGridColor
-                                    }
-                                }]
-                            },
-                        },
-                    });
-                });
-            </script>
             <div class="year-count-charts clearfix">
                 <div class="chart-wrapper">
                     <div class="canvas-wrapper">
-                        <canvas id="year_count" height="400" width="800"></canvas>
+                        <canvas id="year_count" height="400" width="800" data-datasets="{{ ai.yearMonthDatasets|json_encode|e('html_attr') }}" data-year-labels="{{ ai.yearLabels|json_encode|e('html_attr') }}"></canvas>
                     </div>
                     <div class="chart-legend" id="year_count_legend">
                         <div class="legend-body">

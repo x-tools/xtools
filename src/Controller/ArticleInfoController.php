@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Exception\XtoolsHttpException;
 use App\Helper\AutomatedEditsHelper;
 use App\Model\ArticleInfo;
+use App\Model\ArticleInfoApi;
 use App\Model\Authorship;
 use App\Model\Page;
 use App\Model\Project;
@@ -172,7 +173,7 @@ class ArticleInfoController extends XtoolsController
             'project' => $this->project,
             'editorlimit' => (int)$this->request->query->get('editorlimit', 20),
             'botlimit' => $this->request->query->get('botlimit', 10),
-            'pageviewsOffset' => 60,
+            'pageviewsOffset' => ArticleInfoApi::PAGEVIEWS_OFFSET,
             'ai' => $this->articleInfo,
             'showAuthorship' => Authorship::isSupportedPage($this->page) && $this->articleInfo->getNumEditors() > 0,
         ];

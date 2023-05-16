@@ -3,7 +3,7 @@
 {% set values = [] %}
 {% set colors = [] %}
 <div class="chart-wrapper {{ classes }}">
-    <canvas id="{{ id }}"{% if size != null %} height="{{ size }}"{% endif %}></canvas>
+    <canvas id="{{ id }}"{% if size != null %} height="{{ size }}"{% endif %} class="xt-pie-chart"></canvas>
     <div class="chart-legend" id="{{ id }}_legend">
         <div class="legend-body">
             {% for entry in data %}
@@ -25,7 +25,7 @@
     </div>
 </div>
 <script type="text/javascript">
-    $(function() {
+    document.addEventListener('DOMContentLoaded', function () {
         window["{{ id }}"] = new Chart($("#{{ id }}"), {
             type: 'pie',
             data: {
