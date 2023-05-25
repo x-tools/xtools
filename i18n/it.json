@@ -145,6 +145,7 @@
 	"error-authorship-non-mainspace": "Le statistiche sull'autore sono disponibili solo per le voci del namespace principale.",
 	"error-authorship-unsupported-project": "$1 non è un progetto supportato.",
 	"error-automation": "L'uso dell'automazione per eliminare l'interfaccia utente di XTools non è consentito. Utilizza invece la nostra API completa: $1",
+	"error-deleted-data-msg": "$1 {{PLURAL:$1|versione|versioni}} di questa pagina {{PLURAL:$1|contiene|contengono}} informazioni che {{PLURAL:$1|sono}} state $2. Di conseguenza, alcuni dati potrebbero essere imprecisi o fuorvianti.",
 	"error-denied": "Il tuo accesso a XTools è stato bloccato a causa di apparenti abusi o automazioni dirompenti. Si prega di contattare $1",
 	"error-ip-range-unsupported": "Spiacenti, questa funzionalità non è disponibile per gli intervalli IP. Inserisci un unico nome utente o un indirizzo IP.",
 	"error-login": "Accesso fallito! Per favore riprova.",
