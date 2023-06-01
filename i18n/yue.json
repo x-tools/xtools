@@ -5,7 +5,8 @@
 			"Moon0319",
 			"Roy17",
 			"Sun8908",
-			"Z423x5c6"
+			"Z423x5c6",
+			"捍粵者"
 		]
 	},
 	"account-age": "戶口歲數",
@@ -85,9 +86,9 @@
 	"notice": "通知",
 	"num-days": "{{PLURAL:$1|日|日}}",
 	"num-editors": "位{{PLURAL:$1|編輯|編輯}}",
-	"num-hours": "{{PLURAL:$1|個鐘|個鐘}}",
+	"num-hours": "粒鐘",
 	"num-minutes": "{{PLURAL:$1|分鐘|分鐘}}",
-	"num-months": "{{PLURAL:$1|個月|個月}}",
+	"num-months": "個月",
 	"num-pageviews": "{{PLURAL:$1|版瀏覽數|版瀏覽數}}",
 	"num-revisions-since": "自 $3 以來嘅 $1 個{{PLURAL:$2|修訂|修訂}}",
 	"num-seconds": "{{PLURAL:$1|秒}}",

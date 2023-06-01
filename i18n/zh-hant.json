@@ -159,7 +159,7 @@
 	"error-ip-range-unsupported": "很抱歉，此功能不適用於 IP 範圍。請輸入一個使用者名稱或是 IP 位址。",
 	"error-login": "登入失敗！請重試。",
 	"error-pagepile-too-large": "很抱歉，目前有太多頁面匯出到 PagePile 上。您可以手動建立一個 PagePile，或嘗試透過特定命名空間或時間範圍的限制來減少結果集合。",
-	"error-query-timeout": "很抱歉，所請求訊息花費太長時間處理（逾時 $1 {{PLURAL:$1|\n秒|秒}}）。為了保護系統資源，已自動將查詢給刪除。",
+	"error-query-timeout": "很抱歉，所請求訊息花費太長時間處理（逾時 $1 {{PLURAL:$1|秒}}）。為了保護系統資源，已自動將查詢給刪除。",
 	"error-rate-limit": "如果您的身份只是一般普通人，那是因您在短時間內弄出太多請求。在重新載入此工具前請先等待 $1 {{PLURAL:$1|秒|秒}}，或是$2來防止此情況再次發生。若您是網路機器人，請改用我們的$3。",
 	"error-rate-limit-login": "登入",
 	"error-rate-limit-login-big": "請以$1來避免錯誤率限制。",
