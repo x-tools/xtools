@@ -1,5 +1,13 @@
 # Release Notes #
 
+## 3.17.10 ##
+- Authorship: Add wikis that were recently added upstream in WikiWho
+- PageAssessments: add zhwiki to config
+- RateLimitSubscriber: deny access if crawler is detected
+- ArticleInfo: show the number of revisions deleted, if applicable
+- Improve handling of upstream errors
+- Localization updates.
+
 ## 3.17.9 ##
 - Edit: fix bug where 'rev_deleted' may be a string and not an integer.
 
