@@ -55,8 +55,8 @@ class ArticleInfoControllerTest extends ControllerTestAdapter
 
         static::assertEquals(
             [
-                'project', 'page', 'watchers', 'pageviews', 'pageviews_offset',  'revisions',
-                'editors', 'minor_edits', 'author', 'author_editcount', 'created_at',  'created_rev_id',
+                'project', 'page', 'watchers', 'pageviews', 'pageviews_offset',  'revisions', 'editors',
+                'ip_editors', 'minor_edits', 'author', 'author_editcount', 'created_at',  'created_rev_id',
                 'modified_at', 'secs_since_last_edit', 'last_edit_id', 'assessment', 'elapsed_time',
             ],
             array_keys($data)
@@ -99,6 +99,8 @@ class ArticleInfoControllerTest extends ControllerTestAdapter
             '/api/page/links/en.wikipedia/Ravine_du_Sud',
             '/api/page/top_editors/en.wikipedia/Ravine_du_Sud',
             '/api/page/top_editors/en.wikipedia/Ravine_du_Sud/2018-01-01/2018-02-01',
+            '/api/page/bot_data/en.wikipedia/Ravine_du_Sud',
+            '/api/page/automated_edits/enwiki/Ravine_du_Sud',
         ]);
     }
 }

@@ -526,7 +526,7 @@ class AutoEditsRepository extends UserRepository
      * @param string[] $values Values as defined in the AutoEdits config.
      * @return string[] [Equality clause, JOIN clause]
      */
-    private function getInnerAutomatedCountsSql(Project $project, string $toolName, array $values): array
+    protected function getInnerAutomatedCountsSql(Project $project, string $toolName, array $values): array
     {
         $conn = $this->getProjectsConnection($project);
         $commentJoin = '';

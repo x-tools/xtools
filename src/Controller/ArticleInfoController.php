@@ -379,4 +379,68 @@ class ArticleInfoController extends XtoolsController
             'top_editors' => $topEditors,
         ]);
     }
+
+    /**
+     * Get data about bots that have edited a page.
+     * @Route(
+     *     "/api/page/bot_data/{project}/{page}/{start}/{end}", name="PageApiBotData",
+     *     requirements={
+     *         "page"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
+     *         "start"="|\d{4}-\d{2}-\d{2}",
+     *         "end"="|\d{4}-\d{2}-\d{2}",
+     *     },
+     *     defaults={
+     *         "start"=false,
+     *         "end"=false,
+     *     }
+     * )
+     * @param ArticleInfoRepository $articleInfoRepo
+     * @param AutomatedEditsHelper $autoEditsHelper
+     * @return JsonResponse
+     * @codeCoverageIgnore
+     */
+    public function botDataApiAction(
+        ArticleInfoRepository $articleInfoRepo,
+        AutomatedEditsHelper $autoEditsHelper
+    ): JsonResponse {
+        $this->recordApiUsage('page/bot_data');
+
+        $this->setupArticleInfo($articleInfoRepo, $autoEditsHelper);
+        $bots = $this->articleInfo->getBots();
+
+        return $this->getFormattedApiResponse([
+            'bots' => $bots,
+        ]);
+    }
+
+    /**
+     * Get counts of (semi-)automated tools that were used to edit the page.
+     * @Route(
+     *     "/api/page/automated_edits/{project}/{page}/{start}/{end}", name="PageApiAutoEdits",
+     *     requirements={
+     *         "page"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
+     *         "start"="|\d{4}-\d{2}-\d{2}",
+     *         "end"="|\d{4}-\d{2}-\d{2}",
+     *     },
+     *     defaults={
+     *         "start"=false,
+     *         "end"=false,
+     *     }
+     * )
+     * @param ArticleInfoRepository $articleInfoRepo
+     * @param AutomatedEditsHelper $autoEditsHelper
+     * @return JsonResponse
+     * @codeCoverageIgnore
+     */
+    public function getAutoEdits(
+        ArticleInfoRepository $articleInfoRepo,
+        AutomatedEditsHelper $autoEditsHelper
+    ): JsonResponse {
+        $this->recordApiUsage('page/auto_edits');
+
+        $this->setupArticleInfo($articleInfoRepo, $autoEditsHelper);
+        return $this->getFormattedApiResponse([
+            'auto_edits' => $this->articleInfo->getAutoEditsCounts(),
+        ]);
+    }
 }

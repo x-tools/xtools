@@ -4,21 +4,24 @@ declare(strict_types = 1);
 
 namespace App\Repository;
 
+use App\Helper\AutomatedEditsHelper;
 use App\Model\Edit;
 use App\Model\Page;
 use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
+use PDO;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * ArticleInfoRepository is responsible for retrieving data about a single
  * article on a given wiki.
  * @codeCoverageIgnore
  */
-class ArticleInfoRepository extends Repository
+class ArticleInfoRepository extends AutoEditsRepository
 {
     protected EditRepository $editRepo;
     protected UserRepository $userRepo;
@@ -46,11 +49,25 @@ class ArticleInfoRepository extends Repository
         bool $isWMF,
         int $queryTimeout,
         EditRepository $editRepo,
-        UserRepository $userRepo
+        UserRepository $userRepo,
+        ProjectRepository $projectRepo,
+        AutomatedEditsHelper $autoEditsHelper,
+        RequestStack $requestStack
     ) {
         $this->editRepo = $editRepo;
         $this->userRepo = $userRepo;
-        parent::__construct($managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout);
+        parent::__construct(
+            $managerRegistry,
+            $cache,
+            $guzzle,
+            $logger,
+            $parameterBag,
+            $isWMF,
+            $queryTimeout,
+            $projectRepo,
+            $autoEditsHelper,
+            $requestStack
+        );
     }
 
     /**
@@ -108,7 +125,7 @@ class ArticleInfoRepository extends Repository
             $limitClause = "LIMIT $limit";
         }
 
-        $sql = "SELECT COUNT(DISTINCT rev_id) AS count, $actorSelect '0' AS current
+        $sql = "SELECT COUNT(DISTINCT rev_id) AS `count`, $actorSelect '0' AS `current`
                 FROM (
                     SELECT rev_id, rev_actor, rev_timestamp
                     FROM $revTable
@@ -294,8 +311,10 @@ class ArticleInfoRepository extends Repository
                     (
                         SELECT COUNT(rev_id) AS num_edits,
                             COUNT(DISTINCT(rev_actor)) AS num_editors,
+                            SUM(actor_user IS NULL) AS num_ip_editors,
                             SUM(rev_minor_edit) AS minor_edits
                         FROM $revTable
+                        JOIN $actorTable ON actor_id = rev_actor
                         WHERE rev_page = :pageid
                         AND rev_timestamp > 0 # Use rev_timestamp index
                     ) a,
@@ -344,5 +363,76 @@ class ArticleInfoRepository extends Repository
         }
 
         return $result ?? false;
+    }
+
+    /**
+     * Get counts of (semi-)automated tools that were used to edit the page.
+     * @param Page $page
+     * @param $start
+     * @param $end
+     * @return array
+     */
+    public function getAutoEditsCounts(Page $page, $start, $end): array
+    {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'user_autoeditcount');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $project = $page->getProject();
+        $tools = $this->getTools($project);
+        $queries = [];
+        $revisionTable = $project->getTableName('revision', '');
+        $pageTable = $project->getTableName('page');
+        $pageJoin = "LEFT JOIN $pageTable ON rev_page = page_id";
+        $revDateConditions = $this->getDateConditions($start, $end);
+        $conn = $this->getProjectsConnection($project);
+
+        foreach ($tools as $toolName => $values) {
+            [$condTool, $commentJoin, $tagJoin] = $this->getInnerAutomatedCountsSql($project, $toolName, $values);
+            $toolName = $conn->quote($toolName, PDO::PARAM_STR);
+
+            // No regex or tag provided for this tool. This can happen for tag-only tools that are in the global
+            // configuration, but no local tag exists on the said project.
+            if ('' === $condTool) {
+                continue;
+            }
+
+            $queries[] .= "
+                SELECT $toolName AS toolname, COUNT(DISTINCT(rev_id)) AS count
+                FROM $revisionTable
+                $pageJoin
+                $commentJoin
+                $tagJoin
+                WHERE $condTool
+                    AND rev_page = :pageId
+                $revDateConditions";
+        }
+
+        $sql = implode(' UNION ', $queries);
+        $resultQuery = $this->executeProjectsQuery($project, $sql, [
+            'pageId' => $page->getId(),
+        ]);
+
+        $results = [];
+
+        while ($row = $resultQuery->fetchAssociative()) {
+            // Only track tools that they've used at least once
+            $tool = $row['toolname'];
+            if ($row['count'] > 0) {
+                $results[$tool] = [
+                    'link' => $tools[$tool]['link'],
+                    'label' => $tools[$tool]['label'] ?? $tool,
+                    'count' => $row['count'],
+                ];
+            }
+        }
+
+        // Sort the array by count
+        uasort($results, function ($a, $b) {
+            return $b['count'] - $a['count'];
+        });
+
+        return $this->setCache($cacheKey, $results);
     }
 }
