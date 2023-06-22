@@ -318,6 +318,7 @@ class ArticleInfoApi extends Model
             $data = array_merge($data, [
                 'revisions' => (int) $info['num_edits'],
                 'editors' => (int) $info['num_editors'],
+                'ip_editors' => (int) $info['num_ip_editors'],
                 'minor_edits' => (int) $info['minor_edits'],
                 'author' => $info['author'],
                 'author_editcount' => null === $info['author_editcount'] ? null : (int) $info['author_editcount'],
@@ -489,5 +490,14 @@ class ArticleInfoApi extends Model
     public function getNumBots(): int
     {
         return count($this->getBots());
+    }
+
+    /**
+     * Get counts of (semi-)automated tools used to edit the page.
+     * @return array
+     */
+    public function getAutoEditsCounts(): array
+    {
+        return $this->repository->getAutoEditsCounts($this->page, $this->start, $this->end);
     }
 }
