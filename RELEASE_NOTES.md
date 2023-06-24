@@ -1,5 +1,13 @@
 # Release Notes #
 
+## 3.17.11 ##
+- ArticleInfo: added a "bot data" and "(semi-)automated edits" API endpoints.
+  See https://www.mediawiki.org/wiki/XTools/API/Page#Bot_data for more info.
+- ArticleInfo: the [article info API](https://www.mediawiki.org/wiki/XTools/API/Page#Article_info)
+  now returns an `ip_editors` property which is a count of the number of unique
+  IPs that edited the page.
+- Localization updates.
+
 ## 3.17.10 ##
 - Authorship: Add wikis that were recently added upstream in WikiWho
 - PageAssessments: add zhwiki to config
