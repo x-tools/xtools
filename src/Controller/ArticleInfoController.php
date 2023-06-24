@@ -215,6 +215,14 @@ class ArticleInfoController extends XtoolsController
     ): Response {
         $this->recordApiUsage('page/articleinfo');
 
+        if ('/api/articleinfo' === substr($this->request->getRequestUri(), 0, 16)) {
+            $this->addFlash(
+                'warning',
+                'This endpoint will soon be removed. Use /api/page/articleinfo instead. ' .
+                    'See https://w.wiki/6sMx for more information.'
+            );
+        }
+
         $this->setupArticleInfo($articleInfoRepo, $autoEditsHelper);
         $data = [];
 
@@ -304,6 +312,12 @@ class ArticleInfoController extends XtoolsController
     public function assessmentsApiAction(string $pages): JsonResponse
     {
         $this->recordApiUsage('page/assessments');
+
+        $this->addFlash(
+            'warning',
+            'This API endpoint will soon have results nested under the \'pages\' property. ' .
+                'See https://w.wiki/6sMx for more information.'
+        );
 
         $pages = explode('|', $pages);
         $out = [];

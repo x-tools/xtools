@@ -238,6 +238,12 @@ class TopEditsController extends XtoolsController
     ): JsonResponse {
         $this->recordApiUsage('user/topedits');
 
+        $this->addFlash(
+            'warning',
+            'This API endpoint will soon have a different response format. ' .
+            'See https://w.wiki/6sMx for more information.'
+        );
+
         $topEdits = $this->setUpTopEdits($topEditsRepo, $autoEditsHelper);
         $topEdits->prepareData(false);
 

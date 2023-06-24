@@ -317,6 +317,11 @@ class PagesController extends XtoolsController
 
         if ('all' !== $this->namespace && isset($counts[$this->namespace])) {
             $counts = $counts[$this->namespace];
+            $this->addFlash(
+                'warning',
+                'This API endpoint will soon always group results by namespace, even if a specific namespace ' .
+                'was provided. See https://w.wiki/6sMx for more information.'
+            );
         }
 
         return $this->getFormattedApiResponse(['counts' => (object)$counts]);
@@ -357,6 +362,12 @@ class PagesController extends XtoolsController
         string $deleted = 'all'
     ): JsonResponse {
         $this->recordApiUsage('user/pages');
+
+        $this->addFlash(
+            'warning',
+            'This API endpoint will soon have a different response format. ' .
+            'See https://w.wiki/6sMx for more information.'
+        );
 
         $pages = $this->setUpPages($pagesRepo, $redirects, $deleted);
         $pagesList = $pages->getResults();

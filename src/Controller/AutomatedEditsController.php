@@ -241,6 +241,18 @@ class AutomatedEditsController extends XtoolsController
     public function automatedToolsApiAction(AutoEditsRepository $autoEditsRepo): JsonResponse
     {
         $this->recordApiUsage('user/automated_tools');
+        if ('/api/user/' === substr($this->request->getRequestUri(), 0, 10)) {
+            $this->addFlash(
+                'warning',
+                'This endpoint will soon be removed. Use /api/project/automated_tools instead. ' .
+                'See https://w.wiki/6sMx for more information.'
+            );
+        }
+        $this->addFlash(
+            'warning',
+            'This API endpoint will soon have results nested under the \'tools\' property. ' .
+            'See https://w.wiki/6sMx for more information.'
+        );
         return $this->getFormattedApiResponse($autoEditsRepo->getTools($this->project));
     }
 

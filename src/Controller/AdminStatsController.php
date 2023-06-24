@@ -233,6 +233,9 @@ class AdminStatsController extends XtoolsController
      * keyed by user name with a list of the relevant user groups as the values.
      * @Route("/api/project/admins_groups/{project}", name="ProjectApiAdminsGroups")
      * @Route("/api/project/users_groups/{project}/{group}")
+     * @Route("/api/project/{group}_groups/{project}",
+     *     requirements={"group"="admin|patroller|steward"},
+     * )
      * @param AdminStatsRepository $adminStatsRepo
      * @return JsonResponse
      * @codeCoverageIgnore
@@ -240,6 +243,14 @@ class AdminStatsController extends XtoolsController
     public function adminsGroupsApiAction(AdminStatsRepository $adminStatsRepo): JsonResponse
     {
         $this->recordApiUsage('project/admins_groups');
+
+        if (0 === preg_match('/\/api\/project\/(admin|patroller|steward)_groups/', $this->request->getRequestUri())) {
+            $this->addFlash(
+                'warning',
+                'This API endpoint will soon be removed. Use /api/admin_groups, /api/patroller_groups ' .
+                'and /api/steward_groups instead. See https://w.wiki/6sMx for more information.'
+            );
+        }
 
         $this->setUpAdminStats($adminStatsRepo);
 
