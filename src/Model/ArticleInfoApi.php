@@ -318,7 +318,7 @@ class ArticleInfoApi extends Model
             $data = array_merge($data, [
                 'revisions' => (int) $info['num_edits'],
                 'editors' => (int) $info['num_editors'],
-                'ip_editors' => (int) $info['num_ip_editors'],
+                'ip_edits' => (int) $info['ip_edits'],
                 'minor_edits' => (int) $info['minor_edits'],
                 'author' => $info['author'],
                 'author_editcount' => null === $info['author_editcount'] ? null : (int) $info['author_editcount'],

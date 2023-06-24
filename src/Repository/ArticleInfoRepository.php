@@ -311,7 +311,7 @@ class ArticleInfoRepository extends AutoEditsRepository
                     (
                         SELECT COUNT(rev_id) AS num_edits,
                             COUNT(DISTINCT(rev_actor)) AS num_editors,
-                            SUM(actor_user IS NULL) AS num_ip_editors,
+                            SUM(actor_user IS NULL) AS ip_edits,
                             SUM(rev_minor_edit) AS minor_edits
                         FROM $revTable
                         JOIN $actorTable ON actor_id = rev_actor

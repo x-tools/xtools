@@ -1,11 +1,14 @@
 # Release Notes #
 
+## 3.17.12 ##
+- ArticleInfo: Correct the name of the `ip_edits` property in the ArticleInfo
+  API response.
+
 ## 3.17.11 ##
 - ArticleInfo: added a "bot data" and "(semi-)automated edits" API endpoints.
   See https://www.mediawiki.org/wiki/XTools/API/Page#Bot_data for more info.
 - ArticleInfo: the [article info API](https://www.mediawiki.org/wiki/XTools/API/Page#Article_info)
-  now returns an `ip_editors` property which is a count of the number of unique
-  IPs that edited the page.
+  now returns an `ip_edits` property.
 - Localization updates.
 
 ## 3.17.10 ##
