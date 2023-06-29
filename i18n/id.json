@@ -8,6 +8,7 @@
 			"Pebaryan",
 			"Rachmat04",
 			"RaymondSutanto94",
+			"Veracious",
 			"William Surya Permana"
 		]
 	},
@@ -37,6 +38,7 @@
 	"all-quotes": "Semua kutipan",
 	"api": "API",
 	"api-error": "Galat mengkueri $1",
+	"api-error-wikimedia": "Terjadi kesalahan saat menghubungkan ke API $1. Segarkan halaman ini atau coba lagi nanti.",
 	"approve": "Menyetujui",
 	"approximate": "Perkiraan",
 	"article": "Artikel",
@@ -125,6 +127,7 @@
 	"edit-summary": "Ringkasan suntingan",
 	"edit-summary-recent-major": "$1 suntingan besar terakhir beringkasan",
 	"edit-summary-recent-minor": "$1 suntingan kecil terakhir beringkasan",
+	"edit-summary-removed": "(ringkasan suntingan dihapus)",
 	"editors": "Penyunting",
 	"edits": "Suntingan",
 	"edits-in-categories": "Suntingan dengan kategori",
@@ -140,6 +143,8 @@
 	"error-authorship-non-mainspace": "Statistik kepemilikan hanya tersedia untuk artikel ruang nama utama.",
 	"error-authorship-unsupported-project": "$1 bukan merupakan proyek yang didukung.",
 	"error-automation": "Menggunakan otomasi untuk merayap antarmuka pengguna XTools tidak dibenarkan. Silakan gunakan API komperhensif kami saja: $1",
+	"error-deleted-data-msg": "$1 {{PLURAL:$1|revisi}} dari halaman ini {{PLURAL:$1| berisi}} informasi yang {{PLURAL:$1|telah}} $2. Akibatnya, beberapa data mungkin tidak akurat atau menyesatkan.",
+	"error-deleted-data-link": "dihilangkan dari tampilan publik",
 	"error-denied": "Akses Anda ke XTools telah diblokir karena penyalahgunaan yang jelas atau otomasi yang mengacaukan. Harap hubungi $1",
 	"error-ip-range-unsupported": "Maaf, fungsionalitas ini tidak tersedia untuk rentang IP. Tolong masukkan satu nama pengguna atau alamat IP.",
 	"error-login": "Gagal masuk log! Silakan coba lagi.",
@@ -251,6 +256,7 @@
 	"namespaces-desc": "$2 {{PLURAL:$1|suntingan|suntingan}} dalam ruang artikel",
 	"neutral": "Netral",
 	"next": "Maju",
+	"no": "Tidak",
 	"no-contribs": "Kontributor tidak ditemukan",
 	"no-exist": "$1 tidak tersedia",
 	"no-result": "Tidak ada hasil yang sesuai untuk: $1",
@@ -406,6 +412,7 @@
 	"thank": "Berterimakasih",
 	"thanks-received": "Ucapan terima kasih yang diterima",
 	"thursday": "Kamis",
+	"time-local": "Gunakan waktu lokal dan alih-alih UTC",
 	"timecard": "Kartu waktu",
 	"times-in-utc": "Semua waktu dalam UTC.",
 	"too-many-edits": "Pengguna telah membuat terlalu banyak suntingan! (Maks. $1)",
@@ -487,6 +494,7 @@
 	"username": "Nama pengguna",
 	"username-ip-or-cidr": "Nama pengguna, alamat IP, atau rentang CIDR.",
 	"username-or-ip": "Nama pengguna atau IPv4 atau IPv6",
+	"username-removed": "(nama pengguna dihapus)",
 	"version": "Versi $1",
 	"view-source": "Lihat Sumber",
 	"view-wikitext": "Lihat teks wiki",
@@ -503,5 +511,6 @@
 	"xtools-slogan": "Memuaskan dahaga Anda akan data",
 	"xtools-title": "XTools",
 	"year": "Tahun",
-	"year-counts": "Jumlah tahunan"
+	"year-counts": "Jumlah tahunan",
+	"yes": "Ya"
 }
