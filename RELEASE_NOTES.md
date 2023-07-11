@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.18.4 ##
+- UserRights: don't show performer for automatic rights changes
+- AdminStats: fix bug where warnings were shown about invalid parameters
+- Merge version.yaml into services.yaml
+
 ## 3.18.3 ##
 - PageAssessments: fix reference to overall assessment.
 
