@@ -31,7 +31,9 @@
                     {% endfor %}
                 </td>
                 <td class="{{ change.grantType == 'pending' ? 'pending ' : '' }}sort-entry--performer" data-value="{{ change.performer }}">
-                    {{ wiki.userLink(change.performer, change.type == 'local' ? project : metaProject) }}
+                    {% if change.grantType == 'manual' %}
+                        {{ wiki.userLink(change.performer, change.type == 'local' ? project : metaProject) }}
+                    {% endif %}
                 </td>
                 <td class="sort-entry--summary" data-value="{{ change.comment }}">
                     {% if change.grantType == 'manual' %}
