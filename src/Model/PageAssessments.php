@@ -189,12 +189,13 @@ class PageAssessments extends Model
 
     /**
      * Get the class attributes for the given class value, as fetched from the config.
-     * @param string $classValue Such as 'FA', 'GA', 'Start', etc.
+     * @param string|null $classValue Such as 'FA', 'GA', 'Start', etc.
      * @return string[] Attributes as fetched from the XTools assessments config.
      */
-    public function getClassAttrs(string $classValue): array
+    public function getClassAttrs(?string $classValue): array
     {
-        return $this->getConfig()['class'][$classValue];
+        $classValue = $classValue ?: 'Unknown';
+        return $this->getConfig()['class'][$classValue] ?? $this->getConfig()['class']['Unknown'];
     }
 
     /**

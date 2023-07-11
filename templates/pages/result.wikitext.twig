@@ -38,8 +38,8 @@
 | {% if page.length is null %}{{ msg('na') }}{% else %}{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ page.length }}}}{% endif %}
 
 {% if project.hasPageAssessments(ns) %}
-| {% if page.badge_file is defined %}
-[[File:{{ page.badge_file }}|20px]] {{ page.pa_class ? page.pa_class : msg('unknown') }}
+| {% if page.assessment is defined %}
+[[File:{{ project.pageAssessments.badgeURL(page.assessment.class, true) }}|20px]] {{ page.assessment.class ? page.assessment.class : msg('unknown') }}
 {% endif %}
 {% endif %}
 {% endif %}

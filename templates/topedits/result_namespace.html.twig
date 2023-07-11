@@ -57,12 +57,12 @@
                             {{ wiki.pageLinkRaw(pageTitle, project) }}
                         </td>
                         {% if showPageAssessment %}
-                            <td class="sort-entry--assessment" data-value="{{ page.pa_class ? page.pa_class : 'Unknown' }}">
-                                {% set badge = project.pageAssessments.badgeURL(page.pa_class) %}
+                            <td class="sort-entry--assessment" data-value="{{ page.assessment.class }}">
+                                {% set badge = project.pageAssessments.badgeURL(page.assessment.class) %}
                                 {% if badge is defined %}
-                                    <img alt="{{ page.pa_class }}" src="{{ badge }}" class="assessment-badge" />
+                                    <img alt="{{ page.assessment.class }}" src="{{ badge }}" class="assessment-badge" />
                                 {% endif %}
-                                {{ page.pa_class ? page.pa_class : msg('unknown') }}
+                                {{ page.assessment.class ? page.assessment.class : msg('unknown') }}
                             </td>
                         {% endif %}
                         <td>

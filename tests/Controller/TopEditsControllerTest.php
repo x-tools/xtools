@@ -54,6 +54,7 @@ class TopEditsControllerTest extends ControllerTestAdapter
         $this->assertSuccessfulRoutes([
             '/topedits/enwiki/Example',
             '/topedits/enwiki/Example/1',
+            '/topedits/enwiki/MusikVarmint/0?format=wikitext',
             '/topedits/enwiki/Example/1/Main Page',
             '/api/user/top_edits/test.wikipedia/MusikPuppet/1',
             '/api/user/top_edits/test.wikipedia/MusikPuppet/1/Main_Page',

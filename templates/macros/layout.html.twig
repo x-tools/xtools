@@ -140,7 +140,7 @@
 {% endmacro %}
 
 {% macro apiLink() %}
-    <a target="_blank" href="{{ path('app.swagger_ui') }}">{{ msg('api') }}</a>
+    <a href="{{ path('app.swagger_ui') }}">{{ msg('api') }}</a>
 {% endmacro %}
 
 {% macro contributions(project, revs, offset, limit = 50) %}

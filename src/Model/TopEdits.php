@@ -353,8 +353,8 @@ class TopEdits extends Model
 
             if (array_key_exists('pa_class', $page)) {
                 $page['assessment'] = array_merge(
-                    ['class' => $page['pa_class'] ?: 'Unknown'],
-                    $this->project->getPageAssessments()->getClassAttrs($page['pa_class'] ?: 'Unknown')
+                    ['class' => $page['pa_class']],
+                    $this->project->getPageAssessments()->getClassAttrs($page['pa_class'])
                 );
                 unset($page['pa_class']);
             }
