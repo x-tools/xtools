@@ -111,7 +111,7 @@ class TopEditsRepository extends UserRepository
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
 
-        $hasPageAssessments = $this->isWMF && $project->hasPageAssessments() && 0 === $namespace;
+        $hasPageAssessments = $this->isWMF && $project->hasPageAssessments($namespace);
         $paTable = $project->getTableName('page_assessments');
         $paSelect = $hasPageAssessments
             ?  ", (

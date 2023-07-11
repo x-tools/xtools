@@ -14,7 +14,7 @@ use App\Repository\PageAssessmentsRepository;
 class PageAssessments extends Model
 {
     /** Namespaces in which there may be page assessments. */
-    public const SUPPORTED_NAMESPACES = [0, 4, 6, 10, 14, 100, 108, 118];
+    public const SUPPORTED_NAMESPACES = [0, 4, 6, 10, 12, 14, 100, 108, 118];
 
     /** @var array|null The assessments config. */
     protected ?array $config;

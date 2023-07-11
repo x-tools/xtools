@@ -255,6 +255,10 @@ parameters:
           badge: 'b/b0/Symbol_merge_vote.svg'
           color: '#ADD8E6'
           category: 'Category:Merge-Class articles'
+        Help:
+          badge: '8/8c/Symbol_information_vote.svg'
+          color: '#EBEBF6'
+          category: 'Category:Help-Class articles'
         NA:
           badge: '6/6a/Symbol_na_class.svg'
           color: '#F5F5F5'
