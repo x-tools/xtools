@@ -8,7 +8,8 @@
   },
   "scripts": {
     "build": "encore production --progress",
-    "test": "npx banana-checker --requireMetadata=0 i18n/"
+    "test": "npx banana-checker --requireMetadata=0 i18n/",
+    "watch": "encore dev --watch"
   },
   "devDependencies": {
     "@symfony/webpack-encore": "^4.0.0",
