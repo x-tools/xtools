@@ -81,6 +81,9 @@ class AdminStatsController extends XtoolsController
         // Redirect if we have a project.
         if (isset($this->params['project'])) {
             // We want pretty URLs.
+            if ($this->getActionNames($this->params['group']) === explode('|', $this->params['actions'])) {
+                unset($this->params['actions']);
+            }
             $route = $this->generateUrl('AdminStatsResult', $this->params);
             $url = str_replace('%7C', '|', $route);
             return $this->redirect($url);
@@ -140,15 +143,18 @@ class AdminStatsController extends XtoolsController
         $actionsQuery = $this->request->get('actions', '');
 
         // Either a pipe-separated string or an array.
-        $actionsRequested = is_array($actionsQuery) ? $actionsQuery : explode('|', $actionsQuery);
+        $actionsRequested = is_array($actionsQuery) ? $actionsQuery : array_filter(explode('|', $actionsQuery));
 
         // Filter out any invalid action names.
         $actions = array_filter($actionsRequested, function ($action) use ($group) {
             return in_array($action, $this->getActionNames($group));
         });
 
-        foreach (array_diff($actionsRequested, $actions) as $value) {
-            $this->addFlashMessage('warning', 'error-api-param', [$value, 'actions']);
+        // Warn about unsupported actions in the API.
+        if ($this->isApi) {
+            foreach (array_diff($actionsRequested, $actions) as $value) {
+                $this->addFlashMessage('warning', 'error-param', [$value, 'actions']);
+            }
         }
 
         // Fallback for when no valid sections were requested.
