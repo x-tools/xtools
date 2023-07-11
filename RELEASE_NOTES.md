@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.18.2 ##
+- PageAssessments: add Help class to en.wikipedia.org configuration and
+  add the Help namespace to the allowlist.
+- Fix various broken references to page assessments.
+
 ## 3.18.1 ##
 - Pages: fix reference to revision timestamp
 - TopEditsRepository: don't include `pa_class` for projects that don't
