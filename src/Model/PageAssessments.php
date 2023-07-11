@@ -163,6 +163,7 @@ class PageAssessments extends Model
         foreach ($data as $assessment) {
             $assessment['class'] = $this->getClassFromAssessment($assessment);
 
+            // Replace the overall assessment with the first non-empty assessment.
             if ('???' === $overallAssessment['class'] && '???' !== $assessment['class']['value']) {
                 $overallAssessment['class'] = $assessment['class']['value'];
                 $overallAssessment['color'] = $assessment['class']['color'];
@@ -176,7 +177,7 @@ class PageAssessments extends Model
         }
 
         // Don't show 'Unknown' assessment outside of the mainspace.
-        if (0 !== $page->getNamespace() && '???' === $overallAssessment['value']) {
+        if (0 !== $page->getNamespace() && '???' === $overallAssessment['class']) {
             return [];
         }
 
