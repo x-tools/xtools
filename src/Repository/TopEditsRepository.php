@@ -234,7 +234,7 @@ class TopEditsRepository extends UserRepository
                     WHERE pa_page_id = e.page_id
                     LIMIT 1
                 ) AS pa_class"
-            : ', NULL as pa_class';
+            : '';
 
         $ipcJoin = '';
         $whereClause = 'rev_actor = :actorId';
