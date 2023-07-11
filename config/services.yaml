@@ -3,7 +3,6 @@
 
 imports:
     - { resource: tools.yaml }
-    - { resource: version.yaml }
     - { resource: table_map.yaml, ignore_errors: true }
     - { resource: project_map.yaml, ignore_errors: true }
     - { resource: assessments.yaml }
@@ -15,6 +14,7 @@ imports:
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+    app.version: '%env(APP_VERSION)%'
     locale: 'en'
     wiki_url: '%env(WIKI_URL)%'
     default_project: '%env(DEFAULT_PROJECT)%'
