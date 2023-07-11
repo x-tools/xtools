@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.18.1 ##
+- Pages: fix reference to revision timestamp
+- TopEditsRepository: don't include `pa_class` for projects that don't
+  support Page Assessments.
+
 ## 3.18.0 ##
 - XTools API has been rewritten to conform to the OpenAPI Specification.
   Changes are summarized here, but a more consumer-friendly summary can be
