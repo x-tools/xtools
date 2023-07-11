@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.18.3 ##
+- PageAssessments: fix reference to overall assessment.
+
 ## 3.18.2 ##
 - PageAssessments: add Help class to en.wikipedia.org configuration and
   add the Help namespace to the allowlist.
