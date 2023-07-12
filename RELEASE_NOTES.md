@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.18.5 ##
+- Edit: fix a bug where revdel/suppressed edits error out beause there's no
+  way to compute the length change.
+
 ## 3.18.4 ##
 - UserRights: don't show performer for automatic rights changes
 - AdminStats: fix bug where warnings were shown about invalid parameters
