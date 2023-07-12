@@ -631,11 +631,15 @@ class AppExtension extends AbstractExtension
 
     /**
      * Format a given number as a diff, colouring it green if it's positive, red if negative, gary if zero
-     * @param int $size Diff size
+     * @param int|null $size Diff size
      * @return string Markup with formatted number
      */
-    public function diffFormat(int $size): string
+    public function diffFormat(?int $size): string
     {
+        if (null === $size) {
+            // Deleted/suppressed revisions.
+            return '';
+        }
         if ($size < 0) {
             $class = 'diff-neg';
         } elseif ($size > 0) {

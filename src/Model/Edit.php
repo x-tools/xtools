@@ -215,9 +215,9 @@ class Edit extends Model
 
     /**
      * Alias of getSize()
-     * @return int The diff size of this edit
+     * @return int|null The diff size of this edit
      */
-    public function getLengthChange(): int
+    public function getLengthChange(): ?int
     {
         return $this->getSize();
     }

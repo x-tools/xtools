@@ -65,6 +65,7 @@ class AppExtensionTest extends TestAdapter
             "<span class='diff-zero'>0</span>",
             $this->appExtension->diffFormat(0)
         );
+        static::assertEquals('', $this->appExtension->diffFormat(null));
     }
 
     /**
