@@ -146,6 +146,7 @@
 	"error-ip-range-unsupported": "Ta funkcija ni na voljo za IP-razpone. Vnesite uporabniško ime ali IP-naslov.",
 	"error-login": "Prijava je spodletela! Poskusite znova.",
 	"error-pagepile-too-large": "Žal je preveč strani za izvoz v PagePile. PagePile lahko ustvarite ročno ali poskusite zmanjšati nabor zadetkov z omejitvijo na določen imenski prostor ali določeno časovno obdobje.",
+	"error-param": "»$1« ni veljavna vrednost za parameter »$2«",
 	"error-query-timeout": "Se opravičujemo, zahtevana informacija je bila predolgo v obdelavi (pretek po $1 {{PLURAL:$1|sekunde}}). Zaradi varčevanja z zmogljivostjo je bila poizvedba ustavljena.",
 	"error-rate-limit": "Če ste človek, podajate preveč zahtevkov zapovrstjo. Pred ponovno naložitvijo orodja počakajte $1 {{PLURAL:$1|minuto|minuti|minute|minut}}, ali $2, da se to ne bo ponovilo. Če ste robot, raje uporabite naš $3.",
 	"error-rate-limit-login": "Prijavite se",

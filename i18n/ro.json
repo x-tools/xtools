@@ -2,6 +2,7 @@
 	"@metadata": {
 		"authors": [
 			"Adrianbblk",
+			"Alesaru",
 			"Andreyyshore",
 			"MSClaudiu",
 			"NGC 54",
@@ -143,6 +144,7 @@
 	"error-ip-range-unsupported": "Ne pare rău, această funcționalitate nu este disponibilă pentru intervalele IP. Vă rugăm să introduceți un singur nume de utilizator sau o adresă IP.",
 	"error-login": "Autentificare eșuată! Vă rugăm să încercați din nou.",
 	"error-pagepile-too-large": "Ne pare rău, există prea multe pagini pentru a fi exportate în PagePile. Puteți crea manual un PagePile sau puteți încerca să micșorați rezultatul setat prin limitarea la un anumit spațiu de nume sau interval de timp.",
+	"error-param": "„ $1 ” nu este o valoare validă pentru parametrul „ $2 ”.",
 	"error-query-timeout": "Ne pare rău, informațiile solicitate au durat prea mult pentru a procesa (timp de $1 {{PLURAL:$1|second|secunde}}). Pentru a salva resursele, interogarea a fost eliminată automat.",
 	"error-rate-limit": "Dacă sunteți o persoană, faceți prea multe cereri într-o perioadă scurtă de timp. Vă rugăm așteptați $1 {{PLURAL:$1|minut|minute}} înainte sa reîncărcați această uneltă sau $2 să preveniți asta înainte să se întâmple din nou. Dacă sunteți robot, vă rugăm folosiți în loc $3.",
 	"error-rate-limit-login": "intră",

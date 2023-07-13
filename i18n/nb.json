@@ -146,6 +146,7 @@
 	"error-ip-range-unsupported": "Denne funksjonen er dessverre ikke tilgjengelig for IP-områder. Angi enten ett brukernavn eller én IP-adresse.",
 	"error-login": "Innlogging mislyktes! Prøv igjen.",
 	"error-pagepile-too-large": "Beklager, det er for mange sider å eksportere til PagePile. Du kan opprette en PagePile manuelt, eller prøve å begrense resultatsettet ved å begrense det til et visst navnerom eller en viss tidsperiode.",
+	"error-param": "«$1» er ikke en gyldig verdi for parameteren «$2»",
 	"error-query-timeout": "Beklager, det tok for lang tid å prosessere den etterspurte informasjonen (tidsavbrudd på $1 {{PLURAL:$1|sekund|sekunder}}). For å spare på ressursene ble spørringen stoppet automatisk.",
 	"error-rate-limit": "Hvis du er et menneske gjør du for mange forespørsler i løpet av kort tid. Vent i {{PLURAL:$1|ett minutt|$1 minutter}} før du laster verktøyet på nytt, eller $2 for å forhindre at dette skjer igjen. Hvis du er en robot, bruk vårt $3 i stedet.",
 	"error-rate-limit-login": "logg inn",
