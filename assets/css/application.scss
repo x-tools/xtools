@@ -501,7 +501,6 @@ section > .panel-body {
     &:first-child:not(.non-label, .stat-list--footer) {
         font-weight: bold;
         text-align: right;
-        white-space: nowrap;
 
         &::after {
             content: ':';
