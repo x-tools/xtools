@@ -5,7 +5,8 @@
 			"Elisardojm",
 			"Fitoschido",
 			"Maria zaos",
-			"Nemo bis"
+			"Nemo bis",
+			"Toliño"
 		]
 	},
 	"accepted-formats": "Formatos aceptados",
@@ -344,7 +345,7 @@
 	"total": "Total",
 	"total-edits": "Total de edicións",
 	"total-revisions": "Total de revisións",
-	"translation-credits": "As traducións están impulsadas por $1 e $2.",
+	"translation-credits": "As traducións son posibles grazas a $1, $2 e $3.",
 	"tuesday": "Martes",
 	"type": "Tipo",
 	"unapprove": "Desaprobar",
