@@ -35,7 +35,7 @@ class AuthorshipRepository extends Repository
         $projectLang = $page->getProject()->getLang();
         $oRevId = $returnRevId ? 'true' : 'false';
 
-        $url = "https://wikiwho.wmflabs.org/$projectLang/api/v1.0.0-beta/rev_content/$title"
+        $url = "https://wikiwho.wmcloud.org/$projectLang/api/v1.0.0-beta/rev_content/$title"
             .($revId ? "/$revId" : '')
             ."/?o_rev_id=$oRevId&editor=true&token_id=false&out=false&in=false";
 
