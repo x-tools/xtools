@@ -334,7 +334,7 @@
 	"pages-created-since-deleted": "Text indicating the number of pages a user created that have since been deleted. $1 is the number.",
 	"pages-created-tooltip": "Text shown when hovering on a link near the 'pages created' label to explain what is excluded.",
 	"pages-deleted-hover-desc": "In the Pages Created tool, this text indicates that you can hover the 'deleted' labels to reveal the reason why the page was deleted. $1 is the formatted message for 'deleted', which contains HTML markup.",
-	"pages-deleted-redirects": "Disclaimer that deleted pages shown in the Pages tool might have been redirects.",
+	"pages-deleted-redirects": "Disclaimer that deleted pages shown in the Pages tool might have been redirects. This applies only to pages created before December 2017.",
 	"pages-edited-total": "Label for number of total pages a user has edited.",
 	"pages-exclusion-pattern": "Label for the 'Exclusion pattern' field in the Largest Pages tool.",
 	"pages-inclusion-pattern": "Label for the 'Inclusion pattern' field in the Largest Pages tool.",

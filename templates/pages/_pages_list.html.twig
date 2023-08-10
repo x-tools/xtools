@@ -54,7 +54,7 @@
                     <tr>
                         <td>{{ index|num_format }}</td>
                         <td class="sort-entry--page-title" data-value="{{ pagename }}">
-                            {% if page.redirect %}
+                            {% if not(page.deleted) and page.redirect %}
                                 {{ wiki.pageLinkRaw(pagename, project, pagename, 'redirect=no') }}
                                 <small class="text-muted">&middot; ({{ msg('redirect') }})</small>
                             {% else %}

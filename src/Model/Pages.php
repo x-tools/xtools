@@ -15,10 +15,17 @@ class Pages extends Model
     private const RESULTS_LIMIT_SINGLE_NAMESPACE = 1000;
     private const RESULTS_LIMIT_ALL_NAMESPACES = 50;
 
-    /** @var string One of 'noredirects', 'onlyredirects' or 'all' for both. */
+    public const REDIR_NONE = 'noredirects';
+    public const REDIR_ONLY = 'onlyredirects';
+    public const REDIR_ALL = 'all';
+    public const DEL_NONE = 'live';
+    public const DEL_ONLY = 'deleted';
+    public const DEL_ALL = 'all';
+
+    /** @var string One of the self::REDIR_ constants of this class. */
     protected string $redirects;
 
-    /** @var string One of 'live', 'deleted' or 'all' for both. */
+    /** @var string One of the self::DEL_ constants of this class. */
     protected string $deleted;
 
     /** @var array The list of pages including various statistics, keyed by namespace. */
@@ -33,8 +40,8 @@ class Pages extends Model
      * @param Project $project
      * @param User $user
      * @param string|int $namespace Namespace ID or 'all'.
-     * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
-     * @param string $deleted One of 'live', 'deleted' or 'all' for both.
+     * @param string $redirects One of the Pages::REDIR_ constants.
+     * @param string $deleted One of the Pages::DEL_ constants.
      * @param int|false $start Start date as Unix timestamp.
      * @param int|false $end End date as Unix timestamp.
      * @param int|false $offset Unix timestamp. Used for pagination.
@@ -44,8 +51,8 @@ class Pages extends Model
         Project $project,
         User $user,
         $namespace = 0,
-        string $redirects = 'noredirects',
-        string $deleted = 'all',
+        string $redirects = self::REDIR_NONE,
+        string $deleted = self::DEL_ALL,
         $start = false,
         $end = false,
         $offset = false
@@ -56,8 +63,8 @@ class Pages extends Model
         $this->namespace = 'all' === $namespace ? 'all' : (int)$namespace;
         $this->start = $start;
         $this->end = $end;
-        $this->redirects = $redirects ?: 'noredirects';
-        $this->deleted = $deleted ?: 'all';
+        $this->redirects = $redirects ?: self::REDIR_NONE;
+        $this->deleted = $deleted ?: self::DEL_ALL;
         $this->offset = $offset;
     }
 
@@ -249,10 +256,10 @@ class Pages extends Model
                 'total_length' => $totalLength,
                 'avg_length' => round($count > 0 ? $totalLength / $count : 0, 1),
             ];
-            if ('live' !== $this->deleted) {
+            if (self::DEL_NONE !== $this->deleted) {
                 $counts[$ns]['deleted'] = (int)$row['deleted'];
             }
-            if ('noredirects' !== $this->redirects) {
+            if (self::REDIR_NONE !== $this->redirects) {
                 $counts[$ns]['redirects'] = (int)$row['redirects'];
             }
         }
@@ -307,6 +314,34 @@ class Pages extends Model
             return self::RESULTS_LIMIT_ALL_NAMESPACES;
         }
         return self::RESULTS_LIMIT_SINGLE_NAMESPACE;
+    }
+
+    /**
+     * What columns to show in namespace totals table.
+     * @return string[]
+     */
+    public function getSummaryColumns(): array
+    {
+        $order = ['namespace', 'pages', 'redirects', 'deleted', 'total-page-size', 'average-page-size'];
+
+        $summaryColumns = ['namespace'];
+        if (in_array($this->getDeleted(), [self::DEL_ALL, self::DEL_ONLY])) {
+            $summaryColumns[] = 'deleted';
+        }
+        if (in_array($this->getRedirects(), [self::REDIR_ALL, self::REDIR_ONLY])) {
+            $summaryColumns[] = 'redirects';
+        }
+        if (self::DEL_ONLY !== $this->getDeleted() && self::REDIR_ONLY !== $this->getRedirects()) {
+            $summaryColumns[] = 'pages';
+        }
+
+        $summaryColumns[] = 'total-page-size';
+        $summaryColumns[] = 'average-page-size';
+
+        // Re-sort based on $order
+        return array_values(array_filter($order, static function ($column) use ($summaryColumns) {
+            return in_array($column, $summaryColumns);
+        }));
     }
 
     /**
@@ -368,7 +403,7 @@ class Pages extends Model
                 'namespace' => $row['namespace'],
                 'page_title' => $row['page_title'],
                 'full_page_title' => $fullPageTitle,
-                'redirect' => (bool)$row['redirect'],
+                'redirect' => (bool)$row['redirect'] || (bool)$row['was_redirect'],
                 'timestamp' => $row['timestamp'],
                 'rev_id' => $row['rev_id'],
                 'rev_length' => $row['rev_length'],

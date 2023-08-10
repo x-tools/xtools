@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Repository;
 
+use App\Model\Pages;
 use App\Model\Project;
 use App\Model\User;
 
@@ -20,8 +21,8 @@ class PagesRepository extends UserRepository
      * @param Project $project
      * @param User $user
      * @param string|int $namespace Namespace ID or 'all'.
-     * @param string $redirects One of 'noredirects', 'onlyredirects' or blank for both.
-     * @param string $deleted One of 'live', 'deleted' or blank for both.
+     * @param string $redirects One of the Pages::REDIR_ constants.
+     * @param string $deleted One of the Pages::DEL_ constants.
      * @param int|false $start Start date as Unix timestamp.
      * @param int|false $end End date as Unix timestamp.
      * @return string[] Result of query, see below. Includes live and deleted pages.
@@ -52,14 +53,18 @@ class PagesRepository extends UserRepository
             $this->getUserConditions('' !== $start.$end)
         );
 
+        $wasRedirect = $this->getWasRedirectClause($redirects, $deleted);
+        $summation = Pages::DEL_NONE !== $deleted ? 'redirect OR was_redirect' : 'redirect';
+
         $sql = "SELECT `namespace`,
                     COUNT(page_title) AS `count`,
                     SUM(IF(type = 'arc', 1, 0)) AS `deleted`,
-                    SUM(redirect) AS `redirects`,
+                    SUM($summation) AS `redirects`,
                     SUM(rev_length) AS `total_length`
                 FROM (" .
             $this->getPagesCreatedInnerSql($project, $conditions, $redirects, $deleted, $start, $end, false, true)."
                 ) a ".
+                $wasRedirect .
                 "GROUP BY `namespace`";
 
         $result = $this->executeQuery($sql, $project, $user, $namespace)
@@ -74,8 +79,8 @@ class PagesRepository extends UserRepository
      * @param Project $project
      * @param User $user
      * @param string|int $namespace Namespace ID or 'all'.
-     * @param string $redirects One of 'noredirects', 'onlyredirects' or blank for both.
-     * @param string $deleted One of 'live', 'deleted' or blank for both.
+     * @param string $redirects One of the Pages::REDIR_ constants.
+     * @param string $deleted One of the Pages::DEL_ constants.
      * @param int|false $start Start date as Unix timestamp.
      * @param int|false $end End date as Unix timestamp.
      * @param int|null $limit Number of results to return, or blank to return all.
@@ -111,19 +116,21 @@ class PagesRepository extends UserRepository
             $this->getUserConditions('' !== $start.$end)
         );
 
-        $pageAssessmentsTable = $project->getTableName('page_assessments');
-
         $hasPageAssessments = $this->isWMF && $project->hasPageAssessments();
         if ($hasPageAssessments) {
+            $pageAssessmentsTable = $project->getTableName('page_assessments');
             $conditions['paSelects'] = ', pa_class';
             $conditions['paSelectsArchive'] = ', NULL AS pa_class';
             $conditions['paJoin'] = "LEFT JOIN $pageAssessmentsTable ON rev_page = pa_page_id";
             $conditions['revPageGroupBy'] = 'GROUP BY rev_page';
         }
 
+        $wasRedirect = $this->getWasRedirectClause($redirects, $deleted);
+
         $sql = "SELECT * FROM (".
             $this->getPagesCreatedInnerSql($project, $conditions, $redirects, $deleted, $start, $end, $offset)."
                 ) a ".
+                $wasRedirect .
                 "ORDER BY `timestamp` DESC
                 ".(!empty($limit) ? "LIMIT $limit" : '');
 
@@ -134,11 +141,23 @@ class PagesRepository extends UserRepository
         return $this->setCache($cacheKey, $result);
     }
 
+    private function getWasRedirectClause(string $redirects, string $deleted): string
+    {
+        if (Pages::REDIR_NONE === $redirects) {
+            return "WHERE was_redirect IS NULL ";
+        } elseif (Pages::REDIR_ONLY === $redirects && Pages::DEL_ONLY === $deleted) {
+            return "WHERE was_redirect = 1 ";
+        } elseif (Pages::REDIR_ONLY === $redirects && Pages::DEL_ALL === $deleted) {
+            return "WHERE was_redirect = 1 OR redirect = 1 ";
+        }
+        return '';
+    }
+
     /**
      * Get SQL fragments for the namespace and redirects,
      * to be used in self::getPagesCreatedInnerSql().
      * @param string|int $namespace Namespace ID or 'all'.
-     * @param string $redirects One of 'noredirects', 'onlyredirects' or blank for both.
+     * @param string $redirects One of the Pages::REDIR_ constants.
      * @return string[] With keys 'namespaceRev', 'namespaceArc' and 'redirects'
      */
     private function getNamespaceRedirectAndDeletedPagesConditions($namespace, string $redirects): array
@@ -154,9 +173,9 @@ class PagesRepository extends UserRepository
             $conditions['namespaceArc'] = " AND ar_namespace = '".intval($namespace)."' ";
         }
 
-        if ('onlyredirects' == $redirects) {
+        if (Pages::REDIR_ONLY == $redirects) {
             $conditions['redirects'] = " AND page_is_redirect = '1' ";
-        } elseif ('noredirects' == $redirects) {
+        } elseif (Pages::REDIR_NONE == $redirects) {
             $conditions['redirects'] = " AND page_is_redirect = '0' ";
         }
 
@@ -169,8 +188,8 @@ class PagesRepository extends UserRepository
      * @param string[] $conditions Conditions for the SQL, must include 'paSelects',
      *     'paSelectsArchive', 'paJoin', 'whereRev', 'whereArc', 'namespaceRev', 'namespaceArc',
      *     'redirects' and 'revPageGroupBy'.
-     * @param string $redirects One of 'noredirects', 'onlyredirects' or blank for both.
-     * @param string $deleted One of 'live', 'deleted' or blank for both.
+     * @param string $redirects One of the Pages::REDIR_ constants.
+     * @param string $deleted One of the Pages::DEL_ constants.
      * @param int|false $start Start date as Unix timestamp.
      * @param int|false $end End date as Unix timestamp.
      * @param int|false $offset Unix timestamp, used for pagination.
@@ -203,8 +222,12 @@ class PagesRepository extends UserRepository
         $revDateConditions = $this->getDateConditions($start, $end, $offset);
         $arDateConditions = $this->getDateConditions($start, $end, $offset, '', 'ar_timestamp');
 
+        $tagTable = $project->getTableName('change_tag');
+        $tagDefTable = $project->getTableName('change_tag_def');
+
         $revisionsSelect = "
-            SELECT $revSelects ".$conditions['paSelects']."
+            SELECT $revSelects ".$conditions['paSelects'].",
+                NULL AS was_redirect
             FROM $pageTable
             JOIN $revisionTable ON page_id = rev_page ".
             $conditions['paJoin']."
@@ -228,7 +251,18 @@ class PagesRepository extends UserRepository
         }
 
         $archiveSelect = "
-            SELECT $arSelects ".$conditions['paSelectsArchive']."
+            SELECT $arSelects ".$conditions['paSelectsArchive'].",
+                (
+                    SELECT 1
+                    FROM $tagTable
+                    WHERE ct_rev_id = ar_rev_id
+                    AND ct_tag_id = (
+                        SELECT ctd_id
+                        FROM $tagDefTable
+                        WHERE ctd_name = 'mw-new-redirect'
+                    )
+                    LIMIT 1
+                ) AS `was_redirect`
             FROM $archiveTable
             LEFT JOIN $logTable ON log_namespace = ar_namespace AND log_title = ar_title
                 AND log_actor = ar_actor AND (log_action = 'move' OR log_action = 'move_redir')
@@ -240,7 +274,7 @@ class PagesRepository extends UserRepository
                 $arDateConditions
             GROUP BY ar_namespace, ar_title";
 
-        if ('live' === $deleted || 'onlyredirects' === $redirects) {
+        if ('live' === $deleted) {
             return $revisionsSelect;
         } elseif ('deleted' === $deleted) {
             return $archiveSelect;
@@ -254,7 +288,7 @@ class PagesRepository extends UserRepository
      * @param Project $project
      * @param User $user
      * @param int|string $namespace
-     * @param string $redirects
+     * @param string $redirects One of the Pages::REDIR_ constants.
      * @param int|false $start Start date as Unix timestamp.
      * @param int|false $end End date as Unix timestamp.
      * @return array Keys are the assessment class, values are the counts.
