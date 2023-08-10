@@ -82,8 +82,8 @@ class PagesController extends XtoolsController
     /**
      * Every action in this controller (other than 'index') calls this first.
      * @param PagesRepository $pagesRepo
-     * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
-     * @param string $deleted One of 'live', 'deleted' or 'all' for both.
+     * @param string $redirects One of the Pages::REDIR_ constants.
+     * @param string $deleted One of the Pages::DEL_ constants.
      * @return Pages
      * @codeCoverageIgnore
      */
@@ -129,24 +129,24 @@ class PagesController extends XtoolsController
      *     }
      * )
      * @param PagesRepository $pagesRepo
-     * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
-     * @param string $deleted One of 'live', 'deleted' or 'all' for both.
+     * @param string $redirects One of the Pages::REDIR_ constants.
+     * @param string $deleted One of the Pages::DEL_ constants.
      * @return RedirectResponse|Response
      * @codeCoverageIgnore
      */
     public function resultAction(
         PagesRepository $pagesRepo,
-        string $redirects = 'noredirects',
-        string $deleted = 'all'
+        string $redirects = Pages::REDIR_NONE,
+        string $deleted = Pages::DEL_ALL
     ) {
         // Check for legacy values for 'redirects', and redirect
         // back with correct values if need be. This could be refactored
         // out to XtoolsController, but this is the only tool in the suite
         // that deals with redirects, so we'll keep it confined here.
-        $validRedirects = ['', 'noredirects', 'onlyredirects', 'all'];
+        $validRedirects = ['', Pages::REDIR_NONE, Pages::REDIR_ONLY, Pages::REDIR_ALL];
         if ('none' === $redirects || !in_array($redirects, $validRedirects)) {
             return $this->redirectToRoute('PagesResult', array_merge($this->params, [
-                'redirects' => 'noredirects',
+                'redirects' => Pages::REDIR_NONE,
                 'deleted' => $deleted,
                 'offset' => $this->offset,
             ]));
@@ -158,7 +158,7 @@ class PagesController extends XtoolsController
         $ret = [
             'xtPage' => 'Pages',
             'xtTitle' => $this->user->getUsername(),
-            'summaryColumns' => $this->getSummaryColumns($pages),
+            'summaryColumns' => $pages->getSummaryColumns(),
             'pages' => $pages,
         ];
 
@@ -168,41 +168,6 @@ class PagesController extends XtoolsController
 
         // Output the relevant format template.
         return $this->getFormattedResponse('pages/result', $ret);
-    }
-
-    /**
-     * What columns to show in namespace totals table.
-     * @param Pages $pages The Pages instance.
-     * @return string[]
-     * @codeCoverageIgnore
-     */
-    private function getSummaryColumns(Pages $pages): array
-    {
-        $summaryColumns = ['namespace'];
-        if ('deleted' === $pages->getDeleted()) {
-            // Showing only deleted pages shows only the deleted column, as redirects are non-applicable.
-            $summaryColumns[] = 'deleted';
-        } elseif ('onlyredirects' == $pages->getRedirects()) {
-            // Don't show redundant pages column if only getting data on redirects or deleted pages.
-            $summaryColumns[] = 'redirects';
-        } elseif ('noredirects' == $pages->getRedirects()) {
-            // Don't show redundant redirects column if only getting data on non-redirects.
-            $summaryColumns[] = 'pages';
-        } else {
-            // Order is important here.
-            $summaryColumns[] = 'pages';
-            $summaryColumns[] = 'redirects';
-        }
-
-        // Show deleted column only when both deleted and live pages are visible.
-        if ('all' === $pages->getDeleted()) {
-            $summaryColumns[] = 'deleted';
-        }
-
-        $summaryColumns[] = 'total-page-size';
-        $summaryColumns[] = 'average-page-size';
-
-        return $summaryColumns;
     }
 
     /**
@@ -347,8 +312,8 @@ class PagesController extends XtoolsController
      */
     public function countPagesApiAction(
         PagesRepository $pagesRepo,
-        string $redirects = 'noredirects',
-        string $deleted = 'all'
+        string $redirects = Pages::REDIR_NONE,
+        string $deleted = Pages::DEL_ALL
     ): JsonResponse {
         $this->recordApiUsage('user/pages_count');
 
@@ -424,8 +389,8 @@ class PagesController extends XtoolsController
      */
     public function getPagesApiAction(
         PagesRepository $pagesRepo,
-        string $redirects = 'noredirects',
-        string $deleted = 'all'
+        string $redirects = Pages::REDIR_NONE,
+        string $deleted = Pages::DEL_ALL
     ): JsonResponse {
         $this->recordApiUsage('user/pages');
 

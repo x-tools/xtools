@@ -315,7 +315,7 @@
 	"pages-created-since-deleted": "$1 since deleted",
 	"pages-created-tooltip": "Total of all pages created, including those created as a redirect when moving a page. See the documentation for more details.",
 	"pages-deleted-hover-desc": "Hover over the '$1' text to see the deletion summary.",
-	"pages-deleted-redirects": "Deleted pages may have been redirects.",
+	"pages-deleted-redirects": "Deleted pages from before December 2017 may have been redirects.",
 	"pages-edited-total": "Pages edited (total)",
 	"pages-exclusion-pattern": "Exclusion pattern",
 	"pages-inclusion-pattern": "Inclusion pattern",

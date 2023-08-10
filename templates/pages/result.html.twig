@@ -26,12 +26,10 @@
                             {{ nsName(pages.namespace, project.namespaces) }}
                         </td>
                     </tr>
-                    {% if pages.deleted != 'deleted' %}
-                        <tr>
-                            <td>{{ msg('redirects') }}</td>
-                            <td>{{ msg('redirfilter-' ~ pages.redirects) }}</td>
-                        </tr>
-                    {% endif %}
+                    <tr>
+                        <td>{{ msg('redirects') }}</td>
+                        <td>{{ msg('redirfilter-' ~ pages.redirects) }}</td>
+                    </tr>
                     <tr>
                         <td>{{ msg('deleted-pages') }}</td>
                         <td>{{ msg('delpagesfilter-' ~ pages.deleted) }}</td>
@@ -86,7 +84,7 @@
                                     {{ value.count|num_format }}
                                 </td>
                             {% endif %}
-                            {% if pages.redirects != 'noredirects' and pages.deleted != 'deleted' %}
+                            {% if pages.redirects != 'noredirects' %}
                                 <td class="sort-entry--redirects" data-value="{{ value.redirects }}">
                                     {% if pages.redirects == 'onlyredirects' %}
                                         {{ value.redirects|num_format }}
@@ -101,7 +99,7 @@
                                     {% if pages.deleted == 'deleted' %}
                                         {{ value.deleted|num_format }}
                                     {% else %}
-                                        <a href="{{ path('PagesResult', {project: project.domain, username: user.usernameIdent, namespace: key, start: pages.startDate, end: pages.endDate, redirects: '', deleted: 'deleted'}) }}">{{ value.deleted|num_format }}</a>
+                                        <a href="{{ path('PagesResult', {project: project.domain, username: user.usernameIdent, namespace: key, start: pages.startDate, end: pages.endDate, redirects: pages.redirects, deleted: 'deleted'}) }}">{{ value.deleted|num_format }}</a>
                                         ({{ value.deleted|percent_format(value.count) }})
                                     {% endif %}
                                 </td>

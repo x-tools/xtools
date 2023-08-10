@@ -57,8 +57,38 @@ class PagesTest extends TestAdapter
         static::assertEquals(0, $pages->getNamespace());
         static::assertEquals($this->project, $pages->getProject());
         static::assertEquals($this->user, $pages->getUser());
-        static::assertEquals('noredirects', $pages->getRedirects());
+        static::assertEquals(Pages::REDIR_NONE, $pages->getRedirects());
         static::assertEquals(0, $pages->getOffset());
+    }
+
+    /**
+     * @dataProvider provideSummaryColumnsData
+     */
+    public function testSummaryColumns(string $redirects, string $deleted, array $expected): void
+    {
+        $pages = new Pages($this->pagesRepo, $this->project, $this->user, 0, $redirects, $deleted);
+        static::assertEquals(array_merge($expected, [
+            'total-page-size',
+            'average-page-size',
+        ]), $pages->getSummaryColumns());
+    }
+
+    /**
+     * @return array
+     */
+    public function provideSummaryColumnsData(): array
+    {
+        return [
+            [Pages::REDIR_ALL, Pages::DEL_ALL, ['namespace', 'pages', 'redirects', 'deleted']],
+            [Pages::REDIR_ONLY, Pages::DEL_ALL, ['namespace', 'redirects', 'deleted']],
+            [Pages::REDIR_NONE, Pages::DEL_ALL, ['namespace', 'pages', 'deleted']],
+            [Pages::REDIR_ALL, Pages::DEL_ONLY, ['namespace', 'redirects', 'deleted']],
+            [Pages::REDIR_ONLY, Pages::DEL_ONLY, ['namespace', 'redirects', 'deleted']],
+            [Pages::REDIR_NONE, Pages::DEL_ONLY, ['namespace', 'deleted']],
+            [Pages::REDIR_ALL, Pages::DEL_NONE, ['namespace', 'pages', 'redirects']],
+            [Pages::REDIR_ONLY, Pages::DEL_NONE, ['namespace', 'redirects']],
+            [Pages::REDIR_NONE, Pages::DEL_NONE, ['namespace', 'pages']],
+        ];
     }
 
     public function testResults(): void
@@ -96,7 +126,7 @@ class PagesTest extends TestAdapter
             'namespace' => 0,
             'page_title' => 'My_fun_page',
             'full_page_title' => 'My_fun_page',
-            'redirect' => false,
+            'redirect' => true,
             'timestamp' => '20160519000000',
             'rev_id' => 16,
             'rev_length' => 5,
@@ -145,6 +175,7 @@ class PagesTest extends TestAdapter
                     'rev_id' => 15,
                     'recreated' => null,
                     'pa_class' => 'A',
+                    'was_redirect' => null,
                 ], [
                     'namespace' => 0,
                     'type' => 'arc',
@@ -156,6 +187,7 @@ class PagesTest extends TestAdapter
                     'rev_id' => 16,
                     'recreated' => 1,
                     'pa_class' => null,
+                    'was_redirect' => '1',
                 ], [
                     'namespace' => 0,
                     'type' => 'rev',
@@ -167,6 +199,7 @@ class PagesTest extends TestAdapter
                     'rev_id' => 17,
                     'recreated' => null,
                     'pa_class' => 'FA',
+                    'was_redirect' => null,
                 ],
             ]);
         $this->pagesRepo->expects($this->once())
