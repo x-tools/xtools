@@ -38,9 +38,10 @@ $(function () {
         );
     });
 
-    $('.deleted-page').on('mouseover', function (e) {
+    $('.deleted-page').on('mouseenter', function (e) {
         var page = $(this).data('page'),
-            startTime = $(this).data('datetime').toString().slice(0, -2);
+            startTime = $(this).data('datetime').toString().slice(0, -2),
+            isRedirect = !!$(this).data('redir');
 
         var showSummary = function (summary) {
             $(e.target).find('.tooltip-body').html(summary);
@@ -94,7 +95,7 @@ $(function () {
             }).fail(showParserApiFailure);
         };
 
-        logEventsQuery().done(function (resp) {
+        logEventsQuery(isRedirect ? 'delete/delete_redir' : 'delete/delete').done(function (resp) {
             var event = resp.query.logevents[0];
 
             if (!event) {
