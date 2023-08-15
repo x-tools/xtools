@@ -10,7 +10,6 @@ use App\Model\Project;
 use App\Model\User;
 use App\Repository\PageAssessmentsRepository;
 use App\Repository\PagesRepository;
-use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
 use App\Tests\TestAdapter;
 
@@ -21,7 +20,6 @@ use App\Tests\TestAdapter;
 class PagesTest extends TestAdapter
 {
     protected Project $project;
-    protected ProjectRepository $projectRepo;
     protected User $user;
     protected UserRepository $userRepo;
     protected PagesRepository $pagesRepo;
@@ -94,7 +92,7 @@ class PagesTest extends TestAdapter
     public function testResults(): void
     {
         $this->setPagesResults();
-        $pages = new Pages($this->pagesRepo, $this->project, $this->user, 0, 'both');
+        $pages = new Pages($this->pagesRepo, $this->project, $this->user, 0, 'all');
         $pages->setRepository($this->pagesRepo);
         $pages->prepareData();
         static::assertEquals(3, $pages->getNumResults());
@@ -219,6 +217,27 @@ class PagesTest extends TestAdapter
                     'total_length' => 10,
                 ],
             ]);
+    }
+
+    public function testDeletionSummary(): void
+    {
+        $project = new Project('testWiki');
+        $project->setRepository($this->getProjectRepo());
+        $this->pagesRepo->expects(static::once())
+            ->method('getDeletionSummary')
+            ->willReturn([
+                'actor_name' => 'MusikAnimal',
+                'comment_text' => '[[WP:AfD|Articles for deletion]]',
+                'log_timestamp' => '20210108224022',
+            ]);
+        $pages = new Pages($this->pagesRepo, $project, $this->user);
+        $pages->setRepository($this->pagesRepo);
+        static::assertEquals(
+            "2021-01-08 22:40 (<a target='_blank' href=\"https://test.example.org/wiki/User:MusikAnimal\">" .
+                "MusikAnimal</a>): <i><a target='_blank' href='https://test.example.org/wiki/WP:AfD'>" .
+                "Articles for deletion</a></i>",
+            $pages->getDeletionSummary(0, 'Foobar', '20210108224000')
+        );
     }
 
     /**

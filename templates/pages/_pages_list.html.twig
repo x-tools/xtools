@@ -9,8 +9,7 @@
     {% else %}
         {% if (pages.deleted == 'all' or pages.deleted == 'deleted') and pages.numDeleted > 0 %}
             <script>
-                var wikiDomain = "{{ project.domain }}",
-                    wikiApi = "{{ project.apiUrl }}";
+                var wikiDomain = "{{ project.domain }}";
             </script>
             <p>
                 {{ msg('pages-recreated-desc', ["<span class='text-muted'>" ~ msg('recreated') ~ "</span>"]) }}
@@ -54,7 +53,7 @@
                     <tr>
                         <td>{{ index|num_format }}</td>
                         <td class="sort-entry--page-title" data-value="{{ pagename }}">
-                            {% if not(page.deleted) and page.redirect %}
+                            {% if page.redirect %}
                                 {{ wiki.pageLinkRaw(pagename, project, pagename, 'redirect=no') }}
                                 <small class="text-muted">&middot; ({{ msg('redirect') }})</small>
                             {% else %}
@@ -62,7 +61,7 @@
                             {% endif %}
                             {% if page.deleted %}
                                 &middot;
-                                <small class="text-danger deleted-page tooltipcss" data-page="{{ pagename }}" data-datetime="{{ page.timestamp }}" data-redir="{{ page.redirect }}">
+                                <small class="text-danger deleted-page tooltipcss" data-page-title="{{ page.page_title }}" data-namespace="{{ page.namespace }}" data-datetime="{{ page.timestamp }}" data-username="{{ user.usernameIdent }}">
                                     ({{ msg('deleted') }})
                                     <div class="tooltip-body">
                                         <em class="text-muted">{{ msg('loading') }}...</em>

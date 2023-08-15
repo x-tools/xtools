@@ -403,4 +403,27 @@ class PagesController extends XtoolsController
 
         return $this->getFormattedApiResponse($ret);
     }
+
+    /**
+     * Get the deletion summary to be shown when hovering over the "Deleted" text in the UI.
+     * @Route(
+     *     "/pages/deletion_summary/{project}/{username}/{namespace}/{pageTitle}/{timestamp}",
+     *     name="PagesApiDeletionSummary"
+     * )
+     * @return JsonResponse
+     * @codeCoverageIgnore
+     * @internal
+     */
+    public function getDeletionSummaryApiAction(
+        PagesRepository $pagesRepo,
+        int $namespace,
+        string $pageTitle,
+        string $timestamp
+    ): JsonResponse {
+        // Redirect/deleted options actually don't matter here.
+        $pages = $this->setUpPages($pagesRepo, Pages::REDIR_NONE, Pages::DEL_ALL);
+        return $this->getFormattedApiResponse([
+            'summary' => $pages->getDeletionSummary($namespace, $pageTitle, $timestamp),
+        ]);
+    }
 }

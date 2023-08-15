@@ -235,4 +235,16 @@ class ProjectTest extends TestAdapter
             $project->getUsersInGroups(['sysop', 'checkuser'], [])
         );
     }
+
+    public function testGetUrlForPage(): void
+    {
+        $projectRepo = $this->getProjectRepo();
+        $projectRepo->expects(static::once())->method('getMetadata');
+        $project = new Project('testWiki');
+        $project->setRepository($projectRepo);
+        static::assertEquals(
+            "https://test.example.org/wiki/Foobar",
+            $project->getUrlForPage('Foobar')
+        );
+    }
 }

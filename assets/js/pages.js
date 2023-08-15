@@ -39,79 +39,29 @@ $(function () {
     });
 
     $('.deleted-page').on('mouseenter', function (e) {
-        var page = $(this).data('page'),
-            startTime = $(this).data('datetime').toString().slice(0, -2),
-            isRedirect = !!$(this).data('redir');
+        var pageTitle = $(this).data('page-title'),
+            nsId = $(this).data('namespace'),
+            startTime = $(this).data('datetime').toString(),
+            username = $(this).data('username');
 
         var showSummary = function (summary) {
             $(e.target).find('.tooltip-body').html(summary);
         };
 
-        if (deletionSummaries[page] !== undefined) {
-            return showSummary(deletionSummaries[page]);
+        if (deletionSummaries[nsId + '/' + pageTitle] !== undefined) {
+            return showSummary(deletionSummaries[nsId + '/' + pageTitle]);
         }
 
-        var logEventsQuery = function (action) {
-            return $.ajax({
-                url: wikiApi,
-                data: {
-                    action: 'query',
-                    list: 'logevents',
-                    letitle: page,
-                    lestart: startTime,
-                    letype: 'delete',
-                    leaction: action || 'delete/delete',
-                    lelimit: 1,
-                    format: 'json'
-                },
-                dataType: 'jsonp'
-            })
-        };
-
-        var showParserApiFailure = function () {
-            return showSummary("<span class='text-danger'>" + $.i18n('api-error', 'Parser API') + "</span>");
-        };
-
-        var showLoggingApiFailure = function () {
-            return showSummary("<span class='text-danger'>" + $.i18n('api-error', 'Logging API') + "</span>");
-        };
-
-        var showParsedWikitext = function (event) {
-            return $.ajax({
-                url: xtBaseUrl + 'api/project/parser/' + wikiDomain + '?wikitext=' + encodeURIComponent(event.comment)
-            }).done(function (markup) {
-                // Get timestamp in YYYY-MM-DD HH:MM format.
-                var timestamp = new Date(event.timestamp)
-                    .toISOString()
-                    .slice(0, 16)
-                    .replace('T', ' ');
-
-                // Add timestamp and link to admin.
-                var summary = timestamp + " (<a target='_blank' href='https://" + wikiDomain +
-                    "/wiki/User:" + event.user + "'>" + event.user + '</a>): <i>' + markup + '</i>';
-
-                deletionSummaries[page] = summary;
-                showSummary(summary);
-            }).fail(showParserApiFailure);
-        };
-
-        logEventsQuery(isRedirect ? 'delete/delete_redir' : 'delete/delete').done(function (resp) {
-            var event = resp.query.logevents[0];
-
-            if (!event) {
-                // Try again but look for redirect deletions.
-                return logEventsQuery('delete/delete_redir').done(function (resp) {
-                    event = resp.query.logevents[0];
-
-                    if (!event) {
-                        return showParserApiFailure();
-                    }
-
-                    showParsedWikitext(event);
-                }).fail(showLoggingApiFailure);
-            }
-
-            showParsedWikitext(event);
-        }).fail(showLoggingApiFailure);
+        $.ajax({
+            url: xtBaseUrl + 'pages/deletion_summary/' + wikiDomain + '/' + username + '/' + nsId + '/' +
+                pageTitle + '/' + startTime
+        }).done(function (resp) {
+            showSummary(resp.summary);
+            deletionSummaries[nsId + '/' + pageTitle] = resp.summary;
+        }).fail(function () {
+            return showSummary(
+                "<span class='text-danger'>" + $.i18n('api-error', 'Deletion Summary API') + "</span>"
+            );
+        });
     });
 });
