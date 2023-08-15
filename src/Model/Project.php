@@ -159,6 +159,22 @@ class Project extends Model
     }
 
     /**
+     * @param Page|string $page Full page title including namespace, or a Page object.
+     * @param bool $useUnnormalizedPageTitle Use the unnormalized page title to avoid
+     *    an API call. This should be used only if you fetched the page title via other
+     *    means (SQL query), and is not from user input alone. Only applicable if $page
+     *    is a Page object.
+     * @return string
+     */
+    public function getUrlForPage($page, bool $useUnnormalizedPageTitle = false): string
+    {
+        if ($page instanceof Page) {
+            $page = $page->getTitle($useUnnormalizedPageTitle);
+        }
+        return str_replace('$1', $page, $this->getUrl(false) . $this->getArticlePath());
+    }
+
+    /**
      * The base URL path of this project (that page titles are appended to).
      * For some wikis the title (apparently) may not be at the end.
      * Replace $1 with the article name.

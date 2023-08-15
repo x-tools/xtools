@@ -339,4 +339,33 @@ class PagesRepository extends UserRepository
         // Cache and return.
         return $this->setCache($cacheKey, $assessments);
     }
+
+    /**
+     * Fetch the closest 'delete' event as of the time of the given $offset.
+     *
+     * @param Project $project
+     * @param int $namespace
+     * @param string $pageTitle
+     * @param string $offset
+     * @return array
+     */
+    public function getDeletionSummary(Project $project, int $namespace, string $pageTitle, string $offset): array
+    {
+        $actorTable = $project->getTableName('actor');
+        $commentTable = $project->getTableName('comment');
+        $loggingTable = $project->getTableName('logging', 'logindex');
+        $sql = "SELECT actor_name, comment_text, log_timestamp
+                FROM $loggingTable
+                JOIN $actorTable ON actor_id = log_actor
+                JOIN $commentTable ON comment_id = log_comment_id
+                WHERE log_namespace = $namespace
+                AND log_title = :pageTitle
+                AND log_timestamp >= $offset
+                AND log_type = 'delete'
+                AND log_action IN ('delete', 'delete_redir', 'delete_redir2')
+                LIMIT 1";
+        return $this->executeProjectsQuery($project, $sql, [
+            'pageTitle' => str_replace(' ', '_', $pageTitle),
+        ])->fetchAssociative();
+    }
 }

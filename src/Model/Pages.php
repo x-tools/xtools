@@ -345,6 +345,22 @@ class Pages extends Model
     }
 
     /**
+     * Get the deletion summary to be shown when hovering over the "Deleted" text in the UI.
+     * @param int $namespace
+     * @param string $pageTitle
+     * @param string $offset
+     * @return string
+     */
+    public function getDeletionSummary(int $namespace, string $pageTitle, string $offset): string
+    {
+        $ret = $this->repository->getDeletionSummary($this->project, $namespace, $pageTitle, $offset);
+        $timestampStr = (new DateTime($ret['log_timestamp']))->format('Y-m-d H:i');
+        $summary = Edit::wikifyString($ret['comment_text'], $this->project, $this->page, true);
+        $userpageUrl = $this->project->getUrlForPage("User:{$ret['actor_name']}");
+        return "$timestampStr (<a target='_blank' href=\"$userpageUrl\">{$ret['actor_name']}</a>): <i>$summary</i>";
+    }
+
+    /**
      * Run the query to get pages created by the user with options.
      * This is ran independently for each namespace if $this->namespace is 'all'.
      * @param int $namespace Namespace ID.

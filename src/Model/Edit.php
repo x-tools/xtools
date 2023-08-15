@@ -352,11 +352,7 @@ class Edit extends Model
         $isSection = preg_match_all("/^\/\* (.*?) \*\//", $summary, $sectionMatch);
 
         if ($isSection && isset($page)) {
-            $pageUrl = $project->getUrl(false) . str_replace(
-                '$1',
-                $page->getTitle($useUnnormalizedPageTitle),
-                $project->getArticlePath()
-            );
+            $pageUrl = $project->getUrlForPage($page->getTitle($useUnnormalizedPageTitle));
             $sectionTitle = $sectionMatch[1][0];
 
             // Must have underscores for the link to properly go to the section.
@@ -377,11 +373,7 @@ class Edit extends Model
             );
 
             // Use normalized page title (underscored, capitalized).
-            $pageUrl = $project->getUrl(false) . str_replace(
-                '$1',
-                ucfirst(str_replace(' ', '_', $wikiLinkPath)),
-                $project->getArticlePath()
-            );
+            $pageUrl = $project->getUrlForPage(ucfirst(str_replace(' ', '_', $wikiLinkPath)));
 
             $link = "<a target='_blank' href='$pageUrl'>$wikiLinkText</a>";
             $summary = str_replace($linkMatch[0][0], $link, $summary);
@@ -414,9 +406,7 @@ class Edit extends Model
      */
     public function getDiffUrl(): string
     {
-        $project = $this->getProject();
-        $path = str_replace('$1', 'Special:Diff/' . $this->id, $project->getArticlePath());
-        return rtrim($project->getUrl(), '/') . $path;
+        return rtrim($this->getProject()->getUrlForPage('Special:Diff/' . $this->id), '/');
     }
 
     /**
@@ -425,9 +415,7 @@ class Edit extends Model
      */
     public function getPermaUrl(): string
     {
-        $project = $this->getProject();
-        $path = str_replace('$1', 'Special:PermaLink/' . $this->id, $project->getArticlePath());
-        return rtrim($project->getUrl(), '/') . $path;
+        return rtrim($this->getProject()->getUrlForPage('Special:PermaLink/' . $this->id), '/');
     }
 
     /**
