@@ -1,5 +1,11 @@
 # Release Notes #
 
+## 3.18.6 ##
+- Pages (T190065): use mw-new-redirect tag to determine if deleted pages were redirects.
+- Pages: Improve fetching of deletion summary.
+- Pages: allow page title column to wrap on smaller screens.
+- Localization updates.
+
 ## 3.18.5 ##
 - Edit: fix a bug where revdel/suppressed edits error out beause there's no
   way to compute the length change.
