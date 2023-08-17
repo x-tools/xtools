@@ -317,7 +317,7 @@
 	"pages-created-since-deleted": "$1 pozneje {{PLURAL:$1|izbrisana|izbrisani|izbrisane|izbrisanih}}",
 	"pages-created-tooltip": "Vse ustvarjene strani, vključno s tistimi, ki so bile ustvarjene kot preusmeritve ob preimenovanju strani. Za podrobnosti glejte dokumentacijo.",
 	"pages-deleted-hover-desc": "Za ogled povzetka izbrisa se s kazalcem premaknite na »$1«.",
-	"pages-deleted-redirects": "Pri izbrisanih straneh gre morda za preusmeritve.",
+	"pages-deleted-redirects": "Strani, ki so bile izbrisane pred decembrom 2017, so bile morda preusmeritve.",
 	"pages-edited-total": "Urejane strani (skupno)",
 	"pages-exclusion-pattern": "Izključeni vzorec",
 	"pages-inclusion-pattern": "Vsebovani vzorec",
