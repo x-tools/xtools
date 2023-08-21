@@ -320,7 +320,7 @@
 	"pages-created-since-deleted": "$1 eliminate finora",
 	"pages-created-tooltip": "Totale di pagine create, incluse quelle create come reindirizzamenti quando viene spostata una pagina. Vedi la documentazione per ulteriori dettagli.",
 	"pages-deleted-hover-desc": "Passa il cursore sul testo \"$1\" per vedere il riassunto di cancellazione.",
-	"pages-deleted-redirects": "Le pagine cancellate potrebbero essere state reindirizzate.",
+	"pages-deleted-redirects": "Le pagine cancellate prima di dicembre 2017 potrebbero essere state reindirizzate.",
 	"pages-edited-total": "Pagine modificate (totale)",
 	"pages-exclusion-pattern": "Modello di esclusione",
 	"pages-inclusion-pattern": "Modello di inclusione",
