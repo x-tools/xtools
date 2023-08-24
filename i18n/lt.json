@@ -312,7 +312,7 @@
 	"pages-created-since-deleted": "$1 nuo pašalinimo",
 	"pages-created-tooltip": "Iš viso sukurtų puslapių, įskaitant tuos, kurie buvo sukurti kaip nukreipiamieji pervadinant puslapį. Daugiau informacijos rasite dokumentacijoje.",
 	"pages-deleted-hover-desc": "Užveskite pelę ant užrašo „$1“, norėdami pamatyti panaikinimo priežastį.",
-	"pages-deleted-redirects": "Ištrinti puslapiai galėjo būti nukreipiamieji.",
+	"pages-deleted-redirects": "Puslapiai ištrinti iki 2017 m. gruodžio galėjo būti nukreipimai.",
 	"pages-edited-total": "Redaguoti puslapiai (iš viso)",
 	"pages-exclusion-pattern": "Išskyrimo modelis",
 	"pages-inclusion-pattern": "Įtraukimo modelis",

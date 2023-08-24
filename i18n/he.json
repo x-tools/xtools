@@ -327,7 +327,7 @@
 	"pages-created-since-deleted": "$1 נמחקו מאז",
 	"pages-created-tooltip": "סך־כל הדפים שנוצרו, לרבות דפים שנוצרו כהפניות בעקבות העברה. ר' את התיעוד לפרטים נוספים.",
 	"pages-deleted-hover-desc": "יש להעביר את העכבר על הטקסט '$1' לצפייה בתקציר המחיקה.",
-	"pages-deleted-redirects": "ייתכן שדפים שנמחקו היו הפניות.",
+	"pages-deleted-redirects": "דפים מחוקים לפני דצמבר 2017 יכולים להיות דפי הפניה.",
 	"pages-edited-total": "דפים שנערכו (סה\"כ)",
 	"pages-exclusion-pattern": "תבנית אי־הכללה",
 	"pages-inclusion-pattern": "תבנית הכללה",

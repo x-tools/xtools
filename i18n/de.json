@@ -331,7 +331,7 @@
 	"pages-created-since-deleted": "$1 seitdem gelöscht",
 	"pages-created-tooltip": "Summe aller erstellten Seiten, inklusive solcher, die als Weiterleitung beim Verschieben einer Seite erstellt wurden. Siehe die Dokumentation für weitere Einzelheiten.",
 	"pages-deleted-hover-desc": "Fahre mit der Maus über den Text „$1“, um die Löschzusammenfassung zu sehen.",
-	"pages-deleted-redirects": "Gelöschte Seiten können Weiterleitungen gewesen sein.",
+	"pages-deleted-redirects": "Gelöschte Seiten von vor Dezember 2017 können Weiterleitungen gewesen sein",
 	"pages-edited-total": "Bearbeitete Seiten (gesamt)",
 	"pages-exclusion-pattern": "Muster ausschließen",
 	"pages-inclusion-pattern": "Muster einschließen",
