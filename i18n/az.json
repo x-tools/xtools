@@ -71,7 +71,7 @@
 	"blame-query-desc": "Axtarış sorğusunda hər hansı bir əsas vikitekst olmalıdır.",
 	"block": "Bloklama",
 	"block-current": "Cari blok",
-	"block-log": "Bloklama qeydləri",
+	"block-log": "Blok jurnalı",
 	"block-longest": "Ən uzun blok",
 	"blocks": "Bloklar",
 	"blocks-desc": "$2 {{PLURAL:$1|blok|bloklar}} idarə olunur",
