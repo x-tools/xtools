@@ -330,7 +330,7 @@
 	"pages-created-since-deleted": "自上一次刪除後共 $1 個",
 	"pages-created-tooltip": "所有建立頁面的總數，包含在移動頁面時一併建立的重新導向。查看文件來取得更多詳細資訊。",
 	"pages-deleted-hover-desc": "停留在「$1」文字上來查看刪除摘要。",
-	"pages-deleted-redirects": "已刪除的頁面可能是重新導向。",
+	"pages-deleted-redirects": "已在2017年12月以前被刪除的頁面可能是重新導向。",
 	"pages-edited-total": "編輯頁面數（總計）",
 	"pages-exclusion-pattern": "排除模式",
 	"pages-inclusion-pattern": "包含模式",
