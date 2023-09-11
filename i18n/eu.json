@@ -2,6 +2,7 @@
 	"@metadata": {
 		"authors": [
 			"An13sa",
+			"Atzerritik",
 			"EukeneFL",
 			"Mikel Ibaiba",
 			"Sator",
@@ -390,7 +391,7 @@
 	"top-projects-edit-counts": "Aldaketa globalen kontuak",
 	"top-ten-by-edits": "Top 10 aldaketak",
 	"top-ten-by-text": "Top 10 gehitutako testua",
-	"top-ten-count": "Editoreen top %10ak egindako aldaketak",
+	"top-ten-count": "Editoreen top 10ak egindako aldaketak",
 	"topedits-article": "Artikulu bateko aldaketa nagusiak",
 	"topedits-article-desc": "Lankide batengatik egindako orrialde baterako aldaketa guztiak, orden kronologikoan.",
 	"topedits-per-namespace": "Top aldaketak izen tarte bakoitzeko",
