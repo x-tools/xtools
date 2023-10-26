@@ -8,7 +8,7 @@
 	},
 	"accepted-formats": "Ҡабул ителгән форматтар",
 	"account-age": "Иҫәп яҙмаһының йәше",
-	"account-age-desc": "$2 {{PLURAL:$1|көн|көндәр}} элек",
+	"account-age-desc": "$2 {{PLURAL:$1|көн}} элек",
 	"accounts": "Иҫәп яҙмалар",
 	"accounts-created": "Иҫәп яҙмалар яһалған",
 	"actions": "Ғәмәлдәр",
