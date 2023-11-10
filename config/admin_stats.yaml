@@ -82,6 +82,8 @@ parameters:
                 page-curation:
                     - extension: PageTriage
                     - pagetriage-curation/reviewed
+                    - pagetriage-curation/reviewed-article
+                    - pagetriage-curation/reviewed-redirect
                 pc-accept:
                     - extension: FlaggedRevs
                     - review/approve
