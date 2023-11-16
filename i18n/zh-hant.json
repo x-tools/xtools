@@ -77,7 +77,7 @@
 	"average-time-bw-edits": "平均編輯間隔時間（天）",
 	"average-time-bw-edits-abbr": "平均編輯間隔",
 	"back": "返回",
-	"basic-information": "基本訊息",
+	"basic-information": "基本資訊",
 	"blame-as-of": "截至",
 	"blame-as-of-desc": "使用此來執行在條目舊版本上的歸究搜尋。",
 	"blame-query-desc": "搜尋查詢應包含任何潛在的 wikitext。",
