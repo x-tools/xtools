@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"CiphriusKane",
 			"MJL",
 			"Nemo bis"
 		]
@@ -78,8 +79,8 @@
 	"neutral": "Neutral",
 	"no-contribs": "No contreibutions foond",
 	"no-exist": "$1 daes nae exist",
-	"no-result": "No matchin results foond for: $1",
-	"no-revisions": "No reveesions foond",
+	"no-result": "Nae matchin results fand fur: $1",
+	"no-revisions": "Nae revisions fand",
 	"no-summary": "no summary",
 	"not-opted-in-link": "documentation",
 	"not-opted-in-login": "login",
