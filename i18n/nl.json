@@ -298,7 +298,7 @@
 	"num-revisions-processed": "$1 verwerkt",
 	"num-revisions-since": "$1 {{PLURAL:$2|versie|versies}} sinds $3",
 	"num-seconds": "{{PLURAL:$1|seconde|seconden}}",
-	"num-sitelinks": "{{PLURAL:$1|sitelink|sitelinks}}",
+	"num-sitelinks": "sitekoppeling{{PLURAL:$1||en}}",
 	"num-tools": "{{PLURAL:$1|hulpmiddel|hulpmiddelen}}",
 	"num-users": "{{PLURAL:$1|gebruiker|gebruikers}}",
 	"num-watchers": "{{PLURAL:$1|volger|volgers}}",
