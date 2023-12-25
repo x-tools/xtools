@@ -2,12 +2,13 @@
 	"@metadata": {
 		"authors": [
 			"ToJack",
-			"Vashgird"
+			"Vashgird",
+			"ZulfiqorF"
 		]
 	},
 	"abusefilter": "Филтри харобкориҳо",
 	"accepted-formats": "Форматҳои қабулшуда",
-	"account-age": "Сину соли аккаунт",
+	"account-age": "Сину соли ҳисоб",
 	"account-age-desc": "$2 {{PLURAL:$1|рӯз}} пеш",
 	"accounts": "Ҳисобҳо",
 	"accounts-created": "Ҳисобҳо эҷод шуданд",
@@ -23,10 +24,10 @@
 	"aiv": "Дахолати мудир дар бароюари харобкорӣ",
 	"aiv-desc": "$2 {{PLURAL:$1|вироиш|вироишот}} дар саҳифаи дахолати мудир бар зидди харобкорӣ",
 	"all": "Ҳама",
-	"all-approximate": "Ҳамаи маълумот тахмина мебошанд",
-	"all-edits": "Тамоми вироишот",
+	"all-approximate": "Ҳамаи додаҳо тахминӣ мебошанд",
+	"all-edits": "Ҳамаи вироишҳо",
 	"all-languages": "Тамоми забонҳо",
-	"all-namespaces": "Тамоми фазоином",
+	"all-namespaces": "Тамоми фазономҳо",
 	"all-projects": "Тамоми лоиҳаҳо",
 	"all-quotes": "Тамоми гуфтаҳо",
 	"api": "API",
