@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"Augustus A C",
 			"Gazimagomedov",
 			"Omarov M."
 		]
@@ -101,7 +102,7 @@
 	"general-stats": "ГӀаммаб статистика",
 	"global-block": "Глобалияб блок",
 	"group": "Группа",
-	"help-translate": "Таржама гьабизе кумек",
+	"help-translate": "Буссинабиялъе квеки",
 	"hide": "Бахчизе",
 	"history": "Тарих",
 	"import": "Импорт",
