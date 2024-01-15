@@ -219,8 +219,8 @@ class ProjectTest extends TestAdapter
                 ['user_name' => 'Bob', 'user_group' => 'sysop'],
                 ['user_name' => 'Bob', 'user_group' => 'checkuser'],
                 ['user_name' => 'Julie', 'user_group' => 'sysop'],
-                ['user_name' => 'Herald', 'user_group' => 'oversight'],
-                ['user_name' => 'Isosceles', 'user_group' => 'oversight'],
+                ['user_name' => 'Herald', 'user_group' => 'suppress'],
+                ['user_name' => 'Isosceles', 'user_group' => 'suppress'],
                 ['user_name' => 'Isosceles', 'user_group' => 'sysop'],
             ]);
         $project = new Project('testWiki');
@@ -229,8 +229,8 @@ class ProjectTest extends TestAdapter
             [
                 'Bob' => ['sysop', 'checkuser'],
                 'Julie' => ['sysop'],
-                'Herald' => ['oversight'],
-                'Isosceles' => ['oversight', 'sysop'],
+                'Herald' => ['suppress'],
+                'Isosceles' => ['suppress', 'sysop'],
             ],
             $project->getUsersInGroups(['sysop', 'checkuser'], [])
         );
