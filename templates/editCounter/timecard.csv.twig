@@ -1,0 +1,12 @@
+{% set days = {
+    1: msg('sunday'),
+    2: msg('monday'),
+    3: msg('tuesday'),
+    4: msg('wednesday'),
+    5: msg('thursday'),
+    6: msg('friday'),
+    7: msg('saturday')
+}%},{% for period in 0..23 %}{{ period }}:00{% if not(loop.last) %},{% endif %}{% endfor %}
+{% for day in 1..7 %}
+
+{{ days[day] }},{% for item in ec.timeCard|filter(item => item.day_of_week == day and item.hour != 24) %}{{ item.value }}{% if not(loop.last) %},{% endif %}{% endfor %}{% endfor %}
