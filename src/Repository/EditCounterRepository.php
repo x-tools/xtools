@@ -57,6 +57,10 @@ class EditCounterRepository extends Repository
         // Prepare the queries and execute them.
         $archiveTable = $project->getTableName('archive');
         $revisionTable = $project->getTableName('revision');
+        $pageTable = $project->getTableName('page');
+
+        // Always JOIN on page, see T355027
+        $pageJoin = "JOIN $pageTable ON rev_page = page_id";
 
         if ($user->isIpRange()) {
             $ipcTable = $project->getTableName('ip_changes');
@@ -86,26 +90,32 @@ class EditCounterRepository extends Repository
 
             -- Revision counts.
             SELECT 'live' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
+                $pageJoin
                 $ipcJoin
                 WHERE $whereClause
             ) UNION (
             SELECT 'day' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
+                $pageJoin
                 $ipcJoin
                 WHERE $whereClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 DAY)
             ) UNION (
             SELECT 'week' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
+                $pageJoin
                 $ipcJoin
                 WHERE $whereClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 WEEK)
             ) UNION (
             SELECT 'month' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
+                $pageJoin
                 $ipcJoin
                 WHERE $whereClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
             ) UNION (
             SELECT 'year' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
+                $pageJoin
                 $ipcJoin
                 WHERE $whereClause AND rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
             ) UNION (
             SELECT 'minor' AS `key`, COUNT(rev_id) AS val FROM $revisionTable
+                $pageJoin
                 $ipcJoin
                 WHERE $whereClause AND rev_minor_edit = 1
 
@@ -113,11 +123,13 @@ class EditCounterRepository extends Repository
             ) UNION (
             SELECT 'edited-live' AS `key`, COUNT(DISTINCT rev_page) AS `val`
                 FROM $revisionTable
+                $pageJoin
                 $ipcJoin
                 WHERE $whereClause
             ) UNION (
             SELECT 'created-live' AS `key`, COUNT(DISTINCT rev_page) AS `val`
                 FROM $revisionTable
+                $pageJoin
                 $ipcJoin
                 WHERE $whereClause AND rev_parent_id = 0
             )";
@@ -503,17 +515,23 @@ class EditCounterRepository extends Repository
         }
 
         $hourInterval = 1;
+        $revisionTable = $project->getTableName('revision');
+        // Always JOIN on page, see T325492
+        $pageTable = $project->getTableName('page');
 
         if ($user->isIpRange()) {
             $column = 'ipc_rev_timestamp';
             $table = $project->getTableName('ip_changes');
             [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
             $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
+            $joinClause = "JOIN $revisionTable ON rev_id = ipc_rev_id
+                JOIN $pageTable ON rev_page = page_id";
         } else {
             $column = 'rev_timestamp';
-            $table = $project->getTableName('revision');
+            $table = $revisionTable;
             $whereClause = 'rev_actor = :actorId';
             $params = ['actorId' => $user->getActorId($project)];
+            $joinClause = "JOIN $pageTable ON rev_page = page_id";
         }
 
         $xCalc = "ROUND(HOUR($column)/$hourInterval) * $hourInterval";
@@ -523,6 +541,7 @@ class EditCounterRepository extends Repository
                 $xCalc AS `hour`,
                 COUNT($column) AS `value`
             FROM $table
+            $joinClause
             WHERE $whereClause
             GROUP BY DAYOFWEEK($column), $xCalc";
 
@@ -549,6 +568,7 @@ class EditCounterRepository extends Repository
 
         // Prepare the queries and execute them.
         $revisionTable = $project->getTableName('revision');
+        $pageTable = $project->getTableName('page');
         $ipcJoin = '';
         $whereClause = 'revs.rev_actor = :actorId';
         $params = ['actorId' => $user->getActorId($project)];
@@ -566,6 +586,7 @@ class EditCounterRepository extends Repository
                 FROM (
                     SELECT (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS size
                     FROM $revisionTable AS revs
+                    JOIN $pageTable ON revs.rev_page = page_id
                     $ipcJoin
                     LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                     WHERE $whereClause

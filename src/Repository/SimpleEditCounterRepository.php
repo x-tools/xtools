@@ -65,7 +65,8 @@ class SimpleEditCounterRepository extends Repository
         $arDateConditions = $this->getDateConditions($start, $end, false, '', 'ar_timestamp');
         $revDateConditions = $this->getDateConditions($start, $end);
 
-        $revNamespaceJoinSql = 'all' === $namespace ? '' : "JOIN $pageTable ON rev_page = page_id";
+        // Always JOIN on page, see T325492
+        $revNamespaceJoinSql = "JOIN $pageTable ON rev_page = page_id";
         $revNamespaceWhereSql = 'all' === $namespace ? '' : "AND page_namespace = $namespace";
         $arNamespaceWhereSql = 'all' === $namespace ? '' : "AND ar_namespace = $namespace";
 
@@ -126,7 +127,7 @@ class SimpleEditCounterRepository extends Repository
         $sql = "SELECT 'rev' AS source, COUNT(*) AS value
                 FROM $ipcTable
                 $revNamespaceJoinSql
-                WHERE ipc_hex BETWEEN :start AND :end 
+                WHERE ipc_hex BETWEEN :start AND :end
                 $revDateConditions
                 $revNamespaceWhereSql";
 
