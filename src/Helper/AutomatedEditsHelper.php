@@ -80,22 +80,29 @@ class AutomatedEditsHelper
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $uri = 'https://meta.wikimedia.org/w/index.php?action=raw&ctype=application/json&title=' .
-            'MediaWiki:XTools-AutoEdits.json' . ($useSandbox ? '/sandbox' : '');
+        $uri = 'https://meta.wikimedia.org/w/api.php?' . http_build_query([
+            'action' => 'query',
+            'prop' => 'revisions',
+            'rvprop' => 'content',
+            'rvslots' => 'main',
+            'format' => 'json',
+            'formatversion' => 2,
+            'titles' => 'MediaWiki:XTools-AutoEdits.json' . ($useSandbox ? '/sandbox' : ''),
+        ]);
 
         if ($useSandbox && $this->session->get('logged_in_user')) {
             // Request via OAuth to get around server-side caching.
             /** @var Client $client */
             $client = $this->session->get('oauth_client');
-            $resp = $client->makeOAuthCall(
+            $resp = json_decode($client->makeOAuthCall(
                 $this->session->get('oauth_access_token'),
                 $uri
-            );
+            ));
         } else {
-            $resp = file_get_contents($uri);
+            $resp = json_decode(file_get_contents($uri));
         }
 
-        $ret = json_decode($resp, true);
+        $ret = json_decode($resp->query->pages[0]->revisions[0]->slots->main->content, true);
 
         if (!$useSandbox) {
             $cacheItem = $this->cache
