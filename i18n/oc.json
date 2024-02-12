@@ -4,6 +4,7 @@
 			"Cedric31",
 			"Gasconoc",
 			"Guilhelma",
+			"Lhanars",
 			"Unuaiga"
 		]
 	},
@@ -186,6 +187,7 @@
 	"talk": "Discussion",
 	"text": "Tèxte",
 	"thank": "Mercé",
+	"thanks-received": "Mercejaments recebuts",
 	"thursday": "Dijòus",
 	"tool": "Aisina",
 	"tool-about": "A prepaus",
@@ -197,7 +199,7 @@
 	"translation-credits": "Traduccions prepausadas per $1 e $2.",
 	"tuesday": "Dimars",
 	"unknown": "Desconegut",
-	"user": "Utilizaire",
+	"user": "Utilizator",
 	"user-page": "Pagina d'utilizaire",
 	"username": "Nom d'utilizaire",
 	"wiki": "Wiki",
