@@ -235,6 +235,7 @@
 	"namespaces-desc": "$2 {{PLURAL:$1|c'hemm|kemm}} en esaouenn ar pennad",
 	"neutral": "Neptu",
 	"next": "War-lerc'h",
+	"no": "Ket",
 	"no-contribs": "Degasadenn ebet",
 	"no-exist": "N'eus ket eus $1",
 	"no-result": "N'eus bet kavet disoc'h ebet evit : $1",
@@ -387,6 +388,7 @@
 	"text-added-description": "Un destenn ouzhpennet zo un ouzhpennadenn bozitivel n'eo ket bet nullet gant ar c'hemm war-lerc'h",
 	"text-to-serach": "Testenn da glask",
 	"thank": "Trugarez",
+	"thanks-received": "Trugarekadenn resevet",
 	"thursday": "Yaou",
 	"timecard": "Histogramm",
 	"times-in-utc": "En UTC eo an holl eurioù",
@@ -416,6 +418,7 @@
 	"tool-error": "Fazi",
 	"tool-globalcontribs": "Degasadennoù hollek an implijer",
 	"tool-globalcontribs-desc": "Tapout a ra an holl zegasadennoù bet graet gant un implijer bennak en holl raktresoù",
+	"tool-largestpages": "Pennadoù brasañ",
 	"tool-meta": "Stadegoù implijout",
 	"tool-meta-desc": "Gwelet peseurt XTools a zo bet implijet ar muiañ a-hed an amzer",
 	"tool-pages": "Deiziad krouiñ",
@@ -482,5 +485,6 @@
 	"xtools-slogan": "Magañ ho c'hoant roadennoù",
 	"xtools-title": "Ostilhoù",
 	"year": "Bloaz",
-	"year-counts": "Konterioù bloaziek"
+	"year-counts": "Konterioù bloaziek",
+	"yes": "Ya"
 }
