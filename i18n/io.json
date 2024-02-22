@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"JSantos",
-			"Joao Xavier"
+			"Joao Xavier",
+			"Reedy"
 		]
 	},
 	"abusefilter": "AbuzoFiltrado",
@@ -229,7 +230,7 @@
 	"num-watchers": "{{PLURAL:$1|observero|observeri}}",
 	"num-weeks": "{{PLURAL:$1|semano|semani}}",
 	"num-years": "{{PLURAL:$1|yaro|yari}}",
-	"old-page-notice": "Ca pagino esas multe anciena. Multa informi povas ne esar korekta, nam li enrejistresis dum la komenco di Mediawiki.",
+	"old-page-notice": "Ca pagino esas multe anciena. Multa informi povas ne esar korekta, nam li enrejistresis dum la komenco di MediaWiki.",
 	"oppose": "Opozar",
 	"optional": "Fakultativa",
 	"original-size": "Originala grandeso",
