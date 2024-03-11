@@ -355,7 +355,7 @@
 	"user-is-not-admin": "Dëse Benotzer ass keen Administrateur",
 	"user-not-found": "De gefrote Benotzer gëtt et net",
 	"user-page": "Benotzersäit",
-	"user-page-desc": "Gréisst vun der Benotzersäit ass $2 {{PLURAL:$1|Byte|Bytes}}",
+	"user-page-desc": "Gréisst vun der Benotzersäit ass $2 {{PLURAL:$1|Byte|Byten}}",
 	"username": "Benotzernumm",
 	"username-ip-or-cidr": "Benotzernumm, IP-Adress oder CIDR-Beräich",
 	"username-or-ip": "Benotzernumm oder IPv4 oder IPv6-Adress",
