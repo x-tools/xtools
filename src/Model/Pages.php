@@ -322,11 +322,14 @@ class Pages extends Model
      */
     public function getSummaryColumns(): array
     {
-        $order = ['namespace', 'pages', 'redirects', 'deleted', 'total-page-size', 'average-page-size'];
+        $order = ['namespace', 'pages', 'redirects', 'deleted', 'live', 'total-page-size', 'average-page-size'];
 
         $summaryColumns = ['namespace'];
         if (in_array($this->getDeleted(), [self::DEL_ALL, self::DEL_ONLY])) {
             $summaryColumns[] = 'deleted';
+        }
+        if (self::DEL_ALL === $this->getDeleted()) {
+            $summaryColumns[] = 'live';
         }
         if (in_array($this->getRedirects(), [self::REDIR_ALL, self::REDIR_ONLY])) {
             $summaryColumns[] = 'redirects';

@@ -77,9 +77,9 @@ class PagesTest extends TestAdapter
     public function provideSummaryColumnsData(): array
     {
         return [
-            [Pages::REDIR_ALL, Pages::DEL_ALL, ['namespace', 'pages', 'redirects', 'deleted']],
-            [Pages::REDIR_ONLY, Pages::DEL_ALL, ['namespace', 'redirects', 'deleted']],
-            [Pages::REDIR_NONE, Pages::DEL_ALL, ['namespace', 'pages', 'deleted']],
+            [Pages::REDIR_ALL, Pages::DEL_ALL, ['namespace', 'pages', 'redirects', 'deleted', 'live']],
+            [Pages::REDIR_ONLY, Pages::DEL_ALL, ['namespace', 'redirects', 'deleted', 'live']],
+            [Pages::REDIR_NONE, Pages::DEL_ALL, ['namespace', 'pages', 'deleted', 'live']],
             [Pages::REDIR_ALL, Pages::DEL_ONLY, ['namespace', 'redirects', 'deleted']],
             [Pages::REDIR_ONLY, Pages::DEL_ONLY, ['namespace', 'redirects', 'deleted']],
             [Pages::REDIR_NONE, Pages::DEL_ONLY, ['namespace', 'deleted']],
