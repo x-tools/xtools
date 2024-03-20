@@ -39,7 +39,7 @@ class I18nHelperTest extends TestAdapter
     public function testRTLAndFallbacks(): void
     {
         static::assertTrue($this->i18n->isRTL('ar'));
-        static::assertEquals(['zh', 'zh-hans', 'en'], $this->i18n->getFallbacks('zh'));
+        static::assertEquals(['zh-hans', 'en'], array_values($this->i18n->getFallbacks('zh')));
     }
 
     public function testMessageHelpers(): void

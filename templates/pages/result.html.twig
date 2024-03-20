@@ -104,6 +104,12 @@
                                     {% endif %}
                                 </td>
                             {% endif %}
+                            {% if pages.deleted == 'all' %}
+                                <td class="sort-entry--live" data-value="{{ value.count - value.deleted }}">
+                                    <a href="{{ path('PagesResult', {project: project.domain, username: user.usernameIdent, namespace: key, start: pages.startDate, end: pages.endDate, redirects: pages.redirects, deleted: 'live'}) }}">{{ (value.count - value.deleted)|num_format }}</a>
+                                    ({{ (value.count - value.deleted)|percent_format(value.count) }})
+                                </td>
+                            {% endif %}
                             <td class="sort-entry--total-page-size" data-value="{{ value.total_length }}">
                                 {{ value.total_length|size_format }}
                             </td>
@@ -131,8 +137,14 @@
                             {% endif %}
                             {% if pages.deleted == 'all' %}
                                 <th class="namespaces--deleted">
-                                    <a href="{{ path('PagesResult', {project: project.domain, username: user.username, namespace: pages.namespace, start: pages.startDate, end: pages.endDate, redirects: '', deleted: 'deleted'}) }}">{{ pages.numDeleted|num_format }}</a>
+                                    <a href="{{ path('PagesResult', {project: project.domain, username: user.usernameIdent, namespace: pages.namespace, start: pages.startDate, end: pages.endDate, redirects: '', deleted: 'deleted'}) }}">{{ pages.numDeleted|num_format }}</a>
                                     ({{ pages.numDeleted|percent_format(pages.getNumPages) }})
+                                </th>
+                            {% endif %}
+                            {% if pages.deleted == 'all' %}
+                                <th class="namespaces--live">
+                                    <a href="{{ path('PagesResult', {project: project.domain, username: user.usernameIdent, namespace: pages.namespace, start: pages.startDate, end: pages.endDate, redirects: pages.redirects, deleted: 'live'}) }}">{{ (pages.getNumPages - pages.numDeleted)|num_format }}</a>
+                                    ({{ (pages.getNumPages - pages.numDeleted)|percent_format(pages.getNumPages) }})
                                 </th>
                             {% endif %}
                             <th class="namespaces--total-page-size">
@@ -188,7 +200,7 @@
             {% endif %}
         {% endset %}
         {% set downloadLink %}
-            {{ layout.downloadLink('PagesResult', {'project': project.domain, 'username': user.username, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted, 'start': pages.startDate, 'end': pages.endDate}, [], 'UserApiPagesCount') }}
+            {{ layout.downloadLink('PagesResult', {'project': project.domain, 'username': user.usernameIdent, 'namespace': pages.namespace, 'redirects': pages.redirects, 'deleted': pages.deleted, 'start': pages.startDate, 'end': pages.endDate}, [], 'UserApiPagesCount') }}
         {% endset %}
         {{ layout.content_block('summary', content, downloadLink) }}
 
