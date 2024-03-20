@@ -538,6 +538,10 @@ parameters:
           badge: '9/94/Symbol_support_vote.svg'
           color: '#66FF66'
           category: 'Category:优良级条目'
+        乙上: # B plus
+          badge: '2/2c/Symbol_bplus_class.svg'
+          color: '#8CFF66'
+          category: 'Category:乙上级条目'
         乙: # B
           badge: '5/5f/Symbol_b_class.svg'
           color: '#B2FF66'
@@ -546,58 +550,150 @@ parameters:
           badge: 'e/e6/Symbol_c_class.svg'
           color: '#FFFF66'
           category: 'Category:丙级条目'
+        丁: # D
+          badge: 'c/ca/Symbol_d_class.svg'
+          color: '#FFD466'
+          category: 'Category:丁级条目'
         初: # Start
-          badge: 'a/a4/Symbol_start_class.svg'
+          badge: 'c/c8/Start-icon.svg'
           color: '#FFAA66'
           category: 'Category:初级条目'
         小作品: # Stub
           badge: 'f/f5/Symbol_stub_class.svg'
           color: '#FFA4A4'
           category: 'Category:小作品级条目'
+        小小作品: # Substub
+          badge: '3/32/Wikivoyage_usable_icon.png'
+          color: '#FF9292'
+          category: 'Category:小小作品级条目'
         特色列表: # FL
           badge: 'b/bc/Featured_article_star.svg'
           color: '#9CBDFF'
           category: 'Category:维基百科特色列表'
+        甲级列表: # A-List
+          badge: '2/25/Symbol_a_class.svg'
+          color: '#66FFFF'
+          category: 'Category:甲级列表级条目'
+        乙级列表: # B-List
+          badge: '5/5f/Symbol_b_class.svg'
+          color: '#B2FF66'
+          category: 'Category:乙级列表级条目'
+        丙级列表: # C-List
+          badge: 'e/e6/Symbol_c_class.svg'
+          color: '#FFFF66'
+          category: 'Category:丙级列表级条目'
+        小列表: # Small list
+          badge: 'f/f5/Symbol_stub_class.svg'
+          color: '#FFA4A4'
+          category: 'Category:小列表级条目'
         列表: # List
           badge: 'd/db/Symbol_list_class.svg'
           color: '#C7B1FF'
           category: 'Category:列表级条目'
-        动态: # Dynamic lists (?)
-          badge: 'd/db/Symbol_list_class.svg'
+        同类索引: # SIA
+          badge: '9/92/Symbol_sia_class.svg'
+          color: '#E9DAFF'
+          category: 'Category:同类索引级条目'
+        动态: # Current
+          badge: '2/2f/Symbol_current_class.svg'
           color: '#E6A4FF'
           category: 'Category:动态级条目'
         未来: # Future
           badge: '6/6b/Symbol_future_class.svg'
           color: '#B4BBFF'
           category: 'Category:未来级条目'
+        合并: # Merge
+          badge: 'b/b0/Symbol_merge_vote.svg'
+          color: '#ADD8E6'
+          category: 'Category:合并级条目'
+        请求: # Request
+          badge: '6/63/Symbol_needed_class.svg'
+          color: '#DCDCDC'
+          category: 'Category:请求级条目'
+        搁置: # Deferred
+          badge: '3/30/Symbol_deferred.svg'
+          color: '#D1BCAC'
+          category: 'Category:搁置级条目'
+        沙盒: # Sandbox
+          badge: '0/06/Symbol_sandbox_class.svg'
+          color: '#FFCD71'
+          category: 'Category:沙盒级条目'
         分类: # Category
           badge: '9/96/Symbol_category_class.svg'
           color: '#FFDB58'
-          category: 'Category:分类级条目‎'
+          category: 'Category:分类级页面'
+        草稿: # Draft
+          badge: '0/09/Symbol_draft_class.svg'
+          color: '#E7B198'
+          category: 'Category:草稿级页面'
         消歧义: # Disambig
           badge: '2/2a/Symbol_dab_class.svg'
           color: '#00FA9A'
           category: 'Category:消歧义级条目'
+        重定向: # Redirect
+          badge: 'a/a2/Symbol_redirect_class.svg'
+          color: '#C0C0C0'
+          category: 'Category:重定向级条目'
+        特色图片: # Featured file
+          badge: 'b/bc/Featured_article_star.svg'
+          color: '#9CBDFF'
+          category: 'Category:特色图片级页面'
         文件: # File
           badge: '9/9c/Symbol_file_class.svg'
           color: '#DDCCFF'
-          category: 'Category:文件级条目'
+          category: 'Category:文件级页面'
         主题: # Portal
           badge: 'e/e2/Symbol_portal_class.svg'
           color: '#DDB1BC'
-          category: 'Category:主题级条目'
+          category: 'Category:主题级页面'
+        完成: # Completed portal
+          badge: 'e/e2/Symbol_portal_class.svg'
+          color: '#B2FF66'
+          category: 'Category:完成级主题'
+        充实: # Substantial portal
+          badge: 'e/e2/Symbol_portal_class.svg'
+          color: '#FFFF66'
+          category: 'Category:充实级主题'
+        简单: # Simple portal
+          badge: 'e/e2/Symbol_portal_class.svg'
+          color: '#FFAA66'
+          category: 'Category:简单级主题'
         专题: # Project
           badge: '7/72/Symbol_project_class.svg'
           color: '#C0C090'
-          category: 'Category:专题级条目'
+          category: 'Category:专题级页面'
         模板: # Template
           badge: '5/5c/Symbol_template_class.svg'
           color: '#FBCEB1'
-          category: 'Category:模板级条目'
+          category: 'Category:模板级页面'
+        模块: # Module
+          badge: '8/8d/Symbol_code_red.svg'
+          color: '#F8EABA'
+          category: 'Category:模块级页面'
+        用户: # User
+          badge: '1/13/Symbol_user_class.svg'
+          color: '#DDD06A'
+          category: 'Category:用户级页面'
+        使用说明: # Help
+          badge: '8/8c/Symbol_information_vote.svg'
+          color: '#819BEB'
+          category: 'Category:使用说明级页面'
+        界面: # Interface
+          badge: 'b/b8/Symbol_pliers.svg'
+          color: '#F9E59E'
+          category: 'Category:界面级页面'
         非条目: # NA
           badge: '6/6a/Symbol_na_class.svg'
           color: '#F5F5F5'
-          category: 'Category:非条目级条目'
+          category: 'Category:非条目级页面'
+        非页面: # Non-article
+          badge: '6/6a/Symbol_na_class.svg'
+          color: '#F5F5F5'
+          category: 'Category:非页面级条目'
+        无: # None
+          badge: '1/10/Wikivoyage_outline_icon.png'
+          color: '#FFFFFF'
+          category: 'Category:无级条目'
         未评: # Unknown
           badge: 'e/e0/Symbol_question.svg'
           color: ''
