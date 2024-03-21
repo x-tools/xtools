@@ -317,7 +317,7 @@
 	"pages-created-since-deleted": "$1 senere slettet",
 	"pages-created-tooltip": "Totalen av alle sider opprettet, inkludert de som ble opprettet som omdirigering under flytting av sider. Se dokumentasjonen for flere detaljer.",
 	"pages-deleted-hover-desc": "Hold musa over «$1»-teksten for å se slettesammendraget.",
-	"pages-deleted-redirects": "Slettede sider kan ha vært omdirigeringer.",
+	"pages-deleted-redirects": "Slettede sider fra før desember 2017 kan ha vært omdirigeringer.",
 	"pages-edited-total": "Sider redigert (totalt)",
 	"pages-exclusion-pattern": "Ekskluderingsmønster",
 	"pages-inclusion-pattern": "Inkluderingsmønster",
