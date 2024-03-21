@@ -1,5 +1,15 @@
 # Release Notes #
 
+## 3.18.7 ##
+- AdminStats: add new log actions for 'patroller'.
+- AdminStats (T347130): improve user group icons, add new user groups.
+- Pages (T358915): show live pages in summary table.
+- ArticleInfo (T358298): fire wikipage.content hook after gadget loads.
+- PageAssessments (T360012): update configuration for zhwiki
+- T355027: Always JOIN on page table to avoid counting orphaned revisions.
+- AutoEdits (T346400): query config page using action API.
+- Localization updates.
+
 ## 3.18.6 ##
 - Pages (T190065): use mw-new-redirect tag to determine if deleted pages were redirects.
 - Pages: Improve fetching of deletion summary.
