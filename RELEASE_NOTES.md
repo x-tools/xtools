@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.18.8 ##
+- PageAssessments (T360774): Add WikiProject (NSID 102) as supported namespace.
+
 ## 3.18.7 ##
 - AdminStats: add new log actions for 'patroller'.
 - AdminStats (T347130): improve user group icons, add new user groups.
