@@ -13,8 +13,23 @@ use App\Repository\PageAssessmentsRepository;
  */
 class PageAssessments extends Model
 {
-    /** Namespaces in which there may be page assessments. */
-    public const SUPPORTED_NAMESPACES = [0, 4, 6, 10, 12, 14, 100, 108, 118];
+    /**
+     * Namespaces in which there may be page assessments.
+     * @var int[]
+     * @todo Always JOIN on page_assessments and only display the data if it exists.
+     */
+    public const SUPPORTED_NAMESPACES = [
+        // Core namespaces
+        ...[0, 4, 6, 10, 12, 14],
+        // Custom namespaces
+        ...[
+            100, // Portal
+            102, // WikiProject (T360774)
+            108, // Book
+            118, // Draft
+            828, // Module
+        ],
+    ];
 
     /** @var array|null The assessments config. */
     protected ?array $config;
