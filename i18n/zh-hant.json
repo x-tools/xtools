@@ -311,7 +311,7 @@
 	"num-years": "{{PLURAL:$1|年|年}}",
 	"old-page-notice": "此頁面內容已舊。一些資料可能因早期 MediaWiki 的存儲修訂方式而不準確。",
 	"oppose": "反對",
-	"optional": "可選",
+	"optional": "非必填",
 	"original-size": "原始大小",
 	"other": "其它",
 	"others": "其它",
