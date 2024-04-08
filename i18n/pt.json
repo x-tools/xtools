@@ -2,6 +2,7 @@
 	"@metadata": {
 		"authors": [
 			"Athena in Wonderland",
+			"B3rnas",
 			"Fitoschido",
 			"Hamilton Abreu",
 			"Mansil alfalb",
@@ -35,6 +36,7 @@
 	"all-quotes": "Todas as citações",
 	"api": "API",
 	"api-error": "Erro na consulta de $1",
+	"api-error-wikimedia": "Ocorreu um erro ao conectar-se à API $1 . Tente atualizar esta página ou tente novamente mais tarde.",
 	"approve": "Aprovar",
 	"approximate": "aproximado",
 	"article": "Artigo",
@@ -84,6 +86,7 @@
 	"category-search": "Procurar por uma categoria",
 	"characters": "Caracteres",
 	"considered-usernames": "Nomes de utilizador(a) considerados",
+	"contentmodel": "Modelo de conteúdo",
 	"contributions": "Contribuições",
 	"count": "Contagem",
 	"created-by": "Criada por",
@@ -122,6 +125,7 @@
 	"edit-summary": "Comentário",
 	"edit-summary-recent-major": "Últimas $1 edições maiores com resumos",
 	"edit-summary-recent-minor": "Últimas $1 edições menores com resumos",
+	"edit-summary-removed": "(resumo de edição removido)",
 	"editors": "Número de editores",
 	"edits": "edições",
 	"edits-in-categories": "Edições realizadas nas categorias",
