@@ -320,7 +320,7 @@
 	"pages-created-since-deleted": "$1 terhapus setelahnya",
 	"pages-created-tooltip": "Total semua halaman yang dibuat, termasuk halaman yang dibuat sebagai pengalihan ketika memindahkan suatu halaman. Lihat dokumentasi untuk rincian selengkapnya.",
 	"pages-deleted-hover-desc": "Layangkan ke atas teks '$1' untuk melihat ringkasan penghapusan.",
-	"pages-deleted-redirects": "Halaman terhapus bisa berupa pengalihan.",
+	"pages-deleted-redirects": "Halaman yang dihapus sebelum Desember 2017 dapat berupa pengalihan.",
 	"pages-edited-total": "Halaman tersunting (total)",
 	"pages-exclusion-pattern": "Pola pengecualian",
 	"pages-inclusion-pattern": "Pola pemasukan",
