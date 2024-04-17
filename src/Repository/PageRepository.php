@@ -327,9 +327,10 @@ class PageRepository extends Repository
      */
     public function countLinksAndRedirects(Page $page): array
     {
-        $externalLinksTable = $this->getTableName($page->getProject()->getDatabaseName(), 'externallinks');
-        $pageLinksTable = $this->getTableName($page->getProject()->getDatabaseName(), 'pagelinks');
-        $redirectTable = $this->getTableName($page->getProject()->getDatabaseName(), 'redirect');
+        $externalLinksTable = $page->getProject()->getTableName('externallinks');
+        $pageLinksTable = $page->getProject()->getTableName('pagelinks');
+        $linkTargetTable = $page->getProject()->getTableName('linktarget');
+        $redirectTable = $page->getProject()->getTableName('redirect');
 
         $sql = "SELECT COUNT(*) AS value, 'links_ext' AS type
                 FROM $externalLinksTable WHERE el_from = :id
@@ -338,7 +339,9 @@ class PageRepository extends Repository
                 FROM $pageLinksTable WHERE pl_from = :id
                 UNION
                 SELECT COUNT(*) AS value, 'links_in' AS type
-                FROM $pageLinksTable WHERE pl_namespace = :namespace AND pl_title = :title
+                FROM $pageLinksTable
+                JOIN $linkTargetTable ON lt_id = pl_target_id
+                WHERE lt_namespace = :namespace AND lt_title = :title
                 UNION
                 SELECT COUNT(*) AS value, 'redirects' AS type
                 FROM $redirectTable WHERE rd_namespace = :namespace AND rd_title = :title";
