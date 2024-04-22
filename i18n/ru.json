@@ -2,6 +2,7 @@
 	"@metadata": {
 		"authors": [
 			"Coring",
+			"Dirruw'o",
 			"Edible Melon",
 			"Evs",
 			"Facenapalm",
@@ -246,7 +247,7 @@
 	"login": "Войти в систему",
 	"logout": "Завершение сеанса",
 	"logout-msg": "Выполнен вход как $1",
-	"mainspace": "Статья",
+	"mainspace": "Главная",
 	"major-edits": "Немалых правок",
 	"major-edits-with-summaries": "Немалых правок с описаниями",
 	"manual-edits": "Ручные правки",
