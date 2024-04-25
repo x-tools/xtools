@@ -314,7 +314,7 @@
 	"pages-created-since-deleted": "$1 poistettu myöhemmin",
 	"pages-created-tooltip": "Luotujen sivujen määrä, mukaan lukien sivun siirtojen yhteydessä luodut uudelleenohjaukset. Katso lisätietoja dokumentaatiosta.",
 	"pages-deleted-hover-desc": "Siirrä kursori tekstin '$1' päälle nähdäksesi poistoyhteenvedon.",
-	"pages-deleted-redirects": "Poistetut sivut ovat saattaneet olla uudelleenohjauksia.",
+	"pages-deleted-redirects": "Ennen joulukuuta 2017 poistetut sivut ovat saattaneet olla uudelleenohjauksia.",
 	"pages-edited-total": "Sivuja muokattu yhteensä",
 	"pages-exclusion-pattern": "Poissulkemismalli",
 	"pages-inclusion-pattern": "Sisällysmalli",
