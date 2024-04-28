@@ -735,6 +735,9 @@ class EditCounterController extends XtoolsController
         unset($ret['yearLabels']);
         unset($ret['monthLabels']);
 
+        // Ensure 'totals' keys are strings, see T292031.
+        $ret['totals'] = (object)$ret['totals'];
+
         return $this->getFormattedApiResponse($ret);
     }
 
