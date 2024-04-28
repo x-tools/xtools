@@ -55,6 +55,8 @@ class ArticleInfoControllerTest extends ControllerTestAdapter
 
         static::assertEquals(
             [
+                // 'warning' is only temporary so that API deprecations can be announced. To be removed in v3.20
+                'warning',
                 'project', 'page', 'watchers', 'pageviews', 'pageviews_offset',  'revisions', 'editors',
                 'ip_edits', 'minor_edits', 'author', 'author_editcount', 'created_at',  'created_rev_id',
                 'modified_at', 'secs_since_last_edit', 'last_edit_id', 'assessment', 'elapsed_time',

@@ -246,6 +246,10 @@ class CategoryEditsController extends XtoolsController
             'category_editcount' => $this->categoryEdits->getCategoryEditCount(),
         ];
 
+        if (1 === count($this->categoryEdits->getCategories())) {
+            $this->addFlash('warning', 'In XTools 3.20, the categories property will always return an array, '.
+                'even if only one category was provided.');
+        }
         return $this->getFormattedApiResponse($ret);
     }
 }

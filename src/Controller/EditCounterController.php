@@ -738,6 +738,8 @@ class EditCounterController extends XtoolsController
         // Ensure 'totals' keys are strings, see T292031.
         $ret['totals'] = (object)$ret['totals'];
 
+        $this->addFlash('warning', 'In XTools 3.20, the totals property will return an array '
+            . "keyed by namespace and then year/month in the format 'YYYY-MM' with the count as values.");
         return $this->getFormattedApiResponse($ret);
     }
 

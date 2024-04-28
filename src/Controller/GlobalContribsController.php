@@ -235,6 +235,8 @@ class GlobalContribsController extends XtoolsController
         }, array_values($results));
         $results = $this->addFullPageTitlesAndContinue('globalcontribs', [], $results);
 
+        $this->addApiWarningAboutDates(['timestamp']);
+        $this->addApiWarningAboutPageTitles();
         return $this->getFormattedApiResponse($results);
     }
 }

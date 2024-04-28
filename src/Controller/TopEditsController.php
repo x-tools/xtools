@@ -244,6 +244,7 @@ class TopEditsController extends XtoolsController
         $topEdits = $this->setUpTopEdits($topEditsRepo, $autoEditsHelper);
         $topEdits->prepareData();
 
+        $this->addApiWarningAboutPageTitles();
         return $this->getFormattedApiResponse([
             'top_edits' => (object)$topEdits->getTopEdits(),
         ]);
@@ -313,6 +314,11 @@ class TopEditsController extends XtoolsController
         $topEdits = $this->setUpTopEdits($topEditsRepo, $autoEditsHelper);
         $topEdits->prepareData(false);
 
+        $this->addApiWarningAboutDates(['timestamp']);
+        if (false !== strpos($this->page->getTitle(true), '_')) {
+            $this->addFlash('warning', 'In XTools 3.20, the page property will be returned ' .
+                'with spaces instead of underscores.');
+        }
         return $this->getFormattedApiResponse([
             'top_edits' => $topEdits->getTopEdits(),
         ]);

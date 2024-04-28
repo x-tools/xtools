@@ -401,6 +401,8 @@ class PagesController extends XtoolsController
             $ret['continue'] = $pages->getLastTimestamp();
         }
 
+        $this->addApiWarningAboutDates(['timestamp']);
+        $this->addApiWarningAboutPageTitles();
         return $this->getFormattedApiResponse($ret);
     }
 

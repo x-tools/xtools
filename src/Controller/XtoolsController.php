@@ -1053,4 +1053,23 @@ abstract class XtoolsController extends AbstractController
         }
         $this->addFlash($type, $msg);
     }
+
+    /**
+     * @todo To be removed in XTools 3.20
+     * @param array $keys
+     */
+    protected function addApiWarningAboutDates(array $keys): void
+    {
+        $this->addFlash('warning', 'In XTools 3.20, the ' . $this->i18n->getIntuition()->listToText($keys) .
+            ' properties will be returned in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ');
+    }
+
+    /**
+     * @todo To be removed in XTools 3.20
+     */
+    protected function addApiWarningAboutPageTitles(): void
+    {
+        $this->addFlash('warning', 'In XTools 3.20, full_page_title and page_title will return ' .
+            'page titles with spaces instead of underscores.');
+    }
 }

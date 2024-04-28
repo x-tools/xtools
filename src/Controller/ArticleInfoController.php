@@ -271,6 +271,13 @@ class ArticleInfoController extends XtoolsController
             return $this->getApiHtmlResponse($this->project, $this->page, $data);
         }
 
+        $this->addFlash('warning', 'In XTools 3.20, this endpoint will be renamed to /api/page/pageinfo');
+        $this->addApiWarningAboutDates(['created_at', 'modified_at']);
+        $this->addFlash('warning', 'In XTools 3.20, the author and author_editcount properties will be ' .
+            'renamed to creator and creator_editcount, respectively.');
+        $this->addFlash('warning', 'In XTools 3.20, the last_edit_id property will be renamed to modified_rev_id');
+        $this->addFlash('warning', 'In XTools 3.20, the watchers property will return null instead of 0 ' .
+            'if the number of page watchers is unknown.');
         return $this->getFormattedApiResponse($data);
     }
 
@@ -529,6 +536,7 @@ class ArticleInfoController extends XtoolsController
             $this->getBoolVal('nobots')
         );
 
+        $this->addApiWarningAboutDates(['timestamp']);
         return $this->getFormattedApiResponse([
             'top_editors' => $topEditors,
         ]);

@@ -405,6 +405,7 @@ class AutomatedEditsController extends XtoolsController
             $out['continue'] = (new DateTime(end($results)['timestamp']))->format('Y-m-d\TH:i:s');
         }
 
+        $this->addApiWarnings();
         return $this->getFormattedApiResponse($out);
     }
 
@@ -479,6 +480,14 @@ class AutomatedEditsController extends XtoolsController
             $out['continue'] = (new DateTime(end($results)['timestamp']))->format('Y-m-d\TH:i:s');
         }
 
+        $this->addApiWarnings();
         return $this->getFormattedApiResponse($out);
+    }
+
+    private function addApiWarnings(): void
+    {
+        $this->addApiWarningAboutDates(['timestamp']);
+        $this->addApiWarningAboutPageTitles();
+        $this->addFlash('warning', 'In XTools 3.20, the minor property will return a boolean instead of 0 or 1.');
     }
 }
