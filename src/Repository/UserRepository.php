@@ -198,6 +198,15 @@ class UserRepository extends Repository
     }
 
     /**
+     * Number of edits which if exceeded, will require the user to log in.
+     * @return int
+     */
+    public function numEditsRequiringLogin(): int
+    {
+        return (int)$this->parameterBag->get('app.num_edits_requiring_login');
+    }
+
+    /**
      * Maximum number of edits to process, based on configuration.
      * @return int
      */

@@ -264,6 +264,15 @@ class User extends Model
     }
 
     /**
+     * Number of edits which if exceeded, will require the user to log in.
+     * @return int
+     */
+    public function numEditsRequiringLogin(): int
+    {
+        return $this->repository->numEditsRequiringLogin();
+    }
+
+    /**
      * Maximum number of edits to process, based on configuration.
      * @return int
      */
@@ -330,6 +339,17 @@ class User extends Model
     public function isBlocked(Project $project): bool
     {
         return false !== $this->getBlockExpiry($project);
+    }
+
+    /**
+     * Does the user have enough edits that we want to require login?
+     * @param Project $project
+     * @return bool
+     */
+    public function hasManyEdits(Project $project): bool
+    {
+        $editCount = $this->getEditCount($project);
+        return $editCount > $this->numEditsRequiringLogin();
     }
 
     /**
