@@ -167,6 +167,7 @@ class EditCounterRepository extends Repository
                 GROUP BY log_type, log_action
                 -- T363633
                 HAVING source IS NOT NULL";
+
         $results = $this->executeProjectsQuery($project, $sql, [
             'actorId' => $user->getActorId($project),
         ])->fetchAllAssociative();

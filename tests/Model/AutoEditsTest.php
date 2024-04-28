@@ -15,7 +15,6 @@ use App\Repository\PageRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
 use App\Tests\TestAdapter;
-use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
@@ -24,8 +23,6 @@ use PHPUnit\Framework\MockObject\MockObject;
  */
 class AutoEditsTest extends TestAdapter
 {
-    use ArraySubsetAsserts;
-
     protected AutoEditsRepository $aeRepo;
     protected EditRepository $editRepo;
     protected PageRepository $pageRepo;
@@ -59,7 +56,7 @@ class AutoEditsTest extends TestAdapter
      */
     public function testConstructor(): void
     {
-        $autoEdits = $this->getAutoEdits(
+        $autoEdits = $this->getAutoEditsInstance(
             1,
             strtotime('2017-01-01'),
             strtotime('2018-01-01'),
@@ -90,13 +87,21 @@ class AutoEditsTest extends TestAdapter
             'comment' => 'Test',
         ];
 
-        $this->aeRepo->expects(static::exactly(2))
+        $this->aeRepo->expects(static::exactly(1))
             ->method('getNonAutomatedEdits')
             ->willReturn([$rev]);
 
-        $autoEdits = $this->getAutoEdits();
-        $rawEdits = $autoEdits->getNonAutomatedEdits(true);
-        static::assertArraySubset($rev, $rawEdits[0]);
+        $autoEdits = $this->getAutoEditsInstance();
+        static::assertSame([
+            'page_title' => 'Test page',
+            'namespace' => 0,
+            'rev_id' => 123,
+            'timestamp' => '2017-01-01T00:00:00Z',
+            'minor' => false,
+            'length' => 5,
+            'length_change' => -5,
+            'comment' => 'Test',
+        ], $autoEdits->getNonAutomatedEdits()[0]->getForJson());
 
         $page = Page::newFromRow($this->pageRepo, $this->project, [
             'page_title' => 'Test_page',
@@ -109,9 +114,6 @@ class AutoEditsTest extends TestAdapter
             $page,
             array_merge($rev, ['user' => $this->user])
         );
-        static::assertEquals($edit, $autoEdits->getNonAutomatedEdits()[0]);
-
-        // One more time to ensure things are re-queried.
         static::assertEquals($edit, $autoEdits->getNonAutomatedEdits()[0]);
     }
 
@@ -136,7 +138,7 @@ class AutoEditsTest extends TestAdapter
         $this->aeRepo->expects(static::once())
             ->method('getToolCounts')
             ->willReturn($toolCounts);
-        $autoEdits = $this->getAutoEdits();
+        $autoEdits = $this->getAutoEditsInstance();
 
         static::assertEquals($toolCounts, $autoEdits->getToolCounts());
         static::assertEquals(18, $autoEdits->getToolsTotal());
@@ -158,13 +160,21 @@ class AutoEditsTest extends TestAdapter
             'comment' => 'Test ([[WP:TW|TW]])',
         ];
 
-        $this->aeRepo->expects(static::exactly(2))
+        $this->aeRepo->expects(static::exactly(1))
             ->method('getAutomatedEdits')
             ->willReturn([$rev]);
 
-        $autoEdits = $this->getAutoEdits();
-        $rawEdits = $autoEdits->getAutomatedEdits(true);
-        static::assertArraySubset($rev, $rawEdits[0]);
+        $autoEdits = $this->getAutoEditsInstance();
+        static::assertSame([
+            'page_title' => 'Test page',
+            'namespace' => 1,
+            'rev_id' => 123,
+            'timestamp' => '2017-01-01T00:00:00Z',
+            'minor' => false,
+            'length' => 5,
+            'length_change' => -5,
+            'comment' => 'Test ([[WP:TW|TW]])',
+        ], $autoEdits->getAutomatedEdits()[0]->getForJson());
 
         $page = Page::newFromRow($this->pageRepo, $this->project, [
             'page_title' => 'Test_page',
@@ -177,9 +187,6 @@ class AutoEditsTest extends TestAdapter
             $page,
             array_merge($rev, ['user' => $this->user])
         );
-        static::assertEquals($edit, $autoEdits->getAutomatedEdits()[0]);
-
-        // One more time to ensure things are re-queried.
         static::assertEquals($edit, $autoEdits->getAutomatedEdits()[0]);
     }
 
@@ -198,7 +205,7 @@ class AutoEditsTest extends TestAdapter
             ->willReturn(200);
         $this->user->setRepository($userRepo);
 
-        $autoEdits = $this->getAutoEdits();
+        $autoEdits = $this->getAutoEditsInstance();
         $autoEdits->setRepository($this->aeRepo);
         static::assertEquals(50, $autoEdits->getAutomatedCount());
         static::assertEquals(200, $autoEdits->getEditCount());
@@ -219,7 +226,7 @@ class AutoEditsTest extends TestAdapter
      * @param int|null $limit Number of results to return.
      * @return AutoEdits
      */
-    private function getAutoEdits(
+    private function getAutoEditsInstance(
         $namespace = 1,
         $start = false,
         $end = false,
@@ -254,7 +261,7 @@ class AutoEditsTest extends TestAdapter
             ->willReturn(true);
         $this->aeRepo->expects(static::never())
             ->method('setCache');
-        $autoEdits = $this->getAutoEdits();
+        $autoEdits = $this->getAutoEditsInstance();
         $autoEdits->setRepository($this->aeRepo);
 
         static::assertTrue($autoEdits->getUseSandbox());

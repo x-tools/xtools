@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Model;
 
+use App\Controller\XtoolsController;
 use App\Exception\BadGatewayException;
 use App\Helper\AutomatedEditsHelper;
 use App\Helper\I18nHelper;
@@ -137,15 +138,15 @@ class ArticleInfoApi extends Model
             $topEditors[] = [
                 'rank' => ++$rank,
                 'username' => $row['username'],
-                'count' => $row['count'],
-                'minor' => $row['minor'],
+                'count' => (int)$row['count'],
+                'minor' => (int)$row['minor'],
                 'first_edit' => [
-                    'id' => $row['first_revid'],
-                    'timestamp' => $row['first_timestamp'],
+                    'id' => (int)$row['first_revid'],
+                    'timestamp' => XtoolsController::formatDateTimeForApi($row['first_timestamp']),
                 ],
                 'latest_edit' => [
-                    'id' => $row['latest_revid'],
-                    'timestamp' => $row['latest_timestamp'],
+                    'id' => (int)$row['latest_revid'],
+                    'timestamp' => XtoolsController::formatDateTimeForApi($row['latest_timestamp']),
                 ],
             ];
         }
@@ -281,7 +282,7 @@ class ArticleInfoApi extends Model
         $data = [
             'project' => $project->getDomain(),
             'page' => $page->getTitle(),
-            'watchers' => (int) $page->getWatchers(),
+            'watchers' => $page->getWatchers(),
             'pageviews' => $page->getLatestPageviews(),
             'pageviews_offset' => self::PAGEVIEWS_OFFSET,
         ];
@@ -307,9 +308,7 @@ class ArticleInfoApi extends Model
             $secsSinceLastEdit = (new DateTime)->getTimestamp() - $modifiedDateTime->getTimestamp();
 
             // Some wikis (such foundation.wikimedia.org) may be missing the creation date.
-            $creationDateTime = false === $creationDateTime
-                ? null
-                : $creationDateTime->format('Y-m-d');
+            $creationDateTime = false === $creationDateTime ? null : $creationDateTime;
 
             $assessment = $page->getProject()
                 ->getPageAssessments()
@@ -324,7 +323,7 @@ class ArticleInfoApi extends Model
                 'author_editcount' => null === $info['author_editcount'] ? null : (int) $info['author_editcount'],
                 'created_at' => $creationDateTime,
                 'created_rev_id' => $info['created_rev_id'],
-                'modified_at' => $modifiedDateTime->format('Y-m-d H:i'),
+                'modified_at' => $modifiedDateTime,
                 'secs_since_last_edit' => $secsSinceLastEdit,
                 'last_edit_id' => (int) $info['modified_rev_id'],
                 'assessment' => $assessment,

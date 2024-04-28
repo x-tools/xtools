@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Exception\XtoolsHttpException;
 use App\Helper\I18nHelper;
+use App\Model\Edit;
 use App\Model\Page;
 use App\Model\Project;
 use App\Model\User;
@@ -687,6 +688,7 @@ abstract class XtoolsController extends AbstractController
             'include_pattern',
             'exclude_pattern',
             'classonly',
+            'nobots',
 
             // Legacy parameters.
             'user',
@@ -912,7 +914,6 @@ abstract class XtoolsController extends AbstractController
     public function getFormattedApiResponse(array $data, int $responseCode = Response::HTTP_OK): JsonResponse
     {
         $response = new JsonResponse();
-        $response->setEncodingOptions(JSON_NUMERIC_CHECK);
         $response->setStatusCode($responseCode);
 
         // Normalize display of IP ranges (they are prefixed with 'ipr-' in the params).
@@ -932,7 +933,7 @@ abstract class XtoolsController extends AbstractController
         // Flashes now can be cleared after merging into the response.
         $this->flashBag->clear();
 
-        // Normalize path param values.
+        // Normalize path param values, dates, etc.
         $ret = self::normalizeApiProperties($ret);
 
         $response->setData($ret);
@@ -954,6 +955,13 @@ abstract class XtoolsController extends AbstractController
             } elseif (is_string($value) && false !== strpos($value, '|')) {
                 // Any pipe-separated values should be returned as an array.
                 $params[$param] = explode('|', $value);
+            } elseif ($value instanceof DateTime || 'timestamp' === $param) {
+                // Convert DateTime objects to ISO 8601 strings.
+                $params[$param] = self::formatDateTimeForApi($value);
+            } elseif ('namespace' === $param && is_numeric($value)) {
+                $params[$param] = (int)$value;
+            } elseif ($value instanceof Edit) {
+                $params[$param] = $value->getForJson();
             }
         }
 
@@ -962,6 +970,14 @@ abstract class XtoolsController extends AbstractController
             3
         );
         return array_merge($params, ['elapsed_time' => $elapsedTime]);
+    }
+
+    public static function formatDateTimeForApi($dateTime): string
+    {
+        if (is_string($dateTime)) {
+            $dateTime = new DateTime($dateTime);
+        }
+        return $dateTime->format('Y-m-d\TH:i:s\Z');
     }
 
     /**
@@ -989,6 +1005,9 @@ abstract class XtoolsController extends AbstractController
     {
         // Add full_page_title (in addition to the existing page_title and namespace keys).
         $out[$key] = array_map(function ($rev) {
+            if ($rev instanceof Edit) {
+                $rev = $rev->getForJson();
+            }
             return array_merge([
                 'full_page_title' => $this->getPageFromNsAndTitle(
                     (int)$rev['namespace'],

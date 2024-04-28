@@ -217,7 +217,7 @@ class ArticleInfoController extends XtoolsController
      *     @OA\JsonContent(
      *         @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
      *         @OA\Property(property="page", ref="#/components/parameters/Page/schema"),
-     *         @OA\Property(property="watchers", type="integer"),
+     *         @OA\Property(property="watchers", type="integer", description="Number of watchers, null if unknown"),
      *         @OA\Property(property="pageviews", type="integer"),
      *         @OA\Property(property="pageviews_offset", type="integer"),
      *         @OA\Property(property="revisions", type="integer"),
@@ -225,9 +225,9 @@ class ArticleInfoController extends XtoolsController
      *         @OA\Property(property="minor_edits", type="integer"),
      *         @OA\Property(property="author", type="string", example="Jimbo Wales"),
      *         @OA\Property(property="author_editcount", type="integer"),
-     *         @OA\Property(property="created_at", type="date"),
+     *         @OA\Property(property="created_at", type="datetime", example="2020-01-31T12:59:59Z"),
      *         @OA\Property(property="created_rev_id", type="integer"),
-     *         @OA\Property(property="modified_at", type="date"),
+     *         @OA\Property(property="modified_at", type="datetime", example="2020-01-31T12:59:59Z"),
      *         @OA\Property(property="secs_since_last_edit", type="integer"),
      *         @OA\Property(property="last_edit_id", type="integer"),
      *         @OA\Property(property="assessment", type="object", example={
@@ -342,8 +342,6 @@ class ArticleInfoController extends XtoolsController
         $responseCode = Response::HTTP_OK;
         $this->recordApiUsage('page/prose');
         $this->setupArticleInfo($articleInfoRepo, $autoEditsHelper);
-        $this->addFlash('info', 'The algorithm used by this API has recently changed. ' .
-            'See https://www.mediawiki.org/wiki/XTools/Page_History#Prose for details.');
         $ret = $this->articleInfo->getProseStats();
         if (null === $ret) {
             $this->addFlashMessage('error', 'api-error-wikimedia');
@@ -498,11 +496,11 @@ class ArticleInfoController extends XtoolsController
      *                 "minor": 15,
      *                 "first_edit": {
      *                     "id": 12345,
-     *                     "timestamp": 20200101125959
+     *                     "timestamp": "2020-01-01T12:59:59Z"
      *                 },
      *                 "last_edit": {
      *                     "id": 54321,
-     *                     "timestamp": 20200120125959
+     *                     "timestamp": "2020-01-20T12:59:59Z"
      *                 }
      *             }
      *         }),
@@ -530,6 +528,7 @@ class ArticleInfoController extends XtoolsController
         );
 
         return $this->getFormattedApiResponse([
+            'nobots' => $this->getBoolVal('nobots'),
             'top_editors' => $topEditors,
         ]);
     }

@@ -50,7 +50,7 @@ class ArticleInfoControllerTest extends ControllerTestAdapter
         static::assertTrue($data['revisions'] > 4000);
         static::assertTrue($data['editors'] > 400);
         static::assertEquals($data['author'], 'TwoOneTwo');
-        static::assertEquals($data['created_at'], '2002-01-26');
+        static::assertEquals($data['created_at'], '2002-01-26T15:28:12Z');
         static::assertEquals($data['created_rev_id'], 139992);
 
         static::assertEquals(

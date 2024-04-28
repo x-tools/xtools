@@ -238,7 +238,7 @@ nelmio_api_doc:
                             example: 123
                         timestamp:
                             type: date-time
-                            example: 20200101125959
+                            example: '2020-01-01T12:59:59Z'
                         minor:
                             type: boolean
                             example: 0
@@ -296,7 +296,7 @@ nelmio_api_doc:
                             timestamp:
                                 type: date-time
                                 description: Timestamp of the initial revision
-                                example: 20200101125959
+                                example: '2020-01-01T12:59:59Z'
                             rev_id:
                                 type: integer
                                 description: Revision ID (correlates to `archive.ar_rev_id` for deleted pages)

@@ -150,12 +150,12 @@ class Edit extends Model
     }
 
     /**
-     * Get the edit's timestamp as a UTC string, as with YYYY-MM-DDTHH:MM:SS
+     * Get the edit's timestamp as a UTC string, as with YYYY-MM-DDTHH:MM:SSZ
      * @return string
      */
     public function getUTCTimestamp(): string
     {
-        return $this->getTimestamp()->format('Y-m-d\TH:i:s');
+        return $this->getTimestamp()->format('Y-m-d\TH:i:s\Z');
     }
 
     /**
@@ -473,7 +473,7 @@ class Edit extends Model
     public function getForJson(bool $includeUsername = false, bool $includeProject = false): array
     {
         $nsId = $this->getPage()->getNamespace();
-        $pageTitle = $this->getPage()->getTitle(true);
+        $pageTitle = str_replace('_', ' ', $this->getPage()->getTitle(true));
 
         if ($nsId > 0) {
             $nsName = $this->getProject()->getNamespaces()[$nsId];

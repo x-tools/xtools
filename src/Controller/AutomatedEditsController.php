@@ -7,7 +7,6 @@ namespace App\Controller;
 use App\Model\AutoEdits;
 use App\Repository\AutoEditsRepository;
 use App\Repository\EditRepository;
-use DateTime;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -331,7 +330,8 @@ class AutomatedEditsController extends XtoolsController
         ];
         $ret['nonautomated_editcount'] = $ret['total_editcount'] - $ret['automated_editcount'];
 
-        if ($this->getBoolVal('tools')) {
+        $ret['tools'] = $this->getBoolVal('tools');
+        if ($ret['tools']) {
             $tools = $this->autoEdits->getToolCounts();
             $ret['automated_tools'] = $tools;
         }
@@ -378,7 +378,7 @@ class AutomatedEditsController extends XtoolsController
      *         @OA\Property(property="offset", ref="#/components/parameters/Offset/schema"),
      *         @OA\Property(property="limit", ref="#/components/parameters/Limit/schema"),
      *         @OA\Property(property="nonautomated_edits", type="array", @OA\Items(ref="#/components/schemas/Edit")),
-     *         @OA\Property(property="continue", type="date-time", example="2020-01-31T12:59:59Z"),
+     *         @OA\Property(property="continue", type="datetime", example="2020-01-31T12:59:59Z"),
      *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
      *     )
      * )
@@ -399,10 +399,10 @@ class AutomatedEditsController extends XtoolsController
 
         $this->setupAutoEdits($autoEditsRepo, $editRepo);
 
-        $results = $this->autoEdits->getNonAutomatedEdits(true);
+        $results = $this->autoEdits->getNonAutomatedEdits();
         $out = $this->addFullPageTitlesAndContinue('nonautomated_edits', [], $results);
         if (count($results) === $this->limit) {
-            $out['continue'] = (new DateTime(end($results)['timestamp']))->format('Y-m-d\TH:i:s');
+            $out['continue'] = end($results)->getTimestamp();
         }
 
         return $this->getFormattedApiResponse($out);
@@ -450,7 +450,7 @@ class AutomatedEditsController extends XtoolsController
      *         @OA\Property(property="limit", ref="#/components/parameters/Limit/schema"),
      *         @OA\Property(property="tool", type="string", example="Twinkle"),
      *         @OA\Property(property="automated_edits", type="array", @OA\Items(ref="#/components/schemas/Edit")),
-     *         @OA\Property(property="continue", type="date-time", example="2020-01-31T12:59:59Z"),
+     *         @OA\Property(property="continue", type="datetime", example="2020-01-31T12:59:59Z"),
      *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
      *     )
      * )
@@ -473,10 +473,10 @@ class AutomatedEditsController extends XtoolsController
             ? ['tool' => $this->autoEdits->getTool()]
             : [];
 
-        $results = $this->autoEdits->getAutomatedEdits(true);
+        $results = $this->autoEdits->getAutomatedEdits();
         $out = $this->addFullPageTitlesAndContinue('automated_edits', $extras, $results);
         if (count($results) === $this->limit) {
-            $out['continue'] = (new DateTime(end($results)['timestamp']))->format('Y-m-d\TH:i:s');
+            $out['continue'] = end($results)->getTimestamp();
         }
 
         return $this->getFormattedApiResponse($out);

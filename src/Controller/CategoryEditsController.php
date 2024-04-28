@@ -242,6 +242,7 @@ class CategoryEditsController extends XtoolsController
         $this->setupCategoryEdits($categoryEditsRepo);
 
         $ret = [
+            'categories' => $this->categoryEdits->getCategoriesNormalized(),
             'total_editcount' => $this->categoryEdits->getEditCount(),
             'category_editcount' => $this->categoryEdits->getCategoryEditCount(),
         ];

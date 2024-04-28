@@ -148,10 +148,9 @@ class AutoEdits extends Model
 
     /**
      * Get non-automated contributions for this user.
-     * @param bool $raw Whether to return raw data from the database, or get Edit objects.
-     * @return string[]|Edit[]
+     * @return Edit[]
      */
-    public function getNonAutomatedEdits(bool $raw = false): array
+    public function getNonAutomatedEdits(): array
     {
         if (isset($this->nonAutomatedEdits)) {
             return $this->nonAutomatedEdits;
@@ -167,10 +166,6 @@ class AutoEdits extends Model
             $this->limit
         );
 
-        if ($raw) {
-            return $revs;
-        }
-
         $this->nonAutomatedEdits = Edit::getEditsFromRevs(
             $this->pageRepo,
             $this->editRepo,
@@ -185,10 +180,9 @@ class AutoEdits extends Model
 
     /**
      * Get automated contributions for this user.
-     * @param bool $raw Whether to return raw data from the database, or get Edit objects.
      * @return Edit[]
      */
-    public function getAutomatedEdits(bool $raw = false): array
+    public function getAutomatedEdits(): array
     {
         if (isset($this->automatedEdits)) {
             return $this->automatedEdits;
@@ -201,12 +195,9 @@ class AutoEdits extends Model
             $this->start,
             $this->end,
             $this->tool,
-            $this->offset
+            $this->offset,
+            $this->limit
         );
-
-        if ($raw) {
-            return $revs;
-        }
 
         $this->automatedEdits = Edit::getEditsFromRevs(
             $this->pageRepo,

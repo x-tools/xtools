@@ -204,7 +204,7 @@ class GlobalContribsController extends XtoolsController
      *         @OA\Property(property="globalcontribs", type="array",
      *             @OA\Items(ref="#/components/schemas/EditWithProject")
      *         ),
-     *         @OA\Property(property="continue", type="date-time", example="2020-01-31T12:59:59Z"),
+     *         @OA\Property(property="continue", type="datetime", example="2020-01-31T12:59:59Z"),
      *         @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
      *     )
      * )

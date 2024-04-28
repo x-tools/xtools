@@ -251,10 +251,10 @@ class EditTest extends TestAdapter
         static::assertEquals(
             [
                 'username' => 'Testuser',
-                'page_title' => 'Test_page',
+                'page_title' => 'Test page',
                 'namespace' => $this->page->getNamespace(),
                 'rev_id' => 1,
-                'timestamp' => '2017-01-01T10:00:00',
+                'timestamp' => '2017-01-01T10:00:00Z',
                 'minor' => false,
                 'length' => 12,
                 'length_change' => 2,
