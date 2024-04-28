@@ -160,14 +160,13 @@ class EditCounterRepository extends Repository
         }
 
         // Query.
-        $loggingTable = $this->getTableName($project->getDatabaseName(), 'logging');
-        $sql = "
-        (SELECT CONCAT(log_type, '-', log_action) AS source, COUNT(log_id) AS value
-            FROM $loggingTable
-            WHERE log_actor = :actorId
-            GROUP BY log_type, log_action
-        )";
-
+        $loggingTable = $project->getTableName('logging');
+        $sql = "SELECT CONCAT(log_type, '-', log_action) AS source, COUNT(log_id) AS value
+                FROM $loggingTable
+                WHERE log_actor = :actorId
+                GROUP BY log_type, log_action
+                -- T363633
+                HAVING source IS NOT NULL";
         $results = $this->executeProjectsQuery($project, $sql, [
             'actorId' => $user->getActorId($project),
         ])->fetchAllAssociative();
