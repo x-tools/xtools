@@ -161,7 +161,8 @@ class EditSummaryController extends XtoolsController
             $this->namespace,
             $this->start,
             $this->end,
-            150
+            150,
+            false
         );
         $editSummary->prepareData();
 

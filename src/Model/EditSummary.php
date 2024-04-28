@@ -18,6 +18,9 @@ class EditSummary extends Model
     /** @var int Number of edits from present to consider as 'recent'. */
     protected int $numEditsRecent;
 
+    /** @var bool Whether to localize the date formats used for the month keys. */
+    protected bool $localize;
+
     /**
      * Counts of summaries, raw edits, and per-month breakdown.
      * Keys are underscored because this also is served in the API.
@@ -48,6 +51,7 @@ class EditSummary extends Model
      * @param int|false $start Start date as Unix timestamp.
      * @param int|false $end End date as Unix timestamp.
      * @param int $numEditsRecent Number of edits from present to consider as 'recent'.
+     * @param bool $localize Whether to localize the date formats used for the month keys.
      */
     public function __construct(
         EditSummaryRepository $repository,
@@ -57,7 +61,8 @@ class EditSummary extends Model
         $namespace,
         $start = false,
         $end = false,
-        int $numEditsRecent = 150
+        int $numEditsRecent = 150,
+        bool $localize = true
     ) {
         $this->repository = $repository;
         $this->project = $project;
@@ -67,6 +72,7 @@ class EditSummary extends Model
         $this->start = $start;
         $this->end = $end;
         $this->numEditsRecent = $numEditsRecent;
+        $this->localize = $localize;
     }
 
     /**
@@ -214,7 +220,11 @@ class EditSummary extends Model
         // Extract the date out of the date field
         $timestamp = DateTime::createFromFormat('YmdHis', $row['rev_timestamp']);
 
-        $monthKey = $this->i18n->dateFormat($timestamp, 'yyyy-MM');
+        if ($this->localize) {
+            $monthKey = $this->i18n->dateFormat($timestamp, 'yyyy-MM');
+        } else {
+            $monthKey = $timestamp->format('Y-m');
+        }
 
         // Grand total for number of edits
         $this->data['total_edits']++;
