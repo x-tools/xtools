@@ -22,6 +22,7 @@ parameters:
     app.is_wmf: '%env(bool:APP_IS_WMF)%'
     app.max_page_revisions: '%env(int:APP_MAX_PAGE_REVISIONS)%'
     app.max_user_edits: '%env(int:APP_MAX_USER_EDITS)%'
+    app.num_edits_requiring_login: '%env(int:APP_USER_EDITS_LOGIN)%'
     app.replag_threshold: '%env(int:APP_REPLAG_THRESHOLD)%'
     enable.AdminScore: '%env(bool:APP_ENABLE_ADMINSCORE)%'
     enable.AdminStats: '%env(bool:APP_ENABLE_ADMINSTATS)%'

@@ -12,6 +12,7 @@ use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use ReflectionClass;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * Integration/unit tests for the abstract XtoolsController.
@@ -270,6 +271,23 @@ class XtoolsControllerTest extends ControllerTestAdapter
         ], [
             'tooHighEditCountRoute' => 'homepage',
         ])->validateUser('Materialscientist');
+    }
+
+    /**
+     * Users with a high enough edit count that the user must login.
+     */
+    public function testEditCountRequireLogin(): void
+    {
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
+            return;
+        }
+
+        static::expectException(AccessDeniedHttpException::class);
+        static::expectExceptionMessage('error-login-required');
+        $this->getControllerWithRequest([
+            'project' => 'en.wikipedia',
+            '_controller' => 'App\Controller\DefaultController::indexAction',
+        ])->validateUser('Before My Ken');
     }
 
     /**

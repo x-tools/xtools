@@ -26,6 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Twig\Environment;
 use Twig\Markup;
@@ -529,12 +530,21 @@ abstract class XtoolsController extends AbstractController
             return $user;
         }
 
-        $originalParams = $this->params;
-
         // Don't continue if the user doesn't exist.
         if (isset($this->project) && !$user->existsOnProject($this->project)) {
             $this->throwXtoolsException($this->getIndexRoute(), 'user-not-found', [], 'username');
         }
+
+        if (isset($this->project) && $user->hasManyEdits($this->project)) {
+            $this->handleHasManyEdits($user);
+        }
+
+        return $user;
+    }
+
+    private function handleHasManyEdits(User $user): void
+    {
+        $originalParams = $this->params;
 
         // Reject users with a crazy high edit count.
         if ($this->tooHighEditCountRoute() &&
@@ -551,8 +561,8 @@ abstract class XtoolsController extends AbstractController
                     $this->i18n->msg('tool-simpleeditcounter'),
                 ]);
                 $msg = $this->i18n->msg('too-many-edits', [
-                    $this->i18n->numberFormat($user->maxEdits()),
-                ]).'. '.$redirMsg;
+                        $this->i18n->numberFormat($user->maxEdits()),
+                    ]).'. '.$redirMsg;
                 $this->addFlashMessage('danger', $msg);
             } else {
                 $this->addFlashMessage('danger', 'too-many-edits', [
@@ -578,7 +588,11 @@ abstract class XtoolsController extends AbstractController
             );
         }
 
-        return $user;
+        // Require login for users with a semi-crazy high edit count.
+        // For now, this only effects HTML requests and not the API.
+        if (!$this->isApi && !$this->request->getSession()->get('logged_in_user')) {
+            throw new AccessDeniedHttpException('error-login-required');
+        }
     }
 
     /**

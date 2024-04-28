@@ -162,6 +162,8 @@
 	"error-denied": "Error shown when the user's access to XTools has been blocked. $1 is an email address.",
 	"error-ip-range-unsupported": "Error shown when a user attempts to use a tool that doesn't support IP ranges as the user input.",
 	"error-login": "Error shown when logging in failed.",
+	"error-login-required": "Error shown when the user must be logged in to use the tool.",
+	"error-login-required-link": "Link text for logging in when the user must be logged in to use the tool.",
 	"error-pagepile-too-large": "Error shown when a PagePile could not be created from the Pages Created tool. PagePile is another tool used to make lists of pages. In some cases we can't create a PagePile because there are too many pages.",
 	"error-param": "Error shown when an invalid value is passed for a parameter.",
 	"error-query-timeout": "Error message shown when XTools timed out. $1 is the timeout value in seconds.",

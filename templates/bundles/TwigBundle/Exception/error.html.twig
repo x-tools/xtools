@@ -22,7 +22,7 @@
             {% set message = 'unknown' %}
         {% endif %}
 
-        {% if exception.class == 'BadGatewayException' %}
+        {% if exception.class is defined and exception.class == 'BadGatewayException' %}
             {# We ignore 502s as we can't fix them, so there's no need to add a link to report it as a bug. #}
             <p>{{ msg(message, [exception.msgParams]) }}</p>
         {% elseif msgExists(message, [exception.code]) %}
@@ -45,6 +45,13 @@
             <p>
                 {% set loginLink = "<a href='" ~ login_url(app.request) ~ "'>" ~ msg('error-rate-limit-login') ~ "</a>" %}
                 <h3 class="text-danger"><strong>{{ msg('error-rate-limit-login-big', [loginLink]) }}</strong></h3>
+            </p>
+        {% endif %}
+        {% if status_code == 403 and message == 'error-login-required' %}
+            <p>
+                <h3 class="text-danger"><strong><a href="{{ login_url(app.request) }}">
+                    {{ msg('error-login-required-link') }}
+                </a></strong></h3>
             </p>
         {% endif %}
 

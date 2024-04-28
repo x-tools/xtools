@@ -143,6 +143,8 @@
 	"error-denied": "Your access to XTools has been blocked due to apparent abuse or disruptive automation. Please contact $1",
 	"error-ip-range-unsupported": "Sorry, this functionality is not available for IP ranges. Please enter either a single username or IP address.",
 	"error-login": "Login failed! Please try again.",
+	"error-login-required": "For performance reasons, the requested data is only available to logged-in users.",
+	"error-login-required-link": "Please login to continue.",
 	"error-pagepile-too-large": "Sorry, there are too many pages to export to PagePile. You can manually create a PagePile, or try narrowing down the result set by limiting to a specific namespace or time frame.",
 	"error-param": "'$1' is not a valid value for the '$2' parameter",
 	"error-query-timeout": "Sorry, the requested information took too long to process (timeout $1 {{PLURAL:$1|second|seconds}}). In order to save resources, the query was automatically killed.",
