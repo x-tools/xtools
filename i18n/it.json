@@ -149,6 +149,7 @@
 	"error-denied": "Il tuo accesso a XTools è stato bloccato a causa di apparenti abusi o automazioni dirompenti. Si prega di contattare $1",
 	"error-ip-range-unsupported": "Spiacenti, questa funzionalità non è disponibile per gli intervalli IP. Inserisci un unico nome utente o un indirizzo IP.",
 	"error-login": "Accesso fallito! Per favore riprova.",
+	"error-login-required-link": "Per favore accedi per continuare.",
 	"error-pagepile-too-large": "Siamo spiacenti, ci sono troppe pagine da esportare in PagePile. È possibile creare manualmente un PagePile o provare a restringere il numero di risultati limitandosi a uno specifico namespace o a un determinato intervallo di tempo,",
 	"error-query-timeout": "Spiacente, la richiesta ha impiegato troppo tempo per essere elaborata (timeout $1 {{PLURAL:$1|secondo|secondi}}). Per risparmiare risorse la richiesta è stata annullata.",
 	"error-rate-limit": "Se sei un umano, stai facendo troppe richieste in un breve periodo di tempo. Si prega di attendere $1 {{PLURAL:$1|minuto|minuti}} prima di ricaricare questo strumento, o $2 per evitare che ciò accada di nuovo. Se sei un robot, utilizza invece i nostri $3.",

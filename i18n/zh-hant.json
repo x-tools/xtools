@@ -159,6 +159,8 @@
 	"error-denied": "出自於明顯的濫用或破壞性自動化操作，您已被封鎖對 XTools 的訪問。請聯絡：$1",
 	"error-ip-range-unsupported": "很抱歉，此功能不適用於 IP 範圍。請輸入一個使用者名稱或是 IP 位址。",
 	"error-login": "登入失敗！請重試。",
+	"error-login-required": "出於效能因素，請求的資料僅對已登入使用者可用。",
+	"error-login-required-link": "請先登入以繼續。",
 	"error-pagepile-too-large": "很抱歉，目前有太多頁面匯出到 PagePile 上。您可以手動建立一個 PagePile，或嘗試透過特定命名空間或時間範圍的限制來減少結果集合。",
 	"error-param": "對參數「$2」來說「$1」不是有效值",
 	"error-query-timeout": "很抱歉，所請求訊息花費太長時間處理（逾時 $1 {{PLURAL:$1|秒}}）。為了保護系統資源，已自動將查詢給刪除。",
