@@ -1,5 +1,12 @@
 # Release Notes #
 
+## 3.19.0 ##
+- (T318036) Require login to query for users with high edit counts.
+- EditCounter (T292031): ensure keys for `month_counts` endpoint are strings.
+- Add warnings for upcoming API changes.
+- PageRepository: update query following pagelinks normalization.
+- Localization updates.
+
 ## 3.18.8 ##
 - PageAssessments (T360774): Add WikiProject (NSID 102) as supported namespace.
 
