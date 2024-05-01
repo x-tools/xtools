@@ -36,6 +36,16 @@ class RateLimitSubscriber implements EventSubscriberInterface
         'showAction',
     ];
 
+    /**
+     * Maximum number of requests to the same URI with different interface languages.
+     */
+    public const MAX_CRAWLER_COUNT = 3;
+
+    /**
+     * Duration in which the max number of requests to the same URI with different interface languages is allowed.
+     */
+    public const MAX_CRAWLER_TIME = 'PT1M';
+
     protected CacheItemPoolInterface $cache;
     protected I18nHelper $i18n;
     protected LoggerInterface $crawlerLogger;
@@ -212,11 +222,11 @@ class RateLimitSubscriber implements EventSubscriberInterface
 
         // Reset the clock on every request.
         $cacheItem->set($count)
-            ->expiresAfter(new DateInterval('PT1M'));
+            ->expiresAfter(new DateInterval(self::MAX_CRAWLER_TIME));
         $this->cache->save($cacheItem);
 
-        // If we're got a lot of hits, let's go ahead and assume it's a crawler and give a 429.
-        if ($count > 10) {
+        // If we've got a lot of hits, let's go ahead and assume it's a crawler and give a 429.
+        if ($count > self::MAX_CRAWLER_COUNT) {
             $this->denyAccess('Web crawler detected');
         }
     }
