@@ -545,10 +545,11 @@ abstract class XtoolsController extends AbstractController
     private function handleHasManyEdits(User $user): void
     {
         $originalParams = $this->params;
+        $actionAllowlisted = in_array($this->controllerAction, $this->tooHighEditCountActionAllowlist());
 
         // Reject users with a crazy high edit count.
         if ($this->tooHighEditCountRoute() &&
-            !in_array($this->controllerAction, $this->tooHighEditCountActionAllowlist()) &&
+            !$actionAllowlisted &&
             $user->hasTooManyEdits($this->project)
         ) {
             /** TODO: Somehow get this to use self::throwXtoolsException */
@@ -590,7 +591,7 @@ abstract class XtoolsController extends AbstractController
 
         // Require login for users with a semi-crazy high edit count.
         // For now, this only effects HTML requests and not the API.
-        if (!$this->isApi && !$this->request->getSession()->get('logged_in_user')) {
+        if (!$this->isApi && !$actionAllowlisted && !$this->request->getSession()->get('logged_in_user')) {
             throw new AccessDeniedHttpException('error-login-required');
         }
     }
