@@ -154,6 +154,8 @@
 	"error-denied": "Uw toegang tot XTools is geblokkeerd wegens misbruik of verstorende automatisering. Neem contact op met $1",
 	"error-ip-range-unsupported": "Sorry, deze functionaliteit is niet beschikbaar voor IP-ranges. Voer een enkele gebruikersnaam of IP-adres in.",
 	"error-login": "Aanmelden mislukt! Probeer het opnieuw.",
+	"error-login-required": "Om prestatieredenen zijn de gevraagde gegevens alleen beschikbaar voor aangemelde gebruikers.",
+	"error-login-required-link": "Meld u aan om door te gaan.",
 	"error-pagepile-too-large": "Sorry, er zijn te veel pagina's om naar PagePile te exporteren. U kunt handmatig een PagePile maken of proberen de resultatenset te verfijnen door deze te beperken tot een specifieke naamruimte of tijdsbestek.",
 	"error-param": "'$1' is geen geldige waarde voor de parameter '$2'",
 	"error-query-timeout": "Helaas, het verwerken van de gevraagde informatie duurde te lang (time-out $1 {{PLURAL:$1|seconde|seconden}}). Om servercapaciteit te sparen is de zoekopdracht automatisch afgebroken.",
