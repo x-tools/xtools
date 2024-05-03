@@ -1,5 +1,11 @@
 # Release Notes #
 
+## 3.19.1 ##
+- (T318036): Don't put login wall in front of allowlisted actions
+- SimpleEditCounter (T318036): Use APP_MAX_USER_EDITS instead of dedicated constant
+- RateLimitSubscriber: lower thresholds for auto-blocking possible web crawlers
+- Localization updates.
+
 ## 3.19.0 ##
 - (T318036) Require login to query for users with high edit counts.
 - EditCounter (T292031): ensure keys for `month_counts` endpoint are strings.
