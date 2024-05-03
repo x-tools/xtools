@@ -25,9 +25,6 @@ class SimpleEditCounter extends Model
         'global_user_groups' => [],
     ];
 
-    /** @var int If the user has more than this many edits, only the approximate system edit count will be used. */
-    public const MAX_EDIT_COUNT = 500000;
-
     /**
      * Constructor for the SimpleEditCounter class.
      * @param Project $project
@@ -48,7 +45,7 @@ class SimpleEditCounter extends Model
         $this->project = $project;
         $this->user = $user;
 
-        if ($this->user->getEditCount($this->project) > self::MAX_EDIT_COUNT) {
+        if ($this->user->getEditCount($this->project) > $this->user->maxEdits()) {
             $this->limited = true;
             $this->namespace = 'all';
             $this->start = false;
