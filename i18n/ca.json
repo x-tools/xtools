@@ -4,7 +4,8 @@
 			"Fitoschido",
 			"Lluis tgn",
 			"Mguix",
-			"Quel.soler"
+			"Quel.soler",
+			"Tiputini"
 		]
 	},
 	"abusefilter": "Filtre d’abusos",
@@ -33,6 +34,7 @@
 	"all-quotes": "Totes les citacions",
 	"api": "API",
 	"api-error": "S’ha produït un error en consultar $1",
+	"api-error-wikimedia": "S'ha produït un error en connectar-se a l'API $1 . Prova d'actualitzar aquesta pàgina o torna-ho a provar més tard.",
 	"approve": "Aprovar",
 	"approximate": "Aproximadament",
 	"article": "Article",
@@ -121,6 +123,7 @@
 	"edit-summary": "Resum d'edició",
 	"edit-summary-recent-major": "Últimes $1 edicions majors amb resums",
 	"edit-summary-recent-minor": "Últimes $1 edicions menors amb resums",
+	"edit-summary-removed": "(resum d'edició eliminat)",
 	"editors": "Editors",
 	"edits": "Edicions",
 	"edits-in-categories": "Edicions en categories",
