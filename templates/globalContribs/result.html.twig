@@ -108,7 +108,7 @@
                         data-namespace="{{ gc.namespace }}"
                         data-start="{{ gc.startDate }}"
                         data-end="{{ gc.endDate }}"
-                        data-offset="{{ gc.offsetISO ? gc.offsetISO : (gc.globalEdits|first).UTCTimestamp }}"
+                        data-offset="{{ gc.offsetISO ? gc.offsetISO : (gc.globalEdits|length > 0 ? gc.globalEdits|first.UTCTimestamp : '') }}"
                         data-limit="{{ gc.limit }}">
 {% endif %}
 

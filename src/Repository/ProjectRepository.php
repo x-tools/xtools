@@ -22,14 +22,8 @@ class ProjectRepository extends Repository
 {
     protected PageAssessmentsRepository $assessmentsRepo;
 
-    /** @var array Project's 'dbName', 'url' and 'lang'. */
-    protected array $basicInfo;
-
     /** @var string[] Basic metadata if XTools is in single-wiki mode. */
     protected array $singleBasicInfo;
-
-    /** @var array Full Project metadata, including $basicInfo. */
-    protected array $metadata;
 
     /** @var string The cache key for the 'all project' metadata. */
     protected string $cacheKeyAllProjects = 'allprojects';
@@ -259,20 +253,9 @@ class ProjectRepository extends Repository
      */
     public function getMetadata(string $projectUrl): ?array
     {
-        // First try variable cache
-        if (!empty($this->metadata)) {
-            return $this->metadata;
-        }
-
-        $cacheKey = $this->getCacheKey(
-            // Removed non-alphanumeric characters
-            preg_replace("/[^A-Za-z0-9]/", '', $projectUrl),
-            'project_metadata'
-        );
-
+        $cacheKey = $this->getCacheKey(func_get_args(), "project_metadata");
         if ($this->cache->hasItem($cacheKey)) {
-            $this->metadata = $this->cache->getItem($cacheKey)->get();
-            return $this->metadata;
+            return $this->cache->getItem($cacheKey)->get();
         }
 
         try {
@@ -288,27 +271,19 @@ class ProjectRepository extends Repository
             return null;
         }
 
-        $this->metadata = [
+        $metadata = [
             'general' => [],
             'namespaces' => [],
         ];
 
-        // Even if general info could not be fetched,
-        //   return dbName, url and lang if already known
-        if (!empty($this->basicInfo)) {
-            $this->metadata['dbName'] = $this->basicInfo['dbName'];
-            $this->metadata['url'] = $this->basicInfo['url'];
-            $this->metadata['lang'] = $this->basicInfo['lang'];
-        }
-
         if (isset($res['query']['general'])) {
             $info = $res['query']['general'];
 
-            $this->metadata['dbName'] = $info['wikiid'];
-            $this->metadata['url'] = $info['server'];
-            $this->metadata['lang'] = $info['lang'];
+            $metadata['dbName'] = $info['wikiid'];
+            $metadata['url'] = $info['server'];
+            $metadata['lang'] = $info['lang'];
 
-            $this->metadata['general'] = [
+            $metadata['general'] = [
                 'wikiName' => $info['sitename'],
                 'articlePath' => $info['articlepath'],
                 'scriptPath' => $info['scriptpath'],
@@ -319,17 +294,18 @@ class ProjectRepository extends Repository
             ];
         }
 
-        $this->setNamespaces($res);
+        $this->setNamespaces($res, $metadata);
 
         // Cache for one hour and return.
-        return $this->setCache($cacheKey, $this->metadata, 'PT1H');
+        return $this->setCache($cacheKey, $metadata, 'PT1H');
     }
 
     /**
-     * Set the namespaces on $this->metadata.
+     * Set the namespaces on the given $metadata.
      * @param array $res As produced by meta=siteinfo API.
+     * @param array &$metadata The metadata array to modify.
      */
-    private function setNamespaces(array $res): void
+    private function setNamespaces(array $res, array &$metadata): void
     {
         if (!isset($res['query']['namespaces'])) {
             return;
@@ -348,7 +324,7 @@ class ProjectRepository extends Repository
                 continue;
             }
 
-            $this->metadata['namespaces'][$namespace['id']] = $name;
+            $metadata['namespaces'][$namespace['id']] = $name;
         }
     }
 

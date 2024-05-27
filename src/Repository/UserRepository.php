@@ -275,6 +275,24 @@ class UserRepository extends Repository
     }
 
     /**
+     * Check if a user exists globally.
+     * @param User $user
+     * @return bool
+     */
+    public function existsGlobally(User $user): bool
+    {
+        if ($user->isAnon()) {
+            return true;
+        }
+
+        return (bool)$this->executeProjectsQuery(
+            'centralauth',
+            'SELECT 1 FROM centralauth_p.globaluser WHERE gu_name = :username',
+            ['username' => $user->getUsername()]
+        )->fetchFirstColumn();
+    }
+
+    /**
      * Get a user's local user rights on the given Project.
      * @param Project $project
      * @param User $user

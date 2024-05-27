@@ -282,13 +282,22 @@ class User extends Model
     }
 
     /**
-     * Does this user exist on the given project.
+     * Does this user exist on the given project?
      * @param Project $project
      * @return bool
      */
     public function existsOnProject(Project $project): bool
     {
         return $this->getId($project) > 0;
+    }
+
+    /**
+     * Does this user exist globally?
+     * @return bool
+     */
+    public function existsGlobally(): bool
+    {
+        return $this->repository->existsGlobally($this);
     }
 
     /**

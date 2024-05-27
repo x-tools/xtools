@@ -361,11 +361,6 @@ abstract class XtoolsController extends AbstractController
      */
     private function setProject(Project $project): void
     {
-        // TODO: Remove after deprecated routes are retired.
-        if (false !== strpos((string)$this->request->get('_controller'), 'GlobalContribs')) {
-            return;
-        }
-
         $this->project = $project;
         $this->cookies['XtoolsProject'] = $project->getDomain();
     }
@@ -530,8 +525,12 @@ abstract class XtoolsController extends AbstractController
             return $user;
         }
 
-        // Don't continue if the user doesn't exist.
-        if (isset($this->project) && !$user->existsOnProject($this->project)) {
+        // Check against centralauth for global tools.
+        $isGlobalTool = str_contains($this->request->get('_controller', ''), 'Global');
+        if ($isGlobalTool && !$user->existsGlobally()) {
+            $this->throwXtoolsException($this->getIndexRoute(), 'user-not-found', [], 'username');
+        } elseif (!$isGlobalTool && isset($this->project) && !$user->existsOnProject($this->project)) {
+            // Don't continue if the user doesn't exist.
             $this->throwXtoolsException($this->getIndexRoute(), 'user-not-found', [], 'username');
         }
 
