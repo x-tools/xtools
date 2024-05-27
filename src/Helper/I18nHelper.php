@@ -206,8 +206,8 @@ class I18nHelper
      */
     public function numberFormat($number, int $decimals = 0): string
     {
+        $lang = $this->getLangForTranslatingNumerals();
         if (!isset($this->numFormatter)) {
-            $lang = $this->getNumberFormatterLang();
             $this->numFormatter = new NumberFormatter($lang, NumberFormatter::DECIMAL);
         }
 
@@ -225,8 +225,8 @@ class I18nHelper
      */
     public function percentFormat($numerator, ?int $denominator = null, int $precision = 1): string
     {
+        $lang = $this->getLangForTranslatingNumerals();
         if (!isset($this->percentFormatter)) {
-            $lang = $this->getNumberFormatterLang();
             $this->percentFormatter = new NumberFormatter($lang, NumberFormatter::PERCENT);
         }
 
@@ -254,9 +254,10 @@ class I18nHelper
      */
     public function dateFormat($datetime, string $pattern = 'yyyy-MM-dd HH:mm'): string
     {
+        $lang = $this->getLangForTranslatingNumerals();
         if (!isset($this->dateFormatter)) {
             $this->dateFormatter = new IntlDateFormatter(
-                $this->getNumberFormatterLang(),
+                $lang,
                 IntlDateFormatter::SHORT,
                 IntlDateFormatter::SHORT
             );
@@ -278,14 +279,15 @@ class I18nHelper
     /********************* PRIVATE METHODS *********************/
 
     /**
-     * TODO: Remove this when the fallbacks start working on their own. Production for some reason
-     *   doesn't seem to know about ckb, though it has the same version of PHP and ext-intl as my local...
-     * @see T213503
+     * Return the language to be used when translating numberals.
+     * Currently this just disables numeral translation for Arabic.
+     * @see https://mediawiki.org/wiki/Topic:Y4ufad47v5o4ebpe
+     * @todo This should go by $wgTranslateNumerals.
      * @return string
      */
-    private function getNumberFormatterLang(): string
+    private function getLangForTranslatingNumerals(): string
     {
-        return 'ckb' === $this->getIntuition()->getLang() ? 'ar' : $this->getIntuition()->getLang();
+        return 'ar' === $this->getIntuition()->getLang() ? 'en': $this->getIntuition()->getLang();
     }
 
     /**
