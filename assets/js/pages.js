@@ -52,16 +52,21 @@ $(function () {
             return showSummary(deletionSummaries[nsId + '/' + pageTitle]);
         }
 
+        var showError = function () {
+            showSummary(
+                "<span class='text-danger'>" + $.i18n('api-error', 'Deletion Summary API') + "</span>"
+            );
+        };
+
         $.ajax({
             url: xtBaseUrl + 'pages/deletion_summary/' + wikiDomain + '/' + username + '/' + nsId + '/' +
                 pageTitle + '/' + startTime
         }).done(function (resp) {
+            if (null === resp.summary) {
+                return showError();
+            }
             showSummary(resp.summary);
             deletionSummaries[nsId + '/' + pageTitle] = resp.summary;
-        }).fail(function () {
-            return showSummary(
-                "<span class='text-danger'>" + $.i18n('api-error', 'Deletion Summary API') + "</span>"
-            );
-        });
+        }).fail(showError);
     });
 });

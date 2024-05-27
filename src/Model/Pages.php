@@ -352,11 +352,14 @@ class Pages extends Model
      * @param int $namespace
      * @param string $pageTitle
      * @param string $offset
-     * @return string
+     * @return string|null null if no deletion summary is available.
      */
-    public function getDeletionSummary(int $namespace, string $pageTitle, string $offset): string
+    public function getDeletionSummary(int $namespace, string $pageTitle, string $offset): ?string
     {
         $ret = $this->repository->getDeletionSummary($this->project, $namespace, $pageTitle, $offset);
+        if (!$ret) {
+            return null;
+        }
         $timestampStr = (new DateTime($ret['log_timestamp']))->format('Y-m-d H:i');
         $summary = Edit::wikifyString($ret['comment_text'], $this->project, $this->page, true);
         $userpageUrl = $this->project->getUrlForPage("User:{$ret['actor_name']}");

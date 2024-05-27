@@ -364,8 +364,9 @@ class PagesRepository extends UserRepository
                 AND log_type = 'delete'
                 AND log_action IN ('delete', 'delete_redir', 'delete_redir2')
                 LIMIT 1";
-        return $this->executeProjectsQuery($project, $sql, [
+        $ret = $this->executeProjectsQuery($project, $sql, [
             'pageTitle' => str_replace(' ', '_', $pageTitle),
         ])->fetchAssociative();
+        return $ret ?: [];
     }
 }
