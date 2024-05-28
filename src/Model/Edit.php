@@ -150,12 +150,12 @@ class Edit extends Model
     }
 
     /**
-     * Get the edit's timestamp as a UTC string, as with YYYY-MM-DDTHH:MM:SS
+     * Get the edit's timestamp as a UTC string, as with YYYY-MM-DDTHH:MM:SSZ
      * @return string
      */
     public function getUTCTimestamp(): string
     {
-        return $this->getTimestamp()->format('Y-m-d\TH:i:s');
+        return $this->getTimestamp()->format('Y-m-d\TH:i:s\Z');
     }
 
     /**
@@ -465,12 +465,11 @@ class Edit extends Model
 
     /**
      * Formats the data as an array for use in JSON APIs.
-     * @param bool $includeUsername False for most tools such as Global Contribs, AutoEdits, etc.
      * @param bool $includeProject
      * @return array
      * @internal This method assumes the Edit was constructed with data already filled in from a database query.
      */
-    public function getForJson(bool $includeUsername = false, bool $includeProject = false): array
+    public function getForJson(bool $includeProject = false): array
     {
         $nsId = $this->getPage()->getNamespace();
         $pageTitle = $this->getPage()->getTitle(true);
@@ -481,8 +480,16 @@ class Edit extends Model
         }
 
         $ret = [
-            'page_title' => $pageTitle,
+            'page_title' => str_replace('_', ' ', $pageTitle),
             'namespace' => $nsId,
+        ];
+        if ($includeProject) {
+            $ret += ['project' => $this->getProject()->getDomain()];
+        }
+        if ($this->getUser()) {
+            $ret += ['username' => $this->getUser()->getUsername()];
+        }
+        $ret += [
             'rev_id' => $this->id,
             'timestamp' => $this->getUTCTimestamp(),
             'minor' => $this->minor,
@@ -492,12 +499,6 @@ class Edit extends Model
         ];
         if (null !== $this->reverted) {
             $ret['reverted'] = $this->reverted;
-        }
-        if ($includeUsername) {
-            $ret = [ 'username' => $this->getUser()->getUsername() ] + $ret;
-        }
-        if ($includeProject) {
-            $ret = [ 'project' => $this->getProject()->getDomain() ] + $ret;
         }
 
         return $ret;

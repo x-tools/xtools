@@ -109,10 +109,10 @@ class TopEditsTest extends TestAdapter
         static::assertEquals(2, count($result[3]));
         static::assertEquals([
             'namespace' => '0',
-            'page_title' => 'Foo_bar',
+            'page_title' => 'Foo bar',
             'redirect' => '1',
             'count' => '24',
-            'full_page_title' => 'Foo_bar',
+            'full_page_title' => 'Foo bar',
             'assessment' => [
                 'class' => 'List',
             ],
@@ -143,10 +143,10 @@ class TopEditsTest extends TestAdapter
         static::assertEquals(2, count($result[3]));
         static::assertEquals([
             'namespace' => '3',
-            'page_title' => 'Jimbo_Wales',
+            'page_title' => 'Jimbo Wales',
             'redirect' => '0',
             'count' => '1',
-            'full_page_title' => 'User_talk:Jimbo_Wales',
+            'full_page_title' => 'User talk:Jimbo Wales',
         ], $result[3][1]);
     }
 

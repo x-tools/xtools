@@ -67,18 +67,16 @@ class EditSummaryController extends XtoolsController
      *     defaults={"namespace"="all", "start"=false, "end"=false}
      * )
      * @param EditSummaryRepository $editSummaryRepo
-     * @param I18nHelper $i18n
      * @return Response
      * @codeCoverageIgnore
      */
-    public function resultAction(EditSummaryRepository $editSummaryRepo, I18nHelper $i18n): Response
+    public function resultAction(EditSummaryRepository $editSummaryRepo): Response
     {
         // Instantiate an EditSummary, treating the past 150 edits as 'recent'.
         $editSummary = new EditSummary(
             $editSummaryRepo,
             $this->project,
             $this->user,
-            $i18n,
             $this->namespace,
             $this->start,
             $this->end,
@@ -144,11 +142,10 @@ class EditSummaryController extends XtoolsController
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
      * @param EditSummaryRepository $editSummaryRepo
-     * @param I18nHelper $i18n
      * @return JsonResponse
      * @codeCoverageIgnore
      */
-    public function editSummariesApiAction(EditSummaryRepository $editSummaryRepo, I18nHelper $i18n): JsonResponse
+    public function editSummariesApiAction(EditSummaryRepository $editSummaryRepo): JsonResponse
     {
         $this->recordApiUsage('user/edit_summaries');
 
@@ -157,7 +154,6 @@ class EditSummaryController extends XtoolsController
             $editSummaryRepo,
             $this->project,
             $this->user,
-            $i18n,
             $this->namespace,
             $this->start,
             $this->end,

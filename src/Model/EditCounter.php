@@ -788,7 +788,7 @@ class EditCounter extends Model
      * Get the total numbers of edits per month.
      * @param null|DateTime $currentTime - *USED ONLY FOR UNIT TESTING* so we can mock the current DateTime.
      * @return array With keys 'yearLabels', 'monthLabels' and 'totals',
-     *   the latter keyed by namespace, year and then month.
+     *   the latter keyed by namespace, then year/month.
      */
     public function monthCounts(?DateTime $currentTime = null): array
     {
@@ -821,13 +821,9 @@ class EditCounter extends Model
 
         $out = $this->fillInMonthTotalsAndLabels($out, $dateRange);
 
-        // One more set of loops to sort by year/month
+        // One more loop to sort by year/month
         foreach (array_keys($out['totals']) as $nsId) {
             ksort($out['totals'][$nsId]);
-
-            foreach ($out['totals'][$nsId] as &$yearData) {
-                ksort($yearData);
-            }
         }
 
         // Finally, sort the namespaces
@@ -840,24 +836,20 @@ class EditCounter extends Model
     /**
      * Get the counts keyed by month and then namespace.
      * Basically the opposite of self::monthCounts()['totals'].
-     * @param null|DateTime $currentTime - *USED ONLY FOR UNIT TESTING*
-     *   so we can mock the current DateTime.
+     * @param null|DateTime $currentTime - *USED ONLY FOR UNIT TESTING* so we can mock the current DateTime.
      * @return array Months as keys, values are counts keyed by namesapce.
      * @fixme Create API for this!
      */
     public function monthCountsWithNamespaces(?DateTime $currentTime = null): array
     {
         $countsMonthNamespace = array_fill_keys(
-            array_keys($this->monthTotals($currentTime)),
+            array_values($this->monthCounts($currentTime)['monthLabels']),
             []
         );
 
-        foreach ($this->monthCounts($currentTime)['totals'] as $ns => $years) {
-            foreach ($years as $year => $months) {
-                foreach ($months as $month => $count) {
-                    $monthKey = $year.'-'.sprintf('%02d', $month);
-                    $countsMonthNamespace[$monthKey][$ns] = $count;
-                }
+        foreach ($this->monthCounts($currentTime)['totals'] as $ns => $months) {
+            foreach ($months as $month => $count) {
+                $countsMonthNamespace[$month][$ns] = $count;
             }
         }
 
@@ -886,18 +878,9 @@ class EditCounter extends Model
                 $firstEdit = $date;
             }
 
-            // Collate the counts by namespace, and then year and month.
+            // Collate the counts by namespace, and then YYYY-MM.
             $ns = $total['namespace'];
-            if (!isset($out['totals'][$ns])) {
-                $out['totals'][$ns] = [];
-            }
-
-            // Start array for this year if not already present.
-            if (!isset($out['totals'][$ns][$total['year']])) {
-                $out['totals'][$ns][$total['year']] = [];
-            }
-
-            $out['totals'][$ns][$total['year']][$total['month']] = (int) $total['count'];
+            $out['totals'][$ns][$date->format('Y-m')] = (int)$total['count'];
         }
 
         return [$out, $firstEdit];
@@ -914,10 +897,8 @@ class EditCounter extends Model
     private function fillInMonthTotalsAndLabels(array $out, DatePeriod $dateRange): array
     {
         foreach ($dateRange as $monthObj) {
-            $year = (int) $monthObj->format('Y');
-            $yearLabel = $this->i18n->dateFormat($monthObj, 'yyyy');
-            $month = (int) $monthObj->format('n');
-            $monthLabel = $this->i18n->dateFormat($monthObj, 'yyyy-MM');
+            $yearLabel = $monthObj->format('Y');
+            $monthLabel = $monthObj->format('Y-m');
 
             // Fill in labels
             $out['monthLabels'][] = $monthLabel;
@@ -926,41 +907,13 @@ class EditCounter extends Model
             }
 
             foreach (array_keys($out['totals']) as $nsId) {
-                if (!isset($out['totals'][$nsId][$year])) {
-                    $out['totals'][$nsId][$year] = [];
-                }
-
-                if (!isset($out['totals'][$nsId][$year][$month])) {
-                    $out['totals'][$nsId][$year][$month] = 0;
+                if (!isset($out['totals'][$nsId][$monthLabel])) {
+                    $out['totals'][$nsId][$monthLabel] = 0;
                 }
             }
         }
 
         return $out;
-    }
-
-    /**
-     * Get total edits for each month. Used in wikitext export.
-     * @param null|DateTime $currentTime *USED ONLY FOR UNIT TESTING*
-     * @return array With the months as the keys, counts as the values.
-     */
-    public function monthTotals(?DateTime $currentTime = null): array
-    {
-        $months = [];
-
-        foreach (array_values($this->monthCounts($currentTime)['totals']) as $nsData) {
-            foreach ($nsData as $year => $monthData) {
-                foreach ($monthData as $month => $count) {
-                    $monthLabel = $year.'-'.sprintf('%02d', $month);
-                    if (!isset($months[$monthLabel])) {
-                        $months[$monthLabel] = 0;
-                    }
-                    $months[$monthLabel] += $count;
-                }
-            }
-        }
-
-        return $months;
     }
 
     /**
@@ -974,16 +927,24 @@ class EditCounter extends Model
             return $this->yearCounts;
         }
 
-        $out = $this->monthCounts($currentTime);
+        $monthCounts = $this->monthCounts($currentTime);
+        $yearCounts = [
+            'yearLabels' => $monthCounts['yearLabels'],
+            'totals' => [],
+        ];
 
-        foreach ($out['totals'] as $nsId => $years) {
-            foreach ($years as $year => $months) {
-                $out['totals'][$nsId][$year] = array_sum(array_values($months));
+        foreach ($monthCounts['totals'] as $nsId => $months) {
+            foreach ($months as $month => $count) {
+                $year = substr($month, 0, 4);
+                if (!isset($yearCounts['totals'][$nsId][$year])) {
+                    $yearCounts['totals'][$nsId][$year] = 0;
+                }
+                $yearCounts['totals'][$nsId][$year] += $count;
             }
         }
 
-        $this->yearCounts = $out;
-        return $out;
+        $this->yearCounts = $yearCounts;
+        return $yearCounts;
     }
 
     /**
@@ -1018,7 +979,7 @@ class EditCounter extends Model
     {
         $years = [];
 
-        foreach (array_values($this->yearCounts($currentTime)['totals']) as $nsData) {
+        foreach ($this->yearCounts($currentTime)['totals'] as $nsData) {
             foreach ($nsData as $year => $count) {
                 if (!isset($years[$year])) {
                     $years[$year] = 0;

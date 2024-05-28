@@ -143,7 +143,7 @@ class CategoryEditsController extends XtoolsController
      *         "categories"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
      *         "start"="|\d{4}-\d{2}-\d{2}",
      *         "end"="|\d{4}-\d{2}-\d{2}",
-     *         "offset"="|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}",
+     *         "offset"="|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}Z?",
      *     },
      *     defaults={"start"=false, "end"=false, "offset"=false}
      * )
@@ -168,7 +168,7 @@ class CategoryEditsController extends XtoolsController
      *       "categories"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2}))?",
      *       "start"="|\d{4}-\d{2}-\d{2}",
      *       "end"="|\d{4}-\d{2}-\d{2}",
-     *       "offset"="|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}",
+     *       "offset"="|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}Z?",
      *   },
      *   defaults={"start"=false, "end"=false, "offset"=false}
      * )
@@ -242,14 +242,13 @@ class CategoryEditsController extends XtoolsController
         $this->setupCategoryEdits($categoryEditsRepo);
 
         $ret = [
+            // Ensure `categories` is always treated as an array, even if one element.
+            // (XtoolsController would otherwise see it as a single value from the URL query string).
+            'categories' => $this->categories,
             'total_editcount' => $this->categoryEdits->getEditCount(),
             'category_editcount' => $this->categoryEdits->getCategoryEditCount(),
         ];
 
-        if (1 === count($this->categoryEdits->getCategories())) {
-            $this->addFlash('warning', 'In XTools 3.20, the categories property will always return an array, '.
-                'even if only one category was provided.');
-        }
         return $this->getFormattedApiResponse($ret);
     }
 }

@@ -141,11 +141,13 @@ class PageInfoApi extends Model
                 'minor' => $row['minor'],
                 'first_edit' => [
                     'id' => $row['first_revid'],
-                    'timestamp' => $row['first_timestamp'],
+                    'timestamp' => DateTime::createFromFormat('YmdHis', $row['first_timestamp'])
+                        ->format('Y-m-d\TH:i:s\Z'),
                 ],
                 'latest_edit' => [
                     'id' => $row['latest_revid'],
-                    'timestamp' => $row['latest_timestamp'],
+                    'timestamp' => DateTime::createFromFormat('YmdHis', $row['latest_timestamp'])
+                        ->format('Y-m-d\TH:i:s\Z'),
                 ],
             ];
         }
@@ -281,7 +283,7 @@ class PageInfoApi extends Model
         $data = [
             'project' => $project->getDomain(),
             'page' => $page->getTitle(),
-            'watchers' => (int) $page->getWatchers(),
+            'watchers' => $page->getWatchers(),
             'pageviews' => $page->getLatestPageviews(),
             'pageviews_offset' => self::PAGEVIEWS_OFFSET,
         ];
@@ -306,11 +308,6 @@ class PageInfoApi extends Model
             $modifiedDateTime = DateTime::createFromFormat('YmdHis', $info['modified_at']);
             $secsSinceLastEdit = (new DateTime)->getTimestamp() - $modifiedDateTime->getTimestamp();
 
-            // Some wikis (such foundation.wikimedia.org) may be missing the creation date.
-            $creationDateTime = false === $creationDateTime
-                ? null
-                : $creationDateTime->format('Y-m-d');
-
             $assessment = $page->getProject()
                 ->getPageAssessments()
                 ->getAssessment($page);
@@ -320,13 +317,13 @@ class PageInfoApi extends Model
                 'editors' => (int) $info['num_editors'],
                 'ip_edits' => (int) $info['ip_edits'],
                 'minor_edits' => (int) $info['minor_edits'],
-                'author' => $info['author'],
-                'author_editcount' => null === $info['author_editcount'] ? null : (int) $info['author_editcount'],
+                'creator' => $info['creator'],
+                'creator_editcount' => null === $info['creator_editcount'] ? null : (int) $info['creator_editcount'],
                 'created_at' => $creationDateTime,
                 'created_rev_id' => $info['created_rev_id'],
-                'modified_at' => $modifiedDateTime->format('Y-m-d H:i'),
+                'modified_at' => $modifiedDateTime,
                 'secs_since_last_edit' => $secsSinceLastEdit,
-                'last_edit_id' => (int) $info['modified_rev_id'],
+                'modified_rev_id' => (int) $info['modified_rev_id'],
                 'assessment' => $assessment,
             ]);
         }

@@ -148,10 +148,10 @@ class AutoEdits extends Model
 
     /**
      * Get non-automated contributions for this user.
-     * @param bool $raw Whether to return raw data from the database, or get Edit objects.
+     * @param bool $forJson
      * @return string[]|Edit[]
      */
-    public function getNonAutomatedEdits(bool $raw = false): array
+    public function getNonAutomatedEdits(bool $forJson = false): array
     {
         if (isset($this->nonAutomatedEdits)) {
             return $this->nonAutomatedEdits;
@@ -167,10 +167,6 @@ class AutoEdits extends Model
             $this->limit
         );
 
-        if ($raw) {
-            return $revs;
-        }
-
         $this->nonAutomatedEdits = Edit::getEditsFromRevs(
             $this->pageRepo,
             $this->editRepo,
@@ -180,15 +176,21 @@ class AutoEdits extends Model
             $revs
         );
 
+        if ($forJson) {
+            return array_map(function (Edit $edit) {
+                return $edit->getForJson();
+            }, $this->nonAutomatedEdits);
+        }
+
         return $this->nonAutomatedEdits;
     }
 
     /**
      * Get automated contributions for this user.
-     * @param bool $raw Whether to return raw data from the database, or get Edit objects.
+     * @param bool $forJson
      * @return Edit[]
      */
-    public function getAutomatedEdits(bool $raw = false): array
+    public function getAutomatedEdits(bool $forJson = false): array
     {
         if (isset($this->automatedEdits)) {
             return $this->automatedEdits;
@@ -201,12 +203,9 @@ class AutoEdits extends Model
             $this->start,
             $this->end,
             $this->tool,
-            $this->offset
+            $this->offset,
+            $this->limit
         );
-
-        if ($raw) {
-            return $revs;
-        }
 
         $this->automatedEdits = Edit::getEditsFromRevs(
             $this->pageRepo,
@@ -216,6 +215,12 @@ class AutoEdits extends Model
             $this->user,
             $revs
         );
+
+        if ($forJson) {
+            return array_map(function (Edit $edit) {
+                return $edit->getForJson();
+            }, $this->automatedEdits);
+        }
 
         return $this->automatedEdits;
     }

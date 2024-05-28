@@ -128,6 +128,7 @@ class EditCounterControllerTest extends ControllerTestAdapter
             '/ec-timecard/en.wikipedia/Example',
             '/ec-yearcounts/en.wikipedia/Example',
             '/ec-monthcounts/en.wikipedia/Example',
+            '/ec-monthcounts/en.wikipedia/Example?format=wikitext',
             '/ec-rightschanges/en.wikipedia/Example',
             '/ec-latestglobal/en.wikipedia/Example',
         ]);

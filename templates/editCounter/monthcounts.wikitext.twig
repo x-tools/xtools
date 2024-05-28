@@ -16,9 +16,9 @@
 ! {{ msg('count') }}
 |-
 {% set labels = ec.monthCounts.monthLabels %}
-{% for month,total in ec.monthTotals %}
+{% for month,ns in ec.monthCountsWithNamespaces %}
 | {{ labels[loop.index0] }}
-| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ total }}}}
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ns|reduce((carry, v) => carry + v) }}}}
 |-
 {% endfor %}
 |}

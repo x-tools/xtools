@@ -7,7 +7,7 @@
         -#}{{ data.revisions|num_format }} {{ msg('num-revisions', [data.revisions]) }}{{ msg('comma-character') }}
     {% else %}{#-
         -#}{{ msg('num-revisions-since', [data.revisions|num_format, data.revisions, "<a target='_blank' href='" ~ wiki.pageUrlRaw('Special:PermaLink/' ~ data.created_rev_id, project) ~ "'>" ~ data.created_at ~ "</a>"]) }}
-        <span style="color:#A2A9B1">(<a href="{{ wiki.pageUrlRaw('Special:Diff/' ~ data.last_edit_id, project) }}" style="color:#A2A9B1">+{{ formatDuration(data.secs_since_last_edit) }}</a>)</span>{{ msg('comma-character') }}
+        <span style="color:#A2A9B1">(<a href="{{ wiki.pageUrlRaw('Special:Diff/' ~ data.modified_rev_id, project) }}" style="color:#A2A9B1">+{{ formatDuration(data.secs_since_last_edit) }}</a>)</span>{{ msg('comma-character') }}
         {{ data.editors|num_format }} {{ msg('num-editors', [data.editors]) }}{{ msg('comma-character') }}
     {% endif %}
 {% endif %}
@@ -16,11 +16,11 @@
 {% endif %}
 {%- if data.pageviews is defined -%}
 <a target="_blank" href="https://pageviews.wmcloud.org/?project={{ project.domain }}&amp;pages={{ page.title|e('url') }}&amp;range=latest-30">{{ data.pageviews|num_format }} {{ msg('num-pageviews', [data.pageviews]) }}</a> ({{ data.pageviews_offset|num_format }} {{ msg('num-days', [data.pageviews_offset]) }}){% endif -%}
-{% if data.error is not defined and data.author is not empty -%}
+{% if data.error is not defined and data.creator is not empty -%}
     {{ msg('comma-character') }}
-    {{ msg('created-by')|lower }}: {{ wiki.userLink(data.author, project) }}
-    {# IPs have an edit count of null for performance reasons, so we simply don't show anything #}{% if data.author_editcount != null %}
-    (<a target="_blank" title="{{ msg('approximate') }}" href="{{ url('EditCounterResult', { 'project': project.domain, 'username': data.author }) }}">{{ data.author_editcount|num_format }}</a>){% endif %}
+    {{ msg('created-by')|lower }}: {{ wiki.userLink(data.creator, project) }}
+    {# IPs have an edit count of null for performance reasons, so we simply don't show anything #}{% if data.creator_editcount != null %}
+    (<a target="_blank" title="{{ msg('approximate') }}" href="{{ url('EditCounterResult', { 'project': project.domain, 'username': data.creator }) }}">{{ data.creator_editcount|num_format }}</a>){% endif %}
 {% endif %}
  &middot;
 <a target="_blank" href="{{ url('PageInfoResult', { 'project': project.domain, 'page': page.title }) }}">{{ msg('see-full-page-stats') }}</a>

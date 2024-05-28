@@ -135,7 +135,7 @@ class Pages extends Model
 
         $numResults = count($this->getResults()[$this->getNamespace()]);
         $timestamp = new DateTime($this->getResults()[$this->getNamespace()][$numResults - 1]['timestamp']);
-        return $timestamp->format('Y-m-d\TH:i:s');
+        return $timestamp->format('Y-m-d\TH:i:s\Z');
     }
 
     /**

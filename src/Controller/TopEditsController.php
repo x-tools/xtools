@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Helper\AutomatedEditsHelper;
+use App\Model\Edit;
 use App\Model\TopEdits;
 use App\Repository\TopEditsRepository;
 use OpenApi\Annotations as OA;
@@ -244,7 +245,6 @@ class TopEditsController extends XtoolsController
         $topEdits = $this->setUpTopEdits($topEditsRepo, $autoEditsHelper);
         $topEdits->prepareData();
 
-        $this->addApiWarningAboutPageTitles();
         return $this->getFormattedApiResponse([
             'top_edits' => (object)$topEdits->getTopEdits(),
         ]);
@@ -312,15 +312,12 @@ class TopEditsController extends XtoolsController
         $this->recordApiUsage('user/topedits');
 
         $topEdits = $this->setUpTopEdits($topEditsRepo, $autoEditsHelper);
-        $topEdits->prepareData(false);
+        $topEdits->prepareData();
 
-        $this->addApiWarningAboutDates(['timestamp']);
-        if (false !== strpos($this->page->getTitle(true), '_')) {
-            $this->addFlash('warning', 'In XTools 3.20, the page property will be returned ' .
-                'with spaces instead of underscores.');
-        }
         return $this->getFormattedApiResponse([
-            'top_edits' => $topEdits->getTopEdits(),
+            'top_edits' => array_map(function (Edit $edit) {
+                return $edit->getForJson();
+            }, $topEdits->getTopEdits()),
         ]);
     }
 }
