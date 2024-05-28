@@ -94,6 +94,7 @@ class PageInfoControllerTest extends ControllerTestAdapter
         }
 
         $this->assertSuccessfulRoutes([
+            '/api/page/pageinfo/en.wikipedia/Ravine_du_Sud?format=html',
             '/api/page/prose/en.wikipedia/Ravine_du_Sud',
             '/api/page/assessments/en.wikipedia/Ravine_du_Sud',
             '/api/page/links/en.wikipedia/Ravine_du_Sud',
