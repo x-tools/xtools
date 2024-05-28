@@ -10,7 +10,7 @@
 
 {% if not project.userHasOptedIn(user) %}
     {{ wiki.userOptedOut(project, user) }}
-{% elseif ec.monthTotals|length > 0 %}
+{% elseif ec.monthCounts.monthLabels|length > 0 %}
     <table class="sr-only">
         <thead>
             <tr>
@@ -22,11 +22,11 @@
             </tr>
         </thead>
         <tbody>
-            {% for month,namespaces in ec.monthCountsWithNamespaces %}
+            {% for month,counts in ec.monthCountsWithNamespaces %}
                 <tr>
                     <td>{{ month }}</td>
-                    <td>{{ ec.monthTotals[month]|num_format }}</td>
-                    {% for _ns,count in namespaces %}
+                    <td>{{ counts|reduce((carry, v) => carry + v)|num_format }}</td>
+                    {% for _ns,count in counts %}
                         <td>{{ count|num_format }}</td>
                     {% endfor %}
                 </tr>
@@ -51,23 +51,20 @@
             var maxTotal = 0;
 
             // Format data for use in charts.
-            {% for nsId,namespaceData in ec.monthCounts.totals %}
+            {% for nsId,months in ec.monthCounts.totals %}
                 var dataset = {
                     label: "{{ nsName(nsId, project.namespaces) }}",
                     backgroundColor: "{{ color(nsId) }}",
                     data: []
                 };
 
-                {% for year,yearData in namespaceData %}
-                    {% for month,monthData in yearData %}
-                        dataset.data.push({{ monthData }});
-
-                        // Determine maximum value for the totals. This is needed
-                        //   so that we know how much spacing to add in the labels.
-                        if ({{ monthData }} > maxTotal) {
-                            maxTotal = {{ monthData }};
-                        }
-                    {% endfor %}
+                {% for month,count in months %}
+                    dataset.data.push({{ count }});
+                    // Determine maximum value for the totals. This is needed
+                    //   so that we know how much spacing to add in the labels.
+                    if ({{ count }} > maxTotal) {
+                        maxTotal = {{ count }};
+                    }
                 {%- endfor -%}
 
                 datasets.push(dataset);

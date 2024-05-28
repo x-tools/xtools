@@ -90,13 +90,23 @@ class AutoEditsTest extends TestAdapter
             'comment' => 'Test',
         ];
 
-        $this->aeRepo->expects(static::exactly(2))
+        $this->aeRepo->expects(static::once())
             ->method('getNonAutomatedEdits')
             ->willReturn([$rev]);
 
         $autoEdits = $this->getAutoEdits();
         $rawEdits = $autoEdits->getNonAutomatedEdits(true);
-        static::assertArraySubset($rev, $rawEdits[0]);
+        static::assertSame([
+            'page_title' => 'Test page',
+            'namespace' => 0,
+            'username' => 'Test user',
+            'rev_id' => 123,
+            'timestamp' => '2017-01-01T00:00:00Z',
+            'minor' => false,
+            'length' => 5,
+            'length_change' => -5,
+            'comment' => 'Test',
+        ], $rawEdits[0]);
 
         $page = Page::newFromRow($this->pageRepo, $this->project, [
             'page_title' => 'Test_page',
@@ -158,13 +168,23 @@ class AutoEditsTest extends TestAdapter
             'comment' => 'Test ([[WP:TW|TW]])',
         ];
 
-        $this->aeRepo->expects(static::exactly(2))
+        $this->aeRepo->expects(static::once())
             ->method('getAutomatedEdits')
             ->willReturn([$rev]);
 
         $autoEdits = $this->getAutoEdits();
-        $rawEdits = $autoEdits->getAutomatedEdits(true);
-        static::assertArraySubset($rev, $rawEdits[0]);
+        $editObjs = $autoEdits->getAutomatedEdits(true);
+        static::assertSame([
+            'page_title' => 'Test page',
+            'namespace' => 1,
+            'username' => 'Test user',
+            'rev_id' => 123,
+            'timestamp' => '2017-01-01T00:00:00Z',
+            'minor' => false,
+            'length' => 5,
+            'length_change' => -5,
+            'comment' => 'Test ([[WP:TW|TW]])',
+        ], $editObjs[0]);
 
         $page = Page::newFromRow($this->pageRepo, $this->project, [
             'page_title' => 'Test_page',

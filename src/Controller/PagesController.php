@@ -119,7 +119,7 @@ class PagesController extends XtoolsController
      *         "deleted"="|all|live|deleted",
      *         "start"="|\d{4}-\d{2}-\d{2}",
      *         "end"="|\d{4}-\d{2}-\d{2}",
-     *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}",
+     *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
      *     },
      *     defaults={
      *         "namespace"=0,
@@ -283,8 +283,8 @@ class PagesController extends XtoolsController
      *         @OA\Property(property="namespace", ref="#/components/schemas/Namespace"),
      *         @OA\Property(property="redirects", ref="#/components/parameters/Redirects/schema"),
      *         @OA\Property(property="deleted", ref="#components/parameters/Deleted/schema"),
-     *         @OA\Property(property="start", ref="#components/parameters/start/schema"),
-     *         @OA\Property(property="end", ref="#components/parameters/end/schema"),
+     *         @OA\Property(property="start", ref="#components/parameters/Start/schema"),
+     *         @OA\Property(property="end", ref="#components/parameters/End/schema"),
      *         @OA\Property(property="counts", type="object", example={
      *             "0": {
      *                 "count": 5,
@@ -335,7 +335,7 @@ class PagesController extends XtoolsController
      *         "deleted"="|all|live|deleted",
      *         "start"="|\d{4}-\d{2}-\d{2}",
      *         "end"="|\d{4}-\d{2}-\d{2}",
-     *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}",
+     *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
      *     },
      *     defaults={
      *         "namespace"=0,
@@ -401,8 +401,6 @@ class PagesController extends XtoolsController
             $ret['continue'] = $pages->getLastTimestamp();
         }
 
-        $this->addApiWarningAboutDates(['timestamp']);
-        $this->addApiWarningAboutPageTitles();
         return $this->getFormattedApiResponse($ret);
     }
 

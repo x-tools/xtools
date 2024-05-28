@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace App\Model;
 
-use App\Helper\I18nHelper;
 use App\Repository\EditSummaryRepository;
 use DateTime;
 
@@ -13,8 +12,6 @@ use DateTime;
  */
 class EditSummary extends Model
 {
-    protected I18nHelper $i18n;
-
     /** @var int Number of edits from present to consider as 'recent'. */
     protected int $numEditsRecent;
 
@@ -43,7 +40,6 @@ class EditSummary extends Model
      * @param EditSummaryRepository $repository
      * @param Project $project The project we're working with.
      * @param User $user The user to process.
-     * @param I18nHelper $i18n
      * @param int|string $namespace Namespace ID or 'all' for all namespaces.
      * @param int|false $start Start date as Unix timestamp.
      * @param int|false $end End date as Unix timestamp.
@@ -53,7 +49,6 @@ class EditSummary extends Model
         EditSummaryRepository $repository,
         Project $project,
         User $user,
-        I18nHelper $i18n,
         $namespace,
         $start = false,
         $end = false,
@@ -62,7 +57,6 @@ class EditSummary extends Model
         $this->repository = $repository;
         $this->project = $project;
         $this->user = $user;
-        $this->i18n = $i18n;
         $this->namespace = $namespace;
         $this->start = $start;
         $this->end = $end;
@@ -214,7 +208,7 @@ class EditSummary extends Model
         // Extract the date out of the date field
         $timestamp = DateTime::createFromFormat('YmdHis', $row['rev_timestamp']);
 
-        $monthKey = $this->i18n->dateFormat($timestamp, 'yyyy-MM');
+        $monthKey = $timestamp->format('Y-m');
 
         // Grand total for number of edits
         $this->data['total_edits']++;

@@ -129,7 +129,7 @@ class GlobalContribsController extends XtoolsController
      *         "namespace"="|all|\d+",
      *         "start"="|\d*|\d{4}-\d{2}-\d{2}",
      *         "end"="|\d{4}-\d{2}-\d{2}",
-     *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}",
+     *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
      *     },
      *     defaults={
      *         "namespace"="all",
@@ -174,7 +174,7 @@ class GlobalContribsController extends XtoolsController
      *         "namespace"="|all|\d+",
      *         "start"="|\d*|\d{4}-\d{2}-\d{2}",
      *         "end"="|\d{4}-\d{2}-\d{2}",
-     *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}",
+     *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
      *     },
      *     defaults={
      *         "namespace"="all",
@@ -231,12 +231,10 @@ class GlobalContribsController extends XtoolsController
 
         $results = $globalContribs->globalEdits();
         $results = array_map(function (Edit $edit) {
-            return $edit->getForJson(true, true);
+            return $edit->getForJson(true);
         }, array_values($results));
         $results = $this->addFullPageTitlesAndContinue('globalcontribs', [], $results);
 
-        $this->addApiWarningAboutDates(['timestamp']);
-        $this->addApiWarningAboutPageTitles();
         return $this->getFormattedApiResponse($results);
     }
 }

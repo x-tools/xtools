@@ -472,7 +472,7 @@ class XtoolsControllerTest extends ControllerTestAdapter
                     'timestamp' => '2020-01-03T12:59:59',
                 ],
             ],
-            'continue' => '2020-01-03T12:59:59',
+            'continue' => '2020-01-03T12:59:59Z',
         ], $newOut);
     }
 

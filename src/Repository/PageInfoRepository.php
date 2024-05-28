@@ -304,8 +304,8 @@ class PageInfoRepository extends AutoEditsRepository
         $sql = "SELECT *, (
                     SELECT user_editcount
                     FROM $userTable
-                    WHERE user_id = author_user_id
-                ) AS author_editcount
+                    WHERE user_id = creator_user_id
+                ) AS creator_editcount
                 FROM (
                     (
                         SELECT COUNT(rev_id) AS num_edits,
@@ -320,8 +320,8 @@ class PageInfoRepository extends AutoEditsRepository
                     (
                         # With really old pages, the rev_timestamp may need to be sorted ASC,
                         #   and the lowest rev_id may not be the first revision.
-                        SELECT actor_name AS author,
-                               actor_user AS author_user_id,
+                        SELECT actor_name AS creator,
+                               actor_user AS creator_user_id,
                                rev_timestamp AS created_at,
                                rev_id AS created_rev_id
                         FROM $revTable

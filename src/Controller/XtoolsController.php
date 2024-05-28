@@ -954,6 +954,9 @@ abstract class XtoolsController extends AbstractController
             } elseif (is_string($value) && false !== strpos($value, '|')) {
                 // Any pipe-separated values should be returned as an array.
                 $params[$param] = explode('|', $value);
+            } elseif ($value instanceof DateTime) {
+                // Convert DateTime objects to ISO 8601 strings.
+                $params[$param] = $value->format('Y-m-d\TH:i:s\Z');
             }
         }
 
@@ -1003,7 +1006,7 @@ abstract class XtoolsController extends AbstractController
             // Use the timestamp of the last Edit as the value for the 'continue' return key,
             //   which can be used as a value for 'offset' in order to paginate results.
             $timestamp = array_slice($out[$key], -1, 1)[0]['timestamp'];
-            $out['continue'] = (new DateTime($timestamp))->format('Y-m-d\TH:i:s');
+            $out['continue'] = (new DateTime($timestamp))->format('Y-m-d\TH:i:s\Z');
         }
 
         return $out;
@@ -1052,24 +1055,5 @@ abstract class XtoolsController extends AbstractController
             $msg = $this->i18n->msg($key, $vars);
         }
         $this->addFlash($type, $msg);
-    }
-
-    /**
-     * @todo To be removed in XTools 3.20
-     * @param array $keys
-     */
-    protected function addApiWarningAboutDates(array $keys): void
-    {
-        $this->addFlash('warning', 'In XTools 3.20, the ' . $this->i18n->getIntuition()->listToText($keys) .
-            ' properties will be returned in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ');
-    }
-
-    /**
-     * @todo To be removed in XTools 3.20
-     */
-    protected function addApiWarningAboutPageTitles(): void
-    {
-        $this->addFlash('warning', 'In XTools 3.20, full_page_title and page_title will return ' .
-            'page titles with spaces instead of underscores.');
     }
 }

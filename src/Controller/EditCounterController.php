@@ -694,7 +694,7 @@ class EditCounterController extends XtoolsController
      *     methods={"GET"}
      * )
      * @OA\Tag(name="User API")
-     * @OA\Get(description="Get the number of edits a user has made grouped by namespace, year, and month.")
+     * @OA\Get(description="Get the number of edits a user has made grouped by namespace and month.")
      * @OA\Parameter(ref="#/components/parameters/Project")
      * @OA\Parameter(ref="#/components/parameters/UsernameOrIp")
      * @OA\Response(
@@ -705,10 +705,15 @@ class EditCounterController extends XtoolsController
      *         @OA\Property(property="username", ref="#/components/parameters/UsernameOrIp/schema"),
      *         @OA\Property(property="totals", type="object", example={
      *             "0": {
-     *                 "2020": {"1": 40, "12": 50},
-     *                 "2021": {"1": 5, "12": 25}
+     *                 "2020-11": 40,
+     *                 "2020-12": 50,
+     *                 "2021-01": 5
      *             },
-     *             "3": {"2022": {"1": 1, "12": 4}}
+     *             "3": {
+     *                 "2020-11": 0,
+     *                 "2020-12": 10,
+     *                 "2021-01": 0
+     *             }
      *         })
      *     )
      * )
@@ -738,8 +743,6 @@ class EditCounterController extends XtoolsController
         // Ensure 'totals' keys are strings, see T292031.
         $ret['totals'] = (object)$ret['totals'];
 
-        $this->addFlash('warning', 'In XTools 3.20, the totals property will return an array '
-            . "keyed by namespace and then year/month in the format 'YYYY-MM' with the count as values.");
         return $this->getFormattedApiResponse($ret);
     }
 

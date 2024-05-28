@@ -248,7 +248,7 @@ class PageInfoController extends XtoolsController
      *         @OA\Property(property="created_rev_id", type="integer"),
      *         @OA\Property(property="modified_at", type="date"),
      *         @OA\Property(property="secs_since_last_edit", type="integer"),
-     *         @OA\Property(property="last_edit_id", type="integer"),
+     *         @OA\Property(property="modified_rev_id", type="integer"),
      *         @OA\Property(property="assessment", type="object", example={
      *             "value":"FA",
      *             "color": "#9CBDFF",
@@ -290,12 +290,6 @@ class PageInfoController extends XtoolsController
             return $this->getApiHtmlResponse($this->project, $this->page, $data);
         }
 
-        $this->addApiWarningAboutDates(['created_at', 'modified_at']);
-        $this->addFlash('warning', 'In XTools 3.20, the author and author_editcount properties will be ' .
-            'renamed to creator and creator_editcount, respectively.');
-        $this->addFlash('warning', 'In XTools 3.20, the last_edit_id property will be renamed to modified_rev_id');
-        $this->addFlash('warning', 'In XTools 3.20, the watchers property will return null instead of 0 ' .
-            'if the number of page watchers is unknown.');
         return $this->getFormattedApiResponse($data);
     }
 
@@ -523,11 +517,11 @@ class PageInfoController extends XtoolsController
      *                 "minor": 15,
      *                 "first_edit": {
      *                     "id": 12345,
-     *                     "timestamp": 20200101125959
+     *                     "timestamp": "2020-01-01T12:59:59Z"
      *                 },
      *                 "last_edit": {
      *                     "id": 54321,
-     *                     "timestamp": 20200120125959
+     *                     "timestamp": "2020-01-20T12:59:59Z"
      *                 }
      *             }
      *         }),
@@ -554,7 +548,6 @@ class PageInfoController extends XtoolsController
             $this->getBoolVal('nobots')
         );
 
-        $this->addApiWarningAboutDates(['timestamp']);
         return $this->getFormattedApiResponse([
             'top_editors' => $topEditors,
         ]);

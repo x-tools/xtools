@@ -49,17 +49,15 @@ class PageInfoControllerTest extends ControllerTestAdapter
         static::assertEquals($data['page'], 'Main Page');
         static::assertTrue($data['revisions'] > 4000);
         static::assertTrue($data['editors'] > 400);
-        static::assertEquals($data['author'], 'TwoOneTwo');
-        static::assertEquals($data['created_at'], '2002-01-26');
+        static::assertEquals($data['creator'], 'TwoOneTwo');
+        static::assertEquals($data['created_at'], '2002-01-26T15:28:12Z');
         static::assertEquals($data['created_rev_id'], 139992);
 
         static::assertEquals(
             [
-                // 'warning' is only temporary so that API deprecations can be announced. To be removed in v3.20
-                'warning',
                 'project', 'page', 'watchers', 'pageviews', 'pageviews_offset',  'revisions', 'editors',
-                'ip_edits', 'minor_edits', 'author', 'author_editcount', 'created_at',  'created_rev_id',
-                'modified_at', 'secs_since_last_edit', 'last_edit_id', 'assessment', 'elapsed_time',
+                'ip_edits', 'minor_edits', 'creator', 'creator_editcount', 'created_at',  'created_rev_id',
+                'modified_at', 'secs_since_last_edit', 'modified_rev_id', 'assessment', 'elapsed_time',
             ],
             array_keys($data)
         );

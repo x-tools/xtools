@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace App\Tests\Model;
 
-use App\Helper\I18nHelper;
 use App\Model\EditSummary;
 use App\Model\Project;
 use App\Model\User;
@@ -38,16 +37,10 @@ class EditSummaryTest extends TestAdapter
         $userRepo = $this->createMock(UserRepository::class);
         $this->user = new User($userRepo, 'Test user');
         $editSummaryRepo = $this->createMock(EditSummaryRepository::class);
-        $session = $this->createSession(static::createClient());
-        $ti18nHelper = new I18nHelper(
-            $this->getRequestStack($session),
-            static::getContainer()->getParameter('kernel.project_dir')
-        );
         $this->editSummary = new EditSummary(
             $editSummaryRepo,
             $this->project,
             $this->user,
-            $ti18nHelper,
             'all',
             false,
             false,

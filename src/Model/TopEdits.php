@@ -139,7 +139,7 @@ class TopEdits extends Model
 
     /**
      * Get the top edits data.
-     * @return array|Edit[]
+     * @return Edit[]
      */
     public function getTopEdits(): array
     {
@@ -181,25 +181,21 @@ class TopEdits extends Model
      * Fetch and store all the data we need to show the TopEdits view.
      * This is the public method that should be called before using
      * the getter methods.
-     * @param bool $format Whether to format the results, including stats for
-     *     number of reverts, etc. This is set to false for the API endpoints.
      */
-    public function prepareData(bool $format = true): void
+    public function prepareData(): void
     {
         if (isset($this->page)) {
-            $this->topEdits = $this->getTopEditsPage($format);
+            $this->topEdits = $this->getTopEditsPage();
         } else {
-            $this->topEdits = $this->getTopEditsNamespace($format);
+            $this->topEdits = $this->getTopEditsNamespace();
         }
     }
 
     /**
      * Get the top edits by a user in the given namespace, or 'all' namespaces.
-     * @param bool $format Whether to format the results, including stats for
-     *     number of reverts, etc. This is set to false for the API endpoint.
      * @return string[] Results keyed by namespace.
      */
-    private function getTopEditsNamespace(bool $format): array
+    private function getTopEditsNamespace(): array
     {
         if ('all' === $this->namespace) {
             $pages = $this->repository->getTopEditsAllNamespaces(
@@ -221,11 +217,7 @@ class TopEdits extends Model
             );
         }
 
-        if ($format) {
-            return $this->formatTopPagesNamespace($pages);
-        } else {
-            return $pages;
-        }
+        return $this->formatTopPagesNamespace($pages);
     }
 
     /**
@@ -249,11 +241,9 @@ class TopEdits extends Model
 
     /**
      * Get the top edits to the given page.
-     * @param bool $format Whether to format the results, including stats for
-     *     number of reverts, etc. This is set to false for the API endpoint.
      * @return Edit[]
      */
-    private function getTopEditsPage(bool $format = true): array
+    private function getTopEditsPage(): array
     {
         $revs = $this->repository->getTopEditsPage(
             $this->page,
@@ -262,15 +252,7 @@ class TopEdits extends Model
             $this->end
         );
 
-        if ($format) {
-            return $this->formatTopEditsPage($revs);
-        } else {
-            return array_map(function ($rev) {
-                $rev['minor'] = (bool)$rev['minor'];
-                $rev['reverted'] = (bool)$rev['reverted'];
-                return $rev;
-            }, $revs);
-        }
+        return $this->formatTopEditsPage($revs);
     }
 
     /**
@@ -341,14 +323,15 @@ class TopEdits extends Model
 
         foreach ($pages as $page) {
             $nsId = (int)$page['namespace'];
+            $page['page_title'] = str_replace('_', ' ', $page['page_title']);
 
             // FIXME: needs refactoring, done in PagesController::getPagepileResult() and AppExtension::titleWithNs().
             if (0 === $nsId) {
                 $page['full_page_title'] = $page['page_title'];
             } else {
-                $page['full_page_title'] = (
+                $page['full_page_title'] = str_replace('_', ' ', (
                     $this->project->getNamespaces()[$page['namespace']] ?? ''
-                ).':'.$page['page_title'];
+                ).':'.$page['page_title']);
             }
 
             if (array_key_exists('pa_class', $page)) {

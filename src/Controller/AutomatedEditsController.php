@@ -158,7 +158,7 @@ class AutomatedEditsController extends XtoolsController
      *         "namespace"="|all|\d+",
      *         "start"="|\d{4}-\d{2}-\d{2}",
      *         "end"="|\d{4}-\d{2}-\d{2}",
-     *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}",
+     *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
      *     },
      *     defaults={"namespace"=0, "start"=false, "end"=false, "offset"=false}
      * )
@@ -189,7 +189,7 @@ class AutomatedEditsController extends XtoolsController
      *       "namespace"="|all|\d+",
      *       "start"="|\d{4}-\d{2}-\d{2}",
      *       "end"="|\d{4}-\d{2}-\d{2}",
-     *       "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}",
+     *       "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
      *   },
      *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=false}
      * )
@@ -214,7 +214,7 @@ class AutomatedEditsController extends XtoolsController
      *       "namespace"="|all|\d+",
      *       "start"="|\d{4}-\d{2}-\d{2}",
      *       "end"="|\d{4}-\d{2}-\d{2}",
-     *       "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}",
+     *       "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
      *   },
      *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=false}
      * )
@@ -402,10 +402,9 @@ class AutomatedEditsController extends XtoolsController
         $results = $this->autoEdits->getNonAutomatedEdits(true);
         $out = $this->addFullPageTitlesAndContinue('nonautomated_edits', [], $results);
         if (count($results) === $this->limit) {
-            $out['continue'] = (new DateTime(end($results)['timestamp']))->format('Y-m-d\TH:i:s');
+            $out['continue'] = (new DateTime(end($results)['timestamp']))->format('Y-m-d\TH:i:s\Z');
         }
 
-        $this->addApiWarnings();
         return $this->getFormattedApiResponse($out);
     }
 
@@ -419,7 +418,7 @@ class AutomatedEditsController extends XtoolsController
      *       "namespace"="|all|\d+",
      *       "start"="|\d{4}-\d{2}-\d{2}",
      *       "end"="|\d{4}-\d{2}-\d{2}",
-     *       "offset"="|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}",
+     *       "offset"="|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}Z?",
      *   },
      *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=false, "limit"=50},
      *   methods={"GET"}
@@ -477,17 +476,9 @@ class AutomatedEditsController extends XtoolsController
         $results = $this->autoEdits->getAutomatedEdits(true);
         $out = $this->addFullPageTitlesAndContinue('automated_edits', $extras, $results);
         if (count($results) === $this->limit) {
-            $out['continue'] = (new DateTime(end($results)['timestamp']))->format('Y-m-d\TH:i:s');
+            $out['continue'] = (new DateTime(end($results)['timestamp']))->format('Y-m-d\TH:i:s\Z');
         }
 
-        $this->addApiWarnings();
         return $this->getFormattedApiResponse($out);
-    }
-
-    private function addApiWarnings(): void
-    {
-        $this->addApiWarningAboutDates(['timestamp']);
-        $this->addApiWarningAboutPageTitles();
-        $this->addFlash('warning', 'In XTools 3.20, the minor property will return a boolean instead of 0 or 1.');
     }
 }

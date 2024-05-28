@@ -150,7 +150,7 @@
                         {% for month, counts in es.monthCounts %}
                             <tr>
                                 <td class="sort-entry--month" data-value="{{ month|replace({'-': ''}) }}">
-                                    {{ month }}
+                                    {{ (month~'-01')|date_format('yyyy-MM') }}
                                 </td>
                                 <td class="sort-entry--total-edits" data-value="{{ counts.total }}">
                                     {{ counts.total|num_format }}

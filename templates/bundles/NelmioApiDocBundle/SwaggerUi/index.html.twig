@@ -1,5 +1,21 @@
 {% extends '@!NelmioApiDoc/SwaggerUi/index.html.twig' %}
 
+{% block stylesheets %}
+    {{ nelmioAsset(assets_mode, 'swagger-ui/swagger-ui.css') }}
+    {{ nelmioAsset(assets_mode, 'style.css') }}
+    <style>
+        body {
+            background: url('{{ asset('/build/images/gradient.png') }}');
+        }
+        header::before {
+            background: #fff url('{{ asset('/build/images/gradient.png') }}');
+        }
+        header #logo img {
+            background: transparent;
+        }
+    </style>
+{% endblock %}
+
 {% block swagger_initialization %}
     <script type="text/javascript">
         window.onload = loadSwaggerUI({

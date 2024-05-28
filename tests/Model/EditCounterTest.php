@@ -269,66 +269,51 @@ class EditCounterTest extends TestAdapter
         // Mock current time by passing it in (dummy parameter, so to speak).
         $monthCounts = $this->editCounter->monthCounts($mockTime);
 
-        // Make sure zeros were filled in for months with no edits,
-        //   and for each namespace.
+        // Make sure zeros were filled in for months with no edits, and for each namespace.
         static::assertArraySubset(
             [
-                1 => 0,
-                2 => 0,
-                3 => 20,
-                4 => 0,
+                '2017-01' => 0,
+                '2017-02' => 0,
+                '2017-03' => 20,
+                '2017-04' => 0,
             ],
-            $monthCounts['totals'][0][2017]
+            $monthCounts['totals'][0]
         );
         static::assertArraySubset(
             [
-                12 => 0,
+                '2016-12' => 0,
             ],
-            $monthCounts['totals'][1][2016]
+            $monthCounts['totals'][1]
         );
 
         // Assert only active months are reported.
-        static::assertEquals([12], array_keys($monthCounts['totals'][0][2016]));
-        static::assertEquals(['01', '02', '03', '04'], array_keys($monthCounts['totals'][0][2017]));
-
-        // Assert that only active years are reported
-        static::assertEquals([2016, 2017], array_keys($monthCounts['totals'][0]));
+        static::assertArrayNotHasKey('2016-11', $monthCounts['totals'][0]);
+        static::assertArrayHasKey('2016-12', $monthCounts['totals'][0]);
+        static::assertArrayHasKey('2017-04', $monthCounts['totals'][0]);
+        static::assertArrayNotHasKey('2017-05', $monthCounts['totals'][0]);
 
         // Assert that only active namespaces are reported.
-        static::assertEquals([0, 1], array_keys($monthCounts['totals']));
+        static::assertSame([0, 1], array_keys($monthCounts['totals']));
 
         // Labels for the months
-        static::assertEquals(
+        static::assertSame(
             ['2016-12', '2017-01', '2017-02', '2017-03', '2017-04'],
             $monthCounts['monthLabels']
         );
 
         // Labels for the years
-        static::assertEquals(['2016', '2017'], $monthCounts['yearLabels']);
+        static::assertSame(['2016', '2017'], $monthCounts['yearLabels']);
 
         // Month counts by namespace.
         $monthsWithNamespaces = $this->editCounter->monthCountsWithNamespaces($mockTime);
-        static::assertEquals(
+        static::assertSame(
             $monthCounts['monthLabels'],
             array_keys($monthsWithNamespaces)
         );
-        static::assertEquals([0, 1], array_keys($monthsWithNamespaces['2017-03']));
-
-        // Month totals.
-        $monthTotals = $this->editCounter->monthTotals($mockTime);
-        static::assertEquals(
-            [
-                '2016-12' => 10,
-                '2017-01' => 0,
-                '2017-02' => 50,
-                '2017-03' => 20,
-                '2017-04' => 0,
-            ],
-            $monthTotals
-        );
+        static::assertSame([0, 1], array_keys($monthsWithNamespaces['2017-03']));
 
         $yearTotals = $this->editCounter->yearTotals($mockTime);
-        static::assertEquals(['2016' => 10, '2017' => 70], $yearTotals);
+        static::assertSame(['2016' => 10, '2017' => 70], $yearTotals);
     }
 
     /**
@@ -368,8 +353,7 @@ class EditCounterTest extends TestAdapter
         // Mock current time by passing it in (dummy parameter, so to speak).
         $yearCounts = $this->editCounter->yearCounts(new DateTime('2017-04-30 23:59:59'));
 
-        // Make sure zeros were filled in for months with no edits,
-        //   and for each namespace.
+        // Make sure zeros were filled in for months with no edits, and for each namespace.
         static::assertArraySubset(
             [
                 2015 => 0,
