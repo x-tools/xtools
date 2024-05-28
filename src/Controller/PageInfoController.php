@@ -6,11 +6,11 @@ namespace App\Controller;
 
 use App\Exception\XtoolsHttpException;
 use App\Helper\AutomatedEditsHelper;
-use App\Model\ArticleInfo;
 use App\Model\Authorship;
 use App\Model\Page;
+use App\Model\PageInfo;
 use App\Model\Project;
-use App\Repository\ArticleInfoRepository;
+use App\Repository\PageInfoRepository;
 use GuzzleHttp\Exception\ServerException;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,11 +19,11 @@ use Symfony\Component\Routing\Annotation\Route;
 use Twig\Markup;
 
 /**
- * This controller serves the search form and results for the ArticleInfo tool
+ * This controller serves the search form and results for the PageInfo tool
  */
-class ArticleInfoController extends XtoolsController
+class PageInfoController extends XtoolsController
 {
-    protected ArticleInfo $articleInfo;
+    protected PageInfo $pageInfo;
 
     /**
      * @inheritDoc
@@ -31,26 +31,27 @@ class ArticleInfoController extends XtoolsController
      */
     public function getIndexRoute(): string
     {
-        return 'ArticleInfo';
+        return 'PageInfo';
     }
 
     /**
      * The search form.
-     * @Route("/articleinfo", name="ArticleInfo")
-     * @Route("/articleinfo/index.php", name="articleInfoIndexPhp")
-     * @Route("/articleinfo/{project}", name="ArticleInfoProject")
+     * @Route("/pageinfo", name="PageInfo")
+     * @Route("/pageinfo/{project}", name="PageInfoProject")
+     * @Route("/articleinfo", name="PageInfoLegacy")
+     * @Route("/articleinfo/index.php", name="PageInfoLegacyPhp")
      * @return Response
      */
     public function indexAction(): Response
     {
         if (isset($this->params['project']) && isset($this->params['page'])) {
-            return $this->redirectToRoute('ArticleInfoResult', $this->params);
+            return $this->redirectToRoute('PageInfoResult', $this->params);
         }
 
-        return $this->render('articleInfo/index.html.twig', array_merge([
-            'xtPage' => 'ArticleInfo',
-            'xtPageTitle' => 'tool-articleinfo',
-            'xtSubtitle' => 'tool-articleinfo-desc',
+        return $this->render('pageInfo/index.html.twig', array_merge([
+            'xtPage' => 'PageInfo',
+            'xtPageTitle' => 'tool-pageinfo',
+            'xtSubtitle' => 'tool-pageinfo-desc',
 
             // Defaults that will get overridden if in $params.
             'start' => '',
@@ -60,21 +61,21 @@ class ArticleInfoController extends XtoolsController
     }
 
     /**
-     * Setup the ArticleInfo instance and its Repository.
-     * @param ArticleInfoRepository $articleInfoRepo
+     * Setup the PageInfo instance and its Repository.
+     * @param PageInfoRepository $pageInfoRepo
      * @param AutomatedEditsHelper $autoEditsHelper
      * @codeCoverageIgnore
      */
-    private function setupArticleInfo(
-        ArticleInfoRepository $articleInfoRepo,
+    private function setupPageInfo(
+        PageInfoRepository $pageInfoRepo,
         AutomatedEditsHelper $autoEditsHelper
     ): void {
-        if (isset($this->articleInfo)) {
+        if (isset($this->pageInfo)) {
             return;
         }
 
-        $this->articleInfo = new ArticleInfo(
-            $articleInfoRepo,
+        $this->pageInfo = new PageInfo(
+            $pageInfoRepo,
             $this->i18n,
             $autoEditsHelper,
             $this->page,
@@ -84,18 +85,18 @@ class ArticleInfoController extends XtoolsController
     }
 
     /**
-     * Generate ArticleInfo gadget script for use on-wiki. This automatically points the
+     * Generate PageInfo gadget script for use on-wiki. This automatically points the
      * script to this installation's API.
      *
-     * @Route("/articleinfo-gadget.js", name="ArticleInfoGadget")
-     * @link https://www.mediawiki.org/wiki/XTools/ArticleInfo_gadget
+     * @Route("/pageinfo-gadget.js", name="PageInfoGadget")
+     * @link https://www.mediawiki.org/wiki/XTools/PageInfo_gadget
      *
      * @return Response
      * @codeCoverageIgnore
      */
     public function gadgetAction(): Response
     {
-        $rendered = $this->renderView('articleInfo/articleinfo.js.twig');
+        $rendered = $this->renderView('pageInfo/pageinfo.js.twig');
         $response = new Response($rendered);
         $response->headers->set('Content-Type', 'text/javascript');
         return $response;
@@ -104,7 +105,7 @@ class ArticleInfoController extends XtoolsController
     /**
      * Display the results in given date range.
      * @Route(
-     *    "/articleinfo/{project}/{page}/{start}/{end}", name="ArticleInfoResult",
+     *    "/pageinfo/{project}/{page}/{start}/{end}", name="PageInfoResult",
      *     requirements={
      *         "page"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
      *         "start"="|\d{4}-\d{2}-\d{2}",
@@ -115,30 +116,42 @@ class ArticleInfoController extends XtoolsController
      *         "end"=false,
      *     }
      * )
-     * @param ArticleInfoRepository $articleInfoRepo
+     * @Route(
+     *     "/articleinfo/{project}/{page}/{start}/{end}", name="PageInfoResultLegacy",
+     *      requirements={
+     *          "page"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
+     *          "start"="|\d{4}-\d{2}-\d{2}",
+     *          "end"="|\d{4}-\d{2}-\d{2}",
+     *      },
+     *      defaults={
+     *          "start"=false,
+     *          "end"=false,
+     *      }
+     *  )
+     * @param PageInfoRepository $pageInfoRepo
      * @param AutomatedEditsHelper $autoEditsHelper
      * @return Response
      * @codeCoverageIgnore
      */
     public function resultAction(
-        ArticleInfoRepository $articleInfoRepo,
+        PageInfoRepository $pageInfoRepo,
         AutomatedEditsHelper $autoEditsHelper
     ): Response {
         if (!$this->isDateRangeValid($this->page, $this->start, $this->end)) {
             $this->addFlashMessage('notice', 'date-range-outside-revisions');
 
-            return $this->redirectToRoute('ArticleInfo', [
+            return $this->redirectToRoute('PageInfo', [
                 'project' => $this->request->get('project'),
             ]);
         }
 
-        $this->setupArticleInfo($articleInfoRepo, $autoEditsHelper);
-        $this->articleInfo->prepareData();
+        $this->setupPageInfo($pageInfoRepo, $autoEditsHelper);
+        $this->pageInfo->prepareData();
 
         $maxRevisions = $this->getParameter('app.max_page_revisions');
 
         // Show message if we hit the max revisions.
-        if ($this->articleInfo->tooManyRevisions()) {
+        if ($this->pageInfo->tooManyRevisions()) {
             $this->addFlashMessage('notice', 'too-many-revisions', [
                 $this->i18n->numberFormat($maxRevisions),
                 $maxRevisions,
@@ -146,40 +159,40 @@ class ArticleInfoController extends XtoolsController
         }
 
         // For when there is very old data (2001 era) which may cause miscalculations.
-        if ($this->articleInfo->getFirstEdit()->getYear() < 2003) {
+        if ($this->pageInfo->getFirstEdit()->getYear() < 2003) {
             $this->addFlashMessage('warning', 'old-page-notice');
         }
 
         // When all username info has been hidden (see T303724).
-        if (0 === $this->articleInfo->getNumEditors()) {
+        if (0 === $this->pageInfo->getNumEditors()) {
             $this->addFlashMessage('warning', 'error-usernames-missing');
-        } elseif ($this->articleInfo->numDeletedRevisions()) {
+        } elseif ($this->pageInfo->numDeletedRevisions()) {
             $link = new Markup(
                 $this->renderView('flashes/deleted_data.html.twig', [
-                    'numRevs' => $this->articleInfo->numDeletedRevisions(),
+                    'numRevs' => $this->pageInfo->numDeletedRevisions(),
                 ]),
                 'UTF-8'
             );
             $this->addFlashMessage(
                 'warning',
                 $link,
-                [$this->articleInfo->numDeletedRevisions(), $link]
+                [$this->pageInfo->numDeletedRevisions(), $link]
             );
         }
 
         $ret = [
-            'xtPage' => 'ArticleInfo',
+            'xtPage' => 'PageInfo',
             'xtTitle' => $this->page->getTitle(),
             'project' => $this->project,
             'editorlimit' => (int)$this->request->query->get('editorlimit', 20),
             'botlimit' => $this->request->query->get('botlimit', 10),
             'pageviewsOffset' => 60,
-            'ai' => $this->articleInfo,
-            'showAuthorship' => Authorship::isSupportedPage($this->page) && $this->articleInfo->getNumEditors() > 0,
+            'ai' => $this->pageInfo,
+            'showAuthorship' => Authorship::isSupportedPage($this->page) && $this->pageInfo->getNumEditors() > 0,
         ];
 
         // Output the relevant format template.
-        return $this->getFormattedResponse('articleInfo/result', $ret);
+        return $this->getFormattedResponse('pageInfo/result', $ret);
     }
 
     /**
@@ -199,15 +212,21 @@ class ArticleInfoController extends XtoolsController
     /**
      * Get basic information about a page.
      * @Route(
-     *     "/api/page/articleinfo/{project}/{page}",
-     *     name="PageApiArticleInfo",
+     *     "/api/page/pageinfo/{project}/{page}",
+     *     name="PageApiPageInfo",
      *     requirements={"page"=".+"},
      *     methods={"GET"}
      * )
+     * @Route(
+     *      "/api/page/articleinfo/{project}/{page}",
+     *      name="PageApiPageInfoLegacy",
+     *      requirements={"page"=".+"},
+     *      methods={"GET"}
+     *  )
      * @OA\Get(description="Get basic information about the history of a page.
             See also the [pageviews](https://w.wiki/6o9k) and [edit data](https://w.wiki/6o9m) REST APIs.")
      * @OA\Tag(name="Page API")
-     * @OA\ExternalDocumentation(url="https://www.mediawiki.org/wiki/XTools/API/Page#Article_info")
+     * @OA\ExternalDocumentation(url="https://www.mediawiki.org/wiki/XTools/API/Page#Page_info")
      * @OA\Parameter(ref="#/components/parameters/Project")
      * @OA\Parameter(ref="#/components/parameters/Page")
      * @OA\Parameter(name="format", in="query", @OA\Schema(default="json", type="string", enum={"json","html"}))
@@ -243,23 +262,23 @@ class ArticleInfoController extends XtoolsController
      * @OA\Response(response=404, ref="#/components/responses/404")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param ArticleInfoRepository $articleInfoRepo
+     * @param PageInfoRepository $pageInfoRepo
      * @param AutomatedEditsHelper $autoEditsHelper
      * @return Response|JsonResponse
-     * See ArticleInfoControllerTest::testArticleInfoApi()
+     * See PageInfoControllerTest::testPageInfoApi()
      * @codeCoverageIgnore
      */
-    public function articleInfoApiAction(
-        ArticleInfoRepository $articleInfoRepo,
+    public function pageInfoApiAction(
+        PageInfoRepository $pageInfoRepo,
         AutomatedEditsHelper $autoEditsHelper
     ): Response {
-        $this->recordApiUsage('page/articleinfo');
+        $this->recordApiUsage('page/pageinfo');
 
-        $this->setupArticleInfo($articleInfoRepo, $autoEditsHelper);
+        $this->setupPageInfo($pageInfoRepo, $autoEditsHelper);
         $data = [];
 
         try {
-            $data = $this->articleInfo->getArticleInfoApiData($this->project, $this->page);
+            $data = $this->pageInfo->getPageInfoApiData($this->project, $this->page);
         } catch (ServerException $e) {
             // The Wikimedia action API can fail for any number of reasons. To our users
             // any ServerException means the data could not be fetched, so we capture it here
@@ -271,7 +290,6 @@ class ArticleInfoController extends XtoolsController
             return $this->getApiHtmlResponse($this->project, $this->page, $data);
         }
 
-        $this->addFlash('warning', 'In XTools 3.20, this endpoint will be renamed to /api/page/pageinfo');
         $this->addApiWarningAboutDates(['created_at', 'modified_at']);
         $this->addFlash('warning', 'In XTools 3.20, the author and author_editcount properties will be ' .
             'renamed to creator and creator_editcount, respectively.');
@@ -282,7 +300,7 @@ class ArticleInfoController extends XtoolsController
     }
 
     /**
-     * Get the Response for the HTML output of the ArticleInfo API action.
+     * Get the Response for the HTML output of the PageInfo API action.
      * @param Project $project
      * @param Page $page
      * @param string[] $data The pre-fetched data.
@@ -291,7 +309,7 @@ class ArticleInfoController extends XtoolsController
      */
     private function getApiHtmlResponse(Project $project, Page $page, array $data): Response
     {
-        $response = $this->render('articleInfo/api.html.twig', [
+        $response = $this->render('pageInfo/api.html.twig', [
             'project' => $project,
             'page' => $page,
             'data' => $data,
@@ -308,7 +326,7 @@ class ArticleInfoController extends XtoolsController
     }
 
     /**
-     * Get prose statistics for the given article.
+     * Get prose statistics for the given page.
      * @Route(
      *     "/api/page/prose/{project}/{page}",
      *     name="PageApiProse",
@@ -337,21 +355,21 @@ class ArticleInfoController extends XtoolsController
      *     )
      * )
      * @OA\Response(response=404, ref="#/components/responses/404")
-     * @param ArticleInfoRepository $articleInfoRepo
+     * @param PageInfoRepository $pageInfoRepo
      * @param AutomatedEditsHelper $autoEditsHelper
      * @return JsonResponse
      * @codeCoverageIgnore
      */
     public function proseStatsApiAction(
-        ArticleInfoRepository $articleInfoRepo,
+        PageInfoRepository $pageInfoRepo,
         AutomatedEditsHelper $autoEditsHelper
     ): JsonResponse {
         $responseCode = Response::HTTP_OK;
         $this->recordApiUsage('page/prose');
-        $this->setupArticleInfo($articleInfoRepo, $autoEditsHelper);
+        $this->setupPageInfo($pageInfoRepo, $autoEditsHelper);
         $this->addFlash('info', 'The algorithm used by this API has recently changed. ' .
             'See https://www.mediawiki.org/wiki/XTools/Page_History#Prose for details.');
-        $ret = $this->articleInfo->getProseStats();
+        $ret = $this->pageInfo->getProseStats();
         if (null === $ret) {
             $this->addFlashMessage('error', 'api-error-wikimedia');
             $responseCode = Response::HTTP_BAD_GATEWAY;
@@ -519,19 +537,19 @@ class ArticleInfoController extends XtoolsController
      * @OA\Response(response=404, ref="#/components/responses/404")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param ArticleInfoRepository $articleInfoRepo
+     * @param PageInfoRepository $pageInfoRepo
      * @param AutomatedEditsHelper $autoEditsHelper
      * @return JsonResponse
      * @codeCoverageIgnore
      */
     public function topEditorsApiAction(
-        ArticleInfoRepository $articleInfoRepo,
+        PageInfoRepository $pageInfoRepo,
         AutomatedEditsHelper $autoEditsHelper
     ): JsonResponse {
         $this->recordApiUsage('page/top_editors');
 
-        $this->setupArticleInfo($articleInfoRepo, $autoEditsHelper);
-        $topEditors = $this->articleInfo->getTopEditorsByEditCount(
+        $this->setupPageInfo($pageInfoRepo, $autoEditsHelper);
+        $topEditors = $this->pageInfo->getTopEditorsByEditCount(
             (int)$this->limit,
             $this->getBoolVal('nobots')
         );
@@ -586,19 +604,19 @@ class ArticleInfoController extends XtoolsController
      * @OA\Response(response=404, ref="#/components/responses/404")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param ArticleInfoRepository $articleInfoRepo
+     * @param PageInfoRepository $pageInfoRepo
      * @param AutomatedEditsHelper $autoEditsHelper
      * @return JsonResponse
      * @codeCoverageIgnore
      */
     public function botDataApiAction(
-        ArticleInfoRepository $articleInfoRepo,
+        PageInfoRepository $pageInfoRepo,
         AutomatedEditsHelper $autoEditsHelper
     ): JsonResponse {
         $this->recordApiUsage('page/bot_data');
 
-        $this->setupArticleInfo($articleInfoRepo, $autoEditsHelper);
-        $bots = $this->articleInfo->getBots();
+        $this->setupPageInfo($pageInfoRepo, $autoEditsHelper);
+        $bots = $this->pageInfo->getBots();
 
         return $this->getFormattedApiResponse([
             'bots' => $bots,
@@ -641,20 +659,20 @@ class ArticleInfoController extends XtoolsController
      * @OA\Response(response=404, ref="#/components/responses/404")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param ArticleInfoRepository $articleInfoRepo
+     * @param PageInfoRepository $pageInfoRepo
      * @param AutomatedEditsHelper $autoEditsHelper
      * @return JsonResponse
      * @codeCoverageIgnore
      */
     public function getAutoEdits(
-        ArticleInfoRepository $articleInfoRepo,
+        PageInfoRepository $pageInfoRepo,
         AutomatedEditsHelper $autoEditsHelper
     ): JsonResponse {
         $this->recordApiUsage('page/auto_edits');
 
-        $this->setupArticleInfo($articleInfoRepo, $autoEditsHelper);
+        $this->setupPageInfo($pageInfoRepo, $autoEditsHelper);
         return $this->getFormattedApiResponse([
-            'automated_tools' => $this->articleInfo->getAutoEditsCounts(),
+            'automated_tools' => $this->pageInfo->getAutoEditsCounts(),
         ]);
     }
 }

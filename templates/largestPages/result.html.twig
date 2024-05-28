@@ -72,7 +72,7 @@
                             <td>
                                 {{ wiki.pageHistLinkRaw(page.title(true), project) }}
                                 &middot;
-                                <a href="{{ url('ArticleInfoResult', {'project': project.domain, 'page': page.title(true)}) }}">{{ msg('tool-articleinfo') }}</a>
+                                <a href="{{ url('PageInfoResult', {'project': project.domain, 'page': page.title(true)}) }}">{{ msg('tool-pageinfo') }}</a>
                             </td>
                         </tr>
                     {% endfor %}

@@ -1,7 +1,7 @@
 {% import 'macros/wiki.html.twig' as wiki %}
-<span style="line-height:20px">{% if data.assessment is defined and data.assessment is not empty and data.assessment.badge is not empty and data.assessment.value != '???' %}<a target="_blank" title="{{ msg('assessment') }}: {{ data.assessment.value }}" href="{{ url('ArticleInfoResult', { 'project': project.domain, 'page': page.title }) }}"><img src="{{ data.assessment.badge }}" style="height:16px !important; vertical-align:-4px; margin-right:3px"/></a>{% else %}<a target="_blank" href="{{ url('homepage') }}"><img src="https://upload.wikimedia.org/wikipedia/commons/e/ed/XTools_logo_%28icon%29.png" style="height:16px !important; vertical-align:-4px; margin-right:3px"/></a>{% endif %}
+<span style="line-height:20px">{% if data.assessment is defined and data.assessment is not empty and data.assessment.badge is not empty and data.assessment.value != '???' %}<a target="_blank" title="{{ msg('assessment') }}: {{ data.assessment.value }}" href="{{ url('PageInfoResult', { 'project': project.domain, 'page': page.title }) }}"><img src="{{ data.assessment.badge }}" style="height:16px !important; vertical-align:-4px; margin-right:3px"/></a>{% else %}<a target="_blank" href="{{ url('homepage') }}"><img src="https://upload.wikimedia.org/wikipedia/commons/e/ed/XTools_logo_%28icon%29.png" style="height:16px !important; vertical-align:-4px; margin-right:3px"/></a>{% endif %}
 {% if data.error is defined or data.revisions is not defined %}
-{{ msg('error-articleinfo-api') }}
+{{ msg('error-pageinfo-api') }}
 {% else -%}
     {% if data.created_at is empty %}{#-
         -#}{{ data.revisions|num_format }} {{ msg('num-revisions', [data.revisions]) }}{{ msg('comma-character') }}
@@ -23,5 +23,5 @@
     (<a target="_blank" title="{{ msg('approximate') }}" href="{{ url('EditCounterResult', { 'project': project.domain, 'username': data.author }) }}">{{ data.author_editcount|num_format }}</a>){% endif %}
 {% endif %}
  &middot;
-<a target="_blank" href="{{ url('ArticleInfoResult', { 'project': project.domain, 'page': page.title }) }}">{{ msg('see-full-page-stats') }}</a>
+<a target="_blank" href="{{ url('PageInfoResult', { 'project': project.domain, 'page': page.title }) }}">{{ msg('see-full-page-stats') }}</a>
 </span>

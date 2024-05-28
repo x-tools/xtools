@@ -266,7 +266,7 @@ xtools.application.setupColumnSorting = function () {
 /**
  * Floating table of contents.
  *
- * Example usage (see articleInfo/result.html.twig for more):
+ * Example usage (see pageInfo/result.html.twig for more):
  *     <p class="text-center xt-heading-subtitle">
  *         ...
  *     </p>
@@ -440,7 +440,7 @@ function setupProjectListener()
         setupNamespaceSelector();
         // Otherwise, if there's a user or page input field, we still need to update `apiPath`
         // for the user input autocompletion when the project is changed.
-    } else if ($('#user_input')[0] || $('#article_input')[0]) {
+    } else if ($('#user_input')[0] || $('#page_input')[0]) {
         // keep track of last valid project
         xtools.application.vars.lastProject = $projectInput.val();
 
@@ -539,18 +539,18 @@ function revertToValidProject(newProject)
  */
 function setupAutocompletion()
 {
-    var $articleInput = $('#article_input'),
+    var $pageInput = $('#page_input'),
         $userInput = $('#user_input'),
         $namespaceInput = $("#namespace_select");
 
     // Make sure typeahead-compatible fields are present
-    if (!$articleInput[0] && !$userInput[0] && !$('#project_input')[0]) {
+    if (!$pageInput[0] && !$userInput[0] && !$('#project_input')[0]) {
         return;
     }
 
     // Destroy any existing instances
-    if ($articleInput.data('typeahead')) {
-        $articleInput.data('typeahead').destroy();
+    if ($pageInput.data('typeahead')) {
+        $pageInput.data('typeahead').destroy();
     }
     if ($userInput.data('typeahead')) {
         $userInput.data('typeahead').destroy();
@@ -558,7 +558,7 @@ function setupAutocompletion()
 
     // set initial value for the API url, which is put as a data attribute in forms.html.twig
     if (!xtools.application.vars.apiPath) {
-        xtools.application.vars.apiPath = $('#article_input').data('api') || $('#user_input').data('api');
+        xtools.application.vars.apiPath = $('#page_input').data('api') || $('#user_input').data('api');
     }
 
     // Defaults for typeahead options. preDispatch and preProcess will be
@@ -572,8 +572,8 @@ function setupAutocompletion()
         preProcess: null
     };
 
-    if ($articleInput[0]) {
-        $articleInput.typeahead({
+    if ($pageInput[0]) {
+        $pageInput.typeahead({
             ajax: Object.assign(typeaheadOpts, {
                 preDispatch: function (query) {
                     // If there is a namespace selector, make sure we search

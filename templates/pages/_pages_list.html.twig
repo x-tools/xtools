@@ -108,9 +108,9 @@
                             {% if not(page.deleted) or (page.recreated is defined and page.recreated == true) %}
                                 &middot;
                                 {{ wiki.pageHistLinkRaw(pagename, project) }}
-                                {% if enabled('ArticleInfo') %}
+                                {% if enabled('PageInfo') %}
                                     &middot;
-                                    <a href="{{ path('ArticleInfoResult', { 'project': project.domain, 'page': pagename }) }}">{{ msg('tool-articleinfo') }}</a>
+                                    <a href="{{ path('PageInfoResult', { 'project': project.domain, 'page': pagename }) }}">{{ msg('tool-pageinfo') }}</a>
                                 {% endif %}
                                 {% if enabled('TopEdits') %}
                                     &middot;

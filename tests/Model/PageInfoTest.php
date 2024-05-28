@@ -6,13 +6,13 @@ namespace App\Tests\Model;
 
 use App\Exception\BadGatewayException;
 use App\Helper\I18nHelper;
-use App\Model\ArticleInfo;
-use App\Model\ArticleInfoApi;
 use App\Model\Edit;
 use App\Model\Page;
+use App\Model\PageInfo;
+use App\Model\PageInfoApi;
 use App\Model\Project;
-use App\Repository\ArticleInfoRepository;
 use App\Repository\EditRepository;
+use App\Repository\PageInfoRepository;
 use App\Repository\PageRepository;
 use App\Repository\UserRepository;
 use App\Tests\TestAdapter;
@@ -21,16 +21,16 @@ use GuzzleHttp;
 use ReflectionClass;
 
 /**
- * Tests for ArticleInfo.
- * @covers \App\Model\ArticleInfo
- * @covers \App\Model\ArticleInfoApi
+ * Tests for PageInfo.
+ * @covers \App\Model\PageInfo
+ * @covers \App\Model\PageInfoApi
  */
-class ArticleInfoTest extends TestAdapter
+class PageInfoTest extends TestAdapter
 {
     use ArraySubsetAsserts;
 
-    protected ArticleInfo $articleInfo;
-    protected ArticleInfoRepository $articleInfoRepo;
+    protected PageInfo $pageInfo;
+    protected PageInfoRepository $pageInfoRepo;
     protected EditRepository $editRepo;
     protected Page $page;
     protected PageRepository $pageRepo;
@@ -55,19 +55,19 @@ class ArticleInfoTest extends TestAdapter
         $this->editRepo->method('getAutoEditsHelper')
             ->willReturn($autoEditsHelper);
         $this->userRepo = $this->createMock(UserRepository::class);
-        $this->articleInfoRepo = $this->createMock(ArticleInfoRepository::class);
-        $this->articleInfoRepo->method('getMaxPageRevisions')
+        $this->pageInfoRepo = $this->createMock(PageInfoRepository::class);
+        $this->pageInfoRepo->method('getMaxPageRevisions')
             ->willReturn(static::getContainer()->getParameter('app.max_page_revisions'));
-        $this->articleInfo = new ArticleInfo(
-            $this->articleInfoRepo,
+        $this->pageInfo = new PageInfo(
+            $this->pageInfoRepo,
             $i18nHelper,
             $autoEditsHelper,
             $this->page
         );
 
         // Don't care that private methods "shouldn't" be tested...
-        // In ArticleInfo they are all super test-worthy and otherwise fragile.
-        $this->reflectionClass = new ReflectionClass($this->articleInfo);
+        // In PageInfo they are all super test-worthy and otherwise fragile.
+        $this->reflectionClass = new ReflectionClass($this->pageInfo);
     }
 
     /**
@@ -78,9 +78,9 @@ class ArticleInfoTest extends TestAdapter
         $this->pageRepo->expects($this->once())
             ->method('getNumRevisions')
             ->willReturn(10);
-        static::assertEquals(10, $this->articleInfo->getNumRevisions());
+        static::assertEquals(10, $this->pageInfo->getNumRevisions());
         // Should be cached (will error out if repo's getNumRevisions is called again).
-        static::assertEquals(10, $this->articleInfo->getNumRevisions());
+        static::assertEquals(10, $this->pageInfo->getNumRevisions());
     }
 
     /**
@@ -93,7 +93,7 @@ class ArticleInfoTest extends TestAdapter
     {
         $this->pageRepo->method('getNumRevisions')->willReturn($numRevisions);
         static::assertEquals(
-            $this->articleInfo->getNumRevisionsProcessed(),
+            $this->pageInfo->getNumRevisionsProcessed(),
             $assertion
         );
     }
@@ -118,7 +118,7 @@ class ArticleInfoTest extends TestAdapter
         $this->pageRepo->expects($this->once())
             ->method('getNumRevisions')
             ->willReturn(1000000);
-        static::assertTrue($this->articleInfo->tooManyRevisions());
+        static::assertTrue($this->pageInfo->tooManyRevisions());
     }
 
     /**
@@ -139,7 +139,7 @@ class ArticleInfoTest extends TestAdapter
 
         static::assertEquals(
             15,
-            $this->articleInfo->getBotRevisionCount($bots)
+            $this->pageInfo->getBotRevisionCount($bots)
         );
     }
 
@@ -154,10 +154,10 @@ class ArticleInfoTest extends TestAdapter
                 'redirects_count' => 0,
             ]);
         $this->page->setRepository($this->pageRepo);
-        static::assertEquals(5, $this->articleInfo->linksExtCount());
-        static::assertEquals(3, $this->articleInfo->linksOutCount());
-        static::assertEquals(10, $this->articleInfo->linksInCount());
-        static::assertEquals(0, $this->articleInfo->redirectsCount());
+        static::assertEquals(5, $this->pageInfo->linksExtCount());
+        static::assertEquals(3, $this->pageInfo->linksOutCount());
+        static::assertEquals(10, $this->pageInfo->linksInCount());
+        static::assertEquals(0, $this->pageInfo->redirectsCount());
     }
 
     /**
@@ -167,39 +167,39 @@ class ArticleInfoTest extends TestAdapter
     {
         $edits = $this->setupData();
 
-        static::assertEquals(3, $this->articleInfo->getNumEditors());
-        static::assertEquals(2, $this->articleInfo->getAnonCount());
-        static::assertEquals(40, $this->articleInfo->anonPercentage());
-        static::assertEquals(3, $this->articleInfo->getMinorCount());
-        static::assertEquals(60, $this->articleInfo->minorPercentage());
-        static::assertEquals(1, $this->articleInfo->getBotRevisionCount());
-        static::assertEquals(93, $this->articleInfo->getTotalDays());
-        static::assertEquals(18, (int) $this->articleInfo->averageDaysPerEdit());
-        static::assertEquals(0, (int) $this->articleInfo->editsPerDay());
-        static::assertEquals(1.6, $this->articleInfo->editsPerMonth());
-        static::assertEquals(5, $this->articleInfo->editsPerYear());
-        static::assertEquals(1.7, $this->articleInfo->editsPerEditor());
-        static::assertEquals(2, $this->articleInfo->getAutomatedCount());
-        static::assertEquals(1, $this->articleInfo->getRevertCount());
+        static::assertEquals(3, $this->pageInfo->getNumEditors());
+        static::assertEquals(2, $this->pageInfo->getAnonCount());
+        static::assertEquals(40, $this->pageInfo->anonPercentage());
+        static::assertEquals(3, $this->pageInfo->getMinorCount());
+        static::assertEquals(60, $this->pageInfo->minorPercentage());
+        static::assertEquals(1, $this->pageInfo->getBotRevisionCount());
+        static::assertEquals(93, $this->pageInfo->getTotalDays());
+        static::assertEquals(18, (int) $this->pageInfo->averageDaysPerEdit());
+        static::assertEquals(0, (int) $this->pageInfo->editsPerDay());
+        static::assertEquals(1.6, $this->pageInfo->editsPerMonth());
+        static::assertEquals(5, $this->pageInfo->editsPerYear());
+        static::assertEquals(1.7, $this->pageInfo->editsPerEditor());
+        static::assertEquals(2, $this->pageInfo->getAutomatedCount());
+        static::assertEquals(1, $this->pageInfo->getRevertCount());
 
-        static::assertEquals(80, $this->articleInfo->topTenPercentage());
-        static::assertEquals(4, $this->articleInfo->getTopTenCount());
+        static::assertEquals(80, $this->pageInfo->topTenPercentage());
+        static::assertEquals(4, $this->pageInfo->getTopTenCount());
 
         static::assertEquals(
             $edits[0]->getId(),
-            $this->articleInfo->getFirstEdit()->getId()
+            $this->pageInfo->getFirstEdit()->getId()
         );
         static::assertEquals(
             $edits[4]->getId(),
-            $this->articleInfo->getLastEdit()->getId()
+            $this->pageInfo->getLastEdit()->getId()
         );
 
-        static::assertEquals(1, $this->articleInfo->getMaxAddition()->getId());
-        static::assertEquals(32, $this->articleInfo->getMaxDeletion()->getId());
+        static::assertEquals(1, $this->pageInfo->getMaxAddition()->getId());
+        static::assertEquals(32, $this->pageInfo->getMaxDeletion()->getId());
 
         static::assertEquals(
             ['Mick Jagger', '192.168.0.1', '192.168.0.2'],
-            array_keys($this->articleInfo->getEditors())
+            array_keys($this->pageInfo->getEditors())
         );
         static::assertEquals(
             [
@@ -207,7 +207,7 @@ class ArticleInfoTest extends TestAdapter
                 'value' => 2,
                 'percentage' => 50,
             ],
-            $this->articleInfo->topTenEditorsByEdits()[0]
+            $this->pageInfo->topTenEditorsByEdits()[0]
         );
         static::assertEquals(
             [
@@ -215,33 +215,33 @@ class ArticleInfoTest extends TestAdapter
                 'value' => 30,
                 'percentage' => 100,
             ],
-            $this->articleInfo->topTenEditorsByAdded()[0]
+            $this->pageInfo->topTenEditorsByAdded()[0]
         );
 
         // Top 10 counts should not include bots.
         static::assertFalse(
             array_search(
                 'XtoolsBot',
-                array_column($this->articleInfo->topTenEditorsByEdits(), 'label')
+                array_column($this->pageInfo->topTenEditorsByEdits(), 'label')
             )
         );
         static::assertFalse(
             array_search(
                 'XtoolsBot',
-                array_column($this->articleInfo->topTenEditorsByAdded(), 'label')
+                array_column($this->pageInfo->topTenEditorsByAdded(), 'label')
             )
         );
 
-        static::assertEquals(['Mick Jagger'], $this->articleInfo->getHumans(1));
+        static::assertEquals(['Mick Jagger'], $this->pageInfo->getHumans(1));
 
-        static::assertEquals(3, $this->articleInfo->getMaxEditsPerMonth());
+        static::assertEquals(3, $this->pageInfo->getMaxEditsPerMonth());
 
         static::assertContains(
             'AutoWikiBrowser',
-            array_keys($this->articleInfo->getTools())
+            array_keys($this->pageInfo->getTools())
         );
 
-        static::assertEquals(1, $this->articleInfo->numDeletedRevisions());
+        static::assertEquals(1, $this->pageInfo->numDeletedRevisions());
     }
 
     /**
@@ -251,10 +251,10 @@ class ArticleInfoTest extends TestAdapter
     {
         $this->setupData();
 
-        $yearMonthCounts = $this->articleInfo->getYearMonthCounts();
+        $yearMonthCounts = $this->pageInfo->getYearMonthCounts();
 
         static::assertEquals([2016], array_keys($yearMonthCounts));
-        static::assertEquals(['2016'], $this->articleInfo->getYearLabels());
+        static::assertEquals(['2016'], $this->pageInfo->getYearLabels());
         static::assertArraySubset([
             'all' => 5,
             'minor' => 3,
@@ -269,7 +269,7 @@ class ArticleInfoTest extends TestAdapter
         );
         static::assertEquals(
             ['2016-07', '2016-08', '2016-09', '2016-10', '2016-11', '2016-12'],
-            $this->articleInfo->getMonthLabels()
+            $this->pageInfo->getMonthLabels()
         );
 
         // Just test a few, not every month.
@@ -295,7 +295,7 @@ class ArticleInfoTest extends TestAdapter
     {
         $this->setupData();
 
-        $this->articleInfoRepo->expects($this->once())
+        $this->pageInfoRepo->expects($this->once())
             ->method('getLogEvents')
             ->willReturn([
                 [
@@ -314,9 +314,9 @@ class ArticleInfoTest extends TestAdapter
 
         $method = $this->reflectionClass->getMethod('setLogsEvents');
         $method->setAccessible(true);
-        $method->invoke($this->articleInfo);
+        $method->invoke($this->pageInfo);
 
-        $yearMonthCounts = $this->articleInfo->getYearMonthCounts();
+        $yearMonthCounts = $this->pageInfo->getYearMonthCounts();
 
         // Just test a few, not every month.
         static::assertEquals([
@@ -330,7 +330,7 @@ class ArticleInfoTest extends TestAdapter
      * Use ReflectionClass to set up some data and populate the class properties for testing.
      *
      * We don't care that private methods "shouldn't" be tested...
-     * In ArticleInfo the update methods are all super test-worthy and otherwise fragile.
+     * In PageInfo the update methods are all super test-worthy and otherwise fragile.
      *
      * @return Edit[] Array of Edit objects that represent the revision history.
      */
@@ -399,33 +399,33 @@ class ArticleInfoTest extends TestAdapter
 
         $prop = $this->reflectionClass->getProperty('firstEdit');
         $prop->setAccessible(true);
-        $prop->setValue($this->articleInfo, $edits[0]);
+        $prop->setValue($this->pageInfo, $edits[0]);
 
         $prop = $this->reflectionClass->getProperty('numRevisionsProcessed');
         $prop->setAccessible(true);
-        $prop->setValue($this->articleInfo, 5);
+        $prop->setValue($this->pageInfo, 5);
 
         $prop = $this->reflectionClass->getProperty('bots');
         $prop->setAccessible(true);
-        $prop->setValue($this->articleInfo, [
+        $prop->setValue($this->pageInfo, [
             'XtoolsBot' => ['count' => 1],
         ]);
 
         $prop = $this->reflectionClass->getProperty('numDeletedRevisions');
         $prop->setAccessible(true);
-        $prop->setValue($this->articleInfo, 1);
+        $prop->setValue($this->pageInfo, 1);
 
         $method = $this->reflectionClass->getMethod('updateCounts');
         $method->setAccessible(true);
-        $prevEdits = $method->invoke($this->articleInfo, $edits[0], $prevEdits);
-        $prevEdits = $method->invoke($this->articleInfo, $edits[1], $prevEdits);
-        $prevEdits = $method->invoke($this->articleInfo, $edits[2], $prevEdits);
-        $prevEdits = $method->invoke($this->articleInfo, $edits[3], $prevEdits);
-        $method->invoke($this->articleInfo, $edits[4], $prevEdits);
+        $prevEdits = $method->invoke($this->pageInfo, $edits[0], $prevEdits);
+        $prevEdits = $method->invoke($this->pageInfo, $edits[1], $prevEdits);
+        $prevEdits = $method->invoke($this->pageInfo, $edits[2], $prevEdits);
+        $prevEdits = $method->invoke($this->pageInfo, $edits[3], $prevEdits);
+        $method->invoke($this->pageInfo, $edits[4], $prevEdits);
 
         $method = $this->reflectionClass->getMethod('doPostPrecessing');
         $method->setAccessible(true);
-        $method->invoke($this->articleInfo);
+        $method->invoke($this->pageInfo);
 
         return $edits;
     }
@@ -452,7 +452,7 @@ class ArticleInfoTest extends TestAdapter
             'references' => 13,
             'unique_references' => 12,
             'sections' => 2,
-        ], $this->articleInfo->getProseStats());
+        ], $this->pageInfo->getProseStats());
     }
 
     /**
@@ -464,22 +464,22 @@ class ArticleInfoTest extends TestAdapter
 
         $prop = $this->reflectionClass->getProperty('start');
         $prop->setAccessible(true);
-        $prop->setValue($this->articleInfo, strtotime('2016-06-30'));
+        $prop->setValue($this->pageInfo, strtotime('2016-06-30'));
 
         $prop = $this->reflectionClass->getProperty('end');
         $prop->setAccessible(true);
-        $prop->setValue($this->articleInfo, strtotime('2016-10-14'));
+        $prop->setValue($this->pageInfo, strtotime('2016-10-14'));
 
-        static::assertTrue($this->articleInfo->hasDateRange());
-        static::assertEquals('2016-06-30', $this->articleInfo->getStartDate());
-        static::assertEquals('2016-10-14', $this->articleInfo->getEndDate());
+        static::assertTrue($this->pageInfo->hasDateRange());
+        static::assertEquals('2016-06-30', $this->pageInfo->getStartDate());
+        static::assertEquals('2016-10-14', $this->pageInfo->getEndDate());
         static::assertEquals([
             'start' => '2016-06-30',
             'end' => '2016-10-14',
-        ], $this->articleInfo->getDateParams());
+        ], $this->pageInfo->getDateParams());
 
         // Uses length of last edit because there is a date range.
-        static::assertEquals(20, $this->articleInfo->getLength());
+        static::assertEquals(20, $this->pageInfo->getLength());
 
         // Pageviews with a date range.
         $this->pageRepo->expects($this->once())
@@ -491,7 +491,7 @@ class ArticleInfoTest extends TestAdapter
                     ['views' => 500],
                 ],
             ]);
-        static::assertEquals(1500, $this->articleInfo->getPageviews()['count']);
+        static::assertEquals(1500, $this->pageInfo->getPageviews()['count']);
     }
 
     /**
@@ -499,19 +499,19 @@ class ArticleInfoTest extends TestAdapter
      */
     public function testTransclusionData(): void
     {
-        $articleInfoRepo = $this->createMock(ArticleInfoRepository::class);
-        $articleInfoRepo->expects(static::once())
+        $pageInfoRepo = $this->createMock(PageInfoRepository::class);
+        $pageInfoRepo->expects(static::once())
             ->method('getTransclusionData')
             ->willReturn([
                 'categories' => 3,
                 'templates' => 5,
                 'files' => 2,
             ]);
-        $this->articleInfo->setRepository($articleInfoRepo);
+        $this->pageInfo->setRepository($pageInfoRepo);
 
-        static::assertEquals(3, $this->articleInfo->getNumCategories());
-        static::assertEquals(5, $this->articleInfo->getNumTemplates());
-        static::assertEquals(2, $this->articleInfo->getNumFiles());
+        static::assertEquals(3, $this->pageInfo->getNumCategories());
+        static::assertEquals(5, $this->pageInfo->getNumTemplates());
+        static::assertEquals(2, $this->pageInfo->getNumFiles());
     }
 
     public function testPageviews(): void
@@ -529,9 +529,9 @@ class ArticleInfoTest extends TestAdapter
             'count' => 1500,
             'formatted' => '1,500',
             'tooltip' => '',
-        ], $this->articleInfo->getPageviews());
+        ], $this->pageInfo->getPageviews());
 
-        static::assertEquals(ArticleInfoApi::PAGEVIEWS_OFFSET, $this->articleInfo->getPageviewsOffset());
+        static::assertEquals(PageInfoApi::PAGEVIEWS_OFFSET, $this->pageInfo->getPageviewsOffset());
     }
 
     public function testPageviewsFailing(): void
@@ -545,6 +545,6 @@ class ArticleInfoTest extends TestAdapter
             'formatted' => 'Data unavailable',
             'tooltip' => 'There was an error connecting to the Pageviews API. ' .
                 'Try refreshing this page or try again later.',
-        ], $this->articleInfo->getPageviews());
+        ], $this->pageInfo->getPageviews());
     }
 }

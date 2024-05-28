@@ -7,8 +7,8 @@ $(function () {
         return;
     }
 
-    // Disable the article input if they select the 'All' namespace option
+    // Disable the page input if they select the 'All' namespace option
     $('#namespace_select').on('change', function () {
-        $('#article_input').prop('disabled', $(this).val() === 'all');
+        $('#page_input').prop('disabled', $(this).val() === 'all');
     });
 });

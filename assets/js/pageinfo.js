@@ -1,7 +1,7 @@
-xtools.articleinfo = {};
+xtools.pageinfo = {};
 
 $(function () {
-    if (!$('body.articleinfo').length) {
+    if (!$('body.pageinfo').length) {
         return;
     }
 
@@ -20,8 +20,8 @@ $(function () {
         /** global: xtBaseUrl */
         var url = xtBaseUrl + 'authorship/'
             + $textsharesContainer.data('project') + '/'
-            + $textsharesContainer.data('article') + '/'
-            + (xtools.articleinfo.endDate ? xtools.articleinfo.endDate + '/' : '');
+            + $textsharesContainer.data('page') + '/'
+            + (xtools.pageinfo.endDate ? xtools.pageinfo.endDate + '/' : '');
         // Remove extraneous forward slash that would cause a 301 redirect, and request over HTTP instead of HTTPS.
         url = `${url.replace(/\/$/, '')}?htmlonly=yes`;
 

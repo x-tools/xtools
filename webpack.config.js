@@ -40,7 +40,7 @@ Encore
         './assets/js/common/application.js',
         './assets/js/common/contributions-lists.js',
         './assets/js/adminstats.js',
-        './assets/js/articleinfo.js',
+        './assets/js/pageinfo.js',
         './assets/js/authorship.js',
         './assets/js/autoedits.js',
         './assets/js/blame.js',
@@ -52,7 +52,7 @@ Encore
 
         // Stylesheets
         './assets/css/application.scss',
-        './assets/css/articleinfo.scss',
+        './assets/css/pageinfo.scss',
         './assets/css/autoedits.scss',
         './assets/css/blame.scss',
         './assets/css/categoryedits.scss',

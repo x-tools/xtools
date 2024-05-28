@@ -43,7 +43,7 @@
 {% endif %}
 {% endif %}
 {% endif %}
-| [{{ wiki.pageLogUrlRaw(pageTitle, project) }} {{ msg('log') }}]{% if not(page.deleted) %} &middot; [{{ wiki.pageHistUrlRaw(pageTitle, project) }} {{ msg('history') }}]{% if enabled('ArticleInfo') %} &middot; [{{ url('ArticleInfoResult', {'project': project.domain, 'page': pageTitle}) }} {{ msg('tool-articleinfo') }}]{% endif %}{% if enabled('TopEdits') %} &middot; [{{ url('topedits', {'project': project.domain, 'username': user.usernameIdent, 'namespace': ns, 'page': page.page_title}) }} {{ msg('tool-topedits') }}]{% endif %}{% if isWMF() %} &middot; [https://pageviews.wmcloud.org/?project={{ project.domain }}&amp;pages={{ pageTitle|e('url') }} {{ msg('pageviews') }}]{% endif %}{% endif %}
+| [{{ wiki.pageLogUrlRaw(pageTitle, project) }} {{ msg('log') }}]{% if not(page.deleted) %} &middot; [{{ wiki.pageHistUrlRaw(pageTitle, project) }} {{ msg('history') }}]{% if enabled('PageInfo') %} &middot; [{{ url('PageInfoResult', {'project': project.domain, 'page': pageTitle}) }} {{ msg('tool-pageinfo') }}]{% endif %}{% if enabled('TopEdits') %} &middot; [{{ url('topedits', {'project': project.domain, 'username': user.usernameIdent, 'namespace': ns, 'page': page.page_title}) }} {{ msg('tool-topedits') }}]{% endif %}{% if isWMF() %} &middot; [https://pageviews.wmcloud.org/?project={{ project.domain }}&amp;pages={{ pageTitle|e('url') }} {{ msg('pageviews') }}]{% endif %}{% endif %}
 
 {% endfor %}
 {% if pages.multiNamespace and pages.counts[ns].count > pages.resultsPerPage %}

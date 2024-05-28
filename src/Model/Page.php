@@ -498,11 +498,11 @@ class Page extends Model
 
     /**
      * Get the sum of pageviews over the last N days
-     * @param int $days Default ArticleInfoApi::PAGEVIEWS_OFFSET
-     * @see ArticleInfoApi::PAGEVIEWS_OFFSET
+     * @param int $days Default PageInfoApi::PAGEVIEWS_OFFSET
      * @return int|null Number of pageviews or null if data is unavailable.
+     *@see PageInfoApi::PAGEVIEWS_OFFSET
      */
-    public function getLatestPageviews(int $days = ArticleInfoApi::PAGEVIEWS_OFFSET): ?int
+    public function getLatestPageviews(int $days = PageInfoApi::PAGEVIEWS_OFFSET): ?int
     {
         $start = date('Ymd', strtotime("-$days days"));
         $end = date('Ymd');

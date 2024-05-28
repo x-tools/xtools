@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace App\Tests\Controller;
 
 /**
- * Integration tests for the ArticleInfoController.
+ * Integration tests for the AuthorshipController.
  * @group integration
  * @covers \App\Controller\AuthorshipController
  */
