@@ -8,7 +8,7 @@
     <header class="panel-heading">
         <div class="text-center xt-heading-top">
             <a target="_blank" href="https://www.mediawiki.org/wiki/Special:MyLanguage/XTools/Page_History" class="pull-right glyphicon glyphicon-question-sign plainlink help-icon"></a>
-            <a class="back-to-search" href="{{ path('ArticleInfo') }}">
+            <a class="back-to-search" href="{{ path('PageInfo') }}">
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 {{ msg('back') }}
             </a>
@@ -445,10 +445,10 @@
         {# ======================== AUTHORSHIP ======================== #}
         {% if showAuthorship %}
             <script>
-                xtools.articleinfo.endDate = {% if ai.end %}"{{ ai.endDate }}"{% else %}null{% endif %};
+                xtools.pageinfo.endDate = {% if ai.end %}"{{ ai.endDate }}"{% else %}null{% endif %};
             </script>
             {% set content %}
-                <div class="textshares-container" data-project="{{ project.domain }}" data-article="{{ page.title }}">
+                <div class="textshares-container" data-project="{{ project.domain }}" data-page="{{ page.title }}">
                     <em class="text-muted">{{ msg('loading') }}...</em>
                 </div>
             {% endset %}
@@ -627,7 +627,7 @@
                 </div>
             {% endset %}
             {% set downloadLink %}
-                {{ layout.downloadLink('ArticleInfoResult', {project:project.domain, page:page.title, start:ai.startDate, end:ai.endDate}, ['wikitext'], 'PageApiTopEditors') }}
+                {{ layout.downloadLink('PageInfoResult', {project:project.domain, page:page.title, start:ai.startDate, end:ai.endDate}, ['wikitext'], 'PageApiTopEditors') }}
             {% endset %}
             {{ layout.content_block('top-editors', content, ['top-editors-desc', downloadLink]) }}
         {% endif %}

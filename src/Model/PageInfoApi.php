@@ -7,18 +7,18 @@ namespace App\Model;
 use App\Exception\BadGatewayException;
 use App\Helper\AutomatedEditsHelper;
 use App\Helper\I18nHelper;
-use App\Repository\ArticleInfoRepository;
+use App\Repository\PageInfoRepository;
 use DateTime;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 /**
- * An ArticleInfoApi is standalone logic for the ArticleInfo tool. These methods perform SQL queries
- * or make API requests and can be called directly, without any knowledge of the child ArticleInfo class.
- * @see ArticleInfo
+ * An PageInfoApi is standalone logic for the PageInfo tool. These methods perform SQL queries
+ * or make API requests and can be called directly, without any knowledge of the child PageInfo class.
+ * @see PageInfo
  */
-class ArticleInfoApi extends Model
+class PageInfoApi extends Model
 {
     /** @var int Number of days of recent data to show for pageviews. */
     public const PAGEVIEWS_OFFSET = 30;
@@ -51,8 +51,8 @@ class ArticleInfoApi extends Model
     protected array $bugs;
 
     /**
-     * ArticleInfoApi constructor.
-     * @param ArticleInfoRepository $repository
+     * PageInfoApi constructor.
+     * @param PageInfoRepository $repository
      * @param I18nHelper $i18n
      * @param AutomatedEditsHelper $autoEditsHelper
      * @param Page $page The page to process.
@@ -60,7 +60,7 @@ class ArticleInfoApi extends Model
      * @param false|int $end End date as Unix timestamp.
      */
     public function __construct(
-        ArticleInfoRepository $repository,
+        PageInfoRepository $repository,
         I18nHelper $i18n,
         AutomatedEditsHelper $autoEditsHelper,
         Page $page,
@@ -270,13 +270,13 @@ class ArticleInfoApi extends Model
     }
 
     /**
-     * Generate the data structure that will used in the ArticleInfo API response.
+     * Generate the data structure that will used in the PageInfo API response.
      * @param Project $project
      * @param Page $page
      * @return array
      * @codeCoverageIgnore
      */
-    public function getArticleInfoApiData(Project $project, Page $page): array
+    public function getPageInfoApiData(Project $project, Page $page): array
     {
         $data = [
             'project' => $project->getDomain(),
@@ -453,7 +453,7 @@ class ArticleInfoApi extends Model
 
     /**
      * Get and set $this->bots about bots that edited the page. This is done separately from the main query because
-     * we use this information when computing the top 10 editors in ArticleInfo, where we don't want to include bots.
+     * we use this information when computing the top 10 editors in PageInfo, where we don't want to include bots.
      * @return array
      */
     public function getBots(): array

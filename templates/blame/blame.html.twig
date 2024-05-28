@@ -41,7 +41,7 @@
                                 <td>
                                     {{ wiki.pageLink(page) }}
                                     ({#
-                                        #}<a href="{{ path('ArticleInfoResult', {project:project.domain, page:page.title}) }}">{{ msg('tool-articleinfo') }}</a>
+                                        #}<a href="{{ path('PageInfoResult', {project:project.domain, page:page.title}) }}">{{ msg('tool-pageinfo') }}</a>
                                         &middot;
                                         <a href="{{ path('AuthorshipResult', {project:project.domain, page:page.title}) }}">{{ msg('tool-authorship') }}</a>{#
                                      #})

@@ -7,9 +7,9 @@ namespace App\Model;
 use DateTime;
 
 /**
- * An ArticleInfo provides statistics about a page on a project.
+ * A PageInfo provides statistics about a page on a project.
  */
-class ArticleInfo extends ArticleInfoApi
+class PageInfo extends PageInfoApi
 {
     /** @var int Number of revisions that were actually processed. */
     protected int $numRevisionsProcessed;
@@ -157,7 +157,7 @@ class ArticleInfo extends ArticleInfoApi
     }
 
     /**
-     * Fetch and store all the data we need to show the ArticleInfo view.
+     * Fetch and store all the data we need to show the PageInfo view.
      * @codeCoverageIgnore
      */
     public function prepareData(): void
@@ -891,7 +891,7 @@ class ArticleInfo extends ArticleInfoApi
     }
 
     /**
-     * Query for log events during each year of the article's history, and set the results in $this->yearMonthCounts.
+     * Query for log events during each year of the page's history, and set the results in $this->yearMonthCounts.
      */
     private function setLogsEvents(): void
     {
@@ -1022,12 +1022,12 @@ class ArticleInfo extends ArticleInfoApi
     }
 
     /**
-     * Get the number of times the page has been viewed in the last ArticleInfoApi::PAGEVIEWS_OFFSET days.
-     * If the ArticleInfo instance has a date range, it is used instead of the last N days.
+     * Get the number of times the page has been viewed in the last PageInfoApi::PAGEVIEWS_OFFSET days.
+     * If the PageInfo instance has a date range, it is used instead of the last N days.
      * To reduce logic in the view, this method returns an array also containing the localized string
      * for the pageviews count, as well as the tooltip to be used on the link to the Pageviews tool.
-     * @see ArticleInfoApi::PAGEVIEWS_OFFSET
      * @return array With keys 'count'<int>, 'formatted'<string> and 'tooltip'<string>
+     *@see PageInfoApi::PAGEVIEWS_OFFSET
      */
     public function getPageviews(): ?array
     {
@@ -1048,12 +1048,12 @@ class ArticleInfo extends ArticleInfoApi
     /**
      * Convenience method for the view to get the value of the offset constant.
      * (Twig code like `ai.PAGEVIEWS_OFFSET` just looks odd!)
-     * @see ArticleInfoApi::PAGEVIEWS_OFFSET
      * @return int
+     *@see PageInfoApi::PAGEVIEWS_OFFSET
      */
     public function getPageviewsOffset(): int
     {
-        return ArticleInfoApi::PAGEVIEWS_OFFSET;
+        return PageInfoApi::PAGEVIEWS_OFFSET;
     }
 
     /**

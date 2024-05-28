@@ -13,7 +13,7 @@ For pull requests
 Please:
 
 * The first line of the commit message should be prefixed with the relevant tool name, where applicable.
-  For example `EditCounter: count abuse filter changes`. Other tool names include `ArticleInfo`,
+  For example `EditCounter: count abuse filter changes`. Other tool names include `PageInfo`,
   `Pages`, `TopEdits`, `AutoEdits`, `CategoryEdits`, `AdminStats`, `AdminScore`, `EditSummary` and `SimpleCounter`.
 * If there is a [Phabricator task](https://phabricator.wikimedia.org/tag/xtools/) associated with the commit,
   the last line of the commit message should be formatted like `Bug: T123` where `T123` is the task number.

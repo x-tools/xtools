@@ -174,7 +174,7 @@ class TopEditsController extends XtoolsController
         $topEdits->prepareData();
 
         // Send all to the template.
-        return $this->getFormattedResponse('topedits/result_article', [
+        return $this->getFormattedResponse('topedits/result_page', [
             'xtPage' => 'TopEdits',
             'xtTitle' => $this->user->getUsername() . ' - ' . $this->page->getTitle(),
             'te' => $topEdits,

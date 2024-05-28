@@ -68,7 +68,7 @@
                         <td>
                             {{ wiki.pageLogLinkRaw(pageTitle, project) }}
                             &middot;
-                            <a href="{{ path('ArticleInfoResult', {project:project.domain, page:pageTitle}) }}">{{ msg('tool-articleinfo') }}</a>
+                            <a href="{{ path('PageInfoResult', {project:project.domain, page:pageTitle}) }}">{{ msg('tool-pageinfo') }}</a>
                             &middot;
                             <a href="{{ path('TopEditsResultPage', {project:project.domain, username:user.usernameIdent, namespace:page.namespace, page:page.page_title}) }}" >{{ msg('tool-topedits') }}</a>
                         </td>

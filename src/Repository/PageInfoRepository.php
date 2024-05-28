@@ -17,11 +17,10 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * ArticleInfoRepository is responsible for retrieving data about a single
- * article on a given wiki.
+ * PageInfoRepository is responsible for retrieving data about a single page on a given wiki.
  * @codeCoverageIgnore
  */
-class ArticleInfoRepository extends AutoEditsRepository
+class PageInfoRepository extends AutoEditsRepository
 {
     protected EditRepository $editRepo;
     protected UserRepository $userRepo;
@@ -348,7 +347,7 @@ class ArticleInfoRepository extends AutoEditsRepository
 
         /**
          * This query can sometimes take too long to run for pages with tens of thousands
-         * of revisions. This query is used by the ArticleInfo gadget, which shows basic
+         * of revisions. This query is used by the PageInfo gadget, which shows basic
          * data in real-time, so if it takes too long than the user probably didn't even
          * wait to see the result. We'll pass 60 as the last parameter to executeProjectsQuery,
          * which will set the max_statement_time to 60 seconds.

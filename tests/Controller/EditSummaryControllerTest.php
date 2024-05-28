@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace App\Tests\Controller;
 
 /**
- * Integration/unit tests for the ArticleInfoController.
+ * Integration/unit tests for the EditSummaryController.
  * @group integration
  * @covers \App\Controller\EditSummaryController
  */

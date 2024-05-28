@@ -2,7 +2,7 @@ parameters:
   tools:
     # This is the order they will appear in the interface.
     - EditCounter
-    - ArticleInfo
+    - PageInfo
     - Authorship
     - Blame
     - GlobalContribs

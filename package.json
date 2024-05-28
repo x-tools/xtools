@@ -1,6 +1,6 @@
 {
   "name": "xtools",
-  "description": "A suite of tools to analyze article, user and project data of MediaWiki websites",
+  "description": "A suite of tools to analyze page, user and project data of MediaWiki websites",
   "license": "GPL-3.0-or-later",
   "repository": {
     "type": "git",

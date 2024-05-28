@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace App\Tests\Controller;
 
 /**
- * Integration/unit tests for the ArticleInfoController.
+ * Integration/unit tests for the MetaController.
  * @group integration
  * @covers \App\Controller\MetaController
  */

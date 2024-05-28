@@ -26,11 +26,11 @@
             <div class="col-lg-6 stat-list clearfix">
                 <table class="table">
                     <tr>
-                        <td>{{ msg('article') }}</td>
+                        <td>{{ msg('page') }}</td>
                         <td>
                             {{ wiki.pageLink(page, page.title) }}
                             <small>({{ wiki.pageLogLink(page) }}
-                            &middot; <a href="{{ path('ArticleInfoResult', {project:project.domain, page:page.title}) }}">{{ msg('tool-articleinfo') }}</a>)</small>
+                            &middot; <a href="{{ path('PageInfoResult', {project:project.domain, page:page.title}) }}">{{ msg('tool-pageinfo') }}</a>)</small>
                         </td>
                     </tr>
                     <tr>
@@ -197,7 +197,7 @@
         {% set downloadLink %}
             {{ layout.downloadLink('TopEditsResultPage', {'project': project.domain, 'username': user.usernameIdent, 'page': page.title, 'namespace': te.namespace, start: te.startDate, end: te.endDate}, [], 'UserApiTopEditsPage') }}
         {% endset %}
-        {{ layout.content_block('topedits-article', content, [msg('topedits-article-desc'), downloadLink], null, false, false) }}
+        {{ layout.content_block('topedits-page', content, [msg('topedits-page-desc'), downloadLink], null, false, false) }}
 
         <div class="text-muted times-in-utc" style="clear:both">
             {{ msg('times-in-utc') }}

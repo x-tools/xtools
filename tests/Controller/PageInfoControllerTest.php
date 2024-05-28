@@ -5,18 +5,18 @@ declare(strict_types = 1);
 namespace App\Tests\Controller;
 
 /**
- * Integration/unit tests for the ArticleInfoController.
+ * Integration/unit tests for the PageInfoController.
  * @group integration
- * @covers \App\Controller\ArticleInfoController
+ * @covers \App\Controller\PageInfoController
  */
-class ArticleInfoControllerTest extends ControllerTestAdapter
+class PageInfoControllerTest extends ControllerTestAdapter
 {
     /**
      * Test that the AdminStats index page displays correctly when given a project.
      */
     public function testProjectIndex(): void
     {
-        $crawler = $this->client->request('GET', '/articleinfo/de.wikipedia');
+        $crawler = $this->client->request('GET', '/pageinfo/de.wikipedia');
         static::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
         if (!static::getContainer()->getParameter('app.is_wmf')) {
@@ -30,14 +30,14 @@ class ArticleInfoControllerTest extends ControllerTestAdapter
     /**
      * Test the method that sets up a AdminStats instance.
      */
-    public function testArticleInfoApi(): void
+    public function testPageInfoApi(): void
     {
         // For now...
         if (!static::getContainer()->getParameter('app.is_wmf')) {
             return;
         }
 
-        $this->client->request('GET', '/api/page/articleinfo/en.wikipedia.org/Main_Page');
+        $this->client->request('GET', '/api/page/pageinfo/en.wikipedia.org/Main_Page');
 
         $response = $this->client->getResponse();
         static::assertEquals(200, $response->getStatusCode());
@@ -75,14 +75,14 @@ class ArticleInfoControllerTest extends ControllerTestAdapter
         }
 
         $this->assertSuccessfulRoutes([
-            '/articleinfo',
-            '/articleinfo/en.wikipedia.org/Ravine du Sud',
-            '/articleinfo/en.wikipedia.org/Ravine du Sud/2018-01-01',
-            '/articleinfo/en.wikipedia.org/Ravine du Sud/2018-01-01?format=wikitext',
+            '/pageinfo',
+            '/pageinfo/en.wikipedia.org/Ravine du Sud',
+            '/pageinfo/en.wikipedia.org/Ravine du Sud/2018-01-01',
+            '/pageinfo/en.wikipedia.org/Ravine du Sud/2018-01-01?format=wikitext',
         ]);
 
         // Should redirect because there are no revisions.
-        $this->client->request('GET', '/articleinfo/en.wikipedia.org/Ravine du Sud/'.date('Y-m-d'));
+        $this->client->request('GET', '/pageinfo/en.wikipedia.org/Ravine du Sud/'.date('Y-m-d'));
         static::assertTrue($this->client->getResponse()->isRedirect());
     }
 

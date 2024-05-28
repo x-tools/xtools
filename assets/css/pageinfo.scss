@@ -1,6 +1,6 @@
 @import 'mixins.scss';
 
-.articleinfo {
+.pageinfo {
     .top-editors-charts {
         display: block;
         margin-bottom: 25px;
@@ -99,7 +99,7 @@
 }
 
 @media (max-width: $bootstrap-sm) {
-    .articleinfo {
+    .pageinfo {
         #year_count_legend {
             margin: 0;
 

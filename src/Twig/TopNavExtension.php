@@ -101,7 +101,7 @@ class TopNavExtension extends AppExtension
 
         $toolsMessages = [
             'Authorship' => 'tool-authorship',
-            'ArticleInfo' => 'tool-articleinfo',
+            'PageInfo' => 'tool-pageinfo',
             'Blame' => 'tool-blame',
         ];
 
