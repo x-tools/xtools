@@ -241,7 +241,7 @@
 	"pages-recreated-desc": "Verschidde geläscht Säite kéinte vun dësem oder engem anere Benotzer nees ugeluecht gi sinn. Déi sinn dann als '$1' markéiert.",
 	"pageviews": "Gekuckt Säiten",
 	"patrol": "Iwwerwaachen",
-	"patrols-desc": "{{PLURAL:$1|Een Artikel|$2 Artikele}} nogekuckt",
+	"patrols-desc": "$2 {{PLURAL:$1|Säit|Säiten}} nogekuckt",
 	"percent-of-edit-count": "% vun der Zuel vun Ännerungen",
 	"percentage": "Prozentsaz",
 	"performer": "Aktive Benotzer",
