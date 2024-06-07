@@ -58,7 +58,6 @@ class DefaultController extends XtoolsController
      * @param ProjectRepository $projectRepo
      * @param string $centralAuthProject
      * @return RedirectResponse
-     * @throws Exception If initialization fails.
      * @codeCoverageIgnore
      */
     public function loginAction(
@@ -70,10 +69,8 @@ class DefaultController extends XtoolsController
         try {
             [ $next, $token ] = $this->getOauthClient($request, $projectRepo, $centralAuthProject)->initiate();
         } catch (Exception $oauthException) {
-            throw $oauthException;
-            // @TODO Make this work.
-            //$this->addFlash('error', $oauthException->getMessage());
-            //return $this->redirectToRoute('homepage');
+            $this->addFlashMessage('notice', 'error-login');
+            return $this->redirectToRoute('homepage');
         }
 
         // Save the request token to the session.
