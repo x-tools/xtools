@@ -1,6 +1,41 @@
 {
 	"@metadata": {
-		"authors": []
+		"authors": [
+			"Rocioun"
+		]
 	},
-	"data-unavailable": "Na gefræge nu"
+	"data-unavailable": "Na gefræge nu",
+	"name": "Nama",
+	"next": "Oþer",
+	"no": "Nese",
+	"other": "Oþer",
+	"others": "Oþre",
+	"page": "Tramet",
+	"redirect": "Edlædung",
+	"redirects": "Edlædunge",
+	"redirfilter-all": "Belucan edlædunge and na-edlædunge",
+	"redirfilter-noredirects": "Asceadan edlædunge",
+	"redirfilter-onlyredirects": "An belucan edlædunge",
+	"reprotect": "Edscildan",
+	"rights": "Riht",
+	"saturday": "Sæterndæg",
+	"sections": "Dælas",
+	"show": "Ætieƿan",
+	"thursday": "Þunresdæg",
+	"tool": "Getaƿa",
+	"tool-about": "Be Xtoole",
+	"tool-authorship": "Ƿriterscip",
+	"tool-error": "Ƿoh",
+	"tool-pageinfo": "Stær trametes",
+	"tool-pages": "Geƿorhte trametas",
+	"tuesday": "Tiƿesdæg",
+	"unknown": "Uncuð",
+	"unprotect": "Don of gescildnesse",
+	"user": "Brucend",
+	"user-groups": "Heapas brucendra",
+	"username": "Brucendes nama",
+	"words": "Ƿord",
+	"xtools-title": "XTools",
+	"year": "Gear",
+	"yes": "Gea"
 }
