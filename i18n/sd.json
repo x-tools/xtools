@@ -172,6 +172,7 @@
 	"none": "ڪوبہ نہ",
 	"notice": "اعلان",
 	"num-bytes": "{{PLURAL:$1|بائيٽ|بائيٽون}}",
+	"num-days": "{{PLURAL:$1|ڏينھن}}",
 	"num-minutes": "{{PLURAL:$1|منٽ}}",
 	"num-months": "{{PLURAL:$1|مھينو|مھينا}}",
 	"num-sitelinks": "\n{{PLURAL:$1|سائيٽ ڳنڍڻو|سائيٽ ڳنڍڻا}}",
