@@ -7,7 +7,7 @@
         -#}{{ data.revisions|num_format }} {{ msg('num-revisions', [data.revisions]) }}{{ msg('comma-character') }}
     {% else %}{#-
         -#}{{ msg('num-revisions-since', [data.revisions|num_format, data.revisions, "<a target='_blank' href='" ~ wiki.pageUrlRaw('Special:PermaLink/' ~ data.created_rev_id, project) ~ "'>" ~ data.created_at|date_format('yyyy-MM-dd') ~ "</a>"]) }}
-        <span style="color:#A2A9B1">(<a href="{{ wiki.pageUrlRaw('Special:Diff/' ~ data.modified_rev_id, project) }}" style="color:#A2A9B1">+{{ formatDuration(data.secs_since_last_edit) }}</a>)</span>{{ msg('comma-character') }}
+        <span style="color: var(--color-subtle, #54595d);">(<a href="{{ wiki.pageUrlRaw('Special:Diff/' ~ data.modified_rev_id, project) }}" style="color: inherit;">+{{ formatDuration(data.secs_since_last_edit) }}</a>)</span>{{ msg('comma-character') }}
         {{ data.editors|num_format }} {{ msg('num-editors', [data.editors]) }}{{ msg('comma-character') }}
     {% endif %}
 {% endif %}
