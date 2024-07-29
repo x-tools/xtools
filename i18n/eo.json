@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"Fitik",
 			"Mirin",
 			"Robin van der Vliet",
 			"StarrySky"
@@ -84,6 +85,7 @@
 	"deleted-edits": "Forigitaj redaktoj",
 	"deleted-pages": "Forigitaj paĝoj",
 	"diff": "Diferenco",
+	"diff-empty": "Malplena",
 	"documentation": "Dokumentaro",
 	"download-label": "Elŝuti",
 	"edit": "Redakti",
@@ -160,6 +162,7 @@
 	"namespaces": "Nomspacoj",
 	"neutral": "Neŭtrala",
 	"next": "Sekva",
+	"no": "Ne",
 	"no-summary": "Neniu resumo",
 	"none": "Nenio",
 	"notice": "Avizo",
