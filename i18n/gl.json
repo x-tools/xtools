@@ -493,7 +493,7 @@
 	"user-page": "Páxina de usuario",
 	"user-page-desc": "O tamaño da páxina de usuario é de $2 {{PLURAL:$1|byte|bytes}}",
 	"username": "Nome de usuario",
-	"username-ip-or-cidr": "Nome de usuario, enderezo IP ou rango CIDR",
+	"username-ip-or-cidr": "Nome de usuario, enderezo IP ou rango CIDR.",
 	"username-or-ip": "Nome de usuario, IPv4 ou IPv6",
 	"username-removed": "(nome de usuario eliminado)",
 	"version": "Versión $1",
