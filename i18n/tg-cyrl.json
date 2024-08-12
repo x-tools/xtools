@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"Farorud",
 			"ToJack",
 			"Vashgird",
 			"ZulfiqorF"
@@ -177,9 +178,14 @@
 	"name": "Ном",
 	"namespace": "Фазоином",
 	"namespaces": "Фазоҳои ном",
+	"neutral": "Нейтралӣ",
 	"next": "Баъдӣ",
+	"no": "Не",
 	"no-summary": "Хулоса нест",
 	"none": "Ҳеҷ",
+	"not-opted-in-link": "ҳуҷҷатгузорӣ",
+	"not-opted-in-login": "вуруд",
+	"notice": "Огаҳӣ",
 	"num-blocks": "{{PLURAL:$1|бастан|бастанҳо}}",
 	"num-bytes": "{{PLURAL:$1|байт|байтҳо}}",
 	"num-categories": "{{PLURAL:$1|гурӯҳ|гурӯҳҳо}}",
@@ -222,6 +228,7 @@
 	"pages-created-live": "Саҳифаҳои эҷодшуда (ҳазф нашудаанд)",
 	"pages-created-live-desc": "$2 {{PLURAL:$1|саҳифа}} эҷод кардааст",
 	"pages-created-since-deleted": "$1-тояш ҳазф шуд",
+	"pageviews": "Боздиди мақола",
 	"patrol": "Баррасӣ",
 	"patrollers": "Баррасикунандагон",
 	"patrols": "Баррасиҳо",
@@ -230,10 +237,15 @@
 	"performer": "Иҷрокунанда",
 	"powered-by": "Ихтироъшуда: $1",
 	"prev": "Қаблӣ",
+	"priority": "Афзалият",
 	"project": "Лоиҳа",
 	"projects": "Лоиҳаҳо",
+	"prose": "Наср",
 	"protect": "Ҳифз",
+	"proxy-check": "Тафтиши прокси",
 	"query": "Дархост",
+	"quote": "Иқтибос",
+	"quote-number": "Рақами иқтибос",
 	"rank": "Дараҷа",
 	"re-block": "(Ғайри)басташавӣ",
 	"re-blocks": "(Ғайри)басташавиҳо",
@@ -242,6 +254,7 @@
 	"redirects": "Тағйири масир",
 	"references": "Танзимот",
 	"registration-date": "Замони сабтином",
+	"reprotect": "Ҳифзи дубора",
 	"restore": "Барқарор",
 	"result": "Натиҷа",
 	"result-by-name": "Нусха аз рӯи ном / суроғаи IP",
@@ -283,6 +296,7 @@
 	"tool-adminscore": "Ҳисоби мудир",
 	"tool-adminstats": "Омори мудир",
 	"tool-adminstats-desc": "Намоиши омори амалҳои мудир",
+	"tool-authorship": "Муаллифӣ",
 	"tool-autoedits": "Вироишҳои автоматӣ",
 	"tool-editcounter": "Ҳисобкунаки вироишот",
 	"tool-editcounter-desc": "Таҳлили ҳисаи корбар",
@@ -300,6 +314,7 @@
 	"top-editors-desc": "Омори вироишгарон бо таърихи мақолаҳо",
 	"top-projects-edit-counts": "Ҳусобкунаки вироишоти саросарӣ",
 	"top-ten-by-edits": "Топ 10 аз рӯи вироишҳо",
+	"top-ten-other-editors": "Дигар вироишгарон",
 	"total": "Умумӣ",
 	"total-authors": "Ҳамаи муаллифон",
 	"total-edits": "Ҳамаи вириошот",
@@ -331,5 +346,6 @@
 	"words": "Калимаҳо",
 	"xtools-title": "ИксТулз",
 	"year": "Сол",
-	"year-counts": "Шумораи солҳо"
+	"year-counts": "Шумораи солҳо",
+	"yes": "Ҳа"
 }
