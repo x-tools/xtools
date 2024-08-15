@@ -1,5 +1,8 @@
 # Release Notes #
 
+## 3.21.1 ##
+- Fixed issue with monolog configuration.
+
 ## 3.20.0 ##
 - GlobalContribs (T337104): fix caching of namespaces and ensure user exists globally
 - Pages: suppress error when deletion summary cannot be fetched.
