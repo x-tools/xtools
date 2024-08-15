@@ -22,6 +22,7 @@ monolog:
             type: fingers_crossed
             action_level: critical
             handler: main_handler
+            excluded_http_codes: [502]
         main_handler:
             type: group
             members: [console, log_file, mailer]
@@ -40,7 +41,6 @@ monolog:
         symfony_mailer:
             type: symfony_mailer
             level: critical
-            excluded_http_codes: [502]
             from_email: '%env(MAILER_FROM_EMAIL)%'
             to_email: '%env(MAILER_TO_EMAIL)%'
             subject: '[XTools] Fatal error: %%message%%'
