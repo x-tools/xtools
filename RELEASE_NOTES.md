@@ -1,5 +1,14 @@
 # Release Notes #
 
+## 3.20.0 ##
+- GlobalContribs (T337104): fix caching of namespaces and ensure user exists globally
+- Pages: suppress error when deletion summary cannot be fetched.
+- Make API responses more consistent, implementing changes announced in 3.19.
+  See https://w.wiki/AvSG for details.
+- PageInfo: formally renamed from ArticleInfo.
+- PageInfo: fix contrast of gray text in PageInfo gadget.
+- Localization updates.
+
 ## 3.19.1 ##
 - (T318036): Don't put login wall in front of allowlisted actions
 - SimpleEditCounter (T318036): Use APP_MAX_USER_EDITS instead of dedicated constant
