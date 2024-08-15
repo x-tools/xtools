@@ -290,6 +290,14 @@ class PageInfoController extends XtoolsController
             return $this->getApiHtmlResponse($this->project, $this->page, $data);
         }
 
+        $this->addFlash('warning', 'In XTools 3.21, the last_edit_id property will be removed. ' .
+            'Use the modified_rev_id property instead.');
+        $data['last_edit_id'] = $data['modified_rev_id'];
+        $this->addFlash('warning', 'In XTools 3.21, the author and author_editcount properties ' .
+            'will be removed. Instead, use creator and creator_editcount, respectively.');
+        $data['author'] = $data['creator'];
+        $data['author_editcount'] = $data['creator_editcount'];
+
         return $this->getFormattedApiResponse($data);
     }
 
