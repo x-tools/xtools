@@ -382,12 +382,25 @@ xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
                 var offset = $(this).is(':checked') ? timezoneOffset : -timezoneOffset;
                 chart.data.datasets = chart.data.datasets.map(function (day) {
                     day.data = day.data.map(function (datum) {
-                        var newHour = (parseInt(datum.hour, 10) - offset) % 24;
+                        var newHour = (parseInt(datum.hour, 10) - offset);// % 24;
+                        var newDay = parseInt(datum.day_of_week, 10);
                         if (newHour < 0) {
                             newHour = 24 + newHour;
+                            newDay = newDay - 1;
+                            if (newDay < 1) {
+                                newDay = 7 + newDay;
+                            }
+                        } else if (newHour > 23) {
+                            newHour = newHour - 24;
+                            newDay = newDay + 1;
+                            if (newDay > 7) {
+                                newDay = newDay - 7;
+                            }
                         }
                         datum.hour = newHour.toString();
                         datum.x = newHour.toString();
+                        datum.day_of_week = newDay.toString();
+                        datum.y = (8-newDay).toString();
                         return datum;
                     });
                     return day;
