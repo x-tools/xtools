@@ -343,7 +343,7 @@ xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
                     ticks: {
                         beginAtZero: true,
                         min: 0,
-                        max: 23,
+                        max: 24,
                         stepSize: 1,
                         reverse: i18nRTL,
                         padding: 0,
@@ -364,7 +364,7 @@ xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
                 displayColors: false,
                 callbacks: {
                     title: function (items) {
-                        return days[7 - items[0].yLabel + 1] + ' ' + items[0].xLabel + ':00';
+                        return days[7 - items[0].yLabel + 1] + ' ' + parseInt(items[0].xLabel) + ':' + String(60*(items[0].xLabel%1)).padStart(2, '0');
                     },
                     label: function (item) {
                         var numEdits = [timeCardDatasets[item.datasetIndex].data[item.index].value];
@@ -382,7 +382,7 @@ xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
                 var offset = $(this).is(':checked') ? timezoneOffset : -timezoneOffset;
                 chart.data.datasets = chart.data.datasets.map(function (day) {
                     day.data = day.data.map(function (datum) {
-                        var newHour = (parseInt(datum.hour, 10) - offset);// % 24;
+                        var newHour = (parseFloat(datum.hour) - offset);
                         var newDay = parseInt(datum.day_of_week, 10);
                         if (newHour < 0) {
                             newHour = 24 + newHour;
@@ -390,7 +390,7 @@ xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
                             if (newDay < 1) {
                                 newDay = 7 + newDay;
                             }
-                        } else if (newHour > 23) {
+                        } else if (newHour >= 24) {
                             newHour = newHour - 24;
                             newDay = newDay + 1;
                             if (newDay > 7) {
