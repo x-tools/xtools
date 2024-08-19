@@ -2,6 +2,7 @@
 	"@metadata": {
 		"authors": [
 			"Agam Riyandana",
+			"Amire80",
 			"Daud I.F. Argana",
 			"Hidayatsrf",
 			"Ignatgg",
@@ -469,7 +470,7 @@
 	"top-ten-by-text": "10 teks tertambah teratas",
 	"top-ten-count": "Suntingan oleh 10 penyunting teratas",
 	"top-ten-other-editors": "Editor lainnya",
-	"topedits-page": "Suntingan untuk artikel teratas",
+	"topedits-page": "Suntingan artikel teratas",
 	"topedits-page-desc": "Semua suntingan yang dibuat pada suatu halaman oleh satu pengguna, berdasarkan urutan waktu.",
 	"topedits-per-namespace": "Suntingan teratas per ruang nama",
 	"total": "Total",
