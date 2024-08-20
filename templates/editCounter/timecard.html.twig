@@ -60,7 +60,7 @@
             7: "{{ msg('saturday') }}"
         };
         var timeCardDatasets = [];
-        {% for i in 0..7 %}
+        {% for i in 0..6 %}
             timeCardDatasets.push({
                 backgroundColor: "{{ chartColor(i) }}",
                 data: []
