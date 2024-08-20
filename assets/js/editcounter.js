@@ -278,6 +278,10 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
 xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
     var useLocalTimezone = false,
         timezoneOffset = new Date().getTimezoneOffset() / 60;
+    timeCardDatasets = timeCardDatasets.map(function (day) {
+        day.backgroundColor = new Array(day.data.length).fill(day.backgroundColor);
+        return day;
+    });
     window.chart = new Chart($("#timecard-bubble-chart"), {
         type: 'bubble',
         data: {
@@ -380,7 +384,10 @@ xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
             .prop('checked', false)
             .on('click', function () {
                 var offset = $(this).is(':checked') ? timezoneOffset : -timezoneOffset;
+                var color_list = new Array(7);
+                chart.data.datasets.forEach((day) => color_list[day.data[0].day_of_week-1] = day.backgroundColor[0]);
                 chart.data.datasets = chart.data.datasets.map(function (day) {
+                    var background_colors = [];
                     day.data = day.data.map(function (datum) {
                         var newHour = (parseFloat(datum.hour) - offset);
                         var newDay = parseInt(datum.day_of_week, 10);
@@ -401,11 +408,13 @@ xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
                         datum.x = newHour.toString();
                         datum.day_of_week = newDay.toString();
                         datum.y = (8-newDay).toString();
+                        background_colors.push(color_list[newDay - 1]);
                         return datum;
                     });
+                    day.backgroundColor = background_colors;
                     return day;
                 });
-                useLocalTimezone = true;
+                useLocalTimezone = $(this).is(':checked');
                 chart.update();
             });
     });
