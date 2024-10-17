@@ -817,7 +817,7 @@ class PageInfo extends PageInfoApi
         $editMonth = $edit->getMonth();
 
         // If anonymous, increase counts
-        if ($edit->isAnon()) {
+        if ($edit->isAnon($this->page->getProject())) {
             $this->anonCount++;
             $this->yearMonthCounts[$editYear]['anon']++;
             $this->yearMonthCounts[$editYear]['months'][$editMonth]['anon']++;

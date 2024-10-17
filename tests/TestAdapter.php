@@ -44,14 +44,15 @@ class TestAdapter extends WebTestCase
         $projectRepo = $this->createMock(ProjectRepository::class);
         $projectRepo->method('getOne')
             ->willReturn([
-                "url" => "https://en.wikipedia.org/w/api.php",
+                'url' => 'https://en.wikipedia.org/w/api.php',
             ]);
         $projectRepo->method('getMetadata')
             ->willReturn([
-                "general" => [
-                    "mainpage" => "Main Page",
-                    "scriptPath" => "/w",
+                'general' => [
+                    'mainpage' => 'Main Page',
+                    'scriptPath' => '/w',
                 ],
+                'tempAccountPatterns' => ['~2$1'],
             ]);
         $project = new Project('en.wikipedia.org');
         $project->setRepository($projectRepo);

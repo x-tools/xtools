@@ -7,6 +7,7 @@ namespace App\Model;
 use App\Repository\UserRepository;
 use DateTime;
 use Exception;
+use UnexpectedValueException;
 use Wikimedia\IPUtils;
 
 /**
@@ -26,8 +27,12 @@ class User extends Model
     /** @var int[] Quick cache of edit counts, keyed by project domain. */
     protected array $editCounts = [];
 
+    /** @var bool Whether the user is a temporary account. */
+    protected bool $isTemp;
+
     /**
      * Create a new User given a username.
+     * @param UserRepository $repository
      * @param string $username
      */
     public function __construct(UserRepository $repository, string $username)
@@ -39,7 +44,7 @@ class User extends Model
         $this->username = ucfirst(str_replace('_', ' ', trim($username)));
 
         // IPv6 address are stored as uppercase in the database.
-        if ($this->isAnon()) {
+        if ($this->isIP()) {
             $this->username = IPUtils::sanitizeIP($this->username);
         }
     }
@@ -70,7 +75,7 @@ class User extends Model
      */
     public function getPrettyUsername(): string
     {
-        if (!$this->isAnon()) {
+        if (!$this->isIP()) {
             return $this->username;
         }
         return IPUtils::prettifyIP($this->username);
@@ -311,12 +316,68 @@ class User extends Model
     }
 
     /**
-     * Is this user an anonymous user (IP)?
+     * Is this user an IP user? (Not a named or temporary account)
      * @return bool
      */
-    public function isAnon(): bool
+    public function isIP(): bool
     {
         return IPUtils::isIPAddress($this->username);
+    }
+
+    /**
+     * Is this user a temporary account?
+     * @param Project $project
+     * @return bool
+     */
+    public function isTemp(Project $project): bool
+    {
+        if (!isset($this->isTemp)) {
+            $this->isTemp = self::isTempUsername($project, $this->getUsername());
+        }
+        return $this->isTemp;
+    }
+
+    /**
+     * Does the given username match that of temporary accounts?
+     * Based on https://w.wiki/BZQY from MediaWiki core (GPL-2.0-or-later)
+     * @param Project $project
+     * @return bool
+     */
+    public static function isTempUsername(Project $project, string $username): bool
+    {
+        if (!$project->hasTempAccounts()) {
+            return false;
+        }
+        foreach ($project->getTempAccountPatterns() as $pattern) {
+            $varPos = strpos($pattern, '$1');
+            if (false === $varPos) {
+                throw new UnexpectedValueException('Invalid temp account pattern: ' . $pattern);
+            }
+            $prefix = substr($pattern, 0, $varPos);
+            $suffix = substr($pattern, $varPos + 2);
+            $match = true;
+            if ('' !== $prefix) {
+                $match = str_starts_with($username, $prefix);
+            }
+            if ($match && '' !== $suffix) {
+                $match = str_ends_with($username, $suffix)
+                    && strlen($username) >= strlen($prefix) + strlen($suffix);
+            }
+            if ($match) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Is this user an anonymous user (IP or temporary account)?
+     * @param Project $project
+     * @return bool
+     */
+    public function isAnon(Project $project): bool
+    {
+        return $this->isIP() || $this->isTemp($project);
     }
 
     /**

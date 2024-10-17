@@ -189,11 +189,17 @@ class AppExtensionTest extends TestAdapter
         $userRepo = $this->createMock(UserRepository::class);
         $user = new User($userRepo, '68.229.186.65');
         $user2 = new User($userRepo, 'Test user');
-        static::assertTrue($this->appExtension->isUserAnon($user));
-        static::assertFalse($this->appExtension->isUserAnon($user2));
+        $project = $this->createMock(Project::class);
+        $project->method('hasTempAccounts')
+            ->willReturn(true);
+        $project->method('getTempAccountPatterns')
+            ->willReturn(['~2$1']);
+        static::assertTrue($this->appExtension->isUserAnon($project, $user));
+        static::assertFalse($this->appExtension->isUserAnon($project, $user2));
 
-        static::assertTrue($this->appExtension->isUserAnon('2605:E000:855A:4B00:3035:523D:F7E9:8F82'));
-        static::assertFalse($this->appExtension->isUserAnon('192.0.blah.1'));
+        static::assertTrue($this->appExtension->isUserAnon($project, '2605:E000:855A:4B00:3035:523D:F7E9:8F82'));
+        static::assertFalse($this->appExtension->isUserAnon($project, '192.0.blah.1'));
+        static::assertTrue($this->appExtension->isUserAnon($project, '~2024-1234'));
     }
 
     /**

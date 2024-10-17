@@ -582,10 +582,11 @@ class AppExtension extends AbstractExtension
 
     /**
      * Helper to return whether the given user is an anonymous (logged out) user.
+     * @param Project $project
      * @param User|string $user User object or username as a string.
      * @return bool
      */
-    public function isUserAnon($user): bool
+    public function isUserAnon(Project $project, $user): bool
     {
         if ($user instanceof User) {
             $username = $user->getUsername();
@@ -593,7 +594,7 @@ class AppExtension extends AbstractExtension
             $username = $user;
         }
 
-        return IPUtils::isIPAddress($username);
+        return IPUtils::isIPAddress($username) || User::isTempUsername($project, $username);
     }
 
     /**

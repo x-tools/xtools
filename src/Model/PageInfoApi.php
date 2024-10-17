@@ -315,7 +315,7 @@ class PageInfoApi extends Model
             $data = array_merge($data, [
                 'revisions' => (int) $info['num_edits'],
                 'editors' => (int) $info['num_editors'],
-                'ip_edits' => (int) $info['ip_edits'],
+                'anon_edits' => (int) $info['anon_edits'],
                 'minor_edits' => (int) $info['minor_edits'],
                 'creator' => $info['creator'],
                 'creator_editcount' => null === $info['creator_editcount'] ? null : (int) $info['creator_editcount'],

@@ -15,7 +15,7 @@
         <tr>
             <td colspan="2" class="text-muted">{{ msg('basic-information') }}</td>
         </tr>
-        {% if not(user.anon) %}
+        {% if not(user.isIP) %}
             <tr>
                 <td>{{ msg('user-id') }}</td>
                 <td>{{ user.id(project)|num_format }}</td>
@@ -28,10 +28,16 @@
                 </tr>
             {% endif %}
             <tr>
-                <td><a href="#rights-changes">{{ msg('user-groups') }}</a></td>
+                <td>
+                    {% if user.isTemp(project) %}
+                        {{ msg('user-groups') }}
+                    {%- else -%}
+                        <a href="#rights-changes">{{ msg('user-groups') }}</a>
+                    {%- endif -%}
+                </td>
                 <td>
                     {% for group in ec.userRights.rightsStates.local.current %}
-                        {{ ec.userRights.rightsNames[group] }}{% if not loop.last %}, {% endif %}
+                        {{ ec.userRights.rightsName(group) }}{% if not loop.last %}, {% endif %}
                     {% endfor %}
                 </td>
             </tr>
@@ -45,20 +51,22 @@
                     </td>
                 </tr>
             {% endif %}
-            <tr>
-                <td>{{ msg('is-admin') }}</td>
-                <td>
-                    {% set adminStatus = ec.userRights.adminStatus %}
-                    {% if adminStatus == 'current' %}
-                        <img alt="{{ msg('yes') }}" title="{{ msg('yes') }}" src="https://upload.wikimedia.org/wikipedia/commons/f/f6/OOjs_UI_icon_check-constructive.svg" />
-                    {% elseif adminStatus == 'former' %}
-                        <img alt="{{ msg('no') }}" title="{{ msg('no') }}" src="https://upload.wikimedia.org/wikipedia/commons/7/77/OOjs_UI_icon_close-ltr-destructive.svg" />
-                        <em class="text-muted">({{ msg('former-admin')|lower }})</em>
-                    {% else %}
-                        <img alt="{{ msg('no') }}" title="{{ msg('no') }}" src="https://upload.wikimedia.org/wikipedia/commons/7/77/OOjs_UI_icon_close-ltr-destructive.svg" />
-                    {% endif %}
-                </td>
-            </tr>
+            {% if not(user.isTemp(project)) %}
+                <tr>
+                    <td>{{ msg('is-admin') }}</td>
+                    <td>
+                        {% set adminStatus = ec.userRights.adminStatus %}
+                        {% if adminStatus == 'current' %}
+                            <img alt="{{ msg('yes') }}" title="{{ msg('yes') }}" src="https://upload.wikimedia.org/wikipedia/commons/f/f6/OOjs_UI_icon_check-constructive.svg" />
+                        {% elseif adminStatus == 'former' %}
+                            <img alt="{{ msg('no') }}" title="{{ msg('no') }}" src="https://upload.wikimedia.org/wikipedia/commons/7/77/OOjs_UI_icon_close-ltr-destructive.svg" />
+                            <em class="text-muted">({{ msg('former-admin')|lower }})</em>
+                        {% else %}
+                            <img alt="{{ msg('no') }}" title="{{ msg('no') }}" src="https://upload.wikimedia.org/wikipedia/commons/7/77/OOjs_UI_icon_close-ltr-destructive.svg" />
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endif %}
         {% endif %}
         {% if ec.firstAndLatestActions.rev_first is defined %}
             <tr>
@@ -307,7 +315,7 @@
         {% endif %}
 
         {# Show the block stats here if they are an admin, since the middle column would become very tall. #}
-        {% if not(user.isAnon) and adminStatus %}
+        {% if not(user.isAnon(project)) and adminStatus %}
             {{ blockStats }}
         {% endif %}
     </table>
@@ -315,7 +323,7 @@
 <div class="col-lg-4 stat-list clearfix">
     <table class="table">
         {# ======================== ACTIONS ======================== #}
-        {% if not(user.anon) %}
+        {% if not(user.isAnon(project)) %}
             <tbody class="stat-list--group">
                 <tr>
                     <td colspan="2" class="text-muted">{{ msg('actions') }}</td>
@@ -432,7 +440,7 @@
     </table>
 </div>
 
-{% if not(user.anon) %}
+{% if not(user.isIP) %}
     {# ======================== GLOBAL EDITS ======================== #}
     <div class="col-lg-4 stat-list clearfix">
         <table class="table top-project-edit-counts">
