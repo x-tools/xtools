@@ -62,9 +62,9 @@ services:
             $isWMF: '%env(bool:APP_IS_WMF)%'
             $optedIn: '%env(csv:OPTED_IN)%'
             $projectDir: '%kernel.project_dir%'
-            $singleWiki: '%env(bool:APP_SINGLE_WIKI)%'
             $queryTimeout: '%env(APP_QUERY_TIMEOUT)%'
             $replagThreshold: '%env(int:APP_REPLAG_THRESHOLD)%'
+            $singleWiki: '%env(bool:APP_SINGLE_WIKI)%'
 
     # Makes classes in src/App available to be used as services.
     # This creates a service per class whose id is the fully-qualified class name.

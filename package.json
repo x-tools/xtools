@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "encore production --progress",
-    "test": "npx banana-checker --requireMetadata=0 i18n/",
+    "test": "banana-checker i18n/",
     "watch": "encore dev --watch"
   },
   "devDependencies": {
@@ -18,7 +18,6 @@
     "grunt-banana-checker": "^0.10.0",
     "sass": "^1.62.0",
     "sass-loader": "^13.0.0",
-    "uglify-es": "^3.0.27",
     "webpack-notifier": "^1.15.0"
   },
   "private": true

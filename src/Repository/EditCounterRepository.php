@@ -228,7 +228,7 @@ class EditCounterRepository extends Repository
     public function getFileCounts(Project $project, User $user): array
     {
         // Anons can't upload or move files.
-        if ($user->isAnon()) {
+        if ($user->isAnon($project)) {
             return [];
         }
 

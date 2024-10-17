@@ -19,7 +19,7 @@
 {% if data.error is not defined and data.creator is not empty -%}
     {{ msg('comma-character') }}
     {{ msg('created-by')|lower }}: {{ wiki.userLink(data.creator, project) }}
-    {# IPs have an edit count of null for performance reasons, so we simply don't show anything #}{% if data.creator_editcount != null %}
+    {# Anons have an edit count of null for performance reasons, so we simply don't show anything #}{% if data.creator_editcount != null %}
     (<a target="_blank" title="{{ msg('approximate') }}" href="{{ url('EditCounterResult', { 'project': project.domain, 'username': data.creator }) }}">{{ data.creator_editcount|num_format }}</a>){% endif %}
 {% endif %}
  &middot;

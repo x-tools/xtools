@@ -75,7 +75,7 @@ class SimpleEditCounter extends Model
             $this->prepareFullData();
         }
 
-        if (!$this->user->isAnon()) {
+        if (!$this->user->isAnon($this->project)) {
             $this->data['global_user_groups'] = $this->user->getGlobalUserRights($this->project);
         }
     }
@@ -106,6 +106,10 @@ class SimpleEditCounter extends Model
                     $this->data['user_groups'][] = $row['value'];
                     break;
             }
+        }
+
+        if ($this->user->isTemp($this->project)) {
+            $this->data['user_groups'] = ['temp'];
         }
     }
 

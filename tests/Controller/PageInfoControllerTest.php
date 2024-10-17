@@ -56,9 +56,9 @@ class PageInfoControllerTest extends ControllerTestAdapter
         static::assertEquals(
             [
                 'warning', 'project', 'page', 'watchers', 'pageviews', 'pageviews_offset',  'revisions',
-                'editors', 'ip_edits', 'minor_edits', 'creator', 'creator_editcount', 'created_at',  'created_rev_id',
-                'modified_at', 'secs_since_last_edit', 'modified_rev_id', 'assessment', 'last_edit_id',
-                'author', 'author_editcount', 'elapsed_time',
+                'editors', 'anon_edits', 'minor_edits', 'creator', 'creator_editcount', 'created_at',
+                'created_rev_id', 'modified_at', 'secs_since_last_edit', 'modified_rev_id', 'assessment',
+                'last_edit_id', 'author', 'author_editcount', 'ip_edits', 'elapsed_time',
             ],
             array_keys($data)
         );

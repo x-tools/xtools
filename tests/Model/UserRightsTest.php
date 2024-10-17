@@ -28,7 +28,12 @@ class UserRightsTest extends TestAdapter
     {
         $this->i18n = static::createClient()->getContainer()->get('app.i18n_helper');
         $project = new Project('test.example.org');
-        $project->setRepository($this->getProjectRepo());
+        $projectRepo = $this->getProjectRepo();
+        $projectRepo->method('getMetadata')
+            ->willReturn([
+                'tempAccountPatterns' => ['~2$1'],
+            ]);
+        $project->setRepository($projectRepo);
         $this->userRepo = $this->createMock(UserRepository::class);
         $this->user = new User($this->userRepo, 'Testuser');
         $this->userRightsRepo = $this->createMock(UserRightsRepository::class);

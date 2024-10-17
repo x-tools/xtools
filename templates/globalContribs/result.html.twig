@@ -14,7 +14,7 @@
                     <span class="glyphicon glyphicon-chevron-left"></span>
                     {{ msg('back') }}
                 </a>
-                {% if user.anon %}
+                {% if user.isAnon(project) %}
                     {{ wiki.pageLinkRaw('Special:Contributions/' ~ user.username, project, user.prettyUsername) }}
                 {% else %}
                     {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, user.username) }}
@@ -23,7 +23,7 @@
         </header>
         <div class="panel-body xt-panel-body">
             <p class="text-center xt-heading-subtitle">
-                {% if user.anon %}
+                {% if user.isIP %}
                     {{ wiki.pageLogLinkRaw('User:' ~ user.username, project, msg('global-block-log'), 'gblblock') }}
                     &middot;
                     <a target="_blank" href="https://whois-referral.toolforge.org/gateway.py?lookup=true&amp;ip={{ user.prettyUsername|e('url') }}">{{ msg('whois') }}</a>
@@ -46,7 +46,7 @@
                         <tr>
                             <td>{{ msg('user') }}</td>
                             <td>
-                                {% if user.anon %}
+                                {% if user.isAnon(project) %}
                                     {{ wiki.pageLinkRaw('Special:Contributions/' ~ user.username, project, user.prettyUsername) }}
                                 {% else %}
                                     {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, user.username) }}
@@ -72,7 +72,7 @@
                             </tr>
                         {% endif %}
                         {% if not(gc.start) and not(gc.end) %}
-                            {% if not(user.anon) %}
+                            {% if not(user.isIP) %}
                                 <tr>
                                     <td>{{ msg('global-edit-count') }}</td>
                                     <td>{{ gc.globalEditCount|num_format }}</td>
@@ -171,7 +171,7 @@
     </table>
     {{ layout.contributionsNav(gc.offset, gc.globalEdits|length, gc.limit) }}
 {% else %}
-    {% if nsName(gc.namespace, project.namespaces) == msg('unknown') and gc.user.isAnon %}
+    {% if nsName(gc.namespace, project.namespaces) == msg('unknown') and gc.user.isIP %}
         <div class="alert alert-warning">
             <p>{{ msg('global-contribs-ip-range-warning-1', ['<strong>' ~ gc.user.prettyUsername ~ '</strong>', '<strong>' ~ gc.namespace ~ '</strong>']) }}</p>
             {% set ipRangeLink -%}

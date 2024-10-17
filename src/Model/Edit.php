@@ -446,12 +446,13 @@ class Edit extends Model
     }
 
     /**
-     * Was the edit made by a logged out user?
+     * Was the edit made by a logged out user (IP or temporary account)?
+     * @param Project $project
      * @return bool|null
      */
-    public function isAnon(): ?bool
+    public function isAnon(Project $project): ?bool
     {
-        return $this->getUser() ? $this->getUser()->isAnon() : null;
+        return $this->getUser() ? $this->getUser()->isAnon($project) : null;
     }
 
     /**

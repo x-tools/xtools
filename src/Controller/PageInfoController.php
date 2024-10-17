@@ -297,6 +297,9 @@ class PageInfoController extends XtoolsController
             'will be removed. Instead, use creator and creator_editcount, respectively.');
         $data['author'] = $data['creator'];
         $data['author_editcount'] = $data['creator_editcount'];
+        $this->addFlash('warning', 'In XTools 3.21, the ip_edits property will be removed. ' .
+            'Use the anon_edits property instead.');
+        $data['ip_edits'] = $data['anon_edits'];
 
         return $this->getFormattedApiResponse($data);
     }

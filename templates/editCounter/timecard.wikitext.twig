@@ -1,6 +1,6 @@
 {% import 'macros/wiki.html.twig' as wiki %}
 {% if not is_sub_request %}
-== {{ wiki.userLinkWikitext(user, user.username) }} ==
+== {{ wiki.userLinkWikitext(project, user, user.username) }} ==
 
 {% set link %}[{{ url('EditCounterTimecard', {'username': user.usernameIdent, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
 {{ msg('xtools-advert', [link, date()|date_format]) }}

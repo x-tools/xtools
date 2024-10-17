@@ -26,9 +26,6 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-php-
 
-    - name: Install PHP dependencies
-      run: composer install --prefer-dist --no-progress
-
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
@@ -37,9 +34,25 @@ jobs:
         ini-values: xdebug.mode=coverage
         coverage: xdebug
 
+    - name: Read .nvmrc
+      run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
+      id: nvm
+
+    - name: Set up Node ${{ steps.nvm.outputs.NODE_VERSION }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ steps.nvm.outputs.NODE_VERSION }}
+
+    - name: Install dependencies
+      run: |
+        composer install --prefer-dist --no-progress
+        npm ci
+
     - name: Run test suite
       run: |
         composer run-script test
+        npm run test
+        npm run build
         git status
         git status | grep "nothing to commit, working tree clean"
 
