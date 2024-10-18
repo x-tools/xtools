@@ -51,7 +51,7 @@ class GlobalContribsRepository extends Repository
      */
     public function globalEditCounts(User $user): ?array
     {
-        if ($user->isAnon()) {
+        if ($user->isIP()) {
             return null;
         }
 
@@ -86,7 +86,7 @@ class GlobalContribsRepository extends Repository
      */
     protected function globalEditCountsFromCentralAuth(User $user): ?array
     {
-        if (true === $user->isAnon()) {
+        if (true === $user->isIP()) {
             return null;
         }
 
@@ -140,7 +140,7 @@ class GlobalContribsRepository extends Repository
      */
     public function getProjectsWithEdits(User $user): array
     {
-        if ($user->isAnon()) {
+        if ($user->isIP()) {
             $dbNames = array_keys($this->getDbNamesAndActorIds($user));
         } else {
             $dbNames = [];

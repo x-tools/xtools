@@ -1,6 +1,6 @@
 {% import 'macros/wiki.html.twig' as wiki %}
 {% if not is_sub_request %}
-== {{ wiki.userLinkWikitext(user, user.username) }} ==
+== {{ wiki.userLinkWikitext(project, user, user.username) }} ==
 
 {% set link %}[{{ url('EditCounterGeneralStats', {'username': user.usernameIdent, 'project': project.domain}) }} {{ msg('xtools-title') }}]{% endset %}
 {{ msg('xtools-advert', [link, date()|date_format]) }}
@@ -9,7 +9,7 @@
 === {{ msg('general-stats') }} ===
 
 {| class="wikitable sortable"
-{% if not(user.anon) %}
+{% if not(user.isIP(project)) %}
 | {{ msg('user-id') }}
 | {{ user.id(project) }}
 {% set regDate = user.registrationDate(project) %}
@@ -20,7 +20,7 @@
 {% endif %}
 |-
 | {{ msg('user-groups') }}
-| {% for group in ec.userRights.rightsStates.local.current %}{{ ec.userRights.rightsNames[group] }}{% if not loop.last %}, {% endif %}{% endfor %}
+| {% for group in ec.userRights.rightsStates.local.current %}{{ ec.userRights.rightsName(group) }}{% if not loop.last %}, {% endif %}{% endfor %}
 
 {% if ec.userRights.rightsStates.global.current %}
 |-
@@ -28,9 +28,11 @@
 | {% for group in ec.userRights.rightsStates.global.current %}{{ ec.userRights.rightsNames[group] }}{% if not loop.last %}, {% endif %}{% endfor %}
 
 {% endif %}
+{% if not(user.isTemp(project)) %}
 |-
 | {{ msg('is-admin') }}
-| {% if user.isAdmin(project) %}1{% else %}0{% endif %}
+| {% if user.isAdmin(project) %}{{ msg('yes') }}{% else %}{{ msg('no') }}{% endif %}
+{% endif %}
 {% endif %}
 {% if ec.firstAndLatestActions.rev_first is defined %}{% set latestAction = ec.firstAndLatestActions.log_latest %}
 
@@ -132,7 +134,7 @@
 {% endif %}
 
 {# ======================== ACTIONS ======================== #}
-{% if not(user.anon) %}
+{% if not(user.isAnon(project)) %}
 === {{ msg('actions') }} ===
 
 {| class="wikitable sortable"
@@ -221,7 +223,7 @@
 |-
 |}
 
-{% if not(user.anon) %}
+{% if not(user.isIP) %}
 {# ======================== GLOBAL EDITS ======================== #}
 === {{ msg('top-projects-edit-counts') ~ ' (' ~ msg('approximate')|lower ~ ')' }} ===
 

@@ -237,12 +237,13 @@ class EditTest extends TestAdapter
     {
         // Edit made by User:Testuser
         $edit = $this->getEditFactory();
-        static::assertFalse($edit->isAnon());
+        $project = $this->createMock(Project::class);
+        static::assertFalse($edit->isAnon($project));
 
         $edit = $this->getEditFactory([
             'username' => '192.168.0.1',
         ]);
-        static::assertTrue($edit->isAnon());
+        static::assertTrue($edit->isAnon($project));
     }
 
     public function testGetForJson(): void

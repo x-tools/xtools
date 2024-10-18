@@ -15,7 +15,7 @@
 {% set totalPercentage = 0 %}{% set totalCount = 0 %}{% for username, values in authorship.list %}
 |-
 | {{ loop.index|num_format }}
-| {{ wiki.userLinkWikitext(username, username) }}
+| {{ wiki.userLinkWikitext(project, username, username) }}
 | [{{ url('TopEditsResultPage', { 'project': project.domain, 'username': username, 'namespace': page.namespace, 'page': page.titleWithoutNamespace }) }} {{ msg('tool-topedits') }}] &middot; [{{ url('EditCounterResult', { 'project': project.domain, 'username': username }) }} {{ msg('tool-editcounter') }}]
 | {{ values.count|num_format }}
 | {{ values.percentage|percent_format }}

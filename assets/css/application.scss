@@ -716,6 +716,11 @@ a.help-icon {
     top: 5px;
 }
 
+.help-text {
+    cursor: help;
+    text-decoration: underline dotted;
+}
+
 .reverted-edit {
     background: #fcf8e3 !important;
 }

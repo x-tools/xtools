@@ -199,18 +199,18 @@ class UserTest extends TestAdapter
     public function testIpMethods(): void
     {
         $user = new User($this->userRepo, '192.168.0.0');
-        static::assertTrue($user->isAnon());
+        static::assertTrue($user->isIP());
         static::assertFalse($user->isIpRange());
         static::assertFalse($user->isIPv6());
         static::assertEquals('192.168.0.0', $user->getUsernameIdent());
 
         $user = new User($this->userRepo, '74.24.52.13/20');
-        static::assertTrue($user->isAnon());
+        static::assertTrue($user->isIP());
         static::assertTrue($user->isQueryableRange());
         static::assertEquals('ipr-74.24.52.13/20', $user->getUsernameIdent());
 
         $user = new User($this->userRepo, '2600:387:0:80d::b0');
-        static::assertTrue($user->isAnon());
+        static::assertTrue($user->isIP());
         static::assertTrue($user->isIPv6());
         static::assertFalse($user->isIpRange());
         static::assertEquals('2600:387:0:80D:0:0:0:B0', $user->getUsername());
@@ -218,7 +218,7 @@ class UserTest extends TestAdapter
 
         // Using 'ipr-' prefix, which should only apply in routing.
         $user = new User($this->userRepo, 'ipr-2001:DB8::/32');
-        static::assertTrue($user->isAnon());
+        static::assertTrue($user->isIP());
         static::assertTrue($user->isIPv6());
         static::assertTrue($user->isIpRange());
         static::assertTrue($user->isQueryableRange());
@@ -231,7 +231,7 @@ class UserTest extends TestAdapter
         static::assertFalse($user->isQueryableRange());
 
         $user = new User($this->userRepo, 'Test');
-        static::assertFalse($user->isAnon());
+        static::assertFalse($user->isIP());
         static::assertFalse($user->isIpRange());
         static::assertEquals('Test', $user->getPrettyUsername());
     }
@@ -258,5 +258,70 @@ class UserTest extends TestAdapter
 
         $user = new User($this->userRepo, '2001:db8:abc:1400');
         static::assertTrue($user->isQueryableRange());
+    }
+
+    /**
+     * From Core's PatternTest https://w.wiki/BZQH (GPL-2.0-or-later)
+     * @dataProvider provideIsTempUsername
+     * @param string $stringPattern
+     * @param string $name
+     * @param bool $expected
+     * @return void
+     */
+    public function testIsTemp(string $stringPattern, string $name, bool $expected): void
+    {
+        $project = $this->createMock(Project::class);
+        $project->method('hasTempAccounts')->willReturn(true);
+        $project->method('getTempAccountPatterns')->willReturn([$stringPattern]);
+        static::assertSame($expected, User::isTempUsername($project, $name));
+    }
+
+    /**
+     * From Core's PatternTest https://w.wiki/BZQH (GPL-2.0-or-later)
+     */
+    public static function provideIsTempUsername(): array
+    {
+        return [
+            'prefix mismatch' => [
+                'pattern' => '*$1',
+                'name' => 'Test',
+                'expected' => false,
+            ],
+            'prefix match' => [
+                'pattern' => '*$1',
+                'name' => '*Some user',
+                'expected' => true,
+            ],
+            'suffix only match' => [
+                'pattern' => '$1*',
+                'name' => 'Some user*',
+                'expected' => true,
+            ],
+            'suffix only mismatch' => [
+                'pattern' => '$1*',
+                'name' => 'Some user',
+                'expected' => false,
+            ],
+            'prefix and suffix match' => [
+                'pattern' => '*$1*',
+                'name' => '*Unregistered 123*',
+                'expected' => true,
+            ],
+            'prefix and suffix mismatch' => [
+                'pattern' => '*$1*',
+                'name' => 'Unregistered 123*',
+                'expected' => false,
+            ],
+            'prefix and suffix zero length match' => [
+                'pattern' => '*$1*',
+                'name' => '**',
+                'expected' => true,
+            ],
+            'prefix and suffix overlapping' => [
+                'pattern' => '*$1*',
+                'name' => '*',
+                'expected' => false,
+            ],
+        ];
     }
 }

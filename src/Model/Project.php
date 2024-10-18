@@ -264,6 +264,26 @@ class Project extends Model
     }
 
     /**
+     * Whether the project has temporary accounts enabled.
+     * @return bool
+     */
+    public function hasTempAccounts(): bool
+    {
+        $metadata = $this->getMetadata();
+        return null !== $metadata['tempAccountPatterns'];
+    }
+
+    /**
+     * Get the patterns that match temporary accounts.
+     * @return string[]
+     */
+    public function getTempAccountPatterns(): array
+    {
+        $metadata = $this->getMetadata();
+        return $metadata['tempAccountPatterns'] ?? [];
+    }
+
+    /**
      * Get a list of users who are in one of the given user groups.
      * @param string[] $groups User groups to search for.
      * @param string[] $globalGroups Global groups to search for.
