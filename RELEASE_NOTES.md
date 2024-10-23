@@ -1,6 +1,11 @@
 # Release Notes #
 
-## 3.21.1 ##
+## 3.20.2 ##
+- (T365507): Add support for temporary accounts, treat them the same as IPs.
+- EditCounter (T362818): Fix timecard to accommodate fractional timezones.
+- Localization updates.
+
+## 3.20.1 ##
 - Fixed issue with monolog configuration.
 
 ## 3.20.0 ##
