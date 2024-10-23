@@ -516,7 +516,7 @@ abstract class XtoolsController extends AbstractController
 
         // Allow querying for any IP, currently with no edit count limitation...
         // Once T188677 is resolved IPs will be affected by the EXPLAIN results.
-        if ($user->isAnon()) {
+        if ($user->isIP()) {
             // Validate CIDR limits.
             if (!$user->isQueryableRange()) {
                 $limit = $user->isIPv6() ? User::MAX_IPV6_CIDR : User::MAX_IPV4_CIDR;

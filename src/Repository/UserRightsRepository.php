@@ -129,7 +129,6 @@ class UserRightsRepository extends Repository
                 'formatversion' => 2,
             ];
             $result = $this->executeApiRequest($project, $params)['query']['allmessages'];
-
             foreach ($result as $msg) {
                 $normalized = preg_replace('/^group-|-member$/', '', $msg['normalizedname']);
                 $rightsNames[$normalized] = $msg['content'] ?? $normalized;
@@ -161,11 +160,11 @@ class UserRightsRepository extends Repository
             $sql = "SELECT DISTINCT(gug_group) FROM centralauth_p.global_user_groups";
             $groups = array_merge(
                 $groups,
-                $this->executeProjectsQuery('centralauth', $sql)->fetchFirstColumn(),
-                // WMF installations have a special 'autoconfirmed' user group.
-                ['autoconfirmed']
+                $this->executeProjectsQuery('centralauth', $sql)->fetchFirstColumn()
             );
         }
+        // Some installations have the special 'autoconfirmed' and 'temp' user groups.
+        $groups = array_merge($groups, ['autoconfirmed', 'temp']);
 
         return array_unique($groups);
     }

@@ -13,7 +13,7 @@
 
         <div class="text-center xt-toc">
             {% set sectionExclude = [] %}
-            {% if user.anon %}
+            {% if user.isAnon(project) %}
                 {% set sectionExclude = sectionExclude|merge(['rights-changes', 'latest-global-edits']) %}
             {% elseif ec.userRights.rightsChanges|length == 0 %}
                 {% set sectionExclude = sectionExclude|merge(['rights-changes']) %}
@@ -38,7 +38,7 @@
 
         {% include 'editCounter/subtoolSection.html.twig' with {'route': 'TopEditsResultNamespace', 'i18nKey': 'top-edited-pages', 'downloadFormats': ['wikitext'], 'extraParams': {'namespace': 'all'}, 'jsonPath': 'UserApiTopEditsNamespace'} %}
 
-        {% if not(user.anon) and 'rights-changes' in sections and (ec.userRights.rightsChanges|length > 0 or ec.userRights.globalRightsChanges|length > 0) %}
+        {% if not(user.isAnon(project)) and 'rights-changes' in sections and (ec.userRights.rightsChanges|length > 0 or ec.userRights.globalRightsChanges|length > 0) %}
             {% include 'editCounter/subtoolSection.html.twig' with {'route': 'EditCounterRightsChanges', 'i18nKey': 'rights-changes', 'downloadFormats': ['wikitext']} %}
         {% endif %}
 

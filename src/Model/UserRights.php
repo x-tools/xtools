@@ -375,6 +375,10 @@ class UserRights extends Model
             return $acTimestamp;
         }
 
+        if ($this->user->isTemp($this->project)) {
+            return false;
+        }
+
         $thresholds = $this->repository->getAutoconfirmedAgeAndCount($this->project);
 
         // Happens for non-WMF installations, or if there is no autoconfirmed status.

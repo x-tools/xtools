@@ -162,7 +162,7 @@ class UserRepository extends Repository
         $revisionTable = $project->getTableName('revision');
         $params = [];
 
-        if ($user->isAnon()) {
+        if ($user->isIP()) {
             [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
             $ipcTable = $project->getTableName('ip_changes');
             $sql = "SELECT COUNT(ipc_rev_id)
@@ -281,7 +281,7 @@ class UserRepository extends Repository
      */
     public function existsGlobally(User $user): bool
     {
-        if ($user->isAnon()) {
+        if ($user->isIP()) {
             return true;
         }
 
@@ -300,8 +300,10 @@ class UserRepository extends Repository
      */
     public function getUserRights(Project $project, User $user): array
     {
-        if ($user->isAnon()) {
+        if ($user->isIP()) {
             return [];
+        } elseif ($user->isTemp($project)) {
+            return ['temp'];
         }
 
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_rights');

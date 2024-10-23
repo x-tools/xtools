@@ -94,7 +94,7 @@
         {% else %}
             {% set username = user %}
         {% endif %}
-        {% if isUserAnon(username) %}
+        {% if isUserAnon(project, username) %}
             {% set path = project.articlePath|replace({'$1': 'Special:Contributions/' ~ username|replace({' ': '_'})|escape('url')}) %}
         {% else %}
             {% set path = project.articlePath|replace({'$1': 'User:' ~ username|replace({' ': '_'})|escape('url')}) %}
@@ -105,14 +105,14 @@
 
 {# `user` can be of type `User` or string (username) #}
 {# If the user is logged out, the link will point to Special:Contributions, otherwise their userpage #}
-{% macro userLinkWikitext(user, label = null) %}{% apply spaceless %}
+{% macro userLinkWikitext(project, user, label = null) %}{% apply spaceless %}
     {% from _self import extLink as extLink %}
     {% if user.username is defined %}
         {% set username = user.username %}
     {% else %}
         {% set username = user %}
     {% endif %}
-    {% if isUserAnon(username) %}
+    {% if isUserAnon(project, username) %}
         {% set path = '[[Special:Contributions/' ~ username|replace({' ': '_'}) %}
     {% else %}
         {% set path = '[[User:' ~ username|replace({' ': '_'}) %}
@@ -282,7 +282,7 @@
             {% endif %}
             {{ wiki.blockLogLink(user.username, project) }}
         {% endif %}
-        {% if not(isSingleWiki()) and not(user.anon) %}
+        {% if not(isSingleWiki()) and not(user.isIP) %}
             &middot;
             {{ wiki.pageLinkRaw('Special:CentralAuth/' ~ user.username, project, msg('sul-info')) }}
         {% endif %}
@@ -290,7 +290,7 @@
             &middot;
             {{ wiki.gucLink(user.usernameIdent) }}
         {% endif %}
-        {% if isWMF() and not(user.anon) %}
+        {% if isWMF() and not(user.isAnon(project)) %}
             &middot;
             {% set url = 'https://pageviews.wmcloud.org/?project=' ~ project.domain ~ '&pages=User:' ~ user.username|e('url') %}
             {{ wiki.extLink(url, msg('pageviews-userpage')) }}

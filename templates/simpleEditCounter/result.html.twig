@@ -34,7 +34,7 @@
                         <td class="stat-list--new-group">{{ msg('username') }}</td>
                         <td class="stat-list--new-group">{{ wiki.userLink(user, project) }}</td>
                     </tr>
-                    {% if not(user.anon) %}
+                    {% if not(user.isIP(project)) %}
                         <tr>
                             <td>{{ msg('user-id') }}</td>
                             <td>{{ sec.userId }}</td>

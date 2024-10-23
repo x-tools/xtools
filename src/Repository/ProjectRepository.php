@@ -263,8 +263,9 @@ class ProjectRepository extends Repository
                 'query' => [
                     'action' => 'query',
                     'meta' => 'siteinfo',
-                    'siprop' => 'general|namespaces',
+                    'siprop' => 'general|namespaces|autocreatetempuser',
                     'format' => 'json',
+                    'formatversion' => '2',
                 ],
             ])->getBody()->getContents(), true);
         } catch (Exception $e) {
@@ -274,6 +275,7 @@ class ProjectRepository extends Repository
         $metadata = [
             'general' => [],
             'namespaces' => [],
+            'tempAccountPatterns' => $res['query']['autocreatetempuser']['matchPatterns'] ?? null,
         ];
 
         if (isset($res['query']['general'])) {
