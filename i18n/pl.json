@@ -174,8 +174,6 @@
 	"invalid-date": "Nieprawidłowa data",
 	"invalid-project": "$1 to nie jest prawidłowy projekt",
 	"invalid-project-cant-use": "$1 nie jest skonfigurowane do użycia tego narzędzia",
-	"ip-edits": "Liczba edycji spod IP",
-	"ips": "IP",
 	"is-admin": "Jest administratorem?",
 	"json": "JSON",
 	"large-edits": "Duże edycje (ponad 1000 bajtów)",

@@ -184,7 +184,6 @@
 	"invalid-project": "$1 nije važeći projekat",
 	"invalid-project-cant-use": "$1 nije konfigurisan za upotrebu ove alatke",
 	"invalid-type": "Izabran je nevažeći tip",
-	"ip-edits": "IP izmjene",
 	"is-admin": "Administrator?",
 	"json": "JSON",
 	"large-edits": "Velike izmjene (>1000 bajtova)",
