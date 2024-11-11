@@ -3,6 +3,7 @@
 		"authors": [
 			"Arystanbek",
 			"Batyrbek.kz",
+			"Casserium",
 			"Fontan 030"
 		]
 	},
@@ -19,6 +20,7 @@
 	"download-label": "Түсіріп алу",
 	"executed": "$1 {{PLURAL:$2|секундта}} орындалды.",
 	"friday": "Жұма",
+	"global-block-log": "Әр жерде бұғаттау журналы",
 	"help-translate": "Аударуға көмектесу",
 	"history": "Тарихы",
 	"last-day": "Өткен 24 сағаттағы өңдемелер",
