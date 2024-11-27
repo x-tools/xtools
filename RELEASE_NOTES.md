@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.20.3 ##
+- PageInfo (T380953): Typecast Twig input to string.
+- Localization updates.
+
 ## 3.20.2 ##
 - (T365507): Add support for temporary accounts, treat them the same as IPs.
 - EditCounter (T362818): Fix timecard to accommodate fractional timezones.
