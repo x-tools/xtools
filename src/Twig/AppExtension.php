@@ -591,9 +591,8 @@ class AppExtension extends AbstractExtension
         if ($user instanceof User) {
             $username = $user->getUsername();
         } else {
-            $username = $user;
+            $username = (string)$user;
         }
-
         return IPUtils::isIPAddress($username) || User::isTempUsername($project, $username);
     }
 
