@@ -335,7 +335,7 @@
 	"patroller-stats-notice2": "Vissa användare kan vara tidigare partullörer, eller är inte partullörer som har rätt att utföra vissa partullöråtgärder.",
 	"patrollers": "Patrullerare",
 	"patrols": "Patrulleringar",
-	"patrols-desc": "$2 {{PLURAL:$1|sidor|sidor}} patrullerade",
+	"patrols-desc": "$2 {{PLURAL:$1|sida|sidor}} patrullerade",
 	"pattern-input-desc": "Ett mönster kan vara valfri text där $1 är en joker.",
 	"pc-accept": "Acceptera väntande ändring",
 	"pc-reject": "Avvisa väntande ändring",
