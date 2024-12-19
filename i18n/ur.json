@@ -2,6 +2,7 @@
 	"@metadata": {
 		"authors": [
 			"Abdulq",
+			"BukhariSaeed",
 			"Obaid Raza",
 			"امین اکبر",
 			"محمد-عثمان"
@@ -58,6 +59,7 @@
 	"first-edit": "پہلی ترمیم",
 	"friday": "جمعہ",
 	"general-stats": "عمومی شماریات",
+	"global-block-log": "عالمی نوشتۂ پابندی",
 	"global-other-sites-edit-count": "دیگر منصوبوں میں",
 	"help-translate": "ترجمہ کرنے میں مدد کریں",
 	"hide": "چھپائیں",
