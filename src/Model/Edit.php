@@ -8,6 +8,7 @@ use App\Repository\EditRepository;
 use App\Repository\PageRepository;
 use App\Repository\UserRepository;
 use DateTime;
+use TypeError;
 
 /**
  * An Edit is a single edit to a page on one project.
@@ -68,7 +69,12 @@ class Edit extends Model
         if ($attrs['timestamp'] instanceof DateTime) {
             $this->timestamp = $attrs['timestamp'];
         } else {
-            $this->timestamp = DateTime::createFromFormat('YmdHis', $attrs['timestamp']);
+            try {
+                $this->timestamp = DateTime::createFromFormat('YmdHis', $attrs['timestamp']);
+            } catch (TypeError $e) {
+                // Some very old revisions may be missing a timestamp.
+                $this->timestamp = new DateTime('1970-01-01T00:00:00Z');
+            }
         }
 
         $this->deleted = (int)($attrs['rev_deleted'] ?? 0);
