@@ -234,13 +234,13 @@
 	"minor-edits-with-summaries": "Мање измене с описом",
 	"monday": "Понедељак",
 	"month": "Месец",
-	"month-counts": "Бројач по месецима",
+	"month-counts": "По месецима",
 	"more": "Још",
 	"multiple-users-allowed": "Вишеструк унос за кориснике дозвољен (раздвојити усправним цртама)",
 	"na": "Недоступно",
 	"name": "Име",
 	"namespace": "Именски простор",
-	"namespace-totals": "Укупно по именском простору",
+	"namespace-totals": "По именским просторима",
 	"namespaces": "Именски простори",
 	"namespaces-desc": "$2 {{PLURAL:$1|измена|измене|измена}} у простору чланка",
 	"neutral": "Неутрално",
@@ -500,6 +500,6 @@
 	"xtools-slogan": "Утолите глад за подацима",
 	"xtools-title": "XTools",
 	"year": "Година",
-	"year-counts": "Бројач по годинама",
+	"year-counts": "По годинама",
 	"yes": "Да"
 }
