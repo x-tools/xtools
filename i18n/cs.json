@@ -14,6 +14,7 @@
 			"Nemo bis",
 			"Patriccck",
 			"Patrik L.",
+			"Segoulas",
 			"Spotter"
 		]
 	},
@@ -228,6 +229,7 @@
 	"namespaces": "Jmenné prostory",
 	"neutral": "Neutrální",
 	"next": "Další",
+	"no": "Ne",
 	"no-contribs": "Nebyly nalezeny žádné příspěvky.",
 	"no-exist": "$1 neexistuje",
 	"no-result": "Nenalezeny žádné výsledky pro: $1",
@@ -394,6 +396,7 @@
 	"top-ten-by-edits": "Top 10 podle editací",
 	"top-ten-by-text": "Top 10 podle přidaného textu",
 	"top-ten-count": "Počet editací 10 nejaktivnějších přispěvatelů",
+	"top-ten-other-editors": "Další editoři",
 	"topedits-page": "Nejlepší úpravy článku",
 	"topedits-page-desc": "Všechny úpravy provedené na stránce jedním uživatelem v chronologickém pořadí.",
 	"topedits-per-namespace": "Nejlepší editace ve jmenném prostoru",
@@ -422,6 +425,7 @@
 	"user-page-desc": "Velikost uživatelské stránky je $2 {{PLURAL:$1|bajt|bajty|bajtů}}",
 	"username": "Uživatelské jméno",
 	"username-or-ip": "Uživatelské jméno nebo IPv4 nebo IPv6",
+	"username-removed": "(uživatelské jméno odstraněno)",
 	"version": "Verze $1",
 	"view-source": "Zobrazit zdrojový kód",
 	"view-wikitext": "Zobrazit jako wikitext",
@@ -437,5 +441,6 @@
 	"xtools-slogan": "Upokojte svůj hlad po datech",
 	"xtools-title": "XTools",
 	"year": "Rok",
-	"year-counts": "Roční počty editací"
+	"year-counts": "Roční počty editací",
+	"yes": "Ano"
 }
