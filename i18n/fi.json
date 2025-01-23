@@ -11,6 +11,7 @@
 			"Nike",
 			"Pyscowicz",
 			"SMAUG",
+			"Samoasambia",
 			"Yupik"
 		]
 	},
@@ -145,6 +146,7 @@
 	"error-denied": "Pääsysi XToolsiin on estetty väärinkäytön tai häiritsevän automaation avulla. Ota yhteyttä: $1",
 	"error-ip-range-unsupported": "Valitettavasti tämä toiminto ei ole saatavilla IP-alueille. Kirjoita käyttäjätunnus tai IP-osoite.",
 	"error-login": "Kirjautuminen epäonnistui! Yritä uudelleen.",
+	"error-login-required-link": "Kirjaudu sisään jatkaaksesi.",
 	"error-pageinfo-api": "Ei voitu ladata versiota koskevaa tietoa.",
 	"error-pagepile-too-large": "Valitettavasti sivuja on liian monta vietäväksi PagePile-tiedostoon. Voit luoda PagePile manuaalisesti tai yrittää kaventaa tulosjoukkoa rajoittamalla tiettyyn nimitilaan tai aikakehykseen.",
 	"error-query-timeout": "Valitettavasti pyydettyjen tietojen käsittely kesti liian kauan (timeout $1 {{PLURAL:$1|sekunti|sekuntia}}). Resurssien säästämiseksi kysely lopetettiin automaattisesti.",
