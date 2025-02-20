@@ -163,7 +163,7 @@
 	"error-server-message": "Palvelin sanoi: $1",
 	"error-service-overload": "XTools on tällä hetkellä ylikuormittunut muista pyynnöistä. Ole hyvä ja yritä uudelleen muutaman minuutin päästä.",
 	"error-title": "XToolsissa tapahtui sisäinen virhe. Se on automaattisesti välitetty eteenpäin, mutta halutessasi voit ilmoittaa siitä $1:ssä (vaatii Wikimedia-tilin).",
-	"error-usernames-missing": "Käyttäjätunnuksia ei voitu hakea. Tästä johtuen jotkin tiedot voivat olla epätäydellisiä tai virheellisiä.",
+	"error-usernames-missing": "Käyttäjänimiä ei voitu hakea. Tästä johtuen jotkin tiedot voivat olla puutteellisia tai virheellisiä.",
 	"events": "Tapahtumat",
 	"exclusion-pattern": "Älä sisällytä sivuja, joiden otsikot noudattavat määritettyä mallia.",
 	"executed": "Suoritettu $1 {{PLURAL:$2|sekunnissa}}.",
