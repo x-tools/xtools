@@ -59,7 +59,7 @@
 	"auto-edits-request": "Richiedi l'aggiunta di un nuovo strumento (semi-)automatico",
 	"auto-edits-tool-filter-desc": "Mostra solo i contributi utilizzando lo strumento indicato.",
 	"auto-edits-unknown-tool": "Nessuno strumento conosciuto con il nome: $1",
-	"auto-tool-edits": "$1 contributi",
+	"auto-tool-edits": "$1 modifiche",
 	"automatic": "Automatico",
 	"average-change-per-page": "Media dei contributi per pagina",
 	"average-edit-size": "Dimensione media di contributi",
