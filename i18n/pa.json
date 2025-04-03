@@ -6,7 +6,7 @@
 			"Kuldeepburjbhalaike"
 		]
 	},
-	"abusefilter": "ਦੁਰਵਿਵਹਾਰ ਫਿਲਟਰ",
+	"abusefilter": "ਦੁਰਵਰਤੋਂ-ਛਾਨਣੀ",
 	"accepted-formats": "ਸਵੀਕਾਰ ਕੀਤੇ ਫਾਰਮੈਟ",
 	"account-age": "ਖਾਤੇ ਦੀ ਉਮਰ",
 	"account-age-desc": "$2 {{PLURAL:$1|ਦਿਨ}} ਪੁਰਾਣਾ",
@@ -432,7 +432,7 @@
 	"tool-largestpages": "ਸਭ ਤੋਂ ਵੱਡੇ ਸਫ਼ੇ",
 	"tool-largestpages-desc": "ਕਿਸੇ ਪ੍ਰੋਜੈਕਟ 'ਤੇ ਸਭ ਤੋਂ ਵੱਡੇ ਸਫ਼ੇ ਪ੍ਰਾਪਤ ਕਰੋ",
 	"tool-meta": "ਵਰਤੋਂ ਦੇ ਅੰਕੜੇ",
-	"tool-meta-desc": "ਦੇਖੋ ਕਿ ਸਮੇਂ ਦੇ ਨਾਲ ਕਿਹੜੇ XTools ਸਭ ਤੋਂ ਵੱਧ ਪ੍ਰਸਿੱਧ ਹਨ",
+	"tool-meta-desc": "ਵੇਖੋ ਕਿ ਸਮੇਂ ਦੇ ਨਾਲ ਕਿਹੜੇ XTools ਸਭ ਤੋਂ ਵੱਧ ਮਸ਼ਹੂਰ ਹਨ",
 	"tool-pageinfo": "ਸਫ਼ੇ ਦਾ ਅਤੀਤ",
 	"tool-pageinfo-desc": "ਕਿਸੇ ਸਫ਼ੇ ਦੇ ਇਤਿਹਾਸ ਬਾਰੇ ਵੱਖ-ਵੱਖ ਅੰਕੜੇ ਪ੍ਰਾਪਤ ਕਰੋ",
 	"tool-pages": "ਸਫ਼ੇ ਬਣਾਏ",
