@@ -161,7 +161,7 @@ class EditCounter extends Model
         // Filter out unblocks unless requested.
         if ($blocksOnly) {
             $blocks = array_filter($blocks, function ($block) {
-                return 'block' === $block['log_action'];
+                return ('block' === $block['log_action'] || 'reblock' == $block['log_action']);
             });
         }
 
