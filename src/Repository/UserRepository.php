@@ -139,7 +139,7 @@ class UserRepository extends Repository
                 INNER JOIN $block_targetTable
                 ON (block_target.bt_user_text = :username
                 AND block.bl_target = block_target.bt_id)
-                LIMIT 1"
+                LIMIT 1";
         $resultQuery = $this->executeProjectsQuery($databaseName, $sql, ['username' => $username]);
         return $resultQuery->fetchOne();
     }
