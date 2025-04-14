@@ -380,11 +380,19 @@ class EditCounter extends Model
                     $lastBlock = [null, null];
                 }
             } elseif ('reblock' === $block['log_action'] && -1 !== $lastBlock[1]) {
-                // The last block was modified. So we will adjust $lastBlock to include
-                // the difference of the duration of the new reblock, and time since the last block.
+                // The last block was modified. 
                 // $lastBlock is left unchanged if its duration was indefinite.
-                $timeSinceLastBlock = $timestamp - $lastBlock[0];
-                $lastBlock[1] = $timeSinceLastBlock + $duration;
+                
+                // If this reblock set the block to infinite, set lastBlock manually to infinite
+                if ($duration === -1) {
+                    $lastBlock[1] = -1;
+                // Otherwise, we will adjust $lastBlock to include
+                // the difference of the duration of the new reblock, and time since the last block.
+                // we can't use this when $duration === -1.
+                } else {
+                    $timeSinceLastBlock = $timestamp - $lastBlock[0];
+                    $lastBlock[1] = $timeSinceLastBlock + $duration;
+                }
             }
         }
 
