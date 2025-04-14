@@ -137,8 +137,8 @@ class UserRepository extends Repository
         $sql = "SELECT bl_expiry
                 FROM $blockTable
                 INNER JOIN $block_targetTable
-                ON (block_target.bt_user_text = :username
-                AND block.bl_target = block_target.bt_id)
+                ON ($block_targetTable.bt_user_text = :username
+                AND $blockTable.bl_target = $block_targetTable.bt_id)
                 LIMIT 1";
         $resultQuery = $this->executeProjectsQuery($databaseName, $sql, ['username' => $username]);
         return $resultQuery->fetchOne();
