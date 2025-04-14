@@ -132,11 +132,14 @@ class UserRepository extends Repository
      */
     public function getBlockExpiry(string $databaseName, string $username)
     {
-        $ipblocksTable = $this->getTableName($databaseName, 'ipblocks', 'ipindex');
-        $sql = "SELECT ipb_expiry
-                FROM $ipblocksTable
-                WHERE ipb_address = :username
-                LIMIT 1";
+        $blockTable = $this->getTableName($databaseName, 'blocks');
+        $block_targetTable = $this->getTableName($databaseName, 'blocks');
+        $sql = "SELECT bl_expiry
+                FROM $blockTable
+                INNER JOIN $block_targetTable
+                ON (block_target.bt_user_text = :username
+                AND block.bl_target = block_target.bt_id)
+                LIMIT 1"
         $resultQuery = $this->executeProjectsQuery($databaseName, $sql, ['username' => $username]);
         return $resultQuery->fetchOne();
     }
