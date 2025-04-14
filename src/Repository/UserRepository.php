@@ -132,8 +132,8 @@ class UserRepository extends Repository
      */
     public function getBlockExpiry(string $databaseName, string $username)
     {
-        $blockTable = $this->getTableName($databaseName, 'blocks');
-        $block_targetTable = $this->getTableName($databaseName, 'blocks');
+        $blockTable = $this->getTableName($databaseName, 'block');
+        $block_targetTable = $this->getTableName($databaseName, 'block_target');
         $sql = "SELECT bl_expiry
                 FROM $blockTable
                 INNER JOIN $block_targetTable
