@@ -86,7 +86,7 @@ class UserRightsRepository extends Repository
         $sql = "SELECT log_id, log_timestamp, log_params, log_action, actor_name AS `performer`,
                     ISNULL(comment_text, '') AS `log_comment`, '$type' AS type
                 FROM $loggingTable
-                KOIN $actorTable ON log_actor = actor_id
+                JOIN $actorTable ON log_actor = actor_id
                 LEFT OUTER JOIN $commentTable ON comment_id = log_comment_id
                 WHERE log_type = '$logType'
                 AND log_namespace = 2
