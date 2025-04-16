@@ -11,7 +11,6 @@ XTools is a suite of statistics tools for Wikimedia wikis, users, pages, and mor
 
 ![CI](https://github.com/x-tools/xtools/actions/workflows/ci.yml/badge.svg)
 [![codecov](https://codecov.io/gh/x-tools/xtools/branch/main/graph/badge.svg?token=BCmHqChZl7)](https://codecov.io/gh/x-tools/xtools)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/x-tools/xtools/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/x-tools/xtools/?branch=main)
 
 ## Contributing
 
