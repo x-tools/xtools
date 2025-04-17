@@ -693,6 +693,17 @@ class EditCounter extends Model
     }
 
     /**
+     * Get the total number of PageCurations reviews performed by the user.
+     * (Only exists on English Wikipedia.)
+     * @return int
+     */
+    public function reviews(): int
+    {
+        $logCounts = $this->getLogCounts();
+        return $logCounts['reviewed'] ?: 0;
+    }
+    
+    /**
      * Get the total number of accounts created by the user.
      * @return int
      */
