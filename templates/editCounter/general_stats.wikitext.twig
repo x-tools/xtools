@@ -145,7 +145,7 @@
 | [{{ wiki.pageUrlRaw('Special:Log/review/' ~ user.username, project, '&subtype=accept') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.approvals }}}}]
 |-
 | {{ msg('patrol') }}
-| [[Special:Log/patrol/{{ user.username }}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.patrols }}}}]]
+| {% if project.databaseName == "enwiki" %}{{ wiki.pageUrlRaw('Special:Log/pagetriage-curation/' ~ user.username, project, '&subtype=review') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.reviews }}}}{% else %}[[Special:Log/patrol/{{ user.username }}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.patrols }}}}]]{% endif %}
 |-
 | {{ msg('accounts-created') }}
 | [[Special:Log/newusers/{{ user.username }}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.accountsCreated }}}}]]
