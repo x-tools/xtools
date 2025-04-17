@@ -23,21 +23,33 @@
                     {% endif %}
                 </td>
                 <td class="{{ change.grantType == 'pending' ? 'pending ' : '' }}sort-entry--rights" data-value="{{ change.added|length + change.removed|length }}">
-                    {% for right in change.added %}
-                        <div class="diff-pos">{{ ec.userRights.rightsName(right)|trim }}</div>
-                    {% endfor %}
-                    {% for right in change.removed %}
-                        <div class="diff-neg" dir="ltr">-{{ ec.userRights.rightsName(right)|trim }}</div>
-                    {% endfor %}
+                    {% if change.added %}
+                        {% for right in change.added %}
+                            <div class="diff-pos">{{ ec.userRights.rightsName(right)|trim }}</div>
+                        {% endfor %}
+                        {% for right in change.removed %}
+                            <div class="diff-neg" dir="ltr">-{{ ec.userRights.rightsName(right)|trim }}</div>
+                        {% endfor %}
+                    {% else %}
+                         <i class="text-muted">{{ msg('error-deleted-data-link') }}</i>
+                    {% endif %}
                 </td>
                 <td class="{{ change.grantType == 'pending' ? 'pending ' : '' }}sort-entry--performer" data-value="{{ change.performer }}">
-                    {% if change.grantType == 'manual' %}
-                        {{ wiki.userLink(change.performer, change.type == 'local' ? project : metaProject) }}
+                    {% if change.performer %}
+                        {% if change.grantType == 'manual' %}
+                            {{ wiki.userLink(change.performer, change.type == 'local' ? project : metaProject) }}
+                        {% endif %}
+                    {% else %}
+                        <i class="text-muted">{{ msg('error-deleted-data-link') }}</i>
                     {% endif %}
                 </td>
                 <td class="sort-entry--summary" data-value="{{ change.comment }}">
                     {% if change.grantType == 'manual' %}
-                        {{ change.comment|wikify(change.type == 'local' ? project : metaProject)|raw }}
+                        {% if change.comment %}
+                            {{ change.comment|wikify(change.type == 'local' ? project : metaProject)|raw }}
+                        {% else %}
+                            <i class="text-muted">{{ msg('error-deleted-data-link') }}</i>
+                        {% endif %}
                     {% else %}
                         <i class="text-muted">{{ msg('automatic') }}</i>
                     {% endif %}

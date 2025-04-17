@@ -15,7 +15,8 @@
     #}{{ timestamp|trans|date_format }}{#
 #}{% endif %}
 
-| {% for right in change.added %}
+| {% if change.added %}
+{% for right in change.added %}
 <span style="color:#006400">+{{ ec.userRights.rightsName(right)|trim }}</span>{% if not loop.last %}, {% endif %}
 {% endfor %}{% if change.added|length > 0 and change.removed|length > 0 %}
 
@@ -23,10 +24,13 @@
 {% for right in change.removed %}
 <span style="color:#8B0000">-{{ ec.userRights.rightsName(right)|trim }}</span>{% if not loop.last %}, {% endif %}
 {% endfor %}
+{% else %}
+{{ msg('error-deleted-data-link') }}
+{% endif %}
 
-|{% if change.performer is not empty %} <span class="plainlinks">[{% verbatim %}{{{% endverbatim %}fullurl:User:{{ change.performer }}}} {{ change.performer }}]</span>{% endif %}
+| {% if change.performer %}{% if change.performer is not empty %} <span class="plainlinks">[{% verbatim %}{{{% endverbatim %}fullurl:User:{{ change.performer }}}} {{ change.performer }}]</span>{% endif %}{% else %}{{ msg ('error-deleted-data-link') }}{% endif %}
 
-| {% if change.grantType == 'manual' %}{{ change.comment }}{% else %}''{{ msg('automatic') }}''{% endif %}
+| {% if change.grantType == 'manual' %}{% if change.comment %}{{ change.comment }}{% else %}{{ msg('error-deleted-data-link') }}{% endif %}{% else %}''{{ msg('automatic') }}''{% endif %}
 
 {% endfor %}
 |}
