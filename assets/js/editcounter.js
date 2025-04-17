@@ -336,7 +336,8 @@ xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
                             if (index === 0 || index > 7) {
                                 return '';
                             }
-                            return chart.data.datasets[index - 1].data.reduce(function (a, b) {
+                            let datasets = window.chart ? chart.data.datasets : timeCardDatasets;
+                            return datasets[index - 1].data.reduce(function (a, b) {
                                 return a + parseInt(b.value, 10);
                             }, 0);
                         }
