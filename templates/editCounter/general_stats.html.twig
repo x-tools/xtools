@@ -345,14 +345,17 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>{{ msg('patrol') }}</td>
-                    <td>
-                        {% if project.databaseName == "enwiki" %}
+                    {% if project.databaseName == "enwiki" %}
+                        <td>{{ msg('page-curation') }}</td>
+                        <td>
                             {{ wiki.userLogLink(user, project, ec.reviews|num_format, 'pagetriage-curation', 'review') }}
-                        {% else %}
+                        </td>
+                    {% else %}
+                        <td>{{ msg('patrol') }}</td>
+                        <td>
                             {{ wiki.userLogLink(user, project, ec.patrols|num_format, 'patrol') }}
-                        {% endif %}
-                    </td>
+                        </td>
+                    {% endif %}
                 </tr>
                 <tr>
                     <td>{{ msg('accounts-created') }}</td>
