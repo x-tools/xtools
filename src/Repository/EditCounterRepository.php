@@ -207,6 +207,7 @@ class EditCounterRepository extends Repository
             'merge-merge',
             'contentmodel-change',
             'contentmodel-new',
+            'reviewed',
         ];
         foreach ($requiredCounts as $req) {
             if (!isset($logCounts[$req])) {
