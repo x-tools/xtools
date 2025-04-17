@@ -348,7 +348,7 @@
                     <td>{{ msg('patrol') }}</td>
                     <td>
                         {% if project.databaseName == "enwiki" %}
-                            {{ wiki.userLogLink(user, project, ec.reviews|num_format, 'pagetriage-curation', 'reviewed') }}
+                            {{ wiki.userLogLink(user, project, ec.reviews|num_format, 'pagetriage-curation', 'review') }}
                         {% else %}
                             {{ wiki.userLogLink(user, project, ec.patrols|num_format, 'patrol') }}
                         {% endif %}
