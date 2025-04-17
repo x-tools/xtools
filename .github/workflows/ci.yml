@@ -12,14 +12,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Validate composer.json and composer.lock
       run: composer validate --strict
 
     - name: Cache Composer packages
       id: composer-cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: vendor
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
@@ -39,7 +39,7 @@ jobs:
       id: nvm
 
     - name: Set up Node ${{ steps.nvm.outputs.NODE_VERSION }}
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: ${{ steps.nvm.outputs.NODE_VERSION }}
 
@@ -57,4 +57,4 @@ jobs:
         git status | grep "nothing to commit, working tree clean"
 
     - name: Codecov
-      uses: codecov/codecov-action@v1.5.0
+      uses: codecov/codecov-action@v5
