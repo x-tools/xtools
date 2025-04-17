@@ -102,7 +102,7 @@ class Blame extends Authorship
 
     /**
      * Get authorship attribution from the WikiWho API.
-     * @see https://www.f-squared.org/wikiwho/
+     * @see https://www.mediawiki.org/wiki/WikiWho
      */
     public function prepareData(): void
     {
