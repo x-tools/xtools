@@ -234,7 +234,6 @@ class UserRights extends Model
                 $removed = null;
             // Nothing was deleted.
             } else {
-    
                 $unserialized = @unserialize($row['log_params']);
     
                 if (false !== $unserialized) {
@@ -245,7 +244,8 @@ class UserRights extends Model
                     $oldMetadata = $unserialized['oldmetadata'] ?? $unserialized['oldMetadata'] ?? null;
                     $newMetadata = $unserialized['newmetadata'] ?? $unserialized['newMetadata'] ?? null;
     
-                    // Check for changes only to expiry. If such exists, treat it as added. Various issets are safeguards.
+                    // Check for changes only to expiry.
+                    // If such exists, treat it as added. Various issets are safeguards.
                     if (empty($added) && empty($removed) && isset($oldMetadata) && isset($newMetadata)) {
                         foreach ($old as $index => $right) {
                             $oldExpiry = $oldMetadata[$index]['expiry'] ?? null;
