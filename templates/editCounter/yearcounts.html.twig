@@ -33,7 +33,7 @@
     </table>
 
     {# Set height of chart based on how many years (horizontal rows) are being reported. #}
-    <div style="position:relative; height:{{ (25 * ec.yearCounts.yearLabels|length) + 30 }}px">
+    <div style="position:relative; height:{% if is_sub_request %}{{ (25 * ec.yearCounts.yearLabels|length) + 30 }}px{% else %}{{ 25 * ( ec.yearCounts.yearLabels|length + ( ( ec.yearCounts.totals / 3)|round(1, "ceil") ) }}px{% endif %}">
         <canvas id="yearcounts-canvas"></canvas>
     </div>
     <script type="text/javascript">
