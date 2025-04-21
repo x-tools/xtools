@@ -84,7 +84,7 @@ class UserRightsRepository extends Repository
         $logType = 'global' == $type ? 'gblrights' : 'rights';
 
         $sql = "SELECT log_id, log_timestamp, log_params, log_action, actor_name AS `performer`,
-                    comment_text AS `log_comment`, '$type' AS type
+                    comment_text AS `log_comment`, log_deleted, '$type' AS type
                 FROM $loggingTable
                 LEFT OUTER JOIN $actorTable ON log_actor = actor_id
                 LEFT OUTER JOIN $commentTable ON comment_id = log_comment_id
