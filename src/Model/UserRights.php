@@ -63,6 +63,9 @@ class UserRights extends Model
                     'removed' => [],
                     'grantType' => strtotime($acDate) > time() ? 'pending' : 'automatic',
                     'type' => 'local',
+                    'paramsDeleted' => false,
+                    'commentDeleted' => false,
+                    'performerDeleted' => false,
                 ];
                 krsort($this->rightsChanges);
             }
@@ -229,9 +232,10 @@ class UserRights extends Model
             // For the display.
             if (!isset($row['log_params']) || null === $row['log_params']) {
                 // As log_params is NULL, we don't know.
-                // (Twig will process the null's we're leaving.)
-                $added = null;
-                $removed = null;
+                // Leave arrays here to not crash later.
+                // Twig will know from log_deleted.
+                $added = [];
+                $removed = [];
             // Nothing was deleted.
             } else {
                 $unserialized = @unserialize($row['log_params']);
@@ -312,6 +316,9 @@ class UserRights extends Model
                 'removed' => $removed,
                 'grantType' => 'autopromote' === $row['log_action'] ? 'automatic' : 'manual',
                 'type' => $row['type'],
+                'paramsDeleted' => $row['log_deleted'] > 0,
+                'commentDeleted' => ($row['log_deleted'] % 4) >= 2,
+                'performerDeleted' => ($row['log_deleted'] % 8) >= 4,
             ];
         }
 
@@ -354,6 +361,9 @@ class UserRights extends Model
                     'removed' => [$entry],
                     'grantType' => strtotime($expiry) > time() ? 'pending' : 'automatic',
                     'type' => $row['type'],
+                    'paramsDeleted' => false,
+                    'commentDeleted' => false,
+                    'performerDeleted' => false,
                 ];
             }
         }
