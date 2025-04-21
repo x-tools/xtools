@@ -228,8 +228,6 @@ class UserRights extends Model
         foreach ($logData as $row) {
             // Happens when the log entry has been partially deleted.
             // This is when comment or performer was deleted.
-            // But we don't change anything because null is a convenient signal
-            // For the display.
             if (!isset($row['log_params']) || null === $row['log_params']) {
                 // As log_params is NULL, we don't know.
                 // Leave arrays here to not crash later.
@@ -312,8 +310,8 @@ class UserRights extends Model
                 'logId' => $row['log_id'],
                 'performer' => 'autopromote' === $row['log_action'] ? null : $row['performer'],
                 'comment' => $row['log_comment'],
-                'added' => $added,
-                'removed' => $removed,
+                'added' => array_values($added),
+                'removed' => array_values($removed),
                 'grantType' => 'autopromote' === $row['log_action'] ? 'automatic' : 'manual',
                 'type' => $row['type'],
                 'paramsDeleted' => $row['log_deleted'] > 0,
