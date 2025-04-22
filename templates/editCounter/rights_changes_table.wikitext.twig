@@ -26,9 +26,9 @@
 {% endfor %}
 {% endif %}
 
-| {% if change.performerDeleted %}{{ msg ('error-deleted-data-link') }}{% else %}{% if change.performer is not empty %} <span class="plainlinks">[{% verbatim %}{{{% endverbatim %}fullurl:User:{{ change.performer }}}} {{ change.performer }}]</span>{% endif %}{% endif %}
+| {% if change.performerDeleted %}{{ msg('username-removed') }}{% else %}{% if change.performer is not empty %} <span class="plainlinks">[{% verbatim %}{{{% endverbatim %}fullurl:User:{{ change.performer }}}} {{ change.performer }}]</span>{% endif %}{% endif %}
 
-| {% if change.grantType == 'manual' %}{% if change.commentDeleted %}{{ msg('error-deleted-data-link') }}{{ change.comment }}{% else %}{% endif %}{% else %}''{{ msg('automatic') }}''{% endif %}
+| {% if change.grantType == 'manual' %}{% if change.commentDeleted %}{{ msg('edit-summary-removed') }}{{ change.comment }}{% else %}{% endif %}{% else %}''{{ msg('automatic') }}''{% endif %}
 
 {% endfor %}
 |}
