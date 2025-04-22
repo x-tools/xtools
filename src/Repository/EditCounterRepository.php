@@ -207,7 +207,9 @@ class EditCounterRepository extends Repository
             'merge-merge',
             'contentmodel-change',
             'contentmodel-new',
-            'reviewed',
+            'pagetriage-curation-reviewed',
+            'pagetriage-curation-reviewed-redirect',
+            'pagetriage-curation-reviewed-article',
         ];
         foreach ($requiredCounts as $req) {
             if (!isset($logCounts[$req])) {
