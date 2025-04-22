@@ -303,10 +303,9 @@ xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
                     radius: function (context) {
                         var index = context.dataIndex;
                         var data = context.dataset.data[index];
-                        // var size = context.chart.width;
-                        // var base = data.value / 100;
-                        // return (size / 50) * base;
-                        return data.scale;
+                        // Max height a bubble can have. -20 to account for bottom labels, /9 because there are a bit less than 9 such sections, and /2 to get a radius not diameter
+                        var maxRadius = ((context.chart.height - 20) / 9 / 2);
+                        return (data.scale / 20) * maxRadius;
                     },
                     hitRadius: 8
                 }
