@@ -228,16 +228,12 @@
             </td>
         </tr>
         <tr>
-            <td>{{ msg('block-current') }}</td>
+            <td>{{ msg('block-current-count') }}</td>
             <td>
                 {% if user.isBlocked(project) %}
                     <a href="{{ wiki.pageUrlRaw('Special:BlockList', project)~'?wpTarget='~user.username }}">{% apply spaceless %}
-                            {% if user.getBlockExpiry(project) == 'infinity' %}
-                                &#x221e; {# infinity #}
-                            {% else %}
-                                {{ user.getBlockExpiry(project)|date_format }}
-                            {% endif %}
-                        {% endapply %}</a>
+                        {{ user.countActiveBlocks(project, user)|num_format }}
+                    {% endapply %}</a>
                 {% else %}
                     &ndash;
                 {% endif %}

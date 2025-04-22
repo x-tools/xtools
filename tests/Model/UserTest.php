@@ -91,18 +91,18 @@ class UserTest extends TestAdapter
     /**
      * Get the expiry of the current block of a user on a given project
      */
-    public function testExpiry(): void
+    public function testCountActiveBlocks(): void
     {
         $this->userRepo->expects($this->once())
-            ->method('getBlockExpiry')
-            ->willReturn('20500601000000');
+            ->method('countActiveBlocks')
+            ->willReturn(5);
         $user = new User($this->userRepo, 'TestUser');
 
         $projectRepo = $this->createMock(ProjectRepository::class);
         $project = new Project('wiki.example.org');
         $project->setRepository($projectRepo);
 
-        static::assertEquals(new DateTime('20500601000000'), $user->getBlockExpiry($project));
+        static::assertEquals(5, $user->countActiveBlocks($project));
     }
 
     /**
@@ -111,8 +111,8 @@ class UserTest extends TestAdapter
     public function testIsBlocked(): void
     {
         $this->userRepo->expects($this->once())
-            ->method('getBlockExpiry')
-            ->willReturn('infinity');
+            ->method('countActiveBlocks')
+            ->willReturn(1);
         $user = new User($this->userRepo, 'TestUser');
 
         $projectRepo = $this->createMock(ProjectRepository::class);
