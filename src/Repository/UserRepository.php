@@ -125,23 +125,35 @@ class UserRepository extends Repository
     }
 
     /**
-     * Search the ipblocks table to see if the user is currently blocked and return the expiry if they are.
-     * @param string $databaseName The database to query.
-     * @param string $username The username of the user to search for.
-     * @return bool|string Expiry of active block or false
+     * Get the number of active blocks on the user.
+     * @param Project $project
+     * @param User $user
+     * @return int Number of active blocks.
      */
-    public function getBlockExpiry(string $databaseName, string $username)
+    public function countActiveBlocks(Project $project, User $user): int
     {
-        $blockTable = $this->getTableName($databaseName, 'block');
-        $blockTargetTable = $this->getTableName($databaseName, 'block_target');
-        $sql = "SELECT bl_expiry
-                FROM $blockTable
-                INNER JOIN $blockTargetTable
-                ON ($blockTargetTable.bt_user_text = :username
-                AND $blockTable.bl_target = $blockTargetTable.bt_id)
-                LIMIT 1";
-        $resultQuery = $this->executeProjectsQuery($databaseName, $sql, ['username' => $username]);
-        return $resultQuery->fetchOne();
+        $cacheKey = $this->getCacheKey(func_get_args(), 'user_active_blocks');
+        if ($this->cache->hasItem($cacheKey)) {
+            return (int)$this->cache->getItem($cacheKey)->get();
+        }
+        if ($user->isIP()) {
+            $blockTargetTable = $project->getTableName('block_target_ipindex');
+            $userField = 'bt_address';
+            if ($user->isIpRange()) {
+                $userId = IPUtils::sanitizeRange($user->getUsername());
+            } else {
+                $userId = IPUtils::sanitizeIp($user->getUsername());
+            }
+        } else {
+            $blockTargetTable = $project->getTableName('block_target');
+            $userField = 'bt_user';
+            $userId = $user->getId($project);
+        }
+        $sql = "SELECT bt_count
+                FROM $blockTargetTable
+                WHERE $userField = :user";
+        $resultQuery = $this->executeProjectsQuery($project->getDatabaseName(), $sql, ['user' => $userId]);
+        return $this->setCache($cacheKey, (int)$resultQuery->fetchOne());
     }
 
     /**
