@@ -703,7 +703,6 @@ class EditCounter extends Model
     /**
      * Get the total number of PageCurations reviews performed by the user.
      * (Only exists on English Wikipedia.)
-     * In their count of this they also include the count of patrol-patrol.
      * @return int
      */
     public function reviews(): int
@@ -712,7 +711,7 @@ class EditCounter extends Model
         $reviewed = $logCounts['pagetriage-curation-reviewed'] ?: 0;
         $reviewedRedirect = $logCounts['pagetriage-curation-reviewed-redirect'] ?: 0;
         $reviewedArticle = $logCounts['pagetriage-curation-reviewed-article'] ?: 0;
-        return ($reviewed + $reviewedRedirect + $reviewedArticle + $this->patrols());
+        return ($reviewed + $reviewedRedirect + $reviewedArticle);
     }
     
     /**
