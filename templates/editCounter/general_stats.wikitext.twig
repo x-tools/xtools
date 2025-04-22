@@ -143,6 +143,7 @@
 |-
 | {{ msg('approve') }}
 | [{{ wiki.pageUrlRaw('Special:Log/review/' ~ user.username, project, '&subtype=accept') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.approvals }}}}]
+{% if project.databaseName == "enwiki" %}
 |-
 | {{ msg('page-curation') }}
 | [{{ wiki.pageUrlRaw('Special:Log/pagetriage-curation/' ~ user.username, project, '&subtype=review') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.reviews }}}}]
@@ -150,7 +151,6 @@
 |-
 | {{ msg('patrol') }}
 | [[Special:Log/patrol/{{ user.username }}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.patrols }}}}]]
-{% if project.databaseNAme == "enwiki" %}
 |-
 | {{ msg('accounts-created') }}
 | [[Special:Log/newusers/{{ user.username }}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.accountsCreated }}}}]]
@@ -217,12 +217,8 @@
 | {% if ec.longestBlockSeconds == -1 %}&#x221e; {# infinity #}{% elseif ec.longestBlockSeconds == false %}&ndash;{% else %}{{ formatDuration(ec.longestBlockSeconds) }}{% endif %}
 
 |-
-| {{ msg('block-current') }}
-| {% if user.isBlocked(project) %}[[Special:BlockList/{{ user.username }}|{% apply spaceless %}
-    {% if user.getBlockExpiry(project) == 'infinity' %}&#x221e;{# infinity #}{% else %}
-        {{ user.getBlockExpiry(project)|date_format }}{% endif %}]]
-{% endapply %}
-
+| {{ msg('block-current-count') }}
+| {% if user.isBlocked(project) %}[[Special:BlockList/{{ user.username }}|{{ user.countActiveBlocks(project, user)|num_format }}]]
 {% else %}&ndash;
 {% endif %}
 |-
