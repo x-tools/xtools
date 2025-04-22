@@ -256,7 +256,6 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
                 }],
                 yAxes: [{
                     stacked: true,
-                    barThickness: 18,
                     position: i18nRTL ? 'right' : 'left',
                     gridLines: {
                         color: xtools.application.chartGridColor
@@ -336,8 +335,11 @@ xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
                             if (index === 0 || index > 7) {
                                 return '';
                             }
-                            let datasets = window.chart ? chart.data.datasets : timeCardDatasets;
-                            return datasets[index - 1].data.reduce(function (a, b) {
+                            let dataset = (window.chart ? window.chart.data.datasets : timeCardDatasets);
+                            let hours = dataset.map((day) => day.data)
+                                .flat()
+                                .filter((datum) => datum.y == 8-index);
+                            return hours.reduce(function (a, b) {
                                 return a + parseInt(b.value, 10);
                             }, 0);
                         }
