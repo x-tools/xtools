@@ -36,7 +36,7 @@
                 </td>
                 <td class="{{ change.grantType == 'pending' ? 'pending ' : '' }}sort-entry--performer" data-value="{{ change.performer }}">
                     {% if change.performerDeleted %}
-                        <i class="text-muted">{{ msg('error-deleted-data-link') }}</i>
+                        <i class="text-muted">{{ msg('username-removed') }}</i>
                     {% else %}
                         {% if change.grantType == 'manual' %}
                             {{ wiki.userLink(change.performer, change.type == 'local' ? project : metaProject) }}
@@ -46,7 +46,7 @@
                 <td class="sort-entry--summary" data-value="{{ change.comment }}">
                     {% if change.grantType == 'manual' %}
                         {% if change.commentDeleted %}
-                            <i class="text-muted">{{ msg('error-deleted-data-link') }}</i>
+                            <i class="text-muted">{{ msg('edit-summary-removed') }}</i>
                         {% else %}
                             {{ change.comment|wikify(change.type == 'local' ? project : metaProject)|raw }}
                         {% endif %}
