@@ -381,24 +381,13 @@ class User extends Model
     }
 
     /**
-     * Get the expiry of the current block on the user
+     * Get the number of active blocks on the user.
      * @param Project $project The project.
-     * @return DateTime|bool Expiry as DateTime, true if indefinite, or false if they are not blocked.
+     * @return int Number of active blocks.
      */
-    public function getBlockExpiry(Project $project)
+    public function countActiveBlocks(Project $project): int
     {
-        $expiry = $this->repository->getBlockExpiry(
-            $project->getDatabaseName(),
-            $this->getUsername()
-        );
-
-        if ('infinity' === $expiry) {
-            return true;
-        } elseif (false === $expiry) {
-            return false;
-        } else {
-            return new DateTime($expiry);
-        }
+        return (int)$this->repository->countActiveBlocks($project, $this);
     }
 
     /**
@@ -408,7 +397,7 @@ class User extends Model
      */
     public function isBlocked(Project $project): bool
     {
-        return false !== $this->getBlockExpiry($project);
+        return $this->countActiveBlocks($project) > 0;
     }
 
     /**

@@ -67,7 +67,7 @@
 	"blame-as-of-desc": "Use this to perform a blame search on older versions of the article.",
 	"blame-query-desc": "Search query should include any underlying wikitext.",
 	"block": "Block",
-	"block-current": "Current block",
+	"block-current-count": "Current blocks",
 	"block-log": "Block log",
 	"block-longest": "Longest block",
 	"blocks": "Blocks",

@@ -86,7 +86,7 @@
 	"blame-as-of-desc": "Tooltip indicating what the 'as of' option does. It allows you to search 'as of' different revisions, in order to find edits that added wikitext that does not exist in the current version of the article.",
 	"blame-query-desc": "Tooltip indicating that the search query for the Blame tool should be wikitext, and not necessarily a direct copy/paste of visible content that you want to search for.",
 	"block": "Name of a MediaWiki log action, used as header of a row in the table of log action counts for a user.\n{{Identical|Block}}",
-	"block-current": "Label for info about a user's current block.",
+	"block-current-count": "Label for number of blocks currently placed on a user.",
 	"block-log": "Link to a user's block log.\n{{Identical|Block log}}",
 	"block-longest": "Label for info about the longest block a user received.",
 	"blocks": "Heading for section listing stats about a user's block log.\n{{Identical|Block}}",
