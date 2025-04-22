@@ -228,12 +228,16 @@
             </td>
         </tr>
         <tr>
-            <td>{{ msg('block-current-count') }}</td>
+            <td>{{ msg('block-current') }}</td>
             <td>
                 {% if user.isBlocked(project) %}
                     <a href="{{ wiki.pageUrlRaw('Special:BlockList', project)~'?wpTarget='~user.username }}">{% apply spaceless %}
-                        {{ user.countActiveBlocks(project, user)|num_format }}
-                    {% endapply %}</a>
+                            {% if user.getBlockExpiry(project) == 'infinity' %}
+                                &#x221e; {# infinity #}
+                            {% else %}
+                                {{ user.getBlockExpiry(project)|date_format }}
+                            {% endif %}
+                        {% endapply %}</a>
                 {% else %}
                     &ndash;
                 {% endif %}
@@ -340,18 +344,19 @@
                         {{ wiki.userLogLink(user, project, ec.approvals|num_format, 'review', 'accept') }}
                     </td>
                 </tr>
-                <tr>
-                    {% if project.databaseName == "enwiki" %}
+                {% if project.databaseName == "enwiki" %}
+                    <tr>
                         <td>{{ msg('page-curation') }}</td>
                         <td>
                             {{ wiki.userLogLink(user, project, ec.reviews|num_format, 'pagetriage-curation', 'review') }}
                         </td>
-                    {% else %}
-                        <td>{{ msg('patrol') }}</td>
-                        <td>
-                            {{ wiki.userLogLink(user, project, ec.patrols|num_format, 'patrol') }}
-                        </td>
-                    {% endif %}
+                    </tr>
+                {% endif %}
+                <tr>
+                    <td>{{ msg('patrol') }}</td>
+                    <td>
+                        {{ wiki.userLogLink(user, project, ec.patrols|num_format, 'patrol') }}
+                    </td>
                 </tr>
                 <tr>
                     <td>{{ msg('accounts-created') }}</td>
