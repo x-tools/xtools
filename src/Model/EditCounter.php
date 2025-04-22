@@ -161,7 +161,7 @@ class EditCounter extends Model
         // Filter out unblocks unless requested.
         if ($blocksOnly) {
             $blocks = array_filter($blocks, function ($block) {
-                return 'block' === $block['log_action'];
+                return ('block' === $block['log_action'] || 'reblock' == $block['log_action']);
             });
         }
 
@@ -380,11 +380,19 @@ class EditCounter extends Model
                     $lastBlock = [null, null];
                 }
             } elseif ('reblock' === $block['log_action'] && -1 !== $lastBlock[1]) {
-                // The last block was modified. So we will adjust $lastBlock to include
-                // the difference of the duration of the new reblock, and time since the last block.
+                // The last block was modified.
                 // $lastBlock is left unchanged if its duration was indefinite.
-                $timeSinceLastBlock = $timestamp - $lastBlock[0];
-                $lastBlock[1] = $timeSinceLastBlock + $duration;
+                
+                // If this reblock set the block to infinite, set lastBlock manually to infinite
+                if (-1 === $duration) {
+                    $lastBlock[1] = -1;
+                // Otherwise, we will adjust $lastBlock to include
+                // the difference of the duration of the new reblock, and time since the last block.
+                // we can't use this when $duration === -1.
+                } else {
+                    $timeSinceLastBlock = $timestamp - $lastBlock[0];
+                    $lastBlock[1] = $timeSinceLastBlock + $duration;
+                }
             }
         }
 
@@ -695,12 +703,16 @@ class EditCounter extends Model
     /**
      * Get the total number of PageCurations reviews performed by the user.
      * (Only exists on English Wikipedia.)
+     * In their count of this they also include the count of patrol-patrol.
      * @return int
      */
     public function reviews(): int
     {
         $logCounts = $this->getLogCounts();
-        return $logCounts['reviewed'] ?: 0;
+        $reviewed = $logCounts['pagetriage-curation-reviewed'] ?: 0;
+        $reviewedRedirect = $logCounts['pagetriage-curation-reviewed-redirect'] ?: 0;
+        $reviewedArticle = $logCounts['pagetriage-curation-reviewed-article'] ?: 0;
+        return ($reviewed + $reviewedRedirect + $reviewedArticle + $this->patrols());
     }
     
     /**
