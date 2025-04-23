@@ -340,6 +340,14 @@
                         {{ wiki.userLogLink(user, project, ec.approvals|num_format, 'review', 'accept') }}
                     </td>
                 </tr>
+                {% if project.hasPageTriage %}
+                    <tr>
+                        <td>{{ msg('page-curation') }}</td>
+                        <td>
+                            {{ wiki.userLogLink(user, project, ec.reviews|num_format, 'pagetriage-curation', 'review') }}
+                        </td>
+                    </tr>
+                {% endif %}
                 <tr>
                     <td>{{ msg('patrol') }}</td>
                     <td>

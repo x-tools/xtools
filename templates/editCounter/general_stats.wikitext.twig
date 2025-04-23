@@ -143,6 +143,11 @@
 |-
 | {{ msg('approve') }}
 | [{{ wiki.pageUrlRaw('Special:Log/review/' ~ user.username, project, '&subtype=accept') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.approvals }}}}]
+{% if project.hasPageTriage %}
+|-
+| {{ msg('page-curation') }}
+| [{{ wiki.pageUrlRaw('Special:Log/pagetriage-curation/' ~ user.username, project, '&subtype=review') }} {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.reviews }}}}]
+{% endif %}
 |-
 | {{ msg('patrol') }}
 | [[Special:Log/patrol/{{ user.username }}|{% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.patrols }}}}]]
