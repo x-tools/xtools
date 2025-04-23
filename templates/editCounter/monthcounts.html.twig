@@ -34,8 +34,8 @@
         </tbody>
     </table>
 
-    {# Set height of chart based on how many months (horizontal rows) are being reported. #}
-    <div style="position:relative; height:{{ (25 * ec.monthCounts.monthLabels|length) + 30 }}px">
+    {# Set height of chart based on how many months (horizontal rows) and namespaces are being reported. #}
+    <div style="position:relative; height:{% if is_sub_request %}{{ (25 * ec.monthCounts.monthLabels|length) + 30 }}px{% else %}{{ 25 * ( ec.monthCounts.monthLabels|length + ( (ec.monthCounts.totals|keys|length / 3)|round(1, "ceil") ) ) }}px{% endif %}">
         <canvas id="monthcounts-canvas"></canvas>
     </div>
 
