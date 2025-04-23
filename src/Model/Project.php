@@ -264,6 +264,16 @@ class Project extends Model
     }
 
     /**
+     * Get if this Wiki has the PageTriage extension (for review counts)
+     * @return bool Whether it does.
+     */
+    public function hasPageTriage() : bool
+    {
+        $extensions = $this->getInstalledExtensions();
+        return in_array('PageTriage', $extensions);
+    }
+
+    /**
      * Whether the project has temporary accounts enabled.
      * @return bool
      */
