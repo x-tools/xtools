@@ -24,7 +24,7 @@
                 </td>
                 <td class="{{ change.grantType == 'pending' ? 'pending ' : '' }}sort-entry--rights" data-value="{{ change.added|length + change.removed|length }}">
                         {% if change.paramsDeleted %}
-                            <i class="text-muted">{{ msg('error-deleted-data-link') }}</i>
+                            <i class="text-muted">{{ msg('data-unavailable') }}</i>
                         {% else %}
                             {% for right in change.added %}
                                 <div class="diff-pos">{{ ec.userRights.rightsName(right)|trim }}</div>
