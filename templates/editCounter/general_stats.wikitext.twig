@@ -212,12 +212,8 @@
 | {% if ec.longestBlockSeconds == -1 %}&#x221e; {# infinity #}{% elseif ec.longestBlockSeconds == false %}&ndash;{% else %}{{ formatDuration(ec.longestBlockSeconds) }}{% endif %}
 
 |-
-| {{ msg('block-current') }}
-| {% if user.isBlocked(project) %}[[Special:BlockList/{{ user.username }}|{% apply spaceless %}
-    {% if user.getBlockExpiry(project) == 'infinity' %}&#x221e;{# infinity #}{% else %}
-        {{ user.getBlockExpiry(project)|date_format }}{% endif %}]]
-{% endapply %}
-
+| {{ msg('block-current-count') }}
+| {% if user.isBlocked(project) %}[[Special:BlockList/{{ user.username }}|{{ user.countActiveBlocks(project, user)|num_format }}]]
 {% else %}&ndash;
 {% endif %}
 |-
