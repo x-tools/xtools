@@ -15,7 +15,7 @@
     #}{{ timestamp|trans|date_format }}{#
 #}{% endif %}
 
-| {% if change.paramsDeleted %}{{ msg('error-deleted-data-link') }}{% else %}
+| {% if change.paramsDeleted %}{{ msg('data-unavailable') }}{% else %}
 {% for right in change.added %}
 <span style="color:#006400">+{{ ec.userRights.rightsName(right)|trim }}</span>{% if not loop.last %}, {% endif %}
 {% endfor %}{% if change.added|length > 0 and change.removed|length > 0 %}
