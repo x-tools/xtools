@@ -127,7 +127,7 @@ class UserRightsTest extends TestAdapter
                 'performer' => 'Queen of Hearts',
                 'type' => 'local',
                 'log_deleted' => '2',
-            ]
+            ],
             ]);
 
         /** @var MockObject|UserRepository $userRepo */
@@ -235,7 +235,7 @@ class UserRightsTest extends TestAdapter
                 'paramsDeleted' => true,
                 'commentDeleted' => true,
                 'performerDeleted' => false,
-            ]
+            ],
         ], $this->userRights->getRightsChanges());
 
         $this->userRightsRepo->expects(static::once())
