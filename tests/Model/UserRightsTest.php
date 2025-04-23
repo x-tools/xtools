@@ -60,6 +60,7 @@ class UserRightsTest extends TestAdapter
                 'performer' => 'Worm That Turned',
                 'log_comment' => 'per [[Special:Diff/856641107]]',
                 'type' => 'local',
+                'log_deleted' => '0',
             ], [
                 // Removed: ipblock-exempt, filemover.
                 'log_id' => '210221',
@@ -77,6 +78,7 @@ class UserRightsTest extends TestAdapter
                 'log_action' => 'rights',
                 'performer' => 'MusikAnimal',
                 'type' => 'local',
+                'log_deleted' => '0',
             ], [
                 // Added: ipblock-exempt, filemover, templateeditor.
                 'log_id' => '210220',
@@ -92,6 +94,7 @@ class UserRightsTest extends TestAdapter
                 'log_action' => 'rights',
                 'performer' => 'MusikAnimal',
                 'type' => 'local',
+                'log_deleted' => '0',
             ], [
                 // Added: bureaucrat; Removed: rollbacker.
                 'log_id' => '155321',
@@ -103,6 +106,7 @@ class UserRightsTest extends TestAdapter
                 'log_action' => 'rights',
                 'performer' => 'Cyberpower678',
                 'type' => 'meta',
+                'log_deleted' => '0',
             ], [
                 // Old-school log entry, adds sysop.
                 'log_id' => '140643',
@@ -112,7 +116,18 @@ class UserRightsTest extends TestAdapter
                 'log_action' => 'rights',
                 'performer' => 'Snowolf',
                 'type' => 'meta',
-            ],
+                'log_deleted' => '0',
+            ], [
+                // Comment deleted
+                'log_id' => '168397975',
+                'log_timestamp' => '20250310044508',
+                'log_comment' => null,
+                'log_params' => null,
+                'log_action' => 'rights',
+                'performer' => 'Queen of Hearts',
+                'type' => 'local',
+                'log_deleted' => '2',
+            ]
             ]);
 
         /** @var MockObject|UserRepository $userRepo */
@@ -133,6 +148,9 @@ class UserRightsTest extends TestAdapter
                 'removed' => ['interface-admin'],
                 'grantType' => 'automatic',
                 'type' => 'local',
+                'paramsDeleted' => false,
+                'commentDeleted' => false,
+                'performerDeleted' => false,
             ],
             20180826173045 => [
                 'logId' => '92769185',
@@ -142,6 +160,9 @@ class UserRightsTest extends TestAdapter
                 'removed' => [],
                 'grantType' => 'manual',
                 'type' => 'local',
+                'paramsDeleted' => false,
+                'commentDeleted' => false,
+                'performerDeleted' => false,
             ],
             20180108132858 => [
                 'logId' => '210220',
@@ -151,6 +172,9 @@ class UserRightsTest extends TestAdapter
                 'removed' => ['ipblock-exempt', 'filemover'],
                 'grantType' => 'automatic',
                 'type' => 'local',
+                'paramsDeleted' => false,
+                'commentDeleted' => false,
+                'performerDeleted' => false,
             ],
             20180108132810 => [
                 'logId' => '210221',
@@ -160,6 +184,9 @@ class UserRightsTest extends TestAdapter
                 'removed' => ['templateeditor'],
                 'grantType' => 'manual',
                 'type' => 'local',
+                'paramsDeleted' => false,
+                'commentDeleted' => false,
+                'performerDeleted' => false,
             ],
             20180108132758 => [
                 'logId' => '210220',
@@ -169,6 +196,9 @@ class UserRightsTest extends TestAdapter
                 'removed' => [],
                 'grantType' => 'manual',
                 'type' => 'local',
+                'paramsDeleted' => false,
+                'commentDeleted' => false,
+                'performerDeleted' => false,
             ],
             20150716002614 => [
                 'logId' => '155321',
@@ -178,6 +208,9 @@ class UserRightsTest extends TestAdapter
                 'removed' => ['rollbacker'],
                 'grantType' => 'manual',
                 'type' => 'meta',
+                'paramsDeleted' => false,
+                'commentDeleted' => false,
+                'performerDeleted' => false,
             ],
             20141222034127 => [
                 'logId' => '140643',
@@ -187,7 +220,22 @@ class UserRightsTest extends TestAdapter
                 'removed' => [],
                 'grantType' => 'manual',
                 'type' => 'meta',
+                'paramsDeleted' => false,
+                'commentDeleted' => false,
+                'performerDeleted' => false,
             ],
+            20250310044508 => [
+                'logId' => '168397975',
+                'performer' => 'Queen of Hearts',
+                'comment' => null,
+                'added' => [],
+                'removed' => [],
+                'grantType' => 'manual',
+                'type' => 'local',
+                'paramsDeleted' => true,
+                'commentDeleted' => true,
+                'performerDeleted' => false,
+            ]
         ], $this->userRights->getRightsChanges());
 
         $this->userRightsRepo->expects(static::once())
@@ -200,6 +248,7 @@ class UserRightsTest extends TestAdapter
                 'log_action' => 'gblrights',
                 'performer' => 'Snowolf',
                 'type' => 'global',
+                'log_deleted' => '0',
             ]]);
 
         static::assertEquals([
@@ -211,6 +260,9 @@ class UserRightsTest extends TestAdapter
                 'removed' => [],
                 'grantType' => 'manual',
                 'type' => 'global',
+                'paramsDeleted' => false,
+                'commentDeleted' => false,
+                'performerDeleted' => false,
             ],
         ], $this->userRights->getGlobalRightsChanges());
 
