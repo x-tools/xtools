@@ -103,6 +103,10 @@ class EditCounterTest extends TestAdapter
                 // Account creation, sum 3
                 'newusers-create2' => 1,
                 'newusers-byemail' => 2,
+                // PageTriage reviews, sum 9
+                'pagetriage-curation-reviewed' => 2,
+                'pagetriage-curation-reviewed-article' => 3,
+                'pagetriage-curation-reviewed-redirect' => 4,
             ]);
         static::assertEquals(0, $this->editCounter->getLogCounts()['delete-delete']);
         static::assertEquals(0, $this->editCounter->countPagesDeleted());
@@ -125,6 +129,7 @@ class EditCounterTest extends TestAdapter
         static::assertEquals(3, $this->editCounter->countContentModelChanges());
         static::assertEquals(10, $this->editCounter->approvals());
         static::assertEquals(3, $this->editCounter->accountsCreated());
+        static::assertEquals(9, $this->editCounter->reviews());
     }
 
     /**
