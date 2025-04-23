@@ -340,7 +340,7 @@
                         {{ wiki.userLogLink(user, project, ec.approvals|num_format, 'review', 'accept') }}
                     </td>
                 </tr>
-                {% if project.databaseName == "enwiki" %}
+                {% if project.hasPageTriage %}
                     <tr>
                         <td>{{ msg('page-curation') }}</td>
                         <td>
